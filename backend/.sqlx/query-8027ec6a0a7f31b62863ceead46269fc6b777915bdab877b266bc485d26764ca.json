@@ -1,0 +1,38 @@
+{
+  "db_name": "SQLite",
+  "query": "\nINSERT INTO polling_station_investigations (\n  committee_session_id,\n  polling_station_id,\n  reason,\n  findings\n) VALUES (?,?,?,?)\nRETURNING\n  id as \"id: u32\",\n  polling_station_id as \"polling_station_id: u32\",\n  reason,\n  findings\n        ",
+  "describe": {
+    "columns": [
+      {
+        "name": "id: u32",
+        "ordinal": 0,
+        "type_info": "Integer"
+      },
+      {
+        "name": "polling_station_id: u32",
+        "ordinal": 1,
+        "type_info": "Integer"
+      },
+      {
+        "name": "reason",
+        "ordinal": 2,
+        "type_info": "Text"
+      },
+      {
+        "name": "findings",
+        "ordinal": 3,
+        "type_info": "Text"
+      }
+    ],
+    "parameters": {
+      "Right": 4
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "8027ec6a0a7f31b62863ceead46269fc6b777915bdab877b266bc485d26764ca"
+}

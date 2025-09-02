@@ -290,6 +290,7 @@ export type AuditEvent =
   | (CommitteeSessionDetails & { event_type: "CommitteeSessionCreated" })
   | (CommitteeSessionDetails & { event_type: "CommitteeSessionDeleted" })
   | (CommitteeSessionDetails & { event_type: "CommitteeSessionUpdated" })
+  | (PollingStationInvestigation & { event_type: "PollingStationInvestigationCreated" })
   | (ElectionDetails & { event_type: "ApportionmentCreated" })
   | (PollingStationDetails & { event_type: "PollingStationCreated" })
   | (PollingStationDetails & { event_type: "PollingStationUpdated" })
@@ -996,6 +997,13 @@ export interface PollingStationImportDetails {
   import_election_id: number;
   import_file_name: string;
   import_number_of_polling_stations: number;
+}
+
+export interface PollingStationInvestigation {
+  findings?: string;
+  id: number;
+  polling_station_id: number;
+  reason: string;
 }
 
 /**

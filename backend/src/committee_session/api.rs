@@ -10,6 +10,8 @@ use utoipa_axum::{router::OpenApiRouter, routes};
 use super::{
     CommitteeSession, CommitteeSessionCreateRequest, CommitteeSessionNumberOfVotersChangeRequest,
     CommitteeSessionStatusChangeRequest, CommitteeSessionUpdateRequest, NewCommitteeSessionRequest,
+    PollingStationInvestigation, PollingStationInvestigationCreateRequest,
+    repository::create_polling_station_investigation,
     status::{CommitteeSessionStatus, change_committee_session_status},
 };
 use crate::{
@@ -61,30 +63,29 @@ pub async fn committee_session_create(
     audit_service: AuditService,
     Json(request): Json<NewCommitteeSessionRequest>,
 ) -> Result<(StatusCode, CommitteeSession), APIError> {
-    let current_committee_session =
-        crate::committee_session::repository::get_election_committee_session(
-            &pool,
-            request.election_id,
-        )
-        .await?;
-    if current_committee_session.status == CommitteeSessionStatus::DataEntryFinished {
-        let next_committee_session = crate::committee_session::repository::create(&pool, {
+    let committee_session = crate::committee_session::repository::get_election_committee_session(
+        &pool,
+        request.election_id,
+    )
+    .await?;
+    if committee_session.status == CommitteeSessionStatus::DataEntryFinished {
+        let committee_session = crate::committee_session::repository::create(&pool, {
             CommitteeSessionCreateRequest {
                 election_id: request.election_id,
-                number: current_committee_session.number + 1,
-                number_of_voters: current_committee_session.number_of_voters,
+                number: committee_session.number + 1,
+                number_of_voters: committee_session.number_of_voters,
             }
         })
         .await?;
 
         audit_service
             .log(
-                &AuditEvent::CommitteeSessionCreated(next_committee_session.clone().into()),
+                &AuditEvent::CommitteeSessionCreated(committee_session.clone().into()),
                 None,
             )
             .await?;
 
-        Ok((StatusCode::CREATED, next_committee_session))
+        Ok((StatusCode::CREATED, committee_session))
     } else {
         Err(APIError::CommitteeSession(
             CommitteeSessionError::InvalidCommitteeSessionStatus,
@@ -258,6 +259,47 @@ pub async fn committee_session_status_change(
     .await?;
 
     Ok(StatusCode::OK)
+}
+
+/// Create an investigation for a certain polling station
+#[utoipa::path(
+    put,
+    path = "/api/committee_sessions/{committee_session_id}/investigations",
+    request_body = PollingStationInvestigationCreateRequest,
+    responses(
+        (status = 200, description = "Committee session investigation added successfully"),
+        (status = 401, description = "Unauthorized", body = ErrorResponse),
+        (status = 403, description = "Forbidden", body = ErrorResponse),
+        (status = 404, description = "Committee session not found", body = ErrorResponse),
+        (status = 409, description = "Request cannot be completed", body = ErrorResponse),
+        (status = 500, description = "Internal server error", body = ErrorResponse),
+    ),
+    params(
+        ("committee_session_id" = u32, description = "Committee session database id"),
+    ),
+)]
+pub async fn committee_session_investigation_create(
+    _user: Coordinator,
+    State(pool): State<SqlitePool>,
+    audit_service: AuditService,
+    Path(committee_session_id): Path<u32>,
+    Json(polling_station_investigation): Json<PollingStationInvestigationCreateRequest>,
+) -> Result<PollingStationInvestigation, APIError> {
+    let investigation = create_polling_station_investigation(
+        &pool,
+        committee_session_id,
+        polling_station_investigation,
+    )
+    .await?;
+
+    audit_service
+        .log(
+            &AuditEvent::PollingStationInvestigationCreated(investigation.clone()),
+            None,
+        )
+        .await?;
+
+    Ok(investigation)
 }
 
 #[cfg(test)]

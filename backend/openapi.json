@@ -3584,6 +3584,27 @@
           {
             "allOf": [
               {
+                "$ref": "#/components/schemas/PollingStationInvestigation"
+              },
+              {
+                "type": "object",
+                "required": [
+                  "event_type"
+                ],
+                "properties": {
+                  "event_type": {
+                    "type": "string",
+                    "enum": [
+                      "PollingStationInvestigationCreated"
+                    ]
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "allOf": [
+              {
                 "$ref": "#/components/schemas/ElectionDetails"
               },
               {
@@ -5840,6 +5861,33 @@
             "minimum": 0
           }
         }
+      },
+      "PollingStationInvestigation": {
+        "type": "object",
+        "required": [
+          "id",
+          "polling_station_id",
+          "reason"
+        ],
+        "properties": {
+          "findings": {
+            "type": "string"
+          },
+          "id": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "polling_station_id": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "reason": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
       },
       "PollingStationInvestigations": {
         "type": "object",

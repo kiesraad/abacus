@@ -82,3 +82,24 @@ pub struct CommitteeSessionNumberOfVotersChangeRequest {
 pub struct CommitteeSessionStatusChangeRequest {
     pub status: CommitteeSessionStatus,
 }
+
+#[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq, ToSchema, Type, FromRow)]
+#[serde(deny_unknown_fields)]
+pub struct PollingStationInvestigation {
+    pub id: u32,
+    pub polling_station_id: u32,
+    pub reason: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[schema(nullable = false)]
+    pub findings: Option<String>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq, ToSchema, Type, FromRow)]
+#[serde(deny_unknown_fields)]
+pub struct PollingStationInvestigationCreateRequest {
+    pub polling_station_id: u32,
+    pub reason: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[schema(nullable = false)]
+    pub findings: Option<String>,
+}

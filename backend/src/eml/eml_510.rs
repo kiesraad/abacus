@@ -9,7 +9,7 @@ use super::{
     },
 };
 use crate::{
-    data_entry::{PoliticalGroupCandidateVotes, CSOFirstSessionResults},
+    data_entry::{CSOFirstSessionResults, PoliticalGroupCandidateVotes},
     polling_station::PollingStation,
     summary::ElectionSummary,
 };

@@ -997,11 +997,15 @@ mod tests {
         request_body
             .data
             .as_cso_first_session_mut()
-            .map(|r| r.voters_counts.poll_card_count = 100);
+            .unwrap()
+            .voters_counts
+            .poll_card_count = 100;
         request_body
             .data
             .as_cso_first_session_mut()
-            .map(|r| r.voters_counts.proxy_certificate_count = 0);
+            .unwrap()
+            .voters_counts
+            .proxy_certificate_count = 0;
         let response = claim(pool.clone(), 1, EntryNumber::SecondEntry).await;
         assert_eq!(response.status(), StatusCode::OK);
         let response = save(
@@ -1335,7 +1339,9 @@ mod tests {
         request_body
             .data
             .as_cso_first_session_mut()
-            .map(|r| r.voters_counts.poll_card_count = 100); // incorrect value
+            .unwrap()
+            .voters_counts
+            .poll_card_count = 100; // incorrect value
 
         let response = claim(pool.clone(), 1, EntryNumber::FirstEntry).await;
         assert_eq!(response.status(), StatusCode::OK);

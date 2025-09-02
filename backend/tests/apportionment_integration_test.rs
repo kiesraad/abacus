@@ -17,8 +17,9 @@ use abacus::{
         ElectionApportionmentResponse, Fraction, get_total_seats_from_apportionment_result,
     },
     data_entry::{
-        CountingDifferencesPollingStation, DataEntry, PoliticalGroupTotalVotes,
-        CSOFirstSessionResults, VotersCounts, VotesCounts, YesNo, status::ClientState,
+        CSOFirstSessionResults, CountingDifferencesPollingStation, DataEntry,
+        PoliticalGroupTotalVotes, PollingStationResults, VotersCounts, VotesCounts, YesNo,
+        status::ClientState,
     },
 };
 
@@ -32,7 +33,7 @@ async fn test_election_apportionment_works_for_less_than_19_seats(pool: SqlitePo
 
     let data_entry = DataEntry {
         progress: 100,
-        data: CSOFirstSessionResults {
+        data: PollingStationResults::CSOFirstSession(CSOFirstSessionResults {
             extra_investigation: Default::default(),
             counting_differences_polling_station: CountingDifferencesPollingStation {
                 unexplained_difference_ballots_voters: YesNo::no(),
@@ -98,7 +99,7 @@ async fn test_election_apportionment_works_for_less_than_19_seats(pool: SqlitePo
                 political_group_votes_from_test_data_auto(7, &[20, 15, 5, 14]),
                 political_group_votes_from_test_data_auto(8, &[32, 15, 5]),
             ],
-        },
+        }),
         client_state: ClientState::new_from_str(None).unwrap(),
     };
     create_result_with_non_example_data_entry(&addr, 7, 4, data_entry).await;
@@ -128,7 +129,7 @@ async fn test_election_apportionment_works_for_19_or_more_seats(pool: SqlitePool
 
     let data_entry = DataEntry {
         progress: 100,
-        data: CSOFirstSessionResults {
+        data: PollingStationResults::CSOFirstSession(CSOFirstSessionResults {
             extra_investigation: Default::default(),
             counting_differences_polling_station: CountingDifferencesPollingStation {
                 unexplained_difference_ballots_voters: YesNo::no(),
@@ -180,7 +181,7 @@ async fn test_election_apportionment_works_for_19_or_more_seats(pool: SqlitePool
                 political_group_votes_from_test_data_auto(4, &[20, 15, 25, 24, 15]),
                 political_group_votes_from_test_data_auto(5, &[20, 31, 10, 40]),
             ],
-        },
+        }),
         client_state: ClientState::new_from_str(None).unwrap(),
     };
 
@@ -233,7 +234,7 @@ async fn test_election_apportionment_error_drawing_of_lots_not_implemented(pool:
     let coordinator_cookie = shared::coordinator_login(&addr).await;
     let data_entry = DataEntry {
         progress: 100,
-        data: CSOFirstSessionResults {
+        data: PollingStationResults::CSOFirstSession(CSOFirstSessionResults {
             extra_investigation: Default::default(),
             counting_differences_polling_station: CountingDifferencesPollingStation {
                 unexplained_difference_ballots_voters: YesNo::no(),
@@ -267,7 +268,7 @@ async fn test_election_apportionment_error_drawing_of_lots_not_implemented(pool:
                 political_group_votes_from_test_data_auto(1, &[30, 21]),
                 political_group_votes_from_test_data_auto(2, &[30, 21]),
             ],
-        },
+        }),
         client_state: ClientState::new_from_str(None).unwrap(),
     };
 

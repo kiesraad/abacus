@@ -5,9 +5,9 @@ use crate::data_entry::YesNo;
 use crate::{
     APIError,
     data_entry::{
-        CandidateVotes, Count, DifferencesCounts, PoliticalGroupCandidateVotes,
-        PoliticalGroupTotalVotes, CSOFirstSessionResults, Validate, ValidationResults, VotersCounts,
-        VotesCounts,
+        CSOFirstSessionResults, CandidateVotes, Count, DifferencesCounts,
+        PoliticalGroupCandidateVotes, PoliticalGroupTotalVotes, Validate, ValidationResults,
+        VotersCounts, VotesCounts,
     },
     election::ElectionWithPoliticalGroups,
     error::ErrorReference,

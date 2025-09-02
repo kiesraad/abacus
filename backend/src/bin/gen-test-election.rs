@@ -11,9 +11,10 @@ use abacus::{
     },
     create_sqlite_pool,
     data_entry::{
-        CandidateVotes, CountingDifferencesPollingStation, DifferencesCounts, ExtraInvestigation,
-        FieldPath, PoliticalGroupCandidateVotes, PoliticalGroupTotalVotes, CSOFirstSessionResults,
-        Validate, ValidationResults, VotersCounts, VotesCounts, YesNo,
+        CSOFirstSessionResults, CandidateVotes, CountingDifferencesPollingStation,
+        DifferencesCounts, ExtraInvestigation, FieldPath, PoliticalGroupCandidateVotes,
+        PoliticalGroupTotalVotes, PollingStationResults, Validate, ValidationResults, VotersCounts,
+        VotesCounts, YesNo,
         status::{DataEntryStatus, Definitive, SecondEntryNotStarted},
     },
     election::{
@@ -407,13 +408,14 @@ async fn generate_data_entry(
 
             let candidate_slope =
                 rng.random_range(args.candidate_distribution_slope.clone()) as f64 / 1000.0;
-            let results = generate_polling_station_results(
-                rng,
-                &election.political_groups,
-                voters_turned_out,
-                &group_weights,
-                candidate_slope,
-            );
+            let results =
+                PollingStationResults::CSOFirstSession(generate_cso_first_session_results(
+                    rng,
+                    &election.political_groups,
+                    voters_turned_out,
+                    &group_weights,
+                    candidate_slope,
+                ));
 
             // Validate the generated results to catch issues early
             let mut validation_results = ValidationResults::default();
@@ -470,7 +472,7 @@ async fn generate_data_entry(
     (generated_first_entries, generated_second_entries)
 }
 
-fn generate_polling_station_results(
+fn generate_cso_first_session_results(
     rng: &mut impl rand::Rng,
     political_groups: &[PoliticalGroup],
     number_of_votes: u32,

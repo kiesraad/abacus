@@ -1,6 +1,6 @@
 {
   "db_name": "SQLite",
-  "query": "\n        SELECT\n            r.polling_station_id AS \"polling_station_id: u32\",\n            r.committee_session_id AS \"committee_session_id: u32\",\n            r.data AS \"data: Json<PollingStationResults>\",\n            r.created_at as \"created_at: NaiveDateTime\"\n        FROM polling_station_results AS r\n        LEFT JOIN polling_stations AS p ON r.polling_station_id = p.id\n        WHERE p.election_id = $1\n        ",
+  "query": "\n        SELECT\n            r.polling_station_id AS \"polling_station_id: u32\",\n            r.committee_session_id AS \"committee_session_id: u32\",\n            r.data AS \"data: Json<CSOFirstSessionResults>\",\n            r.created_at as \"created_at: NaiveDateTime\"\n        FROM polling_station_results AS r\n        LEFT JOIN polling_stations AS p ON r.polling_station_id = p.id\n        WHERE p.election_id = $1\n        ",
   "describe": {
     "columns": [
       {
@@ -14,7 +14,7 @@
         "type_info": "Integer"
       },
       {
-        "name": "data: Json<PollingStationResults>",
+        "name": "data: Json<CSOFirstSessionResults>",
         "ordinal": 2,
         "type_info": "Text"
       },
@@ -34,5 +34,5 @@
       false
     ]
   },
-  "hash": "70eb1c349f7c5929e26d982d353d72681d527cee27a52f04cbaf354e7022c0f3"
+  "hash": "b2b57ba24616d5c96eccfddf676edc50b47acf0501eba8655d2b2c9bdb0bc976"
 }

@@ -936,8 +936,10 @@ export interface PoliticalGroupTotalVotes {
  */
 export interface PollingStation {
   address: string;
+  committee_session_id: number;
   election_id: number;
   id: number;
+  id_prev_session?: number;
   locality: string;
   name: string;
   number: number;
@@ -948,12 +950,14 @@ export interface PollingStation {
 
 export interface PollingStationDetails {
   polling_station_address: string;
+  polling_station_committee_session_id: number;
   polling_station_election_id: number;
   polling_station_id: number;
+  polling_station_id_prev_session?: number;
   polling_station_locality: string;
   polling_station_name: string;
   polling_station_number: number;
-  polling_station_number_of_voters?: number | null;
+  polling_station_number_of_voters?: number;
   polling_station_postal_code: string;
   polling_station_type?: string;
 }

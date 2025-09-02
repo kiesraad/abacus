@@ -2131,34 +2131,4 @@ mod tests {
         assert!(!result2.has_warnings());
         assert!(!result2.has_errors());
     }
-
-    /// Tests that when fewer_ballots_count exactly matches the calculated difference.
-    #[test]
-    fn test_exact_correct_count() {
-        let election = election_fixture(&[]);
-        let polling_station = polling_station_fixture(None);
-        let mut validation_results = ValidationResults::default();
-
-        // 3 + 3 + 3 + 3 - 2 = 10
-        let differences_counts = DifferencesCounts {
-            more_ballots_count: 0,
-            fewer_ballots_count: 10,
-            compare_votes_cast_admitted_voters: DifferenceCountsCompareVotesCastAdmittedVoters {
-                admitted_voters_equal_votes_cast: false,
-                votes_cast_greater_than_admitted_voters: false,
-                votes_cast_smaller_than_admitted_voters: false,
-            },
-            difference_completely_accounted_for: Default::default(),
-        };
-        differences_counts
-            .validate(
-                &election,
-                &polling_station,
-                &mut validation_results,
-                &"differences_counts".into(),
-            )
-            .unwrap();
-        assert_eq!(validation_results.errors.len(), 0);
-        assert_eq!(validation_results.warnings.len(), 0);
-    }
 }

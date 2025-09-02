@@ -12,7 +12,7 @@ use abacus::{
     create_sqlite_pool,
     data_entry::{
         CandidateVotes, CountingDifferencesPollingStation, DifferencesCounts, ExtraInvestigation,
-        FieldPath, PoliticalGroupCandidateVotes, PoliticalGroupTotalVotes, PollingStationResults,
+        FieldPath, PoliticalGroupCandidateVotes, PoliticalGroupTotalVotes, CSOFirstSessionResults,
         Validate, ValidationResults, VotersCounts, VotesCounts, YesNo,
         status::{DataEntryStatus, Definitive, SecondEntryNotStarted},
     },
@@ -476,7 +476,7 @@ fn generate_polling_station_results(
     number_of_votes: u32,
     group_weights: &[f64],
     candidate_distribution_slope: f64,
-) -> PollingStationResults {
+) -> CSOFirstSessionResults {
     // generate a small percentage of blank votes
     #[allow(clippy::cast_possible_truncation)]
     let blank_votes = (number_of_votes as f64 * rng.random_range(0.0..0.02)) as u32;
@@ -532,7 +532,7 @@ fn generate_polling_station_results(
         .1
         .clone();
 
-    PollingStationResults {
+    CSOFirstSessionResults {
         extra_investigation,
         counting_differences_polling_station: CountingDifferencesPollingStation {
             // 90% chance of "no", 10% chance of "yes" for each field
@@ -675,7 +675,7 @@ async fn export_election(
     election: &ElectionWithPoliticalGroups,
     polling_stations: &[PollingStation],
     export_results_json: bool,
-    results: Vec<(PollingStation, PollingStationResults)>,
+    results: Vec<(PollingStation, CSOFirstSessionResults)>,
 ) {
     if export_dir.exists() && !export_dir.is_dir() {
         panic!("Export directory already exists and is not a directory");

@@ -1,8 +1,10 @@
+use crate::data_entry::PollingStationResults;
+
 use super::{
-    CandidateVotes, Count, CountingDifferencesPollingStation,
+    CSOFirstSessionResults, CandidateVotes, Count, CountingDifferencesPollingStation,
     DifferenceCountsCompareVotesCastAdmittedVoters, DifferencesCounts, ExtraInvestigation,
-    FieldPath, PoliticalGroupCandidateVotes, PoliticalGroupTotalVotes, PollingStationResults,
-    VotersCounts, VotesCounts, YesNo,
+    FieldPath, PoliticalGroupCandidateVotes, PoliticalGroupTotalVotes, VotersCounts, VotesCounts,
+    YesNo,
 };
 
 pub trait Compare {
@@ -10,6 +12,22 @@ pub trait Compare {
 }
 
 impl Compare for PollingStationResults {
+    fn compare(&self, first_entry: &Self, different_fields: &mut Vec<String>, path: &FieldPath) {
+        match (self, first_entry) {
+            (
+                PollingStationResults::CSOFirstSession(s),
+                PollingStationResults::CSOFirstSession(f),
+            ) => s.compare(f, different_fields, &path.field("cso_first_session")),
+            // TODO: remove this allow once we have more variants in the enum
+            #[allow(unreachable_patterns)]
+            _ => {
+                different_fields.push(path.to_string());
+            }
+        }
+    }
+}
+
+impl Compare for CSOFirstSessionResults {
     fn compare(&self, first_entry: &Self, different_fields: &mut Vec<String>, path: &FieldPath) {
         self.extra_investigation.compare(
             &first_entry.extra_investigation,
@@ -273,7 +291,7 @@ mod tests {
     #[test]
     fn test_equal_no_differences_counts() {
         let mut different_fields: Vec<String> = vec![];
-        let first_entry = PollingStationResults {
+        let first_entry = CSOFirstSessionResults {
             extra_investigation: Default::default(),
             counting_differences_polling_station: Default::default(),
             voters_counts: VotersCounts {
@@ -310,7 +328,7 @@ mod tests {
     #[test]
     fn test_equal_with_differences_counts() {
         let mut different_fields: Vec<String> = vec![];
-        let first_entry = PollingStationResults {
+        let first_entry = CSOFirstSessionResults {
             extra_investigation: Default::default(),
             counting_differences_polling_station: Default::default(),
             voters_counts: VotersCounts {
@@ -357,7 +375,7 @@ mod tests {
     #[test]
     fn test_equal_no_differences_counts_variant() {
         let mut different_fields = vec![];
-        let first_entry = PollingStationResults {
+        let first_entry = CSOFirstSessionResults {
             extra_investigation: Default::default(),
             counting_differences_polling_station: Default::default(),
             voters_counts: VotersCounts {
@@ -394,7 +412,7 @@ mod tests {
     #[test]
     fn test_equal_with_differences_counts_variant() {
         let mut different_fields = vec![];
-        let first_entry = PollingStationResults {
+        let first_entry = CSOFirstSessionResults {
             extra_investigation: Default::default(),
             counting_differences_polling_station: Default::default(),
             voters_counts: VotersCounts {
@@ -441,7 +459,7 @@ mod tests {
     #[test]
     fn test_not_equal_voters_counts_differences() {
         let mut different_fields: Vec<String> = vec![];
-        let first_entry = PollingStationResults {
+        let first_entry = CSOFirstSessionResults {
             extra_investigation: Default::default(),
             counting_differences_polling_station: Default::default(),
             voters_counts: VotersCounts {
@@ -488,7 +506,7 @@ mod tests {
     #[test]
     fn test_not_equal_differences_counts_differences() {
         let mut different_fields: Vec<String> = vec![];
-        let first_entry = PollingStationResults {
+        let first_entry = CSOFirstSessionResults {
             extra_investigation: Default::default(),
             counting_differences_polling_station: Default::default(),
             voters_counts: VotersCounts {
@@ -557,7 +575,7 @@ mod tests {
     #[test]
     fn test_not_equal_voters_counts_and_votes_counts_differences() {
         let mut different_fields = vec![];
-        let first_entry = PollingStationResults {
+        let first_entry = CSOFirstSessionResults {
             extra_investigation: Default::default(),
             counting_differences_polling_station: Default::default(),
             voters_counts: VotersCounts {
@@ -641,7 +659,7 @@ mod tests {
     #[test]
     fn test_not_equal_political_group_votes_differences() {
         let mut different_fields = vec![];
-        let first_entry = PollingStationResults {
+        let first_entry = CSOFirstSessionResults {
             extra_investigation: Default::default(),
             counting_differences_polling_station: Default::default(),
             voters_counts: VotersCounts {

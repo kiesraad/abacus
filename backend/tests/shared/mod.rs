@@ -10,7 +10,7 @@ use abacus::{
     data_entry::{
         CandidateVotes, Count, CountingDifferencesPollingStation, DataEntry, DifferencesCounts,
         ElectionStatusResponse, PoliticalGroupCandidateVotes, PoliticalGroupTotalVotes,
-        PollingStationResults, VotersCounts, VotesCounts, YesNo,
+        CSOFirstSessionResults, VotersCounts, VotesCounts, YesNo,
         status::{ClientState, DataEntryStatusName},
     },
     election::{CandidateNumber, ElectionDetailsResponse, PGNumber},
@@ -55,7 +55,7 @@ pub fn political_group_votes_from_test_data_auto(
 pub fn example_data_entry(client_state: Option<&str>) -> DataEntry {
     DataEntry {
         progress: 60,
-        data: PollingStationResults {
+        data: CSOFirstSessionResults {
             extra_investigation: Default::default(),
             counting_differences_polling_station: CountingDifferencesPollingStation {
                 difference_ballots_per_list: YesNo::no(),

@@ -4,14 +4,13 @@ use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
 
 use super::{
-    CandidateVotes, Count, CountingDifferencesPollingStation, DifferencesCounts,
-    ExtraInvestigation, PoliticalGroupCandidateVotes, PollingStationResults, VotersCounts,
-    VotesCounts,
+    CSOFirstSessionResults, CandidateVotes, Count, CountingDifferencesPollingStation,
+    DifferencesCounts, ExtraInvestigation, PoliticalGroupCandidateVotes, VotersCounts, VotesCounts,
     comparison::Compare,
     status::{DataEntryStatus, FirstEntryInProgress},
 };
 use crate::{
-    data_entry::{PoliticalGroupTotalVotes, status::FirstEntryHasErrors},
+    data_entry::{PoliticalGroupTotalVotes, PollingStationResults, status::FirstEntryHasErrors},
     election::ElectionWithPoliticalGroups,
     polling_station::PollingStation,
 };
@@ -269,6 +268,22 @@ impl Validate for DataEntryStatus {
 }
 
 impl Validate for PollingStationResults {
+    fn validate(
+        &self,
+        election: &ElectionWithPoliticalGroups,
+        polling_station: &PollingStation,
+        validation_results: &mut ValidationResults,
+        path: &FieldPath,
+    ) -> Result<(), DataError> {
+        match self {
+            PollingStationResults::CSOFirstSession(results) => {
+                results.validate(election, polling_station, validation_results, path)
+            }
+        }
+    }
+}
+
+impl Validate for CSOFirstSessionResults {
     fn validate(
         &self,
         election: &ElectionWithPoliticalGroups,
@@ -1490,7 +1505,7 @@ mod tests {
     #[test]
     fn test_default_values() {
         let mut validation_results = ValidationResults::default();
-        let polling_station_results = PollingStationResults {
+        let polling_station_results = CSOFirstSessionResults {
             extra_investigation: ValidDefault::valid_default(),
             counting_differences_polling_station: ValidDefault::valid_default(),
             voters_counts: Default::default(),
@@ -1534,7 +1549,7 @@ mod tests {
     #[test]
     fn test_incorrect_total_and_difference() {
         let mut validation_results = ValidationResults::default();
-        let polling_station_results = PollingStationResults {
+        let polling_station_results = CSOFirstSessionResults {
             extra_investigation: ValidDefault::valid_default(),
             counting_differences_polling_station: ValidDefault::valid_default(),
             voters_counts: VotersCounts {
@@ -1605,7 +1620,7 @@ mod tests {
 
         // test F.303 incorrect difference & F.304 should be empty
         validation_results = ValidationResults::default();
-        let polling_station_results = PollingStationResults {
+        let polling_station_results = CSOFirstSessionResults {
             extra_investigation: ValidDefault::valid_default(),
             counting_differences_polling_station: ValidDefault::valid_default(),
             voters_counts: VotersCounts {
@@ -1671,7 +1686,7 @@ mod tests {
 
         // test F.301 incorrect difference, F.302 should be empty & W.203 above threshold in percentage
         validation_results = ValidationResults::default();
-        let polling_station_results = PollingStationResults {
+        let polling_station_results = CSOFirstSessionResults {
             extra_investigation: ValidDefault::valid_default(),
             counting_differences_polling_station: ValidDefault::valid_default(),
             voters_counts: VotersCounts {
@@ -1742,7 +1757,7 @@ mod tests {
 
         // test F.303 incorrect difference, F.304 should be empty & W.203 above threshold in absolute numbers
         validation_results = ValidationResults::default();
-        let polling_station_results = PollingStationResults {
+        let polling_station_results = CSOFirstSessionResults {
             extra_investigation: ValidDefault::valid_default(),
             counting_differences_polling_station: ValidDefault::valid_default(),
             voters_counts: VotersCounts {
@@ -1819,7 +1834,7 @@ mod tests {
     /// and the difference between voters counts and votes counts is >2% (W.203).
     #[test]
     fn test_differences() {
-        let polling_station_results = PollingStationResults {
+        let polling_station_results = CSOFirstSessionResults {
             extra_investigation: ValidDefault::valid_default(),
             counting_differences_polling_station: ValidDefault::valid_default(),
             voters_counts: VotersCounts {
@@ -1890,7 +1905,7 @@ mod tests {
     /// Tests validation when no differences are expected (F.305)
     #[test]
     fn test_no_differences_expected() {
-        let polling_station_results = PollingStationResults {
+        let polling_station_results = CSOFirstSessionResults {
             extra_investigation: ValidDefault::valid_default(),
             counting_differences_polling_station: ValidDefault::valid_default(),
             voters_counts: VotersCounts {
@@ -1950,7 +1965,7 @@ mod tests {
     /// Tests validation when no differences are expected (F.305)
     #[test]
     fn test_no_differences_expected_and_incorrect_total() {
-        let polling_station_results = PollingStationResults {
+        let polling_station_results = CSOFirstSessionResults {
             extra_investigation: ValidDefault::valid_default(),
             counting_differences_polling_station: ValidDefault::valid_default(),
             voters_counts: VotersCounts {

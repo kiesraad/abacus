@@ -1,10 +1,10 @@
 use chrono::NaiveDateTime;
 use sqlx::{query, query_as, types::Json};
 
-use super::{PollingStationDataEntry, PollingStationResults, status::DataEntryStatus};
+use super::{CSOFirstSessionResults, PollingStationDataEntry, status::DataEntryStatus};
 use crate::{
     DbConnLike,
-    data_entry::{ElectionStatusResponseEntry, PollingStationResultsEntry},
+    data_entry::{ElectionStatusResponseEntry, PollingStationResults, PollingStationResultsEntry},
     polling_station::PollingStation,
 };
 
@@ -185,7 +185,7 @@ pub async fn list_entries(
         SELECT
             r.polling_station_id AS "polling_station_id: u32",
             r.committee_session_id AS "committee_session_id: u32",
-            r.data AS "data: Json<PollingStationResults>",
+            r.data AS "data: Json<CSOFirstSessionResults>",
             r.created_at as "created_at: NaiveDateTime"
         FROM polling_station_results AS r
         LEFT JOIN polling_stations AS p ON r.polling_station_id = p.id
@@ -209,7 +209,7 @@ pub async fn list_entries(
 pub async fn list_entries_with_polling_stations(
     conn: impl DbConnLike<'_>,
     election_id: u32,
-) -> Result<Vec<(PollingStation, PollingStationResults)>, sqlx::Error> {
+) -> Result<Vec<(PollingStation, CSOFirstSessionResults)>, sqlx::Error> {
     let mut conn = conn.acquire().await?;
     // first get the list of results and polling stations related to an election
     let list = list_entries(&mut *conn, election_id).await?;

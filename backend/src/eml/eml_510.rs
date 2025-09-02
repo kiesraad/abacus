@@ -9,7 +9,7 @@ use super::{
     },
 };
 use crate::{
-    data_entry::{PoliticalGroupCandidateVotes, PollingStationResults},
+    data_entry::{PoliticalGroupCandidateVotes, CSOFirstSessionResults},
     polling_station::PollingStation,
     summary::ElectionSummary,
 };
@@ -32,7 +32,7 @@ pub struct EML510 {
 impl EML510 {
     pub fn from_results(
         election: &crate::election::ElectionWithPoliticalGroups,
-        results: &[(PollingStation, PollingStationResults)],
+        results: &[(PollingStation, CSOFirstSessionResults)],
         summary: &ElectionSummary,
         creation_date_time: &chrono::DateTime<chrono::Local>,
     ) -> EML510 {
@@ -210,7 +210,7 @@ impl ReportingUnitVotes {
         election: &crate::election::ElectionWithPoliticalGroups,
         authority_id: &str,
         polling_station: &PollingStation,
-        results: &PollingStationResults,
+        results: &CSOFirstSessionResults,
     ) -> ReportingUnitVotes {
         ReportingUnitVotes {
             reporting_unit_identifier: ReportingUnitIdentifier {

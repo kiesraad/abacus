@@ -43,11 +43,40 @@ impl From<PollingStationDataEntry> for DataEntryDetails {
 pub struct PollingStationResultsEntry {
     pub polling_station_id: u32,
     pub committee_session_id: u32,
-    pub data: PollingStationResults,
+    pub data: CSOFirstSessionResults,
     pub created_at: DateTime<Utc>,
 }
 
-/// PollingStationResults, following the fields in Model Na 31-2 Bijlage 2.
+/// PollingStationResults contains the results for a polling station.
+///
+/// The exact type of results depends on the election counting method and
+/// whether this is the first or any subsequent data entry session. Based on
+/// this and of four different models can apply
+#[derive(Serialize, Deserialize, ToSchema, Clone, Debug, PartialEq, Eq, Hash)]
+#[serde(tag = "session")]
+pub enum PollingStationResults {
+    /// Results for centrally counted (CSO) elections, first election committee session.
+    /// This contains the data entry values from Model Na 31-2 Bijlage 2.
+    CSOFirstSession(CSOFirstSessionResults),
+}
+
+impl PollingStationResults {
+    /// Get a reference to the inner CSOFirstSessionResults, if this is of that type.
+    pub fn as_cso_first_session(&self) -> Option<&CSOFirstSessionResults> {
+        match self {
+            PollingStationResults::CSOFirstSession(results) => Some(results),
+        }
+    }
+
+    /// Get a mutable reference to the inner CSOFirstSessionResults, if this is of that type.
+    pub fn as_cso_first_session_mut(&mut self) -> Option<&mut CSOFirstSessionResults> {
+        match self {
+            PollingStationResults::CSOFirstSession(results) => Some(results),
+        }
+    }
+}
+
+/// CSOFirstSessionResults, following the fields in Model Na 31-2 Bijlage 2.
 ///
 /// See "Model Na 31-2. Proces-verbaal van een gemeentelijk stembureau/stembureau voor het openbaar
 /// lichaam in een gemeente/openbaar lichaam waar een centrale stemopneming wordt verricht,
@@ -56,7 +85,7 @@ pub struct PollingStationResultsEntry {
 /// [Verkiezingstoolbox](https://www.rijksoverheid.nl/onderwerpen/verkiezingen/verkiezingentoolkit/modellen).
 #[derive(Serialize, Deserialize, ToSchema, Clone, Debug, PartialEq, Eq, Hash)]
 #[serde(deny_unknown_fields)]
-pub struct PollingStationResults {
+pub struct CSOFirstSessionResults {
     /// Extra investigation ("B1-1 Extra onderzoek")
     pub extra_investigation: ExtraInvestigation,
     /// Counting Differences Polling Station ("B1-2 Verschillen met telresultaten van het stembureau")
@@ -71,7 +100,7 @@ pub struct PollingStationResults {
     pub political_group_votes: Vec<PoliticalGroupCandidateVotes>,
 }
 
-impl PollingStationResults {
+impl CSOFirstSessionResults {
     /// Create a default value for `political_group_votes` (type `Vec<PoliticalGroup>`)
     /// for the given political groups, with all votes set to 0.
     pub fn default_political_group_votes(

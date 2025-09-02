@@ -10,7 +10,7 @@ use crate::{
     APIError, AppState, ErrorResponse,
     authentication::Coordinator,
     committee_session::{CommitteeSession, CommitteeSessionError, status::CommitteeSessionStatus},
-    data_entry::PollingStationResults,
+    data_entry::CSOFirstSessionResults,
     election::ElectionWithPoliticalGroups,
     eml::{EML510, EMLDocument, EmlHash, axum::Eml},
     pdf_gen::{
@@ -33,7 +33,7 @@ struct ResultsInput {
     committee_session: CommitteeSession,
     election: ElectionWithPoliticalGroups,
     polling_stations: Vec<PollingStation>,
-    results: Vec<(PollingStation, PollingStationResults)>,
+    results: Vec<(PollingStation, CSOFirstSessionResults)>,
     summary: ElectionSummary,
     creation_date_time: chrono::DateTime<chrono::Local>,
 }

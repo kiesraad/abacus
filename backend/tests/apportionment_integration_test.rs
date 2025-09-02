@@ -18,7 +18,7 @@ use abacus::{
     },
     data_entry::{
         CountingDifferencesPollingStation, DataEntry, PoliticalGroupTotalVotes,
-        PollingStationResults, VotersCounts, VotesCounts, YesNo, status::ClientState,
+        CSOFirstSessionResults, VotersCounts, VotesCounts, YesNo, status::ClientState,
     },
 };
 
@@ -32,7 +32,7 @@ async fn test_election_apportionment_works_for_less_than_19_seats(pool: SqlitePo
 
     let data_entry = DataEntry {
         progress: 100,
-        data: PollingStationResults {
+        data: CSOFirstSessionResults {
             extra_investigation: Default::default(),
             counting_differences_polling_station: CountingDifferencesPollingStation {
                 unexplained_difference_ballots_voters: YesNo::no(),
@@ -128,7 +128,7 @@ async fn test_election_apportionment_works_for_19_or_more_seats(pool: SqlitePool
 
     let data_entry = DataEntry {
         progress: 100,
-        data: PollingStationResults {
+        data: CSOFirstSessionResults {
             extra_investigation: Default::default(),
             counting_differences_polling_station: CountingDifferencesPollingStation {
                 unexplained_difference_ballots_voters: YesNo::no(),
@@ -233,7 +233,7 @@ async fn test_election_apportionment_error_drawing_of_lots_not_implemented(pool:
     let coordinator_cookie = shared::coordinator_login(&addr).await;
     let data_entry = DataEntry {
         progress: 100,
-        data: PollingStationResults {
+        data: CSOFirstSessionResults {
             extra_investigation: Default::default(),
             counting_differences_polling_station: CountingDifferencesPollingStation {
                 unexplained_difference_ballots_voters: YesNo::no(),

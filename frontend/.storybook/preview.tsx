@@ -1,6 +1,7 @@
 import { StaticRouter } from "react-router";
 
 import type { Preview } from "@storybook/react-vite";
+import { configure } from "storybook/test";
 
 import { ApiResponseStatus } from "@/api/ApiResult";
 import { ElectionProviderContext } from "@/hooks/election/ElectionProviderContext";
@@ -13,6 +14,11 @@ import { TestUserProvider } from "@/testing/TestUserProvider";
 import { ElectionDetailsResponse, ElectionWithPoliticalGroups, PollingStation, Role } from "@/types/generated/openapi";
 
 const preview: Preview = {
+  beforeAll: () => {
+    configure({
+      testIdAttribute: "id",
+    });
+  },
   parameters: {
     controls: {
       matchers: {

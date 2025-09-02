@@ -2,6 +2,7 @@ use sqlx::{Error, query, query_as};
 
 use super::{
     CommitteeSession, CommitteeSessionCreateRequest, CommitteeSessionUpdateRequest,
+    PollingStationInvestigation, PollingStationInvestigationCreateRequest,
     status::CommitteeSessionStatus,
 };
 
@@ -118,6 +119,35 @@ pub async fn get_committee_session_for_each_election(
         "#,
     )
     .fetch_all(conn)
+    .await
+}
+
+pub async fn create_polling_station_investigation(
+    conn: impl DbConnLike<'_>,
+    committee_session_id: u32,
+    polling_station_investigation: PollingStationInvestigationCreateRequest,
+) -> Result<PollingStationInvestigation, Error> {
+    query_as!(
+        PollingStationInvestigation,
+        r#"
+INSERT INTO polling_station_investigations (
+  committee_session_id,
+  polling_station_id,
+  reason,
+  findings
+) VALUES (?,?,?,?)
+RETURNING
+  id as "id: u32",
+  polling_station_id as "polling_station_id: u32",
+  reason,
+  findings
+        "#,
+        committee_session_id,
+        polling_station_investigation.polling_station_id,
+        polling_station_investigation.reason,
+        polling_station_investigation.findings,
+    )
+    .fetch_one(conn)
     .await
 }
 

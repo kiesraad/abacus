@@ -7,12 +7,16 @@ import { FormLayout } from "@/components/ui/Form/FormLayout";
 import { InputField } from "@/components/ui/InputField/InputField";
 import { t } from "@/i18n/translate";
 import { StringFormData } from "@/utils/stringFormData";
+import { useCrud } from "@/api/useCrud";
+import { PollingStationInvestigation } from "@/types/generated/openapi";
 
 export function InvestigationReason() {
   const navigate = useNavigate();
   const [nonEmptyError, setNonEmptyError] = useState(false);
+  const path: COMMITTEE_SESSION_INVESTIGATION_CREATE = `/api/committee_sessions/{committee_session_id}/investigations`;
+  const { update } = useCrud<PollingStationInvestigation>({ update: path });
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
     const formData = new StringFormData(event.currentTarget);
@@ -25,9 +29,11 @@ export function InvestigationReason() {
 
     setNonEmptyError(false);
 
+    console.log(formData);
     // TODO: Handle form submission
+    const response = await update({ polling_station_id, reason, });
 
-    void navigate("../print-corrigendum");
+    //void navigate("../print-corrigendum");
   };
 
   return (

@@ -49,8 +49,11 @@ impl ResultsInput {
             .await?;
         let polling_stations = crate::polling_station::repository::list(&pool, election.id).await?;
         let results =
-            crate::data_entry::repository::list_entries_with_polling_stations(&pool, election.id)
-                .await?;
+            crate::data_entry::repository::list_entries_with_polling_stations_first_session(
+                &pool,
+                election.id,
+            )
+            .await?;
 
         Ok(ResultsInput {
             committee_session,

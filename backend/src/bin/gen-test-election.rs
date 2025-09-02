@@ -209,9 +209,12 @@ async fn main() -> Result<(), Box<dyn Error>> {
 
     if let Some(export_dir) = args.export_definition {
         let results = if data_entry_completed {
-            abacus::data_entry::repository::list_entries_with_polling_stations(&pool, election.id)
-                .await
-                .expect("Could not load results")
+            abacus::data_entry::repository::list_entries_with_polling_stations_first_session(
+                &pool,
+                election.id,
+            )
+            .await
+            .expect("Could not load results")
         } else {
             vec![]
         };

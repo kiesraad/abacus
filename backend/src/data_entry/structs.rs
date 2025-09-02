@@ -43,7 +43,7 @@ impl From<PollingStationDataEntry> for DataEntryDetails {
 pub struct PollingStationResultsEntry {
     pub polling_station_id: u32,
     pub committee_session_id: u32,
-    pub data: CSOFirstSessionResults,
+    pub data: PollingStationResults,
     pub created_at: DateTime<Utc>,
 }
 
@@ -70,6 +70,13 @@ impl PollingStationResults {
 
     /// Get a mutable reference to the inner CSOFirstSessionResults, if this is of that type.
     pub fn as_cso_first_session_mut(&mut self) -> Option<&mut CSOFirstSessionResults> {
+        match self {
+            PollingStationResults::CSOFirstSession(results) => Some(results),
+        }
+    }
+
+    /// Consume self and return the inner CSOFirstSessionResults, if this is of that type.
+    pub fn into_cso_first_session(self) -> Option<CSOFirstSessionResults> {
         match self {
             PollingStationResults::CSOFirstSession(results) => Some(results),
         }

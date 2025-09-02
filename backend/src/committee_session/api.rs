@@ -305,6 +305,8 @@ pub mod tests {
             start_time: "09:15".to_string(),
             status: CommitteeSessionStatus::DataEntryFinished,
             number_of_voters: 100,
+            results_eml: None,
+            results_pdf: None,
         }
     }
 }

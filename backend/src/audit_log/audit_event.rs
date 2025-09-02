@@ -66,6 +66,12 @@ pub struct CommitteeSessionDetails {
     pub session_start_time: String,
     pub session_status: String,
     pub session_number_of_voters: u32,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[schema(nullable = false)]
+    pub session_results_eml: Option<u32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[schema(nullable = false)]
+    pub session_results_pdf: Option<u32>,
 }
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, Eq, ToSchema)]

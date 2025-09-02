@@ -4211,6 +4211,16 @@
             "format": "int32",
             "minimum": 0
           },
+          "results_eml": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "results_pdf": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
           "start_date": {
             "type": "string"
           },
@@ -4255,6 +4265,16 @@
             "minimum": 0
           },
           "session_number_of_voters": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "session_results_eml": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "session_results_pdf": {
             "type": "integer",
             "format": "int32",
             "minimum": 0

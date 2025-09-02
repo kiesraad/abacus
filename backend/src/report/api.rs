@@ -1,5 +1,6 @@
 use axum::{
     extract::{Path, State},
+    http::{HeaderValue, header},
     response::IntoResponse,
 };
 use axum_extra::response::Attachment;
@@ -12,7 +13,8 @@ use crate::{
     committee_session::{CommitteeSession, CommitteeSessionError, status::CommitteeSessionStatus},
     data_entry::PollingStationResults,
     election::ElectionWithPoliticalGroups,
-    eml::{EML510, EMLDocument, EmlHash, axum::Eml},
+    eml::{EML510, EMLDocument, EmlHash},
+    files::repository::{create_file, get_file},
     pdf_gen::{
         generate_pdf,
         models::{ModelNa31_2Input, PdfFileModel, ToPdfFileModel},
@@ -251,7 +253,7 @@ async fn election_download_xml_results(
     _user: Coordinator,
     State(pool): State<SqlitePool>,
     Path(election_id): Path<u32>,
-) -> Result<Eml<EML510>, APIError> {
+) -> Result<impl IntoResponse, APIError> {
     let committee_session =
         crate::committee_session::repository::get_election_committee_session(&pool, election_id)
             .await?;
@@ -261,7 +263,26 @@ async fn election_download_xml_results(
         ));
     }
 
-    let input = ResultsInput::new(election_id, pool).await?;
-    let xml = input.as_xml();
-    Ok(Eml(xml))
+    let file;
+    let mime_type = "text/xml";
+    if let Some(eml_id) = committee_session.results_eml {
+        file = get_file(&pool, eml_id).await?;
+    } else {
+        let input = ResultsInput::new(election_id, pool.clone()).await?;
+        let xml = input.as_xml();
+        let xml_string = xml.to_xml_string()?;
+        file = create_file(
+            &pool,
+            xml_string.as_bytes(),
+            input.xml_filename(),
+            mime_type.to_string(),
+        )
+        .await?;
+        // TODO: add update function in committee session repo
+        //committee_session.results_eml = Some(file.id);
+    }
+    Ok((
+        [(header::CONTENT_TYPE, HeaderValue::from_static(mime_type))],
+        file.data,
+    ))
 }

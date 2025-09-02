@@ -35,6 +35,7 @@ pub mod document;
 pub mod election;
 pub mod eml;
 mod error;
+pub mod files;
 #[cfg(feature = "dev-database")]
 pub mod fixtures;
 pub mod pdf_gen;

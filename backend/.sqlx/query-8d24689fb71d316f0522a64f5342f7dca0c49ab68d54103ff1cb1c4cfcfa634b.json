@@ -1,6 +1,6 @@
 {
   "db_name": "SQLite",
-  "query": "\n        SELECT\n            id as \"id: u32\",\n            number as \"number: u32\",\n            election_id as \"election_id: u32\",\n            status as \"status: _\",\n            location,\n            start_date,\n            start_time,\n            number_of_voters as \"number_of_voters: u32\"\n        FROM (\n            SELECT\n            id,\n            number,\n            election_id,\n            status,\n            location,\n            start_date,\n            start_time,\n            number_of_voters,\n            row_number() over (\n            PARTITION BY election_id\n            ORDER BY number DESC\n            ) AS row_number FROM committee_sessions\n        ) t WHERE t.row_number = 1\n        ",
+  "query": "\n        SELECT\n            id as \"id: u32\",\n            number as \"number: u32\",\n            election_id as \"election_id: u32\",\n            status as \"status: _\",\n            location,\n            start_date,\n            start_time,\n            number_of_voters as \"number_of_voters: u32\",\n            results_eml as \"results_eml: _\",\n            results_pdf as \"results_pdf: _\"\n        FROM committee_sessions\n        WHERE election_id = ?\n        ORDER BY number DESC\n        LIMIT 1\n        ",
   "describe": {
     "columns": [
       {
@@ -42,10 +42,20 @@
         "name": "number_of_voters: u32",
         "ordinal": 7,
         "type_info": "Integer"
+      },
+      {
+        "name": "results_eml: _",
+        "ordinal": 8,
+        "type_info": "Integer"
+      },
+      {
+        "name": "results_pdf: _",
+        "ordinal": 9,
+        "type_info": "Integer"
       }
     ],
     "parameters": {
-      "Right": 0
+      "Right": 1
     },
     "nullable": [
       false,
@@ -55,8 +65,10 @@
       false,
       false,
       false,
-      false
+      false,
+      true,
+      true
     ]
   },
-  "hash": "0a142186e47dd5d49870d17f5d0835a8f936bb1b72f9fec9eda8b98af7ee587d"
+  "hash": "8d24689fb71d316f0522a64f5342f7dca0c49ab68d54103ff1cb1c4cfcfa634b"
 }

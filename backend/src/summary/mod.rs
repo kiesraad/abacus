@@ -1,13 +1,12 @@
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
 
-use crate::data_entry::YesNo;
 use crate::{
     APIError,
     data_entry::{
         CandidateVotes, Count, DifferencesCounts, PoliticalGroupCandidateVotes,
         PoliticalGroupTotalVotes, PollingStationResults, Validate, ValidationResults, VotersCounts,
-        VotesCounts,
+        VotesCounts, YesNo,
     },
     election::ElectionWithPoliticalGroups,
     error::ErrorReference,

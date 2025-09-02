@@ -22,7 +22,9 @@ pub async fn get(
             location,
             start_date,
             start_time,
-            number_of_voters as "number_of_voters: u32"
+            number_of_voters as "number_of_voters: u32",
+            results_eml as "results_eml: _",
+            results_pdf as "results_pdf: _"
         FROM committee_sessions
         WHERE id = ?
         "#,
@@ -47,7 +49,9 @@ pub async fn get_election_committee_session_list(
             location,
             start_date,
             start_time,
-            number_of_voters as "number_of_voters: u32"
+            number_of_voters as "number_of_voters: u32",
+            results_eml as "results_eml: _",
+            results_pdf as "results_pdf: _"
         FROM committee_sessions
         WHERE election_id = ?
         ORDER BY number DESC
@@ -73,7 +77,9 @@ pub async fn get_election_committee_session(
             location,
             start_date,
             start_time,
-            number_of_voters as "number_of_voters: u32"
+            number_of_voters as "number_of_voters: u32",
+            results_eml as "results_eml: _",
+            results_pdf as "results_pdf: _"
         FROM committee_sessions
         WHERE election_id = ?
         ORDER BY number DESC
@@ -99,7 +105,9 @@ pub async fn get_committee_session_for_each_election(
             location,
             start_date,
             start_time,
-            number_of_voters as "number_of_voters: u32"
+            number_of_voters as "number_of_voters: u32",
+            results_eml as "results_eml: _",
+            results_pdf as "results_pdf: _"
         FROM (
             SELECT
             id,
@@ -110,6 +118,8 @@ pub async fn get_committee_session_for_each_election(
             start_date,
             start_time,
             number_of_voters,
+            results_eml,
+            results_pdf,
             row_number() over (
             PARTITION BY election_id
             ORDER BY number DESC
@@ -144,7 +154,9 @@ pub async fn create(
             location,
             start_date,
             start_time,
-            number_of_voters as "number_of_voters: u32"
+            number_of_voters as "number_of_voters: u32",
+            results_eml as "results_eml: _",
+            results_pdf as "results_pdf: _"
         "#,
         committee_session.number,
         committee_session.election_id,
@@ -189,7 +201,9 @@ pub async fn update(
             location,
             start_date,
             start_time,
-            number_of_voters as "number_of_voters: u32"
+            number_of_voters as "number_of_voters: u32",
+            results_eml as "results_eml: _",
+            results_pdf as "results_pdf: _"
         "#,
         committee_session_update.location,
         committee_session_update.start_date,
@@ -219,7 +233,9 @@ pub async fn change_number_of_voters(
             location,
             start_date,
             start_time,
-            number_of_voters as "number_of_voters: u32"
+            number_of_voters as "number_of_voters: u32",
+            results_eml as "results_eml: _",
+            results_pdf as "results_pdf: _"
         "#,
         number_of_voters,
         committee_session_id,
@@ -247,7 +263,9 @@ pub async fn change_status(
             location,
             start_date,
             start_time,
-            number_of_voters as "number_of_voters: u32"
+            number_of_voters as "number_of_voters: u32",
+            results_eml as "results_eml: _",
+            results_pdf as "results_pdf: _"
         "#,
         committee_session_status,
         committee_session_id,

@@ -28,6 +28,7 @@ export const pollingStationRequests: PollingStationRequest[] = [
 
 export const emptyDataEntryResponse: Partial<ClaimDataEntryResponse> = {
   data: {
+    model: "CSOFirstSession",
     extra_investigation: {
       extra_investigation_other_reason: { yes: false, no: false },
       ballots_recounted_extra_investigation: { yes: false, no: false },
@@ -159,6 +160,7 @@ export const emptyDataEntryResponse: Partial<ClaimDataEntryResponse> = {
 };
 
 export const noRecountNoDifferencesDataEntry: PollingStationResults = {
+  model: "CSOFirstSession",
   extra_investigation: {
     extra_investigation_other_reason: { yes: false, no: true },
     ballots_recounted_extra_investigation: { yes: false, no: true },

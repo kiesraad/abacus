@@ -23,12 +23,18 @@ export interface DataEntryState {
   pollingStationResults: DataEntryResults | null;
 
   // state of the forms excl. data
-  dataEntryStructure: DataEntryStructure;
-  formState: FormState;
+  dataEntryStructure: DataEntryStructure | null;
+  formState: FormState | null;
   targetFormSectionId: FormSectionId | null;
   status: Status;
 
   cache: TemporaryCache | null;
+}
+
+export interface DataEntryStateLoaded extends DataEntryState {
+  pollingStationResults: DataEntryResults;
+  dataEntryStructure: DataEntryStructure;
+  formState: FormState;
 }
 
 export interface DataEntryStateAndActions extends DataEntryState {
@@ -44,9 +50,7 @@ export interface DataEntryStateAndActions extends DataEntryState {
   updateFormSection: (sectionId: FormSectionId, partialFormSection: Partial<FormSection>) => void;
 }
 
-export interface DataEntryStateAndActionsLoaded extends DataEntryStateAndActions {
-  pollingStationResults: DataEntryResults;
-}
+export type DataEntryStateAndActionsLoaded = DataEntryStateAndActions & DataEntryStateLoaded;
 
 export type DataEntryDispatch = Dispatch<DataEntryAction>;
 

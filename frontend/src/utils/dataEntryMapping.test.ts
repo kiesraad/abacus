@@ -9,6 +9,7 @@ import { createVotersAndVotesSection, differencesSection } from "./dataEntryStru
 
 // Helper function to create a base PollingStationResults object for testing
 const createBasePollingStationResults = (): PollingStationResults => ({
+  model: "CSOFirstSession",
   extra_investigation: {
     extra_investigation_other_reason: { yes: false, no: false },
     ballots_recounted_extra_investigation: { yes: false, no: false },

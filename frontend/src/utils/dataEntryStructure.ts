@@ -1,6 +1,6 @@
 import { t, tx } from "@/i18n/translate";
 import { ElectionWithPoliticalGroups, PoliticalGroup } from "@/types/generated/openapi";
-import { DataEntrySection, DataEntryStructure, InputGridSubsectionRow } from "@/types/types";
+import { DataEntryModel, DataEntrySection, DataEntryStructure, InputGridSubsectionRow } from "@/types/types";
 import { getCandidateFullName } from "@/utils/candidate";
 import { formatPoliticalGroupName } from "@/utils/politicalGroup";
 
@@ -295,22 +295,30 @@ export function createPoliticalGroupSections(election: ElectionWithPoliticalGrou
   });
 }
 
-function buildDataEntryStructure(election: ElectionWithPoliticalGroups): DataEntryStructure {
-  return [
-    extraInvestigationSection,
-    countingDifferencesPollingStation,
-    createVotersAndVotesSection(election),
-    differencesSection,
-    ...createPoliticalGroupSections(election),
-  ];
+function buildDataEntryStructure(model: DataEntryModel, election: ElectionWithPoliticalGroups): DataEntryStructure {
+  switch (model) {
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+    case "CSOFirstSession":
+      return [
+        extraInvestigationSection,
+        countingDifferencesPollingStation,
+        createVotersAndVotesSection(election),
+        differencesSection,
+        ...createPoliticalGroupSections(election),
+      ];
+  }
 }
 
 /**
  * Returns all data entry sections.
  *
+ * @param model Data entry model that determines the structure
  * @param election ElectionWithPoliticalGroups object
  * @returns Complete array of all data entry sections
  */
-export function getDataEntryStructure(election: ElectionWithPoliticalGroups): DataEntryStructure {
-  return buildDataEntryStructure(election);
+export function getDataEntryStructure(
+  model: DataEntryModel,
+  election: ElectionWithPoliticalGroups,
+): DataEntryStructure {
+  return buildDataEntryStructure(model, election);
 }

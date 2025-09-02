@@ -1,5 +1,6 @@
 import { ApiClient } from "@/api/ApiClient";
 import { ApiResult, isSuccess } from "@/api/ApiResult";
+import { assertStateIsLoaded } from "@/features/data_entry/utils/utils";
 import {
   DataEntry,
   DataEntryStatusResponse,
@@ -45,9 +46,10 @@ export function onSubmitForm(
       showAcceptErrorsAndWarnings = true,
     }: SubmitCurrentFormOptions = {},
   ): Promise<boolean> => {
+    assertStateIsLoaded(state);
     const currentSection = state.formState.sections[sectionId];
 
-    if (!currentSection || !state.pollingStationResults) {
+    if (!currentSection) {
       return false;
     }
 

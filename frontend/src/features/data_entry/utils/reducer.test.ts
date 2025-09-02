@@ -30,6 +30,7 @@ export function _getInitialValues(
   defaultValues?: Partial<PollingStationResults>,
 ): PollingStationResults {
   return {
+    model: "CSOFirstSession",
     extra_investigation: {
       extra_investigation_other_reason: { yes: false, no: false },
       ballots_recounted_extra_investigation: { yes: false, no: false },
@@ -144,7 +145,7 @@ test("should handle SET_CACHE", () => {
 });
 
 test("should handle UPDATE_FORM_SECTION", () => {
-  const oldState = getInitialState();
+  const oldState = getDefaultDataEntryState();
 
   const action: DataEntryAction = {
     type: "UPDATE_FORM_SECTION",
@@ -155,8 +156,22 @@ test("should handle UPDATE_FORM_SECTION", () => {
   };
 
   const state = dataEntryReducer(oldState, action);
-  expect(state.formState.sections.voters_votes_counts!.hasChanges).toBeDefined();
-  expect(state.formState.sections.voters_votes_counts!.hasChanges).toEqual(true);
+  expect(state.formState!.sections.voters_votes_counts!.hasChanges).toBeDefined();
+  expect(state.formState!.sections.voters_votes_counts!.hasChanges).toEqual(true);
+});
+
+test("should reject UPDATE_FORM_SECTION when state is not loaded", () => {
+  const initialState = getInitialState();
+
+  const action: DataEntryAction = {
+    type: "UPDATE_FORM_SECTION",
+    sectionId: "voters_votes_counts",
+    partialFormSection: {
+      hasChanges: true,
+    },
+  };
+
+  expect(() => dataEntryReducer(initialState, action)).toThrow();
 });
 
 test("should handle FORM_SAVE_FAILED", () => {
@@ -189,7 +204,7 @@ test("should handle FORM_SAVED", () => {
     continueToNextSection: true,
   };
 
-  const state = dataEntryReducer(getInitialState(), action);
+  const state = dataEntryReducer(getDefaultDataEntryState(), action);
   expect(state.error).toBeNull();
   expect(state.pollingStationResults).toEqual(action.data);
   expect(state.targetFormSectionId).toBeDefined();
@@ -215,7 +230,7 @@ describe("onSubmitForm", () => {
 
     const submit = onSubmitForm(client, "", dispatch, getDefaultDataEntryState());
 
-    const result = await submit("voters_votes_counts", {}, { showAcceptErrorsAndWarnings: true });
+    const result = await submit("section_does_not_exist", {}, { showAcceptErrorsAndWarnings: true });
     expect(result).toBe(false);
     expect(dispatch).toHaveBeenCalledTimes(0);
   });

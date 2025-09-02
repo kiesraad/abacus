@@ -53,7 +53,7 @@ pub struct PollingStationResultsEntry {
 /// whether this is the first or any subsequent data entry session. Based on
 /// this and of four different models can apply
 #[derive(Serialize, Deserialize, ToSchema, Clone, Debug, PartialEq, Eq, Hash)]
-#[serde(tag = "session")]
+#[serde(tag = "model")]
 pub enum PollingStationResults {
     /// Results for centrally counted (CSO) elections, first election committee session.
     /// This contains the data entry values from Model Na 31-2 Bijlage 2.

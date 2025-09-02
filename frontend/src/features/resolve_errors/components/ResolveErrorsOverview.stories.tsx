@@ -6,7 +6,7 @@ import { validationResultMockData } from "@/testing/api-mocks/ValidationResultMo
 import { ValidationResults } from "@/types/generated/openapi";
 import { getDataEntryStructure } from "@/utils/dataEntryStructure";
 
-const structure = getDataEntryStructure(electionMockData);
+const structure = getDataEntryStructure("CSOFirstSession", electionMockData);
 const results: ValidationResults = {
   errors: [validationResultMockData.F201, validationResultMockData.F401],
   warnings: [validationResultMockData.W201, validationResultMockData.W001],

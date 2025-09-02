@@ -17,6 +17,7 @@ export const emptyValidationResults: ValidationResults = {
 };
 
 export const emptyData: PollingStationResults = {
+  model: "CSOFirstSession",
   extra_investigation: {
     extra_investigation_other_reason: { yes: false, no: false },
     ballots_recounted_extra_investigation: { yes: false, no: false },
@@ -74,6 +75,7 @@ export const dataEntryStatusDifferences: DataEntryGetDifferencesResponse = {
   first_entry_user_id: 3,
   second_entry_user_id: 4,
   first_entry: {
+    model: "CSOFirstSession",
     extra_investigation: {
       extra_investigation_other_reason: { yes: false, no: false },
       ballots_recounted_extra_investigation: { yes: false, no: false },
@@ -133,6 +135,7 @@ export const dataEntryStatusDifferences: DataEntryGetDifferencesResponse = {
     ],
   },
   second_entry: {
+    model: "CSOFirstSession",
     extra_investigation: {
       extra_investigation_other_reason: { yes: false, no: false },
       ballots_recounted_extra_investigation: { yes: false, no: false },

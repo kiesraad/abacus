@@ -1,4 +1,4 @@
-use std::fmt;
+use std::{collections::HashMap, fmt};
 
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
@@ -42,6 +42,9 @@ impl ValidationResults {
 pub struct ValidationResult {
     pub fields: Vec<String>,
     pub code: ValidationResultCode,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[schema(nullable = false)]
+    pub context: Option<HashMap<String, String>>,
 }
 
 #[derive(Serialize, Deserialize, ToSchema, Debug, PartialEq, Eq, PartialOrd, Ord)]
@@ -260,6 +263,7 @@ impl Validate for DataEntryStatus {
                     validation_results.warnings.push(ValidationResult {
                         fields: different_fields.clone(),
                         code: ValidationResultCode::W001,
+                        context: None,
                     });
                 }
                 Ok(())
@@ -342,6 +346,7 @@ impl Validate for CSOFirstSessionResults {
                         .to_string(),
                 ],
                 code: ValidationResultCode::W203,
+                context: None,
             });
         }
 
@@ -357,6 +362,7 @@ impl Validate for CSOFirstSessionResults {
                             .to_string(),
                     ],
                     code: ValidationResultCode::F301,
+                    context: None,
                 });
             }
             // F.302 validate that fewer ballots counted is empty
@@ -368,6 +374,7 @@ impl Validate for CSOFirstSessionResults {
                             .to_string(),
                     ],
                     code: ValidationResultCode::F302,
+                    context: None,
                 });
             }
         }
@@ -384,6 +391,7 @@ impl Validate for CSOFirstSessionResults {
                             .to_string(),
                     ],
                     code: ValidationResultCode::F303,
+                    context: None,
                 });
             }
             // F.304 validate that more ballots counted is empty
@@ -395,6 +403,7 @@ impl Validate for CSOFirstSessionResults {
                             .to_string(),
                     ],
                     code: ValidationResultCode::F304,
+                    context: None,
                 });
             }
         }
@@ -420,6 +429,7 @@ impl Validate for CSOFirstSessionResults {
                 validation_results.errors.push(ValidationResult {
                     fields,
                     code: ValidationResultCode::F305,
+                    context: None,
                 });
             }
         }
@@ -460,6 +470,10 @@ impl Validate for CSOFirstSessionResults {
                             .to_string(),
                     ],
                     code: ValidationResultCode::F403,
+                    context: Some(HashMap::from([(
+                        "political_group_number".to_string(),
+                        pgcv.number.to_string(),
+                    )])),
                 });
             }
         }
@@ -482,6 +496,7 @@ impl Validate for ExtraInvestigation {
             validation_results.errors.push(ValidationResult {
                 fields: vec![path.to_string()],
                 code: ValidationResultCode::F101,
+                context: None,
             });
         }
         if self.extra_investigation_other_reason.is_invalid()
@@ -490,6 +505,7 @@ impl Validate for ExtraInvestigation {
             validation_results.errors.push(ValidationResult {
                 fields: vec![path.to_string()],
                 code: ValidationResultCode::F102,
+                context: None,
             });
         }
         Ok(())
@@ -510,6 +526,7 @@ impl Validate for CountingDifferencesPollingStation {
             validation_results.errors.push(ValidationResult {
                 fields: vec![path.to_string()],
                 code: ValidationResultCode::F111,
+                context: None,
             });
         }
         if self.unexplained_difference_ballots_voters.is_invalid()
@@ -518,6 +535,7 @@ impl Validate for CountingDifferencesPollingStation {
             validation_results.errors.push(ValidationResult {
                 fields: vec![path.to_string()],
                 code: ValidationResultCode::F112,
+                context: None,
             });
         }
         Ok(())
@@ -560,6 +578,7 @@ impl Validate for VotersCounts {
                     path.field("total_admitted_voters_count").to_string(),
                 ],
                 code: ValidationResultCode::F201,
+                context: None,
             });
         }
         Ok(())
@@ -628,6 +647,7 @@ impl Validate for VotesCounts {
             validation_results.errors.push(ValidationResult {
                 fields,
                 code: ValidationResultCode::F202,
+                context: None,
             });
         }
 
@@ -642,6 +662,7 @@ impl Validate for VotesCounts {
                     path.field("total_votes_cast_count").to_string(),
                 ],
                 code: ValidationResultCode::F203,
+                context: None,
             });
         }
 
@@ -649,6 +670,7 @@ impl Validate for VotesCounts {
             validation_results.warnings.push(ValidationResult {
                 fields: vec![path.field("blank_votes_count").to_string()],
                 code: ValidationResultCode::W201,
+                context: None,
             });
         }
 
@@ -656,6 +678,7 @@ impl Validate for VotesCounts {
             validation_results.warnings.push(ValidationResult {
                 fields: vec![path.field("invalid_votes_count").to_string()],
                 code: ValidationResultCode::W202,
+                context: None,
             });
         }
 
@@ -663,6 +686,7 @@ impl Validate for VotesCounts {
             validation_results.warnings.push(ValidationResult {
                 fields: vec![path.field("total_votes_cast_count").to_string()],
                 code: ValidationResultCode::W204,
+                context: None,
             });
         }
         Ok(())
@@ -815,6 +839,10 @@ impl Validate for PoliticalGroupCandidateVotes {
             validation_results.errors.push(ValidationResult {
                 fields: vec![path.field("total").to_string()],
                 code: ValidationResultCode::F401,
+                context: Some(HashMap::from([(
+                    "political_group_number".to_string(),
+                    self.number.to_string(),
+                )])),
             });
         }
 
@@ -822,6 +850,10 @@ impl Validate for PoliticalGroupCandidateVotes {
             validation_results.errors.push(ValidationResult {
                 fields: vec![path.to_string()],
                 code: ValidationResultCode::F402,
+                context: Some(HashMap::from([(
+                    "political_group_number".to_string(),
+                    self.number.to_string(),
+                )])),
             });
         }
         Ok(())
@@ -933,6 +965,7 @@ mod tests {
                 [ValidationResult {
                     code: ValidationResultCode::F101,
                     fields: vec!["extra_investigation".into()],
+                    context: None,
                 }]
             );
 
@@ -942,6 +975,7 @@ mod tests {
                 [ValidationResult {
                     code: ValidationResultCode::F101,
                     fields: vec!["extra_investigation".into()],
+                    context: None,
                 }]
             );
 
@@ -957,6 +991,7 @@ mod tests {
                 [ValidationResult {
                     code: ValidationResultCode::F102,
                     fields: vec!["extra_investigation".into()],
+                    context: None,
                 }]
             );
 
@@ -972,10 +1007,12 @@ mod tests {
                     ValidationResult {
                         code: ValidationResultCode::F101,
                         fields: vec!["extra_investigation".into()],
+                        context: None,
                     },
                     ValidationResult {
                         code: ValidationResultCode::F102,
                         fields: vec!["extra_investigation".into()],
+                        context: None,
                     }
                 ]
             );
@@ -987,10 +1024,12 @@ mod tests {
                     ValidationResult {
                         code: ValidationResultCode::F101,
                         fields: vec!["extra_investigation".into()],
+                        context: None,
                     },
                     ValidationResult {
                         code: ValidationResultCode::F102,
                         fields: vec!["extra_investigation".into()],
+                        context: None,
                     }
                 ]
             );
@@ -1058,6 +1097,7 @@ mod tests {
                 [ValidationResult {
                     code: ValidationResultCode::F111,
                     fields: vec!["counting_differences_polling_station".into()],
+                    context: None,
                 }]
             );
 
@@ -1067,6 +1107,7 @@ mod tests {
                 [ValidationResult {
                     code: ValidationResultCode::F111,
                     fields: vec!["counting_differences_polling_station".into()],
+                    context: None,
                 }]
             );
 
@@ -1076,6 +1117,7 @@ mod tests {
                 [ValidationResult {
                     code: ValidationResultCode::F111,
                     fields: vec!["counting_differences_polling_station".into()],
+                    context: None,
                 }]
             );
 
@@ -1091,6 +1133,7 @@ mod tests {
                 [ValidationResult {
                     code: ValidationResultCode::F112,
                     fields: vec!["counting_differences_polling_station".into()],
+                    context: None,
                 }]
             );
 
@@ -1100,6 +1143,7 @@ mod tests {
                 [ValidationResult {
                     code: ValidationResultCode::F112,
                     fields: vec!["counting_differences_polling_station".into()],
+                    context: None,
                 }]
             );
 
@@ -1109,6 +1153,7 @@ mod tests {
                 [ValidationResult {
                     code: ValidationResultCode::F112,
                     fields: vec!["counting_differences_polling_station".into()],
+                    context: None,
                 }]
             );
 
@@ -1124,10 +1169,12 @@ mod tests {
                     ValidationResult {
                         code: ValidationResultCode::F111,
                         fields: vec!["counting_differences_polling_station".into()],
+                        context: None,
                     },
                     ValidationResult {
                         code: ValidationResultCode::F112,
                         fields: vec!["counting_differences_polling_station".into()],
+                        context: None,
                     }
                 ]
             );
@@ -1139,10 +1186,12 @@ mod tests {
                     ValidationResult {
                         code: ValidationResultCode::F111,
                         fields: vec!["counting_differences_polling_station".into()],
+                        context: None,
                     },
                     ValidationResult {
                         code: ValidationResultCode::F112,
                         fields: vec!["counting_differences_polling_station".into()],
+                        context: None,
                     }
                 ]
             );
@@ -1199,6 +1248,7 @@ mod tests {
                         "voters_counts.proxy_certificate_count".into(),
                         "voters_counts.total_admitted_voters_count".into()
                     ],
+                    context: None,
                 }]
             );
 
@@ -1266,6 +1316,7 @@ mod tests {
                         "votes_counts.political_group_total_votes[2].total".into(),
                         "votes_counts.total_votes_candidates_count".into(),
                     ],
+                    context: None,
                 }]
             );
 
@@ -1289,6 +1340,7 @@ mod tests {
                         "votes_counts.invalid_votes_count".into(),
                         "votes_counts.total_votes_cast_count".into(),
                     ],
+                    context: None,
                 }],
             );
 
@@ -1309,6 +1361,7 @@ mod tests {
                 [ValidationResult {
                     code: ValidationResultCode::W201,
                     fields: vec!["votes_counts.blank_votes_count".into()],
+                    context: None,
                 }],
             );
 
@@ -1319,6 +1372,7 @@ mod tests {
                 [ValidationResult {
                     code: ValidationResultCode::W201,
                     fields: vec!["votes_counts.blank_votes_count".into()],
+                    context: None,
                 }],
             );
 
@@ -1339,6 +1393,7 @@ mod tests {
                 [ValidationResult {
                     code: ValidationResultCode::W202,
                     fields: vec!["votes_counts.invalid_votes_count".into()],
+                    context: None,
                 }],
             );
 
@@ -1349,6 +1404,7 @@ mod tests {
                 [ValidationResult {
                     code: ValidationResultCode::W202,
                     fields: vec!["votes_counts.invalid_votes_count".into()],
+                    context: None,
                 }],
             );
 
@@ -1367,6 +1423,7 @@ mod tests {
                 [ValidationResult {
                     code: ValidationResultCode::W204,
                     fields: vec!["votes_counts.total_votes_cast_count".into()],
+                    context: None,
                 }],
             );
 
@@ -1387,6 +1444,7 @@ mod tests {
                             "votes_counts.political_group_total_votes[2].total".into(),
                             "votes_counts.total_votes_candidates_count".into(),
                         ],
+                        context: None,
                     },
                     ValidationResult {
                         code: ValidationResultCode::F203,
@@ -1396,6 +1454,7 @@ mod tests {
                             "votes_counts.invalid_votes_count".into(),
                             "votes_counts.total_votes_cast_count".into(),
                         ],
+                        context: None,
                     }
                 ],
             );
@@ -1405,14 +1464,17 @@ mod tests {
                     ValidationResult {
                         code: ValidationResultCode::W201,
                         fields: vec!["votes_counts.blank_votes_count".into()],
+                        context: None,
                     },
                     ValidationResult {
                         code: ValidationResultCode::W202,
                         fields: vec!["votes_counts.invalid_votes_count".into()],
+                        context: None,
                     },
                     ValidationResult {
                         code: ValidationResultCode::W204,
                         fields: vec!["votes_counts.total_votes_cast_count".into()],
+                        context: None,
                     }
                 ],
             );
@@ -1422,6 +1484,8 @@ mod tests {
     }
 
     mod political_group_votes {
+        use std::collections::HashMap;
+
         use crate::{
             data_entry::{
                 CandidateVotes, DataError, PoliticalGroupCandidateVotes, Validate,
@@ -1492,6 +1556,10 @@ mod tests {
                 [ValidationResult {
                     code: ValidationResultCode::F401,
                     fields: vec!["political_group_votes[1].total".into(),],
+                    context: Some(HashMap::from([(
+                        "political_group_number".to_string(),
+                        "2".to_string(),
+                    )])),
                 }]
             );
 
@@ -1511,6 +1579,10 @@ mod tests {
                 [ValidationResult {
                     code: ValidationResultCode::F401,
                     fields: vec!["political_group_votes[1].total".into(),],
+                    context: Some(HashMap::from([(
+                        "political_group_number".to_string(),
+                        "2".to_string(),
+                    )])),
                 }]
             );
 
@@ -1521,6 +1593,10 @@ mod tests {
                 [ValidationResult {
                     code: ValidationResultCode::F402,
                     fields: vec!["political_group_votes[1]".into(),],
+                    context: Some(HashMap::from([(
+                        "political_group_number".to_string(),
+                        "2".to_string(),
+                    )])),
                 }]
             );
 
@@ -1673,7 +1749,7 @@ mod tests {
             assert_eq!(validation_results.warnings.len(), 1);
             assert_eq!(
                 validation_results.warnings[0].code,
-                ValidationResultCode::W205
+                ValidationResultCode::W204
             );
 
             Ok(())
@@ -1710,6 +1786,7 @@ mod tests {
                                 "polling_station_results.votes_counts.total_votes_cast_count"
                                     .into(),
                             ],
+                            context: None,
                         }],
                         "Warning not found for admitted_voters={admitted_voters}, votes_cast={votes_cast}",
                     );
@@ -1729,6 +1806,7 @@ mod tests {
             errors: vec![ValidationResult {
                 fields: vec!["field1".to_string()],
                 code: ValidationResultCode::F201,
+                context: None,
             }],
             warnings: vec![],
         };
@@ -1737,6 +1815,7 @@ mod tests {
             errors: vec![ValidationResult {
                 fields: vec!["field2".to_string()],
                 code: ValidationResultCode::F203,
+                context: None,
             }],
             warnings: vec![],
         };
@@ -2233,8 +2312,6 @@ mod tests {
         );
     }
 
-    }
-
     /// Tests the has_errors() and has_warnings() helper methods on ValidationResults.
     #[test]
     fn test_has_errors_has_warnings_methods() {
@@ -2242,15 +2319,18 @@ mod tests {
             errors: vec![ValidationResult {
                 fields: vec!["field1".to_string()],
                 code: ValidationResultCode::F201,
+                context: None,
             }],
             warnings: vec![
                 ValidationResult {
                     fields: vec!["field1".to_string()],
                     code: ValidationResultCode::W001,
+                    context: None,
                 },
                 ValidationResult {
                     fields: vec!["field1".to_string()],
                     code: ValidationResultCode::W201,
+                    context: None,
                 },
             ],
         };

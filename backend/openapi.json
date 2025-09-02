@@ -6431,6 +6431,15 @@
           "code": {
             "$ref": "#/components/schemas/ValidationResultCode"
           },
+          "context": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "propertyNames": {
+              "type": "string"
+            }
+          },
           "fields": {
             "type": "array",
             "items": {

@@ -47,12 +47,9 @@ export function DataEntrySection() {
   // Missing totals error for political group votes form
   const missingTotalError = formSection.errors.includes("F401");
 
-  // Memoize getCodes() results to prevent unnecessary focus triggers in Feedback
-  const memoizedErrorCodes = React.useMemo(
-    () => formSection.errors.getCodes().filter((code) => code !== "F401"),
-    [formSection.errors],
-  );
-  const memoizedWarningCodes = React.useMemo(() => formSection.warnings.getCodes(), [formSection.warnings]);
+  // Memoize errors to prevent unnecessary focus triggers in Feedback
+  const memoizedErrors = React.useMemo(() => formSection.errors.getAll(), [formSection.errors]);
+  const memoizedWarnings = React.useMemo(() => formSection.warnings.getAll(), [formSection.warnings]);
 
   // Scroll unaccepted warnings/errors checkbox into view when error for it is triggered
   React.useEffect(() => {
@@ -86,20 +83,14 @@ export function DataEntrySection() {
           <CommitteeSessionPausedModal showUnsavedChanges />
         )}
         {error instanceof ApiError && <ErrorModal error={error} />}
-        {formSection.isSaved && memoizedErrorCodes.length > 0 && (
-          <Feedback
-            id="feedback-error"
-            type="error"
-            data={memoizedErrorCodes}
-            userRole={user.role}
-            shouldFocus={true}
-          />
+        {formSection.isSaved && !formSection.errors.isEmpty() && (
+          <Feedback id="feedback-error" type="error" data={memoizedErrors} userRole={user.role} shouldFocus={true} />
         )}
         {formSection.isSaved && !formSection.warnings.isEmpty() && (
           <Feedback
             id="feedback-warning"
             type="warning"
-            data={memoizedWarningCodes}
+            data={memoizedWarnings}
             userRole={user.role}
             shouldFocus={formSection.errors.isEmpty()}
           />

@@ -1174,6 +1174,7 @@ export interface UserLoginFailedDetails {
 
 export interface ValidationResult {
   code: ValidationResultCode;
+  context?: Record<string, string>;
   fields: string[];
 }
 

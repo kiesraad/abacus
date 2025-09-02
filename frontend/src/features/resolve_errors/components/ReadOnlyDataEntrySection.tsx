@@ -47,13 +47,13 @@ export function ReadOnlyDataEntrySection({
       </legend>
       <div className={cls.formContainer}>
         {!errors.isEmpty() && (
-          <Feedback id="feedback-error" type="error" data={errors.getCodes()} userRole={userRole} shouldFocus={false} />
+          <Feedback id="feedback-error" type="error" data={errors.getAll()} userRole={userRole} shouldFocus={false} />
         )}
         {!warnings.isEmpty() && (
           <Feedback
             id="feedback-warning"
             type="warning"
-            data={warnings.getCodes()}
+            data={warnings.getAll()}
             userRole={userRole}
             shouldFocus={false}
           />

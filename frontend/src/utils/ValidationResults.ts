@@ -27,8 +27,8 @@ export class ValidationResultSet {
     return this.entries.size;
   }
 
-  getCodes(): ValidationResultCode[] {
-    return Array.from(this.entries).map((entry) => entry.code);
+  getAll(): ValidationResult[] {
+    return Array.from(this.entries);
   }
 
   getFields(): Set<string> {

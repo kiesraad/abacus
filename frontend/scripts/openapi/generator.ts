@@ -166,6 +166,9 @@ function tsType(s: ReferenceObject | SchemaObject | undefined): string {
           type += `  ${k}${isRequired(k, s.required)}: ${tsType(v2)};`;
         });
         type += "}";
+      } else if (s.additionalProperties) {
+        const additionalPropertyType = s.additionalProperties === true ? "unknown" : tsType(s.additionalProperties);
+        type = `Record<string, ${additionalPropertyType}>`;
       }
       break;
   }
@@ -187,6 +190,9 @@ function tsType(s: ReferenceObject | SchemaObject | undefined): string {
           } else {
             // Cannot determine type; type remains "unknown"
           }
+        } else if (t === "object" && s.additionalProperties) {
+          const additionalPropertyType = s.additionalProperties === true ? "unknown" : tsType(s.additionalProperties);
+          return `Record<string, ${additionalPropertyType}>`;
         } else {
           return tsType({ type: t });
         }

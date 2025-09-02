@@ -5672,10 +5672,7 @@
             "minimum": 0
           },
           "id_prev_session": {
-            "type": [
-              "integer",
-              "null"
-            ],
+            "type": "integer",
             "format": "int32",
             "minimum": 0
           },
@@ -5734,10 +5731,7 @@
             "minimum": 0
           },
           "polling_station_id_prev_session": {
-            "type": [
-              "integer",
-              "null"
-            ],
+            "type": "integer",
             "format": "int32",
             "minimum": 0
           },
@@ -5752,10 +5746,7 @@
             "format": "int64"
           },
           "polling_station_number_of_voters": {
-            "type": [
-              "integer",
-              "null"
-            ],
+            "type": "integer",
             "format": "int64"
           },
           "polling_station_postal_code": {

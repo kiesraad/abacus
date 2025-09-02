@@ -52,7 +52,7 @@ describe("ReadOnlyDataEntrySection", () => {
     expect(screen.queryByText(/W\./)).not.toBeInTheDocument();
   });
 
-  test("shows error feedback for on correct section", () => {
+  test("shows error feedback for correct section", () => {
     const validationResults: ValidationResults = {
       errors: [
         validationResultMockData.F201, // voters_votes_counts error
@@ -68,12 +68,15 @@ describe("ReadOnlyDataEntrySection", () => {
     expect(screen.queryByText("F.303")).not.toBeInTheDocument();
   });
 
-  test("shows warning feedback for on correct section", () => {
+  test("shows warning feedback for correct section", () => {
     const validationResults: ValidationResults = {
       errors: [],
       warnings: [
         validationResultMockData.W201, // blank_votes_count warning
-        validationResultMockData.W301, // differences_counts warning (should not show)
+        {
+          fields: ["data.differences_counts.more_ballots_count"],
+          code: "W204",
+        }, // set imaginary warning on field on other page (should not show)
       ],
     };
 
@@ -81,7 +84,7 @@ describe("ReadOnlyDataEntrySection", () => {
 
     const warningFeedback = screen.getByTestId("feedback-warning");
     expect(within(warningFeedback).getByText("W.201")).toBeInTheDocument();
-    expect(screen.queryByText("W.301")).not.toBeInTheDocument();
+    expect(screen.queryByText("W.204")).not.toBeInTheDocument();
   });
 
   test("shows both error and warning feedback when present", () => {

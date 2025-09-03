@@ -14,8 +14,12 @@ import { NumberOfVotersPgObj } from "e2e-tests/page-objects/election/create/Numb
 import { UploadCandidateDefinitionPgObj } from "e2e-tests/page-objects/election/create/UploadCandidateDefinitionPgObj";
 import { UploadElectionDefinitionPgObj } from "e2e-tests/page-objects/election/create/UploadElectionDefinitionPgObj";
 import { UploadPollingStationDefinitionPgObj } from "e2e-tests/page-objects/election/create/UploadPollingStationDefinitionPgObj";
+import { ElectionHome } from "e2e-tests/page-objects/election/ElectionHomePgObj";
 import { ElectionsOverviewPgObj } from "e2e-tests/page-objects/election/ElectionsOverviewPgObj";
 import { AdminNavBar } from "e2e-tests/page-objects/nav_bar/AdminNavBarPgObj";
+import { PollingStationImportPgObj } from "e2e-tests/page-objects/polling_station/PollingStationImportPgObj";
+import { PollingStationListEmptyPgObj } from "e2e-tests/page-objects/polling_station/PollingStationListEmptyPgObj";
+import { PollingStationListPgObj } from "e2e-tests/page-objects/polling_station/PollingStationListPgObj";
 
 import { test } from "../fixtures";
 import { eml110a, eml110b, eml110b_short, eml230b } from "../test-data/eml-files";
@@ -84,7 +88,7 @@ test.describe("Election creation", () => {
     await expect(electionRow).toContainText("Klaar voor steminvoer");
   });
 
-  test("it uploads an election file, candidate list but skips polling stations", async ({ page }) => {
+  test("it uploads an election file, candidate list but adds polling stations afterwards", async ({ page }) => {
     await page.goto("/elections");
     const overviewPage = new ElectionsOverviewPgObj(page);
     await overviewPage.create.click();
@@ -127,6 +131,27 @@ test.describe("Election creation", () => {
     await expect(electionRow).toBeVisible();
     await expect(electionRow).toContainText("Gemeenteraad Test 2022");
     await expect(electionRow).toContainText("Zitting voorbereiden");
+    await electionRow.click();
+
+    const electionHomePage = new ElectionHome(page);
+    await electionHomePage.alertLinkToPollingStations.click();
+
+    const pollingStationsPage = new PollingStationListEmptyPgObj(page);
+    await pollingStationsPage.importButton.click();
+    const importPage = new PollingStationImportPgObj(page);
+    await importPage.uploadFile(page, eml110b.path);
+    await importPage.importButton.click();
+
+    const listPage = new PollingStationListPgObj(page);
+    await expect(listPage.header).toBeVisible();
+    await expect(listPage.alert).toContainText(/Er zijn \d+ stembureaus geïmporteerd/);
+
+    const navBar = new AdminNavBar(page);
+    await navBar.getElectionBreadcrumb(eml110a.electionName).click();
+
+    await expect(electionHomePage.header).toBeVisible();
+    const session = electionHomePage.getCommitteeSessionCard(1);
+    await expect(session).toContainText("Klaar voor steminvoer");
   });
 
   test("it fails on incorrect hash", async ({ page }) => {

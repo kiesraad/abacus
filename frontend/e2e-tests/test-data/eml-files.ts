@@ -1,6 +1,7 @@
 export const eml110a = {
   filename: "eml110a_test.eml.xml",
   path: "../backend/src/eml/tests/eml110a_test.eml.xml",
+  electionName: "Gemeenteraad Test 2022",
   electionDate: "woensdag 16 maart 2022",
   hashInput1: "476b",
   hashInput2: "c0de",

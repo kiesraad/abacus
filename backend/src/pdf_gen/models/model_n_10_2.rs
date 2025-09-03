@@ -20,9 +20,9 @@ impl ToPdfFileModel for ModelN10_2Input {
 
 #[cfg(test)]
 mod tests {
+    use std::{fs::File, io::BufReader};
+
     use super::*;
-    use std::fs::File;
-    use std::io::BufReader;
 
     #[test]
     fn test_json_matches_struct() {

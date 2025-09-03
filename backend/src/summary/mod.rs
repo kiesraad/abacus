@@ -1,3 +1,6 @@
+use serde::{Deserialize, Serialize};
+use utoipa::ToSchema;
+
 use crate::{
     APIError,
     data_entry::{
@@ -9,8 +12,6 @@ use crate::{
     error::ErrorReference,
     polling_station::PollingStation,
 };
-use serde::{Deserialize, Serialize};
-use utoipa::ToSchema;
 
 /// Contains a summary of the election results, added up from the votes of all polling stations.
 #[derive(Serialize, Deserialize, Debug, ToSchema)]

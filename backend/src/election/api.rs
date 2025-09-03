@@ -15,14 +15,14 @@ use super::{
 };
 use crate::{
     APIError, AppState, ErrorResponse,
-    audit_log::{AuditEvent, AuditService, PollingStationImportDetails},
+    audit_log::{AuditEvent, AuditService},
     authentication::{Admin, User},
-    committee_session::{
-        CommitteeSession, CommitteeSessionCreateRequest,
-        status::{CommitteeSessionStatus, change_committee_session_status},
-    },
+    committee_session::{CommitteeSession, CommitteeSessionCreateRequest},
     eml::{EML110, EML230, EMLDocument, EMLImportError, EmlHash, RedactedEmlHash},
-    polling_station::{PollingStation, PollingStationRequest},
+    polling_station::{
+        PollingStation, PollingStationRequest, PollingStationsRequest,
+        create_imported_polling_stations,
+    },
 };
 
 pub fn router() -> OpenApiRouter<AppState> {
@@ -316,28 +316,17 @@ pub async fn election_import(
 
     // Create polling stations
     if let Some(places) = polling_places {
-        let number_of_polling_stations = places.len();
-        crate::polling_station::repository::create_many(&pool, election.id, places).await?;
-
-        audit_service
-            .log(
-                &AuditEvent::PollingStationsImported(PollingStationImportDetails {
-                    import_election_id: election.id,
-                    import_file_name: edu
-                        .polling_station_file_name
-                        .ok_or(EMLImportError::MissingFileName)?,
-                    import_number_of_polling_stations: u64::try_from(number_of_polling_stations)
-                        .map_err(|_| EMLImportError::NumberOfPollingStationsNotInRange)?,
-                }),
-                None,
-            )
-            .await?;
-
-        change_committee_session_status(
-            committee_session.id,
-            CommitteeSessionStatus::DataEntryNotStarted,
-            pool.clone(),
+        let polling_stations_request = PollingStationsRequest {
+            file_name: edu
+                .polling_station_file_name
+                .ok_or(EMLImportError::MissingFileName)?,
+            polling_stations: places,
+        };
+        create_imported_polling_stations(
+            pool,
             audit_service,
+            election.id,
+            polling_stations_request,
         )
         .await?;
     }

@@ -11,7 +11,7 @@ import { server } from "@/testing/server";
 import { screen, setupTestRouter } from "@/testing/test-utils";
 
 import { AddInvestigationLayout } from "./AddInvestigationLayout";
-import { InvestigationPrintCorrigendum } from "./InvestigationPrintCorrigendum";
+import { InvestigationPrintCorrigendumPage } from "./InvestigationPrintCorrigendumPage";
 
 const navigate = vi.fn();
 
@@ -43,7 +43,7 @@ async function renderPage() {
                     },
                     {
                       path: "print-corrigendum",
-                      Component: InvestigationPrintCorrigendum,
+                      Component: InvestigationPrintCorrigendumPage,
                     },
                   ],
                 },
@@ -61,7 +61,7 @@ async function renderPage() {
   return router;
 }
 
-describe("InvestigationPrintCorrigendum", () => {
+describe("InvestigationPrintCorrigendumPage", () => {
   beforeEach(() => {
     server.use(ElectionRequestHandler, ElectionStatusRequestHandler);
     vi.spyOn(ReactRouter, "useNavigate").mockImplementation(() => navigate);
@@ -77,10 +77,10 @@ describe("InvestigationPrintCorrigendum", () => {
     ).toBeVisible();
 
     expect(
-      await screen.findByRole("link", { name: "Download corrigendum voor stembureau 1 Na 14-2 Bijlage 1" }),
+      await screen.findByRole("link", { name: "Download corrigendum voor stembureau 33 Na 14-2 Bijlage 1" }),
     ).toBeVisible();
 
-    expect(await screen.findByRole("button", { name: "Verder naar bevindingen" })).toBeVisible();
+    expect(await screen.findByRole("link", { name: "Verder naar bevindingen" })).toBeVisible();
   });
 
   test("Navigates to investigation overview when clicking back", async () => {

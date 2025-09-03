@@ -330,9 +330,8 @@ describe("Test VotersAndVotesForm", () => {
       await user.click(submitButton);
 
       const feedbackMessage = [
-        "Controleer toegelaten kiezers",
+        "Controleer je antwoorden",
         "F.201",
-        "De invoer bij A, B of D klopt niet.",
         "Heb je iets niet goed overgenomen? Herstel de fout en ga verder.",
         "Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder.",
       ].join("");
@@ -372,9 +371,8 @@ describe("Test VotersAndVotesForm", () => {
       await user.click(submitButton);
 
       const feedbackMessage = [
-        "Controleer uitgebrachte stemmen",
+        "Controleer je antwoorden",
         "F.203",
-        "De invoer bij E, F, G of H klopt niet.",
         "Heb je iets niet goed overgenomen? Herstel de fout en ga verder.",
         "Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder.",
       ].join("");
@@ -416,9 +414,8 @@ describe("Test VotersAndVotesForm", () => {
       await user.click(submitButton);
 
       const feedbackMessage = [
-        "Controleer aantal blanco stemmen",
+        "Controleer F",
         "W.201",
-        "Check of je het papieren proces-verbaal goed hebt overgenomen.",
         "Heb je iets niet goed overgenomen? Herstel de fout en ga verder.",
         "Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder.",
       ].join("");
@@ -510,9 +507,8 @@ describe("Test VotersAndVotesForm", () => {
       await user.click(submitButton);
 
       const feedbackMessage = [
-        "Controleer aantal blanco stemmen",
+        "Controleer F",
         "W.201",
-        "Check of je het papieren proces-verbaal goed hebt overgenomen.",
         "Heb je iets niet goed overgenomen? Herstel de fout en ga verder.",
         "Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder.",
       ].join("");
@@ -553,9 +549,8 @@ describe("Test VotersAndVotesForm", () => {
       await user.click(submitButton);
 
       const feedbackMessage = [
-        "Controleer aantal ongeldige stemmen",
+        "Controleer G",
         "W.202",
-        "Check of je het papieren proces-verbaal goed hebt overgenomen.",
         "Heb je iets niet goed overgenomen? Herstel de fout en ga verder.",
         "Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder.",
       ].join("");
@@ -593,9 +588,8 @@ describe("Test VotersAndVotesForm", () => {
       await user.click(submitButton);
 
       const feedbackMessage = [
-        "Controleer aantal toegelaten kiezers en aantal uitgebrachte stemmen",
+        "Controleer D en H",
         "W.203",
-        "Check of je het papieren proces-verbaal goed hebt overgenomen.",
         "Heb je iets niet goed overgenomen? Herstel de fout en ga verder.",
         "Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder.",
       ].join("");
@@ -618,23 +612,22 @@ describe("Test VotersAndVotesForm", () => {
       expectFieldsToNotHaveIcon(expectedValidFieldIds);
     });
 
-    test("W.205 total votes cast should not be zero", async () => {
+    test("W.204 total votes cast should not be zero", async () => {
       const user = userEvent.setup();
 
       renderForm();
 
       await screen.findByTestId("voters_votes_counts_form");
       overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
-        validation_results: { errors: [], warnings: [validationResultMockData.W205] },
+        validation_results: { errors: [], warnings: [validationResultMockData.W204] },
       });
 
       const submitButton = await screen.findByRole("button", { name: "Volgende" });
       await user.click(submitButton);
 
       const feedbackMessage = [
-        "Controleer aantal uitgebrachte stemmen",
-        "W.205",
-        "Check of je het papieren proces-verbaal goed hebt overgenomen.",
+        "Controleer H",
+        "W.204",
         "Heb je iets niet goed overgenomen? Herstel de fout en ga verder.",
         "Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder.",
       ].join("");
@@ -750,17 +743,15 @@ describe("Test VotersAndVotesForm", () => {
       await userEvent.click(submitButton);
 
       const errorFeedbackMessage = [
-        "Controleer toegelaten kiezers",
+        "Controleer je antwoorden",
         "F.201",
-        "De invoer bij A, B of D klopt niet.",
         "Heb je iets niet goed overgenomen? Herstel de fout en ga verder.",
         "Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder.",
       ].join("");
 
       const warningFeedbackMessage = [
-        "Controleer aantal blanco stemmen",
+        "Controleer F",
         "W.201",
-        "Check of je het papieren proces-verbaal goed hebt overgenomen.",
         "Heb je iets niet goed overgenomen? Herstel de fout en ga verder.",
         "Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder.",
       ].join("");

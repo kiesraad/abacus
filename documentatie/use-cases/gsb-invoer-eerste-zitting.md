@@ -50,10 +50,6 @@ __Uitbreidingen:__
 
 __Niveau:__ gebruikersdoel, zee, 🌊
 
-__Precondities:__
-
-- De coördinator GSB is ingelogd in de applicatie.
-
 ### Hoofdscenario en uitbreidingen
 
 __Hoofdscenario:__
@@ -121,10 +117,6 @@ __Uitbreidingen:__
 ## De eerste of tweede invoerder voert de resultaten van de telling in (zee)
 
 __Niveau:__ gebruikersdoel, zee, 🌊
-
-__Precondities:__
-
-- De invoerder is ingelogd in de applicatie.
 
 ### Hoofdscenario en uitbreidingen
 
@@ -218,11 +210,9 @@ __Niveau:__ subfunctie, vis, 🐟
 
 ### Hoofdscenario en uitbreidingen
 
-__Trigger:__ De controles geven een of meerdere foutmeldingen vanwege de [validatieregels voor fouten](./validatieregels-plausibiliteitschecks-tellingen.md#validatieregels-geven-fouten) en/of een of meerdere waarschuwingen vanwege de [plausibiliteitschecks](./validatieregels-plausibiliteitschecks-tellingen.md#plausibiliteitschecks-geven-waarschuwingen).
+*Foutmelding*: De ingevoerde waardes kunnen niet correct zijn. Bijvoorbeeld: het totaal van de stemmen op een lijst komt niet overeen met de som van de stemmen van de kandidaten op die lijst. Zie de [validatieregels voor fouten](./validatieregels-plausibiliteitschecks-tellingen.md#validatieregels-geven-fouten) voor de volledige lijst.
 
-*Foutmelding*: De ingevoerde waardes kunnen niet correct zijn. Bijvoorbeeld: het totaal van de stemmen op een lijst komt niet overeen met de som van de stemmen van de kandidaten op die lijst.
-
-*Waarschuwing*: De ingevoerde waardes zijn mogelijk niet correct. Bijvoorbeeld: er is een groot aantal blanco stemmen of de tweede invoer klopt niet met de eerste invoer.
+*Waarschuwing*: De ingevoerde waardes zijn mogelijk niet correct. Bijvoorbeeld: er is een groot aantal blanco stemmen of de tweede invoer klopt niet met de eerste invoer. Zie de [plausibiliteitschecks](./validatieregels-plausibiliteitschecks-tellingen.md#plausibiliteitschecks-geven-waarschuwingen) voor de volledige lijst.
 
 __Hoofdscenario:__  
 Voor elke fout of waarschuwing:  

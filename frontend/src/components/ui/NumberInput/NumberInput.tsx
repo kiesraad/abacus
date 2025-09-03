@@ -81,9 +81,7 @@ export const NumberInput = React.forwardRef<HTMLInputElement, NumberInputProps>(
         />
         {formattedOverlay && (
           <div className="formatted-overlay font-number" aria-hidden>
-            <span id={`${id}-formatted-overlay`} data-testid={`${id}-formatted-overlay`}>
-              {formattedOverlay}
-            </span>
+            <span id={`${id}-formatted-overlay`}>{formattedOverlay}</span>
           </div>
         )}
       </div>

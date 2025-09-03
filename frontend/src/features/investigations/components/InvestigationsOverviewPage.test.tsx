@@ -4,14 +4,14 @@ import { beforeEach, describe, expect, test } from "vitest";
 
 import { ErrorBoundary } from "@/components/error/ErrorBoundary";
 import { ElectionLayout } from "@/components/layout/ElectionLayout";
-import { getElectionMockData } from "@/testing/api-mocks/ElectionMockData.ts";
+import { getElectionMockData } from "@/testing/api-mocks/ElectionMockData";
 import { ElectionStatusRequestHandler } from "@/testing/api-mocks/RequestHandlers";
 import { Providers } from "@/testing/Providers";
 import { server } from "@/testing/server";
 import { screen, setupTestRouter } from "@/testing/test-utils";
-import { ElectionDetailsResponse } from "@/types/generated/openapi.ts";
+import { ElectionDetailsResponse } from "@/types/generated/openapi";
 
-import { InvestigationsOverview } from "./InvestigationsOverview";
+import { InvestigationsOverviewPage } from "./InvestigationsOverviewPage";
 
 async function renderPage() {
   const router = setupTestRouter([
@@ -22,7 +22,7 @@ async function renderPage() {
       children: [
         {
           path: "investigations",
-          Component: InvestigationsOverview,
+          Component: InvestigationsOverviewPage,
         },
       ],
     },
@@ -34,7 +34,7 @@ async function renderPage() {
   return router;
 }
 
-describe("InvestigationsOverview", () => {
+describe("InvestigationsOverviewPage", () => {
   beforeEach(() => {
     server.use(ElectionStatusRequestHandler);
     const electionData = getElectionMockData({}, { id: 2, number: 2, status: "created" });

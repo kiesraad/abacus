@@ -15,7 +15,7 @@ export class PollingStationImportPgObj {
 
   async uploadFile(page: Page, path: string) {
     const fileChooserPromise = page.waitForEvent("filechooser");
-    await page.getByText("Bestand kiezen").click();
+    await this.upload.click();
     const fileChooser = await fileChooserPromise;
     await fileChooser.setFiles(path);
   }

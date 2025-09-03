@@ -1,6 +1,6 @@
 import * as ReactRouter from "react-router";
 
-import { UserEvent, userEvent } from "@testing-library/user-event";
+import { userEvent } from "@testing-library/user-event";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
 import * as useUser from "@/hooks/user/useUser";
@@ -501,10 +501,8 @@ describe("Test CandidatesVotesForm", () => {
       const submitButton = screen.getByRole("button", { name: "Volgende" });
       await user.click(submitButton);
 
-      const feedbackMessage = [
-        "Controleer ingevoerde aantallen. De opgetelde stemmen op de kandidaten en het ingevoerde totaal zijn niet gelijk.",
-        "Check of je het papieren proces-verbaal goed hebt overgenomen.",
-      ].join("");
+      const feedbackMessage =
+        "Controleer ingevoerde aantallen. De opgetelde stemmen op de kandidaten en het ingevoerde totaal zijn niet gelijk.";
 
       expect(await screen.findByTestId("missing-total-error")).toHaveTextContent(feedbackMessage);
       expect(screen.queryByTestId("feedback-error")).toBeNull();
@@ -517,122 +515,6 @@ describe("Test CandidatesVotesForm", () => {
       expectFieldsToHaveIconAndToHaveAccessibleName(expectedInvalidFieldIds, "bevat een fout");
       expectFieldsToBeValidAndToNotHaveAccessibleErrorMessage(expectedValidFieldIds);
       expectFieldsToNotHaveIcon(expectedValidFieldIds);
-    });
-  });
-
-  describe("CandidatesVotesForm warnings", () => {
-    test("Imagined warning on this form", async () => {
-      const user = userEvent.setup();
-      overrideServerClaimDataEntryResponse({
-        formState: getDefaultDataEntryState().formState,
-        pollingStationResults: {},
-      });
-      renderForm();
-
-      await screen.findByTestId("political_group_votes_1_form");
-      overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
-        validation_results: {
-          errors: [],
-          warnings: [{ fields: ["data.political_group_votes[0]"], code: "F401" }],
-        },
-      });
-
-      const submitButton = await screen.findByRole("button", { name: "Volgende" });
-      await user.click(submitButton);
-
-      const feedbackMessage = [
-        "Controleer het totaal van de lijst. Is dit veld op het papieren proces-verbaal ook leeg? Dan kan je verdergaan.",
-        "F.401",
-        "Heb je iets niet goed overgenomen? Herstel de fout en ga verder.",
-        "Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder.",
-      ].join("");
-
-      expect(await screen.findByTestId("feedback-warning")).toHaveTextContent(feedbackMessage);
-      expect(screen.queryByTestId("feedback-error")).toBeNull();
-      // When all fields on a page are (potentially) invalid, we do not mark them as so
-      const expectedValidFieldIds = [
-        candidatesFieldIds.candidate0,
-        candidatesFieldIds.candidate1,
-        candidatesFieldIds.total,
-      ];
-      expectFieldsToBeValidAndToNotHaveAccessibleErrorMessage(expectedValidFieldIds);
-      expectFieldsToNotHaveIcon(expectedValidFieldIds);
-    });
-  });
-
-  describe("CandidatesVotesForm accept warnings", () => {
-    let user: UserEvent;
-    let submitButton: HTMLButtonElement;
-    let acceptErrorsAndWarningsCheckbox: HTMLInputElement;
-
-    beforeEach(async () => {
-      overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
-        validation_results: {
-          errors: [],
-          warnings: [{ fields: ["data.political_group_votes[0]"], code: "F401" }],
-        },
-      });
-
-      renderForm();
-
-      user = userEvent.setup();
-      submitButton = await screen.findByRole("button", { name: "Volgende" });
-      await user.click(submitButton);
-
-      acceptErrorsAndWarningsCheckbox = await screen.findByRole("checkbox", {
-        name: "Ik heb mijn invoer gecontroleerd met het papier en correct overgenomen.",
-      });
-    });
-
-    test("checkbox should disappear when filling in any form input", async () => {
-      expect(acceptErrorsAndWarningsCheckbox).toBeVisible();
-      expect(acceptErrorsAndWarningsCheckbox).not.toBeInvalid();
-
-      const candidateNames = getCandidateFullNamesFromMockData(politicalGroupMockData);
-
-      const input = screen.getByRole("textbox", { name: `2 ${candidateNames[1]}` });
-      await user.type(input, "1");
-
-      expect(acceptErrorsAndWarningsCheckbox).not.toBeVisible();
-    });
-
-    test("checkbox with error should disappear when filling in any form input", async () => {
-      expect(acceptErrorsAndWarningsCheckbox).toBeVisible();
-      expect(acceptErrorsAndWarningsCheckbox).not.toBeInvalid();
-
-      await user.click(submitButton);
-
-      expect(acceptErrorsAndWarningsCheckbox).toBeInvalid();
-      const acceptErrorsAndWarningsError = await screen.findByRole("alert", {
-        description: "Je kan alleen verder als je het papieren proces-verbaal hebt gecontroleerd.",
-      });
-      expect(acceptErrorsAndWarningsError).toBeVisible();
-
-      const candidateNames = getCandidateFullNamesFromMockData(politicalGroupMockData);
-
-      const input = screen.getByRole("textbox", { name: `2 ${candidateNames[1]}` });
-      await user.type(input, "1");
-
-      expect(acceptErrorsAndWarningsCheckbox).not.toBeVisible();
-      expect(acceptErrorsAndWarningsError).not.toBeVisible();
-    });
-
-    test("error should not immediately disappear when checkbox is checked", async () => {
-      expect(acceptErrorsAndWarningsCheckbox).toBeVisible();
-      expect(acceptErrorsAndWarningsCheckbox).not.toBeInvalid();
-
-      await user.click(submitButton);
-
-      expect(acceptErrorsAndWarningsCheckbox).toBeInvalid();
-      const acceptErrorsAndWarningsError = screen.getByRole("alert", {
-        description: "Je kan alleen verder als je het papieren proces-verbaal hebt gecontroleerd.",
-      });
-      expect(acceptErrorsAndWarningsError).toBeVisible();
-
-      await user.click(acceptErrorsAndWarningsCheckbox);
-      expect(acceptErrorsAndWarningsCheckbox).toBeChecked();
-      expect(acceptErrorsAndWarningsCheckbox).toBeInvalid();
-      expect(acceptErrorsAndWarningsError).toBeVisible();
     });
   });
 });

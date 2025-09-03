@@ -5,7 +5,7 @@ import { DEFAULT_CANCEL_REASON } from "@/api/ApiClient";
 import { AnyApiError, isSuccess } from "@/api/ApiResult";
 import { useApiClient } from "@/api/useApiClient";
 import { Footer } from "@/components/footer/Footer";
-import { IconTrash } from "@/components/generated/icons.tsx";
+import { IconTrash } from "@/components/generated/icons";
 import { PageTitle } from "@/components/page_title/PageTitle";
 import { Alert } from "@/components/ui/Alert/Alert";
 import { Button } from "@/components/ui/Button/Button";
@@ -20,7 +20,7 @@ import {
   COMMITTEE_SESSION_DELETE_REQUEST_PATH,
 } from "@/types/generated/openapi";
 import { cn } from "@/utils/classnames";
-import { committeeSessionLabel } from "@/utils/committeeSession.ts";
+import { committeeSessionLabel } from "@/utils/committeeSession";
 
 import { directDownload } from "../utils/download";
 import { CommitteeSessionCard } from "./CommitteeSessionCard";

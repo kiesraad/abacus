@@ -25,7 +25,7 @@ describe("ResolveErrorsNavigation", () => {
       validationResultMockData.F201, // voters_counts fields
     ],
     warnings: [
-      validationResultMockData.W301, // differences_counts fields
+      validationResultMockData.W201, // blank_votes_count field
       validationResultMockData.F401, // political_group_votes[0]
     ],
   };
@@ -63,11 +63,14 @@ describe("ResolveErrorsNavigation", () => {
 
     const votersAndVotesItem = screen.getByRole("link", { name: "Aantal kiezers en stemmen" }).closest("li")!;
     expect(within(votersAndVotesItem).getByRole("img", { name: "bevat een fout" })).toBeInTheDocument();
+    expect(within(votersAndVotesItem).queryByRole("img", { name: "bevat een waarschuwing" })).not.toBeInTheDocument();
 
     const differencesItem = screen.getByRole("link", { name: "Verschillen D & H" }).closest("li")!;
-    expect(within(differencesItem).getByRole("img", { name: "bevat een waarschuwing" })).toBeInTheDocument();
+    expect(within(differencesItem).queryByRole("img", { name: "bevat een fout" })).not.toBeInTheDocument();
+    expect(within(differencesItem).queryByRole("img", { name: "bevat een waarschuwing" })).not.toBeInTheDocument();
 
     const politicalGroup1Item = screen.getByRole("link", { name: /Lijst 1 - Vurige Vleugels Partij/ }).closest("li")!;
+    expect(within(politicalGroup1Item).queryByRole("img", { name: "bevat een fout" })).not.toBeInTheDocument();
     expect(within(politicalGroup1Item).getByRole("img", { name: "bevat een waarschuwing" })).toBeInTheDocument();
 
     const politicalGroup2Item = screen.getByRole("link", { name: /Lijst 2 - Wijzen van Water en Wind/ }).closest("li")!;

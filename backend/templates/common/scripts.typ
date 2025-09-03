@@ -123,11 +123,11 @@
   )
 }
 
-#let empty_letterbox(letter, cells: 5, light: true, original: none, bold_top_border: false, content) = {
+#let empty_letterbox(letter, cells: 5, light: true, original: none, corrected: (), bold_top_border: false, wide_cells: false, content) = {
   let bg_grey = luma(213)
   let bg = if light { bg_grey } else { black }
   let fill = if light { black } else { white }
-  let cell_width = range(0, cells).map(_ => 2em)
+  let cell_width = range(0, cells).map(_ => if wide_cells { 8em } else { 2em })
   let total_cell_width = cell_width.sum()
   let additional_width = (3.5em, 1fr)
   let grid_columns = if original != none {
@@ -150,13 +150,14 @@
       grid.cell(stroke: (rest: 0.5pt + black) + top_border_stroke, align: right, fill: bg_grey, prefilled_number(original)),
       grid.vline(stroke: (thickness: 0.5pt, dash: "solid"))
     )),
-    ..range(0, cells).map(cell => {
+    ..range(0, cells).enumerate().map(cell => {
+      let (index, c) = cell;
       grid.cell(
         stroke: (
           y: 0.5pt + black,
           x: (paint: black, thickness: 0.5pt, dash: "densely-dotted"),
         ) + top_border_stroke,
-        " ",
+        prefilled_number(corrected.at(index, default: " "))
       )
     }),
     grid.vline(stroke: (thickness: 0.5pt, dash: "solid")),
@@ -353,6 +354,7 @@
   total: 0,
   values: (),
   continue_on_next_page: "",
+  corrected_cells: 4,
   column_total: (c, v) => [#c: #v],
   sum_total: [(#columns)],
   total_instruction: "",
@@ -421,7 +423,7 @@
             )),
             ..cell_if(with_originals, table.cell(inset: 8pt, fill: luma(213), align(right, prefilled_number(original_votes)))),
             if c.votes == none {
-              table.cell(inset: 1pt, empty_grid(paint: luma(213)))
+              table.cell(inset: 1pt, empty_grid(cells: corrected_cells, paint: luma(213)))
             } else {
               table.cell(align: right + horizon, text(number-width: "tabular", fmt-number(c.votes)))
             },
@@ -464,7 +466,7 @@
                 grid.cell(inset: 9pt, align: center)[#column_total #column],
                 ..cell_if(with_originals, grid.cell(inset: 8pt, fill: luma(213), align(right, prefilled_number(original_total)))),
                 grid.vline(stroke: (paint: luma(213), dash: "densely-dotted")),
-                grid.cell(empty_grid(cells: 4, paint: luma(213)), align: center, inset: 0pt),
+                grid.cell(empty_grid(cells: corrected_cells, paint: luma(213)), align: center, inset: 0pt),
               )
 
               votes = 0

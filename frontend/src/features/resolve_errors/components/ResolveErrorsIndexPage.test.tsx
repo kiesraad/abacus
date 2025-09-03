@@ -66,7 +66,7 @@ describe("ResolveErrorsPage", () => {
     const differences_counts = screen.queryByRole("region", {
       name: "Verschillen tussen aantal kiezers en uitgebrachte stemmen",
     });
-    expect(differences_counts).toBeInTheDocument();
+    expect(differences_counts).not.toBeInTheDocument();
 
     const political_group_votes_1 = screen.queryByRole("region", { name: "Lijst 1 - Vurige Vleugels Partij" });
     expect(political_group_votes_1).not.toBeInTheDocument();

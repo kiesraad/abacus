@@ -1,5 +1,5 @@
 import { Table } from "@/components/ui/Table/Table";
-import { useUserRole } from "@/hooks/user/useUserRole.ts";
+import { useUserRole } from "@/hooks/user/useUserRole";
 import { t } from "@/i18n/translate";
 import { ElectionWithPoliticalGroups } from "@/types/generated/openapi";
 import { cn } from "@/utils/classnames";

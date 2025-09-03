@@ -101,7 +101,6 @@ pub async fn election_details(
     Path(id): Path<u32>,
 ) -> Result<Json<ElectionDetailsResponse>, APIError> {
     let election = crate::election::repository::get(&pool, id).await?;
-    let polling_stations = crate::polling_station::repository::list(&pool, id).await?;
     let committee_sessions =
         crate::committee_session::repository::get_election_committee_session_list(&pool, id)
             .await?;
@@ -109,6 +108,8 @@ pub async fn election_details(
         .first()
         .expect("There is always one committee session")
         .clone();
+    let polling_stations = crate::polling_station::repository::list(&pool, id).await?;
+
     Ok(Json(ElectionDetailsResponse {
         current_committee_session,
         committee_sessions,
@@ -295,6 +296,23 @@ pub async fn election_import(
     let election = crate::election::repository::create(&pool, new_election).await?;
     audit_service
         .log(&AuditEvent::ElectionCreated(election.clone().into()), None)
+        .await?;
+
+    // Create first committee session for the election
+    let committee_session = crate::committee_session::repository::create(
+        &pool,
+        CommitteeSessionCreateRequest {
+            number: 1,
+            election_id: election.id,
+            number_of_voters: edu.number_of_voters,
+        },
+    )
+    .await?;
+    audit_service
+        .log(
+            &AuditEvent::CommitteeSessionCreated(committee_session.clone().into()),
+            None,
+        )
         .await?;
 
     // Create first committee session for the election

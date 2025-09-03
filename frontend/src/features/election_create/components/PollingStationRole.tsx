@@ -5,9 +5,7 @@ import { Button } from "@/components/ui/Button/Button";
 import { ChoiceList } from "@/components/ui/CheckboxAndRadio/ChoiceList";
 import { Form } from "@/components/ui/Form/Form";
 import { FormLayout } from "@/components/ui/Form/FormLayout";
-import { KeyboardKeys } from "@/components/ui/KeyboardKeys/KeyboardKeys";
 import { t } from "@/i18n/translate";
-import { KeyboardKey } from "@/types/ui";
 
 import { useElectionCreateContext } from "../hooks/useElectionCreateContext";
 
@@ -65,10 +63,7 @@ export function PollingStationRole() {
             </ChoiceList>
           </FormLayout.Section>
 
-          <FormLayout.Controls>
-            <Button type="submit">{t("next")}</Button>
-            <KeyboardKeys keys={[KeyboardKey.Shift, KeyboardKey.Enter]} />
-          </FormLayout.Controls>
+          <Button type="submit">{t("next")}</Button>
         </FormLayout>
       </Form>
     </section>

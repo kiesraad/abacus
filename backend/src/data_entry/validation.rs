@@ -338,11 +338,11 @@ impl Validate for CSOFirstSessionResults {
         ) {
             validation_results.warnings.push(ValidationResult {
                 fields: vec![
-                    votes_counts_path
-                        .field("total_votes_cast_count")
-                        .to_string(),
                     voters_counts_path
                         .field("total_admitted_voters_count")
+                        .to_string(),
+                    votes_counts_path
+                        .field("total_votes_cast_count")
                         .to_string(),
                 ],
                 code: ValidationResultCode::W203,
@@ -460,11 +460,6 @@ impl Validate for CSOFirstSessionResults {
                 validation_results.errors.push(ValidationResult {
                     fields: vec![
                         path.field("political_group_votes")
-                            .index(i)
-                            .field("total")
-                            .to_string(),
-                        path.field("votes_counts")
-                            .field("political_group_total_votes")
                             .index(i)
                             .field("total")
                             .to_string(),
@@ -1519,11 +1514,12 @@ mod tests {
                 })
                 .collect();
 
-            let candidate_counts_per_group = candidate_votes_and_totals
-                .iter()
-                .map(|(votes, _)| u32::try_from(votes.len()).unwrap())
-                .collect::<Vec<_>>();
-            let election = election_fixture(&candidate_counts_per_group);
+            let election = election_fixture(
+                &candidate_votes_and_totals
+                    .iter()
+                    .map(|(votes, _)| u32::try_from(votes.len()).unwrap())
+                    .collect::<Vec<_>>(),
+            );
 
             (political_group_votes, election)
         }
@@ -1710,9 +1706,12 @@ mod tests {
     }
 
     mod polling_station_results {
+        use std::collections::HashMap;
+
         use crate::{
             data_entry::{
-                DataError, PollingStationResults, Validate, ValidationResult, ValidationResultCode,
+                DataError, PoliticalGroupCandidateVotes, PoliticalGroupTotalVotes,
+                PollingStationResults, Validate, ValidationResult, ValidationResultCode,
                 ValidationResults, tests::ValidDefault,
             },
             election::tests::election_fixture,
@@ -1732,8 +1731,16 @@ mod tests {
 
         fn validate(data: PollingStationResults) -> Result<ValidationResults, DataError> {
             let mut validation_results = ValidationResults::default();
+
             data.validate(
-                &election_fixture(&[]),
+                // Adjust election political group list to the given test data
+                &election_fixture(
+                    &data
+                        .political_group_votes
+                        .iter()
+                        .map(|pg| u32::try_from(pg.candidate_votes.len()).unwrap())
+                        .collect::<Vec<_>>(),
+                ),
                 &polling_station_fixture(None),
                 &mut validation_results,
                 &"polling_station_results".into(),
@@ -1794,6 +1801,86 @@ mod tests {
                     assert!(validation_results.warnings.is_empty());
                 }
             }
+
+            Ok(())
+        }
+
+        /// CSO | F.403: 'Kandidaten en lijsttotalen': Totaal aantal stemmen op een lijst komt niet overeen met het lijsttotaal van corresponderende E.x
+        #[test]
+        fn test_f403() -> Result<(), DataError> {
+            let mut data = create_test_data();
+
+            data.votes_counts.political_group_total_votes = vec![
+                PoliticalGroupTotalVotes {
+                    number: 1,
+                    total: 100,
+                },
+                PoliticalGroupTotalVotes {
+                    number: 2,
+                    total: 200,
+                },
+            ];
+            data.votes_counts.total_votes_candidates_count = 300;
+            data.votes_counts.total_votes_cast_count = 300;
+
+            data.voters_counts.poll_card_count = 300;
+            data.voters_counts.total_admitted_voters_count = 300;
+
+            data.political_group_votes = vec![
+                PoliticalGroupCandidateVotes::from_test_data_auto(1, &[100]),
+                PoliticalGroupCandidateVotes::from_test_data_auto(2, &[200]),
+            ];
+
+            // Valid case
+            let validation_results = validate(data.clone())?;
+            assert!(validation_results.errors.is_empty());
+            assert!(validation_results.warnings.is_empty());
+
+            // Invalid case
+            data.political_group_votes[1].candidate_votes[0].votes = 199;
+            data.political_group_votes[1].total = 199;
+            let validation_results = validate(data.clone())?;
+            assert_eq!(
+                validation_results.errors,
+                [ValidationResult {
+                    code: ValidationResultCode::F403,
+                    fields: vec!["polling_station_results.political_group_votes[1].total".into()],
+                    context: Some(HashMap::from([(
+                        "political_group_number".to_string(),
+                        "2".to_string(),
+                    )])),
+                }],
+            );
+
+            // Multiple invalid case
+            data.political_group_votes[0].candidate_votes[0].votes = 99;
+            data.political_group_votes[0].total = 99;
+            let validation_results = validate(data)?;
+            assert_eq!(
+                validation_results.errors,
+                [
+                    ValidationResult {
+                        code: ValidationResultCode::F403,
+                        fields: vec![
+                            "polling_station_results.political_group_votes[0].total".into()
+                        ],
+                        context: Some(HashMap::from([(
+                            "political_group_number".to_string(),
+                            "1".to_string(),
+                        )])),
+                    },
+                    ValidationResult {
+                        code: ValidationResultCode::F403,
+                        fields: vec![
+                            "polling_station_results.political_group_votes[1].total".into()
+                        ],
+                        context: Some(HashMap::from([(
+                            "political_group_number".to_string(),
+                            "2".to_string(),
+                        )])),
+                    }
+                ],
+            );
 
             Ok(())
         }

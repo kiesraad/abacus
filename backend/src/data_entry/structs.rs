@@ -51,7 +51,7 @@ pub struct PollingStationResultsEntry {
 ///
 /// The exact type of results depends on the election counting method and
 /// whether this is the first or any subsequent data entry session. Based on
-/// this and of four different models can apply
+/// this, any of four different models can apply
 #[derive(Serialize, Deserialize, ToSchema, Clone, Debug, PartialEq, Eq, Hash)]
 #[serde(tag = "model")]
 pub enum PollingStationResults {

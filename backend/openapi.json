@@ -5908,7 +5908,7 @@
             "description": "Results for centrally counted (CSO) elections, first election committee session.\nThis contains the data entry values from Model Na 31-2 Bijlage 2."
           }
         ],
-        "description": "PollingStationResults contains the results for a polling station.\n\nThe exact type of results depends on the election counting method and\nwhether this is the first or any subsequent data entry session. Based on\nthis and of four different models can apply"
+        "description": "PollingStationResults contains the results for a polling station.\n\nThe exact type of results depends on the election counting method and\nwhether this is the first or any subsequent data entry session. Based on\nthis, any of four different models can apply"
       },
       "PollingStationType": {
         "type": "string",

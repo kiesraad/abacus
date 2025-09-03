@@ -173,7 +173,7 @@
   "F403": {
     "typist": {
       "title": "Controleer het totaal van de lijst",
-      "content": "Als het totaal overeenkomt met het papieren proces-verbaal, controleer dan ook de waarde bij E.{political_group_number} bij <link>Aantal kiezers en stemmen</link>."
+      "content": "Als het totaal overeenkomt met het papieren proces-verbaal, controleer dan ook de waarde bij E.{political_group_number} bij <Link to=\"../voters_votes_counts\">Aantal kiezers en stemmen</Link>."
     },
     "coordinator": {
       "title": "Controleer het totaal van de lijst en E.{political_group_number} in rubriek 3.2",

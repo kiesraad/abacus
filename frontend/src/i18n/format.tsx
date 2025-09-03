@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unsafe-type-assertion -- this file relies on many TypeScript unsafe type assertions */
 import { Fragment, ReactElement } from "react";
+import { Link } from "react-router";
 
 import { RenderCallback } from "./i18n.types";
 
@@ -7,10 +8,15 @@ type AST = Array<Element | string>;
 
 interface Element {
   tag: string;
+  attributes?: Record<string, string>;
   children: AST;
 }
 
-export const DEFAULT_ALLOWED_TAGS = ["ul", "li", "p", "strong", "em", "code", "h2", "h3", "h4"];
+export const DEFAULT_ALLOWED_TAGS = ["ul", "li", "p", "strong", "em", "code", "h2", "h3", "h4", "Link"];
+
+const DEFAULT_RENDER_CALLBACKS: Record<string, RenderCallback> = {
+  Link: (element, attributes) => <Link to={attributes?.to || "."}>{element}</Link>,
+};
 
 // parse the input string into an AST
 export function parse(input: string, allowed = DEFAULT_ALLOWED_TAGS): AST {
@@ -21,12 +27,26 @@ export function parse(input: string, allowed = DEFAULT_ALLOWED_TAGS): AST {
     // possible tag
     if (input[i] === "<") {
       let tag = "";
+      const attributes: Record<string, string> = {};
       let j = i + 1;
 
       // find the end of the tag
       while (input[j] !== ">" && j < input.length) {
         tag += input[j] as string;
         j += 1;
+      }
+
+      const tagParts = tag.split(" ");
+      tag = tagParts[0] || tag;
+
+      // Allow attributes for render callbacks
+      if (Object.keys(DEFAULT_RENDER_CALLBACKS).includes(tag)) {
+        tagParts.slice(1).forEach((attr) => {
+          const [key, value] = attr.split("=");
+          if (!key) return;
+
+          attributes[key] = value?.replace(/"/g, "") ?? "";
+        });
       }
 
       // check whether the tag is allowed
@@ -52,11 +72,17 @@ export function parse(input: string, allowed = DEFAULT_ALLOWED_TAGS): AST {
           const inner = input.slice(j, closingIndex);
           const children = parse(inner, allowed);
 
-          // add this tag with its parsed content to the tree
-          ast.push({
+          const element: Element = {
             tag,
             children,
-          } as Element);
+          };
+
+          if (Object.keys(attributes).length > 0) {
+            element.attributes = attributes;
+          }
+
+          // add this tag with its parsed content to the tree
+          ast.push(element);
 
           // skip the closing tag
           i = closingIndex + closingTag.length - 1;
@@ -82,7 +108,10 @@ export function parse(input: string, allowed = DEFAULT_ALLOWED_TAGS): AST {
 }
 
 // render the AST into React elements
-export function renderAst(input: AST, elements: Record<string, RenderCallback> = {}): ReactElement {
+export function renderAst(
+  input: AST,
+  elements: Record<string, RenderCallback> = DEFAULT_RENDER_CALLBACKS,
+): ReactElement {
   // we can use the index as key since the input is static
   return (
     <>
@@ -96,7 +125,7 @@ export function renderAst(input: AST, elements: Record<string, RenderCallback> =
 
         // if the tag registered as a render callback, call the callback
         if (elements[tag] !== undefined && elements[tag] instanceof Function) {
-          return <Fragment key={i}>{elements[tag](renderAst(children, elements))}</Fragment>;
+          return <Fragment key={i}>{elements[tag](renderAst(children, elements), element.attributes)}</Fragment>;
         }
 
         // handle line breaks

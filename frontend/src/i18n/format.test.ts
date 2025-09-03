@@ -62,6 +62,33 @@ describe("i18n format", () => {
           { tag: "p", children: ["Yes we can!"] },
         ],
       },
+      {
+        input: '<p>Can we handle a link to <Link to="/another-page">another page</Link></p>',
+        expected: [
+          {
+            tag: "p",
+            children: [
+              "Can we handle a link to ",
+              {
+                tag: "Link",
+                attributes: {
+                  to: "/another-page",
+                },
+                children: ["another page"],
+              },
+            ],
+          },
+        ],
+      },
+      {
+        input: '<p class="test">Only allow attributes for Links</p>',
+        expected: [
+          {
+            tag: "p",
+            children: ["Only allow attributes for Links"],
+          },
+        ],
+      },
     ];
 
     for (const { input, expected } of testCases) {

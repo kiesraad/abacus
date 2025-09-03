@@ -162,7 +162,7 @@ export function CheckAndSaveForm() {
                         <StatusList.Item key={code} status="error" id={`section-error-${section.id}-${code}`}>
                           <strong>{dottedCode(code)}</strong>
                           &nbsp;
-                          {tx(`feedback.${code}.typist.title`, {}, context)}
+                          {tx(`feedback.${code}.typist.title`, undefined, context)}
                         </StatusList.Item>
                       );
                     })}
@@ -171,7 +171,7 @@ export function CheckAndSaveForm() {
                         <StatusList.Item key={code} status="warning" id={`section-error-${section.id}-${code}`}>
                           <strong>{dottedCode(code)}</strong>
                           &nbsp;
-                          {tx(`feedback.${code}.typist.title`, {}, context)}
+                          {tx(`feedback.${code}.typist.title`, undefined, context)}
                         </StatusList.Item>
                       );
                     })}

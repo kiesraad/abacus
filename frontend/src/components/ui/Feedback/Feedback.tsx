@@ -1,5 +1,4 @@
-import { ReactElement, ReactNode, useEffect, useRef } from "react";
-import { Link } from "react-router";
+import { ReactNode, useEffect, useRef } from "react";
 
 import { hasTranslation, t, tx } from "@/i18n/translate";
 import { Role, ValidationResult } from "@/types/generated/openapi";
@@ -27,7 +26,6 @@ interface FeedbackProps {
 
 export function Feedback({ id, type, data, userRole, shouldFocus = true }: FeedbackProps) {
   const feedbackHeader = useRef<HTMLHeadingElement | null>(null);
-  const linkVotersandVotes = (children: ReactElement) => <Link to={`../voters_votes_counts`}>{children}</Link>;
   // NOTE: administrator roles are always mapped to coordinator here
   const role = userRole === "administrator" ? "coordinator" : userRole;
 
@@ -36,8 +34,8 @@ export function Feedback({ id, type, data, userRole, shouldFocus = true }: Feedb
     const title = t(`feedback.${code}.${role}.title`);
     const contentPath = `feedback.${code}.${role}.content`;
     const actionsPath = `feedback.${code}.${role}.actions`;
-    const content = hasTranslation(contentPath) ? tx(contentPath, { linkVotersandVotes }, context) : undefined;
-    const actions = hasTranslation(actionsPath) ? tx(actionsPath) : undefined;
+    const content = hasTranslation(contentPath) ? tx(contentPath, undefined, context) : undefined;
+    const actions = hasTranslation(actionsPath) ? tx(actionsPath, undefined, context) : undefined;
 
     const identical = feedbackList.find(
       (item) => item.title === title && item.content === content && item.actions === actions,

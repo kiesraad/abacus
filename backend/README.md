@@ -133,6 +133,7 @@ The following dependencies (crates) are used:
 - `utoipa-swagger-ui`: Swagger UI for the OpenAPI specification.
 - `async_zip`: creating a zip of the EML_NL and PDF PV.
 - `strum`: Converting enums from their string representation and back
+- `futures`: Used for BoxFuture and TryFutureExt, to work around https://github.com/rust-lang/rust/issues/100013
 
 Additionally, the following development dependencies are used:
 

@@ -89,10 +89,10 @@ async fn get_polling_station_election_and_committee_session_id(
 > {
     let polling_station =
         crate::polling_station::repository::get(&pool, polling_station_id).await?;
-    let election = crate::election::repository::get(&pool, polling_station.election_id).await?;
     let committee_session =
-        crate::committee_session::repository::get_election_committee_session(&pool, election.id)
+        crate::committee_session::repository::get(&pool, polling_station.committee_session_id)
             .await?;
+    let election = crate::election::repository::get(&pool, committee_session.election_id).await?;
     Ok((polling_station, election, committee_session))
 }
 
@@ -1187,6 +1187,14 @@ mod tests {
 
         // Claim the same polling station again
         let response = claim(pool.clone(), 1, EntryNumber::FirstEntry).await;
+        assert_eq!(response.status(), StatusCode::NOT_FOUND);
+
+        let new_ps = crate::polling_station::repository::get_by_previous_id(&pool, 1)
+            .await
+            .unwrap();
+
+        // Claim the same polling station again
+        let response = claim(pool.clone(), new_ps.id, EntryNumber::FirstEntry).await;
         assert_eq!(response.status(), StatusCode::OK);
 
         // Check that a new row was created

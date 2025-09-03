@@ -448,7 +448,7 @@ describe("Test CandidatesVotesForm", () => {
   });
 
   describe("CandidatesVotesForm errors", () => {
-    test("F.401 IncorrectTotal group total", async () => {
+    test("F.401 EmptyTotal group total", async () => {
       const user = userEvent.setup();
 
       overrideServerClaimDataEntryResponse({
@@ -465,26 +465,26 @@ describe("Test CandidatesVotesForm", () => {
       const submitButton = await screen.findByRole("button", { name: "Volgende" });
       await user.click(submitButton);
 
-      const feedbackMessage = [
-        "Controleer het totaal van de lijst. Is dit veld op het papieren proces-verbaal ook leeg? Dan kan je verdergaan.",
-        "F.401",
-        "Heb je iets niet goed overgenomen? Herstel de fout en ga verder.",
-        "Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder.",
-      ].join("");
-
-      expect(await screen.findByTestId("feedback-error")).toHaveTextContent(feedbackMessage);
+      // No feedback on top
+      expect(screen.queryByTestId("feedback-error")).toBeNull();
       expect(screen.queryByTestId("feedback-warning")).toBeNull();
-      // When all fields on a page are (potentially) invalid, we do not mark them as so
-      const expectedValidFields = [
-        candidatesFieldIds.candidate0,
-        candidatesFieldIds.candidate1,
-        candidatesFieldIds.total,
-      ];
-      expectFieldsToBeValidAndToNotHaveAccessibleErrorMessage(expectedValidFields);
-      expectFieldsToNotHaveIcon(expectedValidFields);
+
+      // Feedback on bottom
+      const feedbackMessage =
+        "Controleer het totaal van de lijst. Is dit veld op het papieren proces-verbaal ook leeg? Dan kan je verdergaan. (F.401)";
+      expect(await screen.findByTestId("missing-total-error")).toHaveTextContent(feedbackMessage);
+
+      expect(await screen.findByRole("textbox", { name: "Totaal lijst 1" })).toHaveFocus();
+
+      const expectedInvalidFieldIds = [candidatesFieldIds.total];
+      const expectedValidFieldIds = [candidatesFieldIds.candidate0, candidatesFieldIds.candidate1];
+      expectFieldsToBeValidAndToNotHaveAccessibleErrorMessage(expectedValidFieldIds);
+      expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage(expectedInvalidFieldIds, feedbackMessage);
+      expectFieldsToHaveIconAndToHaveAccessibleName(expectedInvalidFieldIds, "bevat een fout");
+      expectFieldsToNotHaveIcon(expectedValidFieldIds);
     });
 
-    test("F.401 EmptyTotal group total", async () => {
+    test("F.402 IncorrectTotal group total", async () => {
       const user = userEvent.setup();
 
       overrideServerClaimDataEntryResponse({
@@ -495,24 +495,29 @@ describe("Test CandidatesVotesForm", () => {
 
       await screen.findByTestId("political_group_votes_1_form");
       overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
-        validation_results: { errors: [validationResultMockData.F401], warnings: [] },
+        validation_results: { errors: [validationResultMockData.F402], warnings: [] },
       });
 
       const submitButton = screen.getByRole("button", { name: "Volgende" });
       await user.click(submitButton);
 
-      const feedbackMessage =
-        "Controleer ingevoerde aantallen. De opgetelde stemmen op de kandidaten en het ingevoerde totaal zijn niet gelijk.";
+      const feedbackMessage = [
+        "Controleer ingevoerde aantallen",
+        "F.402",
+        "De opgetelde stemmen op de kandidaten en het ingevoerde totaal zijn niet gelijk.",
+        "Heb je iets niet goed overgenomen? Herstel de fout en ga verder.",
+        "Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder.",
+      ].join("");
 
-      expect(await screen.findByTestId("missing-total-error")).toHaveTextContent(feedbackMessage);
-      expect(screen.queryByTestId("feedback-error")).toBeNull();
+      expect(await screen.findByTestId("feedback-error")).toHaveTextContent(feedbackMessage);
       expect(screen.queryByTestId("feedback-warning")).toBeNull();
-      expect(await screen.findByRole("textbox", { name: "Totaal lijst 1" })).toHaveFocus();
 
-      const expectedInvalidFieldIds = [candidatesFieldIds.total];
-      const expectedValidFieldIds = [candidatesFieldIds.candidate0, candidatesFieldIds.candidate1];
-      expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage(expectedInvalidFieldIds, feedbackMessage);
-      expectFieldsToHaveIconAndToHaveAccessibleName(expectedInvalidFieldIds, "bevat een fout");
+      // No fields marked
+      const expectedValidFieldIds = [
+        candidatesFieldIds.candidate0,
+        candidatesFieldIds.candidate1,
+        candidatesFieldIds.total,
+      ];
       expectFieldsToBeValidAndToNotHaveAccessibleErrorMessage(expectedValidFieldIds);
       expectFieldsToNotHaveIcon(expectedValidFieldIds);
     });

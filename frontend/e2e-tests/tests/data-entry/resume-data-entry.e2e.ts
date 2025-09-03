@@ -266,11 +266,19 @@ test.describe("resume data entry flow", () => {
           },
         },
         validation_results: {
-          errors: [],
+          errors: [
+            {
+              code: "F403",
+              fields: ["data.political_group_votes[0].total"],
+              context: {
+                political_group_number: "1",
+              },
+            },
+          ],
           warnings: [
             {
-              fields: ["data.votes_counts.blank_votes_count"],
               code: "W201",
+              fields: ["data.votes_counts.blank_votes_count"],
             },
           ],
         },

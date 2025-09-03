@@ -151,7 +151,7 @@
   },
   "F401": {
     "typist": {
-      "title": "Controleer het totaal van de lijst. Is dit veld op het papieren proces-verbaal ook leeg? Dan kan je verdergaan."
+      "title": "Controleer het totaal van de lijst. Is dit veld op het papieren proces-verbaal ook leeg? Dan kan je verdergaan. (F.401)"
     },
     "coordinator": {
       "title": "Het totaal van de lijst is niet ingevuld",

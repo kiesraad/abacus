@@ -484,7 +484,7 @@ test.describe("full data entry flow", () => {
     await candidatesListPage_1.fillCandidatesAndTotal([737, 153], 891);
     await candidatesListPage_1.next.click();
     await expect(candidatesListPage_1.fieldset).toBeVisible();
-    await expect(candidatesListPage_1.error).toContainText("F.401");
+    await expect(candidatesListPage_1.error).toContainText("F.402");
     await candidatesListPage_1.checkAcceptErrorsAndWarnings();
     await candidatesListPage_1.next.click();
 
@@ -505,7 +505,7 @@ test.describe("full data entry flow", () => {
       "W.203 Controleer D en H",
     ]);
     await expect(checkAndSavePage.summaryListItemPoliticalGroupCandidateVotes1).toHaveText([
-      "F.401 Controleer het totaal van de lijst. Is dit veld op het papieren proces-verbaal ook leeg? Dan kan je verdergaan.",
+      "F.402 Controleer ingevoerde aantallen",
     ]);
 
     await expect(checkAndSavePage.complete).toBeVisible();

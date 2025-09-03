@@ -31,7 +31,7 @@ export function Feedback({ id, type, data, userRole, shouldFocus = true }: Feedb
 
   const feedbackList: FeedbackItem[] = [];
   for (const { code, context } of data) {
-    const title = t(`feedback.${code}.${role}.title`);
+    const title = t(`feedback.${code}.${role}.title`, context);
     const contentPath = `feedback.${code}.${role}.content`;
     const actionsPath = `feedback.${code}.${role}.actions`;
     const content = hasTranslation(contentPath) ? tx(contentPath, undefined, context) : undefined;

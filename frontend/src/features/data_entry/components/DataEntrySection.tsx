@@ -48,7 +48,10 @@ export function DataEntrySection() {
   const missingTotalError = formSection.errors.includes("F401");
 
   // Memoize errors to prevent unnecessary focus triggers in Feedback
-  const memoizedErrors = React.useMemo(() => formSection.errors.getAll(), [formSection.errors]);
+  const memoizedErrors = React.useMemo(
+    () => formSection.errors.getAll().filter((result) => result.code !== "F401"),
+    [formSection.errors],
+  );
   const memoizedWarnings = React.useMemo(() => formSection.warnings.getAll(), [formSection.warnings]);
 
   // Scroll unaccepted warnings/errors checkbox into view when error for it is triggered
@@ -83,10 +86,10 @@ export function DataEntrySection() {
           <CommitteeSessionPausedModal showUnsavedChanges />
         )}
         {error instanceof ApiError && <ErrorModal error={error} />}
-        {formSection.isSaved && !formSection.errors.isEmpty() && (
+        {formSection.isSaved && memoizedErrors.length > 0 && (
           <Feedback id="feedback-error" type="error" data={memoizedErrors} userRole={user.role} shouldFocus={true} />
         )}
-        {formSection.isSaved && !formSection.warnings.isEmpty() && (
+        {formSection.isSaved && memoizedWarnings.length > 0 && (
           <Feedback
             id="feedback-warning"
             type="warning"

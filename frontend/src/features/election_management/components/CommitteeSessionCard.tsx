@@ -126,6 +126,13 @@ export function CommitteeSessionCard({
     label: t("election_management.committee_session_details"),
     to: "details",
   };
+
+  const investigationsButtonLink: ButtonLink = {
+    id: committeeSession.id,
+    label: t("election_management.requested_investigations"),
+    to: "investigations",
+  };
+
   const deleteButtonLink: ButtonLink = {
     id: committeeSession.id,
     label: t("election_management.delete_session"),
@@ -135,11 +142,10 @@ export function CommitteeSessionCard({
 
   switch (committeeSession.status) {
     case "created":
-      // TODO: Add in issue #1716 with link
-      // if (committeeSession.number > 1 && currentSession) {
-      //   buttonLinks.push({ id: committeeSession.id, label: t("election_management.select_polling_stations"), to: ""});
-      // }
       if (isCoordinator && currentSession) {
+        if (committeeSession.number > 1) {
+          buttonLinks.push(investigationsButtonLink);
+        }
         buttonLinks.push(detailsButtonLink);
         if (committeeSession.number > 1) {
           buttonLinks.push(deleteButtonLink);
@@ -188,7 +194,7 @@ export function CommitteeSessionCard({
         buttonLinks.push({
           id: committeeSession.id,
           label: t("election_management.results_and_documents"),
-          to: "report/download", // TODO: change link in #1791 when reports are linked to committee sessions
+          to: `report/committee-session/${committeeSession.id}/download`,
         });
       }
       if (currentSession) {

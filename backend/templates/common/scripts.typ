@@ -27,6 +27,30 @@
   )
 }
 
+/// Conditionally render the body if the condition is true, used to conditionally
+/// render cells in grids or tables. The result should always be spread using
+/// e.g. `..cell_if(condition, body)`. Can be used with either a single cell or
+/// an array of cells for the body.
+#let cell_if(condition, body) = {
+  if condition {
+    if type(body) == array {
+      body
+    } else {
+      (body,)
+    }
+  } else {
+    ()
+  }
+}
+
+#let small_header_text(value) = {
+  text(size: 6pt, weight: "semibold", value)
+}
+
+#let prefilled_text(value) = {
+  text(font: "Geist Mono", features: ("ss09", ), value)
+}
+
 /// Display a checkmark for usage in a checkbox
 #let checkmark() = {
   box(width: 8pt, height: 8pt, clip: false, curve(
@@ -88,6 +112,10 @@
   )
 }
 
+#let prefilled_number(value, thousands-sep: ".", zero: "0") = {
+  prefilled_text(fmt-number(value, thousands-sep: thousands-sep, zero: zero))
+}
+
 /// Display a box with a prefixed label and a value
 #let letterbox(letter, value: none, light: true, content) = {
   let bg = if light { luma(213) } else { black }
@@ -103,36 +131,64 @@
   )
 }
 
-#let empty_letterbox(letter, cells: 5, light: true, content) = {
-  let bg = if light { luma(213) } else { black }
+#let empty_letterbox(letter, cells: 5, light: true, original: none, corrected: (), bold_top_border: false, wide_cells: false, content) = {
+  let bg_grey = luma(213)
+  let bg = if light { bg_grey } else { black }
   let fill = if light { black } else { white }
+  let cell_width = range(0, cells).map(_ => if wide_cells { 8em } else { 2em })
+  let total_cell_width = cell_width.sum()
+  let additional_width = (3.5em, 1fr)
+  let grid_columns = if original != none {
+    (total_cell_width,) + cell_width + additional_width
+  } else {
+    cell_width + additional_width
+  }
+  let top_border_stroke = if bold_top_border {
+    (top: (thickness: 1.5pt, paint: black, cap: "butt", join: "miter"))
+  } else {
+    (top: (thickness: 0.5pt, paint: black))
+  }
 
   grid(
     inset: 9pt,
-    columns: range(0, cells).map(_ => 2em) + (3.5em, 1fr),
+    columns: grid_columns,
     align: (center, right),
     grid.vline(stroke: (thickness: 0.5pt, dash: "solid")),
-    ..range(0, cells).map(cell => {
+    ..cell_if(original != none, (
+      grid.cell(stroke: (rest: 0.5pt + black) + top_border_stroke, align: right, fill: bg_grey, prefilled_number(original)),
+      grid.vline(stroke: (thickness: 0.5pt, dash: "solid"))
+    )),
+    ..range(0, cells).enumerate().map(cell => {
+      let (index, c) = cell;
       grid.cell(
         stroke: (
           y: 0.5pt + black,
           x: (paint: black, thickness: 0.5pt, dash: "densely-dotted"),
-        ),
-        " ",
+        ) + top_border_stroke,
+        prefilled_number(corrected.at(index, default: " "))
       )
     }),
     grid.vline(stroke: (thickness: 0.5pt, dash: "solid")),
-    grid.cell(stroke: 0.5pt + black, align: center, fill: bg, text(fill: fill, weight: "bold", letter)),
+    grid.cell(stroke: (rest: 0.5pt + black) + top_border_stroke, align: center, fill: bg, text(fill: fill, weight: "bold", letter)),
     grid.cell(align: horizon + left, content),
   )
 }
 
-
+#let correction_title_grid(correction_width: 8em, input_width: 8em) = {
+  grid(
+    columns: (correction_width, input_width, 3.5em, 1fr),
+    grid.cell(inset: 8pt, align(right, small_header_text[Oorspronkelijk])),
+    grid.cell(inset: 8pt, align(right, small_header_text[Gecorrigeerd])),
+    [],
+    []
+  )
+}
 
 // Mathematical addition layout
-#let sum(..boxes, sum_box) = {
+#let sum(..boxes, with_correction_title: false, sum_box) = {
   grid(
     rows: auto,
+    ..cell_if(with_correction_title, correction_title_grid()),
     ..boxes,
     v(1em),
     grid(
@@ -306,9 +362,13 @@
   total: 0,
   values: (),
   continue_on_next_page: "",
+  corrected_cells: 4,
   column_total: (c, v) => [#c: #v],
   sum_total: [(#columns)],
   total_instruction: "",
+  with_originals: false,
+  explainer_text: none,
+  break_count: (25, 25, 15, 15)
 ) = {
   // Counter that keeps track of the column number
   let column = 0
@@ -322,11 +382,18 @@
   // Vote counter
   let votes = 0
 
+  // Count for the original total column (if rendered)
+  let original_total = 0
+
   // Max rows per table / column
-  let break_count = (25, 25, 15, 15)
   let total_rows = values.len()
 
-  text(size: 14pt, weight: "semibold")[Lijst #title]
+  box[
+    #box(inset: (bottom: 10pt), text(size: 14pt, weight: "semibold")[Lijst #title])
+    #if explainer_text != none {
+      box(width: 500pt, explainer_text)
+    }
+  ]
 
   set text(size: 8pt)
 
@@ -335,19 +402,23 @@
       let rows_in_column = calc.min(break_count.at(column, default: 15), total_rows - rc)
 
       table(
-        columns: (1fr, 2.5em, auto),
+        columns: (1fr, 2.5em) + if with_originals { (6em, 8em) } else { (8em,) },
         rows: (auto,) + range(0, rows_in_column).map(_ => 23pt) + (8pt, 23pt),
-        inset: 8pt,
-        stroke: 0.5pt + silver,
+        inset: (x: 4pt, y: 8pt),
+        stroke: 0.5pt + gray,
         fill: (_, y) => if y > 1 and calc.even(y) { luma(245) },
         table.hline(stroke: none),
         table.header(
-          ..headers.map(h => table.cell(stroke: none, align: bottom, text(size: 8pt, weight: "semibold", h)))
+          ..headers.enumerate().map(((idx, h)) => table.cell(stroke: none, align: bottom + if idx == 0 { left } else { right }, small_header_text(h)))
         ),
         table.hline(stroke: 1pt + black),
         ..while rc < total_rows {
           let c = values.at(rc)
           votes += c.votes
+          let original_votes = 10;
+          if with_originals {
+            original_total += 10
+          }
           rc += 1
           column_row += 1
 
@@ -358,8 +429,9 @@
               weight: "bold",
               [#c.number],
             )),
+            ..cell_if(with_originals, table.cell(inset: 8pt, fill: luma(213), align(right, prefilled_number(original_votes)))),
             if c.votes == none {
-              table.cell(inset: 1pt, empty_grid(paint: luma(213)))
+              table.cell(inset: 1pt, empty_grid(cells: corrected_cells, paint: luma(213)))
             } else {
               table.cell(align: right + horizon, text(number-width: "tabular", fmt-number(c.votes)))
             },
@@ -372,31 +444,44 @@
         table.hline(stroke: 1pt + black),
         table.footer(
           // Empty line
-          table.cell(colspan: 3, stroke: (x: none), fill: white, inset: 0pt, []),
+          table.cell(colspan: if with_originals { 4 } else { 3 }, stroke: (x: none), fill: white, inset: 0pt, []),
           if type(column_total) == function {
-            table.cell(colspan: 3, fill: white, align: center, {
+            table.cell(colspan: if with_originals { 4 } else { 3 }, fill: white, align: center, {
               // Increment the column counter
               column += 1
 
               // Caller defined render of column totals
-              column_total(column, votes)
+              if with_originals {
+                column_total(column, votes, original_total)
+              } else {
+                column_total(column, votes)
+              }
+
 
               // Reset the votes per column counter
               votes = 0
               column_row = 0
+              if with_originals {
+                original_total = 0
+              }
             })
           } else {
-            table.cell(colspan: 3, fill: white, inset: 0pt, {
+            table.cell(colspan: if with_originals { 4 } else { 3 }, fill: white, inset: 0pt, {
               column += 1
 
               grid(
-                columns: (1fr, 10em),
+                columns: (1fr,) + if with_originals { (6em, 8em) } else { (8em,) },
                 grid.cell(inset: 9pt, align: center)[#column_total #column],
-                grid.cell(empty_grid(cells: 5, paint: luma(213)), align: center, inset: 0pt),
+                ..cell_if(with_originals, grid.cell(inset: 8pt, fill: luma(213), align(right, prefilled_number(original_total)))),
+                grid.vline(stroke: (paint: luma(213), dash: "densely-dotted")),
+                grid.cell(empty_grid(cells: corrected_cells, paint: luma(213)), align: center, inset: 0pt),
               )
 
               votes = 0
               column_row = 0
+              if with_originals {
+                original_total = 0
+              }
             })
           },
         ),
@@ -411,17 +496,19 @@
         colbreak()
 
         if (column == 2) {
-          place(top + left, scope: "parent", float: true, text(
-            size: 14pt,
-            weight: "semibold",
-          )[Vervolg lijst #title])
+          place(top + left, scope: "parent", float: true, box[
+            #box(inset: (bottom: 10pt), text(size: 14pt, weight: "semibold")[Vervolg lijst #title])
+            #if explainer_text != none {
+              box(width: 500pt, explainer_text)
+            }
+          ])
         }
       }
     }
   })
 
   align(bottom, grid(
-    columns: (1fr, 8em),
+    columns: (1fr,) + if with_originals { (6em, 8em) } else { (8em,) },
     align: (right, right),
     inset: 8pt,
     grid.cell(stroke: 0.5pt + black, align: right, fill: black, text(fill: white, sum_total(range(
@@ -430,6 +517,7 @@
     )
       .map(str)
       .join(" + ")))),
+    ..cell_if(with_originals, grid.cell(fill: luma(213), stroke: 0.5pt + black, prefilled_number(10))),
     if total == none {
       grid.cell(stroke: 0.5pt + black, inset: 0pt, empty_grid(cells: 5, thickness: 0.5pt))
     } else {

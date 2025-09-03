@@ -5,7 +5,7 @@ import { NumberInput } from "./NumberInput";
 
 export const DefaultNumberInput: StoryObj = {
   render: () => {
-    return <NumberInput id="test" data-testid="test" defaultValue={12300} />;
+    return <NumberInput id="test" defaultValue={12300} />;
   },
   play: async ({ canvas, userEvent, step }) => {
     const input = canvas.getByRole("textbox");

@@ -27,7 +27,7 @@ import { ElectionStatus } from "./ElectionStatus";
 export function ElectionStatusPage() {
   const client = useApiClient();
   const navigate = useNavigate();
-  const { committeeSession, election, pollingStations, refetch: refetchElection } = useElection();
+  const { currentCommitteeSession, election, pollingStations, refetch: refetchElection } = useElection();
   const { statuses, refetch: refetchStatuses } = useElectionStatus();
   const { isCoordinator } = useUserRole();
   const [showPauseModal, setShowPauseModal] = useState(false);
@@ -64,7 +64,7 @@ export function ElectionStatusPage() {
   }
 
   function handleStatusChange(status: CommitteeSessionStatus) {
-    const url: COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_PATH = `/api/committee_sessions/${committeeSession.id}/status`;
+    const url: COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_PATH = `/api/committee_sessions/${currentCommitteeSession.id}/status`;
     const body: COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_BODY = { status: status };
     void client
       .putRequest(url, body)
@@ -79,7 +79,7 @@ export function ElectionStatusPage() {
   }
 
   function getLink() {
-    if (committeeSession.status === "data_entry_not_started") {
+    if (currentCommitteeSession.status === "data_entry_not_started") {
       return (
         <Button
           key="start"
@@ -92,7 +92,7 @@ export function ElectionStatusPage() {
           {t("election_status.start")}
         </Button>
       );
-    } else if (committeeSession.status === "data_entry_in_progress") {
+    } else if (currentCommitteeSession.status === "data_entry_in_progress") {
       return (
         <Button
           key="pause"
@@ -105,7 +105,7 @@ export function ElectionStatusPage() {
           {t("election_status.pause")}
         </Button>
       );
-    } else if (committeeSession.status === "data_entry_paused") {
+    } else if (currentCommitteeSession.status === "data_entry_paused") {
       return (
         <Button
           key="resume"
@@ -126,14 +126,14 @@ export function ElectionStatusPage() {
       <PageTitle title={`${t("election_status.title")} - Abacus`} />
       <header>
         <section>
-          <h1>{committeeSessionLabel(committeeSession.number)}</h1>
+          <h1>{committeeSessionLabel(currentCommitteeSession.number)}</h1>
         </section>
         <section>
           <div className="election_status">
             <HeaderCommitteeSessionStatusWithIcon
-              status={committeeSession.status}
+              status={currentCommitteeSession.status}
               userRole="coordinator"
-              committeeSessionNumber={committeeSession.number}
+              committeeSessionNumber={currentCommitteeSession.number}
             />
             {isCoordinator && getLink()}
           </div>
@@ -164,7 +164,7 @@ export function ElectionStatusPage() {
       )}
 
       {isCoordinator &&
-      committeeSession.status !== "data_entry_finished" &&
+      currentCommitteeSession.status !== "data_entry_finished" &&
       statuses.length > 0 &&
       statuses.every((s) => s.status === "definitive") ? (
         <Alert type="success">
@@ -176,7 +176,7 @@ export function ElectionStatusPage() {
         </Alert>
       ) : (
         isCoordinator &&
-        committeeSession.status === "data_entry_paused" && (
+        currentCommitteeSession.status === "data_entry_paused" && (
           <Alert type="warning">
             <strong className="heading-md">{t("election_status.data_entry_is_paused")}</strong>
             <p>{t("election_status.paused_status_information")}</p>
@@ -199,7 +199,8 @@ export function ElectionStatusPage() {
           statuses={statuses}
           addLinks={
             isCoordinator &&
-            (committeeSession.status === "data_entry_in_progress" || committeeSession.status === "data_entry_paused")
+            (currentCommitteeSession.status === "data_entry_in_progress" ||
+              currentCommitteeSession.status === "data_entry_paused")
           }
           navigate={(path) => void navigate(path)}
         />

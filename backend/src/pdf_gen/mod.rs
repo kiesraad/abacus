@@ -34,6 +34,7 @@ pub(crate) mod tests {
 
     pub fn polling_stations_fixture(
         election: &ElectionWithPoliticalGroups,
+        committee_session_id: u32,
         polling_station_voter_count: &[i64],
     ) -> Vec<PollingStation> {
         let mut polling_stations = Vec::new();
@@ -42,6 +43,8 @@ pub(crate) mod tests {
             polling_stations.push(PollingStation {
                 id: u32::try_from(idx).unwrap(),
                 election_id: election.id,
+                committee_session_id,
+                id_prev_session: None,
                 name: format!("Testplek {idx}"),
                 number: u32::try_from(idx).unwrap() + 30,
                 number_of_voters: if *voter_count < 0 {
@@ -90,9 +93,10 @@ pub(crate) mod tests {
     #[tokio::test]
     async fn it_generates_a_pdf_with_polling_stations() {
         let election = election_fixture(&[2, 3]);
+        let committee_session = committee_session_fixture(election.id);
         let content = generate_pdf(ModelNa31_2Input {
-            committee_session: committee_session_fixture(election.id),
-            polling_stations: polling_stations_fixture(&election, &[100, 200, 300]),
+            polling_stations: polling_stations_fixture(&election, committee_session.id,  &[100, 200, 300]),
+            committee_session,
             election,
             summary: ElectionSummary::zero(),
             hash: "ed36 60eb 017a 0d3a d3ef 72b1 6865 f991 a36a 9f92 72d9 1516 39cd 422b 4756 d161"

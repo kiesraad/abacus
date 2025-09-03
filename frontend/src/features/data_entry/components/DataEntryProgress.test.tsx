@@ -83,7 +83,7 @@ describe("DataEntryProgress", () => {
       continueToNextSection: false,
       validationResults: {
         errors: [validationResultMockData.F201],
-        warnings: [validationResultMockData.W201, validationResultMockData.W301],
+        warnings: [validationResultMockData.W201, validationResultMockData.W202],
       },
     });
     renderForm();

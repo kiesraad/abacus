@@ -40,7 +40,7 @@ describe("ResolveErrorsLayout", () => {
       PollingStationDataEntryGetErrorsHandler,
     );
     vi.spyOn(ReactRouter, "useParams").mockReturnValue({ electionId: "1", pollingStationId: "5" });
-    vi.spyOn(ReactRouter, "Outlet").mockReturnValue(<div data-testid="outlet">Outlet Content</div>);
+    vi.spyOn(ReactRouter, "Outlet").mockReturnValue(<div>Outlet Content</div>);
 
     renderLayout();
 

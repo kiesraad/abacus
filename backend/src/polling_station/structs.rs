@@ -15,6 +15,10 @@ use crate::{APIError, audit_log::PollingStationDetails};
 pub struct PollingStation {
     pub id: u32,
     pub election_id: u32,
+    pub committee_session_id: u32,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[schema(nullable = false)]
+    pub id_prev_session: Option<u32>,
     pub name: String,
     pub number: u32,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -39,6 +43,8 @@ impl From<PollingStation> for PollingStationDetails {
         Self {
             polling_station_id: value.id,
             polling_station_election_id: value.election_id,
+            polling_station_committee_session_id: value.committee_session_id,
+            polling_station_id_prev_session: value.id_prev_session,
             polling_station_name: value.name,
             polling_station_number: value.number,
             polling_station_number_of_voters: value.number_of_voters,
@@ -93,13 +99,20 @@ impl From<String> for PollingStationType {
 #[cfg(test)]
 pub(crate) mod tests {
     use super::*;
-    use crate::election::tests::election_fixture;
+    use crate::{
+        committee_session::tests::committee_session_fixture, election::tests::election_fixture,
+    };
 
     /// Create a test polling station.
     pub fn polling_station_fixture(number_of_voters: Option<i64>) -> PollingStation {
+        let election = election_fixture(&[]);
+        let committee_session = committee_session_fixture(election.id);
+
         PollingStation {
             id: 1,
-            election_id: election_fixture(&[]).id,
+            election_id: election.id,
+            committee_session_id: committee_session.id,
+            id_prev_session: None,
             name: "Testplek".to_string(),
             number: 34,
             number_of_voters,

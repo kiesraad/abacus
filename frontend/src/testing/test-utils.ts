@@ -3,7 +3,7 @@ import { createMemoryRouter, RouteObject } from "react-router";
 
 import { render, RenderOptions, screen } from "@testing-library/react";
 import { UserEvent } from "@testing-library/user-event";
-import { HttpHandler, matchRequestUrl } from "msw";
+import { HttpHandler } from "msw";
 import { expect, vi } from "vitest";
 
 import { Providers } from "./Providers";
@@ -100,19 +100,26 @@ export function spyOnHandler(handler: HttpHandler) {
   spy.mockName(`${method} ${path} spy`);
 
   server.events.on("request:start", ({ request }) => {
-    const url = new URL(request.url);
-    if (request.method === method && matchRequestUrl(url, path).matches) {
-      void request
-        .clone()
-        .text()
-        .then((body) => {
-          if (url.searchParams.size > 0) {
-            spy(body.length ? JSON.parse(body) : null, url.searchParams);
-          } else {
-            spy(body.length ? JSON.parse(body) : null);
-          }
-        });
-    }
+    handler
+      .parse({ request: request })
+      .then(({ match }) => {
+        if (request.method === method && match.matches) {
+          const url = new URL(request.url);
+          void request
+            .clone()
+            .text()
+            .then((body) => {
+              if (url.searchParams.size > 0) {
+                spy(body.length ? JSON.parse(body) : null, url.searchParams);
+              } else {
+                spy(body.length ? JSON.parse(body) : null);
+              }
+            });
+        }
+      })
+      .catch((error: unknown) => {
+        console.error(`Error in spyOnHandler: ${error}`);
+      });
   });
 
   return spy;

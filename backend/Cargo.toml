@@ -50,7 +50,7 @@ serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
 sqlx = { version = "0.8", features = ["runtime-tokio", "sqlite", "chrono"] }
 tower = "0.5"
-tracing-subscriber = { version = "0.3.19", features = ["env-filter"] }
+tracing-subscriber = { version = "0.3.20", features = ["env-filter"] }
 tracing = "0.1.41"
 tower-http = { version = "0.6", features = ["set-header", "trace"] }
 typst = { version = "0.13.1", optional = true }
@@ -64,6 +64,7 @@ cookie = { version = "0.18.1", features = ["percent-encode"] }
 async_zip = { version = "0.0.18", features = ["tokio", "deflate", "chrono"] }
 strum = { version = "0.27", features = ["derive"] }
 tokio-util = { version = "0.7.16", features = ["io"] }
+futures = "0.3.31"
 
 [dev-dependencies]
 test-log = "0.2.17"

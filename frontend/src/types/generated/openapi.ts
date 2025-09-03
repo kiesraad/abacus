@@ -58,12 +58,6 @@ export interface ELECTION_APPORTIONMENT_REQUEST_PARAMS {
 }
 export type ELECTION_APPORTIONMENT_REQUEST_PATH = `/api/elections/${number}/apportionment`;
 
-// /api/elections/{election_id}/committee_sessions
-export interface ELECTION_COMMITTEE_SESSION_LIST_REQUEST_PARAMS {
-  election_id: number;
-}
-export type ELECTION_COMMITTEE_SESSION_LIST_REQUEST_PATH = `/api/elections/${number}/committee_sessions`;
-
 // /api/elections/{election_id}/download_n_10_2
 export interface ELECTION_DOWNLOAD_N_10_2_REQUEST_PARAMS {
   election_id: number;
@@ -419,13 +413,6 @@ export interface CommitteeSessionDetails {
 }
 
 /**
- * Committee session list response
- */
-export interface CommitteeSessionListResponse {
-  committee_sessions: CommitteeSession[];
-}
-
-/**
  * Committee session number of voters change request
  */
 export interface CommitteeSessionNumberOfVotersChangeRequest {
@@ -637,10 +624,11 @@ export interface ElectionDetails {
 
 /**
  * Election details response, including the election's candidate list (political groups),
- * its polling stations and the current committee session
+ * its polling stations and its committee sessions and current committee session
  */
 export interface ElectionDetailsResponse {
-  committee_session: CommitteeSession;
+  committee_sessions: CommitteeSession[];
+  current_committee_session: CommitteeSession;
   election: ElectionWithPoliticalGroups;
   polling_stations: PollingStation[];
 }
@@ -950,8 +938,10 @@ export interface PoliticalGroupTotalVotes {
  */
 export interface PollingStation {
   address: string;
+  committee_session_id: number;
   election_id: number;
   id: number;
+  id_prev_session?: number;
   locality: string;
   name: string;
   number: number;
@@ -962,12 +952,14 @@ export interface PollingStation {
 
 export interface PollingStationDetails {
   polling_station_address: string;
+  polling_station_committee_session_id: number;
   polling_station_election_id: number;
   polling_station_id: number;
+  polling_station_id_prev_session?: number;
   polling_station_locality: string;
   polling_station_name: string;
   polling_station_number: number;
-  polling_station_number_of_voters?: number | null;
+  polling_station_number_of_voters?: number;
   polling_station_postal_code: string;
   polling_station_type?: string;
 }
@@ -1202,9 +1194,7 @@ export type ValidationResultCode =
   | "W201"
   | "W202"
   | "W203"
-  | "W205"
-  | "W301"
-  | "W302";
+  | "W204";
 
 export interface ValidationResults {
   errors: ValidationResult[];

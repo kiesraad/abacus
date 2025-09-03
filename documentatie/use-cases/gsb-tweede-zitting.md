@@ -8,8 +8,6 @@ __Niveau:__ hoog-over, wolk, ☁️
 
 ### Hoofdscenario en uitbreidingen
 
-__Trigger:__ één of meer stembureaus moeten herteld worden n.a.v. verzoek CSB
-
 __Hoofdscenario:__  
 1. Het GSB ontvangt één of meerdere verzoeken tot onderzoek/hertelling van het CSB.
 2. [De coördinator GSB bereidt de documenten voor de zitting voor.](#de-coördinator-gsb-bereidt-de-documenten-voor-de-zitting-voor-zee)

@@ -30,7 +30,8 @@ function renderComponent() {
 describe("AbortDataEntryControl", () => {
   beforeEach(() => {
     vi.spyOn(useElection, "useElection").mockReturnValue({
-      committeeSession: committeeSessionMockData,
+      currentCommitteeSession: committeeSessionMockData,
+      committeeSessions: [committeeSessionMockData],
       election: electionMockData,
       pollingStations: [],
       pollingStation: undefined,
@@ -38,7 +39,12 @@ describe("AbortDataEntryControl", () => {
         Promise.resolve({
           status: ApiResponseStatus.Success,
           code: 200,
-          data: { committee_session: committeeSessionMockData, election: electionMockData, polling_stations: [] },
+          data: {
+            current_committee_session: committeeSessionMockData,
+            committee_sessions: [committeeSessionMockData],
+            election: electionMockData,
+            polling_stations: [],
+          },
         }),
     });
   });

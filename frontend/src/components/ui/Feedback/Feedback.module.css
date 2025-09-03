@@ -6,7 +6,7 @@
   flex-direction: column;
   gap: 1.5rem;
 
-  div:global(.feedback-item) {
+  div.item {
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
@@ -14,7 +14,7 @@
     header {
       display: flex;
       flex-direction: row;
-      justify-content: space-between;
+      align-items: flex-start;
 
       svg {
         flex: 0 0 1.5rem;
@@ -28,21 +28,22 @@
       }
 
       span {
-        flex: 0 0 2rem;
+        flex: 0 0 auto;
         font-weight: bold;
         padding-left: 1.5rem;
       }
     }
 
-    div:global(.content) {
-      max-width: 42.5rem;
+    div.content {
+      max-width: 40rem;
       a:visited {
         color: var(--link-default);
       }
     }
   }
 
-  div:global(.feedback-action) {
+  div.actions {
+    max-width: 40rem;
     ul {
       margin: 0;
     }

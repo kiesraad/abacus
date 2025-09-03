@@ -11,6 +11,7 @@ import { ErrorBoundary } from "@/components/error/ErrorBoundary";
 import { electionManagementRoutes } from "@/features/election_management/routes";
 import { ElectionProvider } from "@/hooks/election/ElectionProvider";
 import { ElectionStatusProvider } from "@/hooks/election/ElectionStatusProvider";
+import { getCommitteeSessionMockData } from "@/testing/api-mocks/CommitteeSessionMockData";
 import { getElectionMockData } from "@/testing/api-mocks/ElectionMockData";
 import {
   CommitteeSessionStatusChangeRequestHandler,
@@ -28,7 +29,7 @@ import {
   waitFor,
 } from "@/testing/test-utils";
 import { TestUserProvider } from "@/testing/TestUserProvider";
-import { ElectionDetailsResponse, ErrorResponse } from "@/types/generated/openapi";
+import { CommitteeSession, ElectionDetailsResponse, ErrorResponse } from "@/types/generated/openapi";
 
 import { ElectionReportPage } from "./ElectionReportPage";
 
@@ -74,6 +75,7 @@ describe("ElectionReportPage", () => {
       navigate(props.to);
       return null;
     });
+    vi.spyOn(ReactRouter, "useParams").mockReturnValue({ committeeSessionId: "1" });
   });
 
   test("Redirects to CommitteeSessionDetailsPage when details are not filled in", async () => {
@@ -149,6 +151,32 @@ describe("ElectionReportPage", () => {
     expect(navigate).toHaveBeenCalledWith("../../status");
   });
 
+  test("Does not show resume data entry button when not current committee session", async () => {
+    const committeeSessionData: Partial<CommitteeSession> = {
+      status: "data_entry_finished",
+      location: "Den Haag",
+      start_date: "2026-03-18",
+      start_time: "21:36",
+    };
+    const electionData = getElectionMockData({}, { id: 2, number: 2, ...committeeSessionData });
+    electionData.committee_sessions = [
+      getCommitteeSessionMockData({ id: 2, number: 2, ...committeeSessionData }),
+      getCommitteeSessionMockData({ id: 1, number: 1, ...committeeSessionData }),
+    ];
+    overrideOnce("get", "/api/elections/1", 200, electionData);
+
+    renderPage();
+
+    expect(await screen.findByRole("heading", { level: 1, name: "Eerste zitting" })).toBeVisible();
+    expect(
+      await screen.findByRole("heading", { level: 2, name: "Telresultaten eerste zitting gemeente Heemdamseburg" }),
+    ).toBeVisible();
+    expect(await screen.findByRole("button", { name: "Download los proces-verbaal" })).toBeVisible();
+    expect(await screen.findByRole("button", { name: "Download proces-verbaal met telbestand" })).toBeVisible();
+    expect(await screen.findByRole("link", { name: "Terug naar overzicht" })).toBeVisible();
+    expect(screen.queryByRole("button", { name: "Steminvoer hervatten" })).not.toBeInTheDocument();
+  });
+
   test("Shows error page when resume data entry call returns an error", async () => {
     // error is expected
     vi.spyOn(console, "error").mockImplementation(() => {});
@@ -180,7 +208,7 @@ describe("ElectionReportPage", () => {
       reference: "InvalidCommitteeSessionStatus",
     } satisfies ErrorResponse);
 
-    await router.navigate("/elections/1/report/download");
+    await router.navigate("/elections/1/report/committee-session/1/download");
 
     rtlRender(<Providers router={router} />);
 
@@ -226,7 +254,7 @@ describe("ElectionReportPage", () => {
       ),
     );
 
-    await router.navigate("/elections/1/report/download");
+    await router.navigate("/elections/1/report/committee-session/1/download");
 
     rtlRender(<Providers router={router} />);
 

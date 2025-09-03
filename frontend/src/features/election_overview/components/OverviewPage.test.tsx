@@ -64,7 +64,7 @@ describe("OverviewPage", () => {
     expect(table).toBeVisible();
     expect(table).toHaveTableContent([
       ["Verkiezing", "Niveau stembureau", "Status"],
-      ["Gemeenteraadsverkiezingen 2026", "", "Steminvoer bezig"],
+      ["Gemeenteraadsverkiezingen 2026", "GSB - Heemdamseburg (0035)", "Steminvoer bezig — Eerste zitting"],
     ]);
 
     const tableRows = within(table).queryAllByRole("row");
@@ -91,7 +91,7 @@ describe("OverviewPage", () => {
     expect(table).toBeVisible();
     expect(table).toHaveTableContent([
       ["Verkiezing", "Niveau stembureau", "Status"],
-      ["Gemeenteraadsverkiezingen 2026", "", "Steminvoer bezig"],
+      ["Gemeenteraadsverkiezingen 2026", "GSB - Heemdamseburg (0035)", "Steminvoer bezig — Eerste zitting"],
     ]);
 
     const tableRows = within(table).queryAllByRole("row");

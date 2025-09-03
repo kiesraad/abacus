@@ -315,23 +315,6 @@ pub async fn election_import(
         )
         .await?;
 
-    // Create first committee session for the election
-    let committee_session = crate::committee_session::repository::create(
-        &pool,
-        CommitteeSessionCreateRequest {
-            number: 1,
-            election_id: election.id,
-            number_of_voters: edu.number_of_voters,
-        },
-    )
-    .await?;
-    audit_service
-        .log(
-            &AuditEvent::CommitteeSessionCreated(committee_session.clone().into()),
-            None,
-        )
-        .await?;
-
     // Create polling stations
     if let Some(places) = polling_places {
         let number_of_polling_stations = places.len();

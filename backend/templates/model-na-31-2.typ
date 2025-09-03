@@ -31,7 +31,7 @@
 
 #location_name
 
-#input.committee_session.location #input.committee_session.start_date #input.committee_session.start_time
+#input.committee_session.location #format_date(input.committee_session.start_date) #input.committee_session.start_time
 
 == Proces-verbaal
 

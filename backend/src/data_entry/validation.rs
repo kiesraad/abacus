@@ -875,9 +875,11 @@ mod tests {
     use test_log::test;
 
     use super::*;
-    use crate::data_entry::{DifferenceCountsCompareVotesCastAdmittedVoters, YesNo};
     use crate::{
-        data_entry::{PoliticalGroupTotalVotes, tests::ValidDefault},
+        data_entry::{
+            DifferenceCountsCompareVotesCastAdmittedVoters, PoliticalGroupTotalVotes, YesNo,
+            tests::ValidDefault,
+        },
         election::tests::election_fixture,
         polling_station::structs::tests::polling_station_fixture,
     };

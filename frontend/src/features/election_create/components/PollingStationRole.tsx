@@ -63,7 +63,9 @@ export function PollingStationRole() {
             </ChoiceList>
           </FormLayout.Section>
 
-          <Button type="submit">{t("next")}</Button>
+          <FormLayout.Controls>
+            <Button type="submit">{t("next")}</Button>
+          </FormLayout.Controls>
         </FormLayout>
       </Form>
     </section>

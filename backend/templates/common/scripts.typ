@@ -85,6 +85,14 @@
   )
 }
 
+/// Format a list of items with comma separation, or return - if empty
+#let comma_list(items, empty: "-") = {
+  if items.len() == 0 {
+    return empty
+  }
+
+  items.map(str).join(", ")
+}
 
 /// Format a number with thousands separator
 #let fmt-number(

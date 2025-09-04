@@ -5020,7 +5020,8 @@
           "voters_counts",
           "votes_counts",
           "differences_counts",
-          "political_group_votes"
+          "political_group_votes",
+          "polling_station_investigations"
         ],
         "properties": {
           "differences_counts": {
@@ -5033,6 +5034,10 @@
               "$ref": "#/components/schemas/PoliticalGroupCandidateVotes"
             },
             "description": "The summary votes for each political group (and each candidate within)"
+          },
+          "polling_station_investigations": {
+            "$ref": "#/components/schemas/PollingStationInvestigations",
+            "description": "Polling stations where results were investigated by the GSB"
           },
           "voters_counts": {
             "$ref": "#/components/schemas/VotersCounts",
@@ -5726,7 +5731,8 @@
           },
           "number": {
             "type": "integer",
-            "format": "int64"
+            "format": "int32",
+            "minimum": 0
           },
           "number_of_voters": {
             "type": "integer",
@@ -5785,7 +5791,8 @@
           },
           "polling_station_number": {
             "type": "integer",
-            "format": "int64"
+            "format": "int32",
+            "minimum": 0
           },
           "polling_station_number_of_voters": {
             "type": "integer",
@@ -5833,6 +5840,45 @@
             "minimum": 0
           }
         }
+      },
+      "PollingStationInvestigations": {
+        "type": "object",
+        "description": "Polling stations where results were investigated by the GSB,\nas vectors of polling station numbers",
+        "required": [
+          "admitted_voters_recounted",
+          "investigated_other_reason",
+          "ballots_recounted"
+        ],
+        "properties": {
+          "admitted_voters_recounted": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32",
+              "minimum": 0
+            },
+            "description": "Admitted voters were recounted\n(\"Toegelaten kiezers opnieuw vastgesteld?\")"
+          },
+          "ballots_recounted": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32",
+              "minimum": 0
+            },
+            "description": "Ballots were (partially) recounted\n(\"Stembiljetten (deels) herteld?\")"
+          },
+          "investigated_other_reason": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32",
+              "minimum": 0
+            },
+            "description": "Investigated for other reasons than unexplained difference\n(\"Onderzocht vanwege andere reden dan onverklaard verschil?\")"
+          }
+        },
+        "additionalProperties": false
       },
       "PollingStationListResponse": {
         "type": "object",
@@ -6233,29 +6279,9 @@
             "type": "array",
             "items": {
               "type": "integer",
-              "format": "int64"
+              "format": "int32",
+              "minimum": 0
             }
-          }
-        },
-        "additionalProperties": false
-      },
-      "SummaryDifferenceCountsCompareVotesCastAdmittedVoters": {
-        "type": "object",
-        "description": "Contains a summary of the differences, containing which polling stations had differences.",
-        "required": [
-          "admitted_voters_equal_votes_cast",
-          "votes_cast_greater_than_admitted_voters",
-          "votes_cast_smaller_than_admitted_voters"
-        ],
-        "properties": {
-          "admitted_voters_equal_votes_cast": {
-            "type": "boolean"
-          },
-          "votes_cast_greater_than_admitted_voters": {
-            "type": "boolean"
-          },
-          "votes_cast_smaller_than_admitted_voters": {
-            "type": "boolean"
           }
         },
         "additionalProperties": false
@@ -6265,17 +6291,9 @@
         "description": "Contains a summary of the differences, containing which polling stations had differences.",
         "required": [
           "more_ballots_count",
-          "fewer_ballots_count",
-          "compare_votes_cast_admitted_voters",
-          "difference_completely_accounted_for"
+          "fewer_ballots_count"
         ],
         "properties": {
-          "compare_votes_cast_admitted_voters": {
-            "$ref": "#/components/schemas/SummaryDifferenceCountsCompareVotesCastAdmittedVoters"
-          },
-          "difference_completely_accounted_for": {
-            "$ref": "#/components/schemas/YesNo"
-          },
           "fewer_ballots_count": {
             "$ref": "#/components/schemas/SumCount"
           },

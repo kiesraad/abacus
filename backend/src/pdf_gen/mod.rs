@@ -46,7 +46,7 @@ pub(crate) mod tests {
                 committee_session_id,
                 id_prev_session: None,
                 name: format!("Testplek {idx}"),
-                number: idx as i64 + 30,
+                number: u32::try_from(idx).unwrap() + 30,
                 number_of_voters: if *voter_count < 0 {
                     None
                 } else {

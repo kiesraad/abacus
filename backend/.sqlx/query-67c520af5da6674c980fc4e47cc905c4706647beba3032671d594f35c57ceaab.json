@@ -1,6 +1,6 @@
 {
   "db_name": "SQLite",
-  "query": "\n        SELECT\n            p.id AS \"id: u32\",\n            c.election_id AS \"election_id: u32\",\n            p.committee_session_id AS \"committee_session_id: u32\",\n            p.id_prev_session AS \"id_prev_session: _\",\n            p.name,\n            p.number,\n            p.number_of_voters,\n            p.polling_station_type AS \"polling_station_type: _\",\n            p.address,\n            p.postal_code,\n            p.locality\n        FROM polling_stations AS p\n        JOIN committee_sessions AS c ON c.id = p.committee_session_id\n        WHERE p.id_prev_session = $1\n        ",
+  "query": "\n            INSERT INTO polling_stations (\n                committee_session_id,\n                id_prev_session,\n                name,\n                number,\n                number_of_voters,\n                polling_station_type,\n                address,\n                postal_code,\n                locality\n            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)\n            RETURNING\n                id AS \"id: u32\",\n                ? AS \"election_id!: u32\", -- Workaround to get election_id in the result without a temporary struct\n                committee_session_id AS \"committee_session_id: u32\",\n                id_prev_session AS \"id_prev_session: _\",\n                name,\n                number AS \"number: u32\",\n                number_of_voters,\n                polling_station_type AS \"polling_station_type: _\",\n                address,\n                postal_code,\n                locality\n            ",
   "describe": {
     "columns": [
       {
@@ -9,9 +9,9 @@
         "type_info": "Integer"
       },
       {
-        "name": "election_id: u32",
+        "name": "election_id!: u32",
         "ordinal": 1,
-        "type_info": "Integer"
+        "type_info": "Null"
       },
       {
         "name": "committee_session_id: u32",
@@ -29,7 +29,7 @@
         "type_info": "Text"
       },
       {
-        "name": "number",
+        "name": "number: u32",
         "ordinal": 5,
         "type_info": "Integer"
       },
@@ -60,11 +60,11 @@
       }
     ],
     "parameters": {
-      "Right": 1
+      "Right": 10
     },
     "nullable": [
       false,
-      false,
+      null,
       false,
       true,
       false,
@@ -76,5 +76,5 @@
       false
     ]
   },
-  "hash": "f407a8a31693358a3371ce9bee68b7848d33882339bbe2d3217308ceb569f80d"
+  "hash": "67c520af5da6674c980fc4e47cc905c4706647beba3032671d594f35c57ceaab"
 }

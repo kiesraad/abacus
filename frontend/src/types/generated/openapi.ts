@@ -1131,7 +1131,18 @@ export interface SumCount {
 /**
  * Contains a summary of the differences, containing which polling stations had differences.
  */
+export interface SummaryDifferenceCountsCompareVotesCastAdmittedVoters {
+  admitted_voters_equal_votes_cast: boolean;
+  votes_cast_greater_than_admitted_voters: boolean;
+  votes_cast_smaller_than_admitted_voters: boolean;
+}
+
+/**
+ * Contains a summary of the differences, containing which polling stations had differences.
+ */
 export interface SummaryDifferencesCounts {
+  compare_votes_cast_admitted_voters: SummaryDifferenceCountsCompareVotesCastAdmittedVoters;
+  difference_completely_accounted_for: YesNo;
   fewer_ballots_count: SumCount;
   more_ballots_count: SumCount;
 }

@@ -6286,14 +6286,43 @@
         },
         "additionalProperties": false
       },
+      "SummaryDifferenceCountsCompareVotesCastAdmittedVoters": {
+        "type": "object",
+        "description": "Contains a summary of the differences, containing which polling stations had differences.",
+        "required": [
+          "admitted_voters_equal_votes_cast",
+          "votes_cast_greater_than_admitted_voters",
+          "votes_cast_smaller_than_admitted_voters"
+        ],
+        "properties": {
+          "admitted_voters_equal_votes_cast": {
+            "type": "boolean"
+          },
+          "votes_cast_greater_than_admitted_voters": {
+            "type": "boolean"
+          },
+          "votes_cast_smaller_than_admitted_voters": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false
+      },
       "SummaryDifferencesCounts": {
         "type": "object",
         "description": "Contains a summary of the differences, containing which polling stations had differences.",
         "required": [
           "more_ballots_count",
-          "fewer_ballots_count"
+          "fewer_ballots_count",
+          "compare_votes_cast_admitted_voters",
+          "difference_completely_accounted_for"
         ],
         "properties": {
+          "compare_votes_cast_admitted_voters": {
+            "$ref": "#/components/schemas/SummaryDifferenceCountsCompareVotesCastAdmittedVoters"
+          },
+          "difference_completely_accounted_for": {
+            "$ref": "#/components/schemas/YesNo"
+          },
           "fewer_ballots_count": {
             "$ref": "#/components/schemas/SumCount"
           },

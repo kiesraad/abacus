@@ -1980,8 +1980,8 @@ mod tests {
     mod differences_counts {
         use crate::data_entry::tests::ValidDefault;
         use crate::data_entry::{
-            DifferenceCountsCompareVotesCastAdmittedVoters, PoliticalGroupCandidateVotes,
-            PoliticalGroupTotalVotes, PollingStationResults, VotersCounts, VotesCounts,
+            CSOFirstSessionResults, DifferenceCountsCompareVotesCastAdmittedVoters,
+            PoliticalGroupCandidateVotes, PoliticalGroupTotalVotes, VotersCounts, VotesCounts,
         };
         use crate::{
             data_entry::{
@@ -2666,7 +2666,6 @@ mod tests {
     // CSO | F.305 (Als D = H) I is ingevuld
     #[test]
     fn test_f305_more_ballots_count() {
-      validation_results = ValidationResults::default();
         let polling_station_results = CSOFirstSessionResults {
             extra_investigation: ValidDefault::valid_default(),
             counting_differences_polling_station: ValidDefault::valid_default(),
@@ -2700,7 +2699,7 @@ mod tests {
                 },
             },
             political_group_votes: vec![PoliticalGroupCandidateVotes::from_test_data_auto(
-                1
+                1,
                 &[50],
             )],
         };

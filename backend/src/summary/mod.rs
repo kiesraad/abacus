@@ -6,7 +6,7 @@ use crate::{
     data_entry::{
         CSOFirstSessionResults, CandidateVotes, Count, DifferencesCounts,
         PoliticalGroupCandidateVotes, PoliticalGroupTotalVotes, Validate, ValidationResults,
-        VotersCounts, VotesCounts,
+        VotersCounts, VotesCounts, YesNo,
     },
     election::ElectionWithPoliticalGroups,
     error::ErrorReference,
@@ -177,6 +177,8 @@ impl SummaryDifferenceCountsCompareVotesCastAdmittedVoters {
 pub struct SummaryDifferencesCounts {
     pub more_ballots_count: SumCount,
     pub fewer_ballots_count: SumCount,
+    pub compare_votes_cast_admitted_voters: SummaryDifferenceCountsCompareVotesCastAdmittedVoters,
+    pub difference_completely_accounted_for: YesNo,
 }
 
 impl SummaryDifferencesCounts {

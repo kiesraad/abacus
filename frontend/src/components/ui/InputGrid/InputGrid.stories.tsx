@@ -35,11 +35,7 @@ export const DefaultGrid: StoryObj<Props> = {
 
     return (
       <InputGrid zebra={zebra}>
-        <InputGrid.Header>
-          <th>Veld</th>
-          <th>Geteld aantal</th>
-          <th>Omschrijving</th>
-        </InputGrid.Header>
+        <InputGrid.Header field="Veld" value="Geteld aantal" title="Omschrijving" />
         <InputGrid.Body>
           <InputGridRow
             readOnly={readOnly}
@@ -106,11 +102,7 @@ export const CandidatesGrid: StoryObj<Props> = {
 
     return (
       <InputGrid zebra={zebra}>
-        <InputGrid.Header>
-          <th>Nummer</th>
-          <th>Aantal stemmen</th>
-          <th>Kandidaat</th>
-        </InputGrid.Header>
+        <InputGrid.Header field="Nummer" value="Aantal stemmen" title="Kandidaat" />
         <InputGrid.Body>
           <InputGridRow
             readOnly={readOnly}

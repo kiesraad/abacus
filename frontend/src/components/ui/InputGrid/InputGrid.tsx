@@ -21,9 +21,13 @@ export function InputGrid({ zebra, children }: InputGridProps) {
   );
 }
 
-InputGrid.Header = ({ children }: { children: InputGridRowCells }) => (
+InputGrid.Header = ({ field, value, title }: { field: string; value: string; title: string }) => (
   <thead>
-    <tr>{children}</tr>
+    <tr>
+      <th className={cls.field}>{field}</th>
+      <th className={cls.value}>{value}</th>
+      <th className={cls.title}>{title}</th>
+    </tr>
   </thead>
 );
 

@@ -18,7 +18,7 @@ function getValidationResults(section: HTMLElement | null) {
 }
 
 describe("ResolveErrorsOverview", () => {
-  const structure = getDataEntryStructure(electionMockData);
+  const structure = getDataEntryStructure("CSOFirstSession", electionMockData);
 
   test("render sections with errors and warnings", () => {
     const results: ValidationResults = {

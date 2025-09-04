@@ -7,6 +7,7 @@ import { FormSectionId } from "@/types/types";
 
 import { DataEntryContext } from "../hooks/DataEntryContext";
 import useDataEntry from "../hooks/useDataEntry";
+import { isStateLoaded } from "../utils/utils";
 
 export interface DataEntryProviderProps {
   election: ElectionWithPoliticalGroups;
@@ -47,18 +48,9 @@ export function DataEntryProvider({ election, pollingStationId, entryNumber, chi
     }
   }
 
-  if (!stateAndActions.pollingStationResults) {
+  if (!isStateLoaded(stateAndActions)) {
     return null;
   }
 
-  return (
-    <DataEntryContext.Provider
-      value={{
-        ...stateAndActions,
-        pollingStationResults: stateAndActions.pollingStationResults,
-      }}
-    >
-      {children}
-    </DataEntryContext.Provider>
-  );
+  return <DataEntryContext.Provider value={stateAndActions}>{children}</DataEntryContext.Provider>;
 }

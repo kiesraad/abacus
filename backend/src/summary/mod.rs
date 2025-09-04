@@ -1,13 +1,12 @@
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
 
-use crate::data_entry::YesNo;
 use crate::{
     APIError,
     data_entry::{
-        CandidateVotes, Count, DifferencesCounts, PoliticalGroupCandidateVotes,
-        PoliticalGroupTotalVotes, PollingStationResults, Validate, ValidationResults, VotersCounts,
-        VotesCounts,
+        CSOFirstSessionResults, CandidateVotes, Count, DifferencesCounts,
+        PoliticalGroupCandidateVotes, PoliticalGroupTotalVotes, Validate, ValidationResults,
+        VotersCounts, VotesCounts, YesNo,
     },
     election::ElectionWithPoliticalGroups,
     error::ErrorReference,
@@ -53,7 +52,7 @@ impl ElectionSummary {
     /// data from the election for candidates and political groups.
     pub fn from_results(
         election: &ElectionWithPoliticalGroups,
-        results: &[(PollingStation, PollingStationResults)],
+        results: &[(PollingStation, CSOFirstSessionResults)],
     ) -> Result<ElectionSummary, APIError> {
         // running totals
         let mut totals = ElectionSummary::zero();
@@ -239,8 +238,8 @@ mod tests {
         pdf_gen::tests::polling_stations_fixture,
     };
 
-    fn polling_station_results_fixture_a() -> PollingStationResults {
-        PollingStationResults {
+    fn polling_station_results_fixture_a() -> CSOFirstSessionResults {
+        CSOFirstSessionResults {
             extra_investigation: ValidDefault::valid_default(),
             counting_differences_polling_station: ValidDefault::valid_default(),
             voters_counts: VotersCounts {
@@ -276,8 +275,8 @@ mod tests {
         }
     }
 
-    fn polling_station_results_fixture_b() -> PollingStationResults {
-        PollingStationResults {
+    fn polling_station_results_fixture_b() -> CSOFirstSessionResults {
+        CSOFirstSessionResults {
             extra_investigation: ValidDefault::valid_default(),
             counting_differences_polling_station: ValidDefault::valid_default(),
             voters_counts: VotersCounts {

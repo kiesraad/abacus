@@ -71,7 +71,7 @@ describe("DataEntrySection", () => {
       const title = await screen.findByText(expectedTitle);
       expect(title).toBeInTheDocument();
 
-      const dataEntryStructure = getDataEntryStructure(electionMockData);
+      const dataEntryStructure = getDataEntryStructure("CSOFirstSession", electionMockData);
       const section = dataEntryStructure.find((s) => s.id === sectionId);
       expect(section?.sectionNumber).toBeUndefined();
 

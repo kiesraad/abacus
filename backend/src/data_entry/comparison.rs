@@ -1,8 +1,10 @@
+use crate::data_entry::PollingStationResults;
+
 use super::{
-    CandidateVotes, Count, CountingDifferencesPollingStation,
+    CSOFirstSessionResults, CandidateVotes, Count, CountingDifferencesPollingStation,
     DifferenceCountsCompareVotesCastAdmittedVoters, DifferencesCounts, ExtraInvestigation,
-    FieldPath, PoliticalGroupCandidateVotes, PoliticalGroupTotalVotes, PollingStationResults,
-    VotersCounts, VotesCounts, YesNo,
+    FieldPath, PoliticalGroupCandidateVotes, PoliticalGroupTotalVotes, VotersCounts, VotesCounts,
+    YesNo,
 };
 
 pub trait Compare {
@@ -10,6 +12,22 @@ pub trait Compare {
 }
 
 impl Compare for PollingStationResults {
+    fn compare(&self, first_entry: &Self, different_fields: &mut Vec<String>, path: &FieldPath) {
+        match (self, first_entry) {
+            (
+                PollingStationResults::CSOFirstSession(s),
+                PollingStationResults::CSOFirstSession(f),
+            ) => s.compare(f, different_fields, path),
+            // TODO: remove this allow once we have more variants in the enum
+            #[allow(unreachable_patterns)]
+            _ => {
+                different_fields.push(path.to_string());
+            }
+        }
+    }
+}
+
+impl Compare for CSOFirstSessionResults {
     fn compare(&self, first_entry: &Self, different_fields: &mut Vec<String>, path: &FieldPath) {
         self.extra_investigation.compare(
             &first_entry.extra_investigation,
@@ -273,7 +291,7 @@ mod tests {
     #[test]
     fn test_equal_no_differences_counts() {
         let mut different_fields: Vec<String> = vec![];
-        let first_entry = PollingStationResults {
+        let first_entry = PollingStationResults::CSOFirstSession(CSOFirstSessionResults {
             extra_investigation: Default::default(),
             counting_differences_polling_station: Default::default(),
             voters_counts: VotersCounts {
@@ -296,7 +314,7 @@ mod tests {
                 1,
                 &[100],
             )],
-        };
+        });
         let second_entry = first_entry.clone();
         second_entry.compare(
             &first_entry,
@@ -310,7 +328,7 @@ mod tests {
     #[test]
     fn test_equal_with_differences_counts() {
         let mut different_fields: Vec<String> = vec![];
-        let first_entry = PollingStationResults {
+        let first_entry = PollingStationResults::CSOFirstSession(CSOFirstSessionResults {
             extra_investigation: Default::default(),
             counting_differences_polling_station: Default::default(),
             voters_counts: VotersCounts {
@@ -343,7 +361,7 @@ mod tests {
                 1,
                 &[100],
             )],
-        };
+        });
         let second_entry = first_entry.clone();
         second_entry.compare(
             &first_entry,
@@ -357,7 +375,7 @@ mod tests {
     #[test]
     fn test_equal_no_differences_counts_variant() {
         let mut different_fields = vec![];
-        let first_entry = PollingStationResults {
+        let first_entry = PollingStationResults::CSOFirstSession(CSOFirstSessionResults {
             extra_investigation: Default::default(),
             counting_differences_polling_station: Default::default(),
             voters_counts: VotersCounts {
@@ -380,7 +398,7 @@ mod tests {
                 1,
                 &[100],
             )],
-        };
+        });
         let second_entry = first_entry.clone();
         second_entry.compare(
             &first_entry,
@@ -394,7 +412,7 @@ mod tests {
     #[test]
     fn test_equal_with_differences_counts_variant() {
         let mut different_fields = vec![];
-        let first_entry = PollingStationResults {
+        let first_entry = PollingStationResults::CSOFirstSession(CSOFirstSessionResults {
             extra_investigation: Default::default(),
             counting_differences_polling_station: Default::default(),
             voters_counts: VotersCounts {
@@ -427,7 +445,7 @@ mod tests {
                 1,
                 &[100],
             )],
-        };
+        });
         let second_entry = first_entry.clone();
         second_entry.compare(
             &first_entry,
@@ -441,7 +459,7 @@ mod tests {
     #[test]
     fn test_not_equal_voters_counts_differences() {
         let mut different_fields: Vec<String> = vec![];
-        let first_entry = PollingStationResults {
+        let first_entry = PollingStationResults::CSOFirstSession(CSOFirstSessionResults {
             extra_investigation: Default::default(),
             counting_differences_polling_station: Default::default(),
             voters_counts: VotersCounts {
@@ -464,10 +482,18 @@ mod tests {
                 1,
                 &[100],
             )],
-        };
+        });
         let mut second_entry = first_entry.clone();
-        second_entry.voters_counts.poll_card_count = 101;
-        second_entry.voters_counts.total_admitted_voters_count = 106;
+        second_entry
+            .as_cso_first_session_mut()
+            .unwrap()
+            .voters_counts
+            .poll_card_count = 101;
+        second_entry
+            .as_cso_first_session_mut()
+            .unwrap()
+            .voters_counts
+            .total_admitted_voters_count = 106;
         second_entry.compare(
             &first_entry,
             &mut different_fields,
@@ -488,7 +514,7 @@ mod tests {
     #[test]
     fn test_not_equal_differences_counts_differences() {
         let mut different_fields: Vec<String> = vec![];
-        let first_entry = PollingStationResults {
+        let first_entry = PollingStationResults::CSOFirstSession(CSOFirstSessionResults {
             extra_investigation: Default::default(),
             counting_differences_polling_station: Default::default(),
             voters_counts: VotersCounts {
@@ -521,9 +547,12 @@ mod tests {
                 1,
                 &[100],
             )],
-        };
+        });
         let mut second_entry = first_entry.clone();
-        second_entry.differences_counts = DifferencesCounts {
+        second_entry
+            .as_cso_first_session_mut()
+            .unwrap()
+            .differences_counts = DifferencesCounts {
             more_ballots_count: 0,
             fewer_ballots_count: 2,
             compare_votes_cast_admitted_voters: DifferenceCountsCompareVotesCastAdmittedVoters {
@@ -557,7 +586,7 @@ mod tests {
     #[test]
     fn test_not_equal_voters_counts_and_votes_counts_differences() {
         let mut different_fields = vec![];
-        let first_entry = PollingStationResults {
+        let first_entry = PollingStationResults::CSOFirstSession(CSOFirstSessionResults {
             extra_investigation: Default::default(),
             counting_differences_polling_station: Default::default(),
             voters_counts: VotersCounts {
@@ -580,14 +609,20 @@ mod tests {
                 1,
                 &[100],
             )],
-        };
+        });
         let mut second_entry = first_entry.clone();
-        second_entry.voters_counts = VotersCounts {
+        second_entry
+            .as_cso_first_session_mut()
+            .unwrap()
+            .voters_counts = VotersCounts {
             poll_card_count: 101,
             proxy_certificate_count: 1,
             total_admitted_voters_count: 102,
         };
-        second_entry.votes_counts = VotesCounts {
+        second_entry
+            .as_cso_first_session_mut()
+            .unwrap()
+            .votes_counts = VotesCounts {
             political_group_total_votes: vec![PoliticalGroupTotalVotes {
                 number: 1,
                 total: 101,
@@ -641,7 +676,7 @@ mod tests {
     #[test]
     fn test_not_equal_political_group_votes_differences() {
         let mut different_fields = vec![];
-        let first_entry = PollingStationResults {
+        let first_entry = PollingStationResults::CSOFirstSession(CSOFirstSessionResults {
             extra_investigation: Default::default(),
             counting_differences_polling_station: Default::default(),
             voters_counts: VotersCounts {
@@ -680,9 +715,12 @@ mod tests {
                 PoliticalGroupCandidateVotes::from_test_data_auto(1, &[100, 0]),
                 PoliticalGroupCandidateVotes::from_test_data_auto(2, &[0]),
             ],
-        };
+        });
         let mut second_entry = first_entry.clone();
-        second_entry.political_group_votes = vec![
+        second_entry
+            .as_cso_first_session_mut()
+            .unwrap()
+            .political_group_votes = vec![
             PoliticalGroupCandidateVotes::from_test_data_auto(1, &[50, 30]),
             PoliticalGroupCandidateVotes::from_test_data_auto(2, &[20]),
         ];

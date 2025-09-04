@@ -13,7 +13,7 @@ import { ResolveErrorsNavigation } from "./ResolveErrorsNavigation";
 
 describe("ResolveErrorsNavigation", () => {
   const electionMockData = getElectionMockData().election;
-  const structure = getDataEntryStructure(electionMockData);
+  const structure = getDataEntryStructure("CSOFirstSession", electionMockData);
 
   const mockValidationResultsNoErrors: ValidationResults = {
     errors: [],

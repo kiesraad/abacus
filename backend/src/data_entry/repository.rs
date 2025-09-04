@@ -1,10 +1,10 @@
 use chrono::NaiveDateTime;
 use sqlx::{query, query_as, types::Json};
 
-use super::{PollingStationDataEntry, PollingStationResults, status::DataEntryStatus};
+use super::{CSOFirstSessionResults, PollingStationDataEntry, status::DataEntryStatus};
 use crate::{
     DbConnLike,
-    data_entry::{ElectionStatusResponseEntry, PollingStationResultsEntry},
+    data_entry::{ElectionStatusResponseEntry, PollingStationResults, PollingStationResultsEntry},
     polling_station::PollingStation,
 };
 
@@ -237,6 +237,29 @@ pub async fn list_entries_with_polling_stations(
             Ok((polling_station, entry.data))
         })
         .collect::<Result<_, sqlx::Error>>() // this collect causes the iterator to fail early if there was any error
+}
+
+/// Get a list of polling stations with their results for an election, but only
+/// if the results are of type CSOFirstSessionResults
+pub async fn list_entries_with_polling_stations_first_session(
+    conn: impl DbConnLike<'_>,
+    election_id: u32,
+) -> Result<Vec<(PollingStation, CSOFirstSessionResults)>, sqlx::Error> {
+    list_entries_with_polling_stations(conn, election_id)
+        .await?
+        .into_iter()
+        .map(|(p, r)| {
+            r.into_cso_first_session()
+                .map(|r| (p, r))
+                .ok_or(sqlx::Error::ColumnDecode {
+                    index: "data".to_string(),
+                    source: Box::new(std::io::Error::new(
+                        std::io::ErrorKind::InvalidData,
+                        "Results are not of type CSOFirstSessionResults",
+                    )),
+                })
+        })
+        .collect::<Result<_, sqlx::Error>>()
 }
 
 /// Check if a polling station has results

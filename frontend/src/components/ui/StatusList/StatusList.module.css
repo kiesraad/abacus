@@ -4,6 +4,7 @@
   margin: 0;
   display: flex;
   flex-direction: column;
+  width: 37.5rem;
 
   &.sm {
     gap: var(--space-sm);
@@ -12,7 +13,7 @@
     gap: var(--space-md);
   }
 
-  li {
+  & > li {
     display: flex;
     align-items: start;
     gap: var(--space-sm);

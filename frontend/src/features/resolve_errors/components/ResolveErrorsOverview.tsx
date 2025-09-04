@@ -1,10 +1,12 @@
 import { Link } from "react-router";
 
 import { StatusList } from "@/components/ui/StatusList/StatusList";
-import { t } from "@/i18n/translate";
+import { hasTranslation, t, tx } from "@/i18n/translate";
 import { ValidationResult, ValidationResults } from "@/types/generated/openapi";
 import { DataEntrySection } from "@/types/types";
 import { dottedCode, getValidationResultSetForSection } from "@/utils/ValidationResults";
+
+import cls from "./ResolveErrors.module.css";
 
 interface ResolveErrorsOverviewProps {
   structure: DataEntrySection[];
@@ -25,9 +27,13 @@ export function ResolveErrorsOverview({ structure, results }: ResolveErrorsOverv
       {sections.map(({ section, errors, warnings }) => (
         <StatusList.Section key={section.id} aria-labelledby={`${section.id}_title`}>
           <StatusList.Title id={`${section.id}_title`}>
-            <Link to={`./${section.id}`}>{section.title}</Link>
+            <h3 className="mb-sm">
+              <Link to={`./${section.id}`}>
+                {section.short_title} {section.sectionNumber}
+              </Link>
+            </h3>
           </StatusList.Title>
-          <StatusList id={`overview-${section.id}`} gap="sm">
+          <StatusList id={`overview-${section.id}`} gap="md">
             {errors.getAll().map((validationResult) => (
               <OverviewItem key={validationResult.code} data={validationResult} status={"error"} />
             ))}
@@ -42,15 +48,19 @@ export function ResolveErrorsOverview({ structure, results }: ResolveErrorsOverv
 }
 
 function OverviewItem({ data: { code, context }, status }: { data: ValidationResult; status: "error" | "warning" }) {
+  const title = t(`feedback.${code}.coordinator.title`, { ...context });
+  const contentPath = `feedback.${code}.coordinator.content`;
+  const actionsPath = `feedback.${code}.coordinator.actions`;
+  const content = hasTranslation(contentPath) ? tx(contentPath, undefined, { ...context }) : undefined;
+  const actions = hasTranslation(actionsPath) ? tx(actionsPath, undefined, { ...context }) : undefined;
+
   return (
     <StatusList.Item status={status}>
-      <div className="bold">
-        {dottedCode(code)} {t(`feedback.${code}.coordinator.title`, { ...context })}
+      <div className="bold" role="heading" aria-level={4}>
+        {dottedCode(code)} {title}
       </div>
-      <div>
-        <strong>→</strong>{" "}
-        <span className="font-italic">{t(`feedback.${code}.coordinator.title`, { ...context })}</span>
-      </div>
+      {content && <div className="content">{content}</div>}
+      {actions && <div className={cls.actions}>{actions}</div>}
     </StatusList.Item>
   );
 }

@@ -68,7 +68,7 @@ export function ResolveErrorsIndexPage() {
       >
         <FormLayout>
           <FormLayout.Section title={t("resolve_errors.form_question")}>
-            <p className="md">{t("resolve_errors.form_content")}</p>
+            <p>{t("resolve_errors.form_content")}</p>
             <ChoiceList>
               {validationError && <ChoiceList.Error id="resolve-errors-error">{validationError}</ChoiceList.Error>}
               <ChoiceList.Radio

@@ -1,4 +1,4 @@
-use std::{collections::HashMap, fmt};
+use std::fmt;
 
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
@@ -11,7 +11,7 @@ use super::{
 };
 use crate::{
     data_entry::{PoliticalGroupTotalVotes, PollingStationResults, status::FirstEntryHasErrors},
-    election::ElectionWithPoliticalGroups,
+    election::{ElectionWithPoliticalGroups, PGNumber},
     polling_station::PollingStation,
 };
 
@@ -44,7 +44,15 @@ pub struct ValidationResult {
     pub code: ValidationResultCode,
     #[serde(skip_serializing_if = "Option::is_none")]
     #[schema(nullable = false)]
-    pub context: Option<HashMap<String, String>>,
+    pub context: Option<ValidationResultContext>,
+}
+
+#[derive(Serialize, Deserialize, ToSchema, Debug, PartialEq, Eq)]
+#[serde(deny_unknown_fields)]
+pub struct ValidationResultContext {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[schema(nullable = false, value_type = u32)]
+    pub political_group_number: Option<PGNumber>,
 }
 
 #[derive(Serialize, Deserialize, ToSchema, Debug, PartialEq, Eq, PartialOrd, Ord)]
@@ -465,10 +473,9 @@ impl Validate for CSOFirstSessionResults {
                             .to_string(),
                     ],
                     code: ValidationResultCode::F403,
-                    context: Some(HashMap::from([(
-                        "political_group_number".to_string(),
-                        pgcv.number.to_string(),
-                    )])),
+                    context: Some(ValidationResultContext {
+                        political_group_number: Some(pgcv.number),
+                    }),
                 });
             }
         }
@@ -834,10 +841,9 @@ impl Validate for PoliticalGroupCandidateVotes {
             validation_results.errors.push(ValidationResult {
                 fields: vec![path.field("total").to_string()],
                 code: ValidationResultCode::F401,
-                context: Some(HashMap::from([(
-                    "political_group_number".to_string(),
-                    self.number.to_string(),
-                )])),
+                context: Some(ValidationResultContext {
+                    political_group_number: Some(self.number),
+                }),
             });
         }
 
@@ -845,10 +851,9 @@ impl Validate for PoliticalGroupCandidateVotes {
             validation_results.errors.push(ValidationResult {
                 fields: vec![path.to_string()],
                 code: ValidationResultCode::F402,
-                context: Some(HashMap::from([(
-                    "political_group_number".to_string(),
-                    self.number.to_string(),
-                )])),
+                context: Some(ValidationResultContext {
+                    political_group_number: Some(self.number),
+                }),
             });
         }
         Ok(())
@@ -1479,12 +1484,10 @@ mod tests {
     }
 
     mod political_group_votes {
-        use std::collections::HashMap;
-
         use crate::{
             data_entry::{
                 CandidateVotes, DataError, PoliticalGroupCandidateVotes, Validate,
-                ValidationResult, ValidationResultCode, ValidationResults,
+                ValidationResult, ValidationResultCode, ValidationResultContext, ValidationResults,
             },
             election::{ElectionWithPoliticalGroups, PGNumber, tests::election_fixture},
             polling_station::structs::tests::polling_station_fixture,
@@ -1551,11 +1554,10 @@ mod tests {
                 validation_results.errors,
                 [ValidationResult {
                     code: ValidationResultCode::F401,
-                    fields: vec!["political_group_votes[1].total".into(),],
-                    context: Some(HashMap::from([(
-                        "political_group_number".to_string(),
-                        "2".to_string(),
-                    )])),
+                    fields: vec!["political_group_votes[1].total".into()],
+                    context: Some(ValidationResultContext {
+                        political_group_number: Some(2),
+                    }),
                 }]
             );
 
@@ -1574,11 +1576,10 @@ mod tests {
                 validation_results.errors,
                 [ValidationResult {
                     code: ValidationResultCode::F401,
-                    fields: vec!["political_group_votes[1].total".into(),],
-                    context: Some(HashMap::from([(
-                        "political_group_number".to_string(),
-                        "2".to_string(),
-                    )])),
+                    fields: vec!["political_group_votes[1].total".into()],
+                    context: Some(ValidationResultContext {
+                        political_group_number: Some(2),
+                    }),
                 }]
             );
 
@@ -1588,11 +1589,10 @@ mod tests {
                 validation_results.errors,
                 [ValidationResult {
                     code: ValidationResultCode::F402,
-                    fields: vec!["political_group_votes[1]".into(),],
-                    context: Some(HashMap::from([(
-                        "political_group_number".to_string(),
-                        "2".to_string(),
-                    )])),
+                    fields: vec!["political_group_votes[1]".into()],
+                    context: Some(ValidationResultContext {
+                        political_group_number: Some(2),
+                    }),
                 }]
             );
 
@@ -1706,13 +1706,11 @@ mod tests {
     }
 
     mod cso_first_session_results {
-        use std::collections::HashMap;
-
         use crate::{
             data_entry::{
                 CSOFirstSessionResults, DataError, PoliticalGroupCandidateVotes,
                 PoliticalGroupTotalVotes, Validate, ValidationResult, ValidationResultCode,
-                ValidationResults, tests::ValidDefault,
+                ValidationResultContext, ValidationResults, tests::ValidDefault,
             },
             election::tests::election_fixture,
             polling_station::structs::tests::polling_station_fixture,
@@ -1843,10 +1841,9 @@ mod tests {
                 [ValidationResult {
                     code: ValidationResultCode::F403,
                     fields: vec!["data.political_group_votes[1].total".into()],
-                    context: Some(HashMap::from([(
-                        "political_group_number".to_string(),
-                        "2".to_string(),
-                    )])),
+                    context: Some(ValidationResultContext {
+                        political_group_number: Some(2),
+                    }),
                 }],
             );
 
@@ -1860,18 +1857,16 @@ mod tests {
                     ValidationResult {
                         code: ValidationResultCode::F403,
                         fields: vec!["data.political_group_votes[0].total".into()],
-                        context: Some(HashMap::from([(
-                            "political_group_number".to_string(),
-                            "1".to_string(),
-                        )])),
+                        context: Some(ValidationResultContext {
+                            political_group_number: Some(1),
+                        }),
                     },
                     ValidationResult {
                         code: ValidationResultCode::F403,
                         fields: vec!["data.political_group_votes[1].total".into()],
-                        context: Some(HashMap::from([(
-                            "political_group_number".to_string(),
-                            "2".to_string(),
-                        )])),
+                        context: Some(ValidationResultContext {
+                            political_group_number: Some(2),
+                        }),
                     }
                 ],
             );

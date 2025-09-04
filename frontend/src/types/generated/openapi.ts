@@ -1174,7 +1174,7 @@ export interface UserLoginFailedDetails {
 
 export interface ValidationResult {
   code: ValidationResultCode;
-  context?: Record<string, string>;
+  context?: ValidationResultContext;
   fields: string[];
 }
 
@@ -1199,6 +1199,10 @@ export type ValidationResultCode =
   | "W202"
   | "W203"
   | "W204";
+
+export interface ValidationResultContext {
+  political_group_number?: number;
+}
 
 export interface ValidationResults {
   errors: ValidationResult[];

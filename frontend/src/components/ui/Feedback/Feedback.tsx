@@ -28,14 +28,13 @@ export function Feedback({ id, type, data, userRole, shouldFocus = true }: Feedb
   const feedbackHeader = useRef<HTMLHeadingElement | null>(null);
   // NOTE: administrator roles are always mapped to coordinator here
   const role = userRole === "administrator" ? "coordinator" : userRole;
-
   const feedbackList: FeedbackItem[] = [];
   for (const { code, context } of data) {
-    const title = t(`feedback.${code}.${role}.title`, context);
+    const title = t(`feedback.${code}.${role}.title`, { ...context });
     const contentPath = `feedback.${code}.${role}.content`;
     const actionsPath = `feedback.${code}.${role}.actions`;
-    const content = hasTranslation(contentPath) ? tx(contentPath, undefined, context) : undefined;
-    const actions = hasTranslation(actionsPath) ? tx(actionsPath, undefined, context) : undefined;
+    const content = hasTranslation(contentPath) ? tx(contentPath, undefined, { ...context }) : undefined;
+    const actions = hasTranslation(actionsPath) ? tx(actionsPath, undefined, { ...context }) : undefined;
 
     const identical = feedbackList.find(
       (item) => item.title === title && item.content === content && item.actions === actions,

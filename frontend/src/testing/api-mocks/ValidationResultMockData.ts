@@ -55,17 +55,17 @@ export const validationResultMockData: ErrorWarningsMap<ValidationResultCode> = 
   },
   F401: {
     fields: ["data.political_group_votes[0].total"],
-    context: { political_group_number: "1" },
+    context: { political_group_number: 1 },
     code: "F401",
   },
   F402: {
     fields: ["data.political_group_votes[0]"],
-    context: { political_group_number: "1" },
+    context: { political_group_number: 1 },
     code: "F402",
   },
   F403: {
     fields: ["data.political_group_votes[0].total", "data.votes_counts.political_group_total_votes[0].total"],
-    context: { political_group_number: "1" },
+    context: { political_group_number: 1 },
     code: "F403",
   },
   W001: { fields: ["data.voters_counts.poll_card_count"], code: "W001" },

@@ -45,10 +45,11 @@ function OverviewItem({ data: { code, context }, status }: { data: ValidationRes
   return (
     <StatusList.Item status={status}>
       <div className="bold">
-        {dottedCode(code)} {t(`feedback.${code}.coordinator.title`, context)}
+        {dottedCode(code)} {t(`feedback.${code}.coordinator.title`, { ...context })}
       </div>
       <div>
-        <strong>→</strong> <span className="font-italic">{t(`feedback.${code}.coordinator.title`, context)}</span>
+        <strong>→</strong>{" "}
+        <span className="font-italic">{t(`feedback.${code}.coordinator.title`, { ...context })}</span>
       </div>
     </StatusList.Item>
   );

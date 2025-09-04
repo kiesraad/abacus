@@ -271,7 +271,7 @@ test.describe("resume data entry flow", () => {
               code: "F403",
               fields: ["data.political_group_votes[0].total"],
               context: {
-                political_group_number: "1",
+                political_group_number: 1,
               },
             },
           ],

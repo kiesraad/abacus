@@ -6432,13 +6432,7 @@
             "$ref": "#/components/schemas/ValidationResultCode"
           },
           "context": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "string"
-            },
-            "propertyNames": {
-              "type": "string"
-            }
+            "$ref": "#/components/schemas/ValidationResultContext"
           },
           "fields": {
             "type": "array",
@@ -6473,6 +6467,17 @@
           "W203",
           "W204"
         ]
+      },
+      "ValidationResultContext": {
+        "type": "object",
+        "properties": {
+          "political_group_number": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          }
+        },
+        "additionalProperties": false
       },
       "ValidationResults": {
         "type": "object",

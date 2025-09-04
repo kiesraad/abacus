@@ -8,7 +8,7 @@ import { t, tx } from "@/i18n/translate";
 import { useElectionCreateContext } from "../hooks/useElectionCreateContext";
 
 export function AbortModal() {
-  const { state, dispatch } = useElectionCreateContext();
+  const { state } = useElectionCreateContext();
   const user = useUser();
 
   // path check to see if the current location is part of the create election flow
@@ -48,7 +48,6 @@ export function AbortModal() {
 
   // when delete was chosen, clear state and proceed
   const onAbortModalDelete = () => {
-    dispatch({ type: "RESET" });
     blocker.proceed();
   };
 

@@ -1705,21 +1705,21 @@ mod tests {
         }
     }
 
-    mod polling_station_results {
+    mod cso_first_session_results {
         use std::collections::HashMap;
 
         use crate::{
             data_entry::{
-                DataError, PoliticalGroupCandidateVotes, PoliticalGroupTotalVotes,
-                PollingStationResults, Validate, ValidationResult, ValidationResultCode,
+                CSOFirstSessionResults, DataError, PoliticalGroupCandidateVotes,
+                PoliticalGroupTotalVotes, Validate, ValidationResult, ValidationResultCode,
                 ValidationResults, tests::ValidDefault,
             },
             election::tests::election_fixture,
             polling_station::structs::tests::polling_station_fixture,
         };
 
-        fn create_test_data() -> PollingStationResults {
-            PollingStationResults {
+        fn create_test_data() -> CSOFirstSessionResults {
+            CSOFirstSessionResults {
                 extra_investigation: ValidDefault::valid_default(),
                 counting_differences_polling_station: ValidDefault::valid_default(),
                 voters_counts: Default::default(),
@@ -1729,7 +1729,7 @@ mod tests {
             }
         }
 
-        fn validate(data: PollingStationResults) -> Result<ValidationResults, DataError> {
+        fn validate(data: CSOFirstSessionResults) -> Result<ValidationResults, DataError> {
             let mut validation_results = ValidationResults::default();
 
             data.validate(
@@ -1743,7 +1743,7 @@ mod tests {
                 ),
                 &polling_station_fixture(None),
                 &mut validation_results,
-                &"polling_station_results".into(),
+                &"data".into(),
             )?;
 
             Ok(validation_results)
@@ -1788,10 +1788,8 @@ mod tests {
                         [ValidationResult {
                             code: ValidationResultCode::W203,
                             fields: vec![
-                                "polling_station_results.voters_counts.total_admitted_voters_count"
-                                    .into(),
-                                "polling_station_results.votes_counts.total_votes_cast_count"
-                                    .into(),
+                                "data.voters_counts.total_admitted_voters_count".into(),
+                                "data.votes_counts.total_votes_cast_count".into(),
                             ],
                             context: None,
                         }],
@@ -1844,7 +1842,7 @@ mod tests {
                 validation_results.errors,
                 [ValidationResult {
                     code: ValidationResultCode::F403,
-                    fields: vec!["polling_station_results.political_group_votes[1].total".into()],
+                    fields: vec!["data.political_group_votes[1].total".into()],
                     context: Some(HashMap::from([(
                         "political_group_number".to_string(),
                         "2".to_string(),
@@ -1861,9 +1859,7 @@ mod tests {
                 [
                     ValidationResult {
                         code: ValidationResultCode::F403,
-                        fields: vec![
-                            "polling_station_results.political_group_votes[0].total".into()
-                        ],
+                        fields: vec!["data.political_group_votes[0].total".into()],
                         context: Some(HashMap::from([(
                             "political_group_number".to_string(),
                             "1".to_string(),
@@ -1871,9 +1867,7 @@ mod tests {
                     },
                     ValidationResult {
                         code: ValidationResultCode::F403,
-                        fields: vec![
-                            "polling_station_results.political_group_votes[1].total".into()
-                        ],
+                        fields: vec!["data.political_group_votes[1].total".into()],
                         context: Some(HashMap::from([(
                             "political_group_number".to_string(),
                             "2".to_string(),

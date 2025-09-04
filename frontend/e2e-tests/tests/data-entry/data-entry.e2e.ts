@@ -172,6 +172,7 @@ test.describe("full data entry flow", () => {
     await votersAndVotesPage.next.click();
 
     const differencesPage = new DifferencesPage(page);
+    await differencesPage.admittedVotersEqualsVotesCastCheckbox.check();
     await expect(differencesPage.fieldset).toBeVisible();
     await differencesPage.next.click();
 
@@ -243,6 +244,7 @@ test.describe("full data entry flow", () => {
     const differencesPage = new DifferencesPage(page);
     await expect(differencesPage.fieldset).toBeVisible();
 
+    await differencesPage.votesCastGreaterThanAdmittedVotersCheckbox.check();
     await differencesPage.differenceCompletelyAccountedForYes.check();
     const moreBallotsFields: MoreBallotsFields = {
       more_ballots_count: 25,
@@ -319,6 +321,8 @@ test.describe("full data entry flow", () => {
     const differencesPage = new DifferencesPage(page);
     await expect(differencesPage.fieldset).toBeVisible();
 
+    await differencesPage.votesCastSmallerThanAdmittedVotersCheckbox.check();
+    await differencesPage.differenceCompletelyAccountedForYes.check();
     const fewerBallotsFields: FewerBallotsFields = {
       fewer_ballots_count: 20,
     };
@@ -387,6 +391,7 @@ test.describe("full data entry flow", () => {
 
     const differencesPage = new DifferencesPage(page);
     await expect(differencesPage.fieldset).toBeVisible();
+    await differencesPage.admittedVotersEqualsVotesCastCheckbox.check();
 
     await expect(differencesPage.progressList.votersAndVotesIcon).toHaveAccessibleName("opgeslagen");
 

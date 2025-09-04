@@ -6,7 +6,7 @@ use crate::{
     data_entry::{
         CSOFirstSessionResults, CandidateVotes, Count, DifferencesCounts,
         PoliticalGroupCandidateVotes, PoliticalGroupTotalVotes, Validate, ValidationResults,
-        VotersCounts, VotesCounts,
+        VotersCounts, VotesCounts, YesNo,
     },
     election::ElectionWithPoliticalGroups,
     error::ErrorReference,
@@ -110,8 +110,8 @@ impl ElectionSummary {
             if validation_results.has_errors() {
                 return Err(APIError::AddError(
                     format!(
-                        "Polling station {} has validation errors",
-                        polling_station.number
+                        "Polling station {} has validation errors: {:?}",
+                        polling_station.number, validation_results
                     ),
                     ErrorReference::PollingStationValidationErrors,
                 ));
@@ -177,6 +177,8 @@ impl SummaryDifferenceCountsCompareVotesCastAdmittedVoters {
 pub struct SummaryDifferencesCounts {
     pub more_ballots_count: SumCount,
     pub fewer_ballots_count: SumCount,
+    pub compare_votes_cast_admitted_voters: SummaryDifferenceCountsCompareVotesCastAdmittedVoters,
+    pub difference_completely_accounted_for: YesNo,
 }
 
 impl SummaryDifferencesCounts {
@@ -185,6 +187,12 @@ impl SummaryDifferencesCounts {
         SummaryDifferencesCounts {
             more_ballots_count: SumCount::zero(),
             fewer_ballots_count: SumCount::zero(),
+            compare_votes_cast_admitted_voters:
+                SummaryDifferenceCountsCompareVotesCastAdmittedVoters::zero(),
+            difference_completely_accounted_for: YesNo {
+                yes: false,
+                no: false,
+            },
         }
     }
 
@@ -198,6 +206,26 @@ impl SummaryDifferencesCounts {
             .add(polling_station, differences_counts.more_ballots_count);
         self.fewer_ballots_count
             .add(polling_station, differences_counts.fewer_ballots_count);
+
+        self.compare_votes_cast_admitted_voters
+            .votes_cast_greater_than_admitted_voters = differences_counts
+            .compare_votes_cast_admitted_voters
+            .votes_cast_greater_than_admitted_voters;
+
+        self.compare_votes_cast_admitted_voters
+            .votes_cast_smaller_than_admitted_voters = differences_counts
+            .compare_votes_cast_admitted_voters
+            .votes_cast_smaller_than_admitted_voters;
+
+        self.compare_votes_cast_admitted_voters
+            .admitted_voters_equal_votes_cast = differences_counts
+            .compare_votes_cast_admitted_voters
+            .admitted_voters_equal_votes_cast;
+
+        self.difference_completely_accounted_for.yes =
+            differences_counts.difference_completely_accounted_for.yes;
+        self.difference_completely_accounted_for.no =
+            differences_counts.difference_completely_accounted_for.no;
     }
 }
 
@@ -306,32 +334,35 @@ mod tests {
             counting_differences_polling_station: ValidDefault::valid_default(),
             voters_counts: VotersCounts {
                 poll_card_count: 30,
-                proxy_certificate_count: 5,
-                total_admitted_voters_count: 35,
+                proxy_certificate_count: 4,
+                total_admitted_voters_count: 34,
             },
             votes_counts: VotesCounts {
                 political_group_total_votes: vec![
                     PoliticalGroupTotalVotes {
                         number: 1,
-                        total: 21,
+                        total: 20,
                     },
                     PoliticalGroupTotalVotes {
                         number: 2,
                         total: 10,
                     },
                 ],
-                total_votes_candidates_count: 31,
+                total_votes_candidates_count: 30,
                 blank_votes_count: 2,
                 invalid_votes_count: 3,
-                total_votes_cast_count: 36,
+                total_votes_cast_count: 35,
             },
             differences_counts: {
                 let mut tmp = DifferencesCounts::zero();
                 tmp.more_ballots_count = 1;
+                tmp.difference_completely_accounted_for.yes = true;
+                tmp.compare_votes_cast_admitted_voters
+                    .votes_cast_greater_than_admitted_voters = true;
                 tmp
             },
             political_group_votes: vec![
-                PoliticalGroupCandidateVotes::from_test_data_auto(1, &[18, 3]),
+                PoliticalGroupCandidateVotes::from_test_data_auto(1, &[18, 2]),
                 PoliticalGroupCandidateVotes::from_test_data_auto(2, &[4, 4, 2]),
             ],
         }
@@ -345,34 +376,37 @@ mod tests {
             },
             counting_differences_polling_station: ValidDefault::valid_default(),
             voters_counts: VotersCounts {
-                poll_card_count: 49,
+                poll_card_count: 59,
                 proxy_certificate_count: 1,
-                total_admitted_voters_count: 50,
+                total_admitted_voters_count: 60,
             },
             votes_counts: VotesCounts {
                 political_group_total_votes: vec![
                     PoliticalGroupTotalVotes {
                         number: 1,
-                        total: 16,
+                        total: 24,
                     },
                     PoliticalGroupTotalVotes {
                         number: 2,
-                        total: 30,
+                        total: 32,
                     },
                 ],
-                total_votes_candidates_count: 46,
+                total_votes_candidates_count: 56,
                 blank_votes_count: 2,
                 invalid_votes_count: 0,
-                total_votes_cast_count: 48,
+                total_votes_cast_count: 58,
             },
-            differences_counts: DifferencesCounts {
-                fewer_ballots_count: 2,
-                difference_completely_accounted_for: YesNo::no(),
-                ..Default::default()
+            differences_counts: {
+                let mut tmp = DifferencesCounts::zero();
+                tmp.fewer_ballots_count = 2;
+                tmp.compare_votes_cast_admitted_voters
+                    .votes_cast_smaller_than_admitted_voters = true;
+                tmp.difference_completely_accounted_for.no = true;
+                tmp
             },
             political_group_votes: vec![
-                PoliticalGroupCandidateVotes::from_test_data_auto(1, &[10, 6]),
-                PoliticalGroupCandidateVotes::from_test_data_auto(2, &[12, 10, 8]),
+                PoliticalGroupCandidateVotes::from_test_data_auto(1, &[17, 7]),
+                PoliticalGroupCandidateVotes::from_test_data_auto(2, &[12, 15, 5]),
             ],
         }
     }
@@ -381,8 +415,11 @@ mod tests {
     fn test_differences_counts_addition() {
         let mut diff = SummaryDifferencesCounts::zero();
         let diff2 = {
-            let mut tmp = DifferencesCounts::zero();
+            let mut tmp = DifferencesCounts::valid_default();
             tmp.more_ballots_count = 1;
+            tmp.difference_completely_accounted_for.yes = true;
+            tmp.compare_votes_cast_admitted_voters
+                .votes_cast_greater_than_admitted_voters = true;
             tmp
         };
 
@@ -394,6 +431,11 @@ mod tests {
         diff.add_polling_station_results(&ps[0], &diff2);
 
         assert_eq!(diff.more_ballots_count.count, 1);
+        assert!(diff.difference_completely_accounted_for.yes);
+        assert!(
+            diff.compare_votes_cast_admitted_voters
+                .votes_cast_greater_than_admitted_voters
+        );
         assert_eq!(diff.more_ballots_count.polling_stations, vec![123]);
         assert_eq!(diff.fewer_ballots_count.count, 0);
 
@@ -437,32 +479,32 @@ mod tests {
         );
 
         // tests for voters counts
-        assert_eq!(totals.voters_counts.total_admitted_voters_count, 85);
-        assert_eq!(totals.voters_counts.poll_card_count, 79);
-        assert_eq!(totals.voters_counts.proxy_certificate_count, 6);
+        assert_eq!(totals.voters_counts.total_admitted_voters_count, 94);
+        assert_eq!(totals.voters_counts.poll_card_count, 89);
+        assert_eq!(totals.voters_counts.proxy_certificate_count, 5);
 
         // tests for votes counts
-        assert_eq!(totals.votes_counts.total_votes_cast_count, 84);
-        assert_eq!(totals.votes_counts.total_votes_candidates_count, 77);
+        assert_eq!(totals.votes_counts.total_votes_cast_count, 93);
+        assert_eq!(totals.votes_counts.total_votes_candidates_count, 86);
         assert_eq!(totals.votes_counts.blank_votes_count, 4);
         assert_eq!(totals.votes_counts.invalid_votes_count, 3);
 
         // finally the political group counts
         assert_eq!(totals.political_group_votes.len(), 2);
         let group1 = totals.political_group_votes.first().unwrap();
-        assert_eq!(group1.total, 37);
+        assert_eq!(group1.total, 44);
         assert_eq!(group1.candidate_votes.len(), 2);
 
-        assert_eq!(group1.candidate_votes.first().unwrap().votes, 28);
+        assert_eq!(group1.candidate_votes.first().unwrap().votes, 35);
         assert_eq!(group1.candidate_votes.get(1).unwrap().votes, 9);
 
         let group2 = totals.political_group_votes.get(1).unwrap();
-        assert_eq!(group2.total, 40);
+        assert_eq!(group2.total, 42);
         assert_eq!(group2.candidate_votes.len(), 3);
 
         assert_eq!(group2.candidate_votes.first().unwrap().votes, 16);
-        assert_eq!(group2.candidate_votes.get(1).unwrap().votes, 14);
-        assert_eq!(group2.candidate_votes.get(2).unwrap().votes, 10);
+        assert_eq!(group2.candidate_votes.get(1).unwrap().votes, 19);
+        assert_eq!(group2.candidate_votes.get(2).unwrap().votes, 7);
     }
 
     #[test]
@@ -485,9 +527,9 @@ mod tests {
             .collect::<Vec<_>>();
         let totals = ElectionSummary::from_results(&election, &results).unwrap();
 
-        assert_eq!(totals.voters_counts.total_admitted_voters_count, 21000);
-        assert_eq!(totals.votes_counts.total_votes_cast_count, 21600);
-        assert_eq!(totals.political_group_votes[0].total, 12600);
+        assert_eq!(totals.voters_counts.total_admitted_voters_count, 20400);
+        assert_eq!(totals.votes_counts.total_votes_cast_count, 21000);
+        assert_eq!(totals.political_group_votes[0].total, 12000);
         assert_eq!(
             totals.political_group_votes[0].candidate_votes[0].votes,
             10800
@@ -518,6 +560,14 @@ mod tests {
         ps_results.voters_counts.proxy_certificate_count = 0;
         ps_results.voters_counts.total_admitted_voters_count = 999_999_998;
         ps_results.differences_counts.more_ballots_count = 0;
+        ps_results
+            .differences_counts
+            .compare_votes_cast_admitted_voters
+            .votes_cast_greater_than_admitted_voters = false;
+        ps_results
+            .differences_counts
+            .compare_votes_cast_admitted_voters
+            .admitted_voters_equal_votes_cast = true;
 
         let results = ps
             .iter()

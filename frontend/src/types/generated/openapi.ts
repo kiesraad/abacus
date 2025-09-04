@@ -58,6 +58,30 @@ export interface ELECTION_APPORTIONMENT_REQUEST_PARAMS {
 }
 export type ELECTION_APPORTIONMENT_REQUEST_PATH = `/api/elections/${number}/apportionment`;
 
+// /api/elections/{election_id}/committee_sessions/{committee_session_id}/download_pdf_results
+export interface ELECTION_DOWNLOAD_PDF_RESULTS_REQUEST_PARAMS {
+  election_id: number;
+  committee_session_id: number;
+}
+export type ELECTION_DOWNLOAD_PDF_RESULTS_REQUEST_PATH =
+  `/api/elections/${number}/committee_sessions/${number}/download_pdf_results`;
+
+// /api/elections/{election_id}/committee_sessions/{committee_session_id}/download_xml_results
+export interface ELECTION_DOWNLOAD_XML_RESULTS_REQUEST_PARAMS {
+  election_id: number;
+  committee_session_id: number;
+}
+export type ELECTION_DOWNLOAD_XML_RESULTS_REQUEST_PATH =
+  `/api/elections/${number}/committee_sessions/${number}/download_xml_results`;
+
+// /api/elections/{election_id}/committee_sessions/{committee_session_id}/download_zip_results
+export interface ELECTION_DOWNLOAD_ZIP_RESULTS_REQUEST_PARAMS {
+  election_id: number;
+  committee_session_id: number;
+}
+export type ELECTION_DOWNLOAD_ZIP_RESULTS_REQUEST_PATH =
+  `/api/elections/${number}/committee_sessions/${number}/download_zip_results`;
+
 // /api/elections/{election_id}/download_n_10_2
 export interface ELECTION_DOWNLOAD_N_10_2_REQUEST_PARAMS {
   election_id: number;
@@ -69,24 +93,6 @@ export interface ELECTION_DOWNLOAD_NA_31_2_BIJLAGE1_REQUEST_PARAMS {
   election_id: number;
 }
 export type ELECTION_DOWNLOAD_NA_31_2_BIJLAGE1_REQUEST_PATH = `/api/elections/${number}/download_na_31_2_bijlage1`;
-
-// /api/elections/{election_id}/download_pdf_results
-export interface ELECTION_DOWNLOAD_PDF_RESULTS_REQUEST_PARAMS {
-  election_id: number;
-}
-export type ELECTION_DOWNLOAD_PDF_RESULTS_REQUEST_PATH = `/api/elections/${number}/download_pdf_results`;
-
-// /api/elections/{election_id}/download_xml_results
-export interface ELECTION_DOWNLOAD_XML_RESULTS_REQUEST_PARAMS {
-  election_id: number;
-}
-export type ELECTION_DOWNLOAD_XML_RESULTS_REQUEST_PATH = `/api/elections/${number}/download_xml_results`;
-
-// /api/elections/{election_id}/download_zip_results
-export interface ELECTION_DOWNLOAD_ZIP_RESULTS_REQUEST_PARAMS {
-  election_id: number;
-}
-export type ELECTION_DOWNLOAD_ZIP_RESULTS_REQUEST_PATH = `/api/elections/${number}/download_zip_results`;
 
 // /api/elections/{election_id}/polling_stations
 export interface POLLING_STATION_LIST_REQUEST_PARAMS {

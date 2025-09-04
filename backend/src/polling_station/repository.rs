@@ -4,16 +4,12 @@ use crate::DbConnLike;
 
 use super::structs::{PollingStation, PollingStationRequest};
 
-/// List all polling stations from an election
+/// List all polling stations from a committee session
 pub async fn list(
     conn: impl DbConnLike<'_>,
-    election_id: u32,
+    committee_session_id: u32,
 ) -> Result<Vec<PollingStation>, sqlx::Error> {
     let mut tx = conn.begin_immediate().await?;
-    let committee_session_id =
-        crate::committee_session::repository::get_current_id_for_election(&mut *tx, election_id)
-            .await?
-            .ok_or(sqlx::Error::RowNotFound)?;
 
     query_as!(
         PollingStation,

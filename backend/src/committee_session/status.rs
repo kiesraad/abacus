@@ -54,7 +54,7 @@ pub async fn change_committee_session_status(
         CommitteeSessionStatus::DataEntryNotStarted => {
             committee_session
                 .status
-                .ready_for_data_entry(committee_session.election_id, &pool)
+                .ready_for_data_entry(committee_session.id, &pool)
                 .await?
         }
         CommitteeSessionStatus::DataEntryInProgress => {
@@ -98,13 +98,13 @@ impl CommitteeSessionStatus {
 
     pub async fn ready_for_data_entry(
         self,
-        election_id: u32,
+        committee_session_id: u32,
         conn: impl DbConnLike<'_>,
     ) -> Result<Self, CommitteeSessionError> {
         match self {
             CommitteeSessionStatus::Created => {
                 let polling_stations =
-                    crate::polling_station::repository::list(conn, election_id).await?;
+                    crate::polling_station::repository::list(conn, committee_session_id).await?;
                 if polling_stations.is_empty() {
                     Err(CommitteeSessionError::InvalidStatusTransition)
                 } else {
@@ -239,7 +239,7 @@ mod tests {
     ) {
         assert_eq!(
             CommitteeSessionStatus::Created
-                .ready_for_data_entry(6, &pool)
+                .ready_for_data_entry(7, &pool)
                 .await,
             Err(CommitteeSessionError::InvalidStatusTransition)
         );

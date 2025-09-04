@@ -1,0 +1,38 @@
+{
+  "db_name": "SQLite",
+  "query": "\n        SELECT\n            r.polling_station_id AS \"polling_station_id: u32\",\n            r.committee_session_id AS \"committee_session_id: u32\",\n            r.data AS \"data: Json<PollingStationResults>\",\n            r.created_at as \"created_at: NaiveDateTime\"\n        FROM polling_station_results AS r\n        LEFT JOIN polling_stations AS p ON r.polling_station_id = p.id\n        LEFT JOIN committee_sessions AS c ON c.id = p.committee_session_id\n        WHERE r.committee_session_id = $1\n        ",
+  "describe": {
+    "columns": [
+      {
+        "name": "polling_station_id: u32",
+        "ordinal": 0,
+        "type_info": "Integer"
+      },
+      {
+        "name": "committee_session_id: u32",
+        "ordinal": 1,
+        "type_info": "Integer"
+      },
+      {
+        "name": "data: Json<PollingStationResults>",
+        "ordinal": 2,
+        "type_info": "Text"
+      },
+      {
+        "name": "created_at: NaiveDateTime",
+        "ordinal": 3,
+        "type_info": "Text"
+      }
+    ],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "5a9cf02cf2bcce866af868f8f93953ffb2e68aecbc77165ee1aee1628da1df17"
+}

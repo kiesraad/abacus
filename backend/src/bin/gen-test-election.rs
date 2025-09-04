@@ -211,7 +211,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
         let results = if data_entry_completed {
             abacus::data_entry::repository::list_entries_with_polling_stations_first_session(
                 &pool,
-                election.id,
+                committee_session.id,
             )
             .await
             .expect("Could not load results")

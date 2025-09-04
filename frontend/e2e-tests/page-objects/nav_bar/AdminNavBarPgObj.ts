@@ -16,6 +16,6 @@ export class AdminNavBar {
   }
 
   getElectionBreadcrumb(electionName: string) {
-    return this.navigation.getByRole("link", { name: new RegExp(electionName) });
+    return this.navigation.getByRole("link", { name: electionName });
   }
 }

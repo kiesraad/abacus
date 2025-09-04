@@ -33,4 +33,4 @@ export type TranslationPath = Join<TranslationValue<Translation>>;
 // Dutch is our type source for translations
 export type Translation = typeof nl;
 
-export type RenderCallback = (contents: ReactElement, attributes?: Record<string, string>) => ReactElement;
+export type RenderFunction = (contents: ReactElement, attributes?: Record<string, string>) => ReactElement;

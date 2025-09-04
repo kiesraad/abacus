@@ -2,7 +2,7 @@
 import { Fragment, ReactElement } from "react";
 import { Link } from "react-router";
 
-import { RenderCallback } from "./i18n.types";
+import { RenderFunction } from "./i18n.types";
 
 type AST = Array<Element | string>;
 
@@ -14,7 +14,7 @@ interface Element {
 
 export const DEFAULT_ALLOWED_TAGS = ["ul", "li", "p", "strong", "em", "code", "h2", "h3", "h4", "Link"];
 
-const DEFAULT_RENDER_CALLBACKS: Record<string, RenderCallback> = {
+const DEFAULT_RENDER_FUNCTIONS: Record<string, RenderFunction> = {
   Link: (element, attributes) => <Link to={attributes?.to || "."}>{element}</Link>,
 };
 
@@ -39,8 +39,8 @@ export function parse(input: string, allowed = DEFAULT_ALLOWED_TAGS): AST {
       const tagParts = tag.split(" ");
       tag = tagParts[0] || tag;
 
-      // Allow attributes for render callbacks
-      if (Object.keys(DEFAULT_RENDER_CALLBACKS).includes(tag)) {
+      // Allow attributes for render functions
+      if (Object.keys(DEFAULT_RENDER_FUNCTIONS).includes(tag)) {
         tagParts.slice(1).forEach((attr) => {
           const [key, value] = attr.split("=");
           if (!key) return;
@@ -110,7 +110,7 @@ export function parse(input: string, allowed = DEFAULT_ALLOWED_TAGS): AST {
 // render the AST into React elements
 export function renderAst(
   input: AST,
-  elements: Record<string, RenderCallback> = DEFAULT_RENDER_CALLBACKS,
+  elements: Record<string, RenderFunction> = DEFAULT_RENDER_FUNCTIONS,
 ): ReactElement {
   // we can use the index as key since the input is static
   return (
@@ -123,7 +123,7 @@ export function renderAst(
 
         const { tag, children } = element;
 
-        // if the tag registered as a render callback, call the callback
+        // if the tag registered as a render function, call the function
         if (elements[tag] !== undefined && elements[tag] instanceof Function) {
           return <Fragment key={i}>{elements[tag](renderAst(children, elements), element.attributes)}</Fragment>;
         }

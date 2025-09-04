@@ -46,7 +46,7 @@ Voorbeeld:
 // signature van de vertaalfunctie
 function tx(
   k: TranslationPath,
-  elements?: Record<string, RenderCallback>,
+  elements?: Record<string, RenderFunction>,
   vars?: Record<string, string | number>,
 ): ReactElement
 

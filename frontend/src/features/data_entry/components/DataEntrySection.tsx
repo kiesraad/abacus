@@ -114,7 +114,7 @@ export function DataEntrySection() {
         />
 
         {missingTotalError && (
-          <div id="missing-total-error">
+          <div id="missing-total-error" className={cls.missingTotalError}>
             <Alert type="error" small>
               <p>
                 {t(`feedback.F402.typist.title`)}. {t(`feedback.F402.typist.content`)}

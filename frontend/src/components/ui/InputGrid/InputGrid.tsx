@@ -1,8 +1,10 @@
-import * as React from "react";
+import { ReactNode, useRef } from "react";
 
 import { cn } from "@/utils/classnames";
 
 import cls from "./InputGrid.module.css";
+
+export type InputGridRowCells = [ReactNode, ReactNode, ReactNode];
 
 export interface InputGridProps {
   zebra?: boolean;
@@ -10,16 +12,16 @@ export interface InputGridProps {
 }
 
 export function InputGrid({ zebra, children }: InputGridProps) {
-  const ref = React.useRef<HTMLTableElement>(null);
+  const ref = useRef<HTMLTableElement>(null);
 
   return (
-    <table role="none" ref={ref} className={cn(cls.inputGrid, { zebra: zebra })}>
+    <table role="none" ref={ref} className={cn(cls.inputGrid, zebra && cls.zebra)}>
       {children}
     </table>
   );
 }
 
-InputGrid.Header = ({ children }: { children: [React.ReactElement, React.ReactElement, React.ReactElement] }) => (
+InputGrid.Header = ({ children }: { children: InputGridRowCells }) => (
   <thead>
     <tr>{children}</tr>
   </thead>
@@ -28,8 +30,8 @@ InputGrid.Header = ({ children }: { children: [React.ReactElement, React.ReactEl
 InputGrid.Body = ({ children }: { children: React.ReactNode }) => <tbody>{children}</tbody>;
 
 InputGrid.Separator = () => (
-  <tr className="sep_row">
-    <td className="sep" colSpan={3}></td>
+  <tr className={cls.separator}>
+    <td colSpan={3} />
   </tr>
 );
 
@@ -39,32 +41,28 @@ InputGrid.Row = ({
   addSeparator,
   id,
 }: {
-  children: [React.ReactElement, React.ReactElement, React.ReactElement];
+  children: InputGridRowCells;
   isTotal?: boolean;
   addSeparator?: boolean;
   id?: string;
 }) => (
   <>
-    <tr className={isTotal ? "is-total " : ""} id={`row-${id}`}>
+    <tr className={cn(isTotal && cls.total)} id={`row-${id}`}>
       {children}
     </tr>
     {addSeparator && <InputGrid.Separator />}
   </>
 );
 
-InputGrid.ListTotal = ({
-  children,
-  id,
-}: {
-  children: [React.ReactElement, React.ReactElement, React.ReactElement];
-  id?: string;
-}) => (
+InputGrid.ListTotal = ({ children, id }: { children: InputGridRowCells; id?: string }) => (
   <>
-    <tr className="sep_total" id={`row-${id}`}>
-      <td></td>
-      <td></td>
-      <td></td>
+    <tr className={cls.totalSeparator}>
+      <td className={cls.field}></td>
+      <td className={cls.value}></td>
+      <td className={cls.title}></td>
     </tr>
-    <tr className="list_total is-total">{children}</tr>
+    <tr className={cn(cls.listTotal, cls.total)} id={`row-${id}`}>
+      {children}
+    </tr>
   </>
 );

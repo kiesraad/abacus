@@ -6,6 +6,10 @@ import { InputGridRow } from "./InputGridRow";
 
 type Props = {
   readOnly: boolean;
+  zebra: boolean;
+  addSeparator: boolean;
+  isListTotal: boolean;
+  isTotal: boolean;
 };
 
 // Create error and warning maps for the stories
@@ -20,11 +24,17 @@ const createErrorsAndWarnings = () => {
 };
 
 export const DefaultGrid: StoryObj<Props> = {
-  render: ({ readOnly }) => {
+  args: {
+    readOnly: false,
+    zebra: false,
+    addSeparator: false,
+    isTotal: true,
+  },
+  render: ({ readOnly, zebra, addSeparator, isTotal }) => {
     const errorsAndWarnings = createErrorsAndWarnings();
 
     return (
-      <InputGrid>
+      <InputGrid zebra={zebra}>
         <InputGrid.Header>
           <th>Veld</th>
           <th>Geteld aantal</th>
@@ -46,6 +56,7 @@ export const DefaultGrid: StoryObj<Props> = {
             title="Input field 2 (Error)"
             defaultValue={2}
             errorsAndWarnings={errorsAndWarnings}
+            addSeparator={addSeparator}
           />
           <InputGridRow
             readOnly={readOnly}
@@ -61,7 +72,7 @@ export const DefaultGrid: StoryObj<Props> = {
             field="D"
             title="Total of all inputs"
             defaultValue={6}
-            isTotal={true}
+            isTotal={isTotal}
             errorsAndWarnings={errorsAndWarnings}
           />
           <InputGrid.Separator />
@@ -84,12 +95,17 @@ export const DefaultGrid: StoryObj<Props> = {
   },
 };
 
-export const ZebraGrid: StoryObj<Props> = {
-  render: ({ readOnly }) => {
+export const CandidatesGrid: StoryObj<Props> = {
+  args: {
+    readOnly: false,
+    zebra: true,
+    isListTotal: true,
+  },
+  render: ({ readOnly, zebra, isListTotal }) => {
     const errorsAndWarnings = createErrorsAndWarnings();
 
     return (
-      <InputGrid zebra={true}>
+      <InputGrid zebra={zebra}>
         <InputGrid.Header>
           <th>Nummer</th>
           <th>Aantal stemmen</th>
@@ -142,7 +158,7 @@ export const ZebraGrid: StoryObj<Props> = {
             field=""
             title="List Total"
             defaultValue={15}
-            isListTotal={true}
+            isListTotal={isListTotal}
             errorsAndWarnings={errorsAndWarnings}
           />
         </InputGrid.Body>

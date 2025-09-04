@@ -149,7 +149,7 @@ async fn test_election_pdf_download_works(pool: SqlitePool) {
     )
     .await;
 
-    let url = format!("http://{addr}/api/elections/2/download_pdf_results");
+    let url = format!("http://{addr}/api/elections/2/committee_sessions/2/download_pdf_results");
     let response = reqwest::Client::new()
         .get(&url)
         .header("cookie", coordinator_cookie)
@@ -181,7 +181,7 @@ async fn test_election_pdf_download_invalid_committee_session_state(pool: Sqlite
     create_result(&addr, 1, 2).await;
     create_result(&addr, 2, 2).await;
 
-    let url = format!("http://{addr}/api/elections/2/download_pdf_results");
+    let url = format!("http://{addr}/api/elections/2/committee_sessions/2/download_pdf_results");
     let response = reqwest::Client::new()
         .get(&url)
         .header("cookie", coordinator_cookie)
@@ -207,7 +207,7 @@ async fn test_election_xml_download_works(pool: SqlitePool) {
     )
     .await;
 
-    let url = format!("http://{addr}/api/elections/2/download_xml_results");
+    let url = format!("http://{addr}/api/elections/2/committee_sessions/2/download_xml_results");
     let response = reqwest::Client::new()
         .get(&url)
         .header("cookie", coordinator_cookie)
@@ -232,7 +232,7 @@ async fn test_election_xml_download_invalid_committee_session_state(pool: Sqlite
     create_result(&addr, 1, 2).await;
     create_result(&addr, 2, 2).await;
 
-    let url = format!("http://{addr}/api/elections/2/download_xml_results");
+    let url = format!("http://{addr}/api/elections/2/committee_sessions/2/download_xml_results");
     let response = reqwest::Client::new()
         .get(&url)
         .header("cookie", coordinator_cookie)
@@ -258,7 +258,7 @@ async fn test_election_zip_download_works(pool: SqlitePool) {
     )
     .await;
 
-    let url = format!("http://{addr}/api/elections/2/download_zip_results");
+    let url = format!("http://{addr}/api/elections/2/committee_sessions/2/download_zip_results");
     let response = reqwest::Client::new()
         .get(&url)
         .header("cookie", coordinator_cookie)
@@ -304,7 +304,7 @@ async fn test_election_zip_download_invalid_committee_session_state(pool: Sqlite
     create_result(&addr, 1, 2).await;
     create_result(&addr, 2, 2).await;
 
-    let url = format!("http://{addr}/api/elections/2/download_zip_results");
+    let url = format!("http://{addr}/api/elections/2/committee_sessions/2/download_zip_results");
     let response = reqwest::Client::new()
         .get(&url)
         .header("cookie", coordinator_cookie)

@@ -4,6 +4,7 @@ import { describe, expect, test } from "vitest";
 import { render, screen } from "@/testing/test-utils";
 
 import { InputGrid } from "./InputGrid";
+import cls from "./InputGrid.module.css";
 import { InputGridRow, InputGridRowProps } from "./InputGridRow";
 
 const defaultProps: InputGridRowProps = {
@@ -29,13 +30,13 @@ describe("InputGridRow", () => {
     expect(rows.length).toBe(1);
   });
 
-  test("InputGridRow renders a ListTotal in case of isListTotal", async () => {
+  test("InputGridRow renders a separator and list total row in case of isListTotal", async () => {
     renderRow({ isListTotal: true });
 
     const rows = await screen.findAllByRole("row");
     expect(rows.length).toBe(2);
-    expect(rows[0]).toHaveClass("sep_total");
-    expect(rows[1]).toHaveClass("list_total");
+    expect(rows[0]).toHaveClass(cls.totalSeparator as string);
+    expect(rows[1]).toHaveClass(cls.listTotal as string);
   });
 
   test("InputGridRow uses aria-errormessage", async () => {

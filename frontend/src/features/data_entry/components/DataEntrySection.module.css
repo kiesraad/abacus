@@ -13,3 +13,8 @@
   flex-direction: column;
   gap: 1.5rem;
 }
+
+.missingTotalError {
+  /* Left aligned with value column in the input grid */
+  padding-left: 6.5rem;
+}

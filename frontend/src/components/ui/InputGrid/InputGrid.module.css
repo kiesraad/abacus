@@ -1,24 +1,27 @@
 .inputGrid {
   width: 100%;
   border-spacing: 0;
+
   th {
     border-bottom: 1px solid var(--bg-gray-darkest);
     font-size: var(--font-size-xs);
     text-align: right;
     padding: 0.75rem 1.5rem;
     color: var(--color-help-text);
-    &:nth-of-type(3) {
+
+    &.title {
       text-align: left;
     }
   }
 
-  &:global(.zebra) {
+  &.zebra {
     tbody tr:nth-of-type(even) {
       background-color: var(--bg-gray-darker);
     }
-    tbody tr:global(.sep_row),
-    tbody tr:global(.sep_total),
-    tbody tr:global(.list_total) {
+
+    tbody tr.separator,
+    tbody tr.totalSeparator,
+    tbody tr.listTotal {
       background-color: var(--bg-gray);
     }
   }
@@ -28,7 +31,8 @@
       border-bottom: 1px solid var(--bg-gray-darkest);
       padding: 0.5rem 1.5rem;
       line-height: 1.25rem;
-      &:first-of-type {
+
+      &.field {
         width: 6.5rem;
         border-right: 1px solid var(--bg-gray-darkest);
         text-align: right;
@@ -36,11 +40,11 @@
         font-weight: bold;
       }
 
-      /* Input */
-      &:nth-of-type(2) {
+      &.value {
         width: 13rem;
         border-right: 1px solid var(--bg-gray-darkest);
         padding: 0;
+
         input {
           width: 100%;
           height: 4.5rem;
@@ -77,14 +81,8 @@
         }
       }
 
-      &:last-of-type {
+      &.title {
         color: var(--color-help-text);
-      }
-
-      &:global(.sep) {
-        border: 0;
-        border-bottom: 1px solid var(--bg-gray-darkest);
-        height: 1.5rem;
       }
     }
 
@@ -95,33 +93,39 @@
       }
     }
 
-    &:global(.list_total) {
-      td:first-of-type {
+    &.separator {
+      td {
+        border: 0;
+        border-bottom: 1px solid var(--bg-gray-darkest);
+        height: 1.5rem;
+      }
+    }
+
+    &.listTotal {
+      td.field {
         border-bottom: 0;
       }
-      td:last-of-type {
+
+      td.title {
         border: 0;
       }
     }
 
-    &:global(.sep_total) {
-      td:first-of-type,
-      td:last-of-type {
+    &.totalSeparator {
+      td.field,
+      td.title {
         border: 0;
       }
-      td:nth-of-type(2) {
+
+      td.value {
         border-right: 0;
       }
     }
 
-    &:global(.is-total) {
-      td:last-of-type {
+    &.total {
+      td.title {
         font-weight: bold;
       }
     }
   }
-}
-
-div:global(#missing-total-error) {
-  padding-left: 6.5rem;
 }

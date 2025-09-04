@@ -12,10 +12,12 @@
     border-radius: 0.25rem;
     background: var(--color-hover);
     font-family: inherit;
+    height: 1.75rem;
 
     svg {
       width: 1rem;
       height: 1rem;
+      fill: var(--color-help-text);
     }
 
     span {

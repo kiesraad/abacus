@@ -1851,7 +1851,16 @@ mod tests {
         #[test]
         fn test_default() -> Result<(), DataError> {
             let validation_results = validate(create_test_data())?;
-            assert_eq!(validation_results.errors.len(), 0);
+            assert_eq!(validation_results.errors.len(), 1);
+            assert_eq!(
+                validation_results.errors[0].code,
+                ValidationResultCode::F304
+            );
+            assert_eq!(
+                validation_results.errors[0].fields,
+                vec!["data.differences_counts.compare_votes_cast_admitted_voters",]
+            );
+
             assert_eq!(validation_results.warnings.len(), 1);
             assert_eq!(
                 validation_results.warnings[0].code,
@@ -1922,6 +1931,10 @@ mod tests {
 
             data.voters_counts.poll_card_count = 300;
             data.voters_counts.total_admitted_voters_count = 300;
+
+            data.differences_counts
+                .compare_votes_cast_admitted_voters
+                .admitted_voters_equal_votes_cast = true;
 
             data.political_group_votes = vec![
                 PoliticalGroupCandidateVotes::from_test_data_auto(1, &[100]),
@@ -2551,7 +2564,7 @@ mod tests {
                 &"polling_station_results".into(),
             )
             .unwrap();
-        assert_eq!(validation_results.errors.len(), 2);
+        assert_eq!(validation_results.errors.len(), 3);
         assert_eq!(validation_results.warnings.len(), 1);
         assert_eq!(
             validation_results.errors[0].code,
@@ -2575,14 +2588,22 @@ mod tests {
             ]
         );
         assert_eq!(
+            validation_results.errors[2].code,
+            ValidationResultCode::F403
+        );
+        assert_eq!(
+            validation_results.errors[2].fields,
+            vec!["polling_station_results.political_group_votes[0].total",]
+        );
+        assert_eq!(
             validation_results.warnings[0].code,
             ValidationResultCode::W203
         );
         assert_eq!(
             validation_results.warnings[0].fields,
             vec![
+                "polling_station_results.voters_counts.total_admitted_voters_count",
                 "polling_station_results.votes_counts.total_votes_cast_count",
-                "polling_station_results.voters_counts.total_admitted_voters_count"
             ]
         );
     }
@@ -2656,8 +2677,8 @@ mod tests {
         assert_eq!(
             validation_results.warnings[0].fields,
             vec![
-                "polling_station_results.votes_counts.total_votes_cast_count",
                 "polling_station_results.voters_counts.total_admitted_voters_count",
+                "polling_station_results.votes_counts.total_votes_cast_count",
             ]
         );
     }
@@ -2847,12 +2868,16 @@ mod tests {
                 &"polling_station_results".into(),
             )
             .unwrap();
-        assert_eq!(validation_results.errors.len(), 1);
+        assert_eq!(validation_results.errors.len(), 2);
         assert_eq!(validation_results.warnings.len(), 1);
 
         assert_eq!(
             validation_results.errors[0].code,
             ValidationResultCode::F306
+        );
+        assert_eq!(
+            validation_results.errors[1].code,
+            ValidationResultCode::F403
         );
         assert_eq!(
             validation_results.errors[0].fields,
@@ -2865,8 +2890,8 @@ mod tests {
         assert_eq!(
             validation_results.warnings[0].fields,
             vec![
-                "polling_station_results.votes_counts.total_votes_cast_count",
                 "polling_station_results.voters_counts.total_admitted_voters_count",
+                "polling_station_results.votes_counts.total_votes_cast_count",
             ]
         );
     }
@@ -2922,7 +2947,7 @@ mod tests {
                 &"polling_station_results".into(),
             )
             .unwrap();
-        assert_eq!(validation_results.errors.len(), 1);
+        assert_eq!(validation_results.errors.len(), 2);
         assert_eq!(validation_results.warnings.len(), 1);
 
         assert_eq!(
@@ -2936,6 +2961,14 @@ mod tests {
                 "polling_station_results.differences_counts.fewer_ballots_count",
             ]
         );
+        assert_eq!(
+            validation_results.errors[1].code,
+            ValidationResultCode::F403
+        );
+        assert_eq!(
+            validation_results.errors[1].fields,
+            vec!["polling_station_results.political_group_votes[0].total",]
+        );
 
         assert_eq!(
             validation_results.warnings[0].code,
@@ -2944,8 +2977,8 @@ mod tests {
         assert_eq!(
             validation_results.warnings[0].fields,
             vec![
-                "polling_station_results.votes_counts.total_votes_cast_count",
                 "polling_station_results.voters_counts.total_admitted_voters_count",
+                "polling_station_results.votes_counts.total_votes_cast_count",
             ]
         );
     }
@@ -3001,7 +3034,7 @@ mod tests {
                 &"polling_station_results".into(),
             )
             .unwrap();
-        assert_eq!(validation_results.errors.len(), 1);
+        assert_eq!(validation_results.errors.len(), 2);
         assert_eq!(
             validation_results.errors[0].code,
             ValidationResultCode::F308
@@ -3009,6 +3042,14 @@ mod tests {
         assert_eq!(
             validation_results.errors[0].fields,
             vec!["polling_station_results.differences_counts.fewer_ballots_count",]
+        );
+        assert_eq!(
+            validation_results.errors[1].code,
+            ValidationResultCode::F403
+        );
+        assert_eq!(
+            validation_results.errors[1].fields,
+            vec!["polling_station_results.political_group_votes[0].total",]
         );
 
         assert_eq!(validation_results.warnings.len(), 1);
@@ -3020,8 +3061,8 @@ mod tests {
         assert_eq!(
             validation_results.warnings[0].fields,
             vec![
-                "polling_station_results.votes_counts.total_votes_cast_count",
                 "polling_station_results.voters_counts.total_admitted_voters_count",
+                "polling_station_results.votes_counts.total_votes_cast_count",
             ]
         );
     }
@@ -3077,7 +3118,7 @@ mod tests {
                 &"polling_station_results".into(),
             )
             .unwrap();
-        assert_eq!(validation_results.errors.len(), 1);
+        assert_eq!(validation_results.errors.len(), 2);
         assert_eq!(
             validation_results.errors[0].code,
             ValidationResultCode::F309
@@ -3089,6 +3130,14 @@ mod tests {
                 "polling_station_results.differences_counts.fewer_ballots_count",
             ]
         );
+        assert_eq!(
+            validation_results.errors[1].code,
+            ValidationResultCode::F403
+        );
+        assert_eq!(
+            validation_results.errors[1].fields,
+            vec!["polling_station_results.political_group_votes[0].total",]
+        );
 
         assert_eq!(validation_results.warnings.len(), 1);
         assert_eq!(
@@ -3098,8 +3147,8 @@ mod tests {
         assert_eq!(
             validation_results.warnings[0].fields,
             vec![
-                "polling_station_results.votes_counts.total_votes_cast_count",
                 "polling_station_results.voters_counts.total_admitted_voters_count",
+                "polling_station_results.votes_counts.total_votes_cast_count",
             ]
         );
     }
@@ -3155,7 +3204,7 @@ mod tests {
                 &"polling_station_results".into(),
             )
             .unwrap();
-        assert_eq!(validation_results.errors.len(), 2);
+        assert_eq!(validation_results.errors.len(), 3);
         assert_eq!(
             validation_results.errors[0].code,
             ValidationResultCode::F309
@@ -3175,6 +3224,14 @@ mod tests {
             validation_results.errors[1].fields,
             vec!["polling_station_results.differences_counts.difference_completely_accounted_for",]
         );
+        assert_eq!(
+            validation_results.errors[2].code,
+            ValidationResultCode::F403
+        );
+        assert_eq!(
+            validation_results.errors[2].fields,
+            vec!["polling_station_results.political_group_votes[0].total",]
+        );
 
         assert_eq!(validation_results.warnings.len(), 1);
         assert_eq!(
@@ -3184,8 +3241,8 @@ mod tests {
         assert_eq!(
             validation_results.warnings[0].fields,
             vec![
-                "polling_station_results.votes_counts.total_votes_cast_count",
                 "polling_station_results.voters_counts.total_admitted_voters_count",
+                "polling_station_results.votes_counts.total_votes_cast_count",
             ]
         );
     }
@@ -3241,7 +3298,7 @@ mod tests {
                 &"polling_station_results".into(),
             )
             .unwrap();
-        assert_eq!(validation_results.errors.len(), 2);
+        assert_eq!(validation_results.errors.len(), 3);
         assert_eq!(
             validation_results.errors[0].code,
             ValidationResultCode::F309
@@ -3261,6 +3318,14 @@ mod tests {
             validation_results.errors[1].fields,
             vec!["polling_station_results.differences_counts.difference_completely_accounted_for",]
         );
+        assert_eq!(
+            validation_results.errors[2].code,
+            ValidationResultCode::F403
+        );
+        assert_eq!(
+            validation_results.errors[2].fields,
+            vec!["polling_station_results.political_group_votes[0].total",]
+        );
 
         assert_eq!(validation_results.warnings.len(), 1);
         assert_eq!(
@@ -3270,8 +3335,8 @@ mod tests {
         assert_eq!(
             validation_results.warnings[0].fields,
             vec![
-                "polling_station_results.votes_counts.total_votes_cast_count",
                 "polling_station_results.voters_counts.total_admitted_voters_count",
+                "polling_station_results.votes_counts.total_votes_cast_count",
             ]
         );
     }

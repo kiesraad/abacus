@@ -359,12 +359,10 @@ mod tests {
                 tmp.difference_completely_accounted_for.yes = true;
                 tmp.compare_votes_cast_admitted_voters
                     .votes_cast_greater_than_admitted_voters = true;
-                tmp.compare_votes_cast_admitted_voters
-                    .admitted_voters_equal_votes_cast = false;
                 tmp
             },
             political_group_votes: vec![
-                PoliticalGroupCandidateVotes::from_test_data_auto(1, &[18, 3]),
+                PoliticalGroupCandidateVotes::from_test_data_auto(1, &[18, 2]),
                 PoliticalGroupCandidateVotes::from_test_data_auto(2, &[4, 4, 2]),
             ],
         }
@@ -386,11 +384,11 @@ mod tests {
                 political_group_total_votes: vec![
                     PoliticalGroupTotalVotes {
                         number: 1,
-                        total: 26,
+                        total: 24,
                     },
                     PoliticalGroupTotalVotes {
                         number: 2,
-                        total: 30,
+                        total: 32,
                     },
                 ],
                 total_votes_candidates_count: 56,
@@ -402,15 +400,13 @@ mod tests {
                 let mut tmp = DifferencesCounts::zero();
                 tmp.fewer_ballots_count = 2;
                 tmp.compare_votes_cast_admitted_voters
-                    .admitted_voters_equal_votes_cast = false;
-                tmp.compare_votes_cast_admitted_voters
                     .votes_cast_smaller_than_admitted_voters = true;
-                tmp.difference_completely_accounted_for.yes = true;
+                tmp.difference_completely_accounted_for.no = true;
                 tmp
             },
             political_group_votes: vec![
-                PoliticalGroupCandidateVotes::from_test_data_auto(1, &[50, 6]),
-                PoliticalGroupCandidateVotes::from_test_data_auto(2, &[12, 15, 8]),
+                PoliticalGroupCandidateVotes::from_test_data_auto(1, &[17, 7]),
+                PoliticalGroupCandidateVotes::from_test_data_auto(2, &[12, 15, 5]),
             ],
         }
     }
@@ -496,19 +492,19 @@ mod tests {
         // finally the political group counts
         assert_eq!(totals.political_group_votes.len(), 2);
         let group1 = totals.political_group_votes.first().unwrap();
-        assert_eq!(group1.total, 77);
+        assert_eq!(group1.total, 44);
         assert_eq!(group1.candidate_votes.len(), 2);
 
-        assert_eq!(group1.candidate_votes.first().unwrap().votes, 68);
+        assert_eq!(group1.candidate_votes.first().unwrap().votes, 35);
         assert_eq!(group1.candidate_votes.get(1).unwrap().votes, 9);
 
         let group2 = totals.political_group_votes.get(1).unwrap();
-        assert_eq!(group2.total, 45);
+        assert_eq!(group2.total, 42);
         assert_eq!(group2.candidate_votes.len(), 3);
 
         assert_eq!(group2.candidate_votes.first().unwrap().votes, 16);
         assert_eq!(group2.candidate_votes.get(1).unwrap().votes, 19);
-        assert_eq!(group2.candidate_votes.get(2).unwrap().votes, 10);
+        assert_eq!(group2.candidate_votes.get(2).unwrap().votes, 7);
     }
 
     #[test]
@@ -533,7 +529,7 @@ mod tests {
 
         assert_eq!(totals.voters_counts.total_admitted_voters_count, 20400);
         assert_eq!(totals.votes_counts.total_votes_cast_count, 21000);
-        assert_eq!(totals.political_group_votes[0].total, 12600);
+        assert_eq!(totals.political_group_votes[0].total, 12000);
         assert_eq!(
             totals.political_group_votes[0].candidate_votes[0].votes,
             10800

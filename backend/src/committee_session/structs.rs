@@ -90,3 +90,11 @@ pub struct CommitteeSessionNumberOfVotersChangeRequest {
 pub struct CommitteeSessionStatusChangeRequest {
     pub status: CommitteeSessionStatus,
 }
+
+/// Committee session files update request
+#[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq, ToSchema, Type, FromRow)]
+#[serde(deny_unknown_fields)]
+pub struct CommitteeSessionFilesUpdateRequest {
+    pub results_eml: Option<u32>,
+    pub results_pdf: Option<u32>,
+}

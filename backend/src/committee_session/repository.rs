@@ -1,8 +1,8 @@
 use sqlx::{Error, query, query_as};
 
 use super::{
-    CommitteeSession, CommitteeSessionCreateRequest, CommitteeSessionUpdateRequest,
-    status::CommitteeSessionStatus,
+    CommitteeSession, CommitteeSessionCreateRequest, CommitteeSessionFilesUpdateRequest,
+    CommitteeSessionUpdateRequest, status::CommitteeSessionStatus,
 };
 
 use crate::DbConnLike;
@@ -303,6 +303,39 @@ pub async fn change_status(
             results_pdf as "results_pdf: _"
         "#,
         committee_session_status,
+        committee_session_id,
+    )
+    .fetch_one(conn)
+    .await
+}
+
+pub async fn change_files(
+    conn: impl DbConnLike<'_>,
+    committee_session_id: u32,
+    committee_session_files_update: CommitteeSessionFilesUpdateRequest,
+) -> Result<CommitteeSession, Error> {
+    query_as!(
+        CommitteeSession,
+        r#"
+        UPDATE committee_sessions
+        SET 
+            results_eml = ?,
+            results_pdf = ?
+        WHERE id = ?
+        RETURNING
+            id as "id: u32",
+            number as "number: u32",
+            election_id as "election_id: u32",
+            status as "status: _",
+            location,
+            start_date,
+            start_time,
+            number_of_voters as "number_of_voters: u32",
+            results_eml as "results_eml: _",
+            results_pdf as "results_pdf: _"
+        "#,
+        committee_session_files_update.results_eml,
+        committee_session_files_update.results_pdf,
         committee_session_id,
     )
     .fetch_one(conn)

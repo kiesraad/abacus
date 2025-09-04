@@ -157,21 +157,21 @@ export function CheckAndSaveForm() {
                     <Link to={getUrlForFormSection(section.id)}>{title}</Link>
                   </StatusList.Title>
                   <StatusList id={`save-form-summary-list-${section.id}`} gap="sm">
-                    {section.errors.getCodes().map((code) => {
+                    {section.errors.getAll().map(({ code, context }) => {
                       return (
                         <StatusList.Item key={code} status="error" id={`section-error-${section.id}-${code}`}>
                           <strong>{dottedCode(code)}</strong>
                           &nbsp;
-                          {tx(`feedback.${code}.typist.title`)}
+                          {tx(`feedback.${code}.typist.title`, undefined, { ...context })}
                         </StatusList.Item>
                       );
                     })}
-                    {section.warnings.getCodes().map((code) => {
+                    {section.warnings.getAll().map(({ code, context }) => {
                       return (
                         <StatusList.Item key={code} status="warning" id={`section-error-${section.id}-${code}`}>
                           <strong>{dottedCode(code)}</strong>
                           &nbsp;
-                          {tx(`feedback.${code}.typist.title`)}
+                          {tx(`feedback.${code}.typist.title`, undefined, { ...context })}
                         </StatusList.Item>
                       );
                     })}

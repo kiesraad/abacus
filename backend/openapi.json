@@ -6449,6 +6449,9 @@
           "code": {
             "$ref": "#/components/schemas/ValidationResultCode"
           },
+          "context": {
+            "$ref": "#/components/schemas/ValidationResultContext"
+          },
           "fields": {
             "type": "array",
             "items": {
@@ -6475,12 +6478,24 @@
           "F305",
           "F401",
           "F402",
+          "F403",
           "W001",
           "W201",
           "W202",
           "W203",
           "W204"
         ]
+      },
+      "ValidationResultContext": {
+        "type": "object",
+        "properties": {
+          "political_group_number": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          }
+        },
+        "additionalProperties": false
       },
       "ValidationResults": {
         "type": "object",

@@ -1181,6 +1181,7 @@ export interface UserLoginFailedDetails {
 
 export interface ValidationResult {
   code: ValidationResultCode;
+  context?: ValidationResultContext;
   fields: string[];
 }
 
@@ -1199,11 +1200,16 @@ export type ValidationResultCode =
   | "F305"
   | "F401"
   | "F402"
+  | "F403"
   | "W001"
   | "W201"
   | "W202"
   | "W203"
   | "W204";
+
+export interface ValidationResultContext {
+  political_group_number?: number;
+}
 
 export interface ValidationResults {
   errors: ValidationResult[];

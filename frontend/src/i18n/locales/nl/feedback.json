@@ -151,11 +151,11 @@
   },
   "F401": {
     "typist": {
-      "title": "Controleer het totaal van de lijst. Is dit veld op het papieren proces-verbaal ook leeg? Dan kan je verdergaan."
+      "title": "Controleer het totaal van de lijst. Is dit veld op het papieren proces-verbaal ook leeg? Dan kan je verdergaan. (F.401)"
     },
     "coordinator": {
       "title": "Het totaal van de lijst is niet ingevuld",
-      "content": "Controleer of het proces-verbaal tijdens het telproces volledig is ingevuld (controleer ook E.{x} in rubriek 3.2).\nKijk of het corrigeren van de fout een onverklaard verschil in rubriek 3.3 wegneemt.",
+      "content": "Controleer of het proces-verbaal tijdens het telproces volledig is ingevuld (controleer ook E.{political_group_number} in rubriek 3.2).\nKijk of het corrigeren van de fout een onverklaard verschil in rubriek 3.3 wegneemt.",
       "actions": "<ul><li>Zo ja: corrigeer de optelfout op het papieren proces-verbaal.</li><li>Zo nee: onderzoek wat er fout is gegaan en tel zo nodig de stembiljetten en het aantal toegelaten kiezers opnieuw. Begin bij deze lijst, en hertel tot de fout gevonden is, of alles één keer herteld is.</li></ul>"
     }
   },
@@ -173,10 +173,10 @@
   "F403": {
     "typist": {
       "title": "Controleer het totaal van de lijst",
-      "content": "Als het totaal overeenkomt met het papieren proces-verbaal, controleer dan ook de waarde bij E.{x} bij <link>Aantal kiezers en stemmen</link>."
+      "content": "Als het totaal overeenkomt met het papieren proces-verbaal, controleer dan ook de waarde bij E.{political_group_number} bij <Link to=\"../voters_votes_counts\">Aantal kiezers en stemmen</Link>."
     },
     "coordinator": {
-      "title": "Controleer het totaal van de lijst en E.{x} in rubriek 3.2",
+      "title": "Controleer het totaal van de lijst en E.{political_group_number} in rubriek 3.2",
       "actions": "<ul><li>Controleer wat er fout is gegaan in rubriek 3.2 en herstel de fout.</li><li>Pas zo nodig rubriek 3.3.2 aan, en volg de instructies over hertellen die daar staan.</li></ul>"
     }
   },

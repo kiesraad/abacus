@@ -12,13 +12,12 @@ use utoipa_axum::{router::OpenApiRouter, routes};
 pub use self::structs::*;
 use crate::{
     APIError, AppState, ErrorResponse,
-    audit_log::{AuditEvent, AuditService},
+    audit_log::{AuditEvent, AuditService, PollingStationImportDetails},
     authentication::{AdminOrCoordinator, User},
-    committee_session::status::{CommitteeSessionStatus, change_committee_session_status},
-};
-
-use crate::{
-    audit_log::PollingStationImportDetails,
+    committee_session::{
+        repository::get_election_committee_session,
+        status::{CommitteeSessionStatus, change_committee_session_status},
+    },
     eml::{EML110, EMLDocument, EMLImportError},
 };
 
@@ -312,6 +311,49 @@ pub struct PollingStationsRequest {
     pub polling_stations: Vec<PollingStationRequest>,
 }
 
+pub async fn create_imported_polling_stations(
+    pool: SqlitePool,
+    audit_service: AuditService,
+    election_id: u32,
+    polling_stations_request: PollingStationsRequest,
+) -> Result<Vec<PollingStation>, APIError> {
+    let committee_session = get_election_committee_session(&pool, election_id).await?;
+
+    // Create new polling stations
+    let polling_stations = repository::create_many(
+        &pool,
+        election_id,
+        polling_stations_request.polling_stations,
+    )
+    .await?;
+
+    // Create audit event
+    audit_service
+        .log(
+            &AuditEvent::PollingStationsImported(PollingStationImportDetails {
+                import_election_id: election_id,
+                import_file_name: polling_stations_request.file_name,
+                import_number_of_polling_stations: u64::try_from(polling_stations.len())
+                    .map_err(|_| EMLImportError::NumberOfPollingStationsNotInRange)?,
+            }),
+            None,
+        )
+        .await?;
+
+    if committee_session.status == CommitteeSessionStatus::Created {
+        // Change committee session status to DataEntryNotStarted
+        change_committee_session_status(
+            committee_session.id,
+            CommitteeSessionStatus::DataEntryNotStarted,
+            pool.clone(),
+            audit_service,
+        )
+        .await?;
+    }
+
+    Ok(polling_stations)
+}
+
 /// Import file with Polling Stations
 #[utoipa::path(
     post,
@@ -335,26 +377,13 @@ async fn polling_station_import(
     audit_service: AuditService,
     Json(polling_stations_request): Json<PollingStationsRequest>,
 ) -> Result<(StatusCode, PollingStationListResponse), APIError> {
-    // Create new polling stations
-    let polling_stations = crate::polling_station::repository::create_many(
-        &pool,
+    let polling_stations: Vec<PollingStation> = create_imported_polling_stations(
+        pool,
+        audit_service,
         election_id,
-        polling_stations_request.polling_stations,
+        polling_stations_request,
     )
     .await?;
-
-    // Create audit event
-    audit_service
-        .log(
-            &AuditEvent::PollingStationsImported(PollingStationImportDetails {
-                import_election_id: election_id,
-                import_file_name: polling_stations_request.file_name,
-                import_number_of_polling_stations: u64::try_from(polling_stations.len())
-                    .map_err(|_| EMLImportError::NumberOfPollingStationsNotInRange)?,
-            }),
-            None,
-        )
-        .await?;
 
     Ok((
         StatusCode::OK,

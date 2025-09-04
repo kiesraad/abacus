@@ -531,7 +531,14 @@ async fn test_polling_station_import_missing_data(pool: SqlitePool) {
 async fn test_polling_station_import_correct_file(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let cookie = shared::coordinator_login(&addr).await;
-    let validate_url = format!("http://{addr}/api/elections/6/polling_stations/validate-import");
+    let election_id = 6;
+
+    let committee_session =
+        shared::get_election_committee_session(&addr, &cookie, election_id).await;
+    assert_eq!(committee_session.status, CommitteeSessionStatus::Created);
+
+    let validate_url =
+        format!("http://{addr}/api/elections/{election_id}/polling_stations/validate-import");
     let validate_response = reqwest::Client::new()
         .post(&validate_url)
         .json(&serde_json::json!({
@@ -546,7 +553,7 @@ async fn test_polling_station_import_correct_file(pool: SqlitePool) {
     let validate_body: PollingStationRequestListResponse = validate_response.json().await.unwrap();
     let polling_stations = validate_body.polling_stations;
 
-    let import_url = format!("http://{addr}/api/elections/6/polling_stations/import");
+    let import_url = format!("http://{addr}/api/elections/{election_id}/polling_stations/import");
     let import_response = reqwest::Client::new()
         .post(&import_url)
         .json(&PollingStationsRequest {
@@ -559,4 +566,11 @@ async fn test_polling_station_import_correct_file(pool: SqlitePool) {
         .unwrap();
 
     assert_eq!(import_response.status(), StatusCode::OK);
+
+    let committee_session =
+        shared::get_election_committee_session(&addr, &cookie, election_id).await;
+    assert_eq!(
+        committee_session.status,
+        CommitteeSessionStatus::DataEntryNotStarted
+    );
 }

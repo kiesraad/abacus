@@ -31,7 +31,7 @@
 
 #location_name
 
-#input.election.location #format_date(input.election.election_date)
+#input.committee_session.location #format_date(input.committee_session.start_date) #input.committee_session.start_time
 
 == Proces-verbaal
 
@@ -103,9 +103,9 @@ De volgende rollen zijn mogelijk: voorzitter, plaatsvervangend voorzitter of lid
             #polling_station.postal_code #polling_station.locality
           ]
         ],
-        align(center, checkbox(checked: false)[]),
-        align(center, checkbox(checked: false)[]),
-        align(center, checkbox(checked: false)[]),
+        align(center, checkbox(checked: input.summary.polling_station_investigations.admitted_voters_recounted.contains(polling_station.number))[]),
+        align(center, checkbox(checked: input.summary.polling_station_investigations.investigated_other_reason.contains(polling_station.number))[]),
+        align(center, checkbox(checked: input.summary.polling_station_investigations.ballots_recounted.contains(polling_station.number))[]),
       )
     })
     .flatten(),
@@ -164,7 +164,7 @@ Bijvoorbeeld een schorsing of als er meerdere verkiezingen tegelijk werden georg
     letterbox(
       "B",
       value: input.summary.voters_counts.proxy_certificate_count,
-    )[Volmachtbewijzen (schriftelijk of via ingevulde stempas],
+    )[Volmachtbewijzen (schriftelijk of via ingevulde stempas)],
     letterbox(
       "D",
       light: false,
@@ -197,7 +197,7 @@ Bijvoorbeeld een schorsing of als er meerdere verkiezingen tegelijk werden georg
   #sum(
     sum(
       ..input.election.political_groups.map(list => {
-        let votes = input.summary.political_group_votes.find(v => v.number == list.number)
+        let votes = input.summary.votes_counts.political_group_total_votes.find(v => v.number == list.number)
 
         if votes == none {
           return
@@ -227,18 +227,20 @@ Bijvoorbeeld een schorsing of als er meerdere verkiezingen tegelijk werden georg
 
 === Is bij *alle afzonderlijke stembureaus* in #this_location het aantal uitgebrachte stemmen en het aantal toegelaten kiezers gelijk?
 
-#checkbox(checked: false)[Ja #sym.arrow.r *Ga door naar #ref(<monitoring_protocol>)*]
+#let differences = input.summary.differences_counts.more_ballots_count.count > 0 or input.summary.differences_counts.fewer_ballots_count.count > 0
 
-#checkbox(checked: false)[Nee, er zijn stembureaus met een verschil]
+#checkbox(checked: not differences)[Ja #sym.arrow.r *Ga door naar #ref(<monitoring_protocol>, supplement: none)*]
 
-=== Voor de stembureaus met de nummers #input.summary.differences_counts.more_ballots_count.polling_stations.map(str).join(", ") zijn *méér* uitgebrachte stemmen dan toegelaten kiezers geteld.
+#checkbox(checked: differences)[Nee, er zijn stembureaus met een verschil]
+
+=== Voor de stembureaus met de nummers #comma_list(input.summary.differences_counts.more_ballots_count.polling_stations) zijn *méér* uitgebrachte stemmen dan toegelaten kiezers geteld.
 
 #letterbox(
   "I",
   value: input.summary.differences_counts.more_ballots_count.count,
 )[Totaal aantal méér getelde stemmen in deze stembureaus]
 
-=== Voor de stembureaus met de nummers #input.summary.differences_counts.fewer_ballots_count.polling_stations.map(str).join(", ") zijn *minder* uitgebrachte stemmen dan toegelaten kiezers geteld.
+=== Voor de stembureaus met de nummers #comma_list(input.summary.differences_counts.fewer_ballots_count.polling_stations) zijn *minder* uitgebrachte stemmen dan toegelaten kiezers geteld.
 
 #letterbox(
   "J",

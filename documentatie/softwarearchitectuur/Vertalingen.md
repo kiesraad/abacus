@@ -46,7 +46,7 @@ Voorbeeld:
 // signature van de vertaalfunctie
 function tx(
   k: TranslationPath,
-  elements?: Record<string, RenderCallback>,
+  elements?: Record<string, RenderFunction>,
   vars?: Record<string, string | number>,
 ): ReactElement
 
@@ -57,7 +57,8 @@ tx("test", {
 // resultaat: Visit my homepage <a href="https://www.kiesraad.nl/">here</a>
 ````
 
-Toegestane HTML tags in vertalingen zijn: "ul", "li", "p", "strong", "code".
+Toegestane HTML tags in vertalingen zijn: "ul", "li", "p", "strong", "em", "code", "h2", "h3", "h4".
+Daarnaast zijn React Router "Link" tags toegestaan, handig voor interne routering. Voorbeeld: `<Link to="../page">Link title</Link>`.
 Newlines worden door de `tx()` functie automatisch omgezet naar `<br>`.
 
 ### Vertalingen toevoegen

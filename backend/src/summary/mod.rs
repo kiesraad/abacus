@@ -6,7 +6,7 @@ use crate::{
     data_entry::{
         CSOFirstSessionResults, CandidateVotes, Count, DifferencesCounts,
         PoliticalGroupCandidateVotes, PoliticalGroupTotalVotes, Validate, ValidationResults,
-        VotersCounts, VotesCounts, YesNo,
+        VotersCounts, VotesCounts,
     },
     election::ElectionWithPoliticalGroups,
     error::ErrorReference,
@@ -25,6 +25,8 @@ pub struct ElectionSummary {
     pub differences_counts: SummaryDifferencesCounts,
     /// The summary votes for each political group (and each candidate within)
     pub political_group_votes: Vec<PoliticalGroupCandidateVotes>,
+    /// Polling stations where results were investigated by the GSB
+    pub polling_station_investigations: PollingStationInvestigations,
 }
 
 impl ElectionSummary {
@@ -44,6 +46,7 @@ impl ElectionSummary {
                 total_votes_cast_count: 0,
             },
             differences_counts: SummaryDifferencesCounts::zero(),
+            polling_station_investigations: PollingStationInvestigations::default(),
             political_group_votes: vec![],
         }
     }
@@ -136,6 +139,11 @@ impl ElectionSummary {
                 pg_total.add(pg)?;
             }
 
+            // add checkbox states for this polling station
+            totals
+                .polling_station_investigations
+                .append_result(polling_station, result);
+
             touched_polling_stations.push(polling_station.number);
         }
 
@@ -169,8 +177,6 @@ impl SummaryDifferenceCountsCompareVotesCastAdmittedVoters {
 pub struct SummaryDifferencesCounts {
     pub more_ballots_count: SumCount,
     pub fewer_ballots_count: SumCount,
-    pub compare_votes_cast_admitted_voters: SummaryDifferenceCountsCompareVotesCastAdmittedVoters,
-    pub difference_completely_accounted_for: YesNo,
 }
 
 impl SummaryDifferencesCounts {
@@ -179,9 +185,6 @@ impl SummaryDifferencesCounts {
         SummaryDifferencesCounts {
             more_ballots_count: SumCount::zero(),
             fewer_ballots_count: SumCount::zero(),
-            compare_votes_cast_admitted_voters:
-                SummaryDifferenceCountsCompareVotesCastAdmittedVoters::zero(),
-            difference_completely_accounted_for: Default::default(),
         }
     }
 
@@ -205,7 +208,7 @@ impl SummaryDifferencesCounts {
 pub struct SumCount {
     #[schema(value_type = u32)]
     pub count: Count,
-    pub polling_stations: Vec<i64>,
+    pub polling_stations: Vec<u32>,
 }
 
 impl SumCount {
@@ -226,6 +229,62 @@ impl SumCount {
     }
 }
 
+/// Polling stations where results were investigated by the GSB,
+/// as vectors of polling station numbers
+#[derive(Serialize, Deserialize, Debug, ToSchema, Default)]
+#[serde(deny_unknown_fields)]
+pub struct PollingStationInvestigations {
+    /// Admitted voters were recounted
+    /// ("Toegelaten kiezers opnieuw vastgesteld?")
+    pub admitted_voters_recounted: Vec<u32>,
+    /// Investigated for other reasons than unexplained difference
+    /// ("Onderzocht vanwege andere reden dan onverklaard verschil?")
+    pub investigated_other_reason: Vec<u32>,
+    /// Ballots were (partially) recounted
+    /// ("Stembiljetten (deels) herteld?")
+    pub ballots_recounted: Vec<u32>,
+}
+
+impl PollingStationInvestigations {
+    pub fn append_result(
+        &mut self,
+        polling_station: &PollingStation,
+        result: &CSOFirstSessionResults,
+    ) {
+        if result
+            .counting_differences_polling_station
+            .unexplained_difference_ballots_voters
+            .yes
+            || result
+                .counting_differences_polling_station
+                .difference_ballots_per_list
+                .yes
+            || result
+                .differences_counts
+                .difference_completely_accounted_for
+                .no
+        {
+            self.admitted_voters_recounted.push(polling_station.number);
+        }
+
+        if result
+            .extra_investigation
+            .extra_investigation_other_reason
+            .yes
+        {
+            self.investigated_other_reason.push(polling_station.number);
+        }
+
+        if result
+            .extra_investigation
+            .ballots_recounted_extra_investigation
+            .yes
+        {
+            self.ballots_recounted.push(polling_station.number);
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use test_log::test;
@@ -233,7 +292,10 @@ mod tests {
     use super::*;
     use crate::{
         committee_session::tests::committee_session_fixture,
-        data_entry::{PoliticalGroupTotalVotes, tests::ValidDefault},
+        data_entry::{
+            CSOFirstSessionResults, ExtraInvestigation, PoliticalGroupTotalVotes, YesNo,
+            tests::ValidDefault,
+        },
         election::tests::election_fixture,
         pdf_gen::tests::polling_stations_fixture,
     };
@@ -277,7 +339,10 @@ mod tests {
 
     fn polling_station_results_fixture_b() -> CSOFirstSessionResults {
         CSOFirstSessionResults {
-            extra_investigation: ValidDefault::valid_default(),
+            extra_investigation: ExtraInvestigation {
+                extra_investigation_other_reason: YesNo::yes(),
+                ballots_recounted_extra_investigation: YesNo::no(),
+            },
             counting_differences_polling_station: ValidDefault::valid_default(),
             voters_counts: VotersCounts {
                 poll_card_count: 49,
@@ -300,10 +365,10 @@ mod tests {
                 invalid_votes_count: 0,
                 total_votes_cast_count: 48,
             },
-            differences_counts: {
-                let mut tmp = DifferencesCounts::zero();
-                tmp.fewer_ballots_count = 2;
-                tmp
+            differences_counts: DifferencesCounts {
+                fewer_ballots_count: 2,
+                difference_completely_accounted_for: YesNo::no(),
+                ..Default::default()
             },
             political_group_votes: vec![
                 PoliticalGroupCandidateVotes::from_test_data_auto(1, &[10, 6]),
@@ -657,5 +722,23 @@ mod tests {
         );
 
         assert!(totals.is_err());
+    }
+
+    #[test]
+    fn test_investigation() {
+        let election = election_fixture(&[2, 3]);
+        let committee_session = committee_session_fixture(election.id);
+        let ps = polling_stations_fixture(&election, committee_session.id, &[20, 20]);
+        let ps1_result = polling_station_results_fixture_a();
+        let ps2_result = polling_station_results_fixture_b();
+        let totals = ElectionSummary::from_results(
+            &election,
+            &[(ps[0].clone(), ps1_result), (ps[1].clone(), ps2_result)],
+        )
+        .unwrap();
+        let investigations = totals.polling_station_investigations;
+        assert_eq!(investigations.admitted_voters_recounted, vec![32]);
+        assert_eq!(investigations.investigated_other_reason, vec![32]);
+        assert!(investigations.ballots_recounted.is_empty());
     }
 }

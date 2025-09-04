@@ -13,7 +13,7 @@ pub(crate) mod test_helpers {
             VotesCounts,
         },
         election::PGNumber,
-        summary::{ElectionSummary, SummaryDifferencesCounts},
+        summary::{ElectionSummary, PollingStationInvestigations, SummaryDifferencesCounts},
     };
 
     /// Create a test election summary with given total votes and political group votes.
@@ -41,6 +41,7 @@ pub(crate) mod test_helpers {
                 total_votes_cast_count: total_votes,
             },
             differences_counts: SummaryDifferencesCounts::zero(),
+            polling_station_investigations: PollingStationInvestigations::default(),
             political_group_votes,
         }
     }

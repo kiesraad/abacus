@@ -12,6 +12,7 @@ import { DataEntryHomePage } from "e2e-tests/page-objects/data_entry/DataEntryHo
 import { CheckAndSavePgObj } from "e2e-tests/page-objects/election/create/CheckAndSavePgObj";
 import { CountingMethodTypePgObj } from "e2e-tests/page-objects/election/create/CountingMethodTypePgObj";
 import { NumberOfVotersPgObj } from "e2e-tests/page-objects/election/create/NumberOfVotersPgObj";
+import { PollingStationRolePgObj } from "e2e-tests/page-objects/election/create/PollingStationRolePgObj";
 import { ElectionDetailsPgObj } from "e2e-tests/page-objects/election/ElectionDetailsPgObject";
 import { ElectionHome } from "e2e-tests/page-objects/election/ElectionHomePgObj";
 import { ElectionReport } from "e2e-tests/page-objects/election/ElectionReportPgObj";
@@ -39,6 +40,11 @@ test.describe("full flow", () => {
     await electionsOverviewPage.create.click();
 
     await uploadElectionAndInputHash(page);
+
+    const pollingStationRolePage = new PollingStationRolePgObj(page);
+    await expect(pollingStationRolePage.header).toBeVisible();
+    await pollingStationRolePage.next.click();
+
     await uploadCandidatesAndInputHash(page);
     await uploadPollingStations(page, eml110b_single);
 
@@ -64,6 +70,8 @@ test.describe("full flow", () => {
 
     const electionHomePage = new ElectionHome(page);
     await expect(electionHomePage.header).toContainText("Gemeenteraad Test 2022");
+    const sessionCard = electionHomePage.getCommitteeSessionCard(1);
+    await expect(sessionCard).toContainText("Eerste zitting — Klaar voor steminvoer");
 
     await electionHomePage.pollingStationsRow.click();
     const pollingStationListPage = new PollingStationListPgObj(page);

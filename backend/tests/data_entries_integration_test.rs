@@ -178,10 +178,10 @@ async fn test_polling_station_data_entry_validation(pool: SqlitePool) {
         ]
     );
     // error 4
-    assert_eq!(errors[3].code, ValidationResultCode::F401);
+    assert_eq!(errors[3].code, ValidationResultCode::F402);
     assert_eq!(errors[3].fields, vec!["data.political_group_votes[0]"]);
     // error 5
-    assert_eq!(errors[4].code, ValidationResultCode::F401);
+    assert_eq!(errors[4].code, ValidationResultCode::F402);
     assert_eq!(errors[4].fields, vec!["data.political_group_votes[1]"]);
 
     let warnings = body.validation_results.warnings;
@@ -203,8 +203,8 @@ async fn test_polling_station_data_entry_validation(pool: SqlitePool) {
     assert_eq!(
         warnings[2].fields,
         vec![
-            "data.votes_counts.total_votes_cast_count",
             "data.voters_counts.total_admitted_voters_count",
+            "data.votes_counts.total_votes_cast_count",
         ]
     );
 }

@@ -73,7 +73,7 @@ export function UploadElectionDefinition() {
           type: "SET_ELECTION_DEFINITION_HASH",
           electionDefinitionHash: chunks,
         });
-        await navigate("/elections/create/list-of-candidates");
+        await navigate("/elections/create/polling-station-role");
       } else if (isError(response) && response instanceof ApiError && response.reference === "InvalidHash") {
         setError(response.message);
       }

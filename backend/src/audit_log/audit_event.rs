@@ -84,7 +84,7 @@ pub struct PollingStationDetails {
     #[schema(nullable = false)]
     pub polling_station_id_prev_session: Option<u32>,
     pub polling_station_name: String,
-    pub polling_station_number: i64,
+    pub polling_station_number: u32,
     #[serde(skip_serializing_if = "Option::is_none")]
     #[schema(nullable = false)]
     pub polling_station_number_of_voters: Option<i64>,

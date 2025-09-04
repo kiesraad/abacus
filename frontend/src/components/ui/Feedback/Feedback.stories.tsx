@@ -6,13 +6,13 @@ import { ValidationResultCode } from "@/types/generated/openapi";
 
 import { Feedback } from "./Feedback";
 
-const validationresultCodes = Object.keys(validationResultMockData) as ValidationResultCode[];
+const validationResultCodes = Object.keys(validationResultMockData) as ValidationResultCode[];
 
 const meta = {
   component: Feedback,
   argTypes: {
     data: {
-      options: validationresultCodes,
+      options: validationResultCodes,
       control: { type: "multi-select" },
     },
     type: {
@@ -22,9 +22,14 @@ const meta = {
 } satisfies Meta<typeof Feedback>;
 
 export default meta;
-type Story = StoryObj<typeof meta>;
+
+type StoryArgs = Omit<React.ComponentProps<typeof Feedback>, "data"> & {
+  data: ValidationResultCode[];
+};
+type Story = StoryObj<StoryArgs>;
 
 export const Coordinator: Story = {
+  render: (args) => <Feedback {...args} data={args.data.map((code) => validationResultMockData[code])} />,
   args: {
     id: "feedback-error",
     type: "error",
@@ -47,6 +52,7 @@ export const Coordinator: Story = {
 };
 
 export const Typist: Story = {
+  render: (args) => <Feedback {...args} data={args.data.map((c) => validationResultMockData[c])} />,
   args: {
     id: "feedback-error",
     type: "error",

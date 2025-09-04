@@ -11,6 +11,7 @@ import { CheckElectionDefinitionPgObj } from "e2e-tests/page-objects/election/cr
 import { CheckPollingStationDefinitionPgObj } from "e2e-tests/page-objects/election/create/CheckPollingStationDefinitionPgObj";
 import { CountingMethodTypePgObj } from "e2e-tests/page-objects/election/create/CountingMethodTypePgObj";
 import { NumberOfVotersPgObj } from "e2e-tests/page-objects/election/create/NumberOfVotersPgObj";
+import { PollingStationRolePgObj } from "e2e-tests/page-objects/election/create/PollingStationRolePgObj";
 import { UploadCandidateDefinitionPgObj } from "e2e-tests/page-objects/election/create/UploadCandidateDefinitionPgObj";
 import { UploadElectionDefinitionPgObj } from "e2e-tests/page-objects/election/create/UploadElectionDefinitionPgObj";
 import { UploadPollingStationDefinitionPgObj } from "e2e-tests/page-objects/election/create/UploadPollingStationDefinitionPgObj";
@@ -32,6 +33,11 @@ test.describe("Election creation", () => {
 
     // upload election and check hash
     await uploadElectionAndInputHash(page);
+
+    // polling station role
+    const pollingStationRolePage = new PollingStationRolePgObj(page);
+    await expect(pollingStationRolePage.header).toBeVisible();
+    await pollingStationRolePage.next.click();
 
     // upload candidates list and check
     await uploadCandidatesAndInputHash(page);
@@ -91,6 +97,11 @@ test.describe("Election creation", () => {
 
     // upload election and check hash
     await uploadElectionAndInputHash(page);
+
+    // polling station role
+    const pollingStationRolePage = new PollingStationRolePgObj(page);
+    await expect(pollingStationRolePage.header).toBeVisible();
+    await pollingStationRolePage.next.click();
 
     // upload candidates list and check
     await uploadCandidatesAndInputHash(page);
@@ -166,6 +177,11 @@ test.describe("Election creation", () => {
     // upload election and check hash
     await uploadElectionAndInputHash(page);
 
+    // polling station role
+    const pollingStationRolePage = new PollingStationRolePgObj(page);
+    await expect(pollingStationRolePage.header).toBeVisible();
+    await pollingStationRolePage.next.click();
+
     // Candidate page
     const uploadCandidateDefinitionPage = new UploadCandidateDefinitionPgObj(page);
     await expect(uploadCandidateDefinitionPage.header).toBeVisible();
@@ -185,6 +201,11 @@ test.describe("Election creation", () => {
 
     // upload election and check hash
     await uploadElectionAndInputHash(page);
+
+    // polling station role
+    const pollingStationRolePage = new PollingStationRolePgObj(page);
+    await expect(pollingStationRolePage.header).toBeVisible();
+    await pollingStationRolePage.next.click();
 
     // Candidate page
     const uploadCandidateDefinitionPage = new UploadCandidateDefinitionPgObj(page);
@@ -276,6 +297,11 @@ test.describe("Election creation", () => {
     // upload election and check hash
     await uploadElectionAndInputHash(page);
 
+    // polling station role
+    const pollingStationRolePage = new PollingStationRolePgObj(page);
+    await expect(pollingStationRolePage.header).toBeVisible();
+    await pollingStationRolePage.next.click();
+
     // Candidate page
     const uploadCandidateDefinitionPage = new UploadCandidateDefinitionPgObj(page);
     await expect(uploadCandidateDefinitionPage.header).toBeVisible();
@@ -298,15 +324,18 @@ test.describe("Election creation", () => {
     // upload election and check hash
     await uploadElectionAndInputHash(page);
 
+    // polling station role
+    const pollingStationRolePage = new PollingStationRolePgObj(page);
+    await expect(pollingStationRolePage.header).toBeVisible();
+    await pollingStationRolePage.next.click();
+
     // Candidate page
     const uploadCandidateDefinitionPage = new UploadCandidateDefinitionPgObj(page);
     await expect(uploadCandidateDefinitionPage.header).toBeVisible();
 
     // Back button
     await page.goBack();
-
-    const uploadElectionDefinitionPage = new UploadElectionDefinitionPgObj(page);
-    await expect(uploadElectionDefinitionPage.header).toBeVisible();
+    await expect(pollingStationRolePage.header).toBeVisible();
   });
 
   test("after candidate upload, moving back to candidate page resets candidates", async ({ page }) => {
@@ -316,6 +345,11 @@ test.describe("Election creation", () => {
 
     // upload election and check hash
     await uploadElectionAndInputHash(page);
+
+    // polling station role
+    const pollingStationRolePage = new PollingStationRolePgObj(page);
+    await expect(pollingStationRolePage.header).toBeVisible();
+    await pollingStationRolePage.next.click();
 
     // upload candidates list and check hash
     await uploadCandidatesAndInputHash(page);
@@ -358,6 +392,11 @@ test.describe("Election creation", () => {
     // upload election and check hash
     await uploadElectionAndInputHash(page);
 
+    // polling station role
+    const pollingStationRolePage = new PollingStationRolePgObj(page);
+    await expect(pollingStationRolePage.header).toBeVisible();
+    await pollingStationRolePage.next.click();
+
     // upload candidates list and check hash
     await uploadCandidatesAndInputHash(page);
 
@@ -385,6 +424,11 @@ test.describe("Election creation", () => {
 
     // upload election and check hash
     await uploadElectionAndInputHash(page);
+
+    // polling station role
+    const pollingStationRolePage = new PollingStationRolePgObj(page);
+    await expect(pollingStationRolePage.header).toBeVisible();
+    await pollingStationRolePage.next.click();
 
     // upload candidates list and check hash
     await uploadCandidatesAndInputHash(page);
@@ -426,6 +470,11 @@ test.describe("Election creation", () => {
     // upload election and check hash
     await uploadElectionAndInputHash(page);
 
+    // polling station role
+    const pollingStationRolePage = new PollingStationRolePgObj(page);
+    await expect(pollingStationRolePage.header).toBeVisible();
+    await pollingStationRolePage.next.click();
+
     // upload candidates list and check hash
     await uploadCandidatesAndInputHash(page);
 
@@ -444,6 +493,11 @@ test.describe("Election creation", () => {
 
     // upload election and check hash
     await uploadElectionAndInputHash(page);
+
+    // polling station role
+    const pollingStationRolePage = new PollingStationRolePgObj(page);
+    await expect(pollingStationRolePage.header).toBeVisible();
+    await pollingStationRolePage.next.click();
 
     // upload candidates list and check hash
     await uploadCandidatesAndInputHash(page);
@@ -473,6 +527,11 @@ test.describe("Election creation", () => {
 
     // upload election and check hash
     await uploadElectionAndInputHash(page);
+
+    // polling station role
+    const pollingStationRolePage = new PollingStationRolePgObj(page);
+    await expect(pollingStationRolePage.header).toBeVisible();
+    await pollingStationRolePage.next.click();
 
     // upload candidates list and check hash
     await uploadCandidatesAndInputHash(page);

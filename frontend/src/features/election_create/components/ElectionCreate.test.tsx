@@ -163,6 +163,15 @@ async function uploadCandidateDefinition(file: File) {
   await user.upload(input, file);
 }
 
+/**
+ * Helper function: assuming we are on the polling station role page, continue.
+ */
+async function setPollingStationRole() {
+  const user = userEvent.setup();
+  expect(await screen.findByRole("heading", { level: 2, name: "Rol van het stembureau" })).toBeVisible();
+  await user.click(screen.getByText("Volgende"));
+}
+
 async function inputCandidateHash() {
   const user = userEvent.setup();
   overrideOnce("post", "/api/elections/import/validate", 200, electionValidateResponse(newElectionMockData));
@@ -264,7 +273,7 @@ describe("Election create pages", () => {
     await inputElectionHash();
 
     // Expect to see the next page
-    expect(await screen.findByRole("heading", { level: 2, name: "Importeer kandidatenlijst" })).toBeVisible();
+    expect(await screen.findByRole("heading", { level: 2, name: "Rol van het stembureau" })).toBeVisible();
   });
 
   test("It shows an error on invalid input", async () => {
@@ -304,6 +313,7 @@ describe("Election create pages", () => {
     // update election and set hash, and continue
     await uploadElectionDefinition(router, file);
     await inputElectionHash();
+    await setPollingStationRole();
 
     // Expect to see the next page
     expect(await screen.findByRole("heading", { level: 2, name: "Importeer kandidatenlijst" })).toBeVisible();
@@ -334,6 +344,7 @@ describe("Election create pages", () => {
     // update election and set hash, and continue
     await uploadElectionDefinition(router, file);
     await inputElectionHash();
+    await setPollingStationRole();
 
     expect(await screen.findByRole("heading", { level: 2, name: "Importeer kandidatenlijst" })).toBeVisible();
 
@@ -361,6 +372,7 @@ describe("Election create pages", () => {
     // update election and set hash, and continue
     await uploadElectionDefinition(router, file);
     await inputElectionHash();
+    await setPollingStationRole();
 
     // Wait for the candidate page to be loaded
     expect(await screen.findByRole("heading", { level: 2, name: "Importeer kandidatenlijst" })).toBeVisible();
@@ -389,6 +401,7 @@ describe("Election create pages", () => {
     // update election and set hash, and continue
     await uploadElectionDefinition(router, file);
     await inputElectionHash();
+    await setPollingStationRole();
 
     // Wait for the page to be loaded
     expect(await screen.findByRole("heading", { level: 2, name: "Importeer kandidatenlijst" })).toBeVisible();
@@ -416,6 +429,7 @@ describe("Election create pages", () => {
     // update election and set hash, and continue
     await uploadElectionDefinition(router, file);
     await inputElectionHash();
+    await setPollingStationRole();
 
     // Wait for the page to be loaded
     expect(await screen.findByRole("heading", { level: 2, name: "Importeer kandidatenlijst" })).toBeVisible();
@@ -465,6 +479,7 @@ describe("Election create pages", () => {
     // update election and set hash, and continue
     await uploadElectionDefinition(router, file);
     await inputElectionHash();
+    await setPollingStationRole();
 
     // Wait for the page to be loaded
     expect(await screen.findByRole("heading", { level: 2, name: "Importeer kandidatenlijst" })).toBeVisible();
@@ -500,6 +515,7 @@ describe("Election create pages", () => {
     // update election and set hash, and continue
     await uploadElectionDefinition(router, file);
     await inputElectionHash();
+    await setPollingStationRole();
 
     // Wait for the page to be loaded
     expect(await screen.findByRole("heading", { level: 2, name: "Importeer kandidatenlijst" })).toBeVisible();
@@ -535,6 +551,7 @@ describe("Election create pages", () => {
     // update election and set hash, and continue
     await uploadElectionDefinition(router, file);
     await inputElectionHash();
+    await setPollingStationRole();
 
     // Wait for the page to be loaded
     expect(await screen.findByRole("heading", { level: 2, name: "Importeer kandidatenlijst" })).toBeVisible();
@@ -568,6 +585,7 @@ describe("Election create pages", () => {
     // upload election and set hash, and continue
     await uploadElectionDefinition(router, file);
     await inputElectionHash();
+    await setPollingStationRole();
 
     // upload candidate file, set hash and continue
     await uploadCandidateDefinition(file);
@@ -602,6 +620,7 @@ describe("Election create pages", () => {
     // upload election and set hash, and continue
     await uploadElectionDefinition(router, file);
     await inputElectionHash();
+    await setPollingStationRole();
 
     // upload candidate file, set hash and continue
     await uploadCandidateDefinition(file);
@@ -635,6 +654,7 @@ describe("Election create pages", () => {
     // upload election and set hash, and continue
     await uploadElectionDefinition(router, file);
     await inputElectionHash();
+    await setPollingStationRole();
 
     // upload candidate file, set hash and continue
     await uploadCandidateDefinition(file);
@@ -657,6 +677,7 @@ describe("Election create pages", () => {
     // upload election and set hash, and continue
     await uploadElectionDefinition(router, file);
     await inputElectionHash();
+    await setPollingStationRole();
 
     // upload candidate file, set hash and continue
     await uploadCandidateDefinition(file);

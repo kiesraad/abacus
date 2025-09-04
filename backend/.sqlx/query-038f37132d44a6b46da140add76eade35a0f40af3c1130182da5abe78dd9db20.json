@@ -1,6 +1,6 @@
 {
   "db_name": "SQLite",
-  "query": "\n        SELECT\n            p.id AS \"id: u32\",\n            c.election_id AS \"election_id: u32\",\n            p.committee_session_id AS \"committee_session_id: u32\",\n            p.id_prev_session AS \"id_prev_session: _\",\n            p.name,\n            p.number,\n            p.number_of_voters,\n            p.polling_station_type AS \"polling_station_type: _\",\n            p.address,\n            p.postal_code,\n            p.locality\n        FROM polling_stations AS p\n        JOIN committee_sessions AS c ON c.id = p.committee_session_id\n        WHERE c.id = $1\n        ",
+  "query": "\n        SELECT\n            p.id AS \"id: u32\",\n            c.election_id AS \"election_id: u32\",\n            p.committee_session_id AS \"committee_session_id: u32\",\n            p.id_prev_session AS \"id_prev_session: _\",\n            p.name,\n            p.number AS \"number: u32\",\n            p.number_of_voters,\n            p.polling_station_type AS \"polling_station_type: _\",\n            p.address,\n            p.postal_code,\n            p.locality\n        FROM polling_stations AS p\n        JOIN committee_sessions AS c ON c.id = p.committee_session_id\n        WHERE p.id = $1 AND c.id = $2\n        ",
   "describe": {
     "columns": [
       {
@@ -29,7 +29,7 @@
         "type_info": "Text"
       },
       {
-        "name": "number",
+        "name": "number: u32",
         "ordinal": 5,
         "type_info": "Integer"
       },
@@ -60,7 +60,7 @@
       }
     ],
     "parameters": {
-      "Right": 1
+      "Right": 2
     },
     "nullable": [
       false,
@@ -76,5 +76,5 @@
       false
     ]
   },
-  "hash": "80b0b6e1115faa074f8445ec19571ca762a689c7da766534b3bcde83b9eecb3c"
+  "hash": "038f37132d44a6b46da140add76eade35a0f40af3c1130182da5abe78dd9db20"
 }

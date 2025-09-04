@@ -11,7 +11,7 @@ use utoipa::ToSchema;
 use utoipa_axum::{router::OpenApiRouter, routes};
 
 use super::{
-    DataEntryStatusResponse, DataError, PollingStationDataEntry, PollingStationResults,
+    CSOFirstSessionResults, DataEntryStatusResponse, DataError, PollingStationDataEntry,
     ValidationResults,
     entry_number::EntryNumber,
     status::{
@@ -25,7 +25,7 @@ use crate::{
     audit_log::{AuditEvent, AuditService},
     authentication::{Coordinator, Typist, User},
     committee_session::{CommitteeSession, CommitteeSessionError, status::CommitteeSessionStatus},
-    data_entry::VotesCounts,
+    data_entry::{PollingStationResults, VotesCounts},
     election::ElectionWithPoliticalGroups,
     error::{ErrorReference, ErrorResponse},
     polling_station::PollingStation,
@@ -186,22 +186,22 @@ async fn polling_station_data_entry_claim(
     let new_data_entry = CurrentDataEntry {
         progress: None,
         user_id: user.0.id(),
-        entry: PollingStationResults {
+        entry: PollingStationResults::CSOFirstSession(CSOFirstSessionResults {
             extra_investigation: Default::default(),
             counting_differences_polling_station: Default::default(),
             voters_counts: Default::default(),
             votes_counts: VotesCounts {
                 political_group_total_votes:
-                    PollingStationResults::default_political_group_total_votes(
+                    CSOFirstSessionResults::default_political_group_total_votes(
                         &election.political_groups,
                     ),
                 ..Default::default()
             },
             differences_counts: Default::default(),
-            political_group_votes: PollingStationResults::default_political_group_votes(
+            political_group_votes: CSOFirstSessionResults::default_political_group_votes(
                 &election.political_groups,
             ),
-        },
+        }),
         client_state: None,
     };
 
@@ -838,7 +838,7 @@ mod tests {
     fn example_data_entry() -> DataEntry {
         DataEntry {
             progress: 100,
-            data: PollingStationResults {
+            data: PollingStationResults::CSOFirstSession(CSOFirstSessionResults {
                 extra_investigation: ValidDefault::valid_default(),
                 counting_differences_polling_station: ValidDefault::valid_default(),
                 voters_counts: VotersCounts {
@@ -880,7 +880,7 @@ mod tests {
                     PoliticalGroupCandidateVotes::from_test_data_auto(1, &[36, 20]),
                     PoliticalGroupCandidateVotes::from_test_data_auto(2, &[30, 10]),
                 ],
-            },
+            }),
             client_state: ClientState(None),
         }
     }
@@ -1008,8 +1008,18 @@ mod tests {
 
         // Save and finalise a different second data entry
         let mut request_body = example_data_entry();
-        request_body.data.voters_counts.poll_card_count = 100;
-        request_body.data.voters_counts.proxy_certificate_count = 0;
+        request_body
+            .data
+            .as_cso_first_session_mut()
+            .unwrap()
+            .voters_counts
+            .poll_card_count = 100;
+        request_body
+            .data
+            .as_cso_first_session_mut()
+            .unwrap()
+            .voters_counts
+            .proxy_certificate_count = 0;
         let response = claim(pool.clone(), 1, EntryNumber::SecondEntry).await;
         assert_eq!(response.status(), StatusCode::OK);
         let response = save(
@@ -1257,8 +1267,16 @@ mod tests {
             panic!("Expected entry to be in FirstEntryInProgress state");
         };
         assert_eq!(
-            state.first_entry.voters_counts.poll_card_count,
-            request_body.data.voters_counts.poll_card_count
+            state
+                .first_entry
+                .as_cso_first_session()
+                .map(|r| r.voters_counts.poll_card_count)
+                .unwrap(),
+            request_body
+                .data
+                .as_cso_first_session()
+                .map(|r| r.voters_counts.poll_card_count)
+                .unwrap()
         );
     }
 
@@ -1340,7 +1358,12 @@ mod tests {
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
     async fn test_first_entry_finalise_with_errors(pool: SqlitePool) {
         let mut request_body = example_data_entry();
-        request_body.data.voters_counts.poll_card_count = 100; // incorrect value
+        request_body
+            .data
+            .as_cso_first_session_mut()
+            .unwrap()
+            .voters_counts
+            .poll_card_count = 100; // incorrect value
 
         let response = claim(pool.clone(), 1, EntryNumber::FirstEntry).await;
         assert_eq!(response.status(), StatusCode::OK);
@@ -1663,7 +1686,12 @@ mod tests {
         let status: DataEntryStatus = row.state.0;
         if let DataEntryStatus::SecondEntryNotStarted(entry) = status {
             assert_eq!(
-                entry.finalised_first_entry.voters_counts.poll_card_count,
+                entry
+                    .finalised_first_entry
+                    .as_cso_first_session()
+                    .unwrap()
+                    .voters_counts
+                    .poll_card_count,
                 99
             )
         } else {
@@ -1689,7 +1717,12 @@ mod tests {
         let status: DataEntryStatus = row.state.0;
         if let DataEntryStatus::SecondEntryNotStarted(entry) = status {
             assert_eq!(
-                entry.finalised_first_entry.voters_counts.poll_card_count,
+                entry
+                    .finalised_first_entry
+                    .as_cso_first_session()
+                    .unwrap()
+                    .voters_counts
+                    .poll_card_count,
                 100
             )
         } else {

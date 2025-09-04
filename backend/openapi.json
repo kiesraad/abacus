@@ -4055,6 +4055,48 @@
         },
         "additionalProperties": false
       },
+      "CSOFirstSessionResults": {
+        "type": "object",
+        "description": "CSOFirstSessionResults, following the fields in Model Na 31-2 Bijlage 2.\n\nSee \"Model Na 31-2. Proces-verbaal van een gemeentelijk stembureau/stembureau voor het openbaar\nlichaam in een gemeente/openbaar lichaam waar een centrale stemopneming wordt verricht,\nBijlage 2: uitkomsten per stembureau\" from the\n[Kiesregeling](https://wetten.overheid.nl/BWBR0034180/2024-04-01#Bijlage1_DivisieNa31.2) or\n[Verkiezingstoolbox](https://www.rijksoverheid.nl/onderwerpen/verkiezingen/verkiezingentoolkit/modellen).",
+        "required": [
+          "extra_investigation",
+          "counting_differences_polling_station",
+          "voters_counts",
+          "votes_counts",
+          "differences_counts",
+          "political_group_votes"
+        ],
+        "properties": {
+          "counting_differences_polling_station": {
+            "$ref": "#/components/schemas/CountingDifferencesPollingStation",
+            "description": "Counting Differences Polling Station (\"B1-2 Verschillen met telresultaten van het stembureau\")"
+          },
+          "differences_counts": {
+            "$ref": "#/components/schemas/DifferencesCounts",
+            "description": "Differences counts (\"3. Verschil tussen het aantal toegelaten kiezers en het aantal getelde stembiljetten\")"
+          },
+          "extra_investigation": {
+            "$ref": "#/components/schemas/ExtraInvestigation",
+            "description": "Extra investigation (\"B1-1 Extra onderzoek\")"
+          },
+          "political_group_votes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PoliticalGroupCandidateVotes"
+            },
+            "description": "Vote counts per list and candidate (5. \"Aantal stemmen per lijst en kandidaat\")"
+          },
+          "voters_counts": {
+            "$ref": "#/components/schemas/VotersCounts",
+            "description": "Voters counts (\"1. Aantal toegelaten kiezers\")"
+          },
+          "votes_counts": {
+            "$ref": "#/components/schemas/VotesCounts",
+            "description": "Votes counts (\"2. Aantal getelde stembiljetten\")"
+          }
+        },
+        "additionalProperties": false
+      },
       "Candidate": {
         "type": "object",
         "description": "Candidate",
@@ -4978,7 +5020,8 @@
           "voters_counts",
           "votes_counts",
           "differences_counts",
-          "political_group_votes"
+          "political_group_votes",
+          "polling_station_investigations"
         ],
         "properties": {
           "differences_counts": {
@@ -4991,6 +5034,10 @@
               "$ref": "#/components/schemas/PoliticalGroupCandidateVotes"
             },
             "description": "The summary votes for each political group (and each candidate within)"
+          },
+          "polling_station_investigations": {
+            "$ref": "#/components/schemas/PollingStationInvestigations",
+            "description": "Polling stations where results were investigated by the GSB"
           },
           "voters_counts": {
             "$ref": "#/components/schemas/VotersCounts",
@@ -5684,7 +5731,8 @@
           },
           "number": {
             "type": "integer",
-            "format": "int64"
+            "format": "int32",
+            "minimum": 0
           },
           "number_of_voters": {
             "type": "integer",
@@ -5743,7 +5791,8 @@
           },
           "polling_station_number": {
             "type": "integer",
-            "format": "int64"
+            "format": "int32",
+            "minimum": 0
           },
           "polling_station_number_of_voters": {
             "type": "integer",
@@ -5791,6 +5840,45 @@
             "minimum": 0
           }
         }
+      },
+      "PollingStationInvestigations": {
+        "type": "object",
+        "description": "Polling stations where results were investigated by the GSB,\nas vectors of polling station numbers",
+        "required": [
+          "admitted_voters_recounted",
+          "investigated_other_reason",
+          "ballots_recounted"
+        ],
+        "properties": {
+          "admitted_voters_recounted": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32",
+              "minimum": 0
+            },
+            "description": "Admitted voters were recounted\n(\"Toegelaten kiezers opnieuw vastgesteld?\")"
+          },
+          "ballots_recounted": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32",
+              "minimum": 0
+            },
+            "description": "Ballots were (partially) recounted\n(\"Stembiljetten (deels) herteld?\")"
+          },
+          "investigated_other_reason": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32",
+              "minimum": 0
+            },
+            "description": "Investigated for other reasons than unexplained difference\n(\"Onderzocht vanwege andere reden dan onverklaard verschil?\")"
+          }
+        },
+        "additionalProperties": false
       },
       "PollingStationListResponse": {
         "type": "object",
@@ -5860,46 +5948,32 @@
         }
       },
       "PollingStationResults": {
-        "type": "object",
-        "description": "PollingStationResults, following the fields in Model Na 31-2 Bijlage 2.\n\nSee \"Model Na 31-2. Proces-verbaal van een gemeentelijk stembureau/stembureau voor het openbaar\nlichaam in een gemeente/openbaar lichaam waar een centrale stemopneming wordt verricht,\nBijlage 2: uitkomsten per stembureau\" from the\n[Kiesregeling](https://wetten.overheid.nl/BWBR0034180/2024-04-01#Bijlage1_DivisieNa31.2) or\n[Verkiezingstoolbox](https://www.rijksoverheid.nl/onderwerpen/verkiezingen/verkiezingentoolkit/modellen).",
-        "required": [
-          "extra_investigation",
-          "counting_differences_polling_station",
-          "voters_counts",
-          "votes_counts",
-          "differences_counts",
-          "political_group_votes"
-        ],
-        "properties": {
-          "counting_differences_polling_station": {
-            "$ref": "#/components/schemas/CountingDifferencesPollingStation",
-            "description": "Counting Differences Polling Station (\"B1-2 Verschillen met telresultaten van het stembureau\")"
-          },
-          "differences_counts": {
-            "$ref": "#/components/schemas/DifferencesCounts",
-            "description": "Differences counts (\"3. Verschil tussen het aantal toegelaten kiezers en het aantal getelde stembiljetten\")"
-          },
-          "extra_investigation": {
-            "$ref": "#/components/schemas/ExtraInvestigation",
-            "description": "Extra investigation (\"B1-1 Extra onderzoek\")"
-          },
-          "political_group_votes": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/PoliticalGroupCandidateVotes"
-            },
-            "description": "Vote counts per list and candidate (5. \"Aantal stemmen per lijst en kandidaat\")"
-          },
-          "voters_counts": {
-            "$ref": "#/components/schemas/VotersCounts",
-            "description": "Voters counts (\"1. Aantal toegelaten kiezers\")"
-          },
-          "votes_counts": {
-            "$ref": "#/components/schemas/VotesCounts",
-            "description": "Votes counts (\"2. Aantal getelde stembiljetten\")"
+        "oneOf": [
+          {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/CSOFirstSessionResults",
+                "description": "Results for centrally counted (CSO) elections, first election committee session.\nThis contains the data entry values from Model Na 31-2 Bijlage 2."
+              },
+              {
+                "type": "object",
+                "required": [
+                  "model"
+                ],
+                "properties": {
+                  "model": {
+                    "type": "string",
+                    "enum": [
+                      "CSOFirstSession"
+                    ]
+                  }
+                }
+              }
+            ],
+            "description": "Results for centrally counted (CSO) elections, first election committee session.\nThis contains the data entry values from Model Na 31-2 Bijlage 2."
           }
-        },
-        "additionalProperties": false
+        ],
+        "description": "PollingStationResults contains the results for a polling station.\n\nThe exact type of results depends on the election counting method and\nwhether this is the first or any subsequent data entry session. Based on\nthis, any of four different models can apply"
       },
       "PollingStationType": {
         "type": "string",
@@ -6205,29 +6279,9 @@
             "type": "array",
             "items": {
               "type": "integer",
-              "format": "int64"
+              "format": "int32",
+              "minimum": 0
             }
-          }
-        },
-        "additionalProperties": false
-      },
-      "SummaryDifferenceCountsCompareVotesCastAdmittedVoters": {
-        "type": "object",
-        "description": "Contains a summary of the differences, containing which polling stations had differences.",
-        "required": [
-          "admitted_voters_equal_votes_cast",
-          "votes_cast_greater_than_admitted_voters",
-          "votes_cast_smaller_than_admitted_voters"
-        ],
-        "properties": {
-          "admitted_voters_equal_votes_cast": {
-            "type": "boolean"
-          },
-          "votes_cast_greater_than_admitted_voters": {
-            "type": "boolean"
-          },
-          "votes_cast_smaller_than_admitted_voters": {
-            "type": "boolean"
           }
         },
         "additionalProperties": false
@@ -6237,17 +6291,9 @@
         "description": "Contains a summary of the differences, containing which polling stations had differences.",
         "required": [
           "more_ballots_count",
-          "fewer_ballots_count",
-          "compare_votes_cast_admitted_voters",
-          "difference_completely_accounted_for"
+          "fewer_ballots_count"
         ],
         "properties": {
-          "compare_votes_cast_admitted_voters": {
-            "$ref": "#/components/schemas/SummaryDifferenceCountsCompareVotesCastAdmittedVoters"
-          },
-          "difference_completely_accounted_for": {
-            "$ref": "#/components/schemas/YesNo"
-          },
           "fewer_ballots_count": {
             "$ref": "#/components/schemas/SumCount"
           },
@@ -6403,6 +6449,9 @@
           "code": {
             "$ref": "#/components/schemas/ValidationResultCode"
           },
+          "context": {
+            "$ref": "#/components/schemas/ValidationResultContext"
+          },
           "fields": {
             "type": "array",
             "items": {
@@ -6434,12 +6483,24 @@
           "F310",
           "F401",
           "F402",
+          "F403",
           "W001",
           "W201",
           "W202",
           "W203",
           "W204"
         ]
+      },
+      "ValidationResultContext": {
+        "type": "object",
+        "properties": {
+          "political_group_number": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          }
+        },
+        "additionalProperties": false
       },
       "ValidationResults": {
         "type": "object",

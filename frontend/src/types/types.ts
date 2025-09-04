@@ -1,5 +1,7 @@
 import { ReactElement } from "react";
 
+import { PollingStationResults } from "./generated/openapi";
+
 export type FormSectionId = string;
 export type PollingStationResultsPath = string;
 
@@ -94,6 +96,7 @@ export interface DataEntrySection {
   subsections: DataEntrySubsection[];
 }
 
+export type DataEntryModel = PollingStationResults["model"];
 export type DataEntryStructure = DataEntrySection[];
 
 export type DataEntryResults = object;

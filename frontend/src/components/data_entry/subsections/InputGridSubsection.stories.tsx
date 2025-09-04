@@ -8,7 +8,7 @@ import { getDataEntryStructure } from "@/utils/dataEntryStructure";
 
 import { InputGridSubsectionComponent } from "./InputGridSubsection";
 
-const inputGridSubsection = getDataEntryStructure(electionMockData)
+const inputGridSubsection = getDataEntryStructure("CSOFirstSession", electionMockData)
   .flatMap((section) => section.subsections)
   .find((subsection) => subsection.type === "inputGrid")!;
 

@@ -5,8 +5,11 @@ use serde::{Deserialize, Serialize};
 use sqlx::Type;
 use utoipa::ToSchema;
 
-use super::{DataError, PollingStationResults, ValidationResults, validate_data_entry_status};
-use crate::{election::ElectionWithPoliticalGroups, polling_station::PollingStation};
+use super::{DataError, ValidationResults, validate_data_entry_status};
+use crate::{
+    data_entry::PollingStationResults, election::ElectionWithPoliticalGroups,
+    polling_station::PollingStation,
+};
 
 #[derive(Debug, PartialEq, Eq)]
 pub enum DataEntryTransitionError {
@@ -687,8 +690,8 @@ mod tests {
     };
     use crate::{
         data_entry::{
-            CandidateVotes, PoliticalGroupCandidateVotes, PoliticalGroupTotalVotes, VotersCounts,
-            VotesCounts, structs::tests::ValidDefault,
+            CSOFirstSessionResults, CandidateVotes, PoliticalGroupCandidateVotes,
+            PoliticalGroupTotalVotes, VotersCounts, VotesCounts, structs::tests::ValidDefault,
         },
         election::{
             Candidate, ElectionCategory, ElectionWithPoliticalGroups, PoliticalGroup,
@@ -697,8 +700,8 @@ mod tests {
         polling_station::{PollingStation, PollingStationType},
     };
 
-    fn polling_station_result() -> PollingStationResults {
-        PollingStationResults {
+    fn cso_first_session_result() -> CSOFirstSessionResults {
+        CSOFirstSessionResults {
             extra_investigation: ValidDefault::valid_default(),
             counting_differences_polling_station: ValidDefault::valid_default(),
             voters_counts: Default::default(),
@@ -706,6 +709,10 @@ mod tests {
             differences_counts: ValidDefault::valid_default(),
             political_group_votes: vec![],
         }
+    }
+
+    fn polling_station_result() -> PollingStationResults {
+        PollingStationResults::CSOFirstSession(cso_first_session_result())
     }
 
     fn empty_current_data_entry() -> CurrentDataEntry {
@@ -936,7 +943,7 @@ mod tests {
     #[test]
     fn finalise_first_entry_validation_error() {
         // Create data with validation errors that will trigger FirstEntryHasErrors
-        let invalid_entry = PollingStationResults {
+        let invalid_entry = PollingStationResults::CSOFirstSession(CSOFirstSessionResults {
             extra_investigation: Default::default(),
             counting_differences_polling_station: Default::default(),
             voters_counts: VotersCounts {
@@ -958,7 +965,7 @@ mod tests {
                 difference_completely_accounted_for: Default::default(),
             },
             political_group_votes: vec![],
-        };
+        });
 
         let initial = DataEntryStatus::FirstEntryInProgress(FirstEntryInProgress {
             progress: 0,
@@ -1132,16 +1139,17 @@ mod tests {
     #[test]
     fn second_entry_in_progress_finalise_not_equal_and_has_error() {
         let first_entry = polling_station_result();
-        let different_second_entry = PollingStationResults {
-            votes_counts: VotesCounts {
-                political_group_total_votes: vec![],
-                total_votes_candidates_count: 0,
-                blank_votes_count: 1, // Different from first entry which has blank_votes_count: 0
-                invalid_votes_count: 0,
-                total_votes_cast_count: 1,
-            },
-            ..polling_station_result()
-        };
+        let different_second_entry =
+            PollingStationResults::CSOFirstSession(CSOFirstSessionResults {
+                votes_counts: VotesCounts {
+                    political_group_total_votes: vec![],
+                    total_votes_candidates_count: 0,
+                    blank_votes_count: 1, // Different from first entry which has blank_votes_count: 0
+                    invalid_votes_count: 0,
+                    total_votes_cast_count: 1,
+                },
+                ..cso_first_session_result()
+            });
 
         let initial = DataEntryStatus::SecondEntryInProgress(SecondEntryInProgress {
             progress: 0,
@@ -1182,7 +1190,7 @@ mod tests {
     fn second_entry_in_progress_finalise_not_equal() {
         let initial = DataEntryStatus::SecondEntryInProgress(SecondEntryInProgress {
             first_entry_user_id: 0,
-            finalised_first_entry: PollingStationResults {
+            finalised_first_entry: PollingStationResults::CSOFirstSession(CSOFirstSessionResults {
                 voters_counts: VotersCounts {
                     poll_card_count: 1,
                     proxy_certificate_count: 0,
@@ -1206,12 +1214,12 @@ mod tests {
                         votes: 0,
                     }],
                 }],
-                ..polling_station_result()
-            },
+                ..cso_first_session_result()
+            }),
             first_entry_finished_at: Utc::now(),
             progress: 0,
             second_entry_user_id: 0,
-            second_entry: PollingStationResults {
+            second_entry: PollingStationResults::CSOFirstSession(CSOFirstSessionResults {
                 voters_counts: VotersCounts {
                     poll_card_count: 1,
                     proxy_certificate_count: 0,
@@ -1235,8 +1243,8 @@ mod tests {
                         votes: 1,
                     }],
                 }],
-                ..polling_station_result()
-            },
+                ..cso_first_session_result()
+            }),
             client_state: ClientState::default(),
         });
 
@@ -1318,7 +1326,7 @@ mod tests {
     fn entries_different_to_second_entry_not_started_keep_first_entry() {
         // Create a difference, so we can check that we keep the right entry
         let first_entry = polling_station_result();
-        let second_entry = PollingStationResults {
+        let second_entry = PollingStationResults::CSOFirstSession(CSOFirstSessionResults {
             votes_counts: VotesCounts {
                 political_group_total_votes: vec![],
                 total_votes_candidates_count: 1,
@@ -1326,8 +1334,8 @@ mod tests {
                 invalid_votes_count: 0,
                 total_votes_cast_count: 1,
             },
-            ..polling_station_result()
-        };
+            ..cso_first_session_result()
+        });
 
         let initial = entries_different();
         let next = initial.keep_first_entry().unwrap();
@@ -1352,7 +1360,7 @@ mod tests {
     fn entries_different_to_second_entry_not_started_keep_second_entry() {
         // Create valid data without errors, so we transition to SecondEntryNotStarted
         let first_entry = polling_station_result();
-        let second_entry = PollingStationResults {
+        let second_entry = PollingStationResults::CSOFirstSession(CSOFirstSessionResults {
             extra_investigation: ValidDefault::valid_default(),
             counting_differences_polling_station: ValidDefault::valid_default(),
             voters_counts: VotersCounts {
@@ -1382,7 +1390,7 @@ mod tests {
                 },
             },
             political_group_votes: vec![],
-        };
+        });
 
         let initial = DataEntryStatus::EntriesDifferent(EntriesDifferent {
             first_entry: first_entry.clone(),
@@ -1408,7 +1416,7 @@ mod tests {
     fn entries_different_to_second_entry_not_started_keep_second_entry_which_has_errors() {
         let first_entry = polling_station_result();
         // Create second entry with validation errors that will trigger FirstEntryHasErrors
-        let second_entry = PollingStationResults {
+        let second_entry = PollingStationResults::CSOFirstSession(CSOFirstSessionResults {
             extra_investigation: Default::default(),
             counting_differences_polling_station: Default::default(),
             voters_counts: VotersCounts {
@@ -1425,7 +1433,7 @@ mod tests {
             },
             differences_counts: Default::default(),
             political_group_votes: vec![],
-        };
+        });
 
         let initial = DataEntryStatus::EntriesDifferent(EntriesDifferent {
             first_entry: first_entry.clone(),

@@ -2,7 +2,7 @@ import { ReactElement } from "react";
 
 import { DEFAULT_ALLOWED_TAGS, parse, renderAst } from "./format";
 import { locale, translations } from "./i18n";
-import { RenderCallback, TranslationPath } from "./i18n.types";
+import { RenderFunction, TranslationPath } from "./i18n.types";
 
 // get the translation for the given path key, return undefined if not found
 function getTranslation(path: string): string | undefined {
@@ -79,7 +79,7 @@ export function t(k: TranslationPath, vars?: Record<string, string | number>): s
  */
 export function tx(
   k: TranslationPath,
-  elements?: Record<string, RenderCallback>,
+  elements?: Record<string, RenderFunction>,
   vars?: Record<string, string | number>,
 ): ReactElement {
   const text = vars ? t(k, vars) : translate(k);

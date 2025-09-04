@@ -79,8 +79,21 @@ export const validationResultMockData: ErrorWarningsMap<ValidationResultCode> = 
     fields: ["data.differences_counts.difference_completely_accounted_for"],
     code: "F310",
   },
-  F401: { fields: ["data.political_group_votes[0]"], code: "F401" },
-  F402: { fields: ["data.political_group_votes[0].total"], code: "F402" },
+  F401: {
+    fields: ["data.political_group_votes[0].total"],
+    context: { political_group_number: 1 },
+    code: "F401",
+  },
+  F402: {
+    fields: ["data.political_group_votes[0]"],
+    context: { political_group_number: 1 },
+    code: "F402",
+  },
+  F403: {
+    fields: ["data.political_group_votes[0].total", "data.votes_counts.political_group_total_votes[0].total"],
+    context: { political_group_number: 1 },
+    code: "F403",
+  },
   W001: { fields: ["data.voters_counts.poll_card_count"], code: "W001" },
   W201: { fields: ["data.votes_counts.blank_votes_count"], code: "W201" },
   W202: { fields: ["data.votes_counts.invalid_votes_count"], code: "W202" },

@@ -302,7 +302,7 @@ pub mod tests {
             number: 1,
             election_id,
             location: "Test location".to_string(),
-            start_date: "22-10-2025".to_string(),
+            start_date: "2025-10-22".to_string(),
             start_time: "09:15".to_string(),
             status: CommitteeSessionStatus::DataEntryFinished,
             number_of_voters: 100,

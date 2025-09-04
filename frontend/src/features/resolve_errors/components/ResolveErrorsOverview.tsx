@@ -2,7 +2,7 @@ import { Link } from "react-router";
 
 import { StatusList } from "@/components/ui/StatusList/StatusList";
 import { t } from "@/i18n/translate";
-import { ValidationResultCode, ValidationResults } from "@/types/generated/openapi";
+import { ValidationResult, ValidationResults } from "@/types/generated/openapi";
 import { DataEntrySection } from "@/types/types";
 import { dottedCode, getValidationResultSetForSection } from "@/utils/ValidationResults";
 
@@ -28,11 +28,11 @@ export function ResolveErrorsOverview({ structure, results }: ResolveErrorsOverv
             <Link to={`./${section.id}`}>{section.title}</Link>
           </StatusList.Title>
           <StatusList id={`overview-${section.id}`} gap="sm">
-            {errors.getCodes().map((code) => (
-              <OverviewItem key={code} code={code} status={"error"} />
+            {errors.getAll().map((validationResult) => (
+              <OverviewItem key={validationResult.code} data={validationResult} status={"error"} />
             ))}
-            {warnings.getCodes().map((code) => (
-              <OverviewItem key={code} code={code} status={"warning"} />
+            {warnings.getAll().map((validationResult) => (
+              <OverviewItem key={validationResult.code} data={validationResult} status={"warning"} />
             ))}
           </StatusList>
         </StatusList.Section>
@@ -41,14 +41,15 @@ export function ResolveErrorsOverview({ structure, results }: ResolveErrorsOverv
   );
 }
 
-function OverviewItem({ code, status }: { code: ValidationResultCode; status: "error" | "warning" }) {
+function OverviewItem({ data: { code, context }, status }: { data: ValidationResult; status: "error" | "warning" }) {
   return (
     <StatusList.Item status={status}>
       <div className="bold">
-        {dottedCode(code)} {t(`feedback.${code}.coordinator.title`)}
+        {dottedCode(code)} {t(`feedback.${code}.coordinator.title`, { ...context })}
       </div>
       <div>
-        <strong>→</strong> <span className="font-italic">{t(`feedback.${code}.coordinator.title`)}</span>
+        <strong>→</strong>{" "}
+        <span className="font-italic">{t(`feedback.${code}.coordinator.title`, { ...context })}</span>
       </div>
     </StatusList.Item>
   );

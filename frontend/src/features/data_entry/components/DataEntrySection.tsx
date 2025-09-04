@@ -45,14 +45,14 @@ export function DataEntrySection() {
   const keyboardHintText = section.id.startsWith("political_group_votes_") ? t("candidates_votes.goto_totals") : null;
 
   // Missing totals error for political group votes form
-  const missingTotalError = formSection.errors.includes("F402");
+  const missingTotalError = formSection.errors.includes("F401");
 
-  // Memoize getCodes() results to prevent unnecessary focus triggers in Feedback
-  const memoizedErrorCodes = React.useMemo(
-    () => formSection.errors.getCodes().filter((code) => code !== "F402"),
+  // Memoize errors to prevent unnecessary focus triggers in Feedback
+  const memoizedErrors = React.useMemo(
+    () => formSection.errors.getAll().filter((result) => result.code !== "F401"),
     [formSection.errors],
   );
-  const memoizedWarningCodes = React.useMemo(() => formSection.warnings.getCodes(), [formSection.warnings]);
+  const memoizedWarnings = React.useMemo(() => formSection.warnings.getAll(), [formSection.warnings]);
 
   // Scroll unaccepted warnings/errors checkbox into view when error for it is triggered
   React.useEffect(() => {
@@ -86,20 +86,14 @@ export function DataEntrySection() {
           <CommitteeSessionPausedModal showUnsavedChanges />
         )}
         {error instanceof ApiError && <ErrorModal error={error} />}
-        {formSection.isSaved && memoizedErrorCodes.length > 0 && (
-          <Feedback
-            id="feedback-error"
-            type="error"
-            data={memoizedErrorCodes}
-            userRole={user.role}
-            shouldFocus={true}
-          />
+        {formSection.isSaved && memoizedErrors.length > 0 && (
+          <Feedback id="feedback-error" type="error" data={memoizedErrors} userRole={user.role} shouldFocus={true} />
         )}
-        {formSection.isSaved && !formSection.warnings.isEmpty() && (
+        {formSection.isSaved && memoizedWarnings.length > 0 && (
           <Feedback
             id="feedback-warning"
             type="warning"
-            data={memoizedWarningCodes}
+            data={memoizedWarnings}
             userRole={user.role}
             shouldFocus={formSection.errors.isEmpty()}
           />
@@ -116,9 +110,7 @@ export function DataEntrySection() {
         {missingTotalError && (
           <div id="missing-total-error">
             <Alert type="error" small>
-              <p>
-                {t(`feedback.F402.typist.title`)}. {t(`feedback.F402.typist.content`)}
-              </p>
+              <p>{t(`feedback.F401.typist.title`)}</p>
             </Alert>
           </div>
         )}

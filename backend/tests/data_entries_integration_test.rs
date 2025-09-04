@@ -57,6 +57,7 @@ async fn test_polling_station_data_entry_validation(pool: SqlitePool) {
 
     let request_body = json!({
       "data": {
+        "model": "CSOFirstSession",
         "extra_investigation": {
           "extra_investigation_other_reason": { "yes": false, "no": false },
           "ballots_recounted_extra_investigation": { "yes": false, "no": false },
@@ -177,10 +178,10 @@ async fn test_polling_station_data_entry_validation(pool: SqlitePool) {
         ]
     );
     // error 4
-    assert_eq!(errors[3].code, ValidationResultCode::F401);
+    assert_eq!(errors[3].code, ValidationResultCode::F402);
     assert_eq!(errors[3].fields, vec!["data.political_group_votes[0]"]);
     // error 5
-    assert_eq!(errors[4].code, ValidationResultCode::F401);
+    assert_eq!(errors[4].code, ValidationResultCode::F402);
     assert_eq!(errors[4].fields, vec!["data.political_group_votes[1]"]);
 
     let warnings = body.validation_results.warnings;
@@ -202,8 +203,8 @@ async fn test_polling_station_data_entry_validation(pool: SqlitePool) {
     assert_eq!(
         warnings[2].fields,
         vec![
-            "data.votes_counts.total_votes_cast_count",
             "data.voters_counts.total_admitted_voters_count",
+            "data.votes_counts.total_votes_cast_count",
         ]
     );
 }
@@ -228,7 +229,7 @@ async fn test_polling_station_data_entry_invalid(pool: SqlitePool) {
     assert_eq!(
         body.error,
         "Failed to deserialize the JSON body into the target type: data: \
-         invalid type: null, expected struct PollingStationResults at line 1 column 12"
+         invalid type: null, expected internally tagged enum PollingStationResults at line 1 column 12"
     );
 }
 

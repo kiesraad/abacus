@@ -339,6 +339,30 @@ export interface AuditLogUser {
 }
 
 /**
+ * CSOFirstSessionResults, following the fields in Model Na 31-2 Bijlage 2.
+ *
+ * See "Model Na 31-2. Proces-verbaal van een gemeentelijk stembureau/stembureau voor het openbaar
+ * lichaam in een gemeente/openbaar lichaam waar een centrale stemopneming wordt verricht,
+ * Bijlage 2: uitkomsten per stembureau" from the
+ * [Kiesregeling](https://wetten.overheid.nl/BWBR0034180/2024-04-01#Bijlage1_DivisieNa31.2) or
+ * [Verkiezingstoolbox](https://www.rijksoverheid.nl/onderwerpen/verkiezingen/verkiezingentoolkit/modellen).
+ */
+export interface CSOFirstSessionResults {
+  /** Counting Differences Polling Station ("B1-2 Verschillen met telresultaten van het stembureau") */
+  counting_differences_polling_station: CountingDifferencesPollingStation;
+  /** Differences counts ("3. Verschil tussen het aantal toegelaten kiezers en het aantal getelde stembiljetten") */
+  differences_counts: DifferencesCounts;
+  /** Extra investigation ("B1-1 Extra onderzoek") */
+  extra_investigation: ExtraInvestigation;
+  /** Vote counts per list and candidate (5. "Aantal stemmen per lijst en kandidaat") */
+  political_group_votes: PoliticalGroupCandidateVotes[];
+  /** Voters counts ("1. Aantal toegelaten kiezers") */
+  voters_counts: VotersCounts;
+  /** Votes counts ("2. Aantal getelde stembiljetten") */
+  votes_counts: VotesCounts;
+}
+
+/**
  * Candidate
  */
 export interface Candidate {
@@ -679,6 +703,8 @@ export interface ElectionSummary {
   differences_counts: SummaryDifferencesCounts;
   /** The summary votes for each political group (and each candidate within) */
   political_group_votes: PoliticalGroupCandidateVotes[];
+  /** Polling stations where results were investigated by the GSB */
+  polling_station_investigations: PollingStationInvestigations;
   /** The total number of voters */
   voters_counts: VotersCounts;
   /** The total number of votes */
@@ -973,6 +999,22 @@ export interface PollingStationImportDetails {
 }
 
 /**
+ * Polling stations where results were investigated by the GSB,
+ * as vectors of polling station numbers
+ */
+export interface PollingStationInvestigations {
+  /** Admitted voters were recounted
+("Toegelaten kiezers opnieuw vastgesteld?") */
+  admitted_voters_recounted: number[];
+  /** Ballots were (partially) recounted
+("Stembiljetten (deels) herteld?") */
+  ballots_recounted: number[];
+  /** Investigated for other reasons than unexplained difference
+("Onderzocht vanwege andere reden dan onverklaard verschil?") */
+  investigated_other_reason: number[];
+}
+
+/**
  * Polling station list response
  */
 export interface PollingStationListResponse {
@@ -997,28 +1039,13 @@ export interface PollingStationRequestListResponse {
 }
 
 /**
- * PollingStationResults, following the fields in Model Na 31-2 Bijlage 2.
+ * PollingStationResults contains the results for a polling station.
  *
- * See "Model Na 31-2. Proces-verbaal van een gemeentelijk stembureau/stembureau voor het openbaar
- * lichaam in een gemeente/openbaar lichaam waar een centrale stemopneming wordt verricht,
- * Bijlage 2: uitkomsten per stembureau" from the
- * [Kiesregeling](https://wetten.overheid.nl/BWBR0034180/2024-04-01#Bijlage1_DivisieNa31.2) or
- * [Verkiezingstoolbox](https://www.rijksoverheid.nl/onderwerpen/verkiezingen/verkiezingentoolkit/modellen).
+ * The exact type of results depends on the election counting method and
+ * whether this is the first or any subsequent data entry session. Based on
+ * this, any of four different models can apply
  */
-export interface PollingStationResults {
-  /** Counting Differences Polling Station ("B1-2 Verschillen met telresultaten van het stembureau") */
-  counting_differences_polling_station: CountingDifferencesPollingStation;
-  /** Differences counts ("3. Verschil tussen het aantal toegelaten kiezers en het aantal getelde stembiljetten") */
-  differences_counts: DifferencesCounts;
-  /** Extra investigation ("B1-1 Extra onderzoek") */
-  extra_investigation: ExtraInvestigation;
-  /** Vote counts per list and candidate (5. "Aantal stemmen per lijst en kandidaat") */
-  political_group_votes: PoliticalGroupCandidateVotes[];
-  /** Voters counts ("1. Aantal toegelaten kiezers") */
-  voters_counts: VotersCounts;
-  /** Votes counts ("2. Aantal getelde stembiljetten") */
-  votes_counts: VotesCounts;
-}
+export type PollingStationResults = CSOFirstSessionResults & { model: "CSOFirstSession" };
 
 /**
  * Type of Polling station
@@ -1104,18 +1131,7 @@ export interface SumCount {
 /**
  * Contains a summary of the differences, containing which polling stations had differences.
  */
-export interface SummaryDifferenceCountsCompareVotesCastAdmittedVoters {
-  admitted_voters_equal_votes_cast: boolean;
-  votes_cast_greater_than_admitted_voters: boolean;
-  votes_cast_smaller_than_admitted_voters: boolean;
-}
-
-/**
- * Contains a summary of the differences, containing which polling stations had differences.
- */
 export interface SummaryDifferencesCounts {
-  compare_votes_cast_admitted_voters: SummaryDifferenceCountsCompareVotesCastAdmittedVoters;
-  difference_completely_accounted_for: YesNo;
   fewer_ballots_count: SumCount;
   more_ballots_count: SumCount;
 }
@@ -1165,6 +1181,7 @@ export interface UserLoginFailedDetails {
 
 export interface ValidationResult {
   code: ValidationResultCode;
+  context?: ValidationResultContext;
   fields: string[];
 }
 
@@ -1188,11 +1205,16 @@ export type ValidationResultCode =
   | "F310"
   | "F401"
   | "F402"
+  | "F403"
   | "W001"
   | "W201"
   | "W202"
   | "W203"
   | "W204";
+
+export interface ValidationResultContext {
+  political_group_number?: number;
+}
 
 export interface ValidationResults {
   errors: ValidationResult[];

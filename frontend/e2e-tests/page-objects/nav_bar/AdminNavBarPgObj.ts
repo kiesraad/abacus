@@ -14,4 +14,8 @@ export class AdminNavBar {
     this.role = this.navigation.getByTestId("navbar-role");
     this.electionOverviewButton = page.getByRole("link", { name: "Verkiezingen" });
   }
+
+  getElectionBreadcrumb(electionName: string) {
+    return this.navigation.getByRole("link", { name: electionName });
+  }
 }

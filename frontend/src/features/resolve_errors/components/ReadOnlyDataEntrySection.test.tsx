@@ -14,7 +14,7 @@ describe("ReadOnlyDataEntrySection", () => {
   const electionMockData = getElectionMockData().election;
   const pollingStationResultsMockData: PollingStationResults = emptyData;
 
-  const structure = getDataEntryStructure(electionMockData);
+  const structure = getDataEntryStructure("CSOFirstSession", electionMockData);
   const votersVotesSection = structure.find((s) => s.id === "voters_votes_counts")!;
 
   const renderComponent = (

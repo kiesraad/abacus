@@ -1903,6 +1903,22 @@ mod tests {
         assert_eq!(result1.warnings.len(), 0);
     }
 
+    #[test]
+    fn test_count_err_out_of_range() {
+        let mut validation_results = ValidationResults::default();
+        let count = 1_000_000_000;
+
+        let result = count.validate(
+            &election_fixture(&[]),
+            &polling_station_fixture(None),
+            &mut validation_results,
+            &"".into(),
+        );
+
+        assert!(result.is_err());
+        assert!(result.unwrap_err().message.eq("count out of range"),);
+    }
+
     /// Tests the above_percentage_threshold function with various input combinations.
     #[test]
     fn test_above_percentage_threshold() {

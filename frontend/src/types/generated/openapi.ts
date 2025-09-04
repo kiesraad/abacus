@@ -339,6 +339,30 @@ export interface AuditLogUser {
 }
 
 /**
+ * CSOFirstSessionResults, following the fields in Model Na 31-2 Bijlage 2.
+ *
+ * See "Model Na 31-2. Proces-verbaal van een gemeentelijk stembureau/stembureau voor het openbaar
+ * lichaam in een gemeente/openbaar lichaam waar een centrale stemopneming wordt verricht,
+ * Bijlage 2: uitkomsten per stembureau" from the
+ * [Kiesregeling](https://wetten.overheid.nl/BWBR0034180/2024-04-01#Bijlage1_DivisieNa31.2) or
+ * [Verkiezingstoolbox](https://www.rijksoverheid.nl/onderwerpen/verkiezingen/verkiezingentoolkit/modellen).
+ */
+export interface CSOFirstSessionResults {
+  /** Counting Differences Polling Station ("B1-2 Verschillen met telresultaten van het stembureau") */
+  counting_differences_polling_station: CountingDifferencesPollingStation;
+  /** Differences counts ("3. Verschil tussen het aantal toegelaten kiezers en het aantal getelde stembiljetten") */
+  differences_counts: DifferencesCounts;
+  /** Extra investigation ("B1-1 Extra onderzoek") */
+  extra_investigation: ExtraInvestigation;
+  /** Vote counts per list and candidate (5. "Aantal stemmen per lijst en kandidaat") */
+  political_group_votes: PoliticalGroupCandidateVotes[];
+  /** Voters counts ("1. Aantal toegelaten kiezers") */
+  voters_counts: VotersCounts;
+  /** Votes counts ("2. Aantal getelde stembiljetten") */
+  votes_counts: VotesCounts;
+}
+
+/**
  * Candidate
  */
 export interface Candidate {
@@ -940,8 +964,10 @@ export interface PoliticalGroupTotalVotes {
  */
 export interface PollingStation {
   address: string;
+  committee_session_id: number;
   election_id: number;
   id: number;
+  id_prev_session?: number;
   locality: string;
   name: string;
   number: number;
@@ -952,12 +978,14 @@ export interface PollingStation {
 
 export interface PollingStationDetails {
   polling_station_address: string;
+  polling_station_committee_session_id: number;
   polling_station_election_id: number;
   polling_station_id: number;
+  polling_station_id_prev_session?: number;
   polling_station_locality: string;
   polling_station_name: string;
   polling_station_number: number;
-  polling_station_number_of_voters?: number | null;
+  polling_station_number_of_voters?: number;
   polling_station_postal_code: string;
   polling_station_type?: string;
 }
@@ -997,28 +1025,13 @@ export interface PollingStationRequestListResponse {
 }
 
 /**
- * PollingStationResults, following the fields in Model Na 31-2 Bijlage 2.
+ * PollingStationResults contains the results for a polling station.
  *
- * See "Model Na 31-2. Proces-verbaal van een gemeentelijk stembureau/stembureau voor het openbaar
- * lichaam in een gemeente/openbaar lichaam waar een centrale stemopneming wordt verricht,
- * Bijlage 2: uitkomsten per stembureau" from the
- * [Kiesregeling](https://wetten.overheid.nl/BWBR0034180/2024-04-01#Bijlage1_DivisieNa31.2) or
- * [Verkiezingstoolbox](https://www.rijksoverheid.nl/onderwerpen/verkiezingen/verkiezingentoolkit/modellen).
+ * The exact type of results depends on the election counting method and
+ * whether this is the first or any subsequent data entry session. Based on
+ * this, any of four different models can apply
  */
-export interface PollingStationResults {
-  /** Counting Differences Polling Station ("B1-2 Verschillen met telresultaten van het stembureau") */
-  counting_differences_polling_station: CountingDifferencesPollingStation;
-  /** Differences counts ("3. Verschil tussen het aantal toegelaten kiezers en het aantal getelde stembiljetten") */
-  differences_counts: DifferencesCounts;
-  /** Extra investigation ("B1-1 Extra onderzoek") */
-  extra_investigation: ExtraInvestigation;
-  /** Vote counts per list and candidate (5. "Aantal stemmen per lijst en kandidaat") */
-  political_group_votes: PoliticalGroupCandidateVotes[];
-  /** Voters counts ("1. Aantal toegelaten kiezers") */
-  voters_counts: VotersCounts;
-  /** Votes counts ("2. Aantal getelde stembiljetten") */
-  votes_counts: VotesCounts;
-}
+export type PollingStationResults = CSOFirstSessionResults & { model: "CSOFirstSession" };
 
 /**
  * Type of Polling station
@@ -1187,9 +1200,7 @@ export type ValidationResultCode =
   | "W201"
   | "W202"
   | "W203"
-  | "W205"
-  | "W301"
-  | "W302";
+  | "W204";
 
 export interface ValidationResults {
   errors: ValidationResult[];

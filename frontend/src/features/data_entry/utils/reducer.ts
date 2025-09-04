@@ -1,3 +1,4 @@
+import { assertStateIsLoaded } from "@/features/data_entry/utils/utils";
 import { ElectionWithPoliticalGroups } from "@/types/generated/openapi";
 import { getDataEntryStructure } from "@/utils/dataEntryStructure";
 
@@ -11,15 +12,14 @@ export function getInitialState(
   pollingStationId: number,
   entryNumber: number,
 ): DataEntryState {
-  const dataEntryStructure = getDataEntryStructure(election);
   return {
     election,
     pollingStationId,
     error: null,
     pollingStationResults: null,
     entryNumber,
-    dataEntryStructure,
-    formState: getInitialFormState(dataEntryStructure),
+    dataEntryStructure: null,
+    formState: null,
     targetFormSectionId: null,
     status: "idle",
     cache: null,
@@ -29,11 +29,12 @@ export function getInitialState(
 export default function dataEntryReducer(state: DataEntryState, action: DataEntryAction): DataEntryState {
   // uncomment the following line to see the action in the console
   /// eslint-disable-next-line
-  //console.log("ACTION", action, "OLD", state);
+  // console.log("ACTION", action, "OLD", state);
 
   switch (action.type) {
     case "DATA_ENTRY_CLAIMED": {
-      const dataEntryStructure = getDataEntryStructure(state.election);
+      const model = action.dataEntry.data.model;
+      const dataEntryStructure = getDataEntryStructure(model, state.election);
       if (action.dataEntry.client_state) {
         const { formState, targetFormSectionId } = buildFormState(
           // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
@@ -53,7 +54,7 @@ export default function dataEntryReducer(state: DataEntryState, action: DataEntr
         return {
           ...state,
           dataEntryStructure,
-          formState: getInitialFormState(state.dataEntryStructure),
+          formState: getInitialFormState(dataEntryStructure),
           targetFormSectionId: INITIAL_FORM_SECTION_ID,
           pollingStationResults: action.dataEntry.data,
           error: null,
@@ -77,6 +78,7 @@ export default function dataEntryReducer(state: DataEntryState, action: DataEntr
         cache: action.cache,
       };
     case "UPDATE_FORM_SECTION": {
+      assertStateIsLoaded(state);
       const existingSection = state.formState.sections[action.sectionId];
       if (!existingSection) {
         throw new Error(`Section ${action.sectionId} not found in form state`);
@@ -103,10 +105,9 @@ export default function dataEntryReducer(state: DataEntryState, action: DataEntr
         error: action.error,
       };
     case "FORM_SAVED": {
-      const dataEntryStructure = getDataEntryStructure(state.election);
-
+      assertStateIsLoaded(state);
       const formState = updateFormStateAfterSubmit(
-        dataEntryStructure,
+        state.dataEntryStructure,
         state.formState,
         action.validationResults,
         action.sectionId,
@@ -118,7 +119,6 @@ export default function dataEntryReducer(state: DataEntryState, action: DataEntr
         status: "idle",
         error: null,
         pollingStationResults: action.data,
-        dataEntryStructure,
         formState,
         targetFormSectionId: action.continueToNextSection
           ? getNextSectionID(formState, action.sectionId)

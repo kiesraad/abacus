@@ -61,29 +61,30 @@ pub async fn committee_session_create(
     audit_service: AuditService,
     Json(request): Json<NewCommitteeSessionRequest>,
 ) -> Result<(StatusCode, CommitteeSession), APIError> {
-    let committee_session = crate::committee_session::repository::get_election_committee_session(
-        &pool,
-        request.election_id,
-    )
-    .await?;
-    if committee_session.status == CommitteeSessionStatus::DataEntryFinished {
-        let committee_session = crate::committee_session::repository::create(&pool, {
+    let current_committee_session =
+        crate::committee_session::repository::get_election_committee_session(
+            &pool,
+            request.election_id,
+        )
+        .await?;
+    if current_committee_session.status == CommitteeSessionStatus::DataEntryFinished {
+        let next_committee_session = crate::committee_session::repository::create(&pool, {
             CommitteeSessionCreateRequest {
                 election_id: request.election_id,
-                number: committee_session.number + 1,
-                number_of_voters: committee_session.number_of_voters,
+                number: current_committee_session.number + 1,
+                number_of_voters: current_committee_session.number_of_voters,
             }
         })
         .await?;
 
         audit_service
             .log(
-                &AuditEvent::CommitteeSessionCreated(committee_session.clone().into()),
+                &AuditEvent::CommitteeSessionCreated(next_committee_session.clone().into()),
                 None,
             )
             .await?;
 
-        Ok((StatusCode::CREATED, committee_session))
+        Ok((StatusCode::CREATED, next_committee_session))
     } else {
         Err(APIError::CommitteeSession(
             CommitteeSessionError::InvalidCommitteeSessionStatus,

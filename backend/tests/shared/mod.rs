@@ -7,10 +7,10 @@ use abacus::{
         CommitteeSession, CommitteeSessionStatusChangeRequest, status::CommitteeSessionStatus,
     },
     data_entry::{
-        CandidateVotes, Count, CountingDifferencesPollingStation, DataEntry,
-        DifferenceCountsCompareVotesCastAdmittedVoters, DifferencesCounts, ElectionStatusResponse,
-        PoliticalGroupCandidateVotes, PoliticalGroupTotalVotes, PollingStationResults,
-        VotersCounts, VotesCounts, YesNo,
+        CSOFirstSessionResults, CandidateVotes, Count, CountingDifferencesPollingStation,
+        DataEntry, DifferenceCountsCompareVotesCastAdmittedVoters, DifferencesCounts,
+        ElectionStatusResponse, PoliticalGroupCandidateVotes, PoliticalGroupTotalVotes,
+        PollingStationResults, VotersCounts, VotesCounts, YesNo,
         status::{ClientState, DataEntryStatusName},
     },
     election::{CandidateNumber, ElectionDetailsResponse, PGNumber},
@@ -55,7 +55,7 @@ pub fn political_group_votes_from_test_data_auto(
 pub fn example_data_entry(client_state: Option<&str>) -> DataEntry {
     DataEntry {
         progress: 60,
-        data: PollingStationResults {
+        data: PollingStationResults::CSOFirstSession(CSOFirstSessionResults {
             extra_investigation: Default::default(),
             counting_differences_polling_station: CountingDifferencesPollingStation {
                 difference_ballots_per_list: YesNo::no(),
@@ -87,7 +87,7 @@ pub fn example_data_entry(client_state: Option<&str>) -> DataEntry {
                 political_group_votes_from_test_data_auto(1, &[40, 20]),
                 political_group_votes_from_test_data_auto(2, &[30, 12]),
             ],
-        },
+        }),
         client_state: ClientState::new_from_str(client_state).unwrap(),
     }
 }

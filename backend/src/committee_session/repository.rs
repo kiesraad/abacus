@@ -135,7 +135,12 @@ pub async fn create(
     conn: impl DbConnLike<'_>,
     committee_session: CommitteeSessionCreateRequest,
 ) -> Result<CommitteeSession, Error> {
-    query_as!(
+    let mut tx = conn.begin_immediate().await?;
+
+    let current_committee_session_id =
+        get_current_id_for_election(&mut *tx, committee_session.election_id).await?;
+
+    let next_committee_session = query_as!(
         CommitteeSession,
         r#"
         INSERT INTO committee_sessions (
@@ -165,16 +170,46 @@ pub async fn create(
         "",
         committee_session.number_of_voters,
     )
-    .fetch_one(conn)
-    .await
+    .fetch_one(&mut *tx)
+    .await?;
+
+    if let Some(current_committee_session_id) = current_committee_session_id {
+        crate::polling_station::repository::duplicate_for_committee_session(
+            &mut *tx,
+            current_committee_session_id,
+            next_committee_session.id,
+        )
+        .await?;
+    }
+
+    tx.commit().await?;
+
+    Ok(next_committee_session)
 }
 
 /// Delete a committee session
 pub async fn delete(conn: impl DbConnLike<'_>, id: u32) -> Result<bool, Error> {
-    let rows_affected = query!(r#"DELETE FROM committee_sessions WHERE id = ?"#, id,)
-        .execute(conn)
+    let mut tx = conn.begin_immediate().await?;
+
+    query!(
+        "DELETE FROM polling_stations WHERE committee_session_id = ?",
+        id,
+    )
+    .execute(&mut *tx)
+    .await?;
+
+    let rows_affected = query!(r#"DELETE FROM committee_sessions WHERE id = ?"#, id)
+        .execute(&mut *tx)
         .await?
         .rows_affected();
+
+    // something weird is happening, rollback
+    if rows_affected != 1 {
+        tx.rollback().await?;
+        return Ok(false);
+    }
+
+    tx.commit().await?;
 
     Ok(rows_affected > 0)
 }
@@ -272,4 +307,23 @@ pub async fn change_status(
     )
     .fetch_one(conn)
     .await
+}
+
+pub async fn get_current_id_for_election(
+    conn: impl DbConnLike<'_>,
+    election_id: u32,
+) -> Result<Option<u32>, Error> {
+    query!(
+        r#"
+        SELECT id AS "id: u32"
+        FROM committee_sessions
+        WHERE election_id = ?
+        ORDER BY number DESC
+        LIMIT 1
+        "#,
+        election_id
+    )
+    .fetch_optional(conn)
+    .await
+    .map(|record| record.map(|r| r.id))
 }

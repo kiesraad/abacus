@@ -11,9 +11,10 @@ use abacus::{
     },
     create_sqlite_pool,
     data_entry::{
-        CandidateVotes, CountingDifferencesPollingStation, DifferencesCounts, ExtraInvestigation,
-        FieldPath, PoliticalGroupCandidateVotes, PoliticalGroupTotalVotes, PollingStationResults,
-        Validate, ValidationResults, VotersCounts, VotesCounts, YesNo,
+        CSOFirstSessionResults, CandidateVotes, CountingDifferencesPollingStation,
+        DifferencesCounts, ExtraInvestigation, FieldPath, PoliticalGroupCandidateVotes,
+        PoliticalGroupTotalVotes, PollingStationResults, Validate, ValidationResults, VotersCounts,
+        VotesCounts, YesNo,
         status::{DataEntryStatus, Definitive, SecondEntryNotStarted},
     },
     election::{
@@ -208,9 +209,12 @@ async fn main() -> Result<(), Box<dyn Error>> {
 
     if let Some(export_dir) = args.export_definition {
         let results = if data_entry_completed {
-            abacus::data_entry::repository::list_entries_with_polling_stations(&pool, election.id)
-                .await
-                .expect("Could not load results")
+            abacus::data_entry::repository::list_entries_with_polling_stations_first_session(
+                &pool,
+                election.id,
+            )
+            .await
+            .expect("Could not load results")
         } else {
             vec![]
         };
@@ -407,13 +411,14 @@ async fn generate_data_entry(
 
             let candidate_slope =
                 rng.random_range(args.candidate_distribution_slope.clone()) as f64 / 1000.0;
-            let results = generate_polling_station_results(
-                rng,
-                &election.political_groups,
-                voters_turned_out,
-                &group_weights,
-                candidate_slope,
-            );
+            let results =
+                PollingStationResults::CSOFirstSession(generate_cso_first_session_results(
+                    rng,
+                    &election.political_groups,
+                    voters_turned_out,
+                    &group_weights,
+                    candidate_slope,
+                ));
 
             // Validate the generated results to catch issues early
             let mut validation_results = ValidationResults::default();
@@ -470,13 +475,13 @@ async fn generate_data_entry(
     (generated_first_entries, generated_second_entries)
 }
 
-fn generate_polling_station_results(
+fn generate_cso_first_session_results(
     rng: &mut impl rand::Rng,
     political_groups: &[PoliticalGroup],
     number_of_votes: u32,
     group_weights: &[f64],
     candidate_distribution_slope: f64,
-) -> PollingStationResults {
+) -> CSOFirstSessionResults {
     // generate a small percentage of blank votes
     #[allow(clippy::cast_possible_truncation)]
     let blank_votes = (number_of_votes as f64 * rng.random_range(0.0..0.02)) as u32;
@@ -532,7 +537,7 @@ fn generate_polling_station_results(
         .1
         .clone();
 
-    PollingStationResults {
+    CSOFirstSessionResults {
         extra_investigation,
         counting_differences_polling_station: CountingDifferencesPollingStation {
             // 90% chance of "no", 10% chance of "yes" for each field
@@ -675,7 +680,7 @@ async fn export_election(
     election: &ElectionWithPoliticalGroups,
     polling_stations: &[PollingStation],
     export_results_json: bool,
-    results: Vec<(PollingStation, PollingStationResults)>,
+    results: Vec<(PollingStation, CSOFirstSessionResults)>,
 ) {
     if export_dir.exists() && !export_dir.is_dir() {
         panic!("Export directory already exists and is not a directory");

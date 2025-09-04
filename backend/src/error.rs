@@ -93,6 +93,7 @@ pub enum APIError {
     InvalidData(DataError),
     InvalidHeaderValue,
     InvalidHashError,
+    InvalidResultsType,
     JsonRejection(JsonRejection),
     NotFound(String, ErrorReference),
     PdfGenError(PdfGenError),
@@ -403,6 +404,14 @@ impl IntoResponse for APIError {
                     ),
                 }
             }
+            APIError::InvalidResultsType => (
+                StatusCode::BAD_REQUEST,
+                to_error(
+                    "Internal server error",
+                    ErrorReference::InternalServerError,
+                    true,
+                ),
+            ),
         };
 
         let mut response = (status, error_response.clone()).into_response();

@@ -1,10 +1,10 @@
 use chrono::NaiveDateTime;
 use sqlx::{query, query_as, types::Json};
 
-use super::{PollingStationDataEntry, PollingStationResults, status::DataEntryStatus};
+use super::{CSOFirstSessionResults, PollingStationDataEntry, status::DataEntryStatus};
 use crate::{
     DbConnLike,
-    data_entry::{ElectionStatusResponseEntry, PollingStationResultsEntry},
+    data_entry::{ElectionStatusResponseEntry, PollingStationResults, PollingStationResultsEntry},
     polling_station::PollingStation,
 };
 
@@ -111,11 +111,16 @@ pub async fn statuses(
     query!(
         r#"
             SELECT
-                id AS "polling_station_id: u32",
-                de.state AS "state: Option<Json<DataEntryStatus>>"
+                p.id AS "polling_station_id: u32",
+                de.state AS "state: Json<DataEntryStatus>"
             FROM polling_stations AS p
+            LEFT JOIN committee_sessions AS c ON c.id = p.committee_session_id
             LEFT JOIN polling_station_data_entries AS de ON de.polling_station_id = p.id
-            WHERE election_id = $1
+            WHERE c.election_id = $1 AND c.number = (
+                SELECT MAX(c2.number)
+                FROM committee_sessions AS c2
+                WHERE c2.election_id = c.election_id
+            )
         "#,
         election_id
     )
@@ -142,7 +147,7 @@ pub async fn make_definitive(
     new_state: &DataEntryStatus,
     definitive_entry: &PollingStationResults,
 ) -> Result<(), sqlx::Error> {
-    let mut tx = conn.begin().await?;
+    let mut tx = conn.begin_immediate().await?;
     let definitive_entry = Json(definitive_entry);
     query!(
         "INSERT INTO polling_station_results (polling_station_id, committee_session_id, data) VALUES ($1, $2, $3)",
@@ -189,7 +194,12 @@ pub async fn list_entries(
             r.created_at as "created_at: NaiveDateTime"
         FROM polling_station_results AS r
         LEFT JOIN polling_stations AS p ON r.polling_station_id = p.id
-        WHERE p.election_id = $1
+        LEFT JOIN committee_sessions AS c ON c.id = p.committee_session_id
+        WHERE c.election_id = $1 AND c.number = (
+            SELECT MAX(c2.number)
+            FROM committee_sessions AS c2
+            WHERE c2.election_id = c.election_id
+        )
         "#,
         election_id
     )
@@ -227,6 +237,29 @@ pub async fn list_entries_with_polling_stations(
             Ok((polling_station, entry.data))
         })
         .collect::<Result<_, sqlx::Error>>() // this collect causes the iterator to fail early if there was any error
+}
+
+/// Get a list of polling stations with their results for an election, but only
+/// if the results are of type CSOFirstSessionResults
+pub async fn list_entries_with_polling_stations_first_session(
+    conn: impl DbConnLike<'_>,
+    election_id: u32,
+) -> Result<Vec<(PollingStation, CSOFirstSessionResults)>, sqlx::Error> {
+    list_entries_with_polling_stations(conn, election_id)
+        .await?
+        .into_iter()
+        .map(|(p, r)| {
+            r.into_cso_first_session()
+                .map(|r| (p, r))
+                .ok_or(sqlx::Error::ColumnDecode {
+                    index: "data".to_string(),
+                    source: Box::new(std::io::Error::new(
+                        std::io::ErrorKind::InvalidData,
+                        "Results are not of type CSOFirstSessionResults",
+                    )),
+                })
+        })
+        .collect::<Result<_, sqlx::Error>>()
 }
 
 /// Check if a polling station has results

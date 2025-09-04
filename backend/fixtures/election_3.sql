@@ -50,6 +50,6 @@ INSERT INTO committee_sessions (id, number, election_id, status, location, start
 VALUES (3, 1, 3, 'data_entry_in_progress','', '', '');
 
 
-INSERT INTO polling_stations (id, election_id, name, number, number_of_voters, polling_station_type, address,
+INSERT INTO polling_stations (id, committee_session_id, id_prev_session, name, number, number_of_voters, polling_station_type, address,
                               postal_code, locality)
-VALUES (3, 3, 'Testgebouw', 35, NULL, 'FixedLocation', 'Testweg 3', '1234 QA', 'Teststad');
+VALUES (3, 3, NULL, 'Testgebouw', 35, NULL, 'FixedLocation', 'Testweg 3', '1234 QA', 'Teststad');

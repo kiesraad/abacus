@@ -20,7 +20,8 @@ export function ResolveErrorsSectionPage() {
     return <Loader />;
   }
 
-  const structure = getDataEntryStructure(election);
+  const model = dataEntry.finalised_first_entry.model;
+  const structure = getDataEntryStructure(model, election);
   const section = structure.find((s) => s.id === sectionId);
 
   if (!section) {

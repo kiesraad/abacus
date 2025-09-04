@@ -11,7 +11,7 @@ use crate::{
     APIError, AppState, ErrorResponse,
     authentication::Coordinator,
     committee_session::{CommitteeSession, CommitteeSessionError, status::CommitteeSessionStatus},
-    data_entry::PollingStationResults,
+    data_entry::CSOFirstSessionResults,
     election::ElectionWithPoliticalGroups,
     eml::{EML510, EMLDocument, EmlHash},
     files::repository::{create_file, get_file},
@@ -35,7 +35,7 @@ struct ResultsInput {
     committee_session: CommitteeSession,
     election: ElectionWithPoliticalGroups,
     polling_stations: Vec<PollingStation>,
-    results: Vec<(PollingStation, PollingStationResults)>,
+    results: Vec<(PollingStation, CSOFirstSessionResults)>,
     summary: ElectionSummary,
     creation_date_time: chrono::DateTime<chrono::Local>,
 }
@@ -51,8 +51,11 @@ impl ResultsInput {
             .await?;
         let polling_stations = crate::polling_station::repository::list(&pool, election.id).await?;
         let results =
-            crate::data_entry::repository::list_entries_with_polling_stations(&pool, election.id)
-                .await?;
+            crate::data_entry::repository::list_entries_with_polling_stations_first_session(
+                &pool,
+                election.id,
+            )
+            .await?;
 
         Ok(ResultsInput {
             committee_session,

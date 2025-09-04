@@ -9,6 +9,7 @@ use axum::{
     middleware,
     serve::ListenerExt,
 };
+use futures::future::BoxFuture;
 use hyper::http::{HeaderName, HeaderValue, header};
 use sqlx::{
     Acquire, Executor, Sqlite, SqlitePool,
@@ -52,18 +53,29 @@ pub use error::{APIError, ErrorResponse};
 pub const MAX_BODY_SIZE_MB: usize = 12;
 
 pub trait DbConnLike<'a>: Acquire<'a, Database = Sqlite> + Executor<'a, Database = Sqlite> {
-    fn begin_immediate(
-        self,
-    ) -> impl Future<Output = Result<sqlx::Transaction<'a, Sqlite>, sqlx::Error>>;
+    /// Start a transaction with "BEGIN IMMEDIATE", which is needed to prevent
+    /// database is busy errors. See https://sqlite.org/isolation.html for
+    /// details.
+    ///
+    /// Note: this function could have been written as an async fn (i.e.
+    /// returning `impl Future<Output = Result<...>`), but that triggers
+    /// https://github.com/rust-lang/rust/issues/100013, so until that is
+    /// resolved we need to box the future instead.
+    fn begin_immediate(self) -> BoxFuture<'a, Result<sqlx::Transaction<'a, Sqlite>, sqlx::Error>>;
 }
 
 impl<'a, T> DbConnLike<'a> for T
 where
-    T: Acquire<'a, Database = Sqlite> + Executor<'a, Database = Sqlite>,
+    T: Acquire<'a, Database = Sqlite> + Executor<'a, Database = Sqlite> + 'a,
     <T as Acquire<'a>>::Connection: Into<sqlx::pool::MaybePoolConnection<'a, Sqlite>>,
 {
-    async fn begin_immediate(self) -> Result<sqlx::Transaction<'a, Sqlite>, sqlx::Error> {
-        sqlx::Transaction::begin(self.acquire().await?, Some("BEGIN IMMEDIATE".into())).await
+    fn begin_immediate(self) -> BoxFuture<'a, Result<sqlx::Transaction<'a, Sqlite>, sqlx::Error>> {
+        use futures::TryFutureExt;
+
+        Box::pin(
+            self.acquire()
+                .and_then(|conn| sqlx::Transaction::begin(conn, Some("BEGIN IMMEDIATE".into()))),
+        )
     }
 }
 

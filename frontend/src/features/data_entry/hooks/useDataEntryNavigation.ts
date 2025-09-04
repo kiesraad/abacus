@@ -33,8 +33,8 @@ export default function useDataEntryNavigation(
 
   // prevent navigating to sections that are not yet active
   useEffect(() => {
-    const currentSection = sectionId ? state.formState.sections[sectionId] : null;
-    const furthestSection = state.formState.sections[state.formState.furthest];
+    const currentSection = sectionId ? state.formState?.sections[sectionId] : null;
+    const furthestSection = state.formState?.sections[state.formState.furthest];
     if (currentSection && furthestSection) {
       if (currentSection.index > furthestSection.index) {
         const url = getUrlForFormSectionID(election.id, pollingStationId, entryNumber, furthestSection.id);

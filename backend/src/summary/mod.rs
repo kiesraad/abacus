@@ -4,9 +4,9 @@ use utoipa::ToSchema;
 use crate::{
     APIError,
     data_entry::{
-        CandidateVotes, Count, DifferencesCounts, PoliticalGroupCandidateVotes,
-        PoliticalGroupTotalVotes, PollingStationResults, Validate, ValidationResults, VotersCounts,
-        VotesCounts,
+        CSOFirstSessionResults, CandidateVotes, Count, DifferencesCounts,
+        PoliticalGroupCandidateVotes, PoliticalGroupTotalVotes, Validate, ValidationResults,
+        VotersCounts, VotesCounts,
     },
     election::ElectionWithPoliticalGroups,
     error::ErrorReference,
@@ -55,7 +55,7 @@ impl ElectionSummary {
     /// data from the election for candidates and political groups.
     pub fn from_results(
         election: &ElectionWithPoliticalGroups,
-        results: &[(PollingStation, PollingStationResults)],
+        results: &[(PollingStation, CSOFirstSessionResults)],
     ) -> Result<ElectionSummary, APIError> {
         // running totals
         let mut totals = ElectionSummary::zero();
@@ -249,7 +249,7 @@ impl PollingStationInvestigations {
     pub fn append_result(
         &mut self,
         polling_station: &PollingStation,
-        result: &PollingStationResults,
+        result: &CSOFirstSessionResults,
     ) {
         if result
             .counting_differences_polling_station
@@ -292,13 +292,16 @@ mod tests {
     use super::*;
     use crate::{
         committee_session::tests::committee_session_fixture,
-        data_entry::{ExtraInvestigation, PoliticalGroupTotalVotes, YesNo, tests::ValidDefault},
+        data_entry::{
+            CSOFirstSessionResults, ExtraInvestigation, PoliticalGroupTotalVotes, YesNo,
+            tests::ValidDefault,
+        },
         election::tests::election_fixture,
         pdf_gen::tests::polling_stations_fixture,
     };
 
-    fn polling_station_results_fixture_a() -> PollingStationResults {
-        PollingStationResults {
+    fn polling_station_results_fixture_a() -> CSOFirstSessionResults {
+        CSOFirstSessionResults {
             extra_investigation: ValidDefault::valid_default(),
             counting_differences_polling_station: ValidDefault::valid_default(),
             voters_counts: VotersCounts {
@@ -334,8 +337,8 @@ mod tests {
         }
     }
 
-    fn polling_station_results_fixture_b() -> PollingStationResults {
-        PollingStationResults {
+    fn polling_station_results_fixture_b() -> CSOFirstSessionResults {
+        CSOFirstSessionResults {
             extra_investigation: ExtraInvestigation {
                 extra_investigation_other_reason: YesNo::yes(),
                 ballots_recounted_extra_investigation: YesNo::no(),

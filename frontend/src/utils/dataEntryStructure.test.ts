@@ -220,7 +220,7 @@ describe("getDataEntryStructure", () => {
       ...electionMockData.political_groups.map((pg) => `political_group_votes_${pg.number}`),
     ];
 
-    const structure = getDataEntryStructure(electionMockData);
+    const structure = getDataEntryStructure("CSOFirstSession", electionMockData);
 
     expect(structure.map((section) => section.id)).toStrictEqual(expectedSectionIds);
   });

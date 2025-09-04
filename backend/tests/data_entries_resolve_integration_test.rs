@@ -14,7 +14,12 @@ pub mod utils;
 fn data_entry_with_error() -> DataEntry {
     let mut data_entry = shared::example_data_entry(None);
     // Introduce error F.203
-    data_entry.data.votes_counts.invalid_votes_count = 2;
+    data_entry
+        .data
+        .as_cso_first_session_mut()
+        .unwrap()
+        .votes_counts
+        .invalid_votes_count = 2;
     data_entry
 }
 
@@ -22,8 +27,18 @@ fn different_data_entries() -> (DataEntry, DataEntry) {
     let first_data_entry = shared::example_data_entry(None);
 
     let mut second_data_entry = first_data_entry.clone();
-    second_data_entry.data.voters_counts.poll_card_count -= 2;
-    second_data_entry.data.voters_counts.proxy_certificate_count += 2;
+    second_data_entry
+        .data
+        .as_cso_first_session_mut()
+        .unwrap()
+        .voters_counts
+        .poll_card_count -= 2;
+    second_data_entry
+        .data
+        .as_cso_first_session_mut()
+        .unwrap()
+        .voters_counts
+        .proxy_certificate_count += 2;
 
     (first_data_entry, second_data_entry)
 }
@@ -360,10 +375,30 @@ async fn test_polling_station_data_entry_resolve_differences(pool: SqlitePool) {
 
     let first_data_entry = shared::example_data_entry(None);
     let mut second_data_entry = first_data_entry.clone();
-    second_data_entry.data.voters_counts.poll_card_count =
-        first_data_entry.data.voters_counts.poll_card_count - 2;
-    second_data_entry.data.voters_counts.proxy_certificate_count =
-        first_data_entry.data.voters_counts.poll_card_count + 2;
+    second_data_entry
+        .data
+        .as_cso_first_session_mut()
+        .unwrap()
+        .voters_counts
+        .poll_card_count = first_data_entry
+        .data
+        .as_cso_first_session()
+        .unwrap()
+        .voters_counts
+        .poll_card_count
+        - 2;
+    second_data_entry
+        .data
+        .as_cso_first_session_mut()
+        .unwrap()
+        .voters_counts
+        .proxy_certificate_count = first_data_entry
+        .data
+        .as_cso_first_session()
+        .unwrap()
+        .voters_counts
+        .poll_card_count
+        + 2;
 
     let typist = shared::typist_login(&addr).await;
     let res = shared::complete_data_entry(&addr, &typist, 1, 1, first_data_entry).await;
@@ -388,7 +423,12 @@ async fn test_polling_station_data_entry_resolve_differences_then_resolve_errors
 
     let first_data_entry = shared::example_data_entry(None);
     let mut second_data_entry = first_data_entry.clone();
-    second_data_entry.data.voters_counts.poll_card_count = 0;
+    second_data_entry
+        .data
+        .as_cso_first_session_mut()
+        .unwrap()
+        .voters_counts
+        .poll_card_count = 0;
 
     let typist = shared::typist_login(&addr).await;
     let res = shared::complete_data_entry(&addr, &typist, 1, 1, first_data_entry).await;

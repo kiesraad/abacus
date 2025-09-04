@@ -82,7 +82,7 @@ export const DefaultProgressList: StoryObj<Props> = {
 
 export const OverviewProgressList: StoryObj = {
   render: function Render() {
-    const structure = getDataEntryStructure(electionMockData);
+    const structure = getDataEntryStructure("CSOFirstSession", electionMockData);
     return (
       <ProgressList>
         <ProgressList.Fixed>

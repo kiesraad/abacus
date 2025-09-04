@@ -1,13 +1,14 @@
 import { electionMockData } from "@/testing/api-mocks/ElectionMockData";
 import { POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_BODY, PollingStationResults } from "@/types/generated/openapi";
-import { DataEntryStructure, FormSectionId } from "@/types/types";
+import { DataEntryModel, DataEntryStructure, FormSectionId } from "@/types/types";
 import { getDataEntryStructure } from "@/utils/dataEntryStructure";
 import { ValidationResultSet } from "@/utils/ValidationResults";
 
-import { DataEntryState, DataEntryStateAndActionsLoaded, FormSection } from "../types/types";
+import { DataEntryStateAndActionsLoaded, DataEntryStateLoaded, FormSection } from "../types/types";
 
 export function getInitialValues(): PollingStationResults {
   return {
+    model: "CSOFirstSession",
     extra_investigation: {
       extra_investigation_other_reason: { yes: false, no: false },
       ballots_recounted_extra_investigation: { yes: false, no: false },
@@ -66,17 +67,18 @@ export function getDefaultFormSection(id: FormSectionId, index: number): FormSec
 }
 
 export function getDefaultDataEntryStructure(): DataEntryStructure {
-  return getDataEntryStructure(electionMockData);
+  return getDataEntryStructure("CSOFirstSession", electionMockData);
 }
 
-export function getDefaultDataEntryState(): DataEntryState {
+export function getDefaultDataEntryState(): DataEntryStateLoaded {
+  const model: DataEntryModel = "CSOFirstSession";
   return {
     election: electionMockData,
     pollingStationId: 1,
     error: null,
-    pollingStationResults: null,
+    pollingStationResults: getInitialValues(),
     entryNumber: 1,
-    dataEntryStructure: getDataEntryStructure(electionMockData),
+    dataEntryStructure: getDataEntryStructure(model, electionMockData),
     formState: {
       furthest: "voters_votes_counts",
       sections: {

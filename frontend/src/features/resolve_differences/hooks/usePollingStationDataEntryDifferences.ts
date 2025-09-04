@@ -27,7 +27,7 @@ interface PollingStationDataEntryDifferences {
   election: ElectionWithPoliticalGroups;
   loading: boolean;
   differences: DataEntryGetDifferencesResponse | null;
-  dataEntryStructure: DataEntryStructure;
+  dataEntryStructure: DataEntryStructure | null;
   onSubmit: () => Promise<void>;
   validationError: string | undefined;
 }
@@ -62,8 +62,12 @@ export function usePollingStationDataEntryDifferences(
     throw requestState.error;
   }
 
-  const differences = requestState.status === "success" ? requestState.data : null;
-  const dataEntryStructure = getDataEntryStructure(election);
+  let differences = null;
+  let dataEntryStructure = null;
+  if (requestState.status === "success") {
+    differences = requestState.data;
+    dataEntryStructure = getDataEntryStructure(differences.first_entry.model, election);
+  }
 
   const onSubmit = async () => {
     if (action === undefined) {

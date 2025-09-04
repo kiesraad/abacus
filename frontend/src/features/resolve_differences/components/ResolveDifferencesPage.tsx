@@ -61,7 +61,7 @@ export function ResolveDifferencesPage() {
   } = usePollingStationDataEntryDifferences(pollingStationId, afterSave);
   const { getName } = useUsers();
 
-  if (loading || differences === null) {
+  if (loading || differences === null || dataEntryStructure === null) {
     return <Loader />;
   }
 

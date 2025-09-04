@@ -28,7 +28,7 @@ export function ResolveErrorsLayout() {
     return null;
   }
 
-  const structure = getDataEntryStructure(election);
+  const structure = getDataEntryStructure(dataEntry.finalised_first_entry.model, election);
 
   return (
     <>

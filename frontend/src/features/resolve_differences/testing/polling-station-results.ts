@@ -6,6 +6,7 @@ import { PollingStationResults } from "@/types/generated/openapi";
  */
 export function pollingStationResultsMockData(first: boolean): PollingStationResults {
   return {
+    model: "CSOFirstSession",
     extra_investigation: {
       extra_investigation_other_reason: { yes: !first, no: first },
       ballots_recounted_extra_investigation: { yes: false, no: !first },

@@ -57,7 +57,7 @@ describe("doesValidationResultApplyToSection", () => {
   };
 
   test("should return true when validation result applies to section", () => {
-    const dataEntryStructure = getDataEntryStructure(electionMockData);
+    const dataEntryStructure = getDataEntryStructure("CSOFirstSession", electionMockData);
 
     const extraInvestigationSection = dataEntryStructure.find((s) => s.id === "extra_investigation")!;
     expect(doesValidationResultApplyToSection(extraInvestigationW001, extraInvestigationSection)).toBe(true);
@@ -83,7 +83,7 @@ describe("doesValidationResultApplyToSection", () => {
   });
 
   test("should return false when validation result does not apply to section", () => {
-    const dataEntryStructure = getDataEntryStructure(electionMockData);
+    const dataEntryStructure = getDataEntryStructure("CSOFirstSession", electionMockData);
 
     const extraInvestigationSection = dataEntryStructure.find((s) => s.id === "extra_investigation")!;
     expect(doesValidationResultApplyToSection(validationResultMockData.F201, extraInvestigationSection)).toBe(false);
@@ -114,7 +114,7 @@ describe("doesValidationResultApplyToSection", () => {
 
 describe("getValidationResultSetForSection", () => {
   test("should return validation results for specific section", () => {
-    const dataEntryStructure = getDataEntryStructure(electionMockData);
+    const dataEntryStructure = getDataEntryStructure("CSOFirstSession", electionMockData);
     const votersVotesSection = dataEntryStructure.find((s) => s.id === "voters_votes_counts")!;
 
     const validationResults = [
@@ -138,7 +138,7 @@ describe("getValidationResultSetForSection", () => {
   });
 
   test("should return empty set when no validation results match section", () => {
-    const dataEntryStructure = getDataEntryStructure(electionMockData);
+    const dataEntryStructure = getDataEntryStructure("CSOFirstSession", electionMockData);
     const votersVotesSection = dataEntryStructure.find((s) => s.id === "voters_votes_counts")!;
 
     const validationResults = [
@@ -152,7 +152,7 @@ describe("getValidationResultSetForSection", () => {
   });
 
   test("should work with political group sections", () => {
-    const dataEntryStructure = getDataEntryStructure(electionMockData);
+    const dataEntryStructure = getDataEntryStructure("CSOFirstSession", electionMockData);
     const politicalGroupSection = dataEntryStructure.find((s) => s.id === "political_group_votes_1")!;
 
     const validationResults = [

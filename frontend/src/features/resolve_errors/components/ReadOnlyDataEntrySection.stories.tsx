@@ -9,6 +9,7 @@ import { getDataEntryStructure } from "@/utils/dataEntryStructure";
 import { ReadOnlyDataEntrySection } from "./ReadOnlyDataEntrySection";
 
 const pollingStationResults: PollingStationResults = {
+  model: "CSOFirstSession",
   extra_investigation: {
     extra_investigation_other_reason: { yes: false, no: false },
     ballots_recounted_extra_investigation: { yes: false, no: false },
@@ -74,7 +75,7 @@ const pollingStationResults: PollingStationResults = {
   ],
 };
 
-const dataEntryStructure = getDataEntryStructure(electionMockData);
+const dataEntryStructure = getDataEntryStructure("CSOFirstSession", electionMockData);
 const sectionIds = dataEntryStructure.map((section) => section.id);
 
 type Props = {

@@ -1,10 +1,5 @@
 #![cfg(test)]
 
-use axum::http::StatusCode;
-use sqlx::SqlitePool;
-use test_log::test;
-
-use crate::utils::serve_api;
 use abacus::{
     ErrorResponse,
     committee_session::status::CommitteeSessionStatus,
@@ -13,6 +8,11 @@ use abacus::{
         PollingStationRequestListResponse, PollingStationType, PollingStationsRequest,
     },
 };
+use axum::http::StatusCode;
+use sqlx::SqlitePool;
+use test_log::test;
+
+use crate::utils::serve_api;
 
 pub mod shared;
 pub mod utils;
@@ -105,7 +105,7 @@ async fn test_polling_station_creation_for_committee_session_with_finished_statu
     shared::change_status_committee_session(
         &addr,
         &cookie,
-        election_id,
+        2,
         CommitteeSessionStatus::DataEntryFinished,
     )
     .await;

@@ -1,15 +1,15 @@
 #![cfg(test)]
 
-use axum::http::StatusCode;
-use sqlx::SqlitePool;
-use test_log::test;
-
-use crate::utils::serve_api;
 use abacus::committee_session::{
     CommitteeSession, CommitteeSessionNumberOfVotersChangeRequest,
     CommitteeSessionStatusChangeRequest, CommitteeSessionUpdateRequest, NewCommitteeSessionRequest,
     status::CommitteeSessionStatus,
 };
+use axum::http::StatusCode;
+use sqlx::SqlitePool;
+use test_log::test;
+
+use crate::utils::serve_api;
 
 pub mod shared;
 pub mod utils;
@@ -23,7 +23,7 @@ async fn test_committee_session_create_works(pool: SqlitePool) {
     shared::change_status_committee_session(
         &addr,
         &cookie,
-        election_id,
+        2,
         CommitteeSessionStatus::DataEntryFinished,
     )
     .await;

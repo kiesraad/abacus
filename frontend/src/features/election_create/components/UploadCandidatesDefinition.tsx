@@ -68,6 +68,8 @@ export function UploadCandidatesDefinition() {
           );
         }
       }
+    } else {
+      setFile(undefined);
     }
   }
 

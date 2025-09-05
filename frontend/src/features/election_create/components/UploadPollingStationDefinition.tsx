@@ -76,6 +76,8 @@ export function UploadPollingStationDefinition() {
           );
         }
       }
+    } else {
+      setFile(undefined);
     }
   }
 

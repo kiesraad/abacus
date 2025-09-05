@@ -58,6 +58,8 @@ export function UploadElectionDefinition() {
           );
         }
       }
+    } else {
+      setFile(undefined);
     }
   }
 

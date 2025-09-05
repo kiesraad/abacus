@@ -93,6 +93,8 @@ export function PollingStationImportPage() {
           );
         }
       }
+    } else {
+      setFile(undefined);
     }
   }
 

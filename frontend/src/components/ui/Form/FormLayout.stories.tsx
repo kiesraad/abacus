@@ -1,5 +1,6 @@
 import type { Meta, StoryFn } from "@storybook/react-vite";
 
+import { Alert } from "../Alert/Alert";
 import { Button } from "../Button/Button";
 import { ChoiceList } from "../CheckboxAndRadio/ChoiceList";
 import { InputField } from "../InputField/InputField";
@@ -8,6 +9,12 @@ import { FormLayout } from "./FormLayout";
 export const DefaultFormLayout: StoryFn = () => (
   <div>
     <FormLayout>
+      <FormLayout.Alert>
+        <Alert type="success">
+          <h2>It works!</h2>
+          <p>This is a success alert.</p>
+        </Alert>
+      </FormLayout.Alert>
       <FormLayout.Section title="Section title which for a medium width form body is slightly wider">
         <p>
           Here is a description of this form, which should have a maximum width set by the width property of this

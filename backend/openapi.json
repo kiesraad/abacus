@@ -3617,6 +3617,48 @@
           {
             "allOf": [
               {
+                "$ref": "#/components/schemas/FileDetails"
+              },
+              {
+                "type": "object",
+                "required": [
+                  "event_type"
+                ],
+                "properties": {
+                  "event_type": {
+                    "type": "string",
+                    "enum": [
+                      "FileCreated"
+                    ]
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/FileDetails"
+              },
+              {
+                "type": "object",
+                "required": [
+                  "event_type"
+                ],
+                "properties": {
+                  "event_type": {
+                    "type": "string",
+                    "enum": [
+                      "FileDeleted"
+                    ]
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "allOf": [
+              {
                 "$ref": "#/components/schemas/ElectionDetails"
               },
               {
@@ -5264,6 +5306,37 @@
           "extra_investigation_other_reason": {
             "$ref": "#/components/schemas/YesNo",
             "description": "Whether extra investigation was done for another reason than an unexplained difference\n(\"Heeft het gemeentelijk stembureau extra onderzoek gedaan vanwege een andere reden dan een onverklaard verschil?\")"
+          }
+        },
+        "additionalProperties": false
+      },
+      "FileDetails": {
+        "type": "object",
+        "required": [
+          "file_id",
+          "file_data",
+          "file_name",
+          "file_mime_type"
+        ],
+        "properties": {
+          "file_data": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32",
+              "minimum": 0
+            }
+          },
+          "file_id": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "file_mime_type": {
+            "type": "string"
+          },
+          "file_name": {
+            "type": "string"
           }
         },
         "additionalProperties": false

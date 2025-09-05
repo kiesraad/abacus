@@ -296,6 +296,8 @@ export type AuditEvent =
   | (CommitteeSessionDetails & { event_type: "CommitteeSessionCreated" })
   | (CommitteeSessionDetails & { event_type: "CommitteeSessionDeleted" })
   | (CommitteeSessionDetails & { event_type: "CommitteeSessionUpdated" })
+  | (FileDetails & { event_type: "FileCreated" })
+  | (FileDetails & { event_type: "FileDeleted" })
   | (ElectionDetails & { event_type: "ApportionmentCreated" })
   | (PollingStationDetails & { event_type: "PollingStationCreated" })
   | (PollingStationDetails & { event_type: "PollingStationUpdated" })
@@ -805,6 +807,13 @@ export interface ExtraInvestigation {
   /** Whether extra investigation was done for another reason than an unexplained difference
 ("Heeft het gemeentelijk stembureau extra onderzoek gedaan vanwege een andere reden dan een onverklaard verschil?") */
   extra_investigation_other_reason: YesNo;
+}
+
+export interface FileDetails {
+  file_data: number[];
+  file_id: number;
+  file_mime_type: string;
+  file_name: string;
 }
 
 /**

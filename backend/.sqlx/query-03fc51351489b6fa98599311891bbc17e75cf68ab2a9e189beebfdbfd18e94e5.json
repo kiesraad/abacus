@@ -1,6 +1,6 @@
 {
   "db_name": "SQLite",
-  "query": "\n        INSERT INTO files (\n            data,\n            filename,\n            mime_type\n        ) VALUES (?, ?, ?)\n        RETURNING\n            id AS \"id: u32\",\n            data,\n            filename,\n            mime_type\n        ",
+  "query": "\n        SELECT\n            id AS \"id: u32\",\n            data,\n            name,\n            mime_type\n        FROM files\n        WHERE id = $1\n        ",
   "describe": {
     "columns": [
       {
@@ -14,7 +14,7 @@
         "type_info": "Blob"
       },
       {
-        "name": "filename",
+        "name": "name",
         "ordinal": 2,
         "type_info": "Text"
       },
@@ -25,7 +25,7 @@
       }
     ],
     "parameters": {
-      "Right": 3
+      "Right": 1
     },
     "nullable": [
       false,
@@ -34,5 +34,5 @@
       false
     ]
   },
-  "hash": "8c9c1c0c80315cf06c3fd7e945d078d9bf627ffcf05f3f80d62f76da33b2bef5"
+  "hash": "03fc51351489b6fa98599311891bbc17e75cf68ab2a9e189beebfdbfd18e94e5"
 }

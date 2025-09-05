@@ -76,6 +76,15 @@ pub struct CommitteeSessionDetails {
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, Eq, ToSchema)]
 #[serde(deny_unknown_fields)]
+pub struct FileDetails {
+    pub file_id: u32,
+    pub file_data: Vec<u8>,
+    pub file_name: String,
+    pub file_mime_type: String,
+}
+
+#[derive(Serialize, Deserialize, Debug, PartialEq, Eq, ToSchema)]
+#[serde(deny_unknown_fields)]
 pub struct PollingStationDetails {
     pub polling_station_id: u32,
     pub polling_station_election_id: u32,
@@ -162,6 +171,9 @@ pub enum AuditEvent {
     CommitteeSessionCreated(CommitteeSessionDetails),
     CommitteeSessionDeleted(CommitteeSessionDetails),
     CommitteeSessionUpdated(CommitteeSessionDetails),
+    // file events
+    FileCreated(FileDetails),
+    FileDeleted(FileDetails),
     // apportionment
     ApportionmentCreated(ElectionDetails),
     // polling station events
@@ -216,6 +228,8 @@ impl AuditEvent {
             AuditEvent::CommitteeSessionCreated(_) => AuditEventLevel::Success,
             AuditEvent::CommitteeSessionDeleted(_) => AuditEventLevel::Info,
             AuditEvent::CommitteeSessionUpdated(_) => AuditEventLevel::Success,
+            AuditEvent::FileCreated(_) => AuditEventLevel::Success,
+            AuditEvent::FileDeleted(_) => AuditEventLevel::Info,
             AuditEvent::ApportionmentCreated(_) => AuditEventLevel::Success,
             AuditEvent::PollingStationCreated(_) => AuditEventLevel::Success,
             AuditEvent::PollingStationUpdated(_) => AuditEventLevel::Success,

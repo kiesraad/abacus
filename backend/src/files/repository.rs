@@ -1,5 +1,5 @@
 use crate::DbConnLike;
-use sqlx::query_as;
+use sqlx::{query, query_as};
 
 use super::File;
 
@@ -11,7 +11,7 @@ pub async fn get_file(conn: impl DbConnLike<'_>, id: u32) -> Result<File, sqlx::
         SELECT
             id AS "id: u32",
             data,
-            filename,
+            name,
             mime_type
         FROM files
         WHERE id = $1
@@ -34,13 +34,13 @@ pub async fn create_file(
         r#"
         INSERT INTO files (
             data,
-            filename,
+            name,
             mime_type
         ) VALUES (?, ?, ?)
         RETURNING
             id AS "id: u32",
             data,
-            filename,
+            name,
             mime_type
         "#,
         data,
@@ -49,4 +49,18 @@ pub async fn create_file(
     )
     .fetch_one(conn)
     .await
+}
+
+/// Delete a single file
+pub async fn delete_file(conn: impl DbConnLike<'_>, id: u32) -> Result<bool, sqlx::Error> {
+    let mut tx = conn.begin_immediate().await?;
+
+    let rows_affected = query!(r#"DELETE FROM files WHERE id = ?"#, id,)
+        .execute(&mut *tx)
+        .await?
+        .rows_affected();
+
+    tx.commit().await?;
+
+    Ok(rows_affected > 0)
 }

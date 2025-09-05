@@ -3,7 +3,7 @@ use sqlx::{SqlitePool, Type};
 use strum::VariantNames;
 use utoipa::ToSchema;
 
-use super::CommitteeSessionError;
+use super::{CommitteeSessionError, CommitteeSessionFilesUpdateRequest, repository::change_files};
 use crate::{
     APIError, DbConnLike,
     audit_log::{AuditEvent, AuditService},
@@ -66,6 +66,35 @@ pub async fn change_committee_session_status(
         }
     };
 
+    // If resuming committee session, delete both results files from committee session and database
+    if committee_session.status == CommitteeSessionStatus::DataEntryFinished
+        && new_status == CommitteeSessionStatus::DataEntryInProgress
+        && (committee_session.results_eml.is_some() || committee_session.results_pdf.is_some())
+    {
+        change_files(
+            &pool,
+            committee_session.id,
+            CommitteeSessionFilesUpdateRequest {
+                results_eml: None,
+                results_pdf: None,
+            },
+        )
+        .await?;
+        if let Some(eml_id) = committee_session.results_eml {
+            let file = crate::files::repository::get_file(&pool, eml_id).await?;
+            crate::files::repository::delete_file(&pool, eml_id).await?;
+            audit_service
+                .log(&AuditEvent::FileDeleted(file.clone().into()), None)
+                .await?;
+        }
+        if let Some(pdf_id) = committee_session.results_pdf {
+            let file = crate::files::repository::get_file(&pool, pdf_id).await?;
+            crate::files::repository::delete_file(&pool, pdf_id).await?;
+            audit_service
+                .log(&AuditEvent::FileDeleted(file.clone().into()), None)
+                .await?;
+        }
+    }
     let committee_session = crate::committee_session::repository::change_status(
         &pool,
         committee_session_id,

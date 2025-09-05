@@ -9,6 +9,7 @@ use utoipa_axum::{router::OpenApiRouter, routes};
 
 use crate::{
     APIError, AppState, ErrorResponse,
+    audit_log::{AuditEvent, AuditService},
     authentication::Coordinator,
     committee_session::{
         CommitteeSession, CommitteeSessionError, CommitteeSessionFilesUpdateRequest,
@@ -129,6 +130,7 @@ fn zip_filename(election: ElectionWithPoliticalGroups) -> String {
 
 async fn generate_and_save_files(
     pool: SqlitePool,
+    audit_service: AuditService,
     committee_session_id: u32,
 ) -> Result<(File, File), APIError> {
     let committee_session =
@@ -165,6 +167,10 @@ async fn generate_and_save_files(
         )
         .await?;
 
+        audit_service
+            .log(&AuditEvent::FileCreated(eml.clone().into()), None)
+            .await?;
+
         let pdf_filename = input.pdf_filename();
         let model = input.into_pdf_file_model(EmlHash::from(xml_string.as_bytes()));
         let content = generate_pdf(model).await?;
@@ -175,6 +181,10 @@ async fn generate_and_save_files(
             PDF_MIME_TYPE.to_string(),
         )
         .await?;
+
+        audit_service
+            .log(&AuditEvent::FileCreated(pdf.clone().into()), None)
+            .await?;
 
         change_files(
             &pool,
@@ -223,22 +233,20 @@ async fn generate_and_save_files(
 async fn election_download_zip_results(
     _user: Coordinator,
     State(pool): State<SqlitePool>,
+    audit_service: AuditService,
     Path((election_id, committee_session_id)): Path<(u32, u32)>,
 ) -> Result<impl IntoResponse, APIError> {
     let election = crate::election::repository::get(&pool, election_id).await?;
 
-    let (eml_file, pdf_file) = generate_and_save_files(pool, committee_session_id).await?;
+    let (eml_file, pdf_file) =
+        generate_and_save_files(pool, audit_service, committee_session_id).await?;
     let zip_filename = zip_filename(election);
 
     let (zip_response, mut zip_writer) = ZipResponse::new(&zip_filename);
 
     tokio::spawn(async move {
-        zip_writer
-            .add_file(&pdf_file.filename, &pdf_file.data)
-            .await?;
-        zip_writer
-            .add_file(&eml_file.filename, &eml_file.data)
-            .await?;
+        zip_writer.add_file(&pdf_file.name, &pdf_file.data).await?;
+        zip_writer.add_file(&eml_file.name, &eml_file.data).await?;
 
         zip_writer.finish().await?;
 
@@ -275,12 +283,13 @@ async fn election_download_zip_results(
 async fn election_download_pdf_results(
     _user: Coordinator,
     State(pool): State<SqlitePool>,
+    audit_service: AuditService,
     Path((_election_id, committee_session_id)): Path<(u32, u32)>,
 ) -> Result<Attachment<Vec<u8>>, APIError> {
-    let (_, pdf_file) = generate_and_save_files(pool, committee_session_id).await?;
+    let (_, pdf_file) = generate_and_save_files(pool, audit_service, committee_session_id).await?;
 
     Ok(Attachment::new(pdf_file.data)
-        .filename(pdf_file.filename)
+        .filename(pdf_file.name)
         .content_type(pdf_file.mime_type))
 }
 
@@ -308,9 +317,10 @@ async fn election_download_pdf_results(
 async fn election_download_xml_results(
     _user: Coordinator,
     State(pool): State<SqlitePool>,
+    audit_service: AuditService,
     Path((_election_id, committee_session_id)): Path<(u32, u32)>,
 ) -> Result<impl IntoResponse, APIError> {
-    let (eml_file, _) = generate_and_save_files(pool, committee_session_id).await?;
+    let (eml_file, _) = generate_and_save_files(pool, audit_service, committee_session_id).await?;
 
     Ok((
         [(

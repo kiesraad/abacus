@@ -1,4 +1,4 @@
-import { ReactNode, useState } from "react";
+import { ChangeEvent, ReactNode, useState } from "react";
 import { useNavigate } from "react-router";
 
 import { ApiError, isError, isSuccess } from "@/api/ApiResult";
@@ -25,6 +25,7 @@ export function PollingStationImportPage() {
   const navigate = useNavigate();
 
   const [error, setError] = useState<ReactNode | undefined>();
+  const [file, setFile] = useState<File | undefined>();
   const [pollingStations, setPollingStations] = useState<PollingStationRequest[]>([]);
   const [pollingStationFileName, setPollingStationFileName] = useState<string | undefined>(undefined);
 
@@ -56,9 +57,10 @@ export function PollingStationImportPage() {
   /**
    * When a file is uploaded, backend validate the contents
    */
-  async function onFileChange(e: React.ChangeEvent<HTMLInputElement>) {
+  async function onFileChange(e: ChangeEvent<HTMLInputElement>) {
     const currentFile = e.target.files ? e.target.files[0] : undefined;
     if (currentFile !== undefined) {
+      setFile(currentFile);
       const data = await currentFile.text();
       const response = await postValidate({ data });
 
@@ -91,6 +93,8 @@ export function PollingStationImportPage() {
           );
         }
       }
+    } else {
+      setFile(undefined);
     }
   }
 
@@ -108,7 +112,7 @@ export function PollingStationImportPage() {
           <p>{t("polling_station.import_instructions")}</p>
 
           <FormLayout.Controls>
-            <FileInput id="upload-eml" onChange={(e) => void onFileChange(e)}>
+            <FileInput id="upload-eml" file={file} onChange={(e) => void onFileChange(e)}>
               {t("select_file")}
             </FileInput>
           </FormLayout.Controls>

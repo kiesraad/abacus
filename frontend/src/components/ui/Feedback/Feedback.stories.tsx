@@ -1,3 +1,5 @@
+import { ComponentProps } from "react";
+
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { expect } from "storybook/test";
 
@@ -23,7 +25,7 @@ const meta = {
 
 export default meta;
 
-type StoryArgs = Omit<React.ComponentProps<typeof Feedback>, "data"> & {
+type StoryArgs = Omit<ComponentProps<typeof Feedback>, "data"> & {
   data: ValidationResultCode[];
 };
 type Story = StoryObj<StoryArgs>;

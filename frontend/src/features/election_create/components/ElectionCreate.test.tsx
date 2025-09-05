@@ -234,7 +234,8 @@ describe("Election create pages", () => {
     await user.upload(input, file);
 
     // Expect error message, file name should be shown
-    expect(screen.getByText(filename)).toBeInTheDocument();
+    expect(screen.queryByLabelText("Geen bestand gekozen")).not.toBeInTheDocument();
+    expect(screen.getAllByText(filename).length).toBe(2);
     expect(screen.getByText("Ongeldige verkiezingsdefinitie")).toBeInTheDocument();
   });
 
@@ -254,9 +255,12 @@ describe("Election create pages", () => {
 
     const input = await screen.findByLabelText("Bestand kiezen");
     expect(input).toBeVisible();
+    expect(await screen.findByLabelText("Geen bestand gekozen")).toBeVisible();
 
     await user.upload(input, file);
 
+    expect(screen.queryByLabelText("Geen bestand gekozen")).not.toBeInTheDocument();
+    expect(screen.getAllByText(filename).length).toBe(2);
     const message = screen.getByText(/Kies een bestand van maximaal 12 Megabyte./i);
     expect(message).toBeVisible();
   });
@@ -331,7 +335,8 @@ describe("Election create pages", () => {
     await user.upload(candidateInput, file);
 
     // Expect error message, file name should be shown
-    expect(screen.getByText(filename)).toBeInTheDocument();
+    expect(screen.queryByLabelText("Geen bestand gekozen")).not.toBeInTheDocument();
+    expect(screen.getAllByText(filename).length).toBe(2);
     expect(screen.getByText("Ongeldige kandidatenlijst")).toBeInTheDocument();
   });
 
@@ -356,8 +361,11 @@ describe("Election create pages", () => {
 
     const input = await screen.findByLabelText("Bestand kiezen");
     expect(input).toBeVisible();
+    expect(await screen.findByLabelText("Geen bestand gekozen")).toBeVisible();
     await user.upload(input, file);
 
+    expect(screen.queryByLabelText("Geen bestand gekozen")).not.toBeInTheDocument();
+    expect(screen.getAllByText(filename).length).toBe(2);
     const message = screen.getByText(/Kies een bestand van maximaal 12 Megabyte./i);
     expect(message).toBeVisible();
   });
@@ -606,7 +614,11 @@ describe("Election create pages", () => {
     // Upload polling station file
     const input = await screen.findByLabelText("Bestand kiezen");
     expect(input).toBeVisible();
+    expect(await screen.findByLabelText("Geen bestand gekozen")).toBeVisible();
     await user.upload(input, file);
+
+    expect(screen.queryByLabelText("Geen bestand gekozen")).not.toBeInTheDocument();
+    expect(screen.getAllByText(filename).length).toBe(2);
     const message = screen.getByText(/Ongeldig stembureaubestand/i);
     expect(message).toBeVisible();
   });
@@ -640,7 +652,11 @@ describe("Election create pages", () => {
     // Upload polling station file
     const input = await screen.findByLabelText("Bestand kiezen");
     expect(input).toBeVisible();
+    expect(await screen.findByLabelText("Geen bestand gekozen")).toBeVisible();
     await user.upload(input, file);
+
+    expect(screen.queryByLabelText("Geen bestand gekozen")).not.toBeInTheDocument();
+    expect(screen.getAllByText(filename).length).toBe(2);
     const message = screen.getByText(/Kies een bestand van maximaal 12 Megabyte./i);
     expect(message).toBeVisible();
   });

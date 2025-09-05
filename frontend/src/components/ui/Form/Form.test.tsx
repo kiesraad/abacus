@@ -12,8 +12,21 @@ describe("UI Component: Form", () => {
       </Form>,
     );
 
-    expect(screen.getByText("Form title")).toBeInTheDocument();
-    expect(screen.getByTestId("test")).toBeInTheDocument();
+    expect(screen.getByRole("group", { name: "Form title" })).toBeVisible();
+    expect(screen.getByRole("heading", { level: 2, name: "Form title" })).toBeVisible();
+    expect(screen.getByTestId("test")).toBeVisible();
+  });
+
+  test("Form renders without title and with children", () => {
+    render(
+      <Form>
+        <input id="test" />
+      </Form>,
+    );
+
+    expect(screen.getByRole("group")).toBeVisible();
+    expect(screen.queryByRole("heading", { level: 2 })).not.toBeInTheDocument();
+    expect(screen.getByTestId("test")).toBeVisible();
   });
 
   test("Ref is forwarded", () => {

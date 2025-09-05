@@ -160,7 +160,9 @@ async fn test_election_pdf_download_works(pool: SqlitePool) {
     assert_eq!(committee_session.results_eml, None);
     assert_eq!(committee_session.results_pdf, None);
 
-    let url = format!("http://{addr}/api/elections/2/committee_sessions/2/download_pdf_results");
+    let url = format!(
+        "http://{addr}/api/elections/{election_id}/committee_sessions/2/download_pdf_results"
+    );
     let response = reqwest::Client::new()
         .get(&url)
         .header("cookie", &coordinator_cookie)
@@ -252,7 +254,9 @@ async fn test_election_xml_download_works(pool: SqlitePool) {
     assert_eq!(committee_session.results_eml, None);
     assert_eq!(committee_session.results_pdf, None);
 
-    let url = format!("http://{addr}/api/elections/2/committee_sessions/2/download_xml_results");
+    let url = format!(
+        "http://{addr}/api/elections/{election_id}/committee_sessions/2/download_xml_results"
+    );
     let response = reqwest::Client::new()
         .get(&url)
         .header("cookie", &coordinator_cookie)
@@ -335,7 +339,9 @@ async fn test_election_zip_download_works(pool: SqlitePool) {
     assert_eq!(committee_session.results_eml, None);
     assert_eq!(committee_session.results_pdf, None);
 
-    let url = format!("http://{addr}/api/elections/2/committee_sessions/2/download_zip_results");
+    let url = format!(
+        "http://{addr}/api/elections/{election_id}/committee_sessions/2/download_zip_results"
+    );
     let response = reqwest::Client::new()
         .get(&url)
         .header("cookie", &coordinator_cookie)

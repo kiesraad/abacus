@@ -464,8 +464,9 @@ async fn test_committee_session_status_change_finished_to_in_progress_deletes_fi
     );
 
     // Generate and download results files
-    let file_download_url =
-        format!("http://{addr}/api/elections/2/committee_sessions/2/download_zip_results");
+    let file_download_url = format!(
+        "http://{addr}/api/elections/{election_id}/committee_sessions/2/download_zip_results"
+    );
     let response = reqwest::Client::new()
         .get(&file_download_url)
         .header("cookie", &coordinator_cookie)

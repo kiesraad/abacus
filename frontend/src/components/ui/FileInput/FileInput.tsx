@@ -1,9 +1,11 @@
+import { DetailedHTMLProps, InputHTMLAttributes } from "react";
+
 import { t } from "@/i18n/translate";
 
 import { Button } from "../Button/Button";
 import cls from "./FileInput.module.css";
 
-type InputProps = React.DetailedHTMLProps<React.InputHTMLAttributes<HTMLInputElement>, HTMLInputElement>;
+type InputProps = DetailedHTMLProps<InputHTMLAttributes<HTMLInputElement>, HTMLInputElement>;
 
 interface FileInputProps extends InputProps {
   file?: File | undefined;

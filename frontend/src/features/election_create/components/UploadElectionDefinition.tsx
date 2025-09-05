@@ -1,4 +1,4 @@
-import { ReactNode, useState } from "react";
+import { ChangeEvent, ReactNode, useState } from "react";
 import { useNavigate } from "react-router";
 
 import { ApiError, isError, isSuccess } from "@/api/ApiResult";
@@ -18,15 +18,17 @@ export function UploadElectionDefinition() {
   const navigate = useNavigate();
   const path: ELECTION_IMPORT_VALIDATE_REQUEST_PATH = `/api/elections/import/validate`;
   const [error, setError] = useState<ReactNode | undefined>();
+  const [file, setFile] = useState<File | undefined>();
   const { create } = useCrud<ElectionDefinitionValidateResponse>({ create: path });
 
-  async function onFileChange(e: React.ChangeEvent<HTMLInputElement>) {
+  async function onFileChange(e: ChangeEvent<HTMLInputElement>) {
     const currentFile = e.target.files ? e.target.files[0] : undefined;
     if (currentFile !== undefined) {
       const data = await currentFile.text();
       const response = await create({ election_data: data });
 
       if (isSuccess(response)) {
+        setFile(undefined);
         dispatch({
           type: "SELECT_ELECTION_DEFINITION",
           response: response.data,
@@ -35,6 +37,7 @@ export function UploadElectionDefinition() {
         });
         setError(undefined);
       } else if (isError(response)) {
+        setFile(currentFile);
         // Response code 413 indicates that the file is too large
         if (response instanceof ApiError && response.code === 413) {
           setError(
@@ -109,7 +112,7 @@ export function UploadElectionDefinition() {
 
             <p>{t("election.use_instructions_to_import_eml")}</p>
 
-            <FileInput id="upload-eml" onChange={(e) => void onFileChange(e)}>
+            <FileInput id="upload-eml" file={error ? file : undefined} onChange={(e) => void onFileChange(e)}>
               {t("select_file")}
             </FileInput>
           </FormLayout.Section>

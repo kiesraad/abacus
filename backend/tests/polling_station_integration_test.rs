@@ -499,7 +499,7 @@ async fn test_polling_station_import_validate_wrong_file(pool: SqlitePool) {
         .await
         .unwrap();
 
-    assert_eq!(response.status(), StatusCode::BAD_REQUEST,);
+    assert_eq!(response.status(), StatusCode::BAD_REQUEST);
 }
 
 #[test(sqlx::test(fixtures(
@@ -521,7 +521,7 @@ async fn test_polling_station_import_missing_data(pool: SqlitePool) {
         .await
         .unwrap();
 
-    assert_eq!(response.status(), StatusCode::UNPROCESSABLE_ENTITY,);
+    assert_eq!(response.status(), StatusCode::UNPROCESSABLE_ENTITY);
 }
 
 #[test(sqlx::test(fixtures(

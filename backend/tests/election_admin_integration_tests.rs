@@ -451,7 +451,7 @@ async fn test_election_import_save_without_polling_stations(pool: SqlitePool) {
     let body: ElectionWithPoliticalGroups = response.json().await.unwrap();
     let committee_session =
         shared::get_election_committee_session(&addr, &admin_cookie, body.id).await;
-    assert_eq!(committee_session.status, CommitteeSessionStatus::Created,);
+    assert_eq!(committee_session.status, CommitteeSessionStatus::Created);
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("users"))))]

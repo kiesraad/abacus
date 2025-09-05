@@ -60,16 +60,15 @@ export function PollingStationImportPage() {
   async function onFileChange(e: ChangeEvent<HTMLInputElement>) {
     const currentFile = e.target.files ? e.target.files[0] : undefined;
     if (currentFile !== undefined) {
+      setFile(currentFile);
       const data = await currentFile.text();
       const response = await postValidate({ data });
 
       if (isSuccess(response)) {
-        setFile(undefined);
         setPollingStationFileName(currentFile.name);
         setPollingStations(response.data.polling_stations);
         setError(undefined);
       } else if (isError(response)) {
-        setFile(currentFile);
         setPollingStations([]);
         setPollingStationFileName(undefined);
 
@@ -111,7 +110,7 @@ export function PollingStationImportPage() {
           <p>{t("polling_station.import_instructions")}</p>
 
           <FormLayout.Controls>
-            <FileInput id="upload-eml" file={error ? file : undefined} onChange={(e) => void onFileChange(e)}>
+            <FileInput id="upload-eml" file={file} onChange={(e) => void onFileChange(e)}>
               {t("select_file")}
             </FileInput>
           </FormLayout.Controls>

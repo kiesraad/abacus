@@ -30,6 +30,7 @@ export function UploadCandidatesDefinition() {
   async function onFileChange(e: ChangeEvent<HTMLInputElement>) {
     const currentFile = e.target.files ? e.target.files[0] : undefined;
     if (currentFile !== undefined) {
+      setFile(currentFile);
       const data = await currentFile.text();
       const response = await create({
         candidate_data: data,
@@ -38,7 +39,6 @@ export function UploadCandidatesDefinition() {
       });
 
       if (isSuccess(response)) {
-        setFile(undefined);
         dispatch({
           type: "SELECT_CANDIDATES_DEFINITION",
           response: response.data,
@@ -47,7 +47,6 @@ export function UploadCandidatesDefinition() {
         });
         setError(undefined);
       } else if (isError(response)) {
-        setFile(currentFile);
         // Response code 413 indicates that the file is too large
         if (response instanceof ApiError && response.code === 413) {
           setError(
@@ -129,7 +128,7 @@ export function UploadCandidatesDefinition() {
             )}
 
             <p>{t("election.use_instructions_to_import_candidates_eml")}</p>
-            <FileInput id="upload-eml" file={error ? file : undefined} onChange={(e) => void onFileChange(e)}>
+            <FileInput id="upload-eml" file={file} onChange={(e) => void onFileChange(e)}>
               {t("select_file")}
             </FileInput>
           </FormLayout.Section>

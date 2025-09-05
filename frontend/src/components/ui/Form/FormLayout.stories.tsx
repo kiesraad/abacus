@@ -56,4 +56,30 @@ export const DefaultFormLayout: StoryFn = () => (
   </div>
 );
 
+export const DisabledFormLayout: StoryFn = () => (
+  <div>
+    <FormLayout disabled={true}>
+      <FormLayout.Field>
+        <ChoiceList>
+          <ChoiceList.Legend>Choose an option</ChoiceList.Legend>
+          <ChoiceList.Radio id="option1" label="Option 1">
+            Some radio option with quite a large description about the results of picking this option
+          </ChoiceList.Radio>
+          <ChoiceList.Radio id="option2" label="Option 2" checked={true}>
+            Then there is ofcourse another option which you could pick instead of the first option
+          </ChoiceList.Radio>
+          <ChoiceList.Radio id="option3" label="Option 3">
+            People should be able to choose the third option as well
+          </ChoiceList.Radio>
+        </ChoiceList>
+      </FormLayout.Field>
+      <InputField name="inp5" label="Input 5" value="some text here already" />
+      <FormLayout.Controls>
+        <Button>Submit your changes</Button>
+        <Button variant="secondary">Cancel</Button>
+      </FormLayout.Controls>
+    </FormLayout>
+  </div>
+);
+
 export default {} satisfies Meta;

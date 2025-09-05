@@ -262,10 +262,11 @@ pub async fn committee_session_status_change(
 
 #[cfg(test)]
 pub mod tests {
+    use sqlx::SqlitePool;
+
     use crate::committee_session::{
         CommitteeSession, CommitteeSessionCreateRequest, status::CommitteeSessionStatus,
     };
-    use sqlx::SqlitePool;
 
     pub async fn create_committee_session(
         pool: SqlitePool,
@@ -306,6 +307,8 @@ pub mod tests {
             start_time: "09:15".to_string(),
             status: CommitteeSessionStatus::DataEntryFinished,
             number_of_voters: 100,
+            results_eml: None,
+            results_pdf: None,
         }
     }
 }

@@ -61,6 +61,9 @@ async fn election_apportionment(
     Path(id): Path<u32>,
 ) -> Result<Json<ElectionApportionmentResponse>, APIError> {
     let election = crate::election::repository::get(&pool, id).await?;
+    let current_committee_session =
+        crate::committee_session::repository::get_election_committee_session(&pool, election.id)
+            .await?;
     let statuses = crate::data_entry::repository::statuses(&pool, id).await?;
     if !statuses.is_empty()
         && statuses
@@ -70,7 +73,7 @@ async fn election_apportionment(
         let results =
             crate::data_entry::repository::list_entries_with_polling_stations_first_session(
                 &pool,
-                election.id,
+                current_committee_session.id,
             )
             .await?;
         let election_summary = ElectionSummary::from_results(&election, &results)?;

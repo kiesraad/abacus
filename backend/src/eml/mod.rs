@@ -1,6 +1,5 @@
 pub use base::*;
 
-pub mod axum;
 mod base;
 mod common;
 mod eml_110;

@@ -1,10 +1,5 @@
 #![cfg(test)]
 
-use axum::http::StatusCode;
-use sqlx::SqlitePool;
-use test_log::test;
-
-use crate::utils::serve_api;
 use abacus::{
     ErrorResponse,
     committee_session::status::CommitteeSessionStatus,
@@ -13,6 +8,11 @@ use abacus::{
         PollingStationRequestListResponse, PollingStationType, PollingStationsRequest,
     },
 };
+use axum::http::StatusCode;
+use sqlx::SqlitePool;
+use test_log::test;
+
+use crate::utils::serve_api;
 
 pub mod shared;
 pub mod utils;
@@ -105,7 +105,7 @@ async fn test_polling_station_creation_for_committee_session_with_finished_statu
     shared::change_status_committee_session(
         &addr,
         &cookie,
-        election_id,
+        2,
         CommitteeSessionStatus::DataEntryFinished,
     )
     .await;
@@ -499,7 +499,7 @@ async fn test_polling_station_import_validate_wrong_file(pool: SqlitePool) {
         .await
         .unwrap();
 
-    assert_eq!(response.status(), StatusCode::BAD_REQUEST,);
+    assert_eq!(response.status(), StatusCode::BAD_REQUEST);
 }
 
 #[test(sqlx::test(fixtures(
@@ -521,7 +521,7 @@ async fn test_polling_station_import_missing_data(pool: SqlitePool) {
         .await
         .unwrap();
 
-    assert_eq!(response.status(), StatusCode::UNPROCESSABLE_ENTITY,);
+    assert_eq!(response.status(), StatusCode::UNPROCESSABLE_ENTITY);
 }
 
 #[test(sqlx::test(fixtures(

@@ -253,7 +253,7 @@ async fn polling_station_delete(
         )
         .await?;
 
-    if crate::polling_station::repository::list(&pool, election_id)
+    if crate::polling_station::repository::list(&pool, committee_session.id)
         .await?
         .is_empty()
     {

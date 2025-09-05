@@ -1,10 +1,9 @@
 use sqlx::{Error, query, query_as};
 
 use super::{
-    CommitteeSession, CommitteeSessionCreateRequest, CommitteeSessionUpdateRequest,
-    status::CommitteeSessionStatus,
+    CommitteeSession, CommitteeSessionCreateRequest, CommitteeSessionFilesUpdateRequest,
+    CommitteeSessionUpdateRequest, status::CommitteeSessionStatus,
 };
-
 use crate::DbConnLike;
 
 pub async fn get(
@@ -22,7 +21,9 @@ pub async fn get(
             location,
             start_date,
             start_time,
-            number_of_voters as "number_of_voters: u32"
+            number_of_voters as "number_of_voters: u32",
+            results_eml as "results_eml: _",
+            results_pdf as "results_pdf: _"
         FROM committee_sessions
         WHERE id = ?
         "#,
@@ -47,7 +48,9 @@ pub async fn get_election_committee_session_list(
             location,
             start_date,
             start_time,
-            number_of_voters as "number_of_voters: u32"
+            number_of_voters as "number_of_voters: u32",
+            results_eml as "results_eml: _",
+            results_pdf as "results_pdf: _"
         FROM committee_sessions
         WHERE election_id = ?
         ORDER BY number DESC
@@ -73,7 +76,9 @@ pub async fn get_election_committee_session(
             location,
             start_date,
             start_time,
-            number_of_voters as "number_of_voters: u32"
+            number_of_voters as "number_of_voters: u32",
+            results_eml as "results_eml: _",
+            results_pdf as "results_pdf: _"
         FROM committee_sessions
         WHERE election_id = ?
         ORDER BY number DESC
@@ -99,7 +104,9 @@ pub async fn get_committee_session_for_each_election(
             location,
             start_date,
             start_time,
-            number_of_voters as "number_of_voters: u32"
+            number_of_voters as "number_of_voters: u32",
+            results_eml as "results_eml: _",
+            results_pdf as "results_pdf: _"
         FROM (
             SELECT
             id,
@@ -110,6 +117,8 @@ pub async fn get_committee_session_for_each_election(
             start_date,
             start_time,
             number_of_voters,
+            results_eml,
+            results_pdf,
             row_number() over (
             PARTITION BY election_id
             ORDER BY number DESC
@@ -149,7 +158,9 @@ pub async fn create(
             location,
             start_date,
             start_time,
-            number_of_voters as "number_of_voters: u32"
+            number_of_voters as "number_of_voters: u32",
+            results_eml as "results_eml: _",
+            results_pdf as "results_pdf: _"
         "#,
         committee_session.number,
         committee_session.election_id,
@@ -224,7 +235,9 @@ pub async fn update(
             location,
             start_date,
             start_time,
-            number_of_voters as "number_of_voters: u32"
+            number_of_voters as "number_of_voters: u32",
+            results_eml as "results_eml: _",
+            results_pdf as "results_pdf: _"
         "#,
         committee_session_update.location,
         committee_session_update.start_date,
@@ -254,7 +267,9 @@ pub async fn change_number_of_voters(
             location,
             start_date,
             start_time,
-            number_of_voters as "number_of_voters: u32"
+            number_of_voters as "number_of_voters: u32",
+            results_eml as "results_eml: _",
+            results_pdf as "results_pdf: _"
         "#,
         number_of_voters,
         committee_session_id,
@@ -282,9 +297,44 @@ pub async fn change_status(
             location,
             start_date,
             start_time,
-            number_of_voters as "number_of_voters: u32"
+            number_of_voters as "number_of_voters: u32",
+            results_eml as "results_eml: _",
+            results_pdf as "results_pdf: _"
         "#,
         committee_session_status,
+        committee_session_id,
+    )
+    .fetch_one(conn)
+    .await
+}
+
+pub async fn change_files(
+    conn: impl DbConnLike<'_>,
+    committee_session_id: u32,
+    committee_session_files_update: CommitteeSessionFilesUpdateRequest,
+) -> Result<CommitteeSession, Error> {
+    query_as!(
+        CommitteeSession,
+        r#"
+        UPDATE committee_sessions
+        SET 
+            results_eml = ?,
+            results_pdf = ?
+        WHERE id = ?
+        RETURNING
+            id as "id: u32",
+            number as "number: u32",
+            election_id as "election_id: u32",
+            status as "status: _",
+            location,
+            start_date,
+            start_time,
+            number_of_voters as "number_of_voters: u32",
+            results_eml as "results_eml: _",
+            results_pdf as "results_pdf: _"
+        "#,
+        committee_session_files_update.results_eml,
+        committee_session_files_update.results_pdf,
         committee_session_id,
     )
     .fetch_one(conn)

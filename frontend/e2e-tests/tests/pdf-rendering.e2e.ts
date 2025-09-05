@@ -12,7 +12,7 @@ test.use({
 });
 
 test.describe("report pdf rendering", () => {
-  test("it downloads a report pdf", async ({ page, completedElection }) => {
+  test("it downloads a report pdf", async ({ page, completedElection, currentCommitteeSession }) => {
     await page.goto(`/elections/${completedElection.id}/status`);
 
     const electionStatusPage = new ElectionStatus(page);
@@ -22,7 +22,9 @@ test.describe("report pdf rendering", () => {
     await finishDataEntryPage.finishDataEntry.click();
 
     const electionReportPage = new ElectionReport(page);
-    const responsePromise = page.waitForResponse(`/api/elections/${completedElection.id}/download_pdf_results`);
+    const responsePromise = page.waitForResponse(
+      `/api/elections/${completedElection.id}/committee_sessions/${currentCommitteeSession.id}/download_pdf_results`,
+    );
     const downloadPromise = page.waitForEvent("download");
     await electionReportPage.downloadPdf.click();
 

@@ -48,12 +48,12 @@ export function ElectionReportPage() {
     throw changeStatusError;
   }
 
-  function downloadPdfResults() {
-    directDownload(`/api/elections/${election.id}/download_pdf_results`);
+  function downloadPdfResults(committeeSession: CommitteeSession) {
+    directDownload(`/api/elections/${election.id}/committee_sessions/${committeeSession.id}/download_pdf_results`);
   }
 
-  function downloadZipResults() {
-    directDownload(`/api/elections/${election.id}/download_zip_results`);
+  function downloadZipResults(committeeSession: CommitteeSession) {
+    directDownload(`/api/elections/${election.id}/committee_sessions/${committeeSession.id}/download_zip_results`);
   }
 
   function handleResume(committeeSession: CommitteeSession) {
@@ -94,12 +94,23 @@ export function ElectionReportPage() {
             {t("election_report.there_was_counting_method", { method: t(election.counting_method).toLowerCase() })}.
           </div>
           <div className={cls.reportInfoSection}>
-            <Button size="md" onClick={downloadZipResults}>
+            <Button
+              size="md"
+              onClick={() => {
+                downloadZipResults(committeeSession);
+              }}
+            >
               {t("election_report.download_zip")}
             </Button>
             <br />
             <br />
-            <Button size="md" variant="secondary" onClick={downloadPdfResults}>
+            <Button
+              size="md"
+              variant="secondary"
+              onClick={() => {
+                downloadPdfResults(committeeSession);
+              }}
+            >
               {t("election_report.download_report")}
             </Button>
           </div>

@@ -108,7 +108,8 @@ pub async fn election_details(
         .first()
         .expect("There is always one committee session")
         .clone();
-    let polling_stations = crate::polling_station::repository::list(&pool, id).await?;
+    let polling_stations =
+        crate::polling_station::repository::list(&pool, current_committee_session.id).await?;
 
     Ok(Json(ElectionDetailsResponse {
         current_committee_session,

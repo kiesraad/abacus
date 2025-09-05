@@ -6,6 +6,7 @@ import {
   COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_PATH,
   COMMITTEE_SESSION_UPDATE_REQUEST_BODY,
   COMMITTEE_SESSION_UPDATE_REQUEST_PATH,
+  CommitteeSession,
   Election,
   ELECTION_DETAILS_REQUEST_PATH,
   ELECTION_IMPORT_REQUEST_PATH,
@@ -59,6 +60,8 @@ type Fixtures = {
   pollingStationEntriesDifferentWithErrors: PollingStation;
   // Election with polling stations and two completed data entries for each
   completedElection: Election;
+  // The current committee session for the election
+  currentCommitteeSession: CommitteeSession;
   // Newly created User
   newTypist: User;
 };
@@ -201,6 +204,9 @@ export const test = base.extend<Fixtures>({
     }
 
     await use(election.election);
+  },
+  currentCommitteeSession: async ({ election }, use) => {
+    await use(election.current_committee_session);
   },
   newTypist: async ({ request }, use) => {
     await loginAs(request, "admin1");

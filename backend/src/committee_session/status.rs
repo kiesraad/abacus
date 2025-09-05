@@ -3,7 +3,7 @@ use sqlx::{SqlitePool, Type};
 use strum::VariantNames;
 use utoipa::ToSchema;
 
-use super::CommitteeSessionError;
+use super::{CommitteeSessionError, CommitteeSessionFilesUpdateRequest, repository::change_files};
 use crate::{
     APIError, DbConnLike,
     audit_log::{AuditEvent, AuditService},
@@ -54,7 +54,7 @@ pub async fn change_committee_session_status(
         CommitteeSessionStatus::DataEntryNotStarted => {
             committee_session
                 .status
-                .ready_for_data_entry(committee_session.election_id, &pool)
+                .ready_for_data_entry(committee_session.id, &pool)
                 .await?
         }
         CommitteeSessionStatus::DataEntryInProgress => {
@@ -66,6 +66,35 @@ pub async fn change_committee_session_status(
         }
     };
 
+    // If resuming committee session, delete both results files from committee session and database
+    if committee_session.status == CommitteeSessionStatus::DataEntryFinished
+        && new_status == CommitteeSessionStatus::DataEntryInProgress
+        && (committee_session.results_eml.is_some() || committee_session.results_pdf.is_some())
+    {
+        change_files(
+            &pool,
+            committee_session.id,
+            CommitteeSessionFilesUpdateRequest {
+                results_eml: None,
+                results_pdf: None,
+            },
+        )
+        .await?;
+        if let Some(eml_id) = committee_session.results_eml {
+            let file = crate::files::repository::get_file(&pool, eml_id).await?;
+            crate::files::repository::delete_file(&pool, eml_id).await?;
+            audit_service
+                .log(&AuditEvent::FileDeleted(file.clone().into()), None)
+                .await?;
+        }
+        if let Some(pdf_id) = committee_session.results_pdf {
+            let file = crate::files::repository::get_file(&pool, pdf_id).await?;
+            crate::files::repository::delete_file(&pool, pdf_id).await?;
+            audit_service
+                .log(&AuditEvent::FileDeleted(file.clone().into()), None)
+                .await?;
+        }
+    }
     let committee_session = crate::committee_session::repository::change_status(
         &pool,
         committee_session_id,
@@ -98,13 +127,13 @@ impl CommitteeSessionStatus {
 
     pub async fn ready_for_data_entry(
         self,
-        election_id: u32,
+        committee_session_id: u32,
         conn: impl DbConnLike<'_>,
     ) -> Result<Self, CommitteeSessionError> {
         match self {
             CommitteeSessionStatus::Created => {
                 let polling_stations =
-                    crate::polling_station::repository::list(conn, election_id).await?;
+                    crate::polling_station::repository::list(conn, committee_session_id).await?;
                 if polling_stations.is_empty() {
                     Err(CommitteeSessionError::InvalidStatusTransition)
                 } else {
@@ -181,8 +210,9 @@ impl Default for CommitteeSessionStatus {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
     use test_log::test;
+
+    use super::*;
 
     /// Created --> Created: prepare_data_entry
     #[test]
@@ -239,7 +269,7 @@ mod tests {
     ) {
         assert_eq!(
             CommitteeSessionStatus::Created
-                .ready_for_data_entry(6, &pool)
+                .ready_for_data_entry(7, &pool)
                 .await,
             Err(CommitteeSessionError::InvalidStatusTransition)
         );

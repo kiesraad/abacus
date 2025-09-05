@@ -1,7 +1,7 @@
-use crate::DbConnLike;
 use sqlx::{query, query_as};
 
 use super::File;
+use crate::DbConnLike;
 
 /// Get a single file
 pub async fn get_file(conn: impl DbConnLike<'_>, id: u32) -> Result<File, sqlx::Error> {

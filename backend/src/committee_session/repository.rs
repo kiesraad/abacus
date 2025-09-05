@@ -4,7 +4,6 @@ use super::{
     CommitteeSession, CommitteeSessionCreateRequest, CommitteeSessionFilesUpdateRequest,
     CommitteeSessionUpdateRequest, status::CommitteeSessionStatus,
 };
-
 use crate::DbConnLike;
 
 pub async fn get(

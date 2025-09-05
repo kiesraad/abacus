@@ -210,8 +210,9 @@ impl Default for CommitteeSessionStatus {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
     use test_log::test;
+
+    use super::*;
 
     /// Created --> Created: prepare_data_entry
     #[test]

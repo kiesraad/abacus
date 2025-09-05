@@ -1,9 +1,10 @@
 pub mod repository;
 
-use crate::audit_log::FileDetails;
 use serde::{Deserialize, Serialize};
 use sqlx::{FromRow, Type};
 use utoipa::ToSchema;
+
+use crate::audit_log::FileDetails;
 
 /// File
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq, ToSchema, Type, FromRow)]

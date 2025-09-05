@@ -1,8 +1,7 @@
 use sqlx::{query, query_as};
 
-use crate::DbConnLike;
-
 use super::structs::{PollingStation, PollingStationRequest};
+use crate::DbConnLike;
 
 /// List all polling stations from a committee session
 pub async fn list(

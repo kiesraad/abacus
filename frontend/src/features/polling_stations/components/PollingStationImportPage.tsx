@@ -27,7 +27,6 @@ export function PollingStationImportPage() {
   const [error, setError] = useState<ReactNode | undefined>();
   const [file, setFile] = useState<File | undefined>();
   const [pollingStations, setPollingStations] = useState<PollingStationRequest[]>([]);
-  const [pollingStationFileName, setPollingStationFileName] = useState<string | undefined>(undefined);
 
   const parentUrl = `/elections/${election.id}/polling-stations`;
   const validatePath = `/api/elections/${election.id}/polling_stations/validate-import`;
@@ -39,8 +38,8 @@ export function PollingStationImportPage() {
   /**
    * Import the polling stations
    */
-  async function importPollingStations() {
-    const response = await postImport({ file_name: pollingStationFileName, polling_stations: pollingStations });
+  async function importPollingStations(pollingStationsFileName: string) {
+    const response = await postImport({ file_name: pollingStationsFileName, polling_stations: pollingStations });
 
     if (isSuccess(response)) {
       pushMessage({
@@ -65,12 +64,10 @@ export function PollingStationImportPage() {
       const response = await postValidate({ data });
 
       if (isSuccess(response)) {
-        setPollingStationFileName(currentFile.name);
         setPollingStations(response.data.polling_stations);
         setError(undefined);
       } else if (isError(response)) {
         setPollingStations([]);
-        setPollingStationFileName(undefined);
 
         // Response code 413 indicates that the file is too large
         if (response instanceof ApiError && response.code === 413) {
@@ -122,7 +119,7 @@ export function PollingStationImportPage() {
   );
 
   // Show polling stations and import button
-  if (pollingStations.length > 0) {
+  if (pollingStations.length > 0 && file) {
     content = (
       <Form title={t("election.polling_stations.check.title")}>
         <FormLayout>
@@ -135,14 +132,14 @@ export function PollingStationImportPage() {
 
             <p>
               {tx("election.polling_stations.check.description", {
-                file: () => <strong>{pollingStationFileName}</strong>,
+                file: () => <strong>{file.name}</strong>,
               })}
             </p>
 
             <PollingStationsPreview pollingStations={pollingStations} />
           </FormLayout.Section>
           <FormLayout.Controls>
-            <Button type="button" onClick={() => void importPollingStations()}>
+            <Button type="button" onClick={() => void importPollingStations(file.name)}>
               {t("polling_station.import")}
             </Button>
           </FormLayout.Controls>

@@ -1066,11 +1066,13 @@ test.describe("navigation", () => {
       await expect(differencesPage.fieldset).toBeVisible();
       await expect(differencesPage.progressList.differencesIcon).toHaveAccessibleName("je bent hier");
       await differencesPage.next.click();
+      await differencesPage.checkAcceptErrorsAndWarnings();
+      await differencesPage.next.click();
 
       const candidatesListPage_1 = new CandidatesListPage(page, 1, "Partijdige Partij");
       await expect(candidatesListPage_1.fieldset).toBeVisible();
       await expect(candidatesListPage_1.progressList.votersAndVotesIcon).toHaveAccessibleName("opgeslagen");
-      await expect(candidatesListPage_1.progressList.differencesIcon).toHaveAccessibleName("leeg");
+      await expect(candidatesListPage_1.progressList.differencesIcon).toHaveAccessibleName("bevat een fout");
 
       await candidatesListPage_1.fillCandidatesAndTotal([1, 1], 90);
       await candidatesListPage_1.next.click();

@@ -14,6 +14,7 @@ label.selectedFile {
   align-content: center;
   padding-left: 1rem;
   color: var(--gray-600);
+  overflow-wrap: anywhere;
 }
 
 .fileInputBtn {

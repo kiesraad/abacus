@@ -1,6 +1,6 @@
 {
   "db_name": "SQLite",
-  "query": "\nINSERT INTO polling_station_investigations (\n  committee_session_id,\n  polling_station_id,\n  reason,\n  findings\n) VALUES (?,?,?,?)\nRETURNING\n  id as \"id: u32\",\n  polling_station_id as \"polling_station_id: u32\",\n  reason,\n  findings\n        ",
+  "query": "\nINSERT INTO polling_station_investigations (\n  committee_session_id,\n  polling_station_id,\n  reason\n) VALUES (?,?,?)\nRETURNING\n  id as \"id: u32\",\n  polling_station_id as \"polling_station_id: u32\",\n  reason,\n  findings,\n  corrected_results as \"corrected_results: bool\"\n        ",
   "describe": {
     "columns": [
       {
@@ -22,17 +22,23 @@
         "name": "findings",
         "ordinal": 3,
         "type_info": "Text"
+      },
+      {
+        "name": "corrected_results: bool",
+        "ordinal": 4,
+        "type_info": "Integer"
       }
     ],
     "parameters": {
-      "Right": 4
+      "Right": 3
     },
     "nullable": [
       false,
       false,
       false,
+      true,
       true
     ]
   },
-  "hash": "8027ec6a0a7f31b62863ceead46269fc6b777915bdab877b266bc485d26764ca"
+  "hash": "365b42507792cc7c9e1fe2833f7e63266a554f9921a3a7178d3c6e788e922825"
 }

@@ -278,6 +278,7 @@ export const getElectionMockData = (
       ...election,
     },
     polling_stations: pollingStationMockData,
+    investigations: [],
   };
 };
 

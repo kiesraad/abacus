@@ -264,7 +264,7 @@ pub async fn committee_session_status_change(
 
 /// Create an investigation for a certain polling station
 #[utoipa::path(
-    put,
+    post,
     path = "/api/committee_sessions/{committee_session_id}/investigations",
     request_body = PollingStationInvestigationCreateRequest,
     responses(

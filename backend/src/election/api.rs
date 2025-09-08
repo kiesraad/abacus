@@ -17,7 +17,9 @@ use crate::{
     APIError, AppState, ErrorResponse,
     audit_log::{AuditEvent, AuditService},
     authentication::{Admin, User},
-    committee_session::{CommitteeSession, CommitteeSessionCreateRequest},
+    committee_session::{
+        CommitteeSession, CommitteeSessionCreateRequest, PollingStationInvestigation,
+    },
     eml::{EML110, EML230, EMLDocument, EMLImportError, EmlHash, RedactedEmlHash},
     polling_station::{
         PollingStation, PollingStationRequest, PollingStationsRequest,
@@ -53,6 +55,7 @@ pub struct ElectionDetailsResponse {
     pub committee_sessions: Vec<CommitteeSession>,
     pub election: ElectionWithPoliticalGroups,
     pub polling_stations: Vec<PollingStation>,
+    pub investigations: Vec<PollingStationInvestigation>,
 }
 
 /// Get a list of all elections, without their candidate lists and
@@ -109,12 +112,16 @@ pub async fn election_details(
         .expect("There is always one committee session")
         .clone();
     let polling_stations = crate::polling_station::repository::list(&pool, id).await?;
+    let investigations =
+        crate::committee_session::repository::investigations(&pool, current_committee_session.id)
+            .await?;
 
     Ok(Json(ElectionDetailsResponse {
         current_committee_session,
         committee_sessions,
         election,
         polling_stations,
+        investigations,
     }))
 }
 

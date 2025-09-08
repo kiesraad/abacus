@@ -245,7 +245,7 @@
       }
     },
     "/api/committee_sessions/{committee_session_id}/investigations": {
-      "put": {
+      "post": {
         "summary": "Create an investigation for a certain polling station",
         "operationId": "committee_session_investigation_create",
         "parameters": [
@@ -5006,7 +5006,8 @@
           "current_committee_session",
           "committee_sessions",
           "election",
-          "polling_stations"
+          "polling_stations",
+          "investigations"
         ],
         "properties": {
           "committee_sessions": {
@@ -5020,6 +5021,12 @@
           },
           "election": {
             "$ref": "#/components/schemas/ElectionWithPoliticalGroups"
+          },
+          "investigations": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PollingStationInvestigation"
+            }
           },
           "polling_stations": {
             "type": "array",
@@ -5954,6 +5961,9 @@
           "reason"
         ],
         "properties": {
+          "corrected_results": {
+            "type": "boolean"
+          },
           "findings": {
             "type": "string"
           },
@@ -5980,6 +5990,9 @@
           "reason"
         ],
         "properties": {
+          "corrected_results": {
+            "type": "boolean"
+          },
           "findings": {
             "type": "string"
           },

@@ -61,6 +61,7 @@ const preview: Preview = {
         polling_stations: pollingStations ?? electionDetailsMockResponse.polling_stations,
         current_committee_session: electionDetailsMockResponse.current_committee_session,
         committee_sessions: electionDetailsMockResponse.committee_sessions,
+        investigations: electionDetailsMockResponse.investigations,
       };
 
       return (
@@ -70,6 +71,7 @@ const preview: Preview = {
             pollingStations: data.polling_stations,
             currentCommitteeSession: data.current_committee_session,
             committeeSessions: data.committee_sessions,
+            investigations: data.investigations,
             refetch: () => Promise.resolve({ status: ApiResponseStatus.Success, code: 200, data: data }),
           }}
         >

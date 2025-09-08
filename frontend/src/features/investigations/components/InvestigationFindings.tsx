@@ -1,20 +1,32 @@
 import { FormEvent, useState } from "react";
 import { useNavigate } from "react-router";
 
+import { isError, isSuccess } from "@/api/ApiResult";
+import { useCrud } from "@/api/useCrud";
 import { Button } from "@/components/ui/Button/Button";
 import { ChoiceList } from "@/components/ui/CheckboxAndRadio/ChoiceList";
 import { Form } from "@/components/ui/Form/Form";
 import { FormLayout } from "@/components/ui/Form/FormLayout";
 import { InputField } from "@/components/ui/InputField/InputField";
+import { useElection } from "@/hooks/election/useElection";
+import { useNumericParam } from "@/hooks/useNumericParam";
 import { t } from "@/i18n/translate";
+import {
+  COMMITTEE_SESSION_INVESTIGATION_CREATE_REQUEST_PATH,
+  PollingStationInvestigationCreateRequest,
+} from "@/types/generated/openapi";
 import { StringFormData } from "@/utils/stringFormData";
 
 export function InvestigationFindings() {
   const navigate = useNavigate();
+  const pollingStationId = useNumericParam("pollingStationId");
+  const { currentCommitteeSession, investigation } = useElection(pollingStationId);
+  const path: COMMITTEE_SESSION_INVESTIGATION_CREATE_REQUEST_PATH = `/api/committee_sessions/${currentCommitteeSession.id}/investigations`;
+  const { update } = useCrud<PollingStationInvestigationCreateRequest>({ update: path });
   const [nonEmptyError, setNonEmptyError] = useState(false);
   const [radioError, setRadioError] = useState(false);
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
     setNonEmptyError(false);
@@ -40,14 +52,19 @@ export function InvestigationFindings() {
       return;
     }
 
-    // TODO: Handle form submission
-    // const correctedResults = correctedResultsChoice === "yes";
-    // console.log({ findings, correctedResults });
+    const correctedResults = correctedResultsChoice === "yes";
+    const response = await update({ ...investigation, findings, corrected_results: correctedResults });
+    if (isSuccess(response)) {
+      await navigate("../print-corrigendum");
+    } else if (isError(response)) {
+      // TODO: error handling
+      // TODO: handle when investigation already exists (409 not unique)
+    }
     void navigate("../../../");
   };
 
   return (
-    <Form title={t("investigations.findings.investigation_findings_title")} onSubmit={handleSubmit}>
+    <Form title={t("investigations.findings.investigation_findings_title")} onSubmit={(e) => void handleSubmit(e)}>
       <FormLayout>
         <FormLayout.Section>
           <ul className="mt-0 mb-0">

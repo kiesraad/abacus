@@ -662,6 +662,7 @@ export interface ElectionDetailsResponse {
   committee_sessions: CommitteeSession[];
   current_committee_session: CommitteeSession;
   election: ElectionWithPoliticalGroups;
+  investigations: PollingStationInvestigation[];
   polling_stations: PollingStation[];
 }
 
@@ -1007,6 +1008,7 @@ export interface PollingStationImportDetails {
 }
 
 export interface PollingStationInvestigation {
+  corrected_results?: boolean;
   findings?: string;
   id: number;
   polling_station_id: number;
@@ -1014,6 +1016,7 @@ export interface PollingStationInvestigation {
 }
 
 export interface PollingStationInvestigationCreateRequest {
+  corrected_results?: boolean;
   findings?: string;
   polling_station_id: number;
   reason: string;

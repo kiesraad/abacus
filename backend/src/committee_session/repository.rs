@@ -338,3 +338,25 @@ pub async fn get_current_id_for_election(
     .await
     .map(|record| record.map(|r| r.id))
 }
+
+pub async fn investigations(
+    conn: impl DbConnLike<'_>,
+    committee_session_id: u32,
+) -> Result<Vec<PollingStationInvestigation>, Error> {
+    query_as!(
+        PollingStationInvestigation,
+        r#"
+        SELECT
+            id as "id: u32",
+polling_station_id as "polling_station_id: u32",
+reason,
+findings,
+corrected_results as "corrected_results: bool"
+FROM polling_station_investigations
+WHERE committee_session_id = ?
+        "#,
+        committee_session_id,
+    )
+    .fetch_all(conn)
+    .await
+}

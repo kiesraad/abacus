@@ -87,6 +87,9 @@ function AdministratorCoordinatorLinks({ electionList }: LinksProps) {
                 <li>
                   <Link to={`/elections/${election.id}/polling-stations`}>{t("polling_station.title.plural")}</Link>
                 </li>
+                <li>
+                  <Link to={`/elections/${election.id}/investigations`}>{t("investigations.title")}</Link>
+                </li>
               </ul>
             </li>
           ))}

@@ -45,9 +45,6 @@ export type ElectionCreateAction =
       type: "SET_NUMBER_OF_VOTERS";
       numberOfVoters: number;
       isNumberOfVotersUserEdited: boolean;
-    }
-  | {
-      type: "RESET";
     };
 
 export interface ElectionCreateState {
@@ -123,9 +120,6 @@ function reducer(state: ElectionCreateState, action: ElectionCreateAction): Elec
         numberOfVoters: action.numberOfVoters,
         isNumberOfVotersUserEdited: action.isNumberOfVotersUserEdited,
       };
-    // Empty the state
-    case "RESET":
-      return {};
   }
 }
 

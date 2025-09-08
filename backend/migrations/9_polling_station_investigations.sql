@@ -4,7 +4,7 @@ CREATE TABLE polling_station_investigations
     polling_station_id   INTEGER                           NOT NULL,
     committee_session_id INTEGER                           NOT NULL,
     reason               TEXT                              NOT NULL,
-    findings             TEXT                              NOT NULL,
+    findings             TEXT                              ,
 
     FOREIGN KEY (polling_station_id) REFERENCES polling_stations (id),
     FOREIGN KEY (committee_session_id) REFERENCES committee_sessions (id),

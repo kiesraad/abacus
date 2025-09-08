@@ -41,6 +41,7 @@ pub fn router() -> OpenApiRouter<AppState> {
         .routes(routes!(committee_session_update))
         .routes(routes!(committee_session_number_of_voters_change))
         .routes(routes!(committee_session_status_change))
+        .routes(routes!(committee_session_investigation_create))
 }
 
 /// Create a new [CommitteeSession].
@@ -278,6 +279,7 @@ pub async fn committee_session_status_change(
         ("committee_session_id" = u32, description = "Committee session database id"),
     ),
 )]
+#[axum::debug_handler]
 pub async fn committee_session_investigation_create(
     _user: Coordinator,
     State(pool): State<SqlitePool>,

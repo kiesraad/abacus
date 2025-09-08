@@ -46,6 +46,7 @@
     "PollingStationDeleted": "Stembureau verwijderd",
     "PollingStationUpdated": "Stembureau bijgewerkt",
     "PollingStationsImported": "Stembureaus geïmporteerd",
+    "PollingStationInvestigationCreated": "Onderzoek gestart",
     "UnknownEvent": "Onbekende gebeurtenis",
     "UserAccountUpdated": "Gebruikersaccount opgeslagen",
     "UserCreated": "Gebruiker aangemaakt",

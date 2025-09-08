@@ -94,6 +94,12 @@ pub struct PollingStationInvestigation {
     pub findings: Option<String>,
 }
 
+impl IntoResponse for PollingStationInvestigation {
+    fn into_response(self) -> Response {
+        Json(self).into_response()
+    }
+}
+
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq, ToSchema, Type, FromRow)]
 #[serde(deny_unknown_fields)]
 pub struct PollingStationInvestigationCreateRequest {

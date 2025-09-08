@@ -1,20 +1,28 @@
 import { FormEvent, useState } from "react";
 import { useNavigate } from "react-router";
 
+import { isError, isSuccess } from "@/api/ApiResult";
+import { useCrud } from "@/api/useCrud";
 import { Button } from "@/components/ui/Button/Button";
 import { Form } from "@/components/ui/Form/Form";
 import { FormLayout } from "@/components/ui/Form/FormLayout";
 import { InputField } from "@/components/ui/InputField/InputField";
+import { useElection } from "@/hooks/election/useElection";
+import { useNumericParam } from "@/hooks/useNumericParam";
 import { t } from "@/i18n/translate";
+import {
+  COMMITTEE_SESSION_INVESTIGATION_CREATE_REQUEST_PATH,
+  PollingStationInvestigationCreateRequest,
+} from "@/types/generated/openapi";
 import { StringFormData } from "@/utils/stringFormData";
-import { useCrud } from "@/api/useCrud";
-import { PollingStationInvestigation } from "@/types/generated/openapi";
 
 export function InvestigationReason() {
   const navigate = useNavigate();
+  const pollingStationId = useNumericParam("pollingStationId");
+  const { currentCommitteeSession } = useElection();
   const [nonEmptyError, setNonEmptyError] = useState(false);
-  const path: COMMITTEE_SESSION_INVESTIGATION_CREATE = `/api/committee_sessions/{committee_session_id}/investigations`;
-  const { update } = useCrud<PollingStationInvestigation>({ update: path });
+  const path: COMMITTEE_SESSION_INVESTIGATION_CREATE_REQUEST_PATH = `/api/committee_sessions/${currentCommitteeSession.id}/investigations`;
+  const { update } = useCrud<PollingStationInvestigationCreateRequest>({ update: path });
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -29,15 +37,22 @@ export function InvestigationReason() {
 
     setNonEmptyError(false);
 
-    console.log(formData);
-    // TODO: Handle form submission
-    const response = await update({ polling_station_id, reason, });
-
-    //void navigate("../print-corrigendum");
+    const response = await update({ polling_station_id: pollingStationId, reason });
+    if (isSuccess(response)) {
+      await navigate("../print-corrigendum");
+    } else if (isError(response)) {
+      // TODO: error handling
+      // TODO: handle when investigation already exists (409 not unique)
+    }
   };
 
   return (
-    <Form title={t("investigations.reason_and_assignment.central_polling_station")} onSubmit={handleSubmit}>
+    <Form
+      title={t("investigations.reason_and_assignment.central_polling_station")}
+      onSubmit={(e) => {
+        void handleSubmit(e);
+      }}
+    >
       <FormLayout>
         <FormLayout.Section>
           <section className="sm">

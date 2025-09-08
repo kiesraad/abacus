@@ -22,7 +22,7 @@ export function InvestigationReason() {
   const { currentCommitteeSession } = useElection();
   const [nonEmptyError, setNonEmptyError] = useState(false);
   const path: COMMITTEE_SESSION_INVESTIGATION_CREATE_REQUEST_PATH = `/api/committee_sessions/${currentCommitteeSession.id}/investigations`;
-  const { update } = useCrud<PollingStationInvestigationCreateRequest>({ update: path });
+  const { create } = useCrud<PollingStationInvestigationCreateRequest>({ create: path });
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -37,7 +37,7 @@ export function InvestigationReason() {
 
     setNonEmptyError(false);
 
-    const response = await update({ polling_station_id: pollingStationId, reason });
+    const response = await create({ polling_station_id: pollingStationId, reason });
     if (isSuccess(response)) {
       await navigate("../print-corrigendum");
     } else if (isError(response)) {

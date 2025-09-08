@@ -8,11 +8,12 @@ import { ChoiceList } from "@/components/ui/CheckboxAndRadio/ChoiceList";
 import { Form } from "@/components/ui/Form/Form";
 import { FormLayout } from "@/components/ui/Form/FormLayout";
 import { InputField } from "@/components/ui/InputField/InputField";
+import { Loader } from "@/components/ui/Loader/Loader";
 import { useElection } from "@/hooks/election/useElection";
 import { useNumericParam } from "@/hooks/useNumericParam";
 import { t } from "@/i18n/translate";
 import {
-  COMMITTEE_SESSION_INVESTIGATION_CREATE_REQUEST_PATH,
+  COMMITTEE_SESSION_INVESTIGATION_CONCLUDE_REQUEST_PATH,
   PollingStationInvestigationCreateRequest,
 } from "@/types/generated/openapi";
 import { StringFormData } from "@/utils/stringFormData";
@@ -21,10 +22,14 @@ export function InvestigationFindings() {
   const navigate = useNavigate();
   const pollingStationId = useNumericParam("pollingStationId");
   const { election, currentCommitteeSession, investigation } = useElection(pollingStationId);
-  const path: COMMITTEE_SESSION_INVESTIGATION_CREATE_REQUEST_PATH = `/api/committee_sessions/${currentCommitteeSession.id}/investigations`;
+  const path: COMMITTEE_SESSION_INVESTIGATION_CONCLUDE_REQUEST_PATH = `/api/committee_sessions/${currentCommitteeSession.id}/investigations`;
   const { update } = useCrud<PollingStationInvestigationCreateRequest>({ update: path });
   const [nonEmptyError, setNonEmptyError] = useState(false);
   const [radioError, setRadioError] = useState(false);
+
+  if (!investigation) {
+    return <Loader />;
+  }
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -53,7 +58,7 @@ export function InvestigationFindings() {
     }
 
     const correctedResults = correctedResultsChoice === "yes";
-    const response = await update({ ...investigation, findings, corrected_results: correctedResults });
+    const response = await update({ id: investigation.id, findings, corrected_results: correctedResults });
     if (isSuccess(response)) {
       await navigate(`/elections/${election.id}/investigations`);
     } else if (isError(response)) {

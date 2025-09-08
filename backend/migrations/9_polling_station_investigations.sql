@@ -5,6 +5,7 @@ CREATE TABLE polling_station_investigations
     committee_session_id INTEGER                           NOT NULL,
     reason               TEXT                              NOT NULL,
     findings             TEXT                              ,
+    corrected_results    INTEGER                           ,
 
     FOREIGN KEY (polling_station_id) REFERENCES polling_stations (id),
     FOREIGN KEY (committee_session_id) REFERENCES committee_sessions (id),

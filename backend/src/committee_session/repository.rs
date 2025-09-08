@@ -133,19 +133,18 @@ pub async fn create_polling_station_investigation(
 INSERT INTO polling_station_investigations (
   committee_session_id,
   polling_station_id,
-  reason,
-  findings
-) VALUES (?,?,?,?)
+  reason
+) VALUES (?,?,?)
 RETURNING
   id as "id: u32",
   polling_station_id as "polling_station_id: u32",
   reason,
-  findings
+  findings,
+  corrected_results as "corrected_results: bool"
         "#,
         committee_session_id,
         polling_station_investigation.polling_station_id,
         polling_station_investigation.reason,
-        polling_station_investigation.findings,
     )
     .fetch_one(conn)
     .await

@@ -92,6 +92,9 @@ pub struct PollingStationInvestigation {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[schema(nullable = false)]
     pub findings: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[schema(nullable = false)]
+    pub corrected_results: Option<bool>,
 }
 
 impl IntoResponse for PollingStationInvestigation {
@@ -108,4 +111,7 @@ pub struct PollingStationInvestigationCreateRequest {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[schema(nullable = false)]
     pub findings: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[schema(nullable = false)]
+    pub corrected_results: Option<bool>,
 }

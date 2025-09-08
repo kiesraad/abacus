@@ -115,3 +115,11 @@ pub struct PollingStationInvestigationCreateRequest {
     #[schema(nullable = false)]
     pub corrected_results: Option<bool>,
 }
+
+#[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq, ToSchema, Type, FromRow)]
+#[serde(deny_unknown_fields)]
+pub struct PollingStationInvestigationConcludeRequest {
+    pub id: u32,
+    pub findings: String,
+    pub corrected_results: bool,
+}

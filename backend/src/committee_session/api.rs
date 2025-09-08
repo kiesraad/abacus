@@ -11,13 +11,14 @@ use super::{
     CommitteeSession, CommitteeSessionCreateRequest, CommitteeSessionNumberOfVotersChangeRequest,
     CommitteeSessionStatusChangeRequest, CommitteeSessionUpdateRequest, NewCommitteeSessionRequest,
     PollingStationInvestigation, PollingStationInvestigationCreateRequest,
-    repository::create_polling_station_investigation,
+    repository::{conclude_polling_station_investigation, create_polling_station_investigation},
     status::{CommitteeSessionStatus, change_committee_session_status},
 };
 use crate::{
     APIError, AppState, ErrorResponse,
     audit_log::{AuditEvent, AuditService},
     authentication::Coordinator,
+    committee_session::PollingStationInvestigationConcludeRequest,
 };
 
 #[derive(Debug, PartialEq, Eq)]
@@ -42,6 +43,7 @@ pub fn router() -> OpenApiRouter<AppState> {
         .routes(routes!(committee_session_number_of_voters_change))
         .routes(routes!(committee_session_status_change))
         .routes(routes!(committee_session_investigation_create))
+        .routes(routes!(committee_session_investigation_conclude))
 }
 
 /// Create a new [CommitteeSession].
@@ -279,7 +281,6 @@ pub async fn committee_session_status_change(
         ("committee_session_id" = u32, description = "Committee session database id"),
     ),
 )]
-#[axum::debug_handler]
 pub async fn committee_session_investigation_create(
     _user: Coordinator,
     State(pool): State<SqlitePool>,
@@ -297,6 +298,42 @@ pub async fn committee_session_investigation_create(
     audit_service
         .log(
             &AuditEvent::PollingStationInvestigationCreated(investigation.clone()),
+            None,
+        )
+        .await?;
+
+    Ok(investigation)
+}
+
+/// Conclude an investigation for a certain polling station
+#[utoipa::path(
+    put,
+    path = "/api/committee_sessions/{committee_session_id}/investigations",
+    request_body = PollingStationInvestigationConcludeRequest,
+    responses(
+        (status = 200, description = "Committee session investigation concluded successfully"),
+        (status = 401, description = "Unauthorized", body = ErrorResponse),
+        (status = 403, description = "Forbidden", body = ErrorResponse),
+        (status = 404, description = "Committee session not found", body = ErrorResponse),
+        (status = 409, description = "Request cannot be completed", body = ErrorResponse),
+        (status = 500, description = "Internal server error", body = ErrorResponse),
+    ),
+    params(
+        ("committee_session_id" = u32, description = "Committee session database id"),
+    ),
+)]
+pub async fn committee_session_investigation_conclude(
+    _user: Coordinator,
+    State(pool): State<SqlitePool>,
+    audit_service: AuditService,
+    Json(polling_station_investigation): Json<PollingStationInvestigationConcludeRequest>,
+) -> Result<PollingStationInvestigation, APIError> {
+    let investigation =
+        conclude_polling_station_investigation(&pool, polling_station_investigation).await?;
+
+    audit_service
+        .log(
+            &AuditEvent::PollingStationInvestigationConcluded(investigation.clone()),
             None,
         )
         .await?;

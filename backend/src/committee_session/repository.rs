@@ -2,8 +2,8 @@ use sqlx::{Error, query, query_as};
 
 use super::{
     CommitteeSession, CommitteeSessionCreateRequest, CommitteeSessionUpdateRequest,
-    PollingStationInvestigation, PollingStationInvestigationCreateRequest,
-    status::CommitteeSessionStatus,
+    PollingStationInvestigation, PollingStationInvestigationConcludeRequest,
+    PollingStationInvestigationCreateRequest, status::CommitteeSessionStatus,
 };
 
 use crate::DbConnLike;
@@ -130,21 +130,49 @@ pub async fn create_polling_station_investigation(
     query_as!(
         PollingStationInvestigation,
         r#"
-INSERT INTO polling_station_investigations (
-  committee_session_id,
-  polling_station_id,
-  reason
-) VALUES (?,?,?)
-RETURNING
-  id as "id: u32",
-  polling_station_id as "polling_station_id: u32",
-  reason,
-  findings,
-  corrected_results as "corrected_results: bool"
+        INSERT INTO polling_station_investigations (
+          committee_session_id,
+          polling_station_id,
+          reason
+        ) VALUES (?,?,?)
+        RETURNING
+          id as "id: u32",
+          polling_station_id as "polling_station_id: u32",
+          reason,
+          findings,
+          corrected_results as "corrected_results: bool"
         "#,
         committee_session_id,
         polling_station_investigation.polling_station_id,
         polling_station_investigation.reason,
+    )
+    .fetch_one(conn)
+    .await
+}
+
+pub async fn conclude_polling_station_investigation(
+    conn: impl DbConnLike<'_>,
+    polling_station_investigation: PollingStationInvestigationConcludeRequest,
+) -> Result<PollingStationInvestigation, Error> {
+    query_as!(
+        PollingStationInvestigation,
+        r#"
+        UPDATE polling_station_investigations
+        SET
+          findings = ?,
+          corrected_results = ?
+        WHERE
+          id = ?
+        RETURNING
+          id as "id: u32",
+          polling_station_id as "polling_station_id: u32",
+          reason,
+          findings,
+          corrected_results as "corrected_results: bool"
+        "#,
+        polling_station_investigation.findings,
+        polling_station_investigation.corrected_results,
+        polling_station_investigation.id,
     )
     .fetch_one(conn)
     .await

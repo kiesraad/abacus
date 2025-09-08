@@ -19,6 +19,11 @@ export interface COMMITTEE_SESSION_DELETE_REQUEST_PARAMS {
 export type COMMITTEE_SESSION_DELETE_REQUEST_PATH = `/api/committee_sessions/${number}`;
 
 // /api/committee_sessions/{committee_session_id}/investigations
+export interface COMMITTEE_SESSION_INVESTIGATION_CONCLUDE_REQUEST_PARAMS {
+  committee_session_id: number;
+}
+export type COMMITTEE_SESSION_INVESTIGATION_CONCLUDE_REQUEST_PATH = `/api/committee_sessions/${number}/investigations`;
+export type COMMITTEE_SESSION_INVESTIGATION_CONCLUDE_REQUEST_BODY = PollingStationInvestigationConcludeRequest;
 export interface COMMITTEE_SESSION_INVESTIGATION_CREATE_REQUEST_PARAMS {
   committee_session_id: number;
 }
@@ -298,6 +303,7 @@ export type AuditEvent =
   | (CommitteeSessionDetails & { event_type: "CommitteeSessionDeleted" })
   | (CommitteeSessionDetails & { event_type: "CommitteeSessionUpdated" })
   | (PollingStationInvestigation & { event_type: "PollingStationInvestigationCreated" })
+  | (PollingStationInvestigation & { event_type: "PollingStationInvestigationConcluded" })
   | (ElectionDetails & { event_type: "ApportionmentCreated" })
   | (PollingStationDetails & { event_type: "PollingStationCreated" })
   | (PollingStationDetails & { event_type: "PollingStationUpdated" })
@@ -1013,6 +1019,12 @@ export interface PollingStationInvestigation {
   id: number;
   polling_station_id: number;
   reason: string;
+}
+
+export interface PollingStationInvestigationConcludeRequest {
+  corrected_results: boolean;
+  findings: string;
+  id: number;
 }
 
 export interface PollingStationInvestigationCreateRequest {

@@ -20,7 +20,7 @@ import { StringFormData } from "@/utils/stringFormData";
 export function InvestigationFindings() {
   const navigate = useNavigate();
   const pollingStationId = useNumericParam("pollingStationId");
-  const { currentCommitteeSession, investigation } = useElection(pollingStationId);
+  const { election, currentCommitteeSession, investigation } = useElection(pollingStationId);
   const path: COMMITTEE_SESSION_INVESTIGATION_CREATE_REQUEST_PATH = `/api/committee_sessions/${currentCommitteeSession.id}/investigations`;
   const { update } = useCrud<PollingStationInvestigationCreateRequest>({ update: path });
   const [nonEmptyError, setNonEmptyError] = useState(false);
@@ -55,12 +55,11 @@ export function InvestigationFindings() {
     const correctedResults = correctedResultsChoice === "yes";
     const response = await update({ ...investigation, findings, corrected_results: correctedResults });
     if (isSuccess(response)) {
-      await navigate("../print-corrigendum");
+      await navigate(`/elections/${election.id}/investigations`);
     } else if (isError(response)) {
       // TODO: error handling
       // TODO: handle when investigation already exists (409 not unique)
     }
-    void navigate("../../../");
   };
 
   return (

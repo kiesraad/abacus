@@ -53,7 +53,8 @@ describe("PollingStationImportPage", () => {
 
     await user.upload(input, file);
 
-    expect(screen.getByText(filename)).toBeInTheDocument();
+    expect(screen.queryByLabelText("Geen bestand gekozen")).not.toBeInTheDocument();
+    expect(screen.getAllByText(filename).length).toBe(2);
     expect(screen.getByText("Ongeldig stembureaubestand")).toBeInTheDocument();
   });
 
@@ -83,7 +84,8 @@ describe("PollingStationImportPage", () => {
 
     await user.upload(input, file);
 
-    expect(screen.getByText(filename)).toBeInTheDocument();
+    expect(screen.queryByLabelText("Geen bestand gekozen")).not.toBeInTheDocument();
+    expect(screen.getAllByText(filename).length).toBe(2);
     expect(screen.getByText(/Kies een bestand van maximaal 12 Megabyte./i)).toBeInTheDocument();
   });
 

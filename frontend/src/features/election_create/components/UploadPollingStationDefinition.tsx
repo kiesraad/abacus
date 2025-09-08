@@ -1,4 +1,4 @@
-import { ReactNode, useState } from "react";
+import { ChangeEvent, ReactNode, useState } from "react";
 import { Navigate, useNavigate } from "react-router";
 
 import { ApiError, isError, isSuccess } from "@/api/ApiResult";
@@ -20,7 +20,7 @@ export function UploadPollingStationDefinition() {
 
   const path: ELECTION_IMPORT_VALIDATE_REQUEST_PATH = `/api/elections/import/validate`;
   const [error, setError] = useState<ReactNode | undefined>();
-
+  const [file, setFile] = useState<File | undefined>();
   const { create } = useCrud<ElectionDefinitionValidateResponse>({ create: path });
 
   // if no data was stored, navigate back to beginning
@@ -32,9 +32,10 @@ export function UploadPollingStationDefinition() {
     await navigate("/elections/create/counting-method-type");
   }
 
-  async function onFileChange(e: React.ChangeEvent<HTMLInputElement>) {
+  async function onFileChange(e: ChangeEvent<HTMLInputElement>) {
     const currentFile = e.target.files ? e.target.files[0] : undefined;
     if (currentFile !== undefined) {
+      setFile(currentFile);
       const data = await currentFile.text();
       const response = await create({
         election_hash: state.electionDefinitionHash,
@@ -75,6 +76,8 @@ export function UploadPollingStationDefinition() {
           );
         }
       }
+    } else {
+      setFile(undefined);
     }
   }
 
@@ -120,7 +123,7 @@ export function UploadPollingStationDefinition() {
             )}
 
             <p>{t("election.use_instructions_to_import_polling_stations_eml")}</p>
-            <FileInput id="upload-eml" onChange={(e) => void onFileChange(e)}>
+            <FileInput id="upload-eml" file={file} onChange={(e) => void onFileChange(e)}>
               {t("select_file")}
             </FileInput>
 

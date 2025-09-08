@@ -8,13 +8,14 @@ import { FormLayout } from "./FormLayout";
 
 export const DefaultFormLayout: StoryFn = () => (
   <div>
+    <FormLayout.Alert>
+      {/* FormLayout.Alert is outside of the FormLayout to prevent extra margin on the bottom. */}
+      <Alert type="success">
+        <h2>It works!</h2>
+        <p>This is a success alert.</p>
+      </Alert>
+    </FormLayout.Alert>
     <FormLayout>
-      <FormLayout.Alert>
-        <Alert type="success">
-          <h2>It works!</h2>
-          <p>This is a success alert.</p>
-        </Alert>
-      </FormLayout.Alert>
       <FormLayout.Section title="Section title which for a medium width form body is slightly wider">
         <p>
           Here is a description of this form, which should have a maximum width set by the width property of this

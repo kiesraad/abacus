@@ -216,7 +216,7 @@ Bijvoorbeeld een schorsing of als er meerdere verkiezingen tegelijk werden georg
     letterbox(
       "H",
       light: false,
-      value: input.summary.votes_counts.invalid_votes_count,
+      value: input.summary.votes_counts.total_votes_cast_count,
     )[*Totaal uitgebrachte stemmen (E+F+G)*],
   )
 ]

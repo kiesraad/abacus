@@ -25,7 +25,9 @@ use crate::{
     audit_log::{AuditEvent, AuditService},
     authentication::{Coordinator, Typist, User},
     committee_session::{CommitteeSession, CommitteeSessionError, status::CommitteeSessionStatus},
-    data_entry::{PollingStationResults, VotesCounts},
+    data_entry::{
+        PollingStationResults, VotesCounts, repository::most_recent_results_for_polling_station,
+    },
     election::ElectionWithPoliticalGroups,
     error::{ErrorReference, ErrorResponse},
     polling_station::PollingStation,
@@ -61,6 +63,9 @@ pub struct ClaimDataEntryResponse {
     #[schema(value_type = Object)]
     pub client_state: Option<serde_json::Value>,
     pub validation_results: ValidationResults,
+    #[serde(skip_serializing_if = "Option::is_none", default)]
+    #[schema(nullable = false)]
+    pub previous_results: Option<PollingStationResults>,
 }
 
 pub fn router() -> OpenApiRouter<AppState> {
@@ -235,10 +240,17 @@ async fn polling_station_data_entry_claim(
         .await?;
 
     let client_state = new_state.get_client_state().map(|v| v.to_owned());
+    let previous_results = if let Some(id) = polling_station.id_prev_session {
+        most_recent_results_for_polling_station(&pool, id).await?
+    } else {
+        None
+    };
+
     Ok(Json(ClaimDataEntryResponse {
         data: data.clone(),
         client_state,
         validation_results,
+        previous_results,
     }))
 }
 

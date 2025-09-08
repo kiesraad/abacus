@@ -408,6 +408,7 @@ export interface CandidateVotes {
 export interface ClaimDataEntryResponse {
   client_state: unknown;
   data: PollingStationResults;
+  previous_results?: PollingStationResults;
   validation_results: ValidationResults;
 }
 

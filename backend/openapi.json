@@ -4210,6 +4210,9 @@
           "data": {
             "$ref": "#/components/schemas/PollingStationResults"
           },
+          "previous_results": {
+            "$ref": "#/components/schemas/PollingStationResults"
+          },
           "validation_results": {
             "$ref": "#/components/schemas/ValidationResults"
           }

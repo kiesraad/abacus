@@ -14,7 +14,13 @@ pub async fn list(
         crate::committee_session::repository::get_current_id_for_election(&mut *tx, election_id)
             .await?
             .ok_or(sqlx::Error::RowNotFound)?;
+    list_for_committee_session(&mut *tx, committee_session_id).await
+}
 
+pub async fn list_for_committee_session(
+    conn: impl DbConnLike<'_>,
+    committee_session_id: u32,
+) -> Result<Vec<PollingStation>, sqlx::Error> {
     query_as!(
         PollingStation,
         r#"
@@ -36,7 +42,7 @@ pub async fn list(
         "#,
         committee_session_id
     )
-    .fetch_all(&mut *tx)
+    .fetch_all(conn)
     .await
 }
 

@@ -1,8 +1,10 @@
 import * as React from "react";
 
+import { cn } from "@/utils/classnames";
+
 import { FormField } from "../FormField/FormField";
 import { NumberInput } from "../NumberInput/NumberInput";
-import { InputGrid } from "./InputGrid";
+import { InputGrid, InputGridRowCells } from "./InputGrid";
 import cls from "./InputGrid.module.css";
 
 export interface InputGridRowProps {
@@ -59,11 +61,11 @@ export function InputGridRow({
     }
   }, [errorMessageId]);
 
-  const children: [React.ReactElement, React.ReactElement, React.ReactElement] = [
-    <td key={`${id}-1`} id={`field-${id}`}>
+  const children: InputGridRowCells = [
+    <td key={`field-${id}`} id={`field-${id}`} className={cls.field}>
       {field}
     </td>,
-    <td key={`${id}-2`} id={`cell-${id}`} className={readOnly ? cls.readOnly : undefined}>
+    <td key={`value-${id}`} id={`value-${id}`} className={cn(cls.value, readOnly && cls.readOnly)}>
       <FormField hasError={!!errorMessageId || hasError} hasWarning={hasWarning}>
         {readOnly ? (
           <span className="font-number">{value !== undefined ? value : defaultValue}</span>
@@ -84,7 +86,7 @@ export function InputGridRow({
         )}
       </FormField>
     </td>,
-    <td key={`${id}-3`} id={`title-${id}`}>
+    <td key={`title-${id}`} id={`title-${id}`} className={cls.title}>
       {title}
     </td>,
   ];

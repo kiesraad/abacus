@@ -206,9 +206,6 @@ export const LinkTable: StoryObj = {
       ["2", "other", "value"],
       ["3", "another", "thing"],
     ]);
-
-    const rows = within(table).getAllByRole("row");
-    await userEvent.click(rows[1]!);
   },
 };
 

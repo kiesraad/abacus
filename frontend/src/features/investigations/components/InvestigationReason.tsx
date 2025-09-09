@@ -1,7 +1,7 @@
 import { FormEvent, useState } from "react";
 import { useNavigate } from "react-router";
 
-import { isError, isSuccess } from "@/api/ApiResult";
+import { AnyApiError, isError, isSuccess } from "@/api/ApiResult";
 import { useCrud } from "@/api/useCrud";
 import { Button } from "@/components/ui/Button/Button";
 import { Form } from "@/components/ui/Form/Form";
@@ -24,6 +24,12 @@ export function InvestigationReason() {
   const path: COMMITTEE_SESSION_INVESTIGATION_CREATE_REQUEST_PATH = `/api/committee_sessions/${currentCommitteeSession.id}/investigations`;
   const { create } = useCrud<PollingStationInvestigationCreateRequest>({ create: path });
 
+  const [error, setError] = useState<AnyApiError>();
+
+  if (error) {
+    throw error;
+  }
+
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
@@ -41,17 +47,14 @@ export function InvestigationReason() {
     if (isSuccess(response)) {
       await navigate("../print-corrigendum");
     } else if (isError(response)) {
-      // TODO: error handling
-      // TODO: handle when investigation already exists (409 not unique)
+      setError(response);
     }
   };
 
   return (
     <Form
       title={t("investigations.reason_and_assignment.central_polling_station")}
-      onSubmit={(e) => {
-        void handleSubmit(e);
-      }}
+      onSubmit={(e) => void handleSubmit(e)}
     >
       <FormLayout>
         <FormLayout.Section>

@@ -6,7 +6,7 @@ use crate::{
     data_entry::{
         CSOFirstSessionResults, CandidateVotes, Count, DifferencesCounts,
         PoliticalGroupCandidateVotes, PoliticalGroupTotalVotes, Validate, ValidationResults,
-        VotersCounts, VotesCounts, YesNo,
+        VotersCounts, VotesCounts,
     },
     election::ElectionWithPoliticalGroups,
     error::ErrorReference,
@@ -177,8 +177,6 @@ impl SummaryDifferenceCountsCompareVotesCastAdmittedVoters {
 pub struct SummaryDifferencesCounts {
     pub more_ballots_count: SumCount,
     pub fewer_ballots_count: SumCount,
-    pub compare_votes_cast_admitted_voters: SummaryDifferenceCountsCompareVotesCastAdmittedVoters,
-    pub difference_completely_accounted_for: YesNo,
 }
 
 impl SummaryDifferencesCounts {
@@ -187,12 +185,6 @@ impl SummaryDifferencesCounts {
         SummaryDifferencesCounts {
             more_ballots_count: SumCount::zero(),
             fewer_ballots_count: SumCount::zero(),
-            compare_votes_cast_admitted_voters:
-                SummaryDifferenceCountsCompareVotesCastAdmittedVoters::zero(),
-            difference_completely_accounted_for: YesNo {
-                yes: false,
-                no: false,
-            },
         }
     }
 
@@ -206,26 +198,6 @@ impl SummaryDifferencesCounts {
             .add(polling_station, differences_counts.more_ballots_count);
         self.fewer_ballots_count
             .add(polling_station, differences_counts.fewer_ballots_count);
-
-        self.compare_votes_cast_admitted_voters
-            .votes_cast_greater_than_admitted_voters = differences_counts
-            .compare_votes_cast_admitted_voters
-            .votes_cast_greater_than_admitted_voters;
-
-        self.compare_votes_cast_admitted_voters
-            .votes_cast_smaller_than_admitted_voters = differences_counts
-            .compare_votes_cast_admitted_voters
-            .votes_cast_smaller_than_admitted_voters;
-
-        self.compare_votes_cast_admitted_voters
-            .admitted_voters_equal_votes_cast = differences_counts
-            .compare_votes_cast_admitted_voters
-            .admitted_voters_equal_votes_cast;
-
-        self.difference_completely_accounted_for.yes =
-            differences_counts.difference_completely_accounted_for.yes;
-        self.difference_completely_accounted_for.no =
-            differences_counts.difference_completely_accounted_for.no;
     }
 }
 
@@ -431,11 +403,6 @@ mod tests {
         diff.add_polling_station_results(&ps[0], &diff2);
 
         assert_eq!(diff.more_ballots_count.count, 1);
-        assert!(diff.difference_completely_accounted_for.yes);
-        assert!(
-            diff.compare_votes_cast_admitted_voters
-                .votes_cast_greater_than_admitted_voters
-        );
         assert_eq!(diff.more_ballots_count.polling_stations, vec![123]);
         assert_eq!(diff.fewer_ballots_count.count, 0);
 

@@ -16,10 +16,11 @@ import { LoginResponse, POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_BODY } from "@/t
 
 import { getDefaultDataEntryState, getEmptyDataEntryRequest } from "../../testing/mock-data";
 import {
-  expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage,
-  expectFieldsToBeValidAndToNotHaveAccessibleErrorMessage,
+  expectCheckboxListToBeInvalidAndToHaveTextContent,
+  expectCheckboxToBeValidAndToNotHaveAccessibleErrorMessage,
   expectFieldsToHaveIconAndToHaveAccessibleName,
-  expectFieldsToNotHaveIcon,
+  expectInputToBeValidAndToNotHaveAccessibleErrorMessage,
+  expectInputToNotHaveIcon,
   overrideServerClaimDataEntryResponse,
 } from "../../testing/test.utils";
 import { DataEntryProvider } from "../DataEntryProvider";
@@ -43,8 +44,17 @@ function renderForm() {
 }
 
 const differencesFieldIds = {
-  moreBallotsCount: "data.differences_counts.more_ballots_count",
-  fewerBallotsCount: "data.differences_counts.fewer_ballots_count",
+  moreBallotsCount: "differences_counts.more_ballots_count",
+  fewerBallotsCount: "differences_counts.fewer_ballots_count",
+  compareVotesCastAdmittedVoters: "differences_counts.compare_votes_cast_admitted_voters",
+  isAdmittedVotersEqualsVotesCast:
+    "differences_counts.compare_votes_cast_admitted_voters.admitted_voters_equal_votes_cast",
+  isVotesCastGreaterThanAdmittedVoters:
+    "differences_counts.compare_votes_cast_admitted_voters.votes_cast_greater_than_admitted_voters",
+  isVotesCastSmallerThanAdmittedVoters:
+    "differences_counts.compare_votes_cast_admitted_voters.votes_cast_smaller_than_admitted_voters",
+  isDifferenceCompletelyAccountedForYes: "differences_counts.difference_completely_accounted_for.yes",
+  isDifferenceCompletelyAccountedForNo: "differences_counts.difference_completely_accounted_for.no",
 };
 
 describe("Test DifferencesForm", () => {
@@ -196,7 +206,9 @@ describe("Test DifferencesForm", () => {
   });
 
   describe("DifferencesForm errors", () => {
-    test("F.301 IncorrectDifference", async () => {
+    const validationError = "Controleer of je antwoord gelijk is aan het papieren proces-verbaal";
+
+    test("F.301 Votes equals voters checked, but votes not equal to voters", async () => {
       const user = userEvent.setup();
 
       overrideServerClaimDataEntryResponse({
@@ -222,15 +234,23 @@ describe("Test DifferencesForm", () => {
 
       expect(await screen.findByTestId("feedback-error")).toHaveTextContent(feedbackMessage);
       expect(screen.queryByTestId("feedback-warning")).toBeNull();
-      const expectedInvalidFieldIds = [differencesFieldIds.moreBallotsCount];
-      const expectedValidFieldIds = [differencesFieldIds.fewerBallotsCount];
-      expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage(expectedInvalidFieldIds, feedbackMessage);
-      expectFieldsToHaveIconAndToHaveAccessibleName(expectedInvalidFieldIds, "bevat een fout");
-      expectFieldsToBeValidAndToNotHaveAccessibleErrorMessage(expectedValidFieldIds);
-      expectFieldsToNotHaveIcon(expectedValidFieldIds);
+      const expectedValidCheckboxFieldIds = [
+        differencesFieldIds.isVotesCastGreaterThanAdmittedVoters,
+        differencesFieldIds.isVotesCastSmallerThanAdmittedVoters,
+        differencesFieldIds.isDifferenceCompletelyAccountedForYes,
+        differencesFieldIds.isDifferenceCompletelyAccountedForNo,
+      ];
+      const expectedValidInputFieldIds = [differencesFieldIds.moreBallotsCount, differencesFieldIds.fewerBallotsCount];
+      expectCheckboxListToBeInvalidAndToHaveTextContent(
+        ["differences_counts.compare_votes_cast_admitted_voters-error"],
+        validationError,
+      );
+      expectCheckboxToBeValidAndToNotHaveAccessibleErrorMessage(expectedValidCheckboxFieldIds);
+      expectInputToBeValidAndToNotHaveAccessibleErrorMessage(expectedValidInputFieldIds);
+      expectInputToNotHaveIcon(expectedValidInputFieldIds);
     });
 
-    test("F.302 Should be empty", async () => {
+    test("F.302 Voters greater than votes checked, but voters >= votes", async () => {
       const user = userEvent.setup();
       overrideServerClaimDataEntryResponse({
         formState: getDefaultDataEntryState().formState,
@@ -255,15 +275,24 @@ describe("Test DifferencesForm", () => {
 
       expect(await screen.findByTestId("feedback-error")).toHaveTextContent(feedbackMessage);
       expect(screen.queryByTestId("feedback-warning")).toBeNull();
-      const expectedInvalidFieldIds = [differencesFieldIds.fewerBallotsCount];
-      const expectedValidFieldIds = [differencesFieldIds.moreBallotsCount];
-      expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage(expectedInvalidFieldIds, feedbackMessage);
-      expectFieldsToHaveIconAndToHaveAccessibleName(expectedInvalidFieldIds, "bevat een fout");
-      expectFieldsToBeValidAndToNotHaveAccessibleErrorMessage(expectedValidFieldIds);
-      expectFieldsToNotHaveIcon(expectedValidFieldIds);
+      const expectedValidCheckboxFieldIds = [
+        differencesFieldIds.isAdmittedVotersEqualsVotesCast,
+        differencesFieldIds.isVotesCastSmallerThanAdmittedVoters,
+        differencesFieldIds.isDifferenceCompletelyAccountedForYes,
+        differencesFieldIds.isDifferenceCompletelyAccountedForNo,
+      ];
+      const expectedValidInputFieldIds = [differencesFieldIds.moreBallotsCount, differencesFieldIds.fewerBallotsCount];
+
+      expectCheckboxListToBeInvalidAndToHaveTextContent(
+        ["differences_counts.compare_votes_cast_admitted_voters-error"],
+        validationError,
+      );
+      expectCheckboxToBeValidAndToNotHaveAccessibleErrorMessage(expectedValidCheckboxFieldIds);
+      expectInputToBeValidAndToNotHaveAccessibleErrorMessage(expectedValidInputFieldIds);
+      expectInputToNotHaveIcon(expectedValidInputFieldIds);
     });
 
-    test("F.303 IncorrectDifference", async () => {
+    test("F.303 Votes smaller than voters checked, but voters >= voters", async () => {
       const user = userEvent.setup();
 
       overrideServerClaimDataEntryResponse({
@@ -290,15 +319,23 @@ describe("Test DifferencesForm", () => {
 
       expect(await screen.findByTestId("feedback-error")).toHaveTextContent(feedbackMessage);
       expect(screen.queryByTestId("feedback-warning")).toBeNull();
-      const expectedInvalidFieldIds = [differencesFieldIds.fewerBallotsCount];
-      const expectedValidFieldIds = [differencesFieldIds.moreBallotsCount];
-      expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage(expectedInvalidFieldIds, feedbackMessage);
-      expectFieldsToHaveIconAndToHaveAccessibleName(expectedInvalidFieldIds, "bevat een fout");
-      expectFieldsToBeValidAndToNotHaveAccessibleErrorMessage(expectedValidFieldIds);
-      expectFieldsToNotHaveIcon(expectedValidFieldIds);
+      const expectedValidCheckboxFieldIds = [
+        differencesFieldIds.isAdmittedVotersEqualsVotesCast,
+        differencesFieldIds.isVotesCastGreaterThanAdmittedVoters,
+        differencesFieldIds.isDifferenceCompletelyAccountedForYes,
+        differencesFieldIds.isDifferenceCompletelyAccountedForNo,
+      ];
+      const expectedValidInputFieldIds = [differencesFieldIds.moreBallotsCount, differencesFieldIds.fewerBallotsCount];
+      expectCheckboxListToBeInvalidAndToHaveTextContent(
+        ["differences_counts.compare_votes_cast_admitted_voters-error"],
+        validationError,
+      );
+      expectCheckboxToBeValidAndToNotHaveAccessibleErrorMessage(expectedValidCheckboxFieldIds);
+      expectInputToBeValidAndToNotHaveAccessibleErrorMessage(expectedValidInputFieldIds);
+      expectInputToNotHaveIcon(expectedValidInputFieldIds);
     });
 
-    test("F.304 Should be empty", async () => {
+    test("F.304 Multiple fields or none checked of compare_votes_cast_admitted_voters", async () => {
       const user = userEvent.setup();
 
       overrideServerClaimDataEntryResponse({
@@ -325,15 +362,23 @@ describe("Test DifferencesForm", () => {
 
       expect(await screen.findByTestId("feedback-error")).toHaveTextContent(feedbackMessage);
       expect(screen.queryByTestId("feedback-warning")).toBeNull();
-      const expectedInvalidFieldIds = [differencesFieldIds.moreBallotsCount];
-      const expectedValidFieldIds = [differencesFieldIds.fewerBallotsCount];
-      expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage(expectedInvalidFieldIds, feedbackMessage);
-      expectFieldsToHaveIconAndToHaveAccessibleName(expectedInvalidFieldIds, "bevat een fout");
-      expectFieldsToBeValidAndToNotHaveAccessibleErrorMessage(expectedValidFieldIds);
-      expectFieldsToNotHaveIcon(expectedValidFieldIds);
+      const expectedValidCheckboxFieldIds = [
+        differencesFieldIds.isVotesCastGreaterThanAdmittedVoters,
+        differencesFieldIds.isVotesCastSmallerThanAdmittedVoters,
+        differencesFieldIds.isDifferenceCompletelyAccountedForYes,
+        differencesFieldIds.isDifferenceCompletelyAccountedForNo,
+      ];
+      const expectedValidInputFieldIds = [differencesFieldIds.moreBallotsCount, differencesFieldIds.fewerBallotsCount];
+      expectCheckboxListToBeInvalidAndToHaveTextContent(
+        ["differences_counts.compare_votes_cast_admitted_voters-error"],
+        validationError,
+      );
+      expectCheckboxToBeValidAndToNotHaveAccessibleErrorMessage(expectedValidCheckboxFieldIds);
+      expectInputToBeValidAndToNotHaveAccessibleErrorMessage(expectedValidInputFieldIds);
+      expectInputToNotHaveIcon(expectedValidInputFieldIds);
     });
 
-    test("F.305 No difference expected", async () => {
+    test("F.305 Votes equals voters checked, but more_ballots_count and/or fewer_ballots_count are filled in", async () => {
       const user = userEvent.setup();
 
       overrideServerClaimDataEntryResponse({
@@ -360,12 +405,228 @@ describe("Test DifferencesForm", () => {
 
       expect(await screen.findByTestId("feedback-error")).toHaveTextContent(feedbackMessage);
       expect(screen.queryByTestId("feedback-warning")).toBeNull();
-      const expectedInvalidFieldIds = [differencesFieldIds.fewerBallotsCount];
-      const expectedValidFieldIds = [differencesFieldIds.moreBallotsCount];
-      expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage(expectedInvalidFieldIds, feedbackMessage);
-      expectFieldsToHaveIconAndToHaveAccessibleName(expectedInvalidFieldIds, "bevat een fout");
-      expectFieldsToBeValidAndToNotHaveAccessibleErrorMessage(expectedValidFieldIds);
-      expectFieldsToNotHaveIcon(expectedValidFieldIds);
+      const expectedValidCheckboxFieldIds = [
+        differencesFieldIds.isAdmittedVotersEqualsVotesCast,
+        differencesFieldIds.isVotesCastGreaterThanAdmittedVoters,
+        differencesFieldIds.isVotesCastSmallerThanAdmittedVoters,
+        differencesFieldIds.isDifferenceCompletelyAccountedForYes,
+        differencesFieldIds.isDifferenceCompletelyAccountedForNo,
+      ];
+      const expectedInvalidInputFieldIds = [
+        "data." + differencesFieldIds.moreBallotsCount,
+        "data." + differencesFieldIds.fewerBallotsCount,
+      ];
+      expectCheckboxToBeValidAndToNotHaveAccessibleErrorMessage(expectedValidCheckboxFieldIds);
+      expectFieldsToHaveIconAndToHaveAccessibleName(expectedInvalidInputFieldIds, "bevat een fout");
+    });
+
+    test("F.306 Votes > voters checked, but more_ballots_count <> votes - voters", async () => {
+      const user = userEvent.setup();
+
+      overrideServerClaimDataEntryResponse({
+        formState: getDefaultDataEntryState().formState,
+        pollingStationResults: {},
+      });
+
+      renderForm();
+
+      await screen.findByTestId("differences_counts_form");
+      overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
+        validation_results: { errors: [validationResultMockData.F306], warnings: [] },
+      });
+
+      const submitButton = await screen.findByRole("button", { name: "Volgende" });
+      await user.click(submitButton);
+
+      const feedbackMessage = [
+        "Controleer I (aantal méér getelde stemmen)",
+        "F.306",
+        "Heb je iets niet goed overgenomen? Herstel de fout en ga verder.",
+        "Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder.",
+      ].join("");
+
+      expect(await screen.findByTestId("feedback-error")).toHaveTextContent(feedbackMessage);
+      expect(screen.queryByTestId("feedback-warning")).toBeNull();
+      const expectedValidCheckboxFieldIds = [
+        differencesFieldIds.isAdmittedVotersEqualsVotesCast,
+        differencesFieldIds.isVotesCastGreaterThanAdmittedVoters,
+        differencesFieldIds.isVotesCastSmallerThanAdmittedVoters,
+        differencesFieldIds.isDifferenceCompletelyAccountedForYes,
+        differencesFieldIds.isDifferenceCompletelyAccountedForNo,
+      ];
+      const expectedValidInputFieldIds = [differencesFieldIds.fewerBallotsCount];
+      const expectedInvalidInputFieldIds = ["data." + differencesFieldIds.moreBallotsCount];
+      expectCheckboxToBeValidAndToNotHaveAccessibleErrorMessage(expectedValidCheckboxFieldIds);
+      expectInputToBeValidAndToNotHaveAccessibleErrorMessage(expectedValidInputFieldIds);
+      expectInputToNotHaveIcon(expectedValidInputFieldIds);
+      expectFieldsToHaveIconAndToHaveAccessibleName(expectedInvalidInputFieldIds, "bevat een fout");
+    });
+
+    test("F.307 Votes > voters checked, but fewer_ballots_count is filled in", async () => {
+      const user = userEvent.setup();
+
+      overrideServerClaimDataEntryResponse({
+        formState: getDefaultDataEntryState().formState,
+        pollingStationResults: {},
+      });
+
+      renderForm();
+
+      await screen.findByTestId("differences_counts_form");
+      overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
+        validation_results: { errors: [validationResultMockData.F307], warnings: [] },
+      });
+
+      const submitButton = await screen.findByRole("button", { name: "Volgende" });
+      await user.click(submitButton);
+
+      const feedbackMessage = [
+        "Controleer je antwoorden",
+        "F.307",
+        "Heb je iets niet goed overgenomen? Herstel de fout en ga verder.",
+        "Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder.",
+      ].join("");
+
+      expect(await screen.findByTestId("feedback-error")).toHaveTextContent(feedbackMessage);
+      expect(screen.queryByTestId("feedback-warning")).toBeNull();
+      const expectedValidCheckboxFieldIds = [
+        differencesFieldIds.isAdmittedVotersEqualsVotesCast,
+        differencesFieldIds.isVotesCastGreaterThanAdmittedVoters,
+        differencesFieldIds.isVotesCastSmallerThanAdmittedVoters,
+        differencesFieldIds.isDifferenceCompletelyAccountedForYes,
+        differencesFieldIds.isDifferenceCompletelyAccountedForNo,
+      ];
+      const expectedInvalidInputFieldIds = [
+        "data." + differencesFieldIds.moreBallotsCount,
+        "data." + differencesFieldIds.fewerBallotsCount,
+      ];
+      expectCheckboxToBeValidAndToNotHaveAccessibleErrorMessage(expectedValidCheckboxFieldIds);
+      expectFieldsToHaveIconAndToHaveAccessibleName(expectedInvalidInputFieldIds, "bevat een fout");
+    });
+
+    test("F.308 Votes < voters checked, but fewer_ballots_count <> voters - votes", async () => {
+      const user = userEvent.setup();
+
+      overrideServerClaimDataEntryResponse({
+        formState: getDefaultDataEntryState().formState,
+        pollingStationResults: {},
+      });
+
+      renderForm();
+
+      await screen.findByTestId("differences_counts_form");
+      overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
+        validation_results: { errors: [validationResultMockData.F308], warnings: [] },
+      });
+
+      const submitButton = await screen.findByRole("button", { name: "Volgende" });
+      await user.click(submitButton);
+
+      const feedbackMessage = [
+        "Controleer je antwoorden",
+        "F.308",
+        "Heb je iets niet goed overgenomen? Herstel de fout en ga verder.",
+        "Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder.",
+      ].join("");
+
+      expect(await screen.findByTestId("feedback-error")).toHaveTextContent(feedbackMessage);
+      expect(screen.queryByTestId("feedback-warning")).toBeNull();
+      const expectedValidCheckboxFieldIds = [
+        differencesFieldIds.isAdmittedVotersEqualsVotesCast,
+        differencesFieldIds.isVotesCastGreaterThanAdmittedVoters,
+        differencesFieldIds.isVotesCastSmallerThanAdmittedVoters,
+        differencesFieldIds.isDifferenceCompletelyAccountedForYes,
+        differencesFieldIds.isDifferenceCompletelyAccountedForNo,
+      ];
+      const expectedValidInputFieldIds = [differencesFieldIds.moreBallotsCount];
+      const expectedInvalidInputFieldIds = ["data." + differencesFieldIds.fewerBallotsCount];
+      expectCheckboxToBeValidAndToNotHaveAccessibleErrorMessage(expectedValidCheckboxFieldIds);
+      expectInputToBeValidAndToNotHaveAccessibleErrorMessage(expectedValidInputFieldIds);
+      expectInputToNotHaveIcon(expectedValidInputFieldIds);
+      expectFieldsToHaveIconAndToHaveAccessibleName(expectedInvalidInputFieldIds, "bevat een fout");
+    });
+
+    test("F.309 Votes < voters checked, but more_ballots_count is filled in", async () => {
+      const user = userEvent.setup();
+
+      overrideServerClaimDataEntryResponse({
+        formState: getDefaultDataEntryState().formState,
+        pollingStationResults: {},
+      });
+
+      renderForm();
+
+      await screen.findByTestId("differences_counts_form");
+      overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
+        validation_results: { errors: [validationResultMockData.F309], warnings: [] },
+      });
+
+      const submitButton = await screen.findByRole("button", { name: "Volgende" });
+      await user.click(submitButton);
+
+      const feedbackMessage = [
+        "Controleer je antwoorden",
+        "F.309",
+        "Heb je iets niet goed overgenomen? Herstel de fout en ga verder.",
+        "Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder.",
+      ].join("");
+
+      expect(await screen.findByTestId("feedback-error")).toHaveTextContent(feedbackMessage);
+      expect(screen.queryByTestId("feedback-warning")).toBeNull();
+      const expectedValidCheckboxFieldIds = [
+        differencesFieldIds.isAdmittedVotersEqualsVotesCast,
+        differencesFieldIds.isVotesCastGreaterThanAdmittedVoters,
+        differencesFieldIds.isVotesCastSmallerThanAdmittedVoters,
+        differencesFieldIds.isDifferenceCompletelyAccountedForYes,
+        differencesFieldIds.isDifferenceCompletelyAccountedForNo,
+      ];
+      const expectedInvalidInputFieldIds = [
+        "data." + differencesFieldIds.moreBallotsCount,
+        "data." + differencesFieldIds.fewerBallotsCount,
+      ];
+      expectCheckboxToBeValidAndToNotHaveAccessibleErrorMessage(expectedValidCheckboxFieldIds);
+      expectFieldsToHaveIconAndToHaveAccessibleName(expectedInvalidInputFieldIds, "bevat een fout");
+    });
+
+    test("F.310 Voters <> votes and difference_completely_account_for all or none checked", async () => {
+      const user = userEvent.setup();
+
+      overrideServerClaimDataEntryResponse({
+        formState: getDefaultDataEntryState().formState,
+        pollingStationResults: {},
+      });
+
+      renderForm();
+
+      await screen.findByTestId("differences_counts_form");
+      overrideOnce("post", "/api/polling_stations/1/data_entries/1", 200, {
+        validation_results: { errors: [validationResultMockData.F310], warnings: [] },
+      });
+
+      const submitButton = await screen.findByRole("button", { name: "Volgende" });
+      await user.click(submitButton);
+
+      const feedbackMessage = [
+        "Controleer je antwoorden",
+        "F.310",
+        "Heb je iets niet goed overgenomen? Herstel de fout en ga verder.",
+        "Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder.",
+      ].join("");
+
+      expect(await screen.findByTestId("feedback-error")).toHaveTextContent(feedbackMessage);
+      expect(screen.queryByTestId("feedback-warning")).toBeNull();
+      const expectedValidCheckboxFieldIds = [
+        differencesFieldIds.isAdmittedVotersEqualsVotesCast,
+        differencesFieldIds.isVotesCastGreaterThanAdmittedVoters,
+        differencesFieldIds.isVotesCastSmallerThanAdmittedVoters,
+        differencesFieldIds.isDifferenceCompletelyAccountedForYes,
+        differencesFieldIds.isDifferenceCompletelyAccountedForNo,
+      ];
+      expectCheckboxToBeValidAndToNotHaveAccessibleErrorMessage(expectedValidCheckboxFieldIds);
+      expectCheckboxListToBeInvalidAndToHaveTextContent(
+        ["differences_counts.difference_completely_accounted_for-error"],
+        validationError,
+      );
     });
   });
 });

@@ -59,6 +59,13 @@ export function expectFieldsToHaveIconAndToHaveAccessibleName(fields: Array<stri
   });
 }
 
+export function expectCheckboxListToBeInvalidAndToHaveTextContent(fields: Array<string>, feedbackMessage: string) {
+  fields.forEach((field) => {
+    const inputField = screen.getByTestId(field);
+    expect(inputField).toHaveTextContent(feedbackMessage);
+  });
+}
+
 export function expectFieldsToBeValidAndToNotHaveAccessibleErrorMessage(fields: Array<string>) {
   fields.forEach((field) => {
     const inputField = within(screen.getByTestId(`cell-${field}`)).getByRole("textbox");
@@ -76,4 +83,27 @@ export function expectFieldsToNotHaveIcon(fields: Array<string>) {
 
 export function getCandidateFullNamesFromMockData(politicalGroupMockData: PoliticalGroup): string[] {
   return politicalGroupMockData.candidates.map(getCandidateFullName);
+}
+
+export function expectCheckboxToBeValidAndToNotHaveAccessibleErrorMessage(fields: Array<string>) {
+  fields.forEach((field) => {
+    const inputField = within(screen.getByTestId(`checkbox-container-${field}`)).getByRole("checkbox");
+    expect(inputField).toBeValid();
+    expect(inputField).not.toHaveAccessibleErrorMessage();
+  });
+}
+
+export function expectInputToBeValidAndToNotHaveAccessibleErrorMessage(fields: Array<string>) {
+  fields.forEach((field) => {
+    const inputField = screen.getByTestId(`data.${field}`);
+    expect(inputField).toBeValid();
+    expect(inputField).not.toBeInvalid();
+  });
+}
+
+export function expectInputToNotHaveIcon(fields: Array<string>) {
+  fields.forEach((field) => {
+    const icon = within(screen.getByTestId(`data.${field}`)).queryByRole("img");
+    expect(icon).toBeNull();
+  });
 }

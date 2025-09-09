@@ -45,13 +45,16 @@ export const validationResultMockData: ErrorWarningsMap<ValidationResultCode> = 
     ],
     code: "F203",
   },
-  F301: { fields: ["data.differences_counts.admitted_voters_equal_votes_cast"], code: "F301" },
+  F301: {
+    fields: ["data.differences_counts.compare_votes_cast_admitted_voters.admitted_voters_equal_votes_cast"],
+    code: "F301",
+  },
   F302: {
     fields: ["data.differences_counts.compare_votes_cast_admitted_voters.votes_cast_greater_than_admitted_voters"],
     code: "F302",
   },
   F303: {
-    fields: ["data.differences_counts.compare_votes_cast_admitted_voters.compare_votes_cast_admitted_voters"],
+    fields: ["data.differences_counts.compare_votes_cast_admitted_voters.votes_cast_smaller_than_admitted_voters"],
     code: "F303",
   },
   F304: { fields: ["data.differences_counts.compare_votes_cast_admitted_voters"], code: "F304" },

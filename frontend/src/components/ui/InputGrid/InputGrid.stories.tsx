@@ -42,7 +42,7 @@ export const DefaultGrid: StoryObj<Props> = {
             id="input1"
             field="A"
             title="Input field 1"
-            defaultValue={1}
+            value={1}
             errorsAndWarnings={errorsAndWarnings}
           />
           <InputGridRow
@@ -50,7 +50,7 @@ export const DefaultGrid: StoryObj<Props> = {
             id="input2"
             field="B"
             title="Input field 2 (Error)"
-            defaultValue={2}
+            value={2}
             errorsAndWarnings={errorsAndWarnings}
             addSeparator={addSeparator}
           />
@@ -59,7 +59,7 @@ export const DefaultGrid: StoryObj<Props> = {
             id="input3"
             field="C"
             title="Input field 3 (Warning)"
-            defaultValue={3}
+            value={3}
             errorsAndWarnings={errorsAndWarnings}
           />
           <InputGridRow
@@ -67,7 +67,7 @@ export const DefaultGrid: StoryObj<Props> = {
             id="total"
             field="D"
             title="Total of all inputs"
-            defaultValue={6}
+            value={6}
             isTotal={isTotal}
             errorsAndWarnings={errorsAndWarnings}
           />
@@ -109,7 +109,7 @@ export const CandidatesGrid: StoryObj<Props> = {
             id="zebra1"
             field="1"
             title="Jacobse, F."
-            defaultValue={1}
+            value={1}
             errorsAndWarnings={errorsAndWarnings}
           />
           <InputGridRow
@@ -117,7 +117,7 @@ export const CandidatesGrid: StoryObj<Props> = {
             id="zebra2"
             field="2"
             title="Van Es, T.J. (Error)"
-            defaultValue={2}
+            value={2}
             errorsAndWarnings={errorsAndWarnings}
           />
           <InputGridRow
@@ -125,7 +125,7 @@ export const CandidatesGrid: StoryObj<Props> = {
             id="zebra3"
             field="3"
             title="Van Es, K."
-            defaultValue={3}
+            value={3}
             errorsAndWarnings={errorsAndWarnings}
           />
           <InputGridRow
@@ -133,7 +133,7 @@ export const CandidatesGrid: StoryObj<Props> = {
             id="zebra4"
             field="4"
             title="Van Yvonne, T. (Warning)"
-            defaultValue={4}
+            value={4}
             errorsAndWarnings={errorsAndWarnings}
           />
           <InputGridRow
@@ -141,7 +141,7 @@ export const CandidatesGrid: StoryObj<Props> = {
             id="zebra5"
             field="5"
             title="Van Yvonne, W. (Error)"
-            defaultValue={5}
+            value={5}
             errorsAndWarnings={errorsAndWarnings}
           />
           <InputGridRow
@@ -149,7 +149,7 @@ export const CandidatesGrid: StoryObj<Props> = {
             id="zebra-list-total"
             field=""
             title="List Total"
-            defaultValue={15}
+            value={15}
             isListTotal={isListTotal}
             errorsAndWarnings={errorsAndWarnings}
           />

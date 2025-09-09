@@ -4224,8 +4224,6 @@
           "number",
           "election_id",
           "location",
-          "start_date",
-          "start_time",
           "status",
           "number_of_voters"
         ],
@@ -4253,11 +4251,9 @@
             "format": "int32",
             "minimum": 0
           },
-          "start_date": {
-            "type": "string"
-          },
-          "start_time": {
-            "type": "string"
+          "start_date_time": {
+            "type": "string",
+            "format": "date-time"
           },
           "status": {
             "$ref": "#/components/schemas/CommitteeSessionStatus"
@@ -4272,8 +4268,6 @@
           "session_number",
           "session_election_id",
           "session_location",
-          "session_start_date",
-          "session_start_time",
           "session_status",
           "session_number_of_voters"
         ],
@@ -4301,11 +4295,12 @@
             "format": "int32",
             "minimum": 0
           },
-          "session_start_date": {
-            "type": "string"
-          },
-          "session_start_time": {
-            "type": "string"
+          "session_start_date_time": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
           },
           "session_status": {
             "type": "string"

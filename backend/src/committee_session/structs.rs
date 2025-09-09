@@ -2,12 +2,14 @@ use axum::{
     Json,
     response::{IntoResponse, Response},
 };
+use chrono::NaiveDateTime;
 use serde::{Deserialize, Serialize};
 use sqlx::{FromRow, Type};
 use utoipa::ToSchema;
 
+use crate::audit_log;
+
 use super::status::CommitteeSessionStatus;
-use crate::audit_log::CommitteeSessionDetails;
 
 /// Committee session
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq, ToSchema, Type, FromRow)]
@@ -17,21 +19,21 @@ pub struct CommitteeSession {
     pub number: u32,
     pub election_id: u32,
     pub location: String,
-    pub start_date: String,
-    pub start_time: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[schema(value_type = String, format = "date-time", nullable = false)]
+    pub start_date_time: Option<NaiveDateTime>,
     pub status: CommitteeSessionStatus,
     pub number_of_voters: u32,
 }
 
-impl From<CommitteeSession> for CommitteeSessionDetails {
+impl From<CommitteeSession> for audit_log::CommitteeSessionDetails {
     fn from(value: CommitteeSession) -> Self {
         Self {
             session_id: value.id,
             session_number: value.number,
             session_election_id: value.election_id,
             session_location: value.location,
-            session_start_date: value.start_date,
-            session_start_time: value.start_time,
+            session_start_date_time: value.start_date_time,
             session_status: value.status.to_string(),
             session_number_of_voters: value.number_of_voters,
         }

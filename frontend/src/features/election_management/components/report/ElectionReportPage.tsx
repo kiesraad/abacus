@@ -35,7 +35,7 @@ export function ElectionReportPage() {
   }
 
   // Redirect to update details page if committee session details have not been filled in
-  if (committeeSession.location === "" || committeeSession.start_date === "" || committeeSession.start_time === "") {
+  if (committeeSession.location === "" || !committeeSession.start_date_time) {
     return <Navigate to={`/elections/${election.id}/details#redirect-to-report`} />;
   }
 
@@ -87,8 +87,15 @@ export function ElectionReportPage() {
           </h2>
           <div className={cls.reportInfoSection}>
             {t("election_report.committee_session_started", {
-              date: formatFullDateWithoutTimezone(new Date(committeeSession.start_date)),
-              time: committeeSession.start_time,
+              date: committeeSession.start_date_time
+                ? formatFullDateWithoutTimezone(new Date(committeeSession.start_date_time))
+                : "",
+              time: committeeSession.start_date_time
+                ? new Date(committeeSession.start_date_time).toLocaleTimeString("nl-NL", {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  })
+                : "",
             })}
             .<br />
             {t("election_report.there_was_counting_method", { method: t(election.counting_method).toLowerCase() })}.

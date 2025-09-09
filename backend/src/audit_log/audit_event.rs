@@ -1,5 +1,5 @@
 use axum::http::Uri;
-use chrono::{DateTime, NaiveDate, Utc};
+use chrono::{DateTime, NaiveDate, NaiveDateTime, Utc};
 use serde::{self, Deserialize, Serialize};
 use strum::VariantNames;
 use utoipa::ToSchema;
@@ -62,8 +62,8 @@ pub struct CommitteeSessionDetails {
     pub session_number: u32,
     pub session_election_id: u32,
     pub session_location: String,
-    pub session_start_date: String,
-    pub session_start_time: String,
+    #[schema(value_type = Option<String>, format = "date-time")]
+    pub session_start_date_time: Option<NaiveDateTime>,
     pub session_status: String,
     pub session_number_of_voters: u32,
 }

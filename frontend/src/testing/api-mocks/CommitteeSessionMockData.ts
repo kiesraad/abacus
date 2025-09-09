@@ -6,8 +6,7 @@ export const committeeSessionMockData: CommitteeSession = {
   election_id: 1,
   status: "data_entry_in_progress",
   location: "",
-  start_date: "",
-  start_time: "",
+  start_date_time: "",
   number_of_voters: 2000,
 };
 

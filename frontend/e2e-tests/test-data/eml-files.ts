@@ -40,6 +40,11 @@ export const eml110b_single = {
   path: "../backend/src/eml/tests/eml110b_1_station.eml.xml",
 };
 
+export const eml110b_not_matching_election = {
+  filename: "eml110b_not_matching_election_id.eml.xml",
+  path: "../backend/src/eml/tests/eml110b_not_matching_election_id.eml.xml",
+};
+
 export const eml230b = {
   filename: "eml230b_test.eml.xml",
   path: "../backend/src/eml/tests/eml230b_test.eml.xml",

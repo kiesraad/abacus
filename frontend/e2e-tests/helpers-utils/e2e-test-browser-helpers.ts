@@ -103,5 +103,6 @@ export async function uploadPollingStations(page: Page, eml = eml110b) {
 
   const checkDefinitionPage = new CheckPollingStationDefinitionPgObj(page);
   await expect(checkDefinitionPage.header).toBeVisible();
+  await expect(checkDefinitionPage.warning).toBeHidden();
   await checkDefinitionPage.next.click();
 }

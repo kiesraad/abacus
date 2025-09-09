@@ -234,6 +234,22 @@ impl EML110 {
         Ok(number_of_voters)
     }
 
+    ///
+    /// Check if the election id from the polling stations file matches the election
+    /// Note: this is optional and should not return an error
+    ///
+    pub fn polling_station_definition_matches_election(
+        &self,
+        election: &crate::election::NewElection,
+    ) -> std::result::Result<bool, EMLImportError> {
+        // we need to be importing from a 110b file
+        if self.base.id != "110b" {
+            return Err(EMLImportError::Needs110b);
+        }
+
+        Ok(election.election_id == self.election_identifier().id)
+    }
+
     pub fn definition_from_abacus_election(
         election: &crate::election::ElectionWithPoliticalGroups,
         transaction_id: &str,

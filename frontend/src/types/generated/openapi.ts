@@ -630,6 +630,7 @@ export interface ElectionDefinitionValidateResponse {
   election: NewElection;
   hash: RedactedEmlHash;
   number_of_voters: number;
+  polling_station_definition_matches_election?: boolean;
   polling_stations?: PollingStationRequest[];
 }
 

@@ -344,5 +344,3 @@ export const IconBadgeTable: StoryObj = {
     ]);
   },
 };
-
-// export default {} satisfies Meta;

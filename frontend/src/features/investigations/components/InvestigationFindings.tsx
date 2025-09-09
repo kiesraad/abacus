@@ -1,7 +1,7 @@
 import { FormEvent, useState } from "react";
 import { useNavigate } from "react-router";
 
-import { isError, isSuccess } from "@/api/ApiResult";
+import { AnyApiError, isError, isSuccess } from "@/api/ApiResult";
 import { useCrud } from "@/api/useCrud";
 import { Button } from "@/components/ui/Button/Button";
 import { ChoiceList } from "@/components/ui/CheckboxAndRadio/ChoiceList";
@@ -21,11 +21,17 @@ import { StringFormData } from "@/utils/stringFormData";
 export function InvestigationFindings() {
   const navigate = useNavigate();
   const pollingStationId = useNumericParam("pollingStationId");
-  const { election, currentCommitteeSession, investigation } = useElection(pollingStationId);
+
+  const { election, currentCommitteeSession, investigation, refetch } = useElection(pollingStationId);
   const path: COMMITTEE_SESSION_INVESTIGATION_CONCLUDE_REQUEST_PATH = `/api/committee_sessions/${currentCommitteeSession.id}/investigations`;
   const { update } = useCrud<PollingStationInvestigationCreateRequest>({ update: path });
   const [nonEmptyError, setNonEmptyError] = useState(false);
   const [radioError, setRadioError] = useState(false);
+  const [apiError, setApiError] = useState<AnyApiError>();
+
+  if (apiError) {
+    throw apiError;
+  }
 
   if (!investigation) {
     return <Loader />;
@@ -60,10 +66,10 @@ export function InvestigationFindings() {
     const correctedResults = correctedResultsChoice === "yes";
     const response = await update({ id: investigation.id, findings, corrected_results: correctedResults });
     if (isSuccess(response)) {
+      await refetch();
       await navigate(`/elections/${election.id}/investigations`);
     } else if (isError(response)) {
-      // TODO: error handling
-      // TODO: handle when investigation already exists (409 not unique)
+      setApiError(response);
     }
   };
 

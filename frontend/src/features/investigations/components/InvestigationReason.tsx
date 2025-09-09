@@ -19,7 +19,7 @@ import { StringFormData } from "@/utils/stringFormData";
 export function InvestigationReason() {
   const navigate = useNavigate();
   const pollingStationId = useNumericParam("pollingStationId");
-  const { currentCommitteeSession } = useElection();
+  const { currentCommitteeSession, refetch } = useElection();
   const [nonEmptyError, setNonEmptyError] = useState(false);
   const path: COMMITTEE_SESSION_INVESTIGATION_CREATE_REQUEST_PATH = `/api/committee_sessions/${currentCommitteeSession.id}/investigations`;
   const { create } = useCrud<PollingStationInvestigationCreateRequest>({ create: path });
@@ -45,6 +45,7 @@ export function InvestigationReason() {
 
     const response = await create({ polling_station_id: pollingStationId, reason });
     if (isSuccess(response)) {
+      await refetch();
       await navigate("../print-corrigendum");
     } else if (isError(response)) {
       setError(response);

@@ -1,4 +1,5 @@
-import type { Meta, StoryFn } from "@storybook/react-vite";
+import type { Meta, StoryFn, StoryObj } from "@storybook/react-vite";
+import { expect } from "storybook/test";
 
 import { IconCheckHeart } from "@/components/generated/icons";
 import { Fraction } from "@/types/generated/openapi";
@@ -13,24 +14,38 @@ const data: [number, string, string][] = [
   [3, "another", "thing"],
 ];
 
-export const BasicTable: StoryFn = () => (
-  <Table id="basic_table">
-    <Table.Header>
-      <Table.HeaderCell className="w-14">Large font</Table.HeaderCell>
-      <Table.HeaderCell className="w-14">Fixed width</Table.HeaderCell>
-      <Table.HeaderCell>Some value</Table.HeaderCell>
-    </Table.Header>
-    <Table.Body>
-      {data.map((row) => (
-        <Table.Row key={row[0]}>
-          <Table.Cell>{`Element ${row[0]}`}</Table.Cell>
-          <Table.Cell>{row[1]}</Table.Cell>
-          <Table.Cell>{row[2]}</Table.Cell>
-        </Table.Row>
-      ))}
-    </Table.Body>
-  </Table>
-);
+export const BasicTable: StoryObj = {
+  render: () => {
+    return (
+      <Table id="basic_table">
+        <Table.Header>
+          <Table.HeaderCell className="w-14">Large font</Table.HeaderCell>
+          <Table.HeaderCell className="w-14">Fixed width</Table.HeaderCell>
+          <Table.HeaderCell>Some value</Table.HeaderCell>
+        </Table.Header>
+        <Table.Body>
+          {data.map((row) => (
+            <Table.Row key={row[0]}>
+              <Table.Cell>{`Element ${row[0]}`}</Table.Cell>
+              <Table.Cell>{row[1]}</Table.Cell>
+              <Table.Cell>{row[2]}</Table.Cell>
+            </Table.Row>
+          ))}
+        </Table.Body>
+      </Table>
+    );
+  },
+  play: async ({ canvas }) => {
+    const table = canvas.getByRole("table");
+    await expect(table).toHaveTextContent("Large ");
+    await expect(table).toHaveTableContent([
+      ["Large font", "Fixed width", "Some value"],
+      ["Element 1", "some", "value"],
+      ["Element 2", "other", "value"],
+      ["Element 3", "another", "thing"],
+    ]);
+  },
+};
 
 export const NumberCellTable: StoryFn = () => (
   <Table id="basic_table_number_cell">

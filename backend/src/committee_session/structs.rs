@@ -24,6 +24,12 @@ pub struct CommitteeSession {
     pub start_date_time: Option<NaiveDateTime>,
     pub status: CommitteeSessionStatus,
     pub number_of_voters: u32,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[schema(nullable = false)]
+    pub results_eml: Option<u32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[schema(nullable = false)]
+    pub results_pdf: Option<u32>,
 }
 
 impl From<CommitteeSession> for audit_log::CommitteeSessionDetails {
@@ -36,6 +42,8 @@ impl From<CommitteeSession> for audit_log::CommitteeSessionDetails {
             session_start_date_time: value.start_date_time,
             session_status: value.status.to_string(),
             session_number_of_voters: value.number_of_voters,
+            session_results_eml: value.results_eml,
+            session_results_pdf: value.results_pdf,
         }
     }
 }
@@ -83,4 +91,12 @@ pub struct CommitteeSessionNumberOfVotersChangeRequest {
 #[serde(deny_unknown_fields)]
 pub struct CommitteeSessionStatusChangeRequest {
     pub status: CommitteeSessionStatus,
+}
+
+/// Committee session files update request
+#[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq, ToSchema, Type, FromRow)]
+#[serde(deny_unknown_fields)]
+pub struct CommitteeSessionFilesUpdateRequest {
+    pub results_eml: Option<u32>,
+    pub results_pdf: Option<u32>,
 }

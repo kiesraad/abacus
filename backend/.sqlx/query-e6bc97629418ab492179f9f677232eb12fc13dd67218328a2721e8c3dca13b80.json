@@ -1,6 +1,6 @@
 {
   "db_name": "SQLite",
-  "query": "\n        SELECT\n            id as \"id: u32\",\n            number as \"number: u32\",\n            election_id as \"election_id: u32\",\n            status as \"status: _\",\n            location,\n            start_date_time as \"start_date_time: _\",\n            number_of_voters as \"number_of_voters: u32\"\n        FROM (\n            SELECT\n            id,\n            number,\n            election_id,\n            status,\n            location,\n            start_date_time,\n            number_of_voters,\n            row_number() over (\n            PARTITION BY election_id\n            ORDER BY number DESC\n            ) AS row_number FROM committee_sessions\n        ) t WHERE t.row_number = 1\n        ",
+  "query": "\n        UPDATE committee_sessions\n        SET\n            location = ?,\n            start_date_time = ?\n        WHERE id = ?\n        RETURNING\n            id as \"id: u32\",\n            number as \"number: u32\",\n            election_id as \"election_id: u32\",\n            status as \"status: _\",\n            location,\n            start_date_time as \"start_date_time: _\",\n            number_of_voters as \"number_of_voters: u32\",\n            results_eml as \"results_eml: _\",\n            results_pdf as \"results_pdf: _\"\n        ",
   "describe": {
     "columns": [
       {
@@ -37,10 +37,20 @@
         "name": "number_of_voters: u32",
         "ordinal": 6,
         "type_info": "Integer"
+      },
+      {
+        "name": "results_eml: _",
+        "ordinal": 7,
+        "type_info": "Integer"
+      },
+      {
+        "name": "results_pdf: _",
+        "ordinal": 8,
+        "type_info": "Integer"
       }
     ],
     "parameters": {
-      "Right": 0
+      "Right": 3
     },
     "nullable": [
       false,
@@ -49,8 +59,10 @@
       false,
       false,
       true,
-      false
+      false,
+      true,
+      true
     ]
   },
-  "hash": "5951dfacca33301ca7b436ae70c7b66431f2595b5c6546a0358dddb45ed02bf1"
+  "hash": "e6bc97629418ab492179f9f677232eb12fc13dd67218328a2721e8c3dca13b80"
 }

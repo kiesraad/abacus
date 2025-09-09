@@ -180,10 +180,10 @@ pub async fn make_definitive(
     Ok(())
 }
 
-/// Get a list of polling station results for an election
+/// Get a list of polling station results for a committee session
 pub async fn list_entries(
     conn: impl DbConnLike<'_>,
-    election_id: u32,
+    committee_session_id: u32,
 ) -> Result<Vec<PollingStationResultsEntry>, sqlx::Error> {
     query!(
         r#"
@@ -195,13 +195,9 @@ pub async fn list_entries(
         FROM polling_station_results AS r
         LEFT JOIN polling_stations AS p ON r.polling_station_id = p.id
         LEFT JOIN committee_sessions AS c ON c.id = p.committee_session_id
-        WHERE c.election_id = $1 AND c.number = (
-            SELECT MAX(c2.number)
-            FROM committee_sessions AS c2
-            WHERE c2.election_id = c.election_id
-        )
+        WHERE r.committee_session_id = $1
         "#,
-        election_id
+        committee_session_id
     )
     .try_map(|row| {
         Ok(PollingStationResultsEntry {
@@ -215,16 +211,16 @@ pub async fn list_entries(
     .await
 }
 
-/// Get a list of polling stations with their results for an election
+/// Get a list of polling stations with their results for a committee session
 pub async fn list_entries_with_polling_stations(
     conn: impl DbConnLike<'_>,
-    election_id: u32,
+    committee_session_id: u32,
 ) -> Result<Vec<(PollingStation, PollingStationResults)>, sqlx::Error> {
     let mut conn = conn.acquire().await?;
     // first get the list of results and polling stations related to an election
-    let list = list_entries(&mut *conn, election_id).await?;
+    let list = list_entries(&mut *conn, committee_session_id).await?;
     let polling_stations =
-        crate::polling_station::repository::list(&mut *conn, election_id).await?;
+        crate::polling_station::repository::list(&mut *conn, committee_session_id).await?;
 
     // find the corresponding polling station for each entry, or fail if any polling station could not be found
     list.into_iter()

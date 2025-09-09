@@ -275,11 +275,12 @@ pub async fn committee_session_status_change(
 
 #[cfg(test)]
 pub mod tests {
+    use chrono::NaiveDate;
+    use sqlx::SqlitePool;
+
     use crate::committee_session::{
         CommitteeSession, CommitteeSessionCreateRequest, status::CommitteeSessionStatus,
     };
-    use chrono::NaiveDate;
-    use sqlx::SqlitePool;
 
     pub async fn create_committee_session(
         pool: SqlitePool,
@@ -320,6 +321,8 @@ pub mod tests {
                 .and_then(|d| d.and_hms_opt(9, 15, 0)),
             status: CommitteeSessionStatus::DataEntryFinished,
             number_of_voters: 100,
+            results_eml: None,
+            results_pdf: None,
         }
     }
 }

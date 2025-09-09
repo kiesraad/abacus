@@ -1,15 +1,15 @@
 #![cfg(test)]
 
-use axum::http::StatusCode;
-use sqlx::SqlitePool;
-use test_log::test;
-
-use crate::utils::serve_api;
 use abacus::committee_session::{
     CommitteeSession, CommitteeSessionNumberOfVotersChangeRequest,
     CommitteeSessionStatusChangeRequest, CommitteeSessionUpdateRequest, NewCommitteeSessionRequest,
     status::CommitteeSessionStatus,
 };
+use axum::http::StatusCode;
+use sqlx::SqlitePool;
+use test_log::test;
+
+use crate::utils::serve_api;
 
 pub mod shared;
 pub mod utils;
@@ -23,7 +23,7 @@ async fn test_committee_session_create_works(pool: SqlitePool) {
     shared::change_status_committee_session(
         &addr,
         &cookie,
-        election_id,
+        2,
         CommitteeSessionStatus::DataEntryFinished,
     )
     .await;
@@ -95,7 +95,7 @@ async fn test_committee_session_delete_ok_status_created(pool: SqlitePool) {
 
     let committee_session =
         shared::get_election_committee_session(&addr, &cookie, election_id).await;
-    assert_eq!(committee_session.status, CommitteeSessionStatus::Created,);
+    assert_eq!(committee_session.status, CommitteeSessionStatus::Created);
 
     let url = format!("http://{addr}/api/committee_sessions/{committee_session_id}");
     let response = reqwest::Client::new()
@@ -278,7 +278,7 @@ async fn test_committee_session_delete_first_committee_session(pool: SqlitePool)
 
     let committee_session =
         shared::get_election_committee_session(&addr, &cookie, election_id).await;
-    assert_eq!(committee_session.status, CommitteeSessionStatus::Created,);
+    assert_eq!(committee_session.status, CommitteeSessionStatus::Created);
 
     let url = format!("http://{addr}/api/committee_sessions/{committee_session_id}");
     let response = reqwest::Client::new()
@@ -297,7 +297,7 @@ async fn test_committee_session_delete_first_committee_session(pool: SqlitePool)
 
     let committee_session =
         shared::get_election_committee_session(&addr, &cookie, election_id).await;
-    assert_eq!(committee_session.status, CommitteeSessionStatus::Created,);
+    assert_eq!(committee_session.status, CommitteeSessionStatus::Created);
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_5", "users"))))]
@@ -427,6 +427,91 @@ async fn test_committee_session_status_change_works(pool: SqlitePool) {
         StatusCode::OK,
         "Unexpected response status"
     );
+}
+
+#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
+async fn test_committee_session_status_change_finished_to_in_progress_deletes_files(
+    pool: SqlitePool,
+) {
+    let addr = serve_api(pool).await;
+    let coordinator_cookie = shared::coordinator_login(&addr).await;
+    let election_id = 2;
+
+    // Change committee session status to DataEntryFinished
+    let url = format!("http://{addr}/api/committee_sessions/2/status");
+    let response = reqwest::Client::new()
+        .put(&url)
+        .header("cookie", &coordinator_cookie)
+        .json(&CommitteeSessionStatusChangeRequest {
+            status: CommitteeSessionStatus::DataEntryFinished,
+        })
+        .send()
+        .await
+        .unwrap();
+
+    // Ensure the response is what we expect
+    assert_eq!(
+        response.status(),
+        StatusCode::OK,
+        "Unexpected response status"
+    );
+
+    let committee_session =
+        shared::get_election_committee_session(&addr, &coordinator_cookie, election_id).await;
+    assert_eq!(
+        committee_session.status,
+        CommitteeSessionStatus::DataEntryFinished
+    );
+
+    // Generate and download results files
+    let file_download_url = format!(
+        "http://{addr}/api/elections/{election_id}/committee_sessions/2/download_zip_results"
+    );
+    let response = reqwest::Client::new()
+        .get(&file_download_url)
+        .header("cookie", &coordinator_cookie)
+        .send()
+        .await
+        .unwrap();
+
+    // Ensure the response is what we expect
+    assert_eq!(
+        response.status(),
+        StatusCode::OK,
+        "Unexpected response status"
+    );
+
+    let committee_session =
+        shared::get_election_committee_session(&addr, &coordinator_cookie, election_id).await;
+    assert_eq!(committee_session.results_eml, Some(1));
+    assert_eq!(committee_session.results_pdf, Some(2));
+
+    // Change committee session status to DataEntryInProgress
+    let response = reqwest::Client::new()
+        .put(&url)
+        .header("cookie", &coordinator_cookie)
+        .json(&CommitteeSessionStatusChangeRequest {
+            status: CommitteeSessionStatus::DataEntryInProgress,
+        })
+        .send()
+        .await
+        .unwrap();
+
+    // Ensure the response is what we expect
+    assert_eq!(
+        response.status(),
+        StatusCode::OK,
+        "Unexpected response status"
+    );
+
+    let committee_session =
+        shared::get_election_committee_session(&addr, &coordinator_cookie, election_id).await;
+    assert_eq!(
+        committee_session.status,
+        CommitteeSessionStatus::DataEntryInProgress
+    );
+    assert_eq!(committee_session.results_eml, None);
+    assert_eq!(committee_session.results_pdf, None);
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]

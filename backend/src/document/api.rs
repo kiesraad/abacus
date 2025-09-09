@@ -49,10 +49,14 @@ pub fn router() -> OpenApiRouter<AppState> {
 async fn election_download_na_31_2_bijlage1(
     _user: AdminOrCoordinator,
     State(pool): State<SqlitePool>,
-    Path(id): Path<u32>,
+    Path(election_id): Path<u32>,
 ) -> Result<impl IntoResponse, APIError> {
-    let election = crate::election::repository::get(&pool, id).await?;
-    let polling_stations = crate::polling_station::repository::list(&pool, election.id).await?;
+    let election = crate::election::repository::get(&pool, election_id).await?;
+    let current_committee_session =
+        crate::committee_session::repository::get_election_committee_session(&pool, election.id)
+            .await?;
+    let polling_stations =
+        crate::polling_station::repository::list(&pool, current_committee_session.id).await?;
     let zip_filename = format!(
         "{}{}_{}_na_31_2_bijlage1.zip",
         election.category.to_eml_code(),
@@ -121,10 +125,14 @@ async fn election_download_na_31_2_bijlage1(
 async fn election_download_n_10_2(
     _user: AdminOrCoordinator,
     State(pool): State<SqlitePool>,
-    Path(id): Path<u32>,
+    Path(election_id): Path<u32>,
 ) -> Result<impl IntoResponse, APIError> {
-    let election = crate::election::repository::get(&pool, id).await?;
-    let polling_stations = crate::polling_station::repository::list(&pool, election.id).await?;
+    let election = crate::election::repository::get(&pool, election_id).await?;
+    let current_committee_session =
+        crate::committee_session::repository::get_election_committee_session(&pool, election.id)
+            .await?;
+    let polling_stations =
+        crate::polling_station::repository::list(&pool, current_committee_session.id).await?;
 
     let zip_filename = format!(
         "{}{}_{}_n_10_2.zip",

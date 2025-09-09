@@ -9,13 +9,14 @@ use utoipa_axum::{router::OpenApiRouter, routes};
 
 use super::{
     CommitteeSession, CommitteeSessionCreateRequest, CommitteeSessionNumberOfVotersChangeRequest,
-    CommitteeSessionStatusChangeRequest, CommitteeSessionUpdateRequest, NewCommitteeSessionRequest,
+    CommitteeSessionStatusChangeRequest, NewCommitteeSessionRequest,
     status::{CommitteeSessionStatus, change_committee_session_status},
 };
 use crate::{
     APIError, AppState, ErrorResponse,
     audit_log::{AuditEvent, AuditService},
     authentication::Coordinator,
+    committee_session::CommitteeSessionUpdateRequest,
 };
 
 #[derive(Debug, PartialEq, Eq)]
@@ -163,17 +164,29 @@ pub async fn committee_session_update(
     Path(committee_session_id): Path<u32>,
     Json(request): Json<CommitteeSessionUpdateRequest>,
 ) -> Result<StatusCode, APIError> {
-    let date_time = format!("{0} {1}", &request.start_date, &request.start_time);
-    if request.location.is_empty()
-        || NaiveDateTime::parse_from_str(&date_time, "%Y-%m-%d %H:%M").is_err()
-    {
+    if request.location.is_empty() {
         return Err(APIError::CommitteeSession(
             CommitteeSessionError::InvalidDetails,
         ));
+    }
+
+    let date_time_str = format!("{}T{}", &request.start_date, &request.start_time);
+    let date_time = match NaiveDateTime::parse_from_str(&date_time_str, "%Y-%m-%dT%H:%M") {
+        Ok(date) => date,
+        Err(_) => {
+            return Err(APIError::CommitteeSession(
+                CommitteeSessionError::InvalidDetails,
+            ));
+        }
     };
 
-    let committee_session =
-        crate::committee_session::repository::update(&pool, committee_session_id, request).await?;
+    let committee_session = crate::committee_session::repository::update(
+        &pool,
+        committee_session_id,
+        request.location,
+        date_time,
+    )
+    .await?;
 
     audit_service
         .log(
@@ -262,6 +275,7 @@ pub async fn committee_session_status_change(
 
 #[cfg(test)]
 pub mod tests {
+    use chrono::NaiveDate;
     use sqlx::SqlitePool;
 
     use crate::committee_session::{
@@ -303,8 +317,8 @@ pub mod tests {
             number: 1,
             election_id,
             location: "Test location".to_string(),
-            start_date: "2025-10-22".to_string(),
-            start_time: "09:15".to_string(),
+            start_date_time: NaiveDate::from_ymd_opt(2025, 10, 22)
+                .and_then(|d| d.and_hms_opt(9, 15, 0)),
             status: CommitteeSessionStatus::DataEntryFinished,
             number_of_voters: 100,
             results_eml: None,

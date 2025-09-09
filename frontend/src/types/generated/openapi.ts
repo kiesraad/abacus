@@ -422,8 +422,7 @@ export interface CommitteeSession {
   number_of_voters: number;
   results_eml?: number;
   results_pdf?: number;
-  start_date: string;
-  start_time: string;
+  start_date_time?: string;
   status: CommitteeSessionStatus;
 }
 
@@ -435,8 +434,7 @@ export interface CommitteeSessionDetails {
   session_number_of_voters: number;
   session_results_eml?: number;
   session_results_pdf?: number;
-  session_start_date: string;
-  session_start_time: string;
+  session_start_date_time?: string | null;
   session_status: string;
 }
 

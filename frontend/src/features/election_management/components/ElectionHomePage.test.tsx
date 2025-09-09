@@ -53,8 +53,7 @@ describe("ElectionHomePage", () => {
     const committeeSessionData: Partial<CommitteeSession> = {
       status: "data_entry_in_progress",
       location: "Den Haag",
-      start_date: "2026-03-18",
-      start_time: "21:36",
+      start_date_time: "2026-03-18T21:36:00",
     };
     const electionData = getElectionMockData({}, committeeSessionData);
     electionData.committee_sessions = getCommitteeSessionListMockData(committeeSessionData);

@@ -41,7 +41,7 @@ jobs:
           workspaces: "backend -> target"
           cache-bin: "false"
       - name: Install Binstall
-        uses: cargo-bins/cargo-binstall@2bb61346d075e720d4c3da92f23b6d612d5a7543 # main
+        uses: cargo-bins/cargo-binstall@837578dfb436769f1e6669b2e23ffea9d9d2da8f # main
       - name: Install cargo-llvm-cov
         run: cargo binstall cargo-llvm-cov
       - name: Install Nextest
@@ -60,7 +60,7 @@ jobs:
       - name: Create code coverage report
         run: cargo llvm-cov report --cobertura --output-path ./target/llvm-cov-target/codecov.json
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@fdcc8476540edceab3de004e990f80d881c6cc00 # v5
+        uses: codecov/codecov-action@5a1091511ad55cbe89839c7260b706298ca349f7 # v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           name: Backend Nextest Coverage
@@ -80,7 +80,7 @@ jobs:
         with:
           fetch-depth: 0
       - name: Setup Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
           node-version: 22
       - name: Install dependencies
@@ -103,7 +103,7 @@ jobs:
           disable_search: true
           fail_ci_if_error: true
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@fdcc8476540edceab3de004e990f80d881c6cc00 # v5
+        uses: codecov/codecov-action@5a1091511ad55cbe89839c7260b706298ca349f7 # v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           name: Frontend Vitest Coverage

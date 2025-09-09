@@ -33,11 +33,17 @@ export function CommitteeSessionDetailsPage() {
   const [errorAlert, setErrorAlert] = useState<string | null>(null);
   const redirectToReportPage = location.hash === "#redirect-to-report";
   const sessionLabel = committeeSessionLabel(currentCommitteeSession.number, true).toLowerCase();
-  const defaultDate = currentCommitteeSession.start_date
-    ? new Date(currentCommitteeSession.start_date).toLocaleDateString(t("date_locale"), {
+  const defaultDate = currentCommitteeSession.start_date_time
+    ? new Date(currentCommitteeSession.start_date_time).toLocaleDateString(t("date_locale"), {
         day: "2-digit",
         month: "2-digit",
         year: "numeric",
+      })
+    : "";
+  const defaultTime = currentCommitteeSession.start_date_time
+    ? new Date(currentCommitteeSession.start_date_time).toLocaleTimeString(t("date_locale"), {
+        hour: "2-digit",
+        minute: "2-digit",
       })
     : "";
 
@@ -48,20 +54,23 @@ export function CommitteeSessionDetailsPage() {
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
-    const details: CommitteeSessionUpdateRequest = {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
-      location: (formData.get("location") as string).trim(),
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
-      start_date: (formData.get("start_date") as string).trim(),
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
-      start_time: (formData.get("start_time") as string).trim(),
-    };
+    const locationValue = formData.get("location");
+    const startDateValue = formData.get("start_date");
+    const startTimeValue = formData.get("start_time");
 
-    if (!validate(details)) {
+    const location = (typeof locationValue === "string" ? locationValue : "").trim();
+    const start_date = (typeof startDateValue === "string" ? startDateValue : "").trim();
+    const start_time = (typeof startTimeValue === "string" ? startTimeValue : "").trim();
+
+    if (!validate(location, start_date, start_time)) {
       return;
     }
 
-    details.start_date = convertNLDateToISODate(details.start_date);
+    const details: CommitteeSessionUpdateRequest = {
+      location,
+      start_date: convertNLDateToISODate(start_date),
+      start_time,
+    };
 
     const path: COMMITTEE_SESSION_UPDATE_REQUEST_PATH = `/api/committee_sessions/${currentCommitteeSession.id}`;
     client
@@ -83,22 +92,22 @@ export function CommitteeSessionDetailsPage() {
       .catch(setSubmitError);
   }
 
-  function validate(detailsUpdate: CommitteeSessionUpdateRequest) {
+  function validate(location: string, start_date: string, start_time: string) {
     const errors: ValidationErrors = {};
 
-    if (detailsUpdate.location.length === 0) {
+    if (location.length === 0) {
       errors.location = t("form_errors.FORM_VALIDATION_RESULT_REQUIRED");
     }
 
-    if (detailsUpdate.start_date.length === 0) {
+    if (start_date.length === 0) {
       errors.start_date = t("form_errors.FORM_VALIDATION_RESULT_REQUIRED");
-    } else if (!isValidNLDate(detailsUpdate.start_date)) {
+    } else if (!isValidNLDate(start_date)) {
       errors.start_date = t("election_management.date_error");
     }
 
-    if (detailsUpdate.start_time.length === 0) {
+    if (start_time.length === 0) {
       errors.start_time = t("form_errors.FORM_VALIDATION_RESULT_REQUIRED");
-    } else if (!isValidTime(detailsUpdate.start_time)) {
+    } else if (!isValidTime(start_time)) {
       errors.start_time = t("election_management.time_error");
     }
 
@@ -164,7 +173,7 @@ export function CommitteeSessionDetailsPage() {
                     hint={t("election_management.time_hint")}
                     fieldWidth="narrowish"
                     error={validationErrors?.start_time}
-                    defaultValue={currentCommitteeSession.start_time || ""}
+                    defaultValue={defaultTime}
                     placeholder="uu:mm"
                   />
                 </FormLayout.Row>

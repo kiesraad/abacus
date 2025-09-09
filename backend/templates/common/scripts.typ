@@ -201,7 +201,7 @@
   )
 }
 
-// Default date formatting
+// Default date formatting (input YYYY-MM-DD)
 #let format_date(date) = {
   let dp = date.split("-")
   let date = datetime(year: int(dp.at(0)), month: int(dp.at(1)), day: int(dp.at(2)))
@@ -235,6 +235,17 @@
   date.display(" [day padding:none] ")
   months.at(date.month() - 1)
   date.display(" [year]")
+}
+
+// Default date time formatting (input YYYY-MM-DDThh:mm:ss)
+#let format_date_time(date_time) = {
+  let dt = date_time.split("T")
+  let date = dt.at(0)
+  let time = dt.at(1)
+
+  format_date(date)
+  " "
+  time.slice(0, 5)
 }
 
 // A title without any numbering

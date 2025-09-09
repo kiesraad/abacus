@@ -1,6 +1,6 @@
 {
   "db_name": "SQLite",
-  "query": "\n        INSERT INTO committee_sessions (\n            number,\n            election_id,\n            location,\n            start_date,\n            start_time,\n            number_of_voters\n        ) VALUES (?, ?, ?, ?, ?, ?)\n        RETURNING\n            id as \"id: u32\",\n            number as \"number: u32\",\n            election_id as \"election_id: u32\",\n            status as \"status: _\",\n            location,\n            start_date,\n            start_time,\n            number_of_voters as \"number_of_voters: u32\",\n            results_eml as \"results_eml: _\",\n            results_pdf as \"results_pdf: _\"\n        ",
+  "query": "\n        UPDATE committee_sessions\n        SET number_of_voters = ?\n        WHERE id = ?\n        RETURNING\n            id as \"id: u32\",\n            number as \"number: u32\",\n            election_id as \"election_id: u32\",\n            status as \"status: _\",\n            location,\n            start_date_time as \"start_date_time: _\",\n            number_of_voters as \"number_of_voters: u32\",\n            results_eml as \"results_eml: _\",\n            results_pdf as \"results_pdf: _\"\n        ",
   "describe": {
     "columns": [
       {
@@ -29,33 +29,28 @@
         "type_info": "Text"
       },
       {
-        "name": "start_date",
+        "name": "start_date_time: _",
         "ordinal": 5,
         "type_info": "Text"
       },
       {
-        "name": "start_time",
-        "ordinal": 6,
-        "type_info": "Text"
-      },
-      {
         "name": "number_of_voters: u32",
-        "ordinal": 7,
+        "ordinal": 6,
         "type_info": "Integer"
       },
       {
         "name": "results_eml: _",
-        "ordinal": 8,
+        "ordinal": 7,
         "type_info": "Integer"
       },
       {
         "name": "results_pdf: _",
-        "ordinal": 9,
+        "ordinal": 8,
         "type_info": "Integer"
       }
     ],
     "parameters": {
-      "Right": 6
+      "Right": 2
     },
     "nullable": [
       false,
@@ -63,12 +58,11 @@
       false,
       false,
       false,
-      false,
-      false,
+      true,
       false,
       true,
       true
     ]
   },
-  "hash": "87c6ae34291c1e92f1c3711d466e0019c5034409e0152a5dd1244d2ca4cfa13b"
+  "hash": "fa4f0ab5ffd688d9d30fcb28ce675964d81af0b9ee0069996d537aecb0a9dd74"
 }

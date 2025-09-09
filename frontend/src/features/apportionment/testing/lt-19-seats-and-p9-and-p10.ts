@@ -1522,8 +1522,7 @@ export const committee_session: CommitteeSession = {
   election_id: 4,
   status: "data_entry_finished",
   location: "",
-  start_date: "",
-  start_time: "",
+  start_date_time: "",
   number_of_voters: 6000,
 };
 

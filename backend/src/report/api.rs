@@ -1,6 +1,5 @@
 use axum::{
     extract::{Path, State},
-    http::{HeaderValue, header},
     response::IntoResponse,
 };
 use axum_extra::response::Attachment;
@@ -38,7 +37,6 @@ pub fn router() -> OpenApiRouter<AppState> {
     OpenApiRouter::default()
         .routes(routes!(election_download_zip_results))
         .routes(routes!(election_download_pdf_results))
-        .routes(routes!(election_download_xml_results))
 }
 
 struct ResultsInput {
@@ -291,42 +289,4 @@ async fn election_download_pdf_results(
     Ok(Attachment::new(pdf_file.data)
         .filename(pdf_file.name)
         .content_type(pdf_file.mime_type))
-}
-
-/// Download a generated EML_NL 510 XML file with election results
-#[utoipa::path(
-    get,
-    path = "/api/elections/{election_id}/committee_sessions/{committee_session_id}/download_xml_results",
-    responses(
-        (
-            status = 200,
-            description = "XML",
-            content_type = "text/xml",
-        ),
-        (status = 401, description = "Unauthorized", body = ErrorResponse),
-        (status = 403, description = "Forbidden", body = ErrorResponse),
-        (status = 404, description = "Not found", body = ErrorResponse),
-        (status = 409, description = "Request cannot be completed", body = ErrorResponse),
-        (status = 500, description = "Internal server error", body = ErrorResponse),
-    ),
-    params(
-        ("election_id" = u32, description = "Election database id"),
-        ("committee_session_id" = u32, description = "Committee session database id"),
-    ),
-)]
-async fn election_download_xml_results(
-    _user: Coordinator,
-    State(pool): State<SqlitePool>,
-    audit_service: AuditService,
-    Path((_election_id, committee_session_id)): Path<(u32, u32)>,
-) -> Result<impl IntoResponse, APIError> {
-    let (eml_file, _) = generate_and_save_files(pool, audit_service, committee_session_id).await?;
-
-    Ok((
-        [(
-            header::CONTENT_TYPE,
-            HeaderValue::from_static(EML_MIME_TYPE),
-        )],
-        eml_file.data,
-    ))
 }

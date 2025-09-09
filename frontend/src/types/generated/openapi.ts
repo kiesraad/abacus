@@ -66,14 +66,6 @@ export interface ELECTION_DOWNLOAD_PDF_RESULTS_REQUEST_PARAMS {
 export type ELECTION_DOWNLOAD_PDF_RESULTS_REQUEST_PATH =
   `/api/elections/${number}/committee_sessions/${number}/download_pdf_results`;
 
-// /api/elections/{election_id}/committee_sessions/{committee_session_id}/download_xml_results
-export interface ELECTION_DOWNLOAD_XML_RESULTS_REQUEST_PARAMS {
-  election_id: number;
-  committee_session_id: number;
-}
-export type ELECTION_DOWNLOAD_XML_RESULTS_REQUEST_PATH =
-  `/api/elections/${number}/committee_sessions/${number}/download_xml_results`;
-
 // /api/elections/{election_id}/committee_sessions/{committee_session_id}/download_zip_results
 export interface ELECTION_DOWNLOAD_ZIP_RESULTS_REQUEST_PARAMS {
   election_id: number;

@@ -11,8 +11,14 @@ describe("UI Component: number input", () => {
     expect(screen.getByRole("textbox")).toBeInTheDocument();
   });
 
-  test("should format the number", () => {
+  test("should format the number from defaultValue", () => {
     render(<NumberInput id="test" defaultValue={1200} />);
+    const formattedOverlay = screen.getByTestId("test-formatted-overlay");
+    expect(formattedOverlay).toHaveTextContent("1.200");
+  });
+
+  test("should format the number from value", () => {
+    render(<NumberInput id="test" value={1200} />);
     const formattedOverlay = screen.getByTestId("test-formatted-overlay");
     expect(formattedOverlay).toHaveTextContent("1.200");
   });

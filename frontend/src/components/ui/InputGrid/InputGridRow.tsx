@@ -14,7 +14,6 @@ export interface InputGridRowProps {
   errorsAndWarnings?: Map<string, "error" | "warning">;
   warningsAccepted?: boolean;
   name?: string;
-  defaultValue?: string | number;
   isTotal?: boolean;
   isListTotal?: boolean;
   errorMessageId?: string;
@@ -31,7 +30,6 @@ export function InputGridRow({
   title,
   errorsAndWarnings,
   warningsAccepted,
-  defaultValue,
   isTotal,
   isListTotal,
   id,
@@ -68,13 +66,12 @@ export function InputGridRow({
     <td key={`value-${id}`} id={`value-${id}`} className={cn(cls.value, readOnly && cls.readOnly)}>
       <FormField hasError={!!errorMessageId || hasError} hasWarning={hasWarning}>
         {readOnly ? (
-          <span className="font-number">{value !== undefined ? value : defaultValue}</span>
+          <span className="font-number">{value}</span>
         ) : (
           <NumberInput
             key={id}
             id={id}
             name={name || id}
-            defaultValue={defaultValue}
             autoFocus={autoFocusInput}
             value={value}
             onChange={onChange}

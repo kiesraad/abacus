@@ -1,6 +1,6 @@
 {
   "db_name": "SQLite",
-  "query": "\n        SELECT\n            id as \"id: u32\",\n            number as \"number: u32\",\n            election_id as \"election_id: u32\",\n            status as \"status: _\",\n            location,\n            start_date,\n            start_time,\n            number_of_voters as \"number_of_voters: u32\"\n        FROM committee_sessions\n        WHERE election_id = ?\n        ORDER BY number DESC\n        ",
+  "query": "\n        UPDATE committee_sessions\n        SET status = ?\n        WHERE id = ?\n        RETURNING\n            id as \"id: u32\",\n            number as \"number: u32\",\n            election_id as \"election_id: u32\",\n            status as \"status: _\",\n            location,\n            start_date_time as \"start_date_time: _\",\n            number_of_voters as \"number_of_voters: u32\"\n        ",
   "describe": {
     "columns": [
       {
@@ -29,23 +29,18 @@
         "type_info": "Text"
       },
       {
-        "name": "start_date",
+        "name": "start_date_time: _",
         "ordinal": 5,
         "type_info": "Text"
       },
       {
-        "name": "start_time",
-        "ordinal": 6,
-        "type_info": "Text"
-      },
-      {
         "name": "number_of_voters: u32",
-        "ordinal": 7,
+        "ordinal": 6,
         "type_info": "Integer"
       }
     ],
     "parameters": {
-      "Right": 1
+      "Right": 2
     },
     "nullable": [
       false,
@@ -53,10 +48,9 @@
       false,
       false,
       false,
-      false,
-      false,
+      true,
       false
     ]
   },
-  "hash": "b45d2b08c77b7a0b5c7d4d3cd3bc49809fc504b181e7552e8bf6779e7c74a668"
+  "hash": "57bbcb6a3f953ebc96f4e8fb348edaa5c329f4d9c8da30ff3cf44efcbb30597f"
 }

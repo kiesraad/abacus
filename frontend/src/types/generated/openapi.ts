@@ -420,8 +420,7 @@ export interface CommitteeSession {
   location: string;
   number: number;
   number_of_voters: number;
-  start_date: string;
-  start_time: string;
+  start_date_time?: string;
   status: CommitteeSessionStatus;
 }
 
@@ -431,8 +430,7 @@ export interface CommitteeSessionDetails {
   session_location: string;
   session_number: number;
   session_number_of_voters: number;
-  session_start_date: string;
-  session_start_time: string;
+  session_start_date_time?: string | null;
   session_status: string;
 }
 

@@ -1323,8 +1323,7 @@ export const committee_session: CommitteeSession = {
   election_id: 2,
   status: "data_entry_finished",
   location: "",
-  start_date: "",
-  start_time: "",
+  start_date_time: "",
   number_of_voters: 2000,
 };
 

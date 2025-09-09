@@ -107,11 +107,11 @@
   },
   "F306": {
     "typist": {
-      "title": "Controleer I (aantal méér getelde stemmen)"
+      "title": "Controleer je antwoorden"
     },
     "coordinator": {
-      "title": "Controleer I (aantal méér getelde stemmen)",
-      "content": "Herstel de fout door op papier het juiste getal in te (laten) vullen.Controleer ook of het verschil nog volledig verklaard is.Pas zo nodig rubriek 3.3.2 aan, en volg de instructies over hertellen die daar staan."
+      "title": "Controleer aantal méér getelde stemmen (I)",
+      "actions": "<ul><li>Herstel de fout door op papier het juiste getal in te (laten) vullen.</li><li>Controleer ook of het verschil nog volledig verklaard is.</li><li>Pas zo nodig rubriek 3.3.2 aan, en volg de instructies over hertellen die daar staan.</li></ul>"
     }
   },
   "F307": {
@@ -128,8 +128,8 @@
       "title": "Controleer je antwoorden"
     },
     "coordinator": {
-      "title": "Controleer J (aantal méér getelde stemmen)",
-      "content": "Herstel de fout door op papier het juiste getal in te (laten) vullen.Controleer ook of het verschil nog volledig verklaard is.Pas zo nodig rubriek 3.3.2 aan, en volg de instructies over hertellen die daar staan."
+      "title": "Controleer aantal minder getelde stemmen (J)",
+      "actions": "<ul><li>Herstel de fout door op papier het juiste getal in te (laten) vullen.</li><li>Controleer ook of het verschil nog volledig verklaard is.</li><li>Pas zo nodig rubriek 3.3.2 aan, en volg de instructies over hertellen die daar staan.</li></ul>"
     }
   },
   "F309": {

@@ -261,7 +261,7 @@ pub async fn list_entries_for_committee_session(
     //
     // Finally, we only select the rows that have results, eliminating all the intermediate rows without
     // results that were only needed to find the previous committee sessions.
-    query!(
+    let results = query!(
         r#"
         WITH RECURSIVE polling_stations_chain(original_id, id, id_prev_session, data) AS (
             SELECT s.id AS original_id, s.id, s.id_prev_session, r.data
@@ -294,7 +294,15 @@ pub async fn list_entries_for_committee_session(
         Ok((polling_station, row.data.0))
     })
     .fetch_all(&mut *tx)
-    .await
+    .await?;
+
+    if results.len() != polling_stations.len() {
+        // This should never happen, since every polling station should always
+        // have results the first time it appears.
+        Err(sqlx::Error::RowNotFound)
+    } else {
+        Ok(results)
+    }
 }
 
 /// Given a polling station id (does not necessarily need to be in the latest
@@ -334,4 +342,23 @@ pub async fn most_recent_results_for_polling_station(
     .map(|row| row.data.0)
     .fetch_optional(conn)
     .await
+}
+
+#[cfg(test)]
+pub async fn insert_test_result(
+    conn: impl DbConnLike<'_>,
+    polling_station_id: u32,
+    committee_session_id: u32,
+    results: &PollingStationResults,
+) -> Result<(), sqlx::Error> {
+    let results = Json(results);
+    query!(
+        "INSERT INTO polling_station_results (polling_station_id, committee_session_id, data) VALUES (?, ?, ?)",
+        polling_station_id,
+        committee_session_id,
+        results,
+    )
+    .execute(conn)
+    .await?;
+    Ok(())
 }

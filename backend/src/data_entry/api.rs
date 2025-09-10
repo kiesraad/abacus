@@ -837,8 +837,9 @@ mod tests {
             tests::{change_status_committee_session, create_committee_session},
         },
         data_entry::{
-            DifferencesCounts, PoliticalGroupCandidateVotes, PoliticalGroupTotalVotes,
-            VotersCounts, VotesCounts, structs::tests::ValidDefault,
+            CountingDifferencesPollingStation, DifferencesCounts, ExtraInvestigation,
+            PoliticalGroupCandidateVotes, PoliticalGroupTotalVotes, VotersCounts, VotesCounts,
+            repository::insert_test_result, structs::tests::ValidDefault,
         },
     };
     use axum::http::StatusCode;
@@ -1774,5 +1775,52 @@ mod tests {
             .expect("One row should exist");
         let status: DataEntryStatus = row.state.0;
         assert!(matches!(status, DataEntryStatus::EntriesDifferent(_)));
+    }
+
+    #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_7"))))]
+    async fn test_data_entry_returns_correct_previous_results(pool: SqlitePool) {
+        let results = CSOFirstSessionResults {
+            extra_investigation: ExtraInvestigation::default(),
+            counting_differences_polling_station: CountingDifferencesPollingStation::default(),
+            voters_counts: VotersCounts::default(),
+            votes_counts: VotesCounts::default(),
+            differences_counts: DifferencesCounts::default(),
+            political_group_votes: vec![],
+        };
+
+        // Check: no previous results, should return none
+        // TODO: check when claiming 741 that it returns none
+
+        // Check: only a result from committee session 1, should return 1
+        // TODO: insert result for PS 711
+        let mut results_711 = results.clone();
+        results_711.voters_counts.poll_card_count = 711;
+        insert_test_result(
+            &pool,
+            711,
+            701,
+            &PollingStationResults::CSOFirstSession(results_711),
+        )
+        .await
+        .unwrap();
+        // TODO: check when claiming 741 that it returns 711 results
+
+        // Check: results from committee session 1 and 3, with a gap in between, should return 3
+        // TODO: insert result for PS 731
+        let mut results_731 = results.clone();
+        results_731.voters_counts.poll_card_count = 731;
+        // TODO: check when claiming 741 that it returns 731 results
+
+        // Check: results with only one in committee session 2, should return 2
+        // TODO: insert result for PS 722
+        let mut results_722 = results.clone();
+        results_722.voters_counts.poll_card_count = 722;
+        // TODO: check when claiming 742 that it returns 722 results
+
+        // Check: two subsequent results from committee sessions 2 and 3, should return 3rd
+        // TODO: insert result for PS 732
+        let mut results_732 = results.clone();
+        results_732.voters_counts.poll_card_count = 732;
+        // TODO: check when claiming 742 that it returns 732 results
     }
 }

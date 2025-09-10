@@ -1,12 +1,4 @@
 .resolveErrors {
-  .actions {
-    margin-top: var(--space-sm);
-
-    ul {
-      list-style-type: disc;
-    }
-  }
-
   .resolveForm {
     margin-top: 1.5rem;
     padding: 1.5rem;
@@ -18,8 +10,6 @@
     }
 
     fieldset {
-      max-width: 37.5rem;
-
       section {
         gap: var(--space-md);
       }

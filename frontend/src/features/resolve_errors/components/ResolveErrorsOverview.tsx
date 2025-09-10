@@ -6,7 +6,7 @@ import { ValidationResult, ValidationResults } from "@/types/generated/openapi";
 import { DataEntrySection } from "@/types/types";
 import { dottedCode, getValidationResultSetForSection } from "@/utils/ValidationResults";
 
-import cls from "./ResolveErrors.module.css";
+import cls from "./ResolveErrorsOverview.module.css";
 
 interface ResolveErrorsOverviewProps {
   structure: DataEntrySection[];

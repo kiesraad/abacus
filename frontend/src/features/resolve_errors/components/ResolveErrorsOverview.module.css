@@ -1,0 +1,7 @@
+.actions {
+  margin-top: var(--space-sm);
+
+  ul {
+    list-style-type: disc;
+  }
+}

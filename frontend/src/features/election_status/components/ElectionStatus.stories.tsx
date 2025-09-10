@@ -99,7 +99,6 @@ export const DefaultElectionStatus: StoryObj<StoryProps> = {
       const progress = canvas.getByTestId("progress");
       await expect(within(progress).getByRole("heading", { level: 3, name: "Voortgang" })).toBeVisible();
       await expect(canvas.getByTestId("progressbar-all")).toBeVisible();
-      // const bars = [...canvas.getByTestId("multi-outer-bar").children];
       const bars = canvas.getByTestId("multi-outer-bar").children;
       const expectedData = [
         { index: 0, percentage: 13, class: "definitive" },
@@ -130,18 +129,6 @@ export const DefaultElectionStatus: StoryObj<StoryProps> = {
           ["39", "Test gemeentehuis 2e invoer", "Verschil 1e en 2e invoer"],
           ["40", "Test kerk 1e invoer", "Fouten in proces-verbaal"],
         ]);
-
-        // const errorsAndWarningsRows = within(tables[0]!).getAllByRole("row");
-
-        // TODO
-        // Click on row of polling station with data entries with differences
-        // await user.click(errorsAndWarningsRows[1]!);
-        // await expect(args.navigate).toHaveBeenCalledWith("./7/resolve-differences");
-
-        // TODO
-        // Click on row of polling station with data entry with errors
-        // await userEvent.click(errorsAndWarningsRows[2]!);
-        // await expect(args.navigate).toHaveBeenCalledWith("./8/resolve-errors");
       });
       await step("Data entry in progress", async () => {
         await expect(headings[1]).toHaveTextContent("Invoer bezig (3)");
@@ -199,6 +186,18 @@ export const Empty: StoryObj<StoryProps> = {
     await expect(
       await canvas.findByText("Er zijn nog geen stembureaus toegevoegd voor deze verkiezing."),
     ).toBeVisible();
+
+    const pollinStationsPerStatus = canvas.getByTestId("polling-stations-per-status");
+    await expect(
+      within(pollinStationsPerStatus).getByRole("heading", { level: 3, name: "Stembureaus per status" }),
+    ).toBeVisible();
+    const items = pollinStationsPerStatus.children;
+    // items[0] is the heading, which we have already checked
+    await expect(items[1]).toHaveTextContent("Fouten en waarschuwingen (0)");
+    await expect(items[2]).toHaveTextContent("Invoer bezig (0)");
+    await expect(items[3]).toHaveTextContent("Eerste invoer klaar (0)");
+    await expect(items[4]).toHaveTextContent("Eerste en tweede invoer klaar (0)");
+    await expect(items[5]).toHaveTextContent("Werkvoorraad (0)");
   },
 };
 

@@ -1,11 +1,11 @@
 use serde::{Deserialize, Serialize};
-use sqlx::{SqlitePool, Type};
+use sqlx::{Connection, SqliteConnection, Type};
 use strum::VariantNames;
 use utoipa::ToSchema;
 
 use super::{CommitteeSessionError, CommitteeSessionFilesUpdateRequest, repository::change_files};
 use crate::{
-    APIError, DbConnLike,
+    APIError,
     audit_log::{AuditEvent, AuditService},
 };
 
@@ -42,19 +42,21 @@ impl From<sqlx::Error> for CommitteeSessionError {
 }
 
 pub async fn change_committee_session_status(
+    conn: &mut SqliteConnection,
     committee_session_id: u32,
     status: CommitteeSessionStatus,
-    pool: SqlitePool,
     audit_service: AuditService,
 ) -> Result<(), APIError> {
+    let mut tx = conn.begin().await?;
+
     let committee_session =
-        crate::committee_session::repository::get(&pool, committee_session_id).await?;
+        crate::committee_session::repository::get(&mut tx, committee_session_id).await?;
     let new_status = match status {
         CommitteeSessionStatus::Created => committee_session.status.prepare_data_entry()?,
         CommitteeSessionStatus::DataEntryNotStarted => {
             committee_session
                 .status
-                .ready_for_data_entry(committee_session.id, &pool)
+                .ready_for_data_entry(&mut tx, committee_session.id)
                 .await?
         }
         CommitteeSessionStatus::DataEntryInProgress => {
@@ -72,7 +74,7 @@ pub async fn change_committee_session_status(
         && (committee_session.results_eml.is_some() || committee_session.results_pdf.is_some())
     {
         change_files(
-            &pool,
+            &mut tx,
             committee_session.id,
             CommitteeSessionFilesUpdateRequest {
                 results_eml: None,
@@ -81,22 +83,22 @@ pub async fn change_committee_session_status(
         )
         .await?;
         if let Some(eml_id) = committee_session.results_eml {
-            let file = crate::files::repository::get_file(&pool, eml_id).await?;
-            crate::files::repository::delete_file(&pool, eml_id).await?;
+            let file = crate::files::repository::get_file(&mut tx, eml_id).await?;
+            crate::files::repository::delete_file(&mut tx, eml_id).await?;
             audit_service
-                .log(&AuditEvent::FileDeleted(file.clone().into()), None)
+                .log(&mut tx, &AuditEvent::FileDeleted(file.clone().into()), None)
                 .await?;
         }
         if let Some(pdf_id) = committee_session.results_pdf {
-            let file = crate::files::repository::get_file(&pool, pdf_id).await?;
-            crate::files::repository::delete_file(&pool, pdf_id).await?;
+            let file = crate::files::repository::get_file(&mut tx, pdf_id).await?;
+            crate::files::repository::delete_file(&mut tx, pdf_id).await?;
             audit_service
-                .log(&AuditEvent::FileDeleted(file.clone().into()), None)
+                .log(&mut tx, &AuditEvent::FileDeleted(file.clone().into()), None)
                 .await?;
         }
     }
     let committee_session = crate::committee_session::repository::change_status(
-        &pool,
+        &mut tx,
         committee_session_id,
         new_status,
     )
@@ -104,10 +106,13 @@ pub async fn change_committee_session_status(
 
     audit_service
         .log(
+            &mut tx,
             &AuditEvent::CommitteeSessionUpdated(committee_session.clone().into()),
             None,
         )
         .await?;
+
+    tx.commit().await?;
 
     Ok(())
 }
@@ -127,8 +132,8 @@ impl CommitteeSessionStatus {
 
     pub async fn ready_for_data_entry(
         self,
+        conn: &mut SqliteConnection,
         committee_session_id: u32,
-        conn: impl DbConnLike<'_>,
     ) -> Result<Self, CommitteeSessionError> {
         match self {
             CommitteeSessionStatus::Created => {
@@ -210,6 +215,7 @@ impl Default for CommitteeSessionStatus {
 
 #[cfg(test)]
 mod tests {
+    use sqlx::SqlitePool;
     use test_log::test;
 
     use super::*;
@@ -267,9 +273,10 @@ mod tests {
     async fn committee_session_status_created_to_data_entry_not_started_no_polling_stations(
         pool: SqlitePool,
     ) {
+        let mut conn = pool.acquire().await.unwrap();
         assert_eq!(
             CommitteeSessionStatus::Created
-                .ready_for_data_entry(7, &pool)
+                .ready_for_data_entry(&mut conn, 7)
                 .await,
             Err(CommitteeSessionError::InvalidStatusTransition)
         );
@@ -280,9 +287,10 @@ mod tests {
     async fn committee_session_status_created_to_data_entry_not_started_with_polling_stations(
         pool: SqlitePool,
     ) {
+        let mut conn = pool.acquire().await.unwrap();
         assert_eq!(
             CommitteeSessionStatus::Created
-                .ready_for_data_entry(2, &pool)
+                .ready_for_data_entry(&mut conn, 2)
                 .await,
             Ok(CommitteeSessionStatus::DataEntryNotStarted)
         );
@@ -293,9 +301,10 @@ mod tests {
     async fn committee_session_status_data_entry_not_started_to_data_entry_not_started(
         pool: SqlitePool,
     ) {
+        let mut conn = pool.acquire().await.unwrap();
         assert_eq!(
             CommitteeSessionStatus::DataEntryNotStarted
-                .ready_for_data_entry(2, &pool)
+                .ready_for_data_entry(&mut conn, 2)
                 .await,
             Ok(CommitteeSessionStatus::DataEntryNotStarted)
         );
@@ -306,9 +315,10 @@ mod tests {
     async fn committee_session_status_data_entry_in_progress_to_data_entry_not_started(
         pool: SqlitePool,
     ) {
+        let mut conn = pool.acquire().await.unwrap();
         assert_eq!(
             CommitteeSessionStatus::DataEntryInProgress
-                .ready_for_data_entry(2, &pool)
+                .ready_for_data_entry(&mut conn, 2)
                 .await,
             Err(CommitteeSessionError::InvalidStatusTransition)
         );
@@ -319,9 +329,10 @@ mod tests {
     async fn committee_session_status_data_entry_paused_to_data_entry_not_started(
         pool: SqlitePool,
     ) {
+        let mut conn = pool.acquire().await.unwrap();
         assert_eq!(
             CommitteeSessionStatus::DataEntryPaused
-                .ready_for_data_entry(2, &pool)
+                .ready_for_data_entry(&mut conn, 2)
                 .await,
             Err(CommitteeSessionError::InvalidStatusTransition)
         );
@@ -332,9 +343,10 @@ mod tests {
     async fn committee_session_status_data_entry_finished_to_data_entry_not_started(
         pool: SqlitePool,
     ) {
+        let mut conn = pool.acquire().await.unwrap();
         assert_eq!(
             CommitteeSessionStatus::DataEntryFinished
-                .ready_for_data_entry(2, &pool)
+                .ready_for_data_entry(&mut conn, 2)
                 .await,
             Err(CommitteeSessionError::InvalidStatusTransition)
         );

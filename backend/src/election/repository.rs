@@ -1,10 +1,8 @@
-use sqlx::{Error, query_as, types::Json};
+use sqlx::{Error, SqliteConnection, query_as, types::Json};
 
 use super::{Election, ElectionWithPoliticalGroups, NewElection};
 
-use crate::DbConnLike;
-
-pub async fn list(conn: impl DbConnLike<'_>) -> Result<Vec<Election>, Error> {
+pub async fn list(conn: &mut SqliteConnection) -> Result<Vec<Election>, Error> {
     let elections: Vec<Election> = query_as(
         "SELECT id, name, counting_method, election_id, location, domain_id, category, number_of_seats, election_date, nomination_date FROM elections",
     )
@@ -13,7 +11,10 @@ pub async fn list(conn: impl DbConnLike<'_>) -> Result<Vec<Election>, Error> {
     Ok(elections)
 }
 
-pub async fn get(conn: impl DbConnLike<'_>, id: u32) -> Result<ElectionWithPoliticalGroups, Error> {
+pub async fn get(
+    conn: &mut SqliteConnection,
+    id: u32,
+) -> Result<ElectionWithPoliticalGroups, Error> {
     let election: ElectionWithPoliticalGroups = query_as("SELECT * FROM elections WHERE id = ?")
         .bind(id)
         .fetch_one(conn)
@@ -22,7 +23,7 @@ pub async fn get(conn: impl DbConnLike<'_>, id: u32) -> Result<ElectionWithPolit
 }
 
 pub async fn create(
-    conn: impl DbConnLike<'_>,
+    conn: &mut SqliteConnection,
     election: NewElection,
 ) -> Result<ElectionWithPoliticalGroups, Error> {
     query_as(

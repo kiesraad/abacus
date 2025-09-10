@@ -1,9 +1,8 @@
 use chrono::NaiveDateTime;
-use sqlx::{query, query_as, types::Json};
+use sqlx::{Connection, SqliteConnection, query, query_as, types::Json};
 
 use super::{CSOFirstSessionResults, PollingStationDataEntry, status::DataEntryStatus};
 use crate::{
-    DbConnLike,
     data_entry::{ElectionStatusResponseEntry, PollingStationResults, PollingStationResultsEntry},
     polling_station::PollingStation,
 };
@@ -11,7 +10,7 @@ use crate::{
 /// Get the full polling station data entry row for a given polling station
 /// id, or return an error if there is no data
 pub async fn get_row(
-    conn: impl DbConnLike<'_>,
+    conn: &mut SqliteConnection,
     polling_station_id: u32,
     committee_session_id: u32,
 ) -> Result<PollingStationDataEntry, sqlx::Error> {
@@ -36,7 +35,7 @@ pub async fn get_row(
 /// Get a data entry or return an error if there is no data entry for the
 /// given polling station id
 pub async fn get(
-    conn: impl DbConnLike<'_>,
+    conn: &mut SqliteConnection,
     polling_station_id: u32,
     committee_session_id: u32,
 ) -> Result<DataEntryStatus, sqlx::Error> {
@@ -48,7 +47,7 @@ pub async fn get(
 /// Get a data entry or return the default data entry state for the given
 /// polling station id
 pub async fn get_or_default(
-    conn: impl DbConnLike<'_>,
+    conn: &mut SqliteConnection,
     polling_station_id: u32,
     committee_session_id: u32,
 ) -> Result<DataEntryStatus, sqlx::Error> {
@@ -74,7 +73,7 @@ pub async fn get_or_default(
 
 /// Saves the data entry or updates it if it already exists for a given polling station id
 pub async fn upsert(
-    conn: impl DbConnLike<'_>,
+    conn: &mut SqliteConnection,
     polling_station_id: u32,
     committee_session_id: u32,
     state: &DataEntryStatus,
@@ -105,7 +104,7 @@ pub async fn upsert(
 
 /// Get the status for each polling station data entry in an election
 pub async fn statuses(
-    conn: impl DbConnLike<'_>,
+    conn: &mut SqliteConnection,
     election_id: u32,
 ) -> Result<Vec<ElectionStatusResponseEntry>, sqlx::Error> {
     query!(
@@ -141,13 +140,14 @@ pub async fn statuses(
 }
 
 pub async fn make_definitive(
-    conn: impl DbConnLike<'_>,
+    conn: &mut SqliteConnection,
     polling_station_id: u32,
     committee_session_id: u32,
     new_state: &DataEntryStatus,
     definitive_entry: &PollingStationResults,
 ) -> Result<(), sqlx::Error> {
-    let mut tx = conn.begin_immediate().await?;
+    let mut tx = conn.begin().await?;
+
     let definitive_entry = Json(definitive_entry);
     query!(
         "INSERT INTO polling_station_results (polling_station_id, committee_session_id, data) VALUES ($1, $2, $3)",
@@ -182,7 +182,7 @@ pub async fn make_definitive(
 
 /// Get a list of polling station results for a committee session
 pub async fn list_entries(
-    conn: impl DbConnLike<'_>,
+    conn: &mut SqliteConnection,
     committee_session_id: u32,
 ) -> Result<Vec<PollingStationResultsEntry>, sqlx::Error> {
     query!(
@@ -213,10 +213,9 @@ pub async fn list_entries(
 
 /// Get a list of polling stations with their results for a committee session
 pub async fn list_entries_with_polling_stations(
-    conn: impl DbConnLike<'_>,
+    conn: &mut SqliteConnection,
     committee_session_id: u32,
 ) -> Result<Vec<(PollingStation, PollingStationResults)>, sqlx::Error> {
-    let mut conn = conn.acquire().await?;
     // first get the list of results and polling stations related to an election
     let list = list_entries(&mut *conn, committee_session_id).await?;
     let polling_stations =
@@ -238,7 +237,7 @@ pub async fn list_entries_with_polling_stations(
 /// Get a list of polling stations with their results for an election, but only
 /// if the results are of type CSOFirstSessionResults
 pub async fn list_entries_with_polling_stations_first_session(
-    conn: impl DbConnLike<'_>,
+    conn: &mut SqliteConnection,
     election_id: u32,
 ) -> Result<Vec<(PollingStation, CSOFirstSessionResults)>, sqlx::Error> {
     list_entries_with_polling_stations(conn, election_id)
@@ -259,7 +258,7 @@ pub async fn list_entries_with_polling_stations_first_session(
 }
 
 /// Check if a polling station has results
-pub async fn entry_exists(conn: impl DbConnLike<'_>, id: u32) -> Result<bool, sqlx::Error> {
+pub async fn entry_exists(conn: &mut SqliteConnection, id: u32) -> Result<bool, sqlx::Error> {
     let res = query!(
         r#"
         SELECT EXISTS(

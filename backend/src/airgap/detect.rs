@@ -81,8 +81,13 @@ impl AirgapDetection {
         };
 
         if let Some(pool) = &self.pool {
-            if let Err(e) = crate::audit_log::create(pool, &event, None, None, None).await {
-                error!("Failed to log air gap status change: {e:#?}");
+            if let Ok(mut conn) = pool.acquire().await {
+                if let Err(e) = crate::audit_log::create(&mut conn, &event, None, None, None).await
+                {
+                    error!("Failed to log air gap status change: {e:#?}");
+                }
+            } else {
+                error!("Failed to acquire database connection for air gap status logging");
             }
         }
     }
@@ -258,7 +263,8 @@ mod tests {
         let mut events = Vec::new();
 
         for _ in 0..20 {
-            events = crate::audit_log::list_all(&pool).await.unwrap();
+            let mut conn = pool.acquire().await.unwrap();
+            events = crate::audit_log::list_all(&mut conn).await.unwrap();
 
             if events.len() == 1 {
                 break;

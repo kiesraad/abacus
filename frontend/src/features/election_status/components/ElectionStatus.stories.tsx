@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { fn } from "storybook/test";
+import { expect, fn } from "storybook/test";
 
 import { electionMockData } from "@/testing/api-mocks/ElectionMockData";
 import { pollingStationMockData } from "@/testing/api-mocks/PollingStationMockData";
@@ -92,6 +92,11 @@ export const Empty: StoryObj<StoryProps> = {
       navigate={navigate}
     />
   ),
+  play: async ({ canvas }) => {
+    await expect(
+      await canvas.findByText("Er zijn nog geen stembureaus toegevoegd voor deze verkiezing."),
+    ).toBeVisible();
+  },
 };
 
 export default {

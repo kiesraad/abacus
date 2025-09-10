@@ -56,6 +56,6 @@ VALUES (711, 701, NULL, 'TestA', 1, NULL, 'FixedLocation', 'Testweg 1a', '1234 A
        (721, 702, 711,  'TestA', 1, NULL, 'FixedLocation', 'Testweg 1a', '1234 AA', 'Grote Stad'),
        (722, 702, 712,  'TestB', 2, NULL, 'FixedLocation', 'Testweg 1b', '1234 BB', 'Grote Stad'),
        (731, 703, 721,  'TestA', 1, NULL, 'FixedLocation', 'Testweg 1a', '1234 AA', 'Grote Stad'),
-       (732, 703, 722,  'TestB', 2, NULL, 'FixedLocation', 'Testweg 1b', '1234 BB', 'Grote Stad');
+       (732, 703, 722,  'TestB', 2, NULL, 'FixedLocation', 'Testweg 1b', '1234 BB', 'Grote Stad'),
        (741, 704, 731,  'TestA', 1, NULL, 'FixedLocation', 'Testweg 1a', '1234 AA', 'Grote Stad'),
        (742, 704, 732,  'TestB', 2, NULL, 'FixedLocation', 'Testweg 1b', '1234 BB', 'Grote Stad');

@@ -1777,9 +1777,8 @@ mod tests {
         assert!(matches!(status, DataEntryStatus::EntriesDifferent(_)));
     }
 
-    #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_7"))))]
-    async fn test_data_entry_returns_correct_previous_results(pool: SqlitePool) {
-        let results = CSOFirstSessionResults {
+    async fn add_results(pool: &SqlitePool, polling_station_id: u32, committee_session_id: u32) {
+        let mut results = CSOFirstSessionResults {
             extra_investigation: ExtraInvestigation::default(),
             counting_differences_polling_station: CountingDifferencesPollingStation::default(),
             voters_counts: VotersCounts::default(),
@@ -1787,40 +1786,66 @@ mod tests {
             differences_counts: DifferencesCounts::default(),
             political_group_votes: vec![],
         };
-
-        // Check: no previous results, should return none
-        // TODO: check when claiming 741 that it returns none
-
-        // Check: only a result from committee session 1, should return 1
-        // TODO: insert result for PS 711
-        let mut results_711 = results.clone();
-        results_711.voters_counts.poll_card_count = 711;
+        results.voters_counts.poll_card_count = polling_station_id;
         insert_test_result(
-            &pool,
-            711,
-            701,
-            &PollingStationResults::CSOFirstSession(results_711),
+            pool,
+            polling_station_id,
+            committee_session_id,
+            &PollingStationResults::CSOFirstSession(results),
         )
         .await
-        .unwrap();
-        // TODO: check when claiming 741 that it returns 711 results
+        .unwrap()
+    }
 
-        // Check: results from committee session 1 and 3, with a gap in between, should return 3
-        // TODO: insert result for PS 731
-        let mut results_731 = results.clone();
-        results_731.voters_counts.poll_card_count = 731;
-        // TODO: check when claiming 741 that it returns 731 results
+    async fn claim_previous_results(
+        pool: SqlitePool,
+        polling_station_id: u32,
+    ) -> Option<CSOFirstSessionResults> {
+        let response = claim(pool.clone(), polling_station_id, EntryNumber::FirstEntry).await;
+        assert_eq!(response.status(), StatusCode::OK);
+        let body = response.into_body().collect().await.unwrap().to_bytes();
+        let result: ClaimDataEntryResponse = serde_json::from_slice(&body).unwrap();
+        result
+            .previous_results
+            .and_then(|p| p.into_cso_first_session())
+    }
 
-        // Check: results with only one in committee session 2, should return 2
-        // TODO: insert result for PS 722
-        let mut results_722 = results.clone();
-        results_722.voters_counts.poll_card_count = 722;
-        // TODO: check when claiming 742 that it returns 722 results
+    /// No previous results, should return none
+    #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_7_four_sessions"))))]
+    async fn test_previous_results_none(pool: SqlitePool) {
+        assert!(claim_previous_results(pool.clone(), 741).await.is_none());
+    }
 
-        // Check: two subsequent results from committee sessions 2 and 3, should return 3rd
-        // TODO: insert result for PS 732
-        let mut results_732 = results.clone();
-        results_732.voters_counts.poll_card_count = 732;
-        // TODO: check when claiming 742 that it returns 732 results
+    /// Only a result from committee session 1, should return 1
+    #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_7_four_sessions"))))]
+    async fn test_previous_results_from_first_session(pool: SqlitePool) {
+        add_results(&pool, 711, 701).await;
+        let previous_results = claim_previous_results(pool.clone(), 741).await.unwrap();
+        assert_eq!(previous_results.voters_counts.poll_card_count, 711);
+    }
+
+    /// Results from committee session 1 and 3, with a gap in between, should return 3
+    #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_7_four_sessions"))))]
+    async fn test_previous_results_with_session_gap(pool: SqlitePool) {
+        add_results(&pool, 711, 701).await;
+        add_results(&pool, 731, 703).await;
+        let previous_results = claim_previous_results(pool.clone(), 741).await.unwrap();
+        assert_eq!(previous_results.voters_counts.poll_card_count, 731);
+    }
+
+    /// Results with only one in committee session 2, should return 2
+    #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_7_four_sessions"))))]
+    async fn test_previous_results_from_second_session(pool: SqlitePool) {
+        add_results(&pool, 722, 702).await;
+        let previous_results = claim_previous_results(pool.clone(), 742).await.unwrap();
+        assert_eq!(previous_results.voters_counts.poll_card_count, 722);
+    }
+
+    /// Two subsequent results from committee sessions 2 and 3, should return 3rd
+    #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_7_four_sessions"))))]
+    async fn test_previous_results_from_last_two_sessions(pool: SqlitePool) {
+        add_results(&pool, 732, 703).await;
+        let previous_results = claim_previous_results(pool.clone(), 742).await.unwrap();
+        assert_eq!(previous_results.voters_counts.poll_card_count, 732);
     }
 }

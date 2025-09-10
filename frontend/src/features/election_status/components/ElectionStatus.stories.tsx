@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { expect, fn } from "storybook/test";
+import { expect, fn, within } from "storybook/test";
 
 import { electionMockData } from "@/testing/api-mocks/ElectionMockData";
 import { pollingStationMockData } from "@/testing/api-mocks/PollingStationMockData";
@@ -79,6 +79,109 @@ export const DefaultElectionStatus: StoryObj<StoryProps> = {
         navigate={navigate}
       />
     );
+  },
+  play: async ({ canvas, step }) => {
+    await expect(await canvas.findByRole("heading", { level: 2, name: "Statusoverzicht steminvoer" })).toBeVisible();
+
+    await step("Progress section", async () => {
+      const pollinStationsPerStatus = canvas.getByTestId("polling-stations-per-status");
+      await expect(
+        within(pollinStationsPerStatus).getByRole("heading", { level: 3, name: "Stembureaus per status" }),
+      ).toBeVisible();
+      const items = pollinStationsPerStatus.children;
+      // items[0] is the heading, which we have already checked
+      await expect(items[1]).toHaveTextContent("Fouten en waarschuwingen (2)");
+      await expect(items[2]).toHaveTextContent("Invoer bezig (3)");
+      await expect(items[3]).toHaveTextContent("Eerste invoer klaar (1)");
+      await expect(items[4]).toHaveTextContent("Eerste en tweede invoer klaar (1)");
+      await expect(items[5]).toHaveTextContent("Werkvoorraad (1)");
+
+      const progress = canvas.getByTestId("progress");
+      await expect(within(progress).getByRole("heading", { level: 3, name: "Voortgang" })).toBeVisible();
+      await expect(canvas.getByTestId("progressbar-all")).toBeVisible();
+      // const bars = [...canvas.getByTestId("multi-outer-bar").children];
+      const bars = canvas.getByTestId("multi-outer-bar").children;
+      const expectedData = [
+        { index: 0, percentage: 13, class: "definitive" },
+        { index: 1, percentage: 13, class: "first-entry-finished" },
+        { index: 2, percentage: 38, class: "in-progress" },
+        { index: 3, percentage: 25, class: "errors-and-warnings" },
+        { index: 4, percentage: 13, class: "not-started" },
+      ];
+
+      for (const data of expectedData) {
+        const bar = bars[data.index];
+        await expect(bar).toHaveClass(data.class);
+        await expect(bar).toHaveAttribute("style", `width: ${data.percentage}%;`);
+      }
+    });
+
+    await step("Main section", async () => {
+      const tablesRoot = canvas.getByRole("article");
+      const headings = within(tablesRoot).getAllByRole("heading", { level: 3 });
+      const tables = within(tablesRoot).getAllByRole("table");
+      await expect(headings.length).toBe(5);
+      await expect(tables.length).toBe(5);
+
+      await step("Errors and warnings", async () => {
+        await expect(headings[0]).toHaveTextContent("Fouten en waarschuwingen (2)");
+        await expect(tables[0]).toHaveTableContent([
+          ["Nummer", "Stembureau", "Te controleren"],
+          ["39", "Test gemeentehuis 2e invoer", "Verschil 1e en 2e invoer"],
+          ["40", "Test kerk 1e invoer", "Fouten in proces-verbaal"],
+        ]);
+
+        // const errorsAndWarningsRows = within(tables[0]!).getAllByRole("row");
+
+        // TODO
+        // Click on row of polling station with data entries with differences
+        // await user.click(errorsAndWarningsRows[1]!);
+        // await expect(args.navigate).toHaveBeenCalledWith("./7/resolve-differences");
+
+        // TODO
+        // Click on row of polling station with data entry with errors
+        // await userEvent.click(errorsAndWarningsRows[2]!);
+        // await expect(args.navigate).toHaveBeenCalledWith("./8/resolve-errors");
+      });
+      await step("Data entry in progress", async () => {
+        await expect(headings[1]).toHaveTextContent("Invoer bezig (3)");
+        await expect(tables[1]).toHaveTableContent([
+          ["Nummer", "Stembureau", "Invoerder", "Voortgang"],
+          ["35", "Testschool 1e invoer", "Sanne Molenaar", "60%"],
+          ["36", "Testbuurthuis 2e invoer", "Jayden Ahmen", "20%"],
+          ["38", "Testmuseum 1e invoer", "Sanne Molenaar", "25%"],
+        ]);
+
+        const inProgressRows = within(tables[1]!).getAllByRole("row");
+        await expect(within(inProgressRows[1]!).getByRole("progressbar")).toHaveAttribute("aria-valuenow", "60");
+        await expect(within(inProgressRows[2]!).getByRole("progressbar")).toHaveAttribute("aria-valuenow", "20");
+        await expect(within(inProgressRows[3]!).getByRole("progressbar")).toHaveAttribute("aria-valuenow", "25");
+      });
+
+      await step("First entry finished", async () => {
+        await expect(headings[2]).toHaveTextContent("Eerste invoer klaar (1)");
+        await expect(tables[2]).toHaveTableContent([
+          ["Nummer", "Stembureau", "Invoerder", "Afgerond op"],
+          ["34", "Testplek", "Sanne Molenaar", "vandaag 10:20"],
+        ]);
+      });
+
+      await step("Definitive", async () => {
+        await expect(headings[3]).toHaveTextContent("Eerste en tweede invoer klaar (1)");
+        await expect(tables[3]).toHaveTableContent([
+          ["Nummer", "Stembureau", "Afgerond op"],
+          ["37", "Dansschool Oeps nou deed ik het weer", "vandaag 10:20"],
+        ]);
+      });
+
+      await step("Not started", async () => {
+        await expect(headings[4]).toHaveTextContent("Werkvoorraad (1)");
+        await expect(tables[4]).toHaveTableContent([
+          ["Nummer", "Stembureau"],
+          ["33", "Op Rolletjes"],
+        ]);
+      });
+    });
   },
 };
 

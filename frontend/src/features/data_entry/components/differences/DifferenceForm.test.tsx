@@ -439,7 +439,7 @@ describe("Test DifferencesForm", () => {
       await user.click(submitButton);
 
       const feedbackMessage = [
-        "Controleer I (aantal méér getelde stemmen)",
+        "Controleer je antwoorden",
         "F.306",
         "Heb je iets niet goed overgenomen? Herstel de fout en ga verder.",
         "Heb je alles gecontroleerd en komt je invoer overeen met het papier? Ga dan verder.",

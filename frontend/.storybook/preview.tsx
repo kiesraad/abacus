@@ -1,7 +1,7 @@
 import { StaticRouter } from "react-router";
 
 import type { Preview } from "@storybook/react-vite";
-import { configure } from "storybook/test";
+import { configure, expect } from "storybook/test";
 
 import { ApiResponseStatus } from "@/api/ApiResult";
 import { ElectionProviderContext } from "@/hooks/election/ElectionProviderContext";
@@ -10,6 +10,7 @@ import { t } from "@/i18n/translate";
 import "@/styles/index.css";
 import { electionDetailsMockResponse } from "@/testing/api-mocks/ElectionMockData";
 import { userMockData } from "@/testing/api-mocks/UserMockData";
+import { matchers } from "@/testing/matchers";
 import { TestUserProvider } from "@/testing/TestUserProvider";
 import { ElectionDetailsResponse, ElectionWithPoliticalGroups, PollingStation, Role } from "@/types/generated/openapi";
 
@@ -18,6 +19,7 @@ const preview: Preview = {
     configure({
       testIdAttribute: "id",
     });
+    expect.extend(matchers);
   },
   parameters: {
     controls: {

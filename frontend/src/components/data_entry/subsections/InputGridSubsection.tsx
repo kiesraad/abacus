@@ -24,11 +24,7 @@ export function InputGridSubsectionComponent({
 }: InputGridSubsectionProps) {
   return (
     <InputGrid zebra={subsection.zebra}>
-      <InputGrid.Header>
-        <th>{subsection.headers[0]}</th>
-        <th>{subsection.headers[1]}</th>
-        <th>{subsection.headers[2]}</th>
-      </InputGrid.Header>
+      <InputGrid.Header field={subsection.headers[0]} value={subsection.headers[1]} title={subsection.headers[2]} />
       <InputGrid.Body>
         {subsection.rows.map((row: InputGridSubsectionRow) => (
           <InputGridRow

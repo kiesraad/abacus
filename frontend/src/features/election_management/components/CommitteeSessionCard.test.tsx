@@ -25,8 +25,7 @@ describe("UI component: CommitteeSessionCard", () => {
     const committeeSession = getCommitteeSessionMockData({
       number: 1,
       status: "created",
-      start_date: "",
-      start_time: "",
+      start_date_time: "",
       location: "Juinen",
     });
     render(<CommitteeSessionCard committeeSession={committeeSession} currentSession={true} />);
@@ -44,8 +43,7 @@ describe("UI component: CommitteeSessionCard", () => {
     const committeeSession = getCommitteeSessionMockData({
       number: 2,
       status: "created",
-      start_date: "",
-      start_time: "",
+      start_date_time: "",
       location: "Juinen",
     });
     render(<CommitteeSessionCard committeeSession={committeeSession} currentSession={true} />);
@@ -67,8 +65,7 @@ describe("UI component: CommitteeSessionCard", () => {
     const committeeSession = getCommitteeSessionMockData({
       number: 2,
       status: "created",
-      start_date: "",
-      start_time: "",
+      start_date_time: "",
       location: "Juinen",
     });
     render(<CommitteeSessionCard committeeSession={committeeSession} currentSession={true} />);
@@ -86,8 +83,7 @@ describe("UI component: CommitteeSessionCard", () => {
     const committeeSession = getCommitteeSessionMockData({
       number: 1,
       status: "data_entry_not_started",
-      start_date: "",
-      start_time: "",
+      start_date_time: "",
       location: "Juinen",
     });
     render(<CommitteeSessionCard committeeSession={committeeSession} currentSession={true} />);
@@ -113,8 +109,7 @@ describe("UI component: CommitteeSessionCard", () => {
     const committeeSession = getCommitteeSessionMockData({
       number: 2,
       status: "data_entry_not_started",
-      start_date: "",
-      start_time: "",
+      start_date_time: "",
       location: "Juinen",
     });
     render(<CommitteeSessionCard committeeSession={committeeSession} currentSession={true} />);
@@ -136,8 +131,7 @@ describe("UI component: CommitteeSessionCard", () => {
     const committeeSession = getCommitteeSessionMockData({
       number: 1,
       status: "data_entry_not_started",
-      start_date: "",
-      start_time: "",
+      start_date_time: "",
       location: "Juinen",
     });
     render(<CommitteeSessionCard committeeSession={committeeSession} currentSession={true} />);
@@ -156,8 +150,7 @@ describe("UI component: CommitteeSessionCard", () => {
     const committeeSession = getCommitteeSessionMockData({
       number: 1,
       status: "data_entry_in_progress",
-      start_date: "",
-      start_time: "",
+      start_date_time: "",
       location: "Juinen",
     });
     const router = renderReturningRouter(
@@ -185,8 +178,7 @@ describe("UI component: CommitteeSessionCard", () => {
     const committeeSession = getCommitteeSessionMockData({
       number: 1,
       status: "data_entry_paused",
-      start_date: "",
-      start_time: "",
+      start_date_time: "",
       location: "Juinen",
     });
     render(<CommitteeSessionCard committeeSession={committeeSession} currentSession={true} />);
@@ -212,8 +204,7 @@ describe("UI component: CommitteeSessionCard", () => {
     const committeeSession = getCommitteeSessionMockData({
       number: 1,
       status: "data_entry_paused",
-      start_date: "",
-      start_time: "",
+      start_date_time: "",
       location: "Juinen",
     });
     render(<CommitteeSessionCard committeeSession={committeeSession} currentSession={true} />);
@@ -239,8 +230,7 @@ describe("UI component: CommitteeSessionCard", () => {
     const committeeSession = getCommitteeSessionMockData({
       number: 1,
       status: "data_entry_finished",
-      start_date: "",
-      start_time: "",
+      start_date_time: "",
       location: "Juinen",
     });
     render(<CommitteeSessionCard committeeSession={committeeSession} currentSession={true} />);
@@ -267,8 +257,7 @@ describe("UI component: CommitteeSessionCard", () => {
     const committeeSession = getCommitteeSessionMockData({
       number: 1,
       status: "data_entry_finished",
-      start_date: "",
-      start_time: "",
+      start_date_time: "",
       location: "Juinen",
     });
     render(<CommitteeSessionCard committeeSession={committeeSession} currentSession={true} />);
@@ -295,8 +284,7 @@ describe("UI component: CommitteeSessionCard", () => {
     const committeeSession = getCommitteeSessionMockData({
       number: 1,
       status: "data_entry_finished",
-      start_date: "2025-11-09",
-      start_time: "09:15",
+      start_date_time: "2025-11-09T09:15:00",
       location: "Juinen",
     });
     render(<CommitteeSessionCard committeeSession={committeeSession} currentSession={false} />);

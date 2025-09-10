@@ -179,16 +179,12 @@ pub async fn make_definitive(
     Ok(())
 }
 
-/// Get a list of polling stations with their results for an election
+/// Get a list of polling station results for a committee session
 pub async fn list_entries_with_polling_stations(
     conn: impl DbConnLike<'_>,
-    election_id: u32,
+    committee_session_id: u32,
 ) -> Result<Vec<(PollingStation, PollingStationResults)>, sqlx::Error> {
     let mut tx = conn.begin().await?;
-    let committee_session_id =
-        crate::committee_session::repository::get_current_id_for_election(&mut *tx, election_id)
-            .await?
-            .ok_or(sqlx::Error::RowNotFound)?;
     list_entries_for_committee_session(&mut *tx, committee_session_id).await
 }
 

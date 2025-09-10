@@ -97,7 +97,7 @@ describe("ElectionReportPage", () => {
       200,
       getElectionMockData(
         {},
-        { status: "data_entry_finished", location: "Den Haag", start_date: "2026-03-18", start_time: "21:36" },
+        { status: "data_entry_finished", location: "Den Haag", start_date_time: "2026-03-18T21:36:00" },
       ),
     );
 
@@ -129,7 +129,7 @@ describe("ElectionReportPage", () => {
       200,
       getElectionMockData(
         {},
-        { status: "data_entry_finished", location: "Den Haag", start_date: "2026-03-18", start_time: "21:36" },
+        { status: "data_entry_finished", location: "Den Haag", start_date_time: "2026-03-18T21:36:00" },
       ),
     );
 
@@ -155,8 +155,7 @@ describe("ElectionReportPage", () => {
     const committeeSessionData: Partial<CommitteeSession> = {
       status: "data_entry_finished",
       location: "Den Haag",
-      start_date: "2026-03-18",
-      start_time: "21:36",
+      start_date_time: "2026-03-18T21:36:00",
     };
     const electionData = getElectionMockData({}, { id: 2, number: 2, ...committeeSessionData });
     electionData.committee_sessions = [
@@ -195,7 +194,7 @@ describe("ElectionReportPage", () => {
     const user = userEvent.setup();
     const electionData = getElectionMockData(
       {},
-      { status: "data_entry_finished", location: "Den Haag", start_date: "2026-03-18", start_time: "21:36" },
+      { status: "data_entry_finished", location: "Den Haag", start_date_time: "2026-03-18T21:36:00" },
     );
     server.use(
       http.get("/api/elections/1", () =>
@@ -250,7 +249,7 @@ describe("ElectionReportPage", () => {
       200,
       getElectionMockData(
         {},
-        { status: "data_entry_in_progress", location: "Den Haag", start_date: "2026-03-18", start_time: "21:36" },
+        { status: "data_entry_in_progress", location: "Den Haag", start_date_time: "2026-03-18T21:36:00" },
       ),
     );
 

@@ -244,6 +244,185 @@ pub fn validate_data_entry_status(
     Ok(validation_results)
 }
 
+pub fn validate_differences_counts(
+    differences_counts: &DifferencesCounts,
+    total_voters_count: u32,
+    total_votes_count: u32,
+    validation_results: &mut ValidationResults,
+    differences_counts_path: &FieldPath,
+) -> Result<(), DataError> {
+    let admitted_voters_equal_votes_cast = differences_counts
+        .compare_votes_cast_admitted_voters
+        .admitted_voters_equal_votes_cast;
+    let votes_cast_greater_than_admitted_voters = differences_counts
+        .compare_votes_cast_admitted_voters
+        .votes_cast_greater_than_admitted_voters;
+    let votes_cast_smaller_than_admitted_voters = differences_counts
+        .compare_votes_cast_admitted_voters
+        .votes_cast_smaller_than_admitted_voters;
+    let difference_completely_accounted_for_yes =
+        differences_counts.difference_completely_accounted_for.yes;
+    let difference_completely_accounted_for_no =
+        differences_counts.difference_completely_accounted_for.no;
+
+    if admitted_voters_equal_votes_cast && (total_voters_count != total_votes_count) {
+        validation_results.errors.push(ValidationResult {
+            fields: vec![
+                differences_counts_path
+                    .field("compare_votes_cast_admitted_voters.admitted_voters_equal_votes_cast")
+                    .to_string(),
+            ],
+            code: ValidationResultCode::F301,
+            context: None,
+        });
+    }
+
+    if votes_cast_greater_than_admitted_voters && total_votes_count <= total_voters_count {
+        validation_results.errors.push(ValidationResult {
+            fields: vec![
+                differences_counts_path
+                    .field(
+                        "compare_votes_cast_admitted_voters.votes_cast_greater_than_admitted_voters",
+                    )
+                    .to_string(),
+            ],
+            code: ValidationResultCode::F302,
+            context: None,
+        });
+    }
+
+    if votes_cast_smaller_than_admitted_voters && total_votes_count >= total_voters_count {
+        validation_results.errors.push(ValidationResult {
+            fields: vec![
+                differences_counts_path
+                    .field(
+                        "compare_votes_cast_admitted_voters.votes_cast_smaller_than_admitted_voters",
+                    )
+                    .to_string(),
+            ],
+            code: ValidationResultCode::F303,
+            context: None,
+        });
+    }
+
+    // Check if multiple fields are checked or none at all.
+    if (admitted_voters_equal_votes_cast
+        & votes_cast_greater_than_admitted_voters
+        & votes_cast_smaller_than_admitted_voters)
+        || (!admitted_voters_equal_votes_cast
+            & !votes_cast_greater_than_admitted_voters
+            & !votes_cast_smaller_than_admitted_voters)
+    {
+        validation_results.errors.push(ValidationResult {
+            fields: vec![
+                differences_counts_path
+                    .field("compare_votes_cast_admitted_voters")
+                    .to_string(),
+            ],
+            code: ValidationResultCode::F304,
+            context: None,
+        });
+    }
+
+    if admitted_voters_equal_votes_cast
+        && (differences_counts.more_ballots_count != 0
+            || differences_counts.fewer_ballots_count != 0)
+    {
+        validation_results.errors.push(ValidationResult {
+            fields: {
+                let mut fields = Vec::new();
+                if differences_counts.more_ballots_count != 0 {
+                    fields.push("more_ballots_count".into());
+                }
+                if differences_counts.fewer_ballots_count != 0 {
+                    fields.push("fewer_ballots_count".into());
+                }
+                fields
+            },
+            code: ValidationResultCode::F305,
+            context: None,
+        });
+    }
+
+    if votes_cast_greater_than_admitted_voters
+        && differences_counts.fewer_ballots_count == 0
+        && total_votes_count >= total_voters_count
+        && (total_votes_count - total_voters_count) != differences_counts.more_ballots_count
+    {
+        validation_results.errors.push(ValidationResult {
+            fields: vec![
+                differences_counts_path
+                    .field("more_ballots_count")
+                    .to_string(),
+            ],
+            code: ValidationResultCode::F306,
+            context: None,
+        });
+    }
+
+    if votes_cast_greater_than_admitted_voters && differences_counts.fewer_ballots_count != 0 {
+        validation_results.errors.push(ValidationResult {
+            fields: vec![
+                differences_counts_path
+                    .field("fewer_ballots_count")
+                    .to_string(),
+            ],
+            code: ValidationResultCode::F307,
+            context: None,
+        });
+    }
+
+    if votes_cast_smaller_than_admitted_voters
+        && differences_counts.fewer_ballots_count != 0
+        && total_voters_count >= total_votes_count
+        && differences_counts.fewer_ballots_count != (total_voters_count - total_votes_count)
+    {
+        validation_results.errors.push(ValidationResult {
+            fields: vec![
+                differences_counts_path
+                    .field("fewer_ballots_count")
+                    .to_string(),
+            ],
+            code: ValidationResultCode::F308,
+            context: None,
+        });
+    }
+
+    if votes_cast_smaller_than_admitted_voters
+        && (total_votes_count < total_voters_count)
+        && differences_counts.more_ballots_count != 0
+    {
+        validation_results.errors.push(ValidationResult {
+            fields: vec![
+                differences_counts_path
+                    .field("more_ballots_count")
+                    .to_string(),
+                differences_counts_path
+                    .field("fewer_ballots_count")
+                    .to_string(),
+            ],
+            code: ValidationResultCode::F309,
+            context: None,
+        });
+    }
+
+    let difference_completely_accounted_matches = difference_completely_accounted_for_yes as u8
+        + difference_completely_accounted_for_no as u8;
+    if (total_voters_count != total_votes_count) && (difference_completely_accounted_matches != 1) {
+        validation_results.errors.push(ValidationResult {
+            fields: vec![
+                differences_counts_path
+                    .field("difference_completely_accounted_for")
+                    .to_string(),
+            ],
+            code: ValidationResultCode::F310,
+            context: None,
+        });
+    }
+
+    Ok(())
+}
+
 impl Validate for DataEntryStatus {
     fn validate(
         &self,
@@ -345,7 +524,6 @@ impl Validate for CSOFirstSessionResults {
 
         let votes_counts_path = path.field("votes_counts");
         let voters_counts_path = path.field("voters_counts");
-        let differences_counts_path = path.field("differences_counts");
 
         let total_voters_count = self.voters_counts.total_admitted_voters_count;
         self.voters_counts.validate(
@@ -373,193 +551,19 @@ impl Validate for CSOFirstSessionResults {
             });
         }
 
-        let admitted_voters_equal_votes_cast = self
-            .differences_counts
-            .compare_votes_cast_admitted_voters
-            .admitted_voters_equal_votes_cast;
-        let votes_cast_greater_than_admitted_voters = self
-            .differences_counts
-            .compare_votes_cast_admitted_voters
-            .votes_cast_greater_than_admitted_voters;
-        let votes_cast_smaller_than_admitted_voters = self
-            .differences_counts
-            .compare_votes_cast_admitted_voters
-            .votes_cast_smaller_than_admitted_voters;
-        let difference_completely_accounted_for_yes = self
-            .differences_counts
-            .difference_completely_accounted_for
-            .yes;
-        let difference_completely_accounted_for_no = self
-            .differences_counts
-            .difference_completely_accounted_for
-            .no;
-
-        if admitted_voters_equal_votes_cast && (total_voters_count != total_votes_count) {
-            validation_results.errors.push(ValidationResult {
-                fields: vec![
-                    differences_counts_path
-                        .field(
-                            "compare_votes_cast_admitted_voters.admitted_voters_equal_votes_cast",
-                        )
-                        .to_string(),
-                ],
-                code: ValidationResultCode::F301,
-                context: None,
-            });
-        }
-
-        if votes_cast_greater_than_admitted_voters && total_votes_count <= total_voters_count {
-            validation_results.errors.push(ValidationResult {
-                fields: vec![
-                    differences_counts_path
-                        .field(
-                            "compare_votes_cast_admitted_voters.votes_cast_greater_than_admitted_voters",
-                        )
-                        .to_string(),
-                ],
-                code: ValidationResultCode::F302,
-                context: None,
-            });
-        }
-
-        if votes_cast_smaller_than_admitted_voters && total_votes_count >= total_voters_count {
-            validation_results.errors.push(ValidationResult {
-                fields: vec![
-                    differences_counts_path
-                        .field(
-                            "compare_votes_cast_admitted_voters.votes_cast_smaller_than_admitted_voters",
-                        )
-                        .to_string(),
-                ],
-                code: ValidationResultCode::F303,
-                context: None,
-            });
-        }
-
-        // Check if multiple fields are checked or none at all.
-        if (admitted_voters_equal_votes_cast
-            & votes_cast_greater_than_admitted_voters
-            & votes_cast_smaller_than_admitted_voters)
-            || (!admitted_voters_equal_votes_cast
-                & !votes_cast_greater_than_admitted_voters
-                & !votes_cast_smaller_than_admitted_voters)
-        {
-            validation_results.errors.push(ValidationResult {
-                fields: vec![
-                    differences_counts_path
-                        .field("compare_votes_cast_admitted_voters")
-                        .to_string(),
-                ],
-                code: ValidationResultCode::F304,
-                context: None,
-            });
-        }
-
-        if admitted_voters_equal_votes_cast
-            && (self.differences_counts.more_ballots_count != 0
-                || self.differences_counts.fewer_ballots_count != 0)
-        {
-            validation_results.errors.push(ValidationResult {
-                fields: vec![
-                    differences_counts_path
-                        .field("more_ballots_count")
-                        .to_string(),
-                    differences_counts_path
-                        .field("fewer_ballots_count")
-                        .to_string(),
-                ],
-                code: ValidationResultCode::F305,
-                context: None,
-            });
-        }
-
-        if votes_cast_greater_than_admitted_voters
-            && total_votes_count >= total_voters_count
-            && (total_votes_count - total_voters_count)
-                != self.differences_counts.more_ballots_count
-        {
-            validation_results.errors.push(ValidationResult {
-                fields: vec![
-                    differences_counts_path
-                        .field("more_ballots_count")
-                        .to_string(),
-                ],
-                code: ValidationResultCode::F306,
-                context: None,
-            });
-        }
-
-        if votes_cast_greater_than_admitted_voters
-            && self.differences_counts.more_ballots_count == 0
-        {
-            validation_results.errors.push(ValidationResult {
-                fields: vec![
-                    differences_counts_path
-                        .field("more_ballots_count")
-                        .to_string(),
-                    differences_counts_path
-                        .field("fewer_ballots_count")
-                        .to_string(),
-                ],
-                code: ValidationResultCode::F307,
-                context: None,
-            });
-        }
-
-        if votes_cast_smaller_than_admitted_voters
-            && self.differences_counts.fewer_ballots_count != 0
-            && total_voters_count >= total_votes_count
-            && self.differences_counts.fewer_ballots_count
-                != (total_voters_count - total_votes_count)
-        {
-            validation_results.errors.push(ValidationResult {
-                fields: vec![
-                    differences_counts_path
-                        .field("fewer_ballots_count")
-                        .to_string(),
-                ],
-                code: ValidationResultCode::F308,
-                context: None,
-            });
-        }
-
-        if votes_cast_smaller_than_admitted_voters
-            && (total_votes_count < total_voters_count)
-            && self.differences_counts.more_ballots_count != 0
-        {
-            validation_results.errors.push(ValidationResult {
-                fields: vec![
-                    differences_counts_path
-                        .field("more_ballots_count")
-                        .to_string(),
-                    differences_counts_path
-                        .field("fewer_ballots_count")
-                        .to_string(),
-                ],
-                code: ValidationResultCode::F309,
-                context: None,
-            });
-        }
-
-        let difference_completely_accounted_matches = difference_completely_accounted_for_yes as u8
-            + difference_completely_accounted_for_no as u8;
-        if (total_voters_count != total_votes_count)
-            && (difference_completely_accounted_matches != 1)
-        {
-            validation_results.errors.push(ValidationResult {
-                fields: vec![
-                    differences_counts_path
-                        .field("difference_completely_accounted_for")
-                        .to_string(),
-                ],
-                code: ValidationResultCode::F310,
-                context: None,
-            });
-        }
+        let differences_counts_path = path.field("differences_counts");
 
         self.differences_counts.validate(
             election,
             polling_station,
+            validation_results,
+            &differences_counts_path,
+        )?;
+
+        validate_differences_counts(
+            &self.differences_counts,
+            total_voters_count,
+            total_votes_count,
             validation_results,
             &differences_counts_path,
         )?;
@@ -1011,12 +1015,7 @@ impl Validate for Count {
 mod tests {
     use super::*;
     use crate::{
-        data_entry::{
-            DifferenceCountsCompareVotesCastAdmittedVoters, PoliticalGroupTotalVotes, YesNo,
-            tests::ValidDefault,
-        },
-        election::tests::election_fixture,
-        polling_station::structs::tests::polling_station_fixture,
+        election::tests::election_fixture, polling_station::structs::tests::polling_station_fixture,
     };
     use test_log::test;
 
@@ -1836,7 +1835,7 @@ mod tests {
                 counting_differences_polling_station: ValidDefault::valid_default(),
                 voters_counts: Default::default(),
                 votes_counts: Default::default(),
-                differences_counts: Default::default(),
+                differences_counts: ValidDefault::valid_default(),
                 political_group_votes: Default::default(),
             }
         }
@@ -1864,15 +1863,7 @@ mod tests {
         #[test]
         fn test_default() -> Result<(), DataError> {
             let validation_results = validate(create_test_data())?;
-            assert_eq!(validation_results.errors.len(), 1);
-            assert_eq!(
-                validation_results.errors[0].code,
-                ValidationResultCode::F304
-            );
-            assert_eq!(
-                validation_results.errors[0].fields,
-                vec!["data.differences_counts.compare_votes_cast_admitted_voters",]
-            );
+            assert_eq!(validation_results.errors.len(), 0);
 
             assert_eq!(validation_results.warnings.len(), 1);
             assert_eq!(
@@ -1945,10 +1936,6 @@ mod tests {
             data.voters_counts.poll_card_count = 300;
             data.voters_counts.total_admitted_voters_count = 300;
 
-            data.differences_counts
-                .compare_votes_cast_admitted_voters
-                .admitted_voters_equal_votes_cast = true;
-
             data.political_group_votes = vec![
                 PoliticalGroupCandidateVotes::from_test_data_auto(1, &[100]),
                 PoliticalGroupCandidateVotes::from_test_data_auto(2, &[200]),
@@ -2004,83 +1991,49 @@ mod tests {
 
     // Tests for DifferencesCounts
     mod differences_counts {
-        use crate::data_entry::tests::ValidDefault;
         use crate::data_entry::{
-            CSOFirstSessionResults, DifferenceCountsCompareVotesCastAdmittedVoters,
-            PoliticalGroupCandidateVotes, PoliticalGroupTotalVotes, VotersCounts, VotesCounts,
+            DataError, DifferencesCounts, ValidationResultCode, ValidationResults,
         };
-        use crate::{
-            data_entry::{
-                DataError, DifferencesCounts, Validate, ValidationResultCode, ValidationResults,
-                YesNo,
-            },
-            election::tests::election_fixture,
-            polling_station::structs::tests::polling_station_fixture,
-        };
+        use crate::data_entry::{ValidationResult, validate_differences_counts};
+
+        fn validate(
+            data: DifferencesCounts,
+            total_voters_counts: u32,
+            total_votes_counts: u32,
+        ) -> Result<ValidationResults, DataError> {
+            let mut validation_results = ValidationResults::default();
+
+            validate_differences_counts(
+                &data,
+                total_voters_counts,
+                total_votes_counts,
+                &mut validation_results,
+                &"differences_counts".into(),
+            )?;
+
+            Ok(validation_results)
+        }
 
         // CSO | F.301: "Vergelijk D&H": (checkbox D=H is aangevinkt, maar D<>H)
         #[test]
         fn test_f301() -> Result<(), DataError> {
-            let polling_station_results = CSOFirstSessionResults {
-                extra_investigation: ValidDefault::valid_default(),
-                counting_differences_polling_station: ValidDefault::valid_default(),
-                voters_counts: VotersCounts {
-                    poll_card_count: 103,
-                    proxy_certificate_count: 2,
-                    total_admitted_voters_count: 105,
-                },
-                votes_counts: VotesCounts {
-                    political_group_total_votes: vec![PoliticalGroupTotalVotes {
-                        number: 1,
-                        total: 100,
-                    }],
-                    total_votes_candidates_count: 100,
-                    blank_votes_count: 2,
-                    invalid_votes_count: 2,
-                    total_votes_cast_count: 104,
-                },
-                differences_counts: DifferencesCounts {
-                    more_ballots_count: 0,
-                    fewer_ballots_count: 0,
-                    compare_votes_cast_admitted_voters:
-                        DifferenceCountsCompareVotesCastAdmittedVoters {
-                            admitted_voters_equal_votes_cast: true,
-                            votes_cast_greater_than_admitted_voters: false,
-                            votes_cast_smaller_than_admitted_voters: false,
-                        },
-                    difference_completely_accounted_for: YesNo {
-                        yes: true,
-                        no: false,
-                    },
-                },
-                political_group_votes: vec![PoliticalGroupCandidateVotes::from_test_data_auto(
-                    1,
-                    &[100],
-                )],
-            };
-            let mut validation_results = ValidationResults::default();
-            let election = election_fixture(&[1]);
-            let polling_station = polling_station_fixture(None);
+            let mut data = DifferencesCounts::zero();
 
-            polling_station_results
-                .validate(
-                    &election,
-                    &polling_station,
-                    &mut validation_results,
-                    &"polling_station_results".into(),
-                )
-                .unwrap();
-            assert_eq!(validation_results.errors.len(), 1);
-            assert_eq!(validation_results.warnings.len(), 0);
+            data.compare_votes_cast_admitted_voters
+                .admitted_voters_equal_votes_cast = true;
+            data.difference_completely_accounted_for.yes = true;
+
+            let validation_results = validate(data, 105, 104)?;
+
             assert_eq!(
-                validation_results.errors[0].code,
-                ValidationResultCode::F301
-            );
-            assert_eq!(
-                validation_results.errors[0].fields,
-                vec![
-                    "polling_station_results.differences_counts.compare_votes_cast_admitted_voters.admitted_voters_equal_votes_cast",
-                ]
+                validation_results.errors,
+                [ValidationResult {
+                    code: ValidationResultCode::F301,
+                    fields: vec![
+                        "differences_counts.compare_votes_cast_admitted_voters.admitted_voters_equal_votes_cast".into(),
+                    ],
+                    context: None,
+                }]
             );
 
             Ok(())
@@ -2089,77 +2042,22 @@ mod tests {
         // CSO | F.302: "Vergelijk D&H": (checkbox H>D is aangevinkt, maar H<=D)
         #[test]
         fn test_f302() -> Result<(), DataError> {
-            let polling_station_results = CSOFirstSessionResults {
-                extra_investigation: ValidDefault::valid_default(),
-                counting_differences_polling_station: ValidDefault::valid_default(),
-                voters_counts: VotersCounts {
-                    poll_card_count: 103,
-                    proxy_certificate_count: 2,
-                    total_admitted_voters_count: 105,
-                },
-                votes_counts: VotesCounts {
-                    political_group_total_votes: vec![PoliticalGroupTotalVotes {
-                        number: 1,
-                        total: 100,
-                    }],
-                    total_votes_candidates_count: 100,
-                    blank_votes_count: 2,
-                    invalid_votes_count: 2,
-                    total_votes_cast_count: 104,
-                },
-                differences_counts: DifferencesCounts {
-                    more_ballots_count: 0,
-                    fewer_ballots_count: 0,
-                    compare_votes_cast_admitted_voters:
-                        DifferenceCountsCompareVotesCastAdmittedVoters {
-                            admitted_voters_equal_votes_cast: false,
-                            votes_cast_greater_than_admitted_voters: true,
-                            votes_cast_smaller_than_admitted_voters: false,
-                        },
-                    difference_completely_accounted_for: YesNo {
-                        yes: true,
-                        no: false,
-                    },
-                },
-                political_group_votes: vec![PoliticalGroupCandidateVotes::from_test_data_auto(
-                    1,
-                    &[100],
-                )],
-            };
-            let mut validation_results = ValidationResults::default();
-            let election = election_fixture(&[1]);
-            let polling_station = polling_station_fixture(None);
+            let mut data = DifferencesCounts::zero();
+            data.compare_votes_cast_admitted_voters
+                .votes_cast_greater_than_admitted_voters = true;
+            data.difference_completely_accounted_for.yes = true;
 
-            polling_station_results
-                .validate(
-                    &election,
-                    &polling_station,
-                    &mut validation_results,
-                    &"polling_station_results".into(),
-                )
-                .unwrap();
-            assert_eq!(validation_results.errors.len(), 2);
-            assert_eq!(validation_results.warnings.len(), 0);
+            let validation_results = validate(data, 105, 104)?;
+
             assert_eq!(
-                validation_results.errors[0].code,
-                ValidationResultCode::F302
-            );
-            assert_eq!(
-                validation_results.errors[0].fields,
-                vec![
-                    "polling_station_results.differences_counts.compare_votes_cast_admitted_voters.votes_cast_greater_than_admitted_voters",
-                ]
-            );
-            assert_eq!(
-                validation_results.errors[1].code,
-                ValidationResultCode::F307
-            );
-            assert_eq!(
-                validation_results.errors[1].fields,
-                vec![
-                    "polling_station_results.differences_counts.more_ballots_count",
-                    "polling_station_results.differences_counts.fewer_ballots_count",
-                ]
+                validation_results.errors,
+                [ValidationResult {
+                    code: ValidationResultCode::F302,
+                    fields: vec![
+                        "differences_counts.compare_votes_cast_admitted_voters.votes_cast_greater_than_admitted_voters".into(),
+                    ],
+                    context: None,
+                }]
             );
 
             Ok(())
@@ -2168,66 +2066,23 @@ mod tests {
         // CSO | F.303: "Vergelijk D&H": (checkbox H>D is aangevinkt, maar H<=D)
         #[test]
         fn test_f303() -> Result<(), DataError> {
-            let polling_station_results = CSOFirstSessionResults {
-                extra_investigation: ValidDefault::valid_default(),
-                counting_differences_polling_station: ValidDefault::valid_default(),
-                voters_counts: VotersCounts {
-                    poll_card_count: 101,
-                    proxy_certificate_count: 2,
-                    total_admitted_voters_count: 103,
-                },
-                votes_counts: VotesCounts {
-                    political_group_total_votes: vec![PoliticalGroupTotalVotes {
-                        number: 1,
-                        total: 100,
-                    }],
-                    total_votes_candidates_count: 100,
-                    blank_votes_count: 2,
-                    invalid_votes_count: 2,
-                    total_votes_cast_count: 104,
-                },
-                differences_counts: DifferencesCounts {
-                    more_ballots_count: 0,
-                    fewer_ballots_count: 0,
-                    compare_votes_cast_admitted_voters:
-                        DifferenceCountsCompareVotesCastAdmittedVoters {
-                            admitted_voters_equal_votes_cast: false,
-                            votes_cast_greater_than_admitted_voters: false,
-                            votes_cast_smaller_than_admitted_voters: true,
-                        },
-                    difference_completely_accounted_for: YesNo {
-                        yes: true,
-                        no: false,
-                    },
-                },
-                political_group_votes: vec![PoliticalGroupCandidateVotes::from_test_data_auto(
-                    1,
-                    &[100],
-                )],
-            };
-            let mut validation_results = ValidationResults::default();
-            let election = election_fixture(&[1]);
-            let polling_station = polling_station_fixture(None);
+            let mut data = DifferencesCounts::zero();
 
-            polling_station_results
-                .validate(
-                    &election,
-                    &polling_station,
-                    &mut validation_results,
-                    &"polling_station_results".into(),
-                )
-                .unwrap();
-            assert_eq!(validation_results.errors.len(), 1);
-            assert_eq!(validation_results.warnings.len(), 0);
+            data.compare_votes_cast_admitted_voters
+                .votes_cast_smaller_than_admitted_voters = true;
+            data.difference_completely_accounted_for.yes = true;
+
+            let validation_results = validate(data, 103, 104)?;
+
             assert_eq!(
-                validation_results.errors[0].code,
-                ValidationResultCode::F303
-            );
-            assert_eq!(
-                validation_results.errors[0].fields,
-                vec![
-                    "polling_station_results.differences_counts.compare_votes_cast_admitted_voters.votes_cast_smaller_than_admitted_voters",
-                ]
+                validation_results.errors,
+                [ValidationResult {
+                    code: ValidationResultCode::F303,
+                    fields: vec![
+                        "differences_counts.compare_votes_cast_admitted_voters.votes_cast_smaller_than_admitted_voters".into(),
+                    ],
+                    context: None,
+                }]
             );
 
             Ok(())
@@ -2236,66 +2091,19 @@ mod tests {
         // CSO | F.304: "Vergelijk D&H": Meerdere aangevinkt of geen enkele aangevinkt
         #[test]
         fn test_f304_none() -> Result<(), DataError> {
-            let polling_station_results = CSOFirstSessionResults {
-                extra_investigation: ValidDefault::valid_default(),
-                counting_differences_polling_station: ValidDefault::valid_default(),
-                voters_counts: VotersCounts {
-                    poll_card_count: 103,
-                    proxy_certificate_count: 2,
-                    total_admitted_voters_count: 105,
-                },
-                votes_counts: VotesCounts {
-                    political_group_total_votes: vec![PoliticalGroupTotalVotes {
-                        number: 1,
-                        total: 100,
-                    }],
-                    total_votes_candidates_count: 100,
-                    blank_votes_count: 2,
-                    invalid_votes_count: 2,
-                    total_votes_cast_count: 104,
-                },
-                differences_counts: DifferencesCounts {
-                    more_ballots_count: 0,
-                    fewer_ballots_count: 0,
-                    compare_votes_cast_admitted_voters:
-                        DifferenceCountsCompareVotesCastAdmittedVoters {
-                            admitted_voters_equal_votes_cast: false,
-                            votes_cast_greater_than_admitted_voters: false,
-                            votes_cast_smaller_than_admitted_voters: false,
-                        },
-                    difference_completely_accounted_for: YesNo {
-                        yes: true,
-                        no: false,
-                    },
-                },
-                political_group_votes: vec![PoliticalGroupCandidateVotes::from_test_data_auto(
-                    1,
-                    &[100],
-                )],
-            };
-            let mut validation_results = ValidationResults::default();
-            let election = election_fixture(&[1]);
-            let polling_station = polling_station_fixture(None);
+            let mut data = DifferencesCounts::zero();
 
-            polling_station_results
-                .validate(
-                    &election,
-                    &polling_station,
-                    &mut validation_results,
-                    &"polling_station_results".into(),
-                )
-                .unwrap();
-            assert_eq!(validation_results.errors.len(), 1);
-            assert_eq!(validation_results.warnings.len(), 0);
+            data.difference_completely_accounted_for.yes = true;
+
+            let validation_results = validate(data, 105, 104)?;
+
             assert_eq!(
-                validation_results.errors[0].code,
-                ValidationResultCode::F304
-            );
-            assert_eq!(
-                validation_results.errors[0].fields,
-                vec![
-                    "polling_station_results.differences_counts.compare_votes_cast_admitted_voters",
-                ]
+                validation_results.errors,
+                [ValidationResult {
+                    code: ValidationResultCode::F304,
+                    fields: vec!["differences_counts.compare_votes_cast_admitted_voters".into(),],
+                    context: None,
+                }]
             );
 
             Ok(())
@@ -2304,96 +2112,259 @@ mod tests {
         // CSO | F.304: "Vergelijk D&H": Meerdere aangevinkt of geen enkele aangevinkt
         #[test]
         fn test_f304_all() -> Result<(), DataError> {
-            let polling_station_results = CSOFirstSessionResults {
-                extra_investigation: ValidDefault::valid_default(),
-                counting_differences_polling_station: ValidDefault::valid_default(),
-                voters_counts: VotersCounts {
-                    poll_card_count: 103,
-                    proxy_certificate_count: 2,
-                    total_admitted_voters_count: 105,
-                },
-                votes_counts: VotesCounts {
-                    political_group_total_votes: vec![PoliticalGroupTotalVotes {
-                        number: 1,
-                        total: 100,
-                    }],
-                    total_votes_candidates_count: 100,
-                    blank_votes_count: 2,
-                    invalid_votes_count: 2,
-                    total_votes_cast_count: 104,
-                },
-                differences_counts: DifferencesCounts {
-                    more_ballots_count: 0,
-                    fewer_ballots_count: 0,
-                    compare_votes_cast_admitted_voters:
-                        DifferenceCountsCompareVotesCastAdmittedVoters {
-                            admitted_voters_equal_votes_cast: true,
-                            votes_cast_greater_than_admitted_voters: true,
-                            votes_cast_smaller_than_admitted_voters: true,
-                        },
-                    difference_completely_accounted_for: YesNo {
-                        yes: true,
-                        no: false,
-                    },
-                },
-                political_group_votes: vec![PoliticalGroupCandidateVotes::from_test_data_auto(
-                    1,
-                    &[100],
-                )],
-            };
-            let mut validation_results = ValidationResults::default();
-            let election = election_fixture(&[1]);
-            let polling_station = polling_station_fixture(None);
+            let mut data = DifferencesCounts::zero();
 
-            polling_station_results
-                .validate(
-                    &election,
-                    &polling_station,
-                    &mut validation_results,
-                    &"polling_station_results".into(),
-                )
-                .unwrap();
-            assert_eq!(validation_results.errors.len(), 4);
-            assert_eq!(validation_results.warnings.len(), 0);
+            data.compare_votes_cast_admitted_voters
+                .admitted_voters_equal_votes_cast = true;
+            data.compare_votes_cast_admitted_voters
+                .votes_cast_greater_than_admitted_voters = true;
+            data.compare_votes_cast_admitted_voters
+                .votes_cast_smaller_than_admitted_voters = true;
+            data.difference_completely_accounted_for.yes = true;
+
+            let validation_results = validate(data, 105, 104)?;
+
             assert_eq!(
-                validation_results.errors[0].code,
-                ValidationResultCode::F301
+                validation_results.errors,
+                [ValidationResult {
+                    code: ValidationResultCode::F301,
+                    fields: vec![
+                        "differences_counts.compare_votes_cast_admitted_voters.admitted_voters_equal_votes_cast".into(),
+                    ],
+                    context: None,
+                },ValidationResult {
+                    code: ValidationResultCode::F302,
+                    fields: vec![
+                        "differences_counts.compare_votes_cast_admitted_voters.votes_cast_greater_than_admitted_voters".into(),
+                    ],
+                    context: None,
+                },ValidationResult {
+                    code: ValidationResultCode::F304,
+                    fields: vec![
+                        "differences_counts.compare_votes_cast_admitted_voters".into(),
+                    ],
+                    context: None,
+                }]
             );
+
+            Ok(())
+        }
+
+        /// Tests validation when no differences are expected (F.305)
+        // CSO | F.305 (Als D = H) I is ingevuld
+        #[test]
+        fn test_f305_more_ballots_count() -> Result<(), DataError> {
+            let mut data = DifferencesCounts::zero();
+
+            data.more_ballots_count = 4;
+            data.compare_votes_cast_admitted_voters
+                .admitted_voters_equal_votes_cast = true;
+            data.difference_completely_accounted_for.yes = true;
+
+            let validation_results = validate(data, 52, 52)?;
+
             assert_eq!(
-                validation_results.errors[0].fields,
-                vec![
-                    "polling_station_results.differences_counts.compare_votes_cast_admitted_voters.admitted_voters_equal_votes_cast",
+                validation_results.errors,
+                [ValidationResult {
+                    code: ValidationResultCode::F305,
+                    fields: vec!["more_ballots_count".into()],
+                    context: None,
+                }]
+            );
+
+            Ok(())
+        }
+
+        /// Tests validation when no differences are expected (F.305)
+        // CSO | F.305 (Als D = H) J is ingevuld
+        #[test]
+        fn test_f305_fewer_ballots_count() -> Result<(), DataError> {
+            let mut data = DifferencesCounts::zero();
+
+            data.fewer_ballots_count = 4;
+            data.compare_votes_cast_admitted_voters
+                .admitted_voters_equal_votes_cast = true;
+            data.difference_completely_accounted_for.yes = true;
+
+            let validation_results = validate(data, 52, 52)?;
+
+            assert_eq!(
+                validation_results.errors,
+                [ValidationResult {
+                    code: ValidationResultCode::F305,
+                    fields: vec!["fewer_ballots_count".into()],
+                    context: None,
+                }]
+            );
+
+            Ok(())
+        }
+
+        // CSO | F.306 (Als H > D) `I <> H - D`
+        #[test]
+        fn test_f306() -> Result<(), DataError> {
+            let mut data = DifferencesCounts::zero();
+
+            data.more_ballots_count = 4;
+            data.compare_votes_cast_admitted_voters
+                .votes_cast_greater_than_admitted_voters = true;
+            data.difference_completely_accounted_for.yes = true;
+
+            let validation_results = validate(data, 52, 72)?;
+
+            assert_eq!(
+                validation_results.errors,
+                [ValidationResult {
+                    code: ValidationResultCode::F306,
+                    fields: vec!["differences_counts.more_ballots_count".into()],
+                    context: None,
+                }]
+            );
+
+            Ok(())
+        }
+
+        // CSO | F.307 (Als H > D) J is ingevuld
+        #[test]
+        fn test_f307() -> Result<(), DataError> {
+            let mut data = DifferencesCounts::zero();
+
+            data.fewer_ballots_count = 3;
+            data.compare_votes_cast_admitted_voters
+                .votes_cast_greater_than_admitted_voters = true;
+            data.difference_completely_accounted_for.yes = true;
+
+            let validation_results = validate(data, 52, 62)?;
+
+            assert_eq!(
+                validation_results.errors,
+                [ValidationResult {
+                    code: ValidationResultCode::F307,
+                    fields: vec!["differences_counts.fewer_ballots_count".into()],
+                    context: None,
+                }]
+            );
+
+            Ok(())
+        }
+
+        // CSO | F.308 (Als H < D) `J <> D - H`
+        #[test]
+        fn test_f308() -> Result<(), DataError> {
+            let mut data = DifferencesCounts::zero();
+
+            data.fewer_ballots_count = 5;
+            data.compare_votes_cast_admitted_voters
+                .votes_cast_smaller_than_admitted_voters = true;
+            data.difference_completely_accounted_for.yes = true;
+
+            let validation_results = validate(data, 46, 44)?;
+
+            assert_eq!(
+                validation_results.errors,
+                [ValidationResult {
+                    code: ValidationResultCode::F308,
+                    fields: vec!["differences_counts.fewer_ballots_count".into()],
+                    context: None,
+                }]
+            );
+
+            Ok(())
+        }
+
+        // CSO | F.309 (Als H < D) I is ingevuld
+        #[test]
+        fn test_f309() -> Result<(), DataError> {
+            let mut data = DifferencesCounts::zero();
+
+            data.more_ballots_count = 5;
+            data.compare_votes_cast_admitted_voters
+                .votes_cast_smaller_than_admitted_voters = true;
+            data.difference_completely_accounted_for.yes = true;
+
+            let validation_results = validate(data, 48, 44)?;
+
+            assert_eq!(
+                validation_results.errors,
+                [ValidationResult {
+                    code: ValidationResultCode::F309,
+                    fields: vec![
+                        "differences_counts.more_ballots_count".into(),
+                        "differences_counts.fewer_ballots_count".into()
+                    ],
+                    context: None,
+                }]
+            );
+
+            Ok(())
+        }
+
+        // CSO | F.310 (Als D <> H en verklaring voor verschil niks aangevinkt of 'ja' en 'nee' aangevinkt)
+        #[test]
+        fn test_f310_none_checked() -> Result<(), DataError> {
+            let mut data = DifferencesCounts::zero();
+
+            data.more_ballots_count = 5;
+            data.compare_votes_cast_admitted_voters
+                .votes_cast_smaller_than_admitted_voters = true;
+
+            let validation_results = validate(data, 48, 44)?;
+
+            assert_eq!(
+                validation_results.errors,
+                [
+                    ValidationResult {
+                        code: ValidationResultCode::F309,
+                        fields: vec![
+                            "differences_counts.more_ballots_count".into(),
+                            "differences_counts.fewer_ballots_count".into(),
+                        ],
+                        context: None,
+                    },
+                    ValidationResult {
+                        code: ValidationResultCode::F310,
+                        fields: vec![
+                            "differences_counts.difference_completely_accounted_for".into(),
+                        ],
+                        context: None,
+                    }
                 ]
             );
+
+            Ok(())
+        }
+
+        // CSO | F.310 (Als D <> H en verklaring voor verschil niks aangevinkt of 'ja' en 'nee' aangevinkt)
+        #[test]
+        fn test_f310_all_checked() -> Result<(), DataError> {
+            let mut data = DifferencesCounts::zero();
+
+            data.more_ballots_count = 5;
+            data.compare_votes_cast_admitted_voters
+                .votes_cast_smaller_than_admitted_voters = true;
+            data.difference_completely_accounted_for.yes = true;
+            data.difference_completely_accounted_for.no = true;
+
+            let validation_results = validate(data, 48, 44)?;
+
             assert_eq!(
-                validation_results.errors[1].code,
-                ValidationResultCode::F302
-            );
-            assert_eq!(
-                validation_results.errors[1].fields,
-                vec![
-                    "polling_station_results.differences_counts.compare_votes_cast_admitted_voters.votes_cast_greater_than_admitted_voters",
-                ]
-            );
-            assert_eq!(
-                validation_results.errors[2].code,
-                ValidationResultCode::F304
-            );
-            assert_eq!(
-                validation_results.errors[2].fields,
-                vec![
-                    "polling_station_results.differences_counts.compare_votes_cast_admitted_voters",
-                ]
-            );
-            assert_eq!(
-                validation_results.errors[1].code,
-                ValidationResultCode::F307
-            );
-            assert_eq!(
-                validation_results.errors[1].fields,
-                vec![
-                    "polling_station_results.differences_counts.more_ballots_count",
-                    "polling_station_results.differences_counts.fewer_ballots_count",
+                validation_results.errors,
+                [
+                    ValidationResult {
+                        code: ValidationResultCode::F309,
+                        fields: vec![
+                            "differences_counts.more_ballots_count".into(),
+                            "differences_counts.fewer_ballots_count".into()
+                        ],
+                        context: None,
+                    },
+                    ValidationResult {
+                        code: ValidationResultCode::F310,
+                        fields: vec![
+                            "differences_counts.difference_completely_accounted_for".into(),
+                        ],
+                        context: None,
+                    }
                 ]
             );
 
@@ -2432,7 +2403,7 @@ mod tests {
     #[test]
     fn test_count_err_out_of_range() {
         let mut validation_results = ValidationResults::default();
-        let count = 1_000_000_000;
+        let count: Count = 1_000_000_000;
 
         let result = count.validate(
             &election_fixture(&[]),
@@ -2489,963 +2460,6 @@ mod tests {
                 "Failed for admitted_voters={admitted_voters}, votes_cast={votes_cast}, expected={expected}"
             );
         }
-    }
-
-    /// Tests validation of polling station results with incorrect totals and differences.
-    /// Covers F.301-F.305 (difference errors).
-    #[test]
-    fn test_incorrect_total_and_difference() {
-        let mut validation_results = ValidationResults::default();
-        let polling_station_results = CSOFirstSessionResults {
-            extra_investigation: ValidDefault::valid_default(),
-            counting_differences_polling_station: ValidDefault::valid_default(),
-            voters_counts: VotersCounts {
-                poll_card_count: 99,
-                proxy_certificate_count: 0,
-                total_admitted_voters_count: 99,
-            },
-            votes_counts: VotesCounts {
-                political_group_total_votes: vec![PoliticalGroupTotalVotes {
-                    number: 1,
-                    total: 100,
-                }],
-                total_votes_candidates_count: 100,
-                blank_votes_count: 0,
-                invalid_votes_count: 0,
-                total_votes_cast_count: 100,
-            },
-            differences_counts: DifferencesCounts {
-                more_ballots_count: 0,
-                fewer_ballots_count: 0,
-                compare_votes_cast_admitted_voters:
-                    DifferenceCountsCompareVotesCastAdmittedVoters {
-                        admitted_voters_equal_votes_cast: true, // F.301 incorrect difference
-                        votes_cast_greater_than_admitted_voters: false,
-                        votes_cast_smaller_than_admitted_voters: false,
-                    },
-                difference_completely_accounted_for: YesNo {
-                    yes: false,
-                    no: true,
-                },
-            },
-            political_group_votes: vec![PoliticalGroupCandidateVotes::from_test_data_auto(
-                1,
-                &[100],
-            )],
-        };
-        let election = election_fixture(&[1]);
-        let polling_station = polling_station_fixture(None);
-        polling_station_results
-            .validate(
-                &election,
-                &polling_station,
-                &mut validation_results,
-                &"polling_station_results".into(),
-            )
-            .unwrap();
-
-        assert_eq!(validation_results.errors.len(), 1);
-        assert_eq!(validation_results.warnings.len(), 0);
-
-        assert_eq!(
-            validation_results.errors[0].code,
-            ValidationResultCode::F301
-        );
-        assert_eq!(
-            validation_results.errors[0].fields,
-            vec![
-                "polling_station_results.differences_counts.compare_votes_cast_admitted_voters.admitted_voters_equal_votes_cast"
-            ]
-        );
-
-        // test F.303 incorrect difference & F.304 should be empty
-        validation_results = ValidationResults::default();
-        let polling_station_results = CSOFirstSessionResults {
-            extra_investigation: ValidDefault::valid_default(),
-            counting_differences_polling_station: ValidDefault::valid_default(),
-            voters_counts: VotersCounts {
-                poll_card_count: 4,
-                proxy_certificate_count: 1,
-                total_admitted_voters_count: 5,
-            },
-            votes_counts: VotesCounts {
-                political_group_total_votes: vec![PoliticalGroupTotalVotes {
-                    number: 1,
-                    total: 6,
-                }],
-                total_votes_candidates_count: 6,
-                blank_votes_count: 0,
-                invalid_votes_count: 0,
-                total_votes_cast_count: 6, // W.203 above threshold in percentage
-            },
-            differences_counts: DifferencesCounts {
-                more_ballots_count: 2, // F.301 incorrect difference
-                fewer_ballots_count: 0,
-                compare_votes_cast_admitted_voters:
-                    DifferenceCountsCompareVotesCastAdmittedVoters {
-                        admitted_voters_equal_votes_cast: true,
-                        votes_cast_greater_than_admitted_voters: false,
-                        votes_cast_smaller_than_admitted_voters: false,
-                    },
-                difference_completely_accounted_for: YesNo::yes(),
-            },
-            political_group_votes: vec![PoliticalGroupCandidateVotes::from_test_data_auto(1, &[3])],
-        };
-        polling_station_results
-            .validate(
-                &election,
-                &polling_station,
-                &mut validation_results,
-                &"polling_station_results".into(),
-            )
-            .unwrap();
-        assert_eq!(validation_results.errors.len(), 3);
-        assert_eq!(validation_results.warnings.len(), 1);
-        assert_eq!(
-            validation_results.errors[0].code,
-            ValidationResultCode::F301
-        );
-        assert_eq!(
-            validation_results.errors[0].fields,
-            vec![
-                "polling_station_results.differences_counts.compare_votes_cast_admitted_voters.admitted_voters_equal_votes_cast",
-            ]
-        );
-        assert_eq!(
-            validation_results.errors[1].code,
-            ValidationResultCode::F305
-        );
-        assert_eq!(
-            validation_results.errors[1].fields,
-            vec![
-                "polling_station_results.differences_counts.more_ballots_count",
-                "polling_station_results.differences_counts.fewer_ballots_count"
-            ]
-        );
-        assert_eq!(
-            validation_results.errors[2].code,
-            ValidationResultCode::F403
-        );
-        assert_eq!(
-            validation_results.errors[2].fields,
-            vec!["polling_station_results.political_group_votes[0].total",]
-        );
-        assert_eq!(
-            validation_results.warnings[0].code,
-            ValidationResultCode::W203
-        );
-        assert_eq!(
-            validation_results.warnings[0].fields,
-            vec![
-                "polling_station_results.voters_counts.total_admitted_voters_count",
-                "polling_station_results.votes_counts.total_votes_cast_count",
-            ]
-        );
-    }
-
-    /// Tests validation when differences are incorrectly specified (F.304)
-    /// and the difference between voters counts and votes counts is >2% (W.203).
-    #[test]
-    fn test_differences() {
-        let polling_station_results = CSOFirstSessionResults {
-            extra_investigation: ValidDefault::valid_default(),
-            counting_differences_polling_station: ValidDefault::valid_default(),
-            voters_counts: VotersCounts {
-                poll_card_count: 54,
-                proxy_certificate_count: 2,
-                total_admitted_voters_count: 56, // W.203 above threshold in percentage
-            },
-            votes_counts: VotesCounts {
-                political_group_total_votes: vec![PoliticalGroupTotalVotes {
-                    number: 1,
-                    total: 50,
-                }],
-                total_votes_candidates_count: 50,
-                blank_votes_count: 1,
-                invalid_votes_count: 1,
-                total_votes_cast_count: 52, // W.203 above threshold in percentage
-            },
-            differences_counts: DifferencesCounts {
-                more_ballots_count: 0,
-                fewer_ballots_count: 4,
-                compare_votes_cast_admitted_voters:
-                    DifferenceCountsCompareVotesCastAdmittedVoters {
-                        admitted_voters_equal_votes_cast: false,
-                        votes_cast_greater_than_admitted_voters: false,
-                        votes_cast_smaller_than_admitted_voters: false,
-                    },
-                difference_completely_accounted_for: YesNo {
-                    yes: true,
-                    no: false,
-                },
-            },
-            political_group_votes: vec![PoliticalGroupCandidateVotes::from_test_data_auto(
-                1,
-                &[50],
-            )],
-        };
-        let election = election_fixture(&[1]);
-        let polling_station = polling_station_fixture(None);
-        let mut validation_results = ValidationResults::default();
-        polling_station_results
-            .validate(
-                &election,
-                &polling_station,
-                &mut validation_results,
-                &"polling_station_results".into(),
-            )
-            .unwrap();
-        assert_eq!(validation_results.errors.len(), 1);
-        assert_eq!(validation_results.warnings.len(), 1);
-        assert_eq!(
-            validation_results.errors[0].code,
-            ValidationResultCode::F304
-        );
-        assert_eq!(
-            validation_results.errors[0].fields,
-            vec!["polling_station_results.differences_counts.compare_votes_cast_admitted_voters",]
-        );
-        assert_eq!(
-            validation_results.warnings[0].code,
-            ValidationResultCode::W203
-        );
-        assert_eq!(
-            validation_results.warnings[0].fields,
-            vec![
-                "polling_station_results.voters_counts.total_admitted_voters_count",
-                "polling_station_results.votes_counts.total_votes_cast_count",
-            ]
-        );
-    }
-
-    /// Tests validation when no differences are expected (F.305)
-    // CSO | F.305 (Als D = H) I is ingevuld
-    #[test]
-    fn test_f305_more_ballots_count() {
-        let polling_station_results = CSOFirstSessionResults {
-            extra_investigation: ValidDefault::valid_default(),
-            counting_differences_polling_station: ValidDefault::valid_default(),
-            voters_counts: VotersCounts {
-                poll_card_count: 50,
-                proxy_certificate_count: 2,
-                total_admitted_voters_count: 52,
-            },
-            votes_counts: VotesCounts {
-                political_group_total_votes: vec![PoliticalGroupTotalVotes {
-                    number: 1,
-                    total: 50,
-                }],
-                total_votes_candidates_count: 50,
-                blank_votes_count: 1,
-                invalid_votes_count: 1,
-                total_votes_cast_count: 52,
-            },
-            differences_counts: DifferencesCounts {
-                more_ballots_count: 4, // F.305 no difference expected
-                fewer_ballots_count: 0,
-                compare_votes_cast_admitted_voters:
-                    DifferenceCountsCompareVotesCastAdmittedVoters {
-                        admitted_voters_equal_votes_cast: true,
-                        votes_cast_greater_than_admitted_voters: false,
-                        votes_cast_smaller_than_admitted_voters: false,
-                    },
-                difference_completely_accounted_for: YesNo {
-                    yes: true,
-                    no: false,
-                },
-            },
-            political_group_votes: vec![PoliticalGroupCandidateVotes::from_test_data_auto(
-                1,
-                &[50],
-            )],
-        };
-        let election = election_fixture(&[1]);
-        let polling_station = polling_station_fixture(None);
-        let mut validation_results = ValidationResults::default();
-        polling_station_results
-            .validate(
-                &election,
-                &polling_station,
-                &mut validation_results,
-                &"polling_station_results".into(),
-            )
-            .unwrap();
-        assert_eq!(validation_results.errors.len(), 1);
-        assert_eq!(validation_results.warnings.len(), 0);
-        assert_eq!(
-            validation_results.errors[0].code,
-            ValidationResultCode::F305
-        );
-        assert_eq!(
-            validation_results.errors[0].fields,
-            vec![
-                "polling_station_results.differences_counts.more_ballots_count",
-                "polling_station_results.differences_counts.fewer_ballots_count",
-            ]
-        );
-    }
-
-    /// Tests validation when no differences are expected (F.305)
-    // CSO | F.305 (Als D = H) J is ingevuld
-    #[test]
-    fn test_f305_fewer_ballots_count() {
-        let polling_station_results = CSOFirstSessionResults {
-            extra_investigation: ValidDefault::valid_default(),
-            counting_differences_polling_station: ValidDefault::valid_default(),
-            voters_counts: VotersCounts {
-                poll_card_count: 50,
-                proxy_certificate_count: 2,
-                total_admitted_voters_count: 52,
-            },
-            votes_counts: VotesCounts {
-                political_group_total_votes: vec![PoliticalGroupTotalVotes {
-                    number: 1,
-                    total: 50,
-                }],
-                total_votes_candidates_count: 50,
-                blank_votes_count: 1,
-                invalid_votes_count: 1,
-                total_votes_cast_count: 52,
-            },
-            differences_counts: DifferencesCounts {
-                more_ballots_count: 0,
-                fewer_ballots_count: 4,
-                compare_votes_cast_admitted_voters:
-                    DifferenceCountsCompareVotesCastAdmittedVoters {
-                        admitted_voters_equal_votes_cast: true,
-                        votes_cast_greater_than_admitted_voters: false,
-                        votes_cast_smaller_than_admitted_voters: false,
-                    },
-                difference_completely_accounted_for: YesNo {
-                    yes: true,
-                    no: false,
-                },
-            },
-            political_group_votes: vec![PoliticalGroupCandidateVotes::from_test_data_auto(
-                1,
-                &[50],
-            )],
-        };
-        let election = election_fixture(&[1]);
-        let polling_station = polling_station_fixture(None);
-        let mut validation_results = ValidationResults::default();
-        polling_station_results
-            .validate(
-                &election,
-                &polling_station,
-                &mut validation_results,
-                &"polling_station_results".into(),
-            )
-            .unwrap();
-        assert_eq!(validation_results.errors.len(), 1);
-        assert_eq!(validation_results.warnings.len(), 0);
-        assert_eq!(
-            validation_results.errors[0].code,
-            ValidationResultCode::F305
-        );
-        assert_eq!(
-            validation_results.errors[0].fields,
-            vec![
-                "polling_station_results.differences_counts.more_ballots_count",
-                "polling_station_results.differences_counts.fewer_ballots_count",
-            ]
-        );
-    }
-
-    // CSO | F.306 (Als H > D) `I <> H - D`
-    #[test]
-    fn test_f306() {
-        let polling_station_results = CSOFirstSessionResults {
-            extra_investigation: ValidDefault::valid_default(),
-            counting_differences_polling_station: ValidDefault::valid_default(),
-            voters_counts: VotersCounts {
-                poll_card_count: 50,
-                proxy_certificate_count: 2,
-                total_admitted_voters_count: 52,
-            },
-            votes_counts: VotesCounts {
-                political_group_total_votes: vec![PoliticalGroupTotalVotes {
-                    number: 1,
-                    total: 70,
-                }],
-                total_votes_candidates_count: 70,
-                blank_votes_count: 1,
-                invalid_votes_count: 1,
-                total_votes_cast_count: 72,
-            },
-            differences_counts: DifferencesCounts {
-                more_ballots_count: 3,
-                fewer_ballots_count: 0,
-                compare_votes_cast_admitted_voters:
-                    DifferenceCountsCompareVotesCastAdmittedVoters {
-                        admitted_voters_equal_votes_cast: false,
-                        votes_cast_greater_than_admitted_voters: true,
-                        votes_cast_smaller_than_admitted_voters: false,
-                    },
-                difference_completely_accounted_for: YesNo {
-                    yes: true,
-                    no: false,
-                },
-            },
-            political_group_votes: vec![PoliticalGroupCandidateVotes::from_test_data_auto(
-                1,
-                &[50],
-            )],
-        };
-        let election = election_fixture(&[1]);
-        let polling_station = polling_station_fixture(None);
-        let mut validation_results = ValidationResults::default();
-        polling_station_results
-            .validate(
-                &election,
-                &polling_station,
-                &mut validation_results,
-                &"polling_station_results".into(),
-            )
-            .unwrap();
-        assert_eq!(validation_results.errors.len(), 2);
-        assert_eq!(validation_results.warnings.len(), 1);
-
-        assert_eq!(
-            validation_results.errors[0].code,
-            ValidationResultCode::F306
-        );
-        assert_eq!(
-            validation_results.errors[1].code,
-            ValidationResultCode::F403
-        );
-        assert_eq!(
-            validation_results.errors[0].fields,
-            vec!["polling_station_results.differences_counts.more_ballots_count"]
-        );
-        assert_eq!(
-            validation_results.warnings[0].code,
-            ValidationResultCode::W203
-        );
-        assert_eq!(
-            validation_results.warnings[0].fields,
-            vec![
-                "polling_station_results.voters_counts.total_admitted_voters_count",
-                "polling_station_results.votes_counts.total_votes_cast_count",
-            ]
-        );
-    }
-
-    // CSO | F.307 (Als H > D) J is ingevuld
-    #[test]
-    fn test_f307() {
-        let polling_station_results = CSOFirstSessionResults {
-            extra_investigation: ValidDefault::valid_default(),
-            counting_differences_polling_station: ValidDefault::valid_default(),
-            voters_counts: VotersCounts {
-                poll_card_count: 50,
-                proxy_certificate_count: 2,
-                total_admitted_voters_count: 52,
-            },
-            votes_counts: VotesCounts {
-                political_group_total_votes: vec![PoliticalGroupTotalVotes {
-                    number: 1,
-                    total: 60,
-                }],
-                total_votes_candidates_count: 60,
-                blank_votes_count: 1,
-                invalid_votes_count: 1,
-                total_votes_cast_count: 62,
-            },
-            differences_counts: DifferencesCounts {
-                more_ballots_count: 0,
-                fewer_ballots_count: 3,
-                compare_votes_cast_admitted_voters:
-                    DifferenceCountsCompareVotesCastAdmittedVoters {
-                        admitted_voters_equal_votes_cast: false,
-                        votes_cast_greater_than_admitted_voters: true,
-                        votes_cast_smaller_than_admitted_voters: false,
-                    },
-                difference_completely_accounted_for: YesNo {
-                    yes: true,
-                    no: false,
-                },
-            },
-            political_group_votes: vec![PoliticalGroupCandidateVotes::from_test_data_auto(
-                1,
-                &[50],
-            )],
-        };
-        let election = election_fixture(&[1]);
-        let polling_station = polling_station_fixture(None);
-        let mut validation_results = ValidationResults::default();
-        polling_station_results
-            .validate(
-                &election,
-                &polling_station,
-                &mut validation_results,
-                &"polling_station_results".into(),
-            )
-            .unwrap();
-        assert_eq!(validation_results.errors.len(), 3);
-        assert_eq!(validation_results.warnings.len(), 1);
-
-        assert_eq!(
-            validation_results.errors[0].code,
-            ValidationResultCode::F306
-        );
-        assert_eq!(
-            validation_results.errors[0].fields,
-            vec!["polling_station_results.differences_counts.more_ballots_count",]
-        );
-        assert_eq!(
-            validation_results.errors[1].code,
-            ValidationResultCode::F307
-        );
-        assert_eq!(
-            validation_results.errors[1].fields,
-            vec![
-                "polling_station_results.differences_counts.more_ballots_count",
-                "polling_station_results.differences_counts.fewer_ballots_count",
-            ]
-        );
-        assert_eq!(
-            validation_results.errors[2].code,
-            ValidationResultCode::F403
-        );
-        assert_eq!(
-            validation_results.errors[2].fields,
-            vec!["polling_station_results.political_group_votes[0].total"]
-        );
-
-        assert_eq!(
-            validation_results.warnings[0].code,
-            ValidationResultCode::W203
-        );
-        assert_eq!(
-            validation_results.warnings[0].fields,
-            vec![
-                "polling_station_results.voters_counts.total_admitted_voters_count",
-                "polling_station_results.votes_counts.total_votes_cast_count",
-            ]
-        );
-    }
-
-    // CSO | F.308 (Als H < D) `J <> D - H`
-    #[test]
-    fn test_f308() {
-        let polling_station_results = CSOFirstSessionResults {
-            extra_investigation: ValidDefault::valid_default(),
-            counting_differences_polling_station: ValidDefault::valid_default(),
-            voters_counts: VotersCounts {
-                poll_card_count: 46,
-                proxy_certificate_count: 0,
-                total_admitted_voters_count: 46,
-            },
-            votes_counts: VotesCounts {
-                political_group_total_votes: vec![PoliticalGroupTotalVotes {
-                    number: 1,
-                    total: 42,
-                }],
-                total_votes_candidates_count: 42,
-                blank_votes_count: 1,
-                invalid_votes_count: 1,
-                total_votes_cast_count: 44,
-            },
-            differences_counts: DifferencesCounts {
-                more_ballots_count: 0,
-                fewer_ballots_count: 5,
-                compare_votes_cast_admitted_voters:
-                    DifferenceCountsCompareVotesCastAdmittedVoters {
-                        admitted_voters_equal_votes_cast: false,
-                        votes_cast_greater_than_admitted_voters: false,
-                        votes_cast_smaller_than_admitted_voters: true,
-                    },
-                difference_completely_accounted_for: YesNo {
-                    yes: true,
-                    no: false,
-                },
-            },
-            political_group_votes: vec![PoliticalGroupCandidateVotes::from_test_data_auto(
-                1,
-                &[50],
-            )],
-        };
-        let election = election_fixture(&[1]);
-        let polling_station = polling_station_fixture(None);
-        let mut validation_results = ValidationResults::default();
-        polling_station_results
-            .validate(
-                &election,
-                &polling_station,
-                &mut validation_results,
-                &"polling_station_results".into(),
-            )
-            .unwrap();
-        assert_eq!(validation_results.errors.len(), 2);
-        assert_eq!(
-            validation_results.errors[0].code,
-            ValidationResultCode::F308
-        );
-        assert_eq!(
-            validation_results.errors[0].fields,
-            vec!["polling_station_results.differences_counts.fewer_ballots_count"]
-        );
-        assert_eq!(
-            validation_results.errors[1].code,
-            ValidationResultCode::F403
-        );
-        assert_eq!(
-            validation_results.errors[1].fields,
-            vec!["polling_station_results.political_group_votes[0].total"]
-        );
-
-        assert_eq!(validation_results.warnings.len(), 1);
-
-        assert_eq!(
-            validation_results.warnings[0].code,
-            ValidationResultCode::W203
-        );
-        assert_eq!(
-            validation_results.warnings[0].fields,
-            vec![
-                "polling_station_results.voters_counts.total_admitted_voters_count",
-                "polling_station_results.votes_counts.total_votes_cast_count",
-            ]
-        );
-    }
-
-    // CSO | F.309 (Als H < D) I is ingevuld
-    #[test]
-    fn test_f309() {
-        let polling_station_results = CSOFirstSessionResults {
-            extra_investigation: ValidDefault::valid_default(),
-            counting_differences_polling_station: ValidDefault::valid_default(),
-            voters_counts: VotersCounts {
-                poll_card_count: 48,
-                proxy_certificate_count: 0,
-                total_admitted_voters_count: 48,
-            },
-            votes_counts: VotesCounts {
-                political_group_total_votes: vec![PoliticalGroupTotalVotes {
-                    number: 1,
-                    total: 42,
-                }],
-                total_votes_candidates_count: 42,
-                blank_votes_count: 1,
-                invalid_votes_count: 1,
-                total_votes_cast_count: 44,
-            },
-            differences_counts: DifferencesCounts {
-                more_ballots_count: 5,
-                fewer_ballots_count: 0,
-                compare_votes_cast_admitted_voters:
-                    DifferenceCountsCompareVotesCastAdmittedVoters {
-                        admitted_voters_equal_votes_cast: false,
-                        votes_cast_greater_than_admitted_voters: false,
-                        votes_cast_smaller_than_admitted_voters: true,
-                    },
-                difference_completely_accounted_for: YesNo {
-                    yes: true,
-                    no: false,
-                },
-            },
-            political_group_votes: vec![PoliticalGroupCandidateVotes::from_test_data_auto(
-                1,
-                &[98],
-            )],
-        };
-        let election = election_fixture(&[1]);
-        let polling_station = polling_station_fixture(None);
-        let mut validation_results = ValidationResults::default();
-        polling_station_results
-            .validate(
-                &election,
-                &polling_station,
-                &mut validation_results,
-                &"polling_station_results".into(),
-            )
-            .unwrap();
-        assert_eq!(validation_results.errors.len(), 2);
-        assert_eq!(
-            validation_results.errors[0].code,
-            ValidationResultCode::F309
-        );
-        assert_eq!(
-            validation_results.errors[0].fields,
-            vec![
-                "polling_station_results.differences_counts.more_ballots_count",
-                "polling_station_results.differences_counts.fewer_ballots_count",
-            ]
-        );
-        assert_eq!(
-            validation_results.errors[1].code,
-            ValidationResultCode::F403
-        );
-        assert_eq!(
-            validation_results.errors[1].fields,
-            vec!["polling_station_results.political_group_votes[0].total",]
-        );
-
-        assert_eq!(validation_results.warnings.len(), 1);
-        assert_eq!(
-            validation_results.warnings[0].code,
-            ValidationResultCode::W203
-        );
-        assert_eq!(
-            validation_results.warnings[0].fields,
-            vec![
-                "polling_station_results.voters_counts.total_admitted_voters_count",
-                "polling_station_results.votes_counts.total_votes_cast_count",
-            ]
-        );
-    }
-
-    // CSO | F.310 (Als D <> H en verklaring voor verschil niks aangevinkt of 'ja' en 'nee' aangevinkt)
-    #[test]
-    fn test_f310_none_checked() {
-        let polling_station_results = CSOFirstSessionResults {
-            extra_investigation: ValidDefault::valid_default(),
-            counting_differences_polling_station: ValidDefault::valid_default(),
-            voters_counts: VotersCounts {
-                poll_card_count: 48,
-                proxy_certificate_count: 0,
-                total_admitted_voters_count: 48,
-            },
-            votes_counts: VotesCounts {
-                political_group_total_votes: vec![PoliticalGroupTotalVotes {
-                    number: 1,
-                    total: 42,
-                }],
-                total_votes_candidates_count: 42,
-                blank_votes_count: 1,
-                invalid_votes_count: 1,
-                total_votes_cast_count: 44,
-            },
-            differences_counts: DifferencesCounts {
-                more_ballots_count: 5,
-                fewer_ballots_count: 0,
-                compare_votes_cast_admitted_voters:
-                    DifferenceCountsCompareVotesCastAdmittedVoters {
-                        admitted_voters_equal_votes_cast: false,
-                        votes_cast_greater_than_admitted_voters: false,
-                        votes_cast_smaller_than_admitted_voters: true,
-                    },
-                difference_completely_accounted_for: YesNo {
-                    yes: false,
-                    no: false,
-                },
-            },
-            political_group_votes: vec![PoliticalGroupCandidateVotes::from_test_data_auto(
-                1,
-                &[50],
-            )],
-        };
-        let election = election_fixture(&[1]);
-        let polling_station = polling_station_fixture(None);
-        let mut validation_results = ValidationResults::default();
-        polling_station_results
-            .validate(
-                &election,
-                &polling_station,
-                &mut validation_results,
-                &"polling_station_results".into(),
-            )
-            .unwrap();
-        assert_eq!(validation_results.errors.len(), 3);
-        assert_eq!(
-            validation_results.errors[0].code,
-            ValidationResultCode::F309
-        );
-        assert_eq!(
-            validation_results.errors[0].fields,
-            vec![
-                "polling_station_results.differences_counts.more_ballots_count",
-                "polling_station_results.differences_counts.fewer_ballots_count",
-            ]
-        );
-        assert_eq!(
-            validation_results.errors[1].code,
-            ValidationResultCode::F310
-        );
-        assert_eq!(
-            validation_results.errors[1].fields,
-            vec!["polling_station_results.differences_counts.difference_completely_accounted_for",]
-        );
-        assert_eq!(
-            validation_results.errors[2].code,
-            ValidationResultCode::F403
-        );
-        assert_eq!(
-            validation_results.errors[2].fields,
-            vec!["polling_station_results.political_group_votes[0].total",]
-        );
-
-        assert_eq!(validation_results.warnings.len(), 1);
-        assert_eq!(
-            validation_results.warnings[0].code,
-            ValidationResultCode::W203
-        );
-        assert_eq!(
-            validation_results.warnings[0].fields,
-            vec![
-                "polling_station_results.voters_counts.total_admitted_voters_count",
-                "polling_station_results.votes_counts.total_votes_cast_count",
-            ]
-        );
-    }
-
-    // CSO | F.310 (Als D <> H en verklaring voor verschil niks aangevinkt of 'ja' en 'nee' aangevinkt)
-    #[test]
-    fn test_f310_all_checked() {
-        let polling_station_results = CSOFirstSessionResults {
-            extra_investigation: ValidDefault::valid_default(),
-            counting_differences_polling_station: ValidDefault::valid_default(),
-            voters_counts: VotersCounts {
-                poll_card_count: 48,
-                proxy_certificate_count: 0,
-                total_admitted_voters_count: 48,
-            },
-            votes_counts: VotesCounts {
-                political_group_total_votes: vec![PoliticalGroupTotalVotes {
-                    number: 1,
-                    total: 42,
-                }],
-                total_votes_candidates_count: 42,
-                blank_votes_count: 1,
-                invalid_votes_count: 1,
-                total_votes_cast_count: 44,
-            },
-            differences_counts: DifferencesCounts {
-                more_ballots_count: 5,
-                fewer_ballots_count: 0,
-                compare_votes_cast_admitted_voters:
-                    DifferenceCountsCompareVotesCastAdmittedVoters {
-                        admitted_voters_equal_votes_cast: false,
-                        votes_cast_greater_than_admitted_voters: false,
-                        votes_cast_smaller_than_admitted_voters: true,
-                    },
-                difference_completely_accounted_for: YesNo {
-                    yes: true,
-                    no: true,
-                },
-            },
-            political_group_votes: vec![PoliticalGroupCandidateVotes::from_test_data_auto(
-                1,
-                &[50],
-            )],
-        };
-        let election = election_fixture(&[1]);
-        let polling_station = polling_station_fixture(None);
-        let mut validation_results = ValidationResults::default();
-        polling_station_results
-            .validate(
-                &election,
-                &polling_station,
-                &mut validation_results,
-                &"polling_station_results".into(),
-            )
-            .unwrap();
-        assert_eq!(validation_results.errors.len(), 3);
-        assert_eq!(
-            validation_results.errors[0].code,
-            ValidationResultCode::F309
-        );
-        assert_eq!(
-            validation_results.errors[0].fields,
-            vec![
-                "polling_station_results.differences_counts.more_ballots_count",
-                "polling_station_results.differences_counts.fewer_ballots_count",
-            ]
-        );
-        assert_eq!(
-            validation_results.errors[1].code,
-            ValidationResultCode::F310
-        );
-        assert_eq!(
-            validation_results.errors[1].fields,
-            vec!["polling_station_results.differences_counts.difference_completely_accounted_for",]
-        );
-        assert_eq!(
-            validation_results.errors[2].code,
-            ValidationResultCode::F403
-        );
-        assert_eq!(
-            validation_results.errors[2].fields,
-            vec!["polling_station_results.political_group_votes[0].total",]
-        );
-
-        assert_eq!(validation_results.warnings.len(), 1);
-        assert_eq!(
-            validation_results.warnings[0].code,
-            ValidationResultCode::W203
-        );
-        assert_eq!(
-            validation_results.warnings[0].fields,
-            vec![
-                "polling_station_results.voters_counts.total_admitted_voters_count",
-                "polling_station_results.votes_counts.total_votes_cast_count",
-            ]
-        );
-    }
-
-    /// Tests validation when no differences are expected (F.305)
-    #[test]
-    fn test_no_differences_expected_and_incorrect_total() {
-        let polling_station_results = CSOFirstSessionResults {
-            extra_investigation: ValidDefault::valid_default(),
-            counting_differences_polling_station: ValidDefault::valid_default(),
-            voters_counts: VotersCounts {
-                poll_card_count: 50,
-                proxy_certificate_count: 2,
-                total_admitted_voters_count: 52,
-            },
-            votes_counts: VotesCounts {
-                political_group_total_votes: vec![PoliticalGroupTotalVotes {
-                    number: 1,
-                    total: 50,
-                }],
-                total_votes_candidates_count: 50,
-                blank_votes_count: 1,
-                invalid_votes_count: 1,
-                total_votes_cast_count: 52,
-            },
-            differences_counts: DifferencesCounts {
-                more_ballots_count: 0,
-                fewer_ballots_count: 4, // F.305 no difference expected
-                compare_votes_cast_admitted_voters:
-                    DifferenceCountsCompareVotesCastAdmittedVoters {
-                        admitted_voters_equal_votes_cast: false,
-                        votes_cast_greater_than_admitted_voters: false,
-                        votes_cast_smaller_than_admitted_voters: false,
-                    },
-                difference_completely_accounted_for: Default::default(),
-            },
-            political_group_votes: vec![PoliticalGroupCandidateVotes {
-                number: 1,
-                total: 50,
-                candidate_votes: vec![CandidateVotes {
-                    number: 1,
-                    votes: 50,
-                }],
-            }],
-        };
-        let election = election_fixture(&[1]);
-        let polling_station = polling_station_fixture(None);
-        let mut validation_results = ValidationResults::default();
-        polling_station_results
-            .validate(
-                &election,
-                &polling_station,
-                &mut validation_results,
-                &"polling_station_results".into(),
-            )
-            .unwrap();
-        assert_eq!(validation_results.errors.len(), 1);
-        assert_eq!(
-            validation_results.errors[0].code,
-            ValidationResultCode::F304
-        );
-        assert_eq!(
-            validation_results.errors[0].fields,
-            vec!["polling_station_results.differences_counts.compare_votes_cast_admitted_voters"]
-        );
-        assert_eq!(validation_results.warnings.len(), 0);
     }
 
     /// Tests the has_errors() and has_warnings() helper methods on ValidationResults.

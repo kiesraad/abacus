@@ -280,6 +280,7 @@ pub async fn list_entries_for_committee_session(
     .fetch_all(&mut *tx)
     .await?;
 
+    tx.commit().await?;
     if results.len() != polling_stations.len() {
         // This should never happen, since every polling station should always
         // have results the first time it appears.

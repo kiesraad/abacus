@@ -1,3 +1,5 @@
+import * as ReactRouter from "react-router";
+
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
 import { UsersProvider } from "@/hooks/user/UsersProvider";

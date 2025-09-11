@@ -3,6 +3,8 @@
 This document describes the states a committee session can have.
 The transition labels describe the action that is used for performing the transition.
 
+N.B.: in case of a next committee session, "polling station" is replaced by "investigation" and adding findings to an investigation is also considered data entry.
+
 ```mermaid
 stateDiagram-v2
   [*] --> Created

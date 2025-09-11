@@ -2014,7 +2014,7 @@ mod tests {
             Ok(validation_results)
         }
 
-        // CSO | F.301: "Vergelijk D&H": (checkbox D=H is aangevinkt, maar D<>H)
+        /// CSO | F.301: "Vergelijk D&H": (checkbox D=H is aangevinkt, maar D<>H)
         #[test]
         fn test_f301() -> Result<(), DataError> {
             let mut data = DifferencesCounts::zero();
@@ -2039,7 +2039,7 @@ mod tests {
             Ok(())
         }
 
-        // CSO | F.302: "Vergelijk D&H": (checkbox H>D is aangevinkt, maar H<=D)
+        /// CSO | F.302: "Vergelijk D&H": (checkbox H>D is aangevinkt, maar H<=D)
         #[test]
         fn test_f302() -> Result<(), DataError> {
             let mut data = DifferencesCounts::zero();
@@ -2063,7 +2063,7 @@ mod tests {
             Ok(())
         }
 
-        // CSO | F.303: "Vergelijk D&H": (checkbox H>D is aangevinkt, maar H<=D)
+        /// CSO | F.303: "Vergelijk D&H": (checkbox H>D is aangevinkt, maar H<=D)
         #[test]
         fn test_f303() -> Result<(), DataError> {
             let mut data = DifferencesCounts::zero();
@@ -2088,7 +2088,7 @@ mod tests {
             Ok(())
         }
 
-        // CSO | F.304: "Vergelijk D&H": Meerdere aangevinkt of geen enkele aangevinkt
+        /// CSO | F.304: "Vergelijk D&H": Meerdere aangevinkt of geen enkele aangevinkt
         #[test]
         fn test_f304_none() -> Result<(), DataError> {
             let mut data = DifferencesCounts::zero();
@@ -2109,7 +2109,7 @@ mod tests {
             Ok(())
         }
 
-        // CSO | F.304: "Vergelijk D&H": Meerdere aangevinkt of geen enkele aangevinkt
+        /// CSO | F.304: "Vergelijk D&H": Meerdere aangevinkt of geen enkele aangevinkt
         #[test]
         fn test_f304_all() -> Result<(), DataError> {
             let mut data = DifferencesCounts::zero();
@@ -2150,8 +2150,7 @@ mod tests {
             Ok(())
         }
 
-        /// Tests validation when no differences are expected (F.305)
-        // CSO | F.305 (Als D = H) I is ingevuld
+        /// CSO | F.305 (Als D = H) I is ingevuld
         #[test]
         fn test_f305_more_ballots_count() -> Result<(), DataError> {
             let mut data = DifferencesCounts::zero();
@@ -2175,8 +2174,7 @@ mod tests {
             Ok(())
         }
 
-        /// Tests validation when no differences are expected (F.305)
-        // CSO | F.305 (Als D = H) J is ingevuld
+        /// CSO | F.305 (Als D = H) J is ingevuld
         #[test]
         fn test_f305_fewer_ballots_count() -> Result<(), DataError> {
             let mut data = DifferencesCounts::zero();
@@ -2200,7 +2198,7 @@ mod tests {
             Ok(())
         }
 
-        // CSO | F.306 (Als H > D) `I <> H - D`
+        /// CSO | F.306 (Als H > D) `I <> H - D`
         #[test]
         fn test_f306() -> Result<(), DataError> {
             let mut data = DifferencesCounts::zero();
@@ -2224,7 +2222,7 @@ mod tests {
             Ok(())
         }
 
-        // CSO | F.307 (Als H > D) J is ingevuld
+        /// CSO | F.307 (Als H > D) J is ingevuld
         #[test]
         fn test_f307() -> Result<(), DataError> {
             let mut data = DifferencesCounts::zero();
@@ -2248,7 +2246,7 @@ mod tests {
             Ok(())
         }
 
-        // CSO | F.308 (Als H < D) `J <> D - H`
+        /// CSO | F.308 (Als H < D) `J <> D - H`
         #[test]
         fn test_f308() -> Result<(), DataError> {
             let mut data = DifferencesCounts::zero();
@@ -2272,7 +2270,7 @@ mod tests {
             Ok(())
         }
 
-        // CSO | F.309 (Als H < D) I is ingevuld
+        /// CSO | F.309 (Als H < D) I is ingevuld
         #[test]
         fn test_f309() -> Result<(), DataError> {
             let mut data = DifferencesCounts::zero();
@@ -2299,7 +2297,7 @@ mod tests {
             Ok(())
         }
 
-        // CSO | F.310 (Als D <> H en verklaring voor verschil niks aangevinkt of 'ja' en 'nee' aangevinkt)
+        /// CSO | F.310 (Als D <> H en verklaring voor verschil niks aangevinkt of 'ja' en 'nee' aangevinkt)
         #[test]
         fn test_f310_none_checked() -> Result<(), DataError> {
             let mut data = DifferencesCounts::zero();
@@ -2334,7 +2332,7 @@ mod tests {
             Ok(())
         }
 
-        // CSO | F.310 (Als D <> H en verklaring voor verschil niks aangevinkt of 'ja' en 'nee' aangevinkt)
+        /// CSO | F.310 (Als D <> H en verklaring voor verschil niks aangevinkt of 'ja' en 'nee' aangevinkt)
         #[test]
         fn test_f310_all_checked() -> Result<(), DataError> {
             let mut data = DifferencesCounts::zero();

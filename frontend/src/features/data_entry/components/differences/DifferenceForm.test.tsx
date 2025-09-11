@@ -250,7 +250,7 @@ describe("Test DifferencesForm", () => {
       expectInputToNotHaveIcon(expectedValidInputFieldIds);
     });
 
-    test("F.302 Votes greater than voters checked, but votes >= voters", async () => {
+    test("F.302 Votes greater than voters checked, but votes <= voters", async () => {
       const user = userEvent.setup();
       overrideServerClaimDataEntryResponse({
         formState: getDefaultDataEntryState().formState,

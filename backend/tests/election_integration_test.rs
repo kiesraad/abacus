@@ -278,22 +278,29 @@ async fn test_election_zip_download_works(pool: SqlitePool) {
     );
 
     let bytes = response.bytes().await.unwrap();
-    let hash1 = sha2::Sha256::digest(&bytes);
     let archive = ZipFileReader::new(bytes.to_vec()).await.unwrap();
 
-    let reader = archive.reader_with_entry(1).await.unwrap();
-    assert_eq!(
-        reader.entry().filename().as_str().unwrap(),
-        "Telling_GR2024_Heemdamseburg.eml.xml"
-    );
-    assert!(reader.entry().uncompressed_size() > 1024);
-
-    let reader = archive.reader_with_entry(0).await.unwrap();
+    // Extract and hash the PDF file
+    let mut reader = archive.reader_with_entry(0).await.unwrap();
     assert_eq!(
         reader.entry().filename().as_str().unwrap(),
         "Model_Na31-2_GR2024_Heemdamseburg.pdf"
     );
     assert!(reader.entry().uncompressed_size() > 1024);
+    let mut pdf_content = Vec::new();
+    reader.read_to_end_checked(&mut pdf_content).await.unwrap();
+    let pdf_hash1 = sha2::Sha256::digest(&pdf_content);
+
+    // Extract and hash the EML file
+    let mut reader = archive.reader_with_entry(1).await.unwrap();
+    assert_eq!(
+        reader.entry().filename().as_str().unwrap(),
+        "Telling_GR2024_Heemdamseburg.eml.xml"
+    );
+    assert!(reader.entry().uncompressed_size() > 1024);
+    let mut eml_content = Vec::new();
+    reader.read_to_end_checked(&mut eml_content).await.unwrap();
+    let eml_hash1 = sha2::Sha256::digest(&eml_content);
 
     let committee_session =
         shared::get_election_committee_session(&addr, &coordinator_cookie, election_id).await;
@@ -308,14 +315,34 @@ async fn test_election_zip_download_works(pool: SqlitePool) {
         .await
         .unwrap();
 
-    let hash2 = sha2::Sha256::digest(response.bytes().await.unwrap());
+    let bytes2 = response.bytes().await.unwrap();
+    let archive2 = ZipFileReader::new(bytes2.to_vec()).await.unwrap();
 
-    // Check that the file is the same
+    // Extract and hash the PDF file from second download
+    let mut reader2 = archive2.reader_with_entry(0).await.unwrap();
+    let mut pdf_content2 = Vec::new();
+    reader2
+        .read_to_end_checked(&mut pdf_content2)
+        .await
+        .unwrap();
+    let pdf_hash2 = sha2::Sha256::digest(&pdf_content2);
+
+    // Extract and hash the EML file from second download
+    let mut reader2 = archive2.reader_with_entry(1).await.unwrap();
+    let mut eml_content2 = Vec::new();
+    reader2
+        .read_to_end_checked(&mut eml_content2)
+        .await
+        .unwrap();
+    let eml_hash2 = sha2::Sha256::digest(&eml_content2);
+
+    // Check that the files inside the zip are the same
     let committee_session =
         shared::get_election_committee_session(&addr, &coordinator_cookie, election_id).await;
     assert_eq!(committee_session.results_eml, Some(1));
     assert_eq!(committee_session.results_pdf, Some(2));
-    assert_eq!(hash1, hash2);
+    assert_eq!(eml_hash1, eml_hash2, "EML files should have the same hash");
+    assert_eq!(pdf_hash1, pdf_hash2, "PDF files should have the same hash");
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]

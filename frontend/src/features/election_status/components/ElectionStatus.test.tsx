@@ -10,13 +10,9 @@ import { render, screen, within } from "@/testing/test-utils";
 import { ElectionStatus } from "./ElectionStatus";
 
 const navigate = vi.fn();
-vi.mock(import("react-router"), async (importOriginal) => ({
-  ...(await importOriginal()),
-  useNavigate: () => navigate,
-}));
-
 describe("ElectionStatus", () => {
   beforeEach(() => {
+    vi.spyOn(ReactRouter, "useNavigate").mockImplementation(() => navigate);
     server.use(UserListRequestHandler);
   });
 

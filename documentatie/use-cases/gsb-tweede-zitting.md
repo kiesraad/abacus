@@ -10,17 +10,20 @@ __Niveau:__ hoog-over, wolk, ☁️
 
 __Hoofdscenario:__  
 1. Het GSB ontvangt één of meerdere verzoeken tot onderzoek/hertelling van het CSB.
-2. De coördinator GSB maakt de nieuwe zitting aan in de applicate. Hiermee wordt de vorige zitting in de applicatie gesloten.
+2. De coördinator GSB maakt de nieuwe zitting aan in de applicatie. Hiermee wordt de vorige zitting in de applicatie gesloten.
 3. [De coördinator GSB bereidt de documenten voor de zitting voor.](#de-coördinator-gsb-bereidt-de-documenten-voor-de-zitting-voor-zee)
-4. Het GSB opent de zitting. (Wanneer dat gebeurt is een afweging van het GSB: liefst pas als alle verzoeken binnen zijn, maar ook niet te lang wachten)
-5. De coördinator GSB voert de locatie en starttijd van de zitting in.
-6. (voor elk verzoek) [Het GSB behandelt een verzoek tot onderzoek/hertelling.](#het-gsb-behandelt-een-verzoek-tot-onderzoekhertelling-vlieger)
-7. De coördinator GSB maakt de GSB PVs en het EML_NL-bestand aan: P 2a (verslag tweede zitting), Na 14-2 (corrigendum GSB).
-8. Het GSB voert de andere onderdelen van het GSB-corrigendum in.
-9. Het GSB leest de PV's voor: P 2a (verslag tweede zitting), Na 14-2 (corrigendum GSB), Na 14-1 versie 2 (DSO, één per SB) of Na 14-2 Bijlage 1 (CSO, één bijlage per SB).
-10. Het GSB ondertekent de PV's.
-11. Het GSB sluit de zitting.
-12. Het GSB stelt de benodigde bestanden beschikbaar aan het CSB voor de uitslagvaststelling.
+4. Het GSB opent de zitting. (Wanneer dat gebeurt, is een afweging van het GSB: het liefst pas als alle verzoeken binnen zijn, maar ook niet te lang wachten).
+5. (gedurende de zitting) Het GSB houdt tijd en locatie bij van de aanwezigheid van elk lid van het GSB.
+6. De coördinator GSB voert de locatie, startdatum en starttijd van de zitting in.
+7. (voor elk verzoek) [Het GSB behandelt een verzoek tot onderzoek/hertelling.](#het-gsb-behandelt-een-verzoek-tot-onderzoekhertelling-vlieger)
+8. [De coördinator GSB maakt de PVs en het EML_NL-bestand aan.](#de-coördinator-gsb-maakt-de-pvs-en-het-eml_nl-bestand-aan-zee)
+9. Het GSB voert de andere onderdelen van het GSB-corrigendum in.
+10. Het GSB leest de PVs voor: P 2a (Verslag tweede zitting), Na 14-2 (Corrigendum GSB), Na 14-1 versie 2 (DSO, één per SB) of Na 14-2 Bijlage 1 (CSO, één bijlage per SB).
+11. Het GSB ondertekent de PVs.
+12. Het GSB sluit de zitting.
+13. Het GSB stelt de benodigde bestanden beschikbaar aan het CSB voor de uitslagvaststelling.
+14. Het GSB stelt de PVs GSB (inc. bijlagen) beschikbaar aan de burgemeester.
+15. De burgemeester publiceert de PVs GSB (inc. bijlagen) en brengt die over naar het CSB.
 
 __Uitbreidingen:__
 
@@ -33,13 +36,16 @@ __Uitbreidingen:__
 &emsp;&emsp;&emsp; 2b1a1. De applicatie verwijdert de geopende zitting niet.
 
 2c. Er is geen eerste zitting in de applicatie:  
-&emsp; 2c1. De coördinator importeert het EML_NL bestand van de eerste zitting.
+&emsp; 2c1. De coördinator importeert het EML_NL-bestand van de eerste zitting.
 
 4-7a. Het GSB schorst de zitting, omdat er mogelijk nog een verzoek komt:
 
-9a. Het GSB stelt een probleem vast met het PV:  
-&emsp; 9a1. Het GSB stelt het bezwaar vast.  
-&emsp; 9a2. Het GSB gaat over tot hertelling.
+10a. Het GSB stelt een probleem vast met het PV:  
+&emsp; 10a1. Het GSB stelt het bezwaar vast.  
+&emsp; 10a2. Het GSB gaat over tot hertelling.
+
+10b. Er zijn bezwaren en/of bijzonderheden tijdens het voorlezen van het PV:  
+&emsp; 10b1. Het GSB voegt de bijzonderheden en/of bezwaren met de hand toe aan het papieren PV.
 
 ## De coördinator GSB bereidt de documenten voor de zitting voor (zee)
 
@@ -50,7 +56,7 @@ __Niveau:__ gebruikersdoel, zee, 🌊
 __Hoofdscenario:__  
 
 1. De coördinator GSB selecteert een stembureau en voert "Aanleiding van het onderzoek" (vrije tekst) in de applicatie in.
-2. De applicatie genereert een 'leeg' corrigendum, Na 14-1 versie 2 (DSO) of Bijlage 1 van Na 14-2 (CSO). ('leeg' == klaar om in te vullen: kandidatenlijst, oorspr. tellingen, verzoek CSB (aanleiding))
+2. De applicatie genereert een 'leeg' corrigendum, Na 14-1 versie 2 (DSO) of Bijlage 1 van Na 14-2 (CSO). ('leeg' == klaar om in te vullen: kandidatenlijst, oorspronkelijke tellingen, verzoek CSB (aanleiding))
 3. De coördinator GSB drukt het 'lege' corrigendum af.
 
 __Uitbreidingen:__  
@@ -105,3 +111,15 @@ __Uitbreidingen:__
 6a. Tijdens invoer is er reden om de invoer (tijdelijk) te stoppen:  
 &emsp; 6a1. De coördinator GSB pauzeert de invoer.  
 &emsp; 6a2. De applicatie blokkeert verdere invoer.  
+
+## De coördinator GSB maakt de PVs en het EML_NL-bestand aan (zee)
+
+__Niveau:__ gebruikersdoel, zee, 🌊
+
+### Hoofdscenario en uitbreidingen
+
+__Hoofdscenario:__
+
+1. De applicatie stelt vast dat de bevindingen voor alle onderzoeken zijn ingevoerd en dat alle onderzochte stembureaus met gecorrigeerde telresultaten definitieve invoer hebben
+2. De coördinator GSB sluit de invoerfase af
+3. De coördinator GSB genereert de [PVs: P 2a (Verslag volgende zitting) & Na 14-2 (Corrigendum GSB) en het EML_NL-bestand: Telling 510b](./input-output-bestanden.md#gsb).

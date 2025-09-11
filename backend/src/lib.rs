@@ -1,4 +1,4 @@
-use std::{error::Error, net::SocketAddr, str::FromStr};
+use std::{error::Error, future::Future, net::SocketAddr, str::FromStr};
 
 use airgap::AirgapDetection;
 #[cfg(feature = "memory-serve")]
@@ -9,10 +9,9 @@ use axum::{
     middleware,
     serve::ListenerExt,
 };
-use futures::future::BoxFuture;
 use hyper::http::{HeaderName, HeaderValue, header};
 use sqlx::{
-    Acquire, Executor, Sqlite, SqlitePool,
+    Sqlite, SqlitePool,
     sqlite::{SqliteConnectOptions, SqliteJournalMode},
 };
 use tokio::{net::TcpListener, signal};
@@ -52,30 +51,19 @@ pub use error::{APIError, ErrorResponse};
 /// Maximum size of the request body in megabytes.
 pub const MAX_BODY_SIZE_MB: usize = 12;
 
-pub trait DbConnLike<'a>: Acquire<'a, Database = Sqlite> + Executor<'a, Database = Sqlite> {
-    /// Start a transaction with "BEGIN IMMEDIATE", which is needed to prevent
-    /// database is busy errors. See https://sqlite.org/isolation.html for
-    /// details.
-    ///
-    /// Note: this function could have been written as an async fn (i.e.
-    /// returning `impl Future<Output = Result<...>`), but that triggers
-    /// https://github.com/rust-lang/rust/issues/100013, so until that is
-    /// resolved we need to box the future instead.
-    fn begin_immediate(self) -> BoxFuture<'a, Result<sqlx::Transaction<'a, Sqlite>, sqlx::Error>>;
+/// Extension trait for SqlitePool to add begin_immediate functionality
+pub trait SqlitePoolExt {
+    /// Acquire a connection and start a transaction with "BEGIN IMMEDIATE",
+    /// which is needed to prevent database is busy errors.
+    /// See https://sqlite.org/isolation.html for details.
+    fn begin_immediate(
+        &self,
+    ) -> impl Future<Output = Result<sqlx::Transaction<'_, Sqlite>, sqlx::Error>> + Send;
 }
 
-impl<'a, T> DbConnLike<'a> for T
-where
-    T: Acquire<'a, Database = Sqlite> + Executor<'a, Database = Sqlite> + 'a,
-    <T as Acquire<'a>>::Connection: Into<sqlx::pool::MaybePoolConnection<'a, Sqlite>>,
-{
-    fn begin_immediate(self) -> BoxFuture<'a, Result<sqlx::Transaction<'a, Sqlite>, sqlx::Error>> {
-        use futures::TryFutureExt;
-
-        Box::pin(
-            self.acquire()
-                .and_then(|conn| sqlx::Transaction::begin(conn, Some("BEGIN IMMEDIATE".into()))),
-        )
+impl SqlitePoolExt for SqlitePool {
+    async fn begin_immediate(&self) -> Result<sqlx::Transaction<'_, Sqlite>, sqlx::Error> {
+        self.begin_with("BEGIN IMMEDIATE").await
     }
 }
 
@@ -297,7 +285,8 @@ pub async fn create_sqlite_pool(
     let db = format!("sqlite://{database}");
     let opts = SqliteConnectOptions::from_str(&db)?
         .create_if_missing(true)
-        .journal_mode(SqliteJournalMode::Wal);
+        .journal_mode(SqliteJournalMode::Wal)
+        .busy_timeout(std::time::Duration::from_secs(20));
 
     #[cfg(feature = "dev-database")]
     if reset_database {

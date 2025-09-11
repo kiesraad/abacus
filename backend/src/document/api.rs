@@ -51,12 +51,18 @@ async fn election_download_na_31_2_bijlage1(
     State(pool): State<SqlitePool>,
     Path(election_id): Path<u32>,
 ) -> Result<impl IntoResponse, APIError> {
-    let election = crate::election::repository::get(&pool, election_id).await?;
+    let mut conn = pool.acquire().await?;
+    let election = crate::election::repository::get(&mut conn, election_id).await?;
     let current_committee_session =
-        crate::committee_session::repository::get_election_committee_session(&pool, election.id)
-            .await?;
+        crate::committee_session::repository::get_election_committee_session(
+            &mut conn,
+            election.id,
+        )
+        .await?;
     let polling_stations =
-        crate::polling_station::repository::list(&pool, current_committee_session.id).await?;
+        crate::polling_station::repository::list(&mut conn, current_committee_session.id).await?;
+    drop(conn);
+
     let zip_filename = format!(
         "{}{}_{}_na_31_2_bijlage1.zip",
         election.category.to_eml_code(),
@@ -127,12 +133,17 @@ async fn election_download_n_10_2(
     State(pool): State<SqlitePool>,
     Path(election_id): Path<u32>,
 ) -> Result<impl IntoResponse, APIError> {
-    let election = crate::election::repository::get(&pool, election_id).await?;
+    let mut conn = pool.acquire().await?;
+    let election = crate::election::repository::get(&mut conn, election_id).await?;
     let current_committee_session =
-        crate::committee_session::repository::get_election_committee_session(&pool, election.id)
-            .await?;
+        crate::committee_session::repository::get_election_committee_session(
+            &mut conn,
+            election.id,
+        )
+        .await?;
     let polling_stations =
-        crate::polling_station::repository::list(&pool, current_committee_session.id).await?;
+        crate::polling_station::repository::list(&mut conn, current_committee_session.id).await?;
+    drop(conn);
 
     let zip_filename = format!(
         "{}{}_{}_n_10_2.zip",

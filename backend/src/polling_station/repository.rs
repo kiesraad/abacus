@@ -1,19 +1,9 @@
-use sqlx::{query, query_as};
-
 use super::structs::{PollingStation, PollingStationRequest};
-use crate::DbConnLike;
+use sqlx::{Connection, SqliteConnection, query, query_as};
 
 /// List all polling stations from a committee session
 pub async fn list(
-    conn: impl DbConnLike<'_>,
-    committee_session_id: u32,
-) -> Result<Vec<PollingStation>, sqlx::Error> {
-    let mut tx = conn.begin_immediate().await?;
-    list_for_committee_session(&mut *tx, committee_session_id).await
-}
-
-pub async fn list_for_committee_session(
-    conn: impl DbConnLike<'_>,
+    conn: &mut SqliteConnection,
     committee_session_id: u32,
 ) -> Result<Vec<PollingStation>, sqlx::Error> {
     query_as!(
@@ -42,7 +32,7 @@ pub async fn list_for_committee_session(
 }
 
 /// Get a single polling station
-pub async fn get(conn: impl DbConnLike<'_>, id: u32) -> Result<PollingStation, sqlx::Error> {
+pub async fn get(conn: &mut SqliteConnection, id: u32) -> Result<PollingStation, sqlx::Error> {
     query_as!(
         PollingStation,
         r#"
@@ -74,7 +64,7 @@ pub async fn get(conn: impl DbConnLike<'_>, id: u32) -> Result<PollingStation, s
 
 #[cfg(test)]
 pub async fn get_by_previous_id(
-    conn: impl DbConnLike<'_>,
+    conn: &mut SqliteConnection,
     previous_id: u32,
 ) -> Result<PollingStation, sqlx::Error> {
     query_as!(
@@ -104,13 +94,12 @@ pub async fn get_by_previous_id(
 
 /// Get a single polling station for an election
 pub async fn get_for_election(
-    conn: impl DbConnLike<'_>,
+    conn: &mut SqliteConnection,
     election_id: u32,
     id: u32,
 ) -> Result<PollingStation, sqlx::Error> {
-    let mut conn = conn.acquire().await?;
     let committee_session_id =
-        crate::committee_session::repository::get_current_id_for_election(&mut *conn, election_id)
+        crate::committee_session::repository::get_current_id_for_election(conn, election_id)
             .await?
             .ok_or(sqlx::Error::RowNotFound)?;
 
@@ -142,13 +131,13 @@ pub async fn get_for_election(
 
 /// Create a single polling station for an election
 pub async fn create(
-    conn: impl DbConnLike<'_>,
+    conn: &mut SqliteConnection,
     election_id: u32,
     new_polling_station: PollingStationRequest,
 ) -> Result<PollingStation, sqlx::Error> {
-    let mut tx = conn.begin_immediate().await?;
+    let mut tx = conn.begin().await?;
     let committee_session_id =
-        crate::committee_session::repository::get_current_id_for_election(&mut *tx, election_id)
+        crate::committee_session::repository::get_current_id_for_election(&mut tx, election_id)
             .await?
             .ok_or(sqlx::Error::RowNotFound)?;
 
@@ -198,15 +187,15 @@ pub async fn create(
 
 /// Create many polling stations for an election
 pub async fn create_many(
-    conn: impl DbConnLike<'_>,
+    conn: &mut SqliteConnection,
     election_id: u32,
     new_polling_stations: Vec<PollingStationRequest>,
 ) -> Result<Vec<PollingStation>, sqlx::Error> {
     let mut stations: Vec<PollingStation> = Vec::new();
-    let mut tx = conn.begin_immediate().await?;
+    let mut tx = conn.begin().await?;
 
     let committee_session_id =
-        crate::committee_session::repository::get_current_id_for_election(&mut *tx, election_id)
+        crate::committee_session::repository::get_current_id_for_election(&mut tx, election_id)
             .await?
             .ok_or(sqlx::Error::RowNotFound)?;
 
@@ -255,20 +244,19 @@ pub async fn create_many(
         );
     }
     tx.commit().await?;
-
     Ok(stations)
 }
 
 /// Update a single polling station for an election
 pub async fn update(
-    conn: impl DbConnLike<'_>,
+    conn: &mut SqliteConnection,
     election_id: u32,
     polling_station_id: u32,
     polling_station_update: PollingStationRequest,
 ) -> Result<PollingStation, sqlx::Error> {
-    let mut tx = conn.begin_immediate().await?;
+    let mut tx = conn.begin().await?;
     let committee_session_id =
-        crate::committee_session::repository::get_current_id_for_election(&mut *tx, election_id)
+        crate::committee_session::repository::get_current_id_for_election(&mut tx, election_id)
             .await?
             .ok_or(sqlx::Error::RowNotFound)?;
 
@@ -318,13 +306,13 @@ pub async fn update(
 
 /// Delete a single polling station for an election
 pub async fn delete(
-    conn: impl DbConnLike<'_>,
+    conn: &mut SqliteConnection,
     election_id: u32,
     id: u32,
 ) -> Result<bool, sqlx::Error> {
-    let mut tx = conn.begin_immediate().await?;
+    let mut tx = conn.begin().await?;
     let committee_session_id =
-        crate::committee_session::repository::get_current_id_for_election(&mut *tx, election_id)
+        crate::committee_session::repository::get_current_id_for_election(&mut tx, election_id)
             .await?
             .ok_or(sqlx::Error::RowNotFound)?;
 
@@ -343,7 +331,7 @@ pub async fn delete(
 }
 
 pub async fn duplicate_for_committee_session(
-    conn: impl DbConnLike<'_>,
+    conn: &mut SqliteConnection,
     from_committee_session_id: u32,
     to_committee_session_id: u32,
 ) -> Result<(), sqlx::Error> {

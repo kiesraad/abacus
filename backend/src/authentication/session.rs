@@ -5,14 +5,14 @@ use axum_extra::extract::cookie::Cookie;
 use chrono::{DateTime, TimeDelta, Utc};
 use cookie::CookieBuilder;
 use serde::{Deserialize, Serialize};
-use sqlx::FromRow;
+use sqlx::{FromRow, SqliteConnection};
 
 use super::{
     SESSION_COOKIE_NAME, SESSION_LIFE_TIME,
     error::AuthenticationError,
     util::{create_new_session_key, get_expires_at},
 };
-use crate::{APIError, DbConnLike};
+use crate::APIError;
 
 /// A session object, corresponds to a row in the sessions table
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Hash, FromRow)]
@@ -88,7 +88,7 @@ impl Session {
 
 /// Create a new session, note this converts any i64 timestamps to i64
 pub(crate) async fn create(
-    conn: impl DbConnLike<'_>,
+    conn: &mut SqliteConnection,
     user_id: u32,
     life_time: TimeDelta,
 ) -> Result<Session, AuthenticationError> {
@@ -117,7 +117,7 @@ pub(crate) async fn create(
 
 /// Get a session by its key
 pub(super) async fn get_by_key(
-    conn: impl DbConnLike<'_>,
+    conn: &mut SqliteConnection,
     session_key: &str,
 ) -> Result<Option<Session>, AuthenticationError> {
     let now = Utc::now();
@@ -144,7 +144,7 @@ pub(super) async fn get_by_key(
 
 /// Delete a session by its key
 pub async fn delete(
-    conn: impl DbConnLike<'_>,
+    conn: &mut SqliteConnection,
     session_key: &str,
 ) -> Result<(), AuthenticationError> {
     sqlx::query!("DELETE FROM sessions WHERE session_key = ?", session_key)
@@ -156,7 +156,7 @@ pub async fn delete(
 
 /// Delete a session for a certain user
 pub async fn delete_user_session(
-    conn: impl DbConnLike<'_>,
+    conn: &mut SqliteConnection,
     user_id: u32,
 ) -> Result<(), AuthenticationError> {
     sqlx::query!("DELETE FROM sessions WHERE user_id = ?", user_id)
@@ -167,7 +167,9 @@ pub async fn delete_user_session(
 }
 
 /// Delete all sessions that have expired
-pub async fn delete_expired_sessions(conn: impl DbConnLike<'_>) -> Result<(), AuthenticationError> {
+pub async fn delete_expired_sessions(
+    conn: &mut SqliteConnection,
+) -> Result<(), AuthenticationError> {
     sqlx::query("DELETE FROM sessions WHERE expires_at <= ?")
         .bind(Utc::now())
         .execute(conn)
@@ -177,7 +179,7 @@ pub async fn delete_expired_sessions(conn: impl DbConnLike<'_>) -> Result<(), Au
 }
 
 /// Count the number of active sessions
-pub async fn count(conn: impl DbConnLike<'_>) -> Result<u32, AuthenticationError> {
+pub async fn count(conn: &mut SqliteConnection) -> Result<u32, AuthenticationError> {
     let now = Utc::now();
     let count = sqlx::query_scalar!(
         r#"SELECT COUNT(*) AS "count: u32" FROM sessions WHERE expires_at > ?"#,
@@ -190,7 +192,7 @@ pub async fn count(conn: impl DbConnLike<'_>) -> Result<u32, AuthenticationError
 }
 
 pub(super) async fn extend_session(
-    conn: impl DbConnLike<'_>,
+    conn: &mut SqliteConnection,
     session: &Session,
 ) -> Result<Session, AuthenticationError> {
     let new_expires_at = get_expires_at(SESSION_LIFE_TIME);
@@ -225,11 +227,12 @@ mod test {
 
     #[test(sqlx::test(fixtures("../../fixtures/users.sql")))]
     async fn test_create_and_get_session(pool: SqlitePool) {
-        let session = super::create(&pool, 1, TimeDelta::seconds(60))
+        let mut conn = pool.acquire().await.unwrap();
+        let session = super::create(&mut conn, 1, TimeDelta::seconds(60))
             .await
             .unwrap();
 
-        let session_from_db = super::get_by_key(&pool, &session.session_key)
+        let session_from_db = super::get_by_key(&mut conn, &session.session_key)
             .await
             .unwrap()
             .unwrap();
@@ -239,18 +242,21 @@ mod test {
 
     #[test(sqlx::test(fixtures("../../fixtures/users.sql")))]
     async fn test_delete_session(pool: SqlitePool) {
-        let session = super::create(&pool, 1, TimeDelta::seconds(60))
+        let mut conn = pool.acquire().await.unwrap();
+        let session = super::create(&mut conn, 1, TimeDelta::seconds(60))
             .await
             .unwrap();
 
-        let session_from_db = super::get_by_key(&pool, &session.session_key)
+        let session_from_db = super::get_by_key(&mut conn, &session.session_key)
             .await
             .unwrap();
         assert_eq!(session_from_db, Some(session.clone()));
 
-        super::delete(&pool, &session.session_key).await.unwrap();
+        super::delete(&mut conn, &session.session_key)
+            .await
+            .unwrap();
 
-        let session_from_db = super::get_by_key(&pool, session.session_key())
+        let session_from_db = super::get_by_key(&mut conn, session.session_key())
             .await
             .unwrap();
 
@@ -259,13 +265,14 @@ mod test {
 
     #[test(sqlx::test(fixtures("../../fixtures/users.sql")))]
     async fn test_delete_old_sessions(pool: SqlitePool) {
-        let session = super::create(&pool, 1, TimeDelta::seconds(0))
+        let mut conn = pool.acquire().await.unwrap();
+        let session = super::create(&mut conn, 1, TimeDelta::seconds(0))
             .await
             .unwrap();
 
-        super::delete_expired_sessions(&pool).await.unwrap();
+        super::delete_expired_sessions(&mut conn).await.unwrap();
 
-        let session_from_db = super::get_by_key(&pool, session.session_key())
+        let session_from_db = super::get_by_key(&mut conn, session.session_key())
             .await
             .unwrap();
 
@@ -274,16 +281,17 @@ mod test {
 
     #[test(sqlx::test(fixtures("../../fixtures/users.sql")))]
     async fn test_session_count(pool: SqlitePool) {
-        let _active_session1 = super::create(&pool, 1, TimeDelta::seconds(60))
+        let mut conn = pool.acquire().await.unwrap();
+        let _active_session1 = super::create(&mut conn, 1, TimeDelta::seconds(60))
             .await
             .unwrap();
-        let _active_session2 = super::create(&pool, 2, TimeDelta::seconds(120))
+        let _active_session2 = super::create(&mut conn, 2, TimeDelta::seconds(120))
             .await
             .unwrap();
-        let _expired_session = super::create(&pool, 2, TimeDelta::seconds(0))
+        let _expired_session = super::create(&mut conn, 2, TimeDelta::seconds(0))
             .await
             .unwrap();
 
-        assert_eq!(2, super::count(&pool).await.unwrap());
+        assert_eq!(2, super::count(&mut conn).await.unwrap());
     }
 }

@@ -1,10 +1,9 @@
-use sqlx::{query, query_as};
+use sqlx::{SqliteConnection, query, query_as};
 
 use super::File;
-use crate::DbConnLike;
 
 /// Get a single file
-pub async fn get_file(conn: impl DbConnLike<'_>, id: u32) -> Result<File, sqlx::Error> {
+pub async fn get_file(conn: &mut SqliteConnection, id: u32) -> Result<File, sqlx::Error> {
     query_as!(
         File,
         r#"
@@ -24,7 +23,7 @@ pub async fn get_file(conn: impl DbConnLike<'_>, id: u32) -> Result<File, sqlx::
 
 /// Create a single file
 pub async fn create_file(
-    conn: impl DbConnLike<'_>,
+    conn: &mut SqliteConnection,
     data: &[u8],
     filename: String,
     mime_type: String,
@@ -52,15 +51,10 @@ pub async fn create_file(
 }
 
 /// Delete a single file
-pub async fn delete_file(conn: impl DbConnLike<'_>, id: u32) -> Result<bool, sqlx::Error> {
-    let mut tx = conn.begin_immediate().await?;
-
+pub async fn delete_file(conn: &mut SqliteConnection, id: u32) -> Result<bool, sqlx::Error> {
     let rows_affected = query!(r#"DELETE FROM files WHERE id = ?"#, id,)
-        .execute(&mut *tx)
+        .execute(conn)
         .await?
         .rows_affected();
-
-    tx.commit().await?;
-
     Ok(rows_affected > 0)
 }

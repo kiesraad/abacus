@@ -13,7 +13,7 @@ use super::{
     status::{CommitteeSessionStatus, change_committee_session_status},
 };
 use crate::{
-    APIError, AppState, ErrorResponse,
+    APIError, AppState, ErrorResponse, SqlitePoolExt,
     audit_log::{AuditEvent, AuditService},
     authentication::Coordinator,
     committee_session::CommitteeSessionUpdateRequest,
@@ -62,14 +62,17 @@ pub async fn committee_session_create(
     audit_service: AuditService,
     Json(request): Json<NewCommitteeSessionRequest>,
 ) -> Result<(StatusCode, CommitteeSession), APIError> {
+    let mut tx = pool.begin_immediate().await?;
+
     let current_committee_session =
         crate::committee_session::repository::get_election_committee_session(
-            &pool,
+            &mut tx,
             request.election_id,
         )
         .await?;
+
     if current_committee_session.status == CommitteeSessionStatus::DataEntryFinished {
-        let next_committee_session = crate::committee_session::repository::create(&pool, {
+        let next_committee_session = crate::committee_session::repository::create(&mut tx, {
             CommitteeSessionCreateRequest {
                 election_id: request.election_id,
                 number: current_committee_session.number + 1,
@@ -80,13 +83,17 @@ pub async fn committee_session_create(
 
         audit_service
             .log(
+                &mut tx,
                 &AuditEvent::CommitteeSessionCreated(next_committee_session.clone().into()),
                 None,
             )
             .await?;
 
+        tx.commit().await?;
+
         Ok((StatusCode::CREATED, next_committee_session))
     } else {
+        tx.rollback().await?;
         Err(APIError::CommitteeSession(
             CommitteeSessionError::InvalidCommitteeSessionStatus,
         ))
@@ -115,25 +122,32 @@ pub async fn committee_session_delete(
     audit_service: AuditService,
     Path(committee_session_id): Path<u32>,
 ) -> Result<StatusCode, APIError> {
+    let mut tx = pool.begin_immediate().await?;
+
     // Check if the committee session exists, will respond with NOT_FOUND otherwise
     let committee_session =
-        crate::committee_session::repository::get(&pool, committee_session_id).await?;
+        crate::committee_session::repository::get(&mut tx, committee_session_id).await?;
 
     if committee_session.number > 1
         && (committee_session.status == CommitteeSessionStatus::Created
             || committee_session.status == CommitteeSessionStatus::DataEntryNotStarted)
     {
-        crate::committee_session::repository::delete(&pool, committee_session_id).await?;
+        crate::committee_session::repository::delete(&mut tx, committee_session_id).await?;
 
         audit_service
             .log(
+                &mut tx,
                 &AuditEvent::CommitteeSessionDeleted(committee_session.clone().into()),
                 None,
             )
             .await?;
 
+        tx.commit().await?;
+
         Ok(StatusCode::OK)
     } else {
+        tx.rollback().await?;
+
         Err(APIError::CommitteeSession(
             CommitteeSessionError::InvalidCommitteeSessionStatus,
         ))
@@ -180,8 +194,10 @@ pub async fn committee_session_update(
         }
     };
 
+    let mut tx = pool.begin_immediate().await?;
+
     let committee_session = crate::committee_session::repository::update(
-        &pool,
+        &mut tx,
         committee_session_id,
         request.location,
         date_time,
@@ -190,10 +206,13 @@ pub async fn committee_session_update(
 
     audit_service
         .log(
+            &mut tx,
             &AuditEvent::CommitteeSessionUpdated(committee_session.clone().into()),
             None,
         )
         .await?;
+
+    tx.commit().await?;
 
     Ok(StatusCode::OK)
 }
@@ -221,8 +240,9 @@ pub async fn committee_session_number_of_voters_change(
     Path(committee_session_id): Path<u32>,
     Json(committee_session_request): Json<CommitteeSessionNumberOfVotersChangeRequest>,
 ) -> Result<StatusCode, APIError> {
+    let mut tx = pool.begin_immediate().await?;
     let committee_session = crate::committee_session::repository::change_number_of_voters(
-        &pool,
+        &mut tx,
         committee_session_id,
         committee_session_request.number_of_voters,
     )
@@ -230,10 +250,13 @@ pub async fn committee_session_number_of_voters_change(
 
     audit_service
         .log(
+            &mut tx,
             &AuditEvent::CommitteeSessionUpdated(committee_session.clone().into()),
             None,
         )
         .await?;
+
+    tx.commit().await?;
 
     Ok(StatusCode::OK)
 }
@@ -262,13 +285,15 @@ pub async fn committee_session_status_change(
     Path(committee_session_id): Path<u32>,
     Json(committee_session_request): Json<CommitteeSessionStatusChangeRequest>,
 ) -> Result<StatusCode, APIError> {
+    let mut tx = pool.begin_immediate().await?;
     change_committee_session_status(
+        &mut tx,
         committee_session_id,
         committee_session_request.status,
-        pool.clone(),
         audit_service,
     )
     .await?;
+    tx.commit().await?;
 
     Ok(StatusCode::OK)
 }
@@ -288,8 +313,9 @@ pub mod tests {
         election_id: u32,
         number_of_voters: u32,
     ) -> CommitteeSession {
+        let mut conn = pool.acquire().await.unwrap();
         crate::committee_session::repository::create(
-            &pool,
+            &mut conn,
             CommitteeSessionCreateRequest {
                 number,
                 election_id,
@@ -305,7 +331,8 @@ pub mod tests {
         committee_session_id: u32,
         status: CommitteeSessionStatus,
     ) -> CommitteeSession {
-        crate::committee_session::repository::change_status(&pool, committee_session_id, status)
+        let mut conn = pool.acquire().await.unwrap();
+        crate::committee_session::repository::change_status(&mut conn, committee_session_id, status)
             .await
             .unwrap()
     }

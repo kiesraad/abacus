@@ -6,6 +6,7 @@ use std::{
 };
 
 use abacus::{
+    SqlitePoolExt,
     committee_session::{
         CommitteeSession, CommitteeSessionCreateRequest, status::CommitteeSessionStatus,
     },
@@ -29,7 +30,6 @@ use abacus::{
 use chrono::{Datelike, Days, NaiveDate, TimeDelta};
 use clap::Parser;
 use rand::{Rng, seq::IndexedRandom};
-use sqlx::SqlitePool;
 #[cfg(feature = "dev-database")]
 use tracing::info;
 use tracing::level_filters::LevelFilter;
@@ -144,14 +144,17 @@ async fn main() -> Result<(), Box<dyn Error>> {
     .await?;
     let mut rng = rand::rng();
 
+    let mut tx = pool.begin_immediate().await?;
+
     // generate and store the election
-    let election = abacus::election::repository::create(&pool, generate_election(&mut rng, &args))
-        .await
-        .expect("Failed to create election");
+    let election =
+        abacus::election::repository::create(&mut tx, generate_election(&mut rng, &args))
+            .await
+            .expect("Failed to create election");
 
     // generate the committee session for the election
     let mut committee_session = abacus::committee_session::repository::create(
-        &pool,
+        &mut tx,
         CommitteeSessionCreateRequest {
             number: 1,
             election_id: election.id,
@@ -163,7 +166,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
 
     if args.with_data_entry {
         committee_session = abacus::committee_session::repository::change_status(
-            &pool,
+            &mut tx,
             committee_session.id,
             CommitteeSessionStatus::DataEntryInProgress,
         )
@@ -174,7 +177,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
     let number_of_voters = rng.random_range(args.voters.clone());
     committee_session.number_of_voters = number_of_voters;
     abacus::committee_session::repository::change_number_of_voters(
-        &pool,
+        &mut tx,
         committee_session.id,
         number_of_voters,
     )
@@ -183,8 +186,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
 
     // generate the polling stations for the election
     let polling_stations =
-        generate_polling_stations(&mut rng, &committee_session, &election, pool.clone(), &args)
-            .await;
+        generate_polling_stations(&mut rng, &committee_session, &election, &mut tx, &args).await;
 
     info!(
         "Election generated with election id: {}, election name: '{}'",
@@ -197,7 +199,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
             &election,
             &polling_stations,
             &mut rng,
-            pool.clone(),
+            &mut tx,
             &args,
         )
         .await;
@@ -209,7 +211,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
     if let Some(export_dir) = args.export_definition {
         let results = if data_entry_completed {
             abacus::data_entry::repository::list_entries_with_polling_stations_first_session(
-                &pool,
+                &mut tx,
                 committee_session.id,
             )
             .await
@@ -229,6 +231,8 @@ async fn main() -> Result<(), Box<dyn Error>> {
         )
         .await;
     }
+
+    tx.commit().await?;
 
     Ok(())
 }
@@ -328,7 +332,7 @@ async fn generate_polling_stations(
     rng: &mut impl rand::Rng,
     committee_session: &CommitteeSession,
     election: &ElectionWithPoliticalGroups,
-    pool: SqlitePool,
+    conn: &mut sqlx::SqliteConnection,
     args: &Args,
 ) -> Vec<PollingStation> {
     let number_of_ps = rng.random_range(args.polling_stations.clone());
@@ -352,7 +356,7 @@ async fn generate_polling_stations(
         remaining_voters -= ps_num_voters;
 
         let ps = abacus::polling_station::repository::create(
-            &pool,
+            conn,
             election.id,
             PollingStationRequest {
                 name: abacus::test_data_gen::polling_station_name(rng),
@@ -378,7 +382,7 @@ async fn generate_data_entry(
     election: &ElectionWithPoliticalGroups,
     polling_stations: &[PollingStation],
     rng: &mut impl rand::Rng,
-    pool: SqlitePool,
+    conn: &mut sqlx::SqliteConnection,
     args: &Args,
 ) -> (usize, usize) {
     info!("Generating data entries for election");
@@ -448,7 +452,7 @@ async fn generate_data_entry(
                 });
 
                 abacus::data_entry::repository::make_definitive(
-                    &pool,
+                    conn,
                     ps.id,
                     committee_session.id,
                     &state,
@@ -464,7 +468,7 @@ async fn generate_data_entry(
                     finalised_first_entry: results.clone(),
                     first_entry_finished_at: ts,
                 });
-                abacus::data_entry::repository::upsert(&pool, ps.id, committee_session.id, &state)
+                abacus::data_entry::repository::upsert(conn, ps.id, committee_session.id, &state)
                     .await
                     .expect("Could not create first data entry");
                 generated_first_entries += 1;

@@ -79,8 +79,8 @@ async fn audit_log_list(
     let filter = LogFilter::from_query(&filter_query);
 
     let mut conn = pool.acquire().await?;
-    let events = crate::audit_log::list(&mut *conn, &filter).await?;
-    let count = crate::audit_log::count(&mut *conn, &filter).await?;
+    let events = crate::audit_log::list(&mut conn, &filter).await?;
+    let count = crate::audit_log::count(&mut conn, &filter).await?;
 
     let pages = if count > 0 && filter.limit > 0 {
         count.div_ceil(filter.limit)
@@ -120,7 +120,8 @@ async fn audit_log_list_users(
     _user: AdminOrCoordinator,
     State(pool): State<SqlitePool>,
 ) -> Result<Json<Vec<AuditLogUser>>, APIError> {
-    let users = crate::audit_log::list_users(&pool).await?;
+    let mut conn = pool.acquire().await?;
+    let users = crate::audit_log::list_users(&mut conn).await?;
 
     Ok(Json(users))
 }
@@ -152,23 +153,24 @@ mod tests {
         authentication::{User, inject_user},
     };
 
-    fn new_test_audit_service(pool: SqlitePool, user: Option<User>) -> AuditService {
-        AuditService::new(pool, user, Some(Ipv4Addr::new(203, 0, 113, 0).into()))
+    fn new_test_audit_service(user: Option<User>) -> AuditService {
+        AuditService::new(user, Some(Ipv4Addr::new(203, 0, 113, 0).into()))
     }
 
     async fn create_log_entries(pool: SqlitePool) {
-        let user = crate::authentication::user::get_by_username(&pool, "admin1")
+        let mut conn = pool.acquire().await.unwrap();
+        let user = crate::authentication::user::get_by_username(&mut conn, "admin1")
             .await
             .unwrap()
             .unwrap();
-        let service = new_test_audit_service(pool, Some(user));
+        let service = new_test_audit_service(Some(user));
         let audit_event = AuditEvent::UserLoggedIn(UserLoggedInDetails {
             user_agent: "Mozilla/5.0".to_string(),
             logged_in_users_count: 1,
         });
-        service.log(&audit_event, None).await.unwrap();
-        service.log(&audit_event, None).await.unwrap();
-        service.log(&audit_event, None).await.unwrap();
+        service.log(&mut conn, &audit_event, None).await.unwrap();
+        service.log(&mut conn, &audit_event, None).await.unwrap();
+        service.log(&mut conn, &audit_event, None).await.unwrap();
     }
 
     #[test(sqlx::test(fixtures("../../fixtures/users.sql")))]
@@ -178,9 +180,11 @@ mod tests {
             airgap_detection: AirgapDetection::nop(),
         };
 
-        let session = crate::authentication::session::create(&pool, 1, TimeDelta::seconds(60 * 30))
-            .await
-            .unwrap();
+        let mut conn = pool.acquire().await.unwrap();
+        let session =
+            crate::authentication::session::create(&mut conn, 1, TimeDelta::seconds(60 * 30))
+                .await
+                .unwrap();
 
         let app = Router::new()
             .route("/api/log", get(audit_log_list))
@@ -239,9 +243,11 @@ mod tests {
             airgap_detection: AirgapDetection::nop(),
         };
 
-        let session = crate::authentication::session::create(&pool, 1, TimeDelta::seconds(60 * 30))
-            .await
-            .unwrap();
+        let mut conn = pool.acquire().await.unwrap();
+        let session =
+            crate::authentication::session::create(&mut conn, 1, TimeDelta::seconds(60 * 30))
+                .await
+                .unwrap();
 
         let app = Router::new()
             .route("/api/log-users", get(audit_log_list_users))

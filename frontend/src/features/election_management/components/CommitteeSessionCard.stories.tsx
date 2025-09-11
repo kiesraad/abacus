@@ -8,18 +8,16 @@ import { CommitteeSessionCard } from "./CommitteeSessionCard";
 type Props = {
   number: number;
   status: CommitteeSessionStatus;
-  startDate: string;
-  startTime: string;
+  startDateTime: string;
   currentSession: boolean;
 };
 
 export const DefaultCommitteeSessionCard: StoryObj<Props> = {
-  render: ({ number, status, startDate, startTime, currentSession }) => {
+  render: ({ number, status, startDateTime, currentSession }) => {
     const committeeSession = getCommitteeSessionMockData({
       number: number,
       status: status,
-      start_date: startDate,
-      start_time: startTime,
+      start_date_time: startDateTime,
       location: "Juinen",
     });
     return <CommitteeSessionCard committeeSession={committeeSession} currentSession={currentSession} />;
@@ -30,8 +28,7 @@ export default {
   args: {
     number: 1,
     status: "data_entry_in_progress",
-    startDate: "2025-11-08",
-    startTime: "09:15",
+    startDateTime: "2025-11-08T09:15:00",
     currentSession: true,
   },
   argTypes: {
@@ -49,10 +46,7 @@ export default {
       ],
       control: { type: "radio" },
     },
-    startDate: {
-      control: { type: "text" },
-    },
-    startTime: {
+    startDateTime: {
       control: { type: "text" },
     },
     currentSession: {

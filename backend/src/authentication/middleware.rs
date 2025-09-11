@@ -11,6 +11,7 @@ use tracing::{debug, error, info};
 
 use super::{SESSION_MIN_LIFE_TIME, session::Session};
 use crate::{
+    SqlitePoolExt,
     audit_log::{AuditEvent, AuditService},
     authentication::{SESSION_COOKIE_NAME, User, set_default_cookie_properties},
 };
@@ -26,7 +27,11 @@ pub async fn inject_user<B>(
     };
 
     // fetch the session from the database
-    let Ok(Some(session)) = super::session::get_by_key(&pool, session_cookie.value()).await else {
+    let Ok(mut conn) = pool.acquire().await else {
+        return request;
+    };
+    let Ok(Some(session)) = super::session::get_by_key(&mut conn, session_cookie.value()).await
+    else {
         return request;
     };
 
@@ -37,11 +42,11 @@ pub async fn inject_user<B>(
     extensions.insert(session);
 
     // fetch the user from the database
-    let Ok(Some(user)) = super::user::get_by_id(&pool, session_id).await else {
+    let Ok(Some(user)) = super::user::get_by_id(&mut conn, session_id).await else {
         return request;
     };
 
-    if let Err(e) = user.update_last_activity_at(&pool).await {
+    if let Err(e) = user.update_last_activity_at(&mut conn).await {
         error!("Error updating last activity at: {e:?}")
     }
 
@@ -68,23 +73,36 @@ pub async fn extend_session(
 
     // extend lifetime of session and set new cookie if the session is still valid and will soon expire
     if (expires - now) < SESSION_MIN_LIFE_TIME && expires > now {
-        if let Ok(session) = super::session::extend_session(&pool, &session).await {
-            let _ = audit_service
-                .with_user(user.clone())
-                .log(&AuditEvent::UserSessionExtended, None)
-                .await;
+        match pool.begin_immediate().await {
+            Ok(mut tx) => match super::session::extend_session(&mut tx, &session).await {
+                Ok(session) => {
+                    let _ = audit_service
+                        .with_user(user.clone())
+                        .log(&mut tx, &AuditEvent::UserSessionExtended, None)
+                        .await;
+                    if let Err(err) = tx.commit().await {
+                        error!("Failed to commit transaction: {:?}", err);
+                    }
 
-            let mut cookie = session.get_cookie();
-            set_default_cookie_properties(&mut cookie);
+                    let mut cookie = session.get_cookie();
+                    set_default_cookie_properties(&mut cookie);
 
-            debug!("Setting cookie: {:?}", cookie);
+                    debug!("Setting cookie: {:?}", cookie);
 
-            if let Ok(header_value) = cookie.encoded().to_string().parse() {
-                response.headers_mut().append(SET_COOKIE, header_value);
+                    if let Ok(header_value) = cookie.encoded().to_string().parse() {
+                        response.headers_mut().append(SET_COOKIE, header_value);
+                    }
+
+                    info!("Session extended for user {}", session.user_id());
+                    expires = session.expires_at();
+                }
+                Err(err) => {
+                    error!("Failed to extend session: {:?}", err);
+                }
+            },
+            Err(err) => {
+                error!("Failed to start transaction: {}", err);
             }
-
-            info!("Session extended for user {}", session.user_id());
-            expires = session.expires_at();
         }
     }
 
@@ -137,9 +155,11 @@ mod test {
         );
 
         let user = User::test_user(Role::Administrator, 1);
-        let session = crate::authentication::session::create(&pool, user.id(), SESSION_LIFE_TIME)
-            .await
-            .unwrap();
+        let mut conn = pool.acquire().await.unwrap();
+        let session =
+            crate::authentication::session::create(&mut conn, user.id(), SESSION_LIFE_TIME)
+                .await
+                .unwrap();
 
         let mut jar = CookieJar::new();
         let cookie = session.get_cookie();
@@ -157,7 +177,7 @@ mod test {
             "inject_user should inject a user if there is a session cookie"
         );
 
-        crate::authentication::user::delete(&pool, user.id())
+        crate::authentication::user::delete(&mut conn, user.id())
             .await
             .unwrap();
 
@@ -174,7 +194,6 @@ mod test {
         let user = User::test_user(Role::Administrator, 1);
 
         let audit_service = AuditService::new(
-            pool.clone(),
             Some(user.clone()),
             Some(Ipv4Addr::new(203, 0, 113, 0).into()),
         );
@@ -197,7 +216,8 @@ mod test {
         );
 
         let life_time = SESSION_MIN_LIFE_TIME + TimeDelta::seconds(30); // min life time + 30 seconds
-        let session = crate::authentication::session::create(&pool, user.id(), life_time)
+        let mut conn = pool.acquire().await.unwrap();
+        let session = crate::authentication::session::create(&mut conn, user.id(), life_time)
             .await
             .unwrap();
 
@@ -224,7 +244,7 @@ mod test {
         );
 
         let life_time = SESSION_MIN_LIFE_TIME - TimeDelta::seconds(30); // min life time - 30 seconds
-        let session = crate::authentication::session::create(&pool, user.id(), life_time)
+        let session = crate::authentication::session::create(&mut conn, user.id(), life_time)
             .await
             .unwrap();
 
@@ -240,7 +260,7 @@ mod test {
         let cookie = updated_response.headers().get(SET_COOKIE).unwrap();
         let cookie = Cookie::from_str(cookie.to_str().unwrap()).unwrap();
 
-        let new_session = crate::authentication::session::get_by_key(&pool, cookie.value())
+        let new_session = crate::authentication::session::get_by_key(&mut conn, cookie.value())
             .await
             .unwrap()
             .unwrap();

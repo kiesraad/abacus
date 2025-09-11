@@ -1,14 +1,15 @@
 #![cfg(test)]
-
-use crate::{shared::create_result, utils::serve_api};
 use abacus::{
     committee_session::status::CommitteeSessionStatus,
     election::{ElectionDetailsResponse, ElectionListResponse},
 };
 use async_zip::base::read::mem::ZipFileReader;
 use axum::http::StatusCode;
+use sha2::Digest;
 use sqlx::SqlitePool;
 use test_log::test;
+
+use crate::{shared::create_result, utils::serve_api};
 
 pub mod shared;
 pub mod utils;
@@ -139,8 +140,10 @@ async fn test_election_details_not_found(pool: SqlitePool) {
 async fn test_election_pdf_download_works(pool: SqlitePool) {
     let addr = serve_api(pool.clone()).await;
     let coordinator_cookie = shared::coordinator_login(&addr).await;
+    let election_id = 2;
     create_result(&addr, 1, 2).await;
     create_result(&addr, 2, 2).await;
+
     shared::change_status_committee_session(
         &addr,
         &coordinator_cookie,
@@ -148,11 +151,21 @@ async fn test_election_pdf_download_works(pool: SqlitePool) {
         CommitteeSessionStatus::DataEntryFinished,
     )
     .await;
+    let committee_session =
+        shared::get_election_committee_session(&addr, &coordinator_cookie, election_id).await;
+    assert_eq!(
+        committee_session.status,
+        CommitteeSessionStatus::DataEntryFinished
+    );
+    assert_eq!(committee_session.results_eml, None);
+    assert_eq!(committee_session.results_pdf, None);
 
-    let url = format!("http://{addr}/api/elections/2/download_pdf_results");
+    let url = format!(
+        "http://{addr}/api/elections/{election_id}/committee_sessions/2/download_pdf_results"
+    );
     let response = reqwest::Client::new()
         .get(&url)
-        .header("cookie", coordinator_cookie)
+        .header("cookie", &coordinator_cookie)
         .send()
         .await
         .unwrap();
@@ -172,6 +185,30 @@ async fn test_election_pdf_download_works(pool: SqlitePool) {
     assert_eq!(&content_disposition_string[..21], "attachment; filename=");
     // But the header should also contain ".pdf"
     assert!(content_disposition_string.contains(".pdf"));
+
+    let hash1 = sha2::Sha256::digest(response.bytes().await.unwrap());
+
+    let committee_session =
+        shared::get_election_committee_session(&addr, &coordinator_cookie, election_id).await;
+    assert_eq!(committee_session.results_eml, Some(1));
+    assert_eq!(committee_session.results_pdf, Some(2));
+
+    // Request the file again
+    let response = reqwest::Client::new()
+        .get(&url)
+        .header("cookie", &coordinator_cookie)
+        .send()
+        .await
+        .unwrap();
+
+    let hash2 = sha2::Sha256::digest(response.bytes().await.unwrap());
+
+    // Check that the file is the same
+    let committee_session =
+        shared::get_election_committee_session(&addr, &coordinator_cookie, election_id).await;
+    assert_eq!(committee_session.results_eml, Some(1));
+    assert_eq!(committee_session.results_pdf, Some(2));
+    assert_eq!(hash1, hash2);
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
@@ -181,58 +218,7 @@ async fn test_election_pdf_download_invalid_committee_session_state(pool: Sqlite
     create_result(&addr, 1, 2).await;
     create_result(&addr, 2, 2).await;
 
-    let url = format!("http://{addr}/api/elections/2/download_pdf_results");
-    let response = reqwest::Client::new()
-        .get(&url)
-        .header("cookie", coordinator_cookie)
-        .send()
-        .await
-        .unwrap();
-
-    // Ensure the response is what we expect
-    assert_eq!(response.status(), StatusCode::CONFLICT);
-}
-
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
-async fn test_election_xml_download_works(pool: SqlitePool) {
-    let addr = serve_api(pool.clone()).await;
-    let coordinator_cookie = shared::coordinator_login(&addr).await;
-    create_result(&addr, 1, 2).await;
-    create_result(&addr, 2, 2).await;
-    shared::change_status_committee_session(
-        &addr,
-        &coordinator_cookie,
-        2,
-        CommitteeSessionStatus::DataEntryFinished,
-    )
-    .await;
-
-    let url = format!("http://{addr}/api/elections/2/download_xml_results");
-    let response = reqwest::Client::new()
-        .get(&url)
-        .header("cookie", coordinator_cookie)
-        .send()
-        .await
-        .unwrap();
-    let content_type = response.headers().get("Content-Type");
-
-    // Ensure the response is what we expect
-    assert_eq!(response.status(), StatusCode::OK);
-    assert_eq!(content_type.unwrap(), "text/xml");
-
-    let body = response.text().await.unwrap();
-    assert!(body.contains("<Election>"));
-    assert!(body.contains("<TotalCounted>204</TotalCounted>"));
-}
-
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
-async fn test_election_xml_download_invalid_committee_session_state(pool: SqlitePool) {
-    let addr = serve_api(pool.clone()).await;
-    let coordinator_cookie = shared::coordinator_login(&addr).await;
-    create_result(&addr, 1, 2).await;
-    create_result(&addr, 2, 2).await;
-
-    let url = format!("http://{addr}/api/elections/2/download_xml_results");
+    let url = format!("http://{addr}/api/elections/2/committee_sessions/2/download_pdf_results");
     let response = reqwest::Client::new()
         .get(&url)
         .header("cookie", coordinator_cookie)
@@ -248,8 +234,10 @@ async fn test_election_xml_download_invalid_committee_session_state(pool: Sqlite
 async fn test_election_zip_download_works(pool: SqlitePool) {
     let addr = serve_api(pool.clone()).await;
     let coordinator_cookie = shared::coordinator_login(&addr).await;
+    let election_id = 2;
     create_result(&addr, 1, 2).await;
     create_result(&addr, 2, 2).await;
+
     shared::change_status_committee_session(
         &addr,
         &coordinator_cookie,
@@ -257,11 +245,21 @@ async fn test_election_zip_download_works(pool: SqlitePool) {
         CommitteeSessionStatus::DataEntryFinished,
     )
     .await;
+    let committee_session =
+        shared::get_election_committee_session(&addr, &coordinator_cookie, election_id).await;
+    assert_eq!(
+        committee_session.status,
+        CommitteeSessionStatus::DataEntryFinished
+    );
+    assert_eq!(committee_session.results_eml, None);
+    assert_eq!(committee_session.results_pdf, None);
 
-    let url = format!("http://{addr}/api/elections/2/download_zip_results");
+    let url = format!(
+        "http://{addr}/api/elections/{election_id}/committee_sessions/2/download_zip_results"
+    );
     let response = reqwest::Client::new()
         .get(&url)
-        .header("cookie", coordinator_cookie)
+        .header("cookie", &coordinator_cookie)
         .send()
         .await
         .unwrap();
@@ -282,19 +280,69 @@ async fn test_election_zip_download_works(pool: SqlitePool) {
     let bytes = response.bytes().await.unwrap();
     let archive = ZipFileReader::new(bytes.to_vec()).await.unwrap();
 
-    let reader = archive.reader_with_entry(1).await.unwrap();
-    assert_eq!(
-        reader.entry().filename().as_str().unwrap(),
-        "Telling_GR2024_Heemdamseburg.eml.xml"
-    );
-    assert!(reader.entry().uncompressed_size() > 1024);
-
-    let reader = archive.reader_with_entry(0).await.unwrap();
+    // Extract and hash the PDF file
+    let mut reader = archive.reader_with_entry(0).await.unwrap();
     assert_eq!(
         reader.entry().filename().as_str().unwrap(),
         "Model_Na31-2_GR2024_Heemdamseburg.pdf"
     );
     assert!(reader.entry().uncompressed_size() > 1024);
+    let mut pdf_content = Vec::new();
+    reader.read_to_end_checked(&mut pdf_content).await.unwrap();
+    let pdf_hash1 = sha2::Sha256::digest(&pdf_content);
+
+    // Extract and hash the EML file
+    let mut reader = archive.reader_with_entry(1).await.unwrap();
+    assert_eq!(
+        reader.entry().filename().as_str().unwrap(),
+        "Telling_GR2024_Heemdamseburg.eml.xml"
+    );
+    assert!(reader.entry().uncompressed_size() > 1024);
+    let mut eml_content = Vec::new();
+    reader.read_to_end_checked(&mut eml_content).await.unwrap();
+    let eml_hash1 = sha2::Sha256::digest(&eml_content);
+
+    let committee_session =
+        shared::get_election_committee_session(&addr, &coordinator_cookie, election_id).await;
+    assert_eq!(committee_session.results_eml, Some(1));
+    assert_eq!(committee_session.results_pdf, Some(2));
+
+    // Request the file again
+    let response = reqwest::Client::new()
+        .get(&url)
+        .header("cookie", &coordinator_cookie)
+        .send()
+        .await
+        .unwrap();
+
+    let bytes2 = response.bytes().await.unwrap();
+    let archive2 = ZipFileReader::new(bytes2.to_vec()).await.unwrap();
+
+    // Extract and hash the PDF file from second download
+    let mut reader2 = archive2.reader_with_entry(0).await.unwrap();
+    let mut pdf_content2 = Vec::new();
+    reader2
+        .read_to_end_checked(&mut pdf_content2)
+        .await
+        .unwrap();
+    let pdf_hash2 = sha2::Sha256::digest(&pdf_content2);
+
+    // Extract and hash the EML file from second download
+    let mut reader2 = archive2.reader_with_entry(1).await.unwrap();
+    let mut eml_content2 = Vec::new();
+    reader2
+        .read_to_end_checked(&mut eml_content2)
+        .await
+        .unwrap();
+    let eml_hash2 = sha2::Sha256::digest(&eml_content2);
+
+    // Check that the files inside the zip are the same
+    let committee_session =
+        shared::get_election_committee_session(&addr, &coordinator_cookie, election_id).await;
+    assert_eq!(committee_session.results_eml, Some(1));
+    assert_eq!(committee_session.results_pdf, Some(2));
+    assert_eq!(eml_hash1, eml_hash2, "EML files should have the same hash");
+    assert_eq!(pdf_hash1, pdf_hash2, "PDF files should have the same hash");
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
@@ -304,7 +352,7 @@ async fn test_election_zip_download_invalid_committee_session_state(pool: Sqlite
     create_result(&addr, 1, 2).await;
     create_result(&addr, 2, 2).await;
 
-    let url = format!("http://{addr}/api/elections/2/download_zip_results");
+    let url = format!("http://{addr}/api/elections/2/committee_sessions/2/download_zip_results");
     let response = reqwest::Client::new()
         .get(&url)
         .header("cookie", coordinator_cookie)

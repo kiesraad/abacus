@@ -28,7 +28,7 @@ export const NumberInput = React.forwardRef<HTMLInputElement, NumberInputProps>(
 ) {
   const [tooltipInvalidValue, setTooltipInvalidValue] = React.useState<string | null>(null);
   const [formattedOverlay, setFormattedOverlay] = React.useState<string | undefined>(
-    inputProps.defaultValue ? formatNumber(inputProps.defaultValue) : "",
+    formatNumber(inputProps.value !== undefined ? inputProps.value : inputProps.defaultValue),
   );
 
   const props = {

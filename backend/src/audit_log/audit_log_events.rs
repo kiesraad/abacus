@@ -3,13 +3,13 @@ use std::net::IpAddr;
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
-use sqlx::{Type, prelude::FromRow, types::Json};
+use sqlx::{SqliteConnection, Type, prelude::FromRow, types::Json};
 use strum::VariantNames;
 use utoipa::ToSchema;
 
 use super::{AuditEvent, AuditLogUser, LogFilterQuery};
 use crate::{
-    APIError, DbConnLike,
+    APIError,
     authentication::{Role, User},
 };
 
@@ -150,7 +150,7 @@ impl LogFilter {
 }
 
 pub async fn create(
-    conn: impl DbConnLike<'_>,
+    conn: &mut SqliteConnection,
     event: &AuditEvent,
     user: Option<&User>,
     message: Option<String>,
@@ -185,7 +185,7 @@ pub async fn create(
 }
 
 #[cfg(test)]
-pub async fn list_all(conn: impl DbConnLike<'_>) -> Result<Vec<AuditLogEvent>, APIError> {
+pub async fn list_all(conn: &mut SqliteConnection) -> Result<Vec<AuditLogEvent>, APIError> {
     sqlx::query_as!(
         AuditLogEvent,
         r#"SELECT
@@ -209,7 +209,7 @@ pub async fn list_all(conn: impl DbConnLike<'_>) -> Result<Vec<AuditLogEvent>, A
 }
 
 pub async fn list(
-    conn: impl DbConnLike<'_>,
+    conn: &mut SqliteConnection,
     filter: &LogFilter,
 ) -> Result<Vec<AuditLogEvent>, APIError> {
     let (level, event, user, since) = filter.as_query_values()?;
@@ -251,7 +251,7 @@ pub async fn list(
     Ok(events)
 }
 
-pub async fn count(conn: impl DbConnLike<'_>, filter: &LogFilter) -> Result<u32, APIError> {
+pub async fn count(conn: &mut SqliteConnection, filter: &LogFilter) -> Result<u32, APIError> {
     let (level, event, user, since) = filter.as_query_values()?;
 
     let row_count = sqlx::query!(r#"
@@ -273,7 +273,7 @@ pub async fn count(conn: impl DbConnLike<'_>, filter: &LogFilter) -> Result<u32,
     Ok(row_count.count)
 }
 
-pub async fn list_users(conn: impl DbConnLike<'_>) -> Result<Vec<AuditLogUser>, APIError> {
+pub async fn list_users(conn: &mut SqliteConnection) -> Result<Vec<AuditLogUser>, APIError> {
     let users = sqlx::query_as!(
         AuditLogUser,
         r#"SELECT

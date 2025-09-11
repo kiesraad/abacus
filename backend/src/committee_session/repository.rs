@@ -1,14 +1,13 @@
 use chrono::NaiveDateTime;
-use sqlx::{Error, query, query_as};
+use sqlx::{Connection, Error, SqliteConnection, query, query_as};
 
 use super::{
     CommitteeSession, CommitteeSessionCreateRequest, CommitteeSessionFilesUpdateRequest,
     status::CommitteeSessionStatus,
 };
-use crate::DbConnLike;
 
 pub async fn get(
-    conn: impl DbConnLike<'_>,
+    conn: &mut SqliteConnection,
     committee_session_id: u32,
 ) -> Result<CommitteeSession, Error> {
     query_as!(
@@ -34,7 +33,7 @@ pub async fn get(
 }
 
 pub async fn get_election_committee_session_list(
-    conn: impl DbConnLike<'_>,
+    conn: &mut SqliteConnection,
     election_id: u32,
 ) -> Result<Vec<CommitteeSession>, Error> {
     query_as!(
@@ -61,7 +60,7 @@ pub async fn get_election_committee_session_list(
 }
 
 pub async fn get_election_committee_session(
-    conn: impl DbConnLike<'_>,
+    conn: &mut SqliteConnection,
     election_id: u32,
 ) -> Result<CommitteeSession, Error> {
     query_as!(
@@ -89,7 +88,7 @@ pub async fn get_election_committee_session(
 }
 
 pub async fn get_committee_session_for_each_election(
-    conn: impl DbConnLike<'_>,
+    conn: &mut SqliteConnection,
 ) -> Result<Vec<CommitteeSession>, Error> {
     query_as!(
         CommitteeSession,
@@ -127,13 +126,13 @@ pub async fn get_committee_session_for_each_election(
 }
 
 pub async fn create(
-    conn: impl DbConnLike<'_>,
+    conn: &mut SqliteConnection,
     committee_session: CommitteeSessionCreateRequest,
 ) -> Result<CommitteeSession, Error> {
-    let mut tx = conn.begin_immediate().await?;
+    let mut tx = conn.begin().await?;
 
     let current_committee_session_id =
-        get_current_id_for_election(&mut *tx, committee_session.election_id).await?;
+        get_current_id_for_election(&mut tx, committee_session.election_id).await?;
 
     let next_committee_session = query_as!(
         CommitteeSession,
@@ -165,7 +164,7 @@ pub async fn create(
 
     if let Some(current_committee_session_id) = current_committee_session_id {
         crate::polling_station::repository::duplicate_for_committee_session(
-            &mut *tx,
+            &mut tx,
             current_committee_session_id,
             next_committee_session.id,
         )
@@ -178,8 +177,8 @@ pub async fn create(
 }
 
 /// Delete a committee session
-pub async fn delete(conn: impl DbConnLike<'_>, id: u32) -> Result<bool, Error> {
-    let mut tx = conn.begin_immediate().await?;
+pub async fn delete(conn: &mut SqliteConnection, id: u32) -> Result<bool, Error> {
+    let mut tx = conn.begin().await?;
 
     query!(
         "DELETE FROM polling_stations WHERE committee_session_id = ?",
@@ -205,7 +204,7 @@ pub async fn delete(conn: impl DbConnLike<'_>, id: u32) -> Result<bool, Error> {
 }
 
 pub async fn update(
-    conn: impl DbConnLike<'_>,
+    conn: &mut SqliteConnection,
     committee_session_id: u32,
     location: String,
     start_date_time: NaiveDateTime,
@@ -238,7 +237,7 @@ pub async fn update(
 }
 
 pub async fn change_number_of_voters(
-    conn: impl DbConnLike<'_>,
+    conn: &mut SqliteConnection,
     committee_session_id: u32,
     number_of_voters: u32,
 ) -> Result<CommitteeSession, Error> {
@@ -267,7 +266,7 @@ pub async fn change_number_of_voters(
 }
 
 pub async fn change_status(
-    conn: impl DbConnLike<'_>,
+    conn: &mut SqliteConnection,
     committee_session_id: u32,
     committee_session_status: CommitteeSessionStatus,
 ) -> Result<CommitteeSession, Error> {
@@ -296,7 +295,7 @@ pub async fn change_status(
 }
 
 pub async fn change_files(
-    conn: impl DbConnLike<'_>,
+    conn: &mut SqliteConnection,
     committee_session_id: u32,
     committee_session_files_update: CommitteeSessionFilesUpdateRequest,
 ) -> Result<CommitteeSession, Error> {
@@ -328,7 +327,7 @@ pub async fn change_files(
 }
 
 pub async fn get_current_id_for_election(
-    conn: impl DbConnLike<'_>,
+    conn: &mut SqliteConnection,
     election_id: u32,
 ) -> Result<Option<u32>, Error> {
     query!(

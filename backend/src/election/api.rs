@@ -14,7 +14,7 @@ use super::{
     structs::{Election, ElectionWithPoliticalGroups},
 };
 use crate::{
-    APIError, AppState, ErrorResponse,
+    APIError, AppState, ErrorResponse, SqlitePoolExt,
     audit_log::{AuditEvent, AuditService},
     authentication::{Admin, User},
     committee_session::{CommitteeSession, CommitteeSessionCreateRequest},
@@ -70,9 +70,10 @@ pub async fn election_list(
     _user: User,
     State(pool): State<SqlitePool>,
 ) -> Result<Json<ElectionListResponse>, APIError> {
-    let elections = crate::election::repository::list(&pool).await?;
+    let mut conn = pool.acquire().await?;
+    let elections = crate::election::repository::list(&mut conn).await?;
     let committee_sessions =
-        crate::committee_session::repository::get_committee_session_for_each_election(&pool)
+        crate::committee_session::repository::get_committee_session_for_each_election(&mut conn)
             .await?;
     Ok(Json(ElectionListResponse {
         committee_sessions,
@@ -100,16 +101,17 @@ pub async fn election_details(
     State(pool): State<SqlitePool>,
     Path(id): Path<u32>,
 ) -> Result<Json<ElectionDetailsResponse>, APIError> {
-    let election = crate::election::repository::get(&pool, id).await?;
+    let mut conn = pool.acquire().await?;
+    let election = crate::election::repository::get(&mut conn, id).await?;
     let committee_sessions =
-        crate::committee_session::repository::get_election_committee_session_list(&pool, id)
+        crate::committee_session::repository::get_election_committee_session_list(&mut conn, id)
             .await?;
     let current_committee_session = committee_sessions
         .first()
         .expect("There is always one committee session")
         .clone();
     let polling_stations =
-        crate::polling_station::repository::list(&pool, current_committee_session.id).await?;
+        crate::polling_station::repository::list(&mut conn, current_committee_session.id).await?;
 
     Ok(Json(ElectionDetailsResponse {
         current_committee_session,
@@ -294,14 +296,19 @@ pub async fn election_import(
     new_election.counting_method = edu.counting_method;
 
     // Create new election
-    let election = crate::election::repository::create(&pool, new_election).await?;
+    let mut tx = pool.begin_immediate().await?;
+    let election = crate::election::repository::create(&mut tx, new_election).await?;
     audit_service
-        .log(&AuditEvent::ElectionCreated(election.clone().into()), None)
+        .log(
+            &mut tx,
+            &AuditEvent::ElectionCreated(election.clone().into()),
+            None,
+        )
         .await?;
 
     // Create first committee session for the election
     let committee_session = crate::committee_session::repository::create(
-        &pool,
+        &mut tx,
         CommitteeSessionCreateRequest {
             number: 1,
             election_id: election.id,
@@ -311,6 +318,7 @@ pub async fn election_import(
     .await?;
     audit_service
         .log(
+            &mut tx,
             &AuditEvent::CommitteeSessionCreated(committee_session.clone().into()),
             None,
         )
@@ -325,13 +333,15 @@ pub async fn election_import(
             polling_stations: places,
         };
         create_imported_polling_stations(
-            pool,
+            &mut tx,
             audit_service,
             election.id,
             polling_stations_request,
         )
         .await?;
     }
+
+    tx.commit().await?;
 
     Ok((StatusCode::CREATED, Json(election)))
 }

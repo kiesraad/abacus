@@ -179,22 +179,13 @@ pub async fn make_definitive(
     Ok(())
 }
 
-/// Get a list of polling station results for a committee session
-pub async fn list_entries_with_polling_stations(
-    conn: impl DbConnLike<'_>,
-    committee_session_id: u32,
-) -> Result<Vec<(PollingStation, PollingStationResults)>, sqlx::Error> {
-    let mut tx = conn.begin().await?;
-    list_entries_for_committee_session(&mut *tx, committee_session_id).await
-}
-
-/// Get a list of polling stations with their results for an election, but only
+/// Get a list of polling stations with their results for a committee session, but only
 /// if the results are of type CSOFirstSessionResults
 pub async fn list_entries_with_polling_stations_first_session(
     conn: impl DbConnLike<'_>,
-    election_id: u32,
+    committee_session_id: u32,
 ) -> Result<Vec<(PollingStation, CSOFirstSessionResults)>, sqlx::Error> {
-    list_entries_with_polling_stations(conn, election_id)
+    list_entries_for_committee_session(conn, committee_session_id)
         .await?
         .into_iter()
         .map(|(p, r)| {
@@ -226,7 +217,7 @@ pub async fn entry_exists(conn: impl DbConnLike<'_>, id: u32) -> Result<bool, sq
     Ok(res.exists == 1)
 }
 
-/// Data entry results for a given polling station
+/// Get a list of polling stations with their results for a committee session
 pub async fn list_entries_for_committee_session(
     conn: impl DbConnLike<'_>,
     committee_session_id: u32,

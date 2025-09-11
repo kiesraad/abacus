@@ -29,7 +29,6 @@ use abacus::{
 use chrono::{Datelike, Days, NaiveDate, TimeDelta};
 use clap::Parser;
 use rand::{Rng, seq::IndexedRandom};
-
 use sqlx::SqlitePool;
 #[cfg(feature = "dev-database")]
 use tracing::info;

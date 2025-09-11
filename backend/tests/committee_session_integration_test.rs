@@ -1,5 +1,6 @@
 #![cfg(test)]
 
+use crate::{shared::create_result, utils::serve_api};
 use abacus::committee_session::{
     CommitteeSession, CommitteeSessionNumberOfVotersChangeRequest,
     CommitteeSessionStatusChangeRequest, CommitteeSessionUpdateRequest, NewCommitteeSessionRequest,
@@ -8,8 +9,6 @@ use abacus::committee_session::{
 use axum::http::StatusCode;
 use sqlx::SqlitePool;
 use test_log::test;
-
-use crate::utils::serve_api;
 
 pub mod shared;
 pub mod utils;
@@ -436,6 +435,8 @@ async fn test_committee_session_status_change_finished_to_in_progress_deletes_fi
     let addr = serve_api(pool).await;
     let coordinator_cookie = shared::coordinator_login(&addr).await;
     let election_id = 2;
+    create_result(&addr, 1, 2).await;
+    create_result(&addr, 2, 2).await;
 
     // Change committee session status to DataEntryFinished
     let url = format!("http://{addr}/api/committee_sessions/2/status");

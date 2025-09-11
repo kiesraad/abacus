@@ -25,7 +25,9 @@ use crate::{
     audit_log::{AuditEvent, AuditService},
     authentication::{Coordinator, Typist, User},
     committee_session::{CommitteeSession, CommitteeSessionError, status::CommitteeSessionStatus},
-    data_entry::{PollingStationResults, VotesCounts},
+    data_entry::{
+        PollingStationResults, VotesCounts, repository::most_recent_results_for_polling_station,
+    },
     election::ElectionWithPoliticalGroups,
     error::{ErrorReference, ErrorResponse},
     polling_station::PollingStation,
@@ -61,6 +63,9 @@ pub struct ClaimDataEntryResponse {
     #[schema(value_type = Object)]
     pub client_state: Option<serde_json::Value>,
     pub validation_results: ValidationResults,
+    #[serde(skip_serializing_if = "Option::is_none", default)]
+    #[schema(nullable = false)]
+    pub previous_results: Option<PollingStationResults>,
 }
 
 pub fn router() -> OpenApiRouter<AppState> {
@@ -238,13 +243,20 @@ async fn polling_station_data_entry_claim(
         )
         .await?;
 
+    let client_state = new_state.get_client_state().map(|v| v.to_owned());
+    let previous_results = if let Some(id) = polling_station.id_prev_session {
+        most_recent_results_for_polling_station(&mut tx, id).await?
+    } else {
+        None
+    };
+
     tx.commit().await?;
 
-    let client_state = new_state.get_client_state().map(|v| v.to_owned());
     Ok(Json(ClaimDataEntryResponse {
         data: data.clone(),
         client_state,
         validation_results,
+        previous_results,
     }))
 }
 
@@ -865,8 +877,9 @@ mod tests {
             tests::{change_status_committee_session, create_committee_session},
         },
         data_entry::{
-            DifferencesCounts, PoliticalGroupCandidateVotes, PoliticalGroupTotalVotes,
-            VotersCounts, VotesCounts, structs::tests::ValidDefault,
+            CountingDifferencesPollingStation, DifferencesCounts, ExtraInvestigation,
+            PoliticalGroupCandidateVotes, PoliticalGroupTotalVotes, VotersCounts, VotesCounts,
+            repository::insert_test_result, structs::tests::ValidDefault,
         },
     };
 
@@ -1802,5 +1815,79 @@ mod tests {
             .expect("One row should exist");
         let status: DataEntryStatus = row.state.0;
         assert!(matches!(status, DataEntryStatus::EntriesDifferent(_)));
+    }
+
+    async fn add_results(pool: &SqlitePool, polling_station_id: u32, committee_session_id: u32) {
+        let mut results = CSOFirstSessionResults {
+            extra_investigation: ExtraInvestigation::default(),
+            counting_differences_polling_station: CountingDifferencesPollingStation::default(),
+            voters_counts: VotersCounts::default(),
+            votes_counts: VotesCounts::default(),
+            differences_counts: DifferencesCounts::default(),
+            political_group_votes: vec![],
+        };
+        results.voters_counts.poll_card_count = polling_station_id;
+
+        let mut conn = pool.acquire().await.unwrap();
+        insert_test_result(
+            &mut conn,
+            polling_station_id,
+            committee_session_id,
+            &PollingStationResults::CSOFirstSession(results),
+        )
+        .await
+        .unwrap()
+    }
+
+    async fn claim_previous_results(
+        pool: SqlitePool,
+        polling_station_id: u32,
+    ) -> Option<CSOFirstSessionResults> {
+        let response = claim(pool.clone(), polling_station_id, EntryNumber::FirstEntry).await;
+        assert_eq!(response.status(), StatusCode::OK);
+        let body = response.into_body().collect().await.unwrap().to_bytes();
+        let result: ClaimDataEntryResponse = serde_json::from_slice(&body).unwrap();
+        result
+            .previous_results
+            .and_then(|p| p.into_cso_first_session())
+    }
+
+    /// No previous results, should return none
+    #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_7_four_sessions"))))]
+    async fn test_previous_results_none(pool: SqlitePool) {
+        assert!(claim_previous_results(pool.clone(), 741).await.is_none());
+    }
+
+    /// Only a result from committee session 1, should return 1
+    #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_7_four_sessions"))))]
+    async fn test_previous_results_from_first_session(pool: SqlitePool) {
+        add_results(&pool, 711, 701).await;
+        let previous_results = claim_previous_results(pool.clone(), 741).await.unwrap();
+        assert_eq!(previous_results.voters_counts.poll_card_count, 711);
+    }
+
+    /// Results from committee session 1 and 3, with a gap in between, should return 3
+    #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_7_four_sessions"))))]
+    async fn test_previous_results_with_session_gap(pool: SqlitePool) {
+        add_results(&pool, 711, 701).await;
+        add_results(&pool, 731, 703).await;
+        let previous_results = claim_previous_results(pool.clone(), 741).await.unwrap();
+        assert_eq!(previous_results.voters_counts.poll_card_count, 731);
+    }
+
+    /// Results with only one in committee session 2, should return 2
+    #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_7_four_sessions"))))]
+    async fn test_previous_results_from_second_session(pool: SqlitePool) {
+        add_results(&pool, 722, 702).await;
+        let previous_results = claim_previous_results(pool.clone(), 742).await.unwrap();
+        assert_eq!(previous_results.voters_counts.poll_card_count, 722);
+    }
+
+    /// Two subsequent results from committee sessions 2 and 3, should return 3rd
+    #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_7_four_sessions"))))]
+    async fn test_previous_results_from_last_two_sessions(pool: SqlitePool) {
+        add_results(&pool, 732, 703).await;
+        let previous_results = claim_previous_results(pool.clone(), 742).await.unwrap();
+        assert_eq!(previous_results.voters_counts.poll_card_count, 732);
     }
 }

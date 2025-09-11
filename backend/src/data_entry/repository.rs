@@ -1,9 +1,8 @@
-use chrono::NaiveDateTime;
 use sqlx::{Connection, SqliteConnection, query, query_as, types::Json};
 
 use super::{CSOFirstSessionResults, PollingStationDataEntry, status::DataEntryStatus};
 use crate::{
-    data_entry::{ElectionStatusResponseEntry, PollingStationResults, PollingStationResultsEntry},
+    data_entry::{ElectionStatusResponseEntry, PollingStationResults},
     polling_station::PollingStation,
 };
 
@@ -180,67 +179,13 @@ pub async fn make_definitive(
     Ok(())
 }
 
-/// Get a list of polling station results for a committee session
-pub async fn list_entries(
-    conn: &mut SqliteConnection,
-    committee_session_id: u32,
-) -> Result<Vec<PollingStationResultsEntry>, sqlx::Error> {
-    query!(
-        r#"
-        SELECT
-            r.polling_station_id AS "polling_station_id: u32",
-            r.committee_session_id AS "committee_session_id: u32",
-            r.data AS "data: Json<PollingStationResults>",
-            r.created_at as "created_at: NaiveDateTime"
-        FROM polling_station_results AS r
-        LEFT JOIN polling_stations AS p ON r.polling_station_id = p.id
-        LEFT JOIN committee_sessions AS c ON c.id = p.committee_session_id
-        WHERE r.committee_session_id = $1
-        "#,
-        committee_session_id
-    )
-    .try_map(|row| {
-        Ok(PollingStationResultsEntry {
-            polling_station_id: row.polling_station_id,
-            committee_session_id: row.committee_session_id,
-            data: row.data.0,
-            created_at: row.created_at.and_utc(),
-        })
-    })
-    .fetch_all(conn)
-    .await
-}
-
-/// Get a list of polling stations with their results for a committee session
-pub async fn list_entries_with_polling_stations(
-    conn: &mut SqliteConnection,
-    committee_session_id: u32,
-) -> Result<Vec<(PollingStation, PollingStationResults)>, sqlx::Error> {
-    // first get the list of results and polling stations related to an election
-    let list = list_entries(&mut *conn, committee_session_id).await?;
-    let polling_stations =
-        crate::polling_station::repository::list(&mut *conn, committee_session_id).await?;
-
-    // find the corresponding polling station for each entry, or fail if any polling station could not be found
-    list.into_iter()
-        .map(|entry| {
-            let polling_station = polling_stations
-                .iter()
-                .find(|p| p.id == entry.polling_station_id)
-                .cloned()
-                .ok_or(sqlx::Error::RowNotFound)?;
-            Ok((polling_station, entry.data))
-        })
-        .collect::<Result<_, sqlx::Error>>() // this collect causes the iterator to fail early if there was any error
-}
-
-/// Get a list of polling stations with their results for an election, but only
+/// Get a list of polling stations with their results for a committee session, but only
 /// if the results are of type CSOFirstSessionResults
 pub async fn list_entries_with_polling_stations_first_session(
     conn: &mut SqliteConnection,
-    election_id: u32,
+    committee_session_id: u32,
 ) -> Result<Vec<(PollingStation, CSOFirstSessionResults)>, sqlx::Error> {
-    list_entries_with_polling_stations(conn, election_id)
+    list_entries_for_committee_session(conn, committee_session_id)
         .await?
         .into_iter()
         .map(|(p, r)| {
@@ -270,4 +215,135 @@ pub async fn entry_exists(conn: &mut SqliteConnection, id: u32) -> Result<bool, 
     .fetch_one(conn)
     .await?;
     Ok(res.exists == 1)
+}
+
+/// Get a list of polling stations with their results for a committee session
+pub async fn list_entries_for_committee_session(
+    conn: &mut SqliteConnection,
+    committee_session_id: u32,
+) -> Result<Vec<(PollingStation, PollingStationResults)>, sqlx::Error> {
+    let mut tx = conn.begin().await?;
+    let polling_stations =
+        crate::polling_station::repository::list(&mut tx, committee_session_id).await?;
+
+    // This query requires a little explanation:
+    //
+    // We are trying to get the latest available results for each polling station in a committee session.
+    // However results beyond the first committee session are not available for all polling stations (only
+    // those that were re-entered in that committee session are available). So we need to look back into
+    // previous committee sessions to find the most recent results available.
+    //
+    // This query does this by using a recursive CTE (Common Table Expression). A recursive CTE consists of
+    // two parts, the initial query and the recursive query. In this case the initial query just fetches the
+    // polling stations from the current committee session and any results available for that session.
+    //
+    // The recursive query then takes the current set of rows and attempts to retrieve the previous
+    // committee session's polling station for each row and any results available for that previous
+    // session. Once we find a row with results or once we reach a polling station with no previous
+    // committee session (the first committee session) we stop looking back, but we should have
+    // found results by then (since every polling station will have results the first time it appears).
+    //
+    // Finally, we only select the rows that have results, eliminating all the intermediate rows without
+    // results that were only needed to find the previous committee sessions.
+    let results = query!(
+        r#"
+        WITH RECURSIVE polling_stations_chain(original_id, id, id_prev_session, data) AS (
+            SELECT s.id AS original_id, s.id, s.id_prev_session, r.data
+            FROM polling_stations AS s
+            LEFT JOIN polling_station_results AS r ON r.polling_station_id = s.id
+            WHERE s.committee_session_id = ?
+
+            UNION ALL
+
+            SELECT sc.original_id, s.id, s.id_prev_session, r.data
+            FROM polling_stations_chain AS sc
+            JOIN polling_stations AS s ON s.id = sc.id_prev_session
+            LEFT JOIN polling_station_results AS r ON r.polling_station_id = s.id
+            WHERE sc.data IS NULL
+        )
+        SELECT
+            sc.original_id AS "original_id!: u32",
+            sc.data AS "data: Json<PollingStationResults>"
+        FROM polling_stations_chain AS sc
+        WHERE sc.data IS NOT NULL
+        "#,
+        committee_session_id
+    )
+    .try_map(|row| {
+        let polling_station = polling_stations
+            .iter()
+            .find(|p| p.id == row.original_id)
+            .cloned()
+            .ok_or(sqlx::Error::RowNotFound)?;
+        Ok((polling_station, row.data.0))
+    })
+    .fetch_all(&mut *tx)
+    .await?;
+
+    tx.commit().await?;
+    if results.len() != polling_stations.len() {
+        // This should never happen, since every polling station should always
+        // have results the first time it appears.
+        Err(sqlx::Error::RowNotFound)
+    } else {
+        Ok(results)
+    }
+}
+
+/// Given a polling station id (does not necessarily need to be in the latest
+/// committee session), find the most recent results for that polling station
+/// by looking back through previous committee sessions from that point.
+pub async fn most_recent_results_for_polling_station(
+    conn: &mut SqliteConnection,
+    polling_station_id: u32,
+) -> Result<Option<PollingStationResults>, sqlx::Error> {
+    // For a description of how this query works, please see the comment in the
+    // `list_entries_for_committee_session` function above. This is a variant
+    // where we start with just a single row for a single polling station, but
+    // the rest of the processing is the same.
+    query!(
+        r#"
+        WITH RECURSIVE polling_stations_chain(original_id, id, id_prev_session, data) AS (
+            SELECT s.id AS original_id, s.id, s.id_prev_session, r.data
+            FROM polling_stations AS s
+            LEFT JOIN polling_station_results AS r ON r.polling_station_id = s.id
+            WHERE s.id = ?
+
+            UNION ALL
+
+            SELECT sc.original_id, s.id, s.id_prev_session, r.data
+            FROM polling_stations_chain AS sc
+            JOIN polling_stations AS s ON s.id = sc.id_prev_session
+            LEFT JOIN polling_station_results AS r ON r.polling_station_id = s.id
+            WHERE sc.data IS NULL
+        )
+        SELECT
+            sc.data AS "data!: Json<PollingStationResults>"
+        FROM polling_stations_chain AS sc
+        WHERE sc.data IS NOT NULL
+        "#,
+        polling_station_id
+    )
+    .map(|row| row.data.0)
+    .fetch_optional(conn)
+    .await
+}
+
+#[cfg(test)]
+pub async fn insert_test_result(
+    conn: &mut SqliteConnection,
+    polling_station_id: u32,
+    committee_session_id: u32,
+    results: &PollingStationResults,
+) -> Result<(), sqlx::Error> {
+    let results = Json(results);
+    query!(
+        "INSERT INTO polling_station_results (polling_station_id, committee_session_id, data) VALUES (?, ?, ?)",
+        polling_station_id,
+        committee_session_id,
+        results,
+    )
+    .execute(conn)
+    .await?;
+    Ok(())
 }

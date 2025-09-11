@@ -815,4 +815,4 @@ INSERT INTO polling_stations (id, committee_session_id, id_prev_session, name, n
 VALUES (4, 1, NULL, 'Studio The Rules', 1, NULL, 'FixedLocation', 'Gerontoplein 1', '1337 YQ', 'Juinen'),
        (5, 1, NULL, 'Buurtcentrum de Mattenklopper', 2, 1000, 'Special', 'Complexiteitslaan 2b', '1337 QY',
         'Juinen'),
-       (6, 1, NULL, 'Positivo Zaal', 3, NULL, 'FixedLocation', 'Kerkweg 3', '1337 QA', 'Juinen');
+       (6, 1, NULL, 'Positivo Zaal', 3, NULL, NULL, 'Kerkweg 3', '1337 QA', 'Juinen');

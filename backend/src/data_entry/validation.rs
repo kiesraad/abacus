@@ -1992,9 +1992,9 @@ mod tests {
     // Tests for DifferencesCounts
     mod differences_counts {
         use crate::data_entry::{
-            DataError, DifferencesCounts, ValidationResultCode, ValidationResults,
+            DataError, DifferencesCounts, ValidationResult, ValidationResultCode,
+            ValidationResults, validate_differences_counts,
         };
-        use crate::data_entry::{ValidationResult, validate_differences_counts};
 
         fn validate(
             data: DifferencesCounts,

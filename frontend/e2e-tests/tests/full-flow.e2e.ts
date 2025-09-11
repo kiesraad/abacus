@@ -178,13 +178,11 @@ test.describe("full flow", () => {
 
     const electionReportPage = new ElectionReport(page);
     const downloadPromise = page.waitForEvent("download");
-    await electionReportPage.downloadPdf.click();
+    await electionReportPage.downloadZip.click();
 
     const download = await downloadPromise;
 
-    expect(download.suggestedFilename()).toBe("Model_Na31-2_GR2022_Test.pdf");
-
-    // The resulting PDF should be around 50 KB
-    expect((await stat(await download.path())).size).toBeGreaterThan(42_000);
+    expect(download.suggestedFilename()).toBe("election_result_GR2022_Test.zip");
+    expect((await stat(await download.path())).size).toBeGreaterThan(1024);
   });
 });

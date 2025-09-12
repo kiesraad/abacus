@@ -51,6 +51,11 @@
     "file_too_large": "Het bestand <file>filename</file> is te groot. Kies een bestand van maximaal {max_size} Megabyte.",
     "title": "Ongeldig stembureaubestand"
   },
+
+  "polling_station_definition_does_not_match_election": {
+    "title": "Afwijkende verkiezing",
+    "description": "Het bestand <file>filename</file> bevat stembureaus voor een andere verkiezing. Controleer voor je verder gaat of de stembureaus juist zijn."
+  },
   "level_polling_station": "Niveau stembureau",
   "location": "Gebied",
   "manage": "Verkiezingen beheren",

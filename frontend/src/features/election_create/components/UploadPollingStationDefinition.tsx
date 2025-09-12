@@ -52,6 +52,7 @@ export function UploadPollingStationDefinition() {
           response: response.data,
           pollingStationDefinitionData: data,
           pollingStationDefinitionFileName: currentFile.name,
+          pollingStationDefinitionMatchesElection: response.data.polling_station_definition_matches_election,
         });
         setError(undefined);
       } else if (isError(response)) {
@@ -91,6 +92,19 @@ export function UploadPollingStationDefinition() {
         <Form title={t("election.polling_stations.check.title")}>
           <FormLayout>
             <FormLayout.Section>
+              {state.pollingStationDefinitionMatchesElection === false && (
+                <Alert
+                  type="warning"
+                  title={t("election.polling_station_definition_does_not_match_election.title")}
+                  inline
+                >
+                  <p>
+                    {tx("election.polling_station_definition_does_not_match_election.description", {
+                      file: () => <strong>{state.pollingStationDefinitionFileName}</strong>,
+                    })}
+                  </p>
+                </Alert>
+              )}
               <p>
                 {tx("election.polling_stations.check.description", {
                   file: () => <strong>{state.pollingStationDefinitionFileName}</strong>,
@@ -121,7 +135,6 @@ export function UploadPollingStationDefinition() {
                 <p>{error}</p>
               </Alert>
             )}
-
             <p>{t("election.use_instructions_to_import_polling_stations_eml")}</p>
             <FileInput id="upload-eml" file={file} onChange={(e) => void onFileChange(e)}>
               {t("select_file")}

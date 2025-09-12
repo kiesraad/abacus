@@ -159,6 +159,11 @@ pub struct ElectionDefinitionValidateResponse {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[schema(nullable = false)]
     polling_stations: Option<Vec<PollingStationRequest>>,
+
+    #[schema(nullable = false)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub polling_station_definition_matches_election: Option<bool>,
+
     number_of_voters: u32,
 }
 
@@ -208,6 +213,7 @@ pub async fn election_import_validate(
 
     // parse and validate polling stations, and update number of voters
     let polling_stations;
+    let mut polling_station_definition_matches_election = None;
     let mut number_of_voters = 0;
     if let Some(data) = edu.polling_station_data {
         // If polling stations are submitted, file name must be also
@@ -217,6 +223,8 @@ pub async fn election_import_validate(
 
         polling_stations = Some(EML110::from_str(&data)?.get_polling_stations()?);
         number_of_voters = EML110::from_str(&data)?.get_number_of_voters()?;
+        polling_station_definition_matches_election =
+            Some(EML110::from_str(&data)?.polling_station_definition_matches_election(&election)?);
     } else {
         polling_stations = None;
     }
@@ -231,6 +239,7 @@ pub async fn election_import_validate(
         election,
         polling_stations,
         number_of_voters,
+        polling_station_definition_matches_election,
     }))
 }
 

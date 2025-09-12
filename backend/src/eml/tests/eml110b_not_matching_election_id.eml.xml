@@ -10,13 +10,11 @@
   <ElectionEvent>
     <EventIdentifier/>
     <Election>
-      <ElectionIdentifier Id="GR2022_Test">
-        <ElectionName>Gemeenteraad Test 2022</ElectionName>
-        <ElectionCategory>GR</ElectionCategory>
-        <kr:ElectionSubcategory>GR2</kr:ElectionSubcategory>
-        <kr:ElectionDomain Id="0000">Test</kr:ElectionDomain>
-        <kr:ElectionDate>2022-03-16</kr:ElectionDate>
-        <kr:NominationDate>2022-01-31</kr:NominationDate>
+      <ElectionIdentifier Id="EP2024">
+        <ElectionName>Europees Parlement 2024</ElectionName>
+        <ElectionCategory>EP</ElectionCategory>
+        <kr:ElectionSubcategory>EP</kr:ElectionSubcategory>
+        <kr:ElectionDate>2024-06-06</kr:ElectionDate>
       </ElectionIdentifier>
       <Contest>
         <ContestIdentifier Id="geen"/>

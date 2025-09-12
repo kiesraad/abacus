@@ -23,7 +23,7 @@ import { PollingStationListEmptyPgObj } from "e2e-tests/page-objects/polling_sta
 import { PollingStationListPgObj } from "e2e-tests/page-objects/polling_station/PollingStationListPgObj";
 
 import { test } from "../fixtures";
-import { eml110a, eml110b, eml110b_short, eml230b } from "../test-data/eml-files";
+import { eml110a, eml110b, eml110b_not_matching_election, eml110b_short, eml230b } from "../test-data/eml-files";
 
 test.use({
   storageState: "e2e-tests/state/admin1.json",
@@ -509,6 +509,33 @@ test.describe("Election creation", () => {
     await uploadElectionDefinitionPage.uploadFile(page, eml110a.path);
     await expect(uploadElectionDefinitionPage.main).toContainText(eml110a.filename);
     await expect(uploadElectionDefinitionPage.error).toBeVisible();
+  });
+
+  test("a valid file of polling stations with a different election should show a warning", async ({ page }) => {
+    await page.goto("/elections");
+    const overviewPage = new ElectionsOverviewPgObj(page);
+    await overviewPage.create.click();
+
+    // upload election and check hash
+    await uploadElectionAndInputHash(page);
+
+    // polling station role
+    const pollingStationRolePage = new PollingStationRolePgObj(page);
+    await expect(pollingStationRolePage.header).toBeVisible();
+    await pollingStationRolePage.next.click();
+
+    // upload candidates list and check hash
+    await uploadCandidatesAndInputHash(page);
+
+    const uploadElectionDefinitionPage = new UploadPollingStationDefinitionPgObj(page);
+    await expect(uploadElectionDefinitionPage.header).toBeVisible();
+    await uploadElectionDefinitionPage.uploadFile(page, eml110b_not_matching_election.path);
+    await expect(uploadElectionDefinitionPage.main).toContainText(eml110b_not_matching_election.filename);
+
+    // Check the warning
+    const checkDefinitionPage = new CheckPollingStationDefinitionPgObj(page);
+    await expect(checkDefinitionPage.header).toBeVisible();
+    await expect(checkDefinitionPage.warning).toBeVisible();
   });
 
   test("show more button should show full list of polling stations", async ({ page }) => {

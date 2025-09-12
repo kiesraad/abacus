@@ -36,6 +36,7 @@ export type ElectionCreateAction =
       response: ElectionDefinitionValidateResponse;
       pollingStationDefinitionData: string;
       pollingStationDefinitionFileName: string;
+      pollingStationDefinitionMatchesElection?: boolean;
     }
   | {
       type: "SET_COUNTING_METHOD_TYPE";
@@ -60,6 +61,7 @@ export interface ElectionCreateState {
   candidateDefinitionRedactedHash?: RedactedEmlHash;
   pollingStationDefinitionData?: string;
   pollingStationDefinitionFileName?: string;
+  pollingStationDefinitionMatchesElection?: boolean;
   countingMethod?: VoteCountingMethod;
   numberOfVoters?: number;
   isNumberOfVotersUserEdited?: boolean;
@@ -72,6 +74,9 @@ function reducer(state: ElectionCreateState, action: ElectionCreateAction): Elec
         ...state,
         election: action.response.election,
         pollingStations: undefined,
+        pollingStationDefinitionData: undefined,
+        pollingStationDefinitionFileName: undefined,
+        pollingStationDefinitionMatchesElection: undefined,
         electionDefinitionRedactedHash: action.response.hash,
         electionDefinitionData: action.electionDefinitionData,
         electionDefinitionFileName: action.electionDefinitionFileName,
@@ -94,6 +99,9 @@ function reducer(state: ElectionCreateState, action: ElectionCreateAction): Elec
         candidateDefinitionData: action.candidateDefinitionData,
         candidateDefinitionFileName: action.candidateDefinitionFileName,
         candidateDefinitionHash: undefined,
+        pollingStationDefinitionData: undefined,
+        pollingStationDefinitionFileName: undefined,
+        pollingStationDefinitionMatchesElection: undefined,
       };
     case "SET_CANDIDATES_DEFINITION_HASH":
       return {
@@ -106,6 +114,7 @@ function reducer(state: ElectionCreateState, action: ElectionCreateAction): Elec
         pollingStations: action.response.polling_stations,
         pollingStationDefinitionData: action.pollingStationDefinitionData,
         pollingStationDefinitionFileName: action.pollingStationDefinitionFileName,
+        pollingStationDefinitionMatchesElection: action.pollingStationDefinitionMatchesElection,
         numberOfVoters: action.response.number_of_voters,
         isNumberOfVotersUserEdited: false,
       };

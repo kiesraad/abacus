@@ -870,7 +870,6 @@ mod tests {
     use test_log::test;
 
     use super::*;
-    use crate::data_entry::{DifferenceCountsCompareVotesCastAdmittedVoters, YesNo};
     use crate::{
         authentication::Role,
         committee_session::{
@@ -878,8 +877,9 @@ mod tests {
             tests::{change_status_committee_session, create_committee_session},
         },
         data_entry::{
-            CountingDifferencesPollingStation, DifferencesCounts, ExtraInvestigation,
-            PoliticalGroupCandidateVotes, PoliticalGroupTotalVotes, VotersCounts, VotesCounts,
+            CountingDifferencesPollingStation, DifferenceCountsCompareVotesCastAdmittedVoters,
+            DifferencesCounts, ExtraInvestigation, PoliticalGroupCandidateVotes,
+            PoliticalGroupTotalVotes, VotersCounts, VotesCounts, YesNo,
             repository::insert_test_result, structs::tests::ValidDefault,
         },
     };

@@ -685,13 +685,11 @@ mod tests {
     use test_log::test;
 
     use super::*;
-    use crate::data_entry::{
-        DifferenceCountsCompareVotesCastAdmittedVoters, DifferencesCounts, YesNo,
-    };
     use crate::{
         data_entry::{
-            CSOFirstSessionResults, CandidateVotes, PoliticalGroupCandidateVotes,
-            PoliticalGroupTotalVotes, VotersCounts, VotesCounts, structs::tests::ValidDefault,
+            CSOFirstSessionResults, CandidateVotes, DifferenceCountsCompareVotesCastAdmittedVoters,
+            DifferencesCounts, PoliticalGroupCandidateVotes, PoliticalGroupTotalVotes,
+            VotersCounts, VotesCounts, YesNo, structs::tests::ValidDefault,
         },
         election::{
             Candidate, ElectionCategory, ElectionWithPoliticalGroups, PoliticalGroup,

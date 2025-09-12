@@ -60,12 +60,10 @@ describe("ResolveErrorsPage", () => {
 
     expect(await screen.findByRole("heading", { level: 2, name: "Alle fouten en waarschuwingen" })).toBeVisible();
 
-    const voters_votes_counts = screen.queryByRole("region", { name: "Toegelaten kiezers en uitgebrachte stemmen" });
+    const voters_votes_counts = screen.queryByRole("region", { name: "Aantal kiezers en stemmen B1-3.1 en 3.2" });
     expect(voters_votes_counts).toBeInTheDocument();
 
-    const differences_counts = screen.queryByRole("region", {
-      name: "Verschillen tussen aantal kiezers en uitgebrachte stemmen",
-    });
+    const differences_counts = screen.queryByRole("region", { name: "Verschillen D & H B1-3.3" });
     expect(differences_counts).not.toBeInTheDocument();
 
     const political_group_votes_1 = screen.queryByRole("region", { name: "Lijst 1 - Vurige Vleugels Partij" });

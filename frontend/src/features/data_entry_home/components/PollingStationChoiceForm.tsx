@@ -184,7 +184,7 @@ export function PollingStationChoiceForm({ anotherEntry }: PollingStationChoiceF
           handleSubmit={handleSubmit}
           refetchStatuses={refetchStatuses}
         />
-        <p className="md">{tx("polling_station_choice.name_correct_warning")}</p>
+        <p className="mb-lg">{tx("polling_station_choice.name_correct_warning")}</p>
         {alert && (
           <div id="pollingStationSubmitFeedback" className={cn(cls.message, cls.submit, cls.error)}>
             <span className={cls.icon}>

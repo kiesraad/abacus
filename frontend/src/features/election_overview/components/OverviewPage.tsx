@@ -160,8 +160,8 @@ export function OverviewPage() {
               <AddFirstElection />
             ) : (
               <>
-                <h2 className="mb-lg">{t("election.not_ready_for_use")}</h2>
-                <p className="md">
+                <h2>{t("election.not_ready_for_use")}</h2>
+                <p>
                   {t("election.configuration_not_finished")} {isTypist && t("election.you_cannot_start_data_entry_yet")}
                 </p>
               </>

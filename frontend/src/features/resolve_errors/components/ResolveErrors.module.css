@@ -6,12 +6,10 @@
     border-radius: 1rem;
 
     p {
-      margin-bottom: 0;
+      width: 37.5rem;
     }
 
     fieldset {
-      max-width: 37.5rem;
-
       section {
         gap: var(--space-md);
       }

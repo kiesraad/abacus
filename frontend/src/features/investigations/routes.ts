@@ -1,12 +1,12 @@
 import { RouteObject } from "react-router";
 
 import { AddInvestigationLayout } from "./components/AddInvestigationLayout";
-import { AddInvestigationPage } from "./components/AddInvestigationPage.tsx";
-import { InvestigationFindingsPage } from "./components/InvestigationFindingsPage.tsx";
+import { AddInvestigationPage } from "./components/AddInvestigationPage";
+import { InvestigationFindingsPage } from "./components/InvestigationFindingsPage";
 import { InvestigationPrintCorrigendumPage } from "./components/InvestigationPrintCorrigendumPage";
-import { InvestigationReasonPage } from "./components/InvestigationReasonPage.tsx";
+import { InvestigationReasonPage } from "./components/InvestigationReasonPage";
 import { InvestigationsLayout } from "./components/InvestigationsLayout";
-import { InvestigationsOverviewPage } from "./components/InvestigationsOverviewPage.tsx";
+import { InvestigationsOverviewPage } from "./components/InvestigationsOverviewPage";
 
 export const investigationRoutes: RouteObject[] = [
   {

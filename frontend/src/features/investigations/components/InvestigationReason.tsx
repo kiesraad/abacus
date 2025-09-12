@@ -8,7 +8,6 @@ import { Form } from "@/components/ui/Form/Form";
 import { FormLayout } from "@/components/ui/Form/FormLayout";
 import { InputField } from "@/components/ui/InputField/InputField";
 import { useElection } from "@/hooks/election/useElection";
-import { useNumericParam } from "@/hooks/useNumericParam";
 import { t } from "@/i18n/translate";
 import {
   COMMITTEE_SESSION_INVESTIGATION_CREATE_REQUEST_PATH,
@@ -16,9 +15,12 @@ import {
 } from "@/types/generated/openapi";
 import { StringFormData } from "@/utils/stringFormData";
 
-export function InvestigationReason() {
+interface InvestigationReasonProps {
+  pollingStationId: number;
+}
+
+export function InvestigationReason({ pollingStationId }: InvestigationReasonProps) {
   const navigate = useNavigate();
-  const pollingStationId = useNumericParam("pollingStationId");
   const { currentCommitteeSession, refetch } = useElection();
   const [nonEmptyError, setNonEmptyError] = useState(false);
   const path: COMMITTEE_SESSION_INVESTIGATION_CREATE_REQUEST_PATH = `/api/committee_sessions/${currentCommitteeSession.id}/investigations`;

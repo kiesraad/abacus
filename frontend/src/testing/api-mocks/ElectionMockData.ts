@@ -278,7 +278,13 @@ export const getElectionMockData = (
       ...election,
     },
     polling_stations: pollingStationMockData,
-    investigations: [],
+    investigations: [
+      {
+        id: 1,
+        polling_station_id: 1,
+        reason: "Test reason",
+      },
+    ],
   };
 };
 

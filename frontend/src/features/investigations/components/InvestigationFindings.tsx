@@ -10,7 +10,6 @@ import { FormLayout } from "@/components/ui/Form/FormLayout";
 import { InputField } from "@/components/ui/InputField/InputField";
 import { Loader } from "@/components/ui/Loader/Loader";
 import { useElection } from "@/hooks/election/useElection";
-import { useNumericParam } from "@/hooks/useNumericParam";
 import { t } from "@/i18n/translate";
 import {
   COMMITTEE_SESSION_INVESTIGATION_CONCLUDE_REQUEST_PATH,
@@ -18,9 +17,12 @@ import {
 } from "@/types/generated/openapi";
 import { StringFormData } from "@/utils/stringFormData";
 
-export function InvestigationFindings() {
+interface InvestigationFindingsProps {
+  pollingStationId: number;
+}
+
+export function InvestigationFindings({ pollingStationId }: InvestigationFindingsProps) {
   const navigate = useNavigate();
-  const pollingStationId = useNumericParam("pollingStationId");
 
   const { election, currentCommitteeSession, investigation, refetch } = useElection(pollingStationId);
   const path: COMMITTEE_SESSION_INVESTIGATION_CONCLUDE_REQUEST_PATH = `/api/committee_sessions/${currentCommitteeSession.id}/investigations`;

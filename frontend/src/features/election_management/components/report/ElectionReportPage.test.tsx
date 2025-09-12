@@ -103,12 +103,16 @@ describe("ElectionReportPage", () => {
 
     const router = renderPage();
 
-    expect(await screen.findByRole("heading", { level: 1, name: "Eerste zitting" })).toBeVisible();
     expect(
-      await screen.findByRole("heading", { level: 2, name: "Telresultaten eerste zitting gemeente Heemdamseburg" }),
+      await screen.findByRole("heading", { level: 1, name: "Eerste zitting Gemeentelijk Stembureau" }),
     ).toBeVisible();
-    expect(await screen.findByRole("button", { name: "Download los proces-verbaal" })).toBeVisible();
-    expect(await screen.findByRole("button", { name: "Download proces-verbaal met telbestand" })).toBeVisible();
+    expect(
+      await screen.findByRole("heading", {
+        level: 2,
+        name: "Telresultaten eerste zitting gemeentelijk stembureau gemeente Heemdamseburg",
+      }),
+    ).toBeVisible();
+    expect(await screen.findByRole("link", { name: /Download definitieve documenten eerste zitting/ })).toBeVisible();
     expect(await screen.findByRole("link", { name: "Terug naar overzicht" })).toBeVisible();
     expect(await screen.findByRole("button", { name: "Steminvoer hervatten" })).toBeVisible();
 
@@ -135,12 +139,16 @@ describe("ElectionReportPage", () => {
 
     renderPage();
 
-    expect(await screen.findByRole("heading", { level: 1, name: "Eerste zitting" })).toBeVisible();
     expect(
-      await screen.findByRole("heading", { level: 2, name: "Telresultaten eerste zitting gemeente Heemdamseburg" }),
+      await screen.findByRole("heading", { level: 1, name: "Eerste zitting Gemeentelijk Stembureau" }),
     ).toBeVisible();
-    expect(await screen.findByRole("button", { name: "Download los proces-verbaal" })).toBeVisible();
-    expect(await screen.findByRole("button", { name: "Download proces-verbaal met telbestand" })).toBeVisible();
+    expect(
+      await screen.findByRole("heading", {
+        level: 2,
+        name: "Telresultaten eerste zitting gemeentelijk stembureau gemeente Heemdamseburg",
+      }),
+    ).toBeVisible();
+    expect(await screen.findByRole("link", { name: /Download definitieve documenten eerste zitting/ })).toBeVisible();
     expect(await screen.findByRole("link", { name: "Terug naar overzicht" })).toBeVisible();
 
     const resumeButton = screen.getByRole("button", { name: "Steminvoer hervatten" });
@@ -166,12 +174,16 @@ describe("ElectionReportPage", () => {
 
     renderPage();
 
-    expect(await screen.findByRole("heading", { level: 1, name: "Eerste zitting" })).toBeVisible();
     expect(
-      await screen.findByRole("heading", { level: 2, name: "Telresultaten eerste zitting gemeente Heemdamseburg" }),
+      await screen.findByRole("heading", { level: 1, name: "Eerste zitting Gemeentelijk Stembureau" }),
     ).toBeVisible();
-    expect(await screen.findByRole("button", { name: "Download los proces-verbaal" })).toBeVisible();
-    expect(await screen.findByRole("button", { name: "Download proces-verbaal met telbestand" })).toBeVisible();
+    expect(
+      await screen.findByRole("heading", {
+        level: 2,
+        name: "Telresultaten eerste zitting gemeentelijk stembureau gemeente Heemdamseburg",
+      }),
+    ).toBeVisible();
+    expect(await screen.findByRole("link", { name: /Download definitieve documenten eerste zitting/ })).toBeVisible();
     expect(await screen.findByRole("link", { name: "Terug naar overzicht" })).toBeVisible();
     expect(screen.queryByRole("button", { name: "Steminvoer hervatten" })).not.toBeInTheDocument();
   });
@@ -211,12 +223,16 @@ describe("ElectionReportPage", () => {
 
     rtlRender(<Providers router={router} />);
 
-    expect(await screen.findByRole("heading", { level: 1, name: "Eerste zitting" })).toBeVisible();
     expect(
-      await screen.findByRole("heading", { level: 2, name: "Telresultaten eerste zitting gemeente Heemdamseburg" }),
+      await screen.findByRole("heading", { level: 1, name: "Eerste zitting Gemeentelijk Stembureau" }),
     ).toBeVisible();
-    expect(await screen.findByRole("button", { name: "Download los proces-verbaal" })).toBeVisible();
-    expect(await screen.findByRole("button", { name: "Download proces-verbaal met telbestand" })).toBeVisible();
+    expect(
+      await screen.findByRole("heading", {
+        level: 2,
+        name: "Telresultaten eerste zitting gemeentelijk stembureau gemeente Heemdamseburg",
+      }),
+    ).toBeVisible();
+    expect(await screen.findByRole("link", { name: /Download definitieve documenten eerste zitting/ })).toBeVisible();
     expect(await screen.findByRole("link", { name: "Terug naar overzicht" })).toBeVisible();
 
     const resumeButton = screen.getByRole("button", { name: "Steminvoer hervatten" });

@@ -71,9 +71,6 @@ components:
       - ".*/backend/tests/.*"
 
   # Frontend src/components
-  - name: "(Frontend) App"
-    include:
-      - ".*/frontend/src/app/.*"
   - name: "(Frontend) Components/committee_session"
     include:
       - ".*/frontend/src/components/committee_session/.*"
@@ -162,6 +159,9 @@ components:
   - name: "(Frontend) Lib/API"
     include:
       - ".*/frontend/src/api/.*"
+  - name: "(Frontend) App"
+    include:
+      - ".*/frontend/src/app/.*"
   - name: "(Frontend) Hooks"
     include:
       - ".*/frontend/src/hooks/.*"

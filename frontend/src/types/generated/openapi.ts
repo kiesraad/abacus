@@ -18,6 +18,18 @@ export interface COMMITTEE_SESSION_DELETE_REQUEST_PARAMS {
 }
 export type COMMITTEE_SESSION_DELETE_REQUEST_PATH = `/api/committee_sessions/${number}`;
 
+// /api/committee_sessions/{committee_session_id}/investigations
+export interface COMMITTEE_SESSION_INVESTIGATION_CONCLUDE_REQUEST_PARAMS {
+  committee_session_id: number;
+}
+export type COMMITTEE_SESSION_INVESTIGATION_CONCLUDE_REQUEST_PATH = `/api/committee_sessions/${number}/investigations`;
+export type COMMITTEE_SESSION_INVESTIGATION_CONCLUDE_REQUEST_BODY = PollingStationInvestigationConcludeRequest;
+export interface COMMITTEE_SESSION_INVESTIGATION_CREATE_REQUEST_PARAMS {
+  committee_session_id: number;
+}
+export type COMMITTEE_SESSION_INVESTIGATION_CREATE_REQUEST_PATH = `/api/committee_sessions/${number}/investigations`;
+export type COMMITTEE_SESSION_INVESTIGATION_CREATE_REQUEST_BODY = PollingStationInvestigationCreateRequest;
+
 // /api/committee_sessions/{committee_session_id}/status
 export interface COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_PARAMS {
   committee_session_id: number;
@@ -288,6 +300,8 @@ export type AuditEvent =
   | (CommitteeSessionDetails & { event_type: "CommitteeSessionCreated" })
   | (CommitteeSessionDetails & { event_type: "CommitteeSessionDeleted" })
   | (CommitteeSessionDetails & { event_type: "CommitteeSessionUpdated" })
+  | (PollingStationInvestigation & { event_type: "PollingStationInvestigationCreated" })
+  | (PollingStationInvestigation & { event_type: "PollingStationInvestigationConcluded" })
   | (FileDetails & { event_type: "FileCreated" })
   | (FileDetails & { event_type: "FileDeleted" })
   | (ElectionDetails & { event_type: "ApportionmentCreated" })
@@ -657,6 +671,7 @@ export interface ElectionDetailsResponse {
   committee_sessions: CommitteeSession[];
   current_committee_session: CommitteeSession;
   election: ElectionWithPoliticalGroups;
+  investigations: PollingStationInvestigation[];
   polling_stations: PollingStation[];
 }
 
@@ -1006,6 +1021,27 @@ export interface PollingStationImportDetails {
   import_election_id: number;
   import_file_name: string;
   import_number_of_polling_stations: number;
+}
+
+export interface PollingStationInvestigation {
+  corrected_results?: boolean;
+  findings?: string;
+  id: number;
+  polling_station_id: number;
+  reason: string;
+}
+
+export interface PollingStationInvestigationConcludeRequest {
+  corrected_results: boolean;
+  findings: string;
+  id: number;
+}
+
+export interface PollingStationInvestigationCreateRequest {
+  corrected_results?: boolean;
+  findings?: string;
+  polling_station_id: number;
+  reason: string;
 }
 
 /**

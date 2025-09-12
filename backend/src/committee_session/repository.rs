@@ -3,7 +3,8 @@ use sqlx::{Connection, Error, SqliteConnection, query, query_as};
 
 use super::{
     CommitteeSession, CommitteeSessionCreateRequest, CommitteeSessionFilesUpdateRequest,
-    status::CommitteeSessionStatus,
+    PollingStationInvestigation, PollingStationInvestigationConcludeRequest,
+    PollingStationInvestigationCreateRequest, status::CommitteeSessionStatus,
 };
 
 pub async fn get(
@@ -122,6 +123,62 @@ pub async fn get_committee_session_for_each_election(
         "#,
     )
     .fetch_all(conn)
+    .await
+}
+
+pub async fn create_polling_station_investigation(
+    conn: &mut SqliteConnection,
+    committee_session_id: u32,
+    polling_station_investigation: PollingStationInvestigationCreateRequest,
+) -> Result<PollingStationInvestigation, Error> {
+    query_as!(
+        PollingStationInvestigation,
+        r#"
+        INSERT INTO polling_station_investigations (
+          committee_session_id,
+          polling_station_id,
+          reason
+        ) VALUES (?,?,?)
+        RETURNING
+          id as "id: u32",
+          polling_station_id as "polling_station_id: u32",
+          reason,
+          findings,
+          corrected_results as "corrected_results: bool"
+        "#,
+        committee_session_id,
+        polling_station_investigation.polling_station_id,
+        polling_station_investigation.reason,
+    )
+    .fetch_one(conn)
+    .await
+}
+
+pub async fn conclude_polling_station_investigation(
+    conn: &mut SqliteConnection,
+    polling_station_investigation: PollingStationInvestigationConcludeRequest,
+) -> Result<PollingStationInvestigation, Error> {
+    query_as!(
+        PollingStationInvestigation,
+        r#"
+        UPDATE polling_station_investigations
+        SET
+          findings = ?,
+          corrected_results = ?
+        WHERE
+          id = ?
+        RETURNING
+          id as "id: u32",
+          polling_station_id as "polling_station_id: u32",
+          reason,
+          findings,
+          corrected_results as "corrected_results: bool"
+        "#,
+        polling_station_investigation.findings,
+        polling_station_investigation.corrected_results,
+        polling_station_investigation.id,
+    )
+    .fetch_one(conn)
     .await
 }
 
@@ -343,4 +400,26 @@ pub async fn get_current_id_for_election(
     .fetch_optional(conn)
     .await
     .map(|record| record.map(|r| r.id))
+}
+
+pub async fn investigations(
+    conn: &mut SqliteConnection,
+    committee_session_id: u32,
+) -> Result<Vec<PollingStationInvestigation>, Error> {
+    query_as!(
+        PollingStationInvestigation,
+        r#"
+        SELECT
+            id as "id: u32",
+polling_station_id as "polling_station_id: u32",
+reason,
+findings,
+corrected_results as "corrected_results: bool"
+FROM polling_station_investigations
+WHERE committee_session_id = ?
+        "#,
+        committee_session_id,
+    )
+    .fetch_all(conn)
+    .await
 }

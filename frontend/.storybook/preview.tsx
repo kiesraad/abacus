@@ -12,7 +12,7 @@ import { electionDetailsMockResponse } from "@/testing/api-mocks/ElectionMockDat
 import { userMockData } from "@/testing/api-mocks/UserMockData";
 import { matchers } from "@/testing/matchers";
 import { TestUserProvider } from "@/testing/TestUserProvider";
-import { ElectionDetailsResponse, ElectionWithPoliticalGroups, PollingStation, Role } from "@/types/generated/openapi";
+import { Role } from "@/types/generated/openapi";
 
 const preview: Preview = {
   beforeAll: () => {
@@ -51,28 +51,21 @@ const preview: Preview = {
     // Election Provider decorator - provide mock election context if needed
     (Story, { parameters }) => {
       const needsElection = (parameters.needsElection as boolean) || false;
-      const election = parameters.election as ElectionWithPoliticalGroups | undefined;
-      const pollingStations = parameters.pollingStations as PollingStation[] | undefined;
 
       if (!needsElection) {
         return <Story />;
       }
 
-      const data: ElectionDetailsResponse = {
-        election: election ?? electionDetailsMockResponse.election,
-        polling_stations: pollingStations ?? electionDetailsMockResponse.polling_stations,
-        current_committee_session: electionDetailsMockResponse.current_committee_session,
-        committee_sessions: electionDetailsMockResponse.committee_sessions,
-      };
-
       return (
         <ElectionProviderContext.Provider
           value={{
-            election: data.election,
-            pollingStations: data.polling_stations,
-            currentCommitteeSession: data.current_committee_session,
-            committeeSessions: data.committee_sessions,
-            refetch: () => Promise.resolve({ status: ApiResponseStatus.Success, code: 200, data: data }),
+            election: electionDetailsMockResponse.election,
+            pollingStations: electionDetailsMockResponse.polling_stations,
+            currentCommitteeSession: electionDetailsMockResponse.current_committee_session,
+            committeeSessions: electionDetailsMockResponse.committee_sessions,
+            investigations: electionDetailsMockResponse.investigations,
+            refetch: () =>
+              Promise.resolve({ status: ApiResponseStatus.Success, code: 200, data: electionDetailsMockResponse }),
           }}
         >
           <Story />

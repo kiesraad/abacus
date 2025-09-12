@@ -4,6 +4,7 @@ import {
   ELECTION_DETAILS_REQUEST_PATH,
   ElectionWithPoliticalGroups,
   PollingStation,
+  PollingStationInvestigation,
 } from "@/types/generated/openapi";
 
 export function useElectionDataRequest(electionId: number) {
@@ -13,5 +14,6 @@ export function useElectionDataRequest(electionId: number) {
     committee_sessions: CommitteeSession[];
     election: ElectionWithPoliticalGroups;
     polling_stations: PollingStation[];
+    investigations: PollingStationInvestigation[];
   }>(path);
 }

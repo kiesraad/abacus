@@ -1,20 +1,45 @@
 import { FormEvent, useState } from "react";
 import { useNavigate } from "react-router";
 
+import { AnyApiError, isError, isSuccess } from "@/api/ApiResult";
+import { useCrud } from "@/api/useCrud";
 import { Button } from "@/components/ui/Button/Button";
 import { ChoiceList } from "@/components/ui/CheckboxAndRadio/ChoiceList";
 import { Form } from "@/components/ui/Form/Form";
 import { FormLayout } from "@/components/ui/Form/FormLayout";
 import { InputField } from "@/components/ui/InputField/InputField";
+import { Loader } from "@/components/ui/Loader/Loader";
+import { useElection } from "@/hooks/election/useElection";
 import { t } from "@/i18n/translate";
+import {
+  COMMITTEE_SESSION_INVESTIGATION_CONCLUDE_REQUEST_PATH,
+  PollingStationInvestigationCreateRequest,
+} from "@/types/generated/openapi";
 import { StringFormData } from "@/utils/stringFormData";
 
-export function InvestigationFindings() {
+interface InvestigationFindingsProps {
+  pollingStationId: number;
+}
+
+export function InvestigationFindings({ pollingStationId }: InvestigationFindingsProps) {
   const navigate = useNavigate();
+
+  const { election, currentCommitteeSession, investigation, refetch } = useElection(pollingStationId);
+  const path: COMMITTEE_SESSION_INVESTIGATION_CONCLUDE_REQUEST_PATH = `/api/committee_sessions/${currentCommitteeSession.id}/investigations`;
+  const { update } = useCrud<PollingStationInvestigationCreateRequest>({ update: path });
   const [nonEmptyError, setNonEmptyError] = useState(false);
   const [radioError, setRadioError] = useState(false);
+  const [apiError, setApiError] = useState<AnyApiError>();
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+  if (apiError) {
+    throw apiError;
+  }
+
+  if (!investigation) {
+    return <Loader />;
+  }
+
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
     setNonEmptyError(false);
@@ -40,14 +65,18 @@ export function InvestigationFindings() {
       return;
     }
 
-    // TODO: Handle form submission
-    // const correctedResults = correctedResultsChoice === "yes";
-    // console.log({ findings, correctedResults });
-    void navigate("../../../");
+    const correctedResults = correctedResultsChoice === "yes";
+    const response = await update({ id: investigation.id, findings, corrected_results: correctedResults });
+    if (isSuccess(response)) {
+      await refetch();
+      await navigate(`/elections/${election.id}/investigations`);
+    } else if (isError(response)) {
+      setApiError(response);
+    }
   };
 
   return (
-    <Form title={t("investigations.findings.investigation_findings_title")} onSubmit={handleSubmit}>
+    <Form title={t("investigations.findings.investigation_findings_title")} onSubmit={(e) => void handleSubmit(e)}>
       <FormLayout>
         <FormLayout.Section>
           <ul className="mt-0 mb-0">

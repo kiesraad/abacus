@@ -1,57 +1,37 @@
 import * as ReactRouter from "react-router";
 
-import { render, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
-import { ErrorBoundary } from "@/components/error/ErrorBoundary";
-import { ElectionLayout } from "@/components/layout/ElectionLayout";
-import { ElectionRequestHandler, ElectionStatusRequestHandler } from "@/testing/api-mocks/RequestHandlers";
-import { Providers } from "@/testing/Providers";
+import { ElectionProvider } from "@/hooks/election/ElectionProvider";
+import {
+  CommitteeSessionInvestigationCreateHandler,
+  ElectionRequestHandler,
+  ElectionStatusRequestHandler,
+} from "@/testing/api-mocks/RequestHandlers";
 import { server } from "@/testing/server";
-import { screen, setupTestRouter } from "@/testing/test-utils";
+import { render, screen, waitFor } from "@/testing/test-utils";
 
-import { AddInvestigationLayout } from "./AddInvestigationLayout";
 import { InvestigationReason } from "./InvestigationReason";
 
 const navigate = vi.fn();
 
-async function renderPage() {
-  const router = setupTestRouter([
-    {
-      path: "/elections/:electionId",
-      Component: ElectionLayout,
-      errorElement: <ErrorBoundary />,
-      children: [
-        {
-          path: "investigations/add/:pollingStationId",
-          Component: AddInvestigationLayout,
-          children: [
-            {
-              index: true,
-              path: "reason",
-              Component: InvestigationReason,
-            },
-          ],
-        },
-      ],
-    },
-  ]);
-
-  await router.navigate("/elections/1/investigations/add/1/reason");
-  render(<Providers router={router} />);
-
-  return router;
+function renderPage() {
+  render(
+    <ElectionProvider electionId={1}>
+      <InvestigationReason pollingStationId={1} />
+    </ElectionProvider>,
+  );
 }
 
 describe("InvestigationReason", () => {
   beforeEach(() => {
-    server.use(ElectionRequestHandler, ElectionStatusRequestHandler);
+    server.use(ElectionRequestHandler, ElectionStatusRequestHandler, CommitteeSessionInvestigationCreateHandler);
     vi.spyOn(ReactRouter, "useNavigate").mockImplementation(() => navigate);
   });
 
   test("Renders a form", async () => {
-    await renderPage();
+    renderPage();
 
     expect(
       await screen.findByRole("heading", { level: 2, name: "Aanleiding en opdracht van het centraal stembureau" }),
@@ -60,7 +40,7 @@ describe("InvestigationReason", () => {
   });
 
   test("Displays an error message when submitting an empty form", async () => {
-    await renderPage();
+    renderPage();
 
     const reason = await screen.findByLabelText("Aanleiding en opdracht");
     const submitButton = await screen.findByRole("button", { name: "Volgende" });
@@ -75,7 +55,7 @@ describe("InvestigationReason", () => {
   });
 
   test("Navigate to the next page when submitting a reason", async () => {
-    await renderPage();
+    renderPage();
 
     const reason = await screen.findByLabelText("Aanleiding en opdracht");
     const submitButton = await screen.findByRole("button", { name: "Volgende" });
@@ -84,6 +64,8 @@ describe("InvestigationReason", () => {
     await user.type(reason, "Reden voor onderzoek");
     submitButton.click();
 
-    expect(navigate).toHaveBeenCalledWith("../print-corrigendum");
+    await waitFor(() => {
+      expect(navigate).toHaveBeenCalledWith("../print-corrigendum");
+    });
   });
 });

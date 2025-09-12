@@ -35,6 +35,8 @@ describe("AbortDataEntryControl", () => {
       election: electionMockData,
       pollingStations: [],
       pollingStation: undefined,
+      investigations: [],
+      investigation: undefined,
       refetch: () =>
         Promise.resolve({
           status: ApiResponseStatus.Success,
@@ -44,6 +46,7 @@ describe("AbortDataEntryControl", () => {
             committee_sessions: [committeeSessionMockData],
             election: electionMockData,
             polling_stations: [],
+            investigations: [],
           },
         }),
     });

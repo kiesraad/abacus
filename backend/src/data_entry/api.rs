@@ -877,8 +877,9 @@ mod tests {
             tests::{change_status_committee_session, create_committee_session},
         },
         data_entry::{
-            CountingDifferencesPollingStation, DifferencesCounts, ExtraInvestigation,
-            PoliticalGroupCandidateVotes, PoliticalGroupTotalVotes, VotersCounts, VotesCounts,
+            CountingDifferencesPollingStation, DifferenceCountsCompareVotesCastAdmittedVoters,
+            DifferencesCounts, ExtraInvestigation, PoliticalGroupCandidateVotes,
+            PoliticalGroupTotalVotes, VotersCounts, VotesCounts, YesNo,
             repository::insert_test_result, structs::tests::ValidDefault,
         },
     };
@@ -910,7 +911,20 @@ mod tests {
                     invalid_votes_count: 2,
                     total_votes_cast_count: 100,
                 },
-                differences_counts: DifferencesCounts::zero(),
+                differences_counts: DifferencesCounts {
+                    more_ballots_count: 0,
+                    fewer_ballots_count: 0,
+                    compare_votes_cast_admitted_voters:
+                        DifferenceCountsCompareVotesCastAdmittedVoters {
+                            admitted_voters_equal_votes_cast: true,
+                            votes_cast_greater_than_admitted_voters: false,
+                            votes_cast_smaller_than_admitted_voters: false,
+                        },
+                    difference_completely_accounted_for: YesNo {
+                        yes: true,
+                        no: false,
+                    },
+                },
                 political_group_votes: vec![
                     PoliticalGroupCandidateVotes::from_test_data_auto(1, &[36, 20]),
                     PoliticalGroupCandidateVotes::from_test_data_auto(2, &[30, 10]),

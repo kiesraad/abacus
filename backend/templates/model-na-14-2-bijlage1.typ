@@ -31,12 +31,17 @@ Het #location_type heeft de telresultaten van dit stembureau onderzocht en is to
 Geef aan *waarom* de resultaten van dit stembureau zijn onderzocht. Denk bijvoorbeeld aan een onverklaard telverschil, of een bezwaar. Schrijf ook op wat er in *opdracht* van het centraal stembureau is onderzocht. Bijvoorbeeld: hertel de stembiljetten van lijst 12.
 
 ==== Aanleiding en opdracht van het centraal stembureau
-#empty_lines(5)
+
+#text_area_with_content(input.investigation.reason)
+
+#block(below: 1.5em)
 
 Schrijf op wat de *uitkomst* van het onderzoek door het #location_type was.
 
 ==== Bevindingen
 #empty_lines(5)
+
+#block(below: 1.5em)
 
 Is er een *gecorrigeerde uitslag*?
 
@@ -61,9 +66,9 @@ Het totaal van alle getelde geldige stempassen en volmachtbewijzen
 
 #sum(
   with_correction_title: true,
-  empty_letterbox("A", cells: 4, original: 10, bold_top_border: true)[Stempassen],
-  empty_letterbox("B", cells: 4, original: 10)[Volmachtbewijzen],
-  empty_letterbox("D", cells: 4, original: 10, light: false)[
+  empty_letterbox("A", cells: 4, original: input.previous_results.voters_counts.poll_card_count, bold_top_border: true)[Stempassen],
+  empty_letterbox("B", cells: 4, original: input.previous_results.voters_counts.proxy_certificate_count)[Volmachtbewijzen],
+  empty_letterbox("D", cells: 4, original: input.previous_results.voters_counts.total_admitted_voters_count, light: false)[
     *Totaal toegelaten kiezers (A+B)*
   ]
 )
@@ -80,20 +85,24 @@ ingevuld te worden in de kolom ‘gecorrigeerd'. Onder ‘oorspronkelijk’ staa
     with_correction_title: true,
     sum(
       ..input.election.political_groups.enumerate().map(((idx, list)) => {
-        empty_letterbox(cells: 4, original: 10, bold_top_border: idx == 0, [E.#list.number])[Totaal lijst #list.number - #list.name]
+        let votes = input.previous_results.votes_counts.political_group_total_votes.find(v => v.number == list.number)
+        if votes == none {
+          return
+        }
+        empty_letterbox(cells: 4, original: votes.total, bold_top_border: idx == 0, [E.#list.number])[Totaal lijst #list.number - #list.name]
       }),
       empty_letterbox(
         cells: 4,
-        original: 10,
+        original: input.previous_results.votes_counts.total_votes_candidates_count,
         "E",
         light: false,
       )[*Totaal stemmen op kandidaten* (tel E.1 t/m E.#input.election.political_groups.last().number op)],
     ),
-    empty_letterbox(cells: 4, original: 10, "F")[Blanco stemmen],
-    empty_letterbox(cells: 4, original: 10, "G")[Ongeldige stemmen],
+    empty_letterbox(cells: 4, original: input.previous_results.votes_counts.blank_votes_count, "F")[Blanco stemmen],
+    empty_letterbox(cells: 4, original: input.previous_results.votes_counts.invalid_votes_count, "G")[Ongeldige stemmen],
     empty_letterbox(
       cells: 4,
-      original: 10,
+      original: input.previous_results.votes_counts.total_votes_cast_count,
       "H",
       light: false,
     )[*Totaal uitgebrachte stemmen (E+F+G)*],
@@ -115,7 +124,7 @@ ingevuld te worden in de kolom ‘gecorrigeerd'. Onder ‘oorspronkelijk’ staa
 #box(width: 500pt, inset: (left: 3em, bottom: 1em))[
     #grid(
       correction_title_grid(correction_width: 6em, input_width: 6em),
-      empty_letterbox(cells: 3, original: 10, light: false, "I")[Aantal méér getelde stemmen (bereken: H _min_ D)],
+      empty_letterbox(cells: 3, original: input.previous_results.differences_counts.more_ballots_count, light: false, "I")[Aantal méér getelde stemmen (bereken: H _min_ D)],
     )
 ]
 
@@ -123,7 +132,7 @@ ingevuld te worden in de kolom ‘gecorrigeerd'. Onder ‘oorspronkelijk’ staa
 #box(width: 500pt, inset: (left: 3em, bottom: 1em))[
   #grid(
     correction_title_grid(correction_width: 6em, input_width: 6em),
-    empty_letterbox(cells: 3, original: 10, light: false, "J")[Aantal minder getelde stemmen (bereken: D _min_ H)]
+    empty_letterbox(cells: 3, original: input.previous_results.differences_counts.fewer_ballots_count, light: false, "J")[Aantal minder getelde stemmen (bereken: D _min_ H)]
   )
 ]
 
@@ -144,7 +153,6 @@ Vul alléén de getallen in die veranderd zijn ten opzichte van een eerdere tell
 
 #for political_group in input.election.political_groups {
   votes_table(
-    with_originals: true,
     title: [#political_group.number #political_group.name],
     headers: ("Kandidaat", "", "Oorspronkelijk", "Gecorrigeerd"),
     total: none,
@@ -152,6 +160,10 @@ Vul alléén de getallen in die veranderd zijn ten opzichte van een eerdere tell
       name: candidate_name(candidate),
       number: candidate.number,
       votes: none,
+    )),
+    original_values: input.previous_results.political_group_votes.find(pg => pg.number == political_group.number).candidate_votes.map(candidate => (
+      number: candidate.number,
+      votes: candidate.votes,
     )),
     continue_on_next_page: [#sym.arrow.r De lijst gaat verder op de volgende pagina],
     column_total: "Subtotaal kolom",

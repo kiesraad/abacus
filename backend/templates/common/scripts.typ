@@ -324,7 +324,7 @@
   )
 }
 
-// Empty table, without any body fields
+// Table with empty lines
 #let empty_lines(lines) = {
   table(
     columns: 1fr,
@@ -337,6 +337,23 @@
     table.hline(stroke: 1pt + black),
     ..range(0, lines).map(_ => table.cell(align: horizon, "")).flatten(),
     table.vline(stroke: none),
+  )
+}
+
+// Text area with given content
+#let text_area_with_content(content) = {
+  block(
+    width: 100%,
+    box(
+      inset: (x: 16pt, y: 16pt),
+      stroke: (
+        top: 1pt + black,
+        y: 0.25pt + black,
+      ),
+      fill: rgb("#E7EEF9"),
+      width: 1fr,
+      block(width: 75%, content)
+    )
   )
 }
 
@@ -372,15 +389,17 @@
   title: "",
   total: 0,
   values: (),
+  original_values: (),
   continue_on_next_page: "",
   corrected_cells: 4,
   column_total: (c, v) => [#c: #v],
   sum_total: [(#columns)],
   total_instruction: "",
-  with_originals: false,
   explainer_text: none,
   break_count: (25, 25, 15, 15)
 ) = {
+  let with_originals = original_values != ();
+
   // Counter that keeps track of the column number
   let column = 0
 
@@ -392,6 +411,9 @@
 
   // Vote counter
   let votes = 0
+
+  // Count for the original subtotal column (if rendered)
+  let original_subtotal = 0
 
   // Count for the original total column (if rendered)
   let original_total = 0
@@ -426,9 +448,12 @@
         ..while rc < total_rows {
           let c = values.at(rc)
           votes += c.votes
-          let original_votes = 10;
+          let original_votes = 0;
           if with_originals {
-            original_total += 10
+            let o = original_values.at(rc)
+            original_votes = o.votes;
+            original_subtotal += original_votes;
+            original_total += original_votes;
           }
           rc += 1
           column_row += 1
@@ -473,7 +498,7 @@
               votes = 0
               column_row = 0
               if with_originals {
-                original_total = 0
+                original_subtotal = 0
               }
             })
           } else {
@@ -483,7 +508,7 @@
               grid(
                 columns: (1fr,) + if with_originals { (6em, 8em) } else { (8em,) },
                 grid.cell(inset: 9pt, align: center)[#column_total #column],
-                ..cell_if(with_originals, grid.cell(inset: 8pt, fill: luma(213), align(right, prefilled_number(original_total)))),
+                ..cell_if(with_originals, grid.cell(inset: 8pt, fill: luma(213), align(right, prefilled_number(original_subtotal)))),
                 grid.vline(stroke: (paint: luma(213), dash: "densely-dotted")),
                 grid.cell(empty_grid(cells: corrected_cells, paint: luma(213)), align: center, inset: 0pt),
               )
@@ -491,7 +516,7 @@
               votes = 0
               column_row = 0
               if with_originals {
-                original_total = 0
+                original_subtotal = 0
               }
             })
           },
@@ -528,7 +553,7 @@
     )
       .map(str)
       .join(" + ")))),
-    ..cell_if(with_originals, grid.cell(fill: luma(213), stroke: 0.5pt + black, prefilled_number(10))),
+    ..cell_if(with_originals, grid.cell(fill: luma(213), stroke: 0.5pt + black, prefilled_number(original_total))),
     if total == none {
       grid.cell(stroke: 0.5pt + black, inset: 0pt, empty_grid(cells: 5, thickness: 0.5pt))
     } else {

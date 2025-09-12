@@ -4,13 +4,14 @@ import { Link } from "react-router";
 import { ApiResult, isError } from "@/api/ApiResult";
 import { useApiState } from "@/api/useApiState";
 import { useInitialApiGet } from "@/api/useInitialApiGet";
-import { MockTest } from "@/components/dev/MockTest";
 import { PageTitle } from "@/components/page_title/PageTitle";
 import { AppLayout } from "@/components/ui/AppLayout/AppLayout";
 import { Loader } from "@/components/ui/Loader/Loader";
 import { useUserRole } from "@/hooks/user/useUserRole";
 import { t } from "@/i18n/translate";
 import { Election, ELECTION_LIST_REQUEST_PATH, ElectionListResponse, LoginResponse } from "@/types/generated/openapi";
+
+import { MockTest } from "./MockTest";
 
 function Links() {
   const { isTypist, isAdministrator, isCoordinator } = useUserRole();

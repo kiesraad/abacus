@@ -1,5 +1,5 @@
 components:
-  # Backend components
+  # Backend modules
   - name: "(Backend) Airgap detection"
     include:
       - ".*/backend/src/airgap/.*"
@@ -18,12 +18,18 @@ components:
   - name: "(Backend) Data entry"
     include:
       - ".*/backend/src/data_entry/.*"
+  - name: "(Backend) Document"
+    include:
+      - ".*/backend/src/document/.*"
   - name: "(Backend) Election"
     include:
       - ".*/backend/src/election/.*"
   - name: "(Backend) EML"
     include:
       - ".*/backend/src/eml/.*"
+  - name: "(Backend) Files"
+    include:
+      - ".*/backend/src/files/.*"
   - name: "(Backend) PDF generation"
     include:
       - ".*/backend/src/pdf_gen/.*"
@@ -39,12 +45,18 @@ components:
   - name: "(Backend) Test data generation"
     include:
       - ".*/backend/src/test_data_gen/.*"
+  - name: "(Backend) Zip"
+    include:
+      - ".*/backend/src/zip/.*"
   - name: "(Backend) bin/abacus"
     include:
       - ".*/backend/src/bin/abacus.rs"
   - name: "(Backend) bin/gen-openapi"
     include:
       - ".*/backend/src/bin/gen-openapi.rs"
+  - name: "(Backend) bin/gen-openapi"
+    include:
+      - ".*/backend/src/bin/gen-test-election.rs"
   - name: "(Backend) error"
     include:
       - ".*/backend/src/error.rs"
@@ -58,26 +70,48 @@ components:
     include:
       - ".*/backend/tests/.*"
 
-  # Frontend components
+  # Frontend src/components
   - name: "(Frontend) App"
     include:
       - ".*/frontend/src/app/.*"
-  - name: "(Frontend) Components/authorization"
-    include:
-      - ".*/frontend/src/components/authorization/.*"
   - name: "(Frontend) Components/committee_session"
     include:
       - ".*/frontend/src/components/committee_session/.*"
+  - name: "(Frontend) Components/data_entry"
+    include:
+      - ".*/frontend/src/components/data_entry/.*"
+  - name: "(Frontend) Components/election"
+    include:
+      - ".*/frontend/src/components/election/.*"
   - name: "(Frontend) Components/error"
     include:
       - ".*/frontend/src/components/error/.*"
   - name: "(Frontend) Components/footer"
     include:
       - ".*/frontend/src/components/footer/.*"
+  - name: "(Frontend) components/generated"
+    include:
+      - ".*/frontend/src/components/generated/.*"
+  - name: "(Frontend) components/layout"
+    include:
+      - ".*/frontend/src/components/layout/.*"
+  - name: "(Frontend) components/messages"
+    include:
+      - ".*/frontend/src/components/messages/.*"
   - name: "(Frontend) Components/navbar"
     include:
       - ".*/frontend/src/components/navbar/.*"
+  - name: "(Frontend) components/page_title"
+    include:
+      - ".*/frontend/src/components/page_title/.*"
+  - name: "(Frontend) components/polling_station"
+    include:
+      - ".*/frontend/src/components/polling_station/.*"
+  - name: "(Frontend) Lib/UI"
+    include:
+      - ".*/frontend/src/components/ui/.*"
 
+  # Frontend src/features
   - name: "(Frontend) Modules/account"
     include:
       - ".*/frontend/src/features/account/.*"
@@ -90,6 +124,9 @@ components:
   - name: "(Frontend) Modules/data_entry_home"
     include:
       - ".*/frontend/src/features/data_entry_home/.*"
+  - name: "(Frontend) features/dev"
+    include:
+      - ".*/frontend/src/features/dev/.*"
   - name: "(Frontend) Modules/election_create"
     include:
       - ".*/frontend/src/features/election_create/.*"
@@ -102,6 +139,9 @@ components:
   - name: "(Frontend) Modules/election_status"
     include:
       - ".*/frontend/src/features/election_status/.*"
+  - name: "(Frontend) features/investigations"
+    include:
+      - ".*/frontend/src/features/investigations/.*"
   - name: "(Frontend) Modules/logs"
     include:
       - ".*/frontend/src/features/logs/.*"
@@ -118,28 +158,27 @@ components:
     include:
       - ".*/frontend/src/features/users/.*"
 
+  # Frontend src level
   - name: "(Frontend) Lib/API"
     include:
       - ".*/frontend/src/api/.*"
-  - name: "(Frontend) lib/API-Mocks"
-    include:
-      - ".*/frontend/src/testing/api-mocks/.*"
   - name: "(Frontend) Hooks"
     include:
       - ".*/frontend/src/hooks/.*"
   - name: "(Frontend) Lib/i18n"
     include:
       - ".*/frontend/src/i18n/.*"
-  - name: "(Frontend) Unit tests"
+  - name: "(Frontend) src/styling"
+    include:
+      - ".*/frontend/src/styling/.*"
+  - name: "(Frontend) src/testing"
     include:
       - ".*/frontend/src/testing/.*"
-  - name: "(Frontend) Lib/UI"
-    include:
-      - ".*/frontend/src/components/ui/.*"
   - name: "(Frontend) Lib/Util"
     include:
       - ".*/frontend/src/utils/.*"
 
+  # Frontend root level
   - name: "(Frontend) e2e tests"
     include:
       - ".*/frontend/e2e-tests/.*"
@@ -159,9 +198,12 @@ languages:
   - name: "rust"
     production:
       include:
-        - ".*/gen-openapi.rs"
-        - ".*/api.rs"
+        - ".*/gen-openapi[.]rs"
+        - ".*/api[.]rs"
     test:
+      include:
+        - ".*/gen-test-election[.]rs"
+        - ".*/test_data_gen/.*[.]rs"
     generated:
       include:
         - ".*/gen/.*[.]rs"
@@ -171,14 +213,13 @@ languages:
     production:
     test:
       include:
-        - ".*DevHomePage[.]tsx"
-        - ".*NotAvailableInMock[.]tsx"
-        - ".*msw-mock-api[.]ts"
+        - ".*/[.]storybook/.*"
         - ".*[.]e2e[.]ts"
         - ".*.stories[.]tsx"
+        - ".*/src/components/error/NotAvailableInMock[.]tsx"
+        - ".*/src/features/dev/.*"
         - ".*/testing/.*"
-        - ".*/test-data/.*[.]ts"
-        - ".*/test[.]utils[.]ts"
+        - ".*/e2e-tests/.*"
     generated:
       include:
         - ".*/generated/.*[.]ts"
@@ -186,9 +227,6 @@ languages:
 exclude:
   - ".*/backend/[.]sqlx/.*"
   - ".*/frontend/scripts/.*"
-  - ".*/frontend/src/components/MockTest[.]tsx"
-  - ".*/frontend/src/lib/icon/.*"
-  - ".*/[.]storybook.*"
   - ".*[.]d[.]ts"
   - ".*[.]config[.]ts"
 

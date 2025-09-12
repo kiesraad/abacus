@@ -3,16 +3,24 @@ use axum::{
     response::IntoResponse,
 };
 use axum_extra::response::Attachment;
-use sqlx::SqlitePool;
+use sqlx::{SqliteConnection, SqlitePool};
 use utoipa_axum::{router::OpenApiRouter, routes};
 
 use crate::{
-    APIError, AppState, ErrorResponse,
+    APIError, AppState, ErrorResponse, SqlitePoolExt,
+    audit_log::{AuditEvent, AuditService},
     authentication::Coordinator,
-    committee_session::{CommitteeSession, CommitteeSessionError, status::CommitteeSessionStatus},
+    committee_session::{
+        CommitteeSession, CommitteeSessionError, CommitteeSessionFilesUpdateRequest,
+        repository::change_files, status::CommitteeSessionStatus,
+    },
     data_entry::CSOFirstSessionResults,
     election::ElectionWithPoliticalGroups,
-    eml::{EML510, EMLDocument, EmlHash, axum::Eml},
+    eml::{EML510, EMLDocument, EmlHash},
+    files::{
+        File,
+        repository::{create_file, get_file},
+    },
     pdf_gen::{
         generate_pdf,
         models::{ModelNa31_2Input, PdfFileModel, ToPdfFileModel},
@@ -22,11 +30,13 @@ use crate::{
     zip::{ZipResponse, ZipResponseError, slugify_filename},
 };
 
+const EML_MIME_TYPE: &str = "text/xml";
+const PDF_MIME_TYPE: &str = "application/pdf";
+
 pub fn router() -> OpenApiRouter<AppState> {
     OpenApiRouter::default()
         .routes(routes!(election_download_zip_results))
         .routes(routes!(election_download_pdf_results))
-        .routes(routes!(election_download_xml_results))
 }
 
 struct ResultsInput {
@@ -39,19 +49,20 @@ struct ResultsInput {
 }
 
 impl ResultsInput {
-    async fn new(election_id: u32, pool: SqlitePool) -> Result<ResultsInput, APIError> {
-        let election = crate::election::repository::get(&pool, election_id).await?;
+    async fn new(
+        conn: &mut SqliteConnection,
+        committee_session_id: u32,
+    ) -> Result<ResultsInput, APIError> {
         let committee_session =
-            crate::committee_session::repository::get_election_committee_session(
-                &pool,
-                election_id,
-            )
-            .await?;
-        let polling_stations = crate::polling_station::repository::list(&pool, election.id).await?;
+            crate::committee_session::repository::get(conn, committee_session_id).await?;
+        let election =
+            crate::election::repository::get(conn, committee_session.election_id).await?;
+        let polling_stations =
+            crate::polling_station::repository::list(conn, committee_session.id).await?;
         let results =
             crate::data_entry::repository::list_entries_with_polling_stations_first_session(
-                &pool,
-                election.id,
+                conn,
+                committee_session.id,
             )
             .await?;
 
@@ -94,16 +105,6 @@ impl ResultsInput {
         ))
     }
 
-    fn zip_name(&self) -> String {
-        use chrono::Datelike;
-        slugify_filename(&format!(
-            "election_result_{}{}_{}.zip",
-            self.election.category.to_eml_code(),
-            self.election.election_date.year(),
-            self.election.location
-        ))
-    }
-
     fn into_pdf_file_model(self, xml_hash: impl Into<String>) -> PdfFileModel {
         let file_name = self.pdf_filename();
         ModelNa31_2Input {
@@ -118,10 +119,104 @@ impl ResultsInput {
     }
 }
 
+fn zip_filename(election: ElectionWithPoliticalGroups) -> String {
+    use chrono::Datelike;
+    slugify_filename(&format!(
+        "election_result_{}{}_{}.zip",
+        election.category.to_eml_code(),
+        election.election_date.year(),
+        election.location
+    ))
+}
+
+async fn generate_and_save_files(
+    pool: &SqlitePool,
+    audit_service: AuditService,
+    committee_session_id: u32,
+) -> Result<(File, File), APIError> {
+    let mut conn = pool.acquire().await?;
+    let committee_session =
+        crate::committee_session::repository::get(&mut conn, committee_session_id).await?;
+    if committee_session.status != CommitteeSessionStatus::DataEntryFinished {
+        return Err(APIError::CommitteeSession(
+            CommitteeSessionError::InvalidCommitteeSessionStatus,
+        ));
+    }
+
+    let mut eml_file: Option<File> = None;
+    let mut pdf_file: Option<File> = None;
+
+    // Check if files exist, if so, get files from database
+    if let Some(eml_id) = committee_session.results_eml {
+        let file = get_file(&mut conn, eml_id).await?;
+        eml_file = Some(file);
+    }
+    if let Some(pdf_id) = committee_session.results_pdf {
+        let file = get_file(&mut conn, pdf_id).await?;
+        pdf_file = Some(file);
+    }
+    drop(conn);
+
+    // If one or both files don't exist, generate them and save them to the database
+    if eml_file.is_none() || pdf_file.is_none() {
+        let mut tx = pool.begin_immediate().await?;
+
+        let input = ResultsInput::new(&mut tx, committee_session.id).await?;
+        let xml = input.as_xml();
+        let xml_string = xml.to_xml_string()?;
+        let eml = create_file(
+            &mut tx,
+            xml_string.as_bytes(),
+            input.xml_filename(),
+            EML_MIME_TYPE.to_string(),
+        )
+        .await?;
+
+        audit_service
+            .log(&mut tx, &AuditEvent::FileCreated(eml.clone().into()), None)
+            .await?;
+
+        let pdf_filename = input.pdf_filename();
+        let model = input.into_pdf_file_model(EmlHash::from(xml_string.as_bytes()));
+        let content = generate_pdf(model).await?;
+        let pdf = create_file(
+            &mut tx,
+            &content.buffer,
+            pdf_filename,
+            PDF_MIME_TYPE.to_string(),
+        )
+        .await?;
+
+        audit_service
+            .log(&mut tx, &AuditEvent::FileCreated(pdf.clone().into()), None)
+            .await?;
+
+        change_files(
+            &mut tx,
+            committee_session.id,
+            CommitteeSessionFilesUpdateRequest {
+                results_eml: Some(eml.id),
+                results_pdf: Some(pdf.id),
+            },
+        )
+        .await?;
+
+        tx.commit().await?;
+
+        eml_file = Some(eml);
+        pdf_file = Some(pdf);
+    }
+
+    Ok((
+        eml_file.expect("EML file should have been generated"),
+        pdf_file.expect("PDF file should have been generated"),
+    ))
+}
+
 /// Download a zip containing a PDF for the PV and the EML with election results
 #[utoipa::path(
     get,
-    path = "/api/elections/{election_id}/download_zip_results",
+    path = "/api/elections/{election_id}/committee_sessions/{committee_session_id}/download_zip_results",
     responses(
         (
             status = 200,
@@ -139,39 +234,28 @@ impl ResultsInput {
     ),
     params(
         ("election_id" = u32, description = "Election database id"),
+        ("committee_session_id" = u32, description = "Committee session database id"),
     ),
 )]
 async fn election_download_zip_results(
     _user: Coordinator,
     State(pool): State<SqlitePool>,
-    Path(election_id): Path<u32>,
+    audit_service: AuditService,
+    Path((election_id, committee_session_id)): Path<(u32, u32)>,
 ) -> Result<impl IntoResponse, APIError> {
-    let committee_session =
-        crate::committee_session::repository::get_election_committee_session(&pool, election_id)
-            .await?;
-    if committee_session.status != CommitteeSessionStatus::DataEntryFinished {
-        return Err(APIError::CommitteeSession(
-            CommitteeSessionError::InvalidCommitteeSessionStatus,
-        ));
-    }
+    let mut conn = pool.acquire().await?;
+    let election = crate::election::repository::get(&mut conn, election_id).await?;
+    let (eml_file, pdf_file) =
+        generate_and_save_files(&pool, audit_service, committee_session_id).await?;
+    drop(conn);
 
-    let input = ResultsInput::new(election_id, pool).await?;
-    let xml = input.as_xml();
-    let xml_string = xml.to_xml_string()?;
-    let pdf_filename = input.pdf_filename();
-    let xml_filename = input.xml_filename();
-    let zip_filename = input.zip_name();
-
-    let model = input.into_pdf_file_model(EmlHash::from(xml_string.as_bytes()));
-    let content = generate_pdf(model).await?;
+    let zip_filename = zip_filename(election);
 
     let (zip_response, mut zip_writer) = ZipResponse::new(&zip_filename);
 
     tokio::spawn(async move {
-        zip_writer.add_file(&pdf_filename, &content.buffer).await?;
-        zip_writer
-            .add_file(&xml_filename, xml_string.as_bytes())
-            .await?;
+        zip_writer.add_file(&pdf_file.name, &pdf_file.data).await?;
+        zip_writer.add_file(&eml_file.name, &eml_file.data).await?;
 
         zip_writer.finish().await?;
 
@@ -184,7 +268,7 @@ async fn election_download_zip_results(
 /// Download a generated PDF with election results
 #[utoipa::path(
     get,
-    path = "/api/elections/{election_id}/download_pdf_results",
+    path = "/api/elections/{election_id}/committee_sessions/{committee_session_id}/download_pdf_results",
     responses(
         (
             status = 200,
@@ -202,69 +286,18 @@ async fn election_download_zip_results(
     ),
     params(
         ("election_id" = u32, description = "Election database id"),
+        ("committee_session_id" = u32, description = "Committee session database id"),
     ),
 )]
 async fn election_download_pdf_results(
     _user: Coordinator,
     State(pool): State<SqlitePool>,
-    Path(election_id): Path<u32>,
+    audit_service: AuditService,
+    Path((_election_id, committee_session_id)): Path<(u32, u32)>,
 ) -> Result<Attachment<Vec<u8>>, APIError> {
-    let committee_session =
-        crate::committee_session::repository::get_election_committee_session(&pool, election_id)
-            .await?;
-    if committee_session.status != CommitteeSessionStatus::DataEntryFinished {
-        return Err(APIError::CommitteeSession(
-            CommitteeSessionError::InvalidCommitteeSessionStatus,
-        ));
-    }
+    let (_, pdf_file) = generate_and_save_files(&pool, audit_service, committee_session_id).await?;
 
-    let input = ResultsInput::new(election_id, pool).await?;
-    let xml = input.as_xml();
-    let xml_string = xml.to_xml_string()?;
-    let pdf_filename = input.pdf_filename();
-    let model = input.into_pdf_file_model(EmlHash::from(xml_string.as_bytes()));
-    let content = generate_pdf(model).await?;
-
-    Ok(Attachment::new(content.buffer)
-        .filename(pdf_filename)
-        .content_type("application/pdf"))
-}
-
-/// Download a generated EML_NL 510 XML file with election results
-#[utoipa::path(
-    get,
-    path = "/api/elections/{election_id}/download_xml_results",
-    responses(
-        (
-            status = 200,
-            description = "XML",
-            content_type = "text/xml",
-        ),
-        (status = 401, description = "Unauthorized", body = ErrorResponse),
-        (status = 403, description = "Forbidden", body = ErrorResponse),
-        (status = 404, description = "Not found", body = ErrorResponse),
-        (status = 409, description = "Request cannot be completed", body = ErrorResponse),
-        (status = 500, description = "Internal server error", body = ErrorResponse),
-    ),
-    params(
-        ("election_id" = u32, description = "Election database id"),
-    ),
-)]
-async fn election_download_xml_results(
-    _user: Coordinator,
-    State(pool): State<SqlitePool>,
-    Path(election_id): Path<u32>,
-) -> Result<Eml<EML510>, APIError> {
-    let committee_session =
-        crate::committee_session::repository::get_election_committee_session(&pool, election_id)
-            .await?;
-    if committee_session.status != CommitteeSessionStatus::DataEntryFinished {
-        return Err(APIError::CommitteeSession(
-            CommitteeSessionError::InvalidCommitteeSessionStatus,
-        ));
-    }
-
-    let input = ResultsInput::new(election_id, pool).await?;
-    let xml = input.as_xml();
-    Ok(Eml(xml))
+    Ok(Attachment::new(pdf_file.data)
+        .filename(pdf_file.name)
+        .content_type(pdf_file.mime_type))
 }

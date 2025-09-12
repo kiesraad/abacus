@@ -35,7 +35,7 @@ export function ElectionReportPage() {
   }
 
   // Redirect to update details page if committee session details have not been filled in
-  if (committeeSession.location === "" || committeeSession.start_date === "" || committeeSession.start_time === "") {
+  if (committeeSession.location === "" || !committeeSession.start_date_time) {
     return <Navigate to={`/elections/${election.id}/details#redirect-to-report`} />;
   }
 
@@ -48,12 +48,12 @@ export function ElectionReportPage() {
     throw changeStatusError;
   }
 
-  function downloadPdfResults() {
-    directDownload(`/api/elections/${election.id}/download_pdf_results`);
+  function downloadPdfResults(committeeSession: CommitteeSession) {
+    directDownload(`/api/elections/${election.id}/committee_sessions/${committeeSession.id}/download_pdf_results`);
   }
 
-  function downloadZipResults() {
-    directDownload(`/api/elections/${election.id}/download_zip_results`);
+  function downloadZipResults(committeeSession: CommitteeSession) {
+    directDownload(`/api/elections/${election.id}/committee_sessions/${committeeSession.id}/download_zip_results`);
   }
 
   function handleResume(committeeSession: CommitteeSession) {
@@ -87,19 +87,37 @@ export function ElectionReportPage() {
           </h2>
           <div className={cls.reportInfoSection}>
             {t("election_report.committee_session_started", {
-              date: formatFullDateWithoutTimezone(new Date(committeeSession.start_date)),
-              time: committeeSession.start_time,
+              date: committeeSession.start_date_time
+                ? formatFullDateWithoutTimezone(new Date(committeeSession.start_date_time))
+                : "",
+              time: committeeSession.start_date_time
+                ? new Date(committeeSession.start_date_time).toLocaleTimeString("nl-NL", {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  })
+                : "",
             })}
             .<br />
             {t("election_report.there_was_counting_method", { method: t(election.counting_method).toLowerCase() })}.
           </div>
           <div className={cls.reportInfoSection}>
-            <Button size="md" onClick={downloadZipResults}>
+            <Button
+              size="md"
+              onClick={() => {
+                downloadZipResults(committeeSession);
+              }}
+            >
               {t("election_report.download_zip")}
             </Button>
             <br />
             <br />
-            <Button size="md" variant="secondary" onClick={downloadPdfResults}>
+            <Button
+              size="md"
+              variant="secondary"
+              onClick={() => {
+                downloadPdfResults(committeeSession);
+              }}
+            >
               {t("election_report.download_report")}
             </Button>
           </div>

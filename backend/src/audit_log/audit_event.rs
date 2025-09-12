@@ -1,5 +1,5 @@
 use axum::http::Uri;
-use chrono::{DateTime, NaiveDate, Utc};
+use chrono::{DateTime, NaiveDate, NaiveDateTime, Utc};
 use serde::{self, Deserialize, Serialize};
 use strum::VariantNames;
 use utoipa::ToSchema;
@@ -62,10 +62,25 @@ pub struct CommitteeSessionDetails {
     pub session_number: u32,
     pub session_election_id: u32,
     pub session_location: String,
-    pub session_start_date: String,
-    pub session_start_time: String,
+    #[schema(value_type = Option<String>, format = "date-time")]
+    pub session_start_date_time: Option<NaiveDateTime>,
     pub session_status: String,
     pub session_number_of_voters: u32,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[schema(nullable = false)]
+    pub session_results_eml: Option<u32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[schema(nullable = false)]
+    pub session_results_pdf: Option<u32>,
+}
+
+#[derive(Serialize, Deserialize, Debug, PartialEq, Eq, ToSchema)]
+#[serde(deny_unknown_fields)]
+pub struct FileDetails {
+    pub file_id: u32,
+    pub file_data: Vec<u8>,
+    pub file_name: String,
+    pub file_mime_type: String,
 }
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, Eq, ToSchema)]
@@ -158,6 +173,9 @@ pub enum AuditEvent {
     CommitteeSessionUpdated(CommitteeSessionDetails),
     PollingStationInvestigationCreated(PollingStationInvestigation),
     PollingStationInvestigationConcluded(PollingStationInvestigation),
+    // file events
+    FileCreated(FileDetails),
+    FileDeleted(FileDetails),
     // apportionment
     ApportionmentCreated(ElectionDetails),
     // polling station events
@@ -212,6 +230,8 @@ impl AuditEvent {
             AuditEvent::CommitteeSessionCreated(_) => AuditEventLevel::Success,
             AuditEvent::CommitteeSessionDeleted(_) => AuditEventLevel::Info,
             AuditEvent::CommitteeSessionUpdated(_) => AuditEventLevel::Success,
+            AuditEvent::FileCreated(_) => AuditEventLevel::Success,
+            AuditEvent::FileDeleted(_) => AuditEventLevel::Info,
             AuditEvent::ApportionmentCreated(_) => AuditEventLevel::Success,
             AuditEvent::PollingStationCreated(_) => AuditEventLevel::Success,
             AuditEvent::PollingStationUpdated(_) => AuditEventLevel::Success,

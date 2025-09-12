@@ -70,6 +70,22 @@ export interface ELECTION_APPORTIONMENT_REQUEST_PARAMS {
 }
 export type ELECTION_APPORTIONMENT_REQUEST_PATH = `/api/elections/${number}/apportionment`;
 
+// /api/elections/{election_id}/committee_sessions/{committee_session_id}/download_pdf_results
+export interface ELECTION_DOWNLOAD_PDF_RESULTS_REQUEST_PARAMS {
+  election_id: number;
+  committee_session_id: number;
+}
+export type ELECTION_DOWNLOAD_PDF_RESULTS_REQUEST_PATH =
+  `/api/elections/${number}/committee_sessions/${number}/download_pdf_results`;
+
+// /api/elections/{election_id}/committee_sessions/{committee_session_id}/download_zip_results
+export interface ELECTION_DOWNLOAD_ZIP_RESULTS_REQUEST_PARAMS {
+  election_id: number;
+  committee_session_id: number;
+}
+export type ELECTION_DOWNLOAD_ZIP_RESULTS_REQUEST_PATH =
+  `/api/elections/${number}/committee_sessions/${number}/download_zip_results`;
+
 // /api/elections/{election_id}/download_n_10_2
 export interface ELECTION_DOWNLOAD_N_10_2_REQUEST_PARAMS {
   election_id: number;
@@ -81,24 +97,6 @@ export interface ELECTION_DOWNLOAD_NA_31_2_BIJLAGE1_REQUEST_PARAMS {
   election_id: number;
 }
 export type ELECTION_DOWNLOAD_NA_31_2_BIJLAGE1_REQUEST_PATH = `/api/elections/${number}/download_na_31_2_bijlage1`;
-
-// /api/elections/{election_id}/download_pdf_results
-export interface ELECTION_DOWNLOAD_PDF_RESULTS_REQUEST_PARAMS {
-  election_id: number;
-}
-export type ELECTION_DOWNLOAD_PDF_RESULTS_REQUEST_PATH = `/api/elections/${number}/download_pdf_results`;
-
-// /api/elections/{election_id}/download_xml_results
-export interface ELECTION_DOWNLOAD_XML_RESULTS_REQUEST_PARAMS {
-  election_id: number;
-}
-export type ELECTION_DOWNLOAD_XML_RESULTS_REQUEST_PATH = `/api/elections/${number}/download_xml_results`;
-
-// /api/elections/{election_id}/download_zip_results
-export interface ELECTION_DOWNLOAD_ZIP_RESULTS_REQUEST_PARAMS {
-  election_id: number;
-}
-export type ELECTION_DOWNLOAD_ZIP_RESULTS_REQUEST_PATH = `/api/elections/${number}/download_zip_results`;
 
 // /api/elections/{election_id}/polling_stations
 export interface POLLING_STATION_LIST_REQUEST_PARAMS {
@@ -304,6 +302,8 @@ export type AuditEvent =
   | (CommitteeSessionDetails & { event_type: "CommitteeSessionUpdated" })
   | (PollingStationInvestigation & { event_type: "PollingStationInvestigationCreated" })
   | (PollingStationInvestigation & { event_type: "PollingStationInvestigationConcluded" })
+  | (FileDetails & { event_type: "FileCreated" })
+  | (FileDetails & { event_type: "FileDeleted" })
   | (ElectionDetails & { event_type: "ApportionmentCreated" })
   | (PollingStationDetails & { event_type: "PollingStationCreated" })
   | (PollingStationDetails & { event_type: "PollingStationUpdated" })
@@ -422,6 +422,7 @@ export interface CandidateVotes {
 export interface ClaimDataEntryResponse {
   client_state: unknown;
   data: PollingStationResults;
+  previous_results?: PollingStationResults;
   validation_results: ValidationResults;
 }
 
@@ -434,8 +435,9 @@ export interface CommitteeSession {
   location: string;
   number: number;
   number_of_voters: number;
-  start_date: string;
-  start_time: string;
+  results_eml?: number;
+  results_pdf?: number;
+  start_date_time?: string;
   status: CommitteeSessionStatus;
 }
 
@@ -445,8 +447,9 @@ export interface CommitteeSessionDetails {
   session_location: string;
   session_number: number;
   session_number_of_voters: number;
-  session_start_date: string;
-  session_start_time: string;
+  session_results_eml?: number;
+  session_results_pdf?: number;
+  session_start_date_time?: string | null;
   session_status: string;
 }
 
@@ -810,6 +813,13 @@ export interface ExtraInvestigation {
   /** Whether extra investigation was done for another reason than an unexplained difference
 ("Heeft het gemeentelijk stembureau extra onderzoek gedaan vanwege een andere reden dan een onverklaard verschil?") */
   extra_investigation_other_reason: YesNo;
+}
+
+export interface FileDetails {
+  file_data: number[];
+  file_id: number;
+  file_mime_type: string;
+  file_name: string;
 }
 
 /**

@@ -9,12 +9,20 @@ import { ValidationResults } from "@/types/generated/openapi";
 import { getDataEntryStructure } from "@/utils/dataEntryStructure";
 
 function getValidationResults(section: HTMLElement | null) {
-  return (
-    within(section!)
-      .getAllByRole("listitem")
-      // Assume that each list item starts with the validation result code with a dot
-      .map((item) => item.textContent.split(" ")[0])
-  );
+  if (!section) return [];
+
+  return within(section)
+    .getAllByRole("listitem")
+    .filter((li) => li.matches(".error, .warning"))
+    .map((item) => {
+      const heading = within(item).getByRole("heading");
+
+      return {
+        code: heading.textContent.split(" ")[0],
+        hasContent: item.getElementsByClassName("content").length > 0,
+        hasActions: within(item).queryByRole("list") !== null,
+      };
+    });
 }
 
 describe("ResolveErrorsOverview", () => {
@@ -23,28 +31,60 @@ describe("ResolveErrorsOverview", () => {
   test("render sections with errors and warnings", () => {
     const results: ValidationResults = {
       errors: [
-        validationResultMockData.F201, // voters_counts
-        validationResultMockData.F401, // political_group_votes[0]
+        validationResultMockData.F101,
+        validationResultMockData.F201,
+        validationResultMockData.F302,
+        validationResultMockData.F401,
       ],
-      warnings: [
-        validationResultMockData.W201, // votes_counts
-      ],
+      warnings: [validationResultMockData.W201],
     };
 
     render(<ResolveErrorsOverview structure={structure} results={results} />);
 
-    const voters_votes_counts = screen.queryByRole("region", { name: "Toegelaten kiezers en uitgebrachte stemmen" });
-    expect(voters_votes_counts).toBeInTheDocument();
-    expect(getValidationResults(voters_votes_counts)).toEqual(["F.201", "W.201"]);
+    const extra_investigation = screen.queryByRole("region", { name: "Extra onderzoek B1-1" });
+    expect(extra_investigation).toBeInTheDocument();
+    expect(getValidationResults(extra_investigation)).toEqual([
+      {
+        code: "F.101",
+        hasContent: true,
+        hasActions: false,
+      },
+    ]);
 
-    const differences_counts = screen.queryByRole("region", {
-      name: "Verschillen tussen aantal kiezers en uitgebrachte stemmen B1-3.3",
-    });
-    expect(differences_counts).not.toBeInTheDocument();
+    const voters_votes_counts = screen.queryByRole("region", { name: "Aantal kiezers en stemmen B1-3.1 en 3.2" });
+    expect(voters_votes_counts).toBeInTheDocument();
+    expect(getValidationResults(voters_votes_counts)).toEqual([
+      {
+        code: "F.201",
+        hasContent: true,
+        hasActions: true,
+      },
+      {
+        code: "W.201",
+        hasContent: false,
+        hasActions: true,
+      },
+    ]);
+
+    const differences_counts = screen.queryByRole("region", { name: "Verschillen D & H B1-3.3" });
+    expect(differences_counts).toBeInTheDocument();
+    expect(getValidationResults(differences_counts)).toEqual([
+      {
+        code: "F.302",
+        hasContent: false,
+        hasActions: false,
+      },
+    ]);
 
     const political_group_votes_1 = screen.queryByRole("region", { name: "Lijst 1 - Vurige Vleugels Partij" });
     expect(political_group_votes_1).toBeInTheDocument();
-    expect(getValidationResults(political_group_votes_1)).toEqual(["F.401"]);
+    expect(getValidationResults(political_group_votes_1)).toEqual([
+      {
+        code: "F.401",
+        hasContent: true,
+        hasActions: true,
+      },
+    ]);
 
     const political_group_votes_2 = screen.queryByRole("region", { name: "Lijst 2 - Wijzen van Water en Wind" });
     expect(political_group_votes_2).not.toBeInTheDocument();

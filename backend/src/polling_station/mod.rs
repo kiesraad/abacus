@@ -5,13 +5,13 @@ use axum::{
     response::{IntoResponse, Response},
 };
 use serde::{Deserialize, Serialize};
-use sqlx::SqlitePool;
+use sqlx::{Connection, SqlitePool};
 use utoipa::ToSchema;
 use utoipa_axum::{router::OpenApiRouter, routes};
 
 pub use self::structs::*;
 use crate::{
-    APIError, AppState, ErrorResponse,
+    APIError, AppState, ErrorResponse, SqlitePoolExt,
     audit_log::{AuditEvent, AuditService, PollingStationImportDetails},
     authentication::{AdminOrCoordinator, User},
     committee_session::{
@@ -67,11 +67,13 @@ async fn polling_station_list(
     State(pool): State<SqlitePool>,
     Path(election_id): Path<u32>,
 ) -> Result<PollingStationListResponse, APIError> {
+    let mut conn = pool.acquire().await?;
+
     // Check if the election exists, will respond with NOT_FOUND otherwise
-    crate::election::repository::get(&pool, election_id).await?;
+    crate::election::repository::get(&mut conn, election_id).await?;
 
     Ok(PollingStationListResponse {
-        polling_stations: crate::polling_station::repository::list(&pool, election_id).await?,
+        polling_stations: crate::polling_station::repository::list(&mut conn, election_id).await?,
     })
 }
 
@@ -99,17 +101,21 @@ async fn polling_station_create(
     audit_service: AuditService,
     new_polling_station: PollingStationRequest,
 ) -> Result<(StatusCode, PollingStation), APIError> {
+    let mut tx = pool.begin_immediate().await?;
+
     // Check if the election and a committee session exist, will respond with NOT_FOUND otherwise
-    crate::election::repository::get(&pool, election_id).await?;
+    crate::election::repository::get(&mut tx, election_id).await?;
     let committee_session =
-        crate::committee_session::repository::get_election_committee_session(&pool, election_id)
+        crate::committee_session::repository::get_election_committee_session(&mut tx, election_id)
             .await?;
 
     let polling_station =
-        crate::polling_station::repository::create(&pool, election_id, new_polling_station).await?;
+        crate::polling_station::repository::create(&mut tx, election_id, new_polling_station)
+            .await?;
 
     audit_service
         .log(
+            &mut tx,
             &AuditEvent::PollingStationCreated(polling_station.clone().into()),
             None,
         )
@@ -117,21 +123,23 @@ async fn polling_station_create(
 
     if committee_session.status == CommitteeSessionStatus::Created {
         change_committee_session_status(
+            &mut tx,
             committee_session.id,
             CommitteeSessionStatus::DataEntryNotStarted,
-            pool.clone(),
             audit_service,
         )
         .await?;
     } else if committee_session.status == CommitteeSessionStatus::DataEntryFinished {
         change_committee_session_status(
+            &mut tx,
             committee_session.id,
             CommitteeSessionStatus::DataEntryInProgress,
-            pool.clone(),
             audit_service,
         )
         .await?;
     };
+
+    tx.commit().await?;
 
     Ok((StatusCode::CREATED, polling_station))
 }
@@ -156,10 +164,11 @@ async fn polling_station_get(
     State(pool): State<SqlitePool>,
     Path((election_id, polling_station_id)): Path<(u32, u32)>,
 ) -> Result<(StatusCode, PollingStation), APIError> {
+    let mut conn = pool.acquire().await?;
     Ok((
         StatusCode::OK,
         crate::polling_station::repository::get_for_election(
-            &pool,
+            &mut conn,
             election_id,
             polling_station_id,
         )
@@ -191,8 +200,10 @@ async fn polling_station_update(
     Path((election_id, polling_station_id)): Path<(u32, u32)>,
     polling_station_update: PollingStationRequest,
 ) -> Result<(StatusCode, PollingStation), APIError> {
+    let mut tx = pool.begin_immediate().await?;
+
     let polling_station = crate::polling_station::repository::update(
-        &pool,
+        &mut tx,
         election_id,
         polling_station_id,
         polling_station_update,
@@ -201,6 +212,7 @@ async fn polling_station_update(
 
     audit_service
         .log(
+            &mut tx,
             &AuditEvent::PollingStationUpdated(polling_station.clone().into()),
             None,
         )
@@ -231,40 +243,45 @@ async fn polling_station_delete(
     audit_service: AuditService,
     Path((election_id, polling_station_id)): Path<(u32, u32)>,
 ) -> Result<StatusCode, APIError> {
+    let mut tx = pool.begin_immediate().await?;
+
     // Check if the election and a committee session exist, will respond with NOT_FOUND otherwise
-    crate::election::repository::get(&pool, election_id).await?;
+    crate::election::repository::get(&mut tx, election_id).await?;
     let committee_session =
-        crate::committee_session::repository::get_election_committee_session(&pool, election_id)
+        crate::committee_session::repository::get_election_committee_session(&mut tx, election_id)
             .await?;
 
     let polling_station = crate::polling_station::repository::get_for_election(
-        &pool,
+        &mut tx,
         election_id,
         polling_station_id,
     )
     .await?;
 
-    crate::polling_station::repository::delete(&pool, election_id, polling_station_id).await?;
+    crate::polling_station::repository::delete(&mut tx, election_id, polling_station_id).await?;
 
     audit_service
         .log(
+            &mut tx,
             &AuditEvent::PollingStationDeleted(polling_station.clone().into()),
             None,
         )
         .await?;
 
-    if crate::polling_station::repository::list(&pool, election_id)
+    if crate::polling_station::repository::list(&mut tx, committee_session.id)
         .await?
         .is_empty()
     {
         change_committee_session_status(
+            &mut tx,
             committee_session.id,
             CommitteeSessionStatus::Created,
-            pool.clone(),
             audit_service,
         )
         .await?;
     }
+
+    tx.commit().await?;
 
     Ok(StatusCode::OK)
 }
@@ -312,16 +329,18 @@ pub struct PollingStationsRequest {
 }
 
 pub async fn create_imported_polling_stations(
-    pool: SqlitePool,
+    conn: &mut sqlx::SqliteConnection,
     audit_service: AuditService,
     election_id: u32,
     polling_stations_request: PollingStationsRequest,
 ) -> Result<Vec<PollingStation>, APIError> {
-    let committee_session = get_election_committee_session(&pool, election_id).await?;
+    let mut tx = conn.begin().await?;
+
+    let committee_session = get_election_committee_session(&mut tx, election_id).await?;
 
     // Create new polling stations
     let polling_stations = repository::create_many(
-        &pool,
+        &mut tx,
         election_id,
         polling_stations_request.polling_stations,
     )
@@ -330,6 +349,7 @@ pub async fn create_imported_polling_stations(
     // Create audit event
     audit_service
         .log(
+            &mut tx,
             &AuditEvent::PollingStationsImported(PollingStationImportDetails {
                 import_election_id: election_id,
                 import_file_name: polling_stations_request.file_name,
@@ -343,13 +363,15 @@ pub async fn create_imported_polling_stations(
     if committee_session.status == CommitteeSessionStatus::Created {
         // Change committee session status to DataEntryNotStarted
         change_committee_session_status(
+            &mut tx,
             committee_session.id,
             CommitteeSessionStatus::DataEntryNotStarted,
-            pool.clone(),
             audit_service,
         )
         .await?;
     }
+
+    tx.commit().await?;
 
     Ok(polling_stations)
 }
@@ -377,13 +399,15 @@ async fn polling_station_import(
     audit_service: AuditService,
     Json(polling_stations_request): Json<PollingStationsRequest>,
 ) -> Result<(StatusCode, PollingStationListResponse), APIError> {
+    let mut tx = pool.begin_immediate().await?;
     let polling_stations: Vec<PollingStation> = create_imported_polling_stations(
-        pool,
+        &mut tx,
         audit_service,
         election_id,
         polling_stations_request,
     )
     .await?;
+    tx.commit().await?;
 
     Ok((
         StatusCode::OK,

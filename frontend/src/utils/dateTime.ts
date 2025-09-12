@@ -32,6 +32,23 @@ export function formatFullDateWithoutTimezone(date: Date) {
   }).format(date);
 }
 
+export function formatFullDateTimeWithoutTimezone(date: Date) {
+  const dateFormat = new Intl.DateTimeFormat(t("date_locale"), {
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+    timeZone: "UTC",
+  }).format(date);
+
+  const timeFormat = new Intl.DateTimeFormat(t("date_locale"), {
+    hour: "2-digit",
+    minute: "2-digit",
+  }).format(date);
+
+  return `${dateFormat} ${timeFormat}`;
+}
+
 export function formatDateTimeFull(date: Date) {
   return date.toLocaleTimeString(t("date_locale"), {
     hour: "numeric",

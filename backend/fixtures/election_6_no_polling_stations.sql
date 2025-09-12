@@ -46,5 +46,5 @@ VALUES (6, 'Nieuwe Verkiezing', 'CSO','KleinDorp_2024', 'KleinDorp', '0123', 'Mu
           }
         ]');
 
-INSERT INTO committee_sessions (id, number, election_id, location, start_date, start_time)
-VALUES (7, 1, 6,'', '', '');
+INSERT INTO committee_sessions (id, number, election_id, location, start_date_time)
+VALUES (7, 1, 6,'', NULL);

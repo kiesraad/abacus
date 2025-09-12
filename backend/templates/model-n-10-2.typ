@@ -6,7 +6,7 @@
   input.election.category == "Municipal"
 ) { municipal } else { public_body }
 
-#let is_mobile = input.polling_station.polling_station_type == "Mobile"
+#let is_mobile = "polling_station_type" in input.polling_station and input.polling_station.polling_station_type == "Mobile"
 
 #let location_name = is_municipality[Gemeente #input.election.domain_id #input.election.location][Openbaar lichaam #input.election.location]
 #let location_type = is_municipality[gemeentelijk stembureau][stembureau voor het openbaar lichaam]

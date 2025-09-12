@@ -15,7 +15,7 @@ use super::{
     error::AuthenticationError, role::Role, user::User,
 };
 use crate::{
-    APIError, AppState, ErrorResponse,
+    APIError, AppState, ErrorResponse, SqlitePoolExt,
     audit_log::{
         AuditEvent, AuditService, UserDetails, UserLoggedInDetails, UserLoggedOutDetails,
         UserLoginFailedDetails,
@@ -122,8 +122,10 @@ async fn login(
     let user = match super::user::authenticate(&pool, &username, &password).await {
         Ok(u) => Ok(u),
         Err(AuthenticationError::UserNotFound) | Err(AuthenticationError::InvalidPassword) => {
+            let mut tx = pool.begin_immediate().await?;
             audit_service
                 .log(
+                    &mut tx,
                     &AuditEvent::UserLoginFailed(UserLoginFailedDetails {
                         username,
                         user_agent: user_agent.clone(),
@@ -131,28 +133,35 @@ async fn login(
                     None,
                 )
                 .await?;
+            tx.commit().await?;
             Err(AuthenticationError::InvalidUsernameOrPassword)
         }
         e => e,
     }?;
 
+    let mut tx = pool.begin_immediate().await?;
+
     // Remove expired sessions, we do this after a login to prevent the necessity of periodical cleanup jobs
-    super::session::delete_expired_sessions(&pool).await?;
+    super::session::delete_expired_sessions(&mut tx).await?;
 
     // Create a new session and cookie
-    let session = super::session::create(&pool, user.id(), SESSION_LIFE_TIME).await?;
+    let session = super::session::create(&mut tx, user.id(), SESSION_LIFE_TIME).await?;
 
     // Log the login event
+    let logged_in_users_count = super::session::count(&mut tx).await?;
     audit_service
         .with_user(user.clone())
         .log(
+            &mut tx,
             &AuditEvent::UserLoggedIn(UserLoggedInDetails {
                 user_agent,
-                logged_in_users_count: super::session::count(&pool).await?,
+                logged_in_users_count,
             }),
             None,
         )
         .await?;
+
+    tx.commit().await?;
 
     // Add the session cookie to the response
     let mut cookie = session.get_cookie();
@@ -199,7 +208,8 @@ async fn whoami(user: Option<User>) -> Result<impl IntoResponse, APIError> {
   ),
 )]
 async fn initialised(State(pool): State<SqlitePool>) -> Result<impl IntoResponse, APIError> {
-    if super::user::has_active_users(&pool).await? {
+    let mut conn = pool.acquire().await?;
+    if super::user::has_active_users(&mut conn).await? {
         Ok(StatusCode::OK)
     } else {
         Err(AuthenticationError::NotInitialised.into())
@@ -223,25 +233,27 @@ async fn create_first_admin(
     audit_service: AuditService,
     Json(create_user_req): Json<CreateUserRequest>,
 ) -> Result<(StatusCode, Json<User>), APIError> {
-    if super::user::has_active_users(&pool).await? {
+    let mut tx = pool.begin_immediate().await?;
+
+    if super::user::has_active_users(&mut tx).await? {
         return Err(AuthenticationError::AlreadyInitialised.into());
     }
 
     // Delete any existing admin user
-    let users = super::user::list(&pool).await?;
+    let users = super::user::list(&mut tx).await?;
     for user in users {
         if user.role() == Role::Administrator {
-            super::user::delete(&pool, user.id()).await?;
+            super::user::delete(&mut tx, user.id()).await?;
 
             audit_service
-                .log(&AuditEvent::UserDeleted(user.into()), None)
+                .log(&mut tx, &AuditEvent::UserDeleted(user.into()), None)
                 .await?;
         }
     }
 
     // Create the first admin user
     let user = super::user::create(
-        &pool,
+        &mut tx,
         &create_user_req.username,
         create_user_req.fullname.as_deref(),
         &create_user_req.temp_password,
@@ -251,8 +263,10 @@ async fn create_first_admin(
     .await?;
 
     audit_service
-        .log(&AuditEvent::UserCreated(user.clone().into()), None)
+        .log(&mut tx, &AuditEvent::UserCreated(user.clone().into()), None)
         .await?;
+
+    tx.commit().await?;
 
     Ok((StatusCode::CREATED, Json(user)))
 }
@@ -268,11 +282,12 @@ async fn create_first_admin(
     ),
 )]
 async fn admin_exists(State(pool): State<SqlitePool>) -> Result<StatusCode, APIError> {
-    if super::user::has_active_users(&pool).await? {
+    let mut conn = pool.acquire().await?;
+    if super::user::has_active_users(&mut conn).await? {
         return Err(AuthenticationError::AlreadyInitialised.into());
     }
 
-    if super::user::admin_exists(&pool).await? {
+    if super::user::admin_exists(&mut conn).await? {
         return Ok(StatusCode::OK);
     }
 
@@ -299,19 +314,21 @@ async fn account_update(
     audit_service: AuditService,
     Json(account): Json<AccountUpdateRequest>,
 ) -> Result<impl IntoResponse, APIError> {
+    let mut tx = pool.begin_immediate().await?;
+
     if user.username() != account.username {
         return Err(AuthenticationError::UserNotFound.into());
     }
 
     // Update the password
-    super::user::update_password(&pool, user.id(), &account.username, &account.password).await?;
+    super::user::update_password(&mut tx, user.id(), &account.username, &account.password).await?;
 
     // Update the fullname
     if let Some(fullname) = account.fullname {
-        super::user::update_fullname(&pool, user.id(), &fullname).await?;
+        super::user::update_fullname(&mut tx, user.id(), &fullname).await?;
     }
 
-    let Some(updated_user) = super::user::get_by_username(&pool, user.username()).await? else {
+    let Some(updated_user) = super::user::get_by_username(&mut tx, user.username()).await? else {
         return Err(AuthenticationError::UserNotFound.into());
     };
 
@@ -319,10 +336,13 @@ async fn account_update(
 
     audit_service
         .log(
+            &mut tx,
             &AuditEvent::UserAccountUpdated(response.clone().into()),
             None,
         )
         .await?;
+
+    tx.commit().await?;
 
     Ok(Json(response))
 }
@@ -355,7 +375,9 @@ async fn logout(
     let session_key = cookie.value();
 
     // Log audit event when a valid session exists
-    if let Some(session) = super::session::get_by_key(&pool, session_key)
+    let mut tx = pool.begin_immediate().await?;
+
+    if let Some(session) = super::session::get_by_key(&mut tx, session_key)
         .await
         .ok()
         .flatten()
@@ -363,6 +385,7 @@ async fn logout(
         // Log the logout event
         audit_service
             .log(
+                &mut tx,
                 &AuditEvent::UserLoggedOut(UserLoggedOutDetails {
                     session_duration: session.duration().as_secs(),
                 }),
@@ -372,7 +395,10 @@ async fn logout(
     }
 
     // Remove session from the database
-    super::session::delete(&pool, session_key).await?;
+    super::session::delete(&mut tx, session_key).await?;
+
+    // Commit the transaction
+    tx.commit().await?;
 
     // Set cookie parameters, these are not present in the request, and have to match in order to clear the cookie
     set_default_cookie_properties(&mut cookie);
@@ -406,8 +432,9 @@ async fn user_list(
     _user: AdminOrCoordinator,
     State(pool): State<SqlitePool>,
 ) -> Result<Json<UserListResponse>, APIError> {
+    let mut conn = pool.acquire().await?;
     Ok(Json(UserListResponse {
-        users: super::user::list(&pool).await?,
+        users: super::user::list(&mut conn).await?,
     }))
 }
 
@@ -453,8 +480,9 @@ pub async fn user_create(
     audit_service: AuditService,
     Json(create_user_req): Json<CreateUserRequest>,
 ) -> Result<(StatusCode, Json<User>), APIError> {
+    let mut tx = pool.begin_immediate().await?;
     let user = super::user::create(
-        &pool,
+        &mut tx,
         &create_user_req.username,
         create_user_req.fullname.as_deref(),
         &create_user_req.temp_password,
@@ -462,10 +490,10 @@ pub async fn user_create(
         create_user_req.role,
     )
     .await?;
-
     audit_service
-        .log(&AuditEvent::UserCreated(user.clone().into()), None)
+        .log(&mut tx, &AuditEvent::UserCreated(user.clone().into()), None)
         .await?;
+    tx.commit().await?;
 
     Ok((StatusCode::CREATED, Json(user)))
 }
@@ -490,7 +518,8 @@ async fn user_get(
     State(pool): State<SqlitePool>,
     Path(user_id): Path<u32>,
 ) -> Result<Json<User>, APIError> {
-    let user = super::user::get_by_id(&pool, user_id).await?;
+    let mut conn = pool.acquire().await?;
+    let user = super::user::get_by_id(&mut conn, user_id).await?;
     Ok(Json(user.ok_or(Error::RowNotFound)?))
 }
 
@@ -515,23 +544,27 @@ pub async fn user_update(
     Path(user_id): Path<u32>,
     Json(update_user_req): Json<UpdateUserRequest>,
 ) -> Result<Json<User>, APIError> {
+    let mut tx = pool.begin_immediate().await?;
+
     if let Some(fullname) = update_user_req.fullname {
-        super::user::update_fullname(&pool, user_id, &fullname).await?
+        super::user::update_fullname(&mut tx, user_id, &fullname).await?
     };
 
     if let Some(temp_password) = update_user_req.temp_password {
-        super::user::set_temporary_password(&pool, user_id, &temp_password).await?;
+        super::user::set_temporary_password(&mut tx, user_id, &temp_password).await?;
 
-        super::session::delete_user_session(&pool, user_id).await?;
+        super::session::delete_user_session(&mut tx, user_id).await?;
     };
 
-    let user = super::user::get_by_id(&pool, user_id)
+    let user = super::user::get_by_id(&mut tx, user_id)
         .await?
         .ok_or(Error::RowNotFound)?;
 
     audit_service
-        .log(&AuditEvent::UserUpdated(user.clone().into()), None)
+        .log(&mut tx, &AuditEvent::UserUpdated(user.clone().into()), None)
         .await?;
+
+    tx.commit().await?;
 
     Ok(Json(user))
 }
@@ -554,7 +587,9 @@ async fn user_delete(
     audit_service: AuditService,
     Path(user_id): Path<u32>,
 ) -> Result<StatusCode, APIError> {
-    let Some(user) = super::user::get_by_id(&pool, user_id).await? else {
+    let mut tx = pool.begin_immediate().await?;
+
+    let Some(user) = super::user::get_by_id(&mut tx, user_id).await? else {
         return Err(APIError::NotFound(
             format!("User with id {user_id} not found"),
             ErrorReference::EntryNotFound,
@@ -566,15 +601,19 @@ async fn user_delete(
         return Err(AuthenticationError::OwnAccountCannotBeDeleted.into());
     }
 
-    let deleted = super::user::delete(&pool, user_id).await?;
+    let deleted = super::user::delete(&mut tx, user_id).await?;
 
     if deleted {
         audit_service
-            .log(&AuditEvent::UserDeleted(user.clone().into()), None)
+            .log(&mut tx, &AuditEvent::UserDeleted(user.clone().into()), None)
             .await?;
+
+        tx.commit().await?;
 
         Ok(StatusCode::OK)
     } else {
+        tx.rollback().await?;
+
         Err(APIError::NotFound(
             format!("Error deleting user with id {user_id}"),
             ErrorReference::EntryNotFound,
@@ -622,8 +661,9 @@ mod tests {
         ));
 
         // Create an admin user to mark the application as initialised
+        let mut conn = pool.acquire().await.unwrap();
         let admin = crate::authentication::user::create(
-            &pool,
+            &mut conn,
             "admin",
             Some("Admin User"),
             "admin_password",
@@ -633,7 +673,7 @@ mod tests {
         .await
         .unwrap();
 
-        admin.update_last_activity_at(&pool).await.unwrap();
+        admin.update_last_activity_at(&mut conn).await.unwrap();
 
         let initialised = super::initialised(State(pool)).await;
         assert!(initialised.is_ok());
@@ -653,7 +693,7 @@ mod tests {
 
         let response = super::create_first_admin(
             State(pool.clone()),
-            crate::audit_log::AuditService::new(pool.clone(), None, None),
+            crate::audit_log::AuditService::new(None, None),
             axum::Json(create_user_req),
         )
         .await;
@@ -672,7 +712,7 @@ mod tests {
         };
         let response = super::create_first_admin(
             State(pool.clone()),
-            crate::audit_log::AuditService::new(pool.clone(), None, None),
+            crate::audit_log::AuditService::new(None, None),
             axum::Json(create_user_req),
         )
         .await;
@@ -683,7 +723,8 @@ mod tests {
         assert_eq!(user.username(), "admin2");
 
         // Not allowed to create a new user after the first admin has logged in
-        update_last_activity_at(&pool, user.id()).await.unwrap();
+        let mut conn = pool.acquire().await.unwrap();
+        update_last_activity_at(&mut conn, user.id()).await.unwrap();
 
         let create_user_req = super::CreateUserRequest {
             username: "admin2".to_string(),
@@ -693,7 +734,7 @@ mod tests {
         };
         let response = super::create_first_admin(
             State(pool.clone()),
-            crate::audit_log::AuditService::new(pool.clone(), None, None),
+            crate::audit_log::AuditService::new(None, None),
             axum::Json(create_user_req),
         )
         .await;
@@ -717,7 +758,7 @@ mod tests {
         };
         let response = super::create_first_admin(
             State(pool.clone()),
-            crate::audit_log::AuditService::new(pool.clone(), None, None),
+            crate::audit_log::AuditService::new(None, None),
             axum::Json(create_user_req),
         )
         .await;

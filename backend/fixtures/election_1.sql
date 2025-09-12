@@ -807,12 +807,12 @@ VALUES (1, 'Gemeenteraad 2026', 'CSO', 'Juinen_2024', 'Juinen', '0000', 'Municip
          }
        ]');
 
-INSERT INTO committee_sessions (id, number, election_id, status, location, start_date, start_time)
-VALUES (1, 1, 1, 'data_entry_in_progress', '', '', '');
+INSERT INTO committee_sessions (id, number, election_id, status, location, start_date_time)
+VALUES (1, 1, 1, 'data_entry_in_progress', '', NULL);
 
 INSERT INTO polling_stations (id, committee_session_id, id_prev_session, name, number, number_of_voters, polling_station_type, address,
                               postal_code, locality)
 VALUES (4, 1, NULL, 'Studio The Rules', 1, NULL, 'FixedLocation', 'Gerontoplein 1', '1337 YQ', 'Juinen'),
        (5, 1, NULL, 'Buurtcentrum de Mattenklopper', 2, 1000, 'Special', 'Complexiteitslaan 2b', '1337 QY',
         'Juinen'),
-       (6, 1, NULL, 'Positivo Zaal', 3, NULL, 'FixedLocation', 'Kerkweg 3', '1337 QA', 'Juinen');
+       (6, 1, NULL, 'Positivo Zaal', 3, NULL, NULL, 'Kerkweg 3', '1337 QA', 'Juinen');

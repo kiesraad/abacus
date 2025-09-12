@@ -60,8 +60,15 @@ async fn election_apportionment(
     audit_service: AuditService,
     Path(id): Path<u32>,
 ) -> Result<Json<ElectionApportionmentResponse>, APIError> {
-    let election = crate::election::repository::get(&pool, id).await?;
-    let statuses = crate::data_entry::repository::statuses(&pool, id).await?;
+    let mut conn = pool.acquire().await?;
+    let election = crate::election::repository::get(&mut conn, id).await?;
+    let current_committee_session =
+        crate::committee_session::repository::get_election_committee_session(
+            &mut conn,
+            election.id,
+        )
+        .await?;
+    let statuses = crate::data_entry::repository::statuses(&mut conn, id).await?;
     if !statuses.is_empty()
         && statuses
             .iter()
@@ -69,8 +76,8 @@ async fn election_apportionment(
     {
         let results =
             crate::data_entry::repository::list_entries_with_polling_stations_first_session(
-                &pool,
-                election.id,
+                &mut conn,
+                current_committee_session.id,
             )
             .await?;
         let election_summary = ElectionSummary::from_results(&election, &results)?;
@@ -84,6 +91,7 @@ async fn election_apportionment(
 
         audit_service
             .log(
+                &mut conn,
                 &AuditEvent::ApportionmentCreated(election.clone().into()),
                 None,
             )

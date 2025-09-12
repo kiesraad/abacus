@@ -1,6 +1,6 @@
-#import "common/style.typ": conf, document_numbering, attachement_numbering
+#import "common/style.typ": conf, document_numbering, attachment_numbering
 #import "common/scripts.typ": *
-#let input = json("inputs/model-na-14-2-bijlage1.json")
+#let input = json("inputs/model-na-14-2.json")
 
 #let is_municipality = (municipal, public_body) => if (
   input.election.category == "Municipal"
@@ -9,11 +9,7 @@
 #let location_name = is_municipality[Gemeente #input.election.domain_id #input.election.location][Openbaar lichaam #input.election.location]
 #let location_type = is_municipality[gemeentelijk stembureau][stembureau voor het openbaar lichaam]
 
-
-#show: doc => conf(doc, header: align(right, [
-  Gemeente #input.election.domain_id #input.election.location \
-  Stembureau #input.polling_station.number
-]), footer: [
+#show: doc => conf(doc, header: location_name, footer: [
   Corrigendum van een #location_type \
   Model Na 14-2
 ])

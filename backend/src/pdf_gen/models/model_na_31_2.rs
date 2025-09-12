@@ -34,7 +34,7 @@ pub struct ModelNa31_2Bijlage1Input {
 
 impl ToPdfFileModel for ModelNa31_2Bijlage1Input {
     fn to_pdf_file_model(self, file_name: String) -> PdfFileModel {
-        PdfFileModel::new(file_name, PdfModel::ModelNa21_2Bijlage1(Box::new(self)))
+        PdfFileModel::new(file_name, PdfModel::ModelNa31_2Bijlage1(Box::new(self)))
     }
 }
 

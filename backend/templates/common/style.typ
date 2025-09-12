@@ -84,8 +84,8 @@
   #doc
 ]
 
-// Attachement header numbering
-#let attachement_numbering(doc, prefix) = [
+// Attachment header numbering
+#let attachment_numbering(doc, prefix) = [
   #set heading(numbering: "1.1", hanging-indent: 0pt, supplement: "")
 
   #show heading: it => {

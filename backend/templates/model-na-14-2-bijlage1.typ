@@ -1,4 +1,4 @@
-#import "common/style.typ": conf, document_numbering, attachement_numbering
+#import "common/style.typ": conf, document_numbering, attachment_numbering
 #import "common/scripts.typ": *
 #let input = json("inputs/model-na-14-2-bijlage1.json")
 
@@ -16,12 +16,6 @@
   Model Na 14-2
 ])
 
-= Bijlage 1
-
-== Verslagen van tellingen van stembureaus die zijn herteld door het #location_type
-
-#pagebreak(weak: true)
-
 = Stembureau #input.polling_station.number \ #input.polling_station.name
 
 #line(length: 100%)
@@ -30,7 +24,7 @@
 
 Het #location_type heeft de telresultaten van dit stembureau onderzocht en is tot een ander resultaat gekomen. De nieuwe telresultaten van het stembureau zijn opgenomen in deze bijlage. Deze bijlage is bij het proces-verbaal van het stembureau gevoegd.
 
-#show: doc => attachement_numbering(doc, "B1")
+#show: doc => attachment_numbering(doc, "B1")
 
 = Aanleiding en opdracht onderzoek
 

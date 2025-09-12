@@ -1,7 +1,7 @@
-#import "common/style.typ": conf, attachement_numbering
+#import "common/style.typ": conf, attachment_numbering
 #import "common/scripts.typ": *
 
-#show: doc => conf(doc, header: [Stembureau \<nummer>], footer: [
+#show: doc => conf(doc, footer: [
   Model Na 31-2 centrale stemopneming
 ])
 

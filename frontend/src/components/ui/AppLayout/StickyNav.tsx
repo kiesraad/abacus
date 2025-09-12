@@ -14,7 +14,8 @@ export function StickyNav({ children }: StickyNavProps) {
     if (nav) {
       const updateTopOffset = () => {
         const navTop = nav.getBoundingClientRect().top;
-        nav.style.setProperty("--sticky-nav-top-offset", `${navTop}px`);
+        nav.style.setProperty("--sticky-nav-top-offset", `${Math.max(0, navTop)}px`);
+        nav.style.paddingTop = navTop < 0 ? `${-navTop}px` : "";
       };
 
       window.addEventListener("resize", updateTopOffset);

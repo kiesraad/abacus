@@ -4,14 +4,13 @@ use axum::{
     extract::{ConnectInfo, FromRef, FromRequestParts},
     http::request::Parts,
 };
-use sqlx::SqlitePool;
+use sqlx::{SqliteConnection, SqlitePool};
 
 use super::AuditEvent;
 use crate::{APIError, authentication::User};
 
 #[derive(Clone)]
 pub struct AuditService {
-    pool: SqlitePool,
     user: Option<User>,
     ip: Option<IpAddr>,
 }
@@ -24,22 +23,20 @@ where
     type Rejection = APIError;
 
     async fn from_request_parts(parts: &mut Parts, state: &S) -> Result<Self, APIError> {
-        let pool = SqlitePool::from_ref(state);
-
         let user: Option<User> = User::from_request_parts(parts, state).await.ok();
         let ip = ConnectInfo::<SocketAddr>::from_request_parts(parts, state)
             .await
             .ok()
             .map(|a| a.ip());
 
-        Ok(Self { pool, ip, user })
+        Ok(Self { ip, user })
     }
 }
 
 impl AuditService {
     #[cfg(test)]
-    pub fn new(pool: SqlitePool, user: Option<User>, ip: Option<IpAddr>) -> Self {
-        Self { pool, user, ip }
+    pub fn new(user: Option<User>, ip: Option<IpAddr>) -> Self {
+        Self { user, ip }
     }
 
     pub fn with_user(mut self, user: User) -> Self {
@@ -52,8 +49,13 @@ impl AuditService {
         self.user.is_some()
     }
 
-    pub async fn log(&self, event: &AuditEvent, message: Option<String>) -> Result<(), APIError> {
-        crate::audit_log::create(&self.pool, event, self.user.as_ref(), message, self.ip).await
+    pub async fn log(
+        &self,
+        conn: &mut SqliteConnection,
+        event: &AuditEvent,
+        message: Option<String>,
+    ) -> Result<(), APIError> {
+        crate::audit_log::create(conn, event, self.user.as_ref(), message, self.ip).await
     }
 }
 
@@ -66,14 +68,17 @@ mod test {
     use test_log::test;
 
     use super::*;
-    use crate::audit_log::{AuditEventLevel, UserLoggedInDetails};
+    use crate::{
+        SqlitePoolExt,
+        audit_log::{AuditEventLevel, UserLoggedInDetails},
+    };
 
     #[test(sqlx::test(fixtures("../../fixtures/users.sql")))]
     async fn test_log_event(pool: SqlitePool) {
+        let mut tx = pool.begin_immediate().await.unwrap();
         let service = AuditService {
-            pool: pool.clone(),
             ip: Some(IpAddr::V4(Ipv4Addr::new(203, 0, 113, 0))),
-            user: crate::authentication::user::get_by_username(&pool, "admin1")
+            user: crate::authentication::user::get_by_username(&mut tx, "admin1")
                 .await
                 .unwrap(),
         };
@@ -83,10 +88,13 @@ mod test {
             logged_in_users_count: 5,
         });
         let message = Some("User logged in".to_string());
-        service.log(&audit_event, message).await.unwrap();
+        service.log(&mut tx, &audit_event, message).await.unwrap();
+        tx.commit().await.unwrap();
+
+        let mut conn = pool.acquire().await.unwrap();
 
         // Verify the event was logged by checking the audit log
-        let logged_events = crate::audit_log::list_all(&pool).await.unwrap();
+        let logged_events = crate::audit_log::list_all(&mut conn).await.unwrap();
         let event = logged_events.first().unwrap();
 
         assert_eq!(

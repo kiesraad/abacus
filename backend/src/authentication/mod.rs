@@ -157,8 +157,9 @@ mod tests {
 
         assert_eq!(response.status(), StatusCode::UNAUTHORIZED);
 
+        let mut conn = pool.acquire().await.unwrap();
         let events = crate::audit_log::list(
-            &pool,
+            &mut conn,
             &LogFilter {
                 limit: 10,
                 ..Default::default()
@@ -397,7 +398,8 @@ mod tests {
     #[test(sqlx::test(fixtures("../../fixtures/users.sql")))]
     async fn test_list(pool: SqlitePool) {
         let app = create_app(pool.clone());
-        let session = super::session::create(&pool, 1, SESSION_LIFE_TIME)
+        let mut conn = pool.acquire().await.unwrap();
+        let session = super::session::create(&mut conn, 1, SESSION_LIFE_TIME)
             .await
             .unwrap();
         let mut cookie = session.get_cookie();
@@ -426,7 +428,8 @@ mod tests {
         let app = create_app(pool.clone());
 
         // with a normal long-valid session the user should not get a new cookie
-        let session = super::session::create(&pool, 1, SESSION_LIFE_TIME)
+        let mut conn = pool.acquire().await.unwrap();
+        let session = super::session::create(&mut conn, 1, SESSION_LIFE_TIME)
             .await
             .unwrap();
         let mut cookie = session.get_cookie();
@@ -449,9 +452,10 @@ mod tests {
         assert_eq!(response.headers().get("set-cookie"), None);
 
         // with a session that is about to expire the user should get a new cookie, and the session lifetime should be extended
-        let session: session::Session = super::session::create(&pool, 1, SESSION_MIN_LIFE_TIME / 2)
-            .await
-            .unwrap();
+        let session: session::Session =
+            super::session::create(&mut conn, 1, SESSION_MIN_LIFE_TIME / 2)
+                .await
+                .unwrap();
         let mut cookie = session.get_cookie();
         set_default_cookie_properties(&mut cookie);
 
@@ -548,7 +552,8 @@ mod tests {
     async fn test_forbidden_on_wrong_user_role(pool: SqlitePool) {
         let app = create_app(pool.clone());
         // user id 5 is a typist
-        let session = super::session::create(&pool, 5, SESSION_LIFE_TIME)
+        let mut conn = pool.acquire().await.unwrap();
+        let session = super::session::create(&mut conn, 5, SESSION_LIFE_TIME)
             .await
             .unwrap();
         let mut cookie = session.get_cookie();

@@ -46,7 +46,7 @@ export function overrideServerClaimDataEntryResponse({
 
 export function expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage(fields: Array<string>, feedbackMessage: string) {
   fields.forEach((field) => {
-    const inputField = within(screen.getByTestId(`cell-${field}`)).getByRole("textbox");
+    const inputField = within(screen.getByTestId(`value-${field}`)).getByRole("textbox");
     expect(inputField).toBeInvalid();
     expect(inputField).toHaveAccessibleErrorMessage(feedbackMessage);
   });
@@ -54,7 +54,7 @@ export function expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage(fields: A
 
 export function expectFieldsToHaveIconAndToHaveAccessibleName(fields: Array<string>, accessibleName: string) {
   fields.forEach((field) => {
-    const icon = within(screen.getByTestId(`cell-${field}`)).getByRole("img");
+    const icon = within(screen.getByTestId(`value-${field}`)).getByRole("img");
     expect(icon).toHaveAccessibleName(accessibleName);
   });
 }
@@ -68,7 +68,7 @@ export function expectCheckboxListToBeInvalidAndToHaveTextContent(fields: Array<
 
 export function expectFieldsToBeValidAndToNotHaveAccessibleErrorMessage(fields: Array<string>) {
   fields.forEach((field) => {
-    const inputField = within(screen.getByTestId(`cell-${field}`)).getByRole("textbox");
+    const inputField = within(screen.getByTestId(`value-${field}`)).getByRole("textbox");
     expect(inputField).toBeValid();
     expect(inputField).not.toHaveAccessibleErrorMessage();
   });
@@ -76,7 +76,7 @@ export function expectFieldsToBeValidAndToNotHaveAccessibleErrorMessage(fields: 
 
 export function expectFieldsToNotHaveIcon(fields: Array<string>) {
   fields.forEach((field) => {
-    const icon = within(screen.getByTestId(`cell-${field}`)).queryByRole("img");
+    const icon = within(screen.getByTestId(`value-${field}`)).queryByRole("img");
     expect(icon).toBeNull();
   });
 }

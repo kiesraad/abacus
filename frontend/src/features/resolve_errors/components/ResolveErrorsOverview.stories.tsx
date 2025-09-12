@@ -9,7 +9,7 @@ import { getDataEntryStructure } from "@/utils/dataEntryStructure";
 const structure = getDataEntryStructure("CSOFirstSession", electionMockData);
 const results: ValidationResults = {
   errors: [validationResultMockData.F201, validationResultMockData.F401],
-  warnings: [validationResultMockData.W201, validationResultMockData.W001],
+  warnings: [validationResultMockData.W201, validationResultMockData.W204],
 };
 
 export const ResolveErrorsOverviewStory: StoryFn = () => (

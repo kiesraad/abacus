@@ -1,7 +1,7 @@
-import "vitest";
+import "@vitest/expect";
 
-declare module "vitest" {
-  interface Assertion<T = unknown> {
+declare module "@vitest/expect" {
+  interface JestAssertion {
     toHaveTableContent(expected: string[][]): T;
   }
 }

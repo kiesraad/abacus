@@ -71,7 +71,7 @@ p {
 p.md {
   width: 39.5rem;
   font-size: var(--font-size-md);
-  margin-bottom: 1.5rem;
+  margin-bottom: var(--space-md);
 }
 
 section.sm {

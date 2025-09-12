@@ -15,7 +15,7 @@ import {
 } from "@/types/generated/openapi";
 import { cn } from "@/utils/classnames";
 import { committeeSessionLabel } from "@/utils/committeeSession";
-import { formatFullDateWithoutTimezone } from "@/utils/dateTime";
+import { formatFullDateTimeWithoutTimezone } from "@/utils/dateTime";
 
 import cls from "./CommitteeSessionCard.module.css";
 
@@ -115,8 +115,8 @@ export function CommitteeSessionCard({
   const icon = CommitteeSessionStatusIcon({ status: committeeSession.status, size: "xl" });
   const label = committeeSessionLabel(committeeSession.number);
   const status = CommitteeSessionStatusLabel(committeeSession.status, "coordinator");
-  const date = committeeSession.start_date
-    ? `${formatFullDateWithoutTimezone(new Date(committeeSession.start_date))} ${committeeSession.start_time}`
+  const date = committeeSession.start_date_time
+    ? formatFullDateTimeWithoutTimezone(new Date(committeeSession.start_date_time))
     : undefined;
   const buttonLinks: ButtonLink[] = [];
   let button = undefined;

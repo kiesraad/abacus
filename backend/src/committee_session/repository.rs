@@ -1,14 +1,13 @@
-use sqlx::{Error, query, query_as};
+use chrono::NaiveDateTime;
+use sqlx::{Connection, Error, SqliteConnection, query, query_as};
 
 use super::{
-    CommitteeSession, CommitteeSessionCreateRequest, CommitteeSessionUpdateRequest,
+    CommitteeSession, CommitteeSessionCreateRequest, CommitteeSessionFilesUpdateRequest,
     status::CommitteeSessionStatus,
 };
 
-use crate::DbConnLike;
-
 pub async fn get(
-    conn: impl DbConnLike<'_>,
+    conn: &mut SqliteConnection,
     committee_session_id: u32,
 ) -> Result<CommitteeSession, Error> {
     query_as!(
@@ -20,9 +19,10 @@ pub async fn get(
             election_id as "election_id: u32",
             status as "status: _",
             location,
-            start_date,
-            start_time,
-            number_of_voters as "number_of_voters: u32"
+            start_date_time as "start_date_time: _",
+            number_of_voters as "number_of_voters: u32",
+            results_eml as "results_eml: _",
+            results_pdf as "results_pdf: _"
         FROM committee_sessions
         WHERE id = ?
         "#,
@@ -33,7 +33,7 @@ pub async fn get(
 }
 
 pub async fn get_election_committee_session_list(
-    conn: impl DbConnLike<'_>,
+    conn: &mut SqliteConnection,
     election_id: u32,
 ) -> Result<Vec<CommitteeSession>, Error> {
     query_as!(
@@ -45,9 +45,10 @@ pub async fn get_election_committee_session_list(
             election_id as "election_id: u32",
             status as "status: _",
             location,
-            start_date,
-            start_time,
-            number_of_voters as "number_of_voters: u32"
+            start_date_time as "start_date_time: _",
+            number_of_voters as "number_of_voters: u32",
+            results_eml as "results_eml: _",
+            results_pdf as "results_pdf: _"
         FROM committee_sessions
         WHERE election_id = ?
         ORDER BY number DESC
@@ -59,7 +60,7 @@ pub async fn get_election_committee_session_list(
 }
 
 pub async fn get_election_committee_session(
-    conn: impl DbConnLike<'_>,
+    conn: &mut SqliteConnection,
     election_id: u32,
 ) -> Result<CommitteeSession, Error> {
     query_as!(
@@ -71,9 +72,10 @@ pub async fn get_election_committee_session(
             election_id as "election_id: u32",
             status as "status: _",
             location,
-            start_date,
-            start_time,
-            number_of_voters as "number_of_voters: u32"
+            start_date_time as "start_date_time: _",
+            number_of_voters as "number_of_voters: u32",
+            results_eml as "results_eml: _",
+            results_pdf as "results_pdf: _"
         FROM committee_sessions
         WHERE election_id = ?
         ORDER BY number DESC
@@ -86,7 +88,7 @@ pub async fn get_election_committee_session(
 }
 
 pub async fn get_committee_session_for_each_election(
-    conn: impl DbConnLike<'_>,
+    conn: &mut SqliteConnection,
 ) -> Result<Vec<CommitteeSession>, Error> {
     query_as!(
         CommitteeSession,
@@ -97,9 +99,10 @@ pub async fn get_committee_session_for_each_election(
             election_id as "election_id: u32",
             status as "status: _",
             location,
-            start_date,
-            start_time,
-            number_of_voters as "number_of_voters: u32"
+            start_date_time as "start_date_time: _",
+            number_of_voters as "number_of_voters: u32",
+            results_eml as "results_eml: _",
+            results_pdf as "results_pdf: _"
         FROM (
             SELECT
             id,
@@ -107,9 +110,10 @@ pub async fn get_committee_session_for_each_election(
             election_id,
             status,
             location,
-            start_date,
-            start_time,
+            start_date_time,
             number_of_voters,
+            results_eml,
+            results_pdf,
             row_number() over (
             PARTITION BY election_id
             ORDER BY number DESC
@@ -122,13 +126,13 @@ pub async fn get_committee_session_for_each_election(
 }
 
 pub async fn create(
-    conn: impl DbConnLike<'_>,
+    conn: &mut SqliteConnection,
     committee_session: CommitteeSessionCreateRequest,
 ) -> Result<CommitteeSession, Error> {
-    let mut tx = conn.begin_immediate().await?;
+    let mut tx = conn.begin().await?;
 
     let current_committee_session_id =
-        get_current_id_for_election(&mut *tx, committee_session.election_id).await?;
+        get_current_id_for_election(&mut tx, committee_session.election_id).await?;
 
     let next_committee_session = query_as!(
         CommitteeSession,
@@ -137,25 +141,22 @@ pub async fn create(
             number,
             election_id,
             location,
-            start_date,
-            start_time,
+            start_date_time,
             number_of_voters
-        ) VALUES (?, ?, ?, ?, ?, ?)
+        ) VALUES (?, ?, "", NULL, ?)
         RETURNING
             id as "id: u32",
             number as "number: u32",
             election_id as "election_id: u32",
             status as "status: _",
             location,
-            start_date,
-            start_time,
-            number_of_voters as "number_of_voters: u32"
+            start_date_time as "start_date_time: _",
+            number_of_voters as "number_of_voters: u32",
+            results_eml as "results_eml: _",
+            results_pdf as "results_pdf: _"
         "#,
         committee_session.number,
         committee_session.election_id,
-        "",
-        "",
-        "",
         committee_session.number_of_voters,
     )
     .fetch_one(&mut *tx)
@@ -163,7 +164,7 @@ pub async fn create(
 
     if let Some(current_committee_session_id) = current_committee_session_id {
         crate::polling_station::repository::duplicate_for_committee_session(
-            &mut *tx,
+            &mut tx,
             current_committee_session_id,
             next_committee_session.id,
         )
@@ -176,8 +177,8 @@ pub async fn create(
 }
 
 /// Delete a committee session
-pub async fn delete(conn: impl DbConnLike<'_>, id: u32) -> Result<bool, Error> {
-    let mut tx = conn.begin_immediate().await?;
+pub async fn delete(conn: &mut SqliteConnection, id: u32) -> Result<bool, Error> {
+    let mut tx = conn.begin().await?;
 
     query!(
         "DELETE FROM polling_stations WHERE committee_session_id = ?",
@@ -203,9 +204,10 @@ pub async fn delete(conn: impl DbConnLike<'_>, id: u32) -> Result<bool, Error> {
 }
 
 pub async fn update(
-    conn: impl DbConnLike<'_>,
+    conn: &mut SqliteConnection,
     committee_session_id: u32,
-    committee_session_update: CommitteeSessionUpdateRequest,
+    location: String,
+    start_date_time: NaiveDateTime,
 ) -> Result<CommitteeSession, Error> {
     query_as!(
         CommitteeSession,
@@ -213,8 +215,7 @@ pub async fn update(
         UPDATE committee_sessions
         SET
             location = ?,
-            start_date = ?,
-            start_time = ?
+            start_date_time = ?
         WHERE id = ?
         RETURNING
             id as "id: u32",
@@ -222,13 +223,13 @@ pub async fn update(
             election_id as "election_id: u32",
             status as "status: _",
             location,
-            start_date,
-            start_time,
-            number_of_voters as "number_of_voters: u32"
+            start_date_time as "start_date_time: _",
+            number_of_voters as "number_of_voters: u32",
+            results_eml as "results_eml: _",
+            results_pdf as "results_pdf: _"
         "#,
-        committee_session_update.location,
-        committee_session_update.start_date,
-        committee_session_update.start_time,
+        location,
+        start_date_time,
         committee_session_id,
     )
     .fetch_one(conn)
@@ -236,7 +237,7 @@ pub async fn update(
 }
 
 pub async fn change_number_of_voters(
-    conn: impl DbConnLike<'_>,
+    conn: &mut SqliteConnection,
     committee_session_id: u32,
     number_of_voters: u32,
 ) -> Result<CommitteeSession, Error> {
@@ -252,9 +253,10 @@ pub async fn change_number_of_voters(
             election_id as "election_id: u32",
             status as "status: _",
             location,
-            start_date,
-            start_time,
-            number_of_voters as "number_of_voters: u32"
+            start_date_time as "start_date_time: _",
+            number_of_voters as "number_of_voters: u32",
+            results_eml as "results_eml: _",
+            results_pdf as "results_pdf: _"
         "#,
         number_of_voters,
         committee_session_id,
@@ -264,7 +266,7 @@ pub async fn change_number_of_voters(
 }
 
 pub async fn change_status(
-    conn: impl DbConnLike<'_>,
+    conn: &mut SqliteConnection,
     committee_session_id: u32,
     committee_session_status: CommitteeSessionStatus,
 ) -> Result<CommitteeSession, Error> {
@@ -280,9 +282,10 @@ pub async fn change_status(
             election_id as "election_id: u32",
             status as "status: _",
             location,
-            start_date,
-            start_time,
-            number_of_voters as "number_of_voters: u32"
+            start_date_time as "start_date_time: _",
+            number_of_voters as "number_of_voters: u32",
+            results_eml as "results_eml: _",
+            results_pdf as "results_pdf: _"
         "#,
         committee_session_status,
         committee_session_id,
@@ -291,8 +294,40 @@ pub async fn change_status(
     .await
 }
 
+pub async fn change_files(
+    conn: &mut SqliteConnection,
+    committee_session_id: u32,
+    committee_session_files_update: CommitteeSessionFilesUpdateRequest,
+) -> Result<CommitteeSession, Error> {
+    query_as!(
+        CommitteeSession,
+        r#"
+        UPDATE committee_sessions
+        SET
+            results_eml = ?,
+            results_pdf = ?
+        WHERE id = ?
+        RETURNING
+            id as "id: u32",
+            number as "number: u32",
+            election_id as "election_id: u32",
+            status as "status: _",
+            location,
+            start_date_time as "start_date_time: _",
+            number_of_voters as "number_of_voters: u32",
+            results_eml as "results_eml: _",
+            results_pdf as "results_pdf: _"
+        "#,
+        committee_session_files_update.results_eml,
+        committee_session_files_update.results_pdf,
+        committee_session_id,
+    )
+    .fetch_one(conn)
+    .await
+}
+
 pub async fn get_current_id_for_election(
-    conn: impl DbConnLike<'_>,
+    conn: &mut SqliteConnection,
     election_id: u32,
 ) -> Result<Option<u32>, Error> {
     query!(

@@ -4,7 +4,7 @@ use axum::{
 };
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
-use sqlx::{Error, FromRow, query, query_as};
+use sqlx::{Error, FromRow, SqliteConnection, SqlitePool, query, query_as};
 use utoipa::ToSchema;
 
 use super::{
@@ -12,7 +12,7 @@ use super::{
     password::{HashedPassword, ValidatedPassword, hash_password, verify_password},
     role::Role,
 };
-use crate::{APIError, DbConnLike, audit_log::UserDetails};
+use crate::{APIError, audit_log::UserDetails};
 
 const MIN_UPDATE_LAST_ACTIVITY_AT_SECS: i64 = 60; // 1 minute
 
@@ -66,7 +66,7 @@ impl User {
     /// Updates the `last_activity_at` field, but first checks if it has been
     /// longer than `MIN_UPDATE_LAST_ACTIVITY_AT_SECS`, to prevent excessive
     /// database writes.
-    pub async fn update_last_activity_at(&self, conn: impl DbConnLike<'_>) -> Result<(), Error> {
+    pub async fn update_last_activity_at(&self, conn: &mut SqliteConnection) -> Result<(), Error> {
         if self.should_update_last_activity_at() {
             update_last_activity_at(conn, self.id()).await?;
         }
@@ -150,13 +150,17 @@ where
 
 /// Authenticate a user by their username and password, returns a user instance on success or an error
 pub async fn authenticate(
-    conn: impl DbConnLike<'_>,
+    pool: &SqlitePool,
     username: &str,
     password: &str,
 ) -> Result<User, AuthenticationError> {
-    let Some(user) = get_by_username(conn, username).await? else {
+    // acquire a connection from the pool and drop it before verifying the password,
+    // to ensure that the connection is not held open for too long
+    let mut conn = pool.acquire().await?;
+    let Some(user) = get_by_username(&mut conn, username).await? else {
         return Err(AuthenticationError::UserNotFound);
     };
+    drop(conn);
 
     if verify_password(password, &user.password_hash) {
         Ok(user)
@@ -167,7 +171,7 @@ pub async fn authenticate(
 
 /// Create a new user, save an Argon2id v19 hash of the password
 pub async fn create(
-    conn: impl DbConnLike<'_>,
+    conn: &mut SqliteConnection,
     username: &str,
     fullname: Option<&str>,
     password: &str,
@@ -215,7 +219,10 @@ pub async fn create(
 }
 
 /// Delete a user
-pub async fn delete(conn: impl DbConnLike<'_>, user_id: u32) -> Result<bool, AuthenticationError> {
+pub async fn delete(
+    conn: &mut SqliteConnection,
+    user_id: u32,
+) -> Result<bool, AuthenticationError> {
     let rows_affected = sqlx::query_as!(User, r#" DELETE FROM users WHERE id = ?"#, user_id)
         .execute(conn)
         .await?
@@ -226,12 +233,11 @@ pub async fn delete(conn: impl DbConnLike<'_>, user_id: u32) -> Result<bool, Aut
 
 /// Update a user's password
 pub async fn update_password(
-    conn: impl DbConnLike<'_>,
+    conn: &mut SqliteConnection,
     user_id: u32,
     username: &str,
     new_password: &str,
 ) -> Result<(), AuthenticationError> {
-    let mut conn = conn.acquire().await?;
     let old_password = sqlx::query!("SELECT password_hash FROM users WHERE id = ?", user_id)
         .fetch_one(&mut *conn)
         .await?
@@ -249,7 +255,7 @@ pub async fn update_password(
         password_hash,
         user_id
     )
-    .execute(&mut *conn)
+    .execute(conn)
     .await?;
 
     Ok(())
@@ -257,7 +263,7 @@ pub async fn update_password(
 
 /// Update a user's fullname
 pub async fn update_fullname(
-    conn: impl DbConnLike<'_>,
+    conn: &mut SqliteConnection,
     user_id: u32,
     fullname: &str,
 ) -> Result<(), AuthenticationError> {
@@ -274,19 +280,18 @@ pub async fn update_fullname(
 
 /// Set a temporary password for a user
 pub async fn set_temporary_password(
-    conn: impl DbConnLike<'_>,
+    conn: &mut SqliteConnection,
     user_id: u32,
     temp_password: &str,
 ) -> Result<(), AuthenticationError> {
-    let mut conn = conn.acquire().await?;
-    let username = username_by_id(&mut *conn, user_id).await?;
+    let username = username_by_id(conn, user_id).await?;
     let password_hash = hash_password(ValidatedPassword::new(&username, temp_password, None)?)?;
     sqlx::query!(
         r#"UPDATE users SET password_hash = ?, needs_password_change = TRUE WHERE id = ?"#,
         password_hash,
         user_id
     )
-    .execute(&mut *conn)
+    .execute(conn)
     .await?;
 
     Ok(())
@@ -294,7 +299,7 @@ pub async fn set_temporary_password(
 
 /// Get a user by their username
 pub async fn get_by_username(
-    conn: impl DbConnLike<'_>,
+    conn: &mut SqliteConnection,
     username: &str,
 ) -> Result<Option<User>, AuthenticationError> {
     let user = sqlx::query_as!(
@@ -322,7 +327,7 @@ pub async fn get_by_username(
 
 /// Get a user by their id
 pub async fn get_by_id(
-    conn: impl DbConnLike<'_>,
+    conn: &mut SqliteConnection,
     id: u32,
 ) -> Result<Option<User>, AuthenticationError> {
     let user = sqlx::query_as!(
@@ -348,7 +353,7 @@ pub async fn get_by_id(
     Ok(user)
 }
 
-pub async fn list(conn: impl DbConnLike<'_>) -> Result<Vec<User>, Error> {
+pub async fn list(conn: &mut SqliteConnection) -> Result<Vec<User>, Error> {
     let users = query_as!(
         User,
         r#"SELECT
@@ -369,7 +374,7 @@ pub async fn list(conn: impl DbConnLike<'_>) -> Result<Vec<User>, Error> {
 }
 
 /// Fetch the first admin user ever created
-pub async fn has_active_users(conn: impl DbConnLike<'_>) -> Result<bool, AuthenticationError> {
+pub async fn has_active_users(conn: &mut SqliteConnection) -> Result<bool, AuthenticationError> {
     let result = sqlx::query!(
         r#"SELECT 1 AS 'exists' FROM users WHERE last_activity_at IS NOT NULL LIMIT 1"#,
     )
@@ -379,7 +384,7 @@ pub async fn has_active_users(conn: impl DbConnLike<'_>) -> Result<bool, Authent
     Ok(result.is_some())
 }
 
-pub async fn admin_exists(conn: impl DbConnLike<'_>) -> Result<bool, AuthenticationError> {
+pub async fn admin_exists(conn: &mut SqliteConnection) -> Result<bool, AuthenticationError> {
     let result = sqlx::query!(
         r#"SELECT 1 AS 'exists' FROM users WHERE role = ? LIMIT 1"#,
         Role::Administrator
@@ -390,7 +395,7 @@ pub async fn admin_exists(conn: impl DbConnLike<'_>) -> Result<bool, Authenticat
     Ok(result.is_some())
 }
 
-pub async fn username_by_id(conn: impl DbConnLike<'_>, user_id: u32) -> Result<String, Error> {
+pub async fn username_by_id(conn: &mut SqliteConnection, user_id: u32) -> Result<String, Error> {
     Ok(
         sqlx::query!("SELECT username FROM users WHERE id = ?", user_id)
             .fetch_one(conn)
@@ -399,7 +404,10 @@ pub async fn username_by_id(conn: impl DbConnLike<'_>, user_id: u32) -> Result<S
     )
 }
 
-pub async fn update_last_activity_at(conn: impl DbConnLike<'_>, user_id: u32) -> Result<(), Error> {
+pub async fn update_last_activity_at(
+    conn: &mut SqliteConnection,
+    user_id: u32,
+) -> Result<(), Error> {
     query!(
         r#"UPDATE users SET last_activity_at = CURRENT_TIMESTAMP WHERE id = ?"#,
         user_id,
@@ -420,8 +428,9 @@ mod tests {
     async fn test_create_user(pool: SqlitePool) {
         const USERNAME: &str = "test_user";
 
+        let mut conn = pool.acquire().await.unwrap();
         let user = super::create(
-            &pool,
+            &mut conn,
             USERNAME,
             None,
             "TotallyValidP4ssW0rd",
@@ -433,11 +442,11 @@ mod tests {
 
         assert_eq!(user.username, USERNAME);
 
-        let fetched_user = super::get_by_id(&pool, user.id).await.unwrap().unwrap();
+        let fetched_user = super::get_by_id(&mut conn, user.id).await.unwrap().unwrap();
 
         assert_eq!(user, fetched_user);
 
-        let fetched_user = super::get_by_username(&pool, USERNAME)
+        let fetched_user = super::get_by_username(&mut conn, USERNAME)
             .await
             .unwrap()
             .unwrap();
@@ -445,15 +454,16 @@ mod tests {
         assert_eq!(user, fetched_user);
 
         assert_eq!(
-            super::username_by_id(&pool, user.id).await.unwrap(),
+            super::username_by_id(&mut conn, user.id).await.unwrap(),
             USERNAME
         );
     }
 
     #[test(sqlx::test)]
     async fn test_create_user_duplicate_username(pool: SqlitePool) {
+        let mut conn = pool.acquire().await.unwrap();
         let user = super::create(
-            &pool,
+            &mut conn,
             "test_user",
             None,
             "TotallyValidP4ssW0rd",
@@ -467,7 +477,7 @@ mod tests {
 
         // Try to create a user with the same username, case-insensitive
         let error = super::create(
-            &pool,
+            &mut conn,
             "test_User",
             None,
             "TotallyValidP4ssW0rd",
@@ -484,8 +494,9 @@ mod tests {
 
     #[test(sqlx::test)]
     async fn test_authenticate_user(pool: SqlitePool) {
+        let mut conn = pool.acquire().await.unwrap();
         let user = super::create(
-            &pool,
+            &mut conn,
             "test_user",
             Some("Full Name"),
             "TotallyValidP4ssW0rd",
@@ -532,8 +543,9 @@ mod tests {
         let old_password = "TotallyValidP4ssW0rd";
         let new_password = "TotallyValidNewP4ssW0rd";
 
+        let mut conn = pool.acquire().await.unwrap();
         let user = super::create(
-            &pool,
+            &mut conn,
             "test_user",
             Some("Full Name"),
             old_password,
@@ -543,7 +555,7 @@ mod tests {
         .await
         .unwrap();
 
-        super::update_password(&pool, user.id(), "test_user", new_password)
+        super::update_password(&mut conn, user.id(), "test_user", new_password)
             .await
             .unwrap();
 
@@ -566,8 +578,9 @@ mod tests {
     #[test(sqlx::test)]
     async fn test_set_temp_password(pool: SqlitePool) {
         // Create new user, password needs change
+        let mut conn = pool.acquire().await.unwrap();
         let user = super::create(
-            &pool,
+            &mut conn,
             "test_user",
             Some("Full Name"),
             "TotallyValidP4ssW0rd",
@@ -580,21 +593,27 @@ mod tests {
         // User should need password change
         assert!(user.needs_password_change());
 
-        super::update_password(&pool, user.id(), "test_user", "temp_password")
+        super::update_password(&mut conn, user.id(), "test_user", "temp_password")
             .await
             .unwrap();
 
-        let user = super::get_by_id(&pool, user.id()).await.unwrap().unwrap();
+        let user = super::get_by_id(&mut conn, user.id())
+            .await
+            .unwrap()
+            .unwrap();
 
         // User now shouldn't need to change their password
         assert!(!user.needs_password_change());
 
         // Set a temporary password via update
-        super::set_temporary_password(&pool, user.id(), "temp_password")
+        super::set_temporary_password(&mut conn, user.id(), "temp_password")
             .await
             .unwrap();
 
-        let user = super::get_by_id(&pool, user.id()).await.unwrap().unwrap();
+        let user = super::get_by_id(&mut conn, user.id())
+            .await
+            .unwrap()
+            .unwrap();
 
         // User needs to change their password again
         assert!(user.needs_password_change());
@@ -602,8 +621,9 @@ mod tests {
 
     #[test(sqlx::test)]
     async fn password_hash_does_not_serialize(pool: SqlitePool) {
+        let mut conn = pool.acquire().await.unwrap();
         let user = super::create(
-            &pool,
+            &mut conn,
             "test_user",
             Some("Full Name"),
             "TotallyValidP4ssW0rd",
@@ -650,7 +670,8 @@ mod tests {
 
     #[test(sqlx::test(fixtures("../../fixtures/users.sql")))]
     async fn test_has_active_users(pool: SqlitePool) {
-        let result = super::has_active_users(&pool).await.unwrap();
+        let mut conn = pool.acquire().await.unwrap();
+        let result = super::has_active_users(&mut conn).await.unwrap();
         assert!(result);
 
         // delete all users
@@ -659,13 +680,14 @@ mod tests {
             .await
             .unwrap();
 
-        let result = super::has_active_users(&pool).await.unwrap();
+        let result = super::has_active_users(&mut conn).await.unwrap();
         assert!(!result);
     }
 
     #[test(sqlx::test(fixtures("../../fixtures/users.sql")))]
     async fn test_admin_exists(pool: SqlitePool) {
-        let result = super::admin_exists(&pool).await.unwrap();
+        let mut conn = pool.acquire().await.unwrap();
+        let result = super::admin_exists(&mut conn).await.unwrap();
         assert!(result);
 
         // delete all users
@@ -674,7 +696,7 @@ mod tests {
             .await
             .unwrap();
 
-        let result = super::admin_exists(&pool).await.unwrap();
+        let result = super::admin_exists(&mut conn).await.unwrap();
         assert!(!result);
     }
 }

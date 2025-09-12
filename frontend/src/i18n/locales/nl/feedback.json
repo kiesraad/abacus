@@ -197,7 +197,7 @@
     },
     "coordinator": {
       "title": "Het aantal blanco stemmen (F) is erg hoog",
-      "action": "<ul><li>Hertel de blanco stemmen of geef een verklaring voor het hoge aantal.</li><li>Geef in elk geval aan wat je hebt gedaan in het proces-verbaal van het GSB (rubriek 1.2).</li></ul>"
+      "actions": "<ul><li>Hertel de blanco stemmen of geef een verklaring voor het hoge aantal.</li><li>Geef in elk geval aan wat je hebt gedaan in het proces-verbaal van het GSB (rubriek 1.2).</li></ul>"
     }
   },
   "W202": {
@@ -206,7 +206,7 @@
     },
     "coordinator": {
       "title": "Het aantal ongeldige stemmen (G) is erg hoog",
-      "action": "<ul><li>Hertel de ongeldige stemmen of geef een verklaring voor het hoge aantal.</li><li>Geef in elk geval aan wat je hebt gedaan in het proces-verbaal van het GSB (rubriek 1.2).</li></ul>"
+      "actions": "<ul><li>Hertel de ongeldige stemmen of geef een verklaring voor het hoge aantal.</li><li>Geef in elk geval aan wat je hebt gedaan in het proces-verbaal van het GSB (rubriek 1.2).</li></ul>"
     }
   },
   "W203": {
@@ -216,7 +216,7 @@
     "coordinator": {
       "title": "Groot verschil tussen D en H",
       "content": "Er is een groot verschil tussen het aantal toegelaten kiezers (D) en het aantal uitgebrachte stemmen (H).",
-      "action": "<ul><li>Tel het stembureau in zijn geheel nogmaals. Dit hoeft niet als er al twee keer geteld is met precies dezelfde uitslag per lijst.</li><li>Verklaar in het proces-verbaal van het GSB (rubriek 1.2) zo goed mogelijk wat de oorzaak van de opmerkelijke uitslag is.</li><li>Schrijf ook op welke stappen het GSB heeft gezet om deze te hertellen en onderzoeken.</li></ul>"
+      "actions": "<ul><li>Tel het stembureau in zijn geheel nogmaals. Dit hoeft niet als er al twee keer geteld is met precies dezelfde uitslag per lijst.</li><li>Verklaar in het proces-verbaal van het GSB (rubriek 1.2) zo goed mogelijk wat de oorzaak van de opmerkelijke uitslag is.</li><li>Schrijf ook op welke stappen het GSB heeft gezet om deze te hertellen en onderzoeken.</li></ul>"
     }
   },
   "W204": {
@@ -226,7 +226,7 @@
     "coordinator": {
       "title": "Het totaal aantal uitgebrachte stemmen (H) is nul",
       "content": "Controleer of het stembureau is opgenomen in de vóór de verkiezing gepubliceerde lijst.",
-      "action": "<ul><li>Zo ja: verklaar in het proces-verbaal van het GSB (rubriek 1.2) waarom in dit stembureau geen stemmen zijn uitgebracht.</li><li>Zo nee: verwijder het stembureau uit Abacus. Het proces-verbaal moet niet ingevoerd worden.</li></ul>"
+      "actions": "<ul><li>Zo ja: verklaar in het proces-verbaal van het GSB (rubriek 1.2) waarom in dit stembureau geen stemmen zijn uitgebracht.</li><li>Zo nee: verwijder het stembureau uit Abacus. Het proces-verbaal moet niet ingevoerd worden.</li></ul>"
     }
   },
   "errors": "foutmeldingen",

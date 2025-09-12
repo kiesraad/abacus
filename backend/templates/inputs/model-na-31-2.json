@@ -4,8 +4,7 @@
     "number": 1,
     "election_id": 2,
     "location": "Juinen",
-    "start_date": "2035-01-12",
-    "start_time": "09:00",
+    "start_date_time": "2035-01-12T09:00:00",
     "status": "data_entry_finished",
     "number_of_voters": 129261
   },

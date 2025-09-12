@@ -1,0 +1,20 @@
+{
+  "db_name": "SQLite",
+  "query": "\n        WITH RECURSIVE polling_stations_chain(original_id, id, id_prev_session, data) AS (\n            SELECT s.id AS original_id, s.id, s.id_prev_session, r.data\n            FROM polling_stations AS s\n            LEFT JOIN polling_station_results AS r ON r.polling_station_id = s.id\n            WHERE s.id = ?\n\n            UNION ALL\n\n            SELECT sc.original_id, s.id, s.id_prev_session, r.data\n            FROM polling_stations_chain AS sc\n            JOIN polling_stations AS s ON s.id = sc.id_prev_session\n            LEFT JOIN polling_station_results AS r ON r.polling_station_id = s.id\n            WHERE sc.data IS NULL\n        )\n        SELECT\n            sc.data AS \"data!: Json<PollingStationResults>\"\n        FROM polling_stations_chain AS sc\n        WHERE sc.data IS NOT NULL\n        ",
+  "describe": {
+    "columns": [
+      {
+        "name": "data!: Json<PollingStationResults>",
+        "ordinal": 0,
+        "type_info": "Text"
+      }
+    ],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": [
+      true
+    ]
+  },
+  "hash": "f4d4ee6ac1a1ba7d31805a330896f9c6c0ee9709ac8452b9f7f530a6bc54944a"
+}

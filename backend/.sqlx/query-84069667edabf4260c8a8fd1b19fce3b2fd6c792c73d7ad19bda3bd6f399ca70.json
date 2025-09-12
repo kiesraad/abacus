@@ -1,6 +1,6 @@
 {
   "db_name": "SQLite",
-  "query": "\n        UPDATE committee_sessions\n        SET number_of_voters = ?\n        WHERE id = ?\n        RETURNING\n            id as \"id: u32\",\n            number as \"number: u32\",\n            election_id as \"election_id: u32\",\n            status as \"status: _\",\n            location,\n            start_date,\n            start_time,\n            number_of_voters as \"number_of_voters: u32\"\n        ",
+  "query": "\n        UPDATE committee_sessions\n        SET status = ?\n        WHERE id = ?\n        RETURNING\n            id as \"id: u32\",\n            number as \"number: u32\",\n            election_id as \"election_id: u32\",\n            status as \"status: _\",\n            location,\n            start_date_time as \"start_date_time: _\",\n            number_of_voters as \"number_of_voters: u32\",\n            results_eml as \"results_eml: _\",\n            results_pdf as \"results_pdf: _\"\n        ",
   "describe": {
     "columns": [
       {
@@ -29,18 +29,23 @@
         "type_info": "Text"
       },
       {
-        "name": "start_date",
+        "name": "start_date_time: _",
         "ordinal": 5,
         "type_info": "Text"
       },
       {
-        "name": "start_time",
+        "name": "number_of_voters: u32",
         "ordinal": 6,
-        "type_info": "Text"
+        "type_info": "Integer"
       },
       {
-        "name": "number_of_voters: u32",
+        "name": "results_eml: _",
         "ordinal": 7,
+        "type_info": "Integer"
+      },
+      {
+        "name": "results_pdf: _",
+        "ordinal": 8,
         "type_info": "Integer"
       }
     ],
@@ -53,10 +58,11 @@
       false,
       false,
       false,
+      true,
       false,
-      false,
-      false
+      true,
+      true
     ]
   },
-  "hash": "c75c7d4a076dcfaa2e817bddb407407f18cee6d1e879a0c2be364fe8beece973"
+  "hash": "84069667edabf4260c8a8fd1b19fce3b2fd6c792c73d7ad19bda3bd6f399ca70"
 }

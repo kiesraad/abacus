@@ -143,8 +143,7 @@ describe("CommitteeSessionDetailsPage", () => {
           number: 2,
           status: "data_entry_not_started",
           location: "Den Haag",
-          start_date: "2026-03-18",
-          start_time: "21:36",
+          start_date_time: "2026-03-18T21:36:00",
         },
       ),
     );
@@ -184,8 +183,7 @@ describe("CommitteeSessionDetailsPage", () => {
         {
           status: "data_entry_not_started",
           location: "Den Haag",
-          start_date: "2026-03-18",
-          start_time: "21:36",
+          start_date_time: "2026-03-18T21:36:00",
         },
       ),
     );
@@ -218,8 +216,7 @@ describe("CommitteeSessionDetailsPage", () => {
         {
           status: "data_entry_not_started",
           location: "Den Haag",
-          start_date: "2026-03-18",
-          start_time: "21:36",
+          start_date_time: "2026-03-18T21:36:00",
         },
       ),
     );
@@ -255,8 +252,7 @@ describe("CommitteeSessionDetailsPage", () => {
           number: 6,
           status: "data_entry_in_progress",
           location: "Den Haag",
-          start_date: "2026-03-18",
-          start_time: "21:36",
+          start_date_time: "2026-03-18T21:36:00",
         },
       ),
     );

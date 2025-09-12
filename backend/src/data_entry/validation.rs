@@ -72,25 +72,25 @@ pub enum ValidationResultCode {
     F202,
     /// CSO/DSO: 'Aantal kiezers en stemmen': stemmen op kandidaten + blanco stemmen + ongeldige stemmen <> totaal aantal uitgebrachte stemmen
     F203,
-    // CSO | F.301 "Vergelijk D&H": (checkbox D=H is aangevinkt, maar D<>H)
+    /// CSO | F.301 "Vergelijk D&H": (checkbox D=H is aangevinkt, maar D<>H)
     F301,
-    // CSO | F.302 "Vergelijk D&H": (checkbox H>D is aangevinkt, maar H<=D)
+    /// CSO | F.302 "Vergelijk D&H": (checkbox H>D is aangevinkt, maar H<=D)
     F302,
-    // CSO | F.303 "Vergelijk D&H": (checkbox H<D is aangevinkt, maar H>=D)
+    /// CSO | F.303 "Vergelijk D&H": (checkbox H<D is aangevinkt, maar H>=D)
     F303,
-    // CSO | F.304 "Vergelijk D&H": Meerdere aangevinkt of geen enkele aangevinkt
+    /// CSO | F.304 "Vergelijk D&H": Meerdere aangevinkt of geen enkele aangevinkt
     F304,
-    // CSO | F.305 (Als D = H) I en/of J zijn ingevuld
+    /// CSO | F.305 (Als D = H) I en/of J zijn ingevuld
     F305,
-    // CSO | F.306 (Als H > D) `I <> H - D`
+    /// CSO | F.306 (Als H > D) `I <> H - D`
     F306,
-    // CSO | F.307 (Als H > D) J is ingevuld
+    /// CSO | F.307 (Als H > D) J is ingevuld
     F307,
-    // CSO | F.308 (Als H < D) `J <> D - H`
+    /// CSO | F.308 (Als H < D) `J <> D - H`
     F308,
-    // CSO | F.309 (Als H < D) I is ingevuld
+    /// CSO | F.309 (Als H < D) I is ingevuld
     F309,
-    // CSO | F.310 (Als D <> H en verklaring voor verschil niks aangevinkt of 'ja' en 'nee' aangevinkt)
+    /// CSO | F.310 (Als D <> H en verklaring voor verschil niks aangevinkt of 'ja' en 'nee' aangevinkt)
     F310,
     /// CSO: 'Kandidaten en lijsttotalen': Er zijn stemmen op kandidaten, en het totaal aantal stemmen op een lijst = leeg of 0
     F401,

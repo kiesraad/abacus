@@ -126,12 +126,6 @@ impl IntoResponse for PollingStationInvestigation {
 pub struct PollingStationInvestigationCreateRequest {
     pub polling_station_id: u32,
     pub reason: String,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[schema(nullable = false)]
-    pub findings: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[schema(nullable = false)]
-    pub corrected_results: Option<bool>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq, ToSchema, Type, FromRow)]

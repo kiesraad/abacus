@@ -6151,12 +6151,6 @@
           "reason"
         ],
         "properties": {
-          "corrected_results": {
-            "type": "boolean"
-          },
-          "findings": {
-            "type": "string"
-          },
           "polling_station_id": {
             "type": "integer",
             "format": "int32",

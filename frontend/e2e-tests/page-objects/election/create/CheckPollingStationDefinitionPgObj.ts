@@ -6,7 +6,6 @@ export class CheckPollingStationDefinitionPgObj {
   readonly next: Locator;
   readonly table: Locator;
   readonly stations: Locator;
-  readonly warning: Locator;
 
   constructor(protected readonly page: Page) {
     this.header = page.getByRole("heading", { level: 2, name: "Controleer stembureaus" });
@@ -14,6 +13,5 @@ export class CheckPollingStationDefinitionPgObj {
     this.next = page.getByRole("button", { name: "Volgende" });
     this.table = page.getByTestId("overview");
     this.stations = this.table.locator("tbody").getByRole("row");
-    this.warning = page.getByRole("strong").filter({ hasText: "Afwijkende verkiezing" });
   }
 }

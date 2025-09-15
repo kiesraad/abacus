@@ -4,9 +4,11 @@ import { useElection } from "@/hooks/election/useElection";
 import { t } from "@/i18n/translate";
 
 export function AddInvestigationPage() {
-  const { pollingStations } = useElection();
+  const { pollingStations, investigations } = useElection();
 
-  // TODO fetch investigations for this election and filter pollingStations
+  const availablePollingStations = pollingStations.filter(
+    (station) => !investigations.some((investigation) => investigation.polling_station_id === station.id),
+  );
 
   return (
     <>
@@ -26,7 +28,7 @@ export function AddInvestigationPage() {
               <Table.HeaderCell>{t("polling_station.title.singular")}</Table.HeaderCell>
             </Table.Header>
             <Table.Body className="fs-md">
-              {pollingStations.map((station) => (
+              {availablePollingStations.map((station) => (
                 <Table.LinkRow key={station.id} to={`./${station.id}/reason`}>
                   <Table.NumberCell>{station.number}</Table.NumberCell>
                   <Table.Cell className="break-word">{station.name}</Table.Cell>

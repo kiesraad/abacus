@@ -10,8 +10,19 @@ export function useElection(pollingStationId?: number) {
     throw new Error("useElection must be used within an ElectionProvider");
   }
 
-  const { currentCommitteeSession, committeeSessions, election, pollingStations, refetch } = context;
+  const { currentCommitteeSession, committeeSessions, election, pollingStations, investigations, refetch } = context;
   const pollingStation = pollingStations.find((ps) => ps.id === pollingStationId);
-
-  return { currentCommitteeSession, committeeSessions, election, pollingStations, pollingStation, refetch };
+  const investigation = pollingStation
+    ? investigations.find((psi) => psi.polling_station_id === pollingStation.id)
+    : undefined;
+  return {
+    currentCommitteeSession,
+    committeeSessions,
+    election,
+    pollingStations,
+    pollingStation,
+    investigations,
+    investigation,
+    refetch,
+  };
 }

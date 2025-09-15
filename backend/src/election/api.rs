@@ -19,6 +19,7 @@ use crate::{
     authentication::{Admin, User},
     committee_session::{CommitteeSession, CommitteeSessionCreateRequest},
     eml::{EML110, EML230, EMLDocument, EMLImportError, EmlHash, RedactedEmlHash},
+    investigation::PollingStationInvestigation,
     polling_station::{
         PollingStation, PollingStationRequest, PollingStationsRequest,
         create_imported_polling_stations,
@@ -53,6 +54,7 @@ pub struct ElectionDetailsResponse {
     pub committee_sessions: Vec<CommitteeSession>,
     pub election: ElectionWithPoliticalGroups,
     pub polling_stations: Vec<PollingStation>,
+    pub investigations: Vec<PollingStationInvestigation>,
 }
 
 /// Get a list of all elections, without their candidate lists and
@@ -112,12 +114,18 @@ pub async fn election_details(
         .clone();
     let polling_stations =
         crate::polling_station::repository::list(&mut conn, current_committee_session.id).await?;
+    let investigations = crate::investigation::list_investigations_for_committee_session(
+        &mut conn,
+        current_committee_session.id,
+    )
+    .await?;
 
     Ok(Json(ElectionDetailsResponse {
         current_committee_session,
         committee_sessions,
         election,
         polling_stations,
+        investigations,
     }))
 }
 

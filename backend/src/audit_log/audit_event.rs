@@ -5,7 +5,7 @@ use strum::VariantNames;
 use utoipa::ToSchema;
 
 use super::AuditEventLevel;
-use crate::{ErrorResponse, error::ErrorReference};
+use crate::{ErrorResponse, error::ErrorReference, investigation::PollingStationInvestigation};
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, Eq, ToSchema)]
 #[serde(deny_unknown_fields)]
@@ -171,6 +171,8 @@ pub enum AuditEvent {
     CommitteeSessionCreated(CommitteeSessionDetails),
     CommitteeSessionDeleted(CommitteeSessionDetails),
     CommitteeSessionUpdated(CommitteeSessionDetails),
+    PollingStationInvestigationCreated(PollingStationInvestigation),
+    PollingStationInvestigationConcluded(PollingStationInvestigation),
     // file events
     FileCreated(FileDetails),
     FileDeleted(FileDetails),
@@ -235,6 +237,8 @@ impl AuditEvent {
             AuditEvent::PollingStationUpdated(_) => AuditEventLevel::Success,
             AuditEvent::PollingStationDeleted(_) => AuditEventLevel::Info,
             AuditEvent::PollingStationsImported(_) => AuditEventLevel::Success,
+            AuditEvent::PollingStationInvestigationCreated(_) => AuditEventLevel::Info,
+            AuditEvent::PollingStationInvestigationConcluded(_) => AuditEventLevel::Info,
             AuditEvent::DataEntryClaimed(_) => AuditEventLevel::Success,
             AuditEvent::DataEntrySaved(_) => AuditEventLevel::Success,
             AuditEvent::DataEntryDeleted(_) => AuditEventLevel::Info,

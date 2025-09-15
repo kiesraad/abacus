@@ -217,6 +217,18 @@ export interface POLLING_STATION_DATA_ENTRY_FINALISE_REQUEST_PARAMS {
 export type POLLING_STATION_DATA_ENTRY_FINALISE_REQUEST_PATH =
   `/api/polling_stations/${number}/data_entries/${number}/finalise`;
 
+// /api/polling_stations/{polling_station_id}/investigations
+export interface COMMITTEE_SESSION_INVESTIGATION_CONCLUDE_REQUEST_PARAMS {
+  polling_station_id: number;
+}
+export type COMMITTEE_SESSION_INVESTIGATION_CONCLUDE_REQUEST_PATH = `/api/polling_stations/${number}/investigations`;
+export type COMMITTEE_SESSION_INVESTIGATION_CONCLUDE_REQUEST_BODY = PollingStationInvestigationConcludeRequest;
+export interface COMMITTEE_SESSION_INVESTIGATION_CREATE_REQUEST_PARAMS {
+  polling_station_id: number;
+}
+export type COMMITTEE_SESSION_INVESTIGATION_CREATE_REQUEST_PATH = `/api/polling_stations/${number}/investigations`;
+export type COMMITTEE_SESSION_INVESTIGATION_CREATE_REQUEST_BODY = PollingStationInvestigationCreateRequest;
+
 // /api/user
 export type USER_LIST_REQUEST_PARAMS = Record<string, never>;
 export type USER_LIST_REQUEST_PATH = `/api/user`;
@@ -288,6 +300,8 @@ export type AuditEvent =
   | (CommitteeSessionDetails & { event_type: "CommitteeSessionCreated" })
   | (CommitteeSessionDetails & { event_type: "CommitteeSessionDeleted" })
   | (CommitteeSessionDetails & { event_type: "CommitteeSessionUpdated" })
+  | (PollingStationInvestigation & { event_type: "PollingStationInvestigationCreated" })
+  | (PollingStationInvestigation & { event_type: "PollingStationInvestigationConcluded" })
   | (FileDetails & { event_type: "FileCreated" })
   | (FileDetails & { event_type: "FileDeleted" })
   | (ElectionDetails & { event_type: "ApportionmentCreated" })
@@ -657,6 +671,7 @@ export interface ElectionDetailsResponse {
   committee_sessions: CommitteeSession[];
   current_committee_session: CommitteeSession;
   election: ElectionWithPoliticalGroups;
+  investigations: PollingStationInvestigation[];
   polling_stations: PollingStation[];
 }
 
@@ -1006,6 +1021,22 @@ export interface PollingStationImportDetails {
   import_election_id: number;
   import_file_name: string;
   import_number_of_polling_stations: number;
+}
+
+export interface PollingStationInvestigation {
+  corrected_results?: boolean;
+  findings?: string;
+  polling_station_id: number;
+  reason: string;
+}
+
+export interface PollingStationInvestigationConcludeRequest {
+  corrected_results: boolean;
+  findings: string;
+}
+
+export interface PollingStationInvestigationCreateRequest {
+  reason: string;
 }
 
 /**

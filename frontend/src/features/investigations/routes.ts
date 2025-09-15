@@ -1,12 +1,12 @@
 import { RouteObject } from "react-router";
 
 import { AddInvestigationLayout } from "./components/AddInvestigationLayout";
-import { AddInvestigationPage } from "./components/AddInvestigationPage.tsx";
-import { InvestigationFindings } from "./components/InvestigationFindings";
+import { AddInvestigationPage } from "./components/AddInvestigationPage";
+import { InvestigationFindingsPage } from "./components/InvestigationFindingsPage";
 import { InvestigationPrintCorrigendumPage } from "./components/InvestigationPrintCorrigendumPage";
-import { InvestigationReason } from "./components/InvestigationReason";
+import { InvestigationReasonPage } from "./components/InvestigationReasonPage";
 import { InvestigationsLayout } from "./components/InvestigationsLayout";
-import { InvestigationsOverviewPage } from "./components/InvestigationsOverviewPage.tsx";
+import { InvestigationsOverviewPage } from "./components/InvestigationsOverviewPage";
 
 export const investigationRoutes: RouteObject[] = [
   {
@@ -27,7 +27,7 @@ export const investigationRoutes: RouteObject[] = [
               {
                 index: true,
                 path: "reason",
-                Component: InvestigationReason,
+                Component: InvestigationReasonPage,
               },
               {
                 path: "print-corrigendum",
@@ -35,7 +35,7 @@ export const investigationRoutes: RouteObject[] = [
               },
               {
                 path: "findings",
-                Component: InvestigationFindings,
+                Component: InvestigationFindingsPage,
               },
             ],
           },

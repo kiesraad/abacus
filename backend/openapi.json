@@ -2725,6 +2725,172 @@
         }
       }
     },
+    "/api/polling_stations/{polling_station_id}/investigations": {
+      "put": {
+        "summary": "Conclude an investigation for a polling station",
+        "operationId": "committee_session_investigation_conclude",
+        "parameters": [
+          {
+            "name": "polling_station_id",
+            "in": "path",
+            "description": "Polling station database id",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "minimum": 0
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PollingStationInvestigationConcludeRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Polling station investigation concluded successfully"
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Investigation not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Request cannot be completed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Create an investigation for a polling station",
+        "operationId": "committee_session_investigation_create",
+        "parameters": [
+          {
+            "name": "polling_station_id",
+            "in": "path",
+            "description": "Polling station database id",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "minimum": 0
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PollingStationInvestigationCreateRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Polling station investigation added successfully"
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Polling station not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Request cannot be completed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/user": {
       "get": {
         "summary": "Lists all users",
@@ -3520,6 +3686,48 @@
                     "type": "string",
                     "enum": [
                       "CommitteeSessionUpdated"
+                    ]
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/PollingStationInvestigation"
+              },
+              {
+                "type": "object",
+                "required": [
+                  "event_type"
+                ],
+                "properties": {
+                  "event_type": {
+                    "type": "string",
+                    "enum": [
+                      "PollingStationInvestigationCreated"
+                    ]
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/PollingStationInvestigation"
+              },
+              {
+                "type": "object",
+                "required": [
+                  "event_type"
+                ],
+                "properties": {
+                  "event_type": {
+                    "type": "string",
+                    "enum": [
+                      "PollingStationInvestigationConcluded"
                     ]
                   }
                 }
@@ -4906,7 +5114,8 @@
           "current_committee_session",
           "committee_sessions",
           "election",
-          "polling_stations"
+          "polling_stations",
+          "investigations"
         ],
         "properties": {
           "committee_sessions": {
@@ -4920,6 +5129,12 @@
           },
           "election": {
             "$ref": "#/components/schemas/ElectionWithPoliticalGroups"
+          },
+          "investigations": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PollingStationInvestigation"
+            }
           },
           "polling_stations": {
             "type": "array",
@@ -5876,6 +6091,58 @@
             "minimum": 0
           }
         }
+      },
+      "PollingStationInvestigation": {
+        "type": "object",
+        "required": [
+          "polling_station_id",
+          "reason"
+        ],
+        "properties": {
+          "corrected_results": {
+            "type": "boolean"
+          },
+          "findings": {
+            "type": "string"
+          },
+          "polling_station_id": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "reason": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "PollingStationInvestigationConcludeRequest": {
+        "type": "object",
+        "required": [
+          "findings",
+          "corrected_results"
+        ],
+        "properties": {
+          "corrected_results": {
+            "type": "boolean"
+          },
+          "findings": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "PollingStationInvestigationCreateRequest": {
+        "type": "object",
+        "required": [
+          "reason"
+        ],
+        "properties": {
+          "reason": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
       },
       "PollingStationInvestigations": {
         "type": "object",

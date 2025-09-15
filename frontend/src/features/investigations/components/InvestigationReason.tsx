@@ -1,18 +1,35 @@
 import { FormEvent, useState } from "react";
 import { useNavigate } from "react-router";
 
+import { AnyApiError, isError, isSuccess } from "@/api/ApiResult";
+import { useCrud } from "@/api/useCrud";
 import { Button } from "@/components/ui/Button/Button";
 import { Form } from "@/components/ui/Form/Form";
 import { FormLayout } from "@/components/ui/Form/FormLayout";
 import { InputField } from "@/components/ui/InputField/InputField";
+import { useElection } from "@/hooks/election/useElection";
 import { t } from "@/i18n/translate";
+import { PollingStationInvestigationCreateRequest } from "@/types/generated/openapi";
 import { StringFormData } from "@/utils/stringFormData";
 
-export function InvestigationReason() {
-  const navigate = useNavigate();
-  const [nonEmptyError, setNonEmptyError] = useState(false);
+interface InvestigationReasonProps {
+  pollingStationId: number;
+}
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+export function InvestigationReason({ pollingStationId }: InvestigationReasonProps) {
+  const navigate = useNavigate();
+  const { refetch } = useElection();
+  const [nonEmptyError, setNonEmptyError] = useState(false);
+  const path = `/api/polling_stations/${pollingStationId}/investigations`;
+  const { create } = useCrud<PollingStationInvestigationCreateRequest>({ create: path });
+
+  const [error, setError] = useState<AnyApiError>();
+
+  if (error) {
+    throw error;
+  }
+
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
     const formData = new StringFormData(event.currentTarget);
@@ -25,13 +42,21 @@ export function InvestigationReason() {
 
     setNonEmptyError(false);
 
-    // TODO: Handle form submission
-
-    void navigate("../print-corrigendum");
+    const body: PollingStationInvestigationCreateRequest = { reason };
+    const response = await create(body);
+    if (isSuccess(response)) {
+      await refetch();
+      await navigate("../print-corrigendum");
+    } else if (isError(response)) {
+      setError(response);
+    }
   };
 
   return (
-    <Form title={t("investigations.reason_and_assignment.central_polling_station")} onSubmit={handleSubmit}>
+    <Form
+      title={t("investigations.reason_and_assignment.central_polling_station")}
+      onSubmit={(e) => void handleSubmit(e)}
+    >
       <FormLayout>
         <FormLayout.Section>
           <section className="sm">

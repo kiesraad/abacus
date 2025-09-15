@@ -38,6 +38,7 @@ mod error;
 pub mod files;
 #[cfg(feature = "dev-database")]
 pub mod fixtures;
+pub mod investigation;
 pub mod pdf_gen;
 pub mod polling_station;
 pub mod report;
@@ -87,6 +88,7 @@ pub fn openapi_router() -> OpenApiRouter<AppState> {
         .merge(polling_station::router())
         .merge(report::router())
         .merge(document::router())
+        .merge(investigation::router())
 }
 
 /// Axum router for the application

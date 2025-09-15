@@ -25,6 +25,7 @@ export function ElectionProvider({ children, electionId }: ElectionProviderProps
             committeeSessions: data.committee_sessions,
             election: data.election,
             pollingStations: data.polling_stations,
+            investigations: data.investigations,
             refetch,
           }}
         >

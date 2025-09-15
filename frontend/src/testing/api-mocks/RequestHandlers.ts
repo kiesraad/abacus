@@ -17,6 +17,12 @@ import {
   COMMITTEE_SESSION_CREATE_REQUEST_PATH,
   COMMITTEE_SESSION_DELETE_REQUEST_PARAMS,
   COMMITTEE_SESSION_DELETE_REQUEST_PATH,
+  COMMITTEE_SESSION_INVESTIGATION_CONCLUDE_REQUEST_BODY,
+  COMMITTEE_SESSION_INVESTIGATION_CONCLUDE_REQUEST_PARAMS,
+  COMMITTEE_SESSION_INVESTIGATION_CONCLUDE_REQUEST_PATH,
+  COMMITTEE_SESSION_INVESTIGATION_CREATE_REQUEST_BODY,
+  COMMITTEE_SESSION_INVESTIGATION_CREATE_REQUEST_PARAMS,
+  COMMITTEE_SESSION_INVESTIGATION_CREATE_REQUEST_PATH,
   COMMITTEE_SESSION_NUMBER_OF_VOTERS_CHANGE_REQUEST_BODY,
   COMMITTEE_SESSION_NUMBER_OF_VOTERS_CHANGE_REQUEST_PARAMS,
   COMMITTEE_SESSION_NUMBER_OF_VOTERS_CHANGE_REQUEST_PATH,
@@ -88,6 +94,7 @@ import {
   POLLING_STATION_UPDATE_REQUEST_PARAMS,
   POLLING_STATION_UPDATE_REQUEST_PATH,
   PollingStation,
+  PollingStationInvestigation,
   PollingStationListResponse,
   SaveDataEntryResponse,
   User,
@@ -204,6 +211,33 @@ export const CommitteeSessionDeleteHandler = http.delete<ParamsToString<COMMITTE
   "/api/committee_sessions/4" satisfies COMMITTEE_SESSION_DELETE_REQUEST_PATH,
   () => new HttpResponse(null, { status: 200 }),
 );
+
+// investigation handlers
+export const CommitteeSessionInvestigationCreateHandler = http.post<
+  ParamsToString<COMMITTEE_SESSION_INVESTIGATION_CREATE_REQUEST_PARAMS>,
+  COMMITTEE_SESSION_INVESTIGATION_CREATE_REQUEST_BODY,
+  PollingStationInvestigation
+>("/api/polling_stations/1/investigations" satisfies COMMITTEE_SESSION_INVESTIGATION_CREATE_REQUEST_PATH, () => {
+  const response: PollingStationInvestigation = {
+    polling_station_id: 1,
+    reason: "Test reason",
+  };
+  return HttpResponse.json(response, { status: 201 });
+});
+
+export const CommitteeSessionInvestigationConcludeHandler = http.put<
+  ParamsToString<COMMITTEE_SESSION_INVESTIGATION_CONCLUDE_REQUEST_PARAMS>,
+  COMMITTEE_SESSION_INVESTIGATION_CONCLUDE_REQUEST_BODY,
+  PollingStationInvestigation
+>("/api/polling_stations/1/investigations" satisfies COMMITTEE_SESSION_INVESTIGATION_CONCLUDE_REQUEST_PATH, () => {
+  const response: PollingStationInvestigation = {
+    polling_station_id: 1,
+    reason: "Test reason",
+    findings: "Test findings",
+    corrected_results: true,
+  };
+  return HttpResponse.json(response, { status: 200 });
+});
 
 // get election list handler
 export const ElectionListRequestHandler = http.get<
@@ -426,6 +460,9 @@ export const handlers: HttpHandler[] = [
   CommitteeSessionChangeNumberOfVotersHandler,
   CommitteeSessionUpdateHandler,
   CommitteeSessionCreateHandler,
+  CommitteeSessionDeleteHandler,
+  CommitteeSessionInvestigationCreateHandler,
+  CommitteeSessionInvestigationConcludeHandler,
   ElectionListRequestHandler,
   ElectionRequestHandler,
   ElectionStatusRequestHandler,

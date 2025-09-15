@@ -4,9 +4,16 @@ import { InvestigationFindings } from "./InvestigationFindings";
 
 const meta = {
   component: InvestigationFindings,
+  parameters: {
+    needsElection: true,
+  },
 } satisfies Meta<typeof InvestigationFindings>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const Default: Story = {};
+export const Default: Story = {
+  args: {
+    pollingStationId: 1,
+  },
+};

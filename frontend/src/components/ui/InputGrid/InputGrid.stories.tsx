@@ -159,6 +159,70 @@ export const CandidatesGrid: StoryObj<Props> = {
   },
 };
 
+export const GridWithPreviousValues: StoryObj<Props> = {
+  args: {
+    readOnly: false,
+    zebra: false,
+    addSeparator: false,
+    isTotal: true,
+  },
+  render: ({ readOnly, zebra, addSeparator, isTotal }) => {
+    const errorsAndWarnings = createErrorsAndWarnings();
+
+    return (
+      <InputGrid zebra={zebra}>
+        <InputGrid.Header field="Veld" previous="Vorig aantal" value="Geteld aantal" title="Omschrijving" />
+        <InputGrid.Body>
+          <InputGridRow
+            readOnly={readOnly}
+            id="input1"
+            field="A"
+            title="Input field 1"
+            previousValue={"1111"}
+            value={""}
+            errorsAndWarnings={errorsAndWarnings}
+          />
+          <InputGridRow
+            readOnly={readOnly}
+            id="input2"
+            field="B"
+            title="Input field 2 (Error)"
+            previousValue={"12"}
+            value={"0"}
+            errorsAndWarnings={errorsAndWarnings}
+            addSeparator={addSeparator}
+          />
+          <InputGridRow
+            readOnly={readOnly}
+            id="input3"
+            field="C"
+            title="Input field 3 (Warning)"
+            previousValue={"13"}
+            value={"1010"}
+            errorsAndWarnings={errorsAndWarnings}
+          />
+          <InputGridRow
+            readOnly={readOnly}
+            id="total"
+            field="D"
+            title="Total of all inputs"
+            previousValue={"36"}
+            value={""}
+            isTotal={isTotal}
+            errorsAndWarnings={errorsAndWarnings}
+          />
+        </InputGrid.Body>
+      </InputGrid>
+    );
+  },
+
+  play: async ({ canvasElement }) => {
+    // Test that the grid table is visible - table has role="none" so use querySelector
+    const grid = canvasElement.querySelector("table");
+    await expect(grid).toBeVisible();
+  },
+};
+
 export default {
   argTypes: {
     readOnly: {

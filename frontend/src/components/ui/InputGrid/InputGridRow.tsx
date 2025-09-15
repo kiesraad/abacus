@@ -1,10 +1,12 @@
 import * as React from "react";
+import { ReactNode } from "react";
 
 import { cn } from "@/utils/classnames";
+import { formatNumber } from "@/utils/number";
 
 import { FormField } from "../FormField/FormField";
 import { NumberInput } from "../NumberInput/NumberInput";
-import { InputGrid, InputGridRowCells } from "./InputGrid";
+import { InputGrid } from "./InputGrid";
 import cls from "./InputGrid.module.css";
 
 export interface InputGridRowProps {
@@ -14,6 +16,7 @@ export interface InputGridRowProps {
   errorsAndWarnings?: Map<string, "error" | "warning">;
   warningsAccepted?: boolean;
   name?: string;
+  previousValue?: string;
   isTotal?: boolean;
   isListTotal?: boolean;
   errorMessageId?: string;
@@ -30,6 +33,7 @@ export function InputGridRow({
   title,
   errorsAndWarnings,
   warningsAccepted,
+  previousValue,
   isTotal,
   isListTotal,
   id,
@@ -43,6 +47,8 @@ export function InputGridRow({
   const hasError = errorsAndWarnings?.get(id) === "error";
   const hasWarning = errorsAndWarnings?.get(id) === "warning";
   const hasUnacceptedWarning = hasWarning && !warningsAccepted;
+  const showPrevious = previousValue !== undefined;
+  const corrected = showPrevious && value !== "";
 
   const errorMessage =
     errorMessageId || (hasError ? "feedback-error" : hasUnacceptedWarning ? "feedback-warning" : undefined);
@@ -59,38 +65,51 @@ export function InputGridRow({
     }
   }, [errorMessageId]);
 
-  const children: InputGridRowCells = [
-    <td key={`field-${id}`} id={`field-${id}`} className={cls.field}>
-      {field}
-    </td>,
-    <td key={`value-${id}`} id={`value-${id}`} className={cn(cls.value, readOnly && cls.readOnly)}>
-      <FormField hasError={!!errorMessageId || hasError} hasWarning={hasWarning}>
-        {readOnly ? (
-          <span className="font-number">{value}</span>
-        ) : (
-          <NumberInput
-            key={id}
-            id={id}
-            name={name || id}
-            autoFocus={autoFocusInput}
-            value={value}
-            onChange={onChange}
-            aria-labelledby={`field-${id} title-${id}`}
-            aria-invalid={errorMessage !== undefined}
-            aria-errormessage={errorMessage}
-            ref={inputRef}
-          />
-        )}
-      </FormField>
-    </td>,
-    <td key={`title-${id}`} id={`title-${id}`} className={cls.title}>
-      {title}
-    </td>,
-  ];
+  const children: ReactNode = (
+    <>
+      <td key={`field-${id}`} id={`field-${id}`} className={cls.field}>
+        {field}
+      </td>
+      {previousValue !== undefined && (
+        <td key={`previous-${id}`} id={`previous-${id}`} className={cn(cls.previous, corrected && cls.corrected)}>
+          {formatNumber(previousValue)}
+        </td>
+      )}
+      <td
+        key={`value-${id}`}
+        id={`value-${id}`}
+        className={cn(cls.value, readOnly && cls.readOnly, corrected && cls.corrected)}
+      >
+        <FormField hasError={!!errorMessageId || hasError} hasWarning={hasWarning}>
+          {readOnly ? (
+            <span className="font-number">{value}</span>
+          ) : (
+            <NumberInput
+              key={id}
+              id={id}
+              name={name || id}
+              autoFocus={autoFocusInput}
+              value={value}
+              onChange={onChange}
+              aria-labelledby={`field-${id} title-${id}`}
+              aria-invalid={errorMessage !== undefined}
+              aria-errormessage={errorMessage}
+              ref={inputRef}
+            />
+          )}
+        </FormField>
+      </td>
+      <td key={`title-${id}`} id={`title-${id}`} className={cls.title}>
+        {title}
+      </td>
+    </>
+  );
   return isListTotal ? (
-    <InputGrid.ListTotal id={id}>{children}</InputGrid.ListTotal>
+    <InputGrid.ListTotal id={id} showPrevious={showPrevious}>
+      {children}
+    </InputGrid.ListTotal>
   ) : (
-    <InputGrid.Row isTotal={isTotal} addSeparator={addSeparator} id={id}>
+    <InputGrid.Row isTotal={isTotal} addSeparator={addSeparator} id={id} showPrevious={showPrevious}>
       {children}
     </InputGrid.Row>
   );

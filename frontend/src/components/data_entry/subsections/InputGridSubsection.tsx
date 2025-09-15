@@ -1,9 +1,12 @@
 import { InputGrid } from "@/components/ui/InputGrid/InputGrid";
 import { InputGridRow } from "@/components/ui/InputGrid/InputGridRow";
+import { t } from "@/i18n/translate";
 import { InputGridSubsection, InputGridSubsectionRow, SectionValues } from "@/types/types";
 
 export interface InputGridSubsectionProps {
+  id?: string;
   subsection: InputGridSubsection;
+  previousValues?: SectionValues;
   currentValues: SectionValues;
   setValues: (path: string, value: string) => void;
   defaultProps: {
@@ -15,7 +18,9 @@ export interface InputGridSubsectionProps {
 }
 
 export function InputGridSubsectionComponent({
+  id,
   subsection,
+  previousValues,
   currentValues,
   setValues,
   defaultProps,
@@ -23,8 +28,13 @@ export function InputGridSubsectionComponent({
   readOnly = false,
 }: InputGridSubsectionProps) {
   return (
-    <InputGrid zebra={subsection.zebra}>
-      <InputGrid.Header field={subsection.headers[0]} value={subsection.headers[1]} title={subsection.headers[2]} />
+    <InputGrid id={id} zebra={subsection.zebra}>
+      <InputGrid.Header
+        field={subsection.headers[0]}
+        previous={previousValues && t("data_entry.previous_value")}
+        value={subsection.headers[1]}
+        title={subsection.headers[2]}
+      />
       <InputGrid.Body>
         {subsection.rows.map((row: InputGridSubsectionRow) => (
           <InputGridRow
@@ -32,6 +42,7 @@ export function InputGridSubsectionComponent({
             field={row.code || ""}
             id={`data.${row.path}`}
             title={row.title}
+            previousValue={previousValues?.[row.path]}
             value={currentValues[row.path] || ""}
             onChange={(e) => {
               setValues(row.path, e.target.value);

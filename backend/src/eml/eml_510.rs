@@ -166,29 +166,50 @@ impl TotalVotes {
                 ),
             ],
             uncounted_votes: vec![
-                UncountedVotes::new(
-                    UncountedVotesReason::PollCard,
-                    summary.voters_counts.poll_card_count as u64,
-                ),
-                UncountedVotes::new(
-                    UncountedVotesReason::ProxyCertificate,
-                    summary.voters_counts.proxy_certificate_count as u64,
-                ),
-                UncountedVotes::new(
-                    UncountedVotesReason::TotalAdmittedVoters,
-                    summary.voters_counts.total_admitted_voters_count as u64,
-                ),
-                UncountedVotes::new(
-                    UncountedVotesReason::MoreBallots,
-                    summary.differences_counts.more_ballots_count.count as u64,
-                ),
-                UncountedVotes::new(
-                    UncountedVotesReason::FewerBallots,
-                    summary.differences_counts.fewer_ballots_count.count as u64,
-                ),
+                UncountedVotes::new(summary.voters_counts.poll_card_count as u64),
+                UncountedVotes::new(summary.voters_counts.proxy_certificate_count as u64),
+                UncountedVotes::new(summary.voters_counts.total_admitted_voters_count as u64),
+                UncountedVotes::new(summary.differences_counts.more_ballots_count.count as u64),
+                UncountedVotes::new(summary.differences_counts.fewer_ballots_count.count as u64),
             ],
         }
     }
+}
+
+#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
+pub enum InvestigationReason {
+    // DSO
+    #[serde(rename = "onderzocht vanwege onverklaard verschil")]
+    UnexplainedDifference,
+    #[serde(rename = "onderzocht vanwege andere fout")]
+    OtherError,
+    #[serde(rename = "uitslag gecorrigeerd")]
+    CorrectedResult,
+
+    // CSO
+    #[serde(rename = "toegelaten kiezers opnieuw vastgesteld")]
+    UpdatedVoters,
+    #[serde(rename = "onderzocht vanwege andere reden")]
+    OtherReason,
+    #[serde(rename = "stembiljetten deels herteld")]
+    PartialRecount,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "PascalCase")]
+#[serde(rename(serialize = "kr:Investigation", deserialize = "Investigation"))]
+pub struct Investigation {
+    #[serde(rename = "@ReasonCode")]
+    reason_code: InvestigationReason,
+    #[serde(rename = "$text")]
+    value: bool,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "PascalCase")]
+pub struct ReportingUnitInvestigations {
+    #[serde(rename = "Investigation")]
+    investigations: Vec<Investigation>,
 }
 
 /// The individual votes for a specific reporting unit (i.e. 'stembureau').
@@ -203,6 +224,8 @@ pub struct ReportingUnitVotes {
     rejected_votes: Vec<RejectedVotes>,
     #[serde(default)]
     uncounted_votes: Vec<UncountedVotes>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    reporting_unit_investigations: Option<ReportingUnitInvestigations>,
 }
 
 impl ReportingUnitVotes {
@@ -220,11 +243,14 @@ impl ReportingUnitVotes {
                     polling_station.name, polling_station.postal_code
                 ),
             },
+            reporting_unit_investigations: None, /*ReportingUnitInvestigations {
+                                                     investigations: Vec::new(), // TODO: fill this in
+                                                 },*/
             selections: Selection::from_political_group_votes(
                 election,
                 &results.political_group_votes,
             ),
-            cast: results.votes_counts.total_votes_cast_count as u64,
+            cast: polling_station.number_of_voters.unwrap_or(0) as u64,
             total_counted: results.votes_counts.total_votes_candidates_count as u64,
             rejected_votes: vec![
                 RejectedVotes::new(
@@ -237,26 +263,11 @@ impl ReportingUnitVotes {
                 ),
             ],
             uncounted_votes: vec![
-                UncountedVotes::new(
-                    UncountedVotesReason::PollCard,
-                    results.voters_counts.poll_card_count as u64,
-                ),
-                UncountedVotes::new(
-                    UncountedVotesReason::ProxyCertificate,
-                    results.voters_counts.proxy_certificate_count as u64,
-                ),
-                UncountedVotes::new(
-                    UncountedVotesReason::TotalAdmittedVoters,
-                    results.voters_counts.total_admitted_voters_count as u64,
-                ),
-                UncountedVotes::new(
-                    UncountedVotesReason::MoreBallots,
-                    results.differences_counts.more_ballots_count as u64,
-                ),
-                UncountedVotes::new(
-                    UncountedVotesReason::FewerBallots,
-                    results.differences_counts.fewer_ballots_count as u64,
-                ),
+                UncountedVotes::new(results.voters_counts.poll_card_count as u64),
+                UncountedVotes::new(results.voters_counts.proxy_certificate_count as u64),
+                UncountedVotes::new(results.voters_counts.total_admitted_voters_count as u64),
+                UncountedVotes::new(results.differences_counts.more_ballots_count as u64),
+                UncountedVotes::new(results.differences_counts.fewer_ballots_count as u64),
             ],
         }
     }
@@ -299,8 +310,6 @@ pub enum RejectedVotesReason {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "PascalCase")]
 pub struct UncountedVotes {
-    #[serde(rename = "@ReasonCode")]
-    reason_code: UncountedVotesReason,
     #[serde(rename = "$text")]
     count: u64,
     #[serde(default, skip_serializing_if = "Option::is_none", rename = "@Reason")]
@@ -310,9 +319,8 @@ pub struct UncountedVotes {
 }
 
 impl UncountedVotes {
-    pub fn new(reason_code: UncountedVotesReason, count: u64) -> UncountedVotes {
+    pub fn new(count: u64) -> UncountedVotes {
         UncountedVotes {
-            reason_code,
             count,
             reason: None,
             vote_type: None,
@@ -502,6 +510,12 @@ mod tests {
                                 id: "HSB1::1234".into(),
                                 name: "Op rolletjes".into(),
                             },
+                            reporting_unit_investigations: Some(ReportingUnitInvestigations {
+                                investigations: vec![Investigation {
+                                    reason_code: InvestigationReason::UnexplainedDifference,
+                                    value: true,
+                                }],
+                            }),
                             selections: vec![
                                 Selection {
                                     selector: Selector::AffiliationIdentifier(

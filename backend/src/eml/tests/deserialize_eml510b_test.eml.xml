@@ -45,6 +45,11 @@
                     </TotalVotes>
                     <ReportingUnitVotes>
                         <ReportingUnitIdentifier Id="HSB1::1234">Op rolletjes</ReportingUnitIdentifier>
+                        <kr:ReportingUnitInvestigations>
+                            <kr:Investigation ReasonCode="onderzocht vanwege onverklaard verschil">true</kr:Investigation>
+                            <kr:Investigation ReasonCode="onderzocht vanwege andere fout">false</kr:Investigation>
+                            <kr:Investigation ReasonCode="uitslag gecorrigeerd">false</kr:Investigation>
+                        </kr:ReportingUnitInvestigations>
                         <Selection>
                             <AffiliationIdentifier Id="1">
                                 <RegisteredName>Test Party</RegisteredName>

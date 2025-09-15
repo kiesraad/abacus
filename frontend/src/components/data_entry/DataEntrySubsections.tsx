@@ -7,6 +7,7 @@ import { DataEntrySection, SectionValues } from "@/types/types";
 
 export interface DataEntrySubsectionsProps {
   section: DataEntrySection;
+  previousValues?: SectionValues;
   currentValues: SectionValues;
   setValues: (path: string, value: string) => void;
   defaultProps: {
@@ -19,6 +20,7 @@ export interface DataEntrySubsectionsProps {
 
 export function DataEntrySubsections({
   section,
+  previousValues,
   currentValues,
   setValues,
   defaultProps,
@@ -49,6 +51,7 @@ export function DataEntrySubsections({
               <InputGridSubsectionComponent
                 key={`input-grid-${subsectionIdx}`}
                 subsection={subsection}
+                previousValues={previousValues}
                 currentValues={currentValues}
                 setValues={setValues}
                 defaultProps={defaultProps}

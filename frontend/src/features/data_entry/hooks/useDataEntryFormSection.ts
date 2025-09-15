@@ -14,6 +14,7 @@ export function useDataEntryFormSection() {
     error,
     cache,
     status,
+    previousResults,
     pollingStationResults,
     dataEntryStructure,
     formState,
@@ -30,6 +31,8 @@ export function useDataEntryFormSection() {
   if (!sectionId || !section) {
     throw new Error(`Form section ${sectionId} not found in data entry structure`);
   }
+
+  const previousValues = previousResults ? mapResultsToSectionValues(section, previousResults) : undefined;
 
   // Local form state
   const [currentValues, setCurrentValues] = React.useState<SectionValues>((): SectionValues => {
@@ -92,6 +95,7 @@ export function useDataEntryFormSection() {
     error,
     formRef,
     onSubmit,
+    previousValues,
     pollingStationResults,
     currentValues,
     dataEntryStructure,

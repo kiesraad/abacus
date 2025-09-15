@@ -2,6 +2,7 @@ import { InputGrid } from "@/components/ui/InputGrid/InputGrid";
 import { InputGridRow } from "@/components/ui/InputGrid/InputGridRow";
 import { t } from "@/i18n/translate";
 import { InputGridSubsection, InputGridSubsectionRow, SectionValues } from "@/types/types";
+import { correctedValue, determineCorrections } from "@/utils/dataEntryMapping";
 
 export interface InputGridSubsectionProps {
   id?: string;
@@ -27,6 +28,12 @@ export function InputGridSubsectionComponent({
   missingTotalError,
   readOnly = false,
 }: InputGridSubsectionProps) {
+  const values = previousValues ? determineCorrections(previousValues, currentValues) : currentValues;
+
+  function handleChange(path: string, value: string) {
+    setValues(path, previousValues ? correctedValue(previousValues[path], value) : value);
+  }
+
   return (
     <InputGrid id={id} zebra={subsection.zebra}>
       <InputGrid.Header
@@ -43,9 +50,9 @@ export function InputGridSubsectionComponent({
             id={`data.${row.path}`}
             title={row.title}
             previousValue={previousValues?.[row.path]}
-            value={currentValues[row.path] || ""}
+            value={values[row.path] || ""}
             onChange={(e) => {
-              setValues(row.path, e.target.value);
+              handleChange(row.path, e.target.value);
             }}
             autoFocusInput={row.autoFocusInput}
             addSeparator={row.addSeparator}

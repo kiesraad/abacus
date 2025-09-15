@@ -9,10 +9,7 @@ import { FormLayout } from "@/components/ui/Form/FormLayout";
 import { InputField } from "@/components/ui/InputField/InputField";
 import { useElection } from "@/hooks/election/useElection";
 import { t } from "@/i18n/translate";
-import {
-  COMMITTEE_SESSION_INVESTIGATION_CREATE_REQUEST_PATH,
-  PollingStationInvestigationCreateRequest,
-} from "@/types/generated/openapi";
+import { PollingStationInvestigationCreateRequest } from "@/types/generated/openapi";
 import { StringFormData } from "@/utils/stringFormData";
 
 interface InvestigationReasonProps {
@@ -21,9 +18,9 @@ interface InvestigationReasonProps {
 
 export function InvestigationReason({ pollingStationId }: InvestigationReasonProps) {
   const navigate = useNavigate();
-  const { currentCommitteeSession, refetch } = useElection();
+  const { refetch } = useElection();
   const [nonEmptyError, setNonEmptyError] = useState(false);
-  const path: COMMITTEE_SESSION_INVESTIGATION_CREATE_REQUEST_PATH = `/api/committee_sessions/${currentCommitteeSession.id}/investigations`;
+  const path = `/api/polling_stations/${pollingStationId}/investigations`;
   const { create } = useCrud<PollingStationInvestigationCreateRequest>({ create: path });
 
   const [error, setError] = useState<AnyApiError>();
@@ -45,7 +42,8 @@ export function InvestigationReason({ pollingStationId }: InvestigationReasonPro
 
     setNonEmptyError(false);
 
-    const response = await create({ polling_station_id: pollingStationId, reason });
+    const body: PollingStationInvestigationCreateRequest = { reason };
+    const response = await create(body);
     if (isSuccess(response)) {
       await refetch();
       await navigate("../print-corrigendum");

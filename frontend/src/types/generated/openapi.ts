@@ -18,18 +18,6 @@ export interface COMMITTEE_SESSION_DELETE_REQUEST_PARAMS {
 }
 export type COMMITTEE_SESSION_DELETE_REQUEST_PATH = `/api/committee_sessions/${number}`;
 
-// /api/committee_sessions/{committee_session_id}/investigations
-export interface COMMITTEE_SESSION_INVESTIGATION_CONCLUDE_REQUEST_PARAMS {
-  committee_session_id: number;
-}
-export type COMMITTEE_SESSION_INVESTIGATION_CONCLUDE_REQUEST_PATH = `/api/committee_sessions/${number}/investigations`;
-export type COMMITTEE_SESSION_INVESTIGATION_CONCLUDE_REQUEST_BODY = PollingStationInvestigationConcludeRequest;
-export interface COMMITTEE_SESSION_INVESTIGATION_CREATE_REQUEST_PARAMS {
-  committee_session_id: number;
-}
-export type COMMITTEE_SESSION_INVESTIGATION_CREATE_REQUEST_PATH = `/api/committee_sessions/${number}/investigations`;
-export type COMMITTEE_SESSION_INVESTIGATION_CREATE_REQUEST_BODY = PollingStationInvestigationCreateRequest;
-
 // /api/committee_sessions/{committee_session_id}/status
 export interface COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_PARAMS {
   committee_session_id: number;
@@ -228,6 +216,18 @@ export interface POLLING_STATION_DATA_ENTRY_FINALISE_REQUEST_PARAMS {
 }
 export type POLLING_STATION_DATA_ENTRY_FINALISE_REQUEST_PATH =
   `/api/polling_stations/${number}/data_entries/${number}/finalise`;
+
+// /api/polling_stations/{polling_station_id}/investigations
+export interface COMMITTEE_SESSION_INVESTIGATION_CONCLUDE_REQUEST_PARAMS {
+  polling_station_id: number;
+}
+export type COMMITTEE_SESSION_INVESTIGATION_CONCLUDE_REQUEST_PATH = `/api/polling_stations/${number}/investigations`;
+export type COMMITTEE_SESSION_INVESTIGATION_CONCLUDE_REQUEST_BODY = PollingStationInvestigationConcludeRequest;
+export interface COMMITTEE_SESSION_INVESTIGATION_CREATE_REQUEST_PARAMS {
+  polling_station_id: number;
+}
+export type COMMITTEE_SESSION_INVESTIGATION_CREATE_REQUEST_PATH = `/api/polling_stations/${number}/investigations`;
+export type COMMITTEE_SESSION_INVESTIGATION_CREATE_REQUEST_BODY = PollingStationInvestigationCreateRequest;
 
 // /api/user
 export type USER_LIST_REQUEST_PARAMS = Record<string, never>;
@@ -1026,7 +1026,6 @@ export interface PollingStationImportDetails {
 export interface PollingStationInvestigation {
   corrected_results?: boolean;
   findings?: string;
-  id: number;
   polling_station_id: number;
   reason: string;
 }
@@ -1034,11 +1033,9 @@ export interface PollingStationInvestigation {
 export interface PollingStationInvestigationConcludeRequest {
   corrected_results: boolean;
   findings: string;
-  id: number;
 }
 
 export interface PollingStationInvestigationCreateRequest {
-  polling_station_id: number;
   reason: string;
 }
 

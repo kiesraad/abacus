@@ -217,9 +217,8 @@ export const CommitteeSessionInvestigationCreateHandler = http.post<
   ParamsToString<COMMITTEE_SESSION_INVESTIGATION_CREATE_REQUEST_PARAMS>,
   COMMITTEE_SESSION_INVESTIGATION_CREATE_REQUEST_BODY,
   PollingStationInvestigation
->("/api/committee_sessions/1/investigations" satisfies COMMITTEE_SESSION_INVESTIGATION_CREATE_REQUEST_PATH, () => {
+>("/api/polling_stations/1/investigations" satisfies COMMITTEE_SESSION_INVESTIGATION_CREATE_REQUEST_PATH, () => {
   const response: PollingStationInvestigation = {
-    id: 1,
     polling_station_id: 1,
     reason: "Test reason",
   };
@@ -230,9 +229,8 @@ export const CommitteeSessionInvestigationConcludeHandler = http.put<
   ParamsToString<COMMITTEE_SESSION_INVESTIGATION_CONCLUDE_REQUEST_PARAMS>,
   COMMITTEE_SESSION_INVESTIGATION_CONCLUDE_REQUEST_BODY,
   PollingStationInvestigation
->("/api/committee_sessions/1/investigations" satisfies COMMITTEE_SESSION_INVESTIGATION_CONCLUDE_REQUEST_PATH, () => {
+>("/api/polling_stations/1/investigations" satisfies COMMITTEE_SESSION_INVESTIGATION_CONCLUDE_REQUEST_PATH, () => {
   const response: PollingStationInvestigation = {
-    id: 1,
     polling_station_id: 1,
     reason: "Test reason",
     findings: "Test findings",

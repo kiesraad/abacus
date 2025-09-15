@@ -12,7 +12,7 @@ import { Loader } from "@/components/ui/Loader/Loader";
 import { useElection } from "@/hooks/election/useElection";
 import { t } from "@/i18n/translate";
 import {
-  COMMITTEE_SESSION_INVESTIGATION_CONCLUDE_REQUEST_PATH,
+  PollingStationInvestigationConcludeRequest,
   PollingStationInvestigationCreateRequest,
 } from "@/types/generated/openapi";
 import { StringFormData } from "@/utils/stringFormData";
@@ -24,8 +24,8 @@ interface InvestigationFindingsProps {
 export function InvestigationFindings({ pollingStationId }: InvestigationFindingsProps) {
   const navigate = useNavigate();
 
-  const { election, currentCommitteeSession, investigation, refetch } = useElection(pollingStationId);
-  const path: COMMITTEE_SESSION_INVESTIGATION_CONCLUDE_REQUEST_PATH = `/api/committee_sessions/${currentCommitteeSession.id}/investigations`;
+  const { election, investigation, refetch } = useElection(pollingStationId);
+  const path = `/api/polling_stations/${pollingStationId}/investigations`;
   const { update } = useCrud<PollingStationInvestigationCreateRequest>({ update: path });
   const [nonEmptyError, setNonEmptyError] = useState(false);
   const [radioError, setRadioError] = useState(false);
@@ -66,7 +66,8 @@ export function InvestigationFindings({ pollingStationId }: InvestigationFinding
     }
 
     const correctedResults = correctedResultsChoice === "yes";
-    const response = await update({ id: investigation.id, findings, corrected_results: correctedResults });
+    const body: PollingStationInvestigationConcludeRequest = { findings, corrected_results: correctedResults };
+    const response = await update(body);
     if (isSuccess(response)) {
       await refetch();
       await navigate(`/elections/${election.id}/investigations`);

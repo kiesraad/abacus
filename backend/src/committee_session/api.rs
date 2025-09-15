@@ -309,31 +309,31 @@ pub async fn committee_session_status_change(
 /// Create an investigation for a certain polling station
 #[utoipa::path(
     post,
-    path = "/api/committee_sessions/{committee_session_id}/investigations",
+    path = "/api/polling_stations/{polling_station_id}/investigations",
     request_body = PollingStationInvestigationCreateRequest,
     responses(
-        (status = 200, description = "Committee session investigation added successfully"),
+        (status = 200, description = "Polling station investigation added successfully"),
         (status = 401, description = "Unauthorized", body = ErrorResponse),
         (status = 403, description = "Forbidden", body = ErrorResponse),
-        (status = 404, description = "Committee session not found", body = ErrorResponse),
+        (status = 404, description = "Polling station not found", body = ErrorResponse),
         (status = 409, description = "Request cannot be completed", body = ErrorResponse),
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
     params(
-        ("committee_session_id" = u32, description = "Committee session database id"),
+        ("polling_station_id" = u32, description = "Polling station database id"),
     ),
 )]
 pub async fn committee_session_investigation_create(
     _user: Coordinator,
     State(pool): State<SqlitePool>,
     audit_service: AuditService,
-    Path(committee_session_id): Path<u32>,
+    Path(polling_station_id): Path<u32>,
     Json(polling_station_investigation): Json<PollingStationInvestigationCreateRequest>,
 ) -> Result<PollingStationInvestigation, APIError> {
     let mut tx = pool.begin_immediate().await?;
     let investigation = create_polling_station_investigation(
         &mut tx,
-        committee_session_id,
+        polling_station_id,
         polling_station_investigation,
     )
     .await?;
@@ -351,29 +351,34 @@ pub async fn committee_session_investigation_create(
 /// Conclude an investigation for a certain polling station
 #[utoipa::path(
     put,
-    path = "/api/committee_sessions/{committee_session_id}/investigations",
+    path = "/api/polling_stations/{polling_station_id}/investigations",
     request_body = PollingStationInvestigationConcludeRequest,
     responses(
-        (status = 200, description = "Committee session investigation concluded successfully"),
+        (status = 200, description = "Polling station investigation concluded successfully"),
         (status = 401, description = "Unauthorized", body = ErrorResponse),
         (status = 403, description = "Forbidden", body = ErrorResponse),
-        (status = 404, description = "Committee session not found", body = ErrorResponse),
+        (status = 404, description = "Investigation not found", body = ErrorResponse),
         (status = 409, description = "Request cannot be completed", body = ErrorResponse),
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
     params(
-        ("committee_session_id" = u32, description = "Committee session database id"),
+        ("polling_station_id" = u32, description = "Polling station database id"),
     ),
 )]
 pub async fn committee_session_investigation_conclude(
     _user: Coordinator,
     State(pool): State<SqlitePool>,
     audit_service: AuditService,
+    Path(polling_station_id): Path<u32>,
     Json(polling_station_investigation): Json<PollingStationInvestigationConcludeRequest>,
 ) -> Result<PollingStationInvestigation, APIError> {
     let mut tx = pool.begin_immediate().await?;
-    let investigation =
-        conclude_polling_station_investigation(&mut tx, polling_station_investigation).await?;
+    let investigation = conclude_polling_station_investigation(
+        &mut tx,
+        polling_station_id,
+        polling_station_investigation,
+    )
+    .await?;
     audit_service
         .log(
             &mut tx,

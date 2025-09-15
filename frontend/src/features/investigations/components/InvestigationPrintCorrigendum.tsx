@@ -6,11 +6,13 @@ import { t, tx } from "@/i18n/translate";
 
 interface InvestigationPrintCorrigendumProps {
   electionId: number;
+  pollingStationId: number;
   pollingStationNumber: number;
 }
 
 export function InvestigationPrintCorrigendum({
   electionId,
+  pollingStationId,
   pollingStationNumber,
 }: InvestigationPrintCorrigendumProps) {
   return (
@@ -24,7 +26,7 @@ export function InvestigationPrintCorrigendum({
             </ul>
             <DownloadButton
               icon="download"
-              href="#" // TODO insert download URL
+              href={`/api/polling_stations/${pollingStationId}/investigation/download_corrigendum_pdf`}
               title={t("investigations.print_corrigendum.download_corrigendum_link", { number: pollingStationNumber })}
               subtitle="Na 14-2 Bijlage 1"
             />

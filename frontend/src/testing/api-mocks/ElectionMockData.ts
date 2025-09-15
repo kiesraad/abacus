@@ -281,7 +281,25 @@ export const getElectionMockData = (
     investigations: [
       {
         polling_station_id: 1,
-        reason: "Test reason",
+        reason: "Test reason 1",
+      },
+      {
+        polling_station_id: 3,
+        reason: "Test reason 2",
+        findings: "Test findings 2",
+        corrected_results: true,
+      },
+      {
+        polling_station_id: 2,
+        reason: "Test reason 3",
+        findings: "Test findings 3",
+        corrected_results: false,
+      },
+      {
+        polling_station_id: 2,
+        reason: "Test reason 4",
+        findings: "Test findings 4",
+        corrected_results: true,
       },
     ],
   };

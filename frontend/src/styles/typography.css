@@ -74,6 +74,10 @@ p.md {
   margin-bottom: var(--space-md);
 }
 
+ul.md {
+  max-width: 38rem;
+}
+
 section.sm {
   p,
   ul,

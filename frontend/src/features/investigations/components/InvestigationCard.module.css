@@ -1,0 +1,43 @@
+.card {
+  background-color: var(--base-white);
+  border: 1px solid var(--border-color-default);
+  margin: var(--space-md) 0;
+  padding: var(--space-md-lg);
+  border-radius: var(--rounded-default);
+  max-width: 40rem;
+
+  h3 {
+    font-size: var(--font-size-lg);
+  }
+
+  h4 {
+    font-size: var(--font-size-md);
+    font-weight: 700;
+    margin-top: var(--space-md-lg);
+    margin-bottom: var(--space-sm);
+
+    /* Align the icon in a header */
+    display: flex;
+    gap: var(--space-sm);
+  }
+
+  a {
+    color: var(--link-default);
+    text-decoration: none;
+
+    /* Align the icon in a link */
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+  }
+}
+
+.card_header {
+  display: flex;
+  gap: var(--space-md);
+  align-items: center;
+
+  a {
+    margin-left: auto;
+  }
+}

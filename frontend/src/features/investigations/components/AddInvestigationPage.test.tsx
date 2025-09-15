@@ -62,8 +62,8 @@ describe("AddInvestigationPage", () => {
     expect(table).toBeInTheDocument();
     expect(table).toHaveTableContent([
       ["Nummer", "Stembureau"],
-      ["34", "Testplek"],
-      ["35", "Testschool"],
+      // ["34", "Testplek"],
+      // ["35", "Testschool"],
       ["36", "Testbuurthuis"],
       ["37", "Dansschool Oeps nou deed ik het weer"],
       ["38", "Testmuseum"],
@@ -75,11 +75,11 @@ describe("AddInvestigationPage", () => {
   test("It navigates to add investigation when clicking a table row", async () => {
     const router = await renderPage();
 
-    const row = await screen.findByRole("row", { name: "34 Testplek" });
+    const row = await screen.findByRole("row", { name: "36 Testbuurthuis" });
     row.click();
 
     await waitFor(() => {
-      expect(router.state.location.pathname).toEqual("/elections/1/investigations/add/2/reason");
+      expect(router.state.location.pathname).toEqual("/elections/1/investigations/add/4/reason");
     });
   });
 
@@ -92,6 +92,6 @@ describe("AddInvestigationPage", () => {
     expect(screen.queryByRole("row", { name: "33 Op Rolletjes" })).not.toBeInTheDocument();
 
     // But other polling stations should still be visible
-    expect(await screen.findByRole("row", { name: "34 Testplek" })).toBeVisible();
+    expect(await screen.findByRole("row", { name: "36 Testbuurthuis" })).toBeVisible();
   });
 });

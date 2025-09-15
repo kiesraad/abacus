@@ -17,10 +17,9 @@ use crate::{
     APIError, AppState, ErrorResponse, SqlitePoolExt,
     audit_log::{AuditEvent, AuditService},
     authentication::{Admin, User},
-    committee_session::{
-        CommitteeSession, CommitteeSessionCreateRequest, PollingStationInvestigation,
-    },
+    committee_session::{CommitteeSession, CommitteeSessionCreateRequest},
     eml::{EML110, EML230, EMLDocument, EMLImportError, EmlHash, RedactedEmlHash},
+    investigation::PollingStationInvestigation,
     polling_station::{
         PollingStation, PollingStationRequest, PollingStationsRequest,
         create_imported_polling_stations,
@@ -115,7 +114,7 @@ pub async fn election_details(
         .clone();
     let polling_stations =
         crate::polling_station::repository::list(&mut conn, current_committee_session.id).await?;
-    let investigations = crate::committee_session::repository::investigations(
+    let investigations = crate::investigation::list_investigations_for_committee_session(
         &mut conn,
         current_committee_session.id,
     )

@@ -2727,7 +2727,7 @@
     },
     "/api/polling_stations/{polling_station_id}/investigations": {
       "put": {
-        "summary": "Conclude an investigation for a certain polling station",
+        "summary": "Conclude an investigation for a polling station",
         "operationId": "committee_session_investigation_conclude",
         "parameters": [
           {
@@ -2809,7 +2809,7 @@
         }
       },
       "post": {
-        "summary": "Create an investigation for a certain polling station",
+        "summary": "Create an investigation for a polling station",
         "operationId": "committee_session_investigation_create",
         "parameters": [
           {

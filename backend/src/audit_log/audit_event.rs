@@ -5,7 +5,7 @@ use strum::VariantNames;
 use utoipa::ToSchema;
 
 use super::AuditEventLevel;
-use crate::{ErrorResponse, committee_session::PollingStationInvestigation, error::ErrorReference};
+use crate::{ErrorResponse, error::ErrorReference, investigation::PollingStationInvestigation};
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, Eq, ToSchema)]
 #[serde(deny_unknown_fields)]

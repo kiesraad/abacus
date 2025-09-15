@@ -16,13 +16,7 @@ use crate::{
     APIError, AppState, ErrorResponse, SqlitePoolExt,
     audit_log::{AuditEvent, AuditService},
     authentication::Coordinator,
-    committee_session::{
-        CommitteeSessionUpdateRequest, PollingStationInvestigation,
-        PollingStationInvestigationConcludeRequest, PollingStationInvestigationCreateRequest,
-        repository::{
-            conclude_polling_station_investigation, create_polling_station_investigation,
-        },
-    },
+    committee_session::CommitteeSessionUpdateRequest,
 };
 
 #[derive(Debug, PartialEq, Eq)]
@@ -46,8 +40,6 @@ pub fn router() -> OpenApiRouter<AppState> {
         .routes(routes!(committee_session_update))
         .routes(routes!(committee_session_number_of_voters_change))
         .routes(routes!(committee_session_status_change))
-        .routes(routes!(committee_session_investigation_create))
-        .routes(routes!(committee_session_investigation_conclude))
 }
 
 /// Create a new [CommitteeSession].
@@ -304,90 +296,6 @@ pub async fn committee_session_status_change(
     tx.commit().await?;
 
     Ok(StatusCode::OK)
-}
-
-/// Create an investigation for a certain polling station
-#[utoipa::path(
-    post,
-    path = "/api/polling_stations/{polling_station_id}/investigations",
-    request_body = PollingStationInvestigationCreateRequest,
-    responses(
-        (status = 200, description = "Polling station investigation added successfully"),
-        (status = 401, description = "Unauthorized", body = ErrorResponse),
-        (status = 403, description = "Forbidden", body = ErrorResponse),
-        (status = 404, description = "Polling station not found", body = ErrorResponse),
-        (status = 409, description = "Request cannot be completed", body = ErrorResponse),
-        (status = 500, description = "Internal server error", body = ErrorResponse),
-    ),
-    params(
-        ("polling_station_id" = u32, description = "Polling station database id"),
-    ),
-)]
-pub async fn committee_session_investigation_create(
-    _user: Coordinator,
-    State(pool): State<SqlitePool>,
-    audit_service: AuditService,
-    Path(polling_station_id): Path<u32>,
-    Json(polling_station_investigation): Json<PollingStationInvestigationCreateRequest>,
-) -> Result<PollingStationInvestigation, APIError> {
-    let mut tx = pool.begin_immediate().await?;
-    let investigation = create_polling_station_investigation(
-        &mut tx,
-        polling_station_id,
-        polling_station_investigation,
-    )
-    .await?;
-    audit_service
-        .log(
-            &mut tx,
-            &AuditEvent::PollingStationInvestigationCreated(investigation.clone()),
-            None,
-        )
-        .await?;
-    tx.commit().await?;
-    Ok(investigation)
-}
-
-/// Conclude an investigation for a certain polling station
-#[utoipa::path(
-    put,
-    path = "/api/polling_stations/{polling_station_id}/investigations",
-    request_body = PollingStationInvestigationConcludeRequest,
-    responses(
-        (status = 200, description = "Polling station investigation concluded successfully"),
-        (status = 401, description = "Unauthorized", body = ErrorResponse),
-        (status = 403, description = "Forbidden", body = ErrorResponse),
-        (status = 404, description = "Investigation not found", body = ErrorResponse),
-        (status = 409, description = "Request cannot be completed", body = ErrorResponse),
-        (status = 500, description = "Internal server error", body = ErrorResponse),
-    ),
-    params(
-        ("polling_station_id" = u32, description = "Polling station database id"),
-    ),
-)]
-pub async fn committee_session_investigation_conclude(
-    _user: Coordinator,
-    State(pool): State<SqlitePool>,
-    audit_service: AuditService,
-    Path(polling_station_id): Path<u32>,
-    Json(polling_station_investigation): Json<PollingStationInvestigationConcludeRequest>,
-) -> Result<PollingStationInvestigation, APIError> {
-    let mut tx = pool.begin_immediate().await?;
-    let investigation = conclude_polling_station_investigation(
-        &mut tx,
-        polling_station_id,
-        polling_station_investigation,
-    )
-    .await?;
-    audit_service
-        .log(
-            &mut tx,
-            &AuditEvent::PollingStationInvestigationConcluded(investigation.clone()),
-            None,
-        )
-        .await?;
-    tx.commit().await?;
-    Ok(investigation)
 }
 
 #[cfg(test)]

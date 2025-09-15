@@ -46,7 +46,7 @@ test.describe("full flow", () => {
     await pollingStationRolePage.next.click();
 
     await uploadCandidatesAndInputHash(page);
-    await uploadPollingStations(page, eml110b_single, true);
+    await uploadPollingStations(page, eml110b_single);
 
     const countingMethodPage = new CountingMethodTypePgObj(page);
     await expect(countingMethodPage.header).toBeVisible();

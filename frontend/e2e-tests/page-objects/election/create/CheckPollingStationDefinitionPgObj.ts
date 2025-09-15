@@ -14,7 +14,6 @@ export class CheckPollingStationDefinitionPgObj {
     this.next = page.getByRole("button", { name: "Volgende" });
     this.table = page.getByTestId("overview");
     this.stations = this.table.locator("tbody").getByRole("row");
-    this.showMore = page.getByRole("button", { name: /Toon alle \d+ stembureaus/ });
     this.warning = page.getByRole("strong").filter({ hasText: "Afwijkende verkiezing" });
   }
 }

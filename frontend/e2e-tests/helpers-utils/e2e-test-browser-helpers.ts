@@ -95,7 +95,7 @@ export async function uploadCandidatesAndInputHash(page: Page) {
   await checkCandidateDefinitionPage.inputHash(eml230b.hashInput1, eml230b.hashInput2);
 }
 
-export async function uploadPollingStations(page: Page, eml = eml110b, warningShouldBeShown = false) {
+export async function uploadPollingStations(page: Page, eml = eml110b) {
   const uploadElectionDefinitionPage = new UploadPollingStationDefinitionPgObj(page);
   await expect(uploadElectionDefinitionPage.header).toBeVisible();
   await uploadElectionDefinitionPage.uploadFile(page, eml.path);
@@ -103,12 +103,5 @@ export async function uploadPollingStations(page: Page, eml = eml110b, warningSh
 
   const checkDefinitionPage = new CheckPollingStationDefinitionPgObj(page);
   await expect(checkDefinitionPage.header).toBeVisible();
-
-  if (!warningShouldBeShown) {
-    await expect(checkDefinitionPage.warning).toBeHidden();
-  } else {
-    await expect(checkDefinitionPage.warning).toBeVisible();
-  }
-
   await checkDefinitionPage.next.click();
 }

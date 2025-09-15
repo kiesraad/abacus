@@ -2080,7 +2080,7 @@ mod tests {
             Ok(())
         }
 
-        /// CSO | F.303: "Vergelijk D&H": (checkbox H>D is aangevinkt, maar H<=D)
+        /// CSO | F.303: "Vergelijk D&H": (checkbox H<D is aangevinkt, maar H>=D)
         #[test]
         fn test_f303() -> Result<(), DataError> {
             let mut data = DifferencesCounts::zero();
@@ -2284,7 +2284,39 @@ mod tests {
             Ok(())
         }
 
-        /// CSO | F.306 (Als H > D) `I <> H - D`
+        /// CSO | F.305 (Als D = H) I en J zijn ingevuld
+        #[test]
+        fn test_f305_more_and_fewer_ballots_count() -> Result<(), DataError> {
+            let mut data = DifferencesCounts::zero();
+
+            data.more_ballots_count = 4;
+            data.fewer_ballots_count = 4;
+            data.compare_votes_cast_admitted_voters
+                .admitted_voters_equal_votes_cast = true;
+            data.difference_completely_accounted_for.yes = true;
+
+            let validation_results = validate(data, 52, 52)?;
+
+            assert_eq!(
+                validation_results.errors,
+                [
+                    ValidationResult {
+                        code: ValidationResultCode::F305,
+                        fields: vec!["differences_counts.more_ballots_count".into()],
+                        context: None,
+                    },
+                    ValidationResult {
+                        code: ValidationResultCode::F305,
+                        fields: vec!["differences_counts.fewer_ballots_count".into()],
+                        context: None,
+                    }
+                ]
+            );
+
+            Ok(())
+        }
+
+        /// CSO | F.306 (Als H > D) I <> H - D
         #[test]
         fn test_f306() -> Result<(), DataError> {
             let mut data = DifferencesCounts::zero();
@@ -2339,7 +2371,7 @@ mod tests {
             Ok(())
         }
 
-        /// CSO | F.308 (Als H < D) `J <> D - H`
+        /// CSO | F.308 (Als H < D) J <> D - H
         #[test]
         fn test_f308() -> Result<(), DataError> {
             let mut data = DifferencesCounts::zero();

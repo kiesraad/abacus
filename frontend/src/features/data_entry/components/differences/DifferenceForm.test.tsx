@@ -420,7 +420,7 @@ describe("Test DifferencesForm", () => {
       expectFieldsToHaveIconAndToHaveAccessibleName(expectedInvalidInputFieldIds, "bevat een fout");
     });
 
-    test("F.306 Votes > voters checked, but more_ballots_count <> votes - voters", async () => {
+    test("F.306 Votes > voters, but more_ballots_count <> votes - voters", async () => {
       const user = userEvent.setup();
 
       overrideServerClaimDataEntryResponse({
@@ -462,7 +462,7 @@ describe("Test DifferencesForm", () => {
       expectFieldsToHaveIconAndToHaveAccessibleName(expectedInvalidInputFieldIds, "bevat een fout");
     });
 
-    test("F.307 Votes > voters checked, but fewer_ballots_count is filled in", async () => {
+    test("F.307 Votes > voters, but fewer_ballots_count is filled in", async () => {
       const user = userEvent.setup();
 
       overrideServerClaimDataEntryResponse({
@@ -504,7 +504,7 @@ describe("Test DifferencesForm", () => {
       expectFieldsToHaveIconAndToHaveAccessibleName(expectedInvalidInputFieldIds, "bevat een fout");
     });
 
-    test("F.308 Votes < voters checked, but fewer_ballots_count <> voters - votes", async () => {
+    test("F.308 Votes < voters, but fewer_ballots_count <> voters - votes", async () => {
       const user = userEvent.setup();
 
       overrideServerClaimDataEntryResponse({
@@ -546,7 +546,7 @@ describe("Test DifferencesForm", () => {
       expectFieldsToHaveIconAndToHaveAccessibleName(expectedInvalidInputFieldIds, "bevat een fout");
     });
 
-    test("F.309 Votes < voters checked, but more_ballots_count is filled in", async () => {
+    test("F.309 Votes < voters, but more_ballots_count is filled in", async () => {
       const user = userEvent.setup();
 
       overrideServerClaimDataEntryResponse({

@@ -175,6 +175,8 @@ section.scroll {
   display: flex;
   flex-direction: column;
   align-items: stretch;
+  min-height: 12rem;
+
   ul {
     width: 100%;
     flex: 1;

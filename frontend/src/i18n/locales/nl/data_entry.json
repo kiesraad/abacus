@@ -26,6 +26,7 @@
   "list": {
     "not_found": "Geen lijst gevonden voor {listNumber}"
   },
+  "previous_value": "Eerder geteld aantal",
   "pick_polling_station": "Kies een stembureau",
   "second_entry": "2e invoer",
   "success": {

@@ -101,7 +101,7 @@ pub struct CommitteeSessionFilesUpdateRequest {
     pub results_pdf: Option<u32>,
 }
 
-#[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq, ToSchema, Type, FromRow)]
+#[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq, ToSchema)]
 #[serde(deny_unknown_fields)]
 pub struct PollingStationInvestigation {
     pub polling_station_id: u32,
@@ -120,13 +120,13 @@ impl IntoResponse for PollingStationInvestigation {
     }
 }
 
-#[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq, ToSchema, Type, FromRow)]
+#[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq, ToSchema)]
 #[serde(deny_unknown_fields)]
 pub struct PollingStationInvestigationCreateRequest {
     pub reason: String,
 }
 
-#[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq, ToSchema, Type, FromRow)]
+#[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq, ToSchema)]
 #[serde(deny_unknown_fields)]
 pub struct PollingStationInvestigationConcludeRequest {
     pub findings: String,

@@ -1,6 +1,6 @@
 {
     "election": {
-        "id": 1,
+        "id": 2,
         "name": "Gemeenteraad Test 2022",
         "counting_method": "CSO",
         "election_id": "GR2022_Test",
@@ -186,6 +186,7 @@
     "polling_station": {
         "id": 87,
         "election_id": 2,
+        "committee_session_id": 1,
         "name": "Hotel Van Den Stem",
         "number": 1,
         "number_of_voters": 820,
@@ -195,6 +196,7 @@
         "locality": "Eemstricht"
     },
     "investigation": {
+        "polling_station_id": 87,
         "reason": "Er is een onverklaard verschil tussen het totaal aantal getelde stembiljetten het aantal toegelaten kiezers wat onderzocht moet worden."
     },
     "previous_results": {

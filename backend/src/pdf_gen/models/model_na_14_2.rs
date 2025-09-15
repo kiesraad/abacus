@@ -3,6 +3,7 @@ use serde::{Deserialize, Serialize};
 use crate::{
     data_entry::PollingStationResults,
     election::ElectionWithPoliticalGroups,
+    investigation::PollingStationInvestigation,
     pdf_gen::models::{PdfFileModel, PdfModel, ToPdfFileModel},
     polling_station::structs::PollingStation,
 };
@@ -11,8 +12,8 @@ use crate::{
 #[serde(deny_unknown_fields)]
 pub struct ModelNa14_2Input {
     pub election: ElectionWithPoliticalGroups,
-    // TODO: Add previous results
-    // TODO: Add new results
+    // pub previous_results: Vec<PollingStationResults>,
+    // pub corrected_results: Vec<PollingStationResults>,
     // TODO: Add polling station numbers with more votes than voters
     // TODO: Add polling station numbers with less votes than voters
 }
@@ -29,7 +30,7 @@ pub struct ModelNa14_2Bijlage1Input {
     pub election: ElectionWithPoliticalGroups,
     pub polling_station: PollingStation,
     pub previous_results: PollingStationResults,
-    //pub investigation: Investigation,
+    pub investigation: PollingStationInvestigation,
 }
 
 impl ToPdfFileModel for ModelNa14_2Bijlage1Input {

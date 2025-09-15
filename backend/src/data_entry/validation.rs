@@ -2022,8 +2022,18 @@ mod tests {
         /// CSO | F.301: "Vergelijk D&H": (checkbox D=H is aangevinkt, maar D<>H)
         #[test]
         fn test_f301() -> Result<(), DataError> {
+            // D=H checked, D=H
             let mut data = DifferencesCounts::zero();
+            data.compare_votes_cast_admitted_voters
+                .admitted_voters_equal_votes_cast = true;
+            data.difference_completely_accounted_for.yes = true;
 
+            let validation_results = validate(data, 105, 105)?;
+
+            assert!(validation_results.errors.is_empty());
+
+            // D=H checked, but D<>H
+            let mut data = DifferencesCounts::zero();
             data.compare_votes_cast_admitted_voters
                 .admitted_voters_equal_votes_cast = true;
             data.difference_completely_accounted_for.yes = true;
@@ -2053,6 +2063,18 @@ mod tests {
         /// CSO | F.302: "Vergelijk D&H": (checkbox H>D is aangevinkt, maar H<=D)
         #[test]
         fn test_f302() -> Result<(), DataError> {
+            // H>D checked, H>D
+            let mut data = DifferencesCounts::zero();
+            data.more_ballots_count = 1;
+            data.compare_votes_cast_admitted_voters
+                .votes_cast_greater_than_admitted_voters = true;
+            data.difference_completely_accounted_for.yes = true;
+
+            let validation_results = validate(data, 104, 105)?;
+
+            assert!(validation_results.errors.is_empty());
+
+            // H>D checked, H<=D
             let mut data = DifferencesCounts::zero();
             data.compare_votes_cast_admitted_voters
                 .votes_cast_greater_than_admitted_voters = true;
@@ -2083,6 +2105,19 @@ mod tests {
         /// CSO | F.303: "Vergelijk D&H": (checkbox H<D is aangevinkt, maar H>=D)
         #[test]
         fn test_f303() -> Result<(), DataError> {
+            // H < D checked, H < D
+            let mut data = DifferencesCounts::zero();
+
+            data.fewer_ballots_count = 1;
+            data.compare_votes_cast_admitted_voters
+                .votes_cast_smaller_than_admitted_voters = true;
+            data.difference_completely_accounted_for.yes = true;
+
+            let validation_results = validate(data, 104, 103)?;
+
+            assert!(validation_results.errors.is_empty());
+
+            // H < D checked, H >= D
             let mut data = DifferencesCounts::zero();
 
             data.compare_votes_cast_admitted_voters
@@ -2113,6 +2148,83 @@ mod tests {
         /// CSO | F.304: "Vergelijk D&H": Meerdere aangevinkt of geen enkele aangevinkt
         #[test]
         fn test_f304_none_checked() -> Result<(), DataError> {
+            // D = H checked, D = H
+            let mut data = DifferencesCounts::zero();
+
+            data.compare_votes_cast_admitted_voters
+                .admitted_voters_equal_votes_cast = true;
+            data.difference_completely_accounted_for.yes = true;
+
+            let validation_results = validate(data, 105, 105)?;
+
+            assert!(validation_results.errors.is_empty());
+
+            // H > D checked, H > D
+            let mut data = DifferencesCounts::zero();
+
+            data.more_ballots_count = 1;
+            data.compare_votes_cast_admitted_voters
+                .votes_cast_greater_than_admitted_voters = true;
+            data.difference_completely_accounted_for.yes = true;
+
+            let validation_results = validate(data, 104, 105)?;
+
+            assert!(validation_results.errors.is_empty());
+
+            // H < D checked, H < D
+            let mut data = DifferencesCounts::zero();
+
+            data.fewer_ballots_count = 1;
+            data.compare_votes_cast_admitted_voters
+                .votes_cast_smaller_than_admitted_voters = true;
+            data.difference_completely_accounted_for.yes = true;
+
+            let validation_results = validate(data, 105, 104)?;
+
+            assert!(validation_results.errors.is_empty());
+
+            // none checked, H = D
+            let mut data = DifferencesCounts::zero();
+
+            data.difference_completely_accounted_for.yes = true;
+
+            let validation_results = validate(data, 105, 105)?;
+
+            assert_eq!(
+                validation_results.errors,
+                [ValidationResult {
+                    code: ValidationResultCode::F304,
+                    fields: vec!["differences_counts.compare_votes_cast_admitted_voters".into(),],
+                    context: None,
+                }]
+            );
+
+            // none checked, H > D
+            let mut data = DifferencesCounts::zero();
+
+            data.difference_completely_accounted_for.yes = true;
+
+            let validation_results = validate(data, 104, 105)?;
+
+            assert_eq!(
+                validation_results.errors,
+                [
+                    ValidationResult {
+                        code: ValidationResultCode::F304,
+                        fields: vec![
+                            "differences_counts.compare_votes_cast_admitted_voters".into(),
+                        ],
+                        context: None,
+                    },
+                    ValidationResult {
+                        code: ValidationResultCode::F306,
+                        fields: vec!["differences_counts.more_ballots_count".into(),],
+                        context: None,
+                    }
+                ]
+            );
+
+            // none checked, H < D
             let mut data = DifferencesCounts::zero();
 
             data.difference_completely_accounted_for.yes = true;
@@ -2143,6 +2255,7 @@ mod tests {
         /// CSO | F.304: "Vergelijk D&H": Meerdere aangevinkt of geen enkele aangevinkt
         #[test]
         fn test_f304_multiple_checked() -> Result<(), DataError> {
+            // H=D and H > D checked
             let mut data = DifferencesCounts::zero();
 
             data.compare_votes_cast_admitted_voters
@@ -2165,6 +2278,76 @@ mod tests {
                     code: ValidationResultCode::F302,
                     fields: vec![
                         "differences_counts.compare_votes_cast_admitted_voters.votes_cast_greater_than_admitted_voters".into(),
+                    ],
+                    context: None,
+                },ValidationResult {
+                    code: ValidationResultCode::F304,
+                    fields: vec![
+                        "differences_counts.compare_votes_cast_admitted_voters".into(),
+                    ],
+                    context: None,
+                },
+                ValidationResult {
+                    code: ValidationResultCode::F308,
+                    fields: vec![
+                        "differences_counts.fewer_ballots_count".into(),
+                    ],
+                    context: None,
+                }]
+            );
+
+            // H = D and H < D checked
+            let mut data = DifferencesCounts::zero();
+
+            data.compare_votes_cast_admitted_voters
+                .admitted_voters_equal_votes_cast = true;
+            data.compare_votes_cast_admitted_voters
+                .votes_cast_smaller_than_admitted_voters = true;
+            data.difference_completely_accounted_for.yes = true;
+
+            let validation_results = validate(data, 105, 104)?;
+
+            assert_eq!(
+                validation_results.errors,
+                [ValidationResult {
+                    code: ValidationResultCode::F301,
+                    fields: vec![
+                        "differences_counts.compare_votes_cast_admitted_voters.admitted_voters_equal_votes_cast".into(),
+                    ],
+                    context: None,
+                },ValidationResult {
+                    code: ValidationResultCode::F304,
+                    fields: vec![
+                        "differences_counts.compare_votes_cast_admitted_voters".into(),
+                    ],
+                    context: None,
+                },
+                ValidationResult {
+                    code: ValidationResultCode::F308,
+                    fields: vec![
+                        "differences_counts.fewer_ballots_count".into(),
+                    ],
+                    context: None,
+                }]
+            );
+
+            // H > D and H < D checked
+            let mut data = DifferencesCounts::zero();
+
+            data.compare_votes_cast_admitted_voters
+                .admitted_voters_equal_votes_cast = true;
+            data.compare_votes_cast_admitted_voters
+                .votes_cast_smaller_than_admitted_voters = true;
+            data.difference_completely_accounted_for.yes = true;
+
+            let validation_results = validate(data, 105, 104)?;
+
+            assert_eq!(
+                validation_results.errors,
+                [ValidationResult {
+                    code: ValidationResultCode::F301,
+                    fields: vec![
+                        "differences_counts.compare_votes_cast_admitted_voters.admitted_voters_equal_votes_cast".into(),
                     ],
                     context: None,
                 },ValidationResult {
@@ -2239,6 +2422,29 @@ mod tests {
         /// CSO | F.305 (Als D = H) I is ingevuld
         #[test]
         fn test_f305_more_ballots_count() -> Result<(), DataError> {
+            // D = H
+            let mut data = DifferencesCounts::zero();
+
+            data.compare_votes_cast_admitted_voters
+                .admitted_voters_equal_votes_cast = true;
+            data.difference_completely_accounted_for.yes = true;
+
+            let validation_results = validate(data, 52, 52)?;
+
+            assert!(validation_results.errors.is_empty());
+
+            // H > D checked, H > D
+            let mut data = DifferencesCounts::zero();
+
+            data.more_ballots_count = 1;
+            data.compare_votes_cast_admitted_voters
+                .votes_cast_greater_than_admitted_voters = true;
+            data.difference_completely_accounted_for.yes = true;
+
+            let validation_results = validate(data, 52, 53)?;
+
+            assert!(validation_results.errors.is_empty());
+
             let mut data = DifferencesCounts::zero();
 
             data.more_ballots_count = 4;
@@ -2263,6 +2469,7 @@ mod tests {
         /// CSO | F.305 (Als D = H) J is ingevuld
         #[test]
         fn test_f305_fewer_ballots_count() -> Result<(), DataError> {
+            // D = H, J filled in
             let mut data = DifferencesCounts::zero();
 
             data.fewer_ballots_count = 4;
@@ -2319,9 +2526,41 @@ mod tests {
         /// CSO | F.306 (Als H > D) I <> H - D
         #[test]
         fn test_f306() -> Result<(), DataError> {
+            // I = H - D
+            let mut data = DifferencesCounts::zero();
+
+            data.more_ballots_count = 20;
+            data.compare_votes_cast_admitted_voters
+                .votes_cast_greater_than_admitted_voters = true;
+            data.difference_completely_accounted_for.yes = true;
+
+            let validation_results = validate(data, 52, 72)?;
+
+            assert!(validation_results.errors.is_empty());
+
+            // I < H - D
             let mut data = DifferencesCounts::zero();
 
             data.more_ballots_count = 4;
+            data.compare_votes_cast_admitted_voters
+                .votes_cast_greater_than_admitted_voters = true;
+            data.difference_completely_accounted_for.yes = true;
+
+            let validation_results = validate(data, 52, 72)?;
+
+            assert_eq!(
+                validation_results.errors,
+                [ValidationResult {
+                    code: ValidationResultCode::F306,
+                    fields: vec!["differences_counts.more_ballots_count".into()],
+                    context: None,
+                }]
+            );
+
+            // I > H - D
+            let mut data = DifferencesCounts::zero();
+
+            data.more_ballots_count = 24;
             data.compare_votes_cast_admitted_voters
                 .votes_cast_greater_than_admitted_voters = true;
             data.difference_completely_accounted_for.yes = true;
@@ -2374,6 +2613,38 @@ mod tests {
         /// CSO | F.308 (Als H < D) J <> D - H
         #[test]
         fn test_f308() -> Result<(), DataError> {
+            // J = D - H
+            let mut data = DifferencesCounts::zero();
+
+            data.fewer_ballots_count = 2;
+            data.compare_votes_cast_admitted_voters
+                .votes_cast_smaller_than_admitted_voters = true;
+            data.difference_completely_accounted_for.yes = true;
+
+            let validation_results = validate(data, 46, 44)?;
+
+            assert!(validation_results.errors.is_empty());
+
+            // J < D - H
+            let mut data = DifferencesCounts::zero();
+
+            data.fewer_ballots_count = 1;
+            data.compare_votes_cast_admitted_voters
+                .votes_cast_smaller_than_admitted_voters = true;
+            data.difference_completely_accounted_for.yes = true;
+
+            let validation_results = validate(data, 46, 44)?;
+
+            assert_eq!(
+                validation_results.errors,
+                [ValidationResult {
+                    code: ValidationResultCode::F308,
+                    fields: vec!["differences_counts.fewer_ballots_count".into()],
+                    context: None,
+                }]
+            );
+
+            // J > D - H
             let mut data = DifferencesCounts::zero();
 
             data.fewer_ballots_count = 5;
@@ -2432,6 +2703,31 @@ mod tests {
         /// CSO | F.310 (Als D <> H en verklaring voor verschil niks aangevinkt of 'ja' en 'nee' aangevinkt)
         #[test]
         fn test_f310_none_checked() -> Result<(), DataError> {
+            // D < H and difference is completely accounted for
+            let mut data = DifferencesCounts::zero();
+
+            data.fewer_ballots_count = 4;
+            data.compare_votes_cast_admitted_voters
+                .votes_cast_smaller_than_admitted_voters = true;
+            data.difference_completely_accounted_for.yes = true;
+
+            let validation_results = validate(data, 48, 44)?;
+
+            assert!(validation_results.errors.is_empty());
+
+            // D < H and difference is not completely accounted for
+            let mut data = DifferencesCounts::zero();
+
+            data.fewer_ballots_count = 4;
+            data.compare_votes_cast_admitted_voters
+                .votes_cast_smaller_than_admitted_voters = true;
+            data.difference_completely_accounted_for.no = true;
+
+            let validation_results = validate(data, 48, 44)?;
+
+            assert!(validation_results.errors.is_empty());
+
+            // D < H and difference is completely accounted for
             let mut data = DifferencesCounts::zero();
 
             data.more_ballots_count = 5;

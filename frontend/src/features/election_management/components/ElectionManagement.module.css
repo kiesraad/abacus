@@ -31,11 +31,24 @@
   }
 }
 
-.reportInfoSection {
-  margin-bottom: 2rem;
-  width: 37.5rem;
+main.reportMain {
+  background-color: var(--blue-50);
 
-  ul {
-    padding-left: 1.75rem;
+  article {
+    background-color: var(--blue-50);
+    display: flex;
+    gap: 2rem;
+  }
+}
+
+.reportInfoSection {
+  margin-bottom: 2.5rem;
+  width: 37.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+
+  ol > li::marker {
+    font-weight: bold;
   }
 }

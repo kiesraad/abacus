@@ -4,7 +4,6 @@ import { extractFieldInfoFromSection, getValueAtPath } from "@/utils/dataEntryMa
 import { doesValidationResultApplyToSection, ValidationResultSet } from "@/utils/ValidationResults";
 
 import { ClientState, FormSection, FormState } from "../types/types";
-import { INITIAL_FORM_SECTION_ID } from "./reducer";
 
 export function formSectionComplete(section: FormSection): boolean {
   return (
@@ -99,6 +98,11 @@ function createFormSection(id: FormSectionId, index: number): FormSection {
 }
 
 export function getInitialFormState(dataEntryStructure: DataEntryStructure): FormState {
+  const furthest = dataEntryStructure[0]?.id;
+  if (furthest === undefined) {
+    throw new Error("Cannot determine initial furthest section from dataEntryStructure");
+  }
+
   // Create sections from data entry structure plus save section
   const sections: Record<string, FormSection> = {};
 
@@ -108,10 +112,7 @@ export function getInitialFormState(dataEntryStructure: DataEntryStructure): For
 
   sections["save"] = createFormSection("save", dataEntryStructure.length);
 
-  return {
-    furthest: INITIAL_FORM_SECTION_ID,
-    sections: sections,
-  };
+  return { furthest, sections };
 }
 
 export function getClientState(

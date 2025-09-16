@@ -15,6 +15,7 @@
   },
   "continue_after_check": "Je kan alleen verder als je het papieren proces-verbaal hebt gecontroleerd.",
   "continue_with_errors": "Je kan alleen verder als je dit met de coördinator hebt overlegd.",
+  "corrected": "Gecorrigeerd",
   "data_entry_not_possible": "Je kan stembureau {nr} niet invoeren",
   "definitive": "Definitief",
   "entry_different": "Let op: verschil met eerste invoer",
@@ -26,6 +27,7 @@
   "list": {
     "not_found": "Geen lijst gevonden voor {listNumber}"
   },
+  "original": "Oorspronkelijk",
   "pick_polling_station": "Kies een stembureau",
   "second_entry": "2e invoer",
   "success": {

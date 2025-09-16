@@ -72,7 +72,9 @@ describe("NavBar", () => {
     await renderNavBar(location, "typist");
 
     expect(screen.queryByRole("link", { name: "Verkiezingen" })).toBeVisible();
-    expect(screen.queryByRole("link", { name: "Heemdamseburg — Gemeenteraadsverkiezingen 2026" })).toBeVisible();
+    expect(
+      screen.queryByRole("link", { name: ["Heemdamseburg", "—", "Gemeenteraadsverkiezingen 2026"].join("") }),
+    ).toBeVisible();
   });
 
   test.each([
@@ -101,7 +103,9 @@ describe("NavBar", () => {
     await renderNavBar(location, "coordinator");
 
     expect(screen.queryByRole("link", { name: "Verkiezingen" })).not.toBeInTheDocument();
-    expect(screen.queryByRole("link", { name: "Heemdamseburg — Gemeenteraadsverkiezingen 2026" })).toBeVisible();
+    expect(
+      screen.queryByRole("link", { name: ["Heemdamseburg", "—", "Gemeenteraadsverkiezingen 2026"].join("") }),
+    ).toBeVisible();
   });
 
   test.each([
@@ -111,7 +115,9 @@ describe("NavBar", () => {
     await renderNavBar(location, "coordinator");
 
     expect(screen.queryByRole("link", { name: "Verkiezingen" })).not.toBeInTheDocument();
-    expect(screen.queryByRole("link", { name: "Heemdamseburg — Gemeenteraadsverkiezingen 2026" })).toBeVisible();
+    expect(
+      screen.queryByRole("link", { name: ["Heemdamseburg", "—", "Gemeenteraadsverkiezingen 2026"].join("") }),
+    ).toBeVisible();
     expect(screen.queryByRole("link", { name: "Eerste zitting" })).toBeVisible();
   });
 
@@ -122,7 +128,9 @@ describe("NavBar", () => {
     await renderNavBar(location, "coordinator");
 
     expect(screen.queryByRole("link", { name: "Verkiezingen" })).not.toBeInTheDocument();
-    expect(screen.queryByRole("link", { name: "Heemdamseburg — Gemeenteraadsverkiezingen 2026" })).toBeVisible();
+    expect(
+      screen.queryByRole("link", { name: ["Heemdamseburg", "—", "Gemeenteraadsverkiezingen 2026"].join("") }),
+    ).toBeVisible();
     expect(screen.queryByRole("link", { name: "Stembureaus" })).toBeVisible();
   });
 
@@ -134,7 +142,9 @@ describe("NavBar", () => {
     await renderNavBar(location, "coordinator");
 
     expect(screen.queryByRole("link", { name: "Verkiezingen" })).not.toBeInTheDocument();
-    expect(screen.queryByRole("link", { name: "Heemdamseburg — Gemeenteraadsverkiezingen 2026" })).toBeVisible();
+    expect(
+      screen.queryByRole("link", { name: ["Heemdamseburg", "—", "Gemeenteraadsverkiezingen 2026"].join("") }),
+    ).toBeVisible();
     expect(screen.queryByRole("link", { name: "Zetelverdeling" })).toBeVisible();
   });
 

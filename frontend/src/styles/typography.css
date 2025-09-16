@@ -81,6 +81,7 @@ ul.md {
 section.sm {
   p,
   ul,
+  ol,
   form {
     max-width: 32rem;
   }

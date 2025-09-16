@@ -78,6 +78,7 @@ export function getDefaultDataEntryState(): DataEntryStateLoaded {
     error: null,
     pollingStationResults: getInitialValues(),
     entryNumber: 1,
+    previousResults: null,
     dataEntryStructure: getDataEntryStructure(model, electionMockData),
     formState: {
       furthest: "voters_votes_counts",

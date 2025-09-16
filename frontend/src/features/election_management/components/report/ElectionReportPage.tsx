@@ -4,9 +4,12 @@ import { Navigate, useNavigate } from "react-router";
 import { AnyApiError, ApplicationError, isSuccess, NotFoundError } from "@/api/ApiResult";
 import { useApiClient } from "@/api/useApiClient";
 import { Footer } from "@/components/footer/Footer";
+import { IconCheckVerified } from "@/components/generated/icons";
 import { PageTitle } from "@/components/page_title/PageTitle";
 import { Button } from "@/components/ui/Button/Button";
+import { DownloadButton } from "@/components/ui/DownloadButton/DownloadButton";
 import { FormLayout } from "@/components/ui/Form/FormLayout";
+import { Icon } from "@/components/ui/Icon/Icon";
 import { useElection } from "@/hooks/election/useElection";
 import { useNumericParam } from "@/hooks/useNumericParam";
 import { t } from "@/i18n/translate";
@@ -15,10 +18,10 @@ import {
   COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_PATH,
   CommitteeSession,
 } from "@/types/generated/openapi";
+import { cn } from "@/utils/classnames";
 import { committeeSessionLabel } from "@/utils/committeeSession";
 import { formatFullDateWithoutTimezone } from "@/utils/dateTime";
 
-import { directDownload } from "../../utils/download";
 import cls from "../ElectionManagement.module.css";
 
 export function ElectionReportPage() {
@@ -34,6 +37,8 @@ export function ElectionReportPage() {
     throw new NotFoundError("error.not_found");
   }
 
+  const sessionLabel = committeeSessionLabel(committeeSession.number);
+
   // Redirect to update details page if committee session details have not been filled in
   if (committeeSession.location === "" || !committeeSession.start_date_time) {
     return <Navigate to={`/elections/${election.id}/details#redirect-to-report`} />;
@@ -46,14 +51,6 @@ export function ElectionReportPage() {
 
   if (changeStatusError) {
     throw changeStatusError;
-  }
-
-  function downloadPdfResults(committeeSession: CommitteeSession) {
-    directDownload(`/api/elections/${election.id}/committee_sessions/${committeeSession.id}/download_pdf_results`);
-  }
-
-  function downloadZipResults(committeeSession: CommitteeSession) {
-    directDownload(`/api/elections/${election.id}/committee_sessions/${committeeSession.id}/download_zip_results`);
   }
 
   function handleResume(committeeSession: CommitteeSession) {
@@ -76,64 +73,77 @@ export function ElectionReportPage() {
       <PageTitle title={`${t("election.title.finish_data_entry")} - Abacus`} />
       <header>
         <section>
-          <h1>{committeeSessionLabel(committeeSession.number)}</h1>
+          <h1>
+            {/* TODO: Change to conditional GSB/HSB/CSB when implemented */}
+            {sessionLabel} {t("GSB").replace(/(^\w|\s\w)/g, (m) => m.toUpperCase())}
+          </h1>
         </section>
       </header>
-      <main>
+      <main className={cls.reportMain}>
         <article>
-          <h2 className="form_title">
-            {t("election_report.counting_results")} {committeeSessionLabel(committeeSession.number).toLowerCase()}{" "}
-            {t("municipality").toLowerCase()} {election.location}
-          </h2>
-          <div className={cls.reportInfoSection}>
-            {t("election_report.committee_session_started", {
-              date: committeeSession.start_date_time
-                ? formatFullDateWithoutTimezone(new Date(committeeSession.start_date_time))
-                : "",
-              time: committeeSession.start_date_time
-                ? new Date(committeeSession.start_date_time).toLocaleTimeString("nl-NL", {
-                    hour: "2-digit",
-                    minute: "2-digit",
-                  })
-                : "",
-            })}
-            .<br />
-            {t("election_report.there_was_counting_method", { method: t(election.counting_method).toLowerCase() })}.
+          <div>
+            <Icon size="lg" color="default" icon={<IconCheckVerified />} />
           </div>
-          <div className={cls.reportInfoSection}>
-            <Button
-              size="md"
-              onClick={() => {
-                downloadZipResults(committeeSession);
-              }}
-            >
-              {t("election_report.download_zip")}
-            </Button>
-            <br />
-            <br />
-            <Button
-              size="md"
-              variant="secondary"
-              onClick={() => {
-                downloadPdfResults(committeeSession);
-              }}
-            >
-              {t("election_report.download_report")}
-            </Button>
+          <div>
+            <h2 className="form_title">
+              {t("election_report.counting_results")} {sessionLabel.toLowerCase()}{" "}
+              {/* TODO: Change to conditional GSB/HSB/CSB when implemented */}
+              {t("GSB").toLowerCase()} {t("municipality").toLowerCase()} {election.location}
+            </h2>
+            <div className={cls.reportInfoSection}>
+              {t("election_report.committee_session_started", {
+                date: committeeSession.start_date_time
+                  ? formatFullDateWithoutTimezone(new Date(committeeSession.start_date_time))
+                  : "",
+                time: committeeSession.start_date_time
+                  ? new Date(committeeSession.start_date_time).toLocaleTimeString("nl-NL", {
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })
+                  : "",
+              })}
+              .<br />
+              {t("election_report.there_was_counting_method", { method: t(election.counting_method).toLowerCase() })}.
+              <DownloadButton
+                icon="download"
+                href={`/api/elections/${election.id}/committee_sessions/${committeeSession.id}/download_zip_results`}
+                title={t("election_management.download_definitive_documents", {
+                  sessionLabel: sessionLabel.toLowerCase(),
+                })}
+                subtitle={t("election_management.zip_file")}
+              />
+            </div>
+            <section className={cn(cls.reportInfoSection, "sm")}>
+              <h3>{t("election_management.what_now")}?</h3>
+              <p>{t("election_management.download_definitive_files")}</p>
+              <section className="sm">
+                <p>{t("election_management.zip_file_explanation")}</p>
+                <ol className={cls.list}>
+                  <li>
+                    <strong>{t("election_management.pdf_file")}</strong>{" "}
+                    {t("election_management.signed_during_the_committee_session")}
+                  </li>
+                  <li>
+                    <strong>{t("election_management.eml_file")}</strong>
+                  </li>
+                </ol>
+                <p>{t("election_management.upload_the_zip")}</p>
+              </section>
+            </section>
+            <FormLayout.Controls>
+              <Button.Link to="../..">{t("election_report.back_to_overview")}</Button.Link>
+              {currentCommitteeSession.id === committeeSession.id && (
+                <Button
+                  variant="secondary"
+                  onClick={() => {
+                    handleResume(committeeSession);
+                  }}
+                >
+                  {t("election_report.resume_data_entry")}
+                </Button>
+              )}
+            </FormLayout.Controls>
           </div>
-          <FormLayout.Controls>
-            <Button.Link to="../..">{t("election_report.back_to_overview")}</Button.Link>
-            {currentCommitteeSession.id === committeeSession.id && (
-              <Button
-                variant="secondary"
-                onClick={() => {
-                  handleResume(committeeSession);
-                }}
-              >
-                {t("election_report.resume_data_entry")}
-              </Button>
-            )}
-          </FormLayout.Controls>
         </article>
       </main>
       <Footer />

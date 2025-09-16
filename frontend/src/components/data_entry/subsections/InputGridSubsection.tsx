@@ -1,9 +1,15 @@
+import { useState } from "react";
+
 import { InputGrid } from "@/components/ui/InputGrid/InputGrid";
 import { InputGridRow } from "@/components/ui/InputGrid/InputGridRow";
+import { t } from "@/i18n/translate";
 import { InputGridSubsection, InputGridSubsectionRow, SectionValues } from "@/types/types";
+import { correctedValue, determineCorrections } from "@/utils/dataEntryMapping";
 
 export interface InputGridSubsectionProps {
+  id?: string;
   subsection: InputGridSubsection;
+  previousValues?: SectionValues;
   currentValues: SectionValues;
   setValues: (path: string, value: string) => void;
   defaultProps: {
@@ -15,16 +21,33 @@ export interface InputGridSubsectionProps {
 }
 
 export function InputGridSubsectionComponent({
+  id,
   subsection,
+  previousValues,
   currentValues,
   setValues,
   defaultProps,
   missingTotalError,
   readOnly = false,
 }: InputGridSubsectionProps) {
+  // When correcting: prevent values that are identical to the previous values to be instantly cleared.
+  const [inputValues, setInputValues] = useState<SectionValues>(() =>
+    previousValues ? determineCorrections(previousValues, currentValues) : currentValues,
+  );
+
+  function handleChange(path: string, value: string) {
+    setInputValues({ ...inputValues, [path]: value });
+    setValues(path, previousValues ? correctedValue(previousValues[path], value) : value);
+  }
+
   return (
-    <InputGrid zebra={subsection.zebra}>
-      <InputGrid.Header field={subsection.headers[0]} value={subsection.headers[1]} title={subsection.headers[2]} />
+    <InputGrid id={id} zebra={subsection.zebra}>
+      <InputGrid.Header
+        field={subsection.headers[0]}
+        previous={previousValues && t("data_entry.original")}
+        value={previousValues ? t("data_entry.corrected") : subsection.headers[1]}
+        title={subsection.headers[2]}
+      />
       <InputGrid.Body>
         {subsection.rows.map((row: InputGridSubsectionRow) => (
           <InputGridRow
@@ -32,9 +55,10 @@ export function InputGridSubsectionComponent({
             field={row.code || ""}
             id={`data.${row.path}`}
             title={row.title}
-            value={currentValues[row.path] || ""}
+            previousValue={previousValues?.[row.path]}
+            value={inputValues[row.path] || ""}
             onChange={(e) => {
-              setValues(row.path, e.target.value);
+              handleChange(row.path, e.target.value);
             }}
             autoFocusInput={row.autoFocusInput}
             addSeparator={row.addSeparator}

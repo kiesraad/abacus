@@ -72,7 +72,9 @@ describe("InvestigationPrintCorrigendumPage", () => {
     ).toBeVisible();
 
     expect(
-      await screen.findByRole("link", { name: "Download corrigendum voor stembureau 33 Na 14-2 Bijlage 1" }),
+      await screen.findByRole("link", {
+        name: ["Download corrigendum voor stembureau 33", "Na 14-2 Bijlage 1"].join(""),
+      }),
     ).toBeVisible();
 
     expect(await screen.findByRole("link", { name: "Verder naar bevindingen" })).toBeVisible();

@@ -5,9 +5,9 @@ import { beforeEach, describe, expect, test, vi } from "vitest";
 
 import { ElectionProvider } from "@/hooks/election/ElectionProvider";
 import {
-  CommitteeSessionInvestigationConcludeHandler,
   ElectionRequestHandler,
   ElectionStatusRequestHandler,
+  PollingStationInvestigationConcludeHandler,
 } from "@/testing/api-mocks/RequestHandlers";
 import { overrideOnce, server } from "@/testing/server";
 import { render, screen, spyOnHandler, waitFor } from "@/testing/test-utils";
@@ -26,7 +26,7 @@ function renderPage(pollingStationId = 1) {
 
 describe("InvestigationFindings", () => {
   beforeEach(() => {
-    server.use(ElectionRequestHandler, ElectionStatusRequestHandler, CommitteeSessionInvestigationConcludeHandler);
+    server.use(ElectionRequestHandler, ElectionStatusRequestHandler, PollingStationInvestigationConcludeHandler);
     vi.spyOn(ReactRouter, "useNavigate").mockImplementation(() => navigate);
   });
 
@@ -78,7 +78,7 @@ describe("InvestigationFindings", () => {
 
   test("Update the existing findings", async () => {
     const update = spyOnHandler(
-      overrideOnce("put", "/api/polling_stations/2/investigations", 200, {
+      overrideOnce("put", "/api/polling_stations/2/investigation", 200, {
         findings: "New test findings 4",
         corrected_results: false,
       }),

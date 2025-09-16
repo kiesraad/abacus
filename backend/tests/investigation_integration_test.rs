@@ -12,7 +12,7 @@ pub mod utils;
 
 async fn create_investigation(pool: SqlitePool, polling_station_id: u32) -> Response {
     let addr = serve_api(pool).await;
-    let url = format!("http://{addr}/api/polling_stations/{polling_station_id}/investigations");
+    let url = format!("http://{addr}/api/polling_stations/{polling_station_id}/investigation");
     let coordinator_cookie = shared::coordinator_login(&addr).await;
     let body = json!({
         "reason": "Test reason"
@@ -34,7 +34,8 @@ async fn conclude_investigation(pool: SqlitePool, polling_station_id: u32) -> Re
         "findings": "Test findings",
         "corrected_results": false
     });
-    let url = format!("http://{addr}/api/polling_stations/{polling_station_id}/investigations");
+    let url =
+        format!("http://{addr}/api/polling_stations/{polling_station_id}/investigation/conclude");
     reqwest::Client::new()
         .put(&url)
         .header("cookie", coordinator_cookie)
@@ -46,7 +47,7 @@ async fn conclude_investigation(pool: SqlitePool, polling_station_id: u32) -> Re
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_7_four_sessions", "users"))))]
-async fn test_investigation_create_and_update(pool: SqlitePool) {
+async fn test_investigation_create_and_conclude(pool: SqlitePool) {
     assert_eq!(
         create_investigation(pool.clone(), 741).await.status(),
         StatusCode::OK

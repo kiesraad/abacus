@@ -11,7 +11,10 @@ import { InputField } from "@/components/ui/InputField/InputField";
 import { Loader } from "@/components/ui/Loader/Loader";
 import { useElection } from "@/hooks/election/useElection";
 import { t } from "@/i18n/translate";
-import { PollingStationInvestigationCreateRequest } from "@/types/generated/openapi";
+import {
+  PollingStationInvestigationConcludeRequest,
+  PollingStationInvestigationUpdateRequest,
+} from "@/types/generated/openapi";
 import { StringFormData } from "@/utils/stringFormData";
 
 interface InvestigationFindingsProps {
@@ -21,10 +24,10 @@ interface InvestigationFindingsProps {
 export function InvestigationFindings({ pollingStationId }: InvestigationFindingsProps) {
   const navigate = useNavigate();
   const { election, investigation, refetch } = useElection(pollingStationId);
-  const concludePath = `/api/polling_stations/${pollingStationId}/investigations/conclude`;
-  const { update: conclude } = useCrud<PollingStationInvestigationCreateRequest>({ update: concludePath });
-  const path = `/api/polling_stations/${pollingStationId}/investigations`;
-  const { update } = useCrud<PollingStationInvestigationCreateRequest>({ update: path });
+  const concludePath = `/api/polling_stations/${pollingStationId}/investigation/conclude`;
+  const { update: conclude } = useCrud<PollingStationInvestigationConcludeRequest>({ update: concludePath });
+  const path = `/api/polling_stations/${pollingStationId}/investigation`;
+  const { update } = useCrud<PollingStationInvestigationUpdateRequest>({ update: path });
 
   const [nonEmptyError, setNonEmptyError] = useState(false);
   const [radioError, setRadioError] = useState(false);

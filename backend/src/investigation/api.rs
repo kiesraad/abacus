@@ -24,15 +24,15 @@ use crate::{
 
 pub fn router() -> OpenApiRouter<AppState> {
     OpenApiRouter::default()
-        .routes(routes!(committee_session_investigation_create))
-        .routes(routes!(committee_session_investigation_conclude))
-        .routes(routes!(committee_session_investigation_update))
+        .routes(routes!(polling_station_investigation_create))
+        .routes(routes!(polling_station_investigation_conclude))
+        .routes(routes!(polling_station_investigation_update))
 }
 
 /// Create an investigation for a polling station
 #[utoipa::path(
     post,
-    path = "/api/polling_stations/{polling_station_id}/investigations",
+    path = "/api/polling_stations/{polling_station_id}/investigation",
     request_body = PollingStationInvestigationCreateRequest,
     responses(
         (status = 200, description = "Polling station investigation added successfully"),
@@ -46,7 +46,7 @@ pub fn router() -> OpenApiRouter<AppState> {
         ("polling_station_id" = u32, description = "Polling station database id"),
     ),
 )]
-async fn committee_session_investigation_create(
+async fn polling_station_investigation_create(
     _user: Coordinator,
     State(pool): State<SqlitePool>,
     audit_service: AuditService,
@@ -78,7 +78,7 @@ async fn committee_session_investigation_create(
 /// Conclude an investigation for a polling station
 #[utoipa::path(
     put,
-    path = "/api/polling_stations/{polling_station_id}/investigations/conclude",
+    path = "/api/polling_stations/{polling_station_id}/investigation/conclude",
     request_body = PollingStationInvestigationConcludeRequest,
     responses(
         (status = 200, description = "Polling station investigation concluded successfully"),
@@ -92,7 +92,7 @@ async fn committee_session_investigation_create(
         ("polling_station_id" = u32, description = "Polling station database id"),
     ),
 )]
-async fn committee_session_investigation_conclude(
+async fn polling_station_investigation_conclude(
     _user: Coordinator,
     State(pool): State<SqlitePool>,
     audit_service: AuditService,
@@ -120,7 +120,7 @@ async fn committee_session_investigation_conclude(
 /// Update an investigation for a polling station
 #[utoipa::path(
     put,
-    path = "/api/polling_stations/{polling_station_id}/investigations",
+    path = "/api/polling_stations/{polling_station_id}/investigation",
     request_body = PollingStationInvestigationUpdateRequest,
     responses(
         (status = 200, description = "Polling station investigation updated successfully"),
@@ -134,7 +134,7 @@ async fn committee_session_investigation_conclude(
         ("polling_station_id" = u32, description = "Polling station database id"),
     ),
 )]
-async fn committee_session_investigation_update(
+async fn polling_station_investigation_update(
     _user: Coordinator,
     State(pool): State<SqlitePool>,
     audit_service: AuditService,

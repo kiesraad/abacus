@@ -217,25 +217,25 @@ export interface POLLING_STATION_DATA_ENTRY_FINALISE_REQUEST_PARAMS {
 export type POLLING_STATION_DATA_ENTRY_FINALISE_REQUEST_PATH =
   `/api/polling_stations/${number}/data_entries/${number}/finalise`;
 
-// /api/polling_stations/{polling_station_id}/investigations
-export interface COMMITTEE_SESSION_INVESTIGATION_UPDATE_REQUEST_PARAMS {
+// /api/polling_stations/{polling_station_id}/investigation
+export interface POLLING_STATION_INVESTIGATION_UPDATE_REQUEST_PARAMS {
   polling_station_id: number;
 }
-export type COMMITTEE_SESSION_INVESTIGATION_UPDATE_REQUEST_PATH = `/api/polling_stations/${number}/investigations`;
-export type COMMITTEE_SESSION_INVESTIGATION_UPDATE_REQUEST_BODY = PollingStationInvestigationUpdateRequest;
-export interface COMMITTEE_SESSION_INVESTIGATION_CREATE_REQUEST_PARAMS {
+export type POLLING_STATION_INVESTIGATION_UPDATE_REQUEST_PATH = `/api/polling_stations/${number}/investigation`;
+export type POLLING_STATION_INVESTIGATION_UPDATE_REQUEST_BODY = PollingStationInvestigationUpdateRequest;
+export interface POLLING_STATION_INVESTIGATION_CREATE_REQUEST_PARAMS {
   polling_station_id: number;
 }
-export type COMMITTEE_SESSION_INVESTIGATION_CREATE_REQUEST_PATH = `/api/polling_stations/${number}/investigations`;
-export type COMMITTEE_SESSION_INVESTIGATION_CREATE_REQUEST_BODY = PollingStationInvestigationCreateRequest;
+export type POLLING_STATION_INVESTIGATION_CREATE_REQUEST_PATH = `/api/polling_stations/${number}/investigation`;
+export type POLLING_STATION_INVESTIGATION_CREATE_REQUEST_BODY = PollingStationInvestigationCreateRequest;
 
-// /api/polling_stations/{polling_station_id}/investigations/conclude
-export interface COMMITTEE_SESSION_INVESTIGATION_CONCLUDE_REQUEST_PARAMS {
+// /api/polling_stations/{polling_station_id}/investigation/conclude
+export interface POLLING_STATION_INVESTIGATION_CONCLUDE_REQUEST_PARAMS {
   polling_station_id: number;
 }
-export type COMMITTEE_SESSION_INVESTIGATION_CONCLUDE_REQUEST_PATH =
-  `/api/polling_stations/${number}/investigations/conclude`;
-export type COMMITTEE_SESSION_INVESTIGATION_CONCLUDE_REQUEST_BODY = PollingStationInvestigationConcludeRequest;
+export type POLLING_STATION_INVESTIGATION_CONCLUDE_REQUEST_PATH =
+  `/api/polling_stations/${number}/investigation/conclude`;
+export type POLLING_STATION_INVESTIGATION_CONCLUDE_REQUEST_BODY = PollingStationInvestigationConcludeRequest;
 
 // /api/user
 export type USER_LIST_REQUEST_PARAMS = Record<string, never>;

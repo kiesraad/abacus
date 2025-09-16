@@ -2725,10 +2725,10 @@
         }
       }
     },
-    "/api/polling_stations/{polling_station_id}/investigations": {
+    "/api/polling_stations/{polling_station_id}/investigation": {
       "put": {
         "summary": "Update an investigation for a polling station",
-        "operationId": "committee_session_investigation_update",
+        "operationId": "polling_station_investigation_update",
         "parameters": [
           {
             "name": "polling_station_id",
@@ -2810,7 +2810,7 @@
       },
       "post": {
         "summary": "Create an investigation for a polling station",
-        "operationId": "committee_session_investigation_create",
+        "operationId": "polling_station_investigation_create",
         "parameters": [
           {
             "name": "polling_station_id",
@@ -2891,10 +2891,10 @@
         }
       }
     },
-    "/api/polling_stations/{polling_station_id}/investigations/conclude": {
+    "/api/polling_stations/{polling_station_id}/investigation/conclude": {
       "put": {
         "summary": "Conclude an investigation for a polling station",
-        "operationId": "committee_session_investigation_conclude",
+        "operationId": "polling_station_investigation_conclude",
         "parameters": [
           {
             "name": "polling_station_id",

@@ -76,7 +76,7 @@ export const InputGridWithPreviousValues: Story = {
   play: async ({ canvas }) => {
     const table = await canvas.findByTestId("input-grid");
     await expect(table).toHaveTableContent([
-      ["Veld", "Eerder geteld aantal", "Geteld aantal", "Omschrijving"],
+      ["Veld", "Oorspronkelijk", "Gecorrigeerd", "Omschrijving"],
       ["A", "1.024", "", "Stempassen"],
       ["B", "32", "", "Volmachtbewijzen"],
       [""],

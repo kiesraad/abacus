@@ -370,7 +370,7 @@ pub fn validate_differences_counts(
         });
     }
 
-    if votes_cast_greater_than_admitted_voters && differences_counts.fewer_ballots_count != 0 {
+    if total_votes_count > total_voters_count && differences_counts.fewer_ballots_count != 0 {
         validation_results.errors.push(ValidationResult {
             fields: vec![
                 differences_counts_path
@@ -2241,7 +2241,14 @@ mod tests {
 
             let validation_results = validate(data, 52, 62)?;
 
-            assert!(validation_results.errors.is_empty());
+            assert_eq!(
+                validation_results.errors,
+                [ValidationResult {
+                    code: ValidationResultCode::F306,
+                    fields: vec!["differences_counts.more_ballots_count".into()],
+                    context: None,
+                }]
+            );
 
             // H > D & J < 0
             let mut data = DifferencesCounts::zero();
@@ -2263,7 +2270,10 @@ mod tests {
                     },
                     ValidationResult {
                         code: ValidationResultCode::F307,
-                        fields: vec!["differences_counts.fewer_ballots_count".into()],
+                        fields: vec![
+                            "differences_counts.more_ballots_count".into(),
+                            "differences_counts.fewer_ballots_count".into()
+                        ],
                         context: None,
                     }
                 ]
@@ -2289,7 +2299,10 @@ mod tests {
                     },
                     ValidationResult {
                         code: ValidationResultCode::F307,
-                        fields: vec!["differences_counts.fewer_ballots_count".into()],
+                        fields: vec![
+                            "differences_counts.more_ballots_count".into(),
+                            "differences_counts.fewer_ballots_count".into()
+                        ],
                         context: None,
                     }
                 ]
@@ -2313,18 +2326,11 @@ mod tests {
 
             assert_eq!(
                 validation_results.errors,
-                [
-                    ValidationResult {
-                        code: ValidationResultCode::F306,
-                        fields: vec!["differences_counts.more_ballots_count".into()],
-                        context: None,
-                    },
-                    ValidationResult {
-                        code: ValidationResultCode::F307,
-                        fields: vec!["differences_counts.fewer_ballots_count".into()],
-                        context: None,
-                    }
-                ]
+                [ValidationResult {
+                    code: ValidationResultCode::F305,
+                    fields: vec!["differences_counts.fewer_ballots_count".into()],
+                    context: None,
+                }]
             );
 
             Ok(())
@@ -2345,18 +2351,11 @@ mod tests {
 
             assert_eq!(
                 validation_results.errors,
-                [
-                    ValidationResult {
-                        code: ValidationResultCode::F306,
-                        fields: vec!["differences_counts.more_ballots_count".into()],
-                        context: None,
-                    },
-                    ValidationResult {
-                        code: ValidationResultCode::F307,
-                        fields: vec!["differences_counts.fewer_ballots_count".into()],
-                        context: None,
-                    }
-                ]
+                [ValidationResult {
+                    code: ValidationResultCode::F308,
+                    fields: vec!["differences_counts.fewer_ballots_count".into()],
+                    context: None,
+                }]
             );
 
             Ok(())

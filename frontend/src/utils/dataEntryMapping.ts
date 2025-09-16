@@ -199,3 +199,36 @@ function ensureArrayLength(arr: unknown[], minLength: number): void {
     arr.push({});
   }
 }
+
+/**
+ * Combine the previousValue and correction by returning previousValue if correction is empty and else the correction.
+ * Note that this also returns the correction if it is set to zero.
+ */
+export function correctedValue(previousValue: string | undefined, correction: string): string {
+  if (previousValue === undefined) {
+    return correction;
+  }
+
+  if (correction !== "") {
+    return correction;
+  } else {
+    return previousValue;
+  }
+}
+
+/**
+ * Determine the corrections by comparing previousValues and currentValues.
+ * The correction is set to "", if the current value and the previous value are the same,
+ * and else set to the current value (changing "" into "0").
+ */
+export function determineCorrections(previousValues: SectionValues, currentValues: SectionValues) {
+  const corrections = { ...currentValues };
+  for (const field in previousValues) {
+    if (currentValues[field] === previousValues[field]) {
+      corrections[field] = "";
+    } else if (currentValues[field] === "") {
+      corrections[field] = "0";
+    }
+  }
+  return corrections;
+}

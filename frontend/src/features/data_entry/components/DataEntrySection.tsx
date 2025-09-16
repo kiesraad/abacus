@@ -26,6 +26,7 @@ export function DataEntrySection() {
     error,
     formRef,
     onSubmit,
+    previousValues,
     currentValues,
     setValues,
     formSection,
@@ -101,6 +102,7 @@ export function DataEntrySection() {
 
         <DataEntrySubsections
           section={section}
+          previousValues={previousValues}
           currentValues={currentValues}
           setValues={setValues}
           defaultProps={defaultProps}

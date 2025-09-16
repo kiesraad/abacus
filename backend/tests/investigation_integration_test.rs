@@ -19,7 +19,7 @@ async fn create_investigation(pool: SqlitePool, polling_station_id: u32) -> Resp
     });
     reqwest::Client::new()
         .post(&url)
-        .header("cookie", coordinator_cookie.clone())
+        .header("cookie", coordinator_cookie)
         .header("Content-Type", "application/json")
         .body(body.to_string())
         .send()
@@ -27,7 +27,7 @@ async fn create_investigation(pool: SqlitePool, polling_station_id: u32) -> Resp
         .unwrap()
 }
 
-async fn update_investigation(pool: SqlitePool, polling_station_id: u32) -> Response {
+async fn conclude_investigation(pool: SqlitePool, polling_station_id: u32) -> Response {
     let addr = serve_api(pool).await;
     let coordinator_cookie = shared::coordinator_login(&addr).await;
     let body = json!({
@@ -52,14 +52,14 @@ async fn test_investigation_create_and_update(pool: SqlitePool) {
         StatusCode::OK
     );
     assert_eq!(
-        update_investigation(pool.clone(), 741).await.status(),
+        conclude_investigation(pool.clone(), 741).await.status(),
         StatusCode::OK
     );
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_7_four_sessions", "users"))))]
 async fn test_investigation_creation_fails_for_wrong_polling_station(pool: SqlitePool) {
-    // 732 is an  existing polling station, but in the wrong committee session
+    // 732 is an existing polling station, but in the wrong committee session
     assert_eq!(
         create_investigation(pool.clone(), 732).await.status(),
         StatusCode::NOT_FOUND
@@ -79,9 +79,9 @@ async fn test_investigation_creation_fails_on_creating_second_investigation(pool
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_7_four_sessions", "users"))))]
-async fn test_investigation_can_only_update_existing(pool: SqlitePool) {
+async fn test_investigation_can_only_conclude_existing(pool: SqlitePool) {
     assert_eq!(
-        update_investigation(pool.clone(), 741).await.status(),
+        conclude_investigation(pool.clone(), 741).await.status(),
         StatusCode::NOT_FOUND
     );
 }

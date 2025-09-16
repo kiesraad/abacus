@@ -17,6 +17,7 @@ use crate::{
     audit_log::{AuditEvent, AuditService},
     authentication::Coordinator,
 };
+
 pub fn router() -> OpenApiRouter<AppState> {
     OpenApiRouter::default()
         .routes(routes!(committee_session_investigation_create))

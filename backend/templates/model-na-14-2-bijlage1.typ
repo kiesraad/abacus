@@ -45,9 +45,9 @@ Schrijf op wat de *uitkomst* van het onderzoek door het #location_type was.
 
 Is er een *gecorrigeerde uitslag*?
 
-#checkbox[Nee #sym.arrow.long.r *Neem de uitkomst van het onderzoek over in het proces-verbaal van het #location_type (nieuwe zitting). Deze bijlage hoeft verder niet ingevuld te worden.*]
+#checkbox[Nee #sym.arrow.r *Neem de uitkomst van het onderzoek over in het proces-verbaal van het #location_type (nieuwe zitting). Deze bijlage hoeft verder niet ingevuld te worden.*]
 
-#checkbox[Ja #sym.arrow.long.r *Ga verder met B1 - #ref(<corrected_results>)*]
+#checkbox[Ja #sym.arrow.r *Ga verder met B1 - #ref(<corrected_results>)*]
 
 #pagebreak(weak: true)
 
@@ -118,7 +118,7 @@ ingevuld te worden in de kolom ‘gecorrigeerd'. Onder ‘oorspronkelijk’ staa
 
 === Vergelijk D (totaal toegelaten kiezers) en H (totaal uitgebrachte stemmen)
 
-#checkbox[D en H zijn gelijk #sym.arrow.long.r Ga door naar B1 - #ref(<per_list_and_candidate>)]
+#checkbox[D en H zijn gelijk #sym.arrow.r Ga door naar B1 - #ref(<per_list_and_candidate>)]
 
 #checkbox[H is groter dan D (meer uitgebrachte stemmen dan toegelaten kiezers)]
 #box(width: 500pt, inset: (left: 3em, bottom: 1em))[
@@ -138,7 +138,7 @@ ingevuld te worden in de kolom ‘gecorrigeerd'. Onder ‘oorspronkelijk’ staa
 
 === Zijn er tijdens de stemming dingen opgeschreven die het verschil tussen D en H volledig verklaren?
 
-(Gebruik het proces-verbaal van het stembureau #sym.arrow.long.r *Tijdens de stemming, vraag 1.2.2*)
+(Gebruik het proces-verbaal van het stembureau #sym.arrow.r *Tijdens de stemming, vraag 1.2.2*)
 
 #checkbox[Ja]
 #checkbox[Nee, er is een onverklaard verschil]

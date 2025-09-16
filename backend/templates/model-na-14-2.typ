@@ -121,7 +121,7 @@ ingevuld te worden in de kolom ‘gecorrigeerd'. Onder ‘oorspronkelijk’ staa
 
 === Is bij *alle afzonderlijke stembureaus* in #is_municipality[deze gemeente][dit openbaar lichaam] het aantal uitgebrachte stemmen en het aantal toegelaten kiezers gelijk?
 
-#checkbox[Ja #sym.arrow.long.r *Ga door naar #ref(<per_list_and_candidate>)*]
+#checkbox[Ja #sym.arrow.r *Ga door naar #ref(<per_list_and_candidate>)*]
 
 #checkbox[Nee, er zijn stembureaus met een verschil]
 

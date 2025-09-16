@@ -65,5 +65,5 @@ async fn test_investigation_creation_fails_for_wrong_polling_station(pool: Sqlit
         .await
         .unwrap();
 
-    assert_eq!(response.status(), StatusCode::UNPROCESSABLE_ENTITY);
+    assert_eq!(response.status(), StatusCode::NOT_FOUND);
 }

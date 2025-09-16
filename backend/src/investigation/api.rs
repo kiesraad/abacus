@@ -17,7 +17,6 @@ use crate::{
     audit_log::{AuditEvent, AuditService},
     authentication::Coordinator,
 };
-
 pub fn router() -> OpenApiRouter<AppState> {
     OpenApiRouter::default()
         .routes(routes!(committee_session_investigation_create))
@@ -49,6 +48,10 @@ async fn committee_session_investigation_create(
     Json(polling_station_investigation): Json<PollingStationInvestigationCreateRequest>,
 ) -> Result<PollingStationInvestigation, APIError> {
     let mut tx = pool.begin_immediate().await?;
+
+    // Throw a 404 if the polling station isn't found in the current committee session
+    let _ = crate::polling_station::repository::get(&mut tx, polling_station_id).await?;
+
     let investigation = create_polling_station_investigation(
         &mut tx,
         polling_station_id,

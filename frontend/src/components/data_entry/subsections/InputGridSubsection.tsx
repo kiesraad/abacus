@@ -44,8 +44,8 @@ export function InputGridSubsectionComponent({
     <InputGrid id={id} zebra={subsection.zebra}>
       <InputGrid.Header
         field={subsection.headers[0]}
-        previous={previousValues && t("data_entry.previous_value")}
-        value={subsection.headers[1]}
+        previous={previousValues && t("data_entry.original")}
+        value={previousValues ? t("data_entry.corrected") : subsection.headers[1]}
         title={subsection.headers[2]}
       />
       <InputGrid.Body>

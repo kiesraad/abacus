@@ -1,3 +1,5 @@
+import { useState } from "react";
+
 import { InputGrid } from "@/components/ui/InputGrid/InputGrid";
 import { InputGridRow } from "@/components/ui/InputGrid/InputGridRow";
 import { t } from "@/i18n/translate";
@@ -28,9 +30,13 @@ export function InputGridSubsectionComponent({
   missingTotalError,
   readOnly = false,
 }: InputGridSubsectionProps) {
-  const values = previousValues ? determineCorrections(previousValues, currentValues) : currentValues;
+  // When correcting: prevent values that are identical to the previous values to be instantly cleared.
+  const [inputValues, setInputValues] = useState<SectionValues>(() =>
+    previousValues ? determineCorrections(previousValues, currentValues) : currentValues,
+  );
 
   function handleChange(path: string, value: string) {
+    setInputValues({ ...inputValues, [path]: value });
     setValues(path, previousValues ? correctedValue(previousValues[path], value) : value);
   }
 
@@ -50,7 +56,7 @@ export function InputGridSubsectionComponent({
             id={`data.${row.path}`}
             title={row.title}
             previousValue={previousValues?.[row.path]}
-            value={values[row.path] || ""}
+            value={inputValues[row.path] || ""}
             onChange={(e) => {
               handleChange(row.path, e.target.value);
             }}

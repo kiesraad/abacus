@@ -74,22 +74,20 @@ describe("InvestigationsOverviewPage", () => {
     expect(router.state.location.pathname).toEqual("/elections/1/investigations/add");
   });
 
-  test("Renders a list of investigations", async () => {
+  test("Renders and filters a list of investigations in two categories", async () => {
     await renderPage();
-
-    expect(await screen.findByRole("heading", { level: 3, name: "Afgehandelde onderzoeken" })).toBeVisible();
-
-    // first investigations item
-    expect(await screen.findByRole("heading", { level: 3, name: "Op Rolletjes" })).toBeVisible();
-    expect(await screen.findByText("Test reason 1")).toBeVisible();
-    expect(await screen.findByRole("link", { name: "Corrigendum afdrukken" })).toBeVisible();
 
     // count that there are 4 investigations + the "Afgehandelde onderzoeken" heading
     expect(await screen.findAllByRole("heading", { level: 3 })).toHaveLength(5);
 
-    // last investigations item
-    expect(await screen.findByText("Test findings 4")).toBeVisible();
-    expect(await screen.findByText("De gecorrigeerde uitslag is ingevoerd")).toBeVisible();
+    // check the order and the filtering
+    const headings = await screen.findAllByRole("heading", { level: 3 });
+
+    expect(headings[0]).toHaveTextContent("Op Rolletjes");
+    expect(headings[1]).toHaveTextContent("Testschool");
+    expect(headings[2]).toHaveTextContent("Afgehandelde onderzoeken");
+    expect(headings[3]).toHaveTextContent("Testbuurthuis");
+    expect(headings[4]).toHaveTextContent("Testplek");
   });
 
   test("Links to the correct pages when editing an investigation or printing the corrigendum", async () => {
@@ -104,7 +102,7 @@ describe("InvestigationsOverviewPage", () => {
     const editLinks = await screen.findAllByRole("link", { name: "Bewerken" });
 
     expect(editLinks[0]).toHaveAttribute("href", "/elections/1/investigations/3/findings");
-    expect(editLinks[1]).toHaveAttribute("href", "/elections/1/investigations/2/findings");
+    expect(editLinks[1]).toHaveAttribute("href", "/elections/1/investigations/4/findings");
     expect(editLinks[2]).toHaveAttribute("href", "/elections/1/investigations/2/findings");
   });
 });

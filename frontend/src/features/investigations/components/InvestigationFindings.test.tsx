@@ -79,7 +79,7 @@ describe("InvestigationFindings", () => {
   test("Update the existing findings", async () => {
     const update = spyOnHandler(
       overrideOnce("put", "/api/polling_stations/2/investigations", 200, {
-        findings: "New test findings 3",
+        findings: "New test findings 4",
         corrected_results: false,
       }),
     );
@@ -87,13 +87,13 @@ describe("InvestigationFindings", () => {
     renderPage(2);
 
     const findings = await screen.findByLabelText("Bevindingen");
-    expect(findings).toHaveValue("Test findings 3");
+    expect(findings).toHaveValue("Test findings 4");
 
     const user = userEvent.setup();
     await user.clear(findings);
-    await user.type(findings, "New test findings 3");
+    await user.type(findings, "New test findings 4");
 
-    expect(findings).toHaveValue("New test findings 3");
+    expect(findings).toHaveValue("New test findings 4");
 
     const noRadio = await screen.findByLabelText(/Nee/);
     noRadio.click();
@@ -106,8 +106,8 @@ describe("InvestigationFindings", () => {
     });
 
     expect(update).toHaveBeenCalledWith({
-      reason: "Test reason 3",
-      findings: "New test findings 3",
+      reason: "Test reason 4",
+      findings: "New test findings 4",
       corrected_results: false,
     });
   });

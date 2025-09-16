@@ -277,7 +277,7 @@ export const mockInvestigations: PollingStationInvestigation[] = [
     corrected_results: true,
   },
   {
-    polling_station_id: 2,
+    polling_station_id: 4,
     reason: "Test reason 3",
     findings: "Test findings 3",
     corrected_results: false,

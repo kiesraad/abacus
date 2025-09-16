@@ -21,15 +21,15 @@ use crate::{
     APIError, AppState, ErrorResponse, SqlitePoolExt,
     audit_log::{AuditEvent, AuditService},
     authentication::Coordinator,
-    investigation::{
-        repository::update_polling_station_investigation,
-        structs::{CurrentSessionPollingStationId, PollingStationInvestigationUpdateRequest},
-    },
     data_entry::{
         CSOFirstSessionResults, PollingStationResults, VotesCounts,
         repository::most_recent_results_for_polling_station,
     },
     election::ElectionWithPoliticalGroups,
+    investigation::{
+        repository::update_polling_station_investigation,
+        structs::{CurrentSessionPollingStationId, PollingStationInvestigationUpdateRequest},
+    },
     pdf_gen::{
         generate_pdf,
         models::{ModelNa14_2Bijlage1Input, ToPdfFileModel},
@@ -42,7 +42,7 @@ pub fn router() -> OpenApiRouter<AppState> {
         .routes(routes!(polling_station_investigation_create))
         .routes(routes!(polling_station_investigation_conclude))
         .routes(routes!(polling_station_investigation_update))
-      .routes(routes!(
+        .routes(routes!(
             polling_station_investigation_download_corrigendum_pdf
         ))
 }
@@ -174,7 +174,7 @@ async fn polling_station_investigation_update(
     Ok(investigation)
 }
 
-/// Print a corrigendum for a polling station
+/// Download a corrigendum for a polling station
 #[utoipa::path(
     get,
     path = "/api/polling_stations/{polling_station_id}/investigation/download_corrigendum_pdf",
@@ -222,10 +222,7 @@ async fn polling_station_investigation_download_corrigendum_pdf(
                         CSOFirstSessionResults::default_political_group_total_votes(
                             &election.political_groups,
                         ),
-                    total_votes_candidates_count: 0,
-                    blank_votes_count: 0,
-                    invalid_votes_count: 0,
-                    total_votes_cast_count: 0,
+                    ..Default::default()
                 },
                 differences_counts: Default::default(),
                 political_group_votes: CSOFirstSessionResults::default_political_group_votes(

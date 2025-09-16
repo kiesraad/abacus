@@ -2977,7 +2977,7 @@
     },
     "/api/polling_stations/{polling_station_id}/investigation/download_corrigendum_pdf": {
       "get": {
-        "summary": "Print a corrigendum for a polling station",
+        "summary": "Download a corrigendum for a polling station",
         "operationId": "polling_station_investigation_download_corrigendum_pdf",
         "parameters": [
           {

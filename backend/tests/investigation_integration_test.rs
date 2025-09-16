@@ -27,7 +27,7 @@ async fn create_investigation(pool: SqlitePool, polling_station_id: u32) -> Resp
         .unwrap()
 }
 
-async fn conclude_investigation(pool: SqlitePool, polling_station_id: u32) -> Response {
+async fn update_investigation(pool: SqlitePool, polling_station_id: u32) -> Response {
     let addr = serve_api(pool).await;
     let coordinator_cookie = shared::coordinator_login(&addr).await;
     let body = json!({
@@ -46,13 +46,13 @@ async fn conclude_investigation(pool: SqlitePool, polling_station_id: u32) -> Re
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_7_four_sessions", "users"))))]
-async fn test_investigation_creation_and_conlusion(pool: SqlitePool) {
+async fn test_investigation_create_and_update(pool: SqlitePool) {
     assert_eq!(
         create_investigation(pool.clone(), 741).await.status(),
         StatusCode::OK
     );
     assert_eq!(
-        conclude_investigation(pool.clone(), 741).await.status(),
+        update_investigation(pool.clone(), 741).await.status(),
         StatusCode::OK
     );
 }
@@ -75,5 +75,13 @@ async fn test_investigation_creation_fails_on_creating_second_investigation(pool
     assert_eq!(
         create_investigation(pool.clone(), 741).await.status(),
         StatusCode::CONFLICT
+    );
+}
+
+#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_7_four_sessions", "users"))))]
+async fn test_investigation_can_only_update_existing(pool: SqlitePool) {
+    assert_eq!(
+        update_investigation(pool.clone(), 741).await.status(),
+        StatusCode::NOT_FOUND
     );
 }

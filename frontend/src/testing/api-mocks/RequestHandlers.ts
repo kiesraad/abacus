@@ -229,15 +229,18 @@ export const CommitteeSessionInvestigationConcludeHandler = http.put<
   ParamsToString<COMMITTEE_SESSION_INVESTIGATION_CONCLUDE_REQUEST_PARAMS>,
   COMMITTEE_SESSION_INVESTIGATION_CONCLUDE_REQUEST_BODY,
   PollingStationInvestigation
->("/api/polling_stations/1/investigations" satisfies COMMITTEE_SESSION_INVESTIGATION_CONCLUDE_REQUEST_PATH, () => {
-  const response: PollingStationInvestigation = {
-    polling_station_id: 1,
-    reason: "Test reason",
-    findings: "Test findings",
-    corrected_results: true,
-  };
-  return HttpResponse.json(response, { status: 200 });
-});
+>(
+  "/api/polling_stations/1/investigations/conclude" satisfies COMMITTEE_SESSION_INVESTIGATION_CONCLUDE_REQUEST_PATH,
+  () => {
+    const response: PollingStationInvestigation = {
+      polling_station_id: 1,
+      reason: "Test reason",
+      findings: "Test findings",
+      corrected_results: true,
+    };
+    return HttpResponse.json(response, { status: 200 });
+  },
+);
 
 // get election list handler
 export const ElectionListRequestHandler = http.get<

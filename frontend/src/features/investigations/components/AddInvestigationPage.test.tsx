@@ -23,16 +23,14 @@ async function renderPage() {
             {
               path: "add",
               Component: AddInvestigationPage,
+            },
+            {
+              path: ":pollingStationId",
               children: [
                 {
-                  path: ":pollingStationId",
-                  children: [
-                    {
-                      index: true,
-                      path: "reason",
-                      Component: () => "Reason stub",
-                    },
-                  ],
+                  index: true,
+                  path: "reason",
+                  Component: () => "Reason stub",
                 },
               ],
             },
@@ -62,8 +60,6 @@ describe("AddInvestigationPage", () => {
     expect(table).toBeInTheDocument();
     expect(table).toHaveTableContent([
       ["Nummer", "Stembureau"],
-      // ["34", "Testplek"],
-      // ["35", "Testschool"],
       ["36", "Testbuurthuis"],
       ["37", "Dansschool Oeps nou deed ik het weer"],
       ["38", "Testmuseum"],
@@ -79,7 +75,7 @@ describe("AddInvestigationPage", () => {
     row.click();
 
     await waitFor(() => {
-      expect(router.state.location.pathname).toEqual("/elections/1/investigations/add/4/reason");
+      expect(router.state.location.pathname).toEqual("/elections/1/investigations/4/reason");
     });
   });
 

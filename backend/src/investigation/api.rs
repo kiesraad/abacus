@@ -16,12 +16,17 @@ use crate::{
     APIError, AppState, ErrorResponse, SqlitePoolExt,
     audit_log::{AuditEvent, AuditService},
     authentication::Coordinator,
+    investigation::{
+        repository::update_polling_station_investigation,
+        structs::PollingStationInvestigationUpdateRequest,
+    },
 };
 
 pub fn router() -> OpenApiRouter<AppState> {
     OpenApiRouter::default()
         .routes(routes!(committee_session_investigation_create))
         .routes(routes!(committee_session_investigation_conclude))
+        .routes(routes!(committee_session_investigation_update))
 }
 
 /// Create an investigation for a polling station
@@ -69,7 +74,7 @@ async fn committee_session_investigation_create(
 /// Conclude an investigation for a polling station
 #[utoipa::path(
     put,
-    path = "/api/polling_stations/{polling_station_id}/investigations",
+    path = "/api/polling_stations/{polling_station_id}/investigations/conclude",
     request_body = PollingStationInvestigationConcludeRequest,
     responses(
         (status = 200, description = "Polling station investigation concluded successfully"),
@@ -101,6 +106,48 @@ async fn committee_session_investigation_conclude(
         .log(
             &mut tx,
             &AuditEvent::PollingStationInvestigationConcluded(investigation.clone()),
+            None,
+        )
+        .await?;
+    tx.commit().await?;
+    Ok(investigation)
+}
+
+/// Update an investigation for a polling station
+#[utoipa::path(
+    put,
+    path = "/api/polling_stations/{polling_station_id}/investigations",
+    request_body = PollingStationInvestigationUpdateRequest,
+    responses(
+        (status = 200, description = "Polling station investigation updated successfully"),
+        (status = 401, description = "Unauthorized", body = ErrorResponse),
+        (status = 403, description = "Forbidden", body = ErrorResponse),
+        (status = 404, description = "Investigation not found", body = ErrorResponse),
+        (status = 409, description = "Request cannot be completed", body = ErrorResponse),
+        (status = 500, description = "Internal server error", body = ErrorResponse),
+    ),
+    params(
+        ("polling_station_id" = u32, description = "Polling station database id"),
+    ),
+)]
+async fn committee_session_investigation_update(
+    _user: Coordinator,
+    State(pool): State<SqlitePool>,
+    audit_service: AuditService,
+    Path(polling_station_id): Path<u32>,
+    Json(polling_station_investigation): Json<PollingStationInvestigationUpdateRequest>,
+) -> Result<PollingStationInvestigation, APIError> {
+    let mut tx = pool.begin_immediate().await?;
+    let investigation = update_polling_station_investigation(
+        &mut tx,
+        polling_station_id,
+        polling_station_investigation,
+    )
+    .await?;
+    audit_service
+        .log(
+            &mut tx,
+            &AuditEvent::PollingStationInvestigationUpdated(investigation.clone()),
             None,
         )
         .await?;

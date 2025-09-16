@@ -65,9 +65,7 @@ export function AddInvestigationLayout() {
                       {disabled ? (
                         <span>{formSection.label}</span>
                       ) : (
-                        <Link
-                          to={`/elections/${election.id}/investigations/add/${pollingStation.id}/${formSection.path}`}
-                        >
+                        <Link to={`/elections/${election.id}/investigations/${pollingStation.id}/${formSection.path}`}>
                           <span>{formSection.label}</span>
                         </Link>
                       )}

@@ -19,7 +19,7 @@ export function InvestigationCard({ investigation }: InvestigationCardProps) {
         <PollingStationNumber size="sm">{investigation.pollingStation.number}</PollingStationNumber>
         <h3>{investigation.pollingStation.name}</h3>
         {investigation.findings && (
-          <Link to={`./add/${investigation.pollingStation.id}/findings`}>
+          <Link to={`./${investigation.pollingStation.id}/findings`}>
             <Icon size="md" icon={<IconPencil />} />
             {t("investigations.edit")}
           </Link>
@@ -29,7 +29,7 @@ export function InvestigationCard({ investigation }: InvestigationCardProps) {
       <p>{investigation.reason}</p>
       {!investigation.findings && (
         <div className="mt-sm">
-          <Link to={`./add/${investigation.pollingStation.id}/print-corrigendum`}>
+          <Link to={`./${investigation.pollingStation.id}/print-corrigendum`}>
             <Icon size="md" icon={<IconPrinter />} />
             {t("investigations.print_corrigendum.title")}
           </Link>
@@ -39,7 +39,7 @@ export function InvestigationCard({ investigation }: InvestigationCardProps) {
       {investigation.findings ? (
         <p>{investigation.findings}</p>
       ) : (
-        <Link to={`./add/${investigation.pollingStation.id}/findings`}>{t("investigations.findings.fill")}</Link>
+        <Link to={`./${investigation.pollingStation.id}/findings`}>{t("investigations.findings.fill")}</Link>
       )}
       {investigation.corrected_results !== undefined && (
         <>

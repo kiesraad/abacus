@@ -218,16 +218,24 @@ export type POLLING_STATION_DATA_ENTRY_FINALISE_REQUEST_PATH =
   `/api/polling_stations/${number}/data_entries/${number}/finalise`;
 
 // /api/polling_stations/{polling_station_id}/investigations
-export interface COMMITTEE_SESSION_INVESTIGATION_CONCLUDE_REQUEST_PARAMS {
+export interface COMMITTEE_SESSION_INVESTIGATION_UPDATE_REQUEST_PARAMS {
   polling_station_id: number;
 }
-export type COMMITTEE_SESSION_INVESTIGATION_CONCLUDE_REQUEST_PATH = `/api/polling_stations/${number}/investigations`;
-export type COMMITTEE_SESSION_INVESTIGATION_CONCLUDE_REQUEST_BODY = PollingStationInvestigationConcludeRequest;
+export type COMMITTEE_SESSION_INVESTIGATION_UPDATE_REQUEST_PATH = `/api/polling_stations/${number}/investigations`;
+export type COMMITTEE_SESSION_INVESTIGATION_UPDATE_REQUEST_BODY = PollingStationInvestigationUpdateRequest;
 export interface COMMITTEE_SESSION_INVESTIGATION_CREATE_REQUEST_PARAMS {
   polling_station_id: number;
 }
 export type COMMITTEE_SESSION_INVESTIGATION_CREATE_REQUEST_PATH = `/api/polling_stations/${number}/investigations`;
 export type COMMITTEE_SESSION_INVESTIGATION_CREATE_REQUEST_BODY = PollingStationInvestigationCreateRequest;
+
+// /api/polling_stations/{polling_station_id}/investigations/conclude
+export interface COMMITTEE_SESSION_INVESTIGATION_CONCLUDE_REQUEST_PARAMS {
+  polling_station_id: number;
+}
+export type COMMITTEE_SESSION_INVESTIGATION_CONCLUDE_REQUEST_PATH =
+  `/api/polling_stations/${number}/investigations/conclude`;
+export type COMMITTEE_SESSION_INVESTIGATION_CONCLUDE_REQUEST_BODY = PollingStationInvestigationConcludeRequest;
 
 // /api/user
 export type USER_LIST_REQUEST_PARAMS = Record<string, never>;
@@ -302,6 +310,7 @@ export type AuditEvent =
   | (CommitteeSessionDetails & { event_type: "CommitteeSessionUpdated" })
   | (PollingStationInvestigation & { event_type: "PollingStationInvestigationCreated" })
   | (PollingStationInvestigation & { event_type: "PollingStationInvestigationConcluded" })
+  | (PollingStationInvestigation & { event_type: "PollingStationInvestigationUpdated" })
   | (FileDetails & { event_type: "FileCreated" })
   | (FileDetails & { event_type: "FileDeleted" })
   | (ElectionDetails & { event_type: "ApportionmentCreated" })
@@ -1036,6 +1045,12 @@ export interface PollingStationInvestigationConcludeRequest {
 }
 
 export interface PollingStationInvestigationCreateRequest {
+  reason: string;
+}
+
+export interface PollingStationInvestigationUpdateRequest {
+  corrected_results: boolean;
+  findings: string;
   reason: string;
 }
 

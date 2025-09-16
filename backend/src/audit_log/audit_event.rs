@@ -171,8 +171,10 @@ pub enum AuditEvent {
     CommitteeSessionCreated(CommitteeSessionDetails),
     CommitteeSessionDeleted(CommitteeSessionDetails),
     CommitteeSessionUpdated(CommitteeSessionDetails),
+    // investigation events
     PollingStationInvestigationCreated(PollingStationInvestigation),
     PollingStationInvestigationConcluded(PollingStationInvestigation),
+    PollingStationInvestigationUpdated(PollingStationInvestigation),
     // file events
     FileCreated(FileDetails),
     FileDeleted(FileDetails),
@@ -239,6 +241,7 @@ impl AuditEvent {
             AuditEvent::PollingStationsImported(_) => AuditEventLevel::Success,
             AuditEvent::PollingStationInvestigationCreated(_) => AuditEventLevel::Info,
             AuditEvent::PollingStationInvestigationConcluded(_) => AuditEventLevel::Info,
+            AuditEvent::PollingStationInvestigationUpdated(_) => AuditEventLevel::Info,
             AuditEvent::DataEntryClaimed(_) => AuditEventLevel::Success,
             AuditEvent::DataEntrySaved(_) => AuditEventLevel::Success,
             AuditEvent::DataEntryDeleted(_) => AuditEventLevel::Info,

@@ -11,10 +11,7 @@ import { InputField } from "@/components/ui/InputField/InputField";
 import { Loader } from "@/components/ui/Loader/Loader";
 import { useElection } from "@/hooks/election/useElection";
 import { t } from "@/i18n/translate";
-import {
-  PollingStationInvestigationConcludeRequest,
-  PollingStationInvestigationCreateRequest,
-} from "@/types/generated/openapi";
+import { PollingStationInvestigationCreateRequest } from "@/types/generated/openapi";
 import { StringFormData } from "@/utils/stringFormData";
 
 interface InvestigationFindingsProps {
@@ -23,10 +20,12 @@ interface InvestigationFindingsProps {
 
 export function InvestigationFindings({ pollingStationId }: InvestigationFindingsProps) {
   const navigate = useNavigate();
-
   const { election, investigation, refetch } = useElection(pollingStationId);
+  const concludePath = `/api/polling_stations/${pollingStationId}/investigations/conclude`;
+  const { update: conclude } = useCrud<PollingStationInvestigationCreateRequest>({ update: concludePath });
   const path = `/api/polling_stations/${pollingStationId}/investigations`;
   const { update } = useCrud<PollingStationInvestigationCreateRequest>({ update: path });
+
   const [nonEmptyError, setNonEmptyError] = useState(false);
   const [radioError, setRadioError] = useState(false);
   const [apiError, setApiError] = useState<AnyApiError>();
@@ -66,8 +65,24 @@ export function InvestigationFindings({ pollingStationId }: InvestigationFinding
     }
 
     const correctedResults = correctedResultsChoice === "yes";
-    const body: PollingStationInvestigationConcludeRequest = { findings, corrected_results: correctedResults };
-    const response = await update(body);
+
+    const save = () => {
+      if (investigation.findings !== undefined) {
+        return update({
+          reason: investigation.reason,
+          findings,
+          corrected_results: correctedResults,
+        });
+      }
+
+      return conclude({
+        findings,
+        corrected_results: correctedResults,
+      });
+    };
+
+    const response = await save();
+
     if (isSuccess(response)) {
       await refetch();
       await navigate(`/elections/${election.id}/investigations`);

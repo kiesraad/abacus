@@ -96,15 +96,15 @@ describe("InvestigationsOverviewPage", () => {
     await renderPage();
 
     const printLink = await screen.findByRole("link", { name: "Print het corrigendum" });
-    expect(printLink).toHaveAttribute("href", "/elections/1/investigations/add/1/print-corrigendum");
+    expect(printLink).toHaveAttribute("href", "/elections/1/investigations/1/print-corrigendum");
 
     const fillInLink = await screen.findByRole("link", { name: "Nu invullen" });
-    expect(fillInLink).toHaveAttribute("href", "/elections/1/investigations/add/1/findings");
+    expect(fillInLink).toHaveAttribute("href", "/elections/1/investigations/1/findings");
 
     const editLinks = await screen.findAllByRole("link", { name: "Bewerken" });
 
-    expect(editLinks[0]).toHaveAttribute("href", "/elections/1/investigations/add/3/findings");
-    expect(editLinks[1]).toHaveAttribute("href", "/elections/1/investigations/add/2/findings");
-    expect(editLinks[2]).toHaveAttribute("href", "/elections/1/investigations/add/2/findings");
+    expect(editLinks[0]).toHaveAttribute("href", "/elections/1/investigations/3/findings");
+    expect(editLinks[1]).toHaveAttribute("href", "/elections/1/investigations/2/findings");
+    expect(editLinks[2]).toHaveAttribute("href", "/elections/1/investigations/2/findings");
   });
 });

@@ -21,8 +21,8 @@ export function InvestigationReason({ pollingStationId, investigation }: Investi
   const navigate = useNavigate();
   const { refetch } = useElection();
   const [nonEmptyError, setNonEmptyError] = useState(false);
-  const createPath = `/api/polling_stations/${pollingStationId}/investigations`;
-  const { create } = useCrud<PollingStationInvestigationCreateRequest>({ create: createPath });
+  const path = `/api/polling_stations/${pollingStationId}/investigations`;
+  const { create, update } = useCrud<PollingStationInvestigationCreateRequest>(path);
   const [error, setError] = useState<AnyApiError>();
 
   if (error) {
@@ -42,8 +42,19 @@ export function InvestigationReason({ pollingStationId, investigation }: Investi
 
     setNonEmptyError(false);
 
-    const body: PollingStationInvestigationCreateRequest = { reason };
-    const response = await create(body);
+    const save = () => {
+      if (investigation != undefined) {
+        return update({
+          reason,
+          findings: investigation.findings,
+          corrected_results: investigation.corrected_results,
+        });
+      }
+
+      return create({ reason });
+    };
+
+    const response = await save();
 
     if (isSuccess(response)) {
       await refetch();
@@ -76,7 +87,7 @@ export function InvestigationReason({ pollingStationId, investigation }: Investi
           />
         </FormLayout.Section>
         <FormLayout.Controls>
-          <Button type="submit">{t("next")}</Button>
+          <Button type="submit">{investigation ? t("save") : t("next")}</Button>
         </FormLayout.Controls>
       </FormLayout>
     </Form>

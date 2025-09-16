@@ -14,30 +14,26 @@ export const investigationRoutes: RouteObject[] = [
     children: [
       { index: true, Component: InvestigationsOverviewPage },
       {
+        index: true,
         path: "add",
+        Component: AddInvestigationPage,
+      },
+      {
+        path: ":pollingStationId",
+        Component: AddInvestigationLayout,
         children: [
           {
             index: true,
-            Component: AddInvestigationPage,
+            path: "reason",
+            Component: InvestigationReasonPage,
           },
           {
-            path: ":pollingStationId",
-            Component: AddInvestigationLayout,
-            children: [
-              {
-                index: true,
-                path: "reason",
-                Component: InvestigationReasonPage,
-              },
-              {
-                path: "print-corrigendum",
-                Component: InvestigationPrintCorrigendumPage,
-              },
-              {
-                path: "findings",
-                Component: InvestigationFindingsPage,
-              },
-            ],
+            path: "print-corrigendum",
+            Component: InvestigationPrintCorrigendumPage,
+          },
+          {
+            path: "findings",
+            Component: InvestigationFindingsPage,
           },
         ],
       },

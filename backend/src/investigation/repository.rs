@@ -58,6 +58,36 @@ pub async fn conclude_polling_station_investigation(
     .await
 }
 
+pub async fn update_polling_station_investigation(
+    conn: &mut SqliteConnection,
+    polling_station_id: u32,
+    polling_station_investigation: super::structs::PollingStationInvestigationUpdateRequest,
+) -> Result<PollingStationInvestigation, Error> {
+    query_as!(
+        PollingStationInvestigation,
+        r#"
+        UPDATE polling_station_investigations
+        SET
+          reason = ?,
+          findings = ?,
+          corrected_results = ?
+        WHERE
+          polling_station_id = ?
+        RETURNING
+          polling_station_id as "polling_station_id: u32",
+          reason,
+          findings,
+          corrected_results as "corrected_results: bool"
+        "#,
+        polling_station_investigation.reason,
+        polling_station_investigation.findings,
+        polling_station_investigation.corrected_results,
+        polling_station_id,
+    )
+    .fetch_one(conn)
+    .await
+}
+
 pub async fn list_investigations_for_committee_session(
     conn: &mut SqliteConnection,
     committee_session_id: u32,

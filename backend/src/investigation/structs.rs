@@ -36,3 +36,11 @@ pub struct PollingStationInvestigationConcludeRequest {
     pub findings: String,
     pub corrected_results: bool,
 }
+
+#[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq, ToSchema)]
+#[serde(deny_unknown_fields)]
+pub struct PollingStationInvestigationUpdateRequest {
+    pub reason: String,
+    pub findings: String,
+    pub corrected_results: bool,
+}

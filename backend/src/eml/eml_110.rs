@@ -40,16 +40,8 @@ impl EML110 {
         &self.election_event.election
     }
 
-    fn election_tree(&self) -> Option<&ElectionTree> {
-        self.election().election_tree.as_ref()
-    }
-
     fn election_identifier(&self) -> &ElectionIdentifier {
         &self.election().election_identifier
-    }
-
-    fn first_region(&self) -> Option<&Region> {
-        self.election_tree().and_then(|t| t.regions.first())
     }
 
     fn election_domain(&self) -> Option<&ElectionDomain> {
@@ -64,16 +56,6 @@ impl EML110 {
         // we need to be importing from a 110a file
         if self.base.id != "110a" {
             return Err(EMLImportError::Needs110a);
-        }
-
-        // check that the election tree is specified
-        if self.election_tree().is_none() {
-            return Err(EMLImportError::MissingElectionTree);
-        }
-
-        // we need a region
-        if self.first_region().is_none() {
-            return Err(EMLImportError::MissingRegion);
         }
 
         // we currently only support GR elections
@@ -267,30 +249,6 @@ impl EML110 {
                     } else {
                         50
                     }),
-                    // TODO: we currently don't have all the information in the election tree datastructure
-                    election_tree: Some(ElectionTree {
-                        regions: vec![Region {
-                            region_name: election.location.clone(),
-                            region_number: Some(election.domain_id.clone()),
-                            region_category: RegionCategory::Municipality,
-                            roman_numerals: false,
-                            frysian_export_allowed: false,
-                            superior_region_number: None,
-                            superior_region_category: None,
-                            committees: vec![
-                                Committee {
-                                    category: CommitteeCategory::CSB,
-                                    name: None,
-                                    accept_central_submissions: false,
-                                },
-                                Committee {
-                                    category: CommitteeCategory::HSB,
-                                    name: None,
-                                    accept_central_submissions: false,
-                                },
-                            ],
-                        }],
-                    }),
                     registered_parties: election
                         .political_groups
                         .iter()
@@ -359,7 +317,6 @@ impl EML110 {
                     },
                     number_of_seats: None,
                     preference_threshold: None,
-                    election_tree: None,
                     registered_parties: vec![],
                 },
             },
@@ -389,8 +346,6 @@ pub struct Election {
     // required in 110a, not in 110b
     #[serde(skip_serializing_if = "Option::is_none", default)]
     preference_threshold: Option<u64>,
-    #[serde(skip_serializing_if = "Option::is_none", default)]
-    election_tree: Option<ElectionTree>,
     #[serde(
         with = "registered_parties",
         rename(serialize = "kr:RegisteredParties", deserialize = "RegisteredParties"),
@@ -527,34 +482,6 @@ pub enum VotingMethod {
     Unknown,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(rename_all = "PascalCase")]
-pub struct ElectionTree {
-    #[serde(rename(serialize = "kr:Region", deserialize = "Region"))]
-    regions: Vec<Region>,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(rename_all = "PascalCase")]
-pub struct Region {
-    #[serde(rename(serialize = "kr:RegionName", deserialize = "RegionName"))]
-    region_name: String,
-    #[serde(rename = "@RegionNumber")]
-    region_number: Option<String>,
-    #[serde(rename = "@RegionCategory")]
-    region_category: RegionCategory,
-    #[serde(rename = "@RomanNumerals", default)]
-    roman_numerals: bool,
-    #[serde(rename = "@FrysianExportAllowed", default)]
-    frysian_export_allowed: bool,
-    #[serde(rename = "@SuperiorRegionNumber")]
-    superior_region_number: Option<String>,
-    #[serde(rename = "@SuperiorRegionCategory")]
-    superior_region_category: Option<RegionCategory>,
-    #[serde(rename(serialize = "kr:Committee", deserialize = "Committee"))]
-    committees: Vec<Committee>,
-}
-
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq, Copy)]
 pub enum RegionCategory {
     #[serde(rename = "DEELGEMEENTE")]
@@ -627,15 +554,6 @@ mod tests {
             doc.election_event.election.contest.voting_method,
             VotingMethod::SinglePreferenceVote
         );
-        assert_eq!(
-            doc.election_event
-                .election
-                .election_tree
-                .unwrap()
-                .regions
-                .len(),
-            1
-        );
     }
 
     #[test]
@@ -647,27 +565,6 @@ mod tests {
             doc.election_event.election.contest.polling_places.len(),
             420
         );
-    }
-
-    #[test]
-    fn test_election_validate_invalid_election_missing_region() {
-        let data = include_str!("./tests/eml110a_invalid_election_missing_region.eml.xml");
-        let doc = EML110::from_str(data).unwrap_err();
-        // currently the missing region is already captured by the parser
-        assert!(matches!(doc, DeError::Custom(_)));
-
-        // modify valid eml to remove regions parsed to check that the error triggers
-        // if constructed otherwise
-        let data = include_str!("./tests/eml110a_test.eml.xml");
-        let mut doc = EML110::from_str(data).unwrap();
-        doc.election_event
-            .election
-            .election_tree
-            .as_mut()
-            .unwrap()
-            .regions = vec![];
-        let res = doc.as_abacus_election().unwrap_err();
-        assert!(matches!(res, EMLImportError::MissingRegion));
     }
 
     #[test]
@@ -737,14 +634,6 @@ mod tests {
         let doc = EML110::from_str(data).unwrap();
         let res = doc.as_abacus_election().unwrap_err();
         assert!(matches!(res, EMLImportError::MissingNumberOfSeats));
-    }
-
-    #[test]
-    fn test_election_validate_missing_election_tree() {
-        let data = include_str!("./tests/eml110a_invalid_election_missing_election_tree.eml.xml");
-        let doc = EML110::from_str(data).unwrap();
-        let res = doc.as_abacus_election().unwrap_err();
-        assert!(matches!(res, EMLImportError::MissingElectionTree))
     }
 
     #[test]

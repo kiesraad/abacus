@@ -378,7 +378,7 @@ describe("Test DifferencesForm", () => {
       expectInputToNotHaveIcon(expectedValidInputFieldIds);
     });
 
-    test("F.305 Votes equals voters checked, but more_ballots_count and/or fewer_ballots_count are filled in", async () => {
+    test("F.305 Votes equals voters, but more_ballots_count and/or fewer_ballots_count are filled in", async () => {
       const user = userEvent.setup();
 
       overrideServerClaimDataEntryResponse({

@@ -26,7 +26,7 @@ export function InvestigationCard({ investigation }: InvestigationCardProps) {
         )}
       </div>
       <h4>{t("investigations.reason_and_assignment.title")}</h4>
-      <p>{investigation.reason}</p>
+      <pre>{investigation.reason}</pre>
       {!investigation.findings && (
         <div className="mt-sm">
           <Link to={`./${investigation.pollingStation.id}/print-corrigendum`}>
@@ -37,7 +37,7 @@ export function InvestigationCard({ investigation }: InvestigationCardProps) {
       )}
       <h4>{t("investigations.findings.title_long")}</h4>
       {investigation.findings ? (
-        <p>{investigation.findings}</p>
+        <pre>{investigation.findings}</pre>
       ) : (
         <Link to={`./${investigation.pollingStation.id}/findings`}>{t("investigations.findings.fill")}</Link>
       )}

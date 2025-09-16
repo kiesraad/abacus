@@ -30,6 +30,11 @@
     align-items: center;
     gap: var(--space-sm);
   }
+
+  pre {
+    font-family: var(--font-text), sans-serif;
+    margin: 0;
+  }
 }
 
 .card_header {

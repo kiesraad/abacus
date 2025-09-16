@@ -347,7 +347,7 @@ pub fn validate_differences_counts(
             );
         }
 
-        if fields.len() > 0 {
+        if !fields.is_empty() {
             validation_results.errors.push(ValidationResult {
                 fields,
                 code: ValidationResultCode::F305,
@@ -2026,8 +2026,8 @@ mod tests {
                         context: None,
                     },
                     ValidationResult {
-                        code: ValidationResultCode::F306,
-                        fields: vec!["differences_counts.more_ballots_count".into()],
+                        code: ValidationResultCode::F308,
+                        fields: vec!["differences_counts.fewer_ballots_count".into()],
                         context: None,
                     }
                 ]

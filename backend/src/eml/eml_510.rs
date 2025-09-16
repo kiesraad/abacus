@@ -674,7 +674,7 @@ mod tests {
     }
 
     #[test]
-    fn test_eml510d_with_investigations() {
+    fn test_eml510b_with_investigations() {
         let data = include_str!("./tests/eml510b_with_investigations.eml.xml");
         let doc = EML510::from_str(data).unwrap();
 

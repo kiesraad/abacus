@@ -349,7 +349,6 @@ impl EML110 {
                                         },
                                     },
                                     polling_station: PollingStation {
-                                        //token: ps.number.to_string(),
                                         number_of_voters: ps
                                             .number_of_voters
                                             .map(|value| value.try_into().unwrap_or(0)),

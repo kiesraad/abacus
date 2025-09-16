@@ -165,11 +165,13 @@ fn load_sources() -> Vec<Source> {
     // read them at runtime on initialization to allow more rapid development on the
     // typst files.
     vec![
-        include_source!("common/style.typ"),
         include_source!("common/scripts.typ"),
+        include_source!("common/style.typ"),
+        include_source!("model-n-10-2.typ"),
+        include_source!("model-na-14-2.typ"),
+        include_source!("model-na-14-2-bijlage1.typ"),
         include_source!("model-na-31-2.typ"),
         include_source!("model-na-31-2-bijlage1.typ"),
-        include_source!("model-n-10-2.typ"),
     ]
 }
 

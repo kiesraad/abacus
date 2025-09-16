@@ -91,6 +91,7 @@ export function InvestigationFindings({ pollingStationId }: InvestigationFinding
             label={t("investigations.findings.title")}
             error={nonEmptyError ? t("form_errors.FORM_VALIDATION_RESULT_REQUIRED") : undefined}
             hint={t("investigations.findings.hint")}
+            defaultValue={investigation.findings || ""}
           />
           <ChoiceList>
             <ChoiceList.Legend>{t("investigations.findings.corrected_result")}</ChoiceList.Legend>
@@ -99,10 +100,22 @@ export function InvestigationFindings({ pollingStationId }: InvestigationFinding
                 {t("investigations.findings.pick_corrected_result")}
               </ChoiceList.Error>
             )}
-            <ChoiceList.Radio id="corrected_results_yes" name="corrected_results" value="yes" label={t("yes")}>
+            <ChoiceList.Radio
+              id="corrected_results_yes"
+              name="corrected_results"
+              value="yes"
+              label={t("yes")}
+              defaultChecked={investigation.corrected_results === true}
+            >
               {t("investigations.findings.corrected_result_yes")}
             </ChoiceList.Radio>
-            <ChoiceList.Radio id="corrected_results_no" name="corrected_results" value="no" label={t("no")}>
+            <ChoiceList.Radio
+              id="corrected_results_no"
+              name="corrected_results"
+              value="no"
+              label={t("no")}
+              defaultChecked={investigation.corrected_results === false}
+            >
               {t("investigations.findings.corrected_result_no")}
             </ChoiceList.Radio>
           </ChoiceList>

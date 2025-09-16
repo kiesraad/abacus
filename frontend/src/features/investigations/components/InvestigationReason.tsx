@@ -9,20 +9,20 @@ import { FormLayout } from "@/components/ui/Form/FormLayout";
 import { InputField } from "@/components/ui/InputField/InputField";
 import { useElection } from "@/hooks/election/useElection";
 import { t } from "@/i18n/translate";
-import { PollingStationInvestigationCreateRequest } from "@/types/generated/openapi";
+import { PollingStationInvestigation, PollingStationInvestigationCreateRequest } from "@/types/generated/openapi";
 import { StringFormData } from "@/utils/stringFormData";
 
 interface InvestigationReasonProps {
   pollingStationId: number;
+  investigation?: PollingStationInvestigation;
 }
 
-export function InvestigationReason({ pollingStationId }: InvestigationReasonProps) {
+export function InvestigationReason({ pollingStationId, investigation }: InvestigationReasonProps) {
   const navigate = useNavigate();
   const { refetch } = useElection();
   const [nonEmptyError, setNonEmptyError] = useState(false);
-  const path = `/api/polling_stations/${pollingStationId}/investigations`;
-  const { create } = useCrud<PollingStationInvestigationCreateRequest>({ create: path });
-
+  const createPath = `/api/polling_stations/${pollingStationId}/investigations`;
+  const { create } = useCrud<PollingStationInvestigationCreateRequest>({ create: createPath });
   const [error, setError] = useState<AnyApiError>();
 
   if (error) {
@@ -44,6 +44,7 @@ export function InvestigationReason({ pollingStationId }: InvestigationReasonPro
 
     const body: PollingStationInvestigationCreateRequest = { reason };
     const response = await create(body);
+
     if (isSuccess(response)) {
       await refetch();
       await navigate("../print-corrigendum");
@@ -71,6 +72,7 @@ export function InvestigationReason({ pollingStationId }: InvestigationReasonPro
             name="reason"
             label={t("investigations.reason_and_assignment.title")}
             error={nonEmptyError ? t("form_errors.FORM_VALIDATION_RESULT_REQUIRED") : undefined}
+            defaultValue={investigation?.reason}
           />
         </FormLayout.Section>
         <FormLayout.Controls>

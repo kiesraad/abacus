@@ -60,6 +60,7 @@ export function InputField({
       <textarea
         name={name}
         value={value}
+        defaultValue={InputFieldProps.defaultValue}
         autoComplete="off"
         autoFocus={autoFocus}
         aria-invalid={error ? "true" : "false"}

@@ -10,7 +10,7 @@ export interface PollingStationInvestigationWithStatus extends PollingStationInv
 interface InvestigationsOverview {
   investigations: PollingStationInvestigationWithStatus[];
   currentInvestigations: PollingStationInvestigationWithStatus[];
-  handledInvestigantions: PollingStationInvestigationWithStatus[];
+  handledInvestigations: PollingStationInvestigationWithStatus[];
 }
 
 export default function useInvestigations(): InvestigationsOverview {
@@ -21,7 +21,7 @@ export default function useInvestigations(): InvestigationsOverview {
     return {
       investigations: [],
       currentInvestigations: [],
-      handledInvestigantions: [],
+      handledInvestigations: [],
     };
   }
 
@@ -43,11 +43,11 @@ export default function useInvestigations(): InvestigationsOverview {
     .filter((inv) => inv !== null) as PollingStationInvestigationWithStatus[];
 
   const currentInvestigations = investigationsWithStatus.filter((inv) => !inv.findings || inv.status !== "definitive");
-  const handledInvestigantions = investigationsWithStatus.filter((inv) => inv.findings && inv.status === "definitive");
+  const handledInvestigations = investigationsWithStatus.filter((inv) => inv.findings && inv.status === "definitive");
 
   return {
     investigations: investigationsWithStatus,
     currentInvestigations,
-    handledInvestigantions,
+    handledInvestigations,
   };
 }

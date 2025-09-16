@@ -8,6 +8,7 @@ import { ProgressList } from "@/components/ui/ProgressList/ProgressList";
 import { useElection } from "@/hooks/election/useElection";
 import { useNumericParam } from "@/hooks/useNumericParam";
 import { t } from "@/i18n/translate";
+import { MenuStatus } from "@/types/ui";
 
 const formSections = [
   { key: "reason_and_assigment", label: t("investigations.reason_and_assignment.title"), path: "reason" },
@@ -18,7 +19,7 @@ const formSections = [
 export function AddInvestigationLayout() {
   const location = useLocation();
   const pollingStationId = useNumericParam("pollingStationId");
-  const { election, pollingStation } = useElection(pollingStationId);
+  const { election, pollingStation, investigation } = useElection(pollingStationId);
 
   const currentFormSection = formSections.findIndex((formSection) => location.pathname.endsWith(formSection.path));
 
@@ -40,28 +41,41 @@ export function AddInvestigationLayout() {
       <main>
         <StickyNav>
           <ProgressList>
-            {formSections.map((formSection, index) => (
-              <div key={formSection.key}>
-                <ProgressList.Fixed>
-                  <ProgressList.Item
-                    key={formSection.key}
-                    status={currentFormSection === index ? "active" : "idle"}
-                    disabled={index > currentFormSection}
-                    active={currentFormSection === index}
-                  >
-                    {index >= currentFormSection ? (
-                      <span>{formSection.label}</span>
-                    ) : (
-                      <Link
-                        to={`/elections/${election.id}/investigations/add/${pollingStation.id}/${formSection.path}`}
-                      >
+            {formSections.map((formSection, index) => {
+              const disabled = index > currentFormSection && investigation === undefined;
+              let status: MenuStatus = currentFormSection === index ? "active" : "idle";
+
+              if (investigation?.reason && formSection.key === "reason_and_assigment") {
+                status = "accept";
+              }
+
+              if (investigation?.findings) {
+                status = "accept";
+              }
+
+              return (
+                <div key={formSection.key}>
+                  <ProgressList.Fixed>
+                    <ProgressList.Item
+                      key={formSection.key}
+                      status={status}
+                      disabled={disabled}
+                      active={currentFormSection === index}
+                    >
+                      {disabled ? (
                         <span>{formSection.label}</span>
-                      </Link>
-                    )}
-                  </ProgressList.Item>
-                </ProgressList.Fixed>
-              </div>
-            ))}
+                      ) : (
+                        <Link
+                          to={`/elections/${election.id}/investigations/add/${pollingStation.id}/${formSection.path}`}
+                        >
+                          <span>{formSection.label}</span>
+                        </Link>
+                      )}
+                    </ProgressList.Item>
+                  </ProgressList.Fixed>
+                </div>
+              );
+            })}
           </ProgressList>
         </StickyNav>
         <article className="md">

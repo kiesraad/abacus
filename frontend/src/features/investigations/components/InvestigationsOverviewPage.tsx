@@ -10,7 +10,7 @@ import { InvestigationCard } from "./InvestigationCard";
 
 export function InvestigationsOverviewPage() {
   const { currentCommitteeSession } = useElection();
-  const { investigations, currentInvestigations, handledInvestigantions } = useInvestigations();
+  const { investigations, currentInvestigations, handledInvestigations } = useInvestigations();
 
   return (
     <>
@@ -42,10 +42,10 @@ export function InvestigationsOverviewPage() {
           {currentInvestigations.map((investigation, index) => (
             <InvestigationCard investigation={investigation} key={index} />
           ))}
-          {handledInvestigantions.length > 0 && (
+          {handledInvestigations.length > 0 && (
             <>
               <h3 className="mb-lg mt-lg">{t("investigations.handled_investigations")}</h3>
-              {handledInvestigantions.map((investigation, index) => (
+              {handledInvestigations.map((investigation, index) => (
                 <InvestigationCard investigation={investigation} key={index} />
               ))}
             </>

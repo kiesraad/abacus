@@ -7,7 +7,7 @@ import { ElectionLayout } from "@/components/layout/ElectionLayout";
 import { getElectionMockData } from "@/testing/api-mocks/ElectionMockData";
 import { ElectionStatusRequestHandler } from "@/testing/api-mocks/RequestHandlers";
 import { Providers } from "@/testing/Providers";
-import { server } from "@/testing/server";
+import { overrideOnce, server } from "@/testing/server";
 import { screen, setupTestRouter } from "@/testing/test-utils";
 import { ElectionDetailsResponse } from "@/types/generated/openapi";
 
@@ -46,12 +46,22 @@ describe("InvestigationsOverviewPage", () => {
   });
 
   test("Renders the correct headings and button", async () => {
+    const electionData = getElectionMockData({}, { id: 2, number: 2, status: "created" }, []);
+    overrideOnce("get", "/api/elections/1", 200, electionData);
+
     await renderPage();
 
     expect(await screen.findByRole("heading", { level: 1, name: "Onderzoeken in tweede zitting" })).toBeVisible();
     expect(
       await screen.findByRole("heading", { level: 2, name: "Onderzoeksverzoeken vanuit het centraal stembureau" }),
     ).toBeVisible();
+
+    expect(
+      await screen.findByText(
+        "Voeg voor elk verzoek van het centraal stembureau een onderzoek toe en voer de aanleiding in.",
+      ),
+    ).toBeVisible();
+
     expect(await screen.findByRole("link", { name: "Onderzoek toevoegen" })).toBeVisible();
   });
 
@@ -62,5 +72,23 @@ describe("InvestigationsOverviewPage", () => {
     link.click();
 
     expect(router.state.location.pathname).toEqual("/elections/1/investigations/add");
+  });
+
+  test("Renders a list of investigations", async () => {
+    await renderPage();
+
+    expect(await screen.findByRole("heading", { level: 3, name: "Afgehandelde onderzoeken" })).toBeVisible();
+
+    // first investigations item
+    expect(await screen.findByRole("heading", { level: 3, name: "Op Rolletjes" })).toBeVisible();
+    expect(await screen.findByText("Test reason 1")).toBeVisible();
+    expect(await screen.findByRole("link", { name: "Print het corrigendum" })).toBeVisible();
+
+    // count that there are 4 investigations + the "Afgehandelde onderzoeken" heading
+    expect(await screen.findAllByRole("heading", { level: 3 })).toHaveLength(5);
+
+    // last investigations item
+    expect(await screen.findByText("Test findings 4")).toBeVisible();
+    expect(await screen.findByText("De gecorrigeerde uitslag is ingevoerd")).toBeVisible();
   });
 });

@@ -293,6 +293,11 @@ impl Validate for PollingStationResults {
             PollingStationResults::CSOFirstSession(results) => {
                 results.validate(election, polling_station, validation_results, path)
             }
+            PollingStationResults::CSONextSession(_results) => {
+                // TODO: validate CSONextSessionResults
+                // results.validate(election, polling_station, validation_results, path)
+                Ok(())
+            }
         }
     }
 }

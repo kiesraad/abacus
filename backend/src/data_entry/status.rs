@@ -222,6 +222,11 @@ impl DataEntryStatus {
             DataEntryStatus::SecondEntryNotStarted(state) => {
                 if current_data_entry.user_id == state.first_entry_user_id {
                     Err(DataEntryTransitionError::SecondEntryNeedsDifferentUser)
+                } else if !state
+                    .finalised_first_entry
+                    .is_same_model(&current_data_entry.entry)
+                {
+                    Err(DataEntryTransitionError::Invalid)
                 } else {
                     Ok(Self::SecondEntryInProgress(SecondEntryInProgress {
                         first_entry_user_id: state.first_entry_user_id,
@@ -261,6 +266,10 @@ impl DataEntryStatus {
                     return Err(DataEntryTransitionError::CannotTransitionUsingDifferentUser);
                 }
 
+                if !state.first_entry.is_same_model(&current_data_entry.entry) {
+                    return Err(DataEntryTransitionError::Invalid);
+                }
+
                 Ok(Self::FirstEntryInProgress(FirstEntryInProgress {
                     progress: current_data_entry.progress.unwrap_or(0),
                     first_entry_user_id: state.first_entry_user_id,
@@ -288,6 +297,10 @@ impl DataEntryStatus {
             DataEntryStatus::SecondEntryInProgress(state) => {
                 if state.second_entry_user_id != current_data_entry.user_id {
                     return Err(DataEntryTransitionError::CannotTransitionUsingDifferentUser);
+                }
+
+                if !state.second_entry.is_same_model(&current_data_entry.entry) {
+                    return Err(DataEntryTransitionError::Invalid);
                 }
 
                 Ok(Self::SecondEntryInProgress(SecondEntryInProgress {

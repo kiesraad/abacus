@@ -39,14 +39,6 @@ impl From<PollingStationDataEntry> for DataEntryDetails {
     }
 }
 
-#[derive(Clone, Debug, PartialEq, Eq, Hash)]
-pub struct PollingStationResultsEntry {
-    pub polling_station_id: u32,
-    pub committee_session_id: u32,
-    pub data: PollingStationResults,
-    pub created_at: DateTime<Utc>,
-}
-
 /// PollingStationResults contains the results for a polling station.
 ///
 /// The exact type of results depends on the election counting method and
@@ -58,6 +50,9 @@ pub enum PollingStationResults {
     /// Results for centrally counted (CSO) elections, first election committee session.
     /// This contains the data entry values from Model Na 31-2 Bijlage 2.
     CSOFirstSession(CSOFirstSessionResults),
+    /// Results for centrally counted (CSO) elections, any subsequent election committee session.
+    /// This contains the data entry values from Model Na 14-2 Bijlage 1.
+    CSONextSession(CSONextSessionResults),
 }
 
 impl PollingStationResults {
@@ -65,6 +60,7 @@ impl PollingStationResults {
     pub fn as_cso_first_session(&self) -> Option<&CSOFirstSessionResults> {
         match self {
             PollingStationResults::CSOFirstSession(results) => Some(results),
+            _ => None,
         }
     }
 
@@ -72,6 +68,7 @@ impl PollingStationResults {
     pub fn as_cso_first_session_mut(&mut self) -> Option<&mut CSOFirstSessionResults> {
         match self {
             PollingStationResults::CSOFirstSession(results) => Some(results),
+            _ => None,
         }
     }
 
@@ -79,35 +76,126 @@ impl PollingStationResults {
     pub fn into_cso_first_session(self) -> Option<CSOFirstSessionResults> {
         match self {
             PollingStationResults::CSOFirstSession(results) => Some(results),
+            _ => None,
         }
     }
-}
 
-/// CSOFirstSessionResults, following the fields in Model Na 31-2 Bijlage 2.
-///
-/// See "Model Na 31-2. Proces-verbaal van een gemeentelijk stembureau/stembureau voor het openbaar
-/// lichaam in een gemeente/openbaar lichaam waar een centrale stemopneming wordt verricht,
-/// Bijlage 2: uitkomsten per stembureau" from the
-/// [Kiesregeling](https://wetten.overheid.nl/BWBR0034180/2024-04-01#Bijlage1_DivisieNa31.2) or
-/// [Verkiezingstoolbox](https://www.rijksoverheid.nl/onderwerpen/verkiezingen/verkiezingentoolkit/modellen).
-#[derive(Serialize, Deserialize, ToSchema, Clone, Debug, PartialEq, Eq, Hash)]
-#[serde(deny_unknown_fields)]
-pub struct CSOFirstSessionResults {
-    /// Extra investigation ("B1-1 Extra onderzoek")
-    pub extra_investigation: ExtraInvestigation,
-    /// Counting Differences Polling Station ("B1-2 Verschillen met telresultaten van het stembureau")
-    pub counting_differences_polling_station: CountingDifferencesPollingStation,
-    /// Voters counts ("1. Aantal toegelaten kiezers")
-    pub voters_counts: VotersCounts,
-    /// Votes counts ("2. Aantal getelde stembiljetten")
-    pub votes_counts: VotesCounts,
-    /// Differences counts ("3. Verschil tussen het aantal toegelaten kiezers en het aantal getelde stembiljetten")
-    pub differences_counts: DifferencesCounts,
-    /// Vote counts per list and candidate (5. "Aantal stemmen per lijst en kandidaat")
-    pub political_group_votes: Vec<PoliticalGroupCandidateVotes>,
-}
+    /// Get a reference to the inner CSONextSessionResults, if this is of that type.
+    pub fn as_cso_next_session(&self) -> Option<&CSONextSessionResults> {
+        match self {
+            PollingStationResults::CSONextSession(results) => Some(results),
+            _ => None,
+        }
+    }
 
-impl CSOFirstSessionResults {
+    /// Get a mutable reference to the inner CSONextSessionResults, if this is of that type.
+    pub fn as_cso_next_session_mut(&mut self) -> Option<&mut CSONextSessionResults> {
+        match self {
+            PollingStationResults::CSONextSession(results) => Some(results),
+            _ => None,
+        }
+    }
+
+    /// Consume self and return the inner CSONextSessionResults, if this is of that type.
+    pub fn into_cso_next_session(self) -> Option<CSONextSessionResults> {
+        match self {
+            PollingStationResults::CSONextSession(results) => Some(results),
+            _ => None,
+        }
+    }
+
+    /// Common accessor for voter counts regardless of the underlying model.
+    pub fn voters_counts(&self) -> &VotersCounts {
+        match self {
+            PollingStationResults::CSOFirstSession(results) => &results.voters_counts,
+            PollingStationResults::CSONextSession(results) => &results.voters_counts,
+        }
+    }
+
+    /// Common mutable accessor for voter counts regardless of the underlying model.
+    #[cfg(test)]
+    pub fn voters_counts_mut(&mut self) -> &mut VotersCounts {
+        match self {
+            PollingStationResults::CSOFirstSession(results) => &mut results.voters_counts,
+            PollingStationResults::CSONextSession(results) => &mut results.voters_counts,
+        }
+    }
+
+    /// Common accessor for votes counts regardless of the underlying model.
+    pub fn votes_counts(&self) -> &VotesCounts {
+        match self {
+            PollingStationResults::CSOFirstSession(results) => &results.votes_counts,
+            PollingStationResults::CSONextSession(results) => &results.votes_counts,
+        }
+    }
+
+    /// Common mutable accessor for votes counts regardless of the underlying model.
+    #[cfg(test)]
+    pub fn votes_counts_mut(&mut self) -> &mut VotesCounts {
+        match self {
+            PollingStationResults::CSOFirstSession(results) => &mut results.votes_counts,
+            PollingStationResults::CSONextSession(results) => &mut results.votes_counts,
+        }
+    }
+
+    /// Common accessor for differences counts regardless of the underlying model.
+    pub fn differences_counts(&self) -> &DifferencesCounts {
+        match self {
+            PollingStationResults::CSOFirstSession(results) => &results.differences_counts,
+            PollingStationResults::CSONextSession(results) => &results.differences_counts,
+        }
+    }
+
+    /// Common mutable accessor for differences counts regardless of the underlying model.
+    #[cfg(test)]
+    pub fn differences_counts_mut(&mut self) -> &mut DifferencesCounts {
+        match self {
+            PollingStationResults::CSOFirstSession(results) => &mut results.differences_counts,
+            PollingStationResults::CSONextSession(results) => &mut results.differences_counts,
+        }
+    }
+
+    /// Common accessor for political group votes regardless of the underlying model.
+    pub fn political_group_votes(&self) -> &[PoliticalGroupCandidateVotes] {
+        match self {
+            PollingStationResults::CSOFirstSession(results) => &results.political_group_votes,
+            PollingStationResults::CSONextSession(results) => &results.political_group_votes,
+        }
+    }
+
+    /// Common mutable accessor for political group votes regardless of the underlying model.
+    #[cfg(test)]
+    pub fn political_group_votes_mut(&mut self) -> &mut Vec<PoliticalGroupCandidateVotes> {
+        match self {
+            PollingStationResults::CSOFirstSession(results) => &mut results.political_group_votes,
+            PollingStationResults::CSONextSession(results) => &mut results.political_group_votes,
+        }
+    }
+
+    /// Convert to CommonPollingStationResults, which contains only the common fields.
+    pub fn as_common(&self) -> CommonPollingStationResults {
+        CommonPollingStationResults {
+            voters_counts: self.voters_counts().clone(),
+            votes_counts: self.votes_counts().clone(),
+            differences_counts: self.differences_counts().clone(),
+            political_group_votes: self.political_group_votes().to_vec(),
+        }
+    }
+
+    /// Returns true if both are of the same model variant, false otherwise.
+    pub fn is_same_model(&self, other: &Self) -> bool {
+        matches!(
+            (self, other),
+            (
+                PollingStationResults::CSOFirstSession(_),
+                PollingStationResults::CSOFirstSession(_)
+            ) | (
+                PollingStationResults::CSONextSession(_),
+                PollingStationResults::CSONextSession(_)
+            )
+        )
+    }
+
     /// Create a default value for `political_group_votes` (type `Vec<PoliticalGroup>`)
     /// for the given political groups, with all votes set to 0.
     pub fn default_political_group_votes(
@@ -142,6 +230,63 @@ impl CSOFirstSessionResults {
             })
             .collect()
     }
+}
+
+/// CommonPollingStationResults contains the common fields for polling station results,
+#[derive(Serialize, Deserialize, ToSchema, Clone, Debug, PartialEq, Eq, Hash)]
+#[serde(deny_unknown_fields)]
+pub struct CommonPollingStationResults {
+    /// Voters counts ("Aantal toegelaten kiezers")
+    pub voters_counts: VotersCounts,
+    /// Votes counts ("Aantal getelde stembiljetten")
+    pub votes_counts: VotesCounts,
+    /// Differences counts ("Verschil tussen het aantal toegelaten kiezers en het aantal getelde stembiljetten")
+    pub differences_counts: DifferencesCounts,
+    /// Vote counts per list and candidate ("Aantal stemmen per lijst en kandidaat")
+    pub political_group_votes: Vec<PoliticalGroupCandidateVotes>,
+}
+
+/// CSOFirstSessionResults, following the fields in Model Na 31-2 Bijlage 2.
+///
+/// See "Model Na 31-2. Proces-verbaal van een gemeentelijk stembureau/stembureau voor het openbaar
+/// lichaam in een gemeente/openbaar lichaam waar een centrale stemopneming wordt verricht,
+/// Bijlage 2: uitkomsten per stembureau" from the
+/// [Kiesregeling](https://wetten.overheid.nl/BWBR0034180/2024-04-01#Bijlage1_DivisieNa31.2) or
+/// [Verkiezingstoolbox](https://www.rijksoverheid.nl/onderwerpen/verkiezingen/verkiezingentoolkit/modellen).
+#[derive(Serialize, Deserialize, ToSchema, Clone, Debug, PartialEq, Eq, Hash)]
+#[serde(deny_unknown_fields)]
+pub struct CSOFirstSessionResults {
+    /// Extra investigation ("B1-1 Extra onderzoek")
+    pub extra_investigation: ExtraInvestigation,
+    /// Counting Differences Polling Station ("B1-2 Verschillen met telresultaten van het stembureau")
+    pub counting_differences_polling_station: CountingDifferencesPollingStation,
+    /// Voters counts ("1. Aantal toegelaten kiezers")
+    pub voters_counts: VotersCounts,
+    /// Votes counts ("2. Aantal getelde stembiljetten")
+    pub votes_counts: VotesCounts,
+    /// Differences counts ("3. Verschil tussen het aantal toegelaten kiezers en het aantal getelde stembiljetten")
+    pub differences_counts: DifferencesCounts,
+    /// Vote counts per list and candidate (5. "Aantal stemmen per lijst en kandidaat")
+    pub political_group_votes: Vec<PoliticalGroupCandidateVotes>,
+}
+
+/// CSONextSessionResults, following the fields in Model Na 14-2 Bijlage 1.
+///
+/// See "Model Na 14-2. Corrigendum bij het proces-verbaal van een gemeentelijk stembureau/
+/// stembureau voor het openbaar lichaam, Bijlage 1: uitkomsten per stembureau" from the
+/// [Kiesregeling](https://wetten.overheid.nl/BWBR0034180/2024-04-01#Bijlage1_DivisieNa14.2) or
+/// [Verkiezingstoolbox](https://www.rijksoverheid.nl/onderwerpen/verkiezingen/verkiezingentoolkit/modellen).
+#[derive(Serialize, Deserialize, ToSchema, Clone, Debug, PartialEq, Eq, Hash)]
+#[serde(deny_unknown_fields)]
+pub struct CSONextSessionResults {
+    /// Voters counts ("Aantal toegelaten kiezers")
+    pub voters_counts: VotersCounts,
+    /// Votes counts ("Aantal getelde stembiljetten")
+    pub votes_counts: VotesCounts,
+    /// Differences counts ("Verschil tussen het aantal toegelaten kiezers en het aantal getelde stembiljetten")
+    pub differences_counts: DifferencesCounts,
+    /// Vote counts per list and candidate ("Aantal stemmen per lijst en kandidaat")
+    pub political_group_votes: Vec<PoliticalGroupCandidateVotes>,
 }
 
 pub type Count = u32;

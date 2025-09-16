@@ -1,7 +1,4 @@
-use axum::{
-    Json,
-    extract::{Path, State},
-};
+use axum::{Json, extract::State};
 use sqlx::SqlitePool;
 use utoipa_axum::{router::OpenApiRouter, routes};
 
@@ -18,7 +15,7 @@ use crate::{
     authentication::Coordinator,
     investigation::{
         repository::update_polling_station_investigation,
-        structs::PollingStationInvestigationUpdateRequest,
+        structs::{CurrentSessionPollingStationId, PollingStationInvestigationUpdateRequest},
     },
 };
 
@@ -50,13 +47,10 @@ async fn polling_station_investigation_create(
     _user: Coordinator,
     State(pool): State<SqlitePool>,
     audit_service: AuditService,
-    Path(polling_station_id): Path<u32>,
+    CurrentSessionPollingStationId(polling_station_id): CurrentSessionPollingStationId,
     Json(polling_station_investigation): Json<PollingStationInvestigationCreateRequest>,
 ) -> Result<PollingStationInvestigation, APIError> {
     let mut tx = pool.begin_immediate().await?;
-
-    // Throw a 404 if the polling station isn't found in the current committee session
-    let _ = crate::polling_station::repository::get(&mut tx, polling_station_id).await?;
 
     let investigation = create_polling_station_investigation(
         &mut tx,
@@ -96,7 +90,7 @@ async fn polling_station_investigation_conclude(
     _user: Coordinator,
     State(pool): State<SqlitePool>,
     audit_service: AuditService,
-    Path(polling_station_id): Path<u32>,
+    CurrentSessionPollingStationId(polling_station_id): CurrentSessionPollingStationId,
     Json(polling_station_investigation): Json<PollingStationInvestigationConcludeRequest>,
 ) -> Result<PollingStationInvestigation, APIError> {
     let mut tx = pool.begin_immediate().await?;
@@ -138,7 +132,7 @@ async fn polling_station_investigation_update(
     _user: Coordinator,
     State(pool): State<SqlitePool>,
     audit_service: AuditService,
-    Path(polling_station_id): Path<u32>,
+    CurrentSessionPollingStationId(polling_station_id): CurrentSessionPollingStationId,
     Json(polling_station_investigation): Json<PollingStationInvestigationUpdateRequest>,
 ) -> Result<PollingStationInvestigation, APIError> {
     let mut tx = pool.begin_immediate().await?;

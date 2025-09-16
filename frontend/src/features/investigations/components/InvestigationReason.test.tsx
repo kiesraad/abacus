@@ -4,13 +4,15 @@ import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
 import { ElectionProvider } from "@/hooks/election/ElectionProvider";
+import { getElectionMockData } from "@/testing/api-mocks/ElectionMockData";
 import {
   CommitteeSessionInvestigationCreateHandler,
+  CommitteeSessionInvestigationUpdateHandler,
   ElectionRequestHandler,
   ElectionStatusRequestHandler,
 } from "@/testing/api-mocks/RequestHandlers";
-import { server } from "@/testing/server";
-import { render, screen, waitFor } from "@/testing/test-utils";
+import { overrideOnce, server } from "@/testing/server";
+import { render, screen, spyOnHandler, waitFor } from "@/testing/test-utils";
 
 import { InvestigationReason } from "./InvestigationReason";
 
@@ -40,6 +42,9 @@ describe("InvestigationReason", () => {
   });
 
   test("Displays an error message when submitting an empty form", async () => {
+    const electionData = getElectionMockData({}, {}, []);
+    overrideOnce("get", "/api/elections/1", 200, electionData);
+
     renderPage();
 
     const reason = await screen.findByLabelText("Aanleiding en opdracht");
@@ -55,6 +60,9 @@ describe("InvestigationReason", () => {
   });
 
   test("Navigate to the next page when submitting a reason", async () => {
+    const electionData = getElectionMockData({}, {}, []);
+    overrideOnce("get", "/api/elections/1", 200, electionData);
+
     renderPage();
 
     const reason = await screen.findByLabelText("Aanleiding en opdracht");
@@ -66,6 +74,33 @@ describe("InvestigationReason", () => {
 
     await waitFor(() => {
       expect(navigate).toHaveBeenCalledWith("../print-corrigendum");
+    });
+  });
+
+  test("Update the existing reason", async () => {
+    server.use(CommitteeSessionInvestigationUpdateHandler);
+    const update = spyOnHandler(CommitteeSessionInvestigationUpdateHandler);
+
+    renderPage();
+
+    const reason = await screen.findByLabelText("Aanleiding en opdracht");
+    expect(reason).toHaveValue("Test reason 1");
+
+    const user = userEvent.setup();
+    await user.clear(reason);
+    await user.type(reason, "New test reason 1");
+
+    expect(reason).toHaveValue("New test reason 1");
+
+    const submitButton = await screen.findByRole("button", { name: "Opslaan" });
+    submitButton.click();
+
+    await waitFor(() => {
+      expect(navigate).toHaveBeenCalledWith("../print-corrigendum");
+    });
+
+    expect(update).toHaveBeenCalledWith({
+      reason: "New test reason 1",
     });
   });
 });

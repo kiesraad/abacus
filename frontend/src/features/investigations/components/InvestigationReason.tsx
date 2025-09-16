@@ -9,17 +9,16 @@ import { FormLayout } from "@/components/ui/Form/FormLayout";
 import { InputField } from "@/components/ui/InputField/InputField";
 import { useElection } from "@/hooks/election/useElection";
 import { t } from "@/i18n/translate";
-import { PollingStationInvestigation, PollingStationInvestigationCreateRequest } from "@/types/generated/openapi";
+import { PollingStationInvestigationCreateRequest } from "@/types/generated/openapi";
 import { StringFormData } from "@/utils/stringFormData";
 
 interface InvestigationReasonProps {
   pollingStationId: number;
-  investigation?: PollingStationInvestigation;
 }
 
-export function InvestigationReason({ pollingStationId, investigation }: InvestigationReasonProps) {
+export function InvestigationReason({ pollingStationId }: InvestigationReasonProps) {
   const navigate = useNavigate();
-  const { refetch } = useElection();
+  const { investigation, refetch } = useElection(pollingStationId);
   const [nonEmptyError, setNonEmptyError] = useState(false);
   const path = `/api/polling_stations/${pollingStationId}/investigations`;
   const { create, update } = useCrud<PollingStationInvestigationCreateRequest>(path);

@@ -9,17 +9,17 @@ import {
   ElectionRequestHandler,
   ElectionStatusRequestHandler,
 } from "@/testing/api-mocks/RequestHandlers";
-import { server } from "@/testing/server";
-import { render, screen, waitFor } from "@/testing/test-utils";
+import { overrideOnce, server } from "@/testing/server";
+import { render, screen, spyOnHandler, waitFor } from "@/testing/test-utils";
 
 import { InvestigationFindings } from "./InvestigationFindings";
 
 const navigate = vi.fn();
 
-function renderPage() {
+function renderPage(pollingStationId = 1) {
   render(
     <ElectionProvider electionId={1}>
-      <InvestigationFindings pollingStationId={1} />
+      <InvestigationFindings pollingStationId={pollingStationId} />
     </ElectionProvider>,
   );
 }
@@ -73,6 +73,42 @@ describe("InvestigationFindings", () => {
 
     await waitFor(() => {
       expect(navigate).toHaveBeenCalledWith("/elections/1/investigations");
+    });
+  });
+
+  test("Update the existing findings", async () => {
+    const update = spyOnHandler(
+      overrideOnce("put", "/api/polling_stations/2/investigations", 200, {
+        findings: "New test findings 3",
+        corrected_results: false,
+      }),
+    );
+
+    renderPage(2);
+
+    const findings = await screen.findByLabelText("Bevindingen");
+    expect(findings).toHaveValue("Test findings 3");
+
+    const user = userEvent.setup();
+    await user.clear(findings);
+    await user.type(findings, "New test findings 3");
+
+    expect(findings).toHaveValue("New test findings 3");
+
+    const noRadio = await screen.findByLabelText(/Nee/);
+    noRadio.click();
+
+    const submitButton = await screen.findByRole("button", { name: "Opslaan" });
+    submitButton.click();
+
+    await waitFor(() => {
+      expect(navigate).toHaveBeenCalledWith("/elections/1/investigations");
+    });
+
+    expect(update).toHaveBeenCalledWith({
+      reason: "Test reason 3",
+      findings: "New test findings 3",
+      corrected_results: false,
     });
   });
 });

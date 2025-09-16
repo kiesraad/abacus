@@ -26,6 +26,7 @@
   "multiple_polling_stations": "Zijn er voor meerdere stembureaus onderzoeken aangevraagd? Doorloop de volgende stappen dan voor elk stembureau.",
   "no_corrected_results": "De uitslag is ongewijzigd",
   "print_corrigendum": {
+    "action": "Corrigendum afdrukken",
     "add_the_findings": "Voer in de volgende stap de bevindingen van het onderzoek in.",
     "after_the_investigation": "Na het onderzoek van het gemeentelijk stembureau",
     "back_to_all_investigations": "Terug naar alle onderzoeken",

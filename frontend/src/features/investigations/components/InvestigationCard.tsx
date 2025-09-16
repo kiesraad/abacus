@@ -31,7 +31,7 @@ export function InvestigationCard({ investigation }: InvestigationCardProps) {
         <div className="mt-sm">
           <Link to={`./${investigation.pollingStation.id}/print-corrigendum`}>
             <Icon size="md" icon={<IconPrinter />} />
-            {t("investigations.print_corrigendum.title")}
+            {t("investigations.print_corrigendum.action")}
           </Link>
         </div>
       )}

@@ -82,7 +82,7 @@ describe("InvestigationsOverviewPage", () => {
     // first investigations item
     expect(await screen.findByRole("heading", { level: 3, name: "Op Rolletjes" })).toBeVisible();
     expect(await screen.findByText("Test reason 1")).toBeVisible();
-    expect(await screen.findByRole("link", { name: "Print het corrigendum" })).toBeVisible();
+    expect(await screen.findByRole("link", { name: "Corrigendum afdrukken" })).toBeVisible();
 
     // count that there are 4 investigations + the "Afgehandelde onderzoeken" heading
     expect(await screen.findAllByRole("heading", { level: 3 })).toHaveLength(5);
@@ -95,7 +95,7 @@ describe("InvestigationsOverviewPage", () => {
   test("Links to the correct pages when editing an investigation or printing the corrigendum", async () => {
     await renderPage();
 
-    const printLink = await screen.findByRole("link", { name: "Print het corrigendum" });
+    const printLink = await screen.findByRole("link", { name: "Corrigendum afdrukken" });
     expect(printLink).toHaveAttribute("href", "/elections/1/investigations/1/print-corrigendum");
 
     const fillInLink = await screen.findByRole("link", { name: "Nu invullen" });

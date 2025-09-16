@@ -449,16 +449,15 @@ pub struct PhysicalLocation {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "PascalCase")]
 pub struct PollingStation {
-    //#[serde(rename = "$text")]
-    //token: String,
     #[serde(rename = "@Id")]
     id: String,
     #[serde(deserialize_with = "deserialize_number_of_voters", rename = "$text")]
     number_of_voters: Option<u64>,
 }
 
-/// If the string value ontains a positive integer, return as number of voters
-/// otherwise leave empty
+/// If the string value for number_of_voters contains a positive integer,
+/// return the integer and store as number of voters
+/// in all other cases; ignore errors and leave empty
 fn deserialize_number_of_voters<'de, D>(data: D) -> Result<Option<u64>, D::Error>
 where
     D: Deserializer<'de>,
@@ -495,20 +494,6 @@ impl TryInto<PollingStationRequest> for &PollingPlace {
                 .id
                 .parse()
                 .or(Err(EMLImportError::InvalidPollingStation))?,
-
-            /*
-            // If the token string contains a positive integer, store as number of voters
-            // otherwise leave empty
-            number_of_voters: match self.physical_location.polling_station.token.parse::<i64>() {
-                Ok(number) => {
-                    if number > 0 {
-                        Some(number)
-                    } else {
-                        None
-                    }
-                }
-                Err(_error) => None,
-            },*/
             number_of_voters: match self.physical_location.polling_station.number_of_voters {
                 Some(value) => value.try_into().ok(),
                 None => None,

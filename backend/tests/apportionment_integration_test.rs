@@ -185,7 +185,7 @@ async fn test_election_apportionment_works_for_19_or_more_seats(pool: SqlitePool
         client_state: ClientState::new_from_str(None).unwrap(),
     };
 
-    create_result_with_non_example_data_entry(&addr, 8, 5, data_entry).await;
+    create_result_with_non_example_data_entry(&addr, 9, 5, data_entry).await;
 
     let url = format!("http://{addr}/api/elections/5/apportionment");
     let response = reqwest::Client::new()

@@ -6,7 +6,7 @@ use serde_json::json;
 use sqlx::SqlitePool;
 use test_log::test;
 
-use crate::{shared::create_result, utils::serve_api};
+use crate::utils::serve_api;
 
 pub mod shared;
 pub mod utils;
@@ -200,14 +200,11 @@ async fn test_investigation_can_only_update_current_session(pool: SqlitePool) {
     );
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
+#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_5", "users"))))]
 async fn test_polling_station_corrigendum_download_with_previous_results(pool: SqlitePool) {
     let addr = serve_api(pool.clone()).await;
     let coordinator_cookie = shared::coordinator_login(&addr).await;
-    let polling_station_id = 2;
-
-    create_result(&addr, 1, 2).await;
-    create_result(&addr, 2, 2).await;
+    let polling_station_id = 9;
 
     assert_eq!(
         create_investigation(pool.clone(), polling_station_id)
@@ -235,7 +232,7 @@ async fn test_polling_station_corrigendum_download_with_previous_results(pool: S
     assert_eq!(&content_disposition_string[..21], "attachment; filename=");
     assert_eq!(
         &content_disposition_string[21..],
-        "\"Model_Na14-2_GR2024_Stembureau_34_Bijlage_1.pdf\""
+        "\"Model_Na14-2_GR2026_Stembureau_41_Bijlage_1.pdf\""
     );
 
     let bytes = response.bytes().await.unwrap();

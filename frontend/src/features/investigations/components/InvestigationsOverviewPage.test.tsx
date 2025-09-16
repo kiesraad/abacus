@@ -91,4 +91,20 @@ describe("InvestigationsOverviewPage", () => {
     expect(await screen.findByText("Test findings 4")).toBeVisible();
     expect(await screen.findByText("De gecorrigeerde uitslag is ingevoerd")).toBeVisible();
   });
+
+  test("Links to the correct pages when editing an investigation or printing the corrigendum", async () => {
+    await renderPage();
+
+    const printLink = await screen.findByRole("link", { name: "Print het corrigendum" });
+    expect(printLink).toHaveAttribute("href", "/elections/1/investigations/add/1/print-corrigendum");
+
+    const fillInLink = await screen.findByRole("link", { name: "Nu invullen" });
+    expect(fillInLink).toHaveAttribute("href", "/elections/1/investigations/add/1/findings");
+
+    const editLinks = await screen.findAllByRole("link", { name: "Bewerken" });
+
+    expect(editLinks[0]).toHaveAttribute("href", "/elections/1/investigations/add/3/findings");
+    expect(editLinks[1]).toHaveAttribute("href", "/elections/1/investigations/add/2/findings");
+    expect(editLinks[2]).toHaveAttribute("href", "/elections/1/investigations/add/2/findings");
+  });
 });

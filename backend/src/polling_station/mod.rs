@@ -225,6 +225,8 @@ async fn polling_station_update(
         )
         .await?;
 
+    tx.commit().await?;
+
     Ok((StatusCode::OK, polling_station))
 }
 

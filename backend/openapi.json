@@ -6332,7 +6332,6 @@
         "description": "Polling station of a certain [crate::election::Election]",
         "required": [
           "name",
-          "number",
           "address",
           "postal_code",
           "locality"

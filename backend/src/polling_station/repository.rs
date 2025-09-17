@@ -141,6 +141,12 @@ pub async fn create(
             .await?
             .ok_or(sqlx::Error::RowNotFound)?;
 
+    if new_polling_station.number.is_none() {
+        return Err(sqlx::Error::InvalidArgument(
+            "number is required".to_string(),
+        ));
+    }
+
     let res = query_as!(
         PollingStation,
         r#"
@@ -200,6 +206,12 @@ pub async fn create_many(
             .ok_or(sqlx::Error::RowNotFound)?;
 
     for new_polling_station in new_polling_stations {
+        if new_polling_station.number.is_none() {
+            return Err(sqlx::Error::InvalidArgument(
+                "number is required".to_string(),
+            ));
+        }
+
         stations.push(
             query_as!(
                 PollingStation,
@@ -260,13 +272,20 @@ pub async fn update(
             .await?
             .ok_or(sqlx::Error::RowNotFound)?;
 
+    let polling_station = get(&mut tx, polling_station_id).await?;
+    if polling_station.id_prev_session.is_some() && polling_station_update.number.is_some() {
+        return Err(sqlx::Error::InvalidArgument(
+            "number cannot be updated for polling stations copied from a previous committee session".to_string(),
+        ));
+    }
+
     let res = query_as!(
         PollingStation,
         r#"
         UPDATE polling_stations
         SET
             name = ?,
-            number = ?,
+            number = COALESCE(?, number),
             number_of_voters = ?,
             polling_station_type = ?,
             address = ?,

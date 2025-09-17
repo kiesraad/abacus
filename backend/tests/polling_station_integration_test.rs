@@ -61,7 +61,7 @@ async fn test_polling_station_creation_for_committee_session_with_created_status
         .post(&url)
         .json(&PollingStationRequest {
             name: "New Polling Station".to_string(),
-            number: 5,
+            number: Some(5),
             number_of_voters: Some(426),
             polling_station_type: Some(PollingStationType::FixedLocation),
             address: "Teststraat 2a".to_string(),
@@ -121,7 +121,7 @@ async fn test_polling_station_creation_for_committee_session_with_finished_statu
         .post(&url)
         .json(&PollingStationRequest {
             name: "New Polling Station".to_string(),
-            number: 5,
+            number: Some(5),
             number_of_voters: Some(426),
             polling_station_type: Some(PollingStationType::FixedLocation),
             address: "Teststraat 2a".to_string(),
@@ -190,7 +190,7 @@ async fn test_polling_station_update_ok(pool: SqlitePool) {
         .put(&url)
         .json(&PollingStationRequest {
             name: "Testverandering".to_string(),
-            number: 34,
+            number: Some(34),
             number_of_voters: Some(2000),
             polling_station_type: Some(PollingStationType::Special),
             address: "Teststraat 2a".to_string(),
@@ -223,7 +223,7 @@ async fn test_polling_station_update_empty_type_ok(pool: SqlitePool) {
         .put(&url)
         .json(&PollingStationRequest {
             name: "Testverandering".to_string(),
-            number: 34,
+            number: Some(34),
             number_of_voters: Some(2000),
             polling_station_type: None,
             address: "Teststraat 2a".to_string(),
@@ -256,7 +256,7 @@ async fn test_polling_station_update_not_found(pool: SqlitePool) {
         .put(&url)
         .json(&PollingStationRequest {
             name: "Testverandering".to_string(),
-            number: 34,
+            number: Some(34),
             number_of_voters: Some(2000),
             polling_station_type: Some(PollingStationType::Special),
             address: "Teststraat 2a".to_string(),
@@ -428,7 +428,7 @@ async fn test_polling_station_non_unique(pool: SqlitePool) {
         .post(&url)
         .json(&PollingStationRequest {
             name: "New Polling Station".to_string(),
-            number: 33,
+            number: Some(33),
             number_of_voters: None,
             polling_station_type: Some(PollingStationType::FixedLocation),
             address: "Teststraat 2a".to_string(),

@@ -16,7 +16,7 @@ import { InvestigationFindings } from "./InvestigationFindings";
 
 const navigate = vi.fn();
 
-function renderPage(pollingStationId = 1) {
+function renderPage(pollingStationId = 3) {
   render(
     <ElectionProvider electionId={1}>
       <InvestigationFindings pollingStationId={pollingStationId} />

@@ -3,7 +3,8 @@
   "add_investigation_for_each_csb_request": "Voeg voor elk verzoek van het centraal stembureau een onderzoek toe en voer de aanleiding in.",
   "corrected_results": "Er is een gecorrigeerde uitslag",
   "corrected_results_inserted": "De gecorrigeerde uitslag is ingevoerd",
-  "corrected_results_not_yet_inserted": "Laat de nieuwe uitslag twee keer invoeren",
+  "corrected_results_not_yet_inserted": "Laat twee invoerders het corrigendum overnemen in Abacus",
+  "corrigendum_data_entry_in_progress": "Invoer corrigendum bezig",
   "edit": "Bewerken",
   "findings": {
     "corrected_result": "Is er een gecorrigeerde uitslag?",

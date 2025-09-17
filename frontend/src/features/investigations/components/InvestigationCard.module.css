@@ -19,6 +19,7 @@
     /* Align the icon in a header */
     display: flex;
     gap: var(--space-sm);
+    align-items: center;
   }
 
   a {
@@ -45,4 +46,8 @@
   a {
     margin-left: auto;
   }
+}
+
+.flex {
+  display: flex;
 }

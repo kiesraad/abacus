@@ -21,7 +21,7 @@ const navigate = vi.fn();
 function renderPage() {
   render(
     <ElectionProvider electionId={1}>
-      <InvestigationReason pollingStationId={1} />
+      <InvestigationReason pollingStationId={3} />
     </ElectionProvider>,
   );
 }

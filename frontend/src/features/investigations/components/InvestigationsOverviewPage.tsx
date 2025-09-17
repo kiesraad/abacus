@@ -9,7 +9,7 @@ import useInvestigations from "../hooks/useInvestigations";
 import { InvestigationCard } from "./InvestigationCard";
 
 export function InvestigationsOverviewPage() {
-  const { currentCommitteeSession } = useElection();
+  const { currentCommitteeSession, election } = useElection();
   const { investigations, currentInvestigations, handledInvestigations } = useInvestigations();
 
   return (
@@ -40,13 +40,13 @@ export function InvestigationsOverviewPage() {
             </Button.Link>
           </nav>
           {currentInvestigations.map((investigation, index) => (
-            <InvestigationCard investigation={investigation} key={index} />
+            <InvestigationCard investigation={investigation} electionId={election.id} key={index} />
           ))}
           {handledInvestigations.length > 0 && (
             <>
               <h3 className="mb-lg mt-lg">{t("investigations.handled_investigations")}</h3>
               {handledInvestigations.map((investigation, index) => (
-                <InvestigationCard investigation={investigation} key={index} />
+                <InvestigationCard investigation={investigation} electionId={election.id} key={index} />
               ))}
             </>
           )}

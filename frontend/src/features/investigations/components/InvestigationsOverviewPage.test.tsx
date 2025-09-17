@@ -78,31 +78,33 @@ describe("InvestigationsOverviewPage", () => {
     await renderPage();
 
     // count that there are 4 investigations + the "Afgehandelde onderzoeken" heading
-    expect(await screen.findAllByRole("heading", { level: 3 })).toHaveLength(5);
+    expect(await screen.findAllByRole("heading", { level: 3 })).toHaveLength(6);
 
     // check the order and the filtering
     const headings = await screen.findAllByRole("heading", { level: 3 });
 
-    expect(headings[0]).toHaveTextContent("Op Rolletjes");
-    expect(headings[1]).toHaveTextContent("Testschool");
-    expect(headings[2]).toHaveTextContent("Afgehandelde onderzoeken");
-    expect(headings[3]).toHaveTextContent("Testbuurthuis");
+    expect(headings[0]).toHaveTextContent("Testschool");
+    expect(headings[1]).toHaveTextContent("Op Rolletjes");
+    expect(headings[2]).toHaveTextContent("Testbuurthuis");
+    expect(headings[3]).toHaveTextContent("Afgehandelde onderzoeken");
     expect(headings[4]).toHaveTextContent("Testplek");
+    expect(headings[5]).toHaveTextContent("Test kerk");
   });
 
   test("Links to the correct pages when editing an investigation or printing the corrigendum", async () => {
     await renderPage();
 
     const printLink = await screen.findByRole("link", { name: "Corrigendum afdrukken" });
-    expect(printLink).toHaveAttribute("href", "/elections/1/investigations/1/print-corrigendum");
+    expect(printLink).toHaveAttribute("href", "/elections/1/investigations/3/print-corrigendum");
 
     const fillInLink = await screen.findByRole("link", { name: "Nu invullen" });
-    expect(fillInLink).toHaveAttribute("href", "/elections/1/investigations/1/findings");
+    expect(fillInLink).toHaveAttribute("href", "/elections/1/investigations/3/findings");
 
     const editLinks = await screen.findAllByRole("link", { name: "Bewerken" });
 
-    expect(editLinks[0]).toHaveAttribute("href", "/elections/1/investigations/3/findings");
+    expect(editLinks[0]).toHaveAttribute("href", "/elections/1/investigations/1/findings");
     expect(editLinks[1]).toHaveAttribute("href", "/elections/1/investigations/4/findings");
     expect(editLinks[2]).toHaveAttribute("href", "/elections/1/investigations/2/findings");
+    expect(editLinks[3]).toHaveAttribute("href", "/elections/1/investigations/8/findings");
   });
 });

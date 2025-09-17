@@ -10,9 +10,10 @@ import cls from "./InvestigationCard.module.css";
 
 interface InvestigationCardProps {
   investigation: PollingStationInvestigationWithStatus;
+  electionId: number;
 }
 
-export function InvestigationCard({ investigation }: InvestigationCardProps) {
+export function InvestigationCard({ investigation, electionId }: InvestigationCardProps) {
   return (
     <div className={cls.card}>
       <div className={cls.card_header}>
@@ -20,7 +21,7 @@ export function InvestigationCard({ investigation }: InvestigationCardProps) {
         <h3>{investigation.pollingStation.name}</h3>
         {investigation.findings && (
           <Link to={`./${investigation.pollingStation.id}/findings`}>
-            <Icon size="md" icon={<IconPencil />} />
+            <Icon size="sm" icon={<IconPencil />} />
             {t("investigations.edit")}
           </Link>
         )}
@@ -30,7 +31,7 @@ export function InvestigationCard({ investigation }: InvestigationCardProps) {
       {!investigation.findings && (
         <div className="mt-sm">
           <Link to={`./${investigation.pollingStation.id}/print-corrigendum`}>
-            <Icon size="md" icon={<IconPrinter />} />
+            <Icon size="sm" icon={<IconPrinter />} />
             {t("investigations.print_corrigendum.action")}
           </Link>
         </div>
@@ -47,18 +48,23 @@ export function InvestigationCard({ investigation }: InvestigationCardProps) {
             <>
               <h4>
                 {t("investigations.corrected_results")}
-                <Icon color="default" size="md" icon={<IconCheckmark />} />
+                <Icon color="default" size="sm" icon={<IconCheckmark />} />
               </h4>
               {investigation.status === "definitive" ? (
                 <p>{t("investigations.corrected_results_inserted")}</p>
-              ) : (
+              ) : investigation.status === "first_entry_not_started" ? (
                 <p>{t("investigations.corrected_results_not_yet_inserted")}</p>
+              ) : (
+                <p className={cls.flex}>
+                  {t("investigations.corrigendum_data_entry_in_progress")}&nbsp;-&nbsp;
+                  <Link to={`/elections/${electionId}/status`}>{t("view_progress").toLowerCase()}</Link>
+                </p>
               )}
             </>
           ) : (
             <h4>
               {t("investigations.no_corrected_results")}
-              <Icon color="muted" size="md" icon={<IconMinus />} />
+              <Icon color="muted" size="sm" icon={<IconMinus />} />
             </h4>
           )}
         </>

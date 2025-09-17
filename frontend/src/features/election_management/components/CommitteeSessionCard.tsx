@@ -173,16 +173,14 @@ export function CommitteeSessionCard({
       }
       button = (
         <Button.Link size="sm" to="status">
-          {t("election_management.view_progress")}
+          {t("view_progress")}
         </Button.Link>
       );
       break;
     case "data_entry_paused":
       buttonLinks.push({
         id: committeeSession.id,
-        label: isCoordinator
-          ? t("election_management.resume_or_check_progress")
-          : t("election_management.view_progress"),
+        label: isCoordinator ? t("election_management.resume_or_check_progress") : t("view_progress"),
         to: "status",
       });
       if (isCoordinator && currentSession) {

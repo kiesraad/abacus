@@ -63,7 +63,6 @@ describe("AddInvestigationPage", () => {
       ["37", "Dansschool Oeps nou deed ik het weer"],
       ["38", "Testmuseum"],
       ["39", "Test gemeentehuis"],
-      ["40", "Test kerk"],
     ]);
   });
 

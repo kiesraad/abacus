@@ -9,14 +9,10 @@ import {
 } from "@/testing/api-mocks/RequestHandlers";
 import { validationResultMockData } from "@/testing/api-mocks/ValidationResultMockData";
 import { overrideOnce, server } from "@/testing/server";
-import {
-  ElectionWithPoliticalGroups,
-  POLLING_STATION_DATA_ENTRY_FINALISE_REQUEST_PATH,
-  PollingStationResults,
-} from "@/types/generated/openapi";
+import { POLLING_STATION_DATA_ENTRY_FINALISE_REQUEST_PATH, PollingStationResults } from "@/types/generated/openapi";
 import { ValidationResultSet } from "@/utils/ValidationResults";
 
-import { getDefaultDataEntryState } from "../testing/mock-data";
+import { getDefaultDataEntryState, getInitialValues } from "../testing/mock-data";
 import { DataEntryAction, DataEntryState } from "../types/types";
 import { onDeleteDataEntry, onFinaliseDataEntry, onSubmitForm } from "./actions";
 import dataEntryReducer, { getInitialState as _getInitialState } from "./reducer";
@@ -25,67 +21,15 @@ function getInitialState(): DataEntryState {
   return _getInitialState(electionMockData, 1, 1);
 }
 
-export function _getInitialValues(
-  election: ElectionWithPoliticalGroups,
-  defaultValues?: Partial<PollingStationResults>,
-): PollingStationResults {
-  return {
-    model: "CSOFirstSession",
-    extra_investigation: {
-      extra_investigation_other_reason: { yes: false, no: false },
-      ballots_recounted_extra_investigation: { yes: false, no: false },
-    },
-    counting_differences_polling_station: {
-      unexplained_difference_ballots_voters: { yes: false, no: false },
-      difference_ballots_per_list: { yes: false, no: false },
-    },
-    voters_counts: {
-      poll_card_count: 0,
-      proxy_certificate_count: 0,
-      total_admitted_voters_count: 0,
-    },
-    votes_counts: {
-      political_group_total_votes: election.political_groups.map((pg) => ({
-        number: pg.number,
-        total: 0,
-      })),
-      total_votes_candidates_count: 0,
-      blank_votes_count: 0,
-      invalid_votes_count: 0,
-      total_votes_cast_count: 0,
-    },
-    differences_counts: {
-      more_ballots_count: 0,
-      fewer_ballots_count: 0,
-      compare_votes_cast_admitted_voters: {
-        admitted_voters_equal_votes_cast: false,
-        votes_cast_greater_than_admitted_voters: false,
-        votes_cast_smaller_than_admitted_voters: false,
-      },
-      difference_completely_accounted_for: { yes: false, no: false },
-    },
-    political_group_votes: election.political_groups.map((pg) => ({
-      number: pg.number,
-      total: 0,
-      candidate_votes: pg.candidates.map((c) => ({
-        number: c.number,
-        votes: 0,
-      })),
-    })),
-    ...defaultValues,
-  };
-}
-
-function getInitialValues() {
-  return _getInitialValues(electionMockData);
-}
-
-test("should handle DATA_ENTRY_CLAIMED with client_state", () => {
+test("should handle CSOFirstSession DATA_ENTRY_CLAIMED with no client_state", () => {
   const action: DataEntryAction = {
     type: "DATA_ENTRY_CLAIMED",
     dataEntry: {
       client_state: null,
-      data: getInitialValues(),
+      data: {
+        model: "CSOFirstSession",
+        ...getInitialValues(),
+      },
       validation_results: {
         errors: [],
         warnings: [],
@@ -94,7 +38,43 @@ test("should handle DATA_ENTRY_CLAIMED with client_state", () => {
   };
   const state = dataEntryReducer(getInitialState(), action);
   expect(state.formState).toBeDefined();
-  expect(state.targetFormSectionId).toBeDefined();
+  expect(state.dataEntryStructure?.map(({ id }) => id)).toEqual([
+    "extra_investigation",
+    "counting_differences_polling_station",
+    "voters_votes_counts",
+    "differences_counts",
+    "political_group_votes_1",
+    "political_group_votes_2",
+  ]);
+  expect(state.targetFormSectionId).toEqual("extra_investigation");
+  expect(state.pollingStationResults).toEqual(action.dataEntry.data);
+  expect(state.error).toBeNull();
+});
+
+test("should handle CSONextSession DATA_ENTRY_CLAIMED with no client_state", () => {
+  const action: DataEntryAction = {
+    type: "DATA_ENTRY_CLAIMED",
+    dataEntry: {
+      client_state: null,
+      data: {
+        model: "CSONextSession",
+        ...getInitialValues(),
+      },
+      validation_results: {
+        errors: [],
+        warnings: [],
+      },
+    },
+  };
+  const state = dataEntryReducer(getInitialState(), action);
+  expect(state.formState).toBeDefined();
+  expect(state.dataEntryStructure?.map(({ id }) => id)).toEqual([
+    "voters_votes_counts",
+    "differences_counts",
+    "political_group_votes_1",
+    "political_group_votes_2",
+  ]);
+  expect(state.targetFormSectionId).toEqual("voters_votes_counts");
   expect(state.pollingStationResults).toEqual(action.dataEntry.data);
   expect(state.error).toBeNull();
 });
@@ -311,6 +291,7 @@ describe("onSubmitForm", () => {
     expect(dispatch.mock.calls[1]).toStrictEqual([{ type: "SET_STATUS", status: "aborted" } satisfies DataEntryAction]);
 
     const data: PollingStationResults = {
+      model: "CSOFirstSession",
       ...getInitialValues(),
       voters_counts: {
         poll_card_count: 1,

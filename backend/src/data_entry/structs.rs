@@ -253,7 +253,7 @@ pub struct CommonPollingStationResults {
 /// Bijlage 2: uitkomsten per stembureau" from the
 /// [Kiesregeling](https://wetten.overheid.nl/BWBR0034180/2024-04-01#Bijlage1_DivisieNa31.2) or
 /// [Verkiezingstoolbox](https://www.rijksoverheid.nl/onderwerpen/verkiezingen/verkiezingentoolkit/modellen).
-#[derive(Serialize, Deserialize, ToSchema, Clone, Debug, PartialEq, Eq, Hash)]
+#[derive(Serialize, Deserialize, ToSchema, Clone, Debug, Default, PartialEq, Eq, Hash)]
 #[serde(deny_unknown_fields)]
 pub struct CSOFirstSessionResults {
     /// Extra investigation ("B1-1 Extra onderzoek")
@@ -276,7 +276,7 @@ pub struct CSOFirstSessionResults {
 /// stembureau voor het openbaar lichaam, Bijlage 1: uitkomsten per stembureau" from the
 /// [Kiesregeling](https://wetten.overheid.nl/BWBR0034180/2024-04-01#Bijlage1_DivisieNa14.2) or
 /// [Verkiezingstoolbox](https://www.rijksoverheid.nl/onderwerpen/verkiezingen/verkiezingentoolkit/modellen).
-#[derive(Serialize, Deserialize, ToSchema, Clone, Debug, PartialEq, Eq, Hash)]
+#[derive(Serialize, Deserialize, ToSchema, Clone, Debug, Default, PartialEq, Eq, Hash)]
 #[serde(deny_unknown_fields)]
 pub struct CSONextSessionResults {
     /// Voters counts ("Aantal toegelaten kiezers")
@@ -595,8 +595,6 @@ impl From<PollingStationDataEntry> for DataEntryStatusResponse {
 
 #[cfg(test)]
 pub mod tests {
-    use test_log::test;
-
     use super::*;
 
     pub trait ValidDefault {
@@ -638,100 +636,171 @@ pub mod tests {
         }
     }
 
-    #[test]
-    fn test_votes_addition() {
-        let mut curr_votes = VotesCounts {
-            political_group_total_votes: vec![
-                PoliticalGroupTotalVotes {
-                    number: 1,
-                    total: 10,
-                },
-                PoliticalGroupTotalVotes {
-                    number: 2,
-                    total: 20,
-                },
-            ],
-            total_votes_candidates_count: 2,
-            blank_votes_count: 3,
-            invalid_votes_count: 4,
-            total_votes_cast_count: 9,
+    mod polling_station_results {
+        use crate::data_entry::PollingStationResults;
+
+        #[test]
+        fn test_cso_first_session_as() {
+            let cso_first_session = PollingStationResults::CSOFirstSession(Default::default());
+            assert!(cso_first_session.as_cso_first_session().is_some());
+            assert!(cso_first_session.as_cso_next_session().is_none());
+            assert!(
+                cso_first_session
+                    .clone()
+                    .as_cso_first_session_mut()
+                    .is_some()
+            );
+            assert!(
+                cso_first_session
+                    .clone()
+                    .as_cso_next_session_mut()
+                    .is_none()
+            );
+        }
+
+        #[test]
+        fn test_cso_next_session_as() {
+            let cso_next_session = PollingStationResults::CSONextSession(Default::default());
+            assert!(cso_next_session.as_cso_first_session().is_none());
+            assert!(cso_next_session.as_cso_next_session().is_some());
+
+            assert!(
+                cso_next_session
+                    .clone()
+                    .as_cso_first_session_mut()
+                    .is_none()
+            );
+            assert!(cso_next_session.clone().as_cso_next_session_mut().is_some());
+        }
+
+        #[test]
+        fn test_cso_first_session_into() {
+            let cso_first_session = PollingStationResults::CSOFirstSession(Default::default());
+            assert!(cso_first_session.clone().into_cso_first_session().is_some());
+            assert!(cso_first_session.clone().into_cso_next_session().is_none());
+        }
+
+        #[test]
+        fn test_cso_next_session_into() {
+            let cso_next_session = PollingStationResults::CSONextSession(Default::default());
+            assert!(cso_next_session.clone().into_cso_first_session().is_none());
+            assert!(cso_next_session.clone().into_cso_next_session().is_some());
+        }
+    }
+
+    mod votes_counts {
+        use crate::{
+            APIError,
+            data_entry::{PoliticalGroupTotalVotes, VotesCounts},
+            error::ErrorReference,
         };
 
-        curr_votes
-            .add(&VotesCounts {
+        #[test]
+        fn test_votes_addition() {
+            let mut curr_votes = VotesCounts {
                 political_group_total_votes: vec![
                     PoliticalGroupTotalVotes {
                         number: 1,
-                        total: 11,
+                        total: 10,
                     },
                     PoliticalGroupTotalVotes {
                         number: 2,
-                        total: 12,
+                        total: 20,
                     },
                 ],
+                total_votes_candidates_count: 2,
+                blank_votes_count: 3,
+                invalid_votes_count: 4,
+                total_votes_cast_count: 9,
+            };
+
+            curr_votes
+                .add(&VotesCounts {
+                    political_group_total_votes: vec![
+                        PoliticalGroupTotalVotes {
+                            number: 1,
+                            total: 11,
+                        },
+                        PoliticalGroupTotalVotes {
+                            number: 2,
+                            total: 12,
+                        },
+                    ],
+                    total_votes_candidates_count: 1,
+                    blank_votes_count: 2,
+                    invalid_votes_count: 3,
+                    total_votes_cast_count: 5,
+                })
+                .unwrap();
+
+            assert_eq!(curr_votes.political_group_total_votes.len(), 2);
+            assert_eq!(curr_votes.political_group_total_votes[0].total, 21);
+            assert_eq!(curr_votes.political_group_total_votes[1].total, 32);
+
+            assert_eq!(curr_votes.total_votes_candidates_count, 3);
+            assert_eq!(curr_votes.blank_votes_count, 5);
+            assert_eq!(curr_votes.invalid_votes_count, 7);
+            assert_eq!(curr_votes.total_votes_cast_count, 14);
+        }
+
+        #[test]
+        fn test_votes_addition_error() {
+            let mut curr_votes = VotesCounts {
+                political_group_total_votes: vec![PoliticalGroupTotalVotes {
+                    number: 1,
+                    total: 10,
+                }],
+                total_votes_candidates_count: 2,
+                blank_votes_count: 3,
+                invalid_votes_count: 4,
+                total_votes_cast_count: 9,
+            };
+
+            let mut other = VotesCounts {
+                political_group_total_votes: vec![PoliticalGroupTotalVotes {
+                    number: 2,
+                    total: 20,
+                }],
                 total_votes_candidates_count: 1,
                 blank_votes_count: 2,
                 invalid_votes_count: 3,
                 total_votes_cast_count: 5,
-            })
-            .unwrap();
+            };
 
-        assert_eq!(curr_votes.political_group_total_votes.len(), 2);
-        assert_eq!(curr_votes.political_group_total_votes[0].total, 21);
-        assert_eq!(curr_votes.political_group_total_votes[1].total, 32);
+            let result = curr_votes.add(&other);
+            assert!(matches!(
+                result,
+                Err(APIError::AddError(_, ErrorReference::InvalidVoteGroup))
+            ));
 
-        assert_eq!(curr_votes.total_votes_candidates_count, 3);
-        assert_eq!(curr_votes.blank_votes_count, 5);
-        assert_eq!(curr_votes.invalid_votes_count, 7);
-        assert_eq!(curr_votes.total_votes_cast_count, 14);
+            let result = other.add(&curr_votes);
+            assert!(matches!(
+                result,
+                Err(APIError::AddError(_, ErrorReference::InvalidVoteGroup))
+            ));
+        }
     }
 
-    #[test]
-    fn test_votes_addition_error() {
-        let mut curr_votes = VotesCounts {
-            political_group_total_votes: vec![PoliticalGroupTotalVotes {
-                number: 1,
-                total: 10,
-            }],
-            total_votes_candidates_count: 2,
-            blank_votes_count: 3,
-            invalid_votes_count: 4,
-            total_votes_cast_count: 9,
-        };
+    mod voters_counts {
+        use crate::data_entry::VotersCounts;
 
-        let result = curr_votes.add(&VotesCounts {
-            political_group_total_votes: vec![PoliticalGroupTotalVotes {
-                number: 2,
-                total: 20,
-            }],
-            total_votes_candidates_count: 1,
-            blank_votes_count: 2,
-            invalid_votes_count: 3,
-            total_votes_cast_count: 5,
-        });
-        assert!(result.is_err());
-        assert!(matches!(
-            result,
-            Err(APIError::AddError(_, ErrorReference::InvalidVoteGroup))
-        ));
-    }
+        #[test]
+        fn test_voters_addition() {
+            let mut curr_votes = VotersCounts {
+                poll_card_count: 2,
+                proxy_certificate_count: 3,
+                total_admitted_voters_count: 9,
+            };
 
-    #[test]
-    fn test_voters_addition() {
-        let mut curr_votes = VotersCounts {
-            poll_card_count: 2,
-            proxy_certificate_count: 3,
-            total_admitted_voters_count: 9,
-        };
+            curr_votes += &VotersCounts {
+                poll_card_count: 1,
+                proxy_certificate_count: 2,
+                total_admitted_voters_count: 5,
+            };
 
-        curr_votes += &VotersCounts {
-            poll_card_count: 1,
-            proxy_certificate_count: 2,
-            total_admitted_voters_count: 5,
-        };
-
-        assert_eq!(curr_votes.poll_card_count, 3);
-        assert_eq!(curr_votes.proxy_certificate_count, 5);
-        assert_eq!(curr_votes.total_admitted_voters_count, 14);
+            assert_eq!(curr_votes.poll_card_count, 3);
+            assert_eq!(curr_votes.proxy_certificate_count, 5);
+            assert_eq!(curr_votes.total_admitted_voters_count, 14);
+        }
     }
 }

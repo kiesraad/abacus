@@ -6,7 +6,7 @@ import { ValidationResultSet } from "@/utils/ValidationResults";
 
 import { DataEntryStateAndActionsLoaded, DataEntryStateLoaded, FormSection } from "../types/types";
 
-export function getInitialValues(): CSOFirstSessionResults {
+export function getInitialValues(election = electionMockData): CSOFirstSessionResults {
   return {
     extra_investigation: {
       extra_investigation_other_reason: { yes: false, no: false },
@@ -22,7 +22,7 @@ export function getInitialValues(): CSOFirstSessionResults {
       total_admitted_voters_count: 0,
     },
     votes_counts: {
-      political_group_total_votes: electionMockData.political_groups.map((pg) => ({
+      political_group_total_votes: election.political_groups.map((pg) => ({
         number: pg.number,
         total: 0,
       })),
@@ -41,7 +41,7 @@ export function getInitialValues(): CSOFirstSessionResults {
       },
       difference_completely_accounted_for: { yes: false, no: false },
     },
-    political_group_votes: electionMockData.political_groups.map((pg) => ({
+    political_group_votes: election.political_groups.map((pg) => ({
       number: pg.number,
       total: 0,
       candidate_votes: pg.candidates.map((c) => ({

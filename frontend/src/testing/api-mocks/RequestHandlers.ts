@@ -228,7 +228,7 @@ export const PollingStationInvestigationCreateHandler = http.post<
   return HttpResponse.json(response, { status: 201 });
 });
 
-export const PollingStationInvestigationConcludeHandler = http.put<
+export const PollingStationInvestigationConcludeHandler = http.post<
   ParamsToString<POLLING_STATION_INVESTIGATION_CONCLUDE_REQUEST_PARAMS>,
   POLLING_STATION_INVESTIGATION_CONCLUDE_REQUEST_BODY,
   PollingStationInvestigation

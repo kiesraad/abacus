@@ -25,7 +25,7 @@ export function InvestigationFindings({ pollingStationId }: InvestigationFinding
   const navigate = useNavigate();
   const { election, investigation, refetch } = useElection(pollingStationId);
   const concludePath = `/api/polling_stations/${pollingStationId}/investigation/conclude`;
-  const { update: conclude } = useCrud<PollingStationInvestigationConcludeRequest>({ update: concludePath });
+  const { create: conclude } = useCrud<PollingStationInvestigationConcludeRequest>({ create: concludePath });
   const path = `/api/polling_stations/${pollingStationId}/investigation`;
   const { update } = useCrud<PollingStationInvestigationUpdateRequest>({ update: path });
 

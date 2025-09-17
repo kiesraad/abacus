@@ -2892,7 +2892,7 @@
       }
     },
     "/api/polling_stations/{polling_station_id}/investigation/conclude": {
-      "put": {
+      "post": {
         "summary": "Conclude an investigation for a polling station",
         "operationId": "polling_station_investigation_conclude",
         "parameters": [

@@ -71,7 +71,7 @@ async fn polling_station_investigation_create(
 
 /// Conclude an investigation for a polling station
 #[utoipa::path(
-    put,
+    post,
     path = "/api/polling_stations/{polling_station_id}/investigation/conclude",
     request_body = PollingStationInvestigationConcludeRequest,
     responses(

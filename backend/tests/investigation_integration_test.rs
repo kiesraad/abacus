@@ -28,25 +28,6 @@ async fn create_investigation(pool: SqlitePool, polling_station_id: u32) -> Resp
         .unwrap()
 }
 
-async fn conclude_investigation(pool: SqlitePool, polling_station_id: u32) -> Response {
-    let addr = serve_api(pool).await;
-    let coordinator_cookie = shared::coordinator_login(&addr).await;
-    let body = json!({
-        "findings": "Test findings",
-        "corrected_results": false
-    });
-    let url =
-        format!("http://{addr}/api/polling_stations/{polling_station_id}/investigation/conclude");
-    reqwest::Client::new()
-        .put(&url)
-        .header("cookie", coordinator_cookie)
-        .header("Content-Type", "application/json")
-        .body(body.to_string())
-        .send()
-        .await
-        .unwrap()
-}
-
 async fn update_investigation(pool: SqlitePool, polling_station_id: u32) -> Response {
     let addr = serve_api(pool).await;
     let coordinator_cookie = shared::coordinator_login(&addr).await;
@@ -58,6 +39,25 @@ async fn update_investigation(pool: SqlitePool, polling_station_id: u32) -> Resp
     let url = format!("http://{addr}/api/polling_stations/{polling_station_id}/investigation");
     reqwest::Client::new()
         .put(&url)
+        .header("cookie", coordinator_cookie)
+        .header("Content-Type", "application/json")
+        .body(body.to_string())
+        .send()
+        .await
+        .unwrap()
+}
+
+async fn conclude_investigation(pool: SqlitePool, polling_station_id: u32) -> Response {
+    let addr = serve_api(pool).await;
+    let coordinator_cookie = shared::coordinator_login(&addr).await;
+    let body = json!({
+        "findings": "Test findings",
+        "corrected_results": false
+    });
+    let url =
+        format!("http://{addr}/api/polling_stations/{polling_station_id}/investigation/conclude");
+    reqwest::Client::new()
+        .post(&url)
         .header("cookie", coordinator_cookie)
         .header("Content-Type", "application/json")
         .body(body.to_string())

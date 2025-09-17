@@ -1,14 +1,13 @@
 import { electionMockData } from "@/testing/api-mocks/ElectionMockData";
-import { POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_BODY, PollingStationResults } from "@/types/generated/openapi";
+import { CSOFirstSessionResults, POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_BODY } from "@/types/generated/openapi";
 import { DataEntryModel, DataEntryStructure, FormSectionId } from "@/types/types";
 import { getDataEntryStructure } from "@/utils/dataEntryStructure";
 import { ValidationResultSet } from "@/utils/ValidationResults";
 
 import { DataEntryStateAndActionsLoaded, DataEntryStateLoaded, FormSection } from "../types/types";
 
-export function getInitialValues(): PollingStationResults {
+export function getInitialValues(): CSOFirstSessionResults {
   return {
-    model: "CSOFirstSession",
     extra_investigation: {
       extra_investigation_other_reason: { yes: false, no: false },
       ballots_recounted_extra_investigation: { yes: false, no: false },
@@ -98,7 +97,10 @@ export function getDefaultDataEntryState(): DataEntryStateLoaded {
 export function getEmptyDataEntryRequest(): POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_BODY {
   return {
     progress: 0,
-    data: getInitialValues(),
+    data: {
+      model: "CSOFirstSession",
+      ...getInitialValues(),
+    },
     client_state: {
       test: "test",
     },

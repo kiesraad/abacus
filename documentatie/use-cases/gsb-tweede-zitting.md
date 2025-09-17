@@ -64,22 +64,26 @@ __Uitbreidingen:__
 1a. Het GSB besluit om n.a.v. een verzoek additionele stembureaus te onderzoeken:  
 &emsp; 1a1. De coördinator GSB selecteert een stembureau en voert "Aanleiding van het onderzoek" (vrije tekst) in de applicatie in.  
 
-1b. De coördinator GSB ontdekt dat een stembureau dat op de vooraf gepubliceerde lijst staat niet in Abacus is opgenomen:  
+1b. De coördinator GSB ontdekt dat een stembureau dat op de vooraf gepubliceerde lijst staat, niet in Abacus is opgenomen:  
 &emsp; 1b1. De coördinator GSB voegt het stembureau toe.  
+&emsp;&emsp; 1b1a. Het stembureau is per ongeluk of per vergissing toegevoegd:  
+&emsp;&emsp;&emsp; 1b1a1. De coördinator GSB verwijdert het stembureau.  
+&emsp;&emsp; 1b1b. De gegevens van het stembureau bevatten een fout:  
+&emsp;&emsp;&emsp; 1b1b1. De coördinator GSB past het stembureau aan.  
 &emsp; 1b2. Abacus maakt melding op het PV dat het stembureau is toegevoegd.  
 &emsp; 1b3. Het corrigendum corrigeert het aantal stemmen bij dit stembureau van 0 naar het werkelijke aantal.  
 
-1c. De coördinator GSB ontdekt dat het nummer van een stembureau niet correct in Abacus is opgenomen:  
-&emsp; 1c1. De coördinator zorgt dat de fout vermeld wordt in het PV.
+1c. De coördinator GSB ontdekt dat het nummer van een stembureau met resultaten uit een vorige zitting niet correct in Abacus is opgenomen:  
+&emsp; 1c1. De coördinator GSB voegt een vermelding van de fout handmatig aan het PV toe.
 
-1d. De coördinator GSB ontdekt dat de gegevens van een stembureau niet correct in Abacus zijn opgenomen:  
+1d. De coördinator GSB ontdekt dat de gegevens van een stembureau met resultaten uit een vorige zitting niet correct in Abacus zijn opgenomen:  
 &emsp; 1d1. De applicatie laat niet toe dat het nummer van het stembureau wordt aangepast.  
 &emsp; 1d2. De coördinator GSB corrigeert de stembureaugegevens.  
 &emsp; 1d3. De applicatie slaat de gecorrigeerde stembureaugegevens op, alleen voor de huidige zitting.  
-&emsp; 1d4. De coördinator GSB zorgt dat de correctie vermeld wordt in het PV.  
+&emsp; 1d4. De coördinator GSB voegt een vermelding van de correctie handmatig aan het PV toe.  
 
-1e. De coördinator GSB ontdekt dat een stembureau ten onrechte is meegenomen in een eerdere zitting:  
-&emsp; 1e1. Het GSB maakt een corrigendum naar 0 stemmen voor dit stembureau.  
+1f. De coördinator GSB ontdekt dat een stembureau ten onrechte is meegenomen in een eerdere zitting:  
+&emsp; 1f1. Het GSB maakt een corrigendum naar 0 stemmen voor dit stembureau.  
 
 
 ## Het GSB behandelt een verzoek tot onderzoek/hertelling (vlieger)

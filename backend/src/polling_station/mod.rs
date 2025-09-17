@@ -72,8 +72,15 @@ async fn polling_station_list(
     // Check if the election exists, will respond with NOT_FOUND otherwise
     crate::election::repository::get(&mut conn, election_id).await?;
 
+    let committee_session = crate::committee_session::repository::get_election_committee_session(
+        &mut conn,
+        election_id,
+    )
+    .await?;
+
     Ok(PollingStationListResponse {
-        polling_stations: crate::polling_station::repository::list(&mut conn, election_id).await?,
+        polling_stations: crate::polling_station::repository::list(&mut conn, committee_session.id)
+            .await?,
     })
 }
 

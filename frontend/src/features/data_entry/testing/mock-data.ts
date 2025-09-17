@@ -75,7 +75,7 @@ export function getDefaultDataEntryState(): DataEntryStateLoaded {
     election: electionMockData,
     pollingStationId: 1,
     error: null,
-    pollingStationResults: getInitialValues(),
+    pollingStationResults: { model, ...getInitialValues() },
     entryNumber: 1,
     previousResults: null,
     dataEntryStructure: getDataEntryStructure(model, electionMockData),

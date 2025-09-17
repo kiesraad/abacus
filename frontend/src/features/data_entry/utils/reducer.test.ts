@@ -221,7 +221,10 @@ describe("onSubmitForm", () => {
     const defaultState = getDefaultDataEntryState();
     const state: DataEntryState = {
       ...defaultState,
-      pollingStationResults: getInitialValues(),
+      pollingStationResults: {
+        model: "CSOFirstSession",
+        ...getInitialValues(),
+      },
       formState: {
         furthest: "voters_votes_counts",
         sections: {
@@ -252,7 +255,10 @@ describe("onSubmitForm", () => {
     const defaultState = getDefaultDataEntryState();
     const state: DataEntryState = {
       ...defaultState,
-      pollingStationResults: getInitialValues(),
+      pollingStationResults: {
+        model: "CSOFirstSession",
+        ...getInitialValues(),
+      },
       cache: {
         key: "voters_votes_counts",
         data: {

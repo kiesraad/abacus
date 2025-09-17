@@ -25,11 +25,14 @@ pub fn differences_counts_zero() -> DifferencesCounts {
         more_ballots_count: 0,
         fewer_ballots_count: 0,
         compare_votes_cast_admitted_voters: DifferenceCountsCompareVotesCastAdmittedVoters {
-            admitted_voters_equal_votes_cast: false,
+            admitted_voters_equal_votes_cast: true,
             votes_cast_greater_than_admitted_voters: false,
             votes_cast_smaller_than_admitted_voters: false,
         },
-        difference_completely_accounted_for: Default::default(),
+        difference_completely_accounted_for: YesNo {
+            yes: true,
+            no: false,
+        },
     }
 }
 

@@ -680,6 +680,7 @@ export interface ElectionDefinitionValidateResponse {
   election: NewElection;
   hash: RedactedEmlHash;
   number_of_voters: number;
+  polling_station_definition_matches_election?: boolean;
   polling_stations?: PollingStationRequest[];
 }
 
@@ -1274,6 +1275,11 @@ export type ValidationResultCode =
   | "F303"
   | "F304"
   | "F305"
+  | "F306"
+  | "F307"
+  | "F308"
+  | "F309"
+  | "F310"
   | "F401"
   | "F402"
   | "F403"

@@ -19,7 +19,8 @@ export interface DataEntryState {
   // api error objects
   error: AnyApiError | null;
 
-  // backend data structure
+  // backend data structures
+  previousResults: DataEntryResults | null;
   pollingStationResults: DataEntryResults | null;
 
   // state of the forms excl. data

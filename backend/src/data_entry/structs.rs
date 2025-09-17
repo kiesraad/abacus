@@ -433,7 +433,11 @@ impl DifferencesCounts {
             more_ballots_count: 0,
             fewer_ballots_count: 0,
             difference_completely_accounted_for: Default::default(),
-            compare_votes_cast_admitted_voters: Default::default(),
+            compare_votes_cast_admitted_voters: DifferenceCountsCompareVotesCastAdmittedVoters {
+                admitted_voters_equal_votes_cast: false,
+                votes_cast_greater_than_admitted_voters: false,
+                votes_cast_smaller_than_admitted_voters: false,
+            },
         }
     }
 }
@@ -613,6 +617,23 @@ pub mod tests {
             Self {
                 unexplained_difference_ballots_voters: YesNo::no(),
                 difference_ballots_per_list: YesNo::no(),
+            }
+        }
+    }
+
+    impl ValidDefault for DifferencesCounts {
+        fn valid_default() -> Self {
+            Self {
+                compare_votes_cast_admitted_voters: {
+                    DifferenceCountsCompareVotesCastAdmittedVoters {
+                        admitted_voters_equal_votes_cast: true,
+                        votes_cast_greater_than_admitted_voters: false,
+                        votes_cast_smaller_than_admitted_voters: false,
+                    }
+                },
+                more_ballots_count: 0,
+                fewer_ballots_count: 0,
+                difference_completely_accounted_for: YesNo::yes(),
             }
         }
     }

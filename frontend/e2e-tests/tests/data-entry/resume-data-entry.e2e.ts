@@ -120,6 +120,8 @@ test.describe("resume data entry flow", () => {
       await page.goto(`/elections/${pollingStation.election_id}/data-entry/${pollingStation.id}/1`);
 
       const differencesPage = new DifferencesPage(page);
+      await differencesPage.admittedVotersEqualsVotesCastCheckbox.check();
+      await differencesPage.differenceCompletelyAccountedForYes.check();
       await expect(differencesPage.fieldset).toBeVisible();
       await differencesPage.next.click();
 
@@ -184,6 +186,10 @@ test.describe("resume data entry flow", () => {
                 "data.voters_counts.total_admitted_voters_count",
               ],
               code: "F201",
+            },
+            {
+              fields: ["data.differences_counts.compare_votes_cast_admitted_voters"],
+              code: "F304",
             },
           ],
           warnings: [
@@ -267,6 +273,10 @@ test.describe("resume data entry flow", () => {
         },
         validation_results: {
           errors: [
+            {
+              code: "F304",
+              fields: ["data.differences_counts.compare_votes_cast_admitted_voters"],
+            },
             {
               code: "F403",
               fields: ["data.political_group_votes[0].total"],
@@ -380,6 +390,8 @@ test.describe("resume data entry flow", () => {
       await votersAndVotesPage.fillInPageAndClickNext(voters, votes);
 
       const differencesPage = new DifferencesPage(page);
+      await differencesPage.admittedVotersEqualsVotesCastCheckbox.check();
+      await differencesPage.differenceCompletelyAccountedForYes.check();
       await differencesPage.next.click();
 
       const candidatesListPage_1 = new CandidatesListPage(page, 1, "Partijdige Partij");
@@ -563,6 +575,8 @@ test.describe("resume data entry flow", () => {
       await votersAndVotesPage.fillInPageAndClickNext(voters, votes);
 
       const differencesPage = new DifferencesPage(page);
+      await differencesPage.admittedVotersEqualsVotesCastCheckbox.check();
+      await differencesPage.differenceCompletelyAccountedForYes.check();
       await differencesPage.next.click();
 
       const candidatesListPage_1 = new CandidatesListPage(page, 1, "Partijdige Partij");

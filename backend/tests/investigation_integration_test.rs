@@ -1,5 +1,5 @@
 #![cfg(test)]
-use abacus::investigation::PollingStationInvestigation;
+use abacus::election::ElectionDetailsResponse;
 use hyper::StatusCode;
 use reqwest::Response;
 use serde_json::json;
@@ -10,6 +10,22 @@ use crate::utils::serve_api;
 
 pub mod shared;
 pub mod utils;
+
+async fn get_election(pool: SqlitePool, election_id: u32) -> ElectionDetailsResponse {
+    let addr = serve_api(pool).await;
+    let url = format!("http://{addr}/api/elections/{election_id}");
+    let coordinator_cookie = shared::coordinator_login(&addr).await;
+    let response = reqwest::Client::new()
+        .get(&url)
+        .header("cookie", coordinator_cookie)
+        .send()
+        .await
+        .unwrap();
+
+    // Ensure the response is what we expect
+    assert_eq!(response.status(), StatusCode::OK);
+    response.json().await.unwrap()
+}
 
 async fn create_investigation(pool: SqlitePool, polling_station_id: u32) -> Response {
     let addr = serve_api(pool).await;
@@ -80,57 +96,55 @@ async fn test_investigation_create_and_conclude(pool: SqlitePool) {
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_7_four_sessions", "users"))))]
 async fn test_investigation_create_conclude_update(pool: SqlitePool) {
-    async fn get_investigation(
-        pool: &SqlitePool,
-        polling_station_id: u32,
-    ) -> PollingStationInvestigation {
-        sqlx::query_as!(
-            PollingStationInvestigation,
-            r#"SELECT polling_station_id as "polling_station_id: u32", reason, findings, corrected_results as "corrected_results: bool" FROM polling_station_investigations WHERE polling_station_id = ?"#,
-            polling_station_id
-        )
-        .fetch_one(pool)
-        .await
-        .unwrap()
-    }
+    let election_details = get_election(pool.clone(), 700).await;
+    assert_eq!(election_details.investigations.len(), 0);
 
     assert_eq!(
         create_investigation(pool.clone(), 741).await.status(),
         StatusCode::OK
     );
 
-    let investigation = get_investigation(&pool, 741).await;
-
-    assert_eq!(investigation.polling_station_id, 741);
-    assert_eq!(investigation.reason, "Test reason");
-    assert_eq!(investigation.findings, None);
+    let election_details = get_election(pool.clone(), 700).await;
+    assert_eq!(election_details.investigations.len(), 1);
+    assert_eq!(election_details.investigations[0].polling_station_id, 741);
+    assert_eq!(election_details.investigations[0].reason, "Test reason");
+    assert_eq!(election_details.investigations[0].findings, None);
 
     assert_eq!(
         conclude_investigation(pool.clone(), 741).await.status(),
         StatusCode::OK
     );
 
-    let investigation = get_investigation(&pool, 741).await;
-
-    assert_eq!(investigation.polling_station_id, 741);
-    assert_eq!(investigation.reason, "Test reason");
-    assert_eq!(investigation.findings, Some("Test findings".to_string()));
-    assert_eq!(investigation.corrected_results, Some(false));
+    let election_details = get_election(pool.clone(), 700).await;
+    assert_eq!(election_details.investigations.len(), 1);
+    assert_eq!(election_details.investigations[0].polling_station_id, 741);
+    assert_eq!(election_details.investigations[0].reason, "Test reason");
+    assert_eq!(
+        election_details.investigations[0].findings,
+        Some("Test findings".to_string())
+    );
+    assert_eq!(
+        election_details.investigations[0].corrected_results,
+        Some(false)
+    );
 
     assert_eq!(
         update_investigation(pool.clone(), 741).await.status(),
         StatusCode::OK
     );
 
-    let investigation = get_investigation(&pool, 741).await;
-
-    assert_eq!(investigation.polling_station_id, 741);
-    assert_eq!(investigation.reason, "Updated reason");
+    let election_details = get_election(pool.clone(), 700).await;
+    assert_eq!(election_details.investigations.len(), 1);
+    assert_eq!(election_details.investigations[0].polling_station_id, 741);
+    assert_eq!(election_details.investigations[0].reason, "Updated reason");
     assert_eq!(
-        investigation.findings,
+        election_details.investigations[0].findings,
         Some("updated test findings".to_string())
     );
-    assert_eq!(investigation.corrected_results, Some(true));
+    assert_eq!(
+        election_details.investigations[0].corrected_results,
+        Some(true)
+    );
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_7_four_sessions", "users"))))]

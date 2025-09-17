@@ -66,27 +66,44 @@ __Uitbreidingen:__
 
 1b. De coördinator GSB ontdekt dat een stembureau dat op de vooraf gepubliceerde lijst staat, niet in Abacus is opgenomen:  
 &emsp; 1b1. De coördinator GSB voegt het stembureau toe.  
-&emsp;&emsp; 1b1a. Het stembureau is per ongeluk of per vergissing toegevoegd:  
-&emsp;&emsp;&emsp; 1b1a1. De coördinator GSB verwijdert het stembureau.  
-&emsp;&emsp; 1b1b. De gegevens van het stembureau bevatten een fout:  
-&emsp;&emsp;&emsp; 1b1b1. De coördinator GSB past het stembureau aan.  
 &emsp; 1b2. De coördinator GSB voert een verklaring voor de wijziging in.  
 &emsp; 1b3. De applicatie maakt melding op het PV dat het stembureau is toegevoegd.  
 &emsp; 1b4. Het corrigendum corrigeert het aantal stemmen bij dit stembureau van 0 naar het werkelijke aantal.  
 
-1c. De coördinator GSB ontdekt dat het nummer van een stembureau met resultaten uit een vorige zitting niet correct in Abacus is opgenomen:  
-&emsp; 1c1. De coördinator GSB voert een vermelding van de fout in de applicatie in.  
+1c. De coördinator GSB ontdekt dat een stembureau ten onrechte is meegenomen in een eerdere zitting:  
+&emsp; 1c1. Het GSB maakt een corrigendum naar 0 stemmen voor dit stembureau.  
+
+1d. De coördinator GSB ontdekt een fout in de gegevens van een stembureau met resultaten uit een vorige zitting:  
+&emsp; 1d1. [De coördinator GSB bewerkt de stembureaus tijdens de tweede zitting](#de-coördinator-gsb-bewerkt-de-stembureaus-tijdens-de-tweede-zitting-zee)
+
+1e. De coördinator GSB ontdekt een fout in de gegevens van een stembureau dat voor de huidige zitting is toegevoegd:  
+&emsp; 1e1. [De coördinator GSB bewerkt de stembureaus tijdens de tweede zitting](#de-coördinator-gsb-bewerkt-de-stembureaus-tijdens-de-tweede-zitting-zee)
+
+
+## De coördinator GSB bewerkt de stembureaus tijdens de tweede zitting (zee)
+
+__Niveau:__ gebruikersdoel, zee, 🌊
+
+### Hoofdscenario en uitbreidingen
+
+__Hoofdscenario 1:__
+1. De coördinator GSB corrigeert de gegevens van een stembureau met resultaten uit een vorige zitting.  
+2. De applicatie laat niet toe dat het nummer van het stembureau wordt aangepast.  
+3. De applicatie slaat de gecorrigeerde stembureaugegevens op, alleen voor de huidige zitting.  
+4. De coördinator GSB voert een verklaring voor de wijziging in.  
+5. De applicatie neemt de verklaring op in het PV.  
+
+1a. De fout zit in het nummer van het stembureau:  
+&emsp; 1a1. De coördinator GSB voert een vermelding van de fout in de applicatie in.  
 &emsp; 1c2. De applicatie neemt de verklaring op in het PV.  
 
-1d. De coördinator GSB ontdekt dat de gegevens van een stembureau met resultaten uit een vorige zitting niet correct in Abacus zijn opgenomen:  
-&emsp; 1d1. De applicatie laat niet toe dat het nummer van het stembureau wordt aangepast.  
-&emsp; 1d2. De coördinator GSB corrigeert de stembureaugegevens.  
-&emsp; 1d3. De applicatie slaat de gecorrigeerde stembureaugegevens op, alleen voor de huidige zitting.  
-&emsp; 1d4. De coördinator GSB voert een verklaring voor de wijziging in.  
-&emsp; 1d5. De applicatie neemt de verklaring op in het PV.  
 
-1f. De coördinator GSB ontdekt dat een stembureau ten onrechte is meegenomen in een eerdere zitting:  
-&emsp; 1f1. Het GSB maakt een corrigendum naar 0 stemmen voor dit stembureau.  
+__Hoofdscenario 2:__
+1. De coördinator GSB corrigeert de gegevens van een stembureau dat voor de huidige zitting is aangemaakt.
+
+__Uitbreidingen op hoofdscenario 2:__  
+1a. Het stembureau was foutievelijk aangemaakt:  
+&emsp; 1a1. De coördinator GSB verwijdert het stembureau.
 
 
 ## Het GSB behandelt een verzoek tot onderzoek/hertelling (vlieger)

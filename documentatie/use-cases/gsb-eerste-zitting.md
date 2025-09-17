@@ -63,7 +63,7 @@ __Uitbreidingen:__
   - Preview: bestand genereren met "concept" in watermerk en in bestandsnaam.
   - Voor nu nog geen preview, maar alleen de zip download met het PV en het EML_NL-bestand
 
-## De coördinator GSB bewerkt de stembureaus tijdens de eerste of nieuwe zitting (zee)
+## De coördinator GSB bewerkt de stembureaus tijdens de eerste zitting (zee)
 
 __Niveau:__ gebruikersdoel, zee, 🌊
 

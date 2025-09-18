@@ -142,8 +142,10 @@ async fn test_investigation_create_conclude_update(pool: SqlitePool) {
 async fn test_investigation_creation_for_committee_session_with_created_status(pool: SqlitePool) {
     let addr = serve_api(pool.clone()).await;
     let cookie = shared::coordinator_login(&addr).await;
-    let election_id = 700;
+    let election_id = 7;
 
+    shared::change_status_committee_session(&addr, &cookie, 704, CommitteeSessionStatus::Created)
+        .await;
     let committee_session =
         shared::get_election_committee_session(&addr, &cookie, election_id).await;
     assert_eq!(committee_session.status, CommitteeSessionStatus::Created);

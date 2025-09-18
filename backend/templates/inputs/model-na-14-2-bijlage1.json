@@ -17,103 +17,251 @@
                 "candidates": [
                     {
                         "number": 1,
-                        "initials": "A.B.C.",
-                        "first_name": "Annemieke",
-                        "last_name": "Oorschot",
-                        "locality": "Heemdamseburg",
-                        "country_code": "NL",
+                        "initials": "L.",
+                        "first_name": "Lidewij",
+                        "last_name": "Oud",
+                        "locality": "Juinen",
                         "gender": "Female"
                     },
                     {
                         "number": 2,
-                        "initials": "K.",
-                        "first_name": "Krisje",
-                        "last_name_prefix": "de",
-                        "last_name": "Blikkert",
-                        "locality": "Heemdamseburgsebuurt",
-                        "gender": "Female"
-                    },
-                    {
-                        "number": 3,
-                        "initials": "G.H.O.",
-                        "first_name": "George",
-                        "last_name_prefix": "van",
-                        "last_name": "Jaspers-Gezen",
-                        "locality": "Heemdamseburg",
+                        "initials": "J.",
+                        "first_name": "Johan",
+                        "last_name": "Oud",
+                        "locality": "Juinen",
                         "gender": "Male"
                     },
                     {
+                        "number": 3,
+                        "initials": "M.",
+                        "first_name": "Marijke",
+                        "last_name": "Oud",
+                        "locality": "Juinen",
+                        "gender": "Female"
+                    },
+                    {
                         "number": 4,
-                        "initials": "T.M.",
-                        "first_name": "Teun",
-                        "last_name": "Meulenkolk",
-                        "locality": "Heemdamseburg",
+                        "initials": "A.",
+                        "first_name": "Arie",
+                        "last_name": "Jansen",
+                        "locality": "Juinen",
                         "gender": "Male"
                     },
                     {
                         "number": 5,
-                        "initials": "L.",
-                        "first_name": "Luc",
-                        "last_name": "Katsma",
-                        "locality": "Heemdamseburg",
+                        "initials": "H.",
+                        "first_name": "Henk",
+                        "last_name_prefix": "van der",
+                        "last_name": "Weijden",
+                        "locality": "Juinen",
                         "gender": "Male"
                     },
                     {
                         "number": 6,
-                        "initials": "M.",
-                        "first_name": "Christine",
-                        "last_name": "Blankenvoorde",
-                        "locality": "Heemdamseburg",
+                        "initials": "B.",
+                        "first_name": "Berta",
+                        "last_name_prefix": "van der",
+                        "last_name": "Weijden",
+                        "locality": "Juinen",
                         "gender": "Female"
                     },
                     {
                         "number": 7,
-                        "initials": "S",
-                        "first_name": "Salomon",
-                        "last_name_prefix": "den",
-                        "last_name": "Mateman",
-                        "locality": "Heemdamseburg",
+                        "initials": "K.",
+                        "first_name": "Klaas",
+                        "last_name": "Oud",
+                        "locality": "Juinen",
                         "gender": "Male"
                     },
                     {
                         "number": 8,
-                        "initials": "F.G.P.",
-                        "first_name": "Fabio",
-                        "last_name": "Oudenalder",
-                        "locality": "Heemdamseburg",
-                        "gender": "Male"
-                    },
-                    {
-                        "number": 9,
-                        "initials": "I.",
-                        "first_name": "Ishana",
-                        "last_name_prefix": "den",
-                        "last_name": "Wolbert",
-                        "locality": "Heemdamseburg",
+                        "initials": "S.",
+                        "first_name": "Sophie",
+                        "last_name": "Bakker",
+                        "locality": "Juinen",
                         "gender": "Female"
                     },
                     {
-                        "number": 10,
-                        "initials": "P.A.",
-                        "first_name": "Patrik",
-                        "last_name": "Hoven",
-                        "locality": "Heemdamseburg",
+                        "number": 9,
+                        "initials": "J.",
+                        "first_name": "Johan",
+                        "last_name_prefix": "de",
+                        "last_name": "Vries",
+                        "locality": "Juinen",
                         "gender": "Male"
                     },
                     {
+                        "number": 10,
+                        "initials": "M.",
+                        "first_name": "Marijke",
+                        "last_name_prefix": "van den",
+                        "last_name": "Berg",
+                        "locality": "Juinen",
+                        "gender": "Female"
+                    },
+                    {
                         "number": 11,
-                        "initials": "J.M.H.",
-                        "first_name": "Jorian",
-                        "last_name": "Vredeveld",
-                        "locality": "Heemdamseburg",
+                        "initials": "R.",
+                        "first_name": "Rolf",
+                        "last_name_prefix": "de",
+                        "last_name": "Jong",
+                        "locality": "Juinen",
                         "gender": "Male"
                     },
                     {
                         "number": 12,
+                        "initials": "K.",
+                        "first_name": "Karin",
+                        "last_name": "Kok",
+                        "locality": "Juinen",
+                        "gender": "Female"
+                    },
+                    {
+                        "number": 13,
+                        "initials": "G.",
+                        "first_name": "Gert",
+                        "last_name": "Smit",
+                        "locality": "Juinen",
+                        "gender": "Male"
+                    },
+                    {
+                        "number": 14,
+                        "initials": "E.",
+                        "first_name": "Eva",
+                        "last_name": "Koster",
+                        "locality": "Juinen",
+                        "gender": "Female"
+                    },
+                    {
+                        "number": 15,
+                        "initials": "L.",
+                        "first_name": "Leon",
+                        "last_name": "Hofman",
+                        "locality": "Juinen",
+                        "gender": "Male"
+                    },
+                    {
+                        "number": 16,
+                        "initials": "S.",
+                        "first_name": "Sophie",
+                        "last_name": "Visser",
+                        "locality": "Juinen",
+                        "gender": "Female"
+                    },
+                    {
+                        "number": 17,
+                        "initials": "D.",
+                        "first_name": "Dirk",
+                        "last_name": "Bakker",
+                        "locality": "Juinen",
+                        "gender": "Male"
+                    },
+                    {
+                        "number": 18,
+                        "initials": "P.",
+                        "first_name": "Piet",
+                        "last_name": "Jansen",
+                        "locality": "Juinen",
+                        "gender": "Male"
+                    },
+                    {
+                        "number": 19,
                         "initials": "A.",
-                        "first_name": "Arendina",
-                        "last_name": "Cornelis",
-                        "locality": "Heemdamseburg",
+                        "first_name": "Annelies",
+                        "last_name_prefix": "van",
+                        "last_name": "Loon",
+                        "locality": "Juinen",
+                        "gender": "Female"
+                    },
+                    {
+                        "number": 20,
+                        "initials": "T.J.",
+                        "first_name": "Tessa",
+                        "last_name": "Jansen",
+                        "locality": "Juinen",
+                        "gender": "Female"
+                    },
+                    {
+                        "number": 21,
+                        "initials": "H.J.",
+                        "first_name": "Hans",
+                        "last_name": "Jansen",
+                        "locality": "Juinen",
+                        "gender": "Male"
+                    },
+                    {
+                        "number": 22,
+                        "initials": "W.J.",
+                        "first_name": "Willem",
+                        "last_name": "Janssen",
+                        "locality": "Juinen",
+                        "gender": "Male"
+                    },
+                    {
+                        "number": 23,
+                        "initials": "B.",
+                        "first_name": "Bert",
+                        "last_name": "Meyer",
+                        "locality": "Juinen",
+                        "gender": "Male"
+                    },
+                    {
+                        "number": 24,
+                        "initials": "M.M.",
+                        "first_name": "Mieke",
+                        "last_name": "Meyer",
+                        "locality": "Juinen",
+                        "gender": "Female"
+                    },
+                    {
+                        "number": 25,
+                        "initials": "J.V.",
+                        "first_name": "Jan",
+                        "last_name_prefix": "van",
+                        "last_name": "Dijk",
+                        "locality": "Juinen",
+                        "gender": "Male"
+                    },
+                    {
+                        "number": 26,
+                        "initials": "S.D.",
+                        "first_name": "Suzan",
+                        "last_name_prefix": "de",
+                        "last_name": "Wit",
+                        "locality": "Juinen",
+                        "gender": "Female"
+                    },
+                    {
+                        "number": 27,
+                        "initials": "K.V.",
+                        "first_name": "Koen",
+                        "last_name_prefix": "van der",
+                        "last_name": "Meer",
+                        "locality": "Juinen",
+                        "gender": "Male"
+                    },
+                    {
+                        "number": 28,
+                        "initials": "L.S.",
+                        "first_name": "Laura",
+                        "last_name": "Smit",
+                        "locality": "Juinen",
+                        "gender": "Female"
+                    },
+                    {
+                        "number": 29,
+                        "initials": "F.K.",
+                        "first_name": "Frank",
+                        "last_name": "Kool",
+                        "locality": "Juinen",
+                        "gender": "Male"
+                    },
+                    {
+                        "number": 30,
+                        "initials": "C.R.",
+                        "first_name": "Claudia",
+                        "last_name": "Reinders",
+                        "locality": "Juinen",
                         "gender": "Female"
                     }
                 ]
@@ -306,11 +454,83 @@
                     },
                     {
                         "number": 11,
-                        "votes": 113
+                        "votes": 0
                     },
                     {
                         "number": 12,
                         "votes": 0
+                    },
+                    {
+                        "number": 13,
+                        "votes": 0
+                    },
+                    {
+                        "number": 14,
+                        "votes": 0
+                    },
+                    {
+                        "number": 15,
+                        "votes": 0
+                    },
+                    {
+                        "number": 16,
+                        "votes": 0
+                    },
+                    {
+                        "number": 17,
+                        "votes": 0
+                    },
+                    {
+                        "number": 18,
+                        "votes": 0
+                    },
+                    {
+                        "number": 19,
+                        "votes": 0
+                    },
+                    {
+                        "number": 20,
+                        "votes": 0
+                    },
+                    {
+                        "number": 21,
+                        "votes": 0
+                    },
+                    {
+                        "number": 22,
+                        "votes": 0
+                    },
+                    {
+                        "number": 23,
+                        "votes": 0
+                    },
+                    {
+                        "number": 24,
+                        "votes": 0
+                    },
+                    {
+                        "number": 25,
+                        "votes": 0
+                    },
+                    {
+                        "number": 26,
+                        "votes": 0
+                    },
+                    {
+                        "number": 27,
+                        "votes": 0
+                    },
+                    {
+                        "number": 28,
+                        "votes": 0
+                    },
+                    {
+                        "number": 29,
+                        "votes": 0
+                    },
+                    {
+                        "number": 30,
+                        "votes": 113
                     }
                 ]
             },

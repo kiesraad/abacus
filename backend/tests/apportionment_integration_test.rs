@@ -174,7 +174,10 @@ async fn test_election_apportionment_works_for_19_or_more_seats(pool: SqlitePool
             political_group_votes: vec![
                 political_group_votes_from_test_data_auto(
                     1,
-                    &[78, 20, 55, 45, 50, 0, 60, 40, 30, 20, 50, 152],
+                    &[
+                        78, 20, 55, 45, 50, 0, 60, 40, 30, 20, 50, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                        0, 0, 0, 0, 0, 0, 0, 152,
+                    ],
                 ),
                 political_group_votes_from_test_data_auto(2, &[150, 50, 22, 10, 30, 40]),
                 political_group_votes_from_test_data_auto(3, &[20, 15, 25, 3, 2, 33]),

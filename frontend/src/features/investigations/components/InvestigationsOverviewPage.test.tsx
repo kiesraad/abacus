@@ -11,6 +11,7 @@ import { overrideOnce, server } from "@/testing/server";
 import { screen, setupTestRouter } from "@/testing/test-utils";
 import { ElectionDetailsResponse } from "@/types/generated/openapi";
 
+import { InvestigationsLayout } from "./InvestigationsLayout";
 import { InvestigationsOverviewPage } from "./InvestigationsOverviewPage";
 
 async function renderPage() {
@@ -22,7 +23,8 @@ async function renderPage() {
       children: [
         {
           path: "investigations",
-          Component: InvestigationsOverviewPage,
+          Component: InvestigationsLayout,
+          children: [{ index: true, Component: InvestigationsOverviewPage }],
         },
       ],
     },

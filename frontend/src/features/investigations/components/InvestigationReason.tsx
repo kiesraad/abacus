@@ -7,7 +7,9 @@ import { Button } from "@/components/ui/Button/Button";
 import { Form } from "@/components/ui/Form/Form";
 import { FormLayout } from "@/components/ui/Form/FormLayout";
 import { InputField } from "@/components/ui/InputField/InputField";
+import { Loader } from "@/components/ui/Loader/Loader";
 import { useElection } from "@/hooks/election/useElection";
+import { useMessages } from "@/hooks/messages/useMessages";
 import { t } from "@/i18n/translate";
 import {
   PollingStationInvestigationCreateRequest,
@@ -21,12 +23,17 @@ interface InvestigationReasonProps {
 
 export function InvestigationReason({ pollingStationId }: InvestigationReasonProps) {
   const navigate = useNavigate();
-  const { investigation, refetch } = useElection(pollingStationId);
+  const { investigation, pollingStation, refetch } = useElection(pollingStationId);
+  const { pushMessage } = useMessages();
   const [nonEmptyError, setNonEmptyError] = useState(false);
   const path = `/api/polling_stations/${pollingStationId}/investigation`;
   const { create } = useCrud<PollingStationInvestigationCreateRequest>(path);
   const { update } = useCrud<PollingStationInvestigationUpdateRequest>(path);
   const [error, setError] = useState<AnyApiError>();
+
+  if (!pollingStation) {
+    return <Loader />;
+  }
 
   if (error) {
     throw error;
@@ -47,14 +54,28 @@ export function InvestigationReason({ pollingStationId }: InvestigationReasonPro
 
     const save = () => {
       if (investigation != undefined) {
+        pushMessage({
+          title: t("investigations.message.investigation_updated", {
+            number: pollingStation.number,
+            name: pollingStation.name,
+          }),
+        });
+
         return update({
           reason,
           findings: investigation.findings,
           corrected_results: investigation.corrected_results,
         });
-      }
+      } else {
+        pushMessage({
+          title: t("investigations.message.investigation_created", {
+            number: pollingStation.number,
+            name: pollingStation.name,
+          }),
+        });
 
-      return create({ reason });
+        return create({ reason });
+      }
     };
 
     const response = await save();

@@ -24,6 +24,10 @@
   "handled_investigations": "Afgehandelde onderzoeken",
   "investigate_which_polling_station": "Voor welk stembureau wordt het onderzoek gedaan?",
   "investigations_in_committee_session": "Onderzoeken in {sessionLabel}",
+  "message": {
+    "investigation_created": "Onderzoek voor stembureau {number} ({name}) toegevoegd",
+    "investigation_updated": "Wijzigingen in onderzoek stembureau {number} ({name}) opgeslagen"
+  },
   "multiple_polling_stations": "Zijn er voor meerdere stembureaus onderzoeken aangevraagd? Doorloop de volgende stappen dan voor elk stembureau.",
   "no_corrected_results": "De uitslag is ongewijzigd",
   "print_corrigendum": {

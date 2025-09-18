@@ -3,6 +3,7 @@ import * as ReactRouter from "react-router";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
+import * as useMessages from "@/hooks/messages/useMessages";
 import { ElectionProvider } from "@/hooks/election/ElectionProvider";
 import {
   ElectionRequestHandler,
@@ -15,6 +16,7 @@ import { render, screen, spyOnHandler, waitFor } from "@/testing/test-utils";
 import { InvestigationFindings } from "./InvestigationFindings";
 
 const navigate = vi.fn();
+const pushMessage = vi.fn();
 
 function renderPage(pollingStationId = 3) {
   render(
@@ -28,6 +30,7 @@ describe("InvestigationFindings", () => {
   beforeEach(() => {
     server.use(ElectionRequestHandler, ElectionStatusRequestHandler, PollingStationInvestigationConcludeHandler);
     vi.spyOn(ReactRouter, "useNavigate").mockImplementation(() => navigate);
+    vi.spyOn(useMessages, "useMessages").mockReturnValue({ pushMessage, popMessages: vi.fn(() => []) });
   });
 
   test("Renders a form", async () => {
@@ -59,6 +62,8 @@ describe("InvestigationFindings", () => {
   });
 
   test("Navigate to the next page when submitting findings", async () => {
+    const conclude = spyOnHandler(PollingStationInvestigationConcludeHandler);
+
     renderPage();
 
     const findings = await screen.findByLabelText("Bevindingen");
@@ -73,6 +78,13 @@ describe("InvestigationFindings", () => {
 
     await waitFor(() => {
       expect(navigate).toHaveBeenCalledWith("/elections/1/investigations");
+    });
+    expect(conclude).toHaveBeenCalledWith({
+      findings: "Bevindingen van het onderzoek",
+      corrected_results: false,
+    });
+    expect(pushMessage).toHaveBeenCalledWith({
+      title: "Wijzigingen in onderzoek stembureau 35 (Testschool) opgeslagen",
     });
   });
 
@@ -104,11 +116,11 @@ describe("InvestigationFindings", () => {
     await waitFor(() => {
       expect(navigate).toHaveBeenCalledWith("/elections/1/investigations");
     });
-
     expect(update).toHaveBeenCalledWith({
       reason: "Test reason 4",
       findings: "New test findings 4",
       corrected_results: false,
     });
+    expect(pushMessage).toHaveBeenCalledWith({ title: "Wijzigingen in onderzoek stembureau 34 (Testplek) opgeslagen" });
   });
 });

@@ -96,7 +96,8 @@ async fn test_investigation_create_and_conclude(pool: SqlitePool) {
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_7_four_sessions", "users"))))]
 async fn test_investigation_create_conclude_update(pool: SqlitePool) {
-    let election_details = get_election(pool.clone(), 700).await;
+    let election_id = 7;
+    let election_details = get_election(pool.clone(), election_id).await;
     assert_eq!(election_details.investigations.len(), 0);
 
     assert_eq!(
@@ -104,7 +105,7 @@ async fn test_investigation_create_conclude_update(pool: SqlitePool) {
         StatusCode::OK
     );
 
-    let election_details = get_election(pool.clone(), 700).await;
+    let election_details = get_election(pool.clone(), election_id).await;
     assert_eq!(election_details.investigations.len(), 1);
     assert_eq!(election_details.investigations[0].polling_station_id, 741);
     assert_eq!(election_details.investigations[0].reason, "Test reason");
@@ -115,7 +116,7 @@ async fn test_investigation_create_conclude_update(pool: SqlitePool) {
         StatusCode::OK
     );
 
-    let election_details = get_election(pool.clone(), 700).await;
+    let election_details = get_election(pool.clone(), election_id).await;
     assert_eq!(election_details.investigations.len(), 1);
     assert_eq!(election_details.investigations[0].polling_station_id, 741);
     assert_eq!(election_details.investigations[0].reason, "Test reason");
@@ -133,7 +134,7 @@ async fn test_investigation_create_conclude_update(pool: SqlitePool) {
         StatusCode::OK
     );
 
-    let election_details = get_election(pool.clone(), 700).await;
+    let election_details = get_election(pool.clone(), election_id).await;
     assert_eq!(election_details.investigations.len(), 1);
     assert_eq!(election_details.investigations[0].polling_station_id, 741);
     assert_eq!(election_details.investigations[0].reason, "Updated reason");

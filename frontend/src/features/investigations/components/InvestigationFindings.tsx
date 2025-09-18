@@ -13,7 +13,7 @@ import { useElection } from "@/hooks/election/useElection";
 import { t } from "@/i18n/translate";
 import {
   PollingStationInvestigationConcludeRequest,
-  PollingStationInvestigationUpdateRequest
+  PollingStationInvestigationUpdateRequest,
 } from "@/types/generated/openapi";
 import { StringFormData } from "@/utils/stringFormData";
 

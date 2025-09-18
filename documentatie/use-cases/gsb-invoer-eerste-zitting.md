@@ -82,12 +82,12 @@ __Trigger:__ De coördinator GSB ontvangt een SB PV evt. met corrigendum.
 
 __Hoofdscenario:__
 
-1. De coördinator GSB geeft het SB PV (eventueel met corrigendum en/of inlegvel) aan de eerste invoerder.
+1. De coördinator GSB geeft het SB PV (DSO: N 10-1 evt. met Na 14-1 versie 1, CSO: N 10-2) aan de eerste invoerder.
 2. (tijdens invoer) De coördinator GSB monitort de voortgang op het statusoverzicht van de steminvoer.
 3. [De eerste invoerder voert de resultaten van de telling in.](#de-eerste-of-tweede-invoerder-voert-de-resultaten-van-de-telling-in-zee)
 4. De applicatie stelt vast dat de eerste invoer geen geaccepteerde fouten bevat.
 5. De applicatie stelt vast dat de eerste invoer geen geaccepteerde waarschuwingen bevat.
-6. De coördinator GSB geeft het SB PV (evt. met corrigendum en/of inlegvel) aan de tweede invoerder.
+6. De coördinator GSB geeft het SB PV (DSO: N 10-1 evt. met Na 14-1 versie 1, CSO: N 10-2) aan de tweede invoerder.
 7. [De tweede invoerder voert de resultaten van de telling in.](#de-eerste-of-tweede-invoerder-voert-de-resultaten-van-de-telling-in-zee)
 8. De applicatie stelt vast dat beide invoeren gelijk zijn.
 9. De applicatie stelt vast dat de tweede invoer geen geaccepteerde waarschuwingen bevat.
@@ -153,7 +153,7 @@ __Uitbreidingen:__
 &emsp; 2a1. De applicatie laadt de eerder ingevoerde data.
 
 4a. De invoer voldoet niet aan de validatieregels voor fouten of aan de plausibiliteitschecks:  
-&emsp; 4a1. De applicatie toont een foutmelding voor elke gefaalde validatieregel en een waarschuwing voor elke gefaalde plausibiliteitscheck. 
+&emsp; 4a1. De applicatie toont een foutmelding voor elke gefaalde validatieregel en een waarschuwing voor elke gefaalde plausibiliteitscheck.  
 &emsp; 4a2. [De invoerder handelt de fout(en) en/of waarschuwing(en) af.](#de-invoerder-handelt-de-fouten-en-of-waarschuwingen-af-vis)
 
 5a. De invoerder breekt de invoer af en bewaart de invoer:  

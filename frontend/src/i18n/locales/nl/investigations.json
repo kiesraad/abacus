@@ -31,6 +31,7 @@
   },
   "multiple_polling_stations": "Zijn er voor meerdere stembureaus onderzoeken aangevraagd? Doorloop de volgende stappen dan voor elk stembureau.",
   "no_corrected_results": "De uitslag is ongewijzigd",
+  "no_polling_stations_to_choose": "Geen stembureaus om uit te kiezen",
   "print_corrigendum": {
     "action": "Corrigendum afdrukken",
     "add_the_findings": "Voer in de volgende stap de bevindingen van het onderzoek in.",
@@ -58,5 +59,6 @@
     "title": "Aanleiding en opdracht",
     "why_investigate_results": "Waarom worden de resultaten van dit stembureau onderzocht? Denk bijvoorbeeld aan een onverklaard telverschil of een bezwaar."
   },
-  "title": "Onderzoeken"
+  "title": "Onderzoeken",
+  "you_cannot_add_another_investigation": "Je hebt voor alle stembureaus al een onderzoek toegevoegd.\nJe kan niet nog een onderzoek toevoegen."
 }

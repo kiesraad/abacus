@@ -219,7 +219,7 @@ export function PollingStationChoiceForm({ anotherEntry }: PollingStationChoiceF
           <h3 className="mb-lg">{t("polling_station_choice.choose_polling_station")}</h3>
           {!pollingStations.length ? (
             <Alert type="error" small>
-              <p>{t("polling_station_choice.no_polling_stations_found")}</p>
+              <p>{t("no_polling_stations_found")}</p>
             </Alert>
           ) : !availableCurrentUser.length ? (
             <Alert type="notify" small>

@@ -26,6 +26,12 @@
     }
   }
 
+  &.muted {
+    svg {
+      fill: var(--bg-gray-darkest);
+    }
+  }
+
   &.errors-and-warnings {
     svg {
       fill: var(--progress-bar-errors-and-warnings);

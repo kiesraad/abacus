@@ -29,7 +29,7 @@ export function AddInvestigationPage() {
             </Table.Header>
             <Table.Body className="fs-md">
               {availablePollingStations.map((station) => (
-                <Table.LinkRow key={station.id} to={`./${station.id}/reason`}>
+                <Table.LinkRow key={station.id} to={`../${station.id}/reason`}>
                   <Table.NumberCell>{station.number}</Table.NumberCell>
                   <Table.Cell className="break-word">{station.name}</Table.Cell>
                 </Table.LinkRow>

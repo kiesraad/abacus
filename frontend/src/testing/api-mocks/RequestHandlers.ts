@@ -17,12 +17,6 @@ import {
   COMMITTEE_SESSION_CREATE_REQUEST_PATH,
   COMMITTEE_SESSION_DELETE_REQUEST_PARAMS,
   COMMITTEE_SESSION_DELETE_REQUEST_PATH,
-  COMMITTEE_SESSION_INVESTIGATION_CONCLUDE_REQUEST_BODY,
-  COMMITTEE_SESSION_INVESTIGATION_CONCLUDE_REQUEST_PARAMS,
-  COMMITTEE_SESSION_INVESTIGATION_CONCLUDE_REQUEST_PATH,
-  COMMITTEE_SESSION_INVESTIGATION_CREATE_REQUEST_BODY,
-  COMMITTEE_SESSION_INVESTIGATION_CREATE_REQUEST_PARAMS,
-  COMMITTEE_SESSION_INVESTIGATION_CREATE_REQUEST_PATH,
   COMMITTEE_SESSION_NUMBER_OF_VOTERS_CHANGE_REQUEST_BODY,
   COMMITTEE_SESSION_NUMBER_OF_VOTERS_CHANGE_REQUEST_PARAMS,
   COMMITTEE_SESSION_NUMBER_OF_VOTERS_CHANGE_REQUEST_PATH,
@@ -88,6 +82,15 @@ import {
   POLLING_STATION_DELETE_REQUEST_PATH,
   POLLING_STATION_GET_REQUEST_PARAMS,
   POLLING_STATION_GET_REQUEST_PATH,
+  POLLING_STATION_INVESTIGATION_CONCLUDE_REQUEST_BODY,
+  POLLING_STATION_INVESTIGATION_CONCLUDE_REQUEST_PARAMS,
+  POLLING_STATION_INVESTIGATION_CONCLUDE_REQUEST_PATH,
+  POLLING_STATION_INVESTIGATION_CREATE_REQUEST_BODY,
+  POLLING_STATION_INVESTIGATION_CREATE_REQUEST_PARAMS,
+  POLLING_STATION_INVESTIGATION_CREATE_REQUEST_PATH,
+  POLLING_STATION_INVESTIGATION_UPDATE_REQUEST_BODY,
+  POLLING_STATION_INVESTIGATION_UPDATE_REQUEST_PARAMS,
+  POLLING_STATION_INVESTIGATION_UPDATE_REQUEST_PATH,
   POLLING_STATION_LIST_REQUEST_PARAMS,
   POLLING_STATION_LIST_REQUEST_PATH,
   POLLING_STATION_UPDATE_REQUEST_BODY,
@@ -213,25 +216,42 @@ export const CommitteeSessionDeleteHandler = http.delete<ParamsToString<COMMITTE
 );
 
 // investigation handlers
-export const CommitteeSessionInvestigationCreateHandler = http.post<
-  ParamsToString<COMMITTEE_SESSION_INVESTIGATION_CREATE_REQUEST_PARAMS>,
-  COMMITTEE_SESSION_INVESTIGATION_CREATE_REQUEST_BODY,
+export const PollingStationInvestigationCreateHandler = http.post<
+  ParamsToString<POLLING_STATION_INVESTIGATION_CREATE_REQUEST_PARAMS>,
+  POLLING_STATION_INVESTIGATION_CREATE_REQUEST_BODY,
   PollingStationInvestigation
->("/api/polling_stations/1/investigations" satisfies COMMITTEE_SESSION_INVESTIGATION_CREATE_REQUEST_PATH, () => {
+>("/api/polling_stations/3/investigation" satisfies POLLING_STATION_INVESTIGATION_CREATE_REQUEST_PATH, () => {
   const response: PollingStationInvestigation = {
-    polling_station_id: 1,
+    polling_station_id: 3,
     reason: "Test reason",
   };
   return HttpResponse.json(response, { status: 201 });
 });
 
-export const CommitteeSessionInvestigationConcludeHandler = http.put<
-  ParamsToString<COMMITTEE_SESSION_INVESTIGATION_CONCLUDE_REQUEST_PARAMS>,
-  COMMITTEE_SESSION_INVESTIGATION_CONCLUDE_REQUEST_BODY,
+export const PollingStationInvestigationConcludeHandler = http.post<
+  ParamsToString<POLLING_STATION_INVESTIGATION_CONCLUDE_REQUEST_PARAMS>,
+  POLLING_STATION_INVESTIGATION_CONCLUDE_REQUEST_BODY,
   PollingStationInvestigation
->("/api/polling_stations/1/investigations" satisfies COMMITTEE_SESSION_INVESTIGATION_CONCLUDE_REQUEST_PATH, () => {
+>(
+  "/api/polling_stations/3/investigation/conclude" satisfies POLLING_STATION_INVESTIGATION_CONCLUDE_REQUEST_PATH,
+  () => {
+    const response: PollingStationInvestigation = {
+      polling_station_id: 3,
+      reason: "Test reason",
+      findings: "Test findings",
+      corrected_results: true,
+    };
+    return HttpResponse.json(response, { status: 200 });
+  },
+);
+
+export const PollingStationInvestigationUpdateHandler = http.put<
+  ParamsToString<POLLING_STATION_INVESTIGATION_UPDATE_REQUEST_PARAMS>,
+  POLLING_STATION_INVESTIGATION_UPDATE_REQUEST_BODY,
+  PollingStationInvestigation
+>("/api/polling_stations/3/investigation" satisfies POLLING_STATION_INVESTIGATION_UPDATE_REQUEST_PATH, () => {
   const response: PollingStationInvestigation = {
-    polling_station_id: 1,
+    polling_station_id: 3,
     reason: "Test reason",
     findings: "Test findings",
     corrected_results: true,
@@ -461,8 +481,9 @@ export const handlers: HttpHandler[] = [
   CommitteeSessionUpdateHandler,
   CommitteeSessionCreateHandler,
   CommitteeSessionDeleteHandler,
-  CommitteeSessionInvestigationCreateHandler,
-  CommitteeSessionInvestigationConcludeHandler,
+  PollingStationInvestigationCreateHandler,
+  PollingStationInvestigationConcludeHandler,
+  PollingStationInvestigationUpdateHandler,
   ElectionListRequestHandler,
   ElectionRequestHandler,
   ElectionStatusRequestHandler,

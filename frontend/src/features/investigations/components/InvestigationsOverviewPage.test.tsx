@@ -77,7 +77,7 @@ describe("InvestigationsOverviewPage", () => {
   test("Renders and filters a list of investigations in two categories", async () => {
     await renderPage();
 
-    // count that there are 4 investigations + the "Afgehandelde onderzoeken" heading
+    // assert the investigations count + one "Afgehandelde onderzoeken" heading
     expect(await screen.findAllByRole("heading", { level: 3 })).toHaveLength(6);
 
     // check the order and the filtering

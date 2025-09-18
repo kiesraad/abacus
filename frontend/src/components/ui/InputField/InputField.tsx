@@ -41,7 +41,7 @@ export function InputField({
   autoFocus,
   numberInput,
   hideErrorMessage,
-  ...InputFieldProps
+  ...inputFieldProps
 }: InputFieldProps) {
   let inputEl: React.ReactNode;
   const commonProps: React.DetailedHTMLProps<React.InputHTMLAttributes<HTMLInputElement>, HTMLInputElement> = {
@@ -52,7 +52,7 @@ export function InputField({
     autoFocus,
     "aria-invalid": error ? "true" : "false",
     "aria-errormessage": error ? `${name}-hint_or_error` : undefined,
-    ...InputFieldProps,
+    ...inputFieldProps,
   };
 
   if (fieldSize === "text-area") {
@@ -60,7 +60,7 @@ export function InputField({
       <textarea
         name={name}
         value={value}
-        defaultValue={InputFieldProps.defaultValue}
+        defaultValue={inputFieldProps.defaultValue}
         autoComplete="off"
         autoFocus={autoFocus}
         aria-invalid={error ? "true" : "false"}

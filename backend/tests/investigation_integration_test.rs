@@ -200,7 +200,7 @@ async fn test_investigation_can_only_update_current_session(pool: SqlitePool) {
     );
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_5", "users"))))]
+#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_5_with_results", "users"))))]
 async fn test_polling_station_corrigendum_download_with_previous_results(pool: SqlitePool) {
     let addr = serve_api(pool.clone()).await;
     let coordinator_cookie = shared::coordinator_login(&addr).await;

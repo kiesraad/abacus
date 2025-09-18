@@ -122,7 +122,7 @@ async fn test_election_apportionment_works_for_less_than_19_seats(pool: SqlitePo
     assert_eq!(total_seats, vec![12, 1, 1, 1, 0, 0, 0, 0]);
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_5", "users"))))]
+#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_5_with_results", "users"))))]
 async fn test_election_apportionment_works_for_19_or_more_seats(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let coordinator_cookie: axum::http::HeaderValue = shared::coordinator_login(&addr).await;

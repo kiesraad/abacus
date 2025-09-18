@@ -498,53 +498,6 @@ pub enum VotingMethod {
     Unknown,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq, Copy)]
-pub enum RegionCategory {
-    #[serde(rename = "DEELGEMEENTE")]
-    SubMunicipality,
-    #[serde(rename = "GEMEENTE")]
-    Municipality,
-    #[serde(rename = "KIESKRING")]
-    ElectoralDistrict,
-    #[serde(rename = "PROVINCIE")]
-    Province,
-    #[serde(rename = "PROVINCIAAL_KIESKRING")]
-    ProvinceElectoralDistrict,
-    #[serde(rename = "PROVINCIAAL_STEMBUREAU")]
-    ProvincePollingStation,
-    #[serde(rename = "STAAT")]
-    State,
-    #[serde(rename = "STEMBUREAU")]
-    PollingStation,
-    #[serde(rename = "WATERSCHAP")]
-    WaterAuthority,
-    #[serde(rename = "WATERSCHAP_KIESKRING")]
-    WaterAuthorityElectoralDistrict,
-    #[serde(rename = "WATERSCHAP_GEMEENTE")]
-    WaterAuthorityMunicipality,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(rename_all = "PascalCase")]
-pub struct Committee {
-    #[serde(rename = "@CommitteeCategory")]
-    category: CommitteeCategory,
-    #[serde(rename = "@CommitteeName")]
-    name: Option<String>,
-    #[serde(rename = "@AcceptCentralSubmissions", default)]
-    accept_central_submissions: bool,
-}
-
-#[allow(clippy::upper_case_acronyms)]
-#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq, Copy)]
-pub enum CommitteeCategory {
-    CSB,
-    HSB,
-    #[serde(rename = "PROV_SB")]
-    PROVSB,
-    PSB,
-}
-
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "PascalCase")]
 pub struct RegisteredParty {

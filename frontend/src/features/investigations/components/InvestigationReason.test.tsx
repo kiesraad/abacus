@@ -59,7 +59,7 @@ describe("InvestigationReason", () => {
       expect(reason).toBeInvalid();
     });
 
-    expect(reason).toHaveAccessibleErrorMessage("Dit veld mag niet leeg zijn");
+    expect(reason).toHaveAccessibleErrorMessage("Vul de opdracht van het centraal stembureau in");
   });
 
   test("Navigate to the next page when submitting a reason", async () => {

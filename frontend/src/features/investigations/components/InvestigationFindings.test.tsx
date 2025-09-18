@@ -57,7 +57,9 @@ describe("InvestigationFindings", () => {
       expect(findings).toBeInvalid();
     });
 
-    expect(findings).toHaveAccessibleErrorMessage("Dit veld mag niet leeg zijn");
+    expect(findings).toHaveAccessibleErrorMessage(
+      "Vul de bevindingen van het onderzoek in. Dit wordt opgenomen in het proces-verbaal van het gemeentelijk stembureau",
+    );
     expect(await screen.findByTestId("corrected_results_error")).toBeVisible();
   });
 

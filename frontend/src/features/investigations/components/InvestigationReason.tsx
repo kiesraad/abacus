@@ -106,7 +106,7 @@ export function InvestigationReason({ pollingStationId }: InvestigationReasonPro
             fieldSize="text-area"
             name="reason"
             label={t("investigations.reason_and_assignment.title")}
-            error={nonEmptyError ? t("form_errors.FORM_VALIDATION_RESULT_REQUIRED") : undefined}
+            error={nonEmptyError ? t("investigations.reason_and_assignment.error") : undefined}
             defaultValue={investigation?.reason}
           />
         </FormLayout.Section>

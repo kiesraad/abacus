@@ -116,7 +116,7 @@ export function InvestigationFindings({ pollingStationId }: InvestigationFinding
             fieldSize="text-area"
             name="findings"
             label={t("investigations.findings.title")}
-            error={nonEmptyError ? t("form_errors.FORM_VALIDATION_RESULT_REQUIRED") : undefined}
+            error={nonEmptyError ? t("investigations.findings.error") : undefined}
             hint={t("investigations.findings.hint")}
             defaultValue={investigation.findings || ""}
           />

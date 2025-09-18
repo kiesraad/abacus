@@ -275,7 +275,8 @@ pub async fn update(
     let polling_station = get(&mut tx, polling_station_id).await?;
     if polling_station.id_prev_session.is_some() && polling_station_update.number.is_some() {
         return Err(sqlx::Error::InvalidArgument(
-            "number cannot be updated for polling stations copied from a previous committee session".to_string(),
+            "number cannot be updated for polling stations linked to a previous session"
+                .to_string(),
         ));
     }
 

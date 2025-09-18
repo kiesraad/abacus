@@ -469,4 +469,114 @@ VALUES
 
         assert!(result.is_err());
     }
+
+    #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_7_four_sessions"))))]
+    async fn test_create_number_required(pool: SqlitePool) {
+        let mut conn = pool.acquire().await.unwrap();
+        let mut data = crate::polling_station::structs::PollingStationRequest {
+            name: "Name".to_string(),
+            number: None,
+            number_of_voters: None,
+            polling_station_type: None,
+            address: "Address".to_string(),
+            postal_code: "1234 AB".to_string(),
+            locality: "Locality".to_string(),
+        };
+        let result = crate::polling_station::repository::create(&mut conn, 700, data.clone()).await;
+        assert!(result.is_err());
+
+        data.number = Some(123);
+        let result = crate::polling_station::repository::create(&mut conn, 700, data).await;
+        assert!(result.is_ok());
+    }
+
+    #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_7_four_sessions"))))]
+    async fn test_create_many_number_required(pool: SqlitePool) {
+        let mut conn = pool.acquire().await.unwrap();
+        let mut data = crate::polling_station::structs::PollingStationRequest {
+            name: "Name".to_string(),
+            number: None,
+            number_of_voters: None,
+            polling_station_type: None,
+            address: "Address".to_string(),
+            postal_code: "1234 AB".to_string(),
+            locality: "Locality".to_string(),
+        };
+        let result =
+            crate::polling_station::repository::create_many(&mut conn, 700, vec![data.clone()])
+                .await;
+        assert!(result.is_err());
+
+        data.number = Some(123);
+        let result =
+            crate::polling_station::repository::create_many(&mut conn, 700, vec![data]).await;
+        assert!(result.is_ok());
+    }
+
+    #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_7_four_sessions"))))]
+    async fn test_update_number_allowed_when_no_prev_session(pool: SqlitePool) {
+        let mut conn = pool.acquire().await.unwrap();
+        let mut data = crate::polling_station::structs::PollingStationRequest {
+            name: "Name".to_string(),
+            number: Some(123),
+            number_of_voters: None,
+            polling_station_type: None,
+            address: "Address".to_string(),
+            postal_code: "1234 AB".to_string(),
+            locality: "Locality".to_string(),
+        };
+
+        // Add a new polling station
+        let polling_station =
+            crate::polling_station::repository::create(&mut conn, 700, data.clone())
+                .await
+                .unwrap();
+
+        // Update number
+        data.number = Some(456);
+        let result = crate::polling_station::repository::update(
+            &mut conn,
+            700,
+            polling_station.id,
+            data.clone(),
+        )
+        .await;
+
+        assert!(result.is_ok());
+    }
+
+    #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_7_four_sessions"))))]
+    async fn test_update_number_restricted_when_prev_session(pool: SqlitePool) {
+        let mut conn = pool.acquire().await.unwrap();
+        let mut data = crate::polling_station::structs::PollingStationRequest {
+            name: "Name".to_string(),
+            number: None,
+            number_of_voters: None,
+            polling_station_type: None,
+            address: "Address".to_string(),
+            postal_code: "1234 AB".to_string(),
+            locality: "Locality".to_string(),
+        };
+
+        // Update a polling station that has a id_prev_session reference
+        // ... without number change
+        let result =
+            crate::polling_station::repository::update(&mut conn, 700, 741, data.clone()).await;
+        assert!(result.is_ok());
+
+        // ... with number change
+        data.number = Some(123);
+        let result = crate::polling_station::repository::update(&mut conn, 700, 741, data).await;
+        assert!(result.is_err());
+    }
+
+    #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_7_four_sessions"))))]
+    async fn test_delete_restricted_when_prev_session(pool: SqlitePool) {
+        // Try to delete a polling station that has a id_prev_session reference
+        let result = query!("DELETE FROM polling_stations WHERE id = 721")
+            .execute(&pool)
+            .await;
+
+        assert!(result.is_err());
+    }
 }

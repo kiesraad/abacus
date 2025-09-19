@@ -8,29 +8,29 @@ __Niveau:__ hoog-over, wolk, ☁️
 
 __Hoofdscenario:__  
 
-1. Het CSB ontvangt het GSB PV (incl. bijlagen) van de burgemeester.
-2. Het CSB ontvangt de benodigde digitale bestanden (PV, onderliggende PVs, digitale bestanden, corrigenda) van het GSB en controleert ze op volledigheid.
-3. Het CSB stelt vast dat het PV geen aanleiding geeft tot een terugverwijzing. (controleprotocol deel A)
+1. Het CSB ontvangt het GSB PV incl. bijlagen (DSO: Na 31-1 , CSO: Na 31-2) van de burgemeester.
+2. Het CSB ontvangt alle overige documenten (PVs, onderliggende PVs, corrigenda, tellingsbestand EML 510b) van het GSB en controleert ze op volledigheid.
+3. Het CSB stelt vast dat het GSB PV geen aanleiding geeft tot een terugverwijzing. (controleprotocol deel A)
 4. [Het CSB voert de tellingen van het GSB in.](./csb-invoer-zitting.md#het-csb-voert-de-tellingen-van-het-gsb-in-vlieger)
 5. Het CSB voert het controleprotocol optellingen uit. (controleprotocol deel B)
 6. [Het CSB stelt de zetelverdeling vast en wijst de gekozen kandidaten aan.](#het-csb-stelt-de-zetelverdeling-vast-en-wijst-de-gekozen-kandidaten-aan-vlieger)
-7. De applicatie genereert de benodigde bestanden: PV, digitaal bestand(en).
+7. De applicatie genereert de benodigde bestanden: P 22-2, EML 510d, EML 520.
 8. De voorzitter CSB (burgemeester) tekent de brieven.
 9. Het CSB voert het controleprotocol zetelverdeling uit. (controleprotocol deel C)
 10. Het CSB opent de zitting.
-11. Het CSB stelt de uitslag vast obv het PV: controleren op compleetheid, voorlezen, er zijn geen bezwaren, ondertekenen. En sluit daarmee de zitting.
-12. Het CSB publiceert het digitaal bestand en het PV op de website van de gemeente.
+11. Het CSB stelt de uitslag vast o.b.v. de P 22-2: controleren op compleetheid, voorlezen, er zijn geen bezwaren, ondertekenen. En sluit daarmee de zitting.
+12. Het CSB publiceert de P22-2, EML 510d en EML 520 op de website van de gemeente.
 13. Het CSB stuurt alle PVs naar de gemeenteraad.
-14. Het CSB deelt het digitale bestand met de Kiesraad.
+14. Het CSB deelt de EML 510d en EML 520 met de Kiesraad.
 
 __Uitbreidingen:__
 
-3a. Het PV geeft aanleiding tot een terugverwijzing:  
+3a. Het GSB PV geeft aanleiding tot een terugverwijzing:  
 &emsp; 3a1. Het CSB verwijst terug naar het GSB.  
 &emsp; 3a2. [Gemeentelijk stembureau (GSB) stelt uitslag vast in tweede zitting (corrigenda) (wolk)](./gsb-tweede-zitting.md#gemeentelijk-stembureau-gsb-stelt-uitslag-vast-in-tweede-zitting-corrigenda-wolk)  
 
 4-11a. Het CSB moet nieuwe aantallen invoeren ter correctie van de eerder ingevoerde tellingen:  
-&emsp; 4-11a1. Het CSB corrigeert de eerder ingevoerde aantallen in de applicatie. Er is dus geen tweede zitting.
+&emsp; 4-11a1. Het CSB corrigeert de eerder ingevoerde aantallen in de applicatie. Er is dus geen tweede CSB-zitting.
 
 11a. Er zijn bezwaren tijdens de zitting:  
 &emsp;11a1. Het CSB neemt de bezwaren op in het PV.  
@@ -43,7 +43,7 @@ __Uitbreidingen:__
 13a. De gemeenteraad besluit dat een hertelling nodig is ([Artikel V 4a Kieswet](https://wetten.overheid.nl/jci1.3:c:BWBR0004627&afdeling=IV&hoofdstuk=V&paragraaf=1&artikel=V_4a&z=2025-02-12&g=2025-02-12)):  
 &emsp; 13a1. De hertelling wordt gedaan door het GSB d.m.v. de corrigendum-flow.  
 &emsp; 13a2. De CSB stelt de nieuwe uitslag vast.  
-&emsp; 13a3. Het CSB maakt een nieuw PV aan met alleen de nieuwe uitslag.
+&emsp; 13a3. Het CSB maakt een nieuw P22-2, EML 510d en EML 520 aan met alleen de nieuwe uitslag.
 
 ### Niet in scope
 

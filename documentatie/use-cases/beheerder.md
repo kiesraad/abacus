@@ -2,32 +2,15 @@
 
 ## De beheerder richt de applicatie in voor GSB en/of CSB (wolk)
 
-_Niveau:_ hoog-over, wolk, ☁️
+__Niveau:__ hoog-over, wolk, ☁️
 
 ### Hoofdscenario en uitbreidingen
 
 1. [De beheerder installeert de applicatie.](#de-beheerder-installeert-de-applicatie-zee)
 2. De beheerder maakt voor zichzelf een eerste account en wachtwoord aan.
 3. [De beheerder zet de verkiezingen in de applicatie.](#de-beheerder-zet-de-verkiezingen-in-de-applicatie-vis)
-4. De beheerder leest de kandidatenlijst in.
-5. [De beheerder leest het bestand met stembureaus en aantal kiesgerechtigden in.](#de-beheerder-leest-het-bestand-met-stembureaus-en-aantal-kiesgerechtigden-in-vis)
-6. De beheerder selecteert het type stemopneming.
-7. De beheerder bevestigt het aantal kiesgerechtigden in de gemeente.
-8. [De beheerder maakt de gebruikers aan.](#de-beheerder-maakt-de-gebruikers-aan-zee)
+4. [De beheerder maakt de gebruikers aan.](#de-beheerder-maakt-de-gebruikers-aan-zee)
 
-__Uitbreidingen:__  
-
-4a. De applicatie geeft een foutmelding bij het inlezen van de kandidatenlijst:
-
-5a. De beheerder slaat het invoeren van stembureaus over:  
-&emsp; 5a1. (na inrichten applicatie) [De beheerder of coördinator zet de stembureaus in de applicatie.](#de-beheerder-of-coördinator-zet-de-stembureaus-in-de-applicatie-zee)
-
-7a. Het aantal kiesgerechtigden stond niet in het EML-bestand met stembureaus:  
-&emsp; 7a1. De beheerder voert het aantal kiesgerechtigden handmatig in.
-
-### Niet in scope
-
-- Inlezen totalenlijst (kandidatenlijst met adresgegevens). Deze gegevens zijn relevant voor de benoemingsbrieven en de kennisgevingen tot geloofsbrief.
 
 ## De beheerder installeert de applicatie (zee)
 
@@ -49,6 +32,7 @@ __Uitbreidingen:__
 
 4a. De applicatie geeft een foutmelding tijdens het starten:
 
+
 ## De beheerder zet de verkiezingen in de applicatie (vis)
 
 __Niveau:__ subfunctie, vis, 🐟
@@ -56,23 +40,50 @@ __Niveau:__ subfunctie, vis, 🐟
 ### Hoofdscenario en uitbreidingen
 
 __Hoofdscenario:__  
-1. De beheerder leest de verkiezingsdefinitie in.
+1. [De beheerder leest de verkiezingsdefinitie (EML 110a) in.](#de-beheerder-leest-de-verkiezingsdefinitie-eml-110a-in-vis)
+2. De beheerder leest de kandidatenlijst (EML 230b) in.
+3. [De beheerder leest het bestand met stembureaus en aantal kiesgerechtigden (EML 110b) in.](#de-beheerder-leest-het-bestand-met-stembureaus-en-aantal-kiesgerechtigden-eml-110b-in-vis)
+4. De beheerder selecteert het type stemopneming.
+5. De beheerder bevestigt het aantal kiesgerechtigden in de gemeente.
+6. De applicatie maakt de verkiezing GSB, de verkiezing CSB, en het GSB als stembureau voor het CSB aan.
+
+__Uitbreidingen:__
+2a. De applicatie geeft een foutmelding bij het inlezen van de kandidatenlijst:
+
+3a. De beheerder slaat het invoeren van stembureaus over:  
+&emsp; 3a1. (tijdens stap 5) De beheerder voert het aantal kiesgerechtigden in de gemeente handmatig in.  
+&emsp; 3a2. (na inrichten applicatie) [De beheerder of coördinator zet de stembureaus in de applicatie.](#de-beheerder-of-coördinator-zet-de-stembureaus-in-de-applicatie-zee)
+
+5b. Het aantal kiesgerechtigden stond niet in het EML-bestand met stembureaus:  
+&emsp; 5b1. De beheerder voert het aantal kiesgerechtigden handmatig in.
+
+### Niet in scope
+
+- Inlezen totalenlijst (kandidatenlijst met adresgegevens). Deze gegevens zijn relevant voor de benoemingsbrieven en de kennisgevingen tot geloofsbrief.
+
+
+## De beheerder leest de verkiezingsdefinitie (EML 110a) in (vis)
+
+__Niveau:__ subfunctie, vis, 🐟
+
+__Hoofscenario:__
+1. De beheerder leest de verkiezingsdefinitie (EML 110a) in.
 2. De beheerder stelt vast dat de hash van de verkiezingsdefinitie klopt.
-3. De applicatie maakt op basis van de verkiezingsdefinitie de verkiezing GSB, de verkiezing CSB, en het GSB als stembureau voor het CSB aan.
 
 __Uitbreidingen:__  
 1a. De applicatie geeft een foutmelding bij het inlezen van de verkiezingsdefinitie:
 
 2a. De hash van de verkiezingsdefinitie klopt niet:
 
-## De beheerder leest het bestand met stembureaus en aantal kiesgerechtigden in (vis)
+
+## De beheerder leest het bestand met stembureaus en aantal kiesgerechtigden (EML 110b) in (vis)
 
 __Niveau:__ subfunctie, vis, 🐟
 
 ### Hoofdscenario en uitbreidingen
 
 __Hoofdscenario:__
-1. De beheerder importeert het bestand met de stembureaus en het aantal kiesgerechtigden op gemeenteniveau.
+1. De beheerder importeert het bestand met de stembureaus en het aantal kiesgerechtigden op gemeenteniveau (EML 110b).
 2. De applicatie stelt vast dat het bestand aan de validatieregels voldoet.
 3. De beheerder stelt vast dat de stembureaus in de applicatie kloppen met de door de gemeente vooraf gepubliceerde lijst.
 

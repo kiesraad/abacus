@@ -1,4 +1,5 @@
 import { IconPlus } from "@/components/generated/icons";
+import { Messages } from "@/components/messages/Messages";
 import { PageTitle } from "@/components/page_title/PageTitle";
 import { Button } from "@/components/ui/Button/Button";
 import { useElection } from "@/hooks/election/useElection";
@@ -24,6 +25,9 @@ export function InvestigationsOverviewPage() {
           </h1>
         </section>
       </header>
+
+      <Messages />
+
       <main>
         <section>
           <h2>{t("investigations.from_central_polling_station")}</h2>

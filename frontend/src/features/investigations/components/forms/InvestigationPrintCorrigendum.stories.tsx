@@ -1,13 +1,14 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
-import { InvestigationFindings } from "./InvestigationFindings";
+import { InvestigationPrintCorrigendum } from "./InvestigationPrintCorrigendum";
 
 const meta = {
-  component: InvestigationFindings,
+  component: InvestigationPrintCorrigendum,
   parameters: {
     needsElection: true,
+    needsMessages: true,
   },
-} satisfies Meta<typeof InvestigationFindings>;
+} satisfies Meta<typeof InvestigationPrintCorrigendum>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;

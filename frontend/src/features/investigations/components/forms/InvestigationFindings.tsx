@@ -23,22 +23,21 @@ interface InvestigationFindingsProps {
 
 export function InvestigationFindings({ pollingStationId }: InvestigationFindingsProps) {
   const navigate = useNavigate();
-  const { election, investigation, refetch } = useElection(pollingStationId);
+  const { election, investigation, pollingStation, refetch } = useElection(pollingStationId);
+  const [nonEmptyError, setNonEmptyError] = useState(false);
+  const [radioError, setRadioError] = useState(false);
+  const [error, setError] = useState<AnyApiError>();
   const concludePath = `/api/polling_stations/${pollingStationId}/investigation/conclude`;
   const { create: conclude } = useCrud<PollingStationInvestigationConcludeRequest>({ create: concludePath });
   const path = `/api/polling_stations/${pollingStationId}/investigation`;
   const { update } = useCrud<PollingStationInvestigationUpdateRequest>({ update: path });
 
-  const [nonEmptyError, setNonEmptyError] = useState(false);
-  const [radioError, setRadioError] = useState(false);
-  const [apiError, setApiError] = useState<AnyApiError>();
-
-  if (apiError) {
-    throw apiError;
+  if (!investigation || !pollingStation) {
+    return <Loader />;
   }
 
-  if (!investigation) {
-    return <Loader />;
+  if (error) {
+    throw error;
   }
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
@@ -90,7 +89,7 @@ export function InvestigationFindings({ pollingStationId }: InvestigationFinding
       await refetch();
       await navigate(`/elections/${election.id}/investigations`);
     } else if (isError(response)) {
-      setApiError(response);
+      setError(response);
     }
   };
 

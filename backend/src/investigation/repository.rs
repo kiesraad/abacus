@@ -1,4 +1,4 @@
-use sqlx::{Connection, Error, SqliteConnection, query, query_as};
+use sqlx::{Error, SqliteConnection, query, query_as};
 
 use super::structs::{
     PollingStationInvestigation, PollingStationInvestigationConcludeRequest,
@@ -102,17 +102,13 @@ pub async fn delete_polling_station_investigation(
     conn: &mut SqliteConnection,
     polling_station_id: u32,
 ) -> Result<bool, Error> {
-    let mut tx = conn.begin().await?;
-
     let rows_affected = query!(
         r#"DELETE FROM polling_station_investigations WHERE polling_station_id = ?"#,
         polling_station_id,
     )
-    .execute(&mut *tx)
+    .execute(conn)
     .await?
     .rows_affected();
-
-    tx.commit().await?;
 
     Ok(rows_affected > 0)
 }

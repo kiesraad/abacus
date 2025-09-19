@@ -14,7 +14,10 @@ use crate::{shared::create_result, utils::serve_api};
 pub mod shared;
 pub mod utils;
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_4", "election_5", "users"))))]
+#[test(sqlx::test(fixtures(
+    path = "../fixtures",
+    scripts("election_4", "election_5_with_results", "users")
+)))]
 async fn test_election_list_works(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 
@@ -39,7 +42,7 @@ async fn test_election_list_works(pool: SqlitePool) {
     assert_eq!(body.elections.len(), 2);
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_5", "users"))))]
+#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_5_with_results", "users"))))]
 async fn test_election_details_works(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 

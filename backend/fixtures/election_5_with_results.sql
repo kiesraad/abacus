@@ -10,7 +10,7 @@ VALUES (5, 'Test Election >= 19 seats', 'CSO', 'GroteStad_2026', 'Grote Stad', '
                 "initials": "L.",
                 "first_name": "Lidewij",
                 "last_name": "Oud",
-                "locality": "Test Location",
+                "locality": "Juinen",
                 "gender": "Female"
               },
               {
@@ -18,7 +18,7 @@ VALUES (5, 'Test Election >= 19 seats', 'CSO', 'GroteStad_2026', 'Grote Stad', '
                 "initials": "J.",
                 "first_name": "Johan",
                 "last_name": "Oud",
-                "locality": "Test Location",
+                "locality": "Juinen",
                 "gender": "Male"
               },
               {
@@ -26,7 +26,7 @@ VALUES (5, 'Test Election >= 19 seats', 'CSO', 'GroteStad_2026', 'Grote Stad', '
                 "initials": "M.",
                 "first_name": "Marijke",
                 "last_name": "Oud",
-                "locality": "Test Location",
+                "locality": "Juinen",
                 "gender": "Female"
               },
               {
@@ -34,7 +34,7 @@ VALUES (5, 'Test Election >= 19 seats', 'CSO', 'GroteStad_2026', 'Grote Stad', '
                 "initials": "A.",
                 "first_name": "Arie",
                 "last_name": "Jansen",
-                "locality": "Test Location",
+                "locality": "Juinen",
                 "gender": "Male"
               },
               {
@@ -43,7 +43,7 @@ VALUES (5, 'Test Election >= 19 seats', 'CSO', 'GroteStad_2026', 'Grote Stad', '
                 "first_name": "Henk",
                 "last_name_prefix": "van der",
                 "last_name": "Weijden",
-                "locality": "Test Location",
+                "locality": "Juinen",
                 "gender": "Male"
               },
               {
@@ -52,7 +52,7 @@ VALUES (5, 'Test Election >= 19 seats', 'CSO', 'GroteStad_2026', 'Grote Stad', '
                 "first_name": "Berta",
                 "last_name_prefix": "van der",
                 "last_name": "Weijden",
-                "locality": "Test Location",
+                "locality": "Juinen",
                 "gender": "Female"
               },
               {
@@ -60,7 +60,7 @@ VALUES (5, 'Test Election >= 19 seats', 'CSO', 'GroteStad_2026', 'Grote Stad', '
                 "initials": "K.",
                 "first_name": "Klaas",
                 "last_name": "Oud",
-                "locality": "Test Location",
+                "locality": "Juinen",
                 "gender": "Male"
               },
               {
@@ -68,7 +68,7 @@ VALUES (5, 'Test Election >= 19 seats', 'CSO', 'GroteStad_2026', 'Grote Stad', '
                 "initials": "S.",
                 "first_name": "Sophie",
                 "last_name": "Bakker",
-                "locality": "Test Location",
+                "locality": "Juinen",
                 "gender": "Female"
               },
               {
@@ -77,7 +77,7 @@ VALUES (5, 'Test Election >= 19 seats', 'CSO', 'GroteStad_2026', 'Grote Stad', '
                 "first_name": "Johan",
                 "last_name_prefix": "de",
                 "last_name": "Vries",
-                "locality": "Test Location",
+                "locality": "Juinen",
                 "gender": "Male"
               },
               {
@@ -86,7 +86,7 @@ VALUES (5, 'Test Election >= 19 seats', 'CSO', 'GroteStad_2026', 'Grote Stad', '
                 "first_name": "Marijke",
                 "last_name_prefix": "van den",
                 "last_name": "Berg",
-                "locality": "Test Location",
+                "locality": "Juinen",
                 "gender": "Female"
               },
               {
@@ -95,7 +95,7 @@ VALUES (5, 'Test Election >= 19 seats', 'CSO', 'GroteStad_2026', 'Grote Stad', '
                 "first_name": "Rolf",
                 "last_name_prefix": "de",
                 "last_name": "Jong",
-                "locality": "Test Location",
+                "locality": "Juinen",
                 "gender": "Male"
               },
               {
@@ -103,7 +103,155 @@ VALUES (5, 'Test Election >= 19 seats', 'CSO', 'GroteStad_2026', 'Grote Stad', '
                 "initials": "K.",
                 "first_name": "Karin",
                 "last_name": "Kok",
-                "locality": "Test Location",
+                "locality": "Juinen",
+                "gender": "Female"
+              },
+              {
+                "number": 13,
+                "initials": "G.",
+                "first_name": "Gert",
+                "last_name": "Smit",
+                "locality": "Juinen",
+                "gender": "Male"
+              },
+              {
+                "number": 14,
+                "initials": "E.",
+                "first_name": "Eva",
+                "last_name": "Koster",
+                "locality": "Juinen",
+                "gender": "Female"
+              },
+              {
+                "number": 15,
+                "initials": "L.",
+                "first_name": "Leon",
+                "last_name": "Hofman",
+                "locality": "Juinen",
+                "gender": "Male"
+              },
+              {
+                "number": 16,
+                "initials": "S.",
+                "first_name": "Sophie",
+                "last_name": "Visser",
+                "locality": "Juinen",
+                "gender": "Female"
+              },
+              {
+                "number": 17,
+                "initials": "D.",
+                "first_name": "Dirk",
+                "last_name": "Bakker",
+                "locality": "Juinen",
+                "gender": "Male"
+              },
+              {
+                "number": 18,
+                "initials": "P.",
+                "first_name": "Piet",
+                "last_name": "Jansen",
+                "locality": "Juinen",
+                "gender": "Male"
+              },
+              {
+                "number": 19,
+                "initials": "A.",
+                "first_name": "Annelies",
+                "last_name_prefix": "van",
+                "last_name": "Loon",
+                "locality": "Juinen",
+                "gender": "Female"
+              },
+              {
+                "number": 20,
+                "initials": "T.J.",
+                "first_name": "Tessa",
+                "last_name": "Jansen",
+                "locality": "Juinen",
+                "gender": "Female"
+              },
+              {
+                "number": 21,
+                "initials": "H.J.",
+                "first_name": "Hans",
+                "last_name": "Jansen",
+                "locality": "Juinen",
+                "gender": "Male"
+              },
+              {
+                "number": 22,
+                "initials": "W.J.",
+                "first_name": "Willem",
+                "last_name": "Janssen",
+                "locality": "Juinen",
+                "gender": "Male"
+              },
+              {
+                "number": 23,
+                "initials": "B.",
+                "first_name": "Bert",
+                "last_name": "Meyer",
+                "locality": "Juinen",
+                "gender": "Male"
+              },
+              {
+                "number": 24,
+                "initials": "M.M.",
+                "first_name": "Mieke",
+                "last_name": "Meyer",
+                "locality": "Juinen",
+                "gender": "Female"
+              },
+              {
+                "number": 25,
+                "initials": "J.V.",
+                "first_name": "Jan",
+                "last_name_prefix": "van",
+                "last_name": "Dijk",
+                "locality": "Juinen",
+                "gender": "Male"
+              },
+              {
+                "number": 26,
+                "initials": "S.D.",
+                "first_name": "Suzan",
+                "last_name_prefix": "de",
+                "last_name": "Wit",
+                "locality": "Juinen",
+                "gender": "Female"
+              },
+              {
+                "number": 27,
+                "initials": "K.V.",
+                "first_name": "Koen",
+                "last_name_prefix": "van der",
+                "last_name": "Meer",
+                "locality": "Juinen",
+                "gender": "Male"
+              },
+              {
+                "number": 28,
+                "initials": "L.S.",
+                "first_name": "Laura",
+                "last_name": "Smit",
+                "locality": "Juinen",
+                "gender": "Female"
+              },
+              {
+                "number": 29,
+                "initials": "F.K.",
+                "first_name": "Frank",
+                "last_name": "Kool",
+                "locality": "Juinen",
+                "gender": "Male"
+              },
+              {
+                "number": 30,
+                "initials": "C.R.",
+                "first_name": "Claudia",
+                "last_name": "Reinders",
+                "locality": "Juinen",
                 "gender": "Female"
               }
             ]
@@ -305,10 +453,30 @@ VALUES (5, 'Test Election >= 19 seats', 'CSO', 'GroteStad_2026', 'Grote Stad', '
         ]');
 
 INSERT INTO committee_sessions (id, number, election_id, status, location, start_date_time, number_of_voters)
-VALUES (5, 1, 5, 'data_entry_finished', 'Grote Stad', '2026-03-19T09:15', 2000),
+VALUES (5, 1, 5, 'data_entry_finished', 'Grote Stad', '2026-03-19 09:15:00', 2000),
        (6, 2, 5, 'data_entry_in_progress', '', NULL, 2000);
 
 INSERT INTO polling_stations (id, committee_session_id, id_prev_session, name, number, number_of_voters, polling_station_type, address,
                               postal_code, locality)
-VALUES (9, 5, NULL, 'Testgebouw', 41, NULL, 'FixedLocation', 'Testweg 3', '1234 QA', 'Grote Stad'),
-(8, 6, 9, 'Testgebouw', 41, NULL, 'FixedLocation', 'Testweg 3', '1234 QA', 'Grote Stad');
+VALUES (8, 5, NULL, 'Testgebouw', 41, NULL, 'FixedLocation', 'Testweg 3', '1234 QA', 'Grote Stad'),
+       (9, 6, 8, 'Testgebouw', 41, NULL, 'FixedLocation', 'Testweg 3', '1234 QA', 'Grote Stad');
+
+INSERT INTO
+    polling_station_data_entries
+VALUES
+    (
+        8,
+        5,
+        '{"status":"Definitive","state":{"first_entry_user_id":5,"second_entry_user_id":6,"finished_at":"2025-09-16T17:07:31.223365436Z"}}',
+        '2025-09-16 17:07:31'
+    );
+
+INSERT INTO
+    polling_station_results
+VALUES
+    (
+        8,
+        5,
+        '{"model":"CSOFirstSession","extra_investigation":{"extra_investigation_other_reason":{"yes":false,"no":false},"ballots_recounted_extra_investigation":{"yes":false,"no":false}},"counting_differences_polling_station":{"unexplained_difference_ballots_voters":{"yes":false,"no":true},"difference_ballots_per_list":{"yes":false,"no":true}},"voters_counts":{"poll_card_count":1203,"proxy_certificate_count":2,"total_admitted_voters_count":1205},"votes_counts":{"political_group_total_votes":[{"number":1,"total":600},{"number":2,"total":302},{"number":3,"total":98},{"number":4,"total":99},{"number":5,"total":101}],"total_votes_candidates_count":1200,"blank_votes_count":3,"invalid_votes_count":2,"total_votes_cast_count":1205},"differences_counts":{"compare_votes_cast_admitted_voters":{"admitted_voters_equal_votes_cast":false,"votes_cast_greater_than_admitted_voters":false,"votes_cast_smaller_than_admitted_voters":false},"more_ballots_count":0,"fewer_ballots_count":0,"difference_completely_accounted_for":{"yes":false,"no":false}},"political_group_votes":[{"number":1,"total":600,"candidate_votes":[{"number":1,"votes":78},{"number":2,"votes":20},{"number":3,"votes":55},{"number":4,"votes":45},{"number":5,"votes":50},{"number":6,"votes":0},{"number":7,"votes":60},{"number":8,"votes":40},{"number":9,"votes":30},{"number":10,"votes":20},{"number":11,"votes":50},{"number":12,"votes":0},{"number":13,"votes":0},{"number":14,"votes":0},{"number":15,"votes":0},{"number":16,"votes":0},{"number":17,"votes":0},{"number":18,"votes":0},{"number":19,"votes":0},{"number":20,"votes":0},{"number":21,"votes":0},{"number":22,"votes":0},{"number":23,"votes":0},{"number":24,"votes":0},{"number":25,"votes":0},{"number":26,"votes":0},{"number":27,"votes":0},{"number":28,"votes":0},{"number":29,"votes":0},{"number":30,"votes":152}]},{"number":2,"total":302,"candidate_votes":[{"number":1,"votes":150},{"number":2,"votes":50},{"number":3,"votes":22},{"number":4,"votes":10},{"number":5,"votes":30},{"number":6,"votes":40}]},{"number":3,"total":98,"candidate_votes":[{"number":1,"votes":20},{"number":2,"votes":15},{"number":3,"votes":25},{"number":4,"votes":3},{"number":5,"votes":2},{"number":6,"votes":33}]},{"number":4,"total":99,"candidate_votes":[{"number":1,"votes":20},{"number":2,"votes":15},{"number":3,"votes":25},{"number":4,"votes":24},{"number":5,"votes":15}]},{"number":5,"total":101,"candidate_votes":[{"number":1,"votes":20},{"number":2,"votes":31},{"number":3,"votes":10},{"number":4,"votes":40}]}]}',
+        '2025-09-16 17:07:31'
+    );

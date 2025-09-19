@@ -12,6 +12,7 @@ type Story = StoryObj<typeof meta>;
 export const Default: Story = {
   args: {
     electionId: 1,
-    pollingStationNumber: 2,
+    pollingStationId: 1,
+    pollingStationNumber: 33,
   },
 };

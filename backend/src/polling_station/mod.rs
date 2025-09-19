@@ -482,11 +482,11 @@ VALUES
             postal_code: "1234 AB".to_string(),
             locality: "Locality".to_string(),
         };
-        let result = crate::polling_station::repository::create(&mut conn, 700, data.clone()).await;
+        let result = crate::polling_station::repository::create(&mut conn, 7, data.clone()).await;
         assert!(result.is_err());
 
         data.number = Some(123);
-        let result = crate::polling_station::repository::create(&mut conn, 700, data).await;
+        let result = crate::polling_station::repository::create(&mut conn, 7, data).await;
         assert!(result.is_ok());
     }
 
@@ -503,13 +503,12 @@ VALUES
             locality: "Locality".to_string(),
         };
         let result =
-            crate::polling_station::repository::create_many(&mut conn, 700, vec![data.clone()])
-                .await;
+            crate::polling_station::repository::create_many(&mut conn, 7, vec![data.clone()]).await;
         assert!(result.is_err());
 
         data.number = Some(123);
         let result =
-            crate::polling_station::repository::create_many(&mut conn, 700, vec![data]).await;
+            crate::polling_station::repository::create_many(&mut conn, 7, vec![data]).await;
         assert!(result.is_ok());
     }
 
@@ -528,7 +527,7 @@ VALUES
 
         // Add a new polling station
         let polling_station =
-            crate::polling_station::repository::create(&mut conn, 700, data.clone())
+            crate::polling_station::repository::create(&mut conn, 7, data.clone())
                 .await
                 .unwrap();
 
@@ -536,7 +535,7 @@ VALUES
         data.number = Some(456);
         let result = crate::polling_station::repository::update(
             &mut conn,
-            700,
+            7,
             polling_station.id,
             data.clone(),
         )
@@ -561,12 +560,12 @@ VALUES
         // Update a polling station that has a id_prev_session reference
         // ... without number change
         let result =
-            crate::polling_station::repository::update(&mut conn, 700, 741, data.clone()).await;
+            crate::polling_station::repository::update(&mut conn, 7, 741, data.clone()).await;
         assert!(result.is_ok());
 
         // ... with number change
         data.number = Some(123);
-        let result = crate::polling_station::repository::update(&mut conn, 700, 741, data).await;
+        let result = crate::polling_station::repository::update(&mut conn, 7, 741, data).await;
         assert!(result.is_err());
     }
 

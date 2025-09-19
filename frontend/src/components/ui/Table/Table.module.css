@@ -101,3 +101,7 @@
 :where(.table.defaultVariant td:first-child) {
   font-size: var(--font-size-lg);
 }
+
+.numberWidth {
+  width: 6.5rem;
+}

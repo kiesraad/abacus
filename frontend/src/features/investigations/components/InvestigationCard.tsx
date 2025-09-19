@@ -3,6 +3,7 @@ import { Link } from "react-router";
 import { IconCheckmark, IconMinus, IconPencil, IconPrinter } from "@/components/generated/icons";
 import { PollingStationNumber } from "@/components/ui/Badge/PollingStationNumber";
 import { Icon } from "@/components/ui/Icon/Icon";
+import { useUserRole } from "@/hooks/user/useUserRole";
 import { t } from "@/i18n/translate";
 
 import { PollingStationInvestigationWithStatus } from "../hooks/useInvestigations";
@@ -14,12 +15,14 @@ interface InvestigationCardProps {
 }
 
 export function InvestigationCard({ investigation, electionId }: InvestigationCardProps) {
+  const { isCoordinator } = useUserRole();
+
   return (
     <div className={cls.card}>
       <div className={cls.card_header}>
         <PollingStationNumber size="sm">{investigation.pollingStation.number}</PollingStationNumber>
         <h3>{investigation.pollingStation.name}</h3>
-        {investigation.findings && (
+        {isCoordinator && investigation.findings && (
           <Link to={`./${investigation.pollingStation.id}/findings`}>
             <Icon size="sm" icon={<IconPencil />} />
             {t("investigations.edit")}
@@ -28,7 +31,7 @@ export function InvestigationCard({ investigation, electionId }: InvestigationCa
       </div>
       <h4>{t("investigations.reason_and_assignment.title")}</h4>
       <pre>{investigation.reason}</pre>
-      {!investigation.findings && (
+      {isCoordinator && !investigation.findings && (
         <div className="mt-sm">
           <Link to={`./${investigation.pollingStation.id}/print-corrigendum`}>
             <Icon size="sm" icon={<IconPrinter />} />
@@ -40,7 +43,9 @@ export function InvestigationCard({ investigation, electionId }: InvestigationCa
       {investigation.findings ? (
         <pre>{investigation.findings}</pre>
       ) : (
-        <Link to={`./${investigation.pollingStation.id}/findings`}>{t("investigations.findings.fill")}</Link>
+        isCoordinator && (
+          <Link to={`./${investigation.pollingStation.id}/findings`}>{t("investigations.findings.fill")}</Link>
+        )
       )}
       {investigation.corrected_results !== undefined && (
         <>

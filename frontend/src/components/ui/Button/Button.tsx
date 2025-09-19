@@ -46,7 +46,7 @@ export interface ButtonLinkProps extends LinkProps {
 }
 
 function ButtonLink({ disabled, variant = "primary", size = "md", children, ...linkProps }: ButtonLinkProps) {
-  const className = cn(cls.button, cls[variant], cls[size], disabled ? cls.disabled : undefined);
+  const className = cn(cls.button, cls[variant], cls[size], "button", disabled ? cls.disabled : undefined);
   return (
     <Link className={className} {...linkProps}>
       {children}

@@ -7,6 +7,7 @@ const meta = {
   parameters: {
     needsElection: true,
     needsElectionStatus: true,
+    needsMessages: true,
   },
 } satisfies Meta<typeof InvestigationsOverviewPage>;
 

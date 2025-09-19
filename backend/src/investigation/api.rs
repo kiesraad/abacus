@@ -1,6 +1,7 @@
 use axum::{
     Json,
     extract::{Path, State},
+    http::StatusCode,
 };
 use axum_extra::response::Attachment;
 use chrono::Datelike;
@@ -10,7 +11,8 @@ use utoipa_axum::{router::OpenApiRouter, routes};
 use super::{
     repository::{
         conclude_polling_station_investigation, create_polling_station_investigation,
-        get_polling_station_investigation, update_polling_station_investigation,
+        delete_polling_station_investigation, get_polling_station_investigation,
+        list_investigations_for_committee_session, update_polling_station_investigation,
     },
     structs::{
         CurrentSessionPollingStationId, PollingStationInvestigation,
@@ -38,6 +40,7 @@ pub fn router() -> OpenApiRouter<AppState> {
         .routes(routes!(polling_station_investigation_create))
         .routes(routes!(polling_station_investigation_conclude))
         .routes(routes!(polling_station_investigation_update))
+        .routes(routes!(polling_station_investigation_delete))
         .routes(routes!(
             polling_station_investigation_download_corrigendum_pdf
         ))
@@ -204,6 +207,59 @@ async fn polling_station_investigation_update(
     tx.commit().await?;
 
     Ok(investigation)
+}
+
+/// Delete an investigation for a polling station
+#[utoipa::path(
+    delete,
+    path = "/api/polling_stations/{polling_station_id}/investigation",
+    responses(
+        (status = 200, description = "Polling station investigation deleted successfully"),
+        (status = 401, description = "Unauthorized", body = ErrorResponse),
+        (status = 403, description = "Forbidden", body = ErrorResponse),
+        (status = 404, description = "Investigation not found", body = ErrorResponse),
+        (status = 500, description = "Internal server error", body = ErrorResponse),
+    ),
+    params(
+        ("polling_station_id" = u32, description = "Polling station database id"),
+    ),
+)]
+async fn polling_station_investigation_delete(
+    _user: Coordinator,
+    State(pool): State<SqlitePool>,
+    audit_service: AuditService,
+    CurrentSessionPollingStationId(polling_station_id): CurrentSessionPollingStationId,
+) -> Result<StatusCode, APIError> {
+    let mut tx = pool.begin_immediate().await?;
+    let investigation = get_polling_station_investigation(&mut tx, polling_station_id).await?;
+    let polling_station =
+        crate::polling_station::repository::get(&mut tx, polling_station_id).await?;
+    delete_polling_station_investigation(&mut tx, polling_station_id).await?;
+
+    audit_service
+        .log(
+            &mut tx,
+            &AuditEvent::PollingStationInvestigationDeleted(investigation.clone()),
+            None,
+        )
+        .await?;
+
+    if list_investigations_for_committee_session(&mut tx, polling_station.committee_session_id)
+        .await?
+        .is_empty()
+    {
+        change_committee_session_status(
+            &mut tx,
+            polling_station.committee_session_id,
+            CommitteeSessionStatus::Created,
+            audit_service,
+        )
+        .await?;
+    }
+
+    tx.commit().await?;
+
+    Ok(StatusCode::OK)
 }
 
 /// Download a corrigendum for a polling station

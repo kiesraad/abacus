@@ -88,8 +88,33 @@ async fn conclude_investigation(pool: SqlitePool, polling_station_id: u32) -> Re
         .unwrap()
 }
 
+async fn delete_investigation(pool: SqlitePool, polling_station_id: u32) -> Response {
+    let addr = serve_api(pool).await;
+    let coordinator_cookie = shared::coordinator_login(&addr).await;
+    let url = format!("http://{addr}/api/polling_stations/{polling_station_id}/investigation");
+    reqwest::Client::new()
+        .delete(&url)
+        .header("cookie", coordinator_cookie)
+        .header("Content-Type", "application/json")
+        .send()
+        .await
+        .unwrap()
+}
+
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_7_four_sessions", "users"))))]
-async fn test_investigation_create_conclude_update(pool: SqlitePool) {
+async fn test_investigation_create_and_conclude(pool: SqlitePool) {
+    assert_eq!(
+        create_investigation(pool.clone(), 741).await.status(),
+        StatusCode::OK
+    );
+    assert_eq!(
+        conclude_investigation(pool.clone(), 741).await.status(),
+        StatusCode::OK
+    );
+}
+
+#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_7_four_sessions", "users"))))]
+async fn test_investigation_create_conclude_update_delete(pool: SqlitePool) {
     let election_id = 7;
     let election_details = get_election(pool.clone(), election_id).await;
     assert_eq!(election_details.investigations.len(), 0);
@@ -140,6 +165,62 @@ async fn test_investigation_create_conclude_update(pool: SqlitePool) {
         election_details.investigations[0].corrected_results,
         Some(true)
     );
+
+    assert_eq!(
+        delete_investigation(pool.clone(), 741).await.status(),
+        StatusCode::OK
+    );
+    let election_details = get_election(pool.clone(), 700).await;
+    assert_eq!(election_details.investigations.len(), 0);
+}
+
+#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_7_four_sessions", "users"))))]
+async fn test_investigation_deletion_setting_committee_session_back_to_created_status(
+    pool: SqlitePool,
+) {
+    let addr = serve_api(pool.clone()).await;
+    let cookie = shared::coordinator_login(&addr).await;
+    let election_id = 700;
+
+    let committee_session =
+        shared::get_election_committee_session(&addr, &cookie, election_id).await;
+    assert_eq!(
+        committee_session.status,
+        CommitteeSessionStatus::DataEntryInProgress
+    );
+
+    // Create 2 investigations
+    assert_eq!(
+        create_investigation(pool.clone(), 741).await.status(),
+        StatusCode::OK
+    );
+    assert_eq!(
+        create_investigation(pool.clone(), 742).await.status(),
+        StatusCode::OK
+    );
+
+    // Delete one investigation
+    assert_eq!(
+        delete_investigation(pool.clone(), 742).await.status(),
+        StatusCode::OK
+    );
+
+    let committee_session =
+        shared::get_election_committee_session(&addr, &cookie, election_id).await;
+    assert_eq!(
+        committee_session.status,
+        CommitteeSessionStatus::DataEntryInProgress
+    );
+
+    // Delete last investigation
+    assert_eq!(
+        delete_investigation(pool.clone(), 741).await.status(),
+        StatusCode::OK
+    );
+
+    let committee_session =
+        shared::get_election_committee_session(&addr, &cookie, election_id).await;
+    assert_eq!(committee_session.status, CommitteeSessionStatus::Created);
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_7_four_sessions", "users"))))]

@@ -3,6 +3,7 @@ import * as ReactRouter from "react-router";
 import { render, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
+import * as useMessages from "@/hooks/messages/useMessages";
 import { ErrorBoundary } from "@/components/error/ErrorBoundary";
 import { ElectionLayout } from "@/components/layout/ElectionLayout";
 import { ElectionRequestHandler, ElectionStatusRequestHandler } from "@/testing/api-mocks/RequestHandlers";
@@ -14,6 +15,7 @@ import { AddInvestigationLayout } from "./AddInvestigationLayout";
 import { InvestigationPrintCorrigendumPage } from "./InvestigationPrintCorrigendumPage";
 
 const navigate = vi.fn();
+const pushMessage = vi.fn();
 
 async function renderPage() {
   const router = setupTestRouter([
@@ -60,6 +62,7 @@ describe("InvestigationPrintCorrigendumPage", () => {
   beforeEach(() => {
     server.use(ElectionRequestHandler, ElectionStatusRequestHandler);
     vi.spyOn(ReactRouter, "useNavigate").mockImplementation(() => navigate);
+    vi.spyOn(useMessages, "useMessages").mockReturnValue({ pushMessage, popMessages: vi.fn(() => []) });
   });
 
   test("Renders the correct headers and a download button", async () => {

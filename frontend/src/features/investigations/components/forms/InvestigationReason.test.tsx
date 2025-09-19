@@ -3,6 +3,7 @@ import * as ReactRouter from "react-router";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
+import * as useMessages from "@/hooks/messages/useMessages";
 import { ElectionProvider } from "@/hooks/election/ElectionProvider";
 import { getElectionMockData } from "@/testing/api-mocks/ElectionMockData";
 import {
@@ -17,6 +18,7 @@ import { render, screen, spyOnHandler, waitFor } from "@/testing/test-utils";
 import { InvestigationReason } from "./InvestigationReason";
 
 const navigate = vi.fn();
+const pushMessage = vi.fn();
 
 function renderPage() {
   render(
@@ -30,6 +32,7 @@ describe("InvestigationReason", () => {
   beforeEach(() => {
     server.use(ElectionRequestHandler, ElectionStatusRequestHandler, PollingStationInvestigationCreateHandler);
     vi.spyOn(ReactRouter, "useNavigate").mockImplementation(() => navigate);
+    vi.spyOn(useMessages, "useMessages").mockReturnValue({ pushMessage, popMessages: vi.fn(() => []) });
   });
 
   test("Renders a form", async () => {

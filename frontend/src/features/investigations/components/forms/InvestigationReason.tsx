@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/Button/Button";
 import { Form } from "@/components/ui/Form/Form";
 import { FormLayout } from "@/components/ui/Form/FormLayout";
 import { InputField } from "@/components/ui/InputField/InputField";
+import { Loader } from "@/components/ui/Loader/Loader";
 import { useElection } from "@/hooks/election/useElection";
 import { t } from "@/i18n/translate";
 import {
@@ -21,12 +22,16 @@ interface InvestigationReasonProps {
 
 export function InvestigationReason({ pollingStationId }: InvestigationReasonProps) {
   const navigate = useNavigate();
-  const { investigation, refetch } = useElection(pollingStationId);
+  const { investigation, pollingStation, refetch } = useElection(pollingStationId);
   const [nonEmptyError, setNonEmptyError] = useState(false);
+  const [error, setError] = useState<AnyApiError>();
   const path = `/api/polling_stations/${pollingStationId}/investigation`;
   const { create } = useCrud<PollingStationInvestigationCreateRequest>(path);
   const { update } = useCrud<PollingStationInvestigationUpdateRequest>(path);
-  const [error, setError] = useState<AnyApiError>();
+
+  if (!pollingStation) {
+    return <Loader />;
+  }
 
   if (error) {
     throw error;

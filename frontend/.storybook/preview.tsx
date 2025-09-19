@@ -6,6 +6,7 @@ import { configure, expect } from "storybook/test";
 import { ApiResponseStatus } from "@/api/ApiResult";
 import { ElectionProviderContext } from "@/hooks/election/ElectionProviderContext";
 import { ElectionStatusProviderContext } from "@/hooks/election/ElectionStatusProviderContext";
+import { MessagesProvider } from "@/hooks/messages/MessagesProvider";
 import { UsersProviderContext } from "@/hooks/user/UsersProviderContext";
 import { t } from "@/i18n/translate";
 import "@/styles/index.css";
@@ -124,6 +125,18 @@ const preview: Preview = {
           <Story />
         </TestUserProvider>
       );
+    },
+    // Messages Provider decorator
+    (Story, { parameters }) => {
+      const needsMessages = (parameters.needsMessages as boolean) || false;
+
+      const component = <Story />;
+
+      if (needsMessages) {
+        return <MessagesProvider>{component}</MessagesProvider>;
+      }
+
+      return component;
     },
   ],
 };

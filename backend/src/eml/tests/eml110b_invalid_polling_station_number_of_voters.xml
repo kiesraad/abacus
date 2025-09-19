@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<EML xmlns="urn:oasis:names:tc:evs:schema:eml" xmlns:ds="http://www.w3.org/2000/09/xmldsig#" xmlns:kr="http://www.kiesraad.nl/extensions" xmlns:xal="urn:oasis:names:tc:ciq:xsdschema:xAL:2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" Id="110b" SchemaVersion="5">
+  <TransactionId>1</TransactionId>
+  <ManagingAuthority>
+    <AuthorityIdentifier Id="0000">Test</AuthorityIdentifier>
+    <AuthorityAddress/>
+  </ManagingAuthority>
+  <kr:CreationDateTime>2024-05-27T17:05:57</kr:CreationDateTime>
+  <ds:CanonicalizationMethod Algorithm="http://www.w3.org/TR/2001/REC-xml-c14n-20010315#WithComments"/>
+  <ElectionEvent>
+    <EventIdentifier/>
+    <Election>
+      <ElectionIdentifier Id="EP2024">
+        <ElectionName>Europees Parlement 2024</ElectionName>
+        <ElectionCategory>EP</ElectionCategory>
+        <kr:ElectionSubcategory>EP</kr:ElectionSubcategory>
+        <kr:ElectionDate>2024-06-06</kr:ElectionDate>
+      </ElectionIdentifier>
+      <Contest>
+        <ContestIdentifier Id="geen"/>
+        <ReportingUnit>
+          <ReportingUnitIdentifier Id="0000">Test</ReportingUnitIdentifier>
+        </ReportingUnit>
+        <VotingMethod />
+        <MaxVotes>612694</MaxVotes>
+        <PollingPlace Channel="polling">
+          <PhysicalLocation>
+            <Address>
+              <Locality>
+                <xal:LocalityName>Stadhuis</xal:LocalityName>
+                <xal:PostalCode>
+                  <xal:PostalCodeNumber>1011 PN</xal:PostalCodeNumber>
+                </xal:PostalCode>
+              </Locality>
+            </Address>
+            <PollingStation Id="1">geen</PollingStation>
+          </PhysicalLocation>
+        </PollingPlace>
+        <PollingPlace Channel="polling">
+          <PhysicalLocation>
+            <Address>
+              <Locality>
+                <xal:LocalityName>Melkweg</xal:LocalityName>
+                <xal:PostalCode>
+                  <xal:PostalCodeNumber>1017 PH</xal:PostalCodeNumber>
+                </xal:PostalCode>
+              </Locality>
+            </Address>
+            <PollingStation Id="2">drie</PollingStation>
+          </PhysicalLocation>
+        </PollingPlace>
+        <PollingPlace Channel="polling">
+          <PhysicalLocation>
+            <Address>
+              <Locality>
+                <xal:LocalityName>Clubhuis Parkschouwburg PST/Swift</xal:LocalityName>
+                <xal:PostalCode>
+                  <xal:PostalCodeNumber>1018 ST</xal:PostalCodeNumber>
+                </xal:PostalCode>
+              </Locality>
+            </Address>
+            <PollingStation Id="3">-</PollingStation>
+          </PhysicalLocation>
+        </PollingPlace>
+        <PollingPlace Channel="polling">
+          <PhysicalLocation>
+            <Address>
+              <Locality>
+                <xal:LocalityName>Universiteitsbibliotheek Amsterdam</xal:LocalityName>
+                <xal:PostalCode>
+                  <xal:PostalCodeNumber>1012 WP</xal:PostalCodeNumber>
+                </xal:PostalCode>
+              </Locality>
+            </Address>
+            <PollingStation Id="4">867</PollingStation>
+          </PhysicalLocation>
+        </PollingPlace>
+        <PollingPlace Channel="polling">
+          <PhysicalLocation>
+            <Address>
+              <Locality>
+                <xal:LocalityName>MBO College Centrum</xal:LocalityName>
+                <xal:PostalCode>
+                  <xal:PostalCodeNumber>1016 SB</xal:PostalCodeNumber>
+                </xal:PostalCode>
+              </Locality>
+            </Address>
+            <PollingStation Id="5">1151</PollingStation>
+          </PhysicalLocation>
+        </PollingPlace>
+        <PollingPlace Channel="polling">
+          <PhysicalLocation>
+            <Address>
+              <Locality>
+                <xal:LocalityName>OBS De Witte Olifant</xal:LocalityName>
+                <xal:PostalCode>
+                  <xal:PostalCodeNumber>1011 LX</xal:PostalCodeNumber>
+                </xal:PostalCode>
+              </Locality>
+            </Address>
+            <PollingStation Id="6">1022</PollingStation>
+          </PhysicalLocation>
+        </PollingPlace>
+        <PollingPlace Channel="polling">
+          <PhysicalLocation>
+            <Address>
+              <Locality>
+                <xal:LocalityName>Voormalige Stadstimmertuin</xal:LocalityName>
+                <xal:PostalCode>
+                  <xal:PostalCodeNumber>1018 ET</xal:PostalCodeNumber>
+                </xal:PostalCode>
+              </Locality>
+            </Address>
+            <PollingStation Id="7">1278</PollingStation>
+          </PhysicalLocation>
+        </PollingPlace>
+        <PollingPlace Channel="polling">
+          <PhysicalLocation>
+            <Address>
+              <Locality>
+                <xal:LocalityName>OBS De Witte Olifant</xal:LocalityName>
+                <xal:PostalCode>
+                  <xal:PostalCodeNumber>1011 CN</xal:PostalCodeNumber>
+                </xal:PostalCode>
+              </Locality>
+            </Address>
+            <PollingStation Id="8">1385</PollingStation>
+          </PhysicalLocation>
+        </PollingPlace>
+        <PollingPlace Channel="polling">
+          <PhysicalLocation>
+            <Address>
+              <Locality>
+                <xal:LocalityName>Openbare Basisschool (OBS) De Burght</xal:LocalityName>
+                <xal:PostalCode>
+                  <xal:PostalCodeNumber>1015 CD</xal:PostalCodeNumber>
+                </xal:PostalCode>
+              </Locality>
+            </Address>
+            <PollingStation Id="9">871</PollingStation>
+          </PhysicalLocation>
+        </PollingPlace>
+      </Contest>
+    </Election>
+  </ElectionEvent>
+</EML>

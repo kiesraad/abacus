@@ -70,6 +70,38 @@ describe("PollingStationUpdatePage", () => {
   });
 
   describe("Delete polling station", () => {
+    test("Delete button should be shown", async () => {
+      render(
+        <ElectionProvider electionId={1}>
+          <PollingStationUpdatePage />
+        </ElectionProvider>,
+      );
+
+      const deleteButton = await screen.findByRole("button", { name: "Stembureau verwijderen" });
+      expect(deleteButton).toBeInTheDocument();
+    });
+
+    test("Delete button should be disabled when polling station is linked to previous session", async () => {
+      overrideOnce("get", "/api/elections/1/polling_stations/1", 200, {
+        ...testPollingStation,
+        id_prev_session: 42,
+      });
+
+      render(
+        <ElectionProvider electionId={1}>
+          <PollingStationUpdatePage />
+        </ElectionProvider>,
+      );
+
+      // Button should not be shown
+      const deleteButton = screen.queryByRole("button", { name: "Stembureau verwijderen" });
+      expect(deleteButton).not.toBeInTheDocument();
+
+      // Should have text explaining why
+      expect(await screen.findByText("Stembureau verwijderen niet mogelijk")).toBeVisible();
+      expect(await screen.findByText("Er zijn al tellingen ingevoerd.")).toBeVisible();
+    });
+
     test("Returns to list page with a message", async () => {
       server.use(PollingStationDeleteHandler);
       const user = userEvent.setup();
@@ -80,7 +112,7 @@ describe("PollingStationUpdatePage", () => {
         </ElectionProvider>,
       );
 
-      const deleteButton = await screen.findByRole("button", { name: "Stembureau verwijderen?" });
+      const deleteButton = await screen.findByRole("button", { name: "Stembureau verwijderen" });
       await user.click(deleteButton);
 
       const modal = await screen.findByTestId("modal-dialog");
@@ -113,7 +145,7 @@ describe("PollingStationUpdatePage", () => {
         </ElectionProvider>,
       );
 
-      const deleteButton = await screen.findByRole("button", { name: "Stembureau verwijderen?" });
+      const deleteButton = await screen.findByRole("button", { name: "Stembureau verwijderen" });
       await user.click(deleteButton);
 
       const modal = await screen.findByTestId("modal-dialog");

@@ -32,6 +32,8 @@ export function PollingStationUpdatePage() {
   const [error, setError] = React.useState<[string, string] | undefined>(undefined);
 
   const parentUrl = `/elections/${election.id}/polling-stations`;
+  const isPreExistingPollingStation =
+    requestState.status === "success" && requestState.data.id_prev_session !== undefined;
 
   function closeError() {
     setError(undefined);
@@ -104,18 +106,27 @@ export function PollingStationUpdatePage() {
                 onCancel={handleCancel}
               />
 
-              <div className="mt-md">
-                <Button variant="tertiary-destructive" leftIcon={<IconTrash />} onClick={toggleShowDeleteModal}>
-                  {t("polling_station.delete")}
-                </Button>
-                {showDeleteModal && (
-                  <PollingStationDeleteModal
-                    electionId={election.id}
-                    pollingStation={requestState.data}
-                    onCancel={toggleShowDeleteModal}
-                    onError={handleDeleteError}
-                    onDeleted={handleDeleted}
-                  />
+              <div className="mt-md-lg">
+                {isPreExistingPollingStation ? (
+                  <>
+                    <strong>{t("polling_station.delete_not_possible.title")}</strong>
+                    <p>{t("polling_station.delete_not_possible.message")}</p>
+                  </>
+                ) : (
+                  <>
+                    <Button variant="tertiary-destructive" leftIcon={<IconTrash />} onClick={toggleShowDeleteModal}>
+                      {t("polling_station.delete")}
+                    </Button>
+                    {showDeleteModal && (
+                      <PollingStationDeleteModal
+                        electionId={election.id}
+                        pollingStation={requestState.data}
+                        onCancel={toggleShowDeleteModal}
+                        onError={handleDeleteError}
+                        onDeleted={handleDeleted}
+                      />
+                    )}
+                  </>
                 )}
               </div>
             </>

@@ -17,11 +17,32 @@ use crate::utils::serve_api;
 pub mod shared;
 pub mod utils;
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
+async fn get_polling_station(
+    pool: SqlitePool,
+    election_id: u32,
+    polling_station_id: u32,
+) -> PollingStation {
+    let addr = serve_api(pool).await;
+    let url =
+        format!("http://{addr}/api/elections/{election_id}/polling_stations/{polling_station_id}");
+    let coordinator_cookie = shared::coordinator_login(&addr).await;
+    let response = reqwest::Client::new()
+        .get(&url)
+        .header("cookie", coordinator_cookie)
+        .send()
+        .await
+        .unwrap();
+
+    // Ensure the response is what we expect
+    assert_eq!(response.status(), StatusCode::OK);
+    response.json().await.unwrap()
+}
+
+#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_7_four_sessions", "users"))))]
 async fn test_polling_station_listing(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let cookie = shared::coordinator_login(&addr).await;
-    let url = format!("http://{addr}/api/elections/2/polling_stations");
+    let url = format!("http://{addr}/api/elections/700/polling_stations");
     let response = reqwest::Client::new()
         .get(&url)
         .header("cookie", cookie)
@@ -34,12 +55,14 @@ async fn test_polling_station_listing(pool: SqlitePool) {
         StatusCode::OK,
         "Unexpected response status"
     );
+
+    // Validate response and make sure they are from the last committee session
     let body: PollingStationListResponse = response.json().await.unwrap();
     assert_eq!(body.polling_stations.len(), 2);
     assert!(
         body.polling_stations
             .iter()
-            .any(|ps| ps.name == "Op Rolletjes")
+            .any(|ps| ps.id == 742 && ps.id_prev_session == Some(732))
     )
 }
 
@@ -61,7 +84,7 @@ async fn test_polling_station_creation_for_committee_session_with_created_status
         .post(&url)
         .json(&PollingStationRequest {
             name: "New Polling Station".to_string(),
-            number: 5,
+            number: Some(5),
             number_of_voters: Some(426),
             polling_station_type: Some(PollingStationType::FixedLocation),
             address: "Teststraat 2a".to_string(),
@@ -121,7 +144,7 @@ async fn test_polling_station_creation_for_committee_session_with_finished_statu
         .post(&url)
         .json(&PollingStationRequest {
             name: "New Polling Station".to_string(),
-            number: 5,
+            number: Some(5),
             number_of_voters: Some(426),
             polling_station_type: Some(PollingStationType::FixedLocation),
             address: "Teststraat 2a".to_string(),
@@ -138,6 +161,8 @@ async fn test_polling_station_creation_for_committee_session_with_finished_statu
         StatusCode::CREATED,
         "Unexpected response status"
     );
+
+    // Validate response
     let body: PollingStation = response.json().await.unwrap();
     assert_eq!(body.committee_session_id, committee_session.id);
     assert_eq!(body.name, "New Polling Station");
@@ -146,6 +171,11 @@ async fn test_polling_station_creation_for_committee_session_with_finished_statu
         Some(PollingStationType::FixedLocation)
     );
 
+    // Validate that the creation is persisted
+    let ps = get_polling_station(pool, election_id, body.id).await;
+    assert_eq!(ps.name, "New Polling Station");
+
+    // Validate committee session status change
     let committee_session =
         shared::get_election_committee_session(&addr, &cookie, election_id).await;
     assert_eq!(
@@ -154,43 +184,36 @@ async fn test_polling_station_creation_for_committee_session_with_finished_statu
     );
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
+#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_7_four_sessions", "users"))))]
 async fn test_polling_station_get(pool: SqlitePool) {
-    let addr = serve_api(pool).await;
-    let cookie = shared::coordinator_login(&addr).await;
-    let election_id = 2;
-    let committee_session_id = 2;
-    let url = format!("http://{addr}/api/elections/{election_id}/polling_stations/2");
+    let election_id = 700;
+    let committee_session_id = 704;
 
-    let response = reqwest::Client::new()
-        .get(&url)
-        .header("cookie", cookie)
-        .send()
-        .await
-        .unwrap();
-
+    let ps = get_polling_station(pool, election_id, 742).await;
+    assert_eq!(ps.committee_session_id, committee_session_id);
+    assert_eq!(ps.id_prev_session, Some(732));
+    assert_eq!(ps.name, "TestB");
     assert_eq!(
-        response.status(),
-        StatusCode::OK,
-        "Unexpected response status"
+        ps.polling_station_type,
+        Some(PollingStationType::FixedLocation)
     );
-    let body: PollingStation = response.json().await.unwrap();
-    assert_eq!(body.committee_session_id, committee_session_id);
-    assert_eq!(body.name, "Testplek");
-    assert_eq!(body.polling_station_type, Some(PollingStationType::Special));
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
+#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_7_four_sessions", "users"))))]
 async fn test_polling_station_update_ok(pool: SqlitePool) {
-    let addr = serve_api(pool).await;
+    let election_id = 700;
+    let polling_station_id = 742;
+
+    let addr = serve_api(pool.clone()).await;
     let cookie = shared::coordinator_login(&addr).await;
-    let url = format!("http://{addr}/api/elections/2/polling_stations/2");
+    let url =
+        format!("http://{addr}/api/elections/{election_id}/polling_stations/{polling_station_id}");
 
     let response = reqwest::Client::new()
         .put(&url)
         .json(&PollingStationRequest {
             name: "Testverandering".to_string(),
-            number: 34,
+            number: None,
             number_of_voters: Some(2000),
             polling_station_type: Some(PollingStationType::Special),
             address: "Teststraat 2a".to_string(),
@@ -208,9 +231,15 @@ async fn test_polling_station_update_ok(pool: SqlitePool) {
         "Unexpected response status"
     );
 
+    // Validate response
     let update: PollingStation = response.json().await.unwrap();
     assert_eq!(update.name, "Testverandering");
     assert_eq!(update.address, "Teststraat 2a");
+
+    // Validate that the changes are persisted
+    let ps = get_polling_station(pool, election_id, polling_station_id).await;
+    assert_eq!(ps.name, "Testverandering");
+    assert_eq!(ps.address, "Teststraat 2a");
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
@@ -223,7 +252,7 @@ async fn test_polling_station_update_empty_type_ok(pool: SqlitePool) {
         .put(&url)
         .json(&PollingStationRequest {
             name: "Testverandering".to_string(),
-            number: 34,
+            number: Some(34),
             number_of_voters: Some(2000),
             polling_station_type: None,
             address: "Teststraat 2a".to_string(),
@@ -256,7 +285,7 @@ async fn test_polling_station_update_not_found(pool: SqlitePool) {
         .put(&url)
         .json(&PollingStationRequest {
             name: "Testverandering".to_string(),
-            number: 34,
+            number: Some(34),
             number_of_voters: Some(2000),
             polling_station_type: Some(PollingStationType::Special),
             address: "Teststraat 2a".to_string(),
@@ -428,7 +457,7 @@ async fn test_polling_station_non_unique(pool: SqlitePool) {
         .post(&url)
         .json(&PollingStationRequest {
             name: "New Polling Station".to_string(),
-            number: 33,
+            number: Some(33),
             number_of_voters: None,
             polling_station_type: Some(PollingStationType::FixedLocation),
             address: "Teststraat 2a".to_string(),

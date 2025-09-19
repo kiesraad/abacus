@@ -228,6 +228,10 @@ export interface POLLING_STATION_INVESTIGATION_CREATE_REQUEST_PARAMS {
 }
 export type POLLING_STATION_INVESTIGATION_CREATE_REQUEST_PATH = `/api/polling_stations/${number}/investigation`;
 export type POLLING_STATION_INVESTIGATION_CREATE_REQUEST_BODY = PollingStationInvestigationCreateRequest;
+export interface POLLING_STATION_INVESTIGATION_DELETE_REQUEST_PARAMS {
+  polling_station_id: number;
+}
+export type POLLING_STATION_INVESTIGATION_DELETE_REQUEST_PATH = `/api/polling_stations/${number}/investigation`;
 
 // /api/polling_stations/{polling_station_id}/investigation/conclude
 export interface POLLING_STATION_INVESTIGATION_CONCLUDE_REQUEST_PARAMS {
@@ -318,6 +322,7 @@ export type AuditEvent =
   | (PollingStationInvestigation & { event_type: "PollingStationInvestigationCreated" })
   | (PollingStationInvestigation & { event_type: "PollingStationInvestigationConcluded" })
   | (PollingStationInvestigation & { event_type: "PollingStationInvestigationUpdated" })
+  | (PollingStationInvestigation & { event_type: "PollingStationInvestigationDeleted" })
   | (FileDetails & { event_type: "FileCreated" })
   | (FileDetails & { event_type: "FileDeleted" })
   | (ElectionDetails & { event_type: "ApportionmentCreated" })

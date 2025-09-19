@@ -591,6 +591,22 @@ impl Validate for CSOFirstSessionResults {
                 .find(|pgtv| pgtv.number == pgcv.number)
                 .expect("political group total votes should exist");
 
+            // all candidate votes, cast to u64 to avoid overflow
+            let candidate_votes_sum: u64 = pgcv
+                .candidate_votes
+                .iter()
+                .map(|cv| cv.votes as u64)
+                .sum::<u64>();
+            if (candidate_votes_sum > 0 || pgtv.total > 0) && pgcv.total == 0 {
+                validation_results.errors.push(ValidationResult {
+                    fields: vec![path.field("total").to_string()],
+                    code: ValidationResultCode::F401,
+                    context: Some(ValidationResultContext {
+                        political_group_number: Some(pgtv.number),
+                    }),
+                });
+            }
+
             if pgcv.total != pgtv.total {
                 validation_results.errors.push(ValidationResult {
                     fields: vec![
@@ -603,6 +619,17 @@ impl Validate for CSOFirstSessionResults {
                     context: Some(ValidationResultContext {
                         political_group_number: Some(pgcv.number),
                     }),
+                });
+            }
+
+            let has_error_f401 = validation_results
+                .errors
+                .iter()
+                .any(|x| x.code == ValidationResultCode::F401);
+
+            if has_error_f401 {
+                validation_results.errors.retain(|vr| {
+                    ![ValidationResultCode::F402, ValidationResultCode::F403].contains(&vr.code)
                 });
             }
         }
@@ -964,17 +991,8 @@ impl Validate for PoliticalGroupCandidateVotes {
             .iter()
             .map(|cv| cv.votes as u64)
             .sum::<u64>();
-        if candidate_votes_sum > 0 && self.total == 0 {
-            validation_results.errors.push(ValidationResult {
-                fields: vec![path.field("total").to_string()],
-                code: ValidationResultCode::F401,
-                context: Some(ValidationResultContext {
-                    political_group_number: Some(self.number),
-                }),
-            });
-        }
 
-        if self.total != 0 && self.total as u64 != candidate_votes_sum {
+        if self.total as u64 != candidate_votes_sum {
             validation_results.errors.push(ValidationResult {
                 fields: vec![path.to_string()],
                 code: ValidationResultCode::F402,

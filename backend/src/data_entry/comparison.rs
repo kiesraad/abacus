@@ -1,10 +1,8 @@
-use crate::data_entry::PollingStationResults;
-
 use super::{
-    CSOFirstSessionResults, CandidateVotes, Count, CountingDifferencesPollingStation,
-    DifferenceCountsCompareVotesCastAdmittedVoters, DifferencesCounts, ExtraInvestigation,
-    FieldPath, PoliticalGroupCandidateVotes, PoliticalGroupTotalVotes, VotersCounts, VotesCounts,
-    YesNo,
+    CSOFirstSessionResults, CSONextSessionResults, CandidateVotes, Count,
+    CountingDifferencesPollingStation, DifferenceCountsCompareVotesCastAdmittedVoters,
+    DifferencesCounts, ExtraInvestigation, FieldPath, PoliticalGroupCandidateVotes,
+    PoliticalGroupTotalVotes, PollingStationResults, VotersCounts, VotesCounts, YesNo,
 };
 
 pub trait Compare {
@@ -18,8 +16,10 @@ impl Compare for PollingStationResults {
                 PollingStationResults::CSOFirstSession(s),
                 PollingStationResults::CSOFirstSession(f),
             ) => s.compare(f, different_fields, path),
-            // TODO: remove this allow once we have more variants in the enum
-            #[allow(unreachable_patterns)]
+            (
+                PollingStationResults::CSONextSession(s),
+                PollingStationResults::CSONextSession(f),
+            ) => s.compare(f, different_fields, path),
             _ => {
                 different_fields.push(path.to_string());
             }
@@ -41,6 +41,34 @@ impl Compare for CSOFirstSessionResults {
             &path.field("counting_differences_polling_station"),
         );
 
+        self.voters_counts.compare(
+            &first_entry.voters_counts,
+            different_fields,
+            &path.field("voters_counts"),
+        );
+
+        self.votes_counts.compare(
+            &first_entry.votes_counts,
+            different_fields,
+            &path.field("votes_counts"),
+        );
+
+        self.differences_counts.compare(
+            &first_entry.differences_counts,
+            different_fields,
+            &path.field("differences_counts"),
+        );
+
+        self.political_group_votes.compare(
+            &first_entry.political_group_votes,
+            different_fields,
+            &path.field("political_group_votes"),
+        );
+    }
+}
+
+impl Compare for CSONextSessionResults {
+    fn compare(&self, first_entry: &Self, different_fields: &mut Vec<String>, path: &FieldPath) {
         self.voters_counts.compare(
             &first_entry.voters_counts,
             different_fields,
@@ -676,9 +704,7 @@ mod tests {
     #[test]
     fn test_not_equal_political_group_votes_differences() {
         let mut different_fields = vec![];
-        let first_entry = PollingStationResults::CSOFirstSession(CSOFirstSessionResults {
-            extra_investigation: Default::default(),
-            counting_differences_polling_station: Default::default(),
+        let first_entry = PollingStationResults::CSONextSession(CSONextSessionResults {
             voters_counts: VotersCounts {
                 poll_card_count: 103,
                 proxy_certificate_count: 2,
@@ -718,7 +744,7 @@ mod tests {
         });
         let mut second_entry = first_entry.clone();
         second_entry
-            .as_cso_first_session_mut()
+            .as_cso_next_session_mut()
             .unwrap()
             .political_group_votes = vec![
             PoliticalGroupCandidateVotes::from_test_data_auto(1, &[50, 30]),

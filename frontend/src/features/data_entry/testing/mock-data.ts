@@ -1,14 +1,13 @@
 import { electionMockData } from "@/testing/api-mocks/ElectionMockData";
-import { POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_BODY, PollingStationResults } from "@/types/generated/openapi";
+import { CSOFirstSessionResults, POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_BODY } from "@/types/generated/openapi";
 import { DataEntryModel, DataEntryStructure, FormSectionId } from "@/types/types";
 import { getDataEntryStructure } from "@/utils/dataEntryStructure";
 import { ValidationResultSet } from "@/utils/ValidationResults";
 
 import { DataEntryStateAndActionsLoaded, DataEntryStateLoaded, FormSection } from "../types/types";
 
-export function getInitialValues(): PollingStationResults {
+export function getInitialValues(election = electionMockData): CSOFirstSessionResults {
   return {
-    model: "CSOFirstSession",
     extra_investigation: {
       extra_investigation_other_reason: { yes: false, no: false },
       ballots_recounted_extra_investigation: { yes: false, no: false },
@@ -23,7 +22,7 @@ export function getInitialValues(): PollingStationResults {
       total_admitted_voters_count: 0,
     },
     votes_counts: {
-      political_group_total_votes: electionMockData.political_groups.map((pg) => ({
+      political_group_total_votes: election.political_groups.map((pg) => ({
         number: pg.number,
         total: 0,
       })),
@@ -42,7 +41,7 @@ export function getInitialValues(): PollingStationResults {
       },
       difference_completely_accounted_for: { yes: false, no: false },
     },
-    political_group_votes: electionMockData.political_groups.map((pg) => ({
+    political_group_votes: election.political_groups.map((pg) => ({
       number: pg.number,
       total: 0,
       candidate_votes: pg.candidates.map((c) => ({
@@ -76,7 +75,7 @@ export function getDefaultDataEntryState(): DataEntryStateLoaded {
     election: electionMockData,
     pollingStationId: 1,
     error: null,
-    pollingStationResults: getInitialValues(),
+    pollingStationResults: { model, ...getInitialValues() },
     entryNumber: 1,
     previousResults: null,
     dataEntryStructure: getDataEntryStructure(model, electionMockData),
@@ -98,7 +97,10 @@ export function getDefaultDataEntryState(): DataEntryStateLoaded {
 export function getEmptyDataEntryRequest(): POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_BODY {
   return {
     progress: 0,
-    data: getInitialValues(),
+    data: {
+      model: "CSOFirstSession",
+      ...getInitialValues(),
+    },
     client_state: {
       test: "test",
     },

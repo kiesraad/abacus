@@ -32,6 +32,13 @@ pub struct CommitteeSession {
     pub results_pdf: Option<u32>,
 }
 
+impl CommitteeSession {
+    /// Check if this session is the next session to be held
+    pub fn is_next_session(&self) -> bool {
+        self.number > 1
+    }
+}
+
 impl From<CommitteeSession> for audit_log::CommitteeSessionDetails {
     fn from(value: CommitteeSession) -> Self {
         Self {

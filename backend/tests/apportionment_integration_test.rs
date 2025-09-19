@@ -17,9 +17,9 @@ use abacus::{
         ElectionApportionmentResponse, Fraction, get_total_seats_from_apportionment_result,
     },
     data_entry::{
-        CSOFirstSessionResults, CountingDifferencesPollingStation, DataEntry,
-        PoliticalGroupTotalVotes, PollingStationResults, VotersCounts, VotesCounts, YesNo,
-        status::ClientState,
+        CSOFirstSessionResults, CSONextSessionResults, CountingDifferencesPollingStation,
+        DataEntry, PoliticalGroupTotalVotes, PollingStationResults, VotersCounts, VotesCounts,
+        YesNo, status::ClientState,
     },
 };
 
@@ -129,12 +129,7 @@ async fn test_election_apportionment_works_for_19_or_more_seats(pool: SqlitePool
 
     let data_entry = DataEntry {
         progress: 100,
-        data: PollingStationResults::CSOFirstSession(CSOFirstSessionResults {
-            extra_investigation: Default::default(),
-            counting_differences_polling_station: CountingDifferencesPollingStation {
-                unexplained_difference_ballots_voters: YesNo::no(),
-                difference_ballots_per_list: YesNo::no(),
-            },
+        data: PollingStationResults::CSONextSession(CSONextSessionResults {
             voters_counts: VotersCounts {
                 poll_card_count: 1203,
                 proxy_certificate_count: 2,

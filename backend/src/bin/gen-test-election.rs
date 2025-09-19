@@ -210,7 +210,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
 
     if let Some(export_dir) = args.export_definition {
         let results = if data_entry_completed {
-            abacus::data_entry::repository::list_entries_with_polling_stations_first_session(
+            abacus::data_entry::repository::list_entries_for_committee_session(
                 &mut tx,
                 committee_session.id,
             )
@@ -683,7 +683,7 @@ async fn export_election(
     election: &ElectionWithPoliticalGroups,
     polling_stations: &[PollingStation],
     export_results_json: bool,
-    results: Vec<(PollingStation, CSOFirstSessionResults)>,
+    results: Vec<(PollingStation, PollingStationResults)>,
 ) {
     if export_dir.exists() && !export_dir.is_dir() {
         panic!("Export directory already exists and is not a directory");

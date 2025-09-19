@@ -4,13 +4,12 @@ use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
 
 use super::{
-    CSOFirstSessionResults, CandidateVotes, Count, CountingDifferencesPollingStation,
-    DifferencesCounts, ExtraInvestigation, PoliticalGroupCandidateVotes, VotersCounts, VotesCounts,
-    comparison::Compare,
-    status::{DataEntryStatus, FirstEntryInProgress},
+    CandidateVotes, CommonPollingStationResults, Compare, Count, CountingDifferencesPollingStation,
+    DifferencesCounts, ExtraInvestigation, PoliticalGroupCandidateVotes, PoliticalGroupTotalVotes,
+    PollingStationResults, VotersCounts, VotesCounts,
+    status::{DataEntryStatus, FirstEntryHasErrors, FirstEntryInProgress},
 };
 use crate::{
-    data_entry::{PoliticalGroupTotalVotes, PollingStationResults, status::FirstEntryHasErrors},
     election::{ElectionWithPoliticalGroups, PGNumber},
     polling_station::PollingStation,
 };
@@ -493,13 +492,32 @@ impl Validate for PollingStationResults {
     ) -> Result<(), DataError> {
         match self {
             PollingStationResults::CSOFirstSession(results) => {
-                results.validate(election, polling_station, validation_results, path)
+                results.extra_investigation.validate(
+                    election,
+                    polling_station,
+                    validation_results,
+                    &path.field("extra_investigation"),
+                )?;
+
+                results.counting_differences_polling_station.validate(
+                    election,
+                    polling_station,
+                    validation_results,
+                    &path.field("counting_differences_polling_station"),
+                )?;
+
+                self.as_common()
+                    .validate(election, polling_station, validation_results, path)
+            }
+            PollingStationResults::CSONextSession(_) => {
+                self.as_common()
+                    .validate(election, polling_station, validation_results, path)
             }
         }
     }
 }
 
-impl Validate for CSOFirstSessionResults {
+impl Validate for CommonPollingStationResults {
     fn validate(
         &self,
         election: &ElectionWithPoliticalGroups,
@@ -507,20 +525,6 @@ impl Validate for CSOFirstSessionResults {
         validation_results: &mut ValidationResults,
         path: &FieldPath,
     ) -> Result<(), DataError> {
-        self.extra_investigation.validate(
-            election,
-            polling_station,
-            validation_results,
-            &path.field("extra_investigation"),
-        )?;
-
-        self.counting_differences_polling_station.validate(
-            election,
-            polling_station,
-            validation_results,
-            &path.field("counting_differences_polling_station"),
-        )?;
-
         let total_votes_count = self.votes_counts.total_votes_cast_count;
 
         self.votes_counts.validate(
@@ -2966,10 +2970,10 @@ mod tests {
         }
     }
 
-    mod cso_first_session_results {
+    mod common_polling_station_results {
         use crate::{
             data_entry::{
-                CSOFirstSessionResults, DataError, PoliticalGroupCandidateVotes,
+                CommonPollingStationResults, DataError, PoliticalGroupCandidateVotes,
                 PoliticalGroupTotalVotes, Validate, ValidationResult, ValidationResultCode,
                 ValidationResultContext, ValidationResults, tests::ValidDefault,
             },
@@ -2977,10 +2981,8 @@ mod tests {
             polling_station::structs::tests::polling_station_fixture,
         };
 
-        fn create_test_data() -> CSOFirstSessionResults {
-            CSOFirstSessionResults {
-                extra_investigation: ValidDefault::valid_default(),
-                counting_differences_polling_station: ValidDefault::valid_default(),
+        fn create_test_data() -> CommonPollingStationResults {
+            CommonPollingStationResults {
                 voters_counts: Default::default(),
                 votes_counts: Default::default(),
                 differences_counts: ValidDefault::valid_default(),
@@ -2988,7 +2990,7 @@ mod tests {
             }
         }
 
-        fn validate(data: CSOFirstSessionResults) -> Result<ValidationResults, DataError> {
+        fn validate(data: CommonPollingStationResults) -> Result<ValidationResults, DataError> {
             let mut validation_results = ValidationResults::default();
 
             data.validate(

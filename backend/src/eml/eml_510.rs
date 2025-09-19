@@ -9,7 +9,7 @@ use super::{
     },
 };
 use crate::{
-    data_entry::{CSOFirstSessionResults, PoliticalGroupCandidateVotes},
+    data_entry::{PoliticalGroupCandidateVotes, PollingStationResults},
     polling_station::PollingStation,
     summary::ElectionSummary,
 };
@@ -32,7 +32,7 @@ pub struct EML510 {
 impl EML510 {
     pub fn from_results(
         election: &crate::election::ElectionWithPoliticalGroups,
-        results: &[(PollingStation, CSOFirstSessionResults)],
+        results: &[(PollingStation, PollingStationResults)],
         summary: &ElectionSummary,
         creation_date_time: &chrono::DateTime<chrono::Local>,
     ) -> EML510 {
@@ -210,7 +210,7 @@ impl ReportingUnitVotes {
         election: &crate::election::ElectionWithPoliticalGroups,
         authority_id: &str,
         polling_station: &PollingStation,
-        results: &CSOFirstSessionResults,
+        results: &PollingStationResults,
     ) -> ReportingUnitVotes {
         ReportingUnitVotes {
             reporting_unit_identifier: ReportingUnitIdentifier {
@@ -222,40 +222,40 @@ impl ReportingUnitVotes {
             },
             selections: Selection::from_political_group_votes(
                 election,
-                &results.political_group_votes,
+                results.political_group_votes(),
             ),
-            cast: results.votes_counts.total_votes_cast_count as u64,
-            total_counted: results.votes_counts.total_votes_candidates_count as u64,
+            cast: results.votes_counts().total_votes_cast_count as u64,
+            total_counted: results.votes_counts().total_votes_candidates_count as u64,
             rejected_votes: vec![
                 RejectedVotes::new(
                     RejectedVotesReason::Blank,
-                    results.votes_counts.blank_votes_count as u64,
+                    results.votes_counts().blank_votes_count as u64,
                 ),
                 RejectedVotes::new(
                     RejectedVotesReason::Invalid,
-                    results.votes_counts.invalid_votes_count as u64,
+                    results.votes_counts().invalid_votes_count as u64,
                 ),
             ],
             uncounted_votes: vec![
                 UncountedVotes::new(
                     UncountedVotesReason::PollCard,
-                    results.voters_counts.poll_card_count as u64,
+                    results.voters_counts().poll_card_count as u64,
                 ),
                 UncountedVotes::new(
                     UncountedVotesReason::ProxyCertificate,
-                    results.voters_counts.proxy_certificate_count as u64,
+                    results.voters_counts().proxy_certificate_count as u64,
                 ),
                 UncountedVotes::new(
                     UncountedVotesReason::TotalAdmittedVoters,
-                    results.voters_counts.total_admitted_voters_count as u64,
+                    results.voters_counts().total_admitted_voters_count as u64,
                 ),
                 UncountedVotes::new(
                     UncountedVotesReason::MoreBallots,
-                    results.differences_counts.more_ballots_count as u64,
+                    results.differences_counts().more_ballots_count as u64,
                 ),
                 UncountedVotes::new(
                     UncountedVotesReason::FewerBallots,
-                    results.differences_counts.fewer_ballots_count as u64,
+                    results.differences_counts().fewer_ballots_count as u64,
                 ),
             ],
         }

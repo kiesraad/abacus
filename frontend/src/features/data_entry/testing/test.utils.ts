@@ -4,9 +4,9 @@ import { overrideOnce } from "@/testing/server";
 import { screen, within } from "@/testing/test-utils";
 import {
   ClaimDataEntryResponse,
+  CSOFirstSessionResults,
   PoliticalGroup,
   POLLING_STATION_DATA_ENTRY_CLAIM_REQUEST_PATH,
-  PollingStationResults,
 } from "@/types/generated/openapi";
 import { getCandidateFullName } from "@/utils/candidate";
 
@@ -16,7 +16,7 @@ import { getInitialValues } from "./mock-data";
 
 export interface OverrideServerClaimDataEntryResponseProps {
   formState: FormState;
-  pollingStationResults: Partial<PollingStationResults>;
+  pollingStationResults: Partial<CSOFirstSessionResults>;
   acceptErrorsAndWarnings?: boolean;
   continueToNextSection?: boolean;
   progress?: number;
@@ -36,6 +36,7 @@ export function overrideServerClaimDataEntryResponse({
     {
       client_state: getClientState(formState, formState.furthest, false, continueToNextSection),
       data: {
+        model: "CSOFirstSession",
         ...getInitialValues(),
         ...pollingStationResults,
       },

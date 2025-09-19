@@ -74,12 +74,11 @@ async fn election_apportionment(
             .iter()
             .all(|s| s.status == DataEntryStatusName::Definitive)
     {
-        let results =
-            crate::data_entry::repository::list_entries_with_polling_stations_first_session(
-                &mut conn,
-                current_committee_session.id,
-            )
-            .await?;
+        let results = crate::data_entry::repository::list_entries_for_committee_session(
+            &mut conn,
+            current_committee_session.id,
+        )
+        .await?;
         let election_summary = ElectionSummary::from_results(&election, &results)?;
         let seat_assignment = seat_assignment(election.number_of_seats, &election_summary)?;
         let candidate_nomination = candidate_nomination(

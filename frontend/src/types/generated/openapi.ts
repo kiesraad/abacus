@@ -1085,7 +1085,7 @@ export interface PollingStationRequest {
   address: string;
   locality: string;
   name: string;
-  number: number;
+  number?: number;
   number_of_voters?: number;
   polling_station_type?: PollingStationType;
   postal_code: string;

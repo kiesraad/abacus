@@ -6,8 +6,15 @@
   "import_subtitle": "Importeer stembureaus gemeente {location}",
   "import_instructions": "Kies het bestand met de stembureaus.",
   "current_form": "het huidige formulier",
-  "delete": "Stembureau verwijderen?",
-  "delete_are_you_sure": "Je kan dit niet ongedaan maken. Weet je zeker dat je dit stembureau wilt verwijderen?",
+  "delete": "Stembureau verwijderen",
+  "delete_modal": {
+    "title": "Stembureau verwijderen?",
+    "confirm": "Je kan dit niet ongedaan maken. Weet je zeker dat je dit stembureau wilt verwijderen?"
+  },
+  "delete_not_possible": {
+    "title": "Stembureau verwijderen niet mogelijk",
+    "message": "Er zijn al tellingen ingevoerd."
+  },
   "details": "Details van het stembureau",
   "empty": "Er zijn nog geen stembureaus ingevoerd voor deze verkiezing. Kies hoe je stembureaus gaat toevoegen.",
   "form": {

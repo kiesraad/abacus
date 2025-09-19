@@ -1,6 +1,6 @@
 {
   "db_name": "SQLite",
-  "query": "\n        UPDATE polling_stations\n        SET\n            name = ?,\n            number = ?,\n            number_of_voters = ?,\n            polling_station_type = ?,\n            address = ?,\n            postal_code = ?,\n            locality = ?\n        WHERE\n            id = ? AND committee_session_id = ?\n        RETURNING\n            id AS \"id: u32\",\n            ? AS \"election_id!: u32\", -- Workaround to get election_id in the result without a temporary struct\n            committee_session_id AS \"committee_session_id: u32\",\n            id_prev_session AS \"id_prev_session: _\",\n            name,\n            number AS \"number: u32\",\n            number_of_voters,\n            polling_station_type AS \"polling_station_type: _\",\n            address,\n            postal_code,\n            locality\n        ",
+  "query": "\n        UPDATE polling_stations\n        SET\n            name = ?,\n            number = COALESCE(?, number),\n            number_of_voters = ?,\n            polling_station_type = ?,\n            address = ?,\n            postal_code = ?,\n            locality = ?\n        WHERE\n            id = ? AND committee_session_id = ?\n        RETURNING\n            id AS \"id: u32\",\n            ? AS \"election_id!: u32\", -- Workaround to get election_id in the result without a temporary struct\n            committee_session_id AS \"committee_session_id: u32\",\n            id_prev_session AS \"id_prev_session: _\",\n            name,\n            number AS \"number: u32\",\n            number_of_voters,\n            polling_station_type AS \"polling_station_type: _\",\n            address,\n            postal_code,\n            locality\n        ",
   "describe": {
     "columns": [
       {
@@ -76,5 +76,5 @@
       false
     ]
   },
-  "hash": "6b9728a05eeddc52ec2211636b51f5eea7d8ca0db8b2d6e17c5177142699aff5"
+  "hash": "27522f7813999e2f9daa191c558b7c55cb6c98401ccf7f86e05d63f2e05572b2"
 }

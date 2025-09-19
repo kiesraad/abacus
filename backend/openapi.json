@@ -1609,6 +1609,16 @@
               }
             }
           },
+          "422": {
+            "description": "Polling station deletion is not possible",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
           "500": {
             "description": "Internal server error",
             "content": {
@@ -6332,7 +6342,6 @@
         "description": "Polling station of a certain [crate::election::Election]",
         "required": [
           "name",
-          "number",
           "address",
           "postal_code",
           "locality"

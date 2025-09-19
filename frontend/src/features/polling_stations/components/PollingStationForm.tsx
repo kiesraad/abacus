@@ -29,23 +29,26 @@ interface Form extends HTMLFormElement {
   readonly elements: FormElements;
 }
 
-const formFields: FormFields<PollingStationRequest> = {
-  number: { required: true, type: "number", min: 1 },
-  name: { required: true, type: "string" },
-  polling_station_type: { type: "string", mapUndefined: true },
-  number_of_voters: { type: "number" },
-  address: { type: "string" },
-  postal_code: { type: "string" },
-  locality: { type: "string" },
-};
-
 export function PollingStationForm({ electionId, pollingStation, onSaved, onCancel }: PollingStationFormProps) {
   const formRef = React.useRef<Form>(null);
+
+  const isUpdate = !!pollingStation;
+  const isPreExistingPollingStation = isUpdate && pollingStation.id_prev_session !== undefined;
+
+  const formFields: FormFields<PollingStationRequest> = {
+    number: isPreExistingPollingStation ? { type: "disabled" } : { required: true, type: "number", min: 1 },
+    name: { required: true, type: "string" },
+    polling_station_type: { type: "string", mapUndefined: true },
+    number_of_voters: { type: "number" },
+    address: { type: "string" },
+    postal_code: { type: "string" },
+    locality: { type: "string" },
+  };
 
   const { process, isValid, validationResult } = useForm<PollingStationRequest>(formFields);
   const { requestState, create, update } = useCrud<PollingStation>({
     create: `/api/elections/${electionId}/polling_stations`,
-    update: pollingStation ? `/api/elections/${electionId}/polling_stations/${pollingStation.id}` : undefined,
+    update: isUpdate ? `/api/elections/${electionId}/polling_stations/${pollingStation.id}` : undefined,
   });
 
   const handleSubmit = (event: React.FormEvent<Form>) => {
@@ -57,23 +60,14 @@ export function PollingStationForm({ electionId, pollingStation, onSaved, onCanc
       window.scrollTo(0, 0);
       return;
     }
-    if (pollingStation) {
-      void update(requestObject).then((result) => {
-        if (isSuccess(result)) {
-          onSaved?.(result.data);
-        } else {
-          window.scrollTo(0, 0);
-        }
-      });
-    } else {
-      void create(requestObject).then((result) => {
-        if (isSuccess(result)) {
-          onSaved?.(result.data);
-        } else {
-          window.scrollTo(0, 0);
-        }
-      });
-    }
+
+    void (isUpdate ? update : create)(requestObject).then((result) => {
+      if (isSuccess(result)) {
+        onSaved?.(result.data);
+      } else {
+        window.scrollTo(0, 0);
+      }
+    });
   };
 
   let numberFieldError;
@@ -95,7 +89,7 @@ export function PollingStationForm({ electionId, pollingStation, onSaved, onCanc
             <Alert type="error">
               <strong className="heading-md">
                 {t("polling_station.form.not_unique.title", {
-                  number: formRef.current?.elements.number.value || "-1",
+                  number: formRef.current?.elements.number?.value || "-1",
                 })}
               </strong>
               <p>{t("polling_station.form.not_unique.description")}</p>
@@ -121,7 +115,10 @@ export function PollingStationForm({ electionId, pollingStation, onSaved, onCanc
                 name="number"
                 label={t("number")}
                 fieldWidth="narrowest"
-                defaultValue={pollingStation?.number}
+                disabled={isPreExistingPollingStation}
+                {...(isPreExistingPollingStation
+                  ? { value: pollingStation.number }
+                  : { defaultValue: pollingStation?.number })}
                 error={numberFieldError}
                 hideErrorMessage={
                   requestState.status === "api-error" && requestState.error.reference !== "EntryNotUnique"

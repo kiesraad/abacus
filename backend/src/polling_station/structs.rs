@@ -62,7 +62,9 @@ impl From<PollingStation> for PollingStationDetails {
 #[serde(deny_unknown_fields)]
 pub struct PollingStationRequest {
     pub name: String,
-    pub number: i64,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[schema(nullable = false)]
+    pub number: Option<i64>,
     #[serde(skip_serializing_if = "Option::is_none")]
     #[schema(nullable = false)]
     pub number_of_voters: Option<i64>,

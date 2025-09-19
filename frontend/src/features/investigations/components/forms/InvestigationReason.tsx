@@ -26,10 +26,10 @@ export function InvestigationReason({ pollingStationId }: InvestigationReasonPro
   const { investigation, pollingStation, refetch } = useElection(pollingStationId);
   const { pushMessage } = useMessages();
   const [nonEmptyError, setNonEmptyError] = useState(false);
+  const [error, setError] = useState<AnyApiError>();
   const path = `/api/polling_stations/${pollingStationId}/investigation`;
   const { create } = useCrud<PollingStationInvestigationCreateRequest>(path);
   const { update } = useCrud<PollingStationInvestigationUpdateRequest>(path);
-  const [error, setError] = useState<AnyApiError>();
 
   if (!pollingStation) {
     return <Loader />;

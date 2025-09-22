@@ -13,7 +13,6 @@ import { CheckAndSavePgObj } from "e2e-tests/page-objects/election/create/CheckA
 import { CountingMethodTypePgObj } from "e2e-tests/page-objects/election/create/CountingMethodTypePgObj";
 import { NumberOfVotersPgObj } from "e2e-tests/page-objects/election/create/NumberOfVotersPgObj";
 import { PollingStationRolePgObj } from "e2e-tests/page-objects/election/create/PollingStationRolePgObj";
-import { ElectionDetailsPgObj } from "e2e-tests/page-objects/election/ElectionDetailsPgObject";
 import { ElectionHome } from "e2e-tests/page-objects/election/ElectionHomePgObj";
 import { ElectionReport } from "e2e-tests/page-objects/election/ElectionReportPgObj";
 import { ElectionsOverviewPgObj } from "e2e-tests/page-objects/election/ElectionsOverviewPgObj";
@@ -24,6 +23,19 @@ import { PollingStationListPgObj } from "e2e-tests/page-objects/polling_station/
 import { eml110b_single } from "e2e-tests/test-data/eml-files";
 import { noRecountNoDifferencesDataEntry } from "e2e-tests/test-data/request-response-templates";
 import { stat } from "node:fs/promises";
+
+import { CandidatesListPage } from "../page-objects/data_entry/CandidatesListPgObj";
+import { CheckAndSavePage } from "../page-objects/data_entry/CheckAndSavePgObj";
+import { DifferencesPage } from "../page-objects/data_entry/DifferencesPgObj";
+import { ExtraInvestigationPage } from "../page-objects/data_entry/ExtraInvestigationPgObj";
+import { ProgressList } from "../page-objects/data_entry/ProgressListPgObj";
+import { ElectionDetailsPgObj } from "../page-objects/election/ElectionDetailsPgObj";
+import { AddInvestigationPgObj } from "../page-objects/investigations/AddInvestigationPgObj";
+import { InvestigationFindingsPgObj } from "../page-objects/investigations/InvestigationFindingsPgObj";
+import { InvestigationOverviewPgObj } from "../page-objects/investigations/InvestigationOverviewPgObj";
+import { InvestigationPrintCorrigendumPgObj } from "../page-objects/investigations/InvestigationPrintCorrigendumPgObj";
+import { InvestigationReasonPgObj } from "../page-objects/investigations/InvestigationReasonPgObj";
+import { CoordinatorNavBarPgObj } from "../page-objects/nav_bar/CoordinatorNavBarPgObj";
 
 test.describe.configure({ mode: "serial" });
 
@@ -196,99 +208,105 @@ test.describe("full flow", () => {
     await expect(overviewPage.header).toBeVisible();
     await overviewPage.findElectionRowById(electionId!).click();
 
-    await page.getByRole("button", { name: "Nieuwe zitting voorbereiden" }).click();
-    await page.getByRole("button", { name: "Ja, zitting toevoegen" }).click();
+    const electionDetailsPage = new ElectionDetailsPgObj(page);
+    await electionDetailsPage.newSessionButton.click();
 
-    await page.getByRole("button", { name: "Aangevraagde onderzoeken" }).click();
-    await page.getByRole("link", { name: "Onderzoek toevoegen" }).click();
+    await electionDetailsPage.newSessionModalConfirmButton.click();
+    await electionDetailsPage.investigationsOverviewButton.click();
 
-    await page.getByRole("cell", { name: "Stadhuis" }).click();
-    await page.getByRole("textbox", { name: "Aanleiding en opdracht" }).fill("Reden");
+    const investigationsOverviewPage = new InvestigationOverviewPgObj(page);
 
-    await page.getByRole("button", { name: "Volgende" }).click();
-    await page.getByRole("link", { name: "Verder naar bevindingen" }).click();
+    // Polling station "Stadhuis"
+    await investigationsOverviewPage.addInvestigationButton.click();
 
-    await page.getByRole("textbox", { name: "Bevindingen" }).fill("Probleem");
+    const addInvestigationPage = new AddInvestigationPgObj(page);
+    await addInvestigationPage.selectPollingStation("Stadhuis");
 
-    await page.getByRole("radio", { name: "Ja" }).check();
-    await page.getByRole("button", { name: "Opslaan" }).click();
+    const investionReasonPage = new InvestigationReasonPgObj(page);
+    await expect(investionReasonPage.header).toBeVisible();
+    await investionReasonPage.reasonField.fill("Reden");
+    await investionReasonPage.nextButton.click();
 
-    await page.getByRole("link", { name: "Onderzoek toevoegen" }).click();
-    await page.getByRole("cell", { name: "Basisschool de Regenboog" }).click();
+    const investigationPrintCorrigendumPage = new InvestigationPrintCorrigendumPgObj(page);
+    await expect(investigationPrintCorrigendumPage.header).toBeVisible();
+    await investigationPrintCorrigendumPage.continueButton.click();
 
-    await page.getByRole("textbox", { name: "Aanleiding en opdracht" }).fill("Reden");
-    await page.getByRole("button", { name: "Volgende" }).click();
-    await page.getByRole("link", { name: "Verder naar bevindingen" }).click();
-    await page.getByRole("textbox", { name: "Bevindingen" }).fill("Geen probleem");
-    await page.getByRole("radio", { name: "Nee" }).check();
-    await page.getByRole("button", { name: "Opslaan" }).click();
+    const investigationsFindingsPage = new InvestigationFindingsPgObj(page);
+    await expect(investigationsFindingsPage.header).toBeVisible();
+    await investigationsFindingsPage.findingsField.fill("Probleem");
+    await investigationsFindingsPage.correctedResultsYes.check();
+    await investigationsFindingsPage.save.click();
 
-    await page.getByRole("button", { name: "Menu" }).click();
-    await page.getByRole("link", { name: "Verkiezingen" }).click();
+    // Polling station "de Regenboog"
+    await investigationsOverviewPage.addInvestigationButton.click();
+
+    await addInvestigationPage.selectPollingStation("Basisschool de Regenboog");
+
+    await expect(investionReasonPage.header).toBeVisible();
+    await investionReasonPage.reasonField.fill("Reden");
+    await investionReasonPage.nextButton.click();
+
+    await expect(investigationPrintCorrigendumPage.header).toBeVisible();
+    await investigationPrintCorrigendumPage.continueButton.click();
+
+    await expect(investigationsFindingsPage.header).toBeVisible();
+    await investigationsFindingsPage.findingsField.fill("Geen probleem");
+    await investigationsFindingsPage.correctedResultsNo.check();
+    await investigationsFindingsPage.save.click();
+
+    const navBar = new CoordinatorNavBarPgObj(page);
+    await navBar.menuButton.click();
+    await navBar.electionsButton.click();
 
     await expect(overviewPage.header).toBeVisible();
     await overviewPage.findElectionRowById(electionId!).click();
 
-    await page.getByRole("button", { name: "Start steminvoer" }).click();
+    await electionDetailsPage.startDataEntryButton.click();
   });
 
-  test("corrected first data entry", async ({ page }) => {
-    await page.goto("/account/login");
+  for (const typist of ["typist1", "typist2"]) {
+    test(`corrected first data entry with ${typist}`, async ({ page }) => {
+      await page.goto("/account/login");
 
-    const loginPage = new LoginPgObj(page);
-    await loginPage.login("typist1", getTestPassword("typist1"));
+      const loginPage = new LoginPgObj(page);
+      await loginPage.login(typist, getTestPassword(typist));
 
-    const overviewPage = new ElectionsOverviewPgObj(page);
-    await expect(overviewPage.header).toBeVisible();
-    await overviewPage.findElectionRowById(electionId!).click();
+      const overviewPage = new ElectionsOverviewPgObj(page);
+      await expect(overviewPage.header).toBeVisible();
+      await overviewPage.findElectionRowById(electionId!).click();
 
-    const dataEntryHomePage = new DataEntryHomePage(page);
-    await expect(dataEntryHomePage.fieldset).toBeVisible();
-    await dataEntryHomePage.pollingStationNumber.fill("1");
-    await expect(dataEntryHomePage.pollingStationFeedback).toContainText("Stadhuis");
-    await dataEntryHomePage.clickStart();
+      const dataEntryHomePage = new DataEntryHomePage(page);
+      await expect(dataEntryHomePage.fieldset).toBeVisible();
+      await dataEntryHomePage.pollingStationNumber.fill("1");
+      await expect(dataEntryHomePage.pollingStationFeedback).toContainText("Stadhuis");
+      await dataEntryHomePage.clickStart();
 
-    await page.getByRole("button", { name: "Volgende" }).click();
-    await page.getByRole("checkbox", { name: "D en H zijn gelijk" }).check();
-    await page.getByRole("checkbox", { name: "Nee" }).check();
-    await page.getByRole("button", { name: "Volgende" }).click();
-    await page.getByRole("textbox", { name: "Oorschot, A.B.C. (Annemieke)" }).fill("1336");
-    await page.getByRole("textbox", { name: "De Blikkert, K. (Krisje)" }).click();
-    await page.getByRole("textbox", { name: "De Blikkert, K. (Krisje)" }).fill("424");
-    await page.getByRole("button", { name: "Volgende" }).click();
-    await page.getByRole("button", { name: "Volgende" }).click();
-    await page.getByRole("button", { name: "Volgende" }).click();
-    await page.getByRole("button", { name: "Opslaan" }).click();
-  });
+      const extraInvestigationPage = new ExtraInvestigationPage(page);
+      await extraInvestigationPage.next.click();
 
-  test("corrected second data entry", async ({ page }) => {
-    await page.goto("/account/login");
+      const differencesPage = new DifferencesPage(page);
+      await differencesPage.admittedVotersEqualsVotesCastCheckbox.check();
+      await differencesPage.differenceCompletelyAccountedForNo.check();
+      await differencesPage.next.click();
 
-    const loginPage = new LoginPgObj(page);
-    await loginPage.login("typist2", getTestPassword("typist2"));
+      const progressList = new ProgressList(page);
+      const [firstListName, secondListName, thirdListName] = await progressList.allListNames();
 
-    const overviewPage = new ElectionsOverviewPgObj(page);
-    await expect(overviewPage.header).toBeVisible();
-    await overviewPage.findElectionRowById(electionId!).click();
+      const firstCandidatesPage = new CandidatesListPage(page, 1, firstListName!);
+      await firstCandidatesPage.fillCandidate(0, 1336);
+      await firstCandidatesPage.fillCandidate(1, 424);
+      await firstCandidatesPage.next.click();
 
-    const dataEntryHomePage = new DataEntryHomePage(page);
-    await expect(dataEntryHomePage.fieldset).toBeVisible();
-    await dataEntryHomePage.pollingStationNumber.fill("1");
-    await expect(dataEntryHomePage.pollingStationFeedback).toContainText("Stadhuis");
-    await dataEntryHomePage.clickStart();
+      const secondCandidatesPage = new CandidatesListPage(page, 2, secondListName!);
+      await secondCandidatesPage.next.click();
 
-    await page.getByRole("button", { name: "Volgende" }).click();
-    await page.getByRole("checkbox", { name: "D en H zijn gelijk" }).check();
-    await page.getByRole("checkbox", { name: "Nee" }).check();
-    await page.getByRole("button", { name: "Volgende" }).click();
-    await page.getByRole("textbox", { name: "Oorschot, A.B.C. (Annemieke)" }).fill("1336");
-    await page.getByRole("textbox", { name: "De Blikkert, K. (Krisje)" }).click();
-    await page.getByRole("textbox", { name: "De Blikkert, K. (Krisje)" }).fill("424");
-    await page.getByRole("button", { name: "Volgende" }).click();
-    await page.getByRole("button", { name: "Volgende" }).click();
-    await page.getByRole("button", { name: "Volgende" }).click();
-    await page.getByRole("button", { name: "Opslaan" }).click();
-  });
+      const thirdCandidatesPage = new CandidatesListPage(page, 3, thirdListName!);
+      await thirdCandidatesPage.next.click();
+
+      const checkAndSavePage = new CheckAndSavePage(page);
+      await checkAndSavePage.save.click();
+    });
+  }
 
   test("check progress", async ({ page }) => {
     await page.goto("/account/login");

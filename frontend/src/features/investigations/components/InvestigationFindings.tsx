@@ -10,6 +10,7 @@ import { FormLayout } from "@/components/ui/Form/FormLayout";
 import { InputField } from "@/components/ui/InputField/InputField";
 import { Loader } from "@/components/ui/Loader/Loader";
 import { useElection } from "@/hooks/election/useElection";
+import { useMessages } from "@/hooks/messages/useMessages";
 import { t } from "@/i18n/translate";
 import {
   PollingStationInvestigationConcludeRequest,
@@ -23,7 +24,8 @@ interface InvestigationFindingsProps {
 
 export function InvestigationFindings({ pollingStationId }: InvestigationFindingsProps) {
   const navigate = useNavigate();
-  const { election, investigation, refetch } = useElection(pollingStationId);
+  const { election, investigation, pollingStation, refetch } = useElection(pollingStationId);
+  const { pushMessage } = useMessages();
   const concludePath = `/api/polling_stations/${pollingStationId}/investigation/conclude`;
   const { create: conclude } = useCrud<PollingStationInvestigationConcludeRequest>({ create: concludePath });
   const path = `/api/polling_stations/${pollingStationId}/investigation`;
@@ -37,7 +39,7 @@ export function InvestigationFindings({ pollingStationId }: InvestigationFinding
     throw apiError;
   }
 
-  if (!investigation) {
+  if (!investigation || !pollingStation) {
     return <Loader />;
   }
 
@@ -70,18 +72,25 @@ export function InvestigationFindings({ pollingStationId }: InvestigationFinding
     const correctedResults = correctedResultsChoice === "yes";
 
     const save = () => {
+      pushMessage({
+        title: t("investigations.message.investigation_updated", {
+          number: pollingStation.number,
+          name: pollingStation.name,
+        }),
+      });
+
       if (investigation.findings !== undefined) {
         return update({
           reason: investigation.reason,
           findings,
           corrected_results: correctedResults,
         });
+      } else {
+        return conclude({
+          findings,
+          corrected_results: correctedResults,
+        });
       }
-
-      return conclude({
-        findings,
-        corrected_results: correctedResults,
-      });
     };
 
     const response = await save();
@@ -107,7 +116,7 @@ export function InvestigationFindings({ pollingStationId }: InvestigationFinding
             fieldSize="text-area"
             name="findings"
             label={t("investigations.findings.title")}
-            error={nonEmptyError ? t("form_errors.FORM_VALIDATION_RESULT_REQUIRED") : undefined}
+            error={nonEmptyError ? t("investigations.findings.error") : undefined}
             hint={t("investigations.findings.hint")}
             defaultValue={investigation.findings || ""}
           />

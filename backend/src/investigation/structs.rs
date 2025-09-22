@@ -5,8 +5,7 @@ use axum::{
     response::{IntoResponse, Response},
 };
 use serde::{Deserialize, Serialize};
-use sqlx::FromRow;
-use sqlx::SqlitePool;
+use sqlx::{FromRow, SqlitePool};
 use utoipa::ToSchema;
 
 use crate::{APIError, error::ErrorReference};

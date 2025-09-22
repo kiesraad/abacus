@@ -48,6 +48,7 @@ describe("PollingStationForm", () => {
   beforeEach(() => {
     server.use(PollingStationCreateHandler, PollingStationUpdateHandler);
   });
+
   describe("PollingStationForm create", () => {
     test("Successful create", async () => {
       const testPollingStation: Omit<PollingStation, "id"> = {
@@ -154,34 +155,93 @@ describe("PollingStationForm", () => {
     });
   });
 
-  test("PollingStationForm update", async () => {
-    const testPollingStation: PollingStation = {
-      id: 1,
-      election_id: 1,
-      committee_session_id: 1,
-      number: 1,
-      name: "test",
-      address: "Teststraat 2",
-      postal_code: "1234",
-      locality: "test",
-      polling_station_type: "FixedLocation",
-      number_of_voters: 1,
-    };
+  describe("PollingStationForm update", () => {
+    test("Successful update", async () => {
+      const testPollingStation: PollingStation = {
+        id: 1,
+        election_id: 1,
+        committee_session_id: 1,
+        number: 1,
+        name: "test",
+        address: "Teststraat 2",
+        postal_code: "1234",
+        locality: "test",
+        polling_station_type: "FixedLocation",
+        number_of_voters: 1,
+      };
 
-    const onSaved = vi.fn();
+      const onSaved = vi.fn();
+      render(<PollingStationForm electionId={1} onSaved={onSaved} pollingStation={testPollingStation} />);
 
-    render(<PollingStationForm electionId={1} onSaved={onSaved} pollingStation={testPollingStation} />);
+      const user = userEvent.setup();
 
-    const user = userEvent.setup();
+      const input = await screen.findByRole("textbox", { name: "Naam" });
+      await user.clear(input);
+      await user.type(input, "test2");
 
-    const input = await screen.findByRole("textbox", { name: "Naam" });
-    await user.clear(input);
-    await user.type(input, "test2");
+      await user.click(screen.getByRole("button", { name: "Wijzigingen opslaan" }));
 
-    await user.click(screen.getByRole("button", { name: "Wijzigingen opslaan" }));
+      await waitFor(() => {
+        expect(onSaved).toHaveBeenCalled();
+      });
+    });
 
-    await waitFor(() => {
-      expect(onSaved).toHaveBeenCalled();
+    test.each([undefined, 42])("Successful update", async (id_prev_session) => {
+      const testPollingStation: PollingStation = {
+        id: 1,
+        election_id: 1,
+        committee_session_id: 1,
+        id_prev_session,
+        number: 1,
+        name: "test",
+        address: "Teststraat 2",
+        postal_code: "1234",
+        locality: "test",
+        polling_station_type: "FixedLocation",
+        number_of_voters: 1,
+      };
+
+      const onSaved = vi.fn();
+      render(<PollingStationForm electionId={1} onSaved={onSaved} pollingStation={testPollingStation} />);
+
+      const user = userEvent.setup();
+
+      const input = await screen.findByRole("textbox", { name: "Naam" });
+      await user.clear(input);
+      await user.type(input, "test2");
+
+      await user.click(screen.getByRole("button", { name: "Wijzigingen opslaan" }));
+
+      await waitFor(() => {
+        expect(onSaved).toHaveBeenCalled();
+      });
+    });
+
+    test("Number should be disabled when polling station is linked to previous session", () => {
+      const testPollingStation: PollingStation = {
+        id: 1,
+        election_id: 1,
+        committee_session_id: 1,
+        id_prev_session: 42,
+        number: 1234,
+        name: "test",
+        address: "Teststraat 2",
+        postal_code: "1234",
+        locality: "test",
+        polling_station_type: "FixedLocation",
+        number_of_voters: 1,
+      };
+      const onSaved = vi.fn();
+
+      // Disabled with id_prev_session defined
+      render(<PollingStationForm electionId={1} onSaved={onSaved} pollingStation={testPollingStation} />);
+      expect(screen.queryByRole("textbox", { name: "Nummer" })).not.toBeInTheDocument();
+      expect(screen.getByText("1234")).toHaveClass("disabled_input");
+
+      // Enabled with id_prev_session undefined
+      testPollingStation.id_prev_session = undefined;
+      render(<PollingStationForm electionId={1} onSaved={onSaved} pollingStation={testPollingStation} />);
+      expect(screen.queryByRole("textbox", { name: "Nummer" })).toBeInTheDocument();
     });
   });
 

@@ -131,7 +131,7 @@ export function ElectionReportPage() {
               </section>
             </section>
             <FormLayout.Controls>
-              <Button.Link to="../..">{t("election_report.back_to_overview")}</Button.Link>
+              <Button.Link to="../..">{t("back_to_overview")}</Button.Link>
               {currentCommitteeSession.id === committeeSession.id && (
                 <Button
                   variant="secondary"

@@ -54,4 +54,7 @@ export default {
       control: { type: "radio" },
     },
   },
+  parameters: {
+    userRole: "coordinator",
+  },
 } satisfies Meta;

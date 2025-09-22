@@ -1,5 +1,7 @@
 #![cfg(test)]
-use abacus::election::ElectionDetailsResponse;
+use abacus::{
+    committee_session::status::CommitteeSessionStatus, election::ElectionDetailsResponse,
+};
 use axum::http::StatusCode;
 use reqwest::Response;
 use serde_json::json;
@@ -83,20 +85,9 @@ async fn conclude_investigation(pool: SqlitePool, polling_station_id: u32) -> Re
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_7_four_sessions", "users"))))]
-async fn test_investigation_create_and_conclude(pool: SqlitePool) {
-    assert_eq!(
-        create_investigation(pool.clone(), 741).await.status(),
-        StatusCode::OK
-    );
-    assert_eq!(
-        conclude_investigation(pool.clone(), 741).await.status(),
-        StatusCode::OK
-    );
-}
-
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_7_four_sessions", "users"))))]
 async fn test_investigation_create_conclude_update(pool: SqlitePool) {
-    let election_details = get_election(pool.clone(), 700).await;
+    let election_id = 7;
+    let election_details = get_election(pool.clone(), election_id).await;
     assert_eq!(election_details.investigations.len(), 0);
 
     assert_eq!(
@@ -104,7 +95,7 @@ async fn test_investigation_create_conclude_update(pool: SqlitePool) {
         StatusCode::OK
     );
 
-    let election_details = get_election(pool.clone(), 700).await;
+    let election_details = get_election(pool.clone(), election_id).await;
     assert_eq!(election_details.investigations.len(), 1);
     assert_eq!(election_details.investigations[0].polling_station_id, 741);
     assert_eq!(election_details.investigations[0].reason, "Test reason");
@@ -115,7 +106,7 @@ async fn test_investigation_create_conclude_update(pool: SqlitePool) {
         StatusCode::OK
     );
 
-    let election_details = get_election(pool.clone(), 700).await;
+    let election_details = get_election(pool.clone(), election_id).await;
     assert_eq!(election_details.investigations.len(), 1);
     assert_eq!(election_details.investigations[0].polling_station_id, 741);
     assert_eq!(election_details.investigations[0].reason, "Test reason");
@@ -133,7 +124,7 @@ async fn test_investigation_create_conclude_update(pool: SqlitePool) {
         StatusCode::OK
     );
 
-    let election_details = get_election(pool.clone(), 700).await;
+    let election_details = get_election(pool.clone(), election_id).await;
     assert_eq!(election_details.investigations.len(), 1);
     assert_eq!(election_details.investigations[0].polling_station_id, 741);
     assert_eq!(election_details.investigations[0].reason, "Updated reason");
@@ -144,6 +135,64 @@ async fn test_investigation_create_conclude_update(pool: SqlitePool) {
     assert_eq!(
         election_details.investigations[0].corrected_results,
         Some(true)
+    );
+}
+
+#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_7_four_sessions", "users"))))]
+async fn test_investigation_creation_for_committee_session_with_created_status(pool: SqlitePool) {
+    let addr = serve_api(pool.clone()).await;
+    let cookie = shared::coordinator_login(&addr).await;
+    let election_id = 7;
+
+    shared::change_status_committee_session(&addr, &cookie, 704, CommitteeSessionStatus::Created)
+        .await;
+    let committee_session =
+        shared::get_election_committee_session(&addr, &cookie, election_id).await;
+    assert_eq!(committee_session.status, CommitteeSessionStatus::Created);
+
+    assert_eq!(
+        create_investigation(pool.clone(), 741).await.status(),
+        StatusCode::OK
+    );
+
+    let committee_session =
+        shared::get_election_committee_session(&addr, &cookie, election_id).await;
+    assert_eq!(
+        committee_session.status,
+        CommitteeSessionStatus::DataEntryNotStarted
+    );
+}
+
+#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_5_with_results", "users"))))]
+async fn test_investigation_creation_for_committee_session_with_finished_status(pool: SqlitePool) {
+    let addr = serve_api(pool.clone()).await;
+    let cookie = shared::coordinator_login(&addr).await;
+    let election_id = 5;
+
+    shared::change_status_committee_session(
+        &addr,
+        &cookie,
+        6,
+        CommitteeSessionStatus::DataEntryFinished,
+    )
+    .await;
+    let committee_session =
+        shared::get_election_committee_session(&addr, &cookie, election_id).await;
+    assert_eq!(
+        committee_session.status,
+        CommitteeSessionStatus::DataEntryFinished
+    );
+
+    assert_eq!(
+        create_investigation(pool.clone(), 8).await.status(),
+        StatusCode::OK
+    );
+
+    let committee_session =
+        shared::get_election_committee_session(&addr, &cookie, election_id).await;
+    assert_eq!(
+        committee_session.status,
+        CommitteeSessionStatus::DataEntryInProgress
     );
 }
 

@@ -42,11 +42,13 @@ function HeaderCell({
   children,
   scope,
   span,
+  numberWidth,
   className,
 }: {
   children?: React.ReactNode;
   scope?: "col" | "row";
   span?: number;
+  numberWidth?: boolean;
   className?: string;
 }) {
   return (
@@ -54,7 +56,7 @@ function HeaderCell({
       scope={scope || "col"}
       rowSpan={scope === "row" ? span : undefined}
       colSpan={scope !== "row" ? span : undefined}
-      className={className}
+      className={cn(numberWidth && cls.numberWidth, className)}
     >
       {children}
     </th>

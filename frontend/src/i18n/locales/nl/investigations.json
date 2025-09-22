@@ -10,13 +10,14 @@
     "corrected_result": "Is er een gecorrigeerde uitslag?",
     "corrected_result_no": "Het stembureau hoeft niet in Abacus te worden ingevoerd.",
     "corrected_result_yes": "Vul de nieuwe telresultaten in op het corrigendum proces-verbaal van het stembureau. Laat daarna het corrigendum invoeren in Abacus.",
+    "error": "Vul de bevindingen van het onderzoek in. Dit wordt opgenomen in het proces-verbaal van het gemeentelijk stembureau",
     "fill": "Nu invullen",
     "hint": "Deze verklaring wordt opgenomen in het proces-verbaal van het gemeentelijk stembureau",
     "indicate_how_result_was_determined": "Geef ook aan wat het gemeentelijk stembureau heeft gedaan om tot deze uitkomst te komen.",
     "investigation_findings_title": "Bevindingen van het onderzoek door het gemeentelijk stembureau",
     "nav_title": "Bevindingen onderzoek",
     "note_investigation_result": "Noteer de uitkomst van het onderzoek door het gemeentelijk stembureau.",
-    "pick_corrected_result": "Kies een van opties",
+    "pick_corrected_result": "Deze vraag is verplicht",
     "title": "Bevindingen",
     "title_long": "Bevindingen van het onderzoek"
   },
@@ -24,8 +25,13 @@
   "handled_investigations": "Afgehandelde onderzoeken",
   "investigate_which_polling_station": "Voor welk stembureau wordt het onderzoek gedaan?",
   "investigations_in_committee_session": "Onderzoeken in {sessionLabel}",
+  "message": {
+    "investigation_created": "Onderzoek voor stembureau {number} ({name}) toegevoegd",
+    "investigation_updated": "Wijzigingen in onderzoek stembureau {number} ({name}) opgeslagen"
+  },
   "multiple_polling_stations": "Zijn er voor meerdere stembureaus onderzoeken aangevraagd? Doorloop de volgende stappen dan voor elk stembureau.",
   "no_corrected_results": "De uitslag is ongewijzigd",
+  "no_polling_stations_to_choose": "Geen stembureaus om uit te kiezen",
   "print_corrigendum": {
     "action": "Corrigendum afdrukken",
     "add_the_findings": "Voer in de volgende stap de bevindingen van het onderzoek in.",
@@ -49,8 +55,10 @@
   "reason_and_assignment": {
     "central_polling_station": "Aanleiding en opdracht van het centraal stembureau",
     "csb_assignment": "Schrijf ook op wat er in opdracht van het centraal stembureau moet worden onderzocht. Bijvoorbeeld: hertel de stembiljetten van lijst 12.",
+    "error": "Vul de opdracht van het centraal stembureau in",
     "title": "Aanleiding en opdracht",
     "why_investigate_results": "Waarom worden de resultaten van dit stembureau onderzocht? Denk bijvoorbeeld aan een onverklaard telverschil of een bezwaar."
   },
-  "title": "Onderzoeken"
+  "title": "Onderzoeken",
+  "you_cannot_add_another_investigation": "Je hebt voor alle stembureaus al een onderzoek toegevoegd.\nJe kan niet nog een onderzoek toevoegen."
 }

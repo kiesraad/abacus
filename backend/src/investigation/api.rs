@@ -10,26 +10,24 @@ use utoipa_axum::{router::OpenApiRouter, routes};
 use super::{
     repository::{
         conclude_polling_station_investigation, create_polling_station_investigation,
-        get_polling_station_investigation,
+        get_polling_station_investigation, update_polling_station_investigation,
     },
     structs::{
-        PollingStationInvestigation, PollingStationInvestigationConcludeRequest,
-        PollingStationInvestigationCreateRequest,
+        CurrentSessionPollingStationId, PollingStationInvestigation,
+        PollingStationInvestigationConcludeRequest, PollingStationInvestigationCreateRequest,
+        PollingStationInvestigationUpdateRequest,
     },
 };
 use crate::{
     APIError, AppState, ErrorResponse, SqlitePoolExt,
     audit_log::{AuditEvent, AuditService},
     authentication::Coordinator,
+    committee_session::status::{CommitteeSessionStatus, change_committee_session_status},
     data_entry::{
         CSOFirstSessionResults, PollingStationResults, VotesCounts,
         repository::most_recent_results_for_polling_station,
     },
     election::ElectionWithPoliticalGroups,
-    investigation::{
-        repository::update_polling_station_investigation,
-        structs::{CurrentSessionPollingStationId, PollingStationInvestigationUpdateRequest},
-    },
     pdf_gen::{
         generate_pdf,
         models::{ModelNa14_2Bijlage1Input, ToPdfFileModel},
@@ -73,12 +71,20 @@ async fn polling_station_investigation_create(
 ) -> Result<PollingStationInvestigation, APIError> {
     let mut tx = pool.begin_immediate().await?;
 
+    // Check if the polling station and its committee session exist, will respond with NOT_FOUND otherwise
+    let polling_station =
+        crate::polling_station::repository::get(&mut tx, polling_station_id).await?;
+    let committee_session =
+        crate::committee_session::repository::get(&mut tx, polling_station.committee_session_id)
+            .await?;
+
     let investigation = create_polling_station_investigation(
         &mut tx,
         polling_station_id,
         polling_station_investigation,
     )
     .await?;
+
     audit_service
         .log(
             &mut tx,
@@ -86,7 +92,27 @@ async fn polling_station_investigation_create(
             None,
         )
         .await?;
+
+    if committee_session.status == CommitteeSessionStatus::Created {
+        change_committee_session_status(
+            &mut tx,
+            committee_session.id,
+            CommitteeSessionStatus::DataEntryNotStarted,
+            audit_service,
+        )
+        .await?;
+    } else if committee_session.status == CommitteeSessionStatus::DataEntryFinished {
+        change_committee_session_status(
+            &mut tx,
+            committee_session.id,
+            CommitteeSessionStatus::DataEntryInProgress,
+            audit_service,
+        )
+        .await?;
+    };
+
     tx.commit().await?;
+
     Ok(investigation)
 }
 
@@ -115,12 +141,14 @@ async fn polling_station_investigation_conclude(
     Json(polling_station_investigation): Json<PollingStationInvestigationConcludeRequest>,
 ) -> Result<PollingStationInvestigation, APIError> {
     let mut tx = pool.begin_immediate().await?;
+
     let investigation = conclude_polling_station_investigation(
         &mut tx,
         polling_station_id,
         polling_station_investigation,
     )
     .await?;
+
     audit_service
         .log(
             &mut tx,
@@ -128,7 +156,9 @@ async fn polling_station_investigation_conclude(
             None,
         )
         .await?;
+
     tx.commit().await?;
+
     Ok(investigation)
 }
 
@@ -157,12 +187,14 @@ async fn polling_station_investigation_update(
     Json(polling_station_investigation): Json<PollingStationInvestigationUpdateRequest>,
 ) -> Result<PollingStationInvestigation, APIError> {
     let mut tx = pool.begin_immediate().await?;
+
     let investigation = update_polling_station_investigation(
         &mut tx,
         polling_station_id,
         polling_station_investigation,
     )
     .await?;
+
     audit_service
         .log(
             &mut tx,
@@ -170,7 +202,9 @@ async fn polling_station_investigation_update(
             None,
         )
         .await?;
+
     tx.commit().await?;
+
     Ok(investigation)
 }
 

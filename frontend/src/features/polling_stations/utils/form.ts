@@ -34,6 +34,10 @@ export type FormFieldNumber = FormFieldBase & {
   max?: number;
 };
 
+export type FormFieldDisabled = FormFieldBase & {
+  type: "disabled";
+};
+
 export type FieldValue<F extends AnyFormField> = F extends FormFieldNumber
   ? number
   : F extends FormFieldString
@@ -42,7 +46,7 @@ export type FieldValue<F extends AnyFormField> = F extends FormFieldNumber
       ? string | undefined
       : never;
 
-export type AnyFormField = FormFieldNumber | FormFieldString | FormFieldStringUndefined;
+export type AnyFormField = FormFieldNumber | FormFieldString | FormFieldStringUndefined | FormFieldDisabled;
 
 export type FormFields<T> = Record<keyof T, AnyFormField>;
 export type ValidationResult<T> = Record<keyof T, ValidationError | undefined>;
@@ -58,6 +62,10 @@ export function processForm<RequestObject>(
 
   for (const fieldName in fields) {
     const field = fields[fieldName];
+    if (field.type === "disabled") {
+      continue;
+    }
+
     const input = elements[fieldName];
     let value: FieldValue<AnyFormField> = input.value.trim();
 

@@ -435,12 +435,13 @@ impl TryInto<PollingStationRequest> for &PollingPlace {
                 .locality_name
                 .name
                 .clone(),
-            number: self
-                .physical_location
-                .polling_station
-                .id
-                .parse()
-                .or(Err(EMLImportError::InvalidPollingStation))?,
+            number: Some(
+                self.physical_location
+                    .polling_station
+                    .id
+                    .parse::<i64>()
+                    .or(Err(EMLImportError::InvalidPollingStation))?,
+            ),
             number_of_voters: None,
             polling_station_type: None,
             address: "".to_string(),

@@ -80,6 +80,38 @@ impl PollingStationResults {
         }
     }
 
+    pub fn empty_cso_first_session(political_groups: &[PoliticalGroup]) -> Self {
+        PollingStationResults::CSOFirstSession(CSOFirstSessionResults {
+            extra_investigation: Default::default(),
+            counting_differences_polling_station: Default::default(),
+            voters_counts: Default::default(),
+            votes_counts: VotesCounts {
+                political_group_total_votes:
+                    PollingStationResults::default_political_group_total_votes(political_groups),
+                ..Default::default()
+            },
+            differences_counts: Default::default(),
+            political_group_votes: PollingStationResults::default_political_group_votes(
+                political_groups,
+            ),
+        })
+    }
+
+    pub fn empty_cso_next_session(political_groups: &[PoliticalGroup]) -> Self {
+        PollingStationResults::CSONextSession(CSONextSessionResults {
+            voters_counts: Default::default(),
+            votes_counts: VotesCounts {
+                political_group_total_votes:
+                    PollingStationResults::default_political_group_total_votes(political_groups),
+                ..Default::default()
+            },
+            differences_counts: Default::default(),
+            political_group_votes: PollingStationResults::default_political_group_votes(
+                political_groups,
+            ),
+        })
+    }
+
     /// Get a reference to the inner CSONextSessionResults, if this is of that type.
     pub fn as_cso_next_session(&self) -> Option<&CSONextSessionResults> {
         match self {

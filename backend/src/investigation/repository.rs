@@ -88,6 +88,16 @@ pub async fn update_polling_station_investigation(
     .await
 }
 
+pub async fn get_polling_station_investigation(
+    conn: &mut SqliteConnection,
+    polling_station_id: u32,
+) -> Result<PollingStationInvestigation, Error> {
+    query_as("SELECT * FROM polling_station_investigations WHERE polling_station_id = ?")
+        .bind(polling_station_id)
+        .fetch_one(conn)
+        .await
+}
+
 pub async fn list_investigations_for_committee_session(
     conn: &mut SqliteConnection,
     committee_session_id: u32,

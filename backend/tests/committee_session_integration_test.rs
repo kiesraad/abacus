@@ -77,7 +77,7 @@ async fn test_committee_session_create_current_committee_session_not_finalised(p
     );
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_5", "users"))))]
+#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_5_with_results", "users"))))]
 async fn test_committee_session_delete_ok_status_created(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let cookie = shared::coordinator_login(&addr).await;
@@ -118,7 +118,7 @@ async fn test_committee_session_delete_ok_status_created(pool: SqlitePool) {
     );
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_5", "users"))))]
+#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_5_with_results", "users"))))]
 async fn test_committee_session_delete_ok_status_data_entry_not_started(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let cookie = shared::coordinator_login(&addr).await;
@@ -169,7 +169,7 @@ async fn test_committee_session_delete_ok_status_data_entry_not_started(pool: Sq
     );
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_5", "users"))))]
+#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_5_with_results", "users"))))]
 async fn test_committee_session_delete_not_ok_wrong_status(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let cookie = shared::coordinator_login(&addr).await;
@@ -299,7 +299,7 @@ async fn test_committee_session_delete_first_committee_session(pool: SqlitePool)
     assert_eq!(committee_session.status, CommitteeSessionStatus::Created);
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_5", "users"))))]
+#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_5_with_results", "users"))))]
 async fn test_committee_session_delete_not_found(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let cookie = shared::coordinator_login(&addr).await;

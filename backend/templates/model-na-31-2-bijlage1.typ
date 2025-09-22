@@ -1,4 +1,4 @@
-#import "common/style.typ": attachement_numbering, conf
+#import "common/style.typ": attachment_numbering, conf
 #import "common/scripts.typ": *
 #let input = json("inputs/model-na-31-2-bijlage1.json")
 
@@ -14,12 +14,6 @@
 
 #set heading(numbering: none)
 
-= Bijlage 1
-
-== Verslagen van tellingen van stembureau
-
-#pagebreak(weak: true)
-
 = Stembureau #input.polling_station.number \ #input.polling_station.name
 
 #line(length: 100%)
@@ -28,7 +22,7 @@
 
 Het stembureau heeft op de dag van de verkiezingen de stemmen per lijst geteld. Het #location_type heeft later op een centrale tellocatie geteld hoeveel stemmen elke kandidaat heeft gekregen. De telresultaten van het #location_type zijn vergeleken met de eerdere tellingen door het stembureau. Alle telresultaten staan in deze bijlage.
 
-#show: doc => attachement_numbering(doc, "B1")
+#show: doc => attachment_numbering(doc, "B1")
 
 = Alleen bij extra onderzoek: opmerkingen #location_type
 

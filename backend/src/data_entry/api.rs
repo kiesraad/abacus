@@ -11,9 +11,10 @@ use utoipa::ToSchema;
 use utoipa_axum::{router::OpenApiRouter, routes};
 
 use super::{
-    CSOFirstSessionResults, DataEntryStatusResponse, DataError, PollingStationDataEntry,
-    ValidationResults,
+    CSONextSessionResults, CommonPollingStationResults, DataEntryStatusResponse, DataError,
+    PollingStationDataEntry, PollingStationResults, ValidationResults,
     entry_number::EntryNumber,
+    repository::most_recent_results_for_polling_station,
     status::{
         ClientState, CurrentDataEntry, DataEntryStatus, DataEntryStatusName,
         DataEntryTransitionError, EntriesDifferent, FirstEntryHasErrors,
@@ -25,10 +26,6 @@ use crate::{
     audit_log::{AuditEvent, AuditService},
     authentication::{Coordinator, Typist, User},
     committee_session::{CommitteeSession, CommitteeSessionError, status::CommitteeSessionStatus},
-    data_entry::{
-        CSONextSessionResults, CommonPollingStationResults, PollingStationResults, VotesCounts,
-        repository::most_recent_results_for_polling_station,
-    },
     election::{ElectionWithPoliticalGroups, PoliticalGroup},
     error::{ErrorReference, ErrorResponse},
     polling_station::PollingStation,
@@ -150,34 +147,10 @@ fn initial_current_data_entry(
 
             PollingStationResults::CSONextSession(copy)
         } else {
-            PollingStationResults::CSONextSession(CSONextSessionResults {
-                voters_counts: Default::default(),
-                votes_counts: VotesCounts {
-                    political_group_total_votes:
-                        PollingStationResults::default_political_group_total_votes(political_groups),
-                    ..Default::default()
-                },
-                differences_counts: Default::default(),
-                political_group_votes: PollingStationResults::default_political_group_votes(
-                    political_groups,
-                ),
-            })
+            PollingStationResults::empty_cso_next_session(political_groups)
         }
     } else {
-        PollingStationResults::CSOFirstSession(CSOFirstSessionResults {
-            extra_investigation: Default::default(),
-            counting_differences_polling_station: Default::default(),
-            voters_counts: Default::default(),
-            votes_counts: VotesCounts {
-                political_group_total_votes:
-                    PollingStationResults::default_political_group_total_votes(political_groups),
-                ..Default::default()
-            },
-            differences_counts: Default::default(),
-            political_group_votes: PollingStationResults::default_political_group_votes(
-                political_groups,
-            ),
-        })
+        PollingStationResults::empty_cso_first_session(political_groups)
     };
 
     CurrentDataEntry {
@@ -936,10 +909,10 @@ mod tests {
             tests::{change_status_committee_session, create_committee_session},
         },
         data_entry::{
-            CountingDifferencesPollingStation, DifferenceCountsCompareVotesCastAdmittedVoters,
-            DifferencesCounts, ExtraInvestigation, PoliticalGroupCandidateVotes,
-            PoliticalGroupTotalVotes, VotersCounts, VotesCounts, YesNo,
-            repository::insert_test_result, structs::tests::ValidDefault,
+            CSOFirstSessionResults, CountingDifferencesPollingStation,
+            DifferenceCountsCompareVotesCastAdmittedVoters, DifferencesCounts, ExtraInvestigation,
+            PoliticalGroupCandidateVotes, PoliticalGroupTotalVotes, VotersCounts, VotesCounts,
+            YesNo, repository::insert_test_result, structs::tests::ValidDefault,
         },
     };
 

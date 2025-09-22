@@ -13,5 +13,11 @@ export function InvestigationPrintCorrigendumPage() {
     return <Loader />;
   }
 
-  return <InvestigationPrintCorrigendum electionId={election.id} pollingStationNumber={pollingStation.number} />;
+  return (
+    <InvestigationPrintCorrigendum
+      electionId={election.id}
+      pollingStationId={pollingStation.id}
+      pollingStationNumber={pollingStation.number}
+    />
+  );
 }

@@ -44,9 +44,9 @@ VALUES (7, 'Test Election >= 19 seats', 'CSO', 'GroteStad_2026', 'Grote Stad', '
         ]');
 
 INSERT INTO committee_sessions (id, number, election_id, status, location, start_date_time, number_of_voters)
-VALUES (701, 1, 7, 'data_entry_finished', 'Grote Stad', '2026-03-19T09:15', 2000),
-       (702, 2, 7, 'data_entry_finished', 'Grote Stad', '2026-03-19T17:15', 2000),
-       (703, 3, 7, 'data_entry_finished', 'Grote Stad', '2026-03-19T23:15', 2000),
+VALUES (701, 1, 7, 'data_entry_finished', 'Grote Stad', '2026-03-19 09:15:00', 2000),
+       (702, 2, 7, 'data_entry_finished', 'Grote Stad', '2026-03-19 17:15:00', 2000),
+       (703, 3, 7, 'data_entry_finished', 'Grote Stad', '2026-03-19 23:15:00', 2000),
        (704, 4, 7, 'data_entry_in_progress', '', NULL, 2000);
 
 INSERT INTO polling_stations (id, committee_session_id, id_prev_session, name, number, number_of_voters, polling_station_type, address,

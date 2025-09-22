@@ -2,7 +2,7 @@
 use abacus::{
     committee_session::status::CommitteeSessionStatus, election::ElectionDetailsResponse,
 };
-use hyper::StatusCode;
+use axum::http::StatusCode;
 use reqwest::Response;
 use serde_json::json;
 use sqlx::SqlitePool;
@@ -255,7 +255,7 @@ async fn test_investigation_creation_for_committee_session_with_created_status(p
     );
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_5", "users"))))]
+#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_5_with_results", "users"))))]
 async fn test_investigation_creation_for_committee_session_with_finished_status(pool: SqlitePool) {
     let addr = serve_api(pool.clone()).await;
     let cookie = shared::coordinator_login(&addr).await;
@@ -276,7 +276,7 @@ async fn test_investigation_creation_for_committee_session_with_finished_status(
     );
 
     assert_eq!(
-        create_investigation(pool.clone(), 8).await.status(),
+        create_investigation(pool.clone(), 9).await.status(),
         StatusCode::OK
     );
 
@@ -339,4 +339,82 @@ async fn test_investigation_can_only_update_current_session(pool: SqlitePool) {
         update_investigation(pool.clone(), 732, None).await.status(),
         StatusCode::NOT_FOUND
     );
+}
+
+#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_5_with_results", "users"))))]
+async fn test_polling_station_corrigendum_download_with_previous_results(pool: SqlitePool) {
+    let addr = serve_api(pool.clone()).await;
+    let coordinator_cookie = shared::coordinator_login(&addr).await;
+    let polling_station_id = 9;
+
+    assert_eq!(
+        create_investigation(pool.clone(), polling_station_id)
+            .await
+            .status(),
+        StatusCode::OK
+    );
+
+    let url = format!(
+        "http://{addr}/api/polling_stations/{polling_station_id}/investigation/download_corrigendum_pdf"
+    );
+    let response = reqwest::Client::new()
+        .get(&url)
+        .header("cookie", coordinator_cookie)
+        .send()
+        .await
+        .unwrap();
+    let content_disposition = response.headers().get("Content-Disposition");
+    let content_type = response.headers().get("Content-Type");
+
+    assert_eq!(response.status(), StatusCode::OK);
+    assert_eq!(content_type.unwrap(), "application/pdf");
+
+    let content_disposition_string = content_disposition.unwrap().to_str().unwrap();
+    assert_eq!(&content_disposition_string[..21], "attachment; filename=");
+    assert_eq!(
+        &content_disposition_string[21..],
+        "\"Model_Na14-2_GR2026_Stembureau_41_Bijlage_1.pdf\""
+    );
+
+    let bytes = response.bytes().await.unwrap();
+    assert!(bytes.len() > 1024);
+}
+
+#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
+async fn test_polling_station_corrigendum_download_without_previous_results(pool: SqlitePool) {
+    let addr = serve_api(pool.clone()).await;
+    let coordinator_cookie = shared::coordinator_login(&addr).await;
+    let polling_station_id = 2;
+
+    assert_eq!(
+        create_investigation(pool.clone(), polling_station_id)
+            .await
+            .status(),
+        StatusCode::OK
+    );
+
+    let url = format!(
+        "http://{addr}/api/polling_stations/{polling_station_id}/investigation/download_corrigendum_pdf"
+    );
+    let response = reqwest::Client::new()
+        .get(&url)
+        .header("cookie", coordinator_cookie)
+        .send()
+        .await
+        .unwrap();
+    let content_disposition = response.headers().get("Content-Disposition");
+    let content_type = response.headers().get("Content-Type");
+
+    assert_eq!(response.status(), StatusCode::OK);
+    assert_eq!(content_type.unwrap(), "application/pdf");
+
+    let content_disposition_string = content_disposition.unwrap().to_str().unwrap();
+    assert_eq!(&content_disposition_string[..21], "attachment; filename=");
+    assert_eq!(
+        &content_disposition_string[21..],
+        "\"Model_Na14-2_GR2024_Stembureau_34_Bijlage_1.pdf\""
+    );
+
+    let bytes = response.bytes().await.unwrap();
+    assert!(bytes.len() > 1024);
 }

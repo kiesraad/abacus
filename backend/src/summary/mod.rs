@@ -231,35 +231,15 @@ impl PollingStationInvestigations {
         polling_station: &PollingStation,
         result: &CSOFirstSessionResults,
     ) {
-        if result
-            .counting_differences_polling_station
-            .unexplained_difference_ballots_voters
-            .yes
-            || result
-                .counting_differences_polling_station
-                .difference_ballots_per_list
-                .yes
-            || result
-                .differences_counts
-                .difference_completely_accounted_for
-                .no
-        {
+        if result.admitted_voters_have_been_recounted() {
             self.admitted_voters_recounted.push(polling_station.number);
         }
 
-        if result
-            .extra_investigation
-            .extra_investigation_other_reason
-            .yes
-        {
+        if result.investigated_other_reason() {
             self.investigated_other_reason.push(polling_station.number);
         }
 
-        if result
-            .extra_investigation
-            .ballots_recounted_extra_investigation
-            .yes
-        {
+        if result.ballots_have_been_recounted() {
             self.ballots_recounted.push(polling_station.number);
         }
     }

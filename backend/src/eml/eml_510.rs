@@ -191,6 +191,33 @@ impl TotalVotes {
     }
 }
 
+#[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq)]
+pub enum InvestigationReason {
+    #[serde(rename = "toegelaten kiezers opnieuw vastgesteld")]
+    AdmittedVotersRecounted,
+    #[serde(rename = "onderzocht vanwege andere reden")]
+    InvestigatedOtherReason,
+    #[serde(rename = "stembiljetten deels herteld")]
+    BallotsRecounted,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "PascalCase")]
+#[serde(rename(serialize = "kr:Investigation", deserialize = "Investigation"))]
+pub struct Investigation {
+    #[serde(rename = "@ReasonCode")]
+    reason_code: InvestigationReason,
+    #[serde(rename = "$text")]
+    value: bool,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "PascalCase")]
+pub struct ReportingUnitInvestigations {
+    #[serde(rename = "Investigation")]
+    investigations: Vec<Investigation>,
+}
+
 /// The individual votes for a specific reporting unit (i.e. 'stembureau').
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "PascalCase")]
@@ -203,6 +230,43 @@ pub struct ReportingUnitVotes {
     rejected_votes: Vec<RejectedVotes>,
     #[serde(default)]
     uncounted_votes: Vec<UncountedVotes>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    reporting_unit_investigations: Option<ReportingUnitInvestigations>,
+}
+
+/// When results were investigated by the GSB
+/// return the relevant investigations.
+fn create_investigations_from_results(
+    result: &CSOFirstSessionResults,
+) -> Option<ReportingUnitInvestigations> {
+    let mut investigations = Vec::new();
+
+    if result.investigation_ballots_recounted_is_answered() {
+        investigations.push(Investigation {
+            reason_code: InvestigationReason::InvestigatedOtherReason,
+            value: result.investigated_other_reason(),
+        });
+    }
+
+    if result.investigation_other_reason_is_answered() {
+        investigations.push(Investigation {
+            reason_code: InvestigationReason::BallotsRecounted,
+            value: result.ballots_have_been_recounted(),
+        });
+    }
+
+    if result.admitted_voters_have_been_recounted() {
+        investigations.push(Investigation {
+            reason_code: InvestigationReason::AdmittedVotersRecounted,
+            value: true,
+        });
+    }
+
+    if !investigations.is_empty() {
+        Some(ReportingUnitInvestigations { investigations })
+    } else {
+        None
+    }
 }
 
 impl ReportingUnitVotes {
@@ -220,11 +284,12 @@ impl ReportingUnitVotes {
                     polling_station.name, polling_station.postal_code
                 ),
             },
+            reporting_unit_investigations: create_investigations_from_results(results),
             selections: Selection::from_political_group_votes(
                 election,
                 &results.political_group_votes,
             ),
-            cast: results.votes_counts.total_votes_cast_count as u64,
+            cast: polling_station.number_of_voters.unwrap_or(0) as u64,
             total_counted: results.votes_counts.total_votes_candidates_count as u64,
             rejected_votes: vec![
                 RejectedVotes::new(
@@ -502,6 +567,12 @@ mod tests {
                                 id: "HSB1::1234".into(),
                                 name: "Op rolletjes".into(),
                             },
+                            reporting_unit_investigations: Some(ReportingUnitInvestigations {
+                                investigations: vec![Investigation {
+                                    reason_code: InvestigationReason::InvestigatedOtherReason,
+                                    value: true,
+                                }],
+                            }),
                             selections: vec![
                                 Selection {
                                     selector: Selector::AffiliationIdentifier(
@@ -557,5 +628,51 @@ mod tests {
         let doc = EML510::from_str(data).unwrap();
         assert_eq!(doc.count.election.contests.len(), 1);
         assert_eq!(doc.base.id, "510d");
+    }
+
+    #[test]
+    fn test_eml510d_without_investigations() {
+        let data = include_str!("./tests/deserialize_eml510d_test.eml.xml");
+        let doc = EML510::from_str(data).unwrap();
+
+        assert_eq!(doc.count.election.contests.len(), 1);
+        assert_eq!(doc.count.election.contests[0].reporting_unit_votes.len(), 1);
+        assert!(
+            doc.count.election.contests[0].reporting_unit_votes[0]
+                .reporting_unit_investigations
+                .is_none()
+        );
+    }
+
+    #[test]
+    fn test_eml510b_with_investigations() {
+        let data = include_str!("./tests/eml510b_with_investigations.eml.xml");
+        let doc = EML510::from_str(data).unwrap();
+
+        assert_eq!(doc.count.election.contests.len(), 1);
+        let contest = &doc.count.election.contests[0];
+
+        assert_eq!(contest.reporting_unit_votes.len(), 1);
+        let votes = &contest.reporting_unit_votes[0];
+        let report = &votes.reporting_unit_investigations;
+        assert!(report.is_some());
+
+        let investigations = report.clone().unwrap().investigations;
+        assert_eq!(investigations.len(), 3);
+        assert_eq!(
+            investigations[0].reason_code,
+            InvestigationReason::AdmittedVotersRecounted
+        );
+        assert!(investigations[0].value);
+        assert_eq!(
+            investigations[1].reason_code,
+            InvestigationReason::InvestigatedOtherReason
+        );
+        assert!(!investigations[1].value);
+        assert_eq!(
+            investigations[2].reason_code,
+            InvestigationReason::BallotsRecounted
+        );
+        assert!(!investigations[2].value);
     }
 }

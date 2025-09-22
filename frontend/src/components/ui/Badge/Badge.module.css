@@ -10,6 +10,12 @@
   color: var(--badge-polling-station);
 }
 
+.sm {
+  font-size: 1.25rem;
+  line-height: 1.9rem;
+  padding: 0 0.5rem;
+}
+
 .data_entry_section {
   font-family: var(--font-text);
   font-size: 1.25rem;

@@ -4,6 +4,8 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
+    cooldown:
+      default-days: 5
     groups:
       github-actions:
         patterns: ["*"]
@@ -11,6 +13,11 @@ updates:
     directory: "/backend"
     schedule:
       interval: "weekly"
+    cooldown:
+      default-days: 5
+      semver-major-days: 21
+      semver-minor-days: 7
+      semver-patch-days: 3
     groups:
       cargo:
         patterns: ["*"]
@@ -24,6 +31,11 @@ updates:
     directory: "/frontend"
     schedule:
       interval: "weekly"
+    cooldown:
+      default-days: 5
+      semver-major-days: 21
+      semver-minor-days: 7
+      semver-patch-days: 3
     groups:
       npm:
         patterns: ["*"]

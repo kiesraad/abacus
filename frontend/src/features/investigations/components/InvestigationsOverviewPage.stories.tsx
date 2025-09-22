@@ -6,6 +6,8 @@ const meta = {
   component: InvestigationsOverviewPage,
   parameters: {
     needsElection: true,
+    needsElectionStatus: true,
+    needsMessages: true,
   },
 } satisfies Meta<typeof InvestigationsOverviewPage>;
 

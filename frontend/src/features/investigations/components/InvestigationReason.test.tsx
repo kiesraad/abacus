@@ -3,31 +3,36 @@ import * as ReactRouter from "react-router";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
+import * as useMessages from "@/hooks/messages/useMessages";
 import { ElectionProvider } from "@/hooks/election/ElectionProvider";
+import { getElectionMockData } from "@/testing/api-mocks/ElectionMockData";
 import {
-  CommitteeSessionInvestigationCreateHandler,
   ElectionRequestHandler,
   ElectionStatusRequestHandler,
+  PollingStationInvestigationCreateHandler,
+  PollingStationInvestigationUpdateHandler,
 } from "@/testing/api-mocks/RequestHandlers";
-import { server } from "@/testing/server";
-import { render, screen, waitFor } from "@/testing/test-utils";
+import { overrideOnce, server } from "@/testing/server";
+import { render, screen, spyOnHandler, waitFor } from "@/testing/test-utils";
 
 import { InvestigationReason } from "./InvestigationReason";
 
 const navigate = vi.fn();
+const pushMessage = vi.fn();
 
 function renderPage() {
   render(
     <ElectionProvider electionId={1}>
-      <InvestigationReason pollingStationId={1} />
+      <InvestigationReason pollingStationId={3} />
     </ElectionProvider>,
   );
 }
 
 describe("InvestigationReason", () => {
   beforeEach(() => {
-    server.use(ElectionRequestHandler, ElectionStatusRequestHandler, CommitteeSessionInvestigationCreateHandler);
+    server.use(ElectionRequestHandler, ElectionStatusRequestHandler, PollingStationInvestigationCreateHandler);
     vi.spyOn(ReactRouter, "useNavigate").mockImplementation(() => navigate);
+    vi.spyOn(useMessages, "useMessages").mockReturnValue({ pushMessage, popMessages: vi.fn(() => []) });
   });
 
   test("Renders a form", async () => {
@@ -40,6 +45,9 @@ describe("InvestigationReason", () => {
   });
 
   test("Displays an error message when submitting an empty form", async () => {
+    const electionData = getElectionMockData({}, {}, []);
+    overrideOnce("get", "/api/elections/1", 200, electionData);
+
     renderPage();
 
     const reason = await screen.findByLabelText("Aanleiding en opdracht");
@@ -51,10 +59,14 @@ describe("InvestigationReason", () => {
       expect(reason).toBeInvalid();
     });
 
-    expect(reason).toHaveAccessibleErrorMessage("Dit veld mag niet leeg zijn");
+    expect(reason).toHaveAccessibleErrorMessage("Vul de opdracht van het centraal stembureau in");
   });
 
   test("Navigate to the next page when submitting a reason", async () => {
+    const create = spyOnHandler(PollingStationInvestigationCreateHandler);
+    const electionData = getElectionMockData({}, {}, []);
+    overrideOnce("get", "/api/elections/1", 200, electionData);
+
     renderPage();
 
     const reason = await screen.findByLabelText("Aanleiding en opdracht");
@@ -66,6 +78,39 @@ describe("InvestigationReason", () => {
 
     await waitFor(() => {
       expect(navigate).toHaveBeenCalledWith("../print-corrigendum");
+    });
+    expect(create).toHaveBeenCalledWith({
+      reason: "Reden voor onderzoek",
+    });
+    expect(pushMessage).toHaveBeenCalledWith({ title: "Onderzoek voor stembureau 35 (Testschool) toegevoegd" });
+  });
+
+  test("Update the existing reason", async () => {
+    server.use(PollingStationInvestigationUpdateHandler);
+    const update = spyOnHandler(PollingStationInvestigationUpdateHandler);
+
+    renderPage();
+
+    const reason = await screen.findByLabelText("Aanleiding en opdracht");
+    expect(reason).toHaveValue("Test reason 1");
+
+    const user = userEvent.setup();
+    await user.clear(reason);
+    await user.type(reason, "New test reason 1");
+
+    expect(reason).toHaveValue("New test reason 1");
+
+    const submitButton = await screen.findByRole("button", { name: "Opslaan" });
+    submitButton.click();
+
+    await waitFor(() => {
+      expect(navigate).toHaveBeenCalledWith("../print-corrigendum");
+    });
+    expect(update).toHaveBeenCalledWith({
+      reason: "New test reason 1",
+    });
+    expect(pushMessage).toHaveBeenCalledWith({
+      title: "Wijzigingen in onderzoek stembureau 35 (Testschool) opgeslagen",
     });
   });
 });

@@ -36,8 +36,8 @@ export function PollingStationDeleteModal({
   const deleting = requestState.status === "loading";
 
   return (
-    <Modal title={t("polling_station.delete")} onClose={onCancel}>
-      <p>{t("polling_station.delete_are_you_sure")}</p>
+    <Modal title={t("polling_station.delete_modal.title")} onClose={onCancel}>
+      <p>{t("polling_station.delete_modal.confirm")}</p>
       <nav>
         <Button
           leftIcon={<IconTrash />}

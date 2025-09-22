@@ -1959,7 +1959,7 @@ mod tests {
     /// Only a result from committee session 1, should return 1
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_7_four_sessions"))))]
     async fn test_previous_results_from_first_session(pool: SqlitePool) {
-        let election = crate::election::repository::get(&mut pool.acquire().await.unwrap(), 700)
+        let election = crate::election::repository::get(&mut pool.acquire().await.unwrap(), 7)
             .await
             .unwrap();
         add_results(&pool, 711, 701, &election.political_groups, true).await;
@@ -1970,7 +1970,7 @@ mod tests {
     /// Results from committee session 1 and 3, with a gap in between, should return 3
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_7_four_sessions"))))]
     async fn test_previous_results_with_session_gap(pool: SqlitePool) {
-        let election = crate::election::repository::get(&mut pool.acquire().await.unwrap(), 700)
+        let election = crate::election::repository::get(&mut pool.acquire().await.unwrap(), 7)
             .await
             .unwrap();
         add_results(&pool, 711, 701, &election.political_groups, true).await;
@@ -1982,7 +1982,7 @@ mod tests {
     /// Results with only one in committee session 2, should return 2
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_7_four_sessions"))))]
     async fn test_previous_results_from_second_session(pool: SqlitePool) {
-        let election = crate::election::repository::get(&mut pool.acquire().await.unwrap(), 700)
+        let election = crate::election::repository::get(&mut pool.acquire().await.unwrap(), 7)
             .await
             .unwrap();
         add_results(&pool, 722, 702, &election.political_groups, false).await;
@@ -1993,7 +1993,7 @@ mod tests {
     /// Two subsequent results from committee sessions 2 and 3, should return 3rd
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_7_four_sessions"))))]
     async fn test_previous_results_from_last_two_sessions(pool: SqlitePool) {
-        let election = crate::election::repository::get(&mut pool.acquire().await.unwrap(), 700)
+        let election = crate::election::repository::get(&mut pool.acquire().await.unwrap(), 7)
             .await
             .unwrap();
         add_results(&pool, 732, 703, &election.political_groups, false).await;

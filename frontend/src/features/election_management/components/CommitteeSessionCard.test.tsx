@@ -33,6 +33,7 @@ describe("UI component: CommitteeSessionCard", () => {
     expect(screen.getByText("Eerste zitting")).toBeVisible();
     expect(screen.getByText("— Zitting voorbereiden")).toBeInTheDocument();
 
+    expect(screen.queryByRole("button", { name: "Aangevraagde onderzoeken" })).not.toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "Zitting verwijderen" })).not.toBeInTheDocument();
   });
 
@@ -50,6 +51,8 @@ describe("UI component: CommitteeSessionCard", () => {
 
     expect(screen.getByText("Tweede zitting")).toBeVisible();
     expect(screen.getByText("— Zitting voorbereiden")).toBeVisible();
+
+    expect(screen.getByRole("button", { name: "Aangevraagde onderzoeken" })).toBeVisible();
 
     const deleteButton = screen.getByRole("button", { name: "Zitting verwijderen" });
     expect(deleteButton).toBeVisible();
@@ -73,6 +76,7 @@ describe("UI component: CommitteeSessionCard", () => {
     expect(screen.getByText("Tweede zitting")).toBeVisible();
     expect(screen.getByText("— Zitting voorbereiden")).toBeVisible();
 
+    expect(screen.getByRole("button", { name: "Aangevraagde onderzoeken" })).toBeVisible();
     expect(screen.queryByRole("button", { name: "Zitting verwijderen" })).not.toBeInTheDocument();
   });
 
@@ -91,6 +95,7 @@ describe("UI component: CommitteeSessionCard", () => {
     expect(screen.getByText("Eerste zitting")).toBeVisible();
     expect(screen.getByText("— Klaar voor steminvoer")).toBeVisible();
 
+    expect(screen.queryByRole("button", { name: "Aangevraagde onderzoeken" })).not.toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "Zitting verwijderen" })).not.toBeInTheDocument();
 
     const startButton = screen.getByRole("button", { name: "Start steminvoer" });
@@ -117,6 +122,8 @@ describe("UI component: CommitteeSessionCard", () => {
     expect(screen.getByText("Tweede zitting")).toBeVisible();
     expect(screen.getByText("— Klaar voor steminvoer")).toBeVisible();
 
+    expect(screen.getByRole("button", { name: "Aangevraagde onderzoeken" })).toBeVisible();
+
     const deleteButton = screen.getByRole("button", { name: "Zitting verwijderen" });
     expect(deleteButton).toBeVisible();
 
@@ -139,11 +146,12 @@ describe("UI component: CommitteeSessionCard", () => {
     expect(screen.getByText("Eerste zitting")).toBeVisible();
     expect(screen.getByText("— Klaar voor steminvoer")).toBeVisible();
 
+    expect(screen.queryByRole("button", { name: "Aangevraagde onderzoeken" })).not.toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "Zitting verwijderen" })).not.toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "Start steminvoer" })).not.toBeInTheDocument();
   });
 
-  test("The card renders with status data_entry_in_progress", async () => {
+  test("The card renders with status data_entry_in_progress committee session number 1 for coordinator", async () => {
     vi.spyOn(useUser, "useUser").mockReturnValue(getCoordinatorUser());
     const user = userEvent.setup();
     const statusChange = spyOnHandler(CommitteeSessionStatusChangeRequestHandler);
@@ -160,6 +168,7 @@ describe("UI component: CommitteeSessionCard", () => {
     expect(screen.getByText("Eerste zitting")).toBeVisible();
     expect(screen.getByText("— Steminvoer bezig")).toBeVisible();
 
+    expect(screen.queryByRole("button", { name: "Aangevraagde onderzoeken" })).not.toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "Zitting verwijderen" })).not.toBeInTheDocument();
 
     const statusButton = screen.getByRole("link", { name: "Bekijk voortgang" });
@@ -171,7 +180,36 @@ describe("UI component: CommitteeSessionCard", () => {
     expect(router.state.location.pathname).toEqual("/status");
   });
 
-  test("The card renders with status data_entry_paused for coordinator", async () => {
+  test("The card renders with status data_entry_in_progress committee session number 2 for coordinator", async () => {
+    vi.spyOn(useUser, "useUser").mockReturnValue(getCoordinatorUser());
+    const user = userEvent.setup();
+    const statusChange = spyOnHandler(CommitteeSessionStatusChangeRequestHandler);
+    const committeeSession = getCommitteeSessionMockData({
+      number: 2,
+      status: "data_entry_in_progress",
+      start_date_time: "",
+      location: "Juinen",
+    });
+    const router = renderReturningRouter(
+      <CommitteeSessionCard committeeSession={committeeSession} currentSession={true} />,
+    );
+
+    expect(screen.getByText("Tweede zitting")).toBeVisible();
+    expect(screen.getByText("— Steminvoer bezig")).toBeVisible();
+
+    expect(screen.getByRole("button", { name: "Aangevraagde onderzoeken" })).toBeVisible();
+    expect(screen.queryByRole("button", { name: "Zitting verwijderen" })).not.toBeInTheDocument();
+
+    const statusButton = screen.getByRole("link", { name: "Bekijk voortgang" });
+    expect(statusButton).toBeVisible();
+
+    await user.click(statusButton);
+
+    expect(statusChange).not.toHaveBeenCalled();
+    expect(router.state.location.pathname).toEqual("/status");
+  });
+
+  test("The card renders with status data_entry_paused committee session number 1 for coordinator", async () => {
     vi.spyOn(useUser, "useUser").mockReturnValue(getCoordinatorUser());
     const user = userEvent.setup();
     const statusChange = spyOnHandler(CommitteeSessionStatusChangeRequestHandler);
@@ -186,6 +224,34 @@ describe("UI component: CommitteeSessionCard", () => {
     expect(screen.getByText("Eerste zitting")).toBeVisible();
     expect(screen.getByText("— Steminvoer gepauzeerd")).toBeVisible();
 
+    expect(screen.queryByRole("button", { name: "Aangevraagde onderzoeken" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Zitting verwijderen" })).not.toBeInTheDocument();
+
+    const statusButton = screen.getByRole("button", { name: "Hervatten of voortgang bekijken" });
+    expect(statusButton).toBeVisible();
+
+    await user.click(statusButton);
+
+    expect(statusChange).not.toHaveBeenCalled();
+    expect(navigate).toHaveBeenCalledWith("status", {});
+  });
+
+  test("The card renders with status data_entry_paused committee session number 2 for coordinator", async () => {
+    vi.spyOn(useUser, "useUser").mockReturnValue(getCoordinatorUser());
+    const user = userEvent.setup();
+    const statusChange = spyOnHandler(CommitteeSessionStatusChangeRequestHandler);
+    const committeeSession = getCommitteeSessionMockData({
+      number: 2,
+      status: "data_entry_paused",
+      start_date_time: "",
+      location: "Juinen",
+    });
+    render(<CommitteeSessionCard committeeSession={committeeSession} currentSession={true} />);
+
+    expect(screen.getByText("Tweede zitting")).toBeVisible();
+    expect(screen.getByText("— Steminvoer gepauzeerd")).toBeVisible();
+
+    expect(screen.getByRole("button", { name: "Aangevraagde onderzoeken" })).toBeVisible();
     expect(screen.queryByRole("button", { name: "Zitting verwijderen" })).not.toBeInTheDocument();
 
     const statusButton = screen.getByRole("button", { name: "Hervatten of voortgang bekijken" });
@@ -212,6 +278,7 @@ describe("UI component: CommitteeSessionCard", () => {
     expect(screen.getByText("Eerste zitting")).toBeVisible();
     expect(screen.getByText("— Steminvoer gepauzeerd")).toBeVisible();
 
+    expect(screen.queryByRole("button", { name: "Aangevraagde onderzoeken" })).not.toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "Zitting verwijderen" })).not.toBeInTheDocument();
 
     const statusButton = screen.getByRole("button", { name: "Bekijk voortgang" });
@@ -238,6 +305,7 @@ describe("UI component: CommitteeSessionCard", () => {
     expect(screen.getByText("Eerste zitting")).toBeVisible();
     expect(screen.getByText("— Steminvoer afgerond")).toBeVisible();
 
+    expect(screen.queryByRole("button", { name: "Aangevraagde onderzoeken" })).not.toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "Zitting verwijderen" })).not.toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Resultaten en documenten" }));
 
@@ -265,6 +333,7 @@ describe("UI component: CommitteeSessionCard", () => {
     expect(screen.getByText("Eerste zitting")).toBeVisible();
     expect(screen.getByText("— Steminvoer afgerond")).toBeVisible();
 
+    expect(screen.queryByRole("button", { name: "Aangevraagde onderzoeken" })).not.toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "Zitting verwijderen" })).not.toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "Resultaten en documenten" })).not.toBeInTheDocument();
 
@@ -293,6 +362,7 @@ describe("UI component: CommitteeSessionCard", () => {
     expect(screen.getByText("— Steminvoer afgerond")).toBeVisible();
     expect(screen.getByText("zondag 9 november 2025 09:15")).toBeVisible();
 
+    expect(screen.queryByRole("button", { name: "Aangevraagde onderzoeken" })).not.toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "Zitting verwijderen" })).not.toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "Steminvoer bekijken" })).not.toBeInTheDocument();
 

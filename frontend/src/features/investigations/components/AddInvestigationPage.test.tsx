@@ -3,12 +3,15 @@ import { beforeEach, describe, expect, test } from "vitest";
 
 import { ErrorBoundary } from "@/components/error/ErrorBoundary";
 import { ElectionLayout } from "@/components/layout/ElectionLayout";
+import { getElectionMockData } from "@/testing/api-mocks/ElectionMockData";
 import { ElectionRequestHandler, ElectionStatusRequestHandler } from "@/testing/api-mocks/RequestHandlers";
 import { Providers } from "@/testing/Providers";
-import { server } from "@/testing/server";
-import { screen, setupTestRouter } from "@/testing/test-utils";
+import { overrideOnce, server } from "@/testing/server";
+import { screen, setupTestRouter, within } from "@/testing/test-utils";
 
 import { AddInvestigationPage } from "./AddInvestigationPage";
+import { InvestigationsLayout } from "./InvestigationsLayout";
+import { InvestigationsOverviewPage } from "./InvestigationsOverviewPage";
 
 async function renderPage() {
   const router = setupTestRouter([
@@ -19,20 +22,20 @@ async function renderPage() {
       children: [
         {
           path: "investigations",
+          Component: InvestigationsLayout,
           children: [
+            { index: true, Component: InvestigationsOverviewPage },
             {
               path: "add",
               Component: AddInvestigationPage,
+            },
+            {
+              path: ":pollingStationId",
               children: [
                 {
-                  path: ":pollingStationId",
-                  children: [
-                    {
-                      index: true,
-                      path: "reason",
-                      Component: () => "Reason stub",
-                    },
-                  ],
+                  index: true,
+                  path: "reason",
+                  Component: () => "Reason stub",
                 },
               ],
             },
@@ -62,24 +65,20 @@ describe("AddInvestigationPage", () => {
     expect(table).toBeInTheDocument();
     expect(table).toHaveTableContent([
       ["Nummer", "Stembureau"],
-      ["34", "Testplek"],
-      ["35", "Testschool"],
-      ["36", "Testbuurthuis"],
       ["37", "Dansschool Oeps nou deed ik het weer"],
       ["38", "Testmuseum"],
       ["39", "Test gemeentehuis"],
-      ["40", "Test kerk"],
     ]);
   });
 
   test("It navigates to add investigation when clicking a table row", async () => {
     const router = await renderPage();
 
-    const row = await screen.findByRole("row", { name: "34 Testplek" });
+    const row = await screen.findByRole("row", { name: "38 Testmuseum" });
     row.click();
 
     await waitFor(() => {
-      expect(router.state.location.pathname).toEqual("/elections/1/investigations/add/2/reason");
+      expect(router.state.location.pathname).toEqual("/elections/1/investigations/6/reason");
     });
   });
 
@@ -92,6 +91,33 @@ describe("AddInvestigationPage", () => {
     expect(screen.queryByRole("row", { name: "33 Op Rolletjes" })).not.toBeInTheDocument();
 
     // But other polling stations should still be visible
-    expect(await screen.findByRole("row", { name: "34 Testplek" })).toBeVisible();
+    expect(await screen.findByRole("row", { name: "38 Testmuseum" })).toBeVisible();
+  });
+
+  test("Shows error with link when no polling stations are available to investigate", async () => {
+    const electionData = getElectionMockData({}, { id: 2, number: 2, status: "created" });
+    electionData.polling_stations = [];
+    overrideOnce("get", "/api/elections/1", 200, electionData);
+
+    const router = await renderPage();
+
+    const table = await screen.findByRole("table");
+    expect(table).toBeVisible();
+    expect(table).toHaveTableContent([["Nummer", "Stembureau"], ["Geen stembureaus gevonden"]]);
+
+    const errorAlert = await screen.findByRole("alert");
+    expect(within(errorAlert).getByRole("strong")).toHaveTextContent("Geen stembureaus om uit te kiezen");
+    expect(within(errorAlert).getByRole("paragraph")).toHaveTextContent(
+      ["Je hebt voor alle stembureaus al een onderzoek toegevoegd.", "Je kan niet nog een onderzoek toevoegen."].join(
+        "",
+      ),
+    );
+    const backToOverviewLink = await within(errorAlert).findByRole("link");
+
+    backToOverviewLink.click();
+
+    await waitFor(() => {
+      expect(router.state.location.pathname).toEqual("/elections/1/investigations");
+    });
   });
 });

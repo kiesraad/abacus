@@ -37,7 +37,7 @@ export const AllBadges: StoryObj = {
     const firstEntryInProgressBadge = canvas.getByTestId("first_entry_in_progress");
     await expect(firstEntryInProgressBadge).toBeVisible();
     await expect(firstEntryInProgressBadge).toHaveTextContent("1e invoer");
-    await expect(within(firstEntryInProgressBadge).getByRole("img")).toHaveAttribute("data-icon", "IconPencil");
+    await expect(within(firstEntryInProgressBadge).getByRole("img")).toHaveAttribute("data-icon", "IconEdit");
 
     const secondEntryBadge = canvas.getByTestId("second_entry_not_started");
     await expect(secondEntryBadge).toBeVisible();
@@ -47,7 +47,7 @@ export const AllBadges: StoryObj = {
     const secondEntryInProgressBadge = canvas.getByTestId("second_entry_in_progress");
     await expect(secondEntryInProgressBadge).toBeVisible();
     await expect(secondEntryInProgressBadge).toHaveTextContent("2e invoer");
-    await expect(within(secondEntryInProgressBadge).getByRole("img")).toHaveAttribute("data-icon", "IconPencil");
+    await expect(within(secondEntryInProgressBadge).getByRole("img")).toHaveAttribute("data-icon", "IconEdit");
 
     const entriesDifferentBadge = canvas.getByTestId("entries_different");
     await expect(entriesDifferentBadge).toBeVisible();

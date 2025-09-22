@@ -10,10 +10,11 @@ import { FormLayout } from "@/components/ui/Form/FormLayout";
 import { InputField } from "@/components/ui/InputField/InputField";
 import { Loader } from "@/components/ui/Loader/Loader";
 import { useElection } from "@/hooks/election/useElection";
+import { useMessages } from "@/hooks/messages/useMessages";
 import { t } from "@/i18n/translate";
 import {
   PollingStationInvestigationConcludeRequest,
-  PollingStationInvestigationCreateRequest,
+  PollingStationInvestigationUpdateRequest,
 } from "@/types/generated/openapi";
 import { StringFormData } from "@/utils/stringFormData";
 
@@ -23,10 +24,13 @@ interface InvestigationFindingsProps {
 
 export function InvestigationFindings({ pollingStationId }: InvestigationFindingsProps) {
   const navigate = useNavigate();
+  const { election, investigation, pollingStation, refetch } = useElection(pollingStationId);
+  const { pushMessage } = useMessages();
+  const concludePath = `/api/polling_stations/${pollingStationId}/investigation/conclude`;
+  const { create: conclude } = useCrud<PollingStationInvestigationConcludeRequest>({ create: concludePath });
+  const path = `/api/polling_stations/${pollingStationId}/investigation`;
+  const { update } = useCrud<PollingStationInvestigationUpdateRequest>({ update: path });
 
-  const { election, investigation, refetch } = useElection(pollingStationId);
-  const path = `/api/polling_stations/${pollingStationId}/investigations`;
-  const { update } = useCrud<PollingStationInvestigationCreateRequest>({ update: path });
   const [nonEmptyError, setNonEmptyError] = useState(false);
   const [radioError, setRadioError] = useState(false);
   const [apiError, setApiError] = useState<AnyApiError>();
@@ -35,7 +39,7 @@ export function InvestigationFindings({ pollingStationId }: InvestigationFinding
     throw apiError;
   }
 
-  if (!investigation) {
+  if (!investigation || !pollingStation) {
     return <Loader />;
   }
 
@@ -66,8 +70,31 @@ export function InvestigationFindings({ pollingStationId }: InvestigationFinding
     }
 
     const correctedResults = correctedResultsChoice === "yes";
-    const body: PollingStationInvestigationConcludeRequest = { findings, corrected_results: correctedResults };
-    const response = await update(body);
+
+    const save = () => {
+      pushMessage({
+        title: t("investigations.message.investigation_updated", {
+          number: pollingStation.number,
+          name: pollingStation.name,
+        }),
+      });
+
+      if (investigation.findings !== undefined) {
+        return update({
+          reason: investigation.reason,
+          findings,
+          corrected_results: correctedResults,
+        });
+      } else {
+        return conclude({
+          findings,
+          corrected_results: correctedResults,
+        });
+      }
+    };
+
+    const response = await save();
+
     if (isSuccess(response)) {
       await refetch();
       await navigate(`/elections/${election.id}/investigations`);
@@ -89,8 +116,9 @@ export function InvestigationFindings({ pollingStationId }: InvestigationFinding
             fieldSize="text-area"
             name="findings"
             label={t("investigations.findings.title")}
-            error={nonEmptyError ? t("form_errors.FORM_VALIDATION_RESULT_REQUIRED") : undefined}
+            error={nonEmptyError ? t("investigations.findings.error") : undefined}
             hint={t("investigations.findings.hint")}
+            defaultValue={investigation.findings || ""}
           />
           <ChoiceList>
             <ChoiceList.Legend>{t("investigations.findings.corrected_result")}</ChoiceList.Legend>
@@ -99,10 +127,22 @@ export function InvestigationFindings({ pollingStationId }: InvestigationFinding
                 {t("investigations.findings.pick_corrected_result")}
               </ChoiceList.Error>
             )}
-            <ChoiceList.Radio id="corrected_results_yes" name="corrected_results" value="yes" label={t("yes")}>
+            <ChoiceList.Radio
+              id="corrected_results_yes"
+              name="corrected_results"
+              value="yes"
+              label={t("yes")}
+              defaultChecked={investigation.corrected_results === true}
+            >
               {t("investigations.findings.corrected_result_yes")}
             </ChoiceList.Radio>
-            <ChoiceList.Radio id="corrected_results_no" name="corrected_results" value="no" label={t("no")}>
+            <ChoiceList.Radio
+              id="corrected_results_no"
+              name="corrected_results"
+              value="no"
+              label={t("no")}
+              defaultChecked={investigation.corrected_results === false}
+            >
               {t("investigations.findings.corrected_result_no")}
             </ChoiceList.Radio>
           </ChoiceList>

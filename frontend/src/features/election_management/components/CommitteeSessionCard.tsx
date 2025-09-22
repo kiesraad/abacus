@@ -142,10 +142,10 @@ export function CommitteeSessionCard({
 
   switch (committeeSession.status) {
     case "created":
+      if (currentSession && committeeSession.number > 1) {
+        buttonLinks.push(investigationsButtonLink);
+      }
       if (isCoordinator && currentSession) {
-        if (committeeSession.number > 1) {
-          buttonLinks.push(investigationsButtonLink);
-        }
         buttonLinks.push(detailsButtonLink);
         if (committeeSession.number > 1) {
           buttonLinks.push(deleteButtonLink);
@@ -153,6 +153,9 @@ export function CommitteeSessionCard({
       }
       break;
     case "data_entry_not_started":
+      if (currentSession && committeeSession.number > 1) {
+        buttonLinks.push(investigationsButtonLink);
+      }
       if (isCoordinator && currentSession) {
         buttonLinks.push(detailsButtonLink);
         if (committeeSession.number > 1) {
@@ -168,21 +171,25 @@ export function CommitteeSessionCard({
       }
       break;
     case "data_entry_in_progress":
+      if (currentSession && committeeSession.number > 1) {
+        buttonLinks.push(investigationsButtonLink);
+      }
       if (isCoordinator && currentSession) {
         buttonLinks.push(detailsButtonLink);
       }
       button = (
         <Button.Link size="sm" to="status">
-          {t("election_management.view_progress")}
+          {t("view_progress")}
         </Button.Link>
       );
       break;
     case "data_entry_paused":
+      if (currentSession && committeeSession.number > 1) {
+        buttonLinks.push(investigationsButtonLink);
+      }
       buttonLinks.push({
         id: committeeSession.id,
-        label: isCoordinator
-          ? t("election_management.resume_or_check_progress")
-          : t("election_management.view_progress"),
+        label: isCoordinator ? t("election_management.resume_or_check_progress") : t("view_progress"),
         to: "status",
       });
       if (isCoordinator && currentSession) {

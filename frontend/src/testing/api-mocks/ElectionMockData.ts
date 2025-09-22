@@ -6,6 +6,7 @@ import {
   ElectionWithPoliticalGroups,
   NewElection,
   PoliticalGroup,
+  PollingStationInvestigation,
 } from "@/types/generated/openapi";
 
 import { committeeSessionMockData, getCommitteeSessionMockData } from "./CommitteeSessionMockData";
@@ -264,9 +265,41 @@ export const electionListMockResponse: ElectionListResponse = {
   ],
 };
 
+export const mockInvestigations: PollingStationInvestigation[] = [
+  {
+    polling_station_id: 3,
+    reason: "Test reason 1",
+  },
+  {
+    polling_station_id: 1,
+    reason: "Test reason 2",
+    findings: "Test findings 2",
+    corrected_results: true,
+  },
+  {
+    polling_station_id: 4,
+    reason: "Test reason 3",
+    findings: "Test findings 3",
+    corrected_results: true,
+  },
+  {
+    polling_station_id: 2,
+    reason: "Test reason 4",
+    findings: "Test findings 4",
+    corrected_results: true,
+  },
+  {
+    polling_station_id: 8,
+    reason: "Test reason 5",
+    findings: "Test findings 5",
+    corrected_results: false,
+  },
+];
+
 export const getElectionMockData = (
   election: Partial<ElectionWithPoliticalGroups> = {},
   committeeSession: Partial<CommitteeSession> = {},
+  investigations: PollingStationInvestigation[] = mockInvestigations,
 ): Required<ElectionDetailsResponse> => {
   const updatedCommitteeSession = getCommitteeSessionMockData(committeeSession);
   return {
@@ -278,12 +311,7 @@ export const getElectionMockData = (
       ...election,
     },
     polling_stations: pollingStationMockData,
-    investigations: [
-      {
-        polling_station_id: 1,
-        reason: "Test reason",
-      },
-    ],
+    investigations,
   };
 };
 

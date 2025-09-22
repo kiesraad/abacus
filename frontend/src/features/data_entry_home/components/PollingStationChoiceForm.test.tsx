@@ -531,7 +531,7 @@ describe("Test PollingStationChoiceForm", () => {
       const pollingStationFeedback = await screen.findByTestId("pollingStationSelectorFeedback");
       expect(await within(pollingStationFeedback).findByText(testPollingStation.name)).toBeVisible();
 
-      expect(within(pollingStationFeedback).getByRole("img")).toHaveAttribute("data-icon", "IconPencil");
+      expect(within(pollingStationFeedback).getByRole("img")).toHaveAttribute("data-icon", "IconEdit");
     });
   });
 

@@ -360,7 +360,7 @@ async fn generate_polling_stations(
             election.id,
             PollingStationRequest {
                 name: abacus::test_data_gen::polling_station_name(rng),
-                number: i64::from(i),
+                number: Some(i64::from(i)),
                 number_of_voters: Some(ps_num_voters.into()),
                 polling_station_type: Some(PollingStationType::FixedLocation),
                 address: abacus::test_data_gen::address(rng),

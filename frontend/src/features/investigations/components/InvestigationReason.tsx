@@ -7,9 +7,14 @@ import { Button } from "@/components/ui/Button/Button";
 import { Form } from "@/components/ui/Form/Form";
 import { FormLayout } from "@/components/ui/Form/FormLayout";
 import { InputField } from "@/components/ui/InputField/InputField";
+import { Loader } from "@/components/ui/Loader/Loader";
 import { useElection } from "@/hooks/election/useElection";
+import { useMessages } from "@/hooks/messages/useMessages";
 import { t } from "@/i18n/translate";
-import { PollingStationInvestigationCreateRequest } from "@/types/generated/openapi";
+import {
+  PollingStationInvestigationCreateRequest,
+  PollingStationInvestigationUpdateRequest,
+} from "@/types/generated/openapi";
 import { StringFormData } from "@/utils/stringFormData";
 
 interface InvestigationReasonProps {
@@ -18,12 +23,17 @@ interface InvestigationReasonProps {
 
 export function InvestigationReason({ pollingStationId }: InvestigationReasonProps) {
   const navigate = useNavigate();
-  const { refetch } = useElection();
+  const { investigation, pollingStation, refetch } = useElection(pollingStationId);
+  const { pushMessage } = useMessages();
   const [nonEmptyError, setNonEmptyError] = useState(false);
-  const path = `/api/polling_stations/${pollingStationId}/investigations`;
-  const { create } = useCrud<PollingStationInvestigationCreateRequest>({ create: path });
-
+  const path = `/api/polling_stations/${pollingStationId}/investigation`;
+  const { create } = useCrud<PollingStationInvestigationCreateRequest>(path);
+  const { update } = useCrud<PollingStationInvestigationUpdateRequest>(path);
   const [error, setError] = useState<AnyApiError>();
+
+  if (!pollingStation) {
+    return <Loader />;
+  }
 
   if (error) {
     throw error;
@@ -42,8 +52,34 @@ export function InvestigationReason({ pollingStationId }: InvestigationReasonPro
 
     setNonEmptyError(false);
 
-    const body: PollingStationInvestigationCreateRequest = { reason };
-    const response = await create(body);
+    const save = () => {
+      if (investigation != undefined) {
+        pushMessage({
+          title: t("investigations.message.investigation_updated", {
+            number: pollingStation.number,
+            name: pollingStation.name,
+          }),
+        });
+
+        return update({
+          reason,
+          findings: investigation.findings,
+          corrected_results: investigation.corrected_results,
+        });
+      } else {
+        pushMessage({
+          title: t("investigations.message.investigation_created", {
+            number: pollingStation.number,
+            name: pollingStation.name,
+          }),
+        });
+
+        return create({ reason });
+      }
+    };
+
+    const response = await save();
+
     if (isSuccess(response)) {
       await refetch();
       await navigate("../print-corrigendum");
@@ -70,11 +106,12 @@ export function InvestigationReason({ pollingStationId }: InvestigationReasonPro
             fieldSize="text-area"
             name="reason"
             label={t("investigations.reason_and_assignment.title")}
-            error={nonEmptyError ? t("form_errors.FORM_VALIDATION_RESULT_REQUIRED") : undefined}
+            error={nonEmptyError ? t("investigations.reason_and_assignment.error") : undefined}
+            defaultValue={investigation?.reason}
           />
         </FormLayout.Section>
         <FormLayout.Controls>
-          <Button type="submit">{t("next")}</Button>
+          <Button type="submit">{investigation ? t("save") : t("next")}</Button>
         </FormLayout.Controls>
       </FormLayout>
     </Form>

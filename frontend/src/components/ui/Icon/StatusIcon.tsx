@@ -1,9 +1,9 @@
 import {
   IconArrowNarrowRight,
   IconCheckmark,
+  IconEdit,
   IconError,
   IconMinus,
-  IconPencil,
   IconWarning,
 } from "@/components/generated/icons";
 import { t } from "@/i18n/translate";
@@ -20,7 +20,7 @@ export function StatusIcon({ status }: { status: MenuStatus }) {
     case "empty":
       return <IconMinus aria-label={t("empty")} />; // "Geen invoer gedaan"
     case "unsaved":
-      return <IconPencil aria-label={t("not_yet_finished")} />; // "Niet opgeslagen wijzigingen"
+      return <IconEdit aria-label={t("not_yet_finished")} />; // "Niet opgeslagen wijzigingen"
     case "error":
       return <IconError aria-label={t("contains_error")} />; // "Ingevoerd, met openstaande fouten"
     default:

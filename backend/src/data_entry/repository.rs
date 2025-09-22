@@ -1,4 +1,4 @@
-use sqlx::{Connection, SqliteConnection, query, query_as, types::Json};
+use sqlx::{Connection, Error, SqliteConnection, query, query_as, types::Json};
 
 use super::{PollingStationDataEntry, status::DataEntryStatus};
 use crate::{
@@ -99,6 +99,29 @@ pub async fn upsert(
     )
     .fetch_one(conn)
     .await
+}
+
+pub async fn delete(conn: &mut SqliteConnection, polling_station_id: u32) -> Result<bool, Error> {
+    let mut tx = conn.begin().await?;
+
+    let data_entries_rows_affected = query!(
+        r#"DELETE FROM polling_station_data_entries WHERE polling_station_id = ?"#,
+        polling_station_id,
+    )
+    .execute(&mut *tx)
+    .await?
+    .rows_affected();
+    let results_rows_affected = query!(
+        r#"DELETE FROM polling_station_results WHERE polling_station_id = ?"#,
+        polling_station_id,
+    )
+    .execute(&mut *tx)
+    .await?
+    .rows_affected();
+
+    tx.commit().await?;
+
+    Ok(data_entries_rows_affected > 0 && results_rows_affected > 0)
 }
 
 /// Get the status for each polling station data entry in an election

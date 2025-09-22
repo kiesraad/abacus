@@ -184,15 +184,17 @@ async fn polling_station_investigation_update(
     _user: Coordinator,
     State(pool): State<SqlitePool>,
     audit_service: AuditService,
-    CurrentSessionPollingStationId(polling_station_id): CurrentSessionPollingStationId,
+    Path(polling_station_id): Path<u32>,
     Json(polling_station_investigation): Json<PollingStationInvestigationUpdateRequest>,
 ) -> Result<PollingStationInvestigation, APIError> {
     let mut tx = pool.begin_immediate().await?;
+    let polling_station =
+        crate::polling_station::repository::get(&mut tx, polling_station_id).await?;
 
     let investigation = update_polling_station_investigation(
         &mut tx,
         polling_station_id,
-        polling_station_investigation,
+        polling_station_investigation.clone(),
     )
     .await?;
 
@@ -203,6 +205,18 @@ async fn polling_station_investigation_update(
             None,
         )
         .await?;
+
+    if let Some(corrected_results) = polling_station_investigation.corrected_results {
+        // When changing corrected_results to false, delete polling station data entries and results
+        if !corrected_results {
+            crate::data_entry::delete_data_entry_and_result_for_polling_station(
+                &mut tx,
+                audit_service,
+                &polling_station,
+            )
+            .await?;
+        }
+    }
 
     tx.commit().await?;
 
@@ -234,6 +248,8 @@ async fn polling_station_investigation_delete(
     let investigation = get_polling_station_investigation(&mut tx, polling_station_id).await?;
     let polling_station =
         crate::polling_station::repository::get(&mut tx, polling_station_id).await?;
+
+    // Delete investigation and potential data entry and results linked to the polling station
     delete_polling_station_investigation(&mut tx, polling_station_id).await?;
 
     audit_service
@@ -243,6 +259,13 @@ async fn polling_station_investigation_delete(
             None,
         )
         .await?;
+
+    crate::data_entry::delete_data_entry_and_result_for_polling_station(
+        &mut tx,
+        audit_service.clone(),
+        &polling_station,
+    )
+    .await?;
 
     if list_investigations_for_committee_session(&mut tx, polling_station.committee_session_id)
         .await?

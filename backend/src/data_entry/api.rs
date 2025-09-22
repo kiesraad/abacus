@@ -14,7 +14,7 @@ use super::{
     CSONextSessionResults, CommonPollingStationResults, DataEntryStatusResponse, DataError,
     PollingStationDataEntry, PollingStationResults, ValidationResults,
     entry_number::EntryNumber,
-    repository::most_recent_results_for_polling_station,
+    repository::{delete, entry_exists, get_row, most_recent_results_for_polling_station},
     status::{
         ClientState, CurrentDataEntry, DataEntryStatus, DataEntryStatusName,
         DataEntryTransitionError, EntriesDifferent, FirstEntryHasErrors,
@@ -96,6 +96,27 @@ async fn get_polling_station_election_and_committee_session_id(
             .await?;
     let election = crate::election::repository::get(conn, committee_session.election_id).await?;
     Ok((polling_station, election, committee_session))
+}
+
+pub async fn delete_data_entry_and_result_for_polling_station(
+    conn: &mut SqliteConnection,
+    audit_service: AuditService,
+    polling_station: &PollingStation,
+) -> Result<(), APIError> {
+    if entry_exists(conn, polling_station.id).await? {
+        let data_entry = get_row(
+            conn,
+            polling_station.id,
+            polling_station.committee_session_id,
+        )
+        .await?;
+        if delete(conn, polling_station.id).await? {
+            audit_service
+                .log(conn, &AuditEvent::DataEntryDeleted(data_entry.into()), None)
+                .await?;
+        }
+    }
+    Ok(())
 }
 
 fn validate_committee_session_for_typist(

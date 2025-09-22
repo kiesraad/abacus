@@ -184,7 +184,7 @@ async fn test_investigation_creation_for_committee_session_with_finished_status(
     );
 
     assert_eq!(
-        create_investigation(pool.clone(), 8).await.status(),
+        create_investigation(pool.clone(), 9).await.status(),
         StatusCode::OK
     );
 

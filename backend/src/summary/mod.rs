@@ -5,8 +5,8 @@ use crate::{
     APIError,
     data_entry::{
         CSOFirstSessionResults, CandidateVotes, Count, DifferencesCounts,
-        PoliticalGroupCandidateVotes, PoliticalGroupTotalVotes, Validate, ValidationResults,
-        VotersCounts, VotesCounts,
+        PoliticalGroupCandidateVotes, PoliticalGroupTotalVotes, PollingStationResults, Validate,
+        ValidationResults, VotersCounts, VotesCounts,
     },
     election::ElectionWithPoliticalGroups,
     error::ErrorReference,
@@ -55,7 +55,7 @@ impl ElectionSummary {
     /// data from the election for candidates and political groups.
     pub fn from_results(
         election: &ElectionWithPoliticalGroups,
-        results: &[(PollingStation, CSOFirstSessionResults)],
+        results: &[(PollingStation, PollingStationResults)],
     ) -> Result<ElectionSummary, APIError> {
         // running totals
         let mut totals = ElectionSummary::zero();
@@ -118,16 +118,16 @@ impl ElectionSummary {
             }
 
             // add voters and votes to the total
-            totals.voters_counts += &result.voters_counts;
-            totals.votes_counts.add(&result.votes_counts)?;
+            totals.voters_counts += result.voters_counts();
+            totals.votes_counts.add(result.votes_counts())?;
 
             // add any differences noted to the total
             totals
                 .differences_counts
-                .add_polling_station_results(polling_station, &result.differences_counts);
+                .add_polling_station_results(polling_station, result.differences_counts());
 
             // add votes for each political group to the total
-            for pg in result.political_group_votes.iter() {
+            for pg in result.political_group_votes().iter() {
                 let pg_total = totals
                     .political_group_votes
                     .iter_mut()
@@ -139,10 +139,12 @@ impl ElectionSummary {
                 pg_total.add(pg)?;
             }
 
-            // add checkbox states for this polling station
-            totals
-                .polling_station_investigations
-                .append_result(polling_station, result);
+            if let Some(cso_first_result) = result.as_cso_first_session() {
+                // add checkbox states for this polling station
+                totals
+                    .polling_station_investigations
+                    .append_result(polling_station, cso_first_result);
+            }
 
             touched_polling_stations.push(polling_station.number);
         }
@@ -260,8 +262,8 @@ mod tests {
         pdf_gen::tests::polling_stations_fixture,
     };
 
-    fn polling_station_results_fixture_a() -> CSOFirstSessionResults {
-        CSOFirstSessionResults {
+    fn polling_station_results_fixture_a() -> PollingStationResults {
+        PollingStationResults::CSOFirstSession(CSOFirstSessionResults {
             extra_investigation: ValidDefault::valid_default(),
             counting_differences_polling_station: ValidDefault::valid_default(),
             voters_counts: VotersCounts {
@@ -297,11 +299,11 @@ mod tests {
                 PoliticalGroupCandidateVotes::from_test_data_auto(1, &[18, 2]),
                 PoliticalGroupCandidateVotes::from_test_data_auto(2, &[4, 4, 2]),
             ],
-        }
+        })
     }
 
-    fn polling_station_results_fixture_b() -> CSOFirstSessionResults {
-        CSOFirstSessionResults {
+    fn polling_station_results_fixture_b() -> PollingStationResults {
+        PollingStationResults::CSOFirstSession(CSOFirstSessionResults {
             extra_investigation: ExtraInvestigation {
                 extra_investigation_other_reason: YesNo::yes(),
                 ballots_recounted_extra_investigation: YesNo::no(),
@@ -340,7 +342,7 @@ mod tests {
                 PoliticalGroupCandidateVotes::from_test_data_auto(1, &[17, 7]),
                 PoliticalGroupCandidateVotes::from_test_data_auto(2, &[12, 15, 5]),
             ],
-        }
+        })
     }
 
     #[test]
@@ -470,29 +472,29 @@ mod tests {
         let committee_session = committee_session_fixture(election.id);
         let ps = polling_stations_fixture(&election, committee_session.id, &[20; 5]);
         let mut ps_results = polling_station_results_fixture_a();
-        ps_results.political_group_votes[0].total = 999_999_998;
-        ps_results.political_group_votes[0].candidate_votes[0].votes = 999_999_998;
-        ps_results.political_group_votes[0].candidate_votes[1].votes = 0;
-        ps_results.political_group_votes[1].total = 0;
-        ps_results.political_group_votes[1].candidate_votes[0].votes = 0;
-        ps_results.political_group_votes[1].candidate_votes[1].votes = 0;
-        ps_results.political_group_votes[1].candidate_votes[2].votes = 0;
-        ps_results.votes_counts.political_group_total_votes[0].total = 999_999_998;
-        ps_results.votes_counts.political_group_total_votes[1].total = 0;
-        ps_results.votes_counts.total_votes_cast_count = 999_999_998;
-        ps_results.votes_counts.total_votes_candidates_count = 999_999_998;
-        ps_results.votes_counts.blank_votes_count = 0;
-        ps_results.votes_counts.invalid_votes_count = 0;
-        ps_results.voters_counts.poll_card_count = 999_999_998;
-        ps_results.voters_counts.proxy_certificate_count = 0;
-        ps_results.voters_counts.total_admitted_voters_count = 999_999_998;
-        ps_results.differences_counts.more_ballots_count = 0;
+        ps_results.political_group_votes_mut()[0].total = 999_999_998;
+        ps_results.political_group_votes_mut()[0].candidate_votes[0].votes = 999_999_998;
+        ps_results.political_group_votes_mut()[0].candidate_votes[1].votes = 0;
+        ps_results.political_group_votes_mut()[1].total = 0;
+        ps_results.political_group_votes_mut()[1].candidate_votes[0].votes = 0;
+        ps_results.political_group_votes_mut()[1].candidate_votes[1].votes = 0;
+        ps_results.political_group_votes_mut()[1].candidate_votes[2].votes = 0;
+        ps_results.votes_counts_mut().political_group_total_votes[0].total = 999_999_998;
+        ps_results.votes_counts_mut().political_group_total_votes[1].total = 0;
+        ps_results.votes_counts_mut().total_votes_cast_count = 999_999_998;
+        ps_results.votes_counts_mut().total_votes_candidates_count = 999_999_998;
+        ps_results.votes_counts_mut().blank_votes_count = 0;
+        ps_results.votes_counts_mut().invalid_votes_count = 0;
+        ps_results.voters_counts_mut().poll_card_count = 999_999_998;
+        ps_results.voters_counts_mut().proxy_certificate_count = 0;
+        ps_results.voters_counts_mut().total_admitted_voters_count = 999_999_998;
+        ps_results.differences_counts_mut().more_ballots_count = 0;
         ps_results
-            .differences_counts
+            .differences_counts_mut()
             .compare_votes_cast_admitted_voters
             .votes_cast_greater_than_admitted_voters = false;
         ps_results
-            .differences_counts
+            .differences_counts_mut()
             .compare_votes_cast_admitted_voters
             .admitted_voters_equal_votes_cast = true;
 
@@ -510,7 +512,7 @@ mod tests {
         let ps = polling_stations_fixture(&election, committee_session.id, &[20, 20]);
         let ps_results = polling_station_results_fixture_a();
         let mut ps_results2 = ps_results.clone();
-        ps_results2.votes_counts.total_votes_cast_count = 0;
+        ps_results2.votes_counts_mut().total_votes_cast_count = 0;
 
         let totals = ElectionSummary::from_results(
             &election,
@@ -544,7 +546,10 @@ mod tests {
         let ps = polling_stations_fixture(&election, committee_session.id, &[20, 20]);
         let ps1_result = polling_station_results_fixture_a();
         let mut ps2_result = polling_station_results_fixture_b();
-        ps2_result.votes_counts.political_group_total_votes.pop();
+        ps2_result
+            .votes_counts_mut()
+            .political_group_total_votes
+            .pop();
         let totals = ElectionSummary::from_results(
             &election,
             &[(ps[0].clone(), ps1_result), (ps[1].clone(), ps2_result)],
@@ -561,7 +566,7 @@ mod tests {
         let ps1_result = polling_station_results_fixture_a();
         let mut ps2_result = polling_station_results_fixture_b();
         ps2_result
-            .votes_counts
+            .votes_counts_mut()
             .political_group_total_votes
             .push(PoliticalGroupTotalVotes {
                 number: 3,
@@ -582,10 +587,11 @@ mod tests {
         let ps = polling_stations_fixture(&election, committee_session.id, &[20, 20]);
         let ps1_result = polling_station_results_fixture_a();
         let mut ps2_result = polling_station_results_fixture_b();
+        let pgvote_copy = ps2_result.votes_counts().political_group_total_votes[1].clone();
         ps2_result
-            .votes_counts
+            .votes_counts_mut()
             .political_group_total_votes
-            .push(ps2_result.votes_counts.political_group_total_votes[1].clone());
+            .push(pgvote_copy);
         let totals = ElectionSummary::from_results(
             &election,
             &[(ps[0].clone(), ps1_result), (ps[1].clone(), ps2_result)],
@@ -601,7 +607,7 @@ mod tests {
         let ps = polling_stations_fixture(&election, committee_session.id, &[20, 20]);
         let ps1_result = polling_station_results_fixture_a();
         let mut ps2_result = polling_station_results_fixture_b();
-        ps2_result.votes_counts.political_group_total_votes[1] = PoliticalGroupTotalVotes {
+        ps2_result.votes_counts_mut().political_group_total_votes[1] = PoliticalGroupTotalVotes {
             number: 3,
             total: 0,
         };
@@ -620,7 +626,7 @@ mod tests {
         let ps = polling_stations_fixture(&election, committee_session.id, &[20, 20]);
         let ps1_result = polling_station_results_fixture_a();
         let mut ps2_result = polling_station_results_fixture_b();
-        ps2_result.political_group_votes.pop();
+        ps2_result.political_group_votes_mut().pop();
         let totals = ElectionSummary::from_results(
             &election,
             &[(ps[0].clone(), ps1_result), (ps[1].clone(), ps2_result)],
@@ -637,7 +643,7 @@ mod tests {
         let ps1_result = polling_station_results_fixture_a();
         let mut ps2_result = polling_station_results_fixture_b();
         ps2_result
-            .political_group_votes
+            .political_group_votes_mut()
             .push(PoliticalGroupCandidateVotes::from_test_data_auto(3, &[0]));
         let totals = ElectionSummary::from_results(
             &election,
@@ -653,13 +659,11 @@ mod tests {
         let committee_session = committee_session_fixture(election.id);
         let ps = polling_stations_fixture(&election, committee_session.id, &[20, 20]);
         let mut ps1_result = polling_station_results_fixture_a();
+        let ps1_pgvote_copy = ps1_result.political_group_votes()[1].clone();
         let mut ps2_result = polling_station_results_fixture_b();
-        ps1_result
-            .political_group_votes
-            .push(ps1_result.political_group_votes[1].clone());
-        ps2_result
-            .political_group_votes
-            .push(ps2_result.political_group_votes[1].clone());
+        let ps2_pgvote_copy = ps2_result.political_group_votes()[1].clone();
+        ps1_result.political_group_votes_mut().push(ps1_pgvote_copy);
+        ps2_result.political_group_votes_mut().push(ps2_pgvote_copy);
         let totals = ElectionSummary::from_results(
             &election,
             &[(ps[0].clone(), ps1_result), (ps[1].clone(), ps2_result)],
@@ -675,7 +679,7 @@ mod tests {
         let ps = polling_stations_fixture(&election, committee_session.id, &[20, 20]);
         let ps1_result = polling_station_results_fixture_a();
         let mut ps2_result = polling_station_results_fixture_b();
-        ps2_result.political_group_votes[1] =
+        ps2_result.political_group_votes_mut()[1] =
             PoliticalGroupCandidateVotes::from_test_data_auto(3, &[0]);
         let totals = ElectionSummary::from_results(
             &election,
@@ -692,7 +696,9 @@ mod tests {
         let ps = polling_stations_fixture(&election, committee_session.id, &[20, 20]);
         let ps1_result = polling_station_results_fixture_a();
         let mut ps2_result = polling_station_results_fixture_b();
-        ps2_result.political_group_votes[1].candidate_votes.pop();
+        ps2_result.political_group_votes_mut()[1]
+            .candidate_votes
+            .pop();
         let totals = ElectionSummary::from_results(
             &election,
             &[(ps[0].clone(), ps1_result), (ps[1].clone(), ps2_result)],

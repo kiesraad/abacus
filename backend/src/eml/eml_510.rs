@@ -9,7 +9,7 @@ use super::{
     },
 };
 use crate::{
-    data_entry::{CSOFirstSessionResults, PoliticalGroupCandidateVotes},
+    data_entry::{PoliticalGroupCandidateVotes, PollingStationResults},
     polling_station::PollingStation,
     summary::ElectionSummary,
 };
@@ -32,7 +32,7 @@ pub struct EML510 {
 impl EML510 {
     pub fn from_results(
         election: &crate::election::ElectionWithPoliticalGroups,
-        results: &[(PollingStation, CSOFirstSessionResults)],
+        results: &[(PollingStation, PollingStationResults)],
         summary: &ElectionSummary,
         creation_date_time: &chrono::DateTime<chrono::Local>,
     ) -> EML510 {
@@ -237,29 +237,31 @@ pub struct ReportingUnitVotes {
 /// When results were investigated by the GSB
 /// return the relevant investigations.
 fn create_investigations_from_results(
-    result: &CSOFirstSessionResults,
+    result: &PollingStationResults,
 ) -> Option<ReportingUnitInvestigations> {
     let mut investigations = Vec::new();
 
-    if result.investigation_ballots_recounted_is_answered() {
-        investigations.push(Investigation {
-            reason_code: InvestigationReason::InvestigatedOtherReason,
-            value: result.investigated_other_reason(),
-        });
-    }
+    if let Some(first_session_result) = result.as_cso_first_session() {
+        if first_session_result.investigation_ballots_recounted_is_answered() {
+            investigations.push(Investigation {
+                reason_code: InvestigationReason::InvestigatedOtherReason,
+                value: first_session_result.investigated_other_reason(),
+            });
+        }
 
-    if result.investigation_other_reason_is_answered() {
-        investigations.push(Investigation {
-            reason_code: InvestigationReason::BallotsRecounted,
-            value: result.ballots_have_been_recounted(),
-        });
-    }
+        if first_session_result.investigation_other_reason_is_answered() {
+            investigations.push(Investigation {
+                reason_code: InvestigationReason::BallotsRecounted,
+                value: first_session_result.ballots_have_been_recounted(),
+            });
+        }
 
-    if result.admitted_voters_have_been_recounted() {
-        investigations.push(Investigation {
-            reason_code: InvestigationReason::AdmittedVotersRecounted,
-            value: true,
-        });
+        if first_session_result.admitted_voters_have_been_recounted() {
+            investigations.push(Investigation {
+                reason_code: InvestigationReason::AdmittedVotersRecounted,
+                value: true,
+            });
+        }
     }
 
     if !investigations.is_empty() {
@@ -274,7 +276,7 @@ impl ReportingUnitVotes {
         election: &crate::election::ElectionWithPoliticalGroups,
         authority_id: &str,
         polling_station: &PollingStation,
-        results: &CSOFirstSessionResults,
+        results: &PollingStationResults,
     ) -> ReportingUnitVotes {
         ReportingUnitVotes {
             reporting_unit_identifier: ReportingUnitIdentifier {
@@ -287,40 +289,40 @@ impl ReportingUnitVotes {
             reporting_unit_investigations: create_investigations_from_results(results),
             selections: Selection::from_political_group_votes(
                 election,
-                &results.political_group_votes,
+                results.political_group_votes(),
             ),
             cast: polling_station.number_of_voters.unwrap_or(0) as u64,
-            total_counted: results.votes_counts.total_votes_candidates_count as u64,
+            total_counted: results.votes_counts().total_votes_candidates_count as u64,
             rejected_votes: vec![
                 RejectedVotes::new(
                     RejectedVotesReason::Blank,
-                    results.votes_counts.blank_votes_count as u64,
+                    results.votes_counts().blank_votes_count as u64,
                 ),
                 RejectedVotes::new(
                     RejectedVotesReason::Invalid,
-                    results.votes_counts.invalid_votes_count as u64,
+                    results.votes_counts().invalid_votes_count as u64,
                 ),
             ],
             uncounted_votes: vec![
                 UncountedVotes::new(
                     UncountedVotesReason::PollCard,
-                    results.voters_counts.poll_card_count as u64,
+                    results.voters_counts().poll_card_count as u64,
                 ),
                 UncountedVotes::new(
                     UncountedVotesReason::ProxyCertificate,
-                    results.voters_counts.proxy_certificate_count as u64,
+                    results.voters_counts().proxy_certificate_count as u64,
                 ),
                 UncountedVotes::new(
                     UncountedVotesReason::TotalAdmittedVoters,
-                    results.voters_counts.total_admitted_voters_count as u64,
+                    results.voters_counts().total_admitted_voters_count as u64,
                 ),
                 UncountedVotes::new(
                     UncountedVotesReason::MoreBallots,
-                    results.differences_counts.more_ballots_count as u64,
+                    results.differences_counts().more_ballots_count as u64,
                 ),
                 UncountedVotes::new(
                     UncountedVotesReason::FewerBallots,
-                    results.differences_counts.fewer_ballots_count as u64,
+                    results.differences_counts().fewer_ballots_count as u64,
                 ),
             ],
         }

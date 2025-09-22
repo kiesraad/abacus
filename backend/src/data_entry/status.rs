@@ -222,6 +222,11 @@ impl DataEntryStatus {
             DataEntryStatus::SecondEntryNotStarted(state) => {
                 if current_data_entry.user_id == state.first_entry_user_id {
                     Err(DataEntryTransitionError::SecondEntryNeedsDifferentUser)
+                } else if !state
+                    .finalised_first_entry
+                    .is_same_model(&current_data_entry.entry)
+                {
+                    Err(DataEntryTransitionError::Invalid)
                 } else {
                     Ok(Self::SecondEntryInProgress(SecondEntryInProgress {
                         first_entry_user_id: state.first_entry_user_id,
@@ -261,6 +266,10 @@ impl DataEntryStatus {
                     return Err(DataEntryTransitionError::CannotTransitionUsingDifferentUser);
                 }
 
+                if !state.first_entry.is_same_model(&current_data_entry.entry) {
+                    return Err(DataEntryTransitionError::Invalid);
+                }
+
                 Ok(Self::FirstEntryInProgress(FirstEntryInProgress {
                     progress: current_data_entry.progress.unwrap_or(0),
                     first_entry_user_id: state.first_entry_user_id,
@@ -288,6 +297,10 @@ impl DataEntryStatus {
             DataEntryStatus::SecondEntryInProgress(state) => {
                 if state.second_entry_user_id != current_data_entry.user_id {
                     return Err(DataEntryTransitionError::CannotTransitionUsingDifferentUser);
+                }
+
+                if !state.second_entry.is_same_model(&current_data_entry.entry) {
+                    return Err(DataEntryTransitionError::Invalid);
                 }
 
                 Ok(Self::SecondEntryInProgress(SecondEntryInProgress {
@@ -731,6 +744,24 @@ mod tests {
         }
     }
 
+    fn next_session_data_entry() -> CurrentDataEntry {
+        CurrentDataEntry {
+            progress: None,
+            user_id: 0,
+            entry: PollingStationResults::CSONextSession(Default::default()),
+            client_state: None,
+        }
+    }
+
+    fn next_session_second_data_entry() -> CurrentDataEntry {
+        CurrentDataEntry {
+            progress: None,
+            user_id: 1,
+            entry: PollingStationResults::CSONextSession(Default::default()),
+            client_state: None,
+        }
+    }
+
     fn polling_station() -> PollingStation {
         PollingStation {
             id: 1,
@@ -1082,6 +1113,14 @@ mod tests {
         );
     }
 
+    #[test]
+    fn claim_second_entry_wrong_model_error() {
+        assert_eq!(
+            second_entry_not_started().claim_second_entry(next_session_second_data_entry()),
+            Err(DataEntryTransitionError::Invalid)
+        );
+    }
+
     /// SecondEntryInProgress --> SecondEntryInProgress: save
     #[test]
     fn second_entry_in_progress_to_second_entry_in_progress() {
@@ -1120,6 +1159,14 @@ mod tests {
                 client_state: None,
             }),
             Err(DataEntryTransitionError::CannotTransitionUsingDifferentUser)
+        );
+    }
+
+    #[test]
+    fn update_second_entry_wrong_model_error() {
+        assert_eq!(
+            second_entry_in_progress().update_second_entry(next_session_data_entry()),
+            Err(DataEntryTransitionError::Invalid)
         );
     }
 
@@ -1506,6 +1553,14 @@ mod tests {
             definitive().update_first_entry(empty_current_data_entry()),
             Err(DataEntryTransitionError::SecondEntryAlreadyFinalised)
         ));
+    }
+
+    #[test]
+    fn update_first_entry_wrong_model_error() {
+        assert_eq!(
+            first_entry_in_progress().update_first_entry(next_session_data_entry()),
+            Err(DataEntryTransitionError::Invalid)
+        );
     }
 
     #[test]

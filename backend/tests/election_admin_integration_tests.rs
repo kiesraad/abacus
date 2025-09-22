@@ -1,8 +1,8 @@
 #![cfg(test)]
 
-use abacus::election::ElectionDefinitionValidateResponse;
 use abacus::{
-    committee_session::status::CommitteeSessionStatus, election::ElectionWithPoliticalGroups,
+    committee_session::status::CommitteeSessionStatus,
+    election::{ElectionDefinitionValidateResponse, ElectionWithPoliticalGroups},
 };
 use axum::http::StatusCode;
 use sqlx::SqlitePool;

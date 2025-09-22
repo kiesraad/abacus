@@ -60,6 +60,7 @@ export function ReadOnlyDataEntrySection({
         )}
 
         <DataEntrySubsections
+          key={section.id}
           section={section}
           currentValues={sectionValues}
           setValues={setValues}

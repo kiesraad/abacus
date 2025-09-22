@@ -1,40 +1,57 @@
 import * as ReactRouter from "react-router";
 
-import userEvent from "@testing-library/user-event";
+import { render, waitFor } from "@testing-library/react";
+import { userEvent } from "@testing-library/user-event";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
 import * as useMessages from "@/hooks/messages/useMessages";
-import { ElectionProvider } from "@/hooks/election/ElectionProvider";
+import { ErrorBoundary } from "@/components/error/ErrorBoundary";
+import { ElectionLayout } from "@/components/layout/ElectionLayout";
 import {
   ElectionRequestHandler,
   ElectionStatusRequestHandler,
   PollingStationInvestigationConcludeHandler,
+  PollingStationInvestigationDeleteHandler,
 } from "@/testing/api-mocks/RequestHandlers";
+import { Providers } from "@/testing/Providers";
 import { overrideOnce, server } from "@/testing/server";
-import { render, screen, spyOnHandler, waitFor } from "@/testing/test-utils";
+import { screen, setupTestRouter, spyOnHandler, within } from "@/testing/test-utils";
 
-import { InvestigationFindings } from "./InvestigationFindings";
+import { investigationRoutes } from "../routes";
 
 const navigate = vi.fn();
 const pushMessage = vi.fn();
 
-function renderPage(pollingStationId = 3) {
-  render(
-    <ElectionProvider electionId={1}>
-      <InvestigationFindings pollingStationId={pollingStationId} />
-    </ElectionProvider>,
-  );
+async function renderPage(pollingStationId: number) {
+  const router = setupTestRouter([
+    {
+      path: "/elections/:electionId",
+      Component: ElectionLayout,
+      errorElement: <ErrorBoundary />,
+      children: [
+        {
+          path: "investigations",
+          children: investigationRoutes,
+        },
+      ],
+    },
+  ]);
+
+  await router.navigate(`/elections/1/investigations/${pollingStationId}/findings`);
+  render(<Providers router={router} />);
+
+  return router;
 }
 
-describe("InvestigationFindings", () => {
+describe("InvestigationFindingsPage", () => {
   beforeEach(() => {
-    server.use(ElectionRequestHandler, ElectionStatusRequestHandler, PollingStationInvestigationConcludeHandler);
+    server.use(ElectionRequestHandler, ElectionStatusRequestHandler);
     vi.spyOn(ReactRouter, "useNavigate").mockImplementation(() => navigate);
     vi.spyOn(useMessages, "useMessages").mockReturnValue({ pushMessage, popMessages: vi.fn(() => []) });
   });
 
   test("Renders a form", async () => {
-    renderPage();
+    await renderPage(3);
 
     expect(
       await screen.findByRole("heading", {
@@ -46,7 +63,7 @@ describe("InvestigationFindings", () => {
   });
 
   test("Displays an error message when submitting an empty form", async () => {
-    renderPage();
+    await renderPage(3);
 
     const findings = await screen.findByLabelText("Bevindingen");
     const submitButton = await screen.findByRole("button", { name: "Opslaan" });
@@ -64,9 +81,10 @@ describe("InvestigationFindings", () => {
   });
 
   test("Navigate to the next page when submitting findings", async () => {
+    server.use(PollingStationInvestigationConcludeHandler);
     const conclude = spyOnHandler(PollingStationInvestigationConcludeHandler);
 
-    renderPage();
+    await renderPage(3);
 
     const findings = await screen.findByLabelText("Bevindingen");
     const submitButton = await screen.findByRole("button", { name: "Opslaan" });
@@ -98,7 +116,7 @@ describe("InvestigationFindings", () => {
       }),
     );
 
-    renderPage(2);
+    await renderPage(2);
 
     const findings = await screen.findByLabelText("Bevindingen");
     expect(findings).toHaveValue("Test findings 4");
@@ -124,5 +142,39 @@ describe("InvestigationFindings", () => {
       corrected_results: false,
     });
     expect(pushMessage).toHaveBeenCalledWith({ title: "Wijzigingen in onderzoek stembureau 34 (Testplek) opgeslagen" });
+  });
+
+  test("Renders delete button on update investigation and delete works", async () => {
+    server.use(PollingStationInvestigationDeleteHandler);
+    const user = userEvent.setup();
+    await renderPage(3);
+
+    expect(
+      await screen.findByRole("heading", {
+        level: 2,
+        name: "Bevindingen van het onderzoek door het gemeentelijk stembureau",
+      }),
+    ).toBeVisible();
+    expect(await screen.findByLabelText("Bevindingen")).toBeVisible();
+
+    const deleteButton = await screen.findByRole("button", { name: "Onderzoek verwijderen" });
+    expect(deleteButton).toBeVisible();
+
+    await user.click(deleteButton);
+
+    const modal = await screen.findByTestId("modal-dialog");
+    expect(modal).toHaveTextContent("Onderzoek verwijderen?");
+
+    const deleteInvestigation = spyOnHandler(PollingStationInvestigationDeleteHandler);
+
+    const confirmButton = await within(modal).findByRole("button", { name: "Verwijderen" });
+    await user.click(confirmButton);
+
+    expect(deleteInvestigation).toHaveBeenCalled();
+
+    expect(pushMessage).toHaveBeenCalledWith({ title: "Onderzoek voor stembureau 35 (Testschool) verwijderd" });
+    await waitFor(() => {
+      expect(navigate).toHaveBeenCalledExactlyOnceWith("/elections/1/investigations");
+    });
   });
 });

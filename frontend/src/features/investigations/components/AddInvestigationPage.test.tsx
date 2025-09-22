@@ -9,9 +9,7 @@ import { Providers } from "@/testing/Providers";
 import { overrideOnce, server } from "@/testing/server";
 import { screen, setupTestRouter, within } from "@/testing/test-utils";
 
-import { AddInvestigationPage } from "./AddInvestigationPage";
-import { InvestigationsLayout } from "./InvestigationsLayout";
-import { InvestigationsOverviewPage } from "./InvestigationsOverviewPage";
+import { investigationRoutes } from "../routes";
 
 async function renderPage() {
   const router = setupTestRouter([
@@ -22,24 +20,7 @@ async function renderPage() {
       children: [
         {
           path: "investigations",
-          Component: InvestigationsLayout,
-          children: [
-            { index: true, Component: InvestigationsOverviewPage },
-            {
-              path: "add",
-              Component: AddInvestigationPage,
-            },
-            {
-              path: ":pollingStationId",
-              children: [
-                {
-                  index: true,
-                  path: "reason",
-                  Component: () => "Reason stub",
-                },
-              ],
-            },
-          ],
+          children: investigationRoutes,
         },
       ],
     },

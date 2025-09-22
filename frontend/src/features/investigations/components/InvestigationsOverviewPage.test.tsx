@@ -16,8 +16,7 @@ import { screen, setupTestRouter } from "@/testing/test-utils";
 import { TestUserProvider } from "@/testing/TestUserProvider";
 import { ElectionDetailsResponse, Role } from "@/types/generated/openapi";
 
-import { InvestigationsLayout } from "./InvestigationsLayout";
-import { InvestigationsOverviewPage } from "./InvestigationsOverviewPage";
+import { investigationRoutes } from "../routes";
 
 const Providers = ({
   children,
@@ -48,8 +47,7 @@ async function renderPage(userRole: Role) {
       children: [
         {
           path: "investigations",
-          Component: InvestigationsLayout,
-          children: [{ index: true, Component: InvestigationsOverviewPage }],
+          children: investigationRoutes,
         },
       ],
     },

@@ -102,18 +102,6 @@ async fn delete_investigation(pool: SqlitePool, polling_station_id: u32) -> Resp
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_7_four_sessions", "users"))))]
-async fn test_investigation_create_and_conclude(pool: SqlitePool) {
-    assert_eq!(
-        create_investigation(pool.clone(), 741).await.status(),
-        StatusCode::OK
-    );
-    assert_eq!(
-        conclude_investigation(pool.clone(), 741).await.status(),
-        StatusCode::OK
-    );
-}
-
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_7_four_sessions", "users"))))]
 async fn test_investigation_create_conclude_update_delete(pool: SqlitePool) {
     let election_id = 7;
     let election_details = get_election(pool.clone(), election_id).await;

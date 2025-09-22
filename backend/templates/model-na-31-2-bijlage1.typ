@@ -171,7 +171,7 @@ Licht hieronder toe wat de reden van het extra onderzoek was
 _(Gebruik het proces-verbaal van het stembureau #sym.arrow.r Tijdens de stemming, vraag 1.2.2)_
 
 #checkbox[Ja]
-#checkbox[Nee, er is een onverklaard verschil #sym.arrow.r → Hertel het aantal toegelaten kiezers(tenzij dat bij rubriek 2 al gedaan is) en noteer dit bij #ref(<admitted_voters>)]
+#checkbox[Nee, er is een onverklaard verschil #sym.arrow.r Hertel het aantal toegelaten kiezers(tenzij dat bij rubriek 2 al gedaan is) en noteer dit bij #ref(<admitted_voters>)]
 
 == Verklaringen vanuit het stembureau <polling_station_declaration>
 
@@ -199,4 +199,3 @@ _(Gebruik het proces-verbaal van het stembureau #sym.arrow.r Tijdens de stemming
     total_instruction: [Neem dit totaal over in rubriek #ref(<cast_votes>) van deze bijlage bij de juiste lijst.],
   )
 }
-

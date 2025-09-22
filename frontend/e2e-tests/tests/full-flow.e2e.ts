@@ -8,34 +8,33 @@ import {
   uploadPollingStations,
 } from "e2e-tests/helpers-utils/e2e-test-browser-helpers";
 import { LoginPgObj } from "e2e-tests/page-objects/authentication/LoginPgObj";
+import { CandidatesListPage } from "e2e-tests/page-objects/data_entry/CandidatesListPgObj";
+import { CheckAndSavePage } from "e2e-tests/page-objects/data_entry/CheckAndSavePgObj";
 import { DataEntryHomePage } from "e2e-tests/page-objects/data_entry/DataEntryHomePgObj";
+import { DifferencesPage } from "e2e-tests/page-objects/data_entry/DifferencesPgObj";
+import { ExtraInvestigationPage } from "e2e-tests/page-objects/data_entry/ExtraInvestigationPgObj";
+import { ProgressList } from "e2e-tests/page-objects/data_entry/ProgressListPgObj";
 import { CheckAndSavePgObj } from "e2e-tests/page-objects/election/create/CheckAndSavePgObj";
 import { CountingMethodTypePgObj } from "e2e-tests/page-objects/election/create/CountingMethodTypePgObj";
 import { NumberOfVotersPgObj } from "e2e-tests/page-objects/election/create/NumberOfVotersPgObj";
 import { PollingStationRolePgObj } from "e2e-tests/page-objects/election/create/PollingStationRolePgObj";
+import { ElectionDetailsPgObj } from "e2e-tests/page-objects/election/ElectionDetailsPgObj";
 import { ElectionHome } from "e2e-tests/page-objects/election/ElectionHomePgObj";
 import { ElectionReport } from "e2e-tests/page-objects/election/ElectionReportPgObj";
 import { ElectionsOverviewPgObj } from "e2e-tests/page-objects/election/ElectionsOverviewPgObj";
 import { ElectionStatus } from "e2e-tests/page-objects/election/ElectionStatusPgObj";
 import { FinishDataEntry } from "e2e-tests/page-objects/election/FinishDataEntryPgObj";
+import { AddInvestigationPgObj } from "e2e-tests/page-objects/investigations/AddInvestigationPgObj";
+import { InvestigationFindingsPgObj } from "e2e-tests/page-objects/investigations/InvestigationFindingsPgObj";
+import { InvestigationOverviewPgObj } from "e2e-tests/page-objects/investigations/InvestigationOverviewPgObj";
+import { InvestigationPrintCorrigendumPgObj } from "e2e-tests/page-objects/investigations/InvestigationPrintCorrigendumPgObj";
+import { InvestigationReasonPgObj } from "e2e-tests/page-objects/investigations/InvestigationReasonPgObj";
+import { CoordinatorNavBarPgObj } from "e2e-tests/page-objects/nav_bar/CoordinatorNavBarPgObj";
 import { PollingStationFormPgObj } from "e2e-tests/page-objects/polling_station/PollingStationFormPgObj";
 import { PollingStationListPgObj } from "e2e-tests/page-objects/polling_station/PollingStationListPgObj";
 import { eml110b_single } from "e2e-tests/test-data/eml-files";
 import { noRecountNoDifferencesDataEntry } from "e2e-tests/test-data/request-response-templates";
 import { stat } from "node:fs/promises";
-
-import { CandidatesListPage } from "../page-objects/data_entry/CandidatesListPgObj";
-import { CheckAndSavePage } from "../page-objects/data_entry/CheckAndSavePgObj";
-import { DifferencesPage } from "../page-objects/data_entry/DifferencesPgObj";
-import { ExtraInvestigationPage } from "../page-objects/data_entry/ExtraInvestigationPgObj";
-import { ProgressList } from "../page-objects/data_entry/ProgressListPgObj";
-import { ElectionDetailsPgObj } from "../page-objects/election/ElectionDetailsPgObj";
-import { AddInvestigationPgObj } from "../page-objects/investigations/AddInvestigationPgObj";
-import { InvestigationFindingsPgObj } from "../page-objects/investigations/InvestigationFindingsPgObj";
-import { InvestigationOverviewPgObj } from "../page-objects/investigations/InvestigationOverviewPgObj";
-import { InvestigationPrintCorrigendumPgObj } from "../page-objects/investigations/InvestigationPrintCorrigendumPgObj";
-import { InvestigationReasonPgObj } from "../page-objects/investigations/InvestigationReasonPgObj";
-import { CoordinatorNavBarPgObj } from "../page-objects/nav_bar/CoordinatorNavBarPgObj";
 
 test.describe.configure({ mode: "serial" });
 
@@ -265,7 +264,7 @@ test.describe("full flow", () => {
   });
 
   for (const typist of ["typist1", "typist2"]) {
-    test(`corrected first data entry with ${typist}`, async ({ page }) => {
+    test(`corrected data entry with ${typist}`, async ({ page }) => {
       await page.goto("/account/login");
 
       const loginPage = new LoginPgObj(page);

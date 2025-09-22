@@ -25,6 +25,7 @@ use crate::{
     committee_session::status::{CommitteeSessionStatus, change_committee_session_status},
     data_entry::{PollingStationResults, repository::most_recent_results_for_polling_station},
     election::ElectionWithPoliticalGroups,
+    error::ErrorReference,
     pdf_gen::{
         generate_pdf,
         models::{ModelNa14_2Bijlage1Input, ToPdfFileModel},
@@ -242,10 +243,13 @@ async fn polling_station_investigation_download_corrigendum_pdf(
         crate::election::repository::get(&mut conn, polling_station.election_id).await?;
 
     let previous_results = if let Some(id) = polling_station.id_prev_session {
-        match most_recent_results_for_polling_station(&mut conn, id).await? {
-            Some(results) => results,
-            None => PollingStationResults::empty_cso_first_session(&election.political_groups),
-        }
+        let Some(results) = most_recent_results_for_polling_station(&mut conn, id).await? else {
+            return Err(APIError::NotFound(
+                "Previous results not found for the current polling station".to_string(),
+                ErrorReference::EntryNotFound,
+            ));
+        };
+        results
     } else {
         PollingStationResults::empty_cso_first_session(&election.political_groups)
     };
@@ -261,7 +265,7 @@ async fn polling_station_investigation_download_corrigendum_pdf(
         ModelNa14_2Bijlage1Input {
             election,
             polling_station,
-            previous_results,
+            previous_results: previous_results.as_common(),
             investigation,
         }
         .to_pdf_file_model(name.clone()),

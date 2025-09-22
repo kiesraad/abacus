@@ -348,27 +348,6 @@
         "reason": "Er is een onverklaard verschil tussen het totaal aantal getelde stembiljetten het aantal toegelaten kiezers wat onderzocht moet worden."
     },
     "previous_results": {
-        "model": "CSOFirstSession",
-        "extra_investigation": {
-            "extra_investigation_other_reason": {
-                "yes": false,
-                "no": true
-            },
-            "ballots_recounted_extra_investigation": {
-                "yes": false,
-                "no": true
-            }
-        },
-        "counting_differences_polling_station": {
-            "unexplained_difference_ballots_voters": {
-                "yes": false,
-                "no": true
-            },
-            "difference_ballots_per_list": {
-                "yes": false,
-                "no": true
-            }
-        },
         "voters_counts": {
             "poll_card_count": 3450,
             "proxy_certificate_count": 157,

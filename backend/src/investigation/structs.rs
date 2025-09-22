@@ -75,7 +75,7 @@ where
 
         Err(APIError::NotFound(
             "Polling station not found for the current committee session".to_string(),
-            ErrorReference::InvalidCommitteeSessionStatus,
+            ErrorReference::EntryNotFound,
         ))
     }
 }

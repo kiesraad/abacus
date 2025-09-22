@@ -18,7 +18,7 @@ import { VotersAndVotesPage } from "e2e-tests/page-objects/data_entry/VotersAndV
 import { ClaimDataEntryResponse, PollingStation, VotersCounts, VotesCounts } from "@/types/generated/openapi";
 
 import { test } from "../../fixtures";
-import { emptyDataEntryResponse } from "../../test-data/request-response-templates";
+import { emptyCSOFirstSessionResults } from "../../test-data/request-response-templates";
 
 test.use({
   storageState: "e2e-tests/state/typist1.json",
@@ -168,7 +168,7 @@ test.describe("resume data entry flow", () => {
       expect(dataEntryResponse.status()).toBe(200);
       expect(await dataEntryResponse.json()).toMatchObject({
         data: {
-          ...emptyDataEntryResponse.data,
+          ...emptyCSOFirstSessionResults(),
           extra_investigation: noExtraInvestigation,
           counting_differences_polling_station: noDifferences,
           voters_counts: {
@@ -251,7 +251,8 @@ test.describe("resume data entry flow", () => {
       expect(dataEntryResponse.status()).toBe(200);
       expect(await dataEntryResponse.json()).toMatchObject({
         data: {
-          ...emptyDataEntryResponse.data!,
+          model: "CSOFirstSession",
+          ...emptyCSOFirstSessionResults(),
           extra_investigation: noExtraInvestigation,
           counting_differences_polling_station: noDifferences,
           voters_counts: {
@@ -493,7 +494,7 @@ test.describe("resume data entry flow", () => {
 
       const claimResponse = await request.post(`/api/polling_stations/${pollingStation.id}/data_entries/1/claim`);
       expect(claimResponse.status()).toBe(200);
-      expect(await claimResponse.json()).toMatchObject(emptyDataEntryResponse);
+      expect(await claimResponse.json()).toMatchObject({ data: emptyCSOFirstSessionResults() });
     });
 
     test("discard input from voters and votes page with warning", async ({ typistOne, pollingStation }) => {
@@ -541,7 +542,7 @@ test.describe("resume data entry flow", () => {
 
       const claimResponse = await request.post(`/api/polling_stations/${pollingStation.id}/data_entries/1/claim`);
       expect(claimResponse.status()).toBe(200);
-      expect(await claimResponse.json()).toMatchObject(emptyDataEntryResponse);
+      expect(await claimResponse.json()).toMatchObject({ data: emptyCSOFirstSessionResults() });
     });
 
     test("discard input from check and save page", async ({ typistOne, pollingStation }) => {
@@ -604,7 +605,7 @@ test.describe("resume data entry flow", () => {
 
       const claimResponse = await request.post(`/api/polling_stations/${pollingStation.id}/data_entries/1/claim`);
       expect(claimResponse.status()).toBe(200);
-      expect(await claimResponse.json()).toMatchObject(emptyDataEntryResponse);
+      expect(await claimResponse.json()).toMatchObject({ data: emptyCSOFirstSessionResults() });
     });
   });
 });

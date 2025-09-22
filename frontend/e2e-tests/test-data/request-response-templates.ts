@@ -1,5 +1,5 @@
 import {
-  ClaimDataEntryResponse,
+  CSOFirstSessionResults,
   DataEntry,
   PollingStationRequest,
   PollingStationResults,
@@ -26,9 +26,8 @@ export const pollingStationRequests: PollingStationRequest[] = [
   },
 ];
 
-export const emptyDataEntryResponse: Partial<ClaimDataEntryResponse> = {
-  data: {
-    model: "CSOFirstSession",
+export function emptyCSOFirstSessionResults(): CSOFirstSessionResults {
+  return {
     extra_investigation: {
       extra_investigation_other_reason: { yes: false, no: false },
       ballots_recounted_extra_investigation: { yes: false, no: false },
@@ -155,9 +154,8 @@ export const emptyDataEntryResponse: Partial<ClaimDataEntryResponse> = {
         ],
       },
     ],
-  },
-  client_state: null,
-};
+  };
+}
 
 export const noRecountNoDifferencesDataEntry: PollingStationResults = {
   model: "CSOFirstSession",

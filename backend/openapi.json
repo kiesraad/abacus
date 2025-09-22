@@ -4492,6 +4492,38 @@
         },
         "additionalProperties": false
       },
+      "CSONextSessionResults": {
+        "type": "object",
+        "description": "CSONextSessionResults, following the fields in Model Na 14-2 Bijlage 1.\n\nSee \"Model Na 14-2. Corrigendum bij het proces-verbaal van een gemeentelijk stembureau/\nstembureau voor het openbaar lichaam, Bijlage 1: uitkomsten per stembureau\" from the\n[Kiesregeling](https://wetten.overheid.nl/BWBR0034180/2024-04-01#Bijlage1_DivisieNa14.2) or\n[Verkiezingstoolbox](https://www.rijksoverheid.nl/onderwerpen/verkiezingen/verkiezingentoolkit/modellen).",
+        "required": [
+          "voters_counts",
+          "votes_counts",
+          "differences_counts",
+          "political_group_votes"
+        ],
+        "properties": {
+          "differences_counts": {
+            "$ref": "#/components/schemas/DifferencesCounts",
+            "description": "Differences counts (\"Verschil tussen het aantal toegelaten kiezers en het aantal getelde stembiljetten\")"
+          },
+          "political_group_votes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PoliticalGroupCandidateVotes"
+            },
+            "description": "Vote counts per list and candidate (\"Aantal stemmen per lijst en kandidaat\")"
+          },
+          "voters_counts": {
+            "$ref": "#/components/schemas/VotersCounts",
+            "description": "Voters counts (\"Aantal toegelaten kiezers\")"
+          },
+          "votes_counts": {
+            "$ref": "#/components/schemas/VotesCounts",
+            "description": "Votes counts (\"Aantal getelde stembiljetten\")"
+          }
+        },
+        "additionalProperties": false
+      },
       "Candidate": {
         "type": "object",
         "description": "Candidate",
@@ -4606,7 +4638,7 @@
             "$ref": "#/components/schemas/PollingStationResults"
           },
           "previous_results": {
-            "$ref": "#/components/schemas/PollingStationResults"
+            "$ref": "#/components/schemas/CommonPollingStationResults"
           },
           "validation_results": {
             "$ref": "#/components/schemas/ValidationResults"
@@ -4782,6 +4814,38 @@
           },
           "start_time": {
             "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "CommonPollingStationResults": {
+        "type": "object",
+        "description": "CommonPollingStationResults contains the common fields for polling station results,",
+        "required": [
+          "voters_counts",
+          "votes_counts",
+          "differences_counts",
+          "political_group_votes"
+        ],
+        "properties": {
+          "differences_counts": {
+            "$ref": "#/components/schemas/DifferencesCounts",
+            "description": "Differences counts (\"Verschil tussen het aantal toegelaten kiezers en het aantal getelde stembiljetten\")"
+          },
+          "political_group_votes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PoliticalGroupCandidateVotes"
+            },
+            "description": "Vote counts per list and candidate (\"Aantal stemmen per lijst en kandidaat\")"
+          },
+          "voters_counts": {
+            "$ref": "#/components/schemas/VotersCounts",
+            "description": "Voters counts (\"Aantal toegelaten kiezers\")"
+          },
+          "votes_counts": {
+            "$ref": "#/components/schemas/VotesCounts",
+            "description": "Votes counts (\"Aantal getelde stembiljetten\")"
           }
         },
         "additionalProperties": false
@@ -6496,6 +6560,29 @@
               }
             ],
             "description": "Results for centrally counted (CSO) elections, first election committee session.\nThis contains the data entry values from Model Na 31-2 Bijlage 2."
+          },
+          {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/CSONextSessionResults",
+                "description": "Results for centrally counted (CSO) elections, any subsequent election committee session.\nThis contains the data entry values from Model Na 14-2 Bijlage 1."
+              },
+              {
+                "type": "object",
+                "required": [
+                  "model"
+                ],
+                "properties": {
+                  "model": {
+                    "type": "string",
+                    "enum": [
+                      "CSONextSession"
+                    ]
+                  }
+                }
+              }
+            ],
+            "description": "Results for centrally counted (CSO) elections, any subsequent election committee session.\nThis contains the data entry values from Model Na 14-2 Bijlage 1."
           }
         ],
         "description": "PollingStationResults contains the results for a polling station.\n\nThe exact type of results depends on the election counting method and\nwhether this is the first or any subsequent data entry session. Based on\nthis, any of four different models can apply"

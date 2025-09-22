@@ -11,8 +11,10 @@ use utoipa::ToSchema;
 use utoipa_axum::{router::OpenApiRouter, routes};
 
 use super::{
-    DataEntryStatusResponse, DataError, PollingStationDataEntry, ValidationResults,
+    CSONextSessionResults, CommonPollingStationResults, DataEntryStatusResponse, DataError,
+    PollingStationDataEntry, PollingStationResults, ValidationResults,
     entry_number::EntryNumber,
+    repository::most_recent_results_for_polling_station,
     status::{
         ClientState, CurrentDataEntry, DataEntryStatus, DataEntryStatusName,
         DataEntryTransitionError, EntriesDifferent, FirstEntryHasErrors,
@@ -24,8 +26,7 @@ use crate::{
     audit_log::{AuditEvent, AuditService},
     authentication::{Coordinator, Typist, User},
     committee_session::{CommitteeSession, CommitteeSessionError, status::CommitteeSessionStatus},
-    data_entry::{PollingStationResults, repository::most_recent_results_for_polling_station},
-    election::ElectionWithPoliticalGroups,
+    election::{ElectionWithPoliticalGroups, PoliticalGroup},
     error::{ErrorReference, ErrorResponse},
     polling_station::PollingStation,
 };
@@ -62,7 +63,7 @@ pub struct ClaimDataEntryResponse {
     pub validation_results: ValidationResults,
     #[serde(skip_serializing_if = "Option::is_none", default)]
     #[schema(nullable = false)]
-    pub previous_results: Option<PollingStationResults>,
+    pub previous_results: Option<CommonPollingStationResults>,
 }
 
 pub fn router() -> OpenApiRouter<AppState> {
@@ -110,6 +111,54 @@ fn validate_committee_session_for_typist(
         ));
     }
     Ok(())
+}
+
+fn initial_current_data_entry(
+    user_id: u32,
+    political_groups: &[PoliticalGroup],
+    committee_session: &CommitteeSession,
+    previous_results: Option<&PollingStationResults>,
+) -> CurrentDataEntry {
+    let entry = if committee_session.is_next_session() {
+        if let Some(prev) = previous_results {
+            let mut copy = CSONextSessionResults {
+                voters_counts: prev.voters_counts().clone(),
+                votes_counts: prev.votes_counts().clone(),
+                differences_counts: prev.differences_counts().clone(),
+                political_group_votes: prev.political_group_votes().to_vec(),
+            };
+
+            // clear checkboxes in differences because they always need to be re-entered
+            copy.differences_counts
+                .compare_votes_cast_admitted_voters
+                .admitted_voters_equal_votes_cast = false;
+            copy.differences_counts
+                .compare_votes_cast_admitted_voters
+                .votes_cast_greater_than_admitted_voters = false;
+            copy.differences_counts
+                .compare_votes_cast_admitted_voters
+                .votes_cast_smaller_than_admitted_voters = false;
+            copy.differences_counts
+                .difference_completely_accounted_for
+                .yes = false;
+            copy.differences_counts
+                .difference_completely_accounted_for
+                .no = false;
+
+            PollingStationResults::CSONextSession(copy)
+        } else {
+            PollingStationResults::empty_cso_next_session(political_groups)
+        }
+    } else {
+        PollingStationResults::empty_cso_first_session(political_groups)
+    };
+
+    CurrentDataEntry {
+        progress: None,
+        user_id,
+        entry,
+        client_state: None,
+    }
 }
 
 fn validate_committee_session_for_coordinator(
@@ -185,12 +234,18 @@ async fn polling_station_data_entry_claim(
 
     validate_committee_session_for_typist(&committee_session)?;
 
-    let new_data_entry = CurrentDataEntry {
-        progress: None,
-        user_id: user.0.id(),
-        entry: PollingStationResults::empty_cso_first_session(&election.political_groups),
-        client_state: None,
+    let previous_results = if let Some(id) = polling_station.id_prev_session {
+        most_recent_results_for_polling_station(&mut tx, id).await?
+    } else {
+        None
     };
+
+    let new_data_entry = initial_current_data_entry(
+        user.0.id(),
+        &election.political_groups,
+        &committee_session,
+        previous_results.as_ref(),
+    );
 
     // Transition to the new state
     let new_state = match entry_number {
@@ -226,11 +281,6 @@ async fn polling_station_data_entry_claim(
         .await?;
 
     let client_state = new_state.get_client_state().map(|v| v.to_owned());
-    let previous_results = if let Some(id) = polling_station.id_prev_session {
-        most_recent_results_for_polling_station(&mut tx, id).await?
-    } else {
-        None
-    };
 
     tx.commit().await?;
 
@@ -238,7 +288,7 @@ async fn polling_station_data_entry_claim(
         data: data.clone(),
         client_state,
         validation_results,
-        previous_results,
+        previous_results: previous_results.map(|r| r.as_common()),
     }))
 }
 
@@ -1813,23 +1863,50 @@ mod tests {
         assert!(matches!(status, DataEntryStatus::EntriesDifferent(_)));
     }
 
-    async fn add_results(pool: &SqlitePool, polling_station_id: u32, committee_session_id: u32) {
-        let mut results = CSOFirstSessionResults {
-            extra_investigation: ExtraInvestigation::default(),
-            counting_differences_polling_station: CountingDifferencesPollingStation::default(),
-            voters_counts: VotersCounts::default(),
-            votes_counts: VotesCounts::default(),
-            differences_counts: DifferencesCounts::default(),
-            political_group_votes: vec![],
+    async fn add_results(
+        pool: &SqlitePool,
+        polling_station_id: u32,
+        committee_session_id: u32,
+        political_groups: &[PoliticalGroup],
+        is_first_session: bool,
+    ) {
+        let mut results = if is_first_session {
+            PollingStationResults::CSOFirstSession(CSOFirstSessionResults {
+                extra_investigation: ExtraInvestigation::default(),
+                counting_differences_polling_station: CountingDifferencesPollingStation::default(),
+                voters_counts: VotersCounts::default(),
+                votes_counts: VotesCounts {
+                    political_group_total_votes:
+                        PollingStationResults::default_political_group_total_votes(political_groups),
+                    ..VotesCounts::default()
+                },
+                differences_counts: DifferencesCounts::default(),
+                political_group_votes: PollingStationResults::default_political_group_votes(
+                    political_groups,
+                ),
+            })
+        } else {
+            PollingStationResults::CSONextSession(CSONextSessionResults {
+                voters_counts: VotersCounts::default(),
+                votes_counts: VotesCounts {
+                    political_group_total_votes:
+                        PollingStationResults::default_political_group_total_votes(political_groups),
+                    ..VotesCounts::default()
+                },
+                differences_counts: DifferencesCounts::default(),
+                political_group_votes: PollingStationResults::default_political_group_votes(
+                    political_groups,
+                ),
+            })
         };
-        results.voters_counts.poll_card_count = polling_station_id;
+        results.voters_counts_mut().poll_card_count = polling_station_id;
 
         let mut conn = pool.acquire().await.unwrap();
         insert_test_result(
             &mut conn,
             polling_station_id,
             committee_session_id,
-            &PollingStationResults::CSOFirstSession(results),
+            &results,
         )
         .await
         .unwrap()
@@ -1838,14 +1915,12 @@ mod tests {
     async fn claim_previous_results(
         pool: SqlitePool,
         polling_station_id: u32,
-    ) -> Option<CSOFirstSessionResults> {
+    ) -> Option<CommonPollingStationResults> {
         let response = claim(pool.clone(), polling_station_id, EntryNumber::FirstEntry).await;
         assert_eq!(response.status(), StatusCode::OK);
         let body = response.into_body().collect().await.unwrap().to_bytes();
         let result: ClaimDataEntryResponse = serde_json::from_slice(&body).unwrap();
-        result
-            .previous_results
-            .and_then(|p| p.into_cso_first_session())
+        result.previous_results
     }
 
     /// No previous results, should return none
@@ -1857,7 +1932,10 @@ mod tests {
     /// Only a result from committee session 1, should return 1
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_7_four_sessions"))))]
     async fn test_previous_results_from_first_session(pool: SqlitePool) {
-        add_results(&pool, 711, 701).await;
+        let election = crate::election::repository::get(&mut pool.acquire().await.unwrap(), 7)
+            .await
+            .unwrap();
+        add_results(&pool, 711, 701, &election.political_groups, true).await;
         let previous_results = claim_previous_results(pool.clone(), 741).await.unwrap();
         assert_eq!(previous_results.voters_counts.poll_card_count, 711);
     }
@@ -1865,8 +1943,11 @@ mod tests {
     /// Results from committee session 1 and 3, with a gap in between, should return 3
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_7_four_sessions"))))]
     async fn test_previous_results_with_session_gap(pool: SqlitePool) {
-        add_results(&pool, 711, 701).await;
-        add_results(&pool, 731, 703).await;
+        let election = crate::election::repository::get(&mut pool.acquire().await.unwrap(), 7)
+            .await
+            .unwrap();
+        add_results(&pool, 711, 701, &election.political_groups, true).await;
+        add_results(&pool, 731, 703, &election.political_groups, false).await;
         let previous_results = claim_previous_results(pool.clone(), 741).await.unwrap();
         assert_eq!(previous_results.voters_counts.poll_card_count, 731);
     }
@@ -1874,7 +1955,10 @@ mod tests {
     /// Results with only one in committee session 2, should return 2
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_7_four_sessions"))))]
     async fn test_previous_results_from_second_session(pool: SqlitePool) {
-        add_results(&pool, 722, 702).await;
+        let election = crate::election::repository::get(&mut pool.acquire().await.unwrap(), 7)
+            .await
+            .unwrap();
+        add_results(&pool, 722, 702, &election.political_groups, false).await;
         let previous_results = claim_previous_results(pool.clone(), 742).await.unwrap();
         assert_eq!(previous_results.voters_counts.poll_card_count, 722);
     }
@@ -1882,7 +1966,10 @@ mod tests {
     /// Two subsequent results from committee sessions 2 and 3, should return 3rd
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_7_four_sessions"))))]
     async fn test_previous_results_from_last_two_sessions(pool: SqlitePool) {
-        add_results(&pool, 732, 703).await;
+        let election = crate::election::repository::get(&mut pool.acquire().await.unwrap(), 7)
+            .await
+            .unwrap();
+        add_results(&pool, 732, 703, &election.political_groups, false).await;
         let previous_results = claim_previous_results(pool.clone(), 742).await.unwrap();
         assert_eq!(previous_results.voters_counts.poll_card_count, 732);
     }

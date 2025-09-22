@@ -393,6 +393,25 @@ export interface CSOFirstSessionResults {
 }
 
 /**
+ * CSONextSessionResults, following the fields in Model Na 14-2 Bijlage 1.
+ *
+ * See "Model Na 14-2. Corrigendum bij het proces-verbaal van een gemeentelijk stembureau/
+ * stembureau voor het openbaar lichaam, Bijlage 1: uitkomsten per stembureau" from the
+ * [Kiesregeling](https://wetten.overheid.nl/BWBR0034180/2024-04-01#Bijlage1_DivisieNa14.2) or
+ * [Verkiezingstoolbox](https://www.rijksoverheid.nl/onderwerpen/verkiezingen/verkiezingentoolkit/modellen).
+ */
+export interface CSONextSessionResults {
+  /** Differences counts ("Verschil tussen het aantal toegelaten kiezers en het aantal getelde stembiljetten") */
+  differences_counts: DifferencesCounts;
+  /** Vote counts per list and candidate ("Aantal stemmen per lijst en kandidaat") */
+  political_group_votes: PoliticalGroupCandidateVotes[];
+  /** Voters counts ("Aantal toegelaten kiezers") */
+  voters_counts: VotersCounts;
+  /** Votes counts ("Aantal getelde stembiljetten") */
+  votes_counts: VotesCounts;
+}
+
+/**
  * Candidate
  */
 export interface Candidate {
@@ -438,7 +457,7 @@ export interface CandidateVotes {
 export interface ClaimDataEntryResponse {
   client_state: unknown;
   data: PollingStationResults;
-  previous_results?: PollingStationResults;
+  previous_results?: CommonPollingStationResults;
   validation_results: ValidationResults;
 }
 
@@ -500,6 +519,20 @@ export interface CommitteeSessionUpdateRequest {
   location: string;
   start_date: string;
   start_time: string;
+}
+
+/**
+ * CommonPollingStationResults contains the common fields for polling station results,
+ */
+export interface CommonPollingStationResults {
+  /** Differences counts ("Verschil tussen het aantal toegelaten kiezers en het aantal getelde stembiljetten") */
+  differences_counts: DifferencesCounts;
+  /** Vote counts per list and candidate ("Aantal stemmen per lijst en kandidaat") */
+  political_group_votes: PoliticalGroupCandidateVotes[];
+  /** Voters counts ("Aantal toegelaten kiezers") */
+  voters_counts: VotersCounts;
+  /** Votes counts ("Aantal getelde stembiljetten") */
+  votes_counts: VotesCounts;
 }
 
 /**
@@ -1109,7 +1142,9 @@ export interface PollingStationRequestListResponse {
  * whether this is the first or any subsequent data entry session. Based on
  * this, any of four different models can apply
  */
-export type PollingStationResults = CSOFirstSessionResults & { model: "CSOFirstSession" };
+export type PollingStationResults =
+  | (CSOFirstSessionResults & { model: "CSOFirstSession" })
+  | (CSONextSessionResults & { model: "CSONextSession" });
 
 /**
  * Type of Polling station

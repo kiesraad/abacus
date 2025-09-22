@@ -1,6 +1,6 @@
 use sqlx::{Connection, SqliteConnection, query, query_as, types::Json};
 
-use super::{CSOFirstSessionResults, PollingStationDataEntry, status::DataEntryStatus};
+use super::{PollingStationDataEntry, status::DataEntryStatus};
 use crate::{
     data_entry::{ElectionStatusResponseEntry, PollingStationResults},
     polling_station::PollingStation,
@@ -177,29 +177,6 @@ pub async fn make_definitive(
     tx.commit().await?;
 
     Ok(())
-}
-
-/// Get a list of polling stations with their results for a committee session, but only
-/// if the results are of type CSOFirstSessionResults
-pub async fn list_entries_with_polling_stations_first_session(
-    conn: &mut SqliteConnection,
-    committee_session_id: u32,
-) -> Result<Vec<(PollingStation, CSOFirstSessionResults)>, sqlx::Error> {
-    list_entries_for_committee_session(conn, committee_session_id)
-        .await?
-        .into_iter()
-        .map(|(p, r)| {
-            r.into_cso_first_session()
-                .map(|r| (p, r))
-                .ok_or(sqlx::Error::ColumnDecode {
-                    index: "data".to_string(),
-                    source: Box::new(std::io::Error::new(
-                        std::io::ErrorKind::InvalidData,
-                        "Results are not of type CSOFirstSessionResults",
-                    )),
-                })
-        })
-        .collect::<Result<_, sqlx::Error>>()
 }
 
 /// Check if a polling station has results

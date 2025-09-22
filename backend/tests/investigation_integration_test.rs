@@ -170,7 +170,7 @@ async fn test_investigation_create_conclude_update_delete(pool: SqlitePool) {
         delete_investigation(pool.clone(), 741).await.status(),
         StatusCode::OK
     );
-    let election_details = get_election(pool.clone(), 700).await;
+    let election_details = get_election(pool.clone(), election_id).await;
     assert_eq!(election_details.investigations.len(), 0);
 }
 
@@ -180,7 +180,7 @@ async fn test_investigation_deletion_setting_committee_session_back_to_created_s
 ) {
     let addr = serve_api(pool.clone()).await;
     let cookie = shared::coordinator_login(&addr).await;
-    let election_id = 700;
+    let election_id = 7;
 
     let committee_session =
         shared::get_election_committee_session(&addr, &cookie, election_id).await;

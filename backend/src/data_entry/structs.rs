@@ -142,6 +142,49 @@ impl CSOFirstSessionResults {
             })
             .collect()
     }
+
+    /// The admitted voters have been recounted in this session
+    pub fn admitted_voters_have_been_recounted(&self) -> bool {
+        self.counting_differences_polling_station
+            .unexplained_difference_ballots_voters
+            .yes
+            || self
+                .counting_differences_polling_station
+                .difference_ballots_per_list
+                .yes
+            || self
+                .differences_counts
+                .difference_completely_accounted_for
+                .no
+    }
+
+    /// The results have been investigated for another reason
+    pub fn investigated_other_reason(&self) -> bool {
+        self.extra_investigation
+            .extra_investigation_other_reason
+            .yes
+    }
+
+    /// There have been recounted ballots in this session
+    pub fn ballots_have_been_recounted(&self) -> bool {
+        self.extra_investigation
+            .ballots_recounted_extra_investigation
+            .yes
+    }
+
+    /// The extra investigation for another reason field has a value
+    pub fn investigation_other_reason_is_answered(&self) -> bool {
+        self.extra_investigation
+            .extra_investigation_other_reason
+            .is_answered()
+    }
+
+    /// The ballots recounted extra investigation field has a value
+    pub fn investigation_ballots_recounted_is_answered(&self) -> bool {
+        self.extra_investigation
+            .ballots_recounted_extra_investigation
+            .is_answered()
+    }
 }
 
 pub type Count = u32;

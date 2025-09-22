@@ -237,54 +237,25 @@ pub struct ReportingUnitVotes {
 /// When results were investigated by the GSB
 /// return the relevant investigations.
 fn create_investigations_from_results(
-    results: &CSOFirstSessionResults,
+    result: &CSOFirstSessionResults,
 ) -> Option<ReportingUnitInvestigations> {
     let mut investigations = Vec::new();
 
-    // onderzocht vanwege andere reden
-    if results
-        .extra_investigation
-        .extra_investigation_other_reason
-        .is_answered()
-    {
+    if result.investigation_ballots_recounted_is_answered() {
         investigations.push(Investigation {
             reason_code: InvestigationReason::InvestigatedOtherReason,
-            value: results
-                .extra_investigation
-                .extra_investigation_other_reason
-                .yes,
+            value: result.investigated_other_reason(),
         });
     }
 
-    // stembiljetten deels herteld
-    if results
-        .extra_investigation
-        .ballots_recounted_extra_investigation
-        .is_answered()
-    {
+    if result.investigation_other_reason_is_answered() {
         investigations.push(Investigation {
             reason_code: InvestigationReason::BallotsRecounted,
-            value: results
-                .extra_investigation
-                .ballots_recounted_extra_investigation
-                .yes,
+            value: result.ballots_have_been_recounted(),
         });
     }
 
-    // toegelaten kiezers opnieuw vastgesteld
-    if results
-        .counting_differences_polling_station
-        .unexplained_difference_ballots_voters
-        .yes
-        || results
-            .counting_differences_polling_station
-            .difference_ballots_per_list
-            .yes
-        || results
-            .differences_counts
-            .difference_completely_accounted_for
-            .no
-    {
+    if result.admitted_voters_have_been_recounted() {
         investigations.push(Investigation {
             reason_code: InvestigationReason::AdmittedVotersRecounted,
             value: true,

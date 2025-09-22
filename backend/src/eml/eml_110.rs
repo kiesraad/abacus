@@ -1,5 +1,5 @@
 use chrono::NaiveDate;
-use serde::{Deserialize, Serialize};
+use serde::{Deserialize, Deserializer, Serialize};
 
 use crate::{
     election::{PoliticalGroup, VoteCountingMethod},
@@ -323,7 +323,7 @@ impl EML110 {
                                         },
                                     },
                                     polling_station: PollingStation {
-                                        token: ps.number.to_string(),
+                                        number_of_voters: ps.number_of_voters,
                                         id: ps.id.to_string(),
                                     },
                                 },
@@ -417,10 +417,31 @@ pub struct PhysicalLocation {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "PascalCase")]
 pub struct PollingStation {
-    #[serde(rename = "$text")]
-    token: String,
     #[serde(rename = "@Id")]
     id: String,
+    #[serde(deserialize_with = "deserialize_number_of_voters", rename = "$text")]
+    number_of_voters: Option<i64>,
+}
+
+/// If the string value for number_of_voters contains a positive integer,
+/// return the integer and store as number of voters
+/// in all other cases; ignore errors and leave empty
+fn deserialize_number_of_voters<'de, D>(data: D) -> Result<Option<i64>, D::Error>
+where
+    D: Deserializer<'de>,
+{
+    let str = String::deserialize(data)?;
+
+    match str.parse::<i64>() {
+        Ok(value) => {
+            if value > 0 {
+                Ok(Some(value))
+            } else {
+                Ok(None)
+            }
+        }
+        Err(..) => Ok(None),
+    }
 }
 
 impl TryInto<PollingStationRequest> for &PollingPlace {
@@ -442,7 +463,7 @@ impl TryInto<PollingStationRequest> for &PollingPlace {
                     .parse::<i64>()
                     .or(Err(EMLImportError::InvalidPollingStation))?,
             ),
-            number_of_voters: None,
+            number_of_voters: self.physical_location.polling_station.number_of_voters,
             polling_station_type: None,
             address: "".to_string(),
             postal_code: match self.physical_location.address.locality.postal_code.clone() {
@@ -710,5 +731,29 @@ mod tests {
         let doc = EML110::from_str(data).unwrap();
         let res = doc.get_number_of_voters().unwrap_err();
         assert!(matches!(res, EMLImportError::InvalidNumberOfVoters));
+    }
+
+    #[test]
+    fn test_polling_station_valid_number_of_voters_parsing() {
+        let data = include_str!("./tests/eml110b_less_than_10_stations.eml.xml");
+        let doc = EML110::from_str(data).unwrap();
+        let polling_stations = doc.get_polling_stations().unwrap();
+        assert!(matches!(polling_stations[0].number_of_voters, Some(1273)));
+        assert!(polling_stations[1].number_of_voters.is_none());
+        assert!(matches!(polling_stations[2].number_of_voters, Some(870)));
+        assert!(matches!(polling_stations[3].number_of_voters, Some(867)));
+    }
+
+    #[test]
+    fn test_polling_station_invalid_number_of_voters() {
+        let data = include_str!("./tests/eml110b_invalid_polling_station_number_of_voters.xml");
+        let doc = EML110::from_str(data).unwrap();
+
+        // Invalid strings yield a None, not an error
+        let polling_stations = doc.get_polling_stations().unwrap();
+        assert!(polling_stations[0].number_of_voters.is_none());
+        assert!(polling_stations[1].number_of_voters.is_none());
+        assert!(polling_stations[2].number_of_voters.is_none());
+        assert!(matches!(polling_stations[3].number_of_voters, Some(867)));
     }
 }

@@ -46,8 +46,12 @@ pub struct PollingStationInvestigationConcludeRequest {
 #[serde(deny_unknown_fields)]
 pub struct PollingStationInvestigationUpdateRequest {
     pub reason: String,
-    pub findings: String,
-    pub corrected_results: bool,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[schema(nullable = false)]
+    pub findings: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[schema(nullable = false)]
+    pub corrected_results: Option<bool>,
 }
 
 pub struct CurrentSessionPollingStationId(pub u32);

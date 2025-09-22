@@ -46,14 +46,18 @@ async fn create_investigation(pool: SqlitePool, polling_station_id: u32) -> Resp
         .unwrap()
 }
 
-async fn update_investigation(pool: SqlitePool, polling_station_id: u32) -> Response {
+async fn update_investigation(
+    pool: SqlitePool,
+    polling_station_id: u32,
+    body: Option<serde_json::Value>,
+) -> Response {
     let addr = serve_api(pool).await;
     let coordinator_cookie = shared::coordinator_login(&addr).await;
-    let body = json!({
+    let body = body.unwrap_or(json!({
         "reason": "Updated reason",
         "findings": "updated test findings",
         "corrected_results": true
-    });
+    }));
     let url = format!("http://{addr}/api/polling_stations/{polling_station_id}/investigation");
     reqwest::Client::new()
         .put(&url)
@@ -120,7 +124,7 @@ async fn test_investigation_create_conclude_update(pool: SqlitePool) {
     );
 
     assert_eq!(
-        update_investigation(pool.clone(), 741).await.status(),
+        update_investigation(pool.clone(), 741, None).await.status(),
         StatusCode::OK
     );
 
@@ -132,6 +136,94 @@ async fn test_investigation_create_conclude_update(pool: SqlitePool) {
         election_details.investigations[0].findings,
         Some("updated test findings".to_string())
     );
+    assert_eq!(
+        election_details.investigations[0].corrected_results,
+        Some(true)
+    );
+}
+
+#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_7_four_sessions", "users"))))]
+async fn test_partials_investigation_update(pool: SqlitePool) {
+    let election_id = 7;
+
+    assert_eq!(
+        create_investigation(pool.clone(), 741).await.status(),
+        StatusCode::OK
+    );
+
+    let election_details = get_election(pool.clone(), election_id).await;
+    assert_eq!(election_details.investigations.len(), 1);
+    assert_eq!(election_details.investigations[0].polling_station_id, 741);
+    assert_eq!(election_details.investigations[0].reason, "Test reason");
+    assert_eq!(election_details.investigations[0].findings, None);
+
+    // Update only the reason
+    let updated = update_investigation(
+        pool.clone(),
+        741,
+        Some(json!({
+            "reason": "Partially updated reason"
+        })),
+    )
+    .await;
+
+    assert_eq!(updated.status(), StatusCode::OK);
+
+    let election_details = get_election(pool.clone(), election_id).await;
+    assert_eq!(election_details.investigations.len(), 1);
+    assert_eq!(election_details.investigations[0].polling_station_id, 741);
+    assert_eq!(
+        election_details.investigations[0].reason,
+        "Partially updated reason"
+    );
+    assert_eq!(election_details.investigations[0].findings, None);
+
+    let updated = update_investigation(
+        pool.clone(),
+        741,
+        Some(json!({
+            "reason": "Partially updated reason",
+            "findings": "Partially updated findings"
+        })),
+    )
+    .await;
+
+    // Update only the findings
+    assert_eq!(updated.status(), StatusCode::OK);
+
+    let election_details = get_election(pool.clone(), election_id).await;
+    assert_eq!(election_details.investigations.len(), 1);
+    assert_eq!(election_details.investigations[0].polling_station_id, 741);
+    assert_eq!(
+        election_details.investigations[0].reason,
+        "Partially updated reason"
+    );
+    assert_eq!(
+        election_details.investigations[0].findings,
+        Some("Partially updated findings".to_string())
+    );
+
+    let updated = update_investigation(
+        pool.clone(),
+        741,
+        Some(json!({
+            "reason": "Partially updated reason",
+            "corrected_results": true
+        })),
+    )
+    .await;
+
+    // Update only the corrected_results
+    assert_eq!(updated.status(), StatusCode::OK);
+
+    let election_details = get_election(pool.clone(), election_id).await;
+    assert_eq!(election_details.investigations.len(), 1);
+    assert_eq!(election_details.investigations[0].polling_station_id, 741);
+    assert_eq!(
+        election_details.investigations[0].reason,
+        "Partially updated reason"
+    );
+    assert_eq!(election_details.investigations[0].findings, None);
     assert_eq!(
         election_details.investigations[0].corrected_results,
         Some(true)
@@ -228,7 +320,7 @@ async fn test_investigation_can_only_conclude_existing(pool: SqlitePool) {
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_7_four_sessions", "users"))))]
 async fn test_investigation_can_only_update_existing(pool: SqlitePool) {
     assert_eq!(
-        update_investigation(pool.clone(), 741).await.status(),
+        update_investigation(pool.clone(), 741, None).await.status(),
         StatusCode::NOT_FOUND
     );
 }
@@ -244,7 +336,7 @@ async fn test_investigation_can_only_conclude_current_session(pool: SqlitePool) 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_7_four_sessions", "users"))))]
 async fn test_investigation_can_only_update_current_session(pool: SqlitePool) {
     assert_eq!(
-        update_investigation(pool.clone(), 732).await.status(),
+        update_investigation(pool.clone(), 732, None).await.status(),
         StatusCode::NOT_FOUND
     );
 }

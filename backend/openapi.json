@@ -6265,9 +6265,7 @@
       "PollingStationInvestigationUpdateRequest": {
         "type": "object",
         "required": [
-          "reason",
-          "findings",
-          "corrected_results"
+          "reason"
         ],
         "properties": {
           "corrected_results": {

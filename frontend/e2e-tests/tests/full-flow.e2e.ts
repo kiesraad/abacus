@@ -185,4 +185,126 @@ test.describe("full flow", () => {
     expect(download.suggestedFilename()).toBe("election_result_GR2022_Test.zip");
     expect((await stat(await download.path())).size).toBeGreaterThan(1024);
   });
+
+  test("create new committee session", async ({ page }) => {
+    await page.goto("/account/login");
+
+    const loginPage = new LoginPgObj(page);
+    await loginPage.login("coordinator1", getTestPassword("coordinator1"));
+
+    const overviewPage = new ElectionsOverviewPgObj(page);
+    await expect(overviewPage.header).toBeVisible();
+    await overviewPage.findElectionRowById(electionId!).click();
+
+    await page.getByRole("button", { name: "Nieuwe zitting voorbereiden" }).click();
+    await page.getByRole("button", { name: "Ja, zitting toevoegen" }).click();
+
+    await page.getByRole("button", { name: "Aangevraagde onderzoeken" }).click();
+    await page.getByRole("link", { name: "Onderzoek toevoegen" }).click();
+
+    await page.getByRole("cell", { name: "Stadhuis" }).click();
+    await page.getByRole("textbox", { name: "Aanleiding en opdracht" }).fill("Reden");
+
+    await page.getByRole("button", { name: "Volgende" }).click();
+    await page.getByRole("link", { name: "Verder naar bevindingen" }).click();
+
+    await page.getByRole("textbox", { name: "Bevindingen" }).fill("Probleem");
+
+    await page.getByRole("radio", { name: "Ja" }).check();
+    await page.getByRole("button", { name: "Opslaan" }).click();
+
+    await page.getByRole("link", { name: "Onderzoek toevoegen" }).click();
+    await page.getByRole("cell", { name: "Basisschool de Regenboog" }).click();
+
+    await page.getByRole("textbox", { name: "Aanleiding en opdracht" }).fill("Reden");
+    await page.getByRole("button", { name: "Volgende" }).click();
+    await page.getByRole("link", { name: "Verder naar bevindingen" }).click();
+    await page.getByRole("textbox", { name: "Bevindingen" }).fill("Geen probleem");
+    await page.getByRole("radio", { name: "Nee" }).check();
+    await page.getByRole("button", { name: "Opslaan" }).click();
+
+    await page.getByRole("button", { name: "Menu" }).click();
+    await page.getByRole("link", { name: "Verkiezingen" }).click();
+
+    await expect(overviewPage.header).toBeVisible();
+    await overviewPage.findElectionRowById(electionId!).click();
+
+    await page.getByRole("button", { name: "Start steminvoer" }).click();
+  });
+
+  test("corrected first data entry", async ({ page }) => {
+    await page.goto("/account/login");
+
+    const loginPage = new LoginPgObj(page);
+    await loginPage.login("typist1", getTestPassword("typist1"));
+
+    const overviewPage = new ElectionsOverviewPgObj(page);
+    await expect(overviewPage.header).toBeVisible();
+    await overviewPage.findElectionRowById(electionId!).click();
+
+    const dataEntryHomePage = new DataEntryHomePage(page);
+    await expect(dataEntryHomePage.fieldset).toBeVisible();
+    await dataEntryHomePage.pollingStationNumber.fill("1");
+    await expect(dataEntryHomePage.pollingStationFeedback).toContainText("Stadhuis");
+    await dataEntryHomePage.clickStart();
+
+    await page.getByRole("button", { name: "Volgende" }).click();
+    await page.getByRole("checkbox", { name: "D en H zijn gelijk" }).check();
+    await page.getByRole("checkbox", { name: "Nee" }).check();
+    await page.getByRole("button", { name: "Volgende" }).click();
+    await page.getByRole("textbox", { name: "Oorschot, A.B.C. (Annemieke)" }).fill("1336");
+    await page.getByRole("textbox", { name: "De Blikkert, K. (Krisje)" }).click();
+    await page.getByRole("textbox", { name: "De Blikkert, K. (Krisje)" }).fill("424");
+    await page.getByRole("button", { name: "Volgende" }).click();
+    await page.getByRole("button", { name: "Volgende" }).click();
+    await page.getByRole("button", { name: "Volgende" }).click();
+    await page.getByRole("button", { name: "Opslaan" }).click();
+  });
+
+  test("corrected second data entry", async ({ page }) => {
+    await page.goto("/account/login");
+
+    const loginPage = new LoginPgObj(page);
+    await loginPage.login("typist2", getTestPassword("typist2"));
+
+    const overviewPage = new ElectionsOverviewPgObj(page);
+    await expect(overviewPage.header).toBeVisible();
+    await overviewPage.findElectionRowById(electionId!).click();
+
+    const dataEntryHomePage = new DataEntryHomePage(page);
+    await expect(dataEntryHomePage.fieldset).toBeVisible();
+    await dataEntryHomePage.pollingStationNumber.fill("1");
+    await expect(dataEntryHomePage.pollingStationFeedback).toContainText("Stadhuis");
+    await dataEntryHomePage.clickStart();
+
+    await page.getByRole("button", { name: "Volgende" }).click();
+    await page.getByRole("checkbox", { name: "D en H zijn gelijk" }).check();
+    await page.getByRole("checkbox", { name: "Nee" }).check();
+    await page.getByRole("button", { name: "Volgende" }).click();
+    await page.getByRole("textbox", { name: "Oorschot, A.B.C. (Annemieke)" }).fill("1336");
+    await page.getByRole("textbox", { name: "De Blikkert, K. (Krisje)" }).click();
+    await page.getByRole("textbox", { name: "De Blikkert, K. (Krisje)" }).fill("424");
+    await page.getByRole("button", { name: "Volgende" }).click();
+    await page.getByRole("button", { name: "Volgende" }).click();
+    await page.getByRole("button", { name: "Volgende" }).click();
+    await page.getByRole("button", { name: "Opslaan" }).click();
+  });
+
+  test("check progress", async ({ page }) => {
+    await page.goto("/account/login");
+
+    const loginPage = new LoginPgObj(page);
+    await loginPage.login("coordinator1", getTestPassword("coordinator1"));
+
+    const overviewPage = new ElectionsOverviewPgObj(page);
+    await expect(overviewPage.header).toBeVisible();
+    await overviewPage.findElectionRowById(electionId!).click();
+
+    const electionHome = new ElectionHome(page);
+    await expect(electionHome.header).toBeVisible();
+    await electionHome.statusButton.click();
+
+    const statusPage = new ElectionStatus(page);
+    await expect(statusPage.definitive).toBeVisible();
+  });
 });

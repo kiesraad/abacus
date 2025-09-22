@@ -42,7 +42,7 @@ async fn get_polling_station(
 async fn test_polling_station_listing(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let cookie = shared::coordinator_login(&addr).await;
-    let url = format!("http://{addr}/api/elections/700/polling_stations");
+    let url = format!("http://{addr}/api/elections/7/polling_stations");
     let response = reqwest::Client::new()
         .get(&url)
         .header("cookie", cookie)
@@ -186,7 +186,7 @@ async fn test_polling_station_creation_for_committee_session_with_finished_statu
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_7_four_sessions", "users"))))]
 async fn test_polling_station_get(pool: SqlitePool) {
-    let election_id = 700;
+    let election_id = 7;
     let committee_session_id = 704;
 
     let ps = get_polling_station(pool, election_id, 742).await;
@@ -201,7 +201,7 @@ async fn test_polling_station_get(pool: SqlitePool) {
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_7_four_sessions", "users"))))]
 async fn test_polling_station_update_ok(pool: SqlitePool) {
-    let election_id = 700;
+    let election_id = 7;
     let polling_station_id = 742;
 
     let addr = serve_api(pool.clone()).await;

@@ -1,7 +1,9 @@
 import { IconPlus } from "@/components/generated/icons";
+import { Messages } from "@/components/messages/Messages";
 import { PageTitle } from "@/components/page_title/PageTitle";
 import { Button } from "@/components/ui/Button/Button";
 import { useElection } from "@/hooks/election/useElection";
+import { useUserRole } from "@/hooks/user/useUserRole";
 import { t } from "@/i18n/translate";
 import { committeeSessionLabel } from "@/utils/committeeSession";
 
@@ -11,6 +13,7 @@ import { InvestigationCard } from "./InvestigationCard";
 export function InvestigationsOverviewPage() {
   const { currentCommitteeSession, election } = useElection();
   const { investigations, currentInvestigations, handledInvestigations } = useInvestigations();
+  const { isCoordinator } = useUserRole();
 
   return (
     <>
@@ -24,6 +27,9 @@ export function InvestigationsOverviewPage() {
           </h1>
         </section>
       </header>
+
+      <Messages />
+
       <main>
         <section>
           <h2>{t("investigations.from_central_polling_station")}</h2>
@@ -33,12 +39,14 @@ export function InvestigationsOverviewPage() {
               <li>{t("investigations.print_corrigendum_form")}</li>
             </ul>
           )}
-          <nav className="mt-md-lg mb-lg">
-            <Button.Link to="./add" variant={investigations.length > 0 ? "secondary" : "primary"}>
-              <IconPlus />
-              {t("investigations.add_investigation")}
-            </Button.Link>
-          </nav>
+          {isCoordinator && currentCommitteeSession.status !== "data_entry_finished" && (
+            <nav className="mt-md-lg mb-lg">
+              <Button.Link to="./add" variant={investigations.length > 0 ? "secondary" : "primary"}>
+                <IconPlus />
+                {t("investigations.add_investigation")}
+              </Button.Link>
+            </nav>
+          )}
           {currentInvestigations.map((investigation, index) => (
             <InvestigationCard investigation={investigation} electionId={election.id} key={index} />
           ))}

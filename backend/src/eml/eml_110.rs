@@ -323,9 +323,7 @@ impl EML110 {
                                         },
                                     },
                                     polling_station: PollingStation {
-                                        number_of_voters: ps
-                                            .number_of_voters
-                                            .map(|value| value.try_into().unwrap_or(0)),
+                                        number_of_voters: ps.number_of_voters,
                                         id: ps.id.to_string(),
                                     },
                                 },
@@ -422,19 +420,19 @@ pub struct PollingStation {
     #[serde(rename = "@Id")]
     id: String,
     #[serde(deserialize_with = "deserialize_number_of_voters", rename = "$text")]
-    number_of_voters: Option<u64>,
+    number_of_voters: Option<i64>,
 }
 
 /// If the string value for number_of_voters contains a positive integer,
 /// return the integer and store as number of voters
 /// in all other cases; ignore errors and leave empty
-fn deserialize_number_of_voters<'de, D>(data: D) -> Result<Option<u64>, D::Error>
+fn deserialize_number_of_voters<'de, D>(data: D) -> Result<Option<i64>, D::Error>
 where
     D: Deserializer<'de>,
 {
     let str = String::deserialize(data)?;
 
-    match str.parse::<u64>() {
+    match str.parse::<i64>() {
         Ok(value) => {
             if value > 0 {
                 Ok(Some(value))
@@ -465,10 +463,7 @@ impl TryInto<PollingStationRequest> for &PollingPlace {
                     .parse::<i64>()
                     .or(Err(EMLImportError::InvalidPollingStation))?,
             ),
-            number_of_voters: match self.physical_location.polling_station.number_of_voters {
-                Some(value) => value.try_into().ok(),
-                None => None,
-            },
+            number_of_voters: self.physical_location.polling_station.number_of_voters,
             polling_station_type: None,
             address: "".to_string(),
             postal_code: match self.physical_location.address.locality.postal_code.clone() {

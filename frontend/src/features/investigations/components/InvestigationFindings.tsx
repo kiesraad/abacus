@@ -1,7 +1,7 @@
 import { FormEvent, useState } from "react";
 import { useNavigate } from "react-router";
 
-import { AnyApiError, isError, isSuccess } from "@/api/ApiResult";
+import { AnyApiError, ApiResult, isError, isSuccess } from "@/api/ApiResult";
 import { useCrud } from "@/api/useCrud";
 import { Button } from "@/components/ui/Button/Button";
 import { ChoiceList } from "@/components/ui/CheckboxAndRadio/ChoiceList";
@@ -71,7 +71,9 @@ export function InvestigationFindings({ pollingStationId }: InvestigationFinding
 
     const correctedResults = correctedResultsChoice === "yes";
 
-    const save = () => {
+    const save = (): Promise<
+      ApiResult<PollingStationInvestigationConcludeRequest | PollingStationInvestigationUpdateRequest>
+    > => {
       pushMessage({
         title: t("investigations.message.investigation_updated", {
           number: pollingStation.number,

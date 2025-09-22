@@ -1083,8 +1083,8 @@ export interface PollingStationInvestigationCreateRequest {
 }
 
 export interface PollingStationInvestigationUpdateRequest {
-  corrected_results: boolean;
-  findings: string;
+  corrected_results?: boolean;
+  findings?: string;
   reason: string;
 }
 

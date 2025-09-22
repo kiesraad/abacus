@@ -35,6 +35,7 @@
   pre {
     font-family: var(--font-text), sans-serif;
     margin: 0;
+    white-space: pre-wrap;
   }
 }
 

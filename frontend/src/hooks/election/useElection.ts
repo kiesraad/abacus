@@ -15,6 +15,7 @@ export function useElection(pollingStationId?: number) {
   const investigation = pollingStation
     ? investigations.find((psi) => psi.polling_station_id === pollingStation.id)
     : undefined;
+
   return {
     currentCommitteeSession,
     committeeSessions,

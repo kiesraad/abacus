@@ -30,22 +30,17 @@ async function renderPage() {
               Component: () => "Overview stub",
             },
             {
-              path: "add",
+              path: ":pollingStationId",
+              Component: AddInvestigationLayout,
               children: [
                 {
-                  path: ":pollingStationId",
-                  Component: AddInvestigationLayout,
-                  children: [
-                    {
-                      index: true,
-                      path: "reason",
-                      Component: () => "Reason stub",
-                    },
-                    {
-                      path: "print-corrigendum",
-                      Component: InvestigationPrintCorrigendumPage,
-                    },
-                  ],
+                  index: true,
+                  path: "reason",
+                  Component: () => "Reason stub",
+                },
+                {
+                  path: "print-corrigendum",
+                  Component: InvestigationPrintCorrigendumPage,
                 },
               ],
             },
@@ -55,7 +50,7 @@ async function renderPage() {
     },
   ]);
 
-  await router.navigate("/elections/1/investigations/add/1/print-corrigendum");
+  await router.navigate("/elections/1/investigations/1/print-corrigendum");
   render(<Providers router={router} />);
 
   return router;

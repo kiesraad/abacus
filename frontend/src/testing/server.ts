@@ -20,21 +20,23 @@ export function overrideOnce(
   body: string | null | JsonBodyType,
   delayResponse?: "infinite" | number,
 ) {
-  server.use(
-    http[method](
-      path,
-      async () => {
-        if (delayResponse) {
-          await delay(delayResponse);
-        }
-        // https://mswjs.io/docs/api/response/once
-        if (typeof body === "string" || body === null) {
-          return new HttpResponse(body, { status });
-        } else {
-          return HttpResponse.json(body, { status });
-        }
-      },
-      { once: true },
-    ),
+  const handler = http[method](
+    path,
+    async () => {
+      if (delayResponse) {
+        await delay(delayResponse);
+      }
+      // https://mswjs.io/docs/api/response/once
+      if (typeof body === "string" || body === null) {
+        return new HttpResponse(body, { status });
+      } else {
+        return HttpResponse.json(body, { status });
+      }
+    },
+    { once: true },
   );
+
+  server.use(handler);
+
+  return handler;
 }

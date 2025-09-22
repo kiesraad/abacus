@@ -217,17 +217,25 @@ export interface POLLING_STATION_DATA_ENTRY_FINALISE_REQUEST_PARAMS {
 export type POLLING_STATION_DATA_ENTRY_FINALISE_REQUEST_PATH =
   `/api/polling_stations/${number}/data_entries/${number}/finalise`;
 
-// /api/polling_stations/{polling_station_id}/investigations
-export interface COMMITTEE_SESSION_INVESTIGATION_CONCLUDE_REQUEST_PARAMS {
+// /api/polling_stations/{polling_station_id}/investigation
+export interface POLLING_STATION_INVESTIGATION_UPDATE_REQUEST_PARAMS {
   polling_station_id: number;
 }
-export type COMMITTEE_SESSION_INVESTIGATION_CONCLUDE_REQUEST_PATH = `/api/polling_stations/${number}/investigations`;
-export type COMMITTEE_SESSION_INVESTIGATION_CONCLUDE_REQUEST_BODY = PollingStationInvestigationConcludeRequest;
-export interface COMMITTEE_SESSION_INVESTIGATION_CREATE_REQUEST_PARAMS {
+export type POLLING_STATION_INVESTIGATION_UPDATE_REQUEST_PATH = `/api/polling_stations/${number}/investigation`;
+export type POLLING_STATION_INVESTIGATION_UPDATE_REQUEST_BODY = PollingStationInvestigationUpdateRequest;
+export interface POLLING_STATION_INVESTIGATION_CREATE_REQUEST_PARAMS {
   polling_station_id: number;
 }
-export type COMMITTEE_SESSION_INVESTIGATION_CREATE_REQUEST_PATH = `/api/polling_stations/${number}/investigations`;
-export type COMMITTEE_SESSION_INVESTIGATION_CREATE_REQUEST_BODY = PollingStationInvestigationCreateRequest;
+export type POLLING_STATION_INVESTIGATION_CREATE_REQUEST_PATH = `/api/polling_stations/${number}/investigation`;
+export type POLLING_STATION_INVESTIGATION_CREATE_REQUEST_BODY = PollingStationInvestigationCreateRequest;
+
+// /api/polling_stations/{polling_station_id}/investigation/conclude
+export interface POLLING_STATION_INVESTIGATION_CONCLUDE_REQUEST_PARAMS {
+  polling_station_id: number;
+}
+export type POLLING_STATION_INVESTIGATION_CONCLUDE_REQUEST_PATH =
+  `/api/polling_stations/${number}/investigation/conclude`;
+export type POLLING_STATION_INVESTIGATION_CONCLUDE_REQUEST_BODY = PollingStationInvestigationConcludeRequest;
 
 // /api/user
 export type USER_LIST_REQUEST_PARAMS = Record<string, never>;
@@ -302,6 +310,7 @@ export type AuditEvent =
   | (CommitteeSessionDetails & { event_type: "CommitteeSessionUpdated" })
   | (PollingStationInvestigation & { event_type: "PollingStationInvestigationCreated" })
   | (PollingStationInvestigation & { event_type: "PollingStationInvestigationConcluded" })
+  | (PollingStationInvestigation & { event_type: "PollingStationInvestigationUpdated" })
   | (FileDetails & { event_type: "FileCreated" })
   | (FileDetails & { event_type: "FileDeleted" })
   | (ElectionDetails & { event_type: "ApportionmentCreated" })
@@ -647,6 +656,7 @@ export interface ElectionDefinitionValidateResponse {
   election: NewElection;
   hash: RedactedEmlHash;
   number_of_voters: number;
+  polling_station_definition_matches_election?: boolean;
   polling_stations?: PollingStationRequest[];
 }
 
@@ -1039,6 +1049,12 @@ export interface PollingStationInvestigationCreateRequest {
   reason: string;
 }
 
+export interface PollingStationInvestigationUpdateRequest {
+  corrected_results: boolean;
+  findings: string;
+  reason: string;
+}
+
 /**
  * Polling stations where results were investigated by the GSB,
  * as vectors of polling station numbers
@@ -1069,7 +1085,7 @@ export interface PollingStationRequest {
   address: string;
   locality: string;
   name: string;
-  number: number;
+  number?: number;
   number_of_voters?: number;
   polling_station_type?: PollingStationType;
   postal_code: string;
@@ -1239,6 +1255,11 @@ export type ValidationResultCode =
   | "F303"
   | "F304"
   | "F305"
+  | "F306"
+  | "F307"
+  | "F308"
+  | "F309"
+  | "F310"
   | "F401"
   | "F402"
   | "F403"

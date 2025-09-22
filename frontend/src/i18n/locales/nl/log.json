@@ -50,6 +50,7 @@
     "PollingStationsImported": "Stembureaus geïmporteerd",
     "PollingStationInvestigationCreated": "Onderzoek gestart",
     "PollingStationInvestigationConcluded": "Onderzoek afgerond",
+    "PollingStationInvestigationUpdated": "Onderzoek bijgewerkt",
     "UnknownEvent": "Onbekende gebeurtenis",
     "UserAccountUpdated": "Gebruikersaccount opgeslagen",
     "UserCreated": "Gebruiker aangemaakt",

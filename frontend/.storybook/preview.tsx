@@ -5,10 +5,12 @@ import { configure, expect } from "storybook/test";
 
 import { ApiResponseStatus } from "@/api/ApiResult";
 import { ElectionProviderContext } from "@/hooks/election/ElectionProviderContext";
+import { ElectionStatusProviderContext } from "@/hooks/election/ElectionStatusProviderContext";
 import { UsersProviderContext } from "@/hooks/user/UsersProviderContext";
 import { t } from "@/i18n/translate";
 import "@/styles/index.css";
 import { electionDetailsMockResponse } from "@/testing/api-mocks/ElectionMockData";
+import { statusResponseMock } from "@/testing/api-mocks/ElectionStatusMockData";
 import { userMockData } from "@/testing/api-mocks/UserMockData";
 import { matchers } from "@/testing/matchers";
 import { TestUserProvider } from "@/testing/TestUserProvider";
@@ -51,26 +53,43 @@ const preview: Preview = {
     // Election Provider decorator - provide mock election context if needed
     (Story, { parameters }) => {
       const needsElection = (parameters.needsElection as boolean) || false;
+      const needsElectionStatus = (parameters.needsElectionStatus as boolean) || false;
 
-      if (!needsElection) {
-        return <Story />;
+      let component = <Story />;
+
+      if (needsElectionStatus) {
+        component = (
+          <ElectionStatusProviderContext.Provider
+            value={{
+              statuses: statusResponseMock.statuses,
+              refetch: () =>
+                Promise.resolve({ status: ApiResponseStatus.Success, code: 200, data: statusResponseMock }),
+            }}
+          >
+            {component}
+          </ElectionStatusProviderContext.Provider>
+        );
       }
 
-      return (
-        <ElectionProviderContext.Provider
-          value={{
-            election: electionDetailsMockResponse.election,
-            pollingStations: electionDetailsMockResponse.polling_stations,
-            currentCommitteeSession: electionDetailsMockResponse.current_committee_session,
-            committeeSessions: electionDetailsMockResponse.committee_sessions,
-            investigations: electionDetailsMockResponse.investigations,
-            refetch: () =>
-              Promise.resolve({ status: ApiResponseStatus.Success, code: 200, data: electionDetailsMockResponse }),
-          }}
-        >
-          <Story />
-        </ElectionProviderContext.Provider>
-      );
+      if (needsElection) {
+        component = (
+          <ElectionProviderContext.Provider
+            value={{
+              election: electionDetailsMockResponse.election,
+              pollingStations: electionDetailsMockResponse.polling_stations,
+              currentCommitteeSession: electionDetailsMockResponse.current_committee_session,
+              committeeSessions: electionDetailsMockResponse.committee_sessions,
+              investigations: electionDetailsMockResponse.investigations,
+              refetch: () =>
+                Promise.resolve({ status: ApiResponseStatus.Success, code: 200, data: electionDetailsMockResponse }),
+            }}
+          >
+            {component}
+          </ElectionProviderContext.Provider>
+        );
+      }
+
+      return component;
     },
     // Users Provider decorator - provide mock users context if needed
     (Story, { parameters }) => {

@@ -3,6 +3,10 @@
   margin-top: 0;
 }
 
+.mt-sm {
+  margin-top: var(--space-sm);
+}
+
 .mt-md {
   margin-top: var(--space-md);
 }

@@ -9,7 +9,10 @@ import { FormLayout } from "@/components/ui/Form/FormLayout";
 import { InputField } from "@/components/ui/InputField/InputField";
 import { useElection } from "@/hooks/election/useElection";
 import { t } from "@/i18n/translate";
-import { PollingStationInvestigationCreateRequest } from "@/types/generated/openapi";
+import {
+  PollingStationInvestigationCreateRequest,
+  PollingStationInvestigationUpdateRequest,
+} from "@/types/generated/openapi";
 import { StringFormData } from "@/utils/stringFormData";
 
 interface InvestigationReasonProps {
@@ -18,11 +21,11 @@ interface InvestigationReasonProps {
 
 export function InvestigationReason({ pollingStationId }: InvestigationReasonProps) {
   const navigate = useNavigate();
-  const { refetch } = useElection();
+  const { investigation, refetch } = useElection(pollingStationId);
   const [nonEmptyError, setNonEmptyError] = useState(false);
-  const path = `/api/polling_stations/${pollingStationId}/investigations`;
-  const { create } = useCrud<PollingStationInvestigationCreateRequest>({ create: path });
-
+  const path = `/api/polling_stations/${pollingStationId}/investigation`;
+  const { create } = useCrud<PollingStationInvestigationCreateRequest>(path);
+  const { update } = useCrud<PollingStationInvestigationUpdateRequest>(path);
   const [error, setError] = useState<AnyApiError>();
 
   if (error) {
@@ -42,8 +45,20 @@ export function InvestigationReason({ pollingStationId }: InvestigationReasonPro
 
     setNonEmptyError(false);
 
-    const body: PollingStationInvestigationCreateRequest = { reason };
-    const response = await create(body);
+    const save = () => {
+      if (investigation != undefined) {
+        return update({
+          reason,
+          findings: investigation.findings,
+          corrected_results: investigation.corrected_results,
+        });
+      }
+
+      return create({ reason });
+    };
+
+    const response = await save();
+
     if (isSuccess(response)) {
       await refetch();
       await navigate("../print-corrigendum");
@@ -71,10 +86,11 @@ export function InvestigationReason({ pollingStationId }: InvestigationReasonPro
             name="reason"
             label={t("investigations.reason_and_assignment.title")}
             error={nonEmptyError ? t("form_errors.FORM_VALIDATION_RESULT_REQUIRED") : undefined}
+            defaultValue={investigation?.reason}
           />
         </FormLayout.Section>
         <FormLayout.Controls>
-          <Button type="submit">{t("next")}</Button>
+          <Button type="submit">{investigation ? t("save") : t("next")}</Button>
         </FormLayout.Controls>
       </FormLayout>
     </Form>

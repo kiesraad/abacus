@@ -4,7 +4,7 @@ import { electionMockData } from "@/testing/api-mocks/ElectionMockData";
 import { PollingStationResults } from "@/types/generated/openapi";
 import { DataEntrySection } from "@/types/types";
 
-import { mapResultsToSectionValues, mapSectionValues } from "./dataEntryMapping";
+import { correctedValue, determineCorrections, mapResultsToSectionValues, mapSectionValues } from "./dataEntryMapping";
 import { createVotersAndVotesSection, differencesSection } from "./dataEntryStructure";
 
 // Helper function to create a base PollingStationResults object for testing
@@ -806,5 +806,37 @@ describe("mapResultsToSectionValues", () => {
     formValues = mapResultsToSectionValues(checkboxesSection, results);
     expect(formValues["test.yes"]).toBe("true");
     expect(formValues["test.no"]).toBe("false");
+  });
+});
+
+describe("correctedValue", () => {
+  test("undefined previousValue return correction", () => {
+    expect(correctedValue(undefined, "10")).toEqual("10");
+  });
+
+  test("empty correction returns previous value", () => {
+    expect(correctedValue("10", "")).toEqual("10");
+  });
+
+  test("empty correction and previous value returns empty", () => {
+    expect(correctedValue("", "")).toEqual("");
+  });
+
+  test("correction not empty return correction", () => {
+    expect(correctedValue("10", "20")).toEqual("20");
+  });
+});
+
+describe("determineCorrections", () => {
+  test("identical previous and current results in empty correction", () => {
+    expect(determineCorrections({ a: "10" }, { a: "10" })).toEqual({ a: "" });
+  });
+
+  test("different previous and current results in correction", () => {
+    expect(determineCorrections({ a: "10" }, { a: "20" })).toEqual({ a: "20" });
+  });
+
+  test("filled previous and empty current results in zero correction", () => {
+    expect(determineCorrections({ a: "10" }, { a: "" })).toEqual({ a: "0" });
   });
 });

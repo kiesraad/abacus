@@ -5,8 +5,6 @@ import { getDataEntryStructure } from "@/utils/dataEntryStructure";
 import { ClientState, DataEntryAction, DataEntryState } from "../types/types";
 import { buildFormState, getInitialFormState, getNextSectionID, updateFormStateAfterSubmit } from "./dataEntryUtils";
 
-export const INITIAL_FORM_SECTION_ID = "extra_investigation";
-
 export function getInitialState(
   election: ElectionWithPoliticalGroups,
   pollingStationId: number,
@@ -16,6 +14,7 @@ export function getInitialState(
     election,
     pollingStationId,
     error: null,
+    previousResults: null,
     pollingStationResults: null,
     entryNumber,
     dataEntryStructure: null,
@@ -47,15 +46,21 @@ export default function dataEntryReducer(state: DataEntryState, action: DataEntr
           dataEntryStructure,
           formState,
           targetFormSectionId,
+          previousResults: action.dataEntry.previous_results ?? null,
           pollingStationResults: action.dataEntry.data,
           error: null,
         };
       } else {
+        const targetFormSectionId = dataEntryStructure[0]?.id;
+        if (targetFormSectionId === undefined) {
+          throw new Error("Cannot determine initial section from dataEntryStructure");
+        }
         return {
           ...state,
           dataEntryStructure,
           formState: getInitialFormState(dataEntryStructure),
-          targetFormSectionId: INITIAL_FORM_SECTION_ID,
+          targetFormSectionId,
+          previousResults: action.dataEntry.previous_results ?? null,
           pollingStationResults: action.dataEntry.data,
           error: null,
         };

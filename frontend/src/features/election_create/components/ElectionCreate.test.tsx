@@ -60,6 +60,7 @@ function renderWithRouter() {
 function electionValidateResponse(
   election: NewElection,
   polling_stations: PollingStationRequest[] | undefined = undefined,
+  matching_election: boolean | undefined = undefined,
 ): ElectionDefinitionValidateResponse {
   return {
     hash: {
@@ -89,6 +90,7 @@ function electionValidateResponse(
     election,
     polling_stations,
     number_of_voters: 0,
+    polling_station_definition_matches_election: matching_election,
   };
 }
 
@@ -685,6 +687,54 @@ describe("Election create pages", () => {
     expect(await screen.findByRole("heading", { level: 2, name: "Type stemopneming in Heemdamseburg" })).toBeVisible();
   });
 
+  test("Shows warning when uploading a polling stations file with not matching election id", async () => {
+    const router = renderWithRouter();
+    const user = userEvent.setup();
+    const filename = "foo.txt";
+    const file = new File(["foo"], filename, { type: "text/plain" });
+
+    // upload election and set hash, and continue
+    await uploadElectionDefinition(router, file);
+    await inputElectionHash();
+    await setPollingStationRole();
+
+    // upload candidate file, set hash and continue
+    await uploadCandidateDefinition(file);
+    await inputCandidateHash();
+
+    overrideOnce(
+      "post",
+      "/api/elections/import/validate",
+      200,
+      electionValidateResponse(newElectionMockData, pollingStationMockData, false),
+    );
+
+    // Make sure we are on the correct page
+    expect(
+      await screen.findByRole("heading", { level: 2, name: "Importeer stembureaus gemeente Heemdamseburg" }),
+    ).toBeVisible();
+    const input = await screen.findByLabelText("Bestand kiezen");
+    expect(input).toBeVisible();
+    expect(await screen.findByLabelText("Geen bestand gekozen")).toBeVisible();
+    await user.upload(input, file);
+
+    // We should be at the check polling stations page
+    expect(await screen.findByRole("heading", { level: 2, name: "Controleer stembureaus" })).toBeVisible();
+
+    // Check the overview table
+    expect(await screen.findByRole("table")).toBeVisible();
+    expect(await screen.findAllByRole("row")).toHaveLength(8);
+
+    // Make sure the warning is not shown
+    expect(await screen.findByText(/Afwijkende verkiezing/i)).toBeVisible();
+
+    // click next
+    await user.click(screen.getByText("Volgende"));
+
+    // Expect to see the next page
+    expect(await screen.findByRole("heading", { level: 2, name: "Type stemopneming in Heemdamseburg" })).toBeVisible();
+  });
+
   test("Shows overview when uploading valid polling station file", async () => {
     const router = renderWithRouter();
     const user = userEvent.setup();
@@ -704,7 +754,7 @@ describe("Election create pages", () => {
       "post",
       "/api/elections/import/validate",
       200,
-      electionValidateResponse(newElectionMockData, pollingStationMockData),
+      electionValidateResponse(newElectionMockData, pollingStationMockData, true),
     );
 
     // Make sure we are on the correct page
@@ -722,6 +772,9 @@ describe("Election create pages", () => {
     // Check the overview table
     expect(await screen.findByRole("table")).toBeVisible();
     expect(await screen.findAllByRole("row")).toHaveLength(8);
+
+    // Make sure the warning is not shown
+    expect(screen.queryByText(/Afwijkende verkiezing/i)).toBeNull();
 
     // click next
     await user.click(screen.getByText("Volgende"));

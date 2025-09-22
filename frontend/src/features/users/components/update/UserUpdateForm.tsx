@@ -2,7 +2,7 @@ import { FormEvent, useState } from "react";
 
 import { AnyApiError, ApiError, isSuccess } from "@/api/ApiResult";
 import { useCrud } from "@/api/useCrud";
-import { IconPencil } from "@/components/generated/icons";
+import { IconEdit } from "@/components/generated/icons";
 import { Alert } from "@/components/ui/Alert/Alert";
 import { Button } from "@/components/ui/Button/Button";
 import { Form } from "@/components/ui/Form/Form";
@@ -122,7 +122,7 @@ export function UserUpdateForm({ user, onSaved, onAbort }: UserUpdateFormProps) 
                     setEditPassword(true);
                   }}
                 >
-                  <IconPencil />
+                  <IconEdit />
                   {t("users.change_password")}
                 </Button>
               </FormLayout.Field>

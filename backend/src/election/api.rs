@@ -114,12 +114,11 @@ pub async fn election_details(
         .clone();
     let polling_stations =
         crate::polling_station::repository::list(&mut conn, current_committee_session.id).await?;
-    let investigations =
-        crate::investigation::repository::list_investigations_for_committee_session(
-            &mut conn,
-            current_committee_session.id,
-        )
-        .await?;
+    let investigations = crate::investigation::list_investigations_for_committee_session(
+        &mut conn,
+        current_committee_session.id,
+    )
+    .await?;
 
     Ok(Json(ElectionDetailsResponse {
         current_committee_session,

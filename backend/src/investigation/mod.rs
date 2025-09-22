@@ -1,5 +1,8 @@
 mod api;
-pub(super) mod repository;
-pub(super) mod structs;
+mod repository;
+mod structs;
 
-pub(crate) use self::{api::router, structs::PollingStationInvestigation};
+pub(crate) use self::{
+    api::router, repository::list_investigations_for_committee_session,
+    structs::PollingStationInvestigation,
+};

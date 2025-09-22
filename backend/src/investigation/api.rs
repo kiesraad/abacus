@@ -228,7 +228,7 @@ async fn polling_station_investigation_delete(
     _user: Coordinator,
     State(pool): State<SqlitePool>,
     audit_service: AuditService,
-    CurrentSessionPollingStationId(polling_station_id): CurrentSessionPollingStationId,
+    Path(polling_station_id): Path<u32>,
 ) -> Result<StatusCode, APIError> {
     let mut tx = pool.begin_immediate().await?;
     let investigation = get_polling_station_investigation(&mut tx, polling_station_id).await?;

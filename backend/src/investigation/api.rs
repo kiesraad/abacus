@@ -23,10 +23,7 @@ use crate::{
     audit_log::{AuditEvent, AuditService},
     authentication::Coordinator,
     committee_session::status::{CommitteeSessionStatus, change_committee_session_status},
-    data_entry::{
-        CSOFirstSessionResults, PollingStationResults, VotesCounts,
-        repository::most_recent_results_for_polling_station,
-    },
+    data_entry::{PollingStationResults, repository::most_recent_results_for_polling_station},
     election::ElectionWithPoliticalGroups,
     pdf_gen::{
         generate_pdf,
@@ -243,27 +240,14 @@ async fn polling_station_investigation_download_corrigendum_pdf(
         crate::polling_station::repository::get(&mut conn, polling_station_id).await?;
     let election: ElectionWithPoliticalGroups =
         crate::election::repository::get(&mut conn, polling_station.election_id).await?;
+
     let previous_results = if let Some(id) = polling_station.id_prev_session {
-        most_recent_results_for_polling_station(&mut conn, id).await?
+        match most_recent_results_for_polling_station(&mut conn, id).await? {
+            Some(results) => results,
+            None => PollingStationResults::empty_cso_first_session(&election.political_groups),
+        }
     } else {
-        Some(PollingStationResults::CSOFirstSession(
-            CSOFirstSessionResults {
-                extra_investigation: Default::default(),
-                counting_differences_polling_station: Default::default(),
-                voters_counts: Default::default(),
-                votes_counts: VotesCounts {
-                    political_group_total_votes:
-                        CSOFirstSessionResults::default_political_group_total_votes(
-                            &election.political_groups,
-                        ),
-                    ..Default::default()
-                },
-                differences_counts: Default::default(),
-                political_group_votes: CSOFirstSessionResults::default_political_group_votes(
-                    &election.political_groups,
-                ),
-            },
-        ))
+        PollingStationResults::empty_cso_first_session(&election.political_groups)
     };
 
     let name = format!(
@@ -275,10 +259,10 @@ async fn polling_station_investigation_download_corrigendum_pdf(
 
     let content = generate_pdf(
         ModelNa14_2Bijlage1Input {
-            election: election.clone(),
-            polling_station: polling_station.clone(),
-            previous_results: previous_results.expect("Previous results should exist"),
-            investigation: investigation.clone(),
+            election,
+            polling_station,
+            previous_results,
+            investigation,
         }
         .to_pdf_file_model(name.clone()),
     )

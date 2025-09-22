@@ -81,6 +81,23 @@ impl PollingStationResults {
             PollingStationResults::CSOFirstSession(results) => Some(results),
         }
     }
+
+    pub fn empty_cso_first_session(political_groups: &[PoliticalGroup]) -> Self {
+        PollingStationResults::CSOFirstSession(CSOFirstSessionResults {
+            extra_investigation: Default::default(),
+            counting_differences_polling_station: Default::default(),
+            voters_counts: Default::default(),
+            votes_counts: VotesCounts {
+                political_group_total_votes:
+                    CSOFirstSessionResults::default_political_group_total_votes(political_groups),
+                ..Default::default()
+            },
+            differences_counts: Default::default(),
+            political_group_votes: CSOFirstSessionResults::default_political_group_votes(
+                political_groups,
+            ),
+        })
+    }
 }
 
 /// CSOFirstSessionResults, following the fields in Model Na 31-2 Bijlage 2.

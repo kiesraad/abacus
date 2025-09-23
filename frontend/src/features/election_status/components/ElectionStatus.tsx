@@ -41,10 +41,10 @@ export function ElectionStatus({
   return (
     <>
       <div className={cls.container}>
-        <div className={cls.statusTitle}>
-          <h2 id="status-title">{t("election_status.main_title")}</h2>
+        <div className={cls.statusTitle} id="status-heading">
+          <h2>{t("election_status.main_title")}</h2>
           <div className={cls.buttons}>
-            {committeeSession.number == 1 ? (
+            {committeeSession.number === 1 ? (
               <Button
                 size="md"
                 variant="secondary"
@@ -88,7 +88,12 @@ export function ElectionStatus({
             </div>
           </Progress>
           <article className={cls.statusArticle}>
-            {pollingStations.length === 0 && <p>{t("election_status.no_polling_stations")}</p>}
+            {pollingStations.length === 0 && committeeSession.number === 1 && (
+              <p>{t("election_status.no_polling_stations")}</p>
+            )}
+            {pollingStations.length === 0 && committeeSession.number > 1 && (
+              <p>{t("election_status.no_investigations_with_corrected_results")}</p>
+            )}
             {pollingStations.length > 0 &&
               tableCategories.map((cat) => (
                 <div key={`item-table-${categoryColorClass[cat]}`}>

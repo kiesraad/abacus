@@ -28,8 +28,7 @@ export function InvestigationReason({ pollingStationId }: InvestigationReasonPro
   const { pushMessage } = useMessages();
   const [nonEmptyError, setNonEmptyError] = useState(false);
   const path = `/api/polling_stations/${pollingStationId}/investigation`;
-  const { create } = useCrud<PollingStationInvestigation>(path);
-  const { update } = useCrud<PollingStationInvestigation>(path);
+  const { create, update } = useCrud<PollingStationInvestigation>(path);
   const [error, setError] = useState<AnyApiError>();
 
   if (!pollingStation) {

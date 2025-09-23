@@ -72,6 +72,9 @@ pub struct CommitteeSessionDetails {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[schema(nullable = false)]
     pub session_results_pdf: Option<u32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[schema(nullable = false)]
+    pub session_overview_pdf: Option<u32>,
 }
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, Eq, ToSchema)]

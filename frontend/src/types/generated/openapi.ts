@@ -470,6 +470,7 @@ export interface CommitteeSession {
   location: string;
   number: number;
   number_of_voters: number;
+  overview_pdf?: number;
   results_eml?: number;
   results_pdf?: number;
   start_date_time?: string;
@@ -482,6 +483,7 @@ export interface CommitteeSessionDetails {
   session_location: string;
   session_number: number;
   session_number_of_voters: number;
+  session_overview_pdf?: number;
   session_results_eml?: number;
   session_results_pdf?: number;
   session_start_date_time?: string | null;

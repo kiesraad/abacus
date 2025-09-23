@@ -52,7 +52,7 @@ pub fn router() -> OpenApiRouter<AppState> {
     path = "/api/polling_stations/{polling_station_id}/investigation",
     request_body = PollingStationInvestigationCreateRequest,
     responses(
-        (status = 200, description = "Polling station investigation added successfully"),
+        (status = 200, description = "Polling station investigation added successfully", body = PollingStationInvestigation),
         (status = 401, description = "Unauthorized", body = ErrorResponse),
         (status = 403, description = "Forbidden", body = ErrorResponse),
         (status = 404, description = "Polling station not found", body = ErrorResponse),
@@ -123,7 +123,7 @@ async fn polling_station_investigation_create(
     path = "/api/polling_stations/{polling_station_id}/investigation/conclude",
     request_body = PollingStationInvestigationConcludeRequest,
     responses(
-        (status = 200, description = "Polling station investigation concluded successfully"),
+        (status = 200, description = "Polling station investigation concluded successfully", body = PollingStationInvestigation),
         (status = 401, description = "Unauthorized", body = ErrorResponse),
         (status = 403, description = "Forbidden", body = ErrorResponse),
         (status = 404, description = "Investigation not found", body = ErrorResponse),
@@ -169,7 +169,7 @@ async fn polling_station_investigation_conclude(
     path = "/api/polling_stations/{polling_station_id}/investigation",
     request_body = PollingStationInvestigationUpdateRequest,
     responses(
-        (status = 200, description = "Polling station investigation updated successfully"),
+        (status = 200, description = "Polling station investigation updated successfully", body = PollingStationInvestigation),
         (status = 401, description = "Unauthorized", body = ErrorResponse),
         (status = 403, description = "Forbidden", body = ErrorResponse),
         (status = 404, description = "Investigation not found", body = ErrorResponse),

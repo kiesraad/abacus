@@ -2764,7 +2764,14 @@
         },
         "responses": {
           "200": {
-            "description": "Polling station investigation updated successfully"
+            "description": "Polling station investigation updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PollingStationInvestigation"
+                }
+              }
+            }
           },
           "401": {
             "description": "Unauthorized",
@@ -2846,7 +2853,14 @@
         },
         "responses": {
           "200": {
-            "description": "Polling station investigation added successfully"
+            "description": "Polling station investigation added successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PollingStationInvestigation"
+                }
+              }
+            }
           },
           "401": {
             "description": "Unauthorized",
@@ -2992,7 +3006,14 @@
         },
         "responses": {
           "200": {
-            "description": "Polling station investigation concluded successfully"
+            "description": "Polling station investigation concluded successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PollingStationInvestigation"
+                }
+              }
+            }
           },
           "401": {
             "description": "Unauthorized",

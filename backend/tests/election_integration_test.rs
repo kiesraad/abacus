@@ -63,7 +63,7 @@ async fn test_election_details_works(pool: SqlitePool) {
         CommitteeSessionStatus::DataEntryInProgress
     );
     assert_eq!(body.committee_sessions.len(), 2);
-    assert_eq!(body.election.name, "Test Election >= 19 seats");
+    assert_eq!(body.election.name, "Corrigendum 2026");
     assert_eq!(body.polling_stations.len(), 1);
     assert!(
         body.polling_stations

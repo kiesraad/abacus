@@ -13,7 +13,6 @@ use crate::{
     APIError, AppState, ErrorResponse, SqlitePoolExt,
     audit_log::{AuditEvent, AuditService},
     authentication::{CreateUserRequest, Role},
-    error::ErrorReference,
 };
 
 pub fn user_router() -> OpenApiRouter<AppState> {
@@ -170,13 +169,9 @@ pub async fn user_update(
     // fetch the current user
     if user.is_coordinator() {
         let mut conn = pool.acquire().await?;
-
-        let Some(target_user) = super::user::get_by_id(&mut conn, user_id).await? else {
-            return Err(APIError::NotFound(
-                format!("User with id {user_id} not found"),
-                ErrorReference::EntryNotFound,
-            ));
-        };
+        let target_user = super::user::get_by_id(&mut conn, user_id)
+            .await?
+            .ok_or(Error::RowNotFound)?;
 
         // Coordinators can only update Typists
         if target_user.role() != Role::Typist {
@@ -229,12 +224,9 @@ async fn user_delete(
 ) -> Result<StatusCode, APIError> {
     let mut tx = pool.begin_immediate().await?;
 
-    let Some(user) = super::user::get_by_id(&mut tx, user_id).await? else {
-        return Err(APIError::NotFound(
-            format!("User with id {user_id} not found"),
-            ErrorReference::EntryNotFound,
-        ));
-    };
+    let user = super::user::get_by_id(&mut tx, user_id)
+        .await?
+        .ok_or(Error::RowNotFound)?;
 
     // Prevent user from deleting their own account
     if logged_in_user.0.id() == user_id {
@@ -254,9 +246,6 @@ async fn user_delete(
     } else {
         tx.rollback().await?;
 
-        Err(APIError::NotFound(
-            format!("Error deleting user with id {user_id}"),
-            ErrorReference::EntryNotFound,
-        ))
+        Err(Error::RowNotFound.into())
     }
 }

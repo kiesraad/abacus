@@ -49,11 +49,6 @@ pub struct Typist(pub User);
 pub struct AdminOrCoordinator(pub User);
 
 impl AdminOrCoordinator {
-    /// Returns true if the user is an administrator
-    pub fn is_admin(&self) -> bool {
-        self.0.role() == Role::Administrator
-    }
-
     /// Returns true if the user is a coordinator
     pub fn is_coordinator(&self) -> bool {
         self.0.role() == Role::Coordinator

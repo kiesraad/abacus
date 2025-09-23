@@ -9,7 +9,7 @@ import { Modal } from "@/components/ui/Modal/Modal";
 import { useElection } from "@/hooks/election/useElection";
 import { useElectionStatus } from "@/hooks/election/useElectionStatus";
 import { t, tx } from "@/i18n/translate";
-import { PollingStation, PollingStationInvestigation } from "@/types/generated/openapi";
+import { PollingStation } from "@/types/generated/openapi";
 
 export interface InvestigationDeleteModalProps {
   pollingStation: PollingStation;
@@ -25,7 +25,7 @@ export function InvestigationDelete({ pollingStation, onDeleted, onError }: Inve
     (status) => status.polling_station_id === pollingStation.id,
   );
   const path = `/api/polling_stations/${pollingStation.id}/investigation`;
-  const { remove, requestState } = useCrud<PollingStationInvestigation>({ remove: path });
+  const { remove, requestState } = useCrud({ remove: path });
 
   function toggleModal() {
     setShowModal(!showModal);

@@ -249,40 +249,49 @@ async fn polling_station_investigation_delete(
     let polling_station =
         crate::polling_station::repository::get(&mut tx, polling_station_id).await?;
 
-    // Delete investigation and potential data entry and results linked to the polling station
-    delete_polling_station_investigation(&mut tx, polling_station_id).await?;
+    // Delete investigation
+    if delete_polling_station_investigation(&mut tx, polling_station_id).await? {
+        audit_service
+            .log(
+                &mut tx,
+                &AuditEvent::PollingStationInvestigationDeleted(investigation.clone()),
+                None,
+            )
+            .await?;
 
-    audit_service
-        .log(
+        // Delete potential data entry and result linked to the polling station
+        crate::data_entry::delete_data_entry_and_result_for_polling_station(
             &mut tx,
-            &AuditEvent::PollingStationInvestigationDeleted(investigation.clone()),
-            None,
+            audit_service.clone(),
+            &polling_station,
         )
         .await?;
 
-    crate::data_entry::delete_data_entry_and_result_for_polling_station(
-        &mut tx,
-        audit_service.clone(),
-        &polling_station,
-    )
-    .await?;
+        // Change committee session status if last investigation is deleted
+        if list_investigations_for_committee_session(&mut tx, polling_station.committee_session_id)
+            .await?
+            .is_empty()
+        {
+            change_committee_session_status(
+                &mut tx,
+                polling_station.committee_session_id,
+                CommitteeSessionStatus::Created,
+                audit_service,
+            )
+            .await?;
+        }
 
-    if list_investigations_for_committee_session(&mut tx, polling_station.committee_session_id)
-        .await?
-        .is_empty()
-    {
-        change_committee_session_status(
-            &mut tx,
-            polling_station.committee_session_id,
-            CommitteeSessionStatus::Created,
-            audit_service,
-        )
-        .await?;
+        tx.commit().await?;
+
+        Ok(StatusCode::OK)
+    } else {
+        tx.commit().await?;
+
+        Err(APIError::NotFound(
+            "Investigation to delete not found".to_string(),
+            ErrorReference::EntryNotFound,
+        ))
     }
-
-    tx.commit().await?;
-
-    Ok(StatusCode::OK)
 }
 
 /// Download a corrigendum for a polling station

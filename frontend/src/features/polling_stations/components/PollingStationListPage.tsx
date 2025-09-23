@@ -78,7 +78,9 @@ export function PollingStationListPage() {
                     <Table.NumberCell>{station.number}</Table.NumberCell>
                     <Table.Cell className="break-word">{station.name}</Table.Cell>
                     <Table.Cell>
-                      {station.polling_station_type && labelForPollingStationType[station.polling_station_type]}
+                      {station.polling_station_type && labelForPollingStationType[station.polling_station_type]
+                        ? labelForPollingStationType[station.polling_station_type]
+                        : "–"}
                     </Table.Cell>
                   </Table.LinkRow>
                 ))}

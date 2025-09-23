@@ -295,7 +295,7 @@ pub async fn typist2_login(addr: &SocketAddr) -> HeaderValue {
 
 /// Calls the login endpoint with a username and password
 pub async fn login(addr: &SocketAddr, username: &str, password: &str) -> HeaderValue {
-    let url = format!("http://{addr}/api/user/login");
+    let url = format!("http://{addr}/api/login");
 
     let response = reqwest::Client::new()
         .post(&url)

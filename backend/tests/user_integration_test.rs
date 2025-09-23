@@ -45,7 +45,7 @@ async fn test_user_last_activity_at_updating(pool: SqlitePool) {
     let typist_cookie = shared::typist_login(&addr).await;
 
     // Call an endpoint using the `FromRequestParts` for `User`
-    let url = format!("http://{addr}/api/user/whoami");
+    let url = format!("http://{addr}/api/whoami");
     let response = reqwest::Client::new()
         .get(&url)
         .header("cookie", &typist_cookie)
@@ -275,7 +275,7 @@ async fn test_user_update_not_found(pool: SqlitePool) {
 async fn test_user_change_to_same_password_fails(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let typist_cookie = shared::typist_login(&addr).await;
-    let url = format!("http://{addr}/api/user/account");
+    let url = format!("http://{addr}/api/account");
 
     let response = reqwest::Client::new()
         .put(&url)
@@ -584,7 +584,7 @@ async fn test_cant_do_anything_when_password_needs_change(pool: SqlitePool) {
     let typist_cookie = shared::login(&addr, "typist1", "TotallyValidTempP4ssW0rd").await;
 
     // User sets password
-    let url = format!("http://{addr}/api/user/account");
+    let url = format!("http://{addr}/api/account");
     let response = reqwest::Client::new()
         .put(&url)
         .json(&json!({

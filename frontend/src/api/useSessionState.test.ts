@@ -24,7 +24,7 @@ describe("Test useSessionState", () => {
   });
 
   test("We should be able to logout", async () => {
-    overrideOnce("post", "/api/user/logout", 200, {});
+    overrideOnce("post", "/api/logout", 200, {});
 
     const client = new ApiClient();
     const { result } = renderHook(() => useSessionState(client));
@@ -48,7 +48,7 @@ describe("Test useSessionState", () => {
       expect(result.current.user?.role).toBe("administrator");
     });
 
-    overrideOnce("get", "/api/user/whoami", 200, {
+    overrideOnce("get", "/api/whoami", 200, {
       user_id: 2,
       username: "typist",
       role: "typist",

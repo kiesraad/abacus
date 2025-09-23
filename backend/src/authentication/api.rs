@@ -94,7 +94,7 @@ pub(super) fn set_default_cookie_properties(cookie: &mut Cookie) {
 /// Login endpoint, authenticates a user and creates a new session + session cookie
 #[utoipa::path(
     post,
-    path = "/api/user/login",
+    path = "/api/login",
     request_body = Credentials,
     responses(
         (status = 200, description = "The logged in user id and user name", body = LoginResponse),
@@ -180,7 +180,7 @@ pub struct AccountUpdateRequest {
 /// Get current logged-in user endpoint
 #[utoipa::path(
   get,
-  path = "/api/user/whoami",
+  path = "/api/whoami",
   responses(
       (status = 200, description = "The current user name and id", body = LoginResponse),
       (status = 401, description = "Invalid user session", body = ErrorResponse),
@@ -296,7 +296,7 @@ async fn admin_exists(State(pool): State<SqlitePool>) -> Result<StatusCode, APIE
 /// Update the user's account with a new password and optionally new fullname
 #[utoipa::path(
   put,
-  path = "/api/user/account",
+  path = "/api/account",
   request_body = AccountUpdateRequest,
   responses(
       (status = 200, description = "The logged in user", body = LoginResponse),
@@ -346,7 +346,7 @@ async fn account_update(
 /// Logout endpoint, deletes the session cookie
 #[utoipa::path(
     post,
-    path = "/api/user/logout",
+    path = "/api/logout",
     responses(
         (status = 200, description = "Successful logout, or user was already logged out"),
         (status = 500, description = "Internal server error", body = ErrorResponse),

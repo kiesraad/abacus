@@ -163,7 +163,7 @@ export const AccountUpdateRequestHandler = http.put<
   ACCOUNT_UPDATE_REQUEST_PARAMS,
   ACCOUNT_UPDATE_REQUEST_BODY,
   LoginResponse
->("/api/user/account" satisfies ACCOUNT_UPDATE_REQUEST_PATH, () =>
+>("/api/account" satisfies ACCOUNT_UPDATE_REQUEST_PATH, () =>
   HttpResponse.json(loginResponseMockData, { status: 200 }),
 );
 
@@ -303,7 +303,7 @@ export const ElectionImportValidateRequestHandler = http.post<
 );
 
 export const LoginHandler = http.post<LOGIN_REQUEST_PARAMS, LOGIN_REQUEST_BODY, LoginResponse>(
-  "/api/user/login" satisfies LOGIN_REQUEST_PATH,
+  "/api/login" satisfies LOGIN_REQUEST_PATH,
   () => HttpResponse.json(loginResponseMockData, { status: 200 }),
 );
 
@@ -463,7 +463,7 @@ export const UserDeleteRequestHandler = http.delete<ParamsToString<USER_DELETE_R
 
 // get user handler
 export const WhoAmIRequestHandler = http.get<WHOAMI_REQUEST_PARAMS, null, LoginResponse>(
-  "/api/user/whoami" satisfies WHOAMI_REQUEST_PATH,
+  "/api/whoami" satisfies WHOAMI_REQUEST_PATH,
   () =>
     HttpResponse.json(loginResponseMockData, {
       status: 200,

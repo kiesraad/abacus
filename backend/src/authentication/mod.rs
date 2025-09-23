@@ -96,7 +96,7 @@ mod tests {
             .oneshot(
                 Request::builder()
                     .method(Method::POST)
-                    .uri("/api/user/login")
+                    .uri("/api/login")
                     .header(CONTENT_TYPE, "application/json")
                     .body(Body::from(
                         serde_json::to_vec(&Credentials {
@@ -124,7 +124,7 @@ mod tests {
             .oneshot(
                 Request::builder()
                     .method(Method::POST)
-                    .uri("/api/user/login")
+                    .uri("/api/login")
                     .header(CONTENT_TYPE, "application/json")
                     .body(Body::from(
                         serde_json::to_vec(&Credentials {
@@ -156,7 +156,7 @@ mod tests {
             .oneshot(
                 Request::builder()
                     .method(Method::POST)
-                    .uri("/api/user/login")
+                    .uri("/api/login")
                     .header(CONTENT_TYPE, "application/json")
                     .header(USER_AGENT, "Servo/1.0")
                     .body(Body::from(
@@ -205,7 +205,7 @@ mod tests {
             .oneshot(
                 Request::builder()
                     .method(Method::POST)
-                    .uri("/api/user/logout")
+                    .uri("/api/logout")
                     .header("cookie", &cookie)
                     .body(Body::empty())
                     .unwrap(),
@@ -235,7 +235,7 @@ mod tests {
             .oneshot(
                 Request::builder()
                     .method(Method::POST)
-                    .uri("/api/user/logout")
+                    .uri("/api/logout")
                     .header("cookie", &cookie)
                     .body(Body::empty())
                     .unwrap(),
@@ -261,7 +261,7 @@ mod tests {
             .oneshot(
                 Request::builder()
                     .method(Method::GET)
-                    .uri("/api/user/whoami")
+                    .uri("/api/whoami")
                     .header("cookie", &cookie)
                     .body(Body::empty())
                     .unwrap(),
@@ -283,7 +283,7 @@ mod tests {
             .oneshot(
                 Request::builder()
                     .method(Method::POST)
-                    .uri("/api/user/logout")
+                    .uri("/api/logout")
                     .header("cookie", &cookie)
                     .body(Body::empty())
                     .unwrap(),
@@ -299,7 +299,7 @@ mod tests {
             .oneshot(
                 Request::builder()
                     .method(Method::GET)
-                    .uri("/api/user/whoami")
+                    .uri("/api/whoami")
                     .header("cookie", &cookie)
                     .body(Body::empty())
                     .unwrap(),
@@ -315,7 +315,7 @@ mod tests {
             .oneshot(
                 Request::builder()
                     .method(Method::GET)
-                    .uri("/api/user/whoami")
+                    .uri("/api/whoami")
                     .body(Body::empty())
                     .unwrap(),
             )
@@ -337,7 +337,7 @@ mod tests {
             .oneshot(
                 Request::builder()
                     .method(Method::PUT)
-                    .uri("/api/user/account")
+                    .uri("/api/account")
                     .header(CONTENT_TYPE, "application/json")
                     .header("cookie", &cookie)
                     .body(Body::from(
@@ -363,7 +363,7 @@ mod tests {
             .oneshot(
                 Request::builder()
                     .method(Method::POST)
-                    .uri("/api/user/login")
+                    .uri("/api/login")
                     .header(CONTENT_TYPE, "application/json")
                     .body(Body::from(
                         serde_json::to_vec(&Credentials {
@@ -392,7 +392,7 @@ mod tests {
             .oneshot(
                 Request::builder()
                     .method(Method::PUT)
-                    .uri("/api/user/account")
+                    .uri("/api/account")
                     .header(CONTENT_TYPE, "application/json")
                     .header("cookie", &cookie)
                     .body(Body::from(
@@ -456,7 +456,7 @@ mod tests {
             .oneshot(
                 Request::builder()
                     .method(Method::GET)
-                    .uri("/api/user/whoami")
+                    .uri("/api/whoami")
                     .header("cookie", &cookie.encoded().to_string())
                     .body(Body::empty())
                     .unwrap(),
@@ -480,7 +480,7 @@ mod tests {
             .oneshot(
                 Request::builder()
                     .method(Method::GET)
-                    .uri("/api/user/whoami")
+                    .uri("/api/whoami")
                     .header("cookie", &cookie.encoded().to_string())
                     .body(Body::empty())
                     .unwrap(),

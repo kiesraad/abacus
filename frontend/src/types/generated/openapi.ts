@@ -2,6 +2,11 @@
 
 /** PATHS **/
 
+// /api/account
+export type ACCOUNT_UPDATE_REQUEST_PARAMS = Record<string, never>;
+export type ACCOUNT_UPDATE_REQUEST_PATH = `/api/account`;
+export type ACCOUNT_UPDATE_REQUEST_BODY = AccountUpdateRequest;
+
 // /api/committee_sessions
 export type COMMITTEE_SESSION_CREATE_REQUEST_PARAMS = Record<string, never>;
 export type COMMITTEE_SESSION_CREATE_REQUEST_PATH = `/api/committee_sessions`;
@@ -162,6 +167,15 @@ export type AUDIT_LOG_LIST_REQUEST_PATH = `/api/log`;
 export type AUDIT_LOG_LIST_USERS_REQUEST_PARAMS = Record<string, never>;
 export type AUDIT_LOG_LIST_USERS_REQUEST_PATH = `/api/log-users`;
 
+// /api/login
+export type LOGIN_REQUEST_PARAMS = Record<string, never>;
+export type LOGIN_REQUEST_PATH = `/api/login`;
+export type LOGIN_REQUEST_BODY = Credentials;
+
+// /api/logout
+export type LOGOUT_REQUEST_PARAMS = Record<string, never>;
+export type LOGOUT_REQUEST_PATH = `/api/logout`;
+
 // /api/polling_stations/{polling_station_id}/data_entries/resolve_differences
 export interface POLLING_STATION_DATA_ENTRY_GET_DIFFERENCES_REQUEST_PARAMS {
   polling_station_id: number;
@@ -251,24 +265,6 @@ export type USER_CREATE_REQUEST_PARAMS = Record<string, never>;
 export type USER_CREATE_REQUEST_PATH = `/api/user`;
 export type USER_CREATE_REQUEST_BODY = CreateUserRequest;
 
-// /api/user/account
-export type ACCOUNT_UPDATE_REQUEST_PARAMS = Record<string, never>;
-export type ACCOUNT_UPDATE_REQUEST_PATH = `/api/user/account`;
-export type ACCOUNT_UPDATE_REQUEST_BODY = AccountUpdateRequest;
-
-// /api/user/login
-export type LOGIN_REQUEST_PARAMS = Record<string, never>;
-export type LOGIN_REQUEST_PATH = `/api/user/login`;
-export type LOGIN_REQUEST_BODY = Credentials;
-
-// /api/user/logout
-export type LOGOUT_REQUEST_PARAMS = Record<string, never>;
-export type LOGOUT_REQUEST_PATH = `/api/user/logout`;
-
-// /api/user/whoami
-export type WHOAMI_REQUEST_PARAMS = Record<string, never>;
-export type WHOAMI_REQUEST_PATH = `/api/user/whoami`;
-
 // /api/user/{user_id}
 export interface USER_GET_REQUEST_PARAMS {
   user_id: number;
@@ -283,6 +279,10 @@ export interface USER_DELETE_REQUEST_PARAMS {
   user_id: number;
 }
 export type USER_DELETE_REQUEST_PATH = `/api/user/${number}`;
+
+// /api/whoami
+export type WHOAMI_REQUEST_PARAMS = Record<string, never>;
+export type WHOAMI_REQUEST_PATH = `/api/whoami`;
 
 /** TYPES **/
 

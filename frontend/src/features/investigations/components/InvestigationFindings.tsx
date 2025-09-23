@@ -13,6 +13,7 @@ import { useElection } from "@/hooks/election/useElection";
 import { useMessages } from "@/hooks/messages/useMessages";
 import { t } from "@/i18n/translate";
 import {
+  PollingStationInvestigation,
   PollingStationInvestigationConcludeRequest,
   PollingStationInvestigationUpdateRequest,
 } from "@/types/generated/openapi";
@@ -27,9 +28,9 @@ export function InvestigationFindings({ pollingStationId }: InvestigationFinding
   const { election, investigation, pollingStation, refetch } = useElection(pollingStationId);
   const { pushMessage } = useMessages();
   const concludePath = `/api/polling_stations/${pollingStationId}/investigation/conclude`;
-  const { create: conclude } = useCrud<PollingStationInvestigationConcludeRequest>({ create: concludePath });
+  const { create: conclude } = useCrud<PollingStationInvestigation>({ create: concludePath });
   const path = `/api/polling_stations/${pollingStationId}/investigation`;
-  const { update } = useCrud<PollingStationInvestigationUpdateRequest>({ update: path });
+  const { update } = useCrud<PollingStationInvestigation>({ update: path });
 
   const [nonEmptyError, setNonEmptyError] = useState(false);
   const [radioError, setRadioError] = useState(false);
@@ -86,12 +87,12 @@ export function InvestigationFindings({ pollingStationId }: InvestigationFinding
           reason: investigation.reason,
           findings,
           corrected_results: correctedResults,
-        });
+        } satisfies PollingStationInvestigationUpdateRequest);
       } else {
         return conclude({
           findings,
           corrected_results: correctedResults,
-        });
+        } satisfies PollingStationInvestigationConcludeRequest);
       }
     };
 

@@ -12,6 +12,7 @@ import { useElection } from "@/hooks/election/useElection";
 import { useMessages } from "@/hooks/messages/useMessages";
 import { t } from "@/i18n/translate";
 import {
+  PollingStationInvestigation,
   PollingStationInvestigationCreateRequest,
   PollingStationInvestigationUpdateRequest,
 } from "@/types/generated/openapi";
@@ -27,8 +28,7 @@ export function InvestigationReason({ pollingStationId }: InvestigationReasonPro
   const { pushMessage } = useMessages();
   const [nonEmptyError, setNonEmptyError] = useState(false);
   const path = `/api/polling_stations/${pollingStationId}/investigation`;
-  const { create } = useCrud<PollingStationInvestigationCreateRequest>(path);
-  const { update } = useCrud<PollingStationInvestigationUpdateRequest>(path);
+  const { create, update } = useCrud<PollingStationInvestigation>(path);
   const [error, setError] = useState<AnyApiError>();
 
   if (!pollingStation) {
@@ -65,7 +65,7 @@ export function InvestigationReason({ pollingStationId }: InvestigationReasonPro
           reason,
           findings: investigation.findings,
           corrected_results: investigation.corrected_results,
-        });
+        } satisfies PollingStationInvestigationUpdateRequest);
       } else {
         pushMessage({
           title: t("investigations.message.investigation_created", {
@@ -74,7 +74,7 @@ export function InvestigationReason({ pollingStationId }: InvestigationReasonPro
           }),
         });
 
-        return create({ reason });
+        return create({ reason } satisfies PollingStationInvestigationCreateRequest);
       }
     };
 

@@ -27,9 +27,9 @@ export type ApiPaths =
     };
 
 // Call the api and return the current status of the request, optionally throws an error when the request fails
-export function useCrud<T>(path: ApiPaths): UseCrudReturn<T> {
+export function useCrud<Response>(path: ApiPaths): UseCrudReturn<Response> {
   const client = useApiClient();
-  const [requestState, setRequestState] = useState<ApiRequestIdleState | ApiRequestState<T>>({ status: "idle" });
+  const [requestState, setRequestState] = useState<ApiRequestIdleState | ApiRequestState<Response>>({ status: "idle" });
   const paths = typeof path === "string" ? { get: path, create: path, update: path, remove: path } : path;
 
   // throw fatal errors
@@ -44,7 +44,7 @@ export function useCrud<T>(path: ApiPaths): UseCrudReturn<T> {
     }
 
     setRequestState({ status: "loading" });
-    const result = await client.getRequest<T>(paths.get, controller);
+    const result = await client.getRequest<Response>(paths.get, controller);
 
     return handleApiResult(result, setRequestState, controller);
   };
@@ -56,7 +56,7 @@ export function useCrud<T>(path: ApiPaths): UseCrudReturn<T> {
     }
 
     setRequestState({ status: "loading" });
-    const result = await client.postRequest<T>(paths.create, requestBody, controller);
+    const result = await client.postRequest<Response>(paths.create, requestBody, controller);
 
     return handleApiResult(result, setRequestState, controller);
   };
@@ -68,7 +68,7 @@ export function useCrud<T>(path: ApiPaths): UseCrudReturn<T> {
     }
 
     setRequestState({ status: "loading" });
-    const result = await client.putRequest<T>(paths.update, requestBody, controller);
+    const result = await client.putRequest<Response>(paths.update, requestBody, controller);
 
     return handleApiResult(result, setRequestState, controller);
   };
@@ -80,7 +80,7 @@ export function useCrud<T>(path: ApiPaths): UseCrudReturn<T> {
     }
 
     setRequestState({ status: "loading" });
-    const result = await client.deleteRequest<T>(paths.remove, controller);
+    const result = await client.deleteRequest<Response>(paths.remove, controller);
 
     return handleApiResult(result, setRequestState, controller);
   };

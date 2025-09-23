@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { expect, fn, within } from "storybook/test";
 
+import { committeeSessionMockData } from "@/testing/api-mocks/CommitteeSessionMockData";
 import { electionMockData } from "@/testing/api-mocks/ElectionMockData";
 import { pollingStationMockData } from "@/testing/api-mocks/PollingStationMockData";
 
@@ -73,6 +74,7 @@ export const DefaultElectionStatus: StoryObj<StoryProps> = {
             first_entry_progress: 100,
           },
         ]}
+        committeeSession={committeeSessionMockData}
         election={electionMockData}
         pollingStations={pollingStationMockData}
         addLinks={addLinks}
@@ -177,6 +179,7 @@ export const Empty: StoryObj<StoryProps> = {
     <ElectionStatus
       statuses={[]}
       election={electionMockData}
+      committeeSession={committeeSessionMockData}
       pollingStations={[]}
       addLinks={addLinks}
       navigate={navigate}

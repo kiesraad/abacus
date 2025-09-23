@@ -101,11 +101,13 @@ pub async fn upsert(
     .await
 }
 
-/// Get the status for each polling station data entry in an election
+/// Get the status for each polling station data entry in a committee session
 pub async fn statuses(
     conn: &mut SqliteConnection,
-    election_id: u32,
+    committee_session_id: u32,
 ) -> Result<Vec<ElectionStatusResponseEntry>, sqlx::Error> {
+    // If this is not the first committee session, we only want to include
+    // polling stations with corrected results in this committee session
     query!(
         r#"
             SELECT
@@ -114,13 +116,14 @@ pub async fn statuses(
             FROM polling_stations AS p
             LEFT JOIN committee_sessions AS c ON c.id = p.committee_session_id
             LEFT JOIN polling_station_data_entries AS de ON de.polling_station_id = p.id
-            WHERE c.election_id = $1 AND c.number = (
-                SELECT MAX(c2.number)
-                FROM committee_sessions AS c2
-                WHERE c2.election_id = c.election_id
-            )
+            LEFT JOIN polling_station_investigations AS psi ON psi.polling_station_id = p.id
+            WHERE c.id = $1 AND
+                CASE
+                    WHEN c.number > 1 THEN psi.corrected_results = TRUE
+                    ELSE TRUE
+                END
         "#,
-        election_id
+        committee_session_id
     )
     .map(|status| {
         let state = status.state.unwrap_or_default();

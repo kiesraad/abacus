@@ -4,7 +4,7 @@ import { Progress } from "@/components/ui/ProgressBar/Progress";
 import { ProgressBar } from "@/components/ui/ProgressBar/ProgressBar";
 import { Table } from "@/components/ui/Table/Table";
 import { t } from "@/i18n/translate";
-import { Election, ElectionStatusResponseEntry, PollingStation } from "@/types/generated/openapi";
+import { CommitteeSession, Election, ElectionStatusResponseEntry, PollingStation } from "@/types/generated/openapi";
 
 import {
   categoryColorClass,
@@ -19,12 +19,20 @@ import cls from "./ElectionStatus.module.css";
 export interface ElectionStatusProps {
   statuses: ElectionStatusResponseEntry[];
   election: Required<Election>;
+  committeeSession: CommitteeSession;
   pollingStations: PollingStation[];
   addLinks: boolean;
   navigate: (path: string) => void;
 }
 
-export function ElectionStatus({ statuses, election, pollingStations, addLinks, navigate }: ElectionStatusProps) {
+export function ElectionStatus({
+  statuses,
+  election,
+  committeeSession,
+  pollingStations,
+  addLinks,
+  navigate,
+}: ElectionStatusProps) {
   const { progressBarData, categoryCounts, pollingStationWithStatusAndTypist, tableCategories } = useElectionStatus(
     statuses,
     pollingStations,
@@ -36,15 +44,27 @@ export function ElectionStatus({ statuses, election, pollingStations, addLinks, 
         <div className={cls.statusTitle}>
           <h2 id="status-title">{t("election_status.main_title")}</h2>
           <div className={cls.buttons}>
-            <Button
-              size="md"
-              variant="secondary"
-              onClick={() => {
-                navigate(`/elections/${election.id}/polling-stations`);
-              }}
-            >
-              {t("polling_station.title.plural")}
-            </Button>
+            {committeeSession.number == 1 ? (
+              <Button
+                size="md"
+                variant="secondary"
+                onClick={() => {
+                  navigate(`/elections/${election.id}/polling-stations`);
+                }}
+              >
+                {t("polling_station.title.plural")}
+              </Button>
+            ) : (
+              <Button
+                size="md"
+                variant="secondary"
+                onClick={() => {
+                  navigate(`/elections/${election.id}/investigations`);
+                }}
+              >
+                {t("investigations.title")}
+              </Button>
+            )}
           </div>
         </div>
         <div className={cls.statusSection}>

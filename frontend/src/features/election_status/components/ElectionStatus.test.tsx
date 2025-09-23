@@ -3,6 +3,7 @@ import * as ReactRouter from "react-router";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
 import { UsersProvider } from "@/hooks/user/UsersProvider";
+import { committeeSessionMockData } from "@/testing/api-mocks/CommitteeSessionMockData";
 import { electionMockData } from "@/testing/api-mocks/ElectionMockData";
 import { pollingStationMockData } from "@/testing/api-mocks/PollingStationMockData";
 import { UserListRequestHandler } from "@/testing/api-mocks/RequestHandlers";
@@ -42,6 +43,7 @@ describe("ElectionStatus", () => {
             },
           ]}
           election={electionMockData}
+          committeeSession={committeeSessionMockData}
           pollingStations={pollingStationMockData}
           addLinks={true}
           navigate={navigate}
@@ -93,6 +95,7 @@ describe("ElectionStatus", () => {
             },
           ]}
           election={electionMockData}
+          committeeSession={committeeSessionMockData}
           pollingStations={pollingStationMockData}
           addLinks={false}
           navigate={navigate}

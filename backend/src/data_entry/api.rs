@@ -890,7 +890,16 @@ async fn election_status(
     Path(election_id): Path<u32>,
 ) -> Result<Json<ElectionStatusResponse>, APIError> {
     let mut conn = pool.acquire().await?;
-    let statuses = crate::data_entry::repository::statuses(&mut conn, election_id).await?;
+
+    let current_committee_session =
+        crate::committee_session::repository::get_election_committee_session(
+            &mut conn,
+            election_id,
+        )
+        .await?;
+
+    let statuses =
+        crate::data_entry::repository::statuses(&mut conn, current_committee_session.id).await?;
     Ok(Json(ElectionStatusResponse { statuses }))
 }
 

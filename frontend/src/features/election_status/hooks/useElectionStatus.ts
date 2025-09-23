@@ -63,6 +63,10 @@ export function useElectionStatus(
 ): ElectionStatusData {
   const { getName } = useUsers();
 
+  // Only include polling stations that have a status
+  // This filters out polling stations that are not relevant to a committee session
+  pollingStations.filter((ps) => statuses.some((s) => s.polling_station_id === ps.id));
+
   const categoryCounts: Record<StatusCategory, number> = useMemo(
     () =>
       // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion

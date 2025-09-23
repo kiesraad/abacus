@@ -2815,22 +2815,6 @@ mod tests {
             (political_group_votes, election)
         }
 
-        fn validate(
-            candidate_votes_totals: &[(&[u32], u32)],
-        ) -> Result<ValidationResults, DataError> {
-            let (political_group_votes, election) = create_test_data(candidate_votes_totals);
-
-            let mut validation_results = ValidationResults::default();
-            political_group_votes.validate(
-                &election,
-                &polling_station_fixture(None),
-                &mut validation_results,
-                &"political_group_votes".into(),
-            )?;
-
-            Ok(validation_results)
-        }
-
         #[test]
         fn test_err_list_incorrect_length() {
             let (political_group_votes, mut election) =

@@ -29,46 +29,6 @@ async fn get_election(pool: SqlitePool, election_id: u32) -> ElectionDetailsResp
     response.json().await.unwrap()
 }
 
-async fn create_investigation(pool: SqlitePool, polling_station_id: u32) -> Response {
-    let addr = serve_api(pool).await;
-    let url = format!("http://{addr}/api/polling_stations/{polling_station_id}/investigation");
-    let coordinator_cookie = shared::coordinator_login(&addr).await;
-    let body = json!({
-        "reason": "Test reason"
-    });
-    reqwest::Client::new()
-        .post(&url)
-        .header("cookie", coordinator_cookie)
-        .header("Content-Type", "application/json")
-        .body(body.to_string())
-        .send()
-        .await
-        .unwrap()
-}
-
-async fn update_investigation(
-    pool: SqlitePool,
-    polling_station_id: u32,
-    body: Option<serde_json::Value>,
-) -> Response {
-    let addr = serve_api(pool).await;
-    let coordinator_cookie = shared::coordinator_login(&addr).await;
-    let body = body.unwrap_or(json!({
-        "reason": "Updated reason",
-        "findings": "updated test findings",
-        "corrected_results": true
-    }));
-    let url = format!("http://{addr}/api/polling_stations/{polling_station_id}/investigation");
-    reqwest::Client::new()
-        .put(&url)
-        .header("cookie", coordinator_cookie)
-        .header("Content-Type", "application/json")
-        .body(body.to_string())
-        .send()
-        .await
-        .unwrap()
-}
-
 async fn conclude_investigation(pool: SqlitePool, polling_station_id: u32) -> Response {
     let addr = serve_api(pool).await;
     let coordinator_cookie = shared::coordinator_login(&addr).await;
@@ -90,12 +50,14 @@ async fn conclude_investigation(pool: SqlitePool, polling_station_id: u32) -> Re
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_7_four_sessions", "users"))))]
 async fn test_investigation_create_conclude_update(pool: SqlitePool) {
+    let addr = serve_api(pool.clone()).await;
+
     let election_id = 7;
     let election_details = get_election(pool.clone(), election_id).await;
     assert_eq!(election_details.investigations.len(), 0);
 
     assert_eq!(
-        create_investigation(pool.clone(), 741).await.status(),
+        shared::create_investigation(&addr, 741).await.status(),
         StatusCode::OK
     );
 
@@ -124,7 +86,9 @@ async fn test_investigation_create_conclude_update(pool: SqlitePool) {
     );
 
     assert_eq!(
-        update_investigation(pool.clone(), 741, None).await.status(),
+        shared::update_investigation(&addr, 741, None)
+            .await
+            .status(),
         StatusCode::OK
     );
 
@@ -144,10 +108,11 @@ async fn test_investigation_create_conclude_update(pool: SqlitePool) {
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_7_four_sessions", "users"))))]
 async fn test_partials_investigation_update(pool: SqlitePool) {
+    let addr = serve_api(pool.clone()).await;
     let election_id = 7;
 
     assert_eq!(
-        create_investigation(pool.clone(), 741).await.status(),
+        shared::create_investigation(&addr, 741).await.status(),
         StatusCode::OK
     );
 
@@ -158,8 +123,8 @@ async fn test_partials_investigation_update(pool: SqlitePool) {
     assert_eq!(election_details.investigations[0].findings, None);
 
     // Update only the reason
-    let updated = update_investigation(
-        pool.clone(),
+    let updated = shared::update_investigation(
+        &addr,
         741,
         Some(json!({
             "reason": "Partially updated reason"
@@ -178,8 +143,8 @@ async fn test_partials_investigation_update(pool: SqlitePool) {
     );
     assert_eq!(election_details.investigations[0].findings, None);
 
-    let updated = update_investigation(
-        pool.clone(),
+    let updated = shared::update_investigation(
+        &addr,
         741,
         Some(json!({
             "reason": "Partially updated reason",
@@ -203,8 +168,8 @@ async fn test_partials_investigation_update(pool: SqlitePool) {
         Some("Partially updated findings".to_string())
     );
 
-    let updated = update_investigation(
-        pool.clone(),
+    let updated = shared::update_investigation(
+        &addr,
         741,
         Some(json!({
             "reason": "Partially updated reason",
@@ -243,7 +208,7 @@ async fn test_investigation_creation_for_committee_session_with_created_status(p
     assert_eq!(committee_session.status, CommitteeSessionStatus::Created);
 
     assert_eq!(
-        create_investigation(pool.clone(), 741).await.status(),
+        shared::create_investigation(&addr, 741).await.status(),
         StatusCode::OK
     );
 
@@ -276,7 +241,7 @@ async fn test_investigation_creation_for_committee_session_with_finished_status(
     );
 
     assert_eq!(
-        create_investigation(pool.clone(), 9).await.status(),
+        shared::create_investigation(&addr, 9).await.status(),
         StatusCode::OK
     );
 
@@ -290,21 +255,25 @@ async fn test_investigation_creation_for_committee_session_with_finished_status(
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_7_four_sessions", "users"))))]
 async fn test_investigation_creation_fails_for_wrong_polling_station(pool: SqlitePool) {
+    let addr = serve_api(pool.clone()).await;
+
     // 732 is an existing polling station, but in the wrong committee session
     assert_eq!(
-        create_investigation(pool.clone(), 732).await.status(),
+        shared::create_investigation(&addr, 732).await.status(),
         StatusCode::NOT_FOUND
     );
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_7_four_sessions", "users"))))]
 async fn test_investigation_creation_fails_on_creating_second_investigation(pool: SqlitePool) {
+    let addr = serve_api(pool.clone()).await;
+
     assert_eq!(
-        create_investigation(pool.clone(), 741).await.status(),
+        shared::create_investigation(&addr, 741).await.status(),
         StatusCode::OK
     );
     assert_eq!(
-        create_investigation(pool.clone(), 741).await.status(),
+        shared::create_investigation(&addr, 741).await.status(),
         StatusCode::CONFLICT
     );
 }
@@ -319,8 +288,12 @@ async fn test_investigation_can_only_conclude_existing(pool: SqlitePool) {
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_7_four_sessions", "users"))))]
 async fn test_investigation_can_only_update_existing(pool: SqlitePool) {
+    let addr = serve_api(pool.clone()).await;
+
     assert_eq!(
-        update_investigation(pool.clone(), 741, None).await.status(),
+        shared::update_investigation(&addr, 741, None)
+            .await
+            .status(),
         StatusCode::NOT_FOUND
     );
 }
@@ -335,8 +308,12 @@ async fn test_investigation_can_only_conclude_current_session(pool: SqlitePool) 
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_7_four_sessions", "users"))))]
 async fn test_investigation_can_only_update_current_session(pool: SqlitePool) {
+    let addr = serve_api(pool.clone()).await;
+
     assert_eq!(
-        update_investigation(pool.clone(), 732, None).await.status(),
+        shared::update_investigation(&addr, 732, None)
+            .await
+            .status(),
         StatusCode::NOT_FOUND
     );
 }
@@ -348,7 +325,7 @@ async fn test_polling_station_corrigendum_download_with_previous_results(pool: S
     let polling_station_id = 9;
 
     assert_eq!(
-        create_investigation(pool.clone(), polling_station_id)
+        shared::create_investigation(&addr, polling_station_id)
             .await
             .status(),
         StatusCode::OK
@@ -387,7 +364,7 @@ async fn test_polling_station_corrigendum_download_without_previous_results(pool
     let polling_station_id = 2;
 
     assert_eq!(
-        create_investigation(pool.clone(), polling_station_id)
+        shared::create_investigation(&addr, polling_station_id)
             .await
             .status(),
         StatusCode::OK

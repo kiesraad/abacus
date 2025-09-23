@@ -127,6 +127,9 @@ async fn test_election_apportionment_works_for_19_or_more_seats(pool: SqlitePool
     let addr = serve_api(pool).await;
     let coordinator_cookie: axum::http::HeaderValue = shared::coordinator_login(&addr).await;
 
+    shared::create_investigation(&addr, 9).await;
+    shared::update_investigation(&addr, 9, None).await;
+
     let data_entry = DataEntry {
         progress: 100,
         data: PollingStationResults::CSONextSession(CSONextSessionResults {
@@ -182,7 +185,6 @@ async fn test_election_apportionment_works_for_19_or_more_seats(pool: SqlitePool
         }),
         client_state: ClientState::new_from_str(None).unwrap(),
     };
-
     create_result_with_non_example_data_entry(&addr, 9, 5, data_entry).await;
 
     let url = format!("http://{addr}/api/elections/5/apportionment");
@@ -201,6 +203,59 @@ async fn test_election_apportionment_works_for_19_or_more_seats(pool: SqlitePool
     assert_eq!(body.seat_assignment.steps.len(), 4);
     let total_seats = get_total_seats_from_apportionment_result(&body.seat_assignment);
     assert_eq!(total_seats, vec![12, 6, 1, 2, 2]);
+}
+
+#[test(sqlx::test(fixtures(path = "../fixtures", scripts("users", "election_5_with_results"))))]
+async fn test_election_apportionment_works_second_committee_session_no_investigations(
+    pool: SqlitePool,
+) {
+    let addr = serve_api(pool).await;
+    let coordinator_cookie: axum::http::HeaderValue = shared::coordinator_login(&addr).await;
+
+    let url = format!("http://{addr}/api/elections/5/apportionment");
+    let response = reqwest::Client::new()
+        .post(&url)
+        .header("cookie", coordinator_cookie)
+        .send()
+        .await
+        .unwrap();
+
+    // Ensure the response is what we expect
+    assert_eq!(response.status(), StatusCode::OK);
+    let body: ElectionApportionmentResponse = response.json().await.unwrap();
+    assert_eq!(body.seat_assignment.seats, 23);
+    assert_eq!(body.seat_assignment.quota, Fraction::new(1200, 23));
+    assert_eq!(body.seat_assignment.steps.len(), 4);
+    let total_seats = get_total_seats_from_apportionment_result(&body.seat_assignment);
+    assert_eq!(total_seats, vec![12, 6, 1, 2, 2]);
+}
+
+#[test(sqlx::test(fixtures(path = "../fixtures", scripts("users", "election_5_with_results"))))]
+async fn test_election_apportionment_error_apportionment_not_available_until_data_entries_finalised_second_committee_session(
+    pool: SqlitePool,
+) {
+    let addr = serve_api(pool).await;
+    let coordinator_cookie: axum::http::HeaderValue = shared::coordinator_login(&addr).await;
+
+    // Add investigation with corrected results
+    shared::create_investigation(&addr, 9).await;
+    shared::update_investigation(&addr, 9, None).await;
+
+    let url = format!("http://{addr}/api/elections/5/apportionment");
+    let response = reqwest::Client::new()
+        .post(&url)
+        .header("cookie", coordinator_cookie)
+        .send()
+        .await
+        .unwrap();
+
+    // Ensure the response is what we expect
+    assert_eq!(response.status(), StatusCode::PRECONDITION_FAILED);
+    let body: ErrorResponse = response.json().await.unwrap();
+    assert_eq!(
+        body.error,
+        "Election data entry first needs to be finalised"
+    );
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_3", "users"))))]

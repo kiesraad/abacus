@@ -116,12 +116,22 @@ pub struct PollingStationImportDetails {
 #[serde(deny_unknown_fields)]
 pub struct DataEntryDetails {
     pub polling_station_id: u32,
+    pub committee_session_id: u32,
     pub data_entry_status: String,
     pub data_entry_progress: u8,
     #[schema(value_type = Option<String>)]
     pub finished_at: Option<DateTime<Utc>>,
     pub first_entry_user_id: Option<u32>,
     pub second_entry_user_id: Option<u32>,
+}
+
+#[derive(Serialize, Deserialize, Debug, PartialEq, Eq, ToSchema)]
+#[serde(deny_unknown_fields)]
+pub struct ResultDetails {
+    pub polling_station_id: u32,
+    pub committee_session_id: u32,
+    #[schema(value_type = String)]
+    pub created_at: DateTime<Utc>,
 }
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, Eq, ToSchema)]
@@ -191,6 +201,7 @@ pub enum AuditEvent {
     DataEntrySaved(DataEntryDetails),
     DataEntryDeleted(DataEntryDetails),
     DataEntryFinalised(DataEntryDetails),
+    ResultDeleted(ResultDetails),
     // data entry resolving events
     DataEntryDiscardedFirst(DataEntryDetails),
     DataEntryResumedFirst(DataEntryDetails),
@@ -248,6 +259,7 @@ impl AuditEvent {
             AuditEvent::DataEntrySaved(_) => AuditEventLevel::Success,
             AuditEvent::DataEntryDeleted(_) => AuditEventLevel::Info,
             AuditEvent::DataEntryFinalised(_) => AuditEventLevel::Success,
+            AuditEvent::ResultDeleted(_) => AuditEventLevel::Success,
             AuditEvent::Error(ErrorDetails { level, .. }) => *level,
             AuditEvent::UnknownEvent => AuditEventLevel::Warning,
             AuditEvent::DataEntryDiscardedFirst(_) => AuditEventLevel::Info,

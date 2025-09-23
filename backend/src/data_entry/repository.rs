@@ -1,18 +1,18 @@
 use sqlx::{Connection, Error, SqliteConnection, query, query_as, types::Json};
 
-use super::{PollingStationDataEntry, status::DataEntryStatus};
-use crate::{
-    data_entry::{ElectionStatusResponseEntry, PollingStationResults},
-    polling_station::PollingStation,
+use super::{
+    ElectionStatusResponseEntry, PollingStationDataEntry, PollingStationResult,
+    PollingStationResults, status::DataEntryStatus,
 };
+use crate::polling_station::PollingStation;
 
 /// Get the full polling station data entry row for a given polling station
 /// id, or return an error if there is no data
-pub async fn get_row(
+pub async fn get_data_entry(
     conn: &mut SqliteConnection,
     polling_station_id: u32,
     committee_session_id: u32,
-) -> Result<PollingStationDataEntry, sqlx::Error> {
+) -> Result<PollingStationDataEntry, Error> {
     query_as!(
         PollingStationDataEntry,
         r#"
@@ -31,14 +31,39 @@ pub async fn get_row(
     .await
 }
 
+/// Get the full polling station result row for a given polling station
+/// id, or return an error if there is no data
+pub async fn get_result(
+    conn: &mut SqliteConnection,
+    polling_station_id: u32,
+    committee_session_id: u32,
+) -> Result<PollingStationResult, Error> {
+    query_as!(
+        PollingStationResult,
+        r#"
+            SELECT
+                polling_station_id AS "polling_station_id: u32",
+                committee_session_id AS "committee_session_id: u32",
+                data AS "data: _",
+                created_at AS "created_at: _"
+            FROM polling_station_results
+            WHERE polling_station_id = ? AND committee_session_id = ?
+        "#,
+        polling_station_id,
+        committee_session_id
+    )
+    .fetch_one(conn)
+    .await
+}
+
 /// Get a data entry or return an error if there is no data entry for the
 /// given polling station id
 pub async fn get(
     conn: &mut SqliteConnection,
     polling_station_id: u32,
     committee_session_id: u32,
-) -> Result<DataEntryStatus, sqlx::Error> {
-    get_row(conn, polling_station_id, committee_session_id)
+) -> Result<DataEntryStatus, Error> {
+    get_data_entry(conn, polling_station_id, committee_session_id)
         .await
         .map(|psde| psde.state.0)
 }
@@ -49,7 +74,7 @@ pub async fn get_or_default(
     conn: &mut SqliteConnection,
     polling_station_id: u32,
     committee_session_id: u32,
-) -> Result<DataEntryStatus, sqlx::Error> {
+) -> Result<DataEntryStatus, Error> {
     Ok(query_as!(
         PollingStationDataEntry,
         r#"
@@ -76,7 +101,7 @@ pub async fn upsert(
     polling_station_id: u32,
     committee_session_id: u32,
     state: &DataEntryStatus,
-) -> Result<PollingStationDataEntry, sqlx::Error> {
+) -> Result<PollingStationDataEntry, Error> {
     let state = Json(state);
     query_as!(
         PollingStationDataEntry,
@@ -101,34 +126,41 @@ pub async fn upsert(
     .await
 }
 
-pub async fn delete(conn: &mut SqliteConnection, polling_station_id: u32) -> Result<bool, Error> {
-    let mut tx = conn.begin().await?;
-
-    let data_entries_rows_affected = query!(
+pub async fn delete_data_entry(
+    conn: &mut SqliteConnection,
+    polling_station_id: u32,
+) -> Result<bool, Error> {
+    let rows_affected = query!(
         r#"DELETE FROM polling_station_data_entries WHERE polling_station_id = ?"#,
         polling_station_id,
     )
-    .execute(&mut *tx)
+    .execute(conn)
     .await?
     .rows_affected();
-    let results_rows_affected = query!(
+
+    Ok(rows_affected > 0)
+}
+
+pub async fn delete_result(
+    conn: &mut SqliteConnection,
+    polling_station_id: u32,
+) -> Result<bool, Error> {
+    let rows_affected = query!(
         r#"DELETE FROM polling_station_results WHERE polling_station_id = ?"#,
         polling_station_id,
     )
-    .execute(&mut *tx)
+    .execute(conn)
     .await?
     .rows_affected();
 
-    tx.commit().await?;
-
-    Ok(data_entries_rows_affected > 0 && results_rows_affected > 0)
+    Ok(rows_affected > 0)
 }
 
 /// Get the status for each polling station data entry in an election
 pub async fn statuses(
     conn: &mut SqliteConnection,
     election_id: u32,
-) -> Result<Vec<ElectionStatusResponseEntry>, sqlx::Error> {
+) -> Result<Vec<ElectionStatusResponseEntry>, Error> {
     query!(
         r#"
             SELECT
@@ -167,7 +199,7 @@ pub async fn make_definitive(
     committee_session_id: u32,
     new_state: &DataEntryStatus,
     definitive_entry: &PollingStationResults,
-) -> Result<(), sqlx::Error> {
+) -> Result<(), Error> {
     let mut tx = conn.begin().await?;
 
     let definitive_entry = Json(definitive_entry);
@@ -202,8 +234,23 @@ pub async fn make_definitive(
     Ok(())
 }
 
-/// Check if a polling station has results
-pub async fn entry_exists(conn: &mut SqliteConnection, id: u32) -> Result<bool, sqlx::Error> {
+/// Check if a polling station has a data entry
+pub async fn data_entry_exists(conn: &mut SqliteConnection, id: u32) -> Result<bool, Error> {
+    let res = query!(
+        r#"
+        SELECT EXISTS(
+            SELECT 1 FROM polling_station_data_entries
+            WHERE polling_station_id = ?)
+        AS `exists`"#,
+        id
+    )
+    .fetch_one(conn)
+    .await?;
+    Ok(res.exists == 1)
+}
+
+/// Check if a polling station has a result
+pub async fn result_exists(conn: &mut SqliteConnection, id: u32) -> Result<bool, Error> {
     let res = query!(
         r#"
         SELECT EXISTS(
@@ -221,7 +268,7 @@ pub async fn entry_exists(conn: &mut SqliteConnection, id: u32) -> Result<bool, 
 pub async fn list_entries_for_committee_session(
     conn: &mut SqliteConnection,
     committee_session_id: u32,
-) -> Result<Vec<(PollingStation, PollingStationResults)>, sqlx::Error> {
+) -> Result<Vec<(PollingStation, PollingStationResults)>, Error> {
     let mut tx = conn.begin().await?;
     let polling_stations =
         crate::polling_station::repository::list(&mut tx, committee_session_id).await?;
@@ -229,7 +276,7 @@ pub async fn list_entries_for_committee_session(
     // This query requires a little explanation:
     //
     // We are trying to get the latest available results for each polling station in a committee session.
-    // However results beyond the first committee session are not available for all polling stations (only
+    // However, results beyond the first committee session are not available for all polling stations (only
     // those that were re-entered in that committee session are available). So we need to look back into
     // previous committee sessions to find the most recent results available.
     //
@@ -274,7 +321,7 @@ pub async fn list_entries_for_committee_session(
             .iter()
             .find(|p| p.id == row.original_id)
             .cloned()
-            .ok_or(sqlx::Error::RowNotFound)?;
+            .ok_or(Error::RowNotFound)?;
         Ok((polling_station, row.data.0))
     })
     .fetch_all(&mut *tx)
@@ -284,7 +331,7 @@ pub async fn list_entries_for_committee_session(
     if results.len() != polling_stations.len() {
         // This should never happen, since every polling station should always
         // have results the first time it appears.
-        Err(sqlx::Error::RowNotFound)
+        Err(Error::RowNotFound)
     } else {
         Ok(results)
     }
@@ -296,7 +343,7 @@ pub async fn list_entries_for_committee_session(
 pub async fn most_recent_results_for_polling_station(
     conn: &mut SqliteConnection,
     polling_station_id: u32,
-) -> Result<Option<PollingStationResults>, sqlx::Error> {
+) -> Result<Option<PollingStationResults>, Error> {
     // For a description of how this query works, please see the comment in the
     // `list_entries_for_committee_session` function above. This is a variant
     // where we start with just a single row for a single polling station, but
@@ -335,7 +382,7 @@ pub async fn insert_test_result(
     polling_station_id: u32,
     committee_session_id: u32,
     results: &PollingStationResults,
-) -> Result<(), sqlx::Error> {
+) -> Result<(), Error> {
     let results = Json(results);
     query!(
         "INSERT INTO polling_station_results (polling_station_id, committee_session_id, data) VALUES (?, ?, ?)",

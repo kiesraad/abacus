@@ -4251,6 +4251,27 @@
           {
             "allOf": [
               {
+                "$ref": "#/components/schemas/ResultDetails"
+              },
+              {
+                "type": "object",
+                "required": [
+                  "event_type"
+                ],
+                "properties": {
+                  "event_type": {
+                    "type": "string",
+                    "enum": [
+                      "ResultDeleted"
+                    ]
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "allOf": [
+              {
                 "$ref": "#/components/schemas/DataEntryDetails"
               },
               {
@@ -5022,10 +5043,16 @@
         "type": "object",
         "required": [
           "polling_station_id",
+          "committee_session_id",
           "data_entry_status",
           "data_entry_progress"
         ],
         "properties": {
+          "committee_session_id": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
           "data_entry_progress": {
             "type": "integer",
             "format": "int32",
@@ -6753,6 +6780,30 @@
           "discard_first_entry",
           "resume_first_entry"
         ]
+      },
+      "ResultDetails": {
+        "type": "object",
+        "required": [
+          "polling_station_id",
+          "committee_session_id",
+          "created_at"
+        ],
+        "properties": {
+          "committee_session_id": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "created_at": {
+            "type": "string"
+          },
+          "polling_station_id": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          }
+        },
+        "additionalProperties": false
       },
       "Role": {
         "type": "string",

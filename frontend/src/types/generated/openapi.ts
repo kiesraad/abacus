@@ -334,6 +334,7 @@ export type AuditEvent =
   | (DataEntryDetails & { event_type: "DataEntrySaved" })
   | (DataEntryDetails & { event_type: "DataEntryDeleted" })
   | (DataEntryDetails & { event_type: "DataEntryFinalised" })
+  | (ResultDetails & { event_type: "ResultDeleted" })
   | (DataEntryDetails & { event_type: "DataEntryDiscardedFirst" })
   | (DataEntryDetails & { event_type: "DataEntryResumedFirst" })
   | (DataEntryDetails & { event_type: "DataEntryKeptFirst" })
@@ -578,6 +579,7 @@ export interface DataEntry {
 }
 
 export interface DataEntryDetails {
+  committee_session_id: number;
   data_entry_progress: number;
   data_entry_status: string;
   finished_at?: string | null;
@@ -1178,6 +1180,12 @@ export interface RedactedEmlHash {
 export type ResolveDifferencesAction = "keep_first_entry" | "keep_second_entry" | "discard_both_entries";
 
 export type ResolveErrorsAction = "discard_first_entry" | "resume_first_entry";
+
+export interface ResultDetails {
+  committee_session_id: number;
+  created_at: string;
+  polling_station_id: number;
+}
 
 export type Role = "administrator" | "typist" | "coordinator";
 

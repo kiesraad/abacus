@@ -52,6 +52,7 @@
     "PollingStationInvestigationCreated": "Onderzoek gestart",
     "PollingStationInvestigationDeleted": "Onderzoek verwijderd",
     "PollingStationInvestigationUpdated": "Onderzoek bijgewerkt",
+    "ResultDeleted": "Resultaat verwijderd",
     "UnknownEvent": "Onbekende gebeurtenis",
     "UserAccountUpdated": "Gebruikersaccount opgeslagen",
     "UserCreated": "Gebruiker aangemaakt",

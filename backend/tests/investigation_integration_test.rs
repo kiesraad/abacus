@@ -6,18 +6,18 @@ use abacus::{
         VotersCounts, VotesCounts,
         status::{ClientState, DataEntryStatusName},
     },
-    election::ElectionDetailsResponse,
 };
 use axum::http::StatusCode;
-use reqwest::Response;
 use serde_json::{Value, json};
 use sqlx::SqlitePool;
 use test_log::test;
 
 use crate::{
     shared::{
-        complete_data_entry, create_result_with_non_example_data_entry, differences_counts_zero,
-        get_statuses, political_group_votes_from_test_data_auto, typist_login,
+        complete_data_entry, conclude_investigation, create_investigation,
+        create_result_with_non_example_data_entry, delete_investigation, differences_counts_zero,
+        get_election, get_statuses, political_group_votes_from_test_data_auto, typist_login,
+        update_investigation,
     },
     utils::serve_api,
 };

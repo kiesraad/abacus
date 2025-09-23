@@ -1,6 +1,6 @@
 {
   "db_name": "SQLite",
-  "query": "\n        SELECT\n            id as \"id: u32\",\n            number as \"number: u32\",\n            election_id as \"election_id: u32\",\n            status as \"status: _\",\n            location,\n            start_date_time as \"start_date_time: _\",\n            number_of_voters as \"number_of_voters: u32\",\n            results_eml as \"results_eml: _\",\n            results_pdf as \"results_pdf: _\"\n        FROM committee_sessions\n        WHERE election_id = ?\n        ORDER BY number DESC\n        LIMIT 1\n        ",
+  "query": "\n        UPDATE committee_sessions\n        SET\n            location = ?,\n            start_date_time = ?\n        WHERE id = ?\n        RETURNING\n            id as \"id: u32\",\n            number as \"number: u32\",\n            election_id as \"election_id: u32\",\n            status as \"status: _\",\n            location,\n            start_date_time as \"start_date_time: _\",\n            number_of_voters as \"number_of_voters: u32\",\n            results_eml as \"results_eml: _\",\n            results_pdf as \"results_pdf: _\",\n            overview_pdf as \"overview_pdf: _\"\n        ",
   "describe": {
     "columns": [
       {
@@ -47,10 +47,15 @@
         "name": "results_pdf: _",
         "ordinal": 8,
         "type_info": "Integer"
+      },
+      {
+        "name": "overview_pdf: _",
+        "ordinal": 9,
+        "type_info": "Integer"
       }
     ],
     "parameters": {
-      "Right": 1
+      "Right": 3
     },
     "nullable": [
       false,
@@ -61,8 +66,9 @@
       true,
       false,
       true,
+      true,
       true
     ]
   },
-  "hash": "816460fac27118a422cba130d437e7c9e3d9807bd1f5dbe1c39c7888f8199036"
+  "hash": "47047cfab3574a662de21478df8ce0d599e226c4ea6c8ef3b1a7957e9f7c9c52"
 }

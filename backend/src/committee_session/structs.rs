@@ -30,6 +30,9 @@ pub struct CommitteeSession {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[schema(nullable = false)]
     pub results_pdf: Option<u32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[schema(nullable = false)]
+    pub overview_pdf: Option<u32>,
 }
 
 impl CommitteeSession {
@@ -51,6 +54,7 @@ impl From<CommitteeSession> for audit_log::CommitteeSessionDetails {
             session_number_of_voters: value.number_of_voters,
             session_results_eml: value.results_eml,
             session_results_pdf: value.results_pdf,
+            session_overview_pdf: value.overview_pdf,
         }
     }
 }
@@ -106,4 +110,5 @@ pub struct CommitteeSessionStatusChangeRequest {
 pub struct CommitteeSessionFilesUpdateRequest {
     pub results_eml: Option<u32>,
     pub results_pdf: Option<u32>,
+    pub overview_pdf: Option<u32>,
 }

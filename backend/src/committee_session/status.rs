@@ -87,6 +87,7 @@ pub async fn change_committee_session_status(
             CommitteeSessionFilesUpdateRequest {
                 results_eml: None,
                 results_pdf: None,
+                overview_pdf: None,
             },
         )
         .await?;

@@ -24,8 +24,8 @@ pub async fn get_file(conn: &mut SqliteConnection, id: u32) -> Result<File, sqlx
 /// Create a single file
 pub async fn create_file(
     conn: &mut SqliteConnection,
-    data: &[u8],
     filename: String,
+    data: &[u8],
     mime_type: String,
 ) -> Result<File, sqlx::Error> {
     query_as!(

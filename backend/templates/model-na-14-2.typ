@@ -68,16 +68,16 @@ vastgesteld.
 #grid(
   rows: auto,
   correction_title_grid(),
-  empty_letterbox("Z", cells: 1, original: 10, corrected: (), bold_top_border: true, wide_cells: true)[Kiesgerechtigden]
+  empty_letterbox("Z", cells: 1, original: input.previous_committee_session.number_of_voters, corrected: (), bold_top_border: true, wide_cells: true)[Kiesgerechtigden]
 )
 
 == Toegelaten kiezers
 Het totaal van alle getelde geldige stempassen, volmachtbewijzen en kiezerspassen
 #sum(
   with_correction_title: true,
-  empty_letterbox("A", cells: 1, original: 10, bold_top_border: true, wide_cells: true)[Stempassen],
-  empty_letterbox("B", cells: 1, original: 10, wide_cells: true)[Volmachtbewijzen],
-  empty_letterbox("D", cells: 1, original: 10, wide_cells: true, light: false)[
+  empty_letterbox("A", cells: 1, original: input.previous_summary.voters_counts.poll_card_count, corrected: (), bold_top_border: true, wide_cells: true)[Stempassen],
+  empty_letterbox("B", cells: 1, original: input.previous_summary.voters_counts.proxy_certificate_count, corrected: (), wide_cells: true)[Volmachtbewijzen],
+  empty_letterbox("D", cells: 1, original: input.previous_summary.voters_counts.total_admitted_voters_count, corrected: (), wide_cells: true, light: false)[
     *Totaal toegelaten kiezers (A+B)*
   ]
 )
@@ -93,21 +93,22 @@ ingevuld te worden in de kolom ‘gecorrigeerd'. Onder ‘oorspronkelijk’ staa
     with_correction_title: true,
     sum(
       ..input.election.political_groups.enumerate().map(((idx, list)) => {
-        empty_letterbox(cells: 1, original: 10, bold_top_border: idx == 0, [E.#list.number], wide_cells: true)[Totaal lijst #list.number - #list.name]
+        let previous_political_group_votes = input.previous_summary.political_group_votes.find((pgv) => pgv.number == list.number);
+        empty_letterbox(cells: 1, original: previous_political_group_votes.total, bold_top_border: idx == 0, [E.#list.number], wide_cells: true)[Totaal lijst #list.number - #list.name]
       }),
       empty_letterbox(
         cells:1,
-        original: 10,
+        original: input.previous_summary.votes_counts.total_votes_candidates_count,
         "E",
         light: false,
         wide_cells: true
       )[*Totaal stemmen op kandidaten* (tel E.1 t/m E.#input.election.political_groups.last().number op)],
     ),
-    empty_letterbox(cells: 1, original: 10, "F", wide_cells: true)[Blanco stemmen],
-    empty_letterbox(cells: 1, original: 10, "G", wide_cells: true)[Ongeldige stemmen],
+    empty_letterbox(cells: 1, original: input.previous_summary.votes_counts.blank_votes_count, "F", wide_cells: true)[Blanco stemmen],
+    empty_letterbox(cells: 1, original: input.previous_summary.votes_counts.invalid_votes_count, "G", wide_cells: true)[Ongeldige stemmen],
     empty_letterbox(
       cells:1,
-      original: 10,
+      original: input.previous_summary.votes_counts.total_votes_cast_count,
       "H",
       light: false,
       wide_cells: true
@@ -121,9 +122,9 @@ ingevuld te worden in de kolom ‘gecorrigeerd'. Onder ‘oorspronkelijk’ staa
 
 === Is bij *alle afzonderlijke stembureaus* in #is_municipality[deze gemeente][dit openbaar lichaam] het aantal uitgebrachte stemmen en het aantal toegelaten kiezers gelijk?
 
-#checkbox[Ja #sym.arrow.r *Ga door naar #ref(<per_list_and_candidate>)*]
+#checkbox(checked: false)[Ja #sym.arrow.r *Ga door naar #ref(<per_list_and_candidate>)*]
 
-#checkbox[Nee, er zijn stembureaus met een verschil]
+#checkbox(checked: false)[Nee, er zijn stembureaus met een verschil]
 
 
 === Voor de stembureaus met de nummers #TODO[stembureaunummers] zijn *méér* uitgebrachte stemmen dan toegelaten kiezers geteld. Noteer onder ‘gecorrigeerd’ het nieuwe verschil.
@@ -142,6 +143,11 @@ ingevuld te worden in de kolom ‘gecorrigeerd'. Onder ‘oorspronkelijk’ staa
 
 #for political_group in input.election.political_groups {
   votes_table(
+    original_values: political_group.candidates.map(candidate => (
+      name: candidate_name(candidate),
+      number: candidate.number,
+      votes: none,
+    )),
     title: [#political_group.number #political_group.name],
     headers: ("Kandidaat", "", "Oorspronkelijk", "Gecorrigeerd"),
     corrected_cells: 1,

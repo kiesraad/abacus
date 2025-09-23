@@ -548,6 +548,9 @@ export interface CountingDifferencesPollingStation {
   unexplained_difference_ballots_voters: YesNo;
 }
 
+/**
+ * Struct used to create a new user
+ */
 export interface CreateUserRequest {
   fullname?: string;
   role: Role;

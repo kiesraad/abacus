@@ -82,6 +82,7 @@ pub fn openapi_router() -> OpenApiRouter<AppState> {
         .merge(apportionment::router())
         .merge(audit_log::router())
         .merge(authentication::router())
+        .merge(authentication::user_router())
         .merge(committee_session::router())
         .merge(data_entry::router())
         .merge(election::router())

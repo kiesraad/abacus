@@ -4892,6 +4892,7 @@
       },
       "CreateUserRequest": {
         "type": "object",
+        "description": "Struct used to create a new user",
         "required": [
           "username",
           "temp_password",

@@ -195,21 +195,14 @@ async fn test_investigation_deletion_setting_committee_session_back_to_created_s
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_5_with_results", "users"))))]
 
-async fn test_investigation_deleting_also_deleting_data_entry_and_results(pool: SqlitePool) {
-    // TODO: This test should change when issue #2151 is implemented:
-    //  The status api should then not return FirstEntryNotStarted
-    //  before an investigation with `corrected_results: true` is added
+async fn test_investigation_deletion_removes_polling_station_from_status(pool: SqlitePool) {
     let addr = serve_api(pool.clone()).await;
     let cookie = shared::coordinator_login(&addr).await;
     let election_id = 5;
     let polling_station_id = 9;
 
     let statuses = get_statuses(&addr, &cookie, election_id).await;
-    assert_eq!(statuses.len(), 1);
-    assert_eq!(
-        statuses[&polling_station_id].status,
-        DataEntryStatusName::FirstEntryNotStarted
-    );
+    assert_eq!(statuses.len(), 0);
 
     // Add investigation with corrected_results: true
     assert_eq!(
@@ -230,6 +223,13 @@ async fn test_investigation_deleting_also_deleting_data_entry_and_results(pool: 
         .await
         .status(),
         StatusCode::OK
+    );
+
+    let statuses = get_statuses(&addr, &cookie, election_id).await;
+    assert_eq!(statuses.len(), 1);
+    assert_eq!(
+        statuses[&polling_station_id].status,
+        DataEntryStatusName::FirstEntryNotStarted
     );
 
     let data_entry = DataEntry {
@@ -287,7 +287,6 @@ async fn test_investigation_deleting_also_deleting_data_entry_and_results(pool: 
         }),
         client_state: ClientState::new_from_str(None).unwrap(),
     };
-
     create_result_with_non_example_data_entry(&addr, 9, 5, data_entry).await;
 
     let statuses = get_statuses(&addr, &cookie, election_id).await;
@@ -305,11 +304,7 @@ async fn test_investigation_deleting_also_deleting_data_entry_and_results(pool: 
     );
 
     let statuses = get_statuses(&addr, &cookie, election_id).await;
-    assert_eq!(statuses.len(), 1);
-    assert_eq!(
-        statuses[&polling_station_id].status,
-        DataEntryStatusName::FirstEntryNotStarted
-    );
+    assert_eq!(statuses.len(), 0);
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_7_four_sessions", "users"))))]
@@ -417,7 +412,7 @@ async fn test_partials_investigation_update(pool: SqlitePool) {
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_7_four_sessions", "users"))))]
-async fn test_investigation_update_and_data_entry_and_results_delete(pool: SqlitePool) {
+async fn test_investigation_update_affects_polling_station_status(pool: SqlitePool) {
     let addr = serve_api(pool.clone()).await;
     let cookie = shared::coordinator_login(&addr).await;
     let election_id = 7;
@@ -441,6 +436,13 @@ async fn test_investigation_update_and_data_entry_and_results_delete(pool: Sqlit
         .await
         .status(),
         StatusCode::OK
+    );
+
+    let statuses = get_statuses(&addr, &cookie, election_id).await;
+    assert_eq!(statuses.len(), 1);
+    assert_eq!(
+        statuses[&polling_station_id].status,
+        DataEntryStatusName::FirstEntryNotStarted
     );
 
     let data_entry = DataEntry {
@@ -481,7 +483,7 @@ async fn test_investigation_update_and_data_entry_and_results_delete(pool: Sqlit
         .await;
 
     let statuses = get_statuses(&addr, &cookie, election_id).await;
-    assert_eq!(statuses.len(), 2);
+    assert_eq!(statuses.len(), 1);
     assert_eq!(
         statuses[&polling_station_id].status,
         DataEntryStatusName::Definitive
@@ -503,11 +505,7 @@ async fn test_investigation_update_and_data_entry_and_results_delete(pool: Sqlit
     );
 
     let statuses = get_statuses(&addr, &cookie, election_id).await;
-    assert_eq!(statuses.len(), 2);
-    assert_eq!(
-        statuses[&polling_station_id].status,
-        DataEntryStatusName::FirstEntryNotStarted
-    );
+    assert_eq!(statuses.len(), 0);
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_7_four_sessions", "users"))))]

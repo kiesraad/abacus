@@ -327,7 +327,6 @@ pub async fn get_statuses(
 
     assert_eq!(response.status(), StatusCode::OK);
     let body: ElectionStatusResponse = response.json().await.unwrap();
-    assert!(!body.statuses.is_empty());
     body.statuses
         .into_iter()
         .fold(BTreeMap::new(), |mut acc, entry| {

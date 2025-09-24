@@ -129,31 +129,43 @@ pub async fn upsert(
 pub async fn delete_data_entry(
     conn: &mut SqliteConnection,
     polling_station_id: u32,
-) -> Result<bool, Error> {
-    let rows_affected = query!(
-        r#"DELETE FROM polling_station_data_entries WHERE polling_station_id = ?"#,
+) -> Result<Option<PollingStationDataEntry>, Error> {
+    query_as!(
+        PollingStationDataEntry,
+        r#"
+            DELETE FROM polling_station_data_entries
+            WHERE polling_station_id = ?
+            RETURNING
+                polling_station_id AS "polling_station_id: u32",
+                committee_session_id AS "committee_session_id: u32",
+                state AS "state: _",
+                updated_at AS "updated_at: _"
+        "#,
         polling_station_id,
     )
-    .execute(conn)
-    .await?
-    .rows_affected();
-
-    Ok(rows_affected > 0)
+    .fetch_optional(conn)
+    .await
 }
 
 pub async fn delete_result(
     conn: &mut SqliteConnection,
     polling_station_id: u32,
-) -> Result<bool, Error> {
-    let rows_affected = query!(
-        r#"DELETE FROM polling_station_results WHERE polling_station_id = ?"#,
+) -> Result<Option<PollingStationResult>, Error> {
+    query_as!(
+        PollingStationResult,
+        r#"
+            DELETE FROM polling_station_results
+            WHERE polling_station_id = ?
+            RETURNING
+                polling_station_id AS "polling_station_id: u32",
+                committee_session_id AS "committee_session_id: u32",
+                data AS "data: _",
+                created_at AS "created_at: _"
+        "#,
         polling_station_id,
     )
-    .execute(conn)
-    .await?
-    .rows_affected();
-
-    Ok(rows_affected > 0)
+    .fetch_optional(conn)
+    .await
 }
 
 /// Get the status for each polling station data entry in an election

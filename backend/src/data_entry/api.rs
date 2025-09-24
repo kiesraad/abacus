@@ -15,8 +15,7 @@ use super::{
     PollingStationDataEntry, PollingStationResults, ValidationResults,
     entry_number::EntryNumber,
     repository::{
-        data_entry_exists, delete_data_entry, delete_result, get_data_entry, get_result,
-        most_recent_results_for_polling_station, result_exists,
+        delete_data_entry, delete_result, get_data_entry, most_recent_results_for_polling_station,
     },
     status::{
         ClientState, CurrentDataEntry, DataEntryStatus, DataEntryStatusName,
@@ -106,31 +105,15 @@ pub async fn delete_data_entry_and_result_for_polling_station(
     audit_service: AuditService,
     polling_station: &PollingStation,
 ) -> Result<(), APIError> {
-    if data_entry_exists(conn, polling_station.id).await? {
-        let data_entry = get_data_entry(
-            conn,
-            polling_station.id,
-            polling_station.committee_session_id,
-        )
-        .await?;
-        if delete_data_entry(conn, polling_station.id).await? {
-            audit_service
-                .log(conn, &AuditEvent::DataEntryDeleted(data_entry.into()), None)
-                .await?;
-        }
+    if let Some(data_entry) = delete_data_entry(conn, polling_station.id).await? {
+        audit_service
+            .log(conn, &AuditEvent::DataEntryDeleted(data_entry.into()), None)
+            .await?;
     }
-    if result_exists(conn, polling_station.id).await? {
-        let result = get_result(
-            conn,
-            polling_station.id,
-            polling_station.committee_session_id,
-        )
-        .await?;
-        if delete_result(conn, polling_station.id).await? {
-            audit_service
-                .log(conn, &AuditEvent::ResultDeleted(result.into()), None)
-                .await?;
-        }
+    if let Some(result) = delete_result(conn, polling_station.id).await? {
+        audit_service
+            .log(conn, &AuditEvent::ResultDeleted(result.into()), None)
+            .await?;
     }
     Ok(())
 }
@@ -305,12 +288,7 @@ async fn polling_station_data_entry_claim(
     )
     .await?;
 
-    let data_entry = crate::data_entry::repository::get_data_entry(
-        &mut tx,
-        polling_station_id,
-        committee_session.id,
-    )
-    .await?;
+    let data_entry = get_data_entry(&mut tx, polling_station_id, committee_session.id).await?;
 
     audit_service
         .log(
@@ -424,12 +402,7 @@ async fn polling_station_data_entry_save(
     )
     .await?;
 
-    let data_entry = crate::data_entry::repository::get_data_entry(
-        &mut tx,
-        polling_station_id,
-        committee_session.id,
-    )
-    .await?;
+    let data_entry = get_data_entry(&mut tx, polling_station_id, committee_session.id).await?;
 
     audit_service
         .log(
@@ -493,12 +466,7 @@ async fn polling_station_data_entry_delete(
     )
     .await?;
 
-    let data_entry = crate::data_entry::repository::get_data_entry(
-        &mut tx,
-        polling_station_id,
-        committee_session.id,
-    )
-    .await?;
+    let data_entry = get_data_entry(&mut tx, polling_station_id, committee_session.id).await?;
 
     audit_service
         .log(
@@ -594,12 +562,7 @@ async fn polling_station_data_entry_finalise(
         }
     }
 
-    let data_entry = crate::data_entry::repository::get_data_entry(
-        &mut tx,
-        polling_station_id,
-        committee_session.id,
-    )
-    .await?;
+    let data_entry = get_data_entry(&mut tx, polling_station_id, committee_session.id).await?;
 
     audit_service
         .log(

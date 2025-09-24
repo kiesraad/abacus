@@ -1,0 +1,38 @@
+{
+  "db_name": "SQLite",
+  "query": "\n            DELETE FROM polling_station_data_entries\n            WHERE polling_station_id = ?\n            RETURNING\n                polling_station_id AS \"polling_station_id: u32\",\n                committee_session_id AS \"committee_session_id: u32\",\n                state AS \"state: _\",\n                updated_at AS \"updated_at: _\"\n        ",
+  "describe": {
+    "columns": [
+      {
+        "name": "polling_station_id: u32",
+        "ordinal": 0,
+        "type_info": "Integer"
+      },
+      {
+        "name": "committee_session_id: u32",
+        "ordinal": 1,
+        "type_info": "Integer"
+      },
+      {
+        "name": "state: _",
+        "ordinal": 2,
+        "type_info": "Text"
+      },
+      {
+        "name": "updated_at: _",
+        "ordinal": 3,
+        "type_info": "Text"
+      }
+    ],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "55973cebb08431d84ce2fe44b4ad5e9c9f001df573c423668596a19027388d76"
+}

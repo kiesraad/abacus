@@ -55,6 +55,7 @@
     gap: 1rem;
     max-width: 40rem;
     word-break: break-word;
+    color: var(--base-black);
 
     p {
       margin: 0;
@@ -136,9 +137,6 @@
     aside {
       display: flex;
       padding: 0;
-    }
-    p {
-      color: var(--color-help-text);
     }
     section {
       gap: 10px;

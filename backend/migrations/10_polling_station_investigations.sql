@@ -5,5 +5,5 @@ CREATE TABLE polling_station_investigations
     findings             TEXT                              ,
     corrected_results    INTEGER                           ,
 
-    FOREIGN KEY (polling_station_id) REFERENCES polling_stations (id)
+    FOREIGN KEY (polling_station_id) REFERENCES polling_stations (id) ON DELETE CASCADE
 ) STRICT;

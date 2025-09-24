@@ -6,116 +6,23 @@ use abacus::{
         VotersCounts, VotesCounts,
         status::{ClientState, DataEntryStatusName},
     },
-    election::ElectionDetailsResponse,
 };
 use axum::http::StatusCode;
-use reqwest::Response;
 use serde_json::json;
 use sqlx::SqlitePool;
 use test_log::test;
 
 use crate::{
     shared::{
-        create_result_with_non_example_data_entry, differences_counts_zero, get_statuses,
-        political_group_votes_from_test_data_auto,
+        conclude_investigation, create_investigation, create_result_with_non_example_data_entry,
+        delete_investigation, differences_counts_zero, get_election, get_statuses,
+        political_group_votes_from_test_data_auto, update_investigation,
     },
     utils::serve_api,
 };
 
 pub mod shared;
 pub mod utils;
-
-async fn get_election(pool: SqlitePool, election_id: u32) -> ElectionDetailsResponse {
-    let addr = serve_api(pool).await;
-    let url = format!("http://{addr}/api/elections/{election_id}");
-    let coordinator_cookie = shared::coordinator_login(&addr).await;
-    let response = reqwest::Client::new()
-        .get(&url)
-        .header("cookie", coordinator_cookie)
-        .send()
-        .await
-        .unwrap();
-
-    // Ensure the response is what we expect
-    assert_eq!(response.status(), StatusCode::OK);
-    response.json().await.unwrap()
-}
-
-async fn create_investigation(pool: SqlitePool, polling_station_id: u32) -> Response {
-    let addr = serve_api(pool).await;
-    let url = format!("http://{addr}/api/polling_stations/{polling_station_id}/investigation");
-    let coordinator_cookie = shared::coordinator_login(&addr).await;
-    let body = json!({
-        "reason": "Test reason"
-    });
-    reqwest::Client::new()
-        .post(&url)
-        .header("cookie", coordinator_cookie)
-        .header("Content-Type", "application/json")
-        .body(body.to_string())
-        .send()
-        .await
-        .unwrap()
-}
-
-async fn update_investigation(
-    pool: SqlitePool,
-    polling_station_id: u32,
-    body: Option<serde_json::Value>,
-) -> Response {
-    let addr = serve_api(pool).await;
-    let coordinator_cookie = shared::coordinator_login(&addr).await;
-    let body = body.unwrap_or(json!({
-        "reason": "Updated reason",
-        "findings": "updated test findings",
-        "corrected_results": true
-    }));
-    let url = format!("http://{addr}/api/polling_stations/{polling_station_id}/investigation");
-    reqwest::Client::new()
-        .put(&url)
-        .header("cookie", coordinator_cookie)
-        .header("Content-Type", "application/json")
-        .body(body.to_string())
-        .send()
-        .await
-        .unwrap()
-}
-
-async fn conclude_investigation(
-    pool: SqlitePool,
-    polling_station_id: u32,
-    body: Option<serde_json::Value>,
-) -> Response {
-    let addr = serve_api(pool).await;
-    let coordinator_cookie = shared::coordinator_login(&addr).await;
-    let body = body.unwrap_or(json!({
-        "findings": "Test findings",
-        "corrected_results": false
-    }));
-    let url =
-        format!("http://{addr}/api/polling_stations/{polling_station_id}/investigation/conclude");
-    reqwest::Client::new()
-        .post(&url)
-        .header("cookie", coordinator_cookie)
-        .header("Content-Type", "application/json")
-        .body(body.to_string())
-        .send()
-        .await
-        .unwrap()
-}
-
-async fn delete_investigation(pool: SqlitePool, polling_station_id: u32) -> Response {
-    let addr = serve_api(pool).await;
-    let coordinator_cookie = shared::coordinator_login(&addr).await;
-    let url = format!("http://{addr}/api/polling_stations/{polling_station_id}/investigation");
-    reqwest::Client::new()
-        .delete(&url)
-        .header("cookie", coordinator_cookie)
-        .header("Content-Type", "application/json")
-        .send()
-        .await
-        .unwrap()
-}
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_7_four_sessions", "users"))))]
 async fn test_investigation_create_conclude_update_delete(pool: SqlitePool) {

@@ -3038,8 +3038,44 @@ mod tests {
         /// CSO | F.401: 'Kandidaten en lijsttotalen': Er zijn stemmen op kandidaten, en het totaal aantal stemmen op een lijst = leeg of 0
         #[test]
         fn test_f401() -> Result<(), DataError> {
+            // Only F.401 is triggered.
+            // Candidate votes sum > 0 & political group candidates votes total == 0
             let mut data = create_test_data();
             data.political_group_votes[1].total = 0;
+
+            let validation_results = validate(data.clone())?;
+            assert_eq!(
+                validation_results.errors,
+                [ValidationResult {
+                    code: ValidationResultCode::F401,
+                    fields: vec!["data.political_group_votes[1].total".into()],
+                    context: Some(ValidationResultContext {
+                        political_group_number: Some(2),
+                    }),
+                }]
+            );
+
+            // Only F.401 is triggered.
+            // Political group total votes > 0 & political group candidates votes total == 0
+            data.political_group_votes[1].candidate_votes[0].votes = 0;
+            data.political_group_votes[1].candidate_votes[1].votes = 0;
+            data.political_group_votes[1].candidate_votes[2].votes = 0;
+            data.political_group_votes[1].total = 0;
+
+            let validation_results = validate(data.clone())?;
+            assert_eq!(
+                validation_results.errors,
+                [ValidationResult {
+                    code: ValidationResultCode::F401,
+                    fields: vec!["data.political_group_votes[1].total".into()],
+                    context: Some(ValidationResultContext {
+                        political_group_number: Some(2),
+                    }),
+                }]
+            );
+
+            // Expect only F.401 (F.401, F.402 and F.403 are triggered)
+            data.political_group_votes[1].candidate_votes[0].votes += 10;
 
             let validation_results = validate(data.clone())?;
             assert_eq!(

@@ -1,19 +1,25 @@
 import * as ReactRouter from "react-router";
 
 import { render, waitFor } from "@testing-library/react";
+import { userEvent } from "@testing-library/user-event";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
+import * as useMessages from "@/hooks/messages/useMessages";
 import { ErrorBoundary } from "@/components/error/ErrorBoundary";
 import { ElectionLayout } from "@/components/layout/ElectionLayout";
-import { ElectionRequestHandler, ElectionStatusRequestHandler } from "@/testing/api-mocks/RequestHandlers";
+import {
+  ElectionRequestHandler,
+  ElectionStatusRequestHandler,
+  PollingStationInvestigationDeleteHandler,
+} from "@/testing/api-mocks/RequestHandlers";
 import { Providers } from "@/testing/Providers";
 import { server } from "@/testing/server";
-import { screen, setupTestRouter } from "@/testing/test-utils";
+import { screen, setupTestRouter, spyOnHandler, within } from "@/testing/test-utils";
 
-import { AddInvestigationLayout } from "./AddInvestigationLayout";
-import { InvestigationPrintCorrigendumPage } from "./InvestigationPrintCorrigendumPage";
+import { investigationRoutes } from "../routes";
 
 const navigate = vi.fn();
+const pushMessage = vi.fn();
 
 async function renderPage() {
   const router = setupTestRouter([
@@ -24,33 +30,13 @@ async function renderPage() {
       children: [
         {
           path: "investigations",
-          children: [
-            {
-              index: true,
-              Component: () => "Overview stub",
-            },
-            {
-              path: ":pollingStationId",
-              Component: AddInvestigationLayout,
-              children: [
-                {
-                  index: true,
-                  path: "reason",
-                  Component: () => "Reason stub",
-                },
-                {
-                  path: "print-corrigendum",
-                  Component: InvestigationPrintCorrigendumPage,
-                },
-              ],
-            },
-          ],
+          children: investigationRoutes,
         },
       ],
     },
   ]);
 
-  await router.navigate("/elections/1/investigations/1/print-corrigendum");
+  await router.navigate("/elections/1/investigations/3/print-corrigendum");
   render(<Providers router={router} />);
 
   return router;
@@ -60,6 +46,7 @@ describe("InvestigationPrintCorrigendumPage", () => {
   beforeEach(() => {
     server.use(ElectionRequestHandler, ElectionStatusRequestHandler);
     vi.spyOn(ReactRouter, "useNavigate").mockImplementation(() => navigate);
+    vi.spyOn(useMessages, "useMessages").mockReturnValue({ pushMessage, popMessages: vi.fn(() => []) });
   });
 
   test("Renders the correct headers and a download button", async () => {
@@ -73,7 +60,7 @@ describe("InvestigationPrintCorrigendumPage", () => {
 
     expect(
       await screen.findByRole("link", {
-        name: ["Download corrigendum voor stembureau 33", "Na 14-2 Bijlage 1"].join(""),
+        name: ["Download corrigendum voor stembureau 35", "Na 14-2 Bijlage 1"].join(""),
       }),
     ).toBeVisible();
 
@@ -88,6 +75,35 @@ describe("InvestigationPrintCorrigendumPage", () => {
 
     await waitFor(() => {
       expect(router.state.location.pathname).toEqual("/elections/1/investigations");
+    });
+  });
+
+  test("Renders delete button on update investigation and delete works", async () => {
+    server.use(PollingStationInvestigationDeleteHandler);
+    const user = userEvent.setup();
+    await renderPage();
+
+    expect(await screen.findByRole("heading", { level: 2, name: "Print het corrigendum" })).toBeVisible();
+    expect(await screen.findByRole("heading", { level: 3, name: "Voer het onderzoek uit" })).toBeVisible();
+
+    const deleteButton = await screen.findByRole("button", { name: "Onderzoek verwijderen" });
+    expect(deleteButton).toBeVisible();
+
+    await user.click(deleteButton);
+
+    const modal = await screen.findByTestId("modal-dialog");
+    expect(modal).toHaveTextContent("Onderzoek verwijderen?");
+
+    const deleteInvestigation = spyOnHandler(PollingStationInvestigationDeleteHandler);
+
+    const confirmButton = await within(modal).findByRole("button", { name: "Verwijderen" });
+    await user.click(confirmButton);
+
+    expect(deleteInvestigation).toHaveBeenCalled();
+
+    expect(pushMessage).toHaveBeenCalledWith({ title: "Onderzoek voor stembureau 35 (Testschool) verwijderd" });
+    await waitFor(() => {
+      expect(navigate).toHaveBeenCalledExactlyOnceWith("/elections/1/investigations");
     });
   });
 });

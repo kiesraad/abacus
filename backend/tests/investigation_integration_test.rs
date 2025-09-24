@@ -10,14 +10,14 @@ use abacus::{
 };
 use axum::http::StatusCode;
 use reqwest::Response;
-use serde_json::json;
+use serde_json::{Value, json};
 use sqlx::SqlitePool;
 use test_log::test;
 
 use crate::{
     shared::{
-        create_result_with_non_example_data_entry, differences_counts_zero, get_statuses,
-        political_group_votes_from_test_data_auto,
+        complete_data_entry, create_result_with_non_example_data_entry, differences_counts_zero,
+        get_statuses, political_group_votes_from_test_data_auto, typist_login,
     },
     utils::serve_api,
 };
@@ -451,34 +451,8 @@ async fn test_partials_investigation_update(pool: SqlitePool) {
     );
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_7_four_sessions", "users"))))]
-async fn test_investigation_update_and_data_entry_and_results_delete(pool: SqlitePool) {
-    let addr = serve_api(pool.clone()).await;
-    let cookie = shared::coordinator_login(&addr).await;
-    let election_id = 7;
-    let polling_station_id = 741;
-
-    assert_eq!(
-        create_investigation(pool.clone(), polling_station_id)
-            .await
-            .status(),
-        StatusCode::OK
-    );
-    assert_eq!(
-        conclude_investigation(
-            pool.clone(),
-            polling_station_id,
-            Some(json!({
-                "findings": "Test findings",
-                "corrected_results": true
-            })),
-        )
-        .await
-        .status(),
-        StatusCode::OK
-    );
-
-    let data_entry = DataEntry {
+fn second_session_data_entry_two_political_groups() -> DataEntry {
+    DataEntry {
         progress: 100,
         data: PollingStationResults::CSONextSession(CSONextSessionResults {
             voters_counts: VotersCounts {
@@ -510,35 +484,147 @@ async fn test_investigation_update_and_data_entry_and_results_delete(pool: Sqlit
             ],
         }),
         client_state: ClientState::new_from_str(None).unwrap(),
-    };
+    }
+}
 
-    create_result_with_non_example_data_entry(&addr, polling_station_id, election_id, data_entry)
-        .await;
+#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_7_four_sessions", "users"))))]
+async fn test_update_investigation_with_result(pool: SqlitePool) {
+    let addr = serve_api(pool.clone()).await;
+    let cookie = shared::coordinator_login(&addr).await;
+    let election_id = 7;
+    let polling_station_id = 741;
+
+    // Create and conclude investigation
+    let response = create_investigation(pool.clone(), polling_station_id).await;
+    assert_eq!(response.status(), StatusCode::OK);
+
+    let response = conclude_investigation(
+        pool.clone(),
+        polling_station_id,
+        Some(json!({"findings": "Test findings", "corrected_results": true})),
+    )
+    .await;
+    assert_eq!(response.status(), StatusCode::OK);
+
+    // Complete data entry
+    create_result_with_non_example_data_entry(
+        &addr,
+        polling_station_id,
+        election_id,
+        second_session_data_entry_two_political_groups(),
+    )
+    .await;
 
     let statuses = get_statuses(&addr, &cookie, election_id).await;
-    assert_eq!(statuses.len(), 2);
     assert_eq!(
         statuses[&polling_station_id].status,
         DataEntryStatusName::Definitive
     );
 
+    // Try to update investigation corrected_results to false
+    let mut investigation = json!({
+        "reason": "Test reason",
+        "findings": "Test findings",
+        "corrected_results": false
+    });
+    let response = update_investigation(
+        pool.clone(),
+        polling_station_id,
+        Some(investigation.clone()),
+    )
+    .await;
+    assert_eq!(response.status(), StatusCode::CONFLICT);
+    let body: Value = response.json().await.unwrap();
+    assert_eq!(body["reference"], "InvestigationHasDataEntryOrResult");
+
+    // Data entry result is still there
+    let statuses = get_statuses(&addr, &cookie, election_id).await;
     assert_eq!(
-        update_investigation(
-            pool.clone(),
-            polling_station_id,
-            Some(json!({
-                "reason": "Partially updated reason",
-                "findings": "Partially updated findings",
-                "corrected_results": false
-            })),
-        )
-        .await
-        .status(),
-        StatusCode::OK
+        statuses[&polling_station_id].status,
+        DataEntryStatusName::Definitive
     );
 
+    // Accept deletion
+    investigation["accept_data_entry_deletion"] = true.into();
+    let response =
+        update_investigation(pool.clone(), polling_station_id, Some(investigation)).await;
+    assert_eq!(response.status(), StatusCode::OK);
+
+    // Data entry result is deleted
     let statuses = get_statuses(&addr, &cookie, election_id).await;
-    assert_eq!(statuses.len(), 2);
+    assert_eq!(
+        statuses[&polling_station_id].status,
+        DataEntryStatusName::FirstEntryNotStarted
+    );
+}
+
+#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_7_four_sessions", "users"))))]
+async fn test_update_investigation_with_data_entry(pool: SqlitePool) {
+    let addr = serve_api(pool.clone()).await;
+    let cookie = shared::coordinator_login(&addr).await;
+    let election_id = 7;
+    let polling_station_id = 741;
+
+    // Create and conclude investigation
+    let response = create_investigation(pool.clone(), polling_station_id).await;
+    assert_eq!(response.status(), StatusCode::OK);
+
+    let response = conclude_investigation(
+        pool.clone(),
+        polling_station_id,
+        Some(json!({"findings": "Test findings", "corrected_results": true})),
+    )
+    .await;
+    assert_eq!(response.status(), StatusCode::OK);
+
+    // First data entry
+    let typist_cookie = typist_login(&addr).await;
+    complete_data_entry(
+        &addr,
+        &typist_cookie,
+        polling_station_id,
+        1,
+        second_session_data_entry_two_political_groups(),
+    )
+    .await;
+
+    let statuses = get_statuses(&addr, &cookie, election_id).await;
+    assert_eq!(
+        statuses[&polling_station_id].status,
+        DataEntryStatusName::SecondEntryNotStarted
+    );
+
+    // Try to update investigation corrected_results to false
+    let mut investigation = json!({
+        "reason": "Test reason",
+        "findings": "Test findings",
+        "corrected_results": false
+    });
+    let response = update_investigation(
+        pool.clone(),
+        polling_station_id,
+        Some(investigation.clone()),
+    )
+    .await;
+    assert_eq!(response.status(), StatusCode::CONFLICT);
+    let body: Value = response.json().await.unwrap();
+    assert_eq!(body["reference"], "InvestigationHasDataEntryOrResult");
+
+    // Data entry is still there
+    let statuses = get_statuses(&addr, &cookie, election_id).await;
+    assert_eq!(
+        statuses[&polling_station_id].status,
+        DataEntryStatusName::SecondEntryNotStarted
+    );
+
+    // Accept deletion
+    investigation["accept_data_entry_deletion"] = true.into();
+    let response =
+        update_investigation(pool.clone(), polling_station_id, Some(investigation)).await;
+    assert_eq!(response.status(), StatusCode::OK);
+
+    // Data entry is deleted
+    let statuses = get_statuses(&addr, &cookie, election_id).await;
     assert_eq!(
         statuses[&polling_station_id].status,
         DataEntryStatusName::FirstEntryNotStarted

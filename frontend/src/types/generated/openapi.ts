@@ -839,6 +839,7 @@ export type ErrorReference =
   | "InvalidVoteCandidate"
   | "InvalidVoteGroup"
   | "InvalidXml"
+  | "InvestigationHasDataEntryOrResult"
   | "NotInitialised"
   | "OwnAccountCannotBeDeleted"
   | "PasswordRejection"
@@ -1097,6 +1098,7 @@ export interface PollingStationInvestigationCreateRequest {
 }
 
 export interface PollingStationInvestigationUpdateRequest {
+  accept_data_entry_deletion?: boolean;
   corrected_results?: boolean;
   findings?: string;
   reason: string;

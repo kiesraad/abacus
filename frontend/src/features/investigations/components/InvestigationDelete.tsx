@@ -4,7 +4,6 @@ import { AnyApiError, isSuccess } from "@/api/ApiResult";
 import { useCrud } from "@/api/useCrud";
 import { IconTrash } from "@/components/generated/icons";
 import { Button } from "@/components/ui/Button/Button";
-import { Loader } from "@/components/ui/Loader/Loader";
 import { Modal } from "@/components/ui/Modal/Modal";
 import { useElection } from "@/hooks/election/useElection";
 import { useElectionStatus } from "@/hooks/election/useElectionStatus";
@@ -21,18 +20,12 @@ export function InvestigationDelete({ pollingStation, onDeleted, onError }: Inve
   const [showModal, setShowModal] = useState(false);
   const { refetch } = useElection(pollingStation.id);
   const electionStatuses = useElectionStatus();
-  const pollingStationStatus = electionStatuses.statuses.find(
-    (status) => status.polling_station_id === pollingStation.id,
-  );
+  const status = electionStatuses.statuses.find((status) => status.polling_station_id === pollingStation.id);
   const path = `/api/polling_stations/${pollingStation.id}/investigation`;
   const { remove, requestState } = useCrud({ remove: path });
 
   function toggleModal() {
     setShowModal(!showModal);
-  }
-
-  if (!pollingStationStatus) {
-    return <Loader />;
   }
 
   function handleDelete() {
@@ -57,7 +50,7 @@ export function InvestigationDelete({ pollingStation, onDeleted, onError }: Inve
       {showModal && (
         <Modal title={`${t("investigations.delete_investigation")}?`} onClose={toggleModal}>
           <p>{t("investigations.delete_are_you_sure")}</p>
-          {pollingStationStatus.status !== "first_entry_not_started" && <p>{tx("investigations.delete_data_entry")}</p>}
+          {status && status.status !== "first_entry_not_started" && <p>{tx("investigations.delete_data_entry")}</p>}
           <nav>
             <Button
               leftIcon={<IconTrash />}

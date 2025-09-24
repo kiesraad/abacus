@@ -279,11 +279,8 @@ test.describe("resume data entry flow", () => {
               fields: ["data.differences_counts.compare_votes_cast_admitted_voters"],
             },
             {
-              code: "F403",
+              code: "F401",
               fields: ["data.political_group_votes[0].total"],
-              context: {
-                political_group_number: 1,
-              },
             },
           ],
           warnings: [

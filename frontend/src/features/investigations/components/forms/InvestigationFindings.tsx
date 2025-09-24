@@ -34,14 +34,14 @@ export function InvestigationFindings({ pollingStationId }: InvestigationFinding
 
   const [nonEmptyError, setNonEmptyError] = useState(false);
   const [radioError, setRadioError] = useState(false);
-  const [apiError, setApiError] = useState<AnyApiError>();
-
-  if (apiError) {
-    throw apiError;
-  }
+  const [error, setError] = useState<AnyApiError>();
 
   if (!investigation || !pollingStation) {
     return <Loader />;
+  }
+
+  if (error) {
+    throw error;
   }
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
@@ -102,7 +102,7 @@ export function InvestigationFindings({ pollingStationId }: InvestigationFinding
       await refetch();
       await navigate(`/elections/${election.id}/investigations`);
     } else if (isError(response)) {
-      setApiError(response);
+      setError(response);
     }
   };
 

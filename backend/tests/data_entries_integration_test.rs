@@ -1,12 +1,12 @@
 #![cfg(test)]
 
-use std::{collections::BTreeMap, net::SocketAddr};
+use std::net::SocketAddr;
 
 use abacus::{
     ErrorResponse,
     data_entry::{
-        ClaimDataEntryResponse, ElectionStatusResponse, ElectionStatusResponseEntry,
-        SaveDataEntryResponse, ValidationResultCode, status::DataEntryStatusName::*,
+        ClaimDataEntryResponse, ElectionStatusResponse, SaveDataEntryResponse,
+        ValidationResultCode, status::DataEntryStatusName::*,
     },
 };
 use axum::http::HeaderValue;
@@ -18,7 +18,7 @@ use test_log::test;
 use crate::{
     shared::{
         claim_data_entry, complete_data_entry, example_data_entry, finalise_data_entry,
-        save_data_entry,
+        get_statuses, save_data_entry,
     },
     utils::serve_api,
 };
@@ -380,29 +380,6 @@ async fn test_polling_station_data_entry_deletion(pool: SqlitePool) {
     assert_eq!(response.status(), StatusCode::CONFLICT);
 }
 
-async fn get_statuses(
-    addr: &SocketAddr,
-    cookie: &HeaderValue,
-) -> BTreeMap<u32, ElectionStatusResponseEntry> {
-    let url = format!("http://{addr}/api/elections/2/status");
-    let response = reqwest::Client::new()
-        .get(url)
-        .header("cookie", cookie)
-        .send()
-        .await
-        .unwrap();
-
-    assert_eq!(response.status(), StatusCode::OK);
-    let body: ElectionStatusResponse = response.json().await.unwrap();
-    assert!(!body.statuses.is_empty());
-    body.statuses
-        .into_iter()
-        .fold(BTreeMap::new(), |mut acc, entry| {
-            acc.insert(entry.polling_station_id, entry);
-            acc
-        })
-}
-
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
 async fn test_election_details_status(pool: SqlitePool) {
     let addr = serve_api(pool).await;
@@ -411,9 +388,10 @@ async fn test_election_details_status(pool: SqlitePool) {
     let typist2_cookie = shared::typist2_login(&addr).await;
     let typist2_user_id = 6;
     let coordinator_cookie = shared::coordinator_login(&addr).await;
+    let election_id = 2;
 
     // Ensure the statuses are "NotStarted"
-    let statuses = get_statuses(&addr, &coordinator_cookie).await;
+    let statuses = get_statuses(&addr, &coordinator_cookie, election_id).await;
 
     assert_eq!(statuses[&1].status, FirstEntryNotStarted);
     assert_eq!(statuses[&1].first_entry_user_id, None);
@@ -441,7 +419,7 @@ async fn test_election_details_status(pool: SqlitePool) {
     .await;
 
     // polling station 1's first entry is now complete, polling station 2 is still incomplete and set to in progress
-    let statuses = get_statuses(&addr, &coordinator_cookie).await;
+    let statuses = get_statuses(&addr, &coordinator_cookie, election_id).await;
 
     assert_eq!(statuses[&1].status, SecondEntryNotStarted);
     assert_eq!(statuses[&1].first_entry_user_id, Some(typist_user_id));
@@ -475,7 +453,7 @@ async fn test_election_details_status(pool: SqlitePool) {
     .await;
 
     // polling station 1 should now be SecondEntryInProgress, polling station 2 is still in the FirstEntryInProgress state
-    let statuses = get_statuses(&addr, &coordinator_cookie).await;
+    let statuses = get_statuses(&addr, &coordinator_cookie, election_id).await;
 
     assert_eq!(statuses[&1].status, SecondEntryInProgress);
     assert_eq!(statuses[&1].first_entry_user_id, Some(typist_user_id));
@@ -493,7 +471,7 @@ async fn test_election_details_status(pool: SqlitePool) {
     complete_data_entry(&addr, &typist2_cookie, 1, 2, example_data_entry(None)).await;
 
     // polling station 1 should now be definitive
-    let statuses = get_statuses(&addr, &coordinator_cookie).await;
+    let statuses = get_statuses(&addr, &coordinator_cookie, election_id).await;
 
     assert_eq!(statuses[&1].status, Definitive);
     assert_eq!(statuses[&1].first_entry_user_id, Some(typist_user_id));

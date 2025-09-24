@@ -88,13 +88,13 @@ export function ElectionStatus({
             </div>
           </Progress>
           <article className={cls.statusArticle}>
-            {pollingStations.length === 0 && committeeSession.number === 1 && (
+            {statuses.length === 0 && committeeSession.number === 1 && (
               <p>{t("election_status.no_polling_stations")}</p>
             )}
-            {pollingStations.length === 0 && committeeSession.number > 1 && (
+            {statuses.length === 0 && committeeSession.number > 1 && (
               <p>{t("election_status.no_investigations_with_corrected_results")}</p>
             )}
-            {pollingStations.length > 0 &&
+            {statuses.length > 0 &&
               tableCategories.map((cat) => (
                 <div key={`item-table-${categoryColorClass[cat]}`}>
                   <span className="item">

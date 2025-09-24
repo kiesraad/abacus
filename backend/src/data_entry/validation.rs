@@ -2926,7 +2926,8 @@ mod tests {
             data_entry::{
                 CommonPollingStationResults, DataError, PoliticalGroupCandidateVotes,
                 PoliticalGroupTotalVotes, Validate, ValidationResult, ValidationResultCode,
-                ValidationResultContext, ValidationResults, tests::ValidDefault,
+                ValidationResultContext, ValidationResults, VotersCounts, VotesCounts,
+                tests::ValidDefault,
             },
             election::tests::election_fixture,
             polling_station::structs::tests::polling_station_fixture,
@@ -2934,10 +2935,34 @@ mod tests {
 
         fn create_test_data() -> CommonPollingStationResults {
             CommonPollingStationResults {
-                voters_counts: Default::default(),
-                votes_counts: Default::default(),
+                extra_investigation: ValidDefault::valid_default(),
+                counting_differences_polling_station: ValidDefault::valid_default(),
+                voters_counts: VotersCounts {
+                    poll_card_count: 90,
+                    proxy_certificate_count: 0,
+                    total_admitted_voters_count: 90,
+                },
+                votes_counts: VotesCounts {
+                    political_group_total_votes: vec![
+                        PoliticalGroupTotalVotes {
+                            number: 1,
+                            total: 60,
+                        },
+                        PoliticalGroupTotalVotes {
+                            number: 2,
+                            total: 30,
+                        },
+                    ],
+                    total_votes_candidates_count: 90,
+                    blank_votes_count: 0,
+                    invalid_votes_count: 0,
+                    total_votes_cast_count: 90,
+                },
                 differences_counts: ValidDefault::valid_default(),
-                political_group_votes: Default::default(),
+                political_group_votes: vec![
+                    PoliticalGroupCandidateVotes::from_test_data_auto(1, &[10, 20, 30]),
+                    PoliticalGroupCandidateVotes::from_test_data_auto(2, &[5, 10, 15]),
+                ],
             }
         }
 
@@ -2965,13 +2990,7 @@ mod tests {
         fn test_default() -> Result<(), DataError> {
             let validation_results = validate(create_test_data())?;
             assert_eq!(validation_results.errors.len(), 0);
-
-            assert_eq!(validation_results.warnings.len(), 1);
-            assert_eq!(
-                validation_results.warnings[0].code,
-                ValidationResultCode::W204
-            );
-
+            assert_eq!(validation_results.warnings.len(), 0);
             Ok(())
         }
 
@@ -3020,36 +3039,8 @@ mod tests {
         #[test]
         fn test_f401() -> Result<(), DataError> {
             let mut data = create_test_data();
-
-            data.votes_counts.political_group_total_votes = vec![
-                PoliticalGroupTotalVotes {
-                    number: 1,
-                    total: 60,
-                },
-                PoliticalGroupTotalVotes {
-                    number: 2,
-                    total: 30,
-                },
-            ];
-
-            data.votes_counts.total_votes_candidates_count = 90;
-            data.votes_counts.total_votes_cast_count = 90;
-
-            data.voters_counts.poll_card_count = 90;
-            data.voters_counts.total_admitted_voters_count = 90;
-
-            data.political_group_votes = vec![
-                PoliticalGroupCandidateVotes::from_test_data_auto(1, &[10, 20, 30]),
-                PoliticalGroupCandidateVotes::from_test_data_auto(2, &[5, 10, 15]),
-            ];
-
-            // Valid case
-            let validation_results = validate(data.clone())?;
-            assert!(validation_results.errors.is_empty());
-
             data.political_group_votes[1].total = 0;
 
-            // Invalid case
             let validation_results = validate(data.clone())?;
             assert_eq!(
                 validation_results.errors,
@@ -3069,33 +3060,6 @@ mod tests {
         #[test]
         fn test_f402() -> Result<(), DataError> {
             let mut data = create_test_data();
-
-            data.votes_counts.political_group_total_votes = vec![
-                PoliticalGroupTotalVotes {
-                    number: 1,
-                    total: 60,
-                },
-                PoliticalGroupTotalVotes {
-                    number: 2,
-                    total: 30,
-                },
-            ];
-
-            data.votes_counts.total_votes_candidates_count = 90;
-            data.votes_counts.total_votes_cast_count = 90;
-
-            data.voters_counts.poll_card_count = 90;
-            data.voters_counts.total_admitted_voters_count = 90;
-
-            data.political_group_votes = vec![
-                PoliticalGroupCandidateVotes::from_test_data_auto(1, &[10, 20, 30]),
-                PoliticalGroupCandidateVotes::from_test_data_auto(2, &[5, 10, 15]),
-            ];
-
-            // Valid case
-            let validation_results = validate(data.clone())?;
-            assert!(validation_results.errors.is_empty());
-
             data.political_group_votes[1].total = 0;
 
             // When list total is empty, don't expect F.402, but F.401
@@ -3111,14 +3075,8 @@ mod tests {
                 }]
             );
 
-            data.votes_counts.total_votes_candidates_count = 89;
-            data.votes_counts.total_votes_cast_count = 89;
-
-            data.voters_counts.poll_card_count = 89;
-            data.voters_counts.total_admitted_voters_count = 89;
-
-            data.political_group_votes[1].total = 29;
-            data.votes_counts.political_group_total_votes[1].total = 29;
+            data.political_group_votes[1].candidate_votes[0].votes = 0;
+            data.political_group_votes[1].total = 30;
 
             // Expect F.402 when list total doesn't match candidate votes
             let validation_results = validate(data.clone())?;
@@ -3140,36 +3098,8 @@ mod tests {
         #[test]
         fn test_f403() -> Result<(), DataError> {
             let mut data = create_test_data();
-
-            data.votes_counts.political_group_total_votes = vec![
-                PoliticalGroupTotalVotes {
-                    number: 1,
-                    total: 100,
-                },
-                PoliticalGroupTotalVotes {
-                    number: 2,
-                    total: 200,
-                },
-            ];
-            data.votes_counts.total_votes_candidates_count = 300;
-            data.votes_counts.total_votes_cast_count = 300;
-
-            data.voters_counts.poll_card_count = 300;
-            data.voters_counts.total_admitted_voters_count = 300;
-
-            data.political_group_votes = vec![
-                PoliticalGroupCandidateVotes::from_test_data_auto(1, &[100]),
-                PoliticalGroupCandidateVotes::from_test_data_auto(2, &[200]),
-            ];
-
-            // Valid case
-            let validation_results = validate(data.clone())?;
-            assert!(validation_results.errors.is_empty());
-            assert!(validation_results.warnings.is_empty());
-
-            // Invalid case
-            data.political_group_votes[1].candidate_votes[0].votes = 199;
-            data.political_group_votes[1].total = 199;
+            data.political_group_votes[1].candidate_votes[0].votes += 10;
+            data.political_group_votes[1].total += 10;
             let validation_results = validate(data.clone())?;
             assert_eq!(
                 validation_results.errors,
@@ -3183,8 +3113,8 @@ mod tests {
             );
 
             // Multiple invalid case
-            data.political_group_votes[0].candidate_votes[0].votes = 99;
-            data.political_group_votes[0].total = 99;
+            data.political_group_votes[0].candidate_votes[0].votes += 10;
+            data.political_group_votes[0].total += 10;
             let validation_results = validate(data)?;
             assert_eq!(
                 validation_results.errors,

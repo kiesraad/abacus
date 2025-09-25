@@ -2935,8 +2935,6 @@ mod tests {
 
         fn create_test_data() -> CommonPollingStationResults {
             CommonPollingStationResults {
-                extra_investigation: ValidDefault::valid_default(),
-                counting_differences_polling_station: ValidDefault::valid_default(),
                 voters_counts: VotersCounts {
                     poll_card_count: 90,
                     proxy_certificate_count: 0,

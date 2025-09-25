@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router";
 
 import { AnyApiError, ApiError } from "@/api/ApiResult";
-import { useInitialApiGet } from "@/api/useInitialApiGet";
+import { useInitialApiGetWithErrors } from "@/api/useInitialApiGet";
 import { PageTitle } from "@/components/page_title/PageTitle";
 import { Alert } from "@/components/ui/Alert/Alert";
 import { FormLayout } from "@/components/ui/Form/FormLayout";
@@ -19,19 +19,19 @@ export function UserUpdatePage() {
   const navigate = useNavigate();
   const loggedInUser = useUser();
   const userId = useNumericParam("userId");
-  const { requestState: getUser } = useInitialApiGet<User>(`/api/user/${userId}` satisfies USER_GET_REQUEST_PATH);
+  const { requestState: getUser } = useInitialApiGetWithErrors<User>(
+    `/api/user/${userId}` satisfies USER_GET_REQUEST_PATH,
+  );
   const [error, setError] = useState<AnyApiError>();
 
   if (error && !(error instanceof ApiError)) {
     throw error;
   }
 
-  if (getUser.status === "api-error") {
-    throw getUser.error;
-  }
-
   if (getUser.status === "loading") {
     return <Loader />;
+  } else if (getUser.status !== "success") {
+    throw getUser.error;
   }
 
   const user = getUser.data;

@@ -91,11 +91,11 @@ pub enum ValidationResultCode {
     F309,
     /// CSO: (Als D <> H en verklaring voor verschil niks aangevinkt of 'ja' en 'nee' aangevinkt)
     F310,
-    /// CSO: 'Kandidaten en lijsttotalen': Er zijn stemmen op kandidaten, en het totaal aantal stemmen op een lijst = leeg of 0
+    /// CSO: 'Kandidaten en lijsttotalen': Er zijn (stemmen op kandidaten of het lijsttotaal van corresponderende E.x is groter dan 0) en het totaal aantal stemmen op een lijst = leeg of 0
     F401,
-    /// CSO: 'Kandidaten en lijsttotalen': Totaal aantal stemmen op een lijst <> som van aantal stemmen op de kandidaten van die lijst (Als totaal aantal stemmen op een lijst niet leeg of 0 is)
+    /// CSO: 'Kandidaten en lijsttotalen': (Als F.401 niet getoond wordt) Totaal aantal stemmen op een lijst <> som van aantal stemmen op de kandidaten van die lijst
     F402,
-    /// CSO: 'Kandidaten en lijsttotalen': Totaal aantal stemmen op een lijst komt niet overeen met het lijsttotaal van corresponderende E.x
+    /// CSO: 'Kandidaten en lijsttotalen': (Als F.401 niet getoond wordt) Totaal aantal stemmen op een lijst komt niet overeen met het lijsttotaal van corresponderende E.x
     F403,
 
     W001,
@@ -595,6 +595,27 @@ impl Validate for CommonPollingStationResults {
                 .find(|pgtv| pgtv.number == pgcv.number)
                 .expect("political group total votes should exist");
 
+            // all candidate votes, cast to u64 to avoid overflow
+            let candidate_votes_sum: u64 = pgcv
+                .candidate_votes
+                .iter()
+                .map(|cv| cv.votes as u64)
+                .sum::<u64>();
+            if (candidate_votes_sum > 0 || pgtv.total > 0) && pgcv.total == 0 {
+                validation_results.errors.push(ValidationResult {
+                    fields: vec![
+                        path.field("political_group_votes")
+                            .index(i)
+                            .field("total")
+                            .to_string(),
+                    ],
+                    code: ValidationResultCode::F401,
+                    context: Some(ValidationResultContext {
+                        political_group_number: Some(pgtv.number),
+                    }),
+                });
+            }
+
             if pgcv.total != pgtv.total {
                 validation_results.errors.push(ValidationResult {
                     fields: vec![
@@ -607,6 +628,17 @@ impl Validate for CommonPollingStationResults {
                     context: Some(ValidationResultContext {
                         political_group_number: Some(pgcv.number),
                     }),
+                });
+            }
+
+            let has_error_f401 = validation_results
+                .errors
+                .iter()
+                .any(|x| x.code == ValidationResultCode::F401);
+
+            if has_error_f401 {
+                validation_results.errors.retain(|vr| {
+                    ![ValidationResultCode::F402, ValidationResultCode::F403].contains(&vr.code)
                 });
             }
         }
@@ -968,17 +1000,8 @@ impl Validate for PoliticalGroupCandidateVotes {
             .iter()
             .map(|cv| cv.votes as u64)
             .sum::<u64>();
-        if candidate_votes_sum > 0 && self.total == 0 {
-            validation_results.errors.push(ValidationResult {
-                fields: vec![path.field("total").to_string()],
-                code: ValidationResultCode::F401,
-                context: Some(ValidationResultContext {
-                    political_group_number: Some(self.number),
-                }),
-            });
-        }
 
-        if self.total != 0 && self.total as u64 != candidate_votes_sum {
+        if self.total as u64 != candidate_votes_sum {
             validation_results.errors.push(ValidationResult {
                 fields: vec![path.to_string()],
                 code: ValidationResultCode::F402,
@@ -2752,7 +2775,7 @@ mod tests {
         use crate::{
             data_entry::{
                 CandidateVotes, DataError, PoliticalGroupCandidateVotes, Validate,
-                ValidationResult, ValidationResultCode, ValidationResultContext, ValidationResults,
+                ValidationResults,
             },
             election::{ElectionWithPoliticalGroups, PGNumber, tests::election_fixture},
             polling_station::structs::tests::polling_station_fixture,
@@ -2790,78 +2813,6 @@ mod tests {
             );
 
             (political_group_votes, election)
-        }
-
-        fn validate(
-            candidate_votes_totals: &[(&[u32], u32)],
-        ) -> Result<ValidationResults, DataError> {
-            let (political_group_votes, election) = create_test_data(candidate_votes_totals);
-
-            let mut validation_results = ValidationResults::default();
-            political_group_votes.validate(
-                &election,
-                &polling_station_fixture(None),
-                &mut validation_results,
-                &"political_group_votes".into(),
-            )?;
-
-            Ok(validation_results)
-        }
-
-        /// CSO | F.401: 'Kandidaten en lijsttotalen': Er zijn stemmen op kandidaten, en het totaal aantal stemmen op een lijst = leeg of 0
-        #[test]
-        fn test_f401() -> Result<(), DataError> {
-            let validation_results = validate(&[(&[10, 20, 30], 60), (&[5, 10, 15], 30)])?;
-            assert!(validation_results.errors.is_empty());
-
-            let validation_results = validate(&[(&[10, 20, 30], 60), (&[5, 10, 15], 0)])?;
-            assert_eq!(
-                validation_results.errors,
-                [ValidationResult {
-                    code: ValidationResultCode::F401,
-                    fields: vec!["political_group_votes[1].total".into()],
-                    context: Some(ValidationResultContext {
-                        political_group_number: Some(2),
-                    }),
-                }]
-            );
-
-            Ok(())
-        }
-
-        /// CSO | F.402: 'Kandidaten en lijsttotalen': Totaal aantal stemmen op een lijst <> som van aantal stemmen op de kandidaten van die lijst (Als totaal aantal stemmen op een lijst niet leeg of 0 is)
-        #[test]
-        fn test_f402() -> Result<(), DataError> {
-            let validation_results = validate(&[(&[10, 20, 30], 60), (&[5, 10, 15], 30)])?;
-            assert!(validation_results.errors.is_empty());
-
-            // When list total is empty, don't expect F.402, but F.401
-            let validation_results = validate(&[(&[10, 20, 30], 60), (&[5, 10, 15], 0)])?;
-            assert_eq!(
-                validation_results.errors,
-                [ValidationResult {
-                    code: ValidationResultCode::F401,
-                    fields: vec!["political_group_votes[1].total".into()],
-                    context: Some(ValidationResultContext {
-                        political_group_number: Some(2),
-                    }),
-                }]
-            );
-
-            // Expect F.402 when list total doesn't match candidate votes
-            let validation_results = validate(&[(&[10, 20, 30], 60), (&[5, 10, 15], 29)])?;
-            assert_eq!(
-                validation_results.errors,
-                [ValidationResult {
-                    code: ValidationResultCode::F402,
-                    fields: vec!["political_group_votes[1]".into()],
-                    context: Some(ValidationResultContext {
-                        political_group_number: Some(2),
-                    }),
-                }]
-            );
-
-            Ok(())
         }
 
         #[test]
@@ -2975,7 +2926,8 @@ mod tests {
             data_entry::{
                 CommonPollingStationResults, DataError, PoliticalGroupCandidateVotes,
                 PoliticalGroupTotalVotes, Validate, ValidationResult, ValidationResultCode,
-                ValidationResultContext, ValidationResults, tests::ValidDefault,
+                ValidationResultContext, ValidationResults, VotersCounts, VotesCounts,
+                tests::ValidDefault,
             },
             election::tests::election_fixture,
             polling_station::structs::tests::polling_station_fixture,
@@ -2983,10 +2935,32 @@ mod tests {
 
         fn create_test_data() -> CommonPollingStationResults {
             CommonPollingStationResults {
-                voters_counts: Default::default(),
-                votes_counts: Default::default(),
+                voters_counts: VotersCounts {
+                    poll_card_count: 90,
+                    proxy_certificate_count: 0,
+                    total_admitted_voters_count: 90,
+                },
+                votes_counts: VotesCounts {
+                    political_group_total_votes: vec![
+                        PoliticalGroupTotalVotes {
+                            number: 1,
+                            total: 60,
+                        },
+                        PoliticalGroupTotalVotes {
+                            number: 2,
+                            total: 30,
+                        },
+                    ],
+                    total_votes_candidates_count: 90,
+                    blank_votes_count: 0,
+                    invalid_votes_count: 0,
+                    total_votes_cast_count: 90,
+                },
                 differences_counts: ValidDefault::valid_default(),
-                political_group_votes: Default::default(),
+                political_group_votes: vec![
+                    PoliticalGroupCandidateVotes::from_test_data_auto(1, &[10, 20, 30]),
+                    PoliticalGroupCandidateVotes::from_test_data_auto(2, &[5, 10, 15]),
+                ],
             }
         }
 
@@ -3014,13 +2988,7 @@ mod tests {
         fn test_default() -> Result<(), DataError> {
             let validation_results = validate(create_test_data())?;
             assert_eq!(validation_results.errors.len(), 0);
-
-            assert_eq!(validation_results.warnings.len(), 1);
-            assert_eq!(
-                validation_results.warnings[0].code,
-                ValidationResultCode::W204
-            );
-
+            assert_eq!(validation_results.warnings.len(), 0);
             Ok(())
         }
 
@@ -3065,40 +3033,107 @@ mod tests {
             Ok(())
         }
 
-        /// CSO | F.403: 'Kandidaten en lijsttotalen': Totaal aantal stemmen op een lijst komt niet overeen met het lijsttotaal van corresponderende E.x
+        /// CSO | F.401 `Er zijn (stemmen op kandidaten of het lijsttotaal van corresponderende E.x is groter dan 0) en het totaal aantal stemmen op een lijst = leeg of 0`
+        #[test]
+        fn test_f401() -> Result<(), DataError> {
+            // Only F.401 is triggered.
+            // Candidate votes sum > 0 & political group candidates votes total == 0
+            let mut data = create_test_data();
+            data.political_group_votes[1].total = 0;
+
+            let validation_results = validate(data.clone())?;
+            assert_eq!(
+                validation_results.errors,
+                [ValidationResult {
+                    code: ValidationResultCode::F401,
+                    fields: vec!["data.political_group_votes[1].total".into()],
+                    context: Some(ValidationResultContext {
+                        political_group_number: Some(2),
+                    }),
+                }]
+            );
+
+            // Only F.401 is triggered.
+            // Political group total votes > 0 & political group candidates votes total == 0
+            data.political_group_votes[1].candidate_votes[0].votes = 0;
+            data.political_group_votes[1].candidate_votes[1].votes = 0;
+            data.political_group_votes[1].candidate_votes[2].votes = 0;
+            data.political_group_votes[1].total = 0;
+
+            let validation_results = validate(data.clone())?;
+            assert_eq!(
+                validation_results.errors,
+                [ValidationResult {
+                    code: ValidationResultCode::F401,
+                    fields: vec!["data.political_group_votes[1].total".into()],
+                    context: Some(ValidationResultContext {
+                        political_group_number: Some(2),
+                    }),
+                }]
+            );
+
+            // Expect only F.401 (F.401, F.402 and F.403 are triggered)
+            data.political_group_votes[1].candidate_votes[0].votes += 10;
+
+            let validation_results = validate(data.clone())?;
+            assert_eq!(
+                validation_results.errors,
+                [ValidationResult {
+                    code: ValidationResultCode::F401,
+                    fields: vec!["data.political_group_votes[1].total".into()],
+                    context: Some(ValidationResultContext {
+                        political_group_number: Some(2),
+                    }),
+                }]
+            );
+
+            Ok(())
+        }
+
+        /// CSO | F.402 (Als F.401 niet getoond wordt) `Totaal aantal stemmen op een lijst <> som van aantal stemmen op de kandidaten van die lijst`
+        #[test]
+        fn test_f402() -> Result<(), DataError> {
+            let mut data = create_test_data();
+            data.political_group_votes[1].total = 0;
+
+            // When list total is empty, don't expect F.402, but F.401
+            let validation_results = validate(data.clone())?;
+            assert_eq!(
+                validation_results.errors,
+                [ValidationResult {
+                    code: ValidationResultCode::F401,
+                    fields: vec!["data.political_group_votes[1].total".into()],
+                    context: Some(ValidationResultContext {
+                        political_group_number: Some(2),
+                    }),
+                }]
+            );
+
+            data.political_group_votes[1].candidate_votes[0].votes = 0;
+            data.political_group_votes[1].total = 30;
+
+            // Expect F.402 when list total doesn't match candidate votes
+            let validation_results = validate(data.clone())?;
+            assert_eq!(
+                validation_results.errors,
+                [ValidationResult {
+                    code: ValidationResultCode::F402,
+                    fields: vec!["data.political_group_votes[1]".into()],
+                    context: Some(ValidationResultContext {
+                        political_group_number: Some(2),
+                    }),
+                }]
+            );
+
+            Ok(())
+        }
+
+        /// CSO | F.403 (Als F.401 niet getoond wordt) `Totaal aantal stemmen op een lijst komt niet overeen met het lijsttotaal van corresponderende E.x`
         #[test]
         fn test_f403() -> Result<(), DataError> {
             let mut data = create_test_data();
-
-            data.votes_counts.political_group_total_votes = vec![
-                PoliticalGroupTotalVotes {
-                    number: 1,
-                    total: 100,
-                },
-                PoliticalGroupTotalVotes {
-                    number: 2,
-                    total: 200,
-                },
-            ];
-            data.votes_counts.total_votes_candidates_count = 300;
-            data.votes_counts.total_votes_cast_count = 300;
-
-            data.voters_counts.poll_card_count = 300;
-            data.voters_counts.total_admitted_voters_count = 300;
-
-            data.political_group_votes = vec![
-                PoliticalGroupCandidateVotes::from_test_data_auto(1, &[100]),
-                PoliticalGroupCandidateVotes::from_test_data_auto(2, &[200]),
-            ];
-
-            // Valid case
-            let validation_results = validate(data.clone())?;
-            assert!(validation_results.errors.is_empty());
-            assert!(validation_results.warnings.is_empty());
-
-            // Invalid case
-            data.political_group_votes[1].candidate_votes[0].votes = 199;
-            data.political_group_votes[1].total = 199;
+            data.political_group_votes[1].candidate_votes[0].votes += 10;
+            data.political_group_votes[1].total += 10;
             let validation_results = validate(data.clone())?;
             assert_eq!(
                 validation_results.errors,
@@ -3112,9 +3147,9 @@ mod tests {
             );
 
             // Multiple invalid case
-            data.political_group_votes[0].candidate_votes[0].votes = 99;
-            data.political_group_votes[0].total = 99;
-            let validation_results = validate(data)?;
+            data.political_group_votes[0].candidate_votes[0].votes += 10;
+            data.political_group_votes[0].total += 10;
+            let validation_results = validate(data.clone())?;
             assert_eq!(
                 validation_results.errors,
                 [
@@ -3133,6 +3168,20 @@ mod tests {
                         }),
                     }
                 ],
+            );
+
+            // When list total is empty, don't expect F.403, but F.401
+            data.political_group_votes[1].total = 0;
+            let validation_results = validate(data.clone())?;
+            assert_eq!(
+                validation_results.errors,
+                [ValidationResult {
+                    code: ValidationResultCode::F401,
+                    fields: vec!["data.political_group_votes[1].total".into()],
+                    context: Some(ValidationResultContext {
+                        political_group_number: Some(2),
+                    }),
+                }],
             );
 
             Ok(())

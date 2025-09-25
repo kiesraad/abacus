@@ -3033,7 +3033,7 @@ mod tests {
             Ok(())
         }
 
-        /// CSO | F.401 `Er zijn stemmen op kandidaten, en het totaal aantal stemmen op een lijst = leeg of 0`
+        /// CSO | F.401 `Er zijn (stemmen op kandidaten of het lijsttotaal van corresponderende E.x is groter dan 0) en het totaal aantal stemmen op een lijst = leeg of 0`
         #[test]
         fn test_f401() -> Result<(), DataError> {
             // Only F.401 is triggered.

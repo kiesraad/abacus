@@ -101,6 +101,7 @@ export function DataEntrySection() {
         )}
 
         <DataEntrySubsections
+          key={section.id}
           section={section}
           previousValues={previousValues}
           currentValues={currentValues}

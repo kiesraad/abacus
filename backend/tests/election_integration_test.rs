@@ -14,7 +14,10 @@ use crate::{shared::create_result, utils::serve_api};
 pub mod shared;
 pub mod utils;
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_4", "election_5", "users"))))]
+#[test(sqlx::test(fixtures(
+    path = "../fixtures",
+    scripts("election_4", "election_5_with_results", "users")
+)))]
 async fn test_election_list_works(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 
@@ -39,7 +42,7 @@ async fn test_election_list_works(pool: SqlitePool) {
     assert_eq!(body.elections.len(), 2);
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_5", "users"))))]
+#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_5_with_results", "users"))))]
 async fn test_election_details_works(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 
@@ -60,7 +63,7 @@ async fn test_election_details_works(pool: SqlitePool) {
         CommitteeSessionStatus::DataEntryInProgress
     );
     assert_eq!(body.committee_sessions.len(), 2);
-    assert_eq!(body.election.name, "Test Election >= 19 seats");
+    assert_eq!(body.election.name, "Corrigendum 2026");
     assert_eq!(body.polling_stations.len(), 1);
     assert!(
         body.polling_stations

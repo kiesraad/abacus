@@ -19,11 +19,13 @@ import { PollingStationResults } from "@/types/generated/openapi";
 import { eml110a, eml110b, eml230b } from "../test-data/eml-files";
 
 export async function fillDataEntryPages(page: Page, results: PollingStationResults) {
-  const extraInvestigationPage = new ExtraInvestigationPage(page);
-  await extraInvestigationPage.fillAndClickNext(results.extra_investigation);
+  if (results.model === "CSOFirstSession") {
+    const extraInvestigationPage = new ExtraInvestigationPage(page);
+    await extraInvestigationPage.fillAndClickNext(results.extra_investigation);
 
-  const countingDifferencesPollingStationPage = new CountingDifferencesPollingStationPage(page);
-  await countingDifferencesPollingStationPage.fillAndClickNext(results.counting_differences_polling_station);
+    const countingDifferencesPollingStationPage = new CountingDifferencesPollingStationPage(page);
+    await countingDifferencesPollingStationPage.fillAndClickNext(results.counting_differences_polling_station);
+  }
 
   const votersAndVotesPage = new VotersAndVotesPage(page);
   await expect(votersAndVotesPage.fieldset).toBeVisible();

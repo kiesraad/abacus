@@ -17,9 +17,9 @@ use abacus::{
         ElectionApportionmentResponse, Fraction, get_total_seats_from_apportionment_result,
     },
     data_entry::{
-        CSOFirstSessionResults, CountingDifferencesPollingStation, DataEntry,
-        PoliticalGroupTotalVotes, PollingStationResults, VotersCounts, VotesCounts, YesNo,
-        status::ClientState,
+        CSOFirstSessionResults, CSONextSessionResults, CountingDifferencesPollingStation,
+        DataEntry, PoliticalGroupTotalVotes, PollingStationResults, VotersCounts, VotesCounts,
+        YesNo, status::ClientState,
     },
 };
 
@@ -122,19 +122,14 @@ async fn test_election_apportionment_works_for_less_than_19_seats(pool: SqlitePo
     assert_eq!(total_seats, vec![12, 1, 1, 1, 0, 0, 0, 0]);
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_5", "users"))))]
+#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_5_with_results", "users"))))]
 async fn test_election_apportionment_works_for_19_or_more_seats(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let coordinator_cookie: axum::http::HeaderValue = shared::coordinator_login(&addr).await;
 
     let data_entry = DataEntry {
         progress: 100,
-        data: PollingStationResults::CSOFirstSession(CSOFirstSessionResults {
-            extra_investigation: Default::default(),
-            counting_differences_polling_station: CountingDifferencesPollingStation {
-                unexplained_difference_ballots_voters: YesNo::no(),
-                difference_ballots_per_list: YesNo::no(),
-            },
+        data: PollingStationResults::CSONextSession(CSONextSessionResults {
             voters_counts: VotersCounts {
                 poll_card_count: 1203,
                 proxy_certificate_count: 2,
@@ -174,7 +169,10 @@ async fn test_election_apportionment_works_for_19_or_more_seats(pool: SqlitePool
             political_group_votes: vec![
                 political_group_votes_from_test_data_auto(
                     1,
-                    &[78, 20, 55, 45, 50, 0, 60, 40, 30, 20, 50, 152],
+                    &[
+                        78, 20, 55, 45, 50, 0, 60, 40, 30, 20, 50, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                        0, 0, 0, 0, 0, 0, 0, 152,
+                    ],
                 ),
                 political_group_votes_from_test_data_auto(2, &[150, 50, 22, 10, 30, 40]),
                 political_group_votes_from_test_data_auto(3, &[20, 15, 25, 3, 2, 33]),
@@ -185,7 +183,7 @@ async fn test_election_apportionment_works_for_19_or_more_seats(pool: SqlitePool
         client_state: ClientState::new_from_str(None).unwrap(),
     };
 
-    create_result_with_non_example_data_entry(&addr, 8, 5, data_entry).await;
+    create_result_with_non_example_data_entry(&addr, 9, 5, data_entry).await;
 
     let url = format!("http://{addr}/api/elections/5/apportionment");
     let response = reqwest::Client::new()

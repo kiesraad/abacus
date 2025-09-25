@@ -363,7 +363,7 @@ describe("ElectionHomePage", () => {
     await renderPage("coordinator");
 
     expect(
-      await screen.findByRole("heading", { level: 3, name: "Lege documenten voor deze verkiezing" }),
+      await screen.findByRole("heading", { level: 3, name: "Lege processen-verbaal voor deze verkiezing" }),
     ).toBeVisible();
     expect(screen.getByText("Na 31-2 Bijlage 1")).toBeVisible();
     expect(screen.getByText("N 10-2")).toBeVisible();
@@ -381,7 +381,7 @@ describe("ElectionHomePage", () => {
     await renderPage("coordinator");
 
     expect(
-      screen.queryByRole("heading", { level: 3, name: "Lege documenten voor deze verkiezing" }),
+      screen.queryByRole("heading", { level: 3, name: "Lege processen-verbaal voor deze verkiezing" }),
     ).not.toBeInTheDocument();
     expect(screen.queryByText("Na 31-2 Bijlage 1")).not.toBeInTheDocument();
   });

@@ -1,6 +1,6 @@
 #![cfg(test)]
 
-use std::net::SocketAddr;
+use std::{collections::BTreeMap, net::SocketAddr};
 
 use abacus::{
     committee_session::{
@@ -9,8 +9,8 @@ use abacus::{
     data_entry::{
         CSOFirstSessionResults, CandidateVotes, Count, CountingDifferencesPollingStation,
         DataEntry, DifferenceCountsCompareVotesCastAdmittedVoters, DifferencesCounts,
-        ElectionStatusResponse, PoliticalGroupCandidateVotes, PoliticalGroupTotalVotes,
-        PollingStationResults, VotersCounts, VotesCounts, YesNo,
+        ElectionStatusResponse, ElectionStatusResponseEntry, PoliticalGroupCandidateVotes,
+        PoliticalGroupTotalVotes, PollingStationResults, VotersCounts, VotesCounts, YesNo,
         status::{ClientState, DataEntryStatusName},
     },
     election::{CandidateNumber, ElectionDetailsResponse, PGNumber},
@@ -271,6 +271,30 @@ pub async fn change_status_committee_session(
         .await
         .unwrap();
     assert_eq!(response.status(), StatusCode::OK);
+}
+
+pub async fn get_statuses(
+    addr: &SocketAddr,
+    cookie: &HeaderValue,
+    election_id: u32,
+) -> BTreeMap<u32, ElectionStatusResponseEntry> {
+    let url = format!("http://{addr}/api/elections/{election_id}/status");
+    let response = Client::new()
+        .get(url)
+        .header("cookie", cookie)
+        .send()
+        .await
+        .unwrap();
+
+    assert_eq!(response.status(), StatusCode::OK);
+    let body: ElectionStatusResponse = response.json().await.unwrap();
+    assert!(!body.statuses.is_empty());
+    body.statuses
+        .into_iter()
+        .fold(BTreeMap::new(), |mut acc, entry| {
+            acc.insert(entry.polling_station_id, entry);
+            acc
+        })
 }
 
 /// Calls the login endpoint for an Admin user and returns the session cookie

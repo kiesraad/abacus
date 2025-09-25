@@ -1,7 +1,7 @@
 import { FormEvent, useState } from "react";
 import { useNavigate } from "react-router";
 
-import { AnyApiError, isError, isSuccess } from "@/api/ApiResult";
+import { AnyApiError, ApiResult, isError, isSuccess } from "@/api/ApiResult";
 import { useCrud } from "@/api/useCrud";
 import { Button } from "@/components/ui/Button/Button";
 import { ChoiceList } from "@/components/ui/CheckboxAndRadio/ChoiceList";
@@ -10,8 +10,10 @@ import { FormLayout } from "@/components/ui/Form/FormLayout";
 import { InputField } from "@/components/ui/InputField/InputField";
 import { Loader } from "@/components/ui/Loader/Loader";
 import { useElection } from "@/hooks/election/useElection";
+import { useMessages } from "@/hooks/messages/useMessages";
 import { t } from "@/i18n/translate";
 import {
+  PollingStationInvestigation,
   PollingStationInvestigationConcludeRequest,
   PollingStationInvestigationUpdateRequest,
 } from "@/types/generated/openapi";
@@ -23,22 +25,23 @@ interface InvestigationFindingsProps {
 
 export function InvestigationFindings({ pollingStationId }: InvestigationFindingsProps) {
   const navigate = useNavigate();
-  const { election, investigation, refetch } = useElection(pollingStationId);
+  const { election, investigation, pollingStation, refetch } = useElection(pollingStationId);
+  const { pushMessage } = useMessages();
   const concludePath = `/api/polling_stations/${pollingStationId}/investigation/conclude`;
-  const { create: conclude } = useCrud<PollingStationInvestigationConcludeRequest>({ create: concludePath });
+  const { create: conclude } = useCrud<PollingStationInvestigation>({ create: concludePath });
   const path = `/api/polling_stations/${pollingStationId}/investigation`;
-  const { update } = useCrud<PollingStationInvestigationUpdateRequest>({ update: path });
+  const { update } = useCrud<PollingStationInvestigation>({ update: path });
 
   const [nonEmptyError, setNonEmptyError] = useState(false);
   const [radioError, setRadioError] = useState(false);
-  const [apiError, setApiError] = useState<AnyApiError>();
+  const [error, setError] = useState<AnyApiError>();
 
-  if (apiError) {
-    throw apiError;
+  if (!investigation || !pollingStation) {
+    return <Loader />;
   }
 
-  if (!investigation) {
-    return <Loader />;
+  if (error) {
+    throw error;
   }
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
@@ -69,19 +72,28 @@ export function InvestigationFindings({ pollingStationId }: InvestigationFinding
 
     const correctedResults = correctedResultsChoice === "yes";
 
-    const save = () => {
+    const save = (): Promise<
+      ApiResult<PollingStationInvestigationConcludeRequest | PollingStationInvestigationUpdateRequest>
+    > => {
+      pushMessage({
+        title: t("investigations.message.investigation_updated", {
+          number: pollingStation.number,
+          name: pollingStation.name,
+        }),
+      });
+
       if (investigation.findings !== undefined) {
         return update({
           reason: investigation.reason,
           findings,
           corrected_results: correctedResults,
-        });
+        } satisfies PollingStationInvestigationUpdateRequest);
+      } else {
+        return conclude({
+          findings,
+          corrected_results: correctedResults,
+        } satisfies PollingStationInvestigationConcludeRequest);
       }
-
-      return conclude({
-        findings,
-        corrected_results: correctedResults,
-      });
     };
 
     const response = await save();
@@ -90,7 +102,7 @@ export function InvestigationFindings({ pollingStationId }: InvestigationFinding
       await refetch();
       await navigate(`/elections/${election.id}/investigations`);
     } else if (isError(response)) {
-      setApiError(response);
+      setError(response);
     }
   };
 
@@ -107,7 +119,7 @@ export function InvestigationFindings({ pollingStationId }: InvestigationFinding
             fieldSize="text-area"
             name="findings"
             label={t("investigations.findings.title")}
-            error={nonEmptyError ? t("form_errors.FORM_VALIDATION_RESULT_REQUIRED") : undefined}
+            error={nonEmptyError ? t("investigations.findings.error") : undefined}
             hint={t("investigations.findings.hint")}
             defaultValue={investigation.findings || ""}
           />

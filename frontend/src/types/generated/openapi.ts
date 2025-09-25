@@ -228,6 +228,10 @@ export interface POLLING_STATION_INVESTIGATION_CREATE_REQUEST_PARAMS {
 }
 export type POLLING_STATION_INVESTIGATION_CREATE_REQUEST_PATH = `/api/polling_stations/${number}/investigation`;
 export type POLLING_STATION_INVESTIGATION_CREATE_REQUEST_BODY = PollingStationInvestigationCreateRequest;
+export interface POLLING_STATION_INVESTIGATION_DELETE_REQUEST_PARAMS {
+  polling_station_id: number;
+}
+export type POLLING_STATION_INVESTIGATION_DELETE_REQUEST_PATH = `/api/polling_stations/${number}/investigation`;
 
 // /api/polling_stations/{polling_station_id}/investigation/conclude
 export interface POLLING_STATION_INVESTIGATION_CONCLUDE_REQUEST_PARAMS {
@@ -236,6 +240,13 @@ export interface POLLING_STATION_INVESTIGATION_CONCLUDE_REQUEST_PARAMS {
 export type POLLING_STATION_INVESTIGATION_CONCLUDE_REQUEST_PATH =
   `/api/polling_stations/${number}/investigation/conclude`;
 export type POLLING_STATION_INVESTIGATION_CONCLUDE_REQUEST_BODY = PollingStationInvestigationConcludeRequest;
+
+// /api/polling_stations/{polling_station_id}/investigation/download_corrigendum_pdf
+export interface POLLING_STATION_INVESTIGATION_DOWNLOAD_CORRIGENDUM_PDF_REQUEST_PARAMS {
+  polling_station_id: number;
+}
+export type POLLING_STATION_INVESTIGATION_DOWNLOAD_CORRIGENDUM_PDF_REQUEST_PATH =
+  `/api/polling_stations/${number}/investigation/download_corrigendum_pdf`;
 
 // /api/user
 export type USER_LIST_REQUEST_PARAMS = Record<string, never>;
@@ -311,6 +322,7 @@ export type AuditEvent =
   | (PollingStationInvestigation & { event_type: "PollingStationInvestigationCreated" })
   | (PollingStationInvestigation & { event_type: "PollingStationInvestigationConcluded" })
   | (PollingStationInvestigation & { event_type: "PollingStationInvestigationUpdated" })
+  | (PollingStationInvestigation & { event_type: "PollingStationInvestigationDeleted" })
   | (FileDetails & { event_type: "FileCreated" })
   | (FileDetails & { event_type: "FileDeleted" })
   | (ElectionDetails & { event_type: "ApportionmentCreated" })
@@ -322,6 +334,7 @@ export type AuditEvent =
   | (DataEntryDetails & { event_type: "DataEntrySaved" })
   | (DataEntryDetails & { event_type: "DataEntryDeleted" })
   | (DataEntryDetails & { event_type: "DataEntryFinalised" })
+  | (ResultDetails & { event_type: "ResultDeleted" })
   | (DataEntryDetails & { event_type: "DataEntryDiscardedFirst" })
   | (DataEntryDetails & { event_type: "DataEntryResumedFirst" })
   | (DataEntryDetails & { event_type: "DataEntryKeptFirst" })
@@ -386,6 +399,25 @@ export interface CSOFirstSessionResults {
 }
 
 /**
+ * CSONextSessionResults, following the fields in Model Na 14-2 Bijlage 1.
+ *
+ * See "Model Na 14-2. Corrigendum bij het proces-verbaal van een gemeentelijk stembureau/
+ * stembureau voor het openbaar lichaam, Bijlage 1: uitkomsten per stembureau" from the
+ * [Kiesregeling](https://wetten.overheid.nl/BWBR0034180/2024-04-01#Bijlage1_DivisieNa14.2) or
+ * [Verkiezingstoolbox](https://www.rijksoverheid.nl/onderwerpen/verkiezingen/verkiezingentoolkit/modellen).
+ */
+export interface CSONextSessionResults {
+  /** Differences counts ("Verschil tussen het aantal toegelaten kiezers en het aantal getelde stembiljetten") */
+  differences_counts: DifferencesCounts;
+  /** Vote counts per list and candidate ("Aantal stemmen per lijst en kandidaat") */
+  political_group_votes: PoliticalGroupCandidateVotes[];
+  /** Voters counts ("Aantal toegelaten kiezers") */
+  voters_counts: VotersCounts;
+  /** Votes counts ("Aantal getelde stembiljetten") */
+  votes_counts: VotesCounts;
+}
+
+/**
  * Candidate
  */
 export interface Candidate {
@@ -431,7 +463,7 @@ export interface CandidateVotes {
 export interface ClaimDataEntryResponse {
   client_state: unknown;
   data: PollingStationResults;
-  previous_results?: PollingStationResults;
+  previous_results?: CommonPollingStationResults;
   validation_results: ValidationResults;
 }
 
@@ -496,6 +528,20 @@ export interface CommitteeSessionUpdateRequest {
 }
 
 /**
+ * CommonPollingStationResults contains the common fields for polling station results,
+ */
+export interface CommonPollingStationResults {
+  /** Differences counts ("Verschil tussen het aantal toegelaten kiezers en het aantal getelde stembiljetten") */
+  differences_counts: DifferencesCounts;
+  /** Vote counts per list and candidate ("Aantal stemmen per lijst en kandidaat") */
+  political_group_votes: PoliticalGroupCandidateVotes[];
+  /** Voters counts ("Aantal toegelaten kiezers") */
+  voters_counts: VotersCounts;
+  /** Votes counts ("Aantal getelde stembiljetten") */
+  votes_counts: VotesCounts;
+}
+
+/**
  * Counting Differences Polling Station,
  * part of the polling station results ("B1-2 Verschillen met telresultaten van het stembureau")
  */
@@ -533,6 +579,7 @@ export interface DataEntry {
 }
 
 export interface DataEntryDetails {
+  committee_session_id: number;
   data_entry_progress: number;
   data_entry_status: string;
   finished_at?: string | null;
@@ -1050,8 +1097,8 @@ export interface PollingStationInvestigationCreateRequest {
 }
 
 export interface PollingStationInvestigationUpdateRequest {
-  corrected_results: boolean;
-  findings: string;
+  corrected_results?: boolean;
+  findings?: string;
   reason: string;
 }
 
@@ -1085,7 +1132,7 @@ export interface PollingStationRequest {
   address: string;
   locality: string;
   name: string;
-  number: number;
+  number?: number;
   number_of_voters?: number;
   polling_station_type?: PollingStationType;
   postal_code: string;
@@ -1102,7 +1149,9 @@ export interface PollingStationRequestListResponse {
  * whether this is the first or any subsequent data entry session. Based on
  * this, any of four different models can apply
  */
-export type PollingStationResults = CSOFirstSessionResults & { model: "CSOFirstSession" };
+export type PollingStationResults =
+  | (CSOFirstSessionResults & { model: "CSOFirstSession" })
+  | (CSONextSessionResults & { model: "CSONextSession" });
 
 /**
  * Type of Polling station
@@ -1131,6 +1180,12 @@ export interface RedactedEmlHash {
 export type ResolveDifferencesAction = "keep_first_entry" | "keep_second_entry" | "discard_both_entries";
 
 export type ResolveErrorsAction = "discard_first_entry" | "resume_first_entry";
+
+export interface ResultDetails {
+  committee_session_id: number;
+  created_at: string;
+  polling_station_id: number;
+}
 
 export type Role = "administrator" | "typist" | "coordinator";
 

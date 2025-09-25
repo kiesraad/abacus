@@ -13,9 +13,9 @@ use abacus::{
     create_sqlite_pool,
     data_entry::{
         CSOFirstSessionResults, CandidateVotes, CountingDifferencesPollingStation,
-        DifferencesCounts, ExtraInvestigation, FieldPath, PoliticalGroupCandidateVotes,
-        PoliticalGroupTotalVotes, PollingStationResults, Validate, ValidationResults, VotersCounts,
-        VotesCounts, YesNo,
+        DifferenceCountsCompareVotesCastAdmittedVoters, DifferencesCounts, ExtraInvestigation,
+        FieldPath, PoliticalGroupCandidateVotes, PoliticalGroupTotalVotes, PollingStationResults,
+        Validate, ValidationResults, VotersCounts, VotesCounts, YesNo,
         status::{DataEntryStatus, Definitive, SecondEntryNotStarted},
     },
     election::{
@@ -30,6 +30,7 @@ use abacus::{
 use chrono::{Datelike, Days, NaiveDate, TimeDelta};
 use clap::Parser;
 use rand::{Rng, seq::IndexedRandom};
+use sqlx::SqlitePool;
 #[cfg(feature = "dev-database")]
 use tracing::info;
 use tracing::level_filters::LevelFilter;
@@ -142,6 +143,11 @@ async fn main() -> Result<(), Box<dyn Error>> {
         args.seed_data,
     )
     .await?;
+
+    create_test_election(args, pool).await
+}
+
+async fn create_test_election(args: Args, pool: SqlitePool) -> Result<(), Box<dyn Error>> {
     let mut rng = rand::rng();
 
     let mut tx = pool.begin_immediate().await?;
@@ -210,7 +216,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
 
     if let Some(export_dir) = args.export_definition {
         let results = if data_entry_completed {
-            abacus::data_entry::repository::list_entries_with_polling_stations_first_session(
+            abacus::data_entry::repository::list_entries_for_committee_session(
                 &mut tx,
                 committee_session.id,
             )
@@ -360,7 +366,7 @@ async fn generate_polling_stations(
             election.id,
             PollingStationRequest {
                 name: abacus::test_data_gen::polling_station_name(rng),
-                number: i64::from(i),
+                number: Some(i64::from(i)),
                 number_of_voters: Some(ps_num_voters.into()),
                 polling_station_type: Some(PollingStationType::FixedLocation),
                 address: abacus::test_data_gen::address(rng),
@@ -574,7 +580,16 @@ fn generate_cso_first_session_results(
             invalid_votes_count: invalid_votes,
             total_votes_cast_count: number_of_votes,
         },
-        differences_counts: DifferencesCounts::zero(),
+        differences_counts: DifferencesCounts {
+            compare_votes_cast_admitted_voters: DifferenceCountsCompareVotesCastAdmittedVoters {
+                admitted_voters_equal_votes_cast: true,
+                votes_cast_greater_than_admitted_voters: false,
+                votes_cast_smaller_than_admitted_voters: false,
+            },
+            more_ballots_count: 0,
+            fewer_ballots_count: 0,
+            difference_completely_accounted_for: YesNo::default(),
+        },
         political_group_votes: political_groups
             .iter()
             .zip(pg_votes)
@@ -683,7 +698,7 @@ async fn export_election(
     election: &ElectionWithPoliticalGroups,
     polling_stations: &[PollingStation],
     export_results_json: bool,
-    results: Vec<(PollingStation, CSOFirstSessionResults)>,
+    results: Vec<(PollingStation, PollingStationResults)>,
 ) {
     if export_dir.exists() && !export_dir.is_dir() {
         panic!("Export directory already exists and is not a directory");
@@ -770,4 +785,39 @@ async fn export_election(
     }
 
     info!("Files written successfully");
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use abacus::election::repository as election_repo;
+
+    #[sqlx::test]
+    async fn test_create_test_election(pool: SqlitePool) {
+        let args = Args {
+            database: String::new(), // not used because we use sqlx::test
+            #[cfg(feature = "dev-database")]
+            seed_data: false,
+            #[cfg(feature = "dev-database")]
+            reset_database: false,
+            political_groups: 20..50,
+            candidates_per_group: 10..50,
+            polling_stations: 50..200,
+            voters: 100_000..200_000,
+            seats: 9..45,
+            with_data_entry: true,
+            first_data_entry: 100..101,
+            second_data_entry: 100..101,
+            turnout: 60..85,
+            candidate_distribution_slope: 1100..1101,
+            political_group_distribution_slope: 1100..1101,
+            export_definition: None,
+        };
+
+        create_test_election(args, pool.clone()).await.unwrap();
+
+        let mut conn = pool.acquire().await.unwrap();
+        let elections = election_repo::list(&mut conn).await.unwrap();
+        assert_eq!(elections.len(), 1);
+    }
 }

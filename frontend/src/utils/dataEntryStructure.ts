@@ -297,7 +297,6 @@ export function createPoliticalGroupSections(election: ElectionWithPoliticalGrou
 
 function buildDataEntryStructure(model: DataEntryModel, election: ElectionWithPoliticalGroups): DataEntryStructure {
   switch (model) {
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     case "CSOFirstSession":
       return [
         extraInvestigationSection,
@@ -306,6 +305,8 @@ function buildDataEntryStructure(model: DataEntryModel, election: ElectionWithPo
         differencesSection,
         ...createPoliticalGroupSections(election),
       ];
+    case "CSONextSession":
+      return [createVotersAndVotesSection(election), differencesSection, ...createPoliticalGroupSections(election)];
   }
 }
 

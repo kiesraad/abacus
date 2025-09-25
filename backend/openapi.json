@@ -1609,6 +1609,16 @@
               }
             }
           },
+          "422": {
+            "description": "Polling station deletion is not possible",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
           "500": {
             "description": "Internal server error",
             "content": {
@@ -2754,7 +2764,14 @@
         },
         "responses": {
           "200": {
-            "description": "Polling station investigation updated successfully"
+            "description": "Polling station investigation updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PollingStationInvestigation"
+                }
+              }
+            }
           },
           "401": {
             "description": "Unauthorized",
@@ -2836,7 +2853,14 @@
         },
         "responses": {
           "200": {
-            "description": "Polling station investigation added successfully"
+            "description": "Polling station investigation added successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PollingStationInvestigation"
+                }
+              }
+            }
           },
           "401": {
             "description": "Unauthorized",
@@ -2889,6 +2913,68 @@
             }
           }
         }
+      },
+      "delete": {
+        "summary": "Delete an investigation for a polling station",
+        "operationId": "polling_station_investigation_delete",
+        "parameters": [
+          {
+            "name": "polling_station_id",
+            "in": "path",
+            "description": "Polling station database id",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "minimum": 0
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Polling station investigation deleted successfully"
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Investigation not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
       }
     },
     "/api/polling_stations/{polling_station_id}/investigation/conclude": {
@@ -2920,7 +3006,14 @@
         },
         "responses": {
           "200": {
-            "description": "Polling station investigation concluded successfully"
+            "description": "Polling station investigation concluded successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PollingStationInvestigation"
+                }
+              }
+            }
           },
           "401": {
             "description": "Unauthorized",
@@ -2944,6 +3037,91 @@
           },
           "404": {
             "description": "Investigation not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Request cannot be completed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/polling_stations/{polling_station_id}/investigation/download_corrigendum_pdf": {
+      "get": {
+        "summary": "Download a corrigendum for a polling station",
+        "operationId": "polling_station_investigation_download_corrigendum_pdf",
+        "parameters": [
+          {
+            "name": "polling_station_id",
+            "in": "path",
+            "description": "Polling station database id",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "minimum": 0
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "PDF",
+            "headers": {
+              "Content-Disposition": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "attachment; filename=\"filename.pdf\""
+              }
+            },
+            "content": {
+              "application/pdf": {}
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
             "content": {
               "application/json": {
                 "schema": {
@@ -3842,6 +4020,27 @@
           {
             "allOf": [
               {
+                "$ref": "#/components/schemas/PollingStationInvestigation"
+              },
+              {
+                "type": "object",
+                "required": [
+                  "event_type"
+                ],
+                "properties": {
+                  "event_type": {
+                    "type": "string",
+                    "enum": [
+                      "PollingStationInvestigationDeleted"
+                    ]
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "allOf": [
+              {
                 "$ref": "#/components/schemas/FileDetails"
               },
               {
@@ -4064,6 +4263,27 @@
                     "type": "string",
                     "enum": [
                       "DataEntryFinalised"
+                    ]
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ResultDetails"
+              },
+              {
+                "type": "object",
+                "required": [
+                  "event_type"
+                ],
+                "properties": {
+                  "event_type": {
+                    "type": "string",
+                    "enum": [
+                      "ResultDeleted"
                     ]
                   }
                 }
@@ -4397,6 +4617,38 @@
         },
         "additionalProperties": false
       },
+      "CSONextSessionResults": {
+        "type": "object",
+        "description": "CSONextSessionResults, following the fields in Model Na 14-2 Bijlage 1.\n\nSee \"Model Na 14-2. Corrigendum bij het proces-verbaal van een gemeentelijk stembureau/\nstembureau voor het openbaar lichaam, Bijlage 1: uitkomsten per stembureau\" from the\n[Kiesregeling](https://wetten.overheid.nl/BWBR0034180/2024-04-01#Bijlage1_DivisieNa14.2) or\n[Verkiezingstoolbox](https://www.rijksoverheid.nl/onderwerpen/verkiezingen/verkiezingentoolkit/modellen).",
+        "required": [
+          "voters_counts",
+          "votes_counts",
+          "differences_counts",
+          "political_group_votes"
+        ],
+        "properties": {
+          "differences_counts": {
+            "$ref": "#/components/schemas/DifferencesCounts",
+            "description": "Differences counts (\"Verschil tussen het aantal toegelaten kiezers en het aantal getelde stembiljetten\")"
+          },
+          "political_group_votes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PoliticalGroupCandidateVotes"
+            },
+            "description": "Vote counts per list and candidate (\"Aantal stemmen per lijst en kandidaat\")"
+          },
+          "voters_counts": {
+            "$ref": "#/components/schemas/VotersCounts",
+            "description": "Voters counts (\"Aantal toegelaten kiezers\")"
+          },
+          "votes_counts": {
+            "$ref": "#/components/schemas/VotesCounts",
+            "description": "Votes counts (\"Aantal getelde stembiljetten\")"
+          }
+        },
+        "additionalProperties": false
+      },
       "Candidate": {
         "type": "object",
         "description": "Candidate",
@@ -4511,7 +4763,7 @@
             "$ref": "#/components/schemas/PollingStationResults"
           },
           "previous_results": {
-            "$ref": "#/components/schemas/PollingStationResults"
+            "$ref": "#/components/schemas/CommonPollingStationResults"
           },
           "validation_results": {
             "$ref": "#/components/schemas/ValidationResults"
@@ -4691,6 +4943,38 @@
         },
         "additionalProperties": false
       },
+      "CommonPollingStationResults": {
+        "type": "object",
+        "description": "CommonPollingStationResults contains the common fields for polling station results,",
+        "required": [
+          "voters_counts",
+          "votes_counts",
+          "differences_counts",
+          "political_group_votes"
+        ],
+        "properties": {
+          "differences_counts": {
+            "$ref": "#/components/schemas/DifferencesCounts",
+            "description": "Differences counts (\"Verschil tussen het aantal toegelaten kiezers en het aantal getelde stembiljetten\")"
+          },
+          "political_group_votes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PoliticalGroupCandidateVotes"
+            },
+            "description": "Vote counts per list and candidate (\"Aantal stemmen per lijst en kandidaat\")"
+          },
+          "voters_counts": {
+            "$ref": "#/components/schemas/VotersCounts",
+            "description": "Voters counts (\"Aantal toegelaten kiezers\")"
+          },
+          "votes_counts": {
+            "$ref": "#/components/schemas/VotesCounts",
+            "description": "Votes counts (\"Aantal getelde stembiljetten\")"
+          }
+        },
+        "additionalProperties": false
+      },
       "CountingDifferencesPollingStation": {
         "type": "object",
         "description": "Counting Differences Polling Station,\npart of the polling station results (\"B1-2 Verschillen met telresultaten van het stembureau\")",
@@ -4780,10 +5064,16 @@
         "type": "object",
         "required": [
           "polling_station_id",
+          "committee_session_id",
           "data_entry_status",
           "data_entry_progress"
         ],
         "properties": {
+          "committee_session_id": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
           "data_entry_progress": {
             "type": "integer",
             "format": "int32",
@@ -6255,9 +6545,7 @@
       "PollingStationInvestigationUpdateRequest": {
         "type": "object",
         "required": [
-          "reason",
-          "findings",
-          "corrected_results"
+          "reason"
         ],
         "properties": {
           "corrected_results": {
@@ -6332,7 +6620,6 @@
         "description": "Polling station of a certain [crate::election::Election]",
         "required": [
           "name",
-          "number",
           "address",
           "postal_code",
           "locality"
@@ -6402,6 +6689,29 @@
               }
             ],
             "description": "Results for centrally counted (CSO) elections, first election committee session.\nThis contains the data entry values from Model Na 31-2 Bijlage 2."
+          },
+          {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/CSONextSessionResults",
+                "description": "Results for centrally counted (CSO) elections, any subsequent election committee session.\nThis contains the data entry values from Model Na 14-2 Bijlage 1."
+              },
+              {
+                "type": "object",
+                "required": [
+                  "model"
+                ],
+                "properties": {
+                  "model": {
+                    "type": "string",
+                    "enum": [
+                      "CSONextSession"
+                    ]
+                  }
+                }
+              }
+            ],
+            "description": "Results for centrally counted (CSO) elections, any subsequent election committee session.\nThis contains the data entry values from Model Na 14-2 Bijlage 1."
           }
         ],
         "description": "PollingStationResults contains the results for a polling station.\n\nThe exact type of results depends on the election counting method and\nwhether this is the first or any subsequent data entry session. Based on\nthis, any of four different models can apply"
@@ -6491,6 +6801,30 @@
           "discard_first_entry",
           "resume_first_entry"
         ]
+      },
+      "ResultDetails": {
+        "type": "object",
+        "required": [
+          "polling_station_id",
+          "committee_session_id",
+          "created_at"
+        ],
+        "properties": {
+          "committee_session_id": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "created_at": {
+            "type": "string"
+          },
+          "polling_station_id": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          }
+        },
+        "additionalProperties": false
       },
       "Role": {
         "type": "string",

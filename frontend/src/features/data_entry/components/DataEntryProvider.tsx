@@ -1,7 +1,7 @@
 import { ReactNode, useEffect } from "react";
 import { Navigate, useNavigate, useParams } from "react-router";
 
-import { ApiError, FatalApiError } from "@/api/ApiResult";
+import { ApiError, FatalApiError, FatalError } from "@/api/ApiResult";
 import { ElectionWithPoliticalGroups } from "@/types/generated/openapi";
 import { FormSectionId } from "@/types/types";
 
@@ -25,27 +25,34 @@ export function DataEntryProvider({ election, pollingStationId, entryNumber, chi
   // handle non-fatal error navigation
   useEffect(() => {
     if (stateAndActions.error && stateAndActions.error instanceof ApiError) {
-      if (stateAndActions.error.reference === "DataEntryAlreadyClaimed") {
-        void navigate(`/elections/${election.id}/data-entry#data-entry-claimed-${pollingStationId}`);
-      } else if (stateAndActions.error.reference === "DataEntryAlreadyFinalised") {
-        void navigate(`/elections/${election.id}/data-entry#data-entry-finalised-${pollingStationId}`);
-      } else if (stateAndActions.error.reference === "InvalidStateTransition") {
-        void navigate(`/elections/${election.id}/data-entry#invalid-action-${pollingStationId}`);
+      switch (stateAndActions.error.reference) {
+        case "DataEntryAlreadyClaimed":
+          void navigate(`/elections/${election.id}/data-entry#data-entry-claimed-${pollingStationId}`);
+          break;
+        case "DataEntryAlreadyFinalised":
+          void navigate(`/elections/${election.id}/data-entry#data-entry-finalised-${pollingStationId}`);
+          break;
+        case "InvalidStateTransition":
+        case "DataEntryNotAllowed":
+          void navigate(`/elections/${election.id}/data-entry#invalid-action-${pollingStationId}`);
+          break;
       }
     }
   }, [election.id, navigate, stateAndActions.error, pollingStationId]);
 
+  // exception for CommitteeSessionPaused error which has to trigger the rendering of a modal
+  // on initial claim, navigate back to DataEntryHomePage (modal is rendered there)
+  if (
+    stateAndActions.error instanceof FatalApiError &&
+    stateAndActions.error.reference === "CommitteeSessionPaused" &&
+    !stateAndActions.pollingStationResults
+  ) {
+    return <Navigate to={`/elections/${election.id}/data-entry`} />;
+  }
+
   // throw fatal errors, so the error boundary can catch them and show the full page error
-  if (stateAndActions.error instanceof FatalApiError) {
-    // exception for CommitteeSessionPaused error which has to trigger the rendering of a modal
-    if (stateAndActions.error.reference === "CommitteeSessionPaused") {
-      // on initial claim, navigate back to DataEntryHomePage (modal is rendered there)
-      if (!stateAndActions.pollingStationResults) {
-        return <Navigate to={`/elections/${election.id}/data-entry`} />;
-      }
-    } else {
-      throw stateAndActions.error;
-    }
+  if (stateAndActions.error instanceof FatalApiError || stateAndActions.error instanceof FatalError) {
+    throw stateAndActions.error;
   }
 
   if (!isStateLoaded(stateAndActions)) {

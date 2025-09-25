@@ -821,6 +821,7 @@ export type ErrorReference =
   | "DatabaseError"
   | "DataEntryAlreadyClaimed"
   | "DataEntryAlreadyFinalised"
+  | "DataEntryNotAllowed"
   | "DrawingOfLotsRequired"
   | "EmlImportError"
   | "EntryNotFound"

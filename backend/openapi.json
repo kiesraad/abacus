@@ -5762,6 +5762,7 @@
           "DatabaseError",
           "DataEntryAlreadyClaimed",
           "DataEntryAlreadyFinalised",
+          "DataEntryNotAllowed",
           "DrawingOfLotsRequired",
           "EmlImportError",
           "EntryNotFound",

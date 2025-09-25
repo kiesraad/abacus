@@ -88,6 +88,8 @@ import {
   POLLING_STATION_INVESTIGATION_CREATE_REQUEST_BODY,
   POLLING_STATION_INVESTIGATION_CREATE_REQUEST_PARAMS,
   POLLING_STATION_INVESTIGATION_CREATE_REQUEST_PATH,
+  POLLING_STATION_INVESTIGATION_DELETE_REQUEST_PARAMS,
+  POLLING_STATION_INVESTIGATION_DELETE_REQUEST_PATH,
   POLLING_STATION_INVESTIGATION_UPDATE_REQUEST_BODY,
   POLLING_STATION_INVESTIGATION_UPDATE_REQUEST_PARAMS,
   POLLING_STATION_INVESTIGATION_UPDATE_REQUEST_PATH,
@@ -258,6 +260,13 @@ export const PollingStationInvestigationUpdateHandler = http.put<
   };
   return HttpResponse.json(response, { status: 200 });
 });
+
+export const PollingStationInvestigationDeleteHandler = http.delete<
+  ParamsToString<POLLING_STATION_INVESTIGATION_DELETE_REQUEST_PARAMS>
+>(
+  "/api/polling_stations/3/investigation" satisfies POLLING_STATION_INVESTIGATION_DELETE_REQUEST_PATH,
+  () => new HttpResponse(null, { status: 204 }),
+);
 
 // get election list handler
 export const ElectionListRequestHandler = http.get<

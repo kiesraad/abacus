@@ -242,6 +242,10 @@ export interface POLLING_STATION_INVESTIGATION_CREATE_REQUEST_PARAMS {
 }
 export type POLLING_STATION_INVESTIGATION_CREATE_REQUEST_PATH = `/api/polling_stations/${number}/investigation`;
 export type POLLING_STATION_INVESTIGATION_CREATE_REQUEST_BODY = PollingStationInvestigationCreateRequest;
+export interface POLLING_STATION_INVESTIGATION_DELETE_REQUEST_PARAMS {
+  polling_station_id: number;
+}
+export type POLLING_STATION_INVESTIGATION_DELETE_REQUEST_PATH = `/api/polling_stations/${number}/investigation`;
 
 // /api/polling_stations/{polling_station_id}/investigation/conclude
 export interface POLLING_STATION_INVESTIGATION_CONCLUDE_REQUEST_PARAMS {
@@ -318,6 +322,7 @@ export type AuditEvent =
   | (PollingStationInvestigation & { event_type: "PollingStationInvestigationCreated" })
   | (PollingStationInvestigation & { event_type: "PollingStationInvestigationConcluded" })
   | (PollingStationInvestigation & { event_type: "PollingStationInvestigationUpdated" })
+  | (PollingStationInvestigation & { event_type: "PollingStationInvestigationDeleted" })
   | (FileDetails & { event_type: "FileCreated" })
   | (FileDetails & { event_type: "FileDeleted" })
   | (ElectionDetails & { event_type: "ApportionmentCreated" })
@@ -329,6 +334,7 @@ export type AuditEvent =
   | (DataEntryDetails & { event_type: "DataEntrySaved" })
   | (DataEntryDetails & { event_type: "DataEntryDeleted" })
   | (DataEntryDetails & { event_type: "DataEntryFinalised" })
+  | (ResultDetails & { event_type: "ResultDeleted" })
   | (DataEntryDetails & { event_type: "DataEntryDiscardedFirst" })
   | (DataEntryDetails & { event_type: "DataEntryResumedFirst" })
   | (DataEntryDetails & { event_type: "DataEntryKeptFirst" })
@@ -576,6 +582,7 @@ export interface DataEntry {
 }
 
 export interface DataEntryDetails {
+  committee_session_id: number;
   data_entry_progress: number;
   data_entry_status: string;
   finished_at?: string | null;
@@ -1176,6 +1183,12 @@ export interface RedactedEmlHash {
 export type ResolveDifferencesAction = "keep_first_entry" | "keep_second_entry" | "discard_both_entries";
 
 export type ResolveErrorsAction = "discard_first_entry" | "resume_first_entry";
+
+export interface ResultDetails {
+  committee_session_id: number;
+  created_at: string;
+  polling_station_id: number;
+}
 
 export type Role = "administrator" | "typist" | "coordinator";
 

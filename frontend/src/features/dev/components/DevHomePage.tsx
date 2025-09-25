@@ -95,13 +95,9 @@ function AdministratorCoordinatorLinks({ electionList }: LinksProps) {
             </li>
           ))}
         </ul>
-        {isAdministrator && (
-          <>
-            <li>
-              <Link to={`/users`}>{t("users.manage")}</Link>
-            </li>
-          </>
-        )}
+        <li>
+          <Link to={`/users`}>{t("users.manage")}</Link>
+        </li>
         <li>
           <Link to={`/logs`}>{t("activity_log")}</Link>
         </li>

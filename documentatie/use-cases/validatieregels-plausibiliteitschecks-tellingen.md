@@ -3,7 +3,7 @@
 ## Definities
 
 **[Fout](#validatieregels-geven-fouten)**:
-Een fout wijst op een probleem in het papieren proces-verbaal. Dit probleem moet opgelost worden voordat een tweede invoerder aan de slag gaat. Als een proces-verbaal gecorrigeerd wordt, moeten beide invoeren namelijk opnieuw.
+Een fout wijst op een probleem in het papieren proces-verbaal. Dit probleem moet opgelost worden voordat een tweede invoerder aan de slag gaat. Als een proces-verbaal gecorrigeerd wordt, moet het proces-verbaal twee keer opnieuw ingevoerd worden.
 
 **[Waarschuwing](#plausibiliteitschecks-geven-waarschuwingen)**:
 Een waarschuwing wijst op een opmerkelijke uitslag in het papieren proces-verbaal. Dit moet het GSB verklaren, anders kan dit resulteren in een nieuwe zitting.

@@ -29,6 +29,7 @@ pub enum ErrorReference {
     DatabaseError,
     DataEntryAlreadyClaimed,
     DataEntryAlreadyFinalised,
+    DataEntryNotAllowed,
     EmlImportError,
     EntryNotFound,
     EntryNotUnique,

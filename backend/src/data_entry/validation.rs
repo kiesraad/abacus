@@ -91,11 +91,11 @@ pub enum ValidationResultCode {
     F309,
     /// CSO: (Als D <> H en verklaring voor verschil niks aangevinkt of 'ja' en 'nee' aangevinkt)
     F310,
-    /// CSO: 'Kandidaten en lijsttotalen': Er zijn stemmen op kandidaten, en het totaal aantal stemmen op een lijst = leeg of 0
+    /// CSO: 'Kandidaten en lijsttotalen': Er zijn (stemmen op kandidaten of het lijsttotaal van corresponderende E.x is groter dan 0) en het totaal aantal stemmen op een lijst = leeg of 0
     F401,
-    /// CSO: 'Kandidaten en lijsttotalen': Totaal aantal stemmen op een lijst <> som van aantal stemmen op de kandidaten van die lijst (Als totaal aantal stemmen op een lijst niet leeg of 0 is)
+    /// CSO: 'Kandidaten en lijsttotalen': (Als F.401 niet getoond wordt) Totaal aantal stemmen op een lijst <> som van aantal stemmen op de kandidaten van die lijst
     F402,
-    /// CSO: 'Kandidaten en lijsttotalen': Totaal aantal stemmen op een lijst komt niet overeen met het lijsttotaal van corresponderende E.x
+    /// CSO: 'Kandidaten en lijsttotalen': (Als F.401 niet getoond wordt) Totaal aantal stemmen op een lijst komt niet overeen met het lijsttotaal van corresponderende E.x
     F403,
 
     W001,
@@ -3128,7 +3128,7 @@ mod tests {
             Ok(())
         }
 
-        /// CSO | F.403 (Als F.401 niet getoond wordt) `totaal aantal stemmen op een lijst komt niet overeen met het lijsttotaal van corresponderende E.x`
+        /// CSO | F.403 (Als F.401 niet getoond wordt) `Totaal aantal stemmen op een lijst komt niet overeen met het lijsttotaal van corresponderende E.x`
         #[test]
         fn test_f403() -> Result<(), DataError> {
             let mut data = create_test_data();

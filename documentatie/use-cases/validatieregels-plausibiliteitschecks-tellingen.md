@@ -424,7 +424,7 @@ Velden markeren: geen (laat alleen foutmelding zien op de pagina)
 
 Velden markeren: geen (laat alleen foutmelding zien op de pagina)
 
-#### CSO | F.403 (Als F.401 niet getoond wordt) `totaal aantal stemmen op een lijst komt niet overeen met het lijsttotaal van corresponderende E.x`
+#### CSO | F.403 (Als F.401 niet getoond wordt) `Totaal aantal stemmen op een lijst komt niet overeen met het lijsttotaal van corresponderende E.x`
 
 > Invoerder: **Controleer het totaal van de lijst** (F.403)  
 > Als het totaal overeenkomt met het papieren proces-verbaal, controleer dan ook de waarde bij E.{x} bij [Aantal kiezers en stemmen]().
@@ -435,7 +435,7 @@ Velden markeren: geen (laat alleen foutmelding zien op de pagina)
 
 Velden markeren: totaal van de lijst, en E.{x} op Aantal kiezers en stemmen  
 
-#### DSO | F.453 (Als F.451 niet getoond wordt) `totaal aantal stemmen op een lijst komt niet overeen met het lijsttotaal van corresponderende E.x`
+#### DSO | F.453 (Als F.451 niet getoond wordt) `Totaal aantal stemmen op een lijst komt niet overeen met het lijsttotaal van corresponderende E.x`
 
 > Invoerder: **Controleer het totaal van de lijst** (F.453)  
 > Als het totaal overeenkomt met het papieren proces-verbaal, controleer dan ook de waarde bij E.{x} bij [Aantal kiezers en stemmen]().

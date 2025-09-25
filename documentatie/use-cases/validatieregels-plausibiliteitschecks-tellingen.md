@@ -385,7 +385,7 @@ Velden markeren: totaal van de lijst
 N.b. anders dan de andere foutmeldingen, tonen we deze foutmelding _bij invoerders_ onderaan de pagina, onder het totaal-veld ([Voorbeeld in Figma](https://www.figma.com/design/zZlFr8tYiRyp4I26sh6eqp/Kiesraad---Abacus-optelsoftware?node-id=6128-28260&t=R2mG7PyAWfHk3c8S-11))  
 Het standaard handelingsperspectief wordt bij deze foutmelding niet getoond.
 
-#### DSO | F.451 `Er zijn stemmen op kandidaten, en het totaal aantal stemmen op een lijst = leeg of 0`
+#### DSO | F.451 `Er zijn (stemmen op kandidaten of het lijsttotaal van corresponderende E.x is groter dan 0) en het totaal aantal stemmen op een lijst = leeg of 0`
 > Invoerder: **Controleer het totaal van de lijst. Is dit veld op het papieren proces-verbaal ook leeg? Dan kan je verdergaan** (F.451)
 
 > Coördinator: **Het totaal van de lijst is niet ingevuld** (F.451)  

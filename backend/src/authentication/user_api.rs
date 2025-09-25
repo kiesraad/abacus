@@ -8,7 +8,7 @@ use sqlx::{Error, SqlitePool};
 use utoipa::ToSchema;
 use utoipa_axum::{router::OpenApiRouter, routes};
 
-use super::{Admin, AdminOrCoordinator, error::AuthenticationError, user::User};
+use super::{AdminOrCoordinator, error::AuthenticationError, user::User};
 use crate::{
     APIError, AppState, ErrorResponse, SqlitePoolExt,
     audit_log::{AuditEvent, AuditService},
@@ -160,14 +160,14 @@ async fn user_get(
     ),
 )]
 pub async fn user_update(
-    user: AdminOrCoordinator,
+    logged_in_user: AdminOrCoordinator,
     State(pool): State<SqlitePool>,
     audit_service: AuditService,
     Path(user_id): Path<u32>,
     Json(update_user_req): Json<UpdateUserRequest>,
 ) -> Result<Json<User>, APIError> {
     // fetch the current user
-    if user.is_coordinator() {
+    if logged_in_user.is_coordinator() {
         let mut conn = pool.acquire().await?;
         let target_user = super::user::get_by_id(&mut conn, user_id)
             .await?
@@ -217,11 +217,24 @@ pub async fn user_update(
     ),
 )]
 async fn user_delete(
-    logged_in_user: Admin,
+    logged_in_user: AdminOrCoordinator,
     State(pool): State<SqlitePool>,
     audit_service: AuditService,
     Path(user_id): Path<u32>,
 ) -> Result<StatusCode, APIError> {
+    // fetch the current user
+    if logged_in_user.is_coordinator() {
+        let mut conn = pool.acquire().await?;
+        let target_user = super::user::get_by_id(&mut conn, user_id)
+            .await?
+            .ok_or(Error::RowNotFound)?;
+
+        // Coordinators can only delete Typists
+        if target_user.role() != Role::Typist {
+            return Err(AuthenticationError::Forbidden.into());
+        }
+    }
+
     let mut tx = pool.begin_immediate().await?;
 
     let user = super::user::get_by_id(&mut tx, user_id)

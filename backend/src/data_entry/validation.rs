@@ -3033,7 +3033,7 @@ mod tests {
             Ok(())
         }
 
-        /// CSO | F.401: 'Kandidaten en lijsttotalen': Er zijn stemmen op kandidaten, en het totaal aantal stemmen op een lijst = leeg of 0
+        /// CSO | F.401 `Er zijn stemmen op kandidaten, en het totaal aantal stemmen op een lijst = leeg of 0`
         #[test]
         fn test_f401() -> Result<(), DataError> {
             // Only F.401 is triggered.
@@ -3090,7 +3090,7 @@ mod tests {
             Ok(())
         }
 
-        /// CSO | F.402: 'Kandidaten en lijsttotalen': Totaal aantal stemmen op een lijst <> som van aantal stemmen op de kandidaten van die lijst (Als totaal aantal stemmen op een lijst niet leeg of 0 is)
+        /// CSO | F.402 (Als F.401 niet getoond wordt) `Totaal aantal stemmen op een lijst <> som van aantal stemmen op de kandidaten van die lijst`
         #[test]
         fn test_f402() -> Result<(), DataError> {
             let mut data = create_test_data();
@@ -3128,7 +3128,7 @@ mod tests {
             Ok(())
         }
 
-        /// CSO | F.403: 'Kandidaten en lijsttotalen': Totaal aantal stemmen op een lijst komt niet overeen met het lijsttotaal van corresponderende E.x
+        /// CSO | F.403 (Als F.401 niet getoond wordt) `totaal aantal stemmen op een lijst komt niet overeen met het lijsttotaal van corresponderende E.x`
         #[test]
         fn test_f403() -> Result<(), DataError> {
             let mut data = create_test_data();
@@ -3149,7 +3149,7 @@ mod tests {
             // Multiple invalid case
             data.political_group_votes[0].candidate_votes[0].votes += 10;
             data.political_group_votes[0].total += 10;
-            let validation_results = validate(data)?;
+            let validation_results = validate(data.clone())?;
             assert_eq!(
                 validation_results.errors,
                 [
@@ -3168,6 +3168,20 @@ mod tests {
                         }),
                     }
                 ],
+            );
+
+            // When list total is empty, don't expect F.403, but F.401
+            data.political_group_votes[1].total = 0;
+            let validation_results = validate(data.clone())?;
+            assert_eq!(
+                validation_results.errors,
+                [ValidationResult {
+                    code: ValidationResultCode::F401,
+                    fields: vec!["data.political_group_votes[1].total".into()],
+                    context: Some(ValidationResultContext {
+                        political_group_number: Some(2),
+                    }),
+                }],
             );
 
             Ok(())

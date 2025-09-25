@@ -372,7 +372,7 @@ Veld markeren: foutmelding op 2.3.2
 
 ### Regels voor kandidaten en lijsttotalen (reeks F.4xx)
 
-#### CSO | F.401 `Er zijn stemmen op kandidaten, en het totaal aantal stemmen op een lijst = leeg of 0`
+#### CSO | F.401 `Er zijn (stemmen op kandidaten of het lijsttotaal van corresponderende E.x is groter dan 0) en het totaal aantal stemmen op een lijst = leeg of 0`
 > Invoerder: **Controleer het totaal van de lijst. Is dit veld op het papieren proces-verbaal ook leeg? Dan kan je verdergaan** (F.401)
 
 > Coördinator: **Het totaal van de lijst is niet ingevuld** (F.401)  

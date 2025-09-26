@@ -25,14 +25,17 @@ use crate::{
     audit_log::{AuditEvent, AuditService},
     authentication::Coordinator,
     committee_session::status::{CommitteeSessionStatus, change_committee_session_status},
-    data_entry::{PollingStationResults, repository::most_recent_results_for_polling_station},
+    data_entry::{
+        PollingStationResults, delete_data_entry_and_result_for_polling_station,
+        repository::{data_entry_exists, most_recent_results_for_polling_station, result_exists},
+    },
     election::ElectionWithPoliticalGroups,
     error::ErrorReference,
     pdf_gen::{
         generate_pdf,
         models::{ModelNa14_2Bijlage1Input, ToPdfFileModel},
     },
-    polling_station::PollingStation,
+    polling_station::{PollingStation, repository::get},
 };
 
 pub fn router() -> OpenApiRouter<AppState> {
@@ -188,13 +191,37 @@ async fn polling_station_investigation_update(
     Json(polling_station_investigation): Json<PollingStationInvestigationUpdateRequest>,
 ) -> Result<PollingStationInvestigation, APIError> {
     let mut tx = pool.begin_immediate().await?;
-    let polling_station =
-        crate::polling_station::repository::get(&mut tx, polling_station_id).await?;
+
+    // If corrected_results is changed from yes to no, check if there are data entries or results.
+    // If deleting them is accepted, delete them. If not, return an error.
+    if polling_station_investigation.corrected_results == Some(false) {
+        if let Ok(current) = get_polling_station_investigation(&mut tx, polling_station_id).await {
+            if current.corrected_results == Some(true)
+                && (data_entry_exists(&mut tx, polling_station_id).await?
+                    || result_exists(&mut tx, polling_station_id).await?)
+            {
+                if polling_station_investigation.accept_data_entry_deletion == Some(true) {
+                    let polling_station = get(&mut tx, polling_station_id).await?;
+                    delete_data_entry_and_result_for_polling_station(
+                        &mut tx,
+                        &audit_service,
+                        &polling_station,
+                    )
+                    .await?;
+                } else {
+                    return Err(APIError::Conflict(
+                        "Investigation has data entries or results".into(),
+                        ErrorReference::InvestigationHasDataEntryOrResult,
+                    ));
+                }
+            }
+        }
+    }
 
     let investigation = update_polling_station_investigation(
         &mut tx,
         polling_station_id,
-        polling_station_investigation.clone(),
+        polling_station_investigation,
     )
     .await?;
 
@@ -205,18 +232,6 @@ async fn polling_station_investigation_update(
             None,
         )
         .await?;
-
-    if let Some(corrected_results) = polling_station_investigation.corrected_results {
-        // When changing corrected_results to false, delete polling station data entries and results
-        if !corrected_results {
-            crate::data_entry::delete_data_entry_and_result_for_polling_station(
-                &mut tx,
-                audit_service,
-                &polling_station,
-            )
-            .await?;
-        }
-    }
 
     tx.commit().await?;
 
@@ -262,7 +277,7 @@ async fn polling_station_investigation_delete(
         // Delete potential data entry and result linked to the polling station
         crate::data_entry::delete_data_entry_and_result_for_polling_station(
             &mut tx,
-            audit_service.clone(),
+            &audit_service,
             &polling_station,
         )
         .await?;

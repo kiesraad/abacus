@@ -5781,6 +5781,7 @@
           "InvalidVoteCandidate",
           "InvalidVoteGroup",
           "InvalidXml",
+          "InvestigationHasDataEntryOrResult",
           "NotInitialised",
           "OwnAccountCannotBeDeleted",
           "PasswordRejection",
@@ -6549,6 +6550,9 @@
           "reason"
         ],
         "properties": {
+          "accept_data_entry_deletion": {
+            "type": "boolean"
+          },
           "corrected_results": {
             "type": "boolean"
           },

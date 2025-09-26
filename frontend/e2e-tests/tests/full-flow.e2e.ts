@@ -8,17 +8,28 @@ import {
   uploadPollingStations,
 } from "e2e-tests/helpers-utils/e2e-test-browser-helpers";
 import { LoginPgObj } from "e2e-tests/page-objects/authentication/LoginPgObj";
+import { CandidatesListPage } from "e2e-tests/page-objects/data_entry/CandidatesListPgObj";
+import { CheckAndSavePage } from "e2e-tests/page-objects/data_entry/CheckAndSavePgObj";
 import { DataEntryHomePage } from "e2e-tests/page-objects/data_entry/DataEntryHomePgObj";
+import { DifferencesPage } from "e2e-tests/page-objects/data_entry/DifferencesPgObj";
+import { ExtraInvestigationPage } from "e2e-tests/page-objects/data_entry/ExtraInvestigationPgObj";
+import { ProgressList } from "e2e-tests/page-objects/data_entry/ProgressListPgObj";
 import { CheckAndSavePgObj } from "e2e-tests/page-objects/election/create/CheckAndSavePgObj";
 import { CountingMethodTypePgObj } from "e2e-tests/page-objects/election/create/CountingMethodTypePgObj";
 import { NumberOfVotersPgObj } from "e2e-tests/page-objects/election/create/NumberOfVotersPgObj";
 import { PollingStationRolePgObj } from "e2e-tests/page-objects/election/create/PollingStationRolePgObj";
-import { ElectionDetailsPgObj } from "e2e-tests/page-objects/election/ElectionDetailsPgObject";
+import { ElectionDetailsPgObj } from "e2e-tests/page-objects/election/ElectionDetailsPgObj";
 import { ElectionHome } from "e2e-tests/page-objects/election/ElectionHomePgObj";
 import { ElectionReport } from "e2e-tests/page-objects/election/ElectionReportPgObj";
 import { ElectionsOverviewPgObj } from "e2e-tests/page-objects/election/ElectionsOverviewPgObj";
 import { ElectionStatus } from "e2e-tests/page-objects/election/ElectionStatusPgObj";
 import { FinishDataEntry } from "e2e-tests/page-objects/election/FinishDataEntryPgObj";
+import { AddInvestigationPgObj } from "e2e-tests/page-objects/investigations/AddInvestigationPgObj";
+import { InvestigationFindingsPgObj } from "e2e-tests/page-objects/investigations/InvestigationFindingsPgObj";
+import { InvestigationOverviewPgObj } from "e2e-tests/page-objects/investigations/InvestigationOverviewPgObj";
+import { InvestigationPrintCorrigendumPgObj } from "e2e-tests/page-objects/investigations/InvestigationPrintCorrigendumPgObj";
+import { InvestigationReasonPgObj } from "e2e-tests/page-objects/investigations/InvestigationReasonPgObj";
+import { CoordinatorNavBarPgObj } from "e2e-tests/page-objects/nav_bar/CoordinatorNavBarPgObj";
 import { PollingStationFormPgObj } from "e2e-tests/page-objects/polling_station/PollingStationFormPgObj";
 import { PollingStationListPgObj } from "e2e-tests/page-objects/polling_station/PollingStationListPgObj";
 import { eml110b_single } from "e2e-tests/test-data/eml-files";
@@ -184,5 +195,133 @@ test.describe("full flow", () => {
 
     expect(download.suggestedFilename()).toBe("election_result_GR2022_Test.zip");
     expect((await stat(await download.path())).size).toBeGreaterThan(1024);
+  });
+
+  test("create new committee session", async ({ page }) => {
+    await page.goto("/account/login");
+
+    const loginPage = new LoginPgObj(page);
+    await loginPage.login("coordinator1", getTestPassword("coordinator1"));
+
+    const overviewPage = new ElectionsOverviewPgObj(page);
+    await expect(overviewPage.header).toBeVisible();
+    await overviewPage.findElectionRowById(electionId!).click();
+
+    const electionDetailsPage = new ElectionDetailsPgObj(page);
+    await electionDetailsPage.newSessionButton.click();
+
+    await electionDetailsPage.newSessionModalConfirmButton.click();
+    await electionDetailsPage.investigationsOverviewButton.click();
+
+    const investigationsOverviewPage = new InvestigationOverviewPgObj(page);
+
+    // Polling station "Stadhuis"
+    await investigationsOverviewPage.addInvestigationButton.click();
+
+    const addInvestigationPage = new AddInvestigationPgObj(page);
+    await addInvestigationPage.selectPollingStation("Stadhuis");
+
+    const investionReasonPage = new InvestigationReasonPgObj(page);
+    await expect(investionReasonPage.header).toBeVisible();
+    await investionReasonPage.reasonField.fill("Reden");
+    await investionReasonPage.nextButton.click();
+
+    const investigationPrintCorrigendumPage = new InvestigationPrintCorrigendumPgObj(page);
+    await expect(investigationPrintCorrigendumPage.header).toBeVisible();
+    await investigationPrintCorrigendumPage.continueButton.click();
+
+    const investigationsFindingsPage = new InvestigationFindingsPgObj(page);
+    await expect(investigationsFindingsPage.header).toBeVisible();
+    await investigationsFindingsPage.findingsField.fill("Probleem");
+    await investigationsFindingsPage.correctedResultsYes.check();
+    await investigationsFindingsPage.save.click();
+
+    // Polling station "de Regenboog"
+    await investigationsOverviewPage.addInvestigationButton.click();
+
+    await addInvestigationPage.selectPollingStation("Basisschool de Regenboog");
+
+    await expect(investionReasonPage.header).toBeVisible();
+    await investionReasonPage.reasonField.fill("Reden");
+    await investionReasonPage.nextButton.click();
+
+    await expect(investigationPrintCorrigendumPage.header).toBeVisible();
+    await investigationPrintCorrigendumPage.continueButton.click();
+
+    await expect(investigationsFindingsPage.header).toBeVisible();
+    await investigationsFindingsPage.findingsField.fill("Geen probleem");
+    await investigationsFindingsPage.correctedResultsNo.check();
+    await investigationsFindingsPage.save.click();
+
+    const navBar = new CoordinatorNavBarPgObj(page);
+    await navBar.menuButton.click();
+    await navBar.electionsButton.click();
+
+    await expect(overviewPage.header).toBeVisible();
+    await overviewPage.findElectionRowById(electionId!).click();
+
+    await electionDetailsPage.startDataEntryButton.click();
+  });
+
+  for (const typist of ["typist1", "typist2"]) {
+    test(`corrected data entry with ${typist}`, async ({ page }) => {
+      await page.goto("/account/login");
+
+      const loginPage = new LoginPgObj(page);
+      await loginPage.login(typist, getTestPassword(typist));
+
+      const overviewPage = new ElectionsOverviewPgObj(page);
+      await expect(overviewPage.header).toBeVisible();
+      await overviewPage.findElectionRowById(electionId!).click();
+
+      const dataEntryHomePage = new DataEntryHomePage(page);
+      await expect(dataEntryHomePage.fieldset).toBeVisible();
+      await dataEntryHomePage.pollingStationNumber.fill("1");
+      await expect(dataEntryHomePage.pollingStationFeedback).toContainText("Stadhuis");
+      await dataEntryHomePage.clickStart();
+
+      const extraInvestigationPage = new ExtraInvestigationPage(page);
+      await extraInvestigationPage.next.click();
+
+      const differencesPage = new DifferencesPage(page);
+      await differencesPage.admittedVotersEqualsVotesCastCheckbox.check();
+      await differencesPage.differenceCompletelyAccountedForNo.check();
+      await differencesPage.next.click();
+
+      const progressList = new ProgressList(page);
+      const [firstListName, secondListName, thirdListName] = await progressList.allListNames();
+
+      const firstCandidatesPage = new CandidatesListPage(page, 1, firstListName!);
+      await firstCandidatesPage.fillCandidate(0, 1336);
+      await firstCandidatesPage.fillCandidate(1, 424);
+      await firstCandidatesPage.next.click();
+
+      const secondCandidatesPage = new CandidatesListPage(page, 2, secondListName!);
+      await secondCandidatesPage.next.click();
+
+      const thirdCandidatesPage = new CandidatesListPage(page, 3, thirdListName!);
+      await thirdCandidatesPage.next.click();
+
+      const checkAndSavePage = new CheckAndSavePage(page);
+      await checkAndSavePage.save.click();
+    });
+  }
+
+  test("check progress", async ({ page }) => {
+    await page.goto("/account/login");
+
+    const loginPage = new LoginPgObj(page);
+    await loginPage.login("coordinator1", getTestPassword("coordinator1"));
+
+    const overviewPage = new ElectionsOverviewPgObj(page);
+    await expect(overviewPage.header).toBeVisible();
+    await overviewPage.findElectionRowById(electionId!).click();
+
+    const electionHome = new ElectionHome(page);
+    await expect(electionHome.header).toBeVisible();
+    await electionHome.statusButton.click();
+
+    const statusPage = new ElectionStatus(page);
+    await expect(statusPage.definitive).toBeVisible();
   });
 });

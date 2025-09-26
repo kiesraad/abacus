@@ -1,5 +1,11 @@
 mod api;
-pub mod repository;
+mod repository;
 mod structs;
 
-pub use self::{api::router, repository::list_investigations_for_committee_session, structs::*};
+pub(crate) use self::{
+    api::router, repository::list_investigations_for_committee_session,
+    structs::PollingStationInvestigation,
+};
+
+#[cfg(test)]
+pub(crate) use self::repository::insert_test_investigation;

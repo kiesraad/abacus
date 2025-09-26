@@ -935,7 +935,7 @@ mod tests {
             PoliticalGroupCandidateVotes, PoliticalGroupTotalVotes, VotersCounts, VotesCounts,
             YesNo, repository::insert_test_result, structs::tests::ValidDefault,
         },
-        investigation::repository::insert_test_investigation,
+        investigation::insert_test_investigation,
     };
 
     fn example_data_entry() -> DataEntry {

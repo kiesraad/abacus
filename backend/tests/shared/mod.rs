@@ -15,6 +15,7 @@ use abacus::{
     },
     election::{CandidateNumber, ElectionDetailsResponse, PGNumber},
 };
+
 use axum::http::{HeaderValue, StatusCode};
 use hyper::header::CONTENT_TYPE;
 use reqwest::{Body, Client, Response};
@@ -195,6 +196,44 @@ async fn check_data_entry_status_is_definitive(
     );
 }
 
+pub async fn create_investigation(addr: &SocketAddr, polling_station_id: u32) -> Response {
+    let url = format!("http://{addr}/api/polling_stations/{polling_station_id}/investigation");
+    let coordinator_cookie = coordinator_login(addr).await;
+    let body = json!({
+        "reason": "Test reason"
+    });
+    reqwest::Client::new()
+        .post(&url)
+        .header("cookie", coordinator_cookie)
+        .header("Content-Type", "application/json")
+        .body(body.to_string())
+        .send()
+        .await
+        .unwrap()
+}
+
+pub async fn update_investigation(
+    addr: &SocketAddr,
+    polling_station_id: u32,
+    body: Option<serde_json::Value>,
+) -> Response {
+    let coordinator_cookie = coordinator_login(addr).await;
+    let body = body.unwrap_or(json!({
+        "reason": "Updated reason",
+        "findings": "updated test findings",
+        "corrected_results": true
+    }));
+    let url = format!("http://{addr}/api/polling_stations/{polling_station_id}/investigation");
+    reqwest::Client::new()
+        .put(&url)
+        .header("cookie", coordinator_cookie)
+        .header("Content-Type", "application/json")
+        .body(body.to_string())
+        .send()
+        .await
+        .unwrap()
+}
+
 pub async fn create_result(addr: &SocketAddr, polling_station_id: u32, election_id: u32) {
     let typist_cookie = typist_login(addr).await;
     complete_data_entry(
@@ -288,7 +327,6 @@ pub async fn get_statuses(
 
     assert_eq!(response.status(), StatusCode::OK);
     let body: ElectionStatusResponse = response.json().await.unwrap();
-    assert!(!body.statuses.is_empty());
     body.statuses
         .into_iter()
         .fold(BTreeMap::new(), |mut acc, entry| {

@@ -8,6 +8,7 @@
   },
   "label": "Status",
   "main_title": "Statusoverzicht steminvoer",
+  "no_investigations_with_corrected_results": "Er zijn nog geen onderzoeken met gecorrigeerde uitslag voor deze zitting.",
   "no_polling_stations": "Er zijn nog geen stembureaus toegevoegd voor deze verkiezing.",
   "pause": "Pauzeren",
   "pause_are_you_sure": "Weet je zeker dat je wilt pauzeren? Invoerders kunnen niet verder werken.",

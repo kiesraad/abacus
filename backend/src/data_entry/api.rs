@@ -902,7 +902,16 @@ async fn election_status(
     Path(election_id): Path<u32>,
 ) -> Result<Json<ElectionStatusResponse>, APIError> {
     let mut conn = pool.acquire().await?;
-    let statuses = crate::data_entry::repository::statuses(&mut conn, election_id).await?;
+
+    let current_committee_session =
+        crate::committee_session::repository::get_election_committee_session(
+            &mut conn,
+            election_id,
+        )
+        .await?;
+
+    let statuses =
+        crate::data_entry::repository::statuses(&mut conn, current_committee_session.id).await?;
     Ok(Json(ElectionStatusResponse { statuses }))
 }
 
@@ -926,6 +935,7 @@ mod tests {
             PoliticalGroupCandidateVotes, PoliticalGroupTotalVotes, VotersCounts, VotesCounts,
             YesNo, repository::insert_test_result, structs::tests::ValidDefault,
         },
+        investigation::insert_test_investigation,
     };
 
     fn example_data_entry() -> DataEntry {
@@ -1980,5 +1990,54 @@ mod tests {
         add_results(&pool, 732, 703, &election.political_groups, false).await;
         let previous_results = claim_previous_results(pool.clone(), 742).await.unwrap();
         assert_eq!(previous_results.voters_counts.poll_card_count, 732);
+    }
+
+    /// First committee session, should return all polling station statuses
+    #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
+    async fn test_statuses_first_session_all_polling_stations(pool: SqlitePool) {
+        let user = User::test_user(Role::Coordinator, 1);
+        let response = election_status(user.clone(), State(pool.clone()), Path(2))
+            .await
+            .into_response();
+
+        assert_eq!(response.status(), StatusCode::OK);
+        let body = response.into_body().collect().await.unwrap().to_bytes();
+        let result: ElectionStatusResponse = serde_json::from_slice(&body).unwrap();
+        assert_eq!(result.statuses.len(), 2);
+    }
+
+    /// Second committee session without investigations, should return no polling station statuses
+    #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_5_with_results"))))]
+    async fn test_statuses_second_session_no_polling_stations(pool: SqlitePool) {
+        let user = User::test_user(Role::Coordinator, 1);
+        let response = election_status(user.clone(), State(pool.clone()), Path(5))
+            .await
+            .into_response();
+
+        assert_eq!(response.status(), StatusCode::OK);
+        let body = response.into_body().collect().await.unwrap().to_bytes();
+        let result: ElectionStatusResponse = serde_json::from_slice(&body).unwrap();
+        assert_eq!(result.statuses.len(), 0);
+    }
+
+    /// Second committee session with 1 investigations, should return 1 polling station status
+    #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_5_with_results"))))]
+    async fn test_statuses_second_session_with_investigation(pool: SqlitePool) {
+        let mut conn = pool.acquire().await.unwrap();
+        let user = User::test_user(Role::Coordinator, 1);
+
+        // Add investigation to polling station in second committee session
+        insert_test_investigation(&mut conn, 9, "Test".into(), Some("Test".into()), Some(true))
+            .await
+            .unwrap();
+
+        let response = election_status(user.clone(), State(pool.clone()), Path(5))
+            .await
+            .into_response();
+
+        assert_eq!(response.status(), StatusCode::OK);
+        let body = response.into_body().collect().await.unwrap().to_bytes();
+        let result: ElectionStatusResponse = serde_json::from_slice(&body).unwrap();
+        assert_eq!(result.statuses.len(), 1);
     }
 }

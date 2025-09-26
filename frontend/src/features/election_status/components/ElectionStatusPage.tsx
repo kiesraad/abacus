@@ -194,6 +194,7 @@ export function ElectionStatusPage() {
 
       <main>
         <ElectionStatus
+          committeeSession={currentCommitteeSession}
           election={election}
           pollingStations={pollingStations}
           statuses={statuses}

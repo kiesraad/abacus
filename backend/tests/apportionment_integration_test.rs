@@ -27,7 +27,7 @@ pub mod shared;
 pub mod utils;
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_4", "users"))))]
-async fn test_election_apportionment_works_for_less_than_19_seats(pool: SqlitePool) {
+async fn test_lt_19_seats(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let coordinator_cookie = shared::coordinator_login(&addr).await;
 
@@ -123,7 +123,7 @@ async fn test_election_apportionment_works_for_less_than_19_seats(pool: SqlitePo
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_5_with_results", "users"))))]
-async fn test_election_apportionment_works_for_19_or_more_seats(pool: SqlitePool) {
+async fn test_gte_19_seats(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let coordinator_cookie: axum::http::HeaderValue = shared::coordinator_login(&addr).await;
 
@@ -206,9 +206,7 @@ async fn test_election_apportionment_works_for_19_or_more_seats(pool: SqlitePool
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("users", "election_5_with_results"))))]
-async fn test_election_apportionment_works_second_committee_session_no_investigations(
-    pool: SqlitePool,
-) {
+async fn test_no_investigations(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let coordinator_cookie: axum::http::HeaderValue = shared::coordinator_login(&addr).await;
 
@@ -230,10 +228,9 @@ async fn test_election_apportionment_works_second_committee_session_no_investiga
     assert_eq!(total_seats, vec![12, 6, 1, 2, 2]);
 }
 
+/// Test that apportionment is not available until data entries are finalised in the second committee session
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("users", "election_5_with_results"))))]
-async fn test_election_apportionment_error_apportionment_not_available_until_data_entries_finalised_second_committee_session(
-    pool: SqlitePool,
-) {
+async fn test_error_second_session_not_finalised(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let coordinator_cookie: axum::http::HeaderValue = shared::coordinator_login(&addr).await;
 
@@ -259,7 +256,7 @@ async fn test_election_apportionment_error_apportionment_not_available_until_dat
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_3", "users"))))]
-async fn test_election_apportionment_error_all_lists_exhausted(pool: SqlitePool) {
+async fn test_error_all_lists_exhausted(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let coordinator_cookie: axum::http::HeaderValue = shared::coordinator_login(&addr).await;
     create_result(&addr, 3, 3).await;
@@ -282,7 +279,7 @@ async fn test_election_apportionment_error_all_lists_exhausted(pool: SqlitePool)
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_3", "users"))))]
-async fn test_election_apportionment_error_drawing_of_lots_not_implemented(pool: SqlitePool) {
+async fn test_error_drawing_of_lots_not_implemented(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let coordinator_cookie = shared::coordinator_login(&addr).await;
     let data_entry = DataEntry {
@@ -345,9 +342,7 @@ async fn test_election_apportionment_error_drawing_of_lots_not_implemented(pool:
     path = "../fixtures",
     scripts("users", "election_6_no_polling_stations")
 )))]
-async fn test_election_apportionment_error_apportionment_not_available_no_polling_stations(
-    pool: SqlitePool,
-) {
+async fn test_error_no_polling_stations(pool: SqlitePool) {
     let addr: std::net::SocketAddr = serve_api(pool).await;
 
     let coordinator_cookie = shared::coordinator_login(&addr).await;
@@ -369,9 +364,7 @@ async fn test_election_apportionment_error_apportionment_not_available_no_pollin
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("users", "election_3"))))]
-async fn test_election_apportionment_error_apportionment_not_available_until_data_entries_finalised(
-    pool: SqlitePool,
-) {
+async fn test_error_not_finalised(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let typist_cookie: axum::http::HeaderValue = shared::typist_login(&addr).await;
     let coordinator_cookie: axum::http::HeaderValue = shared::coordinator_login(&addr).await;
@@ -397,7 +390,7 @@ async fn test_election_apportionment_error_apportionment_not_available_until_dat
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("users"))))]
-async fn test_election_apportionment_election_not_found(pool: SqlitePool) {
+async fn test_error_invalid_election(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let cookie = shared::coordinator_login(&addr).await;
 

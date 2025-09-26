@@ -33,7 +33,7 @@ export default function useSessionState(client: ApiClient, fetchInitialUser: boo
   // Log out the current user
   const logout = async () => {
     setLoading(true);
-    const path: LOGOUT_REQUEST_PATH = "/api/user/logout";
+    const path: LOGOUT_REQUEST_PATH = "/api/logout";
     const response = await client.postRequest<null>(path);
 
     if (isSuccess(response)) {
@@ -46,7 +46,7 @@ export default function useSessionState(client: ApiClient, fetchInitialUser: boo
 
   // Log in the user with the given credentials
   const login = async (username: string, password: string) => {
-    const requestPath: LOGIN_REQUEST_PATH = "/api/user/login";
+    const requestPath: LOGIN_REQUEST_PATH = "/api/login";
     const requestBody: LOGIN_REQUEST_BODY = { username, password };
     const response = await client.postRequest<LoginResponse>(requestPath, requestBody);
 
@@ -58,7 +58,7 @@ export default function useSessionState(client: ApiClient, fetchInitialUser: boo
   };
 
   const extendSession = async () => {
-    const path: WHOAMI_REQUEST_PATH = "/api/user/whoami";
+    const path: WHOAMI_REQUEST_PATH = "/api/whoami";
     const response = await client.getRequest<LoginResponse>(path);
 
     if (isSuccess(response)) {
@@ -74,7 +74,7 @@ export default function useSessionState(client: ApiClient, fetchInitialUser: boo
       const abortController = new AbortController();
 
       void (async () => {
-        const path: WHOAMI_REQUEST_PATH = "/api/user/whoami";
+        const path: WHOAMI_REQUEST_PATH = "/api/whoami";
         const response = await client.getRequest<LoginResponse>(path, abortController);
 
         if (!abortController.signal.aborted) {

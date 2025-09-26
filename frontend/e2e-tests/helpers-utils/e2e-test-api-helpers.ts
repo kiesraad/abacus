@@ -10,7 +10,7 @@ export function getTestPassword(username: string, prefix = ""): string {
 
 export async function loginAs(request: APIRequestContext, username: string, passwordPrefix = "") {
   const password = getTestPassword(username, passwordPrefix);
-  return await request.post("/api/user/login", {
+  return await request.post("/api/login", {
     data: {
       username,
       password,

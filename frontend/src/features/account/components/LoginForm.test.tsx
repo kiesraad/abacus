@@ -17,7 +17,7 @@ describe("LoginForm", () => {
     vi.spyOn(ReactRouter, "useNavigate").mockImplementation(() => navigate);
   });
 
-  const loginUrl: LOGIN_REQUEST_PATH = "/api/user/login";
+  const loginUrl: LOGIN_REQUEST_PATH = "/api/login";
 
   test("Successful login", async () => {
     server.use(LoginHandler, InitialisedHandler);

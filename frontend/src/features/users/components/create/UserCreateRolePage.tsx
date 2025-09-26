@@ -1,4 +1,4 @@
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 
 import { PageTitle } from "@/components/page_title/PageTitle";
@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/Button/Button";
 import { ChoiceList } from "@/components/ui/CheckboxAndRadio/ChoiceList";
 import { Form } from "@/components/ui/Form/Form";
 import { FormLayout } from "@/components/ui/Form/FormLayout";
+import { useUser } from "@/hooks/user/useUser";
 import { t } from "@/i18n/translate";
 import { Role } from "@/types/generated/openapi";
 import { StringFormData } from "@/utils/stringFormData";
@@ -16,6 +17,19 @@ export function UserCreateRolePage() {
   const navigate = useNavigate();
   const [error, setError] = useState<string>("");
   const { role, setRole, setType } = useUserCreateContext();
+  const user = useUser();
+
+  // If the user is not an administrator, set the role to "typist" and navigate to the type page
+  useEffect(() => {
+    if (user?.role === "coordinator") {
+      setRole("typist");
+      void navigate("/users/create/type");
+    }
+  }, [user, navigate, setRole]);
+
+  if (user?.role !== "administrator") {
+    return null;
+  }
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();

@@ -30,7 +30,7 @@ use crate::{
     committee_session::{CommitteeSession, CommitteeSessionError, status::CommitteeSessionStatus},
     election::{ElectionWithPoliticalGroups, PoliticalGroup},
     error::{ErrorReference, ErrorResponse},
-    investigation::repository::get_polling_station_investigation,
+    investigation::get_polling_station_investigation,
     polling_station::PollingStation,
 };
 
@@ -1357,6 +1357,17 @@ mod tests {
             .await
             .unwrap();
 
+        // Insert investigation for the new polling station
+        insert_test_investigation(
+            &mut conn,
+            new_ps.id,
+            "Test".into(),
+            Some("Test".into()),
+            Some(true),
+        )
+        .await
+        .unwrap();
+
         // Claim the same polling station again
         let response = claim(pool.clone(), new_ps.id, EntryNumber::FirstEntry).await;
         assert_eq!(response.status(), StatusCode::OK);
@@ -1995,6 +2006,17 @@ mod tests {
     /// No previous results, should return none
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_7_four_sessions"))))]
     async fn test_previous_results_none(pool: SqlitePool) {
+        // Add investigation with corrected_results to be able to claim the polling station
+        insert_test_investigation(
+            &mut pool.acquire().await.unwrap(),
+            741,
+            "Test".into(),
+            Some("Test".into()),
+            Some(true),
+        )
+        .await
+        .unwrap();
+
         assert!(claim_previous_results(pool.clone(), 741).await.is_none());
     }
 
@@ -2005,6 +2027,18 @@ mod tests {
             .await
             .unwrap();
         add_results(&pool, 711, 701, &election.political_groups, true).await;
+
+        // Add investigation with corrected_results to be able to claim the polling station
+        insert_test_investigation(
+            &mut pool.acquire().await.unwrap(),
+            741,
+            "Test".into(),
+            Some("Test".into()),
+            Some(true),
+        )
+        .await
+        .unwrap();
+
         let previous_results = claim_previous_results(pool.clone(), 741).await.unwrap();
         assert_eq!(previous_results.voters_counts.poll_card_count, 711);
     }
@@ -2017,6 +2051,18 @@ mod tests {
             .unwrap();
         add_results(&pool, 711, 701, &election.political_groups, true).await;
         add_results(&pool, 731, 703, &election.political_groups, false).await;
+
+        // Add investigation with corrected_results to be able to claim the polling station
+        insert_test_investigation(
+            &mut pool.acquire().await.unwrap(),
+            741,
+            "Test".into(),
+            Some("Test".into()),
+            Some(true),
+        )
+        .await
+        .unwrap();
+
         let previous_results = claim_previous_results(pool.clone(), 741).await.unwrap();
         assert_eq!(previous_results.voters_counts.poll_card_count, 731);
     }
@@ -2028,6 +2074,18 @@ mod tests {
             .await
             .unwrap();
         add_results(&pool, 722, 702, &election.political_groups, false).await;
+
+        // Add investigation with corrected_results to be able to claim the polling station
+        insert_test_investigation(
+            &mut pool.acquire().await.unwrap(),
+            742,
+            "Test".into(),
+            Some("Test".into()),
+            Some(true),
+        )
+        .await
+        .unwrap();
+
         let previous_results = claim_previous_results(pool.clone(), 742).await.unwrap();
         assert_eq!(previous_results.voters_counts.poll_card_count, 722);
     }
@@ -2039,6 +2097,18 @@ mod tests {
             .await
             .unwrap();
         add_results(&pool, 732, 703, &election.political_groups, false).await;
+
+        // Add investigation with corrected_results to be able to claim the polling station
+        insert_test_investigation(
+            &mut pool.acquire().await.unwrap(),
+            742,
+            "Test".into(),
+            Some("Test".into()),
+            Some(true),
+        )
+        .await
+        .unwrap();
+
         let previous_results = claim_previous_results(pool.clone(), 742).await.unwrap();
         assert_eq!(previous_results.voters_counts.poll_card_count, 732);
     }

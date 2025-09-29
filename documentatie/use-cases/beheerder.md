@@ -9,7 +9,7 @@ _Niveau:_ hoog-over, wolk, ☁️
 1. [De beheerder installeert de applicatie.](#de-beheerder-installeert-de-applicatie-zee)
 2. De beheerder maakt voor zichzelf een eerste account en wachtwoord aan.
 3. [De beheerder zet de verkiezingen in de applicatie.](#de-beheerder-zet-de-verkiezingen-in-de-applicatie-vis)
-4. De beheerder leest de kandidatenlijst in.
+4. De beheerder leest de kandidatenlijsten in.
 5. [De beheerder leest het bestand met stembureaus en aantal kiesgerechtigden in.](#de-beheerder-leest-het-bestand-met-stembureaus-en-aantal-kiesgerechtigden-in-vis)
 6. De beheerder selecteert het type stemopneming.
 7. De beheerder bevestigt het aantal kiesgerechtigden in de gemeente.
@@ -17,7 +17,7 @@ _Niveau:_ hoog-over, wolk, ☁️
 
 __Uitbreidingen:__  
 
-4a. De applicatie geeft een foutmelding bij het inlezen van de kandidatenlijst:
+4a. De applicatie geeft een foutmelding bij het inlezen van de kandidatenlijsten:
 
 5a. De beheerder slaat het invoeren van stembureaus over:  
 &emsp; 5a1. (na inrichten applicatie) [De beheerder of coördinator zet de stembureaus in de applicatie.](#de-beheerder-of-coördinator-zet-de-stembureaus-in-de-applicatie-zee)
@@ -27,7 +27,7 @@ __Uitbreidingen:__
 
 ### Niet in scope
 
-- Inlezen totalenlijst (kandidatenlijst met adresgegevens). Deze gegevens zijn relevant voor de benoemingsbrieven en de kennisgevingen tot geloofsbrief.
+- Inlezen totalenlijst (kandidatenlijsten met adresgegevens). Deze gegevens zijn relevant voor de benoemingsbrieven en de kennisgevingen tot geloofsbrief.
 
 ## De beheerder installeert de applicatie (zee)
 

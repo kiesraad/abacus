@@ -310,6 +310,8 @@ pub enum ApportionmentError {
     AllListsExhausted,
     ApportionmentNotAvailableUntilDataEntryFinalised,
     DrawingOfLotsNotImplemented,
+    /// Apportionment is not available for this committee role (e.g. GSB or HSB)
+    InvalidCommitteeRole,
     ZeroVotesCast,
 }
 

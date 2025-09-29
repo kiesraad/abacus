@@ -830,6 +830,7 @@ export type ErrorReference =
   | "EntryNotUnique"
   | "Forbidden"
   | "InternalServerError"
+  | "InvalidCommitteeRole"
   | "InvalidCommitteeSessionStatus"
   | "InvalidData"
   | "InvalidHash"

@@ -5769,6 +5769,7 @@
           "EntryNotUnique",
           "Forbidden",
           "InternalServerError",
+          "InvalidCommitteeRole",
           "InvalidCommitteeSessionStatus",
           "InvalidData",
           "InvalidHash",

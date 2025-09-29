@@ -1,22 +1,11 @@
-use axum::{
-    Json,
-    extract::{Path, State},
-};
+use axum::{Json, extract::Path};
 use serde::{Deserialize, Serialize};
-use sqlx::SqlitePool;
 use utoipa::ToSchema;
 use utoipa_axum::{router::OpenApiRouter, routes};
 
-use super::{
-    ApportionmentError, CandidateNominationResult, SeatAssignmentResult, candidate_nomination,
-    get_total_seats_from_apportionment_result, seat_assignment,
-};
+use super::{ApportionmentError, CandidateNominationResult, SeatAssignmentResult};
 use crate::{
-    APIError, AppState, ErrorResponse,
-    audit_log::{AuditEvent, AuditService},
-    authentication::Coordinator,
-    data_entry::status::DataEntryStatusName,
-    summary::ElectionSummary,
+    APIError, AppState, ErrorResponse, authentication::Coordinator, summary::ElectionSummary,
 };
 
 impl From<ApportionmentError> for APIError {
@@ -56,59 +45,8 @@ pub struct ElectionApportionmentResponse {
 )]
 async fn election_apportionment(
     _user: Coordinator,
-    State(pool): State<SqlitePool>,
-    audit_service: AuditService,
-    Path(id): Path<u32>,
+    Path(_id): Path<u32>,
 ) -> Result<Json<ElectionApportionmentResponse>, APIError> {
-    let mut conn = pool.acquire().await?;
-    let election = crate::election::repository::get(&mut conn, id).await?;
-    let current_committee_session =
-        crate::committee_session::repository::get_election_committee_session(
-            &mut conn,
-            election.id,
-        )
-        .await?;
-    let statuses =
-        crate::data_entry::repository::statuses(&mut conn, current_committee_session.id).await?;
-
-    // Committee session must have all data entries as definitive
-    // Or, if this is a next session, no (corrected) data entries
-    if (!statuses.is_empty()
-        && statuses
-            .iter()
-            .all(|s| s.status == DataEntryStatusName::Definitive))
-        || (current_committee_session.number > 1 && statuses.is_empty())
-    {
-        let results = crate::data_entry::repository::list_entries_for_committee_session(
-            &mut conn,
-            current_committee_session.id,
-        )
-        .await?;
-        let election_summary = ElectionSummary::from_results(&election, &results)?;
-        let seat_assignment = seat_assignment(election.number_of_seats, &election_summary)?;
-        let candidate_nomination = candidate_nomination(
-            &election,
-            seat_assignment.quota,
-            &election_summary,
-            get_total_seats_from_apportionment_result(&seat_assignment),
-        )?;
-
-        audit_service
-            .log(
-                &mut conn,
-                &AuditEvent::ApportionmentCreated(election.clone().into()),
-                None,
-            )
-            .await?;
-
-        Ok(Json(ElectionApportionmentResponse {
-            seat_assignment,
-            candidate_nomination,
-            election_summary,
-        }))
-    } else {
-        Err(APIError::Apportionment(
-            ApportionmentError::ApportionmentNotAvailableUntilDataEntryFinalised,
-        ))
-    }
+    // Apportionment is not available for GSB, and we don't have a HSB or CSB version yet.
+    Err(ApportionmentError::InvalidCommitteeRole.into())
 }

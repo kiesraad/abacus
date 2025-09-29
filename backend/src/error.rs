@@ -37,6 +37,7 @@ pub enum ErrorReference {
     EntryNotUnique,
     Forbidden,
     InternalServerError,
+    InvalidCommitteeRole,
     InvalidCommitteeSessionStatus,
     InvalidData,
     InvalidHash,
@@ -358,6 +359,14 @@ impl IntoResponse for APIError {
                         to_error(
                             "Drawing of lots is required",
                             ErrorReference::DrawingOfLotsRequired,
+                            false,
+                        ),
+                    ),
+                    ApportionmentError::InvalidCommitteeRole => (
+                        StatusCode::UNPROCESSABLE_ENTITY,
+                        to_error(
+                            "Invalid committee role",
+                            ErrorReference::InvalidCommitteeRole,
                             false,
                         ),
                     ),

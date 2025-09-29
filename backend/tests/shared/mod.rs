@@ -354,46 +354,6 @@ pub async fn get_statuses(
         })
 }
 
-pub async fn create_investigation(pool: SqlitePool, polling_station_id: u32) -> Response {
-    let addr = serve_api(pool).await;
-    let url = format!("http://{addr}/api/polling_stations/{polling_station_id}/investigation");
-    let coordinator_cookie = coordinator_login(&addr).await;
-    let body = json!({
-        "reason": "Test reason"
-    });
-    Client::new()
-        .post(&url)
-        .header("cookie", coordinator_cookie)
-        .header("Content-Type", "application/json")
-        .body(body.to_string())
-        .send()
-        .await
-        .unwrap()
-}
-
-pub async fn update_investigation(
-    pool: SqlitePool,
-    polling_station_id: u32,
-    body: Option<serde_json::Value>,
-) -> Response {
-    let addr = serve_api(pool).await;
-    let coordinator_cookie = coordinator_login(&addr).await;
-    let body = body.unwrap_or(json!({
-        "reason": "Updated reason",
-        "findings": "updated test findings",
-        "corrected_results": true
-    }));
-    let url = format!("http://{addr}/api/polling_stations/{polling_station_id}/investigation");
-    Client::new()
-        .put(&url)
-        .header("cookie", coordinator_cookie)
-        .header("Content-Type", "application/json")
-        .body(body.to_string())
-        .send()
-        .await
-        .unwrap()
-}
-
 pub async fn conclude_investigation(
     pool: SqlitePool,
     polling_station_id: u32,

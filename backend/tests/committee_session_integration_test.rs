@@ -137,7 +137,7 @@ async fn test_committee_session_delete_ok_status_data_entry_not_started(pool: Sq
     )
     .await;
     assert_eq!(
-        create_investigation(pool.clone(), 9).await.status(),
+        create_investigation(&addr, 9).await.status(),
         StatusCode::OK
     );
     shared::change_status_committee_session(

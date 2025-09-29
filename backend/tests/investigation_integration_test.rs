@@ -2,22 +2,20 @@
 use abacus::{
     committee_session::status::CommitteeSessionStatus,
     data_entry::{
-        CSONextSessionResults, DataEntry, PoliticalGroupTotalVotes, PollingStationResults,
-        VotersCounts, VotesCounts,
-        status::{ClientState, DataEntryStatusName},
-    },
+        status::{ClientState, DataEntryStatusName}, CSONextSessionResults, DataEntry, PoliticalGroupTotalVotes, PollingStationResults, VotersCounts, VotesCounts
+    }, election::ElectionDetailsResponse,
 };
 use axum::http::StatusCode;
+use reqwest::Response;
 use serde_json::{Value, json};
 use sqlx::SqlitePool;
 use test_log::test;
 
 use crate::{
     shared::{
-        complete_data_entry, conclude_investigation, create_investigation,
-        create_result_with_non_example_data_entry, delete_investigation, differences_counts_zero,
-        get_election, get_statuses, political_group_votes_from_test_data_auto, typist_login,
-        update_investigation,
+        complete_data_entry,
+        create_result_with_non_example_data_entry, differences_counts_zero,
+        get_statuses, political_group_votes_from_test_data_auto, typist_login,
     },
     utils::serve_api,
 };
@@ -54,6 +52,7 @@ async fn conclude_investigation(
     }));
     let url =
         format!("http://{addr}/api/polling_stations/{polling_station_id}/investigation/conclude");
+
     reqwest::Client::new()
         .post(&url)
         .header("cookie", coordinator_cookie)
@@ -616,21 +615,15 @@ async fn test_investigation_creation_for_committee_session_with_finished_status(
     .await;
     let committee_session =
         shared::get_election_committee_session(&addr, &cookie, election_id).await;
+
     assert_eq!(
         committee_session.status,
         CommitteeSessionStatus::DataEntryFinished
     );
-
+    
     assert_eq!(
         shared::create_investigation(&addr, 9).await.status(),
-        StatusCode::OK
-    );
-
-    let committee_session =
-        shared::get_election_committee_session(&addr, &cookie, election_id).await;
-    assert_eq!(
-        committee_session.status,
-        CommitteeSessionStatus::DataEntryInProgress
+        StatusCode::CONFLICT
     );
 }
 

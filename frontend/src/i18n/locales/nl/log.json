@@ -27,7 +27,6 @@
     "warning": "Waarschuwing"
   },
   "event": {
-    "ApportionmentCreated": "Zetelverdeling gemaakt",
     "CommitteeSessionCreated": "Zitting aangemaakt",
     "CommitteeSessionDeleted": "Zitting verwijderd",
     "CommitteeSessionUpdated": "Zitting bijgewerkt",

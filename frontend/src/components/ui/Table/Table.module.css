@@ -61,16 +61,6 @@
     text-align: right;
   }
 
-  td.fractionCell {
-    padding-left: 0.5rem;
-    text-align: left;
-    font-size: var(--font-size-xs);
-  }
-  td.fractionCell:empty {
-    width: 0;
-    padding-left: 0;
-  }
-
   tr.rowLink {
     cursor: pointer;
 

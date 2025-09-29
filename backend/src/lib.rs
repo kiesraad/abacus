@@ -26,7 +26,6 @@ use utoipa_axum::router::OpenApiRouter;
 use utoipa_swagger_ui::SwaggerUi;
 
 pub mod airgap;
-pub mod apportionment;
 pub mod audit_log;
 pub mod authentication;
 pub mod committee_session;
@@ -79,7 +78,6 @@ pub fn openapi_router() -> OpenApiRouter<AppState> {
     struct ApiDoc;
 
     OpenApiRouter::with_openapi(ApiDoc::openapi())
-        .merge(apportionment::router())
         .merge(audit_log::router())
         .merge(authentication::router())
         .merge(authentication::user_router())

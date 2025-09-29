@@ -39,9 +39,6 @@ const locations: { pathname: string; userRole: Role }[] = [
   { pathname: "/elections/1/polling-stations", userRole: "coordinator" },
   { pathname: "/elections/1/polling-stations/create", userRole: "coordinator" },
   { pathname: "/elections/1/polling-stations/1/update", userRole: "coordinator" },
-  { pathname: "/elections/1/apportionment", userRole: "coordinator" },
-  { pathname: "/elections/1/apportionment/details-full-seats", userRole: "coordinator" },
-  { pathname: "/elections/1/apportionment/details-residual-seats", userRole: "coordinator" },
 ];
 
 export const AllRoutes: StoryFn = () => (

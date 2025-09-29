@@ -1,6 +1,8 @@
 {
   "add_investigation": "Onderzoek toevoegen",
   "add_investigation_for_each_csb_request": "Voeg voor elk verzoek van het centraal stembureau een onderzoek toe en voer de aanleiding in.",
+  "all_investigations_finished": "Alle onderzoeken zijn afgehandeld",
+  "all_investigations_finished_description": "De resultaten van alle onderzoeken zijn ingevoerd.\nJe kunt de uitslag nu definitief maken en het proces verbaal opmaken.",
   "corrected_results": "Er is een gecorrigeerde uitslag",
   "corrected_results_inserted": "De gecorrigeerde uitslag is ingevoerd",
   "corrected_results_not_yet_inserted": "Laat twee invoerders het corrigendum overnemen in Abacus",

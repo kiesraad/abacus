@@ -1,6 +1,7 @@
 import { IconPlus } from "@/components/generated/icons";
 import { Messages } from "@/components/messages/Messages";
 import { PageTitle } from "@/components/page_title/PageTitle";
+import { Alert } from "@/components/ui/Alert/Alert";
 import { Button } from "@/components/ui/Button/Button";
 import { useElection } from "@/hooks/election/useElection";
 import { useUserRole } from "@/hooks/user/useUserRole";
@@ -15,6 +16,9 @@ export function InvestigationsOverviewPage() {
   const { investigations, currentInvestigations, handledInvestigations } = useInvestigations();
   const { isCoordinator } = useUserRole();
 
+  const allInvestigationsFinished =
+    investigations.length > 0 && investigations.every((inv) => inv.status === "definitive");
+
   return (
     <>
       <PageTitle title={`${t("investigations.title")} - Abacus`} />
@@ -27,6 +31,13 @@ export function InvestigationsOverviewPage() {
           </h1>
         </section>
       </header>
+
+      {allInvestigationsFinished && (
+        <Alert type="success">
+          <strong className="heading-md">{t("investigations.all_investigations_finished")}</strong>
+          <p>{t("investigations.all_investigations_finished_description")}</p>
+        </Alert>
+      )}
 
       <Messages />
 

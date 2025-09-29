@@ -21,6 +21,8 @@ updates:
     groups:
       cargo:
         patterns: ["*"]
+    allow:
+      - dependency-type: all
     ignore:
       # New axum major and minor versions usually have breaking changes, see #790 for axum 0.8
       - dependency-name: "axum"

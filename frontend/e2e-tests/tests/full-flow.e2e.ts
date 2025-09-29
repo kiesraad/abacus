@@ -2,6 +2,7 @@ import { expect } from "@playwright/test";
 import { test } from "e2e-tests/fixtures";
 import { getTestPassword } from "e2e-tests/helpers-utils/e2e-test-api-helpers";
 import {
+  createInvestigation,
   fillDataEntryPagesAndSave,
   uploadCandidatesAndInputHash,
   uploadElectionAndInputHash,
@@ -24,11 +25,8 @@ import { ElectionReport } from "e2e-tests/page-objects/election/ElectionReportPg
 import { ElectionsOverviewPgObj } from "e2e-tests/page-objects/election/ElectionsOverviewPgObj";
 import { ElectionStatus } from "e2e-tests/page-objects/election/ElectionStatusPgObj";
 import { FinishDataEntry } from "e2e-tests/page-objects/election/FinishDataEntryPgObj";
-import { AddInvestigationPgObj } from "e2e-tests/page-objects/investigations/AddInvestigationPgObj";
 import { InvestigationFindingsPgObj } from "e2e-tests/page-objects/investigations/InvestigationFindingsPgObj";
 import { InvestigationOverviewPgObj } from "e2e-tests/page-objects/investigations/InvestigationOverviewPgObj";
-import { InvestigationPrintCorrigendumPgObj } from "e2e-tests/page-objects/investigations/InvestigationPrintCorrigendumPgObj";
-import { InvestigationReasonPgObj } from "e2e-tests/page-objects/investigations/InvestigationReasonPgObj";
 import { CoordinatorNavBarPgObj } from "e2e-tests/page-objects/nav_bar/CoordinatorNavBarPgObj";
 import { PollingStationFormPgObj } from "e2e-tests/page-objects/polling_station/PollingStationFormPgObj";
 import { PollingStationListPgObj } from "e2e-tests/page-objects/polling_station/PollingStationListPgObj";
@@ -209,57 +207,75 @@ test.describe("full flow", () => {
 
     const electionDetailsPage = new ElectionDetailsPgObj(page);
     await electionDetailsPage.newSessionButton.click();
-
     await electionDetailsPage.newSessionModalConfirmButton.click();
-    await electionDetailsPage.investigationsOverviewButton.click();
+  });
 
-    const investigationsOverviewPage = new InvestigationOverviewPgObj(page);
+  for (const station of [
+    { number: "1", name: "Stadhuis", reason: "Reden", findings: "Probleem", correctedResults: true },
+    {
+      number: "2",
+      name: "Basisschool de Regenboog",
+      reason: "Reden",
+      findings: "Geen probleem",
+      correctedResults: false,
+    },
+  ]) {
+    test(`create investigation for ${station.name}`, async ({ page }) => {
+      await page.goto("/account/login");
 
-    // Polling station "Stadhuis"
-    await investigationsOverviewPage.addInvestigationButton.click();
+      const loginPage = new LoginPgObj(page);
+      await loginPage.login("coordinator1", getTestPassword("coordinator1"));
 
-    const addInvestigationPage = new AddInvestigationPgObj(page);
-    await addInvestigationPage.selectPollingStation("Stadhuis");
+      const overviewPage = new ElectionsOverviewPgObj(page);
+      await expect(overviewPage.header).toBeVisible();
+      await overviewPage.findElectionRowById(electionId!).click();
 
-    const investionReasonPage = new InvestigationReasonPgObj(page);
-    await expect(investionReasonPage.header).toBeVisible();
-    await investionReasonPage.reasonField.fill("Reden");
-    await investionReasonPage.nextButton.click();
+      await createInvestigation(page, station.name, station.reason);
+    });
 
-    const investigationPrintCorrigendumPage = new InvestigationPrintCorrigendumPgObj(page);
-    await expect(investigationPrintCorrigendumPage.header).toBeVisible();
-    await investigationPrintCorrigendumPage.continueButton.click();
+    test(`finish investigation for ${station.name}`, async ({ page }) => {
+      await page.goto("/account/login");
 
-    const investigationsFindingsPage = new InvestigationFindingsPgObj(page);
-    await expect(investigationsFindingsPage.header).toBeVisible();
-    await investigationsFindingsPage.findingsField.fill("Probleem");
-    await investigationsFindingsPage.correctedResultsYes.check();
-    await investigationsFindingsPage.save.click();
+      const loginPage = new LoginPgObj(page);
+      await loginPage.login("coordinator1", getTestPassword("coordinator1"));
 
-    // Polling station "de Regenboog"
-    await investigationsOverviewPage.addInvestigationButton.click();
+      const overviewPage = new ElectionsOverviewPgObj(page);
+      await expect(overviewPage.header).toBeVisible();
+      await overviewPage.findElectionRowById(electionId!).click();
 
-    await addInvestigationPage.selectPollingStation("Basisschool de Regenboog");
+      const electionDetailsPage = new ElectionDetailsPgObj(page);
+      await expect(electionDetailsPage.header).toContainText("Gemeenteraad Test 2022");
+      await electionDetailsPage.investigationsOverviewButton.click();
 
-    await expect(investionReasonPage.header).toBeVisible();
-    await investionReasonPage.reasonField.fill("Reden");
-    await investionReasonPage.nextButton.click();
+      const investigationsOverviewPage = new InvestigationOverviewPgObj(page);
+      await expect(investigationsOverviewPage.header).toContainText("Onderzoeken in tweede zitting");
+      await investigationsOverviewPage.findInvestigationEditLinkByPollingStation(station.number).click();
 
-    await expect(investigationPrintCorrigendumPage.header).toBeVisible();
-    await investigationPrintCorrigendumPage.continueButton.click();
+      const investigationsFindingsPage = new InvestigationFindingsPgObj(page);
+      await expect(investigationsFindingsPage.header).toBeVisible();
+      await investigationsFindingsPage.findingsField.fill(station.findings);
+      await investigationsFindingsPage.setCorrectedResults(station.correctedResults);
+      await investigationsFindingsPage.save.click();
 
-    await expect(investigationsFindingsPage.header).toBeVisible();
-    await investigationsFindingsPage.findingsField.fill("Geen probleem");
-    await investigationsFindingsPage.correctedResultsNo.check();
-    await investigationsFindingsPage.save.click();
+      const navBar = new CoordinatorNavBarPgObj(page);
+      await navBar.menuButton.click();
+      await navBar.electionsButton.click();
 
-    const navBar = new CoordinatorNavBarPgObj(page);
-    await navBar.menuButton.click();
-    await navBar.electionsButton.click();
+      await expect(overviewPage.header).toBeVisible();
+    });
+  }
 
+  test("start data entry of corrected results", async ({ page }) => {
+    await page.goto("/account/login");
+
+    const loginPage = new LoginPgObj(page);
+    await loginPage.login("coordinator1", getTestPassword("coordinator1"));
+
+    const overviewPage = new ElectionsOverviewPgObj(page);
     await expect(overviewPage.header).toBeVisible();
     await overviewPage.findElectionRowById(electionId!).click();
 
+    const electionDetailsPage = new ElectionDetailsPgObj(page);
     await electionDetailsPage.startDataEntryButton.click();
   });
 

@@ -13,6 +13,11 @@ import { CheckPollingStationDefinitionPgObj } from "e2e-tests/page-objects/elect
 import { UploadCandidateDefinitionPgObj } from "e2e-tests/page-objects/election/create/UploadCandidateDefinitionPgObj";
 import { UploadElectionDefinitionPgObj } from "e2e-tests/page-objects/election/create/UploadElectionDefinitionPgObj";
 import { UploadPollingStationDefinitionPgObj } from "e2e-tests/page-objects/election/create/UploadPollingStationDefinitionPgObj";
+import { ElectionDetailsPgObj } from "e2e-tests/page-objects/election/ElectionDetailsPgObj";
+import { AddInvestigationPgObj } from "e2e-tests/page-objects/investigations/AddInvestigationPgObj";
+import { InvestigationOverviewPgObj } from "e2e-tests/page-objects/investigations/InvestigationOverviewPgObj";
+import { InvestigationPrintCorrigendumPgObj } from "e2e-tests/page-objects/investigations/InvestigationPrintCorrigendumPgObj";
+import { InvestigationReasonPgObj } from "e2e-tests/page-objects/investigations/InvestigationReasonPgObj";
 
 import { PollingStationResults } from "@/types/generated/openapi";
 
@@ -106,4 +111,24 @@ export async function uploadPollingStations(page: Page, eml = eml110b) {
   const checkDefinitionPage = new CheckPollingStationDefinitionPgObj(page);
   await expect(checkDefinitionPage.header).toBeVisible();
   await checkDefinitionPage.next.click();
+}
+
+export async function createInvestigation(page: Page, pollingStation: string, reason: string) {
+  const electionDetailsPage = new ElectionDetailsPgObj(page);
+  await electionDetailsPage.investigationsOverviewButton.click();
+  const investigationsOverviewPage = new InvestigationOverviewPgObj(page);
+  await investigationsOverviewPage.addInvestigationButton.click();
+  const addInvestigationPage = new AddInvestigationPgObj(page);
+  await addInvestigationPage.selectPollingStation(pollingStation);
+  const investionReasonPage = new InvestigationReasonPgObj(page);
+  await expect(investionReasonPage.header).toBeVisible();
+  await investionReasonPage.reasonField.fill(reason);
+  await investionReasonPage.nextButton.click();
+  const investigationPrintCorrigendumPage = new InvestigationPrintCorrigendumPgObj(page);
+  await expect(investigationPrintCorrigendumPage.header).toBeVisible();
+}
+
+export async function finishInvestigation() {
+  // This function is a placeholder for future implementation.
+  // It should contain the steps to finish an investigation.
 }

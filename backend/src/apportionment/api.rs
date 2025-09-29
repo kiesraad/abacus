@@ -68,11 +68,16 @@ async fn election_apportionment(
             election.id,
         )
         .await?;
-    let statuses = crate::data_entry::repository::statuses(&mut conn, id).await?;
-    if !statuses.is_empty()
+    let statuses =
+        crate::data_entry::repository::statuses(&mut conn, current_committee_session.id).await?;
+
+    // Committee session must have all data entries as definitive
+    // Or, if this is a next session, no (corrected) data entries
+    if (!statuses.is_empty()
         && statuses
             .iter()
-            .all(|s| s.status == DataEntryStatusName::Definitive)
+            .all(|s| s.status == DataEntryStatusName::Definitive))
+        || (current_committee_session.number > 1 && statuses.is_empty())
     {
         let results = crate::data_entry::repository::list_entries_for_committee_session(
             &mut conn,

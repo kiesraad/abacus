@@ -157,7 +157,7 @@ async function uploadCandidateDefinition(file: File) {
   overrideOnce("post", "/api/elections/import/validate", 200, electionValidateResponse(newElectionMockData));
 
   // Wait for the candidate page to be loaded
-  expect(await screen.findByRole("heading", { level: 2, name: "Importeer kandidatenlijst" })).toBeVisible();
+  expect(await screen.findByRole("heading", { level: 2, name: "Importeer kandidatenlijsten" })).toBeVisible();
   const input = await screen.findByLabelText("Bestand kiezen");
   expect(input).toBeVisible();
   expect(await screen.findByLabelText("Geen bestand gekozen")).toBeVisible();
@@ -199,7 +199,7 @@ async function inputCandidateHash() {
   expect(screen.getByText("2")).toHaveRole("mark");
 
   // Click somewhere arbitrary and expect no highlights
-  await user.click(screen.getByText("Controleer kandidatenlijst"));
+  await user.click(screen.getByText("Controleer kandidatenlijsten"));
   expect(screen.getByText("1")).not.toHaveRole("mark");
   expect(screen.getByText("2")).not.toHaveRole("mark");
   await user.type(inputPart2, "gfsd");
@@ -322,7 +322,7 @@ describe("Election create pages", () => {
     await setPollingStationRole();
 
     // Expect to see the next page
-    expect(await screen.findByRole("heading", { level: 2, name: "Importeer kandidatenlijst" })).toBeVisible();
+    expect(await screen.findByRole("heading", { level: 2, name: "Importeer kandidatenlijsten" })).toBeVisible();
     const candidateInput = await screen.findByLabelText("Bestand kiezen");
     expect(candidateInput).toBeVisible();
     expect(await screen.findByLabelText("Geen bestand gekozen")).toBeVisible();
@@ -339,7 +339,7 @@ describe("Election create pages", () => {
     // Expect error message, file name should be shown
     expect(screen.queryByLabelText("Geen bestand gekozen")).not.toBeInTheDocument();
     expect(screen.getAllByText(filename).length).toBe(2);
-    expect(screen.getByText("Ongeldige kandidatenlijst")).toBeInTheDocument();
+    expect(screen.getByText("Ongeldige kandidatenlijsten")).toBeInTheDocument();
   });
 
   test("It shows an error when uploading too large candidate list file", async () => {
@@ -353,7 +353,7 @@ describe("Election create pages", () => {
     await inputElectionHash();
     await setPollingStationRole();
 
-    expect(await screen.findByRole("heading", { level: 2, name: "Importeer kandidatenlijst" })).toBeVisible();
+    expect(await screen.findByRole("heading", { level: 2, name: "Importeer kandidatenlijsten" })).toBeVisible();
 
     overrideOnce("post", "/api/elections/import/validate", 413, {
       error: "12",
@@ -385,7 +385,7 @@ describe("Election create pages", () => {
     await setPollingStationRole();
 
     // Wait for the candidate page to be loaded
-    expect(await screen.findByRole("heading", { level: 2, name: "Importeer kandidatenlijst" })).toBeVisible();
+    expect(await screen.findByRole("heading", { level: 2, name: "Importeer kandidatenlijsten" })).toBeVisible();
     const input = await screen.findByLabelText("Bestand kiezen");
     expect(input).toBeVisible();
     expect(await screen.findByLabelText("Geen bestand gekozen")).toBeVisible();
@@ -414,7 +414,7 @@ describe("Election create pages", () => {
     await setPollingStationRole();
 
     // Wait for the page to be loaded
-    expect(await screen.findByRole("heading", { level: 2, name: "Importeer kandidatenlijst" })).toBeVisible();
+    expect(await screen.findByRole("heading", { level: 2, name: "Importeer kandidatenlijsten" })).toBeVisible();
     const input = await screen.findByLabelText("Bestand kiezen");
     expect(input).toBeVisible();
     expect(await screen.findByLabelText("Geen bestand gekozen")).toBeVisible();
@@ -442,7 +442,7 @@ describe("Election create pages", () => {
     await setPollingStationRole();
 
     // Wait for the page to be loaded
-    expect(await screen.findByRole("heading", { level: 2, name: "Importeer kandidatenlijst" })).toBeVisible();
+    expect(await screen.findByRole("heading", { level: 2, name: "Importeer kandidatenlijsten" })).toBeVisible();
     const input = await screen.findByLabelText("Bestand kiezen");
     expect(input).toBeVisible();
     expect(await screen.findByLabelText("Geen bestand gekozen")).toBeVisible();
@@ -492,12 +492,12 @@ describe("Election create pages", () => {
     await setPollingStationRole();
 
     // Wait for the page to be loaded
-    expect(await screen.findByRole("heading", { level: 2, name: "Importeer kandidatenlijst" })).toBeVisible();
+    expect(await screen.findByRole("heading", { level: 2, name: "Importeer kandidatenlijsten" })).toBeVisible();
     const input = await screen.findByLabelText("Bestand kiezen");
     expect(input).toBeVisible();
     expect(await screen.findByLabelText("Geen bestand gekozen")).toBeVisible();
     await user.upload(input, file);
-    expect(await screen.findByRole("heading", { level: 2, name: "Controleer kandidatenlijst" })).toBeVisible();
+    expect(await screen.findByRole("heading", { level: 2, name: "Controleer kandidatenlijsten" })).toBeVisible();
 
     // Click the 'Verkiezingen' nav item
     const button = screen.getByText("Verkiezingen");
@@ -511,7 +511,7 @@ describe("Election create pages", () => {
     const closeButton = screen.getByText("Annuleren");
     expect(closeButton).toBeVisible();
     await user.click(closeButton);
-    expect(await screen.findByRole("heading", { level: 2, name: "Controleer kandidatenlijst" })).toBeVisible();
+    expect(await screen.findByRole("heading", { level: 2, name: "Controleer kandidatenlijsten" })).toBeVisible();
   });
 
   test("That the confirmation modal delete button closes the modal", async () => {
@@ -528,12 +528,12 @@ describe("Election create pages", () => {
     await setPollingStationRole();
 
     // Wait for the page to be loaded
-    expect(await screen.findByRole("heading", { level: 2, name: "Importeer kandidatenlijst" })).toBeVisible();
+    expect(await screen.findByRole("heading", { level: 2, name: "Importeer kandidatenlijsten" })).toBeVisible();
     const input = await screen.findByLabelText("Bestand kiezen");
     expect(input).toBeVisible();
     expect(await screen.findByLabelText("Geen bestand gekozen")).toBeVisible();
     await user.upload(input, file);
-    expect(await screen.findByRole("heading", { level: 2, name: "Controleer kandidatenlijst" })).toBeVisible();
+    expect(await screen.findByRole("heading", { level: 2, name: "Controleer kandidatenlijsten" })).toBeVisible();
 
     // Click the 'Verkiezingen' nav item
     const button = screen.getByText("Verkiezingen");
@@ -548,7 +548,7 @@ describe("Election create pages", () => {
     const deleteButton = screen.getByText("Verkiezing niet opslaan");
     expect(deleteButton).toBeVisible();
     await user.click(deleteButton);
-    expect(screen.queryAllByText("Controleer kandidatenlijst").length).toBe(0);
+    expect(screen.queryAllByText("Controleer kandidatenlijsten").length).toBe(0);
   });
 
   test("That the confirmation modal close button closes the modal", async () => {
@@ -565,12 +565,12 @@ describe("Election create pages", () => {
     await setPollingStationRole();
 
     // Wait for the page to be loaded
-    expect(await screen.findByRole("heading", { level: 2, name: "Importeer kandidatenlijst" })).toBeVisible();
+    expect(await screen.findByRole("heading", { level: 2, name: "Importeer kandidatenlijsten" })).toBeVisible();
     const input = await screen.findByLabelText("Bestand kiezen");
     expect(input).toBeVisible();
     expect(await screen.findByLabelText("Geen bestand gekozen")).toBeVisible();
     await user.upload(input, file);
-    expect(await screen.findByRole("heading", { level: 2, name: "Controleer kandidatenlijst" })).toBeVisible();
+    expect(await screen.findByRole("heading", { level: 2, name: "Controleer kandidatenlijsten" })).toBeVisible();
 
     // Click the 'Verkiezingen' nav item
     const button = screen.getByText("Verkiezingen");
@@ -584,7 +584,7 @@ describe("Election create pages", () => {
     const closeButton = screen.getByTitle("Annuleren");
     expect(closeButton).toBeVisible();
     await user.click(closeButton);
-    expect(await screen.findByRole("heading", { level: 2, name: "Controleer kandidatenlijst" })).toBeVisible();
+    expect(await screen.findByRole("heading", { level: 2, name: "Controleer kandidatenlijsten" })).toBeVisible();
   });
 
   test("Shows an error when uploading an invalid polling station list", async () => {

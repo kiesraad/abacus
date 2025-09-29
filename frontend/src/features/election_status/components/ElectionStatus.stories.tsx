@@ -1,10 +1,70 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { expect, fn, within } from "storybook/test";
 
+import { committeeSessionMockData } from "@/testing/api-mocks/CommitteeSessionMockData";
 import { electionMockData } from "@/testing/api-mocks/ElectionMockData";
 import { pollingStationMockData } from "@/testing/api-mocks/PollingStationMockData";
+import { ElectionStatusResponseEntry } from "@/types/generated/openapi";
 
 import { ElectionStatus } from "./ElectionStatus";
+
+const today = new Date();
+today.setHours(10, 20);
+const mockStatuses: ElectionStatusResponseEntry[] = [
+  {
+    polling_station_id: 1,
+    status: "first_entry_not_started",
+  },
+  {
+    polling_station_id: 2,
+    status: "second_entry_not_started",
+    first_entry_user_id: 1,
+    finished_at: today.toISOString(),
+  },
+  {
+    polling_station_id: 3,
+    status: "first_entry_in_progress",
+    first_entry_user_id: 1,
+    first_entry_progress: 60,
+  },
+  {
+    polling_station_id: 4,
+    status: "second_entry_in_progress",
+    first_entry_user_id: 1,
+    second_entry_user_id: 2,
+    first_entry_progress: 100,
+    second_entry_progress: 20,
+  },
+  {
+    polling_station_id: 5,
+    status: "definitive",
+    first_entry_user_id: 1,
+    second_entry_user_id: 2,
+    first_entry_progress: 100,
+    second_entry_progress: 100,
+    finished_at: today.toISOString(),
+  },
+  {
+    polling_station_id: 6,
+    status: "first_entry_in_progress",
+    first_entry_user_id: 1,
+    first_entry_progress: 25,
+  },
+  {
+    polling_station_id: 7,
+    status: "entries_different",
+    first_entry_user_id: 1,
+    second_entry_user_id: 2,
+    first_entry_progress: 100,
+    second_entry_progress: 100,
+  },
+  {
+    polling_station_id: 8,
+    status: "first_entry_has_errors",
+    first_entry_user_id: 1,
+    first_entry_progress: 100,
+  },
+];
 
 interface StoryProps {
   addLinks: boolean;
@@ -13,66 +73,10 @@ interface StoryProps {
 
 export const DefaultElectionStatus: StoryObj<StoryProps> = {
   render: ({ addLinks, navigate }) => {
-    const today = new Date();
-    today.setHours(10, 20);
-
     return (
       <ElectionStatus
-        statuses={[
-          {
-            polling_station_id: 1,
-            status: "first_entry_not_started",
-          },
-          {
-            polling_station_id: 2,
-            status: "second_entry_not_started",
-            first_entry_user_id: 1,
-            finished_at: today.toISOString(),
-          },
-          {
-            polling_station_id: 3,
-            status: "first_entry_in_progress",
-            first_entry_user_id: 1,
-            first_entry_progress: 60,
-          },
-          {
-            polling_station_id: 4,
-            status: "second_entry_in_progress",
-            first_entry_user_id: 1,
-            second_entry_user_id: 2,
-            first_entry_progress: 100,
-            second_entry_progress: 20,
-          },
-          {
-            polling_station_id: 5,
-            status: "definitive",
-            first_entry_user_id: 1,
-            second_entry_user_id: 2,
-            first_entry_progress: 100,
-            second_entry_progress: 100,
-            finished_at: today.toISOString(),
-          },
-          {
-            polling_station_id: 6,
-            status: "first_entry_in_progress",
-            first_entry_user_id: 1,
-            first_entry_progress: 25,
-          },
-          {
-            polling_station_id: 7,
-            status: "entries_different",
-            first_entry_user_id: 1,
-            second_entry_user_id: 2,
-            first_entry_progress: 100,
-            second_entry_progress: 100,
-          },
-          {
-            polling_station_id: 8,
-            status: "first_entry_has_errors",
-            first_entry_user_id: 1,
-            first_entry_progress: 100,
-          },
-        ]}
+        statuses={mockStatuses}
+        committeeSession={committeeSessionMockData}
         election={electionMockData}
         pollingStations={pollingStationMockData}
         addLinks={addLinks}
@@ -81,7 +85,15 @@ export const DefaultElectionStatus: StoryObj<StoryProps> = {
     );
   },
   play: async ({ canvas, step }) => {
-    await expect(await canvas.findByRole("heading", { level: 2, name: "Statusoverzicht steminvoer" })).toBeVisible();
+    await step("Heading", async () => {
+      const heading = canvas.getByTestId("status-heading");
+      const title = within(heading).getByRole("heading", { level: 2, name: "Statusoverzicht steminvoer" });
+      await expect(title).toBeVisible();
+
+      const buttons = within(heading).getAllByRole("button");
+      await expect(buttons.length).toBe(1);
+      await expect(buttons[0]).toHaveTextContent("Stembureaus");
+    });
 
     await step("Progress section", async () => {
       const pollinStationsPerStatus = canvas.getByTestId("polling-stations-per-status");
@@ -177,6 +189,7 @@ export const Empty: StoryObj<StoryProps> = {
     <ElectionStatus
       statuses={[]}
       election={electionMockData}
+      committeeSession={committeeSessionMockData}
       pollingStations={[]}
       addLinks={addLinks}
       navigate={navigate}
@@ -198,6 +211,53 @@ export const Empty: StoryObj<StoryProps> = {
     await expect(items[3]).toHaveTextContent("Eerste invoer klaar (0)");
     await expect(items[4]).toHaveTextContent("Eerste en tweede invoer klaar (0)");
     await expect(items[5]).toHaveTextContent("Werkvoorraad (0)");
+  },
+};
+
+export const NextSession: StoryObj<StoryProps> = {
+  render: ({ addLinks, navigate }) => {
+    const today = new Date();
+    today.setHours(10, 20);
+
+    return (
+      <ElectionStatus
+        statuses={mockStatuses}
+        committeeSession={{ ...committeeSessionMockData, number: 2 }}
+        election={electionMockData}
+        pollingStations={pollingStationMockData}
+        addLinks={addLinks}
+        navigate={navigate}
+      />
+    );
+  },
+  play: async ({ canvas, step }) => {
+    await step("Heading", async () => {
+      const heading = canvas.getByTestId("status-heading");
+      const title = within(heading).getByRole("heading", { level: 2, name: "Statusoverzicht steminvoer" });
+      await expect(title).toBeVisible();
+
+      const buttons = within(heading).getAllByRole("button");
+      await expect(buttons.length).toBe(1);
+      await expect(buttons[0]).toHaveTextContent("Onderzoeken");
+    });
+  },
+};
+
+export const NextSessionEmpty: StoryObj<StoryProps> = {
+  render: ({ addLinks, navigate }) => (
+    <ElectionStatus
+      statuses={[]}
+      election={electionMockData}
+      committeeSession={{ ...committeeSessionMockData, number: 2 }}
+      pollingStations={[]}
+      addLinks={addLinks}
+      navigate={navigate}
+    />
+  ),
+  play: async ({ canvas }) => {
+    await expect(
+      await canvas.findByText("Er zijn nog geen onderzoeken met gecorrigeerde uitslag voor deze zitting."),
+    ).toBeVisible();
   },
 };
 

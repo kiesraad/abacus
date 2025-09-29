@@ -1,7 +1,8 @@
 import { ReactNode } from "react";
 import { RouterProvider } from "react-router";
 
-import { render as rtlRender } from "@testing-library/react";
+import { render as rtlRender, waitFor, within } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { http, HttpResponse } from "msw";
 import { beforeEach, describe, expect, test } from "vitest";
 
@@ -9,10 +10,13 @@ import { ApiProvider } from "@/api/ApiProvider";
 import { ErrorBoundary } from "@/components/error/ErrorBoundary";
 import { ElectionLayout } from "@/components/layout/ElectionLayout";
 import { getElectionMockData } from "@/testing/api-mocks/ElectionMockData";
-import { ElectionStatusRequestHandler } from "@/testing/api-mocks/RequestHandlers";
+import {
+  CommitteeSessionStatusChangeRequestHandler,
+  ElectionStatusRequestHandler,
+} from "@/testing/api-mocks/RequestHandlers";
 import { getRouter, Router } from "@/testing/router";
 import { overrideOnce, server } from "@/testing/server";
-import { screen, setupTestRouter } from "@/testing/test-utils";
+import { screen, setupTestRouter, spyOnHandler } from "@/testing/test-utils";
 import { TestUserProvider } from "@/testing/TestUserProvider";
 import { ElectionDetailsResponse, Role } from "@/types/generated/openapi";
 
@@ -71,7 +75,7 @@ describe("InvestigationsOverviewPage", () => {
   });
 
   test("Renders the correct headings and button", async () => {
-    const electionData = getElectionMockData({}, { id: 2, number: 2, status: "created" }, []);
+    const electionData = getElectionMockData({}, { id: 1, number: 2, status: "created" }, []);
     overrideOnce("get", "/api/elections/1", 200, electionData);
 
     await renderPage("coordinator");
@@ -100,7 +104,7 @@ describe("InvestigationsOverviewPage", () => {
   });
 
   test("Hides the add investigation button when committee session status is finished", async () => {
-    const electionData = getElectionMockData({}, { id: 2, number: 2, status: "data_entry_finished" }, []);
+    const electionData = getElectionMockData({}, { id: 1, number: 1, status: "data_entry_finished" }, []);
     overrideOnce("get", "/api/elections/1", 200, electionData);
 
     await renderPage("coordinator");
@@ -123,6 +127,69 @@ describe("InvestigationsOverviewPage", () => {
     expect(headings[3]).toHaveTextContent("Afgehandelde onderzoeken");
     expect(headings[4]).toHaveTextContent("Testplek");
     expect(headings[5]).toHaveTextContent("Test kerk");
+  });
+
+  test("Shows the finish data entry button when all investigations are handled", async () => {
+    server.use(CommitteeSessionStatusChangeRequestHandler);
+    const electionData = getElectionMockData({}, { id: 1, number: 2, status: "data_entry_in_progress" }, [
+      {
+        polling_station_id: 1,
+        reason: "Test reason 1",
+        findings: "Test findings 1",
+        corrected_results: false,
+      },
+    ]);
+    overrideOnce("get", "/api/elections/1", 200, electionData);
+
+    await renderPage("coordinator");
+
+    const alerts = await screen.findAllByRole("alert");
+    expect(alerts).toHaveLength(1);
+
+    const updateCommitteeSession = spyOnHandler(CommitteeSessionStatusChangeRequestHandler);
+
+    const finishButton = await screen.findByRole("button", { name: "Invoerfase afronden" });
+    expect(finishButton).toBeVisible();
+    finishButton.click();
+
+    await waitFor(() => {
+      expect(updateCommitteeSession).toHaveBeenCalledExactlyOnceWith({
+        status: "data_entry_finished",
+      });
+    });
+  });
+
+  test("Start data entry phase when clicking the fill findings button", async () => {
+    server.use(CommitteeSessionStatusChangeRequestHandler);
+
+    const electionData = getElectionMockData({}, { id: 1, number: 2, status: "data_entry_not_started" }, [
+      {
+        polling_station_id: 1,
+        reason: "Test reason 1",
+      },
+    ]);
+    overrideOnce("get", "/api/elections/1", 200, electionData);
+
+    await renderPage("coordinator");
+
+    const fillInLink = await screen.findByRole("button", { name: "Nu invullen" });
+    expect(fillInLink).toBeInTheDocument();
+    fillInLink.click();
+
+    const modal = await screen.findByTestId("modal-dialog");
+    expect(modal).toHaveTextContent("Invoerfase starten?");
+
+    const updateCommitteeSession = spyOnHandler(CommitteeSessionStatusChangeRequestHandler);
+
+    const user = userEvent.setup();
+    const confirmButton = await within(modal).findByRole("button", { name: "Invoerfase starten" });
+    await user.click(confirmButton);
+
+    await waitFor(() => {
+      expect(updateCommitteeSession).toHaveBeenCalledExactlyOnceWith({
+        status: "data_entry_in_progress",
+      });
+    });
   });
 
   test("Links to the correct pages when editing an investigation or printing the corrigendum", async () => {

@@ -40,7 +40,7 @@ export function InvestigationsOverviewPage() {
     }
   };
 
-  const allInvestigationsHandled = investigations.length === handledInvestigations.length;
+  const allInvestigationsHandled = investigations.length > 0 && investigations.length === handledInvestigations.length;
 
   return (
     <>
@@ -55,7 +55,7 @@ export function InvestigationsOverviewPage() {
         </section>
       </header>
 
-      {allInvestigationsHandled && (
+      {allInvestigationsHandled ? (
         <Alert type="success">
           <strong className="heading-md">{t("investigations.all_investigations_finished")}</strong>
           <p>{t("investigations.all_investigations_finished_description")}</p>
@@ -70,9 +70,9 @@ export function InvestigationsOverviewPage() {
             {t("election.title.finish_data_entry")}
           </Button>
         </Alert>
+      ) : (
+        <Messages />
       )}
-
-      <Messages />
 
       <main>
         <section>

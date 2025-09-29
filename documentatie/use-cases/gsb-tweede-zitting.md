@@ -16,8 +16,8 @@ __Hoofdscenario:__
 5. (gedurende de zitting) Het GSB houdt tijd en locatie bij van de aanwezigheid van elk lid van het GSB.
 6. De coördinator GSB voert de locatie, startdatum en starttijd van de zitting in.
 7. (voor elk verzoek) [Het GSB behandelt een verzoek tot onderzoek/hertelling.](#het-gsb-behandelt-een-verzoek-tot-onderzoekhertelling-vlieger)
-8. [De coördinator GSB maakt de PVs en het EML_NL-bestand aan.](#de-coördinator-gsb-maakt-de-pvs-en-het-eml_nl-bestand-aan-zee)
-9. Het GSB voert de andere onderdelen van het GSB-corrigendum in.
+8. [De coördinator GSB maakt de PVs (P 2a en Na 14-2) en het tellingsbestand (EML 501b).](#de-coördinator-gsb-maakt-de-pvs-p-2a-en-na-14-2-en-het-tellingsbestand-eml-501b-zee)
+9. Het GSB voert de andere onderdelen van de PVs (P 2a en Na 14-2) in.
 10. Het GSB leest de PVs voor: P 2a (Verslag tweede zitting), Na 14-2 (Corrigendum GSB), Na 14-1 versie 2 (DSO, één per SB) of Na 14-2 Bijlage 1 (CSO, één bijlage per SB).
 11. Het GSB ondertekent de PVs.
 12. Het GSB sluit de zitting.
@@ -67,7 +67,7 @@ __Uitbreidingen:__
 1b. De coördinator GSB ontdekt dat een stembureau dat op de vooraf gepubliceerde lijst staat, niet in Abacus is opgenomen:  
 &emsp; 1b1. De coördinator GSB voegt het stembureau toe.  
 &emsp; 1b2. De coördinator GSB voert een verklaring voor de wijziging in.  
-&emsp; 1b3. De applicatie maakt melding op het PV dat het stembureau is toegevoegd.  
+&emsp; 1b3. De applicatie maakt melding op het PV Na 14-2 dat het stembureau is toegevoegd.  
 &emsp; 1b4. Het corrigendum corrigeert het aantal stemmen bij dit stembureau van 0 naar het werkelijke aantal.  
 
 1c. De coördinator GSB ontdekt dat een stembureau ten onrechte is meegenomen in een eerdere zitting:  
@@ -91,11 +91,13 @@ __Hoofdscenario 1:__
 2. De applicatie laat niet toe dat het nummer van het stembureau wordt aangepast.  
 3. De applicatie slaat de gecorrigeerde stembureaugegevens op, alleen voor de huidige zitting.  
 4. De coördinator GSB voert een verklaring voor de wijziging in.  
-5. De applicatie neemt de verklaring op in het PV.  
+5. De applicatie neemt de verklaring op in het PV Na 14-2.  
 
+
+__Uitbreidingen op hoofdscenario 1:__  
 1a. De fout zit in het nummer van het stembureau:  
 &emsp; 1a1. De coördinator GSB voert een vermelding van de fout in de applicatie in.  
-&emsp; 1c2. De applicatie neemt de verklaring op in het PV.  
+&emsp; 1c2. De applicatie neemt de verklaring op in het PV Na 14-2.  
 
 
 __Hoofdscenario 2:__
@@ -115,7 +117,7 @@ __Niveau:__ hoog-over, vlieger, 🪁
 __Hoofdscenario:__  
 
 1. Het GSB voert het onderzoek uit.
-2. Het GSB noteert de bevindingen op het corrigendum.
+2. Het GSB noteert de bevindingen op het corrigendum (DSO: Na 14-1 versie 2, CSO: Na 14-2 Bijlage 1).
 3. Het GSB besluit dat er een hertelling nodig is.
 4. Het GSB stelt een ander resultaat vast in de hertelling.
 5. De coördinator voert de uitkomst van het onderzoek in de applicatie in.
@@ -136,7 +138,7 @@ __Uitbreidingen:__
 &emsp; 6a1. De coördinator GSB pauzeert de invoer.  
 &emsp; 6a2. De applicatie blokkeert verdere invoer.  
 
-## De coördinator GSB maakt de PVs en het EML_NL-bestand aan (zee)
+## De coördinator GSB maakt de PVs (P 2a en Na 14-2) en het tellingsbestand (EML 501b) (zee)
 
 __Niveau:__ gebruikersdoel, zee, 🌊
 
@@ -146,4 +148,4 @@ __Hoofdscenario:__
 
 1. De applicatie stelt vast dat de bevindingen voor alle onderzoeken zijn ingevoerd en dat alle onderzochte stembureaus met gecorrigeerde telresultaten definitieve invoer hebben
 2. De coördinator GSB sluit de invoerfase af
-3. De coördinator GSB genereert de [PVs: P 2a (Verslag volgende zitting) & Na 14-2 (Corrigendum GSB) en het EML_NL-bestand: Telling 510b](./input-output-bestanden.md#gsb).
+3. De coördinator GSB genereert de PVs: P 2a (Verslag volgende zitting) & Na 14-2 (Corrigendum GSB) en het EML_NL-bestand: Telling 510b.

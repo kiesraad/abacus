@@ -184,7 +184,7 @@ pub async fn statuses(
             LEFT JOIN committee_sessions AS c ON c.id = p.committee_session_id
             LEFT JOIN polling_station_data_entries AS de ON de.polling_station_id = p.id
             LEFT JOIN polling_station_investigations AS psi ON psi.polling_station_id = p.id
-            WHERE c.id = $1 AND (c.number = 1 OR psi.corrected_results)
+            WHERE c.id = $1 AND (c.number = 1 OR psi.corrected_results = 1)
         "#,
         committee_session_id
     )

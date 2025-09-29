@@ -52,6 +52,9 @@ pub struct PollingStationInvestigationUpdateRequest {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[schema(nullable = false)]
     pub corrected_results: Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[schema(nullable = false)]
+    pub accept_data_entry_deletion: Option<bool>,
 }
 
 pub struct CurrentSessionPollingStationId(pub u32);

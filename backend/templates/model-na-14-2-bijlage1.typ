@@ -66,9 +66,9 @@ Het totaal van alle getelde geldige stempassen en volmachtbewijzen
 
 #sum(
   with_correction_title: true,
-  empty_letterbox("A", cells: 4, original: input.previous_results.voters_counts.poll_card_count, bold_top_border: true)[Stempassen],
-  empty_letterbox("B", cells: 4, original: input.previous_results.voters_counts.proxy_certificate_count)[Volmachtbewijzen],
-  empty_letterbox("D", cells: 4, original: input.previous_results.voters_counts.total_admitted_voters_count, light: false)[
+  empty_letterbox("A", cells: 4, original_value: input.previous_results.voters_counts.poll_card_count, bold_top_border: true)[Stempassen],
+  empty_letterbox("B", cells: 4, original_value: input.previous_results.voters_counts.proxy_certificate_count)[Volmachtbewijzen],
+  empty_letterbox("D", cells: 4, original_value: input.previous_results.voters_counts.total_admitted_voters_count, light: false)[
     *Totaal toegelaten kiezers (A+B)*
   ]
 )
@@ -89,20 +89,20 @@ ingevuld te worden in de kolom ‘gecorrigeerd'. Onder ‘oorspronkelijk’ staa
         if votes == none {
           return
         }
-        empty_letterbox(cells: 4, original: votes.total, bold_top_border: idx == 0, [E.#list.number])[Totaal lijst #list.number - #list.name]
+        empty_letterbox(cells: 4, original_value: votes.total, bold_top_border: idx == 0, [E.#list.number])[Totaal lijst #list.number - #list.name]
       }),
       empty_letterbox(
         cells: 4,
-        original: input.previous_results.votes_counts.total_votes_candidates_count,
+        original_value: input.previous_results.votes_counts.total_votes_candidates_count,
         "E",
         light: false,
       )[*Totaal stemmen op kandidaten* (tel E.1 t/m E.#input.election.political_groups.last().number op)],
     ),
-    empty_letterbox(cells: 4, original: input.previous_results.votes_counts.blank_votes_count, "F")[Blanco stemmen],
-    empty_letterbox(cells: 4, original: input.previous_results.votes_counts.invalid_votes_count, "G")[Ongeldige stemmen],
+    empty_letterbox(cells: 4, original_value: input.previous_results.votes_counts.blank_votes_count, "F")[Blanco stemmen],
+    empty_letterbox(cells: 4, original_value: input.previous_results.votes_counts.invalid_votes_count, "G")[Ongeldige stemmen],
     empty_letterbox(
       cells: 4,
-      original: input.previous_results.votes_counts.total_votes_cast_count,
+      original_value: input.previous_results.votes_counts.total_votes_cast_count,
       "H",
       light: false,
     )[*Totaal uitgebrachte stemmen (E+F+G)*],
@@ -124,7 +124,7 @@ ingevuld te worden in de kolom ‘gecorrigeerd'. Onder ‘oorspronkelijk’ staa
 #box(width: 500pt, inset: (left: 3em, bottom: 1em))[
     #grid(
       correction_title_grid(correction_width: 6em, input_width: 6em),
-      empty_letterbox(cells: 3, original: input.previous_results.differences_counts.more_ballots_count, light: false, "I")[Aantal méér getelde stemmen (bereken: H _min_ D)],
+      empty_letterbox(cells: 3, original_value: input.previous_results.differences_counts.more_ballots_count, light: false, "I")[Aantal méér getelde stemmen (bereken: H _min_ D)],
     )
 ]
 
@@ -132,7 +132,7 @@ ingevuld te worden in de kolom ‘gecorrigeerd'. Onder ‘oorspronkelijk’ staa
 #box(width: 500pt, inset: (left: 3em, bottom: 1em))[
   #grid(
     correction_title_grid(correction_width: 6em, input_width: 6em),
-    empty_letterbox(cells: 3, original: input.previous_results.differences_counts.fewer_ballots_count, light: false, "J")[Aantal minder getelde stemmen (bereken: D _min_ H)]
+    empty_letterbox(cells: 3, original_value: input.previous_results.differences_counts.fewer_ballots_count, light: false, "J")[Aantal minder getelde stemmen (bereken: D _min_ H)]
   )
 ]
 

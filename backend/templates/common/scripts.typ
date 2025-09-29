@@ -116,29 +116,14 @@
   prefilled_text(fmt-number(value, thousands-sep: thousands-sep, zero: zero))
 }
 
-/// Display a box with a prefixed label and a value
-#let letterbox(letter, value: none, light: true, content) = {
-  let bg = if light { luma(213) } else { black }
-  let fill = if light { black } else { white }
-
-  grid(
-    columns: (8em, 3.5em, 1fr),
-    align: (center, right),
-    inset: 9pt,
-    grid.cell(align: right, stroke: 0.5pt + black, text(number-width: "tabular", fmt-number(value))),
-    grid.cell(stroke: 0.5pt + black, align: center, fill: bg, text(fill: fill, weight: "bold", letter)),
-    grid.cell(align: horizon + left, content),
-  )
-}
-
-#let empty_letterbox(letter, cells: 5, light: true, original: none, corrected: (), bold_top_border: false, wide_cells: false, content) = {
+#let empty_letterbox(letter, cells: 5, light: true, original_value: none, value: none, bold_top_border: false, wide_cells: false, content) = {
   let bg_grey = luma(213)
   let bg = if light { bg_grey } else { black }
   let fill = if light { black } else { white }
   let cell_width = range(0, cells).map(_ => if wide_cells { 8em } else { 2em })
   let total_cell_width = cell_width.sum()
   let additional_width = (3.5em, 1fr)
-  let grid_columns = if original != none {
+  let grid_columns = if original_value != none {
     (total_cell_width,) + cell_width + additional_width
   } else {
     cell_width + additional_width
@@ -149,29 +134,64 @@
     (top: (thickness: 0.5pt, paint: black))
   }
 
+  if cells != 1 and value != none {
+    error("empty_letterbox: 'value' can only be set when 'cells' is 1")
+  }
+
+  // Ignore the value if it is the same as the original value
+  if original_value != none and value != none and value == original_value {
+    value = none
+  }
+
   grid(
     inset: 9pt,
     columns: grid_columns,
     align: (center, right),
     grid.vline(stroke: (thickness: 0.5pt, dash: "solid")),
-    ..cell_if(original != none, (
-      grid.cell(stroke: (rest: 0.5pt + black) + top_border_stroke, align: right, fill: bg_grey, prefilled_number(original)),
+    ..cell_if(original_value != none, (
+      grid.cell(stroke: (rest: 0.5pt + black) + top_border_stroke, align: right, fill: bg_grey, prefilled_number(original_value)),
       grid.vline(stroke: (thickness: 0.5pt, dash: "solid"))
     )),
     ..range(0, cells).enumerate().map(cell => {
       let (index, c) = cell;
       grid.cell(
+        align: right,
         stroke: (
           y: 0.5pt + black,
           x: (paint: black, thickness: 0.5pt, dash: "densely-dotted"),
         ) + top_border_stroke,
-        prefilled_number(corrected.at(index, default: " "))
+        if value != none { prefilled_number(value) } else { " " }
       )
     }),
     grid.vline(stroke: (thickness: 0.5pt, dash: "solid")),
     grid.cell(stroke: (rest: 0.5pt + black) + top_border_stroke, align: center, fill: bg, text(fill: fill, weight: "bold", letter)),
     grid.cell(align: horizon + left, content),
   )
+}
+
+/// Display a box with a prefixed label and a value
+#let letterbox(letter, original_value: none, value: none, light: true, bold_top_border: false, wide_cells: true, content) = {
+  empty_letterbox(
+    letter,
+    cells: 1,
+    light: light,
+    value: value,
+    original_value: original_value,
+    bold_top_border: bold_top_border,
+    wide_cells: wide_cells,
+    content
+  )
+  // let bg = if light { luma(213) } else { black }
+  // let fill = if light { black } else { white }
+
+  // grid(
+  //   columns: (8em, 3.5em, 1fr),
+  //   align: (center, right),
+  //   inset: 9pt,
+  //   grid.cell(align: right, stroke: 0.5pt + black, text(number-width: "tabular", fmt-number(value))),
+  //   grid.cell(stroke: 0.5pt + black, align: center, fill: bg, text(fill: fill, weight: "bold", letter)),
+  //   grid.cell(align: horizon + left, content),
+  // )
 }
 
 #let correction_title_grid(correction_width: 8em, input_width: 8em) = {
@@ -388,6 +408,7 @@
   headers: ("", "", ""),
   title: "",
   total: 0,
+  original_total: 0,
   values: (),
   original_values: (),
   continue_on_next_page: "",
@@ -412,11 +433,10 @@
   // Vote counter
   let votes = 0
 
+  let row_has_values = false;
+
   // Count for the original subtotal column (if rendered)
   let original_subtotal = 0
-
-  // Count for the original total column (if rendered)
-  let original_total = 0
 
   // Max rows per table / column
   let total_rows = values.len()
@@ -447,13 +467,15 @@
         table.hline(stroke: 1pt + black),
         ..while rc < total_rows {
           let c = values.at(rc)
+          if c.votes != none {
+            row_has_values = true
+          }
           votes += c.votes
           let original_votes = 0;
           if with_originals {
             let o = original_values.at(rc)
             original_votes = o.votes;
             original_subtotal += original_votes;
-            original_total += original_votes;
           }
           rc += 1
           column_row += 1
@@ -469,7 +491,7 @@
             if c.votes == none {
               table.cell(inset: 1pt, empty_grid(cells: corrected_cells, paint: luma(213)))
             } else {
-              table.cell(align: right + horizon, text(number-width: "tabular", fmt-number(c.votes)))
+              table.cell(align: right + horizon, text(number-width: "tabular", if not with_originals or original_votes != c.votes { fmt-number(c.votes) } else { " " }))
             },
           )
 
@@ -488,7 +510,7 @@
 
               // Caller defined render of column totals
               if with_originals {
-                column_total(column, votes, original_total)
+                column_total(column, votes, original_subtotal)
               } else {
                 column_total(column, votes)
               }
@@ -497,6 +519,7 @@
               // Reset the votes per column counter
               votes = 0
               column_row = 0
+              row_has_values = false
               if with_originals {
                 original_subtotal = 0
               }
@@ -510,11 +533,12 @@
                 grid.cell(inset: 9pt, align: center)[#column_total #column],
                 ..cell_if(with_originals, grid.cell(inset: 8pt, fill: luma(213), align(right, prefilled_number(original_subtotal)))),
                 grid.vline(stroke: (paint: luma(213), dash: "densely-dotted")),
-                grid.cell(empty_grid(cells: corrected_cells, paint: luma(213)), align: center, inset: 0pt),
+                grid.cell(if row_has_values and (not with_originals or votes != original_subtotal) { grid.cell(inset: 4pt, align(right + horizon, prefilled_number(votes))) } else { empty_grid(cells: corrected_cells, paint: luma(213)) }, align: center, inset: 0pt),
               )
 
               votes = 0
               column_row = 0
+              row_has_values = false
               if with_originals {
                 original_subtotal = 0
               }
@@ -557,7 +581,7 @@
     if total == none {
       grid.cell(stroke: 0.5pt + black, inset: 0pt, empty_grid(cells: 5, thickness: 0.5pt))
     } else {
-      grid.cell(stroke: 0.5pt + black, fmt-number(total, zero: "0"))
+      grid.cell(stroke: 0.5pt + black, if not with_originals or original_total != total { fmt-number(total, zero: "0") } else { " " })
     },
   ))
 

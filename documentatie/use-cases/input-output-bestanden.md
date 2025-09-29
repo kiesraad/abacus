@@ -23,7 +23,7 @@ Het doel is dat Abacus zoveel mogelijk in de documenten invult en er dus zo wein
 - stembureaus (EML_NL 110b)
   - wordt geïmporteerd in Abacus
   - kan ook geëxporteerd worden
-- kandidatenlijst (EML_NL 230b)
+- kandidatenlijsten (EML_NL 230b)
   - wordt geïmporteerd in Abacus
 - totaallijst (EML_NL 230c)
   - niet gebruikt door Abacus

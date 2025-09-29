@@ -17,7 +17,7 @@ De eerste versie van Abacus bevat de functionaliteit voor het GSB bij de Gemeent
 
 - Er is een installatieprogramma/-instructie voor de Abacus-server.
 - Het EML_NL-bestand met de verkiezingsdefinitie voor de betreffende verkiezing kan worden geïmporteerd.
-- Het EML_NL-bestand met de kandidatenlijst voor de betreffende verkiezing kan worden geïmporteerd.
+- Het EML_NL-bestand met de kandidatenlijsten voor de betreffende verkiezing kan worden geïmporteerd.
 - Het EML_NL-bestand met de stembureaus van een gemeente kan worden geïmporteerd.
 - De beheerder kan stembureaus aanmaken, aanpassen, verwijderen.
 - De beheerder kan op basis van de geïmporteerde gegevens lege documenten genereren: [lijst met modeltypes](https://github.com/kiesraad/abacus/blob/main/documentatie/use-cases/input-output-bestanden.md)

@@ -1,3 +1,6 @@
+import { useState } from "react";
+import { useNavigate } from "react-router";
+
 import { Button } from "@/components/ui/Button/Button";
 import { DownloadButton } from "@/components/ui/DownloadButton/DownloadButton";
 import { Form } from "@/components/ui/Form/Form";
@@ -6,12 +9,30 @@ import { Loader } from "@/components/ui/Loader/Loader";
 import { useElection } from "@/hooks/election/useElection";
 import { t, tx } from "@/i18n/translate";
 
+import { StartDataEntryModal } from "../StartDataEntryModal";
+
 interface InvestigationPrintCorrigendumProps {
   pollingStationId: number;
 }
 
 export function InvestigationPrintCorrigendum({ pollingStationId }: InvestigationPrintCorrigendumProps) {
-  const { election, pollingStation } = useElection(pollingStationId);
+  const { election, pollingStation, currentCommitteeSession } = useElection(pollingStationId);
+  const navigate = useNavigate();
+  const [showModal, setShowModal] = useState(false);
+
+  const closeModal = () => {
+    setShowModal(false);
+  };
+
+  const goToFindings = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+
+    if (currentCommitteeSession.status === "data_entry_not_started") {
+      setShowModal(true);
+    } else {
+      void navigate("../findings");
+    }
+  };
 
   if (!pollingStation) {
     return <Loader />;
@@ -59,11 +80,12 @@ export function InvestigationPrintCorrigendum({ pollingStationId }: Investigatio
           <Button.Link size="lg" to={`/elections/${election.id}/investigations`}>
             {t("investigations.print_corrigendum.back_to_all_investigations")}
           </Button.Link>
-          <Button.Link size="lg" variant="secondary" to="../findings">
+          <Button type="button" size="lg" variant="secondary" onClick={goToFindings}>
             {t("investigations.print_corrigendum.continue_to_findings")}
-          </Button.Link>
+          </Button>
         </FormLayout.Controls>
       </FormLayout>
+      {showModal && <StartDataEntryModal onClose={closeModal} to="../findings" />}
     </Form>
   );
 }

@@ -68,7 +68,7 @@ describe("InvestigationPrintCorrigendumPage", () => {
       }),
     ).toBeVisible();
 
-    expect(await screen.findByRole("link", { name: "Verder naar bevindingen" })).toBeVisible();
+    expect(await screen.findByRole("button", { name: "Verder naar bevindingen" })).toBeVisible();
   });
 
   test("Navigates to investigation overview when clicking back", async () => {

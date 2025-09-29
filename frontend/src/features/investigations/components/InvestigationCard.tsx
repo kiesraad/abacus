@@ -1,21 +1,41 @@
-import { Link } from "react-router";
+import { useState } from "react";
+import { Link, useNavigate } from "react-router";
 
 import { IconCheckmark, IconMinus, IconPencil, IconPrinter } from "@/components/generated/icons";
 import { PollingStationNumber } from "@/components/ui/Badge/PollingStationNumber";
+import { Button } from "@/components/ui/Button/Button";
 import { Icon } from "@/components/ui/Icon/Icon";
+import { useElection } from "@/hooks/election/useElection";
 import { useUserRole } from "@/hooks/user/useUserRole";
 import { t } from "@/i18n/translate";
 
 import { PollingStationInvestigationWithStatus } from "../hooks/useInvestigations";
 import cls from "./InvestigationCard.module.css";
+import { StartDataEntryModal } from "./StartDataEntryModal";
 
 interface InvestigationCardProps {
   investigation: PollingStationInvestigationWithStatus;
-  electionId: number;
 }
 
-export function InvestigationCard({ investigation, electionId }: InvestigationCardProps) {
+export function InvestigationCard({ investigation }: InvestigationCardProps) {
   const { isCoordinator } = useUserRole();
+  const { currentCommitteeSession, election } = useElection();
+  const navigate = useNavigate();
+  const [showModal, setShowModal] = useState(false);
+
+  const closeModal = () => {
+    setShowModal(false);
+  };
+
+  const goToFindings = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+
+    if (currentCommitteeSession.status === "data_entry_not_started") {
+      setShowModal(true);
+    } else {
+      void navigate(`./${investigation.pollingStation.id}/findings`);
+    }
+  };
 
   return (
     <div className={cls.card}>
@@ -44,7 +64,9 @@ export function InvestigationCard({ investigation, electionId }: InvestigationCa
         <pre>{investigation.findings}</pre>
       ) : (
         isCoordinator && (
-          <Link to={`./${investigation.pollingStation.id}/findings`}>{t("investigations.findings.fill")}</Link>
+          <Button variant="underlined" onClick={goToFindings}>
+            {t("investigations.findings.fill")}
+          </Button>
         )
       )}
       {investigation.corrected_results !== undefined && (
@@ -62,7 +84,7 @@ export function InvestigationCard({ investigation, electionId }: InvestigationCa
               ) : (
                 <p className={cls.flex}>
                   {t("investigations.corrigendum_data_entry_in_progress")}&nbsp;-&nbsp;
-                  <Link to={`/elections/${electionId}/status`}>{t("view_progress").toLowerCase()}</Link>
+                  <Link to={`/elections/${election.id}/status`}>{t("view_progress").toLowerCase()}</Link>
                 </p>
               )}
             </>
@@ -74,6 +96,7 @@ export function InvestigationCard({ investigation, electionId }: InvestigationCa
           )}
         </>
       )}
+      {showModal && <StartDataEntryModal onClose={closeModal} to={`./${investigation.pollingStation.id}/findings`} />}
     </div>
   );
 }

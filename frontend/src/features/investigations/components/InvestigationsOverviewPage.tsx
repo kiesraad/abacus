@@ -11,7 +11,7 @@ import useInvestigations from "../hooks/useInvestigations";
 import { InvestigationCard } from "./InvestigationCard";
 
 export function InvestigationsOverviewPage() {
-  const { currentCommitteeSession, election } = useElection();
+  const { currentCommitteeSession } = useElection();
   const { investigations, currentInvestigations, handledInvestigations } = useInvestigations();
   const { isCoordinator } = useUserRole();
 
@@ -48,13 +48,13 @@ export function InvestigationsOverviewPage() {
             </nav>
           )}
           {currentInvestigations.map((investigation, index) => (
-            <InvestigationCard investigation={investigation} electionId={election.id} key={index} />
+            <InvestigationCard investigation={investigation} key={index} />
           ))}
           {handledInvestigations.length > 0 && (
             <>
               <h3 className="mb-lg mt-lg">{t("investigations.handled_investigations")}</h3>
               {handledInvestigations.map((investigation, index) => (
-                <InvestigationCard investigation={investigation} electionId={election.id} key={index} />
+                <InvestigationCard investigation={investigation} key={index} />
               ))}
             </>
           )}

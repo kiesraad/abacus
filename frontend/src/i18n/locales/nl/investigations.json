@@ -65,6 +65,9 @@
     "title": "Aanleiding en opdracht",
     "why_investigate_results": "Waarom worden de resultaten van dit stembureau onderzocht? Denk bijvoorbeeld aan een onverklaard telverschil of een bezwaar."
   },
+  "start_data_entry": "Invoerfase starten",
+  "start_data_entry_description": "De bevindingen van het onderzoek mogen pas worden ingevoerd als de zitting officieel is geopend. Is dat het geval? Start dan de invoerfase. Je kunt dan voor alle aangevraagde onderzoeken de bevindingen invoeren.",
+  "start_data_entry_question": "Invoerfase starten?",
   "title": "Onderzoeken",
   "you_cannot_add_another_investigation": "Je hebt voor alle stembureaus al een onderzoek toegevoegd.\nJe kan niet nog een onderzoek toevoegen."
 }

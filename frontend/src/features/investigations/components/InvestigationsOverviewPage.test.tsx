@@ -131,8 +131,8 @@ describe("InvestigationsOverviewPage", () => {
     const printLink = await screen.findByRole("link", { name: "Corrigendum afdrukken" });
     expect(printLink).toHaveAttribute("href", "/elections/1/investigations/3/print-corrigendum");
 
-    const fillInLink = await screen.findByRole("link", { name: "Nu invullen" });
-    expect(fillInLink).toHaveAttribute("href", "/elections/1/investigations/3/findings");
+    const fillInLink = await screen.findByRole("button", { name: "Nu invullen" });
+    expect(fillInLink).toBeInTheDocument();
 
     const editLinks = await screen.findAllByRole("link", { name: "Bewerken" });
 

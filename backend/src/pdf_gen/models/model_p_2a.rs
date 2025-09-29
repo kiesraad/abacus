@@ -20,9 +20,6 @@ pub struct ModelP2aInput {
 
 impl ToPdfFileModel for ModelP2aInput {
     fn to_pdf_file_model(self, file_name: String) -> PdfFileModel {
-        // let p2a = serde_json::to_string(&self).expect("ModelP2aInput should serialize to JSON");
-        // let filename = format!("/tmp/p2a-{}.json", self.hash.replace(" ", "_"));
-        // std::fs::write(filename, p2a).expect("should write p2a json to /tmp");
         PdfFileModel::new(file_name, PdfModel::ModelP2a(Box::new(self)))
     }
 }

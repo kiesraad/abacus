@@ -24,9 +24,6 @@ pub struct ModelNa14_2Input {
 
 impl ToPdfFileModel for ModelNa14_2Input {
     fn to_pdf_file_model(self, file_name: String) -> PdfFileModel {
-        // let p2a = serde_json::to_string(&self).expect("ModelNa14_2Input should serialize to JSON");
-        // let filename = format!("/tmp/na14_2-{}.json", self.hash.replace(" ", "_"));
-        // std::fs::write(filename, p2a).expect("should write na14_2 json to /tmp");
         PdfFileModel::new(file_name, PdfModel::ModelNa14_2(Box::new(self)))
     }
 }

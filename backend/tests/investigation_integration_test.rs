@@ -2,8 +2,11 @@
 use abacus::{
     committee_session::status::CommitteeSessionStatus,
     data_entry::{
-        status::{ClientState, DataEntryStatusName}, CSONextSessionResults, DataEntry, PoliticalGroupTotalVotes, PollingStationResults, VotersCounts, VotesCounts
-    }, election::ElectionDetailsResponse,
+        CSONextSessionResults, DataEntry, PoliticalGroupTotalVotes, PollingStationResults,
+        VotersCounts, VotesCounts,
+        status::{ClientState, DataEntryStatusName},
+    },
+    election::ElectionDetailsResponse,
 };
 use axum::http::StatusCode;
 use reqwest::Response;
@@ -13,8 +16,7 @@ use test_log::test;
 
 use crate::{
     shared::{
-        complete_data_entry,
-        create_result_with_non_example_data_entry, differences_counts_zero,
+        complete_data_entry, create_result_with_non_example_data_entry, differences_counts_zero,
         get_statuses, political_group_votes_from_test_data_auto, typist_login,
     },
     utils::serve_api,
@@ -620,7 +622,7 @@ async fn test_investigation_creation_for_committee_session_with_finished_status(
         committee_session.status,
         CommitteeSessionStatus::DataEntryFinished
     );
-    
+
     assert_eq!(
         shared::create_investigation(&addr, 9).await.status(),
         StatusCode::CONFLICT

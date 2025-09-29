@@ -11,7 +11,10 @@ pub(crate) use self::{
 
 #[cfg(test)]
 pub(crate) use self::{
-    repository::{insert_test_investigation, conclude_polling_station_investigation, create_polling_station_investigation},
+    repository::{
+        conclude_polling_station_investigation, create_polling_station_investigation,
+        insert_test_investigation,
+    },
     structs::{
         PollingStationInvestigationConcludeRequest, PollingStationInvestigationCreateRequest,
     },

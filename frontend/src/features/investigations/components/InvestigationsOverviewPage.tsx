@@ -1,3 +1,7 @@
+import { useNavigate } from "react-router";
+
+import { isSuccess } from "@/api/ApiResult";
+import { useCrud } from "@/api/useCrud";
 import { IconPlus } from "@/components/generated/icons";
 import { Messages } from "@/components/messages/Messages";
 import { PageTitle } from "@/components/page_title/PageTitle";
@@ -6,6 +10,10 @@ import { Button } from "@/components/ui/Button/Button";
 import { useElection } from "@/hooks/election/useElection";
 import { useUserRole } from "@/hooks/user/useUserRole";
 import { t } from "@/i18n/translate";
+import {
+  COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_BODY,
+  COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_PATH,
+} from "@/types/generated/openapi";
 import { committeeSessionLabel } from "@/utils/committeeSession";
 
 import useInvestigations from "../hooks/useInvestigations";
@@ -15,9 +23,24 @@ export function InvestigationsOverviewPage() {
   const { currentCommitteeSession } = useElection();
   const { investigations, currentInvestigations, handledInvestigations } = useInvestigations();
   const { isCoordinator } = useUserRole();
+  const navigate = useNavigate();
+  const url: COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_PATH = `/api/committee_sessions/${currentCommitteeSession.id}/status`;
+  const { update, requestState } = useCrud({ update: url });
 
-  const allInvestigationsFinished =
-    investigations.length > 0 && investigations.every((inv) => inv.status === "definitive");
+  if (requestState.status === "api-error") {
+    throw requestState.error;
+  }
+
+  const finishDataEntry = async () => {
+    const body: COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_BODY = { status: "data_entry_finished" };
+    const result = await update(body);
+
+    if (isSuccess(result)) {
+      void navigate("../");
+    }
+  };
+
+  const allInvestigationsHandled = investigations.length === handledInvestigations.length;
 
   return (
     <>
@@ -32,10 +55,20 @@ export function InvestigationsOverviewPage() {
         </section>
       </header>
 
-      {allInvestigationsFinished && (
+      {allInvestigationsHandled && (
         <Alert type="success">
           <strong className="heading-md">{t("investigations.all_investigations_finished")}</strong>
           <p>{t("investigations.all_investigations_finished_description")}</p>
+          <Button
+            variant="primary"
+            size="sm"
+            onClick={() => {
+              void finishDataEntry();
+            }}
+            disabled={requestState.status === "loading"}
+          >
+            {t("election.title.finish_data_entry")}
+          </Button>
         </Alert>
       )}
 

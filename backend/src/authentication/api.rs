@@ -1,18 +1,18 @@
 use axum::{
-    extract::{Path, State},
+    extract::State,
     response::{AppendHeaders, IntoResponse, Json},
 };
 use axum_extra::{TypedHeader, extract::CookieJar, headers::UserAgent};
 use cookie::{Cookie, SameSite};
 use hyper::StatusCode;
 use serde::{Deserialize, Serialize};
-use sqlx::{Error, SqlitePool};
+use sqlx::SqlitePool;
 use utoipa::ToSchema;
 use utoipa_axum::{router::OpenApiRouter, routes};
 
 use super::{
-    Admin, AdminOrCoordinator, SECURE_COOKIES, SESSION_COOKIE_NAME, SESSION_LIFE_TIME,
-    error::AuthenticationError, role::Role, user::User,
+    SECURE_COOKIES, SESSION_COOKIE_NAME, SESSION_LIFE_TIME, error::AuthenticationError, role::Role,
+    user::User,
 };
 use crate::{
     APIError, AppState, ErrorResponse, SqlitePoolExt,
@@ -20,6 +20,7 @@ use crate::{
         AuditEvent, AuditService, UserDetails, UserLoggedInDetails, UserLoggedOutDetails,
         UserLoginFailedDetails,
     },
+    authentication::CreateUserRequest,
     error::ErrorReference,
 };
 
@@ -38,11 +39,6 @@ pub fn router() -> OpenApiRouter<AppState> {
         .routes(routes!(admin_exists))
         .routes(routes!(account_update))
         .routes(routes!(logout))
-        .routes(routes!(user_list))
-        .routes(routes!(user_create))
-        .routes(routes!(user_get))
-        .routes(routes!(user_update))
-        .routes(routes!(user_delete))
 }
 
 #[derive(Debug, Serialize, Deserialize, ToSchema)]
@@ -98,7 +94,7 @@ pub(super) fn set_default_cookie_properties(cookie: &mut Cookie) {
 /// Login endpoint, authenticates a user and creates a new session + session cookie
 #[utoipa::path(
     post,
-    path = "/api/user/login",
+    path = "/api/login",
     request_body = Credentials,
     responses(
         (status = 200, description = "The logged in user id and user name", body = LoginResponse),
@@ -184,7 +180,7 @@ pub struct AccountUpdateRequest {
 /// Get current logged-in user endpoint
 #[utoipa::path(
   get,
-  path = "/api/user/whoami",
+  path = "/api/whoami",
   responses(
       (status = 200, description = "The current user name and id", body = LoginResponse),
       (status = 401, description = "Invalid user session", body = ErrorResponse),
@@ -240,7 +236,7 @@ async fn create_first_admin(
     }
 
     // Delete any existing admin user
-    let users = super::user::list(&mut tx).await?;
+    let users = super::user::list(&mut tx, None).await?;
     for user in users {
         if user.role() == Role::Administrator {
             super::user::delete(&mut tx, user.id()).await?;
@@ -300,7 +296,7 @@ async fn admin_exists(State(pool): State<SqlitePool>) -> Result<StatusCode, APIE
 /// Update the user's account with a new password and optionally new fullname
 #[utoipa::path(
   put,
-  path = "/api/user/account",
+  path = "/api/account",
   request_body = AccountUpdateRequest,
   responses(
       (status = 200, description = "The logged in user", body = LoginResponse),
@@ -350,7 +346,7 @@ async fn account_update(
 /// Logout endpoint, deletes the session cookie
 #[utoipa::path(
     post,
-    path = "/api/user/logout",
+    path = "/api/logout",
     responses(
         (status = 200, description = "Successful logout, or user was already logged out"),
         (status = 500, description = "Internal server error", body = ErrorResponse),
@@ -411,216 +407,6 @@ async fn logout(
     ))
 }
 
-#[derive(Serialize, Deserialize, ToSchema)]
-#[serde(deny_unknown_fields)]
-pub struct UserListResponse {
-    pub users: Vec<User>,
-}
-
-/// Lists all users
-#[utoipa::path(
-    get,
-    path = "/api/user",
-    responses(
-        (status = 200, description = "User list", body = UserListResponse),
-        (status = 401, description = "Unauthorized", body = ErrorResponse),
-        (status = 403, description = "Forbidden", body = ErrorResponse),
-        (status = 500, description = "Internal server error", body = ErrorResponse),
-    ),
-)]
-async fn user_list(
-    _user: AdminOrCoordinator,
-    State(pool): State<SqlitePool>,
-) -> Result<Json<UserListResponse>, APIError> {
-    let mut conn = pool.acquire().await?;
-    Ok(Json(UserListResponse {
-        users: super::user::list(&mut conn).await?,
-    }))
-}
-
-#[derive(Serialize, Deserialize, ToSchema)]
-#[serde(deny_unknown_fields)]
-pub struct CreateUserRequest {
-    pub username: String,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[schema(nullable = false)]
-    pub fullname: Option<String>,
-    pub temp_password: String,
-    pub role: Role,
-}
-
-#[derive(Serialize, Deserialize, ToSchema)]
-#[serde(deny_unknown_fields)]
-pub struct UpdateUserRequest {
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[schema(nullable = false)]
-    pub fullname: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[schema(nullable = false)]
-    pub temp_password: Option<String>,
-}
-
-/// Create a new user
-#[utoipa::path(
-    post,
-    path = "/api/user",
-    request_body = CreateUserRequest,
-    responses(
-        (status = 201, description = "User created", body = User),
-        (status = 400, description = "Bad request", body = ErrorResponse),
-        (status = 401, description = "Unauthorized", body = ErrorResponse),
-        (status = 403, description = "Forbidden", body = ErrorResponse),
-        (status = 409, description = "Conflict (username already exists)", body = ErrorResponse),
-        (status = 500, description = "Internal server error", body = ErrorResponse),
-    ),
-)]
-pub async fn user_create(
-    _admin: Admin,
-    State(pool): State<SqlitePool>,
-    audit_service: AuditService,
-    Json(create_user_req): Json<CreateUserRequest>,
-) -> Result<(StatusCode, Json<User>), APIError> {
-    let mut tx = pool.begin_immediate().await?;
-    let user = super::user::create(
-        &mut tx,
-        &create_user_req.username,
-        create_user_req.fullname.as_deref(),
-        &create_user_req.temp_password,
-        true,
-        create_user_req.role,
-    )
-    .await?;
-    audit_service
-        .log(&mut tx, &AuditEvent::UserCreated(user.clone().into()), None)
-        .await?;
-    tx.commit().await?;
-
-    Ok((StatusCode::CREATED, Json(user)))
-}
-
-/// Get a user
-#[utoipa::path(
-    get,
-    path = "/api/user/{user_id}",
-    responses(
-        (status = 200, description = "User found", body = User),
-        (status = 401, description = "Unauthorized", body = ErrorResponse),
-        (status = 403, description = "Forbidden", body = ErrorResponse),
-        (status = 404, description = "User not found", body = ErrorResponse),
-        (status = 500, description = "Internal server error", body = ErrorResponse),
-    ),
-    params(
-        ("user_id" = u32, description = "User id"),
-    ),
-)]
-async fn user_get(
-    _user: Admin,
-    State(pool): State<SqlitePool>,
-    Path(user_id): Path<u32>,
-) -> Result<Json<User>, APIError> {
-    let mut conn = pool.acquire().await?;
-    let user = super::user::get_by_id(&mut conn, user_id).await?;
-    Ok(Json(user.ok_or(Error::RowNotFound)?))
-}
-
-/// Update a user
-#[utoipa::path(
-    put,
-    path = "/api/user/{user_id}",
-    request_body = UpdateUserRequest,
-    responses(
-        (status = 200, description = "User updated", body = User),
-        (status = 400, description = "Bad request", body = ErrorResponse),
-        (status = 401, description = "Unauthorized", body = ErrorResponse),
-        (status = 403, description = "Forbidden", body = ErrorResponse),
-        (status = 404, description = "User not found", body = ErrorResponse),
-        (status = 500, description = "Internal server error", body = ErrorResponse),
-    ),
-)]
-pub async fn user_update(
-    _admin: Admin,
-    State(pool): State<SqlitePool>,
-    audit_service: AuditService,
-    Path(user_id): Path<u32>,
-    Json(update_user_req): Json<UpdateUserRequest>,
-) -> Result<Json<User>, APIError> {
-    let mut tx = pool.begin_immediate().await?;
-
-    if let Some(fullname) = update_user_req.fullname {
-        super::user::update_fullname(&mut tx, user_id, &fullname).await?
-    };
-
-    if let Some(temp_password) = update_user_req.temp_password {
-        super::user::set_temporary_password(&mut tx, user_id, &temp_password).await?;
-
-        super::session::delete_user_session(&mut tx, user_id).await?;
-    };
-
-    let user = super::user::get_by_id(&mut tx, user_id)
-        .await?
-        .ok_or(Error::RowNotFound)?;
-
-    audit_service
-        .log(&mut tx, &AuditEvent::UserUpdated(user.clone().into()), None)
-        .await?;
-
-    tx.commit().await?;
-
-    Ok(Json(user))
-}
-
-/// Delete a user
-#[utoipa::path(
-    delete,
-    path = "/api/user/{user_id}",
-    responses(
-        (status = 200, description = "User deleted successfully"),
-        (status = 401, description = "Unauthorized", body = ErrorResponse),
-        (status = 403, description = "Forbidden", body = ErrorResponse),
-        (status = 404, description = "User not found", body = ErrorResponse),
-        (status = 500, description = "Internal server error", body = ErrorResponse),
-    ),
-)]
-async fn user_delete(
-    logged_in_user: Admin,
-    State(pool): State<SqlitePool>,
-    audit_service: AuditService,
-    Path(user_id): Path<u32>,
-) -> Result<StatusCode, APIError> {
-    let mut tx = pool.begin_immediate().await?;
-
-    let Some(user) = super::user::get_by_id(&mut tx, user_id).await? else {
-        return Err(APIError::NotFound(
-            format!("User with id {user_id} not found"),
-            ErrorReference::EntryNotFound,
-        ));
-    };
-
-    // Prevent user from deleting their own account
-    if logged_in_user.0.id() == user_id {
-        return Err(AuthenticationError::OwnAccountCannotBeDeleted.into());
-    }
-
-    let deleted = super::user::delete(&mut tx, user_id).await?;
-
-    if deleted {
-        audit_service
-            .log(&mut tx, &AuditEvent::UserDeleted(user.clone().into()), None)
-            .await?;
-
-        tx.commit().await?;
-
-        Ok(StatusCode::OK)
-    } else {
-        tx.rollback().await?;
-
-        Err(APIError::NotFound(
-            format!("Error deleting user with id {user_id}"),
-            ErrorReference::EntryNotFound,
-        ))
-    }
-}
-
 #[cfg(test)]
 mod tests {
     use axum::{extract::State, response::IntoResponse};
@@ -632,8 +418,8 @@ mod tests {
     use crate::{
         APIError,
         authentication::{
-            Role, SECURE_COOKIES, api::set_default_cookie_properties, error::AuthenticationError,
-            user::update_last_activity_at,
+            CreateUserRequest, Role, SECURE_COOKIES, api::set_default_cookie_properties,
+            error::AuthenticationError, user::update_last_activity_at,
         },
     };
 
@@ -684,7 +470,7 @@ mod tests {
 
     #[test(sqlx::test)]
     async fn test_create_first_admin(pool: SqlitePool) {
-        let create_user_req = super::CreateUserRequest {
+        let create_user_req = CreateUserRequest {
             username: "admin".to_string(),
             fullname: Some("Admin User".to_string()),
             temp_password: "admin_password".to_string(),
@@ -704,7 +490,7 @@ mod tests {
         assert_eq!(user.username(), "admin");
 
         // Create a new user again is allowed as long as the admin has not logged in yet
-        let create_user_req = super::CreateUserRequest {
+        let create_user_req = CreateUserRequest {
             username: "admin2".to_string(),
             fullname: Some("Admin User 2".to_string()),
             temp_password: "admin_password".to_string(),
@@ -726,7 +512,7 @@ mod tests {
         let mut conn = pool.acquire().await.unwrap();
         update_last_activity_at(&mut conn, user.id()).await.unwrap();
 
-        let create_user_req = super::CreateUserRequest {
+        let create_user_req = CreateUserRequest {
             username: "admin2".to_string(),
             fullname: Some("Admin User 3".to_string()),
             temp_password: "admin_password".to_string(),
@@ -750,7 +536,7 @@ mod tests {
         assert!(matches!(response, Err(APIError::NotFound(_, _))));
 
         // Create an admin user
-        let create_user_req = super::CreateUserRequest {
+        let create_user_req = CreateUserRequest {
             username: "admin".to_string(),
             fullname: Some("Admin User".to_string()),
             temp_password: "admin_password".to_string(),

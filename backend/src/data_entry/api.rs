@@ -102,7 +102,7 @@ async fn get_polling_station_election_and_committee_session_id(
 
 pub async fn delete_data_entry_and_result_for_polling_station(
     conn: &mut SqliteConnection,
-    audit_service: AuditService,
+    audit_service: &AuditService,
     polling_station: &PollingStation,
 ) -> Result<(), APIError> {
     if let Some(data_entry) = delete_data_entry(conn, polling_station.id).await? {

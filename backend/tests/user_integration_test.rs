@@ -45,7 +45,7 @@ async fn test_user_last_activity_at_updating(pool: SqlitePool) {
     let typist_cookie = shared::typist_login(&addr).await;
 
     // Call an endpoint using the `FromRequestParts` for `User`
-    let url = format!("http://{addr}/api/user/whoami");
+    let url = format!("http://{addr}/api/whoami");
     let response = reqwest::Client::new()
         .get(&url)
         .header("cookie", &typist_cookie)
@@ -253,10 +253,29 @@ async fn test_user_update_password_invalid(pool: SqlitePool) {
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("users"))))]
+async fn test_user_update_not_found(pool: SqlitePool) {
+    let addr = serve_api(pool).await;
+    let admin_cookie = shared::admin_login(&addr).await;
+    let url = format!("http://{addr}/api/user/9999");
+
+    let response = reqwest::Client::new()
+        .put(&url)
+        .json(&json!({
+            "fullname": "Does Not Exist",
+        }))
+        .header("cookie", &admin_cookie)
+        .send()
+        .await
+        .unwrap();
+
+    assert_eq!(response.status(), StatusCode::NOT_FOUND);
+}
+
+#[test(sqlx::test(fixtures(path = "../fixtures", scripts("users"))))]
 async fn test_user_change_to_same_password_fails(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let typist_cookie = shared::typist_login(&addr).await;
-    let url = format!("http://{addr}/api/user/account");
+    let url = format!("http://{addr}/api/account");
 
     let response = reqwest::Client::new()
         .put(&url)
@@ -335,6 +354,22 @@ async fn test_user_delete(pool: SqlitePool) {
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("users"))))]
+async fn test_user_delete_not_found(pool: SqlitePool) {
+    let addr = serve_api(pool).await;
+    let url = format!("http://{addr}/api/user/9999");
+    let admin_cookie = shared::admin_login(&addr).await;
+
+    let response = reqwest::Client::new()
+        .delete(&url)
+        .header("cookie", admin_cookie)
+        .send()
+        .await
+        .unwrap();
+
+    assert_eq!(response.status(), StatusCode::NOT_FOUND);
+}
+
+#[test(sqlx::test(fixtures(path = "../fixtures", scripts("users"))))]
 async fn test_prevent_delete_own_account(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let admin_cookie = shared::admin_login(&addr).await;
@@ -363,6 +398,198 @@ async fn test_can_delete_logged_in_user(pool: SqlitePool) {
         .await
         .unwrap();
     assert_eq!(response.status(), StatusCode::OK);
+}
+
+#[test(sqlx::test(fixtures(path = "../fixtures", scripts("users"))))]
+async fn test_coordinator_user_listing_only_typists(pool: SqlitePool) {
+    let addr = serve_api(pool).await;
+    let coordinator_cookie = shared::coordinator_login(&addr).await;
+
+    let url = format!("http://{addr}/api/user");
+    let response = reqwest::Client::new()
+        .get(&url)
+        .header("cookie", &coordinator_cookie)
+        .send()
+        .await
+        .unwrap();
+
+    assert_eq!(response.status(), StatusCode::OK);
+
+    let body: UserListResponse = response.json().await.unwrap();
+    assert!(!body.users.is_empty());
+    assert!(
+        body.users
+            .into_iter()
+            .all(|user| user.role() == Role::Typist)
+    );
+}
+
+#[test(sqlx::test(fixtures(path = "../fixtures", scripts("users"))))]
+async fn test_coordinator_can_only_create_typists(pool: SqlitePool) {
+    let addr = serve_api(pool).await;
+    let coordinator_cookie = shared::coordinator_login(&addr).await;
+    let url = format!("http://{addr}/api/user");
+
+    let mut data = json!({
+        "role": "typist",
+        "username": "new_typist",
+        "fullname": "New Typist",
+        "temp_password": "MyLongPassword13"
+    });
+
+    let response = reqwest::Client::new()
+        .post(&url)
+        .json(&data)
+        .header("cookie", &coordinator_cookie)
+        .send()
+        .await
+        .unwrap();
+
+    assert_eq!(response.status(), StatusCode::CREATED);
+
+    let body: Value = response.json().await.unwrap();
+    assert_eq!(body["role"], "typist");
+    assert_eq!(body["username"], "new_typist");
+
+    data["role"] = json!("administrator");
+    let response = reqwest::Client::new()
+        .post(&url)
+        .json(&data)
+        .header("cookie", &coordinator_cookie)
+        .send()
+        .await
+        .unwrap();
+
+    assert_eq!(response.status(), StatusCode::FORBIDDEN);
+
+    data["role"] = json!("coordinator");
+    let response = reqwest::Client::new()
+        .post(&url)
+        .json(&data)
+        .header("cookie", &coordinator_cookie)
+        .send()
+        .await
+        .unwrap();
+
+    assert_eq!(response.status(), StatusCode::FORBIDDEN);
+}
+
+#[test(sqlx::test(fixtures(path = "../fixtures", scripts("users"))))]
+async fn test_coordinator_can_only_get_typists(pool: SqlitePool) {
+    let addr = serve_api(pool).await;
+    let coordinator_cookie = shared::coordinator_login(&addr).await;
+
+    let typist_url = format!("http://{addr}/api/user/5");
+    let response = reqwest::Client::new()
+        .get(&typist_url)
+        .header("cookie", &coordinator_cookie)
+        .send()
+        .await
+        .unwrap();
+
+    assert_eq!(response.status(), StatusCode::OK);
+
+    let body: Value = response.json().await.unwrap();
+    assert_eq!(body["id"], 5);
+    assert_eq!(body["role"], "typist");
+
+    let admin_url = format!("http://{addr}/api/user/1");
+    let response = reqwest::Client::new()
+        .get(&admin_url)
+        .header("cookie", &coordinator_cookie)
+        .send()
+        .await
+        .unwrap();
+
+    assert_eq!(response.status(), StatusCode::FORBIDDEN);
+
+    let coordinator_url = format!("http://{addr}/api/user/3");
+    let response = reqwest::Client::new()
+        .get(&coordinator_url)
+        .header("cookie", &coordinator_cookie)
+        .send()
+        .await
+        .unwrap();
+
+    assert_eq!(response.status(), StatusCode::FORBIDDEN);
+}
+
+#[test(sqlx::test(fixtures(path = "../fixtures", scripts("users"))))]
+async fn test_coordinator_can_only_update_typists(pool: SqlitePool) {
+    let addr = serve_api(pool).await;
+    let coordinator_cookie = shared::coordinator_login(&addr).await;
+
+    let typist_url = format!("http://{addr}/api/user/5");
+    let response = reqwest::Client::new()
+        .put(&typist_url)
+        .json(&json!({"fullname": "Updated Typist"}))
+        .header("cookie", &coordinator_cookie)
+        .send()
+        .await
+        .unwrap();
+
+    assert_eq!(response.status(), StatusCode::OK);
+
+    let body: Value = response.json().await.unwrap();
+    assert_eq!(body["fullname"], "Updated Typist");
+
+    let admin_url = format!("http://{addr}/api/user/1");
+    let response = reqwest::Client::new()
+        .put(&admin_url)
+        .json(&json!({"fullname": "Should Fail"}))
+        .header("cookie", &coordinator_cookie)
+        .send()
+        .await
+        .unwrap();
+
+    assert_eq!(response.status(), StatusCode::FORBIDDEN);
+
+    let coordinator_url = format!("http://{addr}/api/user/3");
+    let response = reqwest::Client::new()
+        .put(&coordinator_url)
+        .json(&json!({"fullname": "Should Fail"}))
+        .header("cookie", &coordinator_cookie)
+        .send()
+        .await
+        .unwrap();
+
+    assert_eq!(response.status(), StatusCode::FORBIDDEN);
+}
+
+#[test(sqlx::test(fixtures(path = "../fixtures", scripts("users"))))]
+async fn test_coordinator_can_only_delete_typists(pool: SqlitePool) {
+    let addr = serve_api(pool).await;
+    let coordinator_cookie = shared::coordinator_login(&addr).await;
+
+    let typist_url = format!("http://{addr}/api/user/5");
+    let response = reqwest::Client::new()
+        .delete(&typist_url)
+        .header("cookie", &coordinator_cookie)
+        .send()
+        .await
+        .unwrap();
+
+    assert_eq!(response.status(), StatusCode::OK);
+
+    let admin_url = format!("http://{addr}/api/user/1");
+    let response = reqwest::Client::new()
+        .delete(&admin_url)
+        .header("cookie", &coordinator_cookie)
+        .send()
+        .await
+        .unwrap();
+
+    assert_eq!(response.status(), StatusCode::FORBIDDEN);
+
+    let coordinator_url = format!("http://{addr}/api/user/3");
+    let response = reqwest::Client::new()
+        .delete(&coordinator_url)
+        .header("cookie", &coordinator_cookie)
+        .send()
+        .await
+        .unwrap();
+
+    assert_eq!(response.status(), StatusCode::FORBIDDEN);
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_1", "users"))))]
@@ -397,7 +624,7 @@ async fn test_cant_do_anything_when_password_needs_change(pool: SqlitePool) {
     let typist_cookie = shared::login(&addr, "typist1", "TotallyValidTempP4ssW0rd").await;
 
     // User sets password
-    let url = format!("http://{addr}/api/user/account");
+    let url = format!("http://{addr}/api/account");
     let response = reqwest::Client::new()
         .put(&url)
         .json(&json!({

@@ -1,5 +1,13 @@
 # Validatieregels en plausibiliteitschecks voor invoer tellingen
 
+## Definities
+
+**[Fout](#validatieregels-geven-fouten)**:
+Een fout wijst op een probleem in het papieren proces-verbaal. Dit probleem moet opgelost worden voordat een tweede invoerder aan de slag gaat. Als een proces-verbaal gecorrigeerd wordt, moet het proces-verbaal twee keer opnieuw ingevoerd worden.
+
+**[Waarschuwing](#plausibiliteitschecks-geven-waarschuwingen)**:
+Een waarschuwing wijst op een opmerkelijke uitslag in het papieren proces-verbaal. Dit moet het GSB verklaren, anders kan dit resulteren in een nieuwe zitting.
+
 ## Validatieregels geven fouten
 
 Validatieregels vragen de gebruiker de invoer extra te controleren. Ze resulteren in een niet-blokkerende foutmelding. De foutmelding wordt getoond als de regel evalueert naar `TRUE`.
@@ -21,7 +29,7 @@ Coördinator
 > - Controleer of de invoer in Abacus goed is overgenomen van het papieren proces-verbaal.
 > - Zit de fout ook in het papieren proces-verbaal? Los de fout dan daar op.
 
-Voor sommige meldingen geldt een specifiek handelingsperspectief. Dit is vermeld met bulletpoints. In dat geval zal het standaard handelingsperspectief niet getoond worden. 
+Voor sommige meldingen geldt een specifiek handelingsperspectief. Dit is vermeld met bulletpoints. In dat geval zal het standaard handelingsperspectief niet getoond worden.
 
 ### Regels voor alle numerieke invoervelden (reeks F.0xx)
 
@@ -74,7 +82,7 @@ Velden markeren: geen (laat alleen foutmelding zien op de pagina)
 > - Geef daarna de invoer terug aan de invoerder zodat deze vraag opnieuw beantwoord kan worden.
 
 Velden markeren: geen (laat alleen foutmelding zien op de pagina)
-[Voorbeeld in Figma](https://www.figma.com/design/zZlFr8tYiRyp4I26sh6eqp/Kiesraad---Abacus-optelsoftware?node-id=10078-124322)  
+[Voorbeeld in Figma](https://www.figma.com/design/zZlFr8tYiRyp4I26sh6eqp/Kiesraad---Abacus-optelsoftware?node-id=10078-124322)
 
 #### DSO | F.152: Over het proces-verbaal: Ongeldige combinatie van antwoorden: `wel corrigendum, geen inlegvel`
 
@@ -85,7 +93,7 @@ Velden markeren: geen (laat alleen foutmelding zien op de pagina)
 > - Zorg dat een correct ingevuld inlegvel wordt toegevoegd.
 > - Geef daarna de invoer terug aan de invoerder zodat deze vraag opnieuw beantwoord kan worden.
 
-Velden markeren: geen (laat alleen foutmelding zien op de pagina)  
+Velden markeren: geen (laat alleen foutmelding zien op de pagina)
 
 #### DSO | F.153: 'Controles en correcties': geen vinkjes bij de eerste twee vragen
 
@@ -95,7 +103,7 @@ Velden markeren: geen (laat alleen foutmelding zien op de pagina)
 > - Zorg dat het inlegvel volledig is ingevuld.
 > - Geef daarna de invoer terug aan de invoerder zodat deze vraag opnieuw beantwoord kan worden.
 
-Velden markeren: geen (laat alleen foutmelding zien op de pagina)  
+Velden markeren: geen (laat alleen foutmelding zien op de pagina)
 
 #### DSO, eerste zitting | F.154: Controles en correcties: Ongeldige set documenten (vraag 'gecorrigeerde telresultaten' = 'nee')
 
@@ -109,7 +117,7 @@ Velden markeren: geen (laat alleen foutmelding zien op de pagina)
 > - Verwijder het corrigendum, of geef op het inlegvel aan dat er wel gecorrigeerde telresultaten zijn.
 > - Geef daarna de invoer terug aan de invoerder.
 
-Velden markeren: geen (laat alleen foutmelding zien op de pagina)  
+Velden markeren: geen (laat alleen foutmelding zien op de pagina)
 
 #### DSO, eerste zitting | F.155: Controles en correcties: Ongeldig antwoord in eerste zitting (vraag 'op verzoek van het CSB' = 'ja')
 
@@ -118,7 +126,7 @@ Velden markeren: geen (laat alleen foutmelding zien op de pagina)
 > Coördinator: **Tijdens de eerste zitting kan er nog geen verzoek van het Centraal Stembureau zijn** (F.155)
 > - Herstel de fout door op papier de juiste optie(s) aan te (laten) vinken.
 
-Velden markeren: geen (laat alleen foutmelding zien op de pagina)  
+Velden markeren: geen (laat alleen foutmelding zien op de pagina)
 
 #### DSO | F.156: Controles en correcties: meer dan 1 antwoord op vraag 'zijn er gecorrigeerde telresultaten'
 
@@ -127,20 +135,20 @@ Velden markeren: geen (laat alleen foutmelding zien op de pagina)
 > Coördinator: **Er mag maar 1 antwoord per vraag worden gegeven** (F.156)
 > - Herstel de fout door op papier de juiste optie(s) aan te (laten) vinken.
 
-Velden markeren: geen (laat alleen foutmelding zien op de pagina)  
+Velden markeren: geen (laat alleen foutmelding zien op de pagina)
 
 ### Regels voor totalen (reeks F.2xx)
 
 #### CSO en DSO | F.201: `stempassen + volmachten <> totaal toegelaten kiezers`
 
-> Invoerder: **Controleer je antwoorden** (F.201)  
+> Invoerder: **Controleer je antwoorden** (F.201)
 
 > Coördinator: **A en B tellen niet op tot D** (F.201)  
 > Controleer in rubriek 3.3 of er een onverklaard verschil opgelost wordt als het juiste getal bij D wordt ingevuld.
 > - Zo ja: herstel op papier de optelfout door bij D het juiste getal in te vullen.
 > - Zo nee: tel de stembiljetten en het aantal toegelaten kiezers opnieuw tot de fout gevonden is, of alles één keer herteld is.
 
-Velden markeren: A, B en D  
+Velden markeren: A, B en D
 
 #### CSO en DSO | F.202: `E.1 t/m E.n tellen niet op naar E`
 
@@ -151,11 +159,11 @@ Velden markeren: A, B en D
 > - Zo ja: herstel op papier de optelfout door bij E en H de juiste getallen in te vullen.
 > - Zo nee: tel de stembiljetten en het aantal toegelaten kiezers opnieuw tot de fout gevonden is, of alles één keer herteld is.
 
-Velden markeren: E.1 t/m E.n en E  
+Velden markeren: E.1 t/m E.n en E
 
 #### CSO en DSO | F.203: `stemmen op kandidaten + blanco stemmen + ongeldige stemmen <> totaal aantal uitgebrachte stemmen`
 
-> Invoerder: **Controleer je antwoorden** (F.203)  
+> Invoerder: **Controleer je antwoorden** (F.203)
 
 > Coördinator: **E, F en G tellen niet op tot H** (F.203)  
 > Controleer in rubriek 3.3 of er een onverklaard verschil opgelost wordt als het juiste getal bij H wordt ingevuld.
@@ -175,7 +183,7 @@ Velden markeren: E, F, G en H
 > - Controleer ook of er een onverklaard verschil ontstaat.
 > - Pas zo nodig rubriek 3.3.2 aan, en volg de instructies over hertellen die daar staan.
 
-Veld markeren: foutmelding op 3.3.1 "Vergelijk D en H"  
+Veld markeren: foutmelding op 3.3.1 "Vergelijk D en H"
 
 #### DSO | F.351 "Vergelijk D&H": (checkbox D=H is aangevinkt, maar D<>H)
 
@@ -186,7 +194,7 @@ Veld markeren: foutmelding op 3.3.1 "Vergelijk D en H"
 > - Controleer ook of er een onverklaard verschil ontstaat.
 > - Pas zo nodig rubriek 2.3.2 aan, en volg de instructies over hertellen die daar staan.
 
-Veld markeren: foutmelding op 2.3.1 "Vergelijk D en H"  
+Veld markeren: foutmelding op 2.3.1 "Vergelijk D en H"
 
 #### CSO | F.302 "Vergelijk D&H": (checkbox H>D is aangevinkt, maar H<=D)
 
@@ -194,7 +202,7 @@ Veld markeren: foutmelding op 2.3.1 "Vergelijk D en H"
 
 > Coördinator: **Het getal dat is ingevuld bij H is niet groter dan D** (F.302)
 
-Veld markeren: foutmelding op 3.3.1 "Vergelijk D en H"  
+Veld markeren: foutmelding op 3.3.1 "Vergelijk D en H"
 
 #### DSO | F.352 "Vergelijk D&H": (checkbox H>D is aangevinkt, maar H<=D)
 
@@ -203,7 +211,7 @@ Veld markeren: foutmelding op 3.3.1 "Vergelijk D en H"
 > Coördinator: **Het getal dat is ingevuld bij H is niet groter dan D** (F.352)
 > - Maak een corrigendum waarin de juiste optie geselecteerd wordt.
 
-Veld markeren: foutmelding op 2.3.1 "Vergelijk D en H"  
+Veld markeren: foutmelding op 2.3.1 "Vergelijk D en H"
 
 #### CSO | F.303 "Vergelijk D&H": (checkbox H<D is aangevinkt, maar H>=D)
 
@@ -211,7 +219,7 @@ Veld markeren: foutmelding op 2.3.1 "Vergelijk D en H"
 
 > Coördinator: **Het getal dat is ingevuld bij H is niet kleiner dan D** (F.303)
 
-Veld markeren: foutmelding op 3.3.1 "Vergelijk D en H"  
+Veld markeren: foutmelding op 3.3.1 "Vergelijk D en H"
 
 #### DSO | F.353 "Vergelijk D&H": (checkbox H<D is aangevinkt, maar H>=D)
 
@@ -220,7 +228,7 @@ Veld markeren: foutmelding op 3.3.1 "Vergelijk D en H"
 > Coördinator: **Het getal dat is ingevuld bij H is niet kleiner dan D** (F.353)
 > - Maak een corrigendum waarin de juiste optie geselecteerd wordt.
 
-Veld markeren: foutmelding op 2.3.1 "Vergelijk D en H"    
+Veld markeren: foutmelding op 2.3.1 "Vergelijk D en H"
 
 #### CSO | F.304 "Vergelijk D&H": Meerdere aangevinkt of geen enkele aangevinkt
 
@@ -239,7 +247,7 @@ Veld markeren: foutmelding op 3.3.1 "Vergelijk D en H"
 > - Zo ja: laat dat dan overnemen in Abacus.
 > - Zo nee: maak een corrigendum waarin de juiste optie geselecteerd wordt.
 
-Veld markeren: foutmelding op 2.3.1 "Vergelijk D en H"  
+Veld markeren: foutmelding op 2.3.1 "Vergelijk D en H"
 
 #### CSO | F.305 (Als D = H) I en/of J zijn ingevuld
 > Invoerder: **Controleer je antwoorden** (F.305)
@@ -272,7 +280,7 @@ Veld markeren: I en/of J (als ingevuld)
 > - Controleer ook of het verschil nog volledig verklaard is.
 > - Pas zo nodig rubriek 3.3.2 aan, en volg de instructies over hertellen die daar staan.
 
-Veld markeren: I  
+Veld markeren: I
 
 #### DSO | F.356 (Als H > D) `I <> H - D`
 > Invoerder: **Controleer je antwoorden** (F.356)
@@ -283,7 +291,7 @@ Veld markeren: I
 > - Hertel dan de stembiljetten en het aantal toegelaten kiezers. Hertel tot de fout gevonden is, of alles één keer herteld is.
 > - Vul nieuwe telresultaten op het corrigendum in.
 
-Veld markeren: I  
+Veld markeren: I
 
 #### CSO | F.307 (Als H > D) J is ingevuld
 
@@ -294,7 +302,7 @@ Veld markeren: I
 > - Controleer ook of het verschil nog volledig verklaard is.
 > - Pas zo nodig rubriek 3.3.2 aan, en volg de instructies over hertellen die daar staan.
 
-Veld markeren: I, J  
+Veld markeren: I, J
 
 #### DSO | F.357 (Als H > D) J is ingevuld
 > Invoerder: **Controleer je antwoorden** (F.357)
@@ -305,7 +313,7 @@ Veld markeren: I, J
 > - Hertel dan de stembiljetten en het aantal toegelaten kiezers. Hertel tot de fout gevonden is, of alles één keer herteld is.
 > - Vul nieuwe telresultaten op het corrigendum in.
 
-Veld markeren: I, J  
+Veld markeren: I, J
 
 #### CSO | F.308 (Als H < D) `J <> D - H`
 > Invoerder: **Controleer je antwoorden** (F.308)
@@ -315,7 +323,7 @@ Veld markeren: I, J
 > - Controleer ook of het verschil nog volledig verklaard is.
 > - Pas zo nodig rubriek 3.3.2 aan, en volg de instructies over hertellen die daar staan.
 
-Veld markeren: J  
+Veld markeren: J
 
 #### DSO | F.358 (Als H < D) `J <> D - H`
 > Invoerder: **Controleer je antwoorden** (F.358)
@@ -326,7 +334,7 @@ Veld markeren: J
 > - Hertel dan de stembiljetten en het aantal toegelaten kiezers. Hertel tot de fout gevonden is, of alles één keer herteld is.
 > - Vul nieuwe telresultaten op het corrigendum in.
 
-Veld markeren: J  
+Veld markeren: J
 
 #### CSO | F.309 (Als H < D) I is ingevuld
 > Invoerder: **Controleer je antwoorden** (F.309)
@@ -336,7 +344,7 @@ Veld markeren: J
 > - Controleer ook of het verschil nog volledig verklaard is.
 > - Pas zo nodig rubriek 3.3.2 aan, en volg de instructies over hertellen die daar staan.
 
-Veld markeren: I, J  
+Veld markeren: I, J
 
 #### DSO | F.359 (Als H < D) I is ingevuld
 
@@ -348,7 +356,7 @@ Veld markeren: I, J
 > - Hertel dan de stembiljetten en het aantal toegelaten kiezers. Hertel tot de fout gevonden is, of alles één keer herteld is.
 > - Vul nieuwe telresultaten op het corrigendum in.
 
-Veld markeren: I, J  
+Veld markeren: I, J
 
 #### CSO | F.310 (Als D <> H en verklaring voor verschil niks aangevinkt of 'ja' en 'nee' aangevinkt)
 
@@ -356,7 +364,7 @@ Veld markeren: I, J
 
 > Coördinator: **Deze vraag moet precies één antwoord hebben** (F.310)
 
-Veld markeren: foutmelding op 3.3.2  
+Veld markeren: foutmelding op 3.3.2
 
 #### DSO | F.360 (2.3.2 (verklaring voor verschil) = nee en 'vanwege een onverklaard verschil' in stap 'controles en correcties' is niet aangevinkt)
 
@@ -368,11 +376,11 @@ Veld markeren: foutmelding op 3.3.2
 > - Vul nieuwe telresultaten op een corrigendum in.
 > - Is er al herteld? Zorg dan dat het inlegvel 'controles en correcties' wordt ingevuld en toegevoegd aan het proces-verbaal van het stembureau.
 
-Veld markeren: foutmelding op 2.3.2  
+Veld markeren: foutmelding op 2.3.2
 
 ### Regels voor kandidaten en lijsttotalen (reeks F.4xx)
 
-#### CSO | F.401 `Er zijn stemmen op kandidaten, en het totaal aantal stemmen op een lijst = leeg of 0`
+#### CSO | F.401 `Er zijn (stemmen op kandidaten of het lijsttotaal van corresponderende E.x is groter dan 0) en het totaal aantal stemmen op een lijst = leeg of 0`
 > Invoerder: **Controleer het totaal van de lijst. Is dit veld op het papieren proces-verbaal ook leeg? Dan kan je verdergaan** (F.401)
 
 > Coördinator: **Het totaal van de lijst is niet ingevuld** (F.401)  
@@ -381,11 +389,11 @@ Veld markeren: foutmelding op 2.3.2
 > - Zo ja: corrigeer de optelfout op het papieren proces-verbaal.
 > - Zo nee: onderzoek wat er fout is gegaan en tel zo nodig de stembiljetten en het aantal toegelaten kiezers opnieuw. Begin bij deze lijst, en hertel tot de fout gevonden is, of alles één keer herteld is.
 
-Velden markeren: totaal van de lijst 
+Velden markeren: totaal van de lijst
 N.b. anders dan de andere foutmeldingen, tonen we deze foutmelding _bij invoerders_ onderaan de pagina, onder het totaal-veld ([Voorbeeld in Figma](https://www.figma.com/design/zZlFr8tYiRyp4I26sh6eqp/Kiesraad---Abacus-optelsoftware?node-id=6128-28260&t=R2mG7PyAWfHk3c8S-11))  
 Het standaard handelingsperspectief wordt bij deze foutmelding niet getoond.
 
-#### DSO | F.451 `Er zijn stemmen op kandidaten, en het totaal aantal stemmen op een lijst = leeg of 0`
+#### DSO | F.451 `Er zijn (stemmen op kandidaten of het lijsttotaal van corresponderende E.x is groter dan 0) en het totaal aantal stemmen op een lijst = leeg of 0`
 > Invoerder: **Controleer het totaal van de lijst. Is dit veld op het papieren proces-verbaal ook leeg? Dan kan je verdergaan** (F.451)
 
 > Coördinator: **Het totaal van de lijst is niet ingevuld** (F.451)  
@@ -393,11 +401,11 @@ Het standaard handelingsperspectief wordt bij deze foutmelding niet getoond.
 > - Zo ja: maak een corrigendum en corrigeer daarin de optelfout. Corrigeer ook rubriek 2.3 in het corrigendum.
 > - Zo nee: tel de stembiljetten en het aantal toegelaten kiezers opnieuw. Begin bij deze lijst, en hertel tot de fout gevonden is, of alles één keer herteld is.
 
-Velden markeren: totaal van de lijst 
+Velden markeren: totaal van de lijst
 N.b. anders dan de andere foutmeldingen, tonen we deze foutmelding _bij invoerders_ onderaan de pagina, onder het totaal-veld ([Voorbeeld in Figma](https://www.figma.com/design/zZlFr8tYiRyp4I26sh6eqp/Kiesraad---Abacus-optelsoftware?node-id=6128-28260&t=R2mG7PyAWfHk3c8S-11))  
 Het standaard handelingsperspectief wordt bij deze foutmelding niet getoond.
 
-#### CSO | F.402 (Als totaal aantal stemmen op een lijst niet leeg of 0 is) `Totaal aantal stemmen op een lijst <> som van aantal stemmen op de kandidaten van die lijst`
+#### CSO | F.402 (Als F.401 niet getoond wordt) `Totaal aantal stemmen op een lijst <> som van aantal stemmen op de kandidaten van die lijst`
 
 > Invoerder: **Controleer ingevoerde aantallen** (F.402)  
 > De opgetelde stemmen op de kandidaten en het ingevoerde totaal zijn niet gelijk.
@@ -405,13 +413,13 @@ Het standaard handelingsperspectief wordt bij deze foutmelding niet getoond.
 > Coördinator: **De stemmen op kandidaten tellen niet op tot het lijsttotaal** (F.402)  
 > Controleer of het proces-verbaal tijdens het telproces volledig is ingevuld.  
 > Reken de optelling in het papieren proces-verbaal na.  
-> Kijk of het corrigeren van de fout een onverklaard verschil in rubriek 3.3 wegneemt.  
+> Kijk of het corrigeren van de fout een onverklaard verschil in rubriek 3.3 wegneemt.
 > - Zo ja: corrigeer de optelfout op het papieren proces-verbaal.
 > - Zo nee: onderzoek wat er fout is gegaan en tel zo nodig de stembiljetten en het aantal toegelaten kiezers opnieuw. Begin bij deze lijst, en hertel tot de fout gevonden is, of alles één keer herteld is.
 
-Velden markeren: geen (laat alleen foutmelding zien op de pagina) 
+Velden markeren: geen (laat alleen foutmelding zien op de pagina)
 
-#### DSO | F.452 (Als totaal aantal stemmen op een lijst niet leeg of 0 is) `Totaal aantal stemmen op een lijst <> som van aantal stemmen op de kandidaten van die lijst`
+#### DSO | F.452 (Als F.451 niet getoond wordt) `Totaal aantal stemmen op een lijst <> som van aantal stemmen op de kandidaten van die lijst`
 
 > Invoerder: **Controleer ingevoerde aantallen** (F.452)  
 > De opgetelde stemmen op de kandidaten en het ingevoerde totaal zijn niet gelijk.
@@ -424,7 +432,7 @@ Velden markeren: geen (laat alleen foutmelding zien op de pagina)
 
 Velden markeren: geen (laat alleen foutmelding zien op de pagina)
 
-#### CSO | F.403 `totaal aantal stemmen op een lijst komt niet overeen met het lijsttotaal van corresponderende E.x`
+#### CSO | F.403 (Als F.401 niet getoond wordt) `Totaal aantal stemmen op een lijst komt niet overeen met het lijsttotaal van corresponderende E.x`
 
 > Invoerder: **Controleer het totaal van de lijst** (F.403)  
 > Als het totaal overeenkomt met het papieren proces-verbaal, controleer dan ook de waarde bij E.{x} bij [Aantal kiezers en stemmen]().
@@ -433,9 +441,9 @@ Velden markeren: geen (laat alleen foutmelding zien op de pagina)
 > - Controleer wat er fout is gegaan in rubriek 3.2 en herstel de fout.
 > - Pas zo nodig rubriek 3.3.2 aan, en volg de instructies over hertellen die daar staan.
 
-Velden markeren: totaal van de lijst, en E.{x} op Aantal kiezers en stemmen  
+Velden markeren: totaal van de lijst, en E.{x} op Aantal kiezers en stemmen
 
-#### DSO | F.453 `totaal aantal stemmen op een lijst komt niet overeen met het lijsttotaal van corresponderende E.x`
+#### DSO | F.453 (Als F.451 niet getoond wordt) `Totaal aantal stemmen op een lijst komt niet overeen met het lijsttotaal van corresponderende E.x`
 
 > Invoerder: **Controleer het totaal van de lijst** (F.453)  
 > Als het totaal overeenkomt met het papieren proces-verbaal, controleer dan ook de waarde bij E.{x} bij [Aantal kiezers en stemmen]().
@@ -445,7 +453,7 @@ Velden markeren: totaal van de lijst, en E.{x} op Aantal kiezers en stemmen
 > - Zo ja: maak een corrigendum en corrigeer daarin de optelfout. Corrigeer ook rubriek 2.3 in het corrigendum.
 > - Zo nee: tel de stembiljetten en het aantal toegelaten kiezers opnieuw. Begin bij deze lijst, en hertel tot de fout gevonden is, of alles één keer herteld is.
 
-Velden markeren: totaal van de lijst, en E.{x} op Aantal kiezers en stemmen  
+Velden markeren: totaal van de lijst, en E.{x} op Aantal kiezers en stemmen
 
 ## Plausibiliteitschecks geven waarschuwingen
 
@@ -482,7 +490,7 @@ Geen checks.
 
 #### CSO en DSO | W.201 aantal blanco stemmen is groter dan of gelijk aan 3% van het totaal aantal uitgebrachte stemmen
 
-> Invoerder: **Controleer F** (W.201)  
+> Invoerder: **Controleer F** (W.201)
 
 > Coördinator: **Het aantal blanco stemmen (F) is erg hoog** (W.201)
 > - Hertel de blanco stemmen of geef een verklaring voor het hoge aantal.
@@ -547,4 +555,4 @@ In de user interface behandelen we die als volgt:
 - Zijn er fouten of waarschuwingen in de huidige stap, dan tonen we alle fouten en waarschuwingen ([voorbeeld in Figma](https://www.figma.com/design/zZlFr8tYiRyp4I26sh6eqp/Kiesraad---Abacus-optelsoftware?node-id=2871-9169&t=FtsIfhKtOeDxlo9v-4)).
   - We tonen van elke melding de titel, het nummer en de toelichting.
   - Omdat het handelingsperspectief voor alle meldingen hetzelfde is, tonen we deze maar één keer.
-  - We markeren alle invoervelden waar een foutmelding of waarschuwing op is. Gaat melding 1 over veld A, B en C, en melding 2 over veld C en D, dan markeren we dus A, B, C en D. Mocht er voor een invoerveld zowel een foutmelding als een waarschuwing zijn, dan wordt alleen de foutmelding markering getoond. 
+  - We markeren alle invoervelden waar een foutmelding of waarschuwing op is. Gaat melding 1 over veld A, B en C, en melding 2 over veld C en D, dan markeren we dus A, B, C en D. Mocht er voor een invoerveld zowel een foutmelding als een waarschuwing zijn, dan wordt alleen de foutmelding markering getoond.

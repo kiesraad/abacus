@@ -82,6 +82,7 @@ pub fn openapi_router() -> OpenApiRouter<AppState> {
         .merge(apportionment::router())
         .merge(audit_log::router())
         .merge(authentication::router())
+        .merge(authentication::user_router())
         .merge(committee_session::router())
         .merge(data_entry::router())
         .merge(election::router())
@@ -343,7 +344,7 @@ mod test {
     #[test(sqlx::test)]
     async fn test_abacus_starts(pool: SqlitePool) {
         run_server_test(pool, |base_url| async move {
-            let result = reqwest::get(format!("{base_url}/api/user/whoami"))
+            let result = reqwest::get(format!("{base_url}/api/whoami"))
                 .await
                 .unwrap();
 
@@ -356,7 +357,7 @@ mod test {
     #[test(sqlx::test)]
     async fn test_security_headers(pool: SqlitePool) {
         run_server_test(pool, |base_url| async move {
-            let response = reqwest::get(format!("{base_url}/api/user/whoami"))
+            let response = reqwest::get(format!("{base_url}/api/whoami"))
                 .await
                 .unwrap();
 
@@ -406,7 +407,7 @@ mod test {
     #[test(sqlx::test)]
     async fn test_cache_headers(pool: SqlitePool) {
         run_server_test(pool, |base_url| async move {
-            let response = reqwest::get(format!("{base_url}/api/user/whoami"))
+            let response = reqwest::get(format!("{base_url}/api/whoami"))
                 .await
                 .unwrap();
             assert_eq!(response.headers()["cache-control"], "no-store");

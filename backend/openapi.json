@@ -10,6 +10,54 @@
     "version": "0.1.0"
   },
   "paths": {
+    "/api/account": {
+      "put": {
+        "summary": "Update the user's account with a new password and optionally new fullname",
+        "operationId": "account_update",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AccountUpdateRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "The logged in user",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LoginResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/committee_sessions": {
       "post": {
         "summary": "Create a new [CommitteeSession].",
@@ -1996,6 +2044,85 @@
         }
       }
     },
+    "/api/login": {
+      "post": {
+        "summary": "Login endpoint, authenticates a user and creates a new session + session cookie",
+        "operationId": "login",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Credentials"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "The logged in user id and user name",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LoginResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid credentials",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/logout": {
+      "post": {
+        "summary": "Logout endpoint, deletes the session cookie",
+        "operationId": "logout",
+        "responses": {
+          "200": {
+            "description": "Successful logout, or user was already logged out"
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/polling_stations/{polling_station_id}/data_entries/resolve_differences": {
       "get": {
         "summary": "Get data entry differences to be resolved",
@@ -3277,171 +3404,6 @@
         }
       }
     },
-    "/api/user/account": {
-      "put": {
-        "summary": "Update the user's account with a new password and optionally new fullname",
-        "operationId": "account_update",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/AccountUpdateRequest"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "The logged in user",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/LoginResponse"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad request",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Internal server error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/user/login": {
-      "post": {
-        "summary": "Login endpoint, authenticates a user and creates a new session + session cookie",
-        "operationId": "login",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/Credentials"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "The logged in user id and user name",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/LoginResponse"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Invalid credentials",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "Forbidden",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Internal server error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/user/logout": {
-      "post": {
-        "summary": "Logout endpoint, deletes the session cookie",
-        "operationId": "logout",
-        "responses": {
-          "200": {
-            "description": "Successful logout, or user was already logged out"
-          },
-          "500": {
-            "description": "Internal server error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/user/whoami": {
-      "get": {
-        "summary": "Get current logged-in user endpoint",
-        "operationId": "whoami",
-        "responses": {
-          "200": {
-            "description": "The current user name and id",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/LoginResponse"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Invalid user session",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Internal server error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "/api/user/{user_id}": {
       "get": {
         "summary": "Get a user",
@@ -3641,6 +3603,44 @@
           },
           "404": {
             "description": "User not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/whoami": {
+      "get": {
+        "summary": "Get current logged-in user endpoint",
+        "operationId": "whoami",
+        "responses": {
+          "200": {
+            "description": "The current user name and id",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LoginResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid user session",
             "content": {
               "application/json": {
                 "schema": {
@@ -4996,6 +4996,7 @@
       },
       "CreateUserRequest": {
         "type": "object",
+        "description": "Struct used to create a new user",
         "required": [
           "username",
           "temp_password",
@@ -5780,6 +5781,7 @@
           "InvalidVoteCandidate",
           "InvalidVoteGroup",
           "InvalidXml",
+          "InvestigationHasDataEntryOrResult",
           "NotInitialised",
           "OwnAccountCannotBeDeleted",
           "PasswordRejection",
@@ -6548,6 +6550,9 @@
           "reason"
         ],
         "properties": {
+          "accept_data_entry_deletion": {
+            "type": "boolean"
+          },
           "corrected_results": {
             "type": "boolean"
           },

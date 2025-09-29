@@ -1,11 +1,13 @@
 import { render as rtlRender } from "@testing-library/react";
 import { userEvent } from "@testing-library/user-event";
-import { beforeEach, describe, expect, test } from "vitest";
+import { beforeEach, describe, expect, test, vi } from "vitest";
 
+import * as useUser from "@/hooks/user/useUser";
 import { ElectionListRequestHandler, UserListRequestHandler } from "@/testing/api-mocks/RequestHandlers";
 import { Providers } from "@/testing/Providers";
 import { overrideOnce, server } from "@/testing/server";
 import { screen, setupTestRouter, waitFor, within } from "@/testing/test-utils";
+import { getAdminUser } from "@/testing/user-mock-data";
 
 import { usersRoutes } from "../../routes";
 
@@ -53,6 +55,7 @@ const detailsPage = {
 describe("User create pages integration test", () => {
   beforeEach(() => {
     server.use(ElectionListRequestHandler);
+    vi.spyOn(useUser, "useUser").mockReturnValue(getAdminUser());
   });
 
   describe("Navigation and fullname presence", () => {

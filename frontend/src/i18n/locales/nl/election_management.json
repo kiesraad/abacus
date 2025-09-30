@@ -28,13 +28,24 @@
   "empty_documents_title": "Lege processen-verbaal voor deze verkiezing",
   "enter_a_number": "Voer een getal in",
   "enter_number_of_voters": "Voer het aantal kiesgerechtigden in zoals door de gemeenteraad vastgesteld voor de {name} in de gemeente {location}.",
+  "first_session": {
+    "pdf_file": "PDF document met het proces verbaal.",
+    "signed_during_the_committee_session": "Dit wordt tijdens de zitting van het gemeentelijk stembureau vastgesteld en ondertekend.",
+    "zip_file_explanation": "In het Zip bestand zitten twee documenten:"
+  },
   "how_many_voters": "Hoeveel kiesgerechtigden telt de gemeente?",
   "if_gsb_correction": "Wil het Gemeentelijk Stembureau zelf een fout herstellen en is de zitting nog niet afgesloten door de voorzitter? Ga dan verder in de eerste zitting.",
   "investigation_ordered_by_csb": "Onderzoek in opdracht van het CSB?",
   "lists_and_candidates": "Lijsten en kandidaten",
+  "next_session": {
+    "corrigendum_file": "Het corrigendum van het gemeentelijk stembureau (Na 14-2). Dit is een PDF document.",
+    "corrigendum_file_description": "Bevat de gecorrigeerde telresultaten van de gemeente. ",
+    "pdf_file": "Het proces verbaal van het gemeentelijk stembureau (P 2a). Dit is een PDF document.",
+    "signed_during_the_committee_session": "Dit wordt tijdens de zitting van het gemeentelijk stembureau vastgesteld en ondertekend.",
+    "zip_file_explanation": "In het Zip bestand zitten drie documenten:"
+  },
   "no_polling_stations": "Geen stembureaus",
   "only_add_if_ordered": "Voeg alleen een nieuwe zitting toe als het Centraal Stembureau hier opdracht voor heeft gegeven.",
-  "pdf_file": "PDF document met het proces verbaal.",
   "prepare_new_session": "Nieuwe zitting voorbereiden",
   "requested_investigations": "Aangevraagde onderzoeken",
   "results_and_documents": "Resultaten en documenten",
@@ -42,7 +53,6 @@
   "select_polling_stations": "Selecteer stembureaus",
   "session_location": "Plaats van de zitting",
   "session_start": "Start van de zitting",
-  "signed_during_the_committee_session": "Dit wordt tijdens de zitting van het gemeentelijk stembureau vastgesteld en ondertekend.",
   "start_data_entry": "Start steminvoer",
   "started": "begon",
   "starts": "begint",
@@ -60,6 +70,5 @@
   "what_now": "Wat nu",
   "yes_add_session": "Ja, zitting toevoegen",
   "yes_delete_session": "Verwijder zitting",
-  "zip_file": "Zip bestand",
-  "zip_file_explanation": "In het Zip bestand zitten twee documenten:"
+  "zip_file": "Zip bestand"
 }

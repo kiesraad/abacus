@@ -123,7 +123,7 @@ async fn test_committee_session_delete_ok_status_created(pool: SqlitePool) {
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_5_with_results", "users"))))]
-async fn test_committee_session_delete_ok_status_data_entry_not_started(pool: SqlitePool) {
+async fn test_committee_session_delete_fail(pool: SqlitePool) {
     let addr = serve_api(pool.clone()).await;
     let cookie = shared::coordinator_login(&addr).await;
     let election_id = 5;
@@ -162,17 +162,11 @@ async fn test_committee_session_delete_ok_status_data_entry_not_started(pool: Sq
         .await
         .unwrap();
 
+    // You cannot delete a committee session if there are investigations linked to it
     assert_eq!(
         response.status(),
-        StatusCode::OK,
+        StatusCode::UNPROCESSABLE_ENTITY,
         "Unexpected response status"
-    );
-
-    let committee_session =
-        shared::get_election_committee_session(&addr, &cookie, election_id).await;
-    assert_eq!(
-        committee_session.status,
-        CommitteeSessionStatus::DataEntryFinished
     );
 }
 

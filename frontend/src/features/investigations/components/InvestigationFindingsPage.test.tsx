@@ -48,7 +48,11 @@ describe("InvestigationFindingsPage", () => {
   beforeEach(() => {
     server.use(ElectionRequestHandler, ElectionStatusRequestHandler);
     vi.spyOn(ReactRouter, "useNavigate").mockImplementation(() => navigate);
-    vi.spyOn(useMessages, "useMessages").mockReturnValue({ pushMessage, popMessages: vi.fn(() => []) });
+    vi.spyOn(useMessages, "useMessages").mockReturnValue({
+      pushMessage,
+      popMessages: vi.fn(() => []),
+      hasMessages: vi.fn(() => false),
+    });
   });
 
   test("Renders a form", async () => {

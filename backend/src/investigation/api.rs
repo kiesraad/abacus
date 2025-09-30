@@ -58,7 +58,9 @@ async fn get_unfinished_committee_session(
         crate::committee_session::repository::get(conn, polling_station.committee_session_id)
             .await?;
 
-    if committee_session.status == CommitteeSessionStatus::DataEntryFinished {
+    if !committee_session.is_next_session()
+        || committee_session.status == CommitteeSessionStatus::DataEntryFinished
+    {
         return Err(APIError::CommitteeSession(
             CommitteeSessionError::InvalidCommitteeSessionStatus,
         ));

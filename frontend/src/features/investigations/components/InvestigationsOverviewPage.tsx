@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router";
 
-import { isSuccess } from "@/api/ApiResult";
+import { isSuccess, NotFoundError } from "@/api/ApiResult";
 import { useCrud } from "@/api/useCrud";
 import { IconPlus } from "@/components/generated/icons";
 import { Messages } from "@/components/messages/Messages";
@@ -29,6 +29,11 @@ export function InvestigationsOverviewPage() {
 
   if (requestState.status === "api-error") {
     throw requestState.error;
+  }
+
+  // Only allow access to the page if the current committee session is a second session
+  if (currentCommitteeSession.number < 2) {
+    throw new NotFoundError();
   }
 
   const finishDataEntry = async () => {

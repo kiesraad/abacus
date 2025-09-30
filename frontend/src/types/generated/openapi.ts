@@ -57,12 +57,6 @@ export interface ELECTION_DETAILS_REQUEST_PARAMS {
 }
 export type ELECTION_DETAILS_REQUEST_PATH = `/api/elections/${number}`;
 
-// /api/elections/{election_id}/apportionment
-export interface ELECTION_APPORTIONMENT_REQUEST_PARAMS {
-  election_id: number;
-}
-export type ELECTION_APPORTIONMENT_REQUEST_PATH = `/api/elections/${number}/apportionment`;
-
 // /api/elections/{election_id}/committee_sessions/{committee_session_id}/download_pdf_results
 export interface ELECTION_DOWNLOAD_PDF_RESULTS_REQUEST_PARAMS {
   election_id: number;
@@ -290,16 +284,6 @@ export type WHOAMI_REQUEST_PATH = `/api/whoami`;
 
 /** TYPES **/
 
-/**
- * Contains information about the enactment of article P 9 of the Kieswet.
- */
-export interface AbsoluteMajorityReassignedSeat {
-  /** Political group number which the residual seat is assigned to */
-  pg_assigned_seat: number;
-  /** Political group number which the residual seat is retracted from */
-  pg_retracted_seat: number;
-}
-
 export interface AccountUpdateRequest {
   fullname?: string;
   password: string;
@@ -325,7 +309,6 @@ export type AuditEvent =
   | (PollingStationInvestigation & { event_type: "PollingStationInvestigationDeleted" })
   | (FileDetails & { event_type: "FileCreated" })
   | (FileDetails & { event_type: "FileDeleted" })
-  | (ElectionDetails & { event_type: "ApportionmentCreated" })
   | (PollingStationDetails & { event_type: "PollingStationCreated" })
   | (PollingStationDetails & { event_type: "PollingStationUpdated" })
   | (PollingStationDetails & { event_type: "PollingStationDeleted" })
@@ -435,22 +418,6 @@ export interface Candidate {
  * Candidate gender
  */
 export type CandidateGender = "Male" | "Female" | "X";
-
-/**
- * The result of the candidate nomination procedure.
- * This contains the preference threshold and percentage that was used.
- * It contains a list of all chosen candidates in alphabetical order.
- * It also contains the preferential nomination of candidates, the remaining
- * nomination of candidates and the final ranking of candidates for each political group.
- */
-export interface CandidateNominationResult {
-  /** List of chosen candidates in alphabetical order */
-  chosen_candidates: Candidate[];
-  /** List of chosen candidates and candidate list ranking per political group */
-  political_group_candidate_nomination: PoliticalGroupCandidateNomination[];
-  /** Preference threshold percentage and number of votes */
-  preference_threshold: PreferenceThreshold;
-}
 
 export interface CandidateVotes {
   number: number;
@@ -689,15 +656,6 @@ export interface ElectionAndCandidatesDefinitionImportRequest {
 }
 
 /**
- * Election apportionment response, including the seat assignment, candidate nomination and election summary
- */
-export interface ElectionApportionmentResponse {
-  candidate_nomination: CandidateNominationResult;
-  election_summary: ElectionSummary;
-  seat_assignment: SeatAssignmentResult;
-}
-
-/**
  * Election category (limited for now)
  */
 export type ElectionCategory = "Municipal";
@@ -774,22 +732,6 @@ export interface ElectionStatusResponseEntry {
 }
 
 /**
- * Contains a summary of the election results, added up from the votes of all polling stations.
- */
-export interface ElectionSummary {
-  /** The differences between voters and votes */
-  differences_counts: SummaryDifferencesCounts;
-  /** The summary votes for each political group (and each candidate within) */
-  political_group_votes: PoliticalGroupCandidateVotes[];
-  /** Polling stations where results were investigated by the GSB */
-  polling_station_investigations: PollingStationInvestigations;
-  /** The total number of voters */
-  voters_counts: VotersCounts;
-  /** The total number of votes */
-  votes_counts: VotesCounts;
-}
-
-/**
  * Election with political groups
  */
 export interface ElectionWithPoliticalGroups {
@@ -817,14 +759,11 @@ export interface ErrorDetails {
  */
 export type ErrorReference =
   | "AirgapViolation"
-  | "AllListsExhausted"
   | "AlreadyInitialised"
-  | "ApportionmentNotAvailableUntilDataEntryFinalised"
   | "CommitteeSessionPaused"
   | "DatabaseError"
   | "DataEntryAlreadyClaimed"
   | "DataEntryAlreadyFinalised"
-  | "DrawingOfLotsRequired"
   | "EmlImportError"
   | "EntryNotFound"
   | "EntryNotUnique"
@@ -852,8 +791,7 @@ export type ErrorReference =
   | "RequestPayloadTooLarge"
   | "Unauthorized"
   | "UsernameNotUnique"
-  | "UserNotFound"
-  | "ZeroVotesCast";
+  | "UserNotFound";
 
 /**
  * Response structure for errors
@@ -881,55 +819,6 @@ export interface FileDetails {
   file_id: number;
   file_mime_type: string;
   file_name: string;
-}
-
-/**
- * Fraction with the integer part split out for display purposes
- */
-export interface Fraction {
-  denominator: number;
-  integer: number;
-  numerator: number;
-}
-
-/**
- * Contains the details for an assigned seat, assigned through the highest average method.
- */
-export interface HighestAverageAssignedSeat {
-  /** The list of political groups with the same average, that have been assigned a seat */
-  pg_assigned: number[];
-  /** The list of political groups that are exhausted, and will not be assigned a seat */
-  pg_exhausted: number[];
-  /** The list of political groups with the same average, that have not been assigned a seat */
-  pg_options: number[];
-  /** The political group that was selected for this seat has this political group number */
-  selected_pg_number: number;
-  /** This is the votes per seat achieved by the selected political group */
-  votes_per_seat: Fraction;
-}
-
-/**
- * Contains the details for an assigned seat, assigned through the largest remainder method.
- */
-export interface LargestRemainderAssignedSeat {
-  /** The list of political groups with the same remainder, that have been assigned a seat */
-  pg_assigned: number[];
-  /** The list of political groups with the same remainder, that have not been assigned a seat */
-  pg_options: number[];
-  /** The number of remainder votes achieved by the selected political group */
-  remainder_votes: Fraction;
-  /** The political group that was selected for this seat has this political group number */
-  selected_pg_number: number;
-}
-
-/**
- * Contains information about the enactment of article P 10 of the Kieswet.
- */
-export interface ListExhaustionRemovedSeat {
-  /** Whether the removed seat was a full seat */
-  full_seat: boolean;
-  /** Political group number which the seat is retracted from */
-  pg_retracted_seat: number;
 }
 
 export interface LoginResponse {
@@ -972,70 +861,10 @@ export interface PoliticalGroup {
   number: number;
 }
 
-/**
- * Contains information about the chosen candidates and the candidate list ranking
- * for a specific political group.
- */
-export interface PoliticalGroupCandidateNomination {
-  /** The list of other chosen candidates, can be empty */
-  other_candidate_nomination: CandidateVotes[];
-  /** Political group name for which this nomination applies */
-  pg_name: string;
-  /** Political group number for which this nomination applies */
-  pg_number: number;
-  /** The number of seats assigned to this group */
-  pg_seats: number;
-  /** The list of chosen candidates via preferential votes, can be empty */
-  preferential_candidate_nomination: CandidateVotes[];
-  /** The updated ranking of the whole candidate list, can be empty */
-  updated_candidate_ranking: Candidate[];
-}
-
 export interface PoliticalGroupCandidateVotes {
   candidate_votes: CandidateVotes[];
   number: number;
   total: number;
-}
-
-/**
- * Contains information about the final assignment of seats for a specific political group.
- */
-export interface PoliticalGroupSeatAssignment {
-  /** The number of full seats assigned to this group */
-  full_seats: number;
-  /** Whether this group met the threshold for largest remainder seat assignment */
-  meets_remainder_threshold: boolean;
-  /** Political group number for which this assignment applies */
-  pg_number: number;
-  /** The remainder votes that were not used to get full seats assigned to this political group */
-  remainder_votes: Fraction;
-  /** The number of residual seats assigned to this group */
-  residual_seats: number;
-  /** The total number of seats assigned to this group */
-  total_seats: number;
-  /** The number of votes cast for this group */
-  votes_cast: number;
-}
-
-/**
- * Contains the standing for a specific political group. This is all the information
- * that is needed to compute the apportionment for that specific political group.
- */
-export interface PoliticalGroupStanding {
-  /** The number of full seats this political group got assigned */
-  full_seats: number;
-  /** Whether the remainder votes meet the threshold to be applicable for largest remainder seat assignment */
-  meets_remainder_threshold: boolean;
-  /** The number of votes per seat if a new seat would be added to the current residual seats */
-  next_votes_per_seat: Fraction;
-  /** Political group number for which this standing applies */
-  pg_number: number;
-  /** The remainder of votes that was not used to get full seats (does not have to be a whole number of votes) */
-  remainder_votes: Fraction;
-  /** The current number of residual seats this political group got assigned */
-  residual_seats: number;
-  /** The number of votes cast for this group */
-  votes_cast: number;
 }
 
 export interface PoliticalGroupTotalVotes {
@@ -1108,22 +937,6 @@ export interface PollingStationInvestigationUpdateRequest {
 }
 
 /**
- * Polling stations where results were investigated by the GSB,
- * as vectors of polling station numbers
- */
-export interface PollingStationInvestigations {
-  /** Admitted voters were recounted
-("Toegelaten kiezers opnieuw vastgesteld?") */
-  admitted_voters_recounted: number[];
-  /** Ballots were (partially) recounted
-("Stembiljetten (deels) herteld?") */
-  ballots_recounted: number[];
-  /** Investigated for other reasons than unexplained difference
-("Onderzocht vanwege andere reden dan onverklaard verschil?") */
-  investigated_other_reason: number[];
-}
-
-/**
  * Polling station list response
  */
 export interface PollingStationListResponse {
@@ -1168,13 +981,6 @@ export interface PollingStationsRequest {
   polling_stations: PollingStationRequest[];
 }
 
-export interface PreferenceThreshold {
-  /** Preference threshold as a number of votes */
-  number_of_votes: Fraction;
-  /** Preference threshold as a percentage (0 to 100) */
-  percentage: number;
-}
-
 export interface RedactedEmlHash {
   /** Array holding the hash chunks as text */
   chunks: string[];
@@ -1199,58 +1005,6 @@ export type Role = "administrator" | "typist" | "coordinator";
  */
 export interface SaveDataEntryResponse {
   validation_results: ValidationResults;
-}
-
-/**
- * The result of the seat assignment procedure. This contains the number of seats and the quota
- * that was used. It then contains the initial standing after full seats were assigned,
- * and each of the changes and intermediate standings. The final standing contains the
- * number of seats per political group that was assigned after all seats were assigned.
- */
-export interface SeatAssignmentResult {
-  final_standing: PoliticalGroupSeatAssignment[];
-  full_seats: number;
-  quota: Fraction;
-  residual_seats: number;
-  seats: number;
-  steps: SeatChangeStep[];
-}
-
-/**
- * Records the political group and specific change for a specific residual seat
- */
-export type SeatChange =
-  | (HighestAverageAssignedSeat & { changed_by: "HighestAverageAssignment" })
-  | (HighestAverageAssignedSeat & { changed_by: "UniqueHighestAverageAssignment" })
-  | (LargestRemainderAssignedSeat & { changed_by: "LargestRemainderAssignment" })
-  | (AbsoluteMajorityReassignedSeat & { changed_by: "AbsoluteMajorityReassignment" })
-  | (ListExhaustionRemovedSeat & { changed_by: "ListExhaustionRemoval" });
-
-/**
- * Records the change for a specific seat, and how the standing is once
- * that seat was assigned or removed
- */
-export interface SeatChangeStep {
-  change: SeatChange;
-  residual_seat_number?: number;
-  standings: PoliticalGroupStanding[];
-}
-
-/**
- * Contains a summary count, containing both the count and a list of polling
- * stations that contributed to it.
- */
-export interface SumCount {
-  count: number;
-  polling_stations: number[];
-}
-
-/**
- * Contains a summary of the differences, containing which polling stations had differences.
- */
-export interface SummaryDifferencesCounts {
-  fewer_ballots_count: SumCount;
-  more_ballots_count: SumCount;
 }
 
 export interface UpdateUserRequest {

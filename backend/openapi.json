@@ -685,97 +685,6 @@
         }
       }
     },
-    "/api/elections/{election_id}/apportionment": {
-      "post": {
-        "summary": "Get the apportionment for an election",
-        "operationId": "election_apportionment",
-        "parameters": [
-          {
-            "name": "election_id",
-            "in": "path",
-            "description": "Election database id",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int32",
-              "minimum": 0
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Election Apportionment",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ElectionApportionmentResponse"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "Forbidden",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Not found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "412": {
-            "description": "Election apportionment is not yet available",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Election apportionment is not possible",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Internal server error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "/api/elections/{election_id}/committee_sessions/{committee_session_id}/download_pdf_results": {
       "get": {
         "summary": "Download a generated PDF with election results",
@@ -3665,29 +3574,6 @@
   },
   "components": {
     "schemas": {
-      "AbsoluteMajorityReassignedSeat": {
-        "type": "object",
-        "description": "Contains information about the enactment of article P 9 of the Kieswet.",
-        "required": [
-          "pg_retracted_seat",
-          "pg_assigned_seat"
-        ],
-        "properties": {
-          "pg_assigned_seat": {
-            "type": "integer",
-            "format": "int32",
-            "description": "Political group number which the residual seat is assigned to",
-            "minimum": 0
-          },
-          "pg_retracted_seat": {
-            "type": "integer",
-            "format": "int32",
-            "description": "Political group number which the residual seat is retracted from",
-            "minimum": 0
-          }
-        },
-        "additionalProperties": false
-      },
       "AccountUpdateRequest": {
         "type": "object",
         "required": [
@@ -4074,27 +3960,6 @@
                     "type": "string",
                     "enum": [
                       "FileDeleted"
-                    ]
-                  }
-                }
-              }
-            ]
-          },
-          {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/ElectionDetails"
-              },
-              {
-                "type": "object",
-                "required": [
-                  "event_type"
-                ],
-                "properties": {
-                  "event_type": {
-                    "type": "string",
-                    "enum": [
-                      "ApportionmentCreated"
                     ]
                   }
                 }
@@ -4696,36 +4561,6 @@
           "Female",
           "X"
         ]
-      },
-      "CandidateNominationResult": {
-        "type": "object",
-        "description": "The result of the candidate nomination procedure.\nThis contains the preference threshold and percentage that was used.\nIt contains a list of all chosen candidates in alphabetical order.\nIt also contains the preferential nomination of candidates, the remaining\nnomination of candidates and the final ranking of candidates for each political group.",
-        "required": [
-          "preference_threshold",
-          "chosen_candidates",
-          "political_group_candidate_nomination"
-        ],
-        "properties": {
-          "chosen_candidates": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/Candidate"
-            },
-            "description": "List of chosen candidates in alphabetical order"
-          },
-          "political_group_candidate_nomination": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/PoliticalGroupCandidateNomination"
-            },
-            "description": "List of chosen candidates and candidate list ranking per political group"
-          },
-          "preference_threshold": {
-            "$ref": "#/components/schemas/PreferenceThreshold",
-            "description": "Preference threshold percentage and number of votes"
-          }
-        },
-        "additionalProperties": false
       },
       "CandidateVotes": {
         "type": "object",
@@ -5393,27 +5228,6 @@
         },
         "additionalProperties": false
       },
-      "ElectionApportionmentResponse": {
-        "type": "object",
-        "description": "Election apportionment response, including the seat assignment, candidate nomination and election summary",
-        "required": [
-          "seat_assignment",
-          "candidate_nomination",
-          "election_summary"
-        ],
-        "properties": {
-          "candidate_nomination": {
-            "$ref": "#/components/schemas/CandidateNominationResult"
-          },
-          "election_summary": {
-            "$ref": "#/components/schemas/ElectionSummary"
-          },
-          "seat_assignment": {
-            "$ref": "#/components/schemas/SeatAssignmentResult"
-          }
-        },
-        "additionalProperties": false
-      },
       "ElectionCategory": {
         "type": "string",
         "description": "Election category (limited for now)",
@@ -5632,43 +5446,6 @@
         },
         "additionalProperties": false
       },
-      "ElectionSummary": {
-        "type": "object",
-        "description": "Contains a summary of the election results, added up from the votes of all polling stations.",
-        "required": [
-          "voters_counts",
-          "votes_counts",
-          "differences_counts",
-          "political_group_votes",
-          "polling_station_investigations"
-        ],
-        "properties": {
-          "differences_counts": {
-            "$ref": "#/components/schemas/SummaryDifferencesCounts",
-            "description": "The differences between voters and votes"
-          },
-          "political_group_votes": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/PoliticalGroupCandidateVotes"
-            },
-            "description": "The summary votes for each political group (and each candidate within)"
-          },
-          "polling_station_investigations": {
-            "$ref": "#/components/schemas/PollingStationInvestigations",
-            "description": "Polling stations where results were investigated by the GSB"
-          },
-          "voters_counts": {
-            "$ref": "#/components/schemas/VotersCounts",
-            "description": "The total number of voters"
-          },
-          "votes_counts": {
-            "$ref": "#/components/schemas/VotesCounts",
-            "description": "The total number of votes"
-          }
-        },
-        "additionalProperties": false
-      },
       "ElectionWithPoliticalGroups": {
         "type": "object",
         "description": "Election with political groups",
@@ -5756,14 +5533,11 @@
         "description": "Error reference used to show the corresponding error message to the end-user",
         "enum": [
           "AirgapViolation",
-          "AllListsExhausted",
           "AlreadyInitialised",
-          "ApportionmentNotAvailableUntilDataEntryFinalised",
           "CommitteeSessionPaused",
           "DatabaseError",
           "DataEntryAlreadyClaimed",
           "DataEntryAlreadyFinalised",
-          "DrawingOfLotsRequired",
           "EmlImportError",
           "EntryNotFound",
           "EntryNotUnique",
@@ -5791,8 +5565,7 @@
           "RequestPayloadTooLarge",
           "Unauthorized",
           "UsernameNotUnique",
-          "UserNotFound",
-          "ZeroVotesCast"
+          "UserNotFound"
         ]
       },
       "ErrorResponse": {
@@ -5862,146 +5635,6 @@
           },
           "file_name": {
             "type": "string"
-          }
-        },
-        "additionalProperties": false
-      },
-      "Fraction": {
-        "type": "object",
-        "description": "Fraction with the integer part split out for display purposes",
-        "required": [
-          "integer",
-          "numerator",
-          "denominator"
-        ],
-        "properties": {
-          "denominator": {
-            "type": "integer",
-            "format": "int64",
-            "minimum": 0
-          },
-          "integer": {
-            "type": "integer",
-            "format": "int64",
-            "minimum": 0
-          },
-          "numerator": {
-            "type": "integer",
-            "format": "int64",
-            "minimum": 0
-          }
-        },
-        "additionalProperties": false
-      },
-      "HighestAverageAssignedSeat": {
-        "type": "object",
-        "description": "Contains the details for an assigned seat, assigned through the highest average method.",
-        "required": [
-          "selected_pg_number",
-          "pg_options",
-          "pg_assigned",
-          "pg_exhausted",
-          "votes_per_seat"
-        ],
-        "properties": {
-          "pg_assigned": {
-            "type": "array",
-            "items": {
-              "type": "integer",
-              "format": "int32",
-              "minimum": 0
-            },
-            "description": "The list of political groups with the same average, that have been assigned a seat"
-          },
-          "pg_exhausted": {
-            "type": "array",
-            "items": {
-              "type": "integer",
-              "format": "int32",
-              "minimum": 0
-            },
-            "description": "The list of political groups that are exhausted, and will not be assigned a seat"
-          },
-          "pg_options": {
-            "type": "array",
-            "items": {
-              "type": "integer",
-              "format": "int32",
-              "minimum": 0
-            },
-            "description": "The list of political groups with the same average, that have not been assigned a seat"
-          },
-          "selected_pg_number": {
-            "type": "integer",
-            "format": "int32",
-            "description": "The political group that was selected for this seat has this political group number",
-            "minimum": 0
-          },
-          "votes_per_seat": {
-            "$ref": "#/components/schemas/Fraction",
-            "description": "This is the votes per seat achieved by the selected political group"
-          }
-        },
-        "additionalProperties": false
-      },
-      "LargestRemainderAssignedSeat": {
-        "type": "object",
-        "description": "Contains the details for an assigned seat, assigned through the largest remainder method.",
-        "required": [
-          "selected_pg_number",
-          "pg_options",
-          "pg_assigned",
-          "remainder_votes"
-        ],
-        "properties": {
-          "pg_assigned": {
-            "type": "array",
-            "items": {
-              "type": "integer",
-              "format": "int32",
-              "minimum": 0
-            },
-            "description": "The list of political groups with the same remainder, that have been assigned a seat"
-          },
-          "pg_options": {
-            "type": "array",
-            "items": {
-              "type": "integer",
-              "format": "int32",
-              "minimum": 0
-            },
-            "description": "The list of political groups with the same remainder, that have not been assigned a seat"
-          },
-          "remainder_votes": {
-            "$ref": "#/components/schemas/Fraction",
-            "description": "The number of remainder votes achieved by the selected political group"
-          },
-          "selected_pg_number": {
-            "type": "integer",
-            "format": "int32",
-            "description": "The political group that was selected for this seat has this political group number",
-            "minimum": 0
-          }
-        },
-        "additionalProperties": false
-      },
-      "ListExhaustionRemovedSeat": {
-        "type": "object",
-        "description": "Contains information about the enactment of article P 10 of the Kieswet.",
-        "required": [
-          "pg_retracted_seat",
-          "full_seat"
-        ],
-        "properties": {
-          "full_seat": {
-            "type": "boolean",
-            "description": "Whether the removed seat was a full seat"
-          },
-          "pg_retracted_seat": {
-            "type": "integer",
-            "format": "int32",
-            "description": "Political group number which the seat is retracted from",
-            "minimum": 0
           }
         },
         "additionalProperties": false
@@ -6132,58 +5765,6 @@
         },
         "additionalProperties": false
       },
-      "PoliticalGroupCandidateNomination": {
-        "type": "object",
-        "description": "Contains information about the chosen candidates and the candidate list ranking\nfor a specific political group.",
-        "required": [
-          "pg_number",
-          "pg_name",
-          "pg_seats",
-          "preferential_candidate_nomination",
-          "other_candidate_nomination",
-          "updated_candidate_ranking"
-        ],
-        "properties": {
-          "other_candidate_nomination": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/CandidateVotes"
-            },
-            "description": "The list of other chosen candidates, can be empty"
-          },
-          "pg_name": {
-            "type": "string",
-            "description": "Political group name for which this nomination applies"
-          },
-          "pg_number": {
-            "type": "integer",
-            "format": "int32",
-            "description": "Political group number for which this nomination applies",
-            "minimum": 0
-          },
-          "pg_seats": {
-            "type": "integer",
-            "format": "int32",
-            "description": "The number of seats assigned to this group",
-            "minimum": 0
-          },
-          "preferential_candidate_nomination": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/CandidateVotes"
-            },
-            "description": "The list of chosen candidates via preferential votes, can be empty"
-          },
-          "updated_candidate_ranking": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/Candidate"
-            },
-            "description": "The updated ranking of the whole candidate list, can be empty"
-          }
-        },
-        "additionalProperties": false
-      },
       "PoliticalGroupCandidateVotes": {
         "type": "object",
         "required": [
@@ -6206,112 +5787,6 @@
           "total": {
             "type": "integer",
             "format": "int32",
-            "minimum": 0
-          }
-        },
-        "additionalProperties": false
-      },
-      "PoliticalGroupSeatAssignment": {
-        "type": "object",
-        "description": "Contains information about the final assignment of seats for a specific political group.",
-        "required": [
-          "pg_number",
-          "votes_cast",
-          "remainder_votes",
-          "meets_remainder_threshold",
-          "full_seats",
-          "residual_seats",
-          "total_seats"
-        ],
-        "properties": {
-          "full_seats": {
-            "type": "integer",
-            "format": "int32",
-            "description": "The number of full seats assigned to this group",
-            "minimum": 0
-          },
-          "meets_remainder_threshold": {
-            "type": "boolean",
-            "description": "Whether this group met the threshold for largest remainder seat assignment"
-          },
-          "pg_number": {
-            "type": "integer",
-            "format": "int32",
-            "description": "Political group number for which this assignment applies",
-            "minimum": 0
-          },
-          "remainder_votes": {
-            "$ref": "#/components/schemas/Fraction",
-            "description": "The remainder votes that were not used to get full seats assigned to this political group"
-          },
-          "residual_seats": {
-            "type": "integer",
-            "format": "int32",
-            "description": "The number of residual seats assigned to this group",
-            "minimum": 0
-          },
-          "total_seats": {
-            "type": "integer",
-            "format": "int32",
-            "description": "The total number of seats assigned to this group",
-            "minimum": 0
-          },
-          "votes_cast": {
-            "type": "integer",
-            "format": "int64",
-            "description": "The number of votes cast for this group",
-            "minimum": 0
-          }
-        },
-        "additionalProperties": false
-      },
-      "PoliticalGroupStanding": {
-        "type": "object",
-        "description": "Contains the standing for a specific political group. This is all the information\nthat is needed to compute the apportionment for that specific political group.",
-        "required": [
-          "pg_number",
-          "votes_cast",
-          "remainder_votes",
-          "meets_remainder_threshold",
-          "next_votes_per_seat",
-          "full_seats",
-          "residual_seats"
-        ],
-        "properties": {
-          "full_seats": {
-            "type": "integer",
-            "format": "int32",
-            "description": "The number of full seats this political group got assigned",
-            "minimum": 0
-          },
-          "meets_remainder_threshold": {
-            "type": "boolean",
-            "description": "Whether the remainder votes meet the threshold to be applicable for largest remainder seat assignment"
-          },
-          "next_votes_per_seat": {
-            "$ref": "#/components/schemas/Fraction",
-            "description": "The number of votes per seat if a new seat would be added to the current residual seats"
-          },
-          "pg_number": {
-            "type": "integer",
-            "format": "int32",
-            "description": "Political group number for which this standing applies",
-            "minimum": 0
-          },
-          "remainder_votes": {
-            "$ref": "#/components/schemas/Fraction",
-            "description": "The remainder of votes that was not used to get full seats (does not have to be a whole number of votes)"
-          },
-          "residual_seats": {
-            "type": "integer",
-            "format": "int32",
-            "description": "The current number of residual seats this political group got assigned",
-            "minimum": 0
-          },
-          "votes_cast": {
-            "type": "integer",
-            "format": "int64",
-            "description": "The number of votes cast for this group",
             "minimum": 0
           }
         },
@@ -6565,45 +6040,6 @@
         },
         "additionalProperties": false
       },
-      "PollingStationInvestigations": {
-        "type": "object",
-        "description": "Polling stations where results were investigated by the GSB,\nas vectors of polling station numbers",
-        "required": [
-          "admitted_voters_recounted",
-          "investigated_other_reason",
-          "ballots_recounted"
-        ],
-        "properties": {
-          "admitted_voters_recounted": {
-            "type": "array",
-            "items": {
-              "type": "integer",
-              "format": "int32",
-              "minimum": 0
-            },
-            "description": "Admitted voters were recounted\n(\"Toegelaten kiezers opnieuw vastgesteld?\")"
-          },
-          "ballots_recounted": {
-            "type": "array",
-            "items": {
-              "type": "integer",
-              "format": "int32",
-              "minimum": 0
-            },
-            "description": "Ballots were (partially) recounted\n(\"Stembiljetten (deels) herteld?\")"
-          },
-          "investigated_other_reason": {
-            "type": "array",
-            "items": {
-              "type": "integer",
-              "format": "int32",
-              "minimum": 0
-            },
-            "description": "Investigated for other reasons than unexplained difference\n(\"Onderzocht vanwege andere reden dan onverklaard verschil?\")"
-          }
-        },
-        "additionalProperties": false
-      },
       "PollingStationListResponse": {
         "type": "object",
         "description": "Polling station list response",
@@ -6748,26 +6184,6 @@
           }
         }
       },
-      "PreferenceThreshold": {
-        "type": "object",
-        "required": [
-          "percentage",
-          "number_of_votes"
-        ],
-        "properties": {
-          "number_of_votes": {
-            "$ref": "#/components/schemas/Fraction",
-            "description": "Preference threshold as a number of votes"
-          },
-          "percentage": {
-            "type": "integer",
-            "format": "int64",
-            "description": "Preference threshold as a percentage (0 to 100)",
-            "minimum": 0
-          }
-        },
-        "additionalProperties": false
-      },
       "RedactedEmlHash": {
         "type": "object",
         "required": [
@@ -6848,227 +6264,6 @@
         "properties": {
           "validation_results": {
             "$ref": "#/components/schemas/ValidationResults"
-          }
-        },
-        "additionalProperties": false
-      },
-      "SeatAssignmentResult": {
-        "type": "object",
-        "description": "The result of the seat assignment procedure. This contains the number of seats and the quota\nthat was used. It then contains the initial standing after full seats were assigned,\nand each of the changes and intermediate standings. The final standing contains the\nnumber of seats per political group that was assigned after all seats were assigned.",
-        "required": [
-          "seats",
-          "full_seats",
-          "residual_seats",
-          "quota",
-          "steps",
-          "final_standing"
-        ],
-        "properties": {
-          "final_standing": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/PoliticalGroupSeatAssignment"
-            }
-          },
-          "full_seats": {
-            "type": "integer",
-            "format": "int32",
-            "minimum": 0
-          },
-          "quota": {
-            "$ref": "#/components/schemas/Fraction"
-          },
-          "residual_seats": {
-            "type": "integer",
-            "format": "int32",
-            "minimum": 0
-          },
-          "seats": {
-            "type": "integer",
-            "format": "int32",
-            "minimum": 0
-          },
-          "steps": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/SeatChangeStep"
-            }
-          }
-        },
-        "additionalProperties": false
-      },
-      "SeatChange": {
-        "oneOf": [
-          {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/HighestAverageAssignedSeat"
-              },
-              {
-                "type": "object",
-                "required": [
-                  "changed_by"
-                ],
-                "properties": {
-                  "changed_by": {
-                    "type": "string",
-                    "enum": [
-                      "HighestAverageAssignment"
-                    ]
-                  }
-                }
-              }
-            ]
-          },
-          {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/HighestAverageAssignedSeat"
-              },
-              {
-                "type": "object",
-                "required": [
-                  "changed_by"
-                ],
-                "properties": {
-                  "changed_by": {
-                    "type": "string",
-                    "enum": [
-                      "UniqueHighestAverageAssignment"
-                    ]
-                  }
-                }
-              }
-            ]
-          },
-          {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/LargestRemainderAssignedSeat"
-              },
-              {
-                "type": "object",
-                "required": [
-                  "changed_by"
-                ],
-                "properties": {
-                  "changed_by": {
-                    "type": "string",
-                    "enum": [
-                      "LargestRemainderAssignment"
-                    ]
-                  }
-                }
-              }
-            ]
-          },
-          {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/AbsoluteMajorityReassignedSeat"
-              },
-              {
-                "type": "object",
-                "required": [
-                  "changed_by"
-                ],
-                "properties": {
-                  "changed_by": {
-                    "type": "string",
-                    "enum": [
-                      "AbsoluteMajorityReassignment"
-                    ]
-                  }
-                }
-              }
-            ]
-          },
-          {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/ListExhaustionRemovedSeat"
-              },
-              {
-                "type": "object",
-                "required": [
-                  "changed_by"
-                ],
-                "properties": {
-                  "changed_by": {
-                    "type": "string",
-                    "enum": [
-                      "ListExhaustionRemoval"
-                    ]
-                  }
-                }
-              }
-            ]
-          }
-        ],
-        "description": "Records the political group and specific change for a specific residual seat"
-      },
-      "SeatChangeStep": {
-        "type": "object",
-        "description": "Records the change for a specific seat, and how the standing is once\nthat seat was assigned or removed",
-        "required": [
-          "change",
-          "standings"
-        ],
-        "properties": {
-          "change": {
-            "$ref": "#/components/schemas/SeatChange"
-          },
-          "residual_seat_number": {
-            "type": "integer",
-            "format": "int32",
-            "minimum": 0
-          },
-          "standings": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/PoliticalGroupStanding"
-            }
-          }
-        },
-        "additionalProperties": false
-      },
-      "SumCount": {
-        "type": "object",
-        "description": "Contains a summary count, containing both the count and a list of polling\nstations that contributed to it.",
-        "required": [
-          "count",
-          "polling_stations"
-        ],
-        "properties": {
-          "count": {
-            "type": "integer",
-            "format": "int32",
-            "minimum": 0
-          },
-          "polling_stations": {
-            "type": "array",
-            "items": {
-              "type": "integer",
-              "format": "int32",
-              "minimum": 0
-            }
-          }
-        },
-        "additionalProperties": false
-      },
-      "SummaryDifferencesCounts": {
-        "type": "object",
-        "description": "Contains a summary of the differences, containing which polling stations had differences.",
-        "required": [
-          "more_ballots_count",
-          "fewer_ballots_count"
-        ],
-        "properties": {
-          "fewer_ballots_count": {
-            "$ref": "#/components/schemas/SumCount"
-          },
-          "more_ballots_count": {
-            "$ref": "#/components/schemas/SumCount"
           }
         },
         "additionalProperties": false

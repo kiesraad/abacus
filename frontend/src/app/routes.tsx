@@ -6,7 +6,6 @@ import { AdministratorLayout } from "@/components/layout/AdministratorLayout";
 import { ElectionLayout } from "@/components/layout/ElectionLayout";
 import { ElectionStatusLayout } from "@/components/layout/ElectionStatusLayout";
 import { accountRoutes } from "@/features/account/routes";
-import { apportionmentRoutes } from "@/features/apportionment/routes";
 import { dataEntryRoutes } from "@/features/data_entry/routes";
 import { dataEntryHomeRoutes } from "@/features/data_entry_home/routes";
 import { devRoutes } from "@/features/dev/routes";
@@ -48,10 +47,6 @@ export const routes: RouteObject[] = [
             Component: ElectionLayout,
             children: [
               ...electionManagementRoutes,
-              {
-                path: "apportionment",
-                children: apportionmentRoutes,
-              },
               { path: "polling-stations", children: pollingStationsRoutes },
               {
                 path: "data-entry",

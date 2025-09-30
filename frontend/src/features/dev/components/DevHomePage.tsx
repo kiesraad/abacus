@@ -61,7 +61,7 @@ function TypistLinks({ electionList }: LinksProps) {
 }
 
 function AdministratorCoordinatorLinks({ electionList }: LinksProps) {
-  const { isAdministrator, isCoordinator } = useUserRole();
+  const { isAdministrator } = useUserRole();
 
   return (
     <>
@@ -80,11 +80,6 @@ function AdministratorCoordinatorLinks({ electionList }: LinksProps) {
                 <li>
                   <Link to={`/elections/${election.id}/status`}>{t("election_status.main_title")}</Link>
                 </li>
-                {isCoordinator && (
-                  <li>
-                    <Link to={`/elections/${election.id}/apportionment`}>{t("apportionment.title")}</Link>
-                  </li>
-                )}
                 <li>
                   <Link to={`/elections/${election.id}/polling-stations`}>{t("polling_station.title.plural")}</Link>
                 </li>

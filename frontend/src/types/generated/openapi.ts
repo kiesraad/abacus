@@ -764,6 +764,7 @@ export type ErrorReference =
   | "DatabaseError"
   | "DataEntryAlreadyClaimed"
   | "DataEntryAlreadyFinalised"
+  | "DataEntryNotAllowed"
   | "EmlImportError"
   | "EntryNotFound"
   | "EntryNotUnique"

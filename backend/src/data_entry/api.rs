@@ -112,7 +112,7 @@ async fn validate_and_get_data(
     if committee_session.number > 1 {
         let investigation = get_polling_station_investigation(conn, polling_station.id).await?;
         if investigation.corrected_results != Some(true) {
-            return Err(APIError::AddError(
+            return Err(APIError::Conflict(
                 "Data entry not allowed, no investigation with corrected results.".to_string(),
                 ErrorReference::DataEntryNotAllowed,
             ));
@@ -1104,6 +1104,19 @@ mod tests {
     }
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
+    async fn test_claim_data_entry_ok(pool: SqlitePool) {
+        let response = claim(pool.clone(), 1, EntryNumber::FirstEntry).await;
+        assert_eq!(response.status(), StatusCode::OK);
+
+        // Check that row was created
+        let row_count = query!("SELECT COUNT(*) AS count FROM polling_station_data_entries")
+            .fetch_one(&pool)
+            .await
+            .unwrap();
+        assert_eq!(row_count.count, 1);
+    }
+
+    #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
     async fn test_claim_data_entry_committee_session_status_is_data_entry_paused(pool: SqlitePool) {
         change_status_committee_session(pool.clone(), 2, CommitteeSessionStatus::DataEntryPaused)
             .await;
@@ -1144,6 +1157,71 @@ mod tests {
             .await
             .unwrap();
         assert_eq!(row_count.count, 0);
+    }
+
+    #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_7_four_sessions"))))]
+    async fn test_claim_data_entry_next_session_err_no_investigation(pool: SqlitePool) {
+        let response = claim(pool.clone(), 742, EntryNumber::FirstEntry).await;
+        assert_eq!(response.status(), StatusCode::NOT_FOUND);
+
+        // Check that no row was created
+        let row_count = query!("SELECT COUNT(*) AS count FROM polling_station_data_entries")
+            .fetch_one(&pool)
+            .await
+            .unwrap();
+        assert_eq!(row_count.count, 0);
+    }
+
+    #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_7_four_sessions"))))]
+    async fn test_claim_data_entry_next_session_err_investigation_no_corrected_results(
+        pool: SqlitePool,
+    ) {
+        let mut conn = pool.acquire().await.unwrap();
+        // Insert investigation
+        insert_test_investigation(
+            &mut conn,
+            742,
+            "Test".into(),
+            Some("Test".into()),
+            Some(false),
+        )
+        .await
+        .unwrap();
+
+        let response = claim(pool.clone(), 742, EntryNumber::FirstEntry).await;
+        assert_eq!(response.status(), StatusCode::CONFLICT);
+
+        // Check that no row was created
+        let row_count = query!("SELECT COUNT(*) AS count FROM polling_station_data_entries")
+            .fetch_one(&pool)
+            .await
+            .unwrap();
+        assert_eq!(row_count.count, 0);
+    }
+
+    #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_7_four_sessions"))))]
+    async fn test_claim_data_entry_next_session_ok(pool: SqlitePool) {
+        let mut conn = pool.acquire().await.unwrap();
+        // Insert investigation
+        insert_test_investigation(
+            &mut conn,
+            742,
+            "Test".into(),
+            Some("Test".into()),
+            Some(true),
+        )
+        .await
+        .unwrap();
+
+        let response = claim(pool.clone(), 742, EntryNumber::FirstEntry).await;
+        assert_eq!(response.status(), StatusCode::OK);
+
+        // Check that row was created
+        let row_count = query!("SELECT COUNT(*) AS count FROM polling_station_data_entries")
+            .fetch_one(&pool)
+            .await
+            .unwrap();
+        assert_eq!(row_count.count, 1);
     }
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]

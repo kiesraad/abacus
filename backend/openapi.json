@@ -5538,6 +5538,7 @@
           "DatabaseError",
           "DataEntryAlreadyClaimed",
           "DataEntryAlreadyFinalised",
+          "DataEntryNotAllowed",
           "EmlImportError",
           "EntryNotFound",
           "EntryNotUnique",

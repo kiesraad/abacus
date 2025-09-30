@@ -49,6 +49,10 @@ export function AddInvestigationLayout() {
                 status = "accept";
               }
 
+              if (investigation?.reason && formSection.key === "print_corrigendum" && index < currentFormSection) {
+                status = "accept";
+              }
+
               if (investigation?.findings) {
                 status = "accept";
               }

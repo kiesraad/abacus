@@ -2,6 +2,7 @@ import { ReactElement, ReactNode, useEffect, useRef } from "react";
 
 import { IconCross } from "@/components/generated/icons";
 import { t } from "@/i18n/translate";
+import { cn } from "@/utils/classnames";
 
 import { IconButton } from "../IconButton/IconButton";
 import cls from "./Modal.module.css";
@@ -9,6 +10,7 @@ import cls from "./Modal.module.css";
 export interface ModalProps {
   title: string | ReactElement;
   noFlex?: boolean;
+  autoWidth?: boolean;
   onClose?: () => void;
   children?: ReactNode;
 }
@@ -22,7 +24,7 @@ export interface ModalProps {
  * @param {ReactNode} children - The content of the modal.
  * @returns {ReactNode} The rendered modal component.
  */
-export function Modal({ title, noFlex = false, onClose, children }: ModalProps): ReactNode {
+export function Modal({ title, noFlex = false, autoWidth = false, onClose, children }: ModalProps): ReactNode {
   const dialogRef = useRef<HTMLDialogElement | null>(null);
   const lastActiveElement = useRef<HTMLElement | null>(null);
 
@@ -59,7 +61,7 @@ export function Modal({ title, noFlex = false, onClose, children }: ModalProps):
 
   return (
     <dialog id="modal-dialog" className={cls.modal} ref={dialogRef} aria-labelledby="modal-title">
-      <div className={cls.modalContainer}>
+      <div className={cn(cls.modalContainer, autoWidth && cls.autoWidth)}>
         {onClose && (
           <IconButton
             onClick={() => {

@@ -133,6 +133,11 @@ export interface ELECTION_STATUS_REQUEST_PARAMS {
 }
 export type ELECTION_STATUS_REQUEST_PATH = `/api/elections/${number}/status`;
 
+// /api/generate_test_election
+export type GENERATE_ELECTION_HANDLER_REQUEST_PARAMS = Record<string, never>;
+export type GENERATE_ELECTION_HANDLER_REQUEST_PATH = `/api/generate_test_election`;
+export type GENERATE_ELECTION_HANDLER_REQUEST_BODY = GenerateElectionArgs;
+
 // /api/initialise/admin-exists
 export type ADMIN_EXISTS_REQUEST_PARAMS = Record<string, never>;
 export type ADMIN_EXISTS_REQUEST_PATH = `/api/initialise/admin-exists`;
@@ -821,6 +826,32 @@ export interface FileDetails {
   file_name: string;
 }
 
+/**
+ * Abacus API and asset server
+ */
+export interface GenerateElectionArgs {
+  candidate_distribution_slope: RandomRange;
+  /** Number of candidates to create */
+  candidates_per_group: RandomRange;
+  /** Percentage of the first data entry to complete if data entry is included */
+  first_data_entry: RandomRange;
+  political_group_distribution_slope: RandomRange;
+  /** Number of political groups to create */
+  political_groups: RandomRange;
+  /** Number of polling stations to create */
+  polling_stations: RandomRange;
+  /** Number of seats in the election */
+  seats: RandomRange;
+  /** Percentage of the completed first data entries that also get a second data entry */
+  second_data_entry: RandomRange;
+  /** Percentage of voters that voted (given we generate data entries) */
+  turnout: RandomRange;
+  /** Number of voters to create */
+  voters: RandomRange;
+  /** Include (part of) data entry for this election */
+  with_data_entry: boolean;
+}
+
 export interface LoginResponse {
   fullname?: string;
   needs_password_change: boolean;
@@ -980,6 +1011,8 @@ export interface PollingStationsRequest {
   file_name: string;
   polling_stations: PollingStationRequest[];
 }
+
+export type RandomRange = string;
 
 export interface RedactedEmlHash {
   /** Array holding the hash chunks as text */

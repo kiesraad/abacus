@@ -11,7 +11,9 @@ pub mod utils;
 
 fn expected_response_code(path: &str) -> StatusCode {
     match path {
-        "/api/login" | "/api/initialise/first-admin" => StatusCode::UNSUPPORTED_MEDIA_TYPE,
+        "/api/login" | "/api/initialise/first-admin" | "/api/generate_test_election" => {
+            StatusCode::UNSUPPORTED_MEDIA_TYPE
+        }
         "/api/logout" | "/api/initialised" => StatusCode::OK,
         "/api/initialise/admin-exists" => StatusCode::FORBIDDEN,
         _ => StatusCode::UNAUTHORIZED,

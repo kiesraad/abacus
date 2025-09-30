@@ -13,6 +13,8 @@ import { ELECTION_IMPORT_VALIDATE_REQUEST_PATH, ElectionDefinitionValidateRespon
 import { useElectionCreateContext } from "../hooks/useElectionCreateContext";
 import { CheckHash } from "./CheckHash";
 
+const MAX_UPLOAD_SIZE_MB: number = 12;
+
 export function UploadElectionDefinition() {
   const { state, dispatch } = useElectionCreateContext();
   const navigate = useNavigate();
@@ -24,6 +26,22 @@ export function UploadElectionDefinition() {
   async function onFileChange(e: ChangeEvent<HTMLInputElement>) {
     const currentFile = e.target.files ? e.target.files[0] : undefined;
     if (currentFile !== undefined) {
+      if (currentFile.size > MAX_UPLOAD_SIZE_MB * 1024 * 1024) {
+        setError(
+          tx(
+            "election.invalid_election_definition.file_too_large",
+            {
+              file: () => <strong>{currentFile.name}</strong>,
+            },
+            {
+              max_size: `${MAX_UPLOAD_SIZE_MB} Megabyte`,
+            },
+          ),
+        );
+
+        return;
+      }
+
       setFile(currentFile);
       const data = await currentFile.text();
       const response = await create({ election_data: data });

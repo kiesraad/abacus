@@ -49,6 +49,8 @@ export function ElectionReportPage() {
     throw new ApplicationError(t("error.forbidden_message"), "InvalidCommitteeSessionStatus");
   }
 
+  const isFirstCommitteeSession = currentCommitteeSession.number === 1;
+
   if (changeStatusError) {
     throw changeStatusError;
   }
@@ -117,12 +119,31 @@ export function ElectionReportPage() {
               <h3>{t("election_management.what_now")}?</h3>
               <p>{t("election_management.download_definitive_files")}</p>
               <section className="sm">
-                <p>{t("election_management.zip_file_explanation")}</p>
+                <p>
+                  {t(
+                    isFirstCommitteeSession
+                      ? "election_management.first_session.zip_file_explanation"
+                      : "election_management.next_session.zip_file_explanation",
+                  )}
+                </p>
                 <ol className={cls.list}>
-                  <li>
-                    <strong>{t("election_management.pdf_file")}</strong>{" "}
-                    {t("election_management.signed_during_the_committee_session")}
-                  </li>
+                  {isFirstCommitteeSession ? (
+                    <li>
+                      <strong>{t("election_management.first_session.pdf_file")}</strong>{" "}
+                      {t("election_management.first_session.signed_during_the_committee_session")}
+                    </li>
+                  ) : (
+                    <>
+                      <li>
+                        <strong>{t("election_management.next_session.pdf_file")}</strong>{" "}
+                        {t("election_management.next_session.signed_during_the_committee_session")}
+                      </li>
+                      <li>
+                        <strong>{t("election_management.next_session.corrigendum_file")}</strong>{" "}
+                        {t("election_management.next_session.corrigendum_file_description")}
+                      </li>
+                    </>
+                  )}
                   <li>
                     <strong>{t("election_management.eml_file")}</strong>
                   </li>
@@ -130,6 +151,7 @@ export function ElectionReportPage() {
                 <p>{t("election_management.upload_the_zip")}</p>
               </section>
             </section>
+
             <FormLayout.Controls>
               <Button.Link to="../..">{t("back_to_overview")}</Button.Link>
               {currentCommitteeSession.id === committeeSession.id && (

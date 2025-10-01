@@ -159,7 +159,7 @@ describe("InvestigationsOverviewPage", () => {
     });
   });
 
-  test("Start data entry phase when clicking the fill findings button", async () => {
+  test("Shows start data entry modal when clicking fill findings button", async () => {
     server.use(CommitteeSessionStatusChangeRequestHandler);
 
     const electionData = getElectionMockData({}, { id: 1, number: 2, status: "data_entry_not_started" }, [

@@ -7,15 +7,13 @@ import { beforeEach, describe, expect, test, vi } from "vitest";
 import * as useMessages from "@/hooks/messages/useMessages";
 import { ErrorBoundary } from "@/components/error/ErrorBoundary";
 import { ElectionLayout } from "@/components/layout/ElectionLayout";
-import { getElectionMockData } from "@/testing/api-mocks/ElectionMockData";
 import {
-  CommitteeSessionStatusChangeRequestHandler,
   ElectionRequestHandler,
   ElectionStatusRequestHandler,
   PollingStationInvestigationDeleteHandler,
 } from "@/testing/api-mocks/RequestHandlers";
 import { Providers } from "@/testing/Providers";
-import { overrideOnce, server } from "@/testing/server";
+import { server } from "@/testing/server";
 import { screen, setupTestRouter, spyOnHandler, within } from "@/testing/test-utils";
 
 import { investigationRoutes } from "../routes";
@@ -70,7 +68,7 @@ describe("InvestigationPrintCorrigendumPage", () => {
       }),
     ).toBeVisible();
 
-    expect(await screen.findByRole("button", { name: "Verder naar bevindingen" })).toBeVisible();
+    expect(await screen.findByRole("link", { name: "Verder naar bevindingen" })).toBeVisible();
   });
 
   test("Navigates to investigation overview when clicking back", async () => {
@@ -81,33 +79,6 @@ describe("InvestigationPrintCorrigendumPage", () => {
 
     await waitFor(() => {
       expect(router.state.location.pathname).toEqual("/elections/1/investigations");
-    });
-  });
-
-  test("Shows start data entry modal when clicking continue to findings", async () => {
-    server.use(CommitteeSessionStatusChangeRequestHandler);
-
-    const electionData = getElectionMockData({}, { id: 1, number: 1, status: "data_entry_not_started" }, []);
-    overrideOnce("get", "/api/elections/1", 200, electionData);
-
-    await renderPage();
-
-    const user = userEvent.setup();
-    const continueButton = await screen.findByRole("button", { name: "Verder naar bevindingen" });
-    await user.click(continueButton);
-
-    const modal = await screen.findByTestId("modal-dialog");
-    expect(modal).toHaveTextContent("Invoerfase starten?");
-
-    const updateCommitteeSession = spyOnHandler(CommitteeSessionStatusChangeRequestHandler);
-
-    const confirmButton = await within(modal).findByRole("button", { name: "Invoerfase starten" });
-    await user.click(confirmButton);
-
-    expect(updateCommitteeSession).toHaveBeenCalled();
-
-    await waitFor(() => {
-      expect(navigate).toHaveBeenCalledExactlyOnceWith("../findings");
     });
   });
 

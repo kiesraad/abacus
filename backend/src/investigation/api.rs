@@ -154,7 +154,7 @@ async fn polling_station_investigation_conclude(
     let mut tx = pool.begin_immediate().await?;
 
     // Ensure the committee session is not in a data entry finished state
-    let _ = get_unfinished_committee_session(&mut tx, polling_station_id).await?;
+    let committee_session = get_unfinished_committee_session(&mut tx, polling_station_id).await?;
 
     let investigation = conclude_polling_station_investigation(
         &mut tx,
@@ -170,6 +170,16 @@ async fn polling_station_investigation_conclude(
             None,
         )
         .await?;
+
+    if committee_session.status == CommitteeSessionStatus::DataEntryNotStarted {
+        change_committee_session_status(
+            &mut tx,
+            committee_session.id,
+            CommitteeSessionStatus::DataEntryInProgress,
+            audit_service,
+        )
+        .await?;
+    }
 
     tx.commit().await?;
 

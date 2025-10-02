@@ -8,9 +8,10 @@ import { Messages } from "./Messages";
 
 describe("Messages component", () => {
   const popMessages: Mock<() => Message[]> = vi.fn(() => []);
+  const hasMessages: Mock<() => boolean> = vi.fn(() => false);
 
   beforeEach(() => {
-    vi.spyOn(useMessages, "useMessages").mockReturnValue({ pushMessage: vi.fn(), popMessages });
+    vi.spyOn(useMessages, "useMessages").mockReturnValue({ pushMessage: vi.fn(), popMessages, hasMessages });
   });
 
   test("should render message", async () => {

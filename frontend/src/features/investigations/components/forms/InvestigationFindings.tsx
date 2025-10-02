@@ -29,6 +29,7 @@ const ACCEPTED = "accepted";
 
 export function InvestigationFindings({ pollingStationId }: InvestigationFindingsProps) {
   const navigate = useNavigate();
+  const { hasMessages } = useMessages();
   const { election, investigation, pollingStation, refetch } = useElection(pollingStationId);
   const { pushMessage } = useMessages();
   const concludePath = `/api/polling_stations/${pollingStationId}/investigation/conclude`;
@@ -106,12 +107,15 @@ export function InvestigationFindings({ pollingStationId }: InvestigationFinding
     const response = await save();
 
     if (isSuccess(response)) {
-      pushMessage({
-        title: t("investigations.message.investigation_updated", {
-          number: pollingStation.number,
-          name: pollingStation.name,
-        }),
-      });
+      // Only push a message if there are no messages yet (e.g. from creating this investigation)
+      if (!hasMessages()) {
+        pushMessage({
+          title: t("investigations.message.investigation_updated", {
+            number: pollingStation.number,
+            name: pollingStation.name,
+          }),
+        });
+      }
 
       await refetch();
       await navigate(`/elections/${election.id}/investigations`);

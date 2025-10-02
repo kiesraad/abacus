@@ -36,7 +36,11 @@ describe("PollingStationUpdatePage", () => {
   beforeEach(() => {
     server.use(ElectionRequestHandler, PollingStationGetHandler, PollingStationUpdateHandler);
     vi.spyOn(ReactRouter, "useParams").mockReturnValue({ pollingStationId: "1" });
-    vi.spyOn(useMessages, "useMessages").mockReturnValue({ pushMessage, popMessages: vi.fn(() => []) });
+    vi.spyOn(useMessages, "useMessages").mockReturnValue({
+      pushMessage,
+      popMessages: vi.fn(() => []),
+      hasMessages: vi.fn(() => false),
+    });
   });
 
   test("Shows form", async () => {

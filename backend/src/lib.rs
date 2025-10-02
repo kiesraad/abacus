@@ -77,7 +77,7 @@ pub fn openapi_router() -> OpenApiRouter<AppState> {
     #[derive(utoipa::OpenApi)]
     struct ApiDoc;
 
-    OpenApiRouter::with_openapi(ApiDoc::openapi())
+    let router = OpenApiRouter::with_openapi(ApiDoc::openapi())
         .merge(audit_log::router())
         .merge(authentication::router())
         .merge(authentication::user_router())
@@ -87,7 +87,12 @@ pub fn openapi_router() -> OpenApiRouter<AppState> {
         .merge(polling_station::router())
         .merge(report::router())
         .merge(document::router())
-        .merge(investigation::router())
+        .merge(investigation::router());
+
+    #[cfg(feature = "dev-database")]
+    let router = router.merge(test_data_gen::router());
+
+    router
 }
 
 /// Axum router for the application

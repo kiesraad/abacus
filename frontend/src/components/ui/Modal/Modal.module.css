@@ -20,6 +20,10 @@
     max-height: calc(100% - 2rem);
     overflow-y: auto;
 
+    &.autoWidth {
+      width: auto;
+    }
+
     > button {
       position: absolute;
       top: 1.5rem;

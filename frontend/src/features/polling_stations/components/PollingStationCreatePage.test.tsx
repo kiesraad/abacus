@@ -11,7 +11,11 @@ import { PollingStationCreatePage } from "./PollingStationCreatePage";
 describe("PollingStationCreatePage", () => {
   test("Shows form", async () => {
     server.use(ElectionRequestHandler);
-    vi.spyOn(useMessages, "useMessages").mockReturnValue({ pushMessage: vi.fn(), popMessages: vi.fn(() => []) });
+    vi.spyOn(useMessages, "useMessages").mockReturnValue({
+      pushMessage: vi.fn(),
+      popMessages: vi.fn(() => []),
+      hasMessages: vi.fn(() => false),
+    });
 
     render(
       <ElectionProvider electionId={1}>

@@ -13,5 +13,11 @@ export function MessagesProvider({ children }: { children: ReactNode }) {
     return messages.current.splice(0);
   }
 
-  return <MessagesContext.Provider value={{ pushMessage, popMessages }}>{children}</MessagesContext.Provider>;
+  function hasMessages() {
+    return messages.current.length > 0;
+  }
+
+  return (
+    <MessagesContext.Provider value={{ pushMessage, popMessages, hasMessages }}>{children}</MessagesContext.Provider>
+  );
 }

@@ -11,6 +11,7 @@ export interface Message {
 export interface iMessageContext {
   pushMessage: (message: Message) => void;
   popMessages: () => Message[];
+  hasMessages: () => boolean;
 }
 
 export const MessagesContext = createContext<iMessageContext | undefined>(undefined);

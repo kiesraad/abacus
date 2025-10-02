@@ -76,36 +76,42 @@ pub async fn change_committee_session_status(
         }
     };
 
-    // If resuming committee session, delete both results files from committee session and database
+    // If resuming committee session, delete all files from committee session and files tables
     if committee_session.status == CommitteeSessionStatus::DataEntryFinished
         && new_status == CommitteeSessionStatus::DataEntryInProgress
-        && (committee_session.results_eml.is_some() || committee_session.results_pdf.is_some())
     {
-        change_files(
-            &mut tx,
-            committee_session.id,
-            CommitteeSessionFilesUpdateRequest {
-                results_eml: None,
-                results_pdf: None,
-                overview_pdf: None,
-            },
-        )
-        .await?;
-        if let Some(eml_id) = committee_session.results_eml {
-            let file = crate::files::repository::get_file(&mut tx, eml_id).await?;
-            crate::files::repository::delete_file(&mut tx, eml_id).await?;
-            audit_service
-                .log(&mut tx, &AuditEvent::FileDeleted(file.clone().into()), None)
-                .await?;
-        }
-        if let Some(pdf_id) = committee_session.results_pdf {
-            let file = crate::files::repository::get_file(&mut tx, pdf_id).await?;
-            crate::files::repository::delete_file(&mut tx, pdf_id).await?;
-            audit_service
-                .log(&mut tx, &AuditEvent::FileDeleted(file.clone().into()), None)
-                .await?;
+        let file_ids: Vec<u32> = [
+            committee_session.results_eml,
+            committee_session.results_pdf,
+            committee_session.overview_pdf,
+        ]
+        .iter()
+        .flatten()
+        .copied()
+        .collect();
+
+        if !file_ids.is_empty() {
+            change_files(
+                &mut tx,
+                committee_session.id,
+                CommitteeSessionFilesUpdateRequest {
+                    results_eml: None,
+                    results_pdf: None,
+                    overview_pdf: None,
+                },
+            )
+            .await?;
+
+            for id in file_ids {
+                if let Some(file) = crate::files::repository::delete_file(&mut tx, id).await? {
+                    audit_service
+                        .log(&mut tx, &AuditEvent::FileDeleted(file.into()), None)
+                        .await?;
+                }
+            }
         }
     }
+
     let committee_session = crate::committee_session::repository::change_status(
         &mut tx,
         committee_session_id,
@@ -116,7 +122,7 @@ pub async fn change_committee_session_status(
     audit_service
         .log(
             &mut tx,
-            &AuditEvent::CommitteeSessionUpdated(committee_session.clone().into()),
+            &AuditEvent::CommitteeSessionUpdated(committee_session.into()),
             None,
         )
         .await?;
@@ -247,6 +253,105 @@ mod tests {
     use chrono::Utc;
     use sqlx::SqlitePool;
     use test_log::test;
+
+    mod change_committee_session_status {
+        use test_log::test;
+
+        use crate::{
+            APIError,
+            audit_log::AuditService,
+            committee_session,
+            committee_session::{
+                CommitteeSessionFilesUpdateRequest,
+                status::{CommitteeSessionStatus, change_committee_session_status},
+            },
+            files,
+        };
+        use sqlx::{SqliteConnection, SqlitePool};
+        use std::net::Ipv4Addr;
+
+        async fn sorted_events(conn: &mut SqliteConnection) -> Result<Vec<String>, APIError> {
+            let mut events: Vec<String> = crate::audit_log::list_all(conn)
+                .await?
+                .into_iter()
+                .map(|e| e.event().to_string())
+                .collect();
+            events.sort();
+            Ok(events)
+        }
+
+        async fn generate_file(conn: &mut SqliteConnection) -> Result<u32, APIError> {
+            let file = files::repository::create_file(
+                conn,
+                "filename.txt".into(),
+                &[97, 98, 97, 99, 117, 115, 0],
+                "text/plain".into(),
+            )
+            .await?;
+            Ok(file.id)
+        }
+
+        #[test(sqlx::test(fixtures(
+            path = "../../fixtures",
+            scripts("election_7_four_sessions")
+        )))]
+        async fn test_delete_files_on_resume_no_files(pool: SqlitePool) -> Result<(), APIError> {
+            let mut conn = pool.acquire().await.unwrap();
+            let audit_service = AuditService::new(None, Some(Ipv4Addr::new(203, 0, 113, 0).into()));
+
+            let session = committee_session::repository::get(&mut conn, 703).await?;
+            assert_eq!(session.status, CommitteeSessionStatus::DataEntryFinished);
+
+            change_committee_session_status(
+                &mut conn,
+                703,
+                CommitteeSessionStatus::DataEntryInProgress,
+                audit_service,
+            )
+            .await?;
+
+            assert_eq!(sorted_events(&mut conn).await?, ["CommitteeSessionUpdated"]);
+            Ok(())
+        }
+
+        #[test(sqlx::test(fixtures(
+            path = "../../fixtures",
+            scripts("election_7_four_sessions")
+        )))]
+        async fn test_delete_files_on_resume_with_files(pool: SqlitePool) -> Result<(), APIError> {
+            let mut conn = pool.acquire().await?;
+            let audit_service = AuditService::new(None, Some(Ipv4Addr::new(203, 0, 113, 0).into()));
+
+            let session = committee_session::repository::get(&mut conn, 703).await?;
+            assert_eq!(session.status, CommitteeSessionStatus::DataEntryFinished);
+
+            let files_update = CommitteeSessionFilesUpdateRequest {
+                results_eml: Some(generate_file(&mut conn).await?),
+                results_pdf: Some(generate_file(&mut conn).await?),
+                overview_pdf: Some(generate_file(&mut conn).await?),
+            };
+            committee_session::repository::change_files(&mut conn, 703, files_update).await?;
+
+            change_committee_session_status(
+                &mut conn,
+                703,
+                CommitteeSessionStatus::DataEntryInProgress,
+                audit_service,
+            )
+            .await?;
+
+            assert_eq!(
+                sorted_events(&mut conn).await?,
+                [
+                    "CommitteeSessionUpdated",
+                    "FileDeleted",
+                    "FileDeleted",
+                    "FileDeleted"
+                ]
+            );
+            Ok(())
+        }
+    }
 
     /// Created --> Created: prepare_data_entry
     #[test]

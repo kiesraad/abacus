@@ -350,6 +350,7 @@ pub mod tests {
             number_of_voters: 100,
             results_eml: None,
             results_pdf: None,
+            overview_pdf: None,
         }
     }
 }

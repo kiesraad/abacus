@@ -1,6 +1,6 @@
 {
   "db_name": "SQLite",
-  "query": "\n        SELECT\n            id as \"id: u32\",\n            number as \"number: u32\",\n            election_id as \"election_id: u32\",\n            status as \"status: _\",\n            location,\n            start_date_time as \"start_date_time: _\",\n            number_of_voters as \"number_of_voters: u32\",\n            results_eml as \"results_eml: _\",\n            results_pdf as \"results_pdf: _\"\n        FROM (\n            SELECT\n            id,\n            number,\n            election_id,\n            status,\n            location,\n            start_date_time,\n            number_of_voters,\n            results_eml,\n            results_pdf,\n            row_number() over (\n            PARTITION BY election_id\n            ORDER BY number DESC\n            ) AS row_number FROM committee_sessions\n        ) t WHERE t.row_number = 1\n        ",
+  "query": "\n        SELECT\n            id as \"id: u32\",\n            number as \"number: u32\",\n            election_id as \"election_id: u32\",\n            status as \"status: _\",\n            location,\n            start_date_time as \"start_date_time: _\",\n            number_of_voters as \"number_of_voters: u32\",\n            results_eml as \"results_eml: _\",\n            results_pdf as \"results_pdf: _\",\n            overview_pdf as \"overview_pdf: _\"\n        FROM (\n            SELECT\n            id,\n            number,\n            election_id,\n            status,\n            location,\n            start_date_time,\n            number_of_voters,\n            results_eml,\n            results_pdf,\n            overview_pdf,\n            row_number() over (\n            PARTITION BY election_id\n            ORDER BY number DESC\n            ) AS row_number FROM committee_sessions\n        ) t WHERE t.row_number = 1\n        ",
   "describe": {
     "columns": [
       {
@@ -47,6 +47,11 @@
         "name": "results_pdf: _",
         "ordinal": 8,
         "type_info": "Integer"
+      },
+      {
+        "name": "overview_pdf: _",
+        "ordinal": 9,
+        "type_info": "Integer"
       }
     ],
     "parameters": {
@@ -61,8 +66,9 @@
       true,
       false,
       true,
+      true,
       true
     ]
   },
-  "hash": "3872d3616187c98919ef0bb1ad1eb2776bd37bb75fb5054c666637c6d76eb840"
+  "hash": "b392d9a1d013221c3558fd32d2c0bf67f7b353d7cae801ae4f5c9b595004855e"
 }

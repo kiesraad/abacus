@@ -1,21 +1,25 @@
 use serde::{Deserialize, Serialize};
 
 use crate::{
+    committee_session::CommitteeSession,
     data_entry::CommonPollingStationResults,
     election::ElectionWithPoliticalGroups,
     investigation::PollingStationInvestigation,
     pdf_gen::models::{PdfFileModel, PdfModel, ToPdfFileModel},
     polling_station::structs::PollingStation,
+    summary::ElectionSummary,
 };
 
 #[derive(Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct ModelNa14_2Input {
+    pub committee_session: CommitteeSession,
+    pub previous_committee_session: CommitteeSession,
     pub election: ElectionWithPoliticalGroups,
-    // pub previous_results: Vec<CommonPollingStationResults>,
-    // pub corrected_results: Vec<CommonPollingStationResults>,
-    // TODO: Add polling station numbers with more votes than voters
-    // TODO: Add polling station numbers with less votes than voters
+    pub previous_summary: ElectionSummary,
+    pub summary: ElectionSummary,
+    pub hash: String,
+    pub creation_date_time: String,
 }
 
 impl ToPdfFileModel for ModelNa14_2Input {

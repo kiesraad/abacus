@@ -10,7 +10,7 @@ CREATE TABLE committee_sessions
     results_eml      INTEGER                           ,
     results_pdf      INTEGER                           ,
 
-    FOREIGN KEY (election_id) REFERENCES elections (id) ON DELETE CASCADE,
+    FOREIGN KEY (election_id) REFERENCES elections (id),
     FOREIGN KEY (results_eml) REFERENCES files (id),
     FOREIGN KEY (results_pdf) REFERENCES files (id)
 ) STRICT;

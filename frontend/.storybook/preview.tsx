@@ -55,6 +55,7 @@ const preview: Preview = {
     (Story, { parameters }) => {
       const needsElection = (parameters.needsElection as boolean) || false;
       const needsElectionStatus = (parameters.needsElectionStatus as boolean) || false;
+      const committeeSessionNumber = (parameters.committeeSessionNumber as number) || 1;
 
       let component = <Story />;
 
@@ -78,7 +79,10 @@ const preview: Preview = {
             value={{
               election: electionDetailsMockResponse.election,
               pollingStations: electionDetailsMockResponse.polling_stations,
-              currentCommitteeSession: electionDetailsMockResponse.current_committee_session,
+              currentCommitteeSession: {
+                ...electionDetailsMockResponse.current_committee_session,
+                number: committeeSessionNumber,
+              },
               committeeSessions: electionDetailsMockResponse.committee_sessions,
               investigations: electionDetailsMockResponse.investigations,
               refetch: () =>

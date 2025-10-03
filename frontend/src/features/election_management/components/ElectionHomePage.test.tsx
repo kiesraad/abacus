@@ -168,83 +168,88 @@ describe("ElectionHomePage", () => {
     ]);
   });
 
-  test("Shows delete committee session button and clicking it deletes the current committee session", async () => {
-    const user = userEvent.setup();
-    server.use(CommitteeSessionDeleteHandler);
-    const sessionDeleteRequestSpy = spyOnHandler(CommitteeSessionDeleteHandler);
-    const committeeSessionData: Partial<CommitteeSession> = { id: 4, number: 4, status: "created" };
-    const electionData = getElectionMockData({}, committeeSessionData);
-    electionData.committee_sessions = getCommitteeSessionListMockData(committeeSessionData);
-    server.use(
-      http.get("/api/elections/1", () =>
-        HttpResponse.json(electionData satisfies ElectionDetailsResponse, { status: 200 }),
-      ),
-    );
+  describe("Delete committee session", () => {
+    test("Shows button for coodinator", async () => {
+      const committeeSessionData: Partial<CommitteeSession> = { id: 4, number: 4, status: "created" };
+      const electionData = getElectionMockData({}, committeeSessionData);
+      server.use(
+        http.get("/api/elections/1", () =>
+          HttpResponse.json(electionData satisfies ElectionDetailsResponse, { status: 200 }),
+        ),
+      );
 
-    await renderPage("coordinator");
+      await renderPage("coordinator");
 
-    const committee_session_cards = await screen.findByTestId("committee-session-cards");
-    expect(committee_session_cards).toBeVisible();
-    expect(within(committee_session_cards).getByTestId("session-4")).toHaveTextContent(
-      /Vierde zitting — Zitting voorbereiden/,
-    );
-    expect(within(committee_session_cards).getByTestId("session-3")).toHaveTextContent(
-      /Derde zitting — Steminvoer afgerond/,
-    );
-    expect(within(committee_session_cards).getByTestId("session-2")).toHaveTextContent(
-      /Tweede zitting — Steminvoer afgerond/,
-    );
-    expect(within(committee_session_cards).getByTestId("session-1")).toHaveTextContent(
-      /Eerste zitting — Steminvoer afgerond/,
-    );
-    expect(screen.queryByRole("button", { name: "Nieuwe zitting voorbereiden" })).not.toBeInTheDocument();
+      const deleteButton = screen.getByRole("button", { name: "Zitting verwijderen" });
+      expect(deleteButton).toBeVisible();
+    });
 
-    const deleteButton = screen.getByRole("button", { name: "Zitting verwijderen" });
-    expect(deleteButton).toBeVisible();
+    test("Doesn't show button for administrator", async () => {
+      const committeeSessionData: Partial<CommitteeSession> = { id: 4, number: 4, status: "created" };
+      const electionData = getElectionMockData({}, committeeSessionData);
+      server.use(
+        http.get("/api/elections/1", () =>
+          HttpResponse.json(electionData satisfies ElectionDetailsResponse, { status: 200 }),
+        ),
+      );
 
-    await user.click(deleteButton);
+      await renderPage("administrator");
 
-    const modal = await screen.findByRole("dialog");
-    expect(modal).toBeVisible();
-    const title = within(modal).getByText("Zitting verwijderen?");
-    expect(title).toBeVisible();
+      expect(screen.queryByRole("button", { name: "Zitting verwijderen" })).not.toBeInTheDocument();
+    });
 
-    const confirmButton = within(modal).getByRole("button", { name: "Verwijder zitting" });
-    expect(confirmButton).toBeVisible();
-    await user.click(confirmButton);
+    test("With investigations, modal 'delete investigations first' is shown", async () => {
+      const committeeSessionData: Partial<CommitteeSession> = { id: 4, number: 4, status: "created" };
+      const electionData = getElectionMockData({}, committeeSessionData);
+      server.use(
+        http.get("/api/elections/1", () =>
+          HttpResponse.json(electionData satisfies ElectionDetailsResponse, { status: 200 }),
+        ),
+      );
 
-    expect(sessionDeleteRequestSpy).toHaveBeenCalledOnce();
-  });
+      await renderPage("coordinator");
 
-  test("Does not show delete committee session button for administrator", async () => {
-    const committeeSessionData: Partial<CommitteeSession> = { status: "created" };
-    const electionData = getElectionMockData({}, committeeSessionData);
-    electionData.committee_sessions = getCommitteeSessionListMockData(committeeSessionData);
-    server.use(
-      http.get("/api/elections/1", () =>
-        HttpResponse.json(electionData satisfies ElectionDetailsResponse, { status: 200 }),
-      ),
-    );
+      const user = userEvent.setup();
+      const deleteButton = screen.getByRole("button", { name: "Zitting verwijderen" });
+      await user.click(deleteButton);
 
-    await renderPage("administrator");
+      const modal = await screen.findByRole("dialog");
+      const title = within(modal).getByText("Verwijder eerst onderzoeken");
+      expect(title).toBeVisible();
 
-    const committee_session_cards = await screen.findByTestId("committee-session-cards");
-    expect(committee_session_cards).toBeVisible();
-    expect(within(committee_session_cards).getByTestId("session-4")).toHaveTextContent(
-      /Vierde zitting — Zitting voorbereiden/,
-    );
-    expect(within(committee_session_cards).getByTestId("session-3")).toHaveTextContent(
-      /Derde zitting — Steminvoer afgerond/,
-    );
-    expect(within(committee_session_cards).getByTestId("session-2")).toHaveTextContent(
-      /Tweede zitting — Steminvoer afgerond/,
-    );
-    expect(within(committee_session_cards).getByTestId("session-1")).toHaveTextContent(
-      /Eerste zitting — Steminvoer afgerond/,
-    );
+      const viewInvestigations = within(modal).getByRole("button", { name: "Bekijk onderzoeken" });
+      expect(viewInvestigations).toBeVisible();
+    });
 
-    expect(screen.queryByRole("button", { name: "Nieuwe zitting voorbereiden" })).not.toBeInTheDocument();
-    expect(screen.queryByRole("button", { name: "Zitting verwijderen" })).not.toBeInTheDocument();
+    test("Without investigations, modal 'are you sure' is shown", async () => {
+      server.use(CommitteeSessionDeleteHandler);
+      const sessionDeleteRequestSpy = spyOnHandler(CommitteeSessionDeleteHandler);
+
+      const committeeSessionData: Partial<CommitteeSession> = { id: 4, number: 4, status: "created" };
+      const electionData = getElectionMockData({}, committeeSessionData);
+      electionData.investigations = [];
+      server.use(
+        http.get("/api/elections/1", () =>
+          HttpResponse.json(electionData satisfies ElectionDetailsResponse, { status: 200 }),
+        ),
+      );
+
+      await renderPage("coordinator");
+
+      const user = userEvent.setup();
+      const deleteButton = screen.getByRole("button", { name: "Zitting verwijderen" });
+      await user.click(deleteButton);
+
+      const modal = await screen.findByRole("dialog");
+      const title = within(modal).getByText("Zitting verwijderen?");
+      expect(title).toBeVisible();
+
+      const confirmButton = within(modal).getByRole("button", { name: "Verwijder zitting" });
+      expect(confirmButton).toBeVisible();
+      await user.click(confirmButton);
+
+      expect(sessionDeleteRequestSpy).toHaveBeenCalledOnce();
+    });
   });
 
   test("Shows error page when start data entry call returns an error", async () => {

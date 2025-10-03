@@ -11,7 +11,13 @@ import { Loader } from "@/components/ui/Loader/Loader";
 import { Modal } from "@/components/ui/Modal/Modal";
 import { useUserRole } from "@/hooks/user/useUserRole";
 import { t } from "@/i18n/translate";
-import { Election, ELECTION_LIST_REQUEST_PATH, ElectionListResponse, LoginResponse } from "@/types/generated/openapi";
+import {
+  CommitteeSession,
+  Election,
+  ELECTION_LIST_REQUEST_PATH,
+  ElectionListResponse,
+  LoginResponse,
+} from "@/types/generated/openapi";
 
 import { GenerateTestElectionForm } from "./GenerateTestElectionForm";
 import { MockTest } from "./MockTest";
@@ -28,19 +34,21 @@ function Links() {
     return <Loader />;
   }
   const electionList = getElections.data.elections;
+  const committeeSessions = getElections.data.committee_sessions;
 
   return (
     <>
       {(__API_MSW__ || isAdministrator || isCoordinator) && (
-        <AdministratorCoordinatorLinks electionList={electionList} />
+        <AdministratorCoordinatorLinks electionList={electionList} committeeSessions={committeeSessions} />
       )}
-      {(__API_MSW__ || isTypist) && <TypistLinks electionList={electionList} />}
+      {(__API_MSW__ || isTypist) && <TypistLinks electionList={electionList} committeeSessions={committeeSessions} />}
     </>
   );
 }
 
 interface LinksProps {
   electionList: Election[];
+  committeeSessions: CommitteeSession[];
 }
 
 function TypistLinks({ electionList }: LinksProps) {
@@ -63,7 +71,7 @@ function TypistLinks({ electionList }: LinksProps) {
   );
 }
 
-function AdministratorCoordinatorLinks({ electionList }: LinksProps) {
+function AdministratorCoordinatorLinks({ electionList, committeeSessions }: LinksProps) {
   const { isAdministrator } = useUserRole();
 
   return (
@@ -76,22 +84,28 @@ function AdministratorCoordinatorLinks({ electionList }: LinksProps) {
           <Link to={"/elections"}>{isAdministrator ? t("election.manage") : t("election.title.plural")}</Link>
         </li>
         <ul>
-          {electionList.map((election) => (
-            <li key={election.id}>
-              <Link to={`/elections/${election.id}`}>{election.name}</Link>
-              <ul>
-                <li>
-                  <Link to={`/elections/${election.id}/status`}>{t("election_status.main_title")}</Link>
-                </li>
-                <li>
-                  <Link to={`/elections/${election.id}/polling-stations`}>{t("polling_station.title.plural")}</Link>
-                </li>
-                <li>
-                  <Link to={`/elections/${election.id}/investigations`}>{t("investigations.title")}</Link>
-                </li>
-              </ul>
-            </li>
-          ))}
+          {electionList.map((election) => {
+            const committeeSession = committeeSessions.find((cs) => cs.election_id === election.id);
+
+            return (
+              <li key={election.id}>
+                <Link to={`/elections/${election.id}`}>{election.name}</Link>
+                <ul>
+                  <li>
+                    <Link to={`/elections/${election.id}/status`}>{t("election_status.main_title")}</Link>
+                  </li>
+                  <li>
+                    <Link to={`/elections/${election.id}/polling-stations`}>{t("polling_station.title.plural")}</Link>
+                  </li>
+                  {committeeSession && committeeSession.number > 1 && (
+                    <li>
+                      <Link to={`/elections/${election.id}/investigations`}>{t("investigations.title")}</Link>
+                    </li>
+                  )}
+                </ul>
+              </li>
+            );
+          })}
         </ul>
         <li>
           <Link to={`/users`}>{t("users.manage")}</Link>

@@ -1,6 +1,5 @@
 #![cfg(test)]
 
-use crate::{shared::create_result, utils::serve_api};
 use abacus::committee_session::{
     CommitteeSession, CommitteeSessionNumberOfVotersChangeRequest,
     CommitteeSessionStatusChangeRequest, CommitteeSessionUpdateRequest, NewCommitteeSessionRequest,
@@ -9,6 +8,11 @@ use abacus::committee_session::{
 use axum::http::StatusCode;
 use sqlx::SqlitePool;
 use test_log::test;
+
+use crate::{
+    shared::{create_investigation, create_result},
+    utils::serve_api,
+};
 
 pub mod shared;
 pub mod utils;
@@ -119,8 +123,8 @@ async fn test_committee_session_delete_ok_status_created(pool: SqlitePool) {
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_5_with_results", "users"))))]
-async fn test_committee_session_delete_ok_status_data_entry_not_started(pool: SqlitePool) {
-    let addr = serve_api(pool).await;
+async fn test_committee_session_delete_fail(pool: SqlitePool) {
+    let addr = serve_api(pool.clone()).await;
     let cookie = shared::coordinator_login(&addr).await;
     let election_id = 5;
     let committee_session_id = 6;
@@ -132,6 +136,10 @@ async fn test_committee_session_delete_ok_status_data_entry_not_started(pool: Sq
         CommitteeSessionStatus::Created,
     )
     .await;
+    assert_eq!(
+        create_investigation(&addr, 9).await.status(),
+        StatusCode::OK
+    );
     shared::change_status_committee_session(
         &addr,
         &cookie,
@@ -139,7 +147,6 @@ async fn test_committee_session_delete_ok_status_data_entry_not_started(pool: Sq
         CommitteeSessionStatus::DataEntryNotStarted,
     )
     .await;
-
     let committee_session =
         shared::get_election_committee_session(&addr, &cookie, election_id).await;
     assert_eq!(
@@ -155,17 +162,11 @@ async fn test_committee_session_delete_ok_status_data_entry_not_started(pool: Sq
         .await
         .unwrap();
 
+    // You cannot delete a committee session if there are investigations linked to it
     assert_eq!(
         response.status(),
-        StatusCode::OK,
+        StatusCode::UNPROCESSABLE_ENTITY,
         "Unexpected response status"
-    );
-
-    let committee_session =
-        shared::get_election_committee_session(&addr, &cookie, election_id).await;
-    assert_eq!(
-        committee_session.status,
-        CommitteeSessionStatus::DataEntryFinished
     );
 }
 

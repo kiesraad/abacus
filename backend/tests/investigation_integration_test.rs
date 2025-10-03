@@ -54,6 +54,7 @@ async fn conclude_investigation(
     }));
     let url =
         format!("http://{addr}/api/polling_stations/{polling_station_id}/investigation/conclude");
+
     reqwest::Client::new()
         .post(&url)
         .header("cookie", coordinator_cookie)
@@ -616,6 +617,7 @@ async fn test_investigation_creation_for_committee_session_with_finished_status(
     .await;
     let committee_session =
         shared::get_election_committee_session(&addr, &cookie, election_id).await;
+
     assert_eq!(
         committee_session.status,
         CommitteeSessionStatus::DataEntryFinished
@@ -623,14 +625,7 @@ async fn test_investigation_creation_for_committee_session_with_finished_status(
 
     assert_eq!(
         shared::create_investigation(&addr, 9).await.status(),
-        StatusCode::OK
-    );
-
-    let committee_session =
-        shared::get_election_committee_session(&addr, &cookie, election_id).await;
-    assert_eq!(
-        committee_session.status,
-        CommitteeSessionStatus::DataEntryInProgress
+        StatusCode::CONFLICT
     );
 }
 
@@ -742,11 +737,11 @@ async fn test_polling_station_corrigendum_download_with_previous_results(pool: S
     assert!(bytes.len() > 1024);
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
+#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_5_with_results", "users"))))]
 async fn test_polling_station_corrigendum_download_without_previous_results(pool: SqlitePool) {
     let addr = serve_api(pool.clone()).await;
     let coordinator_cookie = shared::coordinator_login(&addr).await;
-    let polling_station_id = 2;
+    let polling_station_id = 9;
 
     assert_eq!(
         shared::create_investigation(&addr, polling_station_id)
@@ -774,7 +769,7 @@ async fn test_polling_station_corrigendum_download_without_previous_results(pool
     assert_eq!(&content_disposition_string[..21], "attachment; filename=");
     assert_eq!(
         &content_disposition_string[21..],
-        "\"Model_Na14-2_GR2024_Stembureau_34_Bijlage_1.pdf\""
+        "\"Model_Na14-2_GR2026_Stembureau_41_Bijlage_1.pdf\""
     );
 
     let bytes = response.bytes().await.unwrap();

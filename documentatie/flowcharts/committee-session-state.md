@@ -20,6 +20,7 @@ stateDiagram-v2
   DataEntryFinished --> DataEntryInProgress: add new <br/> polling station
   DataEntryFinished --> DataEntryInProgress: click resume <br/> data entry
   DataEntryFinished --> DataEntryInProgress: delete polling <br/> station result
+  DataEntryFinished --> Created: delete last <br/>polling station
   DataEntryFinished --> [*]
 ```
 

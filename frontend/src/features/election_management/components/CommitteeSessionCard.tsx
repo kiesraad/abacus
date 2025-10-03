@@ -204,6 +204,9 @@ export function CommitteeSessionCard({
           to: `report/committee-session/${committeeSession.id}/download`,
         });
       }
+      if (currentSession && committeeSession.number > 1) {
+        buttonLinks.push(investigationsButtonLink);
+      }
       if (currentSession) {
         buttonLinks.push({ id: committeeSession.id, label: t("election_management.view_data_entry"), to: "status" });
       }

@@ -48,8 +48,8 @@ pub fn router() -> OpenApiRouter<AppState> {
         ))
 }
 
-/// Validate that the committee session is not in a data entry finished state
-async fn get_unfinished_committee_session(
+/// Validate that the committee session is in a state that allows mutations
+async fn validate_and_get_committee_session(
     conn: &mut SqliteConnection,
     polling_station_id: u32,
 ) -> Result<CommitteeSession, APIError> {
@@ -58,9 +58,7 @@ async fn get_unfinished_committee_session(
         crate::committee_session::repository::get(conn, polling_station.committee_session_id)
             .await?;
 
-    if !committee_session.is_next_session()
-        || committee_session.status == CommitteeSessionStatus::DataEntryFinished
-    {
+    if !committee_session.is_next_session() {
         return Err(APIError::CommitteeSession(
             CommitteeSessionError::InvalidCommitteeSessionStatus,
         ));
@@ -95,7 +93,7 @@ async fn polling_station_investigation_create(
 ) -> Result<PollingStationInvestigation, APIError> {
     let mut tx = pool.begin_immediate().await?;
 
-    let committee_session = get_unfinished_committee_session(&mut tx, polling_station_id).await?;
+    let committee_session = validate_and_get_committee_session(&mut tx, polling_station_id).await?;
 
     let investigation = create_polling_station_investigation(
         &mut tx,
@@ -117,6 +115,14 @@ async fn polling_station_investigation_create(
             &mut tx,
             committee_session.id,
             CommitteeSessionStatus::DataEntryNotStarted,
+            audit_service,
+        )
+        .await?;
+    } else if committee_session.status == CommitteeSessionStatus::DataEntryFinished {
+        change_committee_session_status(
+            &mut tx,
+            committee_session.id,
+            CommitteeSessionStatus::DataEntryInProgress,
             audit_service,
         )
         .await?;
@@ -153,8 +159,7 @@ async fn polling_station_investigation_conclude(
 ) -> Result<PollingStationInvestigation, APIError> {
     let mut tx = pool.begin_immediate().await?;
 
-    // Ensure the committee session is not in a data entry finished state
-    let committee_session = get_unfinished_committee_session(&mut tx, polling_station_id).await?;
+    let committee_session = validate_and_get_committee_session(&mut tx, polling_station_id).await?;
 
     let investigation = conclude_polling_station_investigation(
         &mut tx,
@@ -171,7 +176,9 @@ async fn polling_station_investigation_conclude(
         )
         .await?;
 
-    if committee_session.status == CommitteeSessionStatus::DataEntryNotStarted {
+    if committee_session.status == CommitteeSessionStatus::DataEntryNotStarted
+        || committee_session.status == CommitteeSessionStatus::DataEntryFinished
+    {
         change_committee_session_status(
             &mut tx,
             committee_session.id,
@@ -212,8 +219,7 @@ async fn polling_station_investigation_update(
 ) -> Result<PollingStationInvestigation, APIError> {
     let mut tx = pool.begin_immediate().await?;
 
-    // Ensure the committee session is not in a data entry finished state
-    let _ = get_unfinished_committee_session(&mut tx, polling_station_id).await?;
+    let committee_session = validate_and_get_committee_session(&mut tx, polling_station_id).await?;
 
     // If corrected_results is changed from yes to no, check if there are data entries or results.
     // If deleting them is accepted, delete them. If not, return an error.
@@ -256,6 +262,16 @@ async fn polling_station_investigation_update(
         )
         .await?;
 
+    if committee_session.status == CommitteeSessionStatus::DataEntryFinished {
+        change_committee_session_status(
+            &mut tx,
+            committee_session.id,
+            CommitteeSessionStatus::DataEntryInProgress,
+            audit_service,
+        )
+        .await?;
+    }
+
     tx.commit().await?;
 
     Ok(investigation)
@@ -284,8 +300,7 @@ async fn polling_station_investigation_delete(
 ) -> Result<StatusCode, APIError> {
     let mut tx = pool.begin_immediate().await?;
 
-    // Ensure the committee session is not in a data entry finished state
-    let _ = get_unfinished_committee_session(&mut tx, polling_station_id).await?;
+    let committee_session = validate_and_get_committee_session(&mut tx, polling_station_id).await?;
 
     let investigation = get_polling_station_investigation(&mut tx, polling_station_id).await?;
     let polling_station =
@@ -310,14 +325,22 @@ async fn polling_station_investigation_delete(
         .await?;
 
         // Change committee session status if last investigation is deleted
-        if list_investigations_for_committee_session(&mut tx, polling_station.committee_session_id)
+        if list_investigations_for_committee_session(&mut tx, committee_session.id)
             .await?
             .is_empty()
         {
             change_committee_session_status(
                 &mut tx,
-                polling_station.committee_session_id,
+                committee_session.id,
                 CommitteeSessionStatus::Created,
+                audit_service,
+            )
+            .await?;
+        } else if committee_session.status == CommitteeSessionStatus::DataEntryFinished {
+            change_committee_session_status(
+                &mut tx,
+                committee_session.id,
+                CommitteeSessionStatus::DataEntryInProgress,
                 audit_service,
             )
             .await?;

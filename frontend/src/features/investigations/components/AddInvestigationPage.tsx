@@ -6,7 +6,7 @@ import { useElection } from "@/hooks/election/useElection";
 import { t, tx } from "@/i18n/translate";
 
 export function AddInvestigationPage() {
-  const { pollingStations, investigations } = useElection();
+  const { election, pollingStations, investigations } = useElection();
 
   const availablePollingStations = pollingStations.filter(
     (station) => !investigations.some((investigation) => investigation.polling_station_id === station.id),
@@ -55,6 +55,12 @@ export function AddInvestigationPage() {
               )}
             </Table.Body>
           </Table>
+
+          <nav className="mt-md-lg mb-lg">
+            <Button.Link to={`/elections/${election.id}/polling-stations/create`} variant="secondary">
+              {t("investigations.add_polling_station")}
+            </Button.Link>
+          </nav>
         </section>
       </main>
     </>

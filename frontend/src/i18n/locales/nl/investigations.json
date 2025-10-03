@@ -1,6 +1,7 @@
 {
   "add_investigation": "Onderzoek toevoegen",
   "add_investigation_for_each_csb_request": "Voeg voor elk verzoek van het centraal stembureau een onderzoek toe en voer de aanleiding in.",
+  "add_polling_station": "Stembureau toevoegen",
   "all_investigations_finished": "Alle onderzoeken zijn afgehandeld",
   "all_investigations_finished_description": "De resultaten van alle onderzoeken zijn ingevoerd.\nJe kunt de uitslag nu definitief maken en het proces verbaal opmaken.",
   "corrected_results": "Er is een gecorrigeerde uitslag",

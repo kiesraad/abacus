@@ -10,10 +10,8 @@ use super::{
 use crate::{
     APIError,
     audit_log::{AuditEvent, AuditService},
-    investigation::{
-        all_investigations_for_committee_session_finished,
-        list_investigations_for_committee_session,
-    },
+    committee_session::repository::all_investigations_finished,
+    investigation::list_investigations_for_committee_session,
 };
 
 /// Committee session status
@@ -214,11 +212,7 @@ impl CommitteeSessionStatus {
             CommitteeSessionStatus::DataEntryInProgress
             | CommitteeSessionStatus::DataEntryPaused => {
                 if committee_session.number > 1
-                    && !all_investigations_for_committee_session_finished(
-                        conn,
-                        committee_session.id,
-                    )
-                    .await?
+                    && !all_investigations_finished(conn, committee_session.id).await?
                 {
                     return Err(CommitteeSessionError::InvalidStatusTransition);
                 }

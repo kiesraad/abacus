@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import { Link, Outlet, useBlocker, useLocation, useNavigate } from "react-router";
 
 import { PageTitle } from "@/components/page_title/PageTitle";
+import { Alert } from "@/components/ui/Alert/Alert";
 import { StickyNav } from "@/components/ui/AppLayout/StickyNav";
 import { PollingStationNumber } from "@/components/ui/Badge/PollingStationNumber";
 import { Loader } from "@/components/ui/Loader/Loader";
@@ -77,6 +78,12 @@ export function AddInvestigationLayout() {
           <h1>{pollingStation.name}</h1>
         </section>
       </header>
+      {currentCommitteeSession.status === "data_entry_finished" && (
+        <Alert type="warning">
+          <strong className="heading-md">{t("investigations.warning_data_entry_finished.title")}</strong>
+          <p>{t("investigations.warning_data_entry_finished.description")}</p>
+        </Alert>
+      )}
       <main>
         <StickyNav>
           <ProgressList>

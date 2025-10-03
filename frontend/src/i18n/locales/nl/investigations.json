@@ -71,5 +71,9 @@
   "start_data_entry_description": "De bevindingen van het onderzoek mogen pas worden ingevoerd als de zitting officieel is geopend. Is dat het geval? Start dan de invoerfase. Je kunt dan voor alle aangevraagde onderzoeken de bevindingen invoeren.",
   "start_data_entry_question": "Invoerfase starten?",
   "title": "Onderzoeken",
-  "you_cannot_add_another_investigation": "Je hebt voor alle stembureaus al een onderzoek toegevoegd.\nJe kan niet nog een onderzoek toevoegen."
+  "you_cannot_add_another_investigation": "Je hebt voor alle stembureaus al een onderzoek toegevoegd.\nJe kan niet nog een onderzoek toevoegen.",
+  "warning_data_entry_finished": {
+    "title": "Invoerfase al afgerond",
+    "description": "Als je wijzigingen aanbrengt in deze zitting door onderzoeken toe te voegen, te bewerken of te verwijderen, wordt de invoerfase heropent. Bij het afronden van de invoerfase wordt een nieuw proces-verbaal gemaakt."
+  }
 }

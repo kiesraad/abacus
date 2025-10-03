@@ -68,6 +68,29 @@ describe("AddInvestigationLayout", () => {
     expect(await screen.findByRole("button", { name: "Opslaan" })).toBeVisible();
   });
 
+  test("Renders warning when data entry is finished", async () => {
+    const electionData = getElectionMockData({}, { id: 1, number: 1, status: "data_entry_finished" }, []);
+    overrideOnce("get", "/api/elections/1", 200, electionData);
+
+    await renderPage("reason");
+
+    const alert = await screen.findByRole("alert");
+    expect(within(alert).getByRole("strong")).toHaveTextContent("Invoerfase al afgerond");
+    expect(alert).toBeVisible();
+  });
+
+  test("Does not render warning when data entry is not finished", async () => {
+    const electionData = getElectionMockData({}, { id: 1, number: 1, status: "data_entry_in_progress" }, []);
+    overrideOnce("get", "/api/elections/1", 200, electionData);
+
+    await renderPage("reason");
+
+    // Ensure rendering is complete
+    await screen.findAllByRole("heading", { level: 1 });
+
+    expect(screen.queryByRole("alert")).toBeNull();
+  });
+
   describe("Navigation: data entry modal", () => {
     test.each([
       { to: "print-corrigendum", status: "data_entry_not_started", expectShown: false },

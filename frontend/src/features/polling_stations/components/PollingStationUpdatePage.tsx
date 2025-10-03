@@ -18,7 +18,7 @@ import { PollingStationForm } from "./PollingStationForm";
 
 export function PollingStationUpdatePage() {
   const pollingStationId = useNumericParam("pollingStationId");
-  const { election } = useElection();
+  const { currentCommitteeSession, election } = useElection();
   const navigate = useNavigate();
   const { pushMessage } = useMessages();
 
@@ -85,6 +85,13 @@ export function PollingStationUpdatePage() {
           <h1>{t("polling_station.update")}</h1>
         </section>
       </header>
+
+      {currentCommitteeSession.status === "data_entry_finished" && (
+        <Alert type="warning">
+          <strong className="heading-md">{t("polling_station.warning_data_entry_finished.title")}</strong>
+          <p>{t("polling_station.warning_data_entry_finished.description")}</p>
+        </Alert>
+      )}
 
       {error && (
         <Alert type="error" onClose={closeError}>

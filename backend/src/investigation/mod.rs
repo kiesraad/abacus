@@ -1,11 +1,9 @@
 mod api;
 mod repository;
-mod status;
 mod structs;
 
 pub(crate) use self::{
     api::router, repository::list_investigations_for_committee_session,
-    status::all_investigations_for_committee_session_finished,
     structs::PollingStationInvestigation,
 };
 

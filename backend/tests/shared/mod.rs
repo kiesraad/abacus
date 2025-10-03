@@ -20,9 +20,6 @@ use axum::http::{HeaderValue, StatusCode};
 use hyper::header::CONTENT_TYPE;
 use reqwest::{Body, Client, Response};
 use serde_json::json;
-use sqlx::SqlitePool;
-
-use crate::utils::serve_api;
 
 pub fn differences_counts_zero() -> DifferencesCounts {
     DifferencesCounts {
@@ -281,22 +278,6 @@ pub async fn create_result_with_non_example_data_entry(
         .await;
 }
 
-pub async fn get_election(pool: SqlitePool, election_id: u32) -> ElectionDetailsResponse {
-    let addr = serve_api(pool).await;
-    let url = format!("http://{addr}/api/elections/{election_id}");
-    let coordinator_cookie = coordinator_login(&addr).await;
-    let response = Client::new()
-        .get(&url)
-        .header("cookie", coordinator_cookie)
-        .send()
-        .await
-        .unwrap();
-
-    // Ensure the response is what we expect
-    assert_eq!(response.status(), StatusCode::OK);
-    response.json().await.unwrap()
-}
-
 pub async fn get_election_committee_session(
     addr: &SocketAddr,
     cookie: &HeaderValue,
@@ -352,42 +333,6 @@ pub async fn get_statuses(
             acc.insert(entry.polling_station_id, entry);
             acc
         })
-}
-
-pub async fn conclude_investigation(
-    pool: SqlitePool,
-    polling_station_id: u32,
-    body: Option<serde_json::Value>,
-) -> Response {
-    let addr = serve_api(pool).await;
-    let coordinator_cookie = coordinator_login(&addr).await;
-    let body = body.unwrap_or(json!({
-        "findings": "Test findings",
-        "corrected_results": false
-    }));
-    let url =
-        format!("http://{addr}/api/polling_stations/{polling_station_id}/investigation/conclude");
-    Client::new()
-        .post(&url)
-        .header("cookie", coordinator_cookie)
-        .header("Content-Type", "application/json")
-        .body(body.to_string())
-        .send()
-        .await
-        .unwrap()
-}
-
-pub async fn delete_investigation(pool: SqlitePool, polling_station_id: u32) -> Response {
-    let addr = serve_api(pool).await;
-    let coordinator_cookie = coordinator_login(&addr).await;
-    let url = format!("http://{addr}/api/polling_stations/{polling_station_id}/investigation");
-    Client::new()
-        .delete(&url)
-        .header("cookie", coordinator_cookie)
-        .header("Content-Type", "application/json")
-        .send()
-        .await
-        .unwrap()
 }
 
 /// Calls the login endpoint for an Admin user and returns the session cookie

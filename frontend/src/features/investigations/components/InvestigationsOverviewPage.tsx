@@ -60,7 +60,7 @@ export function InvestigationsOverviewPage() {
         </section>
       </header>
 
-      {allInvestigationsHandled ? (
+      {allInvestigationsHandled && currentCommitteeSession.status !== "data_entry_finished" ? (
         <Alert type="success">
           <strong className="heading-md">{t("investigations.all_investigations_finished")}</strong>
           <p>{t("investigations.all_investigations_finished_description")}</p>
@@ -88,7 +88,7 @@ export function InvestigationsOverviewPage() {
               <li>{t("investigations.print_corrigendum_form")}</li>
             </ul>
           )}
-          {isCoordinator && currentCommitteeSession.status !== "data_entry_finished" && (
+          {isCoordinator && (
             <nav className="mt-md-lg mb-lg">
               <Button.Link to="./add" variant={investigations.length > 0 ? "secondary" : "primary"}>
                 <IconPlus />

@@ -23,7 +23,7 @@ import { PollingStationListEmptyPgObj } from "e2e-tests/page-objects/polling_sta
 import { PollingStationListPgObj } from "e2e-tests/page-objects/polling_station/PollingStationListPgObj";
 
 import { test } from "../fixtures";
-import { eml110a, eml110b, eml110b_short, eml230b } from "../test-data/eml-files";
+import { eml110a, eml110a_too_large, eml110b, eml110b_short, eml230b } from "../test-data/eml-files";
 
 test.use({
   storageState: "e2e-tests/state/admin1.json",
@@ -219,6 +219,17 @@ test.describe("Election creation", () => {
     await expect(checkCandidateDefinitionPage.error).toBeVisible();
   });
 
+  test("it fails on valid, but too large file", async ({ page }) => {
+    await page.goto("/elections");
+    const overviewPage = new ElectionsOverviewPgObj(page);
+    await overviewPage.create.click();
+
+    const uploadElectionDefinitionPage = new UploadElectionDefinitionPgObj(page);
+    await expect(uploadElectionDefinitionPage.header).toBeVisible();
+    await uploadElectionDefinitionPage.uploadFile(page, eml110a_too_large.path);
+    await uploadElectionDefinitionPage.fileTooLargeError(page, eml110a_too_large.filename);
+  });
+
   test("it fails on valid, but incorrect file for candidate list", async ({ page }) => {
     await page.goto("/elections");
     const overviewPage = new ElectionsOverviewPgObj(page);
@@ -237,6 +248,26 @@ test.describe("Election creation", () => {
     await expect(uploadCandidateDefinitionPage.header).toBeVisible();
     await uploadCandidateDefinitionPage.uploadFile(page, eml110b.path);
     await expect(uploadCandidateDefinitionPage.error).toBeVisible();
+  });
+
+  test("it fails on too large file for candidate list", async ({ page }) => {
+    await page.goto("/elections");
+    const overviewPage = new ElectionsOverviewPgObj(page);
+    await overviewPage.create.click();
+
+    // upload election and check hash
+    await uploadElectionAndInputHash(page);
+
+    // polling station role
+    const pollingStationRolePage = new PollingStationRolePgObj(page);
+    await expect(pollingStationRolePage.header).toBeVisible();
+    await pollingStationRolePage.next.click();
+
+    // Candidate page
+    const uploadCandidateDefinitionPage = new UploadCandidateDefinitionPgObj(page);
+    await expect(uploadCandidateDefinitionPage.header).toBeVisible();
+    await uploadCandidateDefinitionPage.uploadFile(page, eml110a_too_large.path);
+    await uploadCandidateDefinitionPage.fileTooLargeError(page, eml110a_too_large.filename);
   });
 
   test("warning modal close button should stay on page", async ({ page }) => {
@@ -509,6 +540,28 @@ test.describe("Election creation", () => {
     await uploadElectionDefinitionPage.uploadFile(page, eml110a.path);
     await expect(uploadElectionDefinitionPage.main).toContainText(eml110a.filename);
     await expect(uploadElectionDefinitionPage.error).toBeVisible();
+  });
+
+  test("it fails on too large file for polling stations", async ({ page }) => {
+    await page.goto("/elections");
+    const overviewPage = new ElectionsOverviewPgObj(page);
+    await overviewPage.create.click();
+
+    // upload election and check hash
+    await uploadElectionAndInputHash(page);
+
+    // polling station role
+    const pollingStationRolePage = new PollingStationRolePgObj(page);
+    await expect(pollingStationRolePage.header).toBeVisible();
+    await pollingStationRolePage.next.click();
+
+    await uploadCandidatesAndInputHash(page);
+    //
+    // Polling stations page
+    const uploadElectionDefinitionPage = new UploadPollingStationDefinitionPgObj(page);
+    await expect(uploadElectionDefinitionPage.header).toBeVisible();
+    await uploadElectionDefinitionPage.uploadFile(page, eml110a_too_large.path);
+    await uploadElectionDefinitionPage.fileTooLargeError(page, eml110a_too_large.filename);
   });
 
   test("show more button should show full list of polling stations", async ({ page }) => {

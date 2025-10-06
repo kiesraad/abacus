@@ -25,9 +25,19 @@ export const eml110a = {
   ],
 };
 
+export const eml110a_too_large = {
+  filename: "eml110a_invalid_file_size.eml.xml",
+  path: "../backend/src/eml/tests/eml110a_invalid_file_size.eml.xml",
+};
+
 export const eml110b = {
   filename: "eml110b_test.eml.xml",
   path: "../backend/src/eml/tests/eml110b_test.eml.xml",
+};
+
+export const eml110b_too_large = {
+  filename: "eml110b_invalid_file_size.eml.xml",
+  path: "../backend/src/eml/tests/eml110b_invalid_file_size.eml.xml",
 };
 
 export const eml110b_short = {

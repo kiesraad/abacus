@@ -12,7 +12,7 @@ import { FormLayout } from "@/components/ui/Form/FormLayout";
 import { Icon } from "@/components/ui/Icon/Icon";
 import { useElection } from "@/hooks/election/useElection";
 import { useNumericParam } from "@/hooks/useNumericParam";
-import { t } from "@/i18n/translate";
+import { t, tx } from "@/i18n/translate";
 import {
   COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_BODY,
   COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_PATH,
@@ -127,26 +127,11 @@ export function ElectionReportPage() {
                   )}
                 </p>
                 <ol className={cls.list}>
-                  {isFirstCommitteeSession ? (
-                    <li>
-                      <strong>{t("election_management.first_session.pdf_file")}</strong>{" "}
-                      {t("election_management.first_session.signed_during_the_committee_session")}
-                    </li>
-                  ) : (
-                    <>
-                      <li>
-                        <strong>{t("election_management.next_session.pdf_file")}</strong>{" "}
-                        {t("election_management.next_session.signed_during_the_committee_session")}
-                      </li>
-                      <li>
-                        <strong>{t("election_management.next_session.corrigendum_file")}</strong>{" "}
-                        {t("election_management.next_session.corrigendum_file_description")}
-                      </li>
-                    </>
+                  {tx(
+                    isFirstCommitteeSession
+                      ? "election_management.first_session.documents"
+                      : "election_management.next_session.documents",
                   )}
-                  <li>
-                    <strong>{t("election_management.eml_file")}</strong>
-                  </li>
                 </ol>
                 <p>{t("election_management.upload_the_zip")}</p>
               </section>

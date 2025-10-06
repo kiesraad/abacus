@@ -85,9 +85,8 @@ pub async fn change_committee_session_status(
             committee_session.results_pdf,
             committee_session.overview_pdf,
         ]
-        .iter()
+        .into_iter()
         .flatten()
-        .copied()
         .collect();
 
         if !file_ids.is_empty() {

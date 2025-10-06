@@ -23,14 +23,12 @@
   "download_definitive_documents": "Download definitieve documenten {sessionLabel}",
   "download_definitive_files": "Download de definitieve bestanden.",
   "electoral_area": "Kiesgebied",
-  "eml_file": "EML bestand met digitale telresultaten.",
   "empty_documents_description": "Onderstaande documenten zijn relevant voor de huidige zitting van het gemeentelijk stembureau. Overige documenten zijn te downloaden via de toolkit van de Kiesraad.",
   "empty_documents_title": "Lege processen-verbaal voor deze verkiezing",
   "enter_a_number": "Voer een getal in",
   "enter_number_of_voters": "Voer het aantal kiesgerechtigden in zoals door de gemeenteraad vastgesteld voor de {name} in de gemeente {location}.",
   "first_session": {
-    "pdf_file": "PDF document met het proces verbaal.",
-    "signed_during_the_committee_session": "Dit wordt tijdens de zitting van het gemeentelijk stembureau vastgesteld en ondertekend.",
+    "documents": "<li><strong>PDF document met het proces verbaal.</strong> Dit wordt tijdens de zitting van het gemeentelijk stembureau vastgesteld en ondertekend.</li><li><strong>EML bestand met digitale telresultaten.</strong></li>",
     "zip_file_explanation": "In het Zip bestand zitten twee documenten:"
   },
   "how_many_voters": "Hoeveel kiesgerechtigden telt de gemeente?",
@@ -38,10 +36,7 @@
   "investigation_ordered_by_csb": "Onderzoek in opdracht van het CSB?",
   "lists_and_candidates": "Lijsten en kandidaten",
   "next_session": {
-    "corrigendum_file": "Het corrigendum van het gemeentelijk stembureau (Na 14-2). Dit is een PDF document.",
-    "corrigendum_file_description": "Bevat de gecorrigeerde telresultaten van de gemeente. ",
-    "pdf_file": "Het proces verbaal van het gemeentelijk stembureau (P 2a). Dit is een PDF document.",
-    "signed_during_the_committee_session": "Dit wordt tijdens de zitting van het gemeentelijk stembureau vastgesteld en ondertekend.",
+    "documents": "<li><strong>Het proces verbaal van het gemeentelijk stembureau (P 2a). Dit is een PDF document.</strong> Dit wordt tijdens de zitting van het gemeentelijk stembureau vastgesteld en ondertekend.</li><li><strong>Het corrigendum van het gemeentelijk stembureau (Na 14-2). Dit is een PDF document.</strong> Bevat de gecorrigeerde telresultaten van de gemeente.</li><li><strong>EML bestand met digitale telresultaten.</strong></li>",
     "zip_file_explanation": "In het Zip bestand zitten drie documenten:"
   },
   "no_polling_stations": "Geen stembureaus",

@@ -82,7 +82,7 @@ describe("PollingStationImportPage", () => {
 
     expect(screen.queryByLabelText("Geen bestand gekozen")).not.toBeInTheDocument();
     expect(screen.getAllByText(filename).length).toBe(2);
-    expect(screen.getByText(/Kies een bestand van maximaal 12 Megabyte./i)).toBeInTheDocument();
+    expect(screen.getByText(/Kies een bestand van maximaal 5 Megabyte./i)).toBeInTheDocument();
   });
 
   test("Upload a file, show preview", async () => {

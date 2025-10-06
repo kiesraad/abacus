@@ -11,21 +11,8 @@ import { t, tx } from "@/i18n/translate";
 import { ELECTION_IMPORT_VALIDATE_REQUEST_PATH, ElectionDefinitionValidateResponse } from "@/types/generated/openapi";
 
 import { useElectionCreateContext } from "../hooks/useElectionCreateContext";
+import { fileTooLargeError, MAX_FILE_UPLOAD_SIZE_MB } from "../utils/error";
 import { CheckHash } from "./CheckHash";
-
-const MAX_UPLOAD_SIZE_MB: number = 5;
-
-function fileTooLargeError(fileName: string) {
-  return tx(
-    "election.invalid_election_definition.file_too_large",
-    {
-      file: () => <strong>{fileName}</strong>,
-    },
-    {
-      max_size: `${MAX_UPLOAD_SIZE_MB}`,
-    },
-  );
-}
 
 export function UploadElectionDefinition() {
   const { state, dispatch } = useElectionCreateContext();
@@ -38,7 +25,7 @@ export function UploadElectionDefinition() {
   async function onFileChange(e: ChangeEvent<HTMLInputElement>) {
     const currentFile = e.target.files ? e.target.files[0] : undefined;
     if (currentFile !== undefined) {
-      if (currentFile.size > MAX_UPLOAD_SIZE_MB * 1024 * 1024) {
+      if (currentFile.size > MAX_FILE_UPLOAD_SIZE_MB * 1024 * 1024) {
         setError(fileTooLargeError(currentFile.name));
         return;
       }

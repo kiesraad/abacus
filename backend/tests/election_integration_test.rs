@@ -141,7 +141,7 @@ async fn test_election_details_not_found(pool: SqlitePool) {
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
 async fn test_election_pdf_download_works(pool: SqlitePool) {
-    let addr = serve_api(pool.clone()).await;
+    let addr = serve_api(pool).await;
     let coordinator_cookie = shared::coordinator_login(&addr).await;
     let election_id = 2;
     create_result(&addr, 1, 2).await;
@@ -216,7 +216,7 @@ async fn test_election_pdf_download_works(pool: SqlitePool) {
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
 async fn test_election_pdf_download_invalid_committee_session_state(pool: SqlitePool) {
-    let addr = serve_api(pool.clone()).await;
+    let addr = serve_api(pool).await;
     let coordinator_cookie = shared::coordinator_login(&addr).await;
     create_result(&addr, 1, 2).await;
     create_result(&addr, 2, 2).await;
@@ -235,7 +235,7 @@ async fn test_election_pdf_download_invalid_committee_session_state(pool: Sqlite
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
 async fn test_election_zip_download_works(pool: SqlitePool) {
-    let addr = serve_api(pool.clone()).await;
+    let addr = serve_api(pool).await;
     let coordinator_cookie = shared::coordinator_login(&addr).await;
     let election_id = 2;
     create_result(&addr, 1, 2).await;
@@ -350,7 +350,7 @@ async fn test_election_zip_download_works(pool: SqlitePool) {
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
 async fn test_election_zip_download_invalid_committee_session_state(pool: SqlitePool) {
-    let addr = serve_api(pool.clone()).await;
+    let addr = serve_api(pool).await;
     let coordinator_cookie = shared::coordinator_login(&addr).await;
     create_result(&addr, 1, 2).await;
     create_result(&addr, 2, 2).await;

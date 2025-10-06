@@ -1,5 +1,7 @@
 #![cfg(test)]
 
+use std::net::SocketAddr;
+
 use abacus::{
     ErrorResponse,
     committee_session::status::CommitteeSessionStatus,
@@ -18,14 +20,13 @@ pub mod shared;
 pub mod utils;
 
 async fn get_polling_station(
-    pool: SqlitePool,
+    addr: &SocketAddr,
     election_id: u32,
     polling_station_id: u32,
 ) -> PollingStation {
-    let addr = serve_api(pool).await;
     let url =
         format!("http://{addr}/api/elections/{election_id}/polling_stations/{polling_station_id}");
-    let coordinator_cookie = shared::coordinator_login(&addr).await;
+    let coordinator_cookie = shared::coordinator_login(addr).await;
     let response = reqwest::Client::new()
         .get(&url)
         .header("cookie", coordinator_cookie)
@@ -71,7 +72,7 @@ async fn test_polling_station_listing(pool: SqlitePool) {
     scripts("election_6_no_polling_stations", "users")
 )))]
 async fn test_polling_station_creation_for_committee_session_with_created_status(pool: SqlitePool) {
-    let addr = serve_api(pool.clone()).await;
+    let addr = serve_api(pool).await;
     let cookie = shared::coordinator_login(&addr).await;
     let election_id = 6;
 
@@ -121,7 +122,7 @@ async fn test_polling_station_creation_for_committee_session_with_created_status
 async fn test_polling_station_creation_for_committee_session_with_finished_status(
     pool: SqlitePool,
 ) {
-    let addr = serve_api(pool.clone()).await;
+    let addr = serve_api(pool).await;
     let cookie = shared::coordinator_login(&addr).await;
     let election_id = 2;
 
@@ -172,7 +173,7 @@ async fn test_polling_station_creation_for_committee_session_with_finished_statu
     );
 
     // Validate that the creation is persisted
-    let ps = get_polling_station(pool, election_id, body.id).await;
+    let ps = get_polling_station(&addr, election_id, body.id).await;
     assert_eq!(ps.name, "New Polling Station");
 
     // Validate committee session status change
@@ -186,10 +187,11 @@ async fn test_polling_station_creation_for_committee_session_with_finished_statu
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_7_four_sessions", "users"))))]
 async fn test_polling_station_get(pool: SqlitePool) {
+    let addr = serve_api(pool).await;
     let election_id = 7;
     let committee_session_id = 704;
 
-    let ps = get_polling_station(pool, election_id, 742).await;
+    let ps = get_polling_station(&addr, election_id, 742).await;
     assert_eq!(ps.committee_session_id, committee_session_id);
     assert_eq!(ps.id_prev_session, Some(732));
     assert_eq!(ps.name, "TestB");
@@ -201,10 +203,10 @@ async fn test_polling_station_get(pool: SqlitePool) {
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_7_four_sessions", "users"))))]
 async fn test_polling_station_update_ok(pool: SqlitePool) {
+    let addr = serve_api(pool).await;
     let election_id = 7;
     let polling_station_id = 742;
 
-    let addr = serve_api(pool.clone()).await;
     let cookie = shared::coordinator_login(&addr).await;
     let url =
         format!("http://{addr}/api/elections/{election_id}/polling_stations/{polling_station_id}");
@@ -237,7 +239,7 @@ async fn test_polling_station_update_ok(pool: SqlitePool) {
     assert_eq!(update.address, "Teststraat 2a");
 
     // Validate that the changes are persisted
-    let ps = get_polling_station(pool, election_id, polling_station_id).await;
+    let ps = get_polling_station(&addr, election_id, polling_station_id).await;
     assert_eq!(ps.name, "Testverandering");
     assert_eq!(ps.address, "Teststraat 2a");
 }

@@ -40,7 +40,7 @@ async fn get_polling_station(
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_7_four_sessions", "users"))))]
-async fn test_polling_station_listing(pool: SqlitePool) {
+async fn test_listing(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let cookie = shared::coordinator_login(&addr).await;
     let url = format!("http://{addr}/api/elections/7/polling_stations");
@@ -71,7 +71,7 @@ async fn test_polling_station_listing(pool: SqlitePool) {
     path = "../fixtures",
     scripts("election_6_no_polling_stations", "users")
 )))]
-async fn test_polling_station_creation_for_committee_session_with_created_status(pool: SqlitePool) {
+async fn test_creation_for_committee_session_with_created_status(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let cookie = shared::coordinator_login(&addr).await;
     let election_id = 6;
@@ -119,9 +119,7 @@ async fn test_polling_station_creation_for_committee_session_with_created_status
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
-async fn test_polling_station_creation_for_committee_session_with_finished_status(
-    pool: SqlitePool,
-) {
+async fn test_creation_for_committee_session_with_finished_status(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let cookie = shared::coordinator_login(&addr).await;
     let election_id = 2;
@@ -186,7 +184,7 @@ async fn test_polling_station_creation_for_committee_session_with_finished_statu
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_7_four_sessions", "users"))))]
-async fn test_polling_station_get(pool: SqlitePool) {
+async fn test_get(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let election_id = 7;
     let committee_session_id = 704;
@@ -202,7 +200,7 @@ async fn test_polling_station_get(pool: SqlitePool) {
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_7_four_sessions", "users"))))]
-async fn test_polling_station_update_ok(pool: SqlitePool) {
+async fn test_update_ok(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let election_id = 7;
     let polling_station_id = 742;
@@ -245,7 +243,7 @@ async fn test_polling_station_update_ok(pool: SqlitePool) {
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
-async fn test_polling_station_update_empty_type_ok(pool: SqlitePool) {
+async fn test_update_empty_type_ok(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let cookie = shared::coordinator_login(&addr).await;
     let url = format!("http://{addr}/api/elections/2/polling_stations/2");
@@ -278,7 +276,7 @@ async fn test_polling_station_update_empty_type_ok(pool: SqlitePool) {
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
-async fn test_polling_station_update_not_found(pool: SqlitePool) {
+async fn test_update_not_found(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let cookie = shared::coordinator_login(&addr).await;
     let url = format!("http://{addr}/api/elections/2/polling_stations/40404");
@@ -307,7 +305,7 @@ async fn test_polling_station_update_not_found(pool: SqlitePool) {
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
-async fn test_polling_station_delete_ok(pool: SqlitePool) {
+async fn test_delete_ok(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let cookie = shared::coordinator_login(&addr).await;
     let election_id = 2;
@@ -374,7 +372,7 @@ async fn test_polling_station_delete_ok(pool: SqlitePool) {
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
-async fn test_polling_station_delete_with_data_entry_fails(pool: SqlitePool) {
+async fn test_delete_with_data_entry_fails(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let typist_cookie = shared::typist_login(&addr).await;
     shared::claim_data_entry(&addr, &typist_cookie, 2, 1).await;
@@ -406,7 +404,7 @@ async fn test_polling_station_delete_with_data_entry_fails(pool: SqlitePool) {
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
-async fn test_polling_station_delete_with_results_fails(pool: SqlitePool) {
+async fn test_delete_with_results_fails(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let admin_cookie = shared::admin_login(&addr).await;
     shared::create_result(&addr, 1, 2).await;
@@ -429,7 +427,7 @@ async fn test_polling_station_delete_with_results_fails(pool: SqlitePool) {
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
-async fn test_polling_station_delete_not_found(pool: SqlitePool) {
+async fn test_delete_not_found(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let cookie = shared::coordinator_login(&addr).await;
     let url = format!("http://{addr}/api/elections/2/polling_stations/40404");
@@ -449,7 +447,7 @@ async fn test_polling_station_delete_not_found(pool: SqlitePool) {
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
-async fn test_polling_station_non_unique(pool: SqlitePool) {
+async fn test_non_unique(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let cookie = shared::coordinator_login(&addr).await;
     let election_id = 2;
@@ -479,7 +477,7 @@ async fn test_polling_station_non_unique(pool: SqlitePool) {
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
-async fn test_polling_station_list_invalid_election(pool: SqlitePool) {
+async fn test_list_invalid_election(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let cookie = shared::coordinator_login(&addr).await;
     let url = format!("http://{addr}/api/elections/1234/polling_stations");
@@ -494,7 +492,7 @@ async fn test_polling_station_list_invalid_election(pool: SqlitePool) {
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
-async fn test_polling_station_import_validate_correct_file(pool: SqlitePool) {
+async fn test_import_validate_correct_file(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let cookie = shared::coordinator_login(&addr).await;
     let url = format!("http://{addr}/api/elections/2/polling_stations/validate-import");
@@ -515,7 +513,7 @@ async fn test_polling_station_import_validate_correct_file(pool: SqlitePool) {
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
-async fn test_polling_station_import_validate_wrong_file(pool: SqlitePool) {
+async fn test_import_validate_wrong_file(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let cookie = shared::coordinator_login(&addr).await;
     let url = format!("http://{addr}/api/elections/2/polling_stations/validate-import");
@@ -537,7 +535,7 @@ async fn test_polling_station_import_validate_wrong_file(pool: SqlitePool) {
     path = "../fixtures",
     scripts("election_6_no_polling_stations", "users")
 )))]
-async fn test_polling_station_import_missing_data(pool: SqlitePool) {
+async fn test_import_missing_data(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let cookie = shared::coordinator_login(&addr).await;
     let url = format!("http://{addr}/api/elections/6/polling_stations/import");
@@ -559,7 +557,7 @@ async fn test_polling_station_import_missing_data(pool: SqlitePool) {
     path = "../fixtures",
     scripts("election_6_no_polling_stations", "users")
 )))]
-async fn test_polling_station_import_correct_file(pool: SqlitePool) {
+async fn test_import_correct_file(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let cookie = shared::coordinator_login(&addr).await;
     let election_id = 6;

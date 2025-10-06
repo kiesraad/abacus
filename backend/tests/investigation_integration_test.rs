@@ -78,7 +78,7 @@ async fn delete_investigation(addr: &SocketAddr, polling_station_id: u32) -> Res
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_7_four_sessions", "users"))))]
-async fn test_investigation_create_conclude_update_delete(pool: SqlitePool) {
+async fn test_create_conclude_update_delete(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 
     let election_id = 7;
@@ -143,9 +143,7 @@ async fn test_investigation_create_conclude_update_delete(pool: SqlitePool) {
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_7_four_sessions", "users"))))]
-async fn test_investigation_deletion_setting_committee_session_back_to_created_status(
-    pool: SqlitePool,
-) {
+async fn test_deletion_setting_committee_session_back_to_created_status(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let cookie = shared::coordinator_login(&addr).await;
     let election_id = 7;
@@ -192,7 +190,7 @@ async fn test_investigation_deletion_setting_committee_session_back_to_created_s
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_5_with_results", "users"))))]
-async fn test_investigation_deletion_removes_polling_station_from_status(pool: SqlitePool) {
+async fn test_deletion_removes_polling_station_from_status(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let cookie = shared::coordinator_login(&addr).await;
     let election_id = 5;
@@ -305,7 +303,7 @@ async fn test_investigation_deletion_removes_polling_station_from_status(pool: S
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_7_four_sessions", "users"))))]
-async fn test_partials_investigation_update(pool: SqlitePool) {
+async fn test_partials_update(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let election_id = 7;
     let polling_station_id = 741;
@@ -445,7 +443,7 @@ fn second_session_data_entry_two_political_groups() -> DataEntry {
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_7_four_sessions", "users"))))]
-async fn test_update_investigation_with_result(pool: SqlitePool) {
+async fn test_update_with_result(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let cookie = shared::coordinator_login(&addr).await;
     let election_id = 7;
@@ -509,7 +507,7 @@ async fn test_update_investigation_with_result(pool: SqlitePool) {
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_7_four_sessions", "users"))))]
-async fn test_update_investigation_with_data_entry(pool: SqlitePool) {
+async fn test_update_with_data_entry(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let cookie = shared::coordinator_login(&addr).await;
     let election_id = 7;
@@ -575,7 +573,7 @@ async fn test_update_investigation_with_data_entry(pool: SqlitePool) {
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_7_four_sessions", "users"))))]
-async fn test_investigation_creation_for_committee_session_with_created_status(pool: SqlitePool) {
+async fn test_creation_for_committee_session_with_created_status(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let cookie = shared::coordinator_login(&addr).await;
     let election_id = 7;
@@ -600,7 +598,7 @@ async fn test_investigation_creation_for_committee_session_with_created_status(p
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_5_with_results", "users"))))]
-async fn test_investigation_creation_for_committee_session_with_finished_status(pool: SqlitePool) {
+async fn test_creation_for_committee_session_with_finished_status(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let cookie = shared::coordinator_login(&addr).await;
     let election_id = 5;
@@ -627,7 +625,7 @@ async fn test_investigation_creation_for_committee_session_with_finished_status(
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_7_four_sessions", "users"))))]
-async fn test_investigation_creation_fails_for_wrong_polling_station(pool: SqlitePool) {
+async fn test_creation_fails_for_wrong_polling_station(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 
     // 732 is an existing polling station, but in the wrong committee session
@@ -638,7 +636,7 @@ async fn test_investigation_creation_fails_for_wrong_polling_station(pool: Sqlit
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_7_four_sessions", "users"))))]
-async fn test_investigation_creation_fails_on_creating_second_investigation(pool: SqlitePool) {
+async fn test_creation_fails_on_creating_second_investigation(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 
     assert_eq!(
@@ -652,7 +650,7 @@ async fn test_investigation_creation_fails_on_creating_second_investigation(pool
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_7_four_sessions", "users"))))]
-async fn test_investigation_can_only_conclude_existing(pool: SqlitePool) {
+async fn test_can_only_conclude_existing(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 
     assert_eq!(
@@ -662,7 +660,7 @@ async fn test_investigation_can_only_conclude_existing(pool: SqlitePool) {
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_7_four_sessions", "users"))))]
-async fn test_investigation_can_only_update_existing(pool: SqlitePool) {
+async fn test_can_only_update_existing(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 
     assert_eq!(
@@ -674,7 +672,7 @@ async fn test_investigation_can_only_update_existing(pool: SqlitePool) {
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_7_four_sessions", "users"))))]
-async fn test_investigation_can_only_conclude_current_session(pool: SqlitePool) {
+async fn test_can_only_conclude_current_session(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 
     assert_eq!(
@@ -684,7 +682,7 @@ async fn test_investigation_can_only_conclude_current_session(pool: SqlitePool) 
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_7_four_sessions", "users"))))]
-async fn test_investigation_can_only_update_current_session(pool: SqlitePool) {
+async fn test_can_only_update_current_session(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 
     assert_eq!(

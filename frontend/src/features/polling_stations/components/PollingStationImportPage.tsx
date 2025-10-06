@@ -76,7 +76,7 @@ export function PollingStationImportPage() {
         if (response instanceof ApiError && response.code === 413) {
           setError(
             tx(
-              "election.invalid_polling_station_definition.file_too_large",
+              "file_too_large",
               {
                 file: () => <strong>{currentFile.name}</strong>,
               },

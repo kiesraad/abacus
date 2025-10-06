@@ -10,10 +10,8 @@ use super::{
 use crate::{
     APIError,
     audit_log::{AuditEvent, AuditService},
-    investigation::{
-        all_investigations_for_committee_session_finished,
-        list_investigations_for_committee_session,
-    },
+    committee_session::repository::all_investigations_finished,
+    investigation::list_investigations_for_committee_session,
 };
 
 /// Committee session status
@@ -63,7 +61,7 @@ pub async fn change_committee_session_status(
         CommitteeSessionStatus::DataEntryNotStarted => {
             committee_session
                 .status
-                .ready_for_data_entry(&mut tx, committee_session.clone())
+                .ready_for_data_entry(&mut tx, &committee_session)
                 .await?
         }
         CommitteeSessionStatus::DataEntryInProgress => {
@@ -73,7 +71,7 @@ pub async fn change_committee_session_status(
         CommitteeSessionStatus::DataEntryFinished => {
             committee_session
                 .status
-                .finish_data_entry(&mut tx, committee_session.clone())
+                .finish_data_entry(&mut tx, &committee_session)
                 .await?
         }
     };
@@ -143,7 +141,7 @@ impl CommitteeSessionStatus {
     pub async fn ready_for_data_entry(
         self,
         conn: &mut SqliteConnection,
-        committee_session: CommitteeSession,
+        committee_session: &CommitteeSession,
     ) -> Result<Self, CommitteeSessionError> {
         match self {
             CommitteeSessionStatus::Created => {
@@ -204,7 +202,7 @@ impl CommitteeSessionStatus {
     pub async fn finish_data_entry(
         self,
         conn: &mut SqliteConnection,
-        committee_session: CommitteeSession,
+        committee_session: &CommitteeSession,
     ) -> Result<Self, CommitteeSessionError> {
         match self {
             CommitteeSessionStatus::Created => Err(CommitteeSessionError::InvalidStatusTransition),
@@ -214,11 +212,7 @@ impl CommitteeSessionStatus {
             CommitteeSessionStatus::DataEntryInProgress
             | CommitteeSessionStatus::DataEntryPaused => {
                 if committee_session.number > 1
-                    && !all_investigations_for_committee_session_finished(
-                        conn,
-                        committee_session.id,
-                    )
-                    .await?
+                    && !all_investigations_finished(conn, committee_session.id).await?
                 {
                     return Err(CommitteeSessionError::InvalidStatusTransition);
                 }
@@ -310,7 +304,7 @@ mod tests {
         let committee_session = get(&mut conn, 7).await.unwrap();
         assert_eq!(
             CommitteeSessionStatus::Created
-                .ready_for_data_entry(&mut conn, committee_session)
+                .ready_for_data_entry(&mut conn, &committee_session)
                 .await,
             Err(CommitteeSessionError::InvalidStatusTransition)
         );
@@ -325,7 +319,7 @@ mod tests {
         let committee_session = get(&mut conn, 2).await.unwrap();
         assert_eq!(
             CommitteeSessionStatus::Created
-                .ready_for_data_entry(&mut conn, committee_session)
+                .ready_for_data_entry(&mut conn, &committee_session)
                 .await,
             Ok(CommitteeSessionStatus::DataEntryNotStarted)
         );
@@ -340,7 +334,7 @@ mod tests {
         let committee_session = get(&mut conn, 6).await.unwrap();
         assert_eq!(
             CommitteeSessionStatus::Created
-                .ready_for_data_entry(&mut conn, committee_session)
+                .ready_for_data_entry(&mut conn, &committee_session)
                 .await,
             Err(CommitteeSessionError::InvalidStatusTransition)
         );
@@ -364,7 +358,7 @@ mod tests {
         .unwrap();
         assert_eq!(
             CommitteeSessionStatus::Created
-                .ready_for_data_entry(&mut conn, committee_session)
+                .ready_for_data_entry(&mut conn, &committee_session)
                 .await,
             Ok(CommitteeSessionStatus::DataEntryNotStarted)
         );
@@ -379,7 +373,7 @@ mod tests {
         let committee_session = get(&mut conn, 2).await.unwrap();
         assert_eq!(
             CommitteeSessionStatus::DataEntryNotStarted
-                .ready_for_data_entry(&mut conn, committee_session)
+                .ready_for_data_entry(&mut conn, &committee_session)
                 .await,
             Ok(CommitteeSessionStatus::DataEntryNotStarted)
         );
@@ -394,7 +388,7 @@ mod tests {
         let committee_session = get(&mut conn, 2).await.unwrap();
         assert_eq!(
             CommitteeSessionStatus::DataEntryInProgress
-                .ready_for_data_entry(&mut conn, committee_session)
+                .ready_for_data_entry(&mut conn, &committee_session)
                 .await,
             Err(CommitteeSessionError::InvalidStatusTransition)
         );
@@ -409,7 +403,7 @@ mod tests {
         let committee_session = get(&mut conn, 2).await.unwrap();
         assert_eq!(
             CommitteeSessionStatus::DataEntryPaused
-                .ready_for_data_entry(&mut conn, committee_session)
+                .ready_for_data_entry(&mut conn, &committee_session)
                 .await,
             Err(CommitteeSessionError::InvalidStatusTransition)
         );
@@ -424,7 +418,7 @@ mod tests {
         let committee_session = get(&mut conn, 2).await.unwrap();
         assert_eq!(
             CommitteeSessionStatus::DataEntryFinished
-                .ready_for_data_entry(&mut conn, committee_session)
+                .ready_for_data_entry(&mut conn, &committee_session)
                 .await,
             Err(CommitteeSessionError::InvalidStatusTransition)
         );
@@ -527,7 +521,7 @@ mod tests {
         let committee_session = get(&mut conn, 2).await.unwrap();
         assert_eq!(
             CommitteeSessionStatus::Created
-                .finish_data_entry(&mut conn, committee_session)
+                .finish_data_entry(&mut conn, &committee_session)
                 .await,
             Err(CommitteeSessionError::InvalidStatusTransition)
         );
@@ -542,7 +536,7 @@ mod tests {
         let committee_session = get(&mut conn, 2).await.unwrap();
         assert_eq!(
             CommitteeSessionStatus::DataEntryNotStarted
-                .finish_data_entry(&mut conn, committee_session)
+                .finish_data_entry(&mut conn, &committee_session)
                 .await,
             Err(CommitteeSessionError::InvalidStatusTransition)
         );
@@ -557,7 +551,7 @@ mod tests {
         let committee_session = get(&mut conn, 2).await.unwrap();
         assert_eq!(
             CommitteeSessionStatus::DataEntryInProgress
-                .finish_data_entry(&mut conn, committee_session)
+                .finish_data_entry(&mut conn, &committee_session)
                 .await,
             Ok(CommitteeSessionStatus::DataEntryFinished)
         );
@@ -581,7 +575,7 @@ mod tests {
         .unwrap();
         assert_eq!(
             CommitteeSessionStatus::DataEntryInProgress
-                .finish_data_entry(&mut conn, committee_session)
+                .finish_data_entry(&mut conn, &committee_session)
                 .await,
             Err(CommitteeSessionError::InvalidStatusTransition)
         );
@@ -615,7 +609,7 @@ mod tests {
         .unwrap();
         assert_eq!(
             CommitteeSessionStatus::DataEntryInProgress
-                .finish_data_entry(&mut conn, committee_session)
+                .finish_data_entry(&mut conn, &committee_session)
                 .await,
             Err(CommitteeSessionError::InvalidStatusTransition)
         );
@@ -649,7 +643,7 @@ mod tests {
         .unwrap();
         assert_eq!(
             CommitteeSessionStatus::DataEntryInProgress
-                .finish_data_entry(&mut conn, committee_session)
+                .finish_data_entry(&mut conn, &committee_session)
                 .await,
             Ok(CommitteeSessionStatus::DataEntryFinished)
         );
@@ -707,7 +701,7 @@ mod tests {
 
         assert_eq!(
             CommitteeSessionStatus::DataEntryInProgress
-                .finish_data_entry(&mut conn, committee_session)
+                .finish_data_entry(&mut conn, &committee_session)
                 .await,
             Ok(CommitteeSessionStatus::DataEntryFinished)
         );
@@ -720,7 +714,7 @@ mod tests {
         let committee_session = get(&mut conn, 2).await.unwrap();
         assert_eq!(
             CommitteeSessionStatus::DataEntryPaused
-                .finish_data_entry(&mut conn, committee_session)
+                .finish_data_entry(&mut conn, &committee_session)
                 .await,
             Ok(CommitteeSessionStatus::DataEntryFinished)
         );
@@ -733,7 +727,7 @@ mod tests {
         let committee_session = get(&mut conn, 2).await.unwrap();
         assert_eq!(
             CommitteeSessionStatus::DataEntryFinished
-                .finish_data_entry(&mut conn, committee_session)
+                .finish_data_entry(&mut conn, &committee_session)
                 .await,
             Ok(CommitteeSessionStatus::DataEntryFinished)
         );

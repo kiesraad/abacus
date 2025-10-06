@@ -1650,6 +1650,36 @@
         }
       }
     },
+    "/api/generate_test_election": {
+      "post": {
+        "operationId": "generate_election_handler",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GenerateElectionArgs"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Created test election"
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/initialise/admin-exists": {
       "get": {
         "operationId": "admin_exists",
@@ -5640,6 +5670,67 @@
         },
         "additionalProperties": false
       },
+      "GenerateElectionArgs": {
+        "type": "object",
+        "description": "Abacus API and asset server",
+        "required": [
+          "political_groups",
+          "candidates_per_group",
+          "polling_stations",
+          "voters",
+          "seats",
+          "with_data_entry",
+          "first_data_entry",
+          "second_data_entry",
+          "turnout",
+          "candidate_distribution_slope",
+          "political_group_distribution_slope"
+        ],
+        "properties": {
+          "candidate_distribution_slope": {
+            "$ref": "#/components/schemas/RandomRange"
+          },
+          "candidates_per_group": {
+            "$ref": "#/components/schemas/RandomRange",
+            "description": "Number of candidates to create"
+          },
+          "first_data_entry": {
+            "$ref": "#/components/schemas/RandomRange",
+            "description": "Percentage of the first data entry to complete if data entry is included"
+          },
+          "political_group_distribution_slope": {
+            "$ref": "#/components/schemas/RandomRange"
+          },
+          "political_groups": {
+            "$ref": "#/components/schemas/RandomRange",
+            "description": "Number of political groups to create"
+          },
+          "polling_stations": {
+            "$ref": "#/components/schemas/RandomRange",
+            "description": "Number of polling stations to create"
+          },
+          "seats": {
+            "$ref": "#/components/schemas/RandomRange",
+            "description": "Number of seats in the election"
+          },
+          "second_data_entry": {
+            "$ref": "#/components/schemas/RandomRange",
+            "description": "Percentage of the completed first data entries that also get a second data entry"
+          },
+          "turnout": {
+            "$ref": "#/components/schemas/RandomRange",
+            "description": "Percentage of voters that voted (given we generate data entries)"
+          },
+          "voters": {
+            "$ref": "#/components/schemas/RandomRange",
+            "description": "Number of voters to create"
+          },
+          "with_data_entry": {
+            "type": "boolean",
+            "description": "Include (part of) data entry for this election"
+          }
+        }
+      },
       "LoginResponse": {
         "type": "object",
         "required": [
@@ -6184,6 +6275,9 @@
             }
           }
         }
+      },
+      "RandomRange": {
+        "type": "string"
       },
       "RedactedEmlHash": {
         "type": "object",

@@ -16,7 +16,11 @@ describe("PollingStationImportPage", () => {
   });
 
   test("Shows form", async () => {
-    vi.spyOn(useMessages, "useMessages").mockReturnValue({ pushMessage: vi.fn(), popMessages: vi.fn(() => []) });
+    vi.spyOn(useMessages, "useMessages").mockReturnValue({
+      pushMessage: vi.fn(),
+      popMessages: vi.fn(() => []),
+      hasMessages: vi.fn(() => false),
+    });
 
     render(
       <ElectionProvider electionId={1}>
@@ -32,7 +36,11 @@ describe("PollingStationImportPage", () => {
     const filename = "foo.txt";
     const file = new File(["foo"], filename, { type: "text/plain" });
 
-    vi.spyOn(useMessages, "useMessages").mockReturnValue({ pushMessage: vi.fn(), popMessages: vi.fn(() => []) });
+    vi.spyOn(useMessages, "useMessages").mockReturnValue({
+      pushMessage: vi.fn(),
+      popMessages: vi.fn(() => []),
+      hasMessages: vi.fn(() => false),
+    });
 
     overrideOnce("post", "/api/elections/1/polling_stations/validate-import", 400, {
       error: "Invalid XML",
@@ -63,7 +71,11 @@ describe("PollingStationImportPage", () => {
     const filename = "foo.txt";
     const file = new File(["foo"], filename, { type: "text/plain" });
 
-    vi.spyOn(useMessages, "useMessages").mockReturnValue({ pushMessage: vi.fn(), popMessages: vi.fn(() => []) });
+    vi.spyOn(useMessages, "useMessages").mockReturnValue({
+      pushMessage: vi.fn(),
+      popMessages: vi.fn(() => []),
+      hasMessages: vi.fn(() => false),
+    });
 
     overrideOnce("post", "/api/elections/1/polling_stations/validate-import", 413, {
       error: "12",
@@ -94,7 +106,11 @@ describe("PollingStationImportPage", () => {
     const filename = "foo.txt";
     const file = new File(["foo"], filename, { type: "text/plain" });
 
-    vi.spyOn(useMessages, "useMessages").mockReturnValue({ pushMessage: vi.fn(), popMessages: vi.fn(() => []) });
+    vi.spyOn(useMessages, "useMessages").mockReturnValue({
+      pushMessage: vi.fn(),
+      popMessages: vi.fn(() => []),
+      hasMessages: vi.fn(() => false),
+    });
     overrideOnce("post", "/api/elections/1/polling_stations/validate-import", 200, {
       polling_stations: pollingStationRequestMockData,
     });

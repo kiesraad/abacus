@@ -48,9 +48,10 @@ function overrideResponseStatus(status: DataEntryStatusName) {
 
 describe("ResolveDifferencesPage", () => {
   const pushMessage = vi.fn();
+  const hasMessages = vi.fn();
 
   beforeEach(() => {
-    vi.spyOn(useMessages, "useMessages").mockReturnValue({ pushMessage, popMessages: vi.fn(() => []) });
+    vi.spyOn(useMessages, "useMessages").mockReturnValue({ pushMessage, popMessages: vi.fn(() => []), hasMessages });
     vi.spyOn(ReactRouter, "useNavigate").mockImplementation(() => navigate);
     vi.spyOn(ReactRouter, "useParams").mockReturnValue({ pollingStationId: "3" });
     vi.spyOn(ReactRouter, "useLocation").mockReturnValue({

@@ -36,7 +36,8 @@ export function ElectionHomePage() {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
   const location = useLocation() as Location<null | ShowDeleteModalState>;
   const navigate = useNavigate();
-  const { currentCommitteeSession, committeeSessions, election, pollingStations, refetch } = useElection();
+  const { currentCommitteeSession, committeeSessions, election, investigations, pollingStations, refetch } =
+    useElection();
   const { isTypist, isCoordinator } = useUserRole();
   const [showAddCommitteeSessionModal, setShowAddCommitteeSessionModal] = useState(false);
   const [createCommitteeSessionError, setCreateCommitteeSessionError] = useState<AnyApiError | null>(null);
@@ -133,7 +134,7 @@ export function ElectionHomePage() {
           </nav>
         </Modal>
       )}
-      {location.state?.showDeleteModal === true && (
+      {location.state?.showDeleteModal === true && investigations.length === 0 && (
         <Modal title={`${t("election_management.delete_session")}?`} onClose={toggleDeleteCommitteeSessionModal}>
           <p>
             {t("election_management.delete_session_are_you_sure", {
@@ -151,6 +152,23 @@ export function ElectionHomePage() {
               }}
             >
               {t("election_management.yes_delete_session")}
+            </Button>
+            <Button variant="secondary" onClick={toggleDeleteCommitteeSessionModal}>
+              {t("cancel")}
+            </Button>
+          </nav>
+        </Modal>
+      )}
+      {location.state?.showDeleteModal === true && investigations.length > 0 && (
+        <Modal title={t("election_management.delete_investigations_first")} onClose={toggleDeleteCommitteeSessionModal}>
+          <p>
+            {t("election_management.delete_investigations_first_are_you_sure", {
+              sessionLabel: committeeSessionLabel(currentCommitteeSession.number, true).toLowerCase(),
+            })}
+          </p>
+          <nav>
+            <Button variant="primary" size="xl" onClick={() => void navigate("investigations")}>
+              {t("election_management.view_investigations")}
             </Button>
             <Button variant="secondary" onClick={toggleDeleteCommitteeSessionModal}>
               {t("cancel")}

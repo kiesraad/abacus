@@ -13,7 +13,11 @@ import { PollingStationsPreview } from "./PollingStationsPreview";
 describe("PollingStationsPreview", () => {
   beforeEach(() => {
     server.use(ElectionRequestHandler, PollingStationListRequestHandler);
-    vi.spyOn(useMessages, "useMessages").mockReturnValue({ pushMessage: vi.fn(), popMessages: vi.fn(() => []) });
+    vi.spyOn(useMessages, "useMessages").mockReturnValue({
+      pushMessage: vi.fn(),
+      popMessages: vi.fn(() => []),
+      hasMessages: vi.fn(() => false),
+    });
   });
 
   test("Show polling stations", async () => {

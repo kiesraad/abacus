@@ -359,7 +359,7 @@ pub async fn typist2_login(addr: &SocketAddr) -> HeaderValue {
 pub async fn login(addr: &SocketAddr, username: &str, password: &str) -> HeaderValue {
     let url = format!("http://{addr}/api/login");
 
-    let response = reqwest::Client::new()
+    let response = Client::new()
         .post(&url)
         .header(CONTENT_TYPE, "application/json")
         .body(Body::from(

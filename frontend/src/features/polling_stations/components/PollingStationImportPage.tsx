@@ -20,6 +20,7 @@ import {
   PollingStationRequest,
   PollingStationRequestListResponse,
 } from "@/types/generated/openapi";
+import { MAX_FILE_UPLOAD_SIZE_MB } from "@/utils/fileUpload";
 
 import { PollingStationAlert } from "./PollingStationAlert";
 
@@ -81,7 +82,7 @@ export function PollingStationImportPage() {
                 file: () => <strong>{currentFile.name}</strong>,
               },
               {
-                max_size: response.message,
+                max_size: MAX_FILE_UPLOAD_SIZE_MB,
               },
             ),
           );

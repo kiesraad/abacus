@@ -9,7 +9,7 @@ export function fileTooLargeError(fileName: string): ReactElement {
   return tx(
     "file_too_large",
     {
-      file: () => <strong>{fileName}</strong>,
+      file: `${fileName}`,
     },
     {
       max_size: `${MAX_FILE_UPLOAD_SIZE_MB}`,

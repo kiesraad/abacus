@@ -11,7 +11,7 @@ export class InvestigationOverviewPgObj {
     this.fillInvestigationLink = page.getByRole("link", { name: "Nu invullen" });
   }
 
-  findInvestigationEditLinkByPollingStation(number: string) {
-    return this.page.getByTestId(`investigation-${number}`).getByRole("link", { name: /Bewerken|Nu invullen/ });
+  findInvestigationEditButtonByPollingStation(number: string) {
+    return this.page.getByTestId(`investigation-${number}`).getByRole("button", { name: /Bewerken|Nu invullen/ });
   }
 }

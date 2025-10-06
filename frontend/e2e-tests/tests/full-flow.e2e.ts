@@ -34,6 +34,17 @@ import { eml110b_single } from "e2e-tests/test-data/eml-files";
 import { noRecountNoDifferencesDataEntry } from "e2e-tests/test-data/request-response-templates";
 import { stat } from "node:fs/promises";
 
+const investigations = [
+  { number: "1", name: "Stadhuis", reason: "Reden", findings: "Probleem", correctedResults: true },
+  {
+    number: "2",
+    name: "Basisschool de Regenboog",
+    reason: "Reden",
+    findings: "Geen probleem",
+    correctedResults: false,
+  },
+];
+
 test.describe.configure({ mode: "serial" });
 
 test.describe("full flow", () => {
@@ -210,16 +221,7 @@ test.describe("full flow", () => {
     await electionDetailsPage.newSessionModalConfirmButton.click();
   });
 
-  for (const station of [
-    { number: "1", name: "Stadhuis", reason: "Reden", findings: "Probleem", correctedResults: true },
-    {
-      number: "2",
-      name: "Basisschool de Regenboog",
-      reason: "Reden",
-      findings: "Geen probleem",
-      correctedResults: false,
-    },
-  ]) {
+  for (const station of investigations) {
     test(`create investigation for ${station.name}`, async ({ page }) => {
       await page.goto("/account/login");
 
@@ -231,37 +233,6 @@ test.describe("full flow", () => {
       await overviewPage.findElectionRowById(electionId!).click();
 
       await createInvestigation(page, station.name, station.reason);
-    });
-
-    test(`finish investigation for ${station.name}`, async ({ page }) => {
-      await page.goto("/account/login");
-
-      const loginPage = new LoginPgObj(page);
-      await loginPage.login("coordinator1", getTestPassword("coordinator1"));
-
-      const overviewPage = new ElectionsOverviewPgObj(page);
-      await expect(overviewPage.header).toBeVisible();
-      await overviewPage.findElectionRowById(electionId!).click();
-
-      const electionDetailsPage = new ElectionDetailsPgObj(page);
-      await expect(electionDetailsPage.header).toContainText("Gemeenteraad Test 2022");
-      await electionDetailsPage.investigationsOverviewButton.click();
-
-      const investigationsOverviewPage = new InvestigationOverviewPgObj(page);
-      await expect(investigationsOverviewPage.header).toContainText("Onderzoeken in tweede zitting");
-      await investigationsOverviewPage.findInvestigationEditLinkByPollingStation(station.number).click();
-
-      const investigationsFindingsPage = new InvestigationFindingsPgObj(page);
-      await expect(investigationsFindingsPage.header).toBeVisible();
-      await investigationsFindingsPage.findingsField.fill(station.findings);
-      await investigationsFindingsPage.setCorrectedResults(station.correctedResults);
-      await investigationsFindingsPage.save.click();
-
-      const navBar = new CoordinatorNavBarPgObj(page);
-      await navBar.menuButton.click();
-      await navBar.electionsButton.click();
-
-      await expect(overviewPage.header).toBeVisible();
     });
   }
 
@@ -278,6 +249,39 @@ test.describe("full flow", () => {
     const electionDetailsPage = new ElectionDetailsPgObj(page);
     await electionDetailsPage.startDataEntryButton.click();
   });
+
+  for (const station of investigations) {
+    test(`finish investigation for ${station.name}`, async ({ page }) => {
+      await page.goto("/account/login");
+
+      const loginPage = new LoginPgObj(page);
+      await loginPage.login("coordinator1", getTestPassword("coordinator1"));
+
+      const overviewPage = new ElectionsOverviewPgObj(page);
+      await expect(overviewPage.header).toBeVisible();
+      await overviewPage.findElectionRowById(electionId!).click();
+
+      const electionDetailsPage = new ElectionDetailsPgObj(page);
+      await expect(electionDetailsPage.header).toContainText("Gemeenteraad Test 2022");
+      await electionDetailsPage.investigationsOverviewButton.click();
+
+      const investigationsOverviewPage = new InvestigationOverviewPgObj(page);
+      await expect(investigationsOverviewPage.header).toContainText("Onderzoeken in tweede zitting");
+      await investigationsOverviewPage.findInvestigationEditButtonByPollingStation(station.number).click();
+
+      const investigationsFindingsPage = new InvestigationFindingsPgObj(page);
+      await expect(investigationsFindingsPage.header).toBeVisible();
+      await investigationsFindingsPage.findingsField.fill(station.findings);
+      await investigationsFindingsPage.setCorrectedResults(station.correctedResults);
+      await investigationsFindingsPage.save.click();
+
+      const navBar = new CoordinatorNavBarPgObj(page);
+      await navBar.menuButton.click();
+      await navBar.electionsButton.click();
+
+      await expect(overviewPage.header).toBeVisible();
+    });
+  }
 
   for (const typist of ["typist1", "typist2"]) {
     test(`corrected data entry with ${typist}`, async ({ page }) => {
@@ -339,5 +343,29 @@ test.describe("full flow", () => {
 
     const statusPage = new ElectionStatus(page);
     await expect(statusPage.definitive).toBeVisible();
+
+    const finishButton = statusPage.finish;
+    await expect(finishButton).toBeVisible();
+    await finishButton.click();
+
+    const finishDataEntryPage = new FinishDataEntry(page);
+    await finishDataEntryPage.finishDataEntry.click();
+
+    const electionDetails = new ElectionDetailsPgObj(page);
+    await expect(electionDetails.header).toContainText("Gemeentelijk stembureau Test");
+    await electionDetails.locationInput.fill("Pannerdam");
+    await electionDetails.dateInput.fill("18-03-2026");
+    await electionDetails.timeInput.fill("21:34");
+    await electionDetails.continue.click();
+
+    const electionHomePage = new ElectionReport(page);
+    await expect(electionHomePage.header).toContainText("Tweede zitting Gemeentelijk Stembureau");
+    const downloadPromise = page.waitForEvent("download");
+    await electionHomePage.downloadZip.click();
+
+    const download = await downloadPromise;
+
+    expect(download.suggestedFilename()).toBe("election_result_GR2022_Test.zip");
+    expect((await stat(await download.path())).size).toBeGreaterThan(1024);
   });
 });

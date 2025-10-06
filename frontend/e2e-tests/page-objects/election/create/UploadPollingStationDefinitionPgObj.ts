@@ -1,4 +1,4 @@
-import { type Locator, type Page } from "@playwright/test";
+import { expect, type Locator, type Page } from "@playwright/test";
 
 export class UploadPollingStationDefinitionPgObj {
   readonly header: Locator;
@@ -20,5 +20,10 @@ export class UploadPollingStationDefinitionPgObj {
     await page.getByText("Bestand kiezen").click();
     const fileChooser = await fileChooserPromise;
     await fileChooser.setFiles(path);
+  }
+
+  async fileTooLargeError(page: Page, path: string) {
+    await expect(this.error).toBeVisible();
+    await expect(page.getByRole("strong").filter({ hasText: path })).toBeVisible();
   }
 }

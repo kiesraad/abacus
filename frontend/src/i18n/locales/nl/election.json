@@ -37,17 +37,14 @@
   "import_polling_station_eml": "Importeer stembureaus gemeente {location}",
   "invalid_candidates_definition": {
     "description": "Het bestand <file>filename</file> bevat geen geldige kandidatenlijsten. Kies een bestand met een geldige definitie.",
-    "file_too_large": "Het bestand <file>filename</file> is te groot. Kies een bestand van maximaal {max_size} Megabyte.",
     "title": "Ongeldige kandidatenlijsten"
   },
   "invalid_election_definition": {
     "description": "Het bestand <file>filename</file> bevat geen geldige verkiezingsdefinitie. Kies een bestand met een geldige definitie.",
-    "file_too_large": "Het bestand <file>filename</file> is te groot. Kies een bestand van maximaal {max_size} Megabyte.",
     "title": "Ongeldige verkiezingsdefinitie"
   },
   "invalid_polling_station_definition": {
     "description": "Het bestand <file>filename</file> bevat geen geldige lijst met stembureaus. Kies een ander bestand.",
-    "file_too_large": "Het bestand <file>filename</file> is te groot. Kies een bestand van maximaal {max_size} Megabyte.",
     "title": "Ongeldig stembureaubestand"
   },
 

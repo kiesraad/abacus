@@ -263,7 +263,7 @@ describe("Election create pages", () => {
 
     expect(screen.queryByLabelText("Geen bestand gekozen")).not.toBeInTheDocument();
     expect(screen.getAllByText(filename).length).toBe(2);
-    const message = screen.getByText(/Kies een bestand van maximaal 12 Megabyte./i);
+    const message = screen.getByText(/Kies een bestand van maximaal 5 Megabyte./i);
     expect(message).toBeVisible();
   });
 

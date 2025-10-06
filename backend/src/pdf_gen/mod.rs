@@ -6,6 +6,9 @@ mod embedded;
 #[cfg(not(feature = "embed-typst"))]
 mod external;
 
+#[cfg(test)]
+mod typst_tests;
+
 #[cfg(feature = "embed-typst")]
 pub use embedded::{PdfGenError, generate_pdf, generate_pdfs};
 #[cfg(not(feature = "embed-typst"))]

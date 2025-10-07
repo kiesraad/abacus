@@ -128,7 +128,7 @@ pub async fn committee_session_delete(
     let committee_session =
         crate::committee_session::repository::get(&mut tx, committee_session_id).await?;
 
-    if committee_session.number > 1
+    if committee_session.is_next_session()
         && (committee_session.status == CommitteeSessionStatus::Created
             || committee_session.status == CommitteeSessionStatus::DataEntryNotStarted)
     {

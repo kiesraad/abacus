@@ -109,7 +109,7 @@ async fn validate_and_get_data(
     .await?;
 
     // Validate polling station
-    if committee_session.number > 1 {
+    if committee_session.is_next_session() {
         let investigation = get_polling_station_investigation(conn, polling_station.id).await?;
         if investigation.corrected_results != Some(true) {
             return Err(APIError::Conflict(

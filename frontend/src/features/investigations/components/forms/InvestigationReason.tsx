@@ -1,7 +1,7 @@
 import { FormEvent, useState } from "react";
 import { useNavigate } from "react-router";
 
-import { AnyApiError, isError, isSuccess } from "@/api/ApiResult";
+import { isSuccess } from "@/api/ApiResult";
 import { useCrud } from "@/api/useCrud";
 import { Button } from "@/components/ui/Button/Button";
 import { Form } from "@/components/ui/Form/Form";
@@ -12,6 +12,8 @@ import { useElection } from "@/hooks/election/useElection";
 import { useMessages } from "@/hooks/messages/useMessages";
 import { t } from "@/i18n/translate";
 import {
+  POLLING_STATION_INVESTIGATION_CREATE_REQUEST_PATH,
+  POLLING_STATION_INVESTIGATION_UPDATE_REQUEST_PATH,
   PollingStationInvestigation,
   PollingStationInvestigationCreateRequest,
   PollingStationInvestigationUpdateRequest,
@@ -27,16 +29,12 @@ export function InvestigationReason({ pollingStationId }: InvestigationReasonPro
   const { investigation, pollingStation, refetch } = useElection(pollingStationId);
   const { pushMessage } = useMessages();
   const [nonEmptyError, setNonEmptyError] = useState(false);
-  const [error, setError] = useState<AnyApiError>();
-  const path = `/api/polling_stations/${pollingStationId}/investigation`;
-  const { create, update } = useCrud<PollingStationInvestigation>(path);
+  const updatePath: POLLING_STATION_INVESTIGATION_UPDATE_REQUEST_PATH = `/api/polling_stations/${pollingStationId}/investigation`;
+  const createPath: POLLING_STATION_INVESTIGATION_CREATE_REQUEST_PATH = `/api/polling_stations/${pollingStationId}/investigation`;
+  const { create, update } = useCrud<PollingStationInvestigation>({ updatePath, createPath, throwAllErrors: true });
 
   if (!pollingStation) {
     return <Loader />;
-  }
-
-  if (error) {
-    throw error;
   }
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
@@ -83,8 +81,6 @@ export function InvestigationReason({ pollingStationId }: InvestigationReasonPro
     if (isSuccess(response)) {
       await refetch();
       await navigate("../print-corrigendum");
-    } else if (isError(response)) {
-      setError(response);
     }
   };
 

@@ -19,22 +19,19 @@ interface StartDataEntryModalProps {
 export function StartDataEntryModal({ onClose, to }: StartDataEntryModalProps) {
   const { currentCommitteeSession, refetch } = useElection();
   const navigate = useNavigate();
-  const url: COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_PATH = `/api/committee_sessions/${currentCommitteeSession.id}/status`;
-  const { update, requestState } = useCrud({ update: url });
+  const updatePath: COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_PATH = `/api/committee_sessions/${currentCommitteeSession.id}/status`;
+  const { update, isLoading } = useCrud({ updatePath, throwAllErrors: true });
 
-  if (requestState.status === "api-error") {
-    throw requestState.error;
-  }
-
-  const startDataEntry = async () => {
+  function startDataEntry() {
     const body: COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_BODY = { status: "data_entry_in_progress" };
-    const result = await update(body);
-
-    if (isSuccess(result)) {
-      await refetch();
-      void navigate(to);
-    }
-  };
+    void update(body).then((result) => {
+      if (isSuccess(result)) {
+        void refetch().then(() => {
+          void navigate(to);
+        });
+      }
+    });
+  }
 
   return (
     <Modal title={t("investigations.start_data_entry_question")} onClose={onClose}>
@@ -44,8 +41,10 @@ export function StartDataEntryModal({ onClose, to }: StartDataEntryModalProps) {
           type="button"
           variant="primary"
           size="xl"
-          disabled={requestState.status === "loading"}
-          onClick={() => void startDataEntry()}
+          disabled={isLoading}
+          onClick={() => {
+            startDataEntry();
+          }}
         >
           {t("investigations.start_data_entry")}
         </Button>

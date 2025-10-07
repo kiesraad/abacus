@@ -1,8 +1,8 @@
-import { Fragment, HTMLAttributes, ReactNode, useState } from "react";
+import { Fragment, HTMLAttributes, ReactNode } from "react";
 import { NavigateOptions, To, useNavigate } from "react-router";
 
-import { AnyApiError, isSuccess } from "@/api/ApiResult";
-import { useApiClient } from "@/api/useApiClient";
+import { isSuccess } from "@/api/ApiResult";
+import { useCrud } from "@/api/useCrud";
 import { CommitteeSessionStatusLabel } from "@/components/committee_session/CommitteeSessionStatus";
 import { Button } from "@/components/ui/Button/Button";
 import { CommitteeSessionStatusIcon } from "@/components/ui/Icon/CommitteeSessionStatusIcon";
@@ -88,28 +88,18 @@ export function CommitteeSessionCard({
   currentSession,
   ...props
 }: CommitteeSessionCardProps & DivProps) {
-  const client = useApiClient();
   const navigate = useNavigate();
   const { isCoordinator } = useUserRole();
-  const [changeStatusError, setChangeStatusError] = useState<AnyApiError | null>(null);
-
-  if (changeStatusError) {
-    throw changeStatusError;
-  }
+  const updatePath: COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_PATH = `/api/committee_sessions/${committeeSession.id}/status`;
+  const { update } = useCrud({ updatePath, throwAllErrors: true });
 
   function handleStart() {
-    const url: COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_PATH = `/api/committee_sessions/${committeeSession.id}/status`;
     const body: COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_BODY = { status: "data_entry_in_progress" };
-    void client
-      .putRequest(url, body)
-      .then((result) => {
-        if (isSuccess(result)) {
-          void navigate("status");
-        } else {
-          throw result;
-        }
-      })
-      .catch(setChangeStatusError);
+    void update(body).then((result) => {
+      if (isSuccess(result)) {
+        void navigate("status");
+      }
+    });
   }
 
   const icon = CommitteeSessionStatusIcon({ status: committeeSession.status, size: "xl" });

@@ -4,7 +4,7 @@ import { IconTrash } from "@/components/generated/icons";
 import { Button } from "@/components/ui/Button/Button";
 import { Modal } from "@/components/ui/Modal/Modal";
 import { t } from "@/i18n/translate";
-import { PollingStation } from "@/types/generated/openapi";
+import { POLLING_STATION_DELETE_REQUEST_PATH, PollingStation } from "@/types/generated/openapi";
 
 export interface PollingStationDeleteModalProps {
   electionId: number;
@@ -21,7 +21,8 @@ export function PollingStationDeleteModal({
   onCancel,
   onError,
 }: PollingStationDeleteModalProps) {
-  const { remove, requestState } = useCrud(`/api/elections/${electionId}/polling_stations/${pollingStation.id}`);
+  const removePath: POLLING_STATION_DELETE_REQUEST_PATH = `/api/elections/${electionId}/polling_stations/${pollingStation.id}`;
+  const { remove, isLoading } = useCrud({ removePath, throwAllErrors: false });
 
   function handleDelete() {
     void remove().then((result) => {
@@ -33,8 +34,6 @@ export function PollingStationDeleteModal({
     });
   }
 
-  const deleting = requestState.status === "loading";
-
   return (
     <Modal title={t("polling_station.delete_modal.title")} onClose={onCancel}>
       <p>{t("polling_station.delete_modal.confirm")}</p>
@@ -44,11 +43,11 @@ export function PollingStationDeleteModal({
           variant="primary-destructive"
           size="xl"
           onClick={handleDelete}
-          disabled={deleting}
+          disabled={isLoading}
         >
           {t("delete")}
         </Button>
-        <Button variant="secondary" size="xl" onClick={onCancel} disabled={deleting}>
+        <Button variant="secondary" size="xl" onClick={onCancel} disabled={isLoading}>
           {t("cancel")}
         </Button>
       </nav>

@@ -1,7 +1,5 @@
-import { useState } from "react";
 import { useNavigate } from "react-router";
 
-import { AnyApiError } from "@/api/ApiResult";
 import { Loader } from "@/components/ui/Loader/Loader";
 import { useElection } from "@/hooks/election/useElection";
 import { useMessages } from "@/hooks/messages/useMessages";
@@ -17,14 +15,9 @@ export function InvestigationReasonPage() {
   const { election, investigation, pollingStation } = useElection(pollingStationId);
   const navigate = useNavigate();
   const { pushMessage } = useMessages();
-  const [error, setError] = useState<AnyApiError>();
 
   if (!pollingStation) {
     return <Loader />;
-  }
-
-  if (error) {
-    throw error;
   }
 
   function handleDeleted(pollingStation: PollingStation) {
@@ -41,9 +34,7 @@ export function InvestigationReasonPage() {
   return (
     <>
       <InvestigationReason pollingStationId={pollingStationId} />
-      {investigation && (
-        <InvestigationDelete pollingStation={pollingStation} onDeleted={handleDeleted} onError={setError} />
-      )}
+      {investigation && <InvestigationDelete pollingStation={pollingStation} onDeleted={handleDeleted} />}
     </>
   );
 }

@@ -1,8 +1,7 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useNavigate } from "react-router";
 
-import { AnyApiError, isSuccess } from "@/api/ApiResult";
-import { useApiClient } from "@/api/useApiClient";
+import { useCrud } from "@/api/useCrud";
 import { Footer } from "@/components/footer/Footer";
 import { PageTitle } from "@/components/page_title/PageTitle";
 import { Button } from "@/components/ui/Button/Button";
@@ -19,13 +18,9 @@ import cls from "../ElectionManagement.module.css";
 
 export function FinishDataEntryPage() {
   const { currentCommitteeSession, election, refetch } = useElection();
-  const client = useApiClient();
   const navigate = useNavigate();
-  const [changeStatusError, setChangeStatusError] = useState<AnyApiError | null>(null);
-
-  if (changeStatusError) {
-    throw changeStatusError;
-  }
+  const updatePath: COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_PATH = `/api/committee_sessions/${currentCommitteeSession.id}/status`;
+  const { update } = useCrud({ updatePath, throwAllErrors: true });
 
   useEffect(() => {
     // Redirect to report download if committee session data entry phase is already finished
@@ -35,18 +30,10 @@ export function FinishDataEntryPage() {
   }, [currentCommitteeSession, election, navigate]);
 
   function handleFinish() {
-    const url: COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_PATH = `/api/committee_sessions/${currentCommitteeSession.id}/status`;
     const body: COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_BODY = { status: "data_entry_finished" };
-    void client
-      .putRequest(url, body)
-      .then(async (result) => {
-        if (isSuccess(result)) {
-          await refetch();
-        } else {
-          throw result;
-        }
-      })
-      .catch(setChangeStatusError);
+    void update(body).then(() => {
+      void refetch();
+    });
   }
 
   return (

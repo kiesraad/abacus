@@ -16,10 +16,10 @@ import { CheckHash } from "./CheckHash";
 export function UploadElectionDefinition() {
   const { state, dispatch } = useElectionCreateContext();
   const navigate = useNavigate();
-  const path: ELECTION_IMPORT_VALIDATE_REQUEST_PATH = `/api/elections/import/validate`;
   const [error, setError] = useState<ReactNode | undefined>();
   const [file, setFile] = useState<File | undefined>();
-  const { create } = useCrud<ElectionDefinitionValidateResponse>({ create: path });
+  const createPath: ELECTION_IMPORT_VALIDATE_REQUEST_PATH = `/api/elections/import/validate`;
+  const { create } = useCrud<ElectionDefinitionValidateResponse>({ createPath });
 
   async function onFileChange(e: ChangeEvent<HTMLInputElement>) {
     const currentFile = e.target.files ? e.target.files[0] : undefined;

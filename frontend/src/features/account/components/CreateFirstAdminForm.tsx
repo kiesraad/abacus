@@ -1,6 +1,6 @@
-import { FormEvent, useEffect, useState } from "react";
+import { FormEvent, useState } from "react";
 
-import { ApiError } from "@/api/ApiResult";
+import { AnyApiError, ApiError, isSuccess } from "@/api/ApiResult";
 import { useCrud } from "@/api/useCrud";
 import { Alert } from "@/components/ui/Alert/Alert";
 import { Button } from "@/components/ui/Button/Button";
@@ -19,24 +19,9 @@ interface CreateFirstAdminFormProps {
 
 export function CreateFirstAdminForm({ next }: CreateFirstAdminFormProps) {
   const [validationErrors, setValidationErrors] = useState<UserValidationErrors | null>(null);
-
-  const url: CREATE_FIRST_ADMIN_REQUEST_PATH = "/api/initialise/first-admin";
-  const { create, requestState } = useCrud<LoginResponse>(url);
-  const [apiError, setApiError] = useState<ApiError | null>(null);
-
-  useEffect(() => {
-    if (requestState.status === "success") {
-      next();
-    } else if (requestState.status === "api-error") {
-      if (requestState.error.reference === "PasswordRejection") {
-        setValidationErrors({
-          password: t("initialise.password_rules"),
-        });
-      } else {
-        setApiError(requestState.error);
-      }
-    }
-  }, [requestState, next]);
+  const createPath: CREATE_FIRST_ADMIN_REQUEST_PATH = "/api/initialise/first-admin";
+  const { create, isLoading } = useCrud<LoginResponse>({ createPath });
+  const [apiError, setApiError] = useState<AnyApiError | null>(null);
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -60,7 +45,17 @@ export function CreateFirstAdminForm({ next }: CreateFirstAdminFormProps) {
 
     setValidationErrors(null);
 
-    void create(account);
+    void create(account).then((result) => {
+      if (isSuccess(result)) {
+        next();
+      } else if (result instanceof ApiError && result.reference === "PasswordRejection") {
+        setValidationErrors({
+          password: t("initialise.password_rules"),
+        });
+      } else if (result instanceof ApiError) {
+        setApiError(result);
+      }
+    });
   }
 
   return (
@@ -81,7 +76,7 @@ export function CreateFirstAdminForm({ next }: CreateFirstAdminFormProps) {
             </FormLayout.Alert>
           )}
 
-          {apiError && (
+          {apiError instanceof ApiError && (
             <FormLayout.Alert>
               <Alert type="error">
                 <p>{t(`error.api_error.${apiError.reference}`)}</p>
@@ -90,7 +85,7 @@ export function CreateFirstAdminForm({ next }: CreateFirstAdminFormProps) {
           )}
 
           <Form onSubmit={handleSubmit}>
-            <FormLayout disabled={requestState.status === "loading"}>
+            <FormLayout disabled={isLoading}>
               <FormLayout.Section title={t("initialise.account_details")}>
                 <p>{t("initialise.store_in_safe_place")}</p>
                 <InputField

@@ -1280,6 +1280,19 @@
       "post": {
         "summary": "Validate a file with Polling Stations",
         "operationId": "polling_station_validate_import",
+        "parameters": [
+          {
+            "name": "election_id",
+            "in": "path",
+            "description": "Election database id",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "minimum": 0
+            }
+          }
+        ],
         "requestBody": {
           "content": {
             "application/json": {

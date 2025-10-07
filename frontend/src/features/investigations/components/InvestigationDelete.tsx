@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-import { AnyApiError, isSuccess } from "@/api/ApiResult";
+import { isSuccess } from "@/api/ApiResult";
 import { useCrud } from "@/api/useCrud";
 import { IconTrash } from "@/components/generated/icons";
 import { Button } from "@/components/ui/Button/Button";
@@ -13,33 +13,28 @@ import { PollingStation } from "@/types/generated/openapi";
 export interface InvestigationDeleteModalProps {
   pollingStation: PollingStation;
   onDeleted: (pollingStation: PollingStation) => void;
-  onError: (error: AnyApiError) => void;
 }
 
-export function InvestigationDelete({ pollingStation, onDeleted, onError }: InvestigationDeleteModalProps) {
+export function InvestigationDelete({ pollingStation, onDeleted }: InvestigationDeleteModalProps) {
   const [showModal, setShowModal] = useState(false);
   const { refetch } = useElection(pollingStation.id);
   const electionStatuses = useElectionStatus();
   const status = electionStatuses.statuses.find((status) => status.polling_station_id === pollingStation.id);
-  const path = `/api/polling_stations/${pollingStation.id}/investigation`;
-  const { remove, requestState } = useCrud({ remove: path });
+  const removePath = `/api/polling_stations/${pollingStation.id}/investigation`;
+  const { remove, isLoading } = useCrud({ removePath, throwAllErrors: true });
 
   function toggleModal() {
     setShowModal(!showModal);
   }
 
   function handleDelete() {
-    void remove().then(async (result) => {
+    void remove().then((result) => {
       if (isSuccess(result)) {
-        await refetch();
+        void refetch();
         onDeleted(pollingStation);
-      } else {
-        onError(result);
       }
     });
   }
-
-  const deleting = requestState.status === "loading";
 
   return (
     <div className="mt-md">
@@ -57,11 +52,11 @@ export function InvestigationDelete({ pollingStation, onDeleted, onError }: Inve
               variant="primary-destructive"
               size="xl"
               onClick={handleDelete}
-              disabled={deleting}
+              disabled={isLoading}
             >
               {t("delete")}
             </Button>
-            <Button variant="secondary" size="xl" onClick={toggleModal} disabled={deleting}>
+            <Button variant="secondary" size="xl" onClick={toggleModal} disabled={isLoading}>
               {t("cancel")}
             </Button>
           </nav>

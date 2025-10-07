@@ -17,11 +17,10 @@ import { useElectionCreateContext } from "../hooks/useElectionCreateContext";
 export function UploadPollingStationDefinition() {
   const { state, dispatch } = useElectionCreateContext();
   const navigate = useNavigate();
-
-  const path: ELECTION_IMPORT_VALIDATE_REQUEST_PATH = `/api/elections/import/validate`;
   const [error, setError] = useState<ReactNode | undefined>();
   const [file, setFile] = useState<File | undefined>();
-  const { create } = useCrud<ElectionDefinitionValidateResponse>({ create: path });
+  const createPath: ELECTION_IMPORT_VALIDATE_REQUEST_PATH = `/api/elections/import/validate`;
+  const { create } = useCrud<ElectionDefinitionValidateResponse>({ createPath });
 
   // if no data was stored, navigate back to beginning
   if (!state.electionDefinitionData) {

@@ -1,8 +1,7 @@
-import { useState } from "react";
 import { Navigate, useNavigate } from "react-router";
 
-import { AnyApiError, ApplicationError, isSuccess, NotFoundError } from "@/api/ApiResult";
-import { useApiClient } from "@/api/useApiClient";
+import { ApplicationError, isSuccess, NotFoundError } from "@/api/ApiResult";
+import { useCrud } from "@/api/useCrud";
 import { Footer } from "@/components/footer/Footer";
 import { IconCheckVerified } from "@/components/generated/icons";
 import { PageTitle } from "@/components/page_title/PageTitle";
@@ -16,7 +15,6 @@ import { t, tx } from "@/i18n/translate";
 import {
   COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_BODY,
   COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_PATH,
-  CommitteeSession,
 } from "@/types/generated/openapi";
 import { cn } from "@/utils/classnames";
 import { committeeSessionLabel } from "@/utils/committeeSession";
@@ -26,12 +24,11 @@ import cls from "../ElectionManagement.module.css";
 
 export function ElectionReportPage() {
   const { currentCommitteeSession, committeeSessions, election } = useElection();
-  const client = useApiClient();
   const navigate = useNavigate();
-  const [changeStatusError, setChangeStatusError] = useState<AnyApiError | null>(null);
-
   const committeeSessionId = useNumericParam("committeeSessionId");
   const committeeSession = committeeSessions.find((session) => session.id === committeeSessionId);
+  const updatePath: COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_PATH = `/api/committee_sessions/${committeeSessionId}/status`;
+  const { update, isLoading } = useCrud({ updatePath, throwAllErrors: true });
 
   if (!committeeSession) {
     throw new NotFoundError("error.not_found");
@@ -51,23 +48,13 @@ export function ElectionReportPage() {
 
   const isFirstCommitteeSession = currentCommitteeSession.number === 1;
 
-  if (changeStatusError) {
-    throw changeStatusError;
-  }
-
-  function handleResume(committeeSession: CommitteeSession) {
-    const url: COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_PATH = `/api/committee_sessions/${committeeSession.id}/status`;
+  function handleResume() {
     const body: COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_BODY = { status: "data_entry_in_progress" };
-    void client
-      .putRequest(url, body)
-      .then((result) => {
-        if (isSuccess(result)) {
-          void navigate("../../status");
-        } else {
-          throw result;
-        }
-      })
-      .catch(setChangeStatusError);
+    void update(body).then((result) => {
+      if (isSuccess(result)) {
+        void navigate("../../status");
+      }
+    });
   }
 
   return (
@@ -140,12 +127,7 @@ export function ElectionReportPage() {
             <FormLayout.Controls>
               <Button.Link to="../..">{t("back_to_overview")}</Button.Link>
               {currentCommitteeSession.id === committeeSession.id && (
-                <Button
-                  variant="secondary"
-                  onClick={() => {
-                    handleResume(committeeSession);
-                  }}
-                >
+                <Button variant="secondary" onClick={handleResume} disabled={isLoading}>
                   {t("election_report.resume_data_entry")}
                 </Button>
               )}

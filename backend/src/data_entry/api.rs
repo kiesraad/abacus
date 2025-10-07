@@ -26,7 +26,7 @@ use super::{
 use crate::{
     APIError, AppState, SqlitePoolExt,
     audit_log::{AuditEvent, AuditService},
-    authentication::{Coordinator, Role, Typist, User},
+    authentication::{Coordinator, Role, Typist, User, error::AuthenticationError},
     committee_session::{CommitteeSession, CommitteeSessionError, status::CommitteeSessionStatus},
     election::{ElectionWithPoliticalGroups, PoliticalGroup},
     error::{ErrorReference, ErrorResponse},
@@ -83,9 +83,9 @@ pub fn router() -> OpenApiRouter<AppState> {
 }
 
 async fn validate_and_get_data(
+    conn: &mut SqliteConnection,
     polling_station_id: u32,
     user: &User,
-    conn: &mut SqliteConnection,
 ) -> Result<
     (
         PollingStation,
@@ -123,25 +123,21 @@ async fn validate_and_get_data(
     match user.role() {
         Role::Typist => {
             if committee_session.status == CommitteeSessionStatus::DataEntryPaused {
-                return Err(APIError::CommitteeSession(
-                    CommitteeSessionError::CommitteeSessionPaused,
-                ));
+                return Err(CommitteeSessionError::CommitteeSessionPaused.into());
             } else if committee_session.status != CommitteeSessionStatus::DataEntryInProgress {
-                return Err(APIError::CommitteeSession(
-                    CommitteeSessionError::InvalidCommitteeSessionStatus,
-                ));
+                return Err(CommitteeSessionError::InvalidCommitteeSessionStatus.into());
             }
         }
         Role::Coordinator => {
             if committee_session.status != CommitteeSessionStatus::DataEntryInProgress
                 && committee_session.status != CommitteeSessionStatus::DataEntryPaused
             {
-                return Err(APIError::CommitteeSession(
-                    CommitteeSessionError::InvalidCommitteeSessionStatus,
-                ));
+                return Err(CommitteeSessionError::InvalidCommitteeSessionStatus.into());
             }
         }
-        _ => {}
+        _ => {
+            return Err(AuthenticationError::Forbidden.into());
+        }
     }
 
     Ok((
@@ -268,7 +264,7 @@ async fn polling_station_data_entry_claim(
     let mut tx = pool.begin_immediate().await?;
 
     let (polling_station, election, committee_session, state) =
-        validate_and_get_data(polling_station_id, &user.0, &mut tx).await?;
+        validate_and_get_data(&mut tx, polling_station_id, &user.0).await?;
 
     let previous_results = if let Some(id) = polling_station.id_prev_session {
         most_recent_results_for_polling_station(&mut tx, id).await?
@@ -383,7 +379,7 @@ async fn polling_station_data_entry_save(
     let mut tx = pool.begin_immediate().await?;
 
     let (polling_station, election, committee_session, state) =
-        validate_and_get_data(polling_station_id, &user.0, &mut tx).await?;
+        validate_and_get_data(&mut tx, polling_station_id, &user.0).await?;
 
     let current_data_entry = CurrentDataEntry {
         progress: Some(data_entry_request.progress),
@@ -451,7 +447,7 @@ async fn polling_station_data_entry_delete(
     let mut tx = pool.begin_immediate().await?;
 
     let (_, _, committee_session, state) =
-        validate_and_get_data(polling_station_id, &user.0, &mut tx).await?;
+        validate_and_get_data(&mut tx, polling_station_id, &user.0).await?;
 
     let user_id = user.0.id();
     let new_state = match entry_number {
@@ -508,7 +504,7 @@ async fn polling_station_data_entry_finalise(
     let mut tx = pool.begin_immediate().await?;
 
     let (polling_station, election, committee_session, state) =
-        validate_and_get_data(polling_station_id, &user.0, &mut tx).await?;
+        validate_and_get_data(&mut tx, polling_station_id, &user.0).await?;
 
     let user_id = user.0.id();
     match entry_number {
@@ -624,7 +620,7 @@ async fn polling_station_data_entry_get_errors(
     let mut conn = pool.acquire().await?;
 
     let (polling_station, election, _, state) =
-        validate_and_get_data(polling_station_id, &user.0, &mut conn).await?;
+        validate_and_get_data(&mut conn, polling_station_id, &user.0).await?;
 
     match state.clone() {
         DataEntryStatus::FirstEntryHasErrors(FirstEntryHasErrors {
@@ -677,7 +673,7 @@ async fn polling_station_data_entry_resolve_errors(
     let mut tx = pool.begin_immediate().await?;
 
     let (_, _, committee_session, state) =
-        validate_and_get_data(polling_station_id, &user.0, &mut tx).await?;
+        validate_and_get_data(&mut tx, polling_station_id, &user.0).await?;
 
     let new_state = match action {
         ResolveErrorsAction::DiscardFirstEntry => state.discard_first_entry()?,
@@ -733,7 +729,7 @@ async fn polling_station_data_entry_get_differences(
 ) -> Result<Json<DataEntryGetDifferencesResponse>, APIError> {
     let mut conn = pool.acquire().await?;
 
-    let (_, _, _, state) = validate_and_get_data(polling_station_id, &user.0, &mut conn).await?;
+    let (_, _, _, state) = validate_and_get_data(&mut conn, polling_station_id, &user.0).await?;
 
     match state {
         DataEntryStatus::EntriesDifferent(EntriesDifferent {
@@ -783,7 +779,7 @@ async fn polling_station_data_entry_resolve_differences(
     let mut tx = pool.begin_immediate().await?;
 
     let (polling_station, election, committee_session, state) =
-        validate_and_get_data(polling_station_id, &user.0, &mut tx).await?;
+        validate_and_get_data(&mut tx, polling_station_id, &user.0).await?;
 
     let new_state = match action {
         ResolveDifferencesAction::KeepFirstEntry => state.keep_first_entry()?,

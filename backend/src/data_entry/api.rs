@@ -894,7 +894,9 @@ mod tests {
             CSOFirstSessionResults, CountingDifferencesPollingStation,
             DifferenceCountsCompareVotesCastAdmittedVoters, DifferencesCounts, ExtraInvestigation,
             PoliticalGroupCandidateVotes, PoliticalGroupTotalVotes, VotersCounts, VotesCounts,
-            YesNo, repository::insert_test_result, structs::tests::ValidDefault,
+            YesNo,
+            repository::{data_entry_exists, insert_test_result},
+            structs::tests::ValidDefault,
         },
         investigation::insert_test_investigation,
     };
@@ -1105,11 +1107,8 @@ mod tests {
         assert_eq!(response.status(), StatusCode::OK);
 
         // Check that row was created
-        let row_count = query!("SELECT COUNT(*) AS count FROM polling_station_data_entries")
-            .fetch_one(&pool)
-            .await
-            .unwrap();
-        assert_eq!(row_count.count, 1);
+        let mut conn = pool.acquire().await.unwrap();
+        assert!(data_entry_exists(&mut conn, 1).await.unwrap());
     }
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
@@ -1124,11 +1123,8 @@ mod tests {
         assert_eq!(result.reference, ErrorReference::CommitteeSessionPaused);
 
         // Check that no row was created
-        let row_count = query!("SELECT COUNT(*) AS count FROM polling_station_data_entries")
-            .fetch_one(&pool)
-            .await
-            .unwrap();
-        assert_eq!(row_count.count, 0);
+        let mut conn = pool.acquire().await.unwrap();
+        assert!(!data_entry_exists(&mut conn, 1).await.unwrap());
     }
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
@@ -1148,11 +1144,8 @@ mod tests {
         );
 
         // Check that no row was created
-        let row_count = query!("SELECT COUNT(*) AS count FROM polling_station_data_entries")
-            .fetch_one(&pool)
-            .await
-            .unwrap();
-        assert_eq!(row_count.count, 0);
+        let mut conn = pool.acquire().await.unwrap();
+        assert!(!data_entry_exists(&mut conn, 1).await.unwrap());
     }
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_7_four_sessions"))))]
@@ -1161,11 +1154,8 @@ mod tests {
         assert_eq!(response.status(), StatusCode::NOT_FOUND);
 
         // Check that no row was created
-        let row_count = query!("SELECT COUNT(*) AS count FROM polling_station_data_entries")
-            .fetch_one(&pool)
-            .await
-            .unwrap();
-        assert_eq!(row_count.count, 0);
+        let mut conn = pool.acquire().await.unwrap();
+        assert!(!data_entry_exists(&mut conn, 742).await.unwrap());
     }
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_7_four_sessions"))))]
@@ -1180,13 +1170,12 @@ mod tests {
 
         let response = claim(pool.clone(), 742, EntryNumber::FirstEntry).await;
         assert_eq!(response.status(), StatusCode::CONFLICT);
+        let body = response.into_body().collect().await.unwrap().to_bytes();
+        let result: ErrorResponse = serde_json::from_slice(&body).unwrap();
+        assert_eq!(result.reference, ErrorReference::DataEntryNotAllowed);
 
         // Check that no row was created
-        let row_count = query!("SELECT COUNT(*) AS count FROM polling_station_data_entries")
-            .fetch_one(&pool)
-            .await
-            .unwrap();
-        assert_eq!(row_count.count, 0);
+        assert!(!data_entry_exists(&mut conn, 742).await.unwrap());
     }
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_7_four_sessions"))))]
@@ -1201,11 +1190,7 @@ mod tests {
         assert_eq!(response.status(), StatusCode::OK);
 
         // Check that row was created
-        let row_count = query!("SELECT COUNT(*) AS count FROM polling_station_data_entries")
-            .fetch_one(&pool)
-            .await
-            .unwrap();
-        assert_eq!(row_count.count, 1);
+        assert!(data_entry_exists(&mut conn, 742).await.unwrap());
     }
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
@@ -1224,11 +1209,8 @@ mod tests {
         assert_eq!(response.status(), StatusCode::OK);
 
         // Check if a row was created
-        let row_count = query!("SELECT COUNT(*) AS count FROM polling_station_data_entries")
-            .fetch_one(&pool)
-            .await
-            .unwrap();
-        assert_eq!(row_count.count, 1);
+        let mut conn = pool.acquire().await.unwrap();
+        assert!(data_entry_exists(&mut conn, 1).await.unwrap());
     }
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
@@ -1308,11 +1290,8 @@ mod tests {
         assert_eq!(response.status(), StatusCode::OK);
 
         // Check if a row was created
-        let row_count = query!("SELECT COUNT(*) AS count FROM polling_station_data_entries")
-            .fetch_one(&pool)
-            .await
-            .unwrap();
-        assert_eq!(row_count.count, 1);
+        let mut conn = pool.acquire().await.unwrap();
+        assert!(data_entry_exists(&mut conn, 1).await.unwrap());
 
         // Create a new committee session and set status to DataEntryInProgress
         let committee_session: CommitteeSession =
@@ -1328,7 +1307,6 @@ mod tests {
         let response = claim(pool.clone(), 1, EntryNumber::FirstEntry).await;
         assert_eq!(response.status(), StatusCode::NOT_FOUND);
 
-        let mut conn = pool.acquire().await.unwrap();
         let new_ps = crate::polling_station::repository::get_by_previous_id(&mut conn, 1)
             .await
             .unwrap();
@@ -1343,11 +1321,7 @@ mod tests {
         assert_eq!(response.status(), StatusCode::OK);
 
         // Check that a new row was created
-        let row_count = query!("SELECT COUNT(*) AS count FROM polling_station_data_entries")
-            .fetch_one(&pool)
-            .await
-            .unwrap();
-        assert_eq!(row_count.count, 2);
+        assert!(data_entry_exists(&mut conn, new_ps.id).await.unwrap());
 
         // Check that the new data entry is linked to the new committee session
         let data = query_as!(
@@ -1383,12 +1357,9 @@ mod tests {
         .await;
         assert_eq!(response.status(), StatusCode::OK);
 
-        // Check if there is still only one row
-        let row_count = query!("SELECT COUNT(*) AS count FROM polling_station_data_entries")
-            .fetch_one(&pool)
-            .await
-            .unwrap();
-        assert_eq!(row_count.count, 1);
+        // Check if the row is there
+        let mut conn = pool.acquire().await.unwrap();
+        assert!(data_entry_exists(&mut conn, 1).await.unwrap());
 
         // Check if the data was updated
         let row = query!(
@@ -1777,6 +1748,8 @@ mod tests {
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
     async fn test_data_entry_delete_finalised_not_possible(pool: SqlitePool) {
+        let mut conn = pool.acquire().await.unwrap();
+
         for entry_number in 1..=2 {
             let entry_number = EntryNumber::try_from(entry_number).unwrap();
             // create and finalise the first data entry
@@ -1797,12 +1770,7 @@ mod tests {
             // after the first data entry, check if it is still in the database
             // (after the second data entry, the results are finalised so we do not expect rows)
             if entry_number == EntryNumber::FirstEntry {
-                let row_count =
-                    query!("SELECT COUNT(*) AS count FROM polling_station_data_entries")
-                        .fetch_one(&pool)
-                        .await
-                        .unwrap();
-                assert_eq!(row_count.count, 1);
+                assert!(data_entry_exists(&mut conn, 1).await.unwrap());
             }
         }
     }

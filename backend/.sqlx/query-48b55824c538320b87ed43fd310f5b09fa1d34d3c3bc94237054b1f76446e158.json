@@ -1,0 +1,20 @@
+{
+  "db_name": "SQLite",
+  "query": "SELECT event_name FROM audit_log ORDER BY ROWID ASC",
+  "describe": {
+    "columns": [
+      {
+        "name": "event_name",
+        "ordinal": 0,
+        "type_info": "Text"
+      }
+    ],
+    "parameters": {
+      "Right": 0
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "48b55824c538320b87ed43fd310f5b09fa1d34d3c3bc94237054b1f76446e158"
+}

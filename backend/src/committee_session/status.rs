@@ -258,7 +258,7 @@ mod tests {
 
         use crate::{
             APIError,
-            audit_log::AuditService,
+            audit_log::{AuditService, list_event_names},
             committee_session,
             committee_session::{
                 CommitteeSessionFilesUpdateRequest,
@@ -268,16 +268,6 @@ mod tests {
         };
         use sqlx::{SqliteConnection, SqlitePool};
         use std::net::Ipv4Addr;
-
-        async fn sorted_events(conn: &mut SqliteConnection) -> Result<Vec<String>, APIError> {
-            let mut events: Vec<String> = crate::audit_log::list_all(conn)
-                .await?
-                .into_iter()
-                .map(|e| e.event().to_string())
-                .collect();
-            events.sort();
-            Ok(events)
-        }
 
         async fn generate_file(conn: &mut SqliteConnection) -> Result<u32, APIError> {
             let file = files::repository::create_file(
@@ -309,7 +299,10 @@ mod tests {
             )
             .await?;
 
-            assert_eq!(sorted_events(&mut conn).await?, ["CommitteeSessionUpdated"]);
+            assert_eq!(
+                list_event_names(&mut conn).await?,
+                ["CommitteeSessionUpdated"]
+            );
             Ok(())
         }
 
@@ -340,12 +333,12 @@ mod tests {
             .await?;
 
             assert_eq!(
-                sorted_events(&mut conn).await?,
+                list_event_names(&mut conn).await?,
                 [
+                    "FileDeleted",
+                    "FileDeleted",
+                    "FileDeleted",
                     "CommitteeSessionUpdated",
-                    "FileDeleted",
-                    "FileDeleted",
-                    "FileDeleted"
                 ]
             );
             Ok(())

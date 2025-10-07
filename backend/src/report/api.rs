@@ -288,11 +288,14 @@ async fn generate_and_save_files(
     }
     drop(conn);
 
-    // If one or both files don't exist, generate them and save them to the database
-    if eml_file.is_none() || pdf_file.is_none() {
+    // If one of the files doesn't exist, generate all and save them to the database
+    if eml_file.is_none()
+        || pdf_file.is_none()
+        || (committee_session.overview_pdf.is_some() && overview_pdf_file.is_none())
+    {
         let mut tx = pool.begin_immediate().await?;
 
-        let input = dbg!(ResultsInput::new(&mut tx, committee_session.id).await?);
+        let input = ResultsInput::new(&mut tx, committee_session.id).await?;
         let xml = input.as_xml();
         let xml_string = xml.to_xml_string()?;
         let eml = create_file(
@@ -345,7 +348,7 @@ async fn generate_and_save_files(
             CommitteeSessionFilesUpdateRequest {
                 results_eml: Some(eml.id),
                 results_pdf: Some(pdf.id),
-                overview_pdf: None,
+                overview_pdf: overview_pdf_file.as_ref().map(|overview| overview.id),
             },
         )
         .await?;
@@ -457,4 +460,66 @@ async fn election_download_pdf_results(
     Ok(Attachment::new(pdf_file.data)
         .filename(pdf_file.name)
         .content_type(pdf_file.mime_type))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    use crate::audit_log::list_event_names;
+    use test_log::test;
+
+    #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_5_with_results"))))]
+    async fn test_generate_and_save_files_first_session(pool: SqlitePool) {
+        let mut conn = pool.acquire().await.unwrap();
+        let audit_service = AuditService::new(None, None);
+
+        // Files should be generated exactly once
+        for _ in 1..=2 {
+            let (eml, pdf, overview) = generate_and_save_files(&pool, audit_service.clone(), 5)
+                .await
+                .expect("should return files");
+
+            assert_eq!(eml.name, "Telling_GR2026_Grote_Stad.eml.xml");
+            assert_eq!(eml.id, 1);
+            assert_eq!(pdf.name, "Model_Na31-2_GR2026_Grote_Stad.pdf");
+            assert_eq!(pdf.id, 2);
+            assert!(overview.is_none());
+
+            assert_eq!(
+                list_event_names(&mut conn).await.unwrap(),
+                ["FileCreated", "FileCreated"]
+            );
+        }
+    }
+
+    #[test(sqlx::test(fixtures(
+        path = "../../fixtures",
+        scripts("election_8_four_sessions_with_results.sql")
+    )))]
+    async fn test_generate_and_save_files_next_session(pool: SqlitePool) {
+        let mut conn = pool.acquire().await.unwrap();
+        let audit_service = AuditService::new(None, None);
+
+        // Files should be generated exactly once
+        for _ in 1..=2 {
+            let (eml, pdf, overview) = generate_and_save_files(&pool, audit_service.clone(), 703)
+                .await
+                .expect("should return files");
+
+            let overview = overview.expect("should have generated overview");
+
+            assert_eq!(eml.name, "Telling_GR2026_Grote_Stad.eml.xml");
+            assert_eq!(eml.id, 1);
+            assert_eq!(pdf.name, "Model_Na14-2_GR2026_Grote_Stad.pdf");
+            assert_eq!(pdf.id, 3);
+            assert_eq!(overview.name, "Model_P2a_GR2026_Grote_Stad.pdf");
+            assert_eq!(overview.id, 2);
+
+            assert_eq!(
+                list_event_names(&mut conn).await.unwrap(),
+                ["FileCreated", "FileCreated", "FileCreated"]
+            );
+        }
+    }
 }

@@ -1,6 +1,6 @@
 {
   "alert": {
-    "entry_not_allowed": "Stembureau {nr} kan nu niet ingevoerd te worden",
+    "entry_not_allowed": "Stembureau {nr} kan nu niet ingevoerd worden",
     "has_errors": "Stembureau {nr} ligt ter beoordeling bij de coördinator",
     "in_progress_other_user": "Een andere invoerder is bezig met stembureau {nr} ({name})",
     "in_progress_other_user_selector": "Een andere invoerder is bezig met stembureau {nr}",

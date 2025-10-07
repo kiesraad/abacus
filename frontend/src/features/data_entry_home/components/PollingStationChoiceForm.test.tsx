@@ -211,7 +211,7 @@ describe("Test PollingStationChoiceForm", () => {
       await user.type(pollingStation, "33");
       const pollingStationFeedback = await screen.findByTestId("pollingStationSelectorFeedback");
       expect(
-        await within(pollingStationFeedback).findByText("Stembureau 33 kan nu niet ingevoerd te worden"),
+        await within(pollingStationFeedback).findByText("Stembureau 33 kan nu niet ingevoerd worden"),
       ).toBeVisible();
     });
 

@@ -1174,15 +1174,9 @@ mod tests {
     ) {
         let mut conn = pool.acquire().await.unwrap();
         // Insert investigation
-        insert_test_investigation(
-            &mut conn,
-            742,
-            "Test".into(),
-            Some("Test".into()),
-            Some(false),
-        )
-        .await
-        .unwrap();
+        insert_test_investigation(&mut conn, 742, Some(false))
+            .await
+            .unwrap();
 
         let response = claim(pool.clone(), 742, EntryNumber::FirstEntry).await;
         assert_eq!(response.status(), StatusCode::CONFLICT);
@@ -1199,15 +1193,9 @@ mod tests {
     async fn test_claim_data_entry_next_session_ok(pool: SqlitePool) {
         let mut conn = pool.acquire().await.unwrap();
         // Insert investigation
-        insert_test_investigation(
-            &mut conn,
-            742,
-            "Test".into(),
-            Some("Test".into()),
-            Some(true),
-        )
-        .await
-        .unwrap();
+        insert_test_investigation(&mut conn, 742, Some(true))
+            .await
+            .unwrap();
 
         let response = claim(pool.clone(), 742, EntryNumber::FirstEntry).await;
         assert_eq!(response.status(), StatusCode::OK);
@@ -1346,15 +1334,9 @@ mod tests {
             .unwrap();
 
         // Insert investigation for the new polling station
-        insert_test_investigation(
-            &mut conn,
-            new_ps.id,
-            "Test".into(),
-            Some("Test".into()),
-            Some(true),
-        )
-        .await
-        .unwrap();
+        insert_test_investigation(&mut conn, new_ps.id, Some(true))
+            .await
+            .unwrap();
 
         // Claim the same polling station again
         let response = claim(pool.clone(), new_ps.id, EntryNumber::FirstEntry).await;
@@ -1995,15 +1977,9 @@ mod tests {
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_7_four_sessions"))))]
     async fn test_previous_results_none(pool: SqlitePool) {
         // Add investigation with corrected_results to be able to claim the polling station
-        insert_test_investigation(
-            &mut pool.acquire().await.unwrap(),
-            741,
-            "Test".into(),
-            Some("Test".into()),
-            Some(true),
-        )
-        .await
-        .unwrap();
+        insert_test_investigation(&mut pool.acquire().await.unwrap(), 741, Some(true))
+            .await
+            .unwrap();
 
         assert!(claim_previous_results(pool.clone(), 741).await.is_none());
     }
@@ -2017,15 +1993,9 @@ mod tests {
         add_results(&pool, 711, 701, &election.political_groups, true).await;
 
         // Add investigation with corrected_results to be able to claim the polling station
-        insert_test_investigation(
-            &mut pool.acquire().await.unwrap(),
-            741,
-            "Test".into(),
-            Some("Test".into()),
-            Some(true),
-        )
-        .await
-        .unwrap();
+        insert_test_investigation(&mut pool.acquire().await.unwrap(), 741, Some(true))
+            .await
+            .unwrap();
 
         let previous_results = claim_previous_results(pool.clone(), 741).await.unwrap();
         assert_eq!(previous_results.voters_counts.poll_card_count, 711);
@@ -2041,15 +2011,9 @@ mod tests {
         add_results(&pool, 731, 703, &election.political_groups, false).await;
 
         // Add investigation with corrected_results to be able to claim the polling station
-        insert_test_investigation(
-            &mut pool.acquire().await.unwrap(),
-            741,
-            "Test".into(),
-            Some("Test".into()),
-            Some(true),
-        )
-        .await
-        .unwrap();
+        insert_test_investigation(&mut pool.acquire().await.unwrap(), 741, Some(true))
+            .await
+            .unwrap();
 
         let previous_results = claim_previous_results(pool.clone(), 741).await.unwrap();
         assert_eq!(previous_results.voters_counts.poll_card_count, 731);
@@ -2064,15 +2028,9 @@ mod tests {
         add_results(&pool, 722, 702, &election.political_groups, false).await;
 
         // Add investigation with corrected_results to be able to claim the polling station
-        insert_test_investigation(
-            &mut pool.acquire().await.unwrap(),
-            742,
-            "Test".into(),
-            Some("Test".into()),
-            Some(true),
-        )
-        .await
-        .unwrap();
+        insert_test_investigation(&mut pool.acquire().await.unwrap(), 742, Some(true))
+            .await
+            .unwrap();
 
         let previous_results = claim_previous_results(pool.clone(), 742).await.unwrap();
         assert_eq!(previous_results.voters_counts.poll_card_count, 722);
@@ -2087,15 +2045,9 @@ mod tests {
         add_results(&pool, 732, 703, &election.political_groups, false).await;
 
         // Add investigation with corrected_results to be able to claim the polling station
-        insert_test_investigation(
-            &mut pool.acquire().await.unwrap(),
-            742,
-            "Test".into(),
-            Some("Test".into()),
-            Some(true),
-        )
-        .await
-        .unwrap();
+        insert_test_investigation(&mut pool.acquire().await.unwrap(), 742, Some(true))
+            .await
+            .unwrap();
 
         let previous_results = claim_previous_results(pool.clone(), 742).await.unwrap();
         assert_eq!(previous_results.voters_counts.poll_card_count, 732);
@@ -2136,7 +2088,7 @@ mod tests {
         let user = User::test_user(Role::Coordinator, 1);
 
         // Add investigation to polling station in second committee session
-        insert_test_investigation(&mut conn, 9, "Test".into(), Some("Test".into()), Some(true))
+        insert_test_investigation(&mut conn, 9, Some(true))
             .await
             .unwrap();
 

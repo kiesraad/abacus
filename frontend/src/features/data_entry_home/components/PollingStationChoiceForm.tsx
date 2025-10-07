@@ -10,6 +10,7 @@ import { KeyboardKeys } from "@/components/ui/KeyboardKeys/KeyboardKeys";
 import { useElection } from "@/hooks/election/useElection";
 import { useElectionStatus } from "@/hooks/election/useElectionStatus";
 import { useUser } from "@/hooks/user/useUser";
+import { TranslationPath } from "@/i18n/i18n.types";
 import { t, tx } from "@/i18n/translate";
 import { KeyboardKey } from "@/types/ui";
 import { cn } from "@/utils/classnames";
@@ -32,9 +33,6 @@ const USER_INPUT_DEBOUNCE: number = 500; // ms
 export interface PollingStationChoiceFormProps {
   anotherEntry?: boolean;
 }
-
-const INVALID_POLLING_STATION_ALERT: string = t("polling_station_choice.enter_a_valid_number_to_start");
-const DEFINITIVE_POLLING_STATION_ALERT: string = t("polling_station_choice.polling_station_entry_not_possible");
 
 export function PollingStationChoiceForm({ anotherEntry }: PollingStationChoiceFormProps) {
   const navigate = useNavigate();
@@ -72,7 +70,7 @@ export function PollingStationChoiceForm({ anotherEntry }: PollingStationChoiceF
 
   const handleSubmit = () => {
     if (pollingStationNumber === "") {
-      setAlert(INVALID_POLLING_STATION_ALERT);
+      setAlert(t("polling_station_choice.enter_a_valid_number_to_start"));
       return;
     }
 
@@ -82,53 +80,32 @@ export function PollingStationChoiceForm({ anotherEntry }: PollingStationChoiceF
     );
 
     if (!pollingStation) {
-      setAlert(INVALID_POLLING_STATION_ALERT);
+      setAlert(t("polling_station_choice.enter_a_valid_number_to_start"));
       setLoading(false);
       return;
     }
 
-    if (pollingStation.userStatus === PollingStationUserStatus.Finished) {
-      setAlert(DEFINITIVE_POLLING_STATION_ALERT);
+    const statusAlerts: Partial<Record<PollingStationUserStatus, TranslationPath>> = {
+      [PollingStationUserStatus.EntryNotAllowed]: "polling_station_choice.alert.entry_not_allowed",
+      [PollingStationUserStatus.Finished]: "polling_station_choice.alert.finished",
+      [PollingStationUserStatus.InProgressOtherUser]: "polling_station_choice.alert.in_progress_other_user",
+      [PollingStationUserStatus.HasErrors]: "polling_station_choice.alert.has_errors",
+      [PollingStationUserStatus.SecondEntryNotAllowed]: "polling_station_choice.alert.second_entry_not_allowed",
+    };
+
+    const alertMessage = statusAlerts[pollingStation.userStatus];
+    if (alertMessage) {
+      setAlert(t(alertMessage, { nr: pollingStation.number, name: pollingStation.name }));
       setLoading(false);
       return;
     }
 
-    if (pollingStation.userStatus === PollingStationUserStatus.InProgressOtherUser) {
-      setAlert(
-        t("polling_station_choice.polling_station_in_progress_different_user", {
-          nr: pollingStation.number,
-          name: pollingStation.name,
-        }),
-      );
-      setLoading(false);
-      return;
-    }
-
-    if (pollingStation.userStatus === PollingStationUserStatus.HasErrors) {
-      setAlert(
-        t("polling_station_choice.has_errors", {
-          nr: pollingStation.number,
-        }),
-      );
-      setLoading(false);
-      return;
-    }
-
-    if (pollingStation.userStatus === PollingStationUserStatus.SecondEntryNotAllowed) {
-      setAlert(
-        t("polling_station_choice.second_entry_not_allowed", {
-          nr: pollingStation.number,
-        }),
-      );
-      setLoading(false);
-      return;
-    }
-
-    void navigate(getUrlForDataEntry(election.id, pollingStation.id, pollingStation.statusEntry.status));
+    void navigate(getUrlForDataEntry(election.id, pollingStation.id, pollingStation.statusEntry?.status));
   };
 
   const notAvailable = [
     PollingStationUserStatus.Finished,
+    PollingStationUserStatus.EntryNotAllowed,
     PollingStationUserStatus.SecondEntryNotAllowed,
     PollingStationUserStatus.HasErrors,
   ];
@@ -158,13 +135,16 @@ export function PollingStationChoiceForm({ anotherEntry }: PollingStationChoiceF
           <Alert type="notify" variant="no-icon">
             <strong className="heading-md">{t("polling_station_choice.unfinished_input_title")}</strong>
             <p>{t("polling_station_choice.unfinished_input_content")}</p>
-            {inProgressCurrentUser.map((pollingStation) => (
-              <PollingStationLink
-                key={pollingStation.id}
-                pollingStation={pollingStation}
-                status={pollingStation.statusEntry.status}
-              />
-            ))}
+            {inProgressCurrentUser.map(
+              (pollingStation) =>
+                pollingStation.statusEntry && (
+                  <PollingStationLink
+                    key={pollingStation.id}
+                    pollingStation={pollingStation}
+                    status={pollingStation.statusEntry.status}
+                  />
+                ),
+            )}
           </Alert>
         </div>
       )}

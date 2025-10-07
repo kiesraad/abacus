@@ -20,8 +20,8 @@ export class UploadElectionDefinitionPgObj {
     await fileChooser.setFiles(path);
   }
 
-  async fileTooLargeError(page: Page, path: string) {
+  async fileTooLargeError(page: Page, filename: string) {
     await expect(this.error).toBeVisible();
-    await expect(page.getByRole("strong").filter({ hasText: path })).toBeVisible();
+    await expect(page.getByRole("strong").filter({ hasText: filename })).toBeVisible();
   }
 }

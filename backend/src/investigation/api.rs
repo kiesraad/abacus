@@ -73,7 +73,7 @@ async fn validate_and_get_committee_session(
     path = "/api/polling_stations/{polling_station_id}/investigation",
     request_body = PollingStationInvestigationCreateRequest,
     responses(
-        (status = 200, description = "Polling station investigation added successfully", body = PollingStationInvestigation),
+        (status = 201, description = "Polling station investigation created successfully", body = PollingStationInvestigation),
         (status = 401, description = "Unauthorized", body = ErrorResponse),
         (status = 403, description = "Forbidden", body = ErrorResponse),
         (status = 404, description = "Polling station not found", body = ErrorResponse),
@@ -90,7 +90,7 @@ async fn polling_station_investigation_create(
     audit_service: AuditService,
     CurrentSessionPollingStationId(polling_station_id): CurrentSessionPollingStationId,
     Json(polling_station_investigation): Json<PollingStationInvestigationCreateRequest>,
-) -> Result<PollingStationInvestigation, APIError> {
+) -> Result<(StatusCode, PollingStationInvestigation), APIError> {
     let mut tx = pool.begin_immediate().await?;
 
     let committee_session = validate_and_get_committee_session(&mut tx, polling_station_id).await?;
@@ -130,7 +130,7 @@ async fn polling_station_investigation_create(
 
     tx.commit().await?;
 
-    Ok(investigation)
+    Ok((StatusCode::CREATED, investigation))
 }
 
 /// Conclude an investigation for a polling station

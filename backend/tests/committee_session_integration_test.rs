@@ -138,7 +138,7 @@ async fn test_committee_session_delete_fail(pool: SqlitePool) {
     .await;
     assert_eq!(
         create_investigation(&addr, 9).await.status(),
-        StatusCode::OK
+        StatusCode::CREATED
     );
     shared::change_status_committee_session(
         &addr,

@@ -87,7 +87,7 @@ async fn test_create_conclude_update_delete(pool: SqlitePool) {
 
     assert_eq!(
         shared::create_investigation(&addr, 741).await.status(),
-        StatusCode::OK
+        StatusCode::CREATED
     );
 
     let election_details = get_election(&addr, election_id).await;
@@ -158,11 +158,11 @@ async fn test_deletion_setting_committee_session_back_to_created_status(pool: Sq
     // Create 2 investigations
     assert_eq!(
         shared::create_investigation(&addr, 741).await.status(),
-        StatusCode::OK
+        StatusCode::CREATED
     );
     assert_eq!(
         shared::create_investigation(&addr, 742).await.status(),
-        StatusCode::OK
+        StatusCode::CREATED
     );
 
     // Delete one investigation
@@ -204,7 +204,7 @@ async fn test_deletion_removes_polling_station_from_status(pool: SqlitePool) {
         shared::create_investigation(&addr, polling_station_id)
             .await
             .status(),
-        StatusCode::OK
+        StatusCode::CREATED
     );
     assert_eq!(
         conclude_investigation(
@@ -312,7 +312,7 @@ async fn test_partials_update(pool: SqlitePool) {
         shared::create_investigation(&addr, polling_station_id)
             .await
             .status(),
-        StatusCode::OK
+        StatusCode::CREATED
     );
 
     let election_details = get_election(&addr, election_id).await;
@@ -451,7 +451,7 @@ async fn test_update_with_result(pool: SqlitePool) {
 
     // Create and conclude investigation
     let response = shared::create_investigation(&addr, polling_station_id).await;
-    assert_eq!(response.status(), StatusCode::OK);
+    assert_eq!(response.status(), StatusCode::CREATED);
 
     let response = conclude_investigation(
         &addr,
@@ -515,7 +515,7 @@ async fn test_update_with_data_entry(pool: SqlitePool) {
 
     // Create and conclude investigation
     let response = shared::create_investigation(&addr, polling_station_id).await;
-    assert_eq!(response.status(), StatusCode::OK);
+    assert_eq!(response.status(), StatusCode::CREATED);
 
     let response = conclude_investigation(
         &addr,
@@ -586,7 +586,7 @@ async fn test_creation_for_committee_session_with_created_status(pool: SqlitePoo
 
     assert_eq!(
         shared::create_investigation(&addr, 741).await.status(),
-        StatusCode::OK
+        StatusCode::CREATED
     );
 
     let committee_session =
@@ -641,7 +641,7 @@ async fn test_creation_fails_on_creating_second_investigation(pool: SqlitePool) 
 
     assert_eq!(
         shared::create_investigation(&addr, 741).await.status(),
-        StatusCode::OK
+        StatusCode::CREATED
     );
     assert_eq!(
         shared::create_investigation(&addr, 741).await.status(),
@@ -703,7 +703,7 @@ async fn test_polling_station_corrigendum_download_with_previous_results(pool: S
         shared::create_investigation(&addr, polling_station_id)
             .await
             .status(),
-        StatusCode::OK
+        StatusCode::CREATED
     );
 
     let url = format!(
@@ -742,7 +742,7 @@ async fn test_polling_station_corrigendum_download_without_previous_results(pool
         shared::create_investigation(&addr, polling_station_id)
             .await
             .status(),
-        StatusCode::OK
+        StatusCode::CREATED
     );
 
     let url = format!(

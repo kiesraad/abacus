@@ -32,7 +32,8 @@ export function DataEntryProvider({ election, pollingStationId, entryNumber, chi
         case "DataEntryAlreadyFinalised":
           void navigate(`/elections/${election.id}/data-entry#data-entry-finalised-${pollingStationId}`);
           break;
-        default:
+        case "InvalidStateTransition":
+        case "DataEntryNotAllowed":
           void navigate(`/elections/${election.id}/data-entry#invalid-action-${pollingStationId}`);
           break;
       }

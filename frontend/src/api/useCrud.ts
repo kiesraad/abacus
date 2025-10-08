@@ -29,7 +29,7 @@ export function useCrud<Response>({ throwAllErrors = false, ...paths }: UseCrudO
   const client = useApiClient();
   const [requestState, setRequestState] = useState<ApiRequestIdleState | ApiRequestState<Response>>({ status: "idle" });
 
-  // throw fatal errors
+  // throw fatal errors, and optionally all errors
   if ("error" in requestState && (throwAllErrors || isFatalRequestState(requestState))) {
     throw requestState.error;
   }

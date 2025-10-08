@@ -58,7 +58,7 @@ export function AccountSetupForm({ user, onSaved }: AccountSetupFormProps) {
         setValidationErrors({
           password: t("account.password_rules"),
         });
-      } else if (result instanceof ApiError) {
+      } else {
         setApiError(result);
       }
     });

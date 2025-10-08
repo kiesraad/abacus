@@ -1,3 +1,4 @@
+import { IconPlus } from "@/components/generated/icons";
 import { PageTitle } from "@/components/page_title/PageTitle";
 import { Alert } from "@/components/ui/Alert/Alert";
 import { Button } from "@/components/ui/Button/Button";
@@ -56,9 +57,9 @@ export function AddInvestigationPage() {
             </Table.Body>
           </Table>
 
-          <nav className="mt-md-lg mb-lg">
+          <nav className="mt-xl">
             <Button.Link to={`/elections/${election.id}/polling-stations/create`} variant="secondary">
-              {t("investigations.add_polling_station")}
+              <IconPlus /> {t("investigations.add_polling_station")}
             </Button.Link>
           </nav>
         </section>

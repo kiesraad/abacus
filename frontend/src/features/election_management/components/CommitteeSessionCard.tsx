@@ -121,11 +121,13 @@ export function CommitteeSessionCard({
   const buttonLinks: ButtonLink[] = [];
   let cardButton = undefined;
 
-  const addConditional = (item: ButtonLink, condition: boolean) => {
+  const addIf = (item: ButtonLink, condition: boolean) => {
     if (condition) {
       buttonLinks.push(item);
     }
   };
+
+  const isNextSession = committeeSession.number > 1;
 
   const detailsButtonLink: ButtonLink = {
     id: committeeSession.id,
@@ -148,14 +150,14 @@ export function CommitteeSessionCard({
 
   switch (committeeSession.status) {
     case "created":
-      addConditional(investigationsButtonLink, isCurrentSession && committeeSession.number > 1);
-      addConditional(detailsButtonLink, isCurrentSession && isCoordinator);
-      addConditional(deleteButtonLink, isCurrentSession && isCoordinator && committeeSession.number > 1);
+      addIf(investigationsButtonLink, isCurrentSession && isNextSession);
+      addIf(detailsButtonLink, isCurrentSession && isCoordinator);
+      addIf(deleteButtonLink, isCurrentSession && isCoordinator && isNextSession);
       break;
     case "data_entry_not_started":
-      addConditional(investigationsButtonLink, isCurrentSession && committeeSession.number > 1);
-      addConditional(detailsButtonLink, isCurrentSession && isCoordinator);
-      addConditional(deleteButtonLink, isCurrentSession && isCoordinator && committeeSession.number > 1);
+      addIf(investigationsButtonLink, isCurrentSession && isNextSession);
+      addIf(detailsButtonLink, isCurrentSession && isCoordinator);
+      addIf(deleteButtonLink, isCurrentSession && isCoordinator && isNextSession);
 
       if (isCurrentSession && isCoordinator) {
         cardButton = (
@@ -166,8 +168,8 @@ export function CommitteeSessionCard({
       }
       break;
     case "data_entry_in_progress":
-      addConditional(investigationsButtonLink, isCurrentSession && committeeSession.number > 1);
-      addConditional(detailsButtonLink, isCurrentSession && isCoordinator);
+      addIf(investigationsButtonLink, isCurrentSession && isNextSession);
+      addIf(detailsButtonLink, isCurrentSession && isCoordinator);
 
       if (isCurrentSession) {
         cardButton = (
@@ -178,8 +180,8 @@ export function CommitteeSessionCard({
       }
       break;
     case "data_entry_paused":
-      addConditional(investigationsButtonLink, isCurrentSession && committeeSession.number > 1);
-      addConditional(
+      addIf(investigationsButtonLink, isCurrentSession && isNextSession);
+      addIf(
         {
           id: committeeSession.id,
           label: isCoordinator ? t("election_management.resume_or_check_progress") : t("view_progress"),
@@ -187,10 +189,10 @@ export function CommitteeSessionCard({
         },
         isCurrentSession,
       );
-      addConditional(detailsButtonLink, isCurrentSession && isCoordinator);
+      addIf(detailsButtonLink, isCurrentSession && isCoordinator);
       break;
     case "data_entry_finished":
-      addConditional(
+      addIf(
         {
           id: committeeSession.id,
           label: t("election_management.results_and_documents"),
@@ -198,8 +200,8 @@ export function CommitteeSessionCard({
         },
         isCoordinator,
       );
-      addConditional(investigationsButtonLink, isCurrentSession && committeeSession.number > 1);
-      addConditional(
+      addIf(investigationsButtonLink, isCurrentSession && isNextSession);
+      addIf(
         {
           id: committeeSession.id,
           label: t("election_management.view_data_entry"),

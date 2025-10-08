@@ -5,6 +5,7 @@ import { beforeEach, describe, expect, test, vi } from "vitest";
 
 import * as useMessages from "@/hooks/messages/useMessages";
 import { ElectionProvider } from "@/hooks/election/ElectionProvider";
+import { getElectionMockData } from "@/testing/api-mocks/ElectionMockData";
 import {
   ElectionRequestHandler,
   PollingStationDeleteHandler,
@@ -12,10 +13,24 @@ import {
   PollingStationUpdateHandler,
 } from "@/testing/api-mocks/RequestHandlers";
 import { overrideOnce, server } from "@/testing/server";
-import { render, renderReturningRouter, screen, spyOnHandler, waitFor, within } from "@/testing/test-utils";
+import { renderReturningRouter, screen, spyOnHandler, waitFor, within } from "@/testing/test-utils";
 import { PollingStation } from "@/types/generated/openapi";
 
 import { PollingStationUpdatePage } from "./PollingStationUpdatePage";
+
+async function renderPage() {
+  const router = renderReturningRouter(
+    <ElectionProvider electionId={1}>
+      <PollingStationUpdatePage />
+    </ElectionProvider>,
+  );
+
+  // Ensure rendering is complete
+  const form = await screen.findByTestId("polling-station-form");
+  expect(form).toBeVisible();
+
+  return router;
+}
 
 describe("PollingStationUpdatePage", () => {
   const testPollingStation: PollingStation = {
@@ -44,26 +59,28 @@ describe("PollingStationUpdatePage", () => {
   });
 
   test("Shows form", async () => {
-    render(
-      <ElectionProvider electionId={1}>
-        <PollingStationUpdatePage />
-      </ElectionProvider>,
-    );
-
-    const form = await screen.findByTestId("polling-station-form");
-    expect(form).toBeVisible();
-
+    await renderPage();
     expect(screen.getByRole("textbox", { name: "Nummer" })).toHaveValue("33");
     expect(screen.getByRole("textbox", { name: "Naam" })).toHaveValue("Op Rolletjes");
   });
 
-  test("Navigates back on save", async () => {
-    const router = renderReturningRouter(
-      <ElectionProvider electionId={1}>
-        <PollingStationUpdatePage />
-      </ElectionProvider>,
-    );
+  test("Renders warning when data entry is finished", async () => {
+    const electionData = getElectionMockData({}, { id: 1, number: 1, status: "data_entry_finished" }, []);
+    overrideOnce("get", "/api/elections/1", 200, electionData);
+    await renderPage();
 
+    const alert = await screen.findByRole("alert");
+    expect(within(alert).getByRole("strong")).toHaveTextContent("Invoerfase al afgerond");
+    expect(alert).toBeVisible();
+  });
+
+  test("Does not render warning when data entry is not finished", async () => {
+    await renderPage();
+    expect(screen.queryByRole("alert")).toBeNull();
+  });
+
+  test("Navigates back on save", async () => {
+    const router = await renderPage();
     const saveButton = await screen.findByRole("button", { name: "Wijzigingen opslaan" });
     saveButton.click();
 
@@ -75,12 +92,7 @@ describe("PollingStationUpdatePage", () => {
 
   describe("Delete polling station", () => {
     test("Delete button should be shown", async () => {
-      render(
-        <ElectionProvider electionId={1}>
-          <PollingStationUpdatePage />
-        </ElectionProvider>,
-      );
-
+      await renderPage();
       const deleteButton = await screen.findByRole("button", { name: "Stembureau verwijderen" });
       expect(deleteButton).toBeInTheDocument();
     });
@@ -91,11 +103,7 @@ describe("PollingStationUpdatePage", () => {
         id_prev_session: 42,
       });
 
-      render(
-        <ElectionProvider electionId={1}>
-          <PollingStationUpdatePage />
-        </ElectionProvider>,
-      );
+      await renderPage();
 
       // Button should not be shown
       const deleteButton = screen.queryByRole("button", { name: "Stembureau verwijderen" });
@@ -110,11 +118,7 @@ describe("PollingStationUpdatePage", () => {
       server.use(PollingStationDeleteHandler);
       const user = userEvent.setup();
 
-      const router = renderReturningRouter(
-        <ElectionProvider electionId={1}>
-          <PollingStationUpdatePage />
-        </ElectionProvider>,
-      );
+      const router = await renderPage();
 
       const deleteButton = await screen.findByRole("button", { name: "Stembureau verwijderen" });
       await user.click(deleteButton);
@@ -143,11 +147,7 @@ describe("PollingStationUpdatePage", () => {
         reference: "InvalidData",
       });
 
-      render(
-        <ElectionProvider electionId={1}>
-          <PollingStationUpdatePage />
-        </ElectionProvider>,
-      );
+      await renderPage();
 
       const deleteButton = await screen.findByRole("button", { name: "Stembureau verwijderen" });
       await user.click(deleteButton);

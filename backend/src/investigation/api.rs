@@ -453,19 +453,19 @@ mod tests {
     }
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_7_four_sessions"))))]
-    async fn test_validation_err_first_session(pool: SqlitePool) {
-        let mut conn = pool.acquire().await.unwrap();
-
-        let polling_station_id = 711; // session 1 (first)
-        let res = super::validate_and_get_committee_session(&mut conn, polling_station_id).await;
-        assert!(res.is_err());
-    }
-
-    #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_7_four_sessions"))))]
     async fn test_validation_err_not_last_session(pool: SqlitePool) {
         let mut conn = pool.acquire().await.unwrap();
 
         let polling_station_id = 731; // session 3 (out of 4)
+        let res = super::validate_and_get_committee_session(&mut conn, polling_station_id).await;
+        assert!(res.is_err());
+    }
+
+    #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
+    async fn test_validation_err_first_session(pool: SqlitePool) {
+        let mut conn = pool.acquire().await.unwrap();
+
+        let polling_station_id = 33; // part of first and only session
         let res = super::validate_and_get_committee_session(&mut conn, polling_station_id).await;
         assert!(res.is_err());
     }

@@ -3,32 +3,52 @@ import { beforeEach, describe, expect, test, vi } from "vitest";
 
 import * as useMessages from "@/hooks/messages/useMessages";
 import { ElectionProvider } from "@/hooks/election/ElectionProvider";
+import { getElectionMockData } from "@/testing/api-mocks/ElectionMockData";
 import { pollingStationRequestMockData } from "@/testing/api-mocks/PollingStationRequestMockData";
 import { ElectionRequestHandler } from "@/testing/api-mocks/RequestHandlers";
 import { overrideOnce, server } from "@/testing/server";
-import { render, screen } from "@/testing/test-utils";
+import { render, screen, within } from "@/testing/test-utils";
 
 import { PollingStationImportPage } from "./PollingStationImportPage";
+
+async function renderPage() {
+  render(
+    <ElectionProvider electionId={1}>
+      <PollingStationImportPage />
+    </ElectionProvider>,
+  );
+
+  // Ensure rendering is complete
+  expect(await screen.findByRole("heading", { level: 1, name: "Stembureaus importeren" })).toBeVisible();
+}
 
 describe("PollingStationImportPage", () => {
   beforeEach(() => {
     server.use(ElectionRequestHandler);
-  });
-
-  test("Shows form", async () => {
     vi.spyOn(useMessages, "useMessages").mockReturnValue({
       pushMessage: vi.fn(),
       popMessages: vi.fn(() => []),
       hasMessages: vi.fn(() => false),
     });
+  });
 
-    render(
-      <ElectionProvider electionId={1}>
-        <PollingStationImportPage />
-      </ElectionProvider>,
-    );
+  test("Shows form", async () => {
+    await renderPage();
+  });
 
-    expect(await screen.findByRole("heading", { level: 1, name: "Stembureaus importeren" })).toBeVisible();
+  test("Renders warning when data entry is finished", async () => {
+    const electionData = getElectionMockData({}, { id: 1, number: 1, status: "data_entry_finished" }, []);
+    overrideOnce("get", "/api/elections/1", 200, electionData);
+    await renderPage();
+
+    const alert = await screen.findByRole("alert");
+    expect(within(alert).getByRole("strong")).toHaveTextContent("Invoerfase al afgerond");
+    expect(alert).toBeVisible();
+  });
+
+  test("Does not render warning when data entry is not finished", async () => {
+    await renderPage();
+    expect(screen.queryByRole("alert")).toBeNull();
   });
 
   test("Upload an incorrect file", async () => {
@@ -36,23 +56,13 @@ describe("PollingStationImportPage", () => {
     const filename = "foo.txt";
     const file = new File(["foo"], filename, { type: "text/plain" });
 
-    vi.spyOn(useMessages, "useMessages").mockReturnValue({
-      pushMessage: vi.fn(),
-      popMessages: vi.fn(() => []),
-      hasMessages: vi.fn(() => false),
-    });
-
     overrideOnce("post", "/api/elections/1/polling_stations/validate-import", 400, {
       error: "Invalid XML",
       fatal: false,
       reference: "InvalidXml",
     });
 
-    render(
-      <ElectionProvider electionId={1}>
-        <PollingStationImportPage />
-      </ElectionProvider>,
-    );
+    await renderPage();
 
     expect(await screen.findByRole("heading", { level: 1, name: "Stembureaus importeren" })).toBeVisible();
     const input = await screen.findByLabelText("Bestand kiezen");
@@ -71,23 +81,13 @@ describe("PollingStationImportPage", () => {
     const filename = "foo.txt";
     const file = new File(["foo"], filename, { type: "text/plain" });
 
-    vi.spyOn(useMessages, "useMessages").mockReturnValue({
-      pushMessage: vi.fn(),
-      popMessages: vi.fn(() => []),
-      hasMessages: vi.fn(() => false),
-    });
-
     overrideOnce("post", "/api/elections/1/polling_stations/validate-import", 413, {
       error: "12",
       fatal: false,
       reference: "RequestPayloadTooLarge",
     });
 
-    render(
-      <ElectionProvider electionId={1}>
-        <PollingStationImportPage />
-      </ElectionProvider>,
-    );
+    await renderPage();
 
     expect(await screen.findByRole("heading", { level: 1, name: "Stembureaus importeren" })).toBeVisible();
     const input = await screen.findByLabelText("Bestand kiezen");
@@ -105,21 +105,11 @@ describe("PollingStationImportPage", () => {
     const user = userEvent.setup();
     const filename = "foo.txt";
     const file = new File(["foo"], filename, { type: "text/plain" });
-
-    vi.spyOn(useMessages, "useMessages").mockReturnValue({
-      pushMessage: vi.fn(),
-      popMessages: vi.fn(() => []),
-      hasMessages: vi.fn(() => false),
-    });
     overrideOnce("post", "/api/elections/1/polling_stations/validate-import", 200, {
       polling_stations: pollingStationRequestMockData,
     });
 
-    render(
-      <ElectionProvider electionId={1}>
-        <PollingStationImportPage />
-      </ElectionProvider>,
-    );
+    await renderPage();
 
     expect(await screen.findByRole("heading", { level: 1, name: "Stembureaus importeren" })).toBeVisible();
     const input = await screen.findByLabelText("Bestand kiezen");

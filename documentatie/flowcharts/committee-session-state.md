@@ -18,12 +18,12 @@ stateDiagram-v2
   DataEntryPaused --> Created: delete last <br/> polling station*
   DataEntryPaused --> DataEntryFinished: click finish <br/> data entry
   DataEntryFinished --> DataEntryInProgress: add new <br/> polling station
-  DataEntryFinished --> DataEntryInProgress: click resume <br/> data entry
-  DataEntryFinished --> DataEntryInProgress: delete polling <br/> station result
-  DataEntryFinished --> Created: delete last <br/>polling station
+  DataEntryFinished --> DataEntryInProgress: click resume <br/> data entry/update Inv
+  DataEntryFinished --> DataEntryInProgress: delete polling <br/> station result/delete Inv
+  DataEntryFinished --> Created: delete last <br/>PS/Inv
   DataEntryFinished --> [*]
 ```
 
 *currently it's only possible to delete polling stations that do not have a data entry,
-deleting data entries and results needs to be implemented (see https://github.com/kiesraad/abacus-internal/issues/296) 
+deleting data entries and results needs to be implemented (see https://github.com/kiesraad/abacus-internal/issues/296)
 after which the polling station can be deleted

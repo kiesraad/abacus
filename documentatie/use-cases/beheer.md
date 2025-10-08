@@ -1,4 +1,4 @@
-# Beheerder
+# Beheer
 
 ## De beheerder richt de applicatie in voor GSB en/of CSB (wolk)
 

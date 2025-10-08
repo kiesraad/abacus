@@ -226,6 +226,7 @@ fn random_committee_session(
         number_of_voters: rng.random_range(0..=10_000),
         results_eml: random_option(rng, results_eml, none_where_possible),
         results_pdf: random_option(rng, results_pdf, none_where_possible),
+        overview_pdf: random_option(rng, results_pdf, none_where_possible),
     }
 }
 
@@ -376,8 +377,32 @@ async fn test_na_14_2() {
             string_length,
             none_where_possible,
         );
+        let committee_session =
+            random_committee_session(&mut rng, election.id, string_length, none_where_possible);
+        let previous_committee_session =
+            random_committee_session(&mut rng, election.id, string_length, none_where_possible);
+        let polling_station_count = rng.random_range(1..=5);
+        let polling_stations: Vec<_> = (0..polling_station_count)
+            .map(|_| {
+                random_polling_station(&mut rng, &election, string_length, none_where_possible)
+            })
+            .collect();
+        let previous_summary = random_election_summary(&mut rng, &election, &polling_stations);
+        let summary = random_election_summary(&mut rng, &election, &polling_stations);
+        let hash = random_string(&mut rng, 64);
+        let creation_date_time = random_date_time(&mut rng)
+            .format("%Y-%m-%dT%H:%M:%S")
+            .to_string();
 
-        let model = PdfModel::ModelNa14_2(Box::new(ModelNa14_2Input { election }));
+        let model = PdfModel::ModelNa14_2(Box::new(ModelNa14_2Input {
+            election,
+            committee_session,
+            previous_committee_session,
+            previous_summary,
+            summary,
+            hash,
+            creation_date_time,
+        }));
 
         test_pdf(model).await;
     }

@@ -3,8 +3,9 @@ mod repository;
 mod structs;
 
 pub(crate) use self::{
-    api::router, repository::get_polling_station_investigation,
-    repository::list_investigations_for_committee_session, structs::PollingStationInvestigation,
+    api::router,
+    repository::{get_polling_station_investigation, list_investigations_for_committee_session},
+    structs::PollingStationInvestigation,
 };
 
 #[cfg(test)]

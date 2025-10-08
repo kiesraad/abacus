@@ -198,7 +198,7 @@ test.describe("full flow", () => {
 
     const electionReportPage = new ElectionReport(page);
     const downloadPromise = page.waitForEvent("download");
-    await electionReportPage.downloadZip.click();
+    await electionReportPage.downloadFirstSessionZip.click();
 
     const download = await downloadPromise;
 
@@ -361,7 +361,7 @@ test.describe("full flow", () => {
     const electionHomePage = new ElectionReport(page);
     await expect(electionHomePage.header).toContainText("Tweede zitting Gemeentelijk Stembureau");
     const downloadPromise = page.waitForEvent("download");
-    await electionHomePage.downloadZip.click();
+    await electionHomePage.downloadSecondSessionZip.click();
 
     const download = await downloadPromise;
 

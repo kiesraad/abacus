@@ -119,6 +119,7 @@ export async function createInvestigation(page: Page, pollingStation: string, re
   const investigationsOverviewPage = new InvestigationOverviewPgObj(page);
   await investigationsOverviewPage.addInvestigationButton.click();
   const addInvestigationPage = new AddInvestigationPgObj(page);
+  await expect(addInvestigationPage.header).toBeVisible();
   await addInvestigationPage.selectPollingStation(pollingStation);
   const investionReasonPage = new InvestigationReasonPgObj(page);
   await expect(investionReasonPage.header).toBeVisible();

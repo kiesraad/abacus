@@ -139,8 +139,6 @@ pub async fn list_investigations_for_committee_session(
 pub async fn insert_test_investigation(
     conn: &mut SqliteConnection,
     polling_station_id: u32,
-    reason: String,
-    findings: Option<String>,
     corrected_results: Option<bool>,
 ) -> Result<(), sqlx::Error> {
     use sqlx::query;
@@ -148,8 +146,8 @@ pub async fn insert_test_investigation(
     query!(
         "INSERT INTO polling_station_investigations (polling_station_id, reason, findings, corrected_results) VALUES (?, ?, ?, ?)",
         polling_station_id,
-        reason,
-        findings,
+        "Test reason",
+        "Test findings",
         corrected_results
     )
     .execute(conn)

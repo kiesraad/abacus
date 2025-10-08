@@ -149,7 +149,7 @@ impl CommitteeSessionStatus {
                     crate::polling_station::repository::list(conn, committee_session.id).await?;
                 if polling_stations.is_empty() {
                     Err(CommitteeSessionError::InvalidStatusTransition)
-                } else if committee_session.number > 1 {
+                } else if committee_session.is_next_session() {
                     let investigations =
                         list_investigations_for_committee_session(conn, committee_session.id)
                             .await?;
@@ -211,7 +211,7 @@ impl CommitteeSessionStatus {
             }
             CommitteeSessionStatus::DataEntryInProgress
             | CommitteeSessionStatus::DataEntryPaused => {
-                if committee_session.number > 1
+                if committee_session.is_next_session()
                     && !all_investigations_finished(conn, committee_session.id).await?
                 {
                     return Err(CommitteeSessionError::InvalidStatusTransition);

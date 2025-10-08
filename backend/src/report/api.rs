@@ -136,7 +136,11 @@ async fn generate_and_save_files(
     let mut conn = pool.acquire().await?;
     let committee_session =
         crate::committee_session::repository::get(&mut conn, committee_session_id).await?;
-    if committee_session.status != CommitteeSessionStatus::DataEntryFinished {
+
+    // Only generate files if the committee session is finished and has a start date time
+    if committee_session.status != CommitteeSessionStatus::DataEntryFinished
+        || committee_session.start_date_time.is_none()
+    {
         return Err(APIError::CommitteeSession(
             CommitteeSessionError::InvalidCommitteeSessionStatus,
         ));

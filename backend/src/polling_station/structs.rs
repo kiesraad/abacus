@@ -78,7 +78,7 @@ pub struct PollingStationRequest {
 
 /// Type of Polling station
 #[derive(
-    Serialize, Deserialize, strum::Display, ToSchema, Clone, Debug, PartialEq, Eq, Hash, Type,
+    Serialize, Deserialize, strum::Display, ToSchema, Clone, Copy, Debug, PartialEq, Eq, Hash, Type,
 )]
 #[strum(serialize_all = "lowercase")]
 pub enum PollingStationType {

@@ -186,60 +186,6 @@ async fn test_creation_for_committee_session_with_created_status(pool: SqlitePoo
     );
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
-async fn test_creation_for_committee_session_with_finished_status(pool: SqlitePool) {
-    let addr = serve_api(pool).await;
-    let cookie = shared::coordinator_login(&addr).await;
-    let election_id = 2;
-
-    shared::change_status_committee_session(
-        &addr,
-        &cookie,
-        2,
-        CommitteeSessionStatus::DataEntryFinished,
-    )
-    .await;
-    let committee_session =
-        shared::get_election_committee_session(&addr, &cookie, election_id).await;
-    assert_eq!(
-        committee_session.status,
-        CommitteeSessionStatus::DataEntryFinished
-    );
-
-    let response = create_polling_station(&addr, election_id, Some(5)).await;
-
-    assert_eq!(
-        response.status(),
-        StatusCode::CREATED,
-        "Unexpected response status"
-    );
-
-    // Validate response
-    let body: Value = response.json().await.unwrap();
-    assert_eq!(body["committee_session_id"], committee_session.id);
-    assert_eq!(body["name"], "Test polling station");
-    assert_eq!(body["polling_station_type"], "FixedLocation");
-
-    // Validate that the creation is persisted
-    let polling_station_id = body["id"].as_u64().unwrap();
-    let response = get_polling_station(
-        &addr,
-        election_id,
-        u32::try_from(polling_station_id).unwrap(),
-    )
-    .await;
-    let body: Value = response.json().await.unwrap();
-    assert_eq!(body["name"], "Test polling station");
-
-    // Validate committee session status change
-    let committee_session =
-        shared::get_election_committee_session(&addr, &cookie, election_id).await;
-    assert_eq!(
-        committee_session.status,
-        CommitteeSessionStatus::DataEntryInProgress
-    );
-}
-
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_7_four_sessions", "users"))))]
 async fn test_get(pool: SqlitePool) {
     let addr = serve_api(pool).await;
@@ -557,4 +503,94 @@ async fn test_import_correct_file(pool: SqlitePool) {
         committee_session.status,
         CommitteeSessionStatus::DataEntryNotStarted
     );
+}
+
+async fn check_finished_to_in_progress_on<F, Fut>(addr: &SocketAddr, action: F)
+where
+    F: FnOnce() -> Fut,
+    Fut: Future<Output = Response>,
+{
+    let cookie = shared::coordinator_login(addr).await;
+    let election_id = 2;
+    let committee_session_id = 2;
+
+    shared::change_status_committee_session(
+        addr,
+        &cookie,
+        committee_session_id,
+        CommitteeSessionStatus::DataEntryFinished,
+    )
+    .await;
+    let committee_session =
+        shared::get_election_committee_session(addr, &cookie, election_id).await;
+    assert_eq!(
+        committee_session.status,
+        CommitteeSessionStatus::DataEntryFinished
+    );
+
+    let status = action().await.status();
+    assert!(status == StatusCode::OK || status == StatusCode::CREATED);
+
+    let committee_session =
+        shared::get_election_committee_session(addr, &cookie, election_id).await;
+    assert_eq!(
+        committee_session.status,
+        CommitteeSessionStatus::DataEntryInProgress
+    );
+}
+
+#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
+async fn test_finished_to_in_progress_on_create(pool: SqlitePool) {
+    let addr = serve_api(pool).await;
+    check_finished_to_in_progress_on(&addr, || create_polling_station(&addr, 2, 35)).await;
+}
+
+#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
+async fn test_finished_to_in_progress_on_import(pool: SqlitePool) {
+    let addr = serve_api(pool).await;
+    check_finished_to_in_progress_on(&addr, || async {
+        let validate_response = import_validate_polling_stations(
+            &addr,
+            2,
+            include_str!("../src/eml/tests/eml110b_1_station.eml.xml"),
+        )
+        .await;
+        let body: Value = validate_response.json().await.unwrap();
+
+        import_polling_stations(
+            &addr,
+            2,
+            "eml110b_1_station.eml.xml",
+            body["polling_stations"].clone(),
+        )
+        .await
+    })
+    .await;
+}
+
+#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
+async fn test_finished_to_in_progress_on_update(pool: SqlitePool) {
+    let addr = serve_api(pool).await;
+    check_finished_to_in_progress_on(&addr, || {
+        update_polling_station(
+            &addr,
+            2,
+            1,
+            json!({
+                "name": "Testverandering",
+                "number_of_voters": 2000,
+                "polling_station_type": "Special",
+                "address": "Teststraat 2a",
+                "postal_code": "1234 QY",
+                "locality": "Testdorp",
+            }),
+        )
+    })
+    .await;
+}
+
+#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
+async fn test_finished_to_in_progress_on_delete_non_last(pool: SqlitePool) {
+    let addr = serve_api(pool).await;
+    check_finished_to_in_progress_on(&addr, || delete_polling_station(&addr, 2, 1)).await;
 }

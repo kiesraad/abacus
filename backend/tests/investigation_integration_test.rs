@@ -597,33 +597,6 @@ async fn test_creation_for_committee_session_with_created_status(pool: SqlitePoo
     );
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_5_with_results", "users"))))]
-async fn test_creation_for_committee_session_with_finished_status(pool: SqlitePool) {
-    let addr = serve_api(pool).await;
-    let cookie = shared::coordinator_login(&addr).await;
-    let election_id = 5;
-
-    shared::change_status_committee_session(
-        &addr,
-        &cookie,
-        6,
-        CommitteeSessionStatus::DataEntryFinished,
-    )
-    .await;
-    let committee_session =
-        shared::get_election_committee_session(&addr, &cookie, election_id).await;
-
-    assert_eq!(
-        committee_session.status,
-        CommitteeSessionStatus::DataEntryFinished
-    );
-
-    assert_eq!(
-        shared::create_investigation(&addr, 9).await.status(),
-        StatusCode::CONFLICT
-    );
-}
-
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_7_four_sessions", "users"))))]
 async fn test_creation_fails_for_wrong_polling_station(pool: SqlitePool) {
     let addr = serve_api(pool).await;
@@ -769,4 +742,101 @@ async fn test_polling_station_corrigendum_download_without_previous_results(pool
 
     let bytes = response.bytes().await.unwrap();
     assert!(bytes.len() > 1024);
+}
+
+async fn check_finished_to_in_progress_on<F, Fut>(addr: &SocketAddr, pre_create: bool, action: F)
+where
+    F: FnOnce() -> Fut,
+    Fut: Future<Output = Response>,
+{
+    let cookie = shared::coordinator_login(addr).await;
+    let election_id = 7;
+    let committee_session_id = 704;
+
+    if pre_create {
+        assert_eq!(
+            shared::create_investigation(addr, 741).await.status(),
+            StatusCode::CREATED
+        );
+
+        assert_eq!(
+            conclude_investigation(
+                addr,
+                741,
+                Some(json!({"findings": "Test findings", "corrected_results": false})),
+            )
+            .await
+            .status(),
+            StatusCode::OK
+        );
+
+        assert_eq!(
+            shared::create_investigation(addr, 742).await.status(),
+            StatusCode::CREATED
+        );
+
+        assert_eq!(
+            conclude_investigation(
+                addr,
+                742,
+                Some(json!({"findings": "Test findings", "corrected_results": false})),
+            )
+            .await
+            .status(),
+            StatusCode::OK
+        );
+    }
+
+    shared::change_status_committee_session(
+        addr,
+        &cookie,
+        committee_session_id,
+        CommitteeSessionStatus::DataEntryFinished,
+    )
+    .await;
+    let committee_session =
+        shared::get_election_committee_session(addr, &cookie, election_id).await;
+    assert_eq!(
+        committee_session.status,
+        CommitteeSessionStatus::DataEntryFinished
+    );
+
+    let status = action().await.status();
+    assert!(status == StatusCode::OK || status == StatusCode::CREATED);
+
+    let committee_session =
+        shared::get_election_committee_session(addr, &cookie, election_id).await;
+    assert_eq!(
+        committee_session.status,
+        CommitteeSessionStatus::DataEntryInProgress
+    );
+}
+
+#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_7_four_sessions", "users"))))]
+async fn test_finished_to_in_progress_on_create(pool: SqlitePool) {
+    let addr = serve_api(pool).await;
+    check_finished_to_in_progress_on(&addr, false, || shared::create_investigation(&addr, 741))
+        .await;
+}
+
+#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_7_four_sessions", "users"))))]
+async fn test_finished_to_in_progress_on_update(pool: SqlitePool) {
+    let addr = serve_api(pool).await;
+    check_finished_to_in_progress_on(&addr, true, || {
+        shared::update_investigation(&addr, 741, None)
+    })
+    .await;
+}
+
+#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_7_four_sessions", "users"))))]
+async fn test_finished_to_in_progress_on_conclude(pool: SqlitePool) {
+    let addr = serve_api(pool).await;
+    check_finished_to_in_progress_on(&addr, true, || conclude_investigation(&addr, 741, None))
+        .await;
+}
+
+#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_7_four_sessions", "users"))))]
+async fn test_finished_to_in_progress_on_delete_non_last(pool: SqlitePool) {
+    let addr = serve_api(pool).await;
+    check_finished_to_in_progress_on(&addr, true, || delete_investigation(&addr, 741)).await;
 }

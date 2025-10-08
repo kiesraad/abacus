@@ -2,7 +2,7 @@ import { useInitialApiGet } from "@/api/useInitialApiGet";
 import { locale, translations } from "@/i18n/i18n";
 import { AUDIT_LOG_LIST_USERS_REQUEST_PATH, AuditLogUser } from "@/types/generated/openapi";
 
-export const LogFilterNames = ["event", "level", "user"] as const;
+export const LogFilterNames = ["level", "user", "event"] as const;
 export type LogFilterName = (typeof LogFilterNames)[number];
 
 export type LogFilterOptions = Array<
@@ -34,10 +34,12 @@ export function useLogFilterOptions(): LogFilterOptions {
         }));
       }
     } else {
-      values = Object.entries(source[filterName]).map(([value, label]) => ({
-        value,
-        label,
-      }));
+      values = Object.entries(source[filterName])
+        .map(([value, label]) => ({
+          value,
+          label,
+        }))
+        .sort((a, b) => a.label.localeCompare(b.label));
     }
 
     return [filterName, values];

@@ -54,14 +54,19 @@ async fn validate_and_get_committee_session(
     polling_station_id: u32,
 ) -> Result<CommitteeSession, APIError> {
     let polling_station = crate::polling_station::repository::get(conn, polling_station_id).await?;
-    let committee_session =
-        crate::committee_session::repository::get(conn, polling_station.committee_session_id)
-            .await?;
 
-    if !committee_session.is_next_session() {
-        return Err(APIError::CommitteeSession(
-            CommitteeSessionError::InvalidCommitteeSessionStatus,
-        ));
+    // Get latest committee session for the election
+    let committee_session = crate::committee_session::repository::get_election_committee_session(
+        conn,
+        polling_station.election_id,
+    )
+    .await?;
+
+    // Ensure this is not the first session and that the polling station is part of the last session
+    if !committee_session.is_next_session()
+        || polling_station.committee_session_id != committee_session.id
+    {
+        return Err(CommitteeSessionError::InvalidCommitteeSessionStatus.into());
     }
 
     Ok(committee_session)
@@ -428,4 +433,40 @@ async fn polling_station_investigation_download_corrigendum_pdf(
     Ok(Attachment::new(content.buffer)
         .filename(&name)
         .content_type("application/pdf"))
+}
+
+#[cfg(test)]
+mod tests {
+    use sqlx::SqlitePool;
+    use test_log::test;
+
+    #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_7_four_sessions"))))]
+    async fn test_validation_ok(pool: SqlitePool) {
+        let mut conn = pool.acquire().await.unwrap();
+
+        let polling_station_id = 741; // session 4 (last)
+        let res = super::validate_and_get_committee_session(&mut conn, polling_station_id).await;
+        assert!(res.is_ok());
+
+        let committee_session = res.unwrap();
+        assert_eq!(committee_session.number, 4);
+    }
+
+    #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_7_four_sessions"))))]
+    async fn test_validation_err_first_session(pool: SqlitePool) {
+        let mut conn = pool.acquire().await.unwrap();
+
+        let polling_station_id = 711; // session 1 (first)
+        let res = super::validate_and_get_committee_session(&mut conn, polling_station_id).await;
+        assert!(res.is_err());
+    }
+
+    #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_7_four_sessions"))))]
+    async fn test_validation_err_not_last_session(pool: SqlitePool) {
+        let mut conn = pool.acquire().await.unwrap();
+
+        let polling_station_id = 731; // session 3 (out of 4)
+        let res = super::validate_and_get_committee_session(&mut conn, polling_station_id).await;
+        assert!(res.is_err());
+    }
 }

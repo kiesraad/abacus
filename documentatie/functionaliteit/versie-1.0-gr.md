@@ -83,11 +83,19 @@ De eerste versie van Abacus bevat de functionaliteit voor het GSB bij de Gemeent
   [#1096](https://github.com/kiesraad/abacus/issues/1096)
 - De coördinator GSB kan invoerders van het GSB beheren.
   [#2180](https://github.com/kiesraad/abacus/pull/2180)
+- De coördinator GSB kan de uitslag van een stembureau bekijken en eventueel verwijderen.
+  [#1812](https://github.com/kiesraad/abacus/issues/1812)
 
 ## Versie 1.0: gewenst (could have)
 
 *Deze eisen zullen alleen aan bod komen als er tijd genoeg is.*
 
+- De presentielijst van de GSB-zitting kan in Abacus worden ingevuld.
+  [#1543](https://github.com/kiesraad/abacus/issues/1543)
+- Bezwaren en bijzonderheden van de GSB-zitting kunnen in Abacus worden ingevuld.
+  [#803](https://github.com/kiesraad/abacus/issues/803)
+- Wijzigingen in de lijst met stembureaus (ten opzichte van de gepubliceerde lijst) worden door Abacus in het proces-verbaal vermeldt.
+  [#1865](https://github.com/kiesraad/abacus/issues/1865)
 - Invoerders kunnen uitslagen van stembureaus invoeren voor DSO.
   [#798](https://github.com/kiesraad/abacus/issues/798)
 - Invoerders kunnen het stembureaucorrigendum voor DSO invoeren.

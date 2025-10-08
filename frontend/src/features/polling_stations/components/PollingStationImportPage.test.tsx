@@ -48,7 +48,7 @@ describe("PollingStationImportPage", () => {
 
   test("Does not render warning when data entry is not finished", async () => {
     await renderPage();
-    expect(screen.queryByRole("alert")).toBeNull();
+    expect(screen.queryByRole("alert")).not.toBeInTheDocument();
   });
 
   test("Upload an incorrect file", async () => {

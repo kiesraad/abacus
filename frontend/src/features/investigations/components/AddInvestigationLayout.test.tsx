@@ -86,9 +86,9 @@ describe("AddInvestigationLayout", () => {
     await renderPage("reason");
 
     // Ensure rendering is complete
-    await screen.findAllByRole("heading", { level: 1 });
+    await screen.findByRole("heading", { level: 1, name: electionData.polling_stations[0]!.name });
 
-    expect(screen.queryByRole("alert")).toBeNull();
+    expect(screen.queryByRole("alert")).not.toBeInTheDocument();
   });
 
   describe("Navigation: data entry modal", () => {

@@ -17,8 +17,7 @@ async function renderPage() {
   );
 
   // Ensure rendering is complete
-  const form = await screen.findByTestId("polling-station-form");
-  expect(form).toBeVisible();
+  expect(await screen.findByTestId("polling-station-form")).toBeVisible();
 }
 
 describe("PollingStationCreatePage", () => {
@@ -47,6 +46,6 @@ describe("PollingStationCreatePage", () => {
 
   test("Does not render warning when data entry is not finished", async () => {
     await renderPage();
-    expect(screen.queryByRole("alert")).toBeNull();
+    expect(screen.queryByRole("alert")).not.toBeInTheDocument();
   });
 });

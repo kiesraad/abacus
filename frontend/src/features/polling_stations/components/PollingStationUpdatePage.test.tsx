@@ -26,8 +26,7 @@ async function renderPage() {
   );
 
   // Ensure rendering is complete
-  const form = await screen.findByTestId("polling-station-form");
-  expect(form).toBeVisible();
+  expect(await screen.findByTestId("polling-station-form")).toBeVisible();
 
   return router;
 }
@@ -76,7 +75,7 @@ describe("PollingStationUpdatePage", () => {
 
   test("Does not render warning when data entry is not finished", async () => {
     await renderPage();
-    expect(screen.queryByRole("alert")).toBeNull();
+    expect(screen.queryByRole("alert")).not.toBeInTheDocument();
   });
 
   test("Navigates back on save", async () => {

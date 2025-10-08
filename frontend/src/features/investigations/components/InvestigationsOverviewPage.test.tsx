@@ -155,7 +155,7 @@ describe("InvestigationsOverviewPage", () => {
 
     await renderPage("coordinator");
     // Ensure rendering is complete
-    await screen.findAllByRole("heading", { level: 1 });
+    await screen.findByRole("heading", { level: 1, name: "Onderzoeken in tweede zitting" });
 
     expect(screen.queryByRole("alert")).not.toBeInTheDocument();
   });
@@ -241,7 +241,7 @@ describe("InvestigationsOverviewPage", () => {
     await renderPage("administrator");
 
     // Ensure rendering is complete
-    await screen.findAllByRole("heading", { level: 1 });
+    await screen.findByRole("heading", { level: 1, name: "Onderzoeken in tweede zitting" });
 
     expect(screen.queryByRole("link", { name: "Onderzoek toevoegen" })).not.toBeInTheDocument();
     expect(screen.queryByRole("link", { name: "Corrigendum afdrukken" })).not.toBeInTheDocument();

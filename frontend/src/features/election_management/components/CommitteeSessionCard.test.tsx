@@ -19,8 +19,8 @@ type TestCases = {
   [role in Exclude<Role, "typist">]: Record<
     CommitteeSessionStatus,
     {
-      buttonsCurrent?: string[];
-      buttonsNotCurrent?: string[];
+      buttonsCurrentSession?: string[];
+      buttonsNotCurrentSession?: string[];
       actionButton?: string;
     }
   >[];
@@ -28,8 +28,8 @@ type TestCases = {
 
 /**
  * Test cases for both first and second committee sessions.
- * - buttonsCurrent: buttons if card represents the current session
- * - buttonsNotCurrent: buttons if card represents not the current session
+ * - buttonsCurrentSession: buttons if card represents the current session
+ * - buttonsNotCurrentSession: buttons if card represents not the current session
  * - actionButton: link button of card
  */
 const testCases: TestCases = {
@@ -37,30 +37,30 @@ const testCases: TestCases = {
     {
       // First session
       created: {
-        buttonsCurrent: ["Details van de zitting"],
+        buttonsCurrentSession: ["Details van de zitting"],
       },
       data_entry_not_started: {
-        buttonsCurrent: ["Details van de zitting", "Start steminvoer"],
+        buttonsCurrentSession: ["Details van de zitting", "Start steminvoer"],
       },
       data_entry_in_progress: {
-        buttonsCurrent: ["Details van de zitting"],
+        buttonsCurrentSession: ["Details van de zitting"],
         actionButton: "Bekijk voortgang",
       },
       data_entry_paused: {
-        buttonsCurrent: ["Hervatten of voortgang bekijken", "Details van de zitting"],
+        buttonsCurrentSession: ["Hervatten of voortgang bekijken", "Details van de zitting"],
       },
       data_entry_finished: {
-        buttonsCurrent: ["Resultaten en documenten", "Steminvoer bekijken"],
-        buttonsNotCurrent: ["Resultaten en documenten"],
+        buttonsCurrentSession: ["Resultaten en documenten", "Steminvoer bekijken"],
+        buttonsNotCurrentSession: ["Resultaten en documenten"],
       },
     },
     {
       // Second session
       created: {
-        buttonsCurrent: ["Aangevraagde onderzoeken", "Details van de zitting", "Zitting verwijderen"],
+        buttonsCurrentSession: ["Aangevraagde onderzoeken", "Details van de zitting", "Zitting verwijderen"],
       },
       data_entry_not_started: {
-        buttonsCurrent: [
+        buttonsCurrentSession: [
           "Aangevraagde onderzoeken",
           "Details van de zitting",
           "Zitting verwijderen",
@@ -68,15 +68,19 @@ const testCases: TestCases = {
         ],
       },
       data_entry_in_progress: {
-        buttonsCurrent: ["Aangevraagde onderzoeken", "Details van de zitting"],
+        buttonsCurrentSession: ["Aangevraagde onderzoeken", "Details van de zitting"],
         actionButton: "Bekijk voortgang",
       },
       data_entry_paused: {
-        buttonsCurrent: ["Aangevraagde onderzoeken", "Hervatten of voortgang bekijken", "Details van de zitting"],
+        buttonsCurrentSession: [
+          "Aangevraagde onderzoeken",
+          "Hervatten of voortgang bekijken",
+          "Details van de zitting",
+        ],
       },
       data_entry_finished: {
-        buttonsCurrent: ["Resultaten en documenten", "Aangevraagde onderzoeken", "Steminvoer bekijken"],
-        buttonsNotCurrent: ["Resultaten en documenten"],
+        buttonsCurrentSession: ["Resultaten en documenten", "Aangevraagde onderzoeken", "Steminvoer bekijken"],
+        buttonsNotCurrentSession: ["Resultaten en documenten"],
       },
     },
   ],
@@ -89,29 +93,29 @@ const testCases: TestCases = {
         actionButton: "Bekijk voortgang",
       },
       data_entry_paused: {
-        buttonsCurrent: ["Bekijk voortgang"],
+        buttonsCurrentSession: ["Bekijk voortgang"],
       },
       data_entry_finished: {
-        buttonsCurrent: ["Steminvoer bekijken"],
+        buttonsCurrentSession: ["Steminvoer bekijken"],
       },
     },
     {
       // Second session
       created: {
-        buttonsCurrent: ["Aangevraagde onderzoeken"],
+        buttonsCurrentSession: ["Aangevraagde onderzoeken"],
       },
       data_entry_not_started: {
-        buttonsCurrent: ["Aangevraagde onderzoeken"],
+        buttonsCurrentSession: ["Aangevraagde onderzoeken"],
       },
       data_entry_in_progress: {
-        buttonsCurrent: ["Aangevraagde onderzoeken"],
+        buttonsCurrentSession: ["Aangevraagde onderzoeken"],
         actionButton: "Bekijk voortgang",
       },
       data_entry_paused: {
-        buttonsCurrent: ["Aangevraagde onderzoeken", "Bekijk voortgang"],
+        buttonsCurrentSession: ["Aangevraagde onderzoeken", "Bekijk voortgang"],
       },
       data_entry_finished: {
-        buttonsCurrent: ["Aangevraagde onderzoeken", "Steminvoer bekijken"],
+        buttonsCurrentSession: ["Aangevraagde onderzoeken", "Steminvoer bekijken"],
       },
     },
   ],
@@ -190,10 +194,10 @@ describe("UI component: CommitteeSessionCard", () => {
           index + 1,
           true,
           status as CommitteeSessionStatus,
-          testCase.buttonsCurrent,
+          testCase.buttonsCurrentSession,
           testCase.actionButton,
         );
-        createTest(role, index + 1, false, status as CommitteeSessionStatus, testCase.buttonsNotCurrent);
+        createTest(role, index + 1, false, status as CommitteeSessionStatus, testCase.buttonsNotCurrentSession);
       });
     });
   });

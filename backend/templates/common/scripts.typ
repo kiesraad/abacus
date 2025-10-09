@@ -181,17 +181,6 @@
     wide_cells: wide_cells,
     content
   )
-  // let bg = if light { luma(213) } else { black }
-  // let fill = if light { black } else { white }
-
-  // grid(
-  //   columns: (8em, 3.5em, 1fr),
-  //   align: (center, right),
-  //   inset: 9pt,
-  //   grid.cell(align: right, stroke: 0.5pt + black, text(number-width: "tabular", fmt-number(value))),
-  //   grid.cell(stroke: 0.5pt + black, align: center, fill: bg, text(fill: fill, weight: "bold", letter)),
-  //   grid.cell(align: horizon + left, content),
-  // )
 }
 
 #let correction_title_grid(correction_width: 8em, input_width: 8em) = {

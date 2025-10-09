@@ -293,7 +293,7 @@ async fn generate_and_save_files(
     // If one of the files doesn't exist, generate all and save them to the database
     if eml_file.is_none()
         || pdf_file.is_none()
-        || (committee_session.overview_pdf.is_some() && overview_pdf_file.is_none())
+        || (committee_session.is_next_session() && overview_pdf_file.is_none())
     {
         let mut tx = pool.begin_immediate().await?;
 

@@ -38,7 +38,7 @@ export function InvestigationCard({ investigation }: InvestigationCardProps) {
   };
 
   return (
-    <div className={cls.card}>
+    <div className={cls.card} id={`investigation-${investigation.pollingStation.number}`}>
       <div className={cls.card_header}>
         <PollingStationNumber size="sm">{investigation.pollingStation.number}</PollingStationNumber>
         <h3>{investigation.pollingStation.name}</h3>

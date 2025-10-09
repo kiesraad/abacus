@@ -20,7 +20,7 @@ use crate::{
         generate_pdf,
         models::{
             ModelN10_2Input, ModelNa14_2Bijlage1Input, ModelNa14_2Input, ModelNa31_2Bijlage1Input,
-            ModelNa31_2Input, PdfFileModel, PdfModel,
+            ModelNa31_2Input, ModelP2aInput, PdfFileModel, PdfModel,
         },
     },
     polling_station::structs::{PollingStation, PollingStationType},
@@ -197,6 +197,18 @@ fn random_polling_station(
     }
 }
 
+fn random_polling_stations(
+    rng: &mut impl rand::Rng,
+    election: &ElectionWithPoliticalGroups,
+    string_length: usize,
+    none_where_possible: bool,
+) -> Vec<PollingStation> {
+    let polling_station_count = rng.random_range(1..=5);
+    (0..polling_station_count)
+        .map(|_| random_polling_station(rng, election, string_length, none_where_possible))
+        .collect()
+}
+
 fn random_committee_session(
     rng: &mut impl rand::Rng,
     election_id: u32,
@@ -309,13 +321,13 @@ fn random_election_summary(
     let result = random_polling_station_result(rng, election);
 
     ElectionSummary {
-        voters_counts: result.voters_counts.clone(),
-        votes_counts: result.votes_counts.clone(),
+        voters_counts: result.voters_counts,
+        votes_counts: result.votes_counts,
         differences_counts: SummaryDifferencesCounts {
             more_ballots_count: random_sum_count(rng, polling_stations),
             fewer_ballots_count: random_sum_count(rng, polling_stations),
         },
-        political_group_votes: result.political_group_votes.clone(),
+        political_group_votes: result.political_group_votes,
         polling_station_investigations: PollingStationInvestigations {
             admitted_voters_recounted: random_station_subset(rng, polling_stations),
             investigated_other_reason: random_station_subset(rng, polling_stations),
@@ -337,6 +349,21 @@ fn random_investigation(
         reason: random_string(rng, string_length),
         findings: random_string_option(rng, string_length, none_where_possible),
         corrected_results: random_option(rng, corrected_result, none_where_possible),
+    }
+}
+
+fn random_finished_investigation(
+    rng: &mut impl rand::Rng,
+    polling_station: &PollingStation,
+    string_length: usize,
+) -> PollingStationInvestigation {
+    let corrected_results = rng.random_bool(0.5);
+
+    PollingStationInvestigation {
+        polling_station_id: polling_station.id,
+        reason: random_string(rng, string_length),
+        findings: Some(random_string(rng, string_length)),
+        corrected_results: Some(corrected_results),
     }
 }
 
@@ -381,12 +408,8 @@ async fn test_na_14_2() {
             random_committee_session(&mut rng, election.id, string_length, none_where_possible);
         let previous_committee_session =
             random_committee_session(&mut rng, election.id, string_length, none_where_possible);
-        let polling_station_count = rng.random_range(1..=5);
-        let polling_stations: Vec<_> = (0..polling_station_count)
-            .map(|_| {
-                random_polling_station(&mut rng, &election, string_length, none_where_possible)
-            })
-            .collect();
+        let polling_stations =
+            random_polling_stations(&mut rng, &election, string_length, none_where_possible);
         let previous_summary = random_election_summary(&mut rng, &election, &polling_stations);
         let summary = random_election_summary(&mut rng, &election, &polling_stations);
         let hash = random_string(&mut rng, 64);
@@ -432,9 +455,9 @@ async fn test_na_14_2_bijlage_1() {
 
         let model = PdfModel::ModelNa14_2Bijlage1(Box::new(ModelNa14_2Bijlage1Input {
             previous_results,
-            election: election.clone(),
-            polling_station: polling_station.clone(),
-            investigation: investigation.clone(),
+            election,
+            polling_station,
+            investigation,
         }));
 
         test_pdf(model).await;
@@ -455,12 +478,8 @@ async fn test_na_31_2() {
         );
         let committee_session =
             random_committee_session(&mut rng, election.id, string_length, none_where_possible);
-        let polling_station_count = rng.random_range(1..=5);
-        let polling_stations: Vec<_> = (0..polling_station_count)
-            .map(|_| {
-                random_polling_station(&mut rng, &election, string_length, none_where_possible)
-            })
-            .collect();
+        let polling_stations =
+            random_polling_stations(&mut rng, &election, string_length, none_where_possible);
         let summary = random_election_summary(&mut rng, &election, &polling_stations);
         let hash = random_string(&mut rng, 64);
         let creation_date_time = random_date_time(&mut rng)
@@ -522,6 +541,51 @@ async fn test_n_10_2() {
         let model = PdfModel::ModelN10_2(Box::new(ModelN10_2Input {
             election,
             polling_station,
+        }));
+
+        test_pdf(model).await;
+    }
+}
+
+#[test(tokio::test)]
+async fn test_p_2a() {
+    let mut rng = rand::rng();
+
+    for (parties, candidates, string_length, none_where_possible) in EDGE_VALUES {
+        let election = random_election(
+            &mut rng,
+            parties,
+            candidates,
+            string_length,
+            none_where_possible,
+        );
+        let committee_session =
+            random_committee_session(&mut rng, election.id, string_length, none_where_possible);
+        let polling_stations =
+            random_polling_stations(&mut rng, &election, string_length, none_where_possible);
+
+        let mut investigations = polling_stations
+            .iter()
+            .map(|polling_station| {
+                (
+                    polling_station.clone(),
+                    random_finished_investigation(&mut rng, polling_station, string_length),
+                )
+            })
+            .collect::<Vec<_>>();
+        investigations.retain(|_| rng.random_bool(0.8));
+
+        let hash = random_string(&mut rng, 64);
+        let creation_date_time = random_date_time(&mut rng)
+            .format("%Y-%m-%dT%H:%M:%S")
+            .to_string();
+
+        let model = PdfModel::ModelP2a(Box::new(ModelP2aInput {
+            committee_session,
+            election,
+            investigations,
+            hash,
+            creation_date_time,
         }));
 
         test_pdf(model).await;

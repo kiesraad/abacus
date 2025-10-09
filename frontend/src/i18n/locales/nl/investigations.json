@@ -1,15 +1,18 @@
 {
   "add_investigation": "Onderzoek toevoegen",
   "add_investigation_for_each_csb_request": "Voeg voor elk verzoek van het centraal stembureau een onderzoek toe en voer de aanleiding in.",
+  "all_investigations_finished": "Alle onderzoeken zijn afgehandeld",
+  "all_investigations_finished_description": "De resultaten van alle onderzoeken zijn ingevoerd.\nJe kunt de uitslag nu definitief maken en het proces verbaal opmaken.",
   "corrected_results": "Er is een gecorrigeerde uitslag",
   "corrected_results_inserted": "De gecorrigeerde uitslag is ingevoerd",
   "corrected_results_not_yet_inserted": "Laat twee invoerders het corrigendum overnemen in Abacus",
   "corrigendum_data_entry_in_progress": "Invoer corrigendum bezig",
   "delete_are_you_sure": "Je kan dit niet ongedaan maken. Weet je zeker dat je dit onderzoek wilt verwijderen?",
-  "delete_data_entry": "<strong>Let op</strong>: De gecorrigeerde telresultaten die al zijn ingevoerd worden ook verwijderd.",
+  "delete_data_entry": "<strong>Let op:</strong> De gecorrigeerde telresultaten die al zijn ingevoerd worden ook verwijderd.",
   "delete_investigation": "Onderzoek verwijderen",
   "edit": "Bewerken",
   "findings": {
+    "accept_and_delete_results": "Ga verder en verwijder de gecorrigeerde telresultaten",
     "corrected_result": "Is er een gecorrigeerde uitslag?",
     "corrected_result_no": "Het stembureau hoeft niet in Abacus te worden ingevoerd.",
     "corrected_result_yes": "Vul de nieuwe telresultaten in op het corrigendum proces-verbaal van het stembureau. Laat daarna het corrigendum invoeren in Abacus.",
@@ -21,6 +24,7 @@
     "nav_title": "Bevindingen onderzoek",
     "note_investigation_result": "Noteer de uitkomst van het onderzoek door het gemeentelijk stembureau.",
     "pick_corrected_result": "Deze vraag is verplicht",
+    "results_will_be_deleted": "Er zijn al gecorrigeerde telresultaten ingevoerd. Als je verdergaat worden deze verwijderd.",
     "title": "Bevindingen",
     "title_long": "Bevindingen van het onderzoek"
   },
@@ -63,6 +67,9 @@
     "title": "Aanleiding en opdracht",
     "why_investigate_results": "Waarom worden de resultaten van dit stembureau onderzocht? Denk bijvoorbeeld aan een onverklaard telverschil of een bezwaar."
   },
+  "start_data_entry": "Invoerfase starten",
+  "start_data_entry_description": "De bevindingen van het onderzoek mogen pas worden ingevoerd als de zitting officieel is geopend. Is dat het geval? Start dan de invoerfase. Je kunt dan voor alle aangevraagde onderzoeken de bevindingen invoeren.",
+  "start_data_entry_question": "Invoerfase starten?",
   "title": "Onderzoeken",
   "you_cannot_add_another_investigation": "Je hebt voor alle stembureaus al een onderzoek toegevoegd.\nJe kan niet nog een onderzoek toevoegen."
 }

@@ -30,7 +30,7 @@ describe("FirstLoginForm", () => {
   });
 
   test("Login for the first time error", async () => {
-    overrideOnce("post", "/api/user/login", 400, {
+    overrideOnce("post", "/api/login", 400, {
       error: "Invalid credentials",
       fatal: false,
     });

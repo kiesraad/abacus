@@ -78,41 +78,49 @@ export function PollingStationSelector({
       switch (currentPollingStation.userStatus) {
         case PollingStationUserStatus.InProgressOtherUser:
           return renderWarningMessage(
-            tx("polling_station_choice.assigned_to_different_user", undefined, {
+            tx("polling_station_choice.alert.in_progress_other_user_selector", undefined, {
               nr: currentPollingStation.number,
             }),
           );
         case PollingStationUserStatus.SecondEntryNotAllowed:
           return renderWarningMessage(
-            tx("polling_station_choice.second_entry_not_allowed", undefined, {
+            tx("polling_station_choice.alert.second_entry_not_allowed", undefined, {
               nr: currentPollingStation.number,
             }),
           );
         case PollingStationUserStatus.HasErrors:
           return renderWarningMessage(
-            tx("polling_station_choice.has_errors", undefined, {
+            tx("polling_station_choice.alert.has_errors", undefined, {
               nr: currentPollingStation.number,
             }),
           );
         case PollingStationUserStatus.Finished:
           return renderWarningMessage(
-            tx("polling_station_choice.has_already_been_filled_twice", undefined, {
+            tx("polling_station_choice.alert.finished_selector", undefined, {
               nr: currentPollingStation.number,
               name: currentPollingStation.name,
             }),
           );
-        default:
-          return (
-            <FeedbackMessage
-              messageType="success"
-              content={
-                <>
-                  <span className="bold">{currentPollingStation.name}</span>
-                  <Badge type={currentPollingStation.statusEntry.status} showIcon />
-                </>
-              }
-            />
+        case PollingStationUserStatus.EntryNotAllowed:
+          return renderWarningMessage(
+            tx("polling_station_choice.alert.entry_not_allowed", undefined, {
+              nr: currentPollingStation.number,
+            }),
           );
+        default:
+          if (currentPollingStation.statusEntry) {
+            return (
+              <FeedbackMessage
+                messageType="success"
+                content={
+                  <>
+                    <span className="bold">{currentPollingStation.name}</span>
+                    <Badge type={currentPollingStation.statusEntry.status} showIcon />
+                  </>
+                }
+              />
+            );
+          }
       }
     }
 

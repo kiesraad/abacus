@@ -13,7 +13,7 @@ pub mod utils;
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("users"))))]
 async fn test_account_update(pool: SqlitePool) {
     let addr = serve_api(pool).await;
-    let url = format!("http://{addr}/api/user/account");
+    let url = format!("http://{addr}/api/account");
     let admin_cookie = shared::admin_login(&addr).await;
 
     let response = reqwest::Client::new()

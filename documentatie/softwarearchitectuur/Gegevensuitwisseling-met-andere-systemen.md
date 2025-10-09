@@ -5,7 +5,7 @@ Abacus wordt air-gapped en lokaal gedraaid. Gegevensuitwisseling gebeurt dus noo
 
 ## Importeren van data
 
-### Verkiezingsdefinitie en kandidatenlijst
+### Verkiezingsdefinitie en kandidatenlijsten
 
 De Kiesraad beheert `vapp-metadata.zip` met daarin de volgende bestanden:
 - `MasterElectionTree.xml`: xml, maar geen EML_NL
@@ -16,9 +16,9 @@ De Kiesraad beheert `vapp-metadata.zip` met daarin de volgende bestanden:
 
 Deze bestanden zijn onderdeel van OSV2020 PP, KS en U.
 
-Het CSB van de verkiezing maakt met OSV2020 KS de verkiezingsdefinitie en de kandidatenlijst aan. 
+Het CSB van de verkiezing maakt met OSV2020 KS de verkiezingsdefinitie en de kandidatenlijsten aan. 
 
-De xSB's (GSB, CSB, etc) lezen de verkiezingsdefinitie en de kandidatenlijst in de uitslagensoftware (nu: OSV2020 U, straks: Abacus) in.
+De xSB's (GSB, CSB, etc) lezen de verkiezingsdefinitie en de kandidatenlijsten in de uitslagensoftware (nu: OSV2020 U, straks: Abacus) in.
 
 ### Stembureaus
 nog in te vullen

@@ -5,7 +5,7 @@ import { beforeEach, describe, expect, test, vi } from "vitest";
 import * as useUser from "@/hooks/user/useUser";
 import { ElectionProvider } from "@/hooks/election/ElectionProvider";
 import { ElectionStatusProvider } from "@/hooks/election/ElectionStatusProvider";
-import { electionDetailsMockResponse } from "@/testing/api-mocks/ElectionMockData";
+import { electionDetailsMockResponse, getElectionMockData } from "@/testing/api-mocks/ElectionMockData";
 import { statusResponseMock } from "@/testing/api-mocks/ElectionStatusMockData";
 import { pollingStationMockData } from "@/testing/api-mocks/PollingStationMockData";
 import { ElectionRequestHandler, ElectionStatusRequestHandler } from "@/testing/api-mocks/RequestHandlers";
@@ -192,6 +192,27 @@ describe("Test PollingStationChoiceForm", () => {
       await user.type(pollingStation, "0");
       const pollingStationFeedback2 = await screen.findByTestId("pollingStationSelectorFeedback");
       expect(await within(pollingStationFeedback2).findByText("Geen stembureau gevonden met nummer 0")).toBeVisible();
+    });
+
+    test("Selecting a polling station in next session without corrected_results=true", async () => {
+      // Set to session 2, with an investigation on polling station 1 without corrected_results=true
+      const electionDataSecondSession = getElectionMockData(
+        {},
+        { id: 1, number: 2, status: "data_entry_not_started" },
+        [{ polling_station_id: 1, reason: "Test reason 1" }],
+      );
+      overrideOnce("get", "/api/elections/1", 200, electionDataSecondSession);
+      server.use(http.get("/api/elections/1/status", () => HttpResponse.json({ statuses: [] }, { status: 200 })));
+
+      const user = userEvent.setup();
+      await renderPollingStationChoiceForm();
+
+      const pollingStation = await screen.findByTestId("pollingStation");
+      await user.type(pollingStation, "33");
+      const pollingStationFeedback = await screen.findByTestId("pollingStationSelectorFeedback");
+      expect(
+        await within(pollingStationFeedback).findByText("Stembureau 33 kan nu niet ingevoerd worden"),
+      ).toBeVisible();
     });
 
     test("Submitting an empty or invalid polling station shows alert", async () => {

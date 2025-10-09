@@ -22,7 +22,7 @@ export function AccountSetupForm({ user, onSaved }: AccountSetupFormProps) {
   const [showLoginSuccess, setShowLoginSuccess] = useState(true);
   const [validationErrors, setValidationErrors] = useState<UserValidationErrors | null>(null);
 
-  const url: ACCOUNT_UPDATE_REQUEST_PATH = "/api/user/account";
+  const url: ACCOUNT_UPDATE_REQUEST_PATH = "/api/account";
   const { update, requestState } = useCrud<LoginResponse>(url);
   const [apiError, setApiError] = useState<AnyApiError | null>(null);
 

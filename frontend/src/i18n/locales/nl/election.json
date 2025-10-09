@@ -8,14 +8,13 @@
     "keep_input": "Annuleren",
     "title": "Niet opgeslagen wijzigingen"
   },
-  "candidate_list": "kandidatenlijst",
   "check_and_save": {
     "description": "Je gaat de volgende verkiezing toevoegen:",
     "title": "Controleren en opslaan"
   },
   "check_eml": {
     "candidates_description": "Het bestand <file>filename</file> is geïmporteerd en bevat de instellingen voor de volgende kandidaten:",
-    "candidates_title": "Controleer kandidatenlijst",
+    "candidates_title": "Controleer kandidatenlijsten",
     "check_hash": {
       "description": "Vul ter controle de hierboven afgeschermde delen van de digitale vingerafdruk in. De volledige code heb je van de Kiesraad ontvangen.",
       "hint": "Vul 4 karakters in",
@@ -27,19 +26,19 @@
       "description": "Controleer of de ingevulde controle-delen overeenkomen met de digitale vingerafdruk die je hebt ontvangen.",
       "title": "Controle digitale vingerafdruk niet gelukt"
     },
-    "list_name": "{location}, kandidatenlijst {name}",
+    "list_name": "{location}, kandidatenlijsten {name}",
     "polling_station_title": "Controleer stembureaus"
   },
   "configuration_not_finished": "De configuratie van Abacus is nog niet afgerond.",
   "create": "Verkiezing toevoegen",
   "dso_not_supported": "Niet ondersteund in deze versie van Abacus",
-  "import_candidates_eml": "Importeer kandidatenlijst",
+  "import_candidates_eml": "Importeer kandidatenlijsten",
   "import_election_eml": "Importeer verkiezingsdefinitie",
   "import_polling_station_eml": "Importeer stembureaus gemeente {location}",
   "invalid_candidates_definition": {
-    "description": "Het bestand <file>filename</file> bevat geen geldige kandidatenlijst. Kies een bestand met een geldige definitie.",
+    "description": "Het bestand <file>filename</file> bevat geen geldige kandidatenlijsten. Kies een bestand met een geldige definitie.",
     "file_too_large": "Het bestand <file>filename</file> is te groot. Kies een bestand van maximaal {max_size} Megabyte.",
-    "title": "Ongeldige kandidatenlijst"
+    "title": "Ongeldige kandidatenlijsten"
   },
   "invalid_election_definition": {
     "description": "Het bestand <file>filename</file> bevat geen geldige verkiezingsdefinitie. Kies een bestand met een geldige definitie.",
@@ -87,7 +86,7 @@
     "plural": "Verkiezingen",
     "singular": "Verkiezing"
   },
-  "use_instructions_to_import_candidates_eml": "Je hebt van de Kiesraad instructies gekregen waarmee je de kandidatenlijst kunt downloaden. Zet het bestand op deze computer en importeer het.",
+  "use_instructions_to_import_candidates_eml": "Je hebt van de Kiesraad instructies gekregen waarmee je de kandidatenlijsten kunt downloaden. Zet het bestand op deze computer en importeer het.",
   "use_instructions_to_import_eml": "Je hebt van de Kiesraad instructies gekregen waarmee je de verkiezingsdefinitie kunt downloaden. Zet het bestand op deze computer en importeer het.",
   "use_instructions_to_import_polling_stations_eml": "Importeer het bestand met stembureaus. Heb je geen bestand met stembureaus? Je kan ze later nog handmatig invoeren. Sla deze stap dan over.",
   "voting_method_type": {

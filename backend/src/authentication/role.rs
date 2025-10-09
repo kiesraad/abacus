@@ -48,6 +48,13 @@ pub struct Typist(pub User);
 #[allow(unused)]
 pub struct AdminOrCoordinator(pub User);
 
+impl AdminOrCoordinator {
+    /// Returns true if the user is a coordinator
+    pub fn is_coordinator(&self) -> bool {
+        self.0.role() == Role::Coordinator
+    }
+}
+
 impl TryFrom<User> for Admin {
     type Error = ();
 

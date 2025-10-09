@@ -1,5 +1,4 @@
 import account from "./account.json";
-import apportionment from "./apportionment.json";
 import candidate from "./candidate.json";
 import candidates_votes from "./candidates_votes.json";
 import check_and_save from "./check_and_save.json";
@@ -32,7 +31,6 @@ import voters_votes_counts from "./voters_votes_counts.json";
 const nl = {
   ...generic,
   account,
-  apportionment,
   candidate,
   candidates_votes,
   check_and_save,

@@ -6,6 +6,7 @@ import { t } from "@/i18n/translate";
 
 import { LogFilterState } from "../hooks/useAuditLog";
 import { LogFilterName, useLogFilterOptions } from "../hooks/useLogFilterOptions";
+import { dateToTimestampString, timestampToDateString } from "../utils/dateTime";
 import cls from "./LogsHomePage.module.css";
 
 interface LogFilterProps {
@@ -13,29 +14,6 @@ interface LogFilterProps {
   filterState: LogFilterState;
   setSince: (since: string) => void;
   toggleFilter: (filterName: LogFilterName, value: string, checked: boolean) => void;
-}
-
-// timestamp to local date string
-function timestampToDateString(timestamp: string | undefined): string {
-  if (!timestamp) {
-    return "";
-  }
-
-  const d = new Date();
-  const time = new Date(parseInt(timestamp) * 1000 - d.getTimezoneOffset() * 60000);
-
-  return time.toISOString().slice(0, 16);
-}
-
-// local date string to timestamp
-function dateToTimestampString(date: string): string {
-  if (!date) {
-    return "";
-  }
-
-  const time = new Date(date);
-
-  return Math.round(time.getTime() / 1000).toString();
 }
 
 export function LogFilter({ onClose, setSince, filterState, toggleFilter }: LogFilterProps) {
@@ -47,6 +25,19 @@ export function LogFilter({ onClose, setSince, filterState, toggleFilter }: LogF
         <IconCross /> {t("log.action.close_filter")}
       </Button>
       <div className={cls.filters}>
+        <div>
+          <InputField
+            type="datetime-local"
+            name="since"
+            fieldWidth="parent"
+            value={timestampToDateString(filterState.since)}
+            onChange={(e) => {
+              setSince(dateToTimestampString(e.target.value));
+            }}
+            label={t("log.filter.show_events_since")}
+            margin="mb-lg"
+          />
+        </div>
         {options.map(([filterName, options]) => (
           <div key={filterName}>
             <h3>{t(`log.filter.${filterName}`)}</h3>
@@ -66,19 +57,6 @@ export function LogFilter({ onClose, setSince, filterState, toggleFilter }: LogF
             </ul>
           </div>
         ))}
-        <div>
-          <InputField
-            type="datetime-local"
-            name="since"
-            fieldWidth="parent"
-            value={timestampToDateString(filterState.since)}
-            onChange={(e) => {
-              setSince(dateToTimestampString(e.target.value));
-            }}
-            label={t("log.filter.show_events_since")}
-            margin="mb-lg"
-          />
-        </div>
       </div>
     </nav>
   );

@@ -3,9 +3,6 @@ components:
   - name: "(Backend) Airgap detection"
     include:
       - ".*/backend/src/airgap/.*"
-  - name: "(Backend) Apportionment"
-    include:
-      - ".*/backend/src/apportionment/.*"
   - name: "(Backend) Audit Log"
     include:
       - ".*/backend/src/audit_log/.*"
@@ -112,9 +109,6 @@ components:
   - name: "(Frontend) Modules/account"
     include:
       - ".*/frontend/src/features/account/.*"
-  - name: "(Frontend) Modules/apportionment"
-    include:
-      - ".*/frontend/src/features/apportionment/.*"
   - name: "(Frontend) Modules/data_entry"
     include:
       - ".*/frontend/src/features/data_entry/.*"
@@ -204,6 +198,7 @@ languages:
       include:
         - ".*/gen-test-election[.]rs"
         - ".*/test_data_gen/.*[.]rs"
+        - ".*/typst_tests[.]rs"
     generated:
       include:
         - ".*/gen/.*[.]rs"

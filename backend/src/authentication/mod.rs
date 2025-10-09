@@ -1,9 +1,11 @@
 use chrono::TimeDelta;
+use serde::{Deserialize, Serialize};
+use utoipa::ToSchema;
+
+pub use self::{api::*, user_api::*};
 pub use middleware::*;
 pub use role::{Admin, AdminOrCoordinator, Coordinator, Role, Typist};
 pub use user::User;
-
-pub use self::api::*;
 
 pub mod api;
 pub mod error;
@@ -12,6 +14,7 @@ mod password;
 mod role;
 pub mod session;
 pub mod user;
+pub mod user_api;
 mod util;
 
 /// Session lifetime, for both cookie and database
@@ -26,6 +29,18 @@ pub const SESSION_COOKIE_NAME: &str = "ABACUS_SESSION";
 
 /// Only send cookies over a secure (https) connection
 pub const SECURE_COOKIES: bool = false;
+
+/// Struct used to create a new user
+#[derive(Serialize, Deserialize, ToSchema)]
+#[serde(deny_unknown_fields)]
+pub struct CreateUserRequest {
+    pub username: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[schema(nullable = false)]
+    pub fullname: Option<String>,
+    pub temp_password: String,
+    pub role: Role,
+}
 
 #[cfg(test)]
 mod tests {
@@ -49,7 +64,7 @@ mod tests {
         airgap::AirgapDetection,
         audit_log::{AuditEvent, LogFilter, UserLoginFailedDetails},
         authentication::{
-            api::{AccountUpdateRequest, Credentials, UserListResponse},
+            api::{AccountUpdateRequest, Credentials},
             middleware::extend_session,
             role::Role,
             *,
@@ -64,6 +79,7 @@ mod tests {
         };
 
         Router::from(router())
+            .merge(user_router())
             .layer(middleware::map_response_with_state(
                 state.clone(),
                 extend_session,
@@ -80,7 +96,7 @@ mod tests {
             .oneshot(
                 Request::builder()
                     .method(Method::POST)
-                    .uri("/api/user/login")
+                    .uri("/api/login")
                     .header(CONTENT_TYPE, "application/json")
                     .body(Body::from(
                         serde_json::to_vec(&Credentials {
@@ -108,7 +124,7 @@ mod tests {
             .oneshot(
                 Request::builder()
                     .method(Method::POST)
-                    .uri("/api/user/login")
+                    .uri("/api/login")
                     .header(CONTENT_TYPE, "application/json")
                     .body(Body::from(
                         serde_json::to_vec(&Credentials {
@@ -140,7 +156,7 @@ mod tests {
             .oneshot(
                 Request::builder()
                     .method(Method::POST)
-                    .uri("/api/user/login")
+                    .uri("/api/login")
                     .header(CONTENT_TYPE, "application/json")
                     .header(USER_AGENT, "Servo/1.0")
                     .body(Body::from(
@@ -189,7 +205,7 @@ mod tests {
             .oneshot(
                 Request::builder()
                     .method(Method::POST)
-                    .uri("/api/user/logout")
+                    .uri("/api/logout")
                     .header("cookie", &cookie)
                     .body(Body::empty())
                     .unwrap(),
@@ -219,7 +235,7 @@ mod tests {
             .oneshot(
                 Request::builder()
                     .method(Method::POST)
-                    .uri("/api/user/logout")
+                    .uri("/api/logout")
                     .header("cookie", &cookie)
                     .body(Body::empty())
                     .unwrap(),
@@ -245,7 +261,7 @@ mod tests {
             .oneshot(
                 Request::builder()
                     .method(Method::GET)
-                    .uri("/api/user/whoami")
+                    .uri("/api/whoami")
                     .header("cookie", &cookie)
                     .body(Body::empty())
                     .unwrap(),
@@ -267,7 +283,7 @@ mod tests {
             .oneshot(
                 Request::builder()
                     .method(Method::POST)
-                    .uri("/api/user/logout")
+                    .uri("/api/logout")
                     .header("cookie", &cookie)
                     .body(Body::empty())
                     .unwrap(),
@@ -283,7 +299,7 @@ mod tests {
             .oneshot(
                 Request::builder()
                     .method(Method::GET)
-                    .uri("/api/user/whoami")
+                    .uri("/api/whoami")
                     .header("cookie", &cookie)
                     .body(Body::empty())
                     .unwrap(),
@@ -299,7 +315,7 @@ mod tests {
             .oneshot(
                 Request::builder()
                     .method(Method::GET)
-                    .uri("/api/user/whoami")
+                    .uri("/api/whoami")
                     .body(Body::empty())
                     .unwrap(),
             )
@@ -321,7 +337,7 @@ mod tests {
             .oneshot(
                 Request::builder()
                     .method(Method::PUT)
-                    .uri("/api/user/account")
+                    .uri("/api/account")
                     .header(CONTENT_TYPE, "application/json")
                     .header("cookie", &cookie)
                     .body(Body::from(
@@ -347,7 +363,7 @@ mod tests {
             .oneshot(
                 Request::builder()
                     .method(Method::POST)
-                    .uri("/api/user/login")
+                    .uri("/api/login")
                     .header(CONTENT_TYPE, "application/json")
                     .body(Body::from(
                         serde_json::to_vec(&Credentials {
@@ -376,7 +392,7 @@ mod tests {
             .oneshot(
                 Request::builder()
                     .method(Method::PUT)
-                    .uri("/api/user/account")
+                    .uri("/api/account")
                     .header(CONTENT_TYPE, "application/json")
                     .header("cookie", &cookie)
                     .body(Body::from(
@@ -419,7 +435,7 @@ mod tests {
 
         assert_eq!(response.status(), StatusCode::OK);
         let body = response.into_body().collect().await.unwrap().to_bytes();
-        let result: UserListResponse = serde_json::from_slice(&body).unwrap();
+        let result: user_api::UserListResponse = serde_json::from_slice(&body).unwrap();
         assert_eq!(result.users.len(), 6);
     }
 
@@ -440,7 +456,7 @@ mod tests {
             .oneshot(
                 Request::builder()
                     .method(Method::GET)
-                    .uri("/api/user/whoami")
+                    .uri("/api/whoami")
                     .header("cookie", &cookie.encoded().to_string())
                     .body(Body::empty())
                     .unwrap(),
@@ -464,7 +480,7 @@ mod tests {
             .oneshot(
                 Request::builder()
                     .method(Method::GET)
-                    .uri("/api/user/whoami")
+                    .uri("/api/whoami")
                     .header("cookie", &cookie.encoded().to_string())
                     .body(Body::empty())
                     .unwrap(),
@@ -529,7 +545,7 @@ mod tests {
                     .header(CONTENT_TYPE, "application/json")
                     .header("cookie", cookie)
                     .body(Body::from(
-                        serde_json::to_vec(&UpdateUserRequest {
+                        serde_json::to_vec(&user_api::UpdateUserRequest {
                             fullname: Some("Test Full Name".to_string()),
                             temp_password: None,
                         })

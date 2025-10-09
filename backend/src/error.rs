@@ -14,9 +14,9 @@ use tracing::error;
 use utoipa::ToSchema;
 
 use crate::{
-    MAX_BODY_SIZE_MB, apportionment::ApportionmentError,
-    authentication::error::AuthenticationError, committee_session::CommitteeSessionError,
-    data_entry::DataError, eml::EMLImportError, pdf_gen::PdfGenError, zip::ZipResponseError,
+    MAX_BODY_SIZE_MB, authentication::error::AuthenticationError,
+    committee_session::CommitteeSessionError, data_entry::DataError, eml::EMLImportError,
+    pdf_gen::PdfGenError, zip::ZipResponseError,
 };
 
 /// Error reference used to show the corresponding error message to the end-user
@@ -24,14 +24,12 @@ use crate::{
 #[serde(deny_unknown_fields)]
 pub enum ErrorReference {
     AirgapViolation,
-    AllListsExhausted,
     AlreadyInitialised,
-    ApportionmentNotAvailableUntilDataEntryFinalised,
     CommitteeSessionPaused,
     DatabaseError,
     DataEntryAlreadyClaimed,
     DataEntryAlreadyFinalised,
-    DrawingOfLotsRequired,
+    DataEntryNotAllowed,
     EmlImportError,
     EntryNotFound,
     EntryNotUnique,
@@ -49,6 +47,7 @@ pub enum ErrorReference {
     InvalidVoteCandidate,
     InvalidVoteGroup,
     InvalidXml,
+    InvestigationHasDataEntryOrResult,
     NotInitialised,
     OwnAccountCannotBeDeleted,
     PasswordRejection,
@@ -59,7 +58,6 @@ pub enum ErrorReference {
     Unauthorized,
     UsernameNotUnique,
     UserNotFound,
-    ZeroVotesCast,
 }
 
 /// Response structure for errors
@@ -83,7 +81,6 @@ impl IntoResponse for ErrorResponse {
 pub enum APIError {
     AddError(String, ErrorReference),
     AirgapViolation(String),
-    Apportionment(ApportionmentError),
     Authentication(AuthenticationError),
     BadRequest(String, ErrorReference),
     CommitteeSession(CommitteeSessionError),
@@ -331,44 +328,6 @@ impl IntoResponse for APIError {
                     StatusCode::BAD_REQUEST,
                     to_error("EML import error", ErrorReference::EmlImportError, false),
                 )
-            }
-            APIError::Apportionment(err) => {
-                error!("Apportionment error: {:?}", err);
-
-                match err {
-                    ApportionmentError::AllListsExhausted => (
-                        StatusCode::UNPROCESSABLE_ENTITY,
-                        to_error(
-                            "All lists are exhausted, not enough candidates to fill all seats",
-                            ErrorReference::AllListsExhausted,
-                            false,
-                        ),
-                    ),
-                    ApportionmentError::ApportionmentNotAvailableUntilDataEntryFinalised => (
-                        StatusCode::PRECONDITION_FAILED,
-                        to_error(
-                            "Election data entry first needs to be finalised",
-                            ErrorReference::ApportionmentNotAvailableUntilDataEntryFinalised,
-                            false,
-                        ),
-                    ),
-                    ApportionmentError::DrawingOfLotsNotImplemented => (
-                        StatusCode::UNPROCESSABLE_ENTITY,
-                        to_error(
-                            "Drawing of lots is required",
-                            ErrorReference::DrawingOfLotsRequired,
-                            false,
-                        ),
-                    ),
-                    ApportionmentError::ZeroVotesCast => (
-                        StatusCode::UNPROCESSABLE_ENTITY,
-                        to_error(
-                            "No votes on candidates cast",
-                            ErrorReference::ZeroVotesCast,
-                            false,
-                        ),
-                    ),
-                }
             }
             APIError::CommitteeSession(err) => {
                 error!("Committee session status error: {:?}", err);

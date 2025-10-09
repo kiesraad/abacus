@@ -26,7 +26,6 @@ use utoipa_axum::router::OpenApiRouter;
 use utoipa_swagger_ui::SwaggerUi;
 
 pub mod airgap;
-pub mod apportionment;
 pub mod audit_log;
 pub mod authentication;
 pub mod committee_session;
@@ -78,17 +77,22 @@ pub fn openapi_router() -> OpenApiRouter<AppState> {
     #[derive(utoipa::OpenApi)]
     struct ApiDoc;
 
-    OpenApiRouter::with_openapi(ApiDoc::openapi())
-        .merge(apportionment::router())
+    let router = OpenApiRouter::with_openapi(ApiDoc::openapi())
         .merge(audit_log::router())
         .merge(authentication::router())
+        .merge(authentication::user_router())
         .merge(committee_session::router())
         .merge(data_entry::router())
         .merge(election::router())
         .merge(polling_station::router())
         .merge(report::router())
         .merge(document::router())
-        .merge(investigation::router())
+        .merge(investigation::router());
+
+    #[cfg(feature = "dev-database")]
+    let router = router.merge(test_data_gen::router());
+
+    router
 }
 
 /// Axum router for the application
@@ -343,7 +347,7 @@ mod test {
     #[test(sqlx::test)]
     async fn test_abacus_starts(pool: SqlitePool) {
         run_server_test(pool, |base_url| async move {
-            let result = reqwest::get(format!("{base_url}/api/user/whoami"))
+            let result = reqwest::get(format!("{base_url}/api/whoami"))
                 .await
                 .unwrap();
 
@@ -356,7 +360,7 @@ mod test {
     #[test(sqlx::test)]
     async fn test_security_headers(pool: SqlitePool) {
         run_server_test(pool, |base_url| async move {
-            let response = reqwest::get(format!("{base_url}/api/user/whoami"))
+            let response = reqwest::get(format!("{base_url}/api/whoami"))
                 .await
                 .unwrap();
 
@@ -406,7 +410,7 @@ mod test {
     #[test(sqlx::test)]
     async fn test_cache_headers(pool: SqlitePool) {
         run_server_test(pool, |base_url| async move {
-            let response = reqwest::get(format!("{base_url}/api/user/whoami"))
+            let response = reqwest::get(format!("{base_url}/api/whoami"))
                 .await
                 .unwrap();
             assert_eq!(response.headers()["cache-control"], "no-store");

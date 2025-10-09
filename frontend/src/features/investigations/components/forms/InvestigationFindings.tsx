@@ -1,9 +1,11 @@
 import { FormEvent, useState } from "react";
 import { useNavigate } from "react-router";
 
-import { AnyApiError, ApiResult, isError, isSuccess } from "@/api/ApiResult";
+import { AnyApiError, ApiError, ApiResult, isError, isSuccess } from "@/api/ApiResult";
 import { useCrud } from "@/api/useCrud";
+import { Alert } from "@/components/ui/Alert/Alert";
 import { Button } from "@/components/ui/Button/Button";
+import { Checkbox } from "@/components/ui/CheckboxAndRadio/CheckboxAndRadio";
 import { ChoiceList } from "@/components/ui/CheckboxAndRadio/ChoiceList";
 import { Form } from "@/components/ui/Form/Form";
 import { FormLayout } from "@/components/ui/Form/FormLayout";
@@ -23,8 +25,11 @@ interface InvestigationFindingsProps {
   pollingStationId: number;
 }
 
+const ACCEPTED = "accepted";
+
 export function InvestigationFindings({ pollingStationId }: InvestigationFindingsProps) {
   const navigate = useNavigate();
+  const { hasMessages } = useMessages();
   const { election, investigation, pollingStation, refetch } = useElection(pollingStationId);
   const { pushMessage } = useMessages();
   const concludePath = `/api/polling_stations/${pollingStationId}/investigation/conclude`;
@@ -35,6 +40,8 @@ export function InvestigationFindings({ pollingStationId }: InvestigationFinding
   const [nonEmptyError, setNonEmptyError] = useState(false);
   const [radioError, setRadioError] = useState(false);
   const [error, setError] = useState<AnyApiError>();
+  const [showDataEntryWarning, setShowDataEntryWarning] = useState(false);
+  const [warningNotAcceptedError, setWarningNotAcceptedError] = useState(false);
 
   if (!investigation || !pollingStation) {
     return <Loader />;
@@ -49,10 +56,12 @@ export function InvestigationFindings({ pollingStationId }: InvestigationFinding
 
     setNonEmptyError(false);
     setRadioError(false);
+    setWarningNotAcceptedError(false);
 
     const formData = new StringFormData(event.currentTarget);
     const findings = formData.getString("findings");
     const correctedResultsChoice = formData.get("corrected_results");
+    const acceptDataEntryDeletion = formData.get("accept_data_entry_deletion") === ACCEPTED;
 
     let error = false;
 
@@ -66,6 +75,11 @@ export function InvestigationFindings({ pollingStationId }: InvestigationFinding
       error = true;
     }
 
+    if (showDataEntryWarning && !acceptDataEntryDeletion) {
+      setWarningNotAcceptedError(true);
+      error = true;
+    }
+
     if (error) {
       return;
     }
@@ -75,18 +89,12 @@ export function InvestigationFindings({ pollingStationId }: InvestigationFinding
     const save = (): Promise<
       ApiResult<PollingStationInvestigationConcludeRequest | PollingStationInvestigationUpdateRequest>
     > => {
-      pushMessage({
-        title: t("investigations.message.investigation_updated", {
-          number: pollingStation.number,
-          name: pollingStation.name,
-        }),
-      });
-
       if (investigation.findings !== undefined) {
         return update({
           reason: investigation.reason,
           findings,
           corrected_results: correctedResults,
+          accept_data_entry_deletion: acceptDataEntryDeletion,
         } satisfies PollingStationInvestigationUpdateRequest);
       } else {
         return conclude({
@@ -99,10 +107,24 @@ export function InvestigationFindings({ pollingStationId }: InvestigationFinding
     const response = await save();
 
     if (isSuccess(response)) {
+      // Only push a message if there are no messages yet (e.g. from creating this investigation)
+      if (!hasMessages()) {
+        pushMessage({
+          title: t("investigations.message.investigation_updated", {
+            number: pollingStation.number,
+            name: pollingStation.name,
+          }),
+        });
+      }
+
       await refetch();
       await navigate(`/elections/${election.id}/investigations`);
     } else if (isError(response)) {
-      setError(response);
+      if (response instanceof ApiError && response.reference === "InvestigationHasDataEntryOrResult") {
+        setShowDataEntryWarning(true);
+      } else {
+        setError(response);
+      }
     }
   };
 
@@ -149,6 +171,21 @@ export function InvestigationFindings({ pollingStationId }: InvestigationFinding
               {t("investigations.findings.corrected_result_no")}
             </ChoiceList.Radio>
           </ChoiceList>
+
+          {showDataEntryWarning && (
+            <>
+              <Alert type={warningNotAcceptedError ? "error" : "warning"} small>
+                {t("investigations.findings.results_will_be_deleted")}
+              </Alert>
+              <Checkbox
+                id="accept_data_entry_deletion"
+                name="accept_data_entry_deletion"
+                label={t("investigations.findings.accept_and_delete_results")}
+                value={ACCEPTED}
+                hasError={warningNotAcceptedError}
+              />
+            </>
+          )}
         </FormLayout.Section>
         <FormLayout.Controls>
           <Button type="submit">{t("save")}</Button>

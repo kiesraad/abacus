@@ -3,7 +3,9 @@ import * as ReactRouter from "react-router";
 import { userEvent } from "@testing-library/user-event";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
-import { render, screen } from "@/testing/test-utils";
+import * as useUser from "@/hooks/user/useUser";
+import { render, screen, waitFor } from "@/testing/test-utils";
+import { getAdminUser, getCoordinatorUser } from "@/testing/user-mock-data";
 
 import { IUserCreateContext, UserCreateContext } from "../../hooks/UserCreateContext";
 import { UserCreateRolePage } from "./UserCreateRolePage";
@@ -21,6 +23,7 @@ function renderPage(context: Partial<IUserCreateContext>) {
 describe("UserCreateRolePage", () => {
   beforeEach(() => {
     vi.spyOn(ReactRouter, "useNavigate").mockImplementation(() => navigate);
+    vi.spyOn(useUser, "useUser").mockReturnValue(getAdminUser());
   });
 
   test("Shows initial form", async () => {
@@ -97,5 +100,17 @@ describe("UserCreateRolePage", () => {
     expect(setRole).toHaveBeenCalledExactlyOnceWith("typist");
     expect(setType).not.toHaveBeenCalled();
     expect(navigate).toHaveBeenCalledExactlyOnceWith("/users/create/type");
+  });
+
+  test("Coordinator skips role selection", async () => {
+    vi.spyOn(useUser, "useUser").mockReturnValue(getCoordinatorUser());
+
+    const setRole = vi.fn();
+    renderPage({ setRole });
+
+    await waitFor(() => {
+      expect(setRole).toHaveBeenCalledExactlyOnceWith("typist");
+      expect(navigate).toHaveBeenCalledExactlyOnceWith("/users/create/type");
+    });
   });
 });

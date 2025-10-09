@@ -36,12 +36,12 @@ jobs:
           rustup update nightly &&
           rustup default nightly
       - name: Cargo cache
-        uses: Swatinem/rust-cache@98c8021b550208e191a6a3145459bfc9fb29c4c0 # v2
+        uses: Swatinem/rust-cache@f13886b937689c021905a6b90929199931d60db1 # v2
         with:
           workspaces: "backend -> target"
           cache-bin: "false"
       - name: Install Binstall
-        uses: cargo-bins/cargo-binstall@20aa316bab4942180bbbabe93237858e8d77f1ed # main
+        uses: cargo-bins/cargo-binstall@38e8f5e4c386b611d51e8aa997b9a06a3c8eb67a # main
       - name: Install cargo-llvm-cov
         run: cargo binstall cargo-llvm-cov
       - name: Install Nextest

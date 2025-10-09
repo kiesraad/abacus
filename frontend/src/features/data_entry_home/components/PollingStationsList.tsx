@@ -16,20 +16,25 @@ export function PollingStationsList({ pollingStations }: PollingStationsListProp
         <Table.HeaderCell>{t("polling_station.title.singular")}</Table.HeaderCell>
       </Table.Header>
       <Table.Body>
-        {pollingStations.map((pollingStation) => {
-          return (
-            <Table.LinkRow
-              key={pollingStation.number}
-              to={getUrlForDataEntry(pollingStation.election_id, pollingStation.id, pollingStation.statusEntry.status)}
-            >
-              <Table.NumberCell>{pollingStation.number}</Table.NumberCell>
-              <Table.Cell>
-                <span>{pollingStation.name}</span>
-                <Badge type={pollingStation.statusEntry.status} showIcon />
-              </Table.Cell>
-            </Table.LinkRow>
-          );
-        })}
+        {pollingStations.map(
+          (pollingStation) =>
+            pollingStation.statusEntry && (
+              <Table.LinkRow
+                key={pollingStation.number}
+                to={getUrlForDataEntry(
+                  pollingStation.election_id,
+                  pollingStation.id,
+                  pollingStation.statusEntry.status,
+                )}
+              >
+                <Table.NumberCell>{pollingStation.number}</Table.NumberCell>
+                <Table.Cell>
+                  <span>{pollingStation.name}</span>
+                  <Badge type={pollingStation.statusEntry.status} showIcon />
+                </Table.Cell>
+              </Table.LinkRow>
+            ),
+        )}
       </Table.Body>
     </Table>
   );

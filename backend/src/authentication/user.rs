@@ -353,7 +353,10 @@ pub async fn get_by_id(
     Ok(user)
 }
 
-pub async fn list(conn: &mut SqliteConnection) -> Result<Vec<User>, Error> {
+pub async fn list(
+    conn: &mut SqliteConnection,
+    only_allow_role: Option<Role>,
+) -> Result<Vec<User>, Error> {
     let users = query_as!(
         User,
         r#"SELECT
@@ -366,7 +369,10 @@ pub async fn list(conn: &mut SqliteConnection) -> Result<Vec<User>, Error> {
             last_activity_at as "last_activity_at: _",
             updated_at as "updated_at: _",
             created_at as "created_at: _"
-        FROM users"#
+        FROM users
+        WHERE ($1 IS NULL OR role = $1)
+        "#,
+        only_allow_role,
     )
     .fetch_all(conn)
     .await?;

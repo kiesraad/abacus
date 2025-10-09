@@ -5,10 +5,8 @@ import { Button } from "@/components/ui/Button/Button";
 import { Form } from "@/components/ui/Form/Form";
 import { FormLayout } from "@/components/ui/Form/FormLayout";
 import { InputField } from "@/components/ui/InputField/InputField";
-import { KeyboardKeys } from "@/components/ui/KeyboardKeys/KeyboardKeys";
 import { t } from "@/i18n/translate";
 import { RedactedEmlHash } from "@/types/generated/openapi";
-import { KeyboardKey } from "@/types/ui";
 import { formatFullDateWithoutTimezone } from "@/utils/dateTime";
 
 import { RedactedHash, Stub } from "./RedactedHash";
@@ -123,7 +121,6 @@ export function CheckHash({ date, title, header, description, redactedHash, erro
           </FormLayout.Section>
           <FormLayout.Controls>
             <Button type="submit">{t("next")}</Button>
-            <KeyboardKeys keys={[KeyboardKey.Shift, KeyboardKey.Enter]} />
           </FormLayout.Controls>
         </FormLayout>
       </Form>

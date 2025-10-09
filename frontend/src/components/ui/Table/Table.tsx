@@ -1,9 +1,7 @@
 import * as React from "react";
 import { To, useNavigate } from "react-router";
 
-import { Fraction } from "@/types/generated/openapi";
 import { cn } from "@/utils/classnames";
-import { getFractionInteger, getFractionWithoutInteger } from "@/utils/fraction";
 
 import cls from "./Table.module.css";
 
@@ -28,7 +26,6 @@ Table.ClickRow = ClickRow;
 Table.TotalRow = TotalRow;
 Table.Cell = Cell;
 Table.NumberCell = NumberCell;
-Table.DisplayFractionCells = DisplayFractionCells;
 
 function Header({ children, className }: { children: React.ReactNode; className?: string }) {
   return (
@@ -140,16 +137,5 @@ function NumberCell({
     <td colSpan={colSpan} className={cn(cls.numberCell, className)}>
       {children}
     </td>
-  );
-}
-
-function DisplayFractionCells({ children, className }: { children: Fraction | undefined; className?: string }) {
-  return (
-    <>
-      <td className={cn(cls.integerCell, "font-number", className)}>{children && getFractionInteger(children)}</td>
-      <td className={cn(cls.fractionCell, "font-number", className)}>
-        {children && getFractionWithoutInteger(children)}
-      </td>
-    </>
   );
 }

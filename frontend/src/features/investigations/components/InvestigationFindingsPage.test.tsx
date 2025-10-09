@@ -16,6 +16,7 @@ import {
 import { Providers } from "@/testing/Providers";
 import { overrideOnce, server } from "@/testing/server";
 import { screen, setupTestRouter, spyOnHandler, within } from "@/testing/test-utils";
+import { ErrorResponse, PollingStationInvestigation } from "@/types/generated/openapi";
 
 import { investigationRoutes } from "../routes";
 
@@ -47,7 +48,11 @@ describe("InvestigationFindingsPage", () => {
   beforeEach(() => {
     server.use(ElectionRequestHandler, ElectionStatusRequestHandler);
     vi.spyOn(ReactRouter, "useNavigate").mockImplementation(() => navigate);
-    vi.spyOn(useMessages, "useMessages").mockReturnValue({ pushMessage, popMessages: vi.fn(() => []) });
+    vi.spyOn(useMessages, "useMessages").mockReturnValue({
+      pushMessage,
+      popMessages: vi.fn(() => []),
+      hasMessages: vi.fn(() => false),
+    });
   });
 
   test("Renders a form", async () => {
@@ -140,8 +145,61 @@ describe("InvestigationFindingsPage", () => {
       reason: "Test reason 4",
       findings: "New test findings 4",
       corrected_results: false,
+      accept_data_entry_deletion: false,
     });
     expect(pushMessage).toHaveBeenCalledWith({ title: "Wijzigingen in onderzoek stembureau 34 (Testplek) opgeslagen" });
+  });
+
+  test("Show warning when updating corrected results to no with data entry results", async () => {
+    const update = spyOnHandler(
+      overrideOnce("put", "/api/polling_stations/2/investigation", 409, {
+        error: "Investigation has data entries or results",
+        fatal: false,
+        reference: "InvestigationHasDataEntryOrResult",
+      } satisfies ErrorResponse),
+    );
+
+    await renderPage(2);
+    const noRadio = await screen.findByLabelText(/Nee/);
+    noRadio.click();
+
+    const submitButton = await screen.findByRole("button", { name: "Opslaan" });
+    submitButton.click();
+
+    const alert = await screen.findByRole("alert");
+    expect(alert).toHaveTextContent(
+      "Er zijn al gecorrigeerde telresultaten ingevoerd. Als je verdergaat worden deze verwijderd.",
+    );
+
+    const acceptWarning = await screen.findByRole("checkbox", {
+      name: "Ga verder en verwijder de gecorrigeerde telresultaten",
+    });
+    expect(acceptWarning).toBeVisible();
+    expect(acceptWarning).not.toBeInvalid();
+
+    submitButton.click();
+    await waitFor(() => {
+      expect(acceptWarning).toBeInvalid();
+    });
+    expect(update).toHaveBeenCalledTimes(1);
+
+    overrideOnce("put", "/api/polling_stations/2/investigation", 200, {
+      polling_station_id: 0,
+      reason: "Test reason",
+      corrected_results: false,
+    } satisfies PollingStationInvestigation);
+
+    acceptWarning.click();
+    submitButton.click();
+
+    await waitFor(() => {
+      expect(navigate).toHaveBeenCalledWith("/elections/1/investigations");
+    });
+
+    expect(update).toHaveBeenCalledTimes(2);
+    expect(pushMessage).toHaveBeenCalledWith({
+      title: "Wijzigingen in onderzoek stembureau 34 (Testplek) opgeslagen",
+    });
   });
 
   test("Renders delete button on update investigation and delete works", async () => {

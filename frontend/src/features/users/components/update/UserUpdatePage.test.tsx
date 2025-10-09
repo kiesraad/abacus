@@ -3,13 +3,15 @@ import * as ReactRouter from "react-router";
 import { userEvent } from "@testing-library/user-event";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
+import * as useUser from "@/hooks/user/useUser";
 import {
   UserDeleteRequestHandler,
   UserGetRequestHandler,
   UserUpdateRequestHandler,
 } from "@/testing/api-mocks/RequestHandlers";
-import { server } from "@/testing/server";
-import { render, screen } from "@/testing/test-utils";
+import { overrideOnce, server } from "@/testing/server";
+import { render, screen, waitFor } from "@/testing/test-utils";
+import { getAdminUser } from "@/testing/user-mock-data";
 
 import { UserUpdatePage } from "./UserUpdatePage";
 
@@ -45,5 +47,36 @@ describe("UserUpdatePage", () => {
 
     const expectedMessage = "Het account van Sanne Molenaar is verwijderd";
     expect(navigate).toHaveBeenCalledExactlyOnceWith(`/users?deleted=${encodeURIComponent(expectedMessage)}`);
+  });
+
+  test("delete button should not be visible if its the user itself", async () => {
+    // Mock logged in user as admin with user_id 1
+    vi.spyOn(useUser, "useUser").mockReturnValue({ ...getAdminUser(), user_id: 1 });
+
+    render(<UserUpdatePage></UserUpdatePage>);
+    await screen.findByRole("heading", { level: 2, name: "Details van het account" });
+
+    expect(screen.queryByRole("button", { name: "Gebruiker verwijderen" })).not.toBeInTheDocument();
+  });
+
+  test("delete button should be visible if its a different user", async () => {
+    // Mock logged in user as admin with user_id 2
+    vi.spyOn(useUser, "useUser").mockReturnValue({ ...getAdminUser(), user_id: 2 });
+
+    render(<UserUpdatePage></UserUpdatePage>);
+    await screen.findByRole("heading", { level: 2, name: "Details van het account" });
+
+    expect(screen.queryByRole("button", { name: "Gebruiker verwijderen" })).toBeInTheDocument();
+  });
+
+  test("Authorization error should be shown when insufficient rights", async () => {
+    vi.spyOn(console, "error").mockImplementation(() => {});
+    overrideOnce("get", "/api/user/1", 403, { error: "Forbidden", fatal: true, reference: "Forbidden" });
+
+    render(<UserUpdatePage></UserUpdatePage>);
+
+    await waitFor(() => {
+      expect(screen.getByText("Error thrown during render: Forbidden")).toBeVisible();
+    });
   });
 });

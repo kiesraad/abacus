@@ -27,7 +27,7 @@ test.describe("setup test users", () => {
       const loginResponse = await loginAs(userContext, user.username, "Temp");
       expect(loginResponse.status()).toBe(200);
 
-      const response = await userContext.put("/api/user/account", {
+      const response = await userContext.put("/api/account", {
         data: {
           username: user.username,
           fullname: user.fullname,

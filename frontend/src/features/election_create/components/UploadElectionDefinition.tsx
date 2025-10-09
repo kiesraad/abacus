@@ -9,6 +9,7 @@ import { Form } from "@/components/ui/Form/Form";
 import { FormLayout } from "@/components/ui/Form/FormLayout";
 import { t, tx } from "@/i18n/translate";
 import { ELECTION_IMPORT_VALIDATE_REQUEST_PATH, ElectionDefinitionValidateResponse } from "@/types/generated/openapi";
+import { fileTooLargeError, MAX_FILE_UPLOAD_SIZE_MB } from "@/utils/fileUpload";
 
 import { useElectionCreateContext } from "../hooks/useElectionCreateContext";
 import { CheckHash } from "./CheckHash";
@@ -24,6 +25,11 @@ export function UploadElectionDefinition() {
   async function onFileChange(e: ChangeEvent<HTMLInputElement>) {
     const currentFile = e.target.files ? e.target.files[0] : undefined;
     if (currentFile !== undefined) {
+      if (currentFile.size > MAX_FILE_UPLOAD_SIZE_MB * 1024 * 1024) {
+        setError(fileTooLargeError(currentFile.name));
+        return;
+      }
+
       setFile(currentFile);
       const data = await currentFile.text();
       const response = await create({ election_data: data });
@@ -39,17 +45,7 @@ export function UploadElectionDefinition() {
       } else if (isError(response)) {
         // Response code 413 indicates that the file is too large
         if (response instanceof ApiError && response.code === 413) {
-          setError(
-            tx(
-              "election.invalid_election_definition.file_too_large",
-              {
-                file: () => <strong>{currentFile.name}</strong>,
-              },
-              {
-                max_size: response.message,
-              },
-            ),
-          );
+          setError(fileTooLargeError(currentFile.name));
         } else {
           setError(
             tx("election.invalid_election_definition.description", {

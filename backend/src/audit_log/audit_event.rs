@@ -78,9 +78,9 @@ pub struct CommitteeSessionDetails {
 #[serde(deny_unknown_fields)]
 pub struct FileDetails {
     pub file_id: u32,
-    pub file_data: Vec<u8>,
     pub file_name: String,
     pub file_mime_type: String,
+    pub file_size_bytes: u64,
 }
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, Eq, ToSchema)]

@@ -821,10 +821,10 @@ export interface ExtraInvestigation {
 }
 
 export interface FileDetails {
-  file_data: number[];
   file_id: number;
   file_mime_type: string;
   file_name: string;
+  file_size_bytes: number;
 }
 
 /**

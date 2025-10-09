@@ -17,12 +17,12 @@ pub struct File {
 }
 
 impl From<File> for FileDetails {
-    fn from(value: File) -> Self {
+    fn from(file: File) -> Self {
         Self {
-            file_id: value.id,
-            file_data: value.data,
-            file_name: value.name,
-            file_mime_type: value.mime_type,
+            file_id: file.id,
+            file_name: file.name,
+            file_mime_type: file.mime_type,
+            file_size_bytes: file.data.len() as u64,
         }
     }
 }

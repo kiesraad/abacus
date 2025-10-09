@@ -56,7 +56,7 @@ __Niveau:__ gebruikersdoel, zee, 🌊
 __Hoofdscenario:__  
 
 1. De coördinator GSB selecteert een stembureau en voert "Aanleiding van het onderzoek" (vrije tekst) in de applicatie in.
-2. De applicatie genereert een 'leeg' corrigendum, Na 14-1 versie 2 (DSO) of Bijlage 1 van Na 14-2 (CSO). ('leeg' == klaar om in te vullen: kandidatenlijst, oorspronkelijke tellingen, verzoek CSB (aanleiding))
+2. De applicatie genereert een 'leeg' corrigendum, Na 14-1 versie 2 (DSO) of Bijlage 1 van Na 14-2 (CSO). ('leeg' == klaar om in te vullen: kandidatenlijsten, oorspronkelijke tellingen, verzoek CSB (aanleiding))
 3. De coördinator GSB drukt het 'lege' corrigendum af.
 
 __Uitbreidingen:__  

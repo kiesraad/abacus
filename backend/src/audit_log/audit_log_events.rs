@@ -208,6 +208,14 @@ pub async fn list_all(conn: &mut SqliteConnection) -> Result<Vec<AuditLogEvent>,
     .map_err(APIError::from)
 }
 
+#[cfg(test)]
+pub async fn list_event_names(conn: &mut SqliteConnection) -> Result<Vec<String>, APIError> {
+    sqlx::query_scalar!(r#"SELECT event_name FROM audit_log ORDER BY ROWID ASC"#)
+        .fetch_all(conn)
+        .await
+        .map_err(APIError::from)
+}
+
 pub async fn list(
     conn: &mut SqliteConnection,
     filter: &LogFilter,

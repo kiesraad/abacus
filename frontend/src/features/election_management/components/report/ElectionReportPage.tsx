@@ -12,7 +12,7 @@ import { FormLayout } from "@/components/ui/Form/FormLayout";
 import { Icon } from "@/components/ui/Icon/Icon";
 import { useElection } from "@/hooks/election/useElection";
 import { useNumericParam } from "@/hooks/useNumericParam";
-import { t } from "@/i18n/translate";
+import { t, tx } from "@/i18n/translate";
 import {
   COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_BODY,
   COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_PATH,
@@ -48,6 +48,8 @@ export function ElectionReportPage() {
   if (committeeSession.status !== "data_entry_finished") {
     throw new ApplicationError(t("error.forbidden_message"), "InvalidCommitteeSessionStatus");
   }
+
+  const isFirstCommitteeSession = currentCommitteeSession.number === 1;
 
   if (changeStatusError) {
     throw changeStatusError;
@@ -117,19 +119,24 @@ export function ElectionReportPage() {
               <h3>{t("election_management.what_now")}?</h3>
               <p>{t("election_management.download_definitive_files")}</p>
               <section className="sm">
-                <p>{t("election_management.zip_file_explanation")}</p>
+                <p>
+                  {t(
+                    isFirstCommitteeSession
+                      ? "election_management.first_session.zip_file_explanation"
+                      : "election_management.next_session.zip_file_explanation",
+                  )}
+                </p>
                 <ol className={cls.list}>
-                  <li>
-                    <strong>{t("election_management.pdf_file")}</strong>{" "}
-                    {t("election_management.signed_during_the_committee_session")}
-                  </li>
-                  <li>
-                    <strong>{t("election_management.eml_file")}</strong>
-                  </li>
+                  {tx(
+                    isFirstCommitteeSession
+                      ? "election_management.first_session.documents"
+                      : "election_management.next_session.documents",
+                  )}
                 </ol>
                 <p>{t("election_management.upload_the_zip")}</p>
               </section>
             </section>
+
             <FormLayout.Controls>
               <Button.Link to="../..">{t("back_to_overview")}</Button.Link>
               {currentCommitteeSession.id === committeeSession.id && (

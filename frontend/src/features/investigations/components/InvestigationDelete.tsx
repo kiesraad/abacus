@@ -30,8 +30,9 @@ export function InvestigationDelete({ pollingStation, onDeleted }: Investigation
   function handleDelete() {
     void remove().then((result) => {
       if (isSuccess(result)) {
-        void refetch();
-        onDeleted(pollingStation);
+        void refetch().then(() => {
+          onDeleted(pollingStation);
+        });
       }
     });
   }

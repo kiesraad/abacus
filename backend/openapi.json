@@ -4671,6 +4671,11 @@
             "format": "int32",
             "minimum": 0
           },
+          "overview_pdf": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
           "results_eml": {
             "type": "integer",
             "format": "int32",
@@ -4721,6 +4726,11 @@
             "minimum": 0
           },
           "session_number_of_voters": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "session_overview_pdf": {
             "type": "integer",
             "format": "int32",
             "minimum": 0
@@ -5643,19 +5653,11 @@
         "type": "object",
         "required": [
           "file_id",
-          "file_data",
           "file_name",
-          "file_mime_type"
+          "file_mime_type",
+          "file_size_bytes"
         ],
         "properties": {
-          "file_data": {
-            "type": "array",
-            "items": {
-              "type": "integer",
-              "format": "int32",
-              "minimum": 0
-            }
-          },
           "file_id": {
             "type": "integer",
             "format": "int32",
@@ -5666,6 +5668,11 @@
           },
           "file_name": {
             "type": "string"
+          },
+          "file_size_bytes": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 0
           }
         },
         "additionalProperties": false

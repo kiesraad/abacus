@@ -172,6 +172,7 @@ fn load_sources() -> Vec<Source> {
         include_source!("model-na-14-2-bijlage1.typ"),
         include_source!("model-na-31-2.typ"),
         include_source!("model-na-31-2-bijlage1.typ"),
+        include_source!("model-p-2a.typ"),
     ]
 }
 

@@ -25,7 +25,7 @@ test.describe("election results zip", () => {
       `/api/elections/${completedElection.id}/committee_sessions/${currentCommitteeSession.id}/download_zip_results`,
     );
     const downloadPromise = page.waitForEvent("download");
-    await electionReportPage.downloadZip.click();
+    await electionReportPage.downloadFirstSessionZip.click();
 
     const response = await responsePromise;
     expect(response.status()).toBe(200);

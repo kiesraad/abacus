@@ -72,15 +72,18 @@ pub struct CommitteeSessionDetails {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[schema(nullable = false)]
     pub session_results_pdf: Option<u32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[schema(nullable = false)]
+    pub session_overview_pdf: Option<u32>,
 }
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, Eq, ToSchema)]
 #[serde(deny_unknown_fields)]
 pub struct FileDetails {
     pub file_id: u32,
-    pub file_data: Vec<u8>,
     pub file_name: String,
     pub file_mime_type: String,
+    pub file_size_bytes: u64,
 }
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, Eq, ToSchema)]

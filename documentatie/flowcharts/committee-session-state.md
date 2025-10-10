@@ -3,21 +3,22 @@
 This document describes the states a committee session can have.
 The transition labels describe the action that is used for performing the transition.
 
-N.B.: in case of a next committee session, "polling station" is replaced by "investigation" and adding findings to an investigation is part of data entry.
+The label "PS/Inv" on several transitions indicates a "polling station" for the first
+committee session, and an "investigation" in any subsequent committee session.
 
 ```mermaid
 stateDiagram-v2
   [*] --> Created
-  Created --> DataEntryNotStarted: add <br/> polling station
+  Created --> DataEntryNotStarted: add <br/> PS/Inv
   DataEntryNotStarted --> DataEntryInProgress: click start <br/> data entry
-  DataEntryNotStarted --> Created: delete last <br/> polling station
-  DataEntryInProgress --> Created: delete last <br/> polling station*
+  DataEntryNotStarted --> Created: delete last <br/> PS/Inv
+  DataEntryInProgress --> Created: delete last <br/> PS/Inv*
   DataEntryInProgress --> DataEntryFinished: click finish <br/> data entry
   DataEntryInProgress --> DataEntryPaused: click pause <br/> data entry
   DataEntryPaused --> DataEntryInProgress: click resume <br/> data entry
-  DataEntryPaused --> Created: delete last <br/> polling station*
+  DataEntryPaused --> Created: delete last <br/> PS/Inv*
   DataEntryPaused --> DataEntryFinished: click finish <br/> data entry
-  DataEntryFinished --> DataEntryInProgress: add new <br/> polling station
+  DataEntryFinished --> DataEntryInProgress: add new <br/> PS/Inv
   DataEntryFinished --> DataEntryInProgress: click resume <br/> data entry/update Inv
   DataEntryFinished --> DataEntryInProgress: delete polling <br/> station result/delete Inv
   DataEntryFinished --> Created: delete last <br/>PS/Inv
@@ -25,5 +26,6 @@ stateDiagram-v2
 ```
 
 *currently it's only possible to delete polling stations that do not have a data entry,
-deleting data entries and results needs to be implemented (see https://github.com/kiesraad/abacus-internal/issues/296)
+deleting data entries and results needs to be implemented
+([#1812](https://github.com/kiesraad/abacus/issues/1812))
 after which the polling station can be deleted

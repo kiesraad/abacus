@@ -4,11 +4,14 @@ mod model_na_14_2;
 
 mod model_na_31_2;
 
+mod model_p_2a;
+
 use std::{error::Error, path::PathBuf};
 
 pub use model_n_10_2::*;
 pub use model_na_14_2::*;
 pub use model_na_31_2::*;
+pub use model_p_2a::*;
 
 pub trait ToPdfFileModel {
     fn to_pdf_file_model(self, file_name: String) -> PdfFileModel;
@@ -32,6 +35,7 @@ pub enum PdfModel {
     ModelNa31_2(Box<ModelNa31_2Input>),
     ModelNa31_2Bijlage1(Box<ModelNa31_2Bijlage1Input>),
     ModelN10_2(Box<ModelN10_2Input>),
+    ModelP2a(Box<ModelP2aInput>),
 }
 
 impl PdfModel {
@@ -43,6 +47,7 @@ impl PdfModel {
             Self::ModelNa31_2(_) => "model-na-31-2",
             Self::ModelNa31_2Bijlage1(_) => "model-na-31-2-bijlage1",
             Self::ModelN10_2(_) => "model-n-10-2",
+            Self::ModelP2a(_) => "model-p-2a",
         }
     }
 
@@ -70,6 +75,7 @@ impl PdfModel {
             Self::ModelNa31_2(input) => serde_json::to_string(input),
             Self::ModelNa31_2Bijlage1(input) => serde_json::to_string(input),
             Self::ModelN10_2(input) => serde_json::to_string(input),
+            Self::ModelP2a(input) => serde_json::to_string(input),
         }?;
 
         Ok(data)
@@ -84,6 +90,7 @@ impl PdfModel {
             "model-na-31-2" => Ok(Self::ModelNa31_2(serde_json::from_str(input)?)),
             "model-na-31-2-bijlage1" => Ok(Self::ModelNa31_2Bijlage1(serde_json::from_str(input)?)),
             "model-n-10-2" => Ok(Self::ModelN10_2(serde_json::from_str(input)?)),
+            "model-p-2a" => Ok(Self::ModelP2a(serde_json::from_str(input)?)),
             _ => Err(Error::new(ErrorKind::InvalidInput, "Unknown model").into()),
         }
     }

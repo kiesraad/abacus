@@ -102,7 +102,7 @@ where
     S: Clone + Send + Sync + 'static,
 {
     router
-        .layer(SetResponseHeaderLayer::overriding(
+        .layer(SetResponseHeaderLayer::if_not_present(
             header::X_FRAME_OPTIONS,
             HeaderValue::from_static("deny"),
         ))
@@ -219,10 +219,14 @@ pub fn router(
 
     #[cfg(feature = "storybook")]
     let router = router.nest(
-        "/storybook",
+        "/storybook/",
         memory_serve::MemoryServe::new(memory_serve::load_assets!("../frontend/dist-storybook"))
             .index_file(Some("/index.html"))
-            .into_router(),
+            .into_router()
+            .layer(SetResponseHeaderLayer::overriding(
+                header::X_FRAME_OPTIONS,
+                HeaderValue::from_static("sameorigin"),
+            )),
     );
 
     // Add headers for security hardening
@@ -423,8 +427,9 @@ mod test {
             #[cfg(feature = "storybook")]
             {
                 // Test that /storybook path doesn't have CSP header
-                let storybook_response =
-                    reqwest::get(format!("{base_url}/storybook")).await.unwrap();
+                let storybook_response = reqwest::get(format!("{base_url}/storybook/"))
+                    .await
+                    .unwrap();
                 assert!(
                     !storybook_response
                         .headers()

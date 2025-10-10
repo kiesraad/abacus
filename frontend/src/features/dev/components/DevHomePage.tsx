@@ -145,7 +145,7 @@ function DevLinks() {
         </li>
         {__INCLUDE_STORYBOOK_LINK__ && (
           <li>
-            <a href="/storybook" target="_blank" rel="noopener noreferrer">
+            <a href="/storybook/" target="_blank" rel="noopener noreferrer">
               Storybook
             </a>
           </li>

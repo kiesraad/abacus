@@ -95,6 +95,39 @@ pub fn openapi_router() -> OpenApiRouter<AppState> {
     router
 }
 
+/// Apply security headers to a router according to best practices
+/// from the OWASP Secure Headers Project, https://owasp.org/www-project-secure-headers/
+fn apply_security_headers<S>(router: Router<S>) -> Router<S>
+where
+    S: Clone + Send + Sync + 'static,
+{
+    router
+        .layer(SetResponseHeaderLayer::overriding(
+            header::X_FRAME_OPTIONS,
+            HeaderValue::from_static("deny"),
+        ))
+        .layer(SetResponseHeaderLayer::overriding(
+            header::X_CONTENT_TYPE_OPTIONS,
+            HeaderValue::from_static("nosniff"),
+        ))
+        .layer(SetResponseHeaderLayer::overriding(
+            HeaderName::from_static("x-permitted-cross-domain-policies"),
+            HeaderValue::from_static("none"),
+        ))
+        .layer(SetResponseHeaderLayer::overriding(
+            HeaderName::from_static("cross-origin-resource-policy"),
+            HeaderValue::from_static("same-origin"),
+        ))
+        .layer(SetResponseHeaderLayer::overriding(
+            HeaderName::from_static("cross-origin-embedder-policy"),
+            HeaderValue::from_static("require-corp"),
+        ))
+        .layer(SetResponseHeaderLayer::overriding(
+            HeaderName::from_static("cross-origin-opener-policy"),
+            HeaderValue::from_static("same-origin"),
+        ))
+}
+
 /// Axum router for the application
 pub fn router(
     pool: SqlitePool,
@@ -158,8 +191,10 @@ pub fn router(
             .fallback(Some("/index.html"))
             .fallback_status(StatusCode::OK)
             .into_router()
-            // Add Referrer-Policy and Permissions-Policy headers,
-            // these are only needed on HTML documents (not API requests)
+            // Add Referrer-Policy, Permissions-Policy and Content-Security-Policy headers.
+            // These are only needed on HTML documents, not API requests.
+            // From https://cheatsheetseries.owasp.org/cheatsheets/REST_Security_Cheat_Sheet.html#security-headers:
+            // "The headers below are only intended to provide additional security when responses are rendered as HTML."
             .layer(SetResponseHeaderLayer::overriding(
                 header::REFERRER_POLICY,
                 HeaderValue::from_static("no-referrer"),
@@ -175,41 +210,23 @@ pub fn router(
                      xr-spatial-tracking=(), clipboard-read=(), clipboard-write=(), gamepad=(), \
                      hid=(), idle-detection=(), interest-cohort=(), serial=(), unload=()",
                 ),
+            ))
+            .layer(SetResponseHeaderLayer::overriding(
+                header::CONTENT_SECURITY_POLICY,
+                HeaderValue::from_static("default-src 'self'; img-src 'self' data:"),
             )),
     );
 
+    #[cfg(feature = "storybook")]
+    let router = router.nest(
+        "/storybook",
+        memory_serve::MemoryServe::new(memory_serve::load_assets!("../frontend/dist-storybook"))
+            .index_file(Some("/index.html"))
+            .into_router(),
+    );
+
     // Add headers for security hardening
-    // Best practices according to the OWASP Secure Headers Project, https://owasp.org/www-project-secure-headers/
-    let security_headers_service = tower::ServiceBuilder::new()
-        .layer(SetResponseHeaderLayer::overriding(
-            header::X_FRAME_OPTIONS,
-            HeaderValue::from_static("deny"),
-        ))
-        .layer(SetResponseHeaderLayer::overriding(
-            header::X_CONTENT_TYPE_OPTIONS,
-            HeaderValue::from_static("nosniff"),
-        ))
-        .layer(SetResponseHeaderLayer::overriding(
-            header::CONTENT_SECURITY_POLICY,
-            HeaderValue::from_static("default-src 'self'; img-src 'self' data:"),
-        ))
-        .layer(SetResponseHeaderLayer::overriding(
-            HeaderName::from_static("x-permitted-cross-domain-policies"),
-            HeaderValue::from_static("none"),
-        ))
-        .layer(SetResponseHeaderLayer::overriding(
-            HeaderName::from_static("cross-origin-resource-policy"),
-            HeaderValue::from_static("same-origin"),
-        ))
-        .layer(SetResponseHeaderLayer::overriding(
-            HeaderName::from_static("cross-origin-embedder-policy"),
-            HeaderValue::from_static("require-corp"),
-        ))
-        .layer(SetResponseHeaderLayer::overriding(
-            HeaderName::from_static("cross-origin-opener-policy"),
-            HeaderValue::from_static("same-origin"),
-        ));
-    let router = router.layer(security_headers_service);
+    let router = apply_security_headers(router);
 
     // Add the state to the app
     let router = router.with_state(state);
@@ -367,10 +384,6 @@ mod test {
             assert_eq!(response.headers()["x-frame-options"], "deny");
             assert_eq!(response.headers()["x-content-type-options"], "nosniff");
             assert_eq!(
-                response.headers()["content-security-policy"],
-                "default-src 'self'; img-src 'self' data:"
-            );
-            assert_eq!(
                 response.headers()["x-permitted-cross-domain-policies"],
                 "none"
             );
@@ -400,6 +413,22 @@ mod test {
                         screen-wake-lock=(), sync-xhr=(self), usb=(), web-share=(), \
                         xr-spatial-tracking=(), clipboard-read=(), clipboard-write=(), gamepad=(), \
                         hid=(), idle-detection=(), interest-cohort=(), serial=(), unload=()"
+                );
+                assert_eq!(
+                    response.headers()["content-security-policy"],
+                    "default-src 'self'; img-src 'self' data:"
+                );
+            }
+
+            #[cfg(feature = "storybook")]
+            {
+                // Test that /storybook path doesn't have CSP header
+                let storybook_response =
+                    reqwest::get(format!("{base_url}/storybook")).await.unwrap();
+                assert!(
+                    !storybook_response
+                        .headers()
+                        .contains_key("content-security-policy")
                 );
             }
         })

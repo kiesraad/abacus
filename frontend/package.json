@@ -28,7 +28,7 @@
     "check-server": "vite-node scripts/check_server.js",
     "serve": "npm run build:msw && npx serve dist",
     "storybook": "storybook dev -p 6006",
-    "build:storybook": "storybook build -o dist/storybook"
+    "build:storybook": "storybook build -o dist-storybook"
   },
   "dependencies": {
     "browserslist": "^4.26.3",

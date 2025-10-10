@@ -1,7 +1,7 @@
 import { FormEvent, useState } from "react";
 import { useNavigate } from "react-router";
 
-import { AnyApiError, ApiError, ApiResult, isError, isSuccess } from "@/api/ApiResult";
+import { AnyApiError, ApiError, ApiResult, isSuccess } from "@/api/ApiResult";
 import { useCrud } from "@/api/useCrud";
 import { Alert } from "@/components/ui/Alert/Alert";
 import { Button } from "@/components/ui/Button/Button";
@@ -32,10 +32,12 @@ export function InvestigationFindings({ pollingStationId }: InvestigationFinding
   const { hasMessages } = useMessages();
   const { election, investigation, pollingStation, refetch } = useElection(pollingStationId);
   const { pushMessage } = useMessages();
+  const updatePath = `/api/polling_stations/${pollingStationId}/investigation`;
   const concludePath = `/api/polling_stations/${pollingStationId}/investigation/conclude`;
-  const { create: conclude } = useCrud<PollingStationInvestigation>({ create: concludePath });
-  const path = `/api/polling_stations/${pollingStationId}/investigation`;
-  const { update } = useCrud<PollingStationInvestigation>({ update: path });
+  const { update, create: conclude } = useCrud<PollingStationInvestigation>({
+    updatePath,
+    createPath: concludePath,
+  });
 
   const [nonEmptyError, setNonEmptyError] = useState(false);
   const [radioError, setRadioError] = useState(false);
@@ -119,7 +121,7 @@ export function InvestigationFindings({ pollingStationId }: InvestigationFinding
 
       await refetch();
       await navigate(`/elections/${election.id}/investigations`);
-    } else if (isError(response)) {
+    } else {
       if (response instanceof ApiError && response.reference === "InvestigationHasDataEntryOrResult") {
         setShowDataEntryWarning(true);
       } else {

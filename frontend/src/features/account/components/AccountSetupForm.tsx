@@ -22,8 +22,8 @@ export function AccountSetupForm({ user, onSaved }: AccountSetupFormProps) {
   const [showLoginSuccess, setShowLoginSuccess] = useState(true);
   const [validationErrors, setValidationErrors] = useState<UserValidationErrors | null>(null);
 
-  const url: ACCOUNT_UPDATE_REQUEST_PATH = "/api/account";
-  const { update, requestState } = useCrud<LoginResponse>(url);
+  const updatePath: ACCOUNT_UPDATE_REQUEST_PATH = "/api/account";
+  const { update, isLoading } = useCrud<LoginResponse>({ updatePath });
   const [apiError, setApiError] = useState<AnyApiError | null>(null);
 
   function hideLoginSuccess() {
@@ -54,14 +54,12 @@ export function AccountSetupForm({ user, onSaved }: AccountSetupFormProps) {
     void update(account).then((result) => {
       if (isSuccess(result)) {
         onSaved(result.data);
+      } else if (result instanceof ApiError && result.reference === "PasswordRejection") {
+        setValidationErrors({
+          password: t("account.password_rules"),
+        });
       } else {
-        if (result instanceof ApiError && result.reference === "PasswordRejection") {
-          setValidationErrors({
-            password: t("account.password_rules"),
-          });
-        } else {
-          setApiError(result);
-        }
+        setApiError(result);
       }
     });
   }
@@ -92,7 +90,7 @@ export function AccountSetupForm({ user, onSaved }: AccountSetupFormProps) {
         </FormLayout.Alert>
       )}
       <Form title={t("account.personalize_account")} onSubmit={handleSubmit}>
-        <FormLayout disabled={requestState.status === "loading"}>
+        <FormLayout disabled={isLoading}>
           <FormLayout.Section>
             <InputField
               name="username"

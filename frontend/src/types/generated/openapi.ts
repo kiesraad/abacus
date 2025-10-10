@@ -104,9 +104,10 @@ export type POLLING_STATION_IMPORT_REQUEST_PATH = `/api/elections/${number}/poll
 export type POLLING_STATION_IMPORT_REQUEST_BODY = PollingStationsRequest;
 
 // /api/elections/{election_id}/polling_stations/validate-import
-export type POLLING_STATION_VALIDATE_IMPORT_REQUEST_PARAMS = Record<string, never>;
-export type POLLING_STATION_VALIDATE_IMPORT_REQUEST_PATH =
-  `/api/elections/{election_id}/polling_stations/validate-import`;
+export interface POLLING_STATION_VALIDATE_IMPORT_REQUEST_PARAMS {
+  election_id: number;
+}
+export type POLLING_STATION_VALIDATE_IMPORT_REQUEST_PATH = `/api/elections/${number}/polling_stations/validate-import`;
 export type POLLING_STATION_VALIDATE_IMPORT_REQUEST_BODY = PollingStationFileRequest;
 
 // /api/elections/{election_id}/polling_stations/{polling_station_id}

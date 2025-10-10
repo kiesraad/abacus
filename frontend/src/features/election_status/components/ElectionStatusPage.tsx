@@ -2,8 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 
 import { DEFAULT_CANCEL_REASON } from "@/api/ApiClient";
-import { AnyApiError, isSuccess } from "@/api/ApiResult";
-import { useApiClient } from "@/api/useApiClient";
+import { useCrud } from "@/api/useCrud";
 import { HeaderCommitteeSessionStatusWithIcon } from "@/components/committee_session/CommitteeSessionStatus";
 import { Footer } from "@/components/footer/Footer";
 import { Messages } from "@/components/messages/Messages";
@@ -25,17 +24,13 @@ import { committeeSessionLabel } from "@/utils/committeeSession";
 import { ElectionStatus } from "./ElectionStatus";
 
 export function ElectionStatusPage() {
-  const client = useApiClient();
   const navigate = useNavigate();
   const { currentCommitteeSession, election, pollingStations, refetch: refetchElection } = useElection();
   const { statuses, refetch: refetchStatuses } = useElectionStatus();
   const { isCoordinator } = useUserRole();
   const [showPauseModal, setShowPauseModal] = useState(false);
-  const [changeStatusError, setChangeStatusError] = useState<AnyApiError | null>(null);
-
-  if (changeStatusError) {
-    throw changeStatusError;
-  }
+  const updatePath: COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_PATH = `/api/committee_sessions/${currentCommitteeSession.id}/status`;
+  const { update } = useCrud({ updatePath, throwAllErrors: true });
 
   // re-fetch election and status when component mounts and every 30 seconds
   useEffect(() => {
@@ -64,18 +59,10 @@ export function ElectionStatusPage() {
   }
 
   function handleStatusChange(status: CommitteeSessionStatus) {
-    const url: COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_PATH = `/api/committee_sessions/${currentCommitteeSession.id}/status`;
     const body: COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_BODY = { status: status };
-    void client
-      .putRequest(url, body)
-      .then(async (result) => {
-        if (isSuccess(result)) {
-          await refetchElection();
-        } else {
-          throw result;
-        }
-      })
-      .catch(setChangeStatusError);
+    void update(body).then(() => {
+      void refetchElection();
+    });
   }
 
   function getLink() {

@@ -1,7 +1,7 @@
 import { useState } from "react";
 
-import { ApiRequestState, ApiRequestStateWithoutFatalErrors, isFatalRequestState } from "./ApiRequestState";
-import { ApiResult } from "./ApiResult";
+import { ApiRequestState, isFatalRequestState } from "./ApiRequestState";
+import { AnyApiError, ApiResult } from "./ApiResult";
 import { useApiClient } from "./useApiClient";
 import { handleApiResult } from "./useInitialApiGet";
 
@@ -10,86 +10,71 @@ export type ApiRequestIdleState = {
 };
 
 export interface UseCrudReturn<T> {
-  get: (controller?: AbortController) => Promise<ApiResult<T>>;
   create: (requestBody: object, controller?: AbortController) => Promise<ApiResult<T>>;
   update: (requestBody: object, controller?: AbortController) => Promise<ApiResult<T>>;
   remove: (controller?: AbortController) => Promise<ApiResult<T>>;
-  requestState: ApiRequestIdleState | ApiRequestStateWithoutFatalErrors<T>;
+  isLoading: boolean;
+  error: AnyApiError | null;
 }
 
-export type ApiPaths =
-  | string
-  | {
-      get?: string;
-      create?: string;
-      update?: string;
-      remove?: string;
-    };
+export type UseCrudOptions = {
+  createPath?: string;
+  updatePath?: string;
+  removePath?: string;
+  throwAllErrors?: boolean;
+};
 
 // Call the api and return the current status of the request, optionally throws an error when the request fails
-export function useCrud<Response>(path: ApiPaths): UseCrudReturn<Response> {
+export function useCrud<Response>({ throwAllErrors = false, ...paths }: UseCrudOptions): UseCrudReturn<Response> {
   const client = useApiClient();
   const [requestState, setRequestState] = useState<ApiRequestIdleState | ApiRequestState<Response>>({ status: "idle" });
-  const paths = typeof path === "string" ? { get: path, create: path, update: path, remove: path } : path;
 
-  // throw fatal errors
-  if ("error" in requestState && isFatalRequestState(requestState)) {
+  // throw fatal errors, and optionally all errors
+  if ("error" in requestState && (throwAllErrors || isFatalRequestState(requestState))) {
     throw requestState.error;
   }
 
-  // Get a resource
-  const get = async (controller?: AbortController) => {
-    if (!paths.get) {
-      throw new Error("No get path provided for get request");
-    }
-
-    setRequestState({ status: "loading" });
-    const result = await client.getRequest<Response>(paths.get, controller);
-
-    return handleApiResult(result, setRequestState, controller);
-  };
-
   // Create a new resource
   const create = async (requestBody: object, controller?: AbortController) => {
-    if (!paths.create) {
-      throw new Error("No get path provided for create request");
+    if (!paths.createPath) {
+      throw new Error("No create path provided for create request");
     }
 
     setRequestState({ status: "loading" });
-    const result = await client.postRequest<Response>(paths.create, requestBody, controller);
+    const result = await client.postRequest<Response>(paths.createPath, requestBody, controller);
 
     return handleApiResult(result, setRequestState, controller);
   };
 
   // Update an existing resource
   const update = async (requestBody: object, controller?: AbortController) => {
-    if (!paths.update) {
-      throw new Error("No get path provided for update request");
+    if (!paths.updatePath) {
+      throw new Error("No update path provided for update request");
     }
 
     setRequestState({ status: "loading" });
-    const result = await client.putRequest<Response>(paths.update, requestBody, controller);
+    const result = await client.putRequest<Response>(paths.updatePath, requestBody, controller);
 
     return handleApiResult(result, setRequestState, controller);
   };
 
   // Remove an existing resource
   const remove = async (controller?: AbortController) => {
-    if (!paths.remove) {
-      throw new Error("No get path provided for remove request");
+    if (!paths.removePath) {
+      throw new Error("No remove path provided for remove request");
     }
 
     setRequestState({ status: "loading" });
-    const result = await client.deleteRequest<Response>(paths.remove, controller);
+    const result = await client.deleteRequest<Response>(paths.removePath, controller);
 
     return handleApiResult(result, setRequestState, controller);
   };
 
   return {
-    get,
     create,
     update,
     remove,
-    requestState,
+    isLoading: requestState.status === "loading",
+    error: "error" in requestState ? requestState.error : null,
   };
 }

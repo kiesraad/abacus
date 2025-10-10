@@ -24,28 +24,23 @@ export function InvestigationsOverviewPage() {
   const { investigations, currentInvestigations, handledInvestigations } = useInvestigations();
   const { isCoordinator } = useUserRole();
   const navigate = useNavigate();
-  const url: COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_PATH = `/api/committee_sessions/${currentCommitteeSession.id}/status`;
-  const { update, requestState } = useCrud({ update: url });
+  const updatePath: COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_PATH = `/api/committee_sessions/${currentCommitteeSession.id}/status`;
+  const { update, isLoading } = useCrud({ updatePath, throwAllErrors: true });
+  const allInvestigationsHandled = investigations.length > 0 && investigations.length === handledInvestigations.length;
 
-  if (requestState.status === "api-error") {
-    throw requestState.error;
+  function finishDataEntry() {
+    const body: COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_BODY = { status: "data_entry_finished" };
+    void update(body).then((result) => {
+      if (isSuccess(result)) {
+        void navigate("../");
+      }
+    });
   }
 
   // Only allow access to the page if the current committee session is a second session
   if (currentCommitteeSession.number < 2) {
     throw new NotFoundError();
   }
-
-  const finishDataEntry = async () => {
-    const body: COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_BODY = { status: "data_entry_finished" };
-    const result = await update(body);
-
-    if (isSuccess(result)) {
-      void navigate("../");
-    }
-  };
-
-  const allInvestigationsHandled = investigations.length > 0 && investigations.length === handledInvestigations.length;
 
   return (
     <>
@@ -68,9 +63,9 @@ export function InvestigationsOverviewPage() {
             variant="primary"
             size="sm"
             onClick={() => {
-              void finishDataEntry();
+              finishDataEntry();
             }}
-            disabled={requestState.status === "loading"}
+            disabled={isLoading}
           >
             {t("election.title.finish_data_entry")}
           </Button>

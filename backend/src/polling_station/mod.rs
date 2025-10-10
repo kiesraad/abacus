@@ -318,6 +318,9 @@ pub struct PollingStationRequestListResponse {
         (status = 403, description = "Forbidden", body = ErrorResponse),
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
+    params(
+        ("election_id" = u32, description = "Election database id"),
+    ),
 )]
 async fn polling_station_validate_import(
     _user: AdminOrCoordinator,

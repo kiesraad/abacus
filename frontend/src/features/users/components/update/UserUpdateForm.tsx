@@ -1,6 +1,6 @@
 import { FormEvent, useState } from "react";
 
-import { AnyApiError, ApiError, isSuccess } from "@/api/ApiResult";
+import { ApiError, isSuccess } from "@/api/ApiResult";
 import { useCrud } from "@/api/useCrud";
 import { IconEdit } from "@/components/generated/icons";
 import { Alert } from "@/components/ui/Alert/Alert";
@@ -9,7 +9,7 @@ import { Form } from "@/components/ui/Form/Form";
 import { FormLayout } from "@/components/ui/Form/FormLayout";
 import { InputField } from "@/components/ui/InputField/InputField";
 import { t } from "@/i18n/translate";
-import { UpdateUserRequest, User, USER_UPDATE_REQUEST_PATH } from "@/types/generated/openapi";
+import { ErrorReference, UpdateUserRequest, User, USER_UPDATE_REQUEST_PATH } from "@/types/generated/openapi";
 import { StringFormData } from "@/utils/stringFormData";
 
 export interface UserUpdateFormProps {
@@ -23,12 +23,9 @@ type ValidationErrors = Partial<UpdateUserRequest>;
 export function UserUpdateForm({ user, onSaved, onAbort }: UserUpdateFormProps) {
   const [editPassword, setEditPassword] = useState(false);
   const [validationErrors, setValidationErrors] = useState<ValidationErrors>();
-  const { update, requestState } = useCrud<User>(`/api/user/${user.id}` satisfies USER_UPDATE_REQUEST_PATH);
-  const [error, setError] = useState<AnyApiError>();
-
-  if (error && !(error instanceof ApiError)) {
-    throw error;
-  }
+  const updatePath: USER_UPDATE_REQUEST_PATH = `/api/user/${user.id}`;
+  const { update, isLoading } = useCrud<User>({ updatePath });
+  const [error, setError] = useState<ErrorReference | null>(null);
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -60,27 +57,25 @@ export function UserUpdateForm({ user, onSaved, onAbort }: UserUpdateFormProps) 
           onSaved(result.data);
         } else if (result instanceof ApiError && result.reference === "PasswordRejection") {
           setValidationErrors({ temp_password: t("error.api_error.PasswordRejection") });
-        } else {
-          setError(result);
+        } else if (result instanceof ApiError) {
+          setError(result.reference);
         }
       });
     }
   }
-
-  const saving = requestState.status === "loading";
 
   return (
     <>
       {error && (
         <FormLayout.Alert>
           <Alert type="error">
-            <strong className="heading-md">{t(`error.api_error.${error.reference}`)}</strong>
+            <strong className="heading-md">{t(`error.api_error.${error}`)}</strong>
           </Alert>
         </FormLayout.Alert>
       )}
 
       <Form title={t("users.details_title")} onSubmit={handleSubmit}>
-        <FormLayout disabled={saving}>
+        <FormLayout disabled={isLoading}>
           <FormLayout.Section>
             <InputField
               id="username"

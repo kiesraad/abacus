@@ -2,7 +2,7 @@ import { FormEvent, useState } from "react";
 import { useLocation, useNavigate } from "react-router";
 
 import { AnyApiError, ApiError, isSuccess } from "@/api/ApiResult";
-import { useApiClient } from "@/api/useApiClient";
+import { useCrud } from "@/api/useCrud";
 import { Footer } from "@/components/footer/Footer";
 import { Alert } from "@/components/ui/Alert/Alert";
 import { Button } from "@/components/ui/Button/Button";
@@ -24,7 +24,6 @@ type ValidationErrors = {
 };
 
 export function CommitteeSessionDetailsPage() {
-  const client = useApiClient();
   const location = useLocation();
   const navigate = useNavigate();
   const { currentCommitteeSession, election, refetch } = useElection();
@@ -33,6 +32,9 @@ export function CommitteeSessionDetailsPage() {
   const [errorAlert, setErrorAlert] = useState<string | null>(null);
   const redirectToReportPage = location.hash === "#redirect-to-report";
   const sessionLabel = committeeSessionLabel(currentCommitteeSession.number, true).toLowerCase();
+  const updatePath: COMMITTEE_SESSION_UPDATE_REQUEST_PATH = `/api/committee_sessions/${currentCommitteeSession.id}`;
+  const { update } = useCrud({ updatePath });
+
   const defaultDate = currentCommitteeSession.start_date_time
     ? new Date(currentCommitteeSession.start_date_time).toLocaleDateString(t("date_locale"), {
         day: "2-digit",
@@ -72,24 +74,21 @@ export function CommitteeSessionDetailsPage() {
       start_time,
     };
 
-    const path: COMMITTEE_SESSION_UPDATE_REQUEST_PATH = `/api/committee_sessions/${currentCommitteeSession.id}`;
-    client
-      .putRequest(path, details)
-      .then(async (result) => {
-        if (isSuccess(result)) {
-          if (redirectToReportPage) {
-            await refetch();
+    void update(details).then((result) => {
+      if (isSuccess(result)) {
+        if (redirectToReportPage) {
+          void refetch().then(() => {
             void navigate(`/elections/${election.id}/report/committee-session/${currentCommitteeSession.id}/download`);
-          } else {
-            void navigate("..");
-          }
-        } else if (result instanceof ApiError && result.reference === "InvalidData") {
-          setErrorAlert(t(`error.api_error.${result.reference}`));
+          });
         } else {
-          throw result;
+          void navigate("..");
         }
-      })
-      .catch(setSubmitError);
+      } else if (result instanceof ApiError && result.reference === "InvalidData") {
+        setErrorAlert(t(`error.api_error.${result.reference}`));
+      } else {
+        setSubmitError(result);
+      }
+    });
   }
 
   function validate(location: string, start_date: string, start_time: string) {

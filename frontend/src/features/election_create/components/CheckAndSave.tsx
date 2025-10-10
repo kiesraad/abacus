@@ -1,6 +1,6 @@
 import { Navigate, useNavigate } from "react-router";
 
-import { isError, isSuccess } from "@/api/ApiResult";
+import { isSuccess } from "@/api/ApiResult";
 import { useCrud } from "@/api/useCrud";
 import { Button } from "@/components/ui/Button/Button";
 import { t } from "@/i18n/translate";
@@ -12,16 +12,11 @@ import { useElectionCreateContext } from "../hooks/useElectionCreateContext";
 export function CheckAndSave() {
   const navigate = useNavigate();
   const { state } = useElectionCreateContext();
-  const path: ELECTION_IMPORT_REQUEST_PATH = `/api/elections/import`;
-  const { create } = useCrud<ElectionAndCandidatesDefinitionImportRequest>({ create: path });
+  const createPath: ELECTION_IMPORT_REQUEST_PATH = `/api/elections/import`;
+  const { create } = useCrud<ElectionAndCandidatesDefinitionImportRequest>({ createPath, throwAllErrors: true });
 
-  // if no election, election data, candidate data or counting method is found in the state, go back to the beginning
-  if (!state.election || !state.electionDefinitionData || !state.candidateDefinitionData || !state.countingMethod) {
-    return <Navigate to="/elections/create" />;
-  }
-
-  async function handleSubmit() {
-    const response = await create({
+  function handleSubmit() {
+    void create({
       election_data: state.electionDefinitionData,
       election_hash: state.electionDefinitionHash,
       candidate_data: state.candidateDefinitionData,
@@ -30,14 +25,16 @@ export function CheckAndSave() {
       polling_station_file_name: state.pollingStationDefinitionFileName,
       counting_method: state.countingMethod,
       number_of_voters: state.numberOfVoters,
+    }).then((result) => {
+      if (isSuccess(result)) {
+        void navigate("/elections", { state: { success: true } });
+      }
     });
+  }
 
-    if (isSuccess(response)) {
-      // set navigation state to prevent blocking
-      await navigate("/elections", { state: { success: true } });
-    } else if (isError(response)) {
-      throw new Error();
-    }
+  // if no election, election data, candidate data or counting method is found in the state, go back to the beginning
+  if (!state.election || !state.electionDefinitionData || !state.candidateDefinitionData || !state.countingMethod) {
+    return <Navigate to="/elections/create" />;
   }
 
   return (
@@ -65,7 +62,13 @@ export function CheckAndSave() {
         </li>
       </ul>
       <div className="mt-xl">
-        <Button onClick={() => void handleSubmit()}>{t("save")}</Button>
+        <Button
+          onClick={() => {
+            handleSubmit();
+          }}
+        >
+          {t("save")}
+        </Button>
       </div>
     </section>
   );

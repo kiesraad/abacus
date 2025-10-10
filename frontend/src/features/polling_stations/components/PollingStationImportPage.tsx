@@ -19,8 +19,10 @@ import {
   PollingStationRequestListResponse,
 } from "@/types/generated/openapi";
 
+import { PollingStationAlert } from "./PollingStationAlert";
+
 export function PollingStationImportPage() {
-  const { currentCommitteeSession, election } = useElection();
+  const { election } = useElection();
   const { pushMessage } = useMessages();
   const navigate = useNavigate();
 
@@ -156,12 +158,7 @@ export function PollingStationImportPage() {
           <h1>{t("polling_station.import")}</h1>
         </section>
       </header>
-      {currentCommitteeSession.status === "data_entry_finished" && (
-        <Alert type="warning">
-          <strong className="heading-md">{t("polling_station.warning_data_entry_finished.title")}</strong>
-          <p>{t("polling_station.warning_data_entry_finished.description")}</p>
-        </Alert>
-      )}
+      <PollingStationAlert />
       <main>
         <article>{content}</article>
       </main>

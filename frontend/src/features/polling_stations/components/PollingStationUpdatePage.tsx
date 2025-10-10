@@ -13,12 +13,13 @@ import { t } from "@/i18n/translate";
 import { PollingStation } from "@/types/generated/openapi";
 
 import { usePollingStationGet } from "../hooks/usePollingStationGet";
+import { PollingStationAlert } from "./PollingStationAlert";
 import { PollingStationDeleteModal } from "./PollingStationDeleteModal";
 import { PollingStationForm } from "./PollingStationForm";
 
 export function PollingStationUpdatePage() {
   const pollingStationId = useNumericParam("pollingStationId");
-  const { currentCommitteeSession, election } = useElection();
+  const { election } = useElection();
   const navigate = useNavigate();
   const { pushMessage } = useMessages();
 
@@ -86,12 +87,7 @@ export function PollingStationUpdatePage() {
         </section>
       </header>
 
-      {currentCommitteeSession.status === "data_entry_finished" && (
-        <Alert type="warning">
-          <strong className="heading-md">{t("polling_station.warning_data_entry_finished.title")}</strong>
-          <p>{t("polling_station.warning_data_entry_finished.description")}</p>
-        </Alert>
-      )}
+      <PollingStationAlert />
 
       {error && (
         <Alert type="error" onClose={closeError}>

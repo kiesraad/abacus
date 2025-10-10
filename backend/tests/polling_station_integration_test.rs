@@ -1,14 +1,11 @@
 #![cfg(test)]
 
-use abacus::{
-    ErrorResponse,
-    committee_session::status::CommitteeSessionStatus,
-    polling_station::{
-        PollingStation, PollingStationListResponse, PollingStationRequest,
-        PollingStationRequestListResponse, PollingStationType, PollingStationsRequest,
-    },
-};
+use std::net::SocketAddr;
+
+use abacus::{ErrorResponse, committee_session::status::CommitteeSessionStatus};
 use axum::http::StatusCode;
+use reqwest::Response;
+use serde_json::{Value, json};
 use sqlx::SqlitePool;
 use test_log::test;
 
@@ -18,28 +15,117 @@ pub mod shared;
 pub mod utils;
 
 async fn get_polling_station(
-    pool: SqlitePool,
+    addr: &SocketAddr,
     election_id: u32,
     polling_station_id: u32,
-) -> PollingStation {
-    let addr = serve_api(pool).await;
+) -> Response {
     let url =
         format!("http://{addr}/api/elections/{election_id}/polling_stations/{polling_station_id}");
-    let coordinator_cookie = shared::coordinator_login(&addr).await;
-    let response = reqwest::Client::new()
+    let coordinator_cookie = shared::coordinator_login(addr).await;
+    reqwest::Client::new()
         .get(&url)
         .header("cookie", coordinator_cookie)
         .send()
         .await
-        .unwrap();
+        .unwrap()
+}
 
-    // Ensure the response is what we expect
-    assert_eq!(response.status(), StatusCode::OK);
-    response.json().await.unwrap()
+async fn create_polling_station(addr: &SocketAddr, election_id: u32, number: u32) -> Response {
+    let url = format!("http://{addr}/api/elections/{election_id}/polling_stations");
+    let coordinator_cookie = shared::coordinator_login(addr).await;
+    reqwest::Client::new()
+        .post(&url)
+        .header("cookie", coordinator_cookie)
+        .header("Content-Type", "application/json")
+        .json(&json!({
+            "name": "Test polling station",
+            "number": number,
+            "number_of_voters": 123,
+            "polling_station_type": "FixedLocation",
+            "address": "Teststraat 1",
+            "postal_code": "1234 AB",
+            "locality": "Testdorp",
+        }))
+        .send()
+        .await
+        .unwrap()
+}
+
+async fn import_polling_stations(
+    addr: &SocketAddr,
+    election_id: u32,
+    file_name: &str,
+    polling_stations: serde_json::Value,
+) -> Response {
+    let url = format!("http://{addr}/api/elections/{election_id}/polling_stations/import");
+    let coordinator_cookie = shared::coordinator_login(addr).await;
+    reqwest::Client::new()
+        .post(&url)
+        .json(&json!({
+            "file_name": file_name,
+            "polling_stations": polling_stations,
+        }))
+        .header("cookie", coordinator_cookie)
+        .send()
+        .await
+        .unwrap()
+}
+
+async fn import_validate_polling_stations(
+    addr: &SocketAddr,
+    election_id: u32,
+    data: &str,
+) -> Response {
+    let url = format!("http://{addr}/api/elections/{election_id}/polling_stations/validate-import");
+    let coordinator_cookie = shared::coordinator_login(addr).await;
+    reqwest::Client::new()
+        .post(&url)
+        .json(&json!({
+            "data": data,
+        }))
+        .header("cookie", coordinator_cookie)
+        .send()
+        .await
+        .unwrap()
+}
+
+async fn update_polling_station(
+    addr: &SocketAddr,
+    election_id: u32,
+    polling_station_id: u32,
+    body: serde_json::Value,
+) -> Response {
+    let url =
+        format!("http://{addr}/api/elections/{election_id}/polling_stations/{polling_station_id}");
+    let coordinator_cookie = shared::coordinator_login(addr).await;
+    reqwest::Client::new()
+        .put(&url)
+        .header("cookie", coordinator_cookie)
+        .header("Content-Type", "application/json")
+        .body(body.to_string())
+        .send()
+        .await
+        .unwrap()
+}
+
+async fn delete_polling_station(
+    addr: &SocketAddr,
+    election_id: u32,
+    polling_station_id: u32,
+) -> Response {
+    let url =
+        format!("http://{addr}/api/elections/{election_id}/polling_stations/{polling_station_id}");
+    let coordinator_cookie = shared::coordinator_login(addr).await;
+    reqwest::Client::new()
+        .delete(&url)
+        .header("cookie", coordinator_cookie)
+        .send()
+        .await
+        .unwrap()
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_7_four_sessions", "users"))))]
-async fn test_polling_station_listing(pool: SqlitePool) {
+async fn test_listing(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let cookie = shared::coordinator_login(&addr).await;
     let url = format!("http://{addr}/api/elections/7/polling_stations");
@@ -57,21 +143,22 @@ async fn test_polling_station_listing(pool: SqlitePool) {
     );
 
     // Validate response and make sure they are from the last committee session
-    let body: PollingStationListResponse = response.json().await.unwrap();
-    assert_eq!(body.polling_stations.len(), 2);
-    assert!(
-        body.polling_stations
-            .iter()
-            .any(|ps| ps.id == 742 && ps.id_prev_session == Some(732))
-    )
+    let body: Value = response.json().await.unwrap();
+    let polling_stations = body["polling_stations"].as_array().unwrap();
+    assert_eq!(polling_stations.len(), 2);
+    let map = polling_stations
+        .iter()
+        .map(|ps| (ps["id"].as_u64().unwrap(), ps["id_prev_session"].as_u64()))
+        .collect::<Vec<(u64, Option<u64>)>>();
+    assert_eq!(map, vec![(741, Some(731)), (742, Some(732))]);
 }
 
 #[test(sqlx::test(fixtures(
     path = "../fixtures",
     scripts("election_6_no_polling_stations", "users")
 )))]
-async fn test_polling_station_creation_for_committee_session_with_created_status(pool: SqlitePool) {
-    let addr = serve_api(pool.clone()).await;
+async fn test_creation_for_committee_session_with_created_status(pool: SqlitePool) {
+    let addr = serve_api(pool).await;
     let cookie = shared::coordinator_login(&addr).await;
     let election_id = 6;
 
@@ -79,35 +166,17 @@ async fn test_polling_station_creation_for_committee_session_with_created_status
         shared::get_election_committee_session(&addr, &cookie, election_id).await;
     assert_eq!(committee_session.status, CommitteeSessionStatus::Created);
 
-    let url = format!("http://{addr}/api/elections/{election_id}/polling_stations");
-    let response = reqwest::Client::new()
-        .post(&url)
-        .json(&PollingStationRequest {
-            name: "New Polling Station".to_string(),
-            number: Some(5),
-            number_of_voters: Some(426),
-            polling_station_type: Some(PollingStationType::FixedLocation),
-            address: "Teststraat 2a".to_string(),
-            postal_code: "1234 QY".to_string(),
-            locality: "Heemdamseburg".to_string(),
-        })
-        .header("cookie", &cookie)
-        .send()
-        .await
-        .unwrap();
+    let response = create_polling_station(&addr, election_id, 5).await;
 
     assert_eq!(
         response.status(),
         StatusCode::CREATED,
         "Unexpected response status"
     );
-    let body: PollingStation = response.json().await.unwrap();
-    assert_eq!(body.committee_session_id, committee_session.id);
-    assert_eq!(body.name, "New Polling Station");
-    assert_eq!(
-        body.polling_station_type,
-        Some(PollingStationType::FixedLocation)
-    );
+    let body: Value = response.json().await.unwrap();
+    assert_eq!(body["committee_session_id"], committee_session.id);
+    assert_eq!(body["name"], "Test polling station");
+    assert_eq!(body["polling_station_type"], "FixedLocation");
 
     let committee_session =
         shared::get_election_committee_session(&addr, &cookie, election_id).await;
@@ -117,113 +186,40 @@ async fn test_polling_station_creation_for_committee_session_with_created_status
     );
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
-async fn test_polling_station_creation_for_committee_session_with_finished_status(
-    pool: SqlitePool,
-) {
-    let addr = serve_api(pool.clone()).await;
-    let cookie = shared::coordinator_login(&addr).await;
-    let election_id = 2;
-
-    shared::change_status_committee_session(
-        &addr,
-        &cookie,
-        2,
-        CommitteeSessionStatus::DataEntryFinished,
-    )
-    .await;
-    let committee_session =
-        shared::get_election_committee_session(&addr, &cookie, election_id).await;
-    assert_eq!(
-        committee_session.status,
-        CommitteeSessionStatus::DataEntryFinished
-    );
-
-    let url = format!("http://{addr}/api/elections/{election_id}/polling_stations");
-    let response = reqwest::Client::new()
-        .post(&url)
-        .json(&PollingStationRequest {
-            name: "New Polling Station".to_string(),
-            number: Some(5),
-            number_of_voters: Some(426),
-            polling_station_type: Some(PollingStationType::FixedLocation),
-            address: "Teststraat 2a".to_string(),
-            postal_code: "1234 QY".to_string(),
-            locality: "Heemdamseburg".to_string(),
-        })
-        .header("cookie", &cookie)
-        .send()
-        .await
-        .unwrap();
-
-    assert_eq!(
-        response.status(),
-        StatusCode::CREATED,
-        "Unexpected response status"
-    );
-
-    // Validate response
-    let body: PollingStation = response.json().await.unwrap();
-    assert_eq!(body.committee_session_id, committee_session.id);
-    assert_eq!(body.name, "New Polling Station");
-    assert_eq!(
-        body.polling_station_type,
-        Some(PollingStationType::FixedLocation)
-    );
-
-    // Validate that the creation is persisted
-    let ps = get_polling_station(pool, election_id, body.id).await;
-    assert_eq!(ps.name, "New Polling Station");
-
-    // Validate committee session status change
-    let committee_session =
-        shared::get_election_committee_session(&addr, &cookie, election_id).await;
-    assert_eq!(
-        committee_session.status,
-        CommitteeSessionStatus::DataEntryInProgress
-    );
-}
-
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_7_four_sessions", "users"))))]
-async fn test_polling_station_get(pool: SqlitePool) {
+async fn test_get(pool: SqlitePool) {
+    let addr = serve_api(pool).await;
     let election_id = 7;
     let committee_session_id = 704;
 
-    let ps = get_polling_station(pool, election_id, 742).await;
-    assert_eq!(ps.committee_session_id, committee_session_id);
-    assert_eq!(ps.id_prev_session, Some(732));
-    assert_eq!(ps.name, "TestB");
-    assert_eq!(
-        ps.polling_station_type,
-        Some(PollingStationType::FixedLocation)
-    );
+    let response = get_polling_station(&addr, election_id, 742).await;
+    let body: Value = response.json().await.unwrap();
+    assert_eq!(body["committee_session_id"], committee_session_id);
+    assert_eq!(body["id_prev_session"], 732);
+    assert_eq!(body["name"], "TestB");
+    assert_eq!(body["polling_station_type"], "FixedLocation");
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_7_four_sessions", "users"))))]
-async fn test_polling_station_update_ok(pool: SqlitePool) {
+async fn test_update_ok(pool: SqlitePool) {
+    let addr = serve_api(pool).await;
     let election_id = 7;
     let polling_station_id = 742;
 
-    let addr = serve_api(pool.clone()).await;
-    let cookie = shared::coordinator_login(&addr).await;
-    let url =
-        format!("http://{addr}/api/elections/{election_id}/polling_stations/{polling_station_id}");
-
-    let response = reqwest::Client::new()
-        .put(&url)
-        .json(&PollingStationRequest {
-            name: "Testverandering".to_string(),
-            number: None,
-            number_of_voters: Some(2000),
-            polling_station_type: Some(PollingStationType::Special),
-            address: "Teststraat 2a".to_string(),
-            postal_code: "1234 QY".to_string(),
-            locality: "Testdorp".to_string(),
-        })
-        .header("cookie", &cookie)
-        .send()
-        .await
-        .unwrap();
+    let response = update_polling_station(
+        &addr,
+        election_id,
+        polling_station_id,
+        json!({
+            "name": "Testverandering",
+            "number_of_voters": 2000,
+            "polling_station_type": "Special",
+            "address": "Teststraat 2a",
+            "postal_code": "1234 QY",
+            "locality": "Testdorp",
+        }),
+    )
+    .await;
 
     assert_eq!(
         response.status(),
@@ -232,37 +228,35 @@ async fn test_polling_station_update_ok(pool: SqlitePool) {
     );
 
     // Validate response
-    let update: PollingStation = response.json().await.unwrap();
-    assert_eq!(update.name, "Testverandering");
-    assert_eq!(update.address, "Teststraat 2a");
+    let body: Value = response.json().await.unwrap();
+    assert_eq!(body["name"], "Testverandering");
+    assert_eq!(body["address"], "Teststraat 2a");
 
     // Validate that the changes are persisted
-    let ps = get_polling_station(pool, election_id, polling_station_id).await;
-    assert_eq!(ps.name, "Testverandering");
-    assert_eq!(ps.address, "Teststraat 2a");
+    let response = get_polling_station(&addr, election_id, polling_station_id).await;
+    let body: Value = response.json().await.unwrap();
+    assert_eq!(body["name"], "Testverandering");
+    assert_eq!(body["address"], "Teststraat 2a");
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
-async fn test_polling_station_update_empty_type_ok(pool: SqlitePool) {
+async fn test_update_empty_type_ok(pool: SqlitePool) {
     let addr = serve_api(pool).await;
-    let cookie = shared::coordinator_login(&addr).await;
-    let url = format!("http://{addr}/api/elections/2/polling_stations/2");
 
-    let response = reqwest::Client::new()
-        .put(&url)
-        .json(&PollingStationRequest {
-            name: "Testverandering".to_string(),
-            number: Some(34),
-            number_of_voters: Some(2000),
-            polling_station_type: None,
-            address: "Teststraat 2a".to_string(),
-            postal_code: "1234 QY".to_string(),
-            locality: "Testdorp".to_string(),
-        })
-        .header("cookie", &cookie)
-        .send()
-        .await
-        .unwrap();
+    let response = update_polling_station(
+        &addr,
+        2,
+        2,
+        json!({
+            "name": "Testverandering",
+            "number": 34,
+            "number_of_voters": 2000,
+            "address": "Teststraat 2a",
+            "postal_code": "1234 QY",
+            "locality": "Testdorp",
+        }),
+    )
+    .await;
 
     assert_eq!(
         response.status(),
@@ -270,32 +264,30 @@ async fn test_polling_station_update_empty_type_ok(pool: SqlitePool) {
         "Unexpected response status"
     );
 
-    let update: PollingStation = response.json().await.unwrap();
-    assert_eq!(update.name, "Testverandering");
-    assert_eq!(update.polling_station_type, None);
+    let body: Value = response.json().await.unwrap();
+    assert_eq!(body["name"], "Testverandering");
+    assert_eq!(body["polling_station_type"], Value::Null);
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
-async fn test_polling_station_update_not_found(pool: SqlitePool) {
+async fn test_update_not_found(pool: SqlitePool) {
     let addr = serve_api(pool).await;
-    let cookie = shared::coordinator_login(&addr).await;
-    let url = format!("http://{addr}/api/elections/2/polling_stations/40404");
 
-    let response = reqwest::Client::new()
-        .put(&url)
-        .json(&PollingStationRequest {
-            name: "Testverandering".to_string(),
-            number: Some(34),
-            number_of_voters: Some(2000),
-            polling_station_type: Some(PollingStationType::Special),
-            address: "Teststraat 2a".to_string(),
-            postal_code: "1234 QY".to_string(),
-            locality: "Testdorp".to_string(),
-        })
-        .header("cookie", cookie)
-        .send()
-        .await
-        .unwrap();
+    let response = update_polling_station(
+        &addr,
+        2,
+        40404,
+        json!({
+            "name": "Testverandering",
+            "number": 34,
+            "number_of_voters": 2000,
+            "address": "Teststraat 2a",
+            "polling_station_type": "Special",
+            "postal_code": "1234 QY",
+            "locality": "Testdorp",
+        }),
+    )
+    .await;
 
     assert_eq!(
         response.status(),
@@ -305,7 +297,7 @@ async fn test_polling_station_update_not_found(pool: SqlitePool) {
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
-async fn test_polling_station_delete_ok(pool: SqlitePool) {
+async fn test_delete_ok(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let cookie = shared::coordinator_login(&addr).await;
     let election_id = 2;
@@ -317,13 +309,7 @@ async fn test_polling_station_delete_ok(pool: SqlitePool) {
         CommitteeSessionStatus::DataEntryInProgress
     );
 
-    let url = format!("http://{addr}/api/elections/{election_id}/polling_stations/2");
-    let response = reqwest::Client::new()
-        .delete(&url)
-        .header("cookie", cookie.clone())
-        .send()
-        .await
-        .unwrap();
+    let response = delete_polling_station(&addr, election_id, 2).await;
 
     assert_eq!(
         response.status(),
@@ -338,13 +324,7 @@ async fn test_polling_station_delete_ok(pool: SqlitePool) {
         CommitteeSessionStatus::DataEntryInProgress
     );
 
-    let gone = reqwest::Client::new()
-        .get(&url)
-        .header("cookie", cookie.clone())
-        .send()
-        .await
-        .unwrap();
-
+    let gone = get_polling_station(&addr, election_id, 2).await;
     assert_eq!(
         gone.status(),
         StatusCode::NOT_FOUND,
@@ -352,14 +332,7 @@ async fn test_polling_station_delete_ok(pool: SqlitePool) {
     );
 
     // Remove last polling station for election
-    let url = format!("http://{addr}/api/elections/{election_id}/polling_stations/1");
-    let response = reqwest::Client::new()
-        .delete(&url)
-        .header("cookie", cookie.clone())
-        .send()
-        .await
-        .unwrap();
-
+    let response = delete_polling_station(&addr, election_id, 1).await;
     assert_eq!(
         response.status(),
         StatusCode::OK,
@@ -372,7 +345,7 @@ async fn test_polling_station_delete_ok(pool: SqlitePool) {
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
-async fn test_polling_station_delete_with_data_entry_fails(pool: SqlitePool) {
+async fn test_delete_with_data_entry_fails(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let typist_cookie = shared::typist_login(&addr).await;
     shared::claim_data_entry(&addr, &typist_cookie, 2, 1).await;
@@ -385,14 +358,7 @@ async fn test_polling_station_delete_with_data_entry_fails(pool: SqlitePool) {
     )
     .await;
 
-    let admin_cookie = shared::admin_login(&addr).await;
-    let url = format!("http://{addr}/api/elections/2/polling_stations/2");
-    let response = reqwest::Client::new()
-        .delete(&url)
-        .header("cookie", admin_cookie)
-        .send()
-        .await
-        .unwrap();
+    let response = delete_polling_station(&addr, 2, 2).await;
 
     assert_eq!(
         response.status(),
@@ -404,18 +370,11 @@ async fn test_polling_station_delete_with_data_entry_fails(pool: SqlitePool) {
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
-async fn test_polling_station_delete_with_results_fails(pool: SqlitePool) {
+async fn test_delete_with_results_fails(pool: SqlitePool) {
     let addr = serve_api(pool).await;
-    let admin_cookie = shared::admin_login(&addr).await;
     shared::create_result(&addr, 1, 2).await;
 
-    let url = format!("http://{addr}/api/elections/2/polling_stations/1");
-    let response = reqwest::Client::new()
-        .delete(&url)
-        .header("cookie", admin_cookie)
-        .send()
-        .await
-        .unwrap();
+    let response = delete_polling_station(&addr, 2, 1).await;
 
     assert_eq!(
         response.status(),
@@ -427,17 +386,10 @@ async fn test_polling_station_delete_with_results_fails(pool: SqlitePool) {
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
-async fn test_polling_station_delete_not_found(pool: SqlitePool) {
+async fn test_delete_not_found(pool: SqlitePool) {
     let addr = serve_api(pool).await;
-    let cookie = shared::coordinator_login(&addr).await;
-    let url = format!("http://{addr}/api/elections/2/polling_stations/40404");
 
-    let response = reqwest::Client::new()
-        .delete(&url)
-        .header("cookie", cookie)
-        .send()
-        .await
-        .unwrap();
+    let response = delete_polling_station(&addr, 2, 40404).await;
 
     assert_eq!(
         response.status(),
@@ -447,27 +399,11 @@ async fn test_polling_station_delete_not_found(pool: SqlitePool) {
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
-async fn test_polling_station_non_unique(pool: SqlitePool) {
+async fn test_non_unique_number(pool: SqlitePool) {
     let addr = serve_api(pool).await;
-    let cookie = shared::coordinator_login(&addr).await;
     let election_id = 2;
-    let url = format!("http://{addr}/api/elections/{election_id}/polling_stations");
 
-    let response = reqwest::Client::new()
-        .post(&url)
-        .json(&PollingStationRequest {
-            name: "New Polling Station".to_string(),
-            number: Some(33),
-            number_of_voters: None,
-            polling_station_type: Some(PollingStationType::FixedLocation),
-            address: "Teststraat 2a".to_string(),
-            postal_code: "1234 QY".to_string(),
-            locality: "Heemdamseburg".to_string(),
-        })
-        .header("cookie", cookie)
-        .send()
-        .await
-        .unwrap();
+    let response = create_polling_station(&addr, election_id, 33).await;
 
     assert_eq!(
         response.status(),
@@ -477,7 +413,7 @@ async fn test_polling_station_non_unique(pool: SqlitePool) {
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
-async fn test_polling_station_list_invalid_election(pool: SqlitePool) {
+async fn test_list_invalid_election(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let cookie = shared::coordinator_login(&addr).await;
     let url = format!("http://{addr}/api/elections/1234/polling_stations");
@@ -492,41 +428,29 @@ async fn test_polling_station_list_invalid_election(pool: SqlitePool) {
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
-async fn test_polling_station_import_validate_correct_file(pool: SqlitePool) {
+async fn test_import_validate_correct_file(pool: SqlitePool) {
     let addr = serve_api(pool).await;
-    let cookie = shared::coordinator_login(&addr).await;
-    let url = format!("http://{addr}/api/elections/2/polling_stations/validate-import");
-
-    let response = reqwest::Client::new()
-        .post(&url)
-        .json(&serde_json::json!({
-            "data": include_str!("../src/eml/tests/eml110b_test.eml.xml"),
-        }))
-        .header("cookie", cookie)
-        .send()
-        .await
-        .unwrap();
+    let response = import_validate_polling_stations(
+        &addr,
+        2,
+        include_str!("../src/eml/tests/eml110b_test.eml.xml"),
+    )
+    .await;
 
     assert_eq!(response.status(), StatusCode::OK);
-    let body: PollingStationRequestListResponse = response.json().await.unwrap();
-    assert_eq!(body.polling_stations.len(), 420);
+    let body: Value = response.json().await.unwrap();
+    assert_eq!(body["polling_stations"].as_array().unwrap().len(), 420);
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
-async fn test_polling_station_import_validate_wrong_file(pool: SqlitePool) {
+async fn test_import_validate_wrong_file(pool: SqlitePool) {
     let addr = serve_api(pool).await;
-    let cookie = shared::coordinator_login(&addr).await;
-    let url = format!("http://{addr}/api/elections/2/polling_stations/validate-import");
-
-    let response = reqwest::Client::new()
-        .post(&url)
-        .json(&serde_json::json!({
-            "data": include_str!("../src/eml/tests/eml110a_test.eml.xml"),
-        }))
-        .header("cookie", cookie)
-        .send()
-        .await
-        .unwrap();
+    let response = import_validate_polling_stations(
+        &addr,
+        2,
+        include_str!("../src/eml/tests/eml110a_test.eml.xml"),
+    )
+    .await;
 
     assert_eq!(response.status(), StatusCode::BAD_REQUEST);
 }
@@ -535,20 +459,9 @@ async fn test_polling_station_import_validate_wrong_file(pool: SqlitePool) {
     path = "../fixtures",
     scripts("election_6_no_polling_stations", "users")
 )))]
-async fn test_polling_station_import_missing_data(pool: SqlitePool) {
+async fn test_import_missing_data(pool: SqlitePool) {
     let addr = serve_api(pool).await;
-    let cookie = shared::coordinator_login(&addr).await;
-    let url = format!("http://{addr}/api/elections/6/polling_stations/import");
-
-    let response = reqwest::Client::new()
-        .post(&url)
-        .json(&serde_json::json!({
-            "file_name": "eml110b_test.eml.xml",
-        }))
-        .header("cookie", cookie)
-        .send()
-        .await
-        .unwrap();
+    let response = import_polling_stations(&addr, 6, "eml110b_test.eml.xml", Value::Null).await;
 
     assert_eq!(response.status(), StatusCode::UNPROCESSABLE_ENTITY);
 }
@@ -557,7 +470,7 @@ async fn test_polling_station_import_missing_data(pool: SqlitePool) {
     path = "../fixtures",
     scripts("election_6_no_polling_stations", "users")
 )))]
-async fn test_polling_station_import_correct_file(pool: SqlitePool) {
+async fn test_import_correct_file(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let cookie = shared::coordinator_login(&addr).await;
     let election_id = 6;
@@ -566,34 +479,22 @@ async fn test_polling_station_import_correct_file(pool: SqlitePool) {
         shared::get_election_committee_session(&addr, &cookie, election_id).await;
     assert_eq!(committee_session.status, CommitteeSessionStatus::Created);
 
-    let validate_url =
-        format!("http://{addr}/api/elections/{election_id}/polling_stations/validate-import");
-    let validate_response = reqwest::Client::new()
-        .post(&validate_url)
-        .json(&serde_json::json!({
-            "data": include_str!("../src/eml/tests/eml110b_test.eml.xml"),
-        }))
-        .header("cookie", &cookie)
-        .send()
-        .await
-        .unwrap();
-
+    let validate_response = import_validate_polling_stations(
+        &addr,
+        election_id,
+        include_str!("../src/eml/tests/eml110b_test.eml.xml"),
+    )
+    .await;
     assert_eq!(validate_response.status(), StatusCode::OK);
-    let validate_body: PollingStationRequestListResponse = validate_response.json().await.unwrap();
-    let polling_stations = validate_body.polling_stations;
+    let body: Value = validate_response.json().await.unwrap();
 
-    let import_url = format!("http://{addr}/api/elections/{election_id}/polling_stations/import");
-    let import_response = reqwest::Client::new()
-        .post(&import_url)
-        .json(&PollingStationsRequest {
-            file_name: "eml110b_test.eml.xml".to_string(),
-            polling_stations,
-        })
-        .header("cookie", &cookie)
-        .send()
-        .await
-        .unwrap();
-
+    let import_response = import_polling_stations(
+        &addr,
+        6,
+        "eml110b_test.eml.xml",
+        body["polling_stations"].clone(),
+    )
+    .await;
     assert_eq!(import_response.status(), StatusCode::OK);
 
     let committee_session =
@@ -602,4 +503,94 @@ async fn test_polling_station_import_correct_file(pool: SqlitePool) {
         committee_session.status,
         CommitteeSessionStatus::DataEntryNotStarted
     );
+}
+
+async fn check_finished_to_in_progress_on<F, Fut>(addr: &SocketAddr, action: F)
+where
+    F: FnOnce() -> Fut,
+    Fut: Future<Output = Response>,
+{
+    let cookie = shared::coordinator_login(addr).await;
+    let election_id = 2;
+    let committee_session_id = 2;
+
+    shared::change_status_committee_session(
+        addr,
+        &cookie,
+        committee_session_id,
+        CommitteeSessionStatus::DataEntryFinished,
+    )
+    .await;
+    let committee_session =
+        shared::get_election_committee_session(addr, &cookie, election_id).await;
+    assert_eq!(
+        committee_session.status,
+        CommitteeSessionStatus::DataEntryFinished
+    );
+
+    let status = action().await.status();
+    assert!(status == StatusCode::OK || status == StatusCode::CREATED);
+
+    let committee_session =
+        shared::get_election_committee_session(addr, &cookie, election_id).await;
+    assert_eq!(
+        committee_session.status,
+        CommitteeSessionStatus::DataEntryInProgress
+    );
+}
+
+#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
+async fn test_finished_to_in_progress_on_create(pool: SqlitePool) {
+    let addr = serve_api(pool).await;
+    check_finished_to_in_progress_on(&addr, || create_polling_station(&addr, 2, 35)).await;
+}
+
+#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
+async fn test_finished_to_in_progress_on_import(pool: SqlitePool) {
+    let addr = serve_api(pool).await;
+    check_finished_to_in_progress_on(&addr, || async {
+        let validate_response = import_validate_polling_stations(
+            &addr,
+            2,
+            include_str!("../src/eml/tests/eml110b_1_station.eml.xml"),
+        )
+        .await;
+        let body: Value = validate_response.json().await.unwrap();
+
+        import_polling_stations(
+            &addr,
+            2,
+            "eml110b_1_station.eml.xml",
+            body["polling_stations"].clone(),
+        )
+        .await
+    })
+    .await;
+}
+
+#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
+async fn test_finished_to_in_progress_on_update(pool: SqlitePool) {
+    let addr = serve_api(pool).await;
+    check_finished_to_in_progress_on(&addr, || {
+        update_polling_station(
+            &addr,
+            2,
+            1,
+            json!({
+                "name": "Testverandering",
+                "number_of_voters": 2000,
+                "polling_station_type": "Special",
+                "address": "Teststraat 2a",
+                "postal_code": "1234 QY",
+                "locality": "Testdorp",
+            }),
+        )
+    })
+    .await;
+}
+
+#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
+async fn test_finished_to_in_progress_on_delete_non_last(pool: SqlitePool) {
+    let addr = serve_api(pool).await;
+    check_finished_to_in_progress_on(&addr, || delete_polling_station(&addr, 2, 1)).await;
 }

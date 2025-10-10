@@ -13,6 +13,7 @@ import { t } from "@/i18n/translate";
 import { PollingStation } from "@/types/generated/openapi";
 
 import { usePollingStationGet } from "../hooks/usePollingStationGet";
+import { PollingStationAlert } from "./PollingStationAlert";
 import { PollingStationDeleteModal } from "./PollingStationDeleteModal";
 import { PollingStationForm } from "./PollingStationForm";
 
@@ -85,6 +86,8 @@ export function PollingStationUpdatePage() {
           <h1>{t("polling_station.update")}</h1>
         </section>
       </header>
+
+      <PollingStationAlert />
 
       {error && (
         <Alert type="error" onClose={closeError}>

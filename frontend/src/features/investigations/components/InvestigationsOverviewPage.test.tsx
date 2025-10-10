@@ -103,15 +103,6 @@ describe("InvestigationsOverviewPage", () => {
     expect(router.state.location.pathname).toEqual("/elections/1/investigations/add");
   });
 
-  test("Hides the add investigation button when committee session status is finished", async () => {
-    const electionData = getElectionMockData({}, { id: 1, number: 1, status: "data_entry_finished" }, []);
-    overrideOnce("get", "/api/elections/1", 200, electionData);
-
-    await renderPage("coordinator");
-
-    expect(screen.queryByRole("link", { name: "Onderzoek toevoegen" })).not.toBeInTheDocument();
-  });
-
   test("Renders and filters a list of investigations in two categories", async () => {
     await renderPage("coordinator");
 
@@ -129,8 +120,7 @@ describe("InvestigationsOverviewPage", () => {
     expect(headings[5]).toHaveTextContent("Test kerk");
   });
 
-  test("Shows the finish data entry button when all investigations are handled", async () => {
-    server.use(CommitteeSessionStatusChangeRequestHandler);
+  test("Shows finish data entry message when all investigations are handled and session status != finished", async () => {
     const electionData = getElectionMockData({}, { id: 1, number: 2, status: "data_entry_in_progress" }, [
       {
         polling_station_id: 1,
@@ -143,10 +133,48 @@ describe("InvestigationsOverviewPage", () => {
 
     await renderPage("coordinator");
 
-    const alerts = await screen.findAllByRole("alert");
-    expect(alerts).toHaveLength(1);
+    const alert = await screen.findByRole("alert");
+    expect(within(alert).getByRole("strong")).toHaveTextContent("Alle onderzoeken zijn afgehandeld");
+    expect(within(alert).getByRole("paragraph")).toHaveTextContent(
+      "De resultaten van alle onderzoeken zijn ingevoerd. Je kunt de uitslag nu definitief maken en het proces verbaal opmaken.",
+    );
+    expect(within(alert).getByRole("button", { name: "Invoerfase afronden" })).toBeVisible();
+  });
 
+  test("Doesn't show finish data entry message when all investigations are handled and session status = finished", async () => {
+    server.use(CommitteeSessionStatusChangeRequestHandler);
+    const electionData = getElectionMockData({}, { id: 1, number: 2, status: "data_entry_finished" }, [
+      {
+        polling_station_id: 1,
+        reason: "Test reason 1",
+        findings: "Test findings 1",
+        corrected_results: false,
+      },
+    ]);
+    overrideOnce("get", "/api/elections/1", 200, electionData);
+
+    await renderPage("coordinator");
+    // Ensure rendering is complete
+    await screen.findByRole("heading", { level: 1, name: "Onderzoeken in tweede zitting" });
+
+    expect(screen.queryByRole("alert")).not.toBeInTheDocument();
+  });
+
+  test("Updates status when finish data entry is clicked", async () => {
+    server.use(CommitteeSessionStatusChangeRequestHandler);
     const updateCommitteeSession = spyOnHandler(CommitteeSessionStatusChangeRequestHandler);
+
+    const electionData = getElectionMockData({}, { id: 1, number: 2, status: "data_entry_in_progress" }, [
+      {
+        polling_station_id: 1,
+        reason: "Test reason 1",
+        findings: "Test findings 1",
+        corrected_results: false,
+      },
+    ]);
+    overrideOnce("get", "/api/elections/1", 200, electionData);
+
+    await renderPage("coordinator");
 
     const finishButton = await screen.findByRole("button", { name: "Invoerfase afronden" });
     expect(finishButton).toBeVisible();
@@ -211,6 +239,9 @@ describe("InvestigationsOverviewPage", () => {
 
   test("Does not show add and edit links to administrator", async () => {
     await renderPage("administrator");
+
+    // Ensure rendering is complete
+    await screen.findByRole("heading", { level: 1, name: "Onderzoeken in tweede zitting" });
 
     expect(screen.queryByRole("link", { name: "Onderzoek toevoegen" })).not.toBeInTheDocument();
     expect(screen.queryByRole("link", { name: "Corrigendum afdrukken" })).not.toBeInTheDocument();

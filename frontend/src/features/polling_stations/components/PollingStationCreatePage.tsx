@@ -6,6 +6,7 @@ import { useMessages } from "@/hooks/messages/useMessages";
 import { t } from "@/i18n/translate";
 import { PollingStation } from "@/types/generated/openapi";
 
+import { PollingStationAlert } from "./PollingStationAlert";
 import { PollingStationForm } from "./PollingStationForm";
 
 export function PollingStationCreatePage() {
@@ -34,6 +35,7 @@ export function PollingStationCreatePage() {
           <h1>{t("polling_station.create")}</h1>
         </section>
       </header>
+      <PollingStationAlert />
       <main>
         <article>
           <PollingStationForm electionId={election.id} onSaved={handleSaved} />

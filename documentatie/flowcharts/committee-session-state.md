@@ -19,8 +19,9 @@ stateDiagram-v2
   DataEntryPaused --> Created: delete last <br/> PS/Inv*
   DataEntryPaused --> DataEntryFinished: click finish <br/> data entry
   DataEntryFinished --> DataEntryInProgress: add new <br/> PS/Inv
-  DataEntryFinished --> DataEntryInProgress: click resume <br/> data entry
-  DataEntryFinished --> DataEntryInProgress: delete polling <br/> station result
+  DataEntryFinished --> DataEntryInProgress: click resume <br/> data entry/update Inv
+  DataEntryFinished --> DataEntryInProgress: delete polling <br/> station result/delete Inv
+  DataEntryFinished --> Created: delete last <br/>PS/Inv
   DataEntryFinished --> [*]
 ```
 

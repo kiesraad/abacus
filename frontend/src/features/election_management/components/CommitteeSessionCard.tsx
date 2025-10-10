@@ -80,12 +80,12 @@ function ButtonLinkList({ buttonLinks, firstRowBold }: ButtonLinkListProps) {
 
 export interface CommitteeSessionCardProps {
   committeeSession: CommitteeSession;
-  currentSession: boolean;
+  isCurrentSession: boolean;
 }
 
 export function CommitteeSessionCard({
   committeeSession,
-  currentSession,
+  isCurrentSession,
   ...props
 }: CommitteeSessionCardProps & DivProps) {
   const navigate = useNavigate();
@@ -109,7 +109,15 @@ export function CommitteeSessionCard({
     ? formatFullDateTimeWithoutTimezone(new Date(committeeSession.start_date_time))
     : undefined;
   const buttonLinks: ButtonLink[] = [];
-  let button = undefined;
+  let cardButton = undefined;
+
+  const addIf = (item: ButtonLink, condition: boolean) => {
+    if (condition) {
+      buttonLinks.push(item);
+    }
+  };
+
+  const isNextSession = committeeSession.number > 1;
 
   const detailsButtonLink: ButtonLink = {
     id: committeeSession.id,
@@ -132,28 +140,17 @@ export function CommitteeSessionCard({
 
   switch (committeeSession.status) {
     case "created":
-      if (currentSession && committeeSession.number > 1) {
-        buttonLinks.push(investigationsButtonLink);
-      }
-      if (isCoordinator && currentSession) {
-        buttonLinks.push(detailsButtonLink);
-        if (committeeSession.number > 1) {
-          buttonLinks.push(deleteButtonLink);
-        }
-      }
+      addIf(investigationsButtonLink, isCurrentSession && isNextSession);
+      addIf(detailsButtonLink, isCurrentSession && isCoordinator);
+      addIf(deleteButtonLink, isCurrentSession && isCoordinator && isNextSession);
       break;
     case "data_entry_not_started":
-      if (currentSession && committeeSession.number > 1) {
-        buttonLinks.push(investigationsButtonLink);
-      }
-      if (isCoordinator && currentSession) {
-        buttonLinks.push(detailsButtonLink);
-        if (committeeSession.number > 1) {
-          buttonLinks.push(deleteButtonLink);
-        }
-      }
-      if (isCoordinator) {
-        button = (
+      addIf(investigationsButtonLink, isCurrentSession && isNextSession);
+      addIf(detailsButtonLink, isCurrentSession && isCoordinator);
+      addIf(deleteButtonLink, isCurrentSession && isCoordinator && isNextSession);
+
+      if (isCurrentSession && isCoordinator) {
+        cardButton = (
           <Button size="sm" onClick={handleStart}>
             {t("election_management.start_data_entry")}
           </Button>
@@ -161,42 +158,47 @@ export function CommitteeSessionCard({
       }
       break;
     case "data_entry_in_progress":
-      if (currentSession && committeeSession.number > 1) {
-        buttonLinks.push(investigationsButtonLink);
+      addIf(investigationsButtonLink, isCurrentSession && isNextSession);
+      addIf(detailsButtonLink, isCurrentSession && isCoordinator);
+
+      if (isCurrentSession) {
+        cardButton = (
+          <Button.Link size="sm" to="status">
+            {t("view_progress")}
+          </Button.Link>
+        );
       }
-      if (isCoordinator && currentSession) {
-        buttonLinks.push(detailsButtonLink);
-      }
-      button = (
-        <Button.Link size="sm" to="status">
-          {t("view_progress")}
-        </Button.Link>
-      );
       break;
     case "data_entry_paused":
-      if (currentSession && committeeSession.number > 1) {
-        buttonLinks.push(investigationsButtonLink);
-      }
-      buttonLinks.push({
-        id: committeeSession.id,
-        label: isCoordinator ? t("election_management.resume_or_check_progress") : t("view_progress"),
-        to: "status",
-      });
-      if (isCoordinator && currentSession) {
-        buttonLinks.push(detailsButtonLink);
-      }
+      addIf(investigationsButtonLink, isCurrentSession && isNextSession);
+      addIf(
+        {
+          id: committeeSession.id,
+          label: isCoordinator ? t("election_management.resume_or_check_progress") : t("view_progress"),
+          to: "status",
+        },
+        isCurrentSession,
+      );
+      addIf(detailsButtonLink, isCurrentSession && isCoordinator);
       break;
     case "data_entry_finished":
-      if (isCoordinator) {
-        buttonLinks.push({
+      addIf(
+        {
           id: committeeSession.id,
           label: t("election_management.results_and_documents"),
           to: `report/committee-session/${committeeSession.id}/download`,
-        });
-      }
-      if (currentSession) {
-        buttonLinks.push({ id: committeeSession.id, label: t("election_management.view_data_entry"), to: "status" });
-      }
+        },
+        isCoordinator,
+      );
+      addIf(investigationsButtonLink, isCurrentSession && isNextSession);
+      addIf(
+        {
+          id: committeeSession.id,
+          label: t("election_management.view_data_entry"),
+          to: "status",
+        },
+        isCurrentSession,
+      );
       break;
   }
 
@@ -206,12 +208,12 @@ export function CommitteeSessionCard({
       label={label}
       status={status}
       date={date}
-      button={button}
+      button={cardButton}
       id={`session-${committeeSession.number}`}
       {...props}
     >
       {buttonLinks.length > 0 && (
-        <ButtonLinkList buttonLinks={buttonLinks} firstRowBold={currentSession && button === undefined} />
+        <ButtonLinkList buttonLinks={buttonLinks} firstRowBold={isCurrentSession && cardButton === undefined} />
       )}
     </Card>
   );

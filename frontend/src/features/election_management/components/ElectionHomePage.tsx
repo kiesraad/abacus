@@ -175,7 +175,7 @@ export function ElectionHomePage() {
                 <CommitteeSessionCard
                   key={committeeSession.id}
                   committeeSession={committeeSession}
-                  currentSession={index === 0}
+                  isCurrentSession={index === 0}
                 />
               ))}
             </div>

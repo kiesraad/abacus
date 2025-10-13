@@ -158,8 +158,10 @@ pub fn router(
             .fallback(Some("/index.html"))
             .fallback_status(StatusCode::OK)
             .into_router()
-            // Add Referrer-Policy and Permissions-Policy headers,
-            // these are only needed on HTML documents (not API requests)
+            // Add Referrer-Policy, Permissions-Policy and Content-Security-Policy headers.
+            // These are only needed on HTML documents, not API requests.
+            // From https://cheatsheetseries.owasp.org/cheatsheets/REST_Security_Cheat_Sheet.html#security-headers:
+            // "The headers below are only intended to provide additional security when responses are rendered as HTML."
             .layer(SetResponseHeaderLayer::overriding(
                 header::REFERRER_POLICY,
                 HeaderValue::from_static("no-referrer"),
@@ -175,23 +177,45 @@ pub fn router(
                      xr-spatial-tracking=(), clipboard-read=(), clipboard-write=(), gamepad=(), \
                      hid=(), idle-detection=(), interest-cohort=(), serial=(), unload=()",
                 ),
+            ))
+            .layer(SetResponseHeaderLayer::overriding(
+                header::CONTENT_SECURITY_POLICY,
+                HeaderValue::from_static("default-src 'self'; img-src 'self' data:"),
             )),
     );
+
+    #[cfg(feature = "storybook")]
+    let router = router
+        .nest(
+            "/storybook/",
+            memory_serve::MemoryServe::new(memory_serve::load_assets!(
+                "../frontend/dist-storybook"
+            ))
+            .index_file(Some("/index.html"))
+            .into_router()
+            .layer(SetResponseHeaderLayer::overriding(
+                header::X_FRAME_OPTIONS,
+                HeaderValue::from_static("sameorigin"),
+            )),
+        )
+        // Workaround for https://github.com/storybookjs/storybook/issues/32428
+        .route(
+            "/vite-inject-mocker-entry.js",
+            axum::routing::get(|| async {
+                axum::response::Redirect::temporary("/storybook/vite-inject-mocker-entry.js")
+            }),
+        );
 
     // Add headers for security hardening
     // Best practices according to the OWASP Secure Headers Project, https://owasp.org/www-project-secure-headers/
     let security_headers_service = tower::ServiceBuilder::new()
-        .layer(SetResponseHeaderLayer::overriding(
+        .layer(SetResponseHeaderLayer::if_not_present(
             header::X_FRAME_OPTIONS,
             HeaderValue::from_static("deny"),
         ))
         .layer(SetResponseHeaderLayer::overriding(
             header::X_CONTENT_TYPE_OPTIONS,
             HeaderValue::from_static("nosniff"),
-        ))
-        .layer(SetResponseHeaderLayer::overriding(
-            header::CONTENT_SECURITY_POLICY,
-            HeaderValue::from_static("default-src 'self'; img-src 'self' data:"),
         ))
         .layer(SetResponseHeaderLayer::overriding(
             HeaderName::from_static("x-permitted-cross-domain-policies"),
@@ -367,10 +391,6 @@ mod test {
             assert_eq!(response.headers()["x-frame-options"], "deny");
             assert_eq!(response.headers()["x-content-type-options"], "nosniff");
             assert_eq!(
-                response.headers()["content-security-policy"],
-                "default-src 'self'; img-src 'self' data:"
-            );
-            assert_eq!(
                 response.headers()["x-permitted-cross-domain-policies"],
                 "none"
             );
@@ -400,6 +420,23 @@ mod test {
                         screen-wake-lock=(), sync-xhr=(self), usb=(), web-share=(), \
                         xr-spatial-tracking=(), clipboard-read=(), clipboard-write=(), gamepad=(), \
                         hid=(), idle-detection=(), interest-cohort=(), serial=(), unload=()"
+                );
+                assert_eq!(
+                    response.headers()["content-security-policy"],
+                    "default-src 'self'; img-src 'self' data:"
+                );
+            }
+
+            #[cfg(feature = "storybook")]
+            {
+                // Test that /storybook path doesn't have CSP header
+                let storybook_response = reqwest::get(format!("{base_url}/storybook/"))
+                    .await
+                    .unwrap();
+                assert!(
+                    !storybook_response
+                        .headers()
+                        .contains_key("content-security-policy")
                 );
             }
         })

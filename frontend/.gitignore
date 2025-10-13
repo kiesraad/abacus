@@ -9,7 +9,7 @@ lerna-debug.log*
 
 node_modules
 dist
-dist-ssr
+dist-storybook
 *.local
 
 # translation files (.po files) are generated

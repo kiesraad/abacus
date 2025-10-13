@@ -13,6 +13,7 @@ memory-serve = ["dep:memory-serve"]
 embed-typst = ["dep:typst", "dep:typst-pdf"]
 dev-database = []
 airgap-detection = []
+storybook = ["dep:memory-serve"]
 
 [[bin]]
 name = "gen-openapi"

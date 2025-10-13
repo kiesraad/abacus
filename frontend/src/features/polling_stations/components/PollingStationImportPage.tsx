@@ -21,6 +21,8 @@ import {
   PollingStationRequestListResponse,
 } from "@/types/generated/openapi";
 
+import { PollingStationAlert } from "./PollingStationAlert";
+
 export function PollingStationImportPage() {
   const { election } = useElection();
   const { pushMessage } = useMessages();
@@ -157,6 +159,7 @@ export function PollingStationImportPage() {
           <h1>{t("polling_station.import")}</h1>
         </section>
       </header>
+      <PollingStationAlert />
       <main>
         <article>{content}</article>
       </main>

@@ -124,7 +124,7 @@ async fn test_committee_session_delete_ok_status_created(pool: SqlitePool) {
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_5_with_results", "users"))))]
 async fn test_committee_session_delete_fail(pool: SqlitePool) {
-    let addr = serve_api(pool.clone()).await;
+    let addr = serve_api(pool).await;
     let cookie = shared::coordinator_login(&addr).await;
     let election_id = 5;
     let committee_session_id = 6;
@@ -138,7 +138,7 @@ async fn test_committee_session_delete_fail(pool: SqlitePool) {
     .await;
     assert_eq!(
         create_investigation(&addr, 9).await.status(),
-        StatusCode::OK
+        StatusCode::CREATED
     );
     shared::change_status_committee_session(
         &addr,

@@ -2931,8 +2931,8 @@
           "required": true
         },
         "responses": {
-          "200": {
-            "description": "Polling station investigation added successfully",
+          "201": {
+            "description": "Polling station investigation created successfully",
             "content": {
               "application/json": {
                 "schema": {

@@ -61,5 +61,9 @@
   "unsaved_changes_title": "Let op: niet opgeslagen wijzigingen",
   "unsaved_changes_message": "Je hebt in <strong>{name}</strong> wijzigingen gemaakt die nog niet zijn opgeslagen.",
   "update": "Stembureaugegevens wijzigen",
-  "voters_and_vote_count": "Aantal kiezers en stemmen"
+  "voters_and_vote_count": "Aantal kiezers en stemmen",
+  "warning_data_entry_finished": {
+    "title": "Invoerfase al afgerond",
+    "description": "Als je wijzigingen aanbrengt in deze zitting door stembureaus toe te voegen, te bewerken of te verwijderen, wordt de invoerfase heropent. Bij het afronden van de invoerfase wordt een nieuw proces-verbaal gemaakt."
+  }
 }

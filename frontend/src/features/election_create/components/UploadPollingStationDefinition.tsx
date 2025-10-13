@@ -11,9 +11,11 @@ import { Form } from "@/components/ui/Form/Form";
 import { FormLayout } from "@/components/ui/Form/FormLayout";
 import { t, tx } from "@/i18n/translate";
 import { ELECTION_IMPORT_VALIDATE_REQUEST_PATH, ElectionDefinitionValidateResponse } from "@/types/generated/openapi";
-import { fileTooLargeError, MAX_FILE_UPLOAD_SIZE_MB } from "@/utils/fileUpload";
 
 import { useElectionCreateContext } from "../hooks/useElectionCreateContext";
+
+// Maximum file upload this for this component in Megabytes
+const MAX_FILE_UPLOAD_SIZE_MB: number = 5;
 
 export function UploadPollingStationDefinition() {
   const { state, dispatch } = useElectionCreateContext();
@@ -36,7 +38,16 @@ export function UploadPollingStationDefinition() {
     const currentFile = e.target.files ? e.target.files[0] : undefined;
     if (currentFile !== undefined) {
       if (currentFile.size > MAX_FILE_UPLOAD_SIZE_MB * 1024 * 1024) {
-        setError(fileTooLargeError(currentFile.name));
+        setError(
+          tx(
+            "file_too_large",
+            {},
+            {
+              filename: currentFile.name,
+              max_size: `${MAX_FILE_UPLOAD_SIZE_MB}`,
+            },
+          ),
+        );
         return;
       }
 
@@ -63,7 +74,16 @@ export function UploadPollingStationDefinition() {
       } else if (isError(response)) {
         // Response code 413 indicates that the file is too large
         if (response instanceof ApiError && response.code === 413) {
-          setError(fileTooLargeError(currentFile.name));
+          setError(
+            tx(
+              "file_too_large",
+              {},
+              {
+                filename: currentFile.name,
+                max_size: `${MAX_FILE_UPLOAD_SIZE_MB}`,
+              },
+            ),
+          );
         } else {
           setError(
             tx("election.invalid_polling_station_definition.description", {

@@ -20,7 +20,9 @@ import {
   PollingStationRequest,
   PollingStationRequestListResponse,
 } from "@/types/generated/openapi";
-import { fileTooLargeError, MAX_FILE_UPLOAD_SIZE_MB } from "@/utils/fileUpload";
+
+// Maximum file upload this for this component in Megabytes
+const MAX_FILE_UPLOAD_SIZE_MB: number = 5;
 
 import { PollingStationAlert } from "./PollingStationAlert";
 
@@ -64,7 +66,16 @@ export function PollingStationImportPage() {
     const currentFile = e.target.files ? e.target.files[0] : undefined;
     if (currentFile !== undefined) {
       if (currentFile.size > MAX_FILE_UPLOAD_SIZE_MB * 1024 * 1024) {
-        setError(fileTooLargeError(currentFile.name));
+        setError(
+          tx(
+            "file_too_large",
+            {},
+            {
+              filename: currentFile.name,
+              max_size: `${MAX_FILE_UPLOAD_SIZE_MB}`,
+            },
+          ),
+        );
         return;
       }
 
@@ -80,7 +91,16 @@ export function PollingStationImportPage() {
 
         // Response code 413 indicates that the file is too large
         if (response instanceof ApiError && response.code === 413) {
-          setError(fileTooLargeError(currentFile.name));
+          setError(
+            tx(
+              "file_too_large",
+              {},
+              {
+                filename: currentFile.name,
+                max_size: `${MAX_FILE_UPLOAD_SIZE_MB}`,
+              },
+            ),
+          );
         } else {
           setError(
             tx("election.invalid_polling_station_definition.description", {

@@ -48,7 +48,7 @@ jobs:
         run: npm ci
         working-directory: ./frontend
       - name: Build
-        run: npm run build
+        run: npm run build:prod
         working-directory: ./frontend
       - name: Setup Rust
         run: rustup update stable && rustup default stable
@@ -58,9 +58,9 @@ jobs:
         run: sudo apt-get update && sudo apt-get install -y musl-tools
         if: matrix.target.os == 'ubuntu-latest'
       - name: Run tests
-        run: cargo --locked test --release --features embed-typst --target=${{ matrix.target.name }}
+        run: cargo --locked test --release --no-default-features --features memory-serve,embed-typst --target=${{ matrix.target.name }}
       - name: Build
-        run: cargo --locked build --release --features memory-serve,embed-typst --target=${{ matrix.target.name }}
+        run: cargo --locked build --release --no-default-features --features memory-serve,embed-typst --target=${{ matrix.target.name }}
       - name: Attest build provenance
         uses: actions/attest-build-provenance@v3
         with:
@@ -101,8 +101,6 @@ jobs:
         if: runner.os != 'Windows'
       - name: Run Playwright e2e tests
         run: npm run test:e2e
-        env:
-          BACKEND_BUILD: release
       - name: Upload Playwright report
         uses: actions/upload-artifact@v4
         if: ${{ !cancelled() }}

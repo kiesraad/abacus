@@ -21,10 +21,10 @@ import {
   PollingStationRequestListResponse,
 } from "@/types/generated/openapi";
 
+import { PollingStationAlert } from "./PollingStationAlert";
+
 // Maximum file upload this for this component in Megabytes
 const MAX_FILE_UPLOAD_SIZE_MB: number = 5;
-
-import { PollingStationAlert } from "./PollingStationAlert";
 
 export function PollingStationImportPage() {
   const { election } = useElection();

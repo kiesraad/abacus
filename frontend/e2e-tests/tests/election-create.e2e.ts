@@ -227,7 +227,8 @@ test.describe("Election creation", () => {
     const uploadElectionDefinitionPage = new UploadElectionDefinitionPgObj(page);
     await expect(uploadElectionDefinitionPage.header).toBeVisible();
     await uploadElectionDefinitionPage.uploadFile(eml110a_too_large.path);
-    await uploadElectionDefinitionPage.fileTooLargeError(eml110a_too_large.filename);
+    await expect(uploadElectionDefinitionPage.error).toBeVisible();
+    await expect(uploadElectionDefinitionPage.fileTooLargeError(eml110a_too_large.filename)).toBeVisible();
   });
 
   test("it fails on valid, but incorrect file for candidate list", async ({ page }) => {
@@ -267,7 +268,8 @@ test.describe("Election creation", () => {
     const uploadCandidateDefinitionPage = new UploadCandidateDefinitionPgObj(page);
     await expect(uploadCandidateDefinitionPage.header).toBeVisible();
     await uploadCandidateDefinitionPage.uploadFile(eml110a_too_large.path);
-    await uploadCandidateDefinitionPage.fileTooLargeError(eml110a_too_large.filename);
+    await expect(uploadCandidateDefinitionPage.error).toBeVisible();
+    await expect(uploadCandidateDefinitionPage.fileTooLargeError(eml110a_too_large.filename)).toBeVisible();
   });
 
   test("warning modal close button should stay on page", async ({ page }) => {
@@ -561,7 +563,8 @@ test.describe("Election creation", () => {
     const uploadElectionDefinitionPage = new UploadPollingStationDefinitionPgObj(page);
     await expect(uploadElectionDefinitionPage.header).toBeVisible();
     await uploadElectionDefinitionPage.uploadFile(eml110a_too_large.path);
-    await uploadElectionDefinitionPage.fileTooLargeError(eml110a_too_large.filename);
+    await expect(uploadElectionDefinitionPage.error).toBeVisible();
+    await expect(uploadElectionDefinitionPage.fileTooLargeError(eml110a_too_large.filename)).toBeVisible();
   });
 
   test("show more button should show full list of polling stations", async ({ page }) => {

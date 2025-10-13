@@ -27,6 +27,9 @@ components:
   - name: "(Backend) Files"
     include:
       - ".*/backend/src/files/.*"
+  - name: "(Backend) Investigation"
+    include:
+      - ".*/backend/src/investigation/.*"
   - name: "(Backend) PDF generation"
     include:
       - ".*/backend/src/pdf_gen/.*"
@@ -66,6 +69,12 @@ components:
   - name: "(Backend) Integration tests"
     include:
       - ".*/backend/tests/.*"
+  - name: "(Backend) SQL Migrations"
+    include:
+      - ".*/backend/migrations/.*"
+  - name: "(Backend) Typst templates"
+    include:
+      - ".*/backend/templates/.*"
 
   # Frontend src/components
   - name: "(Frontend) Components/committee_session"
@@ -162,12 +171,15 @@ components:
   - name: "(Frontend) Lib/i18n"
     include:
       - ".*/frontend/src/i18n/.*"
-  - name: "(Frontend) src/styling"
+  - name: "(Frontend) src/styles"
     include:
-      - ".*/frontend/src/styling/.*"
+      - ".*/frontend/src/styles/.*"
   - name: "(Frontend) src/testing"
     include:
       - ".*/frontend/src/testing/.*"
+  - name: "(Frontend) src/types"
+    include:
+      - ".*/frontend/src/types/.*"
   - name: "(Frontend) Lib/Util"
     include:
       - ".*/frontend/src/utils/.*"

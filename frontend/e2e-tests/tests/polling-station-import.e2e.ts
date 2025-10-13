@@ -49,6 +49,7 @@ test.describe("Polling station import", () => {
 
     // Select file that's too large
     await importPage.uploadFile(eml110a_too_large.path);
-    await importPage.fileTooLargeError(eml110a_too_large.filename);
+    await expect(importPage.error).toBeVisible();
+    await expect(importPage.fileTooLargeError(eml110a_too_large.filename)).toBeVisible();
   });
 });

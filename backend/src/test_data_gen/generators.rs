@@ -55,15 +55,6 @@ pub async fn create_test_election(
     )
     .await?;
 
-    if args.with_data_entry {
-        committee_session = crate::committee_session::repository::change_status(
-            &mut tx,
-            committee_session.id,
-            CommitteeSessionStatus::DataEntryInProgress,
-        )
-        .await?;
-    }
-
     let number_of_voters = rng.random_range(args.voters.clone());
     committee_session.number_of_voters = number_of_voters;
     crate::committee_session::repository::change_number_of_voters(
@@ -77,10 +68,28 @@ pub async fn create_test_election(
     let polling_stations =
         generate_polling_stations(&mut rng, &committee_session, &election, &mut tx, &args).await;
 
+    if !polling_stations.is_empty() {
+        committee_session = crate::committee_session::repository::change_status(
+            &mut tx,
+            committee_session.id,
+            CommitteeSessionStatus::DataEntryNotStarted,
+        )
+        .await?;
+    }
+
     info!(
         "Election generated with election id: {}, election name: '{}'",
         election.id, election.name
     );
+
+    if args.with_data_entry {
+        committee_session = crate::committee_session::repository::change_status(
+            &mut tx,
+            committee_session.id,
+            CommitteeSessionStatus::DataEntryInProgress,
+        )
+        .await?;
+    }
 
     let data_entry_completed = if args.with_data_entry {
         let (_, second_entries) = generate_data_entry(

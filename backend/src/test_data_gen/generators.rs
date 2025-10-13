@@ -82,16 +82,14 @@ pub async fn create_test_election(
         election.id, election.name
     );
 
-    if args.with_data_entry {
+    let data_entry_completed = if args.with_data_entry {
         committee_session = crate::committee_session::repository::change_status(
             &mut tx,
             committee_session.id,
             CommitteeSessionStatus::DataEntryInProgress,
         )
         .await?;
-    }
 
-    let data_entry_completed = if args.with_data_entry {
         let (_, second_entries) = generate_data_entry(
             &committee_session,
             &election,

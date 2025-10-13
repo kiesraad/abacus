@@ -23,11 +23,11 @@ test.describe("Polling station import", () => {
     await expect(importPage.header).toBeVisible();
 
     // Select incorrect file
-    await importPage.uploadFile(page, eml110a.path);
+    await importPage.uploadFile(eml110a.path);
     await expect(importPage.error).toContainText("Ongeldig stembureaubestand");
 
     // Select correct file
-    await importPage.uploadFile(page, eml110b.path);
+    await importPage.uploadFile(eml110b.path);
     await importPage.importButton.click();
 
     // Check for confirmation on the list page
@@ -48,7 +48,7 @@ test.describe("Polling station import", () => {
     await expect(importPage.header).toBeVisible();
 
     // Select file that's too large
-    await importPage.uploadFile(page, eml110a_too_large.path);
-    await importPage.fileTooLargeError(page, eml110a_too_large.filename);
+    await importPage.uploadFile(eml110a_too_large.path);
+    await importPage.fileTooLargeError(eml110a_too_large.filename);
   });
 });

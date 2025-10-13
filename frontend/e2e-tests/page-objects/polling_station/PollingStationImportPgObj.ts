@@ -13,15 +13,15 @@ export class PollingStationImportPgObj {
     this.upload = page.getByRole("button", { name: "Bestand kiezen" });
   }
 
-  async uploadFile(page: Page, path: string) {
-    const fileChooserPromise = page.waitForEvent("filechooser");
+  async uploadFile(path: string) {
+    const fileChooserPromise = this.page.waitForEvent("filechooser");
     await this.upload.click();
     const fileChooser = await fileChooserPromise;
     await fileChooser.setFiles(path);
   }
 
-  async fileTooLargeError(page: Page, filename: string) {
+  async fileTooLargeError(filename: string) {
     await expect(this.error).toBeVisible();
-    await expect(page.getByRole("strong").filter({ hasText: filename })).toBeVisible();
+    await expect(this.page.getByRole("strong").filter({ hasText: filename })).toBeVisible();
   }
 }

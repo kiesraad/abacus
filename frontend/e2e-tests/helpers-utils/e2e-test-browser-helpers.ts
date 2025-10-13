@@ -81,7 +81,7 @@ export async function fillDataEntryPagesAndSave(page: Page, results: PollingStat
 export async function uploadElectionAndInputHash(page: Page) {
   const uploadElectionDefinitionPage = new UploadElectionDefinitionPgObj(page);
   await expect(uploadElectionDefinitionPage.header).toBeVisible();
-  await uploadElectionDefinitionPage.uploadFile(page, eml110a.path);
+  await uploadElectionDefinitionPage.uploadFile(eml110a.path);
   await expect(uploadElectionDefinitionPage.main).toContainText(eml110a.filename);
   await expect(uploadElectionDefinitionPage.main).toContainText(eml110a.electionDate);
 
@@ -93,7 +93,7 @@ export async function uploadElectionAndInputHash(page: Page) {
 export async function uploadCandidatesAndInputHash(page: Page) {
   const uploadCandidateDefinitionPage = new UploadCandidateDefinitionPgObj(page);
   await expect(uploadCandidateDefinitionPage.header).toBeVisible();
-  await uploadCandidateDefinitionPage.uploadFile(page, eml230b.path);
+  await uploadCandidateDefinitionPage.uploadFile(eml230b.path);
   await expect(uploadCandidateDefinitionPage.main).toContainText(eml230b.filename);
   await expect(uploadCandidateDefinitionPage.main).toContainText(eml230b.electionDate);
 
@@ -105,7 +105,7 @@ export async function uploadCandidatesAndInputHash(page: Page) {
 export async function uploadPollingStations(page: Page, eml = eml110b) {
   const uploadElectionDefinitionPage = new UploadPollingStationDefinitionPgObj(page);
   await expect(uploadElectionDefinitionPage.header).toBeVisible();
-  await uploadElectionDefinitionPage.uploadFile(page, eml.path);
+  await uploadElectionDefinitionPage.uploadFile(eml.path);
   await expect(uploadElectionDefinitionPage.main).toContainText(eml.filename);
 
   const checkDefinitionPage = new CheckPollingStationDefinitionPgObj(page);

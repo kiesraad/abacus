@@ -15,15 +15,15 @@ export class UploadPollingStationDefinitionPgObj {
     this.main = page.getByRole("main");
   }
 
-  async uploadFile(page: Page, path: string) {
-    const fileChooserPromise = page.waitForEvent("filechooser");
-    await page.getByText("Bestand kiezen").click();
+  async uploadFile(path: string) {
+    const fileChooserPromise = this.page.waitForEvent("filechooser");
+    await this.page.getByText("Bestand kiezen").click();
     const fileChooser = await fileChooserPromise;
     await fileChooser.setFiles(path);
   }
 
-  async fileTooLargeError(page: Page, filename: string) {
+  async fileTooLargeError(filename: string) {
     await expect(this.error).toBeVisible();
-    await expect(page.getByRole("strong").filter({ hasText: filename })).toBeVisible();
+    await expect(this.page.getByRole("strong").filter({ hasText: filename })).toBeVisible();
   }
 }

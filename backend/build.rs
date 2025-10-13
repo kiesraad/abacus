@@ -1,4 +1,12 @@
 fn main() {
-    #[cfg(feature = "memory-serve")]
-    memory_serve::load_directory_with_embed("../frontend/dist", true);
+    #[cfg(any(feature = "memory-serve", feature = "storybook"))]
+    {
+        let sources = vec![
+            #[cfg(feature = "memory-serve")]
+            ("frontend", "../frontend/dist"),
+            #[cfg(feature = "storybook")]
+            ("storybook", "../frontend/dist-storybook"),
+        ];
+        memory_serve::load_names_directories(sources, true);
+    }
 }

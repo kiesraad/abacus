@@ -442,9 +442,9 @@ dependencies = [
 
 [[package]]
 name = "brotli"
-version = "7.0.0"
+version = "8.0.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "cc97b8f16f944bba54f0433f07e30be199b6dc2bd25937444bbad560bcea29bd"
+checksum = "4bd8b9603c7aa97359dbd97ecf258968c95f3adddd6db2f7e7a5bef101c84560"
 dependencies = [
  "alloc-no-stdlib",
  "alloc-stdlib",
@@ -453,9 +453,9 @@ dependencies = [
 
 [[package]]
 name = "brotli-decompressor"
-version = "4.0.3"
+version = "5.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a334ef7c9e23abf0ce748e8cd309037da93e606ad52eb372e4ce327a0dcfbdfd"
+checksum = "874bb8112abecc98cbd6d81ea4fa7e94fb9449648c93cc89aa40c81c24d7de03"
 dependencies = [
  "alloc-no-stdlib",
  "alloc-stdlib",
@@ -2061,9 +2061,9 @@ dependencies = [
 
 [[package]]
 name = "memory-serve"
-version = "1.2.1"
+version = "1.2.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e3cc9a6d8b135c31154a1f3b14f902a77cd9172871dedc7df503e7b05c433182"
+checksum = "d442c6a6a2c2c17b73cbbcf80ae7e9f0580361009345229a1aa42c8f68db3d79"
 dependencies = [
  "axum",
  "brotli",
@@ -2076,9 +2076,9 @@ dependencies = [
 
 [[package]]
 name = "memory-serve-core"
-version = "1.2.1"
+version = "1.2.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "520282572b66169a1362b4e843bcccea5fb59dc92f8617a08a9c0c25e89ab47f"
+checksum = "a507b2a57945559742e1bce3c1065dd30f63ba8cb18f335ab2d864fb35e7a3b9"
 dependencies = [
  "brotli",
  "mime_guess",
@@ -2089,9 +2089,9 @@ dependencies = [
 
 [[package]]
 name = "memory-serve-macros"
-version = "1.2.1"
+version = "1.2.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "dc76af6993714bb4f3ef5192c3d78cccf1c4df5f9c75a6bfbc25fa5b84208a88"
+checksum = "c88cca52f1f57b4afae6c5428d3622a6daec7c7cb2f0a055acf11efe9319ad91"
 dependencies = [
  "memory-serve-core",
 ]
@@ -4679,7 +4679,7 @@ version = "0.1.11"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c2a7b1c03c876122aa43f3020e6c3c3ee5c05081c9a00739faf7503aeba10d22"
 dependencies = [
- "windows-sys 0.48.0",
+ "windows-sys 0.60.2",
 ]
 
 [[package]]

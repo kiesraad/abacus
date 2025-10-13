@@ -147,7 +147,7 @@ fn add_middleware(router: Router<AppState>, state: &AppState) -> Router<AppState
 #[cfg(feature = "memory-serve")]
 fn add_frontend_memory_serve(router: Router<AppState>) -> Router<AppState> {
     router.merge(
-        memory_serve::from_local_build!()
+        memory_serve::from_local_build!("frontend")
             .index_file(Some("/index.html"))
             .fallback(Some("/index.html"))
             .fallback_status(StatusCode::OK)
@@ -185,15 +185,13 @@ fn add_storybook_memory_serve(router: Router<AppState>) -> Router<AppState> {
     router
         .nest(
             "/storybook/",
-            memory_serve::MemoryServe::new(memory_serve::load_assets!(
-                "../frontend/dist-storybook"
-            ))
-            .index_file(Some("/index.html"))
-            .into_router()
-            .layer(SetResponseHeaderLayer::overriding(
-                header::X_FRAME_OPTIONS,
-                HeaderValue::from_static("sameorigin"),
-            )),
+            memory_serve::from_local_build!("storybook")
+                .index_file(Some("/index.html"))
+                .into_router()
+                .layer(SetResponseHeaderLayer::overriding(
+                    header::X_FRAME_OPTIONS,
+                    HeaderValue::from_static("sameorigin"),
+                )),
         )
         // Workaround for https://github.com/storybookjs/storybook/issues/32428
         .route(

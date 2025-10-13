@@ -68,6 +68,11 @@ pub async fn create_test_election(
     let polling_stations =
         generate_polling_stations(&mut rng, &committee_session, &election, &mut tx, &args).await;
 
+    info!(
+        "Election generated with election id: {}, election name: '{}'",
+        election.id, election.name
+    );
+
     if !polling_stations.is_empty() {
         committee_session = crate::committee_session::repository::change_status(
             &mut tx,
@@ -77,12 +82,7 @@ pub async fn create_test_election(
         .await?;
     }
 
-    info!(
-        "Election generated with election id: {}, election name: '{}'",
-        election.id, election.name
-    );
-
-    let data_entry_completed = if args.with_data_entry {
+    let data_entry_completed = if args.with_data_entry && !polling_stations.is_empty() {
         committee_session = crate::committee_session::repository::change_status(
             &mut tx,
             committee_session.id,

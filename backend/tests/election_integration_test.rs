@@ -74,13 +74,13 @@ async fn test_election_details_works(pool: SqlitePool) {
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("users"))))]
 async fn test_election_import_payload_too_large(pool: SqlitePool) {
-    use abacus::MAX_BODY_SIZE_MB;
+    use abacus::MAX_BODY_SIZE;
     use reqwest::Body;
 
     let addr = serve_api(pool).await;
 
-    // Create a payload that is larger than MAX_BODY_SIZE_MB
-    let body = Vec::from_iter((0..MAX_BODY_SIZE_MB * 1024 * 1024 + 1).map(|_| b'a'));
+    // Create a payload that is larger than MAX_BODY_SIZE
+    let body = Vec::from_iter((0..MAX_BODY_SIZE + 1).map(|_| b'a'));
 
     let url = format!("http://{addr}/api/elections/import");
     let admin_cookie = shared::admin_login(&addr).await;
@@ -99,13 +99,13 @@ async fn test_election_import_payload_too_large(pool: SqlitePool) {
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("users"))))]
 async fn test_election_import_payload_not_too_large(pool: SqlitePool) {
-    use abacus::MAX_BODY_SIZE_MB;
+    use abacus::MAX_BODY_SIZE;
     use reqwest::Body;
 
     let addr = serve_api(pool).await;
 
-    // Create a MAX_BODY_SIZE_MB payload (should return a 400 instead of a 413)
-    let body = Vec::from_iter((0..MAX_BODY_SIZE_MB * 1024 * 1024).map(|_| b'a'));
+    // Create a MAX_BODY_SIZE payload (should return a 400 instead of a 413)
+    let body = Vec::from_iter((0..MAX_BODY_SIZE).map(|_| b'a'));
 
     let url = format!("http://{addr}/api/elections/import");
     let admin_cookie = shared::admin_login(&addr).await;

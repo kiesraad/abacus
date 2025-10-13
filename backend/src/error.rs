@@ -14,7 +14,7 @@ use tracing::error;
 use utoipa::ToSchema;
 
 use crate::{
-    MAX_BODY_SIZE_MB, authentication::error::AuthenticationError,
+    MAX_BODY_SIZE, authentication::error::AuthenticationError,
     committee_session::CommitteeSessionError, data_entry::DataError, eml::EMLImportError,
     pdf_gen::PdfGenError, zip::ZipResponseError,
 };
@@ -444,7 +444,7 @@ impl From<Box<dyn Error>> for APIError {
 pub async fn map_error_response(response: Response) -> Response {
     if response.status() == StatusCode::PAYLOAD_TOO_LARGE {
         APIError::ContentTooLarge(
-            MAX_BODY_SIZE_MB.to_string(),
+            (MAX_BODY_SIZE / 1024 / 1024).to_string(),
             ErrorReference::RequestPayloadTooLarge,
         )
         .into_response()

@@ -65,7 +65,9 @@ export function PollingStationImportPage() {
   async function onFileChange(e: ChangeEvent<HTMLInputElement>) {
     const currentFile = e.target.files ? e.target.files[0] : undefined;
     if (currentFile !== undefined) {
-      if (currentFile.size > MAX_FILE_UPLOAD_SIZE_MB * 1024 * 1024) {
+      // Get the size of the string in bytes after JSON encoding
+      const fileSize: number = new Blob([JSON.stringify(await currentFile.text())]).size;
+      if (fileSize > MAX_FILE_UPLOAD_SIZE_MB * 1024 * 1024) {
         setError(
           tx(
             "file_too_large",

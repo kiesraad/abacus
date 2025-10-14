@@ -40,6 +40,8 @@ jobs:
           INCLUDE_STORYBOOK_LINK: true
       - name: Build Storybook
         run: npm run build:storybook
+      - name: Move Storybook to dist
+        run: mv dist-storybook dist/storybook
       - name: Deploy
         id: deploy
         uses: cloudflare/wrangler-action@da0e0dfe58b7a431659754fdf3f186c529afbe65 # v3

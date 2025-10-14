@@ -79,13 +79,12 @@ describe("NavBar", () => {
 
   test.each([
     { pathname: "/elections" },
-    { pathname: "/users" },
+    { pathname: "/elections/1" },
+    { pathname: "/elections/create" },
     { pathname: "/users" },
     { pathname: "/users/create" },
     { pathname: "/users/create/details" },
     { pathname: "/logs" },
-    { pathname: "/elections/1" },
-    { pathname: "/elections/create" },
   ])("top level management links for $pathname", async (location) => {
     await renderNavBar(location, "administrator");
 
@@ -149,7 +148,6 @@ describe("NavBar", () => {
     // menu should be invisible
     expect(screen.queryByRole("link", { name: "Verkiezingen" })).not.toBeInTheDocument();
     expect(screen.queryByRole("link", { name: "Gebruikers" })).not.toBeInTheDocument();
-    expect(screen.queryByRole("link", { name: "Werkplekken" })).not.toBeInTheDocument();
     expect(screen.queryByRole("link", { name: "Logs" })).not.toBeInTheDocument();
 
     // menu should be visible after clicking button

@@ -400,16 +400,19 @@ async fn polling_station_investigation_download_corrigendum_pdf(
     let election: ElectionWithPoliticalGroups =
         crate::election::repository::get(&mut conn, polling_station.election_id).await?;
 
-    let previous_results = if let Some(id) = polling_station.id_prev_session {
-        let Some(results) = most_recent_results_for_polling_station(&mut conn, id).await? else {
-            return Err(APIError::NotFound(
-                "Previous results not found for the current polling station".to_string(),
-                ErrorReference::EntryNotFound,
-            ));
-        };
-        results
-    } else {
-        PollingStationResults::empty_cso_first_session(&election.political_groups)
+    let previous_results = match polling_station.id_prev_session {
+        Some(_) => {
+            match most_recent_results_for_polling_station(&mut conn, polling_station_id).await {
+                Ok(results) => results,
+                Err(_) => {
+                    return Err(APIError::NotFound(
+                        "Previous results not found for the current polling station".to_string(),
+                        ErrorReference::EntryNotFound,
+                    ));
+                }
+            }
+        }
+        None => PollingStationResults::empty_cso_first_session(&election.political_groups),
     };
 
     let name = format!(

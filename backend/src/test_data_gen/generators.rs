@@ -105,7 +105,7 @@ pub async fn create_test_election(
     };
 
     let results = if data_entry_completed {
-        crate::data_entry::repository::list_entries_for_committee_session(
+        crate::data_entry::repository::list_results_for_committee_session(
             &mut tx,
             committee_session.id,
         )

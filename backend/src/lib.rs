@@ -95,30 +95,22 @@ pub fn openapi_router() -> OpenApiRouter<AppState> {
     router
 }
 
-/// Axum router for the application
-pub fn router(
-    pool: SqlitePool,
-    airgap_detection: AirgapDetection,
-) -> Result<Router, Box<dyn Error>> {
-    let state = AppState {
-        pool,
-        airgap_detection,
-    };
-
-    // Serve the OpenAPI documentation at /api-docs (if the openapi feature is enabled)
+fn axum_router_from_openapi(router: OpenApiRouter<AppState>) -> Router<AppState> {
+    // Serve the OpenAPI documentation at /api-docs if the openapi feature is enabled
     #[cfg(feature = "openapi")]
-    let router = {
-        let (router, openapi) = openapi_router().split_for_parts();
+    {
+        let (router, openapi) = router.split_for_parts();
         router.merge(SwaggerUi::new("/api-docs").url("/api-docs/openapi.json", openapi))
-    };
+    }
 
-    // Discard the OpenAPI documentation if the openapi feature is disabled
+    // Serve without OpenAPI documentation if the openapi feature is disabled
     #[cfg(not(feature = "openapi"))]
-    let router = Router::from(openapi_router());
+    Router::from(router)
+}
 
-    // Add middleware to trace all HTTP requests and extend the user's session lifetime if needed
-    // Caution: make sure "inject_user" is added after "extend_session"
-    let router = router
+/// Add middleware to trace all HTTP requests and extend the user's session lifetime if needed
+fn add_middleware(router: Router<AppState>, state: &AppState) -> Router<AppState> {
+    router
         .layer(middleware::map_response(error::map_error_response))
         .layer(DefaultBodyLimit::max(1024 * 1024 * MAX_BODY_SIZE_MB))
         .layer(
@@ -134,6 +126,7 @@ pub fn router(
             state.clone(),
             authentication::extend_session,
         ))
+        // Caution: make sure "inject_user" is added after "extend_session"
         .layer(middleware::map_request_with_state(
             state.clone(),
             authentication::inject_user,
@@ -141,25 +134,28 @@ pub fn router(
         .layer(middleware::from_fn_with_state(
             state.clone(),
             airgap::block_request_on_airgap_violation,
-        ));
+        ))
+        // Set Cache-Control header to prevent caching of API responses
+        .layer(SetResponseHeaderLayer::overriding(
+            header::CACHE_CONTROL,
+            HeaderValue::from_static("no-store"),
+        ))
+}
 
-    // Set Cache-Control header to prevent caching of API responses
-    let router = router.layer(SetResponseHeaderLayer::overriding(
-        header::CACHE_CONTROL,
-        HeaderValue::from_static("no-store"),
-    ));
-
-    // Add the memory-serve router to serve the frontend (if the memory-serve feature is enabled)
-    // Note that memory-serve includes its own Cache-Control header.
-    #[cfg(feature = "memory-serve")]
-    let router = router.merge(
-        memory_serve::from_local_build!()
+/// Add the memory-serve router to serve the frontend (if the memory-serve feature is enabled)
+/// Note that memory-serve includes its own Cache-Control header.
+#[cfg(feature = "memory-serve")]
+fn add_frontend_memory_serve(router: Router<AppState>) -> Router<AppState> {
+    router.merge(
+        memory_serve::from_local_build!("frontend")
             .index_file(Some("/index.html"))
             .fallback(Some("/index.html"))
             .fallback_status(StatusCode::OK)
             .into_router()
-            // Add Referrer-Policy and Permissions-Policy headers,
-            // these are only needed on HTML documents (not API requests)
+            // Add Referrer-Policy, Permissions-Policy and Content-Security-Policy headers.
+            // These are only needed on HTML documents, not API requests.
+            // From https://cheatsheetseries.owasp.org/cheatsheets/REST_Security_Cheat_Sheet.html#security-headers:
+            // "The headers below are only intended to provide additional security when responses are rendered as HTML."
             .layer(SetResponseHeaderLayer::overriding(
                 header::REFERRER_POLICY,
                 HeaderValue::from_static("no-referrer"),
@@ -175,23 +171,48 @@ pub fn router(
                      xr-spatial-tracking=(), clipboard-read=(), clipboard-write=(), gamepad=(), \
                      hid=(), idle-detection=(), interest-cohort=(), serial=(), unload=()",
                 ),
+            ))
+            .layer(SetResponseHeaderLayer::overriding(
+                header::CONTENT_SECURITY_POLICY,
+                HeaderValue::from_static("default-src 'self'; img-src 'self' data:"),
             )),
-    );
+    )
+}
 
-    // Add headers for security hardening
-    // Best practices according to the OWASP Secure Headers Project, https://owasp.org/www-project-secure-headers/
+/// Add memory-serve router to serve Storybook
+#[cfg(feature = "storybook")]
+fn add_storybook_memory_serve(router: Router<AppState>) -> Router<AppState> {
+    router
+        .nest(
+            "/storybook/",
+            memory_serve::from_local_build!("storybook")
+                .index_file(Some("/index.html"))
+                .into_router()
+                .layer(SetResponseHeaderLayer::overriding(
+                    header::X_FRAME_OPTIONS,
+                    HeaderValue::from_static("sameorigin"),
+                )),
+        )
+        // Workaround for https://github.com/storybookjs/storybook/issues/32428
+        .route(
+            "/vite-inject-mocker-entry.js",
+            axum::routing::get(|| async {
+                axum::response::Redirect::temporary("/storybook/vite-inject-mocker-entry.js")
+            }),
+        )
+}
+
+/// Add headers for security hardening
+/// Best practices according to the OWASP Secure Headers Project, https://owasp.org/www-project-secure-headers/
+fn add_security_headers(router: Router<AppState>) -> Router<AppState> {
     let security_headers_service = tower::ServiceBuilder::new()
-        .layer(SetResponseHeaderLayer::overriding(
+        .layer(SetResponseHeaderLayer::if_not_present(
             header::X_FRAME_OPTIONS,
             HeaderValue::from_static("deny"),
         ))
         .layer(SetResponseHeaderLayer::overriding(
             header::X_CONTENT_TYPE_OPTIONS,
             HeaderValue::from_static("nosniff"),
-        ))
-        .layer(SetResponseHeaderLayer::overriding(
-            header::CONTENT_SECURITY_POLICY,
-            HeaderValue::from_static("default-src 'self'; img-src 'self' data:"),
         ))
         .layer(SetResponseHeaderLayer::overriding(
             HeaderName::from_static("x-permitted-cross-domain-policies"),
@@ -209,11 +230,26 @@ pub fn router(
             HeaderName::from_static("cross-origin-opener-policy"),
             HeaderValue::from_static("same-origin"),
         ));
-    let router = router.layer(security_headers_service);
+    router.layer(security_headers_service)
+}
 
-    // Add the state to the app
+/// Complete Axum router for the application
+pub fn router(
+    pool: SqlitePool,
+    airgap_detection: AirgapDetection,
+) -> Result<Router, Box<dyn Error>> {
+    let router = axum_router_from_openapi(openapi_router());
+    let state = AppState {
+        pool,
+        airgap_detection,
+    };
+    let router = add_middleware(router, &state);
+    #[cfg(feature = "memory-serve")]
+    let router = add_frontend_memory_serve(router);
+    #[cfg(feature = "storybook")]
+    let router = add_storybook_memory_serve(router);
+    let router = add_security_headers(router);
     let router = router.with_state(state);
-
     Ok(router)
 }
 
@@ -367,10 +403,6 @@ mod test {
             assert_eq!(response.headers()["x-frame-options"], "deny");
             assert_eq!(response.headers()["x-content-type-options"], "nosniff");
             assert_eq!(
-                response.headers()["content-security-policy"],
-                "default-src 'self'; img-src 'self' data:"
-            );
-            assert_eq!(
                 response.headers()["x-permitted-cross-domain-policies"],
                 "none"
             );
@@ -400,6 +432,23 @@ mod test {
                         screen-wake-lock=(), sync-xhr=(self), usb=(), web-share=(), \
                         xr-spatial-tracking=(), clipboard-read=(), clipboard-write=(), gamepad=(), \
                         hid=(), idle-detection=(), interest-cohort=(), serial=(), unload=()"
+                );
+                assert_eq!(
+                    response.headers()["content-security-policy"],
+                    "default-src 'self'; img-src 'self' data:"
+                );
+            }
+
+            #[cfg(feature = "storybook")]
+            {
+                // Test that /storybook path doesn't have CSP header
+                let storybook_response = reqwest::get(format!("{base_url}/storybook/"))
+                    .await
+                    .unwrap();
+                assert!(
+                    !storybook_response
+                        .headers()
+                        .contains_key("content-security-policy")
                 );
             }
         })

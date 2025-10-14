@@ -50,7 +50,7 @@
     "data_entry_status": "Status",
     "election_category": "Verkiezingscategorie",
     "election_counting_method": "Stemopneming",
-    "election_domain_id": "Kieskring",
+    "election_domain_id": "Verkiezingsregio-ID",
     "election_election_date": "Verkiezingsdatum",
     "election_election_id": "Verkiezings-ID",
     "election_id": "Verkiezings-ID",

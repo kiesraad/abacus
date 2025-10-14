@@ -133,7 +133,10 @@ mod tests {
     use axum::{
         Router,
         body::Body,
-        http::{Method, Request},
+        http::{
+            Method, Request,
+            header::{COOKIE, USER_AGENT},
+        },
         middleware,
         routing::get,
     };
@@ -152,6 +155,9 @@ mod tests {
         },
         authentication::{User, inject_user},
     };
+
+    const TEST_USER_AGENT: &str = "TestAgent/1.0";
+    const TEST_IP_ADDRESS: &str = "0.0.0.0";
 
     fn new_test_audit_service(user: Option<User>) -> AuditService {
         AuditService::new(user, Some(Ipv4Addr::new(203, 0, 113, 0).into()))
@@ -181,10 +187,15 @@ mod tests {
         };
 
         let mut conn = pool.acquire().await.unwrap();
-        let session =
-            crate::authentication::session::create(&mut conn, 1, TimeDelta::seconds(60 * 30))
-                .await
-                .unwrap();
+        let session = crate::authentication::session::create(
+            &mut conn,
+            1,
+            TEST_USER_AGENT,
+            TEST_IP_ADDRESS,
+            TimeDelta::seconds(60 * 30),
+        )
+        .await
+        .unwrap();
 
         let app = Router::new()
             .route("/api/log", get(audit_log_list))
@@ -201,7 +212,8 @@ mod tests {
             .oneshot(
                 Request::builder()
                     .method(Method::GET)
-                    .header("cookie", session.get_cookie().encoded().to_string())
+                    .header(USER_AGENT, TEST_USER_AGENT)
+                    .header(COOKIE, session.get_cookie().encoded().to_string())
                     .uri("/api/log")
                     .body(Body::empty())
                     .unwrap(),
@@ -220,7 +232,8 @@ mod tests {
             .oneshot(
                 Request::builder()
                     .method(Method::GET)
-                    .header("cookie", session.get_cookie().encoded().to_string())
+                    .header(USER_AGENT, TEST_USER_AGENT)
+                    .header(COOKIE, session.get_cookie().encoded().to_string())
                     .uri("/api/log?per_page=2&page=2")
                     .body(Body::empty())
                     .unwrap(),
@@ -244,10 +257,15 @@ mod tests {
         };
 
         let mut conn = pool.acquire().await.unwrap();
-        let session =
-            crate::authentication::session::create(&mut conn, 1, TimeDelta::seconds(60 * 30))
-                .await
-                .unwrap();
+        let session = crate::authentication::session::create(
+            &mut conn,
+            1,
+            TEST_USER_AGENT,
+            TEST_IP_ADDRESS,
+            TimeDelta::seconds(60 * 30),
+        )
+        .await
+        .unwrap();
 
         let app = Router::new()
             .route("/api/log-users", get(audit_log_list_users))
@@ -264,7 +282,8 @@ mod tests {
             .oneshot(
                 Request::builder()
                     .method(Method::GET)
-                    .header("cookie", session.get_cookie().encoded().to_string())
+                    .header(USER_AGENT, TEST_USER_AGENT)
+                    .header(COOKIE, session.get_cookie().encoded().to_string())
                     .uri("/api/log-users")
                     .body(Body::empty())
                     .unwrap(),

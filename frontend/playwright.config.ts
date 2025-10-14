@@ -55,10 +55,24 @@ const config: PlaywrightTestConfig = defineConfig({
       use: { ...devices["Desktop Chrome"], channel: "chromium" },
     },
     {
-      name: "setup-test-users",
+      name: "setup-test-users-chrome",
       workers: 1,
       testMatch: /setup-test-users\.ts/,
       use: { ...devices["Desktop Chrome"], channel: "chromium" },
+      dependencies: ["initialisation-test"],
+    },
+    {
+      name: "setup-test-users-firefox",
+      workers: 1,
+      testMatch: /setup-test-users\.ts/,
+      use: { ...devices["Desktop Firefox"] },
+      dependencies: ["initialisation-test"],
+    },
+    {
+      name: "setup-test-users-safari",
+      workers: 1,
+      testMatch: /setup-test-users\.ts/,
+      use: { ...devices["Desktop Safari"] },
       dependencies: ["initialisation-test"],
     },
     {
@@ -72,19 +86,19 @@ const config: PlaywrightTestConfig = defineConfig({
         ...devices["Desktop Chrome"],
         channel: "chromium",
       },
-      dependencies: ["setup-test-users"],
+      dependencies: ["setup-test-users-chrome"],
     },
     {
       name: "firefox",
       testIgnore: /initialisation\.e2e\.ts/,
       use: { ...devices["Desktop Firefox"] },
-      dependencies: ["setup-test-users"],
+      dependencies: ["setup-test-users-firefox"],
     },
     {
       name: "safari",
       testIgnore: /initialisation\.e2e\.ts/,
       use: { ...devices["Desktop Safari"] },
-      dependencies: ["setup-test-users"],
+      dependencies: ["setup-test-users-safari"],
     },
   ],
 });

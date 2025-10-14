@@ -1,10 +1,15 @@
 import { defineConfig, devices, type PlaywrightTestConfig } from "@playwright/test";
 
 function returnWebserverCommand(): string {
-  // CI: use existing backend build, reset and seed database
+  // CI: use existing backend build
   if (process.env.CI) {
     const binary = process.platform === "win32" ? "..\\builds\\backend\\abacus.exe" : "../builds/backend/abacus";
-    return `${binary} --reset-database --port 8081`;
+    let argv = `${binary} --port 8081`;
+    // Release builds don't have the dev-database feature
+    if (!process.env.RELEASE_BUILD) {
+      argv += " --reset-database";
+    }
+    return argv;
   }
 
   // LOCAL CI: build frontend, then build and run backend with database reset and seed playwright-specific database

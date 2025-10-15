@@ -49,7 +49,9 @@ pub mod zip;
 pub use error::{APIError, ErrorResponse};
 
 /// Maximum size of the request body in megabytes.
-pub const MAX_BODY_SIZE_MB: usize = 12;
+/// This maximum is determined by the sum of the Election Create flow's upload limits (3 * 5MB), plus some overhead.
+/// The overhead is about 10x of the observed overhead size in the e2e test
+pub const MAX_BODY_SIZE: usize = (15 * 1024 * 1024) + 4096;
 
 /// Extension trait for SqlitePool to add begin_immediate functionality
 pub trait SqlitePoolExt {
@@ -112,7 +114,7 @@ fn axum_router_from_openapi(router: OpenApiRouter<AppState>) -> Router<AppState>
 fn add_middleware(router: Router<AppState>, state: &AppState) -> Router<AppState> {
     router
         .layer(middleware::map_response(error::map_error_response))
-        .layer(DefaultBodyLimit::max(1024 * 1024 * MAX_BODY_SIZE_MB))
+        .layer(DefaultBodyLimit::max(MAX_BODY_SIZE))
         .layer(
             TraceLayer::new_for_http()
                 .make_span_with(trace::DefaultMakeSpan::new().level(Level::INFO))

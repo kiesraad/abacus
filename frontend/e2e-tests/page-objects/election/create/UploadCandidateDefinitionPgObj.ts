@@ -13,10 +13,14 @@ export class UploadCandidateDefinitionPgObj {
     this.main = page.getByRole("main");
   }
 
-  async uploadFile(page: Page, path: string) {
-    const fileChooserPromise = page.waitForEvent("filechooser");
-    await page.getByText("Bestand kiezen").click();
+  async uploadFile(path: string) {
+    const fileChooserPromise = this.page.waitForEvent("filechooser");
+    await this.page.getByText("Bestand kiezen").click();
     const fileChooser = await fileChooserPromise;
     await fileChooser.setFiles(path);
+  }
+
+  fileTooLargeError(filename: string) {
+    return this.page.getByRole("strong").filter({ hasText: filename });
   }
 }

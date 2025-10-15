@@ -166,6 +166,16 @@ async fn polling_station_investigation_conclude(
 
     let committee_session = validate_and_get_committee_session(&mut tx, polling_station_id).await?;
 
+    let polling_station =
+        crate::polling_station::repository::get(&mut tx, polling_station_id).await?;
+    if polling_station.id_prev_session.is_none() && !polling_station_investigation.corrected_results
+    {
+        return Err(APIError::Conflict(
+            "Investigation requires corrected results, because it is not part of a previous session".into(),
+            ErrorReference::InvestigationRequiresCorrectedResults,
+        ));
+    }
+
     let investigation = conclude_polling_station_investigation(
         &mut tx,
         polling_station_id,
@@ -225,6 +235,17 @@ async fn polling_station_investigation_update(
     let mut tx = pool.begin_immediate().await?;
 
     let committee_session = validate_and_get_committee_session(&mut tx, polling_station_id).await?;
+
+    let polling_station =
+        crate::polling_station::repository::get(&mut tx, polling_station_id).await?;
+    if polling_station.id_prev_session.is_none()
+        && polling_station_investigation.corrected_results != Some(true)
+    {
+        return Err(APIError::Conflict(
+            "Investigation requires corrected results, because it is not part of a previous session".into(),
+            ErrorReference::InvestigationRequiresCorrectedResults,
+        ));
+    }
 
     // If corrected_results is changed from yes to no, check if there are data entries or results.
     // If deleting them is accepted, delete them. If not, return an error.

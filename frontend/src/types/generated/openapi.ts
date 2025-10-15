@@ -791,6 +791,7 @@ export type ErrorReference =
   | "InvalidVoteGroup"
   | "InvalidXml"
   | "InvestigationHasDataEntryOrResult"
+  | "InvestigationRequiresCorrectedResults"
   | "NotInitialised"
   | "OwnAccountCannotBeDeleted"
   | "PasswordRejection"

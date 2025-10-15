@@ -53,6 +53,8 @@ export function InvestigationFindings({ pollingStationId }: InvestigationFinding
     throw error;
   }
 
+  const requiresCorrectedResults = !pollingStation.id_prev_session;
+
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
@@ -72,7 +74,7 @@ export function InvestigationFindings({ pollingStationId }: InvestigationFinding
       error = true;
     }
 
-    if (correctedResultsChoice === null) {
+    if (!requiresCorrectedResults && correctedResultsChoice === null) {
       setRadioError(true);
       error = true;
     }
@@ -86,7 +88,7 @@ export function InvestigationFindings({ pollingStationId }: InvestigationFinding
       return;
     }
 
-    const correctedResults = correctedResultsChoice === "yes";
+    const correctedResults = requiresCorrectedResults || correctedResultsChoice === "yes";
 
     const save = (): Promise<
       ApiResult<PollingStationInvestigationConcludeRequest | PollingStationInvestigationUpdateRequest>
@@ -159,7 +161,8 @@ export function InvestigationFindings({ pollingStationId }: InvestigationFinding
               name="corrected_results"
               value="yes"
               label={t("yes")}
-              defaultChecked={investigation.corrected_results === true}
+              disabled={requiresCorrectedResults}
+              defaultChecked={requiresCorrectedResults || investigation.corrected_results === true}
             >
               {t("investigations.findings.corrected_result_yes")}
             </ChoiceList.Radio>
@@ -168,6 +171,7 @@ export function InvestigationFindings({ pollingStationId }: InvestigationFinding
               name="corrected_results"
               value="no"
               label={t("no")}
+              disabled={requiresCorrectedResults}
               defaultChecked={investigation.corrected_results === false}
             >
               {t("investigations.findings.corrected_result_no")}

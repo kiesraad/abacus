@@ -30,27 +30,6 @@ async fn get_polling_station(
         .unwrap()
 }
 
-async fn create_polling_station(addr: &SocketAddr, election_id: u32, number: u32) -> Response {
-    let url = format!("http://{addr}/api/elections/{election_id}/polling_stations");
-    let coordinator_cookie = shared::coordinator_login(addr).await;
-    reqwest::Client::new()
-        .post(&url)
-        .header("cookie", coordinator_cookie)
-        .header("Content-Type", "application/json")
-        .json(&json!({
-            "name": "Test polling station",
-            "number": number,
-            "number_of_voters": 123,
-            "polling_station_type": "FixedLocation",
-            "address": "Teststraat 1",
-            "postal_code": "1234 AB",
-            "locality": "Testdorp",
-        }))
-        .send()
-        .await
-        .unwrap()
-}
-
 async fn import_polling_stations(
     addr: &SocketAddr,
     election_id: u32,
@@ -166,7 +145,7 @@ async fn test_creation_for_committee_session_with_created_status(pool: SqlitePoo
         shared::get_election_committee_session(&addr, &cookie, election_id).await;
     assert_eq!(committee_session.status, CommitteeSessionStatus::Created);
 
-    let response = create_polling_station(&addr, election_id, 5).await;
+    let response = shared::create_polling_station(&addr, election_id, 5).await;
 
     assert_eq!(
         response.status(),
@@ -403,7 +382,7 @@ async fn test_non_unique_number(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let election_id = 2;
 
-    let response = create_polling_station(&addr, election_id, 33).await;
+    let response = shared::create_polling_station(&addr, election_id, 33).await;
 
     assert_eq!(
         response.status(),
@@ -542,7 +521,7 @@ where
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
 async fn test_finished_to_in_progress_on_create(pool: SqlitePool) {
     let addr = serve_api(pool).await;
-    check_finished_to_in_progress_on(&addr, || create_polling_station(&addr, 2, 35)).await;
+    check_finished_to_in_progress_on(&addr, || shared::create_polling_station(&addr, 2, 35)).await;
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]

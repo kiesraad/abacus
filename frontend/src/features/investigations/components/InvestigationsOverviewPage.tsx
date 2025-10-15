@@ -55,6 +55,7 @@ export function InvestigationsOverviewPage() {
           </h1>
         </section>
       </header>
+
       {allInvestigationsHandled && currentCommitteeSession.status !== "data_entry_finished" ? (
         missingInvestigations.length > 0 ? (
           <Alert type="warning">
@@ -93,6 +94,7 @@ export function InvestigationsOverviewPage() {
       ) : (
         <Messages />
       )}
+
       <main>
         <section>
           <h2>{t("investigations.from_central_polling_station")}</h2>

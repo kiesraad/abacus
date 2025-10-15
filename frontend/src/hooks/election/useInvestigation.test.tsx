@@ -7,7 +7,11 @@ import { pollingStationMockData } from "@/testing/api-mocks/PollingStationMockDa
 import { Providers } from "@/testing/Providers";
 import { overrideOnce } from "@/testing/server";
 import { renderHook, waitFor } from "@/testing/test-utils";
-import { DataEntryStatusName, PollingStationInvestigation } from "@/types/generated/openapi";
+import {
+  ElectionDetailsResponse,
+  ElectionStatusResponse,
+  PollingStationInvestigation,
+} from "@/types/generated/openapi";
 
 import useInvestigations from "./useInvestigations";
 
@@ -26,7 +30,7 @@ function renderUseInvestigations() {
 }
 
 describe("useInvestigations", () => {
-  test("returns empty arrays for first committee session", async () => {
+  test("Returns empty arrays for first committee session", async () => {
     const firstSessionMockResponse = getElectionMockData({}, { number: 1 }, mockInvestigations);
 
     overrideOnce("get", "/api/elections/1", 200, firstSessionMockResponse);
@@ -44,7 +48,7 @@ describe("useInvestigations", () => {
     });
   });
 
-  test("categorizes investigations in current/handled", async () => {
+  test("Categorizes investigations in current/handled", async () => {
     const investigations: PollingStationInvestigation[] = [
       {
         // Should be current
@@ -68,13 +72,7 @@ describe("useInvestigations", () => {
     ];
 
     overrideOnce("get", "/api/elections/1", 200, getElectionMockData({}, { number: 2 }, investigations));
-    overrideOnce("get", "/api/elections/1/status", 200, {
-      statuses: [
-        { polling_station_id: 1, status: "first_entry_in_progress" as DataEntryStatusName },
-        { polling_station_id: 2, status: "definitive" as DataEntryStatusName },
-        { polling_station_id: 3, status: "first_entry_not_started" as DataEntryStatusName },
-      ],
-    });
+    overrideOnce("get", "/api/elections/1/status", 200, { statuses: [] });
 
     const result = renderUseInvestigations();
     await waitFor(() => {
@@ -88,23 +86,20 @@ describe("useInvestigations", () => {
     });
   });
 
-  test("categorizes missing investigations", async () => {
+  test("Categorizes missing investigations", async () => {
     // Initialize with new polling station without id_prev_session and no investigation
     overrideOnce("get", "/api/elections/1", 200, {
       ...getElectionMockData({}, { number: 2 }),
       polling_stations: [
         ...pollingStationMockData.slice(0, 3),
         {
+          ...pollingStationMockData[4]!,
           id: 123,
-          number: 123,
-          name: "New polling station",
           id_prev_session: undefined,
         },
       ],
-    });
-    overrideOnce("get", "/api/elections/1/status", 200, {
-      statuses: [],
-    });
+    } satisfies ElectionDetailsResponse);
+    overrideOnce("get", "/api/elections/1/status", 200, { statuses: [] });
 
     const result = renderUseInvestigations();
 
@@ -114,7 +109,7 @@ describe("useInvestigations", () => {
     });
   });
 
-  test("includes correct polling station and status data", async () => {
+  test("Includes correct polling station and status data", async () => {
     overrideOnce(
       "get",
       "/api/elections/1",
@@ -127,8 +122,8 @@ describe("useInvestigations", () => {
       ]),
     );
     overrideOnce("get", "/api/elections/1/status", 200, {
-      statuses: [{ polling_station_id: 1, status: "second_entry_in_progress" as DataEntryStatusName }],
-    });
+      statuses: [{ polling_station_id: 1, status: "second_entry_in_progress" }],
+    } satisfies ElectionStatusResponse);
 
     const result = renderUseInvestigations();
 

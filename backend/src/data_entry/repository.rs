@@ -287,25 +287,21 @@ pub async fn list_results_for_committee_session(
     let polling_stations =
         crate::polling_station::repository::list(&mut tx, committee_session_id).await?;
 
-    // This query requires a little explanation:
+    // This is a recursive Common Table Expression (CTE)
+    // It traverses polling stations through previous committee sessions to find the most recent results
+    // while respecting investigations that require corrected results. It starts looking from the given
+    // committee session.
     //
-    // We are trying to get the latest available results for each polling station in a committee session.
-    // However, results beyond the first committee session are not available for all polling stations (only
-    // those that were re-entered in that committee session are available). So we need to look back into
-    // previous committee sessions to find the most recent results available.
+    // A recursive CTE consists of two parts, the initial query and the recursive query.
+    // The initial query fetches the polling stations from the given committee session and any results
+    // based on the same conditions as the recursive query.
+    // The recursive query traverses previous committee sessions for each polling stations without results until:
+    // - Results are found
+    // - Or results are expected due to an investigation requiring corrected results
+    // Finally we select all the rows that have results, ensuring we get the most recent results
     //
-    // This query does this by using a recursive CTE (Common Table Expression). A recursive CTE consists of
-    // two parts, the initial query and the recursive query. In this case the initial query just fetches the
-    // polling stations from the current committee session and any results available for that session.
-    //
-    // The recursive query then takes the current set of rows and attempts to retrieve the previous
-    // committee session's polling station for each row and any results available for that previous
-    // session. Once we find a row with results or once we reach a polling station with no previous
-    // committee session (the first committee session) we stop looking back, but we should have
-    // found results by then (since every polling station will have results the first time it appears).
-    //
-    // Finally, we only select the rows that have results, eliminating all the intermediate rows without
-    // results that were only needed to find the previous committee sessions.
+    // This function returns the original polling station id and the found results. When no results are found,
+    // an error is thrown.
     let results = query!(
         r#"
         WITH RECURSIVE polling_stations_chain(original_id, id, id_prev_session, data, investigation) AS (
@@ -466,8 +462,7 @@ mod tests {
         );
     }
 
-    /// Test list_results_for_committee_session with first session, 2 polling stations, only one with results
-    /// Expect error because of polling station without results
+    /// Test list_results_for_committee_session with first session, 2 polling stations, only one with results (error)
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
     async fn test_list_results_incomplete_polling_stations(pool: SqlitePool) {
         let mut conn = pool.acquire().await.unwrap();
@@ -554,7 +549,7 @@ mod tests {
         );
     }
 
-    /// Test list_results_for_committee_session with 4th session, one polling station with investigation, corrected results=true and results don't exist
+    /// Test list_results_for_committee_session with 4th session, one polling station with investigation, corrected results=true and results don't exist (error)
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_7_four_sessions"))))]
     async fn test_list_results_next_one_investigation_with_corrected_results_incomplete(
         pool: SqlitePool,
@@ -571,8 +566,7 @@ mod tests {
         assert!(matches!(results.unwrap_err(), Error::RowNotFound));
     }
 
-    /// Test list_results_for_committee_session with 4th session, new polling station with no investigation
-    /// Expect error because of polling station without results
+    /// Test list_results_for_committee_session with 4th session, new polling station with no investigation (error)
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_7_four_sessions"))))]
     async fn test_list_results_next_new_polling_station_no_investigation(pool: SqlitePool) {
         let mut conn = pool.acquire().await.unwrap();
@@ -594,8 +588,7 @@ mod tests {
         assert!(matches!(results.unwrap_err(), Error::RowNotFound));
     }
 
-    /// Test list_results_for_committee_session with 4th session, new polling station with investigation, but no corrected results
-    /// Expect error because of polling station without results
+    /// Test list_results_for_committee_session with 4th session, new polling station with investigation, but no corrected results (error)
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_7_four_sessions"))))]
     async fn test_list_results_next_new_polling_station_investigation_no_corrected_results(
         pool: SqlitePool,
@@ -679,7 +672,7 @@ mod tests {
         );
     }
 
-    /// Test list_results_for_committee_session with 4th session, new polling station with investigation, corrected results=true and results don't exist
+    /// Test list_results_for_committee_session with 4th session, new polling station with investigation, corrected results=true and results don't exist (error)
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_7_four_sessions"))))]
     async fn test_list_results_next_new_polling_station_investigation_with_corrected_results_incomplete(
         pool: SqlitePool,
@@ -707,7 +700,7 @@ mod tests {
         assert!(matches!(results.unwrap_err(), Error::RowNotFound));
     }
 
-    /// Test list_results_for_committee_session with 4th session, new polling station with investigation in previous session, corrected results=true and results exist
+    /// Test list_results_for_committee_session with 4th session, new polling station with investigation, corrected results=true and results exist in 3rd session
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_7_four_sessions"))))]
     async fn test_list_results_next_new_polling_station_prev_session_investigation_with_corrected_results_complete(
         pool: SqlitePool,
@@ -715,6 +708,7 @@ mod tests {
         let mut conn = pool.acquire().await.unwrap();
         let committee_session_id = 704;
 
+        // Add polling station, investigation and results to third session
         insert_test_polling_station(&mut conn, 733, 703, None, 123)
             .await
             .unwrap();
@@ -727,6 +721,7 @@ mod tests {
             .await
             .unwrap();
 
+        // Add new polling station to fourth session, linked to the one in third session, but without investigation or results
         insert_test_polling_station(&mut conn, 743, 704, Some(733), 123)
             .await
             .unwrap();

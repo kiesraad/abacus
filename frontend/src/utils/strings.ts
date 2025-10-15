@@ -21,7 +21,7 @@ export function parseIntUserInput(text: string): number | undefined {
   return !isNaN(num) && num.toString() === removeLeadingZeros(text) ? num : undefined;
 }
 
-// Formats a list of strings into a human-readable list with a conjunction before the last item
+// Formats a list of strings into a list with a conjunction before the last item
 export function formatList(items: string[] | number[], conjunction: string): string {
   return items.length > 1
     ? `${items.slice(0, -1).join(", ")} ${conjunction} ${items[items.length - 1]}`

@@ -136,7 +136,7 @@ __Hoofdscenario:__
 
 __Uitbreidingen:__
 
-3a. De beheerder heeft de volledige naam niet voor een toe te voegen invoerder:  
+3a. De beheerder heeft de volledige naam niet van de invoerder die nog toegevoegd moet worden:  
 &emsp; 3a1. De beheerder maakt een invoerder aan met een gebruikersnaam en tijdelijk wachtwoord, 
   maar zonder volledige naam.  
 

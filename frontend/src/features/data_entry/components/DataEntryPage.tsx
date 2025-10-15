@@ -35,7 +35,7 @@ export function DataEntryPage() {
   const sectionId = params.sectionId ?? null;
 
   return (
-    <DataEntryProvider election={election} pollingStationId={pollingStation.id} entryNumber={entryNumber}>
+    <DataEntryProvider election={election} pollingStation={pollingStation} entryNumber={entryNumber}>
       <PageTitle title={`${t("data_entry.title")} ${pollingStation.number} ${pollingStation.name} - Abacus`} />
       <header>
         <section className="smaller-gap">

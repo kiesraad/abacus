@@ -87,19 +87,21 @@ export function CreateFirstAdminForm({ next }: CreateFirstAdminFormProps) {
           <Form onSubmit={handleSubmit}>
             <FormLayout disabled={isLoading}>
               <FormLayout.Section title={t("initialise.account_details")}>
-                <p>{t("initialise.store_in_safe_place")}</p>
+                <p>
+                  {t("initialise.store_in_safe_place")} {t("initialise.other_accounts")}
+                </p>
+                <InputField
+                  name="username"
+                  label={t("account.username")}
+                  hint={t("account.choose_username_hint")}
+                  error={validationErrors?.username}
+                />
                 <InputField
                   name="fullname"
                   label={t("account.fullname")}
                   subtext={t("account.fullname_subtext")}
                   hint={t("initialise.fullname_hint")}
                   error={validationErrors?.fullname}
-                />
-                <InputField
-                  name="username"
-                  label={t("account.username")}
-                  hint={t("account.choose_username_hint")}
-                  error={validationErrors?.username}
                 />
                 <InputField
                   name="password"

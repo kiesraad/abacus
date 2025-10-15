@@ -11,6 +11,7 @@ use crate::{
     APIError,
     audit_log::{AuditEvent, AuditService},
     committee_session::repository::all_investigations_finished,
+    data_entry::repository::list_results_for_committee_session,
     investigation::list_investigations_for_committee_session,
 };
 
@@ -218,7 +219,10 @@ impl CommitteeSessionStatus {
             CommitteeSessionStatus::DataEntryInProgress
             | CommitteeSessionStatus::DataEntryPaused => {
                 if committee_session.is_next_session()
-                    && !all_investigations_finished(conn, committee_session.id).await?
+                    && (!all_investigations_finished(conn, committee_session.id).await?
+                        || list_results_for_committee_session(conn, committee_session.id)
+                            .await
+                            .is_err())
                 {
                     return Err(CommitteeSessionError::InvalidStatusTransition);
                 }

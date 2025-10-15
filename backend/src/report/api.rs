@@ -15,7 +15,7 @@ use crate::{
         repository::{all_investigations_finished, change_files},
         status::CommitteeSessionStatus,
     },
-    data_entry::PollingStationResults,
+    data_entry::{PollingStationResults, repository::list_results_for_committee_session},
     election::ElectionWithPoliticalGroups,
     eml::{EML510, EMLDocument, EmlHash},
     files::{
@@ -265,6 +265,9 @@ async fn generate_and_save_files(
     if committee_session.status != CommitteeSessionStatus::DataEntryFinished
         || committee_session.start_date_time.is_none()
         || !all_investigations_finished(&mut conn, committee_session.id).await?
+        || list_results_for_committee_session(&mut conn, committee_session_id)
+            .await
+            .is_err()
     {
         return Err(APIError::CommitteeSession(
             CommitteeSessionError::InvalidCommitteeSessionStatus,

@@ -11,17 +11,19 @@ interface InvestigationsOverview {
   investigations: PollingStationInvestigationWithStatus[];
   currentInvestigations: PollingStationInvestigationWithStatus[];
   handledInvestigations: PollingStationInvestigationWithStatus[];
+  missingInvestigations: PollingStation[];
 }
 
 export default function useInvestigations(): InvestigationsOverview {
-  const { investigations, pollingStations } = useElection();
+  const { currentCommitteeSession, investigations, pollingStations } = useElection();
   const { statuses } = useElectionStatus();
 
-  if (investigations.length === 0) {
+  if (currentCommitteeSession.number === 1) {
     return {
       investigations: [],
       currentInvestigations: [],
       handledInvestigations: [],
+      missingInvestigations: [],
     };
   }
 
@@ -36,11 +38,11 @@ export default function useInvestigations(): InvestigationsOverview {
 
       return {
         ...investigation,
-        pollingStation: pollingStation,
+        pollingStation,
         status: status ? status.status : undefined,
       };
     })
-    .filter((inv) => inv !== null) as PollingStationInvestigationWithStatus[];
+    .filter((inv) => inv !== null) satisfies PollingStationInvestigationWithStatus[];
 
   const currentInvestigations = investigationsWithStatus.filter(
     (inv) => !inv.findings || (inv.findings && inv.corrected_results && inv.status !== "definitive"),
@@ -50,10 +52,14 @@ export default function useInvestigations(): InvestigationsOverview {
       (inv.findings && !inv.corrected_results) ||
       (inv.findings && inv.corrected_results && inv.status === "definitive"),
   );
+  const missingInvestigations = pollingStations.filter(
+    (ps) => !investigations.find((inv) => inv.polling_station_id === ps.id) && !ps.id_prev_session,
+  );
 
   return {
     investigations: investigationsWithStatus,
     currentInvestigations,
     handledInvestigations,
+    missingInvestigations,
   };
 }

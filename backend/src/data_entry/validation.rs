@@ -638,7 +638,7 @@ impl Validate for CommonPollingStationResults {
 
             if has_error_f401 {
                 validation_results.errors.retain(|vr| {
-                    if vr.code == ValidationResultCode::F402
+                    !(vr.code == ValidationResultCode::F402
                         && vr.context
                             == Some(ValidationResultContext {
                                 political_group_number: Some(pgcv.number),
@@ -647,12 +647,7 @@ impl Validate for CommonPollingStationResults {
                             && vr.context
                                 == Some(ValidationResultContext {
                                     political_group_number: Some(pgcv.number),
-                                })
-                    {
-                        false
-                    } else {
-                        true
-                    }
+                                }))
                 });
             }
         }
@@ -3189,13 +3184,22 @@ mod tests {
             let validation_results = validate(data.clone())?;
             assert_eq!(
                 validation_results.errors,
-                [ValidationResult {
-                    code: ValidationResultCode::F401,
-                    fields: vec!["data.political_group_votes[1].total".into()],
-                    context: Some(ValidationResultContext {
-                        political_group_number: Some(2),
-                    }),
-                }],
+                [
+                    ValidationResult {
+                        code: ValidationResultCode::F403,
+                        fields: vec!["data.political_group_votes[0].total".into()],
+                        context: Some(ValidationResultContext {
+                            political_group_number: Some(1),
+                        }),
+                    },
+                    ValidationResult {
+                        code: ValidationResultCode::F401,
+                        fields: vec!["data.political_group_votes[1].total".into()],
+                        context: Some(ValidationResultContext {
+                            political_group_number: Some(2),
+                        }),
+                    }
+                ],
             );
 
             Ok(())

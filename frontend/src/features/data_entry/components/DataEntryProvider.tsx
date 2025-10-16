@@ -2,43 +2,44 @@ import { ReactNode, useEffect } from "react";
 import { Navigate, useNavigate, useParams } from "react-router";
 
 import { ApiError, FatalApiError, NotFoundError } from "@/api/ApiResult";
-import { ElectionWithPoliticalGroups } from "@/types/generated/openapi";
+import { useMessages } from "@/hooks/messages/useMessages";
+import { t } from "@/i18n/translate";
+import { ElectionWithPoliticalGroups, PollingStation } from "@/types/generated/openapi";
 import { FormSectionId } from "@/types/types";
 
 import { DataEntryContext } from "../hooks/DataEntryContext";
 import useDataEntry from "../hooks/useDataEntry";
+import { redirectToHomePageErrorReferences } from "../utils/errors";
 import { isStateLoaded } from "../utils/utils";
 
 export interface DataEntryProviderProps {
   election: ElectionWithPoliticalGroups;
-  pollingStationId: number;
+  pollingStation: PollingStation;
   entryNumber: number;
   children: ReactNode;
 }
 
-export function DataEntryProvider({ election, pollingStationId, entryNumber, children }: DataEntryProviderProps) {
+export function DataEntryProvider({ election, pollingStation, entryNumber, children }: DataEntryProviderProps) {
   const navigate = useNavigate();
   const params = useParams<{ sectionId: FormSectionId }>();
   const sectionId = params.sectionId ?? null;
-  const stateAndActions = useDataEntry(election, pollingStationId, entryNumber, sectionId);
+  const stateAndActions = useDataEntry(election, pollingStation.id, entryNumber, sectionId);
+  const { pushMessage } = useMessages();
 
   // handle non-fatal error navigation
   useEffect(() => {
-    if (stateAndActions.error && stateAndActions.error instanceof ApiError) {
-      switch (stateAndActions.error.reference) {
-        case "DataEntryAlreadyClaimed":
-          void navigate(`/elections/${election.id}/data-entry#data-entry-claimed-${pollingStationId}`);
-          break;
-        case "DataEntryAlreadyFinalised":
-          void navigate(`/elections/${election.id}/data-entry#data-entry-finalised-${pollingStationId}`);
-          break;
-        case "InvalidStateTransition":
-        case "DataEntryNotAllowed":
-          void navigate(`/elections/${election.id}/data-entry#invalid-action-${pollingStationId}`);
-          break;
-      }
+    if (
+      stateAndActions.error instanceof ApiError &&
+      redirectToHomePageErrorReferences.includes(stateAndActions.error.reference)
+    ) {
+      pushMessage({
+        type: "warning",
+        title: t("data_entry.data_entry_not_possible", { nr: pollingStation.number }),
+        text: t(`error.api_error.${stateAndActions.error.reference}`),
+      });
+      void navigate(`/elections/${election.id}/data-entry`);
     }
-  }, [election.id, navigate, stateAndActions.error, pollingStationId]);
+  }, [election.id, navigate, pushMessage, stateAndActions.error, pollingStation.number]);
 
   // throw fatal errors, so the error boundary can catch them and show the full page error
   if (stateAndActions.error instanceof FatalApiError) {

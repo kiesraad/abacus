@@ -4,7 +4,9 @@ import { userEvent } from "@testing-library/user-event";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
 import * as useUser from "@/hooks/user/useUser";
+import { MessagesProvider } from "@/hooks/messages/MessagesProvider";
 import { electionMockData, politicalGroupMockData } from "@/testing/api-mocks/ElectionMockData";
+import { pollingStationMockData } from "@/testing/api-mocks/PollingStationMockData";
 import {
   PollingStationDataEntryClaimHandler,
   PollingStationDataEntrySaveHandler,
@@ -42,9 +44,15 @@ function renderForm({ election, groupNumber }: { election?: ElectionWithPolitica
   vi.spyOn(ReactRouter, "useParams").mockReturnValue({ sectionId: `political_group_votes_${groupNumber || 1}` });
 
   return render(
-    <DataEntryProvider election={election || electionMockData} pollingStationId={1} entryNumber={1}>
-      <DataEntrySection />
-    </DataEntryProvider>,
+    <MessagesProvider>
+      <DataEntryProvider
+        election={election || electionMockData}
+        pollingStation={pollingStationMockData[0]!}
+        entryNumber={1}
+      >
+        <DataEntrySection />
+      </DataEntryProvider>
+    </MessagesProvider>,
   );
 }
 

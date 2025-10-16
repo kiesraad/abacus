@@ -1,6 +1,6 @@
 import { useBlocker, useParams } from "react-router";
 
-import { FatalApiError } from "@/api/ApiResult";
+import { ApiError, FatalApiError } from "@/api/ApiResult";
 import { Button } from "@/components/ui/Button/Button";
 import { Modal } from "@/components/ui/Modal/Modal";
 import { useUser } from "@/hooks/user/useUser";
@@ -9,6 +9,7 @@ import { FormSectionId, SectionValues } from "@/types/types";
 
 import { useDataEntryContext } from "../hooks/useDataEntryContext";
 import { SubmitCurrentFormOptions } from "../types/types";
+import { redirectToHomePageErrorReferences } from "../utils/errors";
 
 export interface DataEntryNavigationProps {
   onSubmit: (options?: SubmitCurrentFormOptions) => Promise<boolean>;
@@ -38,8 +39,12 @@ export function DataEntryNavigation({ onSubmit, currentValues = {} }: DataEntryN
 
   // block navigation if there are unsaved changes
   const blocker = useBlocker(({ currentLocation, nextLocation }) => {
-    // do not block when user is logged out / the session expired or in case of CommitteeSessionPaused error
-    if (user === null || (error instanceof FatalApiError && error.reference === "CommitteeSessionPaused")) {
+    // do not block when user is logged out or an error is redirecting to the data entry home page
+    if (
+      user === null ||
+      (error instanceof FatalApiError && error.reference === "CommitteeSessionPaused") ||
+      (error instanceof ApiError && redirectToHomePageErrorReferences.includes(error.reference))
+    ) {
       return false;
     }
 

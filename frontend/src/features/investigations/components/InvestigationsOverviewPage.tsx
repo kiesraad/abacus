@@ -56,8 +56,9 @@ export function InvestigationsOverviewPage() {
         </section>
       </header>
 
-      {allInvestigationsHandled && currentCommitteeSession.status !== "data_entry_finished" ? (
-        missingInvestigations.length > 0 ? (
+      {allInvestigationsHandled &&
+        currentCommitteeSession.status !== "data_entry_finished" &&
+        (missingInvestigations.length > 0 ? (
           <Alert type="warning">
             <strong className="heading-md">{t("investigations.missing_investigations")}</strong>
             <p>
@@ -90,10 +91,8 @@ export function InvestigationsOverviewPage() {
               {t("election.title.finish_data_entry")}
             </Button>
           </Alert>
-        )
-      ) : (
-        <Messages />
-      )}
+        ))}
+      <Messages />
 
       <main>
         <section>

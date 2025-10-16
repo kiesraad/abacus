@@ -493,6 +493,9 @@ where
     let election_id = 2;
     let committee_session_id = 2;
 
+    shared::create_result(addr, 1, election_id).await;
+    shared::create_result(addr, 2, election_id).await;
+
     shared::change_status_committee_session(
         addr,
         &cookie,
@@ -568,8 +571,10 @@ async fn test_finished_to_in_progress_on_update(pool: SqlitePool) {
     .await;
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
-async fn test_finished_to_in_progress_on_delete_non_last(pool: SqlitePool) {
-    let addr = serve_api(pool).await;
-    check_finished_to_in_progress_on(&addr, || delete_polling_station(&addr, 2, 1)).await;
-}
+// Not possible until we can delete polling stations with results
+// TODO: Epic #1812
+// #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
+// async fn test_finished_to_in_progress_on_delete_non_last(pool: SqlitePool) {
+//     let addr = serve_api(pool).await;
+//     check_finished_to_in_progress_on(&addr, || delete_polling_station(&addr, 2, 1)).await;
+// }

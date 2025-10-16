@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use sqlx::{Connection, Error, SqliteConnection, query, query_as, types::Json};
 
 use super::{
@@ -278,14 +280,19 @@ pub async fn result_exists(conn: &mut SqliteConnection, id: u32) -> Result<bool,
     Ok(res.exists == 1)
 }
 
-/// Get a list of polling stations with their results for a committee session
-pub async fn list_results_for_committee_session(
+async fn fetch_results_for_committee_session(
     conn: &mut SqliteConnection,
     committee_session_id: u32,
-) -> Result<Vec<(PollingStation, PollingStationResults)>, Error> {
-    let mut tx = conn.begin().await?;
-    let polling_stations =
-        crate::polling_station::repository::list(&mut tx, committee_session_id).await?;
+    polling_station_id: Option<u32>,
+) -> Result<Vec<(PollingStation, String)>, Error> {
+    // Get and index polling stations by id for performance
+    let polling_stations: HashMap<u32, _> =
+        crate::polling_station::repository::list(conn, committee_session_id)
+            .await?
+            .into_iter()
+            .filter(|ps| polling_station_id.is_none_or(|id| ps.id == id))
+            .map(|ps| (ps.id, ps))
+            .collect();
 
     // This is a recursive Common Table Expression (CTE)
     // It traverses polling stations through previous committee sessions to find the most recent results
@@ -305,48 +312,72 @@ pub async fn list_results_for_committee_session(
     let results = query!(
         r#"
         WITH RECURSIVE polling_stations_chain(original_id, id, id_prev_session, data, investigation) AS (
-            SELECT s.id AS original_id, s.id, s.id_prev_session, r.data, psi.polling_station_id
-            FROM polling_stations AS s
-            LEFT JOIN polling_station_results AS r ON r.polling_station_id = s.id
-            LEFT JOIN polling_station_investigations AS psi ON psi.polling_station_id = s.id AND psi.corrected_results = 1
-            WHERE s.committee_session_id = ?
+            SELECT ps.id AS original_id, ps.id, ps.id_prev_session, r.data, psi.polling_station_id
+            FROM polling_stations AS ps
+            LEFT JOIN polling_station_results AS r ON r.polling_station_id = ps.id
+            LEFT JOIN polling_station_investigations AS psi ON psi.polling_station_id = ps.id AND psi.corrected_results = 1
+            WHERE ps.committee_session_id = ? AND (? IS NULL OR ps.id = ?)
 
             UNION ALL
 
-            SELECT sc.original_id, s.id, s.id_prev_session, r.data, psi.polling_station_id
+            SELECT sc.original_id, ps.id, ps.id_prev_session, r.data, psi.polling_station_id
             FROM polling_stations_chain AS sc
-            JOIN polling_stations AS s ON s.id = sc.id_prev_session
-            LEFT JOIN polling_station_results AS r ON r.polling_station_id = s.id
-            LEFT JOIN polling_station_investigations AS psi ON psi.polling_station_id = s.id AND psi.corrected_results = 1
+            JOIN polling_stations AS ps ON ps.id = sc.id_prev_session
+            LEFT JOIN polling_station_results AS r ON r.polling_station_id = ps.id
+            LEFT JOIN polling_station_investigations AS psi ON psi.polling_station_id = ps.id AND psi.corrected_results = 1
             WHERE sc.data IS NULL AND sc.investigation IS NULL
         )
         SELECT
             sc.original_id AS "original_id!: u32",
-            sc.data AS "data: Json<PollingStationResults>"
+            sc.data AS "data: String"
         FROM polling_stations_chain AS sc
         WHERE sc.data IS NOT NULL
         "#,
-        committee_session_id
+        committee_session_id,
+        polling_station_id,
+        polling_station_id,
     )
     .try_map(|row| {
         let polling_station = polling_stations
-            .iter()
-            .find(|p| p.id == row.original_id)
+            .get(&row.original_id)
             .cloned()
             .ok_or(Error::RowNotFound)?;
-        Ok((polling_station, row.data.0))
+        Ok((polling_station, row.data))
     })
-    .fetch_all(&mut *tx)
+    .fetch_all(conn)
     .await?;
 
-    tx.commit().await?;
     if results.len() != polling_stations.len() {
-        // This should never happen, since every polling station should always
-        // have results the first time it appears.
         Err(Error::RowNotFound)
     } else {
         Ok(results)
     }
+}
+
+/// Check if all polling stations have results for a committee session
+pub async fn are_results_complete_for_committee_session(
+    conn: &mut SqliteConnection,
+    committee_session_id: u32,
+) -> Result<(), Error> {
+    fetch_results_for_committee_session(conn, committee_session_id, None).await?;
+    Ok(())
+}
+
+/// Get a list of polling stations with their results for a committee session
+pub async fn list_results_for_committee_session(
+    conn: &mut SqliteConnection,
+    committee_session_id: u32,
+) -> Result<Vec<(PollingStation, PollingStationResults)>, Error> {
+    let results = fetch_results_for_committee_session(conn, committee_session_id, None).await?;
+
+    let mut decoded_results = Vec::with_capacity(results.len());
+    for (ps, data) in results {
+        let parsed = serde_json::from_str::<PollingStationResults>(&data)
+            .map_err(|e| Error::Decode(e.into()))?;
+        decoded_results.push((ps, parsed));
+    }
+
+    Ok(decoded_results)
 }
 
 /// Given a polling station id, find the most recent results for that polling station
@@ -363,12 +394,20 @@ pub async fn most_recent_results_for_polling_station(
 
     let ps_id_prev_session = polling_station.id_prev_session.ok_or(Error::RowNotFound)?;
 
-    list_results_for_committee_session(conn, prev_committee_session.id)
-        .await?
-        .into_iter()
-        .find(|entry| entry.0.id == ps_id_prev_session)
-        .map(|(_, results)| results)
-        .ok_or(Error::RowNotFound)
+    let (_, data) = fetch_results_for_committee_session(
+        conn,
+        prev_committee_session.id,
+        Some(ps_id_prev_session),
+    )
+    .await?
+    .into_iter()
+    .next()
+    .ok_or(Error::RowNotFound)?;
+
+    let parsed = serde_json::from_str::<PollingStationResults>(&data)
+        .map_err(|e| Error::Decode(e.into()))?;
+
+    Ok(parsed)
 }
 
 #[cfg(test)]
@@ -404,15 +443,15 @@ mod tests {
     use sqlx::SqlitePool;
     use test_log::test;
 
-    fn create_test_results(voters_count: u32) -> PollingStationResults {
+    fn create_test_results(proxy_certificate_count: u32) -> PollingStationResults {
         PollingStationResults::CSOFirstSession(CSOFirstSessionResults {
             extra_investigation: ValidDefault::valid_default(),
             counting_differences_polling_station: ValidDefault::valid_default(),
             voters_counts: {
                 VotersCounts {
-                    poll_card_count: voters_count,
-                    total_admitted_voters_count: voters_count,
-                    ..VotersCounts::default()
+                    poll_card_count: 100,
+                    proxy_certificate_count,
+                    total_admitted_voters_count: 100 + proxy_certificate_count,
                 }
             },
             votes_counts: VotesCounts::default(),
@@ -421,28 +460,55 @@ mod tests {
         })
     }
 
+    /// Test are_results_complete_for_committee_session with first session, 2 polling stations with results
+    #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
+    async fn test_are_results_complete_polling_stations(pool: SqlitePool) {
+        let mut conn = pool.acquire().await.unwrap();
+        let committee_session_id = 2;
+
+        insert_test_result(&mut conn, 1, committee_session_id, &create_test_results(10))
+            .await
+            .unwrap();
+        insert_test_result(&mut conn, 2, committee_session_id, &create_test_results(10))
+            .await
+            .unwrap();
+
+        assert!(
+            are_results_complete_for_committee_session(&mut conn, committee_session_id)
+                .await
+                .is_ok()
+        );
+    }
+
+    /// Test are_results_complete_for_committee_session with first session, 2 polling stations, only one with results (error)
+    #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
+    async fn are_results_complete_for_committee_session_incomplete(pool: SqlitePool) {
+        let mut conn = pool.acquire().await.unwrap();
+        let committee_session_id = 2;
+
+        insert_test_result(&mut conn, 1, committee_session_id, &create_test_results(10))
+            .await
+            .unwrap();
+
+        assert!(
+            are_results_complete_for_committee_session(&mut conn, committee_session_id)
+                .await
+                .is_err()
+        );
+    }
+
     /// Test list_results_for_committee_session with first session, 2 polling stations with results
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
     async fn test_list_results_complete_polling_stations(pool: SqlitePool) {
         let mut conn = pool.acquire().await.unwrap();
         let committee_session_id = 2;
 
-        insert_test_result(
-            &mut conn,
-            1,
-            committee_session_id,
-            &create_test_results(100),
-        )
-        .await
-        .unwrap();
-        insert_test_result(
-            &mut conn,
-            2,
-            committee_session_id,
-            &create_test_results(200),
-        )
-        .await
-        .unwrap();
+        insert_test_result(&mut conn, 1, committee_session_id, &create_test_results(10))
+            .await
+            .unwrap();
+        insert_test_result(&mut conn, 2, committee_session_id, &create_test_results(20))
+            .await
+            .unwrap();
 
         let results = list_results_for_committee_session(&mut conn, committee_session_id)
             .await
@@ -450,16 +516,10 @@ mod tests {
         assert_eq!(results.len(), 2);
 
         assert_eq!(results[0].0.id, 1);
-        assert_eq!(
-            results[0].1.voters_counts().total_admitted_voters_count,
-            100
-        );
+        assert_eq!(results[0].1.voters_counts().proxy_certificate_count, 10);
 
         assert_eq!(results[1].0.id, 2);
-        assert_eq!(
-            results[1].1.voters_counts().total_admitted_voters_count,
-            200
-        );
+        assert_eq!(results[1].1.voters_counts().proxy_certificate_count, 20);
     }
 
     /// Test list_results_for_committee_session with first session, 2 polling stations, only one with results (error)
@@ -468,14 +528,9 @@ mod tests {
         let mut conn = pool.acquire().await.unwrap();
         let committee_session_id = 2;
 
-        insert_test_result(
-            &mut conn,
-            1,
-            committee_session_id,
-            &create_test_results(100),
-        )
-        .await
-        .unwrap();
+        insert_test_result(&mut conn, 1, committee_session_id, &create_test_results(10))
+            .await
+            .unwrap();
 
         let results = list_results_for_committee_session(&mut conn, committee_session_id).await;
         assert!(results.is_err());
@@ -526,7 +581,7 @@ mod tests {
             &mut conn,
             741,
             committee_session_id,
-            &create_test_results(100),
+            &create_test_results(10),
         )
         .await
         .unwrap();
@@ -537,16 +592,10 @@ mod tests {
         assert_eq!(results.len(), 2);
 
         assert_eq!(results[0].0.id, 741);
-        assert_eq!(
-            results[0].1.voters_counts().total_admitted_voters_count,
-            100
-        );
+        assert_eq!(results[0].1.voters_counts().proxy_certificate_count, 10);
 
         assert_eq!(results[1].0.id, 742);
-        assert_eq!(
-            results[1].1.voters_counts().total_admitted_voters_count,
-            297
-        );
+        assert_eq!(results[1].1.voters_counts().proxy_certificate_count, 4);
     }
 
     /// Test list_results_for_committee_session with 4th session, one polling station with investigation, corrected results=true and results don't exist (error)
@@ -643,7 +692,7 @@ mod tests {
             &mut conn,
             new_polling_station_id,
             committee_session_id,
-            &create_test_results(100),
+            &create_test_results(10),
         )
         .await
         .unwrap();
@@ -654,22 +703,13 @@ mod tests {
         assert_eq!(results.len(), 3);
 
         assert_eq!(results[0].0.id, 743);
-        assert_eq!(
-            results[0].1.voters_counts().total_admitted_voters_count,
-            100
-        );
+        assert_eq!(results[0].1.voters_counts().proxy_certificate_count, 10);
 
         assert_eq!(results[1].0.id, 742);
-        assert_eq!(
-            results[1].1.voters_counts().total_admitted_voters_count,
-            297
-        );
+        assert_eq!(results[1].1.voters_counts().proxy_certificate_count, 4);
 
         assert_eq!(results[2].0.id, 741);
-        assert_eq!(
-            results[2].1.voters_counts().total_admitted_voters_count,
-            297
-        );
+        assert_eq!(results[2].1.voters_counts().proxy_certificate_count, 3);
     }
 
     /// Test list_results_for_committee_session with 4th session, new polling station with investigation, corrected results=true and results don't exist (error)
@@ -717,7 +757,7 @@ mod tests {
             .await
             .unwrap();
 
-        insert_test_result(&mut conn, 733, 703, &create_test_results(100))
+        insert_test_result(&mut conn, 733, 703, &create_test_results(10))
             .await
             .unwrap();
 
@@ -732,21 +772,36 @@ mod tests {
         assert_eq!(results.len(), 3);
 
         assert_eq!(results[0].0.id, 742);
-        assert_eq!(
-            results[0].1.voters_counts().total_admitted_voters_count,
-            297
-        );
+        assert_eq!(results[0].1.voters_counts().proxy_certificate_count, 4);
 
         assert_eq!(results[1].0.id, 743);
-        assert_eq!(
-            results[1].1.voters_counts().total_admitted_voters_count,
-            100
-        );
+        assert_eq!(results[1].1.voters_counts().proxy_certificate_count, 10);
 
         assert_eq!(results[2].0.id, 741);
-        assert_eq!(
-            results[2].1.voters_counts().total_admitted_voters_count,
-            297
-        );
+        assert_eq!(results[2].1.voters_counts().proxy_certificate_count, 3);
+    }
+
+    /// Test most_recent_results_for_polling_station with 4th session, existing polling station
+    #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_7_four_sessions"))))]
+    async fn test_most_recent_results_for_polling_station(pool: SqlitePool) {
+        let mut conn = pool.acquire().await.unwrap();
+        let polling_station_id = 742;
+
+        let results = most_recent_results_for_polling_station(&mut conn, polling_station_id).await;
+        assert!(results.is_ok());
+
+        let results = results.unwrap();
+        assert_eq!(results.voters_counts().proxy_certificate_count, 4);
+    }
+
+    /// Test most_recent_results_for_polling_station with 4th session, non-existing polling station
+    #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_7_four_sessions"))))]
+    async fn test_most_recent_results_for_polling_station_non_existing(pool: SqlitePool) {
+        let mut conn = pool.acquire().await.unwrap();
+        let polling_station_id = 743;
+
+        let results = most_recent_results_for_polling_station(&mut conn, polling_station_id).await;
+        assert!(results.is_err());
+        assert!(matches!(results.unwrap_err(), Error::RowNotFound));
     }
 }

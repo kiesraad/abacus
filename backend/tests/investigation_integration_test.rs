@@ -688,7 +688,7 @@ async fn test_can_conclude_update_new_polling_station_corrected_results_true(poo
     .await;
     assert_eq!(conclude_response.status(), StatusCode::OK);
 
-    let conclude_response = update_investigation(
+    let update_response = update_investigation(
         &addr,
         new_ps_id,
         Some(json!({
@@ -697,7 +697,7 @@ async fn test_can_conclude_update_new_polling_station_corrected_results_true(poo
         })),
     )
     .await;
-    assert_eq!(conclude_response.status(), StatusCode::OK);
+    assert_eq!(update_response.status(), StatusCode::OK);
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_7_four_sessions", "users"))))]
@@ -727,7 +727,7 @@ async fn test_cannot_conclude_update_new_polling_station_corrected_results_false
         "InvestigationRequiresCorrectedResults"
     );
 
-    let conclude_response = update_investigation(
+    let update_response = update_investigation(
         &addr,
         new_ps_id,
         Some(json!({
@@ -737,10 +737,10 @@ async fn test_cannot_conclude_update_new_polling_station_corrected_results_false
     )
     .await;
 
-    assert_eq!(conclude_response.status(), StatusCode::CONFLICT);
-    let conclude_body: Value = conclude_response.json().await.unwrap();
+    assert_eq!(update_response.status(), StatusCode::CONFLICT);
+    let update_body: Value = update_response.json().await.unwrap();
     assert_eq!(
-        conclude_body["reference"],
+        update_body["reference"],
         "InvestigationRequiresCorrectedResults"
     );
 }

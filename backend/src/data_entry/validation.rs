@@ -638,7 +638,21 @@ impl Validate for CommonPollingStationResults {
 
             if has_error_f401 {
                 validation_results.errors.retain(|vr| {
-                    ![ValidationResultCode::F402, ValidationResultCode::F403].contains(&vr.code)
+                    if vr.code == ValidationResultCode::F402
+                        && vr.context
+                            == Some(ValidationResultContext {
+                                political_group_number: Some(pgcv.number),
+                            })
+                        || vr.code == ValidationResultCode::F403
+                            && vr.context
+                                == Some(ValidationResultContext {
+                                    political_group_number: Some(pgcv.number),
+                                })
+                    {
+                        false
+                    } else {
+                        true
+                    }
                 });
             }
         }

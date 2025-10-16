@@ -9,7 +9,7 @@ import { ElectionListRequestHandler } from "@/testing/api-mocks/RequestHandlers"
 import { server } from "@/testing/server";
 import { render, renderReturningRouter, screen, spyOnHandler, waitFor } from "@/testing/test-utils";
 import { TestUserProvider } from "@/testing/TestUserProvider";
-import { ElectionListResponse } from "@/types/generated/openapi";
+import { ElectionListResponse, Role } from "@/types/generated/openapi";
 
 import { OverviewPage } from "./OverviewPage";
 
@@ -222,5 +222,34 @@ describe("OverviewPage", () => {
     }
 
     vi.useRealTimers();
+  });
+
+  describe("Alert on first login", () => {
+    const alertHeader = "Je account is ingesteld";
+    const alertBody = "Zodra je een tellijst van een stembureau hebt gekregen kan je beginnen met invoeren.";
+
+    async function render(role: Role) {
+      const router = renderReturningRouter(
+        <TestUserProvider userRole={role}>
+          <OverviewPage />
+        </TestUserProvider>,
+      );
+      await router.navigate({ hash: "new-account" });
+    }
+
+    test("Typist is shown alert with instructions", async () => {
+      await render("typist");
+
+      const alert = await screen.findByRole("alert");
+      expect(within(alert).getByRole("strong")).toHaveTextContent(alertHeader);
+      expect(within(alert).getByRole("paragraph")).toHaveTextContent(alertBody);
+    });
+    test("Non-typist is shown plain alert", async () => {
+      await render("coordinator");
+
+      const alert = await screen.findByRole("alert");
+      expect(within(alert).getByRole("strong")).toHaveTextContent(alertHeader);
+      expect(alert).not.toHaveTextContent(alertBody);
+    });
   });
 });

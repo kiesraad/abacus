@@ -631,23 +631,22 @@ impl Validate for CommonPollingStationResults {
                 });
             }
 
-            let has_error_f401 = validation_results
-                .errors
-                .iter()
-                .any(|x| x.code == ValidationResultCode::F401);
+            let has_error_f401 = validation_results.errors.iter().any(|x| {
+                x.code == ValidationResultCode::F401
+                    && x.context
+                        == Some(ValidationResultContext {
+                            political_group_number: Some(pgcv.number),
+                        })
+            });
 
             if has_error_f401 {
                 validation_results.errors.retain(|vr| {
-                    !(vr.code == ValidationResultCode::F402
-                        && vr.context
-                            == Some(ValidationResultContext {
-                                political_group_number: Some(pgcv.number),
-                            })
-                        || vr.code == ValidationResultCode::F403
-                            && vr.context
-                                == Some(ValidationResultContext {
-                                    political_group_number: Some(pgcv.number),
-                                }))
+                    !(vr.context
+                        == Some(ValidationResultContext {
+                            political_group_number: Some(pgcv.number),
+                        })
+                        && (vr.code == ValidationResultCode::F402
+                            || vr.code == ValidationResultCode::F403))
                 });
             }
         }
@@ -3094,6 +3093,40 @@ mod tests {
                         political_group_number: Some(2),
                     }),
                 }]
+            );
+
+            // Covers multiple errors over different political groups:
+            // - Expect F.402 and  for group 1.
+            // - Expect only F.401 for group 2 (F.401, F.402 and F.403 are triggered)
+            data.political_group_votes[0].candidate_votes[0].votes = 0;
+            data.political_group_votes[0].total = 30;
+
+            let validation_results = validate(data.clone())?;
+            assert_eq!(
+                validation_results.errors,
+                [
+                    ValidationResult {
+                        code: ValidationResultCode::F402,
+                        fields: vec!["data.political_group_votes[0]".into()],
+                        context: Some(ValidationResultContext {
+                            political_group_number: Some(1),
+                        }),
+                    },
+                    ValidationResult {
+                        code: ValidationResultCode::F403,
+                        fields: vec!["data.political_group_votes[0].total".into()],
+                        context: Some(ValidationResultContext {
+                            political_group_number: Some(1),
+                        }),
+                    },
+                    ValidationResult {
+                        code: ValidationResultCode::F401,
+                        fields: vec!["data.political_group_votes[1].total".into()],
+                        context: Some(ValidationResultContext {
+                            political_group_number: Some(2),
+                        }),
+                    }
+                ]
             );
 
             Ok(())

@@ -9,7 +9,7 @@
 #let location_name = is_municipality[Gemeente #input.election.domain_id #input.election.location][Openbaar lichaam #input.election.location]
 #let location_type = is_municipality[gemeentelijk stembureau][stembureau voor het openbaar lichaam]
 
-#show: doc => conf(doc, header: location_name, footer: [
+#show: doc => conf(doc, header-right: location_name, footer: [
   Corrigendum van een #location_type \
   Model Na 14-2
 ])
@@ -56,6 +56,8 @@ de aantallen in het proces-verbaal.
 #pagebreak(weak: true)
 
 #show: doc => document_numbering(doc)
+
+#show: doc => conf(doc, header-left: [Deel 1 - Gecorrigeerde telresultaten])
 
 = Gecorrigeerde telresultaten van #is_municipality[de gemeente][het openbaar lichaam]
 
@@ -180,6 +182,9 @@ ingevuld te worden in de kolom ‘gecorrigeerd'. Onder ‘oorspronkelijk’ staa
 ]
 
 #pagebreak(weak: true)
+
+#show: doc => conf(doc, header-left: [Deel 2 - Ondertekening])
+
 #emph_block[Deze pagina is expres leeg]
 
 Zo komt het handtekeningen-blad altijd op een losse pagina, ook als het verslag dubbelzijdig is geprint.

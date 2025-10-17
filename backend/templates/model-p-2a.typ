@@ -10,7 +10,7 @@
 #let location_type = is_municipality[gemeentelijk stembureau][stembureau voor het openbaar lichaam]
 #let this_location = is_municipality[deze gemeente][dit openbaar lichaam]
 
-#show: doc => conf(doc, header: location_name, footer: [
+#show: doc => conf(doc, header-right: location_name, footer: [
   Proces-verbaal van een #location_type (nieuwe zitting)\
   Model P 2a
 ])

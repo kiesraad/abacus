@@ -1,9 +1,17 @@
 #import "common/style.typ": conf, attachment_numbering
 #import "common/scripts.typ": *
+#let input = json("inputs/model-na-31-2-bijlage1.json")
 
-#show: doc => conf(doc, footer: [
-  Model Na 31-2 centrale stemopneming
-])
+#let is_municipality = (municipal, public_body) => if (
+  input.election.category == "Municipal"
+) { municipal } else { public_body }
+
+#let location_type = is_municipality[gemeentelijk stembureau][stembureau voor het openbaar lichaam]
+
+#show: doc => conf(doc, header-left: [Bijlage 2 - bezwaren van kiezers], footer: [
+    Proces-verbaal van een #location_type\
+    Model Na 31-2 centrale stemopneming
+  ])
 
 #set heading(numbering: none)
 

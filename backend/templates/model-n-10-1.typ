@@ -15,7 +15,7 @@
 #let this_location = is_municipality[deze gemeente][dit openbaar lichaam]
 #let location = is_municipality[gemeente][openbaar lichaam]
 
-#show: doc => conf(doc, header: [Stembureau #polling_station_number], footer: [Proces-verbaal van een stembureau \
+#show: doc => conf(doc, header-right: [Stembureau #polling_station_number], footer: [Proces-verbaal van een stembureau \
   Model N 10-1 decentrale stemopneming])
 
 #set heading(numbering: none)

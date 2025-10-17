@@ -6,11 +6,23 @@
   input.election.category == "Municipal"
 ) { municipal } else { public_body }
 
+#let location_name = is_municipality[Gemeente #input.election.domain_id #input.election.location][Openbaar lichaam #input.election.location]
 #let location_type = is_municipality[gemeentelijk stembureau][stembureau voor het openbaar lichaam]
 
-#show: doc => conf(doc, header: [Stembureau #input.polling_station.number], footer: [
-  Model Na 31-2 centrale stemopneming
-])
+#show: doc => conf(
+  doc,
+  header-left: [
+    Bijlage 1 - verslag telling stembureau
+  ],
+  header-right: [
+    #location_name \
+    Stembureau #input.polling_station.number
+  ],
+  footer: [
+    Proces-verbaal van een #location_type \
+    Model Na 31-2 centrale stemopneming
+  ]
+)
 
 #set heading(numbering: none)
 

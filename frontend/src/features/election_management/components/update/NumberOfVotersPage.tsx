@@ -26,11 +26,6 @@ export function NumberOfVotersPage() {
     });
   }
 
-  const instructions = t("election_management.enter_number_of_voters", {
-    name: election.name.toLowerCase(),
-    location: election.location,
-  });
-
   return (
     <>
       <header>
@@ -45,7 +40,7 @@ export function NumberOfVotersPage() {
         <article>
           <NumberOfVotersForm
             defaultValue={currentCommitteeSession.number_of_voters}
-            instructions={instructions}
+            instructions={t("election_management.enter_number_of_voters")}
             hint={t("election_management.enter_a_number")}
             button={t("save")}
             onSubmit={handleSubmit}

@@ -1,3 +1,5 @@
+use std::net::{IpAddr, Ipv4Addr};
+
 use axum::{
     extract::State,
     response::{AppendHeaders, IntoResponse, Json},
@@ -104,10 +106,10 @@ pub(super) fn set_default_cookie_properties(cookie: &mut Cookie) {
     ),
 )]
 async fn login(
-    user_agent: Option<TypedHeader<UserAgent>>,
     State(pool): State<SqlitePool>,
     jar: CookieJar,
     audit_service: AuditService,
+    user_agent: Option<TypedHeader<UserAgent>>,
     Json(credentials): Json<Credentials>,
 ) -> Result<impl IntoResponse, APIError> {
     let Credentials { username, password } = credentials;
@@ -140,8 +142,15 @@ async fn login(
     // Remove expired sessions, we do this after a login to prevent the necessity of periodical cleanup jobs
     super::session::delete_expired_sessions(&mut tx).await?;
 
+    // Get the client IP address if available
+    let ip = audit_service
+        .get_ip()
+        .unwrap_or(IpAddr::V4(Ipv4Addr::UNSPECIFIED))
+        .to_string();
+
     // Create a new session and cookie
-    let session = super::session::create(&mut tx, user.id(), SESSION_LIFE_TIME).await?;
+    let session =
+        super::session::create(&mut tx, user.id(), &user_agent, &ip, SESSION_LIFE_TIME).await?;
 
     // Log the login event
     let logged_in_users_count = super::session::count(&mut tx).await?;
@@ -150,7 +159,7 @@ async fn login(
         .log(
             &mut tx,
             &AuditEvent::UserLoggedIn(UserLoggedInDetails {
-                user_agent,
+                user_agent: user_agent.to_string(),
                 logged_in_users_count,
             }),
             None,

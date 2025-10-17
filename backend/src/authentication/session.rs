@@ -12,7 +12,7 @@ use super::{
     error::AuthenticationError,
     util::{create_new_session_key, get_expires_at},
 };
-use crate::APIError;
+use crate::{APIError, authentication::request_data::RequestSessionData};
 
 /// A session object, corresponds to a row in the sessions table
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Hash, FromRow)]
@@ -20,6 +20,8 @@ use crate::APIError;
 pub struct Session {
     session_key: String,
     user_id: u32,
+    user_agent: String,
+    ip_address: String,
     expires_at: DateTime<Utc>,
     created_at: DateTime<Utc>,
 }
@@ -40,7 +42,12 @@ where
 
 impl Session {
     // Create a new session for a specific user
-    pub(super) fn new(user_id: u32, life_time: TimeDelta) -> Result<Self, AuthenticationError> {
+    pub(super) fn new(
+        user_id: u32,
+        user_agent: String,
+        ip_address: String,
+        life_time: TimeDelta,
+    ) -> Result<Self, AuthenticationError> {
         let session_key = create_new_session_key();
         let expires_at = get_expires_at(life_time);
         let created_at = Utc::now();
@@ -48,6 +55,8 @@ impl Session {
         Ok(Self {
             session_key,
             user_id,
+            user_agent,
+            ip_address,
             expires_at,
             created_at,
         })
@@ -90,22 +99,33 @@ impl Session {
 pub(crate) async fn create(
     conn: &mut SqliteConnection,
     user_id: u32,
+    user_agent: &str,
+    ip_address: &str,
     life_time: TimeDelta,
 ) -> Result<Session, AuthenticationError> {
-    let session = Session::new(user_id, life_time)?;
+    let session = Session::new(
+        user_id,
+        user_agent.to_string(),
+        ip_address.to_string(),
+        life_time,
+    )?;
 
     let saved_session = sqlx::query_as!(
         Session,
-        r#"INSERT INTO sessions (session_key, user_id, expires_at, created_at)
-        VALUES (?, ?, ?, ?)
+        r#"INSERT INTO sessions (session_key, user_id, user_agent, ip_address, expires_at, created_at)
+        VALUES (?, ?, ?, ?, ?, ?)
         RETURNING
             session_key,
             user_id as "user_id: u32",
+            user_agent,
+            ip_address,
             expires_at as "expires_at: _",
             created_at as "created_at: _"
         "#,
         session.session_key,
         session.user_id,
+        session.user_agent,
+        session.ip_address,
         session.expires_at,
         session.created_at
     )
@@ -113,6 +133,42 @@ pub(crate) async fn create(
     .await?;
 
     Ok(saved_session)
+}
+
+/// Get a session by its key and validate user agent and IP address
+pub(super) async fn get_by_request_data(
+    conn: &mut SqliteConnection,
+    request_data: &RequestSessionData,
+) -> Result<Option<Session>, AuthenticationError> {
+    let now = Utc::now();
+    let session_key = request_data.session_cookie.value();
+    let ip_address = request_data.ip_address.to_string();
+
+    let session: Option<Session> = sqlx::query_as!(
+        Session,
+        r#"
+        SELECT
+            session_key,
+            user_id as "user_id: u32",
+            user_agent,
+            ip_address,
+            expires_at as "expires_at: _",
+            created_at as "created_at: _"
+        FROM sessions
+        WHERE session_key = ?
+        AND user_agent = ?
+        AND ip_address = ?
+        AND expires_at > ?
+        "#,
+        session_key,
+        request_data.user_agent,
+        ip_address,
+        now
+    )
+    .fetch_optional(conn)
+    .await?;
+
+    Ok(session)
 }
 
 /// Get a session by its key
@@ -127,6 +183,8 @@ pub(super) async fn get_by_key(
         SELECT
             session_key,
             user_id as "user_id: u32",
+            user_agent,
+            ip_address,
             expires_at as "expires_at: _",
             created_at as "created_at: _"
         FROM sessions
@@ -207,6 +265,8 @@ pub(super) async fn extend_session(
         RETURNING
             session_key,
             user_id as "user_id: u32",
+            user_agent,
+            ip_address,
             expires_at as "expires_at: _",
             created_at as "created_at: _"
         "#,
@@ -225,12 +285,21 @@ mod test {
     use sqlx::SqlitePool;
     use test_log::test;
 
+    const TEST_USER_AGENT: &str = "TestAgent/1.0";
+    const TEST_IP_ADDRESS: &str = "0.0.0.0";
+
     #[test(sqlx::test(fixtures("../../fixtures/users.sql")))]
     async fn test_create_and_get_session(pool: SqlitePool) {
         let mut conn = pool.acquire().await.unwrap();
-        let session = super::create(&mut conn, 1, TimeDelta::seconds(60))
-            .await
-            .unwrap();
+        let session = super::create(
+            &mut conn,
+            1,
+            TEST_USER_AGENT,
+            TEST_IP_ADDRESS,
+            TimeDelta::seconds(60),
+        )
+        .await
+        .unwrap();
 
         let session_from_db = super::get_by_key(&mut conn, &session.session_key)
             .await
@@ -243,9 +312,15 @@ mod test {
     #[test(sqlx::test(fixtures("../../fixtures/users.sql")))]
     async fn test_delete_session(pool: SqlitePool) {
         let mut conn = pool.acquire().await.unwrap();
-        let session = super::create(&mut conn, 1, TimeDelta::seconds(60))
-            .await
-            .unwrap();
+        let session = super::create(
+            &mut conn,
+            1,
+            TEST_USER_AGENT,
+            TEST_IP_ADDRESS,
+            TimeDelta::seconds(60),
+        )
+        .await
+        .unwrap();
 
         let session_from_db = super::get_by_key(&mut conn, &session.session_key)
             .await
@@ -266,9 +341,15 @@ mod test {
     #[test(sqlx::test(fixtures("../../fixtures/users.sql")))]
     async fn test_delete_old_sessions(pool: SqlitePool) {
         let mut conn = pool.acquire().await.unwrap();
-        let session = super::create(&mut conn, 1, TimeDelta::seconds(0))
-            .await
-            .unwrap();
+        let session = super::create(
+            &mut conn,
+            1,
+            TEST_USER_AGENT,
+            TEST_IP_ADDRESS,
+            TimeDelta::seconds(0),
+        )
+        .await
+        .unwrap();
 
         super::delete_expired_sessions(&mut conn).await.unwrap();
 
@@ -282,15 +363,33 @@ mod test {
     #[test(sqlx::test(fixtures("../../fixtures/users.sql")))]
     async fn test_session_count(pool: SqlitePool) {
         let mut conn = pool.acquire().await.unwrap();
-        let _active_session1 = super::create(&mut conn, 1, TimeDelta::seconds(60))
-            .await
-            .unwrap();
-        let _active_session2 = super::create(&mut conn, 2, TimeDelta::seconds(120))
-            .await
-            .unwrap();
-        let _expired_session = super::create(&mut conn, 2, TimeDelta::seconds(0))
-            .await
-            .unwrap();
+        let _active_session1 = super::create(
+            &mut conn,
+            1,
+            TEST_USER_AGENT,
+            TEST_IP_ADDRESS,
+            TimeDelta::seconds(60),
+        )
+        .await
+        .unwrap();
+        let _active_session2 = super::create(
+            &mut conn,
+            2,
+            TEST_USER_AGENT,
+            TEST_IP_ADDRESS,
+            TimeDelta::seconds(120),
+        )
+        .await
+        .unwrap();
+        let _expired_session = super::create(
+            &mut conn,
+            2,
+            TEST_USER_AGENT,
+            TEST_IP_ADDRESS,
+            TimeDelta::seconds(0),
+        )
+        .await
+        .unwrap();
 
         assert_eq!(2, super::count(&mut conn).await.unwrap());
     }

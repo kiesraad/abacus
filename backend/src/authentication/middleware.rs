@@ -1,11 +1,11 @@
 use axum::{
+    RequestExt,
+    body::Body,
     extract::{Request, State},
-    http::HeaderValue,
+    http::{HeaderValue, header::SET_COOKIE},
     response::Response,
 };
-use axum_extra::extract::CookieJar;
 use chrono::Utc;
-use hyper::header::SET_COOKIE;
 use sqlx::SqlitePool;
 use tracing::{debug, error, info};
 
@@ -13,16 +13,15 @@ use super::{SESSION_MIN_LIFE_TIME, session::Session};
 use crate::{
     SqlitePoolExt,
     audit_log::{AuditEvent, AuditService},
-    authentication::{SESSION_COOKIE_NAME, User, set_default_cookie_properties},
+    authentication::{User, request_data::RequestSessionData, set_default_cookie_properties},
 };
 
 /// Inject user and session
-pub async fn inject_user<B>(
+pub async fn inject_user(
     State(pool): State<SqlitePool>,
-    jar: CookieJar,
-    mut request: Request<B>,
-) -> Request<B> {
-    let Some(session_cookie) = jar.get(SESSION_COOKIE_NAME) else {
+    mut request: Request<Body>,
+) -> Request<Body> {
+    let Some(request_data) = request.extract_parts::<RequestSessionData>().await.ok() else {
         return request;
     };
 
@@ -30,15 +29,14 @@ pub async fn inject_user<B>(
     let Ok(mut conn) = pool.acquire().await else {
         return request;
     };
-    let Ok(Some(session)) = super::session::get_by_key(&mut conn, session_cookie.value()).await
+
+    let Ok(Some(session)) = super::session::get_by_request_data(&mut conn, &request_data).await
     else {
         return request;
     };
 
     let session_id = session.user_id();
-
     let extensions = request.extensions_mut();
-
     extensions.insert(session);
 
     // fetch the user from the database
@@ -123,12 +121,11 @@ mod test {
     use axum::{
         body::Body,
         extract::{Request, State},
+        http::header::{COOKIE, SET_COOKIE, USER_AGENT},
         response::Response,
     };
-    use axum_extra::extract::CookieJar;
     use chrono::TimeDelta;
     use cookie::Cookie;
-    use hyper::header::SET_COOKIE;
     use sqlx::SqlitePool;
     use test_log::test;
 
@@ -138,16 +135,12 @@ mod test {
         authentication::{Role, SESSION_LIFE_TIME, SESSION_MIN_LIFE_TIME, User},
     };
 
+    const TEST_USER_AGENT: &str = "TestAgent/1.0";
+    const TEST_IP_ADDRESS: &str = "0.0.0.0";
+
     #[test(sqlx::test(fixtures("../../fixtures/users.sql")))]
     async fn test_inject_user(pool: SqlitePool) {
-        let jar = CookieJar::new();
-
-        let request = inject_user(
-            State(pool.clone()),
-            jar.clone(),
-            Request::new(Body::empty()),
-        )
-        .await;
+        let request = inject_user(State(pool.clone()), Request::new(Body::empty())).await;
 
         assert!(
             request.extensions().get::<User>().is_none(),
@@ -156,21 +149,25 @@ mod test {
 
         let user = User::test_user(Role::Administrator, 1);
         let mut conn = pool.acquire().await.unwrap();
-        let session =
-            crate::authentication::session::create(&mut conn, user.id(), SESSION_LIFE_TIME)
-                .await
-                .unwrap();
-
-        let mut jar = CookieJar::new();
-        let cookie = session.get_cookie();
-        jar = jar.add(cookie);
-
-        let request = inject_user(
-            State(pool.clone()),
-            jar.clone(),
-            Request::new(Body::empty()),
+        let session = crate::authentication::session::create(
+            &mut conn,
+            user.id(),
+            TEST_USER_AGENT,
+            TEST_IP_ADDRESS,
+            SESSION_LIFE_TIME,
         )
-        .await;
+        .await
+        .unwrap();
+
+        let cookie = session.get_cookie();
+
+        let request = Request::builder()
+            .header(USER_AGENT, TEST_USER_AGENT)
+            .header(COOKIE, cookie.encoded().to_string())
+            .body(Body::empty())
+            .unwrap();
+
+        let request = inject_user(State(pool.clone()), request).await;
 
         assert!(
             request.extensions().get::<User>().is_some(),
@@ -181,7 +178,7 @@ mod test {
             .await
             .unwrap();
 
-        let request = inject_user(State(pool.clone()), jar, Request::new(Body::empty())).await;
+        let request = inject_user(State(pool.clone()), Request::new(Body::empty())).await;
 
         assert!(
             request.extensions().get::<User>().is_none(),
@@ -217,9 +214,15 @@ mod test {
 
         let life_time = SESSION_MIN_LIFE_TIME + TimeDelta::seconds(30); // min life time + 30 seconds
         let mut conn = pool.acquire().await.unwrap();
-        let session = crate::authentication::session::create(&mut conn, user.id(), life_time)
-            .await
-            .unwrap();
+        let session = crate::authentication::session::create(
+            &mut conn,
+            user.id(),
+            TEST_USER_AGENT,
+            TEST_IP_ADDRESS,
+            life_time,
+        )
+        .await
+        .unwrap();
 
         let updated_response = extend_session(
             State(pool.clone()),
@@ -244,9 +247,15 @@ mod test {
         );
 
         let life_time = SESSION_MIN_LIFE_TIME - TimeDelta::seconds(30); // min life time - 30 seconds
-        let session = crate::authentication::session::create(&mut conn, user.id(), life_time)
-            .await
-            .unwrap();
+        let session = crate::authentication::session::create(
+            &mut conn,
+            user.id(),
+            TEST_USER_AGENT,
+            TEST_IP_ADDRESS,
+            life_time,
+        )
+        .await
+        .unwrap();
 
         let updated_response = extend_session(
             State(pool.clone()),

@@ -45,6 +45,10 @@ impl AuditService {
         self
     }
 
+    pub fn get_ip(&self) -> Option<IpAddr> {
+        self.ip
+    }
+
     pub fn has_user(&self) -> bool {
         self.user.is_some()
     }

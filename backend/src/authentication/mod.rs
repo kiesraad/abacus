@@ -11,6 +11,7 @@ pub mod api;
 pub mod error;
 mod middleware;
 mod password;
+pub mod request_data;
 mod role;
 pub mod session;
 pub mod user;
@@ -44,16 +45,19 @@ pub struct CreateUserRequest {
 
 #[cfg(test)]
 mod tests {
+    use std::net::SocketAddr;
+
     use axum::{
         Router,
         body::Body,
+        extract::ConnectInfo,
         http::{HeaderValue, Request, StatusCode},
         middleware,
     };
     use http_body_util::BodyExt;
     use hyper::{
         Method,
-        header::{CONTENT_TYPE, USER_AGENT},
+        header::{CONTENT_TYPE, COOKIE, USER_AGENT},
     };
     use sqlx::SqlitePool;
     use test_log::test;
@@ -71,6 +75,9 @@ mod tests {
         },
         error::ErrorReference,
     };
+
+    const TEST_USER_AGENT: &str = "TestAgent/1.0";
+    const TEST_IP_ADDRESS: &str = "0.0.0.0";
 
     fn create_app(pool: SqlitePool) -> Router {
         let state = AppState {
@@ -98,6 +105,7 @@ mod tests {
                     .method(Method::POST)
                     .uri("/api/login")
                     .header(CONTENT_TYPE, "application/json")
+                    .header(USER_AGENT, TEST_USER_AGENT)
                     .body(Body::from(
                         serde_json::to_vec(&Credentials {
                             username: "admin1".to_string(),
@@ -126,6 +134,7 @@ mod tests {
                     .method(Method::POST)
                     .uri("/api/login")
                     .header(CONTENT_TYPE, "application/json")
+                    .header(USER_AGENT, TEST_USER_AGENT)
                     .body(Body::from(
                         serde_json::to_vec(&Credentials {
                             username: "admin1".to_string(),
@@ -158,7 +167,7 @@ mod tests {
                     .method(Method::POST)
                     .uri("/api/login")
                     .header(CONTENT_TYPE, "application/json")
-                    .header(USER_AGENT, "Servo/1.0")
+                    .header(USER_AGENT, TEST_USER_AGENT)
                     .body(Body::from(
                         serde_json::to_vec(&Credentials {
                             username: "admin".to_string(),
@@ -189,7 +198,7 @@ mod tests {
             events[0].event(),
             &AuditEvent::UserLoginFailed(UserLoginFailedDetails {
                 username: "admin".to_string(),
-                user_agent: "Servo/1.0".to_string(),
+                user_agent: TEST_USER_AGENT.to_string(),
             })
         );
     }
@@ -206,7 +215,7 @@ mod tests {
                 Request::builder()
                     .method(Method::POST)
                     .uri("/api/logout")
-                    .header("cookie", &cookie)
+                    .header(COOKIE, &cookie)
                     .body(Body::empty())
                     .unwrap(),
             )
@@ -236,7 +245,7 @@ mod tests {
                 Request::builder()
                     .method(Method::POST)
                     .uri("/api/logout")
-                    .header("cookie", &cookie)
+                    .header(COOKIE, &cookie)
                     .body(Body::empty())
                     .unwrap(),
             )
@@ -262,7 +271,8 @@ mod tests {
                 Request::builder()
                     .method(Method::GET)
                     .uri("/api/whoami")
-                    .header("cookie", &cookie)
+                    .header(USER_AGENT, TEST_USER_AGENT)
+                    .header(COOKIE, &cookie)
                     .body(Body::empty())
                     .unwrap(),
             )
@@ -284,7 +294,7 @@ mod tests {
                 Request::builder()
                     .method(Method::POST)
                     .uri("/api/logout")
-                    .header("cookie", &cookie)
+                    .header(COOKIE, &cookie)
                     .body(Body::empty())
                     .unwrap(),
             )
@@ -300,7 +310,8 @@ mod tests {
                 Request::builder()
                     .method(Method::GET)
                     .uri("/api/whoami")
-                    .header("cookie", &cookie)
+                    .header(USER_AGENT, TEST_USER_AGENT)
+                    .header(COOKIE, &cookie)
                     .body(Body::empty())
                     .unwrap(),
             )
@@ -339,7 +350,8 @@ mod tests {
                     .method(Method::PUT)
                     .uri("/api/account")
                     .header(CONTENT_TYPE, "application/json")
-                    .header("cookie", &cookie)
+                    .header(USER_AGENT, TEST_USER_AGENT)
+                    .header(COOKIE, &cookie)
                     .body(Body::from(
                         serde_json::to_vec(&AccountUpdateRequest {
                             username: "admin1".to_string(),
@@ -365,6 +377,7 @@ mod tests {
                     .method(Method::POST)
                     .uri("/api/login")
                     .header(CONTENT_TYPE, "application/json")
+                    .header(USER_AGENT, TEST_USER_AGENT)
                     .body(Body::from(
                         serde_json::to_vec(&Credentials {
                             username: "admin1".to_string(),
@@ -394,7 +407,8 @@ mod tests {
                     .method(Method::PUT)
                     .uri("/api/account")
                     .header(CONTENT_TYPE, "application/json")
-                    .header("cookie", &cookie)
+                    .header(USER_AGENT, TEST_USER_AGENT)
+                    .header(COOKIE, &cookie)
                     .body(Body::from(
                         serde_json::to_vec(&AccountUpdateRequest {
                             username: "wrong_user".to_string(),
@@ -415,9 +429,15 @@ mod tests {
     async fn test_list(pool: SqlitePool) {
         let app = create_app(pool.clone());
         let mut conn = pool.acquire().await.unwrap();
-        let session = super::session::create(&mut conn, 1, SESSION_LIFE_TIME)
-            .await
-            .unwrap();
+        let session = super::session::create(
+            &mut conn,
+            1,
+            TEST_USER_AGENT,
+            TEST_IP_ADDRESS,
+            SESSION_LIFE_TIME,
+        )
+        .await
+        .unwrap();
         let mut cookie = session.get_cookie();
         set_default_cookie_properties(&mut cookie);
         let response = app
@@ -426,7 +446,8 @@ mod tests {
                 Request::builder()
                     .method(Method::GET)
                     .uri("/api/user")
-                    .header("cookie", &cookie.encoded().to_string())
+                    .header(USER_AGENT, TEST_USER_AGENT)
+                    .header(COOKIE, cookie.encoded().to_string())
                     .body(Body::empty())
                     .unwrap(),
             )
@@ -445,9 +466,15 @@ mod tests {
 
         // with a normal long-valid session the user should not get a new cookie
         let mut conn = pool.acquire().await.unwrap();
-        let session = super::session::create(&mut conn, 1, SESSION_LIFE_TIME)
-            .await
-            .unwrap();
+        let session = super::session::create(
+            &mut conn,
+            1,
+            TEST_USER_AGENT,
+            TEST_IP_ADDRESS,
+            SESSION_LIFE_TIME,
+        )
+        .await
+        .unwrap();
         let mut cookie = session.get_cookie();
         set_default_cookie_properties(&mut cookie);
 
@@ -457,7 +484,8 @@ mod tests {
                 Request::builder()
                     .method(Method::GET)
                     .uri("/api/whoami")
-                    .header("cookie", &cookie.encoded().to_string())
+                    .header(USER_AGENT, TEST_USER_AGENT)
+                    .header(COOKIE, cookie.encoded().to_string())
                     .body(Body::empty())
                     .unwrap(),
             )
@@ -468,10 +496,15 @@ mod tests {
         assert_eq!(response.headers().get("set-cookie"), None);
 
         // with a session that is about to expire the user should get a new cookie, and the session lifetime should be extended
-        let session: session::Session =
-            super::session::create(&mut conn, 1, SESSION_MIN_LIFE_TIME / 2)
-                .await
-                .unwrap();
+        let session: session::Session = super::session::create(
+            &mut conn,
+            1,
+            TEST_USER_AGENT,
+            TEST_IP_ADDRESS,
+            SESSION_MIN_LIFE_TIME / 2,
+        )
+        .await
+        .unwrap();
         let mut cookie = session.get_cookie();
         set_default_cookie_properties(&mut cookie);
 
@@ -481,7 +514,8 @@ mod tests {
                 Request::builder()
                     .method(Method::GET)
                     .uri("/api/whoami")
-                    .header("cookie", &cookie.encoded().to_string())
+                    .header(USER_AGENT, TEST_USER_AGENT)
+                    .header(COOKIE, cookie.encoded().to_string())
                     .body(Body::empty())
                     .unwrap(),
             )
@@ -509,7 +543,8 @@ mod tests {
                     .method(Method::POST)
                     .uri("/api/user")
                     .header(CONTENT_TYPE, "application/json")
-                    .header("cookie", cookie)
+                    .header(USER_AGENT, TEST_USER_AGENT)
+                    .header(COOKIE, cookie)
                     .body(Body::from(
                         serde_json::to_vec(&CreateUserRequest {
                             username: "test_user".to_string(),
@@ -543,7 +578,8 @@ mod tests {
                     .method(Method::PUT)
                     .uri("/api/user/1")
                     .header(CONTENT_TYPE, "application/json")
-                    .header("cookie", cookie)
+                    .header(USER_AGENT, TEST_USER_AGENT)
+                    .header(COOKIE, cookie)
                     .body(Body::from(
                         serde_json::to_vec(&user_api::UpdateUserRequest {
                             fullname: Some("Test Full Name".to_string()),
@@ -569,9 +605,15 @@ mod tests {
         let app = create_app(pool.clone());
         // user id 5 is a typist
         let mut conn = pool.acquire().await.unwrap();
-        let session = super::session::create(&mut conn, 5, SESSION_LIFE_TIME)
-            .await
-            .unwrap();
+        let session = super::session::create(
+            &mut conn,
+            5,
+            TEST_USER_AGENT,
+            TEST_IP_ADDRESS,
+            SESSION_LIFE_TIME,
+        )
+        .await
+        .unwrap();
         let mut cookie = session.get_cookie();
         set_default_cookie_properties(&mut cookie);
         let response = app
@@ -580,7 +622,8 @@ mod tests {
                 Request::builder()
                     .method(Method::GET)
                     .uri("/api/user")
-                    .header("cookie", &cookie.encoded().to_string())
+                    .header(USER_AGENT, TEST_USER_AGENT)
+                    .header(COOKIE, cookie.encoded().to_string())
                     .body(Body::empty())
                     .unwrap(),
             )
@@ -591,5 +634,56 @@ mod tests {
         let body = response.into_body().collect().await.unwrap().to_bytes();
         let result: ErrorResponse = serde_json::from_slice(&body).unwrap();
         assert_eq!(result.reference, ErrorReference::Forbidden);
+    }
+
+    #[test(sqlx::test(fixtures("../../fixtures/users.sql")))]
+    async fn test_denied_on_different_user_agent(pool: SqlitePool) {
+        let app = create_app(pool.clone());
+        let cookie = login_as_admin(app.clone()).await;
+
+        let response = app
+            .clone()
+            .oneshot(
+                Request::builder()
+                    .method(Method::GET)
+                    .uri("/api/whoami")
+                    .header(USER_AGENT, "DifferentAgent/2.0")
+                    .header(COOKIE, &cookie)
+                    .body(Body::empty())
+                    .unwrap(),
+            )
+            .await
+            .unwrap();
+
+        assert_eq!(response.status(), StatusCode::UNAUTHORIZED);
+        let body = response.into_body().collect().await.unwrap().to_bytes();
+        let result: ErrorResponse = serde_json::from_slice(&body).unwrap();
+        assert_eq!(result.reference, ErrorReference::UserNotFound);
+    }
+
+    #[test(sqlx::test(fixtures("../../fixtures/users.sql")))]
+    async fn test_denied_on_different_client_ip(pool: SqlitePool) {
+        let app = create_app(pool.clone());
+        let cookie = login_as_admin(app.clone()).await;
+
+        let mut request = Request::builder()
+            .method(Method::GET)
+            .uri("/api/whoami")
+            .header(USER_AGENT, TEST_USER_AGENT)
+            .header(COOKIE, &cookie)
+            .body(Body::empty())
+            .unwrap();
+
+        // manually set a different IP address
+        request
+            .extensions_mut()
+            .insert(ConnectInfo(SocketAddr::from(([1, 2, 3, 4], 1234))));
+
+        let response = app.clone().oneshot(request).await.unwrap();
+
+        assert_eq!(response.status(), StatusCode::UNAUTHORIZED);
+        let body = response.into_body().collect().await.unwrap().to_bytes();
+        let result: ErrorResponse = serde_json::from_slice(&body).unwrap();
+        assert_eq!(result.reference, ErrorReference::UserNotFound);
     }
 }

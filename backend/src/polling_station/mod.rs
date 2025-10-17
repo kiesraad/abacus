@@ -18,7 +18,9 @@ use crate::{
         repository::get_election_committee_session,
         status::{CommitteeSessionStatus, change_committee_session_status},
     },
+    data_entry::status::DataEntryStatusName,
     eml::{EML110, EMLDocument, EMLImportError},
+    error::ErrorReference,
 };
 
 pub mod repository;
@@ -284,6 +286,20 @@ async fn polling_station_delete(
     )
     .await?;
 
+    // If there is no linked data entry or a linked not started data entry, delete polling station
+    if crate::data_entry::repository::data_entry_exists(&mut tx, polling_station_id).await? {
+        let data_entry =
+            crate::data_entry::repository::get(&mut tx, polling_station_id, committee_session.id)
+                .await?;
+        if data_entry.status_name() == DataEntryStatusName::FirstEntryNotStarted {
+            crate::data_entry::repository::delete_data_entry(&mut tx, polling_station_id).await?;
+        } else {
+            return Err(APIError::BadRequest(
+                "Polling station with a data entry cannot be deleted".to_string(),
+                ErrorReference::PollingStationCannotBeDeleted,
+            ));
+        }
+    }
     crate::polling_station::repository::delete(&mut tx, election_id, polling_station_id).await?;
 
     audit_service

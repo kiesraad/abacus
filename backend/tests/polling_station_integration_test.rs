@@ -362,11 +362,14 @@ async fn test_delete_with_data_entry_fails(pool: SqlitePool) {
 
     assert_eq!(
         response.status(),
-        StatusCode::UNPROCESSABLE_ENTITY,
+        StatusCode::BAD_REQUEST,
         "Unexpected response status"
     );
     let body: ErrorResponse = response.json().await.unwrap();
-    assert_eq!(body.error, "Invalid data");
+    assert_eq!(
+        body.error,
+        "Polling station with a data entry cannot be deleted"
+    );
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
@@ -378,11 +381,14 @@ async fn test_delete_with_results_fails(pool: SqlitePool) {
 
     assert_eq!(
         response.status(),
-        StatusCode::UNPROCESSABLE_ENTITY,
+        StatusCode::BAD_REQUEST,
         "Unexpected response status"
     );
     let body: ErrorResponse = response.json().await.unwrap();
-    assert_eq!(body.error, "Invalid data");
+    assert_eq!(
+        body.error,
+        "Polling station with a data entry cannot be deleted"
+    );
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]

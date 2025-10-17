@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { MouseEvent, useState } from "react";
 import { Link, useNavigate } from "react-router";
 
 import { IconCheckmark, IconMinus, IconPencil, IconPrinter } from "@/components/generated/icons";
@@ -27,7 +27,7 @@ export function InvestigationCard({ investigation }: InvestigationCardProps) {
     setShowModal(false);
   };
 
-  const goToFindings = (e: React.MouseEvent<HTMLButtonElement>) => {
+  const goToFindings = (e: MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
 
     if (currentCommitteeSession.status === "data_entry_not_started") {

@@ -165,7 +165,7 @@ export function ElectionHomePage() {
             <div>
               <h2>
                 {/* TODO: Change to conditional GSB/HSB/CSB when implemented */}
-                {t("GSB")} {election.domain_id} {election.location}
+                {t("GSB")} {election.location}
               </h2>
             </div>
           </div>

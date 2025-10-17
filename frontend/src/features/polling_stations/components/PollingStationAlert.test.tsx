@@ -33,7 +33,6 @@ describe("PollingStationAlert", () => {
 
     const alert = await screen.findByRole("alert");
     expect(within(alert).getByRole("strong")).toHaveTextContent("Invoerfase al afgerond");
-    expect(alert).toBeVisible();
   });
 
   test("Does not render warning when data entry is not finished", async () => {

@@ -48,6 +48,7 @@ pub enum ErrorReference {
     InvalidVoteGroup,
     InvalidXml,
     InvestigationHasDataEntryOrResult,
+    InvestigationRequiresCorrectedResults,
     NotInitialised,
     OwnAccountCannotBeDeleted,
     PasswordRejection,

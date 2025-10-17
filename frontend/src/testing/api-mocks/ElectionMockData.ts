@@ -302,6 +302,16 @@ export const getElectionMockData = (
   investigations: PollingStationInvestigation[] = mockInvestigations,
 ): Required<ElectionDetailsResponse> => {
   const updatedCommitteeSession = getCommitteeSessionMockData(committeeSession);
+
+  // If committee session number > 1, add id_prev_session to polling stations
+  const pollingStations =
+    updatedCommitteeSession.number > 1
+      ? pollingStationMockData.map((ps) => ({
+          ...ps,
+          id_prev_session: 1000 + ps.id,
+        }))
+      : pollingStationMockData;
+
   return {
     current_committee_session: updatedCommitteeSession,
     committee_sessions: [updatedCommitteeSession],
@@ -310,7 +320,7 @@ export const getElectionMockData = (
       political_groups: politicalGroupsMockData,
       ...election,
     },
-    polling_stations: pollingStationMockData,
+    polling_stations: pollingStations,
     investigations,
   };
 };

@@ -1,6 +1,6 @@
 import { describe, expect, test } from "vitest";
 
-import { parseIntStrict, parseIntUserInput, removeLeadingZeros } from "./strings";
+import { formatList, parseIntStrict, parseIntUserInput, removeLeadingZeros } from "./strings";
 
 describe("Strings util", () => {
   test.each([
@@ -66,5 +66,16 @@ describe("Strings util", () => {
     } else {
       expect(parseIntUserInput(input)).toBeUndefined();
     }
+  });
+
+  test.each([
+    [[], "and", ""],
+    [["A"], "and", "A"],
+    [["A", "B"], "and", "A and B"],
+    [["A", "B", "C"], "and", "A, B and C"],
+    [["A", "B", "C"], "or", "A, B or C"],
+    [["A ", " B", " C"], "or", "A ,  B or  C"],
+  ])("formatList(%j, %s)", (items, conjunction, expected) => {
+    expect(formatList(items, conjunction)).toBe(expected);
   });
 });

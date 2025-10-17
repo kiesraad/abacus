@@ -15,7 +15,7 @@ use crate::{
         repository::{all_investigations_finished, change_files},
         status::CommitteeSessionStatus,
     },
-    data_entry::PollingStationResults,
+    data_entry::{PollingStationResults, repository::are_results_complete_for_committee_session},
     election::ElectionWithPoliticalGroups,
     eml::{EML510, EMLDocument, EmlHash},
     files::{
@@ -65,7 +65,7 @@ impl ResultsInput {
             crate::election::repository::get(conn, committee_session.election_id).await?;
         let polling_stations =
             crate::polling_station::repository::list(conn, committee_session.id).await?;
-        let results = crate::data_entry::repository::list_entries_for_committee_session(
+        let results = crate::data_entry::repository::list_results_for_committee_session(
             conn,
             committee_session.id,
         )
@@ -94,7 +94,7 @@ impl ResultsInput {
         let previous_summary = if let Some(previous_committee_session) = &previous_committee_session
         {
             let previous_results =
-                crate::data_entry::repository::list_entries_for_committee_session(
+                crate::data_entry::repository::list_results_for_committee_session(
                     conn,
                     previous_committee_session.id,
                 )
@@ -265,6 +265,9 @@ async fn generate_and_save_files(
     if committee_session.status != CommitteeSessionStatus::DataEntryFinished
         || committee_session.start_date_time.is_none()
         || !all_investigations_finished(&mut conn, committee_session.id).await?
+        || are_results_complete_for_committee_session(&mut conn, committee_session_id)
+            .await
+            .is_err()
     {
         return Err(APIError::CommitteeSession(
             CommitteeSessionError::InvalidCommitteeSessionStatus,
@@ -495,10 +498,7 @@ mod tests {
         }
     }
 
-    #[test(sqlx::test(fixtures(
-        path = "../../fixtures",
-        scripts("election_8_four_sessions_with_results.sql")
-    )))]
+    #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_7_four_sessions"))))]
     async fn test_generate_and_save_files_next_session(pool: SqlitePool) {
         let mut conn = pool.acquire().await.unwrap();
         let audit_service = AuditService::new(None, None);

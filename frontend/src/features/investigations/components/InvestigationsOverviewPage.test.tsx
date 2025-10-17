@@ -10,6 +10,7 @@ import { ApiProvider } from "@/api/ApiProvider";
 import { ErrorBoundary } from "@/components/error/ErrorBoundary";
 import { ElectionLayout } from "@/components/layout/ElectionLayout";
 import { getElectionMockData } from "@/testing/api-mocks/ElectionMockData";
+import { pollingStationMockData } from "@/testing/api-mocks/PollingStationMockData";
 import {
   CommitteeSessionStatusChangeRequestHandler,
   ElectionStatusRequestHandler,
@@ -18,7 +19,7 @@ import { getRouter, Router } from "@/testing/router";
 import { overrideOnce, server } from "@/testing/server";
 import { screen, setupTestRouter, spyOnHandler } from "@/testing/test-utils";
 import { TestUserProvider } from "@/testing/TestUserProvider";
-import { ElectionDetailsResponse, Role } from "@/types/generated/openapi";
+import { ElectionDetailsResponse, PollingStation, PollingStationInvestigation, Role } from "@/types/generated/openapi";
 
 import { investigationRoutes } from "../routes";
 
@@ -59,6 +60,9 @@ async function renderPage(userRole: Role) {
 
   await router.navigate("/elections/1/investigations");
   rtlRender(<Providers router={router} userRole={userRole} />);
+
+  // Ensure rendering is complete
+  await screen.findByRole("heading", { level: 1, name: "Onderzoeken in tweede zitting" });
 
   return router;
 }
@@ -118,6 +122,87 @@ describe("InvestigationsOverviewPage", () => {
     expect(headings[3]).toHaveTextContent("Afgehandelde onderzoeken");
     expect(headings[4]).toHaveTextContent("Testplek");
     expect(headings[5]).toHaveTextContent("Test kerk");
+  });
+
+  test("Doesn't show warning of missing investigations if not all existing investigations are handled yet", async () => {
+    overrideOnce("get", "/api/elections/1", 200, {
+      ...getElectionMockData({}, { number: 2 }, [
+        { polling_station_id: 1, reason: "Test reason 1", findings: "Test findings 1", corrected_results: false },
+        { polling_station_id: 2, reason: "Test reason 2", findings: "Test findings 2", corrected_results: false },
+        { polling_station_id: 3, reason: "Test reason 3" },
+      ] satisfies PollingStationInvestigation[]),
+      polling_stations: [
+        ...pollingStationMockData.slice(0, 3),
+        {
+          ...pollingStationMockData[4]!,
+          id_prev_session: undefined,
+        },
+      ] satisfies PollingStation[],
+    });
+
+    await renderPage("coordinator");
+
+    expect(screen.queryByRole("alert")).not.toBeInTheDocument();
+  });
+
+  test("Shows warning if investigations are handled, but there is one missing (singular)", async () => {
+    overrideOnce("get", "/api/elections/1", 200, {
+      ...getElectionMockData({}, { number: 2 }, [
+        { polling_station_id: 1, reason: "Test reason 1", findings: "Test findings 1", corrected_results: false },
+        { polling_station_id: 2, reason: "Test reason 2", findings: "Test findings 2", corrected_results: false },
+        { polling_station_id: 3, reason: "Test reason 3", findings: "Test findings 3", corrected_results: false },
+      ] satisfies PollingStationInvestigation[]),
+      polling_stations: [
+        ...pollingStationMockData.slice(0, 3),
+        {
+          ...pollingStationMockData[4]!,
+          id_prev_session: undefined,
+        },
+      ] satisfies PollingStation[],
+    });
+
+    await renderPage("coordinator");
+
+    const alert = await screen.findByRole("alert");
+    expect(within(alert).getByRole("strong")).toHaveTextContent("Invoerfase kan niet worden afgerond");
+    expect(within(alert).getByRole("paragraph")).toHaveTextContent(
+      "Sinds de vorige zitting van het GSB is een nieuw stembureau toegevoegd in Abacus. Het gaat om het stembureau met nummer 37. Je kan het proces-verbaal van deze zitting pas maken als voor dit stembureau de aanleiding en bevindingen van het onderzoek zijn ingevoerd.",
+    );
+
+    expect(within(alert).getByRole("link", { name: "Onderzoek toevoegen" })).toBeVisible();
+    expect(within(alert).getByRole("link", { name: "verwijder het toegevoegde stembureau" })).toBeVisible();
+  });
+
+  test("Shows warning if investigations are handled, but there are multiple missing (plural)", async () => {
+    overrideOnce("get", "/api/elections/1", 200, {
+      ...getElectionMockData({}, { number: 2 }, [
+        { polling_station_id: 1, reason: "Test reason 1", findings: "Test findings 1", corrected_results: false },
+        { polling_station_id: 2, reason: "Test reason 2", findings: "Test findings 2", corrected_results: false },
+        { polling_station_id: 3, reason: "Test reason 3", findings: "Test findings 3", corrected_results: false },
+      ] satisfies PollingStationInvestigation[]),
+      polling_stations: [
+        ...pollingStationMockData.slice(0, 3),
+        {
+          ...pollingStationMockData[4]!,
+          id_prev_session: undefined,
+        },
+        {
+          ...pollingStationMockData[5]!,
+          id_prev_session: undefined,
+        },
+      ] satisfies PollingStation[],
+    });
+
+    await renderPage("coordinator");
+
+    const alert = await screen.findByRole("alert");
+    expect(within(alert).getByRole("strong")).toHaveTextContent("Invoerfase kan niet worden afgerond");
+    expect(within(alert).getByRole("paragraph")).toHaveTextContent(
+      "Sinds de vorige zitting van het GSB zijn nieuwe stembureaus toegevoegd in Abacus. Het gaat om de stembureaus met nummer 37 en 38. Je kan het proces-verbaal van deze zitting pas maken als voor deze stembureaus de aanleiding en bevindingen van het onderzoek zijn ingevoerd.",
+    );
+
+    expect(within(alert).getByRole("link", { name: "Onderzoek toevoegen" })).toBeVisible();
+    expect(within(alert).getByRole("link", { name: "verwijder de toegevoegde stembureaus" })).toBeVisible();
   });
 
   test("Shows finish data entry message when all investigations are handled and session status != finished", async () => {

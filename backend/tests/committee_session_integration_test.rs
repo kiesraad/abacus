@@ -17,16 +17,16 @@ use crate::{
 pub mod shared;
 pub mod utils;
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
+#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_5_with_results", "users"))))]
 async fn test_committee_session_create_works(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let cookie = shared::coordinator_login(&addr).await;
-    let election_id = 2;
+    let election_id = 5;
 
     shared::change_status_committee_session(
         &addr,
         &cookie,
-        2,
+        6,
         CommitteeSessionStatus::DataEntryFinished,
     )
     .await;
@@ -53,13 +53,13 @@ async fn test_committee_session_create_works(pool: SqlitePool) {
         "Unexpected response status"
     );
     let body: CommitteeSession = response.json().await.unwrap();
-    assert_eq!(body.id, 3);
-    assert_eq!(body.number, 2);
+    assert_eq!(body.id, 7);
+    assert_eq!(body.number, 3);
     assert_eq!(body.election_id, election_id);
     assert_eq!(body.status, CommitteeSessionStatus::Created);
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
+#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_5_with_results", "users"))))]
 async fn test_committee_session_create_current_committee_session_not_finalised(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 
@@ -68,7 +68,7 @@ async fn test_committee_session_create_current_committee_session_not_finalised(p
     let response = reqwest::Client::new()
         .post(&url)
         .header("cookie", coordinator_cookie)
-        .json(&NewCommitteeSessionRequest { election_id: 2 })
+        .json(&NewCommitteeSessionRequest { election_id: 5 })
         .send()
         .await
         .unwrap();
@@ -405,11 +405,11 @@ async fn test_committee_session_update_not_found(pool: SqlitePool) {
     assert_eq!(response.status(), StatusCode::NOT_FOUND);
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
+#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_5_with_results", "users"))))]
 async fn test_committee_session_status_change_works(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 
-    let url = format!("http://{addr}/api/committee_sessions/2/status");
+    let url = format!("http://{addr}/api/committee_sessions/6/status");
     let coordinator_cookie = shared::coordinator_login(&addr).await;
     let response = reqwest::Client::new()
         .put(&url)

@@ -52,6 +52,7 @@ pub enum ErrorReference {
     OwnAccountCannotBeDeleted,
     PasswordRejection,
     PdfGenerationError,
+    PollingStationCannotBeDeleted,
     PollingStationRepeated,
     PollingStationValidationErrors,
     RequestPayloadTooLarge,

@@ -28,7 +28,7 @@ export class CountingDifferencesPollingStationPage extends DataEntryBasePage {
 
     this.differenceBallotsPerList = this.fieldset.getByRole("group").filter({
       hasText:
-        "Was er in de telresultaten van het stembureau een onverklaard verschil tussen het totaal aantal getelde stembiljetten het aantal toegelaten kiezers?",
+        "Was er in de telresultaten van het stembureau een onverklaard verschil tussen het totaal aantal getelde stembiljetten en het aantal toegelaten kiezers?",
     });
     this.differenceBallotsPerListYes = this.differenceBallotsPerList.getByLabel("Ja");
     this.differenceBallotsPerListNo = this.differenceBallotsPerList.getByLabel("Nee");

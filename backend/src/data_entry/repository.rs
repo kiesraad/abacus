@@ -285,9 +285,11 @@ async fn fetch_results_for_committee_session(
     committee_session_id: u32,
     polling_station_id: Option<u32>,
 ) -> Result<Vec<(PollingStation, String)>, Error> {
+    let mut tx = conn.begin().await?;
+
     // Get and index polling stations by id for performance
     let polling_stations: HashMap<u32, _> =
-        crate::polling_station::repository::list(conn, committee_session_id)
+        crate::polling_station::repository::list(&mut tx, committee_session_id)
             .await?
             .into_iter()
             .filter(|ps| polling_station_id.is_none_or(|id| ps.id == id))
@@ -344,8 +346,9 @@ async fn fetch_results_for_committee_session(
             .ok_or(Error::RowNotFound)?;
         Ok((polling_station, row.data))
     })
-    .fetch_all(conn)
+    .fetch_all(&mut *tx)
     .await?;
+    tx.commit().await?;
 
     if results.len() != polling_stations.len() {
         Err(Error::RowNotFound)

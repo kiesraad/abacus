@@ -18,6 +18,7 @@ use crate::{
     data_entry::PollingStationResults,
     election::ElectionWithPoliticalGroups,
     eml::{EML510, EMLDocument, EmlHash},
+    error::ErrorReference,
     files::{
         File,
         repository::{create_file, get_file},
@@ -256,10 +257,18 @@ async fn generate_and_save_files(
     pool: &SqlitePool,
     audit_service: AuditService,
     committee_session_id: u32,
-) -> Result<(File, File, Option<File>), APIError> {
+) -> Result<(Option<File>, Option<File>, Option<File>), APIError> {
     let mut conn = pool.acquire().await?;
     let committee_session =
         crate::committee_session::repository::get(&mut conn, committee_session_id).await?;
+    let investigations = crate::investigation::list_investigations_for_committee_session(
+        &mut conn,
+        committee_session.id,
+    )
+    .await?;
+    let corrections = investigations
+        .iter()
+        .any(|inv| matches!(inv.corrected_results, Some(true)));
 
     // Only generate files if the committee session is finished and has all the data needed
     if committee_session.status != CommitteeSessionStatus::DataEntryFinished
@@ -290,30 +299,72 @@ async fn generate_and_save_files(
     }
     drop(conn);
 
+    // Determine if we need to generate any of the files
+    let generate_files = if committee_session.is_next_session() {
+        if corrections {
+            eml_file.is_some() || pdf_file.is_some() || overview_pdf_file.is_some()
+        } else {
+            overview_pdf_file.is_some()
+        }
+    } else {
+        eml_file.is_some() || pdf_file.is_some()
+    };
+
     // If one of the files doesn't exist, generate all and save them to the database
-    if eml_file.is_none()
-        || pdf_file.is_none()
-        || (committee_session.is_next_session() && overview_pdf_file.is_none())
-    {
+    if generate_files {
         let mut tx = pool.begin_immediate().await?;
 
         let input = ResultsInput::new(&mut tx, committee_session.id).await?;
         let xml = input.as_xml();
         let xml_string = xml.to_xml_string()?;
-        let eml = create_file(
-            &mut tx,
-            input.xml_filename(),
-            xml_string.as_bytes(),
-            EML_MIME_TYPE.to_string(),
-        )
-        .await?;
-
-        audit_service
-            .log(&mut tx, &AuditEvent::FileCreated(eml.clone().into()), None)
-            .await?;
 
         let xml_hash = EmlHash::from(xml_string.as_bytes());
+        let xml_filename = input.xml_filename();
         let pdf_files = input.into_pdf_file_models(xml_hash);
+
+        // For the first session, or if there are corrections, we also store the EML and count PDF
+        // For next sessions without corrections, we don't store these
+        if !committee_session.is_next_session() || corrections {
+            let eml = create_file(
+                &mut tx,
+                xml_filename,
+                xml_string.as_bytes(),
+                EML_MIME_TYPE.to_string(),
+            )
+            .await?;
+
+            audit_service
+                .log(&mut tx, &AuditEvent::FileCreated(eml.clone().into()), None)
+                .await?;
+
+            let pdf = create_file(
+                &mut tx,
+                pdf_files.results.file_name.clone(),
+                &generate_pdf(pdf_files.results).await?.buffer,
+                PDF_MIME_TYPE.to_string(),
+            )
+            .await?;
+
+            audit_service
+                .log(&mut tx, &AuditEvent::FileCreated(pdf.clone().into()), None)
+                .await?;
+
+            change_files(
+                &mut tx,
+                committee_session.id,
+                CommitteeSessionFilesUpdateRequest {
+                    results_eml: Some(eml.id),
+                    results_pdf: Some(pdf.id),
+                    overview_pdf: overview_pdf_file.as_ref().map(|overview| overview.id),
+                },
+            )
+            .await?;
+
+            eml_file = Some(eml);
+            pdf_file = Some(pdf);
+        }
+
+        // Store the overview PDF for next sessions
         if let Some(overview_pdf) = pdf_files.overview {
             let overview_pdf = create_file(
                 &mut tx,
@@ -332,40 +383,10 @@ async fn generate_and_save_files(
             overview_pdf_file = Some(overview_pdf);
         }
 
-        let pdf = create_file(
-            &mut tx,
-            pdf_files.results.file_name.clone(),
-            &generate_pdf(pdf_files.results).await?.buffer,
-            PDF_MIME_TYPE.to_string(),
-        )
-        .await?;
-
-        audit_service
-            .log(&mut tx, &AuditEvent::FileCreated(pdf.clone().into()), None)
-            .await?;
-
-        change_files(
-            &mut tx,
-            committee_session.id,
-            CommitteeSessionFilesUpdateRequest {
-                results_eml: Some(eml.id),
-                results_pdf: Some(pdf.id),
-                overview_pdf: overview_pdf_file.as_ref().map(|overview| overview.id),
-            },
-        )
-        .await?;
-
         tx.commit().await?;
-
-        eml_file = Some(eml);
-        pdf_file = Some(pdf);
     }
 
-    Ok((
-        eml_file.expect("EML file should have been generated"),
-        pdf_file.expect("PDF file should have been generated"),
-        overview_pdf_file,
-    ))
+    Ok((eml_file, pdf_file, overview_pdf_file))
 }
 
 /// Download a zip containing a PDF for the PV and the EML with election results
@@ -409,8 +430,13 @@ async fn election_download_zip_results(
     let (zip_response, mut zip_writer) = ZipResponse::new(&zip_filename);
 
     tokio::spawn(async move {
-        zip_writer.add_file(&pdf_file.name, &pdf_file.data).await?;
-        zip_writer.add_file(&eml_file.name, &eml_file.data).await?;
+        if let Some(pdf_file) = pdf_file {
+            zip_writer.add_file(&pdf_file.name, &pdf_file.data).await?;
+        }
+
+        if let Some(eml_file) = eml_file {
+            zip_writer.add_file(&eml_file.name, &eml_file.data).await?;
+        }
 
         if let Some(overview_file) = overview_file {
             zip_writer
@@ -459,6 +485,11 @@ async fn election_download_pdf_results(
     let (_, pdf_file, _) =
         generate_and_save_files(&pool, audit_service, committee_session_id).await?;
 
+    let pdf_file = pdf_file.ok_or(APIError::BadRequest(
+        "PDF results is not generated".to_string(),
+        ErrorReference::PdfGenerationError,
+    ))?;
+
     Ok(Attachment::new(pdf_file.data)
         .filename(pdf_file.name)
         .content_type(pdf_file.mime_type))
@@ -481,6 +512,8 @@ mod tests {
             let (eml, pdf, overview) = generate_and_save_files(&pool, audit_service.clone(), 5)
                 .await
                 .expect("should return files");
+            let eml = eml.expect("should have generated eml");
+            let pdf = pdf.expect("should have generated pdf");
 
             assert_eq!(eml.name, "Telling_GR2026_Grote_Stad.eml.xml");
             assert_eq!(eml.id, 1);
@@ -508,6 +541,9 @@ mod tests {
             let (eml, pdf, overview) = generate_and_save_files(&pool, audit_service.clone(), 703)
                 .await
                 .expect("should return files");
+
+            let eml = eml.expect("should have generated eml");
+            let pdf = pdf.expect("should have generated pdf");
 
             let overview = overview.expect("should have generated overview");
 

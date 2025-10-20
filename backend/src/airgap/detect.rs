@@ -37,7 +37,7 @@ const DOMAINS: [&str; 3] = [
     "surfnet.nl",
 ];
 
-pub const AIRGAP_DETECTION_INTERVAL: u64 = 60; // interval in seconds
+pub const AIRGAP_DETECTION_INTERVAL: u64 = 30; // interval in seconds
 
 impl AirgapDetection {
     /// Creates a new AirgapDetection instance that does not perform any detection.

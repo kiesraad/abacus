@@ -12,7 +12,7 @@ interface Element {
   children: AST;
 }
 
-export const DEFAULT_ALLOWED_TAGS = ["ul", "li", "p", "strong", "em", "code", "h2", "h3", "h4", "Link"];
+export const DEFAULT_ALLOWED_TAGS = ["ul", "ol", "li", "p", "strong", "em", "code", "h2", "h3", "h4", "Link"];
 
 const DEFAULT_RENDER_FUNCTIONS: Record<string, RenderFunction> = {
   Link: (element, attributes) => <Link to={attributes?.to || "."}>{element}</Link>,

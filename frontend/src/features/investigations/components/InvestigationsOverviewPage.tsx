@@ -1,5 +1,7 @@
+import { useEffect } from "react";
 import { useNavigate } from "react-router";
 
+import { DEFAULT_CANCEL_REASON } from "@/api/ApiClient";
 import { isSuccess, NotFoundError } from "@/api/ApiResult";
 import { useCrud } from "@/api/useCrud";
 import { IconPlus } from "@/components/generated/icons";
@@ -8,6 +10,7 @@ import { PageTitle } from "@/components/page_title/PageTitle";
 import { Alert } from "@/components/ui/Alert/Alert";
 import { Button } from "@/components/ui/Button/Button";
 import { useElection } from "@/hooks/election/useElection";
+import { useElectionStatus } from "@/hooks/election/useElectionStatus";
 import useInvestigations from "@/hooks/election/useInvestigations";
 import { useUserRole } from "@/hooks/user/useUserRole";
 import { t, tx } from "@/i18n/translate";
@@ -23,6 +26,7 @@ import { InvestigationCard } from "./InvestigationCard";
 export function InvestigationsOverviewPage() {
   const { currentCommitteeSession } = useElection();
   const { investigations, currentInvestigations, handledInvestigations, missingInvestigations } = useInvestigations();
+  const { refetch: refetchStatuses } = useElectionStatus();
   const { isCoordinator } = useUserRole();
   const navigate = useNavigate();
   const updatePath: COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_PATH = `/api/committee_sessions/${currentCommitteeSession.id}/status`;
@@ -42,6 +46,17 @@ export function InvestigationsOverviewPage() {
   if (currentCommitteeSession.number < 2) {
     throw new NotFoundError();
   }
+
+  // re-fetch statuses when component mounts
+  useEffect(() => {
+    const abortController = new AbortController();
+
+    void refetchStatuses(abortController);
+
+    return () => {
+      abortController.abort(DEFAULT_CANCEL_REASON);
+    };
+  }, [refetchStatuses]);
 
   return (
     <>

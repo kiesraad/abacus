@@ -39,6 +39,9 @@ async function renderPage(section: "reason" | "print-corrigendum" | "findings") 
   await router.navigate(`/elections/1/investigations/1/${section}`);
   rtlRender(<Providers router={router} />);
 
+  // Ensure rendering is complete
+  await screen.findByRole("banner");
+
   return router;
 }
 

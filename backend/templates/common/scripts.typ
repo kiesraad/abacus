@@ -51,6 +51,33 @@
   text(font: "Geist Mono", features: ("ss09", ), value)
 }
 
+#let truncate(text, max_width) = context {
+  let ell = "…"
+
+  if measure(text).width <= max_width {
+    return text
+  }
+
+  let codepoints = text.codepoints()
+
+  let lo = 0
+  let hi = codepoints.len()
+
+  while lo < hi {
+    let mid = calc.floor((lo + hi) / 2)
+    let cand = codepoints.slice(0, mid).join("") + ell
+    if measure(cand).width <= max_width {
+      lo = mid + 1
+    } else {
+      hi = mid
+    }
+  }
+
+  let cut = calc.max(0, lo - 1)
+
+  codepoints.slice(0, cut).join("") + ell
+}
+
 /// Display a checkmark for usage in a checkbox
 #let checkmark() = {
   box(width: 8pt, height: 8pt, clip: false, curve(
@@ -287,29 +314,33 @@
 
 // Format the name of a candidate
 #let candidate_name(election_candidate) = {
+  let name = ""
+
   if election_candidate == none {
-    return
+    return name
   }
 
   if "last_name_prefix" in election_candidate {
-    election_candidate.last_name_prefix
-    " "
+    name += election_candidate.last_name_prefix + " "
   }
-  election_candidate.last_name
-  " "
-  election_candidate.initials
-  if "first_name" in election_candidate [
-    (#election_candidate.first_name)
-  ]
+
+  name += election_candidate.last_name + " " + election_candidate.initials + " "
+  
+  if "first_name" in election_candidate {
+    name += election_candidate.first_name + " "
+  }
+
   if "gender" in election_candidate {
-    if election_candidate.gender == "Male" [
-      (m)
-    ] else if election_candidate.gender == "Female" [
-      (v)
-    ] else if election_candidate.gender == "X" [
-      (x)
-    ]
+    if election_candidate.gender == "Male" {
+      name += "(m)"
+    } else if election_candidate.gender == "Female" {
+      name += "(v)"
+    } else if election_candidate.gender == "X" {
+      name += "(x)"
+    }
   }
+
+  name.trim()
 }
 
 // Default table layout
@@ -470,7 +501,7 @@
           column_row += 1
 
           (
-            table.cell(align: horizon, text(top-edge: 5pt, [#c.name])),
+            table.cell(align: horizon, text(top-edge: 5pt, size: 7pt, hyphenate: true, truncate(c.name, 280pt))),
             table.cell(fill: luma(213), align: center + horizon, text(
               number-width: "tabular",
               weight: "bold",

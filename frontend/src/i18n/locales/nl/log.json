@@ -34,14 +34,14 @@
     "PollingStationUpdated": "Stembureau bijgewerkt",
     "ResultDeleted": "Resultaat verwijderd",
     "UnknownEvent": "Onbekende gebeurtenis",
-    "UserAccountUpdated": "Gebruikersaccount bijgewerkt",
-    "UserCreated": "Gebruiker aangemaakt",
-    "UserDeleted": "Gebruiker verwijderd",
+    "UserAccountUpdated": "Eigen account bijgewerkt",
+    "UserCreated": "Gebruikersaccount aangemaakt",
+    "UserDeleted": "Gebruikersaccount verwijderd",
     "UserLoggedIn": "Gebruiker ingelogd",
     "UserLoggedOut": "Gebruiker uitgelogd",
     "UserLoginFailed": "Mislukte inlogpoging",
     "UserSessionExtended": "Gebruikerssessie verlengd",
-    "UserUpdated": "Gebruiker bijgewerkt"
+    "UserUpdated": "Gebruikersaccount bijgewerkt"
   },
   "field": {
     "committee_session_id": "Zitting-ID",

@@ -41,7 +41,7 @@ jobs:
     steps:
       - uses: actions/checkout@v5
       - name: Setup Node
-        uses: actions/setup-node@v5
+        uses: actions/setup-node@v6
         with:
           node-version: 22
       - name: Install dependencies
@@ -84,7 +84,7 @@ jobs:
     steps:
       - uses: actions/checkout@v5
       - name: Setup Node
-        uses: actions/setup-node@v5
+        uses: actions/setup-node@v6
         with:
           node-version: 22
       - name: Install dependencies
@@ -152,7 +152,7 @@ jobs:
       - name: Push git tag
         run: git push origin $TAG
       - name: Release
-        uses: softprops/action-gh-release@6cbd405e2c4e67a21c47fa9e383d020e4e28b836 # v2
+        uses: softprops/action-gh-release@6da8fa9354ddfdc4aeace5fc48d7f679b5214090 # v2
         with:
           body: This is an alpha release of Abacus, commit ${{ github.sha }} on ${{ env.BUILD_DATE }}
           tag_name: ${{ env.TAG }}

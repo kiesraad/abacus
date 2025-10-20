@@ -37,9 +37,7 @@ const renderPage = async (userRole: Role) => {
     </TestUserProvider>,
   );
   expect(await screen.findByRole("heading", { level: 1, name: "Gemeenteraadsverkiezingen 2026" })).toBeVisible();
-  expect(
-    await screen.findByRole("heading", { level: 2, name: "Gemeentelijk stembureau 0035 Heemdamseburg" }),
-  ).toBeVisible();
+  expect(await screen.findByRole("heading", { level: 2, name: "Gemeentelijk stembureau Heemdamseburg" })).toBeVisible();
 };
 
 describe("ElectionHomePage", () => {
@@ -309,7 +307,7 @@ describe("ElectionHomePage", () => {
 
     expect(await screen.findByRole("heading", { level: 1, name: "Gemeenteraadsverkiezingen 2026" })).toBeVisible();
     expect(
-      await screen.findByRole("heading", { level: 2, name: "Gemeentelijk stembureau 0035 Heemdamseburg" }),
+      await screen.findByRole("heading", { level: 2, name: "Gemeentelijk stembureau Heemdamseburg" }),
     ).toBeVisible();
 
     const committee_session_cards = await screen.findByTestId("committee-session-cards");

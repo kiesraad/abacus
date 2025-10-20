@@ -12,8 +12,7 @@ use crate::{
     authentication::Coordinator,
     committee_session::{
         CommitteeSession, CommitteeSessionError, CommitteeSessionFilesUpdateRequest,
-        repository::{all_investigations_finished, change_files},
-        status::CommitteeSessionStatus,
+        repository::change_files, status::CommitteeSessionStatus,
     },
     data_entry::{PollingStationResults, repository::are_results_complete_for_committee_session},
     election::ElectionWithPoliticalGroups,
@@ -264,10 +263,7 @@ async fn generate_and_save_files(
     // Only generate files if the committee session is finished and has all the data needed
     if committee_session.status != CommitteeSessionStatus::DataEntryFinished
         || committee_session.start_date_time.is_none()
-        || !all_investigations_finished(&mut conn, committee_session.id).await?
-        || are_results_complete_for_committee_session(&mut conn, committee_session_id)
-            .await
-            .is_err()
+        || !are_results_complete_for_committee_session(&mut conn, committee_session_id).await?
     {
         return Err(APIError::CommitteeSession(
             CommitteeSessionError::InvalidCommitteeSessionStatus,

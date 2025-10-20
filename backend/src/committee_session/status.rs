@@ -10,7 +10,6 @@ use super::{
 use crate::{
     APIError,
     audit_log::{AuditEvent, AuditService},
-    committee_session::repository::all_investigations_finished,
     data_entry::repository::are_results_complete_for_committee_session,
     investigation::list_investigations_for_committee_session,
 };
@@ -218,14 +217,7 @@ impl CommitteeSessionStatus {
             }
             CommitteeSessionStatus::DataEntryInProgress
             | CommitteeSessionStatus::DataEntryPaused => {
-                // Ensure all polling stations have results
-                if are_results_complete_for_committee_session(conn, committee_session.id)
-                    .await
-                    .is_err()
-                    // In case of a next session, also ensure all investigations are finished
-                    || (committee_session.is_next_session()
-                        && !all_investigations_finished(conn, committee_session.id).await?)
-                {
+                if !are_results_complete_for_committee_session(conn, committee_session.id).await? {
                     return Err(CommitteeSessionError::InvalidStatusTransition);
                 }
                 Ok(CommitteeSessionStatus::DataEntryFinished)

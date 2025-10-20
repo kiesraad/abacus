@@ -44,6 +44,8 @@ pub mod report;
 pub mod summary;
 #[cfg(feature = "dev-database")]
 pub mod test_data_gen;
+#[cfg(feature = "e2e-helpers")]
+pub mod test_eml_gen;
 pub mod zip;
 
 pub use error::{APIError, ErrorResponse};
@@ -93,6 +95,9 @@ pub fn openapi_router() -> OpenApiRouter<AppState> {
 
     #[cfg(feature = "dev-database")]
     let router = router.merge(test_data_gen::router());
+
+    #[cfg(feature = "e2e-helpers")]
+    let router = router.merge(test_eml_gen::router());
 
     router
 }

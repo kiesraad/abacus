@@ -14,6 +14,7 @@ embed-typst = ["dep:typst", "dep:typst-pdf"]
 dev-database = []
 airgap-detection = []
 storybook = ["dep:memory-serve"]
+e2e-helpers = []
 
 [[bin]]
 name = "gen-openapi"
@@ -22,10 +23,6 @@ required-features = ["openapi"]
 [[bin]]
 name = "gen-test-election"
 required-features = ["dev-database"]
-
-[[bin]]
-name = "gen-eml"
-required-features = []
 
 # Note: if you add a dependency here, please update the README.md for the backend as well.
 

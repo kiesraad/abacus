@@ -281,8 +281,8 @@ async fn polling_station_data_entry_claim(
 
     // Transition to the new state
     let new_state = match entry_number {
-        EntryNumber::FirstEntry => state.claim_first_entry(new_data_entry.clone())?,
-        EntryNumber::SecondEntry => state.claim_second_entry(new_data_entry.clone())?,
+        EntryNumber::FirstEntry => state.clone().claim_first_entry(new_data_entry.clone())?,
+        EntryNumber::SecondEntry => state.clone().claim_second_entry(new_data_entry.clone())?,
     };
 
     // Validate the state
@@ -302,13 +302,26 @@ async fn polling_station_data_entry_claim(
 
     let data_entry = get_data_entry(&mut tx, polling_station_id, committee_session.id).await?;
 
-    audit_service
-        .log(
-            &mut tx,
-            &AuditEvent::DataEntryClaimed(data_entry.into()),
-            None,
-        )
-        .await?;
+    match state {
+        DataEntryStatus::FirstEntryNotStarted | DataEntryStatus::SecondEntryNotStarted(_) => {
+            audit_service
+                .log(
+                    &mut tx,
+                    &AuditEvent::DataEntryStarted(data_entry.into()),
+                    None,
+                )
+                .await?;
+        }
+        _ => {
+            audit_service
+                .log(
+                    &mut tx,
+                    &AuditEvent::DataEntryResumed(data_entry.into()),
+                    None,
+                )
+                .await?;
+        }
+    }
 
     let client_state = new_state.get_client_state().map(|v| v.to_owned());
 
@@ -580,7 +593,7 @@ impl ResolveErrorsAction {
                 AuditEvent::DataEntryDiscardedFirst(data_entry.into())
             }
             ResolveErrorsAction::ResumeFirstEntry => {
-                AuditEvent::DataEntryResumedFirst(data_entry.into())
+                AuditEvent::DataEntryReturnedFirst(data_entry.into())
             }
         }
     }

@@ -14,11 +14,11 @@ function returnWebserverCommand(): string {
 
   // LOCAL CI: build frontend, then build and run backend with database reset and seed playwright-specific database
   if (process.env.LOCAL_CI) {
-    return `npm run build && cd ../backend && cargo run --features memory-serve,embed-typst -- --database target/debug/playwright.sqlite --reset-database --port 8081`;
+    return `npm run build && cd ../backend && cargo run --features memory-serve,embed-typst,e2e-helpers -- --database target/debug/playwright.sqlite --reset-database --port 8081`;
   }
 
   // DEV: expects frontend build and playwright-specific database setup/seeding to have been done
-  return `cd ../backend && cargo run --features memory-serve,embed-typst -- --database ../backend/target/debug/playwright.sqlite --port 8081`;
+  return `cd ../backend && cargo run --features memory-serve,embed-typst,e2e-helpers -- --database ../backend/target/debug/playwright.sqlite --port 8081`;
 }
 
 const config: PlaywrightTestConfig = defineConfig({

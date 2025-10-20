@@ -75,3 +75,8 @@ export const eml230b = {
     "7096",
   ],
 };
+
+export const eml230b_too_large = {
+  filename: "eml230b_invalid_file_size.eml.xml",
+  path: "../backend/src/eml/tests/eml230b_invalid_file_size.eml.xml",
+};

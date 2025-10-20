@@ -302,13 +302,19 @@ async fn generate_and_save_files(
     // Determine if we need to generate any of the files
     let generate_files = if committee_session.is_next_session() {
         if corrections {
-            eml_file.is_some() || pdf_file.is_some() || overview_pdf_file.is_some()
+            eml_file.is_none() || pdf_file.is_none() || overview_pdf_file.is_none()
         } else {
-            overview_pdf_file.is_some()
+            overview_pdf_file.is_none()
         }
     } else {
-        eml_file.is_some() || pdf_file.is_some()
+        eml_file.is_none() || pdf_file.is_none()
     };
+
+    println!("Results: {:?}", committee_session);
+
+    println!("Generate: {:?}", generate_files);
+
+    println!("Corrections: {:?}", corrections);
 
     // If one of the files doesn't exist, generate all and save them to the database
     if generate_files {
@@ -349,16 +355,7 @@ async fn generate_and_save_files(
                 .log(&mut tx, &AuditEvent::FileCreated(pdf.clone().into()), None)
                 .await?;
 
-            change_files(
-                &mut tx,
-                committee_session.id,
-                CommitteeSessionFilesUpdateRequest {
-                    results_eml: Some(eml.id),
-                    results_pdf: Some(pdf.id),
-                    overview_pdf: overview_pdf_file.as_ref().map(|overview| overview.id),
-                },
-            )
-            .await?;
+            println!("Created files: {:?} {:?}", eml.id, pdf.id);
 
             eml_file = Some(eml);
             pdf_file = Some(pdf);
@@ -381,7 +378,19 @@ async fn generate_and_save_files(
                 )
                 .await?;
             overview_pdf_file = Some(overview_pdf);
+            println!("Created overview file");
         }
+
+        change_files(
+            &mut tx,
+            committee_session.id,
+            CommitteeSessionFilesUpdateRequest {
+                results_eml: eml_file.as_ref().map(|eml| eml.id),
+                results_pdf: pdf_file.as_ref().map(|pdf| pdf.id),
+                overview_pdf: overview_pdf_file.as_ref().map(|overview| overview.id),
+            },
+        )
+        .await?;
 
         tx.commit().await?;
     }
@@ -544,20 +553,45 @@ mod tests {
 
             let eml = eml.expect("should have generated eml");
             let pdf = pdf.expect("should have generated pdf");
-
             let overview = overview.expect("should have generated overview");
 
             assert_eq!(eml.name, "Telling_GR2026_Grote_Stad.eml.xml");
             assert_eq!(eml.id, 1);
             assert_eq!(pdf.name, "Model_Na14-2_GR2026_Grote_Stad.pdf");
-            assert_eq!(pdf.id, 3);
+            assert_eq!(pdf.id, 2);
             assert_eq!(overview.name, "Model_P2a_GR2026_Grote_Stad.pdf");
-            assert_eq!(overview.id, 2);
+            assert_eq!(overview.id, 3);
 
             assert_eq!(
                 list_event_names(&mut conn).await.unwrap(),
                 ["FileCreated", "FileCreated", "FileCreated"]
             );
+        }
+    }
+
+    #[test(sqlx::test(fixtures(
+        path = "../../fixtures",
+        scripts("election_9_four_sessions_without_corrections.sql")
+    )))]
+    async fn test_generate_and_save_files_next_session_without_corrections(pool: SqlitePool) {
+        let mut conn = pool.acquire().await.unwrap();
+        let audit_service = AuditService::new(None, None);
+
+        // File should be generated exactly once
+        for _ in 1..=2 {
+            let (eml, pdf, overview) = generate_and_save_files(&pool, audit_service.clone(), 703)
+                .await
+                .expect("should return files");
+
+            // No EML and no model PDF should be generated at all
+            assert_eq!(eml, None);
+            assert_eq!(pdf, None);
+            let overview = overview.expect("should have generated overview");
+
+            assert_eq!(overview.name, "Model_P2a_GR2026_Grote_Stad.pdf");
+            assert_eq!(overview.id, 1);
+
+            assert_eq!(list_event_names(&mut conn).await.unwrap(), ["FileCreated"]);
         }
     }
 }

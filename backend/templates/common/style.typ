@@ -17,7 +17,7 @@
 
 
 // Default document styling
-#let conf(doc, header: none, footer: none) = [
+#let conf(doc, header-left: none, header-right: none, footer: none) = [
   #set text(
     lang: "nl",
     region: "nl",
@@ -34,9 +34,10 @@
         columns: (1fr, auto),
         text(size: 8pt, {
           show heading: set text(size: 8pt, weight: "regular")
-          current-chapter()
+          set align(top + left)
+          if header-left != none [ #header-left ] else [ #current-chapter() ]
         }),
-        text(size: 8pt, weight: "semibold", header),
+        text(size: 8pt, weight: "semibold", align(top + right, header-right)),
 
         v(0.66em),
       )
@@ -44,7 +45,7 @@
     footer: context (
       grid(
         columns: (1fr, auto),
-        text(size: 8pt, footer), align(end, counter(page).display(both: true)),
+        text(size: 8pt, footer), align(bottom + end, counter(page).display(both: true)),
       )
     ),
   )

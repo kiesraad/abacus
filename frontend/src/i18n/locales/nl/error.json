@@ -1,6 +1,6 @@
 {
   "airgap_violation": {
-    "content": "<p>Abacus is geblokkeerd omdat de applicatie is verbonden met het internet.</p><ul><li>Wijzigingen zijn niet mogelijk</li><li>Alle werkplekken zijn vergrendeld</li></ul><h3>Wat te doen?</h3><ul><li>Verbreek de internetverbinding</li><li><reload>Herlaad de pagina</reload></li></ul><p>Pas daarna kan Abacus weer gebruikt worden.</p>",
+    "content": "<p>Abacus is geblokkeerd omdat de applicatie is verbonden met het internet.</p><ul><li>Wijzigingen zijn niet mogelijk</li><li>Alle werkplekken zijn vergrendeld</li></ul><h3>Wat te doen?</h3><ol><li>Verbreek de internetverbinding</li><li>Wacht 30 seconden</li><li><reload>Herlaad de pagina</reload></li></ol><p>Pas daarna kan Abacus weer gebruikt worden.</p>",
     "reload": "Probeer opnieuw",
     "title": "Abacus zit op slot"
   },

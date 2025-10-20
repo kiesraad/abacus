@@ -355,7 +355,7 @@ pub struct EventIdentifier {}
 #[serde(rename_all = "PascalCase")]
 pub struct Election {
     election_identifier: ElectionIdentifier,
-    contest: Contest,
+    pub contest: Contest,
     // required in 110a, not in 110b
     #[serde(skip_serializing_if = "Option::is_none", default)]
     number_of_seats: Option<u32>,
@@ -367,7 +367,7 @@ pub struct Election {
         rename(serialize = "kr:RegisteredParties", deserialize = "RegisteredParties"),
         default
     )]
-    registered_parties: Vec<RegisteredParty>,
+    pub registered_parties: Vec<RegisteredParty>,
 }
 
 super::util::gen_wrap_list!(
@@ -387,7 +387,7 @@ pub struct Contest {
     #[serde(skip_serializing_if = "Option::is_none", default)]
     max_votes: Option<String>,
     #[serde(rename = "PollingPlace", default)]
-    polling_places: Vec<PollingPlace>,
+    pub polling_places: Vec<PollingPlace>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -527,7 +527,7 @@ pub struct RegisteredParty {
         serialize = "kr:RegisteredAppellation",
         deserialize = "RegisteredAppellation"
     ))]
-    registered_appellation: String,
+    pub registered_appellation: String,
 }
 
 #[cfg(test)]

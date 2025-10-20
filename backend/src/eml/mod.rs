@@ -1,8 +1,8 @@
 pub use base::*;
 
 mod base;
-mod common;
-mod eml_110;
+pub mod common;
+pub mod eml_110;
 pub mod eml_230;
 mod eml_510;
 mod eml_520;

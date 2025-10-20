@@ -41,7 +41,7 @@
   "user_updated_details": "De wijzigingen in het account van {fullname} zijn opgeslagen",
   "user_updated": "Wijzigingen opgeslagen",
   "username_hint_disabled": "Dit is de naam waarmee de gebruiker kan inloggen. De gebruikersnaam kan niet gewijzigd worden.",
-  "username_hint": "Dit is de naam waarmee de gebruiker kan inloggen. De invoer is niet hoofdlettergevoelig",
+  "username_hint": "Dit is de naam waarmee de gebruiker kan inloggen. De gebruikersnaam is niet hoofdlettergevoelig",
   "username_not_unique_error": "Er bestaat al een gebruiker met gebruikersnaam {username}",
   "username_unique": "De gebruikersnaam moet uniek zijn",
   "username": "Gebruikersnaam",

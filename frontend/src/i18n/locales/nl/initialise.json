@@ -2,11 +2,10 @@
   "account_details": "Details van het account",
   "admin_configured": "Account van beheerder ingesteld",
   "create_admin_account": "Account voor beheerder aanmaken",
-  "fullname_hint": "Bijvoorbeeld Karel van Tellingen. Accounts in Abacus zijn persoonsgebonden.",
+  "fullname_hint": "Bijvoorbeeld Karel van Tellingen. Accounts in Abacus zijn persoonsgebonden. Je kan straks via gebruikersbeheer accounts aanmaken voor andere beheerders.",
   "installation_success": "Installatie gelukt",
   "login_to_admin_account": "Inloggen met account van beheerder",
   "login_to_finish_setup": "<p>Abacus is nog niet klaar voor gebruik. Log in met het account van de beheerder om de configuratie af te ronden. Ben je de inloggegevens kwijt?</p><p><link>Stel het account van de beheerder opnieuw in.</link></p>",
-  "other_accounts": "Je kan straks via gebruikersbeheer accounts aanmaken voor andere beheerders.",
   "password_hint": "Gebruik minimaal 13 karakters. Het wachtwoord is hoofdlettergevoelig.",
   "password_login_hint": "Het wachtwoord dat je zojuist hebt gekozen",
   "password_rules": "Het wachtwoord moet minimaal 13 karakters lang zijn.",
@@ -14,6 +13,8 @@
   "reconfigure_admin_account": "Ben je de inloggegevens kwijt? <link>Stel het account van de beheerder opnieuw in.</link>",
   "setup_instructions": "<p>Abacus is geïnstalleerd en bijna klaar voor gebruik.</p><p>Voordat je verder gaat moet je als beheerder een account aanmaken. Als eerste beheerder kan je vervolgens:</p><ul><li>Andere gebruikers aanmaken en beheren</li><li>De verkiezing voorbereiden</li></ul>",
   "store_in_safe_place": "Bewaar de gegevens van het account van de beheerder op een veilige plek.",
+  "username": "Kies een gebruikersnaam",
+  "username_hint": "Dit is de naam waarmee je kan inloggen. De gebruikersnaam is niet hoofdlettergevoelig.",
   "username_login_hint": "De naam die je zojuist hebt ingesteld",
   "welcome_title": "Welkom bij Abacus"
 }

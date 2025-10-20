@@ -4,6 +4,7 @@ import { useLocation, useNavigate } from "react-router";
 import { DEFAULT_CANCEL_REASON } from "@/api/ApiClient";
 import { CommitteeSessionPausedModal } from "@/components/data_entry/CommitteeSessionPausedModal";
 import { Footer } from "@/components/footer/Footer";
+import { Messages } from "@/components/messages/Messages";
 import { PageTitle } from "@/components/page_title/PageTitle";
 import { Alert } from "@/components/ui/Alert/Alert";
 import { useElection } from "@/hooks/election/useElection";
@@ -16,7 +17,7 @@ import { PollingStationChoiceForm } from "./PollingStationChoiceForm";
 export function DataEntryHomePage() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { currentCommitteeSession, election, pollingStations, refetch: refetchElection } = useElection();
+  const { currentCommitteeSession, election, refetch: refetchElection } = useElection();
   const { statuses, refetch: refetchStatuses } = useElectionStatus();
 
   // re-fetch statuses when component mounts
@@ -39,27 +40,11 @@ export function DataEntryHomePage() {
   const showFirstEntryHasErrorsAlert = location.hash.startsWith("#data-entry-errors") ? location.hash : null;
   const dataEntryNotification = showDifferenceWithFirstEntryAlert || showFirstEntryHasErrorsAlert || undefined;
 
-  const showDataEntryClaimedAlert = location.hash.startsWith("#data-entry-claimed-") ? location.hash : null;
-  const showDataEntryFinalisedAlert = location.hash.startsWith("#data-entry-finalised-") ? location.hash : null;
-  const showInvalidActionAlert = location.hash.startsWith("#invalid-action-") ? location.hash : null;
-  const dataEntryWarning =
-    showDataEntryClaimedAlert || showDataEntryFinalisedAlert || showInvalidActionAlert || undefined;
-
-  let claimedPollingStationNumber = 0;
-  if (dataEntryWarning) {
-    const id = parseInt(dataEntryWarning.substring(dataEntryWarning.lastIndexOf("-") + 1));
-    claimedPollingStationNumber = pollingStations.find((ps) => ps.id === id)?.number ?? 0;
-  }
-
   function closeDataEntrySavedAlert() {
     void navigate(location.pathname);
   }
 
   function closeDataEntryNotifyAlert() {
-    void navigate(location.pathname);
-  }
-
-  function closeDataEntryWarningAlert() {
     void navigate(location.pathname);
   }
 
@@ -101,26 +86,7 @@ export function DataEntryHomePage() {
         </Alert>
       )}
 
-      {dataEntryWarning && claimedPollingStationNumber !== 0 && (
-        <Alert type="warning" onClose={closeDataEntryWarningAlert}>
-          <strong className="heading-md" id="dataEntryWarningAlertTitle">
-            {t("data_entry.data_entry_not_possible", {
-              nr: claimedPollingStationNumber,
-            })}
-          </strong>
-          <p id="dataEntryWarningAlertDescription">
-            {t(
-              `error.api_error.${
-                showDataEntryClaimedAlert
-                  ? "DataEntryAlreadyClaimed"
-                  : showDataEntryFinalisedAlert
-                    ? "DataEntryAlreadyFinalised"
-                    : "InvalidStateTransition"
-              }`,
-            )}
-          </p>
-        </Alert>
-      )}
+      <Messages />
 
       {statuses.length > 0 && statuses.every((s) => s.status === "definitive") && (
         <Alert type="success">

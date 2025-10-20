@@ -83,7 +83,7 @@ De eerste versie van Abacus bevat de functionaliteit voor het GSB bij de Gemeent
   [#1096](https://github.com/kiesraad/abacus/issues/1096)
 - ✅ De coördinator GSB kan invoerders van het GSB beheren.
   [#2180](https://github.com/kiesraad/abacus/pull/2180)
-- ⏳ De coördinator GSB kan de uitslag van een stembureau bekijken en eventueel verwijderen.
+- ⏳ De coördinator GSB kan de uitkomst van een stembureau bekijken en eventueel verwijderen.
   [#1812](https://github.com/kiesraad/abacus/issues/1812)
 
 ## Versie 1.0: gewenst (could have)

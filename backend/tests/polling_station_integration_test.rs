@@ -55,7 +55,7 @@ async fn import_polling_stations(
     addr: &SocketAddr,
     election_id: u32,
     file_name: &str,
-    polling_stations: serde_json::Value,
+    polling_stations: Value,
 ) -> Response {
     let url = format!("http://{addr}/api/elections/{election_id}/polling_stations/import");
     let coordinator_cookie = shared::coordinator_login(addr).await;
@@ -93,7 +93,7 @@ async fn update_polling_station(
     addr: &SocketAddr,
     election_id: u32,
     polling_station_id: u32,
-    body: serde_json::Value,
+    body: Value,
 ) -> Response {
     let url =
         format!("http://{addr}/api/elections/{election_id}/polling_stations/{polling_station_id}");
@@ -189,15 +189,26 @@ async fn test_creation_for_committee_session_with_created_status(pool: SqlitePoo
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_7_four_sessions", "users"))))]
 async fn test_get(pool: SqlitePool) {
     let addr = serve_api(pool).await;
-    let election_id = 7;
-    let committee_session_id = 704;
 
-    let response = get_polling_station(&addr, election_id, 742).await;
+    let response = get_polling_station(&addr, 7, 742).await;
     let body: Value = response.json().await.unwrap();
-    assert_eq!(body["committee_session_id"], committee_session_id);
+    assert_eq!(body["committee_session_id"], 704);
     assert_eq!(body["id_prev_session"], 732);
     assert_eq!(body["name"], "TestB");
     assert_eq!(body["polling_station_type"], "FixedLocation");
+}
+
+#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_5_with_results", "users"))))]
+async fn test_get_from_previous_committee_session_fails(pool: SqlitePool) {
+    let addr = serve_api(pool).await;
+
+    let response = get_polling_station(&addr, 5, 8).await;
+
+    assert_eq!(
+        response.status(),
+        StatusCode::NOT_FOUND,
+        "Unexpected response status"
+    );
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_7_four_sessions", "users"))))]
@@ -267,6 +278,32 @@ async fn test_update_empty_type_ok(pool: SqlitePool) {
     let body: Value = response.json().await.unwrap();
     assert_eq!(body["name"], "Testverandering");
     assert_eq!(body["polling_station_type"], Value::Null);
+}
+
+#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_5_with_results", "users"))))]
+async fn test_update_from_previous_committee_session_fails(pool: SqlitePool) {
+    let addr = serve_api(pool).await;
+
+    let response = update_polling_station(
+        &addr,
+        5,
+        8,
+        json!({
+            "name": "Testverandering",
+            "number": 34,
+            "number_of_voters": 2000,
+            "address": "Teststraat 2a",
+            "postal_code": "1234 QY",
+            "locality": "Testdorp",
+        }),
+    )
+    .await;
+
+    assert_eq!(
+        response.status(),
+        StatusCode::NOT_FOUND,
+        "Unexpected response status"
+    );
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
@@ -362,14 +399,11 @@ async fn test_delete_with_data_entry_fails(pool: SqlitePool) {
 
     assert_eq!(
         response.status(),
-        StatusCode::BAD_REQUEST,
+        StatusCode::UNPROCESSABLE_ENTITY,
         "Unexpected response status"
     );
     let body: ErrorResponse = response.json().await.unwrap();
-    assert_eq!(
-        body.error,
-        "Polling station with a data entry cannot be deleted"
-    );
+    assert_eq!(body.error, "Invalid data");
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
@@ -381,13 +415,23 @@ async fn test_delete_with_results_fails(pool: SqlitePool) {
 
     assert_eq!(
         response.status(),
-        StatusCode::BAD_REQUEST,
+        StatusCode::UNPROCESSABLE_ENTITY,
         "Unexpected response status"
     );
     let body: ErrorResponse = response.json().await.unwrap();
+    assert_eq!(body.error, "Invalid data");
+}
+
+#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_5_with_results", "users"))))]
+async fn test_delete_from_previous_committee_session_fails(pool: SqlitePool) {
+    let addr = serve_api(pool).await;
+
+    let response = delete_polling_station(&addr, 5, 8).await;
+
     assert_eq!(
-        body.error,
-        "Polling station with a data entry cannot be deleted"
+        response.status(),
+        StatusCode::NOT_FOUND,
+        "Unexpected response status"
     );
 }
 

@@ -692,6 +692,14 @@ impl From<PollingStationDataEntry> for DataEntryStatusResponse {
     }
 }
 
+impl From<DataEntryStatus> for DataEntryStatusResponse {
+    fn from(data_entry_status: DataEntryStatus) -> Self {
+        DataEntryStatusResponse {
+            status: data_entry_status.status_name(),
+        }
+    }
+}
+
 #[cfg(test)]
 pub mod tests {
     use super::*;

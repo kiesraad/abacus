@@ -34,7 +34,7 @@ use crate::{
         generate_pdf,
         models::{ModelNa14_2Bijlage1Input, ToPdfFileModel},
     },
-    polling_station::{PollingStation, repository::get},
+    polling_station::PollingStation,
 };
 
 pub fn router() -> OpenApiRouter<AppState> {
@@ -235,11 +235,13 @@ async fn polling_station_investigation_update(
                     || result_exists(&mut tx, polling_station_id).await?)
             {
                 if polling_station_investigation.accept_data_entry_deletion == Some(true) {
-                    let polling_station = get(&mut tx, polling_station_id).await?;
+                    let polling_station =
+                        crate::polling_station::repository::get(&mut tx, polling_station_id)
+                            .await?;
                     delete_data_entry_and_result_for_polling_station(
                         &mut tx,
                         &audit_service,
-                        &polling_station,
+                        polling_station.id,
                     )
                     .await?;
                 } else {
@@ -322,10 +324,10 @@ async fn polling_station_investigation_delete(
             .await?;
 
         // Delete potential data entry and result linked to the polling station
-        crate::data_entry::delete_data_entry_and_result_for_polling_station(
+        delete_data_entry_and_result_for_polling_station(
             &mut tx,
             &audit_service,
-            &polling_station,
+            polling_station.id,
         )
         .await?;
 

@@ -310,12 +310,6 @@ async fn generate_and_save_files(
         eml_file.is_none() || pdf_file.is_none()
     };
 
-    println!("Results: {:?}", committee_session);
-
-    println!("Generate: {:?}", generate_files);
-
-    println!("Corrections: {:?}", corrections);
-
     // If one of the files doesn't exist, generate all and save them to the database
     if generate_files {
         let mut tx = pool.begin_immediate().await?;
@@ -355,8 +349,6 @@ async fn generate_and_save_files(
                 .log(&mut tx, &AuditEvent::FileCreated(pdf.clone().into()), None)
                 .await?;
 
-            println!("Created files: {:?} {:?}", eml.id, pdf.id);
-
             eml_file = Some(eml);
             pdf_file = Some(pdf);
         }
@@ -378,7 +370,6 @@ async fn generate_and_save_files(
                 )
                 .await?;
             overview_pdf_file = Some(overview_pdf);
-            println!("Created overview file");
         }
 
         change_files(

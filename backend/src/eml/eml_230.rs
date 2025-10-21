@@ -237,14 +237,14 @@ impl EML230 {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "PascalCase")]
 pub struct CandidateList {
-    pub election: Election,
+    pub(crate) election: Election,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "PascalCase")]
 pub struct Election {
     election_identifier: ElectionIdentifier,
-    pub contest: Contest,
+    pub(crate) contest: Contest,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -252,7 +252,7 @@ pub struct Election {
 pub struct Contest {
     contest_identifier: ContestIdentifier,
     #[serde(rename = "Affiliation")]
-    pub affiliations: Vec<Affiliation>,
+    pub(crate) affiliations: Vec<Affiliation>,
 }
 
 /// Political group and their candidates
@@ -265,7 +265,7 @@ pub struct Affiliation {
     #[serde(rename(serialize = "kr:ListData", deserialize = "ListData"))]
     list_data: ListData,
     #[serde(rename = "Candidate")]
-    pub candidates: Vec<Candidate>,
+    pub(crate) candidates: Vec<Candidate>,
 }
 
 /// Identifier for the political group

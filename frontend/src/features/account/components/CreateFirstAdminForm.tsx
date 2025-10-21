@@ -97,8 +97,8 @@ export function CreateFirstAdminForm({ next }: CreateFirstAdminFormProps) {
                 />
                 <InputField
                   name="username"
-                  label={t("account.username")}
-                  hint={t("account.choose_username_hint")}
+                  label={t("initialise.username")}
+                  hint={t("initialise.username_hint")}
                   error={validationErrors?.username}
                 />
                 <InputField

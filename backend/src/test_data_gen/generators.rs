@@ -132,7 +132,7 @@ fn generate_election(rng: &mut impl rand::Rng, args: &GenerateElectionArgs) -> N
     let num_political_groups = rng.random_range(args.political_groups.clone());
     info!("Generating {num_political_groups} political groups");
 
-    for i in 1..num_political_groups {
+    for i in 1..=num_political_groups {
         political_groups.push(generate_political_party(rng, i, args));
     }
 

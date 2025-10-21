@@ -5,7 +5,7 @@ import userEvent from "@testing-library/user-event";
 import { describe, expect, test } from "vitest";
 
 import { InitialisedHandler } from "@/testing/api-mocks/RequestHandlers";
-import { overrideOnce, server } from "@/testing/server";
+import { server } from "@/testing/server";
 import { render, screen, setupTestRouter, waitFor } from "@/testing/test-utils";
 import { TestUserProvider } from "@/testing/TestUserProvider";
 
@@ -74,6 +74,8 @@ describe("AuthorizationDialog", () => {
       </TestUserProvider>,
     );
 
+    expect(router.state.location.pathname).toBe("/account/login");
+
     const logoutText = within(await screen.findByRole("alert")).getByRole("strong");
     expect(logoutText).toHaveTextContent("Je bent automatisch uitgelogd");
     expect(logoutText).toBeVisible();
@@ -82,21 +84,16 @@ describe("AuthorizationDialog", () => {
   test("Redirect should happen when not authorized", async () => {
     server.use(InitialisedHandler);
 
-    overrideOnce("get", "/api/log", 200, {
-      events: [],
-      page: 1,
-      pages: 1,
-      per_page: 200,
-    });
-
     const router = setupTestRouter(routes);
-    await router.navigate("/logs");
+    await router.navigate("/");
 
     rtlRender(
       <TestUserProvider userRole={null} overrideExpiration={new Date(Date.now() + 1000 * 60)}>
         <RouterProvider router={router} />
       </TestUserProvider>,
     );
+
+    expect(router.state.location.pathname).toBe("/account/login");
 
     const noAccessText = within(await screen.findByRole("alert")).getByRole("strong");
     expect(noAccessText).toHaveTextContent("Je hebt geen toegang tot deze pagina");

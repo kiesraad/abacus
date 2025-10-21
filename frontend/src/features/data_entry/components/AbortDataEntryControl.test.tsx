@@ -16,10 +16,12 @@ function renderComponent() {
     {
       path: "/",
       element: <AbortDataEntryControl />,
+      handle: { public: true },
     },
     {
       path: "/elections/:election-id/data-entry",
       element: <div>test</div>,
+      handle: { public: true },
     },
   ]);
 

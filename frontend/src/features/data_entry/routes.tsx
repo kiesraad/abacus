@@ -6,5 +6,6 @@ export const dataEntryRoutes: RouteObject[] = [
   {
     path: ":sectionId?",
     Component: DataEntryPage,
+    handle: { roles: ["typist"] },
   },
 ];

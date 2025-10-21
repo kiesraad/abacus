@@ -1,4 +1,4 @@
-#import "common/style.typ": conf, document_numbering
+#import "common/style.typ": conf, document_numbering, default_header
 #import "common/scripts.typ": *
 #let input = json("inputs/model-na-31-2.json")
 
@@ -148,8 +148,6 @@ Bijvoorbeeld een schorsing of als er meerdere verkiezingen tegelijk werden georg
 
 #pagebreak(weak: true)
 
-#show: doc => conf(doc, header-left: [Deel 2 - Telresultaten])
-
 = Telresultaten van #is_municipality[de gemeente][het openbaar lichaam]
 
 == Aantal kiesgerechtigden
@@ -289,13 +287,15 @@ Voer de controle uit volgens de stappen in het controleprotocol.
 
 #pagebreak(weak: true)
 
-#show: doc => conf(doc, header-left: [Deel 3 - Ondertekening])
+#set page(header: "")
 
 #emph_block[Deze pagina is expres leeg]
 
 Zo komt het handtekeningen-blad altijd op een losse pagina, ook als het verslag dubbelzijdig is geprint.
 
 #pagebreak(weak: true)
+
+#set page(header: default_header(none, location_name))
 
 = Ondertekening
 

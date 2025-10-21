@@ -1,5 +1,5 @@
 // Get the chapter defined in the current page or the last defined chapter
-#let current-chapter() = context {
+#let current_chapter() = {
   let chapters = query(heading.where(level: 1))
 
   for chapter in chapters {
@@ -15,6 +15,59 @@
   }
 }
 
+// convert any typst value to a string
+#let to-string(it) = {
+  if type(it) == str {
+    it
+  } else if type(it) != content {
+    str(it)
+  } else if it.has("text") {
+    it.text
+  } else if it.has("children") {
+    it.children.map(to-string).join()
+  } else if it.has("body") {
+    to-string(it.body)
+  } else if it == [ ] {
+    " "
+  }
+}
+
+// Get the current chapter title, with possible overrides
+#let current_chapter_title() = {
+  if current_chapter() == none {
+    return ""
+  }
+
+  let chapter_string = to-string(current_chapter())
+
+  if chapter_string.starts-with("Gecorrigeerde telresultaten van") {
+    return "Deel 1 - Gecorrigeerde telresultaten"
+  }
+
+  if chapter_string.starts-with("Telresultaten van") {
+    return "Deel 1 - Telresultaten"
+  }
+
+  return current_chapter()
+}
+
+#let default_header(header-left, header-right) = context {
+  grid(
+    columns: (1fr, auto),
+    text(size: 8pt, {
+      show heading: set text(size: 8pt, weight: "regular")
+      set align(top + left)
+
+      if header-left != none {
+        header-left
+      } else {
+        current_chapter_title()
+      }
+    }),
+    text(size: 8pt, weight: "semibold", align(top + right, header-right)),
+    v(0.66em),
+  )
+}
 
 // Default document styling
 #let conf(doc, header-left: none, header-right: none, footer: none) = [
@@ -29,19 +82,7 @@
     paper: "a4",
     margin: (x: 1.5cm, y: 2.0cm),
     numbering: (current, total) => [Pagina #current van #total],
-    header: context (
-      grid(
-        columns: (1fr, auto),
-        text(size: 8pt, {
-          show heading: set text(size: 8pt, weight: "regular")
-          set align(top + left)
-          if header-left != none [ #header-left ] else [ #current-chapter() ]
-        }),
-        text(size: 8pt, weight: "semibold", align(top + right, header-right)),
-
-        v(0.66em),
-      )
-    ),
+    header: default_header(header-left, header-right),
     footer: context (
       grid(
         columns: (1fr, auto),

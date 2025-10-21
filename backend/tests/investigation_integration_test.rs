@@ -12,7 +12,6 @@ use abacus::{
 };
 use axum::http::StatusCode;
 use reqwest::Response;
-use serde_json::{Value, json};
 use sqlx::SqlitePool;
 use test_log::test;
 
@@ -48,7 +47,7 @@ async fn conclude_investigation(
     body: Option<serde_json::Value>,
 ) -> Response {
     let coordinator_cookie = shared::coordinator_login(addr).await;
-    let body = body.unwrap_or(json!({
+    let body = body.unwrap_or(serde_json::json!({
         "findings": "Test findings",
         "corrected_results": false
     }));
@@ -210,7 +209,7 @@ async fn test_deletion_removes_polling_station_from_status(pool: SqlitePool) {
         conclude_investigation(
             &addr,
             polling_station_id,
-            Some(json!({
+            Some(serde_json::json!({
                 "findings": "Test findings",
                 "corrected_results": true
             })),
@@ -328,7 +327,7 @@ async fn test_partials_update(pool: SqlitePool) {
     let updated = shared::update_investigation(
         &addr,
         polling_station_id,
-        Some(json!({
+        Some(serde_json::json!({
             "reason": "Partially updated reason"
         })),
     )
@@ -351,7 +350,7 @@ async fn test_partials_update(pool: SqlitePool) {
     let updated = shared::update_investigation(
         &addr,
         polling_station_id,
-        Some(json!({
+        Some(serde_json::json!({
             "reason": "Partially updated reason",
             "findings": "Partially updated findings"
         })),
@@ -379,7 +378,7 @@ async fn test_partials_update(pool: SqlitePool) {
     let updated = shared::update_investigation(
         &addr,
         polling_station_id,
-        Some(json!({
+        Some(serde_json::json!({
             "reason": "Partially updated reason",
             "corrected_results": true
         })),
@@ -456,7 +455,7 @@ async fn test_update_with_result(pool: SqlitePool) {
     let response = conclude_investigation(
         &addr,
         polling_station_id,
-        Some(json!({"findings": "Test findings", "corrected_results": true})),
+        Some(serde_json::json!({"findings": "Test findings", "corrected_results": true})),
     )
     .await;
     assert_eq!(response.status(), StatusCode::OK);
@@ -477,7 +476,7 @@ async fn test_update_with_result(pool: SqlitePool) {
     );
 
     // Try to update investigation corrected_results to false
-    let mut investigation = json!({
+    let mut investigation = serde_json::json!({
         "reason": "Test reason",
         "findings": "Test findings",
         "corrected_results": false
@@ -485,7 +484,7 @@ async fn test_update_with_result(pool: SqlitePool) {
     let response =
         shared::update_investigation(&addr, polling_station_id, Some(investigation.clone())).await;
     assert_eq!(response.status(), StatusCode::CONFLICT);
-    let body: Value = response.json().await.unwrap();
+    let body: serde_json::Value = response.json().await.unwrap();
     assert_eq!(body["reference"], "InvestigationHasDataEntryOrResult");
 
     // Data entry result is still there
@@ -520,7 +519,7 @@ async fn test_update_with_data_entry(pool: SqlitePool) {
     let response = conclude_investigation(
         &addr,
         polling_station_id,
-        Some(json!({"findings": "Test findings", "corrected_results": true})),
+        Some(serde_json::json!({"findings": "Test findings", "corrected_results": true})),
     )
     .await;
     assert_eq!(response.status(), StatusCode::OK);
@@ -543,7 +542,7 @@ async fn test_update_with_data_entry(pool: SqlitePool) {
     );
 
     // Try to update investigation corrected_results to false
-    let mut investigation = json!({
+    let mut investigation = serde_json::json!({
         "reason": "Test reason",
         "findings": "Test findings",
         "corrected_results": false
@@ -551,7 +550,7 @@ async fn test_update_with_data_entry(pool: SqlitePool) {
     let response =
         shared::update_investigation(&addr, polling_station_id, Some(investigation.clone())).await;
     assert_eq!(response.status(), StatusCode::CONFLICT);
-    let body: Value = response.json().await.unwrap();
+    let body: serde_json::Value = response.json().await.unwrap();
     assert_eq!(body["reference"], "InvestigationHasDataEntryOrResult");
 
     // Data entry is still there
@@ -763,7 +762,7 @@ where
             conclude_investigation(
                 addr,
                 741,
-                Some(json!({"findings": "Test findings", "corrected_results": false})),
+                Some(serde_json::json!({"findings": "Test findings", "corrected_results": false})),
             )
             .await
             .status(),
@@ -779,7 +778,7 @@ where
             conclude_investigation(
                 addr,
                 742,
-                Some(json!({"findings": "Test findings", "corrected_results": false})),
+                Some(serde_json::json!({"findings": "Test findings", "corrected_results": false})),
             )
             .await
             .status(),

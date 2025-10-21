@@ -5,7 +5,6 @@ use std::net::SocketAddr;
 use abacus::{ErrorResponse, committee_session::status::CommitteeSessionStatus};
 use axum::http::StatusCode;
 use reqwest::Response;
-use serde_json::{Value, json};
 use sqlx::SqlitePool;
 use test_log::test;
 
@@ -37,7 +36,7 @@ async fn create_polling_station(addr: &SocketAddr, election_id: u32, number: u32
         .post(&url)
         .header("cookie", coordinator_cookie)
         .header("Content-Type", "application/json")
-        .json(&json!({
+        .json(&serde_json::json!({
             "name": "Test polling station",
             "number": number,
             "number_of_voters": 123,
@@ -55,13 +54,13 @@ async fn import_polling_stations(
     addr: &SocketAddr,
     election_id: u32,
     file_name: &str,
-    polling_stations: Value,
+    polling_stations: serde_json::Value,
 ) -> Response {
     let url = format!("http://{addr}/api/elections/{election_id}/polling_stations/import");
     let coordinator_cookie = shared::coordinator_login(addr).await;
     reqwest::Client::new()
         .post(&url)
-        .json(&json!({
+        .json(&serde_json::json!({
             "file_name": file_name,
             "polling_stations": polling_stations,
         }))
@@ -80,7 +79,7 @@ async fn import_validate_polling_stations(
     let coordinator_cookie = shared::coordinator_login(addr).await;
     reqwest::Client::new()
         .post(&url)
-        .json(&json!({
+        .json(&serde_json::json!({
             "data": data,
         }))
         .header("cookie", coordinator_cookie)
@@ -93,7 +92,7 @@ async fn update_polling_station(
     addr: &SocketAddr,
     election_id: u32,
     polling_station_id: u32,
-    body: Value,
+    body: serde_json::Value,
 ) -> Response {
     let url =
         format!("http://{addr}/api/elections/{election_id}/polling_stations/{polling_station_id}");
@@ -143,7 +142,7 @@ async fn test_listing(pool: SqlitePool) {
     );
 
     // Validate response and make sure they are from the last committee session
-    let body: Value = response.json().await.unwrap();
+    let body: serde_json::Value = response.json().await.unwrap();
     let polling_stations = body["polling_stations"].as_array().unwrap();
     assert_eq!(polling_stations.len(), 2);
     let map = polling_stations
@@ -173,7 +172,7 @@ async fn test_creation_for_committee_session_with_created_status(pool: SqlitePoo
         StatusCode::CREATED,
         "Unexpected response status"
     );
-    let body: Value = response.json().await.unwrap();
+    let body: serde_json::Value = response.json().await.unwrap();
     assert_eq!(body["committee_session_id"], committee_session.id);
     assert_eq!(body["name"], "Test polling station");
     assert_eq!(body["polling_station_type"], "FixedLocation");
@@ -191,7 +190,7 @@ async fn test_get(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 
     let response = get_polling_station(&addr, 7, 742).await;
-    let body: Value = response.json().await.unwrap();
+    let body: serde_json::Value = response.json().await.unwrap();
     assert_eq!(body["committee_session_id"], 704);
     assert_eq!(body["id_prev_session"], 732);
     assert_eq!(body["name"], "TestB");
@@ -221,7 +220,7 @@ async fn test_update_ok(pool: SqlitePool) {
         &addr,
         election_id,
         polling_station_id,
-        json!({
+        serde_json::json!({
             "name": "Testverandering",
             "number_of_voters": 2000,
             "polling_station_type": "Special",
@@ -239,13 +238,13 @@ async fn test_update_ok(pool: SqlitePool) {
     );
 
     // Validate response
-    let body: Value = response.json().await.unwrap();
+    let body: serde_json::Value = response.json().await.unwrap();
     assert_eq!(body["name"], "Testverandering");
     assert_eq!(body["address"], "Teststraat 2a");
 
     // Validate that the changes are persisted
     let response = get_polling_station(&addr, election_id, polling_station_id).await;
-    let body: Value = response.json().await.unwrap();
+    let body: serde_json::Value = response.json().await.unwrap();
     assert_eq!(body["name"], "Testverandering");
     assert_eq!(body["address"], "Teststraat 2a");
 }
@@ -258,7 +257,7 @@ async fn test_update_empty_type_ok(pool: SqlitePool) {
         &addr,
         2,
         2,
-        json!({
+        serde_json::json!({
             "name": "Testverandering",
             "number": 34,
             "number_of_voters": 2000,
@@ -275,9 +274,9 @@ async fn test_update_empty_type_ok(pool: SqlitePool) {
         "Unexpected response status"
     );
 
-    let body: Value = response.json().await.unwrap();
+    let body: serde_json::Value = response.json().await.unwrap();
     assert_eq!(body["name"], "Testverandering");
-    assert_eq!(body["polling_station_type"], Value::Null);
+    assert_eq!(body["polling_station_type"], serde_json::Value::Null);
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_5_with_results", "users"))))]
@@ -288,7 +287,7 @@ async fn test_update_from_previous_committee_session_fails(pool: SqlitePool) {
         &addr,
         5,
         8,
-        json!({
+        serde_json::json!({
             "name": "Testverandering",
             "number": 34,
             "number_of_voters": 2000,
@@ -314,7 +313,7 @@ async fn test_update_not_found(pool: SqlitePool) {
         &addr,
         2,
         40404,
-        json!({
+        serde_json::json!({
             "name": "Testverandering",
             "number": 34,
             "number_of_voters": 2000,
@@ -488,7 +487,7 @@ async fn test_import_validate_correct_file(pool: SqlitePool) {
     .await;
 
     assert_eq!(response.status(), StatusCode::OK);
-    let body: Value = response.json().await.unwrap();
+    let body: serde_json::Value = response.json().await.unwrap();
     assert_eq!(body["polling_stations"].as_array().unwrap().len(), 420);
 }
 
@@ -511,7 +510,8 @@ async fn test_import_validate_wrong_file(pool: SqlitePool) {
 )))]
 async fn test_import_missing_data(pool: SqlitePool) {
     let addr = serve_api(pool).await;
-    let response = import_polling_stations(&addr, 6, "eml110b_test.eml.xml", Value::Null).await;
+    let response =
+        import_polling_stations(&addr, 6, "eml110b_test.eml.xml", serde_json::Value::Null).await;
 
     assert_eq!(response.status(), StatusCode::UNPROCESSABLE_ENTITY);
 }
@@ -536,7 +536,7 @@ async fn test_import_correct_file(pool: SqlitePool) {
     )
     .await;
     assert_eq!(validate_response.status(), StatusCode::OK);
-    let body: Value = validate_response.json().await.unwrap();
+    let body: serde_json::Value = validate_response.json().await.unwrap();
 
     let import_response = import_polling_stations(
         &addr,
@@ -605,7 +605,7 @@ async fn test_finished_to_in_progress_on_import(pool: SqlitePool) {
             include_str!("../src/eml/tests/eml110b_1_station.eml.xml"),
         )
         .await;
-        let body: Value = validate_response.json().await.unwrap();
+        let body: serde_json::Value = validate_response.json().await.unwrap();
 
         import_polling_stations(
             &addr,
@@ -626,7 +626,7 @@ async fn test_finished_to_in_progress_on_update(pool: SqlitePool) {
             &addr,
             2,
             1,
-            json!({
+            serde_json::json!({
                 "name": "Testverandering",
                 "number_of_voters": 2000,
                 "polling_station_type": "Special",

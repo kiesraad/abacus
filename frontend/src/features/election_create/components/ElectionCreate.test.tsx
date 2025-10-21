@@ -688,4 +688,102 @@ describe("Election create pages", () => {
     // Expect to see the next page
     expect(await screen.findByRole("heading", { level: 2, name: "Type stemopneming in Heemdamseburg" })).toBeVisible();
   });
+
+  test("Shows error when election file is too large", async () => {
+    const router = renderWithRouter();
+    await router.navigate("/elections/create");
+
+    const user = userEvent.setup();
+    const filename = "foo.txt";
+    const file = new File(["foo"], filename, { type: "text/plain" });
+
+    overrideOnce("post", "/api/elections/import/validate", 413, {
+      error: "15",
+      fatal: false,
+      reference: "RequestPayloadTooLarge",
+    });
+    // Wait for the page to be loaded
+    expect(await screen.findByRole("heading", { level: 1, name: "Verkiezing toevoegen" })).toBeVisible();
+    expect(await screen.findByRole("heading", { level: 2, name: "Importeer verkiezingsdefinitie" })).toBeVisible();
+    const input = await screen.findByLabelText("Bestand kiezen");
+    expect(input).toBeVisible();
+    expect(await screen.findByLabelText("Geen bestand gekozen")).toBeVisible();
+
+    await user.upload(input, file);
+
+    expect(await screen.findByText("Ongeldige verkiezingsdefinitie")).toBeVisible();
+    expect(
+      await screen.findByText("Het bestand is te groot. Kies een bestand van maximaal 5 Megabyte", { exact: false }),
+    ).toBeVisible();
+  });
+
+  test("Shows error when candidate file is too large", async () => {
+    const router = renderWithRouter();
+    await router.navigate("/elections/create");
+
+    const user = userEvent.setup();
+    const filename = "foo.txt";
+    const file = new File(["foo"], filename, { type: "text/plain" });
+
+    await uploadElectionDefinition(router, file);
+    await inputElectionHash();
+    await setPollingStationRole();
+
+    overrideOnce("post", "/api/elections/import/validate", 413, {
+      error: "15",
+      fatal: false,
+      reference: "RequestPayloadTooLarge",
+    });
+    // Wait for the page to be loaded
+    expect(await screen.findByRole("heading", { level: 2, name: "Importeer kandidatenlijsten" })).toBeVisible();
+    const input = await screen.findByLabelText("Bestand kiezen");
+    expect(input).toBeVisible();
+    expect(await screen.findByLabelText("Geen bestand gekozen")).toBeVisible();
+
+    await user.upload(input, file);
+
+    expect(await screen.findByText("Ongeldige kandidatenlijsten")).toBeVisible();
+    expect(
+      await screen.findByText("Het bestand is te groot. Kies een bestand van maximaal 5 Megabyte", { exact: false }),
+    ).toBeVisible();
+  });
+
+  test("Shows error when polling station file is too large", async () => {
+    const router = renderWithRouter();
+    await router.navigate("/elections/create");
+
+    const user = userEvent.setup();
+    const filename = "foo.txt";
+    const file = new File(["foo"], filename, { type: "text/plain" });
+
+    // upload election and set hash, and continue
+    await uploadElectionDefinition(router, file);
+    await inputElectionHash();
+    await setPollingStationRole();
+
+    // upload candidate file, set hash and continue
+    await uploadCandidateDefinition(file);
+    await inputCandidateHash();
+
+    overrideOnce("post", "/api/elections/import/validate", 413, {
+      error: "15",
+      fatal: false,
+      reference: "RequestPayloadTooLarge",
+    });
+
+    // Wait for the page to be loaded
+    expect(
+      await screen.findByRole("heading", { level: 2, name: "Importeer stembureaus gemeente Heemdamseburg" }),
+    ).toBeVisible();
+    const input = await screen.findByLabelText("Bestand kiezen");
+    expect(input).toBeVisible();
+    expect(await screen.findByLabelText("Geen bestand gekozen")).toBeVisible();
+
+    await user.upload(input, file);
+
+    expect(await screen.findByText("Ongeldig stembureaubestand")).toBeVisible();
+    expect(
+      await screen.findByText("Het bestand is te groot. Kies een bestand van maximaal 5 Megabyte", { exact: false }),
+    ).toBeVisible();
+  });
 });

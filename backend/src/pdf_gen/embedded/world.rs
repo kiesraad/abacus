@@ -200,6 +200,7 @@ fn load_fonts() -> (Vec<Font>, FontBook) {
     include_font!("DM_Sans/DMSans-ExtraBoldItalic.ttf");
     include_font!("DM_Sans/DMSans-Italic.ttf");
     include_font!("DM_Sans/DMSans-Regular.ttf");
+    include_font!("Arial/Arial.ttf");
     include_font!("Geist_Mono/GeistMono-Regular.otf");
 
     (fonts, fontbook)

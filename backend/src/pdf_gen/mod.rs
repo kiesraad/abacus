@@ -22,6 +22,7 @@ pub struct PdfGenResult {
 pub(crate) mod tests {
     use chrono::Utc;
     use models::ModelNa31_2Input;
+    use test_log::test;
 
     use super::*;
     use crate::{
@@ -64,7 +65,7 @@ pub(crate) mod tests {
         polling_stations
     }
 
-    #[tokio::test]
+    #[test(tokio::test)]
     async fn it_generates_a_pdf() {
         let content = generate_pdf(ModelNa31_2Input {
             committee_session: committee_session_fixture(1),
@@ -93,7 +94,36 @@ pub(crate) mod tests {
         assert!(!content.buffer.is_empty());
     }
 
-    #[tokio::test]
+    #[test(tokio::test)]
+    async fn it_generates_a_pdf_with_special_characters() {
+        let content = generate_pdf(ModelNa31_2Input {
+            committee_session: committee_session_fixture(1),
+            election: ElectionWithPoliticalGroups {
+                id: 1,
+                name: "Municipal Election".to_string(),
+                counting_method: VoteCountingMethod::CSO,
+                election_id: "MunicipalElection_2025".to_string(),
+                location: r#"Bioscoop 💩 !"%&'()*+,-./0123456789:;<=> ?@ABCDEFGHIJKLMNOPQRSTUVhi jklmnWXYZ[]_abcdefgopqrstu vwxyz|¡¢£$¥#§¤«°±²³× µ¶ªĦĿŁØŒºÞŦŊ ŉĸæđðħ·÷»¼½¾¿ ΩÆĐıŀłøœßþŧŋ"#.to_string(),
+                domain_id: "0000".to_string(),
+                category: ElectionCategory::Municipal,
+                number_of_seats: 29,
+                election_date: Utc::now().date_naive(),
+                nomination_date: Utc::now().date_naive(),
+                political_groups: vec![],
+            },
+            polling_stations: vec![],
+            summary: ElectionSummary::zero(),
+            hash: "ed36 60eb 017a 0d3a d3ef 72b1 6865 f991 a36a 9f92 72d9 1516 39cd 422b 4756 d161"
+                .to_string(),
+            creation_date_time: "04-12-2024 12:08".to_string(),
+        }.to_pdf_file_model("file.pdf".into()))
+        .await
+        .unwrap();
+
+        assert!(!content.buffer.is_empty());
+    }
+
+    #[test(tokio::test)]
     async fn it_generates_a_pdf_with_polling_stations() {
         let election = election_fixture(&[2, 3]);
         let committee_session = committee_session_fixture(election.id);

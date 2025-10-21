@@ -171,7 +171,7 @@ async fn polling_station_investigation_conclude(
     if polling_station.id_prev_session.is_none() && !polling_station_investigation.corrected_results
     {
         return Err(APIError::Conflict(
-            "Investigation requires corrected results, because it is not part of a previous session".into(),
+            "Investigation requires corrected results, because the polling station is not part of a previous session".into(),
             ErrorReference::InvestigationRequiresCorrectedResults,
         ));
     }

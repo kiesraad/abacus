@@ -78,11 +78,8 @@ describe("useInvestigations", () => {
     await waitFor(() => {
       expect(result.current.investigations).toHaveLength(3);
 
-      expect(result.current.currentInvestigations).toHaveLength(2);
       expect(result.current.currentInvestigations.map((i) => i.polling_station_id)).toEqual([1, 3]);
-
-      expect(result.current.handledInvestigations).toHaveLength(1);
-      expect(result.current.handledInvestigations[0]?.polling_station_id).toBe(2);
+      expect(result.current.handledInvestigations.map((i) => i.polling_station_id)).toEqual([2]);
     });
   });
 

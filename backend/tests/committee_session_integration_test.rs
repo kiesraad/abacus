@@ -383,6 +383,28 @@ async fn test_committee_session_update_bad_request(pool: SqlitePool) {
     assert_eq!(response.status(), StatusCode::BAD_REQUEST);
 }
 
+#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_5_with_results", "users"))))]
+async fn test_committee_session_update_previous_committee_session_fails(pool: SqlitePool) {
+    let addr = serve_api(pool).await;
+
+    let url = format!("http://{addr}/api/committee_sessions/5");
+    let coordinator_cookie = shared::coordinator_login(&addr).await;
+    let response = reqwest::Client::new()
+        .put(&url)
+        .header("cookie", coordinator_cookie)
+        .json(&CommitteeSessionUpdateRequest {
+            location: "Juinen".to_string(),
+            start_date: "2025-10-25".to_string(),
+            start_time: "10:45".to_string(),
+        })
+        .send()
+        .await
+        .unwrap();
+
+    // Ensure the response is what we expect
+    assert_eq!(response.status(), StatusCode::NOT_FOUND);
+}
+
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("users"))))]
 async fn test_committee_session_update_not_found(pool: SqlitePool) {
     let addr = serve_api(pool).await;
@@ -556,6 +578,26 @@ async fn test_committee_session_status_change_not_found(pool: SqlitePool) {
     assert_eq!(response.status(), StatusCode::NOT_FOUND);
 }
 
+#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_5_with_results", "users"))))]
+async fn test_committee_session_status_change_previous_committee_session_fails(pool: SqlitePool) {
+    let addr = serve_api(pool).await;
+
+    let url = format!("http://{addr}/api/committee_sessions/5/status");
+    let coordinator_cookie = shared::coordinator_login(&addr).await;
+    let response = reqwest::Client::new()
+        .put(&url)
+        .header("cookie", coordinator_cookie)
+        .json(&CommitteeSessionStatusChangeRequest {
+            status: CommitteeSessionStatus::DataEntryInProgress,
+        })
+        .send()
+        .await
+        .unwrap();
+
+    // Ensure the response is what we expect
+    assert_eq!(response.status(), StatusCode::NOT_FOUND);
+}
+
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
 async fn test_committee_session_number_of_voters_change_works(pool: SqlitePool) {
     let addr = serve_api(pool).await;
@@ -578,6 +620,25 @@ async fn test_committee_session_number_of_voters_change_works(pool: SqlitePool) 
         StatusCode::OK,
         "Unexpected response status"
     );
+}
+
+#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_5_with_results", "users"))))]
+async fn test_committee_session_number_of_voters_change_previous_session_fails(pool: SqlitePool) {
+    let addr = serve_api(pool).await;
+
+    let url = format!("http://{addr}/api/committee_sessions/5/voters");
+    let coordinator_cookie = shared::coordinator_login(&addr).await;
+    let response = reqwest::Client::new()
+        .put(&url)
+        .header("cookie", coordinator_cookie)
+        .json(&CommitteeSessionNumberOfVotersChangeRequest {
+            number_of_voters: 0,
+        })
+        .send()
+        .await
+        .unwrap();
+    // Ensure the response is what we expect
+    assert_eq!(response.status(), StatusCode::NOT_FOUND);
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("users"))))]

@@ -130,13 +130,13 @@ export const test = base.extend<Fixtures>({
 
     // Set committee session status to DataEntryInProgress
     await loginAs(request, "coordinator1");
-    const statusChangeUrl: COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_PATH = `/api/elections/${emptyElection.id}/committee_sessions/${response.current_committee_session.id}/status`;
+    const statusChangeUrl: COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_PATH = `/api/elections/${response.current_committee_session.election_id}/committee_sessions/${response.current_committee_session.id}/status`;
     const statusChangeData: COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_BODY = { status: "data_entry_in_progress" };
     const statusChangeResponse = await request.put(statusChangeUrl, { data: statusChangeData });
     expect(statusChangeResponse.ok()).toBeTruthy();
 
     // Fill in committee session details
-    const detailsUpdateUrl: COMMITTEE_SESSION_UPDATE_REQUEST_PATH = `/api/elections/${emptyElection.id}/committee_sessions/${response.current_committee_session.id}`;
+    const detailsUpdateUrl: COMMITTEE_SESSION_UPDATE_REQUEST_PATH = `/api/elections/${response.current_committee_session.election_id}/committee_sessions/${response.current_committee_session.id}`;
     const detailsUpdateData: COMMITTEE_SESSION_UPDATE_REQUEST_BODY = {
       location: "Den Haag",
       start_date: "2026-03-18",

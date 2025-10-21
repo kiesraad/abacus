@@ -27,13 +27,13 @@ export function ElectionReportPage() {
   const navigate = useNavigate();
   const committeeSessionId = useNumericParam("committeeSessionId");
   const committeeSession = committeeSessions.find((session) => session.id === committeeSessionId);
-  const updatePath: COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_PATH = `/api/elections/${currentCommitteeSession.election_id}/committee_sessions/${committeeSessionId}/status`;
-  const { update, isLoading } = useCrud({ updatePath, throwAllErrors: true });
 
   if (!committeeSession) {
     throw new NotFoundError("error.not_found");
   }
 
+  const updatePath: COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_PATH = `/api/elections/${committeeSession.election_id}/committee_sessions/${committeeSession.id}/status`;
+  const { update, isLoading } = useCrud({ updatePath, throwAllErrors: true });
   const sessionLabel = committeeSessionLabel(committeeSession.number);
 
   // Redirect to update details page if committee session details have not been filled in

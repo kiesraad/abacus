@@ -45,11 +45,14 @@ export default function useInvestigations(): InvestigationsOverview {
     .filter((inv) => inv !== null) satisfies PollingStationInvestigationWithStatus[];
 
   const currentInvestigations = investigationsWithStatus.filter(
-    (inv) => !inv.findings || (inv.findings && inv.corrected_results && inv.status !== "definitive"),
+    (inv) =>
+      !inv.findings ||
+      inv.corrected_results === undefined ||
+      (inv.findings && inv.corrected_results && inv.status !== "definitive"),
   );
   const handledInvestigations = investigationsWithStatus.filter(
     (inv) =>
-      (inv.findings && !inv.corrected_results) ||
+      (inv.findings && inv.corrected_results === false) ||
       (inv.findings && inv.corrected_results && inv.status === "definitive"),
   );
   const missingInvestigations = pollingStations.filter(

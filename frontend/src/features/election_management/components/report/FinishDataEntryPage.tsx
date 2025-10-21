@@ -19,14 +19,19 @@ import cls from "../ElectionManagement.module.css";
 
 export function FinishDataEntryPage() {
   const { currentCommitteeSession, election, refetch } = useElection();
-  const { missingInvestigations } = useInvestigations();
+  const { investigations, handledInvestigations, missingInvestigations } = useInvestigations();
   const navigate = useNavigate();
   const updatePath: COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_PATH = `/api/committee_sessions/${currentCommitteeSession.id}/status`;
   const { update } = useCrud({ updatePath, throwAllErrors: true });
 
+  // Check if all investigations are handled and none are missing
+  const investigationsComplete =
+    investigations.length > 0 &&
+    investigations.length === handledInvestigations.length &&
+    missingInvestigations.length === 0;
+
   useEffect(() => {
-    // Redirect to investigations overview if there are missing investigations
-    if (missingInvestigations.length > 0) {
+    if (!investigationsComplete) {
       void navigate(`/elections/${election.id}/investigations`);
     }
 
@@ -34,7 +39,7 @@ export function FinishDataEntryPage() {
     if (currentCommitteeSession.status === "data_entry_finished") {
       void navigate(`/elections/${election.id}/report/committee-session/${currentCommitteeSession.id}/download`);
     }
-  }, [currentCommitteeSession, election, missingInvestigations, navigate]);
+  }, [currentCommitteeSession, election, investigationsComplete, navigate]);
 
   function handleFinish() {
     const body: COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_BODY = { status: "data_entry_finished" };

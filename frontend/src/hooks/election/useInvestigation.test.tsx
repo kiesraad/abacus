@@ -69,6 +69,18 @@ describe("useInvestigations", () => {
         polling_station_id: 3,
         reason: "Reason 3",
       },
+      {
+        // Should be current
+        polling_station_id: 4,
+        reason: "Reason 4",
+        findings: "Findings 4",
+      },
+      {
+        // Should be current
+        polling_station_id: 5,
+        reason: "Reason 5",
+        corrected_results: false,
+      },
     ];
 
     overrideOnce("get", "/api/elections/1", 200, getElectionMockData({}, { number: 2 }, investigations));
@@ -76,9 +88,9 @@ describe("useInvestigations", () => {
 
     const result = renderUseInvestigations();
     await waitFor(() => {
-      expect(result.current.investigations).toHaveLength(3);
+      expect(result.current.investigations).toHaveLength(5);
 
-      expect(result.current.currentInvestigations.map((i) => i.polling_station_id)).toEqual([1, 3]);
+      expect(result.current.currentInvestigations.map((i) => i.polling_station_id)).toEqual([1, 3, 4, 5]);
       expect(result.current.handledInvestigations.map((i) => i.polling_station_id)).toEqual([2]);
     });
   });

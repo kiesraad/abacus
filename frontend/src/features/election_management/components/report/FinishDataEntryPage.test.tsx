@@ -168,6 +168,36 @@ describe("FinishDataEntryPage", () => {
     expect(router.state.location.pathname).toEqual("/status");
   });
 
+  test("Redirect to investigations overview if investigations are unhandled", async () => {
+    overrideOnce("get", "/api/elections/1", 200, {
+      ...getElectionMockData({}, { number: 2 }, [
+        {
+          polling_station_id: 1,
+          reason: "Test reason 1",
+        },
+        {
+          polling_station_id: 2,
+          reason: "Test reason 2",
+          findings: "Test findings 2",
+          corrected_results: false,
+        },
+        {
+          polling_station_id: 3,
+          reason: "Test reason 3",
+          findings: "Test findings 3",
+          corrected_results: false,
+        },
+      ]),
+      polling_stations: pollingStationMockData.slice(0, 3),
+    });
+
+    await renderPage(2);
+
+    await waitFor(() => {
+      expect(navigate).toHaveBeenCalledWith("/elections/1/investigations");
+    });
+  });
+
   test("Redirect to investigations overview if investigations are missing", async () => {
     overrideOnce("get", "/api/elections/1", 200, {
       ...getElectionMockData({}, { number: 2 }),

@@ -18,7 +18,7 @@ describe("CreateFirstAdminForm", () => {
 
     const user = userEvent.setup();
     await user.type(screen.getByLabelText("Jouw naam (roepnaam + achternaam)"), "First Last");
-    await user.type(screen.getByLabelText("Gebruikersnaam"), "firstlast");
+    await user.type(screen.getByLabelText("Kies een gebruikersnaam"), "firstlast");
     await user.type(screen.getByLabelText("Kies een wachtwoord"), "password*password");
     await user.type(screen.getByLabelText("Herhaal wachtwoord"), "password*password");
 
@@ -46,7 +46,7 @@ describe("CreateFirstAdminForm", () => {
     expect(fullnameInput).toBeInvalid();
     expect(fullnameInput).toHaveAccessibleErrorMessage("Dit veld mag niet leeg zijn");
 
-    const usernameInput = screen.getByLabelText("Gebruikersnaam");
+    const usernameInput = screen.getByLabelText("Kies een gebruikersnaam");
     expect(usernameInput).toBeInvalid();
     expect(usernameInput).toHaveAccessibleErrorMessage("Dit veld mag niet leeg zijn");
 
@@ -70,7 +70,7 @@ describe("CreateFirstAdminForm", () => {
 
     const user = userEvent.setup();
     await user.type(screen.getByLabelText("Jouw naam (roepnaam + achternaam)"), "First Last");
-    await user.type(screen.getByLabelText("Gebruikersnaam"), "firstlast");
+    await user.type(screen.getByLabelText("Kies een gebruikersnaam"), "firstlast");
     await user.type(passwordInput, "password");
     await user.type(passwordRepeatInput, "password");
     const submitButton = screen.getByRole("button", { name: "Opslaan" });
@@ -101,7 +101,7 @@ describe("CreateFirstAdminForm", () => {
 
     const user = userEvent.setup();
     await user.type(screen.getByLabelText("Jouw naam (roepnaam + achternaam)"), "First Last");
-    await user.type(screen.getByLabelText("Gebruikersnaam"), "firstlast");
+    await user.type(screen.getByLabelText("Kies een gebruikersnaam"), "firstlast");
     await user.type(screen.getByLabelText("Kies een wachtwoord"), "password*password");
     await user.type(screen.getByLabelText("Herhaal wachtwoord"), "password*password");
     const submitButton = screen.getByRole("button", { name: "Opslaan" });

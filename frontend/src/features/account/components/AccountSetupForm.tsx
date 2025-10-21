@@ -93,19 +93,19 @@ export function AccountSetupForm({ user, onSaved }: AccountSetupFormProps) {
         <FormLayout disabled={isLoading}>
           <FormLayout.Section>
             <InputField
-              name="username"
-              label={t("account.username")}
-              hint={t("account.username_hint")}
-              value={user.username}
-              disabled
-            />
-            <InputField
               name="fullname"
               label={t("account.fullname")}
               subtext={t("account.fullname_subtext")}
               hint={t("account.fullname_hint")}
               error={validationErrors?.fullname}
               defaultValue={user.fullname}
+            />
+            <InputField
+              name="username"
+              label={t("account.username")}
+              hint={t("account.username_hint")}
+              value={user.username}
+              disabled
             />
             <InputField
               name="password"

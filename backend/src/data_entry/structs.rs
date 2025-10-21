@@ -32,7 +32,7 @@ impl From<PollingStationDataEntry> for DataEntryDetails {
             polling_station_id: value.polling_station_id,
             committee_session_id: value.committee_session_id,
             data_entry_status: state.status_name().to_string(),
-            data_entry_progress: state.get_progress(),
+            data_entry_progress: format!("{}%", state.get_progress()),
             finished_at: state.finished_at().cloned(),
             first_entry_user_id: state.get_first_entry_user_id(),
             second_entry_user_id: state.get_second_entry_user_id(),

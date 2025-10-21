@@ -217,6 +217,16 @@ describe("FinishDataEntryPage", () => {
     });
   });
 
+  test("Do not redirect to investigations overview in first committee session", async () => {
+    overrideOnce("get", "/api/elections/1", 200, getElectionMockData());
+
+    await renderPage(1);
+
+    await waitFor(() => {
+      expect(navigate).not.toHaveBeenCalledWith("/elections/1/investigations");
+    });
+  });
+
   test("Redirect to report download page when committee session status is already data_entry_finished", async () => {
     overrideOnce("get", "/api/elections/1", 200, getElectionMockData({}, { status: "data_entry_finished" }));
 

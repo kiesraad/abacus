@@ -25,13 +25,12 @@ export function FinishDataEntryPage() {
   const { update } = useCrud({ updatePath, throwAllErrors: true });
 
   // Check if all investigations are handled and none are missing
-  const investigationsComplete =
-    investigations.length > 0 &&
-    investigations.length === handledInvestigations.length &&
-    missingInvestigations.length === 0;
+  // Note: There are no investigations in the first committee session
+  const incompleteInvestigations =
+    investigations.length !== handledInvestigations.length || missingInvestigations.length > 0;
 
   useEffect(() => {
-    if (!investigationsComplete) {
+    if (incompleteInvestigations) {
       void navigate(`/elections/${election.id}/investigations`);
     }
 
@@ -39,7 +38,7 @@ export function FinishDataEntryPage() {
     if (currentCommitteeSession.status === "data_entry_finished") {
       void navigate(`/elections/${election.id}/report/committee-session/${currentCommitteeSession.id}/download`);
     }
-  }, [currentCommitteeSession, election, investigationsComplete, navigate]);
+  }, [currentCommitteeSession, election, incompleteInvestigations, navigate]);
 
   function handleFinish() {
     const body: COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_BODY = { status: "data_entry_finished" };

@@ -319,13 +319,14 @@ export type AuditEvent =
   | (PollingStationDetails & { event_type: "PollingStationUpdated" })
   | (PollingStationDetails & { event_type: "PollingStationDeleted" })
   | (PollingStationImportDetails & { event_type: "PollingStationsImported" })
-  | (DataEntryDetails & { event_type: "DataEntryClaimed" })
+  | (DataEntryDetails & { event_type: "DataEntryStarted" })
   | (DataEntryDetails & { event_type: "DataEntrySaved" })
+  | (DataEntryDetails & { event_type: "DataEntryResumed" })
   | (DataEntryDetails & { event_type: "DataEntryDeleted" })
   | (DataEntryDetails & { event_type: "DataEntryFinalised" })
   | (ResultDetails & { event_type: "ResultDeleted" })
   | (DataEntryDetails & { event_type: "DataEntryDiscardedFirst" })
-  | (DataEntryDetails & { event_type: "DataEntryResumedFirst" })
+  | (DataEntryDetails & { event_type: "DataEntryReturnedFirst" })
   | (DataEntryDetails & { event_type: "DataEntryKeptFirst" })
   | (DataEntryDetails & { event_type: "DataEntryKeptSecond" })
   | (DataEntryDetails & { event_type: "DataEntryDiscardedBoth" })
@@ -558,7 +559,7 @@ export interface DataEntry {
 
 export interface DataEntryDetails {
   committee_session_id: number;
-  data_entry_progress: number;
+  data_entry_progress: string;
   data_entry_status: string;
   finished_at?: string | null;
   first_entry_user_id?: number | null;

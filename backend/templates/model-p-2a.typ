@@ -143,6 +143,8 @@ Bijvoorbeeld een schorsing of als er meerdere verkiezingen tegelijk werden georg
 
 #pagebreak(weak: true)
 
+#set page(header: "")
+
 #show heading.where(level: 3): it =>[
     #block(it.body)
 ]

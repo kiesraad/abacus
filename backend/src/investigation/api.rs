@@ -26,7 +26,7 @@ use crate::{
     },
     data_entry::{
         PollingStationResults, delete_data_entry_and_result_for_polling_station,
-        repository::{data_entry_exists, most_recent_results_for_polling_station, result_exists},
+        repository::{data_entry_exists, previous_results_for_polling_station, result_exists},
     },
     election::ElectionWithPoliticalGroups,
     error::ErrorReference,
@@ -423,7 +423,7 @@ async fn polling_station_investigation_download_corrigendum_pdf(
 
     let previous_results = match polling_station.id_prev_session {
         Some(_) => {
-            match most_recent_results_for_polling_station(&mut conn, polling_station_id).await {
+            match previous_results_for_polling_station(&mut conn, polling_station_id).await {
                 Ok(results) => results,
                 Err(_) => {
                     return Err(APIError::NotFound(

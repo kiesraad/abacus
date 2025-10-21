@@ -26,7 +26,7 @@ use crate::{
     audit_log::{AuditEvent, AuditService},
     authentication::{Coordinator, Role, Typist, User, error::AuthenticationError},
     committee_session::{CommitteeSession, CommitteeSessionError, status::CommitteeSessionStatus},
-    data_entry::repository::most_recent_results_for_polling_station,
+    data_entry::repository::previous_results_for_polling_station,
     election::{ElectionWithPoliticalGroups, PoliticalGroup},
     error::{ErrorReference, ErrorResponse},
     investigation::get_polling_station_investigation,
@@ -268,7 +268,7 @@ async fn polling_station_data_entry_claim(
         validate_and_get_data(&mut tx, polling_station_id, &user.0).await?;
 
     let previous_results = if polling_station.id_prev_session.is_some() {
-        Some(most_recent_results_for_polling_station(&mut tx, polling_station_id).await?)
+        Some(previous_results_for_polling_station(&mut tx, polling_station_id).await?)
     } else {
         None
     };

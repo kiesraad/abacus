@@ -361,9 +361,9 @@ pub async fn list_results_for_committee_session(
     fetch_results_for_committee_session(conn, committee_session_id, None).await
 }
 
-/// Given a polling station id, find the most recent results for that polling station
-/// by looking back through previous committee sessions from that point.
-pub async fn most_recent_results_for_polling_station(
+/// Given a polling station id, find the previous results for that polling station
+/// Uses the CTE in fetch_results_for_committee_session to look back through previous committee sessions.
+pub async fn previous_results_for_polling_station(
     conn: &mut SqliteConnection,
     polling_station_id: u32,
 ) -> Result<PollingStationResults, Error> {
@@ -1029,26 +1029,26 @@ mod tests {
         }
     }
 
-    /// Test most_recent_results_for_polling_station with 4th session, existing polling station
+    /// Test previous_results_for_polling_station with 4th session, existing polling station
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_7_four_sessions"))))]
-    async fn test_most_recent_results_for_polling_station(pool: SqlitePool) {
+    async fn test_previous_results_for_polling_station(pool: SqlitePool) {
         let mut conn = pool.acquire().await.unwrap();
         let polling_station_id = 742;
 
-        let results = most_recent_results_for_polling_station(&mut conn, polling_station_id).await;
+        let results = previous_results_for_polling_station(&mut conn, polling_station_id).await;
         assert!(results.is_ok());
 
         let results = results.unwrap();
         assert_eq!(results.voters_counts().proxy_certificate_count, 4);
     }
 
-    /// Test most_recent_results_for_polling_station with 4th session, non-existing polling station
+    /// Test previous_results_for_polling_station with 4th session, non-existing polling station
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_7_four_sessions"))))]
-    async fn test_most_recent_results_for_polling_station_non_existing(pool: SqlitePool) {
+    async fn test_previous_results_for_polling_station_non_existing(pool: SqlitePool) {
         let mut conn = pool.acquire().await.unwrap();
         let polling_station_id = 743;
 
-        let results = most_recent_results_for_polling_station(&mut conn, polling_station_id).await;
+        let results = previous_results_for_polling_station(&mut conn, polling_station_id).await;
         assert!(results.is_err());
         assert!(matches!(results.unwrap_err(), Error::RowNotFound));
     }

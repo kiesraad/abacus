@@ -460,8 +460,10 @@ async fn polling_station_data_entry_delete(
     let mut data_entry = get_data_entry(&mut tx, polling_station_id, committee_session.id).await?;
 
     if new_state == DataEntryStatus::FirstEntryNotStarted {
+        // The database entry of the data entry is fully deleted when the first entry is deleted
         delete_data_entry(&mut tx, polling_station_id).await?;
     } else {
+        // The status of the data entry is updated when the second entry is deleted
         data_entry = crate::data_entry::repository::upsert(
             &mut tx,
             polling_station_id,
@@ -688,6 +690,7 @@ async fn polling_station_data_entry_resolve_errors(
     };
 
     if new_state == DataEntryStatus::FirstEntryNotStarted {
+        // The database entry of the data entry is fully deleted when the first entry is discarded
         delete_data_entry_and_result_for_polling_station(
             &mut tx,
             &audit_service,
@@ -695,6 +698,7 @@ async fn polling_station_data_entry_resolve_errors(
         )
         .await?;
     } else {
+        // The status of the data entry is updated when the first entry is resumed
         let data_entry = crate::data_entry::repository::upsert(
             &mut tx,
             polling_station_id,
@@ -805,6 +809,7 @@ async fn polling_station_data_entry_resolve_differences(
     };
 
     if new_state == DataEntryStatus::FirstEntryNotStarted {
+        // The database entry of the data entry is fully deleted when the entries are discarded
         delete_data_entry_and_result_for_polling_station(
             &mut tx,
             &audit_service,
@@ -812,6 +817,7 @@ async fn polling_station_data_entry_resolve_differences(
         )
         .await?;
     } else {
+        // The status of the data entry is updated when the first or second entry is kept
         let data_entry = crate::data_entry::repository::upsert(
             &mut tx,
             polling_station_id,
@@ -918,7 +924,7 @@ mod tests {
             DifferenceCountsCompareVotesCastAdmittedVoters, DifferencesCounts, ExtraInvestigation,
             PoliticalGroupCandidateVotes, PoliticalGroupTotalVotes, VotersCounts, VotesCounts,
             YesNo,
-            repository::{data_entry_exists, insert_test_result},
+            repository::{data_entry_exists, insert_test_result, result_exists},
             structs::tests::ValidDefault,
         },
         investigation::insert_test_investigation,
@@ -1318,8 +1324,8 @@ mod tests {
         // Check that the row was not updated
         let mut conn = pool.acquire().await.unwrap();
         let data_entry = get_data_entry(&mut conn, 1, 2).await.unwrap();
-        let data: DataEntryStatus = data_entry.state.0;
-        let DataEntryStatus::FirstEntryInProgress(state) = data else {
+        let status: DataEntryStatus = data_entry.state.0;
+        let DataEntryStatus::FirstEntryInProgress(state) = status else {
             panic!("Expected entry to be in FirstEntryInProgress state");
         };
         assert_ne!(state.first_entry, request_body.data);
@@ -1355,8 +1361,8 @@ mod tests {
         // Check that the row was not updated
         let mut conn = pool.acquire().await.unwrap();
         let data_entry = get_data_entry(&mut conn, 1, 2).await.unwrap();
-        let data: DataEntryStatus = data_entry.state.0;
-        let DataEntryStatus::FirstEntryInProgress(state) = data else {
+        let status: DataEntryStatus = data_entry.state.0;
+        let DataEntryStatus::FirstEntryInProgress(state) = status else {
             panic!("Expected entry to be in FirstEntryInProgress state");
         };
         assert_ne!(state.first_entry, request_body.data);
@@ -1440,14 +1446,9 @@ mod tests {
         assert!(data_entry_exists(&mut conn, 1).await.unwrap());
 
         // Check if the data was updated
-        let row = query!(
-            "SELECT state AS 'state: sqlx::types::Json<DataEntryStatus>' FROM polling_station_data_entries"
-        )
-            .fetch_one(&pool)
-            .await
-            .expect("No data found");
-        let data: DataEntryStatus = row.state.0;
-        let DataEntryStatus::FirstEntryInProgress(state) = data else {
+        let data_entry = get_data_entry(&mut conn, 1, 2).await.unwrap();
+        let status: DataEntryStatus = data_entry.state.0;
+        let DataEntryStatus::FirstEntryInProgress(state) = status else {
             panic!("Expected entry to be in FirstEntryInProgress state");
         };
         assert_eq!(
@@ -1586,19 +1587,13 @@ mod tests {
         assert_eq!(response.status(), StatusCode::OK);
 
         // Check if entry is now in SecondEntryInProgress state
-        let row = query!("SELECT state AS 'state: sqlx::types::Json<DataEntryStatus>' FROM polling_station_data_entries")
-            .fetch_one(&pool)
-            .await
-            .expect("One row should exist");
-        let status: DataEntryStatus = row.state.0;
+        let mut conn = pool.acquire().await.unwrap();
+        let data_entry = get_data_entry(&mut conn, 1, 2).await.unwrap();
+        let status: DataEntryStatus = data_entry.state.0;
         assert!(matches!(status, DataEntryStatus::SecondEntryInProgress(_)));
 
         // Check that nothing is added to polling_station_results yet
-        let row_count = query!("SELECT COUNT(*) AS count FROM polling_station_results")
-            .fetch_one(&pool)
-            .await
-            .unwrap();
-        assert_eq!(row_count.count, 0);
+        assert!(!result_exists(&mut conn, 1).await.unwrap());
     }
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
@@ -1634,11 +1629,8 @@ mod tests {
         assert_eq!(response.status(), StatusCode::OK);
 
         // Check that polling_station_results contains the finalised result and that the data entries are deleted
-        let row_count = query!("SELECT COUNT(*) AS count FROM polling_station_results")
-            .fetch_one(&pool)
-            .await
-            .unwrap();
-        assert_eq!(row_count.count, 1);
+        let mut conn = pool.acquire().await.unwrap();
+        assert!(result_exists(&mut conn, 1).await.unwrap());
 
         // Check that the status is 'Definitive'
         let status = get_data_entry_status(pool.clone(), 1, 2).await;
@@ -1669,19 +1661,13 @@ mod tests {
         finalise_different_entries(pool.clone()).await;
 
         // Check if entry is now in EntriesDifferent state
-        let row = query!("SELECT state AS 'state: sqlx::types::Json<DataEntryStatus>' FROM polling_station_data_entries")
-            .fetch_one(&pool)
-            .await
-            .expect("One row should exist");
-        let status: DataEntryStatus = row.state.0;
+        let mut conn = pool.acquire().await.unwrap();
+        let data_entry = get_data_entry(&mut conn, 1, 2).await.unwrap();
+        let status: DataEntryStatus = data_entry.state.0;
         assert!(matches!(status, DataEntryStatus::EntriesDifferent(_)));
 
         // Check that no result has been created
-        let row_count = query!("SELECT COUNT(*) AS count FROM polling_station_results")
-            .fetch_one(&pool)
-            .await
-            .unwrap();
-        assert_eq!(row_count.count, 0);
+        assert!(!result_exists(&mut conn, 1).await.unwrap());
     }
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
@@ -1699,23 +1685,15 @@ mod tests {
         .await;
         assert_eq!(response.status(), StatusCode::OK);
 
-        // Check that the data entry is created
-        let row_count = query!("SELECT COUNT(*) AS count FROM polling_station_data_entries")
-            .fetch_one(&pool)
-            .await
-            .unwrap();
-        assert_eq!(row_count.count, 1);
+        let mut conn = pool.acquire().await.unwrap();
+        assert!(data_entry_exists(&mut conn, 1).await.unwrap());
 
         // delete data entry
         let response = delete(pool.clone(), 1, EntryNumber::FirstEntry).await;
         assert_eq!(response.status(), StatusCode::NO_CONTENT);
 
         // Check that the data entry is deleted
-        let row_count = query!("SELECT COUNT(*) AS count FROM polling_station_data_entries")
-            .fetch_one(&pool)
-            .await
-            .unwrap();
-        assert_eq!(row_count.count, 0);
+        assert!(!data_entry_exists(&mut conn, 1).await.unwrap());
     }
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
@@ -1736,11 +1714,8 @@ mod tests {
         assert_eq!(response.status(), StatusCode::OK);
 
         // Check that the data entry is created
-        let row_count = query!("SELECT COUNT(*) AS count FROM polling_station_data_entries")
-            .fetch_one(&pool)
-            .await
-            .unwrap();
-        assert_eq!(row_count.count, 1);
+        let mut conn = pool.acquire().await.unwrap();
+        assert!(data_entry_exists(&mut conn, 1).await.unwrap());
 
         let response = claim(pool.clone(), 1, EntryNumber::SecondEntry).await;
         assert_eq!(response.status(), StatusCode::OK);
@@ -1754,11 +1729,8 @@ mod tests {
         assert_eq!(response.status(), StatusCode::OK);
 
         // Check that the data entry is in SecondEntryInProgress state
-        let row = query!("SELECT state AS 'state: sqlx::types::Json<DataEntryStatus>' FROM polling_station_data_entries")
-          .fetch_one(&pool)
-          .await
-          .expect("One row should exist");
-        let status: DataEntryStatus = row.state.0;
+        let data_entry = get_data_entry(&mut conn, 1, 2).await.unwrap();
+        let status: DataEntryStatus = data_entry.state.0;
         assert!(matches!(status, DataEntryStatus::SecondEntryInProgress(_)));
 
         // delete second data entry
@@ -1766,11 +1738,8 @@ mod tests {
         assert_eq!(response.status(), StatusCode::NO_CONTENT);
 
         // Check that the second data entry is deleted
-        let row = query!("SELECT state AS 'state: sqlx::types::Json<DataEntryStatus>' FROM polling_station_data_entries")
-          .fetch_one(&pool)
-          .await
-          .expect("One row should exist");
-        let status: DataEntryStatus = row.state.0;
+        let data_entry = get_data_entry(&mut conn, 1, 2).await.unwrap();
+        let status: DataEntryStatus = data_entry.state.0;
         assert!(matches!(status, DataEntryStatus::SecondEntryNotStarted(_)));
     }
 
@@ -1802,11 +1771,9 @@ mod tests {
         assert_eq!(result.reference, ErrorReference::CommitteeSessionPaused);
 
         // Check if entry is still in FirstEntryInProgress state
-        let row = query!("SELECT state AS 'state: sqlx::types::Json<DataEntryStatus>' FROM polling_station_data_entries")
-            .fetch_one(&pool)
-            .await
-            .expect("One row should exist");
-        let status: DataEntryStatus = row.state.0;
+        let mut conn = pool.acquire().await.unwrap();
+        let data_entry = get_data_entry(&mut conn, 1, 2).await.unwrap();
+        let status: DataEntryStatus = data_entry.state.0;
         assert!(matches!(status, DataEntryStatus::FirstEntryInProgress(_)));
     }
 
@@ -1841,11 +1808,9 @@ mod tests {
         );
 
         // Check if entry is still in FirstEntryInProgress state
-        let row = query!("SELECT state AS 'state: sqlx::types::Json<DataEntryStatus>' FROM polling_station_data_entries")
-            .fetch_one(&pool)
-            .await
-            .expect("One row should exist");
-        let status: DataEntryStatus = row.state.0;
+        let mut conn = pool.acquire().await.unwrap();
+        let data_entry = get_data_entry(&mut conn, 1, 2).await.unwrap();
+        let status: DataEntryStatus = data_entry.state.0;
         assert!(matches!(status, DataEntryStatus::FirstEntryInProgress(_)));
     }
 
@@ -1901,11 +1866,9 @@ mod tests {
             resolve_differences(pool.clone(), 1, ResolveDifferencesAction::KeepFirstEntry).await;
         assert_eq!(response.status(), StatusCode::OK);
 
-        let row = query!("SELECT state AS 'state: sqlx::types::Json<DataEntryStatus>' FROM polling_station_data_entries")
-          .fetch_one(&pool)
-          .await
-          .expect("One row should exist");
-        let status: DataEntryStatus = row.state.0;
+        let mut conn = pool.acquire().await.unwrap();
+        let data_entry = get_data_entry(&mut conn, 1, 2).await.unwrap();
+        let status: DataEntryStatus = data_entry.state.0;
         if let DataEntryStatus::SecondEntryNotStarted(entry) = status {
             assert_eq!(
                 entry
@@ -1932,11 +1895,9 @@ mod tests {
             resolve_differences(pool.clone(), 1, ResolveDifferencesAction::KeepSecondEntry).await;
         assert_eq!(response.status(), StatusCode::OK);
 
-        let row = query!("SELECT state AS 'state: sqlx::types::Json<DataEntryStatus>' FROM polling_station_data_entries")
-          .fetch_one(&pool)
-          .await
-          .expect("One row should exist");
-        let status: DataEntryStatus = row.state.0;
+        let mut conn = pool.acquire().await.unwrap();
+        let data_entry = get_data_entry(&mut conn, 1, 2).await.unwrap();
+        let status: DataEntryStatus = data_entry.state.0;
         if let DataEntryStatus::SecondEntryNotStarted(entry) = status {
             assert_eq!(
                 entry
@@ -1957,11 +1918,8 @@ mod tests {
         finalise_different_entries(pool.clone()).await;
 
         // Check that the data entry is created
-        let row_count = query!("SELECT COUNT(*) AS count FROM polling_station_data_entries")
-            .fetch_one(&pool)
-            .await
-            .unwrap();
-        assert_eq!(row_count.count, 1);
+        let mut conn = pool.acquire().await.unwrap();
+        assert!(data_entry_exists(&mut conn, 1).await.unwrap());
 
         let response = resolve_differences(
             pool.clone(),
@@ -1972,11 +1930,7 @@ mod tests {
         assert_eq!(response.status(), StatusCode::OK);
 
         // Check that the data entry is deleted
-        let row_count = query!("SELECT COUNT(*) AS count FROM polling_station_data_entries")
-            .fetch_one(&pool)
-            .await
-            .unwrap();
-        assert_eq!(row_count.count, 0);
+        assert!(!data_entry_exists(&mut conn, 1).await.unwrap());
     }
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
@@ -2000,11 +1954,9 @@ mod tests {
             ErrorReference::InvalidCommitteeSessionStatus
         );
 
-        let row = query!("SELECT state AS 'state: sqlx::types::Json<DataEntryStatus>' FROM polling_station_data_entries")
-          .fetch_one(&pool)
-          .await
-          .expect("One row should exist");
-        let status: DataEntryStatus = row.state.0;
+        let mut conn = pool.acquire().await.unwrap();
+        let data_entry = get_data_entry(&mut conn, 1, 2).await.unwrap();
+        let status: DataEntryStatus = data_entry.state.0;
         assert!(matches!(status, DataEntryStatus::EntriesDifferent(_)));
     }
 
@@ -2015,11 +1967,9 @@ mod tests {
         let response = resolve_errors(pool.clone(), 1, ResolveErrorsAction::ResumeFirstEntry).await;
         assert_eq!(response.status(), StatusCode::OK);
 
-        let row = query!("SELECT state AS 'state: sqlx::types::Json<DataEntryStatus>' FROM polling_station_data_entries")
-          .fetch_one(&pool)
-          .await
-          .expect("One row should exist");
-        let status: DataEntryStatus = row.state.0;
+        let mut conn = pool.acquire().await.unwrap();
+        let data_entry = get_data_entry(&mut conn, 1, 2).await.unwrap();
+        let status: DataEntryStatus = data_entry.state.0;
         assert!(matches!(status, DataEntryStatus::FirstEntryInProgress(_)));
     }
 
@@ -2028,22 +1978,15 @@ mod tests {
         finalise_with_errors(pool.clone()).await;
 
         // Check that the data entry is created
-        let row_count = query!("SELECT COUNT(*) AS count FROM polling_station_data_entries")
-            .fetch_one(&pool)
-            .await
-            .unwrap();
-        assert_eq!(row_count.count, 1);
+        let mut conn = pool.acquire().await.unwrap();
+        assert!(data_entry_exists(&mut conn, 1).await.unwrap());
 
         let response =
             resolve_errors(pool.clone(), 1, ResolveErrorsAction::DiscardFirstEntry).await;
         assert_eq!(response.status(), StatusCode::OK);
 
         // Check that the data entry is deleted
-        let row_count = query!("SELECT COUNT(*) AS count FROM polling_station_data_entries")
-            .fetch_one(&pool)
-            .await
-            .unwrap();
-        assert_eq!(row_count.count, 0);
+        assert!(!data_entry_exists(&mut conn, 1).await.unwrap());
     }
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
@@ -2063,11 +2006,9 @@ mod tests {
             ErrorReference::InvalidCommitteeSessionStatus
         );
 
-        let row = query!("SELECT state AS 'state: sqlx::types::Json<DataEntryStatus>' FROM polling_station_data_entries")
-          .fetch_one(&pool)
-          .await
-          .expect("One row should exist");
-        let status: DataEntryStatus = row.state.0;
+        let mut conn = pool.acquire().await.unwrap();
+        let data_entry = get_data_entry(&mut conn, 1, 2).await.unwrap();
+        let status: DataEntryStatus = data_entry.state.0;
         assert!(matches!(status, DataEntryStatus::FirstEntryHasErrors(_)));
     }
 

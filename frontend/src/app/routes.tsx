@@ -95,6 +95,8 @@ export const routes: RouteObject[] = [
   },
   {
     path: "*",
-    element: <NotFoundPage message="error.not_found" path={window.location.pathname} />,
+    element: (
+      <NotFoundPage message="error.not_found" path={typeof window !== "undefined" ? window.location.pathname : "/"} />
+    ),
   },
 ];

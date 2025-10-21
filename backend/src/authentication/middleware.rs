@@ -2,7 +2,7 @@ use axum::{
     RequestExt,
     body::Body,
     extract::{Request, State},
-    http::{HeaderValue, header::SET_COOKIE},
+    http::{HeaderMap, HeaderValue, header::SET_COOKIE},
     response::Response,
 };
 use chrono::Utc;
@@ -56,6 +56,7 @@ pub async fn inject_user(
 /// Middleware to extend the session lifetime
 pub async fn extend_session(
     State(pool): State<SqlitePool>,
+    headers: HeaderMap,
     audit_service: AuditService,
     session: Option<Session>,
     user: Option<User>,
@@ -66,11 +67,14 @@ pub async fn extend_session(
         return response;
     };
 
+    // check for the do not extend session header
+    let do_not_extend = headers.get(super::DO_NOT_EXTEND_SESSION_HEADER).is_some();
+
     let mut expires = session.expires_at();
     let now = Utc::now();
 
     // extend lifetime of session and set new cookie if the session is still valid and will soon expire
-    if (expires - now) < SESSION_MIN_LIFE_TIME && expires > now {
+    if (expires - now) < SESSION_MIN_LIFE_TIME && expires > now && !do_not_extend {
         match pool.begin_immediate().await {
             Ok(mut tx) => match super::session::extend_session(&mut tx, &session).await {
                 Ok(session) => {
@@ -121,7 +125,10 @@ mod test {
     use axum::{
         body::Body,
         extract::{Request, State},
-        http::header::{COOKIE, SET_COOKIE, USER_AGENT},
+        http::{
+            HeaderMap, HeaderValue,
+            header::{COOKIE, SET_COOKIE, USER_AGENT},
+        },
         response::Response,
     };
     use chrono::TimeDelta;
@@ -132,7 +139,9 @@ mod test {
     use super::{extend_session, inject_user};
     use crate::{
         audit_log::AuditService,
-        authentication::{Role, SESSION_LIFE_TIME, SESSION_MIN_LIFE_TIME, User},
+        authentication::{
+            DO_NOT_EXTEND_SESSION_HEADER, Role, SESSION_LIFE_TIME, SESSION_MIN_LIFE_TIME, User,
+        },
     };
 
     const TEST_USER_AGENT: &str = "TestAgent/1.0";
@@ -197,6 +206,7 @@ mod test {
 
         let updated_response = extend_session(
             State(pool.clone()),
+            HeaderMap::new(),
             audit_service.clone(),
             None,
             None,
@@ -226,6 +236,7 @@ mod test {
 
         let updated_response = extend_session(
             State(pool.clone()),
+            HeaderMap::new(),
             audit_service.clone(),
             Some(session.clone()),
             Some(user.clone()),
@@ -259,6 +270,7 @@ mod test {
 
         let updated_response = extend_session(
             State(pool.clone()),
+            HeaderMap::new(),
             audit_service.clone(),
             Some(session.clone()),
             Some(user),
@@ -283,6 +295,60 @@ mod test {
                 .unwrap(),
             new_session.expires_at().to_rfc3339().as_str(),
             "extend_session should update the expiration time"
+        );
+    }
+
+    #[test(sqlx::test(fixtures("../../fixtures/users.sql")))]
+    async fn test_extend_session_do_not_extend_header(pool: SqlitePool) {
+        let user = User::test_user(Role::Administrator, 1);
+
+        let audit_service = AuditService::new(
+            Some(user.clone()),
+            Some(Ipv4Addr::new(203, 0, 113, 0).into()),
+        );
+
+        let life_time = SESSION_MIN_LIFE_TIME - TimeDelta::seconds(30); // min life time - 30 seconds
+        let mut conn = pool.acquire().await.unwrap();
+        let session = crate::authentication::session::create(
+            &mut conn,
+            user.id(),
+            TEST_USER_AGENT,
+            TEST_IP_ADDRESS,
+            life_time,
+        )
+        .await
+        .unwrap();
+
+        let mut headers = HeaderMap::new();
+        headers.insert(
+            DO_NOT_EXTEND_SESSION_HEADER,
+            HeaderValue::from_str("true").unwrap(),
+        );
+
+        let updated_response = extend_session(
+            State(pool.clone()),
+            headers,
+            audit_service.clone(),
+            Some(session.clone()),
+            Some(user),
+            Response::new(Body::empty()),
+        )
+        .await;
+
+        assert!(
+            updated_response.headers().get(SET_COOKIE).is_none(),
+            "extend_session should not extend the session when the do not extend header is set"
+        );
+
+        assert_eq!(
+            updated_response
+                .headers()
+                .get("X-Session-Expires-At")
+                .unwrap()
+                .to_str()
+                .unwrap(),
+            session.expires_at().to_rfc3339().as_str(),
+            "extend_session should return the current expiration time"
         );
     }
 }

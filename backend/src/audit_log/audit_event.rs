@@ -121,7 +121,7 @@ pub struct DataEntryDetails {
     pub polling_station_id: u32,
     pub committee_session_id: u32,
     pub data_entry_status: String,
-    pub data_entry_progress: u8,
+    pub data_entry_progress: String,
     #[schema(value_type = Option<String>)]
     pub finished_at: Option<DateTime<Utc>>,
     pub first_entry_user_id: Option<u32>,

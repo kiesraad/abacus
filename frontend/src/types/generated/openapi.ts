@@ -559,7 +559,7 @@ export interface DataEntry {
 
 export interface DataEntryDetails {
   committee_session_id: number;
-  data_entry_progress: number;
+  data_entry_progress: string;
   data_entry_status: string;
   finished_at?: string | null;
   first_entry_user_id?: number | null;

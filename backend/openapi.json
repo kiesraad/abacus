@@ -4985,9 +4985,7 @@
             "minimum": 0
           },
           "data_entry_progress": {
-            "type": "integer",
-            "format": "int32",
-            "minimum": 0
+            "type": "string"
           },
           "data_entry_status": {
             "type": "string"

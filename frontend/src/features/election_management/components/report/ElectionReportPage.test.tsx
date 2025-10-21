@@ -213,7 +213,7 @@ describe("ElectionReportPage", () => {
         HttpResponse.json(electionData satisfies ElectionDetailsResponse, { status: 200 }),
       ),
     );
-    overrideOnce("put", "/api/committee_sessions/1/status", 409, {
+    overrideOnce("put", "/api/elections/1/committee_sessions/1/status", 409, {
       error: "Invalid committee session status",
       fatal: true,
       reference: "InvalidCommitteeSessionStatus",

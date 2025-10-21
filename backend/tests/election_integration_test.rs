@@ -144,12 +144,13 @@ async fn test_election_pdf_download_works(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let coordinator_cookie = shared::coordinator_login(&addr).await;
     let election_id = 2;
-    create_result(&addr, 1, 2).await;
-    create_result(&addr, 2, 2).await;
+    create_result(&addr, 1, election_id).await;
+    create_result(&addr, 2, election_id).await;
 
     shared::change_status_committee_session(
         &addr,
         &coordinator_cookie,
+        election_id,
         2,
         CommitteeSessionStatus::DataEntryFinished,
     )
@@ -238,12 +239,13 @@ async fn test_election_zip_download_works(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let coordinator_cookie = shared::coordinator_login(&addr).await;
     let election_id = 2;
-    create_result(&addr, 1, 2).await;
-    create_result(&addr, 2, 2).await;
+    create_result(&addr, 1, election_id).await;
+    create_result(&addr, 2, election_id).await;
 
     shared::change_status_committee_session(
         &addr,
         &coordinator_cookie,
+        election_id,
         2,
         CommitteeSessionStatus::DataEntryFinished,
     )

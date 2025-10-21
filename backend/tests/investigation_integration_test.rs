@@ -578,8 +578,14 @@ async fn test_creation_for_committee_session_with_created_status(pool: SqlitePoo
     let cookie = shared::coordinator_login(&addr).await;
     let election_id = 7;
 
-    shared::change_status_committee_session(&addr, &cookie, 704, CommitteeSessionStatus::Created)
-        .await;
+    shared::change_status_committee_session(
+        &addr,
+        &cookie,
+        election_id,
+        704,
+        CommitteeSessionStatus::Created,
+    )
+    .await;
     let committee_session =
         shared::get_election_committee_session(&addr, &cookie, election_id).await;
     assert_eq!(committee_session.status, CommitteeSessionStatus::Created);
@@ -868,6 +874,7 @@ where
     shared::change_status_committee_session(
         addr,
         &cookie,
+        election_id,
         committee_session_id,
         CommitteeSessionStatus::DataEntryFinished,
     )

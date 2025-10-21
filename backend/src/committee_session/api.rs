@@ -9,7 +9,7 @@ use utoipa_axum::{router::OpenApiRouter, routes};
 
 use super::{
     CommitteeSession, CommitteeSessionCreateRequest, CommitteeSessionNumberOfVotersChangeRequest,
-    CommitteeSessionStatusChangeRequest, NewCommitteeSessionRequest,
+    CommitteeSessionStatusChangeRequest,
     status::{CommitteeSessionStatus, change_committee_session_status},
 };
 use crate::{
@@ -45,8 +45,7 @@ pub fn router() -> OpenApiRouter<AppState> {
 /// Create a new [CommitteeSession].
 #[utoipa::path(
     post,
-    path = "/api/committee_sessions",
-    request_body = NewCommitteeSessionRequest,
+    path = "/api/elections/{election_id}/committee_sessions",
     responses(
         (status = 201, description = "Committee session created", body = CommitteeSession),
         (status = 400, description = "Bad request", body = ErrorResponse),
@@ -55,26 +54,26 @@ pub fn router() -> OpenApiRouter<AppState> {
         (status = 409, description = "Request cannot be completed", body = ErrorResponse),
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
+    params(
+        ("election_id" = u32, description = "Election database id"),
+    ),
 )]
 pub async fn committee_session_create(
     _user: Coordinator,
     State(pool): State<SqlitePool>,
     audit_service: AuditService,
-    Json(request): Json<NewCommitteeSessionRequest>,
+    Path(election_id): Path<u32>,
 ) -> Result<(StatusCode, CommitteeSession), APIError> {
     let mut tx = pool.begin_immediate().await?;
 
     let current_committee_session =
-        crate::committee_session::repository::get_election_committee_session(
-            &mut tx,
-            request.election_id,
-        )
-        .await?;
+        crate::committee_session::repository::get_election_committee_session(&mut tx, election_id)
+            .await?;
 
     if current_committee_session.status == CommitteeSessionStatus::DataEntryFinished {
         let next_committee_session = crate::committee_session::repository::create(&mut tx, {
             CommitteeSessionCreateRequest {
-                election_id: request.election_id,
+                election_id,
                 number: current_committee_session.number + 1,
                 number_of_voters: current_committee_session.number_of_voters,
             }
@@ -103,7 +102,7 @@ pub async fn committee_session_create(
 /// Delete a [CommitteeSession].
 #[utoipa::path(
     delete,
-    path = "/api/committee_sessions/{committee_session_id}",
+    path = "/api/elections/{election_id}/committee_sessions/{committee_session_id}",
     responses(
         (status = 200, description = "Committee session deleted successfully"),
         (status = 401, description = "Unauthorized", body = ErrorResponse),
@@ -113,6 +112,7 @@ pub async fn committee_session_create(
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
     params(
+        ("election_id" = u32, description = "Election database id"),
         ("committee_session_id" = u32, description = "Committee session database id"),
     ),
 )]
@@ -120,7 +120,7 @@ pub async fn committee_session_delete(
     _user: Coordinator,
     State(pool): State<SqlitePool>,
     audit_service: AuditService,
-    Path(committee_session_id): Path<u32>,
+    Path((election_id, committee_session_id)): Path<(u32, u32)>,
 ) -> Result<StatusCode, APIError> {
     let mut tx = pool.begin_immediate().await?;
 
@@ -157,7 +157,7 @@ pub async fn committee_session_delete(
 /// Update a [CommitteeSession].
 #[utoipa::path(
     put,
-    path = "/api/committee_sessions/{committee_session_id}",
+    path = "/api/elections/{election_id}/committee_sessions/{committee_session_id}",
     request_body = CommitteeSessionUpdateRequest,
     responses(
         (status = 200, description = "Committee session updated successfully"),
@@ -168,6 +168,7 @@ pub async fn committee_session_delete(
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
     params(
+        ("election_id" = u32, description = "Election database id"),
         ("committee_session_id" = u32, description = "Committee session database id"),
     ),
 )]
@@ -175,7 +176,7 @@ pub async fn committee_session_update(
     _user: Coordinator,
     State(pool): State<SqlitePool>,
     audit_service: AuditService,
-    Path(committee_session_id): Path<u32>,
+    Path((election_id, committee_session_id)): Path<(u32, u32)>,
     Json(request): Json<CommitteeSessionUpdateRequest>,
 ) -> Result<StatusCode, APIError> {
     if request.location.is_empty() {
@@ -220,7 +221,7 @@ pub async fn committee_session_update(
 /// Change the number of voters of a [CommitteeSession].
 #[utoipa::path(
     put,
-    path = "/api/committee_sessions/{committee_session_id}/voters",
+    path = "/api/elections/{election_id}/committee_sessions/{committee_session_id}/voters",
     request_body = CommitteeSessionNumberOfVotersChangeRequest,
     responses(
         (status = 200, description = "Committee session number of voters changed successfully"),
@@ -230,6 +231,7 @@ pub async fn committee_session_update(
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
     params(
+        ("election_id" = u32, description = "Election database id"),
         ("committee_session_id" = u32, description = "Committee session database id"),
     ),
 )]
@@ -237,7 +239,7 @@ pub async fn committee_session_number_of_voters_change(
     _user: Coordinator,
     State(pool): State<SqlitePool>,
     audit_service: AuditService,
-    Path(committee_session_id): Path<u32>,
+    Path((election_id, committee_session_id)): Path<(u32, u32)>,
     Json(committee_session_request): Json<CommitteeSessionNumberOfVotersChangeRequest>,
 ) -> Result<StatusCode, APIError> {
     let mut tx = pool.begin_immediate().await?;
@@ -264,7 +266,7 @@ pub async fn committee_session_number_of_voters_change(
 /// Change the status of a [CommitteeSession].
 #[utoipa::path(
     put,
-    path = "/api/committee_sessions/{committee_session_id}/status",
+    path = "/api/elections/{election_id}/committee_sessions/{committee_session_id}/status",
     request_body = CommitteeSessionStatusChangeRequest,
     responses(
         (status = 200, description = "Committee session status changed successfully"),
@@ -275,6 +277,7 @@ pub async fn committee_session_number_of_voters_change(
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
     params(
+        ("election_id" = u32, description = "Election database id"),
         ("committee_session_id" = u32, description = "Committee session database id"),
     ),
 )]
@@ -282,7 +285,7 @@ pub async fn committee_session_status_change(
     _user: Coordinator,
     State(pool): State<SqlitePool>,
     audit_service: AuditService,
-    Path(committee_session_id): Path<u32>,
+    Path((election_id, committee_session_id)): Path<(u32, u32)>,
     Json(committee_session_request): Json<CommitteeSessionStatusChangeRequest>,
 ) -> Result<StatusCode, APIError> {
     let mut tx = pool.begin_immediate().await?;

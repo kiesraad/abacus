@@ -105,7 +105,7 @@ pub async fn create_test_election(
     };
 
     let results = if data_entry_completed {
-        crate::data_entry::repository::list_entries_for_committee_session(
+        crate::data_entry::repository::list_results_for_committee_session(
             &mut tx,
             committee_session.id,
         )
@@ -132,7 +132,7 @@ fn generate_election(rng: &mut impl rand::Rng, args: &GenerateElectionArgs) -> N
     let num_political_groups = rng.random_range(args.political_groups.clone());
     info!("Generating {num_political_groups} political groups");
 
-    for i in 1..num_political_groups {
+    for i in 1..=num_political_groups {
         political_groups.push(generate_political_party(rng, i, args));
     }
 

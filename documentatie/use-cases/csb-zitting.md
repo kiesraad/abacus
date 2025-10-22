@@ -59,7 +59,7 @@ __Uitbreidingen:__
     - Hoe faciliteren we gemeentes in het bepalen van de layout (bijv. gebruik huisstijl gemeente).
     - Als de applicatie deze moet genereren, dan moeten we ook de totalenlijst i.p.v. de kandidatenlijsten importeren.
 - Overzicht bijlages toevoegen? Komen niet uit de software. (P22-2)
-- Moet de applicatie Sectie 2.11 Hertelling van de P22-2 genereren, inclusief extra secties 2.3 t/m 2.5 of 2.10 o.b.v. de hertelling?
+- Moet de applicatie Sectie 2.11 Hertelling van de P22-2 genereren, inclusief extra secties 2.3 t/m 2.5 of 2.10 o.b.v. de hertelling? N.B. deze sectie is alleen relevant als het vertegenwoordigend orgaan vraagt om een hertelling (dus na zitting CSB).
 
 
 ## Het CSB stelt de zetelverdeling vast en wijst de gekozen kandidaten aan (vlieger)

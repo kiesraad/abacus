@@ -15,7 +15,7 @@ __Hoofdscenario:__
 5. Het CSB voert het controleprotocol optellingen uit. (controleprotocol deel B)
 6. [Het CSB stelt de zetelverdeling vast en wijst de gekozen kandidaten aan.](#het-csb-stelt-de-zetelverdeling-vast-en-wijst-de-gekozen-kandidaten-aan-vlieger)
 7. De applicatie genereert de benodigde bestanden: P 22-2, EML 510d, EML 520.
-8. De voorzitter CSB (burgemeester) tekent de brieven.
+8. De voorzitter CSB (burgemeester) tekent de benoemingsbrieven en de kennisgevingen tot geloofsbrief.
 9. Het CSB voert het controleprotocol zetelverdeling uit. (controleprotocol deel C)
 10. Het CSB opent de zitting.
 11. Het CSB stelt de uitslag vast o.b.v. de P 22-2: controleren op compleetheid, voorlezen, er zijn geen bezwaren, ondertekenen. En sluit daarmee de zitting.

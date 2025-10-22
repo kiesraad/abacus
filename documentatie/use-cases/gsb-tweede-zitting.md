@@ -22,8 +22,8 @@ __Hoofdscenario:__
 11. Het GSB ondertekent de PVs.
 12. Het GSB sluit de zitting.
 13. Het GSB stelt de benodigde bestanden beschikbaar aan het CSB voor de uitslagvaststelling.
-14. Het GSB stelt de PVs GSB (inc. bijlagen) beschikbaar aan de burgemeester.
-15. De burgemeester publiceert de PVs GSB (inc. bijlagen) en brengt die over naar het CSB.
+14. Het GSB stelt de PVs GSB beschikbaar aan de burgemeester.
+15. De burgemeester publiceert de PVs GSB en brengt die over naar het CSB.
 
 __Uitbreidingen:__
 
@@ -122,7 +122,7 @@ __Hoofdscenario:__
 4. Het GSB stelt een ander resultaat vast in de hertelling.
 5. De coördinator voert de uitkomst van het onderzoek in de applicatie in.
 6. De invoerders voeren de hertelling in de applicatie in volgens de systematiek die voor de eerste invoer wordt gebruikt.
-7. Het GSB voegt het corrigendum toe aan de PV's van de zitting.
+7. Het GSB voegt het corrigendum (DSO: Na 14-1 versie 2, CSO: Na 14-2 Bijlage 1) toe aan de PV's van de zitting.
 
 __Uitbreidingen:__  
 

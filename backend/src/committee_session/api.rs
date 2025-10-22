@@ -303,28 +303,7 @@ pub mod tests {
     use chrono::NaiveDate;
     use sqlx::SqlitePool;
 
-    use crate::committee_session::{
-        CommitteeSession, CommitteeSessionCreateRequest, status::CommitteeSessionStatus,
-    };
-
-    pub async fn create_committee_session(
-        pool: SqlitePool,
-        number: u32,
-        election_id: u32,
-        number_of_voters: u32,
-    ) -> CommitteeSession {
-        let mut conn = pool.acquire().await.unwrap();
-        crate::committee_session::repository::create(
-            &mut conn,
-            CommitteeSessionCreateRequest {
-                number,
-                election_id,
-                number_of_voters,
-            },
-        )
-        .await
-        .unwrap()
-    }
+    use crate::committee_session::{CommitteeSession, status::CommitteeSessionStatus};
 
     pub async fn change_status_committee_session(
         pool: SqlitePool,

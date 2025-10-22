@@ -7,11 +7,14 @@ import { beforeEach, describe, expect, test, vi } from "vitest";
 import * as useMessages from "@/hooks/messages/useMessages";
 import { ErrorBoundary } from "@/components/error/ErrorBoundary";
 import { ElectionLayout } from "@/components/layout/ElectionLayout";
+import { getElectionMockData } from "@/testing/api-mocks/ElectionMockData";
+import { pollingStationMockData } from "@/testing/api-mocks/PollingStationMockData";
 import {
   ElectionRequestHandler,
   ElectionStatusRequestHandler,
   PollingStationInvestigationConcludeHandler,
   PollingStationInvestigationDeleteHandler,
+  PollingStationInvestigationUpdateHandler,
 } from "@/testing/api-mocks/RequestHandlers";
 import { Providers } from "@/testing/Providers";
 import { overrideOnce, server } from "@/testing/server";
@@ -47,6 +50,8 @@ async function renderPage(pollingStationId: number) {
 describe("InvestigationFindingsPage", () => {
   beforeEach(() => {
     server.use(ElectionRequestHandler, ElectionStatusRequestHandler);
+    overrideOnce("get", "/api/elections/1", 200, getElectionMockData({}, { number: 2 }));
+
     vi.spyOn(ReactRouter, "useNavigate").mockImplementation(() => navigate);
     vi.spyOn(useMessages, "useMessages").mockReturnValue({
       pushMessage,
@@ -148,6 +153,99 @@ describe("InvestigationFindingsPage", () => {
       accept_data_entry_deletion: false,
     });
     expect(pushMessage).toHaveBeenCalledWith({ title: "Wijzigingen in onderzoek stembureau 34 (Testplek) opgeslagen" });
+  });
+
+  test("Disables corrected results and forces corrected_results=true for new polling stations", async () => {
+    server.use(PollingStationInvestigationUpdateHandler);
+    const update = spyOnHandler(PollingStationInvestigationUpdateHandler);
+
+    overrideOnce("get", "/api/elections/1", 200, {
+      ...getElectionMockData({}, { number: 2 }, [
+        {
+          polling_station_id: 3,
+          reason: "Test investigation",
+          findings: "Test findings",
+        },
+      ]),
+      polling_stations: [
+        {
+          ...pollingStationMockData[2]!,
+          id_prev_session: undefined,
+        },
+      ],
+    });
+    await renderPage(3);
+
+    const correctedResults = await screen.findByRole("group", { name: "Is er een gecorrigeerde uitslag?" });
+    expect(correctedResults).toBeVisible();
+
+    const yes = screen.getByTestId("corrected_results_yes");
+    expect(yes).toBeChecked();
+    expect(yes).toBeDisabled();
+
+    const no = screen.getByTestId("corrected_results_no");
+    expect(no).toBeDisabled();
+
+    const submitButton = await screen.findByRole("button", { name: "Opslaan" });
+    submitButton.click();
+
+    await waitFor(() => {
+      expect(navigate).toHaveBeenCalledWith("/elections/1/investigations");
+    });
+    expect(update).toHaveBeenCalledWith({
+      accept_data_entry_deletion: false,
+      findings: "Test findings",
+      reason: "Test investigation",
+      // Always true for new polling stations
+      corrected_results: true,
+    });
+  });
+
+  test("Does not disable corrected results question when results are not required", async () => {
+    server.use(PollingStationInvestigationUpdateHandler);
+    const update = spyOnHandler(PollingStationInvestigationUpdateHandler);
+
+    overrideOnce("get", "/api/elections/1", 200, {
+      ...getElectionMockData({}, { number: 2 }, [
+        {
+          polling_station_id: 3,
+          reason: "Test investigation",
+          findings: "Test findings",
+        },
+      ]),
+      polling_stations: [
+        {
+          ...pollingStationMockData[2]!,
+          id_prev_session: 1003,
+        },
+      ],
+    });
+    await renderPage(3);
+
+    const correctedResults = await screen.findByRole("group", { name: "Is er een gecorrigeerde uitslag?" });
+    expect(correctedResults).toBeVisible();
+
+    const yes = screen.getByTestId("corrected_results_yes");
+    expect(yes).not.toBeChecked();
+    expect(yes).not.toBeDisabled();
+
+    const no = screen.getByTestId("corrected_results_no");
+    expect(no).not.toBeDisabled();
+    no.click();
+
+    const submitButton = await screen.findByRole("button", { name: "Opslaan" });
+    submitButton.click();
+
+    await waitFor(() => {
+      expect(navigate).toHaveBeenCalledWith("/elections/1/investigations");
+    });
+    expect(update).toHaveBeenCalledWith({
+      accept_data_entry_deletion: false,
+      findings: "Test findings",
+      reason: "Test investigation",
+      // According to user choice
+      corrected_results: false,
+    });
   });
 
   test("Show warning when updating corrected results to no with data entry results", async () => {

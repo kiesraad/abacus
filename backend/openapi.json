@@ -5629,6 +5629,7 @@
           "InvalidVoteGroup",
           "InvalidXml",
           "InvestigationHasDataEntryOrResult",
+          "InvestigationRequiresCorrectedResults",
           "NotInitialised",
           "OwnAccountCannotBeDeleted",
           "PasswordRejection",

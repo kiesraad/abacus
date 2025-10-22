@@ -12,6 +12,7 @@ import { electionManagementRoutes } from "@/features/election_management/routes"
 import { ElectionProvider } from "@/hooks/election/ElectionProvider";
 import { ElectionStatusProvider } from "@/hooks/election/ElectionStatusProvider";
 import { getElectionMockData } from "@/testing/api-mocks/ElectionMockData";
+import { pollingStationMockData } from "@/testing/api-mocks/PollingStationMockData";
 import {
   CommitteeSessionStatusChangeRequestHandler,
   ElectionRequestHandler,
@@ -28,13 +29,13 @@ import {
   waitFor,
 } from "@/testing/test-utils";
 import { TestUserProvider } from "@/testing/TestUserProvider";
-import { ElectionDetailsResponse, ErrorResponse } from "@/types/generated/openapi";
+import { ElectionDetailsResponse, ErrorResponse, PollingStation } from "@/types/generated/openapi";
 
 import { FinishDataEntryPage } from "./FinishDataEntryPage";
 
 const navigate = vi.fn();
 
-const renderPage = async () => {
+const renderPage = async (sessionNumber: number) => {
   const router = renderReturningRouter(
     <ElectionProvider electionId={1}>
       <ElectionStatusProvider electionId={1}>
@@ -42,7 +43,12 @@ const renderPage = async () => {
       </ElectionStatusProvider>
     </ElectionProvider>,
   );
-  expect(await screen.findByRole("heading", { level: 1, name: "Steminvoer eerste zitting afronden" })).toBeVisible();
+  expect(
+    await screen.findByRole("heading", {
+      level: 1,
+      name: `Steminvoer ${sessionNumber === 1 ? "eerste" : "tweede"} zitting afronden`,
+    }),
+  ).toBeVisible();
   return router;
 };
 
@@ -57,7 +63,7 @@ describe("FinishDataEntryPage", () => {
     const statusChange = spyOnHandler(CommitteeSessionStatusChangeRequestHandler);
     overrideOnce("get", "/api/elections/1", 200, getElectionMockData({}, { status: "data_entry_in_progress" }));
 
-    await renderPage();
+    await renderPage(1);
 
     // Wait for the page to be loaded
     expect(await screen.findByRole("heading", { level: 2, name: "Invoerfase afronden?" })).toBeVisible();
@@ -148,7 +154,7 @@ describe("FinishDataEntryPage", () => {
     const statusChange = spyOnHandler(CommitteeSessionStatusChangeRequestHandler);
     overrideOnce("get", "/api/elections/1", 200, getElectionMockData({}, { status: "data_entry_in_progress" }));
 
-    const router = await renderPage();
+    const router = await renderPage(1);
 
     // Wait for the page to be loaded
     expect(await screen.findByRole("heading", { level: 2, name: "Invoerfase afronden?" })).toBeVisible();
@@ -162,10 +168,69 @@ describe("FinishDataEntryPage", () => {
     expect(router.state.location.pathname).toEqual("/status");
   });
 
+  test("Redirect to investigations overview if investigations are unhandled", async () => {
+    overrideOnce("get", "/api/elections/1", 200, {
+      ...getElectionMockData({}, { number: 2 }, [
+        {
+          polling_station_id: 1,
+          reason: "Test reason 1",
+        },
+        {
+          polling_station_id: 2,
+          reason: "Test reason 2",
+          findings: "Test findings 2",
+          corrected_results: false,
+        },
+        {
+          polling_station_id: 3,
+          reason: "Test reason 3",
+          findings: "Test findings 3",
+          corrected_results: false,
+        },
+      ]),
+      polling_stations: pollingStationMockData.slice(0, 3),
+    });
+
+    await renderPage(2);
+
+    await waitFor(() => {
+      expect(navigate).toHaveBeenCalledWith("/elections/1/investigations");
+    });
+  });
+
+  test("Redirect to investigations overview if investigations are missing", async () => {
+    overrideOnce("get", "/api/elections/1", 200, {
+      ...getElectionMockData({}, { number: 2 }),
+      polling_stations: [
+        ...pollingStationMockData.slice(0, 3),
+        {
+          ...pollingStationMockData[4]!,
+          id_prev_session: undefined,
+        },
+      ] satisfies PollingStation[],
+    });
+
+    await renderPage(2);
+
+    await waitFor(() => {
+      expect(navigate).toHaveBeenCalledWith("/elections/1/investigations");
+    });
+  });
+
+  test("Do not redirect to investigations overview in first committee session", async () => {
+    overrideOnce("get", "/api/elections/1", 200, getElectionMockData());
+
+    await renderPage(1);
+
+    await waitFor(() => {
+      expect(navigate).not.toHaveBeenCalledWith("/elections/1/investigations");
+    });
+  });
+
   test("Redirect to report download page when committee session status is already data_entry_finished", async () => {
     overrideOnce("get", "/api/elections/1", 200, getElectionMockData({}, { status: "data_entry_finished" }));
 
-    await renderPage();
+    await renderPage(1);
 
     await waitFor(() => {
       expect(navigate).toHaveBeenCalledWith("/elections/1/report/committee-session/1/download");

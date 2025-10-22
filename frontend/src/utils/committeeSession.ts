@@ -1,16 +1,10 @@
-import { t } from "@/i18n/translate";
+import { hasTranslation, t } from "@/i18n/translate";
 
 export function committeeSessionLabel(sessionNumber: number, addArticle = false): string {
-  const sessionString = sessionNumber.toString();
-  if (
-    sessionString === "1" ||
-    sessionString === "2" ||
-    sessionString === "3" ||
-    sessionString === "4" ||
-    sessionString === "5"
-  ) {
-    return `${addArticle ? `${t("committee_session_status.the")} ` : ""}${t(`committee_session_status.number.${sessionString}`)} ${t(`committee_session_status.session`).toLowerCase()}`;
+  const numberTranslation = `committee_session_status.number.${sessionNumber}`;
+  if (hasTranslation(numberTranslation)) {
+    return `${addArticle ? `${t("committee_session_status.the")} ` : ""}${t(numberTranslation)} ${t(`committee_session_status.session`).toLowerCase()}`;
   } else {
-    return `${t("committee_session_status.session")} ${sessionString}`;
+    return `${t("committee_session_status.session")} ${sessionNumber}`;
   }
 }

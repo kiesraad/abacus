@@ -96,6 +96,27 @@ pub fn example_data_entry(client_state: Option<&str>) -> DataEntry {
     }
 }
 
+pub async fn create_polling_station(addr: &SocketAddr, election_id: u32, number: u32) -> Response {
+    let url = format!("http://{addr}/api/elections/{election_id}/polling_stations");
+    let coordinator_cookie = coordinator_login(addr).await;
+    reqwest::Client::new()
+        .post(&url)
+        .header("cookie", coordinator_cookie)
+        .header("Content-Type", "application/json")
+        .json(&json!({
+            "name": "Test polling station",
+            "number": number,
+            "number_of_voters": 123,
+            "polling_station_type": "FixedLocation",
+            "address": "Teststraat 1",
+            "postal_code": "1234 AB",
+            "locality": "Testdorp",
+        }))
+        .send()
+        .await
+        .unwrap()
+}
+
 /// Claim a first or second data entry
 pub async fn claim_data_entry(
     addr: &SocketAddr,

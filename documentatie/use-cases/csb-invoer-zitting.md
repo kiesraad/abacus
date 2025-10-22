@@ -38,7 +38,7 @@ __Niveau:__ gebruikersdoel, zee, 🌊
 ### Hoofdscenario en uitbreidingen
 
 __Hoofdscenario:__
-1. De coördinator CSB vergelijkt de eerste en tweede invoer met het papieren PV.  
+1. De coördinator CSB vergelijkt de eerste en tweede invoer met het papieren PV (DSO: Na 31-1, CSO: Na 31-2; evt. Na 14-2).  
 2. De coördinator CSB stelt vast dat de digitale invoer correct is, maar de handmatige invoer niet.
 3. De coördinator CSB gooit de handmatige invoer weg.
 4. De coördinator CSB laat opnieuw handmatig invoeren.

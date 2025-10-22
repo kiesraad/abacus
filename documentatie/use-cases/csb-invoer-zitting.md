@@ -16,9 +16,9 @@ __Hoofdscenario:__
 __Uitbreidingen:__
 
 1a. De CSB-applicatie draait op een andere machine dan de GSB-applicatie:  
-&emsp; 1a1. Het CSB importeert het digitale bestand.
+&emsp; 1a1. Het CSB importeert het tellingsbestand (EML 510b).
 
-1b. Het is niet mogelijk het tellingsbestand te importeren:  
+1b. Het is niet mogelijk het tellingsbestand (EML 510b) te importeren:  
 &emsp; 1b1. Het CSB lost in overleg met het GSB het probleem op en importeert alsnog het bestand.  
 &emsp; 1b1a. Het CSB slaagt er niet in het probleem op te lossen:  
 &emsp;&emsp; 1b1a1. Het CSB doet de eerste invoer handmatig.

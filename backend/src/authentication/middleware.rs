@@ -67,7 +67,7 @@ pub async fn extend_session(
         return response;
     };
 
-    // check for the do not extend session header
+    // check for the existence of the do not extend session header
     let do_not_extend = headers.get(super::DO_NOT_EXTEND_SESSION_HEADER).is_some();
 
     let mut expires = session.expires_at();
@@ -112,7 +112,7 @@ pub async fn extend_session(
     if let Ok(expires) = HeaderValue::from_str(&expires.to_rfc3339()) {
         response
             .headers_mut()
-            .append("X-Session-Expires-At", expires);
+            .append("x-session-expires-at", expires);
     }
 
     response
@@ -217,7 +217,7 @@ mod test {
         assert!(
             updated_response
                 .headers()
-                .get("X-Session-Expires-At")
+                .get("x-session-expires-at")
                 .is_none(),
             "extend_session should not return a header given an unauthenticated request"
         );
@@ -249,7 +249,7 @@ mod test {
         assert_eq!(
             updated_response
                 .headers()
-                .get("X-Session-Expires-At")
+                .get("x-session-expires-at")
                 .unwrap()
                 .to_str()
                 .unwrap(),
@@ -289,7 +289,7 @@ mod test {
         assert_eq!(
             updated_response
                 .headers()
-                .get("X-Session-Expires-At")
+                .get("x-session-expires-at")
                 .unwrap()
                 .to_str()
                 .unwrap(),
@@ -343,7 +343,7 @@ mod test {
         assert_eq!(
             updated_response
                 .headers()
-                .get("X-Session-Expires-At")
+                .get("x-session-expires-at")
                 .unwrap()
                 .to_str()
                 .unwrap(),

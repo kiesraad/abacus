@@ -31,8 +31,8 @@ pub const SESSION_COOKIE_NAME: &str = "ABACUS_SESSION";
 /// Only send cookies over a secure (https) connection
 pub const SECURE_COOKIES: bool = false;
 
-/// Do not extend session header
-pub const DO_NOT_EXTEND_SESSION_HEADER: &str = "X-Do-Not-Extend-Session";
+/// Do not extend session header, only its existence of this header is checked, not the value
+pub const DO_NOT_EXTEND_SESSION_HEADER: &str = "x-do-not-extend-session";
 
 /// Struct used to create a new user
 #[derive(Serialize, Deserialize, ToSchema)]

@@ -1,3 +1,4 @@
+import { IconPlus } from "@/components/generated/icons";
 import { PageTitle } from "@/components/page_title/PageTitle";
 import { Alert } from "@/components/ui/Alert/Alert";
 import { Button } from "@/components/ui/Button/Button";
@@ -6,7 +7,7 @@ import { useElection } from "@/hooks/election/useElection";
 import { t, tx } from "@/i18n/translate";
 
 export function AddInvestigationPage() {
-  const { pollingStations, investigations } = useElection();
+  const { election, pollingStations, investigations } = useElection();
 
   const availablePollingStations = pollingStations.filter(
     (station) => !investigations.some((investigation) => investigation.polling_station_id === station.id),
@@ -55,6 +56,12 @@ export function AddInvestigationPage() {
               )}
             </Table.Body>
           </Table>
+
+          <nav className="mt-xl">
+            <Button.Link to={`/elections/${election.id}/polling-stations/create`} variant="secondary">
+              <IconPlus /> {t("investigations.add_polling_station")}
+            </Button.Link>
+          </nav>
         </section>
       </main>
     </>

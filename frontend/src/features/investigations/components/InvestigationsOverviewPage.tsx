@@ -1,5 +1,7 @@
+import { useEffect } from "react";
 import { useNavigate } from "react-router";
 
+import { DEFAULT_CANCEL_REASON } from "@/api/ApiClient";
 import { isSuccess, NotFoundError } from "@/api/ApiResult";
 import { useCrud } from "@/api/useCrud";
 import { IconPlus } from "@/components/generated/icons";
@@ -8,6 +10,7 @@ import { PageTitle } from "@/components/page_title/PageTitle";
 import { Alert } from "@/components/ui/Alert/Alert";
 import { Button } from "@/components/ui/Button/Button";
 import { useElection } from "@/hooks/election/useElection";
+import { useElectionStatus } from "@/hooks/election/useElectionStatus";
 import { useUserRole } from "@/hooks/user/useUserRole";
 import { t } from "@/i18n/translate";
 import {
@@ -22,13 +25,20 @@ import { InvestigationCard } from "./InvestigationCard";
 export function InvestigationsOverviewPage() {
   const { currentCommitteeSession } = useElection();
   const { investigations, currentInvestigations, handledInvestigations } = useInvestigations();
+  const { refetch: refetchStatuses } = useElectionStatus();
   const { isCoordinator } = useUserRole();
   const navigate = useNavigate();
-  const url: COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_PATH = `/api/committee_sessions/${currentCommitteeSession.id}/status`;
-  const { update, requestState } = useCrud({ update: url });
+  const updatePath: COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_PATH = `/api/committee_sessions/${currentCommitteeSession.id}/status`;
+  const { update, isLoading } = useCrud({ updatePath, throwAllErrors: true });
+  const allInvestigationsHandled = investigations.length > 0 && investigations.length === handledInvestigations.length;
 
-  if (requestState.status === "api-error") {
-    throw requestState.error;
+  function finishDataEntry() {
+    const body: COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_BODY = { status: "data_entry_finished" };
+    void update(body).then((result) => {
+      if (isSuccess(result)) {
+        void navigate("../");
+      }
+    });
   }
 
   // Only allow access to the page if the current committee session is a second session
@@ -36,16 +46,16 @@ export function InvestigationsOverviewPage() {
     throw new NotFoundError();
   }
 
-  const finishDataEntry = async () => {
-    const body: COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_BODY = { status: "data_entry_finished" };
-    const result = await update(body);
+  // re-fetch statuses when component mounts
+  useEffect(() => {
+    const abortController = new AbortController();
 
-    if (isSuccess(result)) {
-      void navigate("../");
-    }
-  };
+    void refetchStatuses(abortController);
 
-  const allInvestigationsHandled = investigations.length > 0 && investigations.length === handledInvestigations.length;
+    return () => {
+      abortController.abort(DEFAULT_CANCEL_REASON);
+    };
+  }, [refetchStatuses]);
 
   return (
     <>
@@ -60,7 +70,7 @@ export function InvestigationsOverviewPage() {
         </section>
       </header>
 
-      {allInvestigationsHandled ? (
+      {allInvestigationsHandled && currentCommitteeSession.status !== "data_entry_finished" ? (
         <Alert type="success">
           <strong className="heading-md">{t("investigations.all_investigations_finished")}</strong>
           <p>{t("investigations.all_investigations_finished_description")}</p>
@@ -68,9 +78,9 @@ export function InvestigationsOverviewPage() {
             variant="primary"
             size="sm"
             onClick={() => {
-              void finishDataEntry();
+              finishDataEntry();
             }}
-            disabled={requestState.status === "loading"}
+            disabled={isLoading}
           >
             {t("election.title.finish_data_entry")}
           </Button>
@@ -88,7 +98,7 @@ export function InvestigationsOverviewPage() {
               <li>{t("investigations.print_corrigendum_form")}</li>
             </ul>
           )}
-          {isCoordinator && currentCommitteeSession.status !== "data_entry_finished" && (
+          {isCoordinator && (
             <nav className="mt-md-lg mb-lg">
               <Button.Link to="./add" variant={investigations.length > 0 ? "secondary" : "primary"}>
                 <IconPlus />

@@ -72,15 +72,18 @@ pub struct CommitteeSessionDetails {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[schema(nullable = false)]
     pub session_results_pdf: Option<u32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[schema(nullable = false)]
+    pub session_overview_pdf: Option<u32>,
 }
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, Eq, ToSchema)]
 #[serde(deny_unknown_fields)]
 pub struct FileDetails {
     pub file_id: u32,
-    pub file_data: Vec<u8>,
     pub file_name: String,
     pub file_mime_type: String,
+    pub file_size_bytes: u64,
 }
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, Eq, ToSchema)]
@@ -118,7 +121,7 @@ pub struct DataEntryDetails {
     pub polling_station_id: u32,
     pub committee_session_id: u32,
     pub data_entry_status: String,
-    pub data_entry_progress: u8,
+    pub data_entry_progress: String,
     #[schema(value_type = Option<String>)]
     pub finished_at: Option<DateTime<Utc>>,
     pub first_entry_user_id: Option<u32>,
@@ -195,14 +198,15 @@ pub enum AuditEvent {
     PollingStationDeleted(PollingStationDetails),
     PollingStationsImported(PollingStationImportDetails),
     // data entry events
-    DataEntryClaimed(DataEntryDetails),
+    DataEntryStarted(DataEntryDetails),
     DataEntrySaved(DataEntryDetails),
+    DataEntryResumed(DataEntryDetails),
     DataEntryDeleted(DataEntryDetails),
     DataEntryFinalised(DataEntryDetails),
     ResultDeleted(ResultDetails),
     // data entry resolving events
     DataEntryDiscardedFirst(DataEntryDetails),
-    DataEntryResumedFirst(DataEntryDetails),
+    DataEntryReturnedFirst(DataEntryDetails),
     DataEntryKeptFirst(DataEntryDetails),
     DataEntryKeptSecond(DataEntryDetails),
     DataEntryDiscardedBoth(DataEntryDetails),
@@ -252,15 +256,16 @@ impl AuditEvent {
             AuditEvent::PollingStationInvestigationConcluded(_) => AuditEventLevel::Success,
             AuditEvent::PollingStationInvestigationUpdated(_) => AuditEventLevel::Success,
             AuditEvent::PollingStationInvestigationDeleted(_) => AuditEventLevel::Info,
-            AuditEvent::DataEntryClaimed(_) => AuditEventLevel::Success,
+            AuditEvent::DataEntryStarted(_) => AuditEventLevel::Success,
             AuditEvent::DataEntrySaved(_) => AuditEventLevel::Success,
+            AuditEvent::DataEntryResumed(_) => AuditEventLevel::Success,
             AuditEvent::DataEntryDeleted(_) => AuditEventLevel::Info,
             AuditEvent::DataEntryFinalised(_) => AuditEventLevel::Success,
             AuditEvent::ResultDeleted(_) => AuditEventLevel::Success,
             AuditEvent::Error(ErrorDetails { level, .. }) => *level,
             AuditEvent::UnknownEvent => AuditEventLevel::Warning,
             AuditEvent::DataEntryDiscardedFirst(_) => AuditEventLevel::Info,
-            AuditEvent::DataEntryResumedFirst(_) => AuditEventLevel::Info,
+            AuditEvent::DataEntryReturnedFirst(_) => AuditEventLevel::Info,
             AuditEvent::DataEntryKeptFirst(_) => AuditEventLevel::Info,
             AuditEvent::DataEntryKeptSecond(_) => AuditEventLevel::Info,
             AuditEvent::DataEntryDiscardedBoth(_) => AuditEventLevel::Info,

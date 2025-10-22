@@ -37,6 +37,21 @@ export default defineConfig(({ command }) => {
     };
   }
 
+  const define = {
+    __API_MSW__: JSON.stringify(mswEnabled),
+    __APP_VERSION__: JSON.stringify(pkgjson.version),
+    __INCLUDE_STORYBOOK_LINK__: JSON.stringify(includeStorybookLink),
+    __SHOW_DEV_PAGE__: JSON.stringify(showDevPage),
+    ...gitDetails,
+  };
+
+  // eslint-disable-next-line no-console
+  console.log("Vite build environment:");
+  Object.entries(define).forEach(([key, value]) => {
+    // eslint-disable-next-line no-console
+    console.log(`${key}: ${value}`);
+  });
+
   return {
     build: {
       outDir: path.resolve(__dirname, "dist"),
@@ -55,13 +70,7 @@ export default defineConfig(({ command }) => {
         targets: browserslistToTargets(browserslist(">= 0.25% and not dead")),
       },
     },
-    define: {
-      __API_MSW__: JSON.stringify(mswEnabled),
-      __APP_VERSION__: JSON.stringify(pkgjson.version),
-      __INCLUDE_STORYBOOK_LINK__: JSON.stringify(includeStorybookLink),
-      __SHOW_DEV_PAGE__: JSON.stringify(showDevPage),
-      ...gitDetails,
-    },
+    define,
     optimizeDeps: { exclude: ["msw"] },
     resolve: {
       alias: [{ find: "@", replacement: path.resolve(__dirname, "./src") }],

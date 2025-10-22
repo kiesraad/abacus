@@ -1,10 +1,15 @@
 import { defineConfig, devices, type PlaywrightTestConfig } from "@playwright/test";
 
 function returnWebserverCommand(): string {
-  // CI: use existing backend build, reset and seed database
+  // CI: use existing backend build
   if (process.env.CI) {
     const binary = process.platform === "win32" ? "..\\builds\\backend\\abacus.exe" : "../builds/backend/abacus";
-    return `${binary} --reset-database --port 8081`;
+    let argv = `${binary} --port 8081`;
+    // Release builds don't have the dev-database feature
+    if (!process.env.RELEASE_BUILD) {
+      argv += " --reset-database";
+    }
+    return argv;
   }
 
   // LOCAL CI: build frontend, then build and run backend with database reset and seed playwright-specific database
@@ -52,13 +57,21 @@ const config: PlaywrightTestConfig = defineConfig({
       name: "initialisation-test",
       workers: 1,
       testMatch: /initialisation\.e2e\.ts/,
-      use: { ...devices["Desktop Chrome"], channel: "chromium" },
+      use: {
+        ...devices["Desktop Chrome"],
+        channel: "chromium",
+        userAgent: "Abacus-User-Agent/1",
+      },
     },
     {
       name: "setup-test-users",
       workers: 1,
       testMatch: /setup-test-users\.ts/,
-      use: { ...devices["Desktop Chrome"], channel: "chromium" },
+      use: {
+        ...devices["Desktop Chrome"],
+        channel: "chromium",
+        userAgent: "Abacus-User-Agent/1",
+      },
       dependencies: ["initialisation-test"],
     },
     {
@@ -71,19 +84,26 @@ const config: PlaywrightTestConfig = defineConfig({
         },
         ...devices["Desktop Chrome"],
         channel: "chromium",
+        userAgent: "Abacus-User-Agent/1",
       },
       dependencies: ["setup-test-users"],
     },
     {
       name: "firefox",
       testIgnore: /initialisation\.e2e\.ts/,
-      use: { ...devices["Desktop Firefox"] },
+      use: {
+        ...devices["Desktop Firefox"],
+        userAgent: "Abacus-User-Agent/1",
+      },
       dependencies: ["setup-test-users"],
     },
     {
       name: "safari",
       testIgnore: /initialisation\.e2e\.ts/,
-      use: { ...devices["Desktop Safari"] },
+      use: {
+        ...devices["Desktop Safari"],
+        userAgent: "Abacus-User-Agent/1",
+      },
       dependencies: ["setup-test-users"],
     },
   ],

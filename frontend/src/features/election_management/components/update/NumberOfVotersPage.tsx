@@ -1,8 +1,7 @@
-import { useState } from "react";
 import { useNavigate } from "react-router";
 
-import { AnyApiError, isSuccess } from "@/api/ApiResult";
-import { useApiClient } from "@/api/useApiClient";
+import { isSuccess } from "@/api/ApiResult";
+import { useCrud } from "@/api/useCrud";
 import { NumberOfVotersForm } from "@/components/election/NumberOfVotersForm";
 import { Footer } from "@/components/footer/Footer";
 import { useElection } from "@/hooks/election/useElection";
@@ -13,28 +12,18 @@ import {
 } from "@/types/generated/openapi";
 
 export function NumberOfVotersPage() {
-  const client = useApiClient();
   const navigate = useNavigate();
   const { currentCommitteeSession, election } = useElection();
-  const [submitError, setSubmitError] = useState<AnyApiError | null>(null);
-
-  if (submitError) {
-    throw submitError;
-  }
+  const updatePath: COMMITTEE_SESSION_NUMBER_OF_VOTERS_CHANGE_REQUEST_PATH = `/api/committee_sessions/${currentCommitteeSession.id}/voters`;
+  const { update } = useCrud({ updatePath, throwAllErrors: true });
 
   function handleSubmit(numberOfVoters: number) {
-    const path: COMMITTEE_SESSION_NUMBER_OF_VOTERS_CHANGE_REQUEST_PATH = `/api/committee_sessions/${currentCommitteeSession.id}/voters`;
     const body: COMMITTEE_SESSION_NUMBER_OF_VOTERS_CHANGE_REQUEST_BODY = { number_of_voters: numberOfVoters };
-    client
-      .putRequest(path, body)
-      .then((result) => {
-        if (isSuccess(result)) {
-          void navigate("..");
-        } else {
-          throw result;
-        }
-      })
-      .catch(setSubmitError);
+    void update(body).then((result) => {
+      if (isSuccess(result)) {
+        void navigate("..");
+      }
+    });
   }
 
   const instructions = t("election_management.enter_number_of_voters", {

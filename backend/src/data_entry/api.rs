@@ -110,12 +110,14 @@ async fn validate_and_get_data(
 
     // Validate polling station
     if committee_session.is_next_session() {
-        let investigation = get_polling_station_investigation(conn, polling_station.id).await?;
-        if investigation.corrected_results != Some(true) {
-            return Err(APIError::Conflict(
-                "Data entry not allowed, no investigation with corrected results.".to_string(),
-                ErrorReference::DataEntryNotAllowed,
-            ));
+        match get_polling_station_investigation(conn, polling_station.id).await {
+            Ok(investigation) if investigation.corrected_results == Some(true) => {}
+            _ => {
+                return Err(APIError::Conflict(
+                    "Data entry not allowed, no investigation with corrected results.".to_string(),
+                    ErrorReference::DataEntryNotAllowed,
+                ));
+            }
         }
     }
 
@@ -281,8 +283,8 @@ async fn polling_station_data_entry_claim(
 
     // Transition to the new state
     let new_state = match entry_number {
-        EntryNumber::FirstEntry => state.claim_first_entry(new_data_entry.clone())?,
-        EntryNumber::SecondEntry => state.claim_second_entry(new_data_entry.clone())?,
+        EntryNumber::FirstEntry => state.clone().claim_first_entry(new_data_entry.clone())?,
+        EntryNumber::SecondEntry => state.clone().claim_second_entry(new_data_entry.clone())?,
     };
 
     // Validate the state
@@ -302,13 +304,26 @@ async fn polling_station_data_entry_claim(
 
     let data_entry = get_data_entry(&mut tx, polling_station_id, committee_session.id).await?;
 
-    audit_service
-        .log(
-            &mut tx,
-            &AuditEvent::DataEntryClaimed(data_entry.into()),
-            None,
-        )
-        .await?;
+    match state {
+        DataEntryStatus::FirstEntryNotStarted | DataEntryStatus::SecondEntryNotStarted(_) => {
+            audit_service
+                .log(
+                    &mut tx,
+                    &AuditEvent::DataEntryStarted(data_entry.into()),
+                    None,
+                )
+                .await?;
+        }
+        _ => {
+            audit_service
+                .log(
+                    &mut tx,
+                    &AuditEvent::DataEntryResumed(data_entry.into()),
+                    None,
+                )
+                .await?;
+        }
+    }
 
     let client_state = new_state.get_client_state().map(|v| v.to_owned());
 
@@ -580,7 +595,7 @@ impl ResolveErrorsAction {
                 AuditEvent::DataEntryDiscardedFirst(data_entry.into())
             }
             ResolveErrorsAction::ResumeFirstEntry => {
-                AuditEvent::DataEntryResumedFirst(data_entry.into())
+                AuditEvent::DataEntryReturnedFirst(data_entry.into())
             }
         }
     }
@@ -1151,7 +1166,10 @@ mod tests {
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_7_four_sessions"))))]
     async fn test_claim_data_entry_next_session_err_no_investigation(pool: SqlitePool) {
         let response = claim(pool.clone(), 742, EntryNumber::FirstEntry).await;
-        assert_eq!(response.status(), StatusCode::NOT_FOUND);
+        assert_eq!(response.status(), StatusCode::CONFLICT);
+        let body = response.into_body().collect().await.unwrap().to_bytes();
+        let result: ErrorResponse = serde_json::from_slice(&body).unwrap();
+        assert_eq!(result.reference, ErrorReference::DataEntryNotAllowed);
 
         // Check that no row was created
         let mut conn = pool.acquire().await.unwrap();
@@ -1365,9 +1383,9 @@ mod tests {
         let row = query!(
             "SELECT state AS 'state: sqlx::types::Json<DataEntryStatus>' FROM polling_station_data_entries"
         )
-        .fetch_one(&pool)
-        .await
-        .expect("No data found");
+            .fetch_one(&pool)
+            .await
+            .expect("No data found");
         let data: DataEntryStatus = row.state.0;
         let DataEntryStatus::FirstEntryInProgress(state) = data else {
             panic!("Expected entry to be in FirstEntryInProgress state");
@@ -1493,10 +1511,10 @@ mod tests {
 
         // Check that it has been logged in the audit log
         let audit_log_row =
-          query!(r#"SELECT event_name, json(event) as "event: serde_json::Value" FROM audit_log ORDER BY id DESC LIMIT 1"#)
-            .fetch_one(&pool)
-            .await
-            .expect("should have audit log row");
+            query!(r#"SELECT event_name, json(event) as "event: serde_json::Value" FROM audit_log ORDER BY id DESC LIMIT 1"#)
+                .fetch_one(&pool)
+                .await
+                .expect("should have audit log row");
         assert_eq!(audit_log_row.event_name, "DataEntryFinalised");
 
         let event: serde_json::Value = serde_json::to_value(&audit_log_row.event).unwrap();

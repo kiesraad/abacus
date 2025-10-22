@@ -1,6 +1,6 @@
 #import "common/style.typ": conf, document_numbering
 #import "common/scripts.typ": *
-#let input = json("inputs/model-na-31-2.json")
+#let input = json("inputs/model-p-2a.json")
 
 #let is_municipality = (municipal, public_body) => if (
   input.election.category == "Municipal"
@@ -10,7 +10,7 @@
 #let location_type = is_municipality[gemeentelijk stembureau][stembureau voor het openbaar lichaam]
 #let this_location = is_municipality[deze gemeente][dit openbaar lichaam]
 
-#show: doc => conf(doc, header: location_name, footer: [
+#show: doc => conf(doc, header-right: location_name, footer: [
   Proces-verbaal van een #location_type (nieuwe zitting)\
   Model P 2a
 ])
@@ -31,7 +31,7 @@
 
 #location_name
 
-#input.election.location #format_date(input.election.election_date)
+#input.committee_session.location #format_date_time(input.committee_session.start_date_time)
 
 == Proces-verbaal
 
@@ -87,7 +87,29 @@ Noteer per onderzocht stembureau: \
 - Bevindingen van het onderzoek
 - Of er als gevolg van het onderzoek een nieuw telresultaat is
 \
-#empty_lines(22)
+
+#line(length: 100%)
+#for (polling_station, investigation) in input.investigations [
+  #block(breakable: false)[
+    *Stembureau #polling_station.number (#polling_station.name)*
+    - *Aanleiding en opdracht:* #investigation.reason
+    - *Bevindingen van het onderzoek:* #investigation.findings
+    - *#if investigation.corrected_results [
+        Er is een gecorrigeerde uitslag
+      ] else [
+        De uitslag is ongewijzigd
+      ]*
+    #line(length: 100%, stroke: 0.25pt)
+  ]
+]
+
+// Allow for some additional space for manual notes
+#for _ in range(0, 3) [
+  #block(breakable: false)[
+    #v(1.2em)
+    #line(length: 100%, stroke: 0.25pt)
+  ]
+]
 
 #pagebreak(weak: true)
 

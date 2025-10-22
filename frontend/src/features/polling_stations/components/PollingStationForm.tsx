@@ -1,6 +1,6 @@
 import * as React from "react";
 
-import { isSuccess } from "@/api/ApiResult";
+import { ApiError, isSuccess } from "@/api/ApiResult";
 import { useCrud } from "@/api/useCrud";
 import { Alert } from "@/components/ui/Alert/Alert";
 import { Button } from "@/components/ui/Button/Button";
@@ -46,9 +46,9 @@ export function PollingStationForm({ electionId, pollingStation, onSaved, onCanc
   };
 
   const { process, isValid, validationResult } = useForm<PollingStationRequest>(formFields);
-  const { requestState, create, update } = useCrud<PollingStation>({
-    create: `/api/elections/${electionId}/polling_stations`,
-    update: isUpdate ? `/api/elections/${electionId}/polling_stations/${pollingStation.id}` : undefined,
+  const { create, update, error, isLoading } = useCrud<PollingStation>({
+    createPath: `/api/elections/${electionId}/polling_stations`,
+    updatePath: isUpdate ? `/api/elections/${electionId}/polling_stations/${pollingStation.id}` : undefined,
   });
 
   const handleSubmit = (event: React.FormEvent<Form>) => {
@@ -77,15 +77,15 @@ export function PollingStationForm({ electionId, pollingStation, onSaved, onCanc
         ? "FORM_VALIDATION_RESULT_INVALID_NUMBER"
         : validationResult.number;
     numberFieldError = t(`form_errors.${errorTextKey}`);
-  } else if (isValid && requestState.status === "api-error" && requestState.error.reference === "EntryNotUnique") {
+  } else if (isValid && error instanceof ApiError && error.reference === "EntryNotUnique") {
     numberFieldError = t("polling_station.form.not_unique.error");
   }
 
   return (
     <div>
-      {isValid && requestState.status === "api-error" && (
+      {isValid && error && (
         <FormLayout.Alert>
-          {requestState.error.reference === "EntryNotUnique" ? (
+          {error instanceof ApiError && error.reference === "EntryNotUnique" ? (
             <Alert type="error">
               <strong className="heading-md">
                 {t("polling_station.form.not_unique.title", {
@@ -97,14 +97,14 @@ export function PollingStationForm({ electionId, pollingStation, onSaved, onCanc
           ) : (
             <Alert type="error">
               <p>
-                {requestState.error.code}: {requestState.error.message}
+                {error instanceof ApiError && error.code}: {error.message}
               </p>
             </Alert>
           )}
         </FormLayout.Alert>
       )}
       <Form title={t("polling_station.details")} onSubmit={handleSubmit} id="polling-station-form" ref={formRef}>
-        <FormLayout disabled={requestState.status === "loading"}>
+        <FormLayout disabled={isLoading}>
           <FormLayout.Section title={t("general_details")}>
             <input type="hidden" id="election_id" name="election_id" defaultValue={electionId} />
             <input type="hidden" id="id" name="id" defaultValue={pollingStation?.id} />
@@ -120,9 +120,7 @@ export function PollingStationForm({ electionId, pollingStation, onSaved, onCanc
                   ? { value: pollingStation.number }
                   : { defaultValue: pollingStation?.number })}
                 error={numberFieldError}
-                hideErrorMessage={
-                  requestState.status === "api-error" && requestState.error.reference !== "EntryNotUnique"
-                }
+                hideErrorMessage={error instanceof ApiError ? error.reference !== "EntryNotUnique" : false}
               />
               <InputField
                 id="name"

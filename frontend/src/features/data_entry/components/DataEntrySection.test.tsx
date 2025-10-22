@@ -4,7 +4,9 @@ import { UserEvent, userEvent } from "@testing-library/user-event";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
 import * as useUser from "@/hooks/user/useUser";
+import { MessagesProvider } from "@/hooks/messages/MessagesProvider";
 import { electionMockData } from "@/testing/api-mocks/ElectionMockData";
+import { pollingStationMockData } from "@/testing/api-mocks/PollingStationMockData";
 import {
   PollingStationDataEntryClaimHandler,
   PollingStationDataEntrySaveHandler,
@@ -23,9 +25,11 @@ function renderComponent(sectionId: string) {
   vi.spyOn(ReactRouter, "useParams").mockReturnValue({ sectionId });
 
   return renderReturningRouter(
-    <DataEntryProvider election={electionMockData} pollingStationId={1} entryNumber={1}>
-      <DataEntrySection />
-    </DataEntryProvider>,
+    <MessagesProvider>
+      <DataEntryProvider election={electionMockData} pollingStation={pollingStationMockData[0]!} entryNumber={1}>
+        <DataEntrySection />
+      </DataEntryProvider>
+    </MessagesProvider>,
   );
 }
 

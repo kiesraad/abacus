@@ -38,7 +38,7 @@ describe("InitialiseApplicationPage", () => {
 
     const user = userEvent.setup();
     await user.type(screen.getByLabelText("Jouw naam (roepnaam + achternaam)"), "First Last");
-    await user.type(screen.getByLabelText("Gebruikersnaam"), "firstlast");
+    await user.type(screen.getByLabelText("Kies een gebruikersnaam"), "firstlast");
     await user.type(screen.getByLabelText("Kies een wachtwoord"), "password*password");
     await user.type(screen.getByLabelText("Herhaal wachtwoord"), "password*password");
 
@@ -57,7 +57,7 @@ describe("InitialiseApplicationPage", () => {
     });
 
     await user.type(screen.getByLabelText("Jouw naam (roepnaam + achternaam)"), "First Last");
-    await user.type(screen.getByLabelText("Gebruikersnaam"), "firstlast");
+    await user.type(screen.getByLabelText("Kies een gebruikersnaam"), "firstlast");
     await user.type(screen.getByLabelText("Kies een wachtwoord"), "password*password");
     await user.type(screen.getByLabelText("Herhaal wachtwoord"), "password*password");
 

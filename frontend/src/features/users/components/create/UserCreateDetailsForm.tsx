@@ -21,8 +21,8 @@ type ValidationErrors = Partial<CreateUserRequest>;
 
 export function UserCreateDetailsForm({ role, showFullname, onSubmitted }: UserCreateDetailsFormProps) {
   const [validationErrors, setValidationErrors] = useState<ValidationErrors | null>(null);
-
-  const { create, requestState } = useCrud<User>("/api/user" satisfies USER_CREATE_REQUEST_PATH);
+  const createPath: USER_CREATE_REQUEST_PATH = "/api/user";
+  const { create, isLoading } = useCrud<User>({ createPath });
   const [usernameUniqueError, setUsernameUniqueError] = useState<string | undefined>(undefined);
   const [error, setError] = useState<AnyApiError>();
 
@@ -83,8 +83,6 @@ export function UserCreateDetailsForm({ role, showFullname, onSubmitted }: UserC
     return isValid;
   }
 
-  const saving = requestState.status === "loading";
-
   return (
     <>
       {error && (
@@ -105,16 +103,8 @@ export function UserCreateDetailsForm({ role, showFullname, onSubmitted }: UserC
       )}
 
       <Form title={t("users.details_title")} onSubmit={handleSubmit}>
-        <FormLayout disabled={saving}>
+        <FormLayout disabled={isLoading}>
           <FormLayout.Section>
-            <InputField
-              id="username"
-              name="username"
-              label={t("users.username")}
-              hint={t("users.username_hint")}
-              error={validationErrors?.username}
-            />
-
             {showFullname && (
               <InputField
                 id="fullname"
@@ -124,6 +114,14 @@ export function UserCreateDetailsForm({ role, showFullname, onSubmitted }: UserC
                 error={validationErrors?.fullname}
               />
             )}
+
+            <InputField
+              id="username"
+              name="username"
+              label={t("users.username")}
+              hint={t("users.username_hint")}
+              error={validationErrors?.username}
+            />
 
             <InputField
               id="temp_password"

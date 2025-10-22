@@ -9,7 +9,7 @@
 #let location_name = is_municipality[Gemeente #input.election.domain_id #input.election.location][Openbaar lichaam #input.election.location]
 #let location_type = is_municipality[gemeentelijk stembureau][stembureau voor het openbaar lichaam]
 
-#show: doc => conf(doc, header: location_name, footer: [
+#show: doc => conf(doc, header-right: location_name, footer: [
   Corrigendum van een #location_type \
   Model Na 14-2
 ])
@@ -19,7 +19,7 @@
 #title_page(
   is_municipality[#input.election.domain_id #input.election.location][#input.election.location],
   is_municipality[Gemeentelijk stembureau][Stembureau voor het openbaar lichaam],
-  [Gemeenteraad - #format_date(input.election.election_date)],
+  [#input.election.name #format_date(input.election.election_date)],
   [
     Gecorrigeerde telresultaten per lijst en kandidaat –
     Model Na 14-2
@@ -30,7 +30,7 @@
 
 #location_name
 
-#input.election.location #format_date(input.election.election_date)
+#input.committee_session.location #format_date_time(input.committee_session.start_date_time)
 
 == Corrigendum
 
@@ -57,6 +57,8 @@ de aantallen in het proces-verbaal.
 
 #show: doc => document_numbering(doc)
 
+#show: doc => conf(doc, header-left: [Deel 1 - Gecorrigeerde telresultaten])
+
 = Gecorrigeerde telresultaten van #is_municipality[de gemeente][het openbaar lichaam]
 
 Vul alléén de getallen in die veranderd zijn ten opzichte van een eerdere telling. Getallen die niet zijn
@@ -68,16 +70,16 @@ vastgesteld.
 #grid(
   rows: auto,
   correction_title_grid(),
-  empty_letterbox("Z", cells: 1, original: 10, corrected: (), bold_top_border: true, wide_cells: true)[Kiesgerechtigden]
+  letterbox("Z", original_value: input.previous_committee_session.number_of_voters, value: input.committee_session.number_of_voters, bold_top_border: true, wide_cells: true)[Kiesgerechtigden]
 )
 
 == Toegelaten kiezers
 Het totaal van alle getelde geldige stempassen, volmachtbewijzen en kiezerspassen
 #sum(
   with_correction_title: true,
-  empty_letterbox("A", cells: 1, original: 10, bold_top_border: true, wide_cells: true)[Stempassen],
-  empty_letterbox("B", cells: 1, original: 10, wide_cells: true)[Volmachtbewijzen],
-  empty_letterbox("D", cells: 1, original: 10, wide_cells: true, light: false)[
+  letterbox("A", original_value: input.previous_summary.voters_counts.poll_card_count, value: input.summary.voters_counts.poll_card_count, bold_top_border: true, wide_cells: true)[Stempassen],
+  letterbox("B", original_value: input.previous_summary.voters_counts.proxy_certificate_count, value: input.summary.voters_counts.proxy_certificate_count, wide_cells: true)[Volmachtbewijzen],
+  letterbox("D", original_value: input.previous_summary.voters_counts.total_admitted_voters_count, value: input.summary.voters_counts.total_admitted_voters_count, wide_cells: true, light: false)[
     *Totaal toegelaten kiezers (A+B)*
   ]
 )
@@ -93,21 +95,23 @@ ingevuld te worden in de kolom ‘gecorrigeerd'. Onder ‘oorspronkelijk’ staa
     with_correction_title: true,
     sum(
       ..input.election.political_groups.enumerate().map(((idx, list)) => {
-        empty_letterbox(cells: 1, original: 10, bold_top_border: idx == 0, [E.#list.number], wide_cells: true)[Totaal lijst #list.number - #list.name]
+        let previous_political_group_votes = input.previous_summary.political_group_votes.find((pgv) => pgv.number == list.number);
+        let political_group_votes = input.summary.political_group_votes.find((pgv) => pgv.number == list.number);
+        letterbox(original_value: previous_political_group_votes.total, value: political_group_votes.total, bold_top_border: idx == 0, [E.#list.number], wide_cells: true)[Totaal lijst #list.number - #list.name]
       }),
-      empty_letterbox(
-        cells:1,
-        original: 10,
+      letterbox(
+        original_value: input.previous_summary.votes_counts.total_votes_candidates_count,
+        value: input.summary.votes_counts.total_votes_candidates_count,
         "E",
         light: false,
         wide_cells: true
       )[*Totaal stemmen op kandidaten* (tel E.1 t/m E.#input.election.political_groups.last().number op)],
     ),
-    empty_letterbox(cells: 1, original: 10, "F", wide_cells: true)[Blanco stemmen],
-    empty_letterbox(cells: 1, original: 10, "G", wide_cells: true)[Ongeldige stemmen],
-    empty_letterbox(
-      cells:1,
-      original: 10,
+    letterbox(original_value: input.previous_summary.votes_counts.blank_votes_count, value: input.summary.votes_counts.blank_votes_count, "F", wide_cells: true)[Blanco stemmen],
+    letterbox(original_value: input.previous_summary.votes_counts.invalid_votes_count, value: input.summary.votes_counts.invalid_votes_count, "G", wide_cells: true)[Ongeldige stemmen],
+    letterbox(
+      original_value: input.previous_summary.votes_counts.total_votes_cast_count,
+      value: input.summary.votes_counts.total_votes_cast_count,
       "H",
       light: false,
       wide_cells: true
@@ -121,35 +125,46 @@ ingevuld te worden in de kolom ‘gecorrigeerd'. Onder ‘oorspronkelijk’ staa
 
 === Is bij *alle afzonderlijke stembureaus* in #is_municipality[deze gemeente][dit openbaar lichaam] het aantal uitgebrachte stemmen en het aantal toegelaten kiezers gelijk?
 
-#checkbox[Ja #sym.arrow.r *Ga door naar #ref(<per_list_and_candidate>)*]
+#let differences = input.summary.differences_counts.more_ballots_count.count > 0 or input.summary.differences_counts.fewer_ballots_count.count > 0
 
-#checkbox[Nee, er zijn stembureaus met een verschil]
+#checkbox(checked: not differences)[Ja #sym.arrow.r *Ga door naar #ref(<per_list_and_candidate>)*]
+
+#checkbox(checked: differences)[Nee, er zijn stembureaus met een verschil]
 
 
-=== Voor de stembureaus met de nummers #TODO[stembureaunummers] zijn *méér* uitgebrachte stemmen dan toegelaten kiezers geteld. Noteer onder ‘gecorrigeerd’ het nieuwe verschil.
-
-#correction_title_grid()
-#empty_letterbox("I", cells: 1, original: 10, bold_top_border: true, wide_cells: true)[Kiesgerechtigden]
-
-=== Voor de stembureaus met de nummers #TODO[stembureaunummers] zijn *minder* uitgebrachte stemmen dan toegelaten kiezers geteld. Noteer onder ‘gecorrigeerd’ het nieuwe verschil.
+=== Voor de stembureaus met de nummers #comma_list(input.summary.differences_counts.more_ballots_count.polling_stations) zijn *méér* uitgebrachte stemmen dan toegelaten kiezers geteld. Noteer onder ‘gecorrigeerd’ het nieuwe verschil.
 
 #correction_title_grid()
-#empty_letterbox("J", cells: 1, original: 10, bold_top_border: true, wide_cells: true)[Kiesgerechtigden]
+#letterbox("I", original_value: input.previous_summary.differences_counts.more_ballots_count.count, value: input.summary.differences_counts.more_ballots_count.count, bold_top_border: true, wide_cells: true)[Kiesgerechtigden]
+
+=== Voor de stembureaus met de nummers #comma_list(input.summary.differences_counts.fewer_ballots_count.polling_stations) zijn *minder* uitgebrachte stemmen dan toegelaten kiezers geteld. Noteer onder ‘gecorrigeerd’ het nieuwe verschil.
+
+#correction_title_grid()
+#letterbox("J", original_value: input.previous_summary.differences_counts.fewer_ballots_count.count, value: input.summary.differences_counts.fewer_ballots_count.count, bold_top_border: true, wide_cells: true)[Kiesgerechtigden]
 
 #pagebreak(weak: true)
 
 == Stemmen per lijst en per kandidaat <per_list_and_candidate>
 
 #for political_group in input.election.political_groups {
+  let pg_votes = input.summary.political_group_votes.find((pgv) => pgv.number == political_group.number);
+  let pg_original_votes = input.previous_summary.political_group_votes.find((pgv) => pgv.number == political_group.number);
+
   votes_table(
+    original_values: political_group.candidates.map(candidate => (
+      name: candidate_name(candidate),
+      number: candidate.number,
+      votes: pg_original_votes.candidate_votes.find(cv => cv.number == candidate.number).votes,
+    )),
     title: [#political_group.number #political_group.name],
     headers: ("Kandidaat", "", "Oorspronkelijk", "Gecorrigeerd"),
     corrected_cells: 1,
-    total: none,
+    total: pg_votes.total,
+    original_total: pg_original_votes.total,
     values: political_group.candidates.map(candidate => (
       name: candidate_name(candidate),
       number: candidate.number,
-      votes: none,
+      votes: pg_votes.candidate_votes.find(cv => cv.number == candidate.number).votes,
     )),
     continue_on_next_page: [#sym.arrow.r De lijst gaat verder op de volgende pagina],
     column_total: "Subtotaal kolom",
@@ -167,6 +182,9 @@ ingevuld te worden in de kolom ‘gecorrigeerd'. Onder ‘oorspronkelijk’ staa
 ]
 
 #pagebreak(weak: true)
+
+#show: doc => conf(doc, header-left: [Deel 2 - Ondertekening])
+
 #emph_block[Deze pagina is expres leeg]
 
 Zo komt het handtekeningen-blad altijd op een losse pagina, ook als het verslag dubbelzijdig is geprint.

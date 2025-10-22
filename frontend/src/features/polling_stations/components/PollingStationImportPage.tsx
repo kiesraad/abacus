@@ -1,7 +1,7 @@
 import { ChangeEvent, ReactNode, useState } from "react";
 import { useNavigate } from "react-router";
 
-import { ApiError, isError, isSuccess } from "@/api/ApiResult";
+import { ApiError, isSuccess } from "@/api/ApiResult";
 import { useCrud } from "@/api/useCrud";
 import { PageTitle } from "@/components/page_title/PageTitle";
 import { PollingStationsPreview } from "@/components/polling_station/PollingStationsPreview";
@@ -14,10 +14,14 @@ import { useElection } from "@/hooks/election/useElection";
 import { useMessages } from "@/hooks/messages/useMessages";
 import { t, tx } from "@/i18n/translate";
 import {
+  POLLING_STATION_IMPORT_REQUEST_PATH,
+  POLLING_STATION_VALIDATE_IMPORT_REQUEST_PATH,
   PollingStationListResponse,
   PollingStationRequest,
   PollingStationRequestListResponse,
 } from "@/types/generated/openapi";
+
+import { PollingStationAlert } from "./PollingStationAlert";
 
 export function PollingStationImportPage() {
   const { election } = useElection();
@@ -29,11 +33,10 @@ export function PollingStationImportPage() {
   const [pollingStations, setPollingStations] = useState<PollingStationRequest[]>([]);
 
   const parentUrl = `/elections/${election.id}/polling-stations`;
-  const validatePath = `/api/elections/${election.id}/polling_stations/validate-import`;
-  const importPath = `/api/elections/${election.id}/polling_stations/import`;
-
-  const postImport = useCrud<PollingStationListResponse>({ create: importPath }).create;
-  const postValidate = useCrud<PollingStationRequestListResponse>({ create: validatePath }).create;
+  const validatePath: POLLING_STATION_VALIDATE_IMPORT_REQUEST_PATH = `/api/elections/${election.id}/polling_stations/validate-import`;
+  const importPath: POLLING_STATION_IMPORT_REQUEST_PATH = `/api/elections/${election.id}/polling_stations/import`;
+  const { create: postImport } = useCrud<PollingStationListResponse>({ createPath: importPath });
+  const { create: postValidate } = useCrud<PollingStationRequestListResponse>({ createPath: validatePath });
 
   /**
    * Import the polling stations
@@ -48,7 +51,7 @@ export function PollingStationImportPage() {
         }),
       });
       void navigate(parentUrl);
-    } else if (isError(response)) {
+    } else {
       setError(response.message);
     }
   }
@@ -66,7 +69,7 @@ export function PollingStationImportPage() {
       if (isSuccess(response)) {
         setPollingStations(response.data.polling_stations);
         setError(undefined);
-      } else if (isError(response)) {
+      } else {
         setPollingStations([]);
 
         // Response code 413 indicates that the file is too large
@@ -156,6 +159,7 @@ export function PollingStationImportPage() {
           <h1>{t("polling_station.import")}</h1>
         </section>
       </header>
+      <PollingStationAlert />
       <main>
         <article>{content}</article>
       </main>

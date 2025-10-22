@@ -1,13 +1,15 @@
 import { ApiError, ApiResult, FatalApiError, NetworkError, NotFoundError } from "./ApiResult";
 
-export type ApiRequestStateWithoutFatalErrors<T> =
+export type ApiRequestStateWithoutErrors<T> =
   | {
       status: "loading";
     }
   | {
       status: "success";
       data: T;
-    }
+    };
+export type ApiRequestStateWithoutFatalErrors<T> =
+  | ApiRequestStateWithoutErrors<T>
   | {
       status: "api-error";
       error: ApiError;

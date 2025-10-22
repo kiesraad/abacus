@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { MouseEvent, useState } from "react";
 import { Link, useNavigate } from "react-router";
 
 import { IconCheckmark, IconMinus, IconPencil, IconPrinter } from "@/components/generated/icons";
@@ -27,7 +27,7 @@ export function InvestigationCard({ investigation }: InvestigationCardProps) {
     setShowModal(false);
   };
 
-  const goToFindings = (e: React.MouseEvent<HTMLButtonElement>) => {
+  const goToFindings = (e: MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
 
     if (currentCommitteeSession.status === "data_entry_not_started") {
@@ -38,7 +38,7 @@ export function InvestigationCard({ investigation }: InvestigationCardProps) {
   };
 
   return (
-    <div className={cls.card}>
+    <div className={cls.card} id={`investigation-${investigation.pollingStation.number}`}>
       <div className={cls.card_header}>
         <PollingStationNumber size="sm">{investigation.pollingStation.number}</PollingStationNumber>
         <h3>{investigation.pollingStation.name}</h3>

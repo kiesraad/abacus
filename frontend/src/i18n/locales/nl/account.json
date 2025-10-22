@@ -23,6 +23,6 @@
   "setting_up_account": "We gaan je account instellen voor gebruik. Vul onderstaande gegevens in om verder te gaan.",
   "username": "Gebruikersnaam",
   "username_hint": "Je kan deze niet aanpassen. Log volgende keer weer met deze gebruikersnaam in.",
-  "choose_username_hint": "Dit is de naam waarmee je kan inloggen. De invoer is niet hoofdlettergevoelig.",
+  "choose_username_hint": "Dit is de naam waarmee je kan inloggen. De gebruikersnaam is niet hoofdlettergevoelig.",
   "username_login_hint": "De naam op het briefje dat je van de coördinator hebt gekregen."
 }

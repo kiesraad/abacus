@@ -104,9 +104,10 @@ export type POLLING_STATION_IMPORT_REQUEST_PATH = `/api/elections/${number}/poll
 export type POLLING_STATION_IMPORT_REQUEST_BODY = PollingStationsRequest;
 
 // /api/elections/{election_id}/polling_stations/validate-import
-export type POLLING_STATION_VALIDATE_IMPORT_REQUEST_PARAMS = Record<string, never>;
-export type POLLING_STATION_VALIDATE_IMPORT_REQUEST_PATH =
-  `/api/elections/{election_id}/polling_stations/validate-import`;
+export interface POLLING_STATION_VALIDATE_IMPORT_REQUEST_PARAMS {
+  election_id: number;
+}
+export type POLLING_STATION_VALIDATE_IMPORT_REQUEST_PATH = `/api/elections/${number}/polling_stations/validate-import`;
 export type POLLING_STATION_VALIDATE_IMPORT_REQUEST_BODY = PollingStationFileRequest;
 
 // /api/elections/{election_id}/polling_stations/{polling_station_id}
@@ -318,13 +319,14 @@ export type AuditEvent =
   | (PollingStationDetails & { event_type: "PollingStationUpdated" })
   | (PollingStationDetails & { event_type: "PollingStationDeleted" })
   | (PollingStationImportDetails & { event_type: "PollingStationsImported" })
-  | (DataEntryDetails & { event_type: "DataEntryClaimed" })
+  | (DataEntryDetails & { event_type: "DataEntryStarted" })
   | (DataEntryDetails & { event_type: "DataEntrySaved" })
+  | (DataEntryDetails & { event_type: "DataEntryResumed" })
   | (DataEntryDetails & { event_type: "DataEntryDeleted" })
   | (DataEntryDetails & { event_type: "DataEntryFinalised" })
   | (ResultDetails & { event_type: "ResultDeleted" })
   | (DataEntryDetails & { event_type: "DataEntryDiscardedFirst" })
-  | (DataEntryDetails & { event_type: "DataEntryResumedFirst" })
+  | (DataEntryDetails & { event_type: "DataEntryReturnedFirst" })
   | (DataEntryDetails & { event_type: "DataEntryKeptFirst" })
   | (DataEntryDetails & { event_type: "DataEntryKeptSecond" })
   | (DataEntryDetails & { event_type: "DataEntryDiscardedBoth" })
@@ -448,6 +450,7 @@ export interface CommitteeSession {
   location: string;
   number: number;
   number_of_voters: number;
+  overview_pdf?: number;
   results_eml?: number;
   results_pdf?: number;
   start_date_time?: string;
@@ -460,6 +463,7 @@ export interface CommitteeSessionDetails {
   session_location: string;
   session_number: number;
   session_number_of_voters: number;
+  session_overview_pdf?: number;
   session_results_eml?: number;
   session_results_pdf?: number;
   session_start_date_time?: string | null;
@@ -555,7 +559,7 @@ export interface DataEntry {
 
 export interface DataEntryDetails {
   committee_session_id: number;
-  data_entry_progress: number;
+  data_entry_progress: string;
   data_entry_status: string;
   finished_at?: string | null;
   first_entry_user_id?: number | null;
@@ -821,10 +825,10 @@ export interface ExtraInvestigation {
 }
 
 export interface FileDetails {
-  file_data: number[];
   file_id: number;
   file_mime_type: string;
   file_name: string;
+  file_size_bytes: number;
 }
 
 /**

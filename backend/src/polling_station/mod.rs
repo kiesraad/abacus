@@ -209,6 +209,12 @@ async fn polling_station_update(
 ) -> Result<(StatusCode, PollingStation), APIError> {
     let mut tx = pool.begin_immediate().await?;
 
+    // Check if the election and a committee session exist, will respond with NOT_FOUND otherwise
+    crate::election::repository::get(&mut tx, election_id).await?;
+    let committee_session =
+        crate::committee_session::repository::get_election_committee_session(&mut tx, election_id)
+            .await?;
+
     let polling_station = crate::polling_station::repository::update(
         &mut tx,
         election_id,
@@ -224,6 +230,16 @@ async fn polling_station_update(
             None,
         )
         .await?;
+
+    if committee_session.status == CommitteeSessionStatus::DataEntryFinished {
+        change_committee_session_status(
+            &mut tx,
+            committee_session.id,
+            CommitteeSessionStatus::DataEntryInProgress,
+            audit_service,
+        )
+        .await?;
+    }
 
     tx.commit().await?;
 
@@ -289,6 +305,14 @@ async fn polling_station_delete(
             audit_service,
         )
         .await?;
+    } else if committee_session.status == CommitteeSessionStatus::DataEntryFinished {
+        change_committee_session_status(
+            &mut tx,
+            committee_session.id,
+            CommitteeSessionStatus::DataEntryInProgress,
+            audit_service,
+        )
+        .await?;
     }
 
     tx.commit().await?;
@@ -317,6 +341,9 @@ pub struct PollingStationRequestListResponse {
         (status = 401, description = "Unauthorized", body = ErrorResponse),
         (status = 403, description = "Forbidden", body = ErrorResponse),
         (status = 500, description = "Internal server error", body = ErrorResponse),
+    ),
+    params(
+        ("election_id" = u32, description = "Election database id"),
     ),
 )]
 async fn polling_station_validate_import(
@@ -376,6 +403,14 @@ pub async fn create_imported_polling_stations(
             &mut tx,
             committee_session.id,
             CommitteeSessionStatus::DataEntryNotStarted,
+            audit_service,
+        )
+        .await?;
+    } else if committee_session.status == CommitteeSessionStatus::DataEntryFinished {
+        change_committee_session_status(
+            &mut tx,
+            committee_session.id,
+            CommitteeSessionStatus::DataEntryInProgress,
             audit_service,
         )
         .await?;

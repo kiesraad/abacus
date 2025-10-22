@@ -11,9 +11,35 @@ permissions:
   pull-requests: write
 
 jobs:
+  build-frontend:
+    name: Build production frontend (on linux only)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    env:
+      NODE_ENV: production
+      SHOW_DEV_PAGE: false
+    steps:
+      - uses: actions/checkout@v5
+      - name: Setup Node
+        uses: actions/setup-node@v5
+        with:
+          node-version: 22
+      - name: Install dependencies
+        run: npm ci --omit=dev
+      - name: Build
+        run: npm run build
+      - uses: actions/upload-artifact@v4
+        with:
+          name: frontend-production-build
+          path: frontend/dist
+
   build:
     if: github.repository == 'kiesraad/abacus'
     name: Build
+    needs:
+      - build-frontend
     permissions:
       contents: read
       attestations: write
@@ -37,19 +63,13 @@ jobs:
     env:
       CARGO_TERM_COLOR: always
       SQLX_OFFLINE: "true"
-      NODE_ENV: production
     steps:
       - uses: actions/checkout@v5
-      - name: Setup Node
-        uses: actions/setup-node@v5
+      - name: Download Abacus Frontend
+        uses: actions/download-artifact@v5
         with:
-          node-version: 22
-      - name: Install dependencies
-        run: npm ci
-        working-directory: ./frontend
-      - name: Build
-        run: npm run build
-        working-directory: ./frontend
+          name: frontend-production-build
+          path: frontend/dist
       - name: Setup Rust
         run: rustup update stable && rustup default stable
       - name: Install target
@@ -58,16 +78,24 @@ jobs:
         run: sudo apt-get update && sudo apt-get install -y musl-tools
         if: matrix.target.os == 'ubuntu-latest'
       - name: Run tests
-        run: cargo --locked test --release --features embed-typst --target=${{ matrix.target.name }}
+        run: cargo --locked test --release --no-default-features --features memory-serve,embed-typst,airgap-detection --target=${{ matrix.target.name }}
+      # no airgap detection build
+      - name: Build without airgap detection
+        run: cargo --locked build --release --no-default-features --features memory-serve,embed-typst --target=${{ matrix.target.name }}
+      - uses: actions/upload-artifact@v4
+        with:
+          name: abacus-${{ matrix.target.os }}-no-airgap-detection
+          path: ${{ matrix.target.binary }}
+      # airgap detection build
       - name: Build
-        run: cargo --locked build --release --features memory-serve,embed-typst --target=${{ matrix.target.name }}
+        run: cargo --locked build --release --no-default-features --features memory-serve,embed-typst,airgap-detection --target=${{ matrix.target.name }}
       - name: Attest build provenance
         uses: actions/attest-build-provenance@v3
         with:
           subject-path: ${{ matrix.target.binary }}
       - uses: actions/upload-artifact@v4
         with:
-          name: abacus-${{ matrix.target.os }}
+          name: abacus-release-${{ matrix.target.os }}
           path: ${{ matrix.target.binary }}
 
   playwright-e2e:
@@ -81,10 +109,12 @@ jobs:
     defaults:
       run:
         working-directory: frontend
+    env:
+      RELEASE_BUILD: true
     steps:
       - uses: actions/checkout@v5
       - name: Setup Node
-        uses: actions/setup-node@v5
+        uses: actions/setup-node@v6
         with:
           node-version: 22
       - name: Install dependencies
@@ -94,15 +124,13 @@ jobs:
       - name: Download abacus
         uses: actions/download-artifact@v5
         with:
-          name: abacus-${{ matrix.os }}
+          name: abacus-${{ matrix.os }}-no-airgap-detection
           path: builds/backend
       - name: make backend build executable
         run: chmod a+x ../builds/backend/abacus
         if: runner.os != 'Windows'
       - name: Run Playwright e2e tests
         run: npm run test:e2e
-        env:
-          BACKEND_BUILD: release
       - name: Upload Playwright report
         uses: actions/upload-artifact@v4
         if: ${{ !cancelled() }}
@@ -137,14 +165,14 @@ jobs:
       - name: Download abacus
         uses: actions/download-artifact@v5
         with:
-          pattern: abacus-*
+          pattern: abacus-release-*
           path: release/
       - name: Rename binary
         run: |
-          mv abacus-ubuntu-latest/abacus abacus-linux-${{ env.TAG}}
-          mv abacus-macos-latest/abacus abacus-macos-${{ env.TAG}}
-          mv abacus-windows-latest/abacus.exe abacus-windows-${{ env.TAG}}.exe
-          rmdir abacus-ubuntu-latest abacus-macos-latest abacus-windows-latest
+          mv abacus-release-ubuntu-latest/abacus abacus-linux-${{ env.TAG}}
+          mv abacus-release-macos-latest/abacus abacus-macos-${{ env.TAG}}
+          mv abacus-release-windows-latest/abacus.exe abacus-windows-${{ env.TAG}}.exe
+          rmdir abacus-release-ubuntu-latest abacus-release-macos-latest abacus-release-windows-latest
         working-directory: release
       - name: Create a SHA256SUMS file
         run: sha256sum -b * > SHA256SUMS
@@ -154,7 +182,7 @@ jobs:
       - name: Push git tag
         run: git push origin $TAG
       - name: Release
-        uses: softprops/action-gh-release@6cbd405e2c4e67a21c47fa9e383d020e4e28b836 # v2
+        uses: softprops/action-gh-release@6da8fa9354ddfdc4aeace5fc48d7f679b5214090 # v2
         with:
           body: This is an alpha release of Abacus, commit ${{ github.sha }} on ${{ env.BUILD_DATE }}
           tag_name: ${{ env.TAG }}
@@ -165,7 +193,7 @@ jobs:
           name: Version ${{ env.TAG }}
 
   deploy:
-    name: Deploy to abacus-test.nl
+    name: Deploy to abacus-test.nl, without airgap detection
     needs:
       - build
       - release
@@ -180,7 +208,7 @@ jobs:
       - name: Download abacus
         uses: actions/download-artifact@v5
         with:
-          name: abacus-ubuntu-latest
+          name: abacus-ubuntu-latest-no-airgap-detection
       - name: Upload binary to test server
         run: |
           curl -s -v \

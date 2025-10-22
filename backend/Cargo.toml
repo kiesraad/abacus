@@ -13,6 +13,7 @@ memory-serve = ["dep:memory-serve"]
 embed-typst = ["dep:typst", "dep:typst-pdf"]
 dev-database = []
 airgap-detection = []
+storybook = ["dep:memory-serve"]
 
 [[bin]]
 name = "gen-openapi"
@@ -40,7 +41,7 @@ clap = { version = "4.5", default-features = false, features = [
 ] }
 hyper = { version = "1", features = ["full"] }
 tokio = { version = "1", features = ["full"] }
-memory-serve = { version = "1.2.1", optional = true, features = [
+memory-serve = { version = "1.2.2", optional = true, features = [
     "force-embed",
 ] }
 utoipa = { version = "5.4.0", features = ["axum_extras"] }

@@ -78,15 +78,11 @@ function ElectionManagementLinks({ location }: NavBarLinksProps) {
   );
 }
 
-function TopLevelManagementLinks({ isAdministrator }: { isAdministrator: boolean }) {
+function TopLevelManagementLinks() {
   return (
     <>
       <NavLink to={"/elections"}>{t("election.title.plural")}</NavLink>
-      {isAdministrator && (
-        <>
-          <NavLink to={"/users"}>{t("users.users")}</NavLink>
-        </>
-      )}
+      <NavLink to={"/users"}>{t("users.users")}</NavLink>
       <NavLink to={"/logs"}>{t("logs")}</NavLink>
     </>
   );
@@ -101,7 +97,7 @@ export function NavBarLinks({ location }: NavBarLinksProps) {
     location.pathname.startsWith("/users") ||
     location.pathname === "/logs"
   ) {
-    return <TopLevelManagementLinks isAdministrator={isAdministrator} />;
+    return <TopLevelManagementLinks />;
   }
 
   if (location.pathname.match(/^\/elections\/\d+\/data-entry/)) {

@@ -3,7 +3,9 @@ import * as ReactRouter from "react-router";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
 import { ElectionProvider } from "@/hooks/election/ElectionProvider";
+import { MessagesProvider } from "@/hooks/messages/MessagesProvider";
 import { electionMockData } from "@/testing/api-mocks/ElectionMockData";
+import { pollingStationMockData } from "@/testing/api-mocks/PollingStationMockData";
 import { ElectionRequestHandler, PollingStationDataEntryClaimHandler } from "@/testing/api-mocks/RequestHandlers";
 import { validationResultMockData } from "@/testing/api-mocks/ValidationResultMockData";
 import { server } from "@/testing/server";
@@ -19,9 +21,11 @@ import { DataEntryProvider } from "./DataEntryProvider";
 function renderForm() {
   return render(
     <ElectionProvider electionId={1}>
-      <DataEntryProvider election={electionMockData} pollingStationId={1} entryNumber={1}>
-        <DataEntryProgress />
-      </DataEntryProvider>
+      <MessagesProvider>
+        <DataEntryProvider election={electionMockData} pollingStation={pollingStationMockData[0]!} entryNumber={1}>
+          <DataEntryProgress />
+        </DataEntryProvider>
+      </MessagesProvider>
     </ElectionProvider>,
   );
 }

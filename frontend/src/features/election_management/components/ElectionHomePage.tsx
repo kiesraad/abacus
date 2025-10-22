@@ -2,8 +2,7 @@ import { useEffect, useState } from "react";
 import { Link, Location, Navigate, useLocation, useNavigate } from "react-router";
 
 import { DEFAULT_CANCEL_REASON } from "@/api/ApiClient";
-import { AnyApiError, isSuccess } from "@/api/ApiResult";
-import { useApiClient } from "@/api/useApiClient";
+import { useCrud } from "@/api/useCrud";
 import { Footer } from "@/components/footer/Footer";
 import { IconTrash } from "@/components/generated/icons";
 import { PageTitle } from "@/components/page_title/PageTitle";
@@ -32,7 +31,6 @@ interface ShowDeleteModalState {
 }
 
 export function ElectionHomePage() {
-  const client = useApiClient();
   // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
   const location = useLocation() as Location<null | ShowDeleteModalState>;
   const navigate = useNavigate();
@@ -40,69 +38,43 @@ export function ElectionHomePage() {
     useElection();
   const { isTypist, isCoordinator } = useUserRole();
   const [showAddCommitteeSessionModal, setShowAddCommitteeSessionModal] = useState(false);
-  const [createCommitteeSessionError, setCreateCommitteeSessionError] = useState<AnyApiError | null>(null);
-  const [deleteCommitteeSessionError, setDeleteCommitteeSessionError] = useState<AnyApiError | null>(null);
-
-  if (createCommitteeSessionError) {
-    throw createCommitteeSessionError;
-  }
-
-  if (deleteCommitteeSessionError) {
-    throw deleteCommitteeSessionError;
-  }
+  const isFirstCommitteeSession = currentCommitteeSession.number === 1;
+  const createPath: COMMITTEE_SESSION_CREATE_REQUEST_PATH = `/api/committee_sessions`;
+  const removePath: COMMITTEE_SESSION_DELETE_REQUEST_PATH = `/api/committee_sessions/${currentCommitteeSession.id}`;
+  const { create, remove } = useCrud({ createPath, removePath, throwAllErrors: true });
 
   // re-fetch election when component mounts
   useEffect(() => {
     const abortController = new AbortController();
-
     void refetch(abortController);
-
     return () => {
       abortController.abort(DEFAULT_CANCEL_REASON);
     };
   }, [refetch]);
-
-  const isFirstCommitteeSession = currentCommitteeSession.number === 1;
-
-  if (isTypist) {
-    return <Navigate to="data-entry" />;
-  }
 
   function toggleAddCommitteeSessionModal() {
     setShowAddCommitteeSessionModal(!showAddCommitteeSessionModal);
   }
 
   function handleCommitteeSessionCreate() {
-    const url: COMMITTEE_SESSION_CREATE_REQUEST_PATH = `/api/committee_sessions`;
     const body: COMMITTEE_SESSION_CREATE_REQUEST_BODY = { election_id: election.id };
-    void client
-      .postRequest(url, body)
-      .then(async (result) => {
-        if (isSuccess(result)) {
-          await refetch();
-        } else {
-          throw result;
-        }
-      })
-      .catch(setCreateCommitteeSessionError);
+    void create(body).then(() => {
+      void refetch();
+    });
+  }
+
+  function handleCommitteeSessionDelete() {
+    void remove().then(() => {
+      void refetch();
+    });
   }
 
   function toggleDeleteCommitteeSessionModal() {
     void navigate(".", { replace: true });
   }
 
-  function handleCommitteeSessionDelete() {
-    const url: COMMITTEE_SESSION_DELETE_REQUEST_PATH = `/api/committee_sessions/${currentCommitteeSession.id}`;
-    void client
-      .deleteRequest(url)
-      .then(async (result) => {
-        if (isSuccess(result)) {
-          await refetch();
-        } else {
-          throw result;
-        }
-      })
-      .catch(setDeleteCommitteeSessionError);
+  if (isTypist) {
+    return <Navigate to="data-entry" />;
   }
 
   return (
@@ -193,7 +165,7 @@ export function ElectionHomePage() {
             <div>
               <h2>
                 {/* TODO: Change to conditional GSB/HSB/CSB when implemented */}
-                {t("GSB")} {election.domain_id} {election.location}
+                {t("GSB")} {election.location}
               </h2>
             </div>
           </div>
@@ -203,7 +175,7 @@ export function ElectionHomePage() {
                 <CommitteeSessionCard
                   key={committeeSession.id}
                   committeeSession={committeeSession}
-                  currentSession={index === 0}
+                  isCurrentSession={index === 0}
                 />
               ))}
             </div>

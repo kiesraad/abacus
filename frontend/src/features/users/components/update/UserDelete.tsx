@@ -16,7 +16,8 @@ interface UserDeleteProps {
 
 export function UserDelete({ user, onDeleted, onError }: UserDeleteProps) {
   const [showModal, setShowModal] = useState(false);
-  const { remove, requestState } = useCrud<User>(`/api/user/${user.id}` satisfies USER_DELETE_REQUEST_PATH);
+  const removePath: USER_DELETE_REQUEST_PATH = `/api/user/${user.id}`;
+  const { remove, isLoading } = useCrud<User>({ removePath });
 
   function toggleModal() {
     setShowModal(!showModal);
@@ -24,16 +25,14 @@ export function UserDelete({ user, onDeleted, onError }: UserDeleteProps) {
 
   function handleDelete() {
     void remove().then((result) => {
-      if (!isSuccess(result)) {
+      if (isSuccess(result)) {
+        onDeleted();
+      } else {
         onError(result);
         setShowModal(false);
-      } else {
-        onDeleted();
       }
     });
   }
-
-  const deleting = requestState.status === "loading";
 
   return (
     <div className="mt-md">
@@ -50,11 +49,11 @@ export function UserDelete({ user, onDeleted, onError }: UserDeleteProps) {
               variant="primary-destructive"
               size="xl"
               onClick={handleDelete}
-              disabled={deleting}
+              disabled={isLoading}
             >
               {t("delete")}
             </Button>
-            <Button variant="secondary" size="xl" onClick={toggleModal} disabled={deleting}>
+            <Button variant="secondary" size="xl" onClick={toggleModal} disabled={isLoading}>
               {t("cancel")}
             </Button>
           </nav>

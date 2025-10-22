@@ -1,9 +1,6 @@
 mod model_n_10_2;
-
 mod model_na_14_2;
-
 mod model_na_31_2;
-
 mod model_p_2a;
 
 use std::{error::Error, path::PathBuf};
@@ -12,6 +9,8 @@ pub use model_n_10_2::*;
 pub use model_na_14_2::*;
 pub use model_na_31_2::*;
 pub use model_p_2a::*;
+
+use crate::pdf_gen::filter_input::replace_unsupported_glyphs;
 
 pub trait ToPdfFileModel {
     fn to_pdf_file_model(self, file_name: String) -> PdfFileModel;
@@ -36,6 +35,8 @@ pub enum PdfModel {
     ModelNa31_2Bijlage1(Box<ModelNa31_2Bijlage1Input>),
     ModelN10_2(Box<ModelN10_2Input>),
     ModelP2a(Box<ModelP2aInput>),
+    #[cfg(test)]
+    TeletexTest(),
 }
 
 impl PdfModel {
@@ -48,6 +49,8 @@ impl PdfModel {
             Self::ModelNa31_2Bijlage1(_) => "model-na-31-2-bijlage1",
             Self::ModelN10_2(_) => "model-n-10-2",
             Self::ModelP2a(_) => "model-p-2a",
+            #[cfg(test)]
+            Self::TeletexTest() => "teletex-test",
         }
     }
 
@@ -76,9 +79,13 @@ impl PdfModel {
             Self::ModelNa31_2Bijlage1(input) => serde_json::to_string(input),
             Self::ModelN10_2(input) => serde_json::to_string(input),
             Self::ModelP2a(input) => serde_json::to_string(input),
+            #[cfg(test)]
+            Self::TeletexTest() => {
+                Ok(include_str!("../../../templates/inputs/teletex-test.json").to_string())
+            }
         }?;
 
-        Ok(data)
+        Ok(replace_unsupported_glyphs(data))
     }
 
     pub fn from_name_with_input(name: &str, input: &str) -> Result<PdfModel, Box<dyn Error>> {

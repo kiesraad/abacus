@@ -53,7 +53,7 @@ pub async fn generate_pdfs(
 
 fn get_pdf_options() -> PdfOptions<'static> {
     PdfOptions {
-        standards: PdfStandards::new(&[PdfStandard::V_1_7]).expect("PDF standards should be valid"),
+        standards: PdfStandards::new(&[PdfStandard::A_2b]).expect("PDF standards should be valid"),
         ..Default::default()
     }
 }

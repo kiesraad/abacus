@@ -96,16 +96,31 @@ pub(crate) mod tests {
     }
 
     #[test(tokio::test)]
-    async fn it_generates_a_pdf_with_special_characters() {
+    async fn the_default_font_supports_teletex_chars() {
+        // See backend/templates/inputs/teletex-test.json for the list of characters that are expected to be supported.
+        let input = (32..127)
+            .map(|codepoint| char::from_u32(codepoint).unwrap())
+            .collect::<String>();
+
+        let filtered_input = filter_input::replace_unsupported_glyphs(input.clone());
+        assert_eq!(input, filtered_input);
+
+        let input = (161..383)
+            .map(|codepoint| char::from_u32(codepoint).unwrap())
+            .collect::<String>();
+
+        let filtered_input = filter_input::replace_unsupported_glyphs(input.clone());
+        assert_eq!(input, filtered_input);
+    }
+
+    #[test(tokio::test)]
+    async fn it_generates_a_pdf_with_teletex_chars() {
         let content = generate_pdf(PdfFileModel {
             file_name: "file.pdf".into(),
             model: PdfModel::TeletexTest(),
         })
         .await
         .unwrap();
-
-        // write to file
-        // std::fs::write("file.pdf", &content.buffer).unwrap();
 
         assert!(!content.buffer.is_empty());
     }

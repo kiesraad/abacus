@@ -10,7 +10,7 @@ pub use model_na_14_2::*;
 pub use model_na_31_2::*;
 pub use model_p_2a::*;
 
-use crate::pdf_gen::filter_input::replace_unsupported_glyphs;
+use super::filter_input::replace_unsupported_glyphs;
 
 pub trait ToPdfFileModel {
     fn to_pdf_file_model(self, file_name: String) -> PdfFileModel;

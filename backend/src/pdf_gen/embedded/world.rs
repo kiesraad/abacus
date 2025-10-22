@@ -9,7 +9,7 @@ use typst::{
     utils::LazyHash,
 };
 
-use crate::pdf_gen::{PdfGenError, models::PdfModel};
+use super::{PdfGenError, PdfModel};
 
 /// Contains the context for rendering PDFs.
 #[derive(Clone)]
@@ -53,7 +53,7 @@ impl PdfWorld {
     ///
     /// The input model defines which template is being used and what the input
     /// for that template is.
-    pub fn set_input_model(&mut self, input: PdfModel) -> Result<(), PdfGenError> {
+    pub fn set_input_model(&mut self, input: PdfModel) -> Result<(), super::PdfGenError> {
         let main_source_path = input.as_template_path();
         let Some(main_source) = self
             .sources
@@ -202,7 +202,6 @@ fn load_fonts() -> (Vec<Font>, FontBook) {
     include_font!("DM_Sans/DMSans-ExtraBoldItalic.ttf");
     include_font!("DM_Sans/DMSans-Italic.ttf");
     include_font!("DM_Sans/DMSans-Regular.ttf");
-    include_font!("Arial/Arial.ttf");
     include_font!("Geist_Mono/GeistMono-Regular.otf");
 
     (fonts, fontbook)

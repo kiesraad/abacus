@@ -47,14 +47,18 @@ __Hoofdscenario:__
 5. De beheerder bevestigt het aantal kiesgerechtigden in de gemeente.
 6. De applicatie maakt de verkiezing GSB, de verkiezing CSB, en het GSB als stembureau voor het CSB aan.
 
-__Uitbreidingen:__
-2a. De applicatie geeft een foutmelding bij het inlezen van de kandidatenlijsten:
+__Uitbreidingen:__  
+2a. De applicatie geeft een foutmelding bij het inlezen van de kandidatenlijsten (EML 230b):  
+&emsp; 2a1. De beheerder stelt vast dat die het verkeerde bestand heeft ingelezen.  
+&emsp;&emsp; 2a1a. De beheerder stelt vast dat het bestand geen geldige kandidatenlijsten bevat:  
+&emsp;&emsp;&emsp; 2a1a1. De beheerder neemt contact op met het CSB.  
+&emsp; 2a2. De beheer leest het correcte bestand in.
 
 3a. De beheerder slaat het invoeren van stembureaus over:  
 &emsp; 3a1. (tijdens stap 5) De beheerder voert het aantal kiesgerechtigden in de gemeente handmatig in.  
 &emsp; 3a2. (na inrichten applicatie) [De beheerder of coördinator zet de stembureaus in de applicatie.](#de-beheerder-of-coördinator-zet-de-stembureaus-in-de-applicatie-zee)
 
-5b. Het aantal kiesgerechtigden stond niet in het EML-bestand met stembureaus:  
+5b. Het aantal kiesgerechtigden staat niet in het bestand met stembureaus (EML 110b):  
 &emsp; 5b1. De beheerder voert het aantal kiesgerechtigden handmatig in.
 
 ### Niet in scope
@@ -66,14 +70,22 @@ __Uitbreidingen:__
 
 __Niveau:__ subfunctie, vis, 🐟
 
-__Hoofscenario:__
+__Hoofdscenario:__
 1. De beheerder leest de verkiezingsdefinitie (EML 110a) in.
 2. De beheerder stelt vast dat de hash van de verkiezingsdefinitie klopt.
 
 __Uitbreidingen:__  
-1a. De applicatie geeft een foutmelding bij het inlezen van de verkiezingsdefinitie:
+1a. De applicatie geeft een foutmelding bij het inlezen van de verkiezingsdefinitie (EML 110a):  
+&emsp; 1a1. De beheerder stelt vast dat die het verkeerde bestand heeft ingelezen.  
+&emsp;&emsp; 1a1a. De beheerder stelt vast dat het bestand geen geldige verkiezingsdefinitie bevat:  
+&emsp;&emsp;&emsp; 1a1a1. De beheerder neemt contact op met het CSB.  
+&emsp; 1a2. De beheer leest het correcte bestand in.
 
-2a. De hash van de verkiezingsdefinitie klopt niet:
+2a. De hash van de verkiezingsdefinitie (EML 110a) klopt niet:  
+&emsp; 2a1. De beheerder stelt vast dat die de hash niet correct heeft overgenomen.  
+&emsp;&emsp; 2a1a. De beheerder stelt vast dat die de hash correct heeft overgenomen.  
+&emsp;&emsp;&emsp; 2a1a. De beheerder neemt contact op met het CSB.  
+&emsp; 2a2. De beheerder corrigeert de ingevoerde hash.
 
 
 ## De beheerder leest het bestand met stembureaus en aantal kiesgerechtigden (EML 110b) in (vis)
@@ -88,7 +100,11 @@ __Hoofdscenario:__
 3. De beheerder stelt vast dat de stembureaus in de applicatie kloppen met de door de gemeente vooraf gepubliceerde lijst.
 
 __Uitbreidingen:__  
-2a. De applicatie geeft een foutmelding bij het inlezen van de lijst met stembureaus:
+2a. De applicatie geeft een foutmelding bij het inlezen van de lijst met stembureaus (EML 110b):  
+&emsp; 2a1. De beheerder stelt vast dat die het verkeerde bestand heeft ingelezen.  
+&emsp;&emsp; 2a1a. De beheerder stelt vast dat het bestand geen geldige lijst met stembureaus bevat:  
+&emsp;&emsp;&emsp; 2a1a1. De beheerder neemt contact op met de aanleveraar van het bestand.  
+&emsp; 2a2. De beheer leest het correcte bestand in.
 
 3a. De stembureaus in de applicatie komen niet overeen met de vooraf gepubliceerde lijst:  
 &emsp; 3a1. De beheerder past de stembureaus aan.

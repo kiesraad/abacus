@@ -177,6 +177,28 @@ The Swagger UI is available at [/api-docs](http://localhost:8080/api-docs).
 To update `openapi.json` in the repository, run the command `cargo run --bin gen-openapi`.
 
 ### Test data generation
+
 You can fill the database with test data and (optionally) export the election definition files with `gen-test-election.rs`.
 
 Run `cargo run --bin gen-test-election -- --help` to see all command-line options.
+
+### Binary usage
+
+The abacus binary sopports a few arguments, which can be passed on the command line, or as environment variables:
+
+```
+Options:
+  -p, --port <PORT>          Server port, optional [env: ABACUS_PORT=] [default: 8080]
+  -d, --database <DATABASE>  Location of the database file, will be created if it doesn't exist [env: ABACUS_DATABASE=] [default: db.sqlite]
+  -a, --airgap-detection     Enable airgap detection [env: ABACUS_AIRGAP_DETECTION=]
+  -h, --help                 Print help
+```
+
+Note that airgap-detection is forced in our (pre-)releases.
+
+A development build also supports the following arguments:
+
+```
+  -s, --seed-data            Seed the database with initial data using the fixtures [env: ABACUS_SEED_DATA=]
+  -r, --reset-database       Reset the database [env: ABACUS_RESET_DATABASE=]
+```

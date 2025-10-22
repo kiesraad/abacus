@@ -14,9 +14,7 @@ use super::{
     CSONextSessionResults, CommonPollingStationResults, DataEntryStatusResponse, DataError,
     PollingStationDataEntry, PollingStationResults, ValidationResults,
     entry_number::EntryNumber,
-    repository::{
-        delete_data_entry, delete_result, get_data_entry, most_recent_results_for_polling_station,
-    },
+    repository::{delete_data_entry, delete_result, get_data_entry},
     status::{
         ClientState, CurrentDataEntry, DataEntryStatus, DataEntryStatusName,
         DataEntryTransitionError, EntriesDifferent, FirstEntryHasErrors,
@@ -28,6 +26,7 @@ use crate::{
     audit_log::{AuditEvent, AuditService},
     authentication::{Coordinator, Role, Typist, User, error::AuthenticationError},
     committee_session::{CommitteeSession, CommitteeSessionError, status::CommitteeSessionStatus},
+    data_entry::repository::previous_results_for_polling_station,
     election::{ElectionWithPoliticalGroups, PoliticalGroup},
     error::{ErrorReference, ErrorResponse},
     investigation::get_polling_station_investigation,
@@ -268,8 +267,8 @@ async fn polling_station_data_entry_claim(
     let (polling_station, election, committee_session, state) =
         validate_and_get_data(&mut tx, polling_station_id, &user.0).await?;
 
-    let previous_results = if let Some(id) = polling_station.id_prev_session {
-        most_recent_results_for_polling_station(&mut tx, id).await?
+    let previous_results = if polling_station.id_prev_session.is_some() {
+        Some(previous_results_for_polling_station(&mut tx, polling_station_id).await?)
     } else {
         None
     };
@@ -902,18 +901,16 @@ mod tests {
     use crate::{
         authentication::Role,
         committee_session::{
-            status::CommitteeSessionStatus,
-            tests::{change_status_committee_session, create_committee_session},
+            status::CommitteeSessionStatus, tests::change_status_committee_session,
         },
         data_entry::{
-            CSOFirstSessionResults, CountingDifferencesPollingStation,
-            DifferenceCountsCompareVotesCastAdmittedVoters, DifferencesCounts, ExtraInvestigation,
-            PoliticalGroupCandidateVotes, PoliticalGroupTotalVotes, VotersCounts, VotesCounts,
-            YesNo,
-            repository::{data_entry_exists, insert_test_result},
+            CSOFirstSessionResults, DifferenceCountsCompareVotesCastAdmittedVoters,
+            DifferencesCounts, PoliticalGroupCandidateVotes, PoliticalGroupTotalVotes,
+            VotersCounts, VotesCounts, YesNo, repository::data_entry_exists,
             structs::tests::ValidDefault,
         },
         investigation::insert_test_investigation,
+        polling_station::repository::insert_test_polling_station,
     };
 
     fn example_data_entry() -> DataEntry {
@@ -1302,44 +1299,21 @@ mod tests {
         assert_ne!(state.first_entry, request_body.data);
     }
 
-    #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
+    #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_5_with_results"))))]
     async fn test_create_data_entry_uniqueness(pool: SqlitePool) {
-        let response = claim(pool.clone(), 1, EntryNumber::FirstEntry).await;
-        assert_eq!(response.status(), StatusCode::OK);
-
-        // Check if a row was created
         let mut conn = pool.acquire().await.unwrap();
-        assert!(data_entry_exists(&mut conn, 1).await.unwrap());
 
-        // Create a new committee session and set status to DataEntryInProgress
-        let committee_session: CommitteeSession =
-            create_committee_session(pool.clone(), 2, 2, 2).await;
-        change_status_committee_session(
-            pool.clone(),
-            committee_session.id,
-            CommitteeSessionStatus::DataEntryInProgress,
-        )
-        .await;
-
-        // Claim the same polling station again
-        let response = claim(pool.clone(), 1, EntryNumber::FirstEntry).await;
-        assert_eq!(response.status(), StatusCode::NOT_FOUND);
-
-        let new_ps = crate::polling_station::repository::get_by_previous_id(&mut conn, 1)
+        // Add investigation with corrected_results to be able to claim the polling station
+        insert_test_investigation(&mut pool.acquire().await.unwrap(), 9, Some(true))
             .await
             .unwrap();
 
-        // Insert investigation for the new polling station
-        insert_test_investigation(&mut conn, new_ps.id, Some(true))
-            .await
-            .unwrap();
-
-        // Claim the same polling station again
-        let response = claim(pool.clone(), new_ps.id, EntryNumber::FirstEntry).await;
+        // Claim a polling station that had entries/a result in the previous committee session
+        let response = claim(pool.clone(), 9, EntryNumber::FirstEntry).await;
         assert_eq!(response.status(), StatusCode::OK);
 
         // Check that a new row was created
-        assert!(data_entry_exists(&mut conn, new_ps.id).await.unwrap());
+        assert!(data_entry_exists(&mut conn, 9).await.unwrap());
 
         // Check that the new data entry is linked to the new committee session
         let data = query_as!(
@@ -1356,8 +1330,8 @@ mod tests {
         .fetch_all(&pool)
         .await
         .expect("No data found");
-        assert_eq!(data[0].committee_session_id, 2);
-        assert_eq!(data[1].committee_session_id, committee_session.id);
+        assert_eq!(data[0].committee_session_id, 5);
+        assert_eq!(data[1].committee_session_id, 6);
     }
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
@@ -1899,55 +1873,6 @@ mod tests {
         assert!(matches!(status, DataEntryStatus::EntriesDifferent(_)));
     }
 
-    async fn add_results(
-        pool: &SqlitePool,
-        polling_station_id: u32,
-        committee_session_id: u32,
-        political_groups: &[PoliticalGroup],
-        is_first_session: bool,
-    ) {
-        let mut results = if is_first_session {
-            PollingStationResults::CSOFirstSession(CSOFirstSessionResults {
-                extra_investigation: ExtraInvestigation::default(),
-                counting_differences_polling_station: CountingDifferencesPollingStation::default(),
-                voters_counts: VotersCounts::default(),
-                votes_counts: VotesCounts {
-                    political_group_total_votes:
-                        PollingStationResults::default_political_group_total_votes(political_groups),
-                    ..VotesCounts::default()
-                },
-                differences_counts: DifferencesCounts::default(),
-                political_group_votes: PollingStationResults::default_political_group_votes(
-                    political_groups,
-                ),
-            })
-        } else {
-            PollingStationResults::CSONextSession(CSONextSessionResults {
-                voters_counts: VotersCounts::default(),
-                votes_counts: VotesCounts {
-                    political_group_total_votes:
-                        PollingStationResults::default_political_group_total_votes(political_groups),
-                    ..VotesCounts::default()
-                },
-                differences_counts: DifferencesCounts::default(),
-                political_group_votes: PollingStationResults::default_political_group_votes(
-                    political_groups,
-                ),
-            })
-        };
-        results.voters_counts_mut().poll_card_count = polling_station_id;
-
-        let mut conn = pool.acquire().await.unwrap();
-        insert_test_result(
-            &mut conn,
-            polling_station_id,
-            committee_session_id,
-            &results,
-        )
-        .await
-        .unwrap()
-    }
-
     async fn claim_previous_results(
         pool: SqlitePool,
         polling_station_id: u32,
@@ -1962,81 +1887,30 @@ mod tests {
     /// No previous results, should return none
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_7_four_sessions"))))]
     async fn test_previous_results_none(pool: SqlitePool) {
-        // Add investigation with corrected_results to be able to claim the polling station
-        insert_test_investigation(&mut pool.acquire().await.unwrap(), 741, Some(true))
+        // Add new polling station
+        insert_test_polling_station(&mut pool.acquire().await.unwrap(), 743, 704, None, 123)
             .await
             .unwrap();
-
-        assert!(claim_previous_results(pool.clone(), 741).await.is_none());
-    }
-
-    /// Only a result from committee session 1, should return 1
-    #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_7_four_sessions"))))]
-    async fn test_previous_results_from_first_session(pool: SqlitePool) {
-        let election = crate::election::repository::get(&mut pool.acquire().await.unwrap(), 7)
-            .await
-            .unwrap();
-        add_results(&pool, 711, 701, &election.political_groups, true).await;
 
         // Add investigation with corrected_results to be able to claim the polling station
-        insert_test_investigation(&mut pool.acquire().await.unwrap(), 741, Some(true))
+        insert_test_investigation(&mut pool.acquire().await.unwrap(), 743, Some(true))
             .await
             .unwrap();
 
-        let previous_results = claim_previous_results(pool.clone(), 741).await.unwrap();
-        assert_eq!(previous_results.voters_counts.poll_card_count, 711);
+        assert!(claim_previous_results(pool.clone(), 743).await.is_none());
     }
 
-    /// Results from committee session 1 and 3, with a gap in between, should return 3
+    /// Should get result from third session, even though there were also results in the first session
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_7_four_sessions"))))]
-    async fn test_previous_results_with_session_gap(pool: SqlitePool) {
-        let election = crate::election::repository::get(&mut pool.acquire().await.unwrap(), 7)
-            .await
-            .unwrap();
-        add_results(&pool, 711, 701, &election.political_groups, true).await;
-        add_results(&pool, 731, 703, &election.political_groups, false).await;
-
-        // Add investigation with corrected_results to be able to claim the polling station
-        insert_test_investigation(&mut pool.acquire().await.unwrap(), 741, Some(true))
-            .await
-            .unwrap();
-
-        let previous_results = claim_previous_results(pool.clone(), 741).await.unwrap();
-        assert_eq!(previous_results.voters_counts.poll_card_count, 731);
-    }
-
-    /// Results with only one in committee session 2, should return 2
-    #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_7_four_sessions"))))]
-    async fn test_previous_results_from_second_session(pool: SqlitePool) {
-        let election = crate::election::repository::get(&mut pool.acquire().await.unwrap(), 7)
-            .await
-            .unwrap();
-        add_results(&pool, 722, 702, &election.political_groups, false).await;
-
+    async fn test_previous_results(pool: SqlitePool) {
         // Add investigation with corrected_results to be able to claim the polling station
         insert_test_investigation(&mut pool.acquire().await.unwrap(), 742, Some(true))
             .await
             .unwrap();
 
         let previous_results = claim_previous_results(pool.clone(), 742).await.unwrap();
-        assert_eq!(previous_results.voters_counts.poll_card_count, 722);
-    }
-
-    /// Two subsequent results from committee sessions 2 and 3, should return 3rd
-    #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_7_four_sessions"))))]
-    async fn test_previous_results_from_last_two_sessions(pool: SqlitePool) {
-        let election = crate::election::repository::get(&mut pool.acquire().await.unwrap(), 7)
-            .await
-            .unwrap();
-        add_results(&pool, 732, 703, &election.political_groups, false).await;
-
-        // Add investigation with corrected_results to be able to claim the polling station
-        insert_test_investigation(&mut pool.acquire().await.unwrap(), 742, Some(true))
-            .await
-            .unwrap();
-
-        let previous_results = claim_previous_results(pool.clone(), 742).await.unwrap();
-        assert_eq!(previous_results.voters_counts.poll_card_count, 732);
+        // Check by difference in fixture results data
+        assert_eq!(previous_results.voters_counts.proxy_certificate_count, 4);
     }
 
     /// First committee session, should return all polling station statuses

@@ -26,7 +26,7 @@ use crate::{
     },
     data_entry::{
         PollingStationResults, delete_data_entry_and_result_for_polling_station,
-        repository::{data_entry_exists, most_recent_results_for_polling_station, result_exists},
+        repository::{data_entry_exists, previous_results_for_polling_station, result_exists},
     },
     election::ElectionWithPoliticalGroups,
     error::ErrorReference,
@@ -166,6 +166,16 @@ async fn polling_station_investigation_conclude(
 
     let committee_session = validate_and_get_committee_session(&mut tx, polling_station_id).await?;
 
+    let polling_station =
+        crate::polling_station::repository::get(&mut tx, polling_station_id).await?;
+    if polling_station.id_prev_session.is_none() && !polling_station_investigation.corrected_results
+    {
+        return Err(APIError::Conflict(
+            "Investigation requires corrected results, because the polling station is not part of a previous session".into(),
+            ErrorReference::InvestigationRequiresCorrectedResults,
+        ));
+    }
+
     let investigation = conclude_polling_station_investigation(
         &mut tx,
         polling_station_id,
@@ -225,6 +235,17 @@ async fn polling_station_investigation_update(
     let mut tx = pool.begin_immediate().await?;
 
     let committee_session = validate_and_get_committee_session(&mut tx, polling_station_id).await?;
+
+    let polling_station =
+        crate::polling_station::repository::get(&mut tx, polling_station_id).await?;
+    if polling_station.id_prev_session.is_none()
+        && polling_station_investigation.corrected_results != Some(true)
+    {
+        return Err(APIError::Conflict(
+            "Investigation requires corrected results, because it is not part of a previous session".into(),
+            ErrorReference::InvestigationRequiresCorrectedResults,
+        ));
+    }
 
     // If corrected_results is changed from yes to no, check if there are data entries or results.
     // If deleting them is accepted, delete them. If not, return an error.
@@ -400,16 +421,19 @@ async fn polling_station_investigation_download_corrigendum_pdf(
     let election: ElectionWithPoliticalGroups =
         crate::election::repository::get(&mut conn, polling_station.election_id).await?;
 
-    let previous_results = if let Some(id) = polling_station.id_prev_session {
-        let Some(results) = most_recent_results_for_polling_station(&mut conn, id).await? else {
-            return Err(APIError::NotFound(
-                "Previous results not found for the current polling station".to_string(),
-                ErrorReference::EntryNotFound,
-            ));
-        };
-        results
-    } else {
-        PollingStationResults::empty_cso_first_session(&election.political_groups)
+    let previous_results = match polling_station.id_prev_session {
+        Some(_) => {
+            match previous_results_for_polling_station(&mut conn, polling_station_id).await {
+                Ok(results) => results,
+                Err(_) => {
+                    return Err(APIError::NotFound(
+                        "Previous results not found for the current polling station".to_string(),
+                        ErrorReference::EntryNotFound,
+                    ));
+                }
+            }
+        }
+        None => PollingStationResults::empty_cso_first_session(&election.political_groups),
     };
 
     let name = format!(

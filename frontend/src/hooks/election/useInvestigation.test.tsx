@@ -1,0 +1,150 @@
+import { describe, expect, test } from "vitest";
+
+import { ElectionProvider } from "@/hooks/election/ElectionProvider";
+import { ElectionStatusProvider } from "@/hooks/election/ElectionStatusProvider";
+import { getElectionMockData, mockInvestigations } from "@/testing/api-mocks/ElectionMockData";
+import { pollingStationMockData } from "@/testing/api-mocks/PollingStationMockData";
+import { Providers } from "@/testing/Providers";
+import { overrideOnce } from "@/testing/server";
+import { renderHook, waitFor } from "@/testing/test-utils";
+import {
+  ElectionDetailsResponse,
+  ElectionStatusResponse,
+  PollingStationInvestigation,
+} from "@/types/generated/openapi";
+
+import useInvestigations from "./useInvestigations";
+
+function renderUseInvestigations() {
+  const { result } = renderHook(() => useInvestigations(), {
+    wrapper: ({ children }) => (
+      <Providers>
+        <ElectionProvider electionId={1}>
+          <ElectionStatusProvider electionId={1}>{children}</ElectionStatusProvider>
+        </ElectionProvider>
+      </Providers>
+    ),
+  });
+
+  return result;
+}
+
+describe("useInvestigations", () => {
+  test("Returns empty arrays for first committee session", async () => {
+    const firstSessionMockResponse = getElectionMockData({}, { number: 1 }, mockInvestigations);
+
+    overrideOnce("get", "/api/elections/1", 200, firstSessionMockResponse);
+    overrideOnce("get", "/api/elections/1/status", 200, {
+      statuses: [],
+    });
+
+    const result = renderUseInvestigations();
+
+    await waitFor(() => {
+      expect(result.current.investigations).toEqual([]);
+      expect(result.current.currentInvestigations).toEqual([]);
+      expect(result.current.handledInvestigations).toEqual([]);
+      expect(result.current.missingInvestigations).toEqual([]);
+    });
+  });
+
+  test("Categorizes investigations in current/handled", async () => {
+    const investigations: PollingStationInvestigation[] = [
+      {
+        // Should be current
+        polling_station_id: 1,
+        reason: "Reason 1",
+        findings: "Findings 1",
+        corrected_results: true,
+      },
+      {
+        // Should be handled
+        polling_station_id: 2,
+        reason: "Reason 2",
+        findings: "Findings 2",
+        corrected_results: false,
+      },
+      {
+        // Should be current
+        polling_station_id: 3,
+        reason: "Reason 3",
+      },
+      {
+        // Should be current
+        polling_station_id: 4,
+        reason: "Reason 4",
+        findings: "Findings 4",
+      },
+      {
+        // Should be current
+        polling_station_id: 5,
+        reason: "Reason 5",
+        corrected_results: false,
+      },
+    ];
+
+    overrideOnce("get", "/api/elections/1", 200, getElectionMockData({}, { number: 2 }, investigations));
+    overrideOnce("get", "/api/elections/1/status", 200, { statuses: [] });
+
+    const result = renderUseInvestigations();
+    await waitFor(() => {
+      expect(result.current.investigations).toHaveLength(5);
+
+      expect(result.current.currentInvestigations.map((i) => i.polling_station_id)).toEqual([1, 3, 4, 5]);
+      expect(result.current.handledInvestigations.map((i) => i.polling_station_id)).toEqual([2]);
+    });
+  });
+
+  test("Categorizes missing investigations", async () => {
+    // Initialize with new polling station without id_prev_session and no investigation
+    overrideOnce("get", "/api/elections/1", 200, {
+      ...getElectionMockData({}, { number: 2 }),
+      polling_stations: [
+        ...pollingStationMockData.slice(0, 3),
+        {
+          ...pollingStationMockData[4]!,
+          id: 123,
+          id_prev_session: undefined,
+        },
+      ],
+    } satisfies ElectionDetailsResponse);
+    overrideOnce("get", "/api/elections/1/status", 200, { statuses: [] });
+
+    const result = renderUseInvestigations();
+
+    await waitFor(() => {
+      expect(result.current.missingInvestigations).toHaveLength(1);
+      expect(result.current.missingInvestigations[0]?.id).toBe(123);
+    });
+  });
+
+  test("Includes correct polling station and status data", async () => {
+    overrideOnce(
+      "get",
+      "/api/elections/1",
+      200,
+      getElectionMockData({}, { number: 2 }, [
+        {
+          polling_station_id: 1,
+          reason: "Test investigation",
+        },
+      ]),
+    );
+    overrideOnce("get", "/api/elections/1/status", 200, {
+      statuses: [{ polling_station_id: 1, status: "second_entry_in_progress" }],
+    } satisfies ElectionStatusResponse);
+
+    const result = renderUseInvestigations();
+
+    await waitFor(() => {
+      expect(result.current.investigations).toHaveLength(1);
+
+      const investigation = result.current.investigations[0];
+      expect(investigation?.polling_station_id).toBe(1);
+      expect(investigation?.reason).toBe("Test investigation");
+      expect(investigation?.pollingStation).toBeDefined();
+      expect(investigation?.pollingStation.name).toBe("Op Rolletjes");
+      expect(investigation?.status).toBe("second_entry_in_progress");
+    });
+  });
+});

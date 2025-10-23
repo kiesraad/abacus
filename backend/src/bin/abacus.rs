@@ -13,25 +13,25 @@ use tracing_subscriber::EnvFilter;
 #[derive(Parser, Debug)]
 struct Args {
     /// Server port, optional
-    #[arg(short, long, default_value_t = 8080)]
+    #[arg(short, long, default_value_t = 8080, env = "ABACUS_PORT")]
     port: u16,
 
     /// Location of the database file, will be created if it doesn't exist
-    #[arg(short, long, default_value = "db.sqlite")]
+    #[arg(short, long, default_value = "db.sqlite", env = "ABACUS_DATABASE")]
     database: String,
 
     /// Seed the database with initial data using the fixtures
     #[cfg(feature = "dev-database")]
-    #[arg(short, long)]
+    #[arg(short, long, env = "ABACUS_SEED_DATA")]
     seed_data: bool,
 
     /// Reset the database
     #[cfg(feature = "dev-database")]
-    #[arg(short, long)]
+    #[arg(short, long, env = "ABACUS_RESET_DATABASE")]
     reset_database: bool,
 
     /// Enable airgap detection
-    #[arg(short, long)]
+    #[arg(short, long, env = "ABACUS_AIRGAP_DETECTION")]
     airgap_detection: bool,
 }
 

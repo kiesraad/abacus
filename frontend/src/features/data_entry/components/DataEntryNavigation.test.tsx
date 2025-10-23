@@ -20,15 +20,17 @@ function renderComponent(onSubmit: (options?: SubmitCurrentFormOptions) => Promi
     {
       path: "/",
       element: <ReactRouter.Navigate to={testPath} replace />,
+      handle: { public: true },
     },
     {
       path: "/elections/:electionId/data-entry/:pollingStationId/:entryNumber",
       element: <DataEntryNavigation onSubmit={onSubmit} />,
-      children: [{ path: "differences_counts", element: <div>Differences</div> }],
+      children: [{ path: "differences_counts", element: <div>Differences</div>, handle: { public: true } }],
     },
     {
       path: "/test",
       element: <div>Test</div>,
+      handle: { public: true },
     },
   ]);
 

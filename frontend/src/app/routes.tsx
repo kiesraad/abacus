@@ -34,13 +34,14 @@ export const routes: RouteObject[] = [
         index: true,
         path: "/",
         element: showDevPage ? <Navigate to="/dev" replace /> : <Navigate to="/account/login" replace />,
+        handle: { public: true },
       },
       { path: "account", children: accountRoutes },
       {
         path: "elections",
         Component: OverviewLayout,
         children: [
-          { index: true, Component: OverviewPage },
+          { index: true, Component: OverviewPage, handle: { roles: ["administrator", "coordinator", "typist"] } },
           { path: "create", children: electionCreateRoutes },
           {
             path: ":electionId",
@@ -95,6 +96,9 @@ export const routes: RouteObject[] = [
   },
   {
     path: "*",
-    element: <NotFoundPage message="error.not_found" path={window.location.pathname} />,
+    element: (
+      <NotFoundPage message="error.not_found" path={typeof window !== "undefined" ? window.location.pathname : "/"} />
+    ),
+    handle: { public: true },
   },
 ];

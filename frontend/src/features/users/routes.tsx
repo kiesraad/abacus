@@ -8,18 +8,19 @@ import { UserUpdatePage } from "./components/update/UserUpdatePage";
 import { UserListPage } from "./components/UserListPage";
 
 export const usersRoutes: RouteObject[] = [
-  { index: true, Component: UserListPage },
+  { index: true, Component: UserListPage, handle: { roles: ["administrator", "coordinator"] } },
   {
     path: "create",
     Component: UserCreateLayout,
     children: [
-      { index: true, Component: UserCreateRolePage },
-      { path: "type", Component: UserCreateTypePage },
-      { path: "details", Component: UserCreateDetailsPage },
+      { index: true, Component: UserCreateRolePage, handle: { roles: ["administrator", "coordinator"] } },
+      { path: "type", Component: UserCreateTypePage, handle: { roles: ["administrator", "coordinator"] } },
+      { path: "details", Component: UserCreateDetailsPage, handle: { roles: ["administrator", "coordinator"] } },
     ],
   },
   {
     path: ":userId/update",
     Component: UserUpdatePage,
+    handle: { roles: ["administrator", "coordinator"] },
   },
 ];

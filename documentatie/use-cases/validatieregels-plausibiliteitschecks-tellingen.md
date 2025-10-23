@@ -441,7 +441,7 @@ Velden markeren: geen (laat alleen foutmelding zien op de pagina)
 > - Controleer wat er fout is gegaan in rubriek 3.2 en herstel de fout.
 > - Pas zo nodig rubriek 3.3.2 aan, en volg de instructies over hertellen die daar staan.
 
-Velden markeren: totaal van de lijst, en E.{x} op Aantal kiezers en stemmen
+Velden markeren: totaal van de lijst
 
 #### DSO | F.453 (Als F.451 niet getoond wordt) `Totaal aantal stemmen op een lijst komt niet overeen met het lijsttotaal van corresponderende E.x`
 
@@ -453,7 +453,7 @@ Velden markeren: totaal van de lijst, en E.{x} op Aantal kiezers en stemmen
 > - Zo ja: maak een corrigendum en corrigeer daarin de optelfout. Corrigeer ook rubriek 2.3 in het corrigendum.
 > - Zo nee: tel de stembiljetten en het aantal toegelaten kiezers opnieuw. Begin bij deze lijst, en hertel tot de fout gevonden is, of alles één keer herteld is.
 
-Velden markeren: totaal van de lijst, en E.{x} op Aantal kiezers en stemmen
+Velden markeren: totaal van de lijst
 
 ## Plausibiliteitschecks geven waarschuwingen
 

@@ -78,10 +78,14 @@ export function InvestigationsOverviewPage() {
         <section>
           <h2>{t("investigations.from_central_polling_station")}</h2>
           {investigations.length === 0 && (
-            <ul className="md mt-0 mb-0">
-              <li>{t("investigations.add_investigation_for_each_csb_request")}</li>
-              <li>{t("investigations.print_corrigendum_form")}</li>
-            </ul>
+            <>
+              <p>{t("investigations.add_investigation_for_each_csb_request")}</p>
+              <ul className="md mb-0">
+                <li>{t("investigations.add_the_reason")}</li>
+                <li>{t("investigations.abacus_creates_the_corrigendum")}</li>
+                <li>{t("investigations.print_corrigendum_form")}</li>
+              </ul>
+            </>
           )}
           {isCoordinator && (
             <nav className="mt-md-lg mb-lg">

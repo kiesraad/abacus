@@ -541,7 +541,6 @@ where
 {
     let cookie = shared::coordinator_login(addr).await;
     let election_id = 2;
-    let committee_session_id = 2;
 
     shared::create_result(addr, 1, election_id).await;
     shared::create_result(addr, 2, election_id).await;
@@ -549,7 +548,8 @@ where
     shared::change_status_committee_session(
         addr,
         &cookie,
-        committee_session_id,
+        election_id,
+        2,
         CommitteeSessionStatus::DataEntryFinished,
     )
     .await;

@@ -21,7 +21,7 @@ export function FinishDataEntryPage() {
   const { currentCommitteeSession, election, refetch } = useElection();
   const { investigations, handledInvestigations, missingInvestigations } = useInvestigations();
   const navigate = useNavigate();
-  const updatePath: COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_PATH = `/api/committee_sessions/${currentCommitteeSession.id}/status`;
+  const updatePath: COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_PATH = `/api/elections/${currentCommitteeSession.election_id}/committee_sessions/${currentCommitteeSession.id}/status`;
   const { update } = useCrud({ updatePath, throwAllErrors: true });
 
   // Check if all investigations are handled and none are missing

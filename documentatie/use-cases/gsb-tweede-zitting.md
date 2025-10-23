@@ -16,7 +16,7 @@ __Hoofdscenario:__
 5. (gedurende de zitting) Het GSB houdt tijd en locatie bij van de aanwezigheid van elk lid van het GSB.
 6. De coördinator GSB voert de locatie, startdatum en starttijd van de zitting in.
 7. (voor elk verzoek) [Het GSB behandelt een verzoek tot onderzoek/hertelling.](#het-gsb-behandelt-een-verzoek-tot-onderzoekhertelling-vlieger)
-8. [De coördinator GSB maakt het PV P 2a en evt. het PV Na 14-2 en tellingsbestand EML 501b aan.](#de-coördinator-gsb-maakt-het-pv-p-2a-en-evt-het-pv-na-14-2-en-tellingsbestand-eml-501b-aan-zee)
+8. [De coördinator GSB maakt het PV P 2a en evt. het PV Na 14-2 en tellingsbestand EML 510b aan.](#de-coördinator-gsb-maakt-het-pv-p-2a-en-evt-het-pv-na-14-2-en-tellingsbestand-eml-510b-aan-zee)
 9. Het GSB voert de andere onderdelen van de PVs (P 2a en evt. Na 14-2) in.
 10. Het GSB leest de PVs voor: P 2a (Verslag tweede zitting), evt. Na 14-2 (Corrigendum GSB), Na 14-1 versie 2 (DSO, één per SB) of Na 14-2 Bijlage 1 (CSO, één bijlage per SB).
 11. Het GSB ondertekent de PVs (P2a, evt. Na 14-2, DSO: Na 14-1 versie 2).
@@ -138,7 +138,7 @@ __Uitbreidingen:__
 &emsp; 6a1. De coördinator GSB pauzeert de invoer.  
 &emsp; 6a2. De applicatie blokkeert verdere invoer.  
 
-## De coördinator GSB maakt het PV P 2a en evt. het PV Na 14-2 en tellingsbestand EML 501b aan (zee)
+## De coördinator GSB maakt het PV P 2a en evt. het PV Na 14-2 en tellingsbestand EML 510b aan (zee)
 
 __Niveau:__ gebruikersdoel, zee, 🌊
 

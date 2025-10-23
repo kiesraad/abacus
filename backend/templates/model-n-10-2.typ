@@ -1,4 +1,4 @@
-#import "common/style.typ": conf, document_numbering
+#import "common/style.typ": conf, document_numbering, default_header
 #import "common/scripts.typ": *
 #let input = json("inputs/model-n-10-2.json")
 
@@ -13,7 +13,9 @@
 #let this_location = is_municipality[deze gemeente][dit openbaar lichaam]
 #let location = is_municipality[gemeente][openbaar lichaam]
 
-#show: doc => conf(doc, header-right: [Stembureau #input.polling_station.number], footer: [Proces-verbaal van een stembureau \
+#let header-right = [Stembureau #input.polling_station.number]
+
+#show: doc => conf(doc, header-right: header-right, footer: [Proces-verbaal van een stembureau \
   Model N 10-2 centrale stemopneming])
 
 #set heading(numbering: none)
@@ -241,13 +243,15 @@ Bijvoorbeeld als er meerdere verkiezingen tegelijk werden georganiseerd, en een 
 
 #pagebreak(weak: true)
 
-#show: doc => conf(doc, header-left: [Deel 3 - Ondertekening])
+#set page(header: "")
 
 #emph_block[Deze pagina is expres leeg]
 
 Zo komt het handtekeningen-blad altijd op een losse pagina, ook als het verslag dubbelzijdig is geprint.
 
 #pagebreak(weak: true)
+
+#set page(header: default_header(none, header-right))
 
 = Ondertekening <signing>
 

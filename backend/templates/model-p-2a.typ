@@ -1,4 +1,4 @@
-#import "common/style.typ": conf, document_numbering
+#import "common/style.typ": conf, document_numbering, default_header
 #import "common/scripts.typ": *
 #let input = json("inputs/model-p-2a.json")
 
@@ -143,6 +143,8 @@ Bijvoorbeeld een schorsing of als er meerdere verkiezingen tegelijk werden georg
 
 #pagebreak(weak: true)
 
+#set page(header: "")
+
 #show heading.where(level: 3): it =>[
     #block(it.body)
 ]
@@ -151,6 +153,8 @@ Bijvoorbeeld een schorsing of als er meerdere verkiezingen tegelijk werden georg
 Zo komt het handtekeningen-blad altijd op een losse pagina, ook als het verslag dubbelzijdig is geprint.
 
 #pagebreak(weak: true)
+
+#set page(header: default_header(none, location_name))
 
 = Ondertekening
 

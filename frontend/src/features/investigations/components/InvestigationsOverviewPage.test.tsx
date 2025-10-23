@@ -89,11 +89,7 @@ describe("InvestigationsOverviewPage", () => {
       await screen.findByRole("heading", { level: 2, name: "Onderzoeksverzoeken vanuit het centraal stembureau" }),
     ).toBeVisible();
 
-    expect(
-      await screen.findByText(
-        "Voeg voor elk verzoek van het centraal stembureau een onderzoek toe en voer de aanleiding in. Zijn er in deze zitting meerdere opdrachten voor hetzelfde stembureau, voer deze dan in één keer in.",
-      ),
-    ).toBeVisible();
+    expect(await screen.findByText("Voeg alle onderzoeksverzoeken van het centraal stembureau toe.")).toBeVisible();
 
     expect(await screen.findByRole("link", { name: "Onderzoek toevoegen" })).toBeVisible();
   });

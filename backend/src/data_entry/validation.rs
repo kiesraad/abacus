@@ -588,6 +588,8 @@ impl Validate for CommonPollingStationResults {
         )?;
 
         for (i, pgcv) in self.political_group_votes.iter().enumerate() {
+            let pgcv_path = path.field("political_group_votes").index(i);
+
             let pgtv = self
                 .votes_counts
                 .political_group_total_votes
@@ -601,53 +603,35 @@ impl Validate for CommonPollingStationResults {
                 .iter()
                 .map(|cv| cv.votes as u64)
                 .sum::<u64>();
+
             if (candidate_votes_sum > 0 || pgtv.total > 0) && pgcv.total == 0 {
                 validation_results.errors.push(ValidationResult {
-                    fields: vec![
-                        path.field("political_group_votes")
-                            .index(i)
-                            .field("total")
-                            .to_string(),
-                    ],
+                    fields: vec![pgcv_path.field("total").to_string()],
                     code: ValidationResultCode::F401,
                     context: Some(ValidationResultContext {
                         political_group_number: Some(pgtv.number),
                     }),
                 });
-            }
-
-            if pgcv.total != pgtv.total {
-                validation_results.errors.push(ValidationResult {
-                    fields: vec![
-                        path.field("political_group_votes")
-                            .index(i)
-                            .field("total")
-                            .to_string(),
-                    ],
-                    code: ValidationResultCode::F403,
-                    context: Some(ValidationResultContext {
-                        political_group_number: Some(pgcv.number),
-                    }),
-                });
-            }
-
-            let has_error_f401 = validation_results.errors.iter().any(|x| {
-                x.code == ValidationResultCode::F401
-                    && x.context
-                        == Some(ValidationResultContext {
+            } else {
+                if pgcv.total as u64 != candidate_votes_sum {
+                    validation_results.errors.push(ValidationResult {
+                        fields: vec![pgcv_path.to_string()],
+                        code: ValidationResultCode::F402,
+                        context: Some(ValidationResultContext {
                             political_group_number: Some(pgcv.number),
-                        })
-            });
+                        }),
+                    });
+                }
 
-            if has_error_f401 {
-                validation_results.errors.retain(|vr| {
-                    !(vr.context
-                        == Some(ValidationResultContext {
+                if pgcv.total != pgtv.total {
+                    validation_results.errors.push(ValidationResult {
+                        fields: vec![pgcv_path.field("total").to_string()],
+                        code: ValidationResultCode::F403,
+                        context: Some(ValidationResultContext {
                             political_group_number: Some(pgcv.number),
-                        })
-                        && (vr.code == ValidationResultCode::F402
-                            || vr.code == ValidationResultCode::F403))
-                });
+                        }),
+                    });
+                }
             }
         }
 
@@ -1002,22 +986,6 @@ impl Validate for PoliticalGroupCandidateVotes {
             &path.field("total"),
         )?;
 
-        // all candidate votes, cast to u64 to avoid overflow
-        let candidate_votes_sum: u64 = self
-            .candidate_votes
-            .iter()
-            .map(|cv| cv.votes as u64)
-            .sum::<u64>();
-
-        if self.total as u64 != candidate_votes_sum {
-            validation_results.errors.push(ValidationResult {
-                fields: vec![path.to_string()],
-                code: ValidationResultCode::F402,
-                context: Some(ValidationResultContext {
-                    political_group_number: Some(self.number),
-                }),
-            });
-        }
         Ok(())
     }
 }
@@ -3145,19 +3113,19 @@ mod tests {
                 validation_results.errors,
                 [
                     ValidationResult {
+                        code: ValidationResultCode::F401,
+                        fields: vec!["data.political_group_votes[0].total".into()],
+                        context: Some(ValidationResultContext {
+                            political_group_number: Some(1),
+                        }),
+                    },
+                    ValidationResult {
                         code: ValidationResultCode::F402,
                         fields: vec!["data.political_group_votes[1]".into()],
                         context: Some(ValidationResultContext {
                             political_group_number: Some(2),
                         }),
                     },
-                    ValidationResult {
-                        code: ValidationResultCode::F401,
-                        fields: vec!["data.political_group_votes[0].total".into()],
-                        context: Some(ValidationResultContext {
-                            political_group_number: Some(1),
-                        }),
-                    }
                 ]
             );
 

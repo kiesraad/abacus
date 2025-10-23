@@ -17,7 +17,7 @@ export function AccountSetupPage() {
   }
 
   if (!user) {
-    return <Navigate to="/account/login" />;
+    return <Navigate to="/account/login" state={{ unauthorized: true }} />;
   }
 
   return (

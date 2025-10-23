@@ -2,7 +2,7 @@ import { RouterProvider } from "react-router";
 
 import { render as rtlRender, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { describe, expect, test } from "vitest";
+import { describe, expect, test, vi } from "vitest";
 
 import { InitialisedHandler } from "@/testing/api-mocks/RequestHandlers";
 import { server } from "@/testing/server";
@@ -82,10 +82,11 @@ describe("AuthorizationDialog", () => {
   });
 
   test("Redirect should happen when not authorized", async () => {
+    vi.spyOn(console, "error").mockImplementation(() => {});
     server.use(InitialisedHandler);
 
     const router = setupTestRouter(routes);
-    await router.navigate("/");
+    await router.navigate("/logs");
 
     rtlRender(
       <TestUserProvider userRole={null} overrideExpiration={new Date(Date.now() + 1000 * 60)}>
@@ -94,9 +95,6 @@ describe("AuthorizationDialog", () => {
     );
 
     expect(router.state.location.pathname).toBe("/account/login");
-
-    const noAccessText = within(await screen.findByRole("alert")).getByRole("strong");
-    expect(noAccessText).toHaveTextContent("Je hebt geen toegang tot deze pagina");
-    expect(noAccessText).toBeVisible();
+    expect(router.state.location.state).toEqual({ unauthorized: true });
   });
 });

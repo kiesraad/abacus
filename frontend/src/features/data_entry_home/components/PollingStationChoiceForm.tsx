@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { Navigate, useNavigate } from "react-router";
+import { useNavigate } from "react-router";
 
 import { IconError } from "@/components/generated/icons";
 import { Alert } from "@/components/ui/Alert/Alert";
@@ -118,10 +118,6 @@ export function PollingStationChoiceForm({ anotherEntry }: PollingStationChoiceF
   const inProgressCurrentUser = availableCurrentUser.filter(
     (pollingStation) => pollingStation.userStatus === PollingStationUserStatus.InProgressCurrentUser,
   );
-
-  if (!user) {
-    return <Navigate to="/account/login" />;
-  }
 
   return (
     <form

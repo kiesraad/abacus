@@ -1,6 +1,7 @@
 import * as ReactRouter from "react-router";
 
 import userEvent from "@testing-library/user-event";
+import { within } from "storybook/test";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
 import { InitialisedHandler, LoginHandler } from "@/testing/api-mocks/RequestHandlers";
@@ -119,5 +120,21 @@ describe("LoginForm", () => {
     await user.click(await screen.findByRole("button", { name: "Inloggen" }));
 
     expect(navigate).toHaveBeenCalledWith("/elections");
+  });
+
+  test("Show unauthorized message when state indicates unauthorized", async () => {
+    vi.spyOn(ReactRouter, "useLocation").mockReturnValue({
+      pathname: "/login",
+      search: "",
+      hash: "",
+      state: { unauthorized: true },
+      key: "default",
+    });
+
+    render(<LoginForm />);
+
+    const noAccessText = within(await screen.findByRole("alert")).getByRole("strong");
+    expect(noAccessText).toHaveTextContent("Je hebt geen toegang tot deze pagina");
+    expect(noAccessText).toBeVisible();
   });
 });

@@ -1,11 +1,9 @@
-import { Outlet, ScrollRestoration, useMatches } from "react-router";
+import { Navigate, Outlet, ScrollRestoration, useMatches } from "react-router";
 
-import { ApplicationError } from "@/api/ApiResult";
 import { useApiState } from "@/api/useApiState";
 import { AirGapViolationPage } from "@/components/error/AirGapViolationPage";
 import { AppFrame } from "@/components/ui/AppFrame/AppFrame";
 import { useUserRole } from "@/hooks/user/useUserRole";
-import { t } from "@/i18n/translate";
 
 import { AuthorizationDialog } from "./AuthorizationDialog";
 
@@ -28,7 +26,10 @@ export function RootLayout() {
   }
 
   if (!isAllowed) {
-    throw new ApplicationError(t("error.forbidden_message"), "Forbidden");
+    const route = matches[matches.length - 1]?.pathname || "unknown";
+    console.error(`Forbidden access to route ${route}` + ` for ${role ? `role ${role}` : "unauthenticated user"}`);
+
+    return <Navigate to="/account/login" state={{ unauthorized: true }} />;
   }
 
   return (

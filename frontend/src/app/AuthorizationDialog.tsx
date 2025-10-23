@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Navigate, useLocation } from "react-router";
+import { Navigate, useMatches } from "react-router";
 
 import { useApiState } from "@/api/useApiState";
 import { Button } from "@/components/ui/Button/Button";
@@ -7,16 +7,17 @@ import { Modal } from "@/components/ui/Modal/Modal";
 import { t, tx } from "@/i18n/translate";
 import { formatTimeToGo } from "@/utils/dateTime";
 
-import { ALLOW_UNAUTHORIZED, EXPIRATION_DIALOG_SECONDS } from "./authorizationConstants";
+import { EXPIRATION_DIALOG_SECONDS } from "./authorizationConstants";
 
 export function AuthorizationDialog() {
   const { user, loading, expiration, extendSession, setUser } = useApiState();
-  const location = useLocation();
-  const path = location.pathname;
   const [sessionValidFor, setSessionValidFor] = useState<number | null>(
     expiration !== null ? (expiration.getTime() - new Date().getTime()) / 1000 : null,
   );
   const [hideDialog, setHideDialog] = useState(false);
+
+  const matches = useMatches();
+  const routeHandle = matches[matches.length - 1]?.handle;
 
   // update the current time every second when there is a session expiration
   useEffect(() => {
@@ -46,13 +47,8 @@ export function AuthorizationDialog() {
     }
   }, [expiration, user, setUser, hideDialog]);
 
-  // navigate to login page if the user is not authenticated
-  if (!loading && !user && !ALLOW_UNAUTHORIZED.includes(path)) {
-    return <Navigate to="/account/login" state={{ unauthorized: true }} />;
-  }
-
   // navigate to login page if the session has expired
-  if (sessionValidFor !== null && sessionValidFor <= 0 && !ALLOW_UNAUTHORIZED.includes(path)) {
+  if (sessionValidFor !== null && sessionValidFor <= 0 && !routeHandle?.public) {
     return <Navigate to="/account/login" state={{ unauthorized: true }} />;
   }
 

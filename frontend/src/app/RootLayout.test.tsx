@@ -1,11 +1,12 @@
 import { RouteObject } from "react-router";
 
-import { render as rtlRender, screen } from "@testing-library/react";
+import { render as rtlRender } from "@testing-library/react";
 import { describe, expect, test, vi } from "vitest";
 
 import * as useUser from "@/hooks/user/useUser";
 import * as userMockData from "@/testing/user-mock-data";
 import { ErrorBoundary } from "@/components/error/ErrorBoundary";
+import { LoginPage } from "@/features/account/components/LoginPage";
 import { Providers } from "@/testing/Providers";
 import { setupTestRouter } from "@/testing/test-utils";
 import { Role } from "@/types/generated/openapi";
@@ -33,7 +34,7 @@ describe("Route authorisation is handled", () => {
     handle: RouteObject["handle"];
     ownRole: Role | null;
     allowed: boolean;
-  }>)("$handle, ownRole=$ownRole, allowed=$allowed", async ({ handle, ownRole, allowed }) => {
+  }>)("$handle, ownRole=$ownRole, allowed=$allowed", ({ handle, ownRole, allowed }) => {
     vi.spyOn(console, "error").mockImplementation(() => {});
 
     if (ownRole) {
@@ -53,13 +54,19 @@ describe("Route authorisation is handled", () => {
       vi.spyOn(useUser, "useUser").mockReturnValue(user);
     }
 
-    render([{ path: "/", Component: RootLayout, errorElement: <ErrorBoundary />, handle }]);
+    const router = render([
+      { path: "/", Component: RootLayout, errorElement: <ErrorBoundary />, handle },
+      { path: "/account/login", Component: LoginPage, handle: { public: true } },
+    ]);
 
-    if (allowed) {
-      expect(await screen.findByTestId("app-frame")).toBeInTheDocument();
-      expect(screen.queryByText(/Je hebt niet de juiste rechten/)).not.toBeInTheDocument();
-    } else {
-      expect(await screen.findByText(/Je hebt niet de juiste rechten/)).toBeVisible();
+    expect(router.state.location.pathname).toEqual(allowed ? "/" : "/account/login");
+    expect(router.state.location.state).toEqual(allowed ? null : { unauthorized: true });
+
+    expect(console.error).toHaveBeenCalledTimes(allowed ? 0 : 1);
+    if (!allowed) {
+      expect(console.error).toHaveBeenCalledWith(
+        `Forbidden access to route / for ${ownRole ? `role ${ownRole}` : "unauthenticated user"}`,
+      );
     }
   });
 });

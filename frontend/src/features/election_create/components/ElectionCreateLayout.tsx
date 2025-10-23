@@ -1,11 +1,10 @@
-import { Link, Navigate, Outlet, useLocation } from "react-router";
+import { Link, Outlet, useLocation } from "react-router";
 
 import { Footer } from "@/components/footer/Footer";
 import { NavBar } from "@/components/navbar/NavBar";
 import { PageTitle } from "@/components/page_title/PageTitle";
 import { StickyNav } from "@/components/ui/AppLayout/StickyNav";
 import { ProgressList } from "@/components/ui/ProgressList/ProgressList";
-import { useUserRole } from "@/hooks/user/useUserRole";
 import { t } from "@/i18n/translate";
 
 import { AbortModal } from "./AbortModal";
@@ -30,12 +29,7 @@ const formSections: ElectionCreateFormSection[] = [
 ];
 
 export function ElectionCreateLayout() {
-  const { isAdministrator } = useUserRole();
   const location = useLocation();
-
-  if (!isAdministrator) {
-    return <Navigate to="/account/login" state={{ unauthorized: true }} />;
-  }
 
   const currentFormSection = formSections.findIndex((formSection) => location.pathname.endsWith(formSection.path));
 

@@ -9,7 +9,7 @@ use typst::{
     utils::LazyHash,
 };
 
-use crate::pdf_gen::{PdfGenError, models::PdfModel};
+use super::{PdfGenError, PdfModel};
 
 /// Contains the context for rendering PDFs.
 #[derive(Clone)]
@@ -53,7 +53,7 @@ impl PdfWorld {
     ///
     /// The input model defines which template is being used and what the input
     /// for that template is.
-    pub fn set_input_model(&mut self, input: PdfModel) -> Result<(), PdfGenError> {
+    pub fn set_input_model(&mut self, input: PdfModel) -> Result<(), super::PdfGenError> {
         let main_source_path = input.as_template_path();
         let Some(main_source) = self
             .sources
@@ -173,6 +173,8 @@ fn load_sources() -> Vec<Source> {
         include_source!("model-na-31-2.typ"),
         include_source!("model-na-31-2-bijlage1.typ"),
         include_source!("model-p-2a.typ"),
+        #[cfg(test)]
+        include_source!("teletex-test.typ"),
     ]
 }
 

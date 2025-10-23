@@ -1,3 +1,4 @@
+mod filter_input;
 pub mod models;
 
 #[cfg(feature = "embed-typst")]
@@ -22,6 +23,7 @@ pub struct PdfGenResult {
 pub(crate) mod tests {
     use chrono::Utc;
     use models::ModelNa31_2Input;
+    use test_log::test;
 
     use super::*;
     use crate::{
@@ -30,7 +32,7 @@ pub(crate) mod tests {
             ElectionCategory, ElectionWithPoliticalGroups, VoteCountingMethod,
             tests::election_fixture,
         },
-        pdf_gen::models::ToPdfFileModel,
+        pdf_gen::models::{PdfFileModel, PdfModel, ToPdfFileModel},
         polling_station::{PollingStation, PollingStationType},
         summary::ElectionSummary,
     };
@@ -64,7 +66,7 @@ pub(crate) mod tests {
         polling_stations
     }
 
-    #[tokio::test]
+    #[test(tokio::test)]
     async fn it_generates_a_pdf() {
         let content = generate_pdf(ModelNa31_2Input {
             committee_session: committee_session_fixture(1),
@@ -93,7 +95,37 @@ pub(crate) mod tests {
         assert!(!content.buffer.is_empty());
     }
 
-    #[tokio::test]
+    #[test(tokio::test)]
+    async fn the_default_font_supports_teletex_chars() {
+        // See backend/templates/inputs/teletex-test.json for the list of characters that are expected to be supported.
+        let input = (32..127)
+            .map(|codepoint| char::from_u32(codepoint).unwrap())
+            .collect::<String>();
+
+        let filtered_input = filter_input::replace_unsupported_glyphs(input.clone());
+        assert_eq!(input, filtered_input);
+
+        let input = (161..383)
+            .map(|codepoint| char::from_u32(codepoint).unwrap())
+            .collect::<String>();
+
+        let filtered_input = filter_input::replace_unsupported_glyphs(input.clone());
+        assert_eq!(input, filtered_input);
+    }
+
+    #[test(tokio::test)]
+    async fn it_generates_a_pdf_with_teletex_chars() {
+        let content = generate_pdf(PdfFileModel {
+            file_name: "file.pdf".into(),
+            model: PdfModel::TeletexTest(),
+        })
+        .await
+        .unwrap();
+
+        assert!(!content.buffer.is_empty());
+    }
+
+    #[test(tokio::test)]
     async fn it_generates_a_pdf_with_polling_stations() {
         let election = election_fixture(&[2, 3]);
         let committee_session = committee_session_fixture(election.id);

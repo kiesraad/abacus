@@ -7,7 +7,7 @@ rust-version = "1.85"
 default-run = "abacus"
 
 [features]
-default = ["openapi", "dev-database"]
+default = ["openapi", "dev-database", "embed-typst"]
 openapi = ["dep:utoipa-swagger-ui"]
 memory-serve = ["dep:memory-serve"]
 embed-typst = ["dep:typst", "dep:typst-pdf"]
@@ -66,6 +66,7 @@ cookie = { version = "0.18.1", features = ["percent-encode"] }
 async_zip = { version = "0.0.18", features = ["tokio", "deflate", "chrono"] }
 strum = { version = "0.27", features = ["derive"] }
 tokio-util = { version = "0.7.16", features = ["io"] }
+ttf-parser = "0.25.1"
 
 [dev-dependencies]
 test-log = "0.2.17"

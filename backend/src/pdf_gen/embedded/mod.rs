@@ -59,27 +59,37 @@ fn get_pdf_options() -> PdfOptions<'static> {
 }
 
 fn compile_pdf(world: &mut world::PdfWorld, model: PdfModel) -> Result<PdfGenResult, PdfGenError> {
+    debug!("Starting Typst compilation for {}", model.as_model_name());
+
     world.set_input_model(model)?;
 
     let compile_start = Instant::now();
+
     let result = typst::compile(world);
-    let document = result.output.map_err(PdfGenError::from_typst)?;
     info!(
         "Compile took {} ms, {} warnings",
         compile_start.elapsed().as_millis(),
         result.warnings.len()
     );
-
     result.warnings.iter().for_each(|warning| {
         warn!("Warning: {:?}", warning);
     });
 
+    let document = result.output.map_err(PdfGenError::from_typst)?;
+
     let pdf_gen_start = Instant::now();
-    let buffer = typst_pdf::pdf(&document, &get_pdf_options()).map_err(PdfGenError::from_typst)?;
+    let result = typst_pdf::pdf(&document, &get_pdf_options());
     debug!(
-        "PDF generation took {} ms",
-        pdf_gen_start.elapsed().as_millis()
+        "PDF generation took {} ms, {}",
+        pdf_gen_start.elapsed().as_millis(),
+        if result.is_err() {
+            "failed"
+        } else {
+            "succeeded"
+        }
     );
+
+    let buffer = result.map_err(PdfGenError::from_typst)?;
 
     Ok(PdfGenResult { buffer })
 }

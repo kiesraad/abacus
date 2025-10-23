@@ -9,6 +9,9 @@ const HEADER_CONTENT_TYPE = "Content-Type";
 
 export const DEFAULT_CANCEL_REASON = "Component unmounted";
 
+/// Header to indicate that the session should not be extended, only the existence is checked, not the value
+export const DO_NOT_EXTEND_SESSION = { "x-do-not-extend-session": "on-data-refresh" };
+
 function isErrorResponse(object: unknown): object is ErrorResponse {
   return (
     typeof object === "object" && object !== null && "error" in object && "fatal" in object && "reference" in object
@@ -52,10 +55,11 @@ export class ApiClient extends EventTarget {
   }
 
   // encode an optional JSON body
-  setRequestBodyAndHeaders(requestBody?: object | string): RequestInit {
+  setRequestBodyAndHeaders(requestBody?: object | string, additionalHeaders?: Record<string, string>): RequestInit {
     if (requestBody) {
       return {
         headers: {
+          ...additionalHeaders,
           [HEADER_ACCEPT]: MIME_JSON,
           [HEADER_CONTENT_TYPE]: MIME_JSON,
         },
@@ -65,6 +69,7 @@ export class ApiClient extends EventTarget {
 
     return {
       headers: {
+        ...additionalHeaders,
         [HEADER_ACCEPT]: MIME_JSON,
       },
     };
@@ -169,12 +174,13 @@ export class ApiClient extends EventTarget {
     path: string,
     abort?: AbortController,
     requestBody?: object | string,
+    additionalHeaders?: Record<string, string>,
   ): Promise<ApiResult<T>> {
     try {
       const response = await fetch(path, {
         method,
         signal: abort?.signal,
-        ...this.setRequestBodyAndHeaders(requestBody),
+        ...this.setRequestBodyAndHeaders(requestBody, additionalHeaders),
       });
 
       const sessionExpiration = response.headers.get("x-session-expires-at");
@@ -223,8 +229,12 @@ export class ApiClient extends EventTarget {
   }
 
   // perform a GET request
-  async getRequest<T>(path: string, abort?: AbortController): Promise<ApiResult<T>> {
-    return this.request<T>("GET", path, abort);
+  async getRequest<T>(
+    path: string,
+    abort?: AbortController,
+    additionalHeaders?: Record<string, string>,
+  ): Promise<ApiResult<T>> {
+    return this.request<T>("GET", path, abort, undefined, additionalHeaders);
   }
 
   // perform a DELETE request

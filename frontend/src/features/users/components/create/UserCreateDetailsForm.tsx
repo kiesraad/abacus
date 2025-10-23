@@ -105,14 +105,6 @@ export function UserCreateDetailsForm({ role, showFullname, onSubmitted }: UserC
       <Form title={t("users.details_title")} onSubmit={handleSubmit}>
         <FormLayout disabled={isLoading}>
           <FormLayout.Section>
-            <InputField
-              id="username"
-              name="username"
-              label={t("users.username")}
-              hint={t("users.username_hint")}
-              error={validationErrors?.username}
-            />
-
             {showFullname && (
               <InputField
                 id="fullname"
@@ -122,6 +114,14 @@ export function UserCreateDetailsForm({ role, showFullname, onSubmitted }: UserC
                 error={validationErrors?.fullname}
               />
             )}
+
+            <InputField
+              id="username"
+              name="username"
+              label={t("users.username")}
+              hint={t("users.username_hint")}
+              error={validationErrors?.username}
+            />
 
             <InputField
               id="temp_password"

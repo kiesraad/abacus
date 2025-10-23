@@ -2,7 +2,6 @@ use std::net::IpAddr;
 
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
-use serde_json::Value;
 use sqlx::{SqliteConnection, Type, prelude::FromRow, types::Json};
 use strum::VariantNames;
 use utoipa::ToSchema;
@@ -139,7 +138,17 @@ impl LogFilter {
 
     /// We use json functions to filter the events based on the level and event type,
     /// since sqlx + sqlite does not support array types
-    fn as_query_values(&self) -> Result<(Value, Value, Value, Option<i64>), serde_json::Error> {
+    fn as_query_values(
+        &self,
+    ) -> Result<
+        (
+            serde_json::Value,
+            serde_json::Value,
+            serde_json::Value,
+            Option<i64>,
+        ),
+        serde_json::Error,
+    > {
         let level = serde_json::to_value(&self.level)?;
         let event = serde_json::to_value(&self.event)?;
         let user = serde_json::to_value(&self.user)?;

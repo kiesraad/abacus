@@ -130,7 +130,7 @@ describe("ElectionHomePage", () => {
     expect(addButton).toBeVisible();
     await user.click(addButton);
 
-    expect(sessionCreateRequestSpy).toHaveBeenCalledWith({ election_id: 1 });
+    expect(sessionCreateRequestSpy).toHaveBeenCalledOnce();
   });
 
   test("Does not show create new committee session button for administrator", async () => {
@@ -295,7 +295,7 @@ describe("ElectionHomePage", () => {
         HttpResponse.json(electionData satisfies ElectionDetailsResponse, { status: 200 }),
       ),
     );
-    overrideOnce("put", "/api/committee_sessions/4/status", 409, {
+    overrideOnce("put", "/api/elections/1/committee_sessions/4/status", 409, {
       error: "Invalid committee session status",
       fatal: true,
       reference: "InvalidCommitteeSessionStatus",

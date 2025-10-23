@@ -14,7 +14,6 @@ import { useElection } from "@/hooks/election/useElection";
 import { useUserRole } from "@/hooks/user/useUserRole";
 import { t } from "@/i18n/translate";
 import {
-  COMMITTEE_SESSION_CREATE_REQUEST_BODY,
   COMMITTEE_SESSION_CREATE_REQUEST_PATH,
   COMMITTEE_SESSION_DELETE_REQUEST_PATH,
 } from "@/types/generated/openapi";
@@ -39,8 +38,8 @@ export function ElectionHomePage() {
   const { isCoordinator } = useUserRole();
   const [showAddCommitteeSessionModal, setShowAddCommitteeSessionModal] = useState(false);
   const isFirstCommitteeSession = currentCommitteeSession.number === 1;
-  const createPath: COMMITTEE_SESSION_CREATE_REQUEST_PATH = `/api/committee_sessions`;
-  const removePath: COMMITTEE_SESSION_DELETE_REQUEST_PATH = `/api/committee_sessions/${currentCommitteeSession.id}`;
+  const createPath: COMMITTEE_SESSION_CREATE_REQUEST_PATH = `/api/elections/${election.id}/committee_sessions`;
+  const removePath: COMMITTEE_SESSION_DELETE_REQUEST_PATH = `/api/elections/${currentCommitteeSession.election_id}/committee_sessions/${currentCommitteeSession.id}`;
   const { create, remove } = useCrud({ createPath, removePath, throwAllErrors: true });
 
   // re-fetch election when component mounts
@@ -57,8 +56,7 @@ export function ElectionHomePage() {
   }
 
   function handleCommitteeSessionCreate() {
-    const body: COMMITTEE_SESSION_CREATE_REQUEST_BODY = { election_id: election.id };
-    void create(body).then(() => {
+    void create({}).then(() => {
       void refetch();
     });
   }

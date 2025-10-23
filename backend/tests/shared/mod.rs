@@ -319,10 +319,13 @@ pub async fn get_election_committee_session(
 pub async fn change_status_committee_session(
     addr: &SocketAddr,
     cookie: &HeaderValue,
+    election_id: u32,
     committee_session_id: u32,
     status: CommitteeSessionStatus,
 ) {
-    let url = format!("http://{addr}/api/committee_sessions/{committee_session_id}/status");
+    let url = format!(
+        "http://{addr}/api/elections/{election_id}/committee_sessions/{committee_session_id}/status"
+    );
     let response = Client::new()
         .put(&url)
         .header("cookie", cookie)

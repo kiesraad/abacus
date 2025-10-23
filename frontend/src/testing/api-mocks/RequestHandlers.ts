@@ -12,7 +12,6 @@ import {
   AUDIT_LOG_LIST_USERS_REQUEST_PATH,
   AuditLogListResponse,
   ClaimDataEntryResponse,
-  COMMITTEE_SESSION_CREATE_REQUEST_BODY,
   COMMITTEE_SESSION_CREATE_REQUEST_PARAMS,
   COMMITTEE_SESSION_CREATE_REQUEST_PATH,
   COMMITTEE_SESSION_DELETE_REQUEST_PARAMS,
@@ -183,7 +182,7 @@ export const LogUsersRequestHandler = http.get<ParamsToString<AUDIT_LOG_LIST_USE
 export const CommitteeSessionStatusChangeRequestHandler = http.put<
   ParamsToString<COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_PARAMS>,
   COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_BODY
->("/api/committee_sessions/1/status" satisfies COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_PATH, () =>
+>("/api/elections/1/committee_sessions/1/status" satisfies COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_PATH, () =>
   HttpResponse.json(null, { status: 200 }),
 );
 
@@ -191,7 +190,7 @@ export const CommitteeSessionChangeNumberOfVotersHandler = http.put<
   ParamsToString<COMMITTEE_SESSION_NUMBER_OF_VOTERS_CHANGE_REQUEST_PARAMS>,
   COMMITTEE_SESSION_NUMBER_OF_VOTERS_CHANGE_REQUEST_BODY
 >(
-  "/api/committee_sessions/1/voters" satisfies COMMITTEE_SESSION_NUMBER_OF_VOTERS_CHANGE_REQUEST_PATH,
+  "/api/elections/1/committee_sessions/1/voters" satisfies COMMITTEE_SESSION_NUMBER_OF_VOTERS_CHANGE_REQUEST_PATH,
   () => new HttpResponse(null, { status: 200 }),
 );
 
@@ -199,21 +198,21 @@ export const CommitteeSessionUpdateHandler = http.put<
   ParamsToString<COMMITTEE_SESSION_UPDATE_REQUEST_PARAMS>,
   COMMITTEE_SESSION_UPDATE_REQUEST_BODY
 >(
-  "/api/committee_sessions/1" satisfies COMMITTEE_SESSION_UPDATE_REQUEST_PATH,
+  "/api/elections/1/committee_sessions/1" satisfies COMMITTEE_SESSION_UPDATE_REQUEST_PATH,
   () => new HttpResponse(null, { status: 200 }),
 );
 
 export const CommitteeSessionCreateHandler = http.post<
   ParamsToString<COMMITTEE_SESSION_CREATE_REQUEST_PARAMS>,
-  COMMITTEE_SESSION_CREATE_REQUEST_BODY,
+  null,
   CommitteeSession
->("/api/committee_sessions" satisfies COMMITTEE_SESSION_CREATE_REQUEST_PATH, () => {
+>("/api/elections/1/committee_sessions" satisfies COMMITTEE_SESSION_CREATE_REQUEST_PATH, () => {
   const response: CommitteeSession = getCommitteeSessionMockData({ id: 2, number: 2, status: "created" });
   return HttpResponse.json(response, { status: 201 });
 });
 
 export const CommitteeSessionDeleteHandler = http.delete<ParamsToString<COMMITTEE_SESSION_DELETE_REQUEST_PARAMS>>(
-  "/api/committee_sessions/4" satisfies COMMITTEE_SESSION_DELETE_REQUEST_PATH,
+  "/api/elections/1/committee_sessions/4" satisfies COMMITTEE_SESSION_DELETE_REQUEST_PATH,
   () => new HttpResponse(null, { status: 200 }),
 );
 

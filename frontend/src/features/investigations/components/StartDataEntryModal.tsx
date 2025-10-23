@@ -19,7 +19,7 @@ interface StartDataEntryModalProps {
 export function StartDataEntryModal({ onClose, to }: StartDataEntryModalProps) {
   const { currentCommitteeSession, refetch } = useElection();
   const navigate = useNavigate();
-  const updatePath: COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_PATH = `/api/committee_sessions/${currentCommitteeSession.id}/status`;
+  const updatePath: COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_PATH = `/api/elections/${currentCommitteeSession.election_id}/committee_sessions/${currentCommitteeSession.id}/status`;
   const { update, isLoading } = useCrud({ updatePath, throwAllErrors: true });
 
   function startDataEntry() {

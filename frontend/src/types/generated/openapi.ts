@@ -7,36 +7,6 @@ export type ACCOUNT_UPDATE_REQUEST_PARAMS = Record<string, never>;
 export type ACCOUNT_UPDATE_REQUEST_PATH = `/api/account`;
 export type ACCOUNT_UPDATE_REQUEST_BODY = AccountUpdateRequest;
 
-// /api/committee_sessions
-export type COMMITTEE_SESSION_CREATE_REQUEST_PARAMS = Record<string, never>;
-export type COMMITTEE_SESSION_CREATE_REQUEST_PATH = `/api/committee_sessions`;
-export type COMMITTEE_SESSION_CREATE_REQUEST_BODY = NewCommitteeSessionRequest;
-
-// /api/committee_sessions/{committee_session_id}
-export interface COMMITTEE_SESSION_UPDATE_REQUEST_PARAMS {
-  committee_session_id: number;
-}
-export type COMMITTEE_SESSION_UPDATE_REQUEST_PATH = `/api/committee_sessions/${number}`;
-export type COMMITTEE_SESSION_UPDATE_REQUEST_BODY = CommitteeSessionUpdateRequest;
-export interface COMMITTEE_SESSION_DELETE_REQUEST_PARAMS {
-  committee_session_id: number;
-}
-export type COMMITTEE_SESSION_DELETE_REQUEST_PATH = `/api/committee_sessions/${number}`;
-
-// /api/committee_sessions/{committee_session_id}/status
-export interface COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_PARAMS {
-  committee_session_id: number;
-}
-export type COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_PATH = `/api/committee_sessions/${number}/status`;
-export type COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_BODY = CommitteeSessionStatusChangeRequest;
-
-// /api/committee_sessions/{committee_session_id}/voters
-export interface COMMITTEE_SESSION_NUMBER_OF_VOTERS_CHANGE_REQUEST_PARAMS {
-  committee_session_id: number;
-}
-export type COMMITTEE_SESSION_NUMBER_OF_VOTERS_CHANGE_REQUEST_PATH = `/api/committee_sessions/${number}/voters`;
-export type COMMITTEE_SESSION_NUMBER_OF_VOTERS_CHANGE_REQUEST_BODY = CommitteeSessionNumberOfVotersChangeRequest;
-
 // /api/elections
 export type ELECTION_LIST_REQUEST_PARAMS = Record<string, never>;
 export type ELECTION_LIST_REQUEST_PATH = `/api/elections`;
@@ -57,6 +27,25 @@ export interface ELECTION_DETAILS_REQUEST_PARAMS {
 }
 export type ELECTION_DETAILS_REQUEST_PATH = `/api/elections/${number}`;
 
+// /api/elections/{election_id}/committee_sessions
+export interface COMMITTEE_SESSION_CREATE_REQUEST_PARAMS {
+  election_id: number;
+}
+export type COMMITTEE_SESSION_CREATE_REQUEST_PATH = `/api/elections/${number}/committee_sessions`;
+
+// /api/elections/{election_id}/committee_sessions/{committee_session_id}
+export interface COMMITTEE_SESSION_UPDATE_REQUEST_PARAMS {
+  election_id: number;
+  committee_session_id: number;
+}
+export type COMMITTEE_SESSION_UPDATE_REQUEST_PATH = `/api/elections/${number}/committee_sessions/${number}`;
+export type COMMITTEE_SESSION_UPDATE_REQUEST_BODY = CommitteeSessionUpdateRequest;
+export interface COMMITTEE_SESSION_DELETE_REQUEST_PARAMS {
+  election_id: number;
+  committee_session_id: number;
+}
+export type COMMITTEE_SESSION_DELETE_REQUEST_PATH = `/api/elections/${number}/committee_sessions/${number}`;
+
 // /api/elections/{election_id}/committee_sessions/{committee_session_id}/download_pdf_results
 export interface ELECTION_DOWNLOAD_PDF_RESULTS_REQUEST_PARAMS {
   election_id: number;
@@ -72,6 +61,24 @@ export interface ELECTION_DOWNLOAD_ZIP_RESULTS_REQUEST_PARAMS {
 }
 export type ELECTION_DOWNLOAD_ZIP_RESULTS_REQUEST_PATH =
   `/api/elections/${number}/committee_sessions/${number}/download_zip_results`;
+
+// /api/elections/{election_id}/committee_sessions/{committee_session_id}/status
+export interface COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_PARAMS {
+  election_id: number;
+  committee_session_id: number;
+}
+export type COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_PATH =
+  `/api/elections/${number}/committee_sessions/${number}/status`;
+export type COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_BODY = CommitteeSessionStatusChangeRequest;
+
+// /api/elections/{election_id}/committee_sessions/{committee_session_id}/voters
+export interface COMMITTEE_SESSION_NUMBER_OF_VOTERS_CHANGE_REQUEST_PARAMS {
+  election_id: number;
+  committee_session_id: number;
+}
+export type COMMITTEE_SESSION_NUMBER_OF_VOTERS_CHANGE_REQUEST_PATH =
+  `/api/elections/${number}/committee_sessions/${number}/voters`;
+export type COMMITTEE_SESSION_NUMBER_OF_VOTERS_CHANGE_REQUEST_BODY = CommitteeSessionNumberOfVotersChangeRequest;
 
 // /api/elections/{election_id}/download_n_10_2
 export interface ELECTION_DOWNLOAD_N_10_2_REQUEST_PARAMS {
@@ -864,13 +871,6 @@ export interface LoginResponse {
   role: Role;
   user_id: number;
   username: string;
-}
-
-/**
- * New committee session request
- */
-export interface NewCommitteeSessionRequest {
-  election_id: number;
 }
 
 /**

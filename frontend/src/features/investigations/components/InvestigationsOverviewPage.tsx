@@ -29,7 +29,7 @@ export function InvestigationsOverviewPage() {
   const { refetch: refetchStatuses } = useElectionStatus();
   const { isCoordinator } = useUserRole();
   const navigate = useNavigate();
-  const updatePath: COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_PATH = `/api/committee_sessions/${currentCommitteeSession.id}/status`;
+  const updatePath: COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_PATH = `/api/elections/${currentCommitteeSession.election_id}/committee_sessions/${currentCommitteeSession.id}/status`;
   const { update, isLoading } = useCrud({ updatePath, throwAllErrors: true });
   const allInvestigationsHandled = investigations.length > 0 && investigations.length === handledInvestigations.length;
 

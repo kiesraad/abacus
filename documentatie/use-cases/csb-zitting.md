@@ -43,7 +43,7 @@ __Uitbreidingen:__
 13a. De gemeenteraad besluit dat een hertelling nodig is ([Artikel V 4a Kieswet](https://wetten.overheid.nl/jci1.3:c:BWBR0004627&afdeling=IV&hoofdstuk=V&paragraaf=1&artikel=V_4a&z=2025-02-12&g=2025-02-12)):  
 &emsp; 13a1. De hertelling wordt gedaan door het GSB d.m.v. de corrigendum-flow.  
 &emsp; 13a2. De CSB stelt de nieuwe uitslag vast.  
-&emsp; 13a3. Het CSB maakt een nieuw P22-2, EML 510d en EML 520 aan met alleen de nieuwe uitslag.
+&emsp; 13a3. Het CSB maakt een nieuwe P22-2, EML 510d en EML 520 aan met alleen de nieuwe uitslag.
 
 ### Niet in scope
 

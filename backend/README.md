@@ -184,7 +184,7 @@ Run `cargo run --bin gen-test-election -- --help` to see all command-line option
 
 ### Binary usage
 
-The abacus binary sopports a few arguments, which can be passed on the command line, or as environment variables:
+The abacus binary supports a few arguments, which can be passed on the command line, or as environment variables:
 
 ```
 Options:

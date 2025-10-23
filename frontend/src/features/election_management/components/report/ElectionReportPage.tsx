@@ -23,7 +23,7 @@ import { formatFullDateWithoutTimezone } from "@/utils/dateTime";
 import cls from "../ElectionManagement.module.css";
 
 export function ElectionReportPage() {
-  const { currentCommitteeSession, committeeSessions, election } = useElection();
+  const { currentCommitteeSession, committeeSessions, election, investigations } = useElection();
   const navigate = useNavigate();
   const committeeSessionId = useNumericParam("committeeSessionId");
   const committeeSession = committeeSessions.find((session) => session.id === committeeSessionId);
@@ -47,6 +47,8 @@ export function ElectionReportPage() {
   }
 
   const isFirstCommitteeSession = currentCommitteeSession.number === 1;
+
+  const wasCorrected = investigations.some((i) => i.corrected_results);
 
   function handleResume() {
     const body: COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_BODY = { status: "data_entry_in_progress" };
@@ -110,14 +112,18 @@ export function ElectionReportPage() {
                   {t(
                     isFirstCommitteeSession
                       ? "election_management.first_session.zip_file_explanation"
-                      : "election_management.next_session.zip_file_explanation",
+                      : wasCorrected
+                        ? "election_management.next_session.with_corrections.zip_file_explanation"
+                        : "election_management.next_session.without_corrections.zip_file_explanation",
                   )}
                 </p>
                 <ol className={cls.list}>
                   {tx(
                     isFirstCommitteeSession
                       ? "election_management.first_session.documents"
-                      : "election_management.next_session.documents",
+                      : wasCorrected
+                        ? "election_management.next_session.with_corrections.documents"
+                        : "election_management.next_session.without_corrections.documents",
                   )}
                 </ol>
                 <p>{t("election_management.upload_the_zip")}</p>

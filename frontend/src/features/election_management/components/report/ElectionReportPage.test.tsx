@@ -276,4 +276,76 @@ describe("ElectionReportPage", () => {
     await expectConflictErrorPage();
     expect(console.error).toHaveBeenCalled();
   });
+
+  test("If there is an investigation with corrections, page refers to three documents in the zip", async () => {
+    const router = renderPage();
+    const electionData = getElectionMockData(
+      {},
+      { status: "data_entry_finished", location: "Den Haag", start_date_time: "2026-03-18T21:36:00" },
+    );
+
+    // Set to second session and update investigations
+    electionData.current_committee_session.number = 2;
+    electionData.investigations.map((i) => (i.corrected_results = true));
+
+    server.use(
+      http.get("/api/elections/1", () =>
+        HttpResponse.json(electionData satisfies ElectionDetailsResponse, { status: 200 }),
+      ),
+    );
+
+    await router.navigate("/elections/1/report/committee-session/1/download");
+
+    rtlRender(<Providers router={router} />);
+
+    expect(
+      await screen.findByRole("heading", { level: 1, name: "Tweede zitting Gemeentelijk Stembureau" }),
+    ).toBeVisible();
+
+    expect(
+      await screen.findByRole("heading", {
+        level: 2,
+        name: "Telresultaten tweede zitting gemeentelijk stembureau gemeente Heemdamseburg",
+      }),
+    ).toBeVisible();
+
+    expect(screen.getByText("In het Zip bestand zitten drie documenten:")).toBeInTheDocument();
+    expect(await screen.findByRole("link", { name: /Download definitieve documenten tweede zitting/ })).toBeVisible();
+  });
+
+  test("If there is an investigation without corrections, page refers to one document in the zip", async () => {
+    const router = renderPage();
+    const electionData = getElectionMockData(
+      {},
+      { status: "data_entry_finished", location: "Den Haag", start_date_time: "2026-03-18T21:36:00" },
+    );
+
+    // Set to second session and update investigations
+    electionData.current_committee_session.number = 2;
+    electionData.investigations.map((i) => (i.corrected_results = false));
+
+    server.use(
+      http.get("/api/elections/1", () =>
+        HttpResponse.json(electionData satisfies ElectionDetailsResponse, { status: 200 }),
+      ),
+    );
+
+    await router.navigate("/elections/1/report/committee-session/1/download");
+
+    rtlRender(<Providers router={router} />);
+
+    expect(
+      await screen.findByRole("heading", { level: 1, name: "Tweede zitting Gemeentelijk Stembureau" }),
+    ).toBeVisible();
+
+    expect(
+      await screen.findByRole("heading", {
+        level: 2,
+        name: "Telresultaten tweede zitting gemeentelijk stembureau gemeente Heemdamseburg",
+      }),
+    ).toBeVisible();
+
+    expect(screen.getByText("In het Zip bestand zit één document:")).toBeInTheDocument();
+    expect(await screen.findByRole("link", { name: /Download definitieve documenten tweede zitting/ })).toBeVisible();
+  });
 });

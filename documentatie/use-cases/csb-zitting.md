@@ -19,7 +19,7 @@ __Hoofdscenario:__
 9. Het CSB voert het controleprotocol zetelverdeling uit. (controleprotocol deel C)
 10. Het CSB opent de zitting.
 11. Het CSB stelt de uitslag vast o.b.v. de P 22-2: controleren op compleetheid, voorlezen, er zijn geen bezwaren, ondertekenen. En sluit daarmee de zitting.
-12. Het CSB publiceert de P22-2, EML 510d en EML 520 op de website van de gemeente.
+12. Het CSB publiceert de P 22-2, EML 510d en EML 520 op de website van de gemeente.
 13. Het CSB stuurt alle PVs naar de gemeenteraad.
 14. Het CSB deelt de EML 510d en EML 520 met de Kiesraad.
 
@@ -43,7 +43,7 @@ __Uitbreidingen:__
 13a. De gemeenteraad besluit dat een hertelling nodig is ([Artikel V 4a Kieswet](https://wetten.overheid.nl/jci1.3:c:BWBR0004627&afdeling=IV&hoofdstuk=V&paragraaf=1&artikel=V_4a&z=2025-02-12&g=2025-02-12)):  
 &emsp; 13a1. De hertelling wordt gedaan door het GSB d.m.v. de corrigendum-flow.  
 &emsp; 13a2. De CSB stelt de nieuwe uitslag vast.  
-&emsp; 13a3. Het CSB maakt een nieuwe P22-2, EML 510d en EML 520 aan met alleen de nieuwe uitslag.
+&emsp; 13a3. Het CSB maakt een nieuwe P 22-2, EML 510d en EML 520 aan met alleen de nieuwe uitslag.
 
 ### Niet in scope
 
@@ -58,8 +58,8 @@ __Uitbreidingen:__
 - Willen we de benoemingsbrieven en de kennisgevingen tot geloofsbrief door de applicatie laten genereren? Of doen we dat liever op een andere manier?
     - Hoe faciliteren we gemeentes in het bepalen van de layout (bijv. gebruik huisstijl gemeente).
     - Als de applicatie deze moet genereren, dan moeten we ook de totalenlijst i.p.v. de kandidatenlijsten importeren.
-- Overzicht bijlages toevoegen? Komen niet uit de software. (P22-2)
-- Moet de applicatie Sectie 2.11 Hertelling van de P22-2 genereren, inclusief extra secties 2.3 t/m 2.5 of 2.10 o.b.v. de hertelling? N.B. deze sectie is alleen relevant als het vertegenwoordigend orgaan vraagt om een hertelling (dus na zitting CSB).
+- Overzicht bijlages toevoegen? Komen niet uit de software. (P 22-2)
+- Moet de applicatie Sectie 2.11 Hertelling van de P 22-2 genereren, inclusief extra secties 2.3 t/m 2.5 of 2.10 o.b.v. de hertelling? N.B. deze sectie is alleen relevant als het vertegenwoordigend orgaan vraagt om een hertelling (dus na zitting CSB).
 
 
 ## Het CSB stelt de zetelverdeling vast en wijst de gekozen kandidaten aan (vlieger)

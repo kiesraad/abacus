@@ -13,10 +13,14 @@ export class PollingStationImportPgObj {
     this.upload = page.getByRole("button", { name: "Bestand kiezen" });
   }
 
-  async uploadFile(page: Page, path: string) {
-    const fileChooserPromise = page.waitForEvent("filechooser");
+  async uploadFile(path: string) {
+    const fileChooserPromise = this.page.waitForEvent("filechooser");
     await this.upload.click();
     const fileChooser = await fileChooserPromise;
     await fileChooser.setFiles(path);
+  }
+
+  fileTooLargeError(filename: string) {
+    return this.page.getByRole("strong").filter({ hasText: filename });
   }
 }

@@ -3,10 +3,12 @@ pub use base::*;
 mod base;
 mod common;
 mod eml_110;
-pub mod eml_230;
+mod eml_230;
 mod eml_510;
 mod eml_520;
 pub mod hash;
+#[cfg(feature = "e2e-helpers")]
+pub mod test_api;
 mod util;
 
 pub use common::EMLImportError;

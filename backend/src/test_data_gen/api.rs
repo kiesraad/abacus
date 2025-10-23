@@ -18,7 +18,6 @@ pub fn router() -> OpenApiRouter<AppState> {
     ),
     request_body = GenerateElectionArgs,
 )]
-#[axum::debug_handler]
 async fn generate_election_handler(
     State(pool): State<SqlitePool>,
     Json(args): Json<GenerateElectionArgs>,

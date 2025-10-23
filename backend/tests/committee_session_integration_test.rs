@@ -125,7 +125,7 @@ async fn test_committee_session_delete_ok_status_created(pool: SqlitePool) {
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_5_with_results", "users"))))]
-async fn test_committee_session_delete_fail(pool: SqlitePool) {
+async fn test_committee_session_delete_fails_with_investigation(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let cookie = shared::coordinator_login(&addr).await;
     let election_id = 5;
@@ -272,7 +272,9 @@ async fn test_committee_session_delete_not_ok_wrong_status(pool: SqlitePool) {
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
-async fn test_committee_session_delete_first_committee_session(pool: SqlitePool) {
+async fn test_committee_session_delete_current_committee_session_but_its_the_first(
+    pool: SqlitePool,
+) {
     let addr = serve_api(pool).await;
     let cookie = shared::coordinator_login(&addr).await;
     let election_id = 2;
@@ -311,6 +313,26 @@ async fn test_committee_session_delete_first_committee_session(pool: SqlitePool)
     let committee_session =
         shared::get_election_committee_session(&addr, &cookie, election_id).await;
     assert_eq!(committee_session.status, CommitteeSessionStatus::Created);
+}
+
+#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_5_with_results", "users"))))]
+async fn test_committee_session_delete_previous_committee_session(pool: SqlitePool) {
+    let addr = serve_api(pool).await;
+    let cookie = shared::coordinator_login(&addr).await;
+    let url = format!("http://{addr}/api/elections/5/committee_sessions/5");
+
+    let response = reqwest::Client::new()
+        .delete(&url)
+        .header("cookie", cookie)
+        .send()
+        .await
+        .unwrap();
+
+    assert_eq!(
+        response.status(),
+        StatusCode::NOT_FOUND,
+        "Unexpected response status"
+    );
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_5_with_results", "users"))))]

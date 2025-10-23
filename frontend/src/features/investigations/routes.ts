@@ -12,11 +12,12 @@ export const investigationRoutes: RouteObject[] = [
   {
     Component: InvestigationsLayout,
     children: [
-      { index: true, Component: InvestigationsOverviewPage },
+      { index: true, Component: InvestigationsOverviewPage, handle: { roles: ["administrator", "coordinator"] } },
       {
         index: true,
         path: "add",
         Component: AddInvestigationPage,
+        handle: { roles: ["coordinator"] },
       },
       {
         path: ":pollingStationId",
@@ -26,14 +27,17 @@ export const investigationRoutes: RouteObject[] = [
             index: true,
             path: "reason",
             Component: InvestigationReasonPage,
+            handle: { roles: ["coordinator"] },
           },
           {
             path: "print-corrigendum",
             Component: InvestigationPrintCorrigendumPage,
+            handle: { roles: ["coordinator"] },
           },
           {
             path: "findings",
             Component: InvestigationFindingsPage,
+            handle: { roles: ["coordinator"] },
           },
         ],
       },

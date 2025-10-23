@@ -8,8 +8,8 @@ export const resolveErrorsRoutes: RouteObject[] = [
   {
     Component: ResolveErrorsLayout,
     children: [
-      { index: true, Component: ResolveErrorsIndexPage },
-      { path: ":sectionId", Component: ResolveErrorsSectionPage },
+      { index: true, Component: ResolveErrorsIndexPage, handle: { roles: ["coordinator"] } },
+      { path: ":sectionId", Component: ResolveErrorsSectionPage, handle: { roles: ["coordinator"] } },
     ],
   },
 ];

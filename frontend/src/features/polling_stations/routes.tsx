@@ -10,12 +10,13 @@ export const pollingStationsRoutes: RouteObject[] = [
   {
     Component: PollingStationsLayout,
     children: [
-      { index: true, Component: PollingStationListPage },
-      { path: "create", Component: PollingStationCreatePage },
-      { path: "import", Component: PollingStationImportPage },
+      { index: true, Component: PollingStationListPage, handle: { roles: ["administrator", "coordinator"] } },
+      { path: "create", Component: PollingStationCreatePage, handle: { roles: ["administrator", "coordinator"] } },
+      { path: "import", Component: PollingStationImportPage, handle: { roles: ["administrator", "coordinator"] } },
       {
         path: ":pollingStationId/update",
         Component: PollingStationUpdatePage,
+        handle: { roles: ["administrator", "coordinator"] },
       },
     ],
   },

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link, Location, Navigate, useLocation, useNavigate } from "react-router";
+import { Link, Location, useLocation, useNavigate } from "react-router";
 
 import { DEFAULT_CANCEL_REASON } from "@/api/ApiClient";
 import { useCrud } from "@/api/useCrud";
@@ -36,7 +36,7 @@ export function ElectionHomePage() {
   const navigate = useNavigate();
   const { currentCommitteeSession, committeeSessions, election, investigations, pollingStations, refetch } =
     useElection();
-  const { isTypist, isCoordinator } = useUserRole();
+  const { isCoordinator } = useUserRole();
   const [showAddCommitteeSessionModal, setShowAddCommitteeSessionModal] = useState(false);
   const isFirstCommitteeSession = currentCommitteeSession.number === 1;
   const createPath: COMMITTEE_SESSION_CREATE_REQUEST_PATH = `/api/committee_sessions`;
@@ -71,10 +71,6 @@ export function ElectionHomePage() {
 
   function toggleDeleteCommitteeSessionModal() {
     void navigate(".", { replace: true });
-  }
-
-  if (isTypist) {
-    return <Navigate to="data-entry" />;
   }
 
   return (

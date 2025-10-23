@@ -1,7 +1,6 @@
 #![cfg(test)]
 
 use hyper::StatusCode;
-use serde_json::{Value, json};
 use sqlx::SqlitePool;
 use test_log::test;
 
@@ -110,7 +109,7 @@ async fn test_user_creation(pool: SqlitePool) {
 
     let response = reqwest::Client::new()
         .post(&url)
-        .json(&json!({
+        .json(&serde_json::json!({
             "role": "administrator",
             "username": "username",
             "fullname": "fullname",
@@ -127,7 +126,7 @@ async fn test_user_creation(pool: SqlitePool) {
         "Unexpected response status"
     );
 
-    let body: Value = response.json().await.unwrap();
+    let body: serde_json::Value = response.json().await.unwrap();
 
     assert_eq!(body["role"], "administrator");
     assert_eq!(body["username"], "username");
@@ -143,7 +142,7 @@ async fn test_user_creation_duplicate_username(pool: SqlitePool) {
 
     let response = reqwest::Client::new()
         .post(&url)
-        .json(&json!({
+        .json(&serde_json::json!({
             "role": "administrator",
             "username": "username",
             "fullname": "fullname",
@@ -162,7 +161,7 @@ async fn test_user_creation_duplicate_username(pool: SqlitePool) {
 
     let response = reqwest::Client::new()
         .post(&url)
-        .json(&json!({
+        .json(&serde_json::json!({
             "role": "administrator",
             "username": "Username",
             "fullname": "fullname",
@@ -188,7 +187,7 @@ async fn test_user_creation_anonymous(pool: SqlitePool) {
 
     let response = reqwest::Client::new()
         .post(&url)
-        .json(&json!({
+        .json(&serde_json::json!({
             "role": "typist",
             "username": "username",
             "temp_password": "MyLongPassword13"
@@ -204,7 +203,7 @@ async fn test_user_creation_anonymous(pool: SqlitePool) {
         "Unexpected response status"
     );
 
-    let body: Value = response.json().await.unwrap();
+    let body: serde_json::Value = response.json().await.unwrap();
 
     assert_eq!(body["role"], "typist");
     assert_eq!(body["username"], "username");
@@ -220,7 +219,7 @@ async fn test_user_creation_invalid_password(pool: SqlitePool) {
 
     let response = reqwest::Client::new()
         .post(&url)
-        .json(&json!({
+        .json(&serde_json::json!({
             "role": "typist",
             "username": "username",
             "temp_password": "too_short"
@@ -241,7 +240,7 @@ async fn test_user_update_password_invalid(pool: SqlitePool) {
 
     let response = reqwest::Client::new()
         .put(&url)
-        .json(&json!({
+        .json(&serde_json::json!({
             "temp_password": "too_short"
         }))
         .header("cookie", admin_cookie)
@@ -260,7 +259,7 @@ async fn test_user_update_not_found(pool: SqlitePool) {
 
     let response = reqwest::Client::new()
         .put(&url)
-        .json(&json!({
+        .json(&serde_json::json!({
             "fullname": "Does Not Exist",
         }))
         .header("cookie", &admin_cookie)
@@ -279,7 +278,7 @@ async fn test_user_change_to_same_password_fails(pool: SqlitePool) {
 
     let response = reqwest::Client::new()
         .put(&url)
-        .json(&json!({
+        .json(&serde_json::json!({
             "username": "typist1",
             "password": "Typist1Password01",
         }))
@@ -306,7 +305,7 @@ async fn test_user_get(pool: SqlitePool) {
 
     assert_eq!(response.status(), StatusCode::OK);
 
-    let body: Value = response.json().await.unwrap();
+    let body: serde_json::Value = response.json().await.unwrap();
 
     assert_eq!(body["id"], 1);
     assert_eq!(body["role"], "administrator");
@@ -430,7 +429,7 @@ async fn test_coordinator_can_only_create_typists(pool: SqlitePool) {
     let coordinator_cookie = shared::coordinator_login(&addr).await;
     let url = format!("http://{addr}/api/user");
 
-    let mut data = json!({
+    let mut data = serde_json::json!({
         "role": "typist",
         "username": "new_typist",
         "fullname": "New Typist",
@@ -447,11 +446,11 @@ async fn test_coordinator_can_only_create_typists(pool: SqlitePool) {
 
     assert_eq!(response.status(), StatusCode::CREATED);
 
-    let body: Value = response.json().await.unwrap();
+    let body: serde_json::Value = response.json().await.unwrap();
     assert_eq!(body["role"], "typist");
     assert_eq!(body["username"], "new_typist");
 
-    data["role"] = json!("administrator");
+    data["role"] = serde_json::json!("administrator");
     let response = reqwest::Client::new()
         .post(&url)
         .json(&data)
@@ -462,7 +461,7 @@ async fn test_coordinator_can_only_create_typists(pool: SqlitePool) {
 
     assert_eq!(response.status(), StatusCode::FORBIDDEN);
 
-    data["role"] = json!("coordinator");
+    data["role"] = serde_json::json!("coordinator");
     let response = reqwest::Client::new()
         .post(&url)
         .json(&data)
@@ -489,7 +488,7 @@ async fn test_coordinator_can_only_get_typists(pool: SqlitePool) {
 
     assert_eq!(response.status(), StatusCode::OK);
 
-    let body: Value = response.json().await.unwrap();
+    let body: serde_json::Value = response.json().await.unwrap();
     assert_eq!(body["id"], 5);
     assert_eq!(body["role"], "typist");
 
@@ -522,7 +521,7 @@ async fn test_coordinator_can_only_update_typists(pool: SqlitePool) {
     let typist_url = format!("http://{addr}/api/user/5");
     let response = reqwest::Client::new()
         .put(&typist_url)
-        .json(&json!({"fullname": "Updated Typist"}))
+        .json(&serde_json::json!({"fullname": "Updated Typist"}))
         .header("cookie", &coordinator_cookie)
         .send()
         .await
@@ -530,13 +529,13 @@ async fn test_coordinator_can_only_update_typists(pool: SqlitePool) {
 
     assert_eq!(response.status(), StatusCode::OK);
 
-    let body: Value = response.json().await.unwrap();
+    let body: serde_json::Value = response.json().await.unwrap();
     assert_eq!(body["fullname"], "Updated Typist");
 
     let admin_url = format!("http://{addr}/api/user/1");
     let response = reqwest::Client::new()
         .put(&admin_url)
-        .json(&json!({"fullname": "Should Fail"}))
+        .json(&serde_json::json!({"fullname": "Should Fail"}))
         .header("cookie", &coordinator_cookie)
         .send()
         .await
@@ -547,7 +546,7 @@ async fn test_coordinator_can_only_update_typists(pool: SqlitePool) {
     let coordinator_url = format!("http://{addr}/api/user/3");
     let response = reqwest::Client::new()
         .put(&coordinator_url)
-        .json(&json!({"fullname": "Should Fail"}))
+        .json(&serde_json::json!({"fullname": "Should Fail"}))
         .header("cookie", &coordinator_cookie)
         .send()
         .await
@@ -602,7 +601,7 @@ async fn test_cant_do_anything_when_password_needs_change(pool: SqlitePool) {
     let response = reqwest::Client::new()
         .put(&url)
         .header("cookie", &admin_cookie)
-        .json(&json!({
+        .json(&serde_json::json!({
             "temp_password": "TotallyValidTempP4ssW0rd"
         }))
         .send()
@@ -627,7 +626,7 @@ async fn test_cant_do_anything_when_password_needs_change(pool: SqlitePool) {
     let url = format!("http://{addr}/api/account");
     let response = reqwest::Client::new()
         .put(&url)
-        .json(&json!({
+        .json(&serde_json::json!({
             "username": "typist1",
             "password": "Typist1Password02",
         }))

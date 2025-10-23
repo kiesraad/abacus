@@ -30,7 +30,7 @@ jobs:
       - uses: actions/checkout@v5
       # Build frontend so that it can be included in the backend build
       - name: Setup Node
-        uses: actions/setup-node@v5
+        uses: actions/setup-node@v6
         with:
           node-version: 22
       - name: Install npm dependencies
@@ -82,7 +82,7 @@ jobs:
     steps:
       - uses: actions/checkout@v5
       - name: Setup Node
-        uses: actions/setup-node@v5
+        uses: actions/setup-node@v6
         with:
           node-version: 22
       - name: Install dependencies
@@ -117,7 +117,7 @@ jobs:
     steps:
       - uses: actions/checkout@v5
       - name: Setup Node
-        uses: actions/setup-node@v5
+        uses: actions/setup-node@v6
         with:
           node-version: 22
       - name: Install dependencies

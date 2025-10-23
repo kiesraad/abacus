@@ -13,7 +13,7 @@
 #let this_location = is_municipality[deze gemeente][dit openbaar lichaam]
 #let location = is_municipality[gemeente][openbaar lichaam]
 
-#show: doc => conf(doc, header: [Stembureau #input.polling_station.number], footer: [Proces-verbaal van een stembureau \
+#show: doc => conf(doc, header-right: [Stembureau #input.polling_station.number], footer: [Proces-verbaal van een stembureau \
   Model N 10-2 centrale stemopneming])
 
 #set heading(numbering: none)
@@ -240,6 +240,8 @@ Bijvoorbeeld als er meerdere verkiezingen tegelijk werden georganiseerd, en een 
 #checkbox[Nee, er is een onverklaard verschil]
 
 #pagebreak(weak: true)
+
+#show: doc => conf(doc, header-left: [Deel 3 - Ondertekening])
 
 #emph_block[Deze pagina is expres leeg]
 

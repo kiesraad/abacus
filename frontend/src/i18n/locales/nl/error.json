@@ -1,6 +1,6 @@
 {
   "airgap_violation": {
-    "content": "<p>Abacus is geblokkeerd omdat de applicatie is verbonden met het internet.</p><ul><li>Wijzigingen zijn niet mogelijk</li><li>Alle werkplekken zijn vergrendeld</li></ul><h3>Wat te doen?</h3><ul><li>Verbreek de internetverbinding</li><li><reload>Herlaad de pagina</reload></li></ul><p>Pas daarna kan Abacus weer gebruikt worden.</p>",
+    "content": "<p>Abacus is geblokkeerd omdat de applicatie is verbonden met het internet.</p><ul><li>Wijzigingen zijn niet mogelijk</li><li>Alle werkplekken zijn vergrendeld</li></ul><h3>Wat te doen?</h3><ol><li>Verbreek de internetverbinding</li><li>Wacht 30 seconden</li><li><reload>Herlaad de pagina</reload></li></ol><p>Pas daarna kan Abacus weer gebruikt worden.</p>",
     "reload": "Probeer opnieuw",
     "title": "Abacus zit op slot"
   },
@@ -30,6 +30,7 @@
     "InvalidVoteGroup": "De politieke partij van de stem is niet geldig",
     "InvalidXml": "De XML is niet geldig",
     "InvestigationHasDataEntryOrResult": "Er zijn al gecorrigeerde telresultaten ingevoerd",
+    "InvestigationRequiresCorrectedResults": "Er zijn gecorrigeerde telresultaten vereist voor dit onderzoek",
     "NotInitialised": "De applicatie is nog niet klaar voor gebruik.",
     "OwnAccountCannotBeDeleted": "Je kunt je eigen account niet verwijderen",
     "PasswordRejection": "Het opgegeven wachtwoord voldoet niet aan de eisen. Gebruik minimaal 13 karakters.",

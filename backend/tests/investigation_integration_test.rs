@@ -12,7 +12,6 @@ use abacus::{
 };
 use axum::http::StatusCode;
 use reqwest::Response;
-use serde_json::{Value, json};
 use sqlx::SqlitePool;
 use test_log::test;
 
@@ -20,6 +19,7 @@ use crate::{
     shared::{
         complete_data_entry, create_result_with_non_example_data_entry, differences_counts_zero,
         get_statuses, political_group_votes_from_test_data_auto, typist_login,
+        update_investigation,
     },
     utils::serve_api,
 };
@@ -48,7 +48,7 @@ async fn conclude_investigation(
     body: Option<serde_json::Value>,
 ) -> Response {
     let coordinator_cookie = shared::coordinator_login(addr).await;
-    let body = body.unwrap_or(json!({
+    let body = body.unwrap_or(serde_json::json!({
         "findings": "Test findings",
         "corrected_results": false
     }));
@@ -210,7 +210,7 @@ async fn test_deletion_removes_polling_station_from_status(pool: SqlitePool) {
         conclude_investigation(
             &addr,
             polling_station_id,
-            Some(json!({
+            Some(serde_json::json!({
                 "findings": "Test findings",
                 "corrected_results": true
             })),
@@ -328,7 +328,7 @@ async fn test_partials_update(pool: SqlitePool) {
     let updated = shared::update_investigation(
         &addr,
         polling_station_id,
-        Some(json!({
+        Some(serde_json::json!({
             "reason": "Partially updated reason"
         })),
     )
@@ -351,7 +351,7 @@ async fn test_partials_update(pool: SqlitePool) {
     let updated = shared::update_investigation(
         &addr,
         polling_station_id,
-        Some(json!({
+        Some(serde_json::json!({
             "reason": "Partially updated reason",
             "findings": "Partially updated findings"
         })),
@@ -379,7 +379,7 @@ async fn test_partials_update(pool: SqlitePool) {
     let updated = shared::update_investigation(
         &addr,
         polling_station_id,
-        Some(json!({
+        Some(serde_json::json!({
             "reason": "Partially updated reason",
             "corrected_results": true
         })),
@@ -456,7 +456,7 @@ async fn test_update_with_result(pool: SqlitePool) {
     let response = conclude_investigation(
         &addr,
         polling_station_id,
-        Some(json!({"findings": "Test findings", "corrected_results": true})),
+        Some(serde_json::json!({"findings": "Test findings", "corrected_results": true})),
     )
     .await;
     assert_eq!(response.status(), StatusCode::OK);
@@ -477,7 +477,7 @@ async fn test_update_with_result(pool: SqlitePool) {
     );
 
     // Try to update investigation corrected_results to false
-    let mut investigation = json!({
+    let mut investigation = serde_json::json!({
         "reason": "Test reason",
         "findings": "Test findings",
         "corrected_results": false
@@ -485,7 +485,7 @@ async fn test_update_with_result(pool: SqlitePool) {
     let response =
         shared::update_investigation(&addr, polling_station_id, Some(investigation.clone())).await;
     assert_eq!(response.status(), StatusCode::CONFLICT);
-    let body: Value = response.json().await.unwrap();
+    let body: serde_json::Value = response.json().await.unwrap();
     assert_eq!(body["reference"], "InvestigationHasDataEntryOrResult");
 
     // Data entry result is still there
@@ -520,7 +520,7 @@ async fn test_update_with_data_entry(pool: SqlitePool) {
     let response = conclude_investigation(
         &addr,
         polling_station_id,
-        Some(json!({"findings": "Test findings", "corrected_results": true})),
+        Some(serde_json::json!({"findings": "Test findings", "corrected_results": true})),
     )
     .await;
     assert_eq!(response.status(), StatusCode::OK);
@@ -543,7 +543,7 @@ async fn test_update_with_data_entry(pool: SqlitePool) {
     );
 
     // Try to update investigation corrected_results to false
-    let mut investigation = json!({
+    let mut investigation = serde_json::json!({
         "reason": "Test reason",
         "findings": "Test findings",
         "corrected_results": false
@@ -551,7 +551,7 @@ async fn test_update_with_data_entry(pool: SqlitePool) {
     let response =
         shared::update_investigation(&addr, polling_station_id, Some(investigation.clone())).await;
     assert_eq!(response.status(), StatusCode::CONFLICT);
-    let body: Value = response.json().await.unwrap();
+    let body: serde_json::Value = response.json().await.unwrap();
     assert_eq!(body["reference"], "InvestigationHasDataEntryOrResult");
 
     // Data entry is still there
@@ -666,6 +666,84 @@ async fn test_can_only_update_current_session(pool: SqlitePool) {
     );
 }
 
+#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_7_four_sessions", "users"))))]
+async fn test_can_conclude_update_new_polling_station_corrected_results_true(pool: SqlitePool) {
+    let addr = serve_api(pool).await;
+
+    let ps_response = shared::create_polling_station(&addr, 7, 123).await;
+    let ps_body: serde_json::Value = ps_response.json().await.unwrap();
+    let new_ps_id = u32::try_from(ps_body["id"].as_u64().unwrap()).unwrap();
+
+    shared::create_investigation(&addr, new_ps_id).await;
+
+    let conclude_response = conclude_investigation(
+        &addr,
+        new_ps_id,
+        Some(serde_json::json!({
+            "findings": "Test findings",
+            "corrected_results": true
+        })),
+    )
+    .await;
+    assert_eq!(conclude_response.status(), StatusCode::OK);
+
+    let update_response = update_investigation(
+        &addr,
+        new_ps_id,
+        Some(serde_json::json!({
+            "reason": "Test reason",
+            "corrected_results": true
+        })),
+    )
+    .await;
+    assert_eq!(update_response.status(), StatusCode::OK);
+}
+
+#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_7_four_sessions", "users"))))]
+async fn test_cannot_conclude_update_new_polling_station_corrected_results_false(pool: SqlitePool) {
+    let addr = serve_api(pool).await;
+
+    let ps_response = shared::create_polling_station(&addr, 7, 123).await;
+    let ps_body: serde_json::Value = ps_response.json().await.unwrap();
+    let new_ps_id = u32::try_from(ps_body["id"].as_u64().unwrap()).unwrap();
+
+    shared::create_investigation(&addr, new_ps_id).await;
+
+    let conclude_response = conclude_investigation(
+        &addr,
+        new_ps_id,
+        Some(serde_json::json!({
+            "findings": "Test findings",
+            "corrected_results": false
+        })),
+    )
+    .await;
+
+    assert_eq!(conclude_response.status(), StatusCode::CONFLICT);
+    let conclude_body: serde_json::Value = conclude_response.json().await.unwrap();
+    assert_eq!(
+        conclude_body["reference"],
+        "InvestigationRequiresCorrectedResults"
+    );
+
+    let update_response = update_investigation(
+        &addr,
+        new_ps_id,
+        Some(serde_json::json!({
+            "reason": "Test reason",
+            "corrected_results": false
+        })),
+    )
+    .await;
+
+    assert_eq!(update_response.status(), StatusCode::CONFLICT);
+    let update_body: serde_json::Value = update_response.json().await.unwrap();
+    assert_eq!(
+        update_body["reference"],
+        "InvestigationRequiresCorrectedResults"
+    );
+}
+
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_5_with_results", "users"))))]
 async fn test_polling_station_corrigendum_download_with_previous_results(pool: SqlitePool) {
     let addr = serve_api(pool).await;
@@ -763,7 +841,7 @@ where
             conclude_investigation(
                 addr,
                 741,
-                Some(json!({"findings": "Test findings", "corrected_results": false})),
+                Some(serde_json::json!({"findings": "Test findings", "corrected_results": false})),
             )
             .await
             .status(),
@@ -779,7 +857,7 @@ where
             conclude_investigation(
                 addr,
                 742,
-                Some(json!({"findings": "Test findings", "corrected_results": false})),
+                Some(serde_json::json!({"findings": "Test findings", "corrected_results": false})),
             )
             .await
             .status(),

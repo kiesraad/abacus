@@ -10,7 +10,7 @@
 #let location_type = is_municipality[gemeentelijk stembureau][stembureau voor het openbaar lichaam]
 #let this_location = is_municipality[deze gemeente][dit openbaar lichaam]
 
-#show: doc => conf(doc, header: location_name, footer: [
+#show: doc => conf(doc, header-right: location_name, footer: [
   #input.creation_date_time. Digitale vingerafdruk van EML-telbestand bij dit proces-verbaal (SHA-256): \
   #input.hash
 ])
@@ -141,6 +141,8 @@ Bijvoorbeeld een schorsing of als er meerdere verkiezingen tegelijk werden georg
 )
 
 #pagebreak(weak: true)
+
+#show: doc => conf(doc, header-left: [Deel 2 - Telresultaten])
 
 = Telresultaten van #is_municipality[de gemeente][het openbaar lichaam]
 
@@ -281,12 +283,13 @@ Voer de controle uit volgens de stappen in het controleprotocol.
 
 #pagebreak(weak: true)
 
+#show: doc => conf(doc, header-left: [Deel 3 - Ondertekening])
+
 #emph_block[Deze pagina is expres leeg]
 
 Zo komt het handtekeningen-blad altijd op een losse pagina, ook als het verslag dubbelzijdig is geprint.
 
 #pagebreak(weak: true)
-
 
 = Ondertekening
 

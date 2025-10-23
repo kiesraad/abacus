@@ -57,13 +57,21 @@ const config: PlaywrightTestConfig = defineConfig({
       name: "initialisation-test",
       workers: 1,
       testMatch: /initialisation\.e2e\.ts/,
-      use: { ...devices["Desktop Chrome"], channel: "chromium" },
+      use: {
+        ...devices["Desktop Chrome"],
+        channel: "chromium",
+        userAgent: "Abacus-User-Agent/1",
+      },
     },
     {
       name: "setup-test-users",
       workers: 1,
       testMatch: /setup-test-users\.ts/,
-      use: { ...devices["Desktop Chrome"], channel: "chromium" },
+      use: {
+        ...devices["Desktop Chrome"],
+        channel: "chromium",
+        userAgent: "Abacus-User-Agent/1",
+      },
       dependencies: ["initialisation-test"],
     },
     {
@@ -76,19 +84,26 @@ const config: PlaywrightTestConfig = defineConfig({
         },
         ...devices["Desktop Chrome"],
         channel: "chromium",
+        userAgent: "Abacus-User-Agent/1",
       },
       dependencies: ["setup-test-users"],
     },
     {
       name: "firefox",
       testIgnore: /initialisation\.e2e\.ts/,
-      use: { ...devices["Desktop Firefox"] },
+      use: {
+        ...devices["Desktop Firefox"],
+        userAgent: "Abacus-User-Agent/1",
+      },
       dependencies: ["setup-test-users"],
     },
     {
       name: "safari",
       testIgnore: /initialisation\.e2e\.ts/,
-      use: { ...devices["Desktop Safari"] },
+      use: {
+        ...devices["Desktop Safari"],
+        userAgent: "Abacus-User-Agent/1",
+      },
       dependencies: ["setup-test-users"],
     },
   ],

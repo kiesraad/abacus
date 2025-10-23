@@ -6,7 +6,7 @@ __Niveau:__ gebruikersdoel, zee  (🌊)
 
 ### Hoofdscenario en uitbreidingen
 
-1. Regelmatig: de applicatie stelt vast dat er geen internetverbinding is (elke 60 seconden).
+1. Regelmatig: de applicatie stelt vast dat er geen internetverbinding is (elke 30 seconden).
 
 __Uitbreidingen:__  
 1a. De server stelt vast dat er een internetverbinding is:  

@@ -77,15 +77,6 @@ export function UserUpdateForm({ user, onSaved, onAbort }: UserUpdateFormProps) 
       <Form title={t("users.details_title")} onSubmit={handleSubmit}>
         <FormLayout disabled={isLoading}>
           <FormLayout.Section>
-            <InputField
-              id="username"
-              name="username"
-              disabled={true}
-              value={user.username}
-              label={t("users.username")}
-              hint={t("users.username_hint_disabled")}
-            />
-
             {user.fullname && (
               <InputField
                 id="fullname"
@@ -96,6 +87,15 @@ export function UserUpdateForm({ user, onSaved, onAbort }: UserUpdateFormProps) 
                 error={validationErrors?.fullname}
               />
             )}
+
+            <InputField
+              id="username"
+              name="username"
+              disabled={true}
+              value={user.username}
+              label={t("users.username")}
+              hint={t("users.username_hint_disabled")}
+            />
 
             {editPassword ? (
               <InputField

@@ -37,6 +37,7 @@ pub enum ErrorReference {
     InternalServerError,
     InvalidCommitteeSessionStatus,
     InvalidData,
+    InvalidDataEntryStatus,
     InvalidHash,
     InvalidJson,
     InvalidPassword,

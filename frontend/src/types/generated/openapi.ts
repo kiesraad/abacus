@@ -176,6 +176,12 @@ export type LOGIN_REQUEST_BODY = Credentials;
 export type LOGOUT_REQUEST_PARAMS = Record<string, never>;
 export type LOGOUT_REQUEST_PATH = `/api/logout`;
 
+// /api/polling_stations/{polling_station_id}/data_entries
+export interface POLLING_STATION_DATA_ENTRIES_DELETE_REQUEST_PARAMS {
+  polling_station_id: number;
+}
+export type POLLING_STATION_DATA_ENTRIES_DELETE_REQUEST_PATH = `/api/polling_stations/${number}/data_entries`;
+
 // /api/polling_stations/{polling_station_id}/data_entries/resolve_differences
 export interface POLLING_STATION_DATA_ENTRY_GET_DIFFERENCES_REQUEST_PARAMS {
   polling_station_id: number;
@@ -781,6 +787,7 @@ export type ErrorReference =
   | "InternalServerError"
   | "InvalidCommitteeSessionStatus"
   | "InvalidData"
+  | "InvalidDataEntryStatus"
   | "InvalidHash"
   | "InvalidJson"
   | "InvalidPassword"

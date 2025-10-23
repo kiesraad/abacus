@@ -19,6 +19,7 @@
     "InternalServerError": "Er is een interne fout opgetreden",
     "InvalidCommitteeSessionStatus": "De zitting is niet in de juiste status voor deze actie",
     "InvalidData": "De invoer is niet geldig",
+    "InvalidDataEntryStatus": "De invoer heeft niet de juiste status voor deze actie",
     "InvalidHash": "De hash is niet geldig",
     "InvalidJson": "De JSON is niet geldig",
     "InvalidPassword": "Het opgegeven wachtwoord is onjuist",

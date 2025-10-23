@@ -2124,8 +2124,8 @@
     },
     "/api/polling_stations/{polling_station_id}/data_entries": {
       "delete": {
-        "summary": "Delete data entries for a polling station",
-        "operationId": "polling_station_data_entries_delete",
+        "summary": "Delete data entries and result for a polling station",
+        "operationId": "polling_station_data_entries_and_result_delete",
         "parameters": [
           {
             "name": "polling_station_id",

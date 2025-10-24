@@ -137,10 +137,8 @@ impl CommitteeSessionStatus {
             CommitteeSessionStatus::Created => Ok(self),
             CommitteeSessionStatus::DataEntryNotStarted
             | CommitteeSessionStatus::DataEntryInProgress
-            | CommitteeSessionStatus::DataEntryPaused => Ok(CommitteeSessionStatus::Created),
-            CommitteeSessionStatus::DataEntryFinished => {
-                Err(CommitteeSessionError::InvalidStatusTransition)
-            }
+            | CommitteeSessionStatus::DataEntryPaused
+            | CommitteeSessionStatus::DataEntryFinished => Ok(CommitteeSessionStatus::Created),
         }
     }
 
@@ -211,16 +209,16 @@ impl CommitteeSessionStatus {
         committee_session: &CommitteeSession,
     ) -> Result<Self, CommitteeSessionError> {
         match self {
-            CommitteeSessionStatus::Created => Err(CommitteeSessionError::InvalidStatusTransition),
-            CommitteeSessionStatus::DataEntryNotStarted => {
+            CommitteeSessionStatus::Created | CommitteeSessionStatus::DataEntryNotStarted => {
                 Err(CommitteeSessionError::InvalidStatusTransition)
             }
             CommitteeSessionStatus::DataEntryInProgress
             | CommitteeSessionStatus::DataEntryPaused => {
                 if !are_results_complete_for_committee_session(conn, committee_session.id).await? {
-                    return Err(CommitteeSessionError::InvalidStatusTransition);
+                    Err(CommitteeSessionError::InvalidStatusTransition)
+                } else {
+                    Ok(CommitteeSessionStatus::DataEntryFinished)
                 }
-                Ok(CommitteeSessionStatus::DataEntryFinished)
             }
             CommitteeSessionStatus::DataEntryFinished => Ok(self),
         }
@@ -385,7 +383,7 @@ mod tests {
     fn committee_session_status_data_entry_finished_to_created() {
         assert_eq!(
             CommitteeSessionStatus::DataEntryFinished.prepare_data_entry(),
-            Err(CommitteeSessionError::InvalidStatusTransition)
+            Ok(CommitteeSessionStatus::Created)
         );
     }
 

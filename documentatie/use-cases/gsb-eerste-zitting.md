@@ -1,6 +1,6 @@
 # GSB: Eerste zitting
 
-## Gemeentelijk stembureau (GSB) stelt uitslag vast in eerste zitting (wolk)
+## Gemeentelijk stembureau (GSB) stelt uitkomst vast in eerste zitting (wolk)
 
 _Niveau:_ hoog-over, wolk, ☁️
 

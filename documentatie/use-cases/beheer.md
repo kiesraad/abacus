@@ -52,7 +52,7 @@ __Uitbreidingen:__
 &emsp; 2a1. De beheerder stelt vast dat die het verkeerde bestand heeft ingelezen.  
 &emsp;&emsp; 2a1a. De beheerder stelt vast dat het bestand geen geldige kandidatenlijsten bevat:  
 &emsp;&emsp;&emsp; 2a1a1. De beheerder neemt contact op met het CSB.  
-&emsp; 2a2. De beheer leest het correcte bestand in.
+&emsp; 2a2. De beheerder leest het correcte bestand in.
 
 3a. De beheerder slaat het invoeren van stembureaus over:  
 &emsp; 3a1. (tijdens stap 5) De beheerder voert het aantal kiesgerechtigden in de gemeente handmatig in.  
@@ -79,7 +79,7 @@ __Uitbreidingen:__
 &emsp; 1a1. De beheerder stelt vast dat die het verkeerde bestand heeft ingelezen.  
 &emsp;&emsp; 1a1a. De beheerder stelt vast dat het bestand geen geldige verkiezingsdefinitie bevat:  
 &emsp;&emsp;&emsp; 1a1a1. De beheerder neemt contact op met het CSB.  
-&emsp; 1a2. De beheer leest het correcte bestand in.
+&emsp; 1a2. De beheerder leest het correcte bestand in.
 
 2a. De hash van de verkiezingsdefinitie (EML 110a) klopt niet:  
 &emsp; 2a1. De beheerder stelt vast dat die de hash niet correct heeft overgenomen.  
@@ -104,7 +104,7 @@ __Uitbreidingen:__
 &emsp; 2a1. De beheerder stelt vast dat die het verkeerde bestand heeft ingelezen.  
 &emsp;&emsp; 2a1a. De beheerder stelt vast dat het bestand geen geldige lijst met stembureaus bevat:  
 &emsp;&emsp;&emsp; 2a1a1. De beheerder neemt contact op met de aanleveraar van het bestand.  
-&emsp; 2a2. De beheer leest het correcte bestand in.
+&emsp; 2a2. De beheerder leest het correcte bestand in.
 
 3a. De stembureaus in de applicatie komen niet overeen met de vooraf gepubliceerde lijst:  
 &emsp; 3a1. De beheerder past de stembureaus aan.

@@ -1,8 +1,8 @@
 # GSB: Tweede zitting
 
-N.B.: Alle use cases voor de tweede zitting gelden ook voor elke latere zitting (derde, etc.).
+N.B. Alle use cases voor de tweede zitting gelden ook voor elke latere zitting (derde, etc.).
 
-## Gemeentelijk stembureau (GSB) stelt uitslag vast in tweede zitting (corrigenda) (wolk)
+## Gemeentelijk stembureau (GSB) stelt uitkomst vast in tweede zitting (corrigenda) (wolk)
 
 __Niveau:__ hoog-over, wolk, ☁️
 

@@ -41,7 +41,7 @@ __Uitbreidingen:__
 ### Niet in scope
 
 - Controles op gemeenteniveau nadat alle stembureaus zijn ingevoerd:
-  - Controle "mogelijke omwissel van kandidaatstemmen"
+  - Controle "mogelijke omwisseling van kandidaatstemmen"
   - Controle "verschilpercentage van 50% of hoger"
 
 
@@ -66,8 +66,8 @@ __Uitbreidingen:__
 
 ### Open punten
 
-- Voert de coördinator GSB de sectie "Nieuwe telling aantal toegelaten kiezers bij onverklaarde telverschillen" in? Of doet de applicatie dat? => op welk PV staat deze sectie?  
-  -> Na 14-1 Pv corrigendum SB DSO versie 1 / bijlage 1 (per SB) bij Na 31-2 Pv GSB CSO  
+- Voert de coördinator GSB de sectie "Nieuwe telling aantal toegelaten kiezers bij onverklaarde telverschillen" in? Of doet de applicatie dat? → op welk PV staat deze sectie?  
+  → Na 14-1 Pv corrigendum SB DSO versie 1 / bijlage 1 (per SB) bij Na 31-2 Pv GSB CSO  
   sectie 1.1 voor de vraag en 2.1 voor nieuwe aantallen (DSO)  
   sectie 2.1 voor de vraag en 3.1 voor nieuwe aantallen (CSO)  
 
@@ -153,7 +153,7 @@ __Uitbreidingen:__
 
 4a. De invoer voldoet niet aan de validatieregels voor fouten of aan de plausibiliteitschecks:  
 &emsp; 4a1. De applicatie toont een foutmelding voor elke gefaalde validatieregel en een waarschuwing voor elke gefaalde plausibiliteitscheck.  
-&emsp; 4a2. [De invoerder handelt de fout(en) en/of waarschuwing(en) af.](#de-invoerder-handelt-de-fouten-en-of-waarschuwingen-af-vis)
+&emsp; 4a2. [De invoerder handelt de fout(en) en/of waarschuwing(en) af.](#de-invoerder-handelt-de-fouten-enof-waarschuwingen-af-vis)
 
 5a. De invoerder breekt de invoer af en bewaart de invoer:  
 &emsp; 5a1. De applicatie slaat de invoer op, gekoppeld aan de invoerder.  

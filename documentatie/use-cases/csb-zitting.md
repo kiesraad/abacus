@@ -8,7 +8,7 @@ __Niveau:__ hoog-over, wolk, ☁️
 
 __Hoofdscenario:__  
 
-1. Het CSB ontvangt het GSB PV incl. bijlagen (DSO: Na 31-1 , CSO: Na 31-2) van de burgemeester.
+1. Het CSB ontvangt het GSB PV incl. bijlagen (DSO: Na 31-1, CSO: Na 31-2) van de burgemeester.
 2. Het CSB ontvangt alle overige documenten (PVs, onderliggende PVs, corrigenda, tellingsbestand EML 510b) van het GSB en controleert ze op volledigheid.
 3. Het CSB stelt vast dat het GSB PV geen aanleiding geeft tot een terugverwijzing. (controleprotocol deel A)
 4. [Het CSB voert de tellingen van het GSB in.](./csb-invoer-zitting.md#het-csb-voert-de-tellingen-van-het-gsb-in-vlieger)
@@ -27,7 +27,7 @@ __Uitbreidingen:__
 
 3a. Het GSB PV geeft aanleiding tot een terugverwijzing:  
 &emsp; 3a1. Het CSB verwijst terug naar het GSB.  
-&emsp; 3a2. [Gemeentelijk stembureau (GSB) stelt uitslag vast in tweede zitting (corrigenda) (wolk)](./gsb-tweede-zitting.md#gemeentelijk-stembureau-gsb-stelt-uitslag-vast-in-tweede-zitting-corrigenda-wolk)  
+&emsp; 3a2. [Gemeentelijk stembureau (GSB) stelt uitkomst vast in tweede zitting (corrigenda) (wolk)](./gsb-tweede-zitting.md#gemeentelijk-stembureau-gsb-stelt-uitkomst-vast-in-tweede-zitting-corrigenda-wolk)  
 
 4-11a. Het CSB moet nieuwe aantallen invoeren ter correctie van de eerder ingevoerde tellingen:  
 &emsp; 4-11a1. Het CSB corrigeert de eerder ingevoerde aantallen in de applicatie. Er is dus geen tweede CSB-zitting.

@@ -176,7 +176,7 @@ describe("InvestigationFindingsPage", () => {
     });
     await renderPage(3);
 
-    const correctedResults = await screen.findByRole("group", { name: "Is er een gecorrigeerde uitslag?" });
+    const correctedResults = await screen.findByRole("group", { name: "Is er een gecorrigeerde uitkomst?" });
     expect(correctedResults).toBeVisible();
 
     const yes = screen.getByTestId("corrected_results_yes");
@@ -222,7 +222,7 @@ describe("InvestigationFindingsPage", () => {
     });
     await renderPage(3);
 
-    const correctedResults = await screen.findByRole("group", { name: "Is er een gecorrigeerde uitslag?" });
+    const correctedResults = await screen.findByRole("group", { name: "Is er een gecorrigeerde uitkomst?" });
     expect(correctedResults).toBeVisible();
 
     const yes = screen.getByTestId("corrected_results_yes");

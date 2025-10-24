@@ -217,7 +217,7 @@ describe("InvestigationsOverviewPage", () => {
     const alert = await screen.findByRole("alert");
     expect(within(alert).getByRole("strong")).toHaveTextContent("Alle onderzoeken zijn afgehandeld");
     expect(within(alert).getByRole("paragraph")).toHaveTextContent(
-      "De resultaten van alle onderzoeken zijn ingevoerd. Je kunt de uitslag nu definitief maken en het proces verbaal opmaken.",
+      "De resultaten van alle onderzoeken zijn ingevoerd. Je kunt de uitkomst nu definitief maken en het proces verbaal opmaken.",
     );
     expect(within(alert).getByRole("button", { name: "Invoerfase afronden" })).toBeVisible();
   });

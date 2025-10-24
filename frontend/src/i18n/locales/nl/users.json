@@ -15,7 +15,7 @@
   "new_password": "Nieuw wachtwoord",
   "not_used": "Nog niet gebruikt",
   "password": "Wachtwoord",
-  "role_administrator_hint": "Verkiezingen voorbereiden, gebruikers aanmaken en uitslagen downloaden",
+  "role_administrator_hint": "Verkiezingen voorbereiden, gebruikers aanmaken en uitkomsten downloaden",
   "role_coordinator_hint": "Problemen en fouten tijdens het invoeren oplossen",
   "role_hint": "Kies de rol van de nieuwe gebruiker. De rol kan na het aanmaken van de gebruiker niet meer aangepast worden.",
   "role_label": "Kies een rol",

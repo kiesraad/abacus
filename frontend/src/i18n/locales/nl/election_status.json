@@ -3,12 +3,12 @@
   "data_entry_is_paused": "Het invoeren van stemmen is gepauzeerd",
   "definitive": {
     "title": "Alle stembureaus zijn twee keer ingevoerd",
-    "message": "De resultaten van alle stembureaus in jouw gemeente zijn correct ingevoerd. Je kunt de uitslag nu definitief maken en het proces-verbaal opmaken. Doe dit alleen als er vandaag niks meer herteld hoeft te worden.",
+    "message": "De resultaten van alle stembureaus in jouw gemeente zijn correct ingevoerd. Je kunt de uitkomst nu definitief maken en het proces-verbaal opmaken. Doe dit alleen als er vandaag niks meer herteld hoeft te worden.",
     "finish_button": "Invoerfase afronden"
   },
   "label": "Status",
   "main_title": "Statusoverzicht steminvoer",
-  "no_investigations_with_corrected_results": "Er zijn nog geen onderzoeken met gecorrigeerde uitslag voor deze zitting.",
+  "no_investigations_with_corrected_results": "Er zijn nog geen onderzoeken met gecorrigeerde uitkomst voor deze zitting.",
   "no_polling_stations": "Er zijn nog geen stembureaus toegevoegd voor deze verkiezing.",
   "pause": "Pauzeren",
   "pause_are_you_sure": "Weet je zeker dat je wilt pauzeren? Invoerders kunnen niet verder werken.",

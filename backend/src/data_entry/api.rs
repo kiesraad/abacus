@@ -651,7 +651,6 @@ async fn polling_station_data_entries_and_result_delete(
     let committee_session =
         crate::committee_session::repository::get(&mut tx, polling_station.committee_session_id)
             .await?;
-    crate::election::repository::get(&mut tx, committee_session.election_id).await?;
 
     let data_entry = get_data_entry(&mut tx, polling_station_id, committee_session.id).await?;
 
@@ -662,7 +661,7 @@ async fn polling_station_data_entries_and_result_delete(
 
         Err(APIError::Conflict(
             "Data entry cannot be deleted.".to_string(),
-            ErrorReference::InvalidDataEntryStatus,
+            ErrorReference::DataEntryCannotBeDeleted,
         ))
     } else {
         // The database entries of the data entry (and optional result) are fully deleted
@@ -2046,7 +2045,7 @@ mod tests {
         assert_eq!(response.status(), StatusCode::CONFLICT);
         let body = response.into_body().collect().await.unwrap().to_bytes();
         let result: ErrorResponse = serde_json::from_slice(&body).unwrap();
-        assert_eq!(result.reference, ErrorReference::InvalidDataEntryStatus);
+        assert_eq!(result.reference, ErrorReference::DataEntryCannotBeDeleted);
 
         // Check that the data entry is not deleted
         assert!(data_entry_exists(&mut conn, 1).await.unwrap());
@@ -2066,7 +2065,7 @@ mod tests {
         assert_eq!(response.status(), StatusCode::CONFLICT);
         let body = response.into_body().collect().await.unwrap().to_bytes();
         let result: ErrorResponse = serde_json::from_slice(&body).unwrap();
-        assert_eq!(result.reference, ErrorReference::InvalidDataEntryStatus);
+        assert_eq!(result.reference, ErrorReference::DataEntryCannotBeDeleted);
 
         // Check that the data entry is not deleted
         assert!(data_entry_exists(&mut conn, 1).await.unwrap());

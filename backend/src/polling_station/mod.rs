@@ -283,14 +283,6 @@ async fn polling_station_delete(
             audit_service,
         )
         .await?;
-    } else if committee_session.status == CommitteeSessionStatus::DataEntryFinished {
-        change_committee_session_status(
-            &mut tx,
-            committee_session.id,
-            CommitteeSessionStatus::DataEntryInProgress,
-            audit_service,
-        )
-        .await?;
     }
 
     tx.commit().await?;

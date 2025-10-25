@@ -591,7 +591,7 @@ pub struct ExtraInvestigation {
 #[serde(deny_unknown_fields)]
 pub struct CountingDifferencesPollingStation {
     /// Whether there was an unexplained difference between the number of voters and votes
-    /// ("Was er in de telresultaten van het stembureau een onverklaard verschil tussen het totaal aantal getelde stembiljetten het aantal toegelaten kiezers?")
+    /// ("Was er in de telresultaten van het stembureau een onverklaard verschil tussen het totaal aantal getelde stembiljetten en het aantal toegelaten kiezers?")
     pub unexplained_difference_ballots_voters: YesNo,
     /// Whether there was a difference between the total votes per list as determined by the polling station and by the typist
     /// ("Is er een verschil tussen het totaal aantal getelde stembiljetten per lijst zoals eerder vastgesteld door het stembureau en zoals door u geteld op het gemeentelijk stembureau?")

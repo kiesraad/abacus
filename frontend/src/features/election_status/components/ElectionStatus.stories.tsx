@@ -256,7 +256,7 @@ export const NextSessionEmpty: StoryObj<StoryProps> = {
   ),
   play: async ({ canvas }) => {
     await expect(
-      await canvas.findByText("Er zijn nog geen onderzoeken met gecorrigeerde uitslag voor deze zitting."),
+      await canvas.findByText("Er zijn nog geen onderzoeken met gecorrigeerde uitkomst voor deze zitting."),
     ).toBeVisible();
   },
 };

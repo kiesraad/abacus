@@ -36,10 +36,7 @@ export function NumberOfVoters() {
     <section className="md">
       <NumberOfVotersForm
         defaultValue={state.numberOfVoters}
-        instructions={t("election_management.enter_number_of_voters", {
-          name: state.election.name,
-          location: state.election.location,
-        })}
+        instructions={t("election_management.enter_number_of_voters")}
         button="Volgende"
         onSubmit={(value) => void handleSubmit(value)}
         hint={showHint ? t("election.number_of_voters.hint") : undefined}

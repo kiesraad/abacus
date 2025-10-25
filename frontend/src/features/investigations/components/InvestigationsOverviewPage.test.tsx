@@ -89,11 +89,7 @@ describe("InvestigationsOverviewPage", () => {
       await screen.findByRole("heading", { level: 2, name: "Onderzoeksverzoeken vanuit het centraal stembureau" }),
     ).toBeVisible();
 
-    expect(
-      await screen.findByText(
-        "Voeg voor elk verzoek van het centraal stembureau een onderzoek toe en voer de aanleiding in.",
-      ),
-    ).toBeVisible();
+    expect(await screen.findByText("Voeg alle onderzoeksverzoeken van het centraal stembureau toe.")).toBeVisible();
 
     expect(await screen.findByRole("link", { name: "Onderzoek toevoegen" })).toBeVisible();
   });
@@ -221,7 +217,7 @@ describe("InvestigationsOverviewPage", () => {
     const alert = await screen.findByRole("alert");
     expect(within(alert).getByRole("strong")).toHaveTextContent("Alle onderzoeken zijn afgehandeld");
     expect(within(alert).getByRole("paragraph")).toHaveTextContent(
-      "De resultaten van alle onderzoeken zijn ingevoerd. Je kunt de uitslag nu definitief maken en het proces verbaal opmaken.",
+      "De resultaten van alle onderzoeken zijn ingevoerd. Je kunt de uitkomst nu definitief maken en het proces verbaal opmaken.",
     );
     expect(within(alert).getByRole("button", { name: "Invoerfase afronden" })).toBeVisible();
   });

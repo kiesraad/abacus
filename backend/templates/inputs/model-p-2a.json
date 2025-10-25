@@ -585,7 +585,7 @@
             {
                 "polling_station_id": 521,
                 "reason": "Dit is de aanleiding voor het onderzoek",
-                "findings": "Dit is de uitslag van het onderzoek",
+                "findings": "Dit zijn de bevindingen van het onderzoek",
                 "corrected_results": true
             }
         ],

@@ -6,7 +6,7 @@
 Een fout wijst op een probleem in het papieren proces-verbaal. Dit probleem moet opgelost worden voordat een tweede invoerder aan de slag gaat. Als een proces-verbaal gecorrigeerd wordt, moet het proces-verbaal twee keer opnieuw ingevoerd worden.
 
 **[Waarschuwing](#plausibiliteitschecks-geven-waarschuwingen)**:
-Een waarschuwing wijst op een opmerkelijke uitslag in het papieren proces-verbaal. Dit moet het GSB verklaren, anders kan dit resulteren in een nieuwe zitting.
+Een waarschuwing wijst op een opmerkelijke uitkomst in het papieren proces-verbaal. Dit moet het GSB verklaren, anders kan dit resulteren in een nieuwe zitting.
 
 ## Validatieregels geven fouten
 
@@ -519,8 +519,8 @@ _N.B. Voor "2% of meer" delen we door uitgebrachte stemmen, consistent met de be
 
 > Coördinator: **Groot verschil tussen D en H** (W.203)  
 > Er is een groot verschil tussen het aantal toegelaten kiezers (D) en het aantal uitgebrachte stemmen (H).
-> - Tel het stembureau in zijn geheel nogmaals. Dit hoeft niet als er al twee keer geteld is met precies dezelfde uitslag per lijst.
-> - Verklaar in het proces-verbaal van het GSB (rubriek 1.2) zo goed mogelijk wat de oorzaak van de opmerkelijke uitslag is.
+> - Tel het stembureau in zijn geheel nogmaals. Dit hoeft niet als er al twee keer geteld is met precies dezelfde uitkomst per lijst.
+> - Verklaar in het proces-verbaal van het GSB (rubriek 1.2) zo goed mogelijk wat de oorzaak van de opmerkelijke uitkomst is.
 > - Schrijf ook op welke stappen het GSB heeft gezet om deze te hertellen en onderzoeken.
 
 Velden markeren: D en H

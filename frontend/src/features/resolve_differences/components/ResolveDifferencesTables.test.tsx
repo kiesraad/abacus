@@ -3,7 +3,7 @@ import { describe, expect, test } from "vitest";
 import { electionMockData } from "@/testing/api-mocks/ElectionMockData";
 import { render, screen } from "@/testing/test-utils";
 import { PollingStationResults } from "@/types/generated/openapi";
-import { DataEntrySection } from "@/types/types";
+import { DataEntrySection, HeadingSubsection, InputGridSubsection } from "@/types/types";
 import { getDataEntryStructure } from "@/utils/dataEntryStructure";
 
 import { pollingStationResultsMockData } from "../testing/polling-station-results";
@@ -171,6 +171,53 @@ describe("ResolveDifferencesTables", () => {
         ["Veld", "Eerste invoer", "Tweede invoer", "Omschrijving"],
         ["", "yes, no", "-", "short title"],
       ]);
+    });
+  });
+
+  describe("heading title", () => {
+    const createHeadingSubsection = (title: string): HeadingSubsection => ({ type: "heading", title });
+    const createInputGridSubsection = (): InputGridSubsection => ({
+      type: "inputGrid",
+      headers: ["Nummer", "Aantal stemmen", "Kandidaat"],
+      rows: [{ title: "Naam", path: "candidate" }],
+    });
+
+    test("render section title if no heading subsection is provided", async () => {
+      render(
+        <ResolveDifferencesTables
+          first={{ candidate: 10 }}
+          second={{ candidate: 20 }}
+          structure={[
+            {
+              id: "section_id",
+              title: "Section title",
+              short_title: "Mand",
+              subsections: [createInputGridSubsection()],
+            },
+          ]}
+        />,
+      );
+
+      expect(await screen.findByRole("heading")).toHaveTextContent("Section title");
+    });
+
+    test("render heading title if a heading subsection is provided", async () => {
+      render(
+        <ResolveDifferencesTables
+          first={{ candidate: 10 }}
+          second={{ candidate: 20 }}
+          structure={[
+            {
+              id: "section_id",
+              title: "Section title",
+              short_title: "Mand",
+              subsections: [createHeadingSubsection("Heading title"), createInputGridSubsection()],
+            },
+          ]}
+        />,
+      );
+
+      expect(await screen.findByRole("heading")).toHaveTextContent("Heading title");
     });
   });
 });

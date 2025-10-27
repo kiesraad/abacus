@@ -7,7 +7,7 @@ import {
   fromApiResult,
   isFatalRequestState,
 } from "./ApiRequestState";
-import { ApiResult } from "./ApiResult";
+import { AbortedError, ApiResult } from "./ApiResult";
 import { useApiClient } from "./useApiClient";
 
 export interface UseInitialApiGetReturn<T> {
@@ -26,8 +26,8 @@ export function handleApiResult<T>(
   controller?: AbortController,
 ): ApiResult<T> {
   // Do not update state if the request was aborted (mainly caused by an unmounted component)
-  if (controller instanceof AbortController && controller.signal.aborted) {
-    return result;
+  if ((controller instanceof AbortController && controller.signal.aborted) || result instanceof AbortedError) {
+    return new AbortedError();
   }
 
   setRequestState(fromApiResult(result));

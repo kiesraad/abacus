@@ -1,7 +1,15 @@
 import { ErrorResponse } from "@/types/generated/openapi";
 
 import { ApiErrorEvent, SessionExpirationEvent } from "./ApiEvents";
-import { ApiError, ApiResponseStatus, ApiResult, FatalApiError, NetworkError, NotFoundError } from "./ApiResult";
+import {
+  AbortedError,
+  ApiError,
+  ApiResponseStatus,
+  ApiResult,
+  FatalApiError,
+  NetworkError,
+  NotFoundError,
+} from "./ApiResult";
 
 const MIME_JSON = "application/json";
 const HEADER_ACCEPT = "Accept";
@@ -172,16 +180,22 @@ export class ApiClient extends EventTarget {
   async request<T>(
     method: "GET" | "POST" | "PUT" | "DELETE",
     path: string,
-    abort?: AbortController,
+    callerAbortController?: AbortController,
     requestBody?: object | string,
     additionalHeaders?: Record<string, string>,
   ): Promise<ApiResult<T>> {
+    const abortController = callerAbortController ?? new AbortController();
+
     try {
       const response = await fetch(path, {
         method,
-        signal: abort?.signal,
+        signal: abortController.signal,
         ...this.setRequestBodyAndHeaders(requestBody, additionalHeaders),
       });
+
+      if (abortController.signal.aborted) {
+        return new AbortedError();
+      }
 
       const sessionExpiration = response.headers.get("x-session-expires-at");
       if (sessionExpiration) {
@@ -202,9 +216,8 @@ export class ApiClient extends EventTarget {
 
       return apiResult;
     } catch (e: unknown) {
-      if (e === DEFAULT_CANCEL_REASON) {
-        // ignore cancel by unmounted component
-        return new NetworkError(e);
+      if (abortController.signal.aborted || e === DEFAULT_CANCEL_REASON) {
+        return new AbortedError();
       }
 
       // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
@@ -215,12 +228,8 @@ export class ApiClient extends EventTarget {
   }
 
   // perform a POST request
-  async postRequest<RESPONSE>(
-    path: string,
-    requestBody?: object | string,
-    abort?: AbortController,
-  ): Promise<ApiResult<RESPONSE>> {
-    return this.request<RESPONSE>("POST", path, abort, requestBody);
+  async postRequest<T>(path: string, requestBody?: object | string, abort?: AbortController): Promise<ApiResult<T>> {
+    return this.request<T>("POST", path, abort, requestBody);
   }
 
   // perform a PUT request

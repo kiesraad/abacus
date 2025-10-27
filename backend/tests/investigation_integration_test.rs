@@ -925,3 +925,49 @@ async fn test_finished_to_in_progress_on_delete_non_last(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     check_finished_to_in_progress_on(&addr, true, || delete_investigation(&addr, 741)).await;
 }
+
+#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_7_four_sessions", "users"))))]
+async fn test_finished_to_created_on_delete_last(pool: SqlitePool) {
+    let addr = serve_api(pool).await;
+    let cookie = shared::coordinator_login(&addr).await;
+    let election_id = 7;
+    let committee_session_id = 704;
+
+    assert_eq!(
+        shared::create_investigation(&addr, 741).await.status(),
+        StatusCode::CREATED
+    );
+
+    assert_eq!(
+        conclude_investigation(
+            &addr,
+            741,
+            Some(serde_json::json!({"findings": "Test findings", "corrected_results": false})),
+        )
+        .await
+        .status(),
+        StatusCode::OK
+    );
+
+    shared::change_status_committee_session(
+        &addr,
+        &cookie,
+        election_id,
+        committee_session_id,
+        CommitteeSessionStatus::DataEntryFinished,
+    )
+    .await;
+    let committee_session =
+        shared::get_election_committee_session(&addr, &cookie, election_id).await;
+    assert_eq!(
+        committee_session.status,
+        CommitteeSessionStatus::DataEntryFinished
+    );
+
+    let status = delete_investigation(&addr, 741).await.status();
+    assert_eq!(status, StatusCode::OK);
+
+    let committee_session =
+        shared::get_election_committee_session(&addr, &cookie, election_id).await;
+    assert_eq!(committee_session.status, CommitteeSessionStatus::Created);
+}

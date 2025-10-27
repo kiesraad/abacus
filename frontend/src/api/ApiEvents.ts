@@ -7,6 +7,13 @@ export class ApiErrorEvent extends Event {
   }
 }
 
+export class ApiResponseEvent extends Event {
+  constructor(public response: Response) {
+    super("apiResponse");
+    this.response = response;
+  }
+}
+
 export class SessionExpirationEvent extends Event {
   constructor(public expiration: Date) {
     super("sessionExpiration");

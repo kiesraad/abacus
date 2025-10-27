@@ -53,7 +53,10 @@ export function OverviewPage() {
     const abortController = new AbortController();
 
     const refetch = () => {
-      void refetchElections(abortController);
+      // only refetch if the document is hidden (i.e., user is on another tab)
+      if (!document.hidden) {
+        void refetchElections(abortController);
+      }
     };
 
     const refetchInterval = setInterval(refetch, 30_000);

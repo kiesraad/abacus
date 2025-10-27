@@ -37,8 +37,11 @@ export function ElectionStatusPage() {
     const abortController = new AbortController();
 
     const refetch = () => {
-      void refetchElection(abortController);
-      void refetchStatuses(abortController);
+      // only refetch if the document is hidden (i.e., user is on another tab)
+      if (!document.hidden) {
+        void refetchElection(abortController);
+        void refetchStatuses(abortController);
+      }
     };
 
     refetch();

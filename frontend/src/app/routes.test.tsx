@@ -1,6 +1,7 @@
 import { render as rtlRender } from "@testing-library/react";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
+import * as useUser from "@/hooks/user/useUser";
 import {
   ElectionListRequestHandler,
   ElectionRequestHandler,
@@ -9,6 +10,7 @@ import {
 import { Providers } from "@/testing/Providers";
 import { overrideOnce, server } from "@/testing/server";
 import { expectErrorPage, expectNotFound, setupTestRouter } from "@/testing/test-utils";
+import { getTypistUser } from "@/testing/user-mock-data";
 
 import { routes } from "./routes";
 
@@ -40,12 +42,16 @@ describe("routes", () => {
   });
 
   test("Malformed election ID should result in not found page", async () => {
+    vi.spyOn(useUser, "useUser").mockReturnValue(getTypistUser());
+
     const router = renderWithRouter();
     await router.navigate("/elections/1asd/data-entry/");
     await expectErrorPage();
   });
 
   test("Non existing election id results in not found page", async () => {
+    vi.spyOn(useUser, "useUser").mockReturnValue(getTypistUser());
+
     // Navigate to a non-existing page
     const router = renderWithRouter();
     overrideOnce("get", "/api/elections/9876", 404, null);
@@ -55,6 +61,8 @@ describe("routes", () => {
   });
 
   test("Non existing polling station id results in not found page", async () => {
+    vi.spyOn(useUser, "useUser").mockReturnValue(getTypistUser());
+
     // Navigate to a non-existing page
     const router = renderWithRouter();
     await router.navigate("/elections/1/data-entry/9876/1");
@@ -63,6 +71,8 @@ describe("routes", () => {
   });
 
   test("Non existing entry number results in not found page", async () => {
+    vi.spyOn(useUser, "useUser").mockReturnValue(getTypistUser());
+
     // Navigate to a non-existing page
     const router = renderWithRouter();
     await router.navigate("/elections/1/data-entry/1/3");

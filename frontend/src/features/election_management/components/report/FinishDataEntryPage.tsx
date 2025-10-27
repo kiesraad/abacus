@@ -7,6 +7,7 @@ import { PageTitle } from "@/components/page_title/PageTitle";
 import { Button } from "@/components/ui/Button/Button";
 import { FormLayout } from "@/components/ui/Form/FormLayout";
 import { useElection } from "@/hooks/election/useElection";
+import useInvestigations from "@/hooks/election/useInvestigations";
 import { t, tx } from "@/i18n/translate";
 import {
   COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_BODY,
@@ -18,16 +19,26 @@ import cls from "../ElectionManagement.module.css";
 
 export function FinishDataEntryPage() {
   const { currentCommitteeSession, election, refetch } = useElection();
+  const { investigations, handledInvestigations, missingInvestigations } = useInvestigations();
   const navigate = useNavigate();
-  const updatePath: COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_PATH = `/api/committee_sessions/${currentCommitteeSession.id}/status`;
+  const updatePath: COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_PATH = `/api/elections/${currentCommitteeSession.election_id}/committee_sessions/${currentCommitteeSession.id}/status`;
   const { update } = useCrud({ updatePath, throwAllErrors: true });
 
+  // Check if all investigations are handled and none are missing
+  // Note: There are no investigations in the first committee session
+  const incompleteInvestigations =
+    investigations.length !== handledInvestigations.length || missingInvestigations.length > 0;
+
   useEffect(() => {
+    if (incompleteInvestigations) {
+      void navigate(`/elections/${election.id}/investigations`);
+    }
+
     // Redirect to report download if committee session data entry phase is already finished
     if (currentCommitteeSession.status === "data_entry_finished") {
       void navigate(`/elections/${election.id}/report/committee-session/${currentCommitteeSession.id}/download`);
     }
-  }, [currentCommitteeSession, election, navigate]);
+  }, [currentCommitteeSession, election, incompleteInvestigations, navigate]);
 
   function handleFinish() {
     const body: COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_BODY = { status: "data_entry_finished" };

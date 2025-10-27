@@ -274,7 +274,7 @@ describe("CommitteeSessionDetailsPage", () => {
   test("Shows error page when change details call returns a 400 error", async () => {
     const user = userEvent.setup();
     const updateDetails = spyOnHandler(CommitteeSessionUpdateHandler);
-    overrideOnce("put", "/api/committee_sessions/1", 400, {
+    overrideOnce("put", "/api/elections/1/committee_sessions/1", 400, {
       error: "Invalid details",
       fatal: false,
       reference: "InvalidData",
@@ -315,7 +315,7 @@ describe("CommitteeSessionDetailsPage", () => {
     vi.spyOn(console, "error").mockImplementation(() => {});
     const user = userEvent.setup();
     const updateDetails = spyOnHandler(CommitteeSessionUpdateHandler);
-    overrideOnce("put", "/api/committee_sessions/1", 404, {
+    overrideOnce("put", "/api/elections/1/committee_sessions/1", 404, {
       error: "Resource not found",
       fatal: true,
       reference: "EntryNotFound",

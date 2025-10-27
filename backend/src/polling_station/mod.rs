@@ -72,15 +72,10 @@ async fn polling_station_list(
     // Check if the election exists, will respond with NOT_FOUND otherwise
     crate::election::repository::get(&mut conn, election_id).await?;
 
-    let committee_session = crate::committee_session::repository::get_election_committee_session(
-        &mut conn,
-        election_id,
-    )
-    .await?;
+    let committee_session = get_election_committee_session(&mut conn, election_id).await?;
 
     Ok(PollingStationListResponse {
-        polling_stations: crate::polling_station::repository::list(&mut conn, committee_session.id)
-            .await?,
+        polling_stations: repository::list(&mut conn, committee_session.id).await?,
     })
 }
 
@@ -112,13 +107,9 @@ async fn polling_station_create(
 
     // Check if the election and a committee session exist, will respond with NOT_FOUND otherwise
     crate::election::repository::get(&mut tx, election_id).await?;
-    let committee_session =
-        crate::committee_session::repository::get_election_committee_session(&mut tx, election_id)
-            .await?;
+    let committee_session = get_election_committee_session(&mut tx, election_id).await?;
 
-    let polling_station =
-        crate::polling_station::repository::create(&mut tx, election_id, new_polling_station)
-            .await?;
+    let polling_station = repository::create(&mut tx, election_id, new_polling_station).await?;
 
     audit_service
         .log(
@@ -174,12 +165,7 @@ async fn polling_station_get(
     let mut conn = pool.acquire().await?;
     Ok((
         StatusCode::OK,
-        crate::polling_station::repository::get_for_election(
-            &mut conn,
-            election_id,
-            polling_station_id,
-        )
-        .await?,
+        repository::get_for_election(&mut conn, election_id, polling_station_id).await?,
     ))
 }
 
@@ -211,11 +197,9 @@ async fn polling_station_update(
 
     // Check if the election and a committee session exist, will respond with NOT_FOUND otherwise
     crate::election::repository::get(&mut tx, election_id).await?;
-    let committee_session =
-        crate::committee_session::repository::get_election_committee_session(&mut tx, election_id)
-            .await?;
+    let committee_session = get_election_committee_session(&mut tx, election_id).await?;
 
-    let polling_station = crate::polling_station::repository::update(
+    let polling_station = repository::update(
         &mut tx,
         election_id,
         polling_station_id,
@@ -273,18 +257,12 @@ async fn polling_station_delete(
 
     // Check if the election and a committee session exist, will respond with NOT_FOUND otherwise
     crate::election::repository::get(&mut tx, election_id).await?;
-    let committee_session =
-        crate::committee_session::repository::get_election_committee_session(&mut tx, election_id)
-            .await?;
+    let committee_session = get_election_committee_session(&mut tx, election_id).await?;
 
-    let polling_station = crate::polling_station::repository::get_for_election(
-        &mut tx,
-        election_id,
-        polling_station_id,
-    )
-    .await?;
+    let polling_station =
+        repository::get_for_election(&mut tx, election_id, polling_station_id).await?;
 
-    crate::polling_station::repository::delete(&mut tx, election_id, polling_station_id).await?;
+    repository::delete(&mut tx, election_id, polling_station_id).await?;
 
     audit_service
         .log(
@@ -294,7 +272,7 @@ async fn polling_station_delete(
         )
         .await?;
 
-    if crate::polling_station::repository::list(&mut tx, committee_session.id)
+    if repository::list(&mut tx, committee_session.id)
         .await?
         .is_empty()
     {
@@ -302,14 +280,6 @@ async fn polling_station_delete(
             &mut tx,
             committee_session.id,
             CommitteeSessionStatus::Created,
-            audit_service,
-        )
-        .await?;
-    } else if committee_session.status == CommitteeSessionStatus::DataEntryFinished {
-        change_committee_session_status(
-            &mut tx,
-            committee_session.id,
-            CommitteeSessionStatus::DataEntryInProgress,
             audit_service,
         )
         .await?;
@@ -592,7 +562,7 @@ VALUES
             locality: "Locality".to_string(),
         };
 
-        // Update a polling station that has a id_prev_session reference
+        // Update a polling station that has an id_prev_session reference
         // ... without number change
         let result =
             crate::polling_station::repository::update(&mut conn, 7, 741, data.clone()).await;
@@ -606,7 +576,7 @@ VALUES
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_7_four_sessions"))))]
     async fn test_delete_restricted_when_prev_session(pool: SqlitePool) {
-        // Try to delete a polling station that has a id_prev_session reference
+        // Try to delete a polling station that has an id_prev_session reference
         let result = query!("DELETE FROM polling_stations WHERE id = 721")
             .execute(&pool)
             .await;

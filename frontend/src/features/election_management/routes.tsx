@@ -10,15 +10,16 @@ import { CommitteeSessionDetailsPage } from "./components/update/CommitteeSessio
 import { NumberOfVotersPage } from "./components/update/NumberOfVotersPage";
 
 export const electionManagementRoutes: RouteObject[] = [
-  { index: true, Component: ElectionHomePage },
-  { path: "details", Component: CommitteeSessionDetailsPage },
-  { path: "number-of-voters", Component: NumberOfVotersPage },
+  { index: true, Component: ElectionHomePage, handle: { roles: ["administrator", "coordinator"] } },
+  { path: "details", Component: CommitteeSessionDetailsPage, handle: { roles: ["coordinator"] } },
+  { path: "number-of-voters", Component: NumberOfVotersPage, handle: { roles: ["coordinator"] } },
   {
     path: "report",
     children: [
       {
         index: true,
         Component: FinishDataEntryPage,
+        handle: { roles: ["coordinator"] },
       },
       {
         path: "committee-session/:committeeSessionId/download",
@@ -30,6 +31,7 @@ export const electionManagementRoutes: RouteObject[] = [
             ) : (
               <ElectionReportPage />
             ),
+            handle: { roles: ["coordinator"] },
           },
         ],
       },

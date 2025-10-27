@@ -10,7 +10,6 @@
     "dev": "npm run check-server && vite",
     "dev:msw": "cross-env API_MODE=mock vite",
     "build": "vite build --config vite-prod.config.ts",
-    "build:prod": "cross-env SHOW_DEV_PAGE=false vite build --config vite-prod.config.ts",
     "build:msw": "cross-env API_MODE=mock vite build && cp mockServiceWorker.js dist/",
     "lint": "tsc && cross-env ESLINT_ENV=production eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "prettier": "prettier --ignore-unknown --write .",
@@ -20,6 +19,7 @@
     "test:e2e-dev": "cross-env RUST_LOG=tower_http-warning playwright test",
     "test:e2e-debug": "cross-env DEBUG_DEVELOPMENT=true playwright test --ui",
     "test:e2e-ui": "cross-env LOCAL_CI=true playwright test --ui",
+    "doc:list-routes": "vite-node scripts/list_routes.ts",
     "gen:e2e": "cross-env LOCAL_CI=true playwright codegen http://localhost:3000/dev",
     "gen:icons": "node scripts/gen_icons.js",
     "gen:openapi": "vite-node scripts/gen_openapi.ts",
@@ -36,7 +36,7 @@
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "react-router": "^7.9.4",
-    "vite": "^6.3.7"
+    "vite": "^6.4.1"
   },
   "devDependencies": {
     "@codecov/vite-plugin": "^1.9.1",

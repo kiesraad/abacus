@@ -1,7 +1,6 @@
 #![cfg(test)]
 
 use hyper::StatusCode;
-use serde_json::{Value, json};
 use sqlx::SqlitePool;
 use test_log::test;
 
@@ -18,7 +17,7 @@ async fn test_account_update(pool: SqlitePool) {
 
     let response = reqwest::Client::new()
         .put(&url)
-        .json(&json!({
+        .json(&serde_json::json!({
             "username": "admin1",
             "fullname": "Saartje Molenaar",
             "password": "MyLongPassword13"
@@ -34,7 +33,7 @@ async fn test_account_update(pool: SqlitePool) {
         "Unexpected response status"
     );
 
-    let body: Value = response.json().await.unwrap();
+    let body: serde_json::Value = response.json().await.unwrap();
     assert_eq!(body["username"], "admin1");
     assert_eq!(body["fullname"], "Saartje Molenaar");
     assert_eq!(body["needs_password_change"], false);

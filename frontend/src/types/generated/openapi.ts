@@ -7,36 +7,6 @@ export type ACCOUNT_UPDATE_REQUEST_PARAMS = Record<string, never>;
 export type ACCOUNT_UPDATE_REQUEST_PATH = `/api/account`;
 export type ACCOUNT_UPDATE_REQUEST_BODY = AccountUpdateRequest;
 
-// /api/committee_sessions
-export type COMMITTEE_SESSION_CREATE_REQUEST_PARAMS = Record<string, never>;
-export type COMMITTEE_SESSION_CREATE_REQUEST_PATH = `/api/committee_sessions`;
-export type COMMITTEE_SESSION_CREATE_REQUEST_BODY = NewCommitteeSessionRequest;
-
-// /api/committee_sessions/{committee_session_id}
-export interface COMMITTEE_SESSION_UPDATE_REQUEST_PARAMS {
-  committee_session_id: number;
-}
-export type COMMITTEE_SESSION_UPDATE_REQUEST_PATH = `/api/committee_sessions/${number}`;
-export type COMMITTEE_SESSION_UPDATE_REQUEST_BODY = CommitteeSessionUpdateRequest;
-export interface COMMITTEE_SESSION_DELETE_REQUEST_PARAMS {
-  committee_session_id: number;
-}
-export type COMMITTEE_SESSION_DELETE_REQUEST_PATH = `/api/committee_sessions/${number}`;
-
-// /api/committee_sessions/{committee_session_id}/status
-export interface COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_PARAMS {
-  committee_session_id: number;
-}
-export type COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_PATH = `/api/committee_sessions/${number}/status`;
-export type COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_BODY = CommitteeSessionStatusChangeRequest;
-
-// /api/committee_sessions/{committee_session_id}/voters
-export interface COMMITTEE_SESSION_NUMBER_OF_VOTERS_CHANGE_REQUEST_PARAMS {
-  committee_session_id: number;
-}
-export type COMMITTEE_SESSION_NUMBER_OF_VOTERS_CHANGE_REQUEST_PATH = `/api/committee_sessions/${number}/voters`;
-export type COMMITTEE_SESSION_NUMBER_OF_VOTERS_CHANGE_REQUEST_BODY = CommitteeSessionNumberOfVotersChangeRequest;
-
 // /api/elections
 export type ELECTION_LIST_REQUEST_PARAMS = Record<string, never>;
 export type ELECTION_LIST_REQUEST_PATH = `/api/elections`;
@@ -57,6 +27,25 @@ export interface ELECTION_DETAILS_REQUEST_PARAMS {
 }
 export type ELECTION_DETAILS_REQUEST_PATH = `/api/elections/${number}`;
 
+// /api/elections/{election_id}/committee_sessions
+export interface COMMITTEE_SESSION_CREATE_REQUEST_PARAMS {
+  election_id: number;
+}
+export type COMMITTEE_SESSION_CREATE_REQUEST_PATH = `/api/elections/${number}/committee_sessions`;
+
+// /api/elections/{election_id}/committee_sessions/{committee_session_id}
+export interface COMMITTEE_SESSION_UPDATE_REQUEST_PARAMS {
+  election_id: number;
+  committee_session_id: number;
+}
+export type COMMITTEE_SESSION_UPDATE_REQUEST_PATH = `/api/elections/${number}/committee_sessions/${number}`;
+export type COMMITTEE_SESSION_UPDATE_REQUEST_BODY = CommitteeSessionUpdateRequest;
+export interface COMMITTEE_SESSION_DELETE_REQUEST_PARAMS {
+  election_id: number;
+  committee_session_id: number;
+}
+export type COMMITTEE_SESSION_DELETE_REQUEST_PATH = `/api/elections/${number}/committee_sessions/${number}`;
+
 // /api/elections/{election_id}/committee_sessions/{committee_session_id}/download_pdf_results
 export interface ELECTION_DOWNLOAD_PDF_RESULTS_REQUEST_PARAMS {
   election_id: number;
@@ -72,6 +61,24 @@ export interface ELECTION_DOWNLOAD_ZIP_RESULTS_REQUEST_PARAMS {
 }
 export type ELECTION_DOWNLOAD_ZIP_RESULTS_REQUEST_PATH =
   `/api/elections/${number}/committee_sessions/${number}/download_zip_results`;
+
+// /api/elections/{election_id}/committee_sessions/{committee_session_id}/status
+export interface COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_PARAMS {
+  election_id: number;
+  committee_session_id: number;
+}
+export type COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_PATH =
+  `/api/elections/${number}/committee_sessions/${number}/status`;
+export type COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_BODY = CommitteeSessionStatusChangeRequest;
+
+// /api/elections/{election_id}/committee_sessions/{committee_session_id}/voters
+export interface COMMITTEE_SESSION_NUMBER_OF_VOTERS_CHANGE_REQUEST_PARAMS {
+  election_id: number;
+  committee_session_id: number;
+}
+export type COMMITTEE_SESSION_NUMBER_OF_VOTERS_CHANGE_REQUEST_PATH =
+  `/api/elections/${number}/committee_sessions/${number}/voters`;
+export type COMMITTEE_SESSION_NUMBER_OF_VOTERS_CHANGE_REQUEST_BODY = CommitteeSessionNumberOfVotersChangeRequest;
 
 // /api/elections/{election_id}/download_n_10_2
 export interface ELECTION_DOWNLOAD_N_10_2_REQUEST_PARAMS {
@@ -175,6 +182,13 @@ export type LOGIN_REQUEST_BODY = Credentials;
 // /api/logout
 export type LOGOUT_REQUEST_PARAMS = Record<string, never>;
 export type LOGOUT_REQUEST_PATH = `/api/logout`;
+
+// /api/polling_stations/{polling_station_id}/data_entries
+export interface POLLING_STATION_DATA_ENTRIES_AND_RESULT_DELETE_REQUEST_PARAMS {
+  polling_station_id: number;
+}
+export type POLLING_STATION_DATA_ENTRIES_AND_RESULT_DELETE_REQUEST_PATH =
+  `/api/polling_stations/${number}/data_entries`;
 
 // /api/polling_stations/{polling_station_id}/data_entries/resolve_differences
 export interface POLLING_STATION_DATA_ENTRY_GET_DIFFERENCES_REQUEST_PARAMS {
@@ -319,13 +333,14 @@ export type AuditEvent =
   | (PollingStationDetails & { event_type: "PollingStationUpdated" })
   | (PollingStationDetails & { event_type: "PollingStationDeleted" })
   | (PollingStationImportDetails & { event_type: "PollingStationsImported" })
-  | (DataEntryDetails & { event_type: "DataEntryClaimed" })
+  | (DataEntryDetails & { event_type: "DataEntryStarted" })
   | (DataEntryDetails & { event_type: "DataEntrySaved" })
+  | (DataEntryDetails & { event_type: "DataEntryResumed" })
   | (DataEntryDetails & { event_type: "DataEntryDeleted" })
   | (DataEntryDetails & { event_type: "DataEntryFinalised" })
   | (ResultDetails & { event_type: "ResultDeleted" })
   | (DataEntryDetails & { event_type: "DataEntryDiscardedFirst" })
-  | (DataEntryDetails & { event_type: "DataEntryResumedFirst" })
+  | (DataEntryDetails & { event_type: "DataEntryReturnedFirst" })
   | (DataEntryDetails & { event_type: "DataEntryKeptFirst" })
   | (DataEntryDetails & { event_type: "DataEntryKeptSecond" })
   | (DataEntryDetails & { event_type: "DataEntryDiscardedBoth" })
@@ -558,7 +573,7 @@ export interface DataEntry {
 
 export interface DataEntryDetails {
   committee_session_id: number;
-  data_entry_progress: number;
+  data_entry_progress: string;
   data_entry_status: string;
   finished_at?: string | null;
   first_entry_user_id?: number | null;
@@ -772,6 +787,7 @@ export type ErrorReference =
   | "DatabaseError"
   | "DataEntryAlreadyClaimed"
   | "DataEntryAlreadyFinalised"
+  | "DataEntryCannotBeDeleted"
   | "DataEntryNotAllowed"
   | "EmlImportError"
   | "EntryNotFound"
@@ -791,6 +807,7 @@ export type ErrorReference =
   | "InvalidVoteGroup"
   | "InvalidXml"
   | "InvestigationHasDataEntryOrResult"
+  | "InvestigationRequiresCorrectedResults"
   | "NotInitialised"
   | "OwnAccountCannotBeDeleted"
   | "PasswordRejection"
@@ -862,13 +879,6 @@ export interface LoginResponse {
   role: Role;
   user_id: number;
   username: string;
-}
-
-/**
- * New committee session request
- */
-export interface NewCommitteeSessionRequest {
-  election_id: number;
 }
 
 /**

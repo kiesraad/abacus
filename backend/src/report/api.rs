@@ -485,7 +485,7 @@ async fn election_download_pdf_results(
         generate_and_save_files(&pool, audit_service, committee_session_id).await?;
 
     let pdf_file = pdf_file.ok_or(APIError::BadRequest(
-        "PDF results is not generated".to_string(),
+        "PDF results are not generated".to_string(),
         ErrorReference::PdfGenerationError,
     ))?;
 

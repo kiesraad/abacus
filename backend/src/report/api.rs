@@ -556,13 +556,16 @@ mod tests {
         }
     }
 
-    #[test(sqlx::test(fixtures(
-        path = "../../fixtures",
-        scripts("election_9_four_sessions_without_corrections.sql")
-    )))]
+    #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_7_four_sessions"))))]
     async fn test_generate_and_save_files_next_session_without_corrections(pool: SqlitePool) {
-        let mut conn = pool.acquire().await.unwrap();
         let audit_service = AuditService::new(None, None);
+        let mut conn = pool.acquire().await.unwrap();
+
+        // Update investigations, set no corrections
+        sqlx::query("UPDATE polling_station_investigations SET corrected_results = false")
+            .execute(&mut *conn)
+            .await
+            .unwrap();
 
         // File should be generated exactly once
         for _ in 1..=2 {

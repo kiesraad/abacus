@@ -83,7 +83,7 @@ __Uitbreidingen:__
 
 2a. De hash van de verkiezingsdefinitie (EML 110a) klopt niet:  
 &emsp; 2a1. De beheerder stelt vast dat de hash niet correct is overgenomen.  
-&emsp;&emsp; 2a1a. De beheerder stelt vast dat die de hash correct heeft overgenomen:  
+&emsp;&emsp; 2a1a. De beheerder stelt vast dat de hash correct is overgenomen:  
 &emsp;&emsp;&emsp; 2a1a1. De beheerder neemt contact op met het CSB.  
 &emsp; 2a2. De beheerder corrigeert de ingevoerde hash.
 

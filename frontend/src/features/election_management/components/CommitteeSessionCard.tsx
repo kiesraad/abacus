@@ -90,7 +90,7 @@ export function CommitteeSessionCard({
 }: CommitteeSessionCardProps & DivProps) {
   const navigate = useNavigate();
   const { isCoordinator } = useUserRole();
-  const updatePath: COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_PATH = `/api/committee_sessions/${committeeSession.id}/status`;
+  const updatePath: COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_PATH = `/api/elections/${committeeSession.election_id}/committee_sessions/${committeeSession.id}/status`;
   const { update } = useCrud({ updatePath, throwAllErrors: true });
 
   function handleStart() {

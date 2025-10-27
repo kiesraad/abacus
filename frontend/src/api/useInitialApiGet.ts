@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 
-import { DEFAULT_CANCEL_REASON } from "./ApiClient";
+import { DEFAULT_CANCEL_REASON, DO_NOT_EXTEND_SESSION } from "./ApiClient";
 import {
   ApiRequestState,
   ApiRequestStateWithoutFatalErrors,
@@ -54,7 +54,7 @@ function useInitialApiGetInner<T>(
   // Perform the API request and set the state accordingly
   const refetch = useCallback(
     async (controller?: AbortController): Promise<ApiResult<T>> => {
-      const result = await client.getRequest<T>(path, controller);
+      const result = await client.getRequest<T>(path, controller, DO_NOT_EXTEND_SESSION);
 
       return handleApiResult(result, setRequestState, controller);
     },

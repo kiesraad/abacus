@@ -13,13 +13,13 @@ export const electionCreateRoutes: RouteObject[] = [
   {
     Component: ElectionCreateLayout,
     children: [
-      { index: true, Component: UploadElectionDefinition },
-      { path: "polling-station-role", Component: PollingStationRole },
-      { path: "list-of-candidates", Component: UploadCandidatesDefinition },
-      { path: "polling-stations", Component: UploadPollingStationDefinition },
-      { path: "counting-method-type", Component: CountingMethodType },
-      { path: "number-of-voters", Component: NumberOfVoters },
-      { path: "check-and-save", Component: CheckAndSave },
+      { index: true, Component: UploadElectionDefinition, handle: { roles: ["administrator"] } },
+      { path: "polling-station-role", Component: PollingStationRole, handle: { roles: ["administrator"] } },
+      { path: "list-of-candidates", Component: UploadCandidatesDefinition, handle: { roles: ["administrator"] } },
+      { path: "polling-stations", Component: UploadPollingStationDefinition, handle: { roles: ["administrator"] } },
+      { path: "counting-method-type", Component: CountingMethodType, handle: { roles: ["administrator"] } },
+      { path: "number-of-voters", Component: NumberOfVoters, handle: { roles: ["administrator"] } },
+      { path: "check-and-save", Component: CheckAndSave, handle: { roles: ["administrator"] } },
     ],
   },
 ];

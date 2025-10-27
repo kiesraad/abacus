@@ -14,7 +14,7 @@ import {
 export function NumberOfVotersPage() {
   const navigate = useNavigate();
   const { currentCommitteeSession, election } = useElection();
-  const updatePath: COMMITTEE_SESSION_NUMBER_OF_VOTERS_CHANGE_REQUEST_PATH = `/api/committee_sessions/${currentCommitteeSession.id}/voters`;
+  const updatePath: COMMITTEE_SESSION_NUMBER_OF_VOTERS_CHANGE_REQUEST_PATH = `/api/elections/${currentCommitteeSession.election_id}/committee_sessions/${currentCommitteeSession.id}/voters`;
   const { update } = useCrud({ updatePath, throwAllErrors: true });
 
   function handleSubmit(numberOfVoters: number) {

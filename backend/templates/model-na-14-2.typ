@@ -1,4 +1,4 @@
-#import "common/style.typ": conf, document_numbering, attachment_numbering
+#import "common/style.typ": conf, default_header, document_numbering, attachment_numbering
 #import "common/scripts.typ": *
 #let input = json("inputs/model-na-14-2.json")
 
@@ -10,8 +10,8 @@
 #let location_type = is_municipality[gemeentelijk stembureau][stembureau voor het openbaar lichaam]
 
 #show: doc => conf(doc, header-right: location_name, footer: [
-  Corrigendum van een #location_type \
-  Model Na 14-2
+  #input.creation_date_time. Digitale vingerafdruk van EML-telbestand bij dit proces-verbaal (SHA-256): \
+  #input.hash
 ])
 
 #set heading(numbering: none)
@@ -56,8 +56,6 @@ de aantallen in het proces-verbaal.
 #pagebreak(weak: true)
 
 #show: doc => document_numbering(doc)
-
-#show: doc => conf(doc, header-left: [Deel 1 - Gecorrigeerde telresultaten])
 
 = Gecorrigeerde telresultaten van #is_municipality[de gemeente][het openbaar lichaam]
 
@@ -183,13 +181,15 @@ ingevuld te worden in de kolom ‘gecorrigeerd'. Onder ‘oorspronkelijk’ staa
 
 #pagebreak(weak: true)
 
-#show: doc => conf(doc, header-left: [Deel 2 - Ondertekening])
+#set page(header: "")
 
 #emph_block[Deze pagina is expres leeg]
 
 Zo komt het handtekeningen-blad altijd op een losse pagina, ook als het verslag dubbelzijdig is geprint.
 
 #pagebreak(weak: true)
+
+#set page(header: default_header(none, location_name))
 
 = Ondertekening
 

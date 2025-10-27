@@ -62,6 +62,7 @@ export function PollingStationChoiceForm({ anotherEntry }: PollingStationChoiceF
     setCurrentPollingStation(pollingStation);
   }, USER_INPUT_DEBOUNCE);
 
+  // eslint-disable-next-line react-hooks/use-memo
   useMemo(() => {
     const parsedInt = parseIntUserInput(pollingStationNumber);
     setLoading(true);

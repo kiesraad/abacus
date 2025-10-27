@@ -4,9 +4,6 @@ import { BaseApiClient } from "./BaseApiClient";
 
 export const DEFAULT_CANCEL_REASON = "Component unmounted";
 
-/// Header to indicate that the session should not be extended, only the existence is checked, not the value
-export const DO_NOT_EXTEND_SESSION = { "x-do-not-extend-session": "on-data-refresh" };
-
 /**
  * Abstraction over the browser fetch API to handle JSON responses and errors.
  */

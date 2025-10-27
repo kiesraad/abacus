@@ -21,18 +21,9 @@ import { AdminNavBar } from "e2e-tests/page-objects/nav_bar/AdminNavBarPgObj";
 import { PollingStationImportPgObj } from "e2e-tests/page-objects/polling_station/PollingStationImportPgObj";
 import { PollingStationListEmptyPgObj } from "e2e-tests/page-objects/polling_station/PollingStationListEmptyPgObj";
 import { PollingStationListPgObj } from "e2e-tests/page-objects/polling_station/PollingStationListPgObj";
-import { promises } from "fs";
 
 import { test } from "../fixtures";
-import {
-  eml110a,
-  eml110a_too_large,
-  eml110b,
-  eml110b_short,
-  eml110b_too_large,
-  eml230b,
-  eml230b_too_large,
-} from "../test-data/eml-files";
+import { eml110a, eml110b, eml110b_short, eml230b } from "../test-data/eml-files";
 
 test.use({
   storageState: "e2e-tests/state/admin1.json",
@@ -228,25 +219,16 @@ test.describe("Election creation", () => {
     await expect(checkCandidateDefinitionPage.error).toBeVisible();
   });
 
-  test("it fails on valid, but too large file", async ({ page, request }) => {
-    // Generate EML via backend helper, save it to a file and upload it
-    const fileSize = 5 * 1024 * 1024; // 5MB
-    const response = await request.get(`/api/generate_eml110a/${fileSize}`);
-    const content = await response.text();
-    await promises.writeFile("../backend/src/eml/tests/eml110a_invalid_file_size.eml.xml", content, "utf8");
-
+  test("it fails on valid, but too large file", async ({ page, eml110aTooLargeTestFile }) => {
     await page.goto("/elections");
     const overviewPage = new ElectionsOverviewPgObj(page);
     await overviewPage.create.click();
 
     const uploadElectionDefinitionPage = new UploadElectionDefinitionPgObj(page);
     await expect(uploadElectionDefinitionPage.header).toBeVisible();
-    await uploadElectionDefinitionPage.uploadFile(eml110a_too_large.path);
+    await uploadElectionDefinitionPage.uploadFile(eml110aTooLargeTestFile.path);
     await expect(uploadElectionDefinitionPage.error).toBeVisible();
-    await expect(uploadElectionDefinitionPage.fileTooLargeError(eml110a_too_large.filename)).toBeVisible();
-
-    // Cleanup
-    await promises.unlink("../backend/src/eml/tests/eml110a_invalid_file_size.eml.xml");
+    await expect(uploadElectionDefinitionPage.fileTooLargeError(eml110aTooLargeTestFile.filename)).toBeVisible();
   });
 
   test("it fails on valid, but incorrect file for candidate list", async ({ page }) => {
@@ -269,13 +251,7 @@ test.describe("Election creation", () => {
     await expect(uploadCandidateDefinitionPage.error).toBeVisible();
   });
 
-  test("it fails on too large file for candidate list", async ({ page, request }) => {
-    // Generate EML via backend helper, save it to a file and upload it
-    const fileSize = 5 * 1024 * 1024; // 5MB
-    const response = await request.get(`/api/generate_eml230b/${fileSize}`);
-    const content = await response.text();
-    await promises.writeFile("../backend/src/eml/tests/eml230b_invalid_file_size.eml.xml", content, "utf8");
-
+  test("it fails on too large file for candidate list", async ({ page, eml230bTooLargeTestFile }) => {
     await page.goto("/elections");
     const overviewPage = new ElectionsOverviewPgObj(page);
     await overviewPage.create.click();
@@ -291,12 +267,9 @@ test.describe("Election creation", () => {
     // Candidate page
     const uploadCandidateDefinitionPage = new UploadCandidateDefinitionPgObj(page);
     await expect(uploadCandidateDefinitionPage.header).toBeVisible();
-    await uploadCandidateDefinitionPage.uploadFile(eml230b_too_large.path);
+    await uploadCandidateDefinitionPage.uploadFile(eml230bTooLargeTestFile.path);
     await expect(uploadCandidateDefinitionPage.error).toBeVisible();
-    await expect(uploadCandidateDefinitionPage.fileTooLargeError(eml230b_too_large.filename)).toBeVisible();
-
-    // Cleanup
-    await promises.unlink("../backend/src/eml/tests/eml230b_invalid_file_size.eml.xml");
+    await expect(uploadCandidateDefinitionPage.fileTooLargeError(eml230bTooLargeTestFile.filename)).toBeVisible();
   });
 
   test("warning modal close button should stay on page", async ({ page }) => {
@@ -571,13 +544,7 @@ test.describe("Election creation", () => {
     await expect(uploadElectionDefinitionPage.error).toBeVisible();
   });
 
-  test("it fails on too large file for polling stations", async ({ page, request }) => {
-    // Generate EML via backend helper, save it to a file and upload it
-    const fileSize = 5 * 1024 * 1024; // 5MB
-    const response = await request.get(`/api/generate_eml110b/${fileSize}`);
-    const content = await response.text();
-    await promises.writeFile("../backend/src/eml/tests/eml110b_invalid_file_size.eml.xml", content, "utf8");
-
+  test("it fails on too large file for polling stations", async ({ page, eml110bTooLargeTestFile }) => {
     await page.goto("/elections");
     const overviewPage = new ElectionsOverviewPgObj(page);
     await overviewPage.create.click();
@@ -595,12 +562,9 @@ test.describe("Election creation", () => {
     // Polling stations page
     const uploadElectionDefinitionPage = new UploadPollingStationDefinitionPgObj(page);
     await expect(uploadElectionDefinitionPage.header).toBeVisible();
-    await uploadElectionDefinitionPage.uploadFile(eml110b_too_large.path);
+    await uploadElectionDefinitionPage.uploadFile(eml110bTooLargeTestFile.path);
     await expect(uploadElectionDefinitionPage.error).toBeVisible();
-    await expect(uploadElectionDefinitionPage.fileTooLargeError(eml110b_too_large.filename)).toBeVisible();
-
-    // Cleanup
-    await promises.unlink("../backend/src/eml/tests/eml110b_invalid_file_size.eml.xml");
+    await expect(uploadElectionDefinitionPage.fileTooLargeError(eml110bTooLargeTestFile.filename)).toBeVisible();
   });
 
   test("show more button should show full list of polling stations", async ({ page }) => {

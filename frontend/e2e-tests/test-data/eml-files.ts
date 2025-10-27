@@ -1,3 +1,8 @@
+export interface EmlTestFile {
+  filename: string;
+  path: string;
+}
+
 export const eml110a = {
   filename: "eml110a_test.eml.xml",
   path: "../backend/src/eml/tests/eml110a_test.eml.xml",

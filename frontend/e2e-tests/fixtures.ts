@@ -22,7 +22,14 @@ import {
 import { DataEntryApiClient } from "./helpers-utils/api-clients";
 import { completePollingStationDataEntries, loginAs } from "./helpers-utils/e2e-test-api-helpers";
 import { createRandomUsername } from "./helpers-utils/e2e-test-utils";
-import { eml110a, eml230b } from "./test-data/eml-files";
+import {
+  eml110a,
+  eml110a_too_large,
+  eml110b_too_large,
+  eml230b,
+  eml230b_too_large,
+  EmlTestFile,
+} from "./test-data/eml-files";
 import {
   dataEntryRequest,
   dataEntryWithDifferencesRequest,
@@ -64,6 +71,12 @@ type Fixtures = {
   currentCommitteeSession: CommitteeSession;
   // Newly created User
   newTypist: User;
+  // A generated EML110a test file that is too large to upload
+  eml110aTooLargeTestFile: EmlTestFile;
+  // A generated EML110b test file that is too large to upload
+  eml110bTooLargeTestFile: EmlTestFile;
+  // A generated EML230b test file that is too large to upload
+  eml230bTooLargeTestFile: EmlTestFile;
 };
 
 export const test = base.extend<Fixtures>({
@@ -222,5 +235,41 @@ export const test = base.extend<Fixtures>({
     expect(userResponse.ok()).toBeTruthy();
 
     await use((await userResponse.json()) as User);
+  },
+
+  eml110aTooLargeTestFile: async ({ request }, use) => {
+    const fileSize = 5 * 1024 * 1024; // 5MB
+    const response = await request.get(`/api/generate_eml110a/${fileSize}`);
+    const content = await response.text();
+    await fs.promises.writeFile(eml110a_too_large.path, content, "utf8");
+
+    await use(eml110a_too_large);
+
+    // Cleanup
+    await fs.promises.unlink(eml110a_too_large.path);
+  },
+
+  eml110bTooLargeTestFile: async ({ request }, use) => {
+    const fileSize = 5 * 1024 * 1024; // 5MB
+    const response = await request.get(`/api/generate_eml110b/${fileSize}`);
+    const content = await response.text();
+    await fs.promises.writeFile(eml110b_too_large.path, content, "utf8");
+
+    await use(eml110b_too_large);
+
+    // Cleanup
+    await fs.promises.unlink(eml110b_too_large.path);
+  },
+
+  eml230bTooLargeTestFile: async ({ request }, use) => {
+    const fileSize = 5 * 1024 * 1024; // 5MB
+    const response = await request.get(`/api/generate_eml230b/${fileSize}`);
+    const content = await response.text();
+    await fs.promises.writeFile(eml230b_too_large.path, content, "utf8");
+
+    await use(eml230b_too_large);
+
+    // Cleanup
+    await fs.promises.unlink(eml230b_too_large.path);
   },
 });

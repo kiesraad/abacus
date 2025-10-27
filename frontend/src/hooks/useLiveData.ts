@@ -8,7 +8,7 @@ export function useLiveData(refetchFunctions: Array<(abortController: AbortContr
     const abortController = new AbortController();
 
     const refetch = () => {
-      // only refetch if the document is hidden (i.e., user is on another tab)
+      // don't refetch if the document is hidden (i.e., user is on another tab)
       if (!document.hidden) {
         refetchFunctions.forEach((refetchFunction) => {
           void refetchFunction(abortController);

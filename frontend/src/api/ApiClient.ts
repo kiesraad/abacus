@@ -1,5 +1,5 @@
-import { ApiResponseEvent } from "./ApiEvents";
-import { ApiResult } from "./ApiResult";
+import { ApiErrorEvent, ApiResponseEvent } from "./ApiEvents";
+import { ApiError, ApiResult } from "./ApiResult";
 import { BaseApiClient } from "./BaseApiClient";
 
 export const DEFAULT_CANCEL_REASON = "Component unmounted";
@@ -11,6 +11,22 @@ export const DO_NOT_EXTEND_SESSION = { "x-do-not-extend-session": "on-data-refre
  * Abstraction over the browser fetch API to handle JSON responses and errors.
  */
 export class ApiClient extends BaseApiClient {
+  // subscribe to API errors
+  subscribeToApiErrors(callback: (error: ApiError) => void): () => void {
+    const listener = (event: Event) => {
+      if (event instanceof ApiErrorEvent) {
+        callback(event.error);
+      }
+    };
+
+    this.addEventListener("apiError", listener);
+
+    // return unsubscribe function
+    return () => {
+      this.removeEventListener("apiError", listener);
+    };
+  }
+
   // subscribe to API header value for session expiration timestamps
   subscribeToSessionExpiration(callback: (expiration: Date) => void): () => void {
     const listener = (event: Event) => {

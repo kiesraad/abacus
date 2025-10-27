@@ -207,7 +207,7 @@ async fn whoami(user: Option<User>) -> Result<impl IntoResponse, APIError> {
   get,
   path = "/api/initialised",
   responses(
-      (status = 200, description = "The application is initialised"),
+      (status = 204, description = "The application is initialised"),
       (status = 418, description = "The application is not initialised", body = ErrorResponse),
       (status = 500, description = "Internal server error", body = ErrorResponse),
   ),
@@ -215,7 +215,7 @@ async fn whoami(user: Option<User>) -> Result<impl IntoResponse, APIError> {
 async fn initialised(State(pool): State<SqlitePool>) -> Result<impl IntoResponse, APIError> {
     let mut conn = pool.acquire().await?;
     if super::user::has_active_users(&mut conn).await? {
-        Ok(StatusCode::OK)
+        Ok(StatusCode::NO_CONTENT)
     } else {
         Err(AuthenticationError::NotInitialised.into())
     }
@@ -280,7 +280,7 @@ async fn create_first_admin(
     get,
     path = "/api/initialise/admin-exists",
     responses(
-        (status = 200, description = "First admin user exists"),
+        (status = 204, description = "First admin user exists"),
         (status = 403, description = "Forbidden, the application is already initialised", body = ErrorResponse),
         (status = 404, description = "No admin user exists", body = ErrorResponse),
         (status = 500, description = "Internal server error", body = ErrorResponse),
@@ -293,7 +293,7 @@ async fn admin_exists(State(pool): State<SqlitePool>) -> Result<StatusCode, APIE
     }
 
     if super::user::admin_exists(&mut conn).await? {
-        return Ok(StatusCode::OK);
+        return Ok(StatusCode::NO_CONTENT);
     }
 
     Err(APIError::NotFound(
@@ -357,7 +357,7 @@ async fn account_update(
     post,
     path = "/api/logout",
     responses(
-        (status = 200, description = "Successful logout, or user was already logged out"),
+        (status = 204, description = "Successful logout, or user was already logged out"),
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
 )]
@@ -412,7 +412,7 @@ async fn logout(
     Ok((
         AppendHeaders([CLEAR_SITE_DATA_HEADER]),
         updated_jar,
-        StatusCode::OK,
+        StatusCode::NO_CONTENT,
     ))
 }
 
@@ -474,7 +474,7 @@ mod tests {
         assert!(initialised.is_ok());
 
         let response = initialised.unwrap().into_response();
-        assert_eq!(response.status(), StatusCode::OK);
+        assert_eq!(response.status(), StatusCode::NO_CONTENT);
     }
 
     #[test(sqlx::test)]
@@ -563,6 +563,6 @@ mod tests {
         assert_eq!(status, StatusCode::CREATED);
 
         let response = super::admin_exists(State(pool.clone())).await;
-        assert!(response.unwrap() == StatusCode::OK);
+        assert_eq!(response.unwrap(), StatusCode::NO_CONTENT);
     }
 }

@@ -13,10 +13,3 @@ export class ApiResponseEvent extends Event {
     this.response = response;
   }
 }
-
-export class SessionExpirationEvent extends Event {
-  constructor(public expiration: Date) {
-    super("sessionExpiration");
-    this.expiration = expiration;
-  }
-}

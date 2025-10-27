@@ -30,7 +30,7 @@ interface Form extends HTMLFormElement {
 }
 
 export function PollingStationForm({ electionId, pollingStation, onSaved, onCancel }: PollingStationFormProps) {
-  const formRef = React.useRef<Form>(null);
+  const [lastSubmit, setLastSubmit] = React.useState<PollingStationRequest>();
 
   const isUpdate = !!pollingStation;
   const isPreExistingPollingStation = isUpdate && pollingStation.id_prev_session !== undefined;
@@ -61,6 +61,7 @@ export function PollingStationForm({ electionId, pollingStation, onSaved, onCanc
       return;
     }
 
+    setLastSubmit(requestObject);
     void (isUpdate ? update : create)(requestObject).then((result) => {
       if (isSuccess(result)) {
         onSaved?.(result.data);
@@ -89,7 +90,7 @@ export function PollingStationForm({ electionId, pollingStation, onSaved, onCanc
             <Alert type="error">
               <strong className="heading-md">
                 {t("polling_station.form.not_unique.title", {
-                  number: formRef.current?.elements.number?.value || "-1",
+                  number: lastSubmit?.number ?? "-1",
                 })}
               </strong>
               <p>{t("polling_station.form.not_unique.description")}</p>
@@ -103,7 +104,7 @@ export function PollingStationForm({ electionId, pollingStation, onSaved, onCanc
           )}
         </FormLayout.Alert>
       )}
-      <Form title={t("polling_station.details")} onSubmit={handleSubmit} id="polling-station-form" ref={formRef}>
+      <Form title={t("polling_station.details")} onSubmit={handleSubmit} id="polling-station-form">
         <FormLayout disabled={isLoading}>
           <FormLayout.Section title={t("general_details")}>
             <input type="hidden" id="election_id" name="election_id" defaultValue={electionId} />

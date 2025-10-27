@@ -7,7 +7,7 @@ Het doel is dat Abacus zoveel mogelijk in de documenten invult en er dus zo wein
 - Hoe stellen we de adresgegevens van de (verkozen) kandidaten beschikbaar, makkelijker dan d.m.v. de totaallijst (EML_NL 230c)? Deze gegevens zijn nodig voor het opstellen van de benoemings- en geloofsbrieven.
 - Als er een hertelling gebeurt n.a.v. een verzoek van het CSB of op vraag van de Commissie voor het Onderzoek van de Geloofsbrieven, leidt dit dan op stembureau-niveau tot een corrigendum of tot een volledig nieuw tellings-PV?
   - Wie vervult de rol van de Commissie voor het Onderzoek van de Geloofsbrieven (Tweede Kamerverkiezingen) bij gemeenteraadsverkiezingen?
-- Moet Abacus Sectie 2.11 Hertelling van de P22-2 genereren, inclusief extra secties 2.3 t/m 2.5 of 2.10 o.b.v. de hertelling? Deze sectie wordt alleen gebruikt bij een hertelling n.a.v. een bezwaar tijdens de CSB-zitting.
+- Moet Abacus Sectie 2.11 Hertelling van de P 22-2 genereren, inclusief extra secties 2.3 t/m 2.5 of 2.10 o.b.v. de hertelling? Deze sectie wordt alleen gebruikt bij een hertelling n.a.v. een bezwaar tijdens de CSB-zitting.
 
 ## Genereren van documenten door Abacus
 
@@ -134,7 +134,7 @@ EML_NL 510a (tellingsbestand stembureau) wordt niet gebruikt.
 
 - gegenereerd  door Abacus
 
-#### P22-2 sectie 2.11 Hertelling
+#### P 22-2 sectie 2.11 Hertelling
 
 - open punt of gegenereerd door Abacus
 - twee varianten:

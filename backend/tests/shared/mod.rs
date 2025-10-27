@@ -333,7 +333,7 @@ pub async fn change_status_committee_session(
         .send()
         .await
         .unwrap();
-    assert_eq!(response.status(), StatusCode::OK);
+    assert_eq!(response.status(), StatusCode::NO_CONTENT);
 }
 
 pub async fn get_statuses(

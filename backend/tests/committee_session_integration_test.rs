@@ -112,7 +112,7 @@ async fn test_committee_session_delete_ok_status_created(pool: SqlitePool) {
 
     assert_eq!(
         response.status(),
-        StatusCode::OK,
+        StatusCode::NO_CONTENT,
         "Unexpected response status"
     );
 
@@ -376,7 +376,7 @@ async fn test_committee_session_update_works(pool: SqlitePool) {
     // Ensure the response is what we expect
     assert_eq!(
         response.status(),
-        StatusCode::OK,
+        StatusCode::NO_CONTENT,
         "Unexpected response status"
     );
 }
@@ -481,7 +481,7 @@ async fn test_committee_session_status_change_works(pool: SqlitePool) {
     // Ensure the response is what we expect
     assert_eq!(
         response.status(),
-        StatusCode::OK,
+        StatusCode::NO_CONTENT,
         "Unexpected response status"
     );
 }
@@ -511,7 +511,7 @@ async fn test_committee_session_status_change_finished_to_in_progress_deletes_fi
     // Ensure the response is what we expect
     assert_eq!(
         response.status(),
-        StatusCode::OK,
+        StatusCode::NO_CONTENT,
         "Unexpected response status"
     );
 
@@ -559,7 +559,7 @@ async fn test_committee_session_status_change_finished_to_in_progress_deletes_fi
     // Ensure the response is what we expect
     assert_eq!(
         response.status(),
-        StatusCode::OK,
+        StatusCode::NO_CONTENT,
         "Unexpected response status"
     );
 
@@ -652,7 +652,7 @@ async fn test_committee_session_number_of_voters_change_works(pool: SqlitePool) 
     // Ensure the response is what we expect
     assert_eq!(
         response.status(),
-        StatusCode::OK,
+        StatusCode::NO_CONTENT,
         "Unexpected response status"
     );
 }

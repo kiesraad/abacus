@@ -76,7 +76,7 @@ __Hoofdscenario:__
 
 __Uitbreidingen:__  
 1a. De applicatie geeft een foutmelding bij het inlezen van de verkiezingsdefinitie (EML 110a):  
-&emsp; 1a1. De beheerder stelt vast dat die het verkeerde bestand heeft ingelezen.  
+&emsp; 1a1. De beheerder stelt vast dat het verkeerde bestand is ingelezen.  
 &emsp;&emsp; 1a1a. De beheerder stelt vast dat het bestand geen geldige verkiezingsdefinitie bevat:  
 &emsp;&emsp;&emsp; 1a1a1. De beheerder neemt contact op met het CSB.  
 &emsp; 1a2. De beheerder leest het correcte bestand in.

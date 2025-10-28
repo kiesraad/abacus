@@ -16,7 +16,7 @@ __Hoofdscenario:__
 5. [De coördinator GSB en de invoerders voeren alle gegevens in de applicatie in.](./gsb-invoer-eerste-zitting.md#de-coördinator-gsb-en-de-invoerders-voeren-alle-gegevens-in-de-applicatie-in-vlieger)
 6. [De coördinator GSB maakt het PV (DSO: Na 31-1, CSO: Na 31-2) en het tellingsbestand EML 510b aan.](#de-coördinator-gsb-maakt-het-pv-dso-na-31-1-cso-na-31-2-en-het-tellingsbestand-eml-510b-aan-zee)
 7. Het GSB voert het controleprotocol (handmatige controle optellingen software) uit en stelt geen verschillen vast.
-8. Het GSB stelt de gemeentelijke totalen vast o.b.v. het PV: controleren op compleetheid, voorlezen, geen additionele bezwaren en bijzonderheden, ondertekenen. En sluit daarmee de zitting.
+8. Het GSB stelt de gemeentelijke totalen vast o.b.v. het PV (DSO: Na 31-1, CSO: Na 31-2): controleren op compleetheid, voorlezen, geen additionele bezwaren en bijzonderheden, ondertekenen. En sluit daarmee de zitting.
 9. Het GSB stelt het tellingsbestand EML 510b beschikbaar aan het CSB voor de uitslagvaststelling.
 10. Het GSB stelt het PV GSB incl. bijlagen (DSO: Na 31-1, CSO: Na 31-2) beschikbaar aan de burgemeester.
 11. De burgemeester publiceert het PV GSB incl. bijlagen (DSO: Na 31-1, CSO: Na 31-2) en brengt het over naar het CSB.

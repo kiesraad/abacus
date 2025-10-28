@@ -310,7 +310,7 @@ async fn polling_station_investigation_update(
     delete,
     path = "/api/polling_stations/{polling_station_id}/investigation",
     responses(
-        (status = 200, description = "Polling station investigation deleted successfully"),
+        (status = 204, description = "Polling station investigation deleted successfully"),
         (status = 401, description = "Unauthorized", body = ErrorResponse),
         (status = 403, description = "Forbidden", body = ErrorResponse),
         (status = 404, description = "Investigation not found", body = ErrorResponse),
@@ -376,7 +376,7 @@ async fn polling_station_investigation_delete(
 
         tx.commit().await?;
 
-        Ok(StatusCode::OK)
+        Ok(StatusCode::NO_CONTENT)
     } else {
         tx.commit().await?;
 

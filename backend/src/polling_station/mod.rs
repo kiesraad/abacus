@@ -235,7 +235,7 @@ async fn polling_station_update(
     delete,
     path = "/api/elections/{election_id}/polling_stations/{polling_station_id}",
     responses(
-        (status = 200, description = "Polling station deleted successfully"),
+        (status = 204, description = "Polling station deleted successfully"),
         (status = 401, description = "Unauthorized", body = ErrorResponse),
         (status = 403, description = "Forbidden", body = ErrorResponse),
         (status = 404, description = "Polling station not found", body = ErrorResponse),
@@ -287,7 +287,7 @@ async fn polling_station_delete(
 
     tx.commit().await?;
 
-    Ok(StatusCode::OK)
+    Ok(StatusCode::NO_CONTENT)
 }
 
 #[derive(Debug, Deserialize, Serialize, Clone, ToSchema)]

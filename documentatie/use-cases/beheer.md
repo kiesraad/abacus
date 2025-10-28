@@ -30,7 +30,7 @@ __Hoofdscenario:__
 
 __Uitbreidingen:__  
 1a. De beheerder bereidt één of meerdere reserve-servers voor:  
-&emsp; 1a1. De beheerder doorloopt de stappen op alle servers.
+&emsp; 1a1. De beheerder doorloopt de installatiestappen op alle servers.
 
 4a. De applicatie geeft een foutmelding tijdens het starten:  
 &emsp; 4a1. De beheerder lost het probleem op.  

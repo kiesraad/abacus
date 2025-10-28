@@ -41,15 +41,18 @@ export const NumberInput = React.forwardRef<HTMLInputElement, NumberInputProps>(
 
   const hideTooltip = React.useCallback(() => {
     setTooltipInvalidValue(null);
-  }, []);
+  }, [setTooltipInvalidValue]);
 
-  const onPaste: React.ClipboardEventHandler<HTMLInputElement> = React.useCallback((event) => {
-    const pastedInput = event.clipboardData.getData("text/plain");
-    if (!validateNumberString(pastedInput)) {
-      event.preventDefault();
-      setTooltipInvalidValue(pastedInput);
-    }
-  }, []);
+  const onPaste: React.ClipboardEventHandler<HTMLInputElement> = React.useCallback(
+    (event) => {
+      const pastedInput = event.clipboardData.getData("text/plain");
+      if (!validateNumberString(pastedInput)) {
+        event.preventDefault();
+        setTooltipInvalidValue(pastedInput);
+      }
+    },
+    [setTooltipInvalidValue],
+  );
 
   const tooltipContent = tooltipInvalidValue ? (
     <div className="tooltip-content">

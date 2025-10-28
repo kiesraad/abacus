@@ -59,6 +59,7 @@ export function CheckHash({ date, title, header, description, redactedHash, erro
           newStub.error = t("election.check_eml.check_hash.hint");
           stubsAreValid = false;
         } else {
+          // eslint-disable-next-line react-hooks/immutability
           completeHash[stub.index] = value;
         }
         setStubs(newStubs);

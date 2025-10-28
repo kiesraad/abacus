@@ -92,7 +92,7 @@ De eerste versie van Abacus bevat de functionaliteit voor het GSB bij de Gemeent
 
 - ⏳ De versie voor Microsoft Windows kan door de Kiesraad worden ondertekend.
   [#1068](https://github.com/kiesraad/abacus/issues/1068)
-- 📋 Wijzigingen in de lijst met stembureaus (ten opzichte van de gepubliceerde lijst) worden door Abacus in het proces-verbaal vermeldt.
+- 📋 Wijzigingen in de lijst met stembureaus (ten opzichte van de gepubliceerde lijst) worden door Abacus in het proces-verbaal vermeld.
   [#1865](https://github.com/kiesraad/abacus/issues/1865)
 - 📋 De presentielijst van de GSB-zitting kan in Abacus worden ingevuld.
   [#1543](https://github.com/kiesraad/abacus/issues/1543)

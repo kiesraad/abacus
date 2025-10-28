@@ -54,6 +54,11 @@ impl EML230 {
         self.election_identifier().election_domain.as_ref()
     }
 
+    #[cfg(feature = "e2e-helpers")]
+    pub fn get_affiliations(&self) -> &Vec<Affiliation> {
+        &self.contest().affiliations
+    }
+
     pub fn add_candidate_lists(
         &self,
         mut election: NewElection,
@@ -237,14 +242,14 @@ impl EML230 {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "PascalCase")]
 pub struct CandidateList {
-    pub(crate) election: Election,
+    election: Election,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "PascalCase")]
 pub struct Election {
     election_identifier: ElectionIdentifier,
-    pub(crate) contest: Contest,
+    contest: Contest,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -252,7 +257,7 @@ pub struct Election {
 pub struct Contest {
     contest_identifier: ContestIdentifier,
     #[serde(rename = "Affiliation")]
-    pub(crate) affiliations: Vec<Affiliation>,
+    affiliations: Vec<Affiliation>,
 }
 
 /// Political group and their candidates
@@ -265,7 +270,14 @@ pub struct Affiliation {
     #[serde(rename(serialize = "kr:ListData", deserialize = "ListData"))]
     list_data: ListData,
     #[serde(rename = "Candidate")]
-    pub(crate) candidates: Vec<Candidate>,
+    candidates: Vec<Candidate>,
+}
+
+#[cfg(feature = "e2e-helpers")]
+impl Affiliation {
+    pub fn candidates(&self) -> &Vec<Candidate> {
+        &self.candidates
+    }
 }
 
 /// Identifier for the political group

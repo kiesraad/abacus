@@ -52,6 +52,16 @@ impl EML110 {
         &self.election().contest
     }
 
+    #[cfg(feature = "e2e-helpers")]
+    pub fn get_registered_parties(&self) -> &Vec<RegisteredParty> {
+        &self.election().registered_parties
+    }
+
+    #[cfg(feature = "e2e-helpers")]
+    pub fn get_polling_places(&self) -> &Vec<PollingPlace> {
+        &self.contest().polling_places
+    }
+
     pub fn as_abacus_election(&self) -> Result<crate::election::NewElection, EMLImportError> {
         // we need to be importing from a 110a file
         if self.base.id != "110a" {
@@ -355,7 +365,7 @@ pub struct EventIdentifier {}
 #[serde(rename_all = "PascalCase")]
 pub struct Election {
     election_identifier: ElectionIdentifier,
-    pub(crate) contest: Contest,
+    contest: Contest,
     // required in 110a, not in 110b
     #[serde(skip_serializing_if = "Option::is_none", default)]
     number_of_seats: Option<u32>,
@@ -387,7 +397,7 @@ pub struct Contest {
     #[serde(skip_serializing_if = "Option::is_none", default)]
     max_votes: Option<String>,
     #[serde(rename = "PollingPlace", default)]
-    pub(crate) polling_places: Vec<PollingPlace>,
+    polling_places: Vec<PollingPlace>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -527,7 +537,7 @@ pub struct RegisteredParty {
         serialize = "kr:RegisteredAppellation",
         deserialize = "RegisteredAppellation"
     ))]
-    pub(crate) registered_appellation: String,
+    registered_appellation: String,
 }
 
 #[cfg(test)]

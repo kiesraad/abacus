@@ -20,12 +20,13 @@ __Niveau:__ gebruikersdoel, zee, 🌊
 
 __Hoofdscenario:__
 
-1. De beheerder bereidt één computer als Abacus-server voor.
+1. De beheerder bereidt één computer als Abacus-server voor conform de [Aansluitvoorschriften](https://www.kiesraad.nl/adviezen-en-publicaties/publicaties/2025/08/21/aansluit--en-gebruiksvoorschriften).
 2. De beheerder downloadt de applicatie.
 3. De beheerder plaatst de applicatie op de server.
 4. De beheerder start de applicatie.
-5. (voor elk invoerstation) De beheerder bereidt de computer als invoerstation voor.
-6. (voor elk invoerstation) De beheerder zorgt dat het invoerstation met de server kan verbinden.
+5. [De applicatie controleert of er een internetverbinding is.](./airgap.md#de-applicatie-controleert-of-er-een-internetverbinding-is-zee)
+6. (voor elk invoerstation) De beheerder bereidt de computer als invoerstation voor.
+7. (voor elk invoerstation) De beheerder zorgt dat het invoerstation met de server kan verbinden.
 
 __Uitbreidingen:__  
 1a. De beheerder bereidt één of meerdere reserve-servers voor:  

@@ -32,6 +32,7 @@ dependencies = [
  "tower-http",
  "tracing",
  "tracing-subscriber",
+ "ttf-parser 0.25.1",
  "typst",
  "typst-pdf",
  "utoipa",
@@ -1108,7 +1109,7 @@ dependencies = [
  "memmap2",
  "slotmap",
  "tinyvec",
- "ttf-parser",
+ "ttf-parser 0.24.1",
 ]
 
 [[package]]
@@ -2847,7 +2848,7 @@ dependencies = [
  "core_maths",
  "log",
  "smallvec",
- "ttf-parser",
+ "ttf-parser 0.24.1",
  "unicode-bidi-mirroring",
  "unicode-ccc",
  "unicode-properties",
@@ -3447,7 +3448,7 @@ dependencies = [
  "siphasher",
  "subsetter",
  "tiny-skia",
- "ttf-parser",
+ "ttf-parser 0.24.1",
  "usvg",
 ]
 
@@ -3902,6 +3903,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "ttf-parser"
+version = "0.25.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d2df906b07856748fa3f6e0ad0cbaa047052d4a7dd609e231c4f72cee8c36f31"
+
+[[package]]
 name = "two-face"
 version = "0.4.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -4004,7 +4011,7 @@ dependencies = [
  "kurbo 0.11.3",
  "rustybuzz",
  "smallvec",
- "ttf-parser",
+ "ttf-parser 0.24.1",
  "typst-assets",
  "typst-library",
  "typst-macros",
@@ -4062,7 +4069,7 @@ dependencies = [
  "syntect",
  "time",
  "toml",
- "ttf-parser",
+ "ttf-parser 0.24.1",
  "two-face",
  "typed-arena",
  "typst-assets",
@@ -4108,7 +4115,7 @@ dependencies = [
  "serde",
  "subsetter",
  "svg2pdf",
- "ttf-parser",
+ "ttf-parser 0.24.1",
  "typst-assets",
  "typst-library",
  "typst-macros",
@@ -4147,7 +4154,7 @@ dependencies = [
  "ecow",
  "flate2",
  "image",
- "ttf-parser",
+ "ttf-parser 0.24.1",
  "typst-library",
  "typst-macros",
  "typst-timing",

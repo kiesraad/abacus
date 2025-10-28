@@ -377,7 +377,7 @@ pub struct Election {
         rename(serialize = "kr:RegisteredParties", deserialize = "RegisteredParties"),
         default
     )]
-    pub(crate) registered_parties: Vec<RegisteredParty>,
+    registered_parties: Vec<RegisteredParty>,
 }
 
 super::util::gen_wrap_list!(

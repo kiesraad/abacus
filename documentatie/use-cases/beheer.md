@@ -28,9 +28,13 @@ __Hoofdscenario:__
 6. (voor elk invoerstation) De beheerder zorgt dat het invoerstation met de server kan verbinden.
 
 __Uitbreidingen:__  
-1a. De beheerder bereidt één of meerdere reserve-servers voor:
+1a. De beheerder bereidt één of meerdere reserve-servers voor:  
+&emsp; 1a1. De beheerder doorloopt de stappen op alle servers.
 
-4a. De applicatie geeft een foutmelding tijdens het starten:
+4a. De applicatie geeft een foutmelding tijdens het starten:  
+&emsp; 4a1. De beheerder lost het probleem op.  
+&emsp;&emsp; 4a1a. De beheerder slaagt er niet in het probleem op te lossen:  
+&emsp;&emsp;&emsp; 4a1a1. De beheerder neemt contact op met de Kiesraad.
 
 
 ## De beheerder zet de verkiezingen in de applicatie (vis)

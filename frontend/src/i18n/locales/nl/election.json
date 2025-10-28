@@ -61,10 +61,8 @@
   "no_elections_added": "Nog geen verkiezingen ingesteld",
   "not_ready_for_use": "Abacus is nog niet klaar voor gebruik",
   "number_of_voters": {
-    "description": "Voer het aantal kiesgerechtigden in zoals door de gemeenteraad vastgesteld voor de gemeenteraadsverkiezing 2026 in de gemeente {location}",
     "error": "Vul het aantal kiesgerechtigden in",
-    "hint": "Ingelezen uit bestand met stembureaus",
-    "title": "Hoeveel kiesgerechtigden telt de gemeente?"
+    "hint": "Ingelezen uit bestand met stembureaus"
   },
   "please_wait_for_coordinator": "Je kan als invoerder nog niks doen. Wacht tot de coördinator het systeem openstelt voor het invoeren van telresultaten.",
   "polling_stations": {

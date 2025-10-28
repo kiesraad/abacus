@@ -10,7 +10,7 @@
   "short_title": "Verschillen met stembureau",
   "unexplained_difference_ballots_voters": {
     "short_title": "Verschil tussen getelde stembiljetten en toegelaten kiezers?",
-    "title": "Was er in de telresultaten van het stembureau een onverklaard verschil tussen het totaal aantal getelde stembiljetten het aantal toegelaten kiezers?"
+    "title": "Was er in de telresultaten van het stembureau een onverklaard verschil tussen het totaal aantal getelde stembiljetten en het aantal toegelaten kiezers?"
   },
   "validation_error": "Controleer of je antwoord gelijk is aan het papieren proces-verbaal"
 }

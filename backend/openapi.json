@@ -5019,7 +5019,7 @@
           },
           "unexplained_difference_ballots_voters": {
             "$ref": "#/components/schemas/YesNo",
-            "description": "Whether there was an unexplained difference between the number of voters and votes\n(\"Was er in de telresultaten van het stembureau een onverklaard verschil tussen het totaal aantal getelde stembiljetten het aantal toegelaten kiezers?\")"
+            "description": "Whether there was an unexplained difference between the number of voters and votes\n(\"Was er in de telresultaten van het stembureau een onverklaard verschil tussen het totaal aantal getelde stembiljetten en het aantal toegelaten kiezers?\")"
           }
         },
         "additionalProperties": false

@@ -1,5 +1,5 @@
 import { APIRequestContext, test as base, expect, Page } from "@playwright/test";
-import { readFile, unlink, writeFile } from "node:fs/promises";
+import { readFile, unlink } from "node:fs/promises";
 
 import {
   COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_BODY,
@@ -20,16 +20,14 @@ import {
 } from "@/types/generated/openapi";
 
 import { DataEntryApiClient } from "./helpers-utils/api-clients";
-import { completePollingStationDataEntries, loginAs } from "./helpers-utils/e2e-test-api-helpers";
-import { createRandomUsername } from "./helpers-utils/e2e-test-utils";
 import {
-  eml110a,
-  eml110a_too_large,
-  eml110b_too_large,
-  eml230b,
-  eml230b_too_large,
+  completePollingStationDataEntries,
   EmlTestFile,
-} from "./test-data/eml-files";
+  generateEml,
+  loginAs,
+} from "./helpers-utils/e2e-test-api-helpers";
+import { createRandomUsername } from "./helpers-utils/e2e-test-utils";
+import { eml110a, eml230b } from "./test-data/eml-files";
 import {
   dataEntryRequest,
   dataEntryWithDifferencesRequest,
@@ -238,38 +236,18 @@ export const test = base.extend<Fixtures>({
   },
 
   eml110aTooLargeTestFile: async ({ request }, use) => {
-    const fileSize = 5 * 1024 * 1024; // 5MB
-    const response = await request.get(`/api/generate_eml110a/${fileSize}`);
-    const content = await response.text();
-    await writeFile(eml110a_too_large.path, content, "utf8");
-
-    await use(eml110a_too_large);
-
-    // Cleanup
-    await unlink(eml110a_too_large.path);
+    const { filename, path } = await generateEml(request, "eml110a");
+    await use({ filename, path });
+    await unlink(path);
   },
-
   eml110bTooLargeTestFile: async ({ request }, use) => {
-    const fileSize = 5 * 1024 * 1024; // 5MB
-    const response = await request.get(`/api/generate_eml110b/${fileSize}`);
-    const content = await response.text();
-    await writeFile(eml110b_too_large.path, content, "utf8");
-
-    await use(eml110b_too_large);
-
-    // Cleanup
-    await unlink(eml110b_too_large.path);
+    const { filename, path } = await generateEml(request, "eml110b");
+    await use({ filename, path });
+    await unlink(path);
   },
-
   eml230bTooLargeTestFile: async ({ request }, use) => {
-    const fileSize = 5 * 1024 * 1024; // 5MB
-    const response = await request.get(`/api/generate_eml230b/${fileSize}`);
-    const content = await response.text();
-    await writeFile(eml230b_too_large.path, content, "utf8");
-
-    await use(eml230b_too_large);
-
-    // Cleanup
-    await unlink(eml230b_too_large.path);
+    const { filename, path } = await generateEml(request, "eml230b");
+    await use({ filename, path });
+    await unlink(path);
   },
 });

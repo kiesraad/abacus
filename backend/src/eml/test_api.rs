@@ -7,7 +7,10 @@ use crate::{
     },
 };
 
-use axum::{extract::Path, http::StatusCode};
+use axum::{
+    extract::Path,
+    http::{HeaderMap, StatusCode, header},
+};
 use utoipa_axum::{router::OpenApiRouter, routes};
 
 const EML_110A_ITEM: &str = r#"
@@ -72,8 +75,10 @@ pub fn router() -> OpenApiRouter<AppState> {
 )]
 async fn generate_eml110a(
     Path(min_size_bytes): Path<usize>,
-) -> Result<(StatusCode, String), APIError> {
-    Ok((StatusCode::OK, eml110a(min_size_bytes)))
+) -> Result<(StatusCode, HeaderMap, String), APIError> {
+    let mut headers = HeaderMap::new();
+    headers.insert(header::CONTENT_TYPE, "application/xml".parse().unwrap());
+    Ok((StatusCode::OK, headers, eml110a(min_size_bytes)))
 }
 
 #[utoipa::path(
@@ -87,8 +92,10 @@ async fn generate_eml110a(
 )]
 async fn generate_eml110b(
     Path(min_size_bytes): Path<usize>,
-) -> Result<(StatusCode, String), APIError> {
-    Ok((StatusCode::OK, eml110b(min_size_bytes)))
+) -> Result<(StatusCode, HeaderMap, String), APIError> {
+    let mut headers = HeaderMap::new();
+    headers.insert(header::CONTENT_TYPE, "application/xml".parse().unwrap());
+    Ok((StatusCode::OK, headers, eml110b(min_size_bytes)))
 }
 
 #[utoipa::path(
@@ -102,8 +109,10 @@ async fn generate_eml110b(
 )]
 async fn generate_eml230b(
     Path(min_size_bytes): Path<usize>,
-) -> Result<(StatusCode, String), APIError> {
-    Ok((StatusCode::OK, eml230b(min_size_bytes)))
+) -> Result<(StatusCode, HeaderMap, String), APIError> {
+    let mut headers = HeaderMap::new();
+    headers.insert(header::CONTENT_TYPE, "application/xml".parse().unwrap());
+    Ok((StatusCode::OK, headers, eml230b(min_size_bytes)))
 }
 
 fn eml110a(min_size_bytes: usize) -> String {

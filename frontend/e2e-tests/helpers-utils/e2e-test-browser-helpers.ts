@@ -128,8 +128,3 @@ export async function createInvestigation(page: Page, pollingStation: string, re
   const investigationPrintCorrigendumPage = new InvestigationPrintCorrigendumPgObj(page);
   await expect(investigationPrintCorrigendumPage.header).toBeVisible();
 }
-
-export async function finishInvestigation() {
-  // This function is a placeholder for future implementation.
-  // It should contain the steps to finish an investigation.
-}

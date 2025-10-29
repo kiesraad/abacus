@@ -1,8 +1,3 @@
-export interface EmlTestFile {
-  filename: string;
-  path: string;
-}
-
 export const eml110a = {
   filename: "eml110a_test.eml.xml",
   path: "../backend/src/eml/tests/eml110a_test.eml.xml",
@@ -30,19 +25,9 @@ export const eml110a = {
   ],
 };
 
-export const eml110a_too_large = {
-  filename: "eml110a_invalid_file_size.eml.xml",
-  path: "../backend/src/eml/tests/eml110a_invalid_file_size.eml.xml",
-};
-
 export const eml110b = {
   filename: "eml110b_test.eml.xml",
   path: "../backend/src/eml/tests/eml110b_test.eml.xml",
-};
-
-export const eml110b_too_large = {
-  filename: "eml110b_invalid_file_size.eml.xml",
-  path: "../backend/src/eml/tests/eml110b_invalid_file_size.eml.xml",
 };
 
 export const eml110b_short = {
@@ -79,9 +64,4 @@ export const eml230b = {
     "c000",
     "7096",
   ],
-};
-
-export const eml230b_too_large = {
-  filename: "eml230b_invalid_file_size.eml.xml",
-  path: "../backend/src/eml/tests/eml230b_invalid_file_size.eml.xml",
 };

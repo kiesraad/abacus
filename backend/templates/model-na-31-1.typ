@@ -230,14 +230,14 @@ Bijvoorbeeld een schorsing of als er meerdere verkiezingen tegelijk werden georg
 #letterbox(
   "I",
   value: input.summary.differences_counts.more_ballots_count.count,
-)[Totaal aantal méér getelde stemmen in deze stembureaus]
+)[Totaal aantal méér getelde stemmen]
 
 === Voor de stembureaus met de nummers #input.summary.differences_counts.fewer_ballots_count.polling_stations.map(str).join(", ") zijn *minder* uitgebrachte stemmen dan toegelaten kiezers geteld.
 
 #letterbox(
   "J",
   value: input.summary.differences_counts.fewer_ballots_count.count,
-)[Totaal aantal minder getelde stemmen in deze stembureaus]
+)[Totaal aantal minder getelde stemmen]
 
 == Uitkomst controleprotocol <monitoring_protocol>
 

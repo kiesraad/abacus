@@ -125,20 +125,20 @@ ingevuld te worden in de kolom ‘gecorrigeerd'. Onder ‘oorspronkelijk’ staa
 
 #let differences = input.summary.differences_counts.more_ballots_count.count > 0 or input.summary.differences_counts.fewer_ballots_count.count > 0
 
-#checkbox(checked: not differences)[Ja #sym.arrow.r *Ga door naar #ref(<per_list_and_candidate>)*]
+#checkbox(checked: not differences)[Ja]
 
 #checkbox(checked: differences)[Nee, er zijn stembureaus met een verschil]
 
 
-=== Voor de stembureaus met de nummers #comma_list(input.summary.differences_counts.more_ballots_count.polling_stations) zijn *méér* uitgebrachte stemmen dan toegelaten kiezers geteld. Noteer onder ‘gecorrigeerd’ het nieuwe verschil.
+=== Voor de stembureaus met de nummers #comma_list(input.summary.differences_counts.more_ballots_count.polling_stations) zijn *méér* uitgebrachte stemmen dan toegelaten kiezers geteld.
 
 #correction_title_grid()
-#letterbox("I", original_value: input.previous_summary.differences_counts.more_ballots_count.count, value: input.summary.differences_counts.more_ballots_count.count, bold_top_border: true, wide_cells: true)[Kiesgerechtigden]
+#letterbox("I", original_value: input.previous_summary.differences_counts.more_ballots_count.count, value: input.summary.differences_counts.more_ballots_count.count, bold_top_border: true, wide_cells: true)[Totaal aantal méér getelde stemmen]
 
-=== Voor de stembureaus met de nummers #comma_list(input.summary.differences_counts.fewer_ballots_count.polling_stations) zijn *minder* uitgebrachte stemmen dan toegelaten kiezers geteld. Noteer onder ‘gecorrigeerd’ het nieuwe verschil.
+=== Voor de stembureaus met de nummers #comma_list(input.summary.differences_counts.fewer_ballots_count.polling_stations) zijn *minder* uitgebrachte stemmen dan toegelaten kiezers geteld.
 
 #correction_title_grid()
-#letterbox("J", original_value: input.previous_summary.differences_counts.fewer_ballots_count.count, value: input.summary.differences_counts.fewer_ballots_count.count, bold_top_border: true, wide_cells: true)[Kiesgerechtigden]
+#letterbox("J", original_value: input.previous_summary.differences_counts.fewer_ballots_count.count, value: input.summary.differences_counts.fewer_ballots_count.count, bold_top_border: true, wide_cells: true)[Totaal aantal minder getelde stemmen]
 
 #pagebreak(weak: true)
 

@@ -1,5 +1,5 @@
 import { APIRequestContext, test as base, expect, Page } from "@playwright/test";
-import fs from "fs";
+import { readFile, unlink, writeFile } from "node:fs/promises";
 
 import {
   COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_BODY,
@@ -109,8 +109,8 @@ export const test = base.extend<Fixtures>({
   emptyElection: async ({ request }, use) => {
     await loginAs(request, "admin1");
     const url: ELECTION_IMPORT_REQUEST_PATH = `/api/elections/import`;
-    const election_data = fs.readFileSync(eml110a.path, "utf8");
-    const candidate_data = fs.readFileSync(eml230b.path, "utf8");
+    const election_data = await readFile(eml110a.path, "utf8");
+    const candidate_data = await readFile(eml230b.path, "utf8");
     const electionResponse = await request.post(url, {
       data: {
         election_data,
@@ -241,35 +241,35 @@ export const test = base.extend<Fixtures>({
     const fileSize = 5 * 1024 * 1024; // 5MB
     const response = await request.get(`/api/generate_eml110a/${fileSize}`);
     const content = await response.text();
-    await fs.promises.writeFile(eml110a_too_large.path, content, "utf8");
+    await writeFile(eml110a_too_large.path, content, "utf8");
 
     await use(eml110a_too_large);
 
     // Cleanup
-    await fs.promises.unlink(eml110a_too_large.path);
+    await unlink(eml110a_too_large.path);
   },
 
   eml110bTooLargeTestFile: async ({ request }, use) => {
     const fileSize = 5 * 1024 * 1024; // 5MB
     const response = await request.get(`/api/generate_eml110b/${fileSize}`);
     const content = await response.text();
-    await fs.promises.writeFile(eml110b_too_large.path, content, "utf8");
+    await writeFile(eml110b_too_large.path, content, "utf8");
 
     await use(eml110b_too_large);
 
     // Cleanup
-    await fs.promises.unlink(eml110b_too_large.path);
+    await unlink(eml110b_too_large.path);
   },
 
   eml230bTooLargeTestFile: async ({ request }, use) => {
     const fileSize = 5 * 1024 * 1024; // 5MB
     const response = await request.get(`/api/generate_eml230b/${fileSize}`);
     const content = await response.text();
-    await fs.promises.writeFile(eml230b_too_large.path, content, "utf8");
+    await writeFile(eml230b_too_large.path, content, "utf8");
 
     await use(eml230b_too_large);
 
     // Cleanup
-    await fs.promises.unlink(eml230b_too_large.path);
+    await unlink(eml230b_too_large.path);
   },
 });

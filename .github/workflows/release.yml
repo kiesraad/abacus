@@ -124,7 +124,7 @@ jobs:
       - name: Download abacus
         uses: actions/download-artifact@v5
         with:
-          name: abacus-${{ matrix.os }}-no-airgap-detection
+          name: abacus-${{ matrix.os }}-e2e-build
           path: builds/backend
       - name: make backend build executable
         run: chmod a+x ../builds/backend/abacus
@@ -208,7 +208,7 @@ jobs:
       - name: Download abacus
         uses: actions/download-artifact@v5
         with:
-          name: abacus-ubuntu-latest-no-airgap-detection
+          name: abacus-ubuntu-latest-e2e-build
       - name: Upload binary to test server
         run: |
           curl -s -v \

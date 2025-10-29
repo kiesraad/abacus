@@ -9,7 +9,7 @@ use crate::{
 
 use axum::{
     extract::Path,
-    http::{HeaderMap, HeaderValue, StatusCode, header},
+    http::{HeaderMap, StatusCode, header},
 };
 use utoipa_axum::{router::OpenApiRouter, routes};
 

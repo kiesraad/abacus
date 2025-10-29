@@ -1663,8 +1663,105 @@
         }
       }
     },
+    "/api/generate_eml110a/{min_size_bytes}": {
+      "get": {
+        "description": "Endpoint only available with the e2e-helpers feature",
+        "operationId": "generate_eml110a",
+        "parameters": [
+          {
+            "name": "min_size_bytes",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 0
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "EML generated"
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/generate_eml110b/{min_size_bytes}": {
+      "get": {
+        "description": "Endpoint only available with the e2e-helpers feature",
+        "operationId": "generate_eml110b",
+        "parameters": [
+          {
+            "name": "min_size_bytes",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 0
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "EML generated"
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/generate_eml230b/{min_size_bytes}": {
+      "get": {
+        "description": "Endpoint only available with the e2e-helpers feature",
+        "operationId": "generate_eml230b",
+        "parameters": [
+          {
+            "name": "min_size_bytes",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 0
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "EML generated"
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/generate_test_election": {
       "post": {
+        "description": "Endpoint only available with the dev-database feature",
         "operationId": "generate_election_handler",
         "requestBody": {
           "content": {

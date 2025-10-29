@@ -174,7 +174,7 @@ The [utoipa](https://github.com/juhaku/utoipa) crate is used to generate OpenAPI
 The OpenAPI JSON specification is available in the repository at `openapi.json` and can be found at [/api-docs/openapi.json](http://localhost:8080/api-docs/openapi.json) when running the API server.
 The Swagger UI is available at [/api-docs](http://localhost:8080/api-docs).
 
-To update `openapi.json` in the repository, run the command `cargo run --bin gen-openapi`.
+To update `openapi.json` in the repository, run the command `cargo run --bin gen-openapi --features e2e-helpers`.
 
 ### Test data generation
 

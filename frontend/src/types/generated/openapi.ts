@@ -134,6 +134,24 @@ export interface ELECTION_STATUS_REQUEST_PARAMS {
 }
 export type ELECTION_STATUS_REQUEST_PATH = `/api/elections/${number}/status`;
 
+// /api/generate_eml110a/{min_size_bytes}
+export interface GENERATE_EML110A_REQUEST_PARAMS {
+  min_size_bytes: number;
+}
+export type GENERATE_EML110A_REQUEST_PATH = `/api/generate_eml110a/${number}`;
+
+// /api/generate_eml110b/{min_size_bytes}
+export interface GENERATE_EML110B_REQUEST_PARAMS {
+  min_size_bytes: number;
+}
+export type GENERATE_EML110B_REQUEST_PATH = `/api/generate_eml110b/${number}`;
+
+// /api/generate_eml230b/{min_size_bytes}
+export interface GENERATE_EML230B_REQUEST_PARAMS {
+  min_size_bytes: number;
+}
+export type GENERATE_EML230B_REQUEST_PATH = `/api/generate_eml230b/${number}`;
+
 // /api/generate_test_election
 export type GENERATE_ELECTION_HANDLER_REQUEST_PARAMS = Record<string, never>;
 export type GENERATE_ELECTION_HANDLER_REQUEST_PATH = `/api/generate_test_election`;

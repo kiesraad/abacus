@@ -64,6 +64,7 @@ pub fn router() -> OpenApiRouter<AppState> {
 #[utoipa::path(
     get,
     path = "/api/generate_eml110a/{min_size_bytes}",
+    description = "Endpoint only available with the e2e-helpers feature",
     responses(
         (status = 200, description = "EML generated"),
         (status = 500, description = "Internal server error", body = ErrorResponse),
@@ -78,6 +79,7 @@ async fn generate_eml110a(
 #[utoipa::path(
     get,
     path = "/api/generate_eml110b/{min_size_bytes}",
+    description = "Endpoint only available with the e2e-helpers feature",
     responses(
         (status = 200, description = "EML generated"),
         (status = 500, description = "Internal server error", body = ErrorResponse),
@@ -92,6 +94,7 @@ async fn generate_eml110b(
 #[utoipa::path(
     get,
     path = "/api/generate_eml230b/{min_size_bytes}",
+    description = "Endpoint only available with the e2e-helpers feature",
     responses(
         (status = 200, description = "EML generated"),
         (status = 500, description = "Internal server error", body = ErrorResponse),

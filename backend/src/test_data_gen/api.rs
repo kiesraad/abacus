@@ -12,6 +12,7 @@ pub fn router() -> OpenApiRouter<AppState> {
 #[utoipa::path(
     post,
     path = "/api/generate_test_election",
+    description = "Endpoint only available with the dev-database feature",
     responses(
         (status = 200, description = "Created test election"),
         (status = 500, description = "Internal server error", body = ErrorResponse),

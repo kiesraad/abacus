@@ -24,7 +24,7 @@ pre-commit:
       root: "backend/"
       glob: "*.rs"
       run: >
-        cargo run --package abacus --bin gen-openapi &&
+        cargo run --package abacus --bin gen-openapi --features e2e-helpers &&
         git add openapi.json &&
         cd ../frontend &&
         npm run gen:openapi &&

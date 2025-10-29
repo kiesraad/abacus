@@ -23,6 +23,7 @@ use super::{
     },
     validate_data_entry_status,
 };
+use crate::data_entry::status::{SecondEntryInProgress, SecondEntryNotStarted};
 use crate::{
     APIError, AppState, SqlitePoolExt,
     audit_log::{AuditEvent, AuditService},
@@ -79,7 +80,7 @@ pub fn router() -> OpenApiRouter<AppState> {
         .routes(routes!(polling_station_data_entry_delete))
         .routes(routes!(polling_station_data_entry_finalise))
         .routes(routes!(polling_station_data_entries_and_result_delete))
-        .routes(routes!(polling_station_data_entry_get_errors))
+        .routes(routes!(polling_station_data_entry_get))
         .routes(routes!(polling_station_data_entry_resolve_errors))
         .routes(routes!(polling_station_data_entry_get_differences))
         .routes(routes!(polling_station_data_entry_resolve_differences))
@@ -712,7 +713,7 @@ async fn polling_station_data_entries_and_result_delete(
         ("polling_station_id" = u32, description = "Polling station database id"),
     ),
 )]
-async fn polling_station_data_entry_get_errors(
+async fn polling_station_data_entry_get(
     user: Coordinator,
     State(pool): State<SqlitePool>,
     Path(polling_station_id): Path<u32>,
@@ -727,6 +728,40 @@ async fn polling_station_data_entry_get_errors(
             first_entry_user_id,
             finalised_first_entry,
             first_entry_finished_at,
+        }) => {
+            let validation_results =
+                validate_data_entry_status(&state, &polling_station, &election)?;
+
+            Ok(Json(DataEntryGetErrorsResponse {
+                first_entry_user_id,
+                finalised_first_entry,
+                first_entry_finished_at,
+                validation_results,
+            }))
+        }
+        DataEntryStatus::SecondEntryNotStarted(SecondEntryNotStarted {
+            first_entry_user_id,
+            finalised_first_entry,
+            first_entry_finished_at,
+        }) => {
+            let validation_results =
+                validate_data_entry_status(&state, &polling_station, &election)?;
+
+            Ok(Json(DataEntryGetErrorsResponse {
+                first_entry_user_id,
+                finalised_first_entry,
+                first_entry_finished_at,
+                validation_results,
+            }))
+        }
+        DataEntryStatus::SecondEntryInProgress(SecondEntryInProgress {
+            first_entry_user_id,
+            finalised_first_entry,
+            first_entry_finished_at,
+            progress: _progress,
+            second_entry_user_id: _second_entry_user_id,
+            second_entry: _second_entry,
+            client_state: _client_state,
         }) => {
             let validation_results =
                 validate_data_entry_status(&state, &polling_station, &election)?;
@@ -1095,6 +1130,17 @@ mod tests {
             State(pool.clone()),
             Path((polling_station_id, entry_number)),
             AuditService::new(Some(user), None),
+        )
+        .await
+        .into_response()
+    }
+
+    async fn latest(pool: SqlitePool, polling_station_id: u32) -> Response {
+        let user = User::test_user(Role::Coordinator, 1);
+        polling_station_data_entry_get(
+            Coordinator(user),
+            State(pool.clone()),
+            Path(polling_station_id),
         )
         .await
         .into_response()
@@ -2069,6 +2115,17 @@ mod tests {
 
         // Check that the data entry is not deleted
         assert!(data_entry_exists(&mut conn, 1).await.unwrap());
+    }
+
+    #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_7_four_sessions"))))]
+    async fn test_polling_station_data_entry_latest(pool: SqlitePool) {
+        let response = latest(pool.clone(), 732).await;
+        assert_eq!(response.status(), StatusCode::OK);
+
+        let body = response.into_body().collect().await.unwrap().to_bytes();
+        let result: ErrorResponse = serde_json::from_slice(&body).unwrap();
+
+        assert_eq!(result.reference, ErrorReference::EntryNotFound);
     }
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]

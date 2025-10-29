@@ -13,7 +13,7 @@ pub fn router() -> OpenApiRouter<AppState> {
     post,
     path = "/api/generate_test_election",
     responses(
-        (status = 200, description = "Created test election"),
+        (status = 201, description = "Created test election"),
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
     request_body = GenerateElectionArgs,

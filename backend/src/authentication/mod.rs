@@ -225,7 +225,7 @@ mod tests {
             .await
             .unwrap();
 
-        assert_eq!(response.status(), StatusCode::OK);
+        assert_eq!(response.status(), StatusCode::NO_CONTENT);
         assert_eq!(
             response.headers()["clear-site-data"],
             r#""cookies","storage""#
@@ -255,7 +255,7 @@ mod tests {
             .await
             .unwrap();
 
-        assert_eq!(response.status(), StatusCode::OK);
+        assert_eq!(response.status(), StatusCode::NO_CONTENT);
         assert_eq!(
             response.headers()["clear-site-data"],
             r#""cookies","storage""#
@@ -304,7 +304,7 @@ mod tests {
             .await
             .unwrap();
 
-        assert_eq!(response.status(), StatusCode::OK);
+        assert_eq!(response.status(), StatusCode::NO_CONTENT);
 
         // try to get the current user again, should return 401
         let response = app

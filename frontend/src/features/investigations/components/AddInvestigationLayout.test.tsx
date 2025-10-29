@@ -147,8 +147,8 @@ describe("AddInvestigationLayout", () => {
 
       const user = userEvent.setup();
       const modal = await screen.findByTestId("modal-dialog");
-      const modalNav = within(modal).getByRole("navigation");
-      const cancelButton = await within(modalNav).findByRole("button", { name: "Annuleren" });
+      const modalNav = await within(modal).findByRole("navigation");
+      const cancelButton = within(modalNav).getByRole("button", { name: "Annuleren" });
       await user.click(cancelButton);
 
       expect(updateCommitteeSession).not.toHaveBeenCalled();
@@ -169,8 +169,8 @@ describe("AddInvestigationLayout", () => {
       await user.click(continueButton);
 
       const modal = await screen.findByTestId("modal-dialog");
-      const modalNav = within(modal).getByRole("navigation");
-      const cancelButton = await within(modalNav).findByRole("button", { name: "Annuleren" });
+      const modalNav = await within(modal).findByRole("navigation");
+      const cancelButton = within(modalNav).getByRole("button", { name: "Annuleren" });
       await user.click(cancelButton);
 
       expect(updateCommitteeSession).not.toHaveBeenCalled();

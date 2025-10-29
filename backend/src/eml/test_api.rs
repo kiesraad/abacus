@@ -9,7 +9,7 @@ use crate::{
 
 use axum::{
     extract::Path,
-    http::{HeaderMap, StatusCode, header},
+    http::{HeaderMap, HeaderValue, StatusCode, header},
 };
 use utoipa_axum::{router::OpenApiRouter, routes};
 
@@ -77,7 +77,12 @@ async fn generate_eml110a(
     Path(min_size_bytes): Path<usize>,
 ) -> Result<(StatusCode, HeaderMap, String), APIError> {
     let mut headers = HeaderMap::new();
-    headers.insert(header::CONTENT_TYPE, "application/xml".parse().unwrap());
+    headers.insert(
+        header::CONTENT_TYPE,
+        "application/xml"
+            .parse()
+            .expect("should be able to parse content type application/xml"),
+    );
     Ok((StatusCode::OK, headers, eml110a(min_size_bytes)))
 }
 
@@ -94,7 +99,12 @@ async fn generate_eml110b(
     Path(min_size_bytes): Path<usize>,
 ) -> Result<(StatusCode, HeaderMap, String), APIError> {
     let mut headers = HeaderMap::new();
-    headers.insert(header::CONTENT_TYPE, "application/xml".parse().unwrap());
+    headers.insert(
+        header::CONTENT_TYPE,
+        "application/xml"
+            .parse()
+            .expect("should be able to parse content type application/xml"),
+    );
     Ok((StatusCode::OK, headers, eml110b(min_size_bytes)))
 }
 
@@ -111,7 +121,12 @@ async fn generate_eml230b(
     Path(min_size_bytes): Path<usize>,
 ) -> Result<(StatusCode, HeaderMap, String), APIError> {
     let mut headers = HeaderMap::new();
-    headers.insert(header::CONTENT_TYPE, "application/xml".parse().unwrap());
+    headers.insert(
+        header::CONTENT_TYPE,
+        "application/xml"
+            .parse()
+            .expect("should be able to parse content type application/xml"),
+    );
     Ok((StatusCode::OK, headers, eml230b(min_size_bytes)))
 }
 

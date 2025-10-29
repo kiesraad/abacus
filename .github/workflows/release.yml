@@ -79,14 +79,14 @@ jobs:
         if: matrix.target.os == 'ubuntu-latest'
       - name: Run tests
         run: cargo --locked test --release --no-default-features --features memory-serve,embed-typst,airgap-detection --target=${{ matrix.target.name }}
-      # no airgap detection build
-      - name: Build without airgap detection
-        run: cargo --locked build --release --no-default-features --features memory-serve,embed-typst --target=${{ matrix.target.name }}
+      # Release build with e2e-helpers and no airgap detection, for e2e tests and abacus-test
+      - name: Build with e2e-helpers and no airgap detection
+        run: cargo --locked build --release --no-default-features --features memory-serve,embed-typst,e2e-helpers --target=${{ matrix.target.name }}
       - uses: actions/upload-artifact@v4
         with:
-          name: abacus-${{ matrix.target.os }}-no-airgap-detection
+          name: abacus-${{ matrix.target.os }}-e2e-build
           path: ${{ matrix.target.binary }}
-      # airgap detection build
+      # Release build
       - name: Build
         run: cargo --locked build --release --no-default-features --features memory-serve,embed-typst,airgap-detection --target=${{ matrix.target.name }}
       - name: Attest build provenance

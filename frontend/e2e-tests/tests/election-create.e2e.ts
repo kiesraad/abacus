@@ -191,7 +191,7 @@ test.describe("Election creation", () => {
     const uploadElectionDefinitionPage = new UploadElectionDefinitionPgObj(page);
     await expect(uploadElectionDefinitionPage.header).toBeVisible();
     await uploadElectionDefinitionPage.uploadFile(eml110b.path);
-    await expect(uploadElectionDefinitionPage.error).toBeVisible();
+    await expect(uploadElectionDefinitionPage.invalidFileAlert).toBeVisible();
   });
 
   test("it fails on incorrect hash for candidate list", async ({ page }) => {
@@ -227,8 +227,10 @@ test.describe("Election creation", () => {
     const uploadElectionDefinitionPage = new UploadElectionDefinitionPgObj(page);
     await expect(uploadElectionDefinitionPage.header).toBeVisible();
     await uploadElectionDefinitionPage.uploadFile(eml110aTooLargeTestFile.path);
-    await expect(uploadElectionDefinitionPage.error).toBeVisible();
-    await expect(uploadElectionDefinitionPage.fileTooLargeError(eml110aTooLargeTestFile.filename)).toBeVisible();
+    await expect(uploadElectionDefinitionPage.invalidFileAlert).toBeVisible();
+    await expect(uploadElectionDefinitionPage.invalidFileAlert).toContainText(
+      `Het bestand ${eml110aTooLargeTestFile.filename} is te groot. Kies een bestand van maximaal 5 Megabyte.`,
+    );
   });
 
   test("it fails on valid, but incorrect file for candidate list", async ({ page }) => {
@@ -248,7 +250,7 @@ test.describe("Election creation", () => {
     const uploadCandidateDefinitionPage = new UploadCandidateDefinitionPgObj(page);
     await expect(uploadCandidateDefinitionPage.header).toBeVisible();
     await uploadCandidateDefinitionPage.uploadFile(eml110b.path);
-    await expect(uploadCandidateDefinitionPage.error).toBeVisible();
+    await expect(uploadCandidateDefinitionPage.invalidFileAlert).toBeVisible();
   });
 
   test("it fails on too large file for candidate list", async ({ page, eml230bTooLargeTestFile }) => {
@@ -268,8 +270,10 @@ test.describe("Election creation", () => {
     const uploadCandidateDefinitionPage = new UploadCandidateDefinitionPgObj(page);
     await expect(uploadCandidateDefinitionPage.header).toBeVisible();
     await uploadCandidateDefinitionPage.uploadFile(eml230bTooLargeTestFile.path);
-    await expect(uploadCandidateDefinitionPage.error).toBeVisible();
-    await expect(uploadCandidateDefinitionPage.fileTooLargeError(eml230bTooLargeTestFile.filename)).toBeVisible();
+    await expect(uploadCandidateDefinitionPage.invalidFileAlert).toBeVisible();
+    await expect(uploadCandidateDefinitionPage.invalidFileAlert).toContainText(
+      `Het bestand ${eml230bTooLargeTestFile.filename} is te groot. Kies een bestand van maximaal 5 Megabyte.`,
+    );
   });
 
   test("warning modal close button should stay on page", async ({ page }) => {
@@ -541,7 +545,7 @@ test.describe("Election creation", () => {
     await expect(uploadElectionDefinitionPage.header).toBeVisible();
     await uploadElectionDefinitionPage.uploadFile(eml110a.path);
     await expect(uploadElectionDefinitionPage.main).toContainText(eml110a.filename);
-    await expect(uploadElectionDefinitionPage.error).toBeVisible();
+    await expect(uploadElectionDefinitionPage.invalidFileAlert).toBeVisible();
   });
 
   test("it fails on too large file for polling stations", async ({ page, eml110bTooLargeTestFile }) => {
@@ -558,13 +562,15 @@ test.describe("Election creation", () => {
     await pollingStationRolePage.next.click();
 
     await uploadCandidatesAndInputHash(page);
-    //
+
     // Polling stations page
-    const uploadElectionDefinitionPage = new UploadPollingStationDefinitionPgObj(page);
-    await expect(uploadElectionDefinitionPage.header).toBeVisible();
-    await uploadElectionDefinitionPage.uploadFile(eml110bTooLargeTestFile.path);
-    await expect(uploadElectionDefinitionPage.error).toBeVisible();
-    await expect(uploadElectionDefinitionPage.fileTooLargeError(eml110bTooLargeTestFile.filename)).toBeVisible();
+    const uploadPollingStationDefinitionPage = new UploadPollingStationDefinitionPgObj(page);
+    await expect(uploadPollingStationDefinitionPage.header).toBeVisible();
+    await uploadPollingStationDefinitionPage.uploadFile(eml110bTooLargeTestFile.path);
+    await expect(uploadPollingStationDefinitionPage.invalidFileAlert).toBeVisible();
+    await expect(uploadPollingStationDefinitionPage.invalidFileAlert).toContainText(
+      `Het bestand ${eml110bTooLargeTestFile.filename} is te groot. Kies een bestand van maximaal 5 Megabyte.`,
+    );
   });
 
   test("show more button should show full list of polling stations", async ({ page }) => {

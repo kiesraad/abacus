@@ -24,7 +24,7 @@ test.describe("Polling station import", () => {
 
     // Select incorrect file
     await importPage.uploadFile(eml110a.path);
-    await expect(importPage.error).toContainText("Ongeldig stembureaubestand");
+    await expect(importPage.invalidFileAlert).toContainText("Ongeldig stembureaubestand");
 
     // Select correct file
     await importPage.uploadFile(eml110b.path);
@@ -53,7 +53,9 @@ test.describe("Polling station import", () => {
 
     // Select file that's too large
     await importPage.uploadFile(eml110bTooLargeTestFile.path);
-    await expect(importPage.error).toBeVisible();
-    await expect(importPage.fileTooLargeError(eml110bTooLargeTestFile.filename)).toBeVisible();
+    await expect(importPage.invalidFileAlert).toBeVisible();
+    await expect(importPage.invalidFileAlert).toContainText(
+      `Het bestand ${eml110bTooLargeTestFile.filename} is te groot. Kies een bestand van maximaal 5 Megabyte.`,
+    );
   });
 });

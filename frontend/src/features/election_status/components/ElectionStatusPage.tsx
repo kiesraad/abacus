@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router";
 
 import { useCrud } from "@/api/useCrud";
@@ -32,7 +32,15 @@ export function ElectionStatusPage() {
   const updatePath: COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_PATH = `/api/elections/${currentCommitteeSession.id}/committee_sessions/${currentCommitteeSession.id}/status`;
   const { update } = useCrud({ updatePath, throwAllErrors: true });
 
-  useLiveData([refetchElection, refetchStatuses]);
+  useEffect(() => {
+    console.log("ElectionStatusPage");
+  }, []);
+
+  const refetchFunctions = useMemo(() => {
+    return [refetchElection, refetchStatuses];
+  }, [refetchElection, refetchStatuses]);
+
+  useLiveData(refetchFunctions);
 
   function finishDataEntry() {
     void navigate("../report");

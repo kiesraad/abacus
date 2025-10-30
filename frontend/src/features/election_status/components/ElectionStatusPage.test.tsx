@@ -440,9 +440,25 @@ describe("ElectionStatusPage", () => {
     await renderPage();
 
     // Wait for the page to be loaded
+    expect(vi.getTimerCount()).toBe(1);
+
     await vi.waitFor(() => {
+      console.log("vi.waitFor!!", vi.getTimerCount())
       expect(screen.getByRole("heading", { level: 1, name: "Eerste zitting" })).toBeVisible();
+      // One timer from the effect, one for this waitFor
     });
+
+    setInterval(() => {
+      console.log("intervall!!", vi.getTimerCount())
+    }, 10_000)
+    setInterval(() => {
+      console.log("intervall!!", vi.getTimerCount())
+    }, 10_000)
+    setInterval(() => {
+      console.log("intervall!!", vi.getTimerCount())
+    }, 10_000)
+
+    // expect(vi.getTimerCount()).toBe(2);
 
     const electionRequestSpy = spyOnHandler(ElectionRequestHandler);
     const electionStatusRequestSpy = spyOnHandler(ElectionStatusRequestHandler);
@@ -450,8 +466,11 @@ describe("ElectionStatusPage", () => {
     // Test 3 intervals of 30 seconds each
     for (let i = 1; i <= 3; i++) {
       vi.advanceTimersByTime(30_000);
+      // expect(vi.getTimerCount()).toBe(1);
 
+      console.log("vi.getMockedSystemTime()", vi.getMockedSystemTime());
       await vi.waitFor(() => {
+        console.log("expecting ", i);
         expect(electionRequestSpy).toHaveBeenCalledTimes(i);
         expect(electionStatusRequestSpy).toHaveBeenCalledTimes(i);
       });
@@ -460,3 +479,25 @@ describe("ElectionStatusPage", () => {
     vi.useRealTimers();
   });
 });
+
+
+/*
+useLiveData
+committeeSessionLabel
+ElectionStatusPage
+useLiveData useEffect
+set interval
+set interval fn {
+  refed: true,
+  ref: [Function: ref],
+  unref: [Function: unref],
+  hasRef: [Function: hasRef],
+  refresh: [Function: refresh],
+  [Symbol(Symbol.toPrimitive)]: [Function: [Symbol.toPrimitive]]
+}
+useLiveData cleanup
+
+AssertionError: expected +0 to be 1 // Object.is equality
+
+
+*/

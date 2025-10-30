@@ -13,9 +13,7 @@ import { t, tx } from "@/i18n/translate";
 import { ELECTION_IMPORT_VALIDATE_REQUEST_PATH, ElectionDefinitionValidateResponse } from "@/types/generated/openapi";
 
 import { useElectionCreateContext } from "../hooks/useElectionCreateContext";
-
-// Maximum file upload this for this component in Megabytes
-const MAX_FILE_UPLOAD_SIZE_MB: number = 5;
+import { fileTooLargeError, isFileTooLarge } from "../utils/uploadFileSize";
 
 export function UploadPollingStationDefinition() {
   const { state, dispatch } = useElectionCreateContext();
@@ -37,19 +35,8 @@ export function UploadPollingStationDefinition() {
   async function onFileChange(e: ChangeEvent<HTMLInputElement>) {
     const currentFile = e.target.files ? e.target.files[0] : undefined;
     if (currentFile !== undefined) {
-      // Get the size of the string in bytes after JSON encoding
-      const fileSize: number = new Blob([JSON.stringify(await currentFile.text())]).size;
-      if (fileSize > MAX_FILE_UPLOAD_SIZE_MB * 1024 * 1024) {
-        setError(
-          tx(
-            "file_too_large",
-            {},
-            {
-              filename: currentFile.name,
-              max_size: `${MAX_FILE_UPLOAD_SIZE_MB}`,
-            },
-          ),
-        );
+      if (await isFileTooLarge(currentFile)) {
+        setError(fileTooLargeError(currentFile));
         return;
       }
 
@@ -76,16 +63,7 @@ export function UploadPollingStationDefinition() {
       } else if (isError(response)) {
         // Response code 413 indicates that the file is too large
         if (response instanceof ApiError && response.code === 413) {
-          setError(
-            tx(
-              "file_too_large",
-              {},
-              {
-                filename: currentFile.name,
-                max_size: `${MAX_FILE_UPLOAD_SIZE_MB}`,
-              },
-            ),
-          );
+          setError(fileTooLargeError(currentFile));
         } else {
           setError(
             tx("election.invalid_polling_station_definition.description", {

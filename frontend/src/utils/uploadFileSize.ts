@@ -1,4 +1,3 @@
-// Maximum file upload for election_create
 import { tx } from "@/i18n/translate";
 
 const MAX_FILE_UPLOAD_SIZE_MB: number = 5;

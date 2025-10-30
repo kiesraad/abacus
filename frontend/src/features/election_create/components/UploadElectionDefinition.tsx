@@ -9,9 +9,9 @@ import { Form } from "@/components/ui/Form/Form";
 import { FormLayout } from "@/components/ui/Form/FormLayout";
 import { t, tx } from "@/i18n/translate";
 import { ELECTION_IMPORT_VALIDATE_REQUEST_PATH, ElectionDefinitionValidateResponse } from "@/types/generated/openapi";
+import { fileTooLargeError, isFileTooLarge } from "@/utils/uploadFileSize";
 
 import { useElectionCreateContext } from "../hooks/useElectionCreateContext";
-import { fileTooLargeError, isFileTooLarge } from "../utils/uploadFileSize";
 import { CheckHash } from "./CheckHash";
 
 export function UploadElectionDefinition() {

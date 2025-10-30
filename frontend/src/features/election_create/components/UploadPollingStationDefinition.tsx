@@ -14,6 +14,9 @@ import { ELECTION_IMPORT_VALIDATE_REQUEST_PATH, ElectionDefinitionValidateRespon
 
 import { useElectionCreateContext } from "../hooks/useElectionCreateContext";
 
+// Maximum file upload this for this component in Megabytes
+const MAX_FILE_UPLOAD_SIZE_MB: number = 5;
+
 export function UploadPollingStationDefinition() {
   const { state, dispatch } = useElectionCreateContext();
   const navigate = useNavigate();
@@ -34,6 +37,22 @@ export function UploadPollingStationDefinition() {
   async function onFileChange(e: ChangeEvent<HTMLInputElement>) {
     const currentFile = e.target.files ? e.target.files[0] : undefined;
     if (currentFile !== undefined) {
+      // Get the size of the string in bytes after JSON encoding
+      const fileSize: number = new Blob([JSON.stringify(await currentFile.text())]).size;
+      if (fileSize > MAX_FILE_UPLOAD_SIZE_MB * 1024 * 1024) {
+        setError(
+          tx(
+            "file_too_large",
+            {},
+            {
+              filename: currentFile.name,
+              max_size: `${MAX_FILE_UPLOAD_SIZE_MB}`,
+            },
+          ),
+        );
+        return;
+      }
+
       setFile(currentFile);
       const data = await currentFile.text();
       const response = await create({
@@ -59,12 +78,11 @@ export function UploadPollingStationDefinition() {
         if (response instanceof ApiError && response.code === 413) {
           setError(
             tx(
-              "election.invalid_polling_station_definition.file_too_large",
+              "file_too_large",
+              {},
               {
-                file: () => <strong>{currentFile.name}</strong>,
-              },
-              {
-                max_size: response.message,
+                filename: currentFile.name,
+                max_size: `${MAX_FILE_UPLOAD_SIZE_MB}`,
               },
             ),
           );

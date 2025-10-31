@@ -1,4 +1,5 @@
 use abacus::{
+    AppError,
     committee_session::CommitteeSession,
     create_sqlite_pool,
     data_entry::PollingStationResults,
@@ -11,7 +12,6 @@ use abacus::{
 };
 use clap::Parser;
 use std::{
-    error::Error,
     ops::Range,
     path::{Path, PathBuf},
 };
@@ -105,7 +105,7 @@ impl From<Args> for GenerateElectionArgs {
 /// Main entry point for the application. Sets up the database, and starts the
 /// API server and in-memory file router on port 8080.
 #[tokio::main]
-async fn main() -> Result<(), Box<dyn Error>> {
+async fn main() -> Result<(), AppError> {
     // setup logging
     tracing_subscriber::fmt()
         .with_env_filter(

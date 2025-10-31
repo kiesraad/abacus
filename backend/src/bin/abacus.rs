@@ -1,12 +1,13 @@
 use std::{
-    error::Error,
+    io::ErrorKind,
     net::{Ipv4Addr, SocketAddr},
+    process,
 };
 
-use abacus::{create_sqlite_pool, start_server};
+use abacus::{AppError, create_sqlite_pool, start_server};
 use clap::Parser;
 use tokio::net::TcpListener;
-use tracing::level_filters::LevelFilter;
+use tracing::{error, level_filters::LevelFilter};
 use tracing_subscriber::EnvFilter;
 
 /// Abacus API and asset server
@@ -38,7 +39,14 @@ struct Args {
 /// Main entry point for the application. Sets up the database, and starts the
 /// API server and in-memory file router on port 8080.
 #[tokio::main]
-async fn main() -> Result<(), Box<dyn Error>> {
+async fn main() {
+    if let Err(e) = run().await {
+        error!("{e}");
+        process::exit(1);
+    }
+}
+
+async fn run() -> Result<(), AppError> {
     tracing_subscriber::fmt()
         .with_env_filter(
             EnvFilter::builder()
@@ -61,7 +69,13 @@ async fn main() -> Result<(), Box<dyn Error>> {
     let enable_airgap_detection = args.airgap_detection || cfg!(feature = "airgap-detection");
 
     let address = SocketAddr::from((Ipv4Addr::UNSPECIFIED, args.port));
-    let listener = TcpListener::bind(&address).await?;
+
+    let listener = TcpListener::bind(&address)
+        .await
+        .map_err(|e| match e.kind() {
+            ErrorKind::AddrInUse => AppError::PortAlreadyInUse(args.port),
+            _ => AppError::Io(e),
+        })?;
 
     start_server(pool, listener, enable_airgap_detection).await
 }

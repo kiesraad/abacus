@@ -1,4 +1,4 @@
-use std::{error::Error, future::Future, net::SocketAddr, str::FromStr};
+use std::{future::Future, net::SocketAddr, str::FromStr};
 
 use airgap::AirgapDetection;
 #[cfg(feature = "memory-serve")]
@@ -26,6 +26,7 @@ use utoipa_axum::router::OpenApiRouter;
 use utoipa_swagger_ui::SwaggerUi;
 
 pub mod airgap;
+pub mod app_error;
 pub mod audit_log;
 pub mod authentication;
 pub mod committee_session;
@@ -46,6 +47,7 @@ pub mod summary;
 pub mod test_data_gen;
 pub mod zip;
 
+pub use app_error::AppError;
 pub use error::{APIError, ErrorResponse};
 
 /// Maximum size of the request body in megabytes.
@@ -234,10 +236,7 @@ fn add_security_headers(router: Router<AppState>) -> Router<AppState> {
 }
 
 /// Complete Axum router for the application
-pub fn router(
-    pool: SqlitePool,
-    airgap_detection: AirgapDetection,
-) -> Result<Router, Box<dyn Error>> {
+pub fn router(pool: SqlitePool, airgap_detection: AirgapDetection) -> Result<Router, AppError> {
     let router = axum_router_from_openapi(openapi_router());
     let state = AppState {
         pool,
@@ -258,7 +257,7 @@ pub async fn start_server(
     pool: SqlitePool,
     listener: TcpListener,
     enable_airgap_detection: bool,
-) -> Result<(), Box<dyn Error>> {
+) -> Result<(), AppError> {
     let airgap_detection = if enable_airgap_detection {
         info!("Airgap detection is enabled, starting airgap detection task...");
 
@@ -323,7 +322,7 @@ pub async fn create_sqlite_pool(
     database: &str,
     #[cfg(feature = "dev-database")] reset_database: bool,
     #[cfg(feature = "dev-database")] seed_data: bool,
-) -> Result<SqlitePool, Box<dyn Error>> {
+) -> Result<SqlitePool, AppError> {
     let db = format!("sqlite://{database}");
     let opts = SqliteConnectOptions::from_str(&db)?
         .create_if_missing(true)

@@ -229,7 +229,7 @@ Bijvoorbeeld een schorsing of als er meerdere verkiezingen tegelijk werden georg
 
 #let differences = input.summary.differences_counts.more_ballots_count.count > 0 or input.summary.differences_counts.fewer_ballots_count.count > 0
 
-#checkbox(checked: not differences)[Ja #sym.arrow.r *Ga door naar #ref(<monitoring_protocol>, supplement: none)*]
+#checkbox(checked: not differences)[Ja]
 
 #checkbox(checked: differences)[Nee, er zijn stembureaus met een verschil]
 

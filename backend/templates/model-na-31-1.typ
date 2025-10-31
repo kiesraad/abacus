@@ -221,7 +221,7 @@ Bijvoorbeeld een schorsing of als er meerdere verkiezingen tegelijk werden georg
 
 === Is bij *alle afzonderlijke stembureaus* in #this_location het aantal uitgebrachte stemmen en het aantal toegelaten kiezers gelijk?
 
-#checkbox(checked: false)[Ja #sym.arrow.r *Ga door naar #ref(<monitoring_protocol>)*]
+#checkbox(checked: false)[Ja]
 
 #checkbox(checked: false)[Nee, er zijn stembureaus met een verschil]
 

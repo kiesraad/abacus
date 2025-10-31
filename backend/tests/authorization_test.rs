@@ -14,7 +14,8 @@ fn expected_response_code(path: &str) -> StatusCode {
         "/api/login" | "/api/initialise/first-admin" | "/api/generate_test_election" => {
             StatusCode::UNSUPPORTED_MEDIA_TYPE
         }
-        "/api/logout" | "/api/initialised" => StatusCode::OK,
+        "/api/logout" => StatusCode::OK,
+        "/api/initialised" => StatusCode::NO_CONTENT,
         "/api/initialise/admin-exists" => StatusCode::FORBIDDEN,
         _ => StatusCode::UNAUTHORIZED,
     }

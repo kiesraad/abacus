@@ -32,7 +32,9 @@ use crate::{
 #[serde(rename_all = "snake_case")]
 #[strum(serialize_all = "snake_case")]
 #[sqlx(rename_all = "snake_case")]
+#[derive(Default)]
 pub enum CommitteeSessionStatus {
+    #[default]
     Created,
     DataEntryNotStarted,
     DataEntryInProgress,
@@ -222,12 +224,6 @@ impl CommitteeSessionStatus {
             }
             CommitteeSessionStatus::DataEntryFinished => Ok(self),
         }
-    }
-}
-
-impl Default for CommitteeSessionStatus {
-    fn default() -> Self {
-        Self::Created
     }
 }
 

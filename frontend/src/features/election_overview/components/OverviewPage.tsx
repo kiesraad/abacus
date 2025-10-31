@@ -1,7 +1,6 @@
-import { ReactNode, useEffect } from "react";
+import { ReactNode } from "react";
 import { useLocation, useNavigate } from "react-router";
 
-import { DEFAULT_CANCEL_REASON } from "@/api/ApiClient";
 import { useInitialApiGet } from "@/api/useInitialApiGet";
 import { CommitteeSessionStatusWithIcon } from "@/components/committee_session/CommitteeSessionStatus";
 import { Footer } from "@/components/footer/Footer";
@@ -14,6 +13,7 @@ import { FormLayout } from "@/components/ui/Form/FormLayout";
 import { Loader } from "@/components/ui/Loader/Loader";
 import { Table } from "@/components/ui/Table/Table";
 import { Toolbar } from "@/components/ui/Toolbar/Toolbar";
+import { useLiveData } from "@/hooks/useLiveData";
 import { useUserRole } from "@/hooks/user/useUserRole";
 import { t, tx } from "@/i18n/translate";
 import { Election, ELECTION_LIST_REQUEST_PATH, ElectionListResponse } from "@/types/generated/openapi";
@@ -48,21 +48,7 @@ export function OverviewPage() {
   const isNewAccount = location.hash === "#new-account";
   const isAdminOrCoordinator = isAdministrator || isCoordinator;
 
-  // re-fetch elections every 30 seconds
-  useEffect(() => {
-    const abortController = new AbortController();
-
-    const refetch = () => {
-      void refetchElections(abortController);
-    };
-
-    const refetchInterval = setInterval(refetch, 30_000);
-
-    return () => {
-      abortController.abort(DEFAULT_CANCEL_REASON);
-      clearInterval(refetchInterval);
-    };
-  }, [refetchElections]);
+  useLiveData([refetchElections]);
 
   if (getElections.status === "api-error") {
     throw getElections.error;

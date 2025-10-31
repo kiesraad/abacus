@@ -136,7 +136,7 @@ async fn test_create_conclude_update_delete(pool: SqlitePool) {
 
     assert_eq!(
         delete_investigation(&addr, 741).await.status(),
-        StatusCode::OK
+        StatusCode::NO_CONTENT
     );
     let election_details = get_election(&addr, election_id).await;
     assert_eq!(election_details.investigations.len(), 0);
@@ -168,7 +168,7 @@ async fn test_deletion_setting_committee_session_back_to_created_status(pool: Sq
     // Delete one investigation
     assert_eq!(
         delete_investigation(&addr, 742).await.status(),
-        StatusCode::OK
+        StatusCode::NO_CONTENT
     );
 
     let committee_session =
@@ -181,7 +181,7 @@ async fn test_deletion_setting_committee_session_back_to_created_status(pool: Sq
     // Delete last investigation
     assert_eq!(
         delete_investigation(&addr, 741).await.status(),
-        StatusCode::OK
+        StatusCode::NO_CONTENT
     );
 
     let committee_session =
@@ -295,7 +295,7 @@ async fn test_deletion_removes_polling_station_from_status(pool: SqlitePool) {
         delete_investigation(&addr, polling_station_id)
             .await
             .status(),
-        StatusCode::OK
+        StatusCode::NO_CONTENT
     );
 
     let statuses = get_statuses(&addr, &cookie, election_id).await;
@@ -887,7 +887,11 @@ where
     );
 
     let status = action().await.status();
-    assert!(status == StatusCode::OK || status == StatusCode::CREATED);
+    assert!(
+        status == StatusCode::OK
+            || status == StatusCode::NO_CONTENT
+            || status == StatusCode::CREATED
+    );
 
     let committee_session =
         shared::get_election_committee_session(addr, &cookie, election_id).await;
@@ -965,7 +969,7 @@ async fn test_finished_to_created_on_delete_last(pool: SqlitePool) {
     );
 
     let status = delete_investigation(&addr, 741).await.status();
-    assert_eq!(status, StatusCode::OK);
+    assert_eq!(status, StatusCode::NO_CONTENT);
 
     let committee_session =
         shared::get_election_committee_session(&addr, &cookie, election_id).await;

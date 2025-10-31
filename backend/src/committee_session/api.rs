@@ -125,7 +125,7 @@ pub async fn committee_session_create(
     delete,
     path = "/api/elections/{election_id}/committee_sessions/{committee_session_id}",
     responses(
-        (status = 200, description = "Committee session deleted successfully"),
+        (status = 204, description = "Committee session deleted successfully"),
         (status = 401, description = "Unauthorized", body = ErrorResponse),
         (status = 403, description = "Forbidden", body = ErrorResponse),
         (status = 404, description = "Committee session not found", body = ErrorResponse),
@@ -168,7 +168,7 @@ pub async fn committee_session_delete(
 
         tx.commit().await?;
 
-        Ok(StatusCode::OK)
+        Ok(StatusCode::NO_CONTENT)
     } else {
         tx.rollback().await?;
 
@@ -184,7 +184,7 @@ pub async fn committee_session_delete(
     path = "/api/elections/{election_id}/committee_sessions/{committee_session_id}",
     request_body = CommitteeSessionUpdateRequest,
     responses(
-        (status = 200, description = "Committee session updated successfully"),
+        (status = 204, description = "Committee session updated successfully"),
         (status = 400, description = "Bad request", body = ErrorResponse),
         (status = 401, description = "Unauthorized", body = ErrorResponse),
         (status = 403, description = "Forbidden", body = ErrorResponse),
@@ -246,7 +246,7 @@ pub async fn committee_session_update(
 
     tx.commit().await?;
 
-    Ok(StatusCode::OK)
+    Ok(StatusCode::NO_CONTENT)
 }
 
 /// Change the number of voters of a [CommitteeSession].
@@ -255,7 +255,7 @@ pub async fn committee_session_update(
     path = "/api/elections/{election_id}/committee_sessions/{committee_session_id}/voters",
     request_body = CommitteeSessionNumberOfVotersChangeRequest,
     responses(
-        (status = 200, description = "Committee session number of voters changed successfully"),
+        (status = 204, description = "Committee session number of voters changed successfully"),
         (status = 401, description = "Unauthorized", body = ErrorResponse),
         (status = 403, description = "Forbidden", body = ErrorResponse),
         (status = 404, description = "Committee session not found", body = ErrorResponse),
@@ -299,7 +299,7 @@ pub async fn committee_session_number_of_voters_change(
 
     tx.commit().await?;
 
-    Ok(StatusCode::OK)
+    Ok(StatusCode::NO_CONTENT)
 }
 
 /// Change the status of a [CommitteeSession].
@@ -308,7 +308,7 @@ pub async fn committee_session_number_of_voters_change(
     path = "/api/elections/{election_id}/committee_sessions/{committee_session_id}/status",
     request_body = CommitteeSessionStatusChangeRequest,
     responses(
-        (status = 200, description = "Committee session status changed successfully"),
+        (status = 204, description = "Committee session status changed successfully"),
         (status = 401, description = "Unauthorized", body = ErrorResponse),
         (status = 403, description = "Forbidden", body = ErrorResponse),
         (status = 404, description = "Committee session not found", body = ErrorResponse),
@@ -345,7 +345,7 @@ pub async fn committee_session_status_change(
     .await?;
     tx.commit().await?;
 
-    Ok(StatusCode::OK)
+    Ok(StatusCode::NO_CONTENT)
 }
 
 #[cfg(test)]

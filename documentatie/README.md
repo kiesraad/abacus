@@ -12,7 +12,7 @@ Hier vind je de documentatie over Abacus. De documentatie wordt telkens aangevul
   - [Uitgangspunten voor testen en kwaliteit](/documentatie/ontwikkelproces/testen-en-kwaliteit.md)
 - Referentie:
   - [Afkortingenlijst](/documentatie/referentie/afkortingenlijst.md)
-  - [Woordenlijst Engels - Nederlands](/documentatie/referentie/woordenlijst-EN-NL.md)
+  - [Woordenlijst Nederlands - Engels](/documentatie/referentie/woordenlijst-NL-EN.md)
 - Softwarearchitectuur:
   - [Overwegingen van talen en frameworks](/documentatie/softwarearchitectuur/overwegingen-talen-en-frameworks.md)
   - [Overzicht van de softwarearchitectuur](/documentatie/softwarearchitectuur/Overzicht.md)

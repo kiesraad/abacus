@@ -707,7 +707,7 @@ pub enum GetDataEntryResponse {
 /// Get accepted data entry errors to be resolved
 #[utoipa::path(
     get,
-    path = "/api/polling_stations/{polling_station_id}/data_entries/resolve_errors",
+    path = "/api/polling_stations/{polling_station_id}/data_entries/get",
     responses(
         (status = 200, description = "Data entry with errors and warnings to be resolved", body = DataEntryGetErrorsResponse),
         (status = 401, description = "Unauthorized", body = ErrorResponse),

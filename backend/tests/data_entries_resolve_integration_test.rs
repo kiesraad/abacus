@@ -48,9 +48,7 @@ async fn get_resolve_errors(
     cookie: &HeaderValue,
     polling_station_id: u32,
 ) -> Response {
-    let url = format!(
-        "http://{addr}/api/polling_stations/{polling_station_id}/data_entries/resolve_errors"
-    );
+    let url = format!("http://{addr}/api/polling_stations/{polling_station_id}/data_entries/get");
     Client::new()
         .get(&url)
         .header("cookie", cookie)

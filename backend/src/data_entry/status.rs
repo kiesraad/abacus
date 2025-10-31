@@ -40,7 +40,9 @@ impl From<ValidationResults> for DataEntryTransitionError {
 
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq, ToSchema)]
 #[serde(deny_unknown_fields, tag = "status", content = "state")]
+#[derive(Default)]
 pub enum DataEntryStatus {
+    #[default]
     FirstEntryNotStarted, // First entry has not started yet
     FirstEntryInProgress(FirstEntryInProgress),
     FirstEntryHasErrors(FirstEntryHasErrors),
@@ -684,12 +686,6 @@ impl Display for DataEntryTransitionError {
             }
             DataEntryTransitionError::ValidationError(_) => write!(f, "Validation errors"),
         }
-    }
-}
-
-impl Default for DataEntryStatus {
-    fn default() -> Self {
-        Self::FirstEntryNotStarted
     }
 }
 

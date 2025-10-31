@@ -697,6 +697,13 @@ async fn polling_station_data_entries_and_result_delete(
     }
 }
 
+#[derive(Serialize, Deserialize, ToSchema, Debug)]
+#[serde(deny_unknown_fields)]
+pub enum GetDataEntryResponse {
+    DataEntryGetErrorsResponse(DataEntryGetErrorsResponse),
+    SecondEntryInProgress(SecondEntryInProgress),
+}
+
 /// Get accepted data entry errors to be resolved
 #[utoipa::path(
     get,
@@ -717,7 +724,7 @@ async fn polling_station_data_entry_get(
     user: Coordinator,
     State(pool): State<SqlitePool>,
     Path(polling_station_id): Path<u32>,
-) -> Result<Json<DataEntryGetErrorsResponse>, APIError> {
+) -> Result<Json<GetDataEntryResponse>, APIError> {
     let mut conn = pool.acquire().await?;
 
     let (polling_station, election, _, state) =
@@ -732,12 +739,14 @@ async fn polling_station_data_entry_get(
             let validation_results =
                 validate_data_entry_status(&state, &polling_station, &election)?;
 
-            Ok(Json(DataEntryGetErrorsResponse {
-                first_entry_user_id,
-                finalised_first_entry,
-                first_entry_finished_at,
-                validation_results,
-            }))
+            Ok(Json(GetDataEntryResponse::DataEntryGetErrorsResponse(
+                DataEntryGetErrorsResponse {
+                    first_entry_user_id,
+                    finalised_first_entry,
+                    first_entry_finished_at,
+                    validation_results,
+                },
+            )))
         }
         DataEntryStatus::SecondEntryNotStarted(SecondEntryNotStarted {
             first_entry_user_id,
@@ -747,32 +756,34 @@ async fn polling_station_data_entry_get(
             let validation_results =
                 validate_data_entry_status(&state, &polling_station, &election)?;
 
-            Ok(Json(DataEntryGetErrorsResponse {
-                first_entry_user_id,
-                finalised_first_entry,
-                first_entry_finished_at,
-                validation_results,
-            }))
+            Ok(Json(GetDataEntryResponse::DataEntryGetErrorsResponse(
+                DataEntryGetErrorsResponse {
+                    first_entry_user_id,
+                    finalised_first_entry,
+                    first_entry_finished_at,
+                    validation_results,
+                },
+            )))
         }
         DataEntryStatus::SecondEntryInProgress(SecondEntryInProgress {
             first_entry_user_id,
             finalised_first_entry,
             first_entry_finished_at,
-            progress: _progress,
-            second_entry_user_id: _second_entry_user_id,
-            second_entry: _second_entry,
-            client_state: _client_state,
-        }) => {
-            let validation_results =
-                validate_data_entry_status(&state, &polling_station, &election)?;
-
-            Ok(Json(DataEntryGetErrorsResponse {
+            progress,
+            second_entry_user_id,
+            second_entry,
+            client_state,
+        }) => Ok(Json(GetDataEntryResponse::SecondEntryInProgress(
+            SecondEntryInProgress {
                 first_entry_user_id,
                 finalised_first_entry,
                 first_entry_finished_at,
-                validation_results,
-            }))
-        }
+                progress,
+                second_entry_user_id,
+                second_entry,
+                client_state,
+            },
+        ))),
         _ => Err(APIError::NotFound(
             "No data entry with accepted errors found".to_string(),
             ErrorReference::EntryNotFound,
@@ -1130,17 +1141,6 @@ mod tests {
             State(pool.clone()),
             Path((polling_station_id, entry_number)),
             AuditService::new(Some(user), None),
-        )
-        .await
-        .into_response()
-    }
-
-    async fn latest(pool: SqlitePool, polling_station_id: u32) -> Response {
-        let user = User::test_user(Role::Coordinator, 1);
-        polling_station_data_entry_get(
-            Coordinator(user),
-            State(pool.clone()),
-            Path(polling_station_id),
         )
         .await
         .into_response()
@@ -2117,15 +2117,71 @@ mod tests {
         assert!(data_entry_exists(&mut conn, 1).await.unwrap());
     }
 
-    #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_7_four_sessions"))))]
+    #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
     async fn test_polling_station_data_entry_latest(pool: SqlitePool) {
-        let response = latest(pool.clone(), 732).await;
+        // Save and finalise the first data entry
+        let request_body = example_data_entry();
+        let response = claim(pool.clone(), 1, EntryNumber::FirstEntry).await;
+        assert_eq!(response.status(), StatusCode::OK);
+        let response = save(
+            pool.clone(),
+            request_body.clone(),
+            1,
+            EntryNumber::FirstEntry,
+        )
+        .await;
+        assert_eq!(response.status(), StatusCode::OK);
+        let response = finalise(pool.clone(), 1, EntryNumber::FirstEntry).await;
         assert_eq!(response.status(), StatusCode::OK);
 
-        let body = response.into_body().collect().await.unwrap().to_bytes();
-        let result: ErrorResponse = serde_json::from_slice(&body).unwrap();
+        // Save and finalise a different second data entry
+        let mut request_body = example_data_entry();
+        request_body
+            .data
+            .as_cso_first_session_mut()
+            .unwrap()
+            .voters_counts
+            .poll_card_count = 100;
+        request_body
+            .data
+            .as_cso_first_session_mut()
+            .unwrap()
+            .voters_counts
+            .proxy_certificate_count = 0;
+        let response = claim(pool.clone(), 1, EntryNumber::SecondEntry).await;
+        assert_eq!(response.status(), StatusCode::OK);
+        let response = save(
+            pool.clone(),
+            request_body.clone(),
+            1,
+            EntryNumber::SecondEntry,
+        )
+        .await;
+        assert_eq!(response.status(), StatusCode::OK);
 
-        assert_eq!(result.reference, ErrorReference::EntryNotFound);
+        let mut conn = pool.acquire().await.unwrap();
+        let data_entry = get_data_entry(&mut conn, 1, 2).await;
+
+        let user = User::test_user(Role::Coordinator, 1);
+        let response =
+            polling_station_data_entry_get(Coordinator(user.clone()), State(pool.clone()), Path(1))
+                .await
+                .into_response();
+        assert_eq!(response.status(), StatusCode::OK);
+        let body = response.into_body().collect().await.unwrap().to_bytes();
+        let DataEntryGetErrorsResponse {
+            first_entry_user_id,
+            finalised_first_entry,
+            first_entry_finished_at,
+            validation_results,
+        } = serde_json::from_slice(&body).unwrap();
+        assert_eq!(first_entry_user_id, 1);
+
+        let data_entry = get_data_entry(&mut conn, 1, 2).await;
+        assert!(matches!(
+            data_entry.unwrap().state,
+            DataEntryStatus::SecondEntryInProgress(_)
+        ));
     }
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]

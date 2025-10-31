@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 
 use typst::{
-    Library, World,
+    Library, LibraryExt, World,
     diag::{FileError, FileResult},
     foundations::{Bytes, Datetime},
     syntax::{FileId, Source, VirtualPath},

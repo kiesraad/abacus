@@ -2160,7 +2160,6 @@ mod tests {
         assert_eq!(response.status(), StatusCode::OK);
 
         let mut conn = pool.acquire().await.unwrap();
-        let data_entry = get_data_entry(&mut conn, 1, 2).await;
 
         let user = User::test_user(Role::Coordinator, 1);
         let response =
@@ -2168,20 +2167,13 @@ mod tests {
                 .await
                 .into_response();
         assert_eq!(response.status(), StatusCode::OK);
-        let body = response.into_body().collect().await.unwrap().to_bytes();
-        let DataEntryGetErrorsResponse {
-            first_entry_user_id,
-            finalised_first_entry,
-            first_entry_finished_at,
-            validation_results,
-        } = serde_json::from_slice(&body).unwrap();
-        assert_eq!(first_entry_user_id, 1);
 
-        let data_entry = get_data_entry(&mut conn, 1, 2).await;
-        assert!(matches!(
-            data_entry.unwrap().state,
-            DataEntryStatus::SecondEntryInProgress(_)
-        ));
+        let data_entry = get_data_entry(&mut conn, 1, 2).await.unwrap();
+        let status: DataEntryStatus = data_entry.state.0;
+        let DataEntryStatus::SecondEntryInProgress(state) = status else {
+            panic!("Expected entry to be in SecondEntryInProgress state");
+        };
+        assert_eq!(state.second_entry, request_body.data);
     }
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]

@@ -1,5 +1,5 @@
 import { ApiErrorEvent, ApiResponseEvent } from "./ApiEvents";
-import { ApiError, ApiResult } from "./ApiResult";
+import { ApiError, ApiResult, FatalApiError } from "./ApiResult";
 import { BaseApiClient } from "./BaseApiClient";
 
 export const DEFAULT_CANCEL_REASON = "Component unmounted";
@@ -9,7 +9,7 @@ export const DEFAULT_CANCEL_REASON = "Component unmounted";
  */
 export class ApiClient extends BaseApiClient {
   // subscribe to API errors
-  subscribeToApiErrors(callback: (error: ApiError) => void): () => void {
+  subscribeToApiErrors(callback: (error: ApiError | FatalApiError) => void): () => void {
     const listener = (event: Event) => {
       if (event instanceof ApiErrorEvent) {
         callback(event.error);

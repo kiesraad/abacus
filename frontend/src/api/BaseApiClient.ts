@@ -73,7 +73,6 @@ export class BaseApiClient extends EventTarget {
 
       // NOTE: the reference field references the error we should show to the user,
       // We prefix it by `error.api_error.` to get the translation key.
-
       if (response.status === 404 && isError) {
         return new NotFoundError(`error.api_error.${body.reference}`);
       }
@@ -103,8 +102,8 @@ export class BaseApiClient extends EventTarget {
     } catch (e) {
       console.error("Error parsing response", e);
 
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
-      return new NetworkError((e as Error).message || "Network error");
+      const message = e instanceof Error ? e.message : "Network error";
+      return new NetworkError(message);
     }
   }
 
@@ -189,8 +188,7 @@ export class BaseApiClient extends EventTarget {
         return new AbortedError();
       }
 
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
-      const message = (e as Error).message || "Network error";
+      const message = e instanceof Error ? e.message : "Network error";
       console.error(e, method, path);
       return new NetworkError(`${message}, ${method} ${path}`);
     }

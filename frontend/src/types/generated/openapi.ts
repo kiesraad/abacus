@@ -203,12 +203,11 @@ export type POLLING_STATION_DATA_ENTRY_RESOLVE_DIFFERENCES_REQUEST_PATH =
   `/api/polling_stations/${number}/data_entries/resolve_differences`;
 export type POLLING_STATION_DATA_ENTRY_RESOLVE_DIFFERENCES_REQUEST_BODY = ResolveDifferencesAction;
 
-// /api/polling_stations/{polling_station_id}/data_entries/resolve_errors
+// /api/polling_stations/{polling_station_id}/data_entries/get
 export interface POLLING_STATION_DATA_ENTRY_GET_ERRORS_REQUEST_PARAMS {
   polling_station_id: number;
 }
-export type POLLING_STATION_DATA_ENTRY_GET_ERRORS_REQUEST_PATH =
-  `/api/polling_stations/${number}/data_entries/resolve_errors`;
+export type POLLING_STATION_DATA_ENTRY_GET_ERRORS_REQUEST_PATH = `/api/polling_stations/${number}/data_entries/get`;
 export interface POLLING_STATION_DATA_ENTRY_RESOLVE_ERRORS_REQUEST_PARAMS {
   polling_station_id: number;
 }

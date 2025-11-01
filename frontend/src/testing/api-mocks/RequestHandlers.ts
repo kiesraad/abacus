@@ -333,9 +333,8 @@ export const PollingStationDataEntryGetErrorsHandler = http.get<
   ParamsToString<POLLING_STATION_DATA_ENTRY_GET_ERRORS_REQUEST_PARAMS>,
   null,
   DataEntryGetErrorsResponse
->(
-  "/api/polling_stations/5/data_entries/resolve_errors" satisfies POLLING_STATION_DATA_ENTRY_GET_ERRORS_REQUEST_PATH,
-  () => HttpResponse.json(dataEntryGetErrorsMockResponse, { status: 200 }),
+>("/api/polling_stations/5/data_entries/get" satisfies POLLING_STATION_DATA_ENTRY_GET_ERRORS_REQUEST_PATH, () =>
+  HttpResponse.json(dataEntryGetErrorsMockResponse, { status: 200 }),
 );
 
 export const PollingStationDataEntryResolveDifferencesHandler = http.post<

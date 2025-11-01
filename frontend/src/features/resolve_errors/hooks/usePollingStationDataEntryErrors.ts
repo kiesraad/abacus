@@ -37,7 +37,7 @@ export function usePollingStationDataEntryErrors(pollingStationId: number): Data
   const [validationError, setValidationError] = useState<string>();
 
   // fetch the data entry with errors and warnings
-  const path: POLLING_STATION_DATA_ENTRY_GET_ERRORS_REQUEST_PATH = `/api/polling_stations/${pollingStationId}/data_entries/resolve_errors`;
+  const path: POLLING_STATION_DATA_ENTRY_GET_ERRORS_REQUEST_PATH = `/api/polling_stations/${pollingStationId}/data_entries/get`;
   const { requestState } = useInitialApiGet<DataEntryGetErrorsResponse>(path);
 
   // 404 error if polling station is not found

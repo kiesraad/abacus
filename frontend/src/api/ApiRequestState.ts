@@ -1,4 +1,4 @@
-import { ApiError, ApiResult, FatalApiError, NetworkError, NotFoundError } from "./ApiResult";
+import { AnyApiError, ApiError, ApiResult, FatalApiError, NetworkError, NotFoundError } from "./ApiResult";
 
 export type ApiRequestStateWithoutErrors<T> =
   | {
@@ -38,7 +38,7 @@ export function isFatalRequestState<T>(requestState: ApiRequestState<T>): reques
   );
 }
 
-export function fromApiResult<T>(result: ApiResult<T>): ApiRequestState<T> {
+export function fromApiResult<T>(result: ApiResult<T, AnyApiError>): ApiRequestState<T> {
   if (result instanceof ApiError) {
     return { status: "api-error", error: result };
   } else if (result instanceof FatalApiError) {

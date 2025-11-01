@@ -1,14 +1,17 @@
 import { useCallback, useEffect, useState } from "react";
 
-import { DEFAULT_CANCEL_REASON, DO_NOT_EXTEND_SESSION } from "./ApiClient";
+import { DEFAULT_CANCEL_REASON } from "./ApiClient";
 import {
   ApiRequestState,
   ApiRequestStateWithoutFatalErrors,
   fromApiResult,
   isFatalRequestState,
 } from "./ApiRequestState";
-import { ApiResult } from "./ApiResult";
+import { AbortedError, ApiResult } from "./ApiResult";
 import { useApiClient } from "./useApiClient";
+
+/// Header to indicate that the session should not be extended, only the existence is checked, not the value
+export const DO_NOT_EXTEND_SESSION = { "x-do-not-extend-session": "on-data-refresh" };
 
 export interface UseInitialApiGetReturn<T> {
   requestState: ApiRequestState<T>;
@@ -26,8 +29,8 @@ export function handleApiResult<T>(
   controller?: AbortController,
 ): ApiResult<T> {
   // Do not update state if the request was aborted (mainly caused by an unmounted component)
-  if (controller instanceof AbortController && controller.signal.aborted) {
-    return result;
+  if ((controller instanceof AbortController && controller.signal.aborted) || result instanceof AbortedError) {
+    return new AbortedError();
   }
 
   setRequestState(fromApiResult(result));

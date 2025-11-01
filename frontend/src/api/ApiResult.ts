@@ -44,6 +44,13 @@ export class FatalApiError extends FatalError {
   }
 }
 
+// Request aborted by the client
+export class AbortedError extends Error {
+  constructor(public message = "Request aborted") {
+    super(message);
+  }
+}
+
 // Problem connecting with the backend
 export class NetworkError extends FatalError {
   constructor(public message: string) {
@@ -71,6 +78,7 @@ export class NotFoundError extends FatalError {
   }
 }
 
+export type AnyError = ApiError | FatalApiError | NetworkError | NotFoundError | AbortedError;
 export type AnyApiError = ApiError | FatalApiError | NetworkError | NotFoundError;
 
 export interface ApiResponse<T> {
@@ -79,24 +87,20 @@ export interface ApiResponse<T> {
   data: T;
 }
 
-export type ApiResult<T, E = AnyApiError> = ApiResponse<T> | E;
+export type ApiResult<T, E = AnyError> = ApiResponse<T> | E;
 
 export function isError<T>(result: ApiResult<T>): result is Error {
   return (
     result instanceof ApiError ||
     result instanceof FatalApiError ||
     result instanceof NotFoundError ||
-    result instanceof NetworkError
+    result instanceof NetworkError ||
+    result instanceof AbortedError
   );
 }
 
 export function isSuccess<T>(result: ApiResult<T>): result is ApiResponse<T> {
-  return !(
-    result instanceof ApiError ||
-    result instanceof FatalApiError ||
-    result instanceof NotFoundError ||
-    result instanceof NetworkError
-  );
+  return !isError(result);
 }
 
 export function isFatalError(error: ApiResult<unknown>): error is FatalError {

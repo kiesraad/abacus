@@ -28,6 +28,7 @@
   "empty": "leeg",
   "error_code": "Foutcode",
   "field": "Veld",
+  "file_too_large": "Het bestand <strong>{filename}</strong> is te groot. Kies een bestand van maximaal {max_size} Megabyte.",
   "finished_at": "Afgerond op",
   "for_your_information": "Ter info",
   "general": "Algemeen",

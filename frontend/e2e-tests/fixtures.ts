@@ -1,5 +1,5 @@
 import { APIRequestContext, test as base, expect, Page } from "@playwright/test";
-import fs from "fs";
+import { readFile, unlink } from "node:fs/promises";
 
 import {
   COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_BODY,
@@ -22,6 +22,7 @@ import {
 import { DataEntryApiClient } from "./helpers-utils/api-clients";
 import { completePollingStationDataEntries, loginAs } from "./helpers-utils/e2e-test-api-helpers";
 import { createRandomUsername } from "./helpers-utils/e2e-test-utils";
+import { EmlTestFile, generateEml } from "./helpers-utils/file-helpers";
 import { eml110a, eml230b } from "./test-data/eml-files";
 import {
   dataEntryRequest,
@@ -64,6 +65,12 @@ type Fixtures = {
   currentCommitteeSession: CommitteeSession;
   // Newly created User
   newTypist: User;
+  // A generated EML110a test file that is too large to upload
+  eml110aTooLargeTestFile: EmlTestFile;
+  // A generated EML110b test file that is too large to upload
+  eml110bTooLargeTestFile: EmlTestFile;
+  // A generated EML230b test file that is too large to upload
+  eml230bTooLargeTestFile: EmlTestFile;
 };
 
 export const test = base.extend<Fixtures>({
@@ -96,8 +103,8 @@ export const test = base.extend<Fixtures>({
   emptyElection: async ({ request }, use) => {
     await loginAs(request, "admin1");
     const url: ELECTION_IMPORT_REQUEST_PATH = `/api/elections/import`;
-    const election_data = fs.readFileSync(eml110a.path, "utf8");
-    const candidate_data = fs.readFileSync(eml230b.path, "utf8");
+    const election_data = await readFile(eml110a.path, "utf8");
+    const candidate_data = await readFile(eml230b.path, "utf8");
     const electionResponse = await request.post(url, {
       data: {
         election_data,
@@ -222,5 +229,23 @@ export const test = base.extend<Fixtures>({
     expect(userResponse.ok()).toBeTruthy();
 
     await use((await userResponse.json()) as User);
+  },
+  eml110aTooLargeTestFile: async ({}, use) => {
+    const minimumSize = 5 * 1024 * 1024; // 5MB
+    const { filename, path } = await generateEml("eml110a", minimumSize);
+    await use({ filename, path });
+    await unlink(path);
+  },
+  eml110bTooLargeTestFile: async ({}, use) => {
+    const minimumSize = 5 * 1024 * 1024; // 5MB
+    const { filename, path } = await generateEml("eml110b", minimumSize);
+    await use({ filename, path });
+    await unlink(path);
+  },
+  eml230bTooLargeTestFile: async ({}, use) => {
+    const minimumSize = 5 * 1024 * 1024; // 5MB
+    const { filename, path } = await generateEml("eml230b", minimumSize);
+    await use({ filename, path });
+    await unlink(path);
   },
 });

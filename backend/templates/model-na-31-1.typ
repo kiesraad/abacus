@@ -221,23 +221,25 @@ Bijvoorbeeld een schorsing of als er meerdere verkiezingen tegelijk werden georg
 
 === Is bij *alle afzonderlijke stembureaus* in #this_location het aantal uitgebrachte stemmen en het aantal toegelaten kiezers gelijk?
 
-#checkbox(checked: false)[Ja #sym.arrow.r *Ga door naar #ref(<monitoring_protocol>)*]
+#let differences = input.summary.differences_counts.more_ballots_count.count > 0 or input.summary.differences_counts.fewer_ballots_count.count > 0
 
-#checkbox(checked: false)[Nee, er zijn stembureaus met een verschil]
+#checkbox(checked: not differences)[Ja]
 
-=== Voor de stembureaus met de nummers #input.summary.differences_counts.more_ballots_count.polling_stations.map(str).join(", ") zijn *méér* uitgebrachte stemmen dan toegelaten kiezers geteld.
+#checkbox(checked: differences)[Nee, er zijn stembureaus met een verschil]
+
+=== #if input.summary.differences_counts.more_ballots_count.count > 0 [Voor de stembureaus met de nummers #comma_list(input.summary.differences_counts.more_ballots_count.polling_stations)] else [In geen van de stembureaus] zijn *méér* uitgebrachte stemmen dan toegelaten kiezers geteld.
 
 #letterbox(
   "I",
   value: input.summary.differences_counts.more_ballots_count.count,
-)[Totaal aantal méér getelde stemmen in deze stembureaus]
+)[Totaal aantal méér getelde stemmen]
 
-=== Voor de stembureaus met de nummers #input.summary.differences_counts.fewer_ballots_count.polling_stations.map(str).join(", ") zijn *minder* uitgebrachte stemmen dan toegelaten kiezers geteld.
+=== #if input.summary.differences_counts.fewer_ballots_count.count > 0 [Voor de stembureaus met de nummers #comma_list(input.summary.differences_counts.fewer_ballots_count.polling_stations)] else [In geen van de stembureaus] zijn *minder* uitgebrachte stemmen dan toegelaten kiezers geteld.
 
 #letterbox(
   "J",
   value: input.summary.differences_counts.fewer_ballots_count.count,
-)[Totaal aantal minder getelde stemmen in deze stembureaus]
+)[Totaal aantal minder getelde stemmen]
 
 == Uitkomst controleprotocol <monitoring_protocol>
 

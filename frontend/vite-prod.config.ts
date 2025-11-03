@@ -45,12 +45,15 @@ export default defineConfig(({ command }) => {
     ...gitDetails,
   };
 
-  // eslint-disable-next-line no-console
-  console.log("Vite build environment:");
-  Object.entries(define).forEach(([key, value]) => {
+  // print environment variables on CI
+  if (process.env.CI) {
     // eslint-disable-next-line no-console
-    console.log(`${key}: ${value}`);
-  });
+    console.log("Vite build environment:");
+    Object.entries(define).forEach(([key, value]) => {
+      // eslint-disable-next-line no-console
+      console.log(`${key}: ${value}`);
+    });
+  }
 
   return {
     build: {

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { startTransition, useCallback, useEffect, useState } from "react";
 import { Link, Outlet, useBlocker, useLocation, useNavigate } from "react-router";
 
 import { PageTitle } from "@/components/page_title/PageTitle";
@@ -48,9 +48,11 @@ export function AddInvestigationLayout() {
 
   // Check route on load
   useEffect(() => {
-    // FIXME
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setShowModal(shouldShowModal(location.pathname));
+    const next = shouldShowModal(location.pathname);
+
+    startTransition(() => {
+      setShowModal(next);
+    });
   }, [location.pathname, shouldShowModal]);
 
   // Check route on navigation

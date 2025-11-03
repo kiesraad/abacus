@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 import { AnyApiError, ApiError } from "@/api/ApiResult";
 import { Button } from "@/components/ui/Button/Button";
@@ -11,20 +11,15 @@ interface ErrorModalProps {
 }
 
 export function ErrorModal({ error }: ErrorModalProps) {
-  const [hide, setHide] = useState(false);
+  const [dismissedError, setDismissedError] = useState<AnyApiError | null>(null);
+
+  // we keep track of the dismissed error to not show the same error modal again
   const hideModal = () => {
-    setHide(true);
+    setDismissedError(error);
   };
 
-  // show the modal again if the error changes
-  useEffect(() => {
-    // FIXME
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setHide(false);
-  }, [error]);
-
   // hide dismissed modals
-  if (hide) {
+  if (dismissedError === error) {
     return null;
   }
 

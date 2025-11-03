@@ -48,7 +48,7 @@ export function OverviewPage() {
   const isNewAccount = location.hash === "#new-account";
   const isAdminOrCoordinator = isAdministrator || isCoordinator;
 
-  useLiveData([refetchElections]);
+  useLiveData(refetchElections);
 
   if (getElections.status === "api-error") {
     throw getElections.error;

@@ -3,16 +3,17 @@ import { useEffect } from "react";
 import { DEFAULT_CANCEL_REASON } from "@/api/ApiClient";
 
 // Hook to refetch live data at regular intervals and on tab visibility change
-export function useLiveData(refetchFunctions: Array<(abortController: AbortController) => Promise<unknown>>) {
+export function useLiveData(
+  refetchFunction: (abortController: AbortController) => Promise<unknown>,
+  initialRefetch: boolean = false,
+) {
   useEffect(() => {
     const abortController = new AbortController();
 
     const refetch = () => {
       // don't refetch if the document is hidden (i.e., user is on another tab)
       if (!document.hidden) {
-        refetchFunctions.forEach((refetchFunction) => {
-          void refetchFunction(abortController);
-        });
+        void refetchFunction(abortController);
       }
     };
 
@@ -22,6 +23,10 @@ export function useLiveData(refetchFunctions: Array<(abortController: AbortContr
     // add visibility change listener to refetch when tab becomes active
     document.addEventListener("visibilitychange", refetch);
 
+    if (initialRefetch) {
+      refetch();
+    }
+
     return () => {
       // cancel any ongoing requests
       abortController.abort(DEFAULT_CANCEL_REASON);
@@ -30,5 +35,5 @@ export function useLiveData(refetchFunctions: Array<(abortController: AbortContr
       // clear up the interval
       clearInterval(refetchInterval);
     };
-  }, [refetchFunctions]);
+  }, [refetchFunction, initialRefetch]);
 }

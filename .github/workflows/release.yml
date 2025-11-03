@@ -30,7 +30,7 @@ jobs:
         run: npm ci --omit=dev
       - name: Build
         run: npm run build
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v5
         with:
           name: frontend-production-build
           path: frontend/dist
@@ -66,7 +66,7 @@ jobs:
     steps:
       - uses: actions/checkout@v5
       - name: Download Abacus Frontend
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v6
         with:
           name: frontend-production-build
           path: frontend/dist
@@ -82,7 +82,7 @@ jobs:
       # no airgap detection build
       - name: Build without airgap detection
         run: cargo --locked build --release --no-default-features --features memory-serve,embed-typst --target=${{ matrix.target.name }}
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v5
         with:
           name: abacus-${{ matrix.target.os }}-no-airgap-detection
           path: ${{ matrix.target.binary }}
@@ -93,7 +93,7 @@ jobs:
         uses: actions/attest-build-provenance@v3
         with:
           subject-path: ${{ matrix.target.binary }}
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v5
         with:
           name: abacus-release-${{ matrix.target.os }}
           path: ${{ matrix.target.binary }}
@@ -122,7 +122,7 @@ jobs:
       - name: Install Playwright Browsers
         run: npx playwright install --with-deps --no-shell
       - name: Download abacus
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v6
         with:
           name: abacus-${{ matrix.os }}-no-airgap-detection
           path: builds/backend
@@ -132,7 +132,7 @@ jobs:
       - name: Run Playwright e2e tests
         run: npm run test:e2e
       - name: Upload Playwright report
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         if: ${{ !cancelled() }}
         with:
           name: playwright-report-release-${{ matrix.os }}
@@ -163,7 +163,7 @@ jobs:
       - name: Create release directory
         run: mkdir -p release
       - name: Download abacus
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v6
         with:
           pattern: abacus-release-*
           path: release/
@@ -206,7 +206,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Download abacus
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v6
         with:
           name: abacus-ubuntu-latest-no-airgap-detection
       - name: Upload binary to test server

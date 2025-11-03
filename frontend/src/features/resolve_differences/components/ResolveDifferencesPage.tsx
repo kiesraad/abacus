@@ -21,7 +21,21 @@ import { ResolveDifferencesTables } from "./ResolveDifferencesTables";
 export function ResolveDifferencesPage() {
   const { pushMessage } = useMessages();
   const navigate = useNavigate();
-  const afterSave = (status: DataEntryStatusName, firstEntryUserId: number | undefined) => {
+  const pollingStationId = useNumericParam("pollingStationId");
+  const {
+    pollingStation,
+    election,
+    loading,
+    differences,
+    dataEntryStructure,
+    action,
+    setAction,
+    onSubmit,
+    validationError,
+  } = usePollingStationDataEntryDifferences(pollingStationId, afterSave);
+  const { getName } = useUsers();
+
+  function afterSave(status: DataEntryStatusName, firstEntryUserId: number | undefined) {
     switch (status) {
       case "first_entry_has_errors":
         pushMessage({
@@ -45,21 +59,7 @@ export function ResolveDifferencesPage() {
         void navigate(`/elections/${election.id}/status`);
         break;
     }
-  };
-
-  const pollingStationId = useNumericParam("pollingStationId");
-  const {
-    pollingStation,
-    election,
-    loading,
-    differences,
-    dataEntryStructure,
-    action,
-    setAction,
-    onSubmit,
-    validationError,
-  } = usePollingStationDataEntryDifferences(pollingStationId, afterSave);
-  const { getName } = useUsers();
+  }
 
   if (loading || differences === null || dataEntryStructure === null) {
     return <Loader />;

@@ -413,7 +413,7 @@
           "required": true
         },
         "responses": {
-          "200": {
+          "204": {
             "description": "Committee session updated successfully"
           },
           "400": {
@@ -496,7 +496,7 @@
           }
         ],
         "responses": {
-          "200": {
+          "204": {
             "description": "Committee session deleted successfully"
           },
           "401": {
@@ -783,7 +783,7 @@
           "required": true
         },
         "responses": {
-          "200": {
+          "204": {
             "description": "Committee session status changed successfully"
           },
           "401": {
@@ -878,7 +878,7 @@
           "required": true
         },
         "responses": {
-          "200": {
+          "204": {
             "description": "Committee session number of voters changed successfully"
           },
           "401": {
@@ -1593,7 +1593,7 @@
           }
         ],
         "responses": {
-          "200": {
+          "204": {
             "description": "Polling station deleted successfully"
           },
           "401": {
@@ -1724,7 +1724,7 @@
           "required": true
         },
         "responses": {
-          "200": {
+          "201": {
             "description": "Created test election"
           },
           "500": {
@@ -1744,7 +1744,7 @@
       "get": {
         "operationId": "admin_exists",
         "responses": {
-          "200": {
+          "204": {
             "description": "First admin user exists"
           },
           "403": {
@@ -1843,7 +1843,7 @@
         "summary": "Check whether the application is initialised (an admin user exists + has logged in at least once)",
         "operationId": "initialised",
         "responses": {
-          "200": {
+          "204": {
             "description": "The application is initialised"
           },
           "418": {
@@ -2106,7 +2106,7 @@
         "summary": "Logout endpoint, deletes the session cookie",
         "operationId": "logout",
         "responses": {
-          "200": {
+          "204": {
             "description": "Successful logout, or user was already logged out"
           },
           "500": {
@@ -3133,7 +3133,7 @@
           }
         ],
         "responses": {
-          "200": {
+          "204": {
             "description": "Polling station investigation deleted successfully"
           },
           "401": {
@@ -3653,7 +3653,7 @@
           }
         ],
         "responses": {
-          "200": {
+          "204": {
             "description": "User deleted successfully"
           },
           "401": {
@@ -5021,7 +5021,7 @@
           },
           "unexplained_difference_ballots_voters": {
             "$ref": "#/components/schemas/YesNo",
-            "description": "Whether there was an unexplained difference between the number of voters and votes\n(\"Was er in de telresultaten van het stembureau een onverklaard verschil tussen het totaal aantal getelde stembiljetten het aantal toegelaten kiezers?\")"
+            "description": "Whether there was an unexplained difference between the number of voters and votes\n(\"Was er in de telresultaten van het stembureau een onverklaard verschil tussen het totaal aantal getelde stembiljetten en het aantal toegelaten kiezers?\")"
           }
         },
         "additionalProperties": false

@@ -434,6 +434,7 @@
   continue_on_next_page: "",
   corrected_cells: 4,
   column_total: (c, v) => [#c: #v],
+  column_total_with_border: true,
   sum_total: [(#columns)],
   total_instruction: "",
   explainer_text: none,
@@ -550,9 +551,9 @@
 
               grid(
                 columns: (1fr,) + if with_originals { (6em, 8em) } else { (8em,) },
-                grid.cell(inset: 9pt, align: center)[#column_total #column],
+                grid.cell(inset: 9pt, align: center)[#column_total #column#if not column_total_with_border { ":" }],
                 ..cell_if(with_originals, grid.cell(inset: 8pt, fill: luma(213), align(right, prefilled_number(original_subtotal)))),
-                grid.vline(stroke: (paint: luma(213), dash: "densely-dotted")),
+                grid.vline(stroke: (thickness: if column_total_with_border { 1pt } else { 0pt }, paint: luma(213), dash: "densely-dotted")),
                 grid.cell(if row_has_values and (not with_originals or votes != original_subtotal) { grid.cell(inset: 4pt, align(right + horizon, prefilled_number(votes))) } else { empty_grid(cells: corrected_cells, paint: luma(213)) }, align: center, inset: 0pt),
               )
 

@@ -9,7 +9,7 @@
   "changes_are_not_saved": "Je laatste wijzigingen worden niet opgeslagen.",
   "completed": {
     "all_entries_completed": "Alle stembureaus zijn ingevoerd",
-    "info": "De resultaten van alle stembureaus kunnen nu opgeteld gaan worden om de uitslag van de {electionName} vast te stellen.",
+    "info": "De resultaten van alle stembureaus kunnen nu opgeteld gaan worden om de uitkomst van de {electionName} vast te stellen.",
     "thank_you": "Bedankt voor je hulp!",
     "wait_for_instructions": "Wacht op instructies van de coördinator."
   },

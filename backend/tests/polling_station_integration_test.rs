@@ -328,7 +328,7 @@ async fn test_delete_ok(pool: SqlitePool) {
 
     assert_eq!(
         response.status(),
-        StatusCode::OK,
+        StatusCode::NO_CONTENT,
         "Unexpected response status"
     );
 
@@ -350,7 +350,7 @@ async fn test_delete_ok(pool: SqlitePool) {
     let response = delete_polling_station(&addr, election_id, 1).await;
     assert_eq!(
         response.status(),
-        StatusCode::OK,
+        StatusCode::NO_CONTENT,
         "Unexpected response status"
     );
 

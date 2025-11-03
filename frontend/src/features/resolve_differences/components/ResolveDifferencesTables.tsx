@@ -36,7 +36,9 @@ interface SectionTableProps {
 }
 
 function SectionTable({ section, first, second, action }: SectionTableProps) {
-  let title = section.title;
+  const titleFromHeading = section.subsections.find((s) => s.type === "heading")?.title;
+  const title = titleFromHeading ?? section.title;
+
   const firstValues = mapResultsToSectionValues(section, first);
   const secondValues = mapResultsToSectionValues(section, second);
   const checkboxRows: Array<{
@@ -51,8 +53,7 @@ function SectionTable({ section, first, second, action }: SectionTableProps) {
       {section.subsections.map((subsection, subsectionIdx) => {
         switch (subsection.type) {
           case "heading":
-            // override previous title
-            title = subsection.title;
+            // only used to override title
             return;
           case "message":
             // message is not rendered

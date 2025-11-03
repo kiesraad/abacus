@@ -1,7 +1,6 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router";
 
-import { DEFAULT_CANCEL_REASON } from "@/api/ApiClient";
 import { useCrud } from "@/api/useCrud";
 import { HeaderCommitteeSessionStatusWithIcon } from "@/components/committee_session/CommitteeSessionStatus";
 import { Footer } from "@/components/footer/Footer";
@@ -12,6 +11,7 @@ import { Button } from "@/components/ui/Button/Button";
 import { Modal } from "@/components/ui/Modal/Modal";
 import { useElection } from "@/hooks/election/useElection";
 import { useElectionStatus } from "@/hooks/election/useElectionStatus";
+import { useLiveData } from "@/hooks/useLiveData";
 import { useUserRole } from "@/hooks/user/useUserRole";
 import { t } from "@/i18n/translate";
 import {
@@ -32,23 +32,8 @@ export function ElectionStatusPage() {
   const updatePath: COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_PATH = `/api/elections/${currentCommitteeSession.id}/committee_sessions/${currentCommitteeSession.id}/status`;
   const { update } = useCrud({ updatePath, throwAllErrors: true });
 
-  // re-fetch election and status when component mounts and every 30 seconds
-  useEffect(() => {
-    const abortController = new AbortController();
-
-    const refetch = () => {
-      void refetchElection(abortController);
-      void refetchStatuses(abortController);
-    };
-
-    refetch();
-    const refetchInterval = setInterval(refetch, 30_000);
-
-    return () => {
-      abortController.abort(DEFAULT_CANCEL_REASON);
-      clearInterval(refetchInterval);
-    };
-  }, [refetchElection, refetchStatuses]);
+  useLiveData(refetchElection, true);
+  useLiveData(refetchStatuses, true);
 
   function finishDataEntry() {
     void navigate("../report");

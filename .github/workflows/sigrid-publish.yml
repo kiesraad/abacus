@@ -18,7 +18,7 @@ jobs:
         with:
           fetch-depth: 0
       - name: Sigrid CI
-        uses: Software-Improvement-Group/sigridci@f5e7bd1b953a8fc7558252c584a579ef534d750e # main
+        uses: Software-Improvement-Group/sigridci@e6b89d8a89b51328781abc994daeea5bdb1703bf # main
         with:
           customer: kiesraad
           system: abacus

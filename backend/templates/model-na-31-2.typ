@@ -229,23 +229,23 @@ Bijvoorbeeld een schorsing of als er meerdere verkiezingen tegelijk werden georg
 
 #let differences = input.summary.differences_counts.more_ballots_count.count > 0 or input.summary.differences_counts.fewer_ballots_count.count > 0
 
-#checkbox(checked: not differences)[Ja #sym.arrow.r *Ga door naar #ref(<monitoring_protocol>, supplement: none)*]
+#checkbox(checked: not differences)[Ja]
 
 #checkbox(checked: differences)[Nee, er zijn stembureaus met een verschil]
 
-=== Voor de stembureaus met de nummers #comma_list(input.summary.differences_counts.more_ballots_count.polling_stations) zijn *méér* uitgebrachte stemmen dan toegelaten kiezers geteld.
+=== #if input.summary.differences_counts.more_ballots_count.count > 0 [Voor de stembureaus met de nummers #comma_list(input.summary.differences_counts.more_ballots_count.polling_stations)] else [In geen van de stembureaus] zijn *méér* uitgebrachte stemmen dan toegelaten kiezers geteld.
 
 #letterbox(
   "I",
   value: input.summary.differences_counts.more_ballots_count.count,
-)[Totaal aantal méér getelde stemmen in deze stembureaus]
+)[Totaal aantal méér getelde stemmen]
 
-=== Voor de stembureaus met de nummers #comma_list(input.summary.differences_counts.fewer_ballots_count.polling_stations) zijn *minder* uitgebrachte stemmen dan toegelaten kiezers geteld.
+=== #if input.summary.differences_counts.fewer_ballots_count.count > 0 [Voor de stembureaus met de nummers #comma_list(input.summary.differences_counts.fewer_ballots_count.polling_stations)] else [In geen van de stembureaus] zijn *minder* uitgebrachte stemmen dan toegelaten kiezers geteld.
 
 #letterbox(
   "J",
   value: input.summary.differences_counts.fewer_ballots_count.count,
-)[Totaal aantal minder getelde stemmen in deze stembureaus]
+)[Totaal aantal minder getelde stemmen]
 
 == Uitkomst controleprotocol <monitoring_protocol>
 
@@ -280,7 +280,8 @@ Voer de controle uit volgens de stappen in het controleprotocol.
       votes: candidate.votes,
     )),
     continue_on_next_page: [#sym.arrow.r De lijst gaat verder op de volgende pagina],
-    column_total: (c, v) => [Subtotaal kolom #c: #h(0.5em) #fmt-number(v, zero: "0")],
+    column_total: "Subtotaal kolom",
+    column_total_with_border: false,
     sum_total: columns => [Totaal lijst (kolom #columns)],
   )
 }

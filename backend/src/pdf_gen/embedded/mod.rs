@@ -1,7 +1,8 @@
+use chrono::{Datelike, Timelike};
 use std::{fmt::Debug, time::Instant};
 use tracing::{debug, error, info, warn};
-use typst::{comemo, diag::SourceDiagnostic, ecow::EcoVec};
-use typst_pdf::{PdfOptions, PdfStandard, PdfStandards};
+use typst::{comemo, diag::SourceDiagnostic, ecow::EcoVec, foundations::Datetime};
+use typst_pdf::{PdfOptions, PdfStandard, PdfStandards, Timestamp};
 
 use crate::zip::{ZipResponseError, ZipResponseWriter};
 
@@ -54,32 +55,62 @@ pub async fn generate_pdfs(
 fn get_pdf_options() -> PdfOptions<'static> {
     PdfOptions {
         standards: PdfStandards::new(&[PdfStandard::A_2b]).expect("PDF standards should be valid"),
+        // https://github.com/typst/typst/blob/96dd67e011bb317cf78683bcf1edfdfca5e7b6b3/crates/typst-cli/src/compile.rs#L280
+        timestamp: {
+            let local_datetime = chrono::Local::now();
+            convert_datetime(local_datetime).and_then(|datetime| {
+                Timestamp::new_local(datetime, local_datetime.offset().local_minus_utc() / 60)
+            })
+        },
         ..Default::default()
     }
 }
 
+/// Convert [`chrono::DateTime`] to [`Datetime`]
+/// From https://github.com/typst/typst/blob/96dd67e011bb317cf78683bcf1edfdfca5e7b6b3/crates/typst-cli/src/compile.rs#L305
+fn convert_datetime<Tz: chrono::TimeZone>(date_time: chrono::DateTime<Tz>) -> Option<Datetime> {
+    Datetime::from_ymd_hms(
+        date_time.year(),
+        date_time.month().try_into().ok()?,
+        date_time.day().try_into().ok()?,
+        date_time.hour().try_into().ok()?,
+        date_time.minute().try_into().ok()?,
+        date_time.second().try_into().ok()?,
+    )
+}
+
 fn compile_pdf(world: &mut world::PdfWorld, model: PdfModel) -> Result<PdfGenResult, PdfGenError> {
+    debug!("Starting Typst compilation for {}", model.as_model_name());
+
     world.set_input_model(model)?;
 
     let compile_start = Instant::now();
+
     let result = typst::compile(world);
-    let document = result.output.map_err(PdfGenError::from_typst)?;
     info!(
         "Compile took {} ms, {} warnings",
         compile_start.elapsed().as_millis(),
         result.warnings.len()
     );
-
     result.warnings.iter().for_each(|warning| {
         warn!("Warning: {:?}", warning);
     });
 
+    let document = result.output.map_err(PdfGenError::from_typst)?;
+
     let pdf_gen_start = Instant::now();
-    let buffer = typst_pdf::pdf(&document, &get_pdf_options()).map_err(PdfGenError::from_typst)?;
+    let result = typst_pdf::pdf(&document, &get_pdf_options());
     debug!(
-        "PDF generation took {} ms",
-        pdf_gen_start.elapsed().as_millis()
+        "PDF generation took {} ms, {}",
+        pdf_gen_start.elapsed().as_millis(),
+        if result.is_err() {
+            "failed"
+        } else {
+            "succeeded"
+        }
     );
+
+    let buffer = result.map_err(PdfGenError::from_typst)?;
 
     Ok(PdfGenResult { buffer })
 }

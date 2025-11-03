@@ -2,7 +2,7 @@ import { ReactNode, useEffect, useState } from "react";
 
 import { ApiClient } from "./ApiClient";
 import { ApiProviderContext, ApiState } from "./ApiProviderContext";
-import { ApiError } from "./ApiResult";
+import { ApiError, FatalApiError } from "./ApiResult";
 import useSessionState from "./useSessionState";
 
 export interface ApiProviderProps {
@@ -23,7 +23,7 @@ export function ApiProvider({ children, fetchInitialUser = true }: ApiProviderPr
   // Unset the current user when the API returns an invalid session error
   // indicating that the sessions has expired or the user is not authenticated anymore
   useEffect(() => {
-    const callback = (error: ApiError) => {
+    const callback = (error: ApiError | FatalApiError) => {
       if (error.reference === "AirgapViolation") {
         setAirGapError(true);
       } else if ((error.reference === "InvalidSession" || error.reference === "Unauthorized") && user) {

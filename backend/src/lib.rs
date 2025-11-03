@@ -1,12 +1,13 @@
-use std::{error::Error, future::Future, net::SocketAddr, str::FromStr};
+use std::{future::Future, net::SocketAddr, str::FromStr};
 
 use airgap::AirgapDetection;
-#[cfg(feature = "memory-serve")]
-use axum::http::StatusCode;
 use axum::{
     Router,
     extract::{DefaultBodyLimit, FromRef},
+    http::StatusCode,
     middleware,
+    response::IntoResponse,
+    routing::any,
     serve::ListenerExt,
 };
 use hyper::http::{HeaderName, HeaderValue, header};
@@ -26,6 +27,7 @@ use utoipa_axum::router::OpenApiRouter;
 use utoipa_swagger_ui::SwaggerUi;
 
 pub mod airgap;
+pub mod app_error;
 pub mod audit_log;
 pub mod authentication;
 pub mod committee_session;
@@ -46,6 +48,7 @@ pub mod summary;
 pub mod test_data_gen;
 pub mod zip;
 
+pub use app_error::AppError;
 pub use error::{APIError, ErrorResponse};
 
 /// Maximum size of the request body in megabytes.
@@ -98,14 +101,24 @@ pub fn openapi_router() -> OpenApiRouter<AppState> {
 fn axum_router_from_openapi(router: OpenApiRouter<AppState>) -> Router<AppState> {
     // Serve the OpenAPI documentation at /api-docs if the openapi feature is enabled
     #[cfg(feature = "openapi")]
-    {
+    let router = {
         let (router, openapi) = router.split_for_parts();
         router.merge(SwaggerUi::new("/api-docs").url("/api-docs/openapi.json", openapi))
-    }
+    };
 
     // Serve without OpenAPI documentation if the openapi feature is disabled
     #[cfg(not(feature = "openapi"))]
-    Router::from(router)
+    let router = Router::from(router);
+
+    // Add fallback for unmatched /api/* routes to return 404
+    // This must come before the frontend memory-serve routes
+    async fn api_fallback_handler() -> impl IntoResponse {
+        (StatusCode::NOT_FOUND, "Not Found")
+    }
+    router
+        .route("/api", any(api_fallback_handler))
+        .route("/api/", any(api_fallback_handler))
+        .route("/api/{*path}", any(api_fallback_handler))
 }
 
 /// Add middleware to trace all HTTP requests and extend the user's session lifetime if needed
@@ -234,10 +247,7 @@ fn add_security_headers(router: Router<AppState>) -> Router<AppState> {
 }
 
 /// Complete Axum router for the application
-pub fn router(
-    pool: SqlitePool,
-    airgap_detection: AirgapDetection,
-) -> Result<Router, Box<dyn Error>> {
+pub fn router(pool: SqlitePool, airgap_detection: AirgapDetection) -> Result<Router, AppError> {
     let router = axum_router_from_openapi(openapi_router());
     let state = AppState {
         pool,
@@ -258,7 +268,7 @@ pub async fn start_server(
     pool: SqlitePool,
     listener: TcpListener,
     enable_airgap_detection: bool,
-) -> Result<(), Box<dyn Error>> {
+) -> Result<(), AppError> {
     let airgap_detection = if enable_airgap_detection {
         info!("Airgap detection is enabled, starting airgap detection task...");
 
@@ -323,7 +333,7 @@ pub async fn create_sqlite_pool(
     database: &str,
     #[cfg(feature = "dev-database")] reset_database: bool,
     #[cfg(feature = "dev-database")] seed_data: bool,
-) -> Result<SqlitePool, Box<dyn Error>> {
+) -> Result<SqlitePool, AppError> {
     let db = format!("sqlite://{database}");
     let opts = SqliteConnectOptions::from_str(&db)?
         .create_if_missing(true)
@@ -469,6 +479,38 @@ mod test {
                 let response = reqwest::get(format!("{base_url}/")).await.unwrap();
                 assert_eq!(response.headers()["cache-control"], "max-age:300, private");
             }
+        })
+        .await;
+    }
+
+    /// Check that unknown API routes return 404
+    /// Note that this test is mostly designed for using with the memory-serve feature enabled.
+    #[test(sqlx::test)]
+    async fn test_api_fallback_route(pool: SqlitePool) {
+        run_server_test(pool, |base_url| async move {
+            // Test non-existent API endpoints
+            let response = reqwest::get(format!("{base_url}/api")).await.unwrap();
+            assert_eq!(response.status(), 404);
+
+            let response = reqwest::get(format!("{base_url}/api/")).await.unwrap();
+            assert_eq!(response.status(), 404);
+
+            let response = reqwest::get(format!("{base_url}/api/nonexistent"))
+                .await
+                .unwrap();
+            assert_eq!(response.status(), 404);
+
+            let response = reqwest::get(format!("{base_url}/api/some/nested/path"))
+                .await
+                .unwrap();
+            assert_eq!(response.status(), 404);
+
+            // Test that valid API endpoints still work
+            let response = reqwest::get(format!("{base_url}/api/whoami"))
+                .await
+                .unwrap();
+            // Should return 401 (Unauthorized) since we're not logged in
+            assert_eq!(response.status(), 401);
         })
         .await;
     }

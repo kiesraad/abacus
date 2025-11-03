@@ -341,7 +341,7 @@ async fn test_user_delete(pool: SqlitePool) {
         .send()
         .await
         .unwrap();
-    assert_eq!(response.status(), StatusCode::OK);
+    assert_eq!(response.status(), StatusCode::NO_CONTENT);
 
     let response = reqwest::Client::new()
         .delete(&url)
@@ -396,7 +396,7 @@ async fn test_can_delete_logged_in_user(pool: SqlitePool) {
         .send()
         .await
         .unwrap();
-    assert_eq!(response.status(), StatusCode::OK);
+    assert_eq!(response.status(), StatusCode::NO_CONTENT);
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("users"))))]
@@ -568,7 +568,7 @@ async fn test_coordinator_can_only_delete_typists(pool: SqlitePool) {
         .await
         .unwrap();
 
-    assert_eq!(response.status(), StatusCode::OK);
+    assert_eq!(response.status(), StatusCode::NO_CONTENT);
 
     let admin_url = format!("http://{addr}/api/user/1");
     let response = reqwest::Client::new()

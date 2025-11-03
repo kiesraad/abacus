@@ -209,7 +209,7 @@ pub async fn user_update(
     delete,
     path = "/api/user/{user_id}",
     responses(
-        (status = 200, description = "User deleted successfully"),
+        (status = 204, description = "User deleted successfully"),
         (status = 401, description = "Unauthorized", body = ErrorResponse),
         (status = 403, description = "Forbidden", body = ErrorResponse),
         (status = 404, description = "User not found", body = ErrorResponse),
@@ -255,7 +255,7 @@ async fn user_delete(
 
         tx.commit().await?;
 
-        Ok(StatusCode::OK)
+        Ok(StatusCode::NO_CONTENT)
     } else {
         tx.rollback().await?;
 

@@ -486,8 +486,7 @@ mod tests {
     }
 
     mod list_results_for_committee_session {
-        use super::super::*;
-        use super::create_test_results;
+        use super::{super::*, create_test_results};
         use crate::{
             investigation::insert_test_investigation,
             polling_station::repository::insert_test_polling_station,
@@ -801,8 +800,7 @@ mod tests {
     }
 
     mod are_results_complete_for_committee_session {
-        use super::super::*;
-        use super::create_test_results;
+        use super::{super::*, create_test_results};
         use crate::{
             data_entry::repository::insert_test_result,
             investigation::{

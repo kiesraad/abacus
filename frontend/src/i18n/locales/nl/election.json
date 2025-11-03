@@ -37,17 +37,14 @@
   "import_polling_station_eml": "Importeer stembureaus gemeente {location}",
   "invalid_candidates_definition": {
     "description": "Het bestand <file>filename</file> bevat geen geldige kandidatenlijsten. Kies een bestand met een geldige definitie.",
-    "file_too_large": "Het bestand <file>filename</file> is te groot. Kies een bestand van maximaal {max_size} Megabyte.",
     "title": "Ongeldige kandidatenlijsten"
   },
   "invalid_election_definition": {
     "description": "Het bestand <file>filename</file> bevat geen geldige verkiezingsdefinitie. Kies een bestand met een geldige definitie.",
-    "file_too_large": "Het bestand <file>filename</file> is te groot. Kies een bestand van maximaal {max_size} Megabyte.",
     "title": "Ongeldige verkiezingsdefinitie"
   },
   "invalid_polling_station_definition": {
     "description": "Het bestand <file>filename</file> bevat geen geldige lijst met stembureaus. Kies een ander bestand.",
-    "file_too_large": "Het bestand <file>filename</file> is te groot. Kies een bestand van maximaal {max_size} Megabyte.",
     "title": "Ongeldig stembureaubestand"
   },
 
@@ -61,10 +58,8 @@
   "no_elections_added": "Nog geen verkiezingen ingesteld",
   "not_ready_for_use": "Abacus is nog niet klaar voor gebruik",
   "number_of_voters": {
-    "description": "Voer het aantal kiesgerechtigden in zoals door de gemeenteraad vastgesteld voor de gemeenteraadsverkiezing 2026 in de gemeente {location}",
     "error": "Vul het aantal kiesgerechtigden in",
-    "hint": "Ingelezen uit bestand met stembureaus",
-    "title": "Hoeveel kiesgerechtigden telt de gemeente?"
+    "hint": "Ingelezen uit bestand met stembureaus"
   },
   "please_wait_for_coordinator": "Je kan als invoerder nog niks doen. Wacht tot de coördinator het systeem openstelt voor het invoeren van telresultaten.",
   "polling_stations": {

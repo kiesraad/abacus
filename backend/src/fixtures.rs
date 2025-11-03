@@ -1,6 +1,8 @@
 use sqlx::SqlitePool;
 use tracing::info;
 
+use crate::AppError;
+
 /// Macro to convert a single fixture name to the contents of a fixture file
 macro_rules! load_fixture {
     ($fixture:literal) => {
@@ -30,7 +32,7 @@ struct Fixture {
 
 /// Function that loads the fixture data into the given connection
 /// Each fixture may contain multiple SQL statements.
-pub async fn seed_fixture_data(pool: &SqlitePool) -> Result<(), Box<dyn std::error::Error>> {
+pub async fn seed_fixture_data(pool: &SqlitePool) -> Result<(), AppError> {
     for fixture in FIXTURES {
         sqlx::raw_sql(fixture.data).execute(pool).await?;
     }

@@ -48,6 +48,7 @@ export function AddInvestigationLayout() {
 
   // Check route on load
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setShowModal(shouldShowModal(location.pathname));
   }, [location.pathname, shouldShowModal]);
 

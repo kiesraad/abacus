@@ -1,7 +1,7 @@
 import { Navigate, useRouteError } from "react-router";
 
 import { ApiError, ApplicationError, FatalApiError, NetworkError, NotFoundError } from "@/api/ApiResult";
-import { t } from "@/i18n/translate";
+import { t, tx } from "@/i18n/translate";
 
 import { FatalErrorPage } from "./FatalErrorPage";
 import { NotFoundPage } from "./NotFoundPage";
@@ -24,7 +24,7 @@ export function ErrorBoundary() {
   }
 
   if (error instanceof NetworkError) {
-    return <FatalErrorPage message={error.message} />;
+    return <FatalErrorPage message={tx("error.network_error", {}, { error: error.message })} />;
   }
 
   if (error instanceof ApplicationError) {

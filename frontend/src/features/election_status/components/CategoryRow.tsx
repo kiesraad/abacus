@@ -32,7 +32,7 @@ export function CategoryRow({ category, pollingStation, addLink }: CategoryRowPr
         to={
           pollingStation.status === "entries_different"
             ? `./${pollingStation.id}/resolve-differences`
-            : `./${pollingStation.id}/resolve-errors`
+            : `./${pollingStation.id}/detail`
         }
       >
         <CategoryRowContent category={category} pollingStation={pollingStation} />

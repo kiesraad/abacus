@@ -25,6 +25,31 @@ jobs:
       CARGO_TERM_COLOR: always
       SQLX_OFFLINE: "true"
     steps:
+      # Free up runner disk space, so that our job has enough space to run
+      # https://dev.to/mathio/squeezing-disk-space-from-github-actions-runners-an-engineers-guide-3pjg
+      - name: Free up runner disk space
+        working-directory: /
+        run: >
+          df -h
+          &&
+          echo "Freeing up disk space..."
+          &&
+          sudo rm -rf
+          /opt/az
+          /opt/google
+          /opt/hostedtoolcache
+          /opt/microsoft
+          /usr/lib/google-cloud-sdk
+          /usr/lib/jvm
+          /usr/local/.ghcup
+          /usr/local/julia*
+          /usr/local/lib/android
+          /usr/local/share/chromium
+          /usr/local/share/powershell
+          /usr/share/dotnet
+          /usr/share/swift
+          &&
+          df -h
       - name: Checkout
         uses: actions/checkout@v5
         with:
@@ -67,6 +92,8 @@ jobs:
           files: backend/target/llvm-cov-target/codecov.json
           disable_search: true
           fail_ci_if_error: true
+      - name: Report disk space
+        run: df -h
 
   frontend:
     name: Frontend

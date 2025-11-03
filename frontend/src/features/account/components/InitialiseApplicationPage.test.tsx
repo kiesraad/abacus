@@ -78,7 +78,7 @@ describe("InitialiseApplicationPage", () => {
   });
 
   test("Go to login if an account was already created", async () => {
-    overrideOnce("get", "/api/initialise/admin-exists", 200, "");
+    overrideOnce("get", "/api/initialise/admin-exists", 204, "");
 
     render(<InitialiseApplicationPage />);
 

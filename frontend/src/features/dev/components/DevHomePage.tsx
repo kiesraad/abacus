@@ -27,12 +27,15 @@ function Links() {
   const { requestState: getElections } = useInitialApiGet<ElectionListResponse>(
     `/api/elections` satisfies ELECTION_LIST_REQUEST_PATH,
   );
-  if (getElections.status === "api-error") {
-    throw getElections.error;
-  }
+
   if (getElections.status === "loading") {
     return <Loader />;
   }
+
+  if (getElections.status !== "success") {
+    throw getElections.error;
+  }
+
   const electionList = getElections.data.elections;
   const committeeSessions = getElections.data.committee_sessions;
 

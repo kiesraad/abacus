@@ -692,6 +692,7 @@ async fn polling_station_data_entries_and_result_delete(
 pub struct DataEntryGetResponse {
     pub user_id: Option<u32>,
     pub data: PollingStationResults,
+    pub status: DataEntryStatusName,
     pub validation_results: ValidationResults,
 }
 
@@ -724,32 +725,45 @@ async fn polling_station_data_entry_get(
     let validation_results = validate_data_entry_status(&state, &polling_station, &election)?;
 
     match state.clone() {
-        DataEntryStatus::FirstEntryInProgress(state) => Ok(Json(DataEntryGetResponse {
-            user_id: Some(state.first_entry_user_id),
-            data: state.first_entry,
-            validation_results,
-        })),
-        DataEntryStatus::FirstEntryHasErrors(state) => Ok(Json(DataEntryGetResponse {
-            user_id: Some(state.first_entry_user_id),
-            data: state.finalised_first_entry,
-            validation_results,
-        })),
-        DataEntryStatus::SecondEntryNotStarted(state) => Ok(Json(DataEntryGetResponse {
-            user_id: Some(state.first_entry_user_id),
-            data: state.finalised_first_entry,
-            validation_results,
-        })),
-        DataEntryStatus::SecondEntryInProgress(state) => Ok(Json(DataEntryGetResponse {
-            user_id: Some(state.second_entry_user_id),
-            data: state.second_entry,
-            validation_results,
-        })),
+        DataEntryStatus::FirstEntryInProgress(first_entry_in_progress_state) => {
+            Ok(Json(DataEntryGetResponse {
+                user_id: Some(first_entry_in_progress_state.first_entry_user_id),
+                data: first_entry_in_progress_state.first_entry,
+                status: state.status_name(),
+                validation_results,
+            }))
+        }
+        DataEntryStatus::FirstEntryHasErrors(first_entry_has_errors_state) => {
+            Ok(Json(DataEntryGetResponse {
+                user_id: Some(first_entry_has_errors_state.first_entry_user_id),
+                data: first_entry_has_errors_state.finalised_first_entry,
+                status: state.status_name(),
+                validation_results,
+            }))
+        }
+        DataEntryStatus::SecondEntryNotStarted(second_entry_not_started_state) => {
+            Ok(Json(DataEntryGetResponse {
+                user_id: Some(second_entry_not_started_state.first_entry_user_id),
+                data: second_entry_not_started_state.finalised_first_entry,
+                status: state.status_name(),
+                validation_results,
+            }))
+        }
+        DataEntryStatus::SecondEntryInProgress(second_entry_in_progress_state) => {
+            Ok(Json(DataEntryGetResponse {
+                user_id: Some(second_entry_in_progress_state.second_entry_user_id),
+                data: second_entry_in_progress_state.second_entry,
+                status: state.status_name(),
+                validation_results,
+            }))
+        }
         DataEntryStatus::Definitive(_) => Ok(Json(DataEntryGetResponse {
             user_id: None,
             data: get_result(&mut conn, polling_station_id, committee_session.id)
                 .await?
                 .data
                 .0,
+            status: state.status_name(),
             validation_results,
         })),
         _ => Err(APIError::Conflict(

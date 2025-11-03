@@ -592,6 +592,7 @@ export interface DataEntryGetDifferencesResponse {
 export interface DataEntryGetResponse {
   data: PollingStationResults;
   user_id?: number | null;
+  status?: DataEntryStatusName;
   validation_results: ValidationResults;
 }
 

@@ -32,7 +32,8 @@ export function ElectionStatusPage() {
   const updatePath: COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_PATH = `/api/elections/${currentCommitteeSession.id}/committee_sessions/${currentCommitteeSession.id}/status`;
   const { update } = useCrud({ updatePath, throwAllErrors: true });
 
-  useLiveData([refetchElection, refetchStatuses]);
+  useLiveData(refetchElection, true);
+  useLiveData(refetchStatuses, true);
 
   function finishDataEntry() {
     void navigate("../report");

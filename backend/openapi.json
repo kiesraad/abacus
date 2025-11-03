@@ -2198,7 +2198,7 @@
     },
     "/api/polling_stations/{polling_station_id}/data_entries/get": {
       "get": {
-        "summary": "Get accepted data entry errors to be resolved",
+        "summary": "Get data entry with validation results",
         "operationId": "polling_station_data_entry_get",
         "parameters": [
           {
@@ -2215,7 +2215,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Data entry with errors and warnings to be resolved",
+            "description": "Data entry with validation results",
             "content": {
               "application/json": {
                 "schema": {
@@ -5735,6 +5735,7 @@
           "DataEntryAlreadyFinalised",
           "DataEntryCannotBeDeleted",
           "DataEntryNotAllowed",
+          "DataEntryStatusNotAllowed",
           "EmlImportError",
           "EntryNotFound",
           "EntryNotUnique",

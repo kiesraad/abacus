@@ -31,6 +31,7 @@ pub enum ErrorReference {
     DataEntryAlreadyFinalised,
     DataEntryCannotBeDeleted,
     DataEntryNotAllowed,
+    DataEntryStatusNotAllowed,
     EmlImportError,
     EntryNotFound,
     EntryNotUnique,

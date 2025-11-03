@@ -23,6 +23,9 @@ required-features = ["openapi"]
 name = "gen-test-election"
 required-features = ["dev-database"]
 
+[[bin]]
+name = "eml-import-tester"
+
 # Note: if you add a dependency here, please update the README.md for the backend as well.
 
 [dependencies]

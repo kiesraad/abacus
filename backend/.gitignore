@@ -4,3 +4,4 @@
 *.sqlite*
 /templates/**/*.pdf
 cobertura.xml
+/tmp

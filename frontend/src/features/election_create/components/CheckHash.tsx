@@ -45,7 +45,8 @@ export function CheckHash({ date, title, header, description, redactedHash, erro
     event.preventDefault();
     let stubsAreValid = true;
 
-    const completeHash = redactedHash.chunks;
+    // make a copy of the redacted hash chunks to fill in the stubs
+    const completeHash = redactedHash.chunks.slice(0);
     const formData = new FormData(event.currentTarget);
 
     for (const [i, stub] of stubs.entries()) {
@@ -59,7 +60,6 @@ export function CheckHash({ date, title, header, description, redactedHash, erro
           newStub.error = t("election.check_eml.check_hash.hint");
           stubsAreValid = false;
         } else {
-          // eslint-disable-next-line react-hooks/immutability
           completeHash[stub.index] = value;
         }
         setStubs(newStubs);

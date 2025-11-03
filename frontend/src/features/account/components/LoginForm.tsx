@@ -1,5 +1,5 @@
 import { FormEvent, useState } from "react";
-import { Form, Location, useLocation, useNavigate } from "react-router";
+import { Form, useLocation, useNavigate } from "react-router";
 
 import { AnyApiError, FatalError, isError } from "@/api/ApiResult";
 import { useApiState } from "@/api/useApiState";
@@ -9,15 +9,11 @@ import { FormLayout } from "@/components/ui/Form/FormLayout";
 import { InputField } from "@/components/ui/InputField/InputField";
 import { TranslationPath } from "@/i18n/i18n.types";
 import { t, tx } from "@/i18n/translate";
-
-interface UnauthorizedState {
-  unauthorized?: boolean;
-}
+import { hasBooleanProperty } from "@/utils/typeChecks";
 
 export function LoginForm() {
   const navigate = useNavigate();
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
-  const location = useLocation() as Location<null | UnauthorizedState>;
+  const location = useLocation();
   const { login, expiration } = useApiState();
   const [username, setUsername] = useState<string>("");
   const [password, setPassword] = useState<string>("");
@@ -26,7 +22,7 @@ export function LoginForm() {
 
   // show notification if the user is unauthorized or the session expired
   let notification: TranslationPath | null = null;
-  if (location.state?.unauthorized === true) {
+  if (hasBooleanProperty(location.state, "unauthorized") && location.state.unauthorized) {
     const now = new Date();
     if (expiration !== null && expiration.getTime() < now.getTime()) {
       notification = "users.session_expired";

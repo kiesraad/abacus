@@ -35,7 +35,7 @@ const FeedbackMessage = ({ messageType, content, icon }: FeedbackMessageProps) =
 
 export interface PollingStationSelectorProps {
   pollingStationNumber: string;
-  setPollingStationNumber: Dispatch<SetStateAction<string>>;
+  updatePollingStationNumber: (n: string) => void;
   loading: boolean;
   setLoading: Dispatch<SetStateAction<boolean>>;
   currentPollingStation: PollingStationWithStatus | undefined;
@@ -46,7 +46,7 @@ export interface PollingStationSelectorProps {
 
 export function PollingStationSelector({
   pollingStationNumber,
-  setPollingStationNumber,
+  updatePollingStationNumber,
   loading,
   currentPollingStation,
   setAlert,
@@ -148,7 +148,7 @@ export function PollingStationSelector({
         autoFocus={true}
         onChange={(e) => {
           setAlert(undefined);
-          setPollingStationNumber(e.target.value);
+          updatePollingStationNumber(e.target.value);
         }}
         onKeyDown={(e) => {
           refetch();

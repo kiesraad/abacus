@@ -18,6 +18,7 @@ export function ErrorModal({ error }: ErrorModalProps) {
 
   // show the modal again if the error changes
   useEffect(() => {
+    // FIXME
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setHide(false);
   }, [error]);

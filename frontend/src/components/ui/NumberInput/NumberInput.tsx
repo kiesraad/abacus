@@ -39,9 +39,9 @@ export const NumberInput = React.forwardRef<HTMLInputElement, NumberInputProps>(
     type: "text",
   };
 
-  const hideTooltip = React.useCallback(() => {
+  const hideTooltip = () => {
     setTooltipInvalidValue(null);
-  }, [setTooltipInvalidValue]);
+  };
 
   const onPaste: React.ClipboardEventHandler<HTMLInputElement> = React.useCallback(
     (event) => {

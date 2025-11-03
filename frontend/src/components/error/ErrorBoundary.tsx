@@ -7,8 +7,7 @@ import { FatalErrorPage } from "./FatalErrorPage";
 import { NotFoundPage } from "./NotFoundPage";
 
 export function ErrorBoundary() {
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
-  const error = useRouteError() as Error;
+  const error = useRouteError();
 
   // redirect to login page if the user is not authenticated
   if (error instanceof ApiError && error.code === 401) {
@@ -60,5 +59,9 @@ export function ErrorBoundary() {
     return <FatalErrorPage message={error.message} reference={error.reference} code={error.code} />;
   }
 
-  return <FatalErrorPage message={error.message} error={error} />;
+  if (error instanceof Error) {
+    return <FatalErrorPage message={error.message} error={error} />;
+  }
+
+  return <FatalErrorPage message={String(error)} />;
 }

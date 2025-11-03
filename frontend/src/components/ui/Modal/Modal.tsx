@@ -31,8 +31,9 @@ export function Modal({ title, noFlex = false, autoWidth = false, onClose, child
   // open the modal when the component is mounted and focus on the title element
   useEffect(() => {
     if (dialogRef.current) {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
-      lastActiveElement.current = document.activeElement as HTMLElement;
+      if (document.activeElement instanceof HTMLElement) {
+        lastActiveElement.current = document.activeElement;
+      }
       dialogRef.current.showModal();
       document.getElementById("modal-title")?.focus();
     }

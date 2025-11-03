@@ -37,7 +37,6 @@ export interface PollingStationChoiceFormProps {
 export function PollingStationChoiceForm({ anotherEntry }: PollingStationChoiceFormProps) {
   const navigate = useNavigate();
   const user = useUser();
-
   const { election, pollingStations } = useElection();
   const [pollingStationNumber, setPollingStationNumber] = useState<string>("");
   const [alert, setAlert] = useState<string | undefined>(undefined);
@@ -62,12 +61,13 @@ export function PollingStationChoiceForm({ anotherEntry }: PollingStationChoiceF
     setCurrentPollingStation(pollingStation);
   }, USER_INPUT_DEBOUNCE);
 
-  // eslint-disable-next-line react-hooks/use-memo
-  useMemo(() => {
-    const parsedInt = parseIntUserInput(pollingStationNumber);
+  // set polling station number and trigger debounced lookup
+  const updatePollingStationNumber = (n: string) => {
+    setPollingStationNumber(n);
+    const parsedInt = parseIntUserInput(n);
     setLoading(true);
     debouncedCallback(pollingStationsWithStatus.find((pollingStation) => pollingStation.number === parsedInt));
-  }, [pollingStationNumber, pollingStationsWithStatus, debouncedCallback]);
+  };
 
   const handleSubmit = () => {
     if (pollingStationNumber === "") {
@@ -153,7 +153,7 @@ export function PollingStationChoiceForm({ anotherEntry }: PollingStationChoiceF
         </legend>
         <PollingStationSelector
           pollingStationNumber={pollingStationNumber}
-          setPollingStationNumber={setPollingStationNumber}
+          updatePollingStationNumber={updatePollingStationNumber}
           loading={loading}
           setLoading={setLoading}
           currentPollingStation={currentPollingStation}

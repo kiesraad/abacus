@@ -12,6 +12,7 @@ export function Messages() {
   useEffect(() => {
     // Check if we already retrieved the messages, to make this work during development with react strict mode
     if (!messagesRetrieved.current) {
+      // FIXME
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setMessages(popMessages());
       messagesRetrieved.current = true;

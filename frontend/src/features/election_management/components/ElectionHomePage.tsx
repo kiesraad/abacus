@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link, Location, useLocation, useNavigate } from "react-router";
+import { Link, useLocation, useNavigate } from "react-router";
 
 import { DEFAULT_CANCEL_REASON } from "@/api/ApiClient";
 import { useCrud } from "@/api/useCrud";
@@ -19,19 +19,15 @@ import {
 } from "@/types/generated/openapi";
 import { cn } from "@/utils/classnames";
 import { committeeSessionLabel } from "@/utils/committeeSession";
+import { hasBooleanProperty } from "@/utils/typeChecks";
 
 import { directDownload } from "../utils/download";
 import { CommitteeSessionCard } from "./CommitteeSessionCard";
 import { ElectionInformationTable } from "./ElectionInformationTable";
 import cls from "./ElectionManagement.module.css";
 
-interface ShowDeleteModalState {
-  showDeleteModal?: boolean;
-}
-
 export function ElectionHomePage() {
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
-  const location = useLocation() as Location<null | ShowDeleteModalState>;
+  const location = useLocation();
   const navigate = useNavigate();
   const { currentCommitteeSession, committeeSessions, election, investigations, pollingStations, refetch } =
     useElection();
@@ -41,6 +37,7 @@ export function ElectionHomePage() {
   const createPath: COMMITTEE_SESSION_CREATE_REQUEST_PATH = `/api/elections/${election.id}/committee_sessions`;
   const removePath: COMMITTEE_SESSION_DELETE_REQUEST_PATH = `/api/elections/${currentCommitteeSession.election_id}/committee_sessions/${currentCommitteeSession.id}`;
   const { create, remove } = useCrud({ createPath, removePath, throwAllErrors: true });
+  const showDeleteModal = hasBooleanProperty(location.state, "showDeleteModal") && location.state.showDeleteModal;
 
   // re-fetch election when component mounts
   useEffect(() => {
@@ -100,7 +97,7 @@ export function ElectionHomePage() {
           </nav>
         </Modal>
       )}
-      {location.state?.showDeleteModal === true && investigations.length === 0 && (
+      {showDeleteModal && investigations.length === 0 && (
         <Modal title={`${t("election_management.delete_session")}?`} onClose={toggleDeleteCommitteeSessionModal}>
           <p>
             {t("election_management.delete_session_are_you_sure", {
@@ -125,7 +122,7 @@ export function ElectionHomePage() {
           </nav>
         </Modal>
       )}
-      {location.state?.showDeleteModal === true && investigations.length > 0 && (
+      {showDeleteModal && investigations.length > 0 && (
         <Modal title={t("election_management.delete_investigations_first")} onClose={toggleDeleteCommitteeSessionModal}>
           <p>
             {t("election_management.delete_investigations_first_are_you_sure", {

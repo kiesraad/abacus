@@ -1,5 +1,7 @@
 import { RefObject, useCallback, useEffect, useRef } from "react";
 
+import { isNode } from "@/utils/typeChecks";
+
 type Dir = "up" | "down" | "first" | "last";
 
 export function useFormKeyboardNavigation(): RefObject<HTMLFormElement | null> {
@@ -81,8 +83,7 @@ export function useFormKeyboardNavigation(): RefObject<HTMLFormElement | null> {
         case "Enter":
           // only handle events from inside the form or the body
           if (
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
-            (event.target && innerRef.current?.contains(event.target as Node)) ||
+            (event.target && isNode(event.target) && innerRef.current?.contains(event.target)) ||
             event.target instanceof HTMLBodyElement
           ) {
             const submitButton: HTMLButtonElement | undefined | null =

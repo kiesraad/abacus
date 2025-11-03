@@ -61,6 +61,7 @@ export function InitialiseApplicationPage() {
   // navigate to login if admin exists
   useEffect(() => {
     if (adminExists.requestState.status === "success") {
+      // FIXME
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setStep(InitialiseSteps.Login);
     }

@@ -18,7 +18,7 @@ import { investigationRoutes } from "@/features/investigations/routes";
 import { logsRoutes } from "@/features/logs/routes";
 import { pollingStationsRoutes } from "@/features/polling_stations/routes";
 import { resolveDifferencesRoutes } from "@/features/resolve_differences/routes";
-import { resolveErrorsRoutes } from "@/features/resolve_errors/routes";
+import { detailRoutes } from "@/features/resolve_errors/routes";
 import { usersRoutes } from "@/features/users/routes";
 
 import { RootLayout } from "./RootLayout";
@@ -71,8 +71,8 @@ export const routes: RouteObject[] = [
                     children: resolveDifferencesRoutes,
                   },
                   {
-                    path: ":pollingStationId/resolve-errors",
-                    children: resolveErrorsRoutes,
+                    path: ":pollingStationId/detail",
+                    children: detailRoutes,
                   },
                 ],
               },

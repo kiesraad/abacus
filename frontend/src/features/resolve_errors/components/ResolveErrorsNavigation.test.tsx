@@ -118,9 +118,9 @@ describe("ResolveErrorsNavigation", () => {
     renderNavigation(mockValidationResultsNoErrors);
 
     const overviewLink = screen.getByRole("link", { name: "Fouten en waarschuwingen" });
-    expect(overviewLink).toHaveAttribute("href", "/elections/1/status/5/resolve-errors");
+    expect(overviewLink).toHaveAttribute("href", "/elections/1/status/5/detail");
 
     const kiezersLink = screen.getByRole("link", { name: "Aantal kiezers en stemmen" });
-    expect(kiezersLink).toHaveAttribute("href", "/elections/1/status/5/resolve-errors/voters_votes_counts");
+    expect(kiezersLink).toHaveAttribute("href", "/elections/1/status/5/detail/voters_votes_counts");
   });
 });

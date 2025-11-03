@@ -67,7 +67,7 @@ describe("ElectionStatus", () => {
       expect(navigate).toHaveBeenCalledWith("./7/resolve-differences");
       // Click on row of polling station with data entry with errors
       errorsAndWarningsRows[2]!.click();
-      expect(navigate).toHaveBeenCalledWith("./8/resolve-errors");
+      expect(navigate).toHaveBeenCalledWith("./8/detail");
     } else {
       errorsAndWarningsRows[1]!.click();
       errorsAndWarningsRows[2]!.click();

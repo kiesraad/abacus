@@ -4,7 +4,7 @@ import { ResolveErrorsIndexPage } from "./components/ResolveErrorsIndexPage";
 import { ResolveErrorsLayout } from "./components/ResolveErrorsLayout";
 import { ResolveErrorsSectionPage } from "./components/ResolveErrorsSectionPage";
 
-export const resolveErrorsRoutes: RouteObject[] = [
+export const detailRoutes: RouteObject[] = [
   {
     Component: ResolveErrorsLayout,
     children: [

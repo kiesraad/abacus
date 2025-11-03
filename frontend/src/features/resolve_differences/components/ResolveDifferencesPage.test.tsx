@@ -196,7 +196,7 @@ describe("ResolveDifferencesPage", () => {
     expect(navigate).toHaveBeenCalledWith("/elections/1/status");
   });
 
-  test("should navigate to resolve errors page after keeping second entry which has errors", async () => {
+  test("should navigate to details/resolve errors page after keeping second entry which has errors", async () => {
     const user = userEvent.setup();
 
     await renderPage();
@@ -209,6 +209,6 @@ describe("ResolveDifferencesPage", () => {
       title: "Verschil opgelost voor stembureau 35",
       text: "Let op: het proces-verbaal bevat fouten die moeten worden opgelost",
     });
-    expect(navigate).toHaveBeenCalledWith("/elections/1/status/3/resolve-errors");
+    expect(navigate).toHaveBeenCalledWith("/elections/1/status/3/detail");
   });
 });

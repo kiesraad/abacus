@@ -42,7 +42,7 @@ export function ResolveDifferencesPage() {
           title: t("resolve_errors.differences_resolved", { number: pollingStation.number }),
           text: t("resolve_errors.alert_contains_errors"),
         });
-        void navigate(`/elections/${election.id}/status/${pollingStationId}/resolve-errors`);
+        void navigate(`/elections/${election.id}/status/${pollingStationId}/detail`);
         break;
       case "second_entry_not_started":
         pushMessage({

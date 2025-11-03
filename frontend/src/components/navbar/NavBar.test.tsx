@@ -106,18 +106,18 @@ describe("NavBar", () => {
     ).toBeVisible();
   });
 
-  test.each([
-    { pathname: "/elections/1/status/1/resolve-differences" },
-    { pathname: "/elections/1/status/1/resolve-errors" },
-  ])("election status links for $pathname", async (location) => {
-    await renderNavBar(location, "coordinator");
+  test.each([{ pathname: "/elections/1/status/1/resolve-differences" }, { pathname: "/elections/1/status/1/detail" }])(
+    "election status links for $pathname",
+    async (location) => {
+      await renderNavBar(location, "coordinator");
 
-    expect(screen.queryByRole("link", { name: "Verkiezingen" })).not.toBeInTheDocument();
-    expect(
-      screen.queryByRole("link", { name: ["Heemdamseburg", "—", "Gemeenteraadsverkiezingen 2026"].join("") }),
-    ).toBeVisible();
-    expect(screen.queryByRole("link", { name: "Eerste zitting" })).toBeVisible();
-  });
+      expect(screen.queryByRole("link", { name: "Verkiezingen" })).not.toBeInTheDocument();
+      expect(
+        screen.queryByRole("link", { name: ["Heemdamseburg", "—", "Gemeenteraadsverkiezingen 2026"].join("") }),
+      ).toBeVisible();
+      expect(screen.queryByRole("link", { name: "Eerste zitting" })).toBeVisible();
+    },
+  );
 
   test.each([
     { pathname: "/elections/1/polling-stations/create" },

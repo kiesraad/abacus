@@ -54,7 +54,7 @@
     "title": "Komt het probleem terug?"
   },
   "label": "Fout",
-  "network_error": "<p>Er kan geen verbinding worden gemaakt met de Abacus server.</p><p>Zorg dat Abacus bereikbaar is en probeer het opnieuw.</p><p>Foutmelding:</p><pre>{error}</pre>",
+  "network_error": "<p>Er kan geen verbinding worden gemaakt met de Abacus-server.</p><p>Zorg dat Abacus bereikbaar is en probeer het opnieuw.</p><p>Foutmelding:</p><pre>{error}</pre>",
   "not_found": "Pagina niet gevonden",
   "not_found_feedback": "We kunnen de pagina die je zoekt niet vinden. Het kan zijn dat de pagina is verplaatst of verwijderd.",
   "not_possible": "Dit kan nu niet",

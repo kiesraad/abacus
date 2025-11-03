@@ -229,8 +229,9 @@ pub async fn election_import_validate(
             return Err(APIError::EmlImportError(EMLImportError::MissingFileName));
         }
 
-        polling_stations = Some(EML110::from_str(&data)?.get_polling_stations()?);
-        number_of_voters = EML110::from_str(&data)?.get_number_of_voters()?;
+        let eml110b = EML110::from_str(&data)?;
+        polling_stations = Some(eml110b.get_polling_stations()?);
+        number_of_voters = eml110b.get_number_of_voters().unwrap_or_default();
         polling_station_definition_matches_election =
             Some(EML110::from_str(&data)?.polling_station_definition_matches_election(&election)?);
     } else {

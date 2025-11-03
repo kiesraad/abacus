@@ -27,6 +27,9 @@ required-features = ["dev-database"]
 name = "gen-pdf"
 required-features = ["embed-typst"]
 
+[[bin]]
+name = "eml-import-tester"
+
 # Note: if you add a dependency here, please update the README.md for the backend as well.
 
 [dependencies]

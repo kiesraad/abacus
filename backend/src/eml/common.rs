@@ -210,6 +210,14 @@ pub enum EMLImportError {
     TooManyPoliticalGroups,
 }
 
+impl std::fmt::Display for EMLImportError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{:?}", self)
+    }
+}
+
+impl std::error::Error for EMLImportError {}
+
 /// Name and id of the specific contest
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "PascalCase")]

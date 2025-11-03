@@ -5175,11 +5175,15 @@
         "type": "object",
         "required": [
           "data",
+          "status",
           "validation_results"
         ],
         "properties": {
           "data": {
             "$ref": "#/components/schemas/PollingStationResults"
+          },
+          "status": {
+            "$ref": "#/components/schemas/DataEntryStatusName"
           },
           "user_id": {
             "type": [

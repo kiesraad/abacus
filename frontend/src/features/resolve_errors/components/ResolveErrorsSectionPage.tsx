@@ -20,7 +20,7 @@ export function ResolveErrorsSectionPage() {
     return <Loader />;
   }
 
-  const model = dataEntry.finalised_first_entry.model;
+  const model = dataEntry.data.model;
   const structure = getDataEntryStructure(model, election);
   const section = structure.find((s) => s.id === sectionId);
 
@@ -31,7 +31,7 @@ export function ResolveErrorsSectionPage() {
   return (
     <ReadOnlyDataEntrySection
       section={section}
-      data={dataEntry.finalised_first_entry}
+      data={dataEntry.data}
       validationResults={dataEntry.validation_results}
     />
   );

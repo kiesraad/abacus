@@ -30,7 +30,7 @@ import {
   CREATE_FIRST_ADMIN_REQUEST_PARAMS,
   CREATE_FIRST_ADMIN_REQUEST_PATH,
   DataEntryGetDifferencesResponse,
-  DataEntryGetErrorsResponse,
+  DataEntryGetResponse,
   DataEntryStatusResponse,
   ELECTION_DETAILS_REQUEST_PARAMS,
   ELECTION_DETAILS_REQUEST_PATH,
@@ -66,8 +66,8 @@ import {
   POLLING_STATION_DATA_ENTRY_FINALISE_REQUEST_PATH,
   POLLING_STATION_DATA_ENTRY_GET_DIFFERENCES_REQUEST_PARAMS,
   POLLING_STATION_DATA_ENTRY_GET_DIFFERENCES_REQUEST_PATH,
-  POLLING_STATION_DATA_ENTRY_GET_ERRORS_REQUEST_PARAMS,
-  POLLING_STATION_DATA_ENTRY_GET_ERRORS_REQUEST_PATH,
+  POLLING_STATION_DATA_ENTRY_GET_REQUEST_PARAMS,
+  POLLING_STATION_DATA_ENTRY_GET_REQUEST_PATH,
   POLLING_STATION_DATA_ENTRY_RESOLVE_DIFFERENCES_REQUEST_BODY,
   POLLING_STATION_DATA_ENTRY_RESOLVE_DIFFERENCES_REQUEST_PARAMS,
   POLLING_STATION_DATA_ENTRY_RESOLVE_DIFFERENCES_REQUEST_PATH,
@@ -122,7 +122,7 @@ import {
 import { getCommitteeSessionMockData } from "./CommitteeSessionMockData";
 import {
   claimDataEntryResponse,
-  dataEntryGetErrorsMockResponse,
+  dataEntryGetMockResponse,
   dataEntryStatusDifferences,
   saveDataEntryResponse,
 } from "./DataEntryMockData";
@@ -329,12 +329,12 @@ export const PollingStationDataEntryGetDifferencesHandler = http.get<
   () => HttpResponse.json(dataEntryStatusDifferences, { status: 200 }),
 );
 
-export const PollingStationDataEntryGetErrorsHandler = http.get<
-  ParamsToString<POLLING_STATION_DATA_ENTRY_GET_ERRORS_REQUEST_PARAMS>,
+export const PollingStationDataEntryGetHandler = http.get<
+  ParamsToString<POLLING_STATION_DATA_ENTRY_GET_REQUEST_PARAMS>,
   null,
-  DataEntryGetErrorsResponse
->("/api/polling_stations/5/data_entries/get" satisfies POLLING_STATION_DATA_ENTRY_GET_ERRORS_REQUEST_PATH, () =>
-  HttpResponse.json(dataEntryGetErrorsMockResponse, { status: 200 }),
+  DataEntryGetResponse
+>("/api/polling_stations/5/data_entries/get" satisfies POLLING_STATION_DATA_ENTRY_GET_REQUEST_PATH, () =>
+  HttpResponse.json(dataEntryGetMockResponse, { status: 200 }),
 );
 
 export const PollingStationDataEntryResolveDifferencesHandler = http.post<
@@ -499,7 +499,7 @@ export const handlers: HttpHandler[] = [
   LoginHandler,
   InitialisedHandler,
   PollingStationDataEntryGetDifferencesHandler,
-  PollingStationDataEntryGetErrorsHandler,
+  PollingStationDataEntryGetHandler,
   PollingStationDataEntryResolveDifferencesHandler,
   PollingStationDataEntryResolveErrorsHandler,
   PollingStationListRequestHandler,

@@ -13,6 +13,7 @@
     "DataEntryAlreadyFinalised": "De invoer voor dit stembureau is al gedaan",
     "DataEntryCannotBeDeleted": "De invoer kan niet verwijderd worden",
     "DataEntryNotAllowed": "De invoer voor dit stembureau is niet toegestaan",
+    "DataEntryStatusNotAllowed": "De status van de invoer staat deze actie niet toe",
     "EmlImportError": "Het EML bestand is niet geldig",
     "EntryNotFound": "Niet gevonden",
     "EntryNotUnique": "Deze invoer bestaat al",

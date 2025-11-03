@@ -589,10 +589,9 @@ export interface DataEntryGetDifferencesResponse {
   second_entry_user_id: number;
 }
 
-export interface DataEntryGetErrorsResponse {
-  finalised_first_entry: PollingStationResults;
-  first_entry_finished_at: string;
-  first_entry_user_id: number;
+export interface DataEntryGetResponse {
+  data: PollingStationResults;
+  user_id?: number | null;
   validation_results: ValidationResults;
 }
 

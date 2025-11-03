@@ -7,9 +7,9 @@ import { ElectionStatusProviderContext } from "@/hooks/election/ElectionStatusPr
 import { useElection } from "@/hooks/election/useElection";
 import { t } from "@/i18n/translate";
 import {
-  DataEntryGetErrorsResponse,
+  DataEntryGetResponse,
   ElectionWithPoliticalGroups,
-  POLLING_STATION_DATA_ENTRY_GET_ERRORS_REQUEST_PATH,
+  POLLING_STATION_DATA_ENTRY_GET_REQUEST_PATH,
   POLLING_STATION_DATA_ENTRY_RESOLVE_ERRORS_REQUEST_BODY,
   POLLING_STATION_DATA_ENTRY_RESOLVE_ERRORS_REQUEST_PATH,
   PollingStation,
@@ -22,7 +22,7 @@ interface DataEntryErrors {
   pollingStation: PollingStation;
   election: ElectionWithPoliticalGroups;
   loading: boolean;
-  dataEntry: DataEntryGetErrorsResponse | null;
+  dataEntry: DataEntryGetResponse | null;
   onSubmit: (afterSave: (action: ResolveErrorsAction) => void) => Promise<void>;
   validationError: string | undefined;
 }
@@ -37,8 +37,8 @@ export function usePollingStationDataEntryErrors(pollingStationId: number): Data
   const [validationError, setValidationError] = useState<string>();
 
   // fetch the data entry with errors and warnings
-  const path: POLLING_STATION_DATA_ENTRY_GET_ERRORS_REQUEST_PATH = `/api/polling_stations/${pollingStationId}/data_entries/get`;
-  const { requestState } = useInitialApiGet<DataEntryGetErrorsResponse>(path);
+  const path: POLLING_STATION_DATA_ENTRY_GET_REQUEST_PATH = `/api/polling_stations/${pollingStationId}/data_entries/get`;
+  const { requestState } = useInitialApiGet<DataEntryGetResponse>(path);
 
   // 404 error if polling station is not found
   if (!pollingStation) {

@@ -2219,7 +2219,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/DataEntryGetErrorsResponse"
+                  "$ref": "#/components/schemas/DataEntryGetResponse"
                 }
               }
             }
@@ -5171,23 +5171,21 @@
         },
         "additionalProperties": false
       },
-      "DataEntryGetErrorsResponse": {
+      "DataEntryGetResponse": {
         "type": "object",
         "required": [
-          "first_entry_user_id",
-          "finalised_first_entry",
-          "first_entry_finished_at",
+          "data",
           "validation_results"
         ],
         "properties": {
-          "finalised_first_entry": {
+          "data": {
             "$ref": "#/components/schemas/PollingStationResults"
           },
-          "first_entry_finished_at": {
-            "type": "string"
-          },
-          "first_entry_user_id": {
-            "type": "integer",
+          "user_id": {
+            "type": [
+              "integer",
+              "null"
+            ],
             "format": "int32",
             "minimum": 0
           },

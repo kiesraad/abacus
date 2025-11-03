@@ -20,6 +20,7 @@ import {
   PollingStationRequest,
   PollingStationRequestListResponse,
 } from "@/types/generated/openapi";
+import { fileTooLargeError, isFileTooLarge } from "@/utils/uploadFileSize";
 
 import { PollingStationAlert } from "./PollingStationAlert";
 
@@ -62,6 +63,11 @@ export function PollingStationImportPage() {
   async function onFileChange(e: ChangeEvent<HTMLInputElement>) {
     const currentFile = e.target.files ? e.target.files[0] : undefined;
     if (currentFile !== undefined) {
+      if (await isFileTooLarge(currentFile)) {
+        setError(fileTooLargeError(currentFile));
+        return;
+      }
+
       setFile(currentFile);
       const data = await currentFile.text();
       const response = await postValidate({ data });
@@ -74,17 +80,7 @@ export function PollingStationImportPage() {
 
         // Response code 413 indicates that the file is too large
         if (response instanceof ApiError && response.code === 413) {
-          setError(
-            tx(
-              "election.invalid_polling_station_definition.file_too_large",
-              {
-                file: () => <strong>{currentFile.name}</strong>,
-              },
-              {
-                max_size: response.message,
-              },
-            ),
-          );
+          setError(fileTooLargeError(currentFile));
         } else {
           setError(
             tx("election.invalid_polling_station_definition.description", {

@@ -9,7 +9,7 @@ import {
 } from "@/types/generated/openapi";
 
 import { ApiClient, DEFAULT_CANCEL_REASON } from "./ApiClient";
-import { ApiResult, isSuccess } from "./ApiResult";
+import { AbortedError, ApiResult, isSuccess } from "./ApiResult";
 
 export interface SessionState {
   user: LoginResponse | null;
@@ -77,7 +77,7 @@ export default function useSessionState(client: ApiClient, fetchInitialUser: boo
         const path: WHOAMI_REQUEST_PATH = "/api/whoami";
         const response = await client.getRequest<LoginResponse>(path, abortController);
 
-        if (!abortController.signal.aborted) {
+        if (!abortController.signal.aborted && !(response instanceof AbortedError)) {
           if (isSuccess(response)) {
             setUser(response.data);
           } else {

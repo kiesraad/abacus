@@ -40,7 +40,7 @@ export function ResolveErrorsNavigation({ structure, validationResults }: Resolv
   };
 
   const getSectionUrl = (sectionId: string): string => {
-    const basePath = `/elections/${electionId}/status/${pollingStationId}/resolve-errors`;
+    const basePath = `/elections/${electionId}/status/${pollingStationId}/detail`;
     return sectionId ? `${basePath}/${sectionId}` : basePath;
   };
 

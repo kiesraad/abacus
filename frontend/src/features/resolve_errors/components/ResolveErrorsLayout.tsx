@@ -37,7 +37,7 @@ export function ResolveErrorsLayout() {
         <section className="smaller-gap">
           <PollingStationNumber>{pollingStation.number}</PollingStationNumber>
           <h1>{pollingStation.name}</h1>
-          <Badge type="first_entry_has_errors" />
+          <Badge type={dataEntry.status} />
         </section>
       </header>
       <Messages />

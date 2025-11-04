@@ -1,6 +1,6 @@
 #import "common/style.typ": conf, document_numbering
 #import "common/scripts.typ": *
-#let input = json("inputs/model-na-31-2.json")
+#let input = json("inputs/model-n-10-2.json")
 
 #let is_municipality = (municipal, public_body) => if (
   input.election.category == "Municipal"
@@ -281,22 +281,12 @@ Bijvoorbeeld als er meerdere verkiezingen tegelijk werden georganiseerd, en een 
 
 == Stemmen per lijst en per kandidaat <candidate_votes>
 
-#for political_group in input.summary.political_group_votes {
-  let election_political_group = input.election.political_groups.find(pg => pg.number == political_group.number)
-
-  if election_political_group == none {
-    continue
-  }
-
+#for political_group in input.candidates_tables {
   votes_table(
-    title: [#political_group.number #election_political_group.name],
+    title: [#political_group.number #political_group.name],
     headers: ("Kandidaat", "", "Stemmen"),
     total: none,
-    values: political_group.candidate_votes.map(candidate => (
-      name: candidate_name(election_political_group.candidates.find(c => c.number == candidate.number)),
-      number: candidate.number,
-      votes: none,
-    )),
+    votes_columns: political_group.columns,
     continue_on_next_page: [#sym.arrow.r De lijst gaat verder op de volgende pagina],
     column_total: "Subtotaal kolom",
     sum_total: columns => [Totaal lijst (kolom #columns)],

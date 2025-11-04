@@ -2,7 +2,10 @@ use serde::{Deserialize, Serialize};
 
 use crate::{
     election::ElectionWithPoliticalGroups,
-    pdf_gen::models::{PdfFileModel, PdfModel, ToPdfFileModel},
+    pdf_gen::{
+        models::{PdfFileModel, PdfModel, ToPdfFileModel},
+        votes_table::CandidatesTables,
+    },
     polling_station::structs::PollingStation,
 };
 
@@ -10,6 +13,7 @@ use crate::{
 pub struct ModelN10_2Input {
     pub election: ElectionWithPoliticalGroups,
     pub polling_station: PollingStation,
+    pub candidates_tables: CandidatesTables,
 }
 
 impl ToPdfFileModel for ModelN10_2Input {

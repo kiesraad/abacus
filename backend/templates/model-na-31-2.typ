@@ -263,22 +263,12 @@ Voer de controle uit volgens de stappen in het controleprotocol.
 
 == Stemmen per lijst en per kandidaat
 
-#for political_group in input.summary.political_group_votes {
-  let election_political_group = input.election.political_groups.find(pg => pg.number == political_group.number)
-
-  if election_political_group == none {
-    continue
-  }
-
+#for political_group in input.votes_tables {
   votes_table(
-    title: [#political_group.number #election_political_group.name],
+    title: [#political_group.number #political_group.name],
     headers: ("Kandidaat", "", "Stemmen"),
     total: political_group.total,
-    values: political_group.candidate_votes.map(candidate => (
-      name: candidate_name(election_political_group.candidates.find(c => c.number == candidate.number)),
-      number: candidate.number,
-      votes: candidate.votes,
-    )),
+    votes_columns: political_group.columns,
     continue_on_next_page: [#sym.arrow.r De lijst gaat verder op de volgende pagina],
     column_total: "Subtotaal kolom",
     column_total_with_border: false,

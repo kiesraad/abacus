@@ -159,24 +159,16 @@ Vul alléén de getallen in die veranderd zijn ten opzichte van een eerdere tell
 
 #pagebreak(weak: true)
 
-#for political_group in input.election.political_groups {
+#for political_group in input.votes_tables {
   votes_table(
     title: [#political_group.number #political_group.name],
     headers: ("Kandidaat", "", "Oorspronkelijk", "Gecorrigeerd"),
     total: none,
-    values: political_group.candidates.map(candidate => (
-      name: candidate_name(candidate),
-      number: candidate.number,
-      votes: none,
-    )),
-    original_values: input.previous_results.political_group_votes.find(pg => pg.number == political_group.number).candidate_votes.map(candidate => (
-      number: candidate.number,
-      votes: candidate.votes,
-    )),
+    previous_total: political_group.previous_total,
+    votes_columns: political_group.columns,
     continue_on_next_page: [#sym.arrow.r De lijst gaat verder op de volgende pagina],
     column_total: "Subtotaal kolom",
     sum_total: columns => [Totaal lijst (kolom #columns)],
     total_instruction: [Neem dit totaal over in rubriek #ref(<cast_votes>) van deze bijlage bij de juiste lijst.],
-    break_count: (25, 25, 15, 15)
   )
 }

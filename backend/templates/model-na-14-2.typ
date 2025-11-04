@@ -149,26 +149,14 @@ ingevuld te worden in de kolom ‘gecorrigeerd'. Onder ‘oorspronkelijk’ staa
 
 == Stemmen per lijst en per kandidaat <per_list_and_candidate>
 
-#for political_group in input.election.political_groups {
-  let pg_votes = input.summary.political_group_votes.find((pgv) => pgv.number == political_group.number);
-  let pg_original_votes = input.previous_summary.political_group_votes.find((pgv) => pgv.number == political_group.number);
-
+#for political_group in input.votes_tables {
   votes_table(
-    original_values: political_group.candidates.map(candidate => (
-      name: candidate_name(candidate),
-      number: candidate.number,
-      votes: pg_original_votes.candidate_votes.find(cv => cv.number == candidate.number).votes,
-    )),
     title: [#political_group.number #political_group.name],
     headers: ("Kandidaat", "", "Oorspronkelijk", "Gecorrigeerd"),
     corrected_cells: 1,
-    total: pg_votes.total,
-    original_total: pg_original_votes.total,
-    values: political_group.candidates.map(candidate => (
-      name: candidate_name(candidate),
-      number: candidate.number,
-      votes: pg_votes.candidate_votes.find(cv => cv.number == candidate.number).votes,
-    )),
+    total: political_group.total,
+    previous_total: political_group.previous_total,
+    votes_columns: political_group.columns,
     continue_on_next_page: [#sym.arrow.r De lijst gaat verder op de volgende pagina],
     column_total: "Subtotaal kolom",
     sum_total: columns => [Totaal lijst (kolom #columns)],
@@ -176,7 +164,6 @@ ingevuld te worden in de kolom ‘gecorrigeerd'. Onder ‘oorspronkelijk’ staa
     explainer_text: [
       Vul alléén de getallen in die veranderd zijn ten opzichte van een eerdere telling. Getallen die niet zijn veranderd, hoeven niet ingevuld te worden in de kolom ‘gecorrigeerd'. Onder ‘oorspronkelijk’ staan de getallen die in de eerste zitting door het #location_type zijn vastgesteld.
     ],
-    break_count: (20, 20, 20, 20)
   )
 }
 

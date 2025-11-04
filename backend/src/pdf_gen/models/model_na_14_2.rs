@@ -5,7 +5,10 @@ use crate::{
     data_entry::CommonPollingStationResults,
     election::ElectionWithPoliticalGroups,
     investigation::PollingStationInvestigation,
-    pdf_gen::models::{PdfFileModel, PdfModel, ToPdfFileModel},
+    pdf_gen::{
+        models::{PdfFileModel, PdfModel, ToPdfFileModel},
+        votes_table::{VotesTablesWithOnlyPreviousVotes, VotesTablesWithPreviousVotes},
+    },
     polling_station::structs::PollingStation,
     summary::ElectionSummary,
 };
@@ -20,6 +23,7 @@ pub struct ModelNa14_2Input {
     pub summary: ElectionSummary,
     pub hash: String,
     pub creation_date_time: String,
+    pub votes_tables: VotesTablesWithPreviousVotes,
 }
 
 impl ToPdfFileModel for ModelNa14_2Input {
@@ -35,6 +39,7 @@ pub struct ModelNa14_2Bijlage1Input {
     pub polling_station: PollingStation,
     pub previous_results: CommonPollingStationResults,
     pub investigation: PollingStationInvestigation,
+    pub votes_tables: VotesTablesWithOnlyPreviousVotes,
 }
 
 impl ToPdfFileModel for ModelNa14_2Bijlage1Input {

@@ -3,7 +3,11 @@ use serde::{Deserialize, Serialize};
 use crate::{
     committee_session::CommitteeSession,
     election::ElectionWithPoliticalGroups,
-    pdf_gen::models::{PdfFileModel, PdfModel, ToPdfFileModel},
+    pdf_gen::{
+        CandidatesTables,
+        models::{PdfFileModel, PdfModel, ToPdfFileModel},
+        votes_table::VotesTables,
+    },
     polling_station::structs::PollingStation,
     summary::ElectionSummary,
 };
@@ -17,6 +21,7 @@ pub struct ModelNa31_2Input {
     pub polling_stations: Vec<PollingStation>,
     pub hash: String,
     pub creation_date_time: String,
+    pub votes_tables: VotesTables,
 }
 
 impl ToPdfFileModel for ModelNa31_2Input {
@@ -30,6 +35,7 @@ impl ToPdfFileModel for ModelNa31_2Input {
 pub struct ModelNa31_2Bijlage1Input {
     pub election: ElectionWithPoliticalGroups,
     pub polling_station: PollingStation,
+    pub candidates_tables: CandidatesTables,
 }
 
 impl ToPdfFileModel for ModelNa31_2Bijlage1Input {

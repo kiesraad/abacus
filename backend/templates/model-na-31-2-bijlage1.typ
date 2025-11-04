@@ -189,16 +189,12 @@ _(Gebruik het proces-verbaal van het stembureau #sym.arrow.r Tijdens de stemming
 
 == Stemmen per lijst en per kandidaat
 
-#for political_group in input.election.political_groups {
+#for political_group in input.candidates_tables {
   votes_table(
     title: [#political_group.number #political_group.name],
     headers: ("Kandidaat", "", "Stemmen"),
     total: none,
-    values: political_group.candidates.map(candidate => (
-      name: candidate_name(candidate),
-      number: candidate.number,
-      votes: none,
-    )),
+    votes_columns: political_group.columns,
     continue_on_next_page: [#sym.arrow.r De lijst gaat verder op de volgende pagina],
     column_total: "Subtotaal kolom",
     sum_total: columns => [Totaal lijst (kolom #columns)],

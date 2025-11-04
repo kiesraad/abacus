@@ -154,7 +154,7 @@ impl ElectionSummary {
 }
 
 /// Contains a summary of the differences, containing which polling stations had differences.
-#[derive(Debug, Serialize, Deserialize, ToSchema)]
+#[derive(Debug, Serialize, Deserialize, Clone, ToSchema)]
 #[serde(deny_unknown_fields)]
 pub struct SummaryDifferencesCounts {
     pub more_ballots_count: SumCount,
@@ -185,7 +185,7 @@ impl SummaryDifferencesCounts {
 
 /// Contains a summary count, containing both the count and a list of polling
 /// stations that contributed to it.
-#[derive(Debug, Serialize, Deserialize, ToSchema)]
+#[derive(Debug, Clone, Serialize, Deserialize, ToSchema)]
 #[serde(deny_unknown_fields)]
 pub struct SumCount {
     #[schema(value_type = u32)]
@@ -213,7 +213,7 @@ impl SumCount {
 
 /// Polling stations where results were investigated by the GSB,
 /// as vectors of polling station numbers
-#[derive(Serialize, Deserialize, Debug, ToSchema, Default)]
+#[derive(Serialize, Deserialize, Debug, Clone, ToSchema, Default)]
 #[serde(deny_unknown_fields)]
 pub struct PollingStationInvestigations {
     /// Admitted voters were recounted

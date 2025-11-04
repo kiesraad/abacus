@@ -1649,7 +1649,7 @@ dependencies = [
  "displaydoc",
  "litemap 0.8.0",
  "tinystr 0.8.1",
- "writeable 0.6.1",
+ "writeable 0.6.2",
  "zerovec 0.11.4",
 ]
 
@@ -1775,7 +1775,7 @@ checksum = "85962cf0ce02e1e0a629cc34e7ca3e373ce20dda4c4d7294bbd0bf1fdb59e614"
 dependencies = [
  "displaydoc",
  "icu_locale_core",
- "writeable 0.6.1",
+ "writeable 0.6.2",
  "yoke 0.8.0",
  "zerofrom",
  "zerotrie 0.2.2",
@@ -5065,9 +5065,9 @@ checksum = "1e9df38ee2d2c3c5948ea468a8406ff0db0b29ae1ffde1bcf20ef305bcc95c51"
 
 [[package]]
 name = "writeable"
-version = "0.6.1"
+version = "0.6.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ea2f10b9bb0928dfb1b42b65e1f9e36f7f54dbdf08457afefb38afcdec4fa2bb"
+checksum = "9edde0db4769d2dc68579893f2306b26c6ecfbe0ef499b013d731b7b9247e0b9"
 
 [[package]]
 name = "xmlparser"

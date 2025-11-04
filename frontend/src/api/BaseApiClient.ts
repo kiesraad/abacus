@@ -21,8 +21,10 @@ function isErrorResponse(object: unknown): object is ErrorResponse {
   );
 }
 
+type Method = "GET" | "POST" | "PUT" | "DELETE";
+
 export interface RequestParams {
-  method: "GET" | "POST" | "PUT" | "DELETE";
+  method: Method;
   path: string;
   callerAbortController?: AbortController;
   requestBody?: object | string;
@@ -108,7 +110,7 @@ export class BaseApiClient extends EventTarget {
   }
 
   // handle a response without a body, and return an error when there is a non-2xx status or a non-empty body
-  async handleEmptyOrNonJsonBody<T>(response: Response): Promise<ApiResult<T>> {
+  async handleEmptyOrNonJsonBody<T>(response: Response, method: Method): Promise<ApiResult<T>> {
     const body = await response.text();
 
     if (response.status === 404) {
@@ -131,6 +133,12 @@ export class BaseApiClient extends EventTarget {
     }
 
     if (response.ok) {
+      // a successful GET request with an empty body and a 200 status indicates a throttled or cancelled request
+      // our API should always send a 204 status for empty responses
+      if (method === "GET" && response.status === 200) {
+        return new AbortedError();
+      }
+
       return {
         status: ApiResponseStatus.Success,
         code: response.status,
@@ -175,7 +183,7 @@ export class BaseApiClient extends EventTarget {
       // handle the response, and return an error when state there is a non-2xx status
       const apiResult: ApiResult<T> = isJson
         ? await this.handleJsonBody<T>(response)
-        : await this.handleEmptyOrNonJsonBody(response);
+        : await this.handleEmptyOrNonJsonBody(response, method);
 
       // dispatch error events to subscribers
       if (apiResult instanceof ApiError || apiResult instanceof FatalApiError) {

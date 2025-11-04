@@ -50,12 +50,12 @@ export function OverviewPage() {
 
   useLiveData(refetchElections);
 
-  if (getElections.status === "api-error") {
-    throw getElections.error;
-  }
-
   if (getElections.status === "loading") {
     return <Loader />;
+  }
+
+  if (getElections.status !== "success") {
+    throw getElections.error;
   }
 
   const committeeSessionList = getElections.data.committee_sessions;

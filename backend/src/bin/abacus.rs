@@ -32,6 +32,7 @@ struct Args {
     reset_database: bool,
 
     /// Enable airgap detection
+    #[cfg(not(feature = "airgap-detection"))]
     #[arg(short, long, env = "ABACUS_AIRGAP_DETECTION")]
     airgap_detection: bool,
 }
@@ -66,7 +67,11 @@ async fn run() -> Result<(), AppError> {
     .await?;
 
     // Enable airgap detection if the feature is enabled or if the command line argument is set.
-    let enable_airgap_detection = args.airgap_detection || cfg!(feature = "airgap-detection");
+    #[cfg(feature = "airgap-detection")]
+    let enable_airgap_detection = true;
+
+    #[cfg(not(feature = "airgap-detection"))]
+    let enable_airgap_detection = args.airgap_detection;
 
     let address = SocketAddr::from((Ipv4Addr::UNSPECIFIED, args.port));
 

@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<EML xmlns="urn:oasis:names:tc:evs:schema:eml" xmlns:ds="http://www.w3.org/2000/09/xmldsig#" xmlns:kr="http://www.kiesraad.nl/extensions" xmlns:xal="urn:oasis:names:tc:ciq:xsdschema:xAL:2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" Id="110b" SchemaVersion="5">
+  <TransactionId>1</TransactionId>
+  <ManagingAuthority>
+    <AuthorityIdentifier Id="42">Juinen</AuthorityIdentifier>
+    <AuthorityAddress/>
+  </ManagingAuthority>
+  <kr:CreationDateTime>2025-08-29T00:00:00</kr:CreationDateTime>
+  <ds:CanonicalizationMethod Algorithm="http://www.w3.org/TR/2001/REC-xml-c14n-20010315#WithComments"/>
+  <ElectionEvent>
+    <EventIdentifier/>
+    <Election>
+      <ElectionIdentifier Id="GR2025_Juinen">
+        <ElectionName>Gemeenteraad 2025 Juinen</ElectionName>
+        <ElectionCategory>GR</ElectionCategory>
+        <kr:ElectionSubcategory>GR2</kr:ElectionSubcategory>
+        <kr:ElectionDate>2025-08-29</kr:ElectionDate>
+      </ElectionIdentifier>
+      <Contest>
+        <ContestIdentifier Id="geen"/>
+        <ReportingUnit>
+          <ReportingUnitIdentifier Id="42">Juinen</ReportingUnitIdentifier>
+        </ReportingUnit>
+        <VotingMethod />
+        <MaxVotes>3353</MaxVotes>
+        <PollingPlace Channel="polling">
+          <PhysicalLocation>
+            <Address>
+              <Locality>
+                <xal:LocalityName>Studio The Rules</xal:LocalityName>
+                <xal:PostalCode>
+                  <xal:PostalCodeNumber>2541 AA</xal:PostalCodeNumber>
+                </xal:PostalCode>
+              </Locality>
+            </Address>
+            <PollingStation Id="1">1</PollingStation>
+          </PhysicalLocation>
+        </PollingPlace>
+        <PollingPlace Channel="polling">
+          <PhysicalLocation>
+            <Address>
+              <Locality>
+                <xal:LocalityName>De Mattenklopper</xal:LocalityName>
+                <xal:PostalCode>
+                  <xal:PostalCodeNumber>2541 BB</xal:PostalCodeNumber>
+                </xal:PostalCode>
+              </Locality>
+            </Address>
+            <PollingStation Id="2">2</PollingStation>
+          </PhysicalLocation>
+        </PollingPlace>
+        <PollingPlace Channel="polling">
+          <PhysicalLocation>
+            <Address>
+              <Locality>
+                <xal:LocalityName>De Positivozaal</xal:LocalityName>
+                <xal:PostalCode>
+                  <xal:PostalCodeNumber>2541 CC</xal:PostalCodeNumber>
+                </xal:PostalCode>
+              </Locality>
+            </Address>
+            <PollingStation Id="3">3</PollingStation>
+          </PhysicalLocation>
+        </PollingPlace>
+      </Contest>
+    </Election>
+  </ElectionEvent>
+</EML>

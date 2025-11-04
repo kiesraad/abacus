@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<EML xmlns:xnl="urn:oasis:names:tc:ciq:xsdschema:xNL:2.0" xmlns="urn:oasis:names:tc:evs:schema:eml" xmlns:xal="urn:oasis:names:tc:ciq:xsdschema:xAL:2.0" xmlns:kr="http://www.kiesraad.nl/extensions" Id="110a" SchemaVersion="5">
+    <TransactionId>1</TransactionId>
+    <IssueDate>2025-08-29</IssueDate>
+    <kr:CreationDateTime>2025-08-29T00:00:00.000</kr:CreationDateTime>
+    <ElectionEvent>
+        <EventIdentifier/>
+        <Election>
+            <ElectionIdentifier Id="GR2025_Juinen">
+                <ElectionName>Gemeenteraad 2025 Juinen</ElectionName>
+                <ElectionCategory>GR</ElectionCategory>
+                <kr:ElectionSubcategory>GR2</kr:ElectionSubcategory>
+                <kr:ElectionDomain Id="42">Juinen</kr:ElectionDomain>
+                <kr:ElectionDate>2025-08-29</kr:ElectionDate>
+                <kr:NominationDate>2025-07-10</kr:NominationDate>
+            </ElectionIdentifier>
+            <Contest>
+                <ContestIdentifier Id="geen"/>
+                <VotingMethod>SPV</VotingMethod>
+                <MaxVotes></MaxVotes>
+            </Contest>
+            <kr:NumberOfSeats>45</kr:NumberOfSeats>
+            <kr:PreferenceThreshold>25</kr:PreferenceThreshold>
+            <kr:ElectionTree>
+                <kr:Region RegionNumber="000" RegionCategory="GEMEENTE">
+                    <kr:RegionName>Juinen</kr:RegionName>
+                    <kr:Committee CommitteeCategory="CSB"/>
+                    <kr:Committee CommitteeCategory="HSB"/>
+                </kr:Region>
+            </kr:ElectionTree>
+            <kr:RegisteredParties>
+                <kr:RegisteredParty>
+                    <kr:RegisteredAppellation>Lijst Hekking</kr:RegisteredAppellation>
+                </kr:RegisteredParty>
+                <kr:RegisteredParty>
+                    <kr:RegisteredAppellation>De Tegenpartij</kr:RegisteredAppellation>
+                </kr:RegisteredParty>
+                <kr:RegisteredParty>
+                    <kr:RegisteredAppellation>Juinen Vooruit</kr:RegisteredAppellation>
+                </kr:RegisteredParty>
+                <kr:RegisteredParty>
+                    <kr:RegisteredAppellation>Stadspartij Juinen</kr:RegisteredAppellation>
+                </kr:RegisteredParty>
+            </kr:RegisteredParties>
+        </Election>
+    </ElectionEvent>
+</EML>

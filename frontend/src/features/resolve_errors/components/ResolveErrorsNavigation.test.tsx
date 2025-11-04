@@ -31,7 +31,13 @@ describe("ResolveErrorsNavigation", () => {
   };
 
   const renderNavigation = (validationResults: ValidationResults, testStructure: DataEntryStructure = structure) => {
-    return render(<ResolveErrorsNavigation structure={testStructure} validationResults={validationResults} />);
+    return render(
+      <ResolveErrorsNavigation
+        structure={testStructure}
+        validationResults={validationResults}
+        dataEntryStatus={"definitive"}
+      />,
+    );
   };
 
   beforeEach(() => {

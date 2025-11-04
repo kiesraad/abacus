@@ -5186,10 +5186,7 @@
             "$ref": "#/components/schemas/DataEntryStatusName"
           },
           "user_id": {
-            "type": [
-              "integer",
-              "null"
-            ],
+            "type": "integer",
             "format": "int32",
             "minimum": 0
           },
@@ -5736,8 +5733,8 @@
           "DataEntryAlreadyClaimed",
           "DataEntryAlreadyFinalised",
           "DataEntryCannotBeDeleted",
+          "DataEntryGetNotAllowed",
           "DataEntryNotAllowed",
-          "DataEntryStatusNotAllowed",
           "EmlImportError",
           "EntryNotFound",
           "EntryNotUnique",

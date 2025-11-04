@@ -592,7 +592,7 @@ export interface DataEntryGetDifferencesResponse {
 export interface DataEntryGetResponse {
   data: PollingStationResults;
   status: DataEntryStatusName;
-  user_id?: number | null;
+  user_id?: number;
   validation_results: ValidationResults;
 }
 
@@ -789,8 +789,8 @@ export type ErrorReference =
   | "DataEntryAlreadyClaimed"
   | "DataEntryAlreadyFinalised"
   | "DataEntryCannotBeDeleted"
+  | "DataEntryGetNotAllowed"
   | "DataEntryNotAllowed"
-  | "DataEntryStatusNotAllowed"
   | "EmlImportError"
   | "EntryNotFound"
   | "EntryNotUnique"

@@ -29,7 +29,7 @@ export function ResolveErrorsIndexPage() {
         pushMessage({
           title: t("election_status.success.data_entry_resumed", {
             nr: pollingStation.number,
-            typist: dataEntry?.user_id ? getName(dataEntry.user_id) : t("typist").toLowerCase(),
+            typist: getName(dataEntry?.user_id),
           }),
           text: t("election_status.success.typist_can_continue_data_entry"),
         });
@@ -74,7 +74,7 @@ export function ResolveErrorsIndexPage() {
               <ChoiceList.Radio
                 id="keep_entry"
                 label={tx("resolve_errors.options.resume_first_entry", undefined, {
-                  name: dataEntry.user_id ? getName(dataEntry.user_id) : t("typist").toLowerCase(),
+                  name: getName(dataEntry.user_id),
                 })}
                 checked={action === "resume_first_entry"}
                 onChange={() => {

@@ -10,7 +10,7 @@ import { Error } from "./Error";
 
 interface FatalErrorPageProps {
   title?: TranslationPath;
-  message?: string;
+  message?: string | React.ReactNode;
   reference?: ErrorReference;
   code?: number;
   error?: Error;

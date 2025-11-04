@@ -43,14 +43,12 @@ fn different_data_entries() -> (DataEntry, DataEntry) {
     (first_data_entry, second_data_entry)
 }
 
-async fn get_resolve_errors(
+async fn get_data_entry(
     addr: &SocketAddr,
     cookie: &HeaderValue,
     polling_station_id: u32,
 ) -> Response {
-    let url = format!(
-        "http://{addr}/api/polling_stations/{polling_station_id}/data_entries/resolve_errors"
-    );
+    let url = format!("http://{addr}/api/polling_stations/{polling_station_id}/data_entries/get");
     Client::new()
         .get(&url)
         .header("cookie", cookie)
@@ -122,13 +120,9 @@ async fn test_polling_station_data_entry_get_errors(pool: SqlitePool) {
     assert_eq!(data_entry_status["status"], "first_entry_has_errors");
 
     let coordinator_cookie = shared::coordinator_login(&addr).await;
-    let res = get_resolve_errors(&addr, &coordinator_cookie, 1).await;
+    let res = get_data_entry(&addr, &coordinator_cookie, 1).await;
     assert_eq!(res.status(), StatusCode::OK);
     let result: serde_json::Value = res.json().await.unwrap();
-
-    assert!(result["first_entry_user_id"].is_number());
-    assert!(result["finalised_first_entry"].is_object());
-    assert!(result["first_entry_finished_at"].is_string());
 
     assert_eq!(
         result["validation_results"]["errors"],
@@ -156,12 +150,12 @@ async fn test_polling_station_data_entry_get_errors(pool: SqlitePool) {
     )
     .await;
 
-    let res = get_resolve_errors(&addr, &coordinator_cookie, 1).await;
+    let res = get_data_entry(&addr, &coordinator_cookie, 1).await;
     assert_eq!(res.status(), StatusCode::OK);
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
-async fn test_polling_station_data_entry_errors_not_found(pool: SqlitePool) {
+async fn test_polling_station_data_entry_no_errors(pool: SqlitePool) {
     let addr = utils::serve_api(pool).await;
 
     let typist = shared::typist_login(&addr).await;
@@ -171,8 +165,16 @@ async fn test_polling_station_data_entry_errors_not_found(pool: SqlitePool) {
     assert_eq!(data_entry_status["status"], "second_entry_not_started");
 
     let coordinator = shared::coordinator_login(&addr).await;
-    let res = get_resolve_errors(&addr, &coordinator, 1).await;
-    assert_eq!(res.status(), StatusCode::NOT_FOUND);
+    let res = get_data_entry(&addr, &coordinator, 1).await;
+    assert_eq!(res.status(), StatusCode::OK);
+
+    let body: serde_json::Value = res.json().await.unwrap();
+    assert!(
+        body["validation_results"]["errors"]
+            .as_array()
+            .unwrap()
+            .is_empty()
+    );
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]

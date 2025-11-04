@@ -40,9 +40,9 @@ export function DataEntrySection() {
 
   const formId = section.id + "_form";
 
-  const bottomBarType = section.subsections.some((subsection) => subsection.type === "inputGrid")
-    ? "inputGrid"
-    : "form";
+  const lastSubsection = section.subsections[section.subsections.length - 1];
+  const bottomBarType = lastSubsection?.type === "inputGrid" ? "inputGrid" : "form";
+
   const keyboardHintText = section.id.startsWith("political_group_votes_") ? t("candidates_votes.goto_totals") : null;
 
   // Missing totals error for political group votes form

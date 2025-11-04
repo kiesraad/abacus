@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { startTransition, useEffect, useState } from "react";
 
 import { useInitialApiGetWithErrors } from "@/api/useInitialApiGet";
 import { Footer } from "@/components/footer/Footer";
@@ -60,10 +60,13 @@ export function InitialiseApplicationPage() {
 
   // navigate to login if admin exists
   useEffect(() => {
-    if (adminExists.requestState.status === "success") {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setStep(InitialiseSteps.Login);
+    if (adminExists.requestState.status !== "success") {
+      return;
     }
+
+    startTransition(() => {
+      setStep(InitialiseSteps.Login);
+    });
   }, [adminExists.requestState]);
 
   return (

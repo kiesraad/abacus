@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { startTransition, useEffect, useRef, useState } from "react";
 
 import { Alert } from "@/components/ui/Alert/Alert";
 import { Message } from "@/hooks/messages/MessagesContext";
@@ -11,11 +11,15 @@ export function Messages() {
 
   useEffect(() => {
     // Check if we already retrieved the messages, to make this work during development with react strict mode
-    if (!messagesRetrieved.current) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setMessages(popMessages());
-      messagesRetrieved.current = true;
+    if (messagesRetrieved.current) {
+      return;
     }
+
+    messagesRetrieved.current = true;
+
+    startTransition(() => {
+      setMessages(popMessages());
+    });
   }, [messages, popMessages]);
 
   function closeHandler(index: number) {

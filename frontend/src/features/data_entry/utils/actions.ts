@@ -7,8 +7,9 @@ import {
   PollingStationResults,
   SaveDataEntryResponse,
 } from "@/types/generated/openapi";
-import { FormSectionId, SectionValues } from "@/types/types";
+import { DataEntryResults, FormSectionId, SectionValues } from "@/types/types";
 import { mapSectionValues } from "@/utils/dataEntryMapping";
+import { isRecord } from "@/utils/typeChecks";
 
 import {
   DataEntryDispatch,
@@ -18,6 +19,16 @@ import {
   TemporaryCache,
 } from "../types/types";
 import { calculateDataEntryProgress, getClientState } from "./dataEntryUtils";
+
+function isPollingStationResults(value: DataEntryResults): value is PollingStationResults {
+  if (!isRecord(value)) {
+    return false;
+  }
+
+  const model = value.model;
+
+  return typeof model === "string" && (model === "CSOFirstSession" || model === "CSONextSession");
+}
 
 export function setCache(dispatch: DataEntryDispatch) {
   return (cache: TemporaryCache) => {
@@ -72,6 +83,10 @@ export function onSubmitForm(
       return false;
     }
 
+    if (!isPollingStationResults(state.pollingStationResults)) {
+      return false;
+    }
+
     let data = mapSectionValues(state.pollingStationResults, currentValues, dataEntrySection);
     if (aborting && state.cache) {
       const cache = state.cache;
@@ -95,8 +110,7 @@ export function onSubmitForm(
 
     const response: ApiResult<SaveDataEntryResponse> = await client.postRequest(requestPath, {
       progress,
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
-      data: data as PollingStationResults,
+      data,
       client_state: clientState,
     } satisfies DataEntry);
 

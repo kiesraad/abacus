@@ -3,6 +3,7 @@ import { ReactNode } from "react";
 import { Badge } from "@/components/ui/Badge/Badge";
 import { ProgressBar } from "@/components/ui/ProgressBar/ProgressBar";
 import { Table } from "@/components/ui/Table/Table";
+import { useUserRole } from "@/hooks/user/useUserRole.ts";
 import { t } from "@/i18n/translate";
 import { DataEntryStatusName } from "@/types/generated/openapi";
 import { formatDateTime } from "@/utils/dateTime";
@@ -23,10 +24,19 @@ const SHOW_BADGE: DataEntryStatusName[] = [
 ];
 
 export function CategoryRow({ category, pollingStation, addLink }: CategoryRowProps): ReactNode {
-  if (
-    addLink &&
-    (pollingStation.status === "entries_different" || pollingStation.status === "first_entry_has_errors")
-  ) {
+  const { isCoordinator } = useUserRole();
+
+  let link = null;
+  if (pollingStation.status === "entries_different" || pollingStation.status === "first_entry_has_errors") {
+    link =
+      pollingStation.status === "entries_different"
+        ? `./${pollingStation.id}/resolve-differences`
+        : `./${pollingStation.id}/resolve-errors`;
+  } else if (isCoordinator && pollingStation.status != "first_entry_not_started") {
+    link = `./${pollingStation.id}/detail`;
+  }
+
+  if (addLink && link) {
     return (
       <Table.LinkRow
         to={

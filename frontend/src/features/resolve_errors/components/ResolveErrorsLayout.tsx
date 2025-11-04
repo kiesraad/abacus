@@ -42,8 +42,12 @@ export function ResolveErrorsLayout() {
       </header>
       <Messages />
       <main className={cls.resolveErrors}>
-        <StickyNav>
-          <ResolveErrorsNavigation structure={structure} validationResults={dataEntry.validation_results} />
+        <StickyNav v-if={dataEntry.status == "first_entry_has_errors"}>
+          <ResolveErrorsNavigation
+            dataEntryStatus={dataEntry.status}
+            structure={structure}
+            validationResults={dataEntry.validation_results}
+          />
         </StickyNav>
         <article>
           <Outlet />

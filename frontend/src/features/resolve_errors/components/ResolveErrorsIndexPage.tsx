@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router";
+import { Navigate, useNavigate } from "react-router";
 
 import { Button } from "@/components/ui/Button/Button";
 import { ChoiceList } from "@/components/ui/CheckboxAndRadio/ChoiceList";
@@ -51,6 +51,15 @@ export function ResolveErrorsIndexPage() {
   }
 
   const structure = getDataEntryStructure(dataEntry.data.model, election);
+
+  if (dataEntry.status !== "first_entry_has_errors") {
+    const fixedSections = structure.filter((section) => !section.id.startsWith("political_group_votes_"))[0];
+
+    // Redirect to first section because Coordinator is viewing the read-only version.
+    // Therefor no need to show "resolve errors/warnings section"
+    const basePath = `/elections/${election.id}/status/${pollingStationId}/detail`;
+    return <Navigate to={basePath ? `${basePath}/${fixedSections?.id}` : basePath} />;
+  }
 
   return (
     <>

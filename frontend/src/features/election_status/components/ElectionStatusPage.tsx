@@ -29,7 +29,7 @@ export function ElectionStatusPage() {
   const { statuses, refetch: refetchStatuses } = useElectionStatus();
   const { isCoordinator } = useUserRole();
   const [showPauseModal, setShowPauseModal] = useState(false);
-  const updatePath: COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_PATH = `/api/elections/${currentCommitteeSession.id}/committee_sessions/${currentCommitteeSession.id}/status`;
+  const updatePath: COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_PATH = `/api/elections/${currentCommitteeSession.election_id}/committee_sessions/${currentCommitteeSession.id}/status`;
   const { update } = useCrud({ updatePath, throwAllErrors: true });
 
   useLiveData(refetchElection, true);

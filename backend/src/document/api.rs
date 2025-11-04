@@ -45,6 +45,7 @@ pub fn router() -> OpenApiRouter<AppState> {
     params(
         ("election_id" = u32, description = "Election database id"),
     ),
+    security(("cookie_auth" = ["administrator", "coordinator"])),
 )]
 async fn election_download_na_31_2_bijlage1(
     _user: AdminOrCoordinator,
@@ -127,6 +128,7 @@ async fn election_download_na_31_2_bijlage1(
     params(
         ("election_id" = u32, description = "Election database id"),
     ),
+    security(("cookie_auth" = ["administrator", "coordinator"])),
 )]
 async fn election_download_n_10_2(
     _user: AdminOrCoordinator,

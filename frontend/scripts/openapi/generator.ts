@@ -52,7 +52,17 @@ function addPath(path: string, v: PathsObject | undefined) {
   const result: string[] = [`// ${path}`];
   for (const method in v) {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
-    result.push(addRequest(path, v[method] as OperationObject));
+    const operation = v[method] as OperationObject;
+
+    // Add auth requirements
+    if (operation.security) {
+      const cookie_auth = operation.security.find((s) => "cookie_auth" in s)?.cookie_auth;
+      result.push(`// Roles: ${cookie_auth ? cookie_auth.join(", ") : "none"} `);
+    } else {
+      result.push(`// No authentication required`);
+    }
+
+    result.push(addRequest(path, operation));
   }
 
   return result.join("\n");

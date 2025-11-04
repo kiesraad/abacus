@@ -88,6 +88,7 @@ async fn validate_and_get_committee_session(
     params(
         ("polling_station_id" = u32, description = "Polling station database id"),
     ),
+    security(("cookie_auth" = ["coordinator"])),
 )]
 async fn polling_station_investigation_create(
     _user: Coordinator,
@@ -154,6 +155,7 @@ async fn polling_station_investigation_create(
     params(
         ("polling_station_id" = u32, description = "Polling station database id"),
     ),
+    security(("cookie_auth" = ["coordinator"])),
 )]
 async fn polling_station_investigation_conclude(
     _user: Coordinator,
@@ -224,6 +226,7 @@ async fn polling_station_investigation_conclude(
     params(
         ("polling_station_id" = u32, description = "Polling station database id"),
     ),
+    security(("cookie_auth" = ["coordinator"])),
 )]
 async fn polling_station_investigation_update(
     _user: Coordinator,
@@ -319,6 +322,7 @@ async fn polling_station_investigation_update(
     params(
         ("polling_station_id" = u32, description = "Polling station database id"),
     ),
+    security(("cookie_auth" = ["coordinator"])),
 )]
 async fn polling_station_investigation_delete(
     _user: Coordinator,
@@ -409,6 +413,7 @@ async fn polling_station_investigation_delete(
     params(
         ("polling_station_id" = u32, description = "Polling station database id"),
     ),
+    security(("cookie_auth" = ["coordinator"])),
 )]
 async fn polling_station_investigation_download_corrigendum_pdf(
     _user: Coordinator,

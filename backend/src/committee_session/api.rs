@@ -78,6 +78,7 @@ pub async fn validate_committee_session_is_current_committee_session(
     params(
         ("election_id" = u32, description = "Election database id"),
     ),
+    security(("cookie_auth" = ["coordinator"])),
 )]
 pub async fn committee_session_create(
     _user: Coordinator,
@@ -136,6 +137,7 @@ pub async fn committee_session_create(
         ("election_id" = u32, description = "Election database id"),
         ("committee_session_id" = u32, description = "Committee session database id"),
     ),
+    security(("cookie_auth" = ["coordinator"])),
 )]
 pub async fn committee_session_delete(
     _user: Coordinator,
@@ -195,6 +197,7 @@ pub async fn committee_session_delete(
         ("election_id" = u32, description = "Election database id"),
         ("committee_session_id" = u32, description = "Committee session database id"),
     ),
+    security(("cookie_auth" = ["coordinator"])),
 )]
 pub async fn committee_session_update(
     _user: Coordinator,
@@ -265,6 +268,7 @@ pub async fn committee_session_update(
         ("election_id" = u32, description = "Election database id"),
         ("committee_session_id" = u32, description = "Committee session database id"),
     ),
+    security(("cookie_auth" = ["coordinator"])),
 )]
 pub async fn committee_session_number_of_voters_change(
     _user: Coordinator,
@@ -319,6 +323,7 @@ pub async fn committee_session_number_of_voters_change(
         ("election_id" = u32, description = "Election database id"),
         ("committee_session_id" = u32, description = "Committee session database id"),
     ),
+    security(("cookie_auth" = ["coordinator"])),
 )]
 pub async fn committee_session_status_change(
     _user: Coordinator,

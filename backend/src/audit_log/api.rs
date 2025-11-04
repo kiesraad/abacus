@@ -70,6 +70,7 @@ pub struct LogFilterQuery {
         (status = 403, description = "Forbidden", body = ErrorResponse),
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
+    security(("cookie_auth" = ["administrator", "coordinator"])),
 )]
 async fn audit_log_list(
     _user: AdminOrCoordinator,
@@ -115,6 +116,7 @@ pub struct AuditLogUser {
         (status = 403, description = "Forbidden", body = ErrorResponse),
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
+    security(("cookie_auth" = ["administrator", "coordinator"])),
 )]
 async fn audit_log_list_users(
     _user: AdminOrCoordinator,

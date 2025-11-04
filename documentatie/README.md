@@ -29,6 +29,10 @@ Hier vind je de documentatie over Abacus. De documentatie wordt telkens aangevul
 
 Voor informatie over het installeren, starten en gebruiken van Abacus ga je naar de website [Abacus Documentatie](https://kiesraad.github.io/abacus-documentatie/). Hier vind je niet alleen alle beschikbare gebruikersdocumentatie, maar bieden we ook uitleg over het verkiezingsproces.
 
+## Processen-verbaal voor testen
+
+In de map [testdocumenten](./testdocumenten/) vind je processen-verbaal en een corrigendum waarmee je een testverkiezing in Abacus kunt invoeren.
+
 ## Externe documentatie
 
 - [Formele beschrijving van de berekening van de zetelverdeling - kiesraad.nl](https://www.kiesraad.nl/adviezen-en-publicaties/formulieren/2016/osv/osv-bestanden/formele-beschrijving-berekening-zetelverdeling)

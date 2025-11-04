@@ -31,7 +31,7 @@ Voor informatie over het installeren, starten en gebruiken van Abacus ga je naar
 
 ## Processen-verbaal voor testen
 
-In de map [testdocumenten](./testdocumenten/) vind je processen-verbaal en een corrigendum waarmee je een testverkiezing in Abacus kunt invoeren.
+In de map [testdocumenten](./testdocumenten/) vind je processen-verbaal en een corrigendum waarmee je een testverkiezing in Abacus kunt invoeren. Ook staan daar de eml-bestanden waarmee je als beheerder de verkiezing kunt toevoegen.
 
 ## Externe documentatie
 

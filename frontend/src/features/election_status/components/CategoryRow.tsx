@@ -26,15 +26,28 @@ const SHOW_BADGE: DataEntryStatusName[] = [
 export function CategoryRow({ category, pollingStation, addLink }: CategoryRowProps): ReactNode {
   const { isCoordinator } = useUserRole();
 
-  let link = null;
-  if (pollingStation.status === "entries_different" || pollingStation.status === "first_entry_has_errors") {
-    link =
-      pollingStation.status === "entries_different"
-        ? `./${pollingStation.id}/resolve-differences`
-        : `./${pollingStation.id}/detail`;
-  } else if (isCoordinator && pollingStation.status != "first_entry_not_started") {
-    link = `./${pollingStation.id}/detail`;
-  }
+  const getCategoryRowUrl = (): string | null => {
+    let link = null;
+
+    switch (pollingStation.status) {
+      case "entries_different":
+      case "first_entry_has_errors":
+        link =
+          pollingStation.status === "entries_different"
+            ? `./${pollingStation.id}/resolve-differences`
+            : `./${pollingStation.id}/detail`;
+        break;
+      default:
+        if (isCoordinator && pollingStation.status != "first_entry_not_started") {
+          link = `./${pollingStation.id}/detail`;
+        }
+        break;
+    }
+
+    return link;
+  };
+
+  const link = getCategoryRowUrl();
 
   if (addLink && link) {
     return (

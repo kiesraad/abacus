@@ -30,6 +30,34 @@ export function ResolveErrorsLayout() {
 
   const structure = getDataEntryStructure(dataEntry.data.model, election);
 
+  if (dataEntry.status == "first_entry_has_errors") {
+    return (
+      <>
+        <PageTitle title={`${t("resolve_errors.page_title")} - Abacus`} />
+        <header>
+          <section className="smaller-gap">
+            <PollingStationNumber>{pollingStation.number}</PollingStationNumber>
+            <h1>{pollingStation.name}</h1>
+            <Badge type={dataEntry.status} />
+          </section>
+        </header>
+        <Messages />
+        <main className={cls.resolveErrors}>
+          <StickyNav>
+            <ResolveErrorsNavigation
+              dataEntryStatus={dataEntry.status}
+              structure={structure}
+              validationResults={dataEntry.validation_results}
+            />
+          </StickyNav>
+          <article>
+            <Outlet />
+          </article>
+        </main>
+      </>
+    );
+  }
+
   return (
     <>
       <PageTitle title={`${t("resolve_errors.page_title")} - Abacus`} />
@@ -42,13 +70,6 @@ export function ResolveErrorsLayout() {
       </header>
       <Messages />
       <main className={cls.resolveErrors}>
-        <StickyNav v-if={dataEntry.status == "first_entry_has_errors"}>
-          <ResolveErrorsNavigation
-            dataEntryStatus={dataEntry.status}
-            structure={structure}
-            validationResults={dataEntry.validation_results}
-          />
-        </StickyNav>
         <article>
           <Outlet />
         </article>

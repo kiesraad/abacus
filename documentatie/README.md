@@ -29,9 +29,12 @@ Hier vind je de documentatie over Abacus. De documentatie wordt telkens aangevul
 
 Voor informatie over het installeren, starten en gebruiken van Abacus ga je naar de website [Abacus Documentatie](https://kiesraad.github.io/abacus-documentatie/). Hier vind je niet alleen alle beschikbare gebruikersdocumentatie, maar bieden we ook uitleg over het verkiezingsproces.
 
-## Processen-verbaal voor testen
+## Testdocumenten
 
-In de map [testdocumenten](./testdocumenten/) vind je processen-verbaal en een corrigendum waarmee je een testverkiezing in Abacus kunt invoeren. Ook staan daar de eml-bestanden waarmee je als beheerder de verkiezing kunt toevoegen.
+In de repository `abacus-documentatie` staan verschillende testdocumenten:
+
+- In de map [pvs-juinen](https://github.com/kiesraad/abacus-documentatie/tree/src/main/testdocumenten/test-pvs-juinen/) staan de processen-verbaal voor de testgemeente Juinen, waarmee je de testverkiezing kunt invoeren.
+- Daarnaast staan in de map [emls-juinen](https://github.com/kiesraad/abacus-documentatie/tree/src/main/testdocumenten/test-emls-juinen/) de eml-bestanden waarmee je deze testverkiezing zelf kunt toevoegen.
 
 ## Externe documentatie
 

@@ -5639,6 +5639,9 @@
             "description": "First entry user id",
             "minimum": 0
           },
+          "has_warnings": {
+            "type": "boolean"
+          },
           "polling_station_id": {
             "type": "integer",
             "format": "int32",

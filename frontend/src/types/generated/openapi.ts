@@ -746,6 +746,7 @@ export interface ElectionStatusResponseEntry {
   first_entry_progress?: number;
   /** First entry user id */
   first_entry_user_id?: number;
+  has_warnings?: boolean;
   /** Polling station id */
   polling_station_id: number;
   /** Second entry progress as a percentage (0 to 100) */

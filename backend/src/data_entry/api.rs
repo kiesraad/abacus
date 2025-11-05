@@ -467,13 +467,15 @@ async fn polling_station_data_entry_delete(
 ) -> Result<StatusCode, APIError> {
     let mut tx = pool.begin_immediate().await?;
 
-    let (_, _, committee_session, state) =
+    let (polling_station, election, committee_session, state) =
         validate_and_get_data(&mut tx, polling_station_id, &user.0).await?;
 
     let user_id = user.0.id();
     let new_state = match entry_number {
         EntryNumber::FirstEntry => state.delete_first_entry(user_id)?,
-        EntryNumber::SecondEntry => state.delete_second_entry(user_id)?,
+        EntryNumber::SecondEntry => {
+            state.delete_second_entry(user_id, &polling_station, &election)?
+        }
     };
 
     let mut data_entry = get_data_entry(&mut tx, polling_station_id, committee_session.id).await?;
@@ -929,7 +931,9 @@ async fn polling_station_data_entry_resolve_differences(
         validate_and_get_data(&mut tx, polling_station_id, &user.0).await?;
 
     let new_state = match action {
-        ResolveDifferencesAction::KeepFirstEntry => state.keep_first_entry()?,
+        ResolveDifferencesAction::KeepFirstEntry => {
+            state.keep_first_entry(&polling_station, &election)?
+        }
         ResolveDifferencesAction::KeepSecondEntry => {
             state.keep_second_entry(&polling_station, &election)?
         }
@@ -998,6 +1002,9 @@ pub struct ElectionStatusResponseEntry {
     #[schema(value_type = String)]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub finished_at: Option<DateTime<Utc>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[schema(nullable = false)]
+    pub has_warnings: Option<bool>,
 }
 
 /// Get election polling stations data entry statuses
@@ -1105,6 +1112,18 @@ mod tests {
             }),
             client_state: ClientState(None),
         }
+    }
+
+    fn example_data_entry_with_warning() -> DataEntry {
+        let mut data_entry = example_data_entry().clone();
+
+        data_entry.data.votes_counts_mut().blank_votes_count = 52;
+        data_entry
+            .data
+            .votes_counts_mut()
+            .total_votes_candidates_count = 46;
+
+        data_entry
     }
 
     async fn get_data_entry_status(
@@ -1815,9 +1834,21 @@ mod tests {
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
     async fn test_polling_station_data_entry_delete_second_entry(pool: SqlitePool) {
         // create data entry
-        let request_body = example_data_entry();
+        let request_body = example_data_entry_with_warning();
         let response = claim(pool.clone(), 1, EntryNumber::FirstEntry).await;
         assert_eq!(response.status(), StatusCode::OK);
+
+        let body = response.into_body().collect().await.unwrap().to_bytes();
+        let result: ClaimDataEntryResponse = serde_json::from_slice(&body).unwrap();
+
+        let warnings = result.validation_results.warnings;
+        assert_eq!(warnings.len(), 1);
+        assert_eq!(warnings[0].code, ValidationResultCode::W201);
+        assert_eq!(
+            warnings[0].fields,
+            vec!["data.votes_counts.blank_votes_count",]
+        );
+
         let response = save(
             pool.clone(),
             request_body.clone(),

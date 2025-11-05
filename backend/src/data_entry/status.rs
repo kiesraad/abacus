@@ -117,6 +117,7 @@ pub struct SecondEntryNotStarted {
     /// When the first data entry was finalised
     #[schema(value_type = String)]
     pub first_entry_finished_at: DateTime<Utc>,
+    pub has_warnings: bool,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq, ToSchema, Type)]
@@ -170,6 +171,7 @@ pub struct Definitive {
     /// When both data entries were finalised
     #[schema(value_type = String)]
     pub finished_at: DateTime<Utc>,
+    pub has_warnings: bool,
 }
 
 /// Current data entry, used for function parameters only
@@ -349,6 +351,7 @@ impl DataEntryStatus {
                         first_entry_user_id: state.first_entry_user_id,
                         finalised_first_entry: state.first_entry.clone(),
                         first_entry_finished_at: Utc::now(),
+                        has_warnings: validation_results.has_warnings(),
                     }))
                 }
             }
@@ -390,6 +393,7 @@ impl DataEntryStatus {
                             first_entry_user_id: state.first_entry_user_id,
                             second_entry_user_id: state.second_entry_user_id,
                             finished_at: Utc::now(),
+                            has_warnings: validation_results.has_warnings(),
                         }),
                         Some(state.second_entry.clone()),
                     ))
@@ -436,7 +440,14 @@ impl DataEntryStatus {
     }
 
     /// Delete the second entry while it is in progress
-    pub fn delete_second_entry(self, user_id: u32) -> Result<Self, DataEntryTransitionError> {
+    pub fn delete_second_entry(
+        self,
+        user_id: u32,
+        polling_station: &PollingStation,
+        election: &ElectionWithPoliticalGroups,
+    ) -> Result<Self, DataEntryTransitionError> {
+        let validation_results = validate_data_entry_status(&self, polling_station, election)?;
+
         match self {
             DataEntryStatus::SecondEntryInProgress(SecondEntryInProgress {
                 finalised_first_entry,
@@ -454,6 +465,7 @@ impl DataEntryStatus {
                         first_entry_user_id,
                         finalised_first_entry,
                         first_entry_finished_at,
+                        has_warnings: validation_results.has_warnings(),
                     },
                 ))
             }
@@ -496,7 +508,13 @@ impl DataEntryStatus {
     }
 
     /// Keep first entry while resolving differences
-    pub fn keep_first_entry(self) -> Result<Self, DataEntryTransitionError> {
+    pub fn keep_first_entry(
+        self,
+        polling_station: &PollingStation,
+        election: &ElectionWithPoliticalGroups,
+    ) -> Result<Self, DataEntryTransitionError> {
+        let validation_results = validate_data_entry_status(&self, polling_station, election)?;
+
         let DataEntryStatus::EntriesDifferent(EntriesDifferent {
             first_entry,
             first_entry_user_id,
@@ -513,6 +531,7 @@ impl DataEntryStatus {
             first_entry_user_id,
             finalised_first_entry: first_entry.clone(),
             first_entry_finished_at,
+            has_warnings: validation_results.has_warnings(),
         }))
     }
 
@@ -546,6 +565,7 @@ impl DataEntryStatus {
                         first_entry_user_id: state.second_entry_user_id,
                         finalised_first_entry: state.second_entry.clone(),
                         first_entry_finished_at: state.second_entry_finished_at,
+                        has_warnings: validation_results.has_warnings(),
                     }))
                 }
             }
@@ -651,6 +671,17 @@ impl DataEntryStatus {
                 ..
             }) => Some(first_entry_finished_at),
             DataEntryStatus::Definitive(Definitive { finished_at, .. }) => Some(finished_at),
+            _ => None,
+        }
+    }
+
+    /// Returns the timestamp at which point this data entry process was made definitive
+    pub fn has_warnings(&self) -> Option<&bool> {
+        match self {
+            DataEntryStatus::SecondEntryNotStarted(SecondEntryNotStarted {
+                has_warnings, ..
+            }) => Some(has_warnings),
+            DataEntryStatus::Definitive(Definitive { has_warnings, .. }) => Some(has_warnings),
             _ => None,
         }
     }
@@ -812,6 +843,7 @@ mod tests {
             first_entry_user_id: 0,
             finalised_first_entry: polling_station_result(),
             first_entry_finished_at: Utc::now(),
+            has_warnings: true,
         })
     }
 
@@ -832,6 +864,7 @@ mod tests {
             first_entry_user_id: 0,
             second_entry_user_id: 0,
             finished_at: Utc::now(),
+            has_warnings: false,
         })
     }
 
@@ -1319,7 +1352,9 @@ mod tests {
     #[test]
     fn second_entry_in_progress_to_second_entry_not_started() {
         assert!(matches!(
-            second_entry_in_progress().delete_second_entry(0).unwrap(),
+            second_entry_in_progress()
+                .delete_second_entry(0, &polling_station(), &election())
+                .unwrap(),
             DataEntryStatus::SecondEntryNotStarted(_)
         ));
     }
@@ -1328,7 +1363,7 @@ mod tests {
     #[test]
     fn second_entry_in_progress_delete_as_other_user_error() {
         assert_eq!(
-            second_entry_in_progress().delete_second_entry(1),
+            second_entry_in_progress().delete_second_entry(1, &polling_station(), &election()),
             Err(DataEntryTransitionError::CannotTransitionUsingDifferentUser)
         );
     }
@@ -1357,7 +1392,7 @@ mod tests {
     #[test]
     fn definitive_delete_second_entry_error() {
         assert_eq!(
-            definitive().delete_second_entry(0),
+            definitive().delete_second_entry(0, &polling_station(), &election()),
             Err(DataEntryTransitionError::SecondEntryAlreadyFinalised)
         );
     }
@@ -1379,7 +1414,9 @@ mod tests {
         });
 
         let initial = entries_different();
-        let next = initial.keep_first_entry().unwrap();
+        let next = initial
+            .keep_first_entry(&polling_station(), &election())
+            .unwrap();
 
         if let DataEntryStatus::SecondEntryNotStarted(kept_entry) = next {
             assert_eq!(kept_entry.finalised_first_entry, first_entry);
@@ -1392,7 +1429,7 @@ mod tests {
     #[test]
     fn definitive_keep_first_entry_error() {
         assert_eq!(
-            definitive().keep_first_entry(),
+            definitive().keep_first_entry(&polling_station(), &election()),
             Err(DataEntryTransitionError::Invalid)
         );
     }

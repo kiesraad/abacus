@@ -27,8 +27,8 @@ function AddFirstElection() {
   return (
     <FormLayout>
       <FormLayout.Section>
-        <h2>{t("election.no_elections_added")}</h2>
-        {tx("election.add_first_election")}
+        <h2 className="mb-0">{t("election.no_elections_added")}</h2>
+        <div>{tx("election.add_first_election")}</div>
       </FormLayout.Section>
       <FormLayout.Controls>
         {isAdministrator && <Button.Link to={"./create"}>{t("election.create")}</Button.Link>}

@@ -12,10 +12,10 @@ import { t } from "@/i18n/translate";
 import { getDataEntryStructure } from "@/utils/dataEntryStructure";
 
 import { usePollingStationDataEntryErrors } from "../hooks/usePollingStationDataEntryErrors";
-import cls from "./ResolveErrors.module.css";
-import { ResolveErrorsNavigation } from "./ResolveErrorsNavigation";
+import cls from "./detail.module.css";
+import { DetailNavigation } from "./DetailNavigation.tsx";
 
-export function ResolveErrorsLayout() {
+export function DetailLayout() {
   const pollingStationId = useNumericParam("pollingStationId");
   const { election, pollingStation } = useElection(pollingStationId);
   const { loading, dataEntry } = usePollingStationDataEntryErrors(pollingStationId);
@@ -44,7 +44,7 @@ export function ResolveErrorsLayout() {
         <Messages />
         <main className={cls.resolveErrors}>
           <StickyNav>
-            <ResolveErrorsNavigation
+            <DetailNavigation
               dataEntryStatus={dataEntry.status}
               structure={structure}
               validationResults={dataEntry.validation_results}

@@ -14,11 +14,7 @@ interface ResolveErrorsNavigationProps {
   dataEntryStatus: DataEntryStatusName;
 }
 
-export function ResolveErrorsNavigation({
-  structure,
-  validationResults,
-  dataEntryStatus,
-}: ResolveErrorsNavigationProps) {
+export function DetailNavigation({ structure, validationResults, dataEntryStatus }: ResolveErrorsNavigationProps) {
   const pollingStationId = useNumericParam("pollingStationId");
   const electionId = useNumericParam("electionId");
   const params = useParams<{ sectionId?: string }>();

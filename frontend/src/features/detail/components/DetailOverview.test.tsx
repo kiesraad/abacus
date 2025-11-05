@@ -1,7 +1,7 @@
 import { screen, within } from "@testing-library/react";
 import { describe, expect, test } from "vitest";
 
-import { ResolveErrorsOverview } from "@/features/resolve_errors/components/ResolveErrorsOverview";
+import { DetailOverview } from "@/features/detail/components/DetailOverview.tsx";
 import { electionMockData } from "@/testing/api-mocks/ElectionMockData";
 import { validationResultMockData } from "@/testing/api-mocks/ValidationResultMockData";
 import { render } from "@/testing/test-utils";
@@ -25,7 +25,7 @@ function getValidationResults(section: HTMLElement | null) {
     });
 }
 
-describe("ResolveErrorsOverview", () => {
+describe("DetailOverview", () => {
   const structure = getDataEntryStructure("CSOFirstSession", electionMockData);
 
   test("render sections with errors and warnings", () => {
@@ -39,7 +39,7 @@ describe("ResolveErrorsOverview", () => {
       warnings: [validationResultMockData.W201],
     };
 
-    render(<ResolveErrorsOverview structure={structure} results={results} />);
+    render(<DetailOverview structure={structure} results={results} />);
 
     const extra_investigation = screen.queryByRole("region", { name: "Extra onderzoek B1-1" });
     expect(extra_investigation).toBeInTheDocument();

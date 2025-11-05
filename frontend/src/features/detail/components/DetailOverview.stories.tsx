@@ -1,6 +1,6 @@
 import type { Meta, StoryFn } from "@storybook/react-vite";
 
-import { ResolveErrorsOverview } from "@/features/resolve_errors/components/ResolveErrorsOverview";
+import { DetailOverview } from "@/features/detail/components/DetailOverview.tsx";
 import { electionMockData } from "@/testing/api-mocks/ElectionMockData";
 import { validationResultMockData } from "@/testing/api-mocks/ValidationResultMockData";
 import { ValidationResults } from "@/types/generated/openapi";
@@ -12,8 +12,6 @@ const results: ValidationResults = {
   warnings: [validationResultMockData.W201, validationResultMockData.W204],
 };
 
-export const ResolveErrorsOverviewStory: StoryFn = () => (
-  <ResolveErrorsOverview structure={structure} results={results} />
-);
+export const ResolveErrorsOverviewStory: StoryFn = () => <DetailOverview structure={structure} results={results} />;
 
 export default {} satisfies Meta;

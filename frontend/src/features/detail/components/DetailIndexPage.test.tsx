@@ -19,7 +19,7 @@ import { server } from "@/testing/server";
 import { render, screen, spyOnHandler } from "@/testing/test-utils";
 import { TestUserProvider } from "@/testing/TestUserProvider";
 
-import { ResolveErrorsIndexPage } from "./ResolveErrorsIndexPage";
+import { DetailIndexPage } from "./DetailIndexPage.tsx";
 
 const navigate = vi.fn();
 
@@ -29,7 +29,7 @@ const renderPage = async () => {
       <ElectionProvider electionId={1}>
         <ElectionStatusProvider electionId={1}>
           <UsersProvider>
-            <ResolveErrorsIndexPage />
+            <DetailIndexPage />
           </UsersProvider>
         </ElectionStatusProvider>
       </ElectionProvider>
@@ -38,7 +38,7 @@ const renderPage = async () => {
   expect(await screen.findByRole("heading", { level: 2, name: "Alle fouten en waarschuwingen" })).toBeVisible();
 };
 
-describe("ResolveErrorsPage", () => {
+describe("DetailPage", () => {
   const pushMessage = vi.fn();
   const hasMessages = vi.fn();
 

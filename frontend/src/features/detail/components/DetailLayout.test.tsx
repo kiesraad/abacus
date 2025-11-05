@@ -15,7 +15,7 @@ import { server } from "@/testing/server";
 import { render, screen, waitFor, within } from "@/testing/test-utils";
 import { TestUserProvider } from "@/testing/TestUserProvider";
 
-import { ResolveErrorsLayout } from "./ResolveErrorsLayout";
+import { DetailLayout } from "./DetailLayout.tsx";
 
 const renderLayout = () => {
   return render(
@@ -23,7 +23,7 @@ const renderLayout = () => {
       <ElectionProvider electionId={1}>
         <ElectionStatusProvider electionId={1}>
           <MessagesProvider>
-            <ResolveErrorsLayout />
+            <DetailLayout />
           </MessagesProvider>
         </ElectionStatusProvider>
       </ElectionProvider>
@@ -31,7 +31,7 @@ const renderLayout = () => {
   );
 };
 
-describe("ResolveErrorsLayout", () => {
+describe("DetailLayout", () => {
   test("renders layout with polling station header and navigation", async () => {
     server.use(
       ElectionRequestHandler,

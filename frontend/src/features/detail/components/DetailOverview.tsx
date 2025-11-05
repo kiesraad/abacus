@@ -6,14 +6,14 @@ import { ValidationResult, ValidationResults } from "@/types/generated/openapi";
 import { DataEntrySection } from "@/types/types";
 import { dottedCode, getValidationResultSetForSection } from "@/utils/ValidationResults";
 
-import cls from "./ResolveErrorsOverview.module.css";
+import cls from "./DetailOverview.module.css";
 
 interface ResolveErrorsOverviewProps {
   structure: DataEntrySection[];
   results: ValidationResults;
 }
 
-export function ResolveErrorsOverview({ structure, results }: ResolveErrorsOverviewProps) {
+export function DetailOverview({ structure, results }: ResolveErrorsOverviewProps) {
   const sections = structure
     .map((section) => {
       const errors = getValidationResultSetForSection(results.errors, section);

@@ -9,9 +9,9 @@ import { ValidationResults } from "@/types/generated/openapi";
 import { DataEntryStructure } from "@/types/types";
 import { getDataEntryStructure } from "@/utils/dataEntryStructure";
 
-import { ResolveErrorsNavigation } from "./ResolveErrorsNavigation";
+import { DetailNavigation } from "./DetailNavigation.tsx";
 
-describe("ResolveErrorsNavigation", () => {
+describe("DetailNavigation", () => {
   const electionMockData = getElectionMockData().election;
   const structure = getDataEntryStructure("CSOFirstSession", electionMockData);
 
@@ -32,7 +32,7 @@ describe("ResolveErrorsNavigation", () => {
 
   const renderNavigation = (validationResults: ValidationResults, testStructure: DataEntryStructure = structure) => {
     return render(
-      <ResolveErrorsNavigation
+      <DetailNavigation
         structure={testStructure}
         validationResults={validationResults}
         dataEntryStatus={"definitive"}

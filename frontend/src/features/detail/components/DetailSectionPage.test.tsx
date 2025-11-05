@@ -14,21 +14,21 @@ import { server } from "@/testing/server";
 import { render, screen } from "@/testing/test-utils";
 import { TestUserProvider } from "@/testing/TestUserProvider";
 
-import { ResolveErrorsSectionPage } from "./ResolveErrorsSectionPage";
+import { DetailSectionPage } from "./DetailSectionPage.tsx";
 
 const renderSectionPage = () => {
   return render(
     <TestUserProvider userRole="coordinator">
       <ElectionProvider electionId={1}>
         <ElectionStatusProvider electionId={1}>
-          <ResolveErrorsSectionPage />
+          <DetailSectionPage />
         </ElectionStatusProvider>
       </ElectionProvider>
     </TestUserProvider>,
   );
 };
 
-describe("ResolveErrorsSectionPage", () => {
+describe("DetailSectionPage", () => {
   test("renders read-only section with valid section id", async () => {
     server.use(
       ElectionRequestHandler,

@@ -13,10 +13,10 @@ import { ResolveErrorsAction } from "@/types/generated/openapi";
 import { getDataEntryStructure } from "@/utils/dataEntryStructure";
 
 import { usePollingStationDataEntryErrors } from "../hooks/usePollingStationDataEntryErrors";
-import cls from "./ResolveErrors.module.css";
-import { ResolveErrorsOverview } from "./ResolveErrorsOverview";
+import cls from "./detail.module.css";
+import { DetailOverview } from "./DetailOverview.tsx";
 
-export function ResolveErrorsIndexPage() {
+export function DetailIndexPage() {
   const { pushMessage } = useMessages();
   const navigate = useNavigate();
   const pollingStationId = useNumericParam("pollingStationId");
@@ -66,7 +66,7 @@ export function ResolveErrorsIndexPage() {
       <h2>{t("resolve_errors.title")}</h2>
       <p className="md">{t("resolve_errors.page_content")}</p>
 
-      <ResolveErrorsOverview structure={structure} results={dataEntry.validation_results} />
+      <DetailOverview structure={structure} results={dataEntry.validation_results} />
 
       <Form
         className={cls.resolveForm}

@@ -8,6 +8,7 @@ import { ElectionStatusLayout } from "@/components/layout/ElectionStatusLayout";
 import { accountRoutes } from "@/features/account/routes";
 import { dataEntryRoutes } from "@/features/data_entry/routes";
 import { dataEntryHomeRoutes } from "@/features/data_entry_home/routes";
+import { detailRoutes } from "@/features/detail/routes";
 import { devRoutes } from "@/features/dev/routes";
 import { electionCreateRoutes } from "@/features/election_create/routes";
 import { electionManagementRoutes } from "@/features/election_management/routes";
@@ -18,7 +19,6 @@ import { investigationRoutes } from "@/features/investigations/routes";
 import { logsRoutes } from "@/features/logs/routes";
 import { pollingStationsRoutes } from "@/features/polling_stations/routes";
 import { resolveDifferencesRoutes } from "@/features/resolve_differences/routes";
-import { detailRoutes } from "@/features/resolve_errors/routes";
 import { usersRoutes } from "@/features/users/routes";
 
 import { RootLayout } from "./RootLayout";

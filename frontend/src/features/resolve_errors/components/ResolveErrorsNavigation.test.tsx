@@ -51,7 +51,9 @@ describe("ResolveErrorsNavigation", () => {
   test("renders overview link and links to all sections", () => {
     renderNavigation(mockValidationResultsNoErrors);
 
-    expect(screen.getByRole("link", { name: "Fouten en waarschuwingen" })).toBeInTheDocument();
+    // Errors/warnings section is not shown.
+    expect(screen.queryByRole("link", { name: "Fouten en waarschuwingen" })).not.toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Extra onderzoek" })).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "Aantal kiezers en stemmen" })).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "Verschillen D & H" })).toBeInTheDocument();
     expect(screen.getByRole("link", { name: /Lijst 1 - Vurige Vleugels Partij/ })).toBeInTheDocument();
@@ -61,7 +63,7 @@ describe("ResolveErrorsNavigation", () => {
   test("renders with empty structure", () => {
     renderNavigation(mockValidationResultsNoErrors, []);
 
-    expect(screen.getByText("Fouten en waarschuwingen")).toBeInTheDocument();
+    expect(screen.queryByText("Fouten en waarschuwingen")).not.toBeInTheDocument();
   });
 
   test("shows correct status based on validation results", () => {
@@ -100,8 +102,8 @@ describe("ResolveErrorsNavigation", () => {
 
     renderNavigation(mockValidationResultsNoErrors);
 
-    const overviewItem = screen.getByRole("link", { name: "Fouten en waarschuwingen" }).closest("li");
-    expect(overviewItem).toHaveAttribute("aria-current", "step");
+    const overviewItem = screen.getByRole("link", { name: "Extra onderzoek" }).closest("li");
+    expect(overviewItem).toHaveAttribute("aria-current", "false");
   });
 
   test("shows section link as active when sectionId param is not null", () => {
@@ -116,15 +118,15 @@ describe("ResolveErrorsNavigation", () => {
     const activeItem = screen.getByRole("link", { name: "Aantal kiezers en stemmen" }).closest("li");
     expect(activeItem).toHaveAttribute("aria-current", "step");
 
-    const overviewItem = screen.getByRole("link", { name: "Fouten en waarschuwingen" }).closest("li");
+    const overviewItem = screen.getByRole("link", { name: "Extra onderzoek" }).closest("li");
     expect(overviewItem).toHaveAttribute("aria-current", "false");
   });
 
   test("uses correct links", () => {
     renderNavigation(mockValidationResultsNoErrors);
 
-    const overviewLink = screen.getByRole("link", { name: "Fouten en waarschuwingen" });
-    expect(overviewLink).toHaveAttribute("href", "/elections/1/status/5/detail");
+    const overviewLink = screen.getByRole("link", { name: "Extra onderzoek" });
+    expect(overviewLink).toHaveAttribute("href", "/elections/1/status/5/detail/extra_investigation");
 
     const kiezersLink = screen.getByRole("link", { name: "Aantal kiezers en stemmen" });
     expect(kiezersLink).toHaveAttribute("href", "/elections/1/status/5/detail/voters_votes_counts");

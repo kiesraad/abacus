@@ -199,7 +199,7 @@ export const dataEntryStatusDifferences: DataEntryGetDifferencesResponse = {
 export const dataEntryGetMockResponse: DataEntryGetResponse = {
   user_id: 3,
   data: getEmptyDataEntryRequest().data,
-  status: "first_entry_in_progress",
+  status: "first_entry_has_errors",
   validation_results: {
     errors: [validationResultMockData.F201],
     warnings: [validationResultMockData.W001, validationResultMockData.W201, validationResultMockData.W202],

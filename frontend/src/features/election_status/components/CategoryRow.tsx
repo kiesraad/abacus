@@ -31,20 +31,14 @@ export function CategoryRow({ category, pollingStation, addLink }: CategoryRowPr
     link =
       pollingStation.status === "entries_different"
         ? `./${pollingStation.id}/resolve-differences`
-        : `./${pollingStation.id}/resolve-errors`;
+        : `./${pollingStation.id}/detail`;
   } else if (isCoordinator && pollingStation.status != "first_entry_not_started") {
     link = `./${pollingStation.id}/detail`;
   }
 
   if (addLink && link) {
     return (
-      <Table.LinkRow
-        to={
-          pollingStation.status === "entries_different"
-            ? `./${pollingStation.id}/resolve-differences`
-            : `./${pollingStation.id}/detail`
-        }
-      >
+      <Table.LinkRow to={link}>
         <CategoryRowContent category={category} pollingStation={pollingStation} />
       </Table.LinkRow>
     );

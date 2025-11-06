@@ -3,7 +3,7 @@ import { Link, useParams } from "react-router";
 import { ProgressList } from "@/components/ui/ProgressList/ProgressList";
 import { useNumericParam } from "@/hooks/useNumericParam";
 import { t } from "@/i18n/translate";
-import { DataEntryStatusName, ValidationResults } from "@/types/generated/openapi";
+import { ValidationResults } from "@/types/generated/openapi";
 import { DataEntrySection } from "@/types/types";
 import { MenuStatus } from "@/types/ui";
 import { getValidationResultSetForSection } from "@/utils/ValidationResults";
@@ -11,10 +11,9 @@ import { getValidationResultSetForSection } from "@/utils/ValidationResults";
 interface ResolveErrorsNavigationProps {
   structure: DataEntrySection[];
   validationResults: ValidationResults;
-  dataEntryStatus: DataEntryStatusName;
 }
 
-export function DetailNavigation({ structure, validationResults, dataEntryStatus }: ResolveErrorsNavigationProps) {
+export function DetailNavigation({ structure, validationResults }: ResolveErrorsNavigationProps) {
   const pollingStationId = useNumericParam("pollingStationId");
   const electionId = useNumericParam("electionId");
   const params = useParams<{ sectionId?: string }>();
@@ -52,12 +51,7 @@ export function DetailNavigation({ structure, validationResults, dataEntryStatus
   return (
     <ProgressList>
       <ProgressList.Fixed>
-        <ProgressList.Item
-          status="idle"
-          hide={dataEntryStatus !== "first_entry_has_errors"}
-          active={currentSectionId === null}
-          disabled={dataEntryStatus !== "first_entry_has_errors"}
-        >
+        <ProgressList.Item status="idle" active={currentSectionId === null}>
           <Link to={getSectionUrl("")}>{t("resolve_errors.short_title")}</Link>
         </ProgressList.Item>
 

@@ -29,7 +29,6 @@ export type ProgressListItemProps = {
   status: MenuStatus;
   active?: boolean;
   disabled?: boolean;
-  hide?: boolean;
   children?: React.ReactNode;
   id?: string;
   scrollIntoView?: boolean;
@@ -40,7 +39,6 @@ ProgressList.Item = function ProgressListItem({
   active = false,
   status,
   disabled = false,
-  hide = false,
   children,
   id,
   scrollIntoView,
@@ -53,10 +51,6 @@ ProgressList.Item = function ProgressListItem({
       liRef.current?.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "nearest" });
     }
   }, [scrollIntoView, active]);
-
-  if (hide) {
-    return;
-  }
 
   return (
     <li

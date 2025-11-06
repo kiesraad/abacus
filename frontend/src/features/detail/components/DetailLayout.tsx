@@ -44,11 +44,7 @@ export function DetailLayout() {
         <Messages />
         <main className={cls.resolveErrors}>
           <StickyNav>
-            <DetailNavigation
-              dataEntryStatus={dataEntry.status}
-              structure={structure}
-              validationResults={dataEntry.validation_results}
-            />
+            <DetailNavigation structure={structure} validationResults={dataEntry.validation_results} />
           </StickyNav>
           <article>
             <Outlet />

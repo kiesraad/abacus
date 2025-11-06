@@ -3,6 +3,7 @@ import { ReactNode } from "react";
 import { Badge } from "@/components/ui/Badge/Badge";
 import { ProgressBar } from "@/components/ui/ProgressBar/ProgressBar";
 import { Table } from "@/components/ui/Table/Table";
+import { getCategoryRowUrl } from "@/features/election_status/utils/utils.ts";
 import { useUserRole } from "@/hooks/user/useUserRole.ts";
 import { t } from "@/i18n/translate";
 import { DataEntryStatusName } from "@/types/generated/openapi";
@@ -26,28 +27,7 @@ const SHOW_BADGE: DataEntryStatusName[] = [
 export function CategoryRow({ category, pollingStation, addLink }: CategoryRowProps): ReactNode {
   const { isCoordinator } = useUserRole();
 
-  const getCategoryRowUrl = (): string | null => {
-    let link = null;
-
-    switch (pollingStation.status) {
-      case "entries_different":
-      case "first_entry_has_errors":
-        link =
-          pollingStation.status === "entries_different"
-            ? `./${pollingStation.id}/resolve-differences`
-            : `./${pollingStation.id}/detail`;
-        break;
-      default:
-        if (isCoordinator && pollingStation.status != "first_entry_not_started") {
-          link = `./${pollingStation.id}/detail`;
-        }
-        break;
-    }
-
-    return link;
-  };
-
-  const link = getCategoryRowUrl();
+  const link = getCategoryRowUrl(pollingStation.status, pollingStation.id, isCoordinator);
 
   if (addLink && link) {
     return (

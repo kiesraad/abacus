@@ -1402,6 +1402,13 @@ mod tests {
             .await
             .unwrap();
 
+        change_status_committee_session(
+            pool.clone(),
+            704,
+            CommitteeSessionStatus::DataEntryInProgress,
+        )
+        .await;
+
         let response = claim(pool.clone(), 742, EntryNumber::FirstEntry).await;
         assert_eq!(response.status(), StatusCode::OK);
 
@@ -2278,6 +2285,13 @@ mod tests {
             .await
             .unwrap();
 
+        change_status_committee_session(
+            pool.clone(),
+            704,
+            CommitteeSessionStatus::DataEntryInProgress,
+        )
+        .await;
+
         assert!(claim_previous_results(pool.clone(), 743).await.is_none());
     }
 
@@ -2288,6 +2302,13 @@ mod tests {
         insert_test_investigation(&mut pool.acquire().await.unwrap(), 742, Some(true))
             .await
             .unwrap();
+
+        change_status_committee_session(
+            pool.clone(),
+            704,
+            CommitteeSessionStatus::DataEntryInProgress,
+        )
+        .await;
 
         let previous_results = claim_previous_results(pool.clone(), 742).await.unwrap();
         // Check by difference in fixture results data
@@ -2322,7 +2343,7 @@ mod tests {
         assert_eq!(result.statuses.len(), 0);
     }
 
-    /// Second committee session with 1 investigations, should return 1 polling station status
+    /// Second committee session with 1 investigations, should return one extra polling station status
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_5_with_results"))))]
     async fn test_statuses_second_session_with_investigation(pool: SqlitePool) {
         let mut conn = pool.acquire().await.unwrap();

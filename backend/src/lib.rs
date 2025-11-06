@@ -146,14 +146,12 @@ pub fn openapi_router() -> OpenApiRouter<AppState> {
         }
     }
 
-    let router = build_routes(ApiDoc::openapi());
+    let mut router = build_routes(ApiDoc::openapi());
 
     // Modify schema to add security schemes after building routes
-    let mut doc = router.clone().into_openapi();
-    SecurityAddon.modify(&mut doc);
+    SecurityAddon.modify(router.get_openapi_mut());
 
-    // Rebuild router with modified OpenAPI document
-    build_routes(doc)
+    router
 }
 
 fn build_routes(doc: utoipa::openapi::OpenApi) -> OpenApiRouter<AppState> {

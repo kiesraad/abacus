@@ -163,7 +163,7 @@ Vul alléén de getallen in die veranderd zijn ten opzichte van een eerdere tell
   votes_table(
     title: [#political_group.number #political_group.name],
     headers: ("Kandidaat", "", "Oorspronkelijk", "Gecorrigeerd"),
-    total: none,
+    total: political_group.total,
     previous_total: political_group.previous_total,
     votes_columns: political_group.columns,
     continue_on_next_page: [#sym.arrow.r De lijst gaat verder op de volgende pagina],

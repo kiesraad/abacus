@@ -193,7 +193,7 @@ _(Gebruik het proces-verbaal van het stembureau #sym.arrow.r Tijdens de stemming
   votes_table(
     title: [#political_group.number #political_group.name],
     headers: ("Kandidaat", "", "Stemmen"),
-    total: none,
+    total: political_group.total,
     votes_columns: political_group.columns,
     continue_on_next_page: [#sym.arrow.r De lijst gaat verder op de volgende pagina],
     column_total: "Subtotaal kolom",

@@ -394,6 +394,37 @@ mod tests {
     }
 
     #[test]
+    fn votes_table_calculates_totals_correctly() {
+        let group = sample_group(1, &[1, 2, 3]);
+        let candidate_votes = make_candidate_votes(1, 21, &[(1, 5), (2, 7), (3, 9)]);
+        let previous_candidate_votes = make_candidate_votes(1, 18, &[(1, 4), (2, 6), (3, 8)]);
+
+        let table = VotesTable::new(
+            &group,
+            Some(&candidate_votes),
+            Some(&previous_candidate_votes),
+            DEFAULT_CANDIDATES_PER_COLUMN,
+        )
+        .expect("VotesTable::new should succeed when totals match the candidate sums");
+
+        assert_eq!(table.total, Some(21));
+        assert_eq!(table.previous_total, Some(18));
+        assert_eq!(table.columns.len(), 1);
+
+        let column = &table.columns[0];
+        assert_eq!(column.column_total, Some(21));
+        assert_eq!(column.previous_column_total, Some(18));
+        assert_eq!(column.votes.len(), 3);
+
+        let expected = [(1, 5, 4), (2, 7, 6), (3, 9, 8)];
+        for (candidate_vote, (number, votes, previous_votes)) in column.votes.iter().zip(expected) {
+            assert_eq!(candidate_vote.candidate.number, number);
+            assert_eq!(candidate_vote.votes, Some(votes));
+            assert_eq!(candidate_vote.previous_votes, Some(previous_votes));
+        }
+    }
+
+    #[test]
     fn votes_table_fails_when_too_many_candidates() {
         let group = sample_group(1, &[1, 2]);
 

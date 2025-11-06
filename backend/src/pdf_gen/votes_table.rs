@@ -281,3 +281,180 @@ pub(super) struct CandidateVotes {
     /// Previous number of votes for the candidate
     previous_votes: Option<Count>,
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use chrono::NaiveDate;
+
+    use crate::{
+        data_entry::CandidateVotes as DataEntryCandidateVotes,
+        election::{ElectionCategory, ElectionWithPoliticalGroups, VoteCountingMethod},
+    };
+
+    fn sample_candidate(number: u32) -> Candidate {
+        Candidate {
+            number,
+            initials: "A.B.".to_string(),
+            first_name: None,
+            last_name_prefix: None,
+            last_name: format!("Kandidaat {number}"),
+            locality: "Juinen".to_string(),
+            country_code: None,
+            gender: None,
+        }
+    }
+
+    fn sample_group(number: u32, candidate_numbers: &[u32]) -> PoliticalGroup {
+        PoliticalGroup {
+            number,
+            name: format!("Partij {number}"),
+            candidates: candidate_numbers
+                .iter()
+                .map(|&candidate_number| sample_candidate(candidate_number))
+                .collect(),
+        }
+    }
+
+    fn sample_election(group: PoliticalGroup) -> ElectionWithPoliticalGroups {
+        ElectionWithPoliticalGroups {
+            id: 1,
+            name: "Test election".to_string(),
+            counting_method: VoteCountingMethod::CSO,
+            election_id: "Test_2025".to_string(),
+            location: "Test locatie".to_string(),
+            domain_id: "0000".to_string(),
+            category: ElectionCategory::Municipal,
+            number_of_seats: 1,
+            election_date: NaiveDate::from_ymd_opt(2024, 1, 1).unwrap(),
+            nomination_date: NaiveDate::from_ymd_opt(2024, 1, 1).unwrap(),
+            political_groups: vec![group],
+        }
+    }
+
+    fn make_candidate_votes(
+        group_number: u32,
+        total: Count,
+        entries: &[(u32, Count)],
+    ) -> PoliticalGroupCandidateVotes {
+        PoliticalGroupCandidateVotes {
+            number: group_number,
+            total,
+            candidate_votes: entries
+                .iter()
+                .map(|&(candidate_number, votes)| DataEntryCandidateVotes {
+                    number: candidate_number,
+                    votes,
+                })
+                .collect(),
+        }
+    }
+
+    #[test]
+    fn votes_tables_fails_when_group_missing_in_summary() {
+        let group = sample_group(1, &[1]);
+        let election = sample_election(group);
+        let summary = ElectionSummary::zero();
+
+        let err = VotesTables::new(&election, &summary).unwrap_err();
+
+        match err {
+            APIError::DataIntegrityError(message) => {
+                assert_eq!(
+                    message,
+                    "No votes found for political group number 1 in summary"
+                );
+            }
+            other => panic!("expected DataIntegrityError, got {other:?}"),
+        }
+    }
+
+    #[test]
+    fn votes_table_fails_when_candidate_votes_missing() {
+        let group = sample_group(1, &[1]);
+        let candidate_votes = make_candidate_votes(1, 10, &[(2, 10)]);
+
+        let err = VotesTable::new(
+            &group,
+            Some(&candidate_votes),
+            None,
+            DEFAULT_CANDIDATES_PER_COLUMN,
+        )
+        .unwrap_err();
+
+        match err {
+            APIError::DataIntegrityError(message) => {
+                assert_eq!(
+                    message,
+                    "No votes found for candidate number 1 in political group 1"
+                );
+            }
+            other => panic!("expected DataIntegrityError, got {other:?}"),
+        }
+    }
+
+    #[test]
+    fn votes_table_fails_when_too_many_candidates() {
+        let group = sample_group(1, &[1, 2]);
+
+        let err = VotesTable::new(&group, None, None, [1, 0, 0, 0]).unwrap_err();
+
+        match err {
+            APIError::DataIntegrityError(message) => {
+                assert_eq!(
+                    message,
+                    "More candidates than expected in political group 1"
+                );
+            }
+            other => panic!("expected DataIntegrityError, got {other:?}"),
+        }
+    }
+
+    #[test]
+    fn votes_table_fails_when_column_totals_exceed_group_total() {
+        let group = sample_group(1, &[1, 2]);
+        let candidate_votes = make_candidate_votes(1, 20, &[(1, 12), (2, 15)]);
+
+        let err = VotesTable::new(
+            &group,
+            Some(&candidate_votes),
+            None,
+            DEFAULT_CANDIDATES_PER_COLUMN,
+        )
+        .unwrap_err();
+
+        match err {
+            APIError::DataIntegrityError(message) => {
+                assert_eq!(
+                    message,
+                    "Sum of column totals (27) exceeds total votes (20) for political group 1"
+                );
+            }
+            other => panic!("expected DataIntegrityError, got {other:?}"),
+        }
+    }
+
+    #[test]
+    fn votes_table_fails_when_previous_totals_exceed_group_total() {
+        let group = sample_group(1, &[1, 2]);
+        let previous_candidate_votes = make_candidate_votes(1, 20, &[(1, 12), (2, 15)]);
+
+        let err = VotesTable::new(
+            &group,
+            None,
+            Some(&previous_candidate_votes),
+            DEFAULT_CANDIDATES_PER_COLUMN,
+        )
+        .unwrap_err();
+
+        match err {
+            APIError::DataIntegrityError(message) => {
+                assert_eq!(
+                    message,
+                    "Sum of previous column totals (27) exceeds previous total votes (20) for political group 1"
+                );
+            }
+            other => panic!("expected DataIntegrityError, got {other:?}"),
+        }
+    }
+}

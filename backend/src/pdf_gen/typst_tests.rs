@@ -429,9 +429,9 @@ async fn test_na_14_2() {
         let model = PdfModel::ModelNa14_2(Box::new(ModelNa14_2Input {
             votes_tables: VotesTablesWithPreviousVotes::new(&election, &summary, &previous_summary)
                 .unwrap(),
-            election,
-            previous_summary,
-            summary,
+            election: election.into(),
+            previous_summary: previous_summary.into(),
+            summary: summary.into(),
             committee_session,
             previous_committee_session,
             hash,
@@ -467,8 +467,8 @@ async fn test_na_14_2_bijlage_1() {
         let model = PdfModel::ModelNa14_2Bijlage1(Box::new(ModelNa14_2Bijlage1Input {
             votes_tables: VotesTablesWithOnlyPreviousVotes::new(&election, &previous_results)
                 .unwrap(),
-            previous_results,
-            election,
+            previous_results: previous_results.into(),
+            election: election.into(),
             polling_station,
             investigation,
         }));
@@ -502,8 +502,8 @@ async fn test_na_31_2() {
         let model = PdfModel::ModelNa31_2(Box::new(ModelNa31_2Input {
             votes_tables: VotesTables::new(&election, &summary).unwrap(),
             committee_session,
-            election,
-            summary,
+            election: election.into(),
+            summary: summary.into(),
             polling_stations,
             hash,
             creation_date_time,
@@ -530,7 +530,7 @@ async fn test_na_31_2_bijlage_1() {
 
         let model = PdfModel::ModelNa31_2Bijlage1(Box::new(ModelNa31_2Bijlage1Input {
             candidates_tables: CandidatesTables::new(&election).unwrap(),
-            election,
+            election: election.into(),
             polling_station,
         }));
 
@@ -554,7 +554,6 @@ async fn test_n_10_2() {
             random_polling_station(&mut rng, &election, string_length, none_where_possible);
 
         let model = PdfModel::ModelN10_2(Box::new(ModelN10_2Input {
-            candidates_tables: CandidatesTables::new(&election).unwrap(),
             election,
             polling_station,
         }));

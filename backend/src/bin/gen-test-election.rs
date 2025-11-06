@@ -220,10 +220,10 @@ async fn export_election(
         let input = ModelNa31_2Input {
             votes_tables: VotesTables::new(election, &election_summary)
                 .expect("Failed to create votes tables"),
-            summary: election_summary,
+            summary: election_summary.into(),
             committee_session: committee_session.clone(),
             polling_stations: polling_stations.iter().map(Clone::clone).collect(),
-            election: election.clone(),
+            election: election.clone().into(),
             hash: "0000".to_string(),
             creation_date_time: chrono::Utc::now().format("%d-%m-%Y %H:%M").to_string(),
         }

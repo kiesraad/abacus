@@ -2,15 +2,15 @@ use serde::{Deserialize, Serialize};
 
 use crate::{
     committee_session::CommitteeSession,
-    data_entry::CommonPollingStationResults,
-    election::ElectionWithPoliticalGroups,
+    data_entry::CommonPollingStationResultsWithoutVotes,
+    election::Election,
     investigation::PollingStationInvestigation,
     pdf_gen::{
         models::{PdfFileModel, PdfModel, ToPdfFileModel},
         votes_table::{VotesTablesWithOnlyPreviousVotes, VotesTablesWithPreviousVotes},
     },
     polling_station::structs::PollingStation,
-    summary::ElectionSummary,
+    summary::ElectionSummaryWithoutVotes,
 };
 
 #[derive(Serialize, Deserialize)]
@@ -18,9 +18,9 @@ use crate::{
 pub struct ModelNa14_2Input {
     pub committee_session: CommitteeSession,
     pub previous_committee_session: CommitteeSession,
-    pub election: ElectionWithPoliticalGroups,
-    pub previous_summary: ElectionSummary,
-    pub summary: ElectionSummary,
+    pub election: Election,
+    pub previous_summary: ElectionSummaryWithoutVotes,
+    pub summary: ElectionSummaryWithoutVotes,
     pub hash: String,
     pub creation_date_time: String,
     pub votes_tables: VotesTablesWithPreviousVotes,
@@ -35,9 +35,9 @@ impl ToPdfFileModel for ModelNa14_2Input {
 #[derive(Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct ModelNa14_2Bijlage1Input {
-    pub election: ElectionWithPoliticalGroups,
+    pub election: Election,
     pub polling_station: PollingStation,
-    pub previous_results: CommonPollingStationResults,
+    pub previous_results: CommonPollingStationResultsWithoutVotes,
     pub investigation: PollingStationInvestigation,
     pub votes_tables: VotesTablesWithOnlyPreviousVotes,
 }

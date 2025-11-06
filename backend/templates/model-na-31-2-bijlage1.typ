@@ -128,16 +128,16 @@ Licht hieronder toe wat de reden van het extra onderzoek was
 
 == Uitgebrachte stemmen <cast_votes>
 
-#if input.election.political_groups.len() > 0 [
+#if input.candidates_tables.len() > 0 [
   #sum(
     sum(
-      ..input.election.political_groups.map(list => {
+      ..input.candidates_tables.map(list => {
         empty_letterbox([E.#list.number])[Totaal lijst #list.number - #list.name]
       }),
       empty_letterbox(
         "E",
         light: false,
-      )[*Totaal stemmen op kandidaten* (tel E.1 t/m E.#input.election.political_groups.last().number op)],
+      )[*Totaal stemmen op kandidaten* (tel E.1 t/m E.#input.candidates_tables.last().number op)],
     ),
     empty_letterbox("F")[Blanco stemmen],
     empty_letterbox("G")[Ongeldige stemmen],

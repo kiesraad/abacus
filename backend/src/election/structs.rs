@@ -47,6 +47,23 @@ pub struct ElectionWithPoliticalGroups {
     pub political_groups: Vec<PoliticalGroup>,
 }
 
+impl From<ElectionWithPoliticalGroups> for Election {
+    fn from(value: ElectionWithPoliticalGroups) -> Self {
+        Self {
+            id: value.id,
+            name: value.name,
+            counting_method: value.counting_method,
+            election_id: value.election_id,
+            location: value.location,
+            domain_id: value.domain_id,
+            category: value.category,
+            number_of_seats: value.number_of_seats,
+            election_date: value.election_date,
+            nomination_date: value.nomination_date,
+        }
+    }
+}
+
 impl From<Election> for ElectionDetails {
     fn from(value: Election) -> Self {
         Self {

@@ -89,7 +89,7 @@ async fn election_download_na_31_2_bijlage1(
 
             Ok(ModelNa31_2Bijlage1Input {
                 candidates_tables: CandidatesTables::new(&election)?,
-                election: election.clone(),
+                election: election.clone().into(),
                 polling_station: ps.clone(),
             }
             .to_pdf_file_model(name))
@@ -171,7 +171,6 @@ async fn election_download_n_10_2(
             );
 
             Ok(ModelN10_2Input {
-                candidates_tables: CandidatesTables::new(&election)?,
                 election: election.clone(),
                 polling_station: ps.clone(),
             }

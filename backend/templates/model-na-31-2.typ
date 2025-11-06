@@ -193,10 +193,10 @@ Bijvoorbeeld een schorsing of als er meerdere verkiezingen tegelijk werden georg
 
 == Uitgebrachte stemmen
 
-#if input.election.political_groups.len() > 0 [
+#if input.votes_tables.len() > 0 [
   #sum(
     sum(
-      ..input.election.political_groups.map(list => {
+      ..input.votes_tables.map(list => {
         let votes = input.summary.votes_counts.political_group_total_votes.find(v => v.number == list.number)
 
         if votes == none {
@@ -209,7 +209,7 @@ Bijvoorbeeld een schorsing of als er meerdere verkiezingen tegelijk werden georg
         "E",
         light: false,
         value: input.summary.votes_counts.total_votes_candidates_count,
-      )[*Totaal stemmen op kandidaten* (tel E.1 t/m E.#input.election.political_groups.last().number op)],
+      )[*Totaal stemmen op kandidaten* (tel E.1 t/m E.#input.votes_tables.last().number op)],
     ),
     letterbox("F", value: input.summary.votes_counts.blank_votes_count)[Blanco stemmen],
     letterbox("G", value: input.summary.votes_counts.invalid_votes_count)[Ongeldige stemmen],

@@ -91,10 +91,10 @@ pub(crate) mod tests {
         };
 
         let content = generate_pdf(ModelNa31_2Input {
-            summary: ElectionSummary::zero(),
+            summary: ElectionSummary::zero().into(),
             votes_tables: VotesTables::new(&election, &ElectionSummary::zero()).unwrap(),
             committee_session: committee_session_fixture(1),
-            election,
+            election: election.into(),
             polling_stations: vec![],
             hash: "ed36 60eb 017a 0d3a d3ef 72b1 6865 f991 a36a 9f92 72d9 1516 39cd 422b 4756 d161"
                 .to_string(),
@@ -144,10 +144,10 @@ pub(crate) mod tests {
 
         let content = generate_pdf(ModelNa31_2Input {
             votes_tables: VotesTables::new(&election, &summary).unwrap(),
-            summary,
+            summary: summary.into(),
             polling_stations: polling_stations_fixture(&election, committee_session.id,  &[100, 200, 300]),
             committee_session,
-            election,
+            election: election.into(),
             hash: "ed36 60eb 017a 0d3a d3ef 72b1 6865 f991 a36a 9f92 72d9 1516 39cd 422b 4756 d161"
                 .to_string(),
             creation_date_time: "04-12-2024 12:08".to_string(),

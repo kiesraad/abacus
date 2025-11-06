@@ -247,6 +247,31 @@ impl PollingStationInvestigations {
     }
 }
 
+/// A version of ElectionSummary without the political group votes.
+#[derive(Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct ElectionSummaryWithoutVotes {
+    /// The total number of voters
+    pub voters_counts: VotersCounts,
+    /// The total number of votes
+    pub votes_counts: VotesCounts,
+    /// The differences between voters and votes
+    pub differences_counts: SummaryDifferencesCounts,
+    /// Polling stations where results were investigated by the GSB
+    pub polling_station_investigations: PollingStationInvestigations,
+}
+
+impl From<ElectionSummary> for ElectionSummaryWithoutVotes {
+    fn from(summary: ElectionSummary) -> Self {
+        ElectionSummaryWithoutVotes {
+            voters_counts: summary.voters_counts,
+            votes_counts: summary.votes_counts,
+            differences_counts: summary.differences_counts,
+            polling_station_investigations: summary.polling_station_investigations,
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use test_log::test;

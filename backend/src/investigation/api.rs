@@ -450,9 +450,9 @@ async fn polling_station_investigation_download_corrigendum_pdf(
 
     let input = ModelNa14_2Bijlage1Input {
         votes_tables,
-        election,
+        election: election.into(),
         polling_station,
-        previous_results: previous_results.as_common(),
+        previous_results: previous_results.as_common().into(),
         investigation,
     }
     .to_pdf_file_model(name.clone());

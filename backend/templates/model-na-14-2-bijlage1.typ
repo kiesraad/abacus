@@ -88,11 +88,11 @@ Het totaal van alle getelde geldige stempassen en volmachtbewijzen
 Vul alléén de getallen in die veranderd zijn ten opzichte van een eerdere telling. Getallen die niet zijn veranderd, hoeven niet
 ingevuld te worden in de kolom ‘gecorrigeerd'. Onder ‘oorspronkelijk’ staan de getallen die in de eerste zitting door het #location_type zijn vastgesteld.
 
-#if input.election.political_groups.len() > 0 [
+#if input.votes_tables.len() > 0 [
   #sum(
     with_correction_title: true,
     sum(
-      ..input.election.political_groups.enumerate().map(((idx, list)) => {
+      ..input.votes_tables.enumerate().map(((idx, list)) => {
         let votes = input.previous_results.votes_counts.political_group_total_votes.find(v => v.number == list.number)
         if votes == none {
           return
@@ -104,7 +104,7 @@ ingevuld te worden in de kolom ‘gecorrigeerd'. Onder ‘oorspronkelijk’ staa
         original_value: input.previous_results.votes_counts.total_votes_candidates_count,
         "E",
         light: false,
-      )[*Totaal stemmen op kandidaten* (tel E.1 t/m E.#input.election.political_groups.last().number op)],
+      )[*Totaal stemmen op kandidaten* (tel E.1 t/m E.#input.votes_tables.last().number op)],
     ),
     empty_letterbox(cells: 4, original_value: input.previous_results.votes_counts.blank_votes_count, "F")[Blanco stemmen],
     empty_letterbox(cells: 4, original_value: input.previous_results.votes_counts.invalid_votes_count, "G")[Ongeldige stemmen],

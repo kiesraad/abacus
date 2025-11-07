@@ -62,7 +62,7 @@ export function PollingStationListPage() {
           <article>
             <Toolbar>
               <Button.Link variant="secondary" size="sm" to="./create">
-                <IconPlus /> {t("polling_station.form.create")}
+                <IconPlus /> {t("polling_station.create")}
               </Button.Link>
             </Toolbar>
 

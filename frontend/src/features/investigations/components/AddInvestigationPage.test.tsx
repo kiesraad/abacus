@@ -37,7 +37,7 @@ describe("AddInvestigationPage", () => {
     server.use(ElectionRequestHandler, ElectionStatusRequestHandler);
   });
 
-  test("Renders the correct headings and table", async () => {
+  test("Renders the correct headings, polling stations table and add button", async () => {
     await renderPage();
 
     expect(await screen.findByRole("heading", { level: 1, name: "Onderzoek toevoegen" })).toBeVisible();
@@ -50,6 +50,8 @@ describe("AddInvestigationPage", () => {
       ["38", "Testmuseum"],
       ["39", "Test gemeentehuis"],
     ]);
+
+    expect(await screen.findByRole("link", { name: "Ontbrekend stembureau toevoegen" })).toBeVisible();
   });
 
   test("It navigates to add investigation when clicking a table row", async () => {

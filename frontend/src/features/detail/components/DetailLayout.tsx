@@ -30,57 +30,38 @@ export function DetailLayout() {
 
   const structure = getDataEntryStructure(dataEntry.data.model, election);
 
-  if (dataEntry.status == "first_entry_has_errors") {
-    return (
-      <>
+  return (
+    <>
+      {dataEntry.status == "first_entry_has_errors" ? (
         <PageTitle title={`${t("resolve_errors.page_title")} - Abacus`} />
-        <header>
-          <section className="smaller-gap">
-            <PollingStationNumber>{pollingStation.number}</PollingStationNumber>
-            <h1>{pollingStation.name}</h1>
-            <Badge type={dataEntry.status} />
-          </section>
-        </header>
-        <Messages />
-        <main className={cls.resolveErrors}>
-          <StickyNav>
-            <DetailNavigation
-              structure={structure}
-              status={dataEntry.status}
-              validationResults={dataEntry.validation_results}
-            />
-          </StickyNav>
-          <article>
-            <Outlet />
-          </article>
-        </main>
-      </>
-    );
-  } else {
-    return (
-      <>
+      ) : (
         <PageTitle title={`${t("detail.page_title")} - Abacus`} />
-        <header>
-          <section className="smaller-gap">
-            <PollingStationNumber>{pollingStation.number}</PollingStationNumber>
-            <h1>{pollingStation.name}</h1>
+      )}
+
+      <header>
+        <section className="smaller-gap">
+          <PollingStationNumber>{pollingStation.number}</PollingStationNumber>
+          <h1>{pollingStation.name}</h1>
+          {dataEntry.status == "first_entry_has_errors" ? (
             <Badge type={dataEntry.status} />
-          </section>
-        </header>
-        <Messages />
-        <main className={cls.resolveErrors}>
-          <StickyNav>
-            <DetailNavigation
-              structure={structure}
-              status={dataEntry.status}
-              validationResults={dataEntry.validation_results}
-            />
-          </StickyNav>
-          <article>
-            <Outlet />
-          </article>
-        </main>
-      </>
-    );
-  }
+          ) : (
+            <Badge type={dataEntry.status} readOnlyStatus={true} />
+          )}
+        </section>
+      </header>
+      <Messages />
+      <main className={cls.detail}>
+        <StickyNav>
+          <DetailNavigation
+            structure={structure}
+            status={dataEntry.status}
+            validationResults={dataEntry.validation_results}
+          />
+        </StickyNav>
+        <article>
+          <Outlet />
+        </article>
+      </main>
+    </>
+  );
 }

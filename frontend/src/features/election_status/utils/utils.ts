@@ -1,4 +1,9 @@
-export function getCategoryRowUrl(pollingStationStatus: string | undefined, pollingStationId: number): string | null {
+import { DataEntryStatusName } from "@/types/generated/openapi.ts";
+
+export function getCategoryRowUrl(
+  pollingStationStatus: DataEntryStatusName | undefined,
+  pollingStationId: number,
+): string | null {
   switch (pollingStationStatus) {
     case "first_entry_not_started":
       return null;

@@ -57,7 +57,7 @@ export function DetailIndexPage() {
     // Therefor no need to show "resolve errors/warnings section"
     const fixedSections = structure.filter((section) => !section.id.startsWith("political_group_votes_"))[0];
     const basePath = `/elections/${election.id}/status/${pollingStationId}/detail`;
-    return <Navigate to={basePath ? `${basePath}/${fixedSections?.id}` : basePath} />;
+    return <Navigate to={basePath ? `${basePath}/${fixedSections?.id}` : basePath} replace />;
   } else {
     return (
       <>

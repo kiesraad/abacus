@@ -12,6 +12,6 @@ const results: ValidationResults = {
   warnings: [validationResultMockData.W201, validationResultMockData.W204],
 };
 
-export const ResolveErrorsOverviewStory: StoryFn = () => <DetailOverview structure={structure} results={results} />;
+export const DetailOverviewStory: StoryFn = () => <DetailOverview structure={structure} results={results} />;
 
 export default {} satisfies Meta;

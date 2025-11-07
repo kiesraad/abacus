@@ -8,12 +8,12 @@ import { dottedCode, getValidationResultSetForSection } from "@/utils/Validation
 
 import cls from "./DetailOverview.module.css";
 
-interface ResolveErrorsOverviewProps {
+interface DetailOverviewProps {
   structure: DataEntrySection[];
   results: ValidationResults;
 }
 
-export function DetailOverview({ structure, results }: ResolveErrorsOverviewProps) {
+export function DetailOverview({ structure, results }: DetailOverviewProps) {
   const sections = structure
     .map((section) => {
       const errors = getValidationResultSetForSection(results.errors, section);

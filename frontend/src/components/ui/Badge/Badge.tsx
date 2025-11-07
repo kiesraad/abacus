@@ -20,10 +20,19 @@ const typeToLabel: { [S in DataEntryStatusName]: { label: string; icon?: ReactEl
 export interface BadgeProps {
   type: keyof typeof typeToLabel;
   showIcon?: boolean;
+  readOnlyStatus?: boolean;
 }
 
-export function Badge({ type, showIcon = false }: BadgeProps) {
-  const { label, icon } = typeToLabel[type];
+export function Badge({ type, showIcon = false, readOnlyStatus = false }: BadgeProps) {
+  let { label, icon } = typeToLabel[type];
+
+  // Show first entry status on detail page when second entry has not started yet.
+  // Else this would show the label for second entry, even though you're viewing the first entry.
+  if (type == "second_entry_not_started" && readOnlyStatus) {
+    label = t("data_entry.first_entry");
+    icon = undefined;
+  }
+
   return (
     <div className={`${cls[type]} ${cls.badge}`}>
       {label}

@@ -8,13 +8,13 @@ import { DataEntrySection } from "@/types/types";
 import { MenuStatus } from "@/types/ui";
 import { getValidationResultSetForSection } from "@/utils/ValidationResults";
 
-interface ResolveErrorsNavigationProps {
+interface DetailNavigationProps {
   structure: DataEntrySection[];
   status: DataEntryStatusName;
   validationResults: ValidationResults;
 }
 
-export function DetailNavigation({ structure, status, validationResults }: ResolveErrorsNavigationProps) {
+export function DetailNavigation({ structure, status, validationResults }: DetailNavigationProps) {
   const pollingStationId = useNumericParam("pollingStationId");
   const electionId = useNumericParam("electionId");
   const params = useParams<{ sectionId?: string }>();

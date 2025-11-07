@@ -1117,11 +1117,62 @@ mod tests {
     fn example_data_entry_with_warning() -> DataEntry {
         let mut data_entry = example_data_entry().clone();
 
-        data_entry.data.votes_counts_mut().blank_votes_count = 52;
+        data_entry
+            .data
+            .as_cso_first_session_mut()
+            .unwrap()
+            .extra_investigation
+            .extra_investigation_other_reason
+            .no = true;
+        data_entry
+            .data
+            .as_cso_first_session_mut()
+            .unwrap()
+            .extra_investigation
+            .ballots_recounted_extra_investigation
+            .no = true;
+        data_entry.data.voters_counts_mut().poll_card_count = 1000;
+        data_entry.data.voters_counts_mut().proxy_certificate_count = 0;
+        data_entry
+            .data
+            .voters_counts_mut()
+            .total_admitted_voters_count = 1000;
+
         data_entry
             .data
             .votes_counts_mut()
-            .total_votes_candidates_count = 46;
+            .political_group_total_votes[0]
+            .total = 1;
+        data_entry
+            .data
+            .votes_counts_mut()
+            .political_group_total_votes[1]
+            .total = 0;
+        data_entry
+            .data
+            .votes_counts_mut()
+            .total_votes_candidates_count = 1;
+        data_entry.data.votes_counts_mut().blank_votes_count = 999;
+        data_entry.data.votes_counts_mut().invalid_votes_count = 0;
+        data_entry.data.votes_counts_mut().total_votes_cast_count = 1000;
+
+        data_entry
+            .data
+            .differences_counts_mut()
+            .difference_completely_accounted_for
+            .yes = false;
+        data_entry
+            .data
+            .differences_counts_mut()
+            .difference_completely_accounted_for
+            .no = true;
+
+        data_entry.data.political_group_votes_mut()[0].candidate_votes[0].votes = 1;
+        data_entry.data.political_group_votes_mut()[0].candidate_votes[1].votes = 0;
+        data_entry.data.political_group_votes_mut()[0].total = 1;
+        data_entry.data.political_group_votes_mut()[1].candidate_votes[0].votes = 0;
+        data_entry.data.political_group_votes_mut()[1].candidate_votes[1].votes = 0;
+        data_entry.data.political_group_votes_mut()[1].total = 0;
 
         data_entry
     }
@@ -1841,21 +1892,10 @@ mod tests {
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
     async fn test_polling_station_data_entry_delete_second_entry(pool: SqlitePool) {
-        // create data entry
+        // create data entry with warning
         let request_body = example_data_entry_with_warning();
         let response = claim(pool.clone(), 1, EntryNumber::FirstEntry).await;
         assert_eq!(response.status(), StatusCode::OK);
-
-        let body = response.into_body().collect().await.unwrap().to_bytes();
-        let result: ClaimDataEntryResponse = serde_json::from_slice(&body).unwrap();
-
-        let warnings = result.validation_results.warnings;
-        assert_eq!(warnings.len(), 1);
-        assert_eq!(warnings[0].code, ValidationResultCode::W201);
-        assert_eq!(
-            warnings[0].fields,
-            vec!["data.votes_counts.blank_votes_count",]
-        );
 
         let response = save(
             pool.clone(),
@@ -1867,6 +1907,25 @@ mod tests {
         assert_eq!(response.status(), StatusCode::OK);
         let response = finalise(pool.clone(), 1, EntryNumber::FirstEntry).await;
         assert_eq!(response.status(), StatusCode::OK);
+
+        let user = User::test_user(Role::Coordinator, 1);
+        let response =
+            polling_station_data_entry_get(Coordinator(user), State(pool.clone()), Path(1))
+                .await
+                .into_response();
+        assert_eq!(response.status(), StatusCode::OK);
+        let body = response.into_body().collect().await.unwrap().to_bytes();
+        let result: DataEntryGetResponse = serde_json::from_slice(&body).unwrap();
+
+        let warnings = result.validation_results.warnings;
+        assert_eq!(warnings.len(), 1);
+        assert_eq!(warnings[0].code, ValidationResultCode::W201);
+        assert_eq!(
+            warnings[0].fields,
+            vec!["data.votes_counts.blank_votes_count",]
+        );
+        let errors = result.validation_results.errors;
+        assert_eq!(errors.len(), 0);
 
         // Check that the data entry is created
         let mut conn = pool.acquire().await.unwrap();

@@ -1,10 +1,11 @@
 import type { Meta, StoryFn } from "@storybook/react-vite";
 
-import { DetailOverview } from "@/features/detail/components/DetailOverview.tsx";
 import { electionMockData } from "@/testing/api-mocks/ElectionMockData";
 import { validationResultMockData } from "@/testing/api-mocks/ValidationResultMockData";
 import { ValidationResults } from "@/types/generated/openapi";
 import { getDataEntryStructure } from "@/utils/dataEntryStructure";
+
+import { DetailOverview } from "../components/DetailOverview";
 
 const structure = getDataEntryStructure("CSOFirstSession", electionMockData);
 const results: ValidationResults = {

@@ -14,7 +14,7 @@ import { server } from "@/testing/server";
 import { render, screen } from "@/testing/test-utils";
 import { TestUserProvider } from "@/testing/TestUserProvider";
 
-import { DetailSectionPage } from "./DetailSectionPage.tsx";
+import { DetailSectionPage } from "./DetailSectionPage";
 
 const renderSectionPage = () => {
   return render(

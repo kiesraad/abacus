@@ -55,7 +55,7 @@ export function DetailNavigation({ structure, status, validationResults }: Detai
           status != "first_entry_in_progress" &&
           status != "second_entry_in_progress" && (
             <ProgressList.Item status="idle" active={currentSectionId === null}>
-              {validationResults.warnings.length > 0 && validationResults.errors.length == 0 ? (
+              {validationResults.warnings.length > 0 && validationResults.errors.length === 0 ? (
                 <Link to={getSectionUrl("")}>{t("resolve_errors.warnings_short_title")}</Link>
               ) : (
                 <Link to={getSectionUrl("")}>{t("resolve_errors.short_title")}</Link>

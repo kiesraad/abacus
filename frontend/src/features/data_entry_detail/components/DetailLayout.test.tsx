@@ -15,7 +15,7 @@ import { server } from "@/testing/server";
 import { render, screen, waitFor, within } from "@/testing/test-utils";
 import { TestUserProvider } from "@/testing/TestUserProvider";
 
-import { DetailLayout } from "./DetailLayout.tsx";
+import { DetailLayout } from "./DetailLayout";
 
 const renderLayout = () => {
   return render(

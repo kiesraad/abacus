@@ -13,7 +13,7 @@ import { getDataEntryStructure } from "@/utils/dataEntryStructure";
 
 import { usePollingStationDataEntryErrors } from "../hooks/usePollingStationDataEntryErrors";
 import cls from "./detail.module.css";
-import { DetailNavigation } from "./DetailNavigation.tsx";
+import { DetailNavigation } from "./DetailNavigation";
 
 export function DetailLayout() {
   const pollingStationId = useNumericParam("pollingStationId");
@@ -32,17 +32,17 @@ export function DetailLayout() {
 
   return (
     <>
-      {dataEntry.status == "first_entry_has_errors" ? (
+      {dataEntry.status === "first_entry_has_errors" ? (
         <PageTitle title={`${t("resolve_errors.page_title")} - Abacus`} />
       ) : (
-        <PageTitle title={`${t("detail.page_title")} - Abacus`} />
+        <PageTitle title={`${t("data_entry_detail.page_title")} - Abacus`} />
       )}
 
       <header>
         <section className="smaller-gap">
           <PollingStationNumber>{pollingStation.number}</PollingStationNumber>
           <h1>{pollingStation.name}</h1>
-          {dataEntry.status == "first_entry_has_errors" ? (
+          {dataEntry.status === "first_entry_has_errors" ? (
             <Badge type={dataEntry.status} />
           ) : (
             <Badge type={dataEntry.status} readOnlyStatus={true} />

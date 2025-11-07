@@ -1,12 +1,13 @@
 import { screen, within } from "@testing-library/react";
 import { describe, expect, test } from "vitest";
 
-import { DetailOverview } from "@/features/detail/components/DetailOverview.tsx";
 import { electionMockData } from "@/testing/api-mocks/ElectionMockData";
 import { validationResultMockData } from "@/testing/api-mocks/ValidationResultMockData";
 import { render } from "@/testing/test-utils";
 import { ValidationResults } from "@/types/generated/openapi";
 import { getDataEntryStructure } from "@/utils/dataEntryStructure";
+
+import { DetailOverview } from "../components/DetailOverview";
 
 function getValidationResults(section: HTMLElement | null) {
   if (!section) return [];

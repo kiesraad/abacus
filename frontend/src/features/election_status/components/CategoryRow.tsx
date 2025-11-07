@@ -3,7 +3,7 @@ import { ReactNode } from "react";
 import { Badge } from "@/components/ui/Badge/Badge";
 import { ProgressBar } from "@/components/ui/ProgressBar/ProgressBar";
 import { Table } from "@/components/ui/Table/Table";
-import { getCategoryRowUrl } from "@/features/election_status/utils/utils.ts";
+import { getCategoryRowUrl } from "@/features/election_status/utils/utils";
 import { t } from "@/i18n/translate";
 import { DataEntryStatusName } from "@/types/generated/openapi";
 import { formatDateTime } from "@/utils/dateTime";

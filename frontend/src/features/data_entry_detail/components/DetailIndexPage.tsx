@@ -14,7 +14,7 @@ import { getDataEntryStructure } from "@/utils/dataEntryStructure";
 
 import { usePollingStationDataEntryErrors } from "../hooks/usePollingStationDataEntryErrors";
 import cls from "./detail.module.css";
-import { DetailOverview } from "./DetailOverview.tsx";
+import { DetailOverview } from "./DetailOverview";
 
 export function DetailIndexPage() {
   const { pushMessage } = useMessages();
@@ -52,7 +52,7 @@ export function DetailIndexPage() {
 
   const structure = getDataEntryStructure(dataEntry.data.model, election);
 
-  if (dataEntry.status !== "first_entry_has_errors") {
+  if (dataEntry.status !== "first_entry_has_errors" && dataEntry.validation_results.warnings.length === 0) {
     // Redirect to first section because Coordinator is viewing the read-only version and there are no warnings.
     // Therefor no need to show "resolve errors/warnings section"
     const fixedSections = structure.filter((section) => !section.id.startsWith("political_group_votes_"))[0];
@@ -61,52 +61,60 @@ export function DetailIndexPage() {
   } else {
     return (
       <>
-        <h2>{t("resolve_errors.title")}</h2>
-        <p className="md">{t("resolve_errors.page_content")}</p>
+        <h2>
+          {dataEntry.status === "first_entry_has_errors" ? t("resolve_errors.title") : t("data_entry_detail.title")}
+        </h2>
+        <p className="md">
+          {dataEntry.status === "first_entry_has_errors"
+            ? t("resolve_errors.page_content")
+            : t("data_entry_detail.page_content")}
+        </p>
 
         <DetailOverview structure={structure} results={dataEntry.validation_results} />
 
-        <Form
-          className={cls.resolveForm}
-          onSubmit={(e) => {
-            e.preventDefault();
-            void onSubmit(afterSave);
-          }}
-        >
-          <FormLayout>
-            <FormLayout.Section title={t("resolve_errors.form_question")}>
-              <p>{t("resolve_errors.form_content")}</p>
-              <ChoiceList>
-                {validationError && <ChoiceList.Error id="resolve-errors-error">{validationError}</ChoiceList.Error>}
-                <ChoiceList.Radio
-                  id="keep_entry"
-                  label={tx("resolve_errors.options.resume_first_entry", undefined, {
-                    name: getName(dataEntry.user_id),
-                  })}
-                  checked={action === "resume_first_entry"}
-                  onChange={() => {
-                    setAction("resume_first_entry");
-                  }}
-                >
-                  {t("resolve_errors.options.resume_first_entry_description")}
-                </ChoiceList.Radio>
-                <ChoiceList.Radio
-                  id="discard_entry"
-                  label={tx("resolve_errors.options.discard_first_entry")}
-                  checked={action === "discard_first_entry"}
-                  onChange={() => {
-                    setAction("discard_first_entry");
-                  }}
-                >
-                  {t("resolve_errors.options.discard_first_entry_description")}
-                </ChoiceList.Radio>
-              </ChoiceList>
-            </FormLayout.Section>
-            <FormLayout.Controls>
-              <Button type="submit">{t("save")}</Button>
-            </FormLayout.Controls>
-          </FormLayout>
-        </Form>
+        {dataEntry.status === "first_entry_has_errors" && (
+          <Form
+            className={cls.resolveForm}
+            onSubmit={(e) => {
+              e.preventDefault();
+              void onSubmit(afterSave);
+            }}
+          >
+            <FormLayout>
+              <FormLayout.Section title={t("resolve_errors.form_question")}>
+                <p>{t("resolve_errors.form_content")}</p>
+                <ChoiceList>
+                  {validationError && <ChoiceList.Error id="resolve-errors-error">{validationError}</ChoiceList.Error>}
+                  <ChoiceList.Radio
+                    id="keep_entry"
+                    label={tx("resolve_errors.options.resume_first_entry", undefined, {
+                      name: getName(dataEntry.user_id),
+                    })}
+                    checked={action === "resume_first_entry"}
+                    onChange={() => {
+                      setAction("resume_first_entry");
+                    }}
+                  >
+                    {t("resolve_errors.options.resume_first_entry_description")}
+                  </ChoiceList.Radio>
+                  <ChoiceList.Radio
+                    id="discard_entry"
+                    label={tx("resolve_errors.options.discard_first_entry")}
+                    checked={action === "discard_first_entry"}
+                    onChange={() => {
+                      setAction("discard_first_entry");
+                    }}
+                  >
+                    {t("resolve_errors.options.discard_first_entry_description")}
+                  </ChoiceList.Radio>
+                </ChoiceList>
+              </FormLayout.Section>
+              <FormLayout.Controls>
+                <Button type="submit">{t("save")}</Button>
+              </FormLayout.Controls>
+            </FormLayout>
+          </Form>
+        )}
       </>
     );
   }

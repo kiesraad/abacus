@@ -8,7 +8,6 @@ import { ElectionStatusLayout } from "@/components/layout/ElectionStatusLayout";
 import { accountRoutes } from "@/features/account/routes";
 import { dataEntryRoutes } from "@/features/data_entry/routes";
 import { dataEntryHomeRoutes } from "@/features/data_entry_home/routes";
-import { detailRoutes } from "@/features/detail/routes";
 import { devRoutes } from "@/features/dev/routes";
 import { electionCreateRoutes } from "@/features/election_create/routes";
 import { electionManagementRoutes } from "@/features/election_management/routes";
@@ -21,6 +20,7 @@ import { pollingStationsRoutes } from "@/features/polling_stations/routes";
 import { resolveDifferencesRoutes } from "@/features/resolve_differences/routes";
 import { usersRoutes } from "@/features/users/routes";
 
+import { detailRoutes } from "../features/data_entry_detail/routes";
 import { RootLayout } from "./RootLayout";
 
 const showDevPage = __SHOW_DEV_PAGE__;

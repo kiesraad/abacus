@@ -9,7 +9,7 @@ import { ValidationResults } from "@/types/generated/openapi";
 import { DataEntryStructure } from "@/types/types";
 import { getDataEntryStructure } from "@/utils/dataEntryStructure";
 
-import { DetailNavigation } from "./DetailNavigation.tsx";
+import { DetailNavigation } from "./DetailNavigation";
 
 describe("DetailNavigation", () => {
   const electionMockData = getElectionMockData().election;

@@ -19,7 +19,7 @@ import { server } from "@/testing/server";
 import { render, screen, spyOnHandler } from "@/testing/test-utils";
 import { TestUserProvider } from "@/testing/TestUserProvider";
 
-import { DetailIndexPage } from "./DetailIndexPage.tsx";
+import { DetailIndexPage } from "./DetailIndexPage";
 
 const navigate = vi.fn();
 

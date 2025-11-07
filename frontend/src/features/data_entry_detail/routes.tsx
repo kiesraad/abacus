@@ -1,8 +1,8 @@
 import { RouteObject } from "react-router";
 
-import { DetailIndexPage } from "./components/DetailIndexPage.tsx";
-import { DetailLayout } from "./components/DetailLayout.tsx";
-import { DetailSectionPage } from "./components/DetailSectionPage.tsx";
+import { DetailIndexPage } from "./components/DetailIndexPage";
+import { DetailLayout } from "./components/DetailLayout";
+import { DetailSectionPage } from "./components/DetailSectionPage";
 
 export const detailRoutes: RouteObject[] = [
   {

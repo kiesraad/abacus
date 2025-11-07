@@ -126,6 +126,18 @@ pub(crate) mod tests {
     }
 
     #[test(tokio::test)]
+    async fn it_generates_a_pdf_with_unsupported_chars() {
+        let content = generate_pdf(PdfFileModel {
+            file_name: "file.pdf".into(),
+            model: PdfModel::TestUnsupportedChars(),
+        })
+        .await
+        .unwrap();
+
+        assert!(!content.buffer.is_empty());
+    }
+
+    #[test(tokio::test)]
     async fn it_generates_a_pdf_with_polling_stations() {
         let election = election_fixture(&[2, 3]);
         let committee_session = committee_session_fixture(election.id);

@@ -175,6 +175,8 @@ fn load_sources() -> Vec<Source> {
         include_source!("model-p-2a.typ"),
         #[cfg(test)]
         include_source!("test-teletex-charset.typ"),
+        #[cfg(test)]
+        include_source!("test-unsupported-chars.typ"),
     ]
 }
 

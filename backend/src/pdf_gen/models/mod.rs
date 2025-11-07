@@ -37,6 +37,8 @@ pub enum PdfModel {
     ModelP2a(Box<ModelP2aInput>),
     #[cfg(test)]
     TestTeletexCharset(),
+    #[cfg(test)]
+    TestUnsupportedChars(),
 }
 
 impl PdfModel {
@@ -51,6 +53,8 @@ impl PdfModel {
             Self::ModelP2a(_) => "model-p-2a",
             #[cfg(test)]
             Self::TestTeletexCharset() => "test-teletex-charset",
+            #[cfg(test)]
+            Self::TestUnsupportedChars() => "test-unsupported-chars",
         }
     }
 
@@ -83,6 +87,11 @@ impl PdfModel {
             Self::TestTeletexCharset() => {
                 Ok(include_str!("../../../templates/inputs/test-teletex-charset.json").to_string())
             }
+            #[cfg(test)]
+            Self::TestUnsupportedChars() => Ok(include_str!(
+                "../../../templates/inputs/test-unsupported-chars.json"
+            )
+            .to_string()),
         }?;
 
         Ok(replace_unsupported_glyphs(data))

@@ -1,5 +1,25 @@
 {
-  "page_title": "Invoer bekijken",
-  "page_content": "De invoer bevat waarschuwingen die onderzocht en/of verklaard moeten worden. Volg de instructies hieronder.",
-  "title": "Alle waarschuwingen"
+  "read_only": {
+    "page_title": "Invoer bekijken",
+    "page_content": "De invoer bevat waarschuwingen die onderzocht en/of verklaard moeten worden. Volg de instructies hieronder.",
+    "short_title": "Waarschuwingen",
+    "title": "Alle waarschuwingen"
+  },
+  "resolve_errors": {
+    "alert_contains_errors": "Let op: het proces-verbaal bevat fouten die moeten worden opgelost",
+    "differences_resolved": "Verschil opgelost voor stembureau {number}",
+    "form_content": "In de invoer zijn fouten gevonden die wijzen op fouten in het papieren proces-verbaal. Het proces-verbaal kan worden gecontroleerd door de leden van het Gemeentelijk Stembureau. Kies hieronder op basis van de aanpassingen de meest geschikte optie.",
+    "form_question": "Wat wil je doen met de invoer in Abacus?",
+    "options": {
+      "resume_first_entry": "<strong>Invoer bewaren</strong> en correcties laten invoeren door {name}",
+      "resume_first_entry_description": "Als het papieren proces-verbaal fouten bevat die meteen kunnen worden opgelost door een lid van het Gemeentelijk Stembureau.",
+      "discard_first_entry": "<strong>Stembureau opnieuw laten invoeren</strong>",
+      "discard_first_entry_description": "Als er fouten in het papieren proces-verbaal zitten die alleen kunnen worden opgelost door een (gedeeltelijke) hertelling. Of als de oorspronkelijke invoerder niet meer aanwezig is."
+    },
+    "page_content": "De invoer bevat fouten die wijzen op fouten in het papieren-proces verbaal.",
+    "page_title": "Fouten en waarschuwingen oplossen",
+    "resolve_errors": "Foutmeldingen en waarschuwingen oplossen",
+    "short_title": "Fouten en waarschuwingen",
+    "title": "Alle fouten en waarschuwingen"
+  }
 }

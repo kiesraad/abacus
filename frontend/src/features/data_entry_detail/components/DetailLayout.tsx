@@ -12,7 +12,6 @@ import { t } from "@/i18n/translate";
 import { getDataEntryStructure } from "@/utils/dataEntryStructure";
 
 import { usePollingStationDataEntryErrors } from "../hooks/usePollingStationDataEntryErrors";
-import cls from "./detail.module.css";
 import { DetailNavigation } from "./DetailNavigation";
 
 export function DetailLayout() {
@@ -32,25 +31,19 @@ export function DetailLayout() {
 
   return (
     <>
-      {dataEntry.status === "first_entry_has_errors" ? (
-        <PageTitle title={`${t("resolve_errors.page_title")} - Abacus`} />
-      ) : (
-        <PageTitle title={`${t("data_entry_detail.page_title")} - Abacus`} />
-      )}
+      <PageTitle
+        title={`${t(`data_entry_detail.${dataEntry.status === "first_entry_has_errors" ? "resolve_errors.page_title" : "read_only.page_title"}`)} - Abacus`}
+      />
 
       <header>
         <section className="smaller-gap">
           <PollingStationNumber>{pollingStation.number}</PollingStationNumber>
           <h1>{pollingStation.name}</h1>
-          {dataEntry.status === "first_entry_has_errors" ? (
-            <Badge type={dataEntry.status} />
-          ) : (
-            <Badge type={dataEntry.status} readOnlyStatus={true} />
-          )}
+          <Badge type={dataEntry.status} readOnlyStatus={dataEntry.status !== "first_entry_has_errors"} />
         </section>
       </header>
       <Messages />
-      <main className={cls.detail}>
+      <main>
         <StickyNav>
           <DetailNavigation
             structure={structure}

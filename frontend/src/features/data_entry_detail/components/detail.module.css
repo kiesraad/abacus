@@ -1,18 +1,16 @@
-.detail {
-  .resolveForm {
-    margin-top: 1.5rem;
-    padding: 1.5rem;
-    background-color: var(--base-white);
-    border-radius: 1rem;
+.resolveErrorsForm {
+  margin-top: 1.5rem;
+  padding: 1.5rem;
+  background-color: var(--base-white);
+  border-radius: 1rem;
 
-    p {
-      width: 37.5rem;
-    }
+  p {
+    width: 37.5rem;
+  }
 
-    fieldset {
-      section {
-        gap: var(--space-md);
-      }
+  fieldset {
+    section {
+      gap: var(--space-md);
     }
   }
 }

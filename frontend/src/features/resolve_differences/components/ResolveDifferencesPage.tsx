@@ -39,8 +39,8 @@ export function ResolveDifferencesPage() {
     switch (status) {
       case "first_entry_has_errors":
         pushMessage({
-          title: t("resolve_errors.differences_resolved", { number: pollingStation.number }),
-          text: t("resolve_errors.alert_contains_errors"),
+          title: t("data_entry_detail.resolve_errors.differences_resolved", { number: pollingStation.number }),
+          text: t("data_entry_detail.resolve_errors.alert_contains_errors"),
         });
         void navigate(`/elections/${election.id}/status/${pollingStationId}/detail`);
         break;

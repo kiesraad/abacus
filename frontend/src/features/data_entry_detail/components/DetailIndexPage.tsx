@@ -62,32 +62,34 @@ export function DetailIndexPage() {
     return (
       <>
         <h2>
-          {dataEntry.status === "first_entry_has_errors" ? t("resolve_errors.title") : t("data_entry_detail.title")}
+          {t(
+            `data_entry_detail.${dataEntry.status === "first_entry_has_errors" ? "resolve_errors.title" : "read_only.title"}`,
+          )}
         </h2>
         <p className="md">
-          {dataEntry.status === "first_entry_has_errors"
-            ? t("resolve_errors.page_content")
-            : t("data_entry_detail.page_content")}
+          {t(
+            `data_entry_detail.${dataEntry.status === "first_entry_has_errors" ? "resolve_errors.page_content" : "read_only.page_content"}`,
+          )}
         </p>
 
         <ErrorsAndWarningsOverview structure={structure} results={dataEntry.validation_results} />
 
         {dataEntry.status === "first_entry_has_errors" && (
           <Form
-            className={cls.resolveForm}
+            className={cls.resolveErrorsForm}
             onSubmit={(e) => {
               e.preventDefault();
               void onSubmit(afterSave);
             }}
           >
             <FormLayout>
-              <FormLayout.Section title={t("resolve_errors.form_question")}>
-                <p>{t("resolve_errors.form_content")}</p>
+              <FormLayout.Section title={t("data_entry_detail.resolve_errors.form_question")}>
+                <p>{t("data_entry_detail.resolve_errors.form_content")}</p>
                 <ChoiceList>
                   {validationError && <ChoiceList.Error id="resolve-errors-error">{validationError}</ChoiceList.Error>}
                   <ChoiceList.Radio
                     id="keep_entry"
-                    label={tx("resolve_errors.options.resume_first_entry", undefined, {
+                    label={tx("data_entry_detail.resolve_errors.options.resume_first_entry", undefined, {
                       name: getName(dataEntry.user_id),
                     })}
                     checked={action === "resume_first_entry"}
@@ -95,17 +97,17 @@ export function DetailIndexPage() {
                       setAction("resume_first_entry");
                     }}
                   >
-                    {t("resolve_errors.options.resume_first_entry_description")}
+                    {t("data_entry_detail.resolve_errors.options.resume_first_entry_description")}
                   </ChoiceList.Radio>
                   <ChoiceList.Radio
                     id="discard_entry"
-                    label={tx("resolve_errors.options.discard_first_entry")}
+                    label={tx("data_entry_detail.resolve_errors.options.discard_first_entry")}
                     checked={action === "discard_first_entry"}
                     onChange={() => {
                       setAction("discard_first_entry");
                     }}
                   >
-                    {t("resolve_errors.options.discard_first_entry_description")}
+                    {t("data_entry_detail.resolve_errors.options.discard_first_entry_description")}
                   </ChoiceList.Radio>
                 </ChoiceList>
               </FormLayout.Section>

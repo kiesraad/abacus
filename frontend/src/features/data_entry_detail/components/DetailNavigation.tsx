@@ -52,14 +52,14 @@ export function DetailNavigation({ structure, status, validationResults }: Detai
     <ProgressList>
       <ProgressList.Fixed>
         {(validationResults.errors.length > 0 || validationResults.warnings.length > 0) &&
-          status != "first_entry_in_progress" &&
-          status != "second_entry_in_progress" && (
+          status !== "first_entry_in_progress" &&
+          status !== "second_entry_in_progress" && (
             <ProgressList.Item status="idle" active={currentSectionId === null}>
-              {validationResults.warnings.length > 0 && validationResults.errors.length === 0 ? (
-                <Link to={getSectionUrl("")}>{t("resolve_errors.warnings_short_title")}</Link>
-              ) : (
-                <Link to={getSectionUrl("")}>{t("resolve_errors.short_title")}</Link>
-              )}
+              <Link to={getSectionUrl("")}>
+                {t(
+                  `data_entry_detail.${status === "first_entry_has_errors" ? "resolve_errors.short_title" : "read_only.short_title"}`,
+                )}
+              </Link>
             </ProgressList.Item>
           )}
 

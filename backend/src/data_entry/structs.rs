@@ -310,7 +310,7 @@ pub struct CommonPollingStationResults {
 #[derive(Serialize, Deserialize, ToSchema, Clone, Debug, Default, PartialEq, Eq, Hash)]
 #[serde(deny_unknown_fields)]
 pub struct CSOFirstSessionResults {
-    /// Extra investigation ("B1-1 Extra onderzoek")
+    /// Extra investigation ("B1-1 Alleen bij extra onderzoek")
     pub extra_investigation: ExtraInvestigation,
     /// Counting Differences Polling Station ("B1-2 Verschillen met telresultaten van het stembureau")
     pub counting_differences_polling_station: CountingDifferencesPollingStation,
@@ -573,7 +573,7 @@ impl YesNo {
     }
 }
 
-/// Extra investigation, part of the polling station results ("B1-1 Extra onderzoek")
+/// Extra investigation, part of the polling station results ("B1-1 Alleen bij extra onderzoek")
 #[derive(Serialize, Deserialize, ToSchema, Clone, Debug, Default, PartialEq, Eq, Hash)]
 #[serde(deny_unknown_fields)]
 pub struct ExtraInvestigation {

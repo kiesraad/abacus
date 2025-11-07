@@ -5,7 +5,7 @@
   "check_fields": "Controleer de gemarkeerde velden.",
   "current_password_hint": "Vul je huidige wachtwoord in",
   "fullname": "Jouw naam",
-  "fullname_hint": "Bijvoorbeeld Karel van Tellingen. Je naam wordt opgenomen in het verslag van deze invoersessie. Doe je de invoer met z’n tweeën? Voer dan beide namen in.",
+  "fullname_hint": "Bijvoorbeeld Karel van Tellingen. Je naam wordt opgenomen in het verslag van deze invoersessie.",
   "fullname_subtext": "(roepnaam + achternaam)",
   "login": "Inloggen",
   "login_success": "Inloggen gelukt",

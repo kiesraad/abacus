@@ -186,7 +186,7 @@ describe("OverviewPage", () => {
     expect(await screen.findByText(/Nog geen verkiezingen ingesteld/)).toBeVisible();
     expect(
       await screen.findByText(
-        /Om Abacus in te richten voor het invoeren van telresulaten, heb je de volgende bestanden nodig:/,
+        /Om Abacus in te richten voor het invoeren van telresultaten, heb je de volgende bestanden nodig:/,
       ),
     ).toBeVisible();
     expect(screen.queryByRole("table")).toBeNull();
@@ -226,7 +226,7 @@ describe("OverviewPage", () => {
 
   describe("Alert on first login", () => {
     const alertHeader = "Je account is ingesteld";
-    const alertBody = "Zodra je een tellijst van een stembureau hebt gekregen kan je beginnen met invoeren.";
+    const alertBody = "Zodra je een proces-verbaal van een stembureau hebt gekregen kan je beginnen met invoeren.";
 
     async function render(role: Role) {
       const router = renderReturningRouter(

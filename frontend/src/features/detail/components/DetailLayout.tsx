@@ -44,7 +44,37 @@ export function DetailLayout() {
         <Messages />
         <main className={cls.resolveErrors}>
           <StickyNav>
-            <DetailNavigation structure={structure} validationResults={dataEntry.validation_results} />
+            <DetailNavigation
+              structure={structure}
+              status={dataEntry.status}
+              validationResults={dataEntry.validation_results}
+            />
+          </StickyNav>
+          <article>
+            <Outlet />
+          </article>
+        </main>
+      </>
+    );
+  } else {
+    return (
+      <>
+        <PageTitle title={`${t("detail.page_title")} - Abacus`} />
+        <header>
+          <section className="smaller-gap">
+            <PollingStationNumber>{pollingStation.number}</PollingStationNumber>
+            <h1>{pollingStation.name}</h1>
+            <Badge type={dataEntry.status} />
+          </section>
+        </header>
+        <Messages />
+        <main className={cls.resolveErrors}>
+          <StickyNav>
+            <DetailNavigation
+              structure={structure}
+              status={dataEntry.status}
+              validationResults={dataEntry.validation_results}
+            />
           </StickyNav>
           <article>
             <Outlet />
@@ -53,23 +83,4 @@ export function DetailLayout() {
       </>
     );
   }
-
-  return (
-    <>
-      <PageTitle title={`${t("resolve_errors.page_title")} - Abacus`} />
-      <header>
-        <section className="smaller-gap">
-          <PollingStationNumber>{pollingStation.number}</PollingStationNumber>
-          <h1>{pollingStation.name}</h1>
-          <Badge type={dataEntry.status} />
-        </section>
-      </header>
-      <Messages />
-      <main className={cls.resolveErrors}>
-        <article>
-          <Outlet />
-        </article>
-      </main>
-    </>
-  );
 }

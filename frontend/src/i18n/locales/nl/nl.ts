@@ -5,6 +5,7 @@ import check_and_save from "./check_and_save.json";
 import committee_session_status from "./committee_session_status.json";
 import counting_differences_polling_station from "./counting_differences_polling_station.json";
 import data_entry from "./data_entry.json";
+import detail from "./detail.json";
 import differences_counts from "./differences_counts.json";
 import election from "./election.json";
 import election_management from "./election_management.json";
@@ -37,6 +38,7 @@ const nl = {
   committee_session_status,
   counting_differences_polling_station,
   data_entry,
+  detail,
   differences_counts,
   election,
   election_management,

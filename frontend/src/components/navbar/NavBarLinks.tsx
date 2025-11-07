@@ -62,7 +62,7 @@ function ElectionManagementLinks({ location }: NavBarLinksProps) {
           <Link to={`/elections/${election.id}/polling-stations`}>{t("polling_station.title.plural")}</Link>
         </>
       )}
-      {location.pathname.match(/^\/elections\/\d+\/status\/\d+\/(resolve-differences|detail\/?\w+)$/) && (
+      {location.pathname.match(/^\/elections\/\d+\/status\/\d+\/(resolve-differences|detail(\/\w+)?)$/) && (
         <>
           <IconChevronRight />
           <Link to={`/elections/${election.id}/status`}>{committeeSessionLabel(currentCommitteeSession.number)}</Link>

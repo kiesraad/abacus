@@ -4,7 +4,6 @@ import { Badge } from "@/components/ui/Badge/Badge";
 import { ProgressBar } from "@/components/ui/ProgressBar/ProgressBar";
 import { Table } from "@/components/ui/Table/Table";
 import { getCategoryRowUrl } from "@/features/election_status/utils/utils.ts";
-import { useUserRole } from "@/hooks/user/useUserRole.ts";
 import { t } from "@/i18n/translate";
 import { DataEntryStatusName } from "@/types/generated/openapi";
 import { formatDateTime } from "@/utils/dateTime";
@@ -25,10 +24,7 @@ const SHOW_BADGE: DataEntryStatusName[] = [
 ];
 
 export function CategoryRow({ category, pollingStation, addLink }: CategoryRowProps): ReactNode {
-  const { isCoordinator } = useUserRole();
-
-  const link = getCategoryRowUrl(pollingStation.status, pollingStation.id, isCoordinator);
-
+  const link = getCategoryRowUrl(pollingStation.status, pollingStation.id);
   if (addLink && link) {
     return (
       <Table.LinkRow to={link}>

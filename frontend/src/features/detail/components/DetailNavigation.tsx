@@ -3,17 +3,18 @@ import { Link, useParams } from "react-router";
 import { ProgressList } from "@/components/ui/ProgressList/ProgressList";
 import { useNumericParam } from "@/hooks/useNumericParam";
 import { t } from "@/i18n/translate";
-import { ValidationResults } from "@/types/generated/openapi";
+import { DataEntryStatusName, ValidationResults } from "@/types/generated/openapi";
 import { DataEntrySection } from "@/types/types";
 import { MenuStatus } from "@/types/ui";
 import { getValidationResultSetForSection } from "@/utils/ValidationResults";
 
 interface ResolveErrorsNavigationProps {
   structure: DataEntrySection[];
+  status: DataEntryStatusName;
   validationResults: ValidationResults;
 }
 
-export function DetailNavigation({ structure, validationResults }: ResolveErrorsNavigationProps) {
+export function DetailNavigation({ structure, status, validationResults }: ResolveErrorsNavigationProps) {
   const pollingStationId = useNumericParam("pollingStationId");
   const electionId = useNumericParam("electionId");
   const params = useParams<{ sectionId?: string }>();
@@ -47,13 +48,20 @@ export function DetailNavigation({ structure, validationResults }: ResolveErrors
   // Separate sections into fixed and scrollable groups
   const fixedSections = structure.filter((section) => !section.id.startsWith("political_group_votes_"));
   const politicalGroupSections = structure.filter((section) => section.id.startsWith("political_group_votes_"));
-
   return (
     <ProgressList>
       <ProgressList.Fixed>
-        <ProgressList.Item status="idle" active={currentSectionId === null}>
-          <Link to={getSectionUrl("")}>{t("resolve_errors.short_title")}</Link>
-        </ProgressList.Item>
+        {(validationResults.errors.length > 0 || validationResults.warnings.length > 0) &&
+          status != "first_entry_in_progress" &&
+          status != "second_entry_in_progress" && (
+            <ProgressList.Item status="idle" active={currentSectionId === null}>
+              {validationResults.warnings.length > 0 && validationResults.errors.length == 0 ? (
+                <Link to={getSectionUrl("")}>{t("resolve_errors.warnings_short_title")}</Link>
+              ) : (
+                <Link to={getSectionUrl("")}>{t("resolve_errors.short_title")}</Link>
+              )}
+            </ProgressList.Item>
+          )}
 
         {fixedSections.map((section) => (
           <ProgressList.Item

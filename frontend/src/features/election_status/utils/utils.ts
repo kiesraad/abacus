@@ -1,23 +1,10 @@
-export function getCategoryRowUrl(
-  pollingStationStatus: string | undefined,
-  pollingStationId: number,
-  isCoordinator: boolean,
-): string | null {
-  let link = null;
-
+export function getCategoryRowUrl(pollingStationStatus: string | undefined, pollingStationId: number): string | null {
   switch (pollingStationStatus) {
+    case "first_entry_not_started":
+      return null;
     case "entries_different":
-      link = `./${pollingStationId}/resolve-differences`;
-      break;
-    case "first_entry_has_errors":
-      link = `./${pollingStationId}/detail`;
-      break;
+      return `./${pollingStationId}/resolve-differences`;
     default:
-      if (isCoordinator && pollingStationStatus != "first_entry_not_started") {
-        link = `./${pollingStationId}/detail`;
-      }
-      break;
+      return `./${pollingStationId}/detail`;
   }
-
-  return link;
 }

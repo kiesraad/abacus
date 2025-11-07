@@ -31,7 +31,13 @@ describe("DetailNavigation", () => {
   };
 
   const renderNavigation = (validationResults: ValidationResults, testStructure: DataEntryStructure = structure) => {
-    return render(<DetailNavigation structure={testStructure} validationResults={validationResults} />);
+    return render(
+      <DetailNavigation
+        structure={testStructure}
+        status={"second_entry_not_started"}
+        validationResults={validationResults}
+      />,
+    );
   };
 
   beforeEach(() => {
@@ -46,7 +52,7 @@ describe("DetailNavigation", () => {
     renderNavigation(mockValidationResultsNoErrors);
 
     // Errors/warnings section is not shown.
-    expect(screen.queryByRole("link", { name: "Fouten en waarschuwingen" })).toBeInTheDocument();
+    expect(screen.queryByRole("link", { name: "Fouten en waarschuwingen" })).not.toBeInTheDocument();
     expect(screen.getByRole("link", { name: "Extra onderzoek" })).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "Aantal kiezers en stemmen" })).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "Verschillen D & H" })).toBeInTheDocument();
@@ -57,7 +63,7 @@ describe("DetailNavigation", () => {
   test("renders with empty structure", () => {
     renderNavigation(mockValidationResultsNoErrors, []);
 
-    expect(screen.queryByText("Fouten en waarschuwingen")).toBeInTheDocument();
+    expect(screen.queryByText("Fouten en waarschuwingen")).not.toBeInTheDocument();
   });
 
   test("shows correct status based on validation results", () => {

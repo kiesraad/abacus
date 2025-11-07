@@ -5,7 +5,7 @@ import { validationResultMockData } from "@/testing/api-mocks/ValidationResultMo
 import { ValidationResults } from "@/types/generated/openapi";
 import { getDataEntryStructure } from "@/utils/dataEntryStructure";
 
-import { DetailOverview } from "../components/DetailOverview";
+import { ErrorsAndWarningsOverview } from "./ErrorsAndWarningsOverview";
 
 const structure = getDataEntryStructure("CSOFirstSession", electionMockData);
 const results: ValidationResults = {
@@ -13,6 +13,8 @@ const results: ValidationResults = {
   warnings: [validationResultMockData.W201, validationResultMockData.W204],
 };
 
-export const DetailOverviewStory: StoryFn = () => <DetailOverview structure={structure} results={results} />;
+export const ErrorsAndWarningsOverviewStory: StoryFn = () => (
+  <ErrorsAndWarningsOverview structure={structure} results={results} />
+);
 
 export default {} satisfies Meta;

@@ -14,7 +14,7 @@ import { getDataEntryStructure } from "@/utils/dataEntryStructure";
 
 import { usePollingStationDataEntryErrors } from "../hooks/usePollingStationDataEntryErrors";
 import cls from "./detail.module.css";
-import { DetailOverview } from "./DetailOverview";
+import { ErrorsAndWarningsOverview } from "./ErrorsAndWarningsOverview";
 
 export function DetailIndexPage() {
   const { pushMessage } = useMessages();
@@ -54,7 +54,7 @@ export function DetailIndexPage() {
 
   if (dataEntry.status !== "first_entry_has_errors" && dataEntry.validation_results.warnings.length === 0) {
     // Redirect to first section because Coordinator is viewing the read-only version and there are no warnings.
-    // Therefor no need to show "resolve errors/warnings section"
+    // Therefor no need to show the errors and warnings overview
     const fixedSections = structure.filter((section) => !section.id.startsWith("political_group_votes_"))[0];
     const basePath = `/elections/${election.id}/status/${pollingStationId}/detail`;
     return <Navigate to={basePath ? `${basePath}/${fixedSections?.id}` : basePath} replace />;
@@ -70,7 +70,7 @@ export function DetailIndexPage() {
             : t("data_entry_detail.page_content")}
         </p>
 
-        <DetailOverview structure={structure} results={dataEntry.validation_results} />
+        <ErrorsAndWarningsOverview structure={structure} results={dataEntry.validation_results} />
 
         {dataEntry.status === "first_entry_has_errors" && (
           <Form

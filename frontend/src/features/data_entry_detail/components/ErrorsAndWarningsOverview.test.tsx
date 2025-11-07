@@ -7,7 +7,7 @@ import { render } from "@/testing/test-utils";
 import { ValidationResults } from "@/types/generated/openapi";
 import { getDataEntryStructure } from "@/utils/dataEntryStructure";
 
-import { DetailOverview } from "../components/DetailOverview";
+import { ErrorsAndWarningsOverview } from "./ErrorsAndWarningsOverview";
 
 function getValidationResults(section: HTMLElement | null) {
   if (!section) return [];
@@ -26,7 +26,7 @@ function getValidationResults(section: HTMLElement | null) {
     });
 }
 
-describe("DetailOverview", () => {
+describe("ErrorsAndWarningsOverview", () => {
   const structure = getDataEntryStructure("CSOFirstSession", electionMockData);
 
   test("render sections with errors and warnings", () => {
@@ -40,7 +40,7 @@ describe("DetailOverview", () => {
       warnings: [validationResultMockData.W201],
     };
 
-    render(<DetailOverview structure={structure} results={results} />);
+    render(<ErrorsAndWarningsOverview structure={structure} results={results} />);
 
     const extra_investigation = screen.queryByRole("region", { name: "Extra onderzoek B1-1" });
     expect(extra_investigation).toBeInTheDocument();

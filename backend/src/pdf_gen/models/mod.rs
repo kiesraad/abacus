@@ -36,7 +36,7 @@ pub enum PdfModel {
     ModelN10_2(Box<ModelN10_2Input>),
     ModelP2a(Box<ModelP2aInput>),
     #[cfg(test)]
-    TeletexTest(),
+    TestTeletexCharset(),
 }
 
 impl PdfModel {
@@ -50,7 +50,7 @@ impl PdfModel {
             Self::ModelN10_2(_) => "model-n-10-2",
             Self::ModelP2a(_) => "model-p-2a",
             #[cfg(test)]
-            Self::TeletexTest() => "teletex-test",
+            Self::TestTeletexCharset() => "test-teletex-charset",
         }
     }
 
@@ -80,8 +80,8 @@ impl PdfModel {
             Self::ModelN10_2(input) => serde_json::to_string(input),
             Self::ModelP2a(input) => serde_json::to_string(input),
             #[cfg(test)]
-            Self::TeletexTest() => {
-                Ok(include_str!("../../../templates/inputs/teletex-test.json").to_string())
+            Self::TestTeletexCharset() => {
+                Ok(include_str!("../../../templates/inputs/test-teletex-charset.json").to_string())
             }
         }?;
 

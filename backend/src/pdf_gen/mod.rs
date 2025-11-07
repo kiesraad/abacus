@@ -97,7 +97,7 @@ pub(crate) mod tests {
 
     #[test(tokio::test)]
     async fn the_default_font_supports_teletex_chars() {
-        // See backend/templates/inputs/teletex-test.json for the list of characters that are expected to be supported.
+        // See backend/templates/inputs/test-teletex-charset.json for the list of characters that are expected to be supported.
         let input = (32..127)
             .map(|codepoint| char::from_u32(codepoint).unwrap())
             .collect::<String>();
@@ -117,7 +117,7 @@ pub(crate) mod tests {
     async fn it_generates_a_pdf_with_teletex_chars() {
         let content = generate_pdf(PdfFileModel {
             file_name: "file.pdf".into(),
-            model: PdfModel::TeletexTest(),
+            model: PdfModel::TestTeletexCharset(),
         })
         .await
         .unwrap();

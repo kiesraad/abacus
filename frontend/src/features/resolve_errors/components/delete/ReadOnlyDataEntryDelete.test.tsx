@@ -2,7 +2,7 @@ import { userEvent } from "@testing-library/user-event";
 import { beforeEach, describe, expect, Mock, test, vi } from "vitest";
 
 import { pollingStationMockData } from "@/testing/api-mocks/PollingStationMockData.ts";
-import { PollingStationDataEntryDeleteHandler } from "@/testing/api-mocks/RequestHandlers";
+import { PollingStationDataEntriesAndResultDeleteHandler } from "@/testing/api-mocks/RequestHandlers";
 import { overrideOnce, server } from "@/testing/server";
 import { render, screen, spyOnHandler } from "@/testing/test-utils";
 import { POLLING_STATION_DATA_ENTRIES_AND_RESULT_DELETE_REQUEST_PATH } from "@/types/generated/openapi";
@@ -26,8 +26,8 @@ describe("ReadOnlyDataEntryDelete", () => {
   let deleteDataEntry: Mock;
 
   beforeEach(() => {
-    server.use(PollingStationDataEntryDeleteHandler);
-    deleteDataEntry = spyOnHandler(PollingStationDataEntryDeleteHandler);
+    server.use(PollingStationDataEntriesAndResultDeleteHandler);
+    deleteDataEntry = spyOnHandler(PollingStationDataEntriesAndResultDeleteHandler);
   });
 
   test("delete after confirm", async () => {
@@ -38,7 +38,7 @@ describe("ReadOnlyDataEntryDelete", () => {
 
     expect(await screen.findByRole("dialog")).toBeInTheDocument();
 
-    await user.click(screen.getByRole("button", { name: "Verwijderen" }));
+    await user.click(screen.getByRole("button", { name: "Verwijder invoer" }));
     expect(deleteDataEntry).toHaveBeenCalledOnce();
     expect(onDeleted).toHaveBeenCalledOnce();
   });
@@ -76,7 +76,7 @@ describe("ReadOnlyDataEntryDelete", () => {
 
     expect(await screen.findByRole("dialog")).toBeInTheDocument();
 
-    await user.click(screen.getByRole("button", { name: "Verwijderen" }));
+    await user.click(screen.getByRole("button", { name: "Verwijder invoer" }));
 
     expect(onError).toHaveBeenCalledOnce();
     expect(onDeleted).not.toHaveBeenCalledOnce();

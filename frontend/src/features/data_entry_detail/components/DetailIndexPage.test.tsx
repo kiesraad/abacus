@@ -8,16 +8,16 @@ import * as useMessages from "@/hooks/messages/useMessages";
 import { ElectionProvider } from "@/hooks/election/ElectionProvider";
 import { ElectionStatusProvider } from "@/hooks/election/ElectionStatusProvider";
 import { UsersProvider } from "@/hooks/user/UsersProvider";
+import { dataEntryValidGetMockResponse } from "@/testing/api-mocks/DataEntryMockData";
 import {
   ElectionListRequestHandler,
   ElectionRequestHandler,
   ElectionStatusRequestHandler,
-  PollingStationDataEntryHasErrorsGetHandler,
+  PollingStationDataEntryGetHandler,
   PollingStationDataEntryResolveErrorsHandler,
-  PollingStationDataEntryValidGetHandler,
   UserListRequestHandler,
 } from "@/testing/api-mocks/RequestHandlers";
-import { server } from "@/testing/server";
+import { overrideOnce, server } from "@/testing/server";
 import { renderReturningRouter, screen, spyOnHandler } from "@/testing/test-utils";
 import { TestUserProvider } from "@/testing/TestUserProvider";
 
@@ -39,7 +39,7 @@ const renderPage = () => {
   );
 };
 
-describe("DetailPage", () => {
+describe("DetailIndexPage", () => {
   const pushMessage = vi.fn();
   const hasMessages = vi.fn();
 
@@ -51,7 +51,7 @@ describe("DetailPage", () => {
       ElectionRequestHandler,
       ElectionStatusRequestHandler,
       ElectionListRequestHandler,
-      PollingStationDataEntryHasErrorsGetHandler,
+      PollingStationDataEntryGetHandler,
       PollingStationDataEntryResolveErrorsHandler,
       UserListRequestHandler,
     );
@@ -127,9 +127,8 @@ describe("DetailPage", () => {
     expect(navigate).toHaveBeenCalledWith("/elections/1/status");
   });
 
-  test("should redirect to detail page", async () => {
-    // test regel 55
-    server.use(PollingStationDataEntryValidGetHandler);
+  test("should redirect to detail page because there are no errors or warnings", async () => {
+    overrideOnce("get", "/api/polling_stations/5/data_entries/get", 200, dataEntryValidGetMockResponse);
 
     const router = renderPage();
 
@@ -139,8 +138,6 @@ describe("DetailPage", () => {
   });
 
   test("should render errors and warnings overview on detail index page", async () => {
-    server.use(PollingStationDataEntryHasErrorsGetHandler);
-
     renderPage();
 
     expect(await screen.findByRole("heading", { level: 2, name: "Alle fouten en waarschuwingen" })).toBeVisible();

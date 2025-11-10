@@ -196,7 +196,7 @@ describe("ResolveDifferencesPage", () => {
     expect(navigate).toHaveBeenCalledWith("/elections/1/status");
   });
 
-  test("should navigate to details/resolve errors page after keeping second entry which has errors", async () => {
+  test("should navigate to detail/resolve errors page after keeping second entry which has errors", async () => {
     const user = userEvent.setup();
 
     await renderPage();

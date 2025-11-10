@@ -123,9 +123,7 @@ import { getCommitteeSessionMockData } from "./CommitteeSessionMockData";
 import {
   claimDataEntryResponse,
   dataEntryHasErrorsGetMockResponse,
-  dataEntryHasWarningsGetMockResponse,
   dataEntryStatusDifferences,
-  dataEntryValidGetMockResponse,
   saveDataEntryResponse,
 } from "./DataEntryMockData";
 import {
@@ -331,28 +329,12 @@ export const PollingStationDataEntryGetDifferencesHandler = http.get<
   () => HttpResponse.json(dataEntryStatusDifferences, { status: 200 }),
 );
 
-export const PollingStationDataEntryHasErrorsGetHandler = http.get<
+export const PollingStationDataEntryGetHandler = http.get<
   ParamsToString<POLLING_STATION_DATA_ENTRY_GET_REQUEST_PARAMS>,
   null,
   DataEntryGetResponse
 >("/api/polling_stations/5/data_entries/get" satisfies POLLING_STATION_DATA_ENTRY_GET_REQUEST_PATH, () =>
   HttpResponse.json(dataEntryHasErrorsGetMockResponse, { status: 200 }),
-);
-
-export const PollingStationDataEntryHasWarningsGetHandler = http.get<
-  ParamsToString<POLLING_STATION_DATA_ENTRY_GET_REQUEST_PARAMS>,
-  null,
-  DataEntryGetResponse
->("/api/polling_stations/5/data_entries/get" satisfies POLLING_STATION_DATA_ENTRY_GET_REQUEST_PATH, () =>
-  HttpResponse.json(dataEntryHasWarningsGetMockResponse, { status: 200 }),
-);
-
-export const PollingStationDataEntryValidGetHandler = http.get<
-  ParamsToString<POLLING_STATION_DATA_ENTRY_GET_REQUEST_PARAMS>,
-  null,
-  DataEntryGetResponse
->("/api/polling_stations/5/data_entries/get" satisfies POLLING_STATION_DATA_ENTRY_GET_REQUEST_PATH, () =>
-  HttpResponse.json(dataEntryValidGetMockResponse, { status: 200 }),
 );
 
 export const PollingStationDataEntryResolveDifferencesHandler = http.post<
@@ -517,7 +499,7 @@ export const handlers: HttpHandler[] = [
   LoginHandler,
   InitialisedHandler,
   PollingStationDataEntryGetDifferencesHandler,
-  PollingStationDataEntryHasErrorsGetHandler,
+  PollingStationDataEntryGetHandler,
   PollingStationDataEntryResolveDifferencesHandler,
   PollingStationDataEntryResolveErrorsHandler,
   PollingStationListRequestHandler,

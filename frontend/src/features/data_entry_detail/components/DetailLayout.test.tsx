@@ -1,18 +1,18 @@
 import * as ReactRouter from "react-router";
 
-import { describe, expect, test, vi } from "vitest";
+import { beforeEach, describe, expect, test, vi } from "vitest";
 
 import { ElectionProvider } from "@/hooks/election/ElectionProvider";
 import { ElectionStatusProvider } from "@/hooks/election/ElectionStatusProvider";
 import { MessagesProvider } from "@/hooks/messages/MessagesProvider";
+import { dataEntryHasWarningsGetMockResponse } from "@/testing/api-mocks/DataEntryMockData";
 import {
   ElectionListRequestHandler,
   ElectionRequestHandler,
   ElectionStatusRequestHandler,
-  PollingStationDataEntryHasErrorsGetHandler,
-  PollingStationDataEntryHasWarningsGetHandler,
+  PollingStationDataEntryGetHandler,
 } from "@/testing/api-mocks/RequestHandlers";
-import { server } from "@/testing/server";
+import { overrideOnce, server } from "@/testing/server";
 import { render, screen, waitFor, within } from "@/testing/test-utils";
 import { TestUserProvider } from "@/testing/TestUserProvider";
 
@@ -33,16 +33,18 @@ const renderLayout = () => {
 };
 
 describe("DetailLayout", () => {
-  test("renders resolve errors layout with polling station header and navigation", async () => {
+  beforeEach(() => {
     server.use(
       ElectionRequestHandler,
       ElectionStatusRequestHandler,
       ElectionListRequestHandler,
-      PollingStationDataEntryHasErrorsGetHandler,
+      PollingStationDataEntryGetHandler,
     );
     vi.spyOn(ReactRouter, "useParams").mockReturnValue({ electionId: "1", pollingStationId: "5" });
     vi.spyOn(ReactRouter, "Outlet").mockReturnValue(<div>Outlet Content</div>);
+  });
 
+  test("renders data entry detail layout with polling station header and navigation", async () => {
     renderLayout();
 
     const banner = await screen.findByRole("banner");
@@ -60,15 +62,8 @@ describe("DetailLayout", () => {
     });
   });
 
-  test("renders detail layout with polling station header and navigation", async () => {
-    server.use(
-      ElectionRequestHandler,
-      ElectionStatusRequestHandler,
-      ElectionListRequestHandler,
-      PollingStationDataEntryHasWarningsGetHandler,
-    );
-    vi.spyOn(ReactRouter, "useParams").mockReturnValue({ electionId: "1", pollingStationId: "5" });
-    vi.spyOn(ReactRouter, "Outlet").mockReturnValue(<div>Outlet Content</div>);
+  test("renders data entry detail layout with polling station header and navigation", async () => {
+    overrideOnce("get", "/api/polling_stations/5/data_entries/get", 200, dataEntryHasWarningsGetMockResponse);
 
     renderLayout();
 
@@ -83,6 +78,7 @@ describe("DetailLayout", () => {
     expect(within(banner).getByText("1e invoer")).toBeInTheDocument();
 
     expect(screen.queryByRole("link", { name: "Fouten en waarschuwingen" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("link", { name: "Waarschuwingen" })).toBeInTheDocument();
     expect(screen.queryByRole("link", { name: "Extra onderzoek" })).toBeInTheDocument();
 
     const badge = screen.getByText("1e invoer");

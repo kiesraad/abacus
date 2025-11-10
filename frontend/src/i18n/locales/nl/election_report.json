@@ -1,5 +1,5 @@
 {
-  "committee_session_started": "De zitting begon op {date} om {time}",
+  "committee_session_started": "De zitting begon op {date_time}",
   "counting_results": "Telresultaten",
   "download_report": "Download los proces-verbaal",
   "download_zip": "Download proces-verbaal met telbestand",

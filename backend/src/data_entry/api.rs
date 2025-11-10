@@ -2329,11 +2329,11 @@ mod tests {
         assert_eq!(result.statuses.len(), 2);
     }
 
-    /// Second committee session without investigations, should return no polling station statuses
-    #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_5_with_results"))))]
+    /// New committee session without investigations, should return no polling station statuses
+    #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_7_four_sessions"))))]
     async fn test_statuses_second_session_no_polling_stations(pool: SqlitePool) {
         let user = User::test_user(Role::Coordinator, 1);
-        let response = election_status(user.clone(), State(pool.clone()), Path(5))
+        let response = election_status(user.clone(), State(pool.clone()), Path(7))
             .await
             .into_response();
 
@@ -2343,16 +2343,10 @@ mod tests {
         assert_eq!(result.statuses.len(), 0);
     }
 
-    /// Second committee session with 1 investigations, should return one extra polling station status
+    /// Second committee session with 1 investigation, should return 1 polling station status
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_5_with_results"))))]
     async fn test_statuses_second_session_with_investigation(pool: SqlitePool) {
-        let mut conn = pool.acquire().await.unwrap();
         let user = User::test_user(Role::Coordinator, 1);
-
-        // Add investigation to polling station in second committee session
-        insert_test_investigation(&mut conn, 9, Some(true))
-            .await
-            .unwrap();
 
         let response = election_status(user.clone(), State(pool.clone()), Path(5))
             .await

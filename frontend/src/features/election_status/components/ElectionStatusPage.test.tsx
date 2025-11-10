@@ -1,6 +1,6 @@
 import * as ReactRouter from "react-router";
 
-import { render as rtlRender, within } from "@testing-library/react";
+import { render as rtlRender, waitFor, within } from "@testing-library/react";
 import { userEvent } from "@testing-library/user-event";
 import { http, HttpResponse } from "msw";
 import { beforeEach, describe, expect, test, vi } from "vitest";
@@ -433,6 +433,47 @@ describe("ElectionStatusPage", () => {
 
     await expectConflictErrorPage();
     expect(console.error).toHaveBeenCalled();
+  });
+
+  test("Clicking progress status scrolls corresponding table into view via element link", async () => {
+    vi.spyOn(useUser, "useUser").mockReturnValue(getCoordinatorUser());
+
+    await renderPage();
+
+    expect(await screen.findByRole("heading", { level: 2, name: "Statusoverzicht steminvoer" })).toBeVisible();
+
+    const navigations = screen.getAllByRole("navigation");
+    const statusLinks = within(navigations[1]!).getAllByRole("link");
+
+    expect(statusLinks[0]!.textContent).toEqual("Fouten en waarschuwingen (2)");
+    statusLinks[0]!.click();
+    await waitFor(() => {
+      expect(window.location.hash).toEqual("#item-table-errors-and-warnings");
+    });
+
+    expect(statusLinks[1]!.textContent).toEqual("Invoer bezig (2)");
+    statusLinks[1]!.click();
+    await waitFor(() => {
+      expect(window.location.hash).toEqual("#item-table-in-progress");
+    });
+
+    expect(statusLinks[2]!.textContent).toEqual("Eerste invoer klaar (1)");
+    statusLinks[2]!.click();
+    await waitFor(() => {
+      expect(window.location.hash).toEqual("#item-table-first-entry-finished");
+    });
+
+    expect(statusLinks[3]!.textContent).toEqual("Eerste en tweede invoer klaar (1)");
+    statusLinks[3]!.click();
+    await waitFor(() => {
+      expect(window.location.hash).toEqual("#item-table-definitive");
+    });
+
+    expect(statusLinks[4]!.textContent).toEqual("Werkvoorraad (2)");
+    statusLinks[4]!.click();
+    await waitFor(() => {
+      expect(window.location.hash).toEqual("#item-table-not-started");
+    });
   });
 
   test("Refetches data every 30 seconds", async () => {

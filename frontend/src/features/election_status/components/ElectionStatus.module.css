@@ -43,6 +43,11 @@
     margin: 0;
     flex: 0 0 19.5rem;
   }
+
+  nav {
+    position: sticky;
+    top: 0;
+  }
 }
 
 .statusArticle {

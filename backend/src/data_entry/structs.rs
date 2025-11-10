@@ -300,6 +300,27 @@ pub struct CommonPollingStationResults {
     pub political_group_votes: Vec<PoliticalGroupCandidateVotes>,
 }
 
+#[derive(Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct CommonPollingStationResultsWithoutVotes {
+    /// Voters counts ("Aantal toegelaten kiezers")
+    pub voters_counts: VotersCounts,
+    /// Votes counts ("Aantal getelde stembiljetten")
+    pub votes_counts: VotesCounts,
+    /// Differences counts ("Verschil tussen het aantal toegelaten kiezers en het aantal getelde stembiljetten")
+    pub differences_counts: DifferencesCounts,
+}
+
+impl From<CommonPollingStationResults> for CommonPollingStationResultsWithoutVotes {
+    fn from(value: CommonPollingStationResults) -> Self {
+        Self {
+            voters_counts: value.voters_counts,
+            votes_counts: value.votes_counts,
+            differences_counts: value.differences_counts,
+        }
+    }
+}
+
 /// CSOFirstSessionResults, following the fields in Model Na 31-2 Bijlage 2.
 ///
 /// See "Model Na 31-2. Proces-verbaal van een gemeentelijk stembureau/stembureau voor het openbaar

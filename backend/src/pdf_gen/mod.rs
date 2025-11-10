@@ -1,5 +1,6 @@
 mod filter_input;
 pub mod models;
+mod votes_table;
 
 #[cfg(feature = "embed-typst")]
 mod embedded;
@@ -14,6 +15,10 @@ mod typst_tests;
 pub use embedded::{PdfGenError, generate_pdf, generate_pdfs};
 #[cfg(not(feature = "embed-typst"))]
 pub use external::{PdfGenError, generate_pdf, generate_pdfs};
+
+pub use votes_table::{
+    CandidatesTables, VotesTables, VotesTablesWithOnlyPreviousVotes, VotesTablesWithPreviousVotes,
+};
 
 pub struct PdfGenResult {
     pub buffer: Vec<u8>,
@@ -32,7 +37,10 @@ pub(crate) mod tests {
             ElectionCategory, ElectionWithPoliticalGroups, VoteCountingMethod,
             tests::election_fixture,
         },
-        pdf_gen::models::{PdfFileModel, PdfModel, ToPdfFileModel},
+        pdf_gen::{
+            models::{PdfFileModel, PdfModel, ToPdfFileModel},
+            votes_table::VotesTables,
+        },
         polling_station::{PollingStation, PollingStationType},
         summary::ElectionSummary,
     };
@@ -68,23 +76,26 @@ pub(crate) mod tests {
 
     #[test(tokio::test)]
     async fn it_generates_a_pdf() {
+        let election = ElectionWithPoliticalGroups {
+            id: 1,
+            name: "Municipal Election".to_string(),
+            counting_method: VoteCountingMethod::CSO,
+            election_id: "MunicipalElection_2025".to_string(),
+            location: "Heemdamseburg".to_string(),
+            domain_id: "0000".to_string(),
+            category: ElectionCategory::Municipal,
+            number_of_seats: 29,
+            election_date: Utc::now().date_naive(),
+            nomination_date: Utc::now().date_naive(),
+            political_groups: vec![],
+        };
+
         let content = generate_pdf(ModelNa31_2Input {
+            summary: ElectionSummary::zero().into(),
+            votes_tables: VotesTables::new(&election, &ElectionSummary::zero()).unwrap(),
             committee_session: committee_session_fixture(1),
-            election: ElectionWithPoliticalGroups {
-                id: 1,
-                name: "Municipal Election".to_string(),
-                counting_method: VoteCountingMethod::CSO,
-                election_id: "MunicipalElection_2025".to_string(),
-                location: "Heemdamseburg".to_string(),
-                domain_id: "0000".to_string(),
-                category: ElectionCategory::Municipal,
-                number_of_seats: 29,
-                election_date: Utc::now().date_naive(),
-                nomination_date: Utc::now().date_naive(),
-                political_groups: vec![],
-            },
+            election: election.into(),
             polling_stations: vec![],
-            summary: ElectionSummary::zero(),
             hash: "ed36 60eb 017a 0d3a d3ef 72b1 6865 f991 a36a 9f92 72d9 1516 39cd 422b 4756 d161"
                 .to_string(),
             creation_date_time: "04-12-2024 12:08".to_string(),
@@ -129,11 +140,14 @@ pub(crate) mod tests {
     async fn it_generates_a_pdf_with_polling_stations() {
         let election = election_fixture(&[2, 3]);
         let committee_session = committee_session_fixture(election.id);
+        let summary = ElectionSummary::from_results(&election, &[]).unwrap();
+
         let content = generate_pdf(ModelNa31_2Input {
+            votes_tables: VotesTables::new(&election, &summary).unwrap(),
+            summary: summary.into(),
             polling_stations: polling_stations_fixture(&election, committee_session.id,  &[100, 200, 300]),
             committee_session,
-            election,
-            summary: ElectionSummary::zero(),
+            election: election.into(),
             hash: "ed36 60eb 017a 0d3a d3ef 72b1 6865 f991 a36a 9f92 72d9 1516 39cd 422b 4756 d161"
                 .to_string(),
             creation_date_time: "04-12-2024 12:08".to_string(),

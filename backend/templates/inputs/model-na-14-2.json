@@ -1,1335 +1,1049 @@
 {
-    "committee_session": {
-        "id": 7,
-        "number": 2,
-        "election_id": 4,
-        "location": "Den Haag",
-        "start_date_time": "2025-09-24T10:12:00",
-        "status": "data_entry_finished",
-        "number_of_voters": 152191
+  "committee_session": {
+    "id": 7,
+    "number": 2,
+    "election_id": 4,
+    "location": "Den Haag",
+    "start_date_time": "2025-09-24T10:12:00",
+    "status": "data_entry_finished",
+    "number_of_voters": 152191
+  },
+  "previous_committee_session": {
+    "id": 6,
+    "number": 1,
+    "election_id": 4,
+    "location": "Den Haag",
+    "start_date_time": "2025-09-23T22:08:00",
+    "status": "data_entry_finished",
+    "number_of_voters": 152191
+  },
+  "election": {
+    "id": 4,
+    "name": "Gemeenteraad Hovenerwoud 2022",
+    "counting_method": "CSO",
+    "election_id": "Hovenerwoud_2022",
+    "location": "Hovenerwoud",
+    "domain_id": "0446",
+    "category": "Municipal",
+    "number_of_seats": 26,
+    "election_date": "2022-02-11",
+    "nomination_date": "2021-12-18"
+  },
+  "previous_summary": {
+    "voters_counts": {
+      "poll_card_count": 109855,
+      "proxy_certificate_count": 0,
+      "total_admitted_voters_count": 109855
     },
-    "previous_committee_session": {
-        "id": 6,
-        "number": 1,
-        "election_id": 4,
-        "location": "Den Haag",
-        "start_date_time": "2025-09-23T22:08:00",
-        "status": "data_entry_finished",
-        "number_of_voters": 152191
+    "votes_counts": {
+      "political_group_total_votes": [
+        {
+          "number": 1,
+          "total": 50583
+        },
+        {
+          "number": 2,
+          "total": 57153
+        }
+      ],
+      "total_votes_candidates_count": 107736,
+      "blank_votes_count": 1066,
+      "invalid_votes_count": 1053,
+      "total_votes_cast_count": 109855
     },
-    "election": {
-        "id": 4,
-        "name": "Gemeenteraad Hovenerwoud 2022",
-        "counting_method": "CSO",
-        "election_id": "Hovenerwoud_2022",
-        "location": "Hovenerwoud",
-        "domain_id": "0446",
-        "category": "Municipal",
-        "number_of_seats": 26,
-        "election_date": "2022-02-11",
-        "nomination_date": "2021-12-18",
-        "political_groups": [
-            {
-                "number": 1,
-                "name": "Algemene Lijst",
-                "candidates": [
-                    {
-                        "number": 1,
-                        "initials": "S.W.",
-                        "last_name": "Goedhart",
-                        "locality": "Huisden",
-                        "gender": "Female"
-                    },
-                    {
-                        "number": 2,
-                        "initials": "Y.",
-                        "last_name": "Arets",
-                        "locality": "Hoek van Zoom",
-                        "gender": "X"
-                    },
-                    {
-                        "number": 3,
-                        "initials": "I.",
-                        "last_name": "Titulaer",
-                        "locality": "Bloemstede",
-                        "gender": "X"
-                    },
-                    {
-                        "number": 4,
-                        "initials": "D.S.",
-                        "last_name_prefix": "de",
-                        "last_name": "Vegt",
-                        "locality": "Hovenerwoud",
-                        "gender": "Male"
-                    },
-                    {
-                        "number": 5,
-                        "initials": "T.Y.",
-                        "last_name_prefix": "de",
-                        "last_name": "Vegt",
-                        "locality": "'s Gravenveen",
-                        "gender": "Female"
-                    },
-                    {
-                        "number": 6,
-                        "initials": "J.",
-                        "last_name": "Prakken",
-                        "locality": "Eksterlo",
-                        "gender": "Male"
-                    },
-                    {
-                        "number": 7,
-                        "initials": "S.",
-                        "last_name_prefix": "van de",
-                        "last_name": "Kerkhof",
-                        "locality": "Middelgein",
-                        "gender": "Female"
-                    },
-                    {
-                        "number": 8,
-                        "initials": "Z.O.",
-                        "last_name": "Brienen",
-                        "locality": "Lekkum",
-                        "gender": "Female"
-                    },
-                    {
-                        "number": 9,
-                        "initials": "M.P.",
-                        "last_name": "Groenen",
-                        "locality": "Middelgein",
-                        "gender": "X"
-                    },
-                    {
-                        "number": 10,
-                        "initials": "R.",
-                        "last_name_prefix": "van de",
-                        "last_name": "Kerkhof",
-                        "locality": "Lekkum",
-                        "gender": "Female"
-                    },
-                    {
-                        "number": 11,
-                        "initials": "G.",
-                        "last_name": "Hoogstraten",
-                        "locality": "Heemdamseburg",
-                        "gender": "Male"
-                    },
-                    {
-                        "number": 12,
-                        "initials": "B.",
-                        "last_name": "Katsma",
-                        "locality": "Bloemstede",
-                        "gender": "Male"
-                    },
-                    {
-                        "number": 13,
-                        "initials": "X.",
-                        "last_name": "Titulaer",
-                        "locality": "Hovenerwoud",
-                        "gender": "X"
-                    },
-                    {
-                        "number": 14,
-                        "initials": "L.",
-                        "last_name": "Tax",
-                        "locality": "Hovenerwoud",
-                        "gender": "Male"
-                    },
-                    {
-                        "number": 15,
-                        "initials": "C.",
-                        "last_name": "Boermans",
-                        "locality": "Hoek van Zoom",
-                        "gender": "Female"
-                    },
-                    {
-                        "number": 16,
-                        "initials": "Z.",
-                        "last_name": "Oorschot",
-                        "locality": "Bloemstede",
-                        "gender": "Female"
-                    },
-                    {
-                        "number": 17,
-                        "initials": "F.",
-                        "last_name": "Bruins-Van den Kerk",
-                        "locality": "Juinen",
-                        "gender": "X"
-                    },
-                    {
-                        "number": 18,
-                        "initials": "C.",
-                        "last_name": "Tax",
-                        "locality": "'s Gravenveen",
-                        "gender": "Male"
-                    },
-                    {
-                        "number": 19,
-                        "initials": "P.",
-                        "last_name": "Born",
-                        "locality": "Huisden",
-                        "gender": "Female"
-                    },
-                    {
-                        "number": 20,
-                        "initials": "M.N.",
-                        "last_name": "Katsma",
-                        "locality": "Middelgein",
-                        "gender": "Male"
-                    },
-                    {
-                        "number": 21,
-                        "initials": "M.",
-                        "last_name": "Titulaer",
-                        "locality": "Hovenerwoud",
-                        "gender": "X"
-                    },
-                    {
-                        "number": 22,
-                        "initials": "P.Q.",
-                        "last_name": "Boermans",
-                        "locality": "'s Gravenveen",
-                        "gender": "Male"
-                    },
-                    {
-                        "number": 23,
-                        "initials": "T.",
-                        "last_name": "Born",
-                        "locality": "Sluisdam",
-                        "gender": "Male"
-                    },
-                    {
-                        "number": 24,
-                        "initials": "S.H.",
-                        "last_name": "Katsma",
-                        "locality": "Sluisdam",
-                        "gender": "Male"
-                    },
-                    {
-                        "number": 25,
-                        "initials": "J.",
-                        "last_name": "Bruins-Van den Kerk",
-                        "locality": "Middelgein",
-                        "gender": "Female"
-                    },
-                    {
-                        "number": 26,
-                        "initials": "U.",
-                        "last_name_prefix": "van",
-                        "last_name": "Lent",
-                        "locality": "Huisden",
-                        "gender": "Female"
-                    },
-                    {
-                        "number": 27,
-                        "initials": "Y.",
-                        "last_name": "Meulenkolk",
-                        "locality": "Huisden",
-                        "gender": "X"
-                    },
-                    {
-                        "number": 28,
-                        "initials": "N.N.",
-                        "last_name_prefix": "van",
-                        "last_name": "Jaspers-Gezen",
-                        "locality": "'s Gravenveen",
-                        "gender": "Male"
-                    },
-                    {
-                        "number": 29,
-                        "initials": "I.",
-                        "last_name": "Bruins-Van den Kerk",
-                        "locality": "Heemdamseburg",
-                        "gender": "X"
-                    },
-                    {
-                        "number": 30,
-                        "initials": "Z.",
-                        "last_name_prefix": "den",
-                        "last_name": "Mateman",
-                        "locality": "Bloemstede",
-                        "gender": "Male"
-                    },
-                    {
-                        "number": 31,
-                        "initials": "Y.",
-                        "last_name": "Brienen",
-                        "locality": "Juinen",
-                        "gender": "X"
-                    },
-                    {
-                        "number": 32,
-                        "initials": "C.P.",
-                        "last_name": "Brienen",
-                        "locality": "Eemstricht",
-                        "gender": "Female"
-                    },
-                    {
-                        "number": 33,
-                        "initials": "F.B.",
-                        "last_name": "Prakken",
-                        "locality": "Middelgein",
-                        "gender": "Male"
-                    },
-                    {
-                        "number": 34,
-                        "initials": "Z.",
-                        "last_name": "Born",
-                        "locality": "Hoek van Zoom",
-                        "gender": "X"
-                    },
-                    {
-                        "number": 35,
-                        "initials": "V.",
-                        "last_name": "Groenen",
-                        "locality": "Heemdamseburg",
-                        "gender": "Male"
-                    },
-                    {
-                        "number": 36,
-                        "initials": "D.U.",
-                        "last_name": "Aygün",
-                        "locality": "Middelgein",
-                        "gender": "X"
-                    },
-                    {
-                        "number": 37,
-                        "initials": "X.W.",
-                        "last_name": "Arets",
-                        "locality": "Hovenerwoud",
-                        "gender": "Female"
-                    },
-                    {
-                        "number": 38,
-                        "initials": "C.E.J.",
-                        "last_name": "Titulaer",
-                        "locality": "Sluisdam",
-                        "gender": "Male"
-                    },
-                    {
-                        "number": 39,
-                        "initials": "K.J.L.",
-                        "last_name": "Oorschot",
-                        "locality": "Huisden",
-                        "gender": "Female"
-                    },
-                    {
-                        "number": 40,
-                        "initials": "Z.T.",
-                        "last_name_prefix": "van der",
-                        "last_name": "Meulen",
-                        "locality": "Sluisdam",
-                        "gender": "Female"
-                    },
-                    {
-                        "number": 41,
-                        "initials": "P.R.C.",
-                        "last_name_prefix": "van",
-                        "last_name": "Jaspers-Gezen",
-                        "locality": "Sluisdam",
-                        "gender": "Female"
-                    },
-                    {
-                        "number": 42,
-                        "initials": "M.D.",
-                        "last_name": "Meulenkolk",
-                        "locality": "Hovenerwoud",
-                        "gender": "Male"
-                    },
-                    {
-                        "number": 43,
-                        "initials": "A.",
-                        "last_name": "Hoogstraten",
-                        "locality": "Lekkum",
-                        "gender": "Male"
-                    },
-                    {
-                        "number": 44,
-                        "initials": "R.",
-                        "last_name": "Philippen",
-                        "locality": "Juinen",
-                        "gender": "Male"
-                    },
-                    {
-                        "number": 45,
-                        "initials": "K.L.",
-                        "last_name_prefix": "van de",
-                        "last_name": "Wal",
-                        "locality": "Huisden",
-                        "gender": "X"
-                    }
-                ]
-            },
-            {
-                "number": 2,
-                "name": "Lijst van de Kandidaten",
-                "candidates": [
-                    {
-                        "number": 1,
-                        "initials": "X.",
-                        "last_name_prefix": "van der",
-                        "last_name": "Spek",
-                        "locality": "Eemstricht",
-                        "gender": "Female"
-                    },
-                    {
-                        "number": 2,
-                        "initials": "I.X.B.",
-                        "last_name_prefix": "van",
-                        "last_name": "Bekking",
-                        "locality": "Huisden",
-                        "gender": "Male"
-                    },
-                    {
-                        "number": 3,
-                        "initials": "A.P.",
-                        "last_name": "Gopal",
-                        "locality": "Huisden",
-                        "gender": "X"
-                    },
-                    {
-                        "number": 4,
-                        "initials": "R.",
-                        "last_name_prefix": "van de",
-                        "last_name": "Wal",
-                        "locality": "Bloemstede",
-                        "gender": "X"
-                    },
-                    {
-                        "number": 5,
-                        "initials": "L.U.",
-                        "last_name": "Born",
-                        "locality": "Hovenerwoud",
-                        "gender": "X"
-                    },
-                    {
-                        "number": 6,
-                        "initials": "C.S.",
-                        "last_name": "Aygün",
-                        "locality": "Eemstricht",
-                        "gender": "Male"
-                    },
-                    {
-                        "number": 7,
-                        "initials": "A.",
-                        "last_name": "Boermans",
-                        "locality": "Juinen",
-                        "gender": "Female"
-                    },
-                    {
-                        "number": 8,
-                        "initials": "C.D.B.",
-                        "last_name_prefix": "van der",
-                        "last_name": "Meulen",
-                        "locality": "Bloemstede",
-                        "gender": "X"
-                    },
-                    {
-                        "number": 9,
-                        "initials": "W.",
-                        "last_name": "Gopal",
-                        "locality": "Eksterlo",
-                        "gender": "X"
-                    },
-                    {
-                        "number": 10,
-                        "initials": "M.V.I.",
-                        "last_name_prefix": "van",
-                        "last_name": "Lent",
-                        "locality": "Heemdamseburg",
-                        "gender": "Male"
-                    },
-                    {
-                        "number": 11,
-                        "initials": "A.G.",
-                        "last_name": "Prakken",
-                        "locality": "Heemdamseburg",
-                        "gender": "Female"
-                    },
-                    {
-                        "number": 12,
-                        "initials": "F.",
-                        "last_name": "Meulenkolk",
-                        "locality": "Bloemstede",
-                        "gender": "X"
-                    },
-                    {
-                        "number": 13,
-                        "initials": "Q.R.V.",
-                        "last_name": "Boermans",
-                        "locality": "Bloemstede",
-                        "gender": "Male"
-                    },
-                    {
-                        "number": 14,
-                        "initials": "Q.",
-                        "last_name_prefix": "van der",
-                        "last_name": "Spek",
-                        "locality": "Huisden",
-                        "gender": "Female"
-                    },
-                    {
-                        "number": 15,
-                        "initials": "B.",
-                        "last_name": "Cornelis",
-                        "locality": "Juinen",
-                        "gender": "X"
-                    },
-                    {
-                        "number": 16,
-                        "initials": "F.",
-                        "last_name_prefix": "van",
-                        "last_name": "Lent",
-                        "locality": "Huisden",
-                        "gender": "Male"
-                    },
-                    {
-                        "number": 17,
-                        "initials": "W.N.",
-                        "last_name": "Wiertz",
-                        "locality": "Huisden",
-                        "gender": "Male"
-                    },
-                    {
-                        "number": 18,
-                        "initials": "T.",
-                        "last_name": "Oorschot",
-                        "locality": "Juinen",
-                        "gender": "Female"
-                    },
-                    {
-                        "number": 19,
-                        "initials": "P.",
-                        "last_name_prefix": "van der",
-                        "last_name": "Meulen",
-                        "locality": "Juinen",
-                        "gender": "Female"
-                    },
-                    {
-                        "number": 20,
-                        "initials": "H.A.",
-                        "last_name": "Cornelis",
-                        "locality": "'s Gravenveen",
-                        "gender": "Male"
-                    },
-                    {
-                        "number": 21,
-                        "initials": "E.X.Y.",
-                        "last_name": "Oorschot",
-                        "locality": "Juinen",
-                        "gender": "X"
-                    },
-                    {
-                        "number": 22,
-                        "initials": "Z.P.L.",
-                        "last_name_prefix": "den",
-                        "last_name": "Mateman",
-                        "locality": "Eksterlo",
-                        "gender": "X"
-                    },
-                    {
-                        "number": 23,
-                        "initials": "B.",
-                        "last_name": "Bruins-Van den Kerk",
-                        "locality": "Lekkum",
-                        "gender": "X"
-                    },
-                    {
-                        "number": 24,
-                        "initials": "H.K.X.",
-                        "last_name_prefix": "de",
-                        "last_name": "Vegt",
-                        "locality": "Lekkum",
-                        "gender": "Female"
-                    },
-                    {
-                        "number": 25,
-                        "initials": "E.",
-                        "last_name": "Wiertz",
-                        "locality": "'s Gravenveen",
-                        "gender": "Male"
-                    },
-                    {
-                        "number": 26,
-                        "initials": "Y.",
-                        "last_name": "Gopal",
-                        "locality": "'s Gravenveen",
-                        "gender": "X"
-                    },
-                    {
-                        "number": 27,
-                        "initials": "D.",
-                        "last_name_prefix": "den",
-                        "last_name": "Mateman",
-                        "locality": "Eemstricht",
-                        "gender": "Female"
-                    },
-                    {
-                        "number": 28,
-                        "initials": "V.",
-                        "last_name_prefix": "van",
-                        "last_name": "Lent",
-                        "locality": "Huisden",
-                        "gender": "Male"
-                    }
-                ]
-            }
+    "differences_counts": {
+      "more_ballots_count": {
+        "count": 0,
+        "polling_stations": []
+      },
+      "fewer_ballots_count": {
+        "count": 0,
+        "polling_stations": []
+      }
+    },
+    "polling_station_investigations": {
+      "admitted_voters_recounted": [
+        3,
+        7,
+        10,
+        16,
+        19,
+        20,
+        27,
+        28,
+        35,
+        41,
+        48,
+        49,
+        51,
+        52,
+        62,
+        64,
+        73,
+        82,
+        85,
+        89,
+        90
+      ],
+      "investigated_other_reason": [
+        13,
+        19,
+        35,
+        51,
+        55,
+        75,
+        85
+      ],
+      "ballots_recounted": [
+        13
+      ]
+    }
+  },
+  "summary": {
+    "voters_counts": {
+      "poll_card_count": 109856,
+      "proxy_certificate_count": 0,
+      "total_admitted_voters_count": 109856
+    },
+    "votes_counts": {
+      "political_group_total_votes": [
+        {
+          "number": 1,
+          "total": 50584
+        },
+        {
+          "number": 2,
+          "total": 57153
+        }
+      ],
+      "total_votes_candidates_count": 107737,
+      "blank_votes_count": 1066,
+      "invalid_votes_count": 1052,
+      "total_votes_cast_count": 109855
+    },
+    "differences_counts": {
+      "more_ballots_count": {
+        "count": 0,
+        "polling_stations": []
+      },
+      "fewer_ballots_count": {
+        "count": 1,
+        "polling_stations": [
+          1
         ]
+      }
     },
-    "previous_summary": {
-        "voters_counts": {
-            "poll_card_count": 109855,
-            "proxy_certificate_count": 0,
-            "total_admitted_voters_count": 109855
-        },
-        "votes_counts": {
-            "political_group_total_votes": [
-                {
-                    "number": 1,
-                    "total": 50583
-                },
-                {
-                    "number": 2,
-                    "total": 57153
-                }
-            ],
-            "total_votes_candidates_count": 107736,
-            "blank_votes_count": 1066,
-            "invalid_votes_count": 1053,
-            "total_votes_cast_count": 109855
-        },
-        "differences_counts": {
-            "more_ballots_count": {
-                "count": 0,
-                "polling_stations": []
-            },
-            "fewer_ballots_count": {
-                "count": 0,
-                "polling_stations": []
-            }
-        },
-        "political_group_votes": [
+    "polling_station_investigations": {
+      "admitted_voters_recounted": [
+        3,
+        7,
+        10,
+        16,
+        19,
+        20,
+        27,
+        28,
+        35,
+        41,
+        48,
+        49,
+        51,
+        52,
+        62,
+        64,
+        73,
+        82,
+        85,
+        89,
+        90
+      ],
+      "investigated_other_reason": [
+        13,
+        19,
+        35,
+        51,
+        55,
+        75,
+        85
+      ],
+      "ballots_recounted": [
+        13
+      ]
+    }
+  },
+  "hash": "9a41 7d73 0dd2 b6d2 d0a6 ebdd 5360 d2ed de0c 3cc4 22e1 0c13 863e 3241 040d bd14",
+  "creation_date_time": "23-09-2025 22:16",
+  "votes_tables": [
+    {
+      "number": 1,
+      "name": "Algemene Lijst",
+      "total": 50584,
+      "previous_total": 50583,
+      "columns": [
+        {
+          "column_total": 44351,
+          "previous_column_total": 44350,
+          "votes": [
             {
+              "candidate": {
                 "number": 1,
-                "total": 50583,
-                "candidate_votes": [
-                    {
-                        "number": 1,
-                        "votes": 18206
-                    },
-                    {
-                        "number": 2,
-                        "votes": 6369
-                    },
-                    {
-                        "number": 3,
-                        "votes": 3522
-                    },
-                    {
-                        "number": 4,
-                        "votes": 2505
-                    },
-                    {
-                        "number": 5,
-                        "votes": 1934
-                    },
-                    {
-                        "number": 6,
-                        "votes": 1520
-                    },
-                    {
-                        "number": 7,
-                        "votes": 1318
-                    },
-                    {
-                        "number": 8,
-                        "votes": 1124
-                    },
-                    {
-                        "number": 9,
-                        "votes": 998
-                    },
-                    {
-                        "number": 10,
-                        "votes": 898
-                    },
-                    {
-                        "number": 11,
-                        "votes": 822
-                    },
-                    {
-                        "number": 12,
-                        "votes": 744
-                    },
-                    {
-                        "number": 13,
-                        "votes": 684
-                    },
-                    {
-                        "number": 14,
-                        "votes": 639
-                    },
-                    {
-                        "number": 15,
-                        "votes": 593
-                    },
-                    {
-                        "number": 16,
-                        "votes": 553
-                    },
-                    {
-                        "number": 17,
-                        "votes": 528
-                    },
-                    {
-                        "number": 18,
-                        "votes": 492
-                    },
-                    {
-                        "number": 19,
-                        "votes": 462
-                    },
-                    {
-                        "number": 20,
-                        "votes": 439
-                    },
-                    {
-                        "number": 21,
-                        "votes": 422
-                    },
-                    {
-                        "number": 22,
-                        "votes": 398
-                    },
-                    {
-                        "number": 23,
-                        "votes": 374
-                    },
-                    {
-                        "number": 24,
-                        "votes": 361
-                    },
-                    {
-                        "number": 25,
-                        "votes": 343
-                    },
-                    {
-                        "number": 26,
-                        "votes": 326
-                    },
-                    {
-                        "number": 27,
-                        "votes": 317
-                    },
-                    {
-                        "number": 28,
-                        "votes": 302
-                    },
-                    {
-                        "number": 29,
-                        "votes": 286
-                    },
-                    {
-                        "number": 30,
-                        "votes": 273
-                    },
-                    {
-                        "number": 31,
-                        "votes": 263
-                    },
-                    {
-                        "number": 32,
-                        "votes": 254
-                    },
-                    {
-                        "number": 33,
-                        "votes": 240
-                    },
-                    {
-                        "number": 34,
-                        "votes": 225
-                    },
-                    {
-                        "number": 35,
-                        "votes": 215
-                    },
-                    {
-                        "number": 36,
-                        "votes": 202
-                    },
-                    {
-                        "number": 37,
-                        "votes": 197
-                    },
-                    {
-                        "number": 38,
-                        "votes": 188
-                    },
-                    {
-                        "number": 39,
-                        "votes": 179
-                    },
-                    {
-                        "number": 40,
-                        "votes": 168
-                    },
-                    {
-                        "number": 41,
-                        "votes": 154
-                    },
-                    {
-                        "number": 42,
-                        "votes": 149
-                    },
-                    {
-                        "number": 43,
-                        "votes": 140
-                    },
-                    {
-                        "number": 44,
-                        "votes": 131
-                    },
-                    {
-                        "number": 45,
-                        "votes": 126
-                    }
-                ]
+                "initials": "S.W.",
+                "last_name": "Goedhart",
+                "locality": "Huisden",
+                "gender": "Female"
+              },
+              "votes": 18207,
+              "previous_votes": 18206
             },
             {
+              "candidate": {
                 "number": 2,
-                "total": 57153,
-                "candidate_votes": [
-                    {
-                        "number": 1,
-                        "votes": 22868
-                    },
-                    {
-                        "number": 2,
-                        "votes": 7792
-                    },
-                    {
-                        "number": 3,
-                        "votes": 4565
-                    },
-                    {
-                        "number": 4,
-                        "votes": 2961
-                    },
-                    {
-                        "number": 5,
-                        "votes": 2253
-                    },
-                    {
-                        "number": 6,
-                        "votes": 1854
-                    },
-                    {
-                        "number": 7,
-                        "votes": 1578
-                    },
-                    {
-                        "number": 8,
-                        "votes": 1340
-                    },
-                    {
-                        "number": 9,
-                        "votes": 1160
-                    },
-                    {
-                        "number": 10,
-                        "votes": 1050
-                    },
-                    {
-                        "number": 11,
-                        "votes": 948
-                    },
-                    {
-                        "number": 12,
-                        "votes": 867
-                    },
-                    {
-                        "number": 13,
-                        "votes": 787
-                    },
-                    {
-                        "number": 14,
-                        "votes": 732
-                    },
-                    {
-                        "number": 15,
-                        "votes": 671
-                    },
-                    {
-                        "number": 16,
-                        "votes": 631
-                    },
-                    {
-                        "number": 17,
-                        "votes": 587
-                    },
-                    {
-                        "number": 18,
-                        "votes": 548
-                    },
-                    {
-                        "number": 19,
-                        "votes": 520
-                    },
-                    {
-                        "number": 20,
-                        "votes": 488
-                    },
-                    {
-                        "number": 21,
-                        "votes": 460
-                    },
-                    {
-                        "number": 22,
-                        "votes": 432
-                    },
-                    {
-                        "number": 23,
-                        "votes": 405
-                    },
-                    {
-                        "number": 24,
-                        "votes": 383
-                    },
-                    {
-                        "number": 25,
-                        "votes": 351
-                    },
-                    {
-                        "number": 26,
-                        "votes": 330
-                    },
-                    {
-                        "number": 27,
-                        "votes": 304
-                    },
-                    {
-                        "number": 28,
-                        "votes": 288
-                    }
-                ]
-            }
-        ],
-        "polling_station_investigations": {
-            "admitted_voters_recounted": [
-                3,
-                7,
-                10,
-                16,
-                19,
-                20,
-                27,
-                28,
-                35,
-                41,
-                48,
-                49,
-                51,
-                52,
-                62,
-                64,
-                73,
-                82,
-                85,
-                89,
-                90
-            ],
-            "investigated_other_reason": [
-                13,
-                19,
-                35,
-                51,
-                55,
-                75,
-                85
-            ],
-            "ballots_recounted": [
-                13
-            ]
-        }
-    },
-    "summary": {
-        "voters_counts": {
-            "poll_card_count": 109856,
-            "proxy_certificate_count": 0,
-            "total_admitted_voters_count": 109856
-        },
-        "votes_counts": {
-            "political_group_total_votes": [
-                {
-                    "number": 1,
-                    "total": 50584
-                },
-                {
-                    "number": 2,
-                    "total": 57153
-                }
-            ],
-            "total_votes_candidates_count": 107737,
-            "blank_votes_count": 1066,
-            "invalid_votes_count": 1052,
-            "total_votes_cast_count": 109855
-        },
-        "differences_counts": {
-            "more_ballots_count": {
-                "count": 0,
-                "polling_stations": []
+                "initials": "Y.",
+                "last_name": "Arets",
+                "locality": "Hoek van Zoom",
+                "gender": "X"
+              },
+              "votes": 6369,
+              "previous_votes": 6369
             },
-            "fewer_ballots_count": {
-                "count": 1,
-                "polling_stations": [
-                    1
-                ]
-            }
-        },
-        "political_group_votes": [
             {
+              "candidate": {
+                "number": 3,
+                "initials": "I.",
+                "last_name": "Titulaer",
+                "locality": "Bloemstede",
+                "gender": "X"
+              },
+              "votes": 3522,
+              "previous_votes": 3522
+            },
+            {
+              "candidate": {
+                "number": 4,
+                "initials": "D.S.",
+                "last_name_prefix": "de",
+                "last_name": "Vegt",
+                "locality": "Hovenerwoud",
+                "gender": "Male"
+              },
+              "votes": 2505,
+              "previous_votes": 2505
+            },
+            {
+              "candidate": {
+                "number": 5,
+                "initials": "T.Y.",
+                "last_name_prefix": "de",
+                "last_name": "Vegt",
+                "locality": "'s Gravenveen",
+                "gender": "Female"
+              },
+              "votes": 1934,
+              "previous_votes": 1934
+            },
+            {
+              "candidate": {
+                "number": 6,
+                "initials": "J.",
+                "last_name": "Prakken",
+                "locality": "Eksterlo",
+                "gender": "Male"
+              },
+              "votes": 1520,
+              "previous_votes": 1520
+            },
+            {
+              "candidate": {
+                "number": 7,
+                "initials": "S.",
+                "last_name_prefix": "van de",
+                "last_name": "Kerkhof",
+                "locality": "Middelgein",
+                "gender": "Female"
+              },
+              "votes": 1318,
+              "previous_votes": 1318
+            },
+            {
+              "candidate": {
+                "number": 8,
+                "initials": "Z.O.",
+                "last_name": "Brienen",
+                "locality": "Lekkum",
+                "gender": "Female"
+              },
+              "votes": 1124,
+              "previous_votes": 1124
+            },
+            {
+              "candidate": {
+                "number": 9,
+                "initials": "M.P.",
+                "last_name": "Groenen",
+                "locality": "Middelgein",
+                "gender": "X"
+              },
+              "votes": 998,
+              "previous_votes": 998
+            },
+            {
+              "candidate": {
+                "number": 10,
+                "initials": "R.",
+                "last_name_prefix": "van de",
+                "last_name": "Kerkhof",
+                "locality": "Lekkum",
+                "gender": "Female"
+              },
+              "votes": 898,
+              "previous_votes": 898
+            },
+            {
+              "candidate": {
+                "number": 11,
+                "initials": "G.",
+                "last_name": "Hoogstraten",
+                "locality": "Heemdamseburg",
+                "gender": "Male"
+              },
+              "votes": 822,
+              "previous_votes": 822
+            },
+            {
+              "candidate": {
+                "number": 12,
+                "initials": "B.",
+                "last_name": "Katsma",
+                "locality": "Bloemstede",
+                "gender": "Male"
+              },
+              "votes": 744,
+              "previous_votes": 744
+            },
+            {
+              "candidate": {
+                "number": 13,
+                "initials": "X.",
+                "last_name": "Titulaer",
+                "locality": "Hovenerwoud",
+                "gender": "X"
+              },
+              "votes": 684,
+              "previous_votes": 684
+            },
+            {
+              "candidate": {
+                "number": 14,
+                "initials": "L.",
+                "last_name": "Tax",
+                "locality": "Hovenerwoud",
+                "gender": "Male"
+              },
+              "votes": 639,
+              "previous_votes": 639
+            },
+            {
+              "candidate": {
+                "number": 15,
+                "initials": "C.",
+                "last_name": "Boermans",
+                "locality": "Hoek van Zoom",
+                "gender": "Female"
+              },
+              "votes": 593,
+              "previous_votes": 593
+            },
+            {
+              "candidate": {
+                "number": 16,
+                "initials": "Z.",
+                "last_name": "Oorschot",
+                "locality": "Bloemstede",
+                "gender": "Female"
+              },
+              "votes": 553,
+              "previous_votes": 553
+            },
+            {
+              "candidate": {
+                "number": 17,
+                "initials": "F.",
+                "last_name": "Bruins-Van den Kerk",
+                "locality": "Juinen",
+                "gender": "X"
+              },
+              "votes": 528,
+              "previous_votes": 528
+            },
+            {
+              "candidate": {
+                "number": 18,
+                "initials": "C.",
+                "last_name": "Tax",
+                "locality": "'s Gravenveen",
+                "gender": "Male"
+              },
+              "votes": 492,
+              "previous_votes": 492
+            },
+            {
+              "candidate": {
+                "number": 19,
+                "initials": "P.",
+                "last_name": "Born",
+                "locality": "Huisden",
+                "gender": "Female"
+              },
+              "votes": 462,
+              "previous_votes": 462
+            },
+            {
+              "candidate": {
+                "number": 20,
+                "initials": "M.N.",
+                "last_name": "Katsma",
+                "locality": "Middelgein",
+                "gender": "Male"
+              },
+              "votes": 439,
+              "previous_votes": 439
+            }
+          ]
+        },
+        {
+          "column_total": 5533,
+          "previous_column_total": 5533,
+          "votes": [
+            {
+              "candidate": {
+                "number": 21,
+                "initials": "M.",
+                "last_name": "Titulaer",
+                "locality": "Hovenerwoud",
+                "gender": "X"
+              },
+              "votes": 422,
+              "previous_votes": 422
+            },
+            {
+              "candidate": {
+                "number": 22,
+                "initials": "P.Q.",
+                "last_name": "Boermans",
+                "locality": "'s Gravenveen",
+                "gender": "Male"
+              },
+              "votes": 398,
+              "previous_votes": 398
+            },
+            {
+              "candidate": {
+                "number": 23,
+                "initials": "T.",
+                "last_name": "Born",
+                "locality": "Sluisdam",
+                "gender": "Male"
+              },
+              "votes": 374,
+              "previous_votes": 374
+            },
+            {
+              "candidate": {
+                "number": 24,
+                "initials": "S.H.",
+                "last_name": "Katsma",
+                "locality": "Sluisdam",
+                "gender": "Male"
+              },
+              "votes": 361,
+              "previous_votes": 361
+            },
+            {
+              "candidate": {
+                "number": 25,
+                "initials": "J.",
+                "last_name": "Bruins-Van den Kerk",
+                "locality": "Middelgein",
+                "gender": "Female"
+              },
+              "votes": 343,
+              "previous_votes": 343
+            },
+            {
+              "candidate": {
+                "number": 26,
+                "initials": "U.",
+                "last_name_prefix": "van",
+                "last_name": "Lent",
+                "locality": "Huisden",
+                "gender": "Female"
+              },
+              "votes": 326,
+              "previous_votes": 326
+            },
+            {
+              "candidate": {
+                "number": 27,
+                "initials": "Y.",
+                "last_name": "Meulenkolk",
+                "locality": "Huisden",
+                "gender": "X"
+              },
+              "votes": 317,
+              "previous_votes": 317
+            },
+            {
+              "candidate": {
+                "number": 28,
+                "initials": "N.N.",
+                "last_name_prefix": "van",
+                "last_name": "Jaspers-Gezen",
+                "locality": "'s Gravenveen",
+                "gender": "Male"
+              },
+              "votes": 302,
+              "previous_votes": 302
+            },
+            {
+              "candidate": {
+                "number": 29,
+                "initials": "I.",
+                "last_name": "Bruins-Van den Kerk",
+                "locality": "Heemdamseburg",
+                "gender": "X"
+              },
+              "votes": 286,
+              "previous_votes": 286
+            },
+            {
+              "candidate": {
+                "number": 30,
+                "initials": "Z.",
+                "last_name_prefix": "den",
+                "last_name": "Mateman",
+                "locality": "Bloemstede",
+                "gender": "Male"
+              },
+              "votes": 273,
+              "previous_votes": 273
+            },
+            {
+              "candidate": {
+                "number": 31,
+                "initials": "Y.",
+                "last_name": "Brienen",
+                "locality": "Juinen",
+                "gender": "X"
+              },
+              "votes": 263,
+              "previous_votes": 263
+            },
+            {
+              "candidate": {
+                "number": 32,
+                "initials": "C.P.",
+                "last_name": "Brienen",
+                "locality": "Eemstricht",
+                "gender": "Female"
+              },
+              "votes": 254,
+              "previous_votes": 254
+            },
+            {
+              "candidate": {
+                "number": 33,
+                "initials": "F.B.",
+                "last_name": "Prakken",
+                "locality": "Middelgein",
+                "gender": "Male"
+              },
+              "votes": 240,
+              "previous_votes": 240
+            },
+            {
+              "candidate": {
+                "number": 34,
+                "initials": "Z.",
+                "last_name": "Born",
+                "locality": "Hoek van Zoom",
+                "gender": "X"
+              },
+              "votes": 225,
+              "previous_votes": 225
+            },
+            {
+              "candidate": {
+                "number": 35,
+                "initials": "V.",
+                "last_name": "Groenen",
+                "locality": "Heemdamseburg",
+                "gender": "Male"
+              },
+              "votes": 215,
+              "previous_votes": 215
+            },
+            {
+              "candidate": {
+                "number": 36,
+                "initials": "D.U.",
+                "last_name": "Aygün",
+                "locality": "Middelgein",
+                "gender": "X"
+              },
+              "votes": 202,
+              "previous_votes": 202
+            },
+            {
+              "candidate": {
+                "number": 37,
+                "initials": "X.W.",
+                "last_name": "Arets",
+                "locality": "Hovenerwoud",
+                "gender": "Female"
+              },
+              "votes": 197,
+              "previous_votes": 197
+            },
+            {
+              "candidate": {
+                "number": 38,
+                "initials": "C.E.J.",
+                "last_name": "Titulaer",
+                "locality": "Sluisdam",
+                "gender": "Male"
+              },
+              "votes": 188,
+              "previous_votes": 188
+            },
+            {
+              "candidate": {
+                "number": 39,
+                "initials": "K.J.L.",
+                "last_name": "Oorschot",
+                "locality": "Huisden",
+                "gender": "Female"
+              },
+              "votes": 179,
+              "previous_votes": 179
+            },
+            {
+              "candidate": {
+                "number": 40,
+                "initials": "Z.T.",
+                "last_name_prefix": "van der",
+                "last_name": "Meulen",
+                "locality": "Sluisdam",
+                "gender": "Female"
+              },
+              "votes": 168,
+              "previous_votes": 168
+            }
+          ]
+        },
+        {
+          "column_total": 700,
+          "previous_column_total": 700,
+          "votes": [
+            {
+              "candidate": {
+                "number": 41,
+                "initials": "P.R.C.",
+                "last_name_prefix": "van",
+                "last_name": "Jaspers-Gezen",
+                "locality": "Sluisdam",
+                "gender": "Female"
+              },
+              "votes": 154,
+              "previous_votes": 154
+            },
+            {
+              "candidate": {
+                "number": 42,
+                "initials": "M.D.",
+                "last_name": "Meulenkolk",
+                "locality": "Hovenerwoud",
+                "gender": "Male"
+              },
+              "votes": 149,
+              "previous_votes": 149
+            },
+            {
+              "candidate": {
+                "number": 43,
+                "initials": "A.",
+                "last_name": "Hoogstraten",
+                "locality": "Lekkum",
+                "gender": "Male"
+              },
+              "votes": 140,
+              "previous_votes": 140
+            },
+            {
+              "candidate": {
+                "number": 44,
+                "initials": "R.",
+                "last_name": "Philippen",
+                "locality": "Juinen",
+                "gender": "Male"
+              },
+              "votes": 131,
+              "previous_votes": 131
+            },
+            {
+              "candidate": {
+                "number": 45,
+                "initials": "K.L.",
+                "last_name_prefix": "van de",
+                "last_name": "Wal",
+                "locality": "Huisden",
+                "gender": "X"
+              },
+              "votes": 126,
+              "previous_votes": 126
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "number": 2,
+      "name": "Lijst van de Kandidaten",
+      "total": 57153,
+      "previous_total": 57153,
+      "columns": [
+        {
+          "column_total": 54200,
+          "previous_column_total": 54200,
+          "votes": [
+            {
+              "candidate": {
                 "number": 1,
-                "total": 50584,
-                "candidate_votes": [
-                    {
-                        "number": 1,
-                        "votes": 18207
-                    },
-                    {
-                        "number": 2,
-                        "votes": 6369
-                    },
-                    {
-                        "number": 3,
-                        "votes": 3522
-                    },
-                    {
-                        "number": 4,
-                        "votes": 2505
-                    },
-                    {
-                        "number": 5,
-                        "votes": 1934
-                    },
-                    {
-                        "number": 6,
-                        "votes": 1520
-                    },
-                    {
-                        "number": 7,
-                        "votes": 1318
-                    },
-                    {
-                        "number": 8,
-                        "votes": 1124
-                    },
-                    {
-                        "number": 9,
-                        "votes": 998
-                    },
-                    {
-                        "number": 10,
-                        "votes": 898
-                    },
-                    {
-                        "number": 11,
-                        "votes": 822
-                    },
-                    {
-                        "number": 12,
-                        "votes": 744
-                    },
-                    {
-                        "number": 13,
-                        "votes": 684
-                    },
-                    {
-                        "number": 14,
-                        "votes": 639
-                    },
-                    {
-                        "number": 15,
-                        "votes": 593
-                    },
-                    {
-                        "number": 16,
-                        "votes": 553
-                    },
-                    {
-                        "number": 17,
-                        "votes": 528
-                    },
-                    {
-                        "number": 18,
-                        "votes": 492
-                    },
-                    {
-                        "number": 19,
-                        "votes": 462
-                    },
-                    {
-                        "number": 20,
-                        "votes": 439
-                    },
-                    {
-                        "number": 21,
-                        "votes": 422
-                    },
-                    {
-                        "number": 22,
-                        "votes": 398
-                    },
-                    {
-                        "number": 23,
-                        "votes": 374
-                    },
-                    {
-                        "number": 24,
-                        "votes": 361
-                    },
-                    {
-                        "number": 25,
-                        "votes": 343
-                    },
-                    {
-                        "number": 26,
-                        "votes": 326
-                    },
-                    {
-                        "number": 27,
-                        "votes": 317
-                    },
-                    {
-                        "number": 28,
-                        "votes": 302
-                    },
-                    {
-                        "number": 29,
-                        "votes": 286
-                    },
-                    {
-                        "number": 30,
-                        "votes": 273
-                    },
-                    {
-                        "number": 31,
-                        "votes": 263
-                    },
-                    {
-                        "number": 32,
-                        "votes": 254
-                    },
-                    {
-                        "number": 33,
-                        "votes": 240
-                    },
-                    {
-                        "number": 34,
-                        "votes": 225
-                    },
-                    {
-                        "number": 35,
-                        "votes": 215
-                    },
-                    {
-                        "number": 36,
-                        "votes": 202
-                    },
-                    {
-                        "number": 37,
-                        "votes": 197
-                    },
-                    {
-                        "number": 38,
-                        "votes": 188
-                    },
-                    {
-                        "number": 39,
-                        "votes": 179
-                    },
-                    {
-                        "number": 40,
-                        "votes": 168
-                    },
-                    {
-                        "number": 41,
-                        "votes": 154
-                    },
-                    {
-                        "number": 42,
-                        "votes": 149
-                    },
-                    {
-                        "number": 43,
-                        "votes": 140
-                    },
-                    {
-                        "number": 44,
-                        "votes": 131
-                    },
-                    {
-                        "number": 45,
-                        "votes": 126
-                    }
-                ]
+                "initials": "X.",
+                "last_name_prefix": "van der",
+                "last_name": "Spek",
+                "locality": "Eemstricht",
+                "gender": "Female"
+              },
+              "votes": 22868,
+              "previous_votes": 22868
             },
             {
+              "candidate": {
                 "number": 2,
-                "total": 57153,
-                "candidate_votes": [
-                    {
-                        "number": 1,
-                        "votes": 22868
-                    },
-                    {
-                        "number": 2,
-                        "votes": 7792
-                    },
-                    {
-                        "number": 3,
-                        "votes": 4565
-                    },
-                    {
-                        "number": 4,
-                        "votes": 2961
-                    },
-                    {
-                        "number": 5,
-                        "votes": 2253
-                    },
-                    {
-                        "number": 6,
-                        "votes": 1854
-                    },
-                    {
-                        "number": 7,
-                        "votes": 1578
-                    },
-                    {
-                        "number": 8,
-                        "votes": 1340
-                    },
-                    {
-                        "number": 9,
-                        "votes": 1160
-                    },
-                    {
-                        "number": 10,
-                        "votes": 1050
-                    },
-                    {
-                        "number": 11,
-                        "votes": 948
-                    },
-                    {
-                        "number": 12,
-                        "votes": 867
-                    },
-                    {
-                        "number": 13,
-                        "votes": 787
-                    },
-                    {
-                        "number": 14,
-                        "votes": 732
-                    },
-                    {
-                        "number": 15,
-                        "votes": 671
-                    },
-                    {
-                        "number": 16,
-                        "votes": 631
-                    },
-                    {
-                        "number": 17,
-                        "votes": 587
-                    },
-                    {
-                        "number": 18,
-                        "votes": 548
-                    },
-                    {
-                        "number": 19,
-                        "votes": 520
-                    },
-                    {
-                        "number": 20,
-                        "votes": 488
-                    },
-                    {
-                        "number": 21,
-                        "votes": 460
-                    },
-                    {
-                        "number": 22,
-                        "votes": 432
-                    },
-                    {
-                        "number": 23,
-                        "votes": 405
-                    },
-                    {
-                        "number": 24,
-                        "votes": 383
-                    },
-                    {
-                        "number": 25,
-                        "votes": 351
-                    },
-                    {
-                        "number": 26,
-                        "votes": 330
-                    },
-                    {
-                        "number": 27,
-                        "votes": 304
-                    },
-                    {
-                        "number": 28,
-                        "votes": 288
-                    }
-                ]
+                "initials": "I.X.B.",
+                "last_name_prefix": "van",
+                "last_name": "Bekking",
+                "locality": "Huisden",
+                "gender": "Male"
+              },
+              "votes": 7792,
+              "previous_votes": 7792
+            },
+            {
+              "candidate": {
+                "number": 3,
+                "initials": "A.P.",
+                "last_name": "Gopal",
+                "locality": "Huisden",
+                "gender": "X"
+              },
+              "votes": 4565,
+              "previous_votes": 4565
+            },
+            {
+              "candidate": {
+                "number": 4,
+                "initials": "R.",
+                "last_name_prefix": "van de",
+                "last_name": "Wal",
+                "locality": "Bloemstede",
+                "gender": "X"
+              },
+              "votes": 2961,
+              "previous_votes": 2961
+            },
+            {
+              "candidate": {
+                "number": 5,
+                "initials": "L.U.",
+                "last_name": "Born",
+                "locality": "Hovenerwoud",
+                "gender": "X"
+              },
+              "votes": 2253,
+              "previous_votes": 2253
+            },
+            {
+              "candidate": {
+                "number": 6,
+                "initials": "C.S.",
+                "last_name": "Aygün",
+                "locality": "Eemstricht",
+                "gender": "Male"
+              },
+              "votes": 1854,
+              "previous_votes": 1854
+            },
+            {
+              "candidate": {
+                "number": 7,
+                "initials": "A.",
+                "last_name": "Boermans",
+                "locality": "Juinen",
+                "gender": "Female"
+              },
+              "votes": 1578,
+              "previous_votes": 1578
+            },
+            {
+              "candidate": {
+                "number": 8,
+                "initials": "C.D.B.",
+                "last_name_prefix": "van der",
+                "last_name": "Meulen",
+                "locality": "Bloemstede",
+                "gender": "X"
+              },
+              "votes": 1340,
+              "previous_votes": 1340
+            },
+            {
+              "candidate": {
+                "number": 9,
+                "initials": "W.",
+                "last_name": "Gopal",
+                "locality": "Eksterlo",
+                "gender": "X"
+              },
+              "votes": 1160,
+              "previous_votes": 1160
+            },
+            {
+              "candidate": {
+                "number": 10,
+                "initials": "M.V.I.",
+                "last_name_prefix": "van",
+                "last_name": "Lent",
+                "locality": "Heemdamseburg",
+                "gender": "Male"
+              },
+              "votes": 1050,
+              "previous_votes": 1050
+            },
+            {
+              "candidate": {
+                "number": 11,
+                "initials": "A.G.",
+                "last_name": "Prakken",
+                "locality": "Heemdamseburg",
+                "gender": "Female"
+              },
+              "votes": 948,
+              "previous_votes": 948
+            },
+            {
+              "candidate": {
+                "number": 12,
+                "initials": "F.",
+                "last_name": "Meulenkolk",
+                "locality": "Bloemstede",
+                "gender": "X"
+              },
+              "votes": 867,
+              "previous_votes": 867
+            },
+            {
+              "candidate": {
+                "number": 13,
+                "initials": "Q.R.V.",
+                "last_name": "Boermans",
+                "locality": "Bloemstede",
+                "gender": "Male"
+              },
+              "votes": 787,
+              "previous_votes": 787
+            },
+            {
+              "candidate": {
+                "number": 14,
+                "initials": "Q.",
+                "last_name_prefix": "van der",
+                "last_name": "Spek",
+                "locality": "Huisden",
+                "gender": "Female"
+              },
+              "votes": 732,
+              "previous_votes": 732
+            },
+            {
+              "candidate": {
+                "number": 15,
+                "initials": "B.",
+                "last_name": "Cornelis",
+                "locality": "Juinen",
+                "gender": "X"
+              },
+              "votes": 671,
+              "previous_votes": 671
+            },
+            {
+              "candidate": {
+                "number": 16,
+                "initials": "F.",
+                "last_name_prefix": "van",
+                "last_name": "Lent",
+                "locality": "Huisden",
+                "gender": "Male"
+              },
+              "votes": 631,
+              "previous_votes": 631
+            },
+            {
+              "candidate": {
+                "number": 17,
+                "initials": "W.N.",
+                "last_name": "Wiertz",
+                "locality": "Huisden",
+                "gender": "Male"
+              },
+              "votes": 587,
+              "previous_votes": 587
+            },
+            {
+              "candidate": {
+                "number": 18,
+                "initials": "T.",
+                "last_name": "Oorschot",
+                "locality": "Juinen",
+                "gender": "Female"
+              },
+              "votes": 548,
+              "previous_votes": 548
+            },
+            {
+              "candidate": {
+                "number": 19,
+                "initials": "P.",
+                "last_name_prefix": "van der",
+                "last_name": "Meulen",
+                "locality": "Juinen",
+                "gender": "Female"
+              },
+              "votes": 520,
+              "previous_votes": 520
+            },
+            {
+              "candidate": {
+                "number": 20,
+                "initials": "H.A.",
+                "last_name": "Cornelis",
+                "locality": "'s Gravenveen",
+                "gender": "Male"
+              },
+              "votes": 488,
+              "previous_votes": 488
             }
-        ],
-        "polling_station_investigations": {
-            "admitted_voters_recounted": [
-                3,
-                7,
-                10,
-                16,
-                19,
-                20,
-                27,
-                28,
-                35,
-                41,
-                48,
-                49,
-                51,
-                52,
-                62,
-                64,
-                73,
-                82,
-                85,
-                89,
-                90
-            ],
-            "investigated_other_reason": [
-                13,
-                19,
-                35,
-                51,
-                55,
-                75,
-                85
-            ],
-            "ballots_recounted": [
-                13
-            ]
+          ]
+        },
+        {
+          "column_total": 2953,
+          "previous_column_total": 2953,
+          "votes": [
+            {
+              "candidate": {
+                "number": 21,
+                "initials": "E.X.Y.",
+                "last_name": "Oorschot",
+                "locality": "Juinen",
+                "gender": "X"
+              },
+              "votes": 460,
+              "previous_votes": 460
+            },
+            {
+              "candidate": {
+                "number": 22,
+                "initials": "Z.P.L.",
+                "last_name_prefix": "den",
+                "last_name": "Mateman",
+                "locality": "Eksterlo",
+                "gender": "X"
+              },
+              "votes": 432,
+              "previous_votes": 432
+            },
+            {
+              "candidate": {
+                "number": 23,
+                "initials": "B.",
+                "last_name": "Bruins-Van den Kerk",
+                "locality": "Lekkum",
+                "gender": "X"
+              },
+              "votes": 405,
+              "previous_votes": 405
+            },
+            {
+              "candidate": {
+                "number": 24,
+                "initials": "H.K.X.",
+                "last_name_prefix": "de",
+                "last_name": "Vegt",
+                "locality": "Lekkum",
+                "gender": "Female"
+              },
+              "votes": 383,
+              "previous_votes": 383
+            },
+            {
+              "candidate": {
+                "number": 25,
+                "initials": "E.",
+                "last_name": "Wiertz",
+                "locality": "'s Gravenveen",
+                "gender": "Male"
+              },
+              "votes": 351,
+              "previous_votes": 351
+            },
+            {
+              "candidate": {
+                "number": 26,
+                "initials": "Y.",
+                "last_name": "Gopal",
+                "locality": "'s Gravenveen",
+                "gender": "X"
+              },
+              "votes": 330,
+              "previous_votes": 330
+            },
+            {
+              "candidate": {
+                "number": 27,
+                "initials": "D.",
+                "last_name_prefix": "den",
+                "last_name": "Mateman",
+                "locality": "Eemstricht",
+                "gender": "Female"
+              },
+              "votes": 304,
+              "previous_votes": 304
+            },
+            {
+              "candidate": {
+                "number": 28,
+                "initials": "V.",
+                "last_name_prefix": "van",
+                "last_name": "Lent",
+                "locality": "Huisden",
+                "gender": "Male"
+              },
+              "votes": 288,
+              "previous_votes": 288
+            }
+          ]
         }
-    },
-    "hash": "9a41 7d73 0dd2 b6d2 d0a6 ebdd 5360 d2ed de0c 3cc4 22e1 0c13 863e 3241 040d bd14",
-    "creation_date_time": "23-09-2025 22:16"
+      ]
+    }
+  ]
 }

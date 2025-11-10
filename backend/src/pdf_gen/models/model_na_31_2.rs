@@ -2,21 +2,26 @@ use serde::{Deserialize, Serialize};
 
 use crate::{
     committee_session::CommitteeSession,
-    election::ElectionWithPoliticalGroups,
-    pdf_gen::models::{PdfFileModel, PdfModel, ToPdfFileModel},
+    election::Election,
+    pdf_gen::{
+        CandidatesTables,
+        models::{PdfFileModel, PdfModel, ToPdfFileModel},
+        votes_table::VotesTables,
+    },
     polling_station::structs::PollingStation,
-    summary::ElectionSummary,
+    summary::ElectionSummaryWithoutVotes,
 };
 
 #[derive(Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct ModelNa31_2Input {
     pub committee_session: CommitteeSession,
-    pub election: ElectionWithPoliticalGroups,
-    pub summary: ElectionSummary,
+    pub election: Election,
+    pub summary: ElectionSummaryWithoutVotes,
     pub polling_stations: Vec<PollingStation>,
     pub hash: String,
     pub creation_date_time: String,
+    pub votes_tables: VotesTables,
 }
 
 impl ToPdfFileModel for ModelNa31_2Input {
@@ -28,8 +33,9 @@ impl ToPdfFileModel for ModelNa31_2Input {
 #[derive(Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct ModelNa31_2Bijlage1Input {
-    pub election: ElectionWithPoliticalGroups,
+    pub election: Election,
     pub polling_station: PollingStation,
+    pub candidates_tables: CandidatesTables,
 }
 
 impl ToPdfFileModel for ModelNa31_2Bijlage1Input {

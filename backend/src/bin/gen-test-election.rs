@@ -5,7 +5,10 @@ use abacus::{
     data_entry::PollingStationResults,
     election::ElectionWithPoliticalGroups,
     eml::{EML110, EML230, EMLDocument},
-    pdf_gen::models::{ModelNa31_2Input, ToPdfFileModel},
+    pdf_gen::{
+        VotesTables,
+        models::{ModelNa31_2Input, ToPdfFileModel},
+    },
     polling_station::PollingStation,
     summary::ElectionSummary,
     test_data_gen::{GenerateElectionArgs, RandomRange, parse_range},
@@ -215,10 +218,12 @@ async fn export_election(
         let election_summary = ElectionSummary::from_results(election, &results)
             .expect("Failed to create election summary");
         let input = ModelNa31_2Input {
+            votes_tables: VotesTables::new(election, &election_summary)
+                .expect("Failed to create votes tables"),
+            summary: election_summary.into(),
             committee_session: committee_session.clone(),
             polling_stations: polling_stations.iter().map(Clone::clone).collect(),
-            summary: election_summary,
-            election: election.clone(),
+            election: election.clone().into(),
             hash: "0000".to_string(),
             creation_date_time: chrono::Utc::now().format("%d-%m-%Y %H:%M").to_string(),
         }

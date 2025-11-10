@@ -513,26 +513,28 @@ impl DataEntryStatus {
         polling_station: &PollingStation,
         election: &ElectionWithPoliticalGroups,
     ) -> Result<Self, DataEntryTransitionError> {
-        let validation_results = validate_data_entry_status(&self, polling_station, election)?;
+        match &self {
+            DataEntryStatus::EntriesDifferent(state) => {
+                let validation_results = validate_data_entry_status(
+                    &Self::FirstEntryInProgress(FirstEntryInProgress {
+                        progress: 100,
+                        first_entry_user_id: state.first_entry_user_id,
+                        first_entry: state.first_entry.clone(),
+                        client_state: Default::default(),
+                    }),
+                    polling_station,
+                    election,
+                )?;
 
-        let DataEntryStatus::EntriesDifferent(EntriesDifferent {
-            first_entry,
-            first_entry_user_id,
-            first_entry_finished_at,
-            ..
-        }) = self
-        else {
-            return Err(DataEntryTransitionError::Invalid);
-        };
-
-        Ok(Self::SecondEntryNotStarted(SecondEntryNotStarted {
-            // Note that by setting the second entry to the first
-            // entry, we keep the second entry and discard the first entry
-            first_entry_user_id,
-            finalised_first_entry: first_entry.clone(),
-            first_entry_finished_at,
-            has_warnings: validation_results.has_warnings(),
-        }))
+                Ok(Self::SecondEntryNotStarted(SecondEntryNotStarted {
+                    first_entry_user_id: state.first_entry_user_id,
+                    finalised_first_entry: state.first_entry.clone(),
+                    first_entry_finished_at: state.first_entry_finished_at,
+                    has_warnings: validation_results.has_warnings(),
+                }))
+            }
+            _ => Err(DataEntryTransitionError::Invalid),
+        }
     }
 
     /// Keep second entry while resolving differences; it becomes the first entry
@@ -543,6 +545,8 @@ impl DataEntryStatus {
     ) -> Result<Self, DataEntryTransitionError> {
         match &self {
             DataEntryStatus::EntriesDifferent(state) => {
+                // Note that by setting the second entry to the first
+                // entry, we keep the second entry and discard the first entry
                 let validation_results = validate_data_entry_status(
                     &Self::FirstEntryInProgress(FirstEntryInProgress {
                         progress: 100,

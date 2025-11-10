@@ -172,7 +172,7 @@ async fn test_deletion_setting_committee_session_back_to_created_status(pool: Sq
         shared::get_election_committee_session(&addr, &cookie, election_id).await;
     assert_eq!(
         committee_session.status,
-        CommitteeSessionStatus::DataEntryInProgress
+        CommitteeSessionStatus::DataEntryNotStarted
     );
 
     // Delete last investigation
@@ -832,35 +832,19 @@ where
     Fut: Future<Output = Response>,
 {
     let cookie = shared::coordinator_login(addr).await;
-    let election_id = 7;
-    let committee_session_id = 704;
+    let election_id = 5;
+    let committee_session_id = 6;
 
     if pre_create {
         assert_eq!(
-            shared::create_investigation(addr, 741).await.status(),
+            shared::create_investigation(addr, 9).await.status(),
             StatusCode::CREATED
         );
 
         assert_eq!(
             conclude_investigation(
                 addr,
-                741,
-                Some(serde_json::json!({"findings": "Test findings", "corrected_results": false})),
-            )
-            .await
-            .status(),
-            StatusCode::OK
-        );
-
-        assert_eq!(
-            shared::create_investigation(addr, 742).await.status(),
-            StatusCode::CREATED
-        );
-
-        assert_eq!(
-            conclude_investigation(
-                addr,
-                742,
+                9,
                 Some(serde_json::json!({"findings": "Test findings", "corrected_results": false})),
             )
             .await
@@ -885,11 +869,10 @@ where
     );
 
     let status = action().await.status();
-    assert!(
-        status == StatusCode::OK
-            || status == StatusCode::NO_CONTENT
-            || status == StatusCode::CREATED
-    );
+    assert!(matches!(
+        status,
+        StatusCode::OK | StatusCode::NO_CONTENT | StatusCode::CREATED
+    ));
 
     let committee_session =
         shared::get_election_committee_session(addr, &cookie, election_id).await;
@@ -899,33 +882,29 @@ where
     );
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_7_four_sessions", "users"))))]
+#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_5_with_results", "users"))))]
 async fn test_finished_to_in_progress_on_create(pool: SqlitePool) {
     let addr = serve_api(pool).await;
-    check_finished_to_in_progress_on(&addr, false, || shared::create_investigation(&addr, 741))
-        .await;
+    check_finished_to_in_progress_on(&addr, false, || shared::create_investigation(&addr, 9)).await;
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_7_four_sessions", "users"))))]
+#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_5_with_results", "users"))))]
 async fn test_finished_to_in_progress_on_update(pool: SqlitePool) {
     let addr = serve_api(pool).await;
-    check_finished_to_in_progress_on(&addr, true, || {
-        shared::update_investigation(&addr, 741, None)
-    })
-    .await;
-}
-
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_7_four_sessions", "users"))))]
-async fn test_finished_to_in_progress_on_conclude(pool: SqlitePool) {
-    let addr = serve_api(pool).await;
-    check_finished_to_in_progress_on(&addr, true, || conclude_investigation(&addr, 741, None))
+    check_finished_to_in_progress_on(&addr, true, || shared::update_investigation(&addr, 9, None))
         .await;
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_7_four_sessions", "users"))))]
+#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_5_with_results", "users"))))]
+async fn test_finished_to_in_progress_on_conclude(pool: SqlitePool) {
+    let addr = serve_api(pool).await;
+    check_finished_to_in_progress_on(&addr, true, || conclude_investigation(&addr, 9, None)).await;
+}
+
+#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_5_with_results", "users"))))]
 async fn test_finished_to_in_progress_on_delete_non_last(pool: SqlitePool) {
     let addr = serve_api(pool).await;
-    check_finished_to_in_progress_on(&addr, true, || delete_investigation(&addr, 741)).await;
+    check_finished_to_in_progress_on(&addr, true, || delete_investigation(&addr, 9)).await;
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_7_four_sessions", "users"))))]

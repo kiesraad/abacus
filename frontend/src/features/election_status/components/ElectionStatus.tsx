@@ -110,7 +110,13 @@ export function ElectionStatus({
                       {pollingStationWithStatusAndTypist
                         .filter((ps) => ps.status !== undefined && statusesForCategory[cat].includes(ps.status))
                         .map((ps) => (
-                          <CategoryRow key={`${cat}-${ps.id}`} category={cat} pollingStation={ps} addLink={addLinks} />
+                          <CategoryRow
+                            key={`${cat}-${ps.id}`}
+                            category={cat}
+                            pollingStation={ps}
+                            addLink={addLinks}
+                            hasWarnings={ps.has_warnings || false}
+                          />
                         ))}
                     </Table.Body>
                   </Table>

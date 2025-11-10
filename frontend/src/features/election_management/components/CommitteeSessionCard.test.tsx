@@ -164,9 +164,9 @@ describe("UI component: CommitteeSessionCard", () => {
       expect(screen.getByText(expectedSubtitle)).toBeVisible();
 
       if (!isCurrentSession) {
-        expect(screen.getByText("zondag 9 november 2025 09:15")).toBeVisible();
+        expect(screen.getByText("zondag 9 november 2025 om 09:15")).toBeVisible();
       } else {
-        expect(screen.queryByText("zondag 9 november 2025 09:15")).not.toBeInTheDocument();
+        expect(screen.queryByText("zondag 9 november 2025 om 09:15")).not.toBeInTheDocument();
       }
 
       const buttons = screen.queryAllByRole("button");

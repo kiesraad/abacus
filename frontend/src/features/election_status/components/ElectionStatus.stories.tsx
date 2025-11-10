@@ -160,16 +160,16 @@ export const DefaultElectionStatus: StoryObj<StoryProps> = {
       await step("First entry finished", async () => {
         await expect(headings[2]).toHaveTextContent("Eerste invoer klaar (1)");
         await expect(tables[2]).toHaveTableContent([
-          ["Nummer", "Stembureau", "Invoerder", "Afgerond op"],
-          ["34", "Testplek", "Sanne Molenaar", "vandaag 10:20"],
+          ["Nummer", "Stembureau", "Invoerder", "Afgerond"],
+          ["34", "Testplek", "Sanne Molenaar", "vandaag om 10:20"],
         ]);
       });
 
       await step("Definitive", async () => {
         await expect(headings[3]).toHaveTextContent("Eerste en tweede invoer klaar (1)");
         await expect(tables[3]).toHaveTableContent([
-          ["Nummer", "Stembureau", "Afgerond op"],
-          ["37", "Dansschool Oeps nou deed ik het weer", "vandaag 10:20"],
+          ["Nummer", "Stembureau", "Afgerond"],
+          ["37", "Dansschool Oeps nou deed ik het weer", "vandaag om 10:20"],
         ]);
       });
 

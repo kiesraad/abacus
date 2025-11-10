@@ -17,7 +17,7 @@ export function CategoryHeader({ category }: CategoryHeaderProps): ReactNode {
       </Table.HeaderCell>
       <Table.HeaderCell key={`${category}-name`}>{t("polling_station.title.singular")}</Table.HeaderCell>
       {(category === "in_progress" || category === "first_entry_finished") && (
-        <Table.HeaderCell key={`${category}-typist`} className="w-14">
+        <Table.HeaderCell key={`${category}-typist`} className="w-15">
           {t("typist")}
         </Table.HeaderCell>
       )}
@@ -31,7 +31,7 @@ export function CategoryHeader({ category }: CategoryHeaderProps): ReactNode {
       )}
       {(category === "first_entry_finished" || category === "definitive") && (
         <Table.HeaderCell key={`${category}-time`} className="w-14">
-          {t("finished_at")}
+          {t("finished")}
         </Table.HeaderCell>
       )}
     </Table.Header>

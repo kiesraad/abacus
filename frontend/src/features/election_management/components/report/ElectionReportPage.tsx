@@ -18,7 +18,7 @@ import {
 } from "@/types/generated/openapi";
 import { cn } from "@/utils/classnames";
 import { committeeSessionLabel } from "@/utils/committeeSession";
-import { formatFullDateWithoutTimezone } from "@/utils/dateTime";
+import { formatDateTimeFull } from "@/utils/dateTime";
 
 import cls from "../ElectionManagement.module.css";
 
@@ -83,14 +83,8 @@ export function ElectionReportPage() {
             </h2>
             <div className={cls.reportInfoSection}>
               {t("election_report.committee_session_started", {
-                date: committeeSession.start_date_time
-                  ? formatFullDateWithoutTimezone(new Date(committeeSession.start_date_time))
-                  : "",
-                time: committeeSession.start_date_time
-                  ? new Date(committeeSession.start_date_time).toLocaleTimeString("nl-NL", {
-                      hour: "2-digit",
-                      minute: "2-digit",
-                    })
+                date_time: committeeSession.start_date_time
+                  ? formatDateTimeFull(new Date(committeeSession.start_date_time))
                   : "",
               })}
               .<br />

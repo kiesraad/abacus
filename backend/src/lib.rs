@@ -341,7 +341,7 @@ async fn log_app_started(conn: &mut SqliteConnection, db_path: &str) -> Result<(
     .map_err(|e| {
         if let Some(db_error) = e.as_database_error() {
             let db_path = db_path.to_string();
-
+            // see https://sqlite.org/rescode.html
             match db_error.code().unwrap_or_default().as_ref() {
                 "5" => AppError::DatabaseBusy(db_path),
                 "7" => AppError::DatabaseNoMemory(db_path),

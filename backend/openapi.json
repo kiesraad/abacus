@@ -4476,6 +4476,20 @@
             }
           },
           {
+            "type": "object",
+            "required": [
+              "event_type"
+            ],
+            "properties": {
+              "event_type": {
+                "type": "string",
+                "enum": [
+                  "ApplicationStarted"
+                ]
+              }
+            }
+          },
+          {
             "allOf": [
               {
                 "$ref": "#/components/schemas/ErrorDetails"

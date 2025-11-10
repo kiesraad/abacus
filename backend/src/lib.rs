@@ -12,7 +12,7 @@ use axum::{
 };
 use hyper::http::{HeaderName, HeaderValue, header};
 use sqlx::{
-    Sqlite, SqlitePool,
+    Sqlite, SqliteConnection, SqlitePool,
     sqlite::{SqliteConnectOptions, SqliteJournalMode},
 };
 use tokio::{net::TcpListener, signal};
@@ -327,6 +327,34 @@ pub async fn shutdown_signal() {
     }
 }
 
+/// Log that the application started and thereby check that the database is writeable
+/// This maps common sqlite errors to an AppError
+async fn log_app_started(conn: &mut SqliteConnection, db_path: &str) -> Result<(), AppError> {
+    audit_log::create(
+        conn,
+        &audit_log::AuditEvent::ApplicationStarted,
+        None,
+        None,
+        None,
+    )
+    .await
+    .map_err(|e| {
+        if let Some(db_error) = e.as_database_error() {
+            let db_path = db_path.to_string();
+
+            match db_error.code().unwrap_or_default().as_ref() {
+                "5" => AppError::DatabaseBusy(db_path),
+                "7" => AppError::DatabaseNoMemory(db_path),
+                "8" => AppError::DatabaseReadOnly(db_path),
+                "13" => AppError::DatabaseDiskFull(db_path),
+                _ => e.into(),
+            }
+        } else {
+            e.into()
+        }
+    })
+}
+
 /// Create a SQLite database if needed, then connect to it and run migrations.
 /// Return a connection pool.
 pub async fn create_sqlite_pool(
@@ -348,6 +376,11 @@ pub async fn create_sqlite_pool(
     }
 
     let pool = SqlitePool::connect_with(opts).await?;
+
+    // log startup event and verify the database is writeable
+    let mut connection = pool.acquire().await?;
+    log_app_started(&mut connection, database).await?;
+
     sqlx::migrate!().run(&pool).await?;
 
     #[cfg(feature = "dev-database")]

@@ -1,11 +1,18 @@
 #[derive(Debug)]
 pub enum AppError {
-    PortAlreadyInUse(u16),
+    // wrapped errors
     Database(sqlx::Error),
     DatabaseMigration(sqlx::migrate::MigrateError),
     Io(std::io::Error),
     Environment(tracing_subscriber::filter::FromEnvError),
     StdError(Box<dyn std::error::Error>),
+    // server specific
+    PortAlreadyInUse(u16),
+    // sqlite specifc
+    DatabaseBusy(String),
+    DatabaseNoMemory(String),
+    DatabaseReadOnly(String),
+    DatabaseDiskFull(String),
 }
 
 impl std::error::Error for AppError {}
@@ -43,12 +50,36 @@ impl From<Box<dyn std::error::Error>> for AppError {
 impl std::fmt::Display for AppError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            AppError::Database(e) => write!(f, "Database error: {}", e),
-            AppError::DatabaseMigration(e) => write!(f, "Database migration error: {}", e),
             AppError::Io(e) => write!(f, "IO error: {}", e),
             AppError::Environment(e) => write!(f, "Environment error: {}", e),
+            AppError::Database(e) => write!(f, "Database error: {}", e),
+            AppError::DatabaseBusy(file) => {
+                write!(
+                    f,
+                    "The database file \"{file:?}\" is busy. Is Abacus already running?"
+                )
+            }
+            AppError::DatabaseDiskFull(file) => {
+                write!(
+                    f,
+                    "Cannot write to the database file \"{file}\". Disk full."
+                )
+            }
+            AppError::DatabaseMigration(e) => write!(f, "Database migration error: {}", e),
+            AppError::DatabaseNoMemory(file) => {
+                write!(
+                    f,
+                    "Cannot write to the database file \"{file}\". System is out of memory."
+                )
+            }
+            AppError::DatabaseReadOnly(file) => {
+                write!(
+                    f,
+                    "Cannot write to the database file \"{file}\". Please check file permissions."
+                )
+            }
             AppError::PortAlreadyInUse(port) => {
-                write!(f, "Port {port} is in use. Is Abacus already running?",)
+                write!(f, "Port {port} is in use. Is Abacus already running?")
             }
             AppError::StdError(e) => write!(f, "{}", e),
         }

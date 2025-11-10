@@ -213,6 +213,8 @@ pub enum AuditEvent {
     // airgap detection events
     AirGapViolationDetected,
     AirGapViolationResolved,
+    // system events
+    ApplicationStarted,
     // api errors
     Error(ErrorDetails),
     #[default]
@@ -262,6 +264,7 @@ impl AuditEvent {
             AuditEvent::DataEntryDeleted(_) => AuditEventLevel::Info,
             AuditEvent::DataEntryFinalised(_) => AuditEventLevel::Success,
             AuditEvent::ResultDeleted(_) => AuditEventLevel::Success,
+            AuditEvent::ApplicationStarted => AuditEventLevel::Info,
             AuditEvent::Error(ErrorDetails { level, .. }) => *level,
             AuditEvent::UnknownEvent => AuditEventLevel::Warning,
             AuditEvent::DataEntryDiscardedFirst(_) => AuditEventLevel::Info,

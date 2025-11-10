@@ -5640,7 +5640,8 @@
             "minimum": 0
           },
           "has_warnings": {
-            "type": "boolean"
+            "type": "boolean",
+            "description": "Whether the finalised first or second data entry has warnings"
           },
           "polling_station_id": {
             "type": "integer",

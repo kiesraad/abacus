@@ -377,16 +377,17 @@ pub async fn create_sqlite_pool(
 
     let pool = SqlitePool::connect_with(opts).await?;
 
-    // log startup event and verify the database is writeable
-    let mut connection = pool.acquire().await?;
-    log_app_started(&mut connection, database).await?;
-
+    // run database migrations, this creates the necessary tables if they don't exist yet
     sqlx::migrate!().run(&pool).await?;
 
     #[cfg(feature = "dev-database")]
     if seed_data {
         fixtures::seed_fixture_data(&pool).await?;
     }
+
+    // log startup event and verify the database is writeable
+    let mut connection = pool.acquire().await?;
+    log_app_started(&mut connection, database).await?;
 
     Ok(pool)
 }

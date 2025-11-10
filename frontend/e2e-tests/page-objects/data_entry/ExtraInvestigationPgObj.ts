@@ -23,7 +23,7 @@ export class ExtraInvestigationPage extends DataEntryBasePage {
     super(page);
 
     this.fieldset = page.getByRole("group", {
-      name: /^Extra onderzoek B1-1/,
+      name: /^Alleen bij extra onderzoek B1-1/,
     });
 
     this.extraInvestigationOtherReason = this.fieldset.getByRole("group").filter({

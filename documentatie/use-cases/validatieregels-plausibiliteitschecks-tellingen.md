@@ -37,7 +37,7 @@ Er zijn geen regels omdat het niet mogelijk is om foute aantallen in te vullen i
 
 ### Regels voor extra onderzoek en controles (reeks F.1xx)
 
-#### CSO | F.101: 'Extra onderzoek B1-1': één van beide vragen is beantwoord, en de andere niet
+#### CSO | F.101: 'Alleen bij extra onderzoek B1-1': één van beide vragen is beantwoord, en de andere niet
 
 > Invoerder: **Controleer je antwoorden** (F.101)
 
@@ -47,7 +47,7 @@ Er zijn geen regels omdat het niet mogelijk is om foute aantallen in te vullen i
 
 Velden markeren: geen (laat alleen foutmelding zien op de pagina)
 
-#### CSO | F.102: 'Extra onderzoek B1-1': meerdere antwoorden op 1 van de vragen
+#### CSO | F.102: 'Alleen bij extra onderzoek B1-1': meerdere antwoorden op 1 van de vragen
 
 > Invoerder: **Controleer je antwoorden** (F.102)
 

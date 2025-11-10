@@ -18,7 +18,6 @@
   "details": "Details van het stembureau",
   "empty": "Er zijn nog geen stembureaus ingevoerd voor deze verkiezing. Kies hoe je stembureaus gaat toevoegen.",
   "form": {
-    "create": "Stembureau toevoegen",
     "not_unique": {
       "description": "Het nummer van het stembureau moet uniek zijn.",
       "error": "Voer een uniek nummer in",

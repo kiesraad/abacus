@@ -57,9 +57,9 @@ pub struct ValidationResultContext {
 #[derive(Serialize, Deserialize, ToSchema, Debug, PartialEq, Eq, PartialOrd, Ord)]
 #[serde(deny_unknown_fields)]
 pub enum ValidationResultCode {
-    /// CSO: 'Extra onderzoek B1-1': één van beide vragen is beantwoord, en de andere niet
+    /// CSO: 'Alleen bij extra onderzoek B1-1': één van beide vragen is beantwoord, en de andere niet
     F101,
-    /// CSO: 'Extra onderzoek B1-1': meerdere antwoorden op 1 van de vragen
+    /// CSO: 'Alleen bij extra onderzoek B1-1': meerdere antwoorden op 1 van de vragen
     F102,
     /// CSO: 'Verschillen met telresultaten van het stembureau': één of beide vragen zijn niet beantwoord
     F111,
@@ -1081,7 +1081,7 @@ mod tests {
             Ok(())
         }
 
-        /// CSO | F.101: 'Extra onderzoek B1-1': één van beide vragen is beantwoord, en de andere niet
+        /// CSO | F.101: 'Alleen bij extra onderzoek B1-1': één van beide vragen is beantwoord, en de andere niet
         #[test]
         fn test_f101() -> Result<(), DataError> {
             let validation_results = validate(false, true, false, false)?;
@@ -1107,7 +1107,7 @@ mod tests {
             Ok(())
         }
 
-        /// CSO | F.102: 'Extra onderzoek B1-1': meerdere antwoorden op 1 van de vragen
+        /// CSO | F.102: 'Alleen bij extra onderzoek B1-1': meerdere antwoorden op 1 van de vragen
         #[test]
         fn test_f102() -> Result<(), DataError> {
             let validation_results = validate(true, true, true, true)?;

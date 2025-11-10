@@ -150,10 +150,7 @@ async fn test_deletion_setting_committee_session_back_to_created_status(pool: Sq
 
     let committee_session =
         shared::get_election_committee_session(&addr, &cookie, election_id).await;
-    assert_eq!(
-        committee_session.status,
-        CommitteeSessionStatus::DataEntryInProgress
-    );
+    assert_eq!(committee_session.status, CommitteeSessionStatus::Created);
 
     // Create 2 investigations
     assert_eq!(
@@ -197,7 +194,7 @@ async fn test_deletion_removes_polling_station_from_status(pool: SqlitePool) {
     let polling_station_id = 9;
 
     let statuses = get_statuses(&addr, &cookie, election_id).await;
-    assert_eq!(statuses.len(), 0);
+    assert_eq!(statuses.len(), 1);
 
     // Add investigation with corrected_results: true
     assert_eq!(
@@ -221,7 +218,7 @@ async fn test_deletion_removes_polling_station_from_status(pool: SqlitePool) {
     );
 
     let statuses = get_statuses(&addr, &cookie, election_id).await;
-    assert_eq!(statuses.len(), 1);
+    assert_eq!(statuses.len(), 2);
     assert_eq!(
         statuses[&polling_station_id].status,
         DataEntryStatusName::FirstEntryNotStarted
@@ -282,10 +279,11 @@ async fn test_deletion_removes_polling_station_from_status(pool: SqlitePool) {
         }),
         client_state: ClientState::new_from_str(None).unwrap(),
     };
-    create_result_with_non_example_data_entry(&addr, 9, 5, data_entry).await;
+    create_result_with_non_example_data_entry(&addr, polling_station_id, election_id, data_entry)
+        .await;
 
     let statuses = get_statuses(&addr, &cookie, election_id).await;
-    assert_eq!(statuses.len(), 1);
+    assert_eq!(statuses.len(), 2);
     assert_eq!(
         statuses[&polling_station_id].status,
         DataEntryStatusName::Definitive
@@ -299,7 +297,7 @@ async fn test_deletion_removes_polling_station_from_status(pool: SqlitePool) {
     );
 
     let statuses = get_statuses(&addr, &cookie, election_id).await;
-    assert_eq!(statuses.len(), 0);
+    assert_eq!(statuses.len(), 1);
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_7_four_sessions", "users"))))]

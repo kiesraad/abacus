@@ -215,3 +215,13 @@ export const dataEntryHasWarningsGetMockResponse: DataEntryGetResponse = {
     warnings: [validationResultMockData.W001, validationResultMockData.W201, validationResultMockData.W202],
   },
 };
+
+export const dataEntryValidGetMockResponse: DataEntryGetResponse = {
+  user_id: 3,
+  data: getEmptyDataEntryRequest().data,
+  status: "second_entry_not_started",
+  validation_results: {
+    errors: [],
+    warnings: [],
+  },
+};

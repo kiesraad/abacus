@@ -59,6 +59,7 @@ export function DetailIndexPage() {
     const basePath = `/elections/${election.id}/status/${pollingStationId}/detail`;
     return <Navigate to={basePath ? `${basePath}/${fixedSections?.id}` : basePath} replace />;
   } else {
+    const formId = "resolve_errors_form";
     return (
       <>
         <h2>
@@ -76,6 +77,7 @@ export function DetailIndexPage() {
 
         {dataEntry.status === "first_entry_has_errors" && (
           <Form
+            id={formId}
             className={cls.resolveErrorsForm}
             onSubmit={(e) => {
               e.preventDefault();

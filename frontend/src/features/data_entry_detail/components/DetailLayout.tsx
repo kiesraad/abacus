@@ -39,7 +39,7 @@ export function DetailLayout() {
         <section className="smaller-gap">
           <PollingStationNumber>{pollingStation.number}</PollingStationNumber>
           <h1>{pollingStation.name}</h1>
-          <Badge type={dataEntry.status} readOnlyStatus={dataEntry.status !== "first_entry_has_errors"} />
+          <Badge type={dataEntry.status} readOnlyStatus={true} />
         </section>
       </header>
       <Messages />

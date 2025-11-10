@@ -1,5 +1,6 @@
 import * as ReactRouter from "react-router";
 
+import { waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
@@ -12,20 +13,20 @@ import {
   ElectionRequestHandler,
   ElectionStatusRequestHandler,
   PollingStationDataEntryHasErrorsGetHandler,
-  PollingStationDataEntryHasWarningsGetHandler,
   PollingStationDataEntryResolveErrorsHandler,
+  PollingStationDataEntryValidGetHandler,
   UserListRequestHandler,
 } from "@/testing/api-mocks/RequestHandlers";
 import { server } from "@/testing/server";
-import { render, screen, spyOnHandler } from "@/testing/test-utils";
+import { renderReturningRouter, screen, spyOnHandler } from "@/testing/test-utils";
 import { TestUserProvider } from "@/testing/TestUserProvider";
 
 import { DetailIndexPage } from "./DetailIndexPage";
 
 const navigate = vi.fn();
 
-const renderPage = async () => {
-  render(
+const renderPage = () => {
+  return renderReturningRouter(
     <TestUserProvider userRole="coordinator">
       <ElectionProvider electionId={1}>
         <ElectionStatusProvider electionId={1}>
@@ -36,7 +37,6 @@ const renderPage = async () => {
       </ElectionProvider>
     </TestUserProvider>,
   );
-  expect(await screen.findByRole("heading", { level: 2, name: "Alle fouten en waarschuwingen" })).toBeVisible();
 };
 
 describe("DetailPage", () => {
@@ -52,14 +52,13 @@ describe("DetailPage", () => {
       ElectionStatusRequestHandler,
       ElectionListRequestHandler,
       PollingStationDataEntryHasErrorsGetHandler,
-      PollingStationDataEntryHasWarningsGetHandler,
       PollingStationDataEntryResolveErrorsHandler,
       UserListRequestHandler,
     );
   });
 
   test("should render the page", async () => {
-    await renderPage();
+    renderPage();
 
     expect(await screen.findByRole("heading", { level: 2, name: "Alle fouten en waarschuwingen" })).toBeVisible();
 
@@ -86,7 +85,10 @@ describe("DetailPage", () => {
     const user = userEvent.setup();
     const resolve = spyOnHandler(PollingStationDataEntryResolveErrorsHandler);
 
-    await renderPage();
+    renderPage();
+
+    expect(await screen.findByRole("heading", { level: 2, name: "Alle fouten en waarschuwingen" })).toBeVisible();
+
     const submit = await screen.findByRole("button", { name: "Opslaan" });
 
     await user.click(submit);
@@ -108,7 +110,9 @@ describe("DetailPage", () => {
     const user = userEvent.setup();
     const getElectionStatus = spyOnHandler(ElectionStatusRequestHandler);
 
-    await renderPage();
+    renderPage();
+    expect(await screen.findByRole("heading", { level: 2, name: "Alle fouten en waarschuwingen" })).toBeVisible();
+
     expect(getElectionStatus).toHaveBeenCalledTimes(1);
 
     await user.click(await screen.findByLabelText(/Stembureau opnieuw laten invoeren/));
@@ -121,5 +125,30 @@ describe("DetailPage", () => {
       text: "Het stembureau kan opnieuw ingevoerd worden",
     });
     expect(navigate).toHaveBeenCalledWith("/elections/1/status");
+  });
+
+  test("should redirect to detail page", async () => {
+    // test regel 55
+    server.use(PollingStationDataEntryValidGetHandler);
+
+    const router = renderPage();
+
+    await waitFor(() => {
+      expect(router.state.location.pathname).toEqual("/elections/1/status/5/detail/extra_investigation");
+    });
+  });
+
+  test("should render errors and warnings overview on detail index page", async () => {
+    server.use(PollingStationDataEntryHasErrorsGetHandler);
+
+    renderPage();
+
+    expect(await screen.findByRole("heading", { level: 2, name: "Alle fouten en waarschuwingen" })).toBeVisible();
+
+    const voters_votes_counts = screen.queryByRole("region", { name: "Aantal kiezers en stemmen B1-3.1 en 3.2" });
+    expect(voters_votes_counts).toBeInTheDocument();
+
+    const form = await screen.findByTestId("resolve_errors_form");
+    expect(form).toBeVisible();
   });
 });

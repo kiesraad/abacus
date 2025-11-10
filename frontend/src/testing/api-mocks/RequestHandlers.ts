@@ -125,6 +125,7 @@ import {
   dataEntryHasErrorsGetMockResponse,
   dataEntryHasWarningsGetMockResponse,
   dataEntryStatusDifferences,
+  dataEntryValidGetMockResponse,
   saveDataEntryResponse,
 } from "./DataEntryMockData";
 import {
@@ -344,6 +345,14 @@ export const PollingStationDataEntryHasWarningsGetHandler = http.get<
   DataEntryGetResponse
 >("/api/polling_stations/5/data_entries/get" satisfies POLLING_STATION_DATA_ENTRY_GET_REQUEST_PATH, () =>
   HttpResponse.json(dataEntryHasWarningsGetMockResponse, { status: 200 }),
+);
+
+export const PollingStationDataEntryValidGetHandler = http.get<
+  ParamsToString<POLLING_STATION_DATA_ENTRY_GET_REQUEST_PARAMS>,
+  null,
+  DataEntryGetResponse
+>("/api/polling_stations/5/data_entries/get" satisfies POLLING_STATION_DATA_ENTRY_GET_REQUEST_PATH, () =>
+  HttpResponse.json(dataEntryValidGetMockResponse, { status: 200 }),
 );
 
 export const PollingStationDataEntryResolveDifferencesHandler = http.post<

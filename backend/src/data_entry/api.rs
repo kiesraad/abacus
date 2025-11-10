@@ -19,10 +19,11 @@ use super::{
     },
     status::{
         ClientState, CurrentDataEntry, DataEntryStatus, DataEntryStatusName,
-        DataEntryTransitionError, EntriesDifferent, FirstEntryHasErrors,
+        DataEntryTransitionError, EntriesDifferent,
     },
     validate_data_entry_status,
 };
+use crate::data_entry::repository::get_result;
 use crate::{
     APIError, AppState, SqlitePoolExt,
     audit_log::{AuditEvent, AuditService},
@@ -79,7 +80,7 @@ pub fn router() -> OpenApiRouter<AppState> {
         .routes(routes!(polling_station_data_entry_delete))
         .routes(routes!(polling_station_data_entry_finalise))
         .routes(routes!(polling_station_data_entries_and_result_delete))
-        .routes(routes!(polling_station_data_entry_get_errors))
+        .routes(routes!(polling_station_data_entry_get))
         .routes(routes!(polling_station_data_entry_resolve_errors))
         .routes(routes!(polling_station_data_entry_get_differences))
         .routes(routes!(polling_station_data_entry_resolve_differences))
@@ -616,16 +617,6 @@ impl ResolveErrorsAction {
     }
 }
 
-#[derive(Serialize, Deserialize, ToSchema, Debug)]
-#[serde(deny_unknown_fields)]
-pub struct DataEntryGetErrorsResponse {
-    pub first_entry_user_id: u32,
-    pub finalised_first_entry: PollingStationResults,
-    #[schema(value_type = String)]
-    pub first_entry_finished_at: DateTime<Utc>,
-    pub validation_results: ValidationResults,
-}
-
 /// Delete data entries and result for a polling station
 #[utoipa::path(
     delete,
@@ -701,12 +692,23 @@ async fn polling_station_data_entries_and_result_delete(
     }
 }
 
-/// Get accepted data entry errors to be resolved
+#[derive(Serialize, Deserialize, ToSchema, Debug)]
+#[serde(deny_unknown_fields)]
+pub struct DataEntryGetResponse {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[schema(nullable = false)]
+    pub user_id: Option<u32>,
+    pub data: PollingStationResults,
+    pub status: DataEntryStatusName,
+    pub validation_results: ValidationResults,
+}
+
+/// Get data entry with validation results
 #[utoipa::path(
     get,
-    path = "/api/polling_stations/{polling_station_id}/data_entries/resolve_errors",
+    path = "/api/polling_stations/{polling_station_id}/data_entries/get",
     responses(
-        (status = 200, description = "Data entry with errors and warnings to be resolved", body = DataEntryGetErrorsResponse),
+        (status = 200, description = "Data entry with validation results", body = DataEntryGetResponse),
         (status = 401, description = "Unauthorized", body = ErrorResponse),
         (status = 403, description = "Forbidden", body = ErrorResponse),
         (status = 404, description = "No data entry with accepted errors found", body = ErrorResponse),
@@ -718,35 +720,63 @@ async fn polling_station_data_entries_and_result_delete(
     ),
     security(("cookie_auth" = ["coordinator"])),
 )]
-async fn polling_station_data_entry_get_errors(
+async fn polling_station_data_entry_get(
     user: Coordinator,
     State(pool): State<SqlitePool>,
     Path(polling_station_id): Path<u32>,
-) -> Result<Json<DataEntryGetErrorsResponse>, APIError> {
+) -> Result<Json<DataEntryGetResponse>, APIError> {
     let mut conn = pool.acquire().await?;
 
-    let (polling_station, election, _, state) =
+    let (polling_station, election, committee_session, state) =
         validate_and_get_data(&mut conn, polling_station_id, &user.0).await?;
 
-    match state.clone() {
-        DataEntryStatus::FirstEntryHasErrors(FirstEntryHasErrors {
-            first_entry_user_id,
-            finalised_first_entry,
-            first_entry_finished_at,
-        }) => {
-            let validation_results =
-                validate_data_entry_status(&state, &polling_station, &election)?;
+    let validation_results = validate_data_entry_status(&state, &polling_station, &election)?;
 
-            Ok(Json(DataEntryGetErrorsResponse {
-                first_entry_user_id,
-                finalised_first_entry,
-                first_entry_finished_at,
+    match state.clone() {
+        DataEntryStatus::FirstEntryInProgress(first_entry_in_progress_state) => {
+            Ok(Json(DataEntryGetResponse {
+                user_id: Some(first_entry_in_progress_state.first_entry_user_id),
+                data: first_entry_in_progress_state.first_entry,
+                status: state.status_name(),
                 validation_results,
             }))
         }
-        _ => Err(APIError::NotFound(
-            "No data entry with accepted errors found".to_string(),
-            ErrorReference::EntryNotFound,
+        DataEntryStatus::FirstEntryHasErrors(first_entry_has_errors_state) => {
+            Ok(Json(DataEntryGetResponse {
+                user_id: Some(first_entry_has_errors_state.first_entry_user_id),
+                data: first_entry_has_errors_state.finalised_first_entry,
+                status: state.status_name(),
+                validation_results,
+            }))
+        }
+        DataEntryStatus::SecondEntryNotStarted(second_entry_not_started_state) => {
+            Ok(Json(DataEntryGetResponse {
+                user_id: Some(second_entry_not_started_state.first_entry_user_id),
+                data: second_entry_not_started_state.finalised_first_entry,
+                status: state.status_name(),
+                validation_results,
+            }))
+        }
+        DataEntryStatus::SecondEntryInProgress(second_entry_in_progress_state) => {
+            Ok(Json(DataEntryGetResponse {
+                user_id: Some(second_entry_in_progress_state.second_entry_user_id),
+                data: second_entry_in_progress_state.second_entry,
+                status: state.status_name(),
+                validation_results,
+            }))
+        }
+        DataEntryStatus::Definitive(_) => Ok(Json(DataEntryGetResponse {
+            user_id: None,
+            data: get_result(&mut conn, polling_station_id, committee_session.id)
+                .await?
+                .data
+                .0,
+            status: state.status_name(),
+            validation_results,
+        })),
+        _ => Err(APIError::Conflict(
+            "Data entry is in the wrong state".to_string(),
+            ErrorReference::DataEntryGetNotAllowed,
         )),
     }
 }
@@ -1022,7 +1052,7 @@ mod tests {
         data_entry::{
             CSOFirstSessionResults, DifferenceCountsCompareVotesCastAdmittedVoters,
             DifferencesCounts, PoliticalGroupCandidateVotes, PoliticalGroupTotalVotes,
-            VotersCounts, VotesCounts, YesNo,
+            ValidationResult, ValidationResultCode, VotersCounts, VotesCounts, YesNo,
             repository::{data_entry_exists, result_exists},
             structs::tests::ValidDefault,
         },
@@ -2321,5 +2351,179 @@ mod tests {
         let body = response.into_body().collect().await.unwrap().to_bytes();
         let result: ElectionStatusResponse = serde_json::from_slice(&body).unwrap();
         assert_eq!(result.statuses.len(), 1);
+    }
+
+    mod polling_station_data_entry_get {
+        use super::*;
+        use test_log::test;
+
+        async fn call_polling_station_data_entry_get(
+            pool: SqlitePool,
+            polling_station_id: u32,
+        ) -> Result<DataEntryGetResponse, ErrorResponse> {
+            let user = User::test_user(Role::Coordinator, 1);
+            let response = polling_station_data_entry_get(
+                Coordinator(user),
+                State(pool),
+                Path(polling_station_id),
+            )
+            .await
+            .into_response();
+
+            let is_success = response.status().is_success();
+            let body = response.into_body().collect().await.unwrap().to_bytes();
+
+            if is_success {
+                Ok(serde_json::from_slice(&body).unwrap())
+            } else {
+                Err(serde_json::from_slice(&body).unwrap())
+            }
+        }
+
+        #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
+        async fn test_status_first_entry_not_started(pool: SqlitePool) {
+            let result = call_polling_station_data_entry_get(pool.clone(), 1)
+                .await
+                .err()
+                .unwrap();
+
+            assert_eq!(result.reference, ErrorReference::DataEntryGetNotAllowed);
+        }
+
+        #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
+        async fn test_status_first_entry_in_progress(pool: SqlitePool) {
+            claim(pool.clone(), 1, EntryNumber::FirstEntry).await;
+
+            let result = call_polling_station_data_entry_get(pool.clone(), 1)
+                .await
+                .unwrap();
+
+            assert_eq!(result.status, DataEntryStatusName::FirstEntryInProgress);
+            assert_eq!(result.user_id, Some(1));
+            assert_eq!(result.data.as_common().voters_counts.poll_card_count, 0);
+        }
+
+        #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
+        async fn test_status_first_entry_has_errors(pool: SqlitePool) {
+            let mut data_entry_body = example_data_entry();
+            data_entry_body.data.voters_counts_mut().poll_card_count = 1234; // incorrect value
+
+            claim(pool.clone(), 1, EntryNumber::FirstEntry).await;
+            save(pool.clone(), data_entry_body, 1, EntryNumber::FirstEntry).await;
+            finalise(pool.clone(), 1, EntryNumber::FirstEntry).await;
+
+            let result = call_polling_station_data_entry_get(pool.clone(), 1)
+                .await
+                .unwrap();
+
+            assert_eq!(result.status, DataEntryStatusName::FirstEntryHasErrors);
+            assert_eq!(result.user_id, Some(1));
+            assert_eq!(result.data.as_common().voters_counts.poll_card_count, 1234);
+            assert_eq!(
+                result.validation_results.errors,
+                [ValidationResult {
+                    code: ValidationResultCode::F201,
+                    fields: vec![
+                        "data.voters_counts.poll_card_count".into(),
+                        "data.voters_counts.proxy_certificate_count".into(),
+                        "data.voters_counts.total_admitted_voters_count".into()
+                    ],
+                    context: None,
+                },]
+            );
+        }
+
+        #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
+        async fn test_status_second_entry_not_started(pool: SqlitePool) {
+            claim(pool.clone(), 1, EntryNumber::FirstEntry).await;
+            save(
+                pool.clone(),
+                example_data_entry(),
+                1,
+                EntryNumber::FirstEntry,
+            )
+            .await;
+            finalise(pool.clone(), 1, EntryNumber::FirstEntry).await;
+
+            let result = call_polling_station_data_entry_get(pool.clone(), 1)
+                .await
+                .unwrap();
+
+            assert_eq!(result.status, DataEntryStatusName::SecondEntryNotStarted);
+            assert_eq!(result.user_id, Some(1));
+            assert_eq!(result.data.as_common().voters_counts.poll_card_count, 99);
+            assert!(!result.validation_results.has_errors());
+        }
+
+        #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
+        async fn test_status_second_entry_in_progress(pool: SqlitePool) {
+            // Complete first entry
+            let data_entry_body = example_data_entry();
+            claim(pool.clone(), 1, EntryNumber::FirstEntry).await;
+            save(pool.clone(), data_entry_body, 1, EntryNumber::FirstEntry).await;
+            finalise(pool.clone(), 1, EntryNumber::FirstEntry).await;
+
+            // Start second entry
+            claim(pool.clone(), 1, EntryNumber::SecondEntry).await;
+
+            let result = call_polling_station_data_entry_get(pool.clone(), 1)
+                .await
+                .unwrap();
+
+            assert_eq!(result.status, DataEntryStatusName::SecondEntryInProgress);
+            assert_eq!(result.user_id, Some(2));
+            assert_eq!(result.data.as_common().voters_counts.poll_card_count, 0);
+        }
+
+        #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
+        async fn test_status_entries_different(pool: SqlitePool) {
+            // Complete first entry
+            let data_entry_body = example_data_entry();
+            claim(pool.clone(), 1, EntryNumber::FirstEntry).await;
+            save(pool.clone(), data_entry_body, 1, EntryNumber::FirstEntry).await;
+            finalise(pool.clone(), 1, EntryNumber::FirstEntry).await;
+
+            // Start and complete second entry with different values
+            let mut data_entry_body = example_data_entry();
+            data_entry_body.data.voters_counts_mut().poll_card_count = 80;
+            data_entry_body
+                .data
+                .voters_counts_mut()
+                .proxy_certificate_count = 20;
+
+            claim(pool.clone(), 1, EntryNumber::SecondEntry).await;
+            save(pool.clone(), data_entry_body, 1, EntryNumber::SecondEntry).await;
+            finalise(pool.clone(), 1, EntryNumber::SecondEntry).await;
+
+            let result = call_polling_station_data_entry_get(pool.clone(), 1)
+                .await
+                .err()
+                .unwrap();
+
+            assert_eq!(result.reference, ErrorReference::DataEntryGetNotAllowed);
+        }
+
+        #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
+        async fn test_status_definitive(pool: SqlitePool) {
+            // Complete first entry
+            let data_entry_body = example_data_entry();
+            claim(pool.clone(), 1, EntryNumber::FirstEntry).await;
+            save(pool.clone(), data_entry_body, 1, EntryNumber::FirstEntry).await;
+            finalise(pool.clone(), 1, EntryNumber::FirstEntry).await;
+
+            // Complete second entry
+            let data_entry_body = example_data_entry();
+            claim(pool.clone(), 1, EntryNumber::SecondEntry).await;
+            save(pool.clone(), data_entry_body, 1, EntryNumber::SecondEntry).await;
+            finalise(pool.clone(), 1, EntryNumber::SecondEntry).await;
+
+            let result = call_polling_station_data_entry_get(pool.clone(), 1)
+                .await
+                .unwrap();
+
+            assert_eq!(result.status, DataEntryStatusName::Definitive);
+            assert_eq!(result.user_id, None);
+            assert!(!result.validation_results.has_errors());
+        }
     }
 }

@@ -1004,6 +1004,7 @@ pub struct ElectionStatusResponseEntry {
     pub finished_at: Option<DateTime<Utc>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     #[schema(nullable = false)]
+    /// Whether the finalised first or second data entry has warnings
     pub has_warnings: Option<bool>,
 }
 

@@ -675,7 +675,7 @@ impl DataEntryStatus {
         }
     }
 
-    /// Returns the timestamp at which point this data entry process was made definitive
+    /// Returns whether the finalised first or second data entry has warnings
     pub fn has_warnings(&self) -> Option<&bool> {
         match self {
             DataEntryStatus::SecondEntryNotStarted(SecondEntryNotStarted {

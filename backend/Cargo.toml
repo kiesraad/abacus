@@ -27,7 +27,7 @@ required-features = ["dev-database"]
 
 [dependencies]
 axum = { version = "0.8", features = ["macros", "tracing", "tokio"] }
-axum-extra = { version = "0.10", default-features = false, features = [
+axum-extra = { version = "0.12", default-features = false, features = [
     "attachment",
     "cookie",
     "typed-header",
@@ -65,7 +65,7 @@ rand = "0.9.0"
 cookie = { version = "0.18.1", features = ["percent-encode"] }
 async_zip = { version = "0.0.18", features = ["tokio", "deflate", "chrono"] }
 strum = { version = "0.27", features = ["derive"] }
-tokio-util = { version = "0.7.16", features = ["io"] }
+tokio-util = { version = "0.7.17", features = ["io"] }
 ttf-parser = "0.25.1"
 
 [dev-dependencies]

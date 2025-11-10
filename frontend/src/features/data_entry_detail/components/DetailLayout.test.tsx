@@ -9,7 +9,8 @@ import {
   ElectionListRequestHandler,
   ElectionRequestHandler,
   ElectionStatusRequestHandler,
-  PollingStationDataEntryGetHandler,
+  PollingStationDataEntryHasErrorsGetHandler,
+  PollingStationDataEntryHasWarningsGetHandler,
 } from "@/testing/api-mocks/RequestHandlers";
 import { server } from "@/testing/server";
 import { render, screen, waitFor, within } from "@/testing/test-utils";
@@ -32,12 +33,12 @@ const renderLayout = () => {
 };
 
 describe("DetailLayout", () => {
-  test("renders layout with polling station header and navigation", async () => {
+  test("renders resolve errors layout with polling station header and navigation", async () => {
     server.use(
       ElectionRequestHandler,
       ElectionStatusRequestHandler,
       ElectionListRequestHandler,
-      PollingStationDataEntryGetHandler,
+      PollingStationDataEntryHasErrorsGetHandler,
     );
     vi.spyOn(ReactRouter, "useParams").mockReturnValue({ electionId: "1", pollingStationId: "5" });
     vi.spyOn(ReactRouter, "Outlet").mockReturnValue(<div>Outlet Content</div>);
@@ -56,6 +57,39 @@ describe("DetailLayout", () => {
 
     await waitFor(() => {
       expect(document.title).toBe("Fouten en waarschuwingen oplossen - Abacus");
+    });
+  });
+
+  test("renders detail layout with polling station header and navigation", async () => {
+    server.use(
+      ElectionRequestHandler,
+      ElectionStatusRequestHandler,
+      ElectionListRequestHandler,
+      PollingStationDataEntryHasWarningsGetHandler,
+    );
+    vi.spyOn(ReactRouter, "useParams").mockReturnValue({ electionId: "1", pollingStationId: "5" });
+    vi.spyOn(ReactRouter, "Outlet").mockReturnValue(<div>Outlet Content</div>);
+
+    renderLayout();
+
+    const banner = await screen.findByRole("banner");
+
+    expect(
+      within(banner).getByRole("heading", { level: 1, name: "Dansschool Oeps nou deed ik het weer" }),
+    ).toBeInTheDocument();
+    expect(within(banner).getByText("37")).toBeInTheDocument();
+    // Data entry has status "second_entry_not_started".
+    // In Badge, "1e invoer" is overruled as label instead of "2e invoer".
+    expect(within(banner).getByText("1e invoer")).toBeInTheDocument();
+
+    expect(screen.queryByRole("link", { name: "Fouten en waarschuwingen" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("link", { name: "Extra onderzoek" })).toBeInTheDocument();
+
+    const badge = screen.getByText("1e invoer");
+    expect(badge).toBeInTheDocument();
+
+    await waitFor(() => {
+      expect(document.title).toBe("Invoer bekijken - Abacus");
     });
   });
 });

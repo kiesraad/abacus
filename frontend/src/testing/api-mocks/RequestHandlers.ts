@@ -122,7 +122,8 @@ import {
 import { getCommitteeSessionMockData } from "./CommitteeSessionMockData";
 import {
   claimDataEntryResponse,
-  dataEntryGetMockResponse,
+  dataEntryHasErrorsGetMockResponse,
+  dataEntryHasWarningsGetMockResponse,
   dataEntryStatusDifferences,
   saveDataEntryResponse,
 } from "./DataEntryMockData";
@@ -329,12 +330,20 @@ export const PollingStationDataEntryGetDifferencesHandler = http.get<
   () => HttpResponse.json(dataEntryStatusDifferences, { status: 200 }),
 );
 
-export const PollingStationDataEntryGetHandler = http.get<
+export const PollingStationDataEntryHasErrorsGetHandler = http.get<
   ParamsToString<POLLING_STATION_DATA_ENTRY_GET_REQUEST_PARAMS>,
   null,
   DataEntryGetResponse
 >("/api/polling_stations/5/data_entries/get" satisfies POLLING_STATION_DATA_ENTRY_GET_REQUEST_PATH, () =>
-  HttpResponse.json(dataEntryGetMockResponse, { status: 200 }),
+  HttpResponse.json(dataEntryHasErrorsGetMockResponse, { status: 200 }),
+);
+
+export const PollingStationDataEntryHasWarningsGetHandler = http.get<
+  ParamsToString<POLLING_STATION_DATA_ENTRY_GET_REQUEST_PARAMS>,
+  null,
+  DataEntryGetResponse
+>("/api/polling_stations/5/data_entries/get" satisfies POLLING_STATION_DATA_ENTRY_GET_REQUEST_PATH, () =>
+  HttpResponse.json(dataEntryHasWarningsGetMockResponse, { status: 200 }),
 );
 
 export const PollingStationDataEntryResolveDifferencesHandler = http.post<
@@ -499,7 +508,7 @@ export const handlers: HttpHandler[] = [
   LoginHandler,
   InitialisedHandler,
   PollingStationDataEntryGetDifferencesHandler,
-  PollingStationDataEntryGetHandler,
+  PollingStationDataEntryHasErrorsGetHandler,
   PollingStationDataEntryResolveDifferencesHandler,
   PollingStationDataEntryResolveErrorsHandler,
   PollingStationListRequestHandler,

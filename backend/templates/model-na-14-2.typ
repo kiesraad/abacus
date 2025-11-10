@@ -88,14 +88,12 @@ Het totaal van alle getelde geldige stempassen, volmachtbewijzen en kiezerspasse
 Vul alléén de getallen in die veranderd zijn ten opzichte van een eerdere telling. Getallen die niet zijn veranderd, hoeven niet
 ingevuld te worden in de kolom ‘gecorrigeerd'. Onder ‘oorspronkelijk’ staan de getallen die in de eerste zitting door het #location_type zijn vastgesteld.
 
-#if input.election.political_groups.len() > 0 [
+#if input.votes_tables.len() > 0 [
   #sum(
     with_correction_title: true,
     sum(
-      ..input.election.political_groups.enumerate().map(((idx, list)) => {
-        let previous_political_group_votes = input.previous_summary.political_group_votes.find((pgv) => pgv.number == list.number);
-        let political_group_votes = input.summary.political_group_votes.find((pgv) => pgv.number == list.number);
-        letterbox(original_value: previous_political_group_votes.total, value: political_group_votes.total, bold_top_border: idx == 0, [E.#list.number], wide_cells: true)[Totaal lijst #list.number - #list.name]
+      ..input.votes_tables.enumerate().map(((idx, list)) => {
+        letterbox(original_value: list.previous_total, value: list.total, bold_top_border: idx == 0, [E.#list.number], wide_cells: true)[Totaal lijst #list.number - #list.name]
       }),
       letterbox(
         original_value: input.previous_summary.votes_counts.total_votes_candidates_count,
@@ -103,7 +101,7 @@ ingevuld te worden in de kolom ‘gecorrigeerd'. Onder ‘oorspronkelijk’ staa
         "E",
         light: false,
         wide_cells: true
-      )[*Totaal stemmen op kandidaten* (tel E.1 t/m E.#input.election.political_groups.last().number op)],
+      )[*Totaal stemmen op kandidaten* (tel E.1 t/m E.#input.votes_tables.last().number op)],
     ),
     letterbox(original_value: input.previous_summary.votes_counts.blank_votes_count, value: input.summary.votes_counts.blank_votes_count, "F", wide_cells: true)[Blanco stemmen],
     letterbox(original_value: input.previous_summary.votes_counts.invalid_votes_count, value: input.summary.votes_counts.invalid_votes_count, "G", wide_cells: true)[Ongeldige stemmen],
@@ -149,26 +147,14 @@ ingevuld te worden in de kolom ‘gecorrigeerd'. Onder ‘oorspronkelijk’ staa
 
 == Stemmen per lijst en per kandidaat <per_list_and_candidate>
 
-#for political_group in input.election.political_groups {
-  let pg_votes = input.summary.political_group_votes.find((pgv) => pgv.number == political_group.number);
-  let pg_original_votes = input.previous_summary.political_group_votes.find((pgv) => pgv.number == political_group.number);
-
+#for political_group in input.votes_tables {
   votes_table(
-    original_values: political_group.candidates.map(candidate => (
-      name: candidate_name(candidate),
-      number: candidate.number,
-      votes: pg_original_votes.candidate_votes.find(cv => cv.number == candidate.number).votes,
-    )),
     title: [#political_group.number #political_group.name],
     headers: ("Kandidaat", "", "Oorspronkelijk", "Gecorrigeerd"),
     corrected_cells: 1,
-    total: pg_votes.total,
-    original_total: pg_original_votes.total,
-    values: political_group.candidates.map(candidate => (
-      name: candidate_name(candidate),
-      number: candidate.number,
-      votes: pg_votes.candidate_votes.find(cv => cv.number == candidate.number).votes,
-    )),
+    total: political_group.total,
+    previous_total: political_group.previous_total,
+    votes_columns: political_group.columns,
     continue_on_next_page: [#sym.arrow.r De lijst gaat verder op de volgende pagina],
     column_total: "Subtotaal kolom",
     sum_total: columns => [Totaal lijst (kolom #columns)],
@@ -176,7 +162,6 @@ ingevuld te worden in de kolom ‘gecorrigeerd'. Onder ‘oorspronkelijk’ staa
     explainer_text: [
       Vul alléén de getallen in die veranderd zijn ten opzichte van een eerdere telling. Getallen die niet zijn veranderd, hoeven niet ingevuld te worden in de kolom ‘gecorrigeerd'. Onder ‘oorspronkelijk’ staan de getallen die in de eerste zitting door het #location_type zijn vastgesteld.
     ],
-    break_count: (20, 20, 20, 20)
   )
 }
 

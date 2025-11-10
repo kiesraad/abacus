@@ -1,11 +1,13 @@
-
-#let input = json("inputs/teletex-test.json")
+#let input = json("inputs/test-teletex-charset.json")
 #set text(
   lang: "nl",
   region: "nl",
   font: "DM Sans",
   size: 8pt,
 )
+
+// Note that this should be tested through the Rust code with embedded Typst library,
+// a local Typst installation will fall back to other fonts installed on the system.
 
 = Teletex codepoints
 

@@ -12,7 +12,7 @@ use crate::{
     authentication::AdminOrCoordinator,
     error::ErrorReference,
     pdf_gen::{
-        generate_pdfs,
+        CandidatesTables, generate_pdfs,
         models::{ModelN10_2Input, ModelNa31_2Bijlage1Input, ToPdfFileModel},
     },
     zip::ZipResponse,
@@ -87,13 +87,14 @@ async fn election_download_na_31_2_bijlage1(
                 ps.number
             );
 
-            ModelNa31_2Bijlage1Input {
-                election: election.clone(),
+            Ok(ModelNa31_2Bijlage1Input {
+                candidates_tables: CandidatesTables::new(&election)?,
+                election: election.clone().into(),
                 polling_station: ps.clone(),
             }
-            .to_pdf_file_model(name)
+            .to_pdf_file_model(name))
         })
-        .collect::<Vec<_>>();
+        .collect::<Result<Vec<_>, APIError>>()?;
 
     let (zip_response, zip_writer) = ZipResponse::new(&zip_filename);
 
@@ -169,13 +170,13 @@ async fn election_download_n_10_2(
                 ps.number
             );
 
-            ModelN10_2Input {
+            Ok(ModelN10_2Input {
                 election: election.clone(),
                 polling_station: ps.clone(),
             }
-            .to_pdf_file_model(name)
+            .to_pdf_file_model(name))
         })
-        .collect::<Vec<_>>();
+        .collect::<Result<Vec<_>, APIError>>()?;
 
     let (zip_response, zip_writer) = ZipResponse::new(&zip_filename);
 

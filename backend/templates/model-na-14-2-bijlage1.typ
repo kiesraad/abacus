@@ -88,11 +88,11 @@ Het totaal van alle getelde geldige stempassen en volmachtbewijzen
 Vul alléén de getallen in die veranderd zijn ten opzichte van een eerdere telling. Getallen die niet zijn veranderd, hoeven niet
 ingevuld te worden in de kolom ‘gecorrigeerd'. Onder ‘oorspronkelijk’ staan de getallen die in de eerste zitting door het #location_type zijn vastgesteld.
 
-#if input.election.political_groups.len() > 0 [
+#if input.votes_tables.len() > 0 [
   #sum(
     with_correction_title: true,
     sum(
-      ..input.election.political_groups.enumerate().map(((idx, list)) => {
+      ..input.votes_tables.enumerate().map(((idx, list)) => {
         let votes = input.previous_results.votes_counts.political_group_total_votes.find(v => v.number == list.number)
         if votes == none {
           return
@@ -104,7 +104,7 @@ ingevuld te worden in de kolom ‘gecorrigeerd'. Onder ‘oorspronkelijk’ staa
         original_value: input.previous_results.votes_counts.total_votes_candidates_count,
         "E",
         light: false,
-      )[*Totaal stemmen op kandidaten* (tel E.1 t/m E.#input.election.political_groups.last().number op)],
+      )[*Totaal stemmen op kandidaten* (tel E.1 t/m E.#input.votes_tables.last().number op)],
     ),
     empty_letterbox(cells: 4, original_value: input.previous_results.votes_counts.blank_votes_count, "F")[Blanco stemmen],
     empty_letterbox(cells: 4, original_value: input.previous_results.votes_counts.invalid_votes_count, "G")[Ongeldige stemmen],
@@ -159,24 +159,16 @@ Vul alléén de getallen in die veranderd zijn ten opzichte van een eerdere tell
 
 #pagebreak(weak: true)
 
-#for political_group in input.election.political_groups {
+#for political_group in input.votes_tables {
   votes_table(
     title: [#political_group.number #political_group.name],
     headers: ("Kandidaat", "", "Oorspronkelijk", "Gecorrigeerd"),
-    total: none,
-    values: political_group.candidates.map(candidate => (
-      name: candidate_name(candidate),
-      number: candidate.number,
-      votes: none,
-    )),
-    original_values: input.previous_results.political_group_votes.find(pg => pg.number == political_group.number).candidate_votes.map(candidate => (
-      number: candidate.number,
-      votes: candidate.votes,
-    )),
+    total: political_group.total,
+    previous_total: political_group.previous_total,
+    votes_columns: political_group.columns,
     continue_on_next_page: [#sym.arrow.r De lijst gaat verder op de volgende pagina],
     column_total: "Subtotaal kolom",
     sum_total: columns => [Totaal lijst (kolom #columns)],
     total_instruction: [Neem dit totaal over in rubriek #ref(<cast_votes>) van deze bijlage bij de juiste lijst.],
-    break_count: (25, 25, 15, 15)
   )
 }

@@ -31,7 +31,7 @@ use crate::{
     election::ElectionWithPoliticalGroups,
     error::ErrorReference,
     pdf_gen::{
-        generate_pdf,
+        VotesTablesWithOnlyPreviousVotes, generate_pdf,
         models::{ModelNa14_2Bijlage1Input, ToPdfFileModel},
     },
     polling_station::PollingStation,
@@ -445,16 +445,19 @@ async fn polling_station_investigation_download_corrigendum_pdf(
         polling_station.number
     );
 
-    let content = generate_pdf(
-        ModelNa14_2Bijlage1Input {
-            election,
-            polling_station,
-            previous_results: previous_results.as_common(),
-            investigation,
-        }
-        .to_pdf_file_model(name.clone()),
-    )
-    .await?;
+    let votes_tables =
+        VotesTablesWithOnlyPreviousVotes::new(&election, &previous_results.as_common())?;
+
+    let input = ModelNa14_2Bijlage1Input {
+        votes_tables,
+        election: election.into(),
+        polling_station,
+        previous_results: previous_results.as_common().into(),
+        investigation,
+    }
+    .to_pdf_file_model(name.clone());
+
+    let content = generate_pdf(input).await?;
 
     Ok(Attachment::new(content.buffer)
         .filename(&name)

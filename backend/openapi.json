@@ -4649,7 +4649,7 @@
           },
           "extra_investigation": {
             "$ref": "#/components/schemas/ExtraInvestigation",
-            "description": "Extra investigation (\"B1-1 Extra onderzoek\")"
+            "description": "Extra investigation (\"B1-1 Alleen bij extra onderzoek\")"
           },
           "political_group_votes": {
             "type": "array",
@@ -5789,7 +5789,7 @@
       },
       "ExtraInvestigation": {
         "type": "object",
-        "description": "Extra investigation, part of the polling station results (\"B1-1 Extra onderzoek\")",
+        "description": "Extra investigation, part of the polling station results (\"B1-1 Alleen bij extra onderzoek\")",
         "required": [
           "extra_investigation_other_reason",
           "ballots_recounted_extra_investigation"

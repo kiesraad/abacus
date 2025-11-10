@@ -193,10 +193,10 @@ Bijvoorbeeld een schorsing of als er meerdere verkiezingen tegelijk werden georg
 
 == Uitgebrachte stemmen
 
-#if input.election.political_groups.len() > 0 [
+#if input.votes_tables.len() > 0 [
   #sum(
     sum(
-      ..input.election.political_groups.map(list => {
+      ..input.votes_tables.map(list => {
         let votes = input.summary.votes_counts.political_group_total_votes.find(v => v.number == list.number)
 
         if votes == none {
@@ -209,7 +209,7 @@ Bijvoorbeeld een schorsing of als er meerdere verkiezingen tegelijk werden georg
         "E",
         light: false,
         value: input.summary.votes_counts.total_votes_candidates_count,
-      )[*Totaal stemmen op kandidaten* (tel E.1 t/m E.#input.election.political_groups.last().number op)],
+      )[*Totaal stemmen op kandidaten* (tel E.1 t/m E.#input.votes_tables.last().number op)],
     ),
     letterbox("F", value: input.summary.votes_counts.blank_votes_count)[Blanco stemmen],
     letterbox("G", value: input.summary.votes_counts.invalid_votes_count)[Ongeldige stemmen],
@@ -263,22 +263,12 @@ Voer de controle uit volgens de stappen in het controleprotocol.
 
 == Stemmen per lijst en per kandidaat
 
-#for political_group in input.summary.political_group_votes {
-  let election_political_group = input.election.political_groups.find(pg => pg.number == political_group.number)
-
-  if election_political_group == none {
-    continue
-  }
-
+#for political_group in input.votes_tables {
   votes_table(
-    title: [#political_group.number #election_political_group.name],
+    title: [#political_group.number #political_group.name],
     headers: ("Kandidaat", "", "Stemmen"),
     total: political_group.total,
-    values: political_group.candidate_votes.map(candidate => (
-      name: candidate_name(election_political_group.candidates.find(c => c.number == candidate.number)),
-      number: candidate.number,
-      votes: candidate.votes,
-    )),
+    votes_columns: political_group.columns,
     continue_on_next_page: [#sym.arrow.r De lijst gaat verder op de volgende pagina],
     column_total: "Subtotaal kolom",
     column_total_with_border: false,

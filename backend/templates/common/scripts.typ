@@ -427,10 +427,9 @@
 #let votes_table(
   headers: ("", "", ""),
   title: "",
-  total: 0,
-  original_total: 0,
-  values: (),
-  original_values: (),
+  total: none,
+  previous_total: none,
+  votes_columns: (),
   continue_on_next_page: "",
   corrected_cells: 4,
   column_total: (c, v) => [#c: #v],
@@ -438,29 +437,11 @@
   sum_total: [(#columns)],
   total_instruction: "",
   explainer_text: none,
-  break_count: (25, 25, 15, 15)
 ) = {
-  let with_originals = original_values != ();
+  let with_previous_votes = previous_total != none
 
   // Counter that keeps track of the column number
-  let column = 0
-
-  // Number of rows in the column
-  let column_row = 0
-
-  // Row counter
-  let rc = 0
-
-  // Vote counter
-  let votes = 0
-
-  let row_has_values = false;
-
-  // Count for the original subtotal column (if rendered)
-  let original_subtotal = 0
-
-  // Max rows per table / column
-  let total_rows = values.len()
+  let column_index = 0;
 
   box[
     #box(inset: (bottom: 10pt), text(size: 14pt, weight: "semibold")[Lijst #title])
@@ -472,12 +453,13 @@
   set text(size: 8pt)
 
   columns(2, {
-    while rc < total_rows {
-      let rows_in_column = calc.min(break_count.at(column, default: 15), total_rows - rc)
+    for column in votes_columns {
+      // Increment the column counter
+      column_index += 1
 
       table(
-        columns: (1fr, 2.5em) + if with_originals { (6em, 8em) } else { (8em,) },
-        rows: (auto,) + range(0, rows_in_column).map(_ => 23pt) + (8pt, 23pt),
+        columns: (1fr, 2.5em) + if with_previous_votes { (6em, 8em) } else { (8em,) },
+        rows: (auto,) + range(0, column.votes.len()).map(_ => 23pt) + (8pt, 23pt),
         inset: (x: 4pt, y: 8pt),
         stroke: 0.5pt + gray,
         fill: (_, y) => if y > 1 and calc.even(y) { luma(245) },
@@ -486,97 +468,63 @@
           ..headers.enumerate().map(((idx, h)) => table.cell(stroke: none, align: bottom + if idx == 0 { left } else { right }, small_header_text(h)))
         ),
         table.hline(stroke: 1pt + black),
-        ..while rc < total_rows {
-          let c = values.at(rc)
-          if c.votes != none {
-            row_has_values = true
-          }
-          votes += c.votes
-          let original_votes = 0;
-          if with_originals {
-            let o = original_values.at(rc)
-            original_votes = o.votes;
-            original_subtotal += original_votes;
-          }
-          rc += 1
-          column_row += 1
+        ..for cv in column.votes {
+          let previous_votes = if with_previous_votes { cv.previous_votes } else { none }
+
 
           (
-            table.cell(align: horizon, text(top-edge: 5pt, size: 7pt, hyphenate: true, truncate(c.name, 280pt))),
+            table.cell(align: horizon, text(top-edge: 5pt, size: 7pt, hyphenate: true, truncate(candidate_name(cv.candidate), 280pt))),
             table.cell(fill: luma(213), align: center + horizon, text(
               number-width: "tabular",
               weight: "bold",
-              [#c.number],
+              [#cv.candidate.number],
             )),
-            ..cell_if(with_originals, table.cell(inset: 8pt, fill: luma(213), align(right, prefilled_number(original_votes)))),
-            if c.votes == none {
+            ..cell_if(with_previous_votes, table.cell(inset: 8pt, fill: luma(213), align(right, prefilled_number(previous_votes)))),
+            if cv.votes == none {
               table.cell(inset: 1pt, empty_grid(cells: corrected_cells, paint: luma(213)))
             } else {
-              table.cell(align: right + horizon, text(number-width: "tabular", if not with_originals or original_votes != c.votes { fmt-number(c.votes) } else { " " }))
+              table.cell(align: right + horizon, text(number-width: "tabular", if not with_previous_votes or previous_votes != cv.votes { fmt-number(cv.votes) } else { " " }))
             },
           )
-
-          if calc.rem(column_row, break_count.at(column, default: 15)) == 0 {
-            break
-          }
         }.flatten(),
         table.hline(stroke: 1pt + black),
         table.footer(
           // Empty line
-          table.cell(colspan: if with_originals { 4 } else { 3 }, stroke: (x: none), fill: white, inset: 0pt, []),
+          table.cell(colspan: if with_previous_votes { 4 } else { 3 }, stroke: (x: none), fill: white, inset: 0pt, []),
           if type(column_total) == function {
-            table.cell(colspan: if with_originals { 4 } else { 3 }, fill: white, align: center, {
-              // Increment the column counter
-              column += 1
-
+            table.cell(colspan: if with_previous_votes { 4 } else { 3 }, fill: white, align: center, {
               // Caller defined render of column totals
-              if with_originals {
-                column_total(column, votes, original_subtotal)
+              if with_previous_votes {
+                column_total(column_index, column.column_total, column.previous_column_total)
               } else {
-                column_total(column, votes)
-              }
-
-
-              // Reset the votes per column counter
-              votes = 0
-              column_row = 0
-              row_has_values = false
-              if with_originals {
-                original_subtotal = 0
+                column_total(column_index, column.column_total)
               }
             })
           } else {
-            table.cell(colspan: if with_originals { 4 } else { 3 }, fill: white, inset: 0pt, {
-              column += 1
+            let previous_column_total = if with_previous_votes { column.previous_column_total } else { none }
 
+            table.cell(colspan: if with_previous_votes { 4 } else { 3 }, fill: white, inset: 0pt, {
               grid(
-                columns: (1fr,) + if with_originals { (6em, 8em) } else { (8em,) },
-                grid.cell(inset: 9pt, align: center)[#column_total #column#if not column_total_with_border { ":" }],
-                ..cell_if(with_originals, grid.cell(inset: 8pt, fill: luma(213), align(right, prefilled_number(original_subtotal)))),
+                columns: (1fr,) + if with_previous_votes { (6em, 8em) } else { (8em,) },
+                grid.cell(inset: 9pt, align: center)[#column_total #column_index#if not column_total_with_border { ":" }],
+                ..cell_if(with_previous_votes, grid.cell(inset: 8pt, fill: luma(213), align(right, prefilled_number(previous_column_total)))),
                 grid.vline(stroke: (thickness: if column_total_with_border { 1pt } else { 0pt }, paint: luma(213), dash: "densely-dotted")),
-                grid.cell(if row_has_values and (not with_originals or votes != original_subtotal) { grid.cell(inset: 4pt, align(right + horizon, prefilled_number(votes))) } else { empty_grid(cells: corrected_cells, paint: luma(213)) }, align: center, inset: 0pt),
+                grid.cell(if column.column_total != none and (not with_previous_votes or column.column_total != column.previous_column_total) { grid.cell(inset: 4pt, align(right + horizon, prefilled_number(column.column_total))) } else { empty_grid(cells: corrected_cells, paint: luma(213)) }, align: center, inset: 0pt),
               )
-
-              votes = 0
-              column_row = 0
-              row_has_values = false
-              if with_originals {
-                original_subtotal = 0
-              }
             })
           },
         ),
       )
 
-      if rc < total_rows {
-        if (calc.even(column)) {
+      if column_index < votes_columns.len() {
+        if (calc.even(column_index)) {
           v(8pt)
           align(right, text(weight: "bold", continue_on_next_page))
         }
 
         colbreak()
 
-        if (column == 2) {
+        if (column_index == 2) {
           place(top + left, scope: "parent", float: true, box[
             #box(inset: (bottom: 10pt), text(size: 14pt, weight: "semibold")[Vervolg lijst #title])
             #if explainer_text != none {
@@ -589,20 +537,20 @@
   })
 
   align(bottom, grid(
-    columns: (1fr,) + if with_originals { (6em, 8em) } else { (8em,) },
+    columns: (1fr,) + if with_previous_votes { (6em, 8em) } else { (8em,) },
     align: (right, right),
     inset: 8pt,
     grid.cell(stroke: 0.5pt + black, align: right, fill: black, text(fill: white, sum_total(range(
       1,
-      column + 1,
+      column_index + 1,
     )
       .map(str)
       .join(" + ")))),
-    ..cell_if(with_originals, grid.cell(fill: luma(213), stroke: 0.5pt + black, prefilled_number(original_total))),
+    ..cell_if(with_previous_votes, grid.cell(fill: luma(213), stroke: 0.5pt + black, prefilled_number(previous_total))),
     if total == none {
       grid.cell(stroke: 0.5pt + black, inset: 0pt, empty_grid(cells: 5, thickness: 0.5pt))
     } else {
-      grid.cell(stroke: 0.5pt + black, if not with_originals or original_total != total { fmt-number(total, zero: "0") } else { " " })
+      grid.cell(stroke: 0.5pt + black, if not with_previous_votes or previous_total != total { fmt-number(total, zero: "0") } else { " " })
     },
   ))
 

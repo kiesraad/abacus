@@ -347,6 +347,7 @@ export type AuditEvent =
   | (DataEntryDetails & { event_type: "DataEntryDiscardedBoth" })
   | { event_type: "AirGapViolationDetected" }
   | { event_type: "AirGapViolationResolved" }
+  | { event_type: "ApplicationStarted" }
   | (ErrorDetails & { event_type: "Error" })
   | { event_type: "UnknownEvent" };
 

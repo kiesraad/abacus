@@ -7,6 +7,7 @@
   "event": {
     "AirGapViolationDetected": "Internetverbinding gedetecteerd. Abacus gaat op slot.",
     "AirGapViolationResolved": "Geen internetverbinding meer gedetecteerd.",
+    "ApplicationStarted": "Abacus is gestart",
     "CommitteeSessionCreated": "Zitting aangemaakt",
     "CommitteeSessionDeleted": "Zitting verwijderd",
     "CommitteeSessionUpdated": "Zitting bijgewerkt",

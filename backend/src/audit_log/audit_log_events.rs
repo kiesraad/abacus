@@ -164,7 +164,7 @@ pub async fn create(
     user: Option<&User>,
     message: Option<String>,
     ip: Option<IpAddr>,
-) -> Result<(), APIError> {
+) -> Result<(), sqlx::Error> {
     let event_name = event.to_string();
     let event_level = event.level();
     let event = Json(event);

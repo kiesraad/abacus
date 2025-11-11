@@ -8,7 +8,10 @@ import * as useMessages from "@/hooks/messages/useMessages";
 import { ElectionProvider } from "@/hooks/election/ElectionProvider";
 import { ElectionStatusProvider } from "@/hooks/election/ElectionStatusProvider";
 import { UsersProvider } from "@/hooks/user/UsersProvider";
-import { dataEntryValidGetMockResponse } from "@/testing/api-mocks/DataEntryMockData";
+import {
+  dataEntryHasWarningsGetMockResponse,
+  dataEntryValidGetMockResponse,
+} from "@/testing/api-mocks/DataEntryMockData";
 import {
   ElectionListRequestHandler,
   ElectionRequestHandler,
@@ -147,5 +150,18 @@ describe("DetailIndexPage", () => {
 
     const form = await screen.findByTestId("resolve_errors_form");
     expect(form).toBeVisible();
+  });
+
+  test("should render only warnings overview on detail index page", async () => {
+    overrideOnce("get", "/api/polling_stations/5/data_entries/get", 200, dataEntryHasWarningsGetMockResponse);
+
+    renderPage();
+
+    expect(await screen.findByRole("heading", { level: 2, name: "Alle waarschuwingen" })).toBeVisible();
+
+    const voters_votes_counts = screen.queryByRole("region", { name: "Aantal kiezers en stemmen B1-3.1 en 3.2" });
+    expect(voters_votes_counts).toBeInTheDocument();
+
+    expect(screen.queryByTestId("resolve_errors_form")).toBeNull();
   });
 });

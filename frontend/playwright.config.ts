@@ -18,7 +18,8 @@ function returnWebserverCommand(): string {
   }
 
   // DEV: expects frontend build and playwright-specific database setup/seeding to have been done
-  return `cd ../backend && cargo run --features memory-serve,embed-typst -- --database ../backend/target/debug/playwright.sqlite --port 8081`;
+  //return `cd ../backend && cargo run --release --features memory-serve,embed-typst -- --database ../backend/db.sqlite --port 8081`;
+  return "cd ../backend";
 }
 
 const config: PlaywrightTestConfig = defineConfig({
@@ -31,7 +32,7 @@ const config: PlaywrightTestConfig = defineConfig({
   fullyParallel: true,
   // ...commonConfig,
   // Increase the test timeout on CI, which is usually slower
-  timeout: process.env.CI ? 30_000 : 20_000,
+  timeout: process.env.CI ? 20_000 : 10_000,
   reporter: process.env.CI
     ? [["list"], ["github"], ["junit", { outputFile: "playwright.e2e.junit.xml" }], ["html", { open: "never" }]]
     : "list",
@@ -43,39 +44,10 @@ const config: PlaywrightTestConfig = defineConfig({
     testIdAttribute: "id",
     baseURL: process.env.DEBUG_DEVELOPMENT ? "http://localhost:3000" : "http://127.0.0.1:8081",
   },
-  webServer: process.env.DEBUG_DEVELOPMENT
-    ? []
-    : [
-        {
-          command: returnWebserverCommand(),
-          url: "http://127.0.0.1:8081",
-          stdout: process.env.LOCAL_CI ? "pipe" : "ignore",
-        },
-      ],
+  webServer: process.env.DEBUG_DEVELOPMENT ? [] : [],
   projects: [
     {
-      name: "initialisation-test",
-      workers: 1,
-      testMatch: /initialisation\.e2e\.ts/,
-      use: {
-        ...devices["Desktop Chrome"],
-        channel: "chromium",
-        userAgent: "Abacus-User-Agent/1",
-      },
-    },
-    {
-      name: "setup-test-users",
-      workers: 1,
-      testMatch: /setup-test-users\.ts/,
-      use: {
-        ...devices["Desktop Chrome"],
-        channel: "chromium",
-        userAgent: "Abacus-User-Agent/1",
-      },
-      dependencies: ["initialisation-test"],
-    },
-    {
-      name: "chrome",
+      name: "chrome1",
       testMatch: /.*\.e2e\.ts/,
       testIgnore: /initialisation\.e2e\.ts/,
       use: {
@@ -86,25 +58,153 @@ const config: PlaywrightTestConfig = defineConfig({
         channel: "chromium",
         userAgent: "Abacus-User-Agent/1",
       },
-      dependencies: ["setup-test-users"],
+      dependencies: [],
     },
     {
-      name: "firefox",
+      name: "chrome2",
+      testMatch: /.*\.e2e\.ts/,
+      testIgnore: /initialisation\.e2e\.ts/,
+      use: {
+        contextOptions: {
+          permissions: ["clipboard-read", "clipboard-write"],
+        },
+        ...devices["Desktop Chrome"],
+        channel: "chromium",
+        userAgent: "Abacus-User-Agent/1",
+      },
+      dependencies: [],
+    },
+    {
+      name: "chrome3",
+      testMatch: /.*\.e2e\.ts/,
+      testIgnore: /initialisation\.e2e\.ts/,
+      use: {
+        contextOptions: {
+          permissions: ["clipboard-read", "clipboard-write"],
+        },
+        ...devices["Desktop Chrome"],
+        channel: "chromium",
+        userAgent: "Abacus-User-Agent/1",
+      },
+      dependencies: [],
+    },
+    {
+      name: "chrome4",
+      testMatch: /.*\.e2e\.ts/,
+      testIgnore: /initialisation\.e2e\.ts/,
+      use: {
+        contextOptions: {
+          permissions: ["clipboard-read", "clipboard-write"],
+        },
+        ...devices["Desktop Chrome"],
+        channel: "chromium",
+        userAgent: "Abacus-User-Agent/1",
+      },
+      dependencies: [],
+    },
+    {
+      name: "chrome5",
+      testMatch: /.*\.e2e\.ts/,
+      testIgnore: /initialisation\.e2e\.ts/,
+      use: {
+        contextOptions: {
+          permissions: ["clipboard-read", "clipboard-write"],
+        },
+        ...devices["Desktop Chrome"],
+        channel: "chromium",
+        userAgent: "Abacus-User-Agent/1",
+      },
+      dependencies: [],
+    },
+    {
+      name: "firefox1",
       testIgnore: /initialisation\.e2e\.ts/,
       use: {
         ...devices["Desktop Firefox"],
         userAgent: "Abacus-User-Agent/1",
       },
-      dependencies: ["setup-test-users"],
+      dependencies: [],
     },
     {
-      name: "safari",
+      name: "firefox2",
+      testIgnore: /initialisation\.e2e\.ts/,
+      use: {
+        ...devices["Desktop Firefox"],
+        userAgent: "Abacus-User-Agent/1",
+      },
+      dependencies: [],
+    },
+    {
+      name: "firefox3",
+      testIgnore: /initialisation\.e2e\.ts/,
+      use: {
+        ...devices["Desktop Firefox"],
+        userAgent: "Abacus-User-Agent/1",
+      },
+      dependencies: [],
+    },
+    {
+      name: "firefox4",
+      testIgnore: /initialisation\.e2e\.ts/,
+      use: {
+        ...devices["Desktop Firefox"],
+        userAgent: "Abacus-User-Agent/1",
+      },
+      dependencies: [],
+    },
+    {
+      name: "firefox5",
+      testIgnore: /initialisation\.e2e\.ts/,
+      use: {
+        ...devices["Desktop Firefox"],
+        userAgent: "Abacus-User-Agent/1",
+      },
+      dependencies: [],
+    },
+    {
+      name: "safari1",
       testIgnore: /initialisation\.e2e\.ts/,
       use: {
         ...devices["Desktop Safari"],
         userAgent: "Abacus-User-Agent/1",
       },
-      dependencies: ["setup-test-users"],
+      dependencies: [],
+    },
+    {
+      name: "safari2",
+      testIgnore: /initialisation\.e2e\.ts/,
+      use: {
+        ...devices["Desktop Safari"],
+        userAgent: "Abacus-User-Agent/1",
+      },
+      dependencies: [],
+    },
+    {
+      name: "safari3",
+      testIgnore: /initialisation\.e2e\.ts/,
+      use: {
+        ...devices["Desktop Safari"],
+        userAgent: "Abacus-User-Agent/1",
+      },
+      dependencies: [],
+    },
+    {
+      name: "safari4",
+      testIgnore: /initialisation\.e2e\.ts/,
+      use: {
+        ...devices["Desktop Safari"],
+        userAgent: "Abacus-User-Agent/1",
+      },
+      dependencies: [],
+    },
+    {
+      name: "safari5",
+      testIgnore: /initialisation\.e2e\.ts/,
+      use: {
+        ...devices["Desktop Safari"],
+        userAgent: "Abacus-User-Agent/1",
+      },
+      dependencies: [],
     },
   ],
 });

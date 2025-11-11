@@ -32,7 +32,10 @@ export function CommitteeSessionDetailsPage() {
   const [errorAlert, setErrorAlert] = useState<string | null>(null);
   const redirectToReportPage = location.hash === "#redirect-to-report";
   const sessionLabel = committeeSessionLabel(currentCommitteeSession.number, true).toLowerCase();
-  const updatePath: COMMITTEE_SESSION_UPDATE_REQUEST_PATH = `/api/elections/${currentCommitteeSession.election_id}/committee_sessions/${currentCommitteeSession.id}`;
+
+  //const updatePath: COMMITTEE_SESSION_UPDATE_REQUEST_PATH = `/api/elections/${currentCommitteeSession.election_id}/committee_sessions/${currentCommitteeSession.id}`;
+  const updatePath = `/api/elections/${currentCommitteeSession.election_id}/committee_sessions/${currentCommitteeSession.id}`;
+
   const { update } = useCrud({ updatePath });
 
   const defaultDate = currentCommitteeSession.start_date_time

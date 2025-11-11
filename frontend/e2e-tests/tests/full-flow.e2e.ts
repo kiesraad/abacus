@@ -45,6 +45,10 @@ const investigations = [
   },
 ];
 
+const random = Math.ceil(Date.now() * Math.random());
+const electionName = "Gemeenteraad test " + random;
+const electionCode = "GR" + random;
+
 test.describe.configure({ mode: "serial" });
 
 test.describe("full flow", () => {
@@ -59,13 +63,13 @@ test.describe("full flow", () => {
     const electionsOverviewPage = new ElectionsOverviewPgObj(page);
     await electionsOverviewPage.create.click();
 
-    await uploadElectionAndInputHash(page);
+    await uploadElectionAndInputHash(page, electionName, electionCode);
 
     const pollingStationRolePage = new PollingStationRolePgObj(page);
     await expect(pollingStationRolePage.header).toBeVisible();
     await pollingStationRolePage.next.click();
 
-    await uploadCandidatesAndInputHash(page);
+    await uploadCandidatesAndInputHash(page, electionName, electionCode);
     await uploadPollingStations(page, eml110b_single);
 
     const countingMethodPage = new CountingMethodTypePgObj(page);
@@ -89,7 +93,7 @@ test.describe("full flow", () => {
     await electionsOverviewPage.findElectionRowById(electionId).click();
 
     const electionHomePage = new ElectionHome(page);
-    await expect(electionHomePage.header).toContainText("Gemeenteraad Test 2022");
+    await expect(electionHomePage.header).toContainText(electionName);
     const sessionCard = electionHomePage.getCommitteeSessionCard(1);
     await expect(sessionCard).toContainText("Eerste zitting — Klaar voor steminvoer");
 
@@ -118,14 +122,14 @@ test.describe("full flow", () => {
     await overviewPage.findElectionRowById(electionId!).click();
 
     const electionHomePage = new ElectionHome(page);
-    await expect(electionHomePage.header).toContainText("Gemeenteraad Test 2022");
+    await expect(electionHomePage.header).toContainText(electionName);
     await electionHomePage.detailsButton.click();
 
     const electionDetails = new ElectionDetailsPgObj(page);
     await expect(electionDetails.header).toContainText("Gemeentelijk stembureau Test");
     await electionDetails.fillForm("Pannerdam", "18-03-2026", "21:34");
 
-    await expect(electionHomePage.header).toContainText("Gemeenteraad Test 2022");
+    await expect(electionHomePage.header).toContainText(electionName);
     await expect(page.getByText("woensdag 18 maart 2026 21:34")).toBeVisible();
     await electionHomePage.startButton.click();
 
@@ -187,7 +191,7 @@ test.describe("full flow", () => {
     await overviewPage.findElectionRowById(electionId!).click();
 
     const electionHomePage = new ElectionHome(page);
-    await expect(electionHomePage.header).toContainText("Gemeenteraad Test 2022");
+    await expect(electionHomePage.header).toContainText(electionName);
     await electionHomePage.statusButton.click();
 
     const electionStatusPage = new ElectionStatus(page);
@@ -262,7 +266,7 @@ test.describe("full flow", () => {
       await overviewPage.findElectionRowById(electionId!).click();
 
       const electionDetailsPage = new ElectionDetailsPgObj(page);
-      await expect(electionDetailsPage.header).toContainText("Gemeenteraad Test 2022");
+      await expect(electionDetailsPage.header).toContainText(electionName);
       await electionDetailsPage.investigationsOverviewButton.click();
 
       const investigationsOverviewPage = new InvestigationOverviewPgObj(page);

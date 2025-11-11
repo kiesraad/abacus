@@ -1,4 +1,5 @@
 import { expect, Page } from "@playwright/test";
+import { createHash } from "crypto";
 import { CandidatesListPage } from "e2e-tests/page-objects/data_entry/CandidatesListPgObj";
 import { CheckAndSavePage } from "e2e-tests/page-objects/data_entry/CheckAndSavePgObj";
 import { CountingDifferencesPollingStationPage } from "e2e-tests/page-objects/data_entry/CountingDifferencesPollingStationPgObj";
@@ -18,6 +19,7 @@ import { AddInvestigationPgObj } from "e2e-tests/page-objects/investigations/Add
 import { InvestigationOverviewPgObj } from "e2e-tests/page-objects/investigations/InvestigationOverviewPgObj";
 import { InvestigationPrintCorrigendumPgObj } from "e2e-tests/page-objects/investigations/InvestigationPrintCorrigendumPgObj";
 import { InvestigationReasonPgObj } from "e2e-tests/page-objects/investigations/InvestigationReasonPgObj";
+import { readFile, writeFile } from "node:fs/promises";
 
 import { PollingStationResults } from "@/types/generated/openapi";
 
@@ -78,28 +80,94 @@ export async function fillDataEntryPagesAndSave(page: Page, results: PollingStat
   return dataEntryHomePage;
 }
 
-export async function uploadElectionAndInputHash(page: Page) {
+export async function uploadElectionAndInputHash(page: Page, electionName: string, electionCode: string) {
+  // Edit election file
+  const newFileName = "1_Election_" + electionName.replaceAll(" ", "_") + ".xml";
+  const newFilePath = eml110a.path.replaceAll(eml110a.filename, newFileName);
+  let election_data = await readFile(eml110a.path, "utf8");
+
+  // Replace election name
+  election_data = election_data.replaceAll("Gemeenteraad Test 2022", electionName);
+
+  // Replace election ID
+  election_data = election_data.replaceAll("GR2022_Test", electionCode);
+  await writeFile(newFilePath, election_data);
+
+  // Calculate HASH...
+  const hash = createHash("sha256")
+    .update(election_data)
+    .digest("hex")
+    .match(/.{1,4}/g);
+
   const uploadElectionDefinitionPage = new UploadElectionDefinitionPgObj(page);
   await expect(uploadElectionDefinitionPage.header).toBeVisible();
-  await uploadElectionDefinitionPage.uploadFile(eml110a.path);
-  await expect(uploadElectionDefinitionPage.main).toContainText(eml110a.filename);
+  await uploadElectionDefinitionPage.uploadFile(newFilePath);
+  await expect(uploadElectionDefinitionPage.main).toContainText(newFileName);
   await expect(uploadElectionDefinitionPage.main).toContainText(eml110a.electionDate);
 
   const checkDefinitionPage = new CheckElectionDefinitionPgObj(page);
   await expect(checkDefinitionPage.header).toBeVisible();
-  await checkDefinitionPage.inputHash(eml110a.hashInput1, eml110a.hashInput2);
+
+  // Find correct hashes to input
+  const shownHash = (await page.getByTestId("hash").textContent()).split("-");
+  let hashInput1 = hash[shownHash.indexOf("1")];
+  let hashInput2 = hash[shownHash.indexOf("2")];
+
+  /*
+  console.log({
+    electionName,
+    electionCode,
+    hashInput1,
+    hashInput2,
+  });
+  */
+
+  await checkDefinitionPage.inputHash(hashInput1, hashInput2);
 }
 
-export async function uploadCandidatesAndInputHash(page: Page) {
+export async function uploadCandidatesAndInputHash(page: Page, electionName: string, electionCode: string) {
+  // Edit candidates file
+  const newFileName = "1_Candidates_" + electionName.replaceAll(" ", "_") + ".xml";
+  const newFilePath = eml230b.path.replaceAll(eml230b.filename, newFileName);
+  let election_data = await readFile(eml230b.path, "utf8");
+
+  // Replace election name
+  election_data = election_data.replaceAll("Gemeenteraad Test 2022", electionName);
+
+  // Replace election ID
+  election_data = election_data.replaceAll("GR2022_Test", electionCode);
+  await writeFile(newFilePath, election_data);
+
+  // Calculate HASH...
+  const hash = createHash("sha256")
+    .update(election_data)
+    .digest("hex")
+    .match(/.{1,4}/g);
+
   const uploadCandidateDefinitionPage = new UploadCandidateDefinitionPgObj(page);
   await expect(uploadCandidateDefinitionPage.header).toBeVisible();
-  await uploadCandidateDefinitionPage.uploadFile(eml230b.path);
-  await expect(uploadCandidateDefinitionPage.main).toContainText(eml230b.filename);
+  await uploadCandidateDefinitionPage.uploadFile(newFilePath);
+  await expect(uploadCandidateDefinitionPage.main).toContainText(newFileName);
   await expect(uploadCandidateDefinitionPage.main).toContainText(eml230b.electionDate);
 
   const checkCandidateDefinitionPage = new CheckCandidateDefinitionPgObj(page);
   await expect(checkCandidateDefinitionPage.header).toBeVisible();
-  await checkCandidateDefinitionPage.inputHash(eml230b.hashInput1, eml230b.hashInput2);
+
+  // Find correct hashes to input
+  const shownHash = (await page.getByTestId("hash").textContent()).split("-");
+  let hashInput1 = hash[shownHash.indexOf("1")];
+  let hashInput2 = hash[shownHash.indexOf("2")];
+
+  /*
+  console.log({
+    electionName,
+    electionCode,
+    hashInput1,
+    hashInput2,
+  });
+  */
+
+  await checkCandidateDefinitionPage.inputHash(hashInput1, hashInput2);
 }
 
 export async function uploadPollingStations(page: Page, eml = eml110b) {

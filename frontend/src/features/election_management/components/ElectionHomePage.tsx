@@ -183,7 +183,6 @@ export function ElectionHomePage() {
               election={election}
               committeeSession={currentCommitteeSession}
               numberOfPollingStations={pollingStations.length}
-              numberOfVoters={currentCommitteeSession.number_of_voters}
             />
           </div>
           {isFirstCommitteeSession && (

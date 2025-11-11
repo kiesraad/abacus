@@ -634,17 +634,17 @@ async fn test_committee_session_status_change_previous_committee_session_fails(p
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
-async fn test_committee_session_number_of_voters_change_first_session_created_works(
+async fn test_committee_session_number_of_voters_change_first_session_created_works_for_coordinator(
     pool: SqlitePool,
 ) {
     let addr = serve_api(pool).await;
-    let cookie = shared::coordinator_login(&addr).await;
+    let coordinator_cookie = shared::coordinator_login(&addr).await;
     let election_id = 2;
     let committee_session_id = 2;
 
     shared::change_status_committee_session(
         &addr,
-        &cookie,
+        &coordinator_cookie,
         election_id,
         committee_session_id,
         CommitteeSessionStatus::Created,
@@ -652,13 +652,12 @@ async fn test_committee_session_number_of_voters_change_first_session_created_wo
     .await;
 
     let committee_session =
-        shared::get_election_committee_session(&addr, &cookie, election_id).await;
+        shared::get_election_committee_session(&addr, &coordinator_cookie, election_id).await;
     assert_eq!(committee_session.status, CommitteeSessionStatus::Created);
 
     let url = format!(
         "http://{addr}/api/elections/{election_id}/committee_sessions/{committee_session_id}/voters"
     );
-    let coordinator_cookie = shared::coordinator_login(&addr).await;
     let response = reqwest::Client::new()
         .put(&url)
         .header("cookie", coordinator_cookie)
@@ -678,17 +677,17 @@ async fn test_committee_session_number_of_voters_change_first_session_created_wo
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
-async fn test_committee_session_number_of_voters_change_first_session_not_started_works(
+async fn test_committee_session_number_of_voters_change_first_session_not_started_works_for_administrator(
     pool: SqlitePool,
 ) {
     let addr = serve_api(pool).await;
-    let cookie = shared::coordinator_login(&addr).await;
+    let coordinator_cookie = shared::coordinator_login(&addr).await;
     let election_id = 2;
     let committee_session_id = 2;
 
     shared::change_status_committee_session(
         &addr,
-        &cookie,
+        &coordinator_cookie,
         election_id,
         committee_session_id,
         CommitteeSessionStatus::Created,
@@ -696,7 +695,7 @@ async fn test_committee_session_number_of_voters_change_first_session_not_starte
     .await;
     shared::change_status_committee_session(
         &addr,
-        &cookie,
+        &coordinator_cookie,
         election_id,
         committee_session_id,
         CommitteeSessionStatus::DataEntryNotStarted,
@@ -704,7 +703,7 @@ async fn test_committee_session_number_of_voters_change_first_session_not_starte
     .await;
 
     let committee_session =
-        shared::get_election_committee_session(&addr, &cookie, election_id).await;
+        shared::get_election_committee_session(&addr, &coordinator_cookie, election_id).await;
     assert_eq!(
         committee_session.status,
         CommitteeSessionStatus::DataEntryNotStarted
@@ -713,10 +712,10 @@ async fn test_committee_session_number_of_voters_change_first_session_not_starte
     let url = format!(
         "http://{addr}/api/elections/{election_id}/committee_sessions/{committee_session_id}/voters"
     );
-    let coordinator_cookie = shared::coordinator_login(&addr).await;
+    let admin_cookie = shared::admin_login(&addr).await;
     let response = reqwest::Client::new()
         .put(&url)
-        .header("cookie", coordinator_cookie)
+        .header("cookie", admin_cookie)
         .json(&CommitteeSessionNumberOfVotersChangeRequest {
             number_of_voters: 12345,
         })

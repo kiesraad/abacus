@@ -46,7 +46,6 @@ const renderTable = (userRole: Role, committeeSession: CommitteeSession) => {
         }}
         committeeSession={committeeSession}
         numberOfPollingStations={1}
-        numberOfVoters={0}
       />
     </TestUserProvider>,
   );
@@ -58,7 +57,7 @@ describe("ElectionInformationTable", () => {
   });
 
   test("renders a table with the election information for first committee session status created for coordinator", async () => {
-    renderTable("coordinator", { ...committeeSessionMockData, status: "created" });
+    renderTable("coordinator", { ...committeeSessionMockData, number_of_voters: 0, status: "created" });
 
     const election_information_table = await screen.findByTestId("election-information-table");
     expect(election_information_table).toBeVisible();
@@ -89,14 +88,14 @@ describe("ElectionInformationTable", () => {
       ["Verkiezing", "Gemeenteraadsverkiezingen 2026, 30 november"],
       ["Kiesgebied", "0035 - Gemeente Heemdamseburg"],
       ["Lijsten en kandidaten", "1 lijst en 1 kandidaat"],
-      ["Aantal kiesgerechtigden", "Nog invullen"],
+      ["Aantal kiesgerechtigden", "2.000"],
       ["Invoer doen voor", "Gemeentelijk stembureau"],
       ["Stembureaus", "1 stembureau"],
       ["Type stemopneming", "Decentrale stemopneming"],
     ]);
 
     const tableRows = within(election_information_table).getAllByRole("row");
-    expect(tableRows[3]!.textContent).toEqual("Aantal kiesgerechtigdenNog invullen");
+    expect(tableRows[3]!.textContent).toEqual("Aantal kiesgerechtigden2.000");
     tableRows[3]!.click();
     await waitFor(() => {
       expect(navigate).toHaveBeenCalledWith("number-of-voters");
@@ -112,14 +111,14 @@ describe("ElectionInformationTable", () => {
       ["Verkiezing", "Gemeenteraadsverkiezingen 2026, 30 november"],
       ["Kiesgebied", "0035 - Gemeente Heemdamseburg"],
       ["Lijsten en kandidaten", "1 lijst en 1 kandidaat"],
-      ["Aantal kiesgerechtigden", "Nog invullen"],
+      ["Aantal kiesgerechtigden", "2.000"],
       ["Invoer doen voor", "Gemeentelijk stembureau"],
       ["Stembureaus", "1 stembureau"],
       ["Type stemopneming", "Decentrale stemopneming"],
     ]);
 
     const tableRows = within(election_information_table).getAllByRole("row");
-    expect(tableRows[3]!.textContent).toEqual("Aantal kiesgerechtigdenNog invullen");
+    expect(tableRows[3]!.textContent).toEqual("Aantal kiesgerechtigden2.000");
     tableRows[3]!.click();
     await waitFor(() => {
       expect(navigate).not.toHaveBeenCalled();
@@ -135,14 +134,14 @@ describe("ElectionInformationTable", () => {
       ["Verkiezing", "Gemeenteraadsverkiezingen 2026, 30 november"],
       ["Kiesgebied", "0035 - Gemeente Heemdamseburg"],
       ["Lijsten en kandidaten", "1 lijst en 1 kandidaat"],
-      ["Aantal kiesgerechtigden", "Nog invullen"],
+      ["Aantal kiesgerechtigden", "2.000"],
       ["Invoer doen voor", "Gemeentelijk stembureau"],
       ["Stembureaus", "1 stembureau"],
       ["Type stemopneming", "Decentrale stemopneming"],
     ]);
 
     const tableRows = within(election_information_table).getAllByRole("row");
-    expect(tableRows[3]!.textContent).toEqual("Aantal kiesgerechtigdenNog invullen");
+    expect(tableRows[3]!.textContent).toEqual("Aantal kiesgerechtigden2.000");
     tableRows[3]!.click();
     await waitFor(() => {
       expect(navigate).not.toHaveBeenCalled();
@@ -158,17 +157,17 @@ describe("ElectionInformationTable", () => {
       ["Verkiezing", "Gemeenteraadsverkiezingen 2026, 30 november"],
       ["Kiesgebied", "0035 - Gemeente Heemdamseburg"],
       ["Lijsten en kandidaten", "1 lijst en 1 kandidaat"],
-      ["Aantal kiesgerechtigden", "Nog in te vullen door een coördinator"],
+      ["Aantal kiesgerechtigden", "2.000"],
       ["Invoer doen voor", "Gemeentelijk stembureau"],
       ["Stembureaus", "1 stembureau"],
       ["Type stemopneming", "Decentrale stemopneming"],
     ]);
 
     const tableRows = within(election_information_table).getAllByRole("row");
-    expect(tableRows[3]!.textContent).toEqual("Aantal kiesgerechtigdenNog in te vullen door een coördinator");
+    expect(tableRows[3]!.textContent).toEqual("Aantal kiesgerechtigden2.000");
     tableRows[3]!.click();
     await waitFor(() => {
-      expect(navigate).not.toHaveBeenCalled();
+      expect(navigate).toHaveBeenCalledWith("number-of-voters");
     });
   });
 });

@@ -15,7 +15,7 @@ use super::{
 use crate::{
     APIError, AppState, ErrorResponse, SqlitePoolExt,
     audit_log::{AuditEvent, AuditService},
-    authentication::Coordinator,
+    authentication::{AdminOrCoordinator, Coordinator},
     committee_session::CommitteeSessionUpdateRequest,
     error::ErrorReference,
 };
@@ -268,7 +268,7 @@ pub async fn committee_session_update(
     ),
 )]
 pub async fn committee_session_number_of_voters_change(
-    _user: Coordinator,
+    _user: AdminOrCoordinator,
     State(pool): State<SqlitePool>,
     audit_service: AuditService,
     Path((election_id, committee_session_id)): Path<(u32, u32)>,

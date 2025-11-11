@@ -175,7 +175,7 @@ impl ResultsInput {
         let hash = xml_hash.into();
         let creation_date_time = self
             .creation_date_time
-            .format("%d-%m-%Y %H:%M %Z")
+            .format("%d-%m-%Y %H:%M:%S %Z")
             .to_string();
 
         let overview_pdf = if let Some(overview_filename) = self.overview_pdf_filename() {

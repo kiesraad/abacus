@@ -225,7 +225,9 @@ async fn export_election(
             polling_stations: polling_stations.iter().map(Clone::clone).collect(),
             election: election.clone().into(),
             hash: "0000".to_string(),
-            creation_date_time: chrono::Utc::now().format("%d-%m-%Y %H:%M %Z").to_string(),
+            creation_date_time: chrono::Utc::now()
+                .format("%d-%m-%Y %H:%M:%S %Z")
+                .to_string(),
         }
         .to_pdf_file_model("file.pdf".to_string());
         let input_json = input.model.get_input().expect("Failed to get model input");

@@ -173,7 +173,10 @@ impl ResultsInput {
 
     fn into_pdf_file_models(self, xml_hash: impl Into<String>) -> Result<PdfModelList, APIError> {
         let hash = xml_hash.into();
-        let creation_date_time = self.creation_date_time.format("%d-%m-%Y %H:%M").to_string();
+        let creation_date_time = self
+            .creation_date_time
+            .format("%d-%m-%Y %H:%M %Z")
+            .to_string();
 
         let overview_pdf = if let Some(overview_filename) = self.overview_pdf_filename() {
             Some(

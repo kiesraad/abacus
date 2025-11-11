@@ -9,7 +9,7 @@ pub mod utils;
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
 async fn test_airgap_detection(pool: SqlitePool) {
-    let openapi = abacus::openapi_router().into_openapi();
+    let openapi = abacus::router::openapi_router().into_openapi();
     let addr = utils::serve_api_with_airgap_detection(pool).await;
 
     // loop through all the paths in the openapi spec

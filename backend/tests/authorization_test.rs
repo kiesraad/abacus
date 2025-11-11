@@ -23,7 +23,7 @@ fn expected_response_code(path: &str) -> StatusCode {
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
 async fn test_route_authorization(pool: SqlitePool) {
-    let openapi = abacus::openapi_router().into_openapi();
+    let openapi = abacus::router::openapi_router().into_openapi();
     let addr = serve_api(pool).await;
 
     // loop through all the paths in the openapi spec

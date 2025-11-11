@@ -65,9 +65,7 @@ export function ElectionInformationTable({
               {t("number_of_voters")}
             </Table.HeaderCell>
             <Table.Cell className="underlined">
-              {committeeSession.number_of_voters
-                ? formatNumber(committeeSession.number_of_voters)
-                : t("election_management.still_to_input")}
+              {committeeSession.number_of_voters ? formatNumber(committeeSession.number_of_voters) : "0"}
             </Table.Cell>
           </Table.LinkRow>
         ) : (
@@ -76,9 +74,7 @@ export function ElectionInformationTable({
               {t("number_of_voters")}
             </Table.HeaderCell>
             <Table.Cell>
-              {committeeSession.number_of_voters
-                ? formatNumber(committeeSession.number_of_voters)
-                : t("election_management.still_to_input")}
+              {committeeSession.number_of_voters ? formatNumber(committeeSession.number_of_voters) : "0"}
             </Table.Cell>
           </Table.Row>
         )}

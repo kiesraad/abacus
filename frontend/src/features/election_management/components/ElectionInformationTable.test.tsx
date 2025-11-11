@@ -57,6 +57,7 @@ describe("ElectionInformationTable", () => {
   });
 
   test("renders a table with the election information for first committee session status created for coordinator", async () => {
+    // Number of voters can technically not be lower than 1
     renderTable("coordinator", { ...committeeSessionMockData, number_of_voters: 0, status: "created" });
 
     const election_information_table = await screen.findByTestId("election-information-table");
@@ -65,14 +66,14 @@ describe("ElectionInformationTable", () => {
       ["Verkiezing", "Gemeenteraadsverkiezingen 2026, 30 november"],
       ["Kiesgebied", "0035 - Gemeente Heemdamseburg"],
       ["Lijsten en kandidaten", "1 lijst en 1 kandidaat"],
-      ["Aantal kiesgerechtigden", "Nog invullen"],
+      ["Aantal kiesgerechtigden", "0"],
       ["Invoer doen voor", "Gemeentelijk stembureau"],
       ["Stembureaus", "1 stembureau"],
       ["Type stemopneming", "Decentrale stemopneming"],
     ]);
 
     const tableRows = within(election_information_table).getAllByRole("row");
-    expect(tableRows[3]!.textContent).toEqual("Aantal kiesgerechtigdenNog invullen");
+    expect(tableRows[3]!.textContent).toEqual("Aantal kiesgerechtigden0");
     tableRows[3]!.click();
     await waitFor(() => {
       expect(navigate).toHaveBeenCalledWith("number-of-voters");

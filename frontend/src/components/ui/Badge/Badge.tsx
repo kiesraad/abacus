@@ -27,7 +27,7 @@ export function Badge({ type, showIcon = false, readOnlyStatus = false }: BadgeP
   let { label, icon } = typeToLabel[type];
 
   // Show first entry status on detail page when second entry has not started yet.
-  // Else this would show the label for second entry, even though you're viewing the first entry.
+  // Otherwise, this would show the label for second entry, even though you're viewing the first entry.
   if (type == "second_entry_not_started" && readOnlyStatus) {
     label = t("data_entry.first_entry");
     icon = undefined;

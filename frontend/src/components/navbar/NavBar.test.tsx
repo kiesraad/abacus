@@ -108,6 +108,7 @@ describe("NavBar", () => {
 
   test.each([
     { pathname: "/elections/1/status/1/resolve-differences" },
+    { pathname: "/elections/1/status/1/detail" },
     { pathname: "/elections/1/status/1/detail/extra_investigation" },
   ])("election status links for $pathname", async (location) => {
     await renderNavBar(location, "coordinator");

@@ -8,7 +8,7 @@ import {
   ElectionListRequestHandler,
   ElectionRequestHandler,
   ElectionStatusRequestHandler,
-  PollingStationDataEntryHasErrorsGetHandler,
+  PollingStationDataEntryGetHandler,
 } from "@/testing/api-mocks/RequestHandlers";
 import { server } from "@/testing/server";
 import { render, screen } from "@/testing/test-utils";
@@ -34,7 +34,7 @@ describe("DetailSectionPage", () => {
       ElectionRequestHandler,
       ElectionStatusRequestHandler,
       ElectionListRequestHandler,
-      PollingStationDataEntryHasErrorsGetHandler,
+      PollingStationDataEntryGetHandler,
     );
     vi.spyOn(ReactRouter, "useParams").mockReturnValue({
       electionId: "1",

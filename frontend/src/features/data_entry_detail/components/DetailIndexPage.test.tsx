@@ -162,6 +162,6 @@ describe("DetailIndexPage", () => {
     const voters_votes_counts = screen.queryByRole("region", { name: "Aantal kiezers en stemmen B1-3.1 en 3.2" });
     expect(voters_votes_counts).toBeInTheDocument();
 
-    expect(screen.queryByTestId("resolve_errors_form")).toBeNull();
+    expect(screen.queryByTestId("resolve_errors_form")).not.toBeInTheDocument();
   });
 });

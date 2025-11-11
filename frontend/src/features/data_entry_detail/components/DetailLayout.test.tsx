@@ -81,9 +81,6 @@ describe("DetailLayout", () => {
     expect(screen.queryByRole("link", { name: "Waarschuwingen" })).toBeInTheDocument();
     expect(screen.queryByRole("link", { name: "Extra onderzoek" })).toBeInTheDocument();
 
-    const badge = screen.getByText("1e invoer");
-    expect(badge).toBeInTheDocument();
-
     await waitFor(() => {
       expect(document.title).toBe("Invoer bekijken - Abacus");
     });

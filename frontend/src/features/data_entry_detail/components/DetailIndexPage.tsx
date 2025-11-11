@@ -55,10 +55,13 @@ export function DetailIndexPage() {
   if (dataEntry.status !== "first_entry_has_errors" && dataEntry.validation_results.warnings.length === 0) {
     // Redirect to first section because Coordinator is viewing the read-only version and there are no warnings.
     // Therefor no need to show the errors and warnings overview
-    const fixedSections = structure.filter((section) => !section.id.startsWith("political_group_votes_"))[0];
+    // There are separate sections for fixed and scrollable groups (copied from DetailNavigation).
+    // We only need the first fixed section here.
+    const firstFixedSection = structure.filter((section) => !section.id.startsWith("political_group_votes_"))[0];
     const basePath = `/elections/${election.id}/status/${pollingStationId}/detail`;
-    return <Navigate to={basePath ? `${basePath}/${fixedSections?.id}` : basePath} replace />;
+    return <Navigate to={firstFixedSection ? `${basePath}/${firstFixedSection.id}` : basePath} replace />;
   } else {
+    // Coordinator needs to resolve the errors using the resolve errors form.
     const formId = "resolve_errors_form";
     return (
       <>

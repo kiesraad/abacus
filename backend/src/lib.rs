@@ -51,6 +51,8 @@ pub mod zip;
 pub use app_error::AppError;
 pub use error::{APIError, ErrorResponse};
 
+use crate::app_error::{DatabaseErrorWithPath, DatabaseMigrationErrorWithPath};
+
 /// Maximum size of the request body in megabytes.
 pub const MAX_BODY_SIZE_MB: usize = 12;
 
@@ -330,7 +332,7 @@ pub async fn shutdown_signal() {
 /// Log that the application started and thereby check that the database is writeable
 /// This maps common sqlite errors to an AppError
 async fn log_app_started(conn: &mut SqliteConnection, db_path: &str) -> Result<(), AppError> {
-    audit_log::create(
+    Ok(audit_log::create(
         conn,
         &audit_log::AuditEvent::ApplicationStarted,
         None,
@@ -338,21 +340,7 @@ async fn log_app_started(conn: &mut SqliteConnection, db_path: &str) -> Result<(
         None,
     )
     .await
-    .map_err(|e| {
-        if let Some(db_error) = e.as_database_error() {
-            let db_path = db_path.to_string();
-            // see https://sqlite.org/rescode.html
-            match db_error.code().unwrap_or_default().as_ref() {
-                "5" => AppError::DatabaseBusy(db_path),
-                "7" => AppError::DatabaseNoMemory(db_path),
-                "8" => AppError::DatabaseReadOnly(db_path),
-                "13" => AppError::DatabaseDiskFull(db_path),
-                _ => e.into(),
-            }
-        } else {
-            e.into()
-        }
-    })
+    .map_err(DatabaseErrorWithPath::with_path(db_path))?)
 }
 
 /// Create a SQLite database if needed, then connect to it and run migrations.
@@ -378,7 +366,10 @@ pub async fn create_sqlite_pool(
     let pool = SqlitePool::connect_with(opts).await?;
 
     // run database migrations, this creates the necessary tables if they don't exist yet
-    sqlx::migrate!().run(&pool).await?;
+    sqlx::migrate!()
+        .run(&pool)
+        .await
+        .map_err(DatabaseMigrationErrorWithPath::with_path(database))?;
 
     #[cfg(feature = "dev-database")]
     if seed_data {
@@ -397,6 +388,8 @@ mod test {
     use sqlx::SqlitePool;
     use test_log::test;
     use tokio::net::TcpListener;
+
+    use crate::{AppError, create_sqlite_pool};
 
     use super::start_server;
 
@@ -547,5 +540,21 @@ mod test {
             assert_eq!(response.status(), 401);
         })
         .await;
+    }
+
+    #[test(tokio::test)]
+    async fn test_readonly_database_error() {
+        // Create a read-only in-memory database
+        let db_url = "sqlite::memory:?mode=ro";
+        let result = create_sqlite_pool(
+            db_url,
+            #[cfg(feature = "dev-database")]
+            false,
+            #[cfg(feature = "dev-database")]
+            false,
+        )
+        .await;
+
+        assert!(matches!(result, Err(AppError::DatabaseReadOnly(_))));
     }
 }

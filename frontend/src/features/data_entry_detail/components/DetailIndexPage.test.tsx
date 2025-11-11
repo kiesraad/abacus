@@ -13,6 +13,7 @@ import {
   ElectionRequestHandler,
   ElectionStatusRequestHandler,
   PollingStationDataEntryHasErrorsGetHandler,
+  PollingStationDataEntryHasWarningsGetHandler,
   PollingStationDataEntryResolveErrorsHandler,
   PollingStationDataEntryValidGetHandler,
   UserListRequestHandler,
@@ -150,5 +151,16 @@ describe("DetailPage", () => {
 
     const form = await screen.findByTestId("resolve_errors_form");
     expect(form).toBeVisible();
+  });
+
+  test("should render only warnings overview on detail index page", async () => {
+    server.use(PollingStationDataEntryHasWarningsGetHandler);
+
+    renderPage();
+
+    expect(await screen.findByRole("heading", { level: 2, name: "Alle waarschuwingen" })).toBeVisible();
+
+    const voters_votes_counts = screen.queryByRole("region", { name: "Aantal kiezers en stemmen B1-3.1 en 3.2" });
+    expect(voters_votes_counts).toBeInTheDocument();
   });
 });

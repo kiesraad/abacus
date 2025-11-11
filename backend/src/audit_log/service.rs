@@ -59,7 +59,7 @@ impl AuditService {
         event: &AuditEvent,
         message: Option<String>,
     ) -> Result<(), APIError> {
-        crate::audit_log::create(conn, event, self.user.as_ref(), message, self.ip).await
+        Ok(crate::audit_log::create(conn, event, self.user.as_ref(), message, self.ip).await?)
     }
 }
 

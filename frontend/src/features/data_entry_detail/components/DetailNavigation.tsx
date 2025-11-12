@@ -1,6 +1,7 @@
 import { Link, useParams } from "react-router";
 
 import { ProgressList } from "@/components/ui/ProgressList/ProgressList";
+import { showIndexPage } from "@/features/data_entry_detail/utils/validationResults";
 import { useNumericParam } from "@/hooks/useNumericParam";
 import { t } from "@/i18n/translate";
 import { DataEntryStatusName, ValidationResults } from "@/types/generated/openapi";
@@ -51,17 +52,15 @@ export function DetailNavigation({ structure, status, validationResults }: Detai
   return (
     <ProgressList>
       <ProgressList.Fixed>
-        {(validationResults.errors.length > 0 || validationResults.warnings.length > 0) &&
-          status !== "first_entry_in_progress" &&
-          status !== "second_entry_in_progress" && (
-            <ProgressList.Item status="idle" active={currentSectionId === null}>
-              <Link to={getSectionUrl("")}>
-                {t(
-                  `data_entry_detail.${status === "first_entry_has_errors" ? "resolve_errors.short_title" : "read_only.short_title"}`,
-                )}
-              </Link>
-            </ProgressList.Item>
-          )}
+        {showIndexPage(validationResults) && (
+          <ProgressList.Item status="idle" active={currentSectionId === null}>
+            <Link to={getSectionUrl("")}>
+              {t(
+                `data_entry_detail.${status === "first_entry_has_errors" ? "resolve_errors.short_title" : "read_only.short_title"}`,
+              )}
+            </Link>
+          </ProgressList.Item>
+        )}
 
         {fixedSections.map((section) => (
           <ProgressList.Item

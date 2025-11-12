@@ -5,6 +5,7 @@ import { ChoiceList } from "@/components/ui/CheckboxAndRadio/ChoiceList";
 import { Form } from "@/components/ui/Form/Form";
 import { FormLayout } from "@/components/ui/Form/FormLayout";
 import { Loader } from "@/components/ui/Loader/Loader";
+import { showIndexPage } from "@/features/data_entry_detail/utils/validationResults";
 import { useMessages } from "@/hooks/messages/useMessages";
 import { useNumericParam } from "@/hooks/useNumericParam";
 import { useUsers } from "@/hooks/user/useUsers";
@@ -52,35 +53,27 @@ export function DetailIndexPage() {
 
   const structure = getDataEntryStructure(dataEntry.data.model, election);
 
-  if (dataEntry.status !== "first_entry_has_errors" && dataEntry.validation_results.warnings.length === 0) {
-    // Redirect to first section because Coordinator is viewing the read-only version and there are no warnings.
-    // Therefor no need to show the errors and warnings overview
-    // There are separate sections for fixed and scrollable groups (copied from DetailNavigation).
-    // We only need the first fixed section here.
-    const firstFixedSection = structure.filter((section) => !section.id.startsWith("political_group_votes_"))[0];
-    const basePath = `/elections/${election.id}/status/${pollingStationId}/detail`;
-    return <Navigate to={firstFixedSection ? `${basePath}/${firstFixedSection.id}` : basePath} replace />;
+  if (!showIndexPage(dataEntry.validation_results)) {
+    // If we should not show this index page, redirect to the first section
+    const firstSectionId = structure[0]?.id;
+    if (firstSectionId === undefined) {
+      throw new Error("Could not determine first section id");
+    }
+    return <Navigate to={`/elections/${election.id}/status/${pollingStationId}/detail/${firstSectionId}`} replace />;
   } else {
-    // Coordinator needs to resolve the errors using the resolve errors form.
-    const formId = "resolve_errors_form";
+    const resolveErrors = dataEntry.status === "first_entry_has_errors";
+    const translationPrefix = resolveErrors ? "data_entry_detail.resolve_errors" : "data_entry_detail.read_only";
+
     return (
       <>
-        <h2>
-          {t(
-            `data_entry_detail.${dataEntry.status === "first_entry_has_errors" ? "resolve_errors.title" : "read_only.title"}`,
-          )}
-        </h2>
-        <p className="md">
-          {t(
-            `data_entry_detail.${dataEntry.status === "first_entry_has_errors" ? "resolve_errors.page_content" : "read_only.page_content"}`,
-          )}
-        </p>
+        <h2>{t(`${translationPrefix}.title`)}</h2>
+        <p className="md">{t(`${translationPrefix}.page_content`)}</p>
 
         <ErrorsAndWarningsOverview structure={structure} results={dataEntry.validation_results} />
 
-        {dataEntry.status === "first_entry_has_errors" && (
+        {resolveErrors && (
+          // Coordinator needs to resolve the errors using the resolve errors form.
           <Form
-            id={formId}
             className={cls.resolveErrorsForm}
             onSubmit={(e) => {
               e.preventDefault();

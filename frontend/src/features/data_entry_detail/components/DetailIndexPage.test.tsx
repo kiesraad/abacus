@@ -130,7 +130,7 @@ describe("DetailIndexPage", () => {
     expect(navigate).toHaveBeenCalledWith("/elections/1/status");
   });
 
-  test("should redirect to detail page because there are no errors or warnings", async () => {
+  test("should redirect to first section because there are no errors or warnings", async () => {
     overrideOnce("get", "/api/polling_stations/5/data_entries/get", 200, dataEntryValidGetMockResponse);
 
     const router = renderPage();
@@ -148,7 +148,7 @@ describe("DetailIndexPage", () => {
     const voters_votes_counts = screen.queryByRole("region", { name: "Aantal kiezers en stemmen B1-3.1 en 3.2" });
     expect(voters_votes_counts).toBeInTheDocument();
 
-    const form = await screen.findByTestId("resolve_errors_form");
+    const form = screen.getByRole("heading", { level: 3, name: "Wat wil je doen met de invoer in Abacus?" });
     expect(form).toBeVisible();
   });
 
@@ -162,6 +162,7 @@ describe("DetailIndexPage", () => {
     const voters_votes_counts = screen.queryByRole("region", { name: "Aantal kiezers en stemmen B1-3.1 en 3.2" });
     expect(voters_votes_counts).toBeInTheDocument();
 
-    expect(screen.queryByTestId("resolve_errors_form")).not.toBeInTheDocument();
+    const form = screen.queryByRole("heading", { level: 3, name: "Wat wil je doen met de invoer in Abacus?" });
+    expect(form).not.toBeInTheDocument();
   });
 });

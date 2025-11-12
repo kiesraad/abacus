@@ -23,7 +23,6 @@ use super::{
     },
     validate_data_entry_status,
 };
-use crate::data_entry::repository::get_result;
 use crate::{
     APIError, AppState, SqlitePoolExt,
     audit_log::{AuditEvent, AuditService},
@@ -32,6 +31,7 @@ use crate::{
         CommitteeSession, CommitteeSessionError,
         status::{CommitteeSessionStatus, change_committee_session_status},
     },
+    data_entry::repository::get_result,
     election::{ElectionWithPoliticalGroups, PoliticalGroup},
     error::{ErrorReference, ErrorResponse},
     investigation::get_polling_station_investigation,
@@ -706,7 +706,7 @@ pub struct DataEntryGetResponse {
         (status = 200, description = "Data entry with validation results", body = DataEntryGetResponse),
         (status = 401, description = "Unauthorized", body = ErrorResponse),
         (status = 403, description = "Forbidden", body = ErrorResponse),
-        (status = 404, description = "No data entry with accepted errors found", body = ErrorResponse),
+        (status = 404, description = "Data entry not found", body = ErrorResponse),
         (status = 409, description = "Request cannot be completed", body = ErrorResponse),
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
@@ -724,15 +724,13 @@ async fn polling_station_data_entry_get(
     let (polling_station, election, committee_session, state) =
         validate_and_get_data(&mut conn, polling_station_id, &user.0).await?;
 
-    let validation_results = validate_data_entry_status(&state, &polling_station, &election)?;
-
     match state.clone() {
         DataEntryStatus::FirstEntryInProgress(first_entry_in_progress_state) => {
             Ok(Json(DataEntryGetResponse {
                 user_id: Some(first_entry_in_progress_state.first_entry_user_id),
                 data: first_entry_in_progress_state.first_entry,
                 status: state.status_name(),
-                validation_results,
+                validation_results: ValidationResults::default(),
             }))
         }
         DataEntryStatus::FirstEntryHasErrors(first_entry_has_errors_state) => {
@@ -740,7 +738,11 @@ async fn polling_station_data_entry_get(
                 user_id: Some(first_entry_has_errors_state.first_entry_user_id),
                 data: first_entry_has_errors_state.finalised_first_entry,
                 status: state.status_name(),
-                validation_results,
+                validation_results: validate_data_entry_status(
+                    &state,
+                    &polling_station,
+                    &election,
+                )?,
             }))
         }
         DataEntryStatus::SecondEntryNotStarted(second_entry_not_started_state) => {
@@ -748,7 +750,11 @@ async fn polling_station_data_entry_get(
                 user_id: Some(second_entry_not_started_state.first_entry_user_id),
                 data: second_entry_not_started_state.finalised_first_entry,
                 status: state.status_name(),
-                validation_results,
+                validation_results: validate_data_entry_status(
+                    &state,
+                    &polling_station,
+                    &election,
+                )?,
             }))
         }
         DataEntryStatus::SecondEntryInProgress(second_entry_in_progress_state) => {
@@ -756,7 +762,7 @@ async fn polling_station_data_entry_get(
                 user_id: Some(second_entry_in_progress_state.second_entry_user_id),
                 data: second_entry_in_progress_state.second_entry,
                 status: state.status_name(),
-                validation_results,
+                validation_results: ValidationResults::default(),
             }))
         }
         DataEntryStatus::Definitive(_) => Ok(Json(DataEntryGetResponse {
@@ -766,7 +772,7 @@ async fn polling_station_data_entry_get(
                 .data
                 .0,
             status: state.status_name(),
-            validation_results,
+            validation_results: validate_data_entry_status(&state, &polling_station, &election)?,
         })),
         _ => Err(APIError::Conflict(
             "Data entry is in the wrong state".to_string(),
@@ -2391,6 +2397,7 @@ mod tests {
             assert_eq!(result.status, DataEntryStatusName::FirstEntryInProgress);
             assert_eq!(result.user_id, Some(1));
             assert_eq!(result.data.as_common().voters_counts.poll_card_count, 0);
+            assert_eq!(result.validation_results, ValidationResults::default());
         }
 
         #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
@@ -2463,6 +2470,7 @@ mod tests {
             assert_eq!(result.status, DataEntryStatusName::SecondEntryInProgress);
             assert_eq!(result.user_id, Some(2));
             assert_eq!(result.data.as_common().voters_counts.poll_card_count, 0);
+            assert_eq!(result.validation_results, ValidationResults::default());
         }
 
         #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]

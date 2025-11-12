@@ -2245,7 +2245,7 @@
             }
           },
           "404": {
-            "description": "No data entry with accepted errors found",
+            "description": "Data entry not found",
             "content": {
               "application/json": {
                 "schema": {

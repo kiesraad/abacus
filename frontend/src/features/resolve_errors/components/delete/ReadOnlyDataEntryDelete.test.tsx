@@ -5,16 +5,20 @@ import { pollingStationMockData } from "@/testing/api-mocks/PollingStationMockDa
 import { PollingStationDataEntriesAndResultDeleteHandler } from "@/testing/api-mocks/RequestHandlers";
 import { overrideOnce, server } from "@/testing/server";
 import { render, screen, spyOnHandler } from "@/testing/test-utils";
-import { POLLING_STATION_DATA_ENTRIES_AND_RESULT_DELETE_REQUEST_PATH } from "@/types/generated/openapi";
+import {
+  DataEntryStatusName,
+  POLLING_STATION_DATA_ENTRIES_AND_RESULT_DELETE_REQUEST_PATH,
+} from "@/types/generated/openapi";
 
 import { ReadOnlyDataEntryDelete } from "./ReadOnlyDataEntryDelete";
 
-function renderComponent() {
+function renderComponent(status: DataEntryStatusName) {
   const onDeleted = vi.fn();
   const onError = vi.fn();
   render(
     <ReadOnlyDataEntryDelete
       pollingStation={pollingStationMockData[0]!}
+      status={status}
       onDeleted={onDeleted}
       onError={onError}
     ></ReadOnlyDataEntryDelete>,
@@ -31,7 +35,7 @@ describe("ReadOnlyDataEntryDelete", () => {
   });
 
   test("delete after confirm", async () => {
-    const { onDeleted } = renderComponent();
+    const { onDeleted } = renderComponent("second_entry_not_started");
 
     const user = userEvent.setup();
     await user.click(screen.getByRole("button", { name: "Invoer verwijderen" }));
@@ -44,7 +48,7 @@ describe("ReadOnlyDataEntryDelete", () => {
   });
 
   test("cancel delete", async () => {
-    const { onDeleted } = renderComponent();
+    const { onDeleted } = renderComponent("second_entry_not_started");
 
     const user = userEvent.setup();
     await user.click(screen.getByRole("button", { name: "Invoer verwijderen" }));
@@ -69,7 +73,7 @@ describe("ReadOnlyDataEntryDelete", () => {
       },
     );
 
-    const { onDeleted, onError } = renderComponent();
+    const { onDeleted, onError } = renderComponent("second_entry_not_started");
 
     const user = userEvent.setup();
     await user.click(screen.getByRole("button", { name: "Invoer verwijderen" }));

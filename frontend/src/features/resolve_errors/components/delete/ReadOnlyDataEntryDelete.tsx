@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/Button/Button";
 import { Modal } from "@/components/ui/Modal/Modal";
 import { t } from "@/i18n/translate";
 import {
+  DataEntryStatusName,
   POLLING_STATION_DATA_ENTRIES_AND_RESULT_DELETE_REQUEST_PATH,
   PollingStation,
   PollingStationInvestigation,
@@ -14,11 +15,12 @@ import {
 
 interface ReadOnlyDataEntryDeleteProps {
   pollingStation: PollingStation;
+  status: DataEntryStatusName;
   onDeleted: () => void;
   onError: (error: AnyApiError) => void;
 }
 
-export function ReadOnlyDataEntryDelete({ pollingStation, onDeleted, onError }: ReadOnlyDataEntryDeleteProps) {
+export function ReadOnlyDataEntryDelete({ pollingStation, status, onDeleted, onError }: ReadOnlyDataEntryDeleteProps) {
   const [showModal, setShowModal] = useState(false);
   const removePath: POLLING_STATION_DATA_ENTRIES_AND_RESULT_DELETE_REQUEST_PATH = `/api/polling_stations/${pollingStation.id}/data_entries`;
   const { remove, isLoading } = useCrud<PollingStationInvestigation>({ removePath });
@@ -46,7 +48,11 @@ export function ReadOnlyDataEntryDelete({ pollingStation, onDeleted, onError }: 
 
       {showModal && (
         <Modal title={t("data_entry.delete")} onClose={toggleModal}>
-          <p>{t("data_entry.delete_are_you_sure", { nr: pollingStation.number })}</p>
+          {status === "second_entry_in_progress" || status === "definitive" ? (
+            <p>{t("data_entry.delete_all_are_you_sure", { nr: pollingStation.number })}</p>
+          ) : (
+            <p>{t("data_entry.delete_are_you_sure", { nr: pollingStation.number })}</p>
+          )}
           <nav>
             <Button
               leftIcon={<IconTrash />}

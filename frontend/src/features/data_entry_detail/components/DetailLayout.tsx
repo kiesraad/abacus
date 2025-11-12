@@ -70,10 +70,16 @@ export function DetailLayout() {
           <h1>{pollingStation.name}</h1>
           <Badge type={dataEntry.status === "second_entry_not_started" ? "first_entry_finalised" : dataEntry.status} />
         </section>
-        <section>
-          <ReadOnlyDataEntryDelete pollingStation={pollingStation} onDeleted={handleDeleted} onError={setError} />
-          <Badge type={dataEntry.status === "second_entry_not_started" ? "first_entry_finalised" : dataEntry.status} />
-        </section>
+        {dataEntry.status !== "first_entry_not_started" && (
+          <section>
+            <ReadOnlyDataEntryDelete
+              pollingStation={pollingStation}
+              status={dataEntry.status}
+              onDeleted={handleDeleted}
+              onError={setError}
+            />
+          </section>
+        )}
       </header>
       <Messages />
       <main>

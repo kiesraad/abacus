@@ -167,7 +167,7 @@ describe("ElectionHomePage", () => {
   });
 
   describe("Delete committee session", () => {
-    test("Shows button for coodinator", async () => {
+    test("Shows button for coordinator", async () => {
       const committeeSessionData: Partial<CommitteeSession> = { id: 4, number: 4, status: "created" };
       const electionData = getElectionMockData({}, committeeSessionData);
       server.use(

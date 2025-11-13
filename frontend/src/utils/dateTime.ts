@@ -50,27 +50,25 @@ export function formatDateTime(date: Date, relative = true) {
 
     if (isToday(date)) {
       // Today
-      return `${t("today")} ${timeString}`;
+      return `${t("today")} om ${timeString}`;
     }
 
     if (isYesterday(date)) {
       // Yesterday
-      return `${t("yesterday")} ${timeString}`;
+      return `${t("yesterday")} om ${timeString}`;
     }
 
     if (Math.round(Math.abs(Number(today) - Number(date)) / (24 * 60 * 60 * 1000)) < 7) {
       // Within the past 3-6 days
-      return date.toLocaleString(t("date_locale"), {
+      return `${date.toLocaleString(t("date_locale"), {
         weekday: "long",
-        hour: "numeric",
-        minute: "numeric",
-      });
+      })} om ${timeString}`;
     }
   }
 
   // More than 6 days ago (or in the future)
   const dateString = date.toLocaleDateString(t("date_locale"), { day: "numeric", month: "short" });
-  return `${dateString} ${timeString}`;
+  return `${dateString} om ${timeString}`;
 }
 
 export function formatTimeToGo(seconds: number) {

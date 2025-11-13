@@ -22,18 +22,30 @@ describe("DateTime util", () => {
   const one_week_ago = new Date(today);
   one_week_ago.setDate(today.getDate() - 7);
   test.each([
-    [today, `${t("today")} 10:20`, true],
-    [yesterday, `${t("yesterday")} 10:20`, true],
-    [day_before_yesterday, `${day_before_yesterday.toLocaleString(t("date_locale"), { weekday: "long" })} 10:20`, true],
-    [one_week_ago, `${one_week_ago.toLocaleString(t("date_locale"), { day: "numeric", month: "short" })} 10:20`, true],
-    [today, `${today.toLocaleString(t("date_locale"), { day: "numeric", month: "short" })} 10:20`, false],
-    [yesterday, `${yesterday.toLocaleString(t("date_locale"), { day: "numeric", month: "short" })} 10:20`, false],
+    [today, `${t("today")} om 10:20`, true],
+    [yesterday, `${t("yesterday")} om 10:20`, true],
     [
       day_before_yesterday,
-      `${day_before_yesterday.toLocaleString(t("date_locale"), { day: "numeric", month: "short" })} 10:20`,
+      `${day_before_yesterday.toLocaleString(t("date_locale"), { weekday: "long" })} om 10:20`,
+      true,
+    ],
+    [
+      one_week_ago,
+      `${one_week_ago.toLocaleString(t("date_locale"), { day: "numeric", month: "short" })} om 10:20`,
+      true,
+    ],
+    [today, `${today.toLocaleString(t("date_locale"), { day: "numeric", month: "short" })} om 10:20`, false],
+    [yesterday, `${yesterday.toLocaleString(t("date_locale"), { day: "numeric", month: "short" })} om 10:20`, false],
+    [
+      day_before_yesterday,
+      `${day_before_yesterday.toLocaleString(t("date_locale"), { day: "numeric", month: "short" })} om 10:20`,
       false,
     ],
-    [one_week_ago, `${one_week_ago.toLocaleString(t("date_locale"), { day: "numeric", month: "short" })} 10:20`, false],
+    [
+      one_week_ago,
+      `${one_week_ago.toLocaleString(t("date_locale"), { day: "numeric", month: "short" })} om 10:20`,
+      false,
+    ],
   ])("Date format string %s as %s", (input: Date, expected: string, relative: boolean) => {
     expect(formatDateTime(input, relative)).toEqual(expected);
   });

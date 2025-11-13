@@ -68,11 +68,18 @@ VALUES
 
 INSERT INTO
     polling_station_data_entries
-VALUES
-    (711, 701, '{"status":"Definitive","state":{"first_entry_user_id":5,"second_entry_user_id":6,"finished_at":"2026-03-19T09:15:31.223365436Z"}}', '2026-03-19 09:15:00'),
-    (712, 701, '{"status":"Definitive","state":{"first_entry_user_id":5,"second_entry_user_id":6,"finished_at":"2026-03-19T09:45:31.223365436Z"}}', '2026-03-19 09:45:00'),
-    (721, 702, '{"status":"Definitive","state":{"first_entry_user_id":5,"second_entry_user_id":6,"finished_at":"2026-03-19T17:15:31.223365436Z"}}', '2026-03-19 17:15:00'),
-    (732, 703, '{"status":"Definitive","state":{"first_entry_user_id":5,"second_entry_user_id":6,"finished_at":"2026-03-19T23:45:31.223365436Z"}}', '2026-03-19 23:45:00');
+VALUES (711, 701,
+        '{"status":"Definitive","state":{"first_entry_user_id":5,"second_entry_user_id":6,"finished_at":"2026-03-19T09:15:31.223365436Z","has_warnings":false}}',
+        '2026-03-19 09:15:00'),
+       (712, 701,
+        '{"status":"Definitive","state":{"first_entry_user_id":5,"second_entry_user_id":6,"finished_at":"2026-03-19T09:45:31.223365436Z","has_warnings":false}}',
+        '2026-03-19 09:45:00'),
+       (721, 702,
+        '{"status":"Definitive","state":{"first_entry_user_id":5,"second_entry_user_id":6,"finished_at":"2026-03-19T17:15:31.223365436Z","has_warnings":false}}',
+        '2026-03-19 17:15:00'),
+       (732, 703,
+        '{"status":"Definitive","state":{"first_entry_user_id":5,"second_entry_user_id":6,"finished_at":"2026-03-19T23:45:31.223365436Z","has_warnings":false}}',
+        '2026-03-19 23:45:00');
 
 INSERT INTO
     polling_station_results

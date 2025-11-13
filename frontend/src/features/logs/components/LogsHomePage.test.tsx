@@ -57,7 +57,7 @@ describe("LogsHomePage", () => {
     expect(await screen.findByRole("heading", { level: 1, name: "Activiteitenlog" })).toBeVisible();
 
     const firstRow = await screen.findByRole("row", {
-      name: "24 11 mrt 10:02 Succes Gebruiker ingelogd 1, admin (Beheerder)",
+      name: "24 11 mrt om 10:02 Succes Gebruiker ingelogd 1, admin (Beheerder)",
     });
     await user.click(firstRow);
 

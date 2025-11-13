@@ -91,7 +91,7 @@ function CategoryRowContent({ category, pollingStation, hasWarnings }: CategoryR
       {(category === "first_entry_finished" || category === "definitive") && (
         <Table.Cell key={`${pollingStation.id}-time`}>
           <span>{pollingStation.finished_at ? formatDateTime(new Date(pollingStation.finished_at)) : ""}</span>
-          {hasWarnings && <Icon color="warning" icon={<IconWarning />} />}
+          {hasWarnings && <Icon color="warning" icon={<IconWarning aria-label={t("contains_warning")} />} />}
         </Table.Cell>
       )}
     </>

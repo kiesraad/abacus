@@ -59,6 +59,13 @@ export function DataEntryProvider({ election, pollingStation, entryNumber, child
   }
 
   if (!isStateLoaded(stateAndActions)) {
+    // if sectionId is set the corresponsing section will render an error modal if needed
+    // otherwise we have to throw the error here to show the full page error
+    // this is the case when the data entry claim failed initially on invalid data
+    if (!sectionId && stateAndActions.error instanceof ApiError && stateAndActions.error.reference === "InvalidData") {
+      throw stateAndActions.error;
+    }
+
     return null;
   }
 

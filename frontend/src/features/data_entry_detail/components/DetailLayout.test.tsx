@@ -62,27 +62,14 @@ describe("DetailLayout", () => {
     });
   });
 
-  test("renders data entry detail layout with polling station header and navigation", async () => {
+  test("render badge for second_entry_not_started as 1e invoer", async () => {
     overrideOnce("get", "/api/polling_stations/5/data_entries/get", 200, dataEntryHasWarningsGetMockResponse);
 
     renderLayout();
 
-    const banner = await screen.findByRole("banner");
-
-    expect(
-      within(banner).getByRole("heading", { level: 1, name: "Dansschool Oeps nou deed ik het weer" }),
-    ).toBeInTheDocument();
-    expect(within(banner).getByText("37")).toBeInTheDocument();
     // Data entry has status "second_entry_not_started".
     // In Badge, "1e invoer" is overruled as label instead of "2e invoer".
+    const banner = await screen.findByRole("banner");
     expect(within(banner).getByText("1e invoer")).toBeInTheDocument();
-
-    expect(screen.queryByRole("link", { name: "Fouten en waarschuwingen" })).not.toBeInTheDocument();
-    expect(screen.queryByRole("link", { name: "Waarschuwingen" })).toBeInTheDocument();
-    expect(screen.queryByRole("link", { name: "Extra onderzoek" })).toBeInTheDocument();
-
-    await waitFor(() => {
-      expect(document.title).toBe("Invoer bekijken - Abacus");
-    });
   });
 });

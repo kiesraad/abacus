@@ -281,9 +281,9 @@ pub async fn start_server(
         AirgapDetection::nop()
     };
 
-    let app = router(pool, airgap_detection)?;
+    let app = router(pool.clone(), airgap_detection)?;
 
-    info!("Starting API server on http://{}", listener.local_addr()?);
+    info!("Starting Abacus on http://{}", listener.local_addr()?);
     let listener = listener.tap_io(|tcp_stream| {
         if let Err(err) = tcp_stream.set_nodelay(true) {
             trace!("failed to set TCP_NODELAY on incoming connection: {err:#}");
@@ -296,6 +296,11 @@ pub async fn start_server(
     )
     .with_graceful_shutdown(shutdown_signal())
     .await?;
+
+    // close the database, this will flush the shm and wal files for sqlite
+    pool.close().await;
+
+    info!("Abacus has shut down gracefully.");
 
     Ok(())
 }

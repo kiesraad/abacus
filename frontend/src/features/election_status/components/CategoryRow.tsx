@@ -15,7 +15,7 @@ interface CategoryRowProps {
   category: StatusCategory;
   pollingStation: PollingStationWithStatusAndTypist;
   addLink: boolean;
-  hasWarnings: boolean;
+  hasWarnings?: boolean;
 }
 
 const SHOW_BADGE: DataEntryStatusName[] = [
@@ -59,7 +59,7 @@ export function CategoryRow({ category, pollingStation, addLink, hasWarnings }: 
 interface CategoryRowContentProps {
   category: StatusCategory;
   pollingStation: PollingStationWithStatusAndTypist;
-  hasWarnings: boolean;
+  hasWarnings?: boolean;
 }
 
 function CategoryRowContent({ category, pollingStation, hasWarnings }: CategoryRowContentProps): ReactNode {

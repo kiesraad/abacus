@@ -46,7 +46,7 @@ export function ElectionReportPage() {
     throw new ApplicationError(t("error.forbidden_message"), "InvalidCommitteeSessionStatus");
   }
 
-  const isFirstCommitteeSession = currentCommitteeSession.number === 1;
+  const isFirstCommitteeSession = committeeSession.number === 1;
 
   const wasCorrected = investigations.some((i) => i.corrected_results);
 

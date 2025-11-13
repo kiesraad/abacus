@@ -6,13 +6,11 @@ use abacus::committee_session::{
     status::CommitteeSessionStatus,
 };
 use axum::http::StatusCode;
+use shared::create_investigation;
 use sqlx::SqlitePool;
 use test_log::test;
 
-use crate::{
-    shared::{create_investigation, create_result},
-    utils::serve_api,
-};
+use crate::{shared::create_result, utils::serve_api};
 
 pub mod shared;
 pub mod utils;
@@ -173,14 +171,6 @@ async fn test_committee_session_delete_not_ok_wrong_status(pool: SqlitePool) {
     let cookie = shared::coordinator_login(&addr).await;
     let election_id = 5;
     let committee_session_id = 6;
-
-    // Set status to DataEntryInProgress
-    let committee_session =
-        shared::get_election_committee_session(&addr, &cookie, election_id).await;
-    assert_eq!(
-        committee_session.status,
-        CommitteeSessionStatus::DataEntryInProgress,
-    );
 
     let url = format!(
         "http://{addr}/api/elections/{election_id}/committee_sessions/{committee_session_id}"

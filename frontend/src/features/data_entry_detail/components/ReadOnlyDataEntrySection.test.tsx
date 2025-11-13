@@ -1,6 +1,6 @@
 import { describe, expect, test } from "vitest";
 
-import { emptyData } from "@/testing/api-mocks/DataEntryMockData";
+import { emptyPollingStationResults } from "@/testing/api-mocks/DataEntryMockData";
 import { getElectionMockData } from "@/testing/api-mocks/ElectionMockData";
 import { validationResultMockData } from "@/testing/api-mocks/ValidationResultMockData";
 import { render, screen, within } from "@/testing/test-utils";
@@ -12,7 +12,7 @@ import { ReadOnlyDataEntrySection } from "./ReadOnlyDataEntrySection";
 
 describe("ReadOnlyDataEntrySection", () => {
   const electionMockData = getElectionMockData().election;
-  const pollingStationResultsMockData: PollingStationResults = emptyData;
+  const pollingStationResultsMockData = emptyPollingStationResults();
 
   const structure = getDataEntryStructure("CSOFirstSession", electionMockData);
   const votersVotesSection = structure.find((s) => s.id === "voters_votes_counts")!;

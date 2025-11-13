@@ -7,7 +7,7 @@ use super::{
     CandidateVotes, CommonPollingStationResults, Compare, Count, CountingDifferencesPollingStation,
     DifferencesCounts, ExtraInvestigation, PoliticalGroupCandidateVotes, PoliticalGroupTotalVotes,
     PollingStationResults, VotersCounts, VotesCounts,
-    status::{DataEntryStatus, FirstEntryHasErrors, FirstEntryInProgress},
+    status::{DataEntryStatus, FirstEntryHasErrors, FirstEntryInProgress, SecondEntryNotStarted},
 };
 use crate::{
     election::{ElectionWithPoliticalGroups, PGNumber},
@@ -444,6 +444,10 @@ impl Validate for DataEntryStatus {
                 ..
             })
             | DataEntryStatus::FirstEntryHasErrors(FirstEntryHasErrors {
+                finalised_first_entry: entry,
+                ..
+            })
+            | DataEntryStatus::SecondEntryNotStarted(SecondEntryNotStarted {
                 finalised_first_entry: entry,
                 ..
             }) => {

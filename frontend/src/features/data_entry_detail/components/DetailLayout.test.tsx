@@ -1,21 +1,22 @@
 import * as ReactRouter from "react-router";
 
-import { describe, expect, test, vi } from "vitest";
+import { beforeEach, describe, expect, test, vi } from "vitest";
 
 import { ElectionProvider } from "@/hooks/election/ElectionProvider";
 import { ElectionStatusProvider } from "@/hooks/election/ElectionStatusProvider";
 import { MessagesProvider } from "@/hooks/messages/MessagesProvider";
+import { dataEntryHasWarningsGetMockResponse } from "@/testing/api-mocks/DataEntryMockData";
 import {
   ElectionListRequestHandler,
   ElectionRequestHandler,
   ElectionStatusRequestHandler,
   PollingStationDataEntryGetHandler,
 } from "@/testing/api-mocks/RequestHandlers";
-import { server } from "@/testing/server";
+import { overrideOnce, server } from "@/testing/server";
 import { render, screen, waitFor, within } from "@/testing/test-utils";
 import { TestUserProvider } from "@/testing/TestUserProvider";
 
-import { ResolveErrorsLayout } from "./ResolveErrorsLayout";
+import { DetailLayout } from "./DetailLayout";
 
 const renderLayout = () => {
   return render(
@@ -23,7 +24,7 @@ const renderLayout = () => {
       <ElectionProvider electionId={1}>
         <ElectionStatusProvider electionId={1}>
           <MessagesProvider>
-            <ResolveErrorsLayout />
+            <DetailLayout />
           </MessagesProvider>
         </ElectionStatusProvider>
       </ElectionProvider>
@@ -31,8 +32,8 @@ const renderLayout = () => {
   );
 };
 
-describe("ResolveErrorsLayout", () => {
-  test("renders layout with polling station header and navigation", async () => {
+describe("DetailLayout", () => {
+  beforeEach(() => {
     server.use(
       ElectionRequestHandler,
       ElectionStatusRequestHandler,
@@ -41,7 +42,9 @@ describe("ResolveErrorsLayout", () => {
     );
     vi.spyOn(ReactRouter, "useParams").mockReturnValue({ electionId: "1", pollingStationId: "5" });
     vi.spyOn(ReactRouter, "Outlet").mockReturnValue(<div>Outlet Content</div>);
+  });
 
+  test("renders data entry detail layout with polling station header and navigation", async () => {
     renderLayout();
 
     const banner = await screen.findByRole("banner");
@@ -57,5 +60,16 @@ describe("ResolveErrorsLayout", () => {
     await waitFor(() => {
       expect(document.title).toBe("Fouten en waarschuwingen oplossen - Abacus");
     });
+  });
+
+  test("render badge for second_entry_not_started as 1e invoer", async () => {
+    overrideOnce("get", "/api/polling_stations/5/data_entries/get", 200, dataEntryHasWarningsGetMockResponse);
+
+    renderLayout();
+
+    // Data entry has status "second_entry_not_started".
+    // In Badge, "1e invoer" is overruled as label instead of "2e invoer".
+    const banner = await screen.findByRole("banner");
+    expect(within(banner).getByText("1e invoer")).toBeInTheDocument();
   });
 });

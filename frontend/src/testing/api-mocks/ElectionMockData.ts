@@ -4,6 +4,7 @@ import {
   ElectionDetailsResponse,
   ElectionListResponse,
   ElectionWithPoliticalGroups,
+  InvestigationListResponse,
   NewElection,
   PoliticalGroup,
   PollingStationInvestigation,
@@ -325,6 +326,15 @@ export const getElectionMockData = (
   };
 };
 
+export const getInvestigationMockData = (
+  investigations: PollingStationInvestigation[] = mockInvestigations,
+): Required<InvestigationListResponse> => {
+  return {
+    investigations,
+  };
+};
+
+export const investigationListMockResponse: Required<InvestigationListResponse> = getInvestigationMockData();
 export const electionDetailsMockResponse: Required<ElectionDetailsResponse> = getElectionMockData();
 export const electionMockData = electionDetailsMockResponse.election;
 export const newElectionMockData = {

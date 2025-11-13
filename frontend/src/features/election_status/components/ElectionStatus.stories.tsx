@@ -22,6 +22,7 @@ const mockStatuses: ElectionStatusResponseEntry[] = [
     status: "second_entry_not_started",
     first_entry_user_id: 1,
     finished_at: today.toISOString(),
+    has_warnings: false,
   },
   {
     polling_station_id: 3,
@@ -45,12 +46,14 @@ const mockStatuses: ElectionStatusResponseEntry[] = [
     first_entry_progress: 100,
     second_entry_progress: 100,
     finished_at: today.toISOString(),
+    has_warnings: false,
   },
   {
     polling_station_id: 6,
-    status: "first_entry_in_progress",
-    first_entry_user_id: 1,
-    first_entry_progress: 25,
+    status: "second_entry_not_started",
+    first_entry_user_id: 2,
+    finished_at: today.toISOString(),
+    has_warnings: true,
   },
   {
     polling_station_id: 7,
@@ -108,8 +111,8 @@ export const ElectionStatusNoLinks: StoryObj<StoryProps> = {
       const items = pollinStationsPerStatus.children;
       // items[0] is the heading, which we have already checked
       await expect(items[1]).toHaveTextContent("Fouten en waarschuwingen (2)");
-      await expect(items[2]).toHaveTextContent("Invoer bezig (3)");
-      await expect(items[3]).toHaveTextContent("Eerste invoer klaar (1)");
+      await expect(items[2]).toHaveTextContent("Invoer bezig (2)");
+      await expect(items[3]).toHaveTextContent("Eerste invoer klaar (2)");
       await expect(items[4]).toHaveTextContent("Eerste en tweede invoer klaar (1)");
       await expect(items[5]).toHaveTextContent("Werkvoorraad (1)");
 
@@ -119,8 +122,8 @@ export const ElectionStatusNoLinks: StoryObj<StoryProps> = {
       const bars = canvas.getByTestId("multi-outer-bar").children;
       const expectedData = [
         { index: 0, percentage: 13, class: "definitive" },
-        { index: 1, percentage: 13, class: "first-entry-finished" },
-        { index: 2, percentage: 38, class: "in-progress" },
+        { index: 1, percentage: 25, class: "first-entry-finished" },
+        { index: 2, percentage: 25, class: "in-progress" },
         { index: 3, percentage: 25, class: "errors-and-warnings" },
         { index: 4, percentage: 13, class: "not-started" },
       ];
@@ -148,25 +151,24 @@ export const ElectionStatusNoLinks: StoryObj<StoryProps> = {
         ]);
       });
       await step("Data entry in progress", async () => {
-        await expect(headings[1]).toHaveTextContent("Invoer bezig (3)");
+        await expect(headings[1]).toHaveTextContent("Invoer bezig (2)");
         await expect(tables[1]).toHaveTableContent([
           ["Nummer", "Stembureau", "Invoerder", "Voortgang"],
           ["35", "Testschool 1e invoer", "Sanne Molenaar", "60%"],
           ["36", "Testbuurthuis 2e invoer", "Jayden Ahmen", "20%"],
-          ["38", "Testmuseum 1e invoer", "Sanne Molenaar", "25%"],
         ]);
 
         const inProgressRows = within(tables[1]!).getAllByRole("row");
         await expect(within(inProgressRows[1]!).getByRole("progressbar")).toHaveAttribute("aria-valuenow", "60");
         await expect(within(inProgressRows[2]!).getByRole("progressbar")).toHaveAttribute("aria-valuenow", "20");
-        await expect(within(inProgressRows[3]!).getByRole("progressbar")).toHaveAttribute("aria-valuenow", "25");
       });
 
       await step("First entry finished", async () => {
-        await expect(headings[2]).toHaveTextContent("Eerste invoer klaar (1)");
+        await expect(headings[2]).toHaveTextContent("Eerste invoer klaar (2)");
         await expect(tables[2]).toHaveTableContent([
           ["Nummer", "Stembureau", "Invoerder", "Afgerond"],
           ["34", "Testplek", "Sanne Molenaar", "vandaag om 10:20"],
+          ["38", "Testmuseum", "Jayden Ahmen", "vandaag om 10:20"],
         ]);
       });
 
@@ -233,7 +235,7 @@ export const ElectionStatusWithLinks: StoryObj<StoryProps> = {
       });
 
       await step("Data entry in progress", async () => {
-        await expect(headings[1]).toHaveTextContent("Invoer bezig (3)");
+        await expect(headings[1]).toHaveTextContent("Invoer bezig (2)");
         const tableRows = within(tables[1]!).getAllByRole("row");
         navigate.mockClear();
 
@@ -242,7 +244,7 @@ export const ElectionStatusWithLinks: StoryObj<StoryProps> = {
       });
 
       await step("First entry finished", async () => {
-        await expect(headings[2]).toHaveTextContent("Eerste invoer klaar (1)");
+        await expect(headings[2]).toHaveTextContent("Eerste invoer klaar (2)");
         const tableRows = within(tables[2]!).getAllByRole("row");
         navigate.mockClear();
 

@@ -234,7 +234,7 @@
     },
     "/api/elections/{election_id}": {
       "get": {
-        "summary": "Get election details including the election's candidate list (political groups),\nits polling stations and the current committee session",
+        "summary": "Get election details including the election's candidate list (political groups),\nits polling stations and the current committee session and its investigations",
         "operationId": "election_details",
         "parameters": [
           {
@@ -723,6 +723,88 @@
           },
           "409": {
             "description": "Request cannot be completed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/elections/{election_id}/committee_sessions/{committee_session_id}/investigations": {
+      "get": {
+        "summary": "Get a list of all [Investigation]s for a committee session",
+        "operationId": "committee_session_investigations",
+        "parameters": [
+          {
+            "name": "election_id",
+            "in": "path",
+            "description": "Election database id",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "minimum": 0
+            }
+          },
+          {
+            "name": "committee_session_id",
+            "in": "path",
+            "description": "Committee session database id",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "minimum": 0
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Investigation listing successful",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InvestigationListResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Committee session not found",
             "content": {
               "application/json": {
                 "schema": {
@@ -5918,6 +6000,22 @@
             "description": "Include (part of) data entry for this election"
           }
         }
+      },
+      "InvestigationListResponse": {
+        "type": "object",
+        "description": "Investigation list response",
+        "required": [
+          "investigations"
+        ],
+        "properties": {
+          "investigations": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PollingStationInvestigation"
+            }
+          }
+        },
+        "additionalProperties": false
       },
       "LoginResponse": {
         "type": "object",

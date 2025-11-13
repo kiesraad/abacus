@@ -170,6 +170,9 @@ export const ElectionStatusNoLinks: StoryObj<StoryProps> = {
           ["34", "Testplek", "Sanne Molenaar", "vandaag om 10:20"],
           ["38", "Testmuseum", "Jayden Ahmen", "vandaag om 10:20"],
         ]);
+
+        const tableRows = within(tables[2]!).getAllByRole("row");
+        await expect(within(tableRows[2]!).getByRole("img", { name: "bevat een waarschuwing" })).toBeInTheDocument();
       });
 
       await step("Definitive", async () => {

@@ -1055,7 +1055,7 @@ mod tests {
             status::CommitteeSessionStatus, tests::change_status_committee_session,
         },
         data_entry::{
-            CSOFirstSessionResults, DifferenceCountsCompareVotesCastAdmittedVoters,
+            CSOFirstSessionResults, Count, DifferenceCountsCompareVotesCastAdmittedVoters,
             DifferencesCounts, PoliticalGroupCandidateVotes, PoliticalGroupTotalVotes,
             ValidationResult, ValidationResultCode, VotersCounts, VotesCounts, YesNo,
             repository::{data_entry_exists, result_exists},
@@ -1116,64 +1116,17 @@ mod tests {
     }
 
     fn example_data_entry_with_warning() -> DataEntry {
+        let extra_blank_votes: Count = 100;
+
         let mut data_entry = example_data_entry().clone();
 
-        data_entry
-            .data
-            .as_cso_first_session_mut()
-            .unwrap()
-            .extra_investigation
-            .extra_investigation_other_reason
-            .no = true;
-        data_entry
-            .data
-            .as_cso_first_session_mut()
-            .unwrap()
-            .extra_investigation
-            .ballots_recounted_extra_investigation
-            .no = true;
-        data_entry.data.voters_counts_mut().poll_card_count = 1000;
-        data_entry.data.voters_counts_mut().proxy_certificate_count = 0;
-        data_entry
-            .data
-            .voters_counts_mut()
-            .total_admitted_voters_count = 1000;
+        let voters_counts = data_entry.data.voters_counts_mut();
+        voters_counts.poll_card_count += extra_blank_votes;
+        voters_counts.total_admitted_voters_count += extra_blank_votes;
 
-        data_entry
-            .data
-            .votes_counts_mut()
-            .political_group_total_votes[0]
-            .total = 1;
-        data_entry
-            .data
-            .votes_counts_mut()
-            .political_group_total_votes[1]
-            .total = 0;
-        data_entry
-            .data
-            .votes_counts_mut()
-            .total_votes_candidates_count = 1;
-        data_entry.data.votes_counts_mut().blank_votes_count = 999;
-        data_entry.data.votes_counts_mut().invalid_votes_count = 0;
-        data_entry.data.votes_counts_mut().total_votes_cast_count = 1000;
-
-        data_entry
-            .data
-            .differences_counts_mut()
-            .difference_completely_accounted_for
-            .yes = false;
-        data_entry
-            .data
-            .differences_counts_mut()
-            .difference_completely_accounted_for
-            .no = true;
-
-        data_entry.data.political_group_votes_mut()[0].candidate_votes[0].votes = 1;
-        data_entry.data.political_group_votes_mut()[0].candidate_votes[1].votes = 0;
-        data_entry.data.political_group_votes_mut()[0].total = 1;
-        data_entry.data.political_group_votes_mut()[1].candidate_votes[0].votes = 0;
-        data_entry.data.political_group_votes_mut()[1].candidate_votes[1].votes = 0;
-        data_entry.data.political_group_votes_mut()[1].total = 0;
+        let votes_counts = data_entry.data.votes_counts_mut();
+        votes_counts.blank_votes_count += extra_blank_votes;
+        votes_counts.total_votes_cast_count += extra_blank_votes;
 
         data_entry
     }

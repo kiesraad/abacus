@@ -14,7 +14,7 @@
     "DataEntryCannotBeDeleted": "De invoer kan niet verwijderd worden",
     "DataEntryGetNotAllowed": "De status van de invoer staat deze actie niet toe",
     "DataEntryNotAllowed": "De invoer voor dit stembureau is niet toegestaan",
-    "EmlImportError": "Het EML bestand is niet geldig",
+    "EmlImportError": "Het EML-bestand is niet geldig",
     "EntryNotFound": "Niet gevonden",
     "EntryNotUnique": "Deze invoer bestaat al",
     "Forbidden": "Je hebt niet de juiste rechten",

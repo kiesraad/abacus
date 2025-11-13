@@ -28,8 +28,8 @@
   "enter_a_number": "Voer een getal in",
   "enter_number_of_voters": "Voer het aantal kiesgerechtigden voor deze verkiezing in zoals door de burgemeester en wethouders aan het gemeentelijk stembureau is doorgegeven.",
   "first_session": {
-    "documents": "<li><strong>PDF document met het proces verbaal.</strong> Dit wordt tijdens de zitting van het gemeentelijk stembureau vastgesteld en ondertekend.</li><li><strong>EML bestand met digitale telresultaten.</strong></li>",
-    "zip_file_explanation": "In het Zip bestand zitten twee documenten:"
+    "documents": "<li><strong>PDF-document met het proces verbaal.</strong> Dit wordt tijdens de zitting van het gemeentelijk stembureau vastgesteld en ondertekend.</li><li><strong>EML-bestand met digitale telresultaten.</strong></li>",
+    "zip_file_explanation": "In het ZIP-bestand zitten twee documenten:"
   },
   "how_many_voters": "Hoeveel kiesgerechtigden telt de gemeente?",
   "if_gsb_correction": "Wil het Gemeentelijk Stembureau zelf een fout herstellen en is de zitting nog niet afgesloten door de voorzitter? Ga dan verder in de eerste zitting.",
@@ -37,12 +37,12 @@
   "lists_and_candidates": "Lijsten en kandidaten",
   "next_session": {
     "with_corrections": {
-      "documents": "<li><strong>Het proces verbaal van het gemeentelijk stembureau (P 2a). Dit is een PDF document.</strong> Dit wordt tijdens de zitting van het gemeentelijk stembureau vastgesteld en ondertekend.</li><li><strong>Het corrigendum van het gemeentelijk stembureau (Na 14-2). Dit is een PDF document.</strong> Bevat de gecorrigeerde telresultaten van de gemeente.</li><li><strong>EML bestand met digitale telresultaten.</strong></li>",
-      "zip_file_explanation": "In het Zip bestand zitten drie documenten:"
+      "documents": "<li><strong>Het proces verbaal van het gemeentelijk stembureau (P 2a). Dit is een PDF-document.</strong> Dit wordt tijdens de zitting van het gemeentelijk stembureau vastgesteld en ondertekend.</li><li><strong>Het corrigendum van het gemeentelijk stembureau (Na 14-2). Dit is een PDF document.</strong> Bevat de gecorrigeerde telresultaten van de gemeente.</li><li><strong>EML-bestand met digitale telresultaten.</strong></li>",
+      "zip_file_explanation": "In het ZIP-bestand zitten drie documenten:"
     },
     "without_corrections": {
-      "documents": "<li><strong>Het proces verbaal van het gemeentelijk stembureau (P 2a). Dit is een PDF document.</strong> Dit wordt tijdens de zitting van het gemeentelijk stembureau vastgesteld en ondertekend.</li>",
-      "zip_file_explanation": "In het Zip bestand zit één document:"
+      "documents": "<li><strong>Het proces verbaal van het gemeentelijk stembureau (P 2a). Dit is een PDF-document.</strong> Dit wordt tijdens de zitting van het gemeentelijk stembureau vastgesteld en ondertekend.</li>",
+      "zip_file_explanation": "In het ZIP-bestand zit één document:"
     }
   },
   "no_polling_stations": "Geen stembureaus",
@@ -65,11 +65,11 @@
   "time_hint": "uu:mm, bijvoorbeeld 21:34",
   "to_do_data_entry_for": "Invoer doen voor",
   "to_report": "Naar proces-verbaal",
-  "upload_the_zip": "Upload het volledige Zip bestand naar het uitwisselplatform.",
+  "upload_the_zip": "Upload het volledige ZIP-bestand naar het uitwisselplatform.",
   "view_data_entry": "Steminvoer bekijken",
   "view_investigations": "Bekijk onderzoeken",
   "what_now": "Wat nu",
   "yes_add_session": "Ja, zitting toevoegen",
   "yes_delete_session": "Verwijder zitting",
-  "zip_file": "Zip bestand"
+  "zip_file": "ZIP-bestand"
 }

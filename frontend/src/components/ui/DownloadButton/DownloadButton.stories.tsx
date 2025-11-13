@@ -14,7 +14,7 @@ export const Default: Story = {
     icon: "download",
     href: "#",
     title: "Download definitieve documenten eerste zitting",
-    subtitle: "Zip bestand, 225kb",
+    subtitle: "ZIP-bestand, 225kb",
   },
 };
 

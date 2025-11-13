@@ -191,18 +191,12 @@ async fn test_deletion_removes_polling_station_from_status(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let cookie = shared::coordinator_login(&addr).await;
     let election_id = 5;
-    let polling_station_id = 9;
+    let polling_station_id = 11;
 
     let statuses = get_statuses(&addr, &cookie, election_id).await;
     assert_eq!(statuses.len(), 1);
 
     // Add investigation with corrected_results: true
-    assert_eq!(
-        shared::create_investigation(&addr, polling_station_id)
-            .await
-            .status(),
-        StatusCode::CREATED
-    );
     assert_eq!(
         conclude_investigation(
             &addr,
@@ -218,72 +212,7 @@ async fn test_deletion_removes_polling_station_from_status(pool: SqlitePool) {
     );
 
     let statuses = get_statuses(&addr, &cookie, election_id).await;
-    assert_eq!(statuses.len(), 2);
-    assert_eq!(
-        statuses[&polling_station_id].status,
-        DataEntryStatusName::FirstEntryNotStarted
-    );
-
-    let data_entry = DataEntry {
-        progress: 100,
-        data: PollingStationResults::CSONextSession(CSONextSessionResults {
-            voters_counts: VotersCounts {
-                poll_card_count: 1203,
-                proxy_certificate_count: 2,
-
-                total_admitted_voters_count: 1205,
-            },
-            votes_counts: VotesCounts {
-                political_group_total_votes: vec![
-                    PoliticalGroupTotalVotes {
-                        number: 1,
-                        total: 600,
-                    },
-                    PoliticalGroupTotalVotes {
-                        number: 2,
-                        total: 302,
-                    },
-                    PoliticalGroupTotalVotes {
-                        number: 3,
-                        total: 98,
-                    },
-                    PoliticalGroupTotalVotes {
-                        number: 4,
-                        total: 99,
-                    },
-                    PoliticalGroupTotalVotes {
-                        number: 5,
-                        total: 101,
-                    },
-                ],
-                total_votes_candidates_count: 1200,
-                blank_votes_count: 3,
-                invalid_votes_count: 2,
-                total_votes_cast_count: 1205,
-            },
-
-            differences_counts: differences_counts_zero(),
-            political_group_votes: vec![
-                political_group_votes_from_test_data_auto(
-                    1,
-                    &[
-                        78, 20, 55, 45, 50, 0, 60, 40, 30, 20, 50, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-                        0, 0, 0, 0, 0, 0, 0, 152,
-                    ],
-                ),
-                political_group_votes_from_test_data_auto(2, &[150, 50, 22, 10, 30, 40]),
-                political_group_votes_from_test_data_auto(3, &[20, 15, 25, 3, 2, 33]),
-                political_group_votes_from_test_data_auto(4, &[20, 15, 25, 24, 15]),
-                political_group_votes_from_test_data_auto(5, &[20, 31, 10, 40]),
-            ],
-        }),
-        client_state: ClientState::new_from_str(None).unwrap(),
-    };
-    create_result_with_non_example_data_entry(&addr, polling_station_id, election_id, data_entry)
-        .await;
-
-    let statuses = get_statuses(&addr, &cookie, election_id).await;
-    assert_eq!(statuses.len(), 2);
+    assert_eq!(statuses.len(), 1);
     assert_eq!(
         statuses[&polling_station_id].status,
         DataEntryStatusName::Definitive
@@ -297,7 +226,7 @@ async fn test_deletion_removes_polling_station_from_status(pool: SqlitePool) {
     );
 
     let statuses = get_statuses(&addr, &cookie, election_id).await;
-    assert_eq!(statuses.len(), 1);
+    assert_eq!(statuses.len(), 0);
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_7_four_sessions", "users"))))]

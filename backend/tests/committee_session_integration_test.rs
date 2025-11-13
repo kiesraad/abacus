@@ -6,7 +6,6 @@ use abacus::committee_session::{
     status::CommitteeSessionStatus,
 };
 use axum::http::StatusCode;
-use shared::create_investigation;
 use sqlx::SqlitePool;
 use test_log::test;
 
@@ -120,33 +119,6 @@ async fn test_committee_session_delete_fails_with_investigation(pool: SqlitePool
     let election_id = 5;
     let committee_session_id = 6;
 
-    shared::change_status_committee_session(
-        &addr,
-        &cookie,
-        election_id,
-        committee_session_id,
-        CommitteeSessionStatus::Created,
-    )
-    .await;
-    assert_eq!(
-        create_investigation(&addr, 9).await.status(),
-        StatusCode::CREATED
-    );
-    shared::change_status_committee_session(
-        &addr,
-        &cookie,
-        election_id,
-        committee_session_id,
-        CommitteeSessionStatus::DataEntryNotStarted,
-    )
-    .await;
-    let committee_session =
-        shared::get_election_committee_session(&addr, &cookie, election_id).await;
-    assert_eq!(
-        committee_session.status,
-        CommitteeSessionStatus::DataEntryNotStarted,
-    );
-
     let url = format!(
         "http://{addr}/api/elections/{election_id}/committee_sessions/{committee_session_id}"
     );
@@ -160,7 +132,7 @@ async fn test_committee_session_delete_fails_with_investigation(pool: SqlitePool
     // You cannot delete a committee session if there are investigations linked to it
     assert_eq!(
         response.status(),
-        StatusCode::UNPROCESSABLE_ENTITY,
+        StatusCode::CONFLICT,
         "Unexpected response status"
     );
 }

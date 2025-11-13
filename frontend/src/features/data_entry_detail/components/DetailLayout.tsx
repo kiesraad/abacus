@@ -4,19 +4,19 @@ import { Outlet, useNavigate } from "react-router";
 import { AnyApiError, ApiError, NotFoundError } from "@/api/ApiResult";
 import { Messages } from "@/components/messages/Messages";
 import { PageTitle } from "@/components/page_title/PageTitle";
-import { Alert } from "@/components/ui/Alert/Alert.tsx";
+import { Alert } from "@/components/ui/Alert/Alert";
 import { StickyNav } from "@/components/ui/AppLayout/StickyNav";
 import { Badge } from "@/components/ui/Badge/Badge";
 import { PollingStationNumber } from "@/components/ui/Badge/PollingStationNumber";
-import { FormLayout } from "@/components/ui/Form/FormLayout.tsx";
-import { ReadOnlyDataEntryDelete } from "@/features/resolve_errors/components/delete/ReadOnlyDataEntryDelete.tsx";
+import { FormLayout } from "@/components/ui/Form/FormLayout";
 import { useElection } from "@/hooks/election/useElection";
-import { useMessages } from "@/hooks/messages/useMessages.ts";
+import { useMessages } from "@/hooks/messages/useMessages";
 import { useNumericParam } from "@/hooks/useNumericParam";
 import { t } from "@/i18n/translate";
 import { getDataEntryStructure } from "@/utils/dataEntryStructure";
 
 import { usePollingStationDataEntryErrors } from "../hooks/usePollingStationDataEntryErrors";
+import { ReadOnlyDataEntryDelete } from "./delete/ReadOnlyDataEntryDelete";
 import { DetailNavigation } from "./DetailNavigation";
 
 export function DetailLayout() {

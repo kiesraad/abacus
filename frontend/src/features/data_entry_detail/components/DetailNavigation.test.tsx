@@ -23,10 +23,10 @@ describe("DetailNavigation", () => {
   const mockValidationResultsWithErrors: ValidationResults = {
     errors: [
       validationResultMockData.F201, // voters_counts fields
+      validationResultMockData.F401, // political_group_votes[0]
     ],
     warnings: [
       validationResultMockData.W201, // blank_votes_count field
-      validationResultMockData.F401, // political_group_votes[0]
     ],
   };
 
@@ -34,14 +34,13 @@ describe("DetailNavigation", () => {
     errors: [],
     warnings: [
       validationResultMockData.W201, // blank_votes_count field
-      validationResultMockData.F401, // political_group_votes[0]
     ],
   };
 
   const renderNavigation = (
     validationResults: ValidationResults,
-    testStructure: DataEntryStructure = structure,
     status: DataEntryStatusName,
+    testStructure: DataEntryStructure = structure,
   ) => {
     return render(<DetailNavigation structure={testStructure} status={status} validationResults={validationResults} />);
   };
@@ -55,30 +54,39 @@ describe("DetailNavigation", () => {
   });
 
   test("renders overview link and links to all sections", () => {
-    renderNavigation(mockValidationResultsNoErrors, structure, "second_entry_not_started");
+    renderNavigation(mockValidationResultsWithWarnings, "second_entry_not_started");
 
-    // Errors/warnings section is not shown when there are no errors/warnings.
-    expect(screen.queryByRole("link", { name: "Fouten en waarschuwingen" })).not.toBeInTheDocument();
-    expect(screen.getByRole("link", { name: "Extra onderzoek" })).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: "Aantal kiezers en stemmen" })).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: "Verschillen D & H" })).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: /Lijst 1 - Vurige Vleugels Partij/ })).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: /Lijst 2 - Wijzen van Water en Wind/ })).toBeInTheDocument();
+    const items = screen.getAllByRole("link").map((link) => link.textContent);
+    expect(items).toEqual([
+      "Waarschuwingen",
+      "Extra onderzoek",
+      "Verschillen met stembureau",
+      "Aantal kiezers en stemmen",
+      "Verschillen D & H",
+      "Lijst 1 - Vurige Vleugels Partij",
+      "Lijst 2 - Wijzen van Water en Wind",
+    ]);
   });
 
   test("renders with empty structure", () => {
-    renderNavigation(mockValidationResultsNoErrors, [], "first_entry_in_progress");
+    renderNavigation(mockValidationResultsWithErrors, "first_entry_has_errors", []);
 
-    expect(screen.queryByText("Fouten en waarschuwingen")).not.toBeInTheDocument();
+    expect(screen.getByRole("link")).toBeInTheDocument();
   });
 
-  test("shows correct status based on validation results", () => {
-    renderNavigation(mockValidationResultsWithErrors, structure, "first_entry_has_errors");
+  test("shows correct icons status based on validation results", () => {
+    renderNavigation(mockValidationResultsWithErrors, "first_entry_has_errors");
 
-    expect(screen.queryByRole("link", { name: "Fouten en waarschuwingen" })).toBeInTheDocument();
+    const investigationItem = screen.getByRole("link", { name: "Extra onderzoek" }).closest("li")!;
+    expect(within(investigationItem).queryByRole("img", { name: "bevat een fout" })).not.toBeInTheDocument();
+    expect(within(investigationItem).queryByRole("img", { name: "bevat een waarschuwing" })).not.toBeInTheDocument();
+
+    const countingDiffItem = screen.getByRole("link", { name: "Verschillen met stembureau" }).closest("li")!;
+    expect(within(countingDiffItem).queryByRole("img", { name: "bevat een fout" })).not.toBeInTheDocument();
+    expect(within(countingDiffItem).queryByRole("img", { name: "bevat een waarschuwing" })).not.toBeInTheDocument();
 
     const votersAndVotesItem = screen.getByRole("link", { name: "Aantal kiezers en stemmen" }).closest("li")!;
-    expect(within(votersAndVotesItem).getByRole("img", { name: "bevat een fout" })).toBeInTheDocument();
+    expect(within(votersAndVotesItem).queryByRole("img", { name: "bevat een fout" })).toBeInTheDocument();
     expect(within(votersAndVotesItem).queryByRole("img", { name: "bevat een waarschuwing" })).not.toBeInTheDocument();
 
     const differencesItem = screen.getByRole("link", { name: "Verschillen D & H" }).closest("li")!;
@@ -86,83 +94,34 @@ describe("DetailNavigation", () => {
     expect(within(differencesItem).queryByRole("img", { name: "bevat een waarschuwing" })).not.toBeInTheDocument();
 
     const politicalGroup1Item = screen.getByRole("link", { name: /Lijst 1 - Vurige Vleugels Partij/ }).closest("li")!;
-    expect(within(politicalGroup1Item).queryByRole("img", { name: "bevat een fout" })).not.toBeInTheDocument();
-    expect(within(politicalGroup1Item).getByRole("img", { name: "bevat een waarschuwing" })).toBeInTheDocument();
+    expect(within(politicalGroup1Item).queryByRole("img", { name: "bevat een fout" })).toBeInTheDocument();
+    expect(within(politicalGroup1Item).queryByRole("img", { name: "bevat een waarschuwing" })).not.toBeInTheDocument();
 
     const politicalGroup2Item = screen.getByRole("link", { name: /Lijst 2 - Wijzen van Water en Wind/ }).closest("li")!;
     expect(within(politicalGroup2Item).queryByRole("img", { name: "bevat een fout" })).not.toBeInTheDocument();
     expect(within(politicalGroup2Item).queryByRole("img", { name: "bevat een waarschuwing" })).not.toBeInTheDocument();
   });
 
-  test("shows correct status based on validation results while first entry in progress", () => {
-    renderNavigation(mockValidationResultsWithErrors, structure, "first_entry_in_progress");
-
-    expect(screen.queryByRole("link", { name: "Fouten en waarschuwingen" })).not.toBeInTheDocument();
-
-    const votersAndVotesItem = screen.getByRole("link", { name: "Aantal kiezers en stemmen" }).closest("li")!;
-    expect(within(votersAndVotesItem).getByRole("img", { name: "bevat een fout" })).toBeInTheDocument();
-    expect(within(votersAndVotesItem).queryByRole("img", { name: "bevat een waarschuwing" })).not.toBeInTheDocument();
-
-    const differencesItem = screen.getByRole("link", { name: "Verschillen D & H" }).closest("li")!;
-    expect(within(differencesItem).queryByRole("img", { name: "bevat een fout" })).not.toBeInTheDocument();
-    expect(within(differencesItem).queryByRole("img", { name: "bevat een waarschuwing" })).not.toBeInTheDocument();
-
-    const politicalGroup1Item = screen.getByRole("link", { name: /Lijst 1 - Vurige Vleugels Partij/ }).closest("li")!;
-    expect(within(politicalGroup1Item).queryByRole("img", { name: "bevat een fout" })).not.toBeInTheDocument();
-    expect(within(politicalGroup1Item).getByRole("img", { name: "bevat een waarschuwing" })).toBeInTheDocument();
-
-    const politicalGroup2Item = screen.getByRole("link", { name: /Lijst 2 - Wijzen van Water en Wind/ }).closest("li")!;
-    expect(within(politicalGroup2Item).queryByRole("img", { name: "bevat een fout" })).not.toBeInTheDocument();
-    expect(within(politicalGroup2Item).queryByRole("img", { name: "bevat een waarschuwing" })).not.toBeInTheDocument();
+  test("show errors and warnings overview link when resolving errors ", () => {
+    renderNavigation(mockValidationResultsWithErrors, "first_entry_has_errors");
+    const firstItem = screen.getAllByRole("link")[0]!;
+    expect(firstItem.textContent).toEqual("Fouten en waarschuwingen");
   });
 
-  test("shows correct status based on validation results while second entry in progress", () => {
-    renderNavigation(mockValidationResultsWithErrors, structure, "second_entry_in_progress");
-
-    expect(screen.queryByRole("link", { name: "Fouten en waarschuwingen" })).not.toBeInTheDocument();
-
-    const votersAndVotesItem = screen.getByRole("link", { name: "Aantal kiezers en stemmen" }).closest("li")!;
-    expect(within(votersAndVotesItem).getByRole("img", { name: "bevat een fout" })).toBeInTheDocument();
-    expect(within(votersAndVotesItem).queryByRole("img", { name: "bevat een waarschuwing" })).not.toBeInTheDocument();
-
-    const differencesItem = screen.getByRole("link", { name: "Verschillen D & H" }).closest("li")!;
-    expect(within(differencesItem).queryByRole("img", { name: "bevat een fout" })).not.toBeInTheDocument();
-    expect(within(differencesItem).queryByRole("img", { name: "bevat een waarschuwing" })).not.toBeInTheDocument();
-
-    const politicalGroup1Item = screen.getByRole("link", { name: /Lijst 1 - Vurige Vleugels Partij/ }).closest("li")!;
-    expect(within(politicalGroup1Item).queryByRole("img", { name: "bevat een fout" })).not.toBeInTheDocument();
-    expect(within(politicalGroup1Item).getByRole("img", { name: "bevat een waarschuwing" })).toBeInTheDocument();
-
-    const politicalGroup2Item = screen.getByRole("link", { name: /Lijst 2 - Wijzen van Water en Wind/ }).closest("li")!;
-    expect(within(politicalGroup2Item).queryByRole("img", { name: "bevat een fout" })).not.toBeInTheDocument();
-    expect(within(politicalGroup2Item).queryByRole("img", { name: "bevat een waarschuwing" })).not.toBeInTheDocument();
+  test("show warnings overview link when viewing data entry details with warnings", () => {
+    renderNavigation(mockValidationResultsWithWarnings, "second_entry_not_started");
+    const firstItem = screen.getAllByRole("link")[0]!;
+    expect(firstItem.textContent).toEqual("Waarschuwingen");
   });
 
-  test("shows correct status based on validation results with warnings only", () => {
-    renderNavigation(mockValidationResultsWithWarnings, structure, "second_entry_not_started");
-
-    expect(screen.queryByRole("link", { name: "Waarschuwingen" })).toBeInTheDocument();
-    expect(screen.queryByRole("img", { name: "bevat een fout" })).not.toBeInTheDocument();
-
-    const votersAndVotesItem = screen.getByRole("link", { name: "Aantal kiezers en stemmen" }).closest("li")!;
-    expect(within(votersAndVotesItem).queryByRole("img", { name: "bevat een fout" })).not.toBeInTheDocument();
-    expect(within(votersAndVotesItem).queryByRole("img", { name: "bevat een waarschuwing" })).toBeInTheDocument();
-
-    const differencesItem = screen.getByRole("link", { name: "Verschillen D & H" }).closest("li")!;
-    expect(within(differencesItem).queryByRole("img", { name: "bevat een fout" })).not.toBeInTheDocument();
-    expect(within(differencesItem).queryByRole("img", { name: "bevat een waarschuwing" })).not.toBeInTheDocument();
-
-    const politicalGroup1Item = screen.getByRole("link", { name: /Lijst 1 - Vurige Vleugels Partij/ }).closest("li")!;
-    expect(within(politicalGroup1Item).queryByRole("img", { name: "bevat een fout" })).not.toBeInTheDocument();
-    expect(within(politicalGroup1Item).queryByRole("img", { name: "bevat een waarschuwing" })).toBeInTheDocument();
-
-    const politicalGroup2Item = screen.getByRole("link", { name: /Lijst 2 - Wijzen van Water en Wind/ }).closest("li")!;
-    expect(within(politicalGroup2Item).queryByRole("img", { name: "bevat een fout" })).not.toBeInTheDocument();
-    expect(within(politicalGroup2Item).queryByRole("img", { name: "bevat een waarschuwing" })).not.toBeInTheDocument();
+  test("do not show errors or warnings overview section when there are none", () => {
+    renderNavigation(mockValidationResultsNoErrors, "second_entry_not_started");
+    const firstItem = screen.getAllByRole("link")[0]!;
+    expect(firstItem.textContent).toEqual("Extra onderzoek");
   });
 
   test("shows no icons when there are no validation results", () => {
-    renderNavigation(mockValidationResultsNoErrors, structure, "definitive");
+    renderNavigation(mockValidationResultsNoErrors, "second_entry_not_started");
 
     expect(screen.queryByRole("img", { name: "bevat een fout" })).not.toBeInTheDocument();
     expect(screen.queryByRole("img", { name: "bevat een waarschuwing" })).not.toBeInTheDocument();
@@ -175,10 +134,10 @@ describe("DetailNavigation", () => {
       sectionId: undefined,
     });
 
-    renderNavigation(mockValidationResultsNoErrors, structure, "second_entry_not_started");
+    renderNavigation(mockValidationResultsWithErrors, "first_entry_has_errors");
 
-    const overviewItem = screen.getByRole("link", { name: "Extra onderzoek" }).closest("li");
-    expect(overviewItem).toHaveAttribute("aria-current", "false");
+    const overviewItem = screen.getByRole("link", { name: "Fouten en waarschuwingen" }).closest("li");
+    expect(overviewItem).toHaveAttribute("aria-current", "step");
   });
 
   test("shows section link as active when sectionId param is not null", () => {
@@ -188,20 +147,20 @@ describe("DetailNavigation", () => {
       sectionId: "voters_votes_counts",
     });
 
-    renderNavigation(mockValidationResultsNoErrors, structure, "second_entry_not_started");
+    renderNavigation(mockValidationResultsWithWarnings, "second_entry_not_started");
 
     const activeItem = screen.getByRole("link", { name: "Aantal kiezers en stemmen" }).closest("li");
     expect(activeItem).toHaveAttribute("aria-current", "step");
 
-    const overviewItem = screen.getByRole("link", { name: "Extra onderzoek" }).closest("li");
+    const overviewItem = screen.getByRole("link", { name: "Waarschuwingen" }).closest("li");
     expect(overviewItem).toHaveAttribute("aria-current", "false");
   });
 
   test("uses correct links", () => {
-    renderNavigation(mockValidationResultsNoErrors, structure, "second_entry_not_started");
+    renderNavigation(mockValidationResultsWithWarnings, "second_entry_not_started");
 
-    const overviewLink = screen.getByRole("link", { name: "Extra onderzoek" });
-    expect(overviewLink).toHaveAttribute("href", "/elections/1/status/5/detail/extra_investigation");
+    const overviewLink = screen.getByRole("link", { name: "Waarschuwingen" });
+    expect(overviewLink).toHaveAttribute("href", "/elections/1/status/5/detail");
 
     const kiezersLink = screen.getByRole("link", { name: "Aantal kiezers en stemmen" });
     expect(kiezersLink).toHaveAttribute("href", "/elections/1/status/5/detail/voters_votes_counts");

@@ -1,0 +1,80 @@
+name: Diff PDFs
+
+on:
+  workflow_dispatch:
+  pull_request:
+
+permissions:
+  contents: read
+  pull-requests: write
+
+env:
+  TZ: "Europe/Amsterdam"
+
+jobs:
+  diff:
+    name: Diff PDFs
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./backend
+    env:
+      CARGO_TERM_COLOR: always
+      SQLX_OFFLINE: "true"
+    steps:
+      - name: Setup Rust
+        shell: bash
+        run: >
+          rustup update stable &&
+          rustup default stable
+      - name: Cargo cache
+        uses: Swatinem/rust-cache@f13886b937689c021905a6b90929199931d60db1 # v2
+        with:
+          workspaces: "backend -> target"
+      - uses: actions/checkout@v5
+        with:
+          ref: main
+      - name: Generate PDFs
+        run: cargo run --bin gen-pdf --features embed-typst -- --directory main
+      - name: Switch to feature branch
+        uses: actions/checkout@v5
+      - name: Generate PDFs for feature branch
+        run: cargo run --bin gen-pdf --features embed-typst -- --directory ${{ GITHUB_HEAD_REF }}
+      - name: Install diff-pdf
+        run: sudo apt-get update && sudo apt-get install -y diff-pdf-wx
+      - name: Diff PDFs
+        run: |
+          set -e
+          DIFF_FOUND=0
+          mkdir -p tmp-pdf-gen/diffs
+          TEST_DIR="tmp-pdf-gen/${{ GITHUB_HEAD_REF }}/"
+          for FILE in $(find $TEST_DIR -name "*.pdf"); do
+          FILE_REL=${FILE#$TEST_DIR}
+          FILE_OTHER="tmp-pdf-gen/main/${FILE_REL}"
+          if [ -f "$FILE_OTHER" ]; then
+              diff-pdf --mark-differences --skip-identical --output-diff="tmp-pdf-gen/diffs/${FILE_REL}" "$FILE" "$FILE_OTHER" || FILE_DIFF_FOUND=1
+
+              if [ $FILE_DIFF_FOUND -eq 1 ]; then
+                  DIFF_FOUND=1
+                  echo "Differences found in $FILE_REL"
+              else
+                  echo "No differences in $FILE_REL"
+                  rm "tmp-pdf-gen/diffs/${FILE_REL}"
+              fi
+          else
+              DIFF_FOUND=1
+              echo "File $FILE_OTHER not found in main branch"
+          fi
+          done
+          if [ $DIFF_FOUND -eq 1 ]; then
+              echo "PDF differences were found."
+          else
+              echo "No PDF differences found."
+          fi
+          echo "DIFF_FOUND=$DIFF_FOUND" >> $GITHUB_ENV
+      - name: Upload diff artifacts
+        if: ${{ env.DIFF_FOUND == '1' }}
+        uses: actions/upload-artifact@v3
+        with:
+          name: pdf-diffs
+          path: tmp-pdf-gen/diffs/

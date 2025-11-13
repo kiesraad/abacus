@@ -633,23 +633,17 @@ async fn test_committee_session_status_change_previous_committee_session_fails(p
     assert_eq!(response.status(), StatusCode::NOT_FOUND);
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
+#[test(sqlx::test(fixtures(
+    path = "../fixtures",
+    scripts("election_6_no_polling_stations", "users")
+)))]
 async fn test_committee_session_number_of_voters_change_first_session_created_works_for_coordinator(
     pool: SqlitePool,
 ) {
     let addr = serve_api(pool).await;
     let coordinator_cookie = shared::coordinator_login(&addr).await;
-    let election_id = 2;
-    let committee_session_id = 2;
-
-    shared::change_status_committee_session(
-        &addr,
-        &coordinator_cookie,
-        election_id,
-        committee_session_id,
-        CommitteeSessionStatus::Created,
-    )
-    .await;
+    let election_id = 6;
+    let committee_session_id = 7;
 
     let committee_session =
         shared::get_election_committee_session(&addr, &coordinator_cookie, election_id).await;

@@ -32,7 +32,7 @@ use crate::{
     summary::{ElectionSummary, PollingStationInvestigations, SumCount, SummaryDifferencesCounts},
 };
 
-use chrono::{DateTime, Local, NaiveDate, NaiveDateTime, NaiveTime};
+use chrono::{DateTime, Local, NaiveDate, NaiveDateTime, Utc};
 use rand::{Rng, seq::IndexedRandom};
 use test_log::test;
 
@@ -47,30 +47,22 @@ fn random_value<T: Copy>(rng: &mut impl rand::Rng, variants: &[T]) -> T {
     *variants.choose(rng).unwrap()
 }
 
+fn random_date_time(rng: &mut impl rand::Rng) -> DateTime<Local> {
+    let now = Local::now().timestamp();
+    let ten_years = 10 * 365 * 24 * 60 * 60;
+    let secs = rng.random_range(now..(now + ten_years));
+
+    DateTime::<Utc>::from_timestamp(secs, 0)
+        .unwrap()
+        .with_timezone(&Local)
+}
+
 fn random_date(rng: &mut impl rand::Rng) -> NaiveDate {
-    NaiveDate::from_ymd_opt(
-        rng.random_range(1900..=2100),
-        rng.random_range(1..=12),
-        rng.random_range(1..=28),
-    )
-    .unwrap()
+    random_date_time(rng).date_naive()
 }
 
 fn random_naive_date_time(rng: &mut impl rand::Rng) -> NaiveDateTime {
-    random_date(rng).and_time(
-        NaiveTime::from_hms_opt(
-            rng.random_range(0..24),
-            rng.random_range(0..60),
-            rng.random_range(0..60),
-        )
-        .unwrap(),
-    )
-}
-
-fn random_date_time(rng: &mut impl rand::Rng) -> DateTime<Local> {
-    random_naive_date_time(rng)
-        .and_local_timezone(Local)
-        .unwrap()
+    random_date_time(rng).naive_local()
 }
 
 fn random_option<T>(rng: &mut impl rand::Rng, value: T, none_where_possible: bool) -> Option<T> {

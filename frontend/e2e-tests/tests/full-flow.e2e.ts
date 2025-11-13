@@ -3,6 +3,7 @@ import { test } from "e2e-tests/fixtures";
 import { getTestPassword } from "e2e-tests/helpers-utils/e2e-test-api-helpers";
 import {
   createInvestigation,
+  fillCandidatesListPages,
   fillDataEntryPagesAndSave,
   uploadCandidatesAndInputHash,
   uploadElectionAndInputHash,
@@ -15,6 +16,7 @@ import { DataEntryHomePage } from "e2e-tests/page-objects/data_entry/DataEntryHo
 import { DifferencesPage } from "e2e-tests/page-objects/data_entry/DifferencesPgObj";
 import { ExtraInvestigationPage } from "e2e-tests/page-objects/data_entry/ExtraInvestigationPgObj";
 import { ProgressList } from "e2e-tests/page-objects/data_entry/ProgressListPgObj";
+import { VotersAndVotesPage } from "e2e-tests/page-objects/data_entry/VotersAndVotesPgObj";
 import { CheckAndSavePgObj } from "e2e-tests/page-objects/election/create/CheckAndSavePgObj";
 import { CountingMethodTypePgObj } from "e2e-tests/page-objects/election/create/CountingMethodTypePgObj";
 import { NumberOfVotersPgObj } from "e2e-tests/page-objects/election/create/NumberOfVotersPgObj";
@@ -25,6 +27,7 @@ import { ElectionReport } from "e2e-tests/page-objects/election/ElectionReportPg
 import { ElectionsOverviewPgObj } from "e2e-tests/page-objects/election/ElectionsOverviewPgObj";
 import { ElectionStatus } from "e2e-tests/page-objects/election/ElectionStatusPgObj";
 import { FinishDataEntry } from "e2e-tests/page-objects/election/FinishDataEntryPgObj";
+import { AddInvestigationPgObj } from "e2e-tests/page-objects/investigations/AddInvestigationPgObj";
 import { InvestigationFindingsPgObj } from "e2e-tests/page-objects/investigations/InvestigationFindingsPgObj";
 import { InvestigationOverviewPgObj } from "e2e-tests/page-objects/investigations/InvestigationOverviewPgObj";
 import { CoordinatorNavBarPgObj } from "e2e-tests/page-objects/nav_bar/CoordinatorNavBarPgObj";
@@ -42,6 +45,13 @@ const investigations = [
     reason: "Reden",
     findings: "Geen probleem",
     correctedResults: false,
+  },
+  {
+    number: "5",
+    name: "Sportfondsenbad",
+    reason: "Stembureau vergeten te importeren",
+    findings: "Stembureau toegevoegd en ingevoerd",
+    correctedResults: true,
   },
 ];
 
@@ -221,6 +231,40 @@ test.describe("full flow", () => {
     await electionDetailsPage.newSessionModalConfirmButton.click();
   });
 
+  test("add missing polling station", async ({ page }) => {
+    await page.goto("/account/login");
+
+    const loginPage = new LoginPgObj(page);
+    await loginPage.login("coordinator1", getTestPassword("coordinator1"));
+
+    const overviewPage = new ElectionsOverviewPgObj(page);
+    await expect(overviewPage.header).toBeVisible();
+    await overviewPage.findElectionRowById(electionId!).click();
+
+    const electionDetailsPage = new ElectionDetailsPgObj(page);
+    await expect(electionDetailsPage.header).toContainText("Gemeenteraad Test 2022");
+    await electionDetailsPage.investigationsOverviewButton.click();
+
+    const investigationsOverviewPage = new InvestigationOverviewPgObj(page);
+    await investigationsOverviewPage.addInvestigationButton.click();
+
+    const addInvestigationPage = new AddInvestigationPgObj(page);
+    await expect(addInvestigationPage.header).toBeVisible();
+    await addInvestigationPage.addPollingStation.click();
+
+    const form = new PollingStationFormPgObj(page);
+
+    await form.fillIn({
+      number: 5,
+      name: "Sportfondsenbad",
+    });
+
+    await form.create.click();
+
+    const pollingStationListPage = new PollingStationListPgObj(page);
+    expect(await pollingStationListPage.alert.textContent()).toContain("Stembureau 5 (Sportfondsenbad) toegevoegd");
+  });
+
   for (const station of investigations) {
     test(`create investigation for ${station.name}`, async ({ page }) => {
       await page.goto("/account/login");
@@ -324,6 +368,43 @@ test.describe("full flow", () => {
 
       const checkAndSavePage = new CheckAndSavePage(page);
       await checkAndSavePage.save.click();
+    });
+  }
+
+  for (const typist of ["typist1", "typist2"]) {
+    test(`data entry for new pollings station with ${typist}`, async ({ page }) => {
+      await page.goto("/account/login");
+
+      const loginPage = new LoginPgObj(page);
+      await loginPage.login(typist, getTestPassword(typist));
+
+      const overviewPage = new ElectionsOverviewPgObj(page);
+      await expect(overviewPage.header).toBeVisible();
+      await overviewPage.findElectionRowById(electionId!).click();
+
+      const dataEntryHomePage = new DataEntryHomePage(page);
+      await expect(dataEntryHomePage.fieldset).toBeVisible();
+      await dataEntryHomePage.pollingStationNumber.fill("5");
+      await expect(dataEntryHomePage.pollingStationFeedback).toContainText("Sportfondsenbad");
+      await dataEntryHomePage.clickStart();
+
+      const votersAndVotesPage = new VotersAndVotesPage(page);
+      await expect(votersAndVotesPage.fieldset).toBeVisible();
+      await votersAndVotesPage.fillInPageAndClickNext(
+        noRecountNoDifferencesDataEntry.voters_counts,
+        noRecountNoDifferencesDataEntry.votes_counts,
+      );
+
+      const differencesPage = new DifferencesPage(page);
+      await expect(differencesPage.fieldset).toBeVisible();
+      await differencesPage.fillInPageAndClickNext(noRecountNoDifferencesDataEntry.differences_counts);
+
+      await fillCandidatesListPages(page, noRecountNoDifferencesDataEntry);
+
+      const checkAndSavePage = new CheckAndSavePage(page);
+      await checkAndSavePage.save.click();
+
+      await expect(dataEntryHomePage.dataEntrySaved).toBeVisible();
     });
   }
 

@@ -64,7 +64,7 @@ async fn test_election_details_works(pool: SqlitePool) {
     );
     assert_eq!(body.committee_sessions.len(), 2);
     assert_eq!(body.election.name, "Corrigendum 2026");
-    assert_eq!(body.polling_stations.len(), 1);
+    assert_eq!(body.polling_stations.len(), 2);
     assert!(
         body.polling_stations
             .iter()

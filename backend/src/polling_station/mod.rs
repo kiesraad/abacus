@@ -119,7 +119,9 @@ async fn polling_station_create(
         )
         .await?;
 
-    if committee_session.status == CommitteeSessionStatus::Created {
+    if committee_session.status == CommitteeSessionStatus::Created
+        && !committee_session.is_next_session()
+    {
         change_committee_session_status(
             &mut tx,
             committee_session.id,

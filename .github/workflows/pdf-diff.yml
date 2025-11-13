@@ -1,4 +1,4 @@
-name: PDFs model changes
+name: Track PDF model changes
 
 on:
   workflow_dispatch:
@@ -13,6 +13,7 @@ env:
 
 jobs:
   diff:
+    name: Diff PDFs
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -43,105 +44,109 @@ jobs:
         run: cargo run --bin gen-pdf --features embed-typst -- --directory "$HEAD_REF"
       - name: Install diff-pdf
         run: sudo apt-get update && sudo apt-get install -y diff-pdf-wx
-      - name: Diff PDFs
-        id: diff_pdfs
-        shell: bash
-        run: |
-          set -euo pipefail
-          BASE_DIR="tmp-pdf-gen/main"
-          HEAD_DIR="tmp-pdf-gen/${HEAD_REF}"
-          DIFF_DIR="tmp-pdf-gen/diffs"
-          mkdir -p "$DIFF_DIR"
-          touch "$DIFF_DIR/.keep"
+      - name: Generate PDF diff summary
+        id: diff_summary
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('node:fs');
+            const path = require('node:path');
+            const {spawnSync} = require('node:child_process');
 
-          base_list=$(mktemp)
-          head_list=$(mktemp)
-          all_list=$(mktemp)
-          table_file=$(mktemp)
+            const headRef = process.env.HEAD_REF;
+            if (!headRef) {
+              core.setFailed('HEAD_REF is not set');
+              return;
+            }
 
-          if [ -d "$BASE_DIR" ]; then
-            (cd "$BASE_DIR" && find . -type f -name "*.pdf" -printf '%P\n') | sort > "$base_list"
-          else
-            : > "$base_list"
-          fi
+            const baseDir = path.join('backend', 'tmp-pdf-gen', 'main');
+            const headDir = path.join('backend', 'tmp-pdf-gen', headRef);
+            const diffDir = path.join('backend', 'tmp-pdf-gen', 'diffs');
 
-          if [ -d "$HEAD_DIR" ]; then
-            (cd "$HEAD_DIR" && find . -type f -name "*.pdf" -printf '%P\n') | sort > "$head_list"
-          else
-            : > "$head_list"
-          fi
+            fs.mkdirSync(diffDir, {recursive: true});
+            fs.closeSync(fs.openSync(path.join(diffDir, '.keep'), 'a'));
 
-          # Combine and deduplicate file lists
-          cat "$base_list" "$head_list" | sort -u > "$all_list"
+            const listPdfFiles = (root) => {
+              if (!fs.existsSync(root)) {
+                return [];
+              }
 
-          echo "| File | Status |" > "$table_file"
-          echo "| --- | --- |" >> "$table_file"
+              return fs
+                .readdirSync(root, {withFileTypes: true})
+                .filter((entry) => entry.isFile() && entry.name.toLowerCase().endsWith('.pdf'))
+                .map((entry) => entry.name)
+                .sort();
+            };
 
-          DIFF_FOUND=0
+            const baseFiles = listPdfFiles(baseDir);
+            const headFiles = listPdfFiles(headDir);
+            const allFiles = Array.from(new Set([...baseFiles, ...headFiles])).sort();
 
-          while IFS= read -r file_name || [ -n "$file_name" ]; do
-            if [ -z "$file_name" ]; then
-              continue
-            fi
+            const rows = [
+              '### PDF Diff Summary',
+              '',
+              '| File | Status |',
+              '| --- | --- |'
+            ];
 
-            base_file="$BASE_DIR/$file_name"
-            head_file="$HEAD_DIR/$file_name"
-            status=""
+            let diffFound = false;
 
-            if [ -f "$base_file" ] && [ -f "$head_file" ]; then
-              diff_output="$DIFF_DIR/$file_name"
-              mkdir -p "$(dirname "$diff_output")"
-              if diff-pdf --mark-differences --skip-identical --output-diff="$diff_output" "$head_file" "$base_file"; then
-                status="✅ Unchanged"
-                rm -f "$diff_output"
-                echo "No differences in $file_name"
-              else
-                exit_code=$?
-                if [ $exit_code -eq 1 ]; then
-                  status="⚠️ Changed"
-                  DIFF_FOUND=1
-                  echo "Differences found in $file_name"
-                else
-                  echo "diff-pdf failed for $file_name with exit code $exit_code" >&2
-                  exit $exit_code
-                fi
-              fi
-            elif [ -f "$head_file" ]; then
-              status="🆕 Added"
-              DIFF_FOUND=1
-              echo "File $file_name added on ${HEAD_BRANCH}"
-            else
-              status="🗑️ Removed"
-              DIFF_FOUND=1
-              echo "File $file_name removed on ${HEAD_BRANCH}"
-            fi
+            for (const relativePath of allFiles) {
+              const baseFile = path.join(baseDir, relativePath);
+              const headFile = path.join(headDir, relativePath);
+              let status = '';
 
-            printf '| %s | %s |\n' "$file_name" "$status" >> "$table_file"
-          done < "$all_list"
+              if (fs.existsSync(baseFile) && fs.existsSync(headFile)) {
+                const diffOutput = path.join(diffDir, relativePath);
+                const result = spawnSync('diff-pdf', [
+                  '--mark-differences',
+                  '--skip-identical',
+                  `--output-diff=${diffOutput}`,
+                  baseFile,
+                  headFile,
+                ], {stdio: 'inherit'});
 
-          table_contents=$(cat "$table_file")
-          {
-            echo "table<<EOF"
-            printf '%s\n' "$table_contents"
-            echo "EOF"
-          } >> "$GITHUB_OUTPUT"
+                if (result.status === 0) {
+                  status = '✅ No changes';
+                  fs.rmSync(diffOutput, {force: true});
+                  core.info(`No differences in ${relativePath}`);
+                } else if (result.status === 1) {
+                  status = '⚠️ Changes';
+                  diffFound = true;
+                  core.info(`Differences found in ${relativePath}`);
+                } else {
+                  throw new Error(`diff-pdf failed for ${relativePath} with exit code ${result.status}`);
+                }
+              } else if (fs.existsSync(headFile)) {
+                status = '🆕 Added';
+                diffFound = true;
+                core.info(`File ${relativePath} added on ${headRef}`);
+              } else {
+                status = '🗑️ Removed';
+                diffFound = true;
+                core.info(`File ${relativePath} removed on ${headRef}`);
+              }
 
-          echo "diff_found=$DIFF_FOUND" >> "$GITHUB_OUTPUT"
+              rows.push(`| ${relativePath} | ${status} |`);
+            }
+
+            rows.push('\n');
+
+            core.setOutput('table', rows.join('\n'));
+            core.setOutput('diff_found', diffFound ? '1' : '0');
       - name: Upload diff artifacts
-        if: ${{ steps.diff_pdfs.outputs.diff_found == '1' }}
+        if: ${{ steps.diff_summary.outputs.diff_found == '1' }}
         uses: actions/upload-artifact@v4
         with:
           name: pdf-diffs
           path: backend/tmp-pdf-gen/diffs/
       - name: Comment on PR with PDF diff summary
-        if: ${{ github.event_name == 'pull_request' && steps.diff_pdfs.outputs.diff_found == '1' }}
+        if: ${{ github.event_name == 'pull_request' }}
         uses: actions/github-script@v7
-        env:
-          PDF_DIFF_TABLE: ${{ steps.diff_pdfs.outputs.table }}
         with:
           script: |
             const marker = '<!-- pdf-diff-comment -->';
-            const table = process.env.PDF_DIFF_TABLE;
+            const table = ${{ toJson(steps.diff_summary.outputs.table) }};
 
             if (!table) {
               core.setFailed('PDF diff table is empty');
@@ -169,14 +174,7 @@ jobs:
               core.warning(`Unable to fetch artifacts: ${error.message}`);
             }
 
-            const body = [
-              marker,
-              '### PDF diff summary',
-              '',
-              table,
-              '',
-              artifactLine,
-            ].join('\n').trim();
+            const body = `${marker}\n${table}\n${artifactLine}`.trim();
 
             const comments = await github.paginate(github.rest.issues.listComments, {
               owner,

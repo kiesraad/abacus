@@ -11,6 +11,7 @@ import { UsersProvider } from "@/hooks/user/UsersProvider";
 import {
   dataEntryHasWarningsGetMockResponse,
   dataEntryValidGetMockResponse,
+  emptyPollingStationResults,
 } from "@/testing/api-mocks/DataEntryMockData";
 import {
   ElectionListRequestHandler,
@@ -23,6 +24,7 @@ import {
 import { overrideOnce, server } from "@/testing/server";
 import { renderReturningRouter, screen, spyOnHandler } from "@/testing/test-utils";
 import { TestUserProvider } from "@/testing/TestUserProvider";
+import { DataEntryGetResponse } from "@/types/generated/openapi";
 
 import { DetailIndexPage } from "./DetailIndexPage";
 
@@ -130,13 +132,27 @@ describe("DetailIndexPage", () => {
     expect(navigate).toHaveBeenCalledWith("/elections/1/status");
   });
 
-  test("should redirect to first section because there are no errors or warnings", async () => {
+  test("should redirect to extra_investigation when there are no errors or warnings", async () => {
     overrideOnce("get", "/api/polling_stations/5/data_entries/get", 200, dataEntryValidGetMockResponse);
 
     const router = renderPage();
 
     await waitFor(() => {
       expect(router.state.location.pathname).toEqual("/elections/1/status/5/detail/extra_investigation");
+    });
+  });
+
+  test("should redirect to voters_votes_counts for next committee sessions when there are no errors or warnings", async () => {
+    const secondCommitteeSessionGetMockResponse: DataEntryGetResponse = {
+      ...dataEntryValidGetMockResponse,
+      data: emptyPollingStationResults("CSONextSession"),
+    };
+    overrideOnce("get", "/api/polling_stations/5/data_entries/get", 200, secondCommitteeSessionGetMockResponse);
+
+    const router = renderPage();
+
+    await waitFor(() => {
+      expect(router.state.location.pathname).toEqual("/elections/1/status/5/detail/voters_votes_counts");
     });
   });
 

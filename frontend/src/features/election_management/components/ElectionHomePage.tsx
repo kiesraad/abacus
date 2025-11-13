@@ -181,8 +181,8 @@ export function ElectionHomePage() {
             <h3 className={cls.tableTitle}>{t("election_management.about_this_election")}</h3>
             <ElectionInformationTable
               election={election}
+              committeeSession={currentCommitteeSession}
               numberOfPollingStations={pollingStations.length}
-              numberOfVoters={currentCommitteeSession.number_of_voters}
             />
           </div>
           {isFirstCommitteeSession && (

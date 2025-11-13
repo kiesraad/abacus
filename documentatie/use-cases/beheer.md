@@ -61,7 +61,10 @@ __Uitbreidingen:__
 
 3a. De beheerder slaat het invoeren van stembureaus over:  
 &emsp; 3a1. (tijdens stap 5) De beheerder voert het aantal kiesgerechtigden in de gemeente handmatig in.  
-&emsp; 3a2. (na inrichten applicatie) [De beheerder of coördinator zet de stembureaus in de applicatie.](#de-beheerder-of-coördinator-zet-de-stembureaus-in-de-applicatie-zee)
+&emsp; 3a2. (na inrichten applicatie) [De beheerder of coördinator zet de stembureaus in de applicatie.](#de-beheerder-of-coördinator-gsb-zet-de-stembureaus-in-de-applicatie-zee)
+
+5a. De beheerder stelt vast dat het aantal kiesgerechtigden uit het stembureaubestand (EML 110b) niet klopt:
+&emsp; 5a1. De beheerder corrigeert het aantal kiesgerechtigden in de applicatie.
 
 5b. Het aantal kiesgerechtigden staat niet in het bestand met stembureaus (EML 110b):  
 &emsp; 5b1. De beheerder voert het aantal kiesgerechtigden handmatig in.
@@ -114,7 +117,7 @@ __Uitbreidingen:__
 3a. De stembureaus in de applicatie komen niet overeen met de vooraf gepubliceerde lijst:  
 &emsp; 3a1. De beheerder past de stembureaus aan.
 
-## De beheerder of coördinator zet de stembureaus in de applicatie (zee)
+## De beheerder of coördinator GSB zet de stembureaus in de applicatie (zee)
 
 __Niveau:__ gebruikersdoel, zee, 🌊
 

@@ -12,7 +12,7 @@ import { NumberOfVotersPage } from "./components/update/NumberOfVotersPage";
 export const electionManagementRoutes: RouteObject[] = [
   { index: true, Component: ElectionHomePage, handle: { roles: ["administrator", "coordinator"] } },
   { path: "details", Component: CommitteeSessionDetailsPage, handle: { roles: ["coordinator"] } },
-  { path: "number-of-voters", Component: NumberOfVotersPage, handle: { roles: ["coordinator"] } },
+  { path: "number-of-voters", Component: NumberOfVotersPage, handle: { roles: ["administrator", "coordinator"] } },
   {
     path: "report",
     children: [

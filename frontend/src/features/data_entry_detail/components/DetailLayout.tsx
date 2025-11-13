@@ -12,10 +12,9 @@ import { t } from "@/i18n/translate";
 import { getDataEntryStructure } from "@/utils/dataEntryStructure";
 
 import { usePollingStationDataEntryErrors } from "../hooks/usePollingStationDataEntryErrors";
-import cls from "./ResolveErrors.module.css";
-import { ResolveErrorsNavigation } from "./ResolveErrorsNavigation";
+import { DetailNavigation } from "./DetailNavigation";
 
-export function ResolveErrorsLayout() {
+export function DetailLayout() {
   const pollingStationId = useNumericParam("pollingStationId");
   const { election, pollingStation } = useElection(pollingStationId);
   const { loading, dataEntry } = usePollingStationDataEntryErrors(pollingStationId);
@@ -32,18 +31,25 @@ export function ResolveErrorsLayout() {
 
   return (
     <>
-      <PageTitle title={`${t("resolve_errors.page_title")} - Abacus`} />
+      <PageTitle
+        title={`${t(`data_entry_detail.${dataEntry.status === "first_entry_has_errors" ? "resolve_errors.page_title" : "read_only.page_title"}`)} - Abacus`}
+      />
+
       <header>
         <section className="smaller-gap">
           <PollingStationNumber>{pollingStation.number}</PollingStationNumber>
           <h1>{pollingStation.name}</h1>
-          <Badge type="first_entry_has_errors" />
+          <Badge type={dataEntry.status === "second_entry_not_started" ? "first_entry_finalised" : dataEntry.status} />
         </section>
       </header>
       <Messages />
-      <main className={cls.resolveErrors}>
+      <main>
         <StickyNav>
-          <ResolveErrorsNavigation structure={structure} validationResults={dataEntry.validation_results} />
+          <DetailNavigation
+            structure={structure}
+            status={dataEntry.status}
+            validationResults={dataEntry.validation_results}
+          />
         </StickyNav>
         <article>
           <Outlet />

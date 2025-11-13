@@ -9,7 +9,7 @@ import { getDataEntryStructure } from "@/utils/dataEntryStructure";
 import { usePollingStationDataEntryErrors } from "../hooks/usePollingStationDataEntryErrors";
 import { ReadOnlyDataEntrySection } from "./ReadOnlyDataEntrySection";
 
-export function ResolveErrorsSectionPage() {
+export function DetailSectionPage() {
   const params = useParams<{ sectionId: FormSectionId }>();
   const sectionId = params.sectionId;
   const pollingStationId = useNumericParam("pollingStationId");

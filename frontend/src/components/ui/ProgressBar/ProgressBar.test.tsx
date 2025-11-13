@@ -36,7 +36,6 @@ describe("UI Component: ProgressBar", () => {
       { percentage: 25, class: "definitive" },
       { percentage: 30, class: "first-entry-finished" },
       { percentage: 35, class: "in-progress" },
-      { percentage: 3, class: "unfinished" },
       { percentage: 5, class: "errors-and-warnings" },
       { percentage: 2, class: "not-started" },
     ];

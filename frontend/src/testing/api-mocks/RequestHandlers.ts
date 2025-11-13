@@ -125,7 +125,7 @@ import {
 import { getCommitteeSessionMockData } from "./CommitteeSessionMockData";
 import {
   claimDataEntryResponse,
-  dataEntryGetMockResponse,
+  dataEntryHasErrorsGetMockResponse,
   dataEntryStatusDifferences,
   saveDataEntryResponse,
 } from "./DataEntryMockData";
@@ -347,7 +347,7 @@ export const PollingStationDataEntryGetHandler = http.get<
   null,
   DataEntryGetResponse
 >("/api/polling_stations/5/data_entries/get" satisfies POLLING_STATION_DATA_ENTRY_GET_REQUEST_PATH, () =>
-  HttpResponse.json(dataEntryGetMockResponse, { status: 200 }),
+  HttpResponse.json(dataEntryHasErrorsGetMockResponse, { status: 200 }),
 );
 
 export const PollingStationDataEntryResolveDifferencesHandler = http.post<

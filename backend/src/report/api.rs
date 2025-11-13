@@ -28,6 +28,7 @@ use crate::{
         models::{ModelNa14_2Input, ModelNa31_2Input, ModelP2aInput, PdfFileModel, ToPdfFileModel},
     },
     polling_station::structs::PollingStation,
+    report::DEFAULT_DATE_TIME_FORMAT,
     summary::ElectionSummary,
     zip::{ZipResponse, ZipResponseError, slugify_filename},
 };
@@ -173,7 +174,10 @@ impl ResultsInput {
 
     fn into_pdf_file_models(self, xml_hash: impl Into<String>) -> Result<PdfModelList, APIError> {
         let hash = xml_hash.into();
-        let creation_date_time = self.creation_date_time.format("%d-%m-%Y %H:%M").to_string();
+        let creation_date_time = self
+            .creation_date_time
+            .format(DEFAULT_DATE_TIME_FORMAT)
+            .to_string();
 
         let overview_pdf = if let Some(overview_filename) = self.overview_pdf_filename() {
             Some(

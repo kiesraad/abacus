@@ -11,6 +11,5 @@
   "in_progress": "Invoer bezig",
   "not_started": "Werkvoorraad",
   "second_entry_in_progress": "Tweede invoer bezig",
-  "second_entry_not_started": "Tweede invoer nog niet gestart",
-  "unfinished": "Niet afgeronde invoer"
+  "second_entry_not_started": "Tweede invoer nog niet gestart"
 }

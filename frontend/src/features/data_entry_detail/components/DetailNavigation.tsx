@@ -1,19 +1,21 @@
 import { Link, useParams } from "react-router";
 
 import { ProgressList } from "@/components/ui/ProgressList/ProgressList";
+import { showIndexPage } from "@/features/data_entry_detail/utils/validationResults";
 import { useNumericParam } from "@/hooks/useNumericParam";
 import { t } from "@/i18n/translate";
-import { ValidationResults } from "@/types/generated/openapi";
+import { DataEntryStatusName, ValidationResults } from "@/types/generated/openapi";
 import { DataEntrySection } from "@/types/types";
 import { MenuStatus } from "@/types/ui";
 import { getValidationResultSetForSection } from "@/utils/ValidationResults";
 
-interface ResolveErrorsNavigationProps {
+interface DetailNavigationProps {
   structure: DataEntrySection[];
+  status: DataEntryStatusName;
   validationResults: ValidationResults;
 }
 
-export function ResolveErrorsNavigation({ structure, validationResults }: ResolveErrorsNavigationProps) {
+export function DetailNavigation({ structure, status, validationResults }: DetailNavigationProps) {
   const pollingStationId = useNumericParam("pollingStationId");
   const electionId = useNumericParam("electionId");
   const params = useParams<{ sectionId?: string }>();
@@ -40,20 +42,25 @@ export function ResolveErrorsNavigation({ structure, validationResults }: Resolv
   };
 
   const getSectionUrl = (sectionId: string): string => {
-    const basePath = `/elections/${electionId}/status/${pollingStationId}/resolve-errors`;
+    const basePath = `/elections/${electionId}/status/${pollingStationId}/detail`;
     return sectionId ? `${basePath}/${sectionId}` : basePath;
   };
 
   // Separate sections into fixed and scrollable groups
   const fixedSections = structure.filter((section) => !section.id.startsWith("political_group_votes_"));
   const politicalGroupSections = structure.filter((section) => section.id.startsWith("political_group_votes_"));
-
   return (
     <ProgressList>
       <ProgressList.Fixed>
-        <ProgressList.Item status="idle" active={currentSectionId === null}>
-          <Link to={getSectionUrl("")}>{t("resolve_errors.short_title")}</Link>
-        </ProgressList.Item>
+        {showIndexPage(validationResults) && (
+          <ProgressList.Item status="idle" active={currentSectionId === null}>
+            <Link to={getSectionUrl("")}>
+              {t(
+                `data_entry_detail.${status === "first_entry_has_errors" ? "resolve_errors.short_title" : "read_only.short_title"}`,
+              )}
+            </Link>
+          </ProgressList.Item>
+        )}
 
         {fixedSections.map((section) => (
           <ProgressList.Item

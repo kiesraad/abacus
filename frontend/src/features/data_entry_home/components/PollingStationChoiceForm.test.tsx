@@ -114,7 +114,7 @@ describe("Test PollingStationChoiceForm", () => {
         submitFeedback: "Voer een geldig nummer van een stembureau in om te beginnen",
       },
       {
-        testDescription: "finalized",
+        testDescription: "definitive",
         pollingStationInput: "34",
         selectorFeedback: "Stembureau 34 (Testplek) is al twee keer ingevoerd",
         submitFeedback: "Het stembureau dat je geselecteerd hebt kan niet meer ingevoerd worden",

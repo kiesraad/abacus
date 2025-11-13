@@ -10,6 +10,7 @@ use abacus::{
         models::{ModelNa31_2Input, ToPdfFileModel},
     },
     polling_station::PollingStation,
+    report::DEFAULT_DATE_TIME_FORMAT,
     summary::ElectionSummary,
     test_data_gen::{GenerateElectionArgs, RandomRange, parse_range},
 };
@@ -225,7 +226,9 @@ async fn export_election(
             polling_stations: polling_stations.iter().map(Clone::clone).collect(),
             election: election.clone().into(),
             hash: "0000".to_string(),
-            creation_date_time: chrono::Utc::now().format("%d-%m-%Y %H:%M").to_string(),
+            creation_date_time: chrono::Utc::now()
+                .format(DEFAULT_DATE_TIME_FORMAT)
+                .to_string(),
         }
         .to_pdf_file_model("file.pdf".to_string());
         let input_json = input.model.get_input().expect("Failed to get model input");

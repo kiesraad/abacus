@@ -5,7 +5,6 @@ import cls from "./ProgressBar.module.css";
 export type ProgressBarColorClass =
   | "default"
   | "errors-and-warnings"
-  | "unfinished"
   | "in-progress"
   | "first-entry-finished"
   | "definitive"

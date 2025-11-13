@@ -18,9 +18,9 @@ import { investigationRoutes } from "@/features/investigations/routes";
 import { logsRoutes } from "@/features/logs/routes";
 import { pollingStationsRoutes } from "@/features/polling_stations/routes";
 import { resolveDifferencesRoutes } from "@/features/resolve_differences/routes";
-import { resolveErrorsRoutes } from "@/features/resolve_errors/routes";
 import { usersRoutes } from "@/features/users/routes";
 
+import { detailRoutes } from "../features/data_entry_detail/routes";
 import { RootLayout } from "./RootLayout";
 
 const showDevPage = __SHOW_DEV_PAGE__;
@@ -71,8 +71,8 @@ export const routes: RouteObject[] = [
                     children: resolveDifferencesRoutes,
                   },
                   {
-                    path: ":pollingStationId/resolve-errors",
-                    children: resolveErrorsRoutes,
+                    path: ":pollingStationId/detail",
+                    children: detailRoutes,
                   },
                 ],
               },

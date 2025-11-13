@@ -1,10 +1,11 @@
 import type { Meta, StoryFn } from "@storybook/react-vite";
 
-import { ResolveErrorsOverview } from "@/features/resolve_errors/components/ResolveErrorsOverview";
 import { electionMockData } from "@/testing/api-mocks/ElectionMockData";
 import { validationResultMockData } from "@/testing/api-mocks/ValidationResultMockData";
 import { ValidationResults } from "@/types/generated/openapi";
 import { getDataEntryStructure } from "@/utils/dataEntryStructure";
+
+import { ErrorsAndWarningsOverview } from "./ErrorsAndWarningsOverview";
 
 const structure = getDataEntryStructure("CSOFirstSession", electionMockData);
 const results: ValidationResults = {
@@ -12,8 +13,8 @@ const results: ValidationResults = {
   warnings: [validationResultMockData.W201, validationResultMockData.W204],
 };
 
-export const ResolveErrorsOverviewStory: StoryFn = () => (
-  <ResolveErrorsOverview structure={structure} results={results} />
+export const ErrorsAndWarningsOverviewStory: StoryFn = () => (
+  <ErrorsAndWarningsOverview structure={structure} results={results} />
 );
 
 export default {} satisfies Meta;

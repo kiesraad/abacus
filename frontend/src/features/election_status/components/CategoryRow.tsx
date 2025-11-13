@@ -3,7 +3,6 @@ import { ReactNode } from "react";
 import { Badge } from "@/components/ui/Badge/Badge";
 import { ProgressBar } from "@/components/ui/ProgressBar/ProgressBar";
 import { Table } from "@/components/ui/Table/Table";
-import { getCategoryRowUrl } from "@/features/election_status/utils/utils";
 import { t } from "@/i18n/translate";
 import { DataEntryStatusName } from "@/types/generated/openapi";
 import { formatDateTime } from "@/utils/dateTime";
@@ -22,6 +21,20 @@ const SHOW_BADGE: DataEntryStatusName[] = [
   "entries_different",
   "first_entry_has_errors",
 ];
+
+function getCategoryRowUrl(
+  pollingStationStatus: DataEntryStatusName | undefined,
+  pollingStationId: number,
+): string | null {
+  switch (pollingStationStatus) {
+    case "first_entry_not_started":
+      return null;
+    case "entries_different":
+      return `./${pollingStationId}/resolve-differences`;
+    default:
+      return `./${pollingStationId}/detail`;
+  }
+}
 
 export function CategoryRow({ category, pollingStation, addLink }: CategoryRowProps): ReactNode {
   const link = getCategoryRowUrl(pollingStation.status, pollingStation.id);

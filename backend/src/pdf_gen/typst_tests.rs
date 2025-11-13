@@ -28,10 +28,11 @@ use crate::{
         },
     },
     polling_station::structs::{PollingStation, PollingStationType},
+    report::DEFAULT_DATE_TIME_FORMAT,
     summary::{ElectionSummary, PollingStationInvestigations, SumCount, SummaryDifferencesCounts},
 };
 
-use chrono::{NaiveDate, NaiveDateTime, NaiveTime};
+use chrono::{DateTime, Local, NaiveDate, NaiveDateTime, NaiveTime};
 use rand::{Rng, seq::IndexedRandom};
 use test_log::test;
 
@@ -55,7 +56,7 @@ fn random_date(rng: &mut impl rand::Rng) -> NaiveDate {
     .unwrap()
 }
 
-fn random_date_time(rng: &mut impl rand::Rng) -> NaiveDateTime {
+fn random_naive_date_time(rng: &mut impl rand::Rng) -> NaiveDateTime {
     random_date(rng).and_time(
         NaiveTime::from_hms_opt(
             rng.random_range(0..24),
@@ -64,6 +65,12 @@ fn random_date_time(rng: &mut impl rand::Rng) -> NaiveDateTime {
         )
         .unwrap(),
     )
+}
+
+fn random_date_time(rng: &mut impl rand::Rng) -> DateTime<Local> {
+    random_naive_date_time(rng)
+        .and_local_timezone(Local)
+        .unwrap()
 }
 
 fn random_option<T>(rng: &mut impl rand::Rng, value: T, none_where_possible: bool) -> Option<T> {
@@ -228,7 +235,7 @@ fn random_committee_session(
         election_id,
         location: random_string(rng, string_length),
         // a start_date_time is required for our typst models, this is validated in the code
-        start_date_time: Some(random_date_time(rng)),
+        start_date_time: Some(random_naive_date_time(rng)),
         status: random_value(
             rng,
             &[
@@ -423,7 +430,7 @@ async fn test_na_14_2() {
 
         let hash = random_string(&mut rng, 64);
         let creation_date_time = random_date_time(&mut rng)
-            .format("%Y-%m-%dT%H:%M:%S")
+            .format(DEFAULT_DATE_TIME_FORMAT)
             .to_string();
 
         let model = PdfModel::ModelNa14_2(Box::new(ModelNa14_2Input {
@@ -496,7 +503,7 @@ async fn test_na_31_2() {
         let summary = random_election_summary(&mut rng, &election, &polling_stations);
         let hash = random_string(&mut rng, 64);
         let creation_date_time = random_date_time(&mut rng)
-            .format("%Y-%m-%dT%H:%M:%S")
+            .format(DEFAULT_DATE_TIME_FORMAT)
             .to_string();
 
         let model = PdfModel::ModelNa31_2(Box::new(ModelNa31_2Input {
@@ -592,7 +599,7 @@ async fn test_p_2a() {
 
         let hash = random_string(&mut rng, 64);
         let creation_date_time = random_date_time(&mut rng)
-            .format("%Y-%m-%dT%H:%M:%S")
+            .format(DEFAULT_DATE_TIME_FORMAT)
             .to_string();
 
         let model = PdfModel::ModelP2a(Box::new(ModelP2aInput {

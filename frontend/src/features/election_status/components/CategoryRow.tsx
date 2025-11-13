@@ -22,19 +22,25 @@ const SHOW_BADGE: DataEntryStatusName[] = [
   "first_entry_has_errors",
 ];
 
+function getCategoryRowUrl(
+  pollingStationStatus: DataEntryStatusName | undefined,
+  pollingStationId: number,
+): string | null {
+  switch (pollingStationStatus) {
+    case "first_entry_not_started":
+      return null;
+    case "entries_different":
+      return `./${pollingStationId}/resolve-differences`;
+    default:
+      return `./${pollingStationId}/detail`;
+  }
+}
+
 export function CategoryRow({ category, pollingStation, addLink }: CategoryRowProps): ReactNode {
-  if (
-    addLink &&
-    (pollingStation.status === "entries_different" || pollingStation.status === "first_entry_has_errors")
-  ) {
+  const link = getCategoryRowUrl(pollingStation.status, pollingStation.id);
+  if (addLink && link) {
     return (
-      <Table.LinkRow
-        to={
-          pollingStation.status === "entries_different"
-            ? `./${pollingStation.id}/resolve-differences`
-            : `./${pollingStation.id}/resolve-errors`
-        }
-      >
+      <Table.LinkRow to={link}>
         <CategoryRowContent category={category} pollingStation={pollingStation} />
       </Table.LinkRow>
     );

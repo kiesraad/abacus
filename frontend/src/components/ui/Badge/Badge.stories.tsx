@@ -1,63 +1,60 @@
 import type { StoryObj } from "@storybook/react-vite";
 import { expect, within } from "storybook/test";
 
-import type { DataEntryStatusName } from "@/types/generated/openapi";
+import { Badge, BadgeProps, BadgeType } from "./Badge";
 
-import { Badge, BadgeProps } from "./Badge";
+const expectedBadgeLabel: Record<BadgeType, string> = {
+  first_entry_not_started: "1e invoer",
+  first_entry_in_progress: "1e invoer",
+  first_entry_has_errors: "1e invoer",
+  first_entry_finalised: "1e invoer",
+  second_entry_not_started: "2e invoer",
+  second_entry_in_progress: "2e invoer",
+  entries_different: "2e invoer",
+  definitive: "Definitief",
+};
 
-const badgeTypes: DataEntryStatusName[] = [
-  "first_entry_not_started",
-  "first_entry_in_progress",
-  "first_entry_has_errors",
-  "second_entry_not_started",
-  "second_entry_in_progress",
-  "entries_different",
-  "definitive",
-];
+const badgeTypes = Object.keys(expectedBadgeLabel) as BadgeType[];
 
-export const AllBadges: StoryObj = {
+export const Badges: StoryObj = {
   render: () => {
     return (
       <>
         {badgeTypes.map((type) => (
-          <div id={type} key={type}>
-            <Badge type={type} showIcon />
-          </div>
+          <Badge id={type} key={type} type={type} />
         ))}
       </>
     );
   },
 
   play: async ({ canvas }) => {
-    const notStartedBadge = canvas.getByTestId("first_entry_not_started");
-    await expect(notStartedBadge).toBeVisible();
-    await expect(notStartedBadge).toHaveTextContent("1e invoer");
-    await expect(within(notStartedBadge).queryByRole("img")).toBeNull();
+    for (const badgeType of badgeTypes) {
+      const badge = canvas.getByTestId(badgeType);
+      await expect(badge).toHaveTextContent(expectedBadgeLabel[badgeType]);
+      await expect(within(badge).queryByRole("img")).toBeNull();
+      await expect(badge.className, "there should be a css class defined for this type").toContain(badgeType);
+    }
+  },
+};
 
-    const firstEntryInProgressBadge = canvas.getByTestId("first_entry_in_progress");
-    await expect(firstEntryInProgressBadge).toBeVisible();
-    await expect(firstEntryInProgressBadge).toHaveTextContent("1e invoer");
-    await expect(within(firstEntryInProgressBadge).getByRole("img")).toHaveAttribute("data-icon", "IconEdit");
+export const BadgesWithIcons: StoryObj = {
+  render: () => {
+    return (
+      <>
+        {badgeTypes.map((type) => (
+          <Badge id={type} key={type} type={type} showIcon />
+        ))}
+      </>
+    );
+  },
 
-    const secondEntryBadge = canvas.getByTestId("second_entry_not_started");
-    await expect(secondEntryBadge).toBeVisible();
-    await expect(secondEntryBadge).toHaveTextContent("2e invoer");
-    await expect(within(secondEntryBadge).queryByRole("img")).toBeNull();
+  play: async ({ canvas }) => {
+    const badgesWithIcons = badgeTypes.filter((badgeType) => {
+      const badge = canvas.getByTestId(badgeType);
+      return within(badge).queryByRole("img") !== null;
+    });
 
-    const secondEntryInProgressBadge = canvas.getByTestId("second_entry_in_progress");
-    await expect(secondEntryInProgressBadge).toBeVisible();
-    await expect(secondEntryInProgressBadge).toHaveTextContent("2e invoer");
-    await expect(within(secondEntryInProgressBadge).getByRole("img")).toHaveAttribute("data-icon", "IconEdit");
-
-    const entriesDifferentBadge = canvas.getByTestId("entries_different");
-    await expect(entriesDifferentBadge).toBeVisible();
-    await expect(entriesDifferentBadge).toHaveTextContent("2e invoer");
-    await expect(within(entriesDifferentBadge).queryByRole("img")).toBeNull();
-
-    const definitiveBadge = canvas.getByTestId("definitive");
-    await expect(definitiveBadge).toBeVisible();
-    await expect(definitiveBadge).toHaveTextContent("Definitief");
-    await expect(within(definitiveBadge).queryByRole("img")).toBeNull();
+    await expect(badgesWithIcons).toEqual(["first_entry_in_progress", "second_entry_in_progress"]);
   },
 };
 

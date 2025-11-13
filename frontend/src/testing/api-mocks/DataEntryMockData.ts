@@ -1,6 +1,6 @@
-import { getEmptyDataEntryRequest } from "@/features/data_entry/testing/mock-data";
 import {
   ClaimDataEntryResponse,
+  CommonPollingStationResults,
   DataEntryGetDifferencesResponse,
   DataEntryGetResponse,
   PollingStationResults,
@@ -16,53 +16,71 @@ export const emptyValidationResults: ValidationResults = {
   warnings: [],
 };
 
-export const emptyData: PollingStationResults = {
-  model: "CSOFirstSession",
-  extra_investigation: {
-    extra_investigation_other_reason: { yes: false, no: false },
-    ballots_recounted_extra_investigation: { yes: false, no: false },
-  },
-  counting_differences_polling_station: {
-    unexplained_difference_ballots_voters: { yes: false, no: false },
-    difference_ballots_per_list: { yes: false, no: false },
-  },
-  voters_counts: {
-    poll_card_count: 0,
-    proxy_certificate_count: 0,
-    total_admitted_voters_count: 0,
-  },
-  votes_counts: {
-    political_group_total_votes: electionMockData.political_groups.map((pg) => ({
-      number: pg.number,
-      total: 0,
-    })),
-    total_votes_candidates_count: 0,
-    blank_votes_count: 0,
-    invalid_votes_count: 0,
-    total_votes_cast_count: 0,
-  },
-  differences_counts: {
-    more_ballots_count: 0,
-    fewer_ballots_count: 0,
-    compare_votes_cast_admitted_voters: {
-      admitted_voters_equal_votes_cast: false,
-      votes_cast_greater_than_admitted_voters: false,
-      votes_cast_smaller_than_admitted_voters: false,
+export function emptyPollingStationResults(
+  model: "CSOFirstSession" | "CSONextSession" = "CSOFirstSession",
+): PollingStationResults {
+  const commonPollingStationResults: CommonPollingStationResults = {
+    voters_counts: {
+      poll_card_count: 0,
+      proxy_certificate_count: 0,
+      total_admitted_voters_count: 0,
     },
-    difference_completely_accounted_for: { yes: false, no: false },
-  },
-  political_group_votes: electionMockData.political_groups.map((group) => ({
-    number: group.number,
-    total: 0,
-    candidate_votes: group.candidates.map((candidate) => ({
-      number: candidate.number,
-      votes: 0,
+    votes_counts: {
+      political_group_total_votes: electionMockData.political_groups.map((pg) => ({
+        number: pg.number,
+        total: 0,
+      })),
+      total_votes_candidates_count: 0,
+      blank_votes_count: 0,
+      invalid_votes_count: 0,
+      total_votes_cast_count: 0,
+    },
+    differences_counts: {
+      more_ballots_count: 0,
+      fewer_ballots_count: 0,
+      compare_votes_cast_admitted_voters: {
+        admitted_voters_equal_votes_cast: false,
+        votes_cast_greater_than_admitted_voters: false,
+        votes_cast_smaller_than_admitted_voters: false,
+      },
+      difference_completely_accounted_for: { yes: false, no: false },
+    },
+    political_group_votes: electionMockData.political_groups.map((group) => ({
+      number: group.number,
+      total: 0,
+      candidate_votes: group.candidates.map((candidate) => ({
+        number: candidate.number,
+        votes: 0,
+      })),
     })),
-  })),
-};
+  };
+
+  switch (model) {
+    case "CSOFirstSession":
+      return {
+        model,
+        extra_investigation: {
+          extra_investigation_other_reason: { yes: false, no: false },
+          ballots_recounted_extra_investigation: { yes: false, no: false },
+        },
+        counting_differences_polling_station: {
+          unexplained_difference_ballots_voters: { yes: false, no: false },
+          difference_ballots_per_list: { yes: false, no: false },
+        },
+        ...commonPollingStationResults,
+      };
+    case "CSONextSession":
+      return {
+        model,
+        ...commonPollingStationResults,
+      };
+    default:
+      throw new Error(`Unknown model ${model}`);
+  }
+}
 
 export const claimDataEntryResponse: ClaimDataEntryResponse = {
-  data: emptyData,
+  data: emptyPollingStationResults(),
   validation_results: emptyValidationResults,
   client_state: null,
 };
@@ -196,12 +214,32 @@ export const dataEntryStatusDifferences: DataEntryGetDifferencesResponse = {
   },
 };
 
-export const dataEntryGetMockResponse: DataEntryGetResponse = {
+export const dataEntryHasErrorsGetMockResponse: DataEntryGetResponse = {
   user_id: 3,
-  data: getEmptyDataEntryRequest().data,
-  status: "first_entry_in_progress",
+  data: emptyPollingStationResults(),
+  status: "first_entry_has_errors",
   validation_results: {
     errors: [validationResultMockData.F201],
     warnings: [validationResultMockData.W001, validationResultMockData.W201, validationResultMockData.W202],
+  },
+};
+
+export const dataEntryHasWarningsGetMockResponse: DataEntryGetResponse = {
+  user_id: 3,
+  data: emptyPollingStationResults(),
+  status: "second_entry_not_started",
+  validation_results: {
+    errors: [],
+    warnings: [validationResultMockData.W001, validationResultMockData.W201, validationResultMockData.W202],
+  },
+};
+
+export const dataEntryValidGetMockResponse: DataEntryGetResponse = {
+  user_id: 3,
+  data: emptyPollingStationResults(),
+  status: "second_entry_not_started",
+  validation_results: {
+    errors: [],
+    warnings: [],
   },
 };

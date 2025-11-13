@@ -67,7 +67,8 @@
 
 .first_entry_not_started,
 .first_entry_in_progress,
-.first_entry_has_errors {
+.first_entry_has_errors,
+.first_entry_finalised {
   background: var(--badge-first-entry-bg);
   color: var(--badge-first-entry);
 }

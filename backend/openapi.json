@@ -2255,7 +2255,7 @@
             }
           },
           "404": {
-            "description": "No data entry with accepted errors found",
+            "description": "Data entry not found",
             "content": {
               "application/json": {
                 "schema": {
@@ -2824,6 +2824,16 @@
           },
           "409": {
             "description": "Request cannot be completed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid data",
             "content": {
               "application/json": {
                 "schema": {

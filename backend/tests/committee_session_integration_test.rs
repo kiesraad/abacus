@@ -87,15 +87,6 @@ async fn test_committee_session_delete_ok_status_created(pool: SqlitePool) {
     let election_id = 7;
     let committee_session_id = 704;
 
-    shared::change_status_committee_session(
-        &addr,
-        &cookie,
-        election_id,
-        committee_session_id,
-        CommitteeSessionStatus::Created,
-    )
-    .await;
-
     let committee_session =
         shared::get_election_committee_session(&addr, &cookie, election_id).await;
     assert_eq!(committee_session.status, CommitteeSessionStatus::Created);

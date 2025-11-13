@@ -483,7 +483,7 @@
             if cv.votes == none {
               table.cell(inset: 1pt, empty_grid(cells: corrected_cells, paint: luma(213)))
             } else {
-              table.cell(align: right + horizon, text(number-width: "tabular", if not with_previous_votes or previous_votes != cv.votes { fmt-number(cv.votes) } else { " " }))
+              table.cell(align: right + horizon, text(number-width: "tabular", if not with_previous_votes or previous_votes != cv.votes { fmt-number(cv.votes + 1) } else { " " }))
             },
           )
         }.flatten(),
@@ -550,7 +550,7 @@
     if total == none {
       grid.cell(stroke: 0.5pt + black, inset: 0pt, empty_grid(cells: 5, thickness: 0.5pt))
     } else {
-      grid.cell(stroke: 0.5pt + black, if not with_previous_votes or previous_total != total { fmt-number(total, zero: "0") } else { " " })
+      grid.cell(stroke: 0.5pt + black, if not with_previous_votes or previous_total != total { fmt-number(total + 5, zero: "0") } else { " " })
     },
   ))
 

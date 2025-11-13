@@ -59,12 +59,15 @@ jobs:
               return;
             }
 
-            const baseDir = path.join('backend', 'tmp-pdf-gen', 'main');
-            const headDir = path.join('backend', 'tmp-pdf-gen', headRef);
-            const diffDir = path.join('backend', 'tmp-pdf-gen', 'diffs');
+            const pdfRoot = path.join('backend', 'tmp-pdf-gen');
+            const dirs = {
+              base: path.join(pdfRoot, 'main'),
+              head: path.join(pdfRoot, headRef),
+              diff: path.join(pdfRoot, 'diffs'),
+            };
 
-            fs.mkdirSync(diffDir, {recursive: true});
-            fs.closeSync(fs.openSync(path.join(diffDir, '.keep'), 'a'));
+            fs.mkdirSync(dirs.diff, {recursive: true});
+            fs.closeSync(fs.openSync(path.join(dirs.diff, '.keep'), 'a'));
 
             const listPdfFiles = (root) => {
               if (!fs.existsSync(root)) {
@@ -74,13 +77,12 @@ jobs:
               return fs
                 .readdirSync(root, {withFileTypes: true})
                 .filter((entry) => entry.isFile() && entry.name.toLowerCase().endsWith('.pdf'))
-                .map((entry) => entry.name)
-                .sort();
+                .map((entry) => entry.name);
             };
 
-            const baseFiles = listPdfFiles(baseDir);
-            const headFiles = listPdfFiles(headDir);
-            const allFiles = Array.from(new Set([...baseFiles, ...headFiles])).sort();
+            const allFiles = Array.from(
+              new Set([...listPdfFiles(dirs.base), ...listPdfFiles(dirs.head)])
+            ).sort();
 
             const rows = [
               '### PDF Diff Summary',
@@ -89,16 +91,25 @@ jobs:
               '| --- | --- |'
             ];
 
+            const statusLabels = {
+              identical: '✅ No changes',
+              diff: '⚠️ Changes',
+              added: '🆕 Added',
+              removed: '🗑️ Removed',
+            };
+
             let diffFound = false;
 
             for (const relativePath of allFiles) {
-              const baseFile = path.join(baseDir, relativePath);
-              const headFile = path.join(headDir, relativePath);
+              const baseFile = path.join(dirs.base, relativePath);
+              const headFile = path.join(dirs.head, relativePath);
+              const hasBase = fs.existsSync(baseFile);
+              const hasHead = fs.existsSync(headFile);
               let status = '';
 
-              if (fs.existsSync(baseFile) && fs.existsSync(headFile)) {
-                const diffOutput = path.join(diffDir, relativePath);
-                const result = spawnSync('diff-pdf', [
+              if (hasBase && hasHead) {
+                const diffOutput = path.join(dirs.diff, relativePath);
+                const {status: exitCode} = spawnSync('diff-pdf', [
                   '--mark-differences',
                   '--skip-identical',
                   `--output-diff=${diffOutput}`,
@@ -106,23 +117,23 @@ jobs:
                   headFile,
                 ], {stdio: 'inherit'});
 
-                if (result.status === 0) {
-                  status = '✅ No changes';
+                if (exitCode === 0) {
+                  status = statusLabels.identical;
                   fs.rmSync(diffOutput, {force: true});
                   core.info(`No differences in ${relativePath}`);
-                } else if (result.status === 1) {
-                  status = '⚠️ Changes';
+                } else if (exitCode === 1) {
+                  status = statusLabels.diff;
                   diffFound = true;
                   core.info(`Differences found in ${relativePath}`);
                 } else {
-                  throw new Error(`diff-pdf failed for ${relativePath} with exit code ${result.status}`);
+                  throw new Error(`diff-pdf failed for ${relativePath} with exit code ${exitCode}`);
                 }
-              } else if (fs.existsSync(headFile)) {
-                status = '🆕 Added';
+              } else if (hasHead) {
+                status = statusLabels.added;
                 diffFound = true;
                 core.info(`File ${relativePath} added on ${headRef}`);
               } else {
-                status = '🗑️ Removed';
+                status = statusLabels.removed;
                 diffFound = true;
                 core.info(`File ${relativePath} removed on ${headRef}`);
               }
@@ -130,11 +141,12 @@ jobs:
               rows.push(`| ${relativePath} | ${status} |`);
             }
 
-            rows.push('\n');
+            rows.push('');
 
             core.setOutput('table', rows.join('\n'));
             core.setOutput('diff_found', diffFound ? '1' : '0');
       - name: Upload diff artifacts
+        id: artifact-upload
         if: ${{ steps.diff_summary.outputs.diff_found == '1' }}
         uses: actions/upload-artifact@v4
         with:
@@ -147,6 +159,7 @@ jobs:
           script: |
             const marker = '<!-- pdf-diff-comment -->';
             const table = ${{ toJson(steps.diff_summary.outputs.table) }};
+            const artifactId = ${{ toJson(steps.artifact-upload.outputs['artifact-id'] || '') }};
 
             if (!table) {
               core.setFailed('PDF diff table is empty');
@@ -156,25 +169,11 @@ jobs:
             const {owner, repo} = context.repo;
             const issue_number = context.issue.number;
 
-            let artifactLine = '';
+            const artifactLine = artifactId
+              ? `[Download ZIP file containing PDF files with the visual differences](https://github.com/${owner}/${repo}/actions/runs/${context.runId}/artifacts/${artifactId})`
+              : '';
 
-            try {
-              const {data} = await github.rest.actions.listWorkflowRunArtifacts({
-                owner,
-                repo,
-                run_id: context.runId,
-                per_page: 100,
-              });
-              const artifact = data.artifacts.find(entry => entry.name === 'pdf-diffs');
-              if (artifact) {
-                const artifactUrl = `https://github.com/${owner}/${repo}/actions/runs/${context.runId}/artifacts/${artifact.id}`;
-                artifactLine = `[Download ZIP file containing PDF files with the visual differences](${artifactUrl})`;
-              }
-            } catch (error) {
-              core.warning(`Unable to fetch artifacts: ${error.message}`);
-            }
-
-            const body = `${marker}\n${table}\n${artifactLine}`.trim();
+            const body = [marker, table, artifactLine].filter(Boolean).join('\n');
 
             const comments = await github.paginate(github.rest.issues.listComments, {
               owner,

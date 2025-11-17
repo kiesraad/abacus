@@ -799,7 +799,7 @@ mod tests {
             first_entry_user_id: 5,
             second_entry_user_id: 6,
             finished_at: Utc::now(),
-            has_warnings: false,
+            finalised_with_warnings: false,
         });
         make_definitive(
             &mut conn,

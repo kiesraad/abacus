@@ -22,7 +22,7 @@ const mockStatuses: ElectionStatusResponseEntry[] = [
     status: "second_entry_not_started",
     first_entry_user_id: 1,
     finished_at: today.toISOString(),
-    has_warnings: false,
+    finalised_with_warnings: false,
   },
   {
     polling_station_id: 3,
@@ -46,14 +46,14 @@ const mockStatuses: ElectionStatusResponseEntry[] = [
     first_entry_progress: 100,
     second_entry_progress: 100,
     finished_at: today.toISOString(),
-    has_warnings: false,
+    finalised_with_warnings: false,
   },
   {
     polling_station_id: 6,
     status: "second_entry_not_started",
     first_entry_user_id: 2,
     finished_at: today.toISOString(),
-    has_warnings: true,
+    finalised_with_warnings: true,
   },
   {
     polling_station_id: 7,

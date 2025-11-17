@@ -223,6 +223,9 @@ test.describe("full flow", () => {
     const electionDetailsPage = new ElectionDetailsPgObj(page);
     await electionDetailsPage.newSessionButton.click();
     await electionDetailsPage.newSessionModalConfirmButton.click();
+
+    // Check after click
+    await expect(electionDetailsPage.investigationsOverviewButton).toBeVisible();
   });
 
   for (const station of investigations) {
@@ -252,6 +255,10 @@ test.describe("full flow", () => {
 
     const electionDetailsPage = new ElectionDetailsPgObj(page);
     await electionDetailsPage.startDataEntryButton.click();
+
+    // Check after click
+    const electionStatus = new ElectionStatus(page);
+    await expect(electionStatus.header).toContainText("Tweede zitting");
   });
 
   for (const station of investigations) {
@@ -328,6 +335,9 @@ test.describe("full flow", () => {
 
       const checkAndSavePage = new CheckAndSavePage(page);
       await checkAndSavePage.save.click();
+
+      // Check after click
+      await expect(dataEntryHomePage.dataEntrySaved).toBeVisible();
     });
   }
 

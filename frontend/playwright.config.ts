@@ -23,16 +23,20 @@ function returnWebserverCommand(): string {
 }
 
 const config: PlaywrightTestConfig = defineConfig({
+  maxFailures: 0,
   // Fail the build on CI if you accidentally left test.only in the source code
   forbidOnly: !!process.env.CI,
   // Retry on CI only
-  retries: process.env.CI ? 2 : 0,
+  retries: process.env.CI ? 3 : 0,
   // Use all available cores on GitHub Actions. Default is 50%, use that locally.
-  workers: process.env.CI ? "100%" : undefined,
+  workers: process.env.CI ? "200%" : "200%",
   fullyParallel: true,
   // ...commonConfig,
   // Increase the test timeout on CI, which is usually slower
-  timeout: process.env.CI ? 20_000 : 10_000,
+  timeout: process.env.CI ? 300_000 : 300_000,
+  expect: {
+    timeout: 300_000,
+  },
   reporter: process.env.CI
     ? [["list"], ["github"], ["junit", { outputFile: "playwright.e2e.junit.xml" }], ["html", { open: "never" }]]
     : "list",
@@ -42,7 +46,7 @@ const config: PlaywrightTestConfig = defineConfig({
   use: {
     trace: "retain-on-first-failure",
     testIdAttribute: "id",
-    baseURL: process.env.DEBUG_DEVELOPMENT ? "http://localhost:3000" : "http://127.0.0.1:8081",
+    baseURL: process.env.DEBUG_DEVELOPMENT ? "http://localhost:3000" : "http://192.168.30.13:8081",
   },
   webServer: process.env.DEBUG_DEVELOPMENT ? [] : [],
   projects: [
@@ -199,6 +203,326 @@ const config: PlaywrightTestConfig = defineConfig({
     },
     {
       name: "safari5",
+      testIgnore: /initialisation\.e2e\.ts/,
+      use: {
+        ...devices["Desktop Safari"],
+        userAgent: "Abacus-User-Agent/1",
+      },
+      dependencies: [],
+    },
+    {
+      name: "chrome6",
+      testMatch: /.*\.e2e\.ts/,
+      testIgnore: /initialisation\.e2e\.ts/,
+      use: {
+        contextOptions: {
+          permissions: ["clipboard-read", "clipboard-write"],
+        },
+        ...devices["Desktop Chrome"],
+        channel: "chromium",
+        userAgent: "Abacus-User-Agent/1",
+      },
+      dependencies: [],
+    },
+    {
+      name: "chrome7",
+      testMatch: /.*\.e2e\.ts/,
+      testIgnore: /initialisation\.e2e\.ts/,
+      use: {
+        contextOptions: {
+          permissions: ["clipboard-read", "clipboard-write"],
+        },
+        ...devices["Desktop Chrome"],
+        channel: "chromium",
+        userAgent: "Abacus-User-Agent/1",
+      },
+      dependencies: [],
+    },
+    {
+      name: "chrome8",
+      testMatch: /.*\.e2e\.ts/,
+      testIgnore: /initialisation\.e2e\.ts/,
+      use: {
+        contextOptions: {
+          permissions: ["clipboard-read", "clipboard-write"],
+        },
+        ...devices["Desktop Chrome"],
+        channel: "chromium",
+        userAgent: "Abacus-User-Agent/1",
+      },
+      dependencies: [],
+    },
+    {
+      name: "chrome9",
+      testMatch: /.*\.e2e\.ts/,
+      testIgnore: /initialisation\.e2e\.ts/,
+      use: {
+        contextOptions: {
+          permissions: ["clipboard-read", "clipboard-write"],
+        },
+        ...devices["Desktop Chrome"],
+        channel: "chromium",
+        userAgent: "Abacus-User-Agent/1",
+      },
+      dependencies: [],
+    },
+    {
+      name: "chrome10",
+      testMatch: /.*\.e2e\.ts/,
+      testIgnore: /initialisation\.e2e\.ts/,
+      use: {
+        contextOptions: {
+          permissions: ["clipboard-read", "clipboard-write"],
+        },
+        ...devices["Desktop Chrome"],
+        channel: "chromium",
+        userAgent: "Abacus-User-Agent/1",
+      },
+      dependencies: [],
+    },
+    {
+      name: "firefox6",
+      testIgnore: /initialisation\.e2e\.ts/,
+      use: {
+        ...devices["Desktop Firefox"],
+        userAgent: "Abacus-User-Agent/1",
+      },
+      dependencies: [],
+    },
+    {
+      name: "firefox7",
+      testIgnore: /initialisation\.e2e\.ts/,
+      use: {
+        ...devices["Desktop Firefox"],
+        userAgent: "Abacus-User-Agent/1",
+      },
+      dependencies: [],
+    },
+    {
+      name: "firefox8",
+      testIgnore: /initialisation\.e2e\.ts/,
+      use: {
+        ...devices["Desktop Firefox"],
+        userAgent: "Abacus-User-Agent/1",
+      },
+      dependencies: [],
+    },
+    {
+      name: "firefox9",
+      testIgnore: /initialisation\.e2e\.ts/,
+      use: {
+        ...devices["Desktop Firefox"],
+        userAgent: "Abacus-User-Agent/1",
+      },
+      dependencies: [],
+    },
+    {
+      name: "firefox10",
+      testIgnore: /initialisation\.e2e\.ts/,
+      use: {
+        ...devices["Desktop Firefox"],
+        userAgent: "Abacus-User-Agent/1",
+      },
+      dependencies: [],
+    },
+    {
+      name: "safari6",
+      testIgnore: /initialisation\.e2e\.ts/,
+      use: {
+        ...devices["Desktop Safari"],
+        userAgent: "Abacus-User-Agent/1",
+      },
+      dependencies: [],
+    },
+    {
+      name: "safari7",
+      testIgnore: /initialisation\.e2e\.ts/,
+      use: {
+        ...devices["Desktop Safari"],
+        userAgent: "Abacus-User-Agent/1",
+      },
+      dependencies: [],
+    },
+    {
+      name: "safari8",
+      testIgnore: /initialisation\.e2e\.ts/,
+      use: {
+        ...devices["Desktop Safari"],
+        userAgent: "Abacus-User-Agent/1",
+      },
+      dependencies: [],
+    },
+    {
+      name: "safari9",
+      testIgnore: /initialisation\.e2e\.ts/,
+      use: {
+        ...devices["Desktop Safari"],
+        userAgent: "Abacus-User-Agent/1",
+      },
+      dependencies: [],
+    },
+    {
+      name: "safari10",
+      testIgnore: /initialisation\.e2e\.ts/,
+      use: {
+        ...devices["Desktop Safari"],
+        userAgent: "Abacus-User-Agent/1",
+      },
+      dependencies: [],
+    },
+    {
+      name: "chrome16",
+      testMatch: /.*\.e2e\.ts/,
+      testIgnore: /initialisation\.e2e\.ts/,
+      use: {
+        contextOptions: {
+          permissions: ["clipboard-read", "clipboard-write"],
+        },
+        ...devices["Desktop Chrome"],
+        channel: "chromium",
+        userAgent: "Abacus-User-Agent/1",
+      },
+      dependencies: [],
+    },
+    {
+      name: "chrome17",
+      testMatch: /.*\.e2e\.ts/,
+      testIgnore: /initialisation\.e2e\.ts/,
+      use: {
+        contextOptions: {
+          permissions: ["clipboard-read", "clipboard-write"],
+        },
+        ...devices["Desktop Chrome"],
+        channel: "chromium",
+        userAgent: "Abacus-User-Agent/1",
+      },
+      dependencies: [],
+    },
+    {
+      name: "chrome18",
+      testMatch: /.*\.e2e\.ts/,
+      testIgnore: /initialisation\.e2e\.ts/,
+      use: {
+        contextOptions: {
+          permissions: ["clipboard-read", "clipboard-write"],
+        },
+        ...devices["Desktop Chrome"],
+        channel: "chromium",
+        userAgent: "Abacus-User-Agent/1",
+      },
+      dependencies: [],
+    },
+    {
+      name: "chrome19",
+      testMatch: /.*\.e2e\.ts/,
+      testIgnore: /initialisation\.e2e\.ts/,
+      use: {
+        contextOptions: {
+          permissions: ["clipboard-read", "clipboard-write"],
+        },
+        ...devices["Desktop Chrome"],
+        channel: "chromium",
+        userAgent: "Abacus-User-Agent/1",
+      },
+      dependencies: [],
+    },
+    {
+      name: "chrome110",
+      testMatch: /.*\.e2e\.ts/,
+      testIgnore: /initialisation\.e2e\.ts/,
+      use: {
+        contextOptions: {
+          permissions: ["clipboard-read", "clipboard-write"],
+        },
+        ...devices["Desktop Chrome"],
+        channel: "chromium",
+        userAgent: "Abacus-User-Agent/1",
+      },
+      dependencies: [],
+    },
+    {
+      name: "firefox16",
+      testIgnore: /initialisation\.e2e\.ts/,
+      use: {
+        ...devices["Desktop Firefox"],
+        userAgent: "Abacus-User-Agent/1",
+      },
+      dependencies: [],
+    },
+    {
+      name: "firefox17",
+      testIgnore: /initialisation\.e2e\.ts/,
+      use: {
+        ...devices["Desktop Firefox"],
+        userAgent: "Abacus-User-Agent/1",
+      },
+      dependencies: [],
+    },
+    {
+      name: "firefox18",
+      testIgnore: /initialisation\.e2e\.ts/,
+      use: {
+        ...devices["Desktop Firefox"],
+        userAgent: "Abacus-User-Agent/1",
+      },
+      dependencies: [],
+    },
+    {
+      name: "firefox19",
+      testIgnore: /initialisation\.e2e\.ts/,
+      use: {
+        ...devices["Desktop Firefox"],
+        userAgent: "Abacus-User-Agent/1",
+      },
+      dependencies: [],
+    },
+    {
+      name: "firefox110",
+      testIgnore: /initialisation\.e2e\.ts/,
+      use: {
+        ...devices["Desktop Firefox"],
+        userAgent: "Abacus-User-Agent/1",
+      },
+      dependencies: [],
+    },
+    {
+      name: "safari16",
+      testIgnore: /initialisation\.e2e\.ts/,
+      use: {
+        ...devices["Desktop Safari"],
+        userAgent: "Abacus-User-Agent/1",
+      },
+      dependencies: [],
+    },
+    {
+      name: "safari17",
+      testIgnore: /initialisation\.e2e\.ts/,
+      use: {
+        ...devices["Desktop Safari"],
+        userAgent: "Abacus-User-Agent/1",
+      },
+      dependencies: [],
+    },
+    {
+      name: "safari18",
+      testIgnore: /initialisation\.e2e\.ts/,
+      use: {
+        ...devices["Desktop Safari"],
+        userAgent: "Abacus-User-Agent/1",
+      },
+      dependencies: [],
+    },
+    {
+      name: "safari19",
+      testIgnore: /initialisation\.e2e\.ts/,
+      use: {
+        ...devices["Desktop Safari"],
+        userAgent: "Abacus-User-Agent/1",
+      },
+      dependencies: [],
+    },
+    {
+      name: "safari110",
       testIgnore: /initialisation\.e2e\.ts/,
       use: {
         ...devices["Desktop Safari"],

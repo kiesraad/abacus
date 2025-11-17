@@ -20,7 +20,7 @@ export default defineConfig((configEnv) =>
         port: 3000,
         proxy: {
           "/api": {
-            target: process.env.API_HOST ?? "http://localhost:8080",
+            target: process.env.API_HOST ?? "http://192.168.30.13:8081",
             changeOrigin: true,
           },
         },

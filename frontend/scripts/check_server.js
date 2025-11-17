@@ -1,4 +1,4 @@
-const PORT = 8080;
+const PORT = 8081;
 const TRIES = 30;
 
 // check every second whether the backend is running
@@ -9,7 +9,7 @@ async function waitForPort(port = PORT, tries = TRIES) {
 
   for (let i = 0; i < tries; i++) {
     try {
-      await fetch(`http://localhost:${port}/api/initialised`, {
+      await fetch(`http://192.168.30.13:${port}/api/initialised`, {
         signal: AbortSignal.timeout(1000),
       });
 

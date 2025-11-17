@@ -47,7 +47,7 @@ INSERT INTO committee_sessions (id, number, election_id, status, location, start
 VALUES (701, 1, 7, 'data_entry_finished', 'Grote Stad', '2026-03-19 09:15:00', 2000),
        (702, 2, 7, 'data_entry_finished', 'Grote Stad', '2026-03-19 17:15:00', 2000),
        (703, 3, 7, 'data_entry_finished', 'Grote Stad', '2026-03-19 23:15:00', 2000),
-       (704, 4, 7, 'data_entry_in_progress', '', NULL, 2000);
+       (704, 4, 7, 'created', '', NULL, 2000);
 
 INSERT INTO polling_stations (id, committee_session_id, id_prev_session, name, number, number_of_voters, polling_station_type, address,
                               postal_code, locality)

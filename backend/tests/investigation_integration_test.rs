@@ -195,24 +195,6 @@ async fn test_deletion_removes_polling_station_from_status(pool: SqlitePool) {
 
     let statuses = get_statuses(&addr, &cookie, election_id).await;
     assert_eq!(statuses.len(), 1);
-
-    // Add investigation with corrected_results: true
-    assert_eq!(
-        conclude_investigation(
-            &addr,
-            polling_station_id,
-            Some(serde_json::json!({
-                "findings": "Test findings",
-                "corrected_results": true
-            })),
-        )
-        .await
-        .status(),
-        StatusCode::OK
-    );
-
-    let statuses = get_statuses(&addr, &cookie, election_id).await;
-    assert_eq!(statuses.len(), 1);
     assert_eq!(
         statuses[&polling_station_id].status,
         DataEntryStatusName::Definitive
@@ -681,6 +663,7 @@ async fn test_cannot_conclude_update_new_polling_station_corrected_results_false
 async fn test_polling_station_corrigendum_download_with_previous_results(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let coordinator_cookie = shared::coordinator_login(&addr).await;
+    // Polling station 9 has previous results, but no investigation yet
     let polling_station_id = 9;
 
     assert_eq!(
@@ -720,14 +703,8 @@ async fn test_polling_station_corrigendum_download_with_previous_results(pool: S
 async fn test_polling_station_corrigendum_download_without_previous_results(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let coordinator_cookie = shared::coordinator_login(&addr).await;
-    let polling_station_id = 9;
-
-    assert_eq!(
-        shared::create_investigation(&addr, polling_station_id)
-            .await
-            .status(),
-        StatusCode::CREATED
-    );
+    // Polling station 11 is new and has no previous results. An investigation already exists.
+    let polling_station_id = 11;
 
     let url = format!(
         "http://{addr}/api/polling_stations/{polling_station_id}/investigation/download_corrigendum_pdf"
@@ -748,7 +725,7 @@ async fn test_polling_station_corrigendum_download_without_previous_results(pool
     assert_eq!(&content_disposition_string[..21], "attachment; filename=");
     assert_eq!(
         &content_disposition_string[21..],
-        "\"Model_Na14-2_GR2026_Stembureau_41_Bijlage_1.pdf\""
+        "\"Model_Na14-2_GR2026_Stembureau_42_Bijlage_1.pdf\""
     );
 
     let bytes = response.bytes().await.unwrap();

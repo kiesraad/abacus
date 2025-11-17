@@ -1540,13 +1540,14 @@ mod tests {
                 state AS "state: _",
                 updated_at AS "updated_at: _"
             FROM polling_station_data_entries
+            WHERE polling_station_id = 9
             "#
         )
         .fetch_all(&pool)
         .await
         .expect("No data found");
-        assert_eq!(data[0].committee_session_id, 5);
-        assert_eq!(data[1].committee_session_id, 6);
+        assert_eq!(data.len(), 1);
+        assert_eq!(data[0].committee_session_id, 6);
     }
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]

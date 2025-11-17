@@ -48,103 +48,7 @@ jobs:
         id: diff_summary
         uses: actions/github-script@v7
         with:
-          script: |
-            const fs = require('node:fs');
-            const path = require('node:path');
-            const {spawnSync} = require('node:child_process');
-
-            const headRef = process.env.HEAD_REF;
-            if (!headRef) {
-              core.setFailed('HEAD_REF is not set');
-              return;
-            }
-
-            const pdfRoot = path.join('backend', 'tmp-pdf-gen');
-            const dirs = {
-              base: path.join(pdfRoot, 'main'),
-              head: path.join(pdfRoot, headRef),
-              diff: path.join(pdfRoot, 'diffs'),
-            };
-
-            fs.mkdirSync(dirs.diff, {recursive: true});
-            fs.closeSync(fs.openSync(path.join(dirs.diff, '.keep'), 'a'));
-
-            const listPdfFiles = (root) => {
-              if (!fs.existsSync(root)) {
-                return [];
-              }
-
-              return fs
-                .readdirSync(root, {withFileTypes: true})
-                .filter((entry) => entry.isFile() && entry.name.toLowerCase().endsWith('.pdf'))
-                .map((entry) => entry.name);
-            };
-
-            const allFiles = Array.from(
-              new Set([...listPdfFiles(dirs.base), ...listPdfFiles(dirs.head)])
-            ).sort();
-
-            const rows = [
-              '### PDF Diff Summary',
-              '',
-              '| File | Status |',
-              '| --- | --- |'
-            ];
-
-            const statusLabels = {
-              identical: '✅ No changes',
-              diff: '⚠️ Changes',
-              added: '🆕 Added',
-              removed: '🗑️ Removed',
-            };
-
-            let diffFound = false;
-
-            for (const relativePath of allFiles) {
-              const baseFile = path.join(dirs.base, relativePath);
-              const headFile = path.join(dirs.head, relativePath);
-              const hasBase = fs.existsSync(baseFile);
-              const hasHead = fs.existsSync(headFile);
-              let status = '';
-
-              if (hasBase && hasHead) {
-                const diffOutput = path.join(dirs.diff, relativePath);
-                const {status: exitCode} = spawnSync('diff-pdf', [
-                  '--mark-differences',
-                  '--skip-identical',
-                  `--output-diff=${diffOutput}`,
-                  baseFile,
-                  headFile,
-                ], {stdio: 'inherit'});
-
-                if (exitCode === 0) {
-                  status = statusLabels.identical;
-                  fs.rmSync(diffOutput, {force: true});
-                  core.info(`No differences in ${relativePath}`);
-                } else if (exitCode === 1) {
-                  status = statusLabels.diff;
-                  diffFound = true;
-                  core.info(`Differences found in ${relativePath}`);
-                } else {
-                  throw new Error(`diff-pdf failed for ${relativePath} with exit code ${exitCode}`);
-                }
-              } else if (hasHead) {
-                status = statusLabels.added;
-                diffFound = true;
-                core.info(`File ${relativePath} added on ${headRef}`);
-              } else {
-                status = statusLabels.removed;
-                diffFound = true;
-                core.info(`File ${relativePath} removed on ${headRef}`);
-              }
-
-              rows.push(`| ${relativePath} | ${status} |`);
-            }
-
-            rows.push('');
-
-            core.setOutput('table', rows.join('\n'));
-            core.setOutput('diff_found', diffFound ? '1' : '0');
+          script: require('.github/workflows/script/pdf-diff.js').pdfDiff({ core });
       - name: Upload diff artifacts
         id: artifact-upload
         if: ${{ steps.diff_summary.outputs.diff_found == '1' }}
@@ -152,50 +56,12 @@ jobs:
         with:
           name: pdf-diffs
           path: backend/tmp-pdf-gen/diffs/
-      - name: Comment on PR with PDF diff summary
+      - name: Comment on PR with PDF diff summary and link to artifact
         if: ${{ github.event_name == 'pull_request' }}
-        uses: actions/github-script@v7
+        uses: marocchino/sticky-pull-request-comment@5060d4700a91de252c87eeddd2da026382d9298a #v2
+        env:
+          DOWNLOAD_LINK: "[Download ZIP file containing PDF files with the visual differences](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}/artifacts/${{ steps.artifact-upload.outputs['artifact-id'] }})"
         with:
-          script: |
-            const marker = '<!-- pdf-diff-comment -->';
-            const table = ${{ toJson(steps.diff_summary.outputs.table) }};
-            const artifactId = ${{ toJson(steps.artifact-upload.outputs['artifact-id'] || '') }};
-
-            if (!table) {
-              core.setFailed('PDF diff table is empty');
-              return;
-            }
-
-            const {owner, repo} = context.repo;
-            const issue_number = context.issue.number;
-
-            const artifactLine = artifactId
-              ? `[Download ZIP file containing PDF files with the visual differences](https://github.com/${owner}/${repo}/actions/runs/${context.runId}/artifacts/${artifactId})`
-              : '';
-
-            const body = [marker, table, artifactLine].filter(Boolean).join('\n');
-
-            const comments = await github.paginate(github.rest.issues.listComments, {
-              owner,
-              repo,
-              issue_number,
-              per_page: 100,
-            });
-
-            const existing = comments.find(comment => comment.body && comment.body.includes(marker));
-
-            if (existing) {
-              await github.rest.issues.updateComment({
-                owner,
-                repo,
-                comment_id: existing.id,
-                body,
-              });
-            } else {
-              await github.rest.issues.createComment({
-                owner,
-                repo,
-                issue_number,
-                body,
-              });
-            }
+          message: |
+            ${{ steps.diff_summary.outputs.table }}
+            ${{ steps.artifact-upload.outputs['artifact-id'] && env.DOWNLOAD_LINK }}

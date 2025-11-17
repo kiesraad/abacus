@@ -48,7 +48,7 @@ jobs:
         id: diff_summary
         uses: actions/github-script@v7
         with:
-          script: require('.github/workflows/script/pdf-diff.js').pdfDiff({ core });
+          script: require('.github/workflows/scripts/pdf-diff.js').pdfDiff({ core });
       - name: Upload diff artifacts
         id: artifact-upload
         if: ${{ steps.diff_summary.outputs.diff_found == '1' }}

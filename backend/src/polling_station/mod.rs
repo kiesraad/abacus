@@ -13,7 +13,7 @@ pub use self::structs::*;
 use crate::{
     APIError, AppState, ErrorResponse, SqlitePoolExt,
     audit_log::{AuditEvent, AuditService, PollingStationImportDetails},
-    authentication::{AdminOrCoordinator, User},
+    authentication::{AdminOrCoordinator, User, error::AuthenticationError},
     committee_session::{
         repository::get_election_committee_session,
         status::{CommitteeSessionStatus, change_committee_session_status},
@@ -97,7 +97,7 @@ async fn polling_station_list(
     ),
 )]
 async fn polling_station_create(
-    _user: AdminOrCoordinator,
+    user: AdminOrCoordinator,
     State(pool): State<SqlitePool>,
     Path(election_id): Path<u32>,
     audit_service: AuditService,
@@ -108,6 +108,13 @@ async fn polling_station_create(
     // Check if the election and a committee session exist, will respond with NOT_FOUND otherwise
     crate::election::repository::get(&mut tx, election_id).await?;
     let committee_session = get_election_committee_session(&mut tx, election_id).await?;
+
+    if !user.is_coordinator()
+        && committee_session.status != CommitteeSessionStatus::Created
+        && committee_session.status != CommitteeSessionStatus::DataEntryNotStarted
+    {
+        return Err(AuthenticationError::Forbidden.into());
+    }
 
     let polling_station = repository::create(&mut tx, election_id, new_polling_station).await?;
 
@@ -189,7 +196,7 @@ async fn polling_station_get(
     ),
 )]
 async fn polling_station_update(
-    _user: AdminOrCoordinator,
+    user: AdminOrCoordinator,
     State(pool): State<SqlitePool>,
     audit_service: AuditService,
     Path((election_id, polling_station_id)): Path<(u32, u32)>,
@@ -200,6 +207,13 @@ async fn polling_station_update(
     // Check if the election and a committee session exist, will respond with NOT_FOUND otherwise
     crate::election::repository::get(&mut tx, election_id).await?;
     let committee_session = get_election_committee_session(&mut tx, election_id).await?;
+
+    if !user.is_coordinator()
+        && committee_session.status != CommitteeSessionStatus::Created
+        && committee_session.status != CommitteeSessionStatus::DataEntryNotStarted
+    {
+        return Err(AuthenticationError::Forbidden.into());
+    }
 
     let polling_station = repository::update(
         &mut tx,
@@ -250,7 +264,7 @@ async fn polling_station_update(
     ),
 )]
 async fn polling_station_delete(
-    _user: AdminOrCoordinator,
+    user: AdminOrCoordinator,
     State(pool): State<SqlitePool>,
     audit_service: AuditService,
     Path((election_id, polling_station_id)): Path<(u32, u32)>,
@@ -260,6 +274,13 @@ async fn polling_station_delete(
     // Check if the election and a committee session exist, will respond with NOT_FOUND otherwise
     crate::election::repository::get(&mut tx, election_id).await?;
     let committee_session = get_election_committee_session(&mut tx, election_id).await?;
+
+    if !user.is_coordinator()
+        && committee_session.status != CommitteeSessionStatus::Created
+        && committee_session.status != CommitteeSessionStatus::DataEntryNotStarted
+    {
+        return Err(AuthenticationError::Forbidden.into());
+    }
 
     let polling_station =
         repository::get_for_election(&mut tx, election_id, polling_station_id).await?;

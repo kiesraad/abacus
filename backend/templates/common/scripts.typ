@@ -479,11 +479,20 @@
               weight: "bold",
               [#cv.candidate.number],
             )),
-            ..cell_if(with_previous_votes, table.cell(inset: 8pt, fill: luma(213), align(right, prefilled_number(previous_votes)))),
+            ..cell_if(with_previous_votes, table.cell(inset: 8pt, fill: luma(213), align(right, prefilled_number(previous_votes, zero: if previous_votes == 0 { "-" } else { "0" })))),
             if cv.votes == none {
               table.cell(inset: 1pt, empty_grid(cells: corrected_cells, paint: luma(213)))
             } else {
-              table.cell(align: right + horizon, text(number-width: "tabular", if not with_previous_votes or previous_votes != cv.votes { fmt-number(cv.votes) } else { " " }))
+              table.cell(
+                align: right + horizon,
+                text(number-width: "tabular",
+                  if not with_previous_votes or previous_votes != cv.votes {
+                    fmt-number(cv.votes, zero: if previous_votes == 0 { "-" } else { "0" })
+                  } else {
+                    " "
+                  }
+                )
+              )
             },
           )
         }.flatten(),

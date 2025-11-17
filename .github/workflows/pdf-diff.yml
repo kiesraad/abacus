@@ -21,7 +21,6 @@ jobs:
     env:
       CARGO_TERM_COLOR: always
       SQLX_OFFLINE: "true"
-      HEAD_REF: ${{ github.head_ref || github.ref_name }}
     steps:
       - uses: actions/checkout@v5
         with:
@@ -41,7 +40,7 @@ jobs:
         with:
           clean: false
       - name: Generate PDFs on the current branch
-        run: cargo run --bin gen-pdf --features embed-typst -- --directory "$HEAD_REF"
+        run: cargo run --bin gen-pdf --features embed-typst -- --directory head
       - name: Install diff-pdf
         run: sudo apt-get update && sudo apt-get install -y diff-pdf-wx
       - name: Generate PDF diff summary

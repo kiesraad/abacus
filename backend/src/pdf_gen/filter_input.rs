@@ -4,8 +4,7 @@ use ttf_parser::Face;
 const TOFU: char = '\u{fffd}';
 
 static FONT: OnceLock<Face<'static>> = OnceLock::new();
-static FONT_BYTES: &[u8] =
-    include_bytes!("../../../backend/templates/fonts/DM_Sans/DMSans-Regular.ttf");
+static FONT_BYTES: &[u8] = include_bytes!("../../templates/fonts/DM_Sans/DMSans-Regular.ttf");
 
 fn get_font() -> &'static Face<'static> {
     FONT.get_or_init(|| Face::parse(FONT_BYTES, 0).expect("Failed to parse font"))

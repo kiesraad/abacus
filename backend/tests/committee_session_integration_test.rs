@@ -694,3 +694,75 @@ async fn test_committee_session_number_of_voters_change_not_found(pool: SqlitePo
     // Ensure the response is what we expect
     assert_eq!(response.status(), StatusCode::NOT_FOUND);
 }
+
+#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_7_four_sessions", "users"))))]
+async fn test_committee_session_investigations_list_works(pool: SqlitePool) {
+    let addr = serve_api(pool).await;
+    let cookie = shared::coordinator_login(&addr).await;
+    let url = format!("http://{addr}/api/elections/7/committee_sessions/702/investigations");
+    let response = reqwest::Client::new()
+        .get(&url)
+        .header("cookie", cookie)
+        .send()
+        .await
+        .unwrap();
+
+    assert_eq!(
+        response.status(),
+        StatusCode::OK,
+        "Unexpected response status"
+    );
+
+    // Validate response and make sure the investigations are from the requested committee session
+    let body: serde_json::Value = response.json().await.unwrap();
+    let investigations = body["investigations"].as_array().unwrap();
+    assert_eq!(investigations.len(), 1);
+    let map = investigations
+        .iter()
+        .map(|inv| inv["polling_station_id"].as_u64().unwrap())
+        .collect::<Vec<u64>>();
+    assert_eq!(map, vec![721]);
+}
+
+#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_7_four_sessions", "users"))))]
+async fn test_committee_session_investigations_list_works_no_investigations(pool: SqlitePool) {
+    let addr = serve_api(pool).await;
+    let cookie = shared::coordinator_login(&addr).await;
+    let url = format!("http://{addr}/api/elections/7/committee_sessions/704/investigations");
+    let response = reqwest::Client::new()
+        .get(&url)
+        .header("cookie", cookie)
+        .send()
+        .await
+        .unwrap();
+
+    assert_eq!(
+        response.status(),
+        StatusCode::OK,
+        "Unexpected response status"
+    );
+
+    // Validate response and make sure the investigations are from the requested committee session
+    let body: serde_json::Value = response.json().await.unwrap();
+    let investigations = body["investigations"].as_array().unwrap();
+    assert_eq!(investigations.len(), 0);
+}
+
+#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_7_four_sessions", "users"))))]
+async fn test_committee_session_investigations_list_fails_election_not_found(pool: SqlitePool) {
+    let addr = serve_api(pool).await;
+    let cookie = shared::coordinator_login(&addr).await;
+    let url = format!("http://{addr}/api/elections/1/committee_sessions/1/investigations");
+    let response = reqwest::Client::new()
+        .get(&url)
+        .header("cookie", cookie)
+        .send()
+        .await
+        .unwrap();
+
+    assert_eq!(
+        response.status(),
+        StatusCode::NOT_FOUND,
+        "Unexpected response status"
+    );
+}

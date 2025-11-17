@@ -479,7 +479,7 @@
               weight: "bold",
               [#cv.candidate.number],
             )),
-            ..cell_if(with_previous_votes, table.cell(inset: 8pt, fill: luma(213), align(right, prefilled_number(previous_votes, zero: if previous_votes == 0 { "-" } else { "0" })))),
+            ..cell_if(with_previous_votes, table.cell(inset: 8pt, fill: luma(213), align(right, prefilled_number(previous_votes, zero: if with_previous_votes and previous_votes == 0 { "-" } else { "0" })))),
             if cv.votes == none {
               table.cell(inset: 1pt, empty_grid(cells: corrected_cells, paint: luma(213)))
             } else {

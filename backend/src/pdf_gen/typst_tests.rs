@@ -49,8 +49,9 @@ fn random_value<T: Copy>(rng: &mut impl rand::Rng, variants: &[T]) -> T {
 
 fn random_date_time(rng: &mut impl rand::Rng) -> DateTime<Local> {
     let now = Local::now().timestamp();
-    let ten_years = 10 * 365 * 24 * 60 * 60;
-    let secs = rng.random_range(now..(now + ten_years));
+    let about_ten_years = 10 * 365 * 24 * 60 * 60;
+    let date_range = now - about_ten_years..now + about_ten_years;
+    let secs = rng.random_range(date_range);
 
     DateTime::<Utc>::from_timestamp(secs, 0)
         .unwrap()

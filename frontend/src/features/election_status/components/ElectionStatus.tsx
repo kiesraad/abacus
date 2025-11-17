@@ -115,7 +115,7 @@ export function ElectionStatus({
                             category={cat}
                             pollingStation={ps}
                             addLink={addLinks}
-                            hasWarnings={ps.has_warnings}
+                            warning={ps.finalised_with_warnings}
                           />
                         ))}
                     </Table.Body>

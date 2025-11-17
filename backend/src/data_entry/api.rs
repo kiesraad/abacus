@@ -1409,6 +1409,13 @@ mod tests {
             .await
             .unwrap();
 
+        change_status_committee_session(
+            pool.clone(),
+            704,
+            CommitteeSessionStatus::DataEntryInProgress,
+        )
+        .await;
+
         let response = claim(pool.clone(), 742, EntryNumber::FirstEntry).await;
         assert_eq!(response.status(), StatusCode::OK);
 
@@ -1533,13 +1540,14 @@ mod tests {
                 state AS "state: _",
                 updated_at AS "updated_at: _"
             FROM polling_station_data_entries
+            WHERE polling_station_id = 9
             "#
         )
         .fetch_all(&pool)
         .await
         .expect("No data found");
-        assert_eq!(data[0].committee_session_id, 5);
-        assert_eq!(data[1].committee_session_id, 6);
+        assert_eq!(data.len(), 1);
+        assert_eq!(data[0].committee_session_id, 6);
     }
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
@@ -2285,6 +2293,13 @@ mod tests {
             .await
             .unwrap();
 
+        change_status_committee_session(
+            pool.clone(),
+            704,
+            CommitteeSessionStatus::DataEntryInProgress,
+        )
+        .await;
+
         assert!(claim_previous_results(pool.clone(), 743).await.is_none());
     }
 
@@ -2295,6 +2310,13 @@ mod tests {
         insert_test_investigation(&mut pool.acquire().await.unwrap(), 742, Some(true))
             .await
             .unwrap();
+
+        change_status_committee_session(
+            pool.clone(),
+            704,
+            CommitteeSessionStatus::DataEntryInProgress,
+        )
+        .await;
 
         let previous_results = claim_previous_results(pool.clone(), 742).await.unwrap();
         // Check by difference in fixture results data
@@ -2315,11 +2337,11 @@ mod tests {
         assert_eq!(result.statuses.len(), 2);
     }
 
-    /// Second committee session without investigations, should return no polling station statuses
-    #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_5_with_results"))))]
+    /// New committee session without investigations, should return no polling station statuses
+    #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_7_four_sessions"))))]
     async fn test_statuses_second_session_no_polling_stations(pool: SqlitePool) {
         let user = User::test_user(Role::Coordinator, 1);
-        let response = election_status(user.clone(), State(pool.clone()), Path(5))
+        let response = election_status(user.clone(), State(pool.clone()), Path(7))
             .await
             .into_response();
 
@@ -2329,16 +2351,10 @@ mod tests {
         assert_eq!(result.statuses.len(), 0);
     }
 
-    /// Second committee session with 1 investigations, should return 1 polling station status
+    /// Second committee session with 1 investigation, should return 1 polling station status
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_5_with_results"))))]
     async fn test_statuses_second_session_with_investigation(pool: SqlitePool) {
-        let mut conn = pool.acquire().await.unwrap();
         let user = User::test_user(Role::Coordinator, 1);
-
-        // Add investigation to polling station in second committee session
-        insert_test_investigation(&mut conn, 9, Some(true))
-            .await
-            .unwrap();
 
         let response = election_status(user.clone(), State(pool.clone()), Path(5))
             .await

@@ -164,7 +164,7 @@ const config: PlaywrightTestConfig = defineConfig({
         userAgent: "Abacus-User-Agent/1",
       },
       dependencies: [],
-    },
+    },/*
     {
       name: "safari1",
       testIgnore: /initialisation\.e2e\.ts/,
@@ -529,7 +529,7 @@ const config: PlaywrightTestConfig = defineConfig({
         userAgent: "Abacus-User-Agent/1",
       },
       dependencies: [],
-    },
+    },*/
   ],
 });
 

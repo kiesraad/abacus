@@ -70,7 +70,7 @@ export function DetailLayout() {
           <h1>{pollingStation.name}</h1>
           <Badge type={dataEntry.status === "second_entry_not_started" ? "first_entry_finalised" : dataEntry.status} />
         </section>
-        {dataEntry.status !== "first_entry_not_started" && (
+        {dataEntry.status !== "first_entry_has_errors" && (
           <section>
             <ReadOnlyDataEntryDelete
               pollingStation={pollingStation}

@@ -5,7 +5,10 @@ import { beforeEach, describe, expect, test, vi } from "vitest";
 import { ElectionProvider } from "@/hooks/election/ElectionProvider";
 import { ElectionStatusProvider } from "@/hooks/election/ElectionStatusProvider";
 import { MessagesProvider } from "@/hooks/messages/MessagesProvider";
-import { dataEntryHasWarningsGetMockResponse } from "@/testing/api-mocks/DataEntryMockData";
+import {
+  dataEntryHasWarningsGetMockResponse,
+  dataEntryValidGetMockResponse,
+} from "@/testing/api-mocks/DataEntryMockData";
 import {
   ElectionListRequestHandler,
   ElectionRequestHandler,
@@ -71,5 +74,27 @@ describe("DetailLayout", () => {
     // In Badge, "1e invoer" is overruled as label instead of "2e invoer".
     const banner = await screen.findByRole("banner");
     expect(within(banner).getByText("1e invoer")).toBeInTheDocument();
+  });
+
+  test("renders delete data entry button", async () => {
+    server.use(
+      ElectionRequestHandler,
+      ElectionStatusRequestHandler,
+      ElectionListRequestHandler,
+      PollingStationDataEntryGetHandler,
+    );
+    overrideOnce("get", "/api/polling_stations/5/data_entries/get", 200, dataEntryValidGetMockResponse);
+
+    renderLayout();
+
+    // Verify the delete button is present
+    expect(await screen.findByRole("button", { name: "Invoer verwijderen" })).toBeVisible();
+  });
+
+  test("does not render delete data entry button when first entry has errors", () => {
+    renderLayout();
+
+    // Verify the delete button is not present
+    expect(screen.queryByRole("button", { name: "Invoer verwijderen" })).not.toBeInTheDocument();
   });
 });

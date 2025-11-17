@@ -486,10 +486,14 @@
               table.cell(
                 align: right + horizon,
                 text(number-width: "tabular",
-                  if not with_previous_votes or previous_votes != cv.votes {
-                    fmt-number(cv.votes, zero: if previous_votes == 0 { "-" } else { "0" })
+                  if not with_previous_votes {
+                    fmt-number(cv.votes, zero: "-")
                   } else {
-                    " "
+                    if previous_votes != cv.votes {
+                      fmt-number(cv.votes, zero: "0")
+                    } else {
+                      " "
+                    }
                   }
                 )
               )

@@ -126,7 +126,7 @@ describe("ElectionStatusPage", () => {
     expect(screen.queryByText("Het invoeren van stemmen is gepauzeerd")).not.toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "Steminvoer hervatten" })).not.toBeInTheDocument();
 
-    expect(await screen.findByText("Klaar voor steminvoer")).toBeVisible();
+    expect(await screen.findByText("Klaar voor invoer")).toBeVisible();
     const startLink = screen.getByRole("button", { name: "Starten" });
     expect(startLink).toBeVisible();
 
@@ -155,7 +155,7 @@ describe("ElectionStatusPage", () => {
     expect(screen.queryByText("Het invoeren van stemmen is gepauzeerd")).not.toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "Steminvoer hervatten" })).not.toBeInTheDocument();
 
-    expect(await screen.findByText("Klaar voor steminvoer")).toBeVisible();
+    expect(await screen.findByText("Klaar voor invoer")).toBeVisible();
     expect(screen.queryByRole("button", { name: "Starten" })).not.toBeInTheDocument();
   });
 

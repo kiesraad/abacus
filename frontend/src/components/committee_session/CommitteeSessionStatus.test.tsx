@@ -9,12 +9,12 @@ type Scenario = [CommitteeSessionStatus, "coordinator" | "typist", string, strin
 
 const testScenarios: Scenario[] = [
   ["created", "coordinator", "IconSettings", "Zitting voorbereiden"],
-  ["data_entry_not_started", "coordinator", "IconSettings", "Klaar voor steminvoer"],
+  ["data_entry_not_started", "coordinator", "IconSettings", "Klaar voor invoer"],
   ["data_entry_in_progress", "coordinator", "IconCheckHeart", "Steminvoer bezig"],
   ["data_entry_paused", "coordinator", "IconHourglass", "Steminvoer gepauzeerd"],
   ["data_entry_finished", "coordinator", "IconCheckVerified", "Steminvoer afgerond"],
-  ["created", "typist", "IconClock", "Nog niet begonnen"],
-  ["data_entry_not_started", "typist", "IconClock", "Nog niet begonnen"],
+  ["created", "typist", "IconClock", "Nog niet gestart"],
+  ["data_entry_not_started", "typist", "IconClock", "Nog niet gestart"],
   ["data_entry_in_progress", "typist", "IconCheckHeart", "Je kan invoeren"],
   ["data_entry_paused", "typist", "IconHourglass", "Invoer gepauzeerd"],
   ["data_entry_finished", "typist", "IconCheckVerified", "Alles is ingevoerd"],

@@ -1,7 +1,7 @@
 {
   "coordinator": {
     "created": "Zitting voorbereiden",
-    "data_entry_not_started": "Klaar voor steminvoer",
+    "data_entry_not_started": "Klaar voor invoer",
     "data_entry_in_progress": "Steminvoer bezig",
     "data_entry_paused": "Steminvoer gepauzeerd",
     "data_entry_finished": "Steminvoer afgerond"
@@ -16,8 +16,8 @@
   "session": "Zitting",
   "the": "de",
   "typist": {
-    "created": "Nog niet begonnen",
-    "data_entry_not_started": "Nog niet begonnen",
+    "created": "Nog niet gestart",
+    "data_entry_not_started": "Nog niet gestart",
     "data_entry_in_progress": "Je kan invoeren",
     "data_entry_paused": "Invoer gepauzeerd",
     "data_entry_finished": "Alles is ingevoerd"

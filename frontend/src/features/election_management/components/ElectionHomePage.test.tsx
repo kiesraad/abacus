@@ -313,7 +313,7 @@ describe("ElectionHomePage", () => {
     const committee_session_cards = await screen.findByTestId("committee-session-cards");
     expect(committee_session_cards).toBeVisible();
     const session4 = within(committee_session_cards).getByTestId("session-4");
-    expect(session4).toHaveTextContent(/Vierde zitting — Klaar voor steminvoer/);
+    expect(session4).toHaveTextContent(/Vierde zitting — Klaar voor invoer/);
 
     const startButton = within(session4).getByRole("button", { name: "Start steminvoer" });
     expect(startButton).toBeVisible();

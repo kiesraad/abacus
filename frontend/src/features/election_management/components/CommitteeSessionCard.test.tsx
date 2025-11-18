@@ -145,7 +145,7 @@ describe("UI component: CommitteeSessionCard", () => {
       const expectedSubtitle =
         {
           created: "— Zitting voorbereiden",
-          data_entry_not_started: "— Klaar voor steminvoer",
+          data_entry_not_started: "— Klaar voor invoer",
           data_entry_in_progress: "— Steminvoer bezig",
           data_entry_paused: "— Steminvoer gepauzeerd",
           data_entry_finished: "— Steminvoer afgerond",

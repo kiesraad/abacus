@@ -480,15 +480,15 @@ test.describe("full flow", () => {
       const progressList = new ProgressList(page);
       const [firstListName, secondListName, thirdListName] = await progressList.allListNames();
 
-      const firstCandidatesPage = new CandidatesListPage(page, 1, firstListName!);
+      const firstCandidatesPage = new CandidatesListPage(page, 0, firstListName!);
       await firstCandidatesPage.fillCandidate(0, 1336);
       await firstCandidatesPage.fillCandidate(1, 424);
       await firstCandidatesPage.next.click();
 
-      const secondCandidatesPage = new CandidatesListPage(page, 2, secondListName!);
+      const secondCandidatesPage = new CandidatesListPage(page, 1, secondListName!);
       await secondCandidatesPage.next.click();
 
-      const thirdCandidatesPage = new CandidatesListPage(page, 3, thirdListName!);
+      const thirdCandidatesPage = new CandidatesListPage(page, 2, thirdListName!);
       await thirdCandidatesPage.next.click();
 
       const checkAndSavePage = new CheckAndSavePage(page);

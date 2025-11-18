@@ -3,7 +3,7 @@ import { type Locator, type Page } from "@playwright/test";
 import { DataEntryBasePage } from "./DataEntryBasePgObj";
 
 export class CandidatesListPage extends DataEntryBasePage {
-  private pgNumber: number;
+  private pgIndex: number;
 
   readonly fieldset: Locator;
 
@@ -13,10 +13,10 @@ export class CandidatesListPage extends DataEntryBasePage {
   readonly acceptErrorsAndWarnings: Locator;
   readonly acceptErrorsAndWarningsReminder: Locator;
 
-  constructor(page: Page, pgNumber: number, pgName: string) {
+  constructor(page: Page, pgIndex: number, pgName: string) {
     super(page);
 
-    this.pgNumber = pgNumber;
+    this.pgIndex = pgIndex;
     this.fieldset = page.getByRole("group", { name: pgName });
 
     this.total = page.getByRole("textbox", { name: "Totaal" });
@@ -31,7 +31,7 @@ export class CandidatesListPage extends DataEntryBasePage {
   }
 
   getCandidate(index: number) {
-    return this.page.getByTestId(`data.political_group_votes[${this.pgNumber - 1}].candidate_votes[${index}].votes`);
+    return this.page.getByTestId(`data.political_group_votes[${this.pgIndex}].candidate_votes[${index}].votes`);
   }
 
   async fillCandidate(index: number, count: number) {

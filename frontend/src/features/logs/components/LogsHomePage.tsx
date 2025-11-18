@@ -77,7 +77,7 @@ export function LogsHomePage() {
               </Toolbar.Section>
             )}
           </Toolbar>
-          <LogsTable events={events} setDetails={setDetails} />
+          <LogsTable events={events} details={details} setDetails={setDetails} />
           {pagination && pagination.totalPages > 1 && (
             <Pagination page={pagination.page} totalPages={pagination.totalPages} onPageChange={onPageChange} />
           )}

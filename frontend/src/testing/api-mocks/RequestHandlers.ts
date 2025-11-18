@@ -16,6 +16,8 @@ import {
   COMMITTEE_SESSION_CREATE_REQUEST_PATH,
   COMMITTEE_SESSION_DELETE_REQUEST_PARAMS,
   COMMITTEE_SESSION_DELETE_REQUEST_PATH,
+  COMMITTEE_SESSION_INVESTIGATIONS_REQUEST_PARAMS,
+  COMMITTEE_SESSION_INVESTIGATIONS_REQUEST_PATH,
   COMMITTEE_SESSION_NUMBER_OF_VOTERS_CHANGE_REQUEST_BODY,
   COMMITTEE_SESSION_NUMBER_OF_VOTERS_CHANGE_REQUEST_PARAMS,
   COMMITTEE_SESSION_NUMBER_OF_VOTERS_CHANGE_REQUEST_PATH,
@@ -52,6 +54,7 @@ import {
   ErrorResponse,
   INITIALISED_REQUEST_PARAMS,
   INITIALISED_REQUEST_PATH,
+  InvestigationListResponse,
   LOGIN_REQUEST_BODY,
   LOGIN_REQUEST_PARAMS,
   LOGIN_REQUEST_PATH,
@@ -133,6 +136,7 @@ import {
   electionImportMockResponse,
   electionImportValidateMockResponse,
   electionListMockResponse,
+  investigationListMockResponse,
 } from "./ElectionMockData";
 import { statusResponseMock } from "./ElectionStatusMockData";
 import { logMockResponse } from "./LogMockData";
@@ -216,6 +220,15 @@ export const CommitteeSessionCreateHandler = http.post<
 export const CommitteeSessionDeleteHandler = http.delete<ParamsToString<COMMITTEE_SESSION_DELETE_REQUEST_PARAMS>>(
   "/api/elections/1/committee_sessions/4" satisfies COMMITTEE_SESSION_DELETE_REQUEST_PATH,
   () => new HttpResponse(null, { status: 200 }),
+);
+
+// get investigation list handler
+export const InvestigationListRequestHandler = http.get<
+  ParamsToString<COMMITTEE_SESSION_INVESTIGATIONS_REQUEST_PARAMS>,
+  null,
+  InvestigationListResponse
+>("/api/elections/1/committee_sessions/1/investigations" satisfies COMMITTEE_SESSION_INVESTIGATIONS_REQUEST_PATH, () =>
+  HttpResponse.json(investigationListMockResponse, { status: 200 }),
 );
 
 // investigation handlers
@@ -498,6 +511,7 @@ export const handlers: HttpHandler[] = [
   CommitteeSessionUpdateHandler,
   CommitteeSessionCreateHandler,
   CommitteeSessionDeleteHandler,
+  InvestigationListRequestHandler,
   PollingStationInvestigationCreateHandler,
   PollingStationInvestigationConcludeHandler,
   PollingStationInvestigationUpdateHandler,

@@ -75,14 +75,16 @@ function Row({ id, children, className }: { id?: string; children: React.ReactNo
 function ClickRow({
   children,
   onClick,
+  active,
   className,
 }: {
   children: React.ReactNode;
   onClick: () => void;
+  active?: boolean;
   className?: string;
 }) {
   return (
-    <tr className={cn(cls.rowLink, className)} onClick={onClick}>
+    <tr className={cn(cls.rowLink, active && cls.active, className)} onClick={onClick}>
       {children}
     </tr>
   );

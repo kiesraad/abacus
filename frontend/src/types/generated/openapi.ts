@@ -62,6 +62,14 @@ export interface ELECTION_DOWNLOAD_ZIP_RESULTS_REQUEST_PARAMS {
 export type ELECTION_DOWNLOAD_ZIP_RESULTS_REQUEST_PATH =
   `/api/elections/${number}/committee_sessions/${number}/download_zip_results`;
 
+// /api/elections/{election_id}/committee_sessions/{committee_session_id}/investigations
+export interface COMMITTEE_SESSION_INVESTIGATIONS_REQUEST_PARAMS {
+  election_id: number;
+  committee_session_id: number;
+}
+export type COMMITTEE_SESSION_INVESTIGATIONS_REQUEST_PATH =
+  `/api/elections/${number}/committee_sessions/${number}/investigations`;
+
 // /api/elections/{election_id}/committee_sessions/{committee_session_id}/status
 export interface COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_PARAMS {
   election_id: number;
@@ -815,6 +823,7 @@ export type ErrorReference =
   | "OwnAccountCannotBeDeleted"
   | "PasswordRejection"
   | "PdfGenerationError"
+  | "PollingStationCannotBeDeleted"
   | "PollingStationRepeated"
   | "PollingStationValidationErrors"
   | "RequestPayloadTooLarge"
@@ -874,6 +883,13 @@ export interface GenerateElectionArgs {
   voters: RandomRange;
   /** Include (part of) data entry for this election */
   with_data_entry: boolean;
+}
+
+/**
+ * Investigation list response
+ */
+export interface InvestigationListResponse {
+  investigations: PollingStationInvestigation[];
 }
 
 export interface LoginResponse {

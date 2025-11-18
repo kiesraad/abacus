@@ -116,14 +116,12 @@ describe("createPoliticalGroupSections", () => {
           const row =
             section.subsections[0]?.type === "inputGrid" ? section.subsections[0].rows[candidateIndex] : undefined;
           expect(row?.code).toBe(candidate.number.toString());
-          expect(row?.path).toBe(
-            `political_group_votes[${politicalGroup.number - 1}].candidate_votes[${candidateIndex}].votes`,
-          );
+          expect(row?.path).toBe(`political_group_votes[${groupIndex}].candidate_votes[${candidateIndex}].votes`);
         });
 
         // Check total row
         const totalRow = section.subsections[0].rows[section.subsections[0].rows.length - 1];
-        expect(totalRow?.path).toBe(`political_group_votes[${politicalGroup.number - 1}].total`);
+        expect(totalRow?.path).toBe(`political_group_votes[${groupIndex}].total`);
         expect(totalRow?.isListTotal).toBe(true);
       }
     });

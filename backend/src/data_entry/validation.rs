@@ -871,13 +871,6 @@ impl Validate for Vec<PoliticalGroupTotalVotes> {
 
         // check each political group total votes
         for (i, pgv) in self.iter().enumerate() {
-            let number = pgv.number;
-            if number as usize != i + 1 {
-                return Err(DataError::new(
-                    "political group total votes numbers are not consecutive",
-                ));
-            }
-
             pgv.total.validate(
                 election,
                 polling_station,
@@ -931,12 +924,6 @@ impl Validate for Vec<PoliticalGroupCandidateVotes> {
 
         // check each political group
         for (i, pgv) in self.iter().enumerate() {
-            let number = pgv.number;
-            if number as usize != i + 1 {
-                return Err(DataError::new(
-                    "political group numbers are not consecutive",
-                ));
-            }
             pgv.validate(
                 election,
                 polling_station,
@@ -959,7 +946,8 @@ impl Validate for PoliticalGroupCandidateVotes {
         // check if the list of candidates has the correct length
         let pg = election
             .political_groups
-            .get(self.number as usize - 1)
+            .iter()
+            .find(|pg| pg.number == self.number)
             .expect("political group should exist");
 
         // check if the number of candidates is correct
@@ -969,11 +957,6 @@ impl Validate for PoliticalGroupCandidateVotes {
 
         // validate all candidates
         for (i, cv) in self.candidate_votes.iter().enumerate() {
-            let number = cv.number;
-            if number as usize != i + 1 {
-                return Err(DataError::new("candidate numbers are not consecutive"));
-            }
-
             cv.validate(
                 election,
                 polling_station,
@@ -2821,12 +2804,13 @@ mod tests {
         }
 
         #[test]
-        fn test_err_political_group_numbers_not_consecutive() {
-            let (mut political_group_votes, election) =
+        fn test_ok_political_group_numbers_not_consecutive() {
+            let (mut political_group_votes, mut election) =
                 create_test_data(&[(&[10, 20, 30], 60), (&[5, 10, 15], 30)]);
 
             // Change number of the first list
             political_group_votes[0].number = 3;
+            election.political_groups[0].number = 3;
 
             let mut validation_results = ValidationResults::default();
             let result: Result<(), DataError> = political_group_votes.validate(
@@ -2836,13 +2820,7 @@ mod tests {
                 &"political_group_votes".into(),
             );
 
-            assert!(result.is_err());
-            assert!(
-                result
-                    .unwrap_err()
-                    .message
-                    .eq("political group numbers are not consecutive"),
-            );
+            assert!(result.is_ok());
         }
 
         #[test]
@@ -2876,7 +2854,7 @@ mod tests {
         }
 
         #[test]
-        fn test_err_candidate_numbers_not_consecutive() {
+        fn test_ok_candidate_numbers_not_consecutive() {
             let (mut political_group_votes, election) =
                 create_test_data(&[(&[10, 20, 30], 60), (&[5, 10, 15], 30)]);
 
@@ -2891,13 +2869,7 @@ mod tests {
                 &"political_group_votes".into(),
             );
 
-            assert!(result.is_err());
-            assert!(
-                result
-                    .unwrap_err()
-                    .message
-                    .eq("candidate numbers are not consecutive"),
-            );
+            assert!(result.is_ok());
         }
     }
 

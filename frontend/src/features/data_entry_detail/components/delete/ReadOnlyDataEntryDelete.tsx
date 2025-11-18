@@ -57,7 +57,7 @@ export function ReadOnlyDataEntryDelete({ pollingStation, status, onDeleted, onE
             <Button
               leftIcon={<IconTrash />}
               variant="primary-destructive"
-              size="xl"
+              size="lg"
               onClick={handleDelete}
               disabled={isLoading}
             >

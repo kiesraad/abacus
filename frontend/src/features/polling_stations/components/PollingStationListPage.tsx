@@ -1,17 +1,20 @@
 import { IconFilePlus, IconPlus } from "@/components/generated/icons";
 import { Messages } from "@/components/messages/Messages";
 import { PageTitle } from "@/components/page_title/PageTitle";
+import { Alert } from "@/components/ui/Alert/Alert";
 import { Button } from "@/components/ui/Button/Button";
 import { Loader } from "@/components/ui/Loader/Loader";
 import { Table } from "@/components/ui/Table/Table";
 import { Toolbar } from "@/components/ui/Toolbar/Toolbar";
 import { useElection } from "@/hooks/election/useElection";
+import { useUserRole } from "@/hooks/user/useUserRole";
 import { t } from "@/i18n/translate";
 
 import { usePollingStationListRequest } from "../hooks/usePollingStationListRequest";
 
 export function PollingStationListPage() {
-  const { election } = useElection();
+  const { isCoordinator, isAdministrator } = useUserRole();
+  const { election, currentCommitteeSession } = useElection();
   const { requestState } = usePollingStationListRequest(election.id);
 
   if (requestState.status === "loading") {
@@ -23,6 +26,10 @@ export function PollingStationListPage() {
   }
 
   const data = requestState.data;
+  const editAllowed =
+    isCoordinator ||
+    (isAdministrator &&
+      (currentCommitteeSession.status === "created" || currentCommitteeSession.status === "data_entry_not_started"));
 
   const labelForPollingStationType = {
     FixedLocation: t("polling_station.type.FixedLocation"),
@@ -40,6 +47,13 @@ export function PollingStationListPage() {
       </header>
 
       <Messages />
+
+      {!editAllowed && (
+        <Alert type="notify">
+          <strong className="heading-md">{t("polling_station.edit_not_allowed_alert.title")}</strong>
+          <p>{t("polling_station.edit_not_allowed_alert.description")}</p>
+        </Alert>
+      )}
 
       <main>
         {!data.polling_stations.length ? (
@@ -60,11 +74,13 @@ export function PollingStationListPage() {
           </article>
         ) : (
           <article>
-            <Toolbar>
-              <Button.Link variant="secondary" size="sm" to="./create">
-                <IconPlus /> {t("polling_station.create")}
-              </Button.Link>
-            </Toolbar>
+            {editAllowed && (
+              <Toolbar>
+                <Button.Link variant="secondary" size="sm" to="./create">
+                  <IconPlus /> {t("polling_station.create")}
+                </Button.Link>
+              </Toolbar>
+            )}
 
             <Table id="polling_stations">
               <Table.Header>
@@ -73,17 +89,29 @@ export function PollingStationListPage() {
                 <Table.HeaderCell>{t("type")}</Table.HeaderCell>
               </Table.Header>
               <Table.Body className="fs-md">
-                {data.polling_stations.map((station) => (
-                  <Table.LinkRow key={station.id} to={`${station.id}/update`}>
-                    <Table.NumberCell>{station.number}</Table.NumberCell>
-                    <Table.Cell className="break-word">{station.name}</Table.Cell>
-                    <Table.Cell>
-                      {station.polling_station_type && labelForPollingStationType[station.polling_station_type]
-                        ? labelForPollingStationType[station.polling_station_type]
-                        : "–"}
-                    </Table.Cell>
-                  </Table.LinkRow>
-                ))}
+                {data.polling_stations.map((station) =>
+                  editAllowed ? (
+                    <Table.LinkRow key={station.id} to={`${station.id}/update`}>
+                      <Table.NumberCell>{station.number}</Table.NumberCell>
+                      <Table.Cell className="break-word">{station.name}</Table.Cell>
+                      <Table.Cell>
+                        {station.polling_station_type && labelForPollingStationType[station.polling_station_type]
+                          ? labelForPollingStationType[station.polling_station_type]
+                          : "–"}
+                      </Table.Cell>
+                    </Table.LinkRow>
+                  ) : (
+                    <Table.Row key={station.id}>
+                      <Table.NumberCell>{station.number}</Table.NumberCell>
+                      <Table.Cell className="break-word">{station.name}</Table.Cell>
+                      <Table.Cell>
+                        {station.polling_station_type && labelForPollingStationType[station.polling_station_type]
+                          ? labelForPollingStationType[station.polling_station_type]
+                          : "–"}
+                      </Table.Cell>
+                    </Table.Row>
+                  ),
+                )}
               </Table.Body>
             </Table>
           </article>

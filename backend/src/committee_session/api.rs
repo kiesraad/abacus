@@ -15,7 +15,7 @@ use super::{
 use crate::{
     APIError, AppState, ErrorResponse, SqlitePoolExt,
     audit_log::{AuditEvent, AuditService},
-    authentication::Coordinator,
+    authentication::{AdminOrCoordinator, Coordinator},
     error::ErrorReference,
     investigation::list_investigations_for_committee_session,
 };
@@ -260,6 +260,7 @@ pub async fn committee_session_update(
         (status = 401, description = "Unauthorized", body = ErrorResponse),
         (status = 403, description = "Forbidden", body = ErrorResponse),
         (status = 404, description = "Committee session not found", body = ErrorResponse),
+        (status = 409, description = "Request cannot be completed", body = ErrorResponse),
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
     params(
@@ -268,7 +269,7 @@ pub async fn committee_session_update(
     ),
 )]
 pub async fn committee_session_number_of_voters_change(
-    _user: Coordinator,
+    _user: AdminOrCoordinator,
     State(pool): State<SqlitePool>,
     audit_service: AuditService,
     Path((election_id, committee_session_id)): Path<(u32, u32)>,
@@ -276,31 +277,42 @@ pub async fn committee_session_number_of_voters_change(
 ) -> Result<StatusCode, APIError> {
     let mut tx = pool.begin_immediate().await?;
 
-    validate_committee_session_is_current_committee_session(
+    let committee_session = validate_committee_session_is_current_committee_session(
         &mut tx,
         election_id,
         committee_session_id,
     )
     .await?;
 
-    let committee_session = crate::committee_session::repository::change_number_of_voters(
-        &mut tx,
-        committee_session_id,
-        committee_session_request.number_of_voters,
-    )
-    .await?;
-
-    audit_service
-        .log(
+    if !committee_session.is_next_session()
+        && (committee_session.status == CommitteeSessionStatus::Created
+            || committee_session.status == CommitteeSessionStatus::DataEntryNotStarted)
+    {
+        let committee_session = crate::committee_session::repository::change_number_of_voters(
             &mut tx,
-            &AuditEvent::CommitteeSessionUpdated(committee_session.clone().into()),
-            None,
+            committee_session_id,
+            committee_session_request.number_of_voters,
         )
         .await?;
 
-    tx.commit().await?;
+        audit_service
+            .log(
+                &mut tx,
+                &AuditEvent::CommitteeSessionUpdated(committee_session.clone().into()),
+                None,
+            )
+            .await?;
 
-    Ok(StatusCode::NO_CONTENT)
+        tx.commit().await?;
+
+        Ok(StatusCode::NO_CONTENT)
+    } else {
+        tx.rollback().await?;
+
+        Err(APIError::CommitteeSession(
+            CommitteeSessionError::InvalidCommitteeSessionStatus,
+        ))
+    }
 }
 
 /// Change the status of a [CommitteeSession].

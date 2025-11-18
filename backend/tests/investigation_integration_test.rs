@@ -150,10 +150,7 @@ async fn test_deletion_setting_committee_session_back_to_created_status(pool: Sq
 
     let committee_session =
         shared::get_election_committee_session(&addr, &cookie, election_id).await;
-    assert_eq!(
-        committee_session.status,
-        CommitteeSessionStatus::DataEntryInProgress
-    );
+    assert_eq!(committee_session.status, CommitteeSessionStatus::Created);
 
     // Create 2 investigations
     assert_eq!(
@@ -175,7 +172,7 @@ async fn test_deletion_setting_committee_session_back_to_created_status(pool: Sq
         shared::get_election_committee_session(&addr, &cookie, election_id).await;
     assert_eq!(
         committee_session.status,
-        CommitteeSessionStatus::DataEntryInProgress
+        CommitteeSessionStatus::DataEntryNotStarted
     );
 
     // Delete last investigation
@@ -194,95 +191,7 @@ async fn test_deletion_removes_polling_station_from_status(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let cookie = shared::coordinator_login(&addr).await;
     let election_id = 5;
-    let polling_station_id = 9;
-
-    let statuses = get_statuses(&addr, &cookie, election_id).await;
-    assert_eq!(statuses.len(), 0);
-
-    // Add investigation with corrected_results: true
-    assert_eq!(
-        shared::create_investigation(&addr, polling_station_id)
-            .await
-            .status(),
-        StatusCode::CREATED
-    );
-    assert_eq!(
-        conclude_investigation(
-            &addr,
-            polling_station_id,
-            Some(serde_json::json!({
-                "findings": "Test findings",
-                "corrected_results": true
-            })),
-        )
-        .await
-        .status(),
-        StatusCode::OK
-    );
-
-    let statuses = get_statuses(&addr, &cookie, election_id).await;
-    assert_eq!(statuses.len(), 1);
-    assert_eq!(
-        statuses[&polling_station_id].status,
-        DataEntryStatusName::FirstEntryNotStarted
-    );
-
-    let data_entry = DataEntry {
-        progress: 100,
-        data: PollingStationResults::CSONextSession(CSONextSessionResults {
-            voters_counts: VotersCounts {
-                poll_card_count: 1203,
-                proxy_certificate_count: 2,
-
-                total_admitted_voters_count: 1205,
-            },
-            votes_counts: VotesCounts {
-                political_group_total_votes: vec![
-                    PoliticalGroupTotalVotes {
-                        number: 1,
-                        total: 600,
-                    },
-                    PoliticalGroupTotalVotes {
-                        number: 2,
-                        total: 302,
-                    },
-                    PoliticalGroupTotalVotes {
-                        number: 3,
-                        total: 98,
-                    },
-                    PoliticalGroupTotalVotes {
-                        number: 4,
-                        total: 99,
-                    },
-                    PoliticalGroupTotalVotes {
-                        number: 5,
-                        total: 101,
-                    },
-                ],
-                total_votes_candidates_count: 1200,
-                blank_votes_count: 3,
-                invalid_votes_count: 2,
-                total_votes_cast_count: 1205,
-            },
-
-            differences_counts: differences_counts_zero(),
-            political_group_votes: vec![
-                political_group_votes_from_test_data_auto(
-                    1,
-                    &[
-                        78, 20, 55, 45, 50, 0, 60, 40, 30, 20, 50, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-                        0, 0, 0, 0, 0, 0, 0, 152,
-                    ],
-                ),
-                political_group_votes_from_test_data_auto(2, &[150, 50, 22, 10, 30, 40]),
-                political_group_votes_from_test_data_auto(3, &[20, 15, 25, 3, 2, 33]),
-                political_group_votes_from_test_data_auto(4, &[20, 15, 25, 24, 15]),
-                political_group_votes_from_test_data_auto(5, &[20, 31, 10, 40]),
-            ],
-        }),
-        client_state: ClientState::new_from_str(None).unwrap(),
-    };
-    create_result_with_non_example_data_entry(&addr, 9, 5, data_entry).await;
+    let polling_station_id = 11;
 
     let statuses = get_statuses(&addr, &cookie, election_id).await;
     assert_eq!(statuses.len(), 1);
@@ -754,6 +663,7 @@ async fn test_cannot_conclude_update_new_polling_station_corrected_results_false
 async fn test_polling_station_corrigendum_download_with_previous_results(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let coordinator_cookie = shared::coordinator_login(&addr).await;
+    // Polling station 9 has previous results, but no investigation yet
     let polling_station_id = 9;
 
     assert_eq!(
@@ -793,14 +703,8 @@ async fn test_polling_station_corrigendum_download_with_previous_results(pool: S
 async fn test_polling_station_corrigendum_download_without_previous_results(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let coordinator_cookie = shared::coordinator_login(&addr).await;
-    let polling_station_id = 9;
-
-    assert_eq!(
-        shared::create_investigation(&addr, polling_station_id)
-            .await
-            .status(),
-        StatusCode::CREATED
-    );
+    // Polling station 11 is new and has no previous results. An investigation already exists.
+    let polling_station_id = 11;
 
     let url = format!(
         "http://{addr}/api/polling_stations/{polling_station_id}/investigation/download_corrigendum_pdf"
@@ -821,7 +725,7 @@ async fn test_polling_station_corrigendum_download_without_previous_results(pool
     assert_eq!(&content_disposition_string[..21], "attachment; filename=");
     assert_eq!(
         &content_disposition_string[21..],
-        "\"Model_Na14-2_GR2026_Stembureau_41_Bijlage_1.pdf\""
+        "\"Model_Na14-2_GR2026_Stembureau_42_Bijlage_1.pdf\""
     );
 
     let bytes = response.bytes().await.unwrap();
@@ -834,35 +738,19 @@ where
     Fut: Future<Output = Response>,
 {
     let cookie = shared::coordinator_login(addr).await;
-    let election_id = 7;
-    let committee_session_id = 704;
+    let election_id = 5;
+    let committee_session_id = 6;
 
     if pre_create {
         assert_eq!(
-            shared::create_investigation(addr, 741).await.status(),
+            shared::create_investigation(addr, 9).await.status(),
             StatusCode::CREATED
         );
 
         assert_eq!(
             conclude_investigation(
                 addr,
-                741,
-                Some(serde_json::json!({"findings": "Test findings", "corrected_results": false})),
-            )
-            .await
-            .status(),
-            StatusCode::OK
-        );
-
-        assert_eq!(
-            shared::create_investigation(addr, 742).await.status(),
-            StatusCode::CREATED
-        );
-
-        assert_eq!(
-            conclude_investigation(
-                addr,
-                742,
+                9,
                 Some(serde_json::json!({"findings": "Test findings", "corrected_results": false})),
             )
             .await
@@ -887,11 +775,10 @@ where
     );
 
     let status = action().await.status();
-    assert!(
-        status == StatusCode::OK
-            || status == StatusCode::NO_CONTENT
-            || status == StatusCode::CREATED
-    );
+    assert!(matches!(
+        status,
+        StatusCode::OK | StatusCode::NO_CONTENT | StatusCode::CREATED
+    ));
 
     let committee_session =
         shared::get_election_committee_session(addr, &cookie, election_id).await;
@@ -901,33 +788,29 @@ where
     );
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_7_four_sessions", "users"))))]
+#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_5_with_results", "users"))))]
 async fn test_finished_to_in_progress_on_create(pool: SqlitePool) {
     let addr = serve_api(pool).await;
-    check_finished_to_in_progress_on(&addr, false, || shared::create_investigation(&addr, 741))
-        .await;
+    check_finished_to_in_progress_on(&addr, false, || shared::create_investigation(&addr, 9)).await;
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_7_four_sessions", "users"))))]
+#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_5_with_results", "users"))))]
 async fn test_finished_to_in_progress_on_update(pool: SqlitePool) {
     let addr = serve_api(pool).await;
-    check_finished_to_in_progress_on(&addr, true, || {
-        shared::update_investigation(&addr, 741, None)
-    })
-    .await;
-}
-
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_7_four_sessions", "users"))))]
-async fn test_finished_to_in_progress_on_conclude(pool: SqlitePool) {
-    let addr = serve_api(pool).await;
-    check_finished_to_in_progress_on(&addr, true, || conclude_investigation(&addr, 741, None))
+    check_finished_to_in_progress_on(&addr, true, || shared::update_investigation(&addr, 9, None))
         .await;
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_7_four_sessions", "users"))))]
+#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_5_with_results", "users"))))]
+async fn test_finished_to_in_progress_on_conclude(pool: SqlitePool) {
+    let addr = serve_api(pool).await;
+    check_finished_to_in_progress_on(&addr, true, || conclude_investigation(&addr, 9, None)).await;
+}
+
+#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_5_with_results", "users"))))]
 async fn test_finished_to_in_progress_on_delete_non_last(pool: SqlitePool) {
     let addr = serve_api(pool).await;
-    check_finished_to_in_progress_on(&addr, true, || delete_investigation(&addr, 741)).await;
+    check_finished_to_in_progress_on(&addr, true, || delete_investigation(&addr, 9)).await;
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_7_four_sessions", "users"))))]

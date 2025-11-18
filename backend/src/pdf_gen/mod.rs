@@ -48,7 +48,7 @@ pub(crate) mod tests {
     pub fn polling_stations_fixture(
         election: &ElectionWithPoliticalGroups,
         committee_session_id: u32,
-        polling_station_voter_count: &[i64],
+        polling_station_voter_count: &[u32],
     ) -> Vec<PollingStation> {
         let mut polling_stations = Vec::new();
         for (i, voter_count) in polling_station_voter_count.iter().enumerate() {
@@ -60,11 +60,7 @@ pub(crate) mod tests {
                 id_prev_session: None,
                 name: format!("Testplek {idx}"),
                 number: u32::try_from(idx).unwrap() + 30,
-                number_of_voters: if *voter_count < 0 {
-                    None
-                } else {
-                    Some(*voter_count)
-                },
+                number_of_voters: Some(*voter_count),
                 polling_station_type: Some(PollingStationType::Special),
                 address: "Teststraat 2a".to_string(),
                 postal_code: "1234 QY".to_string(),

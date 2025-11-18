@@ -773,7 +773,7 @@
           }
         ],
         "responses": {
-          "204": {
+          "200": {
             "description": "Investigation listing successful",
             "content": {
               "application/json": {

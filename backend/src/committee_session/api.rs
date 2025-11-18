@@ -354,7 +354,7 @@ pub async fn committee_session_status_change(
     get,
     path = "/api/elections/{election_id}/committee_sessions/{committee_session_id}/investigations",
     responses(
-        (status = 204, description = "Investigation listing successful", body = InvestigationListResponse),
+        (status = 200, description = "Investigation listing successful", body = InvestigationListResponse),
         (status = 401, description = "Unauthorized", body = ErrorResponse),
         (status = 403, description = "Forbidden", body = ErrorResponse),
         (status = 404, description = "Committee session not found", body = ErrorResponse),

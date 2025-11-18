@@ -224,7 +224,7 @@ export const CommitteeSessionDeleteHandler = http.delete<ParamsToString<COMMITTE
 export const InvestigationListRequestHandler = http.get<
   ParamsToString<COMMITTEE_SESSION_INVESTIGATIONS_REQUEST_PARAMS>,
   null,
-  InvestigationListResponse | ErrorResponse
+  InvestigationListResponse
 >("/api/elections/1/committee_sessions/1/investigations" satisfies COMMITTEE_SESSION_INVESTIGATIONS_REQUEST_PATH, () =>
   HttpResponse.json(investigationListMockResponse, { status: 200 }),
 );

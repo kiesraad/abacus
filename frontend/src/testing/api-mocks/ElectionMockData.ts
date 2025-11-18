@@ -328,13 +328,13 @@ export const getElectionMockData = (
 
 export const getInvestigationMockData = (
   investigations: PollingStationInvestigation[] = mockInvestigations,
-): Required<InvestigationListResponse> => {
+): InvestigationListResponse => {
   return {
     investigations,
   };
 };
 
-export const investigationListMockResponse: Required<InvestigationListResponse> = getInvestigationMockData();
+export const investigationListMockResponse: InvestigationListResponse = getInvestigationMockData();
 export const electionDetailsMockResponse: Required<ElectionDetailsResponse> = getElectionMockData();
 export const electionMockData = electionDetailsMockResponse.election;
 export const newElectionMockData = {

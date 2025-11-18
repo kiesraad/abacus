@@ -698,7 +698,7 @@ async fn test_committee_session_investigations_list_works_no_investigations(pool
         "Unexpected response status"
     );
 
-    // Validate response and make sure the investigations are from the requested committee session
+    // Validate response and make sure the investigations are empty
     let body: serde_json::Value = response.json().await.unwrap();
     let investigations = body["investigations"].as_array().unwrap();
     assert_eq!(investigations.len(), 0);

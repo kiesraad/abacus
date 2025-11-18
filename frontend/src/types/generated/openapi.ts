@@ -931,7 +931,7 @@ export interface PollingStation {
   id_prev_session?: number;
   locality: string;
   name: string;
-  number: u32;
+  number: number;
   number_of_voters?: number;
   polling_station_type?: PollingStationType;
   postal_code: string;
@@ -998,7 +998,7 @@ export interface PollingStationRequest {
   address: string;
   locality: string;
   name: string;
-  number?: u32;
+  number?: number;
   number_of_voters?: number;
   polling_station_type?: PollingStationType;
   postal_code: string;
@@ -1181,5 +1181,3 @@ export interface YesNo {
   no: boolean;
   yes: boolean;
 }
-
-export type u32 = number;

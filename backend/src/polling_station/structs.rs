@@ -22,6 +22,7 @@ pub struct PollingStation {
     #[schema(nullable = false)]
     pub id_prev_session: Option<u32>,
     pub name: String,
+    #[schema(value_type = u32)]
     pub number: PollingStationNumber,
     #[serde(skip_serializing_if = "Option::is_none")]
     #[schema(nullable = false)]
@@ -65,7 +66,7 @@ impl From<PollingStation> for PollingStationDetails {
 pub struct PollingStationRequest {
     pub name: String,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[schema(nullable = false)]
+    #[schema(nullable = false, value_type = u32)]
     pub number: Option<PollingStationNumber>,
     #[serde(skip_serializing_if = "Option::is_none")]
     #[schema(nullable = false)]

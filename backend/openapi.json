@@ -6121,7 +6121,9 @@
             "type": "string"
           },
           "number": {
-            "$ref": "#/components/schemas/u32"
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
           },
           "number_of_voters": {
             "type": "integer",
@@ -6341,7 +6343,9 @@
             "type": "string"
           },
           "number": {
-            "$ref": "#/components/schemas/u32"
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
           },
           "number_of_voters": {
             "type": "integer",
@@ -6855,11 +6859,6 @@
           }
         },
         "additionalProperties": false
-      },
-      "u32": {
-        "type": "integer",
-        "format": "int32",
-        "minimum": 0
       }
     }
   }

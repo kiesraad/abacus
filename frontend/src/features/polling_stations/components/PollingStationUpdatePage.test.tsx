@@ -144,7 +144,7 @@ describe("PollingStationUpdatePage", () => {
       const deleteAlert = await screen.findByRole("alert");
       expect(within(deleteAlert).getByRole("strong")).toHaveTextContent("Stembureau kan niet verwijderd worden");
       expect(within(deleteAlert).getByRole("paragraph")).toHaveTextContent(
-        "Het stembureau kan niet meer verwijderd worden.",
+        "Er zijn al tellingen ingevoerd. De invoer moet eerst verwijderd worden om dit stembureau te kunnen verwijderen.",
       );
     });
   });

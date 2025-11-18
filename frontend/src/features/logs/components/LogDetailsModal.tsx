@@ -13,6 +13,7 @@ const SHOULD_TRANSLATE: Record<string, string> = {
   role: "",
   reference: "error.api_error.",
   dataEntryStatus: "status.",
+  level: "log.level.",
 };
 
 // format an audit log event detail value

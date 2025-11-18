@@ -78,6 +78,10 @@
     }
   }
 
+  tr.active {
+    background: var(--gray-200);
+  }
+
   tr.rowTotal {
     td {
       font-weight: bold;

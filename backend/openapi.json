@@ -1626,8 +1626,8 @@
               }
             }
           },
-          "422": {
-            "description": "Polling station deletion is not possible",
+          "409": {
+            "description": "Request cannot be completed",
             "content": {
               "application/json": {
                 "schema": {
@@ -5782,6 +5782,7 @@
           "OwnAccountCannotBeDeleted",
           "PasswordRejection",
           "PdfGenerationError",
+          "PollingStationCannotBeDeleted",
           "PollingStationRepeated",
           "PollingStationValidationErrors",
           "RequestPayloadTooLarge",

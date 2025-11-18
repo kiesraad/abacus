@@ -35,7 +35,7 @@
   "locality": "Plaats",
   "manage": "Stembureaus beheren",
   "message": {
-    "delete_error": "Het stembureau kan niet meer verwijderd worden. De invoerfase is al gestart.",
+    "delete_error": "Er zijn al tellingen ingevoerd. De invoer moet eerst verwijderd worden om dit stembureau te kunnen verwijderen.",
     "delete_error_title": "Stembureau kan niet verwijderd worden",
     "no_polling_stations": "Er zijn nog geen stembureaus ingevoerd voor deze verkiezing. Kies hoe je stembureaus gaat toevoegen.",
     "polling_station_created": "Stembureau {number} ({name}) toegevoegd",

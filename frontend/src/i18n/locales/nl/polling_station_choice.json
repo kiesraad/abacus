@@ -16,7 +16,7 @@
   "name_correct_warning": "Klopt de naam van het stembureau met de naam op je papieren proces-verbaal?\nDan kan je beginnen. Klopt de naam niet? Overleg met de coördinator.",
   "no_polling_station_found_with_number": "Geen stembureau gevonden met nummer {nr}",
   "searching": "aan het zoeken",
-  "there_are_no_polling_stations_left_to_fill_in": "Er zijn voor jou geen stembureaus meer om in te voeren",
+  "there_are_no_polling_stations_left_to_fill_in": "Er zijn voor jou op dit moment geen stembureaus om in te voeren",
   "unfinished_input_content": "Je bent begonnen met het invoeren van onderstaande stembureaus, maar hebt deze nog niet helemaal afgerond:",
   "unfinished_input_title": "Je hebt nog een openstaande invoer",
   "unknown_number": "Weet je het nummer niet?",

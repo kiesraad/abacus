@@ -21,5 +21,11 @@
     "resolve_errors": "Foutmeldingen en waarschuwingen oplossen",
     "short_title": "Fouten en waarschuwingen",
     "title": "Alle fouten en waarschuwingen"
-  }
+  },
+  "delete_are_you_sure": "Weet je zeker dat je de invoer voor stembureau {nr} wilt verwijderen? Deze actie kan niet worden teruggedraaid.",
+  "delete_all_are_you_sure": "Weet je zeker dat je de invoer voor stembureau {nr} wilt verwijderen? Let op: zowel de eerste als de tweede invoer wordt verwijderd. Deze actie kan niet worden teruggedraaid.",
+  "delete": "Invoer verwijderen",
+  "delete_data_entry": "Verwijder invoer",
+  "data_entry_deleted_details": "Stembureau {nr} is weer toegevoegd aan de werkvoorraad en kan opnieuw worden ingevoerd.",
+  "data_entry_deleted": "Invoer verwijderd"
 }

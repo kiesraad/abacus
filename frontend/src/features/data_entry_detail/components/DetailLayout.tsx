@@ -43,8 +43,8 @@ export function DetailLayout() {
 
   function handleDeleted() {
     pushMessage({
-      title: t("data_entry.data_entry_deleted"),
-      text: t("data_entry.data_entry_deleted_details", { nr: pollingStation?.number ?? "-" }),
+      title: t("data_entry_detail.data_entry_deleted"),
+      text: t("data_entry_detail.data_entry_deleted_details", { nr: pollingStation?.number ?? "-" }),
     });
 
     void navigate(`/elections/${election.id}/status`);

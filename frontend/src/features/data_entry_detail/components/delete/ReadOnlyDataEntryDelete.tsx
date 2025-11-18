@@ -43,15 +43,15 @@ export function ReadOnlyDataEntryDelete({ pollingStation, status, onDeleted, onE
   return (
     <div>
       <Button variant="tertiary-destructive" leftIcon={<IconTrash />} onClick={toggleModal}>
-        {t("data_entry.delete")}
+        {t("data_entry_detail.delete")}
       </Button>
 
       {showModal && (
-        <Modal title={t("data_entry.delete")} onClose={toggleModal}>
+        <Modal title={t("data_entry_detail.delete")} onClose={toggleModal}>
           {status === "second_entry_in_progress" || status === "definitive" ? (
-            <p>{t("data_entry.delete_all_are_you_sure", { nr: pollingStation.number })}</p>
+            <p>{t("data_entry_detail.delete_all_are_you_sure", { nr: pollingStation.number })}</p>
           ) : (
-            <p>{t("data_entry.delete_are_you_sure", { nr: pollingStation.number })}</p>
+            <p>{t("data_entry_detail.delete_are_you_sure", { nr: pollingStation.number })}</p>
           )}
           <nav>
             <Button
@@ -61,7 +61,7 @@ export function ReadOnlyDataEntryDelete({ pollingStation, status, onDeleted, onE
               onClick={handleDelete}
               disabled={isLoading}
             >
-              {t("data_entry.delete_data_entry")}
+              {t("data_entry_detail.delete_data_entry")}
             </Button>
             <Button variant="secondary" size="xl" onClick={toggleModal} disabled={isLoading}>
               {t("cancel")}

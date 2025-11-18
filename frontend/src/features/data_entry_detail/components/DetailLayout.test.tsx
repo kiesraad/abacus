@@ -21,6 +21,7 @@ import {
 import { overrideOnce, server } from "@/testing/server";
 import { render, screen, spyOnHandler, waitFor, within } from "@/testing/test-utils";
 import { TestUserProvider } from "@/testing/TestUserProvider";
+import { ErrorResponse } from "@/types/generated/openapi";
 
 import { DetailLayout } from "./DetailLayout";
 
@@ -122,5 +123,24 @@ describe("DetailLayout", () => {
 
     // Verify the delete button is not present
     expect(screen.queryByRole("button", { name: "Invoer verwijderen" })).not.toBeInTheDocument();
+  });
+
+  test("Redirect to status page when trying to visit detail page when data entry has differences", async () => {
+    // Coordinator is viewing the detail page when second entry has not been finished yet.
+    // Meanwhile, the second typist finishes the second entry which results in different entries.
+    // Next, the coordinator refreshes the detail page and should be redirected to the status page.
+    // Because of the new state (EntriesDifferent) of this data entry, the detail page is not allowed.
+    vi.spyOn(ReactRouter, "useParams").mockReturnValue({ electionId: "1", pollingStationId: "3" });
+
+    overrideOnce("get", "/api/polling_stations/3/data_entries/get", 409, {
+      error: "Data entry is in the wrong state",
+      fatal: false,
+      reference: "DataEntryGetNotAllowed",
+    } satisfies ErrorResponse);
+
+    renderLayout();
+    await waitFor(() => {
+      expect(navigate).toHaveBeenCalledWith("/elections/1/status");
+    });
   });
 });

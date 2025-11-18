@@ -1,4 +1,5 @@
 import { useContext, useState } from "react";
+import { useNavigate } from "react-router";
 
 import { AnyApiError, isSuccess, NotFoundError } from "@/api/ApiResult";
 import { useApiClient } from "@/api/useApiClient";
@@ -28,6 +29,7 @@ interface DataEntryErrors {
 }
 
 export function usePollingStationDataEntryErrors(pollingStationId: number): DataEntryErrors {
+  const navigate = useNavigate();
   const client = useApiClient();
   const { election, pollingStations } = useElection();
   const pollingStation = pollingStations.find((ps) => ps.id === pollingStationId);
@@ -52,7 +54,11 @@ export function usePollingStationDataEntryErrors(pollingStationId: number): Data
 
   // render generic error page when any error occurs
   if (requestState.status === "api-error") {
-    throw requestState.error;
+    if (requestState.error.reference === "DataEntryGetNotAllowed") {
+      void navigate(`/elections/${election.id}/status`);
+    } else {
+      throw requestState.error;
+    }
   }
 
   const onSubmit = async (afterSave: (action: ResolveErrorsAction) => void) => {

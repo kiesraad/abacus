@@ -85,7 +85,7 @@ export function PollingStationUpdatePage() {
     currentCommitteeSession.status !== "created" &&
     currentCommitteeSession.status !== "data_entry_not_started"
   ) {
-    return <Navigate to={".."} replace />;
+    return <Navigate to={parentUrl} replace />;
   } else {
     return (
       <>

@@ -5,6 +5,7 @@ import { beforeEach, describe, expect, test, vi } from "vitest";
 
 import * as useMessages from "@/hooks/messages/useMessages";
 import { ElectionProvider } from "@/hooks/election/ElectionProvider";
+import { getElectionMockData } from "@/testing/api-mocks/ElectionMockData";
 import {
   ElectionRequestHandler,
   PollingStationDeleteHandler,
@@ -12,22 +13,22 @@ import {
   PollingStationUpdateHandler,
 } from "@/testing/api-mocks/RequestHandlers";
 import { overrideOnce, server } from "@/testing/server";
-import { renderReturningRouter, screen, spyOnHandler, waitFor, within } from "@/testing/test-utils";
-import { PollingStation } from "@/types/generated/openapi";
+import { render, screen, spyOnHandler, waitFor, within } from "@/testing/test-utils";
+import { TestUserProvider } from "@/testing/TestUserProvider";
+import { PollingStation, Role } from "@/types/generated/openapi";
 
 import { PollingStationUpdatePage } from "./PollingStationUpdatePage";
 
-async function renderPage() {
-  const router = renderReturningRouter(
-    <ElectionProvider electionId={1}>
-      <PollingStationUpdatePage />
-    </ElectionProvider>,
+const navigate = vi.fn();
+
+function renderPage(userRole: Role) {
+  return render(
+    <TestUserProvider userRole={userRole}>
+      <ElectionProvider electionId={1}>
+        <PollingStationUpdatePage />
+      </ElectionProvider>
+    </TestUserProvider>,
   );
-
-  // Ensure rendering is complete
-  expect(await screen.findByTestId("polling-station-form")).toBeVisible();
-
-  return router;
 }
 
 describe("PollingStationUpdatePage", () => {
@@ -48,6 +49,11 @@ describe("PollingStationUpdatePage", () => {
 
   beforeEach(() => {
     server.use(ElectionRequestHandler, PollingStationGetHandler, PollingStationUpdateHandler);
+    vi.spyOn(ReactRouter, "useNavigate").mockImplementation(() => navigate);
+    vi.spyOn(ReactRouter, "Navigate").mockImplementation((props) => {
+      navigate(props.to);
+      return null;
+    });
     vi.spyOn(ReactRouter, "useParams").mockReturnValue({ pollingStationId: "1" });
     vi.spyOn(useMessages, "useMessages").mockReturnValue({
       pushMessage,
@@ -57,25 +63,31 @@ describe("PollingStationUpdatePage", () => {
   });
 
   test("Shows form", async () => {
-    await renderPage();
+    renderPage("coordinator");
+
+    expect(await screen.findByTestId("polling-station-form")).toBeVisible();
     expect(screen.getByRole("textbox", { name: "Nummer" })).toHaveValue("33");
     expect(screen.getByRole("textbox", { name: "Naam" })).toHaveValue("Op Rolletjes");
   });
 
   test("Navigates back on save", async () => {
-    const router = await renderPage();
+    renderPage("coordinator");
+
+    expect(await screen.findByTestId("polling-station-form")).toBeVisible();
     const saveButton = await screen.findByRole("button", { name: "Wijzigingen opslaan" });
     saveButton.click();
 
     await waitFor(() => {
       expect(pushMessage).toHaveBeenCalledWith({ title: "Wijzigingen stembureau 34 (Testplek) opgeslagen" });
-      expect(router.state.location.pathname).toEqual("/elections/1/polling-stations");
+      expect(navigate).toHaveBeenCalledExactlyOnceWith("/elections/1/polling-stations");
     });
   });
 
   describe("Delete polling station", () => {
     test("Delete button should be shown", async () => {
-      await renderPage();
+      renderPage("coordinator");
+
+      expect(await screen.findByTestId("polling-station-form")).toBeVisible();
       const deleteButton = await screen.findByRole("button", { name: "Stembureau verwijderen" });
       expect(deleteButton).toBeInTheDocument();
     });
@@ -86,8 +98,9 @@ describe("PollingStationUpdatePage", () => {
         id_prev_session: 42,
       });
 
-      await renderPage();
+      renderPage("coordinator");
 
+      expect(await screen.findByTestId("polling-station-form")).toBeVisible();
       // Button should not be shown
       const deleteButton = screen.queryByRole("button", { name: "Stembureau verwijderen" });
       expect(deleteButton).not.toBeInTheDocument();
@@ -101,8 +114,9 @@ describe("PollingStationUpdatePage", () => {
       server.use(PollingStationDeleteHandler);
       const user = userEvent.setup();
 
-      const router = await renderPage();
+      renderPage("coordinator");
 
+      expect(await screen.findByTestId("polling-station-form")).toBeVisible();
       const deleteButton = await screen.findByRole("button", { name: "Stembureau verwijderen" });
       await user.click(deleteButton);
 
@@ -117,7 +131,7 @@ describe("PollingStationUpdatePage", () => {
       expect(deletePollingStation).toHaveBeenCalled();
 
       expect(pushMessage).toHaveBeenCalledWith({ title: "Stembureau 33 (Op Rolletjes) verwijderd" });
-      expect(router.state.location.pathname).toEqual("/elections/1/polling-stations");
+      expect(navigate).toHaveBeenCalledExactlyOnceWith("/elections/1/polling-stations");
     });
 
     test("Shows an error message when delete was not possible", async () => {
@@ -130,8 +144,9 @@ describe("PollingStationUpdatePage", () => {
         reference: "InvalidData",
       });
 
-      await renderPage();
+      renderPage("coordinator");
 
+      expect(await screen.findByTestId("polling-station-form")).toBeVisible();
       const deleteButton = await screen.findByRole("button", { name: "Stembureau verwijderen" });
       await user.click(deleteButton);
 
@@ -146,6 +161,36 @@ describe("PollingStationUpdatePage", () => {
       expect(within(deleteAlert).getByRole("paragraph")).toHaveTextContent(
         "Er zijn al tellingen ingevoerd. De invoer moet eerst verwijderd worden om dit stembureau te kunnen verwijderen.",
       );
+    });
+  });
+
+  describe("Administrator user", () => {
+    test("Redirects to list page when committee session status is in progress", async () => {
+      renderPage("administrator");
+
+      await waitFor(() => {
+        expect(navigate).toHaveBeenCalledWith("/elections/1/polling-stations");
+      });
+    });
+
+    test("Shows form when committee session status is created", async () => {
+      overrideOnce("get", "/api/elections/1", 200, getElectionMockData({}, { status: "created" }));
+
+      renderPage("administrator");
+
+      expect(await screen.findByTestId("polling-station-form")).toBeVisible();
+      expect(screen.getByRole("textbox", { name: "Nummer" })).toHaveValue("33");
+      expect(screen.getByRole("textbox", { name: "Naam" })).toHaveValue("Op Rolletjes");
+    });
+
+    test("Shows form when committee session status is not started", async () => {
+      overrideOnce("get", "/api/elections/1", 200, getElectionMockData({}, { status: "data_entry_not_started" }));
+
+      renderPage("administrator");
+
+      expect(await screen.findByTestId("polling-station-form")).toBeVisible();
+      expect(screen.getByRole("textbox", { name: "Nummer" })).toHaveValue("33");
+      expect(screen.getByRole("textbox", { name: "Naam" })).toHaveValue("Op Rolletjes");
     });
   });
 });

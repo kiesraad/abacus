@@ -71,7 +71,8 @@ export function InvestigationsOverviewPage() {
         </section>
       </header>
 
-      {allInvestigationsHandled &&
+      {isCoordinator &&
+        allInvestigationsHandled &&
         currentCommitteeSession.status !== "data_entry_finished" &&
         (missingInvestigations.length > 0 ? (
           <Alert type="warning">

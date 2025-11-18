@@ -52,10 +52,10 @@ describe("PollingStationListPage", () => {
       ["33", "Op Rolletjes", "Mobiel"],
       ["34", "Testplek", "Bijzonder"],
       ["35", "Testschool", "Vaste locatie"],
-      ["36", "Testbuurthuis", "Vaste locatie"],
-      ["37", "Dansschool Oeps nou deed ik het weer", "Bijzonder"],
+      ["36", "Testbuurthuis", "–"],
+      ["37", "Dansschool Oeps nou deed ik het weer", "–"],
       ["38", "Testmuseum", "Bijzonder"],
-      ["39", "Test gemeentehuis", "Vaste locatie"],
+      ["39", "Test gemeentehuis", "Mobiel"],
       ["40", "Test kerk", "Vaste locatie"],
     ]);
 
@@ -106,10 +106,10 @@ describe("PollingStationListPage", () => {
         ["33", "Op Rolletjes", "Mobiel"],
         ["34", "Testplek", "Bijzonder"],
         ["35", "Testschool", "Vaste locatie"],
-        ["36", "Testbuurthuis", "Vaste locatie"],
-        ["37", "Dansschool Oeps nou deed ik het weer", "Bijzonder"],
+        ["36", "Testbuurthuis", "–"],
+        ["37", "Dansschool Oeps nou deed ik het weer", "–"],
         ["38", "Testmuseum", "Bijzonder"],
-        ["39", "Test gemeentehuis", "Vaste locatie"],
+        ["39", "Test gemeentehuis", "Mobiel"],
         ["40", "Test kerk", "Vaste locatie"],
       ]);
 

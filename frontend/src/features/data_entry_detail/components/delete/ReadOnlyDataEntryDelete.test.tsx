@@ -42,6 +42,29 @@ describe("ReadOnlyDataEntryDelete", () => {
 
     expect(await screen.findByRole("dialog")).toBeInTheDocument();
 
+    const modal = await screen.findByTestId("modal-dialog");
+    expect(modal).toHaveTextContent(
+      "Weet je zeker dat je de invoer voor stembureau 37 wilt verwijderen? Deze actie kan niet worden teruggedraaid.",
+    );
+
+    await user.click(screen.getByRole("button", { name: "Verwijder invoer" }));
+    expect(deleteDataEntry).toHaveBeenCalledOnce();
+    expect(onDeleted).toHaveBeenCalledOnce();
+  });
+
+  test("Renders different text when there are 2 data entries", async () => {
+    const { onDeleted } = renderComponent("definitive");
+
+    const user = userEvent.setup();
+    await user.click(screen.getByRole("button", { name: "Invoer verwijderen" }));
+
+    expect(await screen.findByRole("dialog")).toBeInTheDocument();
+
+    const modal = await screen.findByTestId("modal-dialog");
+    expect(modal).toHaveTextContent(
+      "Weet je zeker dat je de invoer voor stembureau 37 wilt verwijderen? Let op: zowel de eerste als de tweede invoer wordt verwijderd. Deze actie kan niet worden teruggedraaid.",
+    );
+
     await user.click(screen.getByRole("button", { name: "Verwijder invoer" }));
     expect(deleteDataEntry).toHaveBeenCalledOnce();
     expect(onDeleted).toHaveBeenCalledOnce();

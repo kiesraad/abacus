@@ -5,10 +5,11 @@ import { formatDateTime } from "@/utils/dateTime";
 
 interface LogsTableProps {
   events: AuditLogEvent[];
+  details: AuditLogEvent | null;
   setDetails: (details: AuditLogEvent) => void;
 }
 
-export function LogsTable({ events, setDetails }: LogsTableProps) {
+export function LogsTable({ events, details, setDetails }: LogsTableProps) {
   return (
     <Table id="users">
       <Table.Header>
@@ -30,6 +31,7 @@ export function LogsTable({ events, setDetails }: LogsTableProps) {
             onClick={() => {
               setDetails(event);
             }}
+            active={event.id === details?.id}
           >
             <Table.Cell>{event.id}</Table.Cell>
             <Table.Cell>{formatDateTime(new Date(event.time), false)}</Table.Cell>

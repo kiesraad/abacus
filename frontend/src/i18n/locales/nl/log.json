@@ -123,6 +123,7 @@
     "time": "Tijdstip",
     "user": "Gebruiker: id, gebruikersnaam (rol)"
   },
+  "id": "Activiteitenlog nummer",
   "level": {
     "error": "Fout",
     "info": "Informatie",

@@ -13,6 +13,7 @@ const SHOULD_TRANSLATE: Record<string, string> = {
   role: "",
   reference: "error.api_error.",
   dataEntryStatus: "status.",
+  level: "log.level.",
 };
 
 // format an audit log event detail value
@@ -68,6 +69,8 @@ export function LogDetailsModal({ details, setDetails }: LogDetailsModalProps) {
     >
       <div>
         <dl className={cls.details} role="list">
+          <dt>{t("log.id")}</dt>
+          <dd>{details.id}</dd>
           <dt>{t("log.header.time")}</dt>
           <dd>{formatDateTimeFull(new Date(details.time))}</dd>
           {details.username && (

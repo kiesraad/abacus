@@ -815,6 +815,7 @@ export type ErrorReference =
   | "OwnAccountCannotBeDeleted"
   | "PasswordRejection"
   | "PdfGenerationError"
+  | "PollingStationCannotBeDeleted"
   | "PollingStationRepeated"
   | "PollingStationValidationErrors"
   | "RequestPayloadTooLarge"

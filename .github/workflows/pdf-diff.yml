@@ -1,0 +1,66 @@
+name: Track PDF model changes
+
+on:
+  workflow_dispatch:
+  pull_request:
+
+permissions:
+  contents: read
+  pull-requests: write
+
+env:
+  TZ: "Europe/Amsterdam"
+
+jobs:
+  diff:
+    name: Diff PDFs
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./backend
+    env:
+      CARGO_TERM_COLOR: always
+      SQLX_OFFLINE: "true"
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: main
+      - name: Setup Rust
+        run: >
+          rustup update stable &&
+          rustup default stable
+      - name: Cargo cache
+        uses: Swatinem/rust-cache@f13886b937689c021905a6b90929199931d60db1 # v2
+        with:
+          workspaces: "backend -> target"
+      - name: Generate PDFs
+        run: cargo run --bin gen-pdf --features embed-typst -- --directory main
+      - name: Switch to current branch
+        uses: actions/checkout@v5
+        with:
+          clean: false
+      - name: Generate PDFs on the current branch
+        run: cargo run --bin gen-pdf --features embed-typst -- --directory head
+      - name: Install diff-pdf
+        run: sudo apt-get update && sudo apt-get install -y diff-pdf-wx
+      - name: Generate PDF diff summary
+        id: diff_summary
+        uses: actions/github-script@v7
+        with:
+          script: require('.github/workflows/scripts/pdf-diff.js').pdfDiff({ core });
+      - name: Upload diff artifacts
+        id: artifact-upload
+        if: ${{ steps.diff_summary.outputs.diff_found == '1' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: pdf-diffs
+          path: backend/tmp-pdf-gen/diffs/
+      - name: Comment on PR with PDF diff summary and link to artifact
+        if: ${{ github.event_name == 'pull_request' }}
+        uses: marocchino/sticky-pull-request-comment@5060d4700a91de252c87eeddd2da026382d9298a #v2
+        env:
+          DOWNLOAD_LINK: "[Download ZIP file containing PDF files with the visual differences](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}/artifacts/${{ steps.artifact-upload.outputs['artifact-id'] }})"
+        with:
+          message: |
+            ${{ steps.diff_summary.outputs.table }}
+            ${{ steps.artifact-upload.outputs['artifact-id'] && env.DOWNLOAD_LINK }}

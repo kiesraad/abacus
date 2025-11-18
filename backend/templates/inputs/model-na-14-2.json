@@ -724,8 +724,8 @@
                 "locality": "Eemstricht",
                 "gender": "Female"
               },
-              "votes": 22868,
-              "previous_votes": 22868
+              "votes": 0,
+              "previous_votes": 0
             },
             {
               "candidate": {
@@ -737,7 +737,7 @@
                 "gender": "Male"
               },
               "votes": 7792,
-              "previous_votes": 7792
+              "previous_votes": 0
             },
             {
               "candidate": {
@@ -747,7 +747,7 @@
                 "locality": "Huisden",
                 "gender": "X"
               },
-              "votes": 4565,
+              "votes": 0,
               "previous_votes": 4565
             },
             {
@@ -760,7 +760,7 @@
                 "gender": "X"
               },
               "votes": 2961,
-              "previous_votes": 2961
+              "previous_votes": 2962
             },
             {
               "candidate": {

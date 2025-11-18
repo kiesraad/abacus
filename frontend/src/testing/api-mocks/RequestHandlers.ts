@@ -406,7 +406,7 @@ export const PollingStationDataEntryFinaliseHandler = http.post<
 export const PollingStationDataEntriesAndResultDeleteHandler = http.delete<
   ParamsToString<POLLING_STATION_DATA_ENTRIES_AND_RESULT_DELETE_REQUEST_PARAMS>
 >(
-  "/api/polling_stations/1/data_entries" satisfies POLLING_STATION_DATA_ENTRIES_AND_RESULT_DELETE_REQUEST_PATH,
+  "/api/polling_stations/5/data_entries" satisfies POLLING_STATION_DATA_ENTRIES_AND_RESULT_DELETE_REQUEST_PATH,
   () => new HttpResponse(null, { status: 204 }),
 );
 

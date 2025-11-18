@@ -17,7 +17,7 @@ function renderComponent(status: DataEntryStatusName) {
   const onError = vi.fn();
   render(
     <ReadOnlyDataEntryDelete
-      pollingStation={pollingStationMockData[0]!}
+      pollingStation={pollingStationMockData[4]!}
       status={status}
       onDeleted={onDeleted}
       onError={onError}
@@ -64,7 +64,7 @@ describe("ReadOnlyDataEntryDelete", () => {
   test("on error", async () => {
     overrideOnce(
       "delete",
-      "/api/polling_stations/1/data_entries" satisfies POLLING_STATION_DATA_ENTRIES_AND_RESULT_DELETE_REQUEST_PATH,
+      "/api/polling_stations/5/data_entries" satisfies POLLING_STATION_DATA_ENTRIES_AND_RESULT_DELETE_REQUEST_PATH,
       401,
       {
         error: "Invalid session",

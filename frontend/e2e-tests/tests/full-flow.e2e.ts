@@ -143,6 +143,48 @@ test.describe("full flow", () => {
     await expect(electionStatus.header).toContainText("Eerste zitting");
   });
 
+  test("download Na 31-2 documents", async ({ page }) => {
+    await page.goto("/account/login");
+
+    const loginPage = new LoginPgObj(page);
+    await loginPage.login("coordinator1", getTestPassword("coordinator1"));
+
+    const overviewPage = new ElectionsOverviewPgObj(page);
+    await expect(overviewPage.header).toBeVisible();
+    await overviewPage.findElectionRowById(electionId!).click();
+
+    const electionHomePage = new ElectionHome(page);
+    await expect(electionHomePage.header).toContainText("Gemeenteraad Test 2022");
+
+    const downloadPromise = page.waitForEvent("download");
+    await electionHomePage.downloadBijlage1.click();
+    const download = await downloadPromise;
+
+    expect(download.suggestedFilename()).toBe("GR2022_Test_na_31_2_bijlage1.zip");
+    expect((await stat(await download.path())).size).toBeGreaterThan(1024);
+  });
+
+  test("download N10-2 documents", async ({ page }) => {
+    await page.goto("/account/login");
+
+    const loginPage = new LoginPgObj(page);
+    await loginPage.login("coordinator1", getTestPassword("coordinator1"));
+
+    const overviewPage = new ElectionsOverviewPgObj(page);
+    await expect(overviewPage.header).toBeVisible();
+    await overviewPage.findElectionRowById(electionId!).click();
+
+    const electionHomePage = new ElectionHome(page);
+    await expect(electionHomePage.header).toContainText("Gemeenteraad Test 2022");
+
+    const downloadPromise = page.waitForEvent("download");
+    await electionHomePage.downloadN10_2.click();
+    const download = await downloadPromise;
+
+    expect(download.suggestedFilename()).toBe("GR2022_Test_n_10_2.zip");
+    expect((await stat(await download.path())).size).toBeGreaterThan(1024);
+  });
+
   for (const station of [
     { number: "1", name: "Stadhuis" },
     { number: "2", name: "Basisschool de Regenboog" },
@@ -229,6 +271,8 @@ test.describe("full flow", () => {
     const electionDetailsPage = new ElectionDetailsPgObj(page);
     await electionDetailsPage.newSessionButton.click();
     await electionDetailsPage.newSessionModalConfirmButton.click();
+
+    await expect(electionDetailsPage.investigationsOverviewButton).toBeVisible();
   });
 
   test("add missing polling station", async ({ page }) => {
@@ -292,6 +336,9 @@ test.describe("full flow", () => {
 
     const electionDetailsPage = new ElectionDetailsPgObj(page);
     await electionDetailsPage.startDataEntryButton.click();
+
+    const electionStatus = new ElectionStatus(page);
+    await expect(electionStatus.header).toContainText("Tweede zitting");
   });
 
   for (const station of investigations) {
@@ -368,6 +415,8 @@ test.describe("full flow", () => {
 
       const checkAndSavePage = new CheckAndSavePage(page);
       await checkAndSavePage.save.click();
+
+      await expect(dataEntryHomePage.dataEntrySaved).toBeVisible();
     });
   }
 
@@ -445,7 +494,6 @@ test.describe("full flow", () => {
     await electionHomePage.downloadSecondSessionZip.click();
 
     const download = await downloadPromise;
-
     expect(download.suggestedFilename()).toBe("election_result_GR2022_Test.zip");
     expect((await stat(await download.path())).size).toBeGreaterThan(1024);
   });

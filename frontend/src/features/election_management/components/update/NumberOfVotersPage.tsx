@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useNavigate } from "react-router";
 
 import { isSuccess } from "@/api/ApiResult";
@@ -14,16 +15,22 @@ import {
 export function NumberOfVotersPage() {
   const navigate = useNavigate();
   const { currentCommitteeSession, election } = useElection();
+  const [error, setError] = useState<string | undefined>();
   const updatePath: COMMITTEE_SESSION_NUMBER_OF_VOTERS_CHANGE_REQUEST_PATH = `/api/elections/${currentCommitteeSession.election_id}/committee_sessions/${currentCommitteeSession.id}/voters`;
   const { update } = useCrud({ updatePath, throwAllErrors: true });
 
   function handleSubmit(numberOfVoters: number) {
-    const body: COMMITTEE_SESSION_NUMBER_OF_VOTERS_CHANGE_REQUEST_BODY = { number_of_voters: numberOfVoters };
-    void update(body).then((result) => {
-      if (isSuccess(result)) {
-        void navigate("..");
-      }
-    });
+    if (numberOfVoters > 0) {
+      setError(undefined);
+      const body: COMMITTEE_SESSION_NUMBER_OF_VOTERS_CHANGE_REQUEST_BODY = { number_of_voters: numberOfVoters };
+      void update(body).then((result) => {
+        if (isSuccess(result)) {
+          void navigate("..");
+        }
+      });
+    } else {
+      setError(t("election.number_of_voters.error"));
+    }
   }
 
   return (
@@ -44,6 +51,7 @@ export function NumberOfVotersPage() {
             hint={t("election_management.enter_a_number")}
             button={t("save")}
             onSubmit={handleSubmit}
+            error={error}
           />
         </article>
       </main>

@@ -1,7 +1,6 @@
 import { Table } from "@/components/ui/Table/Table";
-import { useUserRole } from "@/hooks/user/useUserRole";
 import { t } from "@/i18n/translate";
-import { ElectionWithPoliticalGroups } from "@/types/generated/openapi";
+import { CommitteeSession, ElectionWithPoliticalGroups } from "@/types/generated/openapi";
 import { cn } from "@/utils/classnames";
 import { formatNumber } from "@/utils/number";
 
@@ -9,8 +8,8 @@ import cls from "./ElectionManagement.module.css";
 
 interface ElectionInformationTableProps {
   election: ElectionWithPoliticalGroups;
+  committeeSession: CommitteeSession;
   numberOfPollingStations: number;
-  numberOfVoters: number;
 }
 
 function getListsAndCandidatesLabel(election: ElectionWithPoliticalGroups) {
@@ -26,11 +25,9 @@ function getListsAndCandidatesLabel(election: ElectionWithPoliticalGroups) {
 
 export function ElectionInformationTable({
   election,
+  committeeSession,
   numberOfPollingStations,
-  numberOfVoters,
 }: ElectionInformationTableProps) {
-  const { isCoordinator } = useUserRole();
-
   return (
     <Table
       id="election-information-table"
@@ -61,13 +58,14 @@ export function ElectionInformationTable({
           </Table.HeaderCell>
           <Table.Cell>{getListsAndCandidatesLabel(election)}</Table.Cell>
         </Table.Row>
-        {isCoordinator ? (
+        {committeeSession.number === 1 &&
+        (committeeSession.status === "created" || committeeSession.status === "data_entry_not_started") ? (
           <Table.LinkRow to={"number-of-voters"}>
             <Table.HeaderCell scope="row" className="normal">
               {t("number_of_voters")}
             </Table.HeaderCell>
             <Table.Cell className="underlined">
-              {numberOfVoters ? formatNumber(numberOfVoters) : t("election_management.still_to_input")}
+              {committeeSession.number_of_voters ? formatNumber(committeeSession.number_of_voters) : "0"}
             </Table.Cell>
           </Table.LinkRow>
         ) : (
@@ -76,7 +74,7 @@ export function ElectionInformationTable({
               {t("number_of_voters")}
             </Table.HeaderCell>
             <Table.Cell>
-              {numberOfVoters ? formatNumber(numberOfVoters) : t("election_management.still_to_input_by_a_coordinator")}
+              {committeeSession.number_of_voters ? formatNumber(committeeSession.number_of_voters) : "0"}
             </Table.Cell>
           </Table.Row>
         )}

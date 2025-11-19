@@ -759,15 +759,19 @@ async fn polling_station_data_entry_get(
                 validation_results: ValidationResults::default(),
             }))
         }
-        DataEntryStatus::Definitive(_) => Ok(Json(DataEntryGetResponse {
-            user_id: None,
-            data: get_result(&mut conn, polling_station_id, committee_session.id)
-                .await?
-                .data
-                .0,
-            status: state.status_name(),
-            validation_results: state.start_validate(&polling_station, &election)?,
-        })),
+        DataEntryStatus::Definitive(_) => {
+            let result = get_result(&mut conn, polling_station_id, committee_session.id).await?;
+            let data_entry = result.data.0;
+
+            let validation_results = data_entry.start_validate(&polling_station, &election)?;
+
+            Ok(Json(DataEntryGetResponse {
+                user_id: None,
+                data: data_entry,
+                status: state.status_name(),
+                validation_results,
+            }))
+        }
         _ => Err(APIError::Conflict(
             "Data entry is in the wrong state".to_string(),
             ErrorReference::DataEntryGetNotAllowed,
@@ -2397,7 +2401,8 @@ mod tests {
             assert_eq!(result.status, DataEntryStatusName::FirstEntryInProgress);
             assert_eq!(result.user_id, Some(1));
             assert_eq!(result.data.as_common().voters_counts.poll_card_count, 0);
-            assert_eq!(result.validation_results, ValidationResults::default());
+            assert!(!result.validation_results.has_errors());
+            assert!(!result.validation_results.has_warnings());
         }
 
         #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
@@ -2435,7 +2440,7 @@ mod tests {
             claim(pool.clone(), 1, EntryNumber::FirstEntry).await;
             save(
                 pool.clone(),
-                example_data_entry(),
+                example_data_entry_with_warning(),
                 1,
                 EntryNumber::FirstEntry,
             )
@@ -2448,14 +2453,15 @@ mod tests {
 
             assert_eq!(result.status, DataEntryStatusName::SecondEntryNotStarted);
             assert_eq!(result.user_id, Some(1));
-            assert_eq!(result.data.as_common().voters_counts.poll_card_count, 99);
+            assert_eq!(result.data.as_common().voters_counts.poll_card_count, 199);
             assert!(!result.validation_results.has_errors());
+            assert!(result.validation_results.has_warnings());
         }
 
         #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
         async fn test_status_second_entry_in_progress(pool: SqlitePool) {
             // Complete first entry
-            let data_entry_body = example_data_entry();
+            let data_entry_body = example_data_entry_with_warning();
             claim(pool.clone(), 1, EntryNumber::FirstEntry).await;
             save(pool.clone(), data_entry_body, 1, EntryNumber::FirstEntry).await;
             finalise(pool.clone(), 1, EntryNumber::FirstEntry).await;
@@ -2470,7 +2476,8 @@ mod tests {
             assert_eq!(result.status, DataEntryStatusName::SecondEntryInProgress);
             assert_eq!(result.user_id, Some(2));
             assert_eq!(result.data.as_common().voters_counts.poll_card_count, 0);
-            assert_eq!(result.validation_results, ValidationResults::default());
+            assert!(!result.validation_results.has_errors());
+            assert!(!result.validation_results.has_warnings());
         }
 
         #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
@@ -2504,13 +2511,13 @@ mod tests {
         #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
         async fn test_status_definitive(pool: SqlitePool) {
             // Complete first entry
-            let data_entry_body = example_data_entry();
+            let data_entry_body = example_data_entry_with_warning();
             claim(pool.clone(), 1, EntryNumber::FirstEntry).await;
             save(pool.clone(), data_entry_body, 1, EntryNumber::FirstEntry).await;
             finalise(pool.clone(), 1, EntryNumber::FirstEntry).await;
 
             // Complete second entry
-            let data_entry_body = example_data_entry();
+            let data_entry_body = example_data_entry_with_warning();
             claim(pool.clone(), 1, EntryNumber::SecondEntry).await;
             save(pool.clone(), data_entry_body, 1, EntryNumber::SecondEntry).await;
             finalise(pool.clone(), 1, EntryNumber::SecondEntry).await;
@@ -2522,6 +2529,7 @@ mod tests {
             assert_eq!(result.status, DataEntryStatusName::Definitive);
             assert_eq!(result.user_id, None);
             assert!(!result.validation_results.has_errors());
+            assert!(result.validation_results.has_warnings());
         }
     }
 }

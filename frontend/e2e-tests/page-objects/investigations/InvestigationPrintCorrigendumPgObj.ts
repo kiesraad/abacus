@@ -8,8 +8,6 @@ export class InvestigationPrintCorrigendumPgObj {
   constructor(protected readonly page: Page) {
     this.header = page.getByRole("heading", { name: "Print het corrigendum" });
     this.continueButton = page.getByRole("link", { name: "Verder naar bevindingen" });
-    this.downloadLink = page.getByRole("link").filter({
-      hasText: /Download corrigendum voor stembureau \d+/,
-    });
+    this.downloadLink = page.getByRole("link", { name: /Download corrigendum voor stembureau \d+/ });
   }
 }

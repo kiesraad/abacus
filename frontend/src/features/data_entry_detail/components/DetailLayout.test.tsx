@@ -125,11 +125,7 @@ describe("DetailLayout", () => {
     expect(screen.queryByRole("button", { name: "Invoer verwijderen" })).not.toBeInTheDocument();
   });
 
-  test("Redirect to status page when trying to visit detail page when data entry has differences", async () => {
-    // Coordinator is viewing the detail page when second entry has not been finished yet.
-    // Meanwhile, the second typist finishes the second entry which results in different entries.
-    // Next, the coordinator refreshes the detail page and should be redirected to the status page.
-    // Because of the new state (EntriesDifferent) of this data entry, the detail page is not allowed.
+  test("Redirect to status page on error DataEntryGetNotAllowed", async () => {
     vi.spyOn(ReactRouter, "useParams").mockReturnValue({ electionId: "1", pollingStationId: "3" });
 
     overrideOnce("get", "/api/polling_stations/3/data_entries/get", 409, {

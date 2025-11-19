@@ -822,7 +822,7 @@
     },
     "/api/elections/{election_id}/committee_sessions/{committee_session_id}/investigations": {
       "get": {
-        "summary": "Get a list of all [Investigation]s for a committee session",
+        "summary": "Get a list of all [Investigation]s for a committee session (coordinator)",
         "operationId": "committee_session_investigations",
         "parameters": [
           {
@@ -899,7 +899,14 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "cookie_auth": [
+              "coordinator"
+            ]
+          }
+        ]
       }
     },
     "/api/elections/{election_id}/committee_sessions/{committee_session_id}/status": {
@@ -1006,7 +1013,7 @@
     },
     "/api/elections/{election_id}/committee_sessions/{committee_session_id}/voters": {
       "put": {
-        "summary": "Change the number of voters of a [CommitteeSession]. (coordinator)",
+        "summary": "Change the number of voters of a [CommitteeSession]. (administrator, coordinator)",
         "operationId": "committee_session_number_of_voters_change",
         "parameters": [
           {
@@ -1100,6 +1107,7 @@
         "security": [
           {
             "cookie_auth": [
+              "administrator",
               "coordinator"
             ]
           }

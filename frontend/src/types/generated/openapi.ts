@@ -3,51 +3,43 @@
 /** PATHS **/
 
 // /api/account
-// Roles: administrator, coordinator, typist
 export type ACCOUNT_UPDATE_REQUEST_PARAMS = Record<string, never>;
 export type ACCOUNT_UPDATE_REQUEST_PATH = `/api/account`;
 export type ACCOUNT_UPDATE_REQUEST_BODY = AccountUpdateRequest;
 
 // /api/elections
-// Roles: administrator, coordinator, typist
 export type ELECTION_LIST_REQUEST_PARAMS = Record<string, never>;
 export type ELECTION_LIST_REQUEST_PATH = `/api/elections`;
 
 // /api/elections/import
-// Roles: administrator
 export type ELECTION_IMPORT_REQUEST_PARAMS = Record<string, never>;
 export type ELECTION_IMPORT_REQUEST_PATH = `/api/elections/import`;
 export type ELECTION_IMPORT_REQUEST_BODY = ElectionAndCandidatesDefinitionImportRequest;
 
 // /api/elections/import/validate
-// Roles: administrator
 export type ELECTION_IMPORT_VALIDATE_REQUEST_PARAMS = Record<string, never>;
 export type ELECTION_IMPORT_VALIDATE_REQUEST_PATH = `/api/elections/import/validate`;
 export type ELECTION_IMPORT_VALIDATE_REQUEST_BODY = ElectionAndCandidateDefinitionValidateRequest;
 
 // /api/elections/{election_id}
-// Roles: administrator, coordinator, typist
 export interface ELECTION_DETAILS_REQUEST_PARAMS {
   election_id: number;
 }
 export type ELECTION_DETAILS_REQUEST_PATH = `/api/elections/${number}`;
 
 // /api/elections/{election_id}/committee_sessions
-// Roles: coordinator
 export interface COMMITTEE_SESSION_CREATE_REQUEST_PARAMS {
   election_id: number;
 }
 export type COMMITTEE_SESSION_CREATE_REQUEST_PATH = `/api/elections/${number}/committee_sessions`;
 
 // /api/elections/{election_id}/committee_sessions/{committee_session_id}
-// Roles: coordinator
 export interface COMMITTEE_SESSION_UPDATE_REQUEST_PARAMS {
   election_id: number;
   committee_session_id: number;
 }
 export type COMMITTEE_SESSION_UPDATE_REQUEST_PATH = `/api/elections/${number}/committee_sessions/${number}`;
 export type COMMITTEE_SESSION_UPDATE_REQUEST_BODY = CommitteeSessionUpdateRequest;
-// Roles: coordinator
 export interface COMMITTEE_SESSION_DELETE_REQUEST_PARAMS {
   election_id: number;
   committee_session_id: number;
@@ -55,7 +47,6 @@ export interface COMMITTEE_SESSION_DELETE_REQUEST_PARAMS {
 export type COMMITTEE_SESSION_DELETE_REQUEST_PATH = `/api/elections/${number}/committee_sessions/${number}`;
 
 // /api/elections/{election_id}/committee_sessions/{committee_session_id}/download_pdf_results
-// Roles: coordinator
 export interface ELECTION_DOWNLOAD_PDF_RESULTS_REQUEST_PARAMS {
   election_id: number;
   committee_session_id: number;
@@ -64,7 +55,6 @@ export type ELECTION_DOWNLOAD_PDF_RESULTS_REQUEST_PATH =
   `/api/elections/${number}/committee_sessions/${number}/download_pdf_results`;
 
 // /api/elections/{election_id}/committee_sessions/{committee_session_id}/download_zip_results
-// Roles: coordinator
 export interface ELECTION_DOWNLOAD_ZIP_RESULTS_REQUEST_PARAMS {
   election_id: number;
   committee_session_id: number;
@@ -73,7 +63,6 @@ export type ELECTION_DOWNLOAD_ZIP_RESULTS_REQUEST_PATH =
   `/api/elections/${number}/committee_sessions/${number}/download_zip_results`;
 
 // /api/elections/{election_id}/committee_sessions/{committee_session_id}/investigations
-// No authentication required
 export interface COMMITTEE_SESSION_INVESTIGATIONS_REQUEST_PARAMS {
   election_id: number;
   committee_session_id: number;
@@ -82,7 +71,6 @@ export type COMMITTEE_SESSION_INVESTIGATIONS_REQUEST_PATH =
   `/api/elections/${number}/committee_sessions/${number}/investigations`;
 
 // /api/elections/{election_id}/committee_sessions/{committee_session_id}/status
-// Roles: coordinator
 export interface COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_PARAMS {
   election_id: number;
   committee_session_id: number;
@@ -92,7 +80,6 @@ export type COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_PATH =
 export type COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_BODY = CommitteeSessionStatusChangeRequest;
 
 // /api/elections/{election_id}/committee_sessions/{committee_session_id}/voters
-// Roles: coordinator
 export interface COMMITTEE_SESSION_NUMBER_OF_VOTERS_CHANGE_REQUEST_PARAMS {
   election_id: number;
   committee_session_id: number;
@@ -102,26 +89,22 @@ export type COMMITTEE_SESSION_NUMBER_OF_VOTERS_CHANGE_REQUEST_PATH =
 export type COMMITTEE_SESSION_NUMBER_OF_VOTERS_CHANGE_REQUEST_BODY = CommitteeSessionNumberOfVotersChangeRequest;
 
 // /api/elections/{election_id}/download_n_10_2
-// Roles: administrator, coordinator
 export interface ELECTION_DOWNLOAD_N_10_2_REQUEST_PARAMS {
   election_id: number;
 }
 export type ELECTION_DOWNLOAD_N_10_2_REQUEST_PATH = `/api/elections/${number}/download_n_10_2`;
 
 // /api/elections/{election_id}/download_na_31_2_bijlage1
-// Roles: administrator, coordinator
 export interface ELECTION_DOWNLOAD_NA_31_2_BIJLAGE1_REQUEST_PARAMS {
   election_id: number;
 }
 export type ELECTION_DOWNLOAD_NA_31_2_BIJLAGE1_REQUEST_PATH = `/api/elections/${number}/download_na_31_2_bijlage1`;
 
 // /api/elections/{election_id}/polling_stations
-// Roles: administrator, coordinator, typist
 export interface POLLING_STATION_LIST_REQUEST_PARAMS {
   election_id: number;
 }
 export type POLLING_STATION_LIST_REQUEST_PATH = `/api/elections/${number}/polling_stations`;
-// Roles: administrator, coordinator
 export interface POLLING_STATION_CREATE_REQUEST_PARAMS {
   election_id: number;
 }
@@ -129,7 +112,6 @@ export type POLLING_STATION_CREATE_REQUEST_PATH = `/api/elections/${number}/poll
 export type POLLING_STATION_CREATE_REQUEST_BODY = PollingStationRequest;
 
 // /api/elections/{election_id}/polling_stations/import
-// Roles: administrator, coordinator
 export interface POLLING_STATION_IMPORT_REQUEST_PARAMS {
   election_id: number;
 }
@@ -137,7 +119,6 @@ export type POLLING_STATION_IMPORT_REQUEST_PATH = `/api/elections/${number}/poll
 export type POLLING_STATION_IMPORT_REQUEST_BODY = PollingStationsRequest;
 
 // /api/elections/{election_id}/polling_stations/validate-import
-// Roles: administrator, coordinator
 export interface POLLING_STATION_VALIDATE_IMPORT_REQUEST_PARAMS {
   election_id: number;
 }
@@ -145,20 +126,17 @@ export type POLLING_STATION_VALIDATE_IMPORT_REQUEST_PATH = `/api/elections/${num
 export type POLLING_STATION_VALIDATE_IMPORT_REQUEST_BODY = PollingStationFileRequest;
 
 // /api/elections/{election_id}/polling_stations/{polling_station_id}
-// Roles: administrator, coordinator, typist
 export interface POLLING_STATION_GET_REQUEST_PARAMS {
   election_id: number;
   polling_station_id: number;
 }
 export type POLLING_STATION_GET_REQUEST_PATH = `/api/elections/${number}/polling_stations/${number}`;
-// Roles: administrator, coordinator
 export interface POLLING_STATION_UPDATE_REQUEST_PARAMS {
   election_id: number;
   polling_station_id: number;
 }
 export type POLLING_STATION_UPDATE_REQUEST_PATH = `/api/elections/${number}/polling_stations/${number}`;
 export type POLLING_STATION_UPDATE_REQUEST_BODY = PollingStationRequest;
-// Roles: administrator, coordinator
 export interface POLLING_STATION_DELETE_REQUEST_PARAMS {
   election_id: number;
   polling_station_id: number;
@@ -166,36 +144,30 @@ export interface POLLING_STATION_DELETE_REQUEST_PARAMS {
 export type POLLING_STATION_DELETE_REQUEST_PATH = `/api/elections/${number}/polling_stations/${number}`;
 
 // /api/elections/{election_id}/status
-// Roles: administrator, coordinator, typist
 export interface ELECTION_STATUS_REQUEST_PARAMS {
   election_id: number;
 }
 export type ELECTION_STATUS_REQUEST_PATH = `/api/elections/${number}/status`;
 
 // /api/generate_test_election
-// No authentication required
 export type GENERATE_ELECTION_HANDLER_REQUEST_PARAMS = Record<string, never>;
 export type GENERATE_ELECTION_HANDLER_REQUEST_PATH = `/api/generate_test_election`;
 export type GENERATE_ELECTION_HANDLER_REQUEST_BODY = GenerateElectionArgs;
 
 // /api/initialise/admin-exists
-// No authentication required
 export type ADMIN_EXISTS_REQUEST_PARAMS = Record<string, never>;
 export type ADMIN_EXISTS_REQUEST_PATH = `/api/initialise/admin-exists`;
 
 // /api/initialise/first-admin
-// No authentication required
 export type CREATE_FIRST_ADMIN_REQUEST_PARAMS = Record<string, never>;
 export type CREATE_FIRST_ADMIN_REQUEST_PATH = `/api/initialise/first-admin`;
 export type CREATE_FIRST_ADMIN_REQUEST_BODY = CreateUserRequest;
 
 // /api/initialised
-// No authentication required
 export type INITIALISED_REQUEST_PARAMS = Record<string, never>;
 export type INITIALISED_REQUEST_PATH = `/api/initialised`;
 
 // /api/log
-// Roles: administrator, coordinator
 export interface AUDIT_LOG_LIST_REQUEST_PARAMS {
   page: number;
   per_page: number;
@@ -207,23 +179,19 @@ export interface AUDIT_LOG_LIST_REQUEST_PARAMS {
 export type AUDIT_LOG_LIST_REQUEST_PATH = `/api/log`;
 
 // /api/log-users
-// Roles: administrator, coordinator
 export type AUDIT_LOG_LIST_USERS_REQUEST_PARAMS = Record<string, never>;
 export type AUDIT_LOG_LIST_USERS_REQUEST_PATH = `/api/log-users`;
 
 // /api/login
-// No authentication required
 export type LOGIN_REQUEST_PARAMS = Record<string, never>;
 export type LOGIN_REQUEST_PATH = `/api/login`;
 export type LOGIN_REQUEST_BODY = Credentials;
 
 // /api/logout
-// No authentication required
 export type LOGOUT_REQUEST_PARAMS = Record<string, never>;
 export type LOGOUT_REQUEST_PATH = `/api/logout`;
 
 // /api/polling_stations/{polling_station_id}/data_entries
-// Roles: coordinator
 export interface POLLING_STATION_DATA_ENTRIES_AND_RESULT_DELETE_REQUEST_PARAMS {
   polling_station_id: number;
 }
@@ -231,20 +199,17 @@ export type POLLING_STATION_DATA_ENTRIES_AND_RESULT_DELETE_REQUEST_PATH =
   `/api/polling_stations/${number}/data_entries`;
 
 // /api/polling_stations/{polling_station_id}/data_entries/get
-// Roles: coordinator
 export interface POLLING_STATION_DATA_ENTRY_GET_REQUEST_PARAMS {
   polling_station_id: number;
 }
 export type POLLING_STATION_DATA_ENTRY_GET_REQUEST_PATH = `/api/polling_stations/${number}/data_entries/get`;
 
 // /api/polling_stations/{polling_station_id}/data_entries/resolve_differences
-// Roles: coordinator
 export interface POLLING_STATION_DATA_ENTRY_GET_DIFFERENCES_REQUEST_PARAMS {
   polling_station_id: number;
 }
 export type POLLING_STATION_DATA_ENTRY_GET_DIFFERENCES_REQUEST_PATH =
   `/api/polling_stations/${number}/data_entries/resolve_differences`;
-// Roles: coordinator
 export interface POLLING_STATION_DATA_ENTRY_RESOLVE_DIFFERENCES_REQUEST_PARAMS {
   polling_station_id: number;
 }
@@ -253,7 +218,6 @@ export type POLLING_STATION_DATA_ENTRY_RESOLVE_DIFFERENCES_REQUEST_PATH =
 export type POLLING_STATION_DATA_ENTRY_RESOLVE_DIFFERENCES_REQUEST_BODY = ResolveDifferencesAction;
 
 // /api/polling_stations/{polling_station_id}/data_entries/resolve_errors
-// Roles: coordinator
 export interface POLLING_STATION_DATA_ENTRY_RESOLVE_ERRORS_REQUEST_PARAMS {
   polling_station_id: number;
 }
@@ -262,14 +226,12 @@ export type POLLING_STATION_DATA_ENTRY_RESOLVE_ERRORS_REQUEST_PATH =
 export type POLLING_STATION_DATA_ENTRY_RESOLVE_ERRORS_REQUEST_BODY = ResolveErrorsAction;
 
 // /api/polling_stations/{polling_station_id}/data_entries/{entry_number}
-// Roles: typist
 export interface POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_PARAMS {
   polling_station_id: number;
   entry_number: number;
 }
 export type POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_PATH = `/api/polling_stations/${number}/data_entries/${number}`;
 export type POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_BODY = DataEntry;
-// Roles: typist
 export interface POLLING_STATION_DATA_ENTRY_DELETE_REQUEST_PARAMS {
   polling_station_id: number;
   entry_number: number;
@@ -277,7 +239,6 @@ export interface POLLING_STATION_DATA_ENTRY_DELETE_REQUEST_PARAMS {
 export type POLLING_STATION_DATA_ENTRY_DELETE_REQUEST_PATH = `/api/polling_stations/${number}/data_entries/${number}`;
 
 // /api/polling_stations/{polling_station_id}/data_entries/{entry_number}/claim
-// Roles: typist
 export interface POLLING_STATION_DATA_ENTRY_CLAIM_REQUEST_PARAMS {
   polling_station_id: number;
   entry_number: number;
@@ -286,7 +247,6 @@ export type POLLING_STATION_DATA_ENTRY_CLAIM_REQUEST_PATH =
   `/api/polling_stations/${number}/data_entries/${number}/claim`;
 
 // /api/polling_stations/{polling_station_id}/data_entries/{entry_number}/finalise
-// Roles: typist
 export interface POLLING_STATION_DATA_ENTRY_FINALISE_REQUEST_PARAMS {
   polling_station_id: number;
   entry_number: number;
@@ -295,26 +255,22 @@ export type POLLING_STATION_DATA_ENTRY_FINALISE_REQUEST_PATH =
   `/api/polling_stations/${number}/data_entries/${number}/finalise`;
 
 // /api/polling_stations/{polling_station_id}/investigation
-// Roles: coordinator
 export interface POLLING_STATION_INVESTIGATION_UPDATE_REQUEST_PARAMS {
   polling_station_id: number;
 }
 export type POLLING_STATION_INVESTIGATION_UPDATE_REQUEST_PATH = `/api/polling_stations/${number}/investigation`;
 export type POLLING_STATION_INVESTIGATION_UPDATE_REQUEST_BODY = PollingStationInvestigationUpdateRequest;
-// Roles: coordinator
 export interface POLLING_STATION_INVESTIGATION_CREATE_REQUEST_PARAMS {
   polling_station_id: number;
 }
 export type POLLING_STATION_INVESTIGATION_CREATE_REQUEST_PATH = `/api/polling_stations/${number}/investigation`;
 export type POLLING_STATION_INVESTIGATION_CREATE_REQUEST_BODY = PollingStationInvestigationCreateRequest;
-// Roles: coordinator
 export interface POLLING_STATION_INVESTIGATION_DELETE_REQUEST_PARAMS {
   polling_station_id: number;
 }
 export type POLLING_STATION_INVESTIGATION_DELETE_REQUEST_PATH = `/api/polling_stations/${number}/investigation`;
 
 // /api/polling_stations/{polling_station_id}/investigation/conclude
-// Roles: coordinator
 export interface POLLING_STATION_INVESTIGATION_CONCLUDE_REQUEST_PARAMS {
   polling_station_id: number;
 }
@@ -323,7 +279,6 @@ export type POLLING_STATION_INVESTIGATION_CONCLUDE_REQUEST_PATH =
 export type POLLING_STATION_INVESTIGATION_CONCLUDE_REQUEST_BODY = PollingStationInvestigationConcludeRequest;
 
 // /api/polling_stations/{polling_station_id}/investigation/download_corrigendum_pdf
-// Roles: coordinator
 export interface POLLING_STATION_INVESTIGATION_DOWNLOAD_CORRIGENDUM_PDF_REQUEST_PARAMS {
   polling_station_id: number;
 }
@@ -331,34 +286,28 @@ export type POLLING_STATION_INVESTIGATION_DOWNLOAD_CORRIGENDUM_PDF_REQUEST_PATH 
   `/api/polling_stations/${number}/investigation/download_corrigendum_pdf`;
 
 // /api/user
-// Roles: administrator, coordinator
 export type USER_LIST_REQUEST_PARAMS = Record<string, never>;
 export type USER_LIST_REQUEST_PATH = `/api/user`;
-// Roles: administrator, coordinator
 export type USER_CREATE_REQUEST_PARAMS = Record<string, never>;
 export type USER_CREATE_REQUEST_PATH = `/api/user`;
 export type USER_CREATE_REQUEST_BODY = CreateUserRequest;
 
 // /api/user/{user_id}
-// Roles: administrator, coordinator
 export interface USER_GET_REQUEST_PARAMS {
   user_id: number;
 }
 export type USER_GET_REQUEST_PATH = `/api/user/${number}`;
-// Roles: administrator, coordinator
 export interface USER_UPDATE_REQUEST_PARAMS {
   user_id: number;
 }
 export type USER_UPDATE_REQUEST_PATH = `/api/user/${number}`;
 export type USER_UPDATE_REQUEST_BODY = UpdateUserRequest;
-// Roles: administrator, coordinator
 export interface USER_DELETE_REQUEST_PARAMS {
   user_id: number;
 }
 export type USER_DELETE_REQUEST_PATH = `/api/user/${number}`;
 
 // /api/whoami
-// Roles: administrator, coordinator, typist
 export type WHOAMI_REQUEST_PARAMS = Record<string, never>;
 export type WHOAMI_REQUEST_PATH = `/api/whoami`;
 

@@ -91,6 +91,8 @@ pub fn get_scopes_from_operation(operation: &Operation) -> Option<Vec<String>> {
     let scopes: Vec<String> = security_reqs
         .iter()
         .filter_map(|req| {
+            // Serialization to access private BTreeMap values of SecurityRequirement
+            // Proposed change upstream: https://github.com/juhaku/utoipa/pull/1494
             serde_json::to_value(req).ok().and_then(|v| {
                 v.as_object()?
                     .get(SECURITY_SCHEME_NAME)?

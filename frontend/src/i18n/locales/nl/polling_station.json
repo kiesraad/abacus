@@ -17,7 +17,8 @@
   },
   "delete_not_possible": {
     "title": "Stembureau verwijderen niet mogelijk",
-    "message": "Er zijn al tellingen ingevoerd."
+    "pre_existing_polling_station": "Er zijn al tellingen ingevoerd in een eerdere zitting.",
+    "delete_existing_data_entry": "Er zijn al tellingen ingevoerd. <link>Verwijder eerst de invoer</link> om dit stembureau te kunnen verwijderen."
   },
   "details": "Details van het stembureau",
   "empty": "Er zijn nog geen stembureaus ingevoerd voor deze verkiezing. Kies hoe je stembureaus gaat toevoegen.",

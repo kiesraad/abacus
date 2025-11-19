@@ -5715,6 +5715,10 @@
           "status"
         ],
         "properties": {
+          "finalised_with_warnings": {
+            "type": "boolean",
+            "description": "Whether the finalised first or second data entry has warnings"
+          },
           "finished_at": {
             "type": "string",
             "description": "Time when the data entry was finalised"

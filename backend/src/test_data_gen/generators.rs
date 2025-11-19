@@ -337,6 +337,7 @@ async fn generate_data_entry(
                     first_entry_user_id: 5,  // first typist from users in fixtures
                     second_entry_user_id: 6, // second typist from users in fixtures
                     finished_at: ts,
+                    finalised_with_warnings: validation_results.has_warnings(),
                 });
 
                 crate::data_entry::repository::make_definitive(
@@ -355,6 +356,7 @@ async fn generate_data_entry(
                     first_entry_user_id: 5, // first typist from users in fixtures
                     finalised_first_entry: results.clone(),
                     first_entry_finished_at: ts,
+                    finalised_with_warnings: validation_results.has_warnings(),
                 });
                 crate::data_entry::repository::upsert(conn, ps.id, committee_session.id, &state)
                     .await

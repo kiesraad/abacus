@@ -1,5 +1,6 @@
 use chrono::{Datelike, Timelike};
 use std::{fmt::Debug, time::Instant};
+use strum::Display;
 use tracing::{debug, error, info, warn};
 use typst::{comemo, diag::SourceDiagnostic, ecow::EcoVec, foundations::Datetime};
 use typst_pdf::{PdfOptions, PdfStandard, PdfStandards, Timestamp};
@@ -115,7 +116,7 @@ fn compile_pdf(world: &mut world::PdfWorld, model: PdfModel) -> Result<PdfGenRes
     Ok(PdfGenResult { buffer })
 }
 
-#[derive(Debug)]
+#[derive(Debug, Display)]
 pub enum PdfGenError {
     Typst(String),
     Join(tokio::task::JoinError),
@@ -123,6 +124,8 @@ pub enum PdfGenError {
     TemplateNotFound(String),
     ZipError(ZipResponseError),
 }
+
+impl std::error::Error for PdfGenError {}
 
 impl PdfGenError {
     fn from_typst(typst_errors: EcoVec<SourceDiagnostic>) -> PdfGenError {

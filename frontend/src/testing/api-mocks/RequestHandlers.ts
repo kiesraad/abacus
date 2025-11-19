@@ -16,6 +16,8 @@ import {
   COMMITTEE_SESSION_CREATE_REQUEST_PATH,
   COMMITTEE_SESSION_DELETE_REQUEST_PARAMS,
   COMMITTEE_SESSION_DELETE_REQUEST_PATH,
+  COMMITTEE_SESSION_INVESTIGATIONS_REQUEST_PARAMS,
+  COMMITTEE_SESSION_INVESTIGATIONS_REQUEST_PATH,
   COMMITTEE_SESSION_NUMBER_OF_VOTERS_CHANGE_REQUEST_BODY,
   COMMITTEE_SESSION_NUMBER_OF_VOTERS_CHANGE_REQUEST_PARAMS,
   COMMITTEE_SESSION_NUMBER_OF_VOTERS_CHANGE_REQUEST_PATH,
@@ -52,12 +54,15 @@ import {
   ErrorResponse,
   INITIALISED_REQUEST_PARAMS,
   INITIALISED_REQUEST_PATH,
+  InvestigationListResponse,
   LOGIN_REQUEST_BODY,
   LOGIN_REQUEST_PARAMS,
   LOGIN_REQUEST_PATH,
   LoginResponse,
   POLLING_STATION_CREATE_REQUEST_BODY,
   POLLING_STATION_CREATE_REQUEST_PARAMS,
+  POLLING_STATION_DATA_ENTRIES_AND_RESULT_DELETE_REQUEST_PARAMS,
+  POLLING_STATION_DATA_ENTRIES_AND_RESULT_DELETE_REQUEST_PATH,
   POLLING_STATION_DATA_ENTRY_CLAIM_REQUEST_PARAMS,
   POLLING_STATION_DATA_ENTRY_CLAIM_REQUEST_PATH,
   POLLING_STATION_DATA_ENTRY_DELETE_REQUEST_PARAMS,
@@ -122,7 +127,7 @@ import {
 import { getCommitteeSessionMockData } from "./CommitteeSessionMockData";
 import {
   claimDataEntryResponse,
-  dataEntryGetMockResponse,
+  dataEntryHasErrorsGetMockResponse,
   dataEntryStatusDifferences,
   saveDataEntryResponse,
 } from "./DataEntryMockData";
@@ -131,6 +136,7 @@ import {
   electionImportMockResponse,
   electionImportValidateMockResponse,
   electionListMockResponse,
+  investigationListMockResponse,
 } from "./ElectionMockData";
 import { statusResponseMock } from "./ElectionStatusMockData";
 import { logMockResponse } from "./LogMockData";
@@ -214,6 +220,15 @@ export const CommitteeSessionCreateHandler = http.post<
 export const CommitteeSessionDeleteHandler = http.delete<ParamsToString<COMMITTEE_SESSION_DELETE_REQUEST_PARAMS>>(
   "/api/elections/1/committee_sessions/4" satisfies COMMITTEE_SESSION_DELETE_REQUEST_PATH,
   () => new HttpResponse(null, { status: 200 }),
+);
+
+// get investigation list handler
+export const InvestigationListRequestHandler = http.get<
+  ParamsToString<COMMITTEE_SESSION_INVESTIGATIONS_REQUEST_PARAMS>,
+  null,
+  InvestigationListResponse
+>("/api/elections/1/committee_sessions/1/investigations" satisfies COMMITTEE_SESSION_INVESTIGATIONS_REQUEST_PATH, () =>
+  HttpResponse.json(investigationListMockResponse, { status: 200 }),
 );
 
 // investigation handlers
@@ -334,7 +349,7 @@ export const PollingStationDataEntryGetHandler = http.get<
   null,
   DataEntryGetResponse
 >("/api/polling_stations/5/data_entries/get" satisfies POLLING_STATION_DATA_ENTRY_GET_REQUEST_PATH, () =>
-  HttpResponse.json(dataEntryGetMockResponse, { status: 200 }),
+  HttpResponse.json(dataEntryHasErrorsGetMockResponse, { status: 200 }),
 );
 
 export const PollingStationDataEntryResolveDifferencesHandler = http.post<
@@ -398,6 +413,14 @@ export const PollingStationDataEntryFinaliseHandler = http.post<
   DataEntryStatusResponse | ErrorResponse
 >("/api/polling_stations/1/data_entries/1/finalise" satisfies POLLING_STATION_DATA_ENTRY_FINALISE_REQUEST_PATH, () =>
   HttpResponse.json({ status: "second_entry_not_started" }, { status: 200 }),
+);
+
+// delete data entries and result handler
+export const PollingStationDataEntriesAndResultDeleteHandler = http.delete<
+  ParamsToString<POLLING_STATION_DATA_ENTRIES_AND_RESULT_DELETE_REQUEST_PARAMS>
+>(
+  "/api/polling_stations/5/data_entries" satisfies POLLING_STATION_DATA_ENTRIES_AND_RESULT_DELETE_REQUEST_PATH,
+  () => new HttpResponse(null, { status: 204 }),
 );
 
 export const PollingStationCreateHandler = http.post<
@@ -488,6 +511,7 @@ export const handlers: HttpHandler[] = [
   CommitteeSessionUpdateHandler,
   CommitteeSessionCreateHandler,
   CommitteeSessionDeleteHandler,
+  InvestigationListRequestHandler,
   PollingStationInvestigationCreateHandler,
   PollingStationInvestigationConcludeHandler,
   PollingStationInvestigationUpdateHandler,
@@ -507,6 +531,7 @@ export const handlers: HttpHandler[] = [
   PollingStationDataEntryClaimHandler,
   PollingStationDataEntryDeleteHandler,
   PollingStationDataEntryFinaliseHandler,
+  PollingStationDataEntriesAndResultDeleteHandler,
   PollingStationCreateHandler,
   PollingStationDeleteHandler,
   PollingStationUpdateHandler,

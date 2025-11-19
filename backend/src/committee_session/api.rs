@@ -9,15 +9,15 @@ use utoipa_axum::{router::OpenApiRouter, routes};
 
 use super::{
     CommitteeSession, CommitteeSessionCreateRequest, CommitteeSessionNumberOfVotersChangeRequest,
-    CommitteeSessionStatusChangeRequest,
+    CommitteeSessionStatusChangeRequest, CommitteeSessionUpdateRequest, InvestigationListResponse,
     status::{CommitteeSessionStatus, change_committee_session_status},
 };
 use crate::{
     APIError, AppState, ErrorResponse, SqlitePoolExt,
     audit_log::{AuditEvent, AuditService},
-    authentication::Coordinator,
-    committee_session::CommitteeSessionUpdateRequest,
+    authentication::{AdminOrCoordinator, Coordinator},
     error::ErrorReference,
+    investigation::list_investigations_for_committee_session,
 };
 
 #[derive(Debug, PartialEq, Eq)]
@@ -41,6 +41,7 @@ pub fn router() -> OpenApiRouter<AppState> {
         .routes(routes!(committee_session_update))
         .routes(routes!(committee_session_number_of_voters_change))
         .routes(routes!(committee_session_status_change))
+        .routes(routes!(committee_session_investigations))
 }
 
 pub async fn validate_committee_session_is_current_committee_session(
@@ -262,6 +263,7 @@ pub async fn committee_session_update(
         (status = 401, description = "Unauthorized", body = ErrorResponse),
         (status = 403, description = "Forbidden", body = ErrorResponse),
         (status = 404, description = "Committee session not found", body = ErrorResponse),
+        (status = 409, description = "Request cannot be completed", body = ErrorResponse),
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
     params(
@@ -271,7 +273,7 @@ pub async fn committee_session_update(
     security(("cookie_auth" = ["coordinator"])),
 )]
 pub async fn committee_session_number_of_voters_change(
-    _user: Coordinator,
+    _user: AdminOrCoordinator,
     State(pool): State<SqlitePool>,
     audit_service: AuditService,
     Path((election_id, committee_session_id)): Path<(u32, u32)>,
@@ -279,31 +281,42 @@ pub async fn committee_session_number_of_voters_change(
 ) -> Result<StatusCode, APIError> {
     let mut tx = pool.begin_immediate().await?;
 
-    validate_committee_session_is_current_committee_session(
+    let committee_session = validate_committee_session_is_current_committee_session(
         &mut tx,
         election_id,
         committee_session_id,
     )
     .await?;
 
-    let committee_session = crate::committee_session::repository::change_number_of_voters(
-        &mut tx,
-        committee_session_id,
-        committee_session_request.number_of_voters,
-    )
-    .await?;
-
-    audit_service
-        .log(
+    if !committee_session.is_next_session()
+        && (committee_session.status == CommitteeSessionStatus::Created
+            || committee_session.status == CommitteeSessionStatus::DataEntryNotStarted)
+    {
+        let committee_session = crate::committee_session::repository::change_number_of_voters(
             &mut tx,
-            &AuditEvent::CommitteeSessionUpdated(committee_session.clone().into()),
-            None,
+            committee_session_id,
+            committee_session_request.number_of_voters,
         )
         .await?;
 
-    tx.commit().await?;
+        audit_service
+            .log(
+                &mut tx,
+                &AuditEvent::CommitteeSessionUpdated(committee_session.clone().into()),
+                None,
+            )
+            .await?;
 
-    Ok(StatusCode::NO_CONTENT)
+        tx.commit().await?;
+
+        Ok(StatusCode::NO_CONTENT)
+    } else {
+        tx.rollback().await?;
+
+        Err(APIError::CommitteeSession(
+            CommitteeSessionError::InvalidCommitteeSessionStatus,
+        ))
+    }
 }
 
 /// Change the status of a [CommitteeSession].
@@ -351,6 +364,41 @@ pub async fn committee_session_status_change(
     tx.commit().await?;
 
     Ok(StatusCode::NO_CONTENT)
+}
+
+/// Get a list of all [Investigation]s for a committee session
+#[utoipa::path(
+    get,
+    path = "/api/elections/{election_id}/committee_sessions/{committee_session_id}/investigations",
+    responses(
+        (status = 200, description = "Investigation listing successful", body = InvestigationListResponse),
+        (status = 401, description = "Unauthorized", body = ErrorResponse),
+        (status = 403, description = "Forbidden", body = ErrorResponse),
+        (status = 404, description = "Committee session not found", body = ErrorResponse),
+        (status = 500, description = "Internal server error", body = ErrorResponse),
+    ),
+    params(
+        ("election_id" = u32, description = "Election database id"),
+        ("committee_session_id" = u32, description = "Committee session database id"),
+    ),
+)]
+pub async fn committee_session_investigations(
+    _user: Coordinator,
+    State(pool): State<SqlitePool>,
+    Path((election_id, committee_session_id)): Path<(u32, u32)>,
+) -> Result<Json<InvestigationListResponse>, APIError> {
+    let mut conn = pool.acquire().await?;
+
+    // Check if the election exists, will respond with NOT_FOUND otherwise
+    crate::election::repository::get(&mut conn, election_id).await?;
+
+    let committee_session =
+        crate::committee_session::repository::get(&mut conn, committee_session_id).await?;
+
+    Ok(Json(InvestigationListResponse {
+        investigations: list_investigations_for_committee_session(&mut conn, committee_session.id)
+            .await?,
+    }))
 }
 
 #[cfg(test)]

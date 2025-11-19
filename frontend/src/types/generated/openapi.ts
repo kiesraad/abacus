@@ -72,6 +72,15 @@ export interface ELECTION_DOWNLOAD_ZIP_RESULTS_REQUEST_PARAMS {
 export type ELECTION_DOWNLOAD_ZIP_RESULTS_REQUEST_PATH =
   `/api/elections/${number}/committee_sessions/${number}/download_zip_results`;
 
+// /api/elections/{election_id}/committee_sessions/{committee_session_id}/investigations
+// No authentication required
+export interface COMMITTEE_SESSION_INVESTIGATIONS_REQUEST_PARAMS {
+  election_id: number;
+  committee_session_id: number;
+}
+export type COMMITTEE_SESSION_INVESTIGATIONS_REQUEST_PATH =
+  `/api/elections/${number}/committee_sessions/${number}/investigations`;
+
 // /api/elections/{election_id}/committee_sessions/{committee_session_id}/status
 // Roles: coordinator
 export interface COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_PARAMS {
@@ -397,6 +406,7 @@ export type AuditEvent =
   | (DataEntryDetails & { event_type: "DataEntryDiscardedBoth" })
   | { event_type: "AirGapViolationDetected" }
   | { event_type: "AirGapViolationResolved" }
+  | { event_type: "ApplicationStarted" }
   | (ErrorDetails & { event_type: "Error" })
   | { event_type: "UnknownEvent" };
 
@@ -443,7 +453,7 @@ export interface CSOFirstSessionResults {
   counting_differences_polling_station: CountingDifferencesPollingStation;
   /** Differences counts ("3. Verschil tussen het aantal toegelaten kiezers en het aantal getelde stembiljetten") */
   differences_counts: DifferencesCounts;
-  /** Extra investigation ("B1-1 Extra onderzoek") */
+  /** Extra investigation ("B1-1 Alleen bij extra onderzoek") */
   extra_investigation: ExtraInvestigation;
   /** Vote counts per list and candidate (5. "Aantal stemmen per lijst en kandidaat") */
   political_group_votes: PoliticalGroupCandidateVotes[];
@@ -789,6 +799,8 @@ export interface ElectionStatusResponse {
  * Election polling stations data entry statuses response
  */
 export interface ElectionStatusResponseEntry {
+  /** Whether the finalised first or second data entry has warnings */
+  finalised_with_warnings?: boolean;
   /** Time when the data entry was finalised */
   finished_at?: string;
   /** First entry progress as a percentage (0 to 100) */
@@ -864,6 +876,7 @@ export type ErrorReference =
   | "OwnAccountCannotBeDeleted"
   | "PasswordRejection"
   | "PdfGenerationError"
+  | "PollingStationCannotBeDeleted"
   | "PollingStationRepeated"
   | "PollingStationValidationErrors"
   | "RequestPayloadTooLarge"
@@ -881,7 +894,7 @@ export interface ErrorResponse {
 }
 
 /**
- * Extra investigation, part of the polling station results ("B1-1 Extra onderzoek")
+ * Extra investigation, part of the polling station results ("B1-1 Alleen bij extra onderzoek")
  */
 export interface ExtraInvestigation {
   /** Whether ballots were (partially) recounted following the extra investigation
@@ -923,6 +936,13 @@ export interface GenerateElectionArgs {
   voters: RandomRange;
   /** Include (part of) data entry for this election */
   with_data_entry: boolean;
+}
+
+/**
+ * Investigation list response
+ */
+export interface InvestigationListResponse {
+  investigations: PollingStationInvestigation[];
 }
 
 export interface LoginResponse {

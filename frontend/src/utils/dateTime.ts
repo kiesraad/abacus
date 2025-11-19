@@ -22,37 +22,20 @@ function isYesterday(date: Date): boolean {
   );
 }
 
-export function formatFullDateWithoutTimezone(date: Date) {
+export function formatDateFull(date: Date) {
   return new Intl.DateTimeFormat(t("date_locale"), {
     weekday: "long",
     day: "numeric",
     month: "long",
     year: "numeric",
-    timeZone: "UTC",
   }).format(date);
-}
-
-export function formatFullDateTimeWithoutTimezone(date: Date) {
-  const dateFormat = new Intl.DateTimeFormat(t("date_locale"), {
-    weekday: "long",
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-    timeZone: "UTC",
-  }).format(date);
-
-  const timeFormat = new Intl.DateTimeFormat(t("date_locale"), {
-    hour: "2-digit",
-    minute: "2-digit",
-  }).format(date);
-
-  return `${dateFormat} ${timeFormat}`;
 }
 
 export function formatDateTimeFull(date: Date) {
   return date.toLocaleTimeString(t("date_locale"), {
     hour: "numeric",
     minute: "numeric",
+    weekday: "long",
     day: "numeric",
     month: "long",
     year: "numeric",
@@ -67,27 +50,25 @@ export function formatDateTime(date: Date, relative = true) {
 
     if (isToday(date)) {
       // Today
-      return `${t("today")} ${timeString}`;
+      return `${t("today")} om ${timeString}`;
     }
 
     if (isYesterday(date)) {
       // Yesterday
-      return `${t("yesterday")} ${timeString}`;
+      return `${t("yesterday")} om ${timeString}`;
     }
 
     if (Math.round(Math.abs(Number(today) - Number(date)) / (24 * 60 * 60 * 1000)) < 7) {
       // Within the past 3-6 days
-      return date.toLocaleString(t("date_locale"), {
+      return `${date.toLocaleString(t("date_locale"), {
         weekday: "long",
-        hour: "numeric",
-        minute: "numeric",
-      });
+      })} om ${timeString}`;
     }
   }
 
   // More than 6 days ago (or in the future)
   const dateString = date.toLocaleDateString(t("date_locale"), { day: "numeric", month: "short" });
-  return `${dateString} ${timeString}`;
+  return `${dateString} om ${timeString}`;
 }
 
 export function formatTimeToGo(seconds: number) {

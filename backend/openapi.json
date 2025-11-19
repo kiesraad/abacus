@@ -266,7 +266,7 @@
     },
     "/api/elections/{election_id}": {
       "get": {
-        "summary": "Get election details including the election's candidate list (political groups),\nits polling stations and the current committee session (administrator, coordinator, typist)",
+        "summary": "Get election details including the election's candidate list (political groups),\nits polling stations and the current committee session and its investigations (administrator, coordinator, typist)",
         "operationId": "election_details",
         "parameters": [
           {
@@ -820,6 +820,88 @@
         ]
       }
     },
+    "/api/elections/{election_id}/committee_sessions/{committee_session_id}/investigations": {
+      "get": {
+        "summary": "Get a list of all [Investigation]s for a committee session",
+        "operationId": "committee_session_investigations",
+        "parameters": [
+          {
+            "name": "election_id",
+            "in": "path",
+            "description": "Election database id",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "minimum": 0
+            }
+          },
+          {
+            "name": "committee_session_id",
+            "in": "path",
+            "description": "Committee session database id",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "minimum": 0
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Investigation listing successful",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InvestigationListResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Committee session not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/elections/{election_id}/committee_sessions/{committee_session_id}/status": {
       "put": {
         "summary": "Change the status of a [CommitteeSession]. (coordinator)",
@@ -986,6 +1068,16 @@
           },
           "404": {
             "description": "Committee session not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Request cannot be completed",
             "content": {
               "application/json": {
                 "schema": {
@@ -1784,8 +1876,8 @@
               }
             }
           },
-          "422": {
-            "description": "Polling station deletion is not possible",
+          "409": {
+            "description": "Request cannot be completed",
             "content": {
               "application/json": {
                 "schema": {
@@ -2443,7 +2535,7 @@
             }
           },
           "404": {
-            "description": "No data entry with accepted errors found",
+            "description": "Data entry not found",
             "content": {
               "application/json": {
                 "schema": {
@@ -3054,6 +3146,16 @@
           },
           "409": {
             "description": "Request cannot be completed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid data",
             "content": {
               "application/json": {
                 "schema": {
@@ -4814,6 +4916,20 @@
             }
           },
           {
+            "type": "object",
+            "required": [
+              "event_type"
+            ],
+            "properties": {
+              "event_type": {
+                "type": "string",
+                "enum": [
+                  "ApplicationStarted"
+                ]
+              }
+            }
+          },
+          {
             "allOf": [
               {
                 "$ref": "#/components/schemas/ErrorDetails"
@@ -4987,7 +5103,7 @@
           },
           "extra_investigation": {
             "$ref": "#/components/schemas/ExtraInvestigation",
-            "description": "Extra investigation (\"B1-1 Extra onderzoek\")"
+            "description": "Extra investigation (\"B1-1 Alleen bij extra onderzoek\")"
           },
           "political_group_votes": {
             "type": "array",
@@ -5937,6 +6053,10 @@
           "status"
         ],
         "properties": {
+          "finalised_with_warnings": {
+            "type": "boolean",
+            "description": "Whether the finalised first or second data entry has warnings"
+          },
           "finished_at": {
             "type": "string",
             "description": "Time when the data entry was finalised"
@@ -6096,6 +6216,7 @@
           "OwnAccountCannotBeDeleted",
           "PasswordRejection",
           "PdfGenerationError",
+          "PollingStationCannotBeDeleted",
           "PollingStationRepeated",
           "PollingStationValidationErrors",
           "RequestPayloadTooLarge",
@@ -6127,7 +6248,7 @@
       },
       "ExtraInvestigation": {
         "type": "object",
-        "description": "Extra investigation, part of the polling station results (\"B1-1 Extra onderzoek\")",
+        "description": "Extra investigation, part of the polling station results (\"B1-1 Alleen bij extra onderzoek\")",
         "required": [
           "extra_investigation_other_reason",
           "ballots_recounted_extra_investigation"
@@ -6232,6 +6353,22 @@
             "description": "Include (part of) data entry for this election"
           }
         }
+      },
+      "InvestigationListResponse": {
+        "type": "object",
+        "description": "Investigation list response",
+        "required": [
+          "investigations"
+        ],
+        "properties": {
+          "investigations": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PollingStationInvestigation"
+            }
+          }
+        },
+        "additionalProperties": false
       },
       "LoginResponse": {
         "type": "object",

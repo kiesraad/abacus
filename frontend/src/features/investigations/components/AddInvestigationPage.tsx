@@ -59,7 +59,7 @@ export function AddInvestigationPage() {
 
           <nav className="mt-xl">
             <Button.Link to={`/elections/${election.id}/polling-stations/create`} variant="secondary">
-              <IconPlus /> {t("investigations.add_polling_station")}
+              <IconPlus /> {t("investigations.add_missing_polling_station")}
             </Button.Link>
           </nav>
         </section>

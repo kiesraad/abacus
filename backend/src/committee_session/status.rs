@@ -417,12 +417,12 @@ mod tests {
     }
 
     /// Created --> DataEntryNotStarted: ready for data entry
-    #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_5_with_results"))))]
+    #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_7_four_sessions"))))]
     async fn committee_session_status_created_to_data_entry_not_started_second_session_no_investigation(
         pool: SqlitePool,
     ) {
         let mut conn = pool.acquire().await.unwrap();
-        let committee_session = get(&mut conn, 6).await.unwrap();
+        let committee_session = get(&mut conn, 704).await.unwrap();
         assert_eq!(
             CommitteeSessionStatus::Created
                 .ready_for_data_entry(&mut conn, &committee_session)
@@ -799,6 +799,7 @@ mod tests {
             first_entry_user_id: 5,
             second_entry_user_id: 6,
             finished_at: Utc::now(),
+            finalised_with_warnings: false,
         });
         make_definitive(
             &mut conn,

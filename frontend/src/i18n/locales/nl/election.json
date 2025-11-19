@@ -1,6 +1,6 @@
 {
   "add": "Toevoegen: {name}",
-  "add_first_election": "<p>Om Abacus in te richten voor het invoeren van telresulaten, heb je de volgende bestanden nodig:</p><ul><li>Verkiezingsdefinitie (krijg je van de Kiesraad)</li><li>Kandidatenlijsten (krijg je van het centraal stembureau)</li><li>Overzicht stembureaus in jouw gemeente</li></ul><p>Zorg dat de bestanden op deze computer staan voordat je verder gaat.</p>",
+  "add_first_election": "<p>Om Abacus in te richten voor het invoeren van telresultaten, heb je de volgende bestanden nodig:</p><ul><li>Verkiezingsdefinitie (krijg je van het centraal stembureau)</li><li>Kandidatenlijsten (krijg je van het centraal stembureau)</li><li>Overzicht stembureaus in jouw gemeente</li></ul><p>Zorg dat de bestanden op deze computer staan voordat je verder gaat.</p>",
   "abort": {
     "action": "Afbreken",
     "description": "<p>De verkiezing wordt pas opgeslagen als je alle stappen doorlopen hebt. Weet je zeker dat je het aanmaken van de verkiezing wilt afbreken?</p>",
@@ -65,14 +65,14 @@
   "polling_stations": {
     "added": "{num} stembureaus toegevoegd",
     "check": {
-      "description": "Het bestand <file>filename</file> is geïmporteerd en bevat de volgende stembureaus:",
+      "description": "Het bestand <file>filename</file> is geïmporteerd en bevat onderstaande stembureaus. Zie je een verschil met de vooraf gepubliceerde lijst? Je kan na het toevoegen van deze verkiezing stembureaus toevoegen, verwijderen of aanpassen.",
       "title": "Controleer stembureaus"
     },
     "show_all": "Toon alle {num} stembureaus",
     "skip_step": "Stap overslaan en stembureaus later toevoegen"
   },
   "singular": "verkiezing",
-  "start_when_count_list_received": "Zodra je een tellijst van een stembureau hebt gekregen kan je beginnen met invoeren.",
+  "start_when_count_list_received": "Zodra je een proces-verbaal van een stembureau hebt gekregen kan je beginnen met invoeren.",
   "status": "Status",
   "title": {
     "details": "Details verkiezing",

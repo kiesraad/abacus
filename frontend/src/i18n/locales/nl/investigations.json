@@ -2,7 +2,7 @@
   "abacus_creates_the_corrigendum": "Abacus maakt voor elk stembureau een vooringevuld corrigendum (Na 14-2 Bijlage 1)",
   "add_investigation": "Onderzoek toevoegen",
   "add_investigation_for_each_csb_request": "Voeg alle onderzoeksverzoeken van het centraal stembureau toe.",
-  "add_polling_station": "Stembureau toevoegen",
+  "add_missing_polling_station": "Ontbrekend stembureau toevoegen",
   "add_the_reason": "Voer de aanleiding in. Zijn er meerdere verzoeken voor hetzelfde stembureau? Combineer die dan.",
   "all_investigations_finished": "Alle onderzoeken zijn afgehandeld",
   "all_investigations_finished_description": "De resultaten van alle onderzoeken zijn ingevoerd.\nJe kunt de uitkomst nu definitief maken en het proces verbaal opmaken.",

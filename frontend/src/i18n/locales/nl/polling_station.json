@@ -18,7 +18,6 @@
   "details": "Details van het stembureau",
   "empty": "Er zijn nog geen stembureaus ingevoerd voor deze verkiezing. Kies hoe je stembureaus gaat toevoegen.",
   "form": {
-    "create": "Stembureau toevoegen",
     "not_unique": {
       "description": "Het nummer van het stembureau moet uniek zijn.",
       "error": "Voer een uniek nummer in",
@@ -32,7 +31,7 @@
   "locality": "Plaats",
   "manage": "Stembureaus beheren",
   "message": {
-    "delete_error": "Het stembureau kan niet meer verwijderd worden. De invoerfase is al gestart.",
+    "delete_error": "Er zijn al tellingen ingevoerd. De invoer moet eerst verwijderd worden om dit stembureau te kunnen verwijderen.",
     "delete_error_title": "Stembureau kan niet verwijderd worden",
     "no_polling_stations": "Er zijn nog geen stembureaus ingevoerd voor deze verkiezing. Kies hoe je stembureaus gaat toevoegen.",
     "polling_station_created": "Stembureau {number} ({name}) toegevoegd",

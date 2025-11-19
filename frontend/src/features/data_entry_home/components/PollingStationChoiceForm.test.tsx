@@ -114,7 +114,7 @@ describe("Test PollingStationChoiceForm", () => {
         submitFeedback: "Voer een geldig nummer van een stembureau in om te beginnen",
       },
       {
-        testDescription: "finalized",
+        testDescription: "definitive",
         pollingStationInput: "34",
         selectorFeedback: "Stembureau 34 (Testplek) is al twee keer ingevoerd",
         submitFeedback: "Het stembureau dat je geselecteerd hebt kan niet meer ingevoerd worden",
@@ -351,7 +351,7 @@ describe("Test PollingStationChoiceForm", () => {
 
       const alert = await screen.findByRole("alert");
       expect(within(alert).getByRole("paragraph")).toHaveTextContent(
-        "Er zijn voor jou geen stembureaus meer om in te voeren",
+        "Er zijn voor jou op dit moment geen stembureaus om in te voeren",
       );
     });
 
@@ -394,7 +394,7 @@ describe("Test PollingStationChoiceForm", () => {
       expect(screen.getByText("Kies het stembureau")).toBeVisible();
 
       // Check if the error message is visible
-      expect(screen.getByText("Er zijn voor jou geen stembureaus meer om in te voeren")).toBeVisible();
+      expect(screen.getByText("Er zijn voor jou op dit moment geen stembureaus om in te voeren")).toBeVisible();
     });
 
     test("Second data entry has correct link", async () => {

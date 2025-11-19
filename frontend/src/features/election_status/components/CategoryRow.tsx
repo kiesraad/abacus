@@ -1,6 +1,8 @@
 import { ReactNode } from "react";
 
+import { IconWarning } from "@/components/generated/icons";
 import { Badge } from "@/components/ui/Badge/Badge";
+import { Icon } from "@/components/ui/Icon/Icon";
 import { ProgressBar } from "@/components/ui/ProgressBar/ProgressBar";
 import { Table } from "@/components/ui/Table/Table";
 import { t } from "@/i18n/translate";
@@ -13,6 +15,7 @@ interface CategoryRowProps {
   category: StatusCategory;
   pollingStation: PollingStationWithStatusAndTypist;
   addLink: boolean;
+  warning?: boolean;
 }
 
 const SHOW_BADGE: DataEntryStatusName[] = [
@@ -22,27 +25,33 @@ const SHOW_BADGE: DataEntryStatusName[] = [
   "first_entry_has_errors",
 ];
 
-export function CategoryRow({ category, pollingStation, addLink }: CategoryRowProps): ReactNode {
-  if (
-    addLink &&
-    (pollingStation.status === "entries_different" || pollingStation.status === "first_entry_has_errors")
-  ) {
+function getCategoryRowUrl(
+  pollingStationStatus: DataEntryStatusName | undefined,
+  pollingStationId: number,
+): string | null {
+  switch (pollingStationStatus) {
+    case "first_entry_not_started":
+      return null;
+    case "entries_different":
+      return `./${pollingStationId}/resolve-differences`;
+    default:
+      return `./${pollingStationId}/detail`;
+  }
+}
+
+export function CategoryRow({ category, pollingStation, addLink, warning }: CategoryRowProps): ReactNode {
+  const link = getCategoryRowUrl(pollingStation.status, pollingStation.id);
+  if (addLink && link) {
     return (
-      <Table.LinkRow
-        to={
-          pollingStation.status === "entries_different"
-            ? `./${pollingStation.id}/resolve-differences`
-            : `./${pollingStation.id}/resolve-errors`
-        }
-      >
-        <CategoryRowContent category={category} pollingStation={pollingStation} />
+      <Table.LinkRow to={link}>
+        <CategoryRowContent category={category} pollingStation={pollingStation} warning={warning} />
       </Table.LinkRow>
     );
   }
 
   return (
     <Table.Row>
-      <CategoryRowContent category={category} pollingStation={pollingStation} />
+      <CategoryRowContent category={category} pollingStation={pollingStation} warning={warning} />
     </Table.Row>
   );
 }
@@ -50,9 +59,10 @@ export function CategoryRow({ category, pollingStation, addLink }: CategoryRowPr
 interface CategoryRowContentProps {
   category: StatusCategory;
   pollingStation: PollingStationWithStatusAndTypist;
+  warning?: boolean;
 }
 
-function CategoryRowContent({ category, pollingStation }: CategoryRowContentProps): ReactNode {
+function CategoryRowContent({ category, pollingStation, warning }: CategoryRowContentProps): ReactNode {
   return (
     <>
       <Table.NumberCell key={`${pollingStation.id}-number`}>{pollingStation.number}</Table.NumberCell>
@@ -80,7 +90,8 @@ function CategoryRowContent({ category, pollingStation }: CategoryRowContentProp
       )}
       {(category === "first_entry_finished" || category === "definitive") && (
         <Table.Cell key={`${pollingStation.id}-time`}>
-          {pollingStation.finished_at ? formatDateTime(new Date(pollingStation.finished_at)) : ""}
+          <span>{pollingStation.finished_at ? formatDateTime(new Date(pollingStation.finished_at)) : ""}</span>
+          {warning && <Icon color="warning" icon={<IconWarning aria-label={t("contains_warning")} />} />}
         </Table.Cell>
       )}
     </>

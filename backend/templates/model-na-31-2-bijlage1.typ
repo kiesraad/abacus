@@ -128,16 +128,16 @@ Licht hieronder toe wat de reden van het extra onderzoek was
 
 == Uitgebrachte stemmen <cast_votes>
 
-#if input.election.political_groups.len() > 0 [
+#if input.candidates_tables.len() > 0 [
   #sum(
     sum(
-      ..input.election.political_groups.map(list => {
+      ..input.candidates_tables.map(list => {
         empty_letterbox([E.#list.number])[Totaal lijst #list.number - #list.name]
       }),
       empty_letterbox(
         "E",
         light: false,
-      )[*Totaal stemmen op kandidaten* (tel E.1 t/m E.#input.election.political_groups.last().number op)],
+      )[*Totaal stemmen op kandidaten* (tel E.1 t/m E.#input.candidates_tables.last().number op)],
     ),
     empty_letterbox("F")[Blanco stemmen],
     empty_letterbox("G")[Ongeldige stemmen],
@@ -189,16 +189,12 @@ _(Gebruik het proces-verbaal van het stembureau #sym.arrow.r Tijdens de stemming
 
 == Stemmen per lijst en per kandidaat
 
-#for political_group in input.election.political_groups {
+#for political_group in input.candidates_tables {
   votes_table(
     title: [#political_group.number #political_group.name],
     headers: ("Kandidaat", "", "Stemmen"),
-    total: none,
-    values: political_group.candidates.map(candidate => (
-      name: candidate_name(candidate),
-      number: candidate.number,
-      votes: none,
-    )),
+    total: political_group.total,
+    votes_columns: political_group.columns,
     continue_on_next_page: [#sym.arrow.r De lijst gaat verder op de volgende pagina],
     column_total: "Subtotaal kolom",
     sum_total: columns => [Totaal lijst (kolom #columns)],

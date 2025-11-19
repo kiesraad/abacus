@@ -5,10 +5,11 @@ import { formatDateTime } from "@/utils/dateTime";
 
 interface LogsTableProps {
   events: AuditLogEvent[];
+  details: AuditLogEvent | null;
   setDetails: (details: AuditLogEvent) => void;
 }
 
-export function LogsTable({ events, setDetails }: LogsTableProps) {
+export function LogsTable({ events, details, setDetails }: LogsTableProps) {
   return (
     <Table id="users">
       <Table.Header>
@@ -19,7 +20,7 @@ export function LogsTable({ events, setDetails }: LogsTableProps) {
         <Table.HeaderCell>{t("log.header.user")}</Table.HeaderCell>
       </Table.Header>
       <Table.Body className="fs-md">
-        {events.length == 0 && (
+        {events.length === 0 && (
           <Table.Row>
             <Table.Cell colSpan={7}>{t("log.no_events")}</Table.Cell>
           </Table.Row>
@@ -30,13 +31,14 @@ export function LogsTable({ events, setDetails }: LogsTableProps) {
             onClick={() => {
               setDetails(event);
             }}
+            active={event.id === details?.id}
           >
             <Table.Cell>{event.id}</Table.Cell>
-            <Table.Cell>{formatDateTime(new Date(event.time), false)}</Table.Cell>
+            <Table.Cell className="nowrap">{formatDateTime(new Date(event.time), false)}</Table.Cell>
             <Table.Cell>{t(`log.level.${event.event_level}`)}</Table.Cell>
             <Table.Cell>
               {t(`log.event.${event.event.event_type}`)}
-              {event.event.event_type == "Error" && `: ${t(`error.api_error.${event.event.reference}`)}`}
+              {event.event.event_type === "Error" && `: ${t(`error.api_error.${event.event.reference}`)}`}
             </Table.Cell>
             <Table.Cell>
               {event.user_id &&

@@ -12,7 +12,7 @@ use axum::{
 };
 use hyper::http::{HeaderName, HeaderValue, header};
 use sqlx::{
-    Sqlite, SqlitePool,
+    Sqlite, SqliteConnection, SqlitePool,
     sqlite::{SqliteConnectOptions, SqliteJournalMode},
 };
 use tokio::{net::TcpListener, signal};
@@ -57,6 +57,7 @@ pub mod zip;
 pub use app_error::AppError;
 pub use error::{APIError, ErrorResponse};
 
+use crate::app_error::{DatabaseErrorWithPath, DatabaseMigrationErrorWithPath};
 use crate::authentication::SECURITY_SCHEME_NAME;
 
 /// Maximum size of the request body in megabytes.
@@ -354,9 +355,9 @@ pub async fn start_server(
         AirgapDetection::nop()
     };
 
-    let app = router(pool, airgap_detection)?;
+    let app = router(pool.clone(), airgap_detection)?;
 
-    info!("Starting API server on http://{}", listener.local_addr()?);
+    info!("Starting Abacus on http://{}", listener.local_addr()?);
     let listener = listener.tap_io(|tcp_stream| {
         if let Err(err) = tcp_stream.set_nodelay(true) {
             trace!("failed to set TCP_NODELAY on incoming connection: {err:#}");
@@ -369,6 +370,11 @@ pub async fn start_server(
     )
     .with_graceful_shutdown(shutdown_signal())
     .await?;
+
+    // close the database, this will flush the shm and wal files for sqlite
+    pool.close().await;
+
+    info!("Abacus has shut down gracefully.");
 
     Ok(())
 }
@@ -388,18 +394,60 @@ pub async fn shutdown_signal() {
     #[cfg(unix)]
     let terminate = async {
         signal::unix::signal(signal::unix::SignalKind::terminate())
-            .expect("failed to install signal handler")
+            .expect("failed to install terminate signal handler")
             .recv()
             .await;
     };
 
-    #[cfg(not(unix))]
+    #[cfg(unix)]
+    let quit = async {
+        signal::unix::signal(signal::unix::SignalKind::quit())
+            .expect("failed to install quit signal handler")
+            .recv()
+            .await;
+    };
+
+    #[cfg(windows)]
+    let terminate = async {
+        signal::windows::ctrl_close()
+            .expect("failed to install CTRL_CLOSE handler")
+            .recv()
+            .await
+    };
+
+    #[cfg(windows)]
+    let quit = async {
+        signal::windows::ctrl_shutdown()
+            .expect("failed to install CTRL_SHUTDOWN handler")
+            .recv()
+            .await
+    };
+
+    #[cfg(not(any(unix, windows)))]
     let terminate = std::future::pending::<()>();
+
+    #[cfg(not(any(unix, windows)))]
+    let quit = std::future::pending::<()>();
 
     tokio::select! {
         _ = ctrl_c => {},
         _ = terminate => {},
+        _ = quit => {},
     }
+}
+
+/// Log that the application started and thereby check that the database is writeable
+/// This maps common sqlite errors to an AppError
+async fn log_app_started(conn: &mut SqliteConnection, db_path: &str) -> Result<(), AppError> {
+    Ok(audit_log::create(
+        conn,
+        &audit_log::AuditEvent::ApplicationStarted,
+        None,
+        None,
+        None,
+    )
+    .await
+    .map_err(DatabaseErrorWithPath::with_path(db_path))?)
 }
 
 /// Create a SQLite database if needed, then connect to it and run migrations.
@@ -423,12 +471,21 @@ pub async fn create_sqlite_pool(
     }
 
     let pool = SqlitePool::connect_with(opts).await?;
-    sqlx::migrate!().run(&pool).await?;
+
+    // run database migrations, this creates the necessary tables if they don't exist yet
+    sqlx::migrate!()
+        .run(&pool)
+        .await
+        .map_err(DatabaseMigrationErrorWithPath::with_path(database))?;
 
     #[cfg(feature = "dev-database")]
     if seed_data {
         fixtures::seed_fixture_data(&pool).await?;
     }
+
+    // log startup event and verify the database is writeable
+    let mut connection = pool.acquire().await?;
+    log_app_started(&mut connection, database).await?;
 
     Ok(pool)
 }
@@ -438,6 +495,8 @@ mod test {
     use sqlx::SqlitePool;
     use test_log::test;
     use tokio::net::TcpListener;
+
+    use crate::{AppError, create_sqlite_pool};
 
     use super::start_server;
 
@@ -588,5 +647,21 @@ mod test {
             assert_eq!(response.status(), 401);
         })
         .await;
+    }
+
+    #[test(tokio::test)]
+    async fn test_readonly_database_error() {
+        // Create a read-only in-memory database
+        let db_url = "sqlite::memory:?mode=ro";
+        let result = create_sqlite_pool(
+            db_url,
+            #[cfg(feature = "dev-database")]
+            false,
+            #[cfg(feature = "dev-database")]
+            false,
+        )
+        .await;
+
+        assert!(matches!(result, Err(AppError::DatabaseReadOnly(_))));
     }
 }

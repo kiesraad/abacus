@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/Button/Button";
 import { DownloadButton } from "@/components/ui/DownloadButton/DownloadButton";
 import { FormLayout } from "@/components/ui/Form/FormLayout";
 import { Icon } from "@/components/ui/Icon/Icon";
+import { Loader } from "@/components/ui/Loader/Loader";
 import { useElection } from "@/hooks/election/useElection";
 import { useNumericParam } from "@/hooks/useNumericParam";
 import { t, tx } from "@/i18n/translate";
@@ -18,22 +19,32 @@ import {
 } from "@/types/generated/openapi";
 import { cn } from "@/utils/classnames";
 import { committeeSessionLabel } from "@/utils/committeeSession";
-import { formatFullDateWithoutTimezone } from "@/utils/dateTime";
+import { formatDateTimeFull } from "@/utils/dateTime";
 
+import { useCommitteeSessionInvestigationListRequest } from "../../hooks/useCommitteeSessionInvestigationListRequest";
 import cls from "../ElectionManagement.module.css";
 
 export function ElectionReportPage() {
-  const { currentCommitteeSession, committeeSessions, election, investigations } = useElection();
+  const { currentCommitteeSession, committeeSessions, election } = useElection();
   const navigate = useNavigate();
   const committeeSessionId = useNumericParam("committeeSessionId");
   const committeeSession = committeeSessions.find((session) => session.id === committeeSessionId);
-
   if (!committeeSession) {
     throw new NotFoundError("error.not_found");
   }
 
   const updatePath: COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_PATH = `/api/elections/${committeeSession.election_id}/committee_sessions/${committeeSession.id}/status`;
   const { update, isLoading } = useCrud({ updatePath, throwAllErrors: true });
+
+  // We have to specifically request the investigations of the committee session the page is rendered for
+  const { requestState } = useCommitteeSessionInvestigationListRequest(election.id, committeeSession.id);
+  if (requestState.status === "loading") {
+    return <Loader />;
+  }
+  if ("error" in requestState) {
+    throw requestState.error;
+  }
+
   const sessionLabel = committeeSessionLabel(committeeSession.number);
 
   // Redirect to update details page if committee session details have not been filled in
@@ -46,9 +57,9 @@ export function ElectionReportPage() {
     throw new ApplicationError(t("error.forbidden_message"), "InvalidCommitteeSessionStatus");
   }
 
-  const isFirstCommitteeSession = currentCommitteeSession.number === 1;
+  const isFirstCommitteeSession = committeeSession.number === 1;
 
-  const wasCorrected = investigations.some((i) => i.corrected_results);
+  const wasCorrected = requestState.data.investigations.some((i) => i.corrected_results);
 
   function handleResume() {
     const body: COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_BODY = { status: "data_entry_in_progress" };
@@ -83,14 +94,8 @@ export function ElectionReportPage() {
             </h2>
             <div className={cls.reportInfoSection}>
               {t("election_report.committee_session_started", {
-                date: committeeSession.start_date_time
-                  ? formatFullDateWithoutTimezone(new Date(committeeSession.start_date_time))
-                  : "",
-                time: committeeSession.start_date_time
-                  ? new Date(committeeSession.start_date_time).toLocaleTimeString("nl-NL", {
-                      hour: "2-digit",
-                      minute: "2-digit",
-                    })
+                date_time: committeeSession.start_date_time
+                  ? formatDateTimeFull(new Date(committeeSession.start_date_time))
                   : "",
               })}
               .<br />

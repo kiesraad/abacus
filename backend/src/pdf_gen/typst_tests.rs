@@ -22,12 +22,17 @@ use crate::{
             ModelN10_2Input, ModelNa14_2Bijlage1Input, ModelNa14_2Input, ModelNa31_2Bijlage1Input,
             ModelNa31_2Input, ModelP2aInput, PdfFileModel, PdfModel,
         },
+        votes_table::{
+            CandidatesTables, VotesTables, VotesTablesWithOnlyPreviousVotes,
+            VotesTablesWithPreviousVotes,
+        },
     },
     polling_station::structs::{PollingStation, PollingStationType},
+    report::DEFAULT_DATE_TIME_FORMAT,
     summary::{ElectionSummary, PollingStationInvestigations, SumCount, SummaryDifferencesCounts},
 };
 
-use chrono::{NaiveDate, NaiveDateTime, NaiveTime};
+use chrono::{DateTime, Local, NaiveDate, NaiveDateTime, Utc};
 use rand::{Rng, seq::IndexedRandom};
 use test_log::test;
 
@@ -42,24 +47,23 @@ fn random_value<T: Copy>(rng: &mut impl rand::Rng, variants: &[T]) -> T {
     *variants.choose(rng).unwrap()
 }
 
-fn random_date(rng: &mut impl rand::Rng) -> NaiveDate {
-    NaiveDate::from_ymd_opt(
-        rng.random_range(1900..=2100),
-        rng.random_range(1..=12),
-        rng.random_range(1..=28),
-    )
-    .unwrap()
+fn random_date_time(rng: &mut impl rand::Rng) -> DateTime<Local> {
+    let now = Local::now().timestamp();
+    let about_ten_years = 10 * 365 * 24 * 60 * 60;
+    let date_range = now - about_ten_years..now + about_ten_years;
+    let secs = rng.random_range(date_range);
+
+    DateTime::<Utc>::from_timestamp(secs, 0)
+        .unwrap()
+        .with_timezone(&Local)
 }
 
-fn random_date_time(rng: &mut impl rand::Rng) -> NaiveDateTime {
-    random_date(rng).and_time(
-        NaiveTime::from_hms_opt(
-            rng.random_range(0..24),
-            rng.random_range(0..60),
-            rng.random_range(0..60),
-        )
-        .unwrap(),
-    )
+fn random_date(rng: &mut impl rand::Rng) -> NaiveDate {
+    random_date_time(rng).date_naive()
+}
+
+fn random_naive_date_time(rng: &mut impl rand::Rng) -> NaiveDateTime {
+    random_date_time(rng).naive_local()
 }
 
 fn random_option<T>(rng: &mut impl rand::Rng, value: T, none_where_possible: bool) -> Option<T> {
@@ -224,7 +228,7 @@ fn random_committee_session(
         election_id,
         location: random_string(rng, string_length),
         // a start_date_time is required for our typst models, this is validated in the code
-        start_date_time: Some(random_date_time(rng)),
+        start_date_time: Some(random_naive_date_time(rng)),
         status: random_value(
             rng,
             &[
@@ -279,17 +283,21 @@ fn random_polling_station_result(
         political_group_votes: election
             .political_groups
             .iter()
-            .map(|group| PoliticalGroupCandidateVotes {
-                number: group.number,
-                total: rng.random_range(0..500),
-                candidate_votes: group
+            .map(|group| {
+                let candidate_votes = group
                     .candidates
                     .iter()
                     .map(|candidate| CandidateVotes {
                         number: candidate.number,
                         votes: rng.random_range(0..500),
                     })
-                    .collect(),
+                    .collect::<Vec<CandidateVotes>>();
+
+                PoliticalGroupCandidateVotes {
+                    number: group.number,
+                    total: candidate_votes.iter().map(|cv| cv.votes).sum(),
+                    candidate_votes,
+                }
             })
             .collect(),
     }
@@ -412,17 +420,20 @@ async fn test_na_14_2() {
             random_polling_stations(&mut rng, &election, string_length, none_where_possible);
         let previous_summary = random_election_summary(&mut rng, &election, &polling_stations);
         let summary = random_election_summary(&mut rng, &election, &polling_stations);
+
         let hash = random_string(&mut rng, 64);
         let creation_date_time = random_date_time(&mut rng)
-            .format("%Y-%m-%dT%H:%M:%S")
+            .format(DEFAULT_DATE_TIME_FORMAT)
             .to_string();
 
         let model = PdfModel::ModelNa14_2(Box::new(ModelNa14_2Input {
-            election,
+            votes_tables: VotesTablesWithPreviousVotes::new(&election, &summary, &previous_summary)
+                .unwrap(),
+            election: election.into(),
+            previous_summary: previous_summary.into(),
+            summary: summary.into(),
             committee_session,
             previous_committee_session,
-            previous_summary,
-            summary,
             hash,
             creation_date_time,
         }));
@@ -454,8 +465,10 @@ async fn test_na_14_2_bijlage_1() {
         let previous_results = random_polling_station_result(&mut rng, &election);
 
         let model = PdfModel::ModelNa14_2Bijlage1(Box::new(ModelNa14_2Bijlage1Input {
-            previous_results,
-            election,
+            votes_tables: VotesTablesWithOnlyPreviousVotes::new(&election, &previous_results)
+                .unwrap(),
+            previous_results: previous_results.into(),
+            election: election.into(),
             polling_station,
             investigation,
         }));
@@ -483,13 +496,14 @@ async fn test_na_31_2() {
         let summary = random_election_summary(&mut rng, &election, &polling_stations);
         let hash = random_string(&mut rng, 64);
         let creation_date_time = random_date_time(&mut rng)
-            .format("%Y-%m-%dT%H:%M:%S")
+            .format(DEFAULT_DATE_TIME_FORMAT)
             .to_string();
 
         let model = PdfModel::ModelNa31_2(Box::new(ModelNa31_2Input {
+            votes_tables: VotesTables::new(&election, &summary).unwrap(),
             committee_session,
-            election,
-            summary,
+            election: election.into(),
+            summary: summary.into(),
             polling_stations,
             hash,
             creation_date_time,
@@ -515,7 +529,8 @@ async fn test_na_31_2_bijlage_1() {
             random_polling_station(&mut rng, &election, string_length, none_where_possible);
 
         let model = PdfModel::ModelNa31_2Bijlage1(Box::new(ModelNa31_2Bijlage1Input {
-            election,
+            candidates_tables: CandidatesTables::new(&election).unwrap(),
+            election: election.into(),
             polling_station,
         }));
 
@@ -577,7 +592,7 @@ async fn test_p_2a() {
 
         let hash = random_string(&mut rng, 64);
         let creation_date_time = random_date_time(&mut rng)
-            .format("%Y-%m-%dT%H:%M:%S")
+            .format(DEFAULT_DATE_TIME_FORMAT)
             .to_string();
 
         let model = PdfModel::ModelP2a(Box::new(ModelP2aInput {

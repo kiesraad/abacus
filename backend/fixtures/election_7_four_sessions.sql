@@ -47,7 +47,7 @@ INSERT INTO committee_sessions (id, number, election_id, status, location, start
 VALUES (701, 1, 7, 'data_entry_finished', 'Grote Stad', '2026-03-19 09:15:00', 2000),
        (702, 2, 7, 'data_entry_finished', 'Grote Stad', '2026-03-19 17:15:00', 2000),
        (703, 3, 7, 'data_entry_finished', 'Grote Stad', '2026-03-19 23:15:00', 2000),
-       (704, 4, 7, 'data_entry_in_progress', '', NULL, 2000);
+       (704, 4, 7, 'created', '', NULL, 2000);
 
 INSERT INTO polling_stations (id, committee_session_id, id_prev_session, name, number, number_of_voters, polling_station_type, address,
                               postal_code, locality)
@@ -68,11 +68,18 @@ VALUES
 
 INSERT INTO
     polling_station_data_entries
-VALUES
-    (711, 701, '{"status":"Definitive","state":{"first_entry_user_id":5,"second_entry_user_id":6,"finished_at":"2026-03-19T09:15:31.223365436Z"}}', '2026-03-19 09:15:00'),
-    (712, 701, '{"status":"Definitive","state":{"first_entry_user_id":5,"second_entry_user_id":6,"finished_at":"2026-03-19T09:45:31.223365436Z"}}', '2026-03-19 09:45:00'),
-    (721, 702, '{"status":"Definitive","state":{"first_entry_user_id":5,"second_entry_user_id":6,"finished_at":"2026-03-19T17:15:31.223365436Z"}}', '2026-03-19 17:15:00'),
-    (732, 703, '{"status":"Definitive","state":{"first_entry_user_id":5,"second_entry_user_id":6,"finished_at":"2026-03-19T23:45:31.223365436Z"}}', '2026-03-19 23:45:00');
+VALUES (711, 701,
+        '{"status":"Definitive","state":{"first_entry_user_id":5,"second_entry_user_id":6,"finished_at":"2026-03-19T09:15:31.223365436Z","finalised_with_warnings":false}}',
+        '2026-03-19 09:15:00'),
+       (712, 701,
+        '{"status":"Definitive","state":{"first_entry_user_id":5,"second_entry_user_id":6,"finished_at":"2026-03-19T09:45:31.223365436Z","finalised_with_warnings":false}}',
+        '2026-03-19 09:45:00'),
+       (721, 702,
+        '{"status":"Definitive","state":{"first_entry_user_id":5,"second_entry_user_id":6,"finished_at":"2026-03-19T17:15:31.223365436Z","finalised_with_warnings":false}}',
+        '2026-03-19 17:15:00'),
+       (732, 703,
+        '{"status":"Definitive","state":{"first_entry_user_id":5,"second_entry_user_id":6,"finished_at":"2026-03-19T23:45:31.223365436Z","finalised_with_warnings":false}}',
+        '2026-03-19 23:45:00');
 
 INSERT INTO
     polling_station_results

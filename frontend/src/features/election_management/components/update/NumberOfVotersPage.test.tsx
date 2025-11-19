@@ -39,9 +39,35 @@ describe("NumberOfVotersPage", () => {
 
     const input = screen.getByRole("textbox", { name: "Aantal kiesgerechtigden" });
     expect(input).toHaveValue("2000");
+    await user.clear(input);
+    await user.type(input, "2500");
     await user.click(screen.getByRole("button", { name: "Opslaan" }));
 
-    expect(changeVoters).toHaveBeenCalledExactlyOnceWith({ number_of_voters: 2000 });
+    expect(changeVoters).toHaveBeenCalledExactlyOnceWith({ number_of_voters: 2500 });
     expect(navigate).toHaveBeenCalledExactlyOnceWith("..");
+  });
+
+  test("save and shows error on empty or 0 submit", async () => {
+    await renderPage();
+    const changeVoters = spyOnHandler(CommitteeSessionChangeNumberOfVotersHandler);
+    const user = userEvent.setup();
+
+    const input = screen.getByRole("textbox", { name: "Aantal kiesgerechtigden" });
+    expect(input).toHaveValue("2000");
+    await user.clear(input);
+    await user.click(screen.getByRole("button", { name: "Opslaan" }));
+
+    expect(input).toBeInvalid();
+    expect(input).toHaveAccessibleErrorMessage("Vul het aantal kiesgerechtigden in");
+    expect(changeVoters).not.toHaveBeenCalled();
+    expect(navigate).not.toHaveBeenCalled();
+
+    await user.type(input, "0");
+    await user.click(screen.getByRole("button", { name: "Opslaan" }));
+
+    expect(input).toBeInvalid();
+    expect(input).toHaveAccessibleErrorMessage("Vul het aantal kiesgerechtigden in");
+    expect(changeVoters).not.toHaveBeenCalled();
+    expect(navigate).not.toHaveBeenCalled();
   });
 });

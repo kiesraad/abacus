@@ -55,6 +55,7 @@ pub enum ErrorReference {
     OwnAccountCannotBeDeleted,
     PasswordRejection,
     PdfGenerationError,
+    PollingStationCannotBeDeleted,
     PollingStationRepeated,
     PollingStationValidationErrors,
     RequestPayloadTooLarge,
@@ -89,6 +90,7 @@ pub enum APIError {
     CommitteeSession(CommitteeSessionError),
     Conflict(String, ErrorReference),
     ContentTooLarge(String, ErrorReference),
+    DataIntegrityError(String),
     EmlImportError(EMLImportError),
     InvalidData(DataError),
     InvalidHeaderValue,
@@ -132,6 +134,13 @@ impl IntoResponse for APIError {
             }
             APIError::Conflict(message, reference) => {
                 (StatusCode::CONFLICT, to_error(&message, reference, false))
+            }
+            APIError::DataIntegrityError(message) => {
+                error!("Data integrity error: {}", message);
+                (
+                    StatusCode::INTERNAL_SERVER_ERROR,
+                    to_error("Internal server error", ErrorReference::DatabaseError, true),
+                )
             }
             APIError::InvalidData(err) => {
                 error!("Invalid data error: {}", err);

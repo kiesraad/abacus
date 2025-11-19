@@ -46,7 +46,7 @@
 
 // *Op deze locatie waren meerdere stembureaus>*
 
-== Process-verbaal
+== Proces-verbaal
 
 Elk stembureau maakt bij een verkiezing een verslag: het proces-verbaal. Hierin staat hoe het stemmen en het tellen van de stemmen is verlopen
 

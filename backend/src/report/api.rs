@@ -24,10 +24,11 @@ use crate::{
     },
     investigation::PollingStationInvestigation,
     pdf_gen::{
-        generate_pdf,
+        VotesTables, VotesTablesWithPreviousVotes, generate_pdf,
         models::{ModelNa14_2Input, ModelNa31_2Input, ModelP2aInput, PdfFileModel, ToPdfFileModel},
     },
     polling_station::structs::PollingStation,
+    report::DEFAULT_DATE_TIME_FORMAT,
     summary::ElectionSummary,
     zip::{ZipResponse, ZipResponseError, slugify_filename},
 };
@@ -171,9 +172,12 @@ impl ResultsInput {
         }
     }
 
-    fn into_pdf_file_models(self, xml_hash: impl Into<String>) -> PdfModelList {
+    fn into_pdf_file_models(self, xml_hash: impl Into<String>) -> Result<PdfModelList, APIError> {
         let hash = xml_hash.into();
-        let creation_date_time = self.creation_date_time.format("%d-%m-%Y %H:%M").to_string();
+        let creation_date_time = self
+            .creation_date_time
+            .format(DEFAULT_DATE_TIME_FORMAT)
+            .to_string();
 
         let overview_pdf = if let Some(overview_filename) = self.overview_pdf_filename() {
             Some(
@@ -204,36 +208,52 @@ impl ResultsInput {
 
         let results_pdf_filename = self.results_pdf_filename();
         let results_pdf = if self.committee_session.is_next_session() {
+            let Some(previous_summary) = self.previous_summary else {
+                return Err(APIError::DataIntegrityError(
+                "Previous summary is required for generating results PDF for next committee sessions"
+                    .to_string(),
+            ));
+            };
+
+            let Some(previous_committee_session) = &self.previous_committee_session else {
+                return Err(APIError::DataIntegrityError(
+                "Previous committee session is required for generating results PDF for next committee sessions"
+                    .to_string(),
+            ));
+            };
+
             ModelNa14_2Input {
+                votes_tables: VotesTablesWithPreviousVotes::new(
+                    &self.election,
+                    &self.summary,
+                    &previous_summary,
+                )?,
                 committee_session: self.committee_session,
-                election: self.election,
-                summary: self.summary,
-                previous_summary: self
-                    .previous_summary
-                    .expect("Previous summary should exist for committee sessions after the first"),
-                previous_committee_session: self.previous_committee_session.expect(
-                    "Previous committee session should exist for committee sessions after the first",
-                ),
+                election: self.election.into(),
+                summary: self.summary.into(),
+                previous_summary: previous_summary.into(),
+                previous_committee_session: previous_committee_session.clone(),
                 hash,
                 creation_date_time,
             }
             .to_pdf_file_model(results_pdf_filename)
         } else {
             ModelNa31_2Input {
+                votes_tables: VotesTables::new(&self.election, &self.summary)?,
                 committee_session: self.committee_session,
                 polling_stations: self.polling_stations,
-                summary: self.summary,
-                election: self.election,
+                summary: self.summary.into(),
+                election: self.election.into(),
                 hash,
                 creation_date_time,
             }
             .to_pdf_file_model(results_pdf_filename)
         };
 
-        PdfModelList {
+        Ok(PdfModelList {
             results: results_pdf,
             overview: overview_pdf,
-        }
+        })
     }
 }
 
@@ -319,7 +339,7 @@ async fn generate_and_save_files(
 
         let xml_hash = EmlHash::from(xml_string.as_bytes());
         let xml_filename = input.xml_filename();
-        let pdf_files = input.into_pdf_file_models(xml_hash);
+        let pdf_files = input.into_pdf_file_models(xml_hash)?;
 
         // For the first session, or if there are corrections, we also store the EML and count PDF
         // For next sessions without corrections, we don't store these

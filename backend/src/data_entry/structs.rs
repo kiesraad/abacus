@@ -300,6 +300,27 @@ pub struct CommonPollingStationResults {
     pub political_group_votes: Vec<PoliticalGroupCandidateVotes>,
 }
 
+#[derive(Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct CommonPollingStationResultsWithoutVotes {
+    /// Voters counts ("Aantal toegelaten kiezers")
+    pub voters_counts: VotersCounts,
+    /// Votes counts ("Aantal getelde stembiljetten")
+    pub votes_counts: VotesCounts,
+    /// Differences counts ("Verschil tussen het aantal toegelaten kiezers en het aantal getelde stembiljetten")
+    pub differences_counts: DifferencesCounts,
+}
+
+impl From<CommonPollingStationResults> for CommonPollingStationResultsWithoutVotes {
+    fn from(value: CommonPollingStationResults) -> Self {
+        Self {
+            voters_counts: value.voters_counts,
+            votes_counts: value.votes_counts,
+            differences_counts: value.differences_counts,
+        }
+    }
+}
+
 /// CSOFirstSessionResults, following the fields in Model Na 31-2 Bijlage 2.
 ///
 /// See "Model Na 31-2. Proces-verbaal van een gemeentelijk stembureau/stembureau voor het openbaar
@@ -310,7 +331,7 @@ pub struct CommonPollingStationResults {
 #[derive(Serialize, Deserialize, ToSchema, Clone, Debug, Default, PartialEq, Eq, Hash)]
 #[serde(deny_unknown_fields)]
 pub struct CSOFirstSessionResults {
-    /// Extra investigation ("B1-1 Extra onderzoek")
+    /// Extra investigation ("B1-1 Alleen bij extra onderzoek")
     pub extra_investigation: ExtraInvestigation,
     /// Counting Differences Polling Station ("B1-2 Verschillen met telresultaten van het stembureau")
     pub counting_differences_polling_station: CountingDifferencesPollingStation,
@@ -573,7 +594,7 @@ impl YesNo {
     }
 }
 
-/// Extra investigation, part of the polling station results ("B1-1 Extra onderzoek")
+/// Extra investigation, part of the polling station results ("B1-1 Alleen bij extra onderzoek")
 #[derive(Serialize, Deserialize, ToSchema, Clone, Debug, Default, PartialEq, Eq, Hash)]
 #[serde(deny_unknown_fields)]
 pub struct ExtraInvestigation {
@@ -740,6 +761,87 @@ pub mod tests {
                 fewer_ballots_count: 0,
                 difference_completely_accounted_for: YesNo::yes(),
             }
+        }
+    }
+
+    pub fn example_polling_station_results() -> PollingStationResults {
+        PollingStationResults::CSOFirstSession(CSOFirstSessionResults {
+            extra_investigation: ValidDefault::valid_default(),
+            counting_differences_polling_station: ValidDefault::valid_default(),
+            voters_counts: VotersCounts {
+                poll_card_count: 99,
+                proxy_certificate_count: 1,
+                total_admitted_voters_count: 100,
+            },
+            votes_counts: VotesCounts {
+                political_group_total_votes: vec![
+                    PoliticalGroupTotalVotes {
+                        number: 1,
+                        total: 56,
+                    },
+                    PoliticalGroupTotalVotes {
+                        number: 2,
+                        total: 40,
+                    },
+                ],
+                total_votes_candidates_count: 96,
+                blank_votes_count: 2,
+                invalid_votes_count: 2,
+                total_votes_cast_count: 100,
+            },
+            differences_counts: DifferencesCounts {
+                more_ballots_count: 0,
+                fewer_ballots_count: 0,
+                compare_votes_cast_admitted_voters:
+                    DifferenceCountsCompareVotesCastAdmittedVoters {
+                        admitted_voters_equal_votes_cast: true,
+                        votes_cast_greater_than_admitted_voters: false,
+                        votes_cast_smaller_than_admitted_voters: false,
+                    },
+                difference_completely_accounted_for: YesNo {
+                    yes: true,
+                    no: false,
+                },
+            },
+            political_group_votes: vec![
+                PoliticalGroupCandidateVotes::from_test_data_auto(1, &[36, 20]),
+                PoliticalGroupCandidateVotes::from_test_data_auto(2, &[30, 10]),
+            ],
+        })
+    }
+
+    impl PollingStationResults {
+        pub fn with_warning(mut self) -> Self {
+            let extra_blank_votes: Count = 100;
+
+            let voters_counts = self.voters_counts_mut();
+            voters_counts.poll_card_count += extra_blank_votes;
+            voters_counts.total_admitted_voters_count += extra_blank_votes;
+
+            let votes_counts = self.votes_counts_mut();
+            votes_counts.blank_votes_count += extra_blank_votes;
+            votes_counts.total_votes_cast_count += extra_blank_votes;
+
+            self
+        }
+
+        pub fn with_error(mut self) -> Self {
+            let voters_counts = self.voters_counts_mut();
+            voters_counts.poll_card_count = 10;
+            voters_counts.proxy_certificate_count = 10;
+            voters_counts.total_admitted_voters_count = 80;
+
+            self
+        }
+
+        pub fn with_difference(mut self) -> Self {
+            let extra_proxy_certificate: Count = 10;
+
+            let voters_counts = self.voters_counts_mut();
+            voters_counts.poll_card_count -= extra_proxy_certificate;
+            voters_counts.proxy_certificate_count += extra_proxy_certificate;
+
+            self
         }
     }
 

@@ -85,7 +85,7 @@ pub async fn election_list(
 }
 
 /// Get election details including the election's candidate list (political groups),
-/// its polling stations and the current committee session
+/// its polling stations and the current committee session and its investigations
 #[utoipa::path(
     get,
     path = "/api/elections/{election_id}",

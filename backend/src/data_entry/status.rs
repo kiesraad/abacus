@@ -117,7 +117,7 @@ pub struct SecondEntryNotStarted {
     /// When the first data entry was finalised
     #[schema(value_type = String)]
     pub first_entry_finished_at: DateTime<Utc>,
-    // Whether the first data entry was finalised with warnings
+    /// Whether the first data entry was finalised with warnings
     pub finalised_with_warnings: bool,
 }
 
@@ -172,7 +172,7 @@ pub struct Definitive {
     /// When both data entries were finalised
     #[schema(value_type = String)]
     pub finished_at: DateTime<Utc>,
-    // Whether the second data entry was finalised with warnings
+    /// Whether the second data entry was finalised with warnings
     pub finalised_with_warnings: bool,
 }
 

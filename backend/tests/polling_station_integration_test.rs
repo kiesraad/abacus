@@ -1048,6 +1048,37 @@ async fn test_import_missing_data(pool: SqlitePool) {
     assert_eq!(response.status(), StatusCode::UNPROCESSABLE_ENTITY);
 }
 
+#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_7_four_sessions", "users"))))]
+async fn test_import_fails_when_polling_stations_exist(pool: SqlitePool) {
+    let addr = serve_api(pool).await;
+    let coordinator_cookie = coordinator_login(&addr).await;
+    let election_id = 7;
+
+    let committee_session =
+        get_election_committee_session(&addr, &coordinator_cookie, election_id).await;
+    assert_eq!(committee_session.status, CommitteeSessionStatus::Created);
+
+    let validate_response = import_validate_polling_stations(
+        &addr,
+        &coordinator_cookie,
+        election_id,
+        include_str!("../src/eml/tests/eml110b_test.eml.xml"),
+    )
+    .await;
+    assert_eq!(validate_response.status(), StatusCode::OK);
+    let body: serde_json::Value = validate_response.json().await.unwrap();
+
+    let import_response = import_polling_stations(
+        &addr,
+        &coordinator_cookie,
+        election_id,
+        "eml110b_test.eml.xml",
+        body["polling_stations"].clone(),
+    )
+    .await;
+    assert_eq!(import_response.status(), StatusCode::FORBIDDEN);
+}
+
 #[test(sqlx::test(fixtures(
     path = "../fixtures",
     scripts("election_6_no_polling_stations", "users")
@@ -1074,7 +1105,7 @@ async fn test_import_correct_file(pool: SqlitePool) {
     let import_response = import_polling_stations(
         &addr,
         &coordinator_cookie,
-        6,
+        election_id,
         "eml110b_test.eml.xml",
         body["polling_stations"].clone(),
     )
@@ -1132,32 +1163,6 @@ async fn test_finished_to_in_progress_on_create(pool: SqlitePool) {
     let coordinator_cookie = coordinator_login(&addr).await;
     check_finished_to_in_progress_on(&addr, || {
         create_polling_station(&addr, &coordinator_cookie, 2, 35)
-    })
-    .await;
-}
-
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
-async fn test_finished_to_in_progress_on_import(pool: SqlitePool) {
-    let addr = serve_api(pool).await;
-    let coordinator_cookie = coordinator_login(&addr).await;
-    check_finished_to_in_progress_on(&addr, || async {
-        let validate_response = import_validate_polling_stations(
-            &addr,
-            &coordinator_cookie,
-            2,
-            include_str!("../src/eml/tests/eml110b_1_station.eml.xml"),
-        )
-        .await;
-        let body: serde_json::Value = validate_response.json().await.unwrap();
-
-        import_polling_stations(
-            &addr,
-            &coordinator_cookie,
-            2,
-            "eml110b_1_station.eml.xml",
-            body["polling_stations"].clone(),
-        )
-        .await
     })
     .await;
 }

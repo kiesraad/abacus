@@ -1055,11 +1055,9 @@ mod tests {
             status::CommitteeSessionStatus, tests::change_status_committee_session,
         },
         data_entry::{
-            CSOFirstSessionResults, Count, DifferenceCountsCompareVotesCastAdmittedVoters,
-            DifferencesCounts, PoliticalGroupCandidateVotes, PoliticalGroupTotalVotes,
-            ValidationResult, ValidationResultCode, VotersCounts, VotesCounts, YesNo,
+            ValidationResult, ValidationResultCode,
             repository::{data_entry_exists, result_exists},
-            structs::tests::ValidDefault,
+            structs::tests::example_polling_station_results,
         },
         investigation::insert_test_investigation,
         polling_station::repository::insert_test_polling_station,
@@ -1068,67 +1066,17 @@ mod tests {
     fn example_data_entry() -> DataEntry {
         DataEntry {
             progress: 100,
-            data: PollingStationResults::CSOFirstSession(CSOFirstSessionResults {
-                extra_investigation: ValidDefault::valid_default(),
-                counting_differences_polling_station: ValidDefault::valid_default(),
-                voters_counts: VotersCounts {
-                    poll_card_count: 99,
-                    proxy_certificate_count: 1,
-                    total_admitted_voters_count: 100,
-                },
-                votes_counts: VotesCounts {
-                    political_group_total_votes: vec![
-                        PoliticalGroupTotalVotes {
-                            number: 1,
-                            total: 56,
-                        },
-                        PoliticalGroupTotalVotes {
-                            number: 2,
-                            total: 40,
-                        },
-                    ],
-                    total_votes_candidates_count: 96,
-                    blank_votes_count: 2,
-                    invalid_votes_count: 2,
-                    total_votes_cast_count: 100,
-                },
-                differences_counts: DifferencesCounts {
-                    more_ballots_count: 0,
-                    fewer_ballots_count: 0,
-                    compare_votes_cast_admitted_voters:
-                        DifferenceCountsCompareVotesCastAdmittedVoters {
-                            admitted_voters_equal_votes_cast: true,
-                            votes_cast_greater_than_admitted_voters: false,
-                            votes_cast_smaller_than_admitted_voters: false,
-                        },
-                    difference_completely_accounted_for: YesNo {
-                        yes: true,
-                        no: false,
-                    },
-                },
-                political_group_votes: vec![
-                    PoliticalGroupCandidateVotes::from_test_data_auto(1, &[36, 20]),
-                    PoliticalGroupCandidateVotes::from_test_data_auto(2, &[30, 10]),
-                ],
-            }),
+            data: example_polling_station_results(),
             client_state: ClientState(None),
         }
     }
 
     fn example_data_entry_with_warning() -> DataEntry {
-        let extra_blank_votes: Count = 100;
-
-        let mut data_entry = example_data_entry().clone();
-
-        let voters_counts = data_entry.data.voters_counts_mut();
-        voters_counts.poll_card_count += extra_blank_votes;
-        voters_counts.total_admitted_voters_count += extra_blank_votes;
-
-        let votes_counts = data_entry.data.votes_counts_mut();
-        votes_counts.blank_votes_count += extra_blank_votes;
-        votes_counts.total_votes_cast_count += extra_blank_votes;
-
-        data_entry
+        DataEntry {
+            progress: 100,
+            data: example_polling_station_results().with_warning(),
+            client_state: ClientState(None),
+        }
     }
 
     async fn get_data_entry_status(

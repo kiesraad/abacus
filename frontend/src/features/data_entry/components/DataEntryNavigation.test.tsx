@@ -201,7 +201,7 @@ describe("DataEntryNavigation", () => {
 
       const modal = await screen.findByRole("dialog");
 
-      const deleteButton = within(modal).getByRole("button", { name: "Niet bewaren" });
+      const deleteButton = within(modal).getByRole("button", { name: "Verwijder invoer" });
       expect(deleteButton).toBeVisible();
       deleteButton.click();
 

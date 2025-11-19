@@ -222,25 +222,27 @@ pub trait Validate {
     ) -> Result<(), DataError>;
 }
 
-pub fn validate_data_entry_status(
-    data_entry_status: &DataEntryStatus,
-    polling_station: &PollingStation,
-    election: &ElectionWithPoliticalGroups,
-) -> Result<ValidationResults, DataError> {
-    let mut validation_results = ValidationResults::default();
-    data_entry_status.validate(
-        election,
-        polling_station,
-        &mut validation_results,
-        &"data".into(),
-    )?;
-    validation_results
-        .errors
-        .sort_by(|a, b| a.code.cmp(&b.code));
-    validation_results
-        .warnings
-        .sort_by(|a, b| a.code.cmp(&b.code));
-    Ok(validation_results)
+pub trait ValidateRoot: Validate {
+    fn start_validate(
+        &self,
+        polling_station: &PollingStation,
+        election: &ElectionWithPoliticalGroups,
+    ) -> Result<ValidationResults, DataError> {
+        let mut validation_results = ValidationResults::default();
+        self.validate(
+            election,
+            polling_station,
+            &mut validation_results,
+            &"data".into(),
+        )?;
+        validation_results
+            .errors
+            .sort_by(|a, b| a.code.cmp(&b.code));
+        validation_results
+            .warnings
+            .sort_by(|a, b| a.code.cmp(&b.code));
+        Ok(validation_results)
+    }
 }
 
 pub fn validate_differences_counts(
@@ -430,6 +432,8 @@ pub fn validate_differences_counts(
     Ok(())
 }
 
+impl ValidateRoot for DataEntryStatus {}
+
 impl Validate for DataEntryStatus {
     fn validate(
         &self,
@@ -485,6 +489,8 @@ impl Validate for DataEntryStatus {
         }
     }
 }
+
+impl ValidateRoot for PollingStationResults {}
 
 impl Validate for PollingStationResults {
     fn validate(

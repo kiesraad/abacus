@@ -12,7 +12,7 @@ use utoipa_axum::{router::OpenApiRouter, routes};
 
 use super::{
     CSONextSessionResults, CommonPollingStationResults, DataEntryStatusResponse, DataError,
-    PollingStationDataEntry, PollingStationResults, ValidationResults,
+    PollingStationDataEntry, PollingStationResults, ValidateRoot, ValidationResults,
     entry_number::EntryNumber,
     repository::{
         delete_data_entry, delete_result, get_data_entry, previous_results_for_polling_station,
@@ -21,7 +21,6 @@ use super::{
         ClientState, CurrentDataEntry, DataEntryStatus, DataEntryStatusName,
         DataEntryTransitionError, EntriesDifferent,
     },
-    validate_data_entry_status,
 };
 use crate::{
     APIError, AppState, SqlitePoolExt,
@@ -297,7 +296,7 @@ async fn polling_station_data_entry_claim(
     let data = new_state
         .get_data()
         .expect("data should be present because data entry is in progress");
-    let validation_results = validate_data_entry_status(&new_state, &polling_station, &election)?;
+    let validation_results = new_state.start_validate(&polling_station, &election)?;
 
     // Save the new data entry state
     crate::data_entry::repository::upsert(
@@ -416,7 +415,7 @@ async fn polling_station_data_entry_save(
     };
 
     // Validate the state
-    let validation_results = validate_data_entry_status(&new_state, &polling_station, &election)?;
+    let validation_results = new_state.start_validate(&polling_station, &election)?;
 
     // Save the new data entry state
     crate::data_entry::repository::upsert(
@@ -741,11 +740,7 @@ async fn polling_station_data_entry_get(
                 user_id: Some(first_entry_has_errors_state.first_entry_user_id),
                 data: first_entry_has_errors_state.finalised_first_entry,
                 status: state.status_name(),
-                validation_results: validate_data_entry_status(
-                    &state,
-                    &polling_station,
-                    &election,
-                )?,
+                validation_results: state.start_validate(&polling_station, &election)?,
             }))
         }
         DataEntryStatus::SecondEntryNotStarted(second_entry_not_started_state) => {
@@ -753,11 +748,7 @@ async fn polling_station_data_entry_get(
                 user_id: Some(second_entry_not_started_state.first_entry_user_id),
                 data: second_entry_not_started_state.finalised_first_entry,
                 status: state.status_name(),
-                validation_results: validate_data_entry_status(
-                    &state,
-                    &polling_station,
-                    &election,
-                )?,
+                validation_results: state.start_validate(&polling_station, &election)?,
             }))
         }
         DataEntryStatus::SecondEntryInProgress(second_entry_in_progress_state) => {
@@ -775,7 +766,7 @@ async fn polling_station_data_entry_get(
                 .data
                 .0,
             status: state.status_name(),
-            validation_results: validate_data_entry_status(&state, &polling_station, &election)?,
+            validation_results: state.start_validate(&polling_station, &election)?,
         })),
         _ => Err(APIError::Conflict(
             "Data entry is in the wrong state".to_string(),

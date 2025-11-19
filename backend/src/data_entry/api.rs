@@ -1005,7 +1005,7 @@ pub struct ElectionStatusResponseEntry {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[schema(nullable = false)]
     /// Whether the finalised first or second data entry has warnings
-    pub finalised_with_warnings: Option<bool>,
+    pub has_warnings: Option<bool>,
 }
 
 /// Get election polling stations data entry statuses

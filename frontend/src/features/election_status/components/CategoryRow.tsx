@@ -15,7 +15,7 @@ interface CategoryRowProps {
   category: StatusCategory;
   pollingStation: PollingStationWithStatusAndTypist;
   addLink: boolean;
-  warning?: boolean;
+  hasWarnings?: boolean;
 }
 
 const SHOW_BADGE: DataEntryStatusName[] = [
@@ -39,19 +39,19 @@ function getCategoryRowUrl(
   }
 }
 
-export function CategoryRow({ category, pollingStation, addLink, warning }: CategoryRowProps): ReactNode {
+export function CategoryRow({ category, pollingStation, addLink, hasWarnings }: CategoryRowProps): ReactNode {
   const link = getCategoryRowUrl(pollingStation.status, pollingStation.id);
   if (addLink && link) {
     return (
       <Table.LinkRow to={link}>
-        <CategoryRowContent category={category} pollingStation={pollingStation} warning={warning} />
+        <CategoryRowContent category={category} pollingStation={pollingStation} hasWarnings={hasWarnings} />
       </Table.LinkRow>
     );
   }
 
   return (
     <Table.Row>
-      <CategoryRowContent category={category} pollingStation={pollingStation} warning={warning} />
+      <CategoryRowContent category={category} pollingStation={pollingStation} hasWarnings={hasWarnings} />
     </Table.Row>
   );
 }
@@ -59,10 +59,10 @@ export function CategoryRow({ category, pollingStation, addLink, warning }: Cate
 interface CategoryRowContentProps {
   category: StatusCategory;
   pollingStation: PollingStationWithStatusAndTypist;
-  warning?: boolean;
+  hasWarnings?: boolean;
 }
 
-function CategoryRowContent({ category, pollingStation, warning }: CategoryRowContentProps): ReactNode {
+function CategoryRowContent({ category, pollingStation, hasWarnings }: CategoryRowContentProps): ReactNode {
   return (
     <>
       <Table.NumberCell key={`${pollingStation.id}-number`}>{pollingStation.number}</Table.NumberCell>
@@ -91,7 +91,7 @@ function CategoryRowContent({ category, pollingStation, warning }: CategoryRowCo
       {(category === "first_entry_finished" || category === "definitive") && (
         <Table.Cell key={`${pollingStation.id}-time`}>
           <span>{pollingStation.finished_at ? formatDateTime(new Date(pollingStation.finished_at)) : ""}</span>
-          {warning && <Icon color="warning" icon={<IconWarning aria-label={t("contains_warning")} />} />}
+          {hasWarnings && <Icon color="warning" icon={<IconWarning aria-label={t("contains_warning")} />} />}
         </Table.Cell>
       )}
     </>

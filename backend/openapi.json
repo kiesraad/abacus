@@ -5715,10 +5715,6 @@
           "status"
         ],
         "properties": {
-          "finalised_with_warnings": {
-            "type": "boolean",
-            "description": "Whether the finalised first or second data entry has warnings"
-          },
           "finished_at": {
             "type": "string",
             "description": "Time when the data entry was finalised"
@@ -5734,6 +5730,10 @@
             "format": "int32",
             "description": "First entry user id",
             "minimum": 0
+          },
+          "has_warnings": {
+            "type": "boolean",
+            "description": "Whether the finalised first or second data entry has warnings"
           },
           "polling_station_id": {
             "type": "integer",

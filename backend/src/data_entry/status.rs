@@ -117,8 +117,7 @@ pub struct SecondEntryNotStarted {
     /// When the first data entry was finalised
     #[schema(value_type = String)]
     pub first_entry_finished_at: DateTime<Utc>,
-    // Whether the first data entry was finalised with warnings
-    pub finalised_with_warnings: bool,
+    pub has_warnings: bool,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq, ToSchema, Type)]
@@ -172,8 +171,7 @@ pub struct Definitive {
     /// When both data entries were finalised
     #[schema(value_type = String)]
     pub finished_at: DateTime<Utc>,
-    // Whether the second data entry was finalised with warnings
-    pub finalised_with_warnings: bool,
+    pub has_warnings: bool,
 }
 
 /// Current data entry, used for function parameters only
@@ -353,7 +351,7 @@ impl DataEntryStatus {
                         first_entry_user_id: state.first_entry_user_id,
                         finalised_first_entry: state.first_entry.clone(),
                         first_entry_finished_at: Utc::now(),
-                        finalised_with_warnings: validation_results.has_warnings(),
+                        has_warnings: validation_results.has_warnings(),
                     }))
                 }
             }
@@ -395,7 +393,7 @@ impl DataEntryStatus {
                             first_entry_user_id: state.first_entry_user_id,
                             second_entry_user_id: state.second_entry_user_id,
                             finished_at: Utc::now(),
-                            finalised_with_warnings: validation_results.has_warnings(),
+                            has_warnings: validation_results.has_warnings(),
                         }),
                         Some(state.second_entry.clone()),
                     ))
@@ -467,7 +465,7 @@ impl DataEntryStatus {
                         first_entry_user_id,
                         finalised_first_entry,
                         first_entry_finished_at,
-                        finalised_with_warnings: validation_results.has_warnings(),
+                        has_warnings: validation_results.has_warnings(),
                     },
                 ))
             }
@@ -532,7 +530,7 @@ impl DataEntryStatus {
                     first_entry_user_id: state.first_entry_user_id,
                     finalised_first_entry: state.first_entry.clone(),
                     first_entry_finished_at: state.first_entry_finished_at,
-                    finalised_with_warnings: validation_results.has_warnings(),
+                    has_warnings: validation_results.has_warnings(),
                 }))
             }
             _ => Err(DataEntryTransitionError::Invalid),
@@ -571,7 +569,7 @@ impl DataEntryStatus {
                         first_entry_user_id: state.second_entry_user_id,
                         finalised_first_entry: state.second_entry.clone(),
                         first_entry_finished_at: state.second_entry_finished_at,
-                        finalised_with_warnings: validation_results.has_warnings(),
+                        has_warnings: validation_results.has_warnings(),
                     }))
                 }
             }
@@ -682,16 +680,12 @@ impl DataEntryStatus {
     }
 
     /// Returns whether the finalised first or second data entry has warnings
-    pub fn finalised_with_warnings(&self) -> Option<&bool> {
+    pub fn has_warnings(&self) -> Option<&bool> {
         match self {
             DataEntryStatus::SecondEntryNotStarted(SecondEntryNotStarted {
-                finalised_with_warnings,
-                ..
-            }) => Some(finalised_with_warnings),
-            DataEntryStatus::Definitive(Definitive {
-                finalised_with_warnings,
-                ..
-            }) => Some(finalised_with_warnings),
+                has_warnings, ..
+            }) => Some(has_warnings),
+            DataEntryStatus::Definitive(Definitive { has_warnings, .. }) => Some(has_warnings),
             _ => None,
         }
     }
@@ -853,7 +847,7 @@ mod tests {
             first_entry_user_id: 0,
             finalised_first_entry: polling_station_result(),
             first_entry_finished_at: Utc::now(),
-            finalised_with_warnings: true,
+            has_warnings: true,
         })
     }
 
@@ -874,7 +868,7 @@ mod tests {
             first_entry_user_id: 0,
             second_entry_user_id: 0,
             finished_at: Utc::now(),
-            finalised_with_warnings: false,
+            has_warnings: false,
         })
     }
 

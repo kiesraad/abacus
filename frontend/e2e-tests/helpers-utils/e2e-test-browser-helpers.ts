@@ -18,6 +18,7 @@ import { AddInvestigationPgObj } from "e2e-tests/page-objects/investigations/Add
 import { InvestigationOverviewPgObj } from "e2e-tests/page-objects/investigations/InvestigationOverviewPgObj";
 import { InvestigationPrintCorrigendumPgObj } from "e2e-tests/page-objects/investigations/InvestigationPrintCorrigendumPgObj";
 import { InvestigationReasonPgObj } from "e2e-tests/page-objects/investigations/InvestigationReasonPgObj";
+import { stat } from "node:fs/promises";
 
 import { PollingStationResults } from "@/types/generated/openapi";
 
@@ -127,4 +128,9 @@ export async function createInvestigation(page: Page, pollingStation: string, re
   await investionReasonPage.nextButton.click();
   const investigationPrintCorrigendumPage = new InvestigationPrintCorrigendumPgObj(page);
   await expect(investigationPrintCorrigendumPage.header).toBeVisible();
+  const downloadPromise = page.waitForEvent("download");
+  await investigationPrintCorrigendumPage.downloadLink.click();
+  const download = await downloadPromise;
+  expect(download.suggestedFilename()).toMatch(/Model_Na14-2_GR2022_Stembureau_\d+_Bijlage_1.pdf/);
+  expect((await stat(await download.path())).size).toBeGreaterThan(1024);
 }

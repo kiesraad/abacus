@@ -18,7 +18,9 @@ use crate::{
         repository::get_election_committee_session,
         status::{CommitteeSessionStatus, change_committee_session_status},
     },
+    data_entry::repository::{data_entry_exists, result_exists},
     eml::{EML110, EMLDocument, EMLImportError},
+    error::ErrorReference,
 };
 
 pub mod repository;
@@ -119,7 +121,9 @@ async fn polling_station_create(
         )
         .await?;
 
-    if committee_session.status == CommitteeSessionStatus::Created {
+    if committee_session.status == CommitteeSessionStatus::Created
+        && !committee_session.is_next_session()
+    {
         change_committee_session_status(
             &mut tx,
             committee_session.id,
@@ -239,7 +243,7 @@ async fn polling_station_update(
         (status = 401, description = "Unauthorized", body = ErrorResponse),
         (status = 403, description = "Forbidden", body = ErrorResponse),
         (status = 404, description = "Polling station not found", body = ErrorResponse),
-        (status = 422, description = "Polling station deletion is not possible", body = ErrorResponse),
+        (status = 409, description = "Request cannot be completed", body = ErrorResponse),
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
     params(
@@ -261,6 +265,15 @@ async fn polling_station_delete(
 
     let polling_station =
         repository::get_for_election(&mut tx, election_id, polling_station_id).await?;
+
+    if data_entry_exists(&mut tx, polling_station.id).await?
+        || result_exists(&mut tx, polling_station.id).await?
+    {
+        return Err(APIError::Conflict(
+            "Polling station cannot be deleted.".to_string(),
+            ErrorReference::PollingStationCannotBeDeleted,
+        ));
+    }
 
     repository::delete(&mut tx, election_id, polling_station_id).await?;
 

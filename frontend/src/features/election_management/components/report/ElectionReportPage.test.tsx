@@ -17,6 +17,7 @@ import {
   CommitteeSessionStatusChangeRequestHandler,
   ElectionRequestHandler,
   ElectionStatusRequestHandler,
+  InvestigationListRequestHandler,
 } from "@/testing/api-mocks/RequestHandlers";
 import { getRouter, Router } from "@/testing/router";
 import { overrideOnce, server } from "@/testing/server";
@@ -69,7 +70,12 @@ const renderPage = () => {
 
 describe("ElectionReportPage", () => {
   beforeEach(() => {
-    server.use(CommitteeSessionStatusChangeRequestHandler, ElectionRequestHandler, ElectionStatusRequestHandler);
+    server.use(
+      CommitteeSessionStatusChangeRequestHandler,
+      InvestigationListRequestHandler,
+      ElectionRequestHandler,
+      ElectionStatusRequestHandler,
+    );
     vi.spyOn(ReactRouter, "useNavigate").mockImplementation(() => navigate);
     vi.spyOn(ReactRouter, "Navigate").mockImplementation((props) => {
       navigate(props.to);
@@ -309,7 +315,7 @@ describe("ElectionReportPage", () => {
       }),
     ).toBeVisible();
 
-    expect(screen.getByText("In het Zip bestand zitten drie documenten:")).toBeInTheDocument();
+    expect(screen.getByText("In het ZIP-bestand zitten drie documenten:")).toBeInTheDocument();
     expect(await screen.findByRole("link", { name: /Download definitieve documenten tweede zitting/ })).toBeVisible();
   });
 
@@ -345,7 +351,7 @@ describe("ElectionReportPage", () => {
       }),
     ).toBeVisible();
 
-    expect(screen.getByText("In het Zip bestand zit één document:")).toBeInTheDocument();
+    expect(screen.getByText("In het ZIP-bestand zit één document:")).toBeInTheDocument();
     expect(await screen.findByRole("link", { name: /Download definitieve documenten tweede zitting/ })).toBeVisible();
   });
 });

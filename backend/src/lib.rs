@@ -320,17 +320,45 @@ pub async fn shutdown_signal() {
     #[cfg(unix)]
     let terminate = async {
         signal::unix::signal(signal::unix::SignalKind::terminate())
-            .expect("failed to install signal handler")
+            .expect("failed to install terminate signal handler")
             .recv()
             .await;
     };
 
-    #[cfg(not(unix))]
+    #[cfg(unix)]
+    let quit = async {
+        signal::unix::signal(signal::unix::SignalKind::quit())
+            .expect("failed to install quit signal handler")
+            .recv()
+            .await;
+    };
+
+    #[cfg(windows)]
+    let terminate = async {
+        signal::windows::ctrl_close()
+            .expect("failed to install CTRL_CLOSE handler")
+            .recv()
+            .await
+    };
+
+    #[cfg(windows)]
+    let quit = async {
+        signal::windows::ctrl_shutdown()
+            .expect("failed to install CTRL_SHUTDOWN handler")
+            .recv()
+            .await
+    };
+
+    #[cfg(not(any(unix, windows)))]
     let terminate = std::future::pending::<()>();
+
+    #[cfg(not(any(unix, windows)))]
+    let quit = std::future::pending::<()>();
 
     tokio::select! {
         _ = ctrl_c => {},
         _ = terminate => {},
+        _ = quit => {},
     }
 }
 

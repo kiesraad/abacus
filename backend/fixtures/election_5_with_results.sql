@@ -459,7 +459,13 @@ VALUES (5, 1, 5, 'data_entry_finished', 'Grote Stad', '2026-03-19 09:15:00', 200
 INSERT INTO polling_stations (id, committee_session_id, id_prev_session, name, number, number_of_voters, polling_station_type, address,
                               postal_code, locality)
 VALUES (8, 5, NULL, 'Testgebouw', 41, NULL, 'FixedLocation', 'Testweg 3', '1234 QA', 'Grote Stad'),
-       (9, 6, 8, 'Testgebouw', 41, NULL, 'FixedLocation', 'Testweg 3', '1234 QA', 'Grote Stad');
+       (9, 6, 8, 'Testgebouw', 41, NULL, 'FixedLocation', 'Testweg 3', '1234 QA', 'Grote Stad'),
+       (11, 6, NULL, 'Test ander gebouw', 42, NULL, 'FixedLocation', 'Testweg 4', '1234 QA', 'Grote Stad');
+
+INSERT INTO
+    polling_station_investigations
+VALUES
+    (11, "reason", "findings", 1);
 
 INSERT INTO
     polling_station_data_entries
@@ -469,6 +475,12 @@ VALUES
         5,
         '{"status":"Definitive","state":{"first_entry_user_id":5,"second_entry_user_id":6,"finished_at":"2025-09-16T17:07:31.223365436Z","finalised_with_warnings":false}}',
         '2025-09-16 17:07:31'
+    ),
+    (
+        11,
+        6,
+        '{"status":"Definitive","state":{"first_entry_user_id":5,"second_entry_user_id":6,"finished_at":"2025-09-16T17:07:31.223365436Z"}}',
+        '2025-09-16 17:07:31'
     );
 
 INSERT INTO
@@ -477,6 +489,12 @@ VALUES
     (
         8,
         5,
+        '{"model":"CSOFirstSession","extra_investigation":{"extra_investigation_other_reason":{"yes":false,"no":false},"ballots_recounted_extra_investigation":{"yes":false,"no":false}},"counting_differences_polling_station":{"unexplained_difference_ballots_voters":{"yes":false,"no":true},"difference_ballots_per_list":{"yes":false,"no":true}},"voters_counts":{"poll_card_count":1203,"proxy_certificate_count":2,"total_admitted_voters_count":1205},"votes_counts":{"political_group_total_votes":[{"number":1,"total":600},{"number":2,"total":302},{"number":3,"total":98},{"number":4,"total":99},{"number":5,"total":101}],"total_votes_candidates_count":1200,"blank_votes_count":3,"invalid_votes_count":2,"total_votes_cast_count":1205},"differences_counts":{"compare_votes_cast_admitted_voters":{"admitted_voters_equal_votes_cast":true,"votes_cast_greater_than_admitted_voters":false,"votes_cast_smaller_than_admitted_voters":false},"more_ballots_count":0,"fewer_ballots_count":0,"difference_completely_accounted_for":{"yes":false,"no":false}},"political_group_votes":[{"number":1,"total":600,"candidate_votes":[{"number":1,"votes":78},{"number":2,"votes":20},{"number":3,"votes":55},{"number":4,"votes":45},{"number":5,"votes":50},{"number":6,"votes":0},{"number":7,"votes":60},{"number":8,"votes":40},{"number":9,"votes":30},{"number":10,"votes":20},{"number":11,"votes":50},{"number":12,"votes":0},{"number":13,"votes":0},{"number":14,"votes":0},{"number":15,"votes":0},{"number":16,"votes":0},{"number":17,"votes":0},{"number":18,"votes":0},{"number":19,"votes":0},{"number":20,"votes":0},{"number":21,"votes":0},{"number":22,"votes":0},{"number":23,"votes":0},{"number":24,"votes":0},{"number":25,"votes":0},{"number":26,"votes":0},{"number":27,"votes":0},{"number":28,"votes":0},{"number":29,"votes":0},{"number":30,"votes":152}]},{"number":2,"total":302,"candidate_votes":[{"number":1,"votes":150},{"number":2,"votes":50},{"number":3,"votes":22},{"number":4,"votes":10},{"number":5,"votes":30},{"number":6,"votes":40}]},{"number":3,"total":98,"candidate_votes":[{"number":1,"votes":20},{"number":2,"votes":15},{"number":3,"votes":25},{"number":4,"votes":3},{"number":5,"votes":2},{"number":6,"votes":33}]},{"number":4,"total":99,"candidate_votes":[{"number":1,"votes":20},{"number":2,"votes":15},{"number":3,"votes":25},{"number":4,"votes":24},{"number":5,"votes":15}]},{"number":5,"total":101,"candidate_votes":[{"number":1,"votes":20},{"number":2,"votes":31},{"number":3,"votes":10},{"number":4,"votes":40}]}]}',
+        '2025-09-16 17:07:31'
+    ),
+    (
+        11,
+        6,
         '{"model":"CSOFirstSession","extra_investigation":{"extra_investigation_other_reason":{"yes":false,"no":false},"ballots_recounted_extra_investigation":{"yes":false,"no":false}},"counting_differences_polling_station":{"unexplained_difference_ballots_voters":{"yes":false,"no":true},"difference_ballots_per_list":{"yes":false,"no":true}},"voters_counts":{"poll_card_count":1203,"proxy_certificate_count":2,"total_admitted_voters_count":1205},"votes_counts":{"political_group_total_votes":[{"number":1,"total":600},{"number":2,"total":302},{"number":3,"total":98},{"number":4,"total":99},{"number":5,"total":101}],"total_votes_candidates_count":1200,"blank_votes_count":3,"invalid_votes_count":2,"total_votes_cast_count":1205},"differences_counts":{"compare_votes_cast_admitted_voters":{"admitted_voters_equal_votes_cast":true,"votes_cast_greater_than_admitted_voters":false,"votes_cast_smaller_than_admitted_voters":false},"more_ballots_count":0,"fewer_ballots_count":0,"difference_completely_accounted_for":{"yes":false,"no":false}},"political_group_votes":[{"number":1,"total":600,"candidate_votes":[{"number":1,"votes":78},{"number":2,"votes":20},{"number":3,"votes":55},{"number":4,"votes":45},{"number":5,"votes":50},{"number":6,"votes":0},{"number":7,"votes":60},{"number":8,"votes":40},{"number":9,"votes":30},{"number":10,"votes":20},{"number":11,"votes":50},{"number":12,"votes":0},{"number":13,"votes":0},{"number":14,"votes":0},{"number":15,"votes":0},{"number":16,"votes":0},{"number":17,"votes":0},{"number":18,"votes":0},{"number":19,"votes":0},{"number":20,"votes":0},{"number":21,"votes":0},{"number":22,"votes":0},{"number":23,"votes":0},{"number":24,"votes":0},{"number":25,"votes":0},{"number":26,"votes":0},{"number":27,"votes":0},{"number":28,"votes":0},{"number":29,"votes":0},{"number":30,"votes":152}]},{"number":2,"total":302,"candidate_votes":[{"number":1,"votes":150},{"number":2,"votes":50},{"number":3,"votes":22},{"number":4,"votes":10},{"number":5,"votes":30},{"number":6,"votes":40}]},{"number":3,"total":98,"candidate_votes":[{"number":1,"votes":20},{"number":2,"votes":15},{"number":3,"votes":25},{"number":4,"votes":3},{"number":5,"votes":2},{"number":6,"votes":33}]},{"number":4,"total":99,"candidate_votes":[{"number":1,"votes":20},{"number":2,"votes":15},{"number":3,"votes":25},{"number":4,"votes":24},{"number":5,"votes":15}]},{"number":5,"total":101,"candidate_votes":[{"number":1,"votes":20},{"number":2,"votes":31},{"number":3,"votes":10},{"number":4,"votes":40}]}]}',
         '2025-09-16 17:07:31'
     );

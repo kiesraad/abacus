@@ -23,9 +23,9 @@ describe("PollingStationListPage", () => {
       ["Gebruikersnaam", "Rol", "Volledige naam", "Laatste activiteit"],
       ["Sanne", "Beheerder", "Sanne Molenaar", "vandaag om 10:20"],
       ["Jayden", "Coördinator", "Jayden Ahmen", "gisteren om 10:20"],
-      ["Gebruiker01", "Invoerder", "Nog niet gebruikt", "–"],
-      ["Gebruiker02", "Invoerder", "Nog niet gebruikt", "–"],
-      ["Gebruiker03", "Invoerder", "Nog niet gebruikt", "–"],
+      ["Gebruiker01", "Invoerder", "Account nog niet gebruikt", "–"],
+      ["Gebruiker02", "Invoerder", "Account nog niet gebruikt", "–"],
+      ["Gebruiker03", "Invoerder", "Account nog niet gebruikt", "–"],
     ]);
   });
 
@@ -42,9 +42,9 @@ describe("PollingStationListPage", () => {
       ["Gebruikersnaam", "Rol", "Volledige naam", "Laatste activiteit"],
       ["Sanne", "Beheerder", "Sanne Molenaar", "vandaag om 10:20"],
       ["Jayden", "Coördinator", "Jayden Ahmen", "gisteren om 10:20"],
-      ["Gebruiker01", "Invoerder", "Nog niet gebruikt", "–"],
-      ["Gebruiker02", "Invoerder", "Nog niet gebruikt", "–"],
-      ["Gebruiker03", "Invoerder", "Nog niet gebruikt", "–"],
+      ["Gebruiker01", "Invoerder", "Account nog niet gebruikt", "–"],
+      ["Gebruiker02", "Invoerder", "Account nog niet gebruikt", "–"],
+      ["Gebruiker03", "Invoerder", "Account nog niet gebruikt", "–"],
     ]);
   });
 });

@@ -107,8 +107,7 @@ __Uitbreidingen op hoofdscenario 2:__
 1a. Het stembureau was foutievelijk aangemaakt:  
 &emsp; 1a1. De coördinator GSB verwijdert het stembureau.
 
-
-## Het GSB behandelt een verzoek tot onderzoek/hertelling (vlieger)
+## Het GSB voert het onderzoek en de eventuele hertelling uit (vlieger)
 
 __Niveau:__ hoog-over, vlieger, 🪁
 
@@ -116,10 +115,7 @@ __Niveau:__ hoog-over, vlieger, 🪁
 
 __Hoofdscenario:__  
 
-1. De coördinator maakt een onderzoek aan in de applicatie en vult de opdracht in.
-2. De coördinator print het corrigendum (DSO: Na 14-1 versie 2, CSO: Na 14-2 Bijlage 1) wat gegenereerd wordt door de
-   applicatie.
-3. Het GSB voert het onderzoek uit.
+1. Het GSB voert het onderzoek uit.
 2. Het GSB noteert de bevindingen op het corrigendum (DSO: Na 14-1 versie 2, CSO: Na 14-2 Bijlage 1).
 3. Het GSB besluit dat er een hertelling nodig is.
 4. Het GSB stelt een ander resultaat vast in de hertelling.

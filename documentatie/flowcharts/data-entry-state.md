@@ -35,10 +35,10 @@ stateDiagram-v2
   EntriesDifferent --> resolve: resolve differences
   resolve --> first_has_errors: keep one entry
   resolve --> FirstEntryNotStarted: discard both entries
-    FirstEntryInProgress --> FirstEntryNotStarted: delete
-    SecondEntryNotStarted --> FirstEntryNotStarted: delete
-    SecondEntryInProgress --> SecondEntryNotStarted: delete
-    Definitive --> FirstEntryNotStarted: delete
+  FirstEntryInProgress --> FirstEntryNotStarted: delete
+  SecondEntryNotStarted --> FirstEntryNotStarted: delete
+  SecondEntryInProgress --> SecondEntryNotStarted: delete
+  Definitive --> FirstEntryNotStarted: delete
 
   Definitive --> [*]
 ```

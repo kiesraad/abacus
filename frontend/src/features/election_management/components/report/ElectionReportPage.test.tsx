@@ -120,7 +120,7 @@ describe("ElectionReportPage", () => {
     ).toBeVisible();
     expect(await screen.findByRole("link", { name: /Download definitieve documenten eerste zitting/ })).toBeVisible();
     expect(await screen.findByRole("link", { name: "Terug naar overzicht" })).toBeVisible();
-    expect(await screen.findByRole("button", { name: "Steminvoer hervatten" })).toBeVisible();
+    expect(await screen.findByRole("button", { name: "Invoer hervatten" })).toBeVisible();
 
     const backButton = screen.getByRole("link", { name: "Terug naar overzicht" });
     expect(backButton).toBeVisible();
@@ -157,7 +157,7 @@ describe("ElectionReportPage", () => {
     expect(await screen.findByRole("link", { name: /Download definitieve documenten eerste zitting/ })).toBeVisible();
     expect(await screen.findByRole("link", { name: "Terug naar overzicht" })).toBeVisible();
 
-    const resumeButton = screen.getByRole("button", { name: "Steminvoer hervatten" });
+    const resumeButton = screen.getByRole("button", { name: "Invoer hervatten" });
     expect(resumeButton).toBeVisible();
     await user.click(resumeButton);
 
@@ -191,7 +191,7 @@ describe("ElectionReportPage", () => {
     ).toBeVisible();
     expect(await screen.findByRole("link", { name: /Download definitieve documenten eerste zitting/ })).toBeVisible();
     expect(await screen.findByRole("link", { name: "Terug naar overzicht" })).toBeVisible();
-    expect(screen.queryByRole("button", { name: "Steminvoer hervatten" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Invoer hervatten" })).not.toBeInTheDocument();
   });
 
   test("Shows error page when resume data entry call returns an error", async () => {
@@ -241,7 +241,7 @@ describe("ElectionReportPage", () => {
     expect(await screen.findByRole("link", { name: /Download definitieve documenten eerste zitting/ })).toBeVisible();
     expect(await screen.findByRole("link", { name: "Terug naar overzicht" })).toBeVisible();
 
-    const resumeButton = screen.getByRole("button", { name: "Steminvoer hervatten" });
+    const resumeButton = screen.getByRole("button", { name: "Invoer hervatten" });
     expect(resumeButton).toBeVisible();
     await user.click(resumeButton);
 

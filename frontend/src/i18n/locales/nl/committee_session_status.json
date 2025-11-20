@@ -2,9 +2,9 @@
   "coordinator": {
     "created": "Zitting voorbereiden",
     "data_entry_not_started": "Klaar voor invoer",
-    "data_entry_in_progress": "Steminvoer bezig",
-    "data_entry_paused": "Steminvoer gepauzeerd",
-    "data_entry_finished": "Steminvoer afgerond"
+    "data_entry_in_progress": "Invoer bezig",
+    "data_entry_paused": "Invoer gepauzeerd",
+    "data_entry_finished": "Invoer afgerond"
   },
   "number": {
     "1": "Eerste",

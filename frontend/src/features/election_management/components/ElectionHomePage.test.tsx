@@ -66,17 +66,15 @@ describe("ElectionHomePage", () => {
     const committee_session_cards = await screen.findByTestId("committee-session-cards");
     expect(committee_session_cards).toBeVisible();
 
-    expect(within(committee_session_cards).getByTestId("session-4")).toHaveTextContent(
-      /Vierde zitting — Steminvoer bezig/,
-    );
+    expect(within(committee_session_cards).getByTestId("session-4")).toHaveTextContent(/Vierde zitting — Invoer bezig/);
     expect(within(committee_session_cards).getByTestId("session-3")).toHaveTextContent(
-      /Derde zitting — Steminvoer afgerond/,
+      /Derde zitting — Invoer afgerond/,
     );
     expect(within(committee_session_cards).getByTestId("session-2")).toHaveTextContent(
-      /Tweede zitting — Steminvoer afgerond/,
+      /Tweede zitting — Invoer afgerond/,
     );
     expect(within(committee_session_cards).getByTestId("session-1")).toHaveTextContent(
-      /Eerste zitting — Steminvoer afgerond/,
+      /Eerste zitting — Invoer afgerond/,
     );
 
     expect(screen.queryByRole("button", { name: "Nieuwe zitting voorbereiden" })).not.toBeInTheDocument();
@@ -112,7 +110,7 @@ describe("ElectionHomePage", () => {
     const committee_session_cards = await screen.findByTestId("committee-session-cards");
     expect(committee_session_cards).toBeVisible();
     expect(within(committee_session_cards).getByTestId("session-1")).toHaveTextContent(
-      /Eerste zitting — Steminvoer afgerond/,
+      /Eerste zitting — Invoer afgerond/,
     );
     expect(screen.queryByRole("button", { name: "Zitting verwijderen" })).not.toBeInTheDocument();
 
@@ -146,7 +144,7 @@ describe("ElectionHomePage", () => {
     const committee_session_cards = await screen.findByTestId("committee-session-cards");
     expect(committee_session_cards).toBeVisible();
     expect(within(committee_session_cards).getByTestId("session-1")).toHaveTextContent(
-      /Eerste zitting — Steminvoer afgerond/,
+      /Eerste zitting — Invoer afgerond/,
     );
 
     expect(screen.queryByRole("button", { name: "Nieuwe zitting voorbereiden" })).not.toBeInTheDocument();
@@ -315,7 +313,7 @@ describe("ElectionHomePage", () => {
     const session4 = within(committee_session_cards).getByTestId("session-4");
     expect(session4).toHaveTextContent(/Vierde zitting — Klaar voor invoer/);
 
-    const startButton = within(session4).getByRole("button", { name: "Start steminvoer" });
+    const startButton = within(session4).getByRole("button", { name: "Start invoer" });
     expect(startButton).toBeVisible();
 
     await user.click(startButton);

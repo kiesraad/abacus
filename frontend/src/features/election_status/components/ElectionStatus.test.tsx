@@ -228,7 +228,7 @@ describe("ElectionStatus", () => {
       </UsersProvider>,
     );
 
-    expect(await screen.findByRole("heading", { level: 2, name: "Statusoverzicht steminvoer" })).toBeVisible();
+    expect(await screen.findByRole("heading", { level: 2, name: "Statusoverzicht invoer" })).toBeVisible();
     expect(await screen.findByRole("heading", { level: 3, name: "Stembureaus per status" })).toBeVisible();
 
     return screen.getByRole("article");

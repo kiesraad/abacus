@@ -87,7 +87,7 @@ export const DefaultElectionStatus: StoryObj<StoryProps> = {
   play: async ({ canvas, step }) => {
     await step("Heading", async () => {
       const heading = canvas.getByTestId("status-heading");
-      const title = within(heading).getByRole("heading", { level: 2, name: "Statusoverzicht steminvoer" });
+      const title = within(heading).getByRole("heading", { level: 2, name: "Statusoverzicht invoer" });
       await expect(title).toBeVisible();
 
       const buttons = within(heading).getAllByRole("button");
@@ -233,7 +233,7 @@ export const NextSession: StoryObj<StoryProps> = {
   play: async ({ canvas, step }) => {
     await step("Heading", async () => {
       const heading = canvas.getByTestId("status-heading");
-      const title = within(heading).getByRole("heading", { level: 2, name: "Statusoverzicht steminvoer" });
+      const title = within(heading).getByRole("heading", { level: 2, name: "Statusoverzicht invoer" });
       await expect(title).toBeVisible();
 
       const buttons = within(heading).getAllByRole("button");

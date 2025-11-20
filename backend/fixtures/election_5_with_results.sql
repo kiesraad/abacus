@@ -473,13 +473,13 @@ VALUES
     (
         8,
         5,
-        '{"status":"Definitive","state":{"first_entry_user_id":5,"second_entry_user_id":6,"finished_at":"2025-09-16T17:07:31.223365436Z"}}',
+        '{"status":"Definitive","state":{"first_entry_user_id":5,"second_entry_user_id":6,"finished_at":"2025-09-16T17:07:31.223365436Z","finalised_with_warnings":false}}',
         '2025-09-16 17:07:31'
     ),
     (
         11,
         6,
-        '{"status":"Definitive","state":{"first_entry_user_id":5,"second_entry_user_id":6,"finished_at":"2025-09-16T17:07:31.223365436Z"}}',
+        '{"status":"Definitive","state":{"first_entry_user_id":5,"second_entry_user_id":6,"finished_at":"2025-09-16T17:07:31.223365436Z","finalised_with_warnings":false}}',
         '2025-09-16 17:07:31'
     );
 

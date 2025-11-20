@@ -323,7 +323,7 @@ impl EML110 {
                                         },
                                     },
                                     polling_station: PollingStation {
-                                        number_of_voters: ps.number_of_voters,
+                                        number_of_voters: ps.number_of_voters.map(|n| n as i64),
                                         id: ps.id.to_string(),
                                     },
                                 },
@@ -460,10 +460,18 @@ impl TryInto<PollingStationRequest> for &PollingPlace {
                 self.physical_location
                     .polling_station
                     .id
-                    .parse::<i64>()
+                    .parse::<u32>()
                     .or(Err(EMLImportError::InvalidPollingStation))?,
             ),
-            number_of_voters: self.physical_location.polling_station.number_of_voters,
+            number_of_voters: self
+                .physical_location
+                .polling_station
+                .number_of_voters
+                .map(|n| {
+                    n.try_into()
+                        .map_err(|_| EMLImportError::InvalidPollingStation)
+                })
+                .transpose()?,
             polling_station_type: None,
             address: "".to_string(),
             postal_code: match self.physical_location.address.locality.postal_code.clone() {

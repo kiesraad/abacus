@@ -748,6 +748,8 @@ export interface ElectionStatusResponse {
  * Election polling stations data entry statuses response
  */
 export interface ElectionStatusResponseEntry {
+  /** Whether the finalised first or second data entry has warnings */
+  finalised_with_warnings?: boolean;
   /** Time when the data entry was finalised */
   finished_at?: string;
   /** First entry progress as a percentage (0 to 100) */

@@ -34,7 +34,7 @@ export function LogsTable({ events, details, setDetails }: LogsTableProps) {
             active={event.id === details?.id}
           >
             <Table.Cell>{event.id}</Table.Cell>
-            <Table.Cell>{formatDateTime(new Date(event.time), false)}</Table.Cell>
+            <Table.Cell className="nowrap">{formatDateTime(new Date(event.time), false)}</Table.Cell>
             <Table.Cell>{t(`log.level.${event.event_level}`)}</Table.Cell>
             <Table.Cell>
               {t(`log.event.${event.event.event_type}`)}

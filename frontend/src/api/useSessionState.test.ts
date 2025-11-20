@@ -29,19 +29,14 @@ describe("Test useSessionState", () => {
     const client = new ApiClient();
     const { result } = renderHook(() => useSessionState(client));
 
-    // Normally set by ApiProvider
-    result.current.setExpiration(new Date(new Date(Date.now() + 60_000)));
-
     await waitFor(() => {
       expect(result.current.user?.role).toBe("administrator");
-      expect(result.current.expiration).not.toBeNull();
     });
 
     await result.current.logout();
 
     await waitFor(() => {
       expect(result.current.user).toBeNull();
-      expect(result.current.expiration).toBeNull();
     });
   });
 

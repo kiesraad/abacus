@@ -22,7 +22,6 @@ export function TestUserProvider({ userRole, children, overrideExpiration }: Tes
   const apiState: ApiState = {
     client: new ApiClient(),
     setUser: () => {},
-    clearSession() {},
     user: userRole
       ? {
           user_id: 1,

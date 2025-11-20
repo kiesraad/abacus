@@ -13,8 +13,10 @@ export interface ApiProviderProps {
 const client = new ApiClient();
 
 export function ApiProvider({ children, fetchInitialUser = true }: ApiProviderProps) {
-  const { user, loading, setUser, clearSession, login, logout, expiration, setExpiration, extendSession } =
-    useSessionState(client, fetchInitialUser);
+  const { user, loading, setUser, login, logout, expiration, setExpiration, extendSession } = useSessionState(
+    client,
+    fetchInitialUser,
+  );
 
   const [airGapError, setAirGapError] = useState<boolean>(false);
 
@@ -25,12 +27,12 @@ export function ApiProvider({ children, fetchInitialUser = true }: ApiProviderPr
       if (error.reference === "AirgapViolation") {
         setAirGapError(true);
       } else if ((error.reference === "InvalidSession" || error.reference === "Unauthorized") && user) {
-        clearSession();
+        setUser(null);
       }
     };
 
     return client.subscribeToApiErrors(callback);
-  }, [user, clearSession, setAirGapError]);
+  }, [user, setUser, setAirGapError]);
 
   // Store the next session expiration time in the user state
   useEffect(() => {
@@ -47,7 +49,6 @@ export function ApiProvider({ children, fetchInitialUser = true }: ApiProviderPr
     client,
     user,
     setUser,
-    clearSession,
     logout,
     login,
     loading,

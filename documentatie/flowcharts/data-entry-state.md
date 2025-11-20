@@ -35,6 +35,10 @@ stateDiagram-v2
   EntriesDifferent --> resolve: resolve differences
   resolve --> first_has_errors: keep one entry
   resolve --> FirstEntryNotStarted: discard both entries
+    FirstEntryInProgress --> FirstEntryNotStarted: delete
+    SecondEntryNotStarted --> FirstEntryNotStarted: delete
+    SecondEntryInProgress --> SecondEntryNotStarted: delete
+    Definitive --> FirstEntryNotStarted: delete
 
   Definitive --> [*]
 ```
@@ -42,3 +46,6 @@ stateDiagram-v2
 When resolving differences between the first and second entry (`EntriesDifferent` state), the coordinator can choose to
 keep one of the entries or discard both. If one of the entries is kept, the other entry is discarded. The remaining entry
 will from then on be the first entry, and the data entry is open for a new second entry.
+
+When the coordinator decides to delete the entry when there's a second entry (`SecondEntryInProgress` &
+`Definitive` state), both entries will be deleted.

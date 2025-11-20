@@ -200,6 +200,7 @@ pub async fn statuses(
             first_entry_progress: state.get_first_entry_progress(),
             second_entry_progress: state.get_second_entry_progress(),
             finished_at: state.finished_at().cloned(),
+            finalised_with_warnings: state.finalised_with_warnings().cloned(),
         }
     })
     .fetch_all(conn)

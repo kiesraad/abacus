@@ -157,16 +157,6 @@ export function InvestigationFindings({ pollingStationId }: InvestigationFinding
               </ChoiceList.Error>
             )}
             <ChoiceList.Radio
-              id="corrected_results_yes"
-              name="corrected_results"
-              value="yes"
-              label={t("yes")}
-              disabled={requiresCorrectedResults}
-              defaultChecked={requiresCorrectedResults || investigation.corrected_results === true}
-            >
-              {t("investigations.findings.corrected_result_yes")}
-            </ChoiceList.Radio>
-            <ChoiceList.Radio
               id="corrected_results_no"
               name="corrected_results"
               value="no"
@@ -175,6 +165,16 @@ export function InvestigationFindings({ pollingStationId }: InvestigationFinding
               defaultChecked={investigation.corrected_results === false}
             >
               {t("investigations.findings.corrected_result_no")}
+            </ChoiceList.Radio>
+            <ChoiceList.Radio
+              id="corrected_results_yes"
+              name="corrected_results"
+              value="yes"
+              label={t("yes")}
+              disabled={requiresCorrectedResults}
+              defaultChecked={requiresCorrectedResults || investigation.corrected_results === true}
+            >
+              {t("investigations.findings.corrected_result_yes")}
             </ChoiceList.Radio>
           </ChoiceList>
 

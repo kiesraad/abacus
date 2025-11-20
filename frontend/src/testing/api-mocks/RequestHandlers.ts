@@ -61,6 +61,8 @@ import {
   LoginResponse,
   POLLING_STATION_CREATE_REQUEST_BODY,
   POLLING_STATION_CREATE_REQUEST_PARAMS,
+  POLLING_STATION_DATA_ENTRIES_AND_RESULT_DELETE_REQUEST_PARAMS,
+  POLLING_STATION_DATA_ENTRIES_AND_RESULT_DELETE_REQUEST_PATH,
   POLLING_STATION_DATA_ENTRY_CLAIM_REQUEST_PARAMS,
   POLLING_STATION_DATA_ENTRY_CLAIM_REQUEST_PATH,
   POLLING_STATION_DATA_ENTRY_DELETE_REQUEST_PARAMS,
@@ -413,6 +415,14 @@ export const PollingStationDataEntryFinaliseHandler = http.post<
   HttpResponse.json({ status: "second_entry_not_started" }, { status: 200 }),
 );
 
+// delete data entries and result handler
+export const PollingStationDataEntriesAndResultDeleteHandler = http.delete<
+  ParamsToString<POLLING_STATION_DATA_ENTRIES_AND_RESULT_DELETE_REQUEST_PARAMS>
+>(
+  "/api/polling_stations/5/data_entries" satisfies POLLING_STATION_DATA_ENTRIES_AND_RESULT_DELETE_REQUEST_PATH,
+  () => new HttpResponse(null, { status: 204 }),
+);
+
 export const PollingStationCreateHandler = http.post<
   ParamsToString<POLLING_STATION_CREATE_REQUEST_PARAMS>,
   POLLING_STATION_CREATE_REQUEST_BODY,
@@ -521,6 +531,7 @@ export const handlers: HttpHandler[] = [
   PollingStationDataEntryClaimHandler,
   PollingStationDataEntryDeleteHandler,
   PollingStationDataEntryFinaliseHandler,
+  PollingStationDataEntriesAndResultDeleteHandler,
   PollingStationCreateHandler,
   PollingStationDeleteHandler,
   PollingStationUpdateHandler,

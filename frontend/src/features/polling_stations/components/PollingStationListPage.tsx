@@ -11,9 +11,10 @@ import { useUserRole } from "@/hooks/user/useUserRole";
 import { t } from "@/i18n/translate";
 
 import { usePollingStationListRequest } from "../hooks/usePollingStationListRequest";
+import { isPollingStationUpdateAllowed } from "../utils/checks";
 
 export function PollingStationListPage() {
-  const { isCoordinator, isAdministrator } = useUserRole();
+  const { isAdministrator, isCoordinator } = useUserRole();
   const { election, currentCommitteeSession } = useElection();
   const { requestState } = usePollingStationListRequest(election.id);
 
@@ -26,10 +27,7 @@ export function PollingStationListPage() {
   }
 
   const data = requestState.data;
-  const editAllowed =
-    isCoordinator ||
-    (isAdministrator &&
-      (currentCommitteeSession.status === "created" || currentCommitteeSession.status === "data_entry_not_started"));
+  const updateAllowed = isPollingStationUpdateAllowed(isCoordinator, isAdministrator, currentCommitteeSession.status);
 
   const labelForPollingStationType = {
     FixedLocation: t("polling_station.type.FixedLocation"),
@@ -48,7 +46,7 @@ export function PollingStationListPage() {
 
       <Messages />
 
-      {!editAllowed && (
+      {!updateAllowed && (
         <Alert type="notify">
           <strong className="heading-md">{t("polling_station.edit_not_allowed_alert.title")}</strong>
           <p>{t("polling_station.edit_not_allowed_alert.description")}</p>
@@ -74,7 +72,7 @@ export function PollingStationListPage() {
           </article>
         ) : (
           <article>
-            {editAllowed && (
+            {updateAllowed && (
               <Toolbar>
                 <Button.Link variant="secondary" size="sm" to="./create">
                   <IconPlus /> {t("polling_station.create")}
@@ -90,7 +88,7 @@ export function PollingStationListPage() {
               </Table.Header>
               <Table.Body className="fs-md">
                 {data.polling_stations.map((station) =>
-                  editAllowed ? (
+                  updateAllowed ? (
                     <Table.LinkRow key={station.id} to={`${station.id}/update`}>
                       <Table.NumberCell>{station.number}</Table.NumberCell>
                       <Table.Cell className="break-word">{station.name}</Table.Cell>

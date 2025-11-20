@@ -14,12 +14,13 @@ import { t } from "@/i18n/translate";
 import { PollingStation } from "@/types/generated/openapi";
 
 import { usePollingStationGet } from "../hooks/usePollingStationGet";
+import { isPollingStationUpdateAllowed } from "../utils/checks";
 import { PollingStationAlert } from "./PollingStationAlert";
 import { PollingStationDeleteModal } from "./PollingStationDeleteModal";
 import { PollingStationForm } from "./PollingStationForm";
 
 export function PollingStationUpdatePage() {
-  const { isAdministrator } = useUserRole();
+  const { isAdministrator, isCoordinator } = useUserRole();
   const pollingStationId = useNumericParam("pollingStationId");
   const { election, currentCommitteeSession } = useElection();
   const navigate = useNavigate();
@@ -80,11 +81,7 @@ export function PollingStationUpdatePage() {
     }
   }, [error]);
 
-  if (
-    isAdministrator &&
-    currentCommitteeSession.status !== "created" &&
-    currentCommitteeSession.status !== "data_entry_not_started"
-  ) {
+  if (!isPollingStationUpdateAllowed(isCoordinator, isAdministrator, currentCommitteeSession.status)) {
     return <Navigate to={parentUrl} replace />;
   } else {
     return (

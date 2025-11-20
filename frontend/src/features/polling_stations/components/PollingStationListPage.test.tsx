@@ -98,7 +98,7 @@ describe("PollingStationListPage", () => {
     { status: "data_entry_paused", allowed: false },
     { status: "data_entry_finished", allowed: false },
   ] satisfies Array<{ status: CommitteeSessionStatus; allowed: boolean }>)(
-    "Polling station update links and add button with committee session status=%s are allowed=%s for administrator",
+    "Polling station update links and add button with committee session status=$status are allowed=$allowed for administrator",
     async ({ status, allowed }) => {
       const user = userEvent.setup();
       overrideOnce("get", "/api/elections/1", 200, getElectionMockData({}, { status }));

@@ -171,7 +171,7 @@ describe("PollingStationUpdatePage", () => {
     { status: "data_entry_paused", allowed: false },
     { status: "data_entry_finished", allowed: false },
   ] satisfies Array<{ status: CommitteeSessionStatus; allowed: boolean }>)(
-    "Renders page when committee session status=%s is allowed=%s for administrator",
+    "Renders page when committee session status=$status is allowed=$allowed for administrator",
     async ({ status, allowed }) => {
       overrideOnce("get", "/api/elections/1", 200, getElectionMockData({}, { status }));
 

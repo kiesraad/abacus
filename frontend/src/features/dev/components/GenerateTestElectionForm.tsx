@@ -111,7 +111,7 @@ export function GenerateTestElectionForm() {
                 <Checkbox
                   id="with-data-entry"
                   name="with_data_entry"
-                  label="Inclusief steminvoer"
+                  label="Inclusief invoer"
                   checked={formState.with_data_entry}
                   onChange={handleBooleanChange}
                 />

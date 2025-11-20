@@ -5,7 +5,7 @@ Deze lijst heeft tot doel het verzamelen van opties en mogelijkheden voor Abacus
 
 ## Gebruikersinterface
 
-### Statusoverzicht steminvoer
+### Statusoverzicht invoer
 
 - Sorteren op stembureaunummer
 - Numerieke aantallen per stap anders sorteren: fouten en meldingen bovenaan, verder op volgorde van het werkproces

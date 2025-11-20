@@ -91,7 +91,7 @@ test.describe("Election creation", () => {
     const electionRow = overviewPage.findElectionRowById(election.id);
     await expect(electionRow).toBeVisible();
     await expect(electionRow).toContainText("Gemeenteraad Test 2022");
-    await expect(electionRow).toContainText("Klaar voor steminvoer");
+    await expect(electionRow).toContainText("Klaar voor invoer");
   });
 
   test("it uploads an election file, candidate list but adds polling stations afterwards", async ({ page }) => {
@@ -162,7 +162,7 @@ test.describe("Election creation", () => {
 
     await expect(electionHomePage.header).toBeVisible();
     const session = electionHomePage.getCommitteeSessionCard(1);
-    await expect(session).toContainText("Klaar voor steminvoer");
+    await expect(session).toContainText("Klaar voor invoer");
   });
 
   test("it fails on incorrect hash", async ({ page }) => {

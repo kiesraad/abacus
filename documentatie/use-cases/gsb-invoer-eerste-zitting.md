@@ -32,7 +32,9 @@ __Uitbreidingen:__
 
 2-3b. De telling van het stembureau moet worden gecorrigeerd nadat deze al twee keer was ingevoerd:  
 &emsp; 2-3b1. De coördinator GSB verwijdert de invoer van het stembureau.  
-&emsp; 2-3b2. De coördinator GSB laat het stembureau twee keer invoeren.  
+&emsp;&emsp; 2-3b1a. Als een invoer verwijderd wordt dan wordt de status weer teruggezet naar "Werkvoorraad".
+Ook de gegenereerde documenten worden dan verwijderd.  
+&emsp; 2-3b2. De coördinator GSB laat het stembureau twee keer invoeren.
 
 5a. De applicatie stelt vast dat niet voor alle stembureaus resultaten zijn ingevoerd:
 

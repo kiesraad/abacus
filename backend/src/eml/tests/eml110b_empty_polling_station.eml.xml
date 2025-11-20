@@ -21,7 +21,7 @@
         <ReportingUnit>
           <ReportingUnitIdentifier Id="0000">Test</ReportingUnitIdentifier>
         </ReportingUnit>
-        <VotingMethod />
+        <VotingMethod>SPV</VotingMethod>
         <MaxVotes>612694</MaxVotes>
       </Contest>
     </Election>

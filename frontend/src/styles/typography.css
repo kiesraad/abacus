@@ -162,3 +162,8 @@ a {
   font-family: var(--font-number);
   font-feature-settings: "ss09" on;
 }
+
+/* Slashed zero */
+.font-number-slashed-0 {
+  font-family: var(--font-number);
+}

@@ -13,13 +13,14 @@ export function Footer() {
       <section>Kiesraad - Abacus GR26 ({t("version")} 1.0.0)</section>
       {__SHOW_DEV_PAGE__ && (
         <section>
-          <strong>{t("server")}</strong> {__API_MSW__ ? "Mock Service Worker" : "Live"} &nbsp;&nbsp;{" "}
+          <strong>{t("server")}</strong> {__API_MSW__ ? "Mock Service Worker" : "Live"}&nbsp;&nbsp;{" "}
           {gitBranch && (
             <>
               <strong>Branch</strong>{" "}
               <a href={"https://github.com/kiesraad/abacus/tree/" + gitBranch} target="_blank">
                 {gitBranchShort}
               </a>
+              &nbsp;&nbsp;{" "}
             </>
           )}
           {gitCommit && (

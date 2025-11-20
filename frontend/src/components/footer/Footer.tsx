@@ -8,12 +8,13 @@ export function Footer() {
   }
   const gitCommit = __GIT_COMMIT__;
   const gitDirty = __GIT_DIRTY__;
+  const showDevPage = __SHOW_DEV_PAGE__;
 
   return (
     <footer>
       <section>
-        Abacus{" "}
-        {gitBranch && (
+        Kiesraad - Abacus GR26 ({t("version")} 1.0.0)
+        {showDevPage && gitBranch && (
           <>
             —{" "}
             <a href={"https://github.com/kiesraad/abacus/tree/" + gitBranch} target="_blank">
@@ -22,21 +23,23 @@ export function Footer() {
           </>
         )}
       </section>
-      <section>
-        <strong>{t("server")}</strong> {__API_MSW__ ? "Mock Service Worker" : "Live"} &nbsp;&nbsp;{" "}
-        {gitCommit && (
-          <>
-            <strong>{t("version")}</strong>{" "}
-            {gitDirty ? (
-              <>{gitCommit}-dirty</>
-            ) : (
-              <a href={"https://github.com/kiesraad/abacus/commit/" + gitCommit} target="_blank">
-                {gitCommit}
-              </a>
-            )}
-          </>
-        )}
-      </section>
+      {showDevPage && (
+        <section>
+          <strong>{t("server")}</strong> {__API_MSW__ ? "Mock Service Worker" : "Live"} &nbsp;&nbsp;{" "}
+          {gitCommit && (
+            <>
+              <strong>Commit</strong>{" "}
+              {gitDirty ? (
+                <>{gitCommit}-dirty</>
+              ) : (
+                <a href={"https://github.com/kiesraad/abacus/commit/" + gitCommit} target="_blank">
+                  {gitCommit}
+                </a>
+              )}
+            </>
+          )}
+        </section>
+      )}
     </footer>
   );
 }

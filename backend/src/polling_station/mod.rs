@@ -88,13 +88,14 @@ pub async fn validate_user_is_allowed_to_perform_action(
 ) -> Result<(), APIError> {
     // Check if the user is allowed to perform the action in this committee session status,
     // respond with FORBIDDEN otherwise
-    if !user.is_coordinator()
-        && committee_session.status != CommitteeSessionStatus::Created
-        && committee_session.status != CommitteeSessionStatus::DataEntryNotStarted
+    if user.is_coordinator()
+        || (user.is_administrator()
+            && (committee_session.status == CommitteeSessionStatus::Created
+                || committee_session.status == CommitteeSessionStatus::DataEntryNotStarted))
     {
-        Err(AuthenticationError::Forbidden.into())
-    } else {
         Ok(())
+    } else {
+        Err(AuthenticationError::Forbidden.into())
     }
 }
 

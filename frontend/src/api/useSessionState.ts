@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 import {
   LOGIN_REQUEST_BODY,
@@ -14,7 +14,8 @@ import { AbortedError, ApiResult, isSuccess } from "./ApiResult";
 export interface SessionState {
   user: LoginResponse | null;
   loading: boolean;
-  setUser: (user: LoginResponse | null) => void;
+  setUser: (user: LoginResponse) => void;
+  clearSession: () => void;
   logout: () => Promise<ApiResult<null>>;
   login: (username: string, password: string) => Promise<ApiResult<LoginResponse>>;
   expiration: Date | null;
@@ -30,6 +31,11 @@ export default function useSessionState(client: ApiClient, fetchInitialUser: boo
   const [expiration, setExpiration] = useState<Date | null>(null);
   const [loading, setLoading] = useState(true);
 
+  const clearSession = useCallback(() => {
+    setUser(null);
+    setExpiration(null);
+  }, [setUser, setExpiration]);
+
   // Log out the current user
   const logout = async () => {
     setLoading(true);
@@ -37,7 +43,7 @@ export default function useSessionState(client: ApiClient, fetchInitialUser: boo
     const response = await client.postRequest<null>(path);
 
     if (isSuccess(response)) {
-      setUser(null);
+      clearSession();
     }
 
     setLoading(false);
@@ -64,7 +70,7 @@ export default function useSessionState(client: ApiClient, fetchInitialUser: boo
     if (isSuccess(response)) {
       setUser(response.data);
     } else {
-      setUser(null);
+      clearSession();
     }
   };
 
@@ -101,6 +107,7 @@ export default function useSessionState(client: ApiClient, fetchInitialUser: boo
     logout,
     setExpiration,
     setUser,
+    clearSession,
     user,
     extendSession,
   };

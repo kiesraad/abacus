@@ -10,7 +10,7 @@ import { formatTimeToGo } from "@/utils/dateTime";
 import { EXPIRATION_DIALOG_SECONDS } from "./authorizationConstants";
 
 export function AuthorizationDialog() {
-  const { user, loading, expiration, extendSession, setUser } = useApiState();
+  const { user, loading, expiration, extendSession, clearSession } = useApiState();
   const [sessionValidFor, setSessionValidFor] = useState<number | null>(
     expiration !== null ? (expiration.getTime() - new Date().getTime()) / 1000 : null,
   );
@@ -29,7 +29,7 @@ export function AuthorizationDialog() {
 
         // logout after session expiration
         if (validFor <= 0 && user !== null) {
-          setUser(null);
+          clearSession();
         }
 
         // reset hide dialog state if the session is valid for more than the expiration dialog time
@@ -45,7 +45,7 @@ export function AuthorizationDialog() {
         clearInterval(interval);
       };
     }
-  }, [expiration, user, setUser, hideDialog]);
+  }, [expiration, user, clearSession, hideDialog]);
 
   // navigate to login page if the session has expired
   if (sessionValidFor !== null && sessionValidFor <= 0 && !routeHandle?.public) {

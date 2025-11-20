@@ -16,7 +16,7 @@ export class ElectionHome {
     this.alert = page.getByRole("alert");
     this.alertLinkToPollingStations = this.alert.getByRole("link", { name: "Stembureaus beheren" });
     this.detailsButton = page.getByRole("button", { name: "Details van de zitting" });
-    this.startButton = page.getByRole("button", { name: "Start steminvoer" });
+    this.startButton = page.getByRole("button", { name: "Start invoer" });
     this.statusButton = page.getByRole("link", { name: "Bekijk voortgang" });
     this.pollingStationsRow = page.getByRole("rowheader", { name: "Stembureaus" });
     this.downloadBijlage1 = page.getByRole("cell", { name: "Na 31-2 Bijlage 1" });

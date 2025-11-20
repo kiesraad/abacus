@@ -101,7 +101,7 @@ test.describe("full flow", () => {
     const electionHomePage = new ElectionHome(page);
     await expect(electionHomePage.header).toContainText("Gemeenteraad Test 2022");
     const sessionCard = electionHomePage.getCommitteeSessionCard(1);
-    await expect(sessionCard).toContainText("Eerste zitting — Klaar voor steminvoer");
+    await expect(sessionCard).toContainText("Eerste zitting — Klaar voor invoer");
 
     await electionHomePage.pollingStationsRow.click();
     const pollingStationListPage = new PollingStationListPgObj(page);

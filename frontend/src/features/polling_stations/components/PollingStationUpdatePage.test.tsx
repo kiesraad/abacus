@@ -15,7 +15,7 @@ import {
 import { overrideOnce, server } from "@/testing/server";
 import { render, screen, spyOnHandler, waitFor, within } from "@/testing/test-utils";
 import { TestUserProvider } from "@/testing/TestUserProvider";
-import { PollingStation, Role } from "@/types/generated/openapi";
+import { CommitteeSessionStatus, PollingStation, Role } from "@/types/generated/openapi";
 
 import { PollingStationUpdatePage } from "./PollingStationUpdatePage";
 
@@ -164,33 +164,28 @@ describe("PollingStationUpdatePage", () => {
     });
   });
 
-  describe("Administrator user", () => {
-    test("Redirects to list page when committee session status is in progress", async () => {
-      renderPage("administrator");
-
-      await waitFor(() => {
-        expect(navigate).toHaveBeenCalledWith("/elections/1/polling-stations");
-      });
-    });
-
-    test("Shows form when committee session status is created", async () => {
-      overrideOnce("get", "/api/elections/1", 200, getElectionMockData({}, { status: "created" }));
-
-      renderPage("administrator");
-
-      expect(await screen.findByTestId("polling-station-form")).toBeVisible();
-      expect(screen.getByRole("textbox", { name: "Nummer" })).toHaveValue("33");
-      expect(screen.getByRole("textbox", { name: "Naam" })).toHaveValue("Op Rolletjes");
-    });
-
-    test("Shows form when committee session status is not started", async () => {
-      overrideOnce("get", "/api/elections/1", 200, getElectionMockData({}, { status: "data_entry_not_started" }));
+  test.each([
+    { status: "created", allowed: true },
+    { status: "data_entry_not_started", allowed: true },
+    { status: "data_entry_in_progress", allowed: false },
+    { status: "data_entry_paused", allowed: false },
+    { status: "data_entry_finished", allowed: false },
+  ] satisfies Array<{ status: CommitteeSessionStatus; allowed: boolean }>)(
+    "Renders page when committee session status=%s is allowed=%s for administrator",
+    async ({ status, allowed }) => {
+      overrideOnce("get", "/api/elections/1", 200, getElectionMockData({}, { status }));
 
       renderPage("administrator");
 
-      expect(await screen.findByTestId("polling-station-form")).toBeVisible();
-      expect(screen.getByRole("textbox", { name: "Nummer" })).toHaveValue("33");
-      expect(screen.getByRole("textbox", { name: "Naam" })).toHaveValue("Op Rolletjes");
-    });
-  });
+      if (allowed) {
+        expect(await screen.findByTestId("polling-station-form")).toBeVisible();
+        expect(screen.getByRole("textbox", { name: "Nummer" })).toHaveValue("33");
+        expect(screen.getByRole("textbox", { name: "Naam" })).toHaveValue("Op Rolletjes");
+      } else {
+        await waitFor(() => {
+          expect(navigate).toHaveBeenCalledWith("/elections/1/polling-stations");
+        });
+      }
+    },
+  );
 });

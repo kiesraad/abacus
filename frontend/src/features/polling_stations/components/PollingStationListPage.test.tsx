@@ -11,7 +11,7 @@ import { ElectionRequestHandler, PollingStationListRequestHandler } from "@/test
 import { overrideOnce, server } from "@/testing/server";
 import { render, screen, waitFor } from "@/testing/test-utils";
 import { TestUserProvider } from "@/testing/TestUserProvider";
-import { PollingStationListResponse, Role } from "@/types/generated/openapi";
+import { CommitteeSessionStatus, PollingStationListResponse, Role } from "@/types/generated/openapi";
 
 import { PollingStationListPage } from "./PollingStationListPage";
 
@@ -91,42 +91,21 @@ describe("PollingStationListPage", () => {
     expect(screen.getByText("Importeren uit een bestand")).toBeVisible();
   });
 
-  describe("Administrator user", () => {
-    test("Shows polling stations without links to update page when committee session status is in progress", async () => {
+  test.each([
+    { status: "created", allowed: true },
+    { status: "data_entry_not_started", allowed: true },
+    { status: "data_entry_in_progress", allowed: false },
+    { status: "data_entry_paused", allowed: false },
+    { status: "data_entry_finished", allowed: false },
+  ] satisfies Array<{ status: CommitteeSessionStatus; allowed: boolean }>)(
+    "Polling station update links and add button with committee session status=%s are allowed=%s for administrator",
+    async ({ status, allowed }) => {
       const user = userEvent.setup();
-      renderPage("administrator");
-
-      expect(await screen.findByRole("heading", { level: 1, name: "Stembureaus beheren" })).toBeVisible();
-      expect(screen.queryByRole("link", { name: "Stembureau toevoegen" })).not.toBeInTheDocument();
-
-      const table = await screen.findByRole("table");
-      expect(table).toBeVisible();
-      expect(table).toHaveTableContent([
-        ["Nummer", "Naam", "Soort"],
-        ["33", "Op Rolletjes", "Mobiel"],
-        ["34", "Testplek", "Bijzonder"],
-        ["35", "Testschool", "Vaste locatie"],
-        ["36", "Testbuurthuis", "–"],
-        ["37", "Dansschool Oeps nou deed ik het weer", "–"],
-        ["38", "Testmuseum", "Bijzonder"],
-        ["39", "Test gemeentehuis", "Mobiel"],
-        ["40", "Test kerk", "Vaste locatie"],
-      ]);
-
-      const tableRows = within(table).queryAllByRole("row");
-      await user.click(tableRows[1]!);
-
-      expect(navigate).not.toHaveBeenCalled();
-    });
-
-    test("Shows polling stations without links to update page when committee session status is created", async () => {
-      const user = userEvent.setup();
-      overrideOnce("get", "/api/elections/1", 200, getElectionMockData({}, { status: "created" }));
+      overrideOnce("get", "/api/elections/1", 200, getElectionMockData({}, { status }));
 
       renderPage("administrator");
 
       expect(await screen.findByRole("heading", { level: 1, name: "Stembureaus beheren" })).toBeVisible();
-      expect(await screen.findByRole("link", { name: "Stembureau toevoegen" })).toBeVisible();
 
       const table = await screen.findByRole("table");
       expect(table).toBeVisible();
@@ -134,29 +113,15 @@ describe("PollingStationListPage", () => {
       const tableRows = within(table).queryAllByRole("row");
       await user.click(tableRows[1]!);
 
-      await waitFor(() => {
-        expect(navigate).toHaveBeenCalledExactlyOnceWith("1/update");
-      });
-    });
-
-    test("Shows polling stations without links to update page when committee session status is not started", async () => {
-      const user = userEvent.setup();
-      overrideOnce("get", "/api/elections/1", 200, getElectionMockData({}, { status: "data_entry_not_started" }));
-
-      renderPage("administrator");
-
-      expect(await screen.findByRole("heading", { level: 1, name: "Stembureaus beheren" })).toBeVisible();
-      expect(await screen.findByRole("link", { name: "Stembureau toevoegen" })).toBeVisible();
-
-      const table = await screen.findByRole("table");
-      expect(table).toBeVisible();
-
-      const tableRows = within(table).queryAllByRole("row");
-      await user.click(tableRows[1]!);
-
-      await waitFor(() => {
-        expect(navigate).toHaveBeenCalledExactlyOnceWith("1/update");
-      });
-    });
-  });
+      if (allowed) {
+        await waitFor(() => {
+          expect(navigate).toHaveBeenCalledExactlyOnceWith("1/update");
+        });
+        expect(await screen.findByRole("link", { name: "Stembureau toevoegen" })).toBeVisible();
+      } else {
+        expect(navigate).not.toHaveBeenCalled();
+        expect(screen.queryByRole("link", { name: "Stembureau toevoegen" })).not.toBeInTheDocument();
+      }
+    },
+  );
 });

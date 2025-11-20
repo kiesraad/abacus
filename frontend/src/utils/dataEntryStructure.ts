@@ -4,7 +4,10 @@ import { DataEntryModel, DataEntrySection, DataEntryStructure, InputGridSubsecti
 import { getCandidateFullName } from "@/utils/candidate";
 import { formatPoliticalGroupName } from "@/utils/politicalGroup";
 
-export const createVotersAndVotesSection = (election: ElectionWithPoliticalGroups): DataEntrySection => {
+export const createVotersAndVotesSection = (
+  model: DataEntryModel,
+  election: ElectionWithPoliticalGroups,
+): DataEntrySection => {
   const rowsPerPoliticalGroup: InputGridSubsectionRow[] = election.political_groups.map((politicalGroup, index) => ({
     code: `E.${politicalGroup.number}`,
     path: `votes_counts.political_group_total_votes[${politicalGroup.number - 1}].total`,
@@ -16,7 +19,7 @@ export const createVotersAndVotesSection = (election: ElectionWithPoliticalGroup
     id: "voters_votes_counts",
     title: t("voters_votes_counts.form_title"),
     short_title: t("voters_votes_counts.short_title"),
-    sectionNumber: t("voters_votes_counts.section_number"),
+    sectionNumber: t(`voters_votes_counts.section_number.${model}`),
     subsections: [
       {
         type: "inputGrid",
@@ -71,15 +74,15 @@ export const createVotersAndVotesSection = (election: ElectionWithPoliticalGroup
   };
 };
 
-export const differencesSection: DataEntrySection = {
+export const differencesSection = (model: DataEntryModel): DataEntrySection => ({
   id: "differences_counts",
   title: t("differences_counts.form_title"),
   short_title: t("differences_counts.short_title"),
-  sectionNumber: t("differences_counts.section_number"),
+  sectionNumber: t(`differences_counts.section_number.${model}`),
   subsections: [
     {
       type: "checkboxes",
-      title: tx("differences_counts.compare_votes_cast_admitted_voters.title"),
+      title: tx(`differences_counts.compare_votes_cast_admitted_voters.title.${model}`),
       short_title: t("differences_counts.compare_votes_cast_admitted_voters.short_title"),
       error_path: "differences_counts.compare_votes_cast_admitted_voters",
       error_message: t("differences_counts.validation_error"),
@@ -120,7 +123,7 @@ export const differencesSection: DataEntrySection = {
     },
     {
       type: "checkboxes",
-      title: tx("differences_counts.difference_completely_accounted_for.title"),
+      title: tx(`differences_counts.difference_completely_accounted_for.title.${model}`),
       short_title: t("differences_counts.difference_completely_accounted_for.short_title"),
       error_path: "differences_counts.difference_completely_accounted_for",
       error_message: t("differences_counts.validation_error"),
@@ -138,7 +141,7 @@ export const differencesSection: DataEntrySection = {
       ],
     },
   ],
-};
+});
 
 export const extraInvestigationSection: DataEntrySection = {
   id: "extra_investigation",
@@ -301,12 +304,16 @@ function buildDataEntryStructure(model: DataEntryModel, election: ElectionWithPo
       return [
         extraInvestigationSection,
         countingDifferencesPollingStation,
-        createVotersAndVotesSection(election),
-        differencesSection,
+        createVotersAndVotesSection(model, election),
+        differencesSection(model),
         ...createPoliticalGroupSections(election),
       ];
     case "CSONextSession":
-      return [createVotersAndVotesSection(election), differencesSection, ...createPoliticalGroupSections(election)];
+      return [
+        createVotersAndVotesSection(model, election),
+        differencesSection(model),
+        ...createPoliticalGroupSections(election),
+      ];
   }
 }
 

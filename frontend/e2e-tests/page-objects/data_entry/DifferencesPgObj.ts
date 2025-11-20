@@ -28,7 +28,7 @@ export class DifferencesPage extends DataEntryBasePage {
     super(page);
 
     this.fieldset = page.getByRole("group", {
-      name: "Verschillen tussen aantal kiezers en uitgebrachte stemmen B1-3.3",
+      name: "Verschillen tussen aantal kiezers en uitgebrachte stemmen",
     });
 
     this.admittedVotersEqualsVotesCastCheckbox = page.getByRole("checkbox", { name: "D en H zijn gelijk" });

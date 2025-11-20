@@ -43,8 +43,7 @@ export class DifferencesPage extends DataEntryBasePage {
     this.fewerBallotsCount = page.getByRole("textbox", { name: "J Aantal minder getelde stemmen" });
 
     this.differenceCompletelyAccountedFor = this.fieldset.getByRole("group").filter({
-      hasText:
-        "3.3.2 Zijn er tijdens de stemming dingen opgeschreven die het verschil tussen D en H volledig verklaren?",
+      hasText: "Zijn er tijdens de stemming dingen opgeschreven die het verschil tussen D en H volledig verklaren?",
     });
     this.differenceCompletelyAccountedForYes = this.differenceCompletelyAccountedFor.getByLabel("Ja");
     this.differenceCompletelyAccountedForNo = this.differenceCompletelyAccountedFor.getByLabel("Nee");

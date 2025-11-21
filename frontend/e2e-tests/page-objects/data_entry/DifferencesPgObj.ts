@@ -46,7 +46,9 @@ export class DifferencesPage extends DataEntryBasePage {
       hasText: "Zijn er tijdens de stemming dingen opgeschreven die het verschil tussen D en H volledig verklaren?",
     });
     this.differenceCompletelyAccountedForYes = this.differenceCompletelyAccountedFor.getByLabel("Ja");
-    this.differenceCompletelyAccountedForNo = this.differenceCompletelyAccountedFor.getByLabel("Nee");
+    this.differenceCompletelyAccountedForNo = this.differenceCompletelyAccountedFor.getByLabel(
+      "Nee, er is een onverklaard verschil",
+    );
 
     this.acceptErrorsAndWarnings = page.getByLabel(
       "Ik heb mijn invoer gecontroleerd met het papier en correct overgenomen.",

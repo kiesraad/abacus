@@ -3,6 +3,7 @@ use axum::{
     response::IntoResponse,
 };
 use axum_extra::response::Attachment;
+use chrono::Utc;
 use sqlx::{SqliteConnection, SqlitePool};
 use utoipa_axum::{router::OpenApiRouter, routes};
 
@@ -30,7 +31,7 @@ use crate::{
     polling_station::structs::PollingStation,
     report::DEFAULT_DATE_TIME_FORMAT,
     summary::ElectionSummary,
-    zip::{ZipResponse, ZipResponseError, slugify_filename},
+    zip::{ZipResponse, ZipResponseError, slugify_filename, zip_single_file},
 };
 
 const EML_MIME_TYPE: &str = "text/xml";
@@ -130,43 +131,28 @@ impl ResultsInput {
 
     fn xml_filename(&self) -> String {
         use chrono::Datelike;
+        let mut location = self.election.location.clone();
+        location.retain(|c| c != ' ');
         slugify_filename(&format!(
             "Telling_{}{}_{}.eml.xml",
             self.election.category.to_eml_code(),
             self.election.election_date.year(),
-            self.election.location
+            location
         ))
     }
 
     fn results_pdf_filename(&self) -> String {
-        use chrono::Datelike;
         let name = if self.committee_session.is_next_session() {
-            format!(
-                "Model_Na14-2_{}{}_{}.pdf",
-                self.election.category.to_eml_code(),
-                self.election.election_date.year(),
-                self.election.location
-            )
+            "Model_Na14-2.pdf"
         } else {
-            format!(
-                "Model_Na31-2_{}{}_{}.pdf",
-                self.election.category.to_eml_code(),
-                self.election.election_date.year(),
-                self.election.location
-            )
+            "Model_Na31-2.pdf"
         };
-        slugify_filename(&name)
+        slugify_filename(name)
     }
 
     fn overview_pdf_filename(&self) -> Option<String> {
-        use chrono::Datelike;
         if self.committee_session.is_next_session() {
-            Some(slugify_filename(&format!(
-                "Model_P2a_{}{}_{}.pdf",
-                self.election.category.to_eml_code(),
-                self.election.election_date.year(),
-                self.election.location
-            )))
+            Some(slugify_filename("Leeg_Model_P2a.pdf"))
         } else {
             None
         }
@@ -262,13 +248,40 @@ struct PdfModelList {
     overview: Option<PdfFileModel>,
 }
 
-fn zip_filename(election: ElectionWithPoliticalGroups) -> String {
+fn download_zip_filename(
+    election: &ElectionWithPoliticalGroups,
+    committee_session: &CommitteeSession,
+) -> String {
     use chrono::Datelike;
+    let location = election.location.clone().to_lowercase();
+    let mut location_without_whitespace = location.clone();
+    location_without_whitespace.retain(|c| c != ' ');
+    let created_at = Utc::now();
     slugify_filename(&format!(
-        "election_result_{}{}_{}.zip",
+        "{}_{}{}_{}_gemeente_{}-{}-{}.zip",
+        if committee_session.is_next_session() {
+            "correctie"
+        } else {
+            "definitieve-documenten"
+        },
+        election.category.to_eml_code().to_lowercase(),
+        election.election_date.year(),
+        location_without_whitespace,
+        location.clone().replace(" ", "-"),
+        created_at.date_naive().format("%Y%m%d"),
+        created_at.time().format("%H%M%S"),
+    ))
+}
+
+fn xml_zip_filename(election: &ElectionWithPoliticalGroups) -> String {
+    use chrono::Datelike;
+    let mut location = election.location.clone();
+    location.retain(|c| c != ' ');
+    slugify_filename(&format!(
+        "Telling_{}{}_{}.zip",
         election.category.to_eml_code(),
         election.election_date.year(),
-        election.location
+        location
     ))
 }
 
@@ -292,7 +305,7 @@ async fn generate_and_save_files(
     // Only generate files if the committee session is finished and has all the data needed
     if committee_session.status != CommitteeSessionStatus::DataEntryFinished
         || committee_session.start_date_time.is_none()
-        || !are_results_complete_for_committee_session(&mut conn, committee_session_id).await?
+        || !are_results_complete_for_committee_session(&mut conn, committee_session.id).await?
     {
         return Err(APIError::CommitteeSession(
             CommitteeSessionError::InvalidCommitteeSessionStatus,
@@ -440,13 +453,15 @@ async fn election_download_zip_results(
 ) -> Result<impl IntoResponse, APIError> {
     let mut conn = pool.acquire().await?;
     let election = crate::election::repository::get(&mut conn, election_id).await?;
+    let committee_session =
+        crate::committee_session::repository::get(&mut conn, committee_session_id).await?;
     let (eml_file, pdf_file, overview_file) =
-        generate_and_save_files(&pool, audit_service, committee_session_id).await?;
+        generate_and_save_files(&pool, audit_service, committee_session.id).await?;
     drop(conn);
 
-    let zip_filename = zip_filename(election);
+    let download_zip_filename = download_zip_filename(&election, &committee_session);
 
-    let (zip_response, mut zip_writer) = ZipResponse::new(&zip_filename);
+    let (zip_response, mut zip_writer) = ZipResponse::new(&download_zip_filename);
 
     tokio::spawn(async move {
         if let Some(pdf_file) = pdf_file {
@@ -454,7 +469,9 @@ async fn election_download_zip_results(
         }
 
         if let Some(eml_file) = eml_file {
-            zip_writer.add_file(&eml_file.name, &eml_file.data).await?;
+            let xml_zip_filename = xml_zip_filename(&election);
+            let xml_zip = zip_single_file(&eml_file.name, &eml_file.data).await?;
+            zip_writer.add_file(&xml_zip_filename, &xml_zip).await?;
         }
 
         if let Some(overview_file) = overview_file {
@@ -534,9 +551,9 @@ mod tests {
             let eml = eml.expect("should have generated eml");
             let pdf = pdf.expect("should have generated pdf");
 
-            assert_eq!(eml.name, "Telling_GR2026_Grote_Stad.eml.xml");
+            assert_eq!(eml.name, "Telling_GR2026_GroteStad.eml.xml");
             assert_eq!(eml.id, 1);
-            assert_eq!(pdf.name, "Model_Na31-2_GR2026_Grote_Stad.pdf");
+            assert_eq!(pdf.name, "Model_Na31-2.pdf");
             assert_eq!(pdf.id, 2);
             assert!(overview.is_none());
 
@@ -562,11 +579,11 @@ mod tests {
             let pdf = pdf.expect("should have generated pdf");
             let overview = overview.expect("should have generated overview");
 
-            assert_eq!(eml.name, "Telling_GR2026_Grote_Stad.eml.xml");
+            assert_eq!(eml.name, "Telling_GR2026_GroteStad.eml.xml");
             assert_eq!(eml.id, 1);
-            assert_eq!(pdf.name, "Model_Na14-2_GR2026_Grote_Stad.pdf");
+            assert_eq!(pdf.name, "Model_Na14-2.pdf");
             assert_eq!(pdf.id, 2);
-            assert_eq!(overview.name, "Model_P2a_GR2026_Grote_Stad.pdf");
+            assert_eq!(overview.name, "Leeg_Model_P2a.pdf");
             assert_eq!(overview.id, 3);
 
             assert_eq!(
@@ -598,7 +615,7 @@ mod tests {
             assert_eq!(pdf, None);
             let overview = overview.expect("should have generated overview");
 
-            assert_eq!(overview.name, "Model_P2a_GR2026_Grote_Stad.pdf");
+            assert_eq!(overview.name, "Leeg_Model_P2a.pdf");
             assert_eq!(overview.id, 1);
 
             assert_eq!(list_event_names(&mut conn).await.unwrap(), ["FileCreated"]);

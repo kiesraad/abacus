@@ -121,6 +121,8 @@ describe("PollingStationListPage", () => {
       } else {
         expect(navigate).not.toHaveBeenCalled();
         expect(screen.queryByRole("link", { name: "Stembureau toevoegen" })).not.toBeInTheDocument();
+        const infoAlert = await screen.findByRole("alert");
+        expect(within(infoAlert).getByRole("strong")).toHaveTextContent("Stembureaus kunnen niet aangepast worden");
       }
     },
   );

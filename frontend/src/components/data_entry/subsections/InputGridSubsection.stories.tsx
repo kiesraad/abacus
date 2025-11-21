@@ -4,12 +4,13 @@ import { useArgs } from "storybook/preview-api";
 import { expect } from "storybook/test";
 
 import { electionMockData } from "@/testing/api-mocks/ElectionMockData";
-import { InputGridSubsection, SectionValues } from "@/types/types";
+import { DataEntryModel, InputGridSubsection, SectionValues } from "@/types/types";
 import { createVotersAndVotesSection } from "@/utils/dataEntryStructure";
 
 import { InputGridSubsectionComponent } from "./InputGridSubsection";
 
-const inputGridSubsection = createVotersAndVotesSection(electionMockData).subsections[0] as InputGridSubsection;
+const model: DataEntryModel = "CSOFirstSession";
+const inputGridSubsection = createVotersAndVotesSection(model, electionMockData).subsections[0] as InputGridSubsection;
 
 const meta = {
   component: InputGridSubsectionComponent,

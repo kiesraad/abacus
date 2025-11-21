@@ -2,6 +2,7 @@ import { describe, expect, test } from "vitest";
 
 import { electionMockData } from "@/testing/api-mocks/ElectionMockData";
 import { Candidate, ElectionWithPoliticalGroups } from "@/types/generated/openapi";
+import { DataEntryModel, InputGridSubsection } from "@/types/types";
 
 import {
   createPoliticalGroupSections,
@@ -10,83 +11,84 @@ import {
   getDataEntryStructure,
 } from "./dataEntryStructure";
 
+const model: DataEntryModel = "CSOFirstSession";
+
 describe("votersAndVotesSection", () => {
   test("should have correct structure", () => {
-    const votersAndVotesSection = createVotersAndVotesSection(electionMockData);
+    const votersAndVotesSection = createVotersAndVotesSection(model, electionMockData);
     expect(votersAndVotesSection.id).toBe("voters_votes_counts");
     expect(votersAndVotesSection.subsections).toHaveLength(1);
-    expect(votersAndVotesSection.subsections[0]?.type).toBe("inputGrid");
 
-    if (votersAndVotesSection.subsections[0]?.type === "inputGrid") {
-      expect(votersAndVotesSection.subsections[0].rows).toHaveLength(9);
-      // Check that it has the basic voter and vote count rows
-      expect(
-        votersAndVotesSection.subsections[0].rows.some((row) => row.path === "voters_counts.poll_card_count"),
-      ).toBe(true);
-      expect(
-        votersAndVotesSection.subsections[0].rows.some((row) => row.path === "votes_counts.total_votes_cast_count"),
-      ).toBe(true);
-      // Check that it has the correct amount of political group rows
-      expect(
-        votersAndVotesSection.subsections[0].rows.filter((row) =>
-          row.path.startsWith("votes_counts.political_group_total_votes["),
-        ).length,
-      ).toBe(2);
-    }
+    const inputGrid = votersAndVotesSection.subsections[0] as InputGridSubsection;
+    expect(inputGrid.type).toBe("inputGrid");
+
+    expect(inputGrid.rows).toHaveLength(9);
+    // Check that it has the basic voter and vote count rows
+    expect(inputGrid.rows.some((row) => row.path === "voters_counts.poll_card_count")).toBe(true);
+    expect(inputGrid.rows.some((row) => row.path === "votes_counts.total_votes_cast_count")).toBe(true);
+    // Check that it has the correct amount of political group rows
+    expect(
+      inputGrid.rows.filter((row) => row.path.startsWith("votes_counts.political_group_total_votes[")).length,
+    ).toBe(2);
+  });
+
+  test("should have correct section number", () => {
+    expect(createVotersAndVotesSection("CSOFirstSession", electionMockData).sectionNumber).toBe("B1-3.1 en 3.2");
+    expect(createVotersAndVotesSection("CSONextSession", electionMockData).sectionNumber).toBe("B1-2.1 en 2.2");
   });
 
   test("should have autoFocusInput on first row", () => {
-    const votersAndVotesSection = createVotersAndVotesSection(electionMockData);
-    if (votersAndVotesSection.subsections[0]?.type === "inputGrid") {
-      expect(votersAndVotesSection.subsections[0].rows[0]?.autoFocusInput).toBe(true);
-    }
+    const votersAndVotesSection = createVotersAndVotesSection(model, electionMockData);
+    const inputGrid = votersAndVotesSection.subsections[0] as InputGridSubsection;
+    expect(inputGrid.type).toBe("inputGrid");
+
+    expect(inputGrid.rows[0]?.autoFocusInput).toBe(true);
   });
 
   test("should have correct row codes", () => {
-    const votersAndVotesSection = createVotersAndVotesSection(electionMockData);
-    if (votersAndVotesSection.subsections[0]?.type === "inputGrid") {
-      const codes = votersAndVotesSection.subsections[0].rows.map((row) => row.code);
-      expect(codes).toEqual(["A", "B", "D", "E.1", "E.2", "E", "F", "G", "H"]);
-    }
+    const votersAndVotesSection = createVotersAndVotesSection(model, electionMockData);
+    const inputGrid = votersAndVotesSection.subsections[0] as InputGridSubsection;
+    expect(inputGrid.type).toBe("inputGrid");
+
+    const codes = inputGrid.rows.map((row) => row.code);
+    expect(codes).toEqual(["A", "B", "D", "E.1", "E.2", "E", "F", "G", "H"]);
   });
 });
 
 describe("differencesSection", () => {
   test("should have correct structure", () => {
-    expect(differencesSection.id).toBe("differences_counts");
-    expect(differencesSection.subsections).toHaveLength(3);
-    expect(differencesSection.subsections[0]?.type).toBe("checkboxes");
-    expect(differencesSection.subsections[1]?.type).toBe("inputGrid");
-    expect(differencesSection.subsections[2]?.type).toBe("checkboxes");
+    expect(differencesSection(model).id).toBe("differences_counts");
+    expect(differencesSection(model).subsections).toHaveLength(3);
+    expect(differencesSection(model).subsections[0]?.type).toBe("checkboxes");
+    expect(differencesSection(model).subsections[1]?.type).toBe("inputGrid");
+    expect(differencesSection(model).subsections[2]?.type).toBe("checkboxes");
+  });
+
+  test("should have correct section number", () => {
+    expect(differencesSection("CSOFirstSession").sectionNumber).toBe("B1-3.3");
+    expect(differencesSection("CSONextSession").sectionNumber).toBe("B1-2.3");
   });
 
   test("should have all differences count fields", () => {
-    if (differencesSection.subsections[0]?.type === "inputGrid") {
-      const paths = differencesSection.subsections[0].rows.map((row) => row.path);
-      expect(paths).toContain("differences_counts.more_ballots_count");
-      expect(paths).toContain("differences_counts.fewer_ballots_count");
-      expect(paths).toContain("differences_counts.compare_votes_cast_admitted_voters.admitted_voters_equal_votes_cast");
-      expect(paths).toContain(
-        "differences_counts.compare_votes_cast_admitted_voters.votes_cast_greater_than_admitted_voters",
-      );
-      expect(paths).toContain(
-        "differences_counts.compare_votes_cast_admitted_voters.votes_cast_smaller_than_admitted_voters",
-      );
-      expect(paths).toContain("differences_counts.difference_completely_accounted_for");
-    }
+    const inputGrid = differencesSection(model).subsections[1] as InputGridSubsection;
+    expect(inputGrid.type).toBe("inputGrid");
+
+    expect(inputGrid.rows.map((row) => row.path)).toEqual([
+      "differences_counts.more_ballots_count",
+      "differences_counts.fewer_ballots_count",
+    ]);
   });
 
   test("should have correct row codes", () => {
-    if (differencesSection.subsections[0]?.type === "inputGrid") {
-      const codes = differencesSection.subsections[0].rows.map((row) => row.code);
-      expect(codes).toEqual(["I", "J", "K", "L", "M", "N", "O"]);
-    }
+    const differencesSectionInputGrid = differencesSection(model).subsections[1] as InputGridSubsection;
+    expect(differencesSectionInputGrid.type).toBe("inputGrid");
+    expect(differencesSectionInputGrid.rows.map((row) => row.code)).toEqual(["I", "J"]);
   });
 
-  test("should have autoFocusInput on first row", () => {
-    if (differencesSection.subsections[0]?.type === "inputGrid") {
-      expect(differencesSection.subsections[0].rows[0]?.autoFocusInput).toBe(true);
-    }
+  test("should not have autoFocusInput on first row because it is not the first section", () => {
+    const differencesSectionInputGrid = differencesSection(model).subsections[1] as InputGridSubsection;
+    expect(differencesSectionInputGrid.type).toBe("inputGrid");
+    expect(differencesSectionInputGrid.rows[0]!.autoFocusInput).not.toBe(true);
   });
 });
 
@@ -106,26 +108,27 @@ describe("createPoliticalGroupSections", () => {
     const sections = createPoliticalGroupSections(electionMockData);
 
     sections.forEach((section, groupIndex) => {
-      const politicalGroup = electionMockData.political_groups[groupIndex];
-      if (section.subsections[0]?.type === "inputGrid" && politicalGroup) {
-        const expectedRows = politicalGroup.candidates.length + 1; // candidates + total
-        expect(section.subsections[0].rows).toHaveLength(expectedRows);
+      const politicalGroup = electionMockData.political_groups[groupIndex]!;
+      const inputGrid = section.subsections[0] as InputGridSubsection;
+      expect(inputGrid.type).toEqual("inputGrid");
 
-        // Check candidate rows
-        politicalGroup.candidates.forEach((candidate, candidateIndex) => {
-          const row =
-            section.subsections[0]?.type === "inputGrid" ? section.subsections[0].rows[candidateIndex] : undefined;
-          expect(row?.code).toBe(candidate.number.toString());
-          expect(row?.path).toBe(
-            `political_group_votes[${politicalGroup.number - 1}].candidate_votes[${candidateIndex}].votes`,
-          );
-        });
+      const expectedRows = politicalGroup.candidates.length + 1; // candidates + total
+      expect(inputGrid.rows).toHaveLength(expectedRows);
 
-        // Check total row
-        const totalRow = section.subsections[0].rows[section.subsections[0].rows.length - 1];
-        expect(totalRow?.path).toBe(`political_group_votes[${politicalGroup.number - 1}].total`);
-        expect(totalRow?.isListTotal).toBe(true);
-      }
+      // Check candidate rows
+      politicalGroup.candidates.forEach((candidate, candidateIndex) => {
+        const row =
+          section.subsections[0]?.type === "inputGrid" ? section.subsections[0].rows[candidateIndex] : undefined;
+        expect(row?.code).toBe(candidate.number.toString());
+        expect(row?.path).toBe(
+          `political_group_votes[${politicalGroup.number - 1}].candidate_votes[${candidateIndex}].votes`,
+        );
+      });
+
+      // Check total row
+      const totalRow = inputGrid.rows[inputGrid.rows.length - 1]!;
+      expect(totalRow.path).toBe(`political_group_votes[${politicalGroup.number - 1}].total`);
+      expect(totalRow.isListTotal).toBe(true);
     });
   });
 
@@ -133,12 +136,13 @@ describe("createPoliticalGroupSections", () => {
     const sections = createPoliticalGroupSections(electionMockData);
 
     sections.forEach((section) => {
-      if (section.subsections[0]?.type === "inputGrid") {
-        expect(section.subsections[0].rows[0]?.autoFocusInput).toBe(true);
-        // Other rows should not have autoFocus
-        for (let i = 1; i < section.subsections[0].rows.length; i++) {
-          expect(section.subsections[0].rows[i]?.autoFocusInput).toBeFalsy();
-        }
+      const inputGrid = section.subsections[0] as InputGridSubsection;
+      expect(inputGrid.type).toEqual("inputGrid");
+
+      expect(inputGrid.rows[0]?.autoFocusInput).toBe(true);
+      // Other rows should not have autoFocus
+      for (let i = 1; i < inputGrid.rows.length; i++) {
+        expect(inputGrid.rows[i]?.autoFocusInput).toBeFalsy();
       }
     });
   });
@@ -168,13 +172,13 @@ describe("createPoliticalGroupSections", () => {
 
     const sections = createPoliticalGroupSections(manyCandidatesElection);
 
-    if (sections[0]?.subsections[0]?.type === "inputGrid") {
-      const rows = sections[0].subsections[0].rows;
-      // Should have separator after 25th candidate (index 24)
-      expect(rows[24]?.addSeparator).toBe(true);
-      // Should not have separator on last candidate (index 29)
-      expect(rows[29]?.addSeparator).toBeFalsy();
-    }
+    const inputGrid = sections[0]!.subsections[0] as InputGridSubsection;
+    expect(inputGrid.type).toEqual("inputGrid");
+
+    // Should have separator after 25th candidate (index 24)
+    expect(inputGrid.rows[24]?.addSeparator).toBe(true);
+    // Should not have separator on last candidate (index 29)
+    expect(inputGrid.rows[29]?.addSeparator).toBeFalsy();
   });
 
   test("should handle empty political groups", () => {
@@ -202,16 +206,17 @@ describe("createPoliticalGroupSections", () => {
     const sections = createPoliticalGroupSections(noCandidatesElection);
     expect(sections).toHaveLength(1);
 
-    if (sections[0]?.subsections[0]?.type === "inputGrid") {
-      // Should only have the total row
-      expect(sections[0].subsections[0].rows).toHaveLength(1);
-      expect(sections[0].subsections[0].rows[0]?.isListTotal).toBe(true);
-    }
+    const inputGrid = sections[0]!.subsections[0] as InputGridSubsection;
+    expect(inputGrid.type).toEqual("inputGrid");
+
+    // Should only have the total row
+    expect(inputGrid.rows).toHaveLength(1);
+    expect(inputGrid.rows[0]?.isListTotal).toBe(true);
   });
 });
 
 describe("getDataEntryStructure", () => {
-  test("should return all sections in correct order", () => {
+  test("should return all sections in correct order for CSOFirstSession", () => {
     const expectedSectionIds = [
       "extra_investigation",
       "counting_differences_polling_station",
@@ -221,6 +226,18 @@ describe("getDataEntryStructure", () => {
     ];
 
     const structure = getDataEntryStructure("CSOFirstSession", electionMockData);
+
+    expect(structure.map((section) => section.id)).toStrictEqual(expectedSectionIds);
+  });
+
+  test("should return all sections in correct order for CSONextSession", () => {
+    const expectedSectionIds = [
+      "voters_votes_counts",
+      "differences_counts",
+      ...electionMockData.political_groups.map((pg) => `political_group_votes_${pg.number}`),
+    ];
+
+    const structure = getDataEntryStructure("CSONextSession", electionMockData);
 
     expect(structure.map((section) => section.id)).toStrictEqual(expectedSectionIds);
   });

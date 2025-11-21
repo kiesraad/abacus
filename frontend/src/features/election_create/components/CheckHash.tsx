@@ -60,7 +60,7 @@ export function CheckHash({ date, title, header, description, redactedHash, erro
           newStub.error = t("election.check_eml.check_hash.hint");
           stubsAreValid = false;
         } else {
-          completeHash[stub.index] = value;
+          completeHash[stub.index] = value.toLowerCase();
         }
         setStubs(newStubs);
       }
@@ -102,6 +102,7 @@ export function CheckHash({ date, title, header, description, redactedHash, erro
 
             {stubs.map((stub, stubIndex) => (
               <InputField
+                className="font-number-slashed-0"
                 key={stub.index}
                 name={stub.index.toString()}
                 type="text"

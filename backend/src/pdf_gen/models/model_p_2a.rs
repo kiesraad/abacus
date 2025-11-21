@@ -14,8 +14,6 @@ pub struct ModelP2aInput {
     pub committee_session: CommitteeSession,
     pub election: ElectionWithPoliticalGroups,
     pub investigations: Vec<(PollingStation, PollingStationInvestigation)>,
-    pub hash: String,
-    pub creation_date_time: String,
 }
 
 impl ToPdfFileModel for ModelP2aInput {

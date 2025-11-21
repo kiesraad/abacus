@@ -10,6 +10,7 @@ export class ElectionHome {
   readonly pollingStationsRow: Locator;
   readonly downloadBijlage1: Locator;
   readonly downloadN10_2: Locator;
+  readonly downloadInlegvel: Locator;
 
   constructor(protected readonly page: Page) {
     this.header = page.getByRole("heading", { level: 1 });
@@ -21,6 +22,7 @@ export class ElectionHome {
     this.pollingStationsRow = page.getByRole("rowheader", { name: "Stembureaus" });
     this.downloadBijlage1 = page.getByRole("cell", { name: "Na 31-2 Bijlage 1" });
     this.downloadN10_2 = page.getByRole("cell", { name: "N 10-2" });
+    this.downloadInlegvel = page.getByRole("cell", { name: "Na 31-2 Inlegvel" });
   }
 
   getCommitteeSessionCard(number: number) {

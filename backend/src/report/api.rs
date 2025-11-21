@@ -197,8 +197,6 @@ impl ResultsInput {
                             (ps, inv.clone())
                         })
                         .collect(),
-                    hash: hash.clone(),
-                    creation_date_time: creation_date_time.clone(),
                 }
                 .to_pdf_file_model(overview_filename),
             )

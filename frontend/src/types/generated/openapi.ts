@@ -100,6 +100,12 @@ export interface ELECTION_DOWNLOAD_NA_31_2_BIJLAGE1_REQUEST_PARAMS {
 }
 export type ELECTION_DOWNLOAD_NA_31_2_BIJLAGE1_REQUEST_PATH = `/api/elections/${number}/download_na_31_2_bijlage1`;
 
+// /api/elections/{election_id}/download_na_31_2_inlegvel
+export interface ELECTION_DOWNLOAD_NA_31_2_INLEGVEL_REQUEST_PARAMS {
+  election_id: number;
+}
+export type ELECTION_DOWNLOAD_NA_31_2_INLEGVEL_REQUEST_PATH = `/api/elections/${number}/download_na_31_2_inlegvel`;
+
 // /api/elections/{election_id}/polling_stations
 export interface POLLING_STATION_LIST_REQUEST_PARAMS {
   election_id: number;

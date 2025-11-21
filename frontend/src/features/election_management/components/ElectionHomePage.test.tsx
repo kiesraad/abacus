@@ -370,9 +370,30 @@ describe("ElectionHomePage", () => {
     expect(screen.getByText("N 10-2")).toBeVisible();
   });
 
-  test("Does not show empty documents section for second committee session", async () => {
+  test("Shows empty document section for second committee session", async () => {
     const electionDataSecondSession = getElectionMockData({}, { id: 2, number: 2 });
     electionDataSecondSession.committee_sessions = getCommitteeSessionListMockData().slice(2, 3);
+    server.use(
+      http.get("/api/elections/1", () =>
+        HttpResponse.json(electionDataSecondSession satisfies ElectionDetailsResponse, { status: 200 }),
+      ),
+    );
+
+    await renderPage("coordinator");
+
+    expect(await screen.findByRole("heading", { level: 3, name: "Leeg inlegvel voor deze verkiezing" })).toBeVisible();
+    expect(screen.getByText("Na 31-2 Inlegvel")).toBeVisible();
+
+    expect(
+      screen.queryByRole("heading", { level: 3, name: "Lege processen-verbaal voor deze verkiezing" }),
+    ).not.toBeInTheDocument();
+    expect(screen.queryByText("Na 31-2 Bijlage 1")).not.toBeInTheDocument();
+    expect(screen.queryByText("N 10-2")).not.toBeInTheDocument();
+  });
+
+  test("Does not show empty documents section for third committee session", async () => {
+    const electionDataSecondSession = getElectionMockData({}, { id: 2, number: 3 });
+    electionDataSecondSession.committee_sessions = getCommitteeSessionListMockData().slice(1, 3);
     server.use(
       http.get("/api/elections/1", () =>
         HttpResponse.json(electionDataSecondSession satisfies ElectionDetailsResponse, { status: 200 }),
@@ -384,6 +405,11 @@ describe("ElectionHomePage", () => {
     expect(
       screen.queryByRole("heading", { level: 3, name: "Lege processen-verbaal voor deze verkiezing" }),
     ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole("heading", { level: 3, name: "Leeg inlegvel voor deze verkiezing" }),
+    ).not.toBeInTheDocument();
     expect(screen.queryByText("Na 31-2 Bijlage 1")).not.toBeInTheDocument();
+    expect(screen.queryByText("N 10-2")).not.toBeInTheDocument();
+    expect(screen.queryByText("Na 31-2 Inlegvel")).not.toBeInTheDocument();
   });
 });

@@ -275,6 +275,27 @@ test.describe("full flow", () => {
     await expect(electionDetailsPage.investigationsOverviewButton).toBeVisible();
   });
 
+  test("download Na 31-2 inlegvel", async ({ page }) => {
+    await page.goto("/account/login");
+
+    const loginPage = new LoginPgObj(page);
+    await loginPage.login("coordinator1", getTestPassword("coordinator1"));
+
+    const overviewPage = new ElectionsOverviewPgObj(page);
+    await expect(overviewPage.header).toBeVisible();
+    await overviewPage.findElectionRowById(electionId!).click();
+
+    const electionHomePage = new ElectionHome(page);
+    await expect(electionHomePage.header).toContainText("Gemeenteraad Test 2022");
+
+    const downloadPromise = page.waitForEvent("download");
+    await electionHomePage.downloadInlegvel.click();
+    const download = await downloadPromise;
+
+    expect(download.suggestedFilename()).toBe("Model_Na_31_2_Inlegvel.pdf");
+    expect((await stat(await download.path())).size).toBeGreaterThan(1024);
+  });
+
   test("add missing polling station", async ({ page }) => {
     await page.goto("/account/login");
 

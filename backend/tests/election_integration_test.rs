@@ -277,9 +277,11 @@ async fn test_election_zip_download_works(pool: SqlitePool) {
 
     let content_disposition_string = content_disposition.unwrap().to_str().unwrap();
     assert_eq!(&content_disposition_string[..21], "attachment; filename=");
-    assert_eq!(
-        &content_disposition_string[21..],
-        "\"election_result_GR2024_Heemdamseburg.zip\""
+    // Full filename contains created date and time, so checking if the name is correct up to the date
+    // File name: definitieve-documenten_gr2024_heemdamseburg_gemeente_heemdamseburg-Ymd-HMS.zip
+    assert!(
+        &content_disposition_string[21..]
+            .starts_with("\"definitieve-documenten_gr2024_heemdamseburg_gemeente_heemdamseburg-"),
     );
 
     let bytes = response.bytes().await.unwrap();
@@ -289,22 +291,36 @@ async fn test_election_zip_download_works(pool: SqlitePool) {
     let mut reader = archive.reader_with_entry(0).await.unwrap();
     assert_eq!(
         reader.entry().filename().as_str().unwrap(),
-        "Model_Na31-2_GR2024_Heemdamseburg.pdf"
+        "Model_Na31-2.pdf"
     );
     assert!(reader.entry().uncompressed_size() > 1024);
     let mut pdf_content = Vec::new();
     reader.read_to_end_checked(&mut pdf_content).await.unwrap();
     let pdf_hash1 = sha2::Sha256::digest(&pdf_content);
 
-    // Extract and hash the EML file
+    // Extract the XML archive
     let mut reader = archive.reader_with_entry(1).await.unwrap();
     assert_eq!(
         reader.entry().filename().as_str().unwrap(),
-        "Telling_GR2024_Heemdamseburg.eml.xml"
+        "Telling_GR2024_Heemdamseburg.zip"
     );
     assert!(reader.entry().uncompressed_size() > 1024);
+    let mut xml_zip_file = Vec::new();
+    reader.read_to_end_checked(&mut xml_zip_file).await.unwrap();
+
+    // Extract and hash the XML file
+    let xml_archive = ZipFileReader::new(xml_zip_file).await.unwrap();
+    let mut xml_reader = xml_archive.reader_with_entry(0).await.unwrap();
+    assert_eq!(
+        xml_reader.entry().filename().as_str().unwrap(),
+        "Telling_GR2024_Heemdamseburg.eml.xml"
+    );
+    assert!(xml_reader.entry().uncompressed_size() > 1024);
     let mut eml_content = Vec::new();
-    reader.read_to_end_checked(&mut eml_content).await.unwrap();
+    xml_reader
+        .read_to_end_checked(&mut eml_content)
+        .await
+        .unwrap();
     let eml_hash1 = sha2::Sha256::digest(&eml_content);
 
     let committee_session =
@@ -332,10 +348,29 @@ async fn test_election_zip_download_works(pool: SqlitePool) {
         .unwrap();
     let pdf_hash2 = sha2::Sha256::digest(&pdf_content2);
 
-    // Extract and hash the EML file from second download
+    // Extract the XML archive from the second download
     let mut reader2 = archive2.reader_with_entry(1).await.unwrap();
-    let mut eml_content2 = Vec::new();
+    assert_eq!(
+        reader2.entry().filename().as_str().unwrap(),
+        "Telling_GR2024_Heemdamseburg.zip"
+    );
+    assert!(reader2.entry().uncompressed_size() > 1024);
+    let mut xml_zip_file2 = Vec::new();
     reader2
+        .read_to_end_checked(&mut xml_zip_file2)
+        .await
+        .unwrap();
+
+    // Extract and hash the XML file from the second download
+    let xml_archive2 = ZipFileReader::new(xml_zip_file2).await.unwrap();
+    let mut xml_reader2 = xml_archive2.reader_with_entry(0).await.unwrap();
+    assert_eq!(
+        xml_reader2.entry().filename().as_str().unwrap(),
+        "Telling_GR2024_Heemdamseburg.eml.xml"
+    );
+    assert!(xml_reader2.entry().uncompressed_size() > 1024);
+    let mut eml_content2 = Vec::new();
+    xml_reader2
         .read_to_end_checked(&mut eml_content2)
         .await
         .unwrap();

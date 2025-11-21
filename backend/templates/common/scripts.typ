@@ -286,7 +286,12 @@
 
 // A title without any numbering
 #let title(value) = {
-  text(size: 14pt, weight: "semibold", value)
+  text(size: 14pt, value)
+}
+
+// A subtitle without any numbering
+#let subtitle(value) = {
+  text(size: 20pt, value)
 }
 
 // Title (page) layout

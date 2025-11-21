@@ -69,6 +69,13 @@
   )
 }
 
+#let default_footer(footer) = context {
+  grid(
+    columns: (1fr, auto),
+    text(size: 8pt, footer), align(bottom + end, counter(page).display(both: true)),
+  )
+}
+
 // Default document styling
 #let conf(doc, header-left: none, header-right: none, footer: none) = [
   #set text(
@@ -83,12 +90,7 @@
     margin: (x: 1.5cm, y: 2.0cm),
     numbering: (current, total) => [Pagina #current van #total],
     header: default_header(header-left, header-right),
-    footer: context (
-      grid(
-        columns: (1fr, auto),
-        text(size: 8pt, footer), align(bottom + end, counter(page).display(both: true)),
-      )
-    ),
+    footer: default_footer(footer),
   )
 
   #set list(spacing: 1.5em)

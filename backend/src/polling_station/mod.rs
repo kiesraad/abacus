@@ -63,6 +63,7 @@ impl IntoResponse for PollingStationListResponse {
     params(
         ("election_id" = u32, description = "Election database id"),
     ),
+    security(("cookie_auth" = ["administrator", "coordinator", "typist"])),
 )]
 async fn polling_station_list(
     _user: User,
@@ -97,6 +98,7 @@ async fn polling_station_list(
     params(
         ("election_id" = u32, description = "Election database id"),
     ),
+    security(("cookie_auth" = ["administrator", "coordinator"])),
 )]
 async fn polling_station_create(
     _user: AdminOrCoordinator,
@@ -160,6 +162,7 @@ async fn polling_station_create(
         ("election_id" = u32, description = "Election database id"),
         ("polling_station_id" = u32, description = "Polling station database id"),
     ),
+    security(("cookie_auth" = ["administrator", "coordinator", "typist"])),
 )]
 async fn polling_station_get(
     _user: User,
@@ -189,6 +192,7 @@ async fn polling_station_get(
         ("election_id" = u32, description = "Election database id"),
         ("polling_station_id" = u32, description = "Polling station database id"),
     ),
+    security(("cookie_auth" = ["administrator", "coordinator"])),
 )]
 async fn polling_station_update(
     _user: AdminOrCoordinator,
@@ -250,6 +254,7 @@ async fn polling_station_update(
         ("election_id" = u32, description = "Election database id"),
         ("polling_station_id" = u32, description = "Polling station database id"),
     ),
+    security(("cookie_auth" = ["administrator", "coordinator"])),
 )]
 async fn polling_station_delete(
     _user: AdminOrCoordinator,
@@ -328,6 +333,7 @@ pub struct PollingStationRequestListResponse {
     params(
         ("election_id" = u32, description = "Election database id"),
     ),
+    security(("cookie_auth" = ["administrator", "coordinator"])),
 )]
 async fn polling_station_validate_import(
     _user: AdminOrCoordinator,
@@ -419,6 +425,7 @@ pub async fn create_imported_polling_stations(
     params(
         ("election_id" = u32, description = "Election database id"),
     ),
+    security(("cookie_auth" = ["administrator", "coordinator"])),
 )]
 async fn polling_station_import(
     _user: AdminOrCoordinator,

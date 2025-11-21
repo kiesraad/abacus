@@ -40,6 +40,7 @@ pub struct UserListResponse {
         (status = 403, description = "Forbidden", body = ErrorResponse),
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
+    security(("cookie_auth" = ["administrator", "coordinator"])),
 )]
 async fn user_list(
     user: AdminOrCoordinator,
@@ -82,6 +83,7 @@ pub struct UpdateUserRequest {
         (status = 409, description = "Conflict (username already exists)", body = ErrorResponse),
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
+    security(("cookie_auth" = ["administrator", "coordinator"])),
 )]
 pub async fn user_create(
     user: AdminOrCoordinator,
@@ -126,6 +128,7 @@ pub async fn user_create(
     params(
         ("user_id" = u32, description = "User id"),
     ),
+    security(("cookie_auth" = ["administrator", "coordinator"])),
 )]
 async fn user_get(
     logged_in_user: AdminOrCoordinator,
@@ -158,6 +161,7 @@ async fn user_get(
         (status = 404, description = "User not found", body = ErrorResponse),
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
+    security(("cookie_auth" = ["administrator", "coordinator"])),
 )]
 pub async fn user_update(
     logged_in_user: AdminOrCoordinator,
@@ -215,6 +219,7 @@ pub async fn user_update(
         (status = 404, description = "User not found", body = ErrorResponse),
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
+    security(("cookie_auth" = ["administrator", "coordinator"])),
 )]
 async fn user_delete(
     logged_in_user: AdminOrCoordinator,

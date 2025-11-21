@@ -6,7 +6,7 @@ import { PollingStationListEmptyPgObj } from "../page-objects/polling_station/Po
 import { PollingStationListPgObj } from "../page-objects/polling_station/PollingStationListPgObj";
 
 test.use({
-  storageState: "e2e-tests/state/admin1.json",
+  storageState: "e2e-tests/state/coordinator1.json",
 });
 
 test.describe("Polling station CRUD", () => {
@@ -41,12 +41,12 @@ test.describe("Polling station CRUD", () => {
     const form = new PollingStationFormPgObj(page);
 
     await form.fillIn({
-      number: 42,
-      name: "test42",
+      number: 43,
+      name: "test43",
     });
 
     await form.create.click();
 
-    expect(await pollingStationListPage.alert.textContent()).toContain("Stembureau 42 (test42) toegevoegd");
+    expect(await pollingStationListPage.alert.textContent()).toContain("Stembureau 43 (test43) toegevoegd");
   });
 });

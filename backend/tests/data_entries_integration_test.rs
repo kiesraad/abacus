@@ -29,27 +29,27 @@ pub mod utils;
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
 async fn test_polling_station_data_entry_valid(pool: SqlitePool) {
     let addr = serve_api(pool).await;
-    let cookie = shared::typist_login(&addr).await;
+    let typist_cookie = shared::typist_login(&addr).await;
 
-    claim_data_entry(&addr, &cookie, 1, 1).await;
+    claim_data_entry(&addr, &typist_cookie, 1, 1).await;
 
-    let res = save_data_entry(&addr, &cookie, 1, 1, example_data_entry(None)).await;
+    let res = save_data_entry(&addr, &typist_cookie, 1, 1, example_data_entry(None)).await;
     let validation_results: SaveDataEntryResponse = res.json().await.unwrap();
     assert_eq!(validation_results.validation_results.errors.len(), 0);
     assert_eq!(validation_results.validation_results.warnings.len(), 0);
 
-    finalise_data_entry(&addr, &cookie, 1, 1).await;
+    finalise_data_entry(&addr, &typist_cookie, 1, 1).await;
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
 async fn test_polling_station_data_entry_validation(pool: SqlitePool) {
     let addr = serve_api(pool).await;
-    let cookie = shared::typist_login(&addr).await;
+    let typist_cookie = shared::typist_login(&addr).await;
 
     let url = format!("http://{addr}/api/polling_stations/1/data_entries/1/claim");
     let response = reqwest::Client::new()
         .post(&url)
-        .header("cookie", &cookie)
+        .header("cookie", &typist_cookie)
         .send()
         .await
         .unwrap();
@@ -136,7 +136,7 @@ async fn test_polling_station_data_entry_validation(pool: SqlitePool) {
     let response = reqwest::Client::new()
         .post(&url)
         .json(&request_body)
-        .header("cookie", cookie)
+        .header("cookie", typist_cookie)
         .send()
         .await
         .unwrap();
@@ -212,12 +212,12 @@ async fn test_polling_station_data_entry_validation(pool: SqlitePool) {
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("users"))))]
 async fn test_polling_station_data_entry_invalid(pool: SqlitePool) {
     let addr = serve_api(pool).await;
-    let cookie = shared::typist_login(&addr).await;
+    let typist_cookie = shared::typist_login(&addr).await;
     let url = format!("http://{addr}/api/polling_stations/1/data_entries/1");
     let response = reqwest::Client::new()
         .post(&url)
         .header("content-type", "application/json")
-        .header("cookie", cookie)
+        .header("cookie", typist_cookie)
         .body(r##"{"data":null}"##)
         .send()
         .await
@@ -236,7 +236,7 @@ async fn test_polling_station_data_entry_invalid(pool: SqlitePool) {
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
 async fn test_polling_station_data_entry_only_for_existing(pool: SqlitePool) {
     let addr = serve_api(pool).await;
-    let cookie = shared::typist_login(&addr).await;
+    let typist_cookie = shared::typist_login(&addr).await;
 
     let request_body = example_data_entry(None);
     let invalid_id = 123_456_789;
@@ -245,7 +245,7 @@ async fn test_polling_station_data_entry_only_for_existing(pool: SqlitePool) {
     let response = reqwest::Client::new()
         .post(&url)
         .json(&request_body)
-        .header("cookie", &cookie)
+        .header("cookie", &typist_cookie)
         .send()
         .await
         .unwrap();
@@ -257,7 +257,7 @@ async fn test_polling_station_data_entry_only_for_existing(pool: SqlitePool) {
     let url = format!("http://{addr}/api/polling_stations/{invalid_id}/data_entries/1/finalise");
     let response = reqwest::Client::new()
         .post(&url)
-        .header("cookie", cookie)
+        .header("cookie", typist_cookie)
         .send()
         .await
         .unwrap();
@@ -270,7 +270,7 @@ async fn test_polling_station_data_entry_only_for_existing(pool: SqlitePool) {
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
 async fn test_polling_station_data_entry_claim(pool: SqlitePool) {
     let addr = serve_api(pool).await;
-    let cookie = shared::typist_login(&addr).await;
+    let typist_cookie = shared::typist_login(&addr).await;
 
     let request_body = example_data_entry(None);
 
@@ -278,7 +278,7 @@ async fn test_polling_station_data_entry_claim(pool: SqlitePool) {
     let claim_url = format!("http://{addr}/api/polling_stations/1/data_entries/1/claim");
     let response = reqwest::Client::new()
         .post(&claim_url)
-        .header("cookie", &cookie)
+        .header("cookie", &typist_cookie)
         .send()
         .await
         .unwrap();
@@ -289,7 +289,7 @@ async fn test_polling_station_data_entry_claim(pool: SqlitePool) {
     let response = reqwest::Client::new()
         .post(&url)
         .json(&request_body)
-        .header("cookie", &cookie)
+        .header("cookie", &typist_cookie)
         .send()
         .await
         .unwrap();
@@ -299,7 +299,7 @@ async fn test_polling_station_data_entry_claim(pool: SqlitePool) {
     // claim the data entry again
     let response = reqwest::Client::new()
         .post(&claim_url)
-        .header("cookie", cookie)
+        .header("cookie", typist_cookie)
         .send()
         .await
         .unwrap();
@@ -321,14 +321,14 @@ async fn test_polling_station_data_entry_claim(pool: SqlitePool) {
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
 async fn test_polling_station_data_entry_claim_finalised(pool: SqlitePool) {
     let addr = serve_api(pool).await;
-    let cookie = shared::typist_login(&addr).await;
-    complete_data_entry(&addr, &cookie, 1, 1, example_data_entry(None)).await;
+    let typist_cookie = shared::typist_login(&addr).await;
+    complete_data_entry(&addr, &typist_cookie, 1, 1, example_data_entry(None)).await;
 
     // claim the data entry and expect 409 Conflict
     let url = format!("http://{addr}/api/polling_stations/1/data_entries/1/claim");
     let response = reqwest::Client::new()
         .post(&url)
-        .header("cookie", cookie)
+        .header("cookie", typist_cookie)
         .send()
         .await
         .unwrap();
@@ -338,14 +338,14 @@ async fn test_polling_station_data_entry_claim_finalised(pool: SqlitePool) {
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
 async fn test_polling_station_data_entry_deletion(pool: SqlitePool) {
     let addr = serve_api(pool).await;
-    let cookie = shared::typist_login(&addr).await;
+    let typist_cookie = shared::typist_login(&addr).await;
     let request_body = example_data_entry(None);
 
     // claim a data entry
     let url = format!("http://{addr}/api/polling_stations/1/data_entries/1/claim");
     let response = reqwest::Client::new()
         .post(&url)
-        .header("cookie", &cookie)
+        .header("cookie", &typist_cookie)
         .send()
         .await
         .unwrap();
@@ -356,7 +356,7 @@ async fn test_polling_station_data_entry_deletion(pool: SqlitePool) {
     let response = reqwest::Client::new()
         .post(&url)
         .json(&request_body)
-        .header("cookie", &cookie)
+        .header("cookie", &typist_cookie)
         .send()
         .await
         .unwrap();
@@ -372,11 +372,11 @@ async fn test_polling_station_data_entry_deletion(pool: SqlitePool) {
             .await
             .unwrap()
     }
-    let response = delete_data_entry(addr, &cookie).await;
+    let response = delete_data_entry(addr, &typist_cookie).await;
     assert_eq!(response.status(), StatusCode::NO_CONTENT);
 
     // we should not be allowed to delete the entry again
-    let response = delete_data_entry(addr, &cookie).await;
+    let response = delete_data_entry(addr, &typist_cookie).await;
     assert_eq!(response.status(), StatusCode::CONFLICT);
 }
 

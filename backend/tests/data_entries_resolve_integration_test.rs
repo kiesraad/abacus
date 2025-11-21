@@ -164,8 +164,8 @@ async fn test_polling_station_data_entry_no_errors(pool: SqlitePool) {
     let data_entry_status: serde_json::Value = res.json().await.unwrap();
     assert_eq!(data_entry_status["status"], "second_entry_not_started");
 
-    let coordinator = shared::coordinator_login(&addr).await;
-    let res = get_data_entry(&addr, &coordinator, 1).await;
+    let coordinator_cookie = shared::coordinator_login(&addr).await;
+    let res = get_data_entry(&addr, &coordinator_cookie, 1).await;
     assert_eq!(res.status(), StatusCode::OK);
 
     let body: serde_json::Value = res.json().await.unwrap();
@@ -186,8 +186,8 @@ async fn test_polling_station_data_entry_resolve_errors_discard(pool: SqlitePool
     let data_entry_status: serde_json::Value = res.json().await.unwrap();
     assert_eq!(data_entry_status["status"], "first_entry_has_errors");
 
-    let coordinator = shared::coordinator_login(&addr).await;
-    let res = resolve_errors(&addr, &coordinator, 1, "discard_first_entry").await;
+    let coordinator_cookie = shared::coordinator_login(&addr).await;
+    let res = resolve_errors(&addr, &coordinator_cookie, 1, "discard_first_entry").await;
     assert_eq!(res.status(), StatusCode::OK);
     let body: serde_json::Value = res.json().await.unwrap();
     assert_eq!(body["status"], "first_entry_not_started");
@@ -227,8 +227,8 @@ async fn test_polling_station_data_entry_resolve_errors_wrong_state(pool: Sqlite
     let typist = shared::typist_login(&addr).await;
     shared::claim_data_entry(&addr, &typist, 1, 1).await;
 
-    let coordinator = shared::coordinator_login(&addr).await;
-    let response = resolve_errors(&addr, &coordinator, 1, "discard_first_entry").await;
+    let coordinator_cookie = shared::coordinator_login(&addr).await;
+    let response = resolve_errors(&addr, &coordinator_cookie, 1, "discard_first_entry").await;
     assert_eq!(response.status(), StatusCode::CONFLICT);
 }
 
@@ -241,8 +241,8 @@ async fn test_polling_station_data_entry_resolve_errors_wrong_action(pool: Sqlit
     let data_entry_status: serde_json::Value = res.json().await.unwrap();
     assert_eq!(data_entry_status["status"], "first_entry_has_errors");
 
-    let coordinator = shared::coordinator_login(&addr).await;
-    let response = resolve_errors(&addr, &coordinator, 1, "make_tea").await;
+    let coordinator_cookie = shared::coordinator_login(&addr).await;
+    let response = resolve_errors(&addr, &coordinator_cookie, 1, "make_tea").await;
     assert_eq!(response.status(), StatusCode::UNPROCESSABLE_ENTITY);
 }
 
@@ -294,8 +294,8 @@ async fn test_polling_station_data_entry_differences_not_found(pool: SqlitePool)
     let data_entry_status: serde_json::Value = res.json().await.unwrap();
     assert_eq!(data_entry_status["status"], "second_entry_not_started");
 
-    let coordinator = shared::coordinator_login(&addr).await;
-    let res = get_resolve_differences(&addr, &coordinator, 1).await;
+    let coordinator_cookie = shared::coordinator_login(&addr).await;
+    let res = get_resolve_differences(&addr, &coordinator_cookie, 1).await;
     assert_eq!(res.status(), StatusCode::NOT_FOUND);
 }
 
@@ -340,8 +340,8 @@ async fn test_polling_station_data_entry_resolve_differences(pool: SqlitePool) {
     let data_entry_status: serde_json::Value = res.json().await.unwrap();
     assert_eq!(data_entry_status["status"], "entries_different");
 
-    let coordinator = shared::coordinator_login(&addr).await;
-    let res = resolve_differences(&addr, &coordinator, 1, "keep_first_entry").await;
+    let coordinator_cookie = shared::coordinator_login(&addr).await;
+    let res = resolve_differences(&addr, &coordinator_cookie, 1, "keep_first_entry").await;
     assert_eq!(res.status(), StatusCode::OK);
     let body: serde_json::Value = res.json().await.unwrap();
     assert_eq!(body["status"], "second_entry_not_started");
@@ -370,13 +370,13 @@ async fn test_polling_station_data_entry_resolve_differences_then_resolve_errors
     let data_entry_status: serde_json::Value = res.json().await.unwrap();
     assert_eq!(data_entry_status["status"], "entries_different");
 
-    let coordinator = shared::coordinator_login(&addr).await;
-    let res = resolve_differences(&addr, &coordinator, 1, "keep_second_entry").await;
+    let coordinator_cookie = shared::coordinator_login(&addr).await;
+    let res = resolve_differences(&addr, &coordinator_cookie, 1, "keep_second_entry").await;
     assert_eq!(res.status(), StatusCode::OK);
     let body: serde_json::Value = res.json().await.unwrap();
     assert_eq!(body["status"], "first_entry_has_errors");
 
-    let res = resolve_errors(&addr, &coordinator, 1, "resume_first_entry").await;
+    let res = resolve_errors(&addr, &coordinator_cookie, 1, "resume_first_entry").await;
     assert_eq!(res.status(), StatusCode::OK);
     let body: serde_json::Value = res.json().await.unwrap();
     assert_eq!(body["status"], "first_entry_in_progress");

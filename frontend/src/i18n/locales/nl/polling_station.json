@@ -2,6 +2,10 @@
   "add_choice": "Hoe wil je stembureaus toevoegen?",
   "address": "Straatnaam en huisnummer",
   "create": "Stembureau toevoegen",
+  "edit_not_allowed_alert": {
+    "title": "Stembureaus kunnen niet aangepast worden",
+    "description": "De invoerfase van de eerste zitting is al gestart. Na het starten van de invoerfase kan alleen een coördinator de lijst met stembureaus nog bewerken."
+  },
   "import": "Stembureaus importeren",
   "import_subtitle": "Importeer stembureaus gemeente {location}",
   "import_instructions": "Kies het bestand met de stembureaus.",

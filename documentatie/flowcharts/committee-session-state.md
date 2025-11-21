@@ -24,8 +24,3 @@ stateDiagram-v2
   DataEntryFinished --> Created: delete last <br/>PS/Inv
   DataEntryFinished --> [*]
 ```
-
-*currently it's only possible to delete polling stations that do not have a data entry,
-deleting data entries and results needs to be implemented
-([#1812](https://github.com/kiesraad/abacus/issues/1812))
-after which the polling station can be deleted

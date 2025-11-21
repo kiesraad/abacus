@@ -3,7 +3,6 @@ use axum::{
     response::IntoResponse,
 };
 use axum_extra::response::Attachment;
-use chrono::Utc;
 use sqlx::{SqliteConnection, SqlitePool};
 use utoipa_axum::{router::OpenApiRouter, routes};
 
@@ -256,7 +255,7 @@ fn download_zip_filename(
     let location = election.location.clone().to_lowercase();
     let mut location_without_whitespace = location.clone();
     location_without_whitespace.retain(|c| c != ' ');
-    let created_at = Utc::now();
+    let created_at = chrono::Local::now();
     slugify_filename(&format!(
         "{}_{}{}_{}_gemeente_{}-{}-{}.zip",
         if committee_session.is_next_session() {

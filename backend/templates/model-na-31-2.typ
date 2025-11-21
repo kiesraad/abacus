@@ -1,4 +1,4 @@
-#import "common/style.typ": conf, document_numbering, default_header
+#import "common/style.typ": conf, default_footer, default_header, document_numbering
 #import "common/scripts.typ": *
 #let input = json("inputs/model-na-31-2.json")
 
@@ -309,3 +309,20 @@ Zo komt het handtekeningen-blad altijd op een losse pagina, ook als het verslag 
 === Extra ondertekening: (niet verplicht)
 
 #stack(spacing: 0.5em, ..range(0, 4).map(_ => textbox[Naam:][Handtekening:]))
+
+#pagebreak(weak: true)
+
+#set page(
+  header: default_header([Bijlagen], location_name),
+  footer: default_footer([
+    Proces-verbaal van een #location_type\
+    Model Na 31-2 centrale stemopneming
+  ]),
+  numbering: (_, _) => []
+)
+
+#title([Bijlage 1])
+
+#subtitle([Verslagen van tellingen van stembureau])
+
+#line(length: 100%)

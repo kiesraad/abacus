@@ -46,7 +46,7 @@ const renderPage = async (sessionNumber: number) => {
   expect(
     await screen.findByRole("heading", {
       level: 1,
-      name: `Steminvoer ${sessionNumber === 1 ? "eerste" : "tweede"} zitting afronden`,
+      name: `Invoer ${sessionNumber === 1 ? "eerste" : "tweede"} zitting afronden`,
     }),
   ).toBeVisible();
   return router;
@@ -135,7 +135,7 @@ describe("FinishDataEntryPage", () => {
     rtlRender(<Providers router={router} />);
 
     // Wait for the page to be loaded
-    expect(await screen.findByRole("heading", { level: 1, name: "Steminvoer eerste zitting afronden" })).toBeVisible();
+    expect(await screen.findByRole("heading", { level: 1, name: "Invoer eerste zitting afronden" })).toBeVisible();
     expect(await screen.findByRole("heading", { level: 2, name: "Invoerfase afronden?" })).toBeVisible();
     expect(await screen.findByRole("link", { name: "In invoerfase blijven" })).toBeVisible();
 

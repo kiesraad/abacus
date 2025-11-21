@@ -484,18 +484,6 @@ async fn test_creation_for_committee_session_with_created_status(pool: SqlitePoo
     let coordinator_cookie = coordinator_login(&addr).await;
     let election_id = 7;
 
-    change_status_committee_session(
-        &addr,
-        &coordinator_cookie,
-        election_id,
-        704,
-        CommitteeSessionStatus::Created,
-    )
-    .await;
-    let committee_session =
-        get_election_committee_session(&addr, &coordinator_cookie, election_id).await;
-    assert_eq!(committee_session.status, CommitteeSessionStatus::Created);
-
     assert_eq!(
         create_investigation(&addr, 741).await.status(),
         StatusCode::CREATED

@@ -92,7 +92,7 @@ describe("ElectionStatusPage", () => {
       expect(screen.queryByText("Alle stembureaus zijn twee keer ingevoerd")).not.toBeInTheDocument();
       expect(screen.queryByRole("button", { name: "Invoerfase afronden" })).not.toBeInTheDocument();
       expect(screen.queryByText("Het invoeren van stemmen is gepauzeerd")).not.toBeInTheDocument();
-      expect(screen.queryByRole("button", { name: "Steminvoer hervatten" })).not.toBeInTheDocument();
+      expect(screen.queryByRole("button", { name: "Invoer hervatten" })).not.toBeInTheDocument();
 
       expect(await screen.findByText("Zitting voorbereiden")).toBeVisible();
 
@@ -124,9 +124,9 @@ describe("ElectionStatusPage", () => {
     expect(screen.queryByText("Alle stembureaus zijn twee keer ingevoerd")).not.toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "Invoerfase afronden" })).not.toBeInTheDocument();
     expect(screen.queryByText("Het invoeren van stemmen is gepauzeerd")).not.toBeInTheDocument();
-    expect(screen.queryByRole("button", { name: "Steminvoer hervatten" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Invoer hervatten" })).not.toBeInTheDocument();
 
-    expect(await screen.findByText("Klaar voor steminvoer")).toBeVisible();
+    expect(await screen.findByText("Klaar voor invoer")).toBeVisible();
     const startLink = screen.getByRole("button", { name: "Starten" });
     expect(startLink).toBeVisible();
 
@@ -153,9 +153,9 @@ describe("ElectionStatusPage", () => {
     expect(screen.queryByText("Alle stembureaus zijn twee keer ingevoerd")).not.toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "Invoerfase afronden" })).not.toBeInTheDocument();
     expect(screen.queryByText("Het invoeren van stemmen is gepauzeerd")).not.toBeInTheDocument();
-    expect(screen.queryByRole("button", { name: "Steminvoer hervatten" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Invoer hervatten" })).not.toBeInTheDocument();
 
-    expect(await screen.findByText("Klaar voor steminvoer")).toBeVisible();
+    expect(await screen.findByText("Klaar voor invoer")).toBeVisible();
     expect(screen.queryByRole("button", { name: "Starten" })).not.toBeInTheDocument();
   });
 
@@ -170,9 +170,10 @@ describe("ElectionStatusPage", () => {
     expect(screen.queryByText("Alle stembureaus zijn twee keer ingevoerd")).not.toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "Invoerfase afronden" })).not.toBeInTheDocument();
     expect(screen.queryByText("Het invoeren van stemmen is gepauzeerd")).not.toBeInTheDocument();
-    expect(screen.queryByRole("button", { name: "Steminvoer hervatten" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Invoer hervatten" })).not.toBeInTheDocument();
 
-    expect(await screen.findByText("Steminvoer bezig")).toBeVisible();
+    const data_entry_in_progress_labels = await screen.findAllByText("Invoer bezig");
+    expect(data_entry_in_progress_labels.length).toBe(2);
     const pauseLink = screen.getByRole("button", { name: "Pauzeren" });
     expect(pauseLink).toBeVisible();
 
@@ -205,9 +206,10 @@ describe("ElectionStatusPage", () => {
     expect(screen.queryByText("Alle stembureaus zijn twee keer ingevoerd")).not.toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "Invoerfase afronden" })).not.toBeInTheDocument();
     expect(screen.queryByText("Het invoeren van stemmen is gepauzeerd")).not.toBeInTheDocument();
-    expect(screen.queryByRole("button", { name: "Steminvoer hervatten" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Invoer hervatten" })).not.toBeInTheDocument();
 
-    expect(await screen.findByText("Steminvoer bezig")).toBeVisible();
+    const data_entry_in_progress_labels = await screen.findAllByText("Invoer bezig");
+    expect(data_entry_in_progress_labels.length).toBe(2);
     expect(screen.queryByRole("button", { name: "Pauzeren" })).not.toBeInTheDocument();
   });
 
@@ -232,7 +234,7 @@ describe("ElectionStatusPage", () => {
 
     // Test that the data entry paused alert doesn't exist
     expect(screen.queryByText("Het invoeren van stemmen is gepauzeerd")).not.toBeInTheDocument();
-    expect(screen.queryByRole("button", { name: "Steminvoer hervatten" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Invoer hervatten" })).not.toBeInTheDocument();
 
     expect(await screen.findByText("Alle stembureaus zijn twee keer ingevoerd")).toBeVisible();
     const finishButton = screen.getByRole("button", { name: "Invoerfase afronden" });
@@ -258,7 +260,7 @@ describe("ElectionStatusPage", () => {
     expect(screen.queryByText("Alle stembureaus zijn twee keer ingevoerd")).not.toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "Invoerfase afronden" })).not.toBeInTheDocument();
     expect(screen.queryByText("Het invoeren van stemmen is gepauzeerd")).not.toBeInTheDocument();
-    expect(screen.queryByRole("button", { name: "Steminvoer hervatten" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Invoer hervatten" })).not.toBeInTheDocument();
   });
 
   test("Finish input alert visible when data entry has finished and data entry is paused for coordinator", async () => {
@@ -288,7 +290,7 @@ describe("ElectionStatusPage", () => {
     await renderPage();
 
     expect(screen.queryByText("Het invoeren van stemmen is gepauzeerd")).not.toBeInTheDocument();
-    expect(screen.queryByRole("button", { name: "Steminvoer hervatten" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Invoer hervatten" })).not.toBeInTheDocument();
     expect(await screen.findByText("Alle stembureaus zijn twee keer ingevoerd")).toBeVisible();
     const finishButton = screen.getByRole("button", { name: "Invoerfase afronden" });
     expect(finishButton).toBeVisible();
@@ -315,7 +317,7 @@ describe("ElectionStatusPage", () => {
     expect(screen.queryByText("Alle stembureaus zijn twee keer ingevoerd")).not.toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "Invoerfase afronden" })).not.toBeInTheDocument();
     expect(await screen.findByText("Het invoeren van stemmen is gepauzeerd")).toBeVisible();
-    const resumeButton = screen.getByRole("button", { name: "Steminvoer hervatten" });
+    const resumeButton = screen.getByRole("button", { name: "Invoer hervatten" });
     expect(resumeButton).toBeVisible();
 
     await user.click(resumeButton);
@@ -323,7 +325,7 @@ describe("ElectionStatusPage", () => {
     expect(statusChange).toHaveBeenCalledWith({ status: "data_entry_in_progress" });
     expect(navigate).not.toHaveBeenCalled();
 
-    expect(await screen.findByText("Steminvoer gepauzeerd")).toBeVisible();
+    expect(await screen.findByText("Invoer gepauzeerd")).toBeVisible();
     const resumeLink = screen.getByRole("button", { name: "Hervatten" });
     expect(resumeLink).toBeVisible();
 
@@ -349,9 +351,9 @@ describe("ElectionStatusPage", () => {
     expect(screen.queryByText("Alle stembureaus zijn twee keer ingevoerd")).not.toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "Invoerfase afronden" })).not.toBeInTheDocument();
     expect(screen.queryByText("Het invoeren van stemmen is gepauzeerd")).not.toBeInTheDocument();
-    expect(screen.queryByRole("button", { name: "Steminvoer hervatten" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Invoer hervatten" })).not.toBeInTheDocument();
 
-    expect(await screen.findByText("Steminvoer gepauzeerd")).toBeVisible();
+    expect(await screen.findByText("Invoer gepauzeerd")).toBeVisible();
     expect(screen.queryByRole("button", { name: "Hervatten" })).not.toBeInTheDocument();
   });
 
@@ -380,9 +382,9 @@ describe("ElectionStatusPage", () => {
       expect(screen.queryByText("Alle stembureaus zijn twee keer ingevoerd")).not.toBeInTheDocument();
       expect(screen.queryByRole("button", { name: "Invoerfase afronden" })).not.toBeInTheDocument();
       expect(screen.queryByText("Het invoeren van stemmen is gepauzeerd")).not.toBeInTheDocument();
-      expect(screen.queryByRole("button", { name: "Steminvoer hervatten" })).not.toBeInTheDocument();
+      expect(screen.queryByRole("button", { name: "Invoer hervatten" })).not.toBeInTheDocument();
 
-      expect(await screen.findByText("Steminvoer afgerond")).toBeVisible();
+      expect(await screen.findByText("Invoer afgerond")).toBeVisible();
     },
   );
 
@@ -423,7 +425,7 @@ describe("ElectionStatusPage", () => {
     await renderPage();
 
     expect(await screen.findByText("Het invoeren van stemmen is gepauzeerd")).toBeVisible();
-    const resumeButton = screen.getByRole("button", { name: "Steminvoer hervatten" });
+    const resumeButton = screen.getByRole("button", { name: "Invoer hervatten" });
     expect(resumeButton).toBeVisible();
 
     await user.click(resumeButton);
@@ -440,7 +442,7 @@ describe("ElectionStatusPage", () => {
 
     await renderPage();
 
-    expect(await screen.findByRole("heading", { level: 2, name: "Statusoverzicht steminvoer" })).toBeVisible();
+    expect(await screen.findByRole("heading", { level: 2, name: "Statusoverzicht invoer" })).toBeVisible();
 
     const navigations = screen.getAllByRole("navigation");
     const statusLinks = within(navigations[1]!).getAllByRole("link");

@@ -208,6 +208,15 @@ pub enum EMLImportError {
     NumberOfPollingStationsNotInRange,
     OnlyMunicipalSupported,
     TooManyPoliticalGroups,
+    PoliticalGroupNumbersNotSequential {
+        expected: u32,
+        found: u32,
+    },
+    CandidateNumbersNotSequential {
+        political_group_number: u32,
+        expected: u32,
+        found: u32,
+    },
 }
 
 /// Name and id of the specific contest

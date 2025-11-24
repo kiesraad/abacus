@@ -63,6 +63,7 @@
     "election_number_of_voters": "Aantal kiezers",
     "election_status": "Verkiezingsstatus",
     "event_type": "Gebeurtenis",
+    "file_created_at": "Aangemaakt op",
     "file_id": "Bestands-ID",
     "file_mime_type": "Bestandstype",
     "file_name": "Bestandsnaam",

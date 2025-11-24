@@ -259,6 +259,7 @@ mod tests {
             },
             files,
         };
+        use chrono::Utc;
         use sqlx::{SqliteConnection, SqlitePool};
         use std::net::Ipv4Addr;
 
@@ -268,6 +269,7 @@ mod tests {
                 "filename.txt".into(),
                 &[97, 98, 97, 99, 117, 115, 0],
                 "text/plain".into(),
+                Utc::now(),
             )
             .await?;
             Ok(file.id)

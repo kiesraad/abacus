@@ -855,6 +855,7 @@ export interface ExtraInvestigation {
 }
 
 export interface FileDetails {
+  file_created_at: string;
   file_id: number;
   file_mime_type: string;
   file_name: string;

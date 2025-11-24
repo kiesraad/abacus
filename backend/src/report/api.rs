@@ -3,6 +3,7 @@ use axum::{
     response::IntoResponse,
 };
 use axum_extra::response::Attachment;
+use chrono::{DateTime, Local};
 use sqlx::{SqliteConnection, SqlitePool};
 use utoipa_axum::{router::OpenApiRouter, routes};
 
@@ -52,13 +53,14 @@ struct ResultsInput {
     summary: ElectionSummary,
     previous_summary: Option<ElectionSummary>,
     previous_committee_session: Option<CommitteeSession>,
-    creation_date_time: chrono::DateTime<chrono::Local>,
+    created_at: DateTime<Local>,
 }
 
 impl ResultsInput {
     async fn new(
         conn: &mut SqliteConnection,
         committee_session_id: u32,
+        created_at: DateTime<Local>,
     ) -> Result<ResultsInput, APIError> {
         let committee_session =
             crate::committee_session::repository::get(conn, committee_session_id).await?;
@@ -110,7 +112,7 @@ impl ResultsInput {
             committee_session,
             previous_summary,
             summary: ElectionSummary::from_results(&election, &results)?,
-            creation_date_time: chrono::Local::now(),
+            created_at,
             election,
             polling_stations,
             investigations,
@@ -124,7 +126,7 @@ impl ResultsInput {
             &self.election,
             &self.results,
             &self.summary,
-            &self.creation_date_time,
+            &self.created_at,
         )
     }
 
@@ -159,10 +161,7 @@ impl ResultsInput {
 
     fn into_pdf_file_models(self, xml_hash: impl Into<String>) -> Result<PdfModelList, APIError> {
         let hash = xml_hash.into();
-        let creation_date_time = self
-            .creation_date_time
-            .format(DEFAULT_DATE_TIME_FORMAT)
-            .to_string();
+        let creation_date_time = self.created_at.format(DEFAULT_DATE_TIME_FORMAT).to_string();
 
         let overview_pdf = if let Some(overview_filename) = self.overview_pdf_filename() {
             Some(
@@ -250,12 +249,12 @@ struct PdfModelList {
 fn download_zip_filename(
     election: &ElectionWithPoliticalGroups,
     committee_session: &CommitteeSession,
+    created_at: DateTime<Local>,
 ) -> String {
     use chrono::Datelike;
     let location = election.location.clone().to_lowercase();
     let mut location_without_whitespace = location.clone();
     location_without_whitespace.retain(|c| c != ' ');
-    let created_at = chrono::Local::now();
     slugify_filename(&format!(
         "{}_{}{}_{}_gemeente_{}-{}-{}.zip",
         if committee_session.is_next_session() {
@@ -288,7 +287,7 @@ async fn generate_and_save_files(
     pool: &SqlitePool,
     audit_service: AuditService,
     committee_session_id: u32,
-) -> Result<(Option<File>, Option<File>, Option<File>), APIError> {
+) -> Result<(Option<File>, Option<File>, Option<File>, DateTime<Local>), APIError> {
     let mut conn = pool.acquire().await?;
     let committee_session =
         crate::committee_session::repository::get(&mut conn, committee_session_id).await?;
@@ -311,6 +310,7 @@ async fn generate_and_save_files(
         ));
     }
 
+    let mut created_at = Local::now();
     let mut eml_file: Option<File> = None;
     let mut pdf_file: Option<File> = None;
     let mut overview_pdf_file: Option<File> = None;
@@ -318,14 +318,17 @@ async fn generate_and_save_files(
     // Check if files exist, if so, get files from database
     if let Some(eml_id) = committee_session.results_eml {
         let file = get_file(&mut conn, eml_id).await?;
+        created_at = DateTime::from(file.created_at);
         eml_file = Some(file);
     }
     if let Some(pdf_id) = committee_session.results_pdf {
         let file = get_file(&mut conn, pdf_id).await?;
+        created_at = DateTime::from(file.created_at);
         pdf_file = Some(file);
     }
     if let Some(overview_pdf_id) = committee_session.overview_pdf {
         let file = get_file(&mut conn, overview_pdf_id).await?;
+        created_at = DateTime::from(file.created_at);
         overview_pdf_file = Some(file);
     }
     drop(conn);
@@ -343,9 +346,10 @@ async fn generate_and_save_files(
 
     // If one of the files doesn't exist, generate all and save them to the database
     if generate_files {
+        created_at = Local::now();
         let mut tx = pool.begin_immediate().await?;
 
-        let input = ResultsInput::new(&mut tx, committee_session.id).await?;
+        let input = ResultsInput::new(&mut tx, committee_session.id, created_at).await?;
         let xml = input.as_xml();
         let xml_string = xml.to_xml_string()?;
 
@@ -361,6 +365,7 @@ async fn generate_and_save_files(
                 xml_filename,
                 xml_string.as_bytes(),
                 EML_MIME_TYPE.to_string(),
+                DateTime::from(created_at),
             )
             .await?;
 
@@ -373,6 +378,7 @@ async fn generate_and_save_files(
                 pdf_files.results.file_name.clone(),
                 &generate_pdf(pdf_files.results).await?.buffer,
                 PDF_MIME_TYPE.to_string(),
+                DateTime::from(created_at),
             )
             .await?;
 
@@ -391,6 +397,7 @@ async fn generate_and_save_files(
                 overview_pdf.file_name.clone(),
                 &generate_pdf(overview_pdf).await?.buffer,
                 PDF_MIME_TYPE.to_string(),
+                DateTime::from(created_at),
             )
             .await?;
             audit_service
@@ -417,7 +424,7 @@ async fn generate_and_save_files(
         tx.commit().await?;
     }
 
-    Ok((eml_file, pdf_file, overview_pdf_file))
+    Ok((eml_file, pdf_file, overview_pdf_file, created_at))
 }
 
 /// Download a zip containing a PDF for the PV and the EML with election results
@@ -454,11 +461,11 @@ async fn election_download_zip_results(
     let election = crate::election::repository::get(&mut conn, election_id).await?;
     let committee_session =
         crate::committee_session::repository::get(&mut conn, committee_session_id).await?;
-    let (eml_file, pdf_file, overview_file) =
+    let (eml_file, pdf_file, overview_file, created_at) =
         generate_and_save_files(&pool, audit_service, committee_session.id).await?;
     drop(conn);
 
-    let download_zip_filename = download_zip_filename(&election, &committee_session);
+    let download_zip_filename = download_zip_filename(&election, &committee_session, created_at);
 
     let (zip_response, mut zip_writer) = ZipResponse::new(&download_zip_filename);
 
@@ -517,7 +524,7 @@ async fn election_download_pdf_results(
     audit_service: AuditService,
     Path((_election_id, committee_session_id)): Path<(u32, u32)>,
 ) -> Result<Attachment<Vec<u8>>, APIError> {
-    let (_, pdf_file, _) =
+    let (_, pdf_file, _, _) =
         generate_and_save_files(&pool, audit_service, committee_session_id).await?;
 
     let pdf_file = pdf_file.ok_or(APIError::BadRequest(
@@ -544,7 +551,7 @@ mod tests {
 
         // Files should be generated exactly once
         for _ in 1..=2 {
-            let (eml, pdf, overview) = generate_and_save_files(&pool, audit_service.clone(), 5)
+            let (eml, pdf, overview, _) = generate_and_save_files(&pool, audit_service.clone(), 5)
                 .await
                 .expect("should return files");
             let eml = eml.expect("should have generated eml");
@@ -570,9 +577,10 @@ mod tests {
 
         // Files should be generated exactly once
         for _ in 1..=2 {
-            let (eml, pdf, overview) = generate_and_save_files(&pool, audit_service.clone(), 703)
-                .await
-                .expect("should return files");
+            let (eml, pdf, overview, _) =
+                generate_and_save_files(&pool, audit_service.clone(), 703)
+                    .await
+                    .expect("should return files");
 
             let eml = eml.expect("should have generated eml");
             let pdf = pdf.expect("should have generated pdf");
@@ -605,9 +613,10 @@ mod tests {
 
         // File should be generated exactly once
         for _ in 1..=2 {
-            let (eml, pdf, overview) = generate_and_save_files(&pool, audit_service.clone(), 703)
-                .await
-                .expect("should return files");
+            let (eml, pdf, overview, _) =
+                generate_and_save_files(&pool, audit_service.clone(), 703)
+                    .await
+                    .expect("should return files");
 
             // No EML and no model PDF should be generated at all
             assert_eq!(eml, None);

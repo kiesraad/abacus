@@ -1,3 +1,4 @@
+use chrono::{DateTime, Utc};
 use sqlx::{SqliteConnection, query_as};
 
 use super::File;
@@ -11,7 +12,8 @@ pub async fn get_file(conn: &mut SqliteConnection, id: u32) -> Result<File, sqlx
             id AS "id: u32",
             data,
             name,
-            mime_type
+            mime_type,
+            created_at AS "created_at: _"
         FROM files
         WHERE id = $1
         "#,
@@ -27,6 +29,7 @@ pub async fn create_file(
     filename: String,
     data: &[u8],
     mime_type: String,
+    created_at: DateTime<Utc>,
 ) -> Result<File, sqlx::Error> {
     query_as!(
         File,
@@ -34,17 +37,20 @@ pub async fn create_file(
         INSERT INTO files (
             data,
             name,
-            mime_type
-        ) VALUES (?, ?, ?)
+            mime_type,
+            created_at
+        ) VALUES (?, ?, ?, ?)
         RETURNING
             id AS "id: u32",
             data,
             name,
-            mime_type
+            mime_type,
+            created_at AS "created_at: _"
         "#,
         data,
         filename,
-        mime_type
+        mime_type,
+        created_at
     )
     .fetch_one(conn)
     .await
@@ -57,7 +63,7 @@ pub async fn delete_file(
 ) -> Result<Option<File>, sqlx::Error> {
     query_as!(
         File,
-        r#"DELETE FROM files WHERE id = ? RETURNING id AS "id: u32", data, name, mime_type "#,
+        r#"DELETE FROM files WHERE id = ? RETURNING id AS "id: u32", data, name, mime_type, created_at AS "created_at: _" "#,
         id
     )
     .fetch_optional(conn)

@@ -5933,9 +5933,13 @@
           "file_id",
           "file_name",
           "file_mime_type",
-          "file_size_bytes"
+          "file_size_bytes",
+          "file_created_at"
         ],
         "properties": {
+          "file_created_at": {
+            "type": "string"
+          },
           "file_id": {
             "type": "integer",
             "format": "int32",

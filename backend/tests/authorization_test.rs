@@ -128,11 +128,10 @@ async fn test_route_authorization(pool: SqlitePool) {
         }
     }
 
-    if !failures.is_empty() {
-        eprintln!("\n=== Authorization test failures ===");
-        for f in &failures {
-            eprintln!("{f}");
-        }
-        panic!("-> {} authorization checks failed", failures.len());
-    }
+    assert!(
+        failures.is_empty(),
+        "Authorization test failures ({}):\n{}",
+        failures.len(),
+        failures.join("\n")
+    );
 }

@@ -323,6 +323,6 @@ Zo komt het handtekeningen-blad altijd op een losse pagina, ook als het verslag 
 
 #title([Bijlage 1])
 
-#subtitle([Verslagen van tellingen van stembureau])
+#subtitle([Verslagen van tellingen van stembureaus])
 
 #line(length: 100%)

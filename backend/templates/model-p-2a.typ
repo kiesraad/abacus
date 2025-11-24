@@ -162,9 +162,9 @@ Zo komt het handtekeningen-blad altijd op een losse pagina, ook als het verslag 
 
 #textbox[Datum en tijd:][Plaats:]
 
-== Verplicht: voorzitter en #is_municipality[twee][vier] leden van het stembureau
+== Verplicht: voorzitter en #is_municipality[twee][vier] leden van het #location_type
 
-=== Voorzitter van het gemeentelijk stembureau:
+=== Voorzitter van het #location_type:
 
 #textbox[Naam:][Handtekening:]
 
@@ -172,7 +172,7 @@ Zo komt het handtekeningen-blad altijd op een losse pagina, ook als het verslag 
 
 #stack(spacing: 0.5em, ..range(0, is_municipality(2, 4)).map(_ => textbox[Naam:][Handtekening:]))
 
-== Ondertekening door andere aanwezige leden van het stembureau
+== Ondertekening door andere aanwezige leden van het #location_type
 
 === Extra ondertekening: (niet verplicht)
 

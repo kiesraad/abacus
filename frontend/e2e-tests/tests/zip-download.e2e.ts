@@ -33,7 +33,7 @@ test.describe("election results zip", () => {
 
     const download = await downloadPromise;
 
-    expect(download.suggestedFilename()).toMatch(/definitieve-documenten_gr2022_test_gemeente_test-\d+-\d+.zip/);
+    expect(download.suggestedFilename()).toMatch(/definitieve-documenten_gr2022_test_gemeente_test-\d{8}-\d{6}.zip/);
     expect((await stat(await download.path())).size).toBeGreaterThan(1024);
   });
 });

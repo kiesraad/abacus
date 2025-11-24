@@ -14,7 +14,7 @@ import { t } from "@/i18n/translate";
 import { PollingStation } from "@/types/generated/openapi";
 
 import { usePollingStationGet } from "../hooks/usePollingStationGet";
-import { isPollingStationUpdateAllowed } from "../utils/checks";
+import { isPollingStationCreateAndUpdateAllowed } from "../utils/checks";
 import { PollingStationAlert } from "./PollingStationAlert";
 import { PollingStationDeleteModal } from "./PollingStationDeleteModal";
 import { PollingStationForm } from "./PollingStationForm";
@@ -81,7 +81,7 @@ export function PollingStationUpdatePage() {
     }
   }, [error]);
 
-  if (!isPollingStationUpdateAllowed(isCoordinator, isAdministrator, currentCommitteeSession.status)) {
+  if (!isPollingStationCreateAndUpdateAllowed(isCoordinator, isAdministrator, currentCommitteeSession.status)) {
     return <Navigate to={parentUrl} replace />;
   } else {
     return (

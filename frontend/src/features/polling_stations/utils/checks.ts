@@ -1,6 +1,6 @@
 import { CommitteeSessionStatus } from "@/types/generated/openapi";
 
-export function isPollingStationUpdateAllowed(
+export function isPollingStationCreateAndUpdateAllowed(
   isCoordinator: boolean,
   isAdministrator: boolean,
   currentCommitteeSessionStatus: CommitteeSessionStatus,

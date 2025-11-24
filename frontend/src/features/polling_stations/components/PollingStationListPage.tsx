@@ -11,7 +11,7 @@ import { useUserRole } from "@/hooks/user/useUserRole";
 import { t } from "@/i18n/translate";
 
 import { usePollingStationListRequest } from "../hooks/usePollingStationListRequest";
-import { isPollingStationUpdateAllowed } from "../utils/checks";
+import { isPollingStationCreateAndUpdateAllowed } from "../utils/checks";
 
 export function PollingStationListPage() {
   const { isAdministrator, isCoordinator } = useUserRole();
@@ -27,7 +27,11 @@ export function PollingStationListPage() {
   }
 
   const data = requestState.data;
-  const updateAllowed = isPollingStationUpdateAllowed(isCoordinator, isAdministrator, currentCommitteeSession.status);
+  const createAndUpdateAllowed = isPollingStationCreateAndUpdateAllowed(
+    isCoordinator,
+    isAdministrator,
+    currentCommitteeSession.status,
+  );
 
   const labelForPollingStationType = {
     FixedLocation: t("polling_station.type.FixedLocation"),
@@ -46,7 +50,7 @@ export function PollingStationListPage() {
 
       <Messages />
 
-      {!updateAllowed && (
+      {!createAndUpdateAllowed && (
         <Alert type="notify">
           <strong className="heading-md">{t("polling_station.edit_not_allowed_alert.title")}</strong>
           <p>{t("polling_station.edit_not_allowed_alert.description")}</p>
@@ -72,7 +76,7 @@ export function PollingStationListPage() {
           </article>
         ) : (
           <article>
-            {updateAllowed && (
+            {createAndUpdateAllowed && (
               <Toolbar>
                 <Button.Link variant="secondary" size="sm" to="./create">
                   <IconPlus /> {t("polling_station.create")}
@@ -88,7 +92,7 @@ export function PollingStationListPage() {
               </Table.Header>
               <Table.Body className="fs-md">
                 {data.polling_stations.map((station) =>
-                  updateAllowed ? (
+                  createAndUpdateAllowed ? (
                     <Table.LinkRow key={station.id} to={`${station.id}/update`}>
                       <Table.NumberCell>{station.number}</Table.NumberCell>
                       <Table.Cell className="break-word">{station.name}</Table.Cell>

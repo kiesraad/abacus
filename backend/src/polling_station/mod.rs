@@ -5,7 +5,7 @@ use axum::{
     response::{IntoResponse, Response},
 };
 use serde::{Deserialize, Serialize};
-use sqlx::{Connection, SqlitePool};
+use sqlx::{Connection, SqliteConnection, SqlitePool};
 use utoipa::ToSchema;
 use utoipa_axum::{router::OpenApiRouter, routes};
 
@@ -13,8 +13,9 @@ pub use self::structs::*;
 use crate::{
     APIError, AppState, ErrorResponse, SqlitePoolExt,
     audit_log::{AuditEvent, AuditService, PollingStationImportDetails},
-    authentication::{AdminOrCoordinator, User},
+    authentication::{AdminOrCoordinator, User, error::AuthenticationError},
     committee_session::{
+        CommitteeSession,
         repository::get_election_committee_session,
         status::{CommitteeSessionStatus, change_committee_session_status},
     },
@@ -81,6 +82,23 @@ async fn polling_station_list(
     })
 }
 
+pub async fn validate_user_is_allowed_to_perform_action(
+    user: AdminOrCoordinator,
+    committee_session: &CommitteeSession,
+) -> Result<(), APIError> {
+    // Check if the user is allowed to perform the action in this committee session status,
+    // respond with FORBIDDEN otherwise
+    if user.is_coordinator()
+        || (user.is_administrator()
+            && (committee_session.status == CommitteeSessionStatus::Created
+                || committee_session.status == CommitteeSessionStatus::DataEntryNotStarted))
+    {
+        Ok(())
+    } else {
+        Err(AuthenticationError::Forbidden.into())
+    }
+}
+
 /// Create a new [PollingStation]
 #[utoipa::path(
     post,
@@ -99,7 +117,7 @@ async fn polling_station_list(
     ),
 )]
 async fn polling_station_create(
-    _user: AdminOrCoordinator,
+    user: AdminOrCoordinator,
     State(pool): State<SqlitePool>,
     Path(election_id): Path<u32>,
     audit_service: AuditService,
@@ -110,6 +128,8 @@ async fn polling_station_create(
     // Check if the election and a committee session exist, will respond with NOT_FOUND otherwise
     crate::election::repository::get(&mut tx, election_id).await?;
     let committee_session = get_election_committee_session(&mut tx, election_id).await?;
+
+    validate_user_is_allowed_to_perform_action(user, &committee_session).await?;
 
     let polling_station = repository::create(&mut tx, election_id, new_polling_station).await?;
 
@@ -191,7 +211,7 @@ async fn polling_station_get(
     ),
 )]
 async fn polling_station_update(
-    _user: AdminOrCoordinator,
+    user: AdminOrCoordinator,
     State(pool): State<SqlitePool>,
     audit_service: AuditService,
     Path((election_id, polling_station_id)): Path<(u32, u32)>,
@@ -202,6 +222,8 @@ async fn polling_station_update(
     // Check if the election and a committee session exist, will respond with NOT_FOUND otherwise
     crate::election::repository::get(&mut tx, election_id).await?;
     let committee_session = get_election_committee_session(&mut tx, election_id).await?;
+
+    validate_user_is_allowed_to_perform_action(user, &committee_session).await?;
 
     let polling_station = repository::update(
         &mut tx,
@@ -252,7 +274,7 @@ async fn polling_station_update(
     ),
 )]
 async fn polling_station_delete(
-    _user: AdminOrCoordinator,
+    user: AdminOrCoordinator,
     State(pool): State<SqlitePool>,
     audit_service: AuditService,
     Path((election_id, polling_station_id)): Path<(u32, u32)>,
@@ -262,6 +284,8 @@ async fn polling_station_delete(
     // Check if the election and a committee session exist, will respond with NOT_FOUND otherwise
     crate::election::repository::get(&mut tx, election_id).await?;
     let committee_session = get_election_committee_session(&mut tx, election_id).await?;
+
+    validate_user_is_allowed_to_perform_action(user, &committee_session).await?;
 
     let polling_station =
         repository::get_for_election(&mut tx, election_id, polling_station_id).await?;
@@ -349,7 +373,7 @@ pub struct PollingStationsRequest {
 }
 
 pub async fn create_imported_polling_stations(
-    conn: &mut sqlx::SqliteConnection,
+    conn: &mut SqliteConnection,
     audit_service: AuditService,
     election_id: u32,
     polling_stations_request: PollingStationsRequest,
@@ -389,14 +413,6 @@ pub async fn create_imported_polling_stations(
             audit_service,
         )
         .await?;
-    } else if committee_session.status == CommitteeSessionStatus::DataEntryFinished {
-        change_committee_session_status(
-            &mut tx,
-            committee_session.id,
-            CommitteeSessionStatus::DataEntryInProgress,
-            audit_service,
-        )
-        .await?;
     }
 
     tx.commit().await?;
@@ -428,6 +444,18 @@ async fn polling_station_import(
     Json(polling_stations_request): Json<PollingStationsRequest>,
 ) -> Result<(StatusCode, PollingStationListResponse), APIError> {
     let mut tx = pool.begin_immediate().await?;
+
+    // Check if the election and a committee session exist, will respond with NOT_FOUND otherwise
+    crate::election::repository::get(&mut tx, election_id).await?;
+    let committee_session = get_election_committee_session(&mut tx, election_id).await?;
+
+    if !repository::list(&mut tx, committee_session.id)
+        .await?
+        .is_empty()
+    {
+        return Err(AuthenticationError::Forbidden.into());
+    }
+
     let polling_stations: Vec<PollingStation> = create_imported_polling_stations(
         &mut tx,
         audit_service,

@@ -273,41 +273,55 @@ mod tests {
             Ok(file.id)
         }
 
-        #[test(sqlx::test(fixtures(
-            path = "../../fixtures",
-            scripts("election_7_four_sessions")
-        )))]
+        #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_5_with_results"))))]
         async fn test_delete_files_on_resume_no_files(pool: SqlitePool) -> Result<(), APIError> {
             let mut conn = pool.acquire().await.unwrap();
             let audit_service = AuditService::new(None, Some(Ipv4Addr::new(203, 0, 113, 0).into()));
 
-            let session = committee_session::repository::get(&mut conn, 703).await?;
-            assert_eq!(session.status, CommitteeSessionStatus::DataEntryFinished);
-
+            // DataEntryInProgress --> DataEntryFinished
             change_committee_session_status(
                 &mut conn,
-                703,
+                6,
+                CommitteeSessionStatus::DataEntryFinished,
+                audit_service.clone(),
+            )
+            .await?;
+            let session = committee_session::repository::get(&mut conn, 6).await?;
+            assert_eq!(session.status, CommitteeSessionStatus::DataEntryFinished);
+
+            // DataEntryFinished --> DataEntryInProgress
+            change_committee_session_status(
+                &mut conn,
+                6,
                 CommitteeSessionStatus::DataEntryInProgress,
                 audit_service,
             )
             .await?;
+            let session = committee_session::repository::get(&mut conn, 6).await?;
+            assert_eq!(session.status, CommitteeSessionStatus::DataEntryInProgress);
 
+            // No FileDeleted events should be logged
             assert_eq!(
                 list_event_names(&mut conn).await?,
-                ["CommitteeSessionUpdated"]
+                ["CommitteeSessionUpdated", "CommitteeSessionUpdated"]
             );
             Ok(())
         }
 
-        #[test(sqlx::test(fixtures(
-            path = "../../fixtures",
-            scripts("election_7_four_sessions")
-        )))]
+        #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_5_with_results"))))]
         async fn test_delete_files_on_resume_with_files(pool: SqlitePool) -> Result<(), APIError> {
             let mut conn = pool.acquire().await?;
             let audit_service = AuditService::new(None, Some(Ipv4Addr::new(203, 0, 113, 0).into()));
 
-            let session = committee_session::repository::get(&mut conn, 703).await?;
+            // DataEntryInProgress --> DataEntryFinished
+            change_committee_session_status(
+                &mut conn,
+                6,
+                CommitteeSessionStatus::DataEntryFinished,
+                audit_service.clone(),
+            )
+            .await?;
+            let session = committee_session::repository::get(&mut conn, 6).await?;
             assert_eq!(session.status, CommitteeSessionStatus::DataEntryFinished);
 
             let files_update = CommitteeSessionFilesUpdateRequest {
@@ -315,19 +329,23 @@ mod tests {
                 results_pdf: Some(generate_file(&mut conn).await?),
                 overview_pdf: Some(generate_file(&mut conn).await?),
             };
-            committee_session::repository::change_files(&mut conn, 703, files_update).await?;
+            committee_session::repository::change_files(&mut conn, 6, files_update).await?;
 
+            // DataEntryFinished --> DataEntryInProgress
             change_committee_session_status(
                 &mut conn,
-                703,
+                6,
                 CommitteeSessionStatus::DataEntryInProgress,
                 audit_service,
             )
             .await?;
+            let session = committee_session::repository::get(&mut conn, 6).await?;
+            assert_eq!(session.status, CommitteeSessionStatus::DataEntryInProgress);
 
             assert_eq!(
                 list_event_names(&mut conn).await?,
                 [
+                    "CommitteeSessionUpdated",
                     "FileDeleted",
                     "FileDeleted",
                     "FileDeleted",

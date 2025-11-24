@@ -555,7 +555,8 @@ describe("mapResultsToSectionValues", () => {
       total_votes_cast_count: 208,
     };
 
-    const formValues = mapResultsToSectionValues(createVotersAndVotesSection(electionMockData), results);
+    const section = createVotersAndVotesSection("CSOFirstSession", electionMockData);
+    const formValues = mapResultsToSectionValues(section, results);
 
     // Check voters_counts fields
     expect(formValues["voters_counts.poll_card_count"]).toBe("123");
@@ -587,7 +588,8 @@ describe("mapResultsToSectionValues", () => {
       },
     };
 
-    const formValues = mapResultsToSectionValues(differencesSection, results);
+    const section = differencesSection("CSOFirstSession");
+    const formValues = mapResultsToSectionValues(section, results);
     expect(formValues["differences_counts.more_ballots_count"]).toBe("2");
     expect(formValues["differences_counts.fewer_ballots_count"]).toBe("1");
     expect(formValues["differences_counts.compare_votes_cast_admitted_voters.admitted_voters_equal_votes_cast"]).toBe(
@@ -710,8 +712,8 @@ describe("mapResultsToSectionValues", () => {
   test("should handle zero values", () => {
     const results = createBasePollingStationResults();
 
-    const formValues = mapResultsToSectionValues(createVotersAndVotesSection(electionMockData), results);
-
+    const section = createVotersAndVotesSection("CSOFirstSession", electionMockData);
+    const formValues = mapResultsToSectionValues(section, results);
     expect(formValues["voters_counts.poll_card_count"]).toBe("");
     expect(formValues["votes_counts.blank_votes_count"]).toBe("");
   });

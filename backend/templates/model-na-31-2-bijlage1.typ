@@ -87,7 +87,7 @@ Licht hieronder toe wat de reden van het extra onderzoek was
   headers: (
     [Lijstnummer met verschil],
     [Lijsttotaal vastgesteld door het stembureau],
-    [Lijsttotaal vastgesteld door het gemeentelijk stembureau],
+    [Lijsttotaal vastgesteld door het #location_type],
     [Aantal stemmen verschil],
     [
       Toelichting op het telverschil, bijvoorbeeld:

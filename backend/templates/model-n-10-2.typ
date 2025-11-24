@@ -265,7 +265,7 @@ Zo komt het handtekeningen-blad altijd op een losse pagina, ook als het verslag 
 
 #textbox[Naam:][Handtekening:]
 
-=== #is_municipality[Twee][Vier] leden van het #location_type
+=== #is_municipality[Twee][Vier] leden van het stembureau
 
 #stack(spacing: 0.5em, ..range(0, 2).map(_ => textbox[Naam:][Handtekening:]))
 
@@ -273,4 +273,8 @@ Zo komt het handtekeningen-blad altijd op een losse pagina, ook als het verslag 
 
 === Extra ondertekening: (niet verplicht)
 
-#stack(spacing: 0.5em, ..range(0, 4).map(_ => textbox[Naam:][Handtekening:]))
+#stack(spacing: 0.5em, ..range(0, is_municipality(3, 1)).map(_ => textbox[Naam:][Handtekening:]))
+
+#pagebreak(weak: true)
+
+#stack(spacing: 0.5em, ..range(0, 12).map(_ => textbox[Naam:][Handtekening:]))

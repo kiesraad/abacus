@@ -22,7 +22,7 @@ export class ElectionDetailsPgObj {
     this.newSessionButton = page.getByRole("button", { name: "Nieuwe zitting voorbereiden" });
     this.newSessionModalConfirmButton = page.getByRole("button", { name: "Ja, zitting toevoegen" });
     this.investigationsOverviewButton = page.getByRole("button", { name: "Aangevraagde onderzoeken" });
-    this.startDataEntryButton = page.getByRole("button", { name: "Start steminvoer" });
+    this.startDataEntryButton = page.getByRole("button", { name: "Start invoer" });
   }
 
   async fillForm(location: string, date: string, time: string) {

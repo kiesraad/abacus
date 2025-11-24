@@ -63,6 +63,6 @@
   "voters_and_vote_count": "Aantal kiezers en stemmen",
   "warning_data_entry_finished": {
     "title": "Invoerfase al afgerond",
-    "description": "Als je wijzigingen aanbrengt in deze zitting door stembureaus toe te voegen, te bewerken of te verwijderen, wordt de invoerfase heropent. Bij het afronden van de invoerfase wordt een nieuw proces-verbaal gemaakt."
+    "description": "Als je wijzigingen aanbrengt in deze zitting door stembureaus toe te voegen, te bewerken of te verwijderen, wordt de invoerfase heropend. Bij het afronden van de invoerfase wordt een nieuw proces-verbaal gemaakt."
   }
 }

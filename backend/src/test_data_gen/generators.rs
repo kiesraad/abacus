@@ -248,8 +248,8 @@ async fn generate_polling_stations(
             election.id,
             PollingStationRequest {
                 name: super::data::polling_station_name(rng),
-                number: Some(i64::from(i)),
-                number_of_voters: Some(ps_num_voters.into()),
+                number: Some(i),
+                number_of_voters: Some(ps_num_voters),
                 polling_station_type: Some(PollingStationType::FixedLocation),
                 address: super::data::address(rng),
                 postal_code: super::data::postal_code(rng),
@@ -292,13 +292,14 @@ async fn generate_data_entry(
 
             // extract number of voters from polling station, or generate some approx default
             let voters_available = ps.number_of_voters.unwrap_or_else(|| {
-                committee_session.number_of_voters as i64 / polling_stations.len() as i64
+                committee_session.number_of_voters / u32::try_from(polling_stations.len()).expect(
+                    "Failed to convert polling station length to u32 for voter count estimation",
+                )
             });
 
             // number of voters that actually came and voted
-            let turnout = rng.random_range(args.turnout.clone()) as i64;
-            let voters_turned_out = u32::try_from((voters_available * turnout) / 100)
-                .expect("Failed to convert voters turned out to u32");
+            let turnout = rng.random_range(args.turnout.clone());
+            let voters_turned_out = (voters_available * turnout) / 100;
 
             let candidate_slope =
                 rng.random_range(args.candidate_distribution_slope.clone()) as f64 / 1000.0;

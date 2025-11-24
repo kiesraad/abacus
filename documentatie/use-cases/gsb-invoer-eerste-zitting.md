@@ -32,7 +32,9 @@ __Uitbreidingen:__
 
 2-3b. De telling van het stembureau moet worden gecorrigeerd nadat deze al twee keer was ingevoerd:  
 &emsp; 2-3b1. De coördinator GSB verwijdert de invoer van het stembureau.  
-&emsp; 2-3b2. De coördinator GSB laat het stembureau twee keer invoeren.  
+&emsp;&emsp; 2-3b1a. Als een invoer verwijderd wordt dan wordt de status weer teruggezet naar "Werkvoorraad".
+Ook de gegenereerde documenten worden dan verwijderd.  
+&emsp; 2-3b2. De coördinator GSB laat het stembureau twee keer invoeren.
 
 5a. De applicatie stelt vast dat niet voor alle stembureaus resultaten zijn ingevoerd:
 
@@ -82,7 +84,7 @@ __Trigger:__ De coördinator GSB ontvangt een SB PV evt. met corrigendum.
 __Hoofdscenario:__
 
 1. De coördinator GSB geeft het SB PV (DSO: N 10-1 evt. met Na 14-1 versie 1, CSO: Na 31-2 Bijlage 1) aan de eerste invoerder.
-2. (tijdens invoer) De coördinator GSB monitort de voortgang op het statusoverzicht van de steminvoer.
+2. (tijdens invoer) De coördinator GSB monitort de voortgang op het statusoverzicht van de invoer.
 3. [De eerste invoerder voert de resultaten van de telling in.](#de-eerste-of-tweede-invoerder-voert-de-resultaten-van-de-telling-in-zee)
 4. De applicatie stelt vast dat de eerste invoer geen geaccepteerde fouten bevat.
 5. De applicatie stelt vast dat de eerste invoer geen geaccepteerde waarschuwingen bevat.

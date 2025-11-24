@@ -5,7 +5,7 @@ use serde::{Deserialize, Serialize};
 use sqlx::Type;
 use utoipa::ToSchema;
 
-use super::{DataError, ValidationResults, validate_data_entry_status};
+use super::{DataError, ValidateRoot, ValidationResults};
 use crate::{
     data_entry::PollingStationResults, election::ElectionWithPoliticalGroups,
     polling_station::PollingStation,
@@ -339,8 +339,7 @@ impl DataEntryStatus {
                     return Err(DataEntryTransitionError::CannotTransitionUsingDifferentUser);
                 }
 
-                let validation_results =
-                    validate_data_entry_status(&self, polling_station, election)?;
+                let validation_results = self.start_validate(polling_station, election)?;
 
                 if validation_results.has_errors() {
                     Ok(Self::FirstEntryHasErrors(FirstEntryHasErrors {
@@ -383,8 +382,7 @@ impl DataEntryStatus {
                 }
 
                 if state.finalised_first_entry == state.second_entry {
-                    let validation_results =
-                        validate_data_entry_status(&self, polling_station, election)?;
+                    let validation_results = self.start_validate(polling_station, election)?;
 
                     if validation_results.has_errors() {
                         return Err(validation_results.into());
@@ -460,16 +458,8 @@ impl DataEntryStatus {
                     return Err(DataEntryTransitionError::CannotTransitionUsingDifferentUser);
                 }
 
-                let validation_results = validate_data_entry_status(
-                    &Self::FirstEntryInProgress(FirstEntryInProgress {
-                        progress: 100,
-                        first_entry_user_id,
-                        first_entry: finalised_first_entry.clone(),
-                        client_state: Default::default(),
-                    }),
-                    polling_station,
-                    election,
-                )?;
+                let validation_results =
+                    finalised_first_entry.start_validate(polling_station, election)?;
 
                 Ok(DataEntryStatus::SecondEntryNotStarted(
                     SecondEntryNotStarted {
@@ -526,16 +516,9 @@ impl DataEntryStatus {
     ) -> Result<Self, DataEntryTransitionError> {
         match &self {
             DataEntryStatus::EntriesDifferent(state) => {
-                let validation_results = validate_data_entry_status(
-                    &Self::FirstEntryInProgress(FirstEntryInProgress {
-                        progress: 100,
-                        first_entry_user_id: state.first_entry_user_id,
-                        first_entry: state.first_entry.clone(),
-                        client_state: Default::default(),
-                    }),
-                    polling_station,
-                    election,
-                )?;
+                let validation_results = state
+                    .first_entry
+                    .start_validate(polling_station, election)?;
 
                 Ok(Self::SecondEntryNotStarted(SecondEntryNotStarted {
                     first_entry_user_id: state.first_entry_user_id,
@@ -558,16 +541,9 @@ impl DataEntryStatus {
             DataEntryStatus::EntriesDifferent(state) => {
                 // Note that by setting the second entry to the first
                 // entry, we keep the second entry and discard the first entry
-                let validation_results = validate_data_entry_status(
-                    &Self::FirstEntryInProgress(FirstEntryInProgress {
-                        progress: 100,
-                        first_entry_user_id: state.second_entry_user_id,
-                        first_entry: state.second_entry.clone(),
-                        client_state: Default::default(),
-                    }),
-                    polling_station,
-                    election,
-                )?;
+                let validation_results = state
+                    .second_entry
+                    .start_validate(polling_station, election)?;
 
                 if validation_results.has_errors() {
                     Ok(Self::FirstEntryHasErrors(FirstEntryHasErrors {

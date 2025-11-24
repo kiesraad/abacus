@@ -92,6 +92,7 @@ async fn test_committee_session_delete_ok_status_created(pool: SqlitePool) {
 
     let committee_session =
         get_election_committee_session(&addr, &coordinator_cookie, election_id).await;
+    assert_eq!(committee_session.id, 704);
     assert_eq!(committee_session.status, CommitteeSessionStatus::Created);
 
     let url = format!(
@@ -112,6 +113,7 @@ async fn test_committee_session_delete_ok_status_created(pool: SqlitePool) {
 
     let committee_session =
         get_election_committee_session(&addr, &coordinator_cookie, election_id).await;
+    assert_eq!(committee_session.id, 703);
     assert_eq!(
         committee_session.status,
         CommitteeSessionStatus::DataEntryFinished
@@ -791,11 +793,10 @@ async fn test_committee_session_investigations_list_works(pool: SqlitePool) {
     let body: serde_json::Value = response.json().await.unwrap();
     let investigations = body["investigations"].as_array().unwrap();
     assert_eq!(investigations.len(), 1);
-    let map = investigations
-        .iter()
-        .map(|inv| inv["polling_station_id"].as_u64().unwrap())
-        .collect::<Vec<u64>>();
-    assert_eq!(map, vec![721]);
+    assert_eq!(
+        investigations[0]["polling_station_id"].as_u64().unwrap(),
+        721
+    );
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_7_four_sessions", "users"))))]

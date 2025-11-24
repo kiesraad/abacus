@@ -6586,7 +6586,8 @@
           },
           "number_of_voters": {
             "type": "integer",
-            "format": "int64"
+            "format": "int32",
+            "minimum": 0
           },
           "polling_station_type": {
             "$ref": "#/components/schemas/PollingStationType"
@@ -6646,7 +6647,8 @@
           },
           "polling_station_number_of_voters": {
             "type": "integer",
-            "format": "int64"
+            "format": "int32",
+            "minimum": 0
           },
           "polling_station_postal_code": {
             "type": "string"
@@ -6801,11 +6803,13 @@
           },
           "number": {
             "type": "integer",
-            "format": "int64"
+            "format": "int32",
+            "minimum": 0
           },
           "number_of_voters": {
             "type": "integer",
-            "format": "int64"
+            "format": "int32",
+            "minimum": 0
           },
           "polling_station_type": {
             "$ref": "#/components/schemas/PollingStationType"

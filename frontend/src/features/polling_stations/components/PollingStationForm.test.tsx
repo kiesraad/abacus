@@ -97,28 +97,45 @@ describe("PollingStationForm", () => {
       expect(onSaved).not.toHaveBeenCalled();
     });
 
-    test.each([["asd"], ["0"]])(
-      "Validation client error - invalid polling station number: %s",
-      async (pollingStationNumber) => {
-        const onSaved = vi.fn();
-        render(<PollingStationForm electionId={1} onSaved={onSaved} />);
+    test("Validation client error - invalid polling station number: asd", async () => {
+      const onSaved = vi.fn();
+      render(<PollingStationForm electionId={1} onSaved={onSaved} />);
 
-        const user = userEvent.setup();
+      const user = userEvent.setup();
 
-        const inputs = getInputs();
+      const inputs = getInputs();
 
-        await user.type(inputs.number, pollingStationNumber);
+      await user.type(inputs.number, "asd");
 
-        await user.click(screen.getByRole("button", { name: "Opslaan en toevoegen" }));
+      await user.click(screen.getByRole("button", { name: "Opslaan en toevoegen" }));
 
-        await waitFor(() => {
-          expect(inputs.number).toBeInvalid();
-          expect(inputs.number).toHaveAccessibleErrorMessage("Dit is geen getal. Voer een getal in");
-        });
+      await waitFor(() => {
+        expect(inputs.number).toBeInvalid();
+        expect(inputs.number).toHaveAccessibleErrorMessage("Dit is geen getal. Voer een getal in");
+      });
 
-        expect(onSaved).not.toHaveBeenCalled();
-      },
-    );
+      expect(onSaved).not.toHaveBeenCalled();
+    });
+
+    test("Validation client error - invalid polling station number: 0", async () => {
+      const onSaved = vi.fn();
+      render(<PollingStationForm electionId={1} onSaved={onSaved} />);
+
+      const user = userEvent.setup();
+
+      const inputs = getInputs();
+
+      await user.type(inputs.number, "0");
+
+      await user.click(screen.getByRole("button", { name: "Opslaan en toevoegen" }));
+
+      await waitFor(() => {
+        expect(inputs.number).toBeInvalid();
+        expect(inputs.number).toHaveAccessibleErrorMessage("Waarde is te laag");
+      });
+
+      expect(onSaved).not.toHaveBeenCalled();
+    });
 
     test("Validation backend errors", async () => {
       const onSaved = vi.fn();

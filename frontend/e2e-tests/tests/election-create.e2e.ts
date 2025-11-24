@@ -91,7 +91,7 @@ test.describe("Election creation", () => {
     const electionRow = overviewPage.findElectionRowById(election.id);
     await expect(electionRow).toBeVisible();
     await expect(electionRow).toContainText("Gemeenteraad Test 2022");
-    await expect(electionRow).toContainText("Klaar voor steminvoer");
+    await expect(electionRow).toContainText("Klaar voor invoer");
   });
 
   test("it uploads an election file, candidate list but adds polling stations afterwards", async ({ page }) => {
@@ -162,7 +162,7 @@ test.describe("Election creation", () => {
 
     await expect(electionHomePage.header).toBeVisible();
     const session = electionHomePage.getCommitteeSessionCard(1);
-    await expect(session).toContainText("Klaar voor steminvoer");
+    await expect(session).toContainText("Klaar voor invoer");
   });
 
   test("it fails on incorrect hash", async ({ page }) => {
@@ -180,6 +180,24 @@ test.describe("Election creation", () => {
     await expect(checkDefinitionPage.hashInput1).toBeFocused();
     await checkDefinitionPage.inputHash("1234", "abcd");
     await expect(checkDefinitionPage.error).toBeVisible();
+  });
+
+  test("it succeeds on incorrect case", async ({ page }) => {
+    await page.goto("/elections");
+    const overviewPage = new ElectionsOverviewPgObj(page);
+    await overviewPage.create.click();
+
+    // Upload election
+    const uploadElectionDefinitionPage = new UploadElectionDefinitionPgObj(page);
+    await expect(uploadElectionDefinitionPage.header).toBeVisible();
+    await uploadElectionDefinitionPage.uploadFile(eml110a.path);
+
+    // Correct hash, incorrect case
+    const checkDefinitionPage = new CheckElectionDefinitionPgObj(page);
+    await expect(checkDefinitionPage.hashInput1).toBeFocused();
+    await checkDefinitionPage.inputHash("476B", "C0DE");
+    const pollingStationRolePage = new PollingStationRolePgObj(page);
+    await expect(pollingStationRolePage.header).toBeVisible();
   });
 
   test("it fails on valid, but incorrect file", async ({ page }) => {

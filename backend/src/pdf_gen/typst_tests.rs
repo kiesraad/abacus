@@ -193,7 +193,7 @@ fn random_polling_station(
         id_prev_session: random_option(rng, id_prev_session, none_where_possible),
         name: random_string(rng, string_length),
         number: rng.random_range(0..5),
-        number_of_voters: random_option(rng, number_of_voters as i64, none_where_possible),
+        number_of_voters: random_option(rng, number_of_voters, none_where_possible),
         polling_station_type: random_option(rng, polling_station_type, none_where_possible),
         address: random_string(rng, string_length),
         postal_code: random_string(rng, string_length),

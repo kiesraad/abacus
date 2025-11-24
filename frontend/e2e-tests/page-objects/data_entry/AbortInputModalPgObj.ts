@@ -15,6 +15,6 @@ export class AbortInputModal {
       name: "Wat wil je doen met je invoer?",
     });
     this.saveInput = this.modal.getByRole("button", { name: "Invoer bewaren" });
-    this.discardInput = this.modal.getByRole("button", { name: "Niet bewaren" });
+    this.discardInput = this.modal.getByRole("button", { name: "Verwijder invoer" });
   }
 }

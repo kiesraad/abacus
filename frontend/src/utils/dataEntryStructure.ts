@@ -135,8 +135,10 @@ export const differencesSection = (model: DataEntryModel): DataEntrySection => (
         },
         {
           path: "differences_counts.difference_completely_accounted_for.no",
-          label: t("no"),
-          short_label: t("no"),
+          label: t("differences_counts.difference_completely_accounted_for.no_there_is_an_unexplained_difference"),
+          short_label: t(
+            "differences_counts.difference_completely_accounted_for.no_there_is_an_unexplained_difference",
+          ),
         },
       ],
     },

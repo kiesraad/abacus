@@ -34,6 +34,7 @@
       "CSOFirstSession": "<strong>3.3.2</strong> Zijn er tijdens de stemming dingen opgeschreven die het verschil tussen D en H <strong>volledig</strong> verklaren?",
       "CSONextSession": "<strong>2.3.2</strong> Zijn er tijdens de stemming dingen opgeschreven die het verschil tussen D en H <strong>volledig</strong> verklaren?"
     },
-    "short_title": "Verschil tussen D en H volledig verklaard?"
+    "short_title": "Verschil tussen D en H volledig verklaard?",
+    "no_there_is_an_unexplained_difference": "Nee, er is een onverklaard verschil"
   }
 }

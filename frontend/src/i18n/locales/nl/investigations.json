@@ -80,6 +80,6 @@
   "you_cannot_add_another_investigation": "Je hebt voor alle stembureaus al een onderzoek toegevoegd.\nJe kan niet nog een onderzoek toevoegen.",
   "warning_data_entry_finished": {
     "title": "Invoerfase al afgerond",
-    "description": "Als je wijzigingen aanbrengt in deze zitting door onderzoeken toe te voegen, te bewerken of te verwijderen, wordt de invoerfase heropent. Bij het afronden van de invoerfase wordt een nieuw proces-verbaal gemaakt."
+    "description": "Als je wijzigingen aanbrengt in deze zitting door onderzoeken toe te voegen, te bewerken of te verwijderen, wordt de invoerfase heropend. Bij het afronden van de invoerfase wordt een nieuw proces-verbaal gemaakt."
   }
 }

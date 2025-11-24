@@ -2,6 +2,10 @@
   "add_choice": "Hoe wil je stembureaus toevoegen?",
   "address": "Straatnaam en huisnummer",
   "create": "Stembureau toevoegen",
+  "edit_not_allowed_alert": {
+    "title": "Stembureaus kunnen niet aangepast worden",
+    "description": "De invoerfase van de eerste zitting is al gestart. Na het starten van de invoerfase kan alleen een coördinator de lijst met stembureaus nog bewerken."
+  },
   "import": "Stembureaus importeren",
   "import_subtitle": "Importeer stembureaus gemeente {location}",
   "import_instructions": "Kies het bestand met de stembureaus.",
@@ -63,6 +67,6 @@
   "voters_and_vote_count": "Aantal kiezers en stemmen",
   "warning_data_entry_finished": {
     "title": "Invoerfase al afgerond",
-    "description": "Als je wijzigingen aanbrengt in deze zitting door stembureaus toe te voegen, te bewerken of te verwijderen, wordt de invoerfase heropent. Bij het afronden van de invoerfase wordt een nieuw proces-verbaal gemaakt."
+    "description": "Als je wijzigingen aanbrengt in deze zitting door stembureaus toe te voegen, te bewerken of te verwijderen, wordt de invoerfase heropend. Bij het afronden van de invoerfase wordt een nieuw proces-verbaal gemaakt."
   }
 }

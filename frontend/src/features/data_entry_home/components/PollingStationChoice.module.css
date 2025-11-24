@@ -24,7 +24,7 @@
 .message {
   padding: 1rem 1.5rem;
   background-color: var(--bg-gray-darker);
-  height: 4.5rem;
+  min-height: 4.5rem;
   align-content: center;
   font-size: var(--font-size-lg);
   display: inline-flex;

@@ -21,4 +21,4 @@ COPY --from=backend-builder /build/backend/target/release/abacus /usr/local/bin/
 USER 999
 ENTRYPOINT ["/usr/local/bin/abacus"]
 CMD ["--seed-data"]
-EXPOSE 8080
+EXPOSE 80

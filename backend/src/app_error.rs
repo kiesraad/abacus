@@ -8,6 +8,7 @@ pub enum AppError {
     StdError(Box<dyn std::error::Error>),
     // server specific
     PortAlreadyInUse(u16),
+    PermissionDeniedToBindPort(u16),
     // sqlite specifc
     DatabaseBusy(String),
     DatabaseReadOnly(String),
@@ -136,6 +137,12 @@ impl std::fmt::Display for AppError {
             }
             AppError::PortAlreadyInUse(port) => {
                 write!(f, "Port {port} is in use. Is Abacus already running?")
+            }
+            AppError::PermissionDeniedToBindPort(port) => {
+                write!(
+                    f,
+                    "Permission denied to bind to port {port}. On Unix systems, binding to ports below 1024 requires elevated privileges."
+                )
             }
             AppError::StdError(e) => write!(f, "{}", e),
         }

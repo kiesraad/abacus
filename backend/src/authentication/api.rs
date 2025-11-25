@@ -195,6 +195,7 @@ pub struct AccountUpdateRequest {
       (status = 401, description = "Invalid user session", body = ErrorResponse),
       (status = 500, description = "Internal server error", body = ErrorResponse),
   ),
+  security(("cookie_auth" = ["administrator", "coordinator", "typist"])),
 )]
 async fn whoami(user: Option<User>) -> Result<impl IntoResponse, APIError> {
     let user = user.ok_or(AuthenticationError::UserNotFound)?;
@@ -312,6 +313,7 @@ async fn admin_exists(State(pool): State<SqlitePool>) -> Result<StatusCode, APIE
       (status = 400, description = "Bad request", body = ErrorResponse),
       (status = 500, description = "Internal server error", body = ErrorResponse),
   ),
+  security(("cookie_auth" = ["administrator", "coordinator", "typist"])),
 )]
 async fn account_update(
     user: User,

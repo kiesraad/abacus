@@ -67,6 +67,7 @@ pub struct ElectionDetailsResponse {
         (status = 401, description = "Unauthorized", body = ErrorResponse),
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
+    security(("cookie_auth" = ["administrator", "coordinator", "typist"])),
 )]
 pub async fn election_list(
     _user: User,
@@ -97,6 +98,7 @@ pub async fn election_list(
     params(
         ("election_id" = u32, description = "Election database id"),
     ),
+    security(("cookie_auth" = ["administrator", "coordinator", "typist"])),
 )]
 pub async fn election_details(
     _user: User,
@@ -188,6 +190,7 @@ pub struct ElectionDefinitionValidateResponse {
         (status = 403, description = "Forbidden", body = ErrorResponse),
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
+    security(("cookie_auth" = ["administrator"])),
 )]
 pub async fn election_import_validate(
     _user: Admin,
@@ -281,6 +284,7 @@ pub struct ElectionAndCandidatesDefinitionImportRequest {
         (status = 403, description = "Forbidden", body = ErrorResponse),
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
+    security(("cookie_auth" = ["administrator"])),
 )]
 pub async fn election_import(
     _user: Admin,

@@ -405,6 +405,51 @@ async fn test_election_zip_download_invalid_committee_session_state(pool: Sqlite
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
+async fn test_election_n_10_2_download(pool: SqlitePool) {
+    let addr = serve_api(pool).await;
+    let coordinator_cookie = shared::coordinator_login(&addr).await;
+
+    let url = format!("http://{addr}/api/elections/2/download_n_10_2");
+    let response = reqwest::Client::new()
+        .get(&url)
+        .header("cookie", coordinator_cookie)
+        .send()
+        .await
+        .unwrap();
+    let content_disposition = response.headers().get("Content-Disposition");
+    let content_type = response.headers().get("Content-Type");
+
+    assert_eq!(response.status(), StatusCode::OK);
+    assert_eq!(content_type.unwrap(), "application/zip");
+
+    let content_disposition_string = content_disposition.unwrap().to_str().unwrap();
+    assert_eq!(&content_disposition_string[..21], "attachment; filename=");
+    assert_eq!(
+        &content_disposition_string[21..],
+        "\"GR2024_Heemdamseburg_n_10_2.zip\""
+    );
+
+    let bytes = response.bytes().await.unwrap();
+    assert!(bytes.len() > 1024);
+
+    let archive = ZipFileReader::new(bytes.to_vec()).await.unwrap();
+
+    let reader = archive.reader_with_entry(0).await.unwrap();
+    assert_eq!(
+        reader.entry().filename().as_str().unwrap(),
+        "Model_N_10_2_GR2024_Stembureau_33.pdf"
+    );
+    assert!(reader.entry().uncompressed_size() > 1024);
+
+    let reader = archive.reader_with_entry(1).await.unwrap();
+    assert_eq!(
+        reader.entry().filename().as_str().unwrap(),
+        "Model_N_10_2_GR2024_Stembureau_34.pdf"
+    );
+    assert!(reader.entry().uncompressed_size() > 1024);
+}
+
+#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
 async fn test_election_na_31_2_bijlage1_download(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let coordinator_cookie = shared::coordinator_login(&addr).await;
@@ -449,12 +494,12 @@ async fn test_election_na_31_2_bijlage1_download(pool: SqlitePool) {
     assert!(reader.entry().uncompressed_size() > 1024);
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
-async fn test_election_n_10_2_download(pool: SqlitePool) {
+#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_5_with_results", "users"))))]
+async fn test_election_na_31_2_inlegvel_download(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let coordinator_cookie = shared::coordinator_login(&addr).await;
 
-    let url = format!("http://{addr}/api/elections/2/download_n_10_2");
+    let url = format!("http://{addr}/api/elections/5/download_na_31_2_inlegvel");
     let response = reqwest::Client::new()
         .get(&url)
         .header("cookie", coordinator_cookie)
@@ -465,31 +510,15 @@ async fn test_election_n_10_2_download(pool: SqlitePool) {
     let content_type = response.headers().get("Content-Type");
 
     assert_eq!(response.status(), StatusCode::OK);
-    assert_eq!(content_type.unwrap(), "application/zip");
+    assert_eq!(content_type.unwrap(), "application/pdf");
 
     let content_disposition_string = content_disposition.unwrap().to_str().unwrap();
     assert_eq!(&content_disposition_string[..21], "attachment; filename=");
     assert_eq!(
         &content_disposition_string[21..],
-        "\"GR2024_Heemdamseburg_n_10_2.zip\""
+        "\"Model_Na_31_2_Inlegvel.pdf\""
     );
 
     let bytes = response.bytes().await.unwrap();
     assert!(bytes.len() > 1024);
-
-    let archive = ZipFileReader::new(bytes.to_vec()).await.unwrap();
-
-    let reader = archive.reader_with_entry(0).await.unwrap();
-    assert_eq!(
-        reader.entry().filename().as_str().unwrap(),
-        "Model_N_10_2_GR2024_Stembureau_33.pdf"
-    );
-    assert!(reader.entry().uncompressed_size() > 1024);
-
-    let reader = archive.reader_with_entry(1).await.unwrap();
-    assert_eq!(
-        reader.entry().filename().as_str().unwrap(),
-        "Model_N_10_2_GR2024_Stembureau_34.pdf"
-    );
-    assert!(reader.entry().uncompressed_size() > 1024);
 }

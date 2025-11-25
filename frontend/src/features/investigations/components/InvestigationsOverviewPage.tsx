@@ -98,7 +98,7 @@ export function InvestigationsOverviewPage() {
             <p>{t("investigations.all_investigations_finished_description")}</p>
             <Button
               variant="primary"
-              size="sm"
+              size="md"
               onClick={() => {
                 finishDataEntry();
               }}

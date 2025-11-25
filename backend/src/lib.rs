@@ -21,7 +21,13 @@ use tower_http::{
     trace::{self, TraceLayer},
 };
 use tracing::{Level, info, trace, warn};
-use utoipa::OpenApi;
+use utoipa::{
+    Modify, OpenApi,
+    openapi::{
+        path::Operation,
+        security::{ApiKey, ApiKeyValue, SecurityScheme},
+    },
+};
 use utoipa_axum::router::OpenApiRouter;
 #[cfg(feature = "openapi")]
 use utoipa_swagger_ui::SwaggerUi;
@@ -52,6 +58,7 @@ pub use app_error::AppError;
 pub use error::{APIError, ErrorResponse};
 
 use crate::app_error::{DatabaseErrorWithPath, DatabaseMigrationErrorWithPath};
+use crate::authentication::SECURITY_SCHEME_NAME;
 
 /// Maximum size of the request body in megabytes.
 pub const MAX_BODY_SIZE_MB: usize = 12;
@@ -78,11 +85,80 @@ pub struct AppState {
     airgap_detection: AirgapDetection,
 }
 
+pub fn get_scopes_from_operation(operation: &Operation) -> Option<Vec<String>> {
+    let security_reqs = operation.security.as_ref()?;
+
+    let scopes: Vec<String> = security_reqs
+        .iter()
+        .filter_map(|req| {
+            // Serialization to access private BTreeMap values of SecurityRequirement
+            // Proposed change upstream: https://github.com/juhaku/utoipa/pull/1494
+            serde_json::to_value(req).ok().and_then(|v| {
+                v.as_object()?
+                    .get(SECURITY_SCHEME_NAME)?
+                    .as_array()
+                    .cloned()
+            })
+        })
+        .flat_map(|arr| arr.into_iter().filter_map(|v| v.as_str().map(String::from)))
+        .collect();
+
+    Some(scopes)
+}
+
 pub fn openapi_router() -> OpenApiRouter<AppState> {
     #[derive(utoipa::OpenApi)]
     struct ApiDoc;
 
-    let router = OpenApiRouter::with_openapi(ApiDoc::openapi())
+    struct SecurityAddon;
+
+    impl utoipa::Modify for SecurityAddon {
+        fn modify(&self, openapi: &mut utoipa::openapi::OpenApi) {
+            if let Some(components) = openapi.components.as_mut() {
+                components.add_security_scheme(
+                    "cookie_auth",
+                    SecurityScheme::ApiKey(ApiKey::Cookie(ApiKeyValue::new(String::from(
+                        crate::authentication::SESSION_COOKIE_NAME,
+                    )))),
+                )
+            }
+
+            // Add scopes to operation summaries
+            for path_item in openapi.paths.paths.values_mut() {
+                for operation in [
+                    &mut path_item.get,
+                    &mut path_item.post,
+                    &mut path_item.put,
+                    &mut path_item.delete,
+                    &mut path_item.patch,
+                ]
+                .into_iter()
+                .flatten()
+                {
+                    let scopes = get_scopes_from_operation(operation);
+
+                    if let Some(scopes) = scopes {
+                        let extra = scopes.join(", ");
+                        operation.summary = Some(match &operation.summary {
+                            Some(existing) => format!("{} ({})", existing, extra),
+                            None => extra,
+                        });
+                    }
+                }
+            }
+        }
+    }
+
+    let mut router = build_routes(ApiDoc::openapi());
+
+    // Modify schema to add security schemes after building routes
+    SecurityAddon.modify(router.get_openapi_mut());
+
+    router
+}
+
+fn build_routes(doc: utoipa::openapi::OpenApi) -> OpenApiRouter<AppState> {
+    let router = OpenApiRouter::with_openapi(doc)
         .merge(audit_log::router())
         .merge(authentication::router())
         .merge(authentication::user_router())

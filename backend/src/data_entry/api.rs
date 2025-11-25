@@ -261,6 +261,7 @@ impl ResolveDifferencesAction {
         ("polling_station_id" = u32, description = "Polling station database id"),
         ("entry_number" = u8, description = "Data entry number (first or second data entry)"),
     ),
+    security(("cookie_auth" = ["typist"])),
 )]
 async fn polling_station_data_entry_claim(
     user: Typist,
@@ -388,6 +389,7 @@ impl IntoResponse for SaveDataEntryResponse {
         ("polling_station_id" = u32, description = "Polling station database id"),
         ("entry_number" = u8, description = "Data entry number (first or second data entry)"),
     ),
+    security(("cookie_auth" = ["typist"])),
 )]
 async fn polling_station_data_entry_save(
     user: Typist,
@@ -457,6 +459,7 @@ async fn polling_station_data_entry_save(
         ("polling_station_id" = u32, description = "Polling station database id"),
         ("entry_number" = u8, description = "Data entry number (first or second data entry)"),
     ),
+    security(("cookie_auth" = ["typist"])),
 )]
 async fn polling_station_data_entry_delete(
     user: Typist,
@@ -523,6 +526,7 @@ async fn polling_station_data_entry_delete(
         ("polling_station_id" = u32, description = "Polling station database id"),
         ("entry_number" = u8, description = "Data entry number (first or second data entry)"),
     ),
+    security(("cookie_auth" = ["typist"])),
 )]
 async fn polling_station_data_entry_finalise(
     user: Typist,
@@ -630,6 +634,7 @@ impl ResolveErrorsAction {
     params(
         ("polling_station_id" = u32, description = "Polling station database id"),
     ),
+    security(("cookie_auth" = ["coordinator"])),
 )]
 async fn polling_station_data_entries_and_result_delete(
     _user: Coordinator,
@@ -715,6 +720,7 @@ pub struct DataEntryGetResponse {
     params(
         ("polling_station_id" = u32, description = "Polling station database id"),
     ),
+    security(("cookie_auth" = ["coordinator"])),
 )]
 async fn polling_station_data_entry_get(
     user: Coordinator,
@@ -796,6 +802,7 @@ async fn polling_station_data_entry_get(
     params(
         ("polling_station_id" = u32, description = "Polling station database id"),
     ),
+    security(("cookie_auth" = ["coordinator"])),
 )]
 async fn polling_station_data_entry_resolve_errors(
     user: Coordinator,
@@ -865,6 +872,7 @@ pub struct DataEntryGetDifferencesResponse {
     params(
         ("polling_station_id" = u32, description = "Polling station database id"),
     ),
+    security(("cookie_auth" = ["coordinator"])),
 )]
 async fn polling_station_data_entry_get_differences(
     user: Coordinator,
@@ -912,6 +920,7 @@ async fn polling_station_data_entry_get_differences(
     params(
         ("polling_station_id" = u32, description = "Polling station database id"),
     ),
+    security(("cookie_auth" = ["coordinator"])),
 )]
 async fn polling_station_data_entry_resolve_differences(
     user: Coordinator,
@@ -1016,6 +1025,7 @@ pub struct ElectionStatusResponseEntry {
     params(
         ("election_id" = u32, description = "Election database id"),
     ),
+    security(("cookie_auth" = ["administrator", "coordinator", "typist"])),
 )]
 async fn election_status(
     _user: User,

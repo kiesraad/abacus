@@ -18,6 +18,7 @@ static MODELS: &[&str] = &[
     "model-na-14-2-bijlage1",
     "model-na-31-2",
     "model-na-31-2-bijlage1",
+    "model-na-31-2-inlegvel",
     "model-n-10-2",
     "model-p-2a",
 ];

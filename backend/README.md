@@ -195,6 +195,7 @@ Options:
 ```
 
 Note that airgap-detection is forced in our (pre-)releases.
+For release builds the default port number is 80.
 
 A development build also supports the following arguments:
 

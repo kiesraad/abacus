@@ -36,6 +36,6 @@
 
 #checkbox[Ja, er zijn gecorrigeerde telresultaten (zie voor de correcties het corrigendum dat bij dit proces-verbaal is gevoegd)]
 
-=== Opgesteld door het gemeentelijk stembureau
+=== Opgesteld door het #location_type
 
 #textbox[Datum en tijd:]

@@ -61,7 +61,7 @@ de aantallen in het proces-verbaal.
 
 Vul alléén de getallen in die veranderd zijn ten opzichte van een eerdere telling. Getallen die niet zijn
 veranderd, hoeven niet ingevuld te worden in de kolom ‘gecorrigeerd'. Onder ‘oorspronkelijk’ staan de getallen
-die in de eerste zitting door #is_municipality[de gemeente][het openbaar lichaam] zijn
+die in de eerste zitting door het #location_type zijn
 vastgesteld.
 
 == Aantal kiesgerechtigden
@@ -72,7 +72,7 @@ vastgesteld.
 )
 
 == Toegelaten kiezers
-Het totaal van alle getelde geldige stempassen, volmachtbewijzen en kiezerspassen
+Het totaal van alle getelde geldige stempassen en volmachtbewijzen.
 #sum(
   with_correction_title: true,
   letterbox("A", original_value: input.previous_summary.voters_counts.poll_card_count, value: input.summary.voters_counts.poll_card_count, bold_top_border: true, wide_cells: true)[Stempassen],
@@ -123,11 +123,11 @@ ingevuld te worden in de kolom ‘gecorrigeerd'. Onder ‘oorspronkelijk’ staa
 
 #let differences = input.summary.differences_counts.more_ballots_count.count > 0 or input.summary.differences_counts.fewer_ballots_count.count > 0
 
-#checkbox(checked: not differences)[Ja]
+#checkbox(checked: not differences)[Ja, #sym.arrow.r Ga door naar #ref(<per_list_and_candidate>)]
 
 #checkbox(checked: differences)[Nee, er zijn stembureaus met een verschil]
 
-=== #if input.summary.differences_counts.more_ballots_count.count > 0 [Voor de stembureaus met de nummers #comma_list(input.summary.differences_counts.more_ballots_count.polling_stations)] else [In geen van de stembureaus] zijn *méér* uitgebrachte stemmen dan toegelaten kiezers geteld.
+=== #if input.summary.differences_counts.more_ballots_count.count > 0 [Voor de stembureaus met de nummers #comma_list(input.summary.differences_counts.more_ballots_count.polling_stations)] else [In geen van de stembureaus] zijn *méér* uitgebrachte stemmen dan toegelaten kiezers geteld. Noteer onder ‘gecorrigeerd' het nieuwe verschil.
 
 #grid(
   rows: auto,
@@ -135,7 +135,7 @@ ingevuld te worden in de kolom ‘gecorrigeerd'. Onder ‘oorspronkelijk’ staa
   letterbox("I", original_value: input.previous_summary.differences_counts.more_ballots_count.count, value: input.summary.differences_counts.more_ballots_count.count, bold_top_border: true, wide_cells: true)[Totaal aantal méér getelde stemmen]
 )
 
-=== #if input.summary.differences_counts.fewer_ballots_count.count > 0 [Voor de stembureaus met de nummers #comma_list(input.summary.differences_counts.fewer_ballots_count.polling_stations)] else [In geen van de stembureaus] zijn *minder* uitgebrachte stemmen dan toegelaten kiezers geteld.
+=== #if input.summary.differences_counts.fewer_ballots_count.count > 0 [Voor de stembureaus met de nummers #comma_list(input.summary.differences_counts.fewer_ballots_count.polling_stations)] else [In geen van de stembureaus] zijn *minder* uitgebrachte stemmen dan toegelaten kiezers geteld. Noteer onder ‘gecorrigeerd' het nieuwe verschil.
 
 #grid(
   rows: auto,
@@ -187,18 +187,22 @@ Zo komt het handtekeningen-blad altijd op een losse pagina, ook als het verslag 
 
 #textbox[Datum en tijd:][Plaats:]
 
-== Verplicht: voorzitter en #is_municipality[twee][vier] leden van het stembureau
+== Verplicht: voorzitter en #is_municipality[twee][vier] leden van het #location_type
 
-=== Voorzitter van het gemeentelijk stembureau:
+=== Voorzitter van het #location_type:
 
 #textbox[Naam:][Handtekening:]
 
-=== #is_municipality[Twee][Vier] leden van het #location_type
+=== #is_municipality[Twee][Vier] leden van het #location_type:
 
 #stack(spacing: 0.5em, ..range(0, is_municipality(2, 4)).map(_ => textbox[Naam:][Handtekening:]))
 
-== Ondertekening door andere aanwezige leden van het stembureau
+== Ondertekening door andere aanwezige leden van het #location_type
 
 === Extra ondertekening: (niet verplicht)
 
-#stack(spacing: 0.5em, ..range(0, 4).map(_ => textbox[Naam:][Handtekening:]))
+#stack(spacing: 0.5em, ..range(0, is_municipality(3, 1)).map(_ => textbox[Naam:][Handtekening:]))
+
+#pagebreak(weak: true)
+
+#stack(spacing: 0.5em, ..range(0, 12).map(_ => textbox[Naam:][Handtekening:]))

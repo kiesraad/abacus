@@ -58,7 +58,7 @@ Licht hieronder toe wat de reden van het extra onderzoek was
 
 == Aantallen kiezers en stemmen
 
-=== Was er in de telresultaten van het *stembureau* (rubriek 2.3 van het proces-verbaal van het stembureau) een onverklaard verschil tussen het totaal aantal getelde stemmen en het aantal toegelaten kiezers?
+=== Was er in de telresultaten van het *stembureau* (rubriek 2.3 van het proces-verbaal van het stembureau) een onverklaard verschil tussen het totaal aantal getelde stembiljetten en het aantal toegelaten kiezers?
 
 #checkbox[Ja #sym.arrow.r *Hertel het aantal toegelaten kiezers (#is_municipality[stempassen en volmachten][stempassen, kiezerspassen en volmachten])*, en noteer de uitkomsten bij rubriek 3.1]
 #checkbox[Nee]
@@ -87,7 +87,7 @@ Licht hieronder toe wat de reden van het extra onderzoek was
   headers: (
     [Lijstnummer met verschil],
     [Lijsttotaal vastgesteld door het stembureau],
-    [Lijsttotaal vastgesteld door het gemeentelijk stembureau],
+    [Lijsttotaal vastgesteld door het #location_type],
     [Aantal stemmen verschil],
     [
       Toelichting op het telverschil, bijvoorbeeld:
@@ -177,7 +177,7 @@ Licht hieronder toe wat de reden van het extra onderzoek was
 _(Gebruik het proces-verbaal van het stembureau #sym.arrow.r Tijdens de stemming, vraag 1.2.2)_
 
 #checkbox[Ja]
-#checkbox[Nee, er is een onverklaard verschil #sym.arrow.r Hertel het aantal toegelaten kiezers(tenzij dat bij rubriek 2 al gedaan is) en noteer dit bij #ref(<admitted_voters>)]
+#checkbox[Nee, er is een onverklaard verschil #sym.arrow.r Hertel het aantal toegelaten kiezers (tenzij dat bij rubriek 2 al gedaan is) en noteer dit bij #ref(<admitted_voters>)]
 
 == Verklaringen vanuit het stembureau <polling_station_declaration>
 

@@ -22,7 +22,7 @@
   is_municipality[Gemeentelijk stembureau][Stembureau voor het openbaar lichaam],
   [Gemeenteraad - #format_date(input.election.election_date)],
   [
-    Verslag en telresultaten per lijst en kandidaat \
+    Verslag en telresultaten per lijst en kandidaat -
     Model Na 31-2
   ],
 )
@@ -229,7 +229,7 @@ Bijvoorbeeld een schorsing of als er meerdere verkiezingen tegelijk werden georg
 
 #let differences = input.summary.differences_counts.more_ballots_count.count > 0 or input.summary.differences_counts.fewer_ballots_count.count > 0
 
-#checkbox(checked: not differences)[Ja]
+#checkbox(checked: not differences)[Ja, #sym.arrow.r Ga door naar #ref(<monitoring_protocol>)]
 
 #checkbox(checked: differences)[Nee, er zijn stembureaus met een verschil]
 
@@ -294,18 +294,22 @@ Zo komt het handtekeningen-blad altijd op een losse pagina, ook als het verslag 
 
 #textbox[Datum en tijd:][Plaats:]
 
-== Verplicht: voorzitter en #is_municipality[twee][vier] leden van het stembureau
+== Verplicht: voorzitter en #is_municipality[twee][vier] leden van het #location_type
 
-=== Voorzitter van het gemeentelijk stembureau:
+=== Voorzitter van het #location_type:
 
 #textbox[Naam:][Handtekening:]
 
-=== #is_municipality[Twee][Vier] leden van het #location_type
+=== #is_municipality[Twee][Vier] leden van het #location_type:
 
 #stack(spacing: 0.5em, ..range(0, is_municipality(2, 4)).map(_ => textbox[Naam:][Handtekening:]))
 
-== Ondertekening door andere aanwezige leden van het stembureau
+== Ondertekening door andere aanwezige leden van het #location_type
 
 === Extra ondertekening: (niet verplicht)
 
-#stack(spacing: 0.5em, ..range(0, 4).map(_ => textbox[Naam:][Handtekening:]))
+#stack(spacing: 0.5em, ..range(0, is_municipality(3, 1)).map(_ => textbox[Naam:][Handtekening:]))
+
+#pagebreak(weak: true)
+
+#stack(spacing: 0.5em, ..range(0, 12).map(_ => textbox[Naam:][Handtekening:]))

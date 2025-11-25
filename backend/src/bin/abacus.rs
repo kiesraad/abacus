@@ -10,11 +10,23 @@ use tokio::net::TcpListener;
 use tracing::{error, level_filters::LevelFilter};
 use tracing_subscriber::EnvFilter;
 
+/// Get the default port for the server, 8080 in debug builds and 80 for release builds
+fn get_default_port() -> u16 {
+    #[cfg(debug_assertions)]
+    {
+        8080
+    }
+    #[cfg(not(debug_assertions))]
+    {
+        80
+    }
+}
+
 /// Abacus API and asset server
 #[derive(Parser, Debug)]
 struct Args {
     /// Server port, optional
-    #[arg(short, long, default_value_t = 8080, env = "ABACUS_PORT")]
+    #[arg(short, long, default_value_t = get_default_port(), env = "ABACUS_PORT")]
     port: u16,
 
     /// Location of the database file, will be created if it doesn't exist
@@ -79,6 +91,7 @@ async fn run() -> Result<(), AppError> {
         .await
         .map_err(|e| match e.kind() {
             ErrorKind::AddrInUse => AppError::PortAlreadyInUse(args.port),
+            ErrorKind::PermissionDenied => AppError::PermissionDeniedToBindPort(args.port),
             _ => AppError::Io(e),
         })?;
 

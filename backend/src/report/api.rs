@@ -3,7 +3,7 @@ use axum::{
     response::IntoResponse,
 };
 use axum_extra::response::Attachment;
-use chrono::{DateTime, Local};
+use chrono::{DateTime, Local, Utc};
 use sqlx::{SqliteConnection, SqlitePool};
 use utoipa_axum::{router::OpenApiRouter, routes};
 
@@ -135,7 +135,7 @@ impl ResultsInput {
         let mut location = self.election.location.clone();
         location.retain(|c| c != ' ');
         slugify_filename(&format!(
-            "Telling_{}{}_{}.eml.xml",
+            "Telling {}{} {}.eml.xml",
             self.election.category.to_eml_code(),
             self.election.election_date.year(),
             location
@@ -144,16 +144,16 @@ impl ResultsInput {
 
     fn results_pdf_filename(&self) -> String {
         let name = if self.committee_session.is_next_session() {
-            "Model_Na14-2.pdf"
+            "Model Na14-2.pdf"
         } else {
-            "Model_Na31-2.pdf"
+            "Model Na31-2.pdf"
         };
         slugify_filename(name)
     }
 
     fn overview_pdf_filename(&self) -> Option<String> {
         if self.committee_session.is_next_session() {
-            Some(slugify_filename("Leeg_Model_P2a.pdf"))
+            Some(slugify_filename("Leeg Model P2a.pdf"))
         } else {
             None
         }
@@ -252,11 +252,10 @@ fn download_zip_filename(
     created_at: DateTime<Local>,
 ) -> String {
     use chrono::Datelike;
-    let location = election.location.clone().to_lowercase();
-    let mut location_without_whitespace = location.clone();
-    location_without_whitespace.retain(|c| c != ' ');
+    let location = election.location.to_lowercase();
+    let location_without_whitespace: String = location.split_whitespace().collect();
     slugify_filename(&format!(
-        "{}_{}{}_{}_gemeente_{}-{}-{}.zip",
+        "{} {}{} {} gemeente {}-{}-{}.zip",
         if committee_session.is_next_session() {
             "correctie"
         } else {
@@ -265,7 +264,7 @@ fn download_zip_filename(
         election.category.to_eml_code().to_lowercase(),
         election.election_date.year(),
         location_without_whitespace,
-        location.clone().replace(" ", "-"),
+        location.replace(" ", "-"),
         created_at.date_naive().format("%Y%m%d"),
         created_at.time().format("%H%M%S"),
     ))
@@ -276,7 +275,7 @@ fn xml_zip_filename(election: &ElectionWithPoliticalGroups) -> String {
     let mut location = election.location.clone();
     location.retain(|c| c != ' ');
     slugify_filename(&format!(
-        "Telling_{}{}_{}.zip",
+        "Telling {}{} {}.zip",
         election.category.to_eml_code(),
         election.election_date.year(),
         location
@@ -287,7 +286,7 @@ async fn generate_and_save_files(
     pool: &SqlitePool,
     audit_service: AuditService,
     committee_session_id: u32,
-) -> Result<(Option<File>, Option<File>, Option<File>, DateTime<Local>), APIError> {
+) -> Result<(Option<File>, Option<File>, Option<File>, DateTime<Utc>), APIError> {
     let mut conn = pool.acquire().await?;
     let committee_session =
         crate::committee_session::repository::get(&mut conn, committee_session_id).await?;
@@ -310,7 +309,7 @@ async fn generate_and_save_files(
         ));
     }
 
-    let mut created_at = Local::now();
+    let mut created_at = Utc::now();
     let mut eml_file: Option<File> = None;
     let mut pdf_file: Option<File> = None;
     let mut overview_pdf_file: Option<File> = None;
@@ -318,17 +317,17 @@ async fn generate_and_save_files(
     // Check if files exist, if so, get files from database
     if let Some(eml_id) = committee_session.results_eml {
         let file = get_file(&mut conn, eml_id).await?;
-        created_at = DateTime::from(file.created_at);
+        created_at = file.created_at;
         eml_file = Some(file);
     }
     if let Some(pdf_id) = committee_session.results_pdf {
         let file = get_file(&mut conn, pdf_id).await?;
-        created_at = DateTime::from(file.created_at);
+        created_at = file.created_at;
         pdf_file = Some(file);
     }
     if let Some(overview_pdf_id) = committee_session.overview_pdf {
         let file = get_file(&mut conn, overview_pdf_id).await?;
-        created_at = DateTime::from(file.created_at);
+        created_at = file.created_at;
         overview_pdf_file = Some(file);
     }
     drop(conn);
@@ -346,10 +345,15 @@ async fn generate_and_save_files(
 
     // If one of the files doesn't exist, generate all and save them to the database
     if generate_files {
-        created_at = Local::now();
+        created_at = Utc::now();
         let mut tx = pool.begin_immediate().await?;
 
-        let input = ResultsInput::new(&mut tx, committee_session.id, created_at).await?;
+        let input = ResultsInput::new(
+            &mut tx,
+            committee_session.id,
+            created_at.with_timezone(&Local),
+        )
+        .await?;
         let xml = input.as_xml();
         let xml_string = xml.to_xml_string()?;
 
@@ -365,7 +369,7 @@ async fn generate_and_save_files(
                 xml_filename,
                 xml_string.as_bytes(),
                 EML_MIME_TYPE.to_string(),
-                DateTime::from(created_at),
+                created_at,
             )
             .await?;
 
@@ -378,7 +382,7 @@ async fn generate_and_save_files(
                 pdf_files.results.file_name.clone(),
                 &generate_pdf(pdf_files.results).await?.buffer,
                 PDF_MIME_TYPE.to_string(),
-                DateTime::from(created_at),
+                created_at,
             )
             .await?;
 
@@ -397,7 +401,7 @@ async fn generate_and_save_files(
                 overview_pdf.file_name.clone(),
                 &generate_pdf(overview_pdf).await?.buffer,
                 PDF_MIME_TYPE.to_string(),
-                DateTime::from(created_at),
+                created_at,
             )
             .await?;
             audit_service
@@ -465,7 +469,11 @@ async fn election_download_zip_results(
         generate_and_save_files(&pool, audit_service, committee_session.id).await?;
     drop(conn);
 
-    let download_zip_filename = download_zip_filename(&election, &committee_session, created_at);
+    let download_zip_filename = download_zip_filename(
+        &election,
+        &committee_session,
+        created_at.with_timezone(&Local),
+    );
 
     let (zip_response, mut zip_writer) = ZipResponse::new(&download_zip_filename);
 

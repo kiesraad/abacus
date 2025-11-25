@@ -132,13 +132,13 @@ impl ResultsInput {
 
     fn xml_filename(&self) -> String {
         use chrono::Datelike;
-        let mut location = self.election.location.clone();
-        location.retain(|c| c != ' ');
+        let location_without_whitespace: String =
+            self.election.location.split_whitespace().collect();
         slugify_filename(&format!(
             "Telling {}{} {}.eml.xml",
             self.election.category.to_eml_code(),
             self.election.election_date.year(),
-            location
+            location_without_whitespace
         ))
     }
 
@@ -272,13 +272,12 @@ fn download_zip_filename(
 
 fn xml_zip_filename(election: &ElectionWithPoliticalGroups) -> String {
     use chrono::Datelike;
-    let mut location = election.location.clone();
-    location.retain(|c| c != ' ');
+    let location_without_whitespace: String = election.location.split_whitespace().collect();
     slugify_filename(&format!(
         "Telling {}{} {}.zip",
         election.category.to_eml_code(),
         election.election_date.year(),
-        location
+        location_without_whitespace
     ))
 }
 

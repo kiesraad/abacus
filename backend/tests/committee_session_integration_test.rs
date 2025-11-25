@@ -650,7 +650,7 @@ async fn test_committee_session_number_of_voters_change_first_session_not_starte
         get_election_committee_session(&addr, &coordinator_cookie, election_id).await;
     assert_eq!(committee_session.status, CommitteeSessionStatus::Created);
 
-    create_polling_station(&addr, election_id, 1).await;
+    create_polling_station(&addr, &coordinator_cookie, election_id, 1).await;
 
     let committee_session =
         get_election_committee_session(&addr, &coordinator_cookie, election_id).await;

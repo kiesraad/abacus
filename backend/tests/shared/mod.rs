@@ -18,7 +18,7 @@ use abacus::{
 
 use axum::http::{HeaderValue, StatusCode};
 use hyper::header::CONTENT_TYPE;
-use reqwest::{Body, Client, Response};
+use reqwest::{Body, Response};
 use serde_json::json;
 
 pub fn differences_counts_zero() -> DifferencesCounts {
@@ -96,12 +96,16 @@ pub fn example_data_entry(client_state: Option<&str>) -> DataEntry {
     }
 }
 
-pub async fn create_polling_station(addr: &SocketAddr, election_id: u32, number: u32) -> Response {
+pub async fn create_polling_station(
+    addr: &SocketAddr,
+    cookie: &HeaderValue,
+    election_id: u32,
+    number: u32,
+) -> Response {
     let url = format!("http://{addr}/api/elections/{election_id}/polling_stations");
-    let coordinator_cookie = coordinator_login(addr).await;
     reqwest::Client::new()
         .post(&url)
-        .header("cookie", coordinator_cookie)
+        .header("cookie", cookie)
         .header("Content-Type", "application/json")
         .json(&json!({
             "name": "Test polling station",
@@ -127,7 +131,7 @@ pub async fn claim_data_entry(
     let url = format!(
         "http://{addr}/api/polling_stations/{polling_station_id}/data_entries/{entry_number}/claim"
     );
-    let res = Client::new()
+    let res = reqwest::Client::new()
         .post(&url)
         .header("cookie", cookie)
         .send()
@@ -147,7 +151,7 @@ pub async fn save_data_entry(
     let url = format!(
         "http://{addr}/api/polling_stations/{polling_station_id}/data_entries/{entry_number}"
     );
-    let res = Client::new()
+    let res = reqwest::Client::new()
         .post(&url)
         .header("cookie", cookie)
         .json(&data_entry)
@@ -168,7 +172,7 @@ pub async fn finalise_data_entry(
     let url = format!(
         "http://{addr}/api/polling_stations/{polling_station_id}/data_entries/{entry_number}/finalise"
     );
-    let res = Client::new()
+    let res = reqwest::Client::new()
         .post(&url)
         .header("cookie", cookie)
         .send()
@@ -199,7 +203,7 @@ async fn check_data_entry_status_is_definitive(
 ) {
     // check that data entry status for this polling station is now Definitive
     let url = format!("http://{addr}/api/elections/{election_id}/status");
-    let response = Client::new()
+    let response = reqwest::Client::new()
         .get(&url)
         .header("cookie", cookie)
         .send()
@@ -305,7 +309,7 @@ pub async fn get_election_committee_session(
     election_id: u32,
 ) -> CommitteeSession {
     let url = format!("http://{addr}/api/elections/{election_id}");
-    let response = Client::new()
+    let response = reqwest::Client::new()
         .get(&url)
         .header("cookie", cookie)
         .send()
@@ -326,7 +330,7 @@ pub async fn change_status_committee_session(
     let url = format!(
         "http://{addr}/api/elections/{election_id}/committee_sessions/{committee_session_id}/status"
     );
-    let response = Client::new()
+    let response = reqwest::Client::new()
         .put(&url)
         .header("cookie", cookie)
         .json(&CommitteeSessionStatusChangeRequest { status })
@@ -342,7 +346,7 @@ pub async fn get_statuses(
     election_id: u32,
 ) -> BTreeMap<u32, ElectionStatusResponseEntry> {
     let url = format!("http://{addr}/api/elections/{election_id}/status");
-    let response = Client::new()
+    let response = reqwest::Client::new()
         .get(url)
         .header("cookie", cookie)
         .send()
@@ -383,7 +387,7 @@ pub async fn typist2_login(addr: &SocketAddr) -> HeaderValue {
 pub async fn login(addr: &SocketAddr, username: &str, password: &str) -> HeaderValue {
     let url = format!("http://{addr}/api/login");
 
-    let response = Client::new()
+    let response = reqwest::Client::new()
         .post(&url)
         .header(CONTENT_TYPE, "application/json")
         .body(Body::from(

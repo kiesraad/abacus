@@ -22,7 +22,7 @@
   is_municipality[Gemeentelijk stembureau][Stembureau voor het openbaar lichaam],
   [Gemeenteraad - #format_date(input.election.election_date)],
   [
-    Verslag en telresultaten per lijst en kandidaat \
+    Verslag en telresultaten per lijst en kandidaat -
     Model Na 31-2
   ],
 )
@@ -229,7 +229,7 @@ Bijvoorbeeld een schorsing of als er meerdere verkiezingen tegelijk werden georg
 
 #let differences = input.summary.differences_counts.more_ballots_count.count > 0 or input.summary.differences_counts.fewer_ballots_count.count > 0
 
-#checkbox(checked: not differences)[Ja]
+#checkbox(checked: not differences)[Ja, #sym.arrow.r Ga door naar #ref(<monitoring_protocol>)]
 
 #checkbox(checked: differences)[Nee, er zijn stembureaus met een verschil]
 
@@ -300,7 +300,7 @@ Zo komt het handtekeningen-blad altijd op een losse pagina, ook als het verslag 
 
 #textbox[Naam:][Handtekening:]
 
-=== #is_municipality[Twee][Vier] leden van het #location_type
+=== #is_municipality[Twee][Vier] leden van het #location_type:
 
 #stack(spacing: 0.5em, ..range(0, is_municipality(2, 4)).map(_ => textbox[Naam:][Handtekening:]))
 

@@ -25,12 +25,12 @@
   "",
   [#input.election.name #format_date(input.election.election_date)],
   [
-    Verslag en telresultaten per lijst \
+    Verslag en telresultaten per lijst –
     Model N 10-2
   ]
 )
 
-== Details van het #if is_mobile { "mobiel stembureau" } else { "stembureau" }
+== Details van het #if is_mobile { "mobiele stembureau" } else { "stembureau" }
 
 #location_name #sym.arrow.r Stembureau #input.polling_station.number
 
@@ -48,10 +48,10 @@
 
 == Proces-verbaal
 
-Elk stembureau maakt bij een verkiezing een verslag: het proces-verbaal. Hierin staat hoe het stemmen en het tellen van de stemmen is verlopen
+Elk stembureau maakt bij een verkiezing een verslag: het proces-verbaal. Hierin staat hoe het stemmen en het tellen van de stemmen is verlopen.
 
 #emph_block[
-  In #this_location is gekozen voor centrale stemopneming. Het stembureau telt na het stemmen het aantal kiezers, en hoeveel stemmen elke lijst heeft gekregen. Het #location_type telt 1 of 2 dagen later de stemmen per kandidaat op een centrale tellocatie. Die telresultaten staan in het verslag van het #location_type.
+  In #this_location is gekozen voor *centrale stemopneming*. Het stembureau telt na het stemmen het aantal kiezers, en hoeveel stemmen elke lijst heeft gekregen. Het #location_type telt 1 of 2 dagen later de stemmen per kandidaat op een centrale tellocatie. Die telresultaten staan in het verslag van het #location_type.
 ]
 
 == Inhoudsopgave
@@ -190,7 +190,7 @@ Bijvoorbeeld als er meerdere verkiezingen tegelijk werden georganiseerd, en een 
 
 == Uitgebrachte stemmen <cast_votes>
 
-=== Beoordeel de stembiljetten en tel het aantal stembiljetten per kandidaat. Bereken het aantal stemmen per lijst. Tel de blanco en ongeldige stembiljetten.
+=== Beoordeel de stembiljetten en tel het aantal stembiljetten per lijst. En tel de blanco en ongeldige stembiljetten.
 
 #if input.election.political_groups.len() > 0 [
   #sum(

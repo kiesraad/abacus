@@ -110,7 +110,6 @@ describe("Test VotersAndVotesForm", () => {
       expect(spy).toHaveBeenCalled();
     });
 
-    //TODO: duplicate test for other forms?
     test("Inputs show formatted numbers when blurred", async () => {
       const user = userEvent.setup();
 
@@ -488,8 +487,6 @@ describe("Test VotersAndVotesForm", () => {
 
       expect(feedbackWarning).toHaveTextContent(feedbackMessage);
       // All fields should be considered valid now
-      //TODO: is this true? there is a warning in blank votes, so it should not be valid?
-      //expectedValidFieldIds = expectedValidFieldIds.concat(expectedInvalidFieldIds);
       expectFieldsToBeValidAndToNotHaveAccessibleErrorMessage(expectedValidFieldIds);
       expectFieldsToNotHaveIcon(expectedValidFieldIds);
     });

@@ -120,7 +120,7 @@ export function CommitteeSessionDetailsPage() {
       <header>
         <section>
           <h1>
-            {/* TODO: Change to conditional GSB/HSB/CSB when implemented */}
+            {/* TODO (post 1.0): Change to conditional GSB/HSB/CSB when implemented */}
             {t("GSB")} {election.location}
           </h1>
         </section>

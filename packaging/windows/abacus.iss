@@ -1,14 +1,18 @@
-; Built with InnoSetup 6.6, make sure to use this version
+; Made with InnoSetup 6.6, make sure to use this version
 ; Using a different version of InnoSetup can give different results
 
-#define GetLatestTag() \
-  Local[0] = "/S /C pushd """ + SourcePath + """ && git.exe describe --tags --abbrev=0 > version.txt && popd", \
+#define GetVersion() \
+  Local[0] = \
+    "/S /C pushd """ + SourcePath + """ && " + \
+    "(git.exe describe --tags --exact-match HEAD > version.txt 2>nul " + \
+    "|| for /f %a in ('git.exe rev-parse --short HEAD') do echo dev-%a > version.txt) " + \
+    "&& popd", \
   Local[1] = Exec("cmd.exe", Local[0], "C:\\", , SW_HIDE), \
   Local[2] = FileOpen(AddBackslash(SourcePath) + "version.txt"), \
   Local[3] = FileRead(Local[2]), \
   FileClose(Local[2]), \
   DeleteFile(AddBackslash(SourcePath) + "version.txt"), \
-  Local[3]  
+  Trim(Local[3])
 
 #define MyAppName "Abacus GR26"
 #define MyAppPublisher "Kiesraad"
@@ -22,7 +26,7 @@
 ; (To generate a new GUID, click Tools | Generate GUID inside the IDE.)
 AppId={{8475448A-D5A3-4114-BD32-CDE54A5E2FB5}}
 AppName={#MyAppName}
-AppVersion={#GetLatestTag()}
+AppVersion={#GetVersion()}
 AppPublisher={#MyAppPublisher}
 AppPublisherURL={#MyAppURL}
 AppSupportURL={#MyAppURL}
@@ -82,8 +86,7 @@ ReadyLabel1=U gaat de [name] server installeren op deze computer.
 ReadyLabel2b=Het installatieprogramma vraagt een aantal keren om toestemming om hulpprogramma’s te kunnen installeren. Deze toestemming is nodig om Abacus goed te laten werken. Beantwoord deze vragen met ‘Ja’.
 
 FinishedHeadingLabel=[name] is geïnstalleerd
-FinishedLabel=De installatie van [name] server is klaar.%n%nU kunt Abacus server starten via de snelkoppeling op het bureaublad. Doe dit pas nadat de internetverbinding van deze computer is verbroken.
-ClickFinish=Als de server is gestart, kunt u Abacus inrichten via de snelkoppeling ‘Open [name]’.
+FinishedLabel=De installatie van [name] server is klaar.%n%nU kunt Abacus server starten via de snelkoppeling op het bureaublad. Doe dit pas nadat de internetverbinding van deze computer is verbroken.%n%nAls de server is gestart, kunt u Abacus inrichten via de snelkoppeling ‘Open [name]’.
 
 [Code]
 procedure RunElevatedCommandWithRetry(const CmdLine, ActionDescription: String);

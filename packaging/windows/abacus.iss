@@ -1,7 +1,16 @@
-; InnoSetup 6.6
+; Built with InnoSetup 6.6, make sure to use this version
+; Using a different version of InnoSetup can give different results
+
+#define GetLatestTag() \
+  Local[0] = "/S /C pushd """ + SourcePath + """ && git.exe describe --tags --abbrev=0 > version.txt && popd", \
+  Local[1] = Exec("cmd.exe", Local[0], "C:\\", , SW_HIDE), \
+  Local[2] = FileOpen(AddBackslash(SourcePath) + "version.txt"), \
+  Local[3] = FileRead(Local[2]), \
+  FileClose(Local[2]), \
+  DeleteFile(AddBackslash(SourcePath) + "version.txt"), \
+  Local[3]  
 
 #define MyAppName "Abacus GR26"
-#define MyAppVersion "1.0.0"
 #define MyAppPublisher "Kiesraad"
 #define MyAppURL "https://github.com/kiesraad/abacus"
 #define MyAppExeName "abacus.exe"
@@ -13,7 +22,7 @@
 ; (To generate a new GUID, click Tools | Generate GUID inside the IDE.)
 AppId={{8475448A-D5A3-4114-BD32-CDE54A5E2FB5}}
 AppName={#MyAppName}
-AppVersion={#MyAppVersion}
+AppVersion={#GetLatestTag()}
 AppPublisher={#MyAppPublisher}
 AppPublisherURL={#MyAppURL}
 AppSupportURL={#MyAppURL}

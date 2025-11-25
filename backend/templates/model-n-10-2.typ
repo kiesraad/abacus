@@ -265,7 +265,7 @@ Zo komt het handtekeningen-blad altijd op een losse pagina, ook als het verslag 
 
 #textbox[Naam:][Handtekening:]
 
-=== Twee leden van het stembureau
+=== Twee leden van het stembureau:
 
 #stack(spacing: 0.5em, ..range(0, 2).map(_ => textbox[Naam:][Handtekening:]))
 

@@ -3945,6 +3945,21 @@
         },
         "additionalProperties": false
       },
+      "ApplicationStartedDetails": {
+        "type": "object",
+        "required": [
+          "version",
+          "commit"
+        ],
+        "properties": {
+          "commit": {
+            "type": "string"
+          },
+          "version": {
+            "type": "string"
+          }
+        }
+      },
       "AuditEvent": {
         "oneOf": [
           {
@@ -4662,18 +4677,25 @@
             }
           },
           {
-            "type": "object",
-            "required": [
-              "event_type"
-            ],
-            "properties": {
-              "event_type": {
-                "type": "string",
-                "enum": [
-                  "ApplicationStarted"
-                ]
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ApplicationStartedDetails"
+              },
+              {
+                "type": "object",
+                "required": [
+                  "event_type"
+                ],
+                "properties": {
+                  "event_type": {
+                    "type": "string",
+                    "enum": [
+                      "ApplicationStarted"
+                    ]
+                  }
+                }
               }
-            }
+            ]
           },
           {
             "allOf": [

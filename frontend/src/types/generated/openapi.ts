@@ -325,6 +325,11 @@ export interface AccountUpdateRequest {
   username: string;
 }
 
+export interface ApplicationStartedDetails {
+  commit: string;
+  version: string;
+}
+
 export type AuditEvent =
   | (UserLoggedInDetails & { event_type: "UserLoggedIn" })
   | (UserLoginFailedDetails & { event_type: "UserLoginFailed" })
@@ -361,7 +366,7 @@ export type AuditEvent =
   | (DataEntryDetails & { event_type: "DataEntryDiscardedBoth" })
   | { event_type: "AirGapViolationDetected" }
   | { event_type: "AirGapViolationResolved" }
-  | { event_type: "ApplicationStarted" }
+  | (ApplicationStartedDetails & { event_type: "ApplicationStarted" })
   | (ErrorDetails & { event_type: "Error" })
   | { event_type: "UnknownEvent" };
 

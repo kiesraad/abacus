@@ -271,6 +271,10 @@ pub async fn start_server(
     listener: TcpListener,
     enable_airgap_detection: bool,
 ) -> Result<(), AppError> {
+    info!(
+        "Starting Abacus GR26 (version {})",
+        env!("ABACUS_GIT_VERSION")
+    );
     let airgap_detection = if enable_airgap_detection {
         info!("Airgap detection is enabled, starting airgap detection task...");
 
@@ -367,7 +371,10 @@ pub async fn shutdown_signal() {
 async fn log_app_started(conn: &mut SqliteConnection, db_path: &str) -> Result<(), AppError> {
     Ok(audit_log::create(
         conn,
-        &audit_log::AuditEvent::ApplicationStarted,
+        &audit_log::AuditEvent::ApplicationStarted(audit_log::ApplicationStartedDetails {
+            version: env!("ABACUS_GIT_VERSION").to_string(),
+            commit: env!("ABACUS_GIT_REV").to_string(),
+        }),
         None,
         None,
         None,

@@ -143,7 +143,7 @@
   prefilled_text(fmt-number(value, thousands-sep: thousands-sep, zero: zero))
 }
 
-#let empty_letterbox(letter, cells: 5, light: true, original_value: none, value: none, bold_top_border: false, wide_cells: false, value_as_original_value: false, content) = {
+#let empty_letterbox(letter, cells: 5, light: true, original_value: none, value: none, bold_top_border: false, wide_cells: false, content) = {
   let bg_grey = luma(213)
   let bg = if light { bg_grey } else { black }
   let fill = if light { black } else { white }
@@ -187,7 +187,6 @@
           y: 0.5pt + black,
           x: (paint: black, thickness: 0.5pt, dash: "densely-dotted"),
         ) + top_border_stroke,
-        fill: if value_as_original_value { bg_grey } else { none },
         if value != none { prefilled_number(value) } else { " " }
       )
     }),
@@ -198,7 +197,7 @@
 }
 
 /// Display a box with a prefixed label and a value
-#let letterbox(letter, original_value: none, value: none, light: true, bold_top_border: false, wide_cells: true, value_as_original_value: false, content) = {
+#let letterbox(letter, original_value: none, value: none, light: true, bold_top_border: false, wide_cells: true, content) = {
   empty_letterbox(
     letter,
     cells: 1,
@@ -207,8 +206,7 @@
     original_value: original_value,
     bold_top_border: bold_top_border,
     wide_cells: wide_cells,
-    value_as_original_value: value_as_original_value,
-    content,
+    content
   )
 }
 

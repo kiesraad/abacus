@@ -1,4 +1,4 @@
-#import "common/style.typ": conf, default_footer, default_header, document_numbering
+#import "common/style.typ": conf, default_header, document_numbering
 #import "common/scripts.typ": *
 #let input = json("inputs/model-na-31-2.json")
 

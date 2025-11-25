@@ -1,4 +1,4 @@
-#import "common/style.typ": conf, default_footer, default_header, document_numbering
+#import "common/style.typ": conf, default_header, document_numbering
 #import "common/scripts.typ": *
 #let input = json("inputs/model-na-14-2.json")
 
@@ -66,7 +66,7 @@ vastgesteld.
 
 == Aantal kiesgerechtigden
 
-#letterbox("Z", value: input.committee_session.number_of_voters, value_as_original_value: true)[Kiesgerechtigden]
+#letterbox("Z", value: input.committee_session.number_of_voters)[Kiesgerechtigden]
 
 == Toegelaten kiezers
 Het totaal van alle getelde geldige stempassen en volmachtbewijzen.

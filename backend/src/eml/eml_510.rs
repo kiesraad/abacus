@@ -74,7 +74,7 @@ impl EML510 {
             managing_authority: ManagingAuthority {
                 authority_identifier: AuthorityIdentifier {
                     id: authority_id,
-                    name: election.location.clone(), // TODO (post 1.0): replace with authority name fromelection tree
+                    name: election.location.clone(), // TODO (post 1.0): replace with authority name from election tree
                     created_by_authority: None,
                 },
                 authority_address: AuthorityAddress {},

@@ -1,5 +1,10 @@
 # Abacus deployment on Linux with systemd
 
+Prerequisites:
+- A Linux system with systemd
+- The Abacus binary (named `abacus` below), e.g. from the [releases page](https://github.com/kiesraad/abacus/releases)
+- The Abacus systemd unit file (`abacus.service`), from this directory
+
 Copy the Abacus binary and service file to the system, reload systemd, enable the Abacus service to start on system boot and start it right away:
 ```
 sudo cp abacus /usr/local/bin/abacus

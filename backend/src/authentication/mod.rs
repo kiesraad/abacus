@@ -25,6 +25,9 @@ pub const SESSION_LIFE_TIME: TimeDelta = TimeDelta::seconds(60 * 30); // 30 minu
 /// Minimum session lifetime, refresh if only this much time or less is left before expiration
 pub const SESSION_MIN_LIFE_TIME: TimeDelta = TimeDelta::seconds(60 * 15); // 15 minutes
 
+/// Security scheme name for OpenAPI documentation
+pub const SECURITY_SCHEME_NAME: &str = "cookie_auth";
+
 /// Session cookie name
 pub const SESSION_COOKIE_NAME: &str = "ABACUS_SESSION";
 

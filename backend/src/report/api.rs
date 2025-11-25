@@ -429,6 +429,7 @@ async fn generate_and_save_files(
         ("election_id" = u32, description = "Election database id"),
         ("committee_session_id" = u32, description = "Committee session database id"),
     ),
+    security(("cookie_auth" = ["coordinator"])),
 )]
 async fn election_download_zip_results(
     _user: Coordinator,
@@ -492,6 +493,7 @@ async fn election_download_zip_results(
         ("election_id" = u32, description = "Election database id"),
         ("committee_session_id" = u32, description = "Committee session database id"),
     ),
+    security(("cookie_auth" = ["coordinator"])),
 )]
 async fn election_download_pdf_results(
     _user: Coordinator,

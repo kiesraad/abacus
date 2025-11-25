@@ -8,7 +8,14 @@ The `data_entry_status` fuzz test tests that the data entry system matches the s
 
 This fuzz test covers all possible states and all possible `DataEntryTransitionError` errors, except for the `FirstEntryAlreadyClaimed`, `ValidatorError` and `ValidationError` errors. The `FirstEntryAlreadyClaimed` error is not triggered by the fuzzer for simplicity, but this error is explicitly tested by the `first_entry_in_progress_claim_first_entry_other_user_error` unit test. The `ValidatorError` and `ValidationError` errors are not triggered by the fuzzer because the fuzzer does not test the API directly. Instead, the fuzzer only tests the internal functions to focus on verifying the data entry state machine. This fuzz test can be seen as a more complete extension of the unit tests that test individual transitions, which shows that no unexpected errors or transition can happen.
 
-Run it with the following command (for fuzzing you need the nightly compiler):
+To run the fuzzer, first install the nightly compiler and cargo fuzz if you haven't already:
+
+```
+rustup install nightly
+cargo +nightly install cargo-fuzz
+```
+
+Then, run the fuzzer with the following command:
 
 ```
 cargo +nightly fuzz run data_entry_status
@@ -24,11 +31,12 @@ The output of the fuzzer should look something like:
 
 Here, `NEW` indicates that a new code path has been triggered, and `REDUCE` indicates a previously covered code path has been triggered with a shorter input. The `pulse` is a periodic status update.
 
-If the fuzzer has found a problem, it will exit and print the error. The error message will contain which unexpected transition took place. If after a few minutes the fuzzer has not found any problems we can be fairly certain the data entry system matches the state machine described in the fuzz test.
+Fuzzers never give hard guarantees on the correctness of software, but they are quite good at finding bugs.
+If the fuzzer has found a problem, it will exit and print the error. The error message will contain which unexpected transition took place. If after a few minutes the fuzzer stops finding new paths and has not found any problems we can be fairly certain the data entry system matches the state machine described in the fuzz test. Terminate the process manually when you feel like this is the case.
 
 ### Checking the fuzz test coverage
 
-To check the coverage of the fuzzer, we can use the `fuzz coverage` command.
+To gain some insight in what the fuzzer has actually tested, we can check the coverage of the fuzzer using the `fuzz coverage` command.
 For this you need the `llvm-tools-preview` tools, which can be installed using:
 
 ```

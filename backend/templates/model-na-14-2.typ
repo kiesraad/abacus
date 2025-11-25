@@ -1,4 +1,4 @@
-#import "common/style.typ": conf, default_header, document_numbering, attachment_numbering
+#import "common/style.typ": conf, default_header, document_numbering
 #import "common/scripts.typ": *
 #let input = json("inputs/model-na-14-2.json")
 
@@ -65,11 +65,8 @@ die in de eerste zitting door het #location_type zijn
 vastgesteld.
 
 == Aantal kiesgerechtigden
-#grid(
-  rows: auto,
-  correction_title_grid(),
-  letterbox("Z", original_value: input.previous_committee_session.number_of_voters, value: input.committee_session.number_of_voters, bold_top_border: true, wide_cells: true)[Kiesgerechtigden]
-)
+
+#letterbox("Z", value: input.committee_session.number_of_voters)[Kiesgerechtigden]
 
 == Toegelaten kiezers
 Het totaal van alle getelde geldige stempassen en volmachtbewijzen.

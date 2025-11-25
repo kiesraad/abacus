@@ -1,4 +1,4 @@
-#import "common/style.typ": conf, document_numbering, default_header
+#import "common/style.typ": conf, default_header, document_numbering
 #import "common/scripts.typ": *
 #let input = json("inputs/model-n-10-2.json")
 

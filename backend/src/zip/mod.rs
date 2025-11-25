@@ -4,8 +4,9 @@ use axum::{
     response::{IntoResponse, Response},
 };
 use axum_extra::response::Attachment;
+use std::io::Cursor;
 use tokio::io::{AsyncWriteExt, DuplexStream};
-use tokio_util::io::ReaderStream;
+use tokio_util::{compat::TokioAsyncWriteCompatExt, io::ReaderStream};
 
 /// Slugify a filename by replacing spaces with underscores and slashes with dashes.
 pub fn slugify_filename(filename: &str) -> String {
@@ -97,6 +98,22 @@ impl From<async_zip::error::ZipError> for ZipResponseError {
     fn from(err: async_zip::error::ZipError) -> Self {
         ZipResponseError::ZipError(err)
     }
+}
+
+pub async fn zip_single_file(name: &str, content: &[u8]) -> Result<Vec<u8>, ZipResponseError> {
+    let cursor = Cursor::new(Vec::<u8>::new());
+    let async_cursor = cursor.compat_write();
+
+    let mut zip_writer = ZipFileWriter::new(async_cursor);
+
+    let builder = ZipEntryBuilder::new(slugify_filename(name).into(), Compression::Deflate)
+        .last_modification_date(ZipDateTime::from(chrono::Utc::now()));
+
+    zip_writer.write_entry_whole(builder, content).await?;
+
+    let cursor = zip_writer.close().await?;
+
+    Ok(cursor.into_inner().into_inner())
 }
 
 #[cfg(test)]

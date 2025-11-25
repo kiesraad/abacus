@@ -1,5 +1,6 @@
 pub mod repository;
 
+use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use sqlx::{FromRow, Type};
 use utoipa::ToSchema;
@@ -14,6 +15,8 @@ pub struct File {
     pub data: Vec<u8>,
     pub name: String,
     pub mime_type: String,
+    #[schema(value_type = String)]
+    pub created_at: DateTime<Utc>,
 }
 
 impl From<File> for FileDetails {
@@ -23,6 +26,7 @@ impl From<File> for FileDetails {
             file_name: file.name,
             file_mime_type: file.mime_type,
             file_size_bytes: file.data.len() as u64,
+            file_created_at: file.created_at,
         }
     }
 }

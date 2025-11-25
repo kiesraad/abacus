@@ -84,6 +84,8 @@ pub struct FileDetails {
     pub file_name: String,
     pub file_mime_type: String,
     pub file_size_bytes: u64,
+    #[schema(value_type = String)]
+    pub file_created_at: DateTime<Utc>,
 }
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, Eq, ToSchema)]

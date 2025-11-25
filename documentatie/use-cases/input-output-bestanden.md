@@ -35,20 +35,20 @@ EML_NL 210 (kandidatenlijst voor een politieke groepering) wordt niet gebruikt, 
 
 ### Documenten
 
-| Model(onderdeel)  | DSO  | CSO  | Doel                               | 'leeg' document uit Abacus | input voor Abacus | output van Abacus |
-| ----------------- | :--: | :--: | ---------------------------------- |:--------------------------:| :---------------: | :---------------: |
-| N 10-1            |  X   |      | PV SB                              |             X              |         X         |                   |
-| Na 14-1 versie 1  |  X   |      | Corrigendum SB - eerste zitting    |             X              |         X         |                   |
-| N 10-2            |      |  X   | PV SB                              |             X              |         X         |                   |
-| N 5               |  X   |  X   | Overdrachtsdocument GSB            |                            |                   |                   |
-| Na 31-2 Bijlage 1 |      |  X   | Telresultaten SB                   |             X              |         X         |                   |
-| Na 31-2 Bijlage 2 |      |  X   | Bezwaren SB's                      |                            |                   |                   |
-| Na 31-1           |  X   |      | PV GSB - eerste zitting            |                            |                   |         X         |
-| Na 31-2           |      |  X   | PV GSB - eerste zitting            |                            |                   |         X         |
-| Na 14-1 versie 2  |  X   |      | Corrigendum SB - volgende zitting  |             X              |         X         |                   |
-| Na 14-2 Bijlage 1 |      |  X   | Corrigendum SB - volgende zitting  |             X              |         X         |                   |
-| Na 14-2           |  X   |  X   | Corrigendum GSB - volgende zitting |                            |                   |         X         |
-| P 2a              |  X   |  X   | Verslag volgende zitting           |                            |                   |         X         |
+| Model(onderdeel)  | DSO | CSO | Doel                               | 'leeg' document uit Abacus | input voor Abacus | output van Abacus |
+|-------------------|:---:|:---:|------------------------------------|:--------------------------:|:-----------------:|:-----------------:|
+| N 10-1            |  X  |     | PV SB                              |             X              |         X         |                   |
+| Na 14-1 versie 1  |  X  |     | Corrigendum SB - eerste zitting    |             X              |         X         |                   |
+| N 10-2            |     |  X  | PV SB                              |             X              |         X         |                   |
+| N 5               |  X  |  X  | Overdrachtsdocument GSB            |                            |                   |                   |
+| Na 31-2 Bijlage 1 |     |  X  | Telresultaten SB                   |             X              |         X         |                   |
+| Na 31-2 Bijlage 2 |     |  X  | Bezwaren SB's                      |                            |                   |                   |
+| Na 31-1           |  X  |     | PV GSB - eerste zitting            |                            |                   |         X         |
+| Na 31-2           |     |  X  | PV GSB - eerste zitting            |                            |                   |         X         |
+| Na 14-1 versie 2  |  X  |     | Corrigendum SB - volgende zitting  |             X              |         X         |                   |
+| Na 14-2 Bijlage 1 |     |  X  | Corrigendum SB - volgende zitting  |             X              |         X         |                   |
+| Na 14-2           |  X  |  X  | Corrigendum GSB - volgende zitting |                            |                   |         X         |
+| P 2a              |  X  |  X  | Verslag volgende zitting           |                            |                   |         X         |
 
 #### N 10-1 (DSO) en N 10-2 (CSO): PV op SB-niveau
 
@@ -117,22 +117,39 @@ EML_NL 510a (tellingsbestand stembureau) wordt niet gebruikt.
 - tellingen GSB en SB's
 - Uitwisselplatform zal EML_NLs omzetten naar CSVs, TODO: publicatie gemeente
 
+### Naamgeving documenten
+
+#### Eerste zitting
+
+- `definitieve-documenten_gr2026_gemeentenaam_gemeente_gemeente-naam-jjjjmmdd-uummss.zip`
+  - `Model_Na31-2.pdf`
+  - `Telling_GR2026_GemeenteNaam.zip`
+    - `Telling_GR2026_GemeenteNaam.eml.xml`
+
+#### Volgende zitting
+
+- `correctie_gr2026_gemeentenaam_gemeente_gemeente-naam-jjjjmmdd-uummss.zip`
+  - `Leeg_Model_P2a.pdf`
+  - `Model_Na14-2.pdf` (als corrigendum)
+  - `Telling_GR2026_GemeenteNaam.zip` (als corrigendum)
+    - `Telling_GR2026_GemeenteNaam.eml.xml`
+
 ## CSB
 
 ### Documenten
 
-| Model(onderdeel)   | DSO  | CSO  | Doel                               | input voor Abacus | output van Abacus |
-| ------------------ | :--: | :--: | ---------------------------------- | :---------------: | :---------------: |
-| Na 31-1            |  X   |      | PV GSB - 1ste zitting              |         X         |                   |
-| Na 31-2            |      |  X   | PV GSB - 1ste zitting              |         X         |                   |
-| Na 14-2            |  X   |  X   | Corrigendum GSB - 2de zitting      |         X         |                   |
-| P 2a               |  X   |  X   | Verslag 2de zitting GSB            |                   |                   |
-| P 22-2             |  X   |  X   | PV CSB - einduitslag               |                   |         X         |
-| P 22-2 sectie 2.11 |  X   |  X   | PV CSB - hertelling n.a.v. bezwaar |                   |        ???        |
+| Model(onderdeel)   | DSO | CSO | Doel                               | input voor Abacus | output van Abacus |
+|--------------------|:---:|:---:|------------------------------------|:-----------------:|:-----------------:|
+| Na 31-1            |  X  |     | PV GSB - 1ste zitting              |         X         |                   |
+| Na 31-2            |     |  X  | PV GSB - 1ste zitting              |         X         |                   |
+| Na 14-2            |  X  |  X  | Corrigendum GSB - 2de zitting      |         X         |                   |
+| P 2a               |  X  |  X  | Verslag 2de zitting GSB            |                   |                   |
+| P 22-2             |  X  |  X  | PV CSB - einduitslag               |                   |         X         |
+| P 22-2 sectie 2.11 |  X  |  X  | PV CSB - hertelling n.a.v. bezwaar |                   |        ???        |
 
 #### P 22-2: einduitslag CSB
 
-- gegenereerd  door Abacus
+- gegenereerd door Abacus
 
 #### P 22-2 sectie 2.11 Hertelling
 

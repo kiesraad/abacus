@@ -1,6 +1,6 @@
 {
   "db_name": "SQLite",
-  "query": "DELETE FROM files WHERE id = ? RETURNING id AS \"id: u32\", data, name, mime_type ",
+  "query": "\n        INSERT INTO files (\n            data,\n            name,\n            mime_type,\n            created_at\n        ) VALUES (?, ?, ?, ?)\n        RETURNING\n            id AS \"id: u32\",\n            data,\n            name,\n            mime_type,\n            created_at AS \"created_at: _\"\n        ",
   "describe": {
     "columns": [
       {
@@ -22,17 +22,23 @@
         "name": "mime_type",
         "ordinal": 3,
         "type_info": "Text"
+      },
+      {
+        "name": "created_at: _",
+        "ordinal": 4,
+        "type_info": "Text"
       }
     ],
     "parameters": {
-      "Right": 1
+      "Right": 4
     },
     "nullable": [
+      false,
       false,
       false,
       false,
       false
     ]
   },
-  "hash": "00fec81161854b197492cb34884f5a1a11a2125c846e8e734407c25e099905f3"
+  "hash": "fec8f06dccdbb17d70237846046f4ba41e935895f59fef137fcbd2e2119e7af2"
 }

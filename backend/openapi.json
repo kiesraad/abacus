@@ -1116,6 +1116,7 @@
     },
     "/api/elections/{election_id}/download_n_10_2": {
       "get": {
+        "summary": "administrator, coordinator",
         "operationId": "election_download_n_10_2",
         "parameters": [
           {
@@ -1195,7 +1196,15 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "cookie_auth": [
+              "administrator",
+              "coordinator"
+            ]
+          }
+        ]
       }
     },
     "/api/elections/{election_id}/download_na_31_2_bijlage1": {

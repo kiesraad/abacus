@@ -36,7 +36,7 @@ impl EML510 {
         summary: &ElectionSummary,
         creation_date_time: &chrono::DateTime<chrono::Local>,
     ) -> EML510 {
-        let authority_id = election.domain_id.clone(); // TODO: replace with election tree when that is available
+        let authority_id = election.domain_id.clone(); // TODO (post 1.0): replace with election tree when that is available
         let total_votes = TotalVotes::from_summary(election, summary);
         let reporting_unit_votes = results
             .iter()
@@ -65,16 +65,16 @@ impl EML510 {
             contests: vec![contest],
         };
         let count = Count {
-            event_identifier: EventIdentifier::default(), // TODO: set election event identifier from election definition (optional value)
+            event_identifier: EventIdentifier::default(),
             election: election_eml,
         };
         EML510 {
             base: EMLBase::new("510b"),
-            transaction_id: "1".into(), // TODO: set transaction id from election definition
+            transaction_id: "1".into(),
             managing_authority: ManagingAuthority {
                 authority_identifier: AuthorityIdentifier {
                     id: authority_id,
-                    name: election.location.clone(), // TODO: replace with authority name from election definition (i.e. data from election tree)
+                    name: election.location.clone(), // TODO (post 1.0): replace with authority name from election tree
                     created_by_authority: None,
                 },
                 authority_address: AuthorityAddress {},

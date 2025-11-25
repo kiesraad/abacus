@@ -154,7 +154,7 @@ export function ElectionHomePage() {
           <div className="mb-xl">
             <div>
               <h2>
-                {/* TODO: Change to conditional GSB/HSB/CSB when implemented */}
+                {/* TODO (post 1.0): Change to conditional GSB/HSB/CSB when implemented */}
                 {t("GSB")} {election.location}
               </h2>
             </div>

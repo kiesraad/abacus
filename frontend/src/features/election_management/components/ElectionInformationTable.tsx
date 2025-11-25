@@ -83,7 +83,7 @@ export function ElectionInformationTable({
             {t("election_management.to_do_data_entry_for")}
           </Table.HeaderCell>
           <Table.Cell>
-            {/* TODO: Change to conditional GSB/HSB/CSB when implemented */}
+            {/* TODO (post 1.0): Change to conditional GSB/HSB/CSB when implemented */}
             {t("GSB")}
           </Table.Cell>
         </Table.Row>

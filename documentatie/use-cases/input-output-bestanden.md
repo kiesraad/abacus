@@ -115,7 +115,7 @@ EML_NL 510a (tellingsbestand stembureau) wordt niet gebruikt.
 
 - niet in scope Abacus
 - tellingen GSB en SB's
-- Uitwisselplatform zal EML_NLs omzetten naar CSVs, TODO: publicatie gemeente
+- worden gepubliceerd op de gemeentewebsite
 
 ### Naamgeving documenten
 

@@ -5,9 +5,11 @@ import { beforeEach, describe, expect, test, vi } from "vitest";
 
 import * as useMessages from "@/hooks/messages/useMessages";
 import { ElectionProvider } from "@/hooks/election/ElectionProvider";
+import { ElectionStatusProvider } from "@/hooks/election/ElectionStatusProvider";
 import { getElectionMockData } from "@/testing/api-mocks/ElectionMockData";
 import {
   ElectionRequestHandler,
+  ElectionStatusRequestHandler,
   PollingStationDeleteHandler,
   PollingStationGetHandler,
   PollingStationUpdateHandler,
@@ -25,7 +27,9 @@ function renderPage(userRole: Role) {
   return render(
     <TestUserProvider userRole={userRole}>
       <ElectionProvider electionId={1}>
-        <PollingStationUpdatePage />
+        <ElectionStatusProvider electionId={1}>
+          <PollingStationUpdatePage />
+        </ElectionStatusProvider>
       </ElectionProvider>
     </TestUserProvider>,
   );
@@ -48,7 +52,12 @@ describe("PollingStationUpdatePage", () => {
   const pushMessage = vi.fn();
 
   beforeEach(() => {
-    server.use(ElectionRequestHandler, PollingStationGetHandler, PollingStationUpdateHandler);
+    server.use(
+      ElectionRequestHandler,
+      ElectionStatusRequestHandler,
+      PollingStationGetHandler,
+      PollingStationUpdateHandler,
+    );
     vi.spyOn(ReactRouter, "useNavigate").mockImplementation(() => navigate);
     vi.spyOn(ReactRouter, "Navigate").mockImplementation((props) => {
       navigate(props.to);
@@ -107,7 +116,7 @@ describe("PollingStationUpdatePage", () => {
 
       // Should have text explaining why
       expect(await screen.findByText("Stembureau verwijderen niet mogelijk")).toBeVisible();
-      expect(await screen.findByText("Er zijn al tellingen ingevoerd.")).toBeVisible();
+      expect(await screen.findByText("Er zijn al tellingen ingevoerd in een eerdere zitting.")).toBeVisible();
     });
 
     test("Returns to list page with a message", async () => {

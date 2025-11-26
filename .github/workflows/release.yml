@@ -1,10 +1,9 @@
 name: Release
 
 on:
-  workflow_dispatch:
-  # Run every Sunday at 12:00 UTC
-  schedule:
-    - cron: "0 12 * * 0"
+  push:
+    tags:
+      - "v[0-9]+.[0-9]+.[0-9]+"
 
 permissions:
   contents: read
@@ -36,7 +35,6 @@ jobs:
           path: frontend/dist
 
   build:
-    if: github.repository == 'kiesraad/abacus'
     name: Build
     needs:
       - build-frontend
@@ -50,9 +48,6 @@ jobs:
           - os: ubuntu-latest
             name: x86_64-unknown-linux-musl
             binary: backend/target/x86_64-unknown-linux-musl/release/abacus
-          - os: macos-latest
-            name: aarch64-apple-darwin
-            binary: backend/target/aarch64-apple-darwin/release/abacus
           - os: windows-latest
             name: x86_64-pc-windows-msvc
             binary: backend/target/x86_64-pc-windows-msvc/release/abacus.exe
@@ -104,7 +99,7 @@ jobs:
       - build
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
+        os: [ubuntu-latest, windows-latest]
     runs-on: ${{ matrix.os }}
     defaults:
       run:
@@ -146,20 +141,15 @@ jobs:
       - playwright-e2e
     runs-on: ubuntu-latest
     permissions:
-      # contents write permission is needed to push the tag
+      # contents write permission is needed to push create a release
+      # https://docs.github.com/en/rest/releases/releases?apiVersion=2022-11-28#create-a-release
       contents: write
     steps:
       - uses: actions/checkout@v5
-      - name: Determine release tag
+      - name: Get build date
         run: |
-          VERSION=$(sed -n '/version\s*=\s*"\([^"]*\)"/{s//\1/p;q}' Cargo.toml)
           BUILD_DATE=$(date -u +'%Y-%m-%d')
-          BUILD_DATE_SHORT=$(date -u +'%Y%m%d')
-          SHA_SHORT=$(git rev-parse --short HEAD)
-          TAG="v${VERSION}-alpha.${BUILD_DATE_SHORT}.${SHA_SHORT}"
           echo "BUILD_DATE=$BUILD_DATE" >> $GITHUB_ENV
-          echo "TAG=$TAG" >> $GITHUB_ENV
-        working-directory: backend
       - name: Create release directory
         run: mkdir -p release
       - name: Download abacus
@@ -167,30 +157,33 @@ jobs:
         with:
           pattern: abacus-release-*
           path: release/
-      - name: Rename binary
+      - name: Create Linux tarball
         run: |
-          mv abacus-release-ubuntu-latest/abacus abacus-linux-${{ env.TAG}}
-          mv abacus-release-macos-latest/abacus abacus-macos-${{ env.TAG}}
-          mv abacus-release-windows-latest/abacus.exe abacus-windows-${{ env.TAG}}.exe
-          rmdir abacus-release-ubuntu-latest abacus-release-macos-latest abacus-release-windows-latest
+          mkdir -p abacus-linux-${{ github.ref_name }}
+          mv abacus-release-ubuntu-latest/abacus abacus-linux-${{ github.ref_name }}/
+          cp ../packaging/linux/abacus.service abacus-linux-${{ github.ref_name }}/
+          tar -czvf abacus-linux-${{ github.ref_name }}.tar.gz abacus-linux-${{ github.ref_name }}
+          rm -rf abacus-linux-${{ github.ref_name }} abacus-release-ubuntu-latest
+        working-directory: release
+      - name: Rename Windows binary
+        run: |
+          mv abacus-release-windows-latest/abacus.exe abacus-windows-${{ github.ref_name }}.exe
+          rmdir abacus-release-windows-latest
         working-directory: release
       - name: Create a SHA256SUMS file
         run: sha256sum -b * > SHA256SUMS
         working-directory: release
-      - name: Create git tag
-        run: git tag $TAG
-      - name: Push git tag
-        run: git push origin $TAG
       - name: Release
         uses: softprops/action-gh-release@5be0e66d93ac7ed76da52eca8bb058f665c3a5fe # v2
         with:
-          body: This is an alpha release of Abacus, commit ${{ github.sha }} on ${{ env.BUILD_DATE }}
-          tag_name: ${{ env.TAG }}
-          prerelease: true
+          body: This is a release of Abacus ${{ github.ref_name }}, commit ${{ github.sha }} on ${{ env.BUILD_DATE }}
+          tag_name: ${{ github.ref_name }}
+          prerelease: false
+          draft: true
           target_commitish: "${{ github.sha }}"
           files: release/*
           token: ${{ secrets.GITHUB_TOKEN }}
-          name: Version ${{ env.TAG }}
+          name: Version ${{ github.ref_name }}
 
   deploy:
     name: Deploy to abacus-test.nl, without airgap detection

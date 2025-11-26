@@ -157,11 +157,18 @@ jobs:
         with:
           pattern: abacus-release-*
           path: release/
-      - name: Rename binary
+      - name: Create Linux tarball
         run: |
-          mv abacus-release-ubuntu-latest/abacus abacus-linux-${{ github.ref_name }}
+          mkdir -p abacus-linux-${{ github.ref_name }}
+          mv abacus-release-ubuntu-latest/abacus abacus-linux-${{ github.ref_name }}/
+          cp ../packaging/linux/abacus.service abacus-linux-${{ github.ref_name }}/
+          tar -czvf abacus-linux-${{ github.ref_name }}.tar.gz abacus-linux-${{ github.ref_name }}
+          rm -rf abacus-linux-${{ github.ref_name }} abacus-release-ubuntu-latest
+        working-directory: release
+      - name: Rename Windows binary
+        run: |
           mv abacus-release-windows-latest/abacus.exe abacus-windows-${{ github.ref_name }}.exe
-          rmdir abacus-release-ubuntu-latest abacus-release-windows-latest
+          rmdir abacus-release-windows-latest
         working-directory: release
       - name: Create a SHA256SUMS file
         run: sha256sum -b * > SHA256SUMS

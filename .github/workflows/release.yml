@@ -48,9 +48,6 @@ jobs:
           - os: ubuntu-latest
             name: x86_64-unknown-linux-musl
             binary: backend/target/x86_64-unknown-linux-musl/release/abacus
-          - os: macos-latest
-            name: aarch64-apple-darwin
-            binary: backend/target/aarch64-apple-darwin/release/abacus
           - os: windows-latest
             name: x86_64-pc-windows-msvc
             binary: backend/target/x86_64-pc-windows-msvc/release/abacus.exe
@@ -102,7 +99,7 @@ jobs:
       - build
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
+        os: [ubuntu-latest, windows-latest]
     runs-on: ${{ matrix.os }}
     defaults:
       run:
@@ -163,9 +160,8 @@ jobs:
       - name: Rename binary
         run: |
           mv abacus-release-ubuntu-latest/abacus abacus-linux-${{ github.ref_name }}
-          mv abacus-release-macos-latest/abacus abacus-macos-${{ github.ref_name }}
           mv abacus-release-windows-latest/abacus.exe abacus-windows-${{ github.ref_name }}.exe
-          rmdir abacus-release-ubuntu-latest abacus-release-macos-latest abacus-release-windows-latest
+          rmdir abacus-release-ubuntu-latest abacus-release-windows-latest
         working-directory: release
       - name: Create a SHA256SUMS file
         run: sha256sum -b * > SHA256SUMS

@@ -24,7 +24,7 @@ jobs:
     steps:
       - uses: actions/checkout@v5
         with:
-          ref: main
+          ref: ${{ github.base_ref || 'main' }}
       - name: Setup Rust
         run: >
           rustup update stable &&
@@ -34,7 +34,7 @@ jobs:
         with:
           workspaces: "backend -> target"
       - name: Generate PDFs
-        run: cargo run --bin gen-pdf --features embed-typst -- --directory main
+        run: cargo run --bin gen-pdf --features embed-typst -- --directory base
       - name: Switch to current branch
         uses: actions/checkout@v5
         with:
@@ -46,6 +46,8 @@ jobs:
       - name: Generate PDF diff summary
         id: diff_summary
         uses: actions/github-script@v8
+        env:
+          BASE_REF: ${{ github.base_ref || 'main' }}
         with:
           script: require('.github/workflows/scripts/pdf-diff.js').pdfDiff({ core });
       - name: Upload diff artifacts

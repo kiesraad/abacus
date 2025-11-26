@@ -3,10 +3,10 @@ const path = require("node:path");
 const { spawnSync } = require("node:child_process");
 
 exports.pdfDiff = ({ core }) => {
-  // Generated PDFs are stored under backend/tmp-pdf-gen/(main/head)
+  // Generated PDFs are stored under backend/tmp-pdf-gen/{base,head}
   const pdfRoot = path.join("backend", "tmp-pdf-gen");
   const dirs = {
-    base: path.join(pdfRoot, "main"),
+    base: path.join(pdfRoot, "base"),
     head: path.join(pdfRoot, "head"),
     diff: path.join(pdfRoot, "diffs"),
   };
@@ -33,8 +33,11 @@ exports.pdfDiff = ({ core }) => {
   ).sort();
 
   // Markdown table that will be posted as a comment on the PR
+  const baseRef = process.env.BASE_REF;
   const rows = [
     "### PDF Diff Summary",
+    "",
+    `Comparing against base branch: \`${baseRef}\``,
     "",
     "| File | Status |",
     "| --- | --- |",

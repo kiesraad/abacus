@@ -43,7 +43,13 @@ impl EML510 {
         let reporting_unit_votes = results
             .iter()
             .map(|(ps, results)| {
-                ReportingUnitVotes::from_polling_station(election, &authority_id, ps, results)
+                ReportingUnitVotes::from_polling_station(
+                    election,
+                    committee_session,
+                    &authority_id,
+                    ps,
+                    results,
+                )
             })
             .collect();
         let contest = Contest {
@@ -248,7 +254,7 @@ pub struct ReportingUnitVotes {
 /// return the relevant investigations.
 fn create_investigations_from_results(
     result: &PollingStationResults,
-) -> Option<ReportingUnitInvestigations> {
+) -> ReportingUnitInvestigations {
     let mut investigations = Vec::new();
 
     if let Some(first_session_result) = result.as_cso_first_session() {
@@ -266,24 +272,19 @@ fn create_investigations_from_results(
             });
         }
 
-        if first_session_result.admitted_voters_have_been_recounted() {
-            investigations.push(Investigation {
-                reason_code: InvestigationReason::AdmittedVotersRecounted,
-                value: true,
-            });
-        }
+        investigations.push(Investigation {
+            reason_code: InvestigationReason::AdmittedVotersRecounted,
+            value: first_session_result.admitted_voters_have_been_recounted(),
+        });
     }
 
-    if !investigations.is_empty() {
-        Some(ReportingUnitInvestigations { investigations })
-    } else {
-        None
-    }
+    ReportingUnitInvestigations { investigations }
 }
 
 impl ReportingUnitVotes {
     pub fn from_polling_station(
         election: &crate::election::ElectionWithPoliticalGroups,
+        committee_session: &CommitteeSession,
         authority_id: &str,
         polling_station: &PollingStation,
         results: &PollingStationResults,
@@ -296,7 +297,11 @@ impl ReportingUnitVotes {
                     polling_station.name, polling_station.postal_code
                 ),
             },
-            reporting_unit_investigations: create_investigations_from_results(results),
+            reporting_unit_investigations: if committee_session.is_next_session() {
+                None
+            } else {
+                Some(create_investigations_from_results(results))
+            },
             selections: Selection::from_political_group_votes(
                 election,
                 results.political_group_votes(),

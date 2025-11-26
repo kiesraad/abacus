@@ -214,7 +214,7 @@ pub struct Investigation {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "PascalCase")]
 pub struct ReportingUnitInvestigations {
-    #[serde(rename = "Investigation")]
+    #[serde(rename(serialize = "kr:Investigation", deserialize = "Investigation"))]
     investigations: Vec<Investigation>,
 }
 
@@ -230,7 +230,14 @@ pub struct ReportingUnitVotes {
     rejected_votes: Vec<RejectedVotes>,
     #[serde(default)]
     uncounted_votes: Vec<UncountedVotes>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        default,
+        skip_serializing_if = "Option::is_none",
+        rename(
+            serialize = "kr:ReportingUnitInvestigations",
+            deserialize = "ReportingUnitInvestigations"
+        )
+    )]
     reporting_unit_investigations: Option<ReportingUnitInvestigations>,
 }
 
@@ -612,6 +619,8 @@ mod tests {
         };
 
         let res = value.to_xml_string().unwrap();
+        assert!(res.contains("<kr:ReportingUnitInvestigations>"));
+        assert!(res.contains("<kr:Investigation"));
         println!("{res}");
     }
 

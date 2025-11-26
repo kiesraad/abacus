@@ -57,12 +57,21 @@ WizardSmallImageBackColor=clNone
 WizardSmallImageFile=abacus_wizard_small.png
 WizardStyle=modern
 
+; For signing the (un)installer and program, uncomment the configuration and follow the steps below.
+; 1. Download Windows SDK: https://developer.microsoft.com/en-us/windows/downloads/windows-sdk/ and install component "Windows SDK Signing Tools for Desktop Apps".
+; 2. Install the SafeNet drivers: https://support.globalsign.com/digital-certificates/manage-safeNet-eToken/safenet-drivers
+; 3. Find path to signtool.exe, e.g. "C:\Program Files (x86)\Windows Kits\10\bin\10.0.26100.0\x64\signtool.exe"
+; 4. Add signtool via menu "Tools -> Configure Sign Tools...", click "Add", use name "winsign" and "C:\your\path\to\signtool.exe $p" as the command.
+; 5. Insert the USB stick with certificate into the computer
+;SignTool=winsign sign /a /tr http://timestamp.globalsign.com/tsa/r6advanced1 /td SHA256 /fd SHA256 $f
+;SignedUninstaller=yes
+
 [Languages]
 Name: "dutch"; MessagesFile: "compiler:Languages\Dutch.isl"
 
 [Files]
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
-Source: ".\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion
+Source: ".\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion sign
 Source: ".\VC_redist.x64.exe"; DestDir: "{tmp}"; Flags: deleteafterinstall
 Source: ".\{#MyAppIcon}"; DestDir: "{app}"
 

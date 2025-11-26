@@ -9,6 +9,7 @@ use super::{
     },
 };
 use crate::{
+    committee_session::CommitteeSession,
     data_entry::{PoliticalGroupCandidateVotes, PollingStationResults},
     polling_station::PollingStation,
     summary::ElectionSummary,
@@ -32,12 +33,13 @@ pub struct EML510 {
 impl EML510 {
     pub fn from_results(
         election: &crate::election::ElectionWithPoliticalGroups,
+        committee_session: &CommitteeSession,
         results: &[(PollingStation, PollingStationResults)],
         summary: &ElectionSummary,
         creation_date_time: &chrono::DateTime<chrono::Local>,
     ) -> EML510 {
         let authority_id = election.domain_id.clone(); // TODO (post 1.0): replace with election tree when that is available
-        let total_votes = TotalVotes::from_summary(election, summary);
+        let total_votes = TotalVotes::from_summary(election, committee_session, summary);
         let reporting_unit_votes = results
             .iter()
             .map(|(ps, results)| {
@@ -146,6 +148,7 @@ pub struct TotalVotes {
 impl TotalVotes {
     pub fn from_summary(
         election: &crate::election::ElectionWithPoliticalGroups,
+        committee_session: &CommitteeSession,
         summary: &ElectionSummary,
     ) -> TotalVotes {
         TotalVotes {
@@ -153,7 +156,7 @@ impl TotalVotes {
                 election,
                 &summary.political_group_votes,
             ),
-            cast: summary.votes_counts.total_votes_cast_count as u64,
+            cast: committee_session.number_of_voters as u64,
             total_counted: summary.votes_counts.total_votes_candidates_count as u64,
             rejected_votes: vec![
                 RejectedVotes::new(

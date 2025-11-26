@@ -59,7 +59,7 @@ De eerste versie van Abacus bevat de functionaliteit voor het GSB bij de Gemeent
   [#546](https://github.com/kiesraad/abacus/issues/546)
 - ✅ De uitslag van het GSB wordt gegenereerd als proces-verbaal in PDF-formaat.
   [#124](https://github.com/kiesraad/abacus/issues/124)
-- ⏳ De uitslag kan na de eerste zitting worden gecorrigeerd met behulp van een corrigendum.
+- ✅ De uitslag kan na de eerste zitting worden gecorrigeerd met behulp van een corrigendum.
   [#1109](https://github.com/kiesraad/abacus/issues/1109),
   [#1885](https://github.com/kiesraad/abacus/issues/1885),
   [#1886](https://github.com/kiesraad/abacus/issues/1886)
@@ -79,18 +79,18 @@ De eerste versie van Abacus bevat de functionaliteit voor het GSB bij de Gemeent
 
 *Deze punten zijn zeer gewenst en worden geïmplementeerd als het kan, maar zonder is de software ook bruikbaar.*
 
-- 📋 Er is een installatieprogramma voor Microsoft Windows.
+- ✅ Er is een installatieprogramma voor Microsoft Windows.
   [#1096](https://github.com/kiesraad/abacus/issues/1096)
 - ✅ De coördinator GSB kan invoerders van het GSB beheren.
   [#2180](https://github.com/kiesraad/abacus/pull/2180)
-- ⏳ De coördinator GSB kan de uitkomst van een stembureau bekijken en eventueel verwijderen.
+- ✅ De coördinator GSB kan de uitkomst van een stembureau bekijken en eventueel verwijderen.
   [#1812](https://github.com/kiesraad/abacus/issues/1812)
 
 ## Versie 1.0: gewenst (could have)
 
 *Deze eisen zullen alleen aan bod komen als er tijd genoeg is.*
 
-- ⏳ De versie voor Microsoft Windows kan door de Kiesraad worden ondertekend.
+- ✅ De versie voor Microsoft Windows kan door de Kiesraad worden ondertekend.
   [#1068](https://github.com/kiesraad/abacus/issues/1068)
 - 📋 Wijzigingen in de lijst met stembureaus (ten opzichte van de gepubliceerde lijst) worden door Abacus in het proces-verbaal vermeld.
   [#1865](https://github.com/kiesraad/abacus/issues/1865)

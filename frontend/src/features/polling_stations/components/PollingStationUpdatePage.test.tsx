@@ -7,6 +7,7 @@ import * as useMessages from "@/hooks/messages/useMessages";
 import { ElectionProvider } from "@/hooks/election/ElectionProvider";
 import { ElectionStatusProvider } from "@/hooks/election/ElectionStatusProvider";
 import { getElectionMockData } from "@/testing/api-mocks/ElectionMockData";
+import { getElectionStatusMockData } from "@/testing/api-mocks/ElectionStatusMockData";
 import {
   ElectionRequestHandler,
   ElectionStatusRequestHandler,
@@ -15,16 +16,16 @@ import {
   PollingStationUpdateHandler,
 } from "@/testing/api-mocks/RequestHandlers";
 import { overrideOnce, server } from "@/testing/server";
-import { render, screen, spyOnHandler, waitFor, within } from "@/testing/test-utils";
+import { renderReturningRouter, screen, spyOnHandler, waitFor, within } from "@/testing/test-utils";
 import { TestUserProvider } from "@/testing/TestUserProvider";
-import { CommitteeSessionStatus, PollingStation, Role } from "@/types/generated/openapi";
+import { CommitteeSessionStatus, DataEntryStatusName, PollingStation, Role } from "@/types/generated/openapi";
 
 import { PollingStationUpdatePage } from "./PollingStationUpdatePage";
 
 const navigate = vi.fn();
 
 function renderPage(userRole: Role) {
-  return render(
+  return renderReturningRouter(
     <TestUserProvider userRole={userRole}>
       <ElectionProvider electionId={1}>
         <ElectionStatusProvider electionId={1}>
@@ -93,15 +94,7 @@ describe("PollingStationUpdatePage", () => {
   });
 
   describe("Delete polling station", () => {
-    test("Delete button should be shown", async () => {
-      renderPage("coordinator");
-
-      expect(await screen.findByTestId("polling-station-form")).toBeVisible();
-      const deleteButton = await screen.findByRole("button", { name: "Stembureau verwijderen" });
-      expect(deleteButton).toBeInTheDocument();
-    });
-
-    test("Delete button should be disabled when polling station is linked to previous session", async () => {
+    test("Delete button should not be shown when polling station is linked to previous session", async () => {
       overrideOnce("get", "/api/elections/1/polling_stations/1", 200, {
         ...testPollingStation,
         id_prev_session: 42,
@@ -119,7 +112,7 @@ describe("PollingStationUpdatePage", () => {
       expect(await screen.findByText("Er zijn al tellingen ingevoerd in een eerdere zitting.")).toBeVisible();
     });
 
-    test("Returns to list page with a message", async () => {
+    test("Returns to list page with a message when clicking delete polling station", async () => {
       server.use(PollingStationDeleteHandler);
       const user = userEvent.setup();
 
@@ -147,10 +140,10 @@ describe("PollingStationUpdatePage", () => {
       const user = userEvent.setup();
 
       const url = `/api/elections/${testPollingStation.election_id}/polling_stations/${testPollingStation.id}`;
-      overrideOnce("delete", url, 422, {
-        error: "Invalid data",
+      overrideOnce("delete", url, 409, {
+        error: "Polling station cannot be deleted.",
         fatal: false,
-        reference: "InvalidData",
+        reference: "PollingStationCannotBeDeleted",
       });
 
       renderPage("coordinator");
@@ -171,6 +164,42 @@ describe("PollingStationUpdatePage", () => {
         "Er zijn al tellingen ingevoerd. De invoer moet eerst verwijderd worden om dit stembureau te kunnen verwijderen.",
       );
     });
+
+    test.each([
+      { status: "first_entry_not_started", allowed: true },
+      { status: "first_entry_in_progress", allowed: false },
+      { status: "first_entry_has_errors", allowed: false },
+      { status: "second_entry_not_started", allowed: false },
+      { status: "second_entry_in_progress", allowed: false },
+      { status: "definitive", allowed: false },
+      { status: "entries_different", allowed: false },
+    ] satisfies Array<{ status: DataEntryStatusName; allowed: boolean }>)(
+      "Renders delete button when polling station data entry status=$status is allowed=$allowed",
+      async ({ status, allowed }) => {
+        overrideOnce("get", "/api/elections/1/status", 200, getElectionStatusMockData({ status: status }));
+        const user = userEvent.setup();
+
+        const router = renderPage("coordinator");
+
+        expect(await screen.findByTestId("polling-station-form")).toBeVisible();
+
+        if (allowed) {
+          const deleteButton = await screen.findByRole("button", { name: "Stembureau verwijderen" });
+          expect(deleteButton).toBeInTheDocument();
+        } else {
+          const deleteButton = screen.queryByRole("button", { name: "Stembureau verwijderen" });
+          expect(deleteButton).not.toBeInTheDocument();
+          expect(await screen.findByText("Stembureau verwijderen niet mogelijk")).toBeVisible();
+          const explanation = await screen.findByText(/Er zijn al tellingen ingevoerd./);
+          expect(explanation).toBeVisible();
+          const link = within(explanation).getByRole("link", { name: "Verwijder eerst de invoer" });
+          await user.click(link);
+          await waitFor(() => {
+            expect(router.state.location.pathname).toEqual("/elections/1/status/1/detail");
+          });
+        }
+      },
+    );
   });
 
   test.each([

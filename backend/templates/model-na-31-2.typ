@@ -233,14 +233,14 @@ Bijvoorbeeld een schorsing of als er meerdere verkiezingen tegelijk werden georg
 
 #checkbox(checked: differences)[Nee, er zijn stembureaus met een verschil]
 
-=== #if input.summary.differences_counts.more_ballots_count.count > 0 [Voor de stembureaus met de nummers #comma_list(input.summary.differences_counts.more_ballots_count.polling_stations)] else [In geen van de stembureaus] zijn *méér* uitgebrachte stemmen dan toegelaten kiezers geteld.
+=== #if input.summary.differences_counts.more_ballots_count.count > 0 [Voor de stembureaus met de nummers #comma_list(input.summary.differences_counts.more_ballots_count.polling_stations)] else [In geen van de stembureaus] zijn er *méér* uitgebrachte stemmen dan toegelaten kiezers geteld.
 
 #letterbox(
   "I",
   value: input.summary.differences_counts.more_ballots_count.count,
 )[Totaal aantal méér getelde stemmen]
 
-=== #if input.summary.differences_counts.fewer_ballots_count.count > 0 [Voor de stembureaus met de nummers #comma_list(input.summary.differences_counts.fewer_ballots_count.polling_stations)] else [In geen van de stembureaus] zijn *minder* uitgebrachte stemmen dan toegelaten kiezers geteld.
+=== #if input.summary.differences_counts.fewer_ballots_count.count > 0 [Voor de stembureaus met de nummers #comma_list(input.summary.differences_counts.fewer_ballots_count.polling_stations)] else [In geen van de stembureaus] zijn er *minder* uitgebrachte stemmen dan toegelaten kiezers geteld.
 
 #letterbox(
   "J",

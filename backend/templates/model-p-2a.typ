@@ -103,14 +103,6 @@ Noteer per onderzocht stembureau: \
   ]
 ]
 
-// Allow for some additional space for manual notes
-#for _ in range(0, 3) [
-  #block(breakable: false)[
-    #v(1.2em)
-    #line(length: 100%, stroke: 0.25pt)
-  ]
-]
-
 #pagebreak(weak: true)
 
 #show: doc => document_numbering(doc)

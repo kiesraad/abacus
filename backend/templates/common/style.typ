@@ -45,7 +45,7 @@
   }
 
   if chapter_string.starts-with("Telresultaten van") {
-    return "Deel 1 - Telresultaten"
+    return "Deel 2 - Telresultaten"
   }
 
   return current_chapter()

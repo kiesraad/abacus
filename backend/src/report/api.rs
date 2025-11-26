@@ -124,6 +124,7 @@ impl ResultsInput {
     fn as_xml(&self) -> EML510 {
         EML510::from_results(
             &self.election,
+            &self.committee_session,
             &self.results,
             &self.summary,
             &self.created_at,

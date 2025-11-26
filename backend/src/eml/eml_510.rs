@@ -9,6 +9,7 @@ use super::{
     },
 };
 use crate::{
+    committee_session::CommitteeSession,
     data_entry::{PoliticalGroupCandidateVotes, PollingStationResults},
     polling_station::PollingStation,
     summary::ElectionSummary,
@@ -32,16 +33,23 @@ pub struct EML510 {
 impl EML510 {
     pub fn from_results(
         election: &crate::election::ElectionWithPoliticalGroups,
+        committee_session: &CommitteeSession,
         results: &[(PollingStation, PollingStationResults)],
         summary: &ElectionSummary,
         creation_date_time: &chrono::DateTime<chrono::Local>,
     ) -> EML510 {
         let authority_id = election.domain_id.clone(); // TODO (post 1.0): replace with election tree when that is available
-        let total_votes = TotalVotes::from_summary(election, summary);
+        let total_votes = TotalVotes::from_summary(election, committee_session, summary);
         let reporting_unit_votes = results
             .iter()
             .map(|(ps, results)| {
-                ReportingUnitVotes::from_polling_station(election, &authority_id, ps, results)
+                ReportingUnitVotes::from_polling_station(
+                    election,
+                    committee_session,
+                    &authority_id,
+                    ps,
+                    results,
+                )
             })
             .collect();
         let contest = Contest {
@@ -146,6 +154,7 @@ pub struct TotalVotes {
 impl TotalVotes {
     pub fn from_summary(
         election: &crate::election::ElectionWithPoliticalGroups,
+        committee_session: &CommitteeSession,
         summary: &ElectionSummary,
     ) -> TotalVotes {
         TotalVotes {
@@ -153,7 +162,7 @@ impl TotalVotes {
                 election,
                 &summary.political_group_votes,
             ),
-            cast: summary.votes_counts.total_votes_cast_count as u64,
+            cast: committee_session.number_of_voters as u64,
             total_counted: summary.votes_counts.total_votes_candidates_count as u64,
             rejected_votes: vec![
                 RejectedVotes::new(
@@ -214,7 +223,7 @@ pub struct Investigation {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "PascalCase")]
 pub struct ReportingUnitInvestigations {
-    #[serde(rename = "Investigation")]
+    #[serde(rename(serialize = "kr:Investigation", deserialize = "Investigation"))]
     investigations: Vec<Investigation>,
 }
 
@@ -230,7 +239,14 @@ pub struct ReportingUnitVotes {
     rejected_votes: Vec<RejectedVotes>,
     #[serde(default)]
     uncounted_votes: Vec<UncountedVotes>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        default,
+        skip_serializing_if = "Option::is_none",
+        rename(
+            serialize = "kr:ReportingUnitInvestigations",
+            deserialize = "ReportingUnitInvestigations"
+        )
+    )]
     reporting_unit_investigations: Option<ReportingUnitInvestigations>,
 }
 
@@ -238,42 +254,37 @@ pub struct ReportingUnitVotes {
 /// return the relevant investigations.
 fn create_investigations_from_results(
     result: &PollingStationResults,
-) -> Option<ReportingUnitInvestigations> {
+) -> ReportingUnitInvestigations {
     let mut investigations = Vec::new();
 
     if let Some(first_session_result) = result.as_cso_first_session() {
-        if first_session_result.investigation_ballots_recounted_is_answered() {
+        if first_session_result.investigation_other_reason_is_answered() {
             investigations.push(Investigation {
                 reason_code: InvestigationReason::InvestigatedOtherReason,
                 value: first_session_result.investigated_other_reason(),
             });
         }
 
-        if first_session_result.investigation_other_reason_is_answered() {
+        if first_session_result.investigation_ballots_recounted_is_answered() {
             investigations.push(Investigation {
                 reason_code: InvestigationReason::BallotsRecounted,
                 value: first_session_result.ballots_have_been_recounted(),
             });
         }
 
-        if first_session_result.admitted_voters_have_been_recounted() {
-            investigations.push(Investigation {
-                reason_code: InvestigationReason::AdmittedVotersRecounted,
-                value: true,
-            });
-        }
+        investigations.push(Investigation {
+            reason_code: InvestigationReason::AdmittedVotersRecounted,
+            value: first_session_result.admitted_voters_have_been_recounted(),
+        });
     }
 
-    if !investigations.is_empty() {
-        Some(ReportingUnitInvestigations { investigations })
-    } else {
-        None
-    }
+    ReportingUnitInvestigations { investigations }
 }
 
 impl ReportingUnitVotes {
     pub fn from_polling_station(
         election: &crate::election::ElectionWithPoliticalGroups,
+        committee_session: &CommitteeSession,
         authority_id: &str,
         polling_station: &PollingStation,
         results: &PollingStationResults,
@@ -286,7 +297,11 @@ impl ReportingUnitVotes {
                     polling_station.name, polling_station.postal_code
                 ),
             },
-            reporting_unit_investigations: create_investigations_from_results(results),
+            reporting_unit_investigations: if committee_session.is_next_session() {
+                None
+            } else {
+                Some(create_investigations_from_results(results))
+            },
             selections: Selection::from_political_group_votes(
                 election,
                 results.political_group_votes(),
@@ -612,6 +627,8 @@ mod tests {
         };
 
         let res = value.to_xml_string().unwrap();
+        assert!(res.contains("<kr:ReportingUnitInvestigations>"));
+        assert!(res.contains("<kr:Investigation"));
         println!("{res}");
     }
 

@@ -216,11 +216,17 @@ pub enum AuditEvent {
     AirGapViolationDetected,
     AirGapViolationResolved,
     // system events
-    ApplicationStarted,
+    ApplicationStarted(ApplicationStartedDetails),
     // api errors
     Error(ErrorDetails),
     #[default]
     UnknownEvent,
+}
+
+#[derive(Serialize, Deserialize, Debug, PartialEq, Eq, ToSchema)]
+pub struct ApplicationStartedDetails {
+    pub version: String,
+    pub commit: String,
 }
 
 impl From<serde_json::Value> for AuditEvent {
@@ -266,7 +272,7 @@ impl AuditEvent {
             AuditEvent::DataEntryDeleted(_) => AuditEventLevel::Info,
             AuditEvent::DataEntryFinalised(_) => AuditEventLevel::Success,
             AuditEvent::ResultDeleted(_) => AuditEventLevel::Success,
-            AuditEvent::ApplicationStarted => AuditEventLevel::Info,
+            AuditEvent::ApplicationStarted(_) => AuditEventLevel::Info,
             AuditEvent::Error(ErrorDetails { level, .. }) => *level,
             AuditEvent::UnknownEvent => AuditEventLevel::Warning,
             AuditEvent::DataEntryDiscardedFirst(_) => AuditEventLevel::Info,

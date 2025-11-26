@@ -7,10 +7,13 @@ export function Footer() {
     gitBranchShort = gitBranch.substring(0, 32) + "…";
   }
   const gitCommit = __GIT_COMMIT__;
+  const gitVersion = __GIT_VERSION__ ?? (gitCommit ? "dev-" + gitCommit.substring(0, 7) : "-");
 
   return (
     <footer>
-      <section>Kiesraad - Abacus GR26 ({t("version")} 1.0.0)</section>
+      <section>
+        Kiesraad - Abacus GR26 ({t("version")} {gitVersion})
+      </section>
       {__SHOW_DEV_PAGE__ && (
         <section>
           <strong>{t("server")}</strong> {__API_MSW__ ? "Mock Service Worker" : "Live"}&nbsp;&nbsp;{" "}

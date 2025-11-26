@@ -47,6 +47,7 @@
   "field": {
     "committee_session_id": "Zitting-ID",
     "corrected_results": "Gecorrigeerde uitkomst",
+    "commit": "Commit",
     "created_at": "Aangemaakt op",
     "data_entry_progress": "Voortgang",
     "data_entry_status": "Status",
@@ -107,7 +108,8 @@
     "session_status": "Zitting status",
     "user_agent": "User agent",
     "user_id": "Gebruikers-ID",
-    "username": "Gebruikersnaam"
+    "username": "Gebruikersnaam",
+    "version": "Versie"
   },
   "filter": {
     "event": "Gebeurtenis",

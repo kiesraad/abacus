@@ -17,12 +17,14 @@ export default defineConfig(({ command }) => {
     __GIT_DIRTY__: undefined as string | undefined,
     __GIT_BRANCH__: undefined as string | undefined,
     __GIT_COMMIT__: undefined as string | undefined,
+    __GIT_VERSION__: undefined as string | undefined,
   };
 
   if (command == "build") {
     let gitDirty: boolean | undefined;
     let gitBranch: string | undefined;
     let gitCommit: string | undefined;
+    let gitVersion: string | undefined;
     try {
       gitDirty = execSync("git status --porcelain").toString().trimEnd().length > 0;
       gitBranch = process.env.GITHUB_HEAD_REF ?? execSync("git rev-parse --abbrev-ref HEAD").toString().trimEnd();
@@ -30,10 +32,31 @@ export default defineConfig(({ command }) => {
     } catch {
       // ignore errors, most likely building from outside a Git repository
     }
+
+    try {
+      gitVersion = execSync("git describe --tags --exact-match --abbrev=0 --match 'v*' HEAD").toString().trimEnd();
+      if (gitVersion.startsWith("v")) {
+        gitVersion = gitVersion.slice(1);
+      }
+    } catch {
+      // ignore errors, most likely no tag for this commit
+    }
+
+    // fallback to dev-<commit> if no tag found
+    if (gitVersion === undefined && gitCommit !== undefined) {
+      gitVersion = "dev-" + gitCommit.slice(0, 7);
+    }
+
+    // append -dirty suffix if needed to version
+    if (gitVersion !== undefined && gitDirty === true) {
+      gitVersion += "-dirty";
+    }
+
     gitDetails = {
       __GIT_DIRTY__: JSON.stringify(gitDirty),
       __GIT_BRANCH__: JSON.stringify(gitBranch),
       __GIT_COMMIT__: JSON.stringify(gitCommit),
+      __GIT_VERSION__: JSON.stringify(gitVersion),
     };
   }
 

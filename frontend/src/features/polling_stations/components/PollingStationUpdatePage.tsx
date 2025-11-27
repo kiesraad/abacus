@@ -126,7 +126,7 @@ export function PollingStationUpdatePage() {
                       <strong>{t("polling_station.delete_not_possible.title")}</strong>
                       <p>{t("polling_station.delete_not_possible.pre_existing_polling_station")}</p>
                     </section>
-                  ) : status && status.status === "first_entry_not_started" ? (
+                  ) : status?.status === "first_entry_not_started" ? (
                     <>
                       <Button variant="tertiary-destructive" leftIcon={<IconTrash />} onClick={toggleShowDeleteModal}>
                         {t("polling_station.delete")}

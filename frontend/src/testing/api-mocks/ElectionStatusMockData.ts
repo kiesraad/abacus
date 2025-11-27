@@ -51,7 +51,7 @@ export const electionStatusesMock: ElectionStatusResponseEntry[] = [
 export const getElectionStatusMockData = (
   status: Partial<ElectionStatusResponseEntry> = {},
 ): ElectionStatusResponse => {
-  const updatedStatuses = electionStatusesMock;
+  const updatedStatuses = [...electionStatusesMock];
   updatedStatuses[0] = {
     ...electionStatusesMock[0]!,
     ...status,

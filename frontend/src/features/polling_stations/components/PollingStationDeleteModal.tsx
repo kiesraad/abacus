@@ -1,4 +1,4 @@
-import { isSuccess } from "@/api/ApiResult";
+import { AnyApiError, isSuccess } from "@/api/ApiResult";
 import { useCrud } from "@/api/useCrud";
 import { IconTrash } from "@/components/generated/icons";
 import { Button } from "@/components/ui/Button/Button";
@@ -10,7 +10,7 @@ export interface PollingStationDeleteModalProps {
   electionId: number;
   pollingStation: PollingStation;
   onDeleted: (pollingStation: PollingStation) => void;
-  onError: () => void;
+  onError: (error: AnyApiError) => void;
   onCancel: () => void;
 }
 
@@ -29,7 +29,7 @@ export function PollingStationDeleteModal({
       if (isSuccess(result)) {
         onDeleted(pollingStation);
       } else {
-        onError();
+        onError(result);
       }
     });
   }

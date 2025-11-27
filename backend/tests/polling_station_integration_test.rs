@@ -12,8 +12,8 @@ use test_log::test;
 use crate::{
     shared::{
         admin_login, change_status_committee_session, claim_data_entry, coordinator_login,
-        create_polling_station, create_result, example_data_entry, get_election_committee_session,
-        save_data_entry, typist_login,
+        create_investigation, create_polling_station, create_result, example_data_entry,
+        get_election_committee_session, save_data_entry, typist_login,
     },
     utils::serve_api,
 };
@@ -919,7 +919,10 @@ async fn test_delete_with_data_entry_fails(pool: SqlitePool) {
         "Unexpected response status"
     );
     let body: ErrorResponse = response.json().await.unwrap();
-    assert_eq!(body.error, "Polling station cannot be deleted.");
+    assert_eq!(
+        body.error,
+        "Polling station cannot be deleted, because a data entry exists"
+    );
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
@@ -936,7 +939,33 @@ async fn test_delete_with_results_fails(pool: SqlitePool) {
         "Unexpected response status"
     );
     let body: ErrorResponse = response.json().await.unwrap();
-    assert_eq!(body.error, "Polling station cannot be deleted.");
+    assert_eq!(
+        body.error,
+        "Polling station cannot be deleted, because a data entry exists"
+    );
+}
+
+#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_5_with_results", "users"))))]
+async fn test_delete_with_investigation_fails(pool: SqlitePool) {
+    let addr = serve_api(pool).await;
+    let coordinator_cookie = coordinator_login(&addr).await;
+    assert_eq!(
+        create_investigation(&addr, 9).await.status(),
+        StatusCode::CREATED
+    );
+
+    let response = delete_polling_station(&addr, &coordinator_cookie, 5, 9).await;
+
+    assert_eq!(
+        response.status(),
+        StatusCode::CONFLICT,
+        "Unexpected response status"
+    );
+    let body: ErrorResponse = response.json().await.unwrap();
+    assert_eq!(
+        body.error,
+        "Polling station cannot be deleted, because an investigation exists"
+    );
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_5_with_results", "users"))))]

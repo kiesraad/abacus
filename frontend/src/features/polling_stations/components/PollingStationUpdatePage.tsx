@@ -1,6 +1,7 @@
 import * as React from "react";
 import { Link, Navigate, useNavigate } from "react-router";
 
+import { AnyApiError } from "@/api/ApiResult";
 import { IconTrash } from "@/components/generated/icons";
 import { PageTitle } from "@/components/page_title/PageTitle";
 import { Alert } from "@/components/ui/Alert/Alert";
@@ -23,7 +24,7 @@ import { PollingStationForm } from "./PollingStationForm";
 export function PollingStationUpdatePage() {
   const { isAdministrator, isCoordinator } = useUserRole();
   const pollingStationId = useNumericParam("pollingStationId");
-  const { election, currentCommitteeSession } = useElection();
+  const { election, currentCommitteeSession, investigation } = useElection(pollingStationId);
   const navigate = useNavigate();
   const { pushMessage } = useMessages();
 
@@ -71,9 +72,13 @@ export function PollingStationUpdatePage() {
     void navigate(parentUrl);
   }
 
-  function handleDeleteError() {
+  function handleDeleteError(error: AnyApiError) {
     setShowDeleteModal(false);
-    setError([t("polling_station.message.delete_error_title"), t("polling_station.message.delete_error")]);
+    const errorDescription =
+      error.message === "Polling station cannot be deleted, because a data entry exists"
+        ? t("polling_station.message.delete_error_data_entry_exists")
+        : t("polling_station.message.delete_error_investigation_exists");
+    setError([t("polling_station.message.delete_error_title"), errorDescription]);
   }
 
   React.useEffect(() => {
@@ -82,8 +87,16 @@ export function PollingStationUpdatePage() {
     }
   }, [error]);
 
-  const link = (title: React.ReactElement) => (
+  const delete_data_entry_link = (title: React.ReactElement) => (
     <Link className="color-visited-link-default" to={`/elections/${election.id}/status/${pollingStationId}/detail`}>
+      {title}
+    </Link>
+  );
+  const delete_investigation_link = (title: React.ReactElement) => (
+    <Link
+      className="color-visited-link-default"
+      to={`/elections/${election.id}/investigations/${investigation?.polling_station_id}/findings`}
+    >
       {title}
     </Link>
   );
@@ -128,7 +141,25 @@ export function PollingStationUpdatePage() {
                       <strong>{t("polling_station.delete_not_possible.title")}</strong>
                       <p>{t("polling_station.delete_not_possible.pre_existing_polling_station")}</p>
                     </section>
-                  ) : status?.status === "first_entry_not_started" ? (
+                  ) : investigation && (status === undefined || status.status === "first_entry_not_started") ? (
+                    <section className="sm">
+                      <strong>{t("polling_station.delete_not_possible.title")}</strong>
+                      <p>
+                        {tx("polling_station.delete_not_possible.delete_existing_investigation", {
+                          link: delete_investigation_link,
+                        })}
+                      </p>
+                    </section>
+                  ) : status?.status !== "first_entry_not_started" ? (
+                    <section className="sm">
+                      <strong>{t("polling_station.delete_not_possible.title")}</strong>
+                      <p>
+                        {tx("polling_station.delete_not_possible.delete_existing_data_entry", {
+                          link: delete_data_entry_link,
+                        })}
+                      </p>
+                    </section>
+                  ) : (
                     <>
                       <Button variant="tertiary-destructive" leftIcon={<IconTrash />} onClick={toggleShowDeleteModal}>
                         {t("polling_station.delete")}
@@ -143,11 +174,6 @@ export function PollingStationUpdatePage() {
                         />
                       )}
                     </>
-                  ) : (
-                    <section className="sm">
-                      <strong>{t("polling_station.delete_not_possible.title")}</strong>
-                      <p>{tx("polling_station.delete_not_possible.delete_existing_data_entry", { link })}</p>
-                    </section>
                   )}
                 </div>
               </>

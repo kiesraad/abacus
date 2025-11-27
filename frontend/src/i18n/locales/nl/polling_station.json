@@ -17,8 +17,9 @@
   },
   "delete_not_possible": {
     "title": "Stembureau verwijderen niet mogelijk",
-    "pre_existing_polling_station": "Er zijn al tellingen ingevoerd in een eerdere zitting.",
-    "delete_existing_data_entry": "Er zijn al tellingen ingevoerd. <link>Verwijder eerst de invoer</link> om dit stembureau te kunnen verwijderen."
+    "pre_existing_polling_station": "Er zijn al tellingen ingevoerd voor dit stembureau in een eerdere zitting.",
+    "delete_existing_data_entry": "Er zijn al tellingen ingevoerd voor dit stembureau. <link>Verwijder eerst de invoer</link> om dit stembureau te kunnen verwijderen.",
+    "delete_existing_investigation": "Er is een onderzoek voor dit stembureau. <link>Verwijder eerst het onderzoek</link> om dit stembureau te kunnen verwijderen."
   },
   "details": "Details van het stembureau",
   "empty": "Er zijn nog geen stembureaus ingevoerd voor deze verkiezing. Kies hoe je stembureaus gaat toevoegen.",
@@ -36,7 +37,8 @@
   "locality": "Plaats",
   "manage": "Stembureaus beheren",
   "message": {
-    "delete_error": "Er zijn al tellingen ingevoerd. De invoer moet eerst verwijderd worden om dit stembureau te kunnen verwijderen.",
+    "delete_error_data_entry_exists": "Er zijn al tellingen ingevoerd voor dit stembureau. De invoer moet eerst verwijderd worden om dit stembureau te kunnen verwijderen.",
+    "delete_error_investigation_exists": "Er is een onderzoek voor dit stembureau. Het onderzoek moet eerst verwijderd worden om dit stembureau te kunnen verwijderen.",
     "delete_error_title": "Stembureau kan niet verwijderd worden",
     "no_polling_stations": "Er zijn nog geen stembureaus ingevoerd voor deze verkiezing. Kies hoe je stembureaus gaat toevoegen.",
     "polling_station_created": "Stembureau {number} ({name}) toegevoegd",

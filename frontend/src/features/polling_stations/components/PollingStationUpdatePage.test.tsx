@@ -59,6 +59,7 @@ describe("PollingStationUpdatePage", () => {
       PollingStationGetHandler,
       PollingStationUpdateHandler,
     );
+    overrideOnce("get", "/api/elections/1", 200, getElectionMockData({}, {}, []));
     vi.spyOn(ReactRouter, "useNavigate").mockImplementation(() => navigate);
     vi.spyOn(ReactRouter, "Navigate").mockImplementation((props) => {
       navigate(props.to);
@@ -109,7 +110,9 @@ describe("PollingStationUpdatePage", () => {
 
       // Should have text explaining why
       expect(await screen.findByText("Stembureau verwijderen niet mogelijk")).toBeVisible();
-      expect(await screen.findByText("Er zijn al tellingen ingevoerd in een eerdere zitting.")).toBeVisible();
+      expect(
+        await screen.findByText("Er zijn al tellingen ingevoerd voor dit stembureau in een eerdere zitting."),
+      ).toBeVisible();
     });
 
     test("Returns to list page with a message when clicking delete polling station", async () => {
@@ -136,12 +139,12 @@ describe("PollingStationUpdatePage", () => {
       expect(navigate).toHaveBeenCalledExactlyOnceWith("/elections/1/polling-stations");
     });
 
-    test("Shows an error message when delete was not possible", async () => {
+    test("Shows an error message when delete was not possible because a data entry exists", async () => {
       const user = userEvent.setup();
 
       const url = `/api/elections/${testPollingStation.election_id}/polling_stations/${testPollingStation.id}`;
       overrideOnce("delete", url, 409, {
-        error: "Polling station cannot be deleted.",
+        error: "Polling station cannot be deleted, because a data entry exists",
         fatal: false,
         reference: "PollingStationCannotBeDeleted",
       });
@@ -161,8 +164,56 @@ describe("PollingStationUpdatePage", () => {
       const deleteAlert = await screen.findByRole("alert");
       expect(within(deleteAlert).getByRole("strong")).toHaveTextContent("Stembureau kan niet verwijderd worden");
       expect(within(deleteAlert).getByRole("paragraph")).toHaveTextContent(
-        "Er zijn al tellingen ingevoerd. De invoer moet eerst verwijderd worden om dit stembureau te kunnen verwijderen.",
+        "Er zijn al tellingen ingevoerd voor dit stembureau. De invoer moet eerst verwijderd worden om dit stembureau te kunnen verwijderen.",
       );
+    });
+
+    test("Shows an error message when delete was not possible because an investigation exists", async () => {
+      const user = userEvent.setup();
+
+      const url = `/api/elections/${testPollingStation.election_id}/polling_stations/${testPollingStation.id}`;
+      overrideOnce("delete", url, 409, {
+        error: "Polling station cannot be deleted, because an investigation exists",
+        fatal: false,
+        reference: "PollingStationCannotBeDeleted",
+      });
+
+      renderPage("coordinator");
+
+      expect(await screen.findByTestId("polling-station-form")).toBeVisible();
+      const deleteButton = await screen.findByRole("button", { name: "Stembureau verwijderen" });
+      await user.click(deleteButton);
+
+      const modal = await screen.findByTestId("modal-dialog");
+      expect(modal).toHaveTextContent("Stembureau verwijderen?");
+
+      const confirmButton = await within(modal).findByRole("button", { name: "Verwijderen" });
+      await user.click(confirmButton);
+
+      const deleteAlert = await screen.findByRole("alert");
+      expect(within(deleteAlert).getByRole("strong")).toHaveTextContent("Stembureau kan niet verwijderd worden");
+      expect(within(deleteAlert).getByRole("paragraph")).toHaveTextContent(
+        "Er is een onderzoek voor dit stembureau. Het onderzoek moet eerst verwijderd worden om dit stembureau te kunnen verwijderen.",
+      );
+    });
+
+    test("Renders a message and link instead of delete button because an investigation exists", async () => {
+      overrideOnce("get", "/api/elections/1", 200, getElectionMockData({}, {}));
+      const user = userEvent.setup();
+
+      const router = renderPage("coordinator");
+
+      expect(await screen.findByTestId("polling-station-form")).toBeVisible();
+      const deleteButton = screen.queryByRole("button", { name: "Stembureau verwijderen" });
+      expect(deleteButton).not.toBeInTheDocument();
+      expect(await screen.findByText("Stembureau verwijderen niet mogelijk")).toBeVisible();
+      const explanation = await screen.findByText(/Er is een onderzoek voor dit stembureau./);
+      expect(explanation).toBeVisible();
+      const link = within(explanation).getByRole("link", { name: "Verwijder eerst het onderzoek" });
+      await user.click(link);
+      await waitFor(() => {
+        expect(router.state.location.pathname).toEqual("/elections/1/investigations/1/findings");
+      });
     });
 
     test.each([
@@ -190,7 +241,7 @@ describe("PollingStationUpdatePage", () => {
           const deleteButton = screen.queryByRole("button", { name: "Stembureau verwijderen" });
           expect(deleteButton).not.toBeInTheDocument();
           expect(await screen.findByText("Stembureau verwijderen niet mogelijk")).toBeVisible();
-          const explanation = await screen.findByText(/Er zijn al tellingen ingevoerd./);
+          const explanation = await screen.findByText(/Er zijn al tellingen ingevoerd voor dit stembureau./);
           expect(explanation).toBeVisible();
           const link = within(explanation).getByRole("link", { name: "Verwijder eerst de invoer" });
           await user.click(link);
@@ -211,7 +262,7 @@ describe("PollingStationUpdatePage", () => {
   ] satisfies Array<{ status: CommitteeSessionStatus; allowed: boolean }>)(
     "Renders page when committee session status=$status is allowed=$allowed for administrator",
     async ({ status, allowed }) => {
-      overrideOnce("get", "/api/elections/1", 200, getElectionMockData({}, { status }));
+      overrideOnce("get", "/api/elections/1", 200, getElectionMockData({}, { status }, []));
 
       renderPage("administrator");
 

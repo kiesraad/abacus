@@ -135,6 +135,21 @@ pub async fn list_investigations_for_committee_session(
     .await
 }
 
+/// Check if a polling station has an investigation
+pub async fn investigation_exists(conn: &mut SqliteConnection, id: u32) -> Result<bool, Error> {
+    let res = query!(
+        r#"
+        SELECT EXISTS(
+            SELECT 1 FROM polling_station_investigations
+            WHERE polling_station_id = ?)
+        AS `exists`"#,
+        id
+    )
+    .fetch_one(conn)
+    .await?;
+    Ok(res.exists == 1)
+}
+
 #[cfg(test)]
 pub async fn insert_test_investigation(
     conn: &mut SqliteConnection,

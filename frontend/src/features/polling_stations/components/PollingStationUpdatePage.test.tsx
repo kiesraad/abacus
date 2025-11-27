@@ -59,7 +59,6 @@ describe("PollingStationUpdatePage", () => {
       PollingStationGetHandler,
       PollingStationUpdateHandler,
     );
-    overrideOnce("get", "/api/elections/1", 200, getElectionMockData({}, {}, []));
     vi.spyOn(ReactRouter, "useNavigate").mockImplementation(() => navigate);
     vi.spyOn(ReactRouter, "Navigate").mockImplementation((props) => {
       navigate(props.to);
@@ -198,7 +197,7 @@ describe("PollingStationUpdatePage", () => {
     });
 
     test("Renders a message and link instead of delete button because an investigation exists", async () => {
-      overrideOnce("get", "/api/elections/1", 200, getElectionMockData({}, {}));
+      overrideOnce("get", "/api/elections/1", 200, getElectionMockData({}, { number: 2 }));
       const user = userEvent.setup();
 
       const router = renderPage("coordinator");
@@ -262,7 +261,7 @@ describe("PollingStationUpdatePage", () => {
   ] satisfies Array<{ status: CommitteeSessionStatus; allowed: boolean }>)(
     "Renders page when committee session status=$status is allowed=$allowed for administrator",
     async ({ status, allowed }) => {
-      overrideOnce("get", "/api/elections/1", 200, getElectionMockData({}, { status }, []));
+      overrideOnce("get", "/api/elections/1", 200, getElectionMockData({}, { status }));
 
       renderPage("administrator");
 

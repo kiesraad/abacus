@@ -48,6 +48,7 @@ async function renderPage(pollingStationId: number) {
 describe("InvestigationReasonPage", () => {
   beforeEach(() => {
     server.use(ElectionRequestHandler, ElectionStatusRequestHandler);
+    overrideOnce("get", "/api/elections/1", 200, getElectionMockData({}, { number: 2 }));
     vi.spyOn(ReactRouter, "useNavigate").mockImplementation(() => navigate);
     vi.spyOn(useMessages, "useMessages").mockReturnValue({
       pushMessage,
@@ -66,8 +67,7 @@ describe("InvestigationReasonPage", () => {
   });
 
   test("Displays an error message when submitting an empty form", async () => {
-    const electionData = getElectionMockData({}, {}, []);
-    overrideOnce("get", "/api/elections/1", 200, electionData);
+    overrideOnce("get", "/api/elections/1", 200, getElectionMockData({}, { number: 2 }, []));
 
     await renderPage(3);
 
@@ -86,8 +86,7 @@ describe("InvestigationReasonPage", () => {
   test("Navigate to the next page when submitting a reason", async () => {
     server.use(PollingStationInvestigationCreateHandler);
     const create = spyOnHandler(PollingStationInvestigationCreateHandler);
-    const electionData = getElectionMockData({}, {}, []);
-    overrideOnce("get", "/api/elections/1", 200, electionData);
+    overrideOnce("get", "/api/elections/1", 200, getElectionMockData({}, { number: 2 }, []));
 
     await renderPage(3);
 

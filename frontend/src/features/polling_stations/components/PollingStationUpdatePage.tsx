@@ -83,7 +83,9 @@ export function PollingStationUpdatePage() {
   }, [error]);
 
   const link = (title: React.ReactElement) => (
-    <Link to={`/elections/${election.id}/status/${pollingStationId}/detail`}>{title}</Link>
+    <Link className="color-visited-link-default" to={`/elections/${election.id}/status/${pollingStationId}/detail`}>
+      {title}
+    </Link>
   );
 
   if (!isPollingStationCreateAndUpdateAllowed(isCoordinator, isAdministrator, currentCommitteeSession.status)) {

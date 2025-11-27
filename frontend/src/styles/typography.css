@@ -113,6 +113,12 @@ a {
   }
 }
 
+.color-visited-link-default {
+  &:visited {
+    color: var(--link-default);
+  }
+}
+
 .underlined {
   text-decoration: underline;
   color: var(--link-default);

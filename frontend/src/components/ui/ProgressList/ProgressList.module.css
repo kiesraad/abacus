@@ -4,6 +4,7 @@
   flex-direction: column;
   overflow: hidden;
   gap: 1rem;
+  max-height: 70vh;
 
   ul {
     list-style: none;

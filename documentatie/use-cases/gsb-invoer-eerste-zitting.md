@@ -32,9 +32,11 @@ __Uitbreidingen:__
 
 2-3b. De telling van het stembureau moet worden gecorrigeerd nadat deze al twee keer was ingevoerd:  
 &emsp; 2-3b1. De coördinator GSB verwijdert de invoer van het stembureau.  
-&emsp;&emsp; 2-3b1a. Als een invoer verwijderd wordt dan wordt de status weer teruggezet naar "Werkvoorraad".
-Ook de gegenereerde documenten worden dan verwijderd.  
-&emsp; 2-3b2. De coördinator GSB laat het stembureau twee keer invoeren.
+&emsp; 2-3b2. De applicatie zet de invoer terug naar de initiële status.  
+&emsp; 2-3b3. De applicatie stelt vast dat het PV (DSO: Na 31-1, CSO: Na 31-2) en het tellingsbestand EML 510b van de zitting niet zijn gegenereerd.  
+&emsp;&emsp; 2-3b3a. De applicatie stelt vast dat het PV en het tellingsbestand van de zitting zijn gegenereerd:  
+&emsp;&emsp;&emsp; 2-3b3a1. De applicatie verwijdert de gegenereerde documenten.  
+&emsp; 2-3b4. De coördinator GSB laat het stembureau twee keer invoeren.
 
 5a. De applicatie stelt vast dat niet voor alle stembureaus resultaten zijn ingevoerd:
 

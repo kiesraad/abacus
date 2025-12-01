@@ -43,7 +43,7 @@ jobs:
           /usr/share/swift
           &&
           df -h
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       # Build frontend so that it can be included in the backend build
       - name: Setup Node
         uses: actions/setup-node@v6

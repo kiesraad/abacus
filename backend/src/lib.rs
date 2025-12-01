@@ -347,10 +347,7 @@ pub async fn start_server(
     listener: TcpListener,
     enable_airgap_detection: bool,
 ) -> Result<(), AppError> {
-    info!(
-        "Starting Abacus GR26 (version {})",
-        env!("ABACUS_GIT_VERSION")
-    );
+    info!("Starting Abacus (version {})", env!("ABACUS_GIT_VERSION"));
     let airgap_detection = if enable_airgap_detection {
         info!("Airgap detection is enabled, starting airgap detection task...");
 

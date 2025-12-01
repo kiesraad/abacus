@@ -342,6 +342,7 @@ pub fn router(pool: SqlitePool, airgap_detection: AirgapDetection) -> Result<Rou
 }
 
 /// Start the API server on the given port, using the given database pool.
+#[allow(clippy::cognitive_complexity)]
 pub async fn start_server(
     pool: SqlitePool,
     listener: TcpListener,

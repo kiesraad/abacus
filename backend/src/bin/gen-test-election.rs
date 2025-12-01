@@ -1,3 +1,5 @@
+#![allow(clippy::cognitive_complexity)]
+#![allow(clippy::too_many_lines)]
 use abacus::{
     AppError,
     committee_session::CommitteeSession,

@@ -73,8 +73,8 @@ const testCases: TestCases = {
       },
       data_entry_paused: {
         buttonsCurrentSession: [
-          "Aangevraagde onderzoeken",
           "Hervatten of voortgang bekijken",
+          "Aangevraagde onderzoeken",
           "Details van de zitting",
         ],
       },
@@ -112,7 +112,7 @@ const testCases: TestCases = {
         actionButton: "Bekijk voortgang",
       },
       data_entry_paused: {
-        buttonsCurrentSession: ["Aangevraagde onderzoeken", "Bekijk voortgang"],
+        buttonsCurrentSession: ["Bekijk voortgang", "Aangevraagde onderzoeken"],
       },
       data_entry_finished: {
         buttonsCurrentSession: ["Aangevraagde onderzoeken", "Invoer bekijken"],

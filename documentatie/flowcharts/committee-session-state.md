@@ -12,11 +12,11 @@ stateDiagram-v2
   Created --> DataEntryNotStarted: add <br/> PS/Inv
   DataEntryNotStarted --> DataEntryInProgress: click start <br/> data entry
   DataEntryNotStarted --> Created: delete last <br/> PS/Inv
-  DataEntryInProgress --> Created: delete last <br/> PS/Inv*
+  DataEntryInProgress --> Created: delete last <br/> PS/Inv
   DataEntryInProgress --> DataEntryFinished: click finish <br/> data entry
   DataEntryInProgress --> DataEntryPaused: click pause <br/> data entry
   DataEntryPaused --> DataEntryInProgress: click resume <br/> data entry
-  DataEntryPaused --> Created: delete last <br/> PS/Inv*
+  DataEntryPaused --> Created: delete last <br/> PS/Inv
   DataEntryPaused --> DataEntryFinished: click finish <br/> data entry
   DataEntryFinished --> DataEntryInProgress: add new <br/> PS/Inv
   DataEntryFinished --> DataEntryInProgress: click resume <br/> data entry/update Inv

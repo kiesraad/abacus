@@ -266,7 +266,7 @@ mod tests {
     }
 
     #[test(sqlx::test(fixtures("../../fixtures/users.sql")))]
-    async fn test_whoami(pool: SqlitePool) {
+    async fn test_account(pool: SqlitePool) {
         let app = create_app(pool);
 
         let cookie = login_as_admin(app.clone()).await;
@@ -276,7 +276,7 @@ mod tests {
             .oneshot(
                 Request::builder()
                     .method(Method::GET)
-                    .uri("/api/whoami")
+                    .uri("/api/account")
                     .header(USER_AGENT, TEST_USER_AGENT)
                     .header(COOKIE, &cookie)
                     .body(Body::empty())
@@ -315,7 +315,7 @@ mod tests {
             .oneshot(
                 Request::builder()
                     .method(Method::GET)
-                    .uri("/api/whoami")
+                    .uri("/api/account")
                     .header(USER_AGENT, TEST_USER_AGENT)
                     .header(COOKIE, &cookie)
                     .body(Body::empty())
@@ -332,7 +332,7 @@ mod tests {
             .oneshot(
                 Request::builder()
                     .method(Method::GET)
-                    .uri("/api/whoami")
+                    .uri("/api/account")
                     .body(Body::empty())
                     .unwrap(),
             )
@@ -451,7 +451,7 @@ mod tests {
             .oneshot(
                 Request::builder()
                     .method(Method::GET)
-                    .uri("/api/user")
+                    .uri("/api/users")
                     .header(USER_AGENT, TEST_USER_AGENT)
                     .header(COOKIE, cookie.encoded().to_string())
                     .body(Body::empty())
@@ -489,7 +489,7 @@ mod tests {
             .oneshot(
                 Request::builder()
                     .method(Method::GET)
-                    .uri("/api/whoami")
+                    .uri("/api/account")
                     .header(USER_AGENT, TEST_USER_AGENT)
                     .header(COOKIE, cookie.encoded().to_string())
                     .body(Body::empty())
@@ -519,7 +519,7 @@ mod tests {
             .oneshot(
                 Request::builder()
                     .method(Method::GET)
-                    .uri("/api/whoami")
+                    .uri("/api/account")
                     .header(USER_AGENT, TEST_USER_AGENT)
                     .header(COOKIE, cookie.encoded().to_string())
                     .body(Body::empty())
@@ -547,7 +547,7 @@ mod tests {
             .oneshot(
                 Request::builder()
                     .method(Method::POST)
-                    .uri("/api/user")
+                    .uri("/api/users")
                     .header(CONTENT_TYPE, "application/json")
                     .header(USER_AGENT, TEST_USER_AGENT)
                     .header(COOKIE, cookie)
@@ -582,7 +582,7 @@ mod tests {
             .oneshot(
                 Request::builder()
                     .method(Method::PUT)
-                    .uri("/api/user/1")
+                    .uri("/api/users/1")
                     .header(CONTENT_TYPE, "application/json")
                     .header(USER_AGENT, TEST_USER_AGENT)
                     .header(COOKIE, cookie)
@@ -627,7 +627,7 @@ mod tests {
             .oneshot(
                 Request::builder()
                     .method(Method::GET)
-                    .uri("/api/user")
+                    .uri("/api/users")
                     .header(USER_AGENT, TEST_USER_AGENT)
                     .header(COOKIE, cookie.encoded().to_string())
                     .body(Body::empty())
@@ -652,7 +652,7 @@ mod tests {
             .oneshot(
                 Request::builder()
                     .method(Method::GET)
-                    .uri("/api/whoami")
+                    .uri("/api/account")
                     .header(USER_AGENT, "DifferentAgent/2.0")
                     .header(COOKIE, &cookie)
                     .body(Body::empty())
@@ -674,7 +674,7 @@ mod tests {
 
         let mut request = Request::builder()
             .method(Method::GET)
-            .uri("/api/whoami")
+            .uri("/api/account")
             .header(USER_AGENT, TEST_USER_AGENT)
             .header(COOKIE, &cookie)
             .body(Body::empty())

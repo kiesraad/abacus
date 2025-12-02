@@ -3,6 +3,8 @@
 /** PATHS **/
 
 // /api/account
+export type ACCOUNT_REQUEST_PARAMS = Record<string, never>;
+export type ACCOUNT_REQUEST_PATH = `/api/account`;
 export type ACCOUNT_UPDATE_REQUEST_PARAMS = Record<string, never>;
 export type ACCOUNT_UPDATE_REQUEST_PATH = `/api/account`;
 export type ACCOUNT_UPDATE_REQUEST_BODY = AccountUpdateRequest;
@@ -291,31 +293,27 @@ export interface POLLING_STATION_INVESTIGATION_DOWNLOAD_CORRIGENDUM_PDF_REQUEST_
 export type POLLING_STATION_INVESTIGATION_DOWNLOAD_CORRIGENDUM_PDF_REQUEST_PATH =
   `/api/polling_stations/${number}/investigation/download_corrigendum_pdf`;
 
-// /api/user
+// /api/users
 export type USER_LIST_REQUEST_PARAMS = Record<string, never>;
-export type USER_LIST_REQUEST_PATH = `/api/user`;
+export type USER_LIST_REQUEST_PATH = `/api/users`;
 export type USER_CREATE_REQUEST_PARAMS = Record<string, never>;
-export type USER_CREATE_REQUEST_PATH = `/api/user`;
+export type USER_CREATE_REQUEST_PATH = `/api/users`;
 export type USER_CREATE_REQUEST_BODY = CreateUserRequest;
 
-// /api/user/{user_id}
+// /api/users/{user_id}
 export interface USER_GET_REQUEST_PARAMS {
   user_id: number;
 }
-export type USER_GET_REQUEST_PATH = `/api/user/${number}`;
+export type USER_GET_REQUEST_PATH = `/api/users/${number}`;
 export interface USER_UPDATE_REQUEST_PARAMS {
   user_id: number;
 }
-export type USER_UPDATE_REQUEST_PATH = `/api/user/${number}`;
+export type USER_UPDATE_REQUEST_PATH = `/api/users/${number}`;
 export type USER_UPDATE_REQUEST_BODY = UpdateUserRequest;
 export interface USER_DELETE_REQUEST_PARAMS {
   user_id: number;
 }
-export type USER_DELETE_REQUEST_PATH = `/api/user/${number}`;
-
-// /api/whoami
-export type WHOAMI_REQUEST_PARAMS = Record<string, never>;
-export type WHOAMI_REQUEST_PATH = `/api/whoami`;
+export type USER_DELETE_REQUEST_PATH = `/api/users/${number}`;
 
 /** TYPES **/
 

@@ -21,7 +21,7 @@ type ValidationErrors = Partial<CreateUserRequest>;
 
 export function UserCreateDetailsForm({ role, showFullname, onSubmitted }: UserCreateDetailsFormProps) {
   const [validationErrors, setValidationErrors] = useState<ValidationErrors | null>(null);
-  const createPath: USER_CREATE_REQUEST_PATH = "/api/user";
+  const createPath: USER_CREATE_REQUEST_PATH = "/api/users";
   const { create, isLoading } = useCrud<User>({ createPath });
   const [usernameUniqueError, setUsernameUniqueError] = useState<string | undefined>(undefined);
   const [error, setError] = useState<AnyApiError>();

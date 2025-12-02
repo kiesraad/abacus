@@ -218,7 +218,7 @@ export const test = base.extend<Fixtures>({
   newTypist: async ({ request }, use) => {
     await loginAs(request, "admin1");
     // create a new user
-    const url: USER_CREATE_REQUEST_PATH = "/api/user";
+    const url: USER_CREATE_REQUEST_PATH = "/api/users";
     const data: USER_CREATE_REQUEST_BODY = {
       role: "typist",
       username: createRandomUsername(),

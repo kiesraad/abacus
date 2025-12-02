@@ -103,7 +103,7 @@ describe("User create pages integration test", () => {
   describe("Save user", () => {
     test("Successfully", async () => {
       server.use(UserListRequestHandler);
-      overrideOnce("post", "/api/user", 201, {
+      overrideOnce("post", "/api/users", 201, {
         id: 10,
         username: "GuusGeluk",
         fullname: "Guus Geluk",
@@ -132,7 +132,7 @@ describe("User create pages integration test", () => {
     });
 
     test("Showing a unique username error", async () => {
-      overrideOnce("post", "/api/user", 409, {
+      overrideOnce("post", "/api/users", 409, {
         error: "Username already exists",
         fatal: false,
         reference: "UsernameNotUnique",

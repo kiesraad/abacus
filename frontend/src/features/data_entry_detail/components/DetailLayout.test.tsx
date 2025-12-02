@@ -114,7 +114,7 @@ describe("DetailLayout", () => {
     });
 
     await waitFor(() => {
-      expect(navigate).toHaveBeenCalledWith("/elections/1/status");
+      expect(navigate).toHaveBeenCalledWith("/elections/1/status", { replace: true });
     });
   });
 

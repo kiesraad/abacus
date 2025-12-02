@@ -57,8 +57,10 @@ pub mod zip;
 pub use app_error::AppError;
 pub use error::{APIError, ErrorResponse};
 
-use crate::app_error::{DatabaseErrorWithPath, DatabaseMigrationErrorWithPath};
-use crate::authentication::SECURITY_SCHEME_NAME;
+use crate::{
+    app_error::{DatabaseErrorWithPath, DatabaseMigrationErrorWithPath},
+    authentication::SECURITY_SCHEME_NAME,
+};
 
 /// Maximum size of the request body in megabytes.
 pub const MAX_BODY_SIZE_MB: usize = 12;
@@ -348,10 +350,7 @@ pub async fn start_server(
     listener: TcpListener,
     enable_airgap_detection: bool,
 ) -> Result<(), AppError> {
-    info!(
-        "Starting Abacus GR26 (version {})",
-        env!("ABACUS_GIT_VERSION")
-    );
+    info!("Starting Abacus (version {})", env!("ABACUS_GIT_VERSION"));
     let airgap_detection = if enable_airgap_detection {
         info!("Airgap detection is enabled, starting airgap detection task...");
 
@@ -533,11 +532,11 @@ mod test {
         let _ = server_task.await;
     }
 
-    /// Test that Abacus server starts and the whoami endpoint returns 401 Unauthorized
+    /// Test that Abacus server starts and the account endpoint returns 401 Unauthorized
     #[test(sqlx::test)]
     async fn test_abacus_starts(pool: SqlitePool) {
         run_server_test(pool, |base_url| async move {
-            let result = reqwest::get(format!("{base_url}/api/whoami"))
+            let result = reqwest::get(format!("{base_url}/api/account"))
                 .await
                 .unwrap();
 
@@ -550,7 +549,7 @@ mod test {
     #[test(sqlx::test)]
     async fn test_security_headers(pool: SqlitePool) {
         run_server_test(pool, |base_url| async move {
-            let response = reqwest::get(format!("{base_url}/api/whoami"))
+            let response = reqwest::get(format!("{base_url}/api/account"))
                 .await
                 .unwrap();
 
@@ -613,7 +612,7 @@ mod test {
     #[test(sqlx::test)]
     async fn test_cache_headers(pool: SqlitePool) {
         run_server_test(pool, |base_url| async move {
-            let response = reqwest::get(format!("{base_url}/api/whoami"))
+            let response = reqwest::get(format!("{base_url}/api/account"))
                 .await
                 .unwrap();
             assert_eq!(response.headers()["cache-control"], "no-store");
@@ -650,7 +649,7 @@ mod test {
             assert_eq!(response.status(), 404);
 
             // Test that valid API endpoints still work
-            let response = reqwest::get(format!("{base_url}/api/whoami"))
+            let response = reqwest::get(format!("{base_url}/api/account"))
                 .await
                 .unwrap();
             // Should return 401 (Unauthorized) since we're not logged in

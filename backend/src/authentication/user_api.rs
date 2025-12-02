@@ -33,7 +33,7 @@ pub struct UserListResponse {
 /// Lists all users
 #[utoipa::path(
     get,
-    path = "/api/user",
+    path = "/api/users",
     responses(
         (status = 200, description = "User list", body = UserListResponse),
         (status = 401, description = "Unauthorized", body = ErrorResponse),
@@ -73,7 +73,7 @@ pub struct UpdateUserRequest {
 /// Create a new user
 #[utoipa::path(
     post,
-    path = "/api/user",
+    path = "/api/users",
     request_body = CreateUserRequest,
     responses(
         (status = 201, description = "User created", body = User),
@@ -117,7 +117,7 @@ pub async fn user_create(
 /// Get a user
 #[utoipa::path(
     get,
-    path = "/api/user/{user_id}",
+    path = "/api/users/{user_id}",
     responses(
         (status = 200, description = "User found", body = User),
         (status = 401, description = "Unauthorized", body = ErrorResponse),
@@ -151,7 +151,7 @@ async fn user_get(
 /// Update a user
 #[utoipa::path(
     put,
-    path = "/api/user/{user_id}",
+    path = "/api/users/{user_id}",
     request_body = UpdateUserRequest,
     responses(
         (status = 200, description = "User updated", body = User),
@@ -211,7 +211,7 @@ pub async fn user_update(
 /// Delete a user
 #[utoipa::path(
     delete,
-    path = "/api/user/{user_id}",
+    path = "/api/users/{user_id}",
     responses(
         (status = 204, description = "User deleted successfully"),
         (status = 401, description = "Unauthorized", body = ErrorResponse),

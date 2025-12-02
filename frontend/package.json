@@ -39,6 +39,7 @@
     "vite": "^6.4.1"
   },
   "devDependencies": {
+    "@biomejs/biome": "2.3.10",
     "@codecov/vite-plugin": "^1.9.1",
     "@eslint/js": "^9.39.2",
     "@playwright/test": "^1.57.0",

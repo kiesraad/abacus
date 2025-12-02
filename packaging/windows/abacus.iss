@@ -11,7 +11,7 @@
   DeleteFile(AddBackslash(SourcePath) + "version.txt"), \
   Trim(Local[3])
 
-#define MyAppName "Abacus GR26"
+#define MyAppName "Abacus"
 #define MyAppPublisher "Kiesraad"
 #define MyAppURL "https://github.com/kiesraad/abacus"
 #define MyAppExeName "abacus.exe"
@@ -103,7 +103,7 @@ var
 begin
   repeat
     Retry := False;
-    
+
     if not ShellExec('runas', ExpandConstant('{sys}\cmd.exe'),
       '/c ' + CmdLine, '', SW_HIDE, ewWaitUntilTerminated, ResultCode) then
     begin
@@ -156,7 +156,7 @@ begin
       if FileExists(ExpandConstant('{app}\{#MyDatabaseFile}')) then
         begin
         case TaskDialogMsgBox('Database verwijderen?',
-                     'De database bevat alle verkiezingsdetails, ingevoerde data en gemaakte processen-verbaal.' + #13#10#13#10 + 'Als u de database verwijdert, gaan deze gegevens definitief verloren.',   
+                     'De database bevat alle verkiezingsdetails, ingevoerde data en gemaakte processen-verbaal.' + #13#10#13#10 + 'Als u de database verwijdert, gaan deze gegevens definitief verloren.',
                       mbConfirmation,
                       MB_YESNO, ['Database verwijderen', 'Bewaren'],
                       0) of
@@ -167,7 +167,7 @@ begin
           IDNO: MsgBox('Database wordt behouden', mbInformation, MB_OK);
         end;
       end;
-        
+
       RunElevatedCommandWithRetry('netsh advfirewall firewall delete rule name="Abacus server"', 'Het verwijderen van de firewallregel');
     end;
 end;

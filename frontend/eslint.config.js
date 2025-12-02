@@ -25,11 +25,11 @@ export default tseslint.config(
     // global ignores
     ignores: [
       "dist/**",
+      "coverage/**",
       "dist-storybook/**",
       "playwright-report/**",
       "eslint.config.js",
       "mockServiceWorker.js",
-      "vitest.shims.d.ts",
     ],
   },
   {
@@ -61,7 +61,7 @@ export default tseslint.config(
         {
           zones: [
             // disables cross-feature imports:
-            // eg. src/features/abc should not import from src/features/xyz, etc.
+            // e.g. src/features/abc should not import from src/features/xyz, etc.
             ...restrictFeatureImports,
 
             // enforce unidirectional codebase:
@@ -72,7 +72,7 @@ export default tseslint.config(
               message: "Imports from app are not allowed in features.",
             },
 
-            // e.g src/features and src/app can import from these shared modules but not the other way around
+            // e.g. src/features and src/app can import from these shared modules but not the other way around
             {
               target: ["./src/components", "./src/hooks", "./src/lib", "./src/types", "./src/utils"],
               from: ["./src/features", "./src/app"],

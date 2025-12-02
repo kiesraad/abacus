@@ -28,7 +28,7 @@ export function InvestigationPrintCorrigendumPage() {
       }),
     });
 
-    void navigate(`/elections/${election.id}/investigations`);
+    void navigate(`/elections/${election.id}/investigations`, { replace: true });
   }
 
   return (

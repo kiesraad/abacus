@@ -11,20 +11,10 @@ __Hoofdscenario:__
 2. (voor elk stembureau) [De invoerders vullen de resultaten van de tellingen in.](#de-invoerders-vullen-de-resultaten-van-de-tellingen-in-vlieger)
 3. (parallel aan invoer stembureaus) [De coördinator GSB voert details zitting, bezwaren, bijzonderheden, etc. van de GSB-zitting in.](#de-coördinator-gsb-voert-details-zitting-bezwaren-bijzonderheden-etc-van-de-gsb-zitting-in-zee)
 4. De coördinator GSB sluit de invoer.
-5. De applicatie stelt vast dat voor alle stembureaus resultaten zijn ingevoerd.
-6. De applicatie stelt vast dat er geen stembureaus met waarschuwingen zijn.
+5. De applicatie stelt vast dat er geen stembureaus met waarschuwingen zijn.
 
 __Uitbreidingen:__  
 2a. De eerste invoer in de applicatie is gebruikt om verschillende optellingen te controleren:  
-
-2b. (CSO) Er moeten hertellingen uitgevoerd worden vanwege foutmeldingen en/of waarschuwingen:  
-&emsp; 2b1. Het GSB voert de hertelling uit.  
-&emsp; 2b2. Het GSB corrigeert de Na 31-2 Bijlage 1 of vult een nieuwe Na 31-2 Bijlage 1 in.  
-&emsp; 2b3. Het GSB voert de gecorrigeerde/nieuwe Na 31-2 Bijlage 1 in de applicatie in.  
-
-2c. (DSO) Er zijn controles op de telresultaten van het stembureau uitgevoerd:  
-&emsp; 2c1. Het GSB vult het inlegvel "Controles en correcties" in.  
-&emsp; 2c2. Het GSB voegt het inlegvel toe aan het proces-verbaal N 10-1.  
 
 2-3a. Tijdens invoer is er reden om de invoer (tijdelijk) te stoppen:  
 &emsp; 2-3a1. De coördinator GSB pauzeert de invoer.  
@@ -36,9 +26,10 @@ __Uitbreidingen:__
 Ook de gegenereerde documenten worden dan verwijderd.  
 &emsp; 2-3b2. De coördinator GSB laat het stembureau twee keer invoeren.
 
-5a. De applicatie stelt vast dat niet voor alle stembureaus resultaten zijn ingevoerd:
+4a. De applicatie stelt vast dat voor alle stembureaus resultaten zijn ingevoerd:
+4a1. De applicatie stelt vast dat niet voor alle stembureaus resultaten zijn ingevoerd:
 
-6a. De applicatie stelt vast dat er stembureaus met geaccepteerde waarschuwingen zijn:
+5a. De applicatie stelt vast dat er stembureaus met geaccepteerde waarschuwingen zijn:
 
 ### Niet in scope
 
@@ -101,9 +92,6 @@ __Uitbreidingen:__
 5a. De applicatie stelt vast dat een invoerder waarschuwingen heeft geaccepteerd:  
 &emsp; 5a1. De coördinator GSB beoordeelt de geaccepteerde waarschuwingen.
 
-8a. De applicatie stelt vast dat een invoerder waarschuwingen heeft geaccepteerd:  
-&emsp; 8a1. De coördinator GSB beoordeelt de geaccepteerde waarschuwingen.
-
 8a. De applicatie stelt vast dat beide invoeren niet gelijk zijn:  
 &emsp; 8a1. [De coördinator GSB beoordeelt de verschillen tussen de twee invoeren.](#de-coördinator-gsb-beoordeelt-de-verschillen-tussen-de-twee-invoeren-zee)
 
@@ -149,6 +137,8 @@ __Uitbreidingen:__
 &emsp; 1e1. De applicatie voorkomt dat de invoer wordt gestart.  
 1f. De invoerder selecteert een stembureau waarvan de invoer al definitief is:  
 &emsp; 1f1. De applicatie voorkomt dat de invoer wordt gestart.
+1g. De invoerder kan een stembureau niet vinden:
+&emsp; 1g1. De invoer heeft nog foutmeldingen. De coördinator moet de foutmeldingen eerst oplossen.
 
 2a. De applicatie stelt vast dat de invoerder eerdere invoer voor het stembureau heeft opgeslagen:  
 &emsp; 2a1. De applicatie laadt de eerder ingevoerde data.

@@ -22,7 +22,15 @@ __Hoofdscenario:__
 11. Het GSB stelt het PV GSB incl. bijlagen (DSO: Na 31-1, CSO: Na 31-2) beschikbaar aan de burgemeester.
 12. De burgemeester publiceert het PV GSB incl. bijlagen (DSO: Na 31-1, CSO: Na 31-2) en brengt het over naar het CSB.
 
-__Uitbreidingen:__  
+__Uitbreidingen:__
+2a. (CSO) Er moeten hertellingen uitgevoerd worden vanwege foutmeldingen en/of waarschuwingen:  
+&emsp; 2b1. Het GSB voert de hertelling uit.  
+&emsp; 2b2. Het GSB corrigeert de Na 31-2 Bijlage 1 of vult een nieuwe Na 31-2 Bijlage 1 in.  
+&emsp; 2b3. Het GSB voert de gecorrigeerde/nieuwe Na 31-2 Bijlage 1 in de applicatie in.
+
+2b. (DSO) Er zijn controles op de telresultaten van het stembureau uitgevoerd:  
+&emsp; 2c1. Het GSB vult het inlegvel "Controles en correcties" in.  
+&emsp; 2c2. Het GSB voegt het inlegvel toe aan het proces-verbaal N 10-1.
 
 3b. (DSO) Het GSB stelt vast dat de tellingen van het stembureau mogelijk niet kloppen:  
 &emsp; 3b1. Het GSB doet een (gedeeltelijke) hertelling van het stembureau.  

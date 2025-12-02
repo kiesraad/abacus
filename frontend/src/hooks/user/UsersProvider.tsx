@@ -8,7 +8,7 @@ import { USER_LIST_REQUEST_PATH, UserListResponse } from "@/types/generated/open
 import { UsersProviderContext } from "./UsersProviderContext";
 
 export function UsersProvider({ children }: { children: React.ReactNode }) {
-  const path: USER_LIST_REQUEST_PATH = "/api/user";
+  const path: USER_LIST_REQUEST_PATH = "/api/users";
   const { requestState } = useInitialApiGetWithErrors<UserListResponse>(path);
 
   return (

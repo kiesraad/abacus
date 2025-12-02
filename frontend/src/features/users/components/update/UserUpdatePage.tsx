@@ -20,7 +20,7 @@ export function UserUpdatePage() {
   const loggedInUser = useUser();
   const userId = useNumericParam("userId");
   const { requestState: getUser } = useInitialApiGetWithErrors<User>(
-    `/api/user/${userId}` satisfies USER_GET_REQUEST_PATH,
+    `/api/users/${userId}` satisfies USER_GET_REQUEST_PATH,
   );
   const [error, setError] = useState<AnyApiError>();
 

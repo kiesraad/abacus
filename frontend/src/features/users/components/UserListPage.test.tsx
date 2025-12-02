@@ -31,7 +31,7 @@ describe("PollingStationListPage", () => {
 
   test("Show users - table sorts data by default", async () => {
     const users = [userMockData[2], userMockData[1], userMockData[4], userMockData[0], userMockData[3]];
-    overrideOnce("get", "/api/user", 200, { users });
+    overrideOnce("get", "/api/users", 200, { users });
     render(<UserListPage />);
 
     expect(await screen.findByRole("heading", { level: 1, name: "Gebruikers beheren" })).toBeVisible();

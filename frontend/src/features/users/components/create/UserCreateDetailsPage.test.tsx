@@ -49,7 +49,7 @@ describe("UserCreateDetailsPage", () => {
   });
 
   test("Navigate to user list after submitting", async () => {
-    overrideOnce("post", "/api/user" satisfies USER_CREATE_REQUEST_PATH, 201, {
+    overrideOnce("post", "/api/users" satisfies USER_CREATE_REQUEST_PATH, 201, {
       role: "coordinator",
       username: "NieuweGebruiker",
     } satisfies Partial<User>);

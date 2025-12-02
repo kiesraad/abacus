@@ -451,7 +451,7 @@ mod tests {
             .oneshot(
                 Request::builder()
                     .method(Method::GET)
-                    .uri("/api/user")
+                    .uri("/api/users")
                     .header(USER_AGENT, TEST_USER_AGENT)
                     .header(COOKIE, cookie.encoded().to_string())
                     .body(Body::empty())
@@ -547,7 +547,7 @@ mod tests {
             .oneshot(
                 Request::builder()
                     .method(Method::POST)
-                    .uri("/api/user")
+                    .uri("/api/users")
                     .header(CONTENT_TYPE, "application/json")
                     .header(USER_AGENT, TEST_USER_AGENT)
                     .header(COOKIE, cookie)
@@ -582,7 +582,7 @@ mod tests {
             .oneshot(
                 Request::builder()
                     .method(Method::PUT)
-                    .uri("/api/user/1")
+                    .uri("/api/users/1")
                     .header(CONTENT_TYPE, "application/json")
                     .header(USER_AGENT, TEST_USER_AGENT)
                     .header(COOKIE, cookie)
@@ -627,7 +627,7 @@ mod tests {
             .oneshot(
                 Request::builder()
                     .method(Method::GET)
-                    .uri("/api/user")
+                    .uri("/api/users")
                     .header(USER_AGENT, TEST_USER_AGENT)
                     .header(COOKIE, cookie.encoded().to_string())
                     .body(Body::empty())

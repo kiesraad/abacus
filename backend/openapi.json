@@ -3847,7 +3847,7 @@
         ]
       }
     },
-    "/api/user": {
+    "/api/users": {
       "get": {
         "summary": "Lists all users (administrator, coordinator)",
         "operationId": "user_list",
@@ -3987,7 +3987,7 @@
         ]
       }
     },
-    "/api/user/{user_id}": {
+    "/api/users/{user_id}": {
       "get": {
         "summary": "Get a user (administrator, coordinator)",
         "operationId": "user_get",

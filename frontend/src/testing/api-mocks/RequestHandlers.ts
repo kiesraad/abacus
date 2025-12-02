@@ -453,7 +453,7 @@ export const PollingStationGetHandler = http.get<
 );
 
 export const UserCreateRequestHandler = http.post<USER_CREATE_REQUEST_PARAMS, USER_CREATE_REQUEST_BODY, User>(
-  "/api/user" satisfies USER_CREATE_REQUEST_PATH,
+  "/api/users" satisfies USER_CREATE_REQUEST_PATH,
   () => HttpResponse.json(userMockData[0], { status: 200 }),
 );
 
@@ -471,12 +471,12 @@ export const AdminExistsRequestHandler = http.get<ParamsToString<ADMIN_EXISTS_RE
 );
 
 export const UserGetRequestHandler = http.get<ParamsToString<USER_GET_REQUEST_PARAMS>>(
-  "/api/user/1" satisfies USER_GET_REQUEST_PATH,
+  "/api/users/1" satisfies USER_GET_REQUEST_PATH,
   () => HttpResponse.json(userMockData[0], { status: 200 }),
 );
 
 export const UserListRequestHandler = http.get<USER_LIST_REQUEST_PARAMS, null, UserListResponse>(
-  "/api/user" satisfies USER_LIST_REQUEST_PATH,
+  "/api/users" satisfies USER_LIST_REQUEST_PATH,
   () => HttpResponse.json({ users: userMockData }, { status: 200 }),
 );
 
@@ -484,10 +484,10 @@ export const UserUpdateRequestHandler = http.put<
   ParamsToString<USER_UPDATE_REQUEST_PARAMS>,
   USER_UPDATE_REQUEST_BODY,
   User
->("/api/user/1" satisfies USER_UPDATE_REQUEST_PATH, () => HttpResponse.json(userMockData[0], { status: 200 }));
+>("/api/users/1" satisfies USER_UPDATE_REQUEST_PATH, () => HttpResponse.json(userMockData[0], { status: 200 }));
 
 export const UserDeleteRequestHandler = http.delete<ParamsToString<USER_DELETE_REQUEST_PARAMS>>(
-  "/api/user/1" satisfies USER_DELETE_REQUEST_PATH,
+  "/api/users/1" satisfies USER_DELETE_REQUEST_PATH,
   () => new HttpResponse(null, { status: 200 }),
 );
 

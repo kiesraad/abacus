@@ -50,7 +50,7 @@ describe("UserCreateDetailsForm", () => {
   });
 
   test("Show username must be unique error", async () => {
-    overrideOnce("post", "/api/user" satisfies USER_CREATE_REQUEST_PATH, 409, {
+    overrideOnce("post", "/api/users" satisfies USER_CREATE_REQUEST_PATH, 409, {
       error: "Username already exists",
       fatal: false,
       reference: "UsernameNotUnique",

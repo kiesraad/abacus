@@ -13,7 +13,7 @@ test.describe("setup test users", () => {
     await adminContext.storageState({ path: "e2e-tests/state/admin1.json" });
 
     for (const user of testUsers) {
-      const response = await adminContext.post("/api/user", {
+      const response = await adminContext.post("/api/users", {
         data: {
           ...user,
           temp_password: getTestPassword(user.username, "Temp"),

@@ -51,7 +51,7 @@ describe("UserDelete", () => {
   });
 
   test("on error", async () => {
-    overrideOnce("delete", "/api/user/1" satisfies USER_DELETE_REQUEST_PATH, 401, {
+    overrideOnce("delete", "/api/users/1" satisfies USER_DELETE_REQUEST_PATH, 401, {
       error: "Invalid session",
       fatal: false,
       reference: "InvalidSession",

@@ -71,7 +71,7 @@ describe("UserUpdatePage", () => {
 
   test("Authorization error should be shown when insufficient rights", async () => {
     vi.spyOn(console, "error").mockImplementation(() => {});
-    overrideOnce("get", "/api/user/1", 403, { error: "Forbidden", fatal: true, reference: "Forbidden" });
+    overrideOnce("get", "/api/users/1", 403, { error: "Forbidden", fatal: true, reference: "Forbidden" });
 
     render(<UserUpdatePage></UserUpdatePage>);
 

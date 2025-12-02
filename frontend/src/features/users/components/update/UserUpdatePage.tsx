@@ -44,7 +44,7 @@ export function UserUpdatePage() {
 
   function handleDeleted() {
     const deletedMessage = t("users.user_deleted_details", { fullname: user.fullname || user.username });
-    void navigate(`/users?deleted=${encodeURIComponent(deletedMessage)}`);
+    void navigate(`/users?deleted=${encodeURIComponent(deletedMessage)}`, { replace: true });
   }
 
   function handleAbort() {

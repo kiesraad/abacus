@@ -11,6 +11,51 @@
   },
   "paths": {
     "/api/account": {
+      "get": {
+        "summary": "Get current logged-in user endpoint (administrator, coordinator, typist)",
+        "operationId": "account",
+        "responses": {
+          "200": {
+            "description": "The current user name and id",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LoginResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid user session",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "cookie_auth": [
+              "administrator",
+              "coordinator",
+              "typist"
+            ]
+          }
+        ]
+      },
       "put": {
         "summary": "Update the user's account with a new password and optionally new fullname (administrator, coordinator, typist)",
         "operationId": "account_update",
@@ -4226,53 +4271,6 @@
             "cookie_auth": [
               "administrator",
               "coordinator"
-            ]
-          }
-        ]
-      }
-    },
-    "/api/whoami": {
-      "get": {
-        "summary": "Get current logged-in user endpoint (administrator, coordinator, typist)",
-        "operationId": "whoami",
-        "responses": {
-          "200": {
-            "description": "The current user name and id",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/LoginResponse"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Invalid user session",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Internal server error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "cookie_auth": [
-              "administrator",
-              "coordinator",
-              "typist"
             ]
           }
         ]

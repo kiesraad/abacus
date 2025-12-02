@@ -3,6 +3,8 @@
 /** PATHS **/
 
 // /api/account
+export type ACCOUNT_REQUEST_PARAMS = Record<string, never>;
+export type ACCOUNT_REQUEST_PATH = `/api/account`;
 export type ACCOUNT_UPDATE_REQUEST_PARAMS = Record<string, never>;
 export type ACCOUNT_UPDATE_REQUEST_PATH = `/api/account`;
 export type ACCOUNT_UPDATE_REQUEST_BODY = AccountUpdateRequest;
@@ -312,10 +314,6 @@ export interface USER_DELETE_REQUEST_PARAMS {
   user_id: number;
 }
 export type USER_DELETE_REQUEST_PATH = `/api/users/${number}`;
-
-// /api/whoami
-export type WHOAMI_REQUEST_PARAMS = Record<string, never>;
-export type WHOAMI_REQUEST_PATH = `/api/whoami`;
 
 /** TYPES **/
 

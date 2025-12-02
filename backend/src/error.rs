@@ -234,7 +234,7 @@ impl IntoResponse for APIError {
                 )
             }
             APIError::Authentication(err) => {
-                // note that we don't log the UserNotFound error, as it is triggered for every whoami call
+                // note that we don't log the UserNotFound error, as it is triggered for every account call
                 if !matches!(err, AuthenticationError::UserNotFound) {
                     error!("Authentication error: {:?}", err);
                 }

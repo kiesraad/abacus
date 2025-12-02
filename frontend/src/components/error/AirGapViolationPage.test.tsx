@@ -9,7 +9,7 @@ import { AirGapViolationPage } from "./AirGapViolationPage";
 
 describe("AirGapViolationPage", () => {
   test("Error dialog when air-gap violation is detected", async () => {
-    overrideOnce("get", "/api/whoami", 503, {
+    overrideOnce("get", "/api/account", 503, {
       error: "Blocking request due to airgap violation",
       fatal: true,
       reference: "AirgapViolation",

@@ -35,11 +35,11 @@ impl From<AuthenticationError> for APIError {
 pub fn router() -> OpenApiRouter<AppState> {
     OpenApiRouter::default()
         .routes(routes!(login))
-        .routes(routes!(whoami))
+        .routes(routes!(account))
+        .routes(routes!(account_update))
         .routes(routes!(initialised))
         .routes(routes!(create_first_admin))
         .routes(routes!(admin_exists))
-        .routes(routes!(account_update))
         .routes(routes!(logout))
 }
 
@@ -189,7 +189,7 @@ pub struct AccountUpdateRequest {
 /// Get current logged-in user endpoint
 #[utoipa::path(
   get,
-  path = "/api/whoami",
+  path = "/api/account",
   responses(
       (status = 200, description = "The current user name and id", body = LoginResponse),
       (status = 401, description = "Invalid user session", body = ErrorResponse),
@@ -197,10 +197,61 @@ pub struct AccountUpdateRequest {
   ),
   security(("cookie_auth" = ["administrator", "coordinator", "typist"])),
 )]
-async fn whoami(user: Option<User>) -> Result<impl IntoResponse, APIError> {
+async fn account(user: Option<User>) -> Result<impl IntoResponse, APIError> {
     let user = user.ok_or(AuthenticationError::UserNotFound)?;
 
     Ok(Json(LoginResponse::from(&user)))
+}
+
+/// Update the user's account with a new password and optionally new fullname
+#[utoipa::path(
+  put,
+  path = "/api/account",
+  request_body = AccountUpdateRequest,
+  responses(
+      (status = 200, description = "The logged in user", body = LoginResponse),
+      (status = 400, description = "Bad request", body = ErrorResponse),
+      (status = 500, description = "Internal server error", body = ErrorResponse),
+  ),
+  security(("cookie_auth" = ["administrator", "coordinator", "typist"])),
+)]
+async fn account_update(
+    user: User,
+    State(pool): State<SqlitePool>,
+    audit_service: AuditService,
+    Json(account): Json<AccountUpdateRequest>,
+) -> Result<impl IntoResponse, APIError> {
+    let mut tx = pool.begin_immediate().await?;
+
+    if user.username() != account.username {
+        return Err(AuthenticationError::UserNotFound.into());
+    }
+
+    // Update the password
+    super::user::update_password(&mut tx, user.id(), &account.username, &account.password).await?;
+
+    // Update the fullname
+    if let Some(fullname) = account.fullname {
+        super::user::update_fullname(&mut tx, user.id(), &fullname).await?;
+    }
+
+    let Some(updated_user) = super::user::get_by_username(&mut tx, user.username()).await? else {
+        return Err(AuthenticationError::UserNotFound.into());
+    };
+
+    let response = LoginResponse::from(&updated_user);
+
+    audit_service
+        .log(
+            &mut tx,
+            &AuditEvent::UserAccountUpdated(response.clone().into()),
+            None,
+        )
+        .await?;
+
+    tx.commit().await?;
+
+    Ok(Json(response))
 }
 
 /// Check whether the application is initialised (an admin user exists + has logged in at least once)
@@ -301,57 +352,6 @@ async fn admin_exists(State(pool): State<SqlitePool>) -> Result<StatusCode, APIE
         "No admin user exists".into(),
         ErrorReference::UserNotFound,
     ))
-}
-
-/// Update the user's account with a new password and optionally new fullname
-#[utoipa::path(
-  put,
-  path = "/api/account",
-  request_body = AccountUpdateRequest,
-  responses(
-      (status = 200, description = "The logged in user", body = LoginResponse),
-      (status = 400, description = "Bad request", body = ErrorResponse),
-      (status = 500, description = "Internal server error", body = ErrorResponse),
-  ),
-  security(("cookie_auth" = ["administrator", "coordinator", "typist"])),
-)]
-async fn account_update(
-    user: User,
-    State(pool): State<SqlitePool>,
-    audit_service: AuditService,
-    Json(account): Json<AccountUpdateRequest>,
-) -> Result<impl IntoResponse, APIError> {
-    let mut tx = pool.begin_immediate().await?;
-
-    if user.username() != account.username {
-        return Err(AuthenticationError::UserNotFound.into());
-    }
-
-    // Update the password
-    super::user::update_password(&mut tx, user.id(), &account.username, &account.password).await?;
-
-    // Update the fullname
-    if let Some(fullname) = account.fullname {
-        super::user::update_fullname(&mut tx, user.id(), &fullname).await?;
-    }
-
-    let Some(updated_user) = super::user::get_by_username(&mut tx, user.username()).await? else {
-        return Err(AuthenticationError::UserNotFound.into());
-    };
-
-    let response = LoginResponse::from(&updated_user);
-
-    audit_service
-        .log(
-            &mut tx,
-            &AuditEvent::UserAccountUpdated(response.clone().into()),
-            None,
-        )
-        .await?;
-
-    tx.commit().await?;
-
-    Ok(Json(response))
 }
 
 /// Logout endpoint, deletes the session cookie

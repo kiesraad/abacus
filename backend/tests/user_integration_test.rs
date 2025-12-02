@@ -41,9 +41,9 @@ async fn test_user_last_activity_at_updating(pool: SqlitePool) {
         .unwrap();
     assert!(typist_user.last_activity_at().is_none());
 
-    // Log in as the typist and call whoami to trigger an update
+    // Log in as the typist and call account to trigger an update
     let typist_cookie = shared::typist_login(&addr).await;
-    let url = format!("http://{addr}/api/whoami");
+    let url = format!("http://{addr}/api/account");
     let response = reqwest::Client::new()
         .get(&url)
         .header("cookie", &typist_cookie)

@@ -1,6 +1,8 @@
 import { http, type HttpHandler, HttpResponse } from "msw";
 
 import {
+  ACCOUNT_REQUEST_PARAMS,
+  ACCOUNT_REQUEST_PATH,
   ACCOUNT_UPDATE_REQUEST_BODY,
   ACCOUNT_UPDATE_REQUEST_PARAMS,
   ACCOUNT_UPDATE_REQUEST_PATH,
@@ -120,8 +122,6 @@ import {
   USER_UPDATE_REQUEST_PARAMS,
   USER_UPDATE_REQUEST_PATH,
   UserListResponse,
-  WHOAMI_REQUEST_PARAMS,
-  WHOAMI_REQUEST_PATH,
 } from "@/types/generated/openapi";
 
 import { getCommitteeSessionMockData } from "./CommitteeSessionMockData";
@@ -165,6 +165,15 @@ export const pingHandler = http.post<PingParams, PingRequestBody, PingResponseBo
     pong,
   });
 });
+
+export const AccountRequestHandler = http.get<ACCOUNT_REQUEST_PARAMS, null, LoginResponse>(
+  "/api/account" satisfies ACCOUNT_REQUEST_PATH,
+  () =>
+    HttpResponse.json(loginResponseMockData, {
+      status: 200,
+      headers: { "x-session-expires-at": new Date(Date.now() + 1000 * 60 * 30).toString() },
+    }),
+);
 
 export const AccountUpdateRequestHandler = http.put<
   ACCOUNT_UPDATE_REQUEST_PARAMS,
@@ -491,18 +500,9 @@ export const UserDeleteRequestHandler = http.delete<ParamsToString<USER_DELETE_R
   () => new HttpResponse(null, { status: 200 }),
 );
 
-// get user handler
-export const WhoAmIRequestHandler = http.get<WHOAMI_REQUEST_PARAMS, null, LoginResponse>(
-  "/api/whoami" satisfies WHOAMI_REQUEST_PATH,
-  () =>
-    HttpResponse.json(loginResponseMockData, {
-      status: 200,
-      headers: { "x-session-expires-at": new Date(Date.now() + 1000 * 60 * 30).toString() },
-    }),
-);
-
 export const handlers: HttpHandler[] = [
   pingHandler,
+  AccountRequestHandler,
   AccountUpdateRequestHandler,
   LogRequestHandler,
   LogUsersRequestHandler,
@@ -543,5 +543,4 @@ export const handlers: HttpHandler[] = [
   UserListRequestHandler,
   UserUpdateRequestHandler,
   UserDeleteRequestHandler,
-  WhoAmIRequestHandler,
 ];

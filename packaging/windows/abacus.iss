@@ -3,10 +3,7 @@
 
 #define GetVersion() \
   Local[0] = \
-    "/S /C pushd """ + SourcePath + """ && " + \
-    "(git.exe describe --tags --exact-match HEAD > version.txt 2>nul " + \
-    "|| for /f %a in ('git.exe rev-parse --short HEAD') do echo dev-%a > version.txt) " + \
-    "&& popd", \
+    "/S /C pushd """ + SourcePath + """ && """ +  MyAppExeName + """ -V > version.txt && popd", \
   Local[1] = Exec("cmd.exe", Local[0], "C:\\", , SW_HIDE), \
   Local[2] = FileOpen(AddBackslash(SourcePath) + "version.txt"), \
   Local[3] = FileRead(Local[2]), \

@@ -47,6 +47,10 @@ struct Args {
     #[cfg(not(feature = "airgap-detection"))]
     #[arg(short, long, env = "ABACUS_AIRGAP_DETECTION")]
     airgap_detection: bool,
+
+    /// Show version
+    #[arg(short = 'V', long)]
+    version: bool,
 }
 
 /// Main entry point for the application. Sets up the database, and starts the
@@ -69,6 +73,11 @@ async fn run() -> Result<(), AppError> {
         .init();
 
     let args = Args::parse();
+    if args.version {
+        println!(env!("ABACUS_GIT_VERSION"));
+        return Ok(());
+    }
+
     let pool = create_sqlite_pool(
         &args.database,
         #[cfg(feature = "dev-database")]

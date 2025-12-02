@@ -80,6 +80,7 @@ fn convert_datetime<Tz: chrono::TimeZone>(date_time: chrono::DateTime<Tz>) -> Op
     )
 }
 
+#[allow(clippy::cognitive_complexity)]
 fn compile_pdf(world: &mut world::PdfWorld, model: PdfModel) -> Result<PdfGenResult, PdfGenError> {
     debug!("Starting Typst compilation for {}", model.as_model_name());
 

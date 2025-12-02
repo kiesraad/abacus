@@ -166,6 +166,7 @@ pub(super) struct VotesTable {
 }
 
 impl VotesTable {
+    #[allow(clippy::too_many_lines)]
     pub fn new(
         group: &PoliticalGroup,
         candidate_votes: Option<&PoliticalGroupCandidateVotes>,

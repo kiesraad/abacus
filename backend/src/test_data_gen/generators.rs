@@ -1,3 +1,5 @@
+#![allow(clippy::too_many_lines)]
+#![allow(clippy::cognitive_complexity)]
 use chrono::{Datelike, Days, NaiveDate, TimeDelta};
 use rand::{Rng, SeedableRng, rngs::StdRng, seq::IndexedRandom};
 use sqlx::SqlitePool;

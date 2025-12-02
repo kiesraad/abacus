@@ -160,6 +160,7 @@ impl ResultsInput {
         }
     }
 
+    #[allow(clippy::too_many_lines)]
     fn into_pdf_file_models(self, xml_hash: impl Into<String>) -> Result<PdfModelList, APIError> {
         let hash = xml_hash.into();
         let creation_date_time = self.created_at.format(DEFAULT_DATE_TIME_FORMAT).to_string();
@@ -280,6 +281,8 @@ fn xml_zip_filename(election: &ElectionWithPoliticalGroups) -> String {
     ))
 }
 
+#[allow(clippy::cognitive_complexity)]
+#[allow(clippy::too_many_lines)]
 async fn generate_and_save_files(
     pool: &SqlitePool,
     audit_service: AuditService,

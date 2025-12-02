@@ -73,6 +73,7 @@ impl AirgapDetection {
         airgap_detection
     }
 
+    #[allow(clippy::cognitive_complexity)]
     async fn log_status_change(&self) {
         let event = if self.violation_detected() {
             AuditEvent::AirGapViolationDetected
@@ -92,6 +93,7 @@ impl AirgapDetection {
         }
     }
 
+    #[allow(clippy::cognitive_complexity)]
     async fn perform_detection(&self) {
         let was_connected = self.violation_detected();
 

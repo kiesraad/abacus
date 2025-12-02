@@ -52,6 +52,7 @@ impl EML110 {
         &self.election().contest
     }
 
+    #[allow(clippy::too_many_lines)]
     pub fn as_abacus_election(&self) -> Result<crate::election::NewElection, EMLImportError> {
         // we need to be importing from a 110a file
         if self.base.id != "110a" {

@@ -47,4 +47,5 @@ afterEach(() => {
   cleanup();
   server.resetHandlers();
   server.events.removeAllListeners();
+  vi.clearAllMocks();
 });

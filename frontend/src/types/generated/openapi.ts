@@ -81,15 +81,6 @@ export type COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_PATH =
   `/api/elections/${number}/committee_sessions/${number}/status`;
 export type COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_BODY = CommitteeSessionStatusChangeRequest;
 
-// /api/elections/{election_id}/committee_sessions/{committee_session_id}/voters
-export interface COMMITTEE_SESSION_NUMBER_OF_VOTERS_CHANGE_REQUEST_PARAMS {
-  election_id: number;
-  committee_session_id: number;
-}
-export type COMMITTEE_SESSION_NUMBER_OF_VOTERS_CHANGE_REQUEST_PATH =
-  `/api/elections/${number}/committee_sessions/${number}/voters`;
-export type COMMITTEE_SESSION_NUMBER_OF_VOTERS_CHANGE_REQUEST_BODY = CommitteeSessionNumberOfVotersChangeRequest;
-
 // /api/elections/{election_id}/download_n_10_2
 export interface ELECTION_DOWNLOAD_N_10_2_REQUEST_PARAMS {
   election_id: number;
@@ -156,6 +147,13 @@ export interface ELECTION_STATUS_REQUEST_PARAMS {
   election_id: number;
 }
 export type ELECTION_STATUS_REQUEST_PATH = `/api/elections/${number}/status`;
+
+// /api/elections/{election_id}/voters
+export interface ELECTION_NUMBER_OF_VOTERS_CHANGE_REQUEST_PARAMS {
+  election_id: number;
+}
+export type ELECTION_NUMBER_OF_VOTERS_CHANGE_REQUEST_PATH = `/api/elections/${number}/voters`;
+export type ELECTION_NUMBER_OF_VOTERS_CHANGE_REQUEST_BODY = ElectionNumberOfVotersChangeRequest;
 
 // /api/generate_test_election
 export type GENERATE_ELECTION_HANDLER_REQUEST_PARAMS = Record<string, never>;
@@ -338,6 +336,7 @@ export type AuditEvent =
   | (UserDetails & { event_type: "UserUpdated" })
   | (UserDetails & { event_type: "UserDeleted" })
   | (ElectionDetails & { event_type: "ElectionCreated" })
+  | (ElectionDetails & { event_type: "ElectionUpdated" })
   | (CommitteeSessionDetails & { event_type: "CommitteeSessionCreated" })
   | (CommitteeSessionDetails & { event_type: "CommitteeSessionDeleted" })
   | (CommitteeSessionDetails & { event_type: "CommitteeSessionUpdated" })
@@ -482,7 +481,6 @@ export interface CommitteeSession {
   id: number;
   location: string;
   number: number;
-  number_of_voters: number;
   overview_pdf?: number;
   results_eml?: number;
   results_pdf?: number;
@@ -495,19 +493,11 @@ export interface CommitteeSessionDetails {
   session_id: number;
   session_location: string;
   session_number: number;
-  session_number_of_voters: number;
   session_overview_pdf?: number;
   session_results_eml?: number;
   session_results_pdf?: number;
   session_start_date_time?: string | null;
   session_status: string;
-}
-
-/**
- * Committee session number of voters change request
- */
-export interface CommitteeSessionNumberOfVotersChangeRequest {
-  number_of_voters: number;
 }
 
 /**
@@ -673,6 +663,7 @@ export interface Election {
   name: string;
   nomination_date: string;
   number_of_seats: number;
+  number_of_voters: number;
 }
 
 export interface ElectionAndCandidateDefinitionValidateRequest {
@@ -721,6 +712,7 @@ export interface ElectionDetails {
   election_name: string;
   election_nomination_date: string;
   election_number_of_seats: number;
+  election_number_of_voters: number;
 }
 
 /**
@@ -744,6 +736,13 @@ export interface ElectionDetailsResponse {
 export interface ElectionListResponse {
   committee_sessions: CommitteeSession[];
   elections: Election[];
+}
+
+/**
+ * Election number of voters change request
+ */
+export interface ElectionNumberOfVotersChangeRequest {
+  number_of_voters: number;
 }
 
 /**
@@ -789,6 +788,7 @@ export interface ElectionWithPoliticalGroups {
   name: string;
   nomination_date: string;
   number_of_seats: number;
+  number_of_voters: number;
   political_groups: PoliticalGroup[];
 }
 
@@ -925,6 +925,7 @@ export interface NewElection {
   name: string;
   nomination_date: string;
   number_of_seats: number;
+  number_of_voters: number;
   political_groups: PoliticalGroup[];
 }
 

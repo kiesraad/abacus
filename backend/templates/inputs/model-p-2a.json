@@ -5,8 +5,7 @@
         "election_id": 4,
         "location": "Den Haag",
         "start_date_time": "2025-09-24T10:12:00",
-        "status": "data_entry_finished",
-        "number_of_voters": 152191
+        "status": "data_entry_finished"
     },
     "election": {
         "id": 4,
@@ -17,6 +16,7 @@
         "domain_id": "0446",
         "category": "Municipal",
         "number_of_seats": 26,
+        "number_of_voters": 152191,
         "election_date": "2022-02-11",
         "nomination_date": "2021-12-18",
         "political_groups": [

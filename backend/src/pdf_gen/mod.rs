@@ -81,6 +81,7 @@ pub(crate) mod tests {
             domain_id: "0000".to_string(),
             category: ElectionCategory::Municipal,
             number_of_seats: 29,
+            number_of_voters: 25000,
             election_date: Utc::now().date_naive(),
             nomination_date: Utc::now().date_naive(),
             political_groups: vec![],

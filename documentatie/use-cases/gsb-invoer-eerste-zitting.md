@@ -199,7 +199,7 @@ __Hoofdscenario:__
 
 1. De coördinator GSB bekijkt de geaccepteerde fouten en eventuele waarschuwingen.
 2. De coördinator GSB stelt vast het PV fouten bevat die kunnen worden opgelost.
-3. De coördinator laat de fouten in het PV corrigeren en laat de invoerder verder gaan met diens invoer.
+3. De coördinator laat de fouten in het PV corrigeren en laat de invoerder verdergaan met diens invoer.
 
 __Uitbreidingen:__  
 2a. Het PV bevat fouten die niet opgelost kunnen worden:  

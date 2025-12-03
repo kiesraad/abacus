@@ -15,7 +15,7 @@ rustup install nightly
 cargo +nightly install cargo-fuzz
 ```
 
-Then, run the fuzzer with the following command:
+Then, run the fuzzer with the following command from within the `/backend` folder:
 
 ```
 cargo +nightly fuzz run data_entry_status
@@ -55,7 +55,7 @@ We can use `llvm-cov` to visualize the coverage data. For this, we will need `ru
 cargo +nightly install rustfilt
 ```
 
-Then we can run the following command to output the coverage data to `/tmp/coverage` (thanks [Folkert](https://tweedegolf.nl/en/blog/154/what-is-my-fuzzer-doing#generating-a-coverage-report)!):
+Then we can run the following command from the `/backend` folder to output the coverage data to `/tmp/coverage` (thanks [Folkert](https://tweedegolf.nl/en/blog/154/what-is-my-fuzzer-doing#generating-a-coverage-report)!):
 
 ```
 $(rustc +nightly --print sysroot)/lib/rustlib/$(rustc +nightly --print host-tuple)/bin/llvm-cov show \

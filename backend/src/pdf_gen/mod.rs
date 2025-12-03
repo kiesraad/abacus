@@ -35,7 +35,7 @@ pub(crate) mod tests {
         committee_session::tests::committee_session_fixture,
         election::{
             ElectionCategory, ElectionWithPoliticalGroups, VoteCountingMethod,
-            tests::election_fixture,
+            structs::tests::election_fixture,
         },
         pdf_gen::{
             models::{PdfFileModel, PdfModel, ToPdfFileModel},

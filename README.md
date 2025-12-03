@@ -11,7 +11,7 @@
 - Voor informatie over het installeren, starten en gebruiken van Abacus ga je naar de website [Abacus Documentatie](https://kiesraad.github.io/abacus-documentatie/). Hier vind je niet alleen alle beschikbare gebruikersdocumentatie, maar bieden we ook uitleg over het verkiezingsproces.
 - Alle documentatie met betrekking tot de ontwikkeling van Abacus vind je op de [Hoofdpagina voor documentatie](/documentatie/README.md) in deze repository. Hier staat documentatie over de functionaliteit, de softwarearchitectuur, ons ontwikkelproces en specifieke facetten van het verkiezingsproces.
 
-## Versie 1.0 voor gemeenteraadsverkiezingen 2026 (GR26)
+### Versie 1.0 voor gemeenteraadsverkiezingen 2026 (GR26)
 
 Voor de gemeenteraadsverkiezingen 2026 (GR26) wordt Abacus 1.0 gebruikt, te vinden in de branch [`release-1.0-GR26`](https://github.com/kiesraad/abacus/tree/release-1.0-GR26).
 

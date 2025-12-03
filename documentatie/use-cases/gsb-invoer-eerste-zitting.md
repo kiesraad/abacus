@@ -11,11 +11,8 @@ __Hoofdscenario:__
 2. (voor elk stembureau) [De invoerders vullen de resultaten van de tellingen in.](#de-invoerders-vullen-de-resultaten-van-de-tellingen-in-vlieger)
 3. (parallel aan invoer stembureaus) [De coördinator GSB voert details zitting, bezwaren, bijzonderheden, etc. van de GSB-zitting in.](#de-coördinator-gsb-voert-details-zitting-bezwaren-bijzonderheden-etc-van-de-gsb-zitting-in-zee)
 4. De coördinator GSB sluit de invoer.
-5. De applicatie stelt vast dat er geen stembureaus met waarschuwingen zijn.
 
-__Uitbreidingen:__  
-2a. De eerste invoer in de applicatie is gebruikt om verschillende optellingen te controleren:  
-
+__Uitbreidingen:__
 2-3a. Tijdens invoer is er reden om de invoer (tijdelijk) te stoppen:  
 &emsp; 2-3a1. De coördinator GSB pauzeert de invoer.  
 &emsp; 2-3a2. De applicatie blokkeert verdere invoer.
@@ -28,8 +25,6 @@ Ook de gegenereerde documenten worden dan verwijderd.
 
 4a. De applicatie stelt vast dat voor alle stembureaus resultaten zijn ingevoerd:
 4a1. De applicatie stelt vast dat niet voor alle stembureaus resultaten zijn ingevoerd:
-
-5a. De applicatie stelt vast dat er stembureaus met geaccepteerde waarschuwingen zijn:
 
 ### Niet in scope
 
@@ -131,7 +126,7 @@ __Uitbreidingen:__
 1c. De invoerder selecteert een ander stembureau dan op het PV staat:  
 &emsp; 1c1. De invoerder merkt de fout op (naam en nummer stembureau komen niet overeen).  
 &emsp; 1c2. De invoerder breekt de invoer af en kiest ervoor om de invoer niet te bewaren.  
-1d. De invoerder selecteert een stembureau waar iemand anders mee bezig is:  
+1d. De invoerder selecteert een stembureau waar een andere invoerder of een coördinator GSB mee bezig is:  
 &emsp; 1d1. De applicatie voorkomt dat de invoer wordt gestart.  
 1e. De invoerder selecteert een stembureau waar een andere gebruiker invoer voor heeft opgeslagen:  
 &emsp; 1e1. De applicatie voorkomt dat de invoer wordt gestart.  

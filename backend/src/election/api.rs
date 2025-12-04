@@ -197,20 +197,20 @@ pub async fn election_import_validate(
     Json(edu): Json<ElectionAndCandidateDefinitionValidateRequest>,
 ) -> Result<Json<ElectionDefinitionValidateResponse>, APIError> {
     // parse and validate election
-    if let Some(user_hash) = edu.election_hash {
-        if user_hash != EmlHash::from(edu.election_data.as_bytes()).chunks {
-            return Err(APIError::InvalidHashError);
-        }
+    if let Some(user_hash) = edu.election_hash
+        && user_hash != EmlHash::from(edu.election_data.as_bytes()).chunks
+    {
+        return Err(APIError::InvalidHashError);
     }
     let mut hash = RedactedEmlHash::from(edu.election_data.as_bytes());
     let mut election = EML110::from_str(&edu.election_data)?.as_abacus_election()?;
 
     // parse and validate candidates, if available
     if let Some(data) = edu.candidate_data.clone() {
-        if let Some(user_hash) = edu.candidate_hash {
-            if user_hash != EmlHash::from(data.as_bytes()).chunks {
-                return Err(APIError::InvalidHashError);
-            }
+        if let Some(user_hash) = edu.candidate_hash
+            && user_hash != EmlHash::from(data.as_bytes()).chunks
+        {
+            return Err(APIError::InvalidHashError);
         }
 
         hash = RedactedEmlHash::from(data.as_bytes());

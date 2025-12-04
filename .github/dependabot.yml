@@ -41,6 +41,8 @@ updates:
     groups:
       npm:
         patterns: ["*"]
+    allow:
+      - dependency-type: all
     ignore:
       # @types/node depends on Node.js version, which we upgrade manually
       - dependency-name: "@types/node"

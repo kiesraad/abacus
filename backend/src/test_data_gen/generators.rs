@@ -397,8 +397,8 @@ fn generate_cso_first_session_results(
             // 85% weight - both unanswered
             85,
             ExtraInvestigation {
-                extra_investigation_other_reason: YesNo::default(),
-                ballots_recounted_extra_investigation: YesNo::default(),
+                extra_investigation_other_reason: YesNo::empty(),
+                ballots_recounted_extra_investigation: YesNo::empty(),
             },
         ),
         (
@@ -475,7 +475,7 @@ fn generate_cso_first_session_results(
             },
             more_ballots_count: 0,
             fewer_ballots_count: 0,
-            difference_completely_accounted_for: YesNo::default(),
+            difference_completely_accounted_for: YesNo::empty(),
         },
         political_group_votes: political_groups
             .iter()

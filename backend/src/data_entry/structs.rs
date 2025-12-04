@@ -374,20 +374,6 @@ impl CSOFirstSessionResults {
             .ballots_recounted_extra_investigation
             .yes
     }
-
-    /// The extra investigation for another reason field has a value
-    pub fn investigation_other_reason_is_answered(&self) -> bool {
-        self.extra_investigation
-            .extra_investigation_other_reason
-            .is_answered()
-    }
-
-    /// The ballots recounted extra investigation field has a value
-    pub fn investigation_ballots_recounted_is_answered(&self) -> bool {
-        self.extra_investigation
-            .ballots_recounted_extra_investigation
-            .is_answered()
-    }
 }
 
 /// CSONextSessionResults, following the fields in Model Na 14-2 Bijlage 1.
@@ -566,30 +552,48 @@ impl DifferencesCounts {
 #[derive(Serialize, Deserialize, ToSchema, Clone, Debug, Default, PartialEq, Eq, Hash)]
 #[serde(deny_unknown_fields)]
 pub struct YesNo {
-    pub yes: bool,
-    pub no: bool,
+    yes: bool,
+    no: bool,
 }
 
 impl YesNo {
-    pub fn is_answered(&self) -> bool {
-        self.yes || self.no
-    }
-
-    pub fn is_invalid(&self) -> bool {
-        self.yes && self.no
+    pub fn new(yes: bool, no: bool) -> Self {
+        Self { yes, no }
     }
 
     pub fn yes() -> Self {
-        Self {
-            yes: true,
-            no: false,
-        }
+        Self::new(true, false)
     }
 
     pub fn no() -> Self {
-        Self {
-            yes: false,
-            no: true,
+        Self::new(false, true)
+    }
+
+    pub fn empty() -> Self {
+        Self::new(false, false)
+    }
+
+    pub fn both() -> Self {
+        Self::new(true, true)
+    }
+
+    /// true if both `yes` and `no` are false
+    pub fn is_empty(&self) -> bool {
+        !self.yes && !self.no
+    }
+
+    /// true if both `yes` and `no` are true
+    pub fn is_both(&self) -> bool {
+        self.yes && self.no
+    }
+
+    /// Some(true) if `yes` is true and `no` is false,
+    /// Some(false) if `yes` is false and `no` is true, otherwise None
+    pub fn as_bool(&self) -> Option<bool> {
+        match (self.yes, self.no) {
+            (true, false) => Some(true),
+            (false, true) => Some(false),
+            _ => None,
         }
     }
 }
@@ -732,8 +736,8 @@ pub mod tests {
     impl ValidDefault for ExtraInvestigation {
         fn valid_default() -> Self {
             Self {
-                extra_investigation_other_reason: YesNo::default(),
-                ballots_recounted_extra_investigation: YesNo::default(),
+                extra_investigation_other_reason: YesNo::empty(),
+                ballots_recounted_extra_investigation: YesNo::empty(),
             }
         }
     }

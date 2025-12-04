@@ -10,7 +10,8 @@ __Hoofdscenario:__
 1. De coördinator GSB stelt de invoer open.
 2. (voor elk stembureau) [De invoerders vullen de resultaten van de tellingen in.](#de-invoerders-vullen-de-resultaten-van-de-tellingen-in-vlieger)
 3. (parallel aan invoer stembureaus) [De coördinator GSB voert details zitting, bezwaren, bijzonderheden, etc. van de GSB-zitting in.](#de-coördinator-gsb-voert-details-zitting-bezwaren-bijzonderheden-etc-van-de-gsb-zitting-in-zee)
-4. De coördinator GSB sluit de invoer.
+4. De applicatie stelt vast dat voor alle stembureaus de resultaten zijn ingevoerd.
+5. De coördinator GSB sluit de invoer.
 
 __Uitbreidingen:__
 2-3a. Tijdens invoer is er reden om de invoer (tijdelijk) te stoppen:  
@@ -23,8 +24,9 @@ __Uitbreidingen:__
 Ook de gegenereerde documenten worden dan verwijderd.  
 &emsp; 2-3b2. De coördinator GSB laat het stembureau twee keer invoeren.
 
-4a. De applicatie stelt vast dat voor alle stembureaus resultaten zijn ingevoerd:
-4a1. De applicatie stelt vast dat niet voor alle stembureaus resultaten zijn ingevoerd:
+4a. De applicatie stelt vast dat niet voor alle stembureaus de resultaten zijn ingevoerd:
+4a1. De invoer kan nog niet gesloten worden. De coordinator ziet op de statusoverzicht van de invoer welke resultaten
+nog missen.
 
 ### Niet in scope
 
@@ -132,8 +134,6 @@ __Uitbreidingen:__
 &emsp; 1e1. De applicatie voorkomt dat de invoer wordt gestart.  
 1f. De invoerder selecteert een stembureau waarvan de invoer al definitief is:  
 &emsp; 1f1. De applicatie voorkomt dat de invoer wordt gestart.
-1g. De invoerder kan een stembureau niet vinden:
-&emsp; 1g1. De invoer heeft nog foutmeldingen. De coördinator moet de foutmeldingen eerst oplossen.
 
 2a. De applicatie stelt vast dat de invoerder eerdere invoer voor het stembureau heeft opgeslagen:  
 &emsp; 2a1. De applicatie laadt de eerder ingevoerde data.

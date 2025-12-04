@@ -1,9 +1,8 @@
-use sqlx::{Error, SqliteConnection, query, query_as};
-
 use super::structs::{
     PollingStationInvestigation, PollingStationInvestigationConcludeRequest,
     PollingStationInvestigationCreateRequest,
 };
+use sqlx::{Error, SqliteConnection, query, query_as};
 
 pub async fn create_polling_station_investigation(
     conn: &mut SqliteConnection,
@@ -101,16 +100,22 @@ pub async fn get_polling_station_investigation(
 pub async fn delete_polling_station_investigation(
     conn: &mut SqliteConnection,
     polling_station_id: u32,
-) -> Result<bool, Error> {
-    let rows_affected = query!(
-        r#"DELETE FROM polling_station_investigations WHERE polling_station_id = ?"#,
+) -> Result<Option<PollingStationInvestigation>, Error> {
+    query_as!(
+        PollingStationInvestigation,
+        r#"
+            DELETE FROM polling_station_investigations
+            WHERE polling_station_id = ?
+            RETURNING
+                polling_station_id AS "polling_station_id: u32",
+                reason,
+                findings,
+                corrected_results as "corrected_results: bool"
+        "#,
         polling_station_id,
     )
-    .execute(conn)
-    .await?
-    .rows_affected();
-
-    Ok(rows_affected > 0)
+    .fetch_optional(conn)
+    .await
 }
 
 pub async fn list_investigations_for_committee_session(

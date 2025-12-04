@@ -8,7 +8,6 @@ use abacus::{
         VotersCounts, VotesCounts,
         status::{ClientState, DataEntryStatusName},
     },
-    election::ElectionDetailsResponse,
 };
 use axum::http::StatusCode;
 use reqwest::Response;
@@ -19,7 +18,7 @@ use crate::{
     shared::{
         change_status_committee_session, complete_data_entry, coordinator_login,
         create_investigation, create_polling_station, create_result_with_non_example_data_entry,
-        differences_counts_zero, get_election_committee_session, get_statuses,
+        differences_counts_zero, get_election, get_election_committee_session, get_statuses,
         political_group_votes_from_test_data_auto, typist_login, update_investigation,
     },
     utils::serve_api,
@@ -27,21 +26,6 @@ use crate::{
 
 pub mod shared;
 pub mod utils;
-
-async fn get_election(addr: &SocketAddr, election_id: u32) -> ElectionDetailsResponse {
-    let url = format!("http://{addr}/api/elections/{election_id}");
-    let coordinator_cookie = coordinator_login(addr).await;
-    let response = reqwest::Client::new()
-        .get(&url)
-        .header("cookie", coordinator_cookie)
-        .send()
-        .await
-        .unwrap();
-
-    // Ensure the response is what we expect
-    assert_eq!(response.status(), StatusCode::OK);
-    response.json().await.unwrap()
-}
 
 async fn conclude_investigation(
     addr: &SocketAddr,

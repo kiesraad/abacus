@@ -2,21 +2,20 @@
 
 use std::net::SocketAddr;
 
-use abacus::{ErrorResponse, committee_session::status::CommitteeSessionStatus};
+use crate::{
+    shared::{
+        admin_login, change_status_committee_session, claim_data_entry, coordinator_login,
+        create_investigation, create_polling_station, create_result, example_data_entry,
+        get_election, get_election_committee_session, get_statuses, save_data_entry, typist_login,
+    },
+    utils::serve_api,
+};
+use abacus::committee_session::status::CommitteeSessionStatus;
 use axum::http::StatusCode;
 use hyper::http::HeaderValue;
 use reqwest::Response;
 use sqlx::SqlitePool;
 use test_log::test;
-
-use crate::{
-    shared::{
-        admin_login, change_status_committee_session, claim_data_entry, coordinator_login,
-        create_investigation, create_polling_station, create_result, example_data_entry,
-        get_election_committee_session, save_data_entry, typist_login,
-    },
-    utils::serve_api,
-};
 
 pub mod shared;
 pub mod utils;
@@ -903,69 +902,92 @@ async fn test_delete_for_committee_session_with_in_progress_status_as_administra
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
-async fn test_delete_with_data_entry_fails(pool: SqlitePool) {
+async fn test_delete_with_data_entry_works(pool: SqlitePool) {
     let addr = serve_api(pool).await;
+    let election_id = 2;
+    let polling_station_id = 1;
+
     let typist_cookie = typist_login(&addr).await;
-    claim_data_entry(&addr, &typist_cookie, 2, 1).await;
-    save_data_entry(&addr, &typist_cookie, 2, 1, example_data_entry(None)).await;
+    claim_data_entry(&addr, &typist_cookie, polling_station_id, 1).await;
+    save_data_entry(
+        &addr,
+        &typist_cookie,
+        polling_station_id,
+        1,
+        example_data_entry(None),
+    )
+    .await;
 
     let coordinator_cookie = coordinator_login(&addr).await;
+    let statuses = get_statuses(&addr, &coordinator_cookie, election_id).await;
+    assert_eq!(statuses.len(), 2);
 
-    let response = delete_polling_station(&addr, &coordinator_cookie, 2, 2).await;
+    let response =
+        delete_polling_station(&addr, &coordinator_cookie, election_id, polling_station_id).await;
 
     assert_eq!(
         response.status(),
-        StatusCode::CONFLICT,
+        StatusCode::NO_CONTENT,
         "Unexpected response status"
     );
-    let body: ErrorResponse = response.json().await.unwrap();
-    assert_eq!(
-        body.error,
-        "Polling station cannot be deleted, because a data entry exists"
-    );
+
+    // Data entry is deleted
+    let statuses = get_statuses(&addr, &coordinator_cookie, election_id).await;
+    assert_eq!(statuses.len(), 1);
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
-async fn test_delete_with_results_fails(pool: SqlitePool) {
+async fn test_delete_with_result_works(pool: SqlitePool) {
     let addr = serve_api(pool).await;
-    let coordinator_cookie = coordinator_login(&addr).await;
-    create_result(&addr, 1, 2).await;
+    let election_id = 2;
+    let polling_station_id = 1;
 
-    let response = delete_polling_station(&addr, &coordinator_cookie, 2, 1).await;
+    let coordinator_cookie = coordinator_login(&addr).await;
+    create_result(&addr, polling_station_id, election_id).await;
+    let statuses = get_statuses(&addr, &coordinator_cookie, election_id).await;
+    assert_eq!(statuses.len(), 2);
+
+    let response =
+        delete_polling_station(&addr, &coordinator_cookie, election_id, polling_station_id).await;
 
     assert_eq!(
         response.status(),
-        StatusCode::CONFLICT,
+        StatusCode::NO_CONTENT,
         "Unexpected response status"
     );
-    let body: ErrorResponse = response.json().await.unwrap();
-    assert_eq!(
-        body.error,
-        "Polling station cannot be deleted, because a data entry exists"
-    );
+
+    // Data entry result is deleted
+    let statuses = get_statuses(&addr, &coordinator_cookie, election_id).await;
+    assert_eq!(statuses.len(), 1);
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_5_with_results", "users"))))]
-async fn test_delete_with_investigation_fails(pool: SqlitePool) {
+async fn test_delete_with_investigation_works(pool: SqlitePool) {
     let addr = serve_api(pool).await;
+    let election_id = 5;
+    let polling_station_id = 9;
+
     let coordinator_cookie = coordinator_login(&addr).await;
     assert_eq!(
-        create_investigation(&addr, 9).await.status(),
+        create_investigation(&addr, polling_station_id)
+            .await
+            .status(),
         StatusCode::CREATED
     );
+    let election_details = get_election(&addr, election_id).await;
+    assert_eq!(election_details.investigations.len(), 2);
 
-    let response = delete_polling_station(&addr, &coordinator_cookie, 5, 9).await;
+    let response =
+        delete_polling_station(&addr, &coordinator_cookie, election_id, polling_station_id).await;
 
     assert_eq!(
         response.status(),
-        StatusCode::CONFLICT,
+        StatusCode::NO_CONTENT,
         "Unexpected response status"
     );
-    let body: ErrorResponse = response.json().await.unwrap();
-    assert_eq!(
-        body.error,
-        "Polling station cannot be deleted, because an investigation exists"
-    );
+
+    let election_details = get_election(&addr, election_id).await;
+    assert_eq!(election_details.investigations.len(), 1);
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_5_with_results", "users"))))]

@@ -135,7 +135,7 @@ describe("PollingStationUpdatePage", () => {
       expect(deletePollingStation).toHaveBeenCalled();
 
       expect(pushMessage).toHaveBeenCalledWith({ title: "Stembureau 33 (Op Rolletjes) verwijderd" });
-      expect(navigate).toHaveBeenCalledExactlyOnceWith("/elections/1/polling-stations");
+      expect(navigate).toHaveBeenCalledExactlyOnceWith("/elections/1/polling-stations", { replace: true });
     });
 
     test("Shows an error message when delete was not possible because a data entry exists", async () => {

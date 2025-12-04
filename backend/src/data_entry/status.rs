@@ -1244,6 +1244,7 @@ mod tests {
 
     /// SecondEntryInProgress --> is_equal: finalise
     /// is_equal --> EntriesDifferent: equal? no
+    #[allow(clippy::too_many_lines)]
     #[test]
     fn second_entry_in_progress_finalise_not_equal() {
         let initial = DataEntryStatus::SecondEntryInProgress(SecondEntryInProgress {

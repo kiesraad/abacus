@@ -392,7 +392,7 @@ describe("ElectionStatusPage", () => {
     vi.spyOn(useUser, "useUser").mockReturnValue(getTypistUser());
     // error is expected
     vi.spyOn(console, "error").mockImplementation(() => {});
-    overrideOnce("get", "/api/user", 403, {
+    overrideOnce("get", "/api/users", 403, {
       error: "Forbidden",
       fatal: true,
       reference: "Forbidden",

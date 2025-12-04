@@ -16,7 +16,7 @@ interface UserDeleteProps {
 
 export function UserDelete({ user, onDeleted, onError }: UserDeleteProps) {
   const [showModal, setShowModal] = useState(false);
-  const removePath: USER_DELETE_REQUEST_PATH = `/api/user/${user.id}`;
+  const removePath: USER_DELETE_REQUEST_PATH = `/api/users/${user.id}`;
   const { remove, isLoading } = useCrud<User>({ removePath });
 
   function toggleModal() {

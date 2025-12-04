@@ -23,7 +23,7 @@ type ValidationErrors = Partial<UpdateUserRequest>;
 export function UserUpdateForm({ user, onSaved, onAbort }: UserUpdateFormProps) {
   const [editPassword, setEditPassword] = useState(false);
   const [validationErrors, setValidationErrors] = useState<ValidationErrors>();
-  const updatePath: USER_UPDATE_REQUEST_PATH = `/api/user/${user.id}`;
+  const updatePath: USER_UPDATE_REQUEST_PATH = `/api/users/${user.id}`;
   const { update, isLoading } = useCrud<User>({ updatePath });
   const [error, setError] = useState<ErrorReference | null>(null);
 

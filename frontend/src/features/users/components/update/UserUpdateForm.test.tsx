@@ -78,7 +78,7 @@ describe("UserUpdateForm", () => {
   test("password field", async () => {
     const { onSaved } = await renderForm();
 
-    overrideOnce("put", "/api/user/1" satisfies USER_UPDATE_REQUEST_PATH, 400, {
+    overrideOnce("put", "/api/users/1" satisfies USER_UPDATE_REQUEST_PATH, 400, {
       error: "Invalid password",
       fatal: false,
       reference: "PasswordRejection",

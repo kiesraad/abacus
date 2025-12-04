@@ -69,7 +69,7 @@ export function PollingStationUpdatePage() {
       }),
     });
 
-    void navigate(parentUrl);
+    void navigate(parentUrl, { replace: true });
   }
 
   function handleDeleteError(error: AnyApiError) {

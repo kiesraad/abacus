@@ -10,7 +10,7 @@ __Niveau:__ hoog-over, wolk, ☁️
 
 __Hoofdscenario:__  
 1. Het GSB ontvangt één of meerdere verzoeken tot onderzoek/hertelling van het CSB.
-2. De coördinator GSB maakt de nieuwe zitting aan in de applicatie. Hiermee wordt de vorige zitting in de applicatie gesloten.
+2. De coördinator GSB maakt de nieuwe zitting aan in de applicatie. De applicatie sluit hierbij de vorige zitting.
 3. [De coördinator GSB bereidt de documenten voor de zitting voor.](#de-coördinator-gsb-bereidt-de-documenten-voor-de-zitting-voor-zee)
 4. Het GSB opent de zitting. (Wanneer dat gebeurt, is een afweging van het GSB: het liefst pas als alle verzoeken binnen zijn, maar ook niet te lang wachten).
 5. (gedurende de zitting) Het GSB houdt tijd en locatie bij van de aanwezigheid van elk lid van het GSB.

@@ -54,6 +54,7 @@ pub async fn inject_user(
 }
 
 /// Middleware to extend the session lifetime
+#[allow(clippy::cognitive_complexity)]
 pub async fn extend_session(
     State(pool): State<SqlitePool>,
     headers: HeaderMap,

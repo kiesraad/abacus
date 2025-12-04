@@ -48,6 +48,7 @@ impl From<sqlx::Error> for CommitteeSessionError {
     }
 }
 
+#[allow(clippy::too_many_lines)]
 pub async fn change_committee_session_status(
     conn: &mut SqliteConnection,
     committee_session_id: u32,

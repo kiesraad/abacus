@@ -53,6 +53,7 @@ impl ElectionSummary {
 
     /// Add all the votes from the given polling stations together, using the
     /// data from the election for candidates and political groups.
+    #[allow(clippy::too_many_lines)]
     pub fn from_results(
         election: &ElectionWithPoliticalGroups,
         results: &[(PollingStation, PollingStationResults)],

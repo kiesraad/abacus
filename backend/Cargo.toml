@@ -1,6 +1,6 @@
 [package]
 name = "abacus"
-version = "0.1.0"
+version = "1.1.0"
 edition = "2024"
 license = "EUPL-1.2"
 rust-version = "1.85"
@@ -61,7 +61,7 @@ tracing = "0.1.41"
 tower-http = { version = "0.6", features = ["set-header", "trace"] }
 typst = { version = "0.14.0", optional = true }
 typst-pdf = { version = "0.14.0", optional = true }
-quick-xml = { version = "0.38.3", features = ["serialize"] }
+quick-xml = { version = "0.38.4", features = ["serialize"] }
 sha2 = "0.10.9"
 argon2 = "0.5.3"
 password-hash = { version = "0.5.0", features = ["getrandom"] }
@@ -73,7 +73,7 @@ tokio-util = { version = "0.7.17", features = ["io"] }
 ttf-parser = "0.25.1"
 
 [dev-dependencies]
-test-log = "0.2.17"
+test-log = "0.2.19"
 http-body-util = "0.1.3"
 reqwest = { version = "0.12", default-features = false, features = ["json"] }
 
@@ -85,6 +85,8 @@ unsafe_code = "forbid"
 
 [lints.clippy]
 cast_possible_truncation = "deny"
+cognitive_complexity = "warn"
+too_many_lines = "warn"
 unwrap_used = "warn"
 
 [profile.release]

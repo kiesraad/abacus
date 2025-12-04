@@ -134,7 +134,6 @@ The following dependencies (crates) are used:
 - `async_zip`: creating a zip of the EML_NL and PDF PV.
 - `strum`: Converting enums from their string representation and back
 
-
 Additionally, the following development dependencies are used:
 
 - `test-log`: show tracing messages while running tests
@@ -191,6 +190,7 @@ Options:
   -p, --port <PORT>          Server port, optional [env: ABACUS_PORT=] [default: 8080]
   -d, --database <DATABASE>  Location of the database file, will be created if it doesn't exist [env: ABACUS_DATABASE=] [default: db.sqlite]
   -a, --airgap-detection     Enable airgap detection [env: ABACUS_AIRGAP_DETECTION=]
+  -V, --version              Show version
   -h, --help                 Print help
 ```
 

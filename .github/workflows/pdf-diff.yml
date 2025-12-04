@@ -22,7 +22,7 @@ jobs:
       CARGO_TERM_COLOR: always
       SQLX_OFFLINE: "true"
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
         with:
           ref: ${{ github.base_ref || 'main' }}
       - name: Setup Rust
@@ -36,7 +36,7 @@ jobs:
       - name: Generate PDFs
         run: cargo run --bin gen-pdf --features embed-typst -- --directory base
       - name: Switch to current branch
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           clean: false
       - name: Generate PDFs on the current branch

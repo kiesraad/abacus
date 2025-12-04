@@ -8,6 +8,7 @@ use tracing::error;
 use super::{AuditEvent, AuditService, ErrorDetails};
 use crate::ErrorResponse;
 
+#[allow(clippy::cognitive_complexity)]
 pub async fn log_error(
     State(pool): State<SqlitePool>,
     audit_service: AuditService,

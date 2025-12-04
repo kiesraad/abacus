@@ -130,6 +130,7 @@ The following dependencies (crates) are used:
 - `tower`: a library of modular and reusable components for building robust networking clients and servers.
 - `tracing-subscriber`: utilities for implementing and composing `tracing` subscribers.
 - `tracing`: a framework for instrumenting Rust programs to collect structured, event-based diagnostic information.
+- `ttf-parser`: for parsing TrueType fonts.
 - `typst-pdf`: a PDF exporter for Typst.
 - `typst`: a new markup-based typesetting system that is powerful and easy to learn.
 - `utoipa-swagger-ui`: Swagger UI for the OpenAPI specification.

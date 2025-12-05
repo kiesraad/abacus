@@ -110,7 +110,7 @@ jobs:
       - name: Install Playwright Chromium Browser
         run: npx playwright install --with-deps chromium
       - name: Check formatting
-        run: npx prettier --check .
+        run: npx @biomejs/biome format
       - name: Lint
         run: npm run lint
       - name: Test

@@ -31,7 +31,7 @@ pre-commit:
         git add src/types/generated/openapi.ts
     frontend-formatter:
       root: "frontend/"
-      run: npx prettier --ignore-unknown --write {staged_files}
+      run: npm run format -- --staged
       stage_fixed: true
     frontend-linter:
       root: "frontend/"

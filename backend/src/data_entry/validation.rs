@@ -2752,7 +2752,10 @@ mod tests {
                 CandidateVotes, DataError, PoliticalGroupCandidateVotes, Validate,
                 ValidationResults,
             },
-            election::{ElectionWithPoliticalGroups, PGNumber, structs::tests::election_fixture},
+            election::{
+                CandidateNumber, ElectionWithPoliticalGroups, PGNumber,
+                structs::tests::election_fixture,
+            },
             polling_station::structs::tests::polling_station_fixture,
         };
 
@@ -2844,7 +2847,7 @@ mod tests {
             political_group_votes[0]
                 .candidate_votes
                 .push(CandidateVotes {
-                    number: 4,
+                    number: CandidateNumber::new(4),
                     votes: 0,
                 });
 
@@ -2871,7 +2874,7 @@ mod tests {
                 create_test_data(&[(&[10, 20, 30], 60), (&[5, 10, 15], 30)]);
 
             // Change number of the second candidate on the first list
-            political_group_votes[0].candidate_votes[1].number = 5;
+            political_group_votes[0].candidate_votes[1].number = CandidateNumber::new(5);
 
             let mut validation_results = ValidationResults::default();
             let result = political_group_votes.validate(

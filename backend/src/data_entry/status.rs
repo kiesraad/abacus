@@ -725,8 +725,8 @@ mod tests {
             structs::tests::{ValidDefault, example_polling_station_results},
         },
         election::{
-            Candidate, ElectionCategory, ElectionWithPoliticalGroups, PGNumber, PoliticalGroup,
-            VoteCountingMethod,
+            Candidate, CandidateNumber, ElectionCategory, ElectionWithPoliticalGroups, PGNumber,
+            PoliticalGroup, VoteCountingMethod,
         },
         polling_station::{PollingStation, PollingStationType},
     };
@@ -813,7 +813,7 @@ mod tests {
                     name: format!("Partij {number}"),
                     candidates: (1..=2)
                         .map(|number| Candidate {
-                            number,
+                            number: CandidateNumber::new(number),
                             initials: "A".to_string(),
                             first_name: None,
                             last_name_prefix: None,
@@ -1270,7 +1270,7 @@ mod tests {
                     number: PGNumber::new(1),
                     total: 0,
                     candidate_votes: vec![CandidateVotes {
-                        number: 1,
+                        number: CandidateNumber::new(1),
                         votes: 0,
                     }],
                 }],
@@ -1299,7 +1299,7 @@ mod tests {
                     number: PGNumber::new(1),
                     total: 1,
                     candidate_votes: vec![CandidateVotes {
-                        number: 1,
+                        number: CandidateNumber::new(1),
                         votes: 1,
                     }],
                 }],
@@ -1316,7 +1316,7 @@ mod tests {
                         number: PGNumber::new(1),
                         name: "Test group".to_string(),
                         candidates: vec![Candidate {
-                            number: 1,
+                            number: CandidateNumber::new(1),
                             initials: "A.".to_string(),
                             first_name: None,
                             last_name_prefix: None,

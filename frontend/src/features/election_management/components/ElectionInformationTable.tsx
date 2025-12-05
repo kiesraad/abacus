@@ -29,11 +29,7 @@ export function ElectionInformationTable({
   numberOfPollingStations,
 }: ElectionInformationTableProps) {
   return (
-    <Table
-      id="election-information-table"
-      variant="information"
-      className={cn(cls.table, cls.electionInformationTable)}
-    >
+    <Table id="election-information-table" variant="information" className={cn(cls.electionInformationTable)}>
       <Table.Body>
         <Table.Row>
           <Table.HeaderCell scope="row" className="normal">
@@ -65,7 +61,7 @@ export function ElectionInformationTable({
               {t("number_of_voters")}
             </Table.HeaderCell>
             <Table.Cell className="underlined">
-              {committeeSession.number_of_voters ? formatNumber(committeeSession.number_of_voters) : "0"}
+              {election.number_of_voters ? formatNumber(election.number_of_voters) : "0"}
             </Table.Cell>
           </Table.LinkRow>
         ) : (
@@ -73,9 +69,7 @@ export function ElectionInformationTable({
             <Table.HeaderCell scope="row" className="normal">
               {t("number_of_voters")}
             </Table.HeaderCell>
-            <Table.Cell>
-              {committeeSession.number_of_voters ? formatNumber(committeeSession.number_of_voters) : "0"}
-            </Table.Cell>
+            <Table.Cell>{election.number_of_voters ? formatNumber(election.number_of_voters) : "0"}</Table.Cell>
           </Table.Row>
         )}
         <Table.Row>

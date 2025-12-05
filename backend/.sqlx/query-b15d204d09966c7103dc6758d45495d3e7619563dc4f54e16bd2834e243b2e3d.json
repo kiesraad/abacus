@@ -1,6 +1,6 @@
 {
   "db_name": "SQLite",
-  "query": "\n        UPDATE committee_sessions\n        SET status = ?\n        WHERE id = ?\n        RETURNING\n            id as \"id: u32\",\n            number as \"number: u32\",\n            election_id as \"election_id: u32\",\n            status as \"status: _\",\n            location,\n            start_date_time as \"start_date_time: _\",\n            number_of_voters as \"number_of_voters: u32\",\n            results_eml as \"results_eml: _\",\n            results_pdf as \"results_pdf: _\",\n            overview_pdf as \"overview_pdf: _\"\n        ",
+  "query": "\n        SELECT\n            id as \"id: u32\",\n            number as \"number: u32\",\n            election_id as \"election_id: u32\",\n            status as \"status: _\",\n            location,\n            start_date_time as \"start_date_time: _\",\n            results_eml as \"results_eml: _\",\n            results_pdf as \"results_pdf: _\",\n            overview_pdf as \"overview_pdf: _\"\n        FROM (\n            SELECT\n            id,\n            number,\n            election_id,\n            status,\n            location,\n            start_date_time,\n            results_eml,\n            results_pdf,\n            overview_pdf,\n            row_number() over (\n            PARTITION BY election_id\n            ORDER BY number DESC\n            ) AS row_number FROM committee_sessions\n        ) t WHERE t.row_number = 1\n        ",
   "describe": {
     "columns": [
       {
@@ -34,28 +34,23 @@
         "type_info": "Text"
       },
       {
-        "name": "number_of_voters: u32",
+        "name": "results_eml: _",
         "ordinal": 6,
         "type_info": "Integer"
       },
       {
-        "name": "results_eml: _",
+        "name": "results_pdf: _",
         "ordinal": 7,
         "type_info": "Integer"
       },
       {
-        "name": "results_pdf: _",
-        "ordinal": 8,
-        "type_info": "Integer"
-      },
-      {
         "name": "overview_pdf: _",
-        "ordinal": 9,
+        "ordinal": 8,
         "type_info": "Integer"
       }
     ],
     "parameters": {
-      "Right": 2
+      "Right": 0
     },
     "nullable": [
       false,
@@ -64,11 +59,10 @@
       false,
       false,
       true,
-      false,
       true,
       true,
       true
     ]
   },
-  "hash": "c049e00f66ad7c2638815460b363d4e0acd22ecaa9a48bc2d1b5c43bb6e01078"
+  "hash": "b15d204d09966c7103dc6758d45495d3e7619563dc4f54e16bd2834e243b2e3d"
 }

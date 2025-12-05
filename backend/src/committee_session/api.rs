@@ -8,14 +8,14 @@ use sqlx::{SqliteConnection, SqlitePool};
 use utoipa_axum::{router::OpenApiRouter, routes};
 
 use super::{
-    CommitteeSession, CommitteeSessionCreateRequest, CommitteeSessionNumberOfVotersChangeRequest,
-    CommitteeSessionStatusChangeRequest, CommitteeSessionUpdateRequest, InvestigationListResponse,
+    CommitteeSession, CommitteeSessionCreateRequest, CommitteeSessionStatusChangeRequest,
+    CommitteeSessionUpdateRequest, InvestigationListResponse,
     status::{CommitteeSessionStatus, change_committee_session_status},
 };
 use crate::{
     APIError, AppState, ErrorResponse, SqlitePoolExt,
     audit_log::{AuditEvent, AuditService},
-    authentication::{AdminOrCoordinator, Coordinator},
+    authentication::Coordinator,
     error::ErrorReference,
     investigation::list_investigations_for_committee_session,
 };
@@ -39,7 +39,6 @@ pub fn router() -> OpenApiRouter<AppState> {
         .routes(routes!(committee_session_create))
         .routes(routes!(committee_session_delete))
         .routes(routes!(committee_session_update))
-        .routes(routes!(committee_session_number_of_voters_change))
         .routes(routes!(committee_session_status_change))
         .routes(routes!(committee_session_investigations))
 }
@@ -98,7 +97,6 @@ pub async fn committee_session_create(
             CommitteeSessionCreateRequest {
                 election_id,
                 number: current_committee_session.number + 1,
-                number_of_voters: current_committee_session.number_of_voters,
             }
         })
         .await?;
@@ -253,72 +251,6 @@ pub async fn committee_session_update(
     Ok(StatusCode::NO_CONTENT)
 }
 
-/// Change the number of voters of a [CommitteeSession].
-#[utoipa::path(
-    put,
-    path = "/api/elections/{election_id}/committee_sessions/{committee_session_id}/voters",
-    request_body = CommitteeSessionNumberOfVotersChangeRequest,
-    responses(
-        (status = 204, description = "Committee session number of voters changed successfully"),
-        (status = 401, description = "Unauthorized", body = ErrorResponse),
-        (status = 403, description = "Forbidden", body = ErrorResponse),
-        (status = 404, description = "Committee session not found", body = ErrorResponse),
-        (status = 409, description = "Request cannot be completed", body = ErrorResponse),
-        (status = 500, description = "Internal server error", body = ErrorResponse),
-    ),
-    params(
-        ("election_id" = u32, description = "Election database id"),
-        ("committee_session_id" = u32, description = "Committee session database id"),
-    ),
-    security(("cookie_auth" = ["administrator", "coordinator"])),
-)]
-pub async fn committee_session_number_of_voters_change(
-    _user: AdminOrCoordinator,
-    State(pool): State<SqlitePool>,
-    audit_service: AuditService,
-    Path((election_id, committee_session_id)): Path<(u32, u32)>,
-    Json(committee_session_request): Json<CommitteeSessionNumberOfVotersChangeRequest>,
-) -> Result<StatusCode, APIError> {
-    let mut tx = pool.begin_immediate().await?;
-
-    let committee_session = validate_committee_session_is_current_committee_session(
-        &mut tx,
-        election_id,
-        committee_session_id,
-    )
-    .await?;
-
-    if !committee_session.is_next_session()
-        && (committee_session.status == CommitteeSessionStatus::Created
-            || committee_session.status == CommitteeSessionStatus::DataEntryNotStarted)
-    {
-        let committee_session = crate::committee_session::repository::change_number_of_voters(
-            &mut tx,
-            committee_session_id,
-            committee_session_request.number_of_voters,
-        )
-        .await?;
-
-        audit_service
-            .log(
-                &mut tx,
-                &AuditEvent::CommitteeSessionUpdated(committee_session.clone().into()),
-                None,
-            )
-            .await?;
-
-        tx.commit().await?;
-
-        Ok(StatusCode::NO_CONTENT)
-    } else {
-        tx.rollback().await?;
-
-        Err(APIError::CommitteeSession(
-            CommitteeSessionError::InvalidCommitteeSessionStatus,
-        ))
-    }
-}
-
 /// Change the status of a [CommitteeSession].
 #[utoipa::path(
     put,
@@ -430,7 +362,6 @@ pub mod tests {
             start_date_time: NaiveDate::from_ymd_opt(2025, 10, 22)
                 .and_then(|d| d.and_hms_opt(9, 15, 0)),
             status: CommitteeSessionStatus::DataEntryFinished,
-            number_of_voters: 100,
             results_eml: None,
             results_pdf: None,
             overview_pdf: None,

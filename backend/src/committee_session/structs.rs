@@ -22,7 +22,6 @@ pub struct CommitteeSession {
     #[schema(value_type = String, format = "date-time", nullable = false)]
     pub start_date_time: Option<NaiveDateTime>,
     pub status: CommitteeSessionStatus,
-    pub number_of_voters: u32,
     #[serde(skip_serializing_if = "Option::is_none")]
     #[schema(nullable = false)]
     pub results_eml: Option<u32>,
@@ -50,7 +49,6 @@ impl From<CommitteeSession> for audit_log::CommitteeSessionDetails {
             session_location: value.location,
             session_start_date_time: value.start_date_time,
             session_status: value.status.to_string(),
-            session_number_of_voters: value.number_of_voters,
             session_results_eml: value.results_eml,
             session_results_pdf: value.results_pdf,
             session_overview_pdf: value.overview_pdf,
@@ -70,7 +68,6 @@ impl IntoResponse for CommitteeSession {
 pub struct CommitteeSessionCreateRequest {
     pub number: u32,
     pub election_id: u32,
-    pub number_of_voters: u32,
 }
 
 /// Committee session update request
@@ -80,13 +77,6 @@ pub struct CommitteeSessionUpdateRequest {
     pub location: String,
     pub start_date: String,
     pub start_time: String,
-}
-
-/// Committee session number of voters change request
-#[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq, ToSchema, Type, FromRow)]
-#[serde(deny_unknown_fields)]
-pub struct CommitteeSessionNumberOfVotersChangeRequest {
-    pub number_of_voters: u32,
 }
 
 /// Committee session status change request

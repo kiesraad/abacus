@@ -21,6 +21,7 @@ pub struct Election {
     pub domain_id: String,
     pub category: ElectionCategory,
     pub number_of_seats: u32,
+    pub number_of_voters: u32,
     #[schema(value_type = String, format = "date")]
     pub election_date: NaiveDate,
     #[schema(value_type = String, format = "date")]
@@ -39,6 +40,7 @@ pub struct ElectionWithPoliticalGroups {
     pub domain_id: String,
     pub category: ElectionCategory,
     pub number_of_seats: u32,
+    pub number_of_voters: u32,
     #[schema(value_type = String, format = "date")]
     pub election_date: NaiveDate,
     #[schema(value_type = String, format = "date")]
@@ -58,6 +60,7 @@ impl From<ElectionWithPoliticalGroups> for Election {
             domain_id: value.domain_id,
             category: value.category,
             number_of_seats: value.number_of_seats,
+            number_of_voters: value.number_of_voters,
             election_date: value.election_date,
             nomination_date: value.nomination_date,
         }
@@ -75,6 +78,7 @@ impl From<Election> for ElectionDetails {
             election_domain_id: value.domain_id,
             election_category: value.category.to_string(),
             election_number_of_seats: value.number_of_seats,
+            election_number_of_voters: value.number_of_voters,
             election_election_date: value.election_date,
             election_nomination_date: value.nomination_date,
         }
@@ -92,6 +96,7 @@ impl From<ElectionWithPoliticalGroups> for ElectionDetails {
             election_domain_id: value.domain_id,
             election_category: value.category.to_string(),
             election_number_of_seats: value.number_of_seats,
+            election_number_of_voters: value.number_of_voters,
             election_election_date: value.election_date,
             election_nomination_date: value.nomination_date,
         }
@@ -121,11 +126,19 @@ pub struct NewElection {
     pub domain_id: String,
     pub category: ElectionCategory,
     pub number_of_seats: u32,
+    pub number_of_voters: u32,
     #[schema(value_type = String, format = "date")]
     pub election_date: NaiveDate,
     #[schema(value_type = String, format = "date")]
     pub nomination_date: NaiveDate,
     pub political_groups: Vec<PoliticalGroup>,
+}
+
+/// Election number of voters change request
+#[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq, ToSchema, Type, FromRow)]
+#[serde(deny_unknown_fields)]
+pub struct ElectionNumberOfVotersChangeRequest {
+    pub number_of_voters: u32,
 }
 
 /// Election category (limited for now)
@@ -246,6 +259,7 @@ pub(crate) mod tests {
             domain_id: "0000".to_string(),
             category: ElectionCategory::Municipal,
             number_of_seats,
+            number_of_voters: 1000,
             election_date: NaiveDate::from_ymd_opt(2023, 11, 1).unwrap(),
             nomination_date: NaiveDate::from_ymd_opt(2023, 11, 1).unwrap(),
             political_groups,

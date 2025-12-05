@@ -20,7 +20,6 @@ pub async fn get(
             status as "status: _",
             location,
             start_date_time as "start_date_time: _",
-            number_of_voters as "number_of_voters: u32",
             results_eml as "results_eml: _",
             results_pdf as "results_pdf: _",
             overview_pdf as "overview_pdf: _"
@@ -47,7 +46,6 @@ pub async fn get_previous_session(
             prev.status as "status: _",
             prev.location,
             prev.start_date_time as "start_date_time: _",
-            prev.number_of_voters as "number_of_voters: u32",
             prev.results_eml as "results_eml: _",
             prev.results_pdf as "results_pdf: _",
             prev.overview_pdf as "overview_pdf: _"
@@ -75,7 +73,6 @@ pub async fn get_election_committee_session_list(
             status as "status: _",
             location,
             start_date_time as "start_date_time: _",
-            number_of_voters as "number_of_voters: u32",
             results_eml as "results_eml: _",
             results_pdf as "results_pdf: _",
             overview_pdf as "overview_pdf: _"
@@ -103,7 +100,6 @@ pub async fn get_election_committee_session(
             status as "status: _",
             location,
             start_date_time as "start_date_time: _",
-            number_of_voters as "number_of_voters: u32",
             results_eml as "results_eml: _",
             results_pdf as "results_pdf: _",
             overview_pdf as "overview_pdf: _"
@@ -131,7 +127,6 @@ pub async fn get_committee_session_for_each_election(
             status as "status: _",
             location,
             start_date_time as "start_date_time: _",
-            number_of_voters as "number_of_voters: u32",
             results_eml as "results_eml: _",
             results_pdf as "results_pdf: _",
             overview_pdf as "overview_pdf: _"
@@ -143,7 +138,6 @@ pub async fn get_committee_session_for_each_election(
             status,
             location,
             start_date_time,
-            number_of_voters,
             results_eml,
             results_pdf,
             overview_pdf,
@@ -174,9 +168,8 @@ pub async fn create(
             number,
             election_id,
             location,
-            start_date_time,
-            number_of_voters
-        ) VALUES (?, ?, "", NULL, ?)
+            start_date_time
+        ) VALUES (?, ?, "", NULL)
         RETURNING
             id as "id: u32",
             number as "number: u32",
@@ -184,14 +177,12 @@ pub async fn create(
             status as "status: _",
             location,
             start_date_time as "start_date_time: _",
-            number_of_voters as "number_of_voters: u32",
             results_eml as "results_eml: _",
             results_pdf as "results_pdf: _",
             overview_pdf as "overview_pdf: _"
         "#,
         committee_session.number,
         committee_session.election_id,
-        committee_session.number_of_voters,
     )
     .fetch_one(&mut *tx)
     .await?;
@@ -258,43 +249,12 @@ pub async fn update(
             status as "status: _",
             location,
             start_date_time as "start_date_time: _",
-            number_of_voters as "number_of_voters: u32",
             results_eml as "results_eml: _",
             results_pdf as "results_pdf: _",
             overview_pdf as "overview_pdf: _"
         "#,
         location,
         start_date_time,
-        committee_session_id,
-    )
-    .fetch_one(conn)
-    .await
-}
-
-pub async fn change_number_of_voters(
-    conn: &mut SqliteConnection,
-    committee_session_id: u32,
-    number_of_voters: u32,
-) -> Result<CommitteeSession, Error> {
-    query_as!(
-        CommitteeSession,
-        r#"
-        UPDATE committee_sessions
-        SET number_of_voters = ?
-        WHERE id = ?
-        RETURNING
-            id as "id: u32",
-            number as "number: u32",
-            election_id as "election_id: u32",
-            status as "status: _",
-            location,
-            start_date_time as "start_date_time: _",
-            number_of_voters as "number_of_voters: u32",
-            results_eml as "results_eml: _",
-            results_pdf as "results_pdf: _",
-            overview_pdf as "overview_pdf: _"
-        "#,
-        number_of_voters,
         committee_session_id,
     )
     .fetch_one(conn)
@@ -319,7 +279,6 @@ pub async fn change_status(
             status as "status: _",
             location,
             start_date_time as "start_date_time: _",
-            number_of_voters as "number_of_voters: u32",
             results_eml as "results_eml: _",
             results_pdf as "results_pdf: _",
             overview_pdf as "overview_pdf: _"
@@ -352,7 +311,6 @@ pub async fn change_files(
             status as "status: _",
             location,
             start_date_time as "start_date_time: _",
-            number_of_voters as "number_of_voters: u32",
             results_eml as "results_eml: _",
             results_pdf as "results_pdf: _",
             overview_pdf as "overview_pdf: _"

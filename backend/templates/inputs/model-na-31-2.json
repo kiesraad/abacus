@@ -5,8 +5,7 @@
     "election_id": 2,
     "location": "Juinen",
     "start_date_time": "2035-01-12T09:00:00",
-    "status": "data_entry_finished",
-    "number_of_voters": 129261
+    "status": "data_entry_finished"
   },
   "election": {
     "id": 2,
@@ -17,6 +16,7 @@
     "domain_id": "0263",
     "category": "Municipal",
     "number_of_seats": 29,
+    "number_of_voters": 129261,
     "election_date": "2035-01-08",
     "nomination_date": "2034-12-15"
   },

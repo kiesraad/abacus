@@ -3,7 +3,7 @@ mod repository;
 mod structs;
 
 pub(crate) use self::{
-    api::router,
+    api::{delete_investigation_for_polling_station, router},
     repository::{get_polling_station_investigation, list_investigations_for_committee_session},
     structs::PollingStationInvestigation,
 };

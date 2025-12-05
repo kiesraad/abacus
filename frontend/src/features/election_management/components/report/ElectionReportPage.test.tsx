@@ -97,15 +97,11 @@ describe("ElectionReportPage", () => {
   test("Shows page and click on back to overview", async () => {
     const user = userEvent.setup();
     const statusChange = spyOnHandler(CommitteeSessionStatusChangeRequestHandler);
-    overrideOnce(
-      "get",
-      "/api/elections/1",
-      200,
-      getElectionMockData(
-        {},
-        { status: "data_entry_finished", location: "Den Haag", start_date_time: "2026-03-18T21:36:00" },
-      ),
+    const electionData = getElectionMockData(
+      {},
+      { status: "data_entry_finished", location: "Den Haag", start_date_time: "2026-03-18T21:36:00" },
     );
+    overrideOnce("get", "/api/elections/1", 200, electionData);
 
     const router = renderPage();
 
@@ -133,15 +129,11 @@ describe("ElectionReportPage", () => {
   test("Shows page and click on resume data entry", async () => {
     const user = userEvent.setup();
     const statusChange = spyOnHandler(CommitteeSessionStatusChangeRequestHandler);
-    overrideOnce(
-      "get",
-      "/api/elections/1",
-      200,
-      getElectionMockData(
-        {},
-        { status: "data_entry_finished", location: "Den Haag", start_date_time: "2026-03-18T21:36:00" },
-      ),
+    const electionData = getElectionMockData(
+      {},
+      { status: "data_entry_finished", location: "Den Haag", start_date_time: "2026-03-18T21:36:00" },
     );
+    overrideOnce("get", "/api/elections/1", 200, electionData);
 
     renderPage();
 
@@ -287,7 +279,7 @@ describe("ElectionReportPage", () => {
     const router = renderPage();
     const electionData = getElectionMockData(
       {},
-      { status: "data_entry_finished", location: "Den Haag", start_date_time: "2026-03-18T21:36:00" },
+      { number: 2, status: "data_entry_finished", location: "Den Haag", start_date_time: "2026-03-18T21:36:00" },
     );
 
     // Set to second session and update investigations
@@ -323,7 +315,7 @@ describe("ElectionReportPage", () => {
     const router = renderPage();
     const electionData = getElectionMockData(
       {},
-      { status: "data_entry_finished", location: "Den Haag", start_date_time: "2026-03-18T21:36:00" },
+      { number: 2, status: "data_entry_finished", location: "Den Haag", start_date_time: "2026-03-18T21:36:00" },
     );
 
     // Set to second session and update investigations

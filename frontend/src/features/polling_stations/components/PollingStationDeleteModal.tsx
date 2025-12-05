@@ -3,12 +3,14 @@ import { useCrud } from "@/api/useCrud";
 import { IconTrash } from "@/components/generated/icons";
 import { Button } from "@/components/ui/Button/Button";
 import { Modal } from "@/components/ui/Modal/Modal";
-import { t } from "@/i18n/translate";
+import { t, tx } from "@/i18n/translate";
 import { POLLING_STATION_DELETE_REQUEST_PATH, PollingStation } from "@/types/generated/openapi";
 
 export interface PollingStationDeleteModalProps {
   electionId: number;
   pollingStation: PollingStation;
+  existingInvestigation: boolean;
+  existingDataEntry: boolean;
   onDeleted: (pollingStation: PollingStation) => void;
   onError: () => void;
   onCancel: () => void;
@@ -17,6 +19,8 @@ export interface PollingStationDeleteModalProps {
 export function PollingStationDeleteModal({
   electionId,
   pollingStation,
+  existingInvestigation,
+  existingDataEntry,
   onDeleted,
   onCancel,
   onError,
@@ -34,9 +38,24 @@ export function PollingStationDeleteModal({
     });
   }
 
+  function deleteWarning() {
+    if (existingDataEntry && existingInvestigation) {
+      return tx("polling_station.delete_modal.existing_investigation_and_data_entry");
+    }
+    if (existingDataEntry) {
+      return tx("polling_station.delete_modal.existing_data_entry");
+    }
+    if (existingInvestigation) {
+      return tx("polling_station.delete_modal.existing_investigation");
+    }
+  }
+
   return (
     <Modal title={t("polling_station.delete_modal.title")} onClose={onCancel}>
-      <p>{t("polling_station.delete_modal.confirm")}</p>
+      <span>
+        {deleteWarning()}
+        {t("polling_station.delete_modal.action_cannot_be_reverted")}
+      </span>
       <nav>
         <Button
           leftIcon={<IconTrash />}

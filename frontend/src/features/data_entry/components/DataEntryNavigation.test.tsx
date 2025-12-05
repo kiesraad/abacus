@@ -314,7 +314,7 @@ describe("DataEntryNavigation", () => {
 
       const modal = await screen.findByRole("dialog");
 
-      const closeButton = within(modal).getByRole("button", { name: "Annuleren" });
+      const closeButton = within(modal).getByRole("button", { name: "Sluiten" });
       expect(closeButton).toBeVisible();
       closeButton.click();
 
@@ -434,7 +434,7 @@ describe("DataEntryNavigation", () => {
       await router.navigate(testPath + "/differences_counts");
 
       const modal = await screen.findByRole("dialog");
-      const closeButton = within(modal).getByRole("button", { name: "Annuleren" });
+      const closeButton = within(modal).getByRole("button", { name: "Sluiten" });
       expect(closeButton).toBeVisible();
       closeButton.click();
 

@@ -117,7 +117,7 @@ describe("UserUpdateForm", () => {
   test("abort update", async () => {
     const { onAbort, onSaved } = await renderForm();
     const user = userEvent.setup();
-    await user.click(await screen.findByRole("button", { name: "Annuleren" }));
+    await user.click(screen.getByRole("button", { name: "Annuleren" }));
     expect(onAbort).toHaveBeenCalledOnce();
     expect(updateUser).not.toHaveBeenCalled();
     expect(onSaved).not.toHaveBeenCalled();

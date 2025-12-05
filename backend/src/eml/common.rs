@@ -1,4 +1,4 @@
-use crate::election::{CandidateGender, structs};
+use crate::election::{CandidateGender, CandidateNumber, structs};
 use serde::{Deserialize, Serialize};
 
 /// Managing authority for the EML document
@@ -215,7 +215,7 @@ pub enum EMLImportError {
     CandidateNumbersNotSequential {
         political_group_number: u32,
         expected: u32,
-        found: u32,
+        found: CandidateNumber,
     },
 }
 
@@ -263,6 +263,7 @@ impl TryFrom<Candidate> for structs::Candidate {
                 .candidate_identifier
                 .id
                 .parse()
+                .map(CandidateNumber::new)
                 .or(Err(EMLImportError::InvalidCandidate))?,
             initials: match parsed.candidate_full_name.person_name.name_line {
                 Some(line) => line.value,

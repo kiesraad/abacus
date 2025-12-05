@@ -292,7 +292,7 @@ mod tests {
             CSOFirstSessionResults, ExtraInvestigation, PoliticalGroupTotalVotes, YesNo,
             tests::ValidDefault,
         },
-        election::structs::tests::election_fixture,
+        election::{PGNumber, structs::tests::election_fixture},
         pdf_gen::tests::polling_stations_fixture,
     };
 
@@ -308,11 +308,11 @@ mod tests {
             votes_counts: VotesCounts {
                 political_group_total_votes: vec![
                     PoliticalGroupTotalVotes {
-                        number: 1,
+                        number: PGNumber::new(1),
                         total: 20,
                     },
                     PoliticalGroupTotalVotes {
-                        number: 2,
+                        number: PGNumber::new(2),
                         total: 10,
                     },
                 ],
@@ -330,8 +330,8 @@ mod tests {
                 tmp
             },
             political_group_votes: vec![
-                PoliticalGroupCandidateVotes::from_test_data_auto(1, &[18, 2]),
-                PoliticalGroupCandidateVotes::from_test_data_auto(2, &[4, 4, 2]),
+                PoliticalGroupCandidateVotes::from_test_data_auto(PGNumber::new(1), &[18, 2]),
+                PoliticalGroupCandidateVotes::from_test_data_auto(PGNumber::new(2), &[4, 4, 2]),
             ],
         })
     }
@@ -351,11 +351,11 @@ mod tests {
             votes_counts: VotesCounts {
                 political_group_total_votes: vec![
                     PoliticalGroupTotalVotes {
-                        number: 1,
+                        number: PGNumber::new(1),
                         total: 24,
                     },
                     PoliticalGroupTotalVotes {
-                        number: 2,
+                        number: PGNumber::new(2),
                         total: 32,
                     },
                 ],
@@ -373,8 +373,8 @@ mod tests {
                 tmp
             },
             political_group_votes: vec![
-                PoliticalGroupCandidateVotes::from_test_data_auto(1, &[17, 7]),
-                PoliticalGroupCandidateVotes::from_test_data_auto(2, &[12, 15, 5]),
+                PoliticalGroupCandidateVotes::from_test_data_auto(PGNumber::new(1), &[17, 7]),
+                PoliticalGroupCandidateVotes::from_test_data_auto(PGNumber::new(2), &[12, 15, 5]),
             ],
         })
     }
@@ -603,7 +603,7 @@ mod tests {
             .votes_counts_mut()
             .political_group_total_votes
             .push(PoliticalGroupTotalVotes {
-                number: 3,
+                number: PGNumber::new(3),
                 total: 0,
             });
         let totals = ElectionSummary::from_results(
@@ -642,7 +642,7 @@ mod tests {
         let ps1_result = polling_station_results_fixture_a();
         let mut ps2_result = polling_station_results_fixture_b();
         ps2_result.votes_counts_mut().political_group_total_votes[1] = PoliticalGroupTotalVotes {
-            number: 3,
+            number: PGNumber::new(3),
             total: 0,
         };
         let totals = ElectionSummary::from_results(
@@ -676,9 +676,9 @@ mod tests {
         let ps = polling_stations_fixture(&election, committee_session.id, &[20, 20]);
         let ps1_result = polling_station_results_fixture_a();
         let mut ps2_result = polling_station_results_fixture_b();
-        ps2_result
-            .political_group_votes_mut()
-            .push(PoliticalGroupCandidateVotes::from_test_data_auto(3, &[0]));
+        ps2_result.political_group_votes_mut().push(
+            PoliticalGroupCandidateVotes::from_test_data_auto(PGNumber::new(3), &[0]),
+        );
         let totals = ElectionSummary::from_results(
             &election,
             &[(ps[0].clone(), ps1_result), (ps[1].clone(), ps2_result)],
@@ -714,7 +714,7 @@ mod tests {
         let ps1_result = polling_station_results_fixture_a();
         let mut ps2_result = polling_station_results_fixture_b();
         ps2_result.political_group_votes_mut()[1] =
-            PoliticalGroupCandidateVotes::from_test_data_auto(3, &[0]);
+            PoliticalGroupCandidateVotes::from_test_data_auto(PGNumber::new(3), &[0]);
         let totals = ElectionSummary::from_results(
             &election,
             &[(ps[0].clone(), ps1_result), (ps[1].clone(), ps2_result)],

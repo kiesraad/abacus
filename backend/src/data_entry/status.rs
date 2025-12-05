@@ -725,8 +725,8 @@ mod tests {
             structs::tests::{ValidDefault, example_polling_station_results},
         },
         election::{
-            Candidate, ElectionCategory, ElectionId, ElectionWithPoliticalGroups, PoliticalGroup,
-            VoteCountingMethod,
+            Candidate, CandidateNumber, ElectionCategory, ElectionId, ElectionWithPoliticalGroups,
+            PGNumber, PoliticalGroup, VoteCountingMethod,
         },
         polling_station::{PollingStation, PollingStationType},
     };
@@ -809,11 +809,11 @@ mod tests {
             nomination_date: Utc::now().date_naive(),
             political_groups: (1..=2)
                 .map(|number| PoliticalGroup {
-                    number,
+                    number: PGNumber::new(number),
                     name: format!("Partij {number}"),
                     candidates: (1..=2)
                         .map(|number| Candidate {
-                            number,
+                            number: CandidateNumber::new(number),
                             initials: "A".to_string(),
                             first_name: None,
                             last_name_prefix: None,
@@ -1258,7 +1258,7 @@ mod tests {
                 },
                 votes_counts: VotesCounts {
                     political_group_total_votes: vec![PoliticalGroupTotalVotes {
-                        number: 1,
+                        number: PGNumber::new(1),
                         total: 0,
                     }],
                     total_votes_candidates_count: 0,
@@ -1267,10 +1267,10 @@ mod tests {
                     total_votes_cast_count: 1,
                 },
                 political_group_votes: vec![PoliticalGroupCandidateVotes {
-                    number: 1,
+                    number: PGNumber::new(1),
                     total: 0,
                     candidate_votes: vec![CandidateVotes {
-                        number: 1,
+                        number: CandidateNumber::new(1),
                         votes: 0,
                     }],
                 }],
@@ -1287,7 +1287,7 @@ mod tests {
                 },
                 votes_counts: VotesCounts {
                     political_group_total_votes: vec![PoliticalGroupTotalVotes {
-                        number: 1,
+                        number: PGNumber::new(1),
                         total: 1,
                     }],
                     total_votes_candidates_count: 1,
@@ -1296,10 +1296,10 @@ mod tests {
                     total_votes_cast_count: 1,
                 },
                 political_group_votes: vec![PoliticalGroupCandidateVotes {
-                    number: 1,
+                    number: PGNumber::new(1),
                     total: 1,
                     candidate_votes: vec![CandidateVotes {
-                        number: 1,
+                        number: CandidateNumber::new(1),
                         votes: 1,
                     }],
                 }],
@@ -1313,10 +1313,10 @@ mod tests {
                 &polling_station(),
                 &ElectionWithPoliticalGroups {
                     political_groups: vec![PoliticalGroup {
-                        number: 1,
+                        number: PGNumber::new(1),
                         name: "Test group".to_string(),
                         candidates: vec![Candidate {
-                            number: 1,
+                            number: CandidateNumber::new(1),
                             initials: "A.".to_string(),
                             first_name: None,
                             last_name_prefix: None,

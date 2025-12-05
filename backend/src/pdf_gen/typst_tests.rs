@@ -12,8 +12,8 @@ use crate::{
         PoliticalGroupCandidateVotes, PoliticalGroupTotalVotes, VotersCounts, VotesCounts, YesNo,
     },
     election::{
-        Candidate, CandidateGender, ElectionCategory, ElectionId, ElectionWithPoliticalGroups,
-        PoliticalGroup, VoteCountingMethod,
+        Candidate, CandidateGender, CandidateNumber, ElectionCategory, ElectionId,
+        ElectionWithPoliticalGroups, PGNumber, PoliticalGroup, VoteCountingMethod,
     },
     investigation::PollingStationInvestigation,
     pdf_gen::{
@@ -122,7 +122,7 @@ fn random_election(
         nomination_date: random_date(rng),
         political_groups: (0..parties)
             .map(|party_index| PoliticalGroup {
-                number: party_index + 1,
+                number: PGNumber::new(party_index + 1),
                 name: random_string(rng, string_length),
                 candidates: (0..candidates)
                     .map(|candidate_index| {
@@ -136,7 +136,7 @@ fn random_election(
                         );
 
                         Candidate {
-                            number: candidate_index + 1,
+                            number: CandidateNumber::new(candidate_index + 1),
                             initials: random_string(rng, string_length),
                             first_name: random_string_option(
                                 rng,

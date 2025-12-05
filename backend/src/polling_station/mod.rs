@@ -19,12 +19,9 @@ use crate::{
         repository::get_election_committee_session,
         status::{CommitteeSessionStatus, change_committee_session_status},
     },
-    data_entry::{
-        delete_data_entry_and_result_for_polling_station,
-        repository::{data_entry_exists, result_exists},
-    },
+    data_entry::delete_data_entry_and_result_for_polling_station,
     eml::{EML110, EMLDocument, EMLImportError},
-    investigation::{delete_investigation_for_polling_station, investigation_exists},
+    investigation::delete_investigation_for_polling_station,
 };
 
 pub mod repository;
@@ -298,20 +295,10 @@ async fn polling_station_delete(
     let polling_station =
         repository::get_for_election(&mut tx, election_id, polling_station_id).await?;
 
-    if data_entry_exists(&mut tx, polling_station.id).await?
-        || result_exists(&mut tx, polling_station.id).await?
-    {
-        delete_data_entry_and_result_for_polling_station(
-            &mut tx,
-            &audit_service,
-            polling_station.id,
-        )
+    delete_data_entry_and_result_for_polling_station(&mut tx, &audit_service, polling_station.id)
         .await?;
-    }
-    if investigation_exists(&mut tx, polling_station.id).await? {
-        delete_investigation_for_polling_station(&mut tx, &audit_service, polling_station.id)
-            .await?;
-    }
+
+    delete_investigation_for_polling_station(&mut tx, &audit_service, polling_station.id).await?;
 
     repository::delete(&mut tx, election_id, polling_station_id).await?;
 
@@ -331,6 +318,14 @@ async fn polling_station_delete(
             &mut tx,
             committee_session.id,
             CommitteeSessionStatus::Created,
+            audit_service,
+        )
+        .await?;
+    } else if committee_session.status == CommitteeSessionStatus::DataEntryFinished {
+        change_committee_session_status(
+            &mut tx,
+            committee_session.id,
+            CommitteeSessionStatus::DataEntryInProgress,
             audit_service,
         )
         .await?;

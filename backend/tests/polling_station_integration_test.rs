@@ -1172,8 +1172,11 @@ async fn test_import_correct_file(pool: SqlitePool) {
     );
 }
 
-async fn check_finished_to_in_progress_on<F, Fut>(addr: &SocketAddr, action: F)
-where
+async fn check_finished_to_in_progress_on<F, Fut>(
+    addr: &SocketAddr,
+    action: F,
+    expected_status: StatusCode,
+) where
     F: FnOnce() -> Fut,
     Fut: Future<Output = Response>,
 {
@@ -1199,7 +1202,7 @@ where
     );
 
     let status = action().await.status();
-    assert!(status == StatusCode::OK || status == StatusCode::CREATED);
+    assert_eq!(status, expected_status, "Unexpected response status");
 
     let committee_session =
         get_election_committee_session(addr, &coordinator_cookie, election_id).await;
@@ -1213,9 +1216,11 @@ where
 async fn test_finished_to_in_progress_on_create(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let coordinator_cookie = coordinator_login(&addr).await;
-    check_finished_to_in_progress_on(&addr, || {
-        create_polling_station(&addr, &coordinator_cookie, 2, 35)
-    })
+    check_finished_to_in_progress_on(
+        &addr,
+        || create_polling_station(&addr, &coordinator_cookie, 2, 35),
+        StatusCode::CREATED,
+    )
     .await;
 }
 
@@ -1224,21 +1229,47 @@ async fn test_finished_to_in_progress_on_update(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let coordinator_cookie = coordinator_login(&addr).await;
 
-    check_finished_to_in_progress_on(&addr, || {
-        update_polling_station(
-            &addr,
-            &coordinator_cookie,
-            2,
-            1,
-            serde_json::json!({
-                "name": "Testverandering",
-                "number_of_voters": 2000,
-                "polling_station_type": "Special",
-                "address": "Teststraat 2a",
-                "postal_code": "1234 QY",
-                "locality": "Testdorp",
-            }),
-        )
-    })
+    check_finished_to_in_progress_on(
+        &addr,
+        || {
+            update_polling_station(
+                &addr,
+                &coordinator_cookie,
+                2,
+                1,
+                serde_json::json!({
+                    "name": "Testverandering",
+                    "number_of_voters": 2000,
+                    "polling_station_type": "Special",
+                    "address": "Teststraat 2a",
+                    "postal_code": "1234 QY",
+                    "locality": "Testdorp",
+                }),
+            )
+        },
+        StatusCode::OK,
+    )
     .await;
+}
+
+#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
+async fn test_finished_to_in_progress_on_delete(pool: SqlitePool) {
+    let addr = serve_api(pool).await;
+    let coordinator_cookie = coordinator_login(&addr).await;
+    let election_id = 2;
+
+    check_finished_to_in_progress_on(
+        &addr,
+        || delete_polling_station(&addr, &coordinator_cookie, election_id, 2),
+        StatusCode::NO_CONTENT,
+    )
+    .await;
+
+    // Delete last polling station
+    let response = delete_polling_station(&addr, &coordinator_cookie, election_id, 1).await;
+    assert_eq!(response.status(), StatusCode::NO_CONTENT);
+
+    let committee_session =
+        get_election_committee_session(&addr, &coordinator_cookie, election_id).await;
+    assert_eq!(committee_session.status, CommitteeSessionStatus::Created);
 }

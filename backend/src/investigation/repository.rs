@@ -2,7 +2,7 @@ use super::structs::{
     PollingStationInvestigation, PollingStationInvestigationConcludeRequest,
     PollingStationInvestigationCreateRequest,
 };
-use sqlx::{Error, SqliteConnection, query, query_as};
+use sqlx::{Error, SqliteConnection, query_as};
 
 pub async fn create_polling_station_investigation(
     conn: &mut SqliteConnection,
@@ -138,21 +138,6 @@ pub async fn list_investigations_for_committee_session(
     )
     .fetch_all(conn)
     .await
-}
-
-/// Check if a polling station has an investigation
-pub async fn investigation_exists(conn: &mut SqliteConnection, id: u32) -> Result<bool, Error> {
-    let res = query!(
-        r#"
-        SELECT EXISTS(
-            SELECT 1 FROM polling_station_investigations
-            WHERE polling_station_id = ?)
-        AS `exists`"#,
-        id
-    )
-    .fetch_one(conn)
-    .await?;
-    Ok(res.exists == 1)
 }
 
 #[cfg(test)]

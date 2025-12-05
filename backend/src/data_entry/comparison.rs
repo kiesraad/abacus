@@ -313,6 +313,8 @@ impl Compare for CandidateVotes {
 mod tests {
     use test_log::test;
 
+    use crate::election::PGNumber;
+
     use super::*;
 
     /// Tests that polling station results with equal data and no differences counts are correctly identified as equal.
@@ -329,7 +331,7 @@ mod tests {
             },
             votes_counts: VotesCounts {
                 political_group_total_votes: vec![PoliticalGroupTotalVotes {
-                    number: 1,
+                    number: PGNumber::new(1),
                     total: 100,
                 }],
                 total_votes_candidates_count: 100,
@@ -339,7 +341,7 @@ mod tests {
             },
             differences_counts: DifferencesCounts::zero(),
             political_group_votes: vec![PoliticalGroupCandidateVotes::from_test_data_auto(
-                1,
+                PGNumber::new(1),
                 &[100],
             )],
         });
@@ -366,7 +368,7 @@ mod tests {
             },
             votes_counts: VotesCounts {
                 political_group_total_votes: vec![PoliticalGroupTotalVotes {
-                    number: 1,
+                    number: PGNumber::new(1),
                     total: 100,
                 }],
                 total_votes_candidates_count: 100,
@@ -386,7 +388,7 @@ mod tests {
                     },
             },
             political_group_votes: vec![PoliticalGroupCandidateVotes::from_test_data_auto(
-                1,
+                PGNumber::new(1),
                 &[100],
             )],
         });
@@ -413,7 +415,7 @@ mod tests {
             },
             votes_counts: VotesCounts {
                 political_group_total_votes: vec![PoliticalGroupTotalVotes {
-                    number: 1,
+                    number: PGNumber::new(1),
                     total: 100,
                 }],
                 total_votes_candidates_count: 100,
@@ -423,7 +425,7 @@ mod tests {
             },
             differences_counts: DifferencesCounts::zero(),
             political_group_votes: vec![PoliticalGroupCandidateVotes::from_test_data_auto(
-                1,
+                PGNumber::new(1),
                 &[100],
             )],
         });
@@ -450,7 +452,7 @@ mod tests {
             },
             votes_counts: VotesCounts {
                 political_group_total_votes: vec![PoliticalGroupTotalVotes {
-                    number: 1,
+                    number: PGNumber::new(1),
                     total: 100,
                 }],
                 total_votes_candidates_count: 100,
@@ -470,7 +472,7 @@ mod tests {
                 difference_completely_accounted_for: Default::default(),
             },
             political_group_votes: vec![PoliticalGroupCandidateVotes::from_test_data_auto(
-                1,
+                PGNumber::new(1),
                 &[100],
             )],
         });
@@ -497,7 +499,7 @@ mod tests {
             },
             votes_counts: VotesCounts {
                 political_group_total_votes: vec![PoliticalGroupTotalVotes {
-                    number: 1,
+                    number: PGNumber::new(1),
                     total: 100,
                 }],
                 total_votes_candidates_count: 100,
@@ -507,7 +509,7 @@ mod tests {
             },
             differences_counts: DifferencesCounts::zero(),
             political_group_votes: vec![PoliticalGroupCandidateVotes::from_test_data_auto(
-                1,
+                PGNumber::new(1),
                 &[100],
             )],
         });
@@ -552,7 +554,7 @@ mod tests {
             },
             votes_counts: VotesCounts {
                 political_group_total_votes: vec![PoliticalGroupTotalVotes {
-                    number: 1,
+                    number: PGNumber::new(1),
                     total: 100,
                 }],
                 total_votes_candidates_count: 100,
@@ -572,7 +574,7 @@ mod tests {
                 difference_completely_accounted_for: Default::default(),
             },
             political_group_votes: vec![PoliticalGroupCandidateVotes::from_test_data_auto(
-                1,
+                PGNumber::new(1),
                 &[100],
             )],
         });
@@ -624,7 +626,7 @@ mod tests {
             },
             votes_counts: VotesCounts {
                 political_group_total_votes: vec![PoliticalGroupTotalVotes {
-                    number: 1,
+                    number: PGNumber::new(1),
                     total: 100,
                 }],
                 total_votes_candidates_count: 100,
@@ -634,7 +636,7 @@ mod tests {
             },
             differences_counts: DifferencesCounts::zero(),
             political_group_votes: vec![PoliticalGroupCandidateVotes::from_test_data_auto(
-                1,
+                PGNumber::new(1),
                 &[100],
             )],
         });
@@ -652,7 +654,7 @@ mod tests {
             .unwrap()
             .votes_counts = VotesCounts {
             political_group_total_votes: vec![PoliticalGroupTotalVotes {
-                number: 1,
+                number: PGNumber::new(1),
                 total: 101,
             }],
             total_votes_candidates_count: 101,
@@ -713,11 +715,11 @@ mod tests {
             votes_counts: VotesCounts {
                 political_group_total_votes: vec![
                     PoliticalGroupTotalVotes {
-                        number: 1,
+                        number: PGNumber::new(1),
                         total: 100,
                     },
                     PoliticalGroupTotalVotes {
-                        number: 2,
+                        number: PGNumber::new(2),
                         total: 0,
                     },
                 ],
@@ -738,8 +740,8 @@ mod tests {
                 difference_completely_accounted_for: Default::default(),
             },
             political_group_votes: vec![
-                PoliticalGroupCandidateVotes::from_test_data_auto(1, &[100, 0]),
-                PoliticalGroupCandidateVotes::from_test_data_auto(2, &[0]),
+                PoliticalGroupCandidateVotes::from_test_data_auto(PGNumber::new(1), &[100, 0]),
+                PoliticalGroupCandidateVotes::from_test_data_auto(PGNumber::new(2), &[0]),
             ],
         });
         let mut second_entry = first_entry.clone();
@@ -747,8 +749,8 @@ mod tests {
             .as_cso_next_session_mut()
             .unwrap()
             .political_group_votes = vec![
-            PoliticalGroupCandidateVotes::from_test_data_auto(1, &[50, 30]),
-            PoliticalGroupCandidateVotes::from_test_data_auto(2, &[20]),
+            PoliticalGroupCandidateVotes::from_test_data_auto(PGNumber::new(1), &[50, 30]),
+            PoliticalGroupCandidateVotes::from_test_data_auto(PGNumber::new(2), &[20]),
         ];
         second_entry.compare(
             &first_entry,

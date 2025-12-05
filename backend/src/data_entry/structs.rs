@@ -776,11 +776,11 @@ pub mod tests {
             votes_counts: VotesCounts {
                 political_group_total_votes: vec![
                     PoliticalGroupTotalVotes {
-                        number: 1,
+                        number: PGNumber::new(1),
                         total: 56,
                     },
                     PoliticalGroupTotalVotes {
-                        number: 2,
+                        number: PGNumber::new(2),
                         total: 40,
                     },
                 ],
@@ -804,8 +804,8 @@ pub mod tests {
                 },
             },
             political_group_votes: vec![
-                PoliticalGroupCandidateVotes::from_test_data_auto(1, &[36, 20]),
-                PoliticalGroupCandidateVotes::from_test_data_auto(2, &[30, 10]),
+                PoliticalGroupCandidateVotes::from_test_data_auto(PGNumber::new(1), &[36, 20]),
+                PoliticalGroupCandidateVotes::from_test_data_auto(PGNumber::new(2), &[30, 10]),
             ],
         })
     }
@@ -901,6 +901,7 @@ pub mod tests {
         use crate::{
             APIError,
             data_entry::{PoliticalGroupTotalVotes, VotesCounts},
+            election::PGNumber,
             error::ErrorReference,
         };
 
@@ -909,11 +910,11 @@ pub mod tests {
             let mut curr_votes = VotesCounts {
                 political_group_total_votes: vec![
                     PoliticalGroupTotalVotes {
-                        number: 1,
+                        number: PGNumber::new(1),
                         total: 10,
                     },
                     PoliticalGroupTotalVotes {
-                        number: 2,
+                        number: PGNumber::new(2),
                         total: 20,
                     },
                 ],
@@ -927,11 +928,11 @@ pub mod tests {
                 .add(&VotesCounts {
                     political_group_total_votes: vec![
                         PoliticalGroupTotalVotes {
-                            number: 1,
+                            number: PGNumber::new(1),
                             total: 11,
                         },
                         PoliticalGroupTotalVotes {
-                            number: 2,
+                            number: PGNumber::new(2),
                             total: 12,
                         },
                     ],
@@ -956,7 +957,7 @@ pub mod tests {
         fn test_votes_addition_error() {
             let mut curr_votes = VotesCounts {
                 political_group_total_votes: vec![PoliticalGroupTotalVotes {
-                    number: 1,
+                    number: PGNumber::new(1),
                     total: 10,
                 }],
                 total_votes_candidates_count: 2,
@@ -967,7 +968,7 @@ pub mod tests {
 
             let mut other = VotesCounts {
                 political_group_total_votes: vec![PoliticalGroupTotalVotes {
-                    number: 2,
+                    number: PGNumber::new(2),
                     total: 20,
                 }],
                 total_votes_candidates_count: 1,

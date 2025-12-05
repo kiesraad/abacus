@@ -7,7 +7,7 @@ const io = readline.createInterface({
   output: process.stdout,
 });
 
-io.question("Do you want to import .po files and overwrite all translation json files? (y/n) ", function (ans) {
+io.question("Do you want to import .po files and overwrite all translation json files? (y/n) ", (ans) => {
   if (ans == "y" || ans == "yes") {
     importPoFiles();
   } else {

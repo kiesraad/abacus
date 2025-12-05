@@ -25,7 +25,7 @@ export type FormElements = {
   [key in keyof PollingStationRequest]: HTMLInputElement;
 } & HTMLFormControlsCollection;
 
-interface Form extends HTMLFormElement {
+interface HTMLForm extends HTMLFormElement {
   readonly elements: FormElements;
 }
 
@@ -53,7 +53,7 @@ export function PollingStationForm({ electionId, pollingStation, onSaved, onCanc
     updatePath: isUpdate ? `/api/elections/${electionId}/polling_stations/${pollingStation.id}` : undefined,
   });
 
-  const handleSubmit = (event: React.FormEvent<Form>) => {
+  const handleSubmit = (event: React.FormEvent<HTMLForm>) => {
     event.preventDefault();
     const elements = event.currentTarget.elements;
 
@@ -73,7 +73,7 @@ export function PollingStationForm({ electionId, pollingStation, onSaved, onCanc
     });
   };
 
-  let numberFieldError;
+  let numberFieldError: string | undefined;
   if (validationResult.number) {
     numberFieldError = t(`form_errors.${validationResult.number}`);
   } else if (isValid && error instanceof ApiError && error.reference === "EntryNotUnique") {

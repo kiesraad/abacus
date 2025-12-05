@@ -8,7 +8,7 @@ import { render, screen } from "@/testing/test-utils";
 
 import { useFormKeyboardNavigation } from "./useFormKeyboardNavigation";
 
-export const FormWithNavigation = ({ onSubmit, children }: { onSubmit: FormEventHandler; children: ReactNode }) => {
+const FormWithNavigation = ({ onSubmit, children }: { onSubmit: FormEventHandler; children: ReactNode }) => {
   const ref = useFormKeyboardNavigation();
 
   return (

@@ -284,7 +284,9 @@ describe("ElectionReportPage", () => {
 
     // Set to second session and update investigations
     electionData.current_committee_session.number = 2;
-    electionData.investigations.map((i) => (i.corrected_results = true));
+    electionData.investigations.forEach((i) => {
+      i.corrected_results = true;
+    });
 
     server.use(
       http.get("/api/elections/1", () =>
@@ -320,7 +322,9 @@ describe("ElectionReportPage", () => {
 
     // Set to second session and update investigations
     electionData.current_committee_session.number = 2;
-    electionData.investigations.map((i) => (i.corrected_results = false));
+    electionData.investigations.forEach((i) => {
+      i.corrected_results = false;
+    });
 
     server.use(
       http.get("/api/elections/1", () =>

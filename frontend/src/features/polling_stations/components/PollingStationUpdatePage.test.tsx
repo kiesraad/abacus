@@ -16,7 +16,7 @@ import {
   PollingStationUpdateHandler,
 } from "@/testing/api-mocks/RequestHandlers";
 import { overrideOnce, server } from "@/testing/server";
-import { renderReturningRouter, screen, spyOnHandler, waitFor, within } from "@/testing/test-utils";
+import { render, screen, spyOnHandler, waitFor, within } from "@/testing/test-utils";
 import { TestUserProvider } from "@/testing/TestUserProvider";
 import { CommitteeSessionStatus, DataEntryStatusName, PollingStation, Role } from "@/types/generated/openapi";
 
@@ -25,7 +25,7 @@ import { PollingStationUpdatePage } from "./PollingStationUpdatePage";
 const navigate = vi.fn();
 
 function renderPage(userRole: Role) {
-  return renderReturningRouter(
+  return render(
     <TestUserProvider userRole={userRole}>
       <ElectionProvider electionId={1}>
         <ElectionStatusProvider electionId={1}>

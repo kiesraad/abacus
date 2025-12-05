@@ -50,7 +50,7 @@ export const DefaultModal: StoryObj = {
       await expect(heading).toHaveFocus();
 
       // Test closing modal with X button
-      const closeButton = within(modal).getByRole("button", { name: "Annuleren" });
+      const closeButton = within(modal).getByRole("button", { name: "Sluiten" });
       await userEvent.click(closeButton);
     });
 

@@ -68,7 +68,7 @@ function Row({ id, children, to, className }: { id?: string; children: React.Rea
 
   if (to) {
     return (
-      <tr id={id} className={cn(cls.rowLink, className)} onClick={() => void navigate(to)}>
+      <tr id={id} className={cn(cls.rowLink, cls.chevronIcon, className)} onClick={() => void navigate(to)}>
         {children}
       </tr>
     );
@@ -84,16 +84,21 @@ function Row({ id, children, to, className }: { id?: string; children: React.Rea
 function ClickRow({
   children,
   onClick,
+  downloadIcon,
   active,
   className,
 }: {
   children: React.ReactNode;
   onClick: () => void;
+  downloadIcon?: boolean;
   active?: boolean;
   className?: string;
 }) {
   return (
-    <tr className={cn(cls.rowLink, active && cls.active, className)} onClick={onClick}>
+    <tr
+      className={cn(cls.rowLink, downloadIcon ? cls.downloadIcon : cls.chevronIcon, active && cls.active, className)}
+      onClick={onClick}
+    >
       {children}
     </tr>
   );

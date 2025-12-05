@@ -208,14 +208,14 @@ pub enum EMLImportError {
     NumberOfPollingStationsNotInRange,
     OnlyMunicipalSupported,
     TooManyPoliticalGroups,
-    PoliticalGroupNumbersNotSequential {
-        expected: u32,
+    PoliticalGroupNumbersNotIncreasing {
+        expected_larger_than: u32,
         found: u32,
     },
-    CandidateNumbersNotSequential {
+    CandidateNumbersNotIncreasing {
         political_group_number: u32,
-        expected: u32,
-        found: CandidateNumber,
+        expected_larger_than: u32,
+        found: u32,
     },
 }
 

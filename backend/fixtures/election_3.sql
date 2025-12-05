@@ -1,5 +1,5 @@
-INSERT INTO elections (id, name, counting_method, election_id, location, domain_id, category, number_of_seats, election_date, nomination_date, political_groups)
-VALUES (3, 'Municipal Re-election', 'CSO', 'Heemdamseburg_2024', 'Heemdamseburg', '0000', 'Municipal', 29, '2024-12-31', '2024-12-01',
+INSERT INTO elections (id, name, counting_method, election_id, location, domain_id, category, number_of_seats, number_of_voters, election_date, nomination_date, political_groups)
+VALUES (3, 'Municipal Re-election', 'CSO', 'Heemdamseburg_2024', 'Heemdamseburg', '0000', 'Municipal', 29, 2000, '2024-12-31', '2024-12-01',
         '[
           {
             "number": 1,

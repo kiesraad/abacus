@@ -1,7 +1,9 @@
 #![cfg(test)]
 use abacus::{
     committee_session::status::CommitteeSessionStatus,
-    election::{ElectionDetailsResponse, ElectionListResponse},
+    election::{
+        ElectionDetailsResponse, ElectionListResponse, ElectionNumberOfVotersChangeRequest,
+    },
 };
 use async_zip::base::read::mem::ZipFileReader;
 use axum::http::StatusCode;
@@ -9,7 +11,13 @@ use sha2::Digest;
 use sqlx::SqlitePool;
 use test_log::test;
 
-use crate::{shared::create_result, utils::serve_api};
+use crate::{
+    shared::{
+        admin_login, coordinator_login, create_polling_station, create_result,
+        get_election_committee_session,
+    },
+    utils::serve_api,
+};
 
 pub mod shared;
 pub mod utils;
@@ -131,6 +139,152 @@ async fn test_election_details_not_found(pool: SqlitePool) {
     let response = reqwest::Client::new()
         .get(&url)
         .header("cookie", typist_cookie)
+        .send()
+        .await
+        .unwrap();
+
+    // Ensure the response is what we expect
+    assert_eq!(response.status(), StatusCode::NOT_FOUND);
+}
+
+#[test(sqlx::test(fixtures(
+    path = "../fixtures",
+    scripts("election_6_no_polling_stations", "users")
+)))]
+async fn test_election_number_of_voters_change_first_session_created_works_for_coordinator(
+    pool: SqlitePool,
+) {
+    let addr = serve_api(pool).await;
+    let coordinator_cookie = coordinator_login(&addr).await;
+    let election_id = 6;
+
+    let committee_session =
+        get_election_committee_session(&addr, &coordinator_cookie, election_id).await;
+    assert_eq!(committee_session.status, CommitteeSessionStatus::Created);
+
+    let url = format!("http://{addr}/api/elections/{election_id}/voters");
+    let response = reqwest::Client::new()
+        .put(&url)
+        .header("cookie", coordinator_cookie)
+        .json(&ElectionNumberOfVotersChangeRequest {
+            number_of_voters: 12345,
+        })
+        .send()
+        .await
+        .unwrap();
+
+    // Ensure the response is what we expect
+    assert_eq!(
+        response.status(),
+        StatusCode::NO_CONTENT,
+        "Unexpected response status"
+    );
+}
+
+#[test(sqlx::test(fixtures(
+    path = "../fixtures",
+    scripts("election_6_no_polling_stations", "users")
+)))]
+async fn test_election_number_of_voters_change_first_session_not_started_works_for_administrator(
+    pool: SqlitePool,
+) {
+    let addr = serve_api(pool).await;
+    let coordinator_cookie = coordinator_login(&addr).await;
+    let election_id = 6;
+
+    let committee_session =
+        get_election_committee_session(&addr, &coordinator_cookie, election_id).await;
+    assert_eq!(committee_session.status, CommitteeSessionStatus::Created);
+
+    create_polling_station(&addr, &coordinator_cookie, election_id, 1).await;
+
+    let committee_session =
+        get_election_committee_session(&addr, &coordinator_cookie, election_id).await;
+    assert_eq!(
+        committee_session.status,
+        CommitteeSessionStatus::DataEntryNotStarted
+    );
+
+    let url = format!("http://{addr}/api/elections/{election_id}/voters");
+    let admin_cookie = admin_login(&addr).await;
+    let response = reqwest::Client::new()
+        .put(&url)
+        .header("cookie", admin_cookie)
+        .json(&ElectionNumberOfVotersChangeRequest {
+            number_of_voters: 12345,
+        })
+        .send()
+        .await
+        .unwrap();
+
+    // Ensure the response is what we expect
+    assert_eq!(
+        response.status(),
+        StatusCode::NO_CONTENT,
+        "Unexpected response status"
+    );
+}
+
+#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_7_four_sessions", "users"))))]
+async fn test_election_number_of_voters_change_not_first_session_fails(pool: SqlitePool) {
+    let addr = serve_api(pool).await;
+    let coordinator_cookie = coordinator_login(&addr).await;
+
+    let url = format!("http://{addr}/api/elections/7/voters");
+    let response = reqwest::Client::new()
+        .put(&url)
+        .header("cookie", coordinator_cookie)
+        .json(&ElectionNumberOfVotersChangeRequest {
+            number_of_voters: 12345,
+        })
+        .send()
+        .await
+        .unwrap();
+
+    // Ensure the response is what we expect
+    assert_eq!(
+        response.status(),
+        StatusCode::CONFLICT,
+        "Unexpected response status"
+    );
+}
+
+#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
+async fn test_election_number_of_voters_change_first_session_in_progress_fails(pool: SqlitePool) {
+    let addr = serve_api(pool).await;
+    let coordinator_cookie = coordinator_login(&addr).await;
+
+    let url = format!("http://{addr}/api/elections/2/voters");
+    let response = reqwest::Client::new()
+        .put(&url)
+        .header("cookie", coordinator_cookie)
+        .json(&ElectionNumberOfVotersChangeRequest {
+            number_of_voters: 12345,
+        })
+        .send()
+        .await
+        .unwrap();
+
+    // Ensure the response is what we expect
+    assert_eq!(
+        response.status(),
+        StatusCode::CONFLICT,
+        "Unexpected response status"
+    );
+}
+
+#[test(sqlx::test(fixtures(path = "../fixtures", scripts("users"))))]
+async fn test_election_number_of_voters_change_not_found(pool: SqlitePool) {
+    let addr = serve_api(pool).await;
+    let coordinator_cookie = coordinator_login(&addr).await;
+
+    let url = format!("http://{addr}/api/elections/1/voters");
+    let response = reqwest::Client::new()
+        .put(&url)
+        .header("cookie", coordinator_cookie)
+        .json(&ElectionNumberOfVotersChangeRequest {
+            number_of_voters: 0,
+        })
         .send()
         .await
         .unwrap();

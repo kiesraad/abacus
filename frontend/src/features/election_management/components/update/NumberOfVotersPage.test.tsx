@@ -4,10 +4,7 @@ import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
 import { ElectionProvider } from "@/hooks/election/ElectionProvider";
-import {
-  CommitteeSessionChangeNumberOfVotersHandler,
-  ElectionRequestHandler,
-} from "@/testing/api-mocks/RequestHandlers";
+import { ElectionChangeNumberOfVotersHandler, ElectionRequestHandler } from "@/testing/api-mocks/RequestHandlers";
 import { server } from "@/testing/server";
 import { render, screen, spyOnHandler } from "@/testing/test-utils";
 
@@ -28,13 +25,13 @@ async function renderPage() {
 
 describe("NumberOfVotersPage", () => {
   beforeEach(() => {
-    server.use(ElectionRequestHandler, CommitteeSessionChangeNumberOfVotersHandler);
+    server.use(ElectionRequestHandler, ElectionChangeNumberOfVotersHandler);
     vi.spyOn(ReactRouter, "useNavigate").mockImplementation(() => navigate);
   });
 
   test("save and navigate on submit", async () => {
     await renderPage();
-    const changeVoters = spyOnHandler(CommitteeSessionChangeNumberOfVotersHandler);
+    const changeVoters = spyOnHandler(ElectionChangeNumberOfVotersHandler);
     const user = userEvent.setup();
 
     const input = screen.getByRole("textbox", { name: "Aantal kiesgerechtigden" });
@@ -49,7 +46,7 @@ describe("NumberOfVotersPage", () => {
 
   test("save and shows error on empty or 0 submit", async () => {
     await renderPage();
-    const changeVoters = spyOnHandler(CommitteeSessionChangeNumberOfVotersHandler);
+    const changeVoters = spyOnHandler(ElectionChangeNumberOfVotersHandler);
     const user = userEvent.setup();
 
     const input = screen.getByRole("textbox", { name: "Aantal kiesgerechtigden" });

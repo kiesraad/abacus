@@ -6,7 +6,8 @@ use crate::{
     shared::{
         admin_login, change_status_committee_session, claim_data_entry, coordinator_login,
         create_investigation, create_polling_station, create_result, example_data_entry,
-        get_election, get_election_committee_session, get_statuses, save_data_entry, typist_login,
+        get_election_committee_session, get_election_details, get_statuses, save_data_entry,
+        typist_login,
     },
     utils::serve_api,
 };
@@ -974,7 +975,7 @@ async fn test_delete_with_investigation_works(pool: SqlitePool) {
             .status(),
         StatusCode::CREATED
     );
-    let election_details = get_election(&addr, election_id).await;
+    let election_details = get_election_details(&addr, &coordinator_cookie, election_id).await;
     assert_eq!(election_details.investigations.len(), 2);
 
     let response =
@@ -986,7 +987,7 @@ async fn test_delete_with_investigation_works(pool: SqlitePool) {
         "Unexpected response status"
     );
 
-    let election_details = get_election(&addr, election_id).await;
+    let election_details = get_election_details(&addr, &coordinator_cookie, election_id).await;
     assert_eq!(election_details.investigations.len(), 1);
 }
 

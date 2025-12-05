@@ -1,5 +1,5 @@
-INSERT INTO elections (id, name, counting_method, election_id, location, domain_id, category, number_of_seats, election_date, nomination_date, political_groups)
-VALUES (7, 'Test Election >= 19 seats', 'CSO', 'GroteStad_2026', 'Grote Stad', '0000', 'Municipal', 23, '2026-03-18', '2026-02-02',
+INSERT INTO elections (id, name, counting_method, election_id, location, domain_id, category, number_of_seats, number_of_voters, election_date, nomination_date, political_groups)
+VALUES (7, 'Test Election >= 19 seats', 'CSO', 'GroteStad_2026', 'Grote Stad', '0000', 'Municipal', 23, 15000, '2026-03-18', '2026-02-02',
         '[
           {
             "number": 1,
@@ -43,11 +43,11 @@ VALUES (7, 'Test Election >= 19 seats', 'CSO', 'GroteStad_2026', 'Grote Stad', '
           }
         ]');
 
-INSERT INTO committee_sessions (id, number, election_id, status, location, start_date_time, number_of_voters)
-VALUES (701, 1, 7, 'data_entry_finished', 'Grote Stad', '2026-03-19 09:15:00', 2000),
-       (702, 2, 7, 'data_entry_finished', 'Grote Stad', '2026-03-19 17:15:00', 2000),
-       (703, 3, 7, 'data_entry_finished', 'Grote Stad', '2026-03-19 23:15:00', 2000),
-       (704, 4, 7, 'created', '', NULL, 2000);
+INSERT INTO committee_sessions (id, number, election_id, status, location, start_date_time)
+VALUES (701, 1, 7, 'data_entry_finished', 'Grote Stad', '2026-03-19 09:15:00'),
+       (702, 2, 7, 'data_entry_finished', 'Grote Stad', '2026-03-19 17:15:00'),
+       (703, 3, 7, 'data_entry_finished', 'Grote Stad', '2026-03-19 23:15:00'),
+       (704, 4, 7, 'created', '', NULL);
 
 INSERT INTO polling_stations (id, committee_session_id, id_prev_session, name, number, number_of_voters, polling_station_type, address,
                               postal_code, locality)

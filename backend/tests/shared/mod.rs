@@ -303,17 +303,18 @@ pub async fn create_result_with_non_example_data_entry(
         .await;
 }
 
-pub async fn get_election(addr: &SocketAddr, election_id: u32) -> ElectionDetailsResponse {
+pub async fn get_election_details(
+    addr: &SocketAddr,
+    cookie: &HeaderValue,
+    election_id: u32,
+) -> ElectionDetailsResponse {
     let url = format!("http://{addr}/api/elections/{election_id}");
-    let coordinator_cookie = coordinator_login(addr).await;
     let response = reqwest::Client::new()
         .get(&url)
-        .header("cookie", coordinator_cookie)
+        .header("cookie", cookie)
         .send()
         .await
         .unwrap();
-
-    // Ensure the response is what we expect
     assert_eq!(response.status(), StatusCode::OK);
     response.json().await.unwrap()
 }

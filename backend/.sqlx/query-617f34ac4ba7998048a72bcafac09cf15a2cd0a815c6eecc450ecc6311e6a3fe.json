@@ -1,6 +1,6 @@
 {
   "db_name": "SQLite",
-  "query": "\n        SELECT\n            prev.id as \"id: u32\",\n            prev.number as \"number: u32\",\n            prev.election_id as \"election_id: u32\",\n            prev.status as \"status: _\",\n            prev.location,\n            prev.start_date_time as \"start_date_time: _\",\n            prev.number_of_voters as \"number_of_voters: u32\",\n            prev.results_eml as \"results_eml: _\",\n            prev.results_pdf as \"results_pdf: _\",\n            prev.overview_pdf as \"overview_pdf: _\"\n        FROM committee_sessions AS c\n        JOIN committee_sessions AS prev ON c.election_id = prev.election_id AND c.number = prev.number + 1\n        WHERE c.id = ?\n        ",
+  "query": "\n        UPDATE committee_sessions\n        SET\n            location = ?,\n            start_date_time = ?\n        WHERE id = ?\n        RETURNING\n            id as \"id: u32\",\n            number as \"number: u32\",\n            election_id as \"election_id: u32\",\n            status as \"status: _\",\n            location,\n            start_date_time as \"start_date_time: _\",\n            results_eml as \"results_eml: _\",\n            results_pdf as \"results_pdf: _\",\n            overview_pdf as \"overview_pdf: _\"\n        ",
   "describe": {
     "columns": [
       {
@@ -34,28 +34,23 @@
         "type_info": "Text"
       },
       {
-        "name": "number_of_voters: u32",
+        "name": "results_eml: _",
         "ordinal": 6,
         "type_info": "Integer"
       },
       {
-        "name": "results_eml: _",
+        "name": "results_pdf: _",
         "ordinal": 7,
         "type_info": "Integer"
       },
       {
-        "name": "results_pdf: _",
-        "ordinal": 8,
-        "type_info": "Integer"
-      },
-      {
         "name": "overview_pdf: _",
-        "ordinal": 9,
+        "ordinal": 8,
         "type_info": "Integer"
       }
     ],
     "parameters": {
-      "Right": 1
+      "Right": 3
     },
     "nullable": [
       false,
@@ -64,11 +59,10 @@
       false,
       false,
       true,
-      false,
       true,
       true,
       true
     ]
   },
-  "hash": "c787000bcf058d5ac10a63a052c019f836991835d58ce99c303ecb2cf31b610a"
+  "hash": "617f34ac4ba7998048a72bcafac09cf15a2cd0a815c6eecc450ecc6311e6a3fe"
 }

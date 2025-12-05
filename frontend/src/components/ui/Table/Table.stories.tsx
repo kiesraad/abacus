@@ -187,11 +187,11 @@ export const LinkTable: StoryObj = {
         </Table.Header>
         <Table.Body className="fs-md">
           {data.map((row) => (
-            <Table.LinkRow key={row[0]} to={`#row${row[0]}`}>
+            <Table.Row key={row[0]} to={`#row${row[0]}`}>
               <Table.NumberCell>{row[0]}</Table.NumberCell>
               <Table.Cell>{row[1]}</Table.Cell>
               <Table.Cell>{row[2]}</Table.Cell>
-            </Table.LinkRow>
+            </Table.Row>
           ))}
         </Table.Body>
       </Table>
@@ -219,7 +219,7 @@ export const IconBadgeTable: StoryObj = {
         </Table.Header>
         <Table.Body>
           {data.map((row) => (
-            <Table.LinkRow key={row[0]} to={`#row${row[0]}`}>
+            <Table.Row key={row[0]} to={`#row${row[0]}`}>
               <Table.NumberCell>{row[0]}</Table.NumberCell>
               <Table.Cell>
                 <Icon icon={<IconCheckHeart />} color="accept" />
@@ -229,7 +229,7 @@ export const IconBadgeTable: StoryObj = {
                 <span>{row[2]}</span>
                 <Badge type="first_entry_in_progress" showIcon />
               </Table.Cell>
-            </Table.LinkRow>
+            </Table.Row>
           ))}
         </Table.Body>
       </Table>

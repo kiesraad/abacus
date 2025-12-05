@@ -195,6 +195,7 @@ export function ElectionHomePage() {
                 </Table.Header>
                 <Table.Body>
                   <Table.ClickRow
+                    downloadIcon
                     onClick={() => {
                       directDownload(`/api/elections/${election.id}/download_na_31_2_bijlage1`);
                     }}
@@ -203,6 +204,7 @@ export function ElectionHomePage() {
                     <Table.Cell>{t("election_management.document_na_31_2_bijlage_1")}</Table.Cell>
                   </Table.ClickRow>
                   <Table.ClickRow
+                    downloadIcon
                     onClick={() => {
                       directDownload(`/api/elections/${election.id}/download_n_10_2`);
                     }}
@@ -225,6 +227,7 @@ export function ElectionHomePage() {
                   </Table.Header>
                   <Table.Body>
                     <Table.ClickRow
+                      downloadIcon
                       onClick={() => {
                         directDownload(`/api/elections/${election.id}/download_na_31_2_inlegvel`);
                       }}

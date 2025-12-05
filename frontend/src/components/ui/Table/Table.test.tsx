@@ -7,7 +7,7 @@ import { renderReturningRouter, screen } from "@/testing/test-utils";
 import { Table } from "./Table";
 
 describe("Table", () => {
-  test("LinkRow navigates to url when clicked", async () => {
+  test("Row with link navigates to url when clicked", async () => {
     const user = userEvent.setup();
 
     const data: [number, string][] = [
@@ -24,10 +24,10 @@ describe("Table", () => {
           </Table.Header>
           <Table.Body>
             {data.map((row) => (
-              <Table.LinkRow key={row[0]} to={`#row${row[0]}`}>
+              <Table.Row key={row[0]} to={`#row${row[0]}`}>
                 <Table.NumberCell>{row[0]}</Table.NumberCell>
                 <Table.Cell>{row[1]}</Table.Cell>
-              </Table.LinkRow>
+              </Table.Row>
             ))}
           </Table.Body>
         </Table>

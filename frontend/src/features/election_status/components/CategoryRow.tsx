@@ -43,9 +43,9 @@ export function CategoryRow({ category, pollingStation, addLink, warning }: Cate
   const link = getCategoryRowUrl(pollingStation.status, pollingStation.id);
   if (addLink && link) {
     return (
-      <Table.LinkRow to={link}>
+      <Table.Row to={link}>
         <CategoryRowContent category={category} pollingStation={pollingStation} warning={warning} />
-      </Table.LinkRow>
+      </Table.Row>
     );
   }
 

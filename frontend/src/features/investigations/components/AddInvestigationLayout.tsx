@@ -91,43 +91,47 @@ export function AddInvestigationLayout() {
       <main>
         <StickyNav>
           <ProgressList>
-            {formSections.map((formSection, index) => {
-              const disabled = index > currentFormSection && investigation === undefined;
-              let status: MenuStatus = currentFormSection === index ? "active" : "idle";
+            <ProgressList.Fixed>
+              {formSections.map((formSection, index) => {
+                const disabled = index > currentFormSection && investigation === undefined;
+                let status: MenuStatus = currentFormSection === index ? "active" : "idle";
 
-              if (investigation?.reason && formSection.key === "reason_and_assigment") {
-                status = "accept";
-              }
+                if (investigation?.reason && formSection.key === "reason_and_assigment") {
+                  status = "accept";
+                }
 
-              if (investigation?.reason && formSection.key === "print_corrigendum" && index < currentFormSection) {
-                status = "accept";
-              }
+                if (investigation?.reason && formSection.key === "print_corrigendum" && index < currentFormSection) {
+                  status = "accept";
+                }
 
-              if (investigation?.findings) {
-                status = "accept";
-              }
+                if (investigation?.findings) {
+                  status = "accept";
+                }
 
-              return (
-                <div key={formSection.key}>
-                  <ProgressList.Fixed>
-                    <ProgressList.Item
-                      key={formSection.key}
-                      status={status}
-                      disabled={disabled}
-                      active={currentFormSection === index}
-                    >
-                      {disabled ? (
-                        <span>{formSection.label}</span>
-                      ) : (
-                        <Link to={`/elections/${election.id}/investigations/${pollingStation.id}/${formSection.path}`}>
+                return (
+                  <div key={formSection.key}>
+                    <ProgressList.Fixed>
+                      <ProgressList.Item
+                        key={formSection.key}
+                        status={status}
+                        disabled={disabled}
+                        active={currentFormSection === index}
+                      >
+                        {disabled ? (
                           <span>{formSection.label}</span>
-                        </Link>
-                      )}
-                    </ProgressList.Item>
-                  </ProgressList.Fixed>
-                </div>
-              );
-            })}
+                        ) : (
+                          <Link
+                            to={`/elections/${election.id}/investigations/${pollingStation.id}/${formSection.path}`}
+                          >
+                            <span>{formSection.label}</span>
+                          </Link>
+                        )}
+                      </ProgressList.Item>
+                    </ProgressList.Fixed>
+                  </div>
+                );
+              })}
+            </ProgressList.Fixed>
           </ProgressList>
         </StickyNav>
         <article className="md">

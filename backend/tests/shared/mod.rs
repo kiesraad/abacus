@@ -30,10 +30,7 @@ pub fn differences_counts_zero() -> DifferencesCounts {
             votes_cast_greater_than_admitted_voters: false,
             votes_cast_smaller_than_admitted_voters: false,
         },
-        difference_completely_accounted_for: YesNo {
-            yes: true,
-            no: false,
-        },
+        difference_completely_accounted_for: YesNo::yes(),
     }
 }
 

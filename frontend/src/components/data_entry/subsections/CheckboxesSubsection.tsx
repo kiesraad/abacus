@@ -18,9 +18,7 @@ export function CheckboxesSubsectionComponent({
   errorsAndWarnings,
   readOnly = false,
 }: CheckboxesSubsectionProps) {
-  const hasErrorOrWarning =
-    errorsAndWarnings?.get(`data.${subsection.error_path}`) ||
-    subsection.options.some((option) => errorsAndWarnings?.get(`data.${option.path}`));
+  const hasErrorOrWarning = errorsAndWarnings?.get(`data.${subsection.error_path}`);
 
   return (
     <div className={cls.container}>

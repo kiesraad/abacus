@@ -262,10 +262,6 @@ pub fn validate_differences_counts(
     let votes_cast_smaller_than_admitted_voters = differences_counts
         .compare_votes_cast_admitted_voters
         .votes_cast_smaller_than_admitted_voters;
-    let difference_completely_accounted_for_yes =
-        differences_counts.difference_completely_accounted_for.yes;
-    let difference_completely_accounted_for_no =
-        differences_counts.difference_completely_accounted_for.no;
 
     if admitted_voters_equal_votes_cast && (total_voters_count != total_votes_count) {
         validation_results.errors.push(ValidationResult {
@@ -416,9 +412,10 @@ pub fn validate_differences_counts(
         });
     }
 
-    let difference_completely_accounted_matches = difference_completely_accounted_for_yes as u8
-        + difference_completely_accounted_for_no as u8;
-    if (total_voters_count != total_votes_count) && (difference_completely_accounted_matches != 1) {
+    let accounted_for = &differences_counts.difference_completely_accounted_for;
+    if (total_voters_count != total_votes_count)
+        && (accounted_for.is_empty() || (accounted_for.is_both()))
+    {
         validation_results.errors.push(ValidationResult {
             fields: vec![
                 differences_counts_path
@@ -659,8 +656,8 @@ impl Validate for ExtraInvestigation {
         validation_results: &mut ValidationResults,
         path: &FieldPath,
     ) -> Result<(), DataError> {
-        if self.extra_investigation_other_reason.is_answered()
-            != self.ballots_recounted_extra_investigation.is_answered()
+        if self.extra_investigation_other_reason.is_empty()
+            != self.ballots_recounted_extra_investigation.is_empty()
         {
             validation_results.errors.push(ValidationResult {
                 fields: vec![path.to_string()],
@@ -668,8 +665,9 @@ impl Validate for ExtraInvestigation {
                 context: None,
             });
         }
-        if self.extra_investigation_other_reason.is_invalid()
-            || self.ballots_recounted_extra_investigation.is_invalid()
+
+        if self.extra_investigation_other_reason.is_both()
+            || self.ballots_recounted_extra_investigation.is_both()
         {
             validation_results.errors.push(ValidationResult {
                 fields: vec![path.to_string()],
@@ -677,6 +675,7 @@ impl Validate for ExtraInvestigation {
                 context: None,
             });
         }
+
         Ok(())
     }
 }
@@ -689,8 +688,8 @@ impl Validate for CountingDifferencesPollingStation {
         validation_results: &mut ValidationResults,
         path: &FieldPath,
     ) -> Result<(), DataError> {
-        if !self.unexplained_difference_ballots_voters.is_answered()
-            || !self.difference_ballots_per_list.is_answered()
+        if self.unexplained_difference_ballots_voters.is_empty()
+            || self.difference_ballots_per_list.is_empty()
         {
             validation_results.errors.push(ValidationResult {
                 fields: vec![path.to_string()],
@@ -698,8 +697,9 @@ impl Validate for CountingDifferencesPollingStation {
                 context: None,
             });
         }
-        if self.unexplained_difference_ballots_voters.is_invalid()
-            || self.difference_ballots_per_list.is_invalid()
+
+        if self.unexplained_difference_ballots_voters.is_both()
+            || self.difference_ballots_per_list.is_both()
         {
             validation_results.errors.push(ValidationResult {
                 fields: vec![path.to_string()],
@@ -707,6 +707,7 @@ impl Validate for CountingDifferencesPollingStation {
                 context: None,
             });
         }
+
         Ok(())
     }
 }
@@ -1062,14 +1063,8 @@ mod tests {
             recounted_no: bool,
         ) -> Result<ValidationResults, DataError> {
             let extra_investigation = ExtraInvestigation {
-                extra_investigation_other_reason: YesNo {
-                    yes: investigation_yes,
-                    no: investigation_no,
-                },
-                ballots_recounted_extra_investigation: YesNo {
-                    yes: recounted_yes,
-                    no: recounted_no,
-                },
+                extra_investigation_other_reason: YesNo::new(investigation_yes, investigation_no),
+                ballots_recounted_extra_investigation: YesNo::new(recounted_yes, recounted_no),
             };
 
             let mut validation_results = ValidationResults::default();
@@ -1194,14 +1189,8 @@ mod tests {
             ballots_no: bool,
         ) -> Result<ValidationResults, DataError> {
             let counting_differences_polling_station = CountingDifferencesPollingStation {
-                unexplained_difference_ballots_voters: YesNo {
-                    yes: unexplained_yes,
-                    no: unexplained_no,
-                },
-                difference_ballots_per_list: YesNo {
-                    yes: ballots_yes,
-                    no: ballots_no,
-                },
+                unexplained_difference_ballots_voters: YesNo::new(unexplained_yes, unexplained_no),
+                difference_ballots_per_list: YesNo::new(ballots_yes, ballots_no),
             };
 
             let mut validation_results = ValidationResults::default();
@@ -1625,7 +1614,7 @@ mod tests {
     mod differences_counts {
         use crate::data_entry::{
             DataError, DifferencesCounts, ValidationResult, ValidationResultCode,
-            ValidationResults, validate_differences_counts,
+            ValidationResults, YesNo, validate_differences_counts,
         };
 
         fn validate(
@@ -1653,7 +1642,7 @@ mod tests {
             let mut data = DifferencesCounts::zero();
             data.compare_votes_cast_admitted_voters
                 .admitted_voters_equal_votes_cast = true;
-            data.difference_completely_accounted_for.yes = true;
+            data.difference_completely_accounted_for = YesNo::yes();
 
             let validation_results = validate(data, 105, 105)?;
 
@@ -1663,7 +1652,7 @@ mod tests {
             let mut data = DifferencesCounts::zero();
             data.compare_votes_cast_admitted_voters
                 .admitted_voters_equal_votes_cast = true;
-            data.difference_completely_accounted_for.yes = true;
+            data.difference_completely_accounted_for = YesNo::yes();
 
             let validation_results = validate(data, 105, 104)?;
 
@@ -1675,7 +1664,7 @@ mod tests {
                         "differences_counts.compare_votes_cast_admitted_voters.admitted_voters_equal_votes_cast".into(),
                     ],
                     context: None,
-                },ValidationResult {
+                }, ValidationResult {
                     code: ValidationResultCode::F308,
                     fields: vec![
                         "differences_counts.fewer_ballots_count".into(),
@@ -1695,7 +1684,7 @@ mod tests {
             data.more_ballots_count = 1;
             data.compare_votes_cast_admitted_voters
                 .votes_cast_greater_than_admitted_voters = true;
-            data.difference_completely_accounted_for.yes = true;
+            data.difference_completely_accounted_for = YesNo::yes();
 
             let validation_results = validate(data, 104, 105)?;
 
@@ -1705,7 +1694,7 @@ mod tests {
             let mut data = DifferencesCounts::zero();
             data.compare_votes_cast_admitted_voters
                 .votes_cast_greater_than_admitted_voters = true;
-            data.difference_completely_accounted_for.yes = true;
+            data.difference_completely_accounted_for = YesNo::yes();
 
             let validation_results = validate(data, 105, 104)?;
 
@@ -1717,7 +1706,7 @@ mod tests {
                         "differences_counts.compare_votes_cast_admitted_voters.votes_cast_greater_than_admitted_voters".into(),
                     ],
                     context: None,
-                },ValidationResult {
+                }, ValidationResult {
                     code: ValidationResultCode::F308,
                     fields: vec![
                         "differences_counts.fewer_ballots_count".into(),
@@ -1730,7 +1719,7 @@ mod tests {
             let mut data = DifferencesCounts::zero();
             data.compare_votes_cast_admitted_voters
                 .votes_cast_greater_than_admitted_voters = true;
-            data.difference_completely_accounted_for.yes = true;
+            data.difference_completely_accounted_for = YesNo::yes();
 
             let validation_results = validate(data, 105, 105)?;
 
@@ -1757,7 +1746,7 @@ mod tests {
             data.fewer_ballots_count = 1;
             data.compare_votes_cast_admitted_voters
                 .votes_cast_smaller_than_admitted_voters = true;
-            data.difference_completely_accounted_for.yes = true;
+            data.difference_completely_accounted_for = YesNo::yes();
 
             let validation_results = validate(data, 104, 103)?;
 
@@ -1768,7 +1757,7 @@ mod tests {
 
             data.compare_votes_cast_admitted_voters
                 .votes_cast_smaller_than_admitted_voters = true;
-            data.difference_completely_accounted_for.yes = true;
+            data.difference_completely_accounted_for = YesNo::yes();
 
             let validation_results = validate(data, 103, 104)?;
 
@@ -1793,7 +1782,7 @@ mod tests {
 
             data.compare_votes_cast_admitted_voters
                 .votes_cast_smaller_than_admitted_voters = true;
-            data.difference_completely_accounted_for.yes = true;
+            data.difference_completely_accounted_for = YesNo::yes();
 
             let validation_results = validate(data, 103, 103)?;
 
@@ -1819,7 +1808,7 @@ mod tests {
 
             data.compare_votes_cast_admitted_voters
                 .admitted_voters_equal_votes_cast = true;
-            data.difference_completely_accounted_for.yes = true;
+            data.difference_completely_accounted_for = YesNo::yes();
 
             let validation_results = validate(data, 105, 105)?;
 
@@ -1828,7 +1817,7 @@ mod tests {
             // None checked
             let mut data = DifferencesCounts::zero();
 
-            data.difference_completely_accounted_for.yes = true;
+            data.difference_completely_accounted_for = YesNo::yes();
 
             let validation_results = validate(data, 105, 105)?;
 
@@ -1854,7 +1843,7 @@ mod tests {
                 .admitted_voters_equal_votes_cast = true;
             data.compare_votes_cast_admitted_voters
                 .votes_cast_smaller_than_admitted_voters = true;
-            data.difference_completely_accounted_for.yes = true;
+            data.difference_completely_accounted_for = YesNo::yes();
 
             let validation_results = validate(data, 105, 104)?;
 
@@ -1897,7 +1886,7 @@ mod tests {
                 .votes_cast_greater_than_admitted_voters = true;
             data.compare_votes_cast_admitted_voters
                 .votes_cast_smaller_than_admitted_voters = true;
-            data.difference_completely_accounted_for.yes = true;
+            data.difference_completely_accounted_for = YesNo::yes();
 
             let validation_results = validate(data, 105, 104)?;
 
@@ -1945,7 +1934,7 @@ mod tests {
             data.more_ballots_count = 4;
             data.compare_votes_cast_admitted_voters
                 .admitted_voters_equal_votes_cast = true;
-            data.difference_completely_accounted_for.yes = true;
+            data.difference_completely_accounted_for = YesNo::yes();
 
             let validation_results = validate(data, 52, 52)?;
 
@@ -1970,7 +1959,7 @@ mod tests {
             data.fewer_ballots_count = 4;
             data.compare_votes_cast_admitted_voters
                 .admitted_voters_equal_votes_cast = true;
-            data.difference_completely_accounted_for.yes = true;
+            data.difference_completely_accounted_for = YesNo::yes();
 
             let validation_results = validate(data, 52, 52)?;
 
@@ -1995,7 +1984,7 @@ mod tests {
 
             data.compare_votes_cast_admitted_voters
                 .admitted_voters_equal_votes_cast = true;
-            data.difference_completely_accounted_for.yes = true;
+            data.difference_completely_accounted_for = YesNo::yes();
 
             let validation_results = validate(data, 52, 52)?;
 
@@ -2006,7 +1995,7 @@ mod tests {
 
             data.compare_votes_cast_admitted_voters
                 .admitted_voters_equal_votes_cast = true;
-            data.difference_completely_accounted_for.yes = true;
+            data.difference_completely_accounted_for = YesNo::yes();
 
             let validation_results = validate(data, 52, 53)?;
 
@@ -2031,7 +2020,7 @@ mod tests {
 
             data.compare_votes_cast_admitted_voters
                 .admitted_voters_equal_votes_cast = true;
-            data.difference_completely_accounted_for.yes = true;
+            data.difference_completely_accounted_for = YesNo::yes();
 
             let validation_results = validate(data, 53, 52)?;
 
@@ -2058,7 +2047,7 @@ mod tests {
             data.fewer_ballots_count = 4;
             data.compare_votes_cast_admitted_voters
                 .admitted_voters_equal_votes_cast = true;
-            data.difference_completely_accounted_for.yes = true;
+            data.difference_completely_accounted_for = YesNo::yes();
 
             let validation_results = validate(data, 52, 52)?;
 
@@ -2086,7 +2075,7 @@ mod tests {
             data.more_ballots_count = 20;
             data.compare_votes_cast_admitted_voters
                 .votes_cast_greater_than_admitted_voters = true;
-            data.difference_completely_accounted_for.yes = true;
+            data.difference_completely_accounted_for = YesNo::yes();
 
             let validation_results = validate(data, 52, 72)?;
 
@@ -2104,7 +2093,7 @@ mod tests {
             data.more_ballots_count = 10;
             data.compare_votes_cast_admitted_voters
                 .admitted_voters_equal_votes_cast = true;
-            data.difference_completely_accounted_for.yes = true;
+            data.difference_completely_accounted_for = YesNo::yes();
 
             let validation_results = validate(data, 52, 52)?;
 
@@ -2123,7 +2112,7 @@ mod tests {
             data.more_ballots_count = 30;
             data.compare_votes_cast_admitted_voters
                 .admitted_voters_equal_votes_cast = true;
-            data.difference_completely_accounted_for.yes = true;
+            data.difference_completely_accounted_for = YesNo::yes();
 
             let validation_results = validate(data, 52, 52)?;
 
@@ -2148,7 +2137,7 @@ mod tests {
             data.more_ballots_count = 30;
             data.compare_votes_cast_admitted_voters
                 .votes_cast_smaller_than_admitted_voters = true;
-            data.difference_completely_accounted_for.yes = true;
+            data.difference_completely_accounted_for = YesNo::yes();
 
             let validation_results = validate(data, 72, 52)?;
 
@@ -2177,7 +2166,7 @@ mod tests {
             data.more_ballots_count = 4;
             data.compare_votes_cast_admitted_voters
                 .votes_cast_smaller_than_admitted_voters = true;
-            data.difference_completely_accounted_for.yes = true;
+            data.difference_completely_accounted_for = YesNo::yes();
 
             let validation_results = validate(data, 72, 52)?;
 
@@ -2212,7 +2201,7 @@ mod tests {
             data.more_ballots_count = 4;
             data.compare_votes_cast_admitted_voters
                 .votes_cast_greater_than_admitted_voters = true;
-            data.difference_completely_accounted_for.yes = true;
+            data.difference_completely_accounted_for = YesNo::yes();
 
             let validation_results = validate(data, 52, 72)?;
 
@@ -2231,7 +2220,7 @@ mod tests {
             data.more_ballots_count = 24;
             data.compare_votes_cast_admitted_voters
                 .votes_cast_greater_than_admitted_voters = true;
-            data.difference_completely_accounted_for.yes = true;
+            data.difference_completely_accounted_for = YesNo::yes();
 
             let validation_results = validate(data, 52, 72)?;
 
@@ -2256,7 +2245,7 @@ mod tests {
 
             data.compare_votes_cast_admitted_voters
                 .votes_cast_greater_than_admitted_voters = true;
-            data.difference_completely_accounted_for.yes = true;
+            data.difference_completely_accounted_for = YesNo::yes();
 
             let validation_results = validate(data, 52, 62)?;
 
@@ -2275,7 +2264,7 @@ mod tests {
             data.fewer_ballots_count = 3;
             data.compare_votes_cast_admitted_voters
                 .votes_cast_greater_than_admitted_voters = true;
-            data.difference_completely_accounted_for.yes = true;
+            data.difference_completely_accounted_for = YesNo::yes();
 
             let validation_results = validate(data, 52, 62)?;
 
@@ -2304,7 +2293,7 @@ mod tests {
             data.fewer_ballots_count = 30;
             data.compare_votes_cast_admitted_voters
                 .votes_cast_greater_than_admitted_voters = true;
-            data.difference_completely_accounted_for.yes = true;
+            data.difference_completely_accounted_for = YesNo::yes();
 
             let validation_results = validate(data, 52, 62)?;
 
@@ -2339,7 +2328,7 @@ mod tests {
             data.fewer_ballots_count = 3;
             data.compare_votes_cast_admitted_voters
                 .admitted_voters_equal_votes_cast = true;
-            data.difference_completely_accounted_for.yes = true;
+            data.difference_completely_accounted_for = YesNo::yes();
 
             let validation_results = validate(data, 52, 52)?;
 
@@ -2364,7 +2353,7 @@ mod tests {
             data.fewer_ballots_count = 3;
             data.compare_votes_cast_admitted_voters
                 .votes_cast_smaller_than_admitted_voters = true;
-            data.difference_completely_accounted_for.yes = true;
+            data.difference_completely_accounted_for = YesNo::yes();
 
             let validation_results = validate(data, 62, 52)?;
 
@@ -2389,7 +2378,7 @@ mod tests {
             data.fewer_ballots_count = 2;
             data.compare_votes_cast_admitted_voters
                 .votes_cast_smaller_than_admitted_voters = true;
-            data.difference_completely_accounted_for.yes = true;
+            data.difference_completely_accounted_for = YesNo::yes();
 
             let validation_results = validate(data, 46, 44)?;
 
@@ -2401,7 +2390,7 @@ mod tests {
             data.fewer_ballots_count = 1;
             data.compare_votes_cast_admitted_voters
                 .votes_cast_smaller_than_admitted_voters = true;
-            data.difference_completely_accounted_for.yes = true;
+            data.difference_completely_accounted_for = YesNo::yes();
 
             let validation_results = validate(data, 46, 44)?;
 
@@ -2420,7 +2409,7 @@ mod tests {
             data.fewer_ballots_count = 5;
             data.compare_votes_cast_admitted_voters
                 .votes_cast_smaller_than_admitted_voters = true;
-            data.difference_completely_accounted_for.yes = true;
+            data.difference_completely_accounted_for = YesNo::yes();
 
             let validation_results = validate(data, 46, 44)?;
 
@@ -2445,7 +2434,7 @@ mod tests {
             data.fewer_ballots_count = 5;
             data.compare_votes_cast_admitted_voters
                 .votes_cast_smaller_than_admitted_voters = true;
-            data.difference_completely_accounted_for.yes = true;
+            data.difference_completely_accounted_for = YesNo::yes();
 
             let validation_results = validate(data, 44, 44)?;
 
@@ -2455,7 +2444,7 @@ mod tests {
                     code: ValidationResultCode::F303,
                     fields: vec!["differences_counts.compare_votes_cast_admitted_voters.votes_cast_smaller_than_admitted_voters".into()],
                     context: None,
-                },ValidationResult {
+                }, ValidationResult {
                     code: ValidationResultCode::F305,
                     fields: vec!["differences_counts.fewer_ballots_count".into()],
                     context: None,
@@ -2473,7 +2462,7 @@ mod tests {
 
             data.compare_votes_cast_admitted_voters
                 .votes_cast_smaller_than_admitted_voters = true;
-            data.difference_completely_accounted_for.yes = true;
+            data.difference_completely_accounted_for = YesNo::yes();
 
             let validation_results = validate(data, 48, 44)?;
 
@@ -2492,7 +2481,7 @@ mod tests {
             data.more_ballots_count = 5;
             data.compare_votes_cast_admitted_voters
                 .votes_cast_smaller_than_admitted_voters = true;
-            data.difference_completely_accounted_for.yes = true;
+            data.difference_completely_accounted_for = YesNo::yes();
 
             let validation_results = validate(data, 48, 44)?;
 
@@ -2527,7 +2516,7 @@ mod tests {
             data.more_ballots_count = 3;
             data.compare_votes_cast_admitted_voters
                 .votes_cast_smaller_than_admitted_voters = true;
-            data.difference_completely_accounted_for.yes = true;
+            data.difference_completely_accounted_for = YesNo::yes();
 
             let validation_results = validate(data, 44, 44)?;
 
@@ -2536,7 +2525,7 @@ mod tests {
                 [
                     ValidationResult {
                         code: ValidationResultCode::F303,
-                        fields: vec!["differences_counts.compare_votes_cast_admitted_voters.votes_cast_smaller_than_admitted_voters".into(),],
+                        fields: vec!["differences_counts.compare_votes_cast_admitted_voters.votes_cast_smaller_than_admitted_voters".into()],
                         context: None,
                     },
                     ValidationResult {
@@ -2558,7 +2547,7 @@ mod tests {
 
             data.compare_votes_cast_admitted_voters
                 .votes_cast_smaller_than_admitted_voters = true;
-            data.difference_completely_accounted_for.yes = true;
+            data.difference_completely_accounted_for = YesNo::yes();
 
             let validation_results = validate(data, 48, 44)?;
 
@@ -2577,7 +2566,7 @@ mod tests {
             data.more_ballots_count = 5;
             data.compare_votes_cast_admitted_voters
                 .votes_cast_smaller_than_admitted_voters = true;
-            data.difference_completely_accounted_for.yes = true;
+            data.difference_completely_accounted_for = YesNo::yes();
 
             let validation_results = validate(data, 48, 44)?;
 
@@ -2612,7 +2601,7 @@ mod tests {
             data.more_ballots_count = 4;
             data.compare_votes_cast_admitted_voters
                 .votes_cast_greater_than_admitted_voters = true;
-            data.difference_completely_accounted_for.yes = true;
+            data.difference_completely_accounted_for = YesNo::yes();
 
             let validation_results = validate(data, 44, 48)?;
 
@@ -2624,7 +2613,7 @@ mod tests {
             data.fewer_ballots_count = 4;
             data.compare_votes_cast_admitted_voters
                 .votes_cast_smaller_than_admitted_voters = true;
-            data.difference_completely_accounted_for.yes = true;
+            data.difference_completely_accounted_for = YesNo::yes();
 
             let validation_results = validate(data, 48, 44)?;
 
@@ -2636,7 +2625,7 @@ mod tests {
             data.more_ballots_count = 4;
             data.compare_votes_cast_admitted_voters
                 .votes_cast_greater_than_admitted_voters = true;
-            data.difference_completely_accounted_for.no = true;
+            data.difference_completely_accounted_for = YesNo::no();
 
             let validation_results = validate(data, 44, 48)?;
 
@@ -2648,7 +2637,7 @@ mod tests {
             data.fewer_ballots_count = 4;
             data.compare_votes_cast_admitted_voters
                 .votes_cast_smaller_than_admitted_voters = true;
-            data.difference_completely_accounted_for.no = true;
+            data.difference_completely_accounted_for = YesNo::no();
 
             let validation_results = validate(data, 48, 44)?;
 
@@ -2725,8 +2714,7 @@ mod tests {
             data.more_ballots_count = 4;
             data.compare_votes_cast_admitted_voters
                 .votes_cast_greater_than_admitted_voters = true;
-            data.difference_completely_accounted_for.yes = true;
-            data.difference_completely_accounted_for.no = true;
+            data.difference_completely_accounted_for = YesNo::both();
 
             let validation_results = validate(data, 44, 48)?;
 
@@ -2745,8 +2733,7 @@ mod tests {
             data.fewer_ballots_count = 4;
             data.compare_votes_cast_admitted_voters
                 .votes_cast_smaller_than_admitted_voters = true;
-            data.difference_completely_accounted_for.yes = true;
-            data.difference_completely_accounted_for.no = true;
+            data.difference_completely_accounted_for = YesNo::both();
 
             let validation_results = validate(data, 48, 44)?;
 

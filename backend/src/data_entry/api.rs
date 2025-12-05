@@ -188,21 +188,8 @@ fn initial_current_data_entry(
             };
 
             // clear checkboxes in differences because they always need to be re-entered
-            copy.differences_counts
-                .compare_votes_cast_admitted_voters
-                .admitted_voters_equal_votes_cast = false;
-            copy.differences_counts
-                .compare_votes_cast_admitted_voters
-                .votes_cast_greater_than_admitted_voters = false;
-            copy.differences_counts
-                .compare_votes_cast_admitted_voters
-                .votes_cast_smaller_than_admitted_voters = false;
-            copy.differences_counts
-                .difference_completely_accounted_for
-                .yes = false;
-            copy.differences_counts
-                .difference_completely_accounted_for
-                .no = false;
+            copy.differences_counts.compare_votes_cast_admitted_voters = Default::default();
+            copy.differences_counts.difference_completely_accounted_for = Default::default();
 
             PollingStationResults::CSONextSession(copy)
         } else {

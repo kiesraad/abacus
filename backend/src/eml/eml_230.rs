@@ -104,7 +104,7 @@ impl EML230 {
             return Err(EMLImportError::MismatchElectionDate);
         }
 
-        let mut expected_pg_number = 1;
+        let mut previous_pg_number = 0;
         // extract initial listing of political groups with candidates
         election.political_groups = self
             .contest()
@@ -116,45 +116,44 @@ impl EML230 {
                     .id
                     .parse()
                     .or(Err(EMLImportError::TooManyPoliticalGroups))?;
-                if pg_number != expected_pg_number {
-                    return Err(EMLImportError::PoliticalGroupNumbersNotSequential {
-                        expected: expected_pg_number,
+                if pg_number <= previous_pg_number {
+                    return Err(EMLImportError::PoliticalGroupNumbersNotIncreasing {
+                        expected_larger_than: previous_pg_number,
                         found: pg_number,
                     });
                 }
 
-                let mut expected_candidate_number = 1;
+                let mut previous_candidate_number = 0;
                 let political_group = PoliticalGroup {
-                    number: PGNumber::new(pg_number),
-                    name: aff.affiliation_identifier.registered_name.clone(),
-                    candidates:
-                        aff.candidates
-                            .iter()
-                            .map(|can| {
-                                let candidate =
-                                    crate::election::structs::Candidate::try_from(
-                                        can.clone(),
-                                    )?;
-                                if CandidateNumber::new(expected_candidate_number)
-                                    != candidate.number
-                                {
-                                    return Err(
-                                        EMLImportError::CandidateNumbersNotSequential {
-                                            political_group_number: pg_number,
-                                            expected: expected_candidate_number,
-                                            found: candidate.number,
-                                        },
-                                    );
-                                }
-                                expected_candidate_number += 1;
-                                Ok(candidate)
-                            })
-                            .collect::<Result<
-                                Vec<crate::election::structs::Candidate>,
-                                EMLImportError,
-                            >>()?,
-                };
-                expected_pg_number += 1;
+                            number: PGNumber::new(pg_number),
+                            name: aff.affiliation_identifier.registered_name.clone(),
+                            candidates:
+                                aff.candidates
+                                    .iter()
+                                    .map(|can| {
+                                        let candidate =
+                                            crate::election::structs::Candidate::try_from(
+                                                can.clone(),
+                                            )?;
+                                        if previous_candidate_number <= candidate.number {
+                                            return Err(
+                                                EMLImportError::CandidateNumbersNotIncreasing {
+                                                    political_group_number: pg_number,
+                                                    expected_larger_than: previous_candidate_number,
+                                                    found: candidate.number,
+                                                },
+                                            );
+                                        }
+                                        previous_candidate_number = candidate.number;
+                                        Ok(candidate)
+                                    })
+                                    .collect::<Result<
+                                        Vec<crate::election::structs::Candidate>,
+                                        EMLImportError,
+                                    >>()?,
+                        };
+
+                previous_pg_number += pg_number;
                 Ok(political_group)
             })
             .collect::<Result<Vec<PoliticalGroup>, EMLImportError>>()?;

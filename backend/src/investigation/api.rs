@@ -228,6 +228,7 @@ async fn polling_station_investigation_conclude(
     ),
     security(("cookie_auth" = ["coordinator"])),
 )]
+#[allow(clippy::too_many_lines)]
 async fn polling_station_investigation_update(
     _user: Coordinator,
     State(pool): State<SqlitePool>,

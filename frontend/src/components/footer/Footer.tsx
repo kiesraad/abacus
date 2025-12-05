@@ -12,7 +12,7 @@ export function Footer() {
   return (
     <footer>
       <section>
-        Kiesraad - Abacus GR26 ({t("version")} {gitVersion})
+        Kiesraad - Abacus ({t("version")} {gitVersion})
       </section>
       {__SHOW_DEV_PAGE__ && (
         <section>

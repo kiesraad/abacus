@@ -1,6 +1,8 @@
 import { http, type HttpHandler, HttpResponse } from "msw";
 
 import {
+  ACCOUNT_REQUEST_PARAMS,
+  ACCOUNT_REQUEST_PATH,
   ACCOUNT_UPDATE_REQUEST_BODY,
   ACCOUNT_UPDATE_REQUEST_PARAMS,
   ACCOUNT_UPDATE_REQUEST_PATH,
@@ -18,9 +20,6 @@ import {
   COMMITTEE_SESSION_DELETE_REQUEST_PATH,
   COMMITTEE_SESSION_INVESTIGATIONS_REQUEST_PARAMS,
   COMMITTEE_SESSION_INVESTIGATIONS_REQUEST_PATH,
-  COMMITTEE_SESSION_NUMBER_OF_VOTERS_CHANGE_REQUEST_BODY,
-  COMMITTEE_SESSION_NUMBER_OF_VOTERS_CHANGE_REQUEST_PARAMS,
-  COMMITTEE_SESSION_NUMBER_OF_VOTERS_CHANGE_REQUEST_PATH,
   COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_BODY,
   COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_PARAMS,
   COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_PATH,
@@ -44,6 +43,9 @@ import {
   ELECTION_IMPORT_VALIDATE_REQUEST_PATH,
   ELECTION_LIST_REQUEST_PARAMS,
   ELECTION_LIST_REQUEST_PATH,
+  ELECTION_NUMBER_OF_VOTERS_CHANGE_REQUEST_BODY,
+  ELECTION_NUMBER_OF_VOTERS_CHANGE_REQUEST_PARAMS,
+  ELECTION_NUMBER_OF_VOTERS_CHANGE_REQUEST_PATH,
   ELECTION_STATUS_REQUEST_PARAMS,
   ELECTION_STATUS_REQUEST_PATH,
   ElectionDefinitionValidateResponse,
@@ -120,8 +122,6 @@ import {
   USER_UPDATE_REQUEST_PARAMS,
   USER_UPDATE_REQUEST_PATH,
   UserListResponse,
-  WHOAMI_REQUEST_PARAMS,
-  WHOAMI_REQUEST_PATH,
 } from "@/types/generated/openapi";
 
 import { getCommitteeSessionMockData } from "./CommitteeSessionMockData";
@@ -166,6 +166,15 @@ export const pingHandler = http.post<PingParams, PingRequestBody, PingResponseBo
   });
 });
 
+export const AccountRequestHandler = http.get<ACCOUNT_REQUEST_PARAMS, null, LoginResponse>(
+  "/api/account" satisfies ACCOUNT_REQUEST_PATH,
+  () =>
+    HttpResponse.json(loginResponseMockData, {
+      status: 200,
+      headers: { "x-session-expires-at": new Date(Date.now() + 1000 * 60 * 30).toString() },
+    }),
+);
+
 export const AccountUpdateRequestHandler = http.put<
   ACCOUNT_UPDATE_REQUEST_PARAMS,
   ACCOUNT_UPDATE_REQUEST_BODY,
@@ -190,14 +199,6 @@ export const CommitteeSessionStatusChangeRequestHandler = http.put<
   COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_BODY
 >("/api/elections/1/committee_sessions/1/status" satisfies COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_PATH, () =>
   HttpResponse.json(null, { status: 200 }),
-);
-
-export const CommitteeSessionChangeNumberOfVotersHandler = http.put<
-  ParamsToString<COMMITTEE_SESSION_NUMBER_OF_VOTERS_CHANGE_REQUEST_PARAMS>,
-  COMMITTEE_SESSION_NUMBER_OF_VOTERS_CHANGE_REQUEST_BODY
->(
-  "/api/elections/1/committee_sessions/1/voters" satisfies COMMITTEE_SESSION_NUMBER_OF_VOTERS_CHANGE_REQUEST_PATH,
-  () => new HttpResponse(null, { status: 200 }),
 );
 
 export const CommitteeSessionUpdateHandler = http.put<
@@ -323,6 +324,14 @@ export const ElectionImportValidateRequestHandler = http.post<
   ElectionDefinitionValidateResponse
 >("/api/elections/import/validate" satisfies ELECTION_IMPORT_VALIDATE_REQUEST_PATH, () =>
   HttpResponse.json(electionImportValidateMockResponse, { status: 200 }),
+);
+
+export const ElectionChangeNumberOfVotersHandler = http.put<
+  ParamsToString<ELECTION_NUMBER_OF_VOTERS_CHANGE_REQUEST_PARAMS>,
+  ELECTION_NUMBER_OF_VOTERS_CHANGE_REQUEST_BODY
+>(
+  "/api/elections/1/voters" satisfies ELECTION_NUMBER_OF_VOTERS_CHANGE_REQUEST_PATH,
+  () => new HttpResponse(null, { status: 200 }),
 );
 
 export const LoginHandler = http.post<LOGIN_REQUEST_PARAMS, LOGIN_REQUEST_BODY, LoginResponse>(
@@ -453,7 +462,7 @@ export const PollingStationGetHandler = http.get<
 );
 
 export const UserCreateRequestHandler = http.post<USER_CREATE_REQUEST_PARAMS, USER_CREATE_REQUEST_BODY, User>(
-  "/api/user" satisfies USER_CREATE_REQUEST_PATH,
+  "/api/users" satisfies USER_CREATE_REQUEST_PATH,
   () => HttpResponse.json(userMockData[0], { status: 200 }),
 );
 
@@ -471,12 +480,12 @@ export const AdminExistsRequestHandler = http.get<ParamsToString<ADMIN_EXISTS_RE
 );
 
 export const UserGetRequestHandler = http.get<ParamsToString<USER_GET_REQUEST_PARAMS>>(
-  "/api/user/1" satisfies USER_GET_REQUEST_PATH,
+  "/api/users/1" satisfies USER_GET_REQUEST_PATH,
   () => HttpResponse.json(userMockData[0], { status: 200 }),
 );
 
 export const UserListRequestHandler = http.get<USER_LIST_REQUEST_PARAMS, null, UserListResponse>(
-  "/api/user" satisfies USER_LIST_REQUEST_PATH,
+  "/api/users" satisfies USER_LIST_REQUEST_PATH,
   () => HttpResponse.json({ users: userMockData }, { status: 200 }),
 );
 
@@ -484,30 +493,20 @@ export const UserUpdateRequestHandler = http.put<
   ParamsToString<USER_UPDATE_REQUEST_PARAMS>,
   USER_UPDATE_REQUEST_BODY,
   User
->("/api/user/1" satisfies USER_UPDATE_REQUEST_PATH, () => HttpResponse.json(userMockData[0], { status: 200 }));
+>("/api/users/1" satisfies USER_UPDATE_REQUEST_PATH, () => HttpResponse.json(userMockData[0], { status: 200 }));
 
 export const UserDeleteRequestHandler = http.delete<ParamsToString<USER_DELETE_REQUEST_PARAMS>>(
-  "/api/user/1" satisfies USER_DELETE_REQUEST_PATH,
+  "/api/users/1" satisfies USER_DELETE_REQUEST_PATH,
   () => new HttpResponse(null, { status: 200 }),
-);
-
-// get user handler
-export const WhoAmIRequestHandler = http.get<WHOAMI_REQUEST_PARAMS, null, LoginResponse>(
-  "/api/whoami" satisfies WHOAMI_REQUEST_PATH,
-  () =>
-    HttpResponse.json(loginResponseMockData, {
-      status: 200,
-      headers: { "x-session-expires-at": new Date(Date.now() + 1000 * 60 * 30).toString() },
-    }),
 );
 
 export const handlers: HttpHandler[] = [
   pingHandler,
+  AccountRequestHandler,
   AccountUpdateRequestHandler,
   LogRequestHandler,
   LogUsersRequestHandler,
   CommitteeSessionStatusChangeRequestHandler,
-  CommitteeSessionChangeNumberOfVotersHandler,
   CommitteeSessionUpdateHandler,
   CommitteeSessionCreateHandler,
   CommitteeSessionDeleteHandler,
@@ -520,6 +519,7 @@ export const handlers: HttpHandler[] = [
   ElectionStatusRequestHandler,
   ElectionImportRequestHandler,
   ElectionImportValidateRequestHandler,
+  ElectionChangeNumberOfVotersHandler,
   LoginHandler,
   InitialisedHandler,
   PollingStationDataEntryGetDifferencesHandler,
@@ -543,5 +543,4 @@ export const handlers: HttpHandler[] = [
   UserListRequestHandler,
   UserUpdateRequestHandler,
   UserDeleteRequestHandler,
-  WhoAmIRequestHandler,
 ];

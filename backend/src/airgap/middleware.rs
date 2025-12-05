@@ -15,6 +15,7 @@ const API_PREFIX: &str = "/api/";
 /// If `block_requests_on_violation` is true, it will return an error.
 /// If false, it will add a header to the response indicating the violation status.
 /// This middleware only operates on requests thating with `API_PREFIX`
+#[allow(clippy::cognitive_complexity)]
 pub async fn block_request_on_airgap_violation(
     State(airgap_detection): State<AirgapDetection>,
     request: Request,

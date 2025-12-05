@@ -66,7 +66,7 @@ vastgesteld.
 
 == Aantal kiesgerechtigden
 
-#letterbox("Z", value: input.committee_session.number_of_voters)[Kiesgerechtigden]
+#letterbox("Z", value: input.election.number_of_voters)[Kiesgerechtigden]
 
 == Toegelaten kiezers
 Het totaal van alle getelde geldige stempassen en volmachtbewijzen.

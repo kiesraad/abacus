@@ -105,7 +105,8 @@ impl From<String> for PollingStationType {
 pub(crate) mod tests {
     use super::*;
     use crate::{
-        committee_session::tests::committee_session_fixture, election::tests::election_fixture,
+        committee_session::tests::committee_session_fixture,
+        election::structs::tests::election_fixture,
     };
 
     /// Create a test polling station.

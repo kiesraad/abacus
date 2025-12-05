@@ -245,6 +245,7 @@ pub trait ValidateRoot: Validate {
     }
 }
 
+#[allow(clippy::too_many_lines)]
 pub fn validate_differences_counts(
     differences_counts: &DifferencesCounts,
     total_voters_count: u32,
@@ -528,6 +529,7 @@ impl Validate for PollingStationResults {
 }
 
 impl Validate for CommonPollingStationResults {
+    #[allow(clippy::too_many_lines)]
     fn validate(
         &self,
         election: &ElectionWithPoliticalGroups,
@@ -753,6 +755,7 @@ impl Validate for VotersCounts {
 }
 
 impl Validate for VotesCounts {
+    #[allow(clippy::too_many_lines)]
     fn validate(
         &self,
         election: &ElectionWithPoliticalGroups,
@@ -1038,7 +1041,8 @@ mod tests {
 
     use super::*;
     use crate::{
-        election::tests::election_fixture, polling_station::structs::tests::polling_station_fixture,
+        election::structs::tests::election_fixture,
+        polling_station::structs::tests::polling_station_fixture,
     };
 
     mod extra_investigation {
@@ -1047,7 +1051,7 @@ mod tests {
                 DataError, ExtraInvestigation, Validate, ValidationResult, ValidationResultCode,
                 ValidationResults, YesNo,
             },
-            election::tests::election_fixture,
+            election::structs::tests::election_fixture,
             polling_station::structs::tests::polling_station_fixture,
         };
 
@@ -1179,7 +1183,7 @@ mod tests {
                 CountingDifferencesPollingStation, DataError, Validate, ValidationResult,
                 ValidationResultCode, ValidationResults, YesNo,
             },
-            election::tests::election_fixture,
+            election::structs::tests::election_fixture,
             polling_station::structs::tests::polling_station_fixture,
         };
 
@@ -1341,7 +1345,7 @@ mod tests {
                 DataError, Validate, ValidationResult, ValidationResultCode, ValidationResults,
                 VotersCounts,
             },
-            election::tests::election_fixture,
+            election::structs::tests::election_fixture,
             polling_station::structs::tests::polling_station_fixture,
         };
 
@@ -1397,7 +1401,7 @@ mod tests {
                 DataError, PoliticalGroupTotalVotes, Validate, ValidationResult,
                 ValidationResultCode, ValidationResults, VotesCounts,
             },
-            election::tests::election_fixture,
+            election::structs::tests::election_fixture,
             polling_station::structs::tests::polling_station_fixture,
         };
 
@@ -1983,6 +1987,7 @@ mod tests {
         }
 
         /// CSO | F.305 (Als D = H) I en/of J zijn ingevuld
+        #[allow(clippy::too_many_lines)]
         #[test]
         fn test_f305_more_and_fewer_ballots_count() -> Result<(), DataError> {
             // D = H & I and J not filled in
@@ -2243,6 +2248,7 @@ mod tests {
         }
 
         /// CSO | F.307 (Als H > D) J is ingevuld
+        #[allow(clippy::too_many_lines)]
         #[test]
         fn test_f307_votes_greater_than_voters() -> Result<(), DataError> {
             // H > D & J == 0
@@ -2763,7 +2769,7 @@ mod tests {
                 CandidateVotes, DataError, PoliticalGroupCandidateVotes, Validate,
                 ValidationResults,
             },
-            election::{ElectionWithPoliticalGroups, PGNumber, tests::election_fixture},
+            election::{ElectionWithPoliticalGroups, PGNumber, structs::tests::election_fixture},
             polling_station::structs::tests::polling_station_fixture,
         };
 
@@ -2915,7 +2921,7 @@ mod tests {
                 ValidationResultContext, ValidationResults, VotersCounts, VotesCounts,
                 tests::ValidDefault,
             },
-            election::tests::election_fixture,
+            election::structs::tests::election_fixture,
             polling_station::structs::tests::polling_station_fixture,
         };
 
@@ -3020,6 +3026,7 @@ mod tests {
         }
 
         /// CSO | F.401 `Er zijn (stemmen op kandidaten of het lijsttotaal van corresponderende E.x is groter dan 0) en het totaal aantal stemmen op een lijst = leeg of 0`
+        #[allow(clippy::too_many_lines)]
         #[test]
         fn test_f401() -> Result<(), DataError> {
             // Only F.401 is triggered.

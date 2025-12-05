@@ -1,3 +1,5 @@
+#![allow(clippy::cognitive_complexity)]
+#![allow(clippy::too_many_lines)]
 use abacus::{
     AppError,
     committee_session::CommitteeSession,
@@ -172,12 +174,8 @@ async fn export_election(
 
     info!("Converting election to EML definitions");
     let definition_eml = EML110::definition_from_abacus_election(election, transaction_id);
-    let polling_stations_eml = EML110::polling_stations_from_election(
-        committee_session,
-        election,
-        polling_stations,
-        transaction_id,
-    );
+    let polling_stations_eml =
+        EML110::polling_stations_from_election(election, polling_stations, transaction_id);
     let candidates_eml = EML230::candidates_from_abacus_election(election, transaction_id);
 
     info!("Converting EML definitions to XML strings");

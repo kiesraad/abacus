@@ -52,7 +52,7 @@ jobs:
           &&
           df -h
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
       # Branch coverage requires Rust nightly: https://github.com/taiki-e/cargo-llvm-cov/issues/8
@@ -62,12 +62,12 @@ jobs:
           rustup update nightly &&
           rustup default nightly
       - name: Cargo cache
-        uses: Swatinem/rust-cache@f13886b937689c021905a6b90929199931d60db1 # v2
+        uses: Swatinem/rust-cache@779680da715d629ac1d338a641029a2f4372abb5 # v2
         with:
           workspaces: "backend -> target"
           cache-bin: "false"
       - name: Install Binstall
-        uses: cargo-bins/cargo-binstall@a66119fbb1c952daba62640c2609111fe0803621 # main
+        uses: cargo-bins/cargo-binstall@3fc81674af4165a753833a94cae9f91d8849049f # main
       - name: Install cargo-llvm-cov
         run: cargo binstall cargo-llvm-cov
       - name: Install Nextest
@@ -104,7 +104,7 @@ jobs:
         working-directory: frontend
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
       - name: Setup Node

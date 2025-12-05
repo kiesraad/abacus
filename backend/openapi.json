@@ -7,10 +7,55 @@
       "name": "EUPL-1.2",
       "identifier": "EUPL-1.2"
     },
-    "version": "0.1.0"
+    "version": "1.1.0"
   },
   "paths": {
     "/api/account": {
+      "get": {
+        "summary": "Get current logged-in user endpoint (administrator, coordinator, typist)",
+        "operationId": "account",
+        "responses": {
+          "200": {
+            "description": "The current user name and id",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LoginResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid user session",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "cookie_auth": [
+              "administrator",
+              "coordinator",
+              "typist"
+            ]
+          }
+        ]
+      },
       "put": {
         "summary": "Update the user's account with a new password and optionally new fullname (administrator, coordinator, typist)",
         "operationId": "account_update",
@@ -1011,109 +1056,6 @@
         ]
       }
     },
-    "/api/elections/{election_id}/committee_sessions/{committee_session_id}/voters": {
-      "put": {
-        "summary": "Change the number of voters of a [CommitteeSession]. (administrator, coordinator)",
-        "operationId": "committee_session_number_of_voters_change",
-        "parameters": [
-          {
-            "name": "election_id",
-            "in": "path",
-            "description": "Election database id",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int32",
-              "minimum": 0
-            }
-          },
-          {
-            "name": "committee_session_id",
-            "in": "path",
-            "description": "Committee session database id",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int32",
-              "minimum": 0
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CommitteeSessionNumberOfVotersChangeRequest"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "204": {
-            "description": "Committee session number of voters changed successfully"
-          },
-          "401": {
-            "description": "Unauthorized",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "Forbidden",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Committee session not found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "409": {
-            "description": "Request cannot be completed",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Internal server error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "cookie_auth": [
-              "administrator",
-              "coordinator"
-            ]
-          }
-        ]
-      }
-    },
     "/api/elections/{election_id}/download_n_10_2": {
       "get": {
         "summary": "administrator, coordinator",
@@ -2073,6 +2015,98 @@
               "administrator",
               "coordinator",
               "typist"
+            ]
+          }
+        ]
+      }
+    },
+    "/api/elections/{election_id}/voters": {
+      "put": {
+        "summary": "Change the number of voters of an [Election]. (administrator, coordinator)",
+        "operationId": "election_number_of_voters_change",
+        "parameters": [
+          {
+            "name": "election_id",
+            "in": "path",
+            "description": "Election database id",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "minimum": 0
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ElectionNumberOfVotersChangeRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "Election number of voters changed successfully"
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Election not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Request cannot be completed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "cookie_auth": [
+              "administrator",
+              "coordinator"
             ]
           }
         ]
@@ -3847,7 +3881,7 @@
         ]
       }
     },
-    "/api/user": {
+    "/api/users": {
       "get": {
         "summary": "Lists all users (administrator, coordinator)",
         "operationId": "user_list",
@@ -3987,7 +4021,7 @@
         ]
       }
     },
-    "/api/user/{user_id}": {
+    "/api/users/{user_id}": {
       "get": {
         "summary": "Get a user (administrator, coordinator)",
         "operationId": "user_get",
@@ -4230,53 +4264,6 @@
           }
         ]
       }
-    },
-    "/api/whoami": {
-      "get": {
-        "summary": "Get current logged-in user endpoint (administrator, coordinator, typist)",
-        "operationId": "whoami",
-        "responses": {
-          "200": {
-            "description": "The current user name and id",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/LoginResponse"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Invalid user session",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Internal server error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "cookie_auth": [
-              "administrator",
-              "coordinator",
-              "typist"
-            ]
-          }
-        ]
-      }
     }
   },
   "components": {
@@ -4493,6 +4480,27 @@
                     "type": "string",
                     "enum": [
                       "ElectionCreated"
+                    ]
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ElectionDetails"
+              },
+              {
+                "type": "object",
+                "required": [
+                  "event_type"
+                ],
+                "properties": {
+                  "event_type": {
+                    "type": "string",
+                    "enum": [
+                      "ElectionUpdated"
                     ]
                   }
                 }
@@ -5378,8 +5386,7 @@
           "number",
           "election_id",
           "location",
-          "status",
-          "number_of_voters"
+          "status"
         ],
         "properties": {
           "election_id": {
@@ -5396,11 +5403,6 @@
             "type": "string"
           },
           "number": {
-            "type": "integer",
-            "format": "int32",
-            "minimum": 0
-          },
-          "number_of_voters": {
             "type": "integer",
             "format": "int32",
             "minimum": 0
@@ -5437,8 +5439,7 @@
           "session_number",
           "session_election_id",
           "session_location",
-          "session_status",
-          "session_number_of_voters"
+          "session_status"
         ],
         "properties": {
           "session_election_id": {
@@ -5455,11 +5456,6 @@
             "type": "string"
           },
           "session_number": {
-            "type": "integer",
-            "format": "int32",
-            "minimum": 0
-          },
-          "session_number_of_voters": {
             "type": "integer",
             "format": "int32",
             "minimum": 0
@@ -5488,21 +5484,6 @@
           },
           "session_status": {
             "type": "string"
-          }
-        },
-        "additionalProperties": false
-      },
-      "CommitteeSessionNumberOfVotersChangeRequest": {
-        "type": "object",
-        "description": "Committee session number of voters change request",
-        "required": [
-          "number_of_voters"
-        ],
-        "properties": {
-          "number_of_voters": {
-            "type": "integer",
-            "format": "int32",
-            "minimum": 0
           }
         },
         "additionalProperties": false
@@ -5866,6 +5847,7 @@
           "domain_id",
           "category",
           "number_of_seats",
+          "number_of_voters",
           "election_date",
           "nomination_date"
         ],
@@ -5902,6 +5884,11 @@
             "format": "date"
           },
           "number_of_seats": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "number_of_voters": {
             "type": "integer",
             "format": "int32",
             "minimum": 0
@@ -6048,6 +6035,7 @@
           "election_domain_id",
           "election_category",
           "election_number_of_seats",
+          "election_number_of_voters",
           "election_election_date",
           "election_nomination_date"
         ],
@@ -6084,6 +6072,11 @@
             "format": "date"
           },
           "election_number_of_seats": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "election_number_of_voters": {
             "type": "integer",
             "format": "int32",
             "minimum": 0
@@ -6148,6 +6141,21 @@
             "items": {
               "$ref": "#/components/schemas/Election"
             }
+          }
+        },
+        "additionalProperties": false
+      },
+      "ElectionNumberOfVotersChangeRequest": {
+        "type": "object",
+        "description": "Election number of voters change request",
+        "required": [
+          "number_of_voters"
+        ],
+        "properties": {
+          "number_of_voters": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
           }
         },
         "additionalProperties": false
@@ -6233,6 +6241,7 @@
           "domain_id",
           "category",
           "number_of_seats",
+          "number_of_voters",
           "election_date",
           "nomination_date",
           "political_groups"
@@ -6270,6 +6279,11 @@
             "format": "date"
           },
           "number_of_seats": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "number_of_voters": {
             "type": "integer",
             "format": "int32",
             "minimum": 0
@@ -6537,6 +6551,7 @@
           "domain_id",
           "category",
           "number_of_seats",
+          "number_of_voters",
           "election_date",
           "nomination_date",
           "political_groups"
@@ -6569,6 +6584,11 @@
             "format": "date"
           },
           "number_of_seats": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "number_of_voters": {
             "type": "integer",
             "format": "int32",
             "minimum": 0

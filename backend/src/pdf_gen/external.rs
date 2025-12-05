@@ -10,6 +10,8 @@ use crate::{
 };
 
 /// Create a PDF file for each model in the provided vector and send them through the provided channel.
+#[allow(clippy::too_many_lines)]
+#[allow(clippy::cognitive_complexity)]
 pub async fn generate_pdfs(
     models: Vec<PdfFileModel>,
     mut zip_writer: ZipResponseWriter,

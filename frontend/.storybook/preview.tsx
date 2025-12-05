@@ -19,13 +19,11 @@ import { Role } from "@/types/generated/openapi";
 
 sb.mock("react-router", { spy: true });
 
+configure({ testIdAttribute: "id" });
+
+expect.extend(matchers);
+
 const preview: Preview = {
-  beforeAll: () => {
-    configure({
-      testIdAttribute: "id",
-    });
-    expect.extend(matchers);
-  },
   parameters: {
     controls: {
       matchers: {

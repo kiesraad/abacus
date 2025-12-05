@@ -108,6 +108,8 @@ pub enum APIError {
 }
 
 impl IntoResponse for APIError {
+    #[allow(clippy::too_many_lines)]
+    #[allow(clippy::cognitive_complexity)]
     fn into_response(self) -> Response {
         fn to_error(error: &str, reference: ErrorReference, fatal: bool) -> ErrorResponse {
             ErrorResponse {
@@ -234,7 +236,7 @@ impl IntoResponse for APIError {
                 )
             }
             APIError::Authentication(err) => {
-                // note that we don't log the UserNotFound error, as it is triggered for every whoami call
+                // note that we don't log the UserNotFound error, as it is triggered for every account call
                 if !matches!(err, AuthenticationError::UserNotFound) {
                     error!("Authentication error: {:?}", err);
                 }

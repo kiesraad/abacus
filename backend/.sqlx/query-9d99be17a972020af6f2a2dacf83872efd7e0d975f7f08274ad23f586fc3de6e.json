@@ -1,6 +1,6 @@
 {
   "db_name": "SQLite",
-  "query": "\n        SELECT\n            id as \"id: u32\",\n            number as \"number: u32\",\n            election_id as \"election_id: u32\",\n            status as \"status: _\",\n            location,\n            start_date_time as \"start_date_time: _\",\n            number_of_voters as \"number_of_voters: u32\",\n            results_eml as \"results_eml: _\",\n            results_pdf as \"results_pdf: _\",\n            overview_pdf as \"overview_pdf: _\"\n        FROM committee_sessions\n        WHERE id = ?\n        ",
+  "query": "\n        UPDATE committee_sessions\n        SET status = ?\n        WHERE id = ?\n        RETURNING\n            id as \"id: u32\",\n            number as \"number: u32\",\n            election_id as \"election_id: u32\",\n            status as \"status: _\",\n            location,\n            start_date_time as \"start_date_time: _\",\n            results_eml as \"results_eml: _\",\n            results_pdf as \"results_pdf: _\",\n            overview_pdf as \"overview_pdf: _\"\n        ",
   "describe": {
     "columns": [
       {
@@ -34,28 +34,23 @@
         "type_info": "Text"
       },
       {
-        "name": "number_of_voters: u32",
+        "name": "results_eml: _",
         "ordinal": 6,
         "type_info": "Integer"
       },
       {
-        "name": "results_eml: _",
+        "name": "results_pdf: _",
         "ordinal": 7,
         "type_info": "Integer"
       },
       {
-        "name": "results_pdf: _",
-        "ordinal": 8,
-        "type_info": "Integer"
-      },
-      {
         "name": "overview_pdf: _",
-        "ordinal": 9,
+        "ordinal": 8,
         "type_info": "Integer"
       }
     ],
     "parameters": {
-      "Right": 1
+      "Right": 2
     },
     "nullable": [
       false,
@@ -64,11 +59,10 @@
       false,
       false,
       true,
-      false,
       true,
       true,
       true
     ]
   },
-  "hash": "3b9eda12290f8f9d0a215a91c7fa029de658795756f7982457239193e3afa5de"
+  "hash": "9d99be17a972020af6f2a2dacf83872efd7e0d975f7f08274ad23f586fc3de6e"
 }

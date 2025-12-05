@@ -1,5 +1,7 @@
+#![allow(clippy::too_many_lines)]
+#![allow(clippy::cognitive_complexity)]
 use chrono::{Datelike, Days, NaiveDate, TimeDelta};
-use rand::{Rng, SeedableRng, rngs::StdRng, seq::IndexedRandom};
+use rand::{SeedableRng, rngs::StdRng, seq::IndexedRandom};
 use sqlx::SqlitePool;
 use std::error::Error;
 use tracing::info;
@@ -50,23 +52,12 @@ pub async fn create_test_election(
         CommitteeSessionCreateRequest {
             number: 1,
             election_id: election.id,
-            number_of_voters: 0,
         },
     )
     .await?;
 
-    let number_of_voters = rng.random_range(args.voters.clone());
-    committee_session.number_of_voters = number_of_voters;
-    crate::committee_session::repository::change_number_of_voters(
-        &mut tx,
-        committee_session.id,
-        number_of_voters,
-    )
-    .await?;
-
     // generate the polling stations for the election
-    let polling_stations =
-        generate_polling_stations(&mut rng, &committee_session, &election, &mut tx, &args).await;
+    let polling_stations = generate_polling_stations(&mut rng, &election, &mut tx, &args).await;
 
     info!(
         "Election generated with election id: {}, election name: '{}'",
@@ -165,6 +156,7 @@ fn generate_election(rng: &mut impl rand::Rng, args: &GenerateElectionArgs) -> N
         location: locality,
         category: ElectionCategory::Municipal,
         number_of_seats: rng.random_range(args.seats.clone()),
+        number_of_voters: rng.random_range(args.voters.clone()),
         election_date,
         nomination_date,
         political_groups,
@@ -218,7 +210,6 @@ fn generate_political_party(
 /// Generate the polling stations for the given election using the limits from args
 async fn generate_polling_stations(
     rng: &mut impl rand::Rng,
-    committee_session: &CommitteeSession,
     election: &ElectionWithPoliticalGroups,
     conn: &mut sqlx::SqliteConnection,
     args: &GenerateElectionArgs,
@@ -227,7 +218,7 @@ async fn generate_polling_stations(
     info!("Generating {number_of_ps} polling stations for election");
 
     let mut polling_stations = vec![];
-    let mut remaining_voters = committee_session.number_of_voters;
+    let mut remaining_voters = election.number_of_voters;
     for i in 1..=number_of_ps {
         // compute a some somewhat distributed number of voters for each polling station
         let remaining_ps = number_of_ps - i + 1;
@@ -292,7 +283,7 @@ async fn generate_data_entry(
 
             // extract number of voters from polling station, or generate some approx default
             let voters_available = ps.number_of_voters.unwrap_or_else(|| {
-                committee_session.number_of_voters / u32::try_from(polling_stations.len()).expect(
+                election.number_of_voters / u32::try_from(polling_stations.len()).expect(
                     "Failed to convert polling station length to u32 for voter count estimation",
                 )
             });

@@ -52,6 +52,7 @@ impl EML110 {
         &self.election().contest
     }
 
+    #[allow(clippy::too_many_lines)]
     pub fn as_abacus_election(&self) -> Result<crate::election::NewElection, EMLImportError> {
         // we need to be importing from a 110a file
         if self.base.id != "110a" {
@@ -159,6 +160,7 @@ impl EML110 {
             domain_id: election_domain.id.clone(),
             category: crate::election::ElectionCategory::Municipal,
             number_of_seats,
+            number_of_voters: 0,
             election_date,
             nomination_date,
             political_groups,
@@ -278,7 +280,6 @@ impl EML110 {
     }
 
     pub fn polling_stations_from_election(
-        committee_session: &crate::committee_session::CommitteeSession,
         election: &crate::election::ElectionWithPoliticalGroups,
         polling_stations: &[crate::polling_station::PollingStation],
         transaction_id: &str,
@@ -305,7 +306,7 @@ impl EML110 {
                     contest: Contest {
                         contest_identifier: Some(ContestIdentifier::geen()),
                         voting_method: VotingMethod::Unknown,
-                        max_votes: Some(committee_session.number_of_voters.to_string()),
+                        max_votes: Some(election.number_of_voters.to_string()),
                         polling_places: polling_stations
                             .iter()
                             .map(|ps| PollingPlace {

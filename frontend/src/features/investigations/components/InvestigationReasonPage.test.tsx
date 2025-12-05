@@ -174,7 +174,7 @@ describe("InvestigationReasonPage", () => {
 
     expect(pushMessage).toHaveBeenCalledWith({ title: "Onderzoek voor stembureau 35 (Testschool) verwijderd" });
     await waitFor(() => {
-      expect(navigate).toHaveBeenCalledExactlyOnceWith("/elections/1/investigations");
+      expect(navigate).toHaveBeenCalledExactlyOnceWith("/elections/1/investigations", { replace: true });
     });
   });
 });

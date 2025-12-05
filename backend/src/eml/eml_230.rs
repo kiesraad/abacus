@@ -54,6 +54,7 @@ impl EML230 {
         self.election_identifier().election_domain.as_ref()
     }
 
+    #[allow(clippy::too_many_lines)]
     pub fn add_candidate_lists(
         &self,
         mut election: NewElection,
@@ -156,6 +157,7 @@ impl EML230 {
         Ok(election)
     }
 
+    #[allow(clippy::too_many_lines)]
     pub fn candidates_from_abacus_election(
         election: &ElectionWithPoliticalGroups,
         transaction_id: &str,

@@ -166,6 +166,7 @@ pub(super) struct VotesTable {
 }
 
 impl VotesTable {
+    #[allow(clippy::too_many_lines)]
     pub fn new(
         group: &PoliticalGroup,
         candidate_votes: Option<&PoliticalGroupCandidateVotes>,
@@ -326,6 +327,7 @@ mod tests {
             domain_id: "0000".to_string(),
             category: ElectionCategory::Municipal,
             number_of_seats: 1,
+            number_of_voters: 1000,
             election_date: NaiveDate::from_ymd_opt(2024, 1, 1).unwrap(),
             nomination_date: NaiveDate::from_ymd_opt(2024, 1, 1).unwrap(),
             political_groups: vec![group],

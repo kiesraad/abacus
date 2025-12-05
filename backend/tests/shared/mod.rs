@@ -303,6 +303,22 @@ pub async fn create_result_with_non_example_data_entry(
         .await;
 }
 
+pub async fn get_election_details(
+    addr: &SocketAddr,
+    cookie: &HeaderValue,
+    election_id: u32,
+) -> ElectionDetailsResponse {
+    let url = format!("http://{addr}/api/elections/{election_id}");
+    let response = reqwest::Client::new()
+        .get(&url)
+        .header("cookie", cookie)
+        .send()
+        .await
+        .unwrap();
+    assert_eq!(response.status(), StatusCode::OK);
+    response.json().await.unwrap()
+}
+
 pub async fn get_election_committee_session(
     addr: &SocketAddr,
     cookie: &HeaderValue,

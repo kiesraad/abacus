@@ -804,6 +804,7 @@ mod tests {
             domain_id: "0000".to_string(),
             category: ElectionCategory::Municipal,
             number_of_seats: 18,
+            number_of_voters: 1000,
             election_date: Utc::now().date_naive(),
             nomination_date: Utc::now().date_naive(),
             political_groups: (1..=2)
@@ -1244,6 +1245,7 @@ mod tests {
 
     /// SecondEntryInProgress --> is_equal: finalise
     /// is_equal --> EntriesDifferent: equal? no
+    #[allow(clippy::too_many_lines)]
     #[test]
     fn second_entry_in_progress_finalise_not_equal() {
         let initial = DataEntryStatus::SecondEntryInProgress(SecondEntryInProgress {

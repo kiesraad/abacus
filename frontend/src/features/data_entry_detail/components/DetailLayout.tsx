@@ -47,7 +47,7 @@ export function DetailLayout() {
       text: t("data_entry_detail.data_entry_deleted_details", { nr: pollingStation?.number ?? "-" }),
     });
 
-    void navigate(`/elections/${election.id}/status`);
+    void navigate(`/elections/${election.id}/status`, { replace: true });
   }
 
   return (

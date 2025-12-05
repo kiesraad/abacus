@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
 
 import {
+  ACCOUNT_REQUEST_PATH,
   LOGIN_REQUEST_BODY,
   LOGIN_REQUEST_PATH,
   LoginResponse,
   LOGOUT_REQUEST_PATH,
-  WHOAMI_REQUEST_PATH,
 } from "@/types/generated/openapi";
 
 import { ApiClient, DEFAULT_CANCEL_REASON } from "./ApiClient";
@@ -58,7 +58,7 @@ export default function useSessionState(client: ApiClient, fetchInitialUser: boo
   };
 
   const extendSession = async () => {
-    const path: WHOAMI_REQUEST_PATH = "/api/whoami";
+    const path: ACCOUNT_REQUEST_PATH = "/api/account";
     const response = await client.getRequest<LoginResponse>(path);
 
     if (isSuccess(response)) {
@@ -74,7 +74,7 @@ export default function useSessionState(client: ApiClient, fetchInitialUser: boo
       const abortController = new AbortController();
 
       void (async () => {
-        const path: WHOAMI_REQUEST_PATH = "/api/whoami";
+        const path: ACCOUNT_REQUEST_PATH = "/api/account";
         const response = await client.getRequest<LoginResponse>(path, abortController);
 
         if (!abortController.signal.aborted && !(response instanceof AbortedError)) {

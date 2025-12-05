@@ -1,7 +1,6 @@
 import * as React from "react";
-import { Link, Navigate, useNavigate } from "react-router";
+import { Navigate, useNavigate } from "react-router";
 
-import { AnyApiError } from "@/api/ApiResult";
 import { IconTrash } from "@/components/generated/icons";
 import { PageTitle } from "@/components/page_title/PageTitle";
 import { Alert } from "@/components/ui/Alert/Alert";
@@ -12,7 +11,7 @@ import { useElectionStatus } from "@/hooks/election/useElectionStatus";
 import { useMessages } from "@/hooks/messages/useMessages";
 import { useNumericParam } from "@/hooks/useNumericParam";
 import { useUserRole } from "@/hooks/user/useUserRole";
-import { t, tx } from "@/i18n/translate";
+import { t } from "@/i18n/translate";
 import { PollingStation } from "@/types/generated/openapi";
 
 import { usePollingStationGet } from "../hooks/usePollingStationGet";
@@ -37,7 +36,7 @@ export function PollingStationUpdatePage() {
     setShowDeleteModal(!showDeleteModal);
   }
 
-  const [error, setError] = React.useState<[string, string] | undefined>(undefined);
+  const [error, setError] = React.useState<string | undefined>();
 
   const parentUrl = `/elections/${election.id}/polling-stations`;
 
@@ -72,13 +71,9 @@ export function PollingStationUpdatePage() {
     void navigate(parentUrl, { replace: true });
   }
 
-  function handleDeleteError(error: AnyApiError) {
+  function handleDeleteError() {
     setShowDeleteModal(false);
-    const errorDescription =
-      error.message === "Polling station cannot be deleted, because a data entry exists"
-        ? t("polling_station.message.delete_error_data_entry_exists")
-        : t("polling_station.message.delete_error_investigation_exists");
-    setError([t("polling_station.message.delete_error_title"), errorDescription]);
+    setError(t("polling_station.message.delete_error_title"));
   }
 
   React.useEffect(() => {
@@ -86,20 +81,6 @@ export function PollingStationUpdatePage() {
       window.scrollTo(0, 0);
     }
   }, [error]);
-
-  const delete_data_entry_link = (title: React.ReactElement) => (
-    <Link className="color-visited-link-default" to={`/elections/${election.id}/status/${pollingStationId}/detail`}>
-      {title}
-    </Link>
-  );
-  const delete_investigation_link = (title: React.ReactElement) => (
-    <Link
-      className="color-visited-link-default"
-      to={`/elections/${election.id}/investigations/${investigation?.polling_station_id}/findings`}
-    >
-      {title}
-    </Link>
-  );
 
   if (!isPollingStationCreateAndUpdateAllowed(isCoordinator, isAdministrator, currentCommitteeSession.status)) {
     return <Navigate to={parentUrl} replace />;
@@ -141,24 +122,6 @@ export function PollingStationUpdatePage() {
                       <strong>{t("polling_station.delete_not_possible.title")}</strong>
                       <p>{t("polling_station.delete_not_possible.pre_existing_polling_station")}</p>
                     </section>
-                  ) : investigation && (status === undefined || status.status === "first_entry_not_started") ? (
-                    <section className="sm">
-                      <strong>{t("polling_station.delete_not_possible.title")}</strong>
-                      <p>
-                        {tx("polling_station.delete_not_possible.delete_existing_investigation", {
-                          link: delete_investigation_link,
-                        })}
-                      </p>
-                    </section>
-                  ) : status?.status !== "first_entry_not_started" ? (
-                    <section className="sm">
-                      <strong>{t("polling_station.delete_not_possible.title")}</strong>
-                      <p>
-                        {tx("polling_station.delete_not_possible.delete_existing_data_entry", {
-                          link: delete_data_entry_link,
-                        })}
-                      </p>
-                    </section>
                   ) : (
                     <>
                       <Button variant="tertiary-destructive" leftIcon={<IconTrash />} onClick={toggleShowDeleteModal}>
@@ -168,6 +131,8 @@ export function PollingStationUpdatePage() {
                         <PollingStationDeleteModal
                           electionId={election.id}
                           pollingStation={requestState.data}
+                          existingInvestigation={!!investigation}
+                          existingDataEntry={status !== undefined && status.status !== "first_entry_not_started"}
                           onCancel={toggleShowDeleteModal}
                           onError={handleDeleteError}
                           onDeleted={handleDeleted}

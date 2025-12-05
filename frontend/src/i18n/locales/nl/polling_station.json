@@ -3,8 +3,8 @@
   "address": "Straatnaam en huisnummer",
   "create": "Stembureau toevoegen",
   "edit_not_allowed_alert": {
-    "title": "Stembureaus kunnen niet aangepast worden",
-    "description": "De invoerfase van de eerste zitting is al gestart. Na het starten van de invoerfase kan alleen een coördinator de lijst met stembureaus nog bewerken."
+    "description": "De invoerfase van de eerste zitting is al gestart. Na het starten van de invoerfase kan alleen een coördinator de lijst met stembureaus nog bewerken.",
+    "title": "Stembureaus kunnen niet aangepast worden"
   },
   "import": "Stembureaus importeren",
   "import_subtitle": "Importeer stembureaus gemeente {location}",
@@ -12,14 +12,15 @@
   "current_form": "het huidige formulier",
   "delete": "Stembureau verwijderen",
   "delete_modal": {
-    "title": "Stembureau verwijderen?",
-    "confirm": "Je kan dit niet ongedaan maken. Weet je zeker dat je dit stembureau wilt verwijderen?"
+    "action_cannot_be_reverted": "Deze actie kan niet worden teruggedraaid.",
+    "existing_data_entry": "<strong>Let op:</strong> Er is in deze zitting invoer voor dit stembureau gedaan. De invoer wordt ook verwijderd. ",
+    "existing_investigation": "<strong>Let op:</strong> Er is in deze zitting een onderzoek voor dit stembureau aangemaakt. Het onderzoek wordt ook verwijderd. ",
+    "existing_investigation_and_data_entry": "<strong>Let op:</strong> Er is in deze zitting een onderzoek voor dit stembureau aangemaakt én invoer gedaan. Het onderzoek en de invoer worden ook verwijderd. ",
+    "title": "Stembureau verwijderen?"
   },
   "delete_not_possible": {
-    "title": "Stembureau verwijderen niet mogelijk",
     "pre_existing_polling_station": "Er zijn al tellingen ingevoerd voor dit stembureau in een eerdere zitting.",
-    "delete_existing_data_entry": "Er zijn al tellingen ingevoerd voor dit stembureau. <link>Verwijder eerst de invoer</link> om dit stembureau te kunnen verwijderen.",
-    "delete_existing_investigation": "Er is een onderzoek voor dit stembureau. <link>Verwijder eerst het onderzoek</link> om dit stembureau te kunnen verwijderen."
+    "title": "Stembureau verwijderen niet mogelijk"
   },
   "details": "Details van het stembureau",
   "empty": "Er zijn nog geen stembureaus ingevoerd voor deze verkiezing. Kies hoe je stembureaus gaat toevoegen.",
@@ -37,8 +38,6 @@
   "locality": "Plaats",
   "manage": "Stembureaus beheren",
   "message": {
-    "delete_error_data_entry_exists": "Er zijn al tellingen ingevoerd voor dit stembureau. De invoer moet eerst verwijderd worden om dit stembureau te kunnen verwijderen.",
-    "delete_error_investigation_exists": "Er is een onderzoek voor dit stembureau. Het onderzoek moet eerst verwijderd worden om dit stembureau te kunnen verwijderen.",
     "delete_error_title": "Stembureau kan niet verwijderd worden",
     "no_polling_stations": "Er zijn nog geen stembureaus ingevoerd voor deze verkiezing. Kies hoe je stembureaus gaat toevoegen.",
     "polling_station_created": "Stembureau {number} ({name}) toegevoegd",
@@ -69,7 +68,7 @@
   "update": "Stembureaugegevens wijzigen",
   "voters_and_vote_count": "Aantal kiezers en stemmen",
   "warning_data_entry_finished": {
-    "title": "Invoerfase al afgerond",
-    "description": "Als je wijzigingen aanbrengt in deze zitting door stembureaus toe te voegen, te bewerken of te verwijderen, wordt de invoerfase heropend. Bij het afronden van de invoerfase wordt een nieuw proces-verbaal gemaakt."
+    "description": "Als je wijzigingen aanbrengt in deze zitting door stembureaus toe te voegen, te bewerken of te verwijderen, wordt de invoerfase heropend. Bij het afronden van de invoerfase wordt een nieuw proces-verbaal gemaakt.",
+    "title": "Invoerfase al afgerond"
   }
 }

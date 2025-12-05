@@ -9,6 +9,10 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+dialog {
+  color: var(--text-color-body);
+}
+
 h1,
 h2,
 h3,

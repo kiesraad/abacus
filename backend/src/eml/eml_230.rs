@@ -10,7 +10,9 @@ use super::{
 };
 
 use crate::{
-    election::{CandidateGender, ElectionWithPoliticalGroups, NewElection, PoliticalGroup},
+    election::{
+        CandidateGender, ElectionWithPoliticalGroups, NewElection, PGNumber, PoliticalGroup,
+    },
     eml::common::{
         AuthorityAddress, AuthorityIdentifier, CandidateFullName, Country, Gender, Locality,
         NameLine, PersonName, QualifyingAddress, QualifyingAddressData,
@@ -122,7 +124,7 @@ impl EML230 {
 
                 let mut expected_candidate_number = 1;
                 let political_group = PoliticalGroup {
-                    number: pg_number,
+                    number: PGNumber::new(pg_number),
                     name: aff.affiliation_identifier.registered_name.clone(),
                     candidates:
                         aff.candidates

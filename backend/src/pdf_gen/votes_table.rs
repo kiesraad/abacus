@@ -118,7 +118,7 @@ impl VotesTablesWithOnlyPreviousVotes {
 }
 
 fn get_votes_for_political_party(
-    political_group_number: u32,
+    political_group_number: PGNumber,
     political_group_votes: &[PoliticalGroupCandidateVotes],
 ) -> Result<&PoliticalGroupCandidateVotes, APIError> {
     political_group_votes
@@ -308,7 +308,7 @@ mod tests {
 
     fn sample_group(number: u32, candidate_numbers: &[u32]) -> PoliticalGroup {
         PoliticalGroup {
-            number,
+            number: PGNumber::new(number),
             name: format!("Partij {number}"),
             candidates: candidate_numbers
                 .iter()
@@ -340,7 +340,7 @@ mod tests {
         entries: &[(u32, Count)],
     ) -> PoliticalGroupCandidateVotes {
         PoliticalGroupCandidateVotes {
-            number: group_number,
+            number: PGNumber::new(group_number),
             total,
             candidate_votes: entries
                 .iter()

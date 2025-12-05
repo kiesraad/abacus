@@ -19,8 +19,8 @@ use crate::{
         status::{DataEntryStatus, Definitive, SecondEntryNotStarted},
     },
     election::{
-        CandidateGender, ElectionCategory, ElectionWithPoliticalGroups, NewElection, PGNumber,
-        PoliticalGroup, VoteCountingMethod,
+        CandidateGender, CandidateNumber, ElectionCategory, ElectionWithPoliticalGroups,
+        NewElection, PGNumber, PoliticalGroup, VoteCountingMethod,
     },
     polling_station::{PollingStation, PollingStationRequest, PollingStationType},
     test_data_gen::GenerateElectionArgs,
@@ -184,7 +184,7 @@ fn generate_political_party(
         let initials = super::data::initials(rng, first_name.as_deref());
         let (prefix, last_name) = super::data::last_name(rng);
         candidates.push(crate::election::Candidate {
-            number: i,
+            number: CandidateNumber::new(i),
             initials,
             first_name,
             last_name_prefix: prefix.map(ToOwned::to_owned),

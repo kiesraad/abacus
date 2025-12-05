@@ -11,7 +11,8 @@ use super::{
 
 use crate::{
     election::{
-        CandidateGender, ElectionWithPoliticalGroups, NewElection, PGNumber, PoliticalGroup,
+        CandidateGender, CandidateNumber, ElectionWithPoliticalGroups, NewElection, PGNumber,
+        PoliticalGroup,
     },
     eml::common::{
         AuthorityAddress, AuthorityIdentifier, CandidateFullName, Country, Gender, Locality,
@@ -134,7 +135,9 @@ impl EML230 {
                                     crate::election::structs::Candidate::try_from(
                                         can.clone(),
                                     )?;
-                                if expected_candidate_number != candidate.number {
+                                if CandidateNumber::new(expected_candidate_number)
+                                    != candidate.number
+                                {
                                     return Err(
                                         EMLImportError::CandidateNumbersNotSequential {
                                             political_group_number: pg_number,

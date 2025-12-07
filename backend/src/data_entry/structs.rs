@@ -569,10 +569,6 @@ impl YesNo {
         Self::new(false, true)
     }
 
-    pub fn empty() -> Self {
-        Self::new(false, false)
-    }
-
     pub fn both() -> Self {
         Self::new(true, true)
     }
@@ -736,8 +732,8 @@ pub mod tests {
     impl ValidDefault for ExtraInvestigation {
         fn valid_default() -> Self {
             Self {
-                extra_investigation_other_reason: YesNo::empty(),
-                ballots_recounted_extra_investigation: YesNo::empty(),
+                extra_investigation_other_reason: YesNo::default(),
+                ballots_recounted_extra_investigation: YesNo::default(),
             }
         }
     }

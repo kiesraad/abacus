@@ -94,7 +94,7 @@ fn random_string_option(
 
 fn random_yes_no(rng: &mut impl Rng) -> YesNo {
     match rng.random_range(0..4) {
-        0 => YesNo::empty(),
+        0 => YesNo::default(),
         1 => YesNo::both(),
         2 => YesNo::yes(),
         _ => YesNo::no(),

@@ -20,9 +20,6 @@ import {
   COMMITTEE_SESSION_DELETE_REQUEST_PATH,
   COMMITTEE_SESSION_INVESTIGATIONS_REQUEST_PARAMS,
   COMMITTEE_SESSION_INVESTIGATIONS_REQUEST_PATH,
-  COMMITTEE_SESSION_NUMBER_OF_VOTERS_CHANGE_REQUEST_BODY,
-  COMMITTEE_SESSION_NUMBER_OF_VOTERS_CHANGE_REQUEST_PARAMS,
-  COMMITTEE_SESSION_NUMBER_OF_VOTERS_CHANGE_REQUEST_PATH,
   COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_BODY,
   COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_PARAMS,
   COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_PATH,
@@ -46,6 +43,9 @@ import {
   ELECTION_IMPORT_VALIDATE_REQUEST_PATH,
   ELECTION_LIST_REQUEST_PARAMS,
   ELECTION_LIST_REQUEST_PATH,
+  ELECTION_NUMBER_OF_VOTERS_CHANGE_REQUEST_BODY,
+  ELECTION_NUMBER_OF_VOTERS_CHANGE_REQUEST_PARAMS,
+  ELECTION_NUMBER_OF_VOTERS_CHANGE_REQUEST_PATH,
   ELECTION_STATUS_REQUEST_PARAMS,
   ELECTION_STATUS_REQUEST_PATH,
   ElectionDefinitionValidateResponse,
@@ -201,14 +201,6 @@ export const CommitteeSessionStatusChangeRequestHandler = http.put<
   HttpResponse.json(null, { status: 200 }),
 );
 
-export const CommitteeSessionChangeNumberOfVotersHandler = http.put<
-  ParamsToString<COMMITTEE_SESSION_NUMBER_OF_VOTERS_CHANGE_REQUEST_PARAMS>,
-  COMMITTEE_SESSION_NUMBER_OF_VOTERS_CHANGE_REQUEST_BODY
->(
-  "/api/elections/1/committee_sessions/1/voters" satisfies COMMITTEE_SESSION_NUMBER_OF_VOTERS_CHANGE_REQUEST_PATH,
-  () => new HttpResponse(null, { status: 200 }),
-);
-
 export const CommitteeSessionUpdateHandler = http.put<
   ParamsToString<COMMITTEE_SESSION_UPDATE_REQUEST_PARAMS>,
   COMMITTEE_SESSION_UPDATE_REQUEST_BODY
@@ -332,6 +324,14 @@ export const ElectionImportValidateRequestHandler = http.post<
   ElectionDefinitionValidateResponse
 >("/api/elections/import/validate" satisfies ELECTION_IMPORT_VALIDATE_REQUEST_PATH, () =>
   HttpResponse.json(electionImportValidateMockResponse, { status: 200 }),
+);
+
+export const ElectionChangeNumberOfVotersHandler = http.put<
+  ParamsToString<ELECTION_NUMBER_OF_VOTERS_CHANGE_REQUEST_PARAMS>,
+  ELECTION_NUMBER_OF_VOTERS_CHANGE_REQUEST_BODY
+>(
+  "/api/elections/1/voters" satisfies ELECTION_NUMBER_OF_VOTERS_CHANGE_REQUEST_PATH,
+  () => new HttpResponse(null, { status: 200 }),
 );
 
 export const LoginHandler = http.post<LOGIN_REQUEST_PARAMS, LOGIN_REQUEST_BODY, LoginResponse>(
@@ -507,7 +507,6 @@ export const handlers: HttpHandler[] = [
   LogRequestHandler,
   LogUsersRequestHandler,
   CommitteeSessionStatusChangeRequestHandler,
-  CommitteeSessionChangeNumberOfVotersHandler,
   CommitteeSessionUpdateHandler,
   CommitteeSessionCreateHandler,
   CommitteeSessionDeleteHandler,
@@ -520,6 +519,7 @@ export const handlers: HttpHandler[] = [
   ElectionStatusRequestHandler,
   ElectionImportRequestHandler,
   ElectionImportValidateRequestHandler,
+  ElectionChangeNumberOfVotersHandler,
   LoginHandler,
   InitialisedHandler,
   PollingStationDataEntryGetDifferencesHandler,

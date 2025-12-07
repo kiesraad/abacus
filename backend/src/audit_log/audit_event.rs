@@ -49,6 +49,7 @@ pub struct ElectionDetails {
     pub election_domain_id: String,
     pub election_category: String,
     pub election_number_of_seats: u32,
+    pub election_number_of_voters: u32,
     #[schema(value_type = String, format = "date")]
     pub election_election_date: NaiveDate,
     #[schema(value_type = String, format = "date")]
@@ -65,7 +66,6 @@ pub struct CommitteeSessionDetails {
     #[schema(value_type = Option<String>, format = "date-time")]
     pub session_start_date_time: Option<NaiveDateTime>,
     pub session_status: String,
-    pub session_number_of_voters: u32,
     #[serde(skip_serializing_if = "Option::is_none")]
     #[schema(nullable = false)]
     pub session_results_eml: Option<u32>,
@@ -182,6 +182,7 @@ pub enum AuditEvent {
     UserDeleted(UserDetails),
     // election events
     ElectionCreated(ElectionDetails),
+    ElectionUpdated(ElectionDetails),
     // committee session events
     CommitteeSessionCreated(CommitteeSessionDetails),
     CommitteeSessionDeleted(CommitteeSessionDetails),
@@ -253,6 +254,7 @@ impl AuditEvent {
             AuditEvent::UserUpdated(_) => AuditEventLevel::Success,
             AuditEvent::UserDeleted(_) => AuditEventLevel::Info,
             AuditEvent::ElectionCreated(_) => AuditEventLevel::Success,
+            AuditEvent::ElectionUpdated(_) => AuditEventLevel::Success,
             AuditEvent::CommitteeSessionCreated(_) => AuditEventLevel::Success,
             AuditEvent::CommitteeSessionDeleted(_) => AuditEventLevel::Info,
             AuditEvent::CommitteeSessionUpdated(_) => AuditEventLevel::Success,

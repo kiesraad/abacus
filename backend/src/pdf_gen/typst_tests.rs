@@ -117,6 +117,7 @@ fn random_election(
         domain_id: random_string(rng, string_length),
         category: ElectionCategory::Municipal,
         number_of_seats: rng.random_range(0..5),
+        number_of_voters: rng.random_range(0..=10_000),
         election_date: random_date(rng),
         nomination_date: random_date(rng),
         political_groups: (0..parties)
@@ -233,7 +234,6 @@ fn random_committee_session(
                 CommitteeSessionStatus::DataEntryFinished,
             ],
         ),
-        number_of_voters: rng.random_range(0..=10_000),
         results_eml: random_option(rng, results_eml, none_where_possible),
         results_pdf: random_option(rng, results_pdf, none_where_possible),
         overview_pdf: random_option(rng, results_pdf, none_where_possible),

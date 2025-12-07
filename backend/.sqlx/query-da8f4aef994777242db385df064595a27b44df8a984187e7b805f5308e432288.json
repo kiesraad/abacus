@@ -1,0 +1,80 @@
+{
+  "db_name": "SQLite",
+  "query": "\n        UPDATE elections\n        SET number_of_voters = ?\n        WHERE id = ?\n        RETURNING\n            id as \"id: u32\",\n            name,\n            counting_method as \"counting_method: _\", \n            election_id,\n            location,\n            domain_id,\n            category as \"category: _\",\n            number_of_seats as \"number_of_seats: u32\",\n            number_of_voters as \"number_of_voters: u32\",\n            election_date as \"election_date: _\",\n            nomination_date as \"nomination_date: _\"\n        ",
+  "describe": {
+    "columns": [
+      {
+        "name": "id: u32",
+        "ordinal": 0,
+        "type_info": "Integer"
+      },
+      {
+        "name": "name",
+        "ordinal": 1,
+        "type_info": "Text"
+      },
+      {
+        "name": "counting_method: _",
+        "ordinal": 2,
+        "type_info": "Text"
+      },
+      {
+        "name": "election_id",
+        "ordinal": 3,
+        "type_info": "Text"
+      },
+      {
+        "name": "location",
+        "ordinal": 4,
+        "type_info": "Text"
+      },
+      {
+        "name": "domain_id",
+        "ordinal": 5,
+        "type_info": "Text"
+      },
+      {
+        "name": "category: _",
+        "ordinal": 6,
+        "type_info": "Text"
+      },
+      {
+        "name": "number_of_seats: u32",
+        "ordinal": 7,
+        "type_info": "Integer"
+      },
+      {
+        "name": "number_of_voters: u32",
+        "ordinal": 8,
+        "type_info": "Integer"
+      },
+      {
+        "name": "election_date: _",
+        "ordinal": 9,
+        "type_info": "Text"
+      },
+      {
+        "name": "nomination_date: _",
+        "ordinal": 10,
+        "type_info": "Text"
+      }
+    ],
+    "parameters": {
+      "Right": 2
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "da8f4aef994777242db385df064595a27b44df8a984187e7b805f5308e432288"
+}

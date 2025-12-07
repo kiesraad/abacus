@@ -284,7 +284,7 @@ mod tests {
             CSOFirstSessionResults, ExtraInvestigation, PoliticalGroupTotalVotes, YesNo,
             tests::ValidDefault,
         },
-        election::tests::election_fixture,
+        election::structs::tests::election_fixture,
         pdf_gen::tests::polling_stations_fixture,
     };
 

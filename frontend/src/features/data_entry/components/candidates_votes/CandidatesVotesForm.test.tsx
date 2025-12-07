@@ -319,6 +319,7 @@ describe("Test CandidatesVotesForm", () => {
         domain_id: "0000",
         category: "Municipal",
         number_of_seats: 29,
+        number_of_voters: 1000,
         election_date: "2024-11-30",
         nomination_date: "2024-11-01",
         political_groups: [

@@ -1042,7 +1042,8 @@ mod tests {
 
     use super::*;
     use crate::{
-        election::tests::election_fixture, polling_station::structs::tests::polling_station_fixture,
+        election::structs::tests::election_fixture,
+        polling_station::structs::tests::polling_station_fixture,
     };
 
     mod extra_investigation {
@@ -1051,7 +1052,7 @@ mod tests {
                 DataError, ExtraInvestigation, Validate, ValidationResult, ValidationResultCode,
                 ValidationResults, YesNo,
             },
-            election::tests::election_fixture,
+            election::structs::tests::election_fixture,
             polling_station::structs::tests::polling_station_fixture,
         };
 
@@ -1177,7 +1178,7 @@ mod tests {
                 CountingDifferencesPollingStation, DataError, Validate, ValidationResult,
                 ValidationResultCode, ValidationResults, YesNo,
             },
-            election::tests::election_fixture,
+            election::structs::tests::election_fixture,
             polling_station::structs::tests::polling_station_fixture,
         };
 
@@ -1333,7 +1334,7 @@ mod tests {
                 DataError, Validate, ValidationResult, ValidationResultCode, ValidationResults,
                 VotersCounts,
             },
-            election::tests::election_fixture,
+            election::structs::tests::election_fixture,
             polling_station::structs::tests::polling_station_fixture,
         };
 
@@ -1389,7 +1390,7 @@ mod tests {
                 DataError, PoliticalGroupTotalVotes, Validate, ValidationResult,
                 ValidationResultCode, ValidationResults, VotesCounts,
             },
-            election::tests::election_fixture,
+            election::structs::tests::election_fixture,
             polling_station::structs::tests::polling_station_fixture,
         };
 
@@ -2755,7 +2756,7 @@ mod tests {
                 CandidateVotes, DataError, PoliticalGroupCandidateVotes, Validate,
                 ValidationResults,
             },
-            election::{ElectionWithPoliticalGroups, PGNumber, tests::election_fixture},
+            election::{ElectionWithPoliticalGroups, PGNumber, structs::tests::election_fixture},
             polling_station::structs::tests::polling_station_fixture,
         };
 
@@ -2907,7 +2908,7 @@ mod tests {
                 ValidationResultContext, ValidationResults, VotersCounts, VotesCounts,
                 tests::ValidDefault,
             },
-            election::tests::election_fixture,
+            election::structs::tests::election_fixture,
             polling_station::structs::tests::polling_station_fixture,
         };
 

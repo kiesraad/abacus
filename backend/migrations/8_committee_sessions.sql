@@ -6,7 +6,6 @@ CREATE TABLE committee_sessions
     location         TEXT                              NOT NULL,
     start_date_time  TEXT,
     status           TEXT                              NOT NULL DEFAULT 'created',
-    number_of_voters INTEGER                           NOT NULL DEFAULT 0,
     results_eml      INTEGER                           ,
     results_pdf      INTEGER                           ,
     overview_pdf     INTEGER                           ,

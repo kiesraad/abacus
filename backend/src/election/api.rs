@@ -16,8 +16,12 @@ use super::{
 use crate::{
     APIError, AppState, ErrorResponse, SqlitePoolExt,
     audit_log::{AuditEvent, AuditService},
-    authentication::{Admin, User},
-    committee_session::{CommitteeSession, CommitteeSessionCreateRequest},
+    authentication::{Admin, AdminOrCoordinator, User},
+    committee_session::{
+        CommitteeSession, CommitteeSessionCreateRequest, CommitteeSessionError,
+        status::CommitteeSessionStatus,
+    },
+    election::ElectionNumberOfVotersChangeRequest,
     eml::{EML110, EML230, EMLDocument, EMLImportError, EmlHash, RedactedEmlHash},
     investigation::PollingStationInvestigation,
     polling_station::{
@@ -32,6 +36,7 @@ pub fn router() -> OpenApiRouter<AppState> {
         .routes(routes!(election_import))
         .routes(routes!(election_list))
         .routes(routes!(election_details))
+        .routes(routes!(election_number_of_voters_change))
 }
 
 /// Election list response
@@ -129,6 +134,69 @@ pub async fn election_details(
         polling_stations,
         investigations,
     }))
+}
+
+/// Change the number of voters of an [Election].
+#[utoipa::path(
+    put,
+    path = "/api/elections/{election_id}/voters",
+    request_body = ElectionNumberOfVotersChangeRequest,
+    responses(
+        (status = 204, description = "Election number of voters changed successfully"),
+        (status = 401, description = "Unauthorized", body = ErrorResponse),
+        (status = 403, description = "Forbidden", body = ErrorResponse),
+        (status = 404, description = "Election not found", body = ErrorResponse),
+        (status = 409, description = "Request cannot be completed", body = ErrorResponse),
+        (status = 500, description = "Internal server error", body = ErrorResponse),
+    ),
+    params(
+        ("election_id" = u32, description = "Election database id"),
+    ),
+    security(("cookie_auth" = ["administrator", "coordinator"])),
+)]
+pub async fn election_number_of_voters_change(
+    _user: AdminOrCoordinator,
+    State(pool): State<SqlitePool>,
+    audit_service: AuditService,
+    Path(id): Path<u32>,
+    Json(request): Json<ElectionNumberOfVotersChangeRequest>,
+) -> Result<StatusCode, APIError> {
+    let mut tx = pool.begin_immediate().await?;
+
+    crate::election::repository::get(&mut tx, id).await?;
+    let current_committee_session =
+        crate::committee_session::repository::get_election_committee_session(&mut tx, id).await?;
+
+    // Only allow if this is a first and not yet started committee session
+    if !current_committee_session.is_next_session()
+        && (current_committee_session.status == CommitteeSessionStatus::Created
+            || current_committee_session.status == CommitteeSessionStatus::DataEntryNotStarted)
+    {
+        let election = crate::election::repository::change_number_of_voters(
+            &mut tx,
+            id,
+            request.number_of_voters,
+        )
+        .await?;
+
+        audit_service
+            .log(
+                &mut tx,
+                &AuditEvent::ElectionUpdated(election.clone().into()),
+                None,
+            )
+            .await?;
+
+        tx.commit().await?;
+
+        Ok(StatusCode::NO_CONTENT)
+    } else {
+        tx.rollback().await?;
+
+        Err(APIError::CommitteeSession(
+            CommitteeSessionError::InvalidCommitteeSessionStatus,
+        ))
+    }
 }
 
 #[derive(Debug, Deserialize, Serialize, Clone, ToSchema)]
@@ -317,6 +385,9 @@ pub async fn election_import(
     // Note: not used yet in the frontend, only CSO is implemented for now
     new_election.counting_method = edu.counting_method;
 
+    // Set number of voters based on input
+    new_election.number_of_voters = edu.number_of_voters;
+
     // Create new election
     let mut tx = pool.begin_immediate().await?;
     let election = crate::election::repository::create(&mut tx, new_election).await?;
@@ -334,7 +405,6 @@ pub async fn election_import(
         CommitteeSessionCreateRequest {
             number: 1,
             election_id: election.id,
-            number_of_voters: edu.number_of_voters,
         },
     )
     .await?;

@@ -238,11 +238,19 @@ impl PollingStationInvestigations {
             self.admitted_voters_recounted.push(polling_station.number);
         }
 
-        if result.investigated_other_reason() {
+        if let Some(true) = result
+            .extra_investigation
+            .extra_investigation_other_reason
+            .as_bool()
+        {
             self.investigated_other_reason.push(polling_station.number);
         }
 
-        if result.ballots_have_been_recounted() {
+        if let Some(true) = result
+            .extra_investigation
+            .ballots_recounted_extra_investigation
+            .as_bool()
+        {
             self.ballots_recounted.push(polling_station.number);
         }
     }

@@ -253,29 +253,26 @@ async fn polling_station_investigation_update(
 
     // If corrected_results is changed from yes to no, check if there are data entries or results.
     // If deleting them is accepted, delete them. If not, return an error.
-    if polling_station_investigation.corrected_results == Some(false) {
-        if let Ok(current) = get_polling_station_investigation(&mut tx, polling_station_id).await {
-            if current.corrected_results == Some(true)
-                && (data_entry_exists(&mut tx, polling_station_id).await?
-                    || result_exists(&mut tx, polling_station_id).await?)
-            {
-                if polling_station_investigation.accept_data_entry_deletion == Some(true) {
-                    let polling_station =
-                        crate::polling_station::repository::get(&mut tx, polling_station_id)
-                            .await?;
-                    delete_data_entry_and_result_for_polling_station(
-                        &mut tx,
-                        &audit_service,
-                        polling_station.id,
-                    )
-                    .await?;
-                } else {
-                    return Err(APIError::Conflict(
-                        "Investigation has data entries or results".into(),
-                        ErrorReference::InvestigationHasDataEntryOrResult,
-                    ));
-                }
-            }
+    if polling_station_investigation.corrected_results == Some(false)
+        && let Ok(current) = get_polling_station_investigation(&mut tx, polling_station_id).await
+        && current.corrected_results == Some(true)
+        && (data_entry_exists(&mut tx, polling_station_id).await?
+            || result_exists(&mut tx, polling_station_id).await?)
+    {
+        if polling_station_investigation.accept_data_entry_deletion == Some(true) {
+            let polling_station =
+                crate::polling_station::repository::get(&mut tx, polling_station_id).await?;
+            delete_data_entry_and_result_for_polling_station(
+                &mut tx,
+                &audit_service,
+                polling_station.id,
+            )
+            .await?;
+        } else {
+            return Err(APIError::Conflict(
+                "Investigation has data entries or results".into(),
+                ErrorReference::InvestigationHasDataEntryOrResult,
+            ));
         }
     }
 

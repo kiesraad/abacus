@@ -23,15 +23,6 @@ __Hoofdscenario:__
 11. De burgemeester publiceert het PV GSB incl. bijlagen (DSO: Na 31-1, CSO: Na 31-2) en brengt het over naar het CSB.
 
 __Uitbreidingen:__
-5a. (CSO) Er moeten hertellingen uitgevoerd worden vanwege foutmeldingen en/of waarschuwingen:  
-&emsp; 5b1. Het GSB voert de hertelling uit.  
-&emsp; 5b2. Het GSB corrigeert de Na 31-2 Bijlage 1 of vult een nieuwe Na 31-2 Bijlage 1 in.  
-&emsp; 5b3. Het GSB voert de gecorrigeerde/nieuwe Na 31-2 Bijlage 1 in de applicatie in.
-
-5b. (DSO) Er zijn controles op de telresultaten van het stembureau uitgevoerd:  
-&emsp; 5c1. Het GSB vult het inlegvel "Controles en correcties" in.  
-&emsp; 5c2. Het GSB voegt het inlegvel toe aan het proces-verbaal N 10-1.
-
 3b. (DSO) Het GSB stelt vast dat de tellingen van het stembureau mogelijk niet kloppen:  
 &emsp; 3b1. Het GSB doet een (gedeeltelijke) hertelling van het stembureau.  
 &emsp; 3b1. Het GSB noteert de wijzigingen in een corrigendum Na 14-1.
@@ -41,6 +32,15 @@ __Uitbreidingen:__
 
 4b. De coördinator GSB ziet een fout in het aantal kiesgerechtigden:  
 &emsp; 4b1. De coördinator GSB of de beheerder past het aantal kiesgerechtigden aan.
+
+5a. (CSO) Er moeten hertellingen uitgevoerd worden vanwege foutmeldingen en/of waarschuwingen:  
+&emsp; 5b1. Het GSB voert de hertelling uit.  
+&emsp; 5b2. Het GSB corrigeert de Na 31-2 Bijlage 1 of vult een nieuwe Na 31-2 Bijlage 1 in.  
+&emsp; 5b3. Het GSB voert de gecorrigeerde/nieuwe Na 31-2 Bijlage 1 in de applicatie in.
+
+5b. (DSO) Er zijn controles op de telresultaten van het stembureau uitgevoerd:  
+&emsp; 5c1. Het GSB vult het inlegvel "Controles en correcties" in.  
+&emsp; 5c2. Het GSB voegt het inlegvel toe aan het proces-verbaal N 10-1.
 
 7a. Het GSB stelt verschillen vast d.m.v. het controleprotocol (handmatige controle optellingen software):  
 &emsp; 7a1. Het GSB controleert de resultaten van het controleprotocol.  

@@ -24,9 +24,8 @@ __Uitbreidingen:__
 Ook de gegenereerde documenten worden dan verwijderd.  
 &emsp; 2-3b2. De coördinator GSB laat het stembureau twee keer invoeren.
 
-4a. De applicatie stelt vast dat niet voor alle stembureaus de resultaten zijn ingevoerd:
-4a1. De invoer kan nog niet gesloten worden. De coordinator ziet op de statusoverzicht van de invoer welke resultaten
-nog missen.
+4a. De applicatie stelt vast dat niet voor alle stembureaus de resultaten zijn ingevoerd:  
+&emsp; 4a1. De applicatie laat niet toe dat de coördinator GSB de invoer sluit.
 
 ### Niet in scope
 
@@ -86,13 +85,13 @@ __Uitbreidingen:__
 4a. De applicatie stelt vast dat een invoerder fouten heeft geaccepteerd:  
 &emsp; 4a1. [De coördinator GSB beoordeelt de geaccepteerde fouten.](#de-coördinator-gsb-beoordeelt-de-geaccepteerde-fouten-zee)
 
-5a. De applicatie stelt vast dat een invoerder waarschuwingen heeft geaccepteerd:  
+5a. De applicatie stelt vast dat een invoerder waarschuwingen heeft geaccepteerd in de eerste invoer:  
 &emsp; 5a1. De coördinator GSB beoordeelt de geaccepteerde waarschuwingen.
 
 8a. De applicatie stelt vast dat beide invoeren niet gelijk zijn:  
 &emsp; 8a1. [De coördinator GSB beoordeelt de verschillen tussen de twee invoeren.](#de-coördinator-gsb-beoordeelt-de-verschillen-tussen-de-twee-invoeren-zee)
 
-9a. De applicatie stelt vast dat een invoerder waarschuwingen heeft geaccepteerd:  
+9a. De applicatie stelt vast dat een invoerder waarschuwingen heeft geaccepteerd in de tweede invoer:  
 &emsp; 9a1. De coördinator GSB beoordeelt de geaccepteerde waarschuwingen.
 
 ### Open punten

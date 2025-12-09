@@ -62,6 +62,30 @@ npm run test:e2e-dev
 npx playwright show-report <path-to-unzipped-report-folder>
 ```
 
+When manually debugging Playwright tests in developer mode, it is important to have Abacus in the correct state:
+
+- Run the Abacus backend with a clean database (in the `../backend` folder):
+  ```sh
+  cargo run --features memory-serve -- --reset-database
+  ```
+- Run the Abacus frontend in developer mode (here in `../frontend`):
+  ```sh
+  npm run dev
+  ```
+- Start Playwright in debug mode (also here in `../frontend`):
+  ```
+  npm run test:e2e-debug
+  ```
+- Alternatively, if you're using the Playwright VS Code extension, set `DEBUG_DEVELOPMENT=true` in `settings.json`:
+  ```json
+  "playwright.env": {
+    "DEBUG_DEVELOPMENT": true
+  },
+  ```
+  Also note that the VS Code extension only works properly if you open the `../frontend` folder as project root in VS Code (otherwise the relative paths used within the tests are incorrect).
+- Run the "create test user accounts" test with the `initialisation-test` and `setup-test-users` projects enabled. The "create test user accounts" test depends on the initialisation tests, so those will also run automatically. These initialisation tests can only be run once on a clean database, if you try to run them again they will fail.
+- Now the test user has been initialized, disable the `initialisation-test` and `setup-test-users` projects, and enable one or more of the browser projects (`chrome`, `firefox`, `safari`). Now you can run any of the other browser tests!
+
 ### Component Development with Storybook
 
 ```sh

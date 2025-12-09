@@ -295,10 +295,21 @@ async fn polling_station_delete(
     let polling_station =
         repository::get_for_election(&mut tx, election_id, polling_station_id).await?;
 
-    delete_data_entry_and_result_for_polling_station(&mut tx, &audit_service, polling_station.id)
-        .await?;
+    delete_data_entry_and_result_for_polling_station(
+        &mut tx,
+        &audit_service,
+        &committee_session,
+        polling_station.id,
+    )
+    .await?;
 
-    delete_investigation_for_polling_station(&mut tx, &audit_service, polling_station.id).await?;
+    delete_investigation_for_polling_station(
+        &mut tx,
+        &audit_service,
+        &committee_session,
+        polling_station.id,
+    )
+    .await?;
 
     repository::delete(&mut tx, election_id, polling_station_id).await?;
 
@@ -318,14 +329,6 @@ async fn polling_station_delete(
             &mut tx,
             committee_session.id,
             CommitteeSessionStatus::Created,
-            audit_service,
-        )
-        .await?;
-    } else if committee_session.status == CommitteeSessionStatus::DataEntryFinished {
-        change_committee_session_status(
-            &mut tx,
-            committee_session.id,
-            CommitteeSessionStatus::DataEntryInProgress,
             audit_service,
         )
         .await?;

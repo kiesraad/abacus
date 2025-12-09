@@ -75,6 +75,7 @@ async fn validate_and_get_committee_session(
 pub async fn delete_investigation_for_polling_station(
     conn: &mut SqliteConnection,
     audit_service: &AuditService,
+    committee_session: &CommitteeSession,
     polling_station_id: u32,
 ) -> Result<(), APIError> {
     if let Some(investigation) =
@@ -87,6 +88,16 @@ pub async fn delete_investigation_for_polling_station(
                 None,
             )
             .await?;
+
+        if committee_session.status == CommitteeSessionStatus::DataEntryFinished {
+            change_committee_session_status(
+                conn,
+                committee_session.id,
+                CommitteeSessionStatus::DataEntryInProgress,
+                audit_service.clone(),
+            )
+            .await?;
+        }
     }
     Ok(())
 }
@@ -285,6 +296,7 @@ async fn polling_station_investigation_update(
                     delete_data_entry_and_result_for_polling_station(
                         &mut tx,
                         &audit_service,
+                        &committee_session,
                         polling_station.id,
                     )
                     .await?;
@@ -359,11 +371,22 @@ async fn polling_station_investigation_delete(
         crate::polling_station::repository::get(&mut tx, polling_station_id).await?;
 
     // Delete investigation
-    delete_investigation_for_polling_station(&mut tx, &audit_service, polling_station_id).await?;
+    delete_investigation_for_polling_station(
+        &mut tx,
+        &audit_service,
+        &committee_session,
+        polling_station_id,
+    )
+    .await?;
 
     // Delete potential data entry and result linked to the polling station
-    delete_data_entry_and_result_for_polling_station(&mut tx, &audit_service, polling_station.id)
-        .await?;
+    delete_data_entry_and_result_for_polling_station(
+        &mut tx,
+        &audit_service,
+        &committee_session,
+        polling_station.id,
+    )
+    .await?;
 
     // Change committee session status if last investigation is deleted
     if list_investigations_for_committee_session(&mut tx, committee_session.id)
@@ -374,14 +397,6 @@ async fn polling_station_investigation_delete(
             &mut tx,
             committee_session.id,
             CommitteeSessionStatus::Created,
-            audit_service,
-        )
-        .await?;
-    } else if committee_session.status == CommitteeSessionStatus::DataEntryFinished {
-        change_committee_session_status(
-            &mut tx,
-            committee_session.id,
-            CommitteeSessionStatus::DataEntryInProgress,
             audit_service,
         )
         .await?;

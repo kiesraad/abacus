@@ -157,17 +157,32 @@ async fn validate_and_get_data(
 pub async fn delete_data_entry_and_result_for_polling_station(
     conn: &mut SqliteConnection,
     audit_service: &AuditService,
+    committee_session: &CommitteeSession,
     polling_station_id: u32,
 ) -> Result<(), APIError> {
+    let mut committee_session_status_should_change = false;
     if let Some(data_entry) = delete_data_entry(conn, polling_station_id).await? {
         audit_service
             .log(conn, &AuditEvent::DataEntryDeleted(data_entry.into()), None)
             .await?;
+        committee_session_status_should_change =
+            committee_session.status == CommitteeSessionStatus::DataEntryFinished;
     }
     if let Some(result) = delete_result(conn, polling_station_id).await? {
         audit_service
             .log(conn, &AuditEvent::ResultDeleted(result.into()), None)
             .await?;
+        committee_session_status_should_change =
+            committee_session.status == CommitteeSessionStatus::DataEntryFinished;
+    }
+    if committee_session_status_should_change {
+        change_committee_session_status(
+            conn,
+            committee_session.id,
+            CommitteeSessionStatus::DataEntryInProgress,
+            audit_service.clone(),
+        )
+        .await?;
     }
     Ok(())
 }
@@ -666,27 +681,10 @@ async fn polling_station_data_entries_and_result_delete(
         delete_data_entry_and_result_for_polling_station(
             &mut tx,
             &audit_service,
+            &committee_session,
             polling_station_id,
         )
         .await?;
-
-        audit_service
-            .log(
-                &mut tx,
-                &AuditEvent::DataEntryDeleted(data_entry.into()),
-                None,
-            )
-            .await?;
-
-        if committee_session.status == CommitteeSessionStatus::DataEntryFinished {
-            change_committee_session_status(
-                &mut tx,
-                committee_session.id,
-                CommitteeSessionStatus::DataEntryInProgress,
-                audit_service,
-            )
-            .await?;
-        }
 
         tx.commit().await?;
 
@@ -826,6 +824,7 @@ async fn polling_station_data_entry_resolve_errors(
         delete_data_entry_and_result_for_polling_station(
             &mut tx,
             &audit_service,
+            &committee_session,
             polling_station_id,
         )
         .await?;
@@ -949,6 +948,7 @@ async fn polling_station_data_entry_resolve_differences(
         delete_data_entry_and_result_for_polling_station(
             &mut tx,
             &audit_service,
+            &committee_session,
             polling_station_id,
         )
         .await?;

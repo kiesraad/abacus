@@ -544,8 +544,9 @@ async fn test_election_zip_download_works(pool: SqlitePool) {
 async fn test_election_zip_download_invalid_committee_session_state(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let coordinator_cookie = shared::coordinator_login(&addr).await;
-    create_result(&addr, 1, ElectionId::from(2)).await;
-    create_result(&addr, 2, ElectionId::from(2)).await;
+    let election_id = ElectionId::from(2);
+    create_result(&addr, 1, election_id).await;
+    create_result(&addr, 2, election_id).await;
 
     let url = format!("http://{addr}/api/elections/2/committee_sessions/2/download_zip_results");
     let response = reqwest::Client::new()

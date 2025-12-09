@@ -91,29 +91,17 @@ export function PollingStationListPage() {
                 <Table.HeaderCell>{t("type")}</Table.HeaderCell>
               </Table.Header>
               <Table.Body className="fs-md">
-                {data.polling_stations.map((station) =>
-                  createAndUpdateAllowed ? (
-                    <Table.LinkRow key={station.id} to={`${station.id}/update`}>
-                      <Table.NumberCell>{station.number}</Table.NumberCell>
-                      <Table.Cell className="break-word">{station.name}</Table.Cell>
-                      <Table.Cell>
-                        {station.polling_station_type && labelForPollingStationType[station.polling_station_type]
-                          ? labelForPollingStationType[station.polling_station_type]
-                          : "–"}
-                      </Table.Cell>
-                    </Table.LinkRow>
-                  ) : (
-                    <Table.Row key={station.id}>
-                      <Table.NumberCell>{station.number}</Table.NumberCell>
-                      <Table.Cell className="break-word">{station.name}</Table.Cell>
-                      <Table.Cell>
-                        {station.polling_station_type && labelForPollingStationType[station.polling_station_type]
-                          ? labelForPollingStationType[station.polling_station_type]
-                          : "–"}
-                      </Table.Cell>
-                    </Table.Row>
-                  ),
-                )}
+                {data.polling_stations.map((station) => (
+                  <Table.Row key={station.id} to={createAndUpdateAllowed ? `${station.id}/update` : undefined}>
+                    <Table.NumberCell>{station.number}</Table.NumberCell>
+                    <Table.Cell className="break-word">{station.name}</Table.Cell>
+                    <Table.Cell>
+                      {station.polling_station_type && labelForPollingStationType[station.polling_station_type]
+                        ? labelForPollingStationType[station.polling_station_type]
+                        : "–"}
+                    </Table.Cell>
+                  </Table.Row>
+                ))}
               </Table.Body>
             </Table>
           </article>

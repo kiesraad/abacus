@@ -48,10 +48,10 @@ export function AddInvestigationPage() {
                 </Table.Row>
               ) : (
                 availablePollingStations.map((station) => (
-                  <Table.LinkRow key={station.id} to={`../${station.id}/reason`}>
+                  <Table.Row key={station.id} to={`../${station.id}/reason`}>
                     <Table.NumberCell>{station.number}</Table.NumberCell>
                     <Table.Cell className="break-word">{station.name}</Table.Cell>
-                  </Table.LinkRow>
+                  </Table.Row>
                 ))
               )}
             </Table.Body>

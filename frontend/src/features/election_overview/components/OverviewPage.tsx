@@ -88,7 +88,7 @@ export function OverviewPage() {
     const committeeSession = committeeSessionList.find(
       (committeeSession) => committeeSession.election_id === election.id,
     );
-    let electionLink = null;
+    let electionLink = undefined;
     let committeeSessionStatus = <></>;
     let committeeSessionString = "";
     if (isAdminOrCoordinator) {
@@ -105,19 +105,11 @@ export function OverviewPage() {
       );
       committeeSessionString = committeeSessionLabel(committeeSession.number);
     }
-    if (electionLink) {
-      return (
-        <Table.LinkRow id={`election-row-${election.id}`} key={election.id} to={electionLink}>
-          <ElectionRowContent />
-        </Table.LinkRow>
-      );
-    } else {
-      return (
-        <Table.Row id={`election-row-${election.id}`}>
-          <ElectionRowContent />
-        </Table.Row>
-      );
-    }
+    return (
+      <Table.Row id={`election-row-${election.id}`} key={election.id} to={electionLink}>
+        <ElectionRowContent />
+      </Table.Row>
+    );
   }
 
   function closeNewAccountAlert() {

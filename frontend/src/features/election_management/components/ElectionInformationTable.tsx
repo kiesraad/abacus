@@ -28,6 +28,11 @@ export function ElectionInformationTable({
   committeeSession,
   numberOfPollingStations,
 }: ElectionInformationTableProps) {
+  const rowLink =
+    committeeSession.number === 1 &&
+    (committeeSession.status === "created" || committeeSession.status === "data_entry_not_started")
+      ? "number-of-voters"
+      : undefined;
   return (
     <Table id="election-information-table" variant="information" className={cn(cls.electionInformationTable)}>
       <Table.Body>
@@ -54,24 +59,14 @@ export function ElectionInformationTable({
           </Table.HeaderCell>
           <Table.Cell>{getListsAndCandidatesLabel(election)}</Table.Cell>
         </Table.Row>
-        {committeeSession.number === 1 &&
-        (committeeSession.status === "created" || committeeSession.status === "data_entry_not_started") ? (
-          <Table.LinkRow to={"number-of-voters"}>
-            <Table.HeaderCell scope="row" className="normal">
-              {t("number_of_voters")}
-            </Table.HeaderCell>
-            <Table.Cell className="underlined">
-              {election.number_of_voters ? formatNumber(election.number_of_voters) : "0"}
-            </Table.Cell>
-          </Table.LinkRow>
-        ) : (
-          <Table.Row>
-            <Table.HeaderCell scope="row" className="normal">
-              {t("number_of_voters")}
-            </Table.HeaderCell>
-            <Table.Cell>{election.number_of_voters ? formatNumber(election.number_of_voters) : "0"}</Table.Cell>
-          </Table.Row>
-        )}
+        <Table.Row to={rowLink}>
+          <Table.HeaderCell scope="row" className="normal">
+            {t("number_of_voters")}
+          </Table.HeaderCell>
+          <Table.Cell className={rowLink && "underlined"}>
+            {election.number_of_voters ? formatNumber(election.number_of_voters) : "0"}
+          </Table.Cell>
+        </Table.Row>
         <Table.Row>
           <Table.HeaderCell scope="row" className="normal">
             {t("election_management.to_do_data_entry_for")}
@@ -81,7 +76,7 @@ export function ElectionInformationTable({
             {t("GSB")}
           </Table.Cell>
         </Table.Row>
-        <Table.LinkRow key={election.id} to="polling-stations">
+        <Table.Row key={election.id} to="polling-stations">
           <Table.HeaderCell scope="row" className="normal">
             {t("polling_station.title.plural")}
           </Table.HeaderCell>
@@ -89,7 +84,7 @@ export function ElectionInformationTable({
             {numberOfPollingStations}{" "}
             {t(`polling_station.title.${numberOfPollingStations === 1 ? "singular" : "plural"}`).toLowerCase()}
           </Table.Cell>
-        </Table.LinkRow>
+        </Table.Row>
         <Table.Row>
           <Table.HeaderCell scope="row" className="normal">
             {t("counting_method_type")}

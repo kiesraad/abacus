@@ -77,7 +77,7 @@ pub async fn validate_committee_session_is_current_committee_session(
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
     params(
-        ("election_id" = u32, description = "Election database id"),
+        ("election_id" = ElectionId, description = "Election database id"),
     ),
     security(("cookie_auth" = ["coordinator"])),
 )]
@@ -134,7 +134,7 @@ pub async fn committee_session_create(
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
     params(
-        ("election_id" = u32, description = "Election database id"),
+        ("election_id" = ElectionId, description = "Election database id"),
         ("committee_session_id" = u32, description = "Committee session database id"),
     ),
     security(("cookie_auth" = ["coordinator"])),
@@ -194,7 +194,7 @@ pub async fn committee_session_delete(
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
     params(
-        ("election_id" = u32, description = "Election database id"),
+        ("election_id" = ElectionId, description = "Election database id"),
         ("committee_session_id" = u32, description = "Committee session database id"),
     ),
     security(("cookie_auth" = ["coordinator"])),
@@ -266,7 +266,7 @@ pub async fn committee_session_update(
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
     params(
-        ("election_id" = u32, description = "Election database id"),
+        ("election_id" = ElectionId, description = "Election database id"),
         ("committee_session_id" = u32, description = "Committee session database id"),
     ),
     security(("cookie_auth" = ["coordinator"])),
@@ -311,7 +311,7 @@ pub async fn committee_session_status_change(
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
     params(
-        ("election_id" = u32, description = "Election database id"),
+        ("election_id" = ElectionId, description = "Election database id"),
         ("committee_session_id" = u32, description = "Committee session database id"),
     ),
     security(("cookie_auth" = ["coordinator"])),

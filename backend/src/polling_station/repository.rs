@@ -13,7 +13,7 @@ pub async fn list(
         r#"
         SELECT
             p.id AS "id: u32",
-            c.election_id AS "election_id: u32",
+            c.election_id AS "election_id: ElectionId",
             p.committee_session_id AS "committee_session_id: u32",
             p.id_prev_session AS "id_prev_session: _",
             p.name,
@@ -74,7 +74,7 @@ pub async fn get_by_previous_id(
         r#"
         SELECT
             p.id AS "id: u32",
-            c.election_id AS "election_id: u32",
+            c.election_id AS "election_id: ElectionId",
             p.committee_session_id AS "committee_session_id: u32",
             p.id_prev_session AS "id_prev_session: _",
             p.name,
@@ -110,7 +110,7 @@ pub async fn get_for_election(
         r#"
         SELECT
             p.id AS "id: u32",
-            c.election_id AS "election_id: u32",
+            c.election_id AS "election_id: ElectionId",
             p.committee_session_id AS "committee_session_id: u32",
             p.id_prev_session AS "id_prev_session: _",
             p.name,
@@ -165,7 +165,7 @@ pub async fn create(
         ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
         RETURNING
             id AS "id: u32",
-            ? AS "election_id!: u32", -- Workaround to get election_id in the result without a temporary struct
+            ? AS "election_id!: ElectionId", -- Workaround to get election_id in the result without a temporary struct
             committee_session_id AS "committee_session_id: u32",
             id_prev_session AS "id_prev_session: _",
             name,
@@ -231,7 +231,7 @@ pub async fn create_many(
             ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
             RETURNING
                 id AS "id: u32",
-                ? AS "election_id!: u32", -- Workaround to get election_id in the result without a temporary struct
+                ? AS "election_id!: ElectionId", -- Workaround to get election_id in the result without a temporary struct
                 committee_session_id AS "committee_session_id: u32",
                 id_prev_session AS "id_prev_session: _",
                 name,
@@ -298,7 +298,7 @@ pub async fn update(
             id = ? AND committee_session_id = ?
         RETURNING
             id AS "id: u32",
-            ? AS "election_id!: u32", -- Workaround to get election_id in the result without a temporary struct
+            ? AS "election_id!: ElectionId", -- Workaround to get election_id in the result without a temporary struct
             committee_session_id AS "committee_session_id: u32",
             id_prev_session AS "id_prev_session: _",
             name,

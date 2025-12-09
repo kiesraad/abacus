@@ -28,7 +28,7 @@ use crate::{
 pub mod shared;
 pub mod utils;
 
-async fn get_election(addr: &SocketAddr, election_id: u32) -> ElectionDetailsResponse {
+async fn get_election(addr: &SocketAddr, election_id: ElectionId) -> ElectionDetailsResponse {
     let url = format!("http://{addr}/api/elections/{election_id}");
     let coordinator_cookie = coordinator_login(addr).await;
     let response = reqwest::Client::new()
@@ -82,7 +82,7 @@ async fn delete_investigation(addr: &SocketAddr, polling_station_id: u32) -> Res
 async fn test_create_conclude_update_delete(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 
-    let election_id = 7;
+    let election_id = ElectionId::from(7);
     let election_details = get_election(&addr, election_id).await;
     assert_eq!(election_details.investigations.len(), 0);
 
@@ -213,7 +213,7 @@ async fn test_deletion_removes_polling_station_from_status(pool: SqlitePool) {
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_7_four_sessions", "users"))))]
 async fn test_partials_update(pool: SqlitePool) {
     let addr = serve_api(pool).await;
-    let election_id = 7;
+    let election_id = ElectionId::from(7);
     let polling_station_id = 741;
 
     assert_eq!(

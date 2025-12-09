@@ -63,7 +63,7 @@ impl IntoResponse for PollingStationListResponse {
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
     params(
-        ("election_id" = u32, description = "Election database id"),
+        ("election_id" = ElectionId, description = "Election database id"),
     ),
     security(("cookie_auth" = ["administrator", "coordinator", "typist"])),
 )]
@@ -115,7 +115,7 @@ pub async fn validate_user_is_allowed_to_perform_action(
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
     params(
-        ("election_id" = u32, description = "Election database id"),
+        ("election_id" = ElectionId, description = "Election database id"),
     ),
     security(("cookie_auth" = ["administrator", "coordinator"])),
 )]
@@ -180,7 +180,7 @@ async fn polling_station_create(
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
     params(
-        ("election_id" = u32, description = "Election database id"),
+        ("election_id" = ElectionId, description = "Election database id"),
         ("polling_station_id" = u32, description = "Polling station database id"),
     ),
     security(("cookie_auth" = ["administrator", "coordinator", "typist"])),
@@ -210,7 +210,7 @@ async fn polling_station_get(
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
     params(
-        ("election_id" = u32, description = "Election database id"),
+        ("election_id" = ElectionId, description = "Election database id"),
         ("polling_station_id" = u32, description = "Polling station database id"),
     ),
     security(("cookie_auth" = ["administrator", "coordinator"])),
@@ -274,7 +274,7 @@ async fn polling_station_update(
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
     params(
-        ("election_id" = u32, description = "Election database id"),
+        ("election_id" = ElectionId, description = "Election database id"),
         ("polling_station_id" = u32, description = "Polling station database id"),
     ),
     security(("cookie_auth" = ["administrator", "coordinator"])),
@@ -356,7 +356,7 @@ pub struct PollingStationRequestListResponse {
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
     params(
-        ("election_id" = u32, description = "Election database id"),
+        ("election_id" = ElectionId, description = "Election database id"),
     ),
     security(("cookie_auth" = ["administrator", "coordinator"])),
 )]
@@ -440,7 +440,7 @@ pub async fn create_imported_polling_stations(
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
     params(
-        ("election_id" = u32, description = "Election database id"),
+        ("election_id" = ElectionId, description = "Election database id"),
     ),
     security(("cookie_auth" = ["administrator", "coordinator"])),
 )]

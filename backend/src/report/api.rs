@@ -452,7 +452,7 @@ async fn generate_and_save_files(
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
     params(
-        ("election_id" = u32, description = "Election database id"),
+        ("election_id" = ElectionId, description = "Election database id"),
         ("committee_session_id" = u32, description = "Committee session database id"),
     ),
     security(("cookie_auth" = ["coordinator"])),
@@ -524,7 +524,7 @@ async fn election_download_zip_results(
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
     params(
-        ("election_id" = u32, description = "Election database id"),
+        ("election_id" = ElectionId, description = "Election database id"),
         ("committee_session_id" = u32, description = "Committee session database id"),
     ),
     security(("cookie_auth" = ["coordinator"])),
@@ -533,7 +533,7 @@ async fn election_download_pdf_results(
     _user: Coordinator,
     State(pool): State<SqlitePool>,
     audit_service: AuditService,
-    Path((_election_id, committee_session_id)): Path<(u32, u32)>,
+    Path((_election_id, committee_session_id)): Path<(ElectionId, u32)>,
 ) -> Result<Attachment<Vec<u8>>, APIError> {
     let (_, pdf_file, _, _) =
         generate_and_save_files(&pool, audit_service, committee_session_id).await?;

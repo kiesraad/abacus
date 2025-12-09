@@ -18,7 +18,7 @@ pub async fn get(
         SELECT
             id as "id: u32",
             number as "number: u32",
-            election_id as "election_id: u32",
+            election_id as "election_id: ElectionId",
             status as "status: _",
             location,
             start_date_time as "start_date_time: _",
@@ -44,7 +44,7 @@ pub async fn get_previous_session(
         SELECT
             prev.id as "id: u32",
             prev.number as "number: u32",
-            prev.election_id as "election_id: u32",
+            prev.election_id as "election_id: ElectionId",
             prev.status as "status: _",
             prev.location,
             prev.start_date_time as "start_date_time: _",
@@ -71,7 +71,7 @@ pub async fn get_election_committee_session_list(
         SELECT
             id as "id: u32",
             number as "number: u32",
-            election_id as "election_id: u32",
+            election_id as "election_id: ElectionId",
             status as "status: _",
             location,
             start_date_time as "start_date_time: _",
@@ -98,7 +98,7 @@ pub async fn get_election_committee_session(
         SELECT
             id as "id: u32",
             number as "number: u32",
-            election_id as "election_id: u32",
+            election_id as "election_id: ElectionId",
             status as "status: _",
             location,
             start_date_time as "start_date_time: _",
@@ -125,7 +125,7 @@ pub async fn get_committee_session_for_each_election(
         SELECT
             id as "id: u32",
             number as "number: u32",
-            election_id as "election_id: u32",
+            election_id as "election_id: ElectionId",
             status as "status: _",
             location,
             start_date_time as "start_date_time: _",
@@ -175,7 +175,7 @@ pub async fn create(
         RETURNING
             id as "id: u32",
             number as "number: u32",
-            election_id as "election_id: u32",
+            election_id as "election_id: ElectionId",
             status as "status: _",
             location,
             start_date_time as "start_date_time: _",
@@ -247,7 +247,7 @@ pub async fn update(
         RETURNING
             id as "id: u32",
             number as "number: u32",
-            election_id as "election_id: u32",
+            election_id as "election_id: ElectionId",
             status as "status: _",
             location,
             start_date_time as "start_date_time: _",
@@ -277,7 +277,7 @@ pub async fn change_status(
         RETURNING
             id as "id: u32",
             number as "number: u32",
-            election_id as "election_id: u32",
+            election_id as "election_id: ElectionId",
             status as "status: _",
             location,
             start_date_time as "start_date_time: _",
@@ -309,7 +309,7 @@ pub async fn change_files(
         RETURNING
             id as "id: u32",
             number as "number: u32",
-            election_id as "election_id: u32",
+            election_id as "election_id: ElectionId",
             status as "status: _",
             location,
             start_date_time as "start_date_time: _",

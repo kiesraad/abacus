@@ -114,7 +114,7 @@ describe("PollingStationUpdatePage", () => {
       ).toBeVisible();
     });
 
-    test("Returns to list page with a message when clicking delete polling station", async () => {
+    test("Returns to list page with a success message when clicking delete polling station", async () => {
       server.use(PollingStationDeleteHandler);
       const user = userEvent.setup();
 
@@ -136,6 +136,37 @@ describe("PollingStationUpdatePage", () => {
       expect(deletePollingStation).toHaveBeenCalled();
 
       expect(pushMessage).toHaveBeenCalledWith({ title: "Stembureau 33 (Op Rolletjes) verwijderd" });
+      expect(navigate).toHaveBeenCalledExactlyOnceWith("/elections/1/polling-stations", { replace: true });
+    });
+
+    test("Returns to list page with a warning message when clicking delete polling station when data entry finished", async () => {
+      server.use(PollingStationDeleteHandler);
+      overrideOnce("get", "/api/elections/1", 200, getElectionMockData({}, { status: "data_entry_finished" }));
+
+      const user = userEvent.setup();
+
+      renderPage("coordinator");
+
+      expect(await screen.findByTestId("polling-station-form")).toBeVisible();
+      const deleteButton = await screen.findByRole("button", { name: "Stembureau verwijderen" });
+      await user.click(deleteButton);
+
+      const modal = await screen.findByTestId("modal-dialog");
+      expect(modal).toHaveTextContent("Stembureau verwijderen?");
+      expect(modal).toHaveTextContent("Deze actie kan niet worden teruggedraaid.");
+
+      const deletePollingStation = spyOnHandler(PollingStationDeleteHandler);
+
+      const confirmButton = await within(modal).findByRole("button", { name: "Verwijderen" });
+      await user.click(confirmButton);
+
+      expect(deletePollingStation).toHaveBeenCalled();
+
+      expect(pushMessage).toHaveBeenCalledWith({
+        type: "warning",
+        title: "Maak een nieuw proces-verbaal voor deze zitting",
+        text: "Stembureau 33 (Op Rolletjes) is verwijderd. De eerder gemaakte documenten van deze zitting zijn daardoor niet meer geldig. Maak een nieuw proces-verbaal door de invoerfase opnieuw af te ronden.",
+      });
       expect(navigate).toHaveBeenCalledExactlyOnceWith("/elections/1/polling-stations", { replace: true });
     });
 

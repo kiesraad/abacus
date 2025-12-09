@@ -23,7 +23,7 @@ import { PollingStationForm } from "./PollingStationForm";
 export function PollingStationUpdatePage() {
   const { isAdministrator, isCoordinator } = useUserRole();
   const pollingStationId = useNumericParam("pollingStationId");
-  const { election, currentCommitteeSession, investigation } = useElection(pollingStationId);
+  const { election, currentCommitteeSession, investigation, refetch } = useElection(pollingStationId);
   const navigate = useNavigate();
   const { pushMessage } = useMessages();
 
@@ -61,13 +61,24 @@ export function PollingStationUpdatePage() {
 
   function handleDeleted(pollingStation: PollingStation) {
     toggleShowDeleteModal();
-    pushMessage({
-      title: t("polling_station.message.polling_station_deleted", {
-        number: pollingStation.number,
-        name: pollingStation.name,
-      }),
-    });
-
+    if (currentCommitteeSession.status === "data_entry_finished") {
+      pushMessage({
+        type: "warning",
+        title: t("polling_station.message.generate_new_results"),
+        text: t("polling_station.message.documents_are_invalid", {
+          number: pollingStation.number,
+          name: pollingStation.name,
+        }),
+      });
+    } else {
+      pushMessage({
+        title: t("polling_station.message.polling_station_deleted", {
+          number: pollingStation.number,
+          name: pollingStation.name,
+        }),
+      });
+    }
+    void refetch();
     void navigate(parentUrl, { replace: true });
   }
 

@@ -39,6 +39,8 @@
   "manage": "Stembureaus beheren",
   "message": {
     "delete_error_title": "Stembureau kan niet verwijderd worden",
+    "documents_are_invalid": "Stembureau {number} ({name}) is verwijderd. De eerder gemaakte documenten van deze zitting zijn daardoor niet meer geldig. Maak een nieuw proces-verbaal door de invoerfase opnieuw af te ronden.",
+    "generate_new_results": "Maak een nieuw proces-verbaal voor deze zitting",
     "no_polling_stations": "Er zijn nog geen stembureaus ingevoerd voor deze verkiezing. Kies hoe je stembureaus gaat toevoegen.",
     "polling_station_created": "Stembureau {number} ({name}) toegevoegd",
     "polling_station_deleted": "Stembureau {number} ({name}) verwijderd",

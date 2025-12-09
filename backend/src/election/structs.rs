@@ -171,7 +171,9 @@ pub enum VoteCountingMethod {
     DSO,
 }
 
-#[derive(Serialize, Deserialize, Clone, Copy, Debug, Default, PartialEq, Eq, Hash)]
+#[derive(
+    Serialize, Deserialize, Clone, Copy, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Hash,
+)]
 pub struct PGNumber(u32);
 
 impl PGNumber {
@@ -204,7 +206,9 @@ pub struct PoliticalGroup {
     pub candidates: Vec<Candidate>,
 }
 
-#[derive(Serialize, Deserialize, Clone, Copy, Debug, Default, PartialEq, Eq, Hash)]
+#[derive(
+    Serialize, Deserialize, Clone, Copy, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Hash,
+)]
 pub struct CandidateNumber(u32);
 
 impl CandidateNumber {

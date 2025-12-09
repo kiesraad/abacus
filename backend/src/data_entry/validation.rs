@@ -10,7 +10,7 @@ use super::{
     status::{DataEntryStatus, FirstEntryHasErrors, FirstEntryInProgress, SecondEntryNotStarted},
 };
 use crate::{
-    election::{ElectionWithPoliticalGroups, PGNumber},
+    election::{CandidateNumber, ElectionWithPoliticalGroups, PGNumber},
     polling_station::PollingStation,
 };
 
@@ -880,7 +880,16 @@ impl Validate for Vec<PoliticalGroupTotalVotes> {
         }
 
         // check each political group total votes
+        let mut previous_number = PGNumber::new(0);
         for (i, pgv) in self.iter().enumerate() {
+            let number = pgv.number;
+            if number <= previous_number {
+                return Err(DataError::new(
+                    "political group total votes numbers are not increasing",
+                ));
+            }
+            previous_number = number;
+
             pgv.total.validate(
                 election,
                 polling_station,
@@ -933,7 +942,14 @@ impl Validate for Vec<PoliticalGroupCandidateVotes> {
         }
 
         // check each political group
+        let mut previous_number = PGNumber::new(0);
         for (i, pgv) in self.iter().enumerate() {
+            let number = pgv.number;
+            if number <= previous_number {
+                return Err(DataError::new("political group numbers are not increasing"));
+            }
+            previous_number = number;
+
             pgv.validate(
                 election,
                 polling_station,
@@ -966,7 +982,14 @@ impl Validate for PoliticalGroupCandidateVotes {
         }
 
         // validate all candidates
+        let mut prev_number = CandidateNumber::new(0);
         for (i, cv) in self.candidate_votes.iter().enumerate() {
+            let number = cv.number;
+            if number <= prev_number {
+                return Err(DataError::new("candidate numbers are not increasing"));
+            }
+            prev_number = number;
+
             cv.validate(
                 election,
                 polling_station,
@@ -2810,6 +2833,26 @@ mod tests {
             let (mut political_group_votes, mut election) =
                 create_test_data(&[(&[10, 20, 30], 60), (&[5, 10, 15], 30)]);
 
+            // Change number of the last list
+            political_group_votes[1].number = PGNumber::new(3);
+            election.political_groups[1].number = PGNumber::new(3);
+
+            let mut validation_results = ValidationResults::default();
+            let result: Result<(), DataError> = political_group_votes.validate(
+                &election,
+                &polling_station_fixture(None),
+                &mut validation_results,
+                &"political_group_votes".into(),
+            );
+
+            assert!(result.is_ok());
+        }
+
+        #[test]
+        fn test_err_political_group_numbers_not_increasing() {
+            let (mut political_group_votes, mut election) =
+                create_test_data(&[(&[10, 20, 30], 60), (&[5, 10, 15], 30)]);
+
             // Change number of the first list
             political_group_votes[0].number = PGNumber::new(3);
             election.political_groups[0].number = PGNumber::new(3);
@@ -2822,7 +2865,7 @@ mod tests {
                 &"political_group_votes".into(),
             );
 
-            assert!(result.is_ok());
+            assert!(result.is_err());
         }
 
         #[test]
@@ -2860,8 +2903,8 @@ mod tests {
             let (mut political_group_votes, election) =
                 create_test_data(&[(&[10, 20, 30], 60), (&[5, 10, 15], 30)]);
 
-            // Change number of the second candidate on the first list
-            political_group_votes[0].candidate_votes[1].number = CandidateNumber::new(5);
+            // Change number of the last candidate on the first list
+            political_group_votes[0].candidate_votes[2].number = CandidateNumber::new(5);
 
             let mut validation_results = ValidationResults::default();
             let result = political_group_votes.validate(
@@ -2872,6 +2915,28 @@ mod tests {
             );
 
             assert!(result.is_ok());
+
+            // Change number of the second candidate on the first list to a non-increasing number
+            political_group_votes[0].candidate_votes[1].number = CandidateNumber::new(1);
+        }
+
+        #[test]
+        fn test_err_candidate_numbers_not_increasing() {
+            let (mut political_group_votes, election) =
+                create_test_data(&[(&[10, 20, 30], 60), (&[5, 10, 15], 30)]);
+
+            // Change number of the second candidate on the first list to a non-increasing number
+            political_group_votes[0].candidate_votes[1].number = CandidateNumber::new(1);
+
+            let mut validation_results = ValidationResults::default();
+            let result = political_group_votes.validate(
+                &election,
+                &polling_station_fixture(None),
+                &mut validation_results,
+                &"political_group_votes".into(),
+            );
+
+            assert!(result.is_err());
         }
     }
 

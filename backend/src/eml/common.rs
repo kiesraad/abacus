@@ -1,4 +1,4 @@
-use crate::election::{CandidateGender, CandidateNumber, structs};
+use crate::election::{CandidateGender, CandidateNumber, PGNumber, structs};
 use serde::{Deserialize, Serialize};
 
 /// Managing authority for the EML document
@@ -76,7 +76,7 @@ impl From<crate::election::ElectionCategory> for ElectionCategory {
 
 #[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq, Eq)]
 pub enum ElectionSubcategory {
-    /// Provinciale staten (provinicial council), single electoral district
+    /// Provinciale staten (provincial council), single electoral district
     PS1,
     /// Provinciale staten (provincial council), multiple electoral districts
     PS2,
@@ -209,13 +209,13 @@ pub enum EMLImportError {
     OnlyMunicipalSupported,
     TooManyPoliticalGroups,
     PoliticalGroupNumbersNotIncreasing {
-        expected_larger_than: u32,
-        found: u32,
+        expected_larger_than: PGNumber,
+        found: PGNumber,
     },
     CandidateNumbersNotIncreasing {
-        political_group_number: u32,
-        expected_larger_than: u32,
-        found: u32,
+        political_group_number: PGNumber,
+        expected_larger_than: CandidateNumber,
+        found: CandidateNumber,
     },
 }
 

@@ -11,7 +11,8 @@ use super::{
 
 use crate::{
     election::{
-        CandidateGender, ElectionWithPoliticalGroups, NewElection, PGNumber, PoliticalGroup,
+        CandidateGender, CandidateNumber, ElectionWithPoliticalGroups, NewElection, PGNumber,
+        PoliticalGroup,
     },
     eml::common::{
         AuthorityAddress, AuthorityIdentifier, CandidateFullName, Country, Gender, Locality,
@@ -103,8 +104,8 @@ impl EML230 {
             return Err(EMLImportError::MismatchElectionDate);
         }
 
-        let mut previous_pg_number = 0;
         // extract initial listing of political groups with candidates
+        let mut previous_pg_number = PGNumber::new(0);
         election.political_groups = self
             .contest()
             .affiliations
@@ -114,6 +115,7 @@ impl EML230 {
                     .affiliation_identifier
                     .id
                     .parse()
+                    .map(PGNumber::new)
                     .or(Err(EMLImportError::TooManyPoliticalGroups))?;
                 if pg_number <= previous_pg_number {
                     return Err(EMLImportError::PoliticalGroupNumbersNotIncreasing {
@@ -122,42 +124,37 @@ impl EML230 {
                     });
                 }
 
-                let mut previous_candidate_number = 0;
+                let mut previous_can_number = CandidateNumber::new(0);
                 let political_group = PoliticalGroup {
-                            number: PGNumber::new(pg_number),
-                            name: aff.affiliation_identifier.registered_name.clone(),
-                            candidates:
-                                aff.candidates
-                                    .iter()
-                                    .map(|can| {
-                                        let candidate_number = can
-                                            .candidate_identifier
-                                            .id
-                                            .parse()
-                                            .or(Err(EMLImportError::InvalidCandidate))?;
-                                        if candidate_number <= previous_candidate_number {
-                                            return Err(
-                                                EMLImportError::CandidateNumbersNotIncreasing {
-                                                    political_group_number: pg_number,
-                                                    expected_larger_than: previous_candidate_number,
-                                                    found: candidate_number,
-                                                },
-                                            );
-                                        }
+                    number: pg_number,
+                    name: aff.affiliation_identifier.registered_name.clone(),
+                    candidates:
+                        aff.candidates
+                            .iter()
+                            .map(|can| {
+                                let candidate =
+                                    crate::election::structs::Candidate::try_from(
+                                        can.clone(),
+                                    )?;
 
-                                        let candidate =
-                                            crate::election::structs::Candidate::try_from(
-                                                can.clone(),
-                                            )?;
+                                if candidate.number <= previous_can_number {
+                                    return Err(
+                                        EMLImportError::CandidateNumbersNotIncreasing {
+                                            political_group_number: pg_number,
+                                            expected_larger_than: previous_can_number,
+                                            found: candidate.number,
+                                        },
+                                    );
+                                }
 
-                                        previous_candidate_number = candidate_number;
-                                        Ok(candidate)
-                                    })
-                                    .collect::<Result<
-                                        Vec<crate::election::structs::Candidate>,
-                                        EMLImportError,
-                                    >>()?,
-                        };
+                                previous_can_number = candidate.number;
+                                Ok(candidate)
+                            })
+                            .collect::<Result<
+                                Vec<crate::election::structs::Candidate>,
+                                EMLImportError,
+                            >>()?,
+                };
 
                 previous_pg_number = pg_number;
                 Ok(political_group)
@@ -335,7 +332,10 @@ pub struct ListData {
 
 #[cfg(test)]
 mod tests {
-    use crate::eml::{EML110, EML230, EMLDocument, EMLImportError};
+    use crate::{
+        election::{CandidateNumber, PGNumber},
+        eml::{EML110, EML230, EMLDocument, EMLImportError},
+    };
     use quick_xml::DeError;
 
     #[test]
@@ -435,13 +435,11 @@ mod tests {
         let candidates = EML230::from_str(candidate_data).unwrap();
         let res = candidates.add_candidate_lists(new_election).unwrap_err();
 
-        assert!(matches!(
-            res,
-            EMLImportError::PoliticalGroupNumbersNotIncreasing {
-                expected_larger_than: 2,
-                found: 1
-            }
-        ));
+        let expected = EMLImportError::PoliticalGroupNumbersNotIncreasing {
+            expected_larger_than: PGNumber::new(2),
+            found: PGNumber::new(1),
+        };
+        assert_eq!(res, expected);
     }
 
     #[test]
@@ -455,14 +453,12 @@ mod tests {
         let candidates = EML230::from_str(candidate_data).unwrap();
         let res = candidates.add_candidate_lists(new_election).unwrap_err();
 
-        assert!(matches!(
-            res,
-            EMLImportError::CandidateNumbersNotIncreasing {
-                political_group_number: 1,
-                expected_larger_than: 1,
-                found: 1,
-            }
-        ));
+        let expected = EMLImportError::CandidateNumbersNotIncreasing {
+            political_group_number: PGNumber::new(1),
+            expected_larger_than: CandidateNumber::new(1),
+            found: CandidateNumber::new(1),
+        };
+        assert_eq!(res, expected);
     }
 
     #[test]

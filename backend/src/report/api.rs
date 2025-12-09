@@ -16,7 +16,7 @@ use crate::{
         repository::change_files, status::CommitteeSessionStatus,
     },
     data_entry::{PollingStationResults, repository::are_results_complete_for_committee_session},
-    election::ElectionWithPoliticalGroups,
+    election::{ElectionId, ElectionWithPoliticalGroups},
     eml::{EML510, EMLDocument, EmlHash},
     error::ErrorReference,
     files::{
@@ -461,7 +461,7 @@ async fn election_download_zip_results(
     _user: Coordinator,
     State(pool): State<SqlitePool>,
     audit_service: AuditService,
-    Path((election_id, committee_session_id)): Path<(u32, u32)>,
+    Path((election_id, committee_session_id)): Path<(ElectionId, u32)>,
 ) -> Result<impl IntoResponse, APIError> {
     let mut conn = pool.acquire().await?;
     let election = crate::election::repository::get(&mut conn, election_id).await?;

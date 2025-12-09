@@ -1,6 +1,8 @@
 use chrono::NaiveDateTime;
 use sqlx::{Connection, Error, SqliteConnection, query, query_as};
 
+use crate::election::ElectionId;
+
 use super::{
     CommitteeSession, CommitteeSessionCreateRequest, CommitteeSessionFilesUpdateRequest,
     status::CommitteeSessionStatus,
@@ -61,7 +63,7 @@ pub async fn get_previous_session(
 
 pub async fn get_election_committee_session_list(
     conn: &mut SqliteConnection,
-    election_id: u32,
+    election_id: ElectionId,
 ) -> Result<Vec<CommitteeSession>, Error> {
     query_as!(
         CommitteeSession,
@@ -88,7 +90,7 @@ pub async fn get_election_committee_session_list(
 
 pub async fn get_election_committee_session(
     conn: &mut SqliteConnection,
-    election_id: u32,
+    election_id: ElectionId,
 ) -> Result<CommitteeSession, Error> {
     query_as!(
         CommitteeSession,
@@ -326,7 +328,7 @@ pub async fn change_files(
 
 pub async fn get_current_id_for_election(
     conn: &mut SqliteConnection,
-    election_id: u32,
+    election_id: ElectionId,
 ) -> Result<Option<u32>, Error> {
     query!(
         r#"

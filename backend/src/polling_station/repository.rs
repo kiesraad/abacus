@@ -1,3 +1,5 @@
+use crate::election::ElectionId;
+
 use super::structs::{PollingStation, PollingStationRequest};
 use sqlx::{Connection, SqliteConnection, query, query_as};
 
@@ -38,7 +40,7 @@ pub async fn get(conn: &mut SqliteConnection, id: u32) -> Result<PollingStation,
         r#"
         SELECT
             p.id AS "id: u32",
-            c.election_id AS "election_id: u32",
+            c.election_id AS "election_id: ElectionId",
             p.committee_session_id AS "committee_session_id: u32",
             p.id_prev_session AS "id_prev_session: _",
             p.name,
@@ -95,7 +97,7 @@ pub async fn get_by_previous_id(
 /// Get a single polling station for an election
 pub async fn get_for_election(
     conn: &mut SqliteConnection,
-    election_id: u32,
+    election_id: ElectionId,
     id: u32,
 ) -> Result<PollingStation, sqlx::Error> {
     let committee_session_id =
@@ -132,7 +134,7 @@ pub async fn get_for_election(
 /// Create a single polling station for an election
 pub async fn create(
     conn: &mut SqliteConnection,
-    election_id: u32,
+    election_id: ElectionId,
     new_polling_station: PollingStationRequest,
 ) -> Result<PollingStation, sqlx::Error> {
     let mut tx = conn.begin().await?;
@@ -194,7 +196,7 @@ pub async fn create(
 /// Create many polling stations for an election
 pub async fn create_many(
     conn: &mut SqliteConnection,
-    election_id: u32,
+    election_id: ElectionId,
     new_polling_stations: Vec<PollingStationRequest>,
 ) -> Result<Vec<PollingStation>, sqlx::Error> {
     let mut stations: Vec<PollingStation> = Vec::new();
@@ -262,7 +264,7 @@ pub async fn create_many(
 /// Update a single polling station for an election
 pub async fn update(
     conn: &mut SqliteConnection,
-    election_id: u32,
+    election_id: ElectionId,
     polling_station_id: u32,
     polling_station_update: PollingStationRequest,
 ) -> Result<PollingStation, sqlx::Error> {
@@ -327,7 +329,7 @@ pub async fn update(
 /// Delete a single polling station for an election
 pub async fn delete(
     conn: &mut SqliteConnection,
-    election_id: u32,
+    election_id: ElectionId,
     id: u32,
 ) -> Result<bool, sqlx::Error> {
     let mut tx = conn.begin().await?;

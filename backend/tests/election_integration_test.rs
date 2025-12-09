@@ -2,7 +2,8 @@
 use abacus::{
     committee_session::status::CommitteeSessionStatus,
     election::{
-        ElectionDetailsResponse, ElectionListResponse, ElectionNumberOfVotersChangeRequest,
+        ElectionDetailsResponse, ElectionId, ElectionListResponse,
+        ElectionNumberOfVotersChangeRequest,
     },
 };
 use async_zip::base::read::mem::ZipFileReader;
@@ -156,7 +157,7 @@ async fn test_election_number_of_voters_change_first_session_created_works_for_c
 ) {
     let addr = serve_api(pool).await;
     let coordinator_cookie = coordinator_login(&addr).await;
-    let election_id = 6;
+    let election_id = ElectionId::from(6);
 
     let committee_session =
         get_election_committee_session(&addr, &coordinator_cookie, election_id).await;
@@ -190,7 +191,7 @@ async fn test_election_number_of_voters_change_first_session_not_started_works_f
 ) {
     let addr = serve_api(pool).await;
     let coordinator_cookie = coordinator_login(&addr).await;
-    let election_id = 6;
+    let election_id = ElectionId::from(6);
 
     let committee_session =
         get_election_committee_session(&addr, &coordinator_cookie, election_id).await;
@@ -297,7 +298,7 @@ async fn test_election_number_of_voters_change_not_found(pool: SqlitePool) {
 async fn test_election_pdf_download_works(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let coordinator_cookie = shared::coordinator_login(&addr).await;
-    let election_id = 2;
+    let election_id = ElectionId::from(2);
     create_result(&addr, 1, election_id).await;
     create_result(&addr, 2, election_id).await;
 
@@ -373,8 +374,8 @@ async fn test_election_pdf_download_works(pool: SqlitePool) {
 async fn test_election_pdf_download_invalid_committee_session_state(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let coordinator_cookie = shared::coordinator_login(&addr).await;
-    create_result(&addr, 1, 2).await;
-    create_result(&addr, 2, 2).await;
+    create_result(&addr, 1, ElectionId::from(2)).await;
+    create_result(&addr, 2, ElectionId::from(2)).await;
 
     let url = format!("http://{addr}/api/elections/2/committee_sessions/2/download_pdf_results");
     let response = reqwest::Client::new()
@@ -392,7 +393,7 @@ async fn test_election_pdf_download_invalid_committee_session_state(pool: Sqlite
 async fn test_election_zip_download_works(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let coordinator_cookie = shared::coordinator_login(&addr).await;
-    let election_id = 2;
+    let election_id = ElectionId::from(2);
     create_result(&addr, 1, election_id).await;
     create_result(&addr, 2, election_id).await;
 
@@ -543,8 +544,8 @@ async fn test_election_zip_download_works(pool: SqlitePool) {
 async fn test_election_zip_download_invalid_committee_session_state(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let coordinator_cookie = shared::coordinator_login(&addr).await;
-    create_result(&addr, 1, 2).await;
-    create_result(&addr, 2, 2).await;
+    create_result(&addr, 1, ElectionId::from(2)).await;
+    create_result(&addr, 2, ElectionId::from(2)).await;
 
     let url = format!("http://{addr}/api/elections/2/committee_sessions/2/download_zip_results");
     let response = reqwest::Client::new()

@@ -11,6 +11,7 @@ use utoipa_axum::{router::OpenApiRouter, routes};
 use crate::{
     APIError, AppState, ErrorResponse,
     authentication::AdminOrCoordinator,
+    election::ElectionId,
     error::ErrorReference,
     pdf_gen::{
         CandidatesTables, generate_pdf, generate_pdfs,
@@ -54,7 +55,7 @@ pub fn router() -> OpenApiRouter<AppState> {
 async fn election_download_n_10_2(
     _user: AdminOrCoordinator,
     State(pool): State<SqlitePool>,
-    Path(election_id): Path<u32>,
+    Path(election_id): Path<ElectionId>,
 ) -> Result<impl IntoResponse, APIError> {
     let mut conn = pool.acquire().await?;
     let election = crate::election::repository::get(&mut conn, election_id).await?;
@@ -137,7 +138,7 @@ async fn election_download_n_10_2(
 async fn election_download_na_31_2_bijlage1(
     _user: AdminOrCoordinator,
     State(pool): State<SqlitePool>,
-    Path(election_id): Path<u32>,
+    Path(election_id): Path<ElectionId>,
 ) -> Result<impl IntoResponse, APIError> {
     let mut conn = pool.acquire().await?;
     let election = crate::election::repository::get(&mut conn, election_id).await?;
@@ -221,7 +222,7 @@ async fn election_download_na_31_2_bijlage1(
 async fn election_download_na_31_2_inlegvel(
     _user: AdminOrCoordinator,
     State(pool): State<SqlitePool>,
-    Path(election_id): Path<u32>,
+    Path(election_id): Path<ElectionId>,
 ) -> Result<impl IntoResponse, APIError> {
     let mut conn = pool.acquire().await?;
     let election = crate::election::repository::get(&mut conn, election_id).await?;

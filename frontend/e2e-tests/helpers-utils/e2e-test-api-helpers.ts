@@ -19,19 +19,18 @@ export async function loginAs(request: APIRequestContext, username: string, pass
 }
 
 export async function completePollingStationDataEntries(
-  request: APIRequestContext,
   pollingStationId: number,
+  typistOneRequest: APIRequestContext,
+  typistTwoRequest: APIRequestContext,
   firstRequest = dataEntryRequest,
   secondRequest = dataEntryRequest,
 ) {
-  await loginAs(request, "typist1");
-  const firstDataEntry = new DataEntryApiClient(request, pollingStationId, 1);
+  const firstDataEntry = new DataEntryApiClient(typistOneRequest, pollingStationId, 1);
   await firstDataEntry.claim();
   await firstDataEntry.save(firstRequest);
   await firstDataEntry.finalise();
 
-  await loginAs(request, "typist2");
-  const secondDataEntry = new DataEntryApiClient(request, pollingStationId, 2);
+  const secondDataEntry = new DataEntryApiClient(typistTwoRequest, pollingStationId, 2);
   await secondDataEntry.claim();
   await secondDataEntry.save(secondRequest);
   await secondDataEntry.finalise();

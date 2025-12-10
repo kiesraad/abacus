@@ -9,7 +9,7 @@ export class AbortInputModal {
 
   constructor(protected readonly page: Page) {
     this.modal = page.getByRole("dialog");
-    this.close = this.modal.getByRole("button", { name: "Sluiten" });
+    this.close = this.modal.getByRole("button", { name: "Venster sluiten" });
     this.heading = this.modal.getByRole("heading", {
       level: 3,
       name: "Wat wil je doen met je invoer?",

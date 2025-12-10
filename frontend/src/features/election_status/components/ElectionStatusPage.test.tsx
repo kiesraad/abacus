@@ -180,7 +180,7 @@ describe("ElectionStatusPage", () => {
     await user.click(pauseLink);
     let modal = await screen.findByRole("dialog");
 
-    const closeButton = within(modal).getByRole("button", { name: "Sluiten" });
+    const closeButton = within(modal).getByRole("button", { name: "Venster sluiten" });
     const cancelButton = within(modal).getByRole("button", { name: "Annuleren" });
     expect(closeButton).toBeVisible();
     expect(cancelButton).toBeVisible();

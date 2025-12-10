@@ -72,7 +72,7 @@ export function Modal({ title, noFlex = false, autoWidth = false, onClose, child
               onClose();
             }}
             icon={<IconCross />}
-            title={t("close")}
+            title={t("close_modal")}
             size="lg"
             variant="tertiary"
             type="button"

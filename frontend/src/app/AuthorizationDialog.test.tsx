@@ -51,7 +51,7 @@ describe("AuthorizationDialog", () => {
       </TestUserProvider>,
     );
 
-    await userEvent.click(await screen.findByRole("button", { name: "Sluiten" }));
+    await userEvent.click(await screen.findByRole("button", { name: "Venster sluiten" }));
 
     await waitFor(() => {
       expect(screen.queryByTestId("modal-title")).toBeNull();

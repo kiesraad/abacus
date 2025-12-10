@@ -452,7 +452,7 @@ describe("Election create pages", () => {
     expect(await screen.findByRole("heading", { level: 3, name: "Niet opgeslagen wijzigingen" })).toBeVisible();
 
     // Clicking close button should keep user on the import page
-    const closeButton = screen.getByRole("button", { name: "Sluiten" });
+    const closeButton = screen.getByRole("button", { name: "Venster sluiten" });
     expect(closeButton).toBeVisible();
     await user.click(closeButton);
     expect(await screen.findByRole("heading", { level: 2, name: "Controleer kandidatenlijsten" })).toBeVisible();

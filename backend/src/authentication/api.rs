@@ -142,6 +142,9 @@ async fn login(
     // Remove expired sessions, we do this after a login to prevent the necessity of periodical cleanup jobs
     super::session::delete_expired_sessions(&mut tx).await?;
 
+    // Remove possible old session for this user
+    super::session::delete_user_session(&mut tx, user.id()).await?;
+
     // Get the client IP address if available
     let ip = audit_service
         .get_ip()

@@ -12,6 +12,7 @@ use crate::{
     election::{CandidateNumber, PGNumber, PoliticalGroup},
     error::ErrorReference,
 };
+pub use yes_no::YesNo;
 
 #[derive(Serialize, Deserialize, Clone, ToSchema, Debug, FromRow, Default)]
 #[serde(deny_unknown_fields)]
@@ -348,45 +349,22 @@ pub struct CSOFirstSessionResults {
 impl CSOFirstSessionResults {
     /// The admitted voters have been recounted in this session
     pub fn admitted_voters_have_been_recounted(&self) -> bool {
-        self.counting_differences_polling_station
-            .unexplained_difference_ballots_voters
-            .yes
-            || self
-                .counting_differences_polling_station
+        matches!(
+            self.counting_differences_polling_station
+                .unexplained_difference_ballots_voters
+                .as_bool(),
+            Some(true)
+        ) || matches!(
+            self.counting_differences_polling_station
                 .difference_ballots_per_list
-                .yes
-            || self
-                .differences_counts
+                .as_bool(),
+            Some(true)
+        ) || matches!(
+            self.differences_counts
                 .difference_completely_accounted_for
-                .no
-    }
-
-    /// The results have been investigated for another reason
-    pub fn investigated_other_reason(&self) -> bool {
-        self.extra_investigation
-            .extra_investigation_other_reason
-            .yes
-    }
-
-    /// There have been recounted ballots in this session
-    pub fn ballots_have_been_recounted(&self) -> bool {
-        self.extra_investigation
-            .ballots_recounted_extra_investigation
-            .yes
-    }
-
-    /// The extra investigation for another reason field has a value
-    pub fn investigation_other_reason_is_answered(&self) -> bool {
-        self.extra_investigation
-            .extra_investigation_other_reason
-            .is_answered()
-    }
-
-    /// The ballots recounted extra investigation field has a value
-    pub fn investigation_ballots_recounted_is_answered(&self) -> bool {
-        self.extra_investigation
-            .ballots_recounted_extra_investigation
-            .is_answered()
+                .as_bool(),
+            Some(false)
+        )
     }
 }
 
@@ -562,34 +540,52 @@ impl DifferencesCounts {
     }
 }
 
-/// Yes/No response structure for boolean questions with separate yes and no fields.
-#[derive(Serialize, Deserialize, ToSchema, Clone, Debug, Default, PartialEq, Eq, Hash)]
-#[serde(deny_unknown_fields)]
-pub struct YesNo {
-    pub yes: bool,
-    pub no: bool,
-}
+mod yes_no {
+    use super::*;
 
-impl YesNo {
-    pub fn is_answered(&self) -> bool {
-        self.yes || self.no
+    /// Yes/No response structure for boolean questions with separate yes and no fields.
+    #[derive(Serialize, Deserialize, ToSchema, Clone, Debug, Default, PartialEq, Eq, Hash)]
+    #[serde(deny_unknown_fields)]
+    pub struct YesNo {
+        yes: bool,
+        no: bool,
     }
 
-    pub fn is_invalid(&self) -> bool {
-        self.yes && self.no
-    }
-
-    pub fn yes() -> Self {
-        Self {
-            yes: true,
-            no: false,
+    impl YesNo {
+        pub fn new(yes: bool, no: bool) -> Self {
+            Self { yes, no }
         }
-    }
 
-    pub fn no() -> Self {
-        Self {
-            yes: false,
-            no: true,
+        pub fn yes() -> Self {
+            Self::new(true, false)
+        }
+
+        pub fn no() -> Self {
+            Self::new(false, true)
+        }
+
+        pub fn both() -> Self {
+            Self::new(true, true)
+        }
+
+        /// true if both `yes` and `no` are false
+        pub fn is_empty(&self) -> bool {
+            !self.yes && !self.no
+        }
+
+        /// true if both `yes` and `no` are true
+        pub fn is_both(&self) -> bool {
+            self.yes && self.no
+        }
+
+        /// Some(true) if `yes` is true and `no` is false,
+        /// Some(false) if `yes` is false and `no` is true, otherwise None
+        pub fn as_bool(&self) -> Option<bool> {
+            match (self.yes, self.no) {
+                (true, false) => Some(true),
+                (false, true) => Some(false),
+                _ => None,
+            }
         }
     }
 }
@@ -798,10 +794,7 @@ pub mod tests {
                         votes_cast_greater_than_admitted_voters: false,
                         votes_cast_smaller_than_admitted_voters: false,
                     },
-                difference_completely_accounted_for: YesNo {
-                    yes: true,
-                    no: false,
-                },
+                difference_completely_accounted_for: YesNo::yes(),
             },
             political_group_votes: vec![
                 PoliticalGroupCandidateVotes::from_test_data_auto(1, &[36, 20]),

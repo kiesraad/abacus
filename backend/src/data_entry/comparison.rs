@@ -129,11 +129,9 @@ impl Compare for CountingDifferencesPollingStation {
 
 impl Compare for YesNo {
     fn compare(&self, first_entry: &Self, different_fields: &mut Vec<String>, path: &FieldPath) {
-        self.yes
-            .compare(&first_entry.yes, different_fields, &path.field("yes"));
-
-        self.no
-            .compare(&first_entry.no, different_fields, &path.field("no"));
+        if self != first_entry {
+            different_fields.push(path.to_string());
+        }
     }
 }
 

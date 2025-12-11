@@ -28,11 +28,6 @@ describe("PollingStationCreatePage", () => {
   beforeEach(() => {
     server.use(ElectionRequestHandler, PollingStationCreateHandler);
     vi.spyOn(ReactRouter, "useNavigate").mockImplementation(() => navigate);
-    vi.spyOn(ReactRouter, "Navigate").mockImplementation((props) => {
-      navigate(props.to);
-      return null;
-    });
-    vi.spyOn(ReactRouter, "useParams").mockReturnValue({ pollingStationId: "1" });
     vi.spyOn(useMessages, "useMessages").mockReturnValue({
       pushMessage,
       popMessages: vi.fn(() => []),

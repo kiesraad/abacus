@@ -76,6 +76,7 @@
     "fullname": "Volledige naam",
     "import_election_id": "Verkiezings-ID",
     "import_file_name": "Bestandsnaam",
+    "import_file_hash": "Bestandshash",
     "import_number_of_polling_stations": "Aantal geïmporteerde stembureaus",
     "ip": "IP-adres",
     "level": "Type",

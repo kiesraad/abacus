@@ -20,7 +20,7 @@ use crate::{
         status::{CommitteeSessionStatus, change_committee_session_status},
     },
     data_entry::repository::{data_entry_exists, result_exists},
-    eml::{EML110, EMLDocument, EMLImportError},
+    eml::{EML110, EMLDocument, EMLImportError, EmlHash},
     error::ErrorReference,
 };
 
@@ -375,7 +375,7 @@ async fn polling_station_validate_import(
 #[derive(Debug, Deserialize, Serialize, Clone, ToSchema)]
 pub struct PollingStationsRequest {
     pub file_name: String,
-    pub polling_stations: Vec<PollingStationRequest>,
+    pub data: String,
 }
 
 pub async fn create_imported_polling_stations(
@@ -387,14 +387,12 @@ pub async fn create_imported_polling_stations(
     let mut tx = conn.begin().await?;
 
     let committee_session = get_election_committee_session(&mut tx, election_id).await?;
+    let polling_stations =
+        EML110::from_str(&polling_stations_request.data)?.get_polling_stations()?;
+    let file_hash = EmlHash::from(polling_stations_request.data.as_bytes()).chunks;
 
     // Create new polling stations
-    let polling_stations = repository::create_many(
-        &mut tx,
-        election_id,
-        polling_stations_request.polling_stations,
-    )
-    .await?;
+    let polling_stations = repository::create_many(&mut tx, election_id, polling_stations).await?;
 
     // Create audit event
     audit_service
@@ -403,6 +401,7 @@ pub async fn create_imported_polling_stations(
             &AuditEvent::PollingStationsImported(PollingStationImportDetails {
                 import_election_id: election_id,
                 import_file_name: polling_stations_request.file_name,
+                import_file_hash: file_hash.join(" "),
                 import_number_of_polling_stations: u64::try_from(polling_stations.len())
                     .map_err(|_| EMLImportError::NumberOfPollingStationsNotInRange)?,
             }),

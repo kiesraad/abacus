@@ -42,14 +42,14 @@ async fn import_polling_stations(
     cookie: &HeaderValue,
     election_id: u32,
     file_name: &str,
-    polling_stations: serde_json::Value,
+    data: serde_json::Value,
 ) -> Response {
     let url = format!("http://{addr}/api/elections/{election_id}/polling_stations/import");
     reqwest::Client::new()
         .post(&url)
         .json(&serde_json::json!({
             "file_name": file_name,
-            "polling_stations": polling_stations,
+            "data": data,
         }))
         .header("cookie", cookie)
         .send()
@@ -1058,22 +1058,18 @@ async fn test_import_fails_when_polling_stations_exist(pool: SqlitePool) {
         get_election_committee_session(&addr, &coordinator_cookie, election_id).await;
     assert_eq!(committee_session.status, CommitteeSessionStatus::Created);
 
-    let validate_response = import_validate_polling_stations(
-        &addr,
-        &coordinator_cookie,
-        election_id,
-        include_str!("../src/eml/tests/eml110b_test.eml.xml"),
-    )
-    .await;
+    let data = include_str!("../src/eml/tests/eml110b_test.eml.xml");
+
+    let validate_response =
+        import_validate_polling_stations(&addr, &coordinator_cookie, election_id, data).await;
     assert_eq!(validate_response.status(), StatusCode::OK);
-    let body: serde_json::Value = validate_response.json().await.unwrap();
 
     let import_response = import_polling_stations(
         &addr,
         &coordinator_cookie,
         election_id,
         "eml110b_test.eml.xml",
-        body["polling_stations"].clone(),
+        data.into(),
     )
     .await;
     assert_eq!(import_response.status(), StatusCode::FORBIDDEN);
@@ -1092,22 +1088,20 @@ async fn test_import_correct_file(pool: SqlitePool) {
         get_election_committee_session(&addr, &coordinator_cookie, election_id).await;
     assert_eq!(committee_session.status, CommitteeSessionStatus::Created);
 
-    let validate_response = import_validate_polling_stations(
-        &addr,
-        &coordinator_cookie,
-        election_id,
-        include_str!("../src/eml/tests/eml110b_test.eml.xml"),
-    )
-    .await;
+    let data = include_str!("../src/eml/tests/eml110b_test.eml.xml");
+
+    let validate_response =
+        import_validate_polling_stations(&addr, &coordinator_cookie, election_id, data).await;
     assert_eq!(validate_response.status(), StatusCode::OK);
     let body: serde_json::Value = validate_response.json().await.unwrap();
+    assert_eq!(body["polling_stations"].as_array().unwrap().len(), 420);
 
     let import_response = import_polling_stations(
         &addr,
         &coordinator_cookie,
         election_id,
         "eml110b_test.eml.xml",
-        body["polling_stations"].clone(),
+        data.into(),
     )
     .await;
     assert_eq!(import_response.status(), StatusCode::OK);

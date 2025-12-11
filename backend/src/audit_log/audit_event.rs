@@ -114,6 +114,7 @@ pub struct PollingStationDetails {
 pub struct PollingStationImportDetails {
     pub import_election_id: u32,
     pub import_file_name: String,
+    pub import_file_hash: String,
     pub import_number_of_polling_stations: u64,
 }
 

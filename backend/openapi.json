@@ -6814,7 +6814,6 @@
         "required": [
           "import_election_id",
           "import_file_name",
-          "import_file_hash",
           "import_number_of_polling_stations"
         ],
         "properties": {
@@ -6822,9 +6821,6 @@
             "type": "integer",
             "format": "int32",
             "minimum": 0
-          },
-          "import_file_hash": {
-            "type": "string"
           },
           "import_file_name": {
             "type": "string"
@@ -7041,13 +7037,13 @@
         "type": "object",
         "required": [
           "file_name",
-          "data"
+          "polling_stations"
         ],
         "properties": {
-          "data": {
+          "file_name": {
             "type": "string"
           },
-          "file_name": {
+          "polling_stations": {
             "type": "string"
           }
         }

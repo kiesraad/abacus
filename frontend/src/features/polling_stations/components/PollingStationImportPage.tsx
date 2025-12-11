@@ -46,7 +46,7 @@ export function PollingStationImportPage() {
   async function importPollingStations(file: File) {
     const response = await postImport({
       file_name: file.name,
-      data: await file.text(),
+      polling_stations: await file.text(),
     } satisfies PollingStationsRequest);
 
     if (isSuccess(response)) {

@@ -428,7 +428,7 @@ pub async fn election_import(
             file_name: edu
                 .polling_station_file_name
                 .ok_or(EMLImportError::MissingFileName)?,
-            data: polling_station_data,
+            polling_stations: polling_station_data,
         };
         create_imported_polling_stations(
             &mut tx,

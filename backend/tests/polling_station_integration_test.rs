@@ -42,14 +42,14 @@ async fn import_polling_stations(
     cookie: &HeaderValue,
     election_id: u32,
     file_name: &str,
-    data: serde_json::Value,
+    polling_stations: serde_json::Value,
 ) -> Response {
     let url = format!("http://{addr}/api/elections/{election_id}/polling_stations/import");
     reqwest::Client::new()
         .post(&url)
         .json(&serde_json::json!({
             "file_name": file_name,
-            "data": data,
+            "polling_stations": polling_stations,
         }))
         .header("cookie", cookie)
         .send()

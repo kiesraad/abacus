@@ -986,7 +986,6 @@ export interface PollingStationFileRequest {
 
 export interface PollingStationImportDetails {
   import_election_id: number;
-  import_file_hash: string;
   import_file_name: string;
   import_number_of_polling_stations: number;
 }
@@ -1055,8 +1054,8 @@ export type PollingStationResults =
 export type PollingStationType = "FixedLocation" | "Special" | "Mobile";
 
 export interface PollingStationsRequest {
-  data: string;
   file_name: string;
+  polling_stations: string;
 }
 
 export type RandomRange = string;

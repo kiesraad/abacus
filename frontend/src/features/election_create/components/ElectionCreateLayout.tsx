@@ -32,6 +32,7 @@ export function ElectionCreateLayout() {
   const location = useLocation();
 
   const currentFormSection = formSections.findIndex((formSection) => location.pathname.endsWith(formSection.path));
+  const fixedSections = formSections.slice(0, formSections.length - 1);
 
   return (
     <ElectionCreateContextProvider>
@@ -42,42 +43,35 @@ export function ElectionCreateLayout() {
       <main>
         <StickyNav>
           <ProgressList>
-            {formSections.map((formSection, index) => {
-              if (index === formSections.length - 1) {
-                return (
-                  <div className="mt-md" key={formSection.key}>
-                    <ProgressList.Fixed>
-                      <ProgressList.Item
-                        key="check_and_save"
-                        status="idle"
-                        disabled={currentFormSection !== formSections.length - 1}
-                        active={currentFormSection === formSections.length - 1}
-                      >
-                        <span>{t("election.check_and_save.title")}</span>
-                      </ProgressList.Item>
-                    </ProgressList.Fixed>
-                  </div>
-                );
-              } else {
-                return (
-                  <ProgressList.Fixed key={formSection.key}>
-                    <ProgressList.Item
-                      status={index < currentFormSection ? "accept" : "idle"}
-                      active={index === currentFormSection}
-                      disabled={index > currentFormSection}
-                    >
-                      {index >= currentFormSection ? (
-                        <span>{formSection.label}</span>
-                      ) : (
-                        <Link to={`/elections/${formSection.path}`}>
-                          <span>{formSection.label}</span>
-                        </Link>
-                      )}
-                    </ProgressList.Item>
-                  </ProgressList.Fixed>
-                );
-              }
-            })}
+            <ProgressList.Fixed>
+              {fixedSections.map((formSection, index) => (
+                <ProgressList.Item
+                  key={formSection.key}
+                  status={index < currentFormSection ? "accept" : "idle"}
+                  active={index === currentFormSection}
+                  disabled={index > currentFormSection}
+                >
+                  {index >= currentFormSection ? (
+                    <span>{formSection.label}</span>
+                  ) : (
+                    <Link to={`/elections/${formSection.path}`}>
+                      <span>{formSection.label}</span>
+                    </Link>
+                  )}
+                </ProgressList.Item>
+              ))}
+            </ProgressList.Fixed>
+
+            <ProgressList.Fixed>
+              <ProgressList.Item
+                key="check_and_save"
+                status="idle"
+                disabled={currentFormSection !== formSections.length - 1}
+                active={currentFormSection === formSections.length - 1}
+              >
+                <span>{t("election.check_and_save.title")}</span>
+              </ProgressList.Item>
+            </ProgressList.Fixed>
           </ProgressList>
         </StickyNav>
         <article className={cls.container}>

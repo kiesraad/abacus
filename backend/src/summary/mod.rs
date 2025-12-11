@@ -238,11 +238,19 @@ impl PollingStationInvestigations {
             self.admitted_voters_recounted.push(polling_station.number);
         }
 
-        if result.investigated_other_reason() {
+        if let Some(true) = result
+            .extra_investigation
+            .extra_investigation_other_reason
+            .as_bool()
+        {
             self.investigated_other_reason.push(polling_station.number);
         }
 
-        if result.ballots_have_been_recounted() {
+        if let Some(true) = result
+            .extra_investigation
+            .ballots_recounted_extra_investigation
+            .as_bool()
+        {
             self.ballots_recounted.push(polling_station.number);
         }
     }
@@ -316,7 +324,7 @@ mod tests {
             differences_counts: {
                 let mut tmp = DifferencesCounts::zero();
                 tmp.more_ballots_count = 1;
-                tmp.difference_completely_accounted_for.yes = true;
+                tmp.difference_completely_accounted_for = YesNo::yes();
                 tmp.compare_votes_cast_admitted_voters
                     .votes_cast_greater_than_admitted_voters = true;
                 tmp
@@ -361,7 +369,7 @@ mod tests {
                 tmp.fewer_ballots_count = 2;
                 tmp.compare_votes_cast_admitted_voters
                     .votes_cast_smaller_than_admitted_voters = true;
-                tmp.difference_completely_accounted_for.no = true;
+                tmp.difference_completely_accounted_for = YesNo::no();
                 tmp
             },
             political_group_votes: vec![
@@ -377,7 +385,7 @@ mod tests {
         let diff2 = {
             let mut tmp = DifferencesCounts::valid_default();
             tmp.more_ballots_count = 1;
-            tmp.difference_completely_accounted_for.yes = true;
+            tmp.difference_completely_accounted_for = YesNo::yes();
             tmp.compare_votes_cast_admitted_voters
                 .votes_cast_greater_than_admitted_voters = true;
             tmp

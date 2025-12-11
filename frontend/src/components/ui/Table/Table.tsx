@@ -21,7 +21,6 @@ Table.Header = Header;
 Table.HeaderCell = HeaderCell;
 Table.Body = Body;
 Table.Row = Row;
-Table.LinkRow = LinkRow;
 Table.ClickRow = ClickRow;
 Table.TotalRow = TotalRow;
 Table.Cell = Cell;
@@ -64,51 +63,42 @@ function Body({ children, className }: { children: React.ReactNode; className?: 
   return <tbody className={className}>{children}</tbody>;
 }
 
-function Row({ id, children, className }: { id?: string; children: React.ReactNode; className?: string }) {
-  return (
-    <tr id={id} className={className}>
-      {children}
-    </tr>
-  );
+function Row({ id, children, to, className }: { id?: string; children: React.ReactNode; to?: To; className?: string }) {
+  const navigate = useNavigate();
+
+  if (to) {
+    return (
+      <tr id={id} className={cn(cls.rowLink, className)} onClick={() => void navigate(to)}>
+        {children}
+      </tr>
+    );
+  } else {
+    return (
+      <tr id={id} className={className}>
+        {children}
+      </tr>
+    );
+  }
 }
 
 function ClickRow({
   children,
   onClick,
+  downloadIcon,
   active,
   className,
 }: {
   children: React.ReactNode;
   onClick: () => void;
+  downloadIcon?: boolean;
   active?: boolean;
   className?: string;
 }) {
   return (
-    <tr className={cn(cls.rowLink, active && cls.active, className)} onClick={onClick}>
-      {children}
-    </tr>
-  );
-}
-
-function LinkRow({
-  id,
-  children,
-  to,
-  className,
-}: {
-  id?: string;
-  children: React.ReactNode;
-  to: To;
-  className?: string;
-}) {
-  const navigate = useNavigate();
-
-  function handleClick() {
-    void navigate(to);
-  }
-
-  return (
-    <tr id={id} className={cn(cls.rowLink, className)} onClick={handleClick}>
+    <tr
+      className={cn(cls.rowLink, downloadIcon && cls.downloadIcon, active && cls.active, className)}
+      onClick={onClick}
+    >
       {children}
     </tr>
   );

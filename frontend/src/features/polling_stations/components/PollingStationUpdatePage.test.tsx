@@ -80,7 +80,7 @@ describe("PollingStationUpdatePage", () => {
     expect(screen.getByRole("textbox", { name: "Naam" })).toHaveValue("Op Rolletjes");
   });
 
-  test("Navigates back on save", async () => {
+  test("Navigates back on save with a success message", async () => {
     renderPage("coordinator");
 
     expect(await screen.findByTestId("polling-station-form")).toBeVisible();
@@ -89,6 +89,25 @@ describe("PollingStationUpdatePage", () => {
 
     await waitFor(() => {
       expect(pushMessage).toHaveBeenCalledWith({ title: "Wijzigingen stembureau 34 (Testplek) opgeslagen" });
+      expect(navigate).toHaveBeenCalledExactlyOnceWith("/elections/1/polling-stations");
+    });
+  });
+
+  test("Navigates back on save with a warning message when data entry finished", async () => {
+    overrideOnce("get", "/api/elections/1", 200, getElectionMockData({}, { status: "data_entry_finished" }));
+
+    renderPage("coordinator");
+
+    expect(await screen.findByTestId("polling-station-form")).toBeVisible();
+    const saveButton = await screen.findByRole("button", { name: "Wijzigingen opslaan" });
+    saveButton.click();
+
+    await waitFor(() => {
+      expect(pushMessage).toHaveBeenCalledWith({
+        type: "warning",
+        title: "Maak een nieuw proces-verbaal voor deze zitting",
+        text: "Wijzigingen stembureau 34 (Testplek) opgeslagen. De eerder gemaakte documenten van deze zitting zijn daardoor niet meer geldig. Maak een nieuw proces-verbaal door de invoerfase opnieuw af te ronden.",
+      });
       expect(navigate).toHaveBeenCalledExactlyOnceWith("/elections/1/polling-stations");
     });
   });
@@ -165,7 +184,7 @@ describe("PollingStationUpdatePage", () => {
       expect(pushMessage).toHaveBeenCalledWith({
         type: "warning",
         title: "Maak een nieuw proces-verbaal voor deze zitting",
-        text: "Stembureau 33 (Op Rolletjes) is verwijderd. De eerder gemaakte documenten van deze zitting zijn daardoor niet meer geldig. Maak een nieuw proces-verbaal door de invoerfase opnieuw af te ronden.",
+        text: "Stembureau 33 (Op Rolletjes) verwijderd. De eerder gemaakte documenten van deze zitting zijn daardoor niet meer geldig. Maak een nieuw proces-verbaal door de invoerfase opnieuw af te ronden.",
       });
       expect(navigate).toHaveBeenCalledExactlyOnceWith("/elections/1/polling-stations", { replace: true });
     });

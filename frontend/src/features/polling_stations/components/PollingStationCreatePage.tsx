@@ -10,20 +10,31 @@ import { PollingStationAlert } from "./PollingStationAlert";
 import { PollingStationForm } from "./PollingStationForm";
 
 export function PollingStationCreatePage() {
-  const { election } = useElection();
+  const { currentCommitteeSession, election, refetch } = useElection();
   const { pushMessage } = useMessages();
   const navigate = useNavigate();
 
   const parentUrl = `/elections/${election.id}/polling-stations`;
 
   function handleSaved(pollingStation: PollingStation) {
-    pushMessage({
-      title: t("polling_station.message.polling_station_created", {
-        number: pollingStation.number,
-        name: pollingStation.name,
-      }),
-    });
-
+    if (currentCommitteeSession.status === "data_entry_finished") {
+      pushMessage({
+        type: "warning",
+        title: t("generate_new_results"),
+        text: `${t("polling_station.message.polling_station_created", {
+          number: pollingStation.number,
+          name: pollingStation.name,
+        })}. ${t("documents_are_invalidated")}`,
+      });
+    } else {
+      pushMessage({
+        title: t("polling_station.message.polling_station_created", {
+          number: pollingStation.number,
+          name: pollingStation.name,
+        }),
+      });
+    }
+    void refetch();
     void navigate(parentUrl);
   }
 

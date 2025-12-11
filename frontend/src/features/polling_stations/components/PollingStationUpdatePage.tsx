@@ -45,13 +45,24 @@ export function PollingStationUpdatePage() {
   }
 
   function handleSaved(pollingStation: PollingStation) {
-    pushMessage({
-      title: t("polling_station.message.polling_station_updated", {
-        number: pollingStation.number,
-        name: pollingStation.name,
-      }),
-    });
-
+    if (currentCommitteeSession.status === "data_entry_finished") {
+      pushMessage({
+        type: "warning",
+        title: t("generate_new_results"),
+        text: `${t("polling_station.message.polling_station_updated", {
+          number: pollingStation.number,
+          name: pollingStation.name,
+        })}. ${t("documents_are_invalidated")}`,
+      });
+    } else {
+      pushMessage({
+        title: t("polling_station.message.polling_station_updated", {
+          number: pollingStation.number,
+          name: pollingStation.name,
+        }),
+      });
+    }
+    void refetch();
     void navigate(parentUrl);
   }
 
@@ -64,11 +75,11 @@ export function PollingStationUpdatePage() {
     if (currentCommitteeSession.status === "data_entry_finished") {
       pushMessage({
         type: "warning",
-        title: t("polling_station.message.generate_new_results"),
-        text: t("polling_station.message.documents_are_invalid", {
+        title: t("generate_new_results"),
+        text: `${t("polling_station.message.polling_station_deleted", {
           number: pollingStation.number,
           name: pollingStation.name,
-        }),
+        })}. ${t("documents_are_invalidated")}`,
       });
     } else {
       pushMessage({

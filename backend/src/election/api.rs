@@ -354,16 +354,19 @@ pub struct ElectionAndCandidatesDefinitionImportRequest {
     ),
     security(("cookie_auth" = ["administrator"])),
 )]
+#[allow(clippy::too_many_lines)]
 pub async fn election_import(
     _user: Admin,
     State(pool): State<SqlitePool>,
     audit_service: AuditService,
     Json(edu): Json<ElectionAndCandidatesDefinitionImportRequest>,
 ) -> Result<(StatusCode, Json<ElectionWithPoliticalGroups>), APIError> {
-    if edu.election_hash != EmlHash::from(edu.election_data.as_bytes()).chunks {
+    let election_data_hash = EmlHash::from(edu.election_data.as_bytes()).chunks;
+    if edu.election_hash != election_data_hash {
         return Err(APIError::InvalidHashError);
     }
-    if edu.candidate_hash != EmlHash::from(edu.candidate_data.as_bytes()).chunks {
+    let candidate_data_hash = EmlHash::from(edu.candidate_data.as_bytes()).chunks;
+    if edu.candidate_hash != candidate_data_hash {
         return Err(APIError::InvalidHashError);
     }
 
@@ -391,11 +394,16 @@ pub async fn election_import(
     // Create new election
     let mut tx = pool.begin_immediate().await?;
     let election = crate::election::repository::create(&mut tx, new_election).await?;
+    let message = format!(
+        "Election file hash: {}, candidates file hash: {}",
+        election_data_hash.join(" "),
+        candidate_data_hash.join(" ")
+    );
     audit_service
         .log(
             &mut tx,
             &AuditEvent::ElectionCreated(election.clone().into()),
-            None,
+            Some(message),
         )
         .await?;
 

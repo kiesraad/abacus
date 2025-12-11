@@ -1,14 +1,10 @@
 #![cfg(test)]
 use std::net::SocketAddr;
 
-use abacus::{
-    committee_session::status::CommitteeSessionStatus,
-    data_entry::{
-        CSONextSessionResults, DataEntry, PoliticalGroupTotalVotes, PollingStationResults,
-        VotersCounts, VotesCounts,
-        status::{ClientState, DataEntryStatusName},
-    },
-    election::ElectionId,
+use abacus::data_entry::{
+    CSONextSessionResults, DataEntry, PoliticalGroupTotalVotes, PollingStationResults,
+    VotersCounts, VotesCounts,
+    status::{ClientState, DataEntryStatusName},
 };
 use axum::http::StatusCode;
 use reqwest::Response;
@@ -46,7 +42,7 @@ async fn conclude_investigation(
         .post(&url)
         .header("cookie", coordinator_cookie)
         .header("Content-Type", "application/json")
-        .body(body.to_string())
+        .json(&body)
         .send()
         .await
         .unwrap()
@@ -67,7 +63,7 @@ async fn delete_investigation(addr: &SocketAddr, polling_station_id: u32) -> Res
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_7_four_sessions", "users"))))]
 async fn test_create_conclude_update_delete(pool: SqlitePool) {
     let addr = serve_api(pool).await;
-    let election_id = ElectionId::from(7);
+    let election_id = 7;
     let polling_station_id = 741;
 
     let election_details =
@@ -153,11 +149,11 @@ async fn test_create_conclude_update_delete(pool: SqlitePool) {
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_7_four_sessions", "users"))))]
 async fn test_deletion_setting_committee_session_back_to_created_status(pool: SqlitePool) {
     let addr = serve_api(pool).await;
-    let election_id = ElectionId::from(7);
+    let election_id = 7;
 
     let committee_session =
         get_election_committee_session(&addr, &coordinator_login(&addr).await, election_id).await;
-    assert_eq!(committee_session.status, CommitteeSessionStatus::Created);
+    assert_eq!(committee_session.status.to_string(), "created".to_string());
 
     // Create 2 investigations
     assert_eq!(
@@ -178,8 +174,8 @@ async fn test_deletion_setting_committee_session_back_to_created_status(pool: Sq
     let committee_session =
         get_election_committee_session(&addr, &coordinator_login(&addr).await, election_id).await;
     assert_eq!(
-        committee_session.status,
-        CommitteeSessionStatus::DataEntryNotStarted
+        committee_session.status.to_string(),
+        "data_entry_not_started".to_string()
     );
 
     // Delete last investigation
@@ -190,13 +186,13 @@ async fn test_deletion_setting_committee_session_back_to_created_status(pool: Sq
 
     let committee_session =
         get_election_committee_session(&addr, &coordinator_login(&addr).await, election_id).await;
-    assert_eq!(committee_session.status, CommitteeSessionStatus::Created);
+    assert_eq!(committee_session.status.to_string(), "created".to_string());
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_5_with_results", "users"))))]
 async fn test_deletion_removes_polling_station_from_status(pool: SqlitePool) {
     let addr = serve_api(pool).await;
-    let election_id = ElectionId::from(5);
+    let election_id = 5;
     let polling_station_id = 11;
 
     let statuses = get_statuses(&addr, &coordinator_login(&addr).await, election_id).await;
@@ -220,7 +216,7 @@ async fn test_deletion_removes_polling_station_from_status(pool: SqlitePool) {
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_7_four_sessions", "users"))))]
 async fn test_partials_update(pool: SqlitePool) {
     let addr = serve_api(pool).await;
-    let election_id = ElectionId::from(7);
+    let election_id = 7;
     let polling_station_id = 741;
 
     assert_eq!(
@@ -364,7 +360,7 @@ fn second_session_data_entry_two_political_groups() -> DataEntry {
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_7_four_sessions", "users"))))]
 async fn test_update_with_result(pool: SqlitePool) {
     let addr = serve_api(pool).await;
-    let election_id = ElectionId::from(7);
+    let election_id = 7;
     let polling_station_id = 741;
 
     // Create and conclude investigation
@@ -426,7 +422,7 @@ async fn test_update_with_result(pool: SqlitePool) {
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_7_four_sessions", "users"))))]
 async fn test_update_with_data_entry(pool: SqlitePool) {
     let addr = serve_api(pool).await;
-    let election_id = ElectionId::from(7);
+    let election_id = 7;
     let polling_station_id = 741;
 
     // Create and conclude investigation
@@ -490,7 +486,7 @@ async fn test_update_with_data_entry(pool: SqlitePool) {
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_7_four_sessions", "users"))))]
 async fn test_creation_for_committee_session_with_created_status(pool: SqlitePool) {
     let addr = serve_api(pool).await;
-    let election_id = ElectionId::from(7);
+    let election_id = 7;
 
     assert_eq!(
         create_investigation(&addr, 741).await.status(),
@@ -500,8 +496,8 @@ async fn test_creation_for_committee_session_with_created_status(pool: SqlitePoo
     let committee_session =
         get_election_committee_session(&addr, &coordinator_login(&addr).await, election_id).await;
     assert_eq!(
-        committee_session.status,
-        CommitteeSessionStatus::DataEntryNotStarted
+        committee_session.status.to_string(),
+        "data_entry_not_started".to_string()
     );
 }
 
@@ -574,8 +570,7 @@ async fn test_can_only_update_current_session(pool: SqlitePool) {
 async fn test_can_conclude_update_new_polling_station_corrected_results_true(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let coordinator_cookie = coordinator_login(&addr).await;
-    let ps_response =
-        create_polling_station(&addr, &coordinator_cookie, ElectionId::from(7), 123).await;
+    let ps_response = create_polling_station(&addr, &coordinator_cookie, 7, 123).await;
     let ps_body: serde_json::Value = ps_response.json().await.unwrap();
     let new_ps_id = u32::try_from(ps_body["id"].as_u64().unwrap()).unwrap();
 
@@ -608,8 +603,7 @@ async fn test_can_conclude_update_new_polling_station_corrected_results_true(poo
 async fn test_cannot_conclude_update_new_polling_station_corrected_results_false(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let coordinator_cookie = coordinator_login(&addr).await;
-    let ps_response =
-        create_polling_station(&addr, &coordinator_cookie, ElectionId::from(7), 123).await;
+    let ps_response = create_polling_station(&addr, &coordinator_cookie, 7, 123).await;
     let ps_body: serde_json::Value = ps_response.json().await.unwrap();
     let new_ps_id = u32::try_from(ps_body["id"].as_u64().unwrap()).unwrap();
 
@@ -731,7 +725,7 @@ async fn check_finished_to_in_progress_on<F, Fut>(
     F: FnOnce() -> Fut,
     Fut: Future<Output = Response>,
 {
-    let election_id = ElectionId::from(5);
+    let election_id = 5;
     let committee_session_id = 6;
 
     if pre_create {
@@ -758,14 +752,14 @@ async fn check_finished_to_in_progress_on<F, Fut>(
         &coordinator_cookie,
         election_id,
         committee_session_id,
-        CommitteeSessionStatus::DataEntryFinished,
+        "data_entry_finished",
     )
     .await;
     let committee_session =
         get_election_committee_session(addr, &coordinator_cookie, election_id).await;
     assert_eq!(
-        committee_session.status,
-        CommitteeSessionStatus::DataEntryFinished
+        committee_session.status.to_string(),
+        "data_entry_finished".to_string()
     );
 
     let status = action().await.status();
@@ -775,8 +769,8 @@ async fn check_finished_to_in_progress_on<F, Fut>(
     let committee_session =
         get_election_committee_session(addr, &coordinator_cookie, election_id).await;
     assert_eq!(
-        committee_session.status,
-        CommitteeSessionStatus::DataEntryInProgress
+        committee_session.status.to_string(),
+        "data_entry_in_progress".to_string()
     );
 }
 
@@ -831,7 +825,7 @@ async fn test_finished_to_in_progress_on_delete_non_last(pool: SqlitePool) {
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_7_four_sessions", "users"))))]
 async fn test_finished_to_created_on_delete_last(pool: SqlitePool) {
     let addr = serve_api(pool).await;
-    let election_id = ElectionId::from(7);
+    let election_id = 7;
     let committee_session_id = 704;
 
     assert_eq!(
@@ -856,14 +850,14 @@ async fn test_finished_to_created_on_delete_last(pool: SqlitePool) {
         &coordinator_cookie,
         election_id,
         committee_session_id,
-        CommitteeSessionStatus::DataEntryFinished,
+        "data_entry_finished",
     )
     .await;
     let committee_session =
         get_election_committee_session(&addr, &coordinator_cookie, election_id).await;
     assert_eq!(
-        committee_session.status,
-        CommitteeSessionStatus::DataEntryFinished
+        committee_session.status.to_string(),
+        "data_entry_finished".to_string()
     );
 
     let status = delete_investigation(&addr, 741).await.status();
@@ -872,5 +866,5 @@ async fn test_finished_to_created_on_delete_last(pool: SqlitePool) {
     let coordinator_cookie = coordinator_login(&addr).await;
     let committee_session =
         get_election_committee_session(&addr, &coordinator_cookie, election_id).await;
-    assert_eq!(committee_session.status, CommitteeSessionStatus::Created);
+    assert_eq!(committee_session.status.to_string(), "created".to_string());
 }

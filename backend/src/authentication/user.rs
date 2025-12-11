@@ -137,7 +137,7 @@ where
     }
 }
 
-/// Implement the FromRequestParts trait for PartialUser,
+/// Implement the FromRequestParts trait for IncompleteUser,
 /// for endpoints that are needed to fully set up the account
 impl<S> FromRequestParts<S> for IncompleteUser
 where

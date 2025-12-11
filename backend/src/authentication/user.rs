@@ -12,7 +12,7 @@ use super::{
     password::{HashedPassword, ValidatedPassword, hash_password, verify_password},
     role::Role,
 };
-use crate::{APIError, audit_log::UserDetails, authentication::role::PartialUser};
+use crate::{APIError, audit_log::UserDetails, authentication::role::IncompleteUser};
 
 const MIN_UPDATE_LAST_ACTIVITY_AT_SECS: i64 = 60; // 1 minute
 
@@ -139,7 +139,7 @@ where
 
 /// Implement the FromRequestParts trait for PartialUser,
 /// for endpoints that are needed to fully set up the account
-impl<S> FromRequestParts<S> for PartialUser
+impl<S> FromRequestParts<S> for IncompleteUser
 where
     S: Send + Sync,
 {
@@ -150,7 +150,7 @@ where
             return Err(AuthenticationError::Unauthenticated.into());
         };
 
-        Ok(PartialUser(user.clone()))
+        Ok(IncompleteUser(user.clone()))
     }
 }
 

@@ -50,7 +50,7 @@ pub struct AdminOrCoordinator(pub User);
 
 /// A user with potentially no fullname or needs_password_change=true
 #[allow(unused)]
-pub struct PartialUser(pub User);
+pub struct IncompleteUser(pub User);
 
 impl AdminOrCoordinator {
     /// Returns true if the user is an administrator

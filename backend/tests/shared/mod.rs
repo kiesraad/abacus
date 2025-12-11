@@ -3,9 +3,7 @@
 use std::{collections::BTreeMap, net::SocketAddr};
 
 use abacus::{
-    committee_session::{
-        CommitteeSession, CommitteeSessionStatusChangeRequest, status::CommitteeSessionStatus,
-    },
+    committee_session::CommitteeSession,
     data_entry::{
         CSOFirstSessionResults, CandidateVotes, Count, CountingDifferencesPollingStation,
         DataEntry, DifferenceCountsCompareVotesCastAdmittedVoters, DifferencesCounts,
@@ -18,8 +16,7 @@ use abacus::{
 
 use axum::http::{HeaderValue, StatusCode};
 use hyper::header::CONTENT_TYPE;
-use reqwest::{Body, Response};
-use serde_json::json;
+use reqwest::Response;
 
 pub fn differences_counts_zero() -> DifferencesCounts {
     DifferencesCounts {
@@ -104,7 +101,7 @@ pub async fn create_polling_station(
         .post(&url)
         .header("cookie", cookie)
         .header("Content-Type", "application/json")
-        .json(&json!({
+        .json(&&serde_json::json!({
             "name": "Test polling station",
             "number": number,
             "number_of_voters": 123,
@@ -221,14 +218,13 @@ async fn check_data_entry_status_is_definitive(
 pub async fn create_investigation(addr: &SocketAddr, polling_station_id: u32) -> Response {
     let url = format!("http://{addr}/api/polling_stations/{polling_station_id}/investigation");
     let coordinator_cookie = coordinator_login(addr).await;
-    let body = json!({
-        "reason": "Test reason"
-    });
     reqwest::Client::new()
         .post(&url)
         .header("cookie", coordinator_cookie)
         .header("Content-Type", "application/json")
-        .body(body.to_string())
+        .json(&serde_json::json!({
+            "reason": "Test reason"
+        }))
         .send()
         .await
         .unwrap()
@@ -240,7 +236,7 @@ pub async fn update_investigation(
     body: Option<serde_json::Value>,
 ) -> Response {
     let coordinator_cookie = coordinator_login(addr).await;
-    let body = body.unwrap_or(json!({
+    let body = body.unwrap_or(serde_json::json!({
         "reason": "Updated reason",
         "findings": "updated test findings",
         "corrected_results": true
@@ -250,7 +246,7 @@ pub async fn update_investigation(
         .put(&url)
         .header("cookie", coordinator_cookie)
         .header("Content-Type", "application/json")
-        .body(body.to_string())
+        .json(&body)
         .send()
         .await
         .unwrap()
@@ -338,7 +334,7 @@ pub async fn change_status_committee_session(
     cookie: &HeaderValue,
     election_id: u32,
     committee_session_id: u32,
-    status: CommitteeSessionStatus,
+    status: &str,
 ) {
     let url = format!(
         "http://{addr}/api/elections/{election_id}/committee_sessions/{committee_session_id}/status"
@@ -346,7 +342,7 @@ pub async fn change_status_committee_session(
     let response = reqwest::Client::new()
         .put(&url)
         .header("cookie", cookie)
-        .json(&CommitteeSessionStatusChangeRequest { status })
+        .json(&serde_json::json!({"status": status }))
         .send()
         .await
         .unwrap();
@@ -403,13 +399,10 @@ pub async fn login(addr: &SocketAddr, username: &str, password: &str) -> HeaderV
     let response = reqwest::Client::new()
         .post(&url)
         .header(CONTENT_TYPE, "application/json")
-        .body(Body::from(
-            json!({
-                "username": username,
-                "password": password,
-            })
-            .to_string(),
-        ))
+        .json(&serde_json::json!({
+            "username": username,
+            "password": password,
+        }))
         .send()
         .await
         .unwrap();

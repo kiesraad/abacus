@@ -23,14 +23,14 @@ async fn test_route_authorization(pool: SqlitePool) {
     let auth_states = [
         (None, None),
         (
-            Some(Role::Administrator),
+            Some("administrator"),
             Some(shared::admin_login(&addr).await),
         ),
         (
-            Some(Role::Coordinator),
+            Some("coordinator"),
             Some(shared::coordinator_login(&addr).await),
         ),
-        (Some(Role::Typist), Some(shared::typist_login(&addr).await)),
+        (Some("typist"), Some(shared::typist_login(&addr).await)),
     ];
 
     let client = reqwest::Client::new();

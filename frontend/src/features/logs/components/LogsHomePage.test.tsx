@@ -85,7 +85,7 @@ describe("LogsHomePage", () => {
       ].join(""),
     );
 
-    const closeButton = await screen.findByRole("button", { name: "Annuleren" });
+    const closeButton = await screen.findByRole("button", { name: "Venster sluiten" });
     await user.click(closeButton);
 
     expect(list).not.toBeVisible();

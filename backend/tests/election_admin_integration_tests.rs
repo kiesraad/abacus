@@ -1,9 +1,6 @@
 #![cfg(test)]
 
-use abacus::{
-    committee_session::status::CommitteeSessionStatus,
-    election::{ElectionDefinitionValidateResponse, ElectionWithPoliticalGroups},
-};
+use abacus::election::ElectionDefinitionValidateResponse;
 use axum::http::StatusCode;
 use sqlx::SqlitePool;
 use test_log::test;
@@ -388,16 +385,24 @@ async fn test_election_import_save_with_polling_stations(pool: SqlitePool) {
         .unwrap();
 
     assert_eq!(response.status(), StatusCode::CREATED);
-    let body: ElectionWithPoliticalGroups = response.json().await.unwrap();
-    let election_details = shared::get_election_details(&addr, &admin_cookie, body.id).await;
+    let body: serde_json::Value = response.json().await.unwrap();
+    let election_details = shared::get_election_details(
+        &addr,
+        &admin_cookie,
+        u32::try_from(body["id"].as_u64().unwrap()).unwrap(),
+    )
+    .await;
     assert_eq!(
-        election_details.election.counting_method,
-        abacus::election::VoteCountingMethod::CSO
+        election_details.election.counting_method.to_string(),
+        "cso".to_string()
     );
     assert_eq!(election_details.election.number_of_voters, 1234);
     assert_eq!(
-        election_details.current_committee_session.status,
-        CommitteeSessionStatus::DataEntryNotStarted,
+        election_details
+            .current_committee_session
+            .status
+            .to_string(),
+        "data_entry_not_started".to_string()
     );
 }
 
@@ -433,16 +438,24 @@ async fn test_election_import_save_without_polling_stations(pool: SqlitePool) {
         .unwrap();
 
     assert_eq!(response.status(), StatusCode::CREATED);
-    let body: ElectionWithPoliticalGroups = response.json().await.unwrap();
-    let election_details = shared::get_election_details(&addr, &admin_cookie, body.id).await;
+    let body: serde_json::Value = response.json().await.unwrap();
+    let election_details = shared::get_election_details(
+        &addr,
+        &admin_cookie,
+        u32::try_from(body["id"].as_u64().unwrap()).unwrap(),
+    )
+    .await;
     assert_eq!(
         election_details.election.counting_method,
         abacus::election::VoteCountingMethod::CSO
     );
     assert_eq!(election_details.election.number_of_voters, 1234);
     assert_eq!(
-        election_details.current_committee_session.status,
-        CommitteeSessionStatus::Created
+        election_details
+            .current_committee_session
+            .status
+            .to_string(),
+        "created".to_string()
     );
 }
 

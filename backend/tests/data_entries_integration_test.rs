@@ -2,13 +2,8 @@
 
 use std::net::SocketAddr;
 
-use abacus::{
-    ErrorResponse,
-    data_entry::{
-        ClaimDataEntryResponse, ElectionStatusResponse, SaveDataEntryResponse,
-        ValidationResultCode, status::DataEntryStatusName::*,
-    },
-    election::ElectionId,
+use abacus::data_entry::{
+    ClaimDataEntryResponse, ElectionStatusResponse, SaveDataEntryResponse, ValidationResultCode,
 };
 use axum::http::HeaderValue;
 use reqwest::{Response, StatusCode};
@@ -226,9 +221,9 @@ async fn test_polling_station_data_entry_invalid(pool: SqlitePool) {
 
     // Ensure the response is what we expect
     assert_eq!(response.status(), StatusCode::UNPROCESSABLE_ENTITY);
-    let body: ErrorResponse = response.json().await.unwrap();
+    let body: serde_json::Value = response.json().await.unwrap();
     assert_eq!(
-        body.error,
+        body["error"],
         "Failed to deserialize the JSON body into the target type: data: \
          invalid type: null, expected internally tagged enum PollingStationResults at line 1 column 12"
     );
@@ -389,17 +384,17 @@ async fn test_election_details_status(pool: SqlitePool) {
     let typist2_cookie = shared::typist2_login(&addr).await;
     let typist2_user_id = 6;
     let coordinator_cookie = shared::coordinator_login(&addr).await;
-    let election_id = ElectionId::from(2);
+    let election_id = 2;
 
     // Ensure the statuses are "NotStarted"
     let statuses = get_statuses(&addr, &coordinator_cookie, election_id).await;
 
-    assert_eq!(statuses[&1].status, FirstEntryNotStarted);
+    assert_eq!(statuses[&1].status.to_string(), "first_entry_not_started");
     assert_eq!(statuses[&1].first_entry_user_id, None);
     assert_eq!(statuses[&1].second_entry_user_id, None);
     assert_eq!(statuses[&1].first_entry_progress, None);
     assert_eq!(statuses[&1].second_entry_progress, None);
-    assert_eq!(statuses[&2].status, FirstEntryNotStarted);
+    assert_eq!(statuses[&2].status.to_string(), "first_entry_not_started");
     assert_eq!(statuses[&2].first_entry_user_id, None);
     assert_eq!(statuses[&2].second_entry_user_id, None);
     assert_eq!(statuses[&2].first_entry_progress, None);
@@ -422,13 +417,13 @@ async fn test_election_details_status(pool: SqlitePool) {
     // polling station 1's first entry is now complete, polling station 2 is still incomplete and set to in progress
     let statuses = get_statuses(&addr, &coordinator_cookie, election_id).await;
 
-    assert_eq!(statuses[&1].status, SecondEntryNotStarted);
+    assert_eq!(statuses[&1].status.to_string(), "second_entry_not_started");
     assert_eq!(statuses[&1].first_entry_user_id, Some(typist_user_id));
     assert_eq!(statuses[&1].second_entry_user_id, None);
     assert_eq!(statuses[&1].first_entry_progress, Some(100));
     assert_eq!(statuses[&1].second_entry_progress, None);
 
-    assert_eq!(statuses[&2].status, FirstEntryInProgress);
+    assert_eq!(statuses[&2].status.to_string(), "first_entry_in_progress");
     assert_eq!(statuses[&2].first_entry_user_id, Some(typist_user_id));
     assert_eq!(statuses[&2].second_entry_user_id, None);
     assert_eq!(statuses[&2].first_entry_progress, Some(60));
@@ -456,13 +451,13 @@ async fn test_election_details_status(pool: SqlitePool) {
     // polling station 1 should now be SecondEntryInProgress, polling station 2 is still in the FirstEntryInProgress state
     let statuses = get_statuses(&addr, &coordinator_cookie, election_id).await;
 
-    assert_eq!(statuses[&1].status, SecondEntryInProgress);
+    assert_eq!(statuses[&1].status.to_string(), "second_entry_in_progress");
     assert_eq!(statuses[&1].first_entry_user_id, Some(typist_user_id));
     assert_eq!(statuses[&1].second_entry_user_id, Some(typist2_user_id));
     assert_eq!(statuses[&1].first_entry_progress, Some(100));
     assert_eq!(statuses[&1].second_entry_progress, Some(60));
 
-    assert_eq!(statuses[&2].status, FirstEntryInProgress);
+    assert_eq!(statuses[&2].status.to_string(), "first_entry_in_progress");
     assert_eq!(statuses[&2].first_entry_user_id, Some(typist_user_id));
     assert_eq!(statuses[&2].second_entry_user_id, None);
     assert_eq!(statuses[&2].first_entry_progress, Some(60));
@@ -474,13 +469,13 @@ async fn test_election_details_status(pool: SqlitePool) {
     // polling station 1 should now be definitive
     let statuses = get_statuses(&addr, &coordinator_cookie, election_id).await;
 
-    assert_eq!(statuses[&1].status, Definitive);
+    assert_eq!(statuses[&1].status.to_string(), "definitive");
     assert_eq!(statuses[&1].first_entry_user_id, Some(typist_user_id));
     assert_eq!(statuses[&1].second_entry_user_id, Some(typist2_user_id));
     assert_eq!(statuses[&1].first_entry_progress, Some(100));
     assert_eq!(statuses[&1].second_entry_progress, Some(100));
 
-    assert_eq!(statuses[&2].status, FirstEntryInProgress);
+    assert_eq!(statuses[&2].status.to_string(), "first_entry_in_progress");
     assert_eq!(statuses[&2].first_entry_user_id, Some(typist_user_id));
     assert_eq!(statuses[&2].second_entry_user_id, None);
     assert_eq!(statuses[&2].first_entry_progress, Some(60));
@@ -534,5 +529,8 @@ async fn test_election_details_status_no_other_election_statuses(pool: SqlitePoo
         body.statuses
     );
     assert_eq!(body.statuses[0].polling_station_id, 3);
-    assert_eq!(body.statuses[0].status, FirstEntryInProgress);
+    assert_eq!(
+        body.statuses[0].status.to_string(),
+        "first_entry_in_progress"
+    );
 }

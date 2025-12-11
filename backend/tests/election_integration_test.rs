@@ -1,11 +1,5 @@
 #![cfg(test)]
-use abacus::{
-    committee_session::status::CommitteeSessionStatus,
-    election::{
-        ElectionDetailsResponse, ElectionId, ElectionListResponse,
-        ElectionNumberOfVotersChangeRequest,
-    },
-};
+use abacus::election::{ElectionDetailsResponse, ElectionListResponse};
 use async_zip::base::read::mem::ZipFileReader;
 use axum::http::StatusCode;
 use sha2::Digest;
@@ -45,8 +39,8 @@ async fn test_election_list_works(pool: SqlitePool) {
     assert_eq!(body.committee_sessions.len(), 2);
     assert_eq!(body.committee_sessions[1].number, 2);
     assert_eq!(
-        body.committee_sessions[1].status,
-        CommitteeSessionStatus::DataEntryInProgress
+        body.committee_sessions[1].status.to_string(),
+        "data_entry_in_progress".to_string()
     );
     assert_eq!(body.elections.len(), 2);
 }
@@ -68,8 +62,8 @@ async fn test_election_details_works(pool: SqlitePool) {
     assert_eq!(response.status(), StatusCode::OK);
     let body: ElectionDetailsResponse = response.json().await.unwrap();
     assert_eq!(
-        body.current_committee_session.status,
-        CommitteeSessionStatus::DataEntryInProgress
+        body.current_committee_session.status.to_string(),
+        "data_entry_in_progress".to_string()
     );
     assert_eq!(body.committee_sessions.len(), 2);
     assert_eq!(body.election.name, "Corrigendum 2026");
@@ -157,19 +151,19 @@ async fn test_election_number_of_voters_change_first_session_created_works_for_c
 ) {
     let addr = serve_api(pool).await;
     let coordinator_cookie = coordinator_login(&addr).await;
-    let election_id = ElectionId::from(6);
+    let election_id = 6;
 
     let committee_session =
         get_election_committee_session(&addr, &coordinator_cookie, election_id).await;
-    assert_eq!(committee_session.status, CommitteeSessionStatus::Created);
+    assert_eq!(committee_session.status.to_string(), "created".to_string());
 
     let url = format!("http://{addr}/api/elections/{election_id}/voters");
     let response = reqwest::Client::new()
         .put(&url)
         .header("cookie", coordinator_cookie)
-        .json(&ElectionNumberOfVotersChangeRequest {
-            number_of_voters: 12345,
-        })
+        .json(&serde_json::json!({
+            "number_of_voters": 12345,
+        }))
         .send()
         .await
         .unwrap();
@@ -191,19 +185,19 @@ async fn test_election_number_of_voters_change_first_session_not_started_works_f
 ) {
     let addr = serve_api(pool).await;
     let coordinator_cookie = coordinator_login(&addr).await;
-    let election_id = ElectionId::from(6);
+    let election_id = 6;
 
     let committee_session =
         get_election_committee_session(&addr, &coordinator_cookie, election_id).await;
-    assert_eq!(committee_session.status, CommitteeSessionStatus::Created);
+    assert_eq!(committee_session.status.to_string(), "created".to_string());
 
     create_polling_station(&addr, &coordinator_cookie, election_id, 1).await;
 
     let committee_session =
         get_election_committee_session(&addr, &coordinator_cookie, election_id).await;
     assert_eq!(
-        committee_session.status,
-        CommitteeSessionStatus::DataEntryNotStarted
+        committee_session.status.to_string(),
+        "data_entry_not_started".to_string()
     );
 
     let url = format!("http://{addr}/api/elections/{election_id}/voters");
@@ -211,9 +205,9 @@ async fn test_election_number_of_voters_change_first_session_not_started_works_f
     let response = reqwest::Client::new()
         .put(&url)
         .header("cookie", admin_cookie)
-        .json(&ElectionNumberOfVotersChangeRequest {
-            number_of_voters: 12345,
-        })
+        .json(&serde_json::json!({
+            "number_of_voters": 12345,
+        }))
         .send()
         .await
         .unwrap();
@@ -235,9 +229,9 @@ async fn test_election_number_of_voters_change_not_first_session_fails(pool: Sql
     let response = reqwest::Client::new()
         .put(&url)
         .header("cookie", coordinator_cookie)
-        .json(&ElectionNumberOfVotersChangeRequest {
-            number_of_voters: 12345,
-        })
+        .json(&serde_json::json!({
+            "number_of_voters": 12345,
+        }))
         .send()
         .await
         .unwrap();
@@ -259,9 +253,9 @@ async fn test_election_number_of_voters_change_first_session_in_progress_fails(p
     let response = reqwest::Client::new()
         .put(&url)
         .header("cookie", coordinator_cookie)
-        .json(&ElectionNumberOfVotersChangeRequest {
-            number_of_voters: 12345,
-        })
+        .json(&serde_json::json!({
+            "number_of_voters": 12345,
+        }))
         .send()
         .await
         .unwrap();
@@ -283,9 +277,9 @@ async fn test_election_number_of_voters_change_not_found(pool: SqlitePool) {
     let response = reqwest::Client::new()
         .put(&url)
         .header("cookie", coordinator_cookie)
-        .json(&ElectionNumberOfVotersChangeRequest {
-            number_of_voters: 0,
-        })
+        .json(&serde_json::json!({
+            "number_of_voters": 0,
+        }))
         .send()
         .await
         .unwrap();
@@ -298,7 +292,7 @@ async fn test_election_number_of_voters_change_not_found(pool: SqlitePool) {
 async fn test_election_pdf_download_works(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let coordinator_cookie = shared::coordinator_login(&addr).await;
-    let election_id = ElectionId::from(2);
+    let election_id = 2;
     create_result(&addr, 1, election_id).await;
     create_result(&addr, 2, election_id).await;
 
@@ -307,14 +301,14 @@ async fn test_election_pdf_download_works(pool: SqlitePool) {
         &coordinator_cookie,
         election_id,
         2,
-        CommitteeSessionStatus::DataEntryFinished,
+        "data_entry_finished",
     )
     .await;
     let committee_session =
         shared::get_election_committee_session(&addr, &coordinator_cookie, election_id).await;
     assert_eq!(
-        committee_session.status,
-        CommitteeSessionStatus::DataEntryFinished
+        committee_session.status.to_string(),
+        "data_entry_finished".to_string()
     );
     assert_eq!(committee_session.results_eml, None);
     assert_eq!(committee_session.results_pdf, None);
@@ -374,7 +368,7 @@ async fn test_election_pdf_download_works(pool: SqlitePool) {
 async fn test_election_pdf_download_invalid_committee_session_state(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let coordinator_cookie = shared::coordinator_login(&addr).await;
-    let election_id = ElectionId::from(2);
+    let election_id = 2;
     create_result(&addr, 1, election_id).await;
     create_result(&addr, 2, election_id).await;
 
@@ -394,7 +388,7 @@ async fn test_election_pdf_download_invalid_committee_session_state(pool: Sqlite
 async fn test_election_zip_download_works(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let coordinator_cookie = shared::coordinator_login(&addr).await;
-    let election_id = ElectionId::from(2);
+    let election_id = 2;
     create_result(&addr, 1, election_id).await;
     create_result(&addr, 2, election_id).await;
 
@@ -403,14 +397,14 @@ async fn test_election_zip_download_works(pool: SqlitePool) {
         &coordinator_cookie,
         election_id,
         2,
-        CommitteeSessionStatus::DataEntryFinished,
+        "data_entry_finished",
     )
     .await;
     let committee_session =
         shared::get_election_committee_session(&addr, &coordinator_cookie, election_id).await;
     assert_eq!(
-        committee_session.status,
-        CommitteeSessionStatus::DataEntryFinished
+        committee_session.status.to_string(),
+        "data_entry_finished".to_string()
     );
     assert_eq!(committee_session.results_eml, None);
     assert_eq!(committee_session.results_pdf, None);
@@ -545,7 +539,7 @@ async fn test_election_zip_download_works(pool: SqlitePool) {
 async fn test_election_zip_download_invalid_committee_session_state(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let coordinator_cookie = shared::coordinator_login(&addr).await;
-    let election_id = ElectionId::from(2);
+    let election_id = 2;
     create_result(&addr, 1, election_id).await;
     create_result(&addr, 2, election_id).await;
 

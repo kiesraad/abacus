@@ -2,9 +2,7 @@
 
 use std::net::SocketAddr;
 
-use abacus::{
-    committee_session::status::CommitteeSessionStatus, data_entry::DataEntry, election::ElectionId,
-};
+use abacus::data_entry::DataEntry;
 use axum::http::HeaderValue;
 use reqwest::{Client, Response, StatusCode};
 use sqlx::SqlitePool;
@@ -143,14 +141,8 @@ async fn test_polling_station_data_entry_get_errors(pool: SqlitePool) {
         serde_json::json!([])
     );
 
-    shared::change_status_committee_session(
-        &addr,
-        &coordinator_cookie,
-        ElectionId::from(2),
-        2,
-        CommitteeSessionStatus::DataEntryPaused,
-    )
-    .await;
+    shared::change_status_committee_session(&addr, &coordinator_cookie, 2, 2, "data_entry_paused")
+        .await;
 
     let res = get_data_entry(&addr, &coordinator_cookie, 1).await;
     assert_eq!(res.status(), StatusCode::OK);
@@ -207,14 +199,8 @@ async fn test_polling_station_data_entry_resolve_errors_resume(pool: SqlitePool)
 
     let coordinator_cookie = shared::coordinator_login(&addr).await;
 
-    shared::change_status_committee_session(
-        &addr,
-        &coordinator_cookie,
-        ElectionId::from(2),
-        2,
-        CommitteeSessionStatus::DataEntryPaused,
-    )
-    .await;
+    shared::change_status_committee_session(&addr, &coordinator_cookie, 2, 2, "data_entry_paused")
+        .await;
 
     let res = resolve_errors(&addr, &coordinator_cookie, 1, "resume_first_entry").await;
     assert_eq!(res.status(), StatusCode::OK);
@@ -273,14 +259,8 @@ async fn test_polling_station_data_entry_get_differences(pool: SqlitePool) {
         result["second_entry"]["voters_counts"]["poll_card_count"]
     );
 
-    shared::change_status_committee_session(
-        &addr,
-        &coordinator_cookie,
-        ElectionId::from(2),
-        2,
-        CommitteeSessionStatus::DataEntryPaused,
-    )
-    .await;
+    shared::change_status_committee_session(&addr, &coordinator_cookie, 2, 2, "data_entry_paused")
+        .await;
 
     let res = get_resolve_differences(&addr, &coordinator_cookie, 1).await;
     assert_eq!(res.status(), StatusCode::OK);

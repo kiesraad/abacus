@@ -5,7 +5,7 @@ use sqlx::SqlitePool;
 use test_log::test;
 
 use crate::utils::serve_api;
-use abacus::authentication::{Role, UserListResponse};
+use abacus::authentication::UserListResponse;
 
 pub mod shared;
 pub mod utils;
@@ -74,7 +74,7 @@ async fn test_user_last_activity_at_updating(pool: SqlitePool) {
     let typist_user = body
         .users
         .iter()
-        .find(|u| u.role() == Role::Typist)
+        .find(|u| u.role().to_string() == "typist")
         .unwrap();
     assert!(typist_user.last_activity_at().is_none());
 
@@ -417,7 +417,7 @@ async fn test_coordinator_user_listing_only_typists(pool: SqlitePool) {
     assert!(
         body.users
             .into_iter()
-            .all(|user| user.role() == Role::Typist)
+            .all(|user| user.role().to_string() == "typist")
     );
 }
 

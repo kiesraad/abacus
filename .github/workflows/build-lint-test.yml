@@ -28,6 +28,21 @@ jobs:
       CARGO_TERM_COLOR: always
       SQLX_OFFLINE: "true"
     steps:
+      # Free up runner disk space, so that our job has enough space to run
+      # https://dev.to/mathio/squeezing-disk-space-from-github-actions-runners-an-engineers-guide-3pjg
+      - name: Free up runner disk space
+        working-directory: /
+        run: >
+          df -h
+          &&
+          echo "Freeing up disk space..."
+          &&
+          sudo rm -rf
+          /usr/local/.ghcup
+          /usr/share/dotnet
+          /usr/share/swift
+          &&
+          df -h
       - uses: actions/checkout@v5
       # Build frontend so that it can be included in the backend build
       - name: Setup Node

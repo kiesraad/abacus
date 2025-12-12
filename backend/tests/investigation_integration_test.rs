@@ -149,7 +149,7 @@ async fn test_deletion_setting_committee_session_back_to_created_status(pool: Sq
 
     let committee_session =
         get_election_committee_session(&addr, &coordinator_login(&addr).await, election_id).await;
-    assert_eq!(committee_session.status.to_string(), "created".to_string());
+    assert_eq!(committee_session["status"], "created");
 
     // Create 2 investigations
     assert_eq!(
@@ -169,10 +169,7 @@ async fn test_deletion_setting_committee_session_back_to_created_status(pool: Sq
 
     let committee_session =
         get_election_committee_session(&addr, &coordinator_login(&addr).await, election_id).await;
-    assert_eq!(
-        committee_session.status.to_string(),
-        "data_entry_not_started".to_string()
-    );
+    assert_eq!(committee_session["status"], "data_entry_not_started");
 
     // Delete last investigation
     assert_eq!(
@@ -182,7 +179,7 @@ async fn test_deletion_setting_committee_session_back_to_created_status(pool: Sq
 
     let committee_session =
         get_election_committee_session(&addr, &coordinator_login(&addr).await, election_id).await;
-    assert_eq!(committee_session.status.to_string(), "created".to_string());
+    assert_eq!(committee_session["status"], "created");
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_5_with_results", "users"))))]
@@ -482,10 +479,7 @@ async fn test_creation_for_committee_session_with_created_status(pool: SqlitePoo
 
     let committee_session =
         get_election_committee_session(&addr, &coordinator_login(&addr).await, election_id).await;
-    assert_eq!(
-        committee_session.status.to_string(),
-        "data_entry_not_started".to_string()
-    );
+    assert_eq!(committee_session["status"], "data_entry_not_started");
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_7_four_sessions", "users"))))]
@@ -744,10 +738,7 @@ async fn check_finished_to_in_progress_on<F, Fut>(
     .await;
     let committee_session =
         get_election_committee_session(addr, &coordinator_cookie, election_id).await;
-    assert_eq!(
-        committee_session.status.to_string(),
-        "data_entry_finished".to_string()
-    );
+    assert_eq!(committee_session["status"], "data_entry_finished");
 
     let status = action().await.status();
     assert_eq!(status, expected_status, "Unexpected response status");
@@ -755,10 +746,7 @@ async fn check_finished_to_in_progress_on<F, Fut>(
     let coordinator_cookie = coordinator_login(addr).await;
     let committee_session =
         get_election_committee_session(addr, &coordinator_cookie, election_id).await;
-    assert_eq!(
-        committee_session.status.to_string(),
-        "data_entry_in_progress".to_string()
-    );
+    assert_eq!(committee_session["status"], "data_entry_in_progress");
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_5_with_results", "users"))))]
@@ -842,10 +830,7 @@ async fn test_finished_to_created_on_delete_last(pool: SqlitePool) {
     .await;
     let committee_session =
         get_election_committee_session(&addr, &coordinator_cookie, election_id).await;
-    assert_eq!(
-        committee_session.status.to_string(),
-        "data_entry_finished".to_string()
-    );
+    assert_eq!(committee_session["status"], "data_entry_finished");
 
     let status = delete_investigation(&addr, 741).await.status();
     assert_eq!(status, StatusCode::NO_CONTENT);
@@ -853,5 +838,5 @@ async fn test_finished_to_created_on_delete_last(pool: SqlitePool) {
     let coordinator_cookie = coordinator_login(&addr).await;
     let committee_session =
         get_election_committee_session(&addr, &coordinator_cookie, election_id).await;
-    assert_eq!(committee_session.status.to_string(), "created".to_string());
+    assert_eq!(committee_session["status"], "created");
 }

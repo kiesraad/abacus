@@ -150,7 +150,7 @@ async fn test_election_number_of_voters_change_first_session_created_works_for_c
 
     let committee_session =
         get_election_committee_session(&addr, &coordinator_cookie, election_id).await;
-    assert_eq!(committee_session.status.to_string(), "created".to_string());
+    assert_eq!(committee_session["status"], "created");
 
     let url = format!("http://{addr}/api/elections/{election_id}/voters");
     let response = reqwest::Client::new()
@@ -184,16 +184,13 @@ async fn test_election_number_of_voters_change_first_session_not_started_works_f
 
     let committee_session =
         get_election_committee_session(&addr, &coordinator_cookie, election_id).await;
-    assert_eq!(committee_session.status.to_string(), "created".to_string());
+    assert_eq!(committee_session["status"], "created");
 
     create_polling_station(&addr, &coordinator_cookie, election_id, 1).await;
 
     let committee_session =
         get_election_committee_session(&addr, &coordinator_cookie, election_id).await;
-    assert_eq!(
-        committee_session.status.to_string(),
-        "data_entry_not_started".to_string()
-    );
+    assert_eq!(committee_session["status"], "data_entry_not_started");
 
     let url = format!("http://{addr}/api/elections/{election_id}/voters");
     let admin_cookie = admin_login(&addr).await;
@@ -301,12 +298,9 @@ async fn test_election_pdf_download_works(pool: SqlitePool) {
     .await;
     let committee_session =
         get_election_committee_session(&addr, &coordinator_cookie, election_id).await;
-    assert_eq!(
-        committee_session.status.to_string(),
-        "data_entry_finished".to_string()
-    );
-    assert_eq!(committee_session.results_eml, None);
-    assert_eq!(committee_session.results_pdf, None);
+    assert_eq!(committee_session["status"], "data_entry_finished");
+    assert!(committee_session["results_eml"].is_null());
+    assert!(committee_session["results_pdf"].is_null());
 
     let url = format!(
         "http://{addr}/api/elections/{election_id}/committee_sessions/2/download_pdf_results"
@@ -338,8 +332,8 @@ async fn test_election_pdf_download_works(pool: SqlitePool) {
 
     let committee_session =
         get_election_committee_session(&addr, &coordinator_cookie, election_id).await;
-    assert_eq!(committee_session.results_eml, Some(1));
-    assert_eq!(committee_session.results_pdf, Some(2));
+    assert_eq!(committee_session["results_eml"], 1);
+    assert_eq!(committee_session["results_pdf"], 2);
 
     // Request the file again
     let response = reqwest::Client::new()
@@ -354,8 +348,8 @@ async fn test_election_pdf_download_works(pool: SqlitePool) {
     // Check that the file is the same
     let committee_session =
         get_election_committee_session(&addr, &coordinator_cookie, election_id).await;
-    assert_eq!(committee_session.results_eml, Some(1));
-    assert_eq!(committee_session.results_pdf, Some(2));
+    assert_eq!(committee_session["results_eml"], 1);
+    assert_eq!(committee_session["results_pdf"], 2);
     assert_eq!(hash1, hash2);
 }
 
@@ -397,12 +391,9 @@ async fn test_election_zip_download_works(pool: SqlitePool) {
     .await;
     let committee_session =
         get_election_committee_session(&addr, &coordinator_cookie, election_id).await;
-    assert_eq!(
-        committee_session.status.to_string(),
-        "data_entry_finished".to_string()
-    );
-    assert_eq!(committee_session.results_eml, None);
-    assert_eq!(committee_session.results_pdf, None);
+    assert_eq!(committee_session["status"], "data_entry_finished");
+    assert!(committee_session["results_eml"].is_null());
+    assert!(committee_session["results_pdf"].is_null());
 
     let url = format!(
         "http://{addr}/api/elections/{election_id}/committee_sessions/2/download_zip_results"
@@ -470,8 +461,8 @@ async fn test_election_zip_download_works(pool: SqlitePool) {
 
     let committee_session =
         get_election_committee_session(&addr, &coordinator_cookie, election_id).await;
-    assert_eq!(committee_session.results_eml, Some(1));
-    assert_eq!(committee_session.results_pdf, Some(2));
+    assert_eq!(committee_session["results_eml"], 1);
+    assert_eq!(committee_session["results_pdf"], 2);
 
     // Request the file again
     let response = reqwest::Client::new()
@@ -524,8 +515,8 @@ async fn test_election_zip_download_works(pool: SqlitePool) {
     // Check that the files inside the zip are the same
     let committee_session =
         get_election_committee_session(&addr, &coordinator_cookie, election_id).await;
-    assert_eq!(committee_session.results_eml, Some(1));
-    assert_eq!(committee_session.results_pdf, Some(2));
+    assert_eq!(committee_session["results_eml"], 1);
+    assert_eq!(committee_session["results_pdf"], 2);
     assert_eq!(eml_hash1, eml_hash2, "EML files should have the same hash");
     assert_eq!(pdf_hash1, pdf_hash2, "PDF files should have the same hash");
 }

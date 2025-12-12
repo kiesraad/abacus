@@ -1,4 +1,5 @@
 import { expect } from "@playwright/test";
+import { getTestPassword } from "e2e-tests/helpers-utils/e2e-test-api-helpers";
 
 import { FIXTURE_TYPIST_TEMP_PASSWORD, test } from "../fixtures";
 import { AccountSetupPgObj } from "../page-objects/authentication/AccountSetupPgObj";
@@ -12,14 +13,14 @@ test.describe("authentication", () => {
     await page.goto("/account/login");
 
     const loginPage = new LoginPgObj(page);
-    await loginPage.username.fill("admin1");
-    await loginPage.password.fill("Admin1Password01");
+    await loginPage.username.fill("admin2");
+    await loginPage.password.fill(getTestPassword("admin2"));
     await loginPage.loginBtn.click();
 
     await page.waitForURL("/elections");
 
     const navBar = new AdminNavBar(page);
-    await expect(navBar.username).toHaveText("Sanne Molenaar");
+    await expect(navBar.username).toHaveText("Jef van Reybrouck");
     await expect(navBar.role).toHaveText("(Beheerder)");
   });
 

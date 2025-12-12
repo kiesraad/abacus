@@ -144,11 +144,10 @@ async fn test_create_conclude_update_delete(pool: SqlitePool) {
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_7_four_sessions", "users"))))]
 async fn test_deletion_setting_committee_session_back_to_created_status(pool: SqlitePool) {
     let addr = serve_api(pool).await;
-    let coordinator_cookie = coordinator_login(&addr).await;
     let election_id = 7;
 
     let committee_session =
-        get_election_committee_session(&addr, &coordinator_cookie, election_id).await;
+        get_election_committee_session(&addr, &coordinator_login(&addr).await, election_id).await;
     assert_eq!(committee_session.status, CommitteeSessionStatus::Created);
 
     // Create 2 investigations
@@ -168,7 +167,7 @@ async fn test_deletion_setting_committee_session_back_to_created_status(pool: Sq
     );
 
     let committee_session =
-        get_election_committee_session(&addr, &coordinator_cookie, election_id).await;
+        get_election_committee_session(&addr, &coordinator_login(&addr).await, election_id).await;
     assert_eq!(
         committee_session.status,
         CommitteeSessionStatus::DataEntryNotStarted
@@ -181,18 +180,17 @@ async fn test_deletion_setting_committee_session_back_to_created_status(pool: Sq
     );
 
     let committee_session =
-        get_election_committee_session(&addr, &coordinator_cookie, election_id).await;
+        get_election_committee_session(&addr, &coordinator_login(&addr).await, election_id).await;
     assert_eq!(committee_session.status, CommitteeSessionStatus::Created);
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_5_with_results", "users"))))]
 async fn test_deletion_removes_polling_station_from_status(pool: SqlitePool) {
     let addr = serve_api(pool).await;
-    let coordinator_cookie = coordinator_login(&addr).await;
     let election_id = 5;
     let polling_station_id = 11;
 
-    let statuses = get_statuses(&addr, &coordinator_cookie, election_id).await;
+    let statuses = get_statuses(&addr, &coordinator_login(&addr).await, election_id).await;
     assert_eq!(statuses.len(), 1);
     assert_eq!(
         statuses[&polling_station_id].status,
@@ -206,7 +204,7 @@ async fn test_deletion_removes_polling_station_from_status(pool: SqlitePool) {
         StatusCode::NO_CONTENT
     );
 
-    let statuses = get_statuses(&addr, &coordinator_cookie, election_id).await;
+    let statuses = get_statuses(&addr, &coordinator_login(&addr).await, election_id).await;
     assert_eq!(statuses.len(), 0);
 }
 
@@ -353,7 +351,6 @@ fn second_session_data_entry_two_political_groups() -> DataEntry {
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_7_four_sessions", "users"))))]
 async fn test_update_with_result(pool: SqlitePool) {
     let addr = serve_api(pool).await;
-    let coordinator_cookie = coordinator_login(&addr).await;
     let election_id = 7;
     let polling_station_id = 741;
 
@@ -378,7 +375,7 @@ async fn test_update_with_result(pool: SqlitePool) {
     )
     .await;
 
-    let statuses = get_statuses(&addr, &coordinator_cookie, election_id).await;
+    let statuses = get_statuses(&addr, &coordinator_login(&addr).await, election_id).await;
     assert_eq!(
         statuses[&polling_station_id].status,
         DataEntryStatusName::Definitive
@@ -397,7 +394,7 @@ async fn test_update_with_result(pool: SqlitePool) {
     assert_eq!(body["reference"], "InvestigationHasDataEntryOrResult");
 
     // Data entry result is still there
-    let statuses = get_statuses(&addr, &coordinator_cookie, election_id).await;
+    let statuses = get_statuses(&addr, &coordinator_login(&addr).await, election_id).await;
     assert_eq!(
         statuses[&polling_station_id].status,
         DataEntryStatusName::Definitive
@@ -409,14 +406,13 @@ async fn test_update_with_result(pool: SqlitePool) {
     assert_eq!(response.status(), StatusCode::OK);
 
     // Data entry result is deleted
-    let statuses = get_statuses(&addr, &coordinator_cookie, election_id).await;
+    let statuses = get_statuses(&addr, &coordinator_login(&addr).await, election_id).await;
     assert_eq!(statuses.len(), 0);
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_7_four_sessions", "users"))))]
 async fn test_update_with_data_entry(pool: SqlitePool) {
     let addr = serve_api(pool).await;
-    let coordinator_cookie = coordinator_login(&addr).await;
     let election_id = 7;
     let polling_station_id = 741;
 
@@ -443,7 +439,7 @@ async fn test_update_with_data_entry(pool: SqlitePool) {
     )
     .await;
 
-    let statuses = get_statuses(&addr, &coordinator_cookie, election_id).await;
+    let statuses = get_statuses(&addr, &coordinator_login(&addr).await, election_id).await;
     assert_eq!(
         statuses[&polling_station_id].status,
         DataEntryStatusName::SecondEntryNotStarted
@@ -462,7 +458,7 @@ async fn test_update_with_data_entry(pool: SqlitePool) {
     assert_eq!(body["reference"], "InvestigationHasDataEntryOrResult");
 
     // Data entry is still there
-    let statuses = get_statuses(&addr, &coordinator_cookie, election_id).await;
+    let statuses = get_statuses(&addr, &coordinator_login(&addr).await, election_id).await;
     assert_eq!(
         statuses[&polling_station_id].status,
         DataEntryStatusName::SecondEntryNotStarted
@@ -474,14 +470,13 @@ async fn test_update_with_data_entry(pool: SqlitePool) {
     assert_eq!(response.status(), StatusCode::OK);
 
     // Data entry is deleted
-    let statuses = get_statuses(&addr, &coordinator_cookie, election_id).await;
+    let statuses = get_statuses(&addr, &coordinator_login(&addr).await, election_id).await;
     assert_eq!(statuses.len(), 0);
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_7_four_sessions", "users"))))]
 async fn test_creation_for_committee_session_with_created_status(pool: SqlitePool) {
     let addr = serve_api(pool).await;
-    let coordinator_cookie = coordinator_login(&addr).await;
     let election_id = 7;
 
     assert_eq!(
@@ -490,7 +485,7 @@ async fn test_creation_for_committee_session_with_created_status(pool: SqlitePoo
     );
 
     let committee_session =
-        get_election_committee_session(&addr, &coordinator_cookie, election_id).await;
+        get_election_committee_session(&addr, &coordinator_login(&addr).await, election_id).await;
     assert_eq!(
         committee_session.status,
         CommitteeSessionStatus::DataEntryNotStarted
@@ -643,7 +638,6 @@ async fn test_cannot_conclude_update_new_polling_station_corrected_results_false
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_5_with_results", "users"))))]
 async fn test_polling_station_corrigendum_download_with_previous_results(pool: SqlitePool) {
     let addr = serve_api(pool).await;
-    let coordinator_cookie = coordinator_login(&addr).await;
     // Polling station 9 has previous results, but no investigation yet
     let polling_station_id = 9;
 
@@ -659,7 +653,7 @@ async fn test_polling_station_corrigendum_download_with_previous_results(pool: S
     );
     let response = reqwest::Client::new()
         .get(&url)
-        .header("cookie", coordinator_cookie)
+        .header("cookie", coordinator_login(&addr).await)
         .send()
         .await
         .unwrap();
@@ -718,7 +712,6 @@ where
     F: FnOnce() -> Fut,
     Fut: Future<Output = Response>,
 {
-    let coordinator_cookie = coordinator_login(addr).await;
     let election_id = 5;
     let committee_session_id = 6;
 
@@ -740,6 +733,7 @@ where
         );
     }
 
+    let coordinator_cookie = coordinator_login(addr).await;
     change_status_committee_session(
         addr,
         &coordinator_cookie,
@@ -761,6 +755,7 @@ where
         StatusCode::OK | StatusCode::NO_CONTENT | StatusCode::CREATED
     ));
 
+    let coordinator_cookie = coordinator_login(addr).await;
     let committee_session =
         get_election_committee_session(addr, &coordinator_cookie, election_id).await;
     assert_eq!(
@@ -796,7 +791,6 @@ async fn test_finished_to_in_progress_on_delete_non_last(pool: SqlitePool) {
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_7_four_sessions", "users"))))]
 async fn test_finished_to_created_on_delete_last(pool: SqlitePool) {
     let addr = serve_api(pool).await;
-    let coordinator_cookie = coordinator_login(&addr).await;
     let election_id = 7;
     let committee_session_id = 704;
 
@@ -816,6 +810,7 @@ async fn test_finished_to_created_on_delete_last(pool: SqlitePool) {
         StatusCode::OK
     );
 
+    let coordinator_cookie = coordinator_login(&addr).await;
     change_status_committee_session(
         &addr,
         &coordinator_cookie,
@@ -834,6 +829,7 @@ async fn test_finished_to_created_on_delete_last(pool: SqlitePool) {
     let status = delete_investigation(&addr, 741).await.status();
     assert_eq!(status, StatusCode::NO_CONTENT);
 
+    let coordinator_cookie = coordinator_login(&addr).await;
     let committee_session =
         get_election_committee_session(&addr, &coordinator_cookie, election_id).await;
     assert_eq!(committee_session.status, CommitteeSessionStatus::Created);

@@ -1149,6 +1149,7 @@ where
     let status = action().await.status();
     assert!(status == StatusCode::OK || status == StatusCode::CREATED);
 
+    let coordinator_cookie = coordinator_login(addr).await;
     let committee_session =
         get_election_committee_session(addr, &coordinator_cookie, election_id).await;
     assert_eq!(
@@ -1160,9 +1161,8 @@ where
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
 async fn test_finished_to_in_progress_on_create(pool: SqlitePool) {
     let addr = serve_api(pool).await;
-    let coordinator_cookie = coordinator_login(&addr).await;
-    check_finished_to_in_progress_on(&addr, || {
-        create_polling_station(&addr, &coordinator_cookie, 2, 35)
+    check_finished_to_in_progress_on(&addr, || async {
+        create_polling_station(&addr, &coordinator_login(&addr).await, 2, 35).await
     })
     .await;
 }
@@ -1170,12 +1170,11 @@ async fn test_finished_to_in_progress_on_create(pool: SqlitePool) {
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
 async fn test_finished_to_in_progress_on_update(pool: SqlitePool) {
     let addr = serve_api(pool).await;
-    let coordinator_cookie = coordinator_login(&addr).await;
 
-    check_finished_to_in_progress_on(&addr, || {
+    check_finished_to_in_progress_on(&addr, || async {
         update_polling_station(
             &addr,
-            &coordinator_cookie,
+            &coordinator_login(&addr).await,
             2,
             1,
             serde_json::json!({
@@ -1187,6 +1186,7 @@ async fn test_finished_to_in_progress_on_update(pool: SqlitePool) {
                 "locality": "Testdorp",
             }),
         )
+        .await
     })
     .await;
 }

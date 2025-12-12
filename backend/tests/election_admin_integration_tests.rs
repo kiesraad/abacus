@@ -1,6 +1,5 @@
 #![cfg(test)]
 
-use abacus::election::ElectionDefinitionValidateResponse;
 use axum::http::StatusCode;
 use sqlx::SqlitePool;
 use test_log::test;
@@ -449,10 +448,7 @@ async fn test_election_import_save_without_polling_stations(pool: SqlitePool) {
         u32::try_from(body["id"].as_u64().unwrap()).unwrap(),
     )
     .await;
-    assert_eq!(
-        election_details.election.counting_method,
-        abacus::election::VoteCountingMethod::CSO
-    );
+    assert_eq!(election_details.election.counting_method.to_string(), "cso");
     assert_eq!(election_details.election.number_of_voters, 1234);
     assert_eq!(
         election_details
@@ -640,14 +636,8 @@ async fn test_election_polling_stations_not_matching_election(pool: SqlitePool) 
 
     // Ensure the response is what we expect
     assert_eq!(response.status(), StatusCode::OK);
-    assert_eq!(
-        response
-            .json::<ElectionDefinitionValidateResponse>()
-            .await
-            .unwrap()
-            .polling_station_definition_matches_election,
-        Some(false)
-    );
+    let body: serde_json::Value = response.json().await.unwrap();
+    assert_eq!(body["polling_station_definition_matches_election"], false);
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("users"))))]
@@ -684,14 +674,8 @@ async fn test_election_polling_stations_validate_valid(pool: SqlitePool) {
 
     // Ensure the response is what we expect
     assert_eq!(response.status(), StatusCode::OK);
-    assert_eq!(
-        response
-            .json::<ElectionDefinitionValidateResponse>()
-            .await
-            .unwrap()
-            .polling_station_definition_matches_election,
-        Some(true)
-    );
+    let body: serde_json::Value = response.json().await.unwrap();
+    assert_eq!(body["polling_station_definition_matches_election"], true);
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("users"))))]

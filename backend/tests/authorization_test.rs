@@ -1,7 +1,7 @@
 #![cfg(test)]
 #![cfg(feature = "openapi")]
 
-use abacus::{authentication::Role, get_scopes_from_operation};
+use abacus::{authentication::Role, get_scopes_from_operation, openapi_router};
 use hyper::{Method, StatusCode};
 use sqlx::SqlitePool;
 use std::panic;
@@ -17,7 +17,7 @@ pub mod utils;
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
 async fn test_route_authorization(pool: SqlitePool) {
-    let openapi = abacus::openapi_router().into_openapi();
+    let openapi = openapi_router().into_openapi();
     let addr = serve_api(pool).await;
 
     // Possible auth-related error statuses

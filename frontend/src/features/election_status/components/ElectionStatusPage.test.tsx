@@ -460,7 +460,7 @@ describe("ElectionStatusPage", () => {
       expect(window.location.hash).toEqual("#item-table-in-progress");
     });
 
-    expect(statusLinks[2]!.textContent).toEqual("Eerste invoer klaar (1)");
+    expect(statusLinks[2]!.textContent).toEqual("Eerste invoer klaar (2)");
     statusLinks[2]!.click();
     await waitFor(() => {
       expect(window.location.hash).toEqual("#item-table-first-entry-finished");
@@ -472,7 +472,7 @@ describe("ElectionStatusPage", () => {
       expect(window.location.hash).toEqual("#item-table-definitive");
     });
 
-    expect(statusLinks[4]!.textContent).toEqual("Werkvoorraad (2)");
+    expect(statusLinks[4]!.textContent).toEqual("Werkvoorraad (1)");
     statusLinks[4]!.click();
     await waitFor(() => {
       expect(window.location.hash).toEqual("#item-table-not-started");

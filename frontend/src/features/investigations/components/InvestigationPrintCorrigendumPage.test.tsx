@@ -7,13 +7,14 @@ import { beforeEach, describe, expect, test, vi } from "vitest";
 import * as useMessages from "@/hooks/messages/useMessages";
 import { ErrorBoundary } from "@/components/error/ErrorBoundary";
 import { ElectionLayout } from "@/components/layout/ElectionLayout";
+import { getElectionMockData } from "@/testing/api-mocks/ElectionMockData";
 import {
   ElectionRequestHandler,
   ElectionStatusRequestHandler,
   PollingStationInvestigationDeleteHandler,
 } from "@/testing/api-mocks/RequestHandlers";
 import { Providers } from "@/testing/Providers";
-import { server } from "@/testing/server";
+import { overrideOnce, server } from "@/testing/server";
 import { screen, setupTestRouter, spyOnHandler, within } from "@/testing/test-utils";
 
 import { investigationRoutes } from "../routes";
@@ -45,6 +46,7 @@ async function renderPage() {
 describe("InvestigationPrintCorrigendumPage", () => {
   beforeEach(() => {
     server.use(ElectionRequestHandler, ElectionStatusRequestHandler);
+    overrideOnce("get", "/api/elections/1", 200, getElectionMockData({}, { number: 2 }));
     vi.spyOn(ReactRouter, "useNavigate").mockImplementation(() => navigate);
     vi.spyOn(useMessages, "useMessages").mockReturnValue({
       pushMessage,

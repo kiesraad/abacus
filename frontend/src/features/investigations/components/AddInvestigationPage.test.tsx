@@ -35,6 +35,7 @@ async function renderPage() {
 describe("AddInvestigationPage", () => {
   beforeEach(() => {
     server.use(ElectionRequestHandler, ElectionStatusRequestHandler);
+    overrideOnce("get", "/api/elections/1", 200, getElectionMockData({}, { number: 2 }));
   });
 
   test("Renders the correct headings, polling stations table and add button", async () => {

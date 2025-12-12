@@ -70,7 +70,7 @@ async function renderPage(userRole: Role) {
 describe("InvestigationsOverviewPage", () => {
   beforeEach(() => {
     server.use(ElectionStatusRequestHandler);
-    const electionData = getElectionMockData({}, { id: 2, number: 2, status: "created" });
+    const electionData = getElectionMockData({}, { number: 2, status: "created" });
     server.use(
       http.get("/api/elections/1", () =>
         HttpResponse.json(electionData satisfies ElectionDetailsResponse, { status: 200 }),
@@ -79,8 +79,7 @@ describe("InvestigationsOverviewPage", () => {
   });
 
   test("Renders the correct headings and button", async () => {
-    const electionData = getElectionMockData({}, { id: 1, number: 2, status: "created" }, []);
-    overrideOnce("get", "/api/elections/1", 200, electionData);
+    overrideOnce("get", "/api/elections/1", 200, getElectionMockData({}, { number: 2, status: "created" }, []));
 
     await renderPage("coordinator");
 
@@ -202,7 +201,7 @@ describe("InvestigationsOverviewPage", () => {
   });
 
   test("Shows finish data entry message when all investigations are handled and session status != finished", async () => {
-    const electionData = getElectionMockData({}, { id: 1, number: 2, status: "data_entry_in_progress" }, [
+    const electionData = getElectionMockData({}, { number: 2, status: "data_entry_in_progress" }, [
       {
         polling_station_id: 1,
         reason: "Test reason 1",
@@ -224,7 +223,7 @@ describe("InvestigationsOverviewPage", () => {
 
   test("Doesn't show finish data entry message when all investigations are handled and session status = finished", async () => {
     server.use(CommitteeSessionStatusChangeRequestHandler);
-    const electionData = getElectionMockData({}, { id: 1, number: 2, status: "data_entry_finished" }, [
+    const electionData = getElectionMockData({}, { number: 2, status: "data_entry_finished" }, [
       {
         polling_station_id: 1,
         reason: "Test reason 1",
@@ -245,7 +244,7 @@ describe("InvestigationsOverviewPage", () => {
     server.use(CommitteeSessionStatusChangeRequestHandler);
     const updateCommitteeSession = spyOnHandler(CommitteeSessionStatusChangeRequestHandler);
 
-    const electionData = getElectionMockData({}, { id: 1, number: 2, status: "data_entry_in_progress" }, [
+    const electionData = getElectionMockData({}, { number: 2, status: "data_entry_in_progress" }, [
       {
         polling_station_id: 1,
         reason: "Test reason 1",
@@ -271,7 +270,7 @@ describe("InvestigationsOverviewPage", () => {
   test("Shows start data entry modal when clicking fill findings button", async () => {
     server.use(CommitteeSessionStatusChangeRequestHandler);
 
-    const electionData = getElectionMockData({}, { id: 1, number: 2, status: "data_entry_not_started" }, [
+    const electionData = getElectionMockData({}, { number: 2, status: "data_entry_not_started" }, [
       {
         polling_station_id: 1,
         reason: "Test reason 1",

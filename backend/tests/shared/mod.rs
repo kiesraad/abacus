@@ -3,7 +3,6 @@
 use std::{collections::BTreeMap, net::SocketAddr};
 
 use abacus::{
-    committee_session::CommitteeSession,
     data_entry::{
         CandidateVotes, Count, ElectionStatusResponse, PoliticalGroupCandidateVotes,
         status::DataEntryStatusName,
@@ -317,7 +316,7 @@ pub async fn get_election_committee_session(
     addr: &SocketAddr,
     cookie: &HeaderValue,
     election_id: u32,
-) -> CommitteeSession {
+) -> serde_json::Value {
     let url = format!("http://{addr}/api/elections/{election_id}");
     let response = reqwest::Client::new()
         .get(&url)
@@ -326,8 +325,8 @@ pub async fn get_election_committee_session(
         .await
         .unwrap();
     assert_eq!(response.status(), StatusCode::OK);
-    let body: ElectionDetailsResponse = response.json().await.unwrap();
-    body.current_committee_session.clone()
+    let body: serde_json::Value = response.json().await.unwrap();
+    body["current_committee_session"].clone()
 }
 
 pub async fn change_status_committee_session(

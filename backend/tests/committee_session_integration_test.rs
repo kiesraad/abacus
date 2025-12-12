@@ -31,10 +31,7 @@ async fn test_committee_session_create_works(pool: SqlitePool) {
     .await;
     let committee_session =
         get_election_committee_session(&addr, &coordinator_cookie, election_id).await;
-    assert_eq!(
-        committee_session.status.to_string(),
-        "data_entry_finished".to_string()
-    );
+    assert_eq!(committee_session["status"], "data_entry_finished");
 
     let url = format!("http://{addr}/api/elections/{election_id}/committee_sessions");
     let response = reqwest::Client::new()
@@ -87,8 +84,8 @@ async fn test_committee_session_delete_ok_status_created(pool: SqlitePool) {
 
     let committee_session =
         get_election_committee_session(&addr, &coordinator_cookie, election_id).await;
-    assert_eq!(committee_session.id, 704);
-    assert_eq!(committee_session.status.to_string(), "created".to_string());
+    assert_eq!(committee_session["id"], 704);
+    assert_eq!(committee_session["status"], "created");
 
     let url = format!(
         "http://{addr}/api/elections/{election_id}/committee_sessions/{committee_session_id}"
@@ -108,11 +105,8 @@ async fn test_committee_session_delete_ok_status_created(pool: SqlitePool) {
 
     let committee_session =
         get_election_committee_session(&addr, &coordinator_cookie, election_id).await;
-    assert_eq!(committee_session.id, 703);
-    assert_eq!(
-        committee_session.status.to_string(),
-        "data_entry_finished".to_string()
-    );
+    assert_eq!(committee_session["id"], 703);
+    assert_eq!(committee_session["status"], "data_entry_finished");
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_7_four_sessions", "users"))))]
@@ -179,10 +173,7 @@ async fn test_committee_session_delete_not_ok_wrong_status(pool: SqlitePool) {
 
     let committee_session =
         get_election_committee_session(&addr, &coordinator_cookie, election_id).await;
-    assert_eq!(
-        committee_session.status.to_string(),
-        "data_entry_paused".to_string()
-    );
+    assert_eq!(committee_session["status"], "data_entry_paused");
 
     let response = reqwest::Client::new()
         .delete(&url)
@@ -210,10 +201,7 @@ async fn test_committee_session_delete_not_ok_wrong_status(pool: SqlitePool) {
 
     let committee_session =
         get_election_committee_session(&addr, &coordinator_cookie, election_id).await;
-    assert_eq!(
-        committee_session.status.to_string(),
-        "data_entry_finished".to_string()
-    );
+    assert_eq!(committee_session["status"], "data_entry_finished");
 
     let response = reqwest::Client::new()
         .delete(&url)
@@ -250,7 +238,7 @@ async fn test_committee_session_delete_current_committee_session_but_its_the_fir
 
     let committee_session =
         get_election_committee_session(&addr, &coordinator_cookie, election_id).await;
-    assert_eq!(committee_session.status.to_string(), "created".to_string());
+    assert_eq!(committee_session["status"], "created");
 
     let url = format!(
         "http://{addr}/api/elections/{election_id}/committee_sessions/{committee_session_id}"
@@ -271,7 +259,7 @@ async fn test_committee_session_delete_current_committee_session_but_its_the_fir
 
     let committee_session =
         get_election_committee_session(&addr, &coordinator_cookie, election_id).await;
-    assert_eq!(committee_session.status.to_string(), "created".to_string());
+    assert_eq!(committee_session["status"], "created");
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_5_with_results", "users"))))]
@@ -472,10 +460,7 @@ async fn test_committee_session_status_change_finished_to_in_progress_deletes_fi
 
     let committee_session =
         get_election_committee_session(&addr, &coordinator_cookie, election_id).await;
-    assert_eq!(
-        committee_session.status.to_string(),
-        "data_entry_finished".to_string()
-    );
+    assert_eq!(committee_session["status"], "data_entry_finished");
 
     // Generate and download results files
     let file_download_url = format!(
@@ -497,8 +482,8 @@ async fn test_committee_session_status_change_finished_to_in_progress_deletes_fi
 
     let committee_session =
         get_election_committee_session(&addr, &coordinator_cookie, election_id).await;
-    assert_eq!(committee_session.results_eml, Some(1));
-    assert_eq!(committee_session.results_pdf, Some(2));
+    assert_eq!(committee_session["results_eml"], 1);
+    assert_eq!(committee_session["results_pdf"], 2);
 
     // Change committee session status to DataEntryInProgress
     let response = reqwest::Client::new()
@@ -518,12 +503,9 @@ async fn test_committee_session_status_change_finished_to_in_progress_deletes_fi
 
     let committee_session =
         get_election_committee_session(&addr, &coordinator_cookie, election_id).await;
-    assert_eq!(
-        committee_session.status.to_string(),
-        "data_entry_in_progress".to_string()
-    );
-    assert_eq!(committee_session.results_eml, None);
-    assert_eq!(committee_session.results_pdf, None);
+    assert_eq!(committee_session["status"], "data_entry_in_progress");
+    assert!(committee_session["results_eml"].is_null());
+    assert!(committee_session["results_pdf"].is_null());
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]

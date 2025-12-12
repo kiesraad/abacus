@@ -2,7 +2,7 @@
 
 use abacus::{
     data_entry::{status::*, *},
-    election::{ElectionCategory, ElectionWithPoliticalGroups, VoteCountingMethod},
+    election::{ElectionCategory, ElectionId, ElectionWithPoliticalGroups, VoteCountingMethod},
     polling_station::{PollingStation, PollingStationType},
 };
 
@@ -82,7 +82,7 @@ fn get_cde(user_id: u32, correct_entry: bool) -> CurrentDataEntry {
 fn polling_station() -> PollingStation {
     PollingStation {
         id: 1,
-        election_id: 1,
+        election_id: ElectionId::from(1),
         committee_session_id: 1,
         id_prev_session: None,
         name: "Test polling station".to_string(),
@@ -97,7 +97,7 @@ fn polling_station() -> PollingStation {
 
 fn election() -> ElectionWithPoliticalGroups {
     ElectionWithPoliticalGroups {
-        id: 1,
+        id: ElectionId::from(1),
         name: "Test election".to_string(),
         counting_method: VoteCountingMethod::CSO,
         election_id: "Test_2025".to_string(),
@@ -105,6 +105,7 @@ fn election() -> ElectionWithPoliticalGroups {
         domain_id: "0000".to_string(),
         category: ElectionCategory::Municipal,
         number_of_seats: 18,
+        number_of_voters: 1000,
         election_date: Utc::now().date_naive(),
         nomination_date: Utc::now().date_naive(),
         political_groups: vec![],

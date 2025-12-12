@@ -7,7 +7,7 @@ use serde::{Deserialize, Serialize};
 use sqlx::{FromRow, Type};
 use utoipa::ToSchema;
 
-use crate::{APIError, audit_log::PollingStationDetails};
+use crate::{APIError, audit_log::PollingStationDetails, election::ElectionId};
 
 pub type PollingStationNumber = u32;
 
@@ -16,7 +16,7 @@ pub type PollingStationNumber = u32;
 #[serde(deny_unknown_fields)]
 pub struct PollingStation {
     pub id: u32,
-    pub election_id: u32,
+    pub election_id: ElectionId,
     pub committee_session_id: u32,
     #[serde(skip_serializing_if = "Option::is_none")]
     #[schema(nullable = false)]

@@ -21,7 +21,7 @@ use crate::{
         CommitteeSession, CommitteeSessionCreateRequest, CommitteeSessionError,
         status::CommitteeSessionStatus,
     },
-    election::ElectionNumberOfVotersChangeRequest,
+    election::{ElectionId, ElectionNumberOfVotersChangeRequest},
     eml::{EML110, EML230, EMLDocument, EMLImportError, EmlHash, RedactedEmlHash},
     investigation::PollingStationInvestigation,
     polling_station::{
@@ -101,20 +101,23 @@ pub async fn election_list(
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
     params(
-        ("election_id" = u32, description = "Election database id"),
+        ("election_id" = ElectionId, description = "Election database id"),
     ),
     security(("cookie_auth" = ["administrator", "coordinator", "typist"])),
 )]
 pub async fn election_details(
     _user: User,
     State(pool): State<SqlitePool>,
-    Path(id): Path<u32>,
+    Path(election_id): Path<ElectionId>,
 ) -> Result<Json<ElectionDetailsResponse>, APIError> {
     let mut conn = pool.acquire().await?;
-    let election = crate::election::repository::get(&mut conn, id).await?;
+    let election = crate::election::repository::get(&mut conn, election_id).await?;
     let committee_sessions =
-        crate::committee_session::repository::get_election_committee_session_list(&mut conn, id)
-            .await?;
+        crate::committee_session::repository::get_election_committee_session_list(
+            &mut conn,
+            election_id,
+        )
+        .await?;
     let current_committee_session = committee_sessions
         .first()
         .expect("There is always one committee session")
@@ -150,7 +153,7 @@ pub async fn election_details(
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
     params(
-        ("election_id" = u32, description = "Election database id"),
+        ("election_id" = ElectionId, description = "Election database id"),
     ),
     security(("cookie_auth" = ["administrator", "coordinator"])),
 )]
@@ -158,14 +161,15 @@ pub async fn election_number_of_voters_change(
     _user: AdminOrCoordinator,
     State(pool): State<SqlitePool>,
     audit_service: AuditService,
-    Path(id): Path<u32>,
+    Path(election_id): Path<ElectionId>,
     Json(request): Json<ElectionNumberOfVotersChangeRequest>,
 ) -> Result<StatusCode, APIError> {
     let mut tx = pool.begin_immediate().await?;
 
-    crate::election::repository::get(&mut tx, id).await?;
+    crate::election::repository::get(&mut tx, election_id).await?;
     let current_committee_session =
-        crate::committee_session::repository::get_election_committee_session(&mut tx, id).await?;
+        crate::committee_session::repository::get_election_committee_session(&mut tx, election_id)
+            .await?;
 
     // Only allow if this is a first and not yet started committee session
     if !current_committee_session.is_next_session()
@@ -174,7 +178,7 @@ pub async fn election_number_of_voters_change(
     {
         let election = crate::election::repository::change_number_of_voters(
             &mut tx,
-            id,
+            election_id,
             request.number_of_voters,
         )
         .await?;

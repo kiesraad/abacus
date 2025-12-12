@@ -1,6 +1,6 @@
 {
   "db_name": "SQLite",
-  "query": "\n        INSERT INTO committee_sessions (\n            number,\n            election_id,\n            location,\n            start_date_time\n        ) VALUES (?, ?, \"\", NULL)\n        RETURNING\n            id as \"id: u32\",\n            number as \"number: u32\",\n            election_id as \"election_id: u32\",\n            status as \"status: _\",\n            location,\n            start_date_time as \"start_date_time: _\",\n            results_eml as \"results_eml: _\",\n            results_pdf as \"results_pdf: _\",\n            overview_pdf as \"overview_pdf: _\"\n        ",
+  "query": "\n        SELECT\n            prev.id as \"id: u32\",\n            prev.number as \"number: u32\",\n            prev.election_id as \"election_id: ElectionId\",\n            prev.status as \"status: _\",\n            prev.location,\n            prev.start_date_time as \"start_date_time: _\",\n            prev.results_eml as \"results_eml: _\",\n            prev.results_pdf as \"results_pdf: _\",\n            prev.overview_pdf as \"overview_pdf: _\"\n        FROM committee_sessions AS c\n        JOIN committee_sessions AS prev ON c.election_id = prev.election_id AND c.number = prev.number + 1\n        WHERE c.id = ?\n        ",
   "describe": {
     "columns": [
       {
@@ -14,7 +14,7 @@
         "type_info": "Integer"
       },
       {
-        "name": "election_id: u32",
+        "name": "election_id: ElectionId",
         "ordinal": 2,
         "type_info": "Integer"
       },
@@ -50,7 +50,7 @@
       }
     ],
     "parameters": {
-      "Right": 2
+      "Right": 1
     },
     "nullable": [
       false,
@@ -64,5 +64,5 @@
       true
     ]
   },
-  "hash": "69da7bd3f673c81cfd80788cc7df6c7e09d2a7378ac7d9fe2999a88dd88a8110"
+  "hash": "bde19ef178a0b5c4b4de58c1b0e849abccb539bf1dd5c26833272bc566233347"
 }

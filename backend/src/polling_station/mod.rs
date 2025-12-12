@@ -20,6 +20,7 @@ use crate::{
         status::{CommitteeSessionStatus, change_committee_session_status},
     },
     data_entry::repository::{data_entry_exists, result_exists},
+    election::ElectionId,
     eml::{EML110, EMLDocument, EMLImportError},
     error::ErrorReference,
 };
@@ -62,14 +63,14 @@ impl IntoResponse for PollingStationListResponse {
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
     params(
-        ("election_id" = u32, description = "Election database id"),
+        ("election_id" = ElectionId, description = "Election database id"),
     ),
     security(("cookie_auth" = ["administrator", "coordinator", "typist"])),
 )]
 async fn polling_station_list(
     _user: User,
     State(pool): State<SqlitePool>,
-    Path(election_id): Path<u32>,
+    Path(election_id): Path<ElectionId>,
 ) -> Result<PollingStationListResponse, APIError> {
     let mut conn = pool.acquire().await?;
 
@@ -114,14 +115,14 @@ pub async fn validate_user_is_allowed_to_perform_action(
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
     params(
-        ("election_id" = u32, description = "Election database id"),
+        ("election_id" = ElectionId, description = "Election database id"),
     ),
     security(("cookie_auth" = ["administrator", "coordinator"])),
 )]
 async fn polling_station_create(
     user: AdminOrCoordinator,
     State(pool): State<SqlitePool>,
-    Path(election_id): Path<u32>,
+    Path(election_id): Path<ElectionId>,
     audit_service: AuditService,
     new_polling_station: PollingStationRequest,
 ) -> Result<(StatusCode, PollingStation), APIError> {
@@ -179,7 +180,7 @@ async fn polling_station_create(
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
     params(
-        ("election_id" = u32, description = "Election database id"),
+        ("election_id" = ElectionId, description = "Election database id"),
         ("polling_station_id" = u32, description = "Polling station database id"),
     ),
     security(("cookie_auth" = ["administrator", "coordinator", "typist"])),
@@ -187,7 +188,7 @@ async fn polling_station_create(
 async fn polling_station_get(
     _user: User,
     State(pool): State<SqlitePool>,
-    Path((election_id, polling_station_id)): Path<(u32, u32)>,
+    Path((election_id, polling_station_id)): Path<(ElectionId, u32)>,
 ) -> Result<(StatusCode, PollingStation), APIError> {
     let mut conn = pool.acquire().await?;
     Ok((
@@ -209,7 +210,7 @@ async fn polling_station_get(
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
     params(
-        ("election_id" = u32, description = "Election database id"),
+        ("election_id" = ElectionId, description = "Election database id"),
         ("polling_station_id" = u32, description = "Polling station database id"),
     ),
     security(("cookie_auth" = ["administrator", "coordinator"])),
@@ -218,7 +219,7 @@ async fn polling_station_update(
     user: AdminOrCoordinator,
     State(pool): State<SqlitePool>,
     audit_service: AuditService,
-    Path((election_id, polling_station_id)): Path<(u32, u32)>,
+    Path((election_id, polling_station_id)): Path<(ElectionId, u32)>,
     polling_station_update: PollingStationRequest,
 ) -> Result<(StatusCode, PollingStation), APIError> {
     let mut tx = pool.begin_immediate().await?;
@@ -273,7 +274,7 @@ async fn polling_station_update(
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
     params(
-        ("election_id" = u32, description = "Election database id"),
+        ("election_id" = ElectionId, description = "Election database id"),
         ("polling_station_id" = u32, description = "Polling station database id"),
     ),
     security(("cookie_auth" = ["administrator", "coordinator"])),
@@ -282,7 +283,7 @@ async fn polling_station_delete(
     user: AdminOrCoordinator,
     State(pool): State<SqlitePool>,
     audit_service: AuditService,
-    Path((election_id, polling_station_id)): Path<(u32, u32)>,
+    Path((election_id, polling_station_id)): Path<(ElectionId, u32)>,
 ) -> Result<StatusCode, APIError> {
     let mut tx = pool.begin_immediate().await?;
 
@@ -355,7 +356,7 @@ pub struct PollingStationRequestListResponse {
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
     params(
-        ("election_id" = u32, description = "Election database id"),
+        ("election_id" = ElectionId, description = "Election database id"),
     ),
     security(("cookie_auth" = ["administrator", "coordinator"])),
 )]
@@ -381,7 +382,7 @@ pub struct PollingStationsRequest {
 pub async fn create_imported_polling_stations(
     conn: &mut SqliteConnection,
     audit_service: AuditService,
-    election_id: u32,
+    election_id: ElectionId,
     polling_stations_request: PollingStationsRequest,
 ) -> Result<Vec<PollingStation>, APIError> {
     let mut tx = conn.begin().await?;
@@ -439,14 +440,14 @@ pub async fn create_imported_polling_stations(
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
     params(
-        ("election_id" = u32, description = "Election database id"),
+        ("election_id" = ElectionId, description = "Election database id"),
     ),
     security(("cookie_auth" = ["administrator", "coordinator"])),
 )]
 async fn polling_station_import(
     _user: AdminOrCoordinator,
     State(pool): State<SqlitePool>,
-    Path(election_id): Path<u32>,
+    Path(election_id): Path<ElectionId>,
     audit_service: AuditService,
     Json(polling_stations_request): Json<PollingStationsRequest>,
 ) -> Result<(StatusCode, PollingStationListResponse), APIError> {
@@ -482,6 +483,8 @@ async fn polling_station_import(
 mod tests {
     use sqlx::{SqlitePool, query};
     use test_log::test;
+
+    use crate::election::ElectionId;
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2", "election_3"))))]
     async fn test_polling_station_number_unique_per_election(pool: SqlitePool) {
@@ -535,11 +538,17 @@ VALUES
             postal_code: "1234 AB".to_string(),
             locality: "Locality".to_string(),
         };
-        let result = crate::polling_station::repository::create(&mut conn, 7, data.clone()).await;
+        let result = crate::polling_station::repository::create(
+            &mut conn,
+            ElectionId::from(7),
+            data.clone(),
+        )
+        .await;
         assert!(result.is_err());
 
         data.number = Some(123);
-        let result = crate::polling_station::repository::create(&mut conn, 7, data).await;
+        let result =
+            crate::polling_station::repository::create(&mut conn, ElectionId::from(7), data).await;
         assert!(result.is_ok());
     }
 
@@ -555,13 +564,21 @@ VALUES
             postal_code: "1234 AB".to_string(),
             locality: "Locality".to_string(),
         };
-        let result =
-            crate::polling_station::repository::create_many(&mut conn, 7, vec![data.clone()]).await;
+        let result = crate::polling_station::repository::create_many(
+            &mut conn,
+            ElectionId::from(7),
+            vec![data.clone()],
+        )
+        .await;
         assert!(result.is_err());
 
         data.number = Some(123);
-        let result =
-            crate::polling_station::repository::create_many(&mut conn, 7, vec![data]).await;
+        let result = crate::polling_station::repository::create_many(
+            &mut conn,
+            ElectionId::from(7),
+            vec![data],
+        )
+        .await;
         assert!(result.is_ok());
     }
 
@@ -579,16 +596,19 @@ VALUES
         };
 
         // Add a new polling station
-        let polling_station =
-            crate::polling_station::repository::create(&mut conn, 7, data.clone())
-                .await
-                .unwrap();
+        let polling_station = crate::polling_station::repository::create(
+            &mut conn,
+            ElectionId::from(7),
+            data.clone(),
+        )
+        .await
+        .unwrap();
 
         // Update number
         data.number = Some(456);
         let result = crate::polling_station::repository::update(
             &mut conn,
-            7,
+            ElectionId::from(7),
             polling_station.id,
             data.clone(),
         )
@@ -612,13 +632,20 @@ VALUES
 
         // Update a polling station that has an id_prev_session reference
         // ... without number change
-        let result =
-            crate::polling_station::repository::update(&mut conn, 7, 741, data.clone()).await;
+        let result = crate::polling_station::repository::update(
+            &mut conn,
+            ElectionId::from(7),
+            741,
+            data.clone(),
+        )
+        .await;
         assert!(result.is_ok());
 
         // ... with number change
         data.number = Some(123);
-        let result = crate::polling_station::repository::update(&mut conn, 7, 741, data).await;
+        let result =
+            crate::polling_station::repository::update(&mut conn, ElectionId::from(7), 741, data)
+                .await;
         assert!(result.is_err());
     }
 

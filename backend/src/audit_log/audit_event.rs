@@ -5,7 +5,10 @@ use strum::VariantNames;
 use utoipa::ToSchema;
 
 use super::AuditEventLevel;
-use crate::{ErrorResponse, error::ErrorReference, investigation::PollingStationInvestigation};
+use crate::{
+    ErrorResponse, election::ElectionId, error::ErrorReference,
+    investigation::PollingStationInvestigation,
+};
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, Eq, ToSchema)]
 #[serde(deny_unknown_fields)]
@@ -41,7 +44,7 @@ pub struct UserDetails {
 #[derive(Serialize, Deserialize, Debug, PartialEq, Eq, ToSchema)]
 #[serde(deny_unknown_fields)]
 pub struct ElectionDetails {
-    pub election_id: u32,
+    pub election_id: ElectionId,
     pub election_name: String,
     pub election_counting_method: String,
     pub election_election_id: String,
@@ -61,7 +64,7 @@ pub struct ElectionDetails {
 pub struct CommitteeSessionDetails {
     pub session_id: u32,
     pub session_number: u32,
-    pub session_election_id: u32,
+    pub session_election_id: ElectionId,
     pub session_location: String,
     #[schema(value_type = Option<String>, format = "date-time")]
     pub session_start_date_time: Option<NaiveDateTime>,
@@ -92,7 +95,7 @@ pub struct FileDetails {
 #[serde(deny_unknown_fields)]
 pub struct PollingStationDetails {
     pub polling_station_id: u32,
-    pub polling_station_election_id: u32,
+    pub polling_station_election_id: ElectionId,
     pub polling_station_committee_session_id: u32,
     #[serde(skip_serializing_if = "Option::is_none")]
     #[schema(nullable = false)]
@@ -112,7 +115,7 @@ pub struct PollingStationDetails {
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, Eq, ToSchema)]
 pub struct PollingStationImportDetails {
-    pub import_election_id: u32,
+    pub import_election_id: ElectionId,
     pub import_file_name: String,
     pub import_number_of_polling_stations: u64,
 }

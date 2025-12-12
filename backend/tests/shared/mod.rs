@@ -13,7 +13,7 @@ use abacus::{
         PoliticalGroupTotalVotes, PollingStationResults, VotersCounts, VotesCounts, YesNo,
         status::{ClientState, DataEntryStatusName},
     },
-    election::{CandidateNumber, ElectionDetailsResponse, PGNumber},
+    election::{CandidateNumber, ElectionDetailsResponse, ElectionId, PGNumber},
 };
 
 use axum::http::{HeaderValue, StatusCode};
@@ -96,7 +96,7 @@ pub fn example_data_entry(client_state: Option<&str>) -> DataEntry {
 pub async fn create_polling_station(
     addr: &SocketAddr,
     cookie: &HeaderValue,
-    election_id: u32,
+    election_id: ElectionId,
     number: u32,
 ) -> Response {
     let url = format!("http://{addr}/api/elections/{election_id}/polling_stations");
@@ -196,7 +196,7 @@ async fn check_data_entry_status_is_definitive(
     addr: &SocketAddr,
     cookie: &HeaderValue,
     polling_station_id: u32,
-    election_id: u32,
+    election_id: ElectionId,
 ) {
     // check that data entry status for this polling station is now Definitive
     let url = format!("http://{addr}/api/elections/{election_id}/status");
@@ -256,7 +256,7 @@ pub async fn update_investigation(
         .unwrap()
 }
 
-pub async fn create_result(addr: &SocketAddr, polling_station_id: u32, election_id: u32) {
+pub async fn create_result(addr: &SocketAddr, polling_station_id: u32, election_id: ElectionId) {
     let typist_cookie = typist_login(addr).await;
     complete_data_entry(
         addr,
@@ -282,7 +282,7 @@ pub async fn create_result(addr: &SocketAddr, polling_station_id: u32, election_
 pub async fn create_result_with_non_example_data_entry(
     addr: &SocketAddr,
     polling_station_id: u32,
-    election_id: u32,
+    election_id: ElectionId,
     data_entry: DataEntry,
 ) {
     let typist_cookie = typist_login(addr).await;
@@ -303,7 +303,7 @@ pub async fn create_result_with_non_example_data_entry(
 pub async fn get_election_details(
     addr: &SocketAddr,
     cookie: &HeaderValue,
-    election_id: u32,
+    election_id: ElectionId,
 ) -> ElectionDetailsResponse {
     let url = format!("http://{addr}/api/elections/{election_id}");
     let response = reqwest::Client::new()
@@ -319,7 +319,7 @@ pub async fn get_election_details(
 pub async fn get_election_committee_session(
     addr: &SocketAddr,
     cookie: &HeaderValue,
-    election_id: u32,
+    election_id: ElectionId,
 ) -> CommitteeSession {
     let url = format!("http://{addr}/api/elections/{election_id}");
     let response = reqwest::Client::new()
@@ -336,7 +336,7 @@ pub async fn get_election_committee_session(
 pub async fn change_status_committee_session(
     addr: &SocketAddr,
     cookie: &HeaderValue,
-    election_id: u32,
+    election_id: ElectionId,
     committee_session_id: u32,
     status: CommitteeSessionStatus,
 ) {
@@ -356,7 +356,7 @@ pub async fn change_status_committee_session(
 pub async fn get_statuses(
     addr: &SocketAddr,
     cookie: &HeaderValue,
-    election_id: u32,
+    election_id: ElectionId,
 ) -> BTreeMap<u32, ElectionStatusResponseEntry> {
     let url = format!("http://{addr}/api/elections/{election_id}/status");
     let response = reqwest::Client::new()

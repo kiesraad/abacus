@@ -725,7 +725,7 @@ mod tests {
             structs::tests::{ValidDefault, example_polling_station_results},
         },
         election::{
-            Candidate, ElectionCategory, ElectionWithPoliticalGroups, PoliticalGroup,
+            Candidate, ElectionCategory, ElectionId, ElectionWithPoliticalGroups, PoliticalGroup,
             VoteCountingMethod,
         },
         polling_station::{PollingStation, PollingStationType},
@@ -781,7 +781,7 @@ mod tests {
     fn polling_station() -> PollingStation {
         PollingStation {
             id: 1,
-            election_id: 1,
+            election_id: ElectionId::from(1),
             committee_session_id: 1,
             id_prev_session: None,
             name: "Test polling station".to_string(),
@@ -796,7 +796,7 @@ mod tests {
 
     fn election() -> ElectionWithPoliticalGroups {
         ElectionWithPoliticalGroups {
-            id: 1,
+            id: ElectionId::from(1),
             name: "Test election".to_string(),
             counting_method: VoteCountingMethod::CSO,
             election_id: "Test_2025".to_string(),

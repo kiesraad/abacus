@@ -8,7 +8,7 @@ use sqlx::{FromRow, Type};
 use utoipa::ToSchema;
 
 use super::status::CommitteeSessionStatus;
-use crate::{audit_log, investigation::PollingStationInvestigation};
+use crate::{audit_log, election::ElectionId, investigation::PollingStationInvestigation};
 
 /// Committee session
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq, ToSchema, Type, FromRow)]
@@ -16,7 +16,7 @@ use crate::{audit_log, investigation::PollingStationInvestigation};
 pub struct CommitteeSession {
     pub id: u32,
     pub number: u32,
-    pub election_id: u32,
+    pub election_id: ElectionId,
     pub location: String,
     #[serde(skip_serializing_if = "Option::is_none")]
     #[schema(value_type = String, format = "date-time", nullable = false)]
@@ -67,7 +67,7 @@ impl IntoResponse for CommitteeSession {
 #[serde(deny_unknown_fields)]
 pub struct CommitteeSessionCreateRequest {
     pub number: u32,
-    pub election_id: u32,
+    pub election_id: ElectionId,
 }
 
 /// Committee session update request

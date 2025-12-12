@@ -1,6 +1,6 @@
 {
   "db_name": "SQLite",
-  "query": "\n            INSERT INTO polling_stations (\n                committee_session_id,\n                id_prev_session,\n                name,\n                number,\n                number_of_voters,\n                polling_station_type,\n                address,\n                postal_code,\n                locality\n            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)\n            RETURNING\n                id AS \"id: u32\",\n                ? AS \"election_id!: u32\", -- Workaround to get election_id in the result without a temporary struct\n                committee_session_id AS \"committee_session_id: u32\",\n                id_prev_session AS \"id_prev_session: _\",\n                name,\n                number AS \"number: u32\",\n                number_of_voters AS \"number_of_voters: _\",\n                polling_station_type AS \"polling_station_type: _\",\n                address,\n                postal_code,\n                locality\n            ",
+  "query": "\n        SELECT\n            p.id AS \"id: u32\",\n            c.election_id AS \"election_id: ElectionId\",\n            p.committee_session_id AS \"committee_session_id: u32\",\n            p.id_prev_session AS \"id_prev_session: _\",\n            p.name,\n            p.number AS \"number: u32\",\n            p.number_of_voters AS \"number_of_voters: _\",\n            p.polling_station_type AS \"polling_station_type: _\",\n            p.address,\n            p.postal_code,\n            p.locality\n        FROM polling_stations AS p\n        JOIN committee_sessions AS c ON c.id = p.committee_session_id\n        WHERE p.id_prev_session = $1\n        ",
   "describe": {
     "columns": [
       {
@@ -9,9 +9,9 @@
         "type_info": "Integer"
       },
       {
-        "name": "election_id!: u32",
+        "name": "election_id: ElectionId",
         "ordinal": 1,
-        "type_info": "Null"
+        "type_info": "Integer"
       },
       {
         "name": "committee_session_id: u32",
@@ -60,11 +60,11 @@
       }
     ],
     "parameters": {
-      "Right": 10
+      "Right": 1
     },
     "nullable": [
       false,
-      null,
+      false,
       false,
       true,
       false,
@@ -76,5 +76,5 @@
       false
     ]
   },
-  "hash": "4d93c7d77626483fcea4e2047481f02a3cd92f7e9fe4b97e626e97b17f462ac5"
+  "hash": "19e51970edf30b9a689369a2b23e35458cb25aa10514dc73273dd4df444cb385"
 }

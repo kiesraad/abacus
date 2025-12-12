@@ -2,7 +2,9 @@
 
 use std::net::SocketAddr;
 
-use abacus::{committee_session::status::CommitteeSessionStatus, data_entry::DataEntry};
+use abacus::{
+    committee_session::status::CommitteeSessionStatus, data_entry::DataEntry, election::ElectionId,
+};
 use axum::http::HeaderValue;
 use reqwest::{Client, Response, StatusCode};
 use sqlx::SqlitePool;
@@ -144,7 +146,7 @@ async fn test_polling_station_data_entry_get_errors(pool: SqlitePool) {
     shared::change_status_committee_session(
         &addr,
         &coordinator_cookie,
-        2,
+        ElectionId::from(2),
         2,
         CommitteeSessionStatus::DataEntryPaused,
     )
@@ -208,7 +210,7 @@ async fn test_polling_station_data_entry_resolve_errors_resume(pool: SqlitePool)
     shared::change_status_committee_session(
         &addr,
         &coordinator_cookie,
-        2,
+        ElectionId::from(2),
         2,
         CommitteeSessionStatus::DataEntryPaused,
     )
@@ -274,7 +276,7 @@ async fn test_polling_station_data_entry_get_differences(pool: SqlitePool) {
     shared::change_status_committee_session(
         &addr,
         &coordinator_cookie,
-        2,
+        ElectionId::from(2),
         2,
         CommitteeSessionStatus::DataEntryPaused,
     )

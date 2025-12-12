@@ -931,7 +931,10 @@ async fn test_delete_with_investigation_works(pool: SqlitePool) {
     );
     let coordinator_cookie = coordinator_login(&addr).await;
     let election_details = get_election_details(&addr, &coordinator_cookie, election_id).await;
-    assert_eq!(election_details.investigations.len(), 2);
+    assert_eq!(
+        election_details["investigations"].as_array().unwrap().len(),
+        2
+    );
 
     let response =
         delete_polling_station(&addr, &coordinator_cookie, election_id, polling_station_id).await;
@@ -943,7 +946,10 @@ async fn test_delete_with_investigation_works(pool: SqlitePool) {
     );
 
     let election_details = get_election_details(&addr, &coordinator_cookie, election_id).await;
-    assert_eq!(election_details.investigations.len(), 1);
+    assert_eq!(
+        election_details["investigations"].as_array().unwrap().len(),
+        1
+    );
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_5_with_results", "users"))))]

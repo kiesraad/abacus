@@ -64,7 +64,10 @@ async fn test_create_conclude_update_delete(pool: SqlitePool) {
 
     let election_details =
         get_election_details(&addr, &coordinator_login(&addr).await, election_id).await;
-    assert_eq!(election_details.investigations.len(), 0);
+    assert_eq!(
+        election_details["investigations"].as_array().unwrap().len(),
+        0
+    );
 
     assert_eq!(
         create_investigation(&addr, polling_station_id)
@@ -75,13 +78,11 @@ async fn test_create_conclude_update_delete(pool: SqlitePool) {
 
     let election_details =
         get_election_details(&addr, &coordinator_login(&addr).await, election_id).await;
-    assert_eq!(election_details.investigations.len(), 1);
-    assert_eq!(
-        election_details.investigations[0].polling_station_id,
-        polling_station_id
-    );
-    assert_eq!(election_details.investigations[0].reason, "Test reason");
-    assert_eq!(election_details.investigations[0].findings, None);
+    let investigations = election_details["investigations"].as_array().unwrap();
+    assert_eq!(investigations.len(), 1);
+    assert_eq!(investigations[0]["polling_station_id"], polling_station_id);
+    assert_eq!(investigations[0]["reason"], "Test reason");
+    assert!(investigations[0]["findings"].is_null());
 
     assert_eq!(
         conclude_investigation(&addr, polling_station_id, None)
@@ -92,20 +93,12 @@ async fn test_create_conclude_update_delete(pool: SqlitePool) {
 
     let election_details =
         get_election_details(&addr, &coordinator_login(&addr).await, election_id).await;
-    assert_eq!(election_details.investigations.len(), 1);
-    assert_eq!(
-        election_details.investigations[0].polling_station_id,
-        polling_station_id
-    );
-    assert_eq!(election_details.investigations[0].reason, "Test reason");
-    assert_eq!(
-        election_details.investigations[0].findings,
-        Some("Test findings".to_string())
-    );
-    assert_eq!(
-        election_details.investigations[0].corrected_results,
-        Some(false)
-    );
+    let investigations = election_details["investigations"].as_array().unwrap();
+    assert_eq!(investigations.len(), 1);
+    assert_eq!(investigations[0]["polling_station_id"], polling_station_id);
+    assert_eq!(investigations[0]["reason"], "Test reason");
+    assert_eq!(investigations[0]["findings"], "Test findings");
+    assert_eq!(investigations[0]["corrected_results"], false);
 
     assert_eq!(
         update_investigation(&addr, polling_station_id, None)
@@ -116,20 +109,12 @@ async fn test_create_conclude_update_delete(pool: SqlitePool) {
 
     let election_details =
         get_election_details(&addr, &coordinator_login(&addr).await, election_id).await;
-    assert_eq!(election_details.investigations.len(), 1);
-    assert_eq!(
-        election_details.investigations[0].polling_station_id,
-        polling_station_id
-    );
-    assert_eq!(election_details.investigations[0].reason, "Updated reason");
-    assert_eq!(
-        election_details.investigations[0].findings,
-        Some("updated test findings".to_string())
-    );
-    assert_eq!(
-        election_details.investigations[0].corrected_results,
-        Some(true)
-    );
+    let investigations = election_details["investigations"].as_array().unwrap();
+    assert_eq!(investigations.len(), 1);
+    assert_eq!(investigations[0]["polling_station_id"], polling_station_id);
+    assert_eq!(investigations[0]["reason"], "Updated reason");
+    assert_eq!(investigations[0]["findings"], "updated test findings");
+    assert_eq!(investigations[0]["corrected_results"], true);
 
     assert_eq!(
         delete_investigation(&addr, polling_station_id)
@@ -139,7 +124,10 @@ async fn test_create_conclude_update_delete(pool: SqlitePool) {
     );
     let election_details =
         get_election_details(&addr, &coordinator_login(&addr).await, election_id).await;
-    assert_eq!(election_details.investigations.len(), 0);
+    assert_eq!(
+        election_details["investigations"].as_array().unwrap().len(),
+        0
+    );
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_7_four_sessions", "users"))))]
@@ -218,13 +206,11 @@ async fn test_partials_update(pool: SqlitePool) {
 
     let election_details =
         get_election_details(&addr, &coordinator_login(&addr).await, election_id).await;
-    assert_eq!(election_details.investigations.len(), 1);
-    assert_eq!(
-        election_details.investigations[0].polling_station_id,
-        polling_station_id
-    );
-    assert_eq!(election_details.investigations[0].reason, "Test reason");
-    assert_eq!(election_details.investigations[0].findings, None);
+    let investigations = election_details["investigations"].as_array().unwrap();
+    assert_eq!(investigations.len(), 1);
+    assert_eq!(investigations[0]["polling_station_id"], polling_station_id);
+    assert_eq!(investigations[0]["reason"], "Test reason");
+    assert!(investigations[0]["findings"].is_null());
 
     // Update only the reason
     let updated = update_investigation(
@@ -240,16 +226,11 @@ async fn test_partials_update(pool: SqlitePool) {
 
     let election_details =
         get_election_details(&addr, &coordinator_login(&addr).await, election_id).await;
-    assert_eq!(election_details.investigations.len(), 1);
-    assert_eq!(
-        election_details.investigations[0].polling_station_id,
-        polling_station_id
-    );
-    assert_eq!(
-        election_details.investigations[0].reason,
-        "Partially updated reason"
-    );
-    assert_eq!(election_details.investigations[0].findings, None);
+    let investigations = election_details["investigations"].as_array().unwrap();
+    assert_eq!(investigations.len(), 1);
+    assert_eq!(investigations[0]["polling_station_id"], polling_station_id);
+    assert_eq!(investigations[0]["reason"], "Partially updated reason");
+    assert!(investigations[0]["findings"].is_null());
 
     let updated = update_investigation(
         &addr,
@@ -266,19 +247,11 @@ async fn test_partials_update(pool: SqlitePool) {
 
     let election_details =
         get_election_details(&addr, &coordinator_login(&addr).await, election_id).await;
-    assert_eq!(election_details.investigations.len(), 1);
-    assert_eq!(
-        election_details.investigations[0].polling_station_id,
-        polling_station_id
-    );
-    assert_eq!(
-        election_details.investigations[0].reason,
-        "Partially updated reason"
-    );
-    assert_eq!(
-        election_details.investigations[0].findings,
-        Some("Partially updated findings".to_string())
-    );
+    let investigations = election_details["investigations"].as_array().unwrap();
+    assert_eq!(investigations.len(), 1);
+    assert_eq!(investigations[0]["polling_station_id"], polling_station_id);
+    assert_eq!(investigations[0]["reason"], "Partially updated reason");
+    assert_eq!(investigations[0]["findings"], "Partially updated findings");
 
     let updated = update_investigation(
         &addr,
@@ -295,20 +268,12 @@ async fn test_partials_update(pool: SqlitePool) {
 
     let election_details =
         get_election_details(&addr, &coordinator_login(&addr).await, election_id).await;
-    assert_eq!(election_details.investigations.len(), 1);
-    assert_eq!(
-        election_details.investigations[0].polling_station_id,
-        polling_station_id
-    );
-    assert_eq!(
-        election_details.investigations[0].reason,
-        "Partially updated reason"
-    );
-    assert_eq!(election_details.investigations[0].findings, None);
-    assert_eq!(
-        election_details.investigations[0].corrected_results,
-        Some(true)
-    );
+    let investigations = election_details["investigations"].as_array().unwrap();
+    assert_eq!(investigations.len(), 1);
+    assert_eq!(investigations[0]["polling_station_id"], polling_station_id);
+    assert_eq!(investigations[0]["reason"], "Partially updated reason");
+    assert!(investigations[0]["findings"].is_null());
+    assert_eq!(investigations[0]["corrected_results"], true);
 }
 
 fn second_session_data_entry_two_political_groups() -> serde_json::Value {

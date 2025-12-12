@@ -582,7 +582,7 @@ async fn test_committee_session_status_change_previous_committee_session_fails(p
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_7_four_sessions", "users"))))]
 async fn test_committee_session_investigations_list_works(pool: SqlitePool) {
     let addr = serve_api(pool).await;
-    let cookie = shared::coordinator_login(&addr).await;
+    let cookie = coordinator_login(&addr).await;
     let url = format!("http://{addr}/api/elections/7/committee_sessions/702/investigations");
     let response = reqwest::Client::new()
         .get(&url)
@@ -610,7 +610,7 @@ async fn test_committee_session_investigations_list_works(pool: SqlitePool) {
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_7_four_sessions", "users"))))]
 async fn test_committee_session_investigations_list_works_no_investigations(pool: SqlitePool) {
     let addr = serve_api(pool).await;
-    let cookie = shared::coordinator_login(&addr).await;
+    let cookie = coordinator_login(&addr).await;
     let url = format!("http://{addr}/api/elections/7/committee_sessions/704/investigations");
     let response = reqwest::Client::new()
         .get(&url)
@@ -634,7 +634,7 @@ async fn test_committee_session_investigations_list_works_no_investigations(pool
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_7_four_sessions", "users"))))]
 async fn test_committee_session_investigations_list_fails_election_not_found(pool: SqlitePool) {
     let addr = serve_api(pool).await;
-    let cookie = shared::coordinator_login(&addr).await;
+    let cookie = coordinator_login(&addr).await;
     let url = format!("http://{addr}/api/elections/1/committee_sessions/1/investigations");
     let response = reqwest::Client::new()
         .get(&url)

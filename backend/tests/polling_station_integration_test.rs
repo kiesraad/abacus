@@ -152,7 +152,7 @@ async fn test_creation_for_committee_session_with_created_and_not_started_status
 
     let committee_session =
         get_election_committee_session(&addr, &coordinator_cookie, election_id).await;
-    assert_eq!(committee_session.status.to_string(), "created".to_string());
+    assert_eq!(committee_session["status"], "created");
 
     let response = create_polling_station(&addr, &coordinator_cookie, election_id, 1).await;
 
@@ -162,16 +162,13 @@ async fn test_creation_for_committee_session_with_created_and_not_started_status
         "Unexpected response status"
     );
     let body: serde_json::Value = response.json().await.unwrap();
-    assert_eq!(body["committee_session_id"], committee_session.id);
+    assert_eq!(body["committee_session_id"], committee_session["id"]);
     assert_eq!(body["name"], "Test polling station");
     assert_eq!(body["polling_station_type"], "FixedLocation");
 
     let committee_session =
         get_election_committee_session(&addr, &coordinator_cookie, election_id).await;
-    assert_eq!(
-        committee_session.status.to_string(),
-        "data_entry_not_started".to_string()
-    );
+    assert_eq!(committee_session["status"], "data_entry_not_started");
 
     // Create another polling station
     let response = create_polling_station(&addr, &coordinator_cookie, election_id, 2).await;
@@ -195,7 +192,7 @@ async fn test_creation_for_committee_session_with_created_and_not_started_status
     let election_id = 6;
 
     let committee_session = get_election_committee_session(&addr, &admin_cookie, election_id).await;
-    assert_eq!(committee_session.status.to_string(), "created".to_string());
+    assert_eq!(committee_session["status"], "created");
 
     let response = create_polling_station(&addr, &admin_cookie, election_id, 1).await;
 
@@ -205,15 +202,12 @@ async fn test_creation_for_committee_session_with_created_and_not_started_status
         "Unexpected response status"
     );
     let body: serde_json::Value = response.json().await.unwrap();
-    assert_eq!(body["committee_session_id"], committee_session.id);
+    assert_eq!(body["committee_session_id"], committee_session["id"]);
     assert_eq!(body["name"], "Test polling station");
     assert_eq!(body["polling_station_type"], "FixedLocation");
 
     let committee_session = get_election_committee_session(&addr, &admin_cookie, election_id).await;
-    assert_eq!(
-        committee_session.status.to_string(),
-        "data_entry_not_started".to_string()
-    );
+    assert_eq!(committee_session["status"], "data_entry_not_started");
 
     // Create another polling station
     let response = create_polling_station(&addr, &admin_cookie, election_id, 2).await;
@@ -235,10 +229,7 @@ async fn test_creation_for_committee_session_with_in_progress_status_as_coordina
 
     let committee_session =
         get_election_committee_session(&addr, &coordinator_cookie, election_id).await;
-    assert_eq!(
-        committee_session.status.to_string(),
-        "data_entry_in_progress".to_string()
-    );
+    assert_eq!(committee_session["status"], "data_entry_in_progress");
 
     let response = create_polling_station(&addr, &coordinator_cookie, election_id, 5).await;
 
@@ -248,7 +239,7 @@ async fn test_creation_for_committee_session_with_in_progress_status_as_coordina
         "Unexpected response status"
     );
     let body: serde_json::Value = response.json().await.unwrap();
-    assert_eq!(body["committee_session_id"], committee_session.id);
+    assert_eq!(body["committee_session_id"], committee_session["id"]);
     assert_eq!(body["name"], "Test polling station");
     assert_eq!(body["polling_station_type"], "FixedLocation");
 }
@@ -262,10 +253,7 @@ async fn test_creation_for_committee_session_with_in_progress_status_as_administ
     let election_id = 4;
 
     let committee_session = get_election_committee_session(&addr, &admin_cookie, election_id).await;
-    assert_eq!(
-        committee_session.status.to_string(),
-        "data_entry_in_progress".to_string()
-    );
+    assert_eq!(committee_session["status"], "data_entry_in_progress");
 
     let response = create_polling_station(&addr, &admin_cookie, election_id, 5).await;
 
@@ -314,7 +302,7 @@ async fn test_update_for_committee_session_with_created_status_as_coordinator_wo
 
     let committee_session =
         get_election_committee_session(&addr, &coordinator_cookie, election_id).await;
-    assert_eq!(committee_session.status.to_string(), "created".to_string());
+    assert_eq!(committee_session["status"], "created");
 
     let response = update_polling_station(
         &addr,
@@ -352,7 +340,7 @@ async fn test_update_for_committee_session_with_created_status_as_coordinator_wo
 
     let committee_session =
         get_election_committee_session(&addr, &coordinator_cookie, election_id).await;
-    assert_eq!(committee_session.status.to_string(), "created".to_string());
+    assert_eq!(committee_session["status"], "created");
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_7_four_sessions", "users"))))]
@@ -365,7 +353,7 @@ async fn test_update_for_committee_session_with_created_status_as_administrator_
     let polling_station_id = 741;
 
     let committee_session = get_election_committee_session(&addr, &admin_cookie, election_id).await;
-    assert_eq!(committee_session.status.to_string(), "created".to_string());
+    assert_eq!(committee_session["status"], "created");
 
     let response = update_polling_station(
         &addr,
@@ -401,7 +389,7 @@ async fn test_update_for_committee_session_with_created_status_as_administrator_
     assert_eq!(body["address"], "Teststraat 2a");
 
     let committee_session = get_election_committee_session(&addr, &admin_cookie, election_id).await;
-    assert_eq!(committee_session.status.to_string(), "created".to_string());
+    assert_eq!(committee_session["status"], "created");
 }
 
 #[test(sqlx::test(fixtures(
@@ -417,7 +405,7 @@ async fn test_update_for_committee_session_with_not_started_status_as_coordinato
 
     let committee_session =
         get_election_committee_session(&addr, &coordinator_cookie, election_id).await;
-    assert_eq!(committee_session.status.to_string(), "created".to_string());
+    assert_eq!(committee_session["status"], "created");
 
     let response = create_polling_station(&addr, &coordinator_cookie, election_id, 1).await;
     let body: serde_json::Value = response.json().await.unwrap();
@@ -425,10 +413,7 @@ async fn test_update_for_committee_session_with_not_started_status_as_coordinato
 
     let committee_session =
         get_election_committee_session(&addr, &coordinator_cookie, election_id).await;
-    assert_eq!(
-        committee_session.status.to_string(),
-        "data_entry_not_started".to_string()
-    );
+    assert_eq!(committee_session["status"], "data_entry_not_started");
 
     let response = update_polling_station(
         &addr,
@@ -466,10 +451,7 @@ async fn test_update_for_committee_session_with_not_started_status_as_coordinato
 
     let committee_session =
         get_election_committee_session(&addr, &coordinator_cookie, election_id).await;
-    assert_eq!(
-        committee_session.status.to_string(),
-        "data_entry_not_started".to_string()
-    );
+    assert_eq!(committee_session["status"], "data_entry_not_started");
 }
 
 #[test(sqlx::test(fixtures(
@@ -484,17 +466,14 @@ async fn test_update_for_committee_session_with_not_started_status_as_administra
     let election_id = 6;
 
     let committee_session = get_election_committee_session(&addr, &admin_cookie, election_id).await;
-    assert_eq!(committee_session.status.to_string(), "created".to_string());
+    assert_eq!(committee_session["status"], "created");
 
     let response = create_polling_station(&addr, &admin_cookie, election_id, 1).await;
     let body: serde_json::Value = response.json().await.unwrap();
     let polling_station_id = u32::try_from(body.get("id").unwrap().as_u64().unwrap()).unwrap();
 
     let committee_session = get_election_committee_session(&addr, &admin_cookie, election_id).await;
-    assert_eq!(
-        committee_session.status.to_string(),
-        "data_entry_not_started".to_string()
-    );
+    assert_eq!(committee_session["status"], "data_entry_not_started");
 
     let response = update_polling_station(
         &addr,
@@ -530,10 +509,7 @@ async fn test_update_for_committee_session_with_not_started_status_as_administra
     assert_eq!(body["address"], "Teststraat 2a");
 
     let committee_session = get_election_committee_session(&addr, &admin_cookie, election_id).await;
-    assert_eq!(
-        committee_session.status.to_string(),
-        "data_entry_not_started".to_string()
-    );
+    assert_eq!(committee_session["status"], "data_entry_not_started");
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_4", "users"))))]
@@ -547,10 +523,7 @@ async fn test_update_for_committee_session_with_in_progress_status_as_coordinato
 
     let committee_session =
         get_election_committee_session(&addr, &coordinator_cookie, election_id).await;
-    assert_eq!(
-        committee_session.status.to_string(),
-        "data_entry_in_progress".to_string()
-    );
+    assert_eq!(committee_session["status"], "data_entry_in_progress");
 
     let response = update_polling_station(
         &addr,
@@ -597,10 +570,7 @@ async fn test_update_for_committee_session_with_in_progress_status_as_administra
     let polling_station_id = 7;
 
     let committee_session = get_election_committee_session(&addr, &admin_cookie, election_id).await;
-    assert_eq!(
-        committee_session.status.to_string(),
-        "data_entry_in_progress".to_string()
-    );
+    assert_eq!(committee_session["status"], "data_entry_in_progress");
 
     let response = update_polling_station(
         &addr,
@@ -725,7 +695,7 @@ async fn test_delete_for_committee_session_with_created_status_as_coordinator_wo
 
     let committee_session =
         get_election_committee_session(&addr, &coordinator_cookie, election_id).await;
-    assert_eq!(committee_session.status.to_string(), "created".to_string());
+    assert_eq!(committee_session["status"], "created");
 
     let response =
         delete_polling_station(&addr, &coordinator_cookie, election_id, polling_station_id).await;
@@ -747,7 +717,7 @@ async fn test_delete_for_committee_session_with_created_status_as_administrator_
     let polling_station_id = 741;
 
     let committee_session = get_election_committee_session(&addr, &admin_cookie, election_id).await;
-    assert_eq!(committee_session.status.to_string(), "created".to_string());
+    assert_eq!(committee_session["status"], "created");
 
     let response =
         delete_polling_station(&addr, &admin_cookie, election_id, polling_station_id).await;
@@ -772,7 +742,7 @@ async fn test_delete_for_committee_session_with_not_started_status_as_coordinato
 
     let committee_session =
         get_election_committee_session(&addr, &coordinator_cookie, election_id).await;
-    assert_eq!(committee_session.status.to_string(), "created".to_string());
+    assert_eq!(committee_session["status"], "created");
 
     let response = create_polling_station(&addr, &coordinator_cookie, election_id, 1).await;
     let body: serde_json::Value = response.json().await.unwrap();
@@ -780,10 +750,7 @@ async fn test_delete_for_committee_session_with_not_started_status_as_coordinato
 
     let committee_session =
         get_election_committee_session(&addr, &coordinator_cookie, election_id).await;
-    assert_eq!(
-        committee_session.status.to_string(),
-        "data_entry_not_started".to_string()
-    );
+    assert_eq!(committee_session["status"], "data_entry_not_started");
 
     let response =
         delete_polling_station(&addr, &coordinator_cookie, election_id, polling_station_id).await;
@@ -807,17 +774,14 @@ async fn test_delete_for_committee_session_with_not_started_status_as_administra
     let election_id = 6;
 
     let committee_session = get_election_committee_session(&addr, &admin_cookie, election_id).await;
-    assert_eq!(committee_session.status.to_string(), "created".to_string());
+    assert_eq!(committee_session["status"], "created");
 
     let response = create_polling_station(&addr, &admin_cookie, election_id, 1).await;
     let body: serde_json::Value = response.json().await.unwrap();
     let polling_station_id = u32::try_from(body.get("id").unwrap().as_u64().unwrap()).unwrap();
 
     let committee_session = get_election_committee_session(&addr, &admin_cookie, election_id).await;
-    assert_eq!(
-        committee_session.status.to_string(),
-        "data_entry_not_started".to_string()
-    );
+    assert_eq!(committee_session["status"], "data_entry_not_started");
 
     let response =
         delete_polling_station(&addr, &admin_cookie, election_id, polling_station_id).await;
@@ -839,10 +803,7 @@ async fn test_delete_for_committee_session_with_in_progress_status_as_coordinato
 
     let committee_session =
         get_election_committee_session(&addr, &coordinator_cookie, election_id).await;
-    assert_eq!(
-        committee_session.status.to_string(),
-        "data_entry_in_progress".to_string()
-    );
+    assert_eq!(committee_session["status"], "data_entry_in_progress");
 
     let response = delete_polling_station(&addr, &coordinator_cookie, election_id, 2).await;
 
@@ -854,10 +815,7 @@ async fn test_delete_for_committee_session_with_in_progress_status_as_coordinato
 
     let committee_session =
         get_election_committee_session(&addr, &coordinator_cookie, election_id).await;
-    assert_eq!(
-        committee_session.status.to_string(),
-        "data_entry_in_progress".to_string()
-    );
+    assert_eq!(committee_session["status"], "data_entry_in_progress");
 
     let gone = get_polling_station(&addr, &coordinator_cookie, election_id, 2).await;
     assert_eq!(
@@ -876,7 +834,7 @@ async fn test_delete_for_committee_session_with_in_progress_status_as_coordinato
 
     let committee_session =
         get_election_committee_session(&addr, &coordinator_cookie, election_id).await;
-    assert_eq!(committee_session.status.to_string(), "created".to_string());
+    assert_eq!(committee_session["status"], "created");
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
@@ -888,10 +846,7 @@ async fn test_delete_for_committee_session_with_in_progress_status_as_administra
     let election_id = 2;
 
     let committee_session = get_election_committee_session(&addr, &admin_cookie, election_id).await;
-    assert_eq!(
-        committee_session.status.to_string(),
-        "data_entry_in_progress".to_string()
-    );
+    assert_eq!(committee_session["status"], "data_entry_in_progress");
 
     let response = delete_polling_station(&addr, &admin_cookie, election_id, 2).await;
 
@@ -1108,7 +1063,7 @@ async fn test_import_fails_when_polling_stations_exist(pool: SqlitePool) {
 
     let committee_session =
         get_election_committee_session(&addr, &coordinator_cookie, election_id).await;
-    assert_eq!(committee_session.status.to_string(), "created".to_string());
+    assert_eq!(committee_session["status"], "created");
 
     let data = include_str!("../src/eml/tests/eml110b_test.eml.xml");
 
@@ -1138,7 +1093,7 @@ async fn test_import_correct_file(pool: SqlitePool) {
 
     let committee_session =
         get_election_committee_session(&addr, &coordinator_cookie, election_id).await;
-    assert_eq!(committee_session.status.to_string(), "created".to_string());
+    assert_eq!(committee_session["status"], "created");
 
     let data = include_str!("../src/eml/tests/eml110b_test.eml.xml");
 
@@ -1160,10 +1115,7 @@ async fn test_import_correct_file(pool: SqlitePool) {
 
     let committee_session =
         get_election_committee_session(&addr, &coordinator_cookie, election_id).await;
-    assert_eq!(
-        committee_session.status.to_string(),
-        "data_entry_not_started".to_string()
-    );
+    assert_eq!(committee_session["status"], "data_entry_not_started");
 }
 
 async fn check_finished_to_in_progress_on<F, Fut>(
@@ -1190,10 +1142,7 @@ async fn check_finished_to_in_progress_on<F, Fut>(
     .await;
     let committee_session =
         get_election_committee_session(addr, &coordinator_cookie, election_id).await;
-    assert_eq!(
-        committee_session.status.to_string(),
-        "data_entry_finished".to_string()
-    );
+    assert_eq!(committee_session["status"], "data_entry_finished");
 
     let status = action().await.status();
     assert_eq!(status, expected_status, "Unexpected response status");
@@ -1201,10 +1150,7 @@ async fn check_finished_to_in_progress_on<F, Fut>(
     let coordinator_cookie = coordinator_login(addr).await;
     let committee_session =
         get_election_committee_session(addr, &coordinator_cookie, election_id).await;
-    assert_eq!(
-        committee_session.status.to_string(),
-        "data_entry_in_progress".to_string()
-    );
+    assert_eq!(committee_session["status"], "data_entry_in_progress");
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
@@ -1267,5 +1213,5 @@ async fn test_finished_to_in_progress_on_delete(pool: SqlitePool) {
 
     let committee_session =
         get_election_committee_session(&addr, &coordinator_login(&addr).await, election_id).await;
-    assert_eq!(committee_session.status.to_string(), "created".to_string());
+    assert_eq!(committee_session["status"], "created");
 }

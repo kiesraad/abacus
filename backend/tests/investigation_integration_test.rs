@@ -2,11 +2,6 @@
 
 use std::net::SocketAddr;
 
-use abacus::data_entry::{
-    CSONextSessionResults, DataEntry, PoliticalGroupTotalVotes, PollingStationResults,
-    VotersCounts, VotesCounts,
-    status::{ClientState, DataEntryStatusName},
-};
 use axum::http::StatusCode;
 use reqwest::Response;
 use sqlx::SqlitePool;
@@ -198,10 +193,7 @@ async fn test_deletion_removes_polling_station_from_status(pool: SqlitePool) {
 
     let statuses = get_statuses(&addr, &coordinator_login(&addr).await, election_id).await;
     assert_eq!(statuses.len(), 1);
-    assert_eq!(
-        statuses[&polling_station_id].status,
-        DataEntryStatusName::Definitive
-    );
+    assert_eq!(statuses[&polling_station_id]["status"], "definitive");
 
     assert_eq!(
         delete_investigation(&addr, polling_station_id)
@@ -322,40 +314,40 @@ async fn test_partials_update(pool: SqlitePool) {
     );
 }
 
-fn second_session_data_entry_two_political_groups() -> DataEntry {
-    DataEntry {
-        progress: 100,
-        data: PollingStationResults::CSONextSession(CSONextSessionResults {
-            voters_counts: VotersCounts {
-                poll_card_count: 15,
-                proxy_certificate_count: 0,
-                total_admitted_voters_count: 15,
+fn second_session_data_entry_two_political_groups() -> serde_json::Value {
+    serde_json::json!({
+        "progress": 100,
+        "data": {
+            "model": "CSONextSession",
+            "voters_counts": {
+                "poll_card_count": 15,
+                "proxy_certificate_count": 0,
+                "total_admitted_voters_count": 15,
             },
-            votes_counts: VotesCounts {
-                political_group_total_votes: vec![
-                    PoliticalGroupTotalVotes {
-                        number: 1,
-                        total: 10,
+            "votes_counts": {
+                "political_group_total_votes": [
+                    {
+                        "number": 1,
+                        "total": 10,
                     },
-                    PoliticalGroupTotalVotes {
-                        number: 2,
-                        total: 5,
+                    {
+                        "number": 2,
+                        "total": 5,
                     },
                 ],
-                total_votes_candidates_count: 15,
-                blank_votes_count: 0,
-                invalid_votes_count: 0,
-                total_votes_cast_count: 15,
+                "total_votes_candidates_count": 15,
+                "blank_votes_count": 0,
+                "invalid_votes_count": 0,
+                "total_votes_cast_count": 15,
             },
-
-            differences_counts: differences_counts_zero(),
-            political_group_votes: vec![
+            "differences_counts": differences_counts_zero(),
+            "political_group_votes": [
                 political_group_votes_from_test_data_auto(1, &[8, 2]),
                 political_group_votes_from_test_data_auto(2, &[5, 0]),
             ],
-        }),
-        client_state: ClientState::new_from_str(None).unwrap(),
-    }
+        },
+        "client_state": {},
+    })
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_7_four_sessions", "users"))))]
@@ -386,10 +378,7 @@ async fn test_update_with_result(pool: SqlitePool) {
     .await;
 
     let statuses = get_statuses(&addr, &coordinator_login(&addr).await, election_id).await;
-    assert_eq!(
-        statuses[&polling_station_id].status,
-        DataEntryStatusName::Definitive
-    );
+    assert_eq!(statuses[&polling_station_id]["status"], "definitive");
 
     // Try to update investigation corrected_results to false
     let mut investigation = serde_json::json!({
@@ -405,10 +394,7 @@ async fn test_update_with_result(pool: SqlitePool) {
 
     // Data entry result is still there
     let statuses = get_statuses(&addr, &coordinator_login(&addr).await, election_id).await;
-    assert_eq!(
-        statuses[&polling_station_id].status,
-        DataEntryStatusName::Definitive
-    );
+    assert_eq!(statuses[&polling_station_id]["status"], "definitive");
 
     // Accept deletion
     investigation["accept_data_entry_deletion"] = true.into();
@@ -451,8 +437,8 @@ async fn test_update_with_data_entry(pool: SqlitePool) {
 
     let statuses = get_statuses(&addr, &coordinator_login(&addr).await, election_id).await;
     assert_eq!(
-        statuses[&polling_station_id].status,
-        DataEntryStatusName::SecondEntryNotStarted
+        statuses[&polling_station_id]["status"],
+        "second_entry_not_started"
     );
 
     // Try to update investigation corrected_results to false
@@ -470,8 +456,8 @@ async fn test_update_with_data_entry(pool: SqlitePool) {
     // Data entry is still there
     let statuses = get_statuses(&addr, &coordinator_login(&addr).await, election_id).await;
     assert_eq!(
-        statuses[&polling_station_id].status,
-        DataEntryStatusName::SecondEntryNotStarted
+        statuses[&polling_station_id]["status"],
+        "second_entry_not_started"
     );
 
     // Accept deletion

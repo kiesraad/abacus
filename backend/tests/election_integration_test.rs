@@ -8,8 +8,8 @@ use test_log::test;
 
 use crate::{
     shared::{
-        admin_login, coordinator_login, create_polling_station, create_result,
-        get_election_committee_session,
+        admin_login, change_status_committee_session, coordinator_login, create_polling_station,
+        create_result, get_election_committee_session, typist_login,
     },
     utils::serve_api,
 };
@@ -25,7 +25,7 @@ async fn test_election_list_works(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 
     let url = format!("http://{addr}/api/elections");
-    let typist_cookie = shared::typist_login(&addr).await;
+    let typist_cookie = typist_login(&addr).await;
     let response = reqwest::Client::new()
         .get(&url)
         .header("cookie", typist_cookie)
@@ -50,7 +50,7 @@ async fn test_election_details_works(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 
     let url = format!("http://{addr}/api/elections/5");
-    let typist_cookie = shared::typist_login(&addr).await;
+    let typist_cookie = typist_login(&addr).await;
     let response = reqwest::Client::new()
         .get(&url)
         .header("cookie", typist_cookie)
@@ -86,7 +86,7 @@ async fn test_election_import_payload_too_large(pool: SqlitePool) {
     let body = Vec::from_iter((0..MAX_BODY_SIZE_MB * 1024 * 1024 + 1).map(|_| b'a'));
 
     let url = format!("http://{addr}/api/elections/import");
-    let admin_cookie = shared::admin_login(&addr).await;
+    let admin_cookie = admin_login(&addr).await;
     let response = reqwest::Client::new()
         .post(&url)
         .header("cookie", admin_cookie)
@@ -111,7 +111,7 @@ async fn test_election_import_payload_not_too_large(pool: SqlitePool) {
     let body = Vec::from_iter((0..MAX_BODY_SIZE_MB * 1024 * 1024).map(|_| b'a'));
 
     let url = format!("http://{addr}/api/elections/import");
-    let admin_cookie = shared::admin_login(&addr).await;
+    let admin_cookie = admin_login(&addr).await;
     let response = reqwest::Client::new()
         .post(&url)
         .header("cookie", admin_cookie)
@@ -130,7 +130,7 @@ async fn test_election_details_not_found(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 
     let url: String = format!("http://{addr}/api/elections/1");
-    let typist_cookie = shared::typist_login(&addr).await;
+    let typist_cookie = typist_login(&addr).await;
     let response = reqwest::Client::new()
         .get(&url)
         .header("cookie", typist_cookie)
@@ -291,12 +291,12 @@ async fn test_election_number_of_voters_change_not_found(pool: SqlitePool) {
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
 async fn test_election_pdf_download_works(pool: SqlitePool) {
     let addr = serve_api(pool).await;
-    let coordinator_cookie = shared::coordinator_login(&addr).await;
+    let coordinator_cookie = coordinator_login(&addr).await;
     let election_id = 2;
     create_result(&addr, 1, election_id).await;
     create_result(&addr, 2, election_id).await;
 
-    shared::change_status_committee_session(
+    change_status_committee_session(
         &addr,
         &coordinator_cookie,
         election_id,
@@ -305,7 +305,7 @@ async fn test_election_pdf_download_works(pool: SqlitePool) {
     )
     .await;
     let committee_session =
-        shared::get_election_committee_session(&addr, &coordinator_cookie, election_id).await;
+        get_election_committee_session(&addr, &coordinator_cookie, election_id).await;
     assert_eq!(
         committee_session.status.to_string(),
         "data_entry_finished".to_string()
@@ -342,7 +342,7 @@ async fn test_election_pdf_download_works(pool: SqlitePool) {
     let hash1 = sha2::Sha256::digest(response.bytes().await.unwrap());
 
     let committee_session =
-        shared::get_election_committee_session(&addr, &coordinator_cookie, election_id).await;
+        get_election_committee_session(&addr, &coordinator_cookie, election_id).await;
     assert_eq!(committee_session.results_eml, Some(1));
     assert_eq!(committee_session.results_pdf, Some(2));
 
@@ -358,7 +358,7 @@ async fn test_election_pdf_download_works(pool: SqlitePool) {
 
     // Check that the file is the same
     let committee_session =
-        shared::get_election_committee_session(&addr, &coordinator_cookie, election_id).await;
+        get_election_committee_session(&addr, &coordinator_cookie, election_id).await;
     assert_eq!(committee_session.results_eml, Some(1));
     assert_eq!(committee_session.results_pdf, Some(2));
     assert_eq!(hash1, hash2);
@@ -367,7 +367,7 @@ async fn test_election_pdf_download_works(pool: SqlitePool) {
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
 async fn test_election_pdf_download_invalid_committee_session_state(pool: SqlitePool) {
     let addr = serve_api(pool).await;
-    let coordinator_cookie = shared::coordinator_login(&addr).await;
+    let coordinator_cookie = coordinator_login(&addr).await;
     let election_id = 2;
     create_result(&addr, 1, election_id).await;
     create_result(&addr, 2, election_id).await;
@@ -387,12 +387,12 @@ async fn test_election_pdf_download_invalid_committee_session_state(pool: Sqlite
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
 async fn test_election_zip_download_works(pool: SqlitePool) {
     let addr = serve_api(pool).await;
-    let coordinator_cookie = shared::coordinator_login(&addr).await;
+    let coordinator_cookie = coordinator_login(&addr).await;
     let election_id = 2;
     create_result(&addr, 1, election_id).await;
     create_result(&addr, 2, election_id).await;
 
-    shared::change_status_committee_session(
+    change_status_committee_session(
         &addr,
         &coordinator_cookie,
         election_id,
@@ -401,7 +401,7 @@ async fn test_election_zip_download_works(pool: SqlitePool) {
     )
     .await;
     let committee_session =
-        shared::get_election_committee_session(&addr, &coordinator_cookie, election_id).await;
+        get_election_committee_session(&addr, &coordinator_cookie, election_id).await;
     assert_eq!(
         committee_session.status.to_string(),
         "data_entry_finished".to_string()
@@ -474,7 +474,7 @@ async fn test_election_zip_download_works(pool: SqlitePool) {
     let eml_hash1 = sha2::Sha256::digest(&eml_content);
 
     let committee_session =
-        shared::get_election_committee_session(&addr, &coordinator_cookie, election_id).await;
+        get_election_committee_session(&addr, &coordinator_cookie, election_id).await;
     assert_eq!(committee_session.results_eml, Some(1));
     assert_eq!(committee_session.results_pdf, Some(2));
 
@@ -528,7 +528,7 @@ async fn test_election_zip_download_works(pool: SqlitePool) {
 
     // Check that the files inside the zip are the same
     let committee_session =
-        shared::get_election_committee_session(&addr, &coordinator_cookie, election_id).await;
+        get_election_committee_session(&addr, &coordinator_cookie, election_id).await;
     assert_eq!(committee_session.results_eml, Some(1));
     assert_eq!(committee_session.results_pdf, Some(2));
     assert_eq!(eml_hash1, eml_hash2, "EML files should have the same hash");
@@ -538,7 +538,7 @@ async fn test_election_zip_download_works(pool: SqlitePool) {
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
 async fn test_election_zip_download_invalid_committee_session_state(pool: SqlitePool) {
     let addr = serve_api(pool).await;
-    let coordinator_cookie = shared::coordinator_login(&addr).await;
+    let coordinator_cookie = coordinator_login(&addr).await;
     let election_id = 2;
     create_result(&addr, 1, election_id).await;
     create_result(&addr, 2, election_id).await;
@@ -558,7 +558,7 @@ async fn test_election_zip_download_invalid_committee_session_state(pool: Sqlite
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
 async fn test_election_n_10_2_download(pool: SqlitePool) {
     let addr = serve_api(pool).await;
-    let coordinator_cookie = shared::coordinator_login(&addr).await;
+    let coordinator_cookie = coordinator_login(&addr).await;
 
     let url = format!("http://{addr}/api/elections/2/download_n_10_2");
     let response = reqwest::Client::new()
@@ -603,7 +603,7 @@ async fn test_election_n_10_2_download(pool: SqlitePool) {
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
 async fn test_election_na_31_2_bijlage1_download(pool: SqlitePool) {
     let addr = serve_api(pool).await;
-    let coordinator_cookie = shared::coordinator_login(&addr).await;
+    let coordinator_cookie = coordinator_login(&addr).await;
 
     let url = format!("http://{addr}/api/elections/2/download_na_31_2_bijlage1");
     let response = reqwest::Client::new()
@@ -648,7 +648,7 @@ async fn test_election_na_31_2_bijlage1_download(pool: SqlitePool) {
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_5_with_results", "users"))))]
 async fn test_election_na_31_2_inlegvel_download(pool: SqlitePool) {
     let addr = serve_api(pool).await;
-    let coordinator_cookie = shared::coordinator_login(&addr).await;
+    let coordinator_cookie = coordinator_login(&addr).await;
 
     let url = format!("http://{addr}/api/elections/5/download_na_31_2_inlegvel");
     let response = reqwest::Client::new()

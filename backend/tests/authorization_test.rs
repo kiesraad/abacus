@@ -7,7 +7,10 @@ use sqlx::SqlitePool;
 use std::panic;
 use test_log::test;
 
-use crate::utils::serve_api;
+use crate::{
+    shared::{admin_login, coordinator_login, typist_login},
+    utils::serve_api,
+};
 
 pub mod shared;
 pub mod utils;
@@ -22,15 +25,9 @@ async fn test_route_authorization(pool: SqlitePool) {
     // Get cookies for all roles
     let auth_states = [
         (None, None),
-        (
-            Some("administrator"),
-            Some(shared::admin_login(&addr).await),
-        ),
-        (
-            Some("coordinator"),
-            Some(shared::coordinator_login(&addr).await),
-        ),
-        (Some("typist"), Some(shared::typist_login(&addr).await)),
+        (Some("administrator"), Some(admin_login(&addr).await)),
+        (Some("coordinator"), Some(coordinator_login(&addr).await)),
+        (Some("typist"), Some(typist_login(&addr).await)),
     ];
 
     let client = reqwest::Client::new();
@@ -105,7 +102,7 @@ async fn test_route_authorization(pool: SqlitePool) {
                     _ => None,
                 };
 
-                // Exception, this route always forbids access after initialiation
+                // Exception, this route always forbids access after initialisation
                 if path == "/api/initialise/admin-exists" {
                     expected_error_status = Some(StatusCode::FORBIDDEN);
                 }

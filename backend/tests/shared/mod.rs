@@ -90,6 +90,38 @@ pub fn example_data_entry(client_state: Option<&str>) -> DataEntry {
     }
 }
 
+pub fn data_entry_with_error() -> DataEntry {
+    let mut data_entry = example_data_entry(None);
+    // Introduce error F.203
+    data_entry
+        .data
+        .as_cso_first_session_mut()
+        .unwrap()
+        .votes_counts
+        .invalid_votes_count = 2;
+    data_entry
+}
+
+pub fn different_data_entries() -> (DataEntry, DataEntry) {
+    let first_data_entry = example_data_entry(None);
+
+    let mut second_data_entry = first_data_entry.clone();
+    second_data_entry
+        .data
+        .as_cso_first_session_mut()
+        .unwrap()
+        .voters_counts
+        .poll_card_count -= 2;
+    second_data_entry
+        .data
+        .as_cso_first_session_mut()
+        .unwrap()
+        .voters_counts
+        .proxy_certificate_count += 2;
+
+    (first_data_entry, second_data_entry)
+}
+
 pub async fn create_polling_station(
     addr: &SocketAddr,
     cookie: &HeaderValue,

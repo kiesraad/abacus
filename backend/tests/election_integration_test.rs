@@ -1,5 +1,5 @@
 #![cfg(test)]
-use abacus::election::{ElectionDetailsResponse, ElectionListResponse};
+
 use async_zip::base::read::mem::ZipFileReader;
 use axum::http::StatusCode;
 use sha2::Digest;
@@ -35,14 +35,12 @@ async fn test_election_list_works(pool: SqlitePool) {
 
     // Ensure the response is what we expect
     assert_eq!(response.status(), StatusCode::OK);
-    let body: ElectionListResponse = response.json().await.unwrap();
-    assert_eq!(body.committee_sessions.len(), 2);
-    assert_eq!(body.committee_sessions[1].number, 2);
-    assert_eq!(
-        body.committee_sessions[1].status.to_string(),
-        "data_entry_in_progress".to_string()
-    );
-    assert_eq!(body.elections.len(), 2);
+    let body: serde_json::Value = response.json().await.unwrap();
+    let committee_sessions = body["committee_sessions"].as_array().unwrap();
+    assert_eq!(committee_sessions.len(), 2);
+    assert_eq!(committee_sessions[1]["number"], 2);
+    assert_eq!(committee_sessions[1]["status"], "data_entry_in_progress");
+    assert_eq!(body["elections"].as_array().unwrap().len(), 2);
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_5_with_results", "users"))))]
@@ -60,19 +58,16 @@ async fn test_election_details_works(pool: SqlitePool) {
 
     // Ensure the response is what we expect
     assert_eq!(response.status(), StatusCode::OK);
-    let body: ElectionDetailsResponse = response.json().await.unwrap();
+    let body: serde_json::Value = response.json().await.unwrap();
     assert_eq!(
-        body.current_committee_session.status.to_string(),
-        "data_entry_in_progress".to_string()
+        body["current_committee_session"]["status"],
+        "data_entry_in_progress"
     );
-    assert_eq!(body.committee_sessions.len(), 2);
-    assert_eq!(body.election.name, "Corrigendum 2026");
-    assert_eq!(body.polling_stations.len(), 2);
-    assert!(
-        body.polling_stations
-            .iter()
-            .any(|ps| ps.name == "Testgebouw")
-    );
+    assert_eq!(body["committee_sessions"].as_array().unwrap().len(), 2);
+    assert_eq!(body["election"]["name"], "Corrigendum 2026");
+    let polling_stations = body["polling_stations"].as_array().unwrap();
+    assert_eq!(polling_stations.len(), 2);
+    assert!(polling_stations.iter().any(|ps| ps["name"] == "Testgebouw"));
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("users"))))]

@@ -8,7 +8,6 @@ use crate::{
     shared::{admin_login, coordinator_login, login, typist_login, typist2_login},
     utils::serve_api,
 };
-use abacus::authentication::UserListResponse;
 
 pub mod shared;
 pub mod utils;
@@ -73,13 +72,14 @@ async fn test_user_last_activity_at_updating(pool: SqlitePool) {
         .await
         .unwrap();
     assert_eq!(response.status(), StatusCode::OK);
-    let body: UserListResponse = response.json().await.unwrap();
-    let typist_user = body
-        .users
+    let body: serde_json::Value = response.json().await.unwrap();
+    let typist_user = body["users"]
+        .as_array()
+        .unwrap()
         .iter()
-        .find(|u| u.role().to_string() == "typist")
+        .find(|u| u["role"] == "typist")
         .unwrap();
-    assert!(typist_user.last_activity_at().is_none());
+    assert!(typist_user["last_activity_at"].is_null());
 
     // Log in as the typist and call account to trigger an update
     let typist_cookie = typist_login(&addr).await;
@@ -100,9 +100,9 @@ async fn test_user_last_activity_at_updating(pool: SqlitePool) {
         .await
         .unwrap();
     assert_eq!(response.status(), StatusCode::OK);
-    let body: UserListResponse = response.json().await.unwrap();
-    let user = body.users.first().unwrap();
-    assert!(user.last_activity_at().is_some());
+    let body: serde_json::Value = response.json().await.unwrap();
+    let user = body["users"].as_array().unwrap().first().unwrap();
+    assert!(!user["last_activity_at"].is_null());
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("users"))))]
@@ -122,9 +122,10 @@ async fn test_user_listing(pool: SqlitePool) {
         StatusCode::OK,
         "Unexpected response status"
     );
-    let body: UserListResponse = response.json().await.unwrap();
-    assert_eq!(body.users.len(), 6);
-    assert!(body.users.iter().any(|ps| {
+    let body: serde_json::Value = response.json().await.unwrap();
+    let users = body["users"].as_array().unwrap();
+    assert_eq!(users.len(), 6);
+    assert!(users.iter().any(|ps| {
         [
             "admin1",
             "admin2",
@@ -134,7 +135,7 @@ async fn test_user_listing(pool: SqlitePool) {
             "typist2",
         ]
         .iter()
-        .any(|u| ps.username() == *u)
+        .any(|u| ps["username"] == *u)
     }))
 }
 
@@ -415,13 +416,10 @@ async fn test_coordinator_user_listing_only_typists(pool: SqlitePool) {
         .await
         .unwrap();
     assert_eq!(response.status(), StatusCode::OK);
-    let body: UserListResponse = response.json().await.unwrap();
-    assert!(!body.users.is_empty());
-    assert!(
-        body.users
-            .into_iter()
-            .all(|user| user.role().to_string() == "typist")
-    );
+    let body: serde_json::Value = response.json().await.unwrap();
+    let users = body["users"].as_array().unwrap();
+    assert!(!users.is_empty());
+    assert!(users.iter().all(|user| user["role"] == "typist"));
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("users"))))]

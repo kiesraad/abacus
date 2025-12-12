@@ -193,3 +193,24 @@ jobs:
           -H "Authorization: Bearer ${{ secrets.ABACUS_TEST_API_KEY }}" \
           -T ./abacus \
           https://abacus-test.nl/etes/api/v1/executable/${{ github.event.pull_request.head.sha || github.sha }}/${{ github.sha }}
+
+  fuzz:
+    name: Run fuzzer
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - name: Setup Rust Nightly 
+        shell: bash 
+        run: > 
+          rustup update nightly && 
+          rustup default nightly 
+      - name: Install cargo fuzz
+        run: cargo install cargo-fuzz
+      - name: Cargo cache
+        uses: Swatinem/rust-cache@779680da715d629ac1d338a641029a2f4372abb5 # v2
+        with:
+          workspaces: "backend -> fuzz -> target"
+          shared-key: "fuzzer"
+      - name: Run the fuzzer
+        working-directory: ./backend
+        run: SQLX_OFFLINE=true cargo fuzz run data_entry_status -- -max_total_time=60

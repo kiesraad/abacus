@@ -395,17 +395,11 @@ async fn test_election_import_save_with_polling_stations(pool: SqlitePool) {
         u32::try_from(body["id"].as_u64().unwrap()).unwrap(),
     )
     .await;
+    assert_eq!(election_details["election"]["counting_method"], "CSO");
+    assert_eq!(election_details["election"]["number_of_voters"], 1234);
     assert_eq!(
-        election_details.election.counting_method.to_string(),
-        "cso".to_string()
-    );
-    assert_eq!(election_details.election.number_of_voters, 1234);
-    assert_eq!(
-        election_details
-            .current_committee_session
-            .status
-            .to_string(),
-        "data_entry_not_started".to_string()
+        election_details["current_committee_session"]["status"],
+        "data_entry_not_started"
     );
 }
 
@@ -448,14 +442,11 @@ async fn test_election_import_save_without_polling_stations(pool: SqlitePool) {
         u32::try_from(body["id"].as_u64().unwrap()).unwrap(),
     )
     .await;
-    assert_eq!(election_details.election.counting_method.to_string(), "cso");
-    assert_eq!(election_details.election.number_of_voters, 1234);
+    assert_eq!(election_details["election"]["counting_method"], "CSO");
+    assert_eq!(election_details["election"]["number_of_voters"], 1234);
     assert_eq!(
-        election_details
-            .current_committee_session
-            .status
-            .to_string(),
-        "created".to_string()
+        election_details["current_committee_session"]["status"],
+        "created"
     );
 }
 

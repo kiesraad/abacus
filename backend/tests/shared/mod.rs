@@ -2,14 +2,6 @@
 
 use std::{collections::BTreeMap, net::SocketAddr};
 
-use abacus::{
-    data_entry::{
-        CandidateVotes, Count, ElectionStatusResponse, PoliticalGroupCandidateVotes,
-        status::DataEntryStatusName,
-    },
-    election::{CandidateNumber, ElectionDetailsResponse, PGNumber},
-};
-
 use axum::http::{HeaderValue, StatusCode};
 use hyper::header::CONTENT_TYPE;
 use reqwest::Response;
@@ -28,21 +20,21 @@ pub fn differences_counts_zero() -> serde_json::Value {
 }
 
 pub fn political_group_votes_from_test_data_auto(
-    number: PGNumber,
-    candidate_votes: &[Count],
-) -> PoliticalGroupCandidateVotes {
-    PoliticalGroupCandidateVotes {
-        number,
-        total: candidate_votes.iter().sum(),
-        candidate_votes: candidate_votes
-            .iter()
-            .enumerate()
-            .map(|(i, votes)| CandidateVotes {
-                number: CandidateNumber::try_from(i + 1).unwrap(),
-                votes: *votes,
-            })
-            .collect(),
-    }
+    number: u32,
+    candidate_votes: &[u32],
+) -> serde_json::Value {
+    serde_json::json!({
+    "number": number,
+    "total": candidate_votes.iter().sum::<u32>(),
+    "candidate_votes": candidate_votes
+        .iter()
+        .enumerate()
+        .map(|(i, votes)| serde_json::json!({
+            "number": i + 1,
+            "votes": *votes,
+        }))
+        .collect::<Vec<serde_json::Value>>(),
+    })
 }
 
 /// Example data entry for an election with two parties with two candidates.
@@ -204,14 +196,14 @@ async fn check_data_entry_status_is_definitive(
         .await
         .unwrap();
     assert_eq!(response.status(), StatusCode::OK);
-    let body: ElectionStatusResponse = response.json().await.unwrap();
+    let body: serde_json::Value = response.json().await.unwrap();
+    let statuses = body["statuses"].as_array().unwrap();
     assert_eq!(
-        body.statuses
+        statuses
             .iter()
-            .find(|s| s.polling_station_id == polling_station_id)
-            .unwrap()
-            .status,
-        DataEntryStatusName::Definitive
+            .find(|s| s["polling_station_id"] == polling_station_id)
+            .unwrap()["status"],
+        "definitive"
     );
 }
 
@@ -300,7 +292,7 @@ pub async fn get_election_details(
     addr: &SocketAddr,
     cookie: &HeaderValue,
     election_id: u32,
-) -> ElectionDetailsResponse {
+) -> serde_json::Value {
     let url = format!("http://{addr}/api/elections/{election_id}");
     let response = reqwest::Client::new()
         .get(&url)

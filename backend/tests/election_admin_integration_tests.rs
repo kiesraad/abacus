@@ -398,7 +398,7 @@ async fn test_election_import_save_with_polling_stations(pool: SqlitePool) {
     .await;
     assert_eq!(
         election_details.election.counting_method.to_string(),
-        "CSO".to_string()
+        "cso".to_string()
     );
     assert_eq!(election_details.election.number_of_voters, 1234);
     assert_eq!(

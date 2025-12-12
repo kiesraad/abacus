@@ -141,11 +141,11 @@ async function inputElectionHash() {
   expect(screen.getByText("2")).toHaveRole("mark");
 
   // Click somewhere arbitrary and expect no highlights
-  await user.click(screen.getByText("Controleer verkiezingsdefinitie"));
+  await user.click(screen.getByRole("heading", { level: 2, name: "Controleer verkiezingsdefinitie" }));
   expect(screen.getByText("1")).not.toHaveRole("mark");
   expect(screen.getByText("2")).not.toHaveRole("mark");
   await user.type(inputPart2, "gfsd");
-  await user.click(screen.getByText("Volgende"));
+  await user.click(screen.getByRole("button", { name: "Volgende" }));
 }
 
 /**
@@ -171,7 +171,7 @@ async function uploadCandidateDefinition(file: File) {
 async function setPollingStationRole() {
   const user = userEvent.setup();
   expect(await screen.findByRole("heading", { level: 2, name: "Rol van het stembureau" })).toBeVisible();
-  await user.click(screen.getByText("Volgende"));
+  await user.click(screen.getByRole("button", { name: "Volgende" }));
 }
 
 async function inputCandidateHash() {
@@ -199,11 +199,11 @@ async function inputCandidateHash() {
   expect(screen.getByText("2")).toHaveRole("mark");
 
   // Click somewhere arbitrary and expect no highlights
-  await user.click(screen.getByText("Controleer kandidatenlijsten"));
+  await user.click(screen.getByRole("heading", { level: 2, name: "Controleer kandidatenlijsten" }));
   expect(screen.getByText("1")).not.toHaveRole("mark");
   expect(screen.getByText("2")).not.toHaveRole("mark");
   await user.type(inputPart2, "gfsd");
-  await user.click(screen.getByText("Volgende"));
+  await user.click(screen.getByRole("button", { name: "Volgende" }));
 }
 
 describe("Election create pages", () => {
@@ -278,7 +278,7 @@ describe("Election create pages", () => {
     const inputPart2 = screen.getByLabelText("Controle deel 2");
     await user.type(inputPart2, "123");
 
-    await user.click(screen.getByText("Volgende"));
+    await user.click(screen.getByRole("button", { name: "Volgende" }));
 
     // Expect error to be shown
     expect(await screen.findByText("Controle digitale vingerafdruk niet gelukt")).toBeInTheDocument();
@@ -365,7 +365,7 @@ describe("Election create pages", () => {
     await user.upload(input, file);
 
     // Click the Afbreken button
-    const button = screen.getByText("Afbreken");
+    const button = screen.getByRole("button", { name: "Afbreken" });
     expect(button).toBeVisible();
     await user.click(button);
     expect(await screen.findByRole("heading", { level: 3, name: "Niet opgeslagen wijzigingen" })).toBeVisible();
@@ -393,9 +393,9 @@ describe("Election create pages", () => {
     await user.upload(input, file);
 
     // Click the 'Verkiezingen' nav item
-    const button = screen.getByText("Verkiezingen");
-    expect(button).toBeVisible();
-    await user.click(button);
+    const nav_item = screen.getByRole("link", { name: "Verkiezingen" });
+    expect(nav_item).toBeVisible();
+    await user.click(nav_item);
 
     // The modal should have triggered
     expect(await screen.findByRole("heading", { level: 3, name: "Niet opgeslagen wijzigingen" })).toBeVisible();
@@ -413,7 +413,7 @@ describe("Election create pages", () => {
     expect(await screen.findByRole("heading", { level: 2, name: "Importeer verkiezingsdefinitie" })).toBeVisible();
 
     // Click the Afbreken button
-    const button = screen.getByText("Afbreken");
+    const button = screen.getByRole("button", { name: "Afbreken" });
     expect(button).toBeVisible();
     await user.click(button);
 
@@ -444,15 +444,15 @@ describe("Election create pages", () => {
     expect(await screen.findByRole("heading", { level: 2, name: "Controleer kandidatenlijsten" })).toBeVisible();
 
     // Click the 'Verkiezingen' nav item
-    const button = screen.getByText("Verkiezingen");
-    expect(button).toBeVisible();
-    await user.click(button);
+    const nav_item = screen.getByRole("link", { name: "Verkiezingen" });
+    expect(nav_item).toBeVisible();
+    await user.click(nav_item);
 
     // The modal should have triggered
     expect(await screen.findByRole("heading", { level: 3, name: "Niet opgeslagen wijzigingen" })).toBeVisible();
 
-    // Close button should keep us at the import page
-    const closeButton = screen.getByText("Annuleren");
+    // Clicking close button should keep user on the import page
+    const closeButton = screen.getByRole("button", { name: "Venster sluiten" });
     expect(closeButton).toBeVisible();
     await user.click(closeButton);
     expect(await screen.findByRole("heading", { level: 2, name: "Controleer kandidatenlijsten" })).toBeVisible();
@@ -480,16 +480,16 @@ describe("Election create pages", () => {
     expect(await screen.findByRole("heading", { level: 2, name: "Controleer kandidatenlijsten" })).toBeVisible();
 
     // Click the 'Verkiezingen' nav item
-    const button = screen.getByText("Verkiezingen");
-    expect(button).toBeVisible();
-    await user.click(button);
+    const nav_item = screen.getByRole("link", { name: "Verkiezingen" });
+    expect(nav_item).toBeVisible();
+    await user.click(nav_item);
 
     // The modal should have triggered
     expect(await screen.findByRole("heading", { level: 3, name: "Niet opgeslagen wijzigingen" })).toBeVisible();
     vi.spyOn(console, "warn").mockImplementation(() => {});
 
-    // Delete button should move away from the import page
-    const deleteButton = screen.getByText("Verkiezing niet opslaan");
+    // Clicking delete button should move user away from the import page
+    const deleteButton = screen.getByRole("button", { name: "Verkiezing niet opslaan" });
     expect(deleteButton).toBeVisible();
     await user.click(deleteButton);
     expect(screen.queryAllByText("Controleer kandidatenlijsten").length).toBe(0);
@@ -517,17 +517,17 @@ describe("Election create pages", () => {
     expect(await screen.findByRole("heading", { level: 2, name: "Controleer kandidatenlijsten" })).toBeVisible();
 
     // Click the 'Verkiezingen' nav item
-    const button = screen.getByText("Verkiezingen");
-    expect(button).toBeVisible();
-    await user.click(button);
+    const nav_item = screen.getByRole("link", { name: "Verkiezingen" });
+    expect(nav_item).toBeVisible();
+    await user.click(nav_item);
 
     // The modal should have triggered
     expect(await screen.findByRole("heading", { level: 3, name: "Niet opgeslagen wijzigingen" })).toBeVisible();
 
-    // Delete button should move away from the import page
-    const closeButton = screen.getByTitle("Annuleren");
-    expect(closeButton).toBeVisible();
-    await user.click(closeButton);
+    // Clicking cancel button should keep user on the import page
+    const cancelButton = screen.getByRole("button", { name: "Annuleren" });
+    expect(cancelButton).toBeVisible();
+    await user.click(cancelButton);
     expect(await screen.findByRole("heading", { level: 2, name: "Controleer kandidatenlijsten" })).toBeVisible();
   });
 
@@ -635,7 +635,7 @@ describe("Election create pages", () => {
     expect(await screen.findByText(/Afwijkende verkiezing/i)).toBeVisible();
 
     // click next
-    await user.click(screen.getByText("Volgende"));
+    await user.click(screen.getByRole("button", { name: "Volgende" }));
 
     // Expect to see the next page
     expect(await screen.findByRole("heading", { level: 2, name: "Type stemopneming in Heemdamseburg" })).toBeVisible();
@@ -683,7 +683,7 @@ describe("Election create pages", () => {
     expect(screen.queryByText(/Afwijkende verkiezing/i)).toBeNull();
 
     // click next
-    await user.click(screen.getByText("Volgende"));
+    await user.click(screen.getByRole("button", { name: "Volgende" }));
 
     // Expect to see the next page
     expect(await screen.findByRole("heading", { level: 2, name: "Type stemopneming in Heemdamseburg" })).toBeVisible();

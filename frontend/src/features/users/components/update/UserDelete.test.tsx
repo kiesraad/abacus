@@ -44,7 +44,7 @@ describe("UserDelete", () => {
 
     expect(await screen.findByRole("dialog")).toBeInTheDocument();
 
-    await user.click(screen.getAllByRole("button", { name: "Annuleren" })[0]!);
+    await user.click(screen.getByRole("button", { name: "Annuleren" }));
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
     expect(deleteUser).not.toHaveBeenCalledOnce();
     expect(onDeleted).not.toHaveBeenCalledOnce();

@@ -10,14 +10,39 @@ use test_log::test;
 use crate::{
     shared::{
         change_status_committee_session, claim_data_entry, complete_data_entry, coordinator_login,
-        data_entry_with_error, different_data_entries, example_data_entry, typist_login,
-        typist2_login,
+        example_data_entry, typist_login, typist2_login,
     },
     utils::serve_api,
 };
 
 pub mod shared;
 pub mod utils;
+
+pub fn data_entry_with_error() -> serde_json::Value {
+    let mut data_entry = example_data_entry(None);
+    // Introduce error F.203
+    data_entry["data"]["votes_counts"]["invalid_votes_count"] = serde_json::Value::from(2);
+    data_entry
+}
+
+pub fn different_data_entries() -> (serde_json::Value, serde_json::Value) {
+    let first_data_entry = example_data_entry(None);
+
+    let mut second_data_entry = first_data_entry.clone();
+    let poll_card_count = second_data_entry["data"]["voters_counts"]["poll_card_count"]
+        .as_u64()
+        .unwrap();
+    let proxy_certificate_count =
+        second_data_entry["data"]["voters_counts"]["proxy_certificate_count"]
+            .as_u64()
+            .unwrap();
+    second_data_entry["data"]["voters_counts"]["poll_card_count"] =
+        serde_json::Value::from(poll_card_count - 2);
+    second_data_entry["data"]["voters_counts"]["proxy_certificate_count"] =
+        serde_json::Value::from(proxy_certificate_count + 2);
+
+    (first_data_entry, second_data_entry)
+}
 
 async fn get_data_entry(
     addr: &SocketAddr,
@@ -95,12 +120,12 @@ async fn test_polling_station_data_entry_get_errors(pool: SqlitePool) {
     assert_eq!(data_entry_status["status"], "first_entry_has_errors");
 
     let coordinator_cookie = coordinator_login(&addr).await;
-    let res = get_data_entry(&addr, &coordinator_cookie, 1).await;
-    assert_eq!(res.status(), StatusCode::OK);
-    let result: serde_json::Value = res.json().await.unwrap();
+    let response = get_data_entry(&addr, &coordinator_cookie, 1).await;
+    assert_eq!(response.status(), StatusCode::OK);
+    let body: serde_json::Value = response.json().await.unwrap();
 
     assert_eq!(
-        result["validation_results"]["errors"],
+        body["validation_results"]["errors"],
         serde_json::json!([{
             "code": "F203",
             "fields": [
@@ -112,14 +137,14 @@ async fn test_polling_station_data_entry_get_errors(pool: SqlitePool) {
         }])
     );
     assert_eq!(
-        result["validation_results"]["warnings"],
+        body["validation_results"]["warnings"],
         serde_json::json!([])
     );
 
     change_status_committee_session(&addr, &coordinator_cookie, 2, 2, "data_entry_paused").await;
 
-    let res = get_data_entry(&addr, &coordinator_cookie, 1).await;
-    assert_eq!(res.status(), StatusCode::OK);
+    let response = get_data_entry(&addr, &coordinator_cookie, 1).await;
+    assert_eq!(response.status(), StatusCode::OK);
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
@@ -147,7 +172,7 @@ async fn test_polling_station_data_entry_no_errors(pool: SqlitePool) {
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
 async fn test_polling_station_data_entry_resolve_errors_discard(pool: SqlitePool) {
-    let addr = utils::serve_api(pool).await;
+    let addr = serve_api(pool).await;
 
     let typist = typist_login(&addr).await;
     let res = complete_data_entry(&addr, &typist, 1, 1, data_entry_with_error()).await;
@@ -163,7 +188,7 @@ async fn test_polling_station_data_entry_resolve_errors_discard(pool: SqlitePool
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
 async fn test_polling_station_data_entry_resolve_errors_resume(pool: SqlitePool) {
-    let addr = utils::serve_api(pool.clone()).await;
+    let addr = serve_api(pool.clone()).await;
 
     let typist_cookie = typist_login(&addr).await;
     let res = complete_data_entry(&addr, &typist_cookie, 1, 1, data_entry_with_error()).await;
@@ -182,7 +207,7 @@ async fn test_polling_station_data_entry_resolve_errors_resume(pool: SqlitePool)
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
 async fn test_polling_station_data_entry_resolve_errors_wrong_state(pool: SqlitePool) {
-    let addr = utils::serve_api(pool).await;
+    let addr = serve_api(pool).await;
 
     let typist = typist_login(&addr).await;
     claim_data_entry(&addr, &typist, 1, 1).await;
@@ -194,7 +219,7 @@ async fn test_polling_station_data_entry_resolve_errors_wrong_state(pool: Sqlite
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
 async fn test_polling_station_data_entry_resolve_errors_wrong_action(pool: SqlitePool) {
-    let addr = utils::serve_api(pool).await;
+    let addr = serve_api(pool).await;
 
     let typist = typist_login(&addr).await;
     let res = complete_data_entry(&addr, &typist, 1, 1, data_entry_with_error()).await;
@@ -208,7 +233,7 @@ async fn test_polling_station_data_entry_resolve_errors_wrong_action(pool: Sqlit
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
 async fn test_polling_station_data_entry_get_differences(pool: SqlitePool) {
-    let addr = utils::serve_api(pool.clone()).await;
+    let addr = serve_api(pool.clone()).await;
     let (first_entry, second_entry) = different_data_entries();
 
     let typist_cookie = typist_login(&addr).await;
@@ -239,7 +264,7 @@ async fn test_polling_station_data_entry_get_differences(pool: SqlitePool) {
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
 async fn test_polling_station_data_entry_differences_not_found(pool: SqlitePool) {
-    let addr = utils::serve_api(pool).await;
+    let addr = serve_api(pool).await;
 
     let typist = typist_login(&addr).await;
     let data_entry = example_data_entry(None);
@@ -254,34 +279,22 @@ async fn test_polling_station_data_entry_differences_not_found(pool: SqlitePool)
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
 async fn test_polling_station_data_entry_resolve_differences(pool: SqlitePool) {
-    let addr = utils::serve_api(pool).await;
+    let addr = serve_api(pool).await;
 
     let first_data_entry = example_data_entry(None);
     let mut second_data_entry = first_data_entry.clone();
-    second_data_entry
-        .data
-        .as_cso_first_session_mut()
-        .unwrap()
-        .voters_counts
-        .poll_card_count = first_data_entry
-        .data
-        .as_cso_first_session()
-        .unwrap()
-        .voters_counts
-        .poll_card_count
-        - 2;
-    second_data_entry
-        .data
-        .as_cso_first_session_mut()
-        .unwrap()
-        .voters_counts
-        .proxy_certificate_count = first_data_entry
-        .data
-        .as_cso_first_session()
-        .unwrap()
-        .voters_counts
-        .poll_card_count
-        + 2;
+    second_data_entry["data"]["voters_counts"]["poll_card_count"] = serde_json::Value::from(
+        first_data_entry["data"]["voters_counts"]["poll_card_count"]
+            .as_u64()
+            .unwrap()
+            - 2,
+    );
+    second_data_entry["data"]["voters_counts"]["proxy_certificate_count"] = serde_json::Value::from(
+        first_data_entry["data"]["voters_counts"]["poll_card_count"]
+            .as_u64()
+            .unwrap()
+            + 2,
+    );
 
     let typist = typist_login(&addr).await;
     let res = complete_data_entry(&addr, &typist, 1, 1, first_data_entry).await;
@@ -302,16 +315,11 @@ async fn test_polling_station_data_entry_resolve_differences(pool: SqlitePool) {
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
 async fn test_polling_station_data_entry_resolve_differences_then_resolve_errors(pool: SqlitePool) {
-    let addr = utils::serve_api(pool).await;
+    let addr = serve_api(pool).await;
 
     let first_data_entry = example_data_entry(None);
     let mut second_data_entry = first_data_entry.clone();
-    second_data_entry
-        .data
-        .as_cso_first_session_mut()
-        .unwrap()
-        .voters_counts
-        .poll_card_count = 0;
+    second_data_entry["data"]["voters_counts"]["poll_card_count"] = serde_json::Value::from(0);
 
     let typist = typist_login(&addr).await;
     let res = complete_data_entry(&addr, &typist, 1, 1, first_data_entry).await;

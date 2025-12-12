@@ -1,4 +1,5 @@
 #![cfg(test)]
+
 use std::net::SocketAddr;
 
 use abacus::data_entry::{

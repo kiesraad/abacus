@@ -1,7 +1,9 @@
 #![cfg(test)]
 
-use axum::http::StatusCode;
+use axum::http::{HeaderValue, StatusCode};
+use reqwest::Response;
 use sqlx::SqlitePool;
+use std::net::SocketAddr;
 use test_log::test;
 
 use crate::{
@@ -14,6 +16,23 @@ use crate::{
 
 pub mod shared;
 pub mod utils;
+
+async fn delete_committee_session(
+    addr: &SocketAddr,
+    cookie: &HeaderValue,
+    election_id: u32,
+    committee_session_id: u32,
+) -> Response {
+    let url = format!(
+        "http://{addr}/api/elections/{election_id}/committee_sessions/{committee_session_id}"
+    );
+    reqwest::Client::new()
+        .delete(&url)
+        .header("cookie", cookie)
+        .send()
+        .await
+        .unwrap()
+}
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_5_with_results", "users"))))]
 async fn test_committee_session_create_works(pool: SqlitePool) {
@@ -87,16 +106,13 @@ async fn test_committee_session_delete_ok_status_created(pool: SqlitePool) {
     assert_eq!(committee_session["id"], 704);
     assert_eq!(committee_session["status"], "created");
 
-    let url = format!(
-        "http://{addr}/api/elections/{election_id}/committee_sessions/{committee_session_id}"
-    );
-    let response = reqwest::Client::new()
-        .delete(&url)
-        .header("cookie", &coordinator_cookie)
-        .send()
-        .await
-        .unwrap();
-
+    let response = delete_committee_session(
+        &addr,
+        &coordinator_cookie,
+        election_id,
+        committee_session_id,
+    )
+    .await;
     assert_eq!(
         response.status(),
         StatusCode::NO_CONTENT,
@@ -118,16 +134,13 @@ async fn test_committee_session_delete_fails_with_investigation(pool: SqlitePool
 
     create_investigation(&addr, polling_station_id).await;
 
-    let url = format!(
-        "http://{addr}/api/elections/{election_id}/committee_sessions/{committee_session_id}"
-    );
-    let response = reqwest::Client::new()
-        .delete(&url)
-        .header("cookie", &coordinator_login(&addr).await)
-        .send()
-        .await
-        .unwrap();
-
+    let response = delete_committee_session(
+        &addr,
+        &coordinator_login(&addr).await,
+        election_id,
+        committee_session_id,
+    )
+    .await;
     // You cannot delete a committee session if there are investigations linked to it
     assert_eq!(
         response.status(),
@@ -143,16 +156,13 @@ async fn test_committee_session_delete_not_ok_wrong_status(pool: SqlitePool) {
     let election_id = 5;
     let committee_session_id = 6;
 
-    let url = format!(
-        "http://{addr}/api/elections/{election_id}/committee_sessions/{committee_session_id}"
-    );
-    let response = reqwest::Client::new()
-        .delete(&url)
-        .header("cookie", &coordinator_cookie)
-        .send()
-        .await
-        .unwrap();
-
+    let response = delete_committee_session(
+        &addr,
+        &coordinator_cookie,
+        election_id,
+        committee_session_id,
+    )
+    .await;
     // Ensure the response is what we expect
     assert_eq!(
         response.status(),
@@ -174,13 +184,13 @@ async fn test_committee_session_delete_not_ok_wrong_status(pool: SqlitePool) {
         get_election_committee_session(&addr, &coordinator_cookie, election_id).await;
     assert_eq!(committee_session["status"], "data_entry_paused");
 
-    let response = reqwest::Client::new()
-        .delete(&url)
-        .header("cookie", &coordinator_cookie)
-        .send()
-        .await
-        .unwrap();
-
+    let response = delete_committee_session(
+        &addr,
+        &coordinator_cookie,
+        election_id,
+        committee_session_id,
+    )
+    .await;
     // Ensure the response is what we expect
     assert_eq!(
         response.status(),
@@ -202,13 +212,13 @@ async fn test_committee_session_delete_not_ok_wrong_status(pool: SqlitePool) {
         get_election_committee_session(&addr, &coordinator_cookie, election_id).await;
     assert_eq!(committee_session["status"], "data_entry_finished");
 
-    let response = reqwest::Client::new()
-        .delete(&url)
-        .header("cookie", &coordinator_cookie)
-        .send()
-        .await
-        .unwrap();
-
+    let response = delete_committee_session(
+        &addr,
+        &coordinator_cookie,
+        election_id,
+        committee_session_id,
+    )
+    .await;
     // Ensure the response is what we expect
     assert_eq!(
         response.status(),
@@ -239,16 +249,13 @@ async fn test_committee_session_delete_current_committee_session_but_its_the_fir
         get_election_committee_session(&addr, &coordinator_cookie, election_id).await;
     assert_eq!(committee_session["status"], "created");
 
-    let url = format!(
-        "http://{addr}/api/elections/{election_id}/committee_sessions/{committee_session_id}"
-    );
-    let response = reqwest::Client::new()
-        .delete(&url)
-        .header("cookie", &coordinator_cookie)
-        .send()
-        .await
-        .unwrap();
-
+    let response = delete_committee_session(
+        &addr,
+        &coordinator_cookie,
+        election_id,
+        committee_session_id,
+    )
+    .await;
     // Ensure the response is what we expect
     assert_eq!(
         response.status(),
@@ -266,14 +273,7 @@ async fn test_committee_session_delete_previous_committee_session(pool: SqlitePo
     let addr = serve_api(pool).await;
     let coordinator_cookie = coordinator_login(&addr).await;
 
-    let url = format!("http://{addr}/api/elections/5/committee_sessions/5");
-    let response = reqwest::Client::new()
-        .delete(&url)
-        .header("cookie", coordinator_cookie)
-        .send()
-        .await
-        .unwrap();
-
+    let response = delete_committee_session(&addr, &coordinator_cookie, 5, 5).await;
     assert_eq!(
         response.status(),
         StatusCode::NOT_FOUND,
@@ -286,14 +286,7 @@ async fn test_committee_session_delete_not_found(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let coordinator_cookie = coordinator_login(&addr).await;
 
-    let url = format!("http://{addr}/api/elections/5/committee_sessions/40404");
-    let response = reqwest::Client::new()
-        .delete(&url)
-        .header("cookie", coordinator_cookie)
-        .send()
-        .await
-        .unwrap();
-
+    let response = delete_committee_session(&addr, &coordinator_cookie, 5, 40404).await;
     assert_eq!(
         response.status(),
         StatusCode::NOT_FOUND,

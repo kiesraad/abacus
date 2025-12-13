@@ -1,20 +1,23 @@
 #![cfg(test)]
 #![cfg(feature = "openapi")]
 
-use abacus::{authentication::Role, get_scopes_from_operation};
+use abacus::{authentication::Role, get_scopes_from_operation, openapi_router};
 use hyper::{Method, StatusCode};
 use sqlx::SqlitePool;
 use std::panic;
 use test_log::test;
 
-use crate::utils::serve_api;
+use crate::{
+    shared::{admin_login, coordinator_login, typist_login},
+    utils::serve_api,
+};
 
 pub mod shared;
 pub mod utils;
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
 async fn test_route_authorization(pool: SqlitePool) {
-    let openapi = abacus::openapi_router().into_openapi();
+    let openapi = openapi_router().into_openapi();
     let addr = serve_api(pool).await;
 
     // Possible auth-related error statuses
@@ -22,15 +25,9 @@ async fn test_route_authorization(pool: SqlitePool) {
     // Get cookies for all roles
     let auth_states = [
         (None, None),
-        (
-            Some(Role::Administrator),
-            Some(shared::admin_login(&addr).await),
-        ),
-        (
-            Some(Role::Coordinator),
-            Some(shared::coordinator_login(&addr).await),
-        ),
-        (Some(Role::Typist), Some(shared::typist_login(&addr).await)),
+        (Some("administrator"), Some(admin_login(&addr).await)),
+        (Some("coordinator"), Some(coordinator_login(&addr).await)),
+        (Some("typist"), Some(typist_login(&addr).await)),
     ];
 
     let client = reqwest::Client::new();
@@ -105,7 +102,7 @@ async fn test_route_authorization(pool: SqlitePool) {
                     _ => None,
                 };
 
-                // Exception, this route always forbids access after initialiation
+                // Exception, this route always forbids access after initialisation
                 if path == "/api/initialise/admin-exists" {
                     expected_error_status = Some(StatusCode::FORBIDDEN);
                 }

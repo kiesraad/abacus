@@ -4,7 +4,10 @@ use hyper::StatusCode;
 use sqlx::SqlitePool;
 use test_log::test;
 
-use crate::utils::serve_api;
+use crate::{
+    shared::{admin_login, typist_login},
+    utils::serve_api,
+};
 
 pub mod shared;
 pub mod utils;
@@ -13,7 +16,7 @@ pub mod utils;
 async fn test_account_update(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let url = format!("http://{addr}/api/account");
-    let admin_cookie = shared::admin_login(&addr).await;
+    let admin_cookie = admin_login(&addr).await;
 
     let response = reqwest::Client::new()
         .put(&url)
@@ -42,7 +45,7 @@ async fn test_account_update(pool: SqlitePool) {
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("users"))))]
 async fn test_user_change_to_same_password_fails(pool: SqlitePool) {
     let addr = serve_api(pool).await;
-    let typist_cookie = shared::typist_login(&addr).await;
+    let typist_cookie = typist_login(&addr).await;
 
     let url = format!("http://{addr}/api/account");
     let response = reqwest::Client::new()

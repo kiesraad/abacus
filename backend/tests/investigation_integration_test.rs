@@ -1,14 +1,7 @@
 #![cfg(test)]
+
 use std::net::SocketAddr;
 
-use abacus::{
-    committee_session::status::CommitteeSessionStatus,
-    data_entry::{
-        CSONextSessionResults, DataEntry, PoliticalGroupTotalVotes, PollingStationResults,
-        VotersCounts, VotesCounts,
-        status::{ClientState, DataEntryStatusName},
-    },
-};
 use axum::http::StatusCode;
 use reqwest::Response;
 use sqlx::SqlitePool;
@@ -45,7 +38,7 @@ async fn conclude_investigation(
         .post(&url)
         .header("cookie", coordinator_cookie)
         .header("Content-Type", "application/json")
-        .body(body.to_string())
+        .json(&body)
         .send()
         .await
         .unwrap()
@@ -71,7 +64,10 @@ async fn test_create_conclude_update_delete(pool: SqlitePool) {
     let polling_station_id = 741;
 
     let election_details = get_election_details(&addr, &coordinator_cookie, election_id).await;
-    assert_eq!(election_details.investigations.len(), 0);
+    assert_eq!(
+        election_details["investigations"].as_array().unwrap().len(),
+        0
+    );
 
     assert_eq!(
         create_investigation(&addr, polling_station_id)
@@ -81,13 +77,11 @@ async fn test_create_conclude_update_delete(pool: SqlitePool) {
     );
 
     let election_details = get_election_details(&addr, &coordinator_cookie, election_id).await;
-    assert_eq!(election_details.investigations.len(), 1);
-    assert_eq!(
-        election_details.investigations[0].polling_station_id,
-        polling_station_id
-    );
-    assert_eq!(election_details.investigations[0].reason, "Test reason");
-    assert_eq!(election_details.investigations[0].findings, None);
+    let investigations = election_details["investigations"].as_array().unwrap();
+    assert_eq!(investigations.len(), 1);
+    assert_eq!(investigations[0]["polling_station_id"], polling_station_id);
+    assert_eq!(investigations[0]["reason"], "Test reason");
+    assert!(investigations[0]["findings"].is_null());
 
     assert_eq!(
         conclude_investigation(&addr, polling_station_id, None)
@@ -97,20 +91,12 @@ async fn test_create_conclude_update_delete(pool: SqlitePool) {
     );
 
     let election_details = get_election_details(&addr, &coordinator_cookie, election_id).await;
-    assert_eq!(election_details.investigations.len(), 1);
-    assert_eq!(
-        election_details.investigations[0].polling_station_id,
-        polling_station_id
-    );
-    assert_eq!(election_details.investigations[0].reason, "Test reason");
-    assert_eq!(
-        election_details.investigations[0].findings,
-        Some("Test findings".to_string())
-    );
-    assert_eq!(
-        election_details.investigations[0].corrected_results,
-        Some(false)
-    );
+    let investigations = election_details["investigations"].as_array().unwrap();
+    assert_eq!(investigations.len(), 1);
+    assert_eq!(investigations[0]["polling_station_id"], polling_station_id);
+    assert_eq!(investigations[0]["reason"], "Test reason");
+    assert_eq!(investigations[0]["findings"], "Test findings");
+    assert_eq!(investigations[0]["corrected_results"], false);
 
     assert_eq!(
         update_investigation(&addr, polling_station_id, None)
@@ -120,20 +106,12 @@ async fn test_create_conclude_update_delete(pool: SqlitePool) {
     );
 
     let election_details = get_election_details(&addr, &coordinator_cookie, election_id).await;
-    assert_eq!(election_details.investigations.len(), 1);
-    assert_eq!(
-        election_details.investigations[0].polling_station_id,
-        polling_station_id
-    );
-    assert_eq!(election_details.investigations[0].reason, "Updated reason");
-    assert_eq!(
-        election_details.investigations[0].findings,
-        Some("updated test findings".to_string())
-    );
-    assert_eq!(
-        election_details.investigations[0].corrected_results,
-        Some(true)
-    );
+    let investigations = election_details["investigations"].as_array().unwrap();
+    assert_eq!(investigations.len(), 1);
+    assert_eq!(investigations[0]["polling_station_id"], polling_station_id);
+    assert_eq!(investigations[0]["reason"], "Updated reason");
+    assert_eq!(investigations[0]["findings"], "updated test findings");
+    assert_eq!(investigations[0]["corrected_results"], true);
 
     assert_eq!(
         delete_investigation(&addr, polling_station_id)
@@ -142,7 +120,10 @@ async fn test_create_conclude_update_delete(pool: SqlitePool) {
         StatusCode::NO_CONTENT
     );
     let election_details = get_election_details(&addr, &coordinator_cookie, election_id).await;
-    assert_eq!(election_details.investigations.len(), 0);
+    assert_eq!(
+        election_details["investigations"].as_array().unwrap().len(),
+        0
+    );
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_7_four_sessions", "users"))))]
@@ -153,7 +134,7 @@ async fn test_deletion_setting_committee_session_back_to_created_status(pool: Sq
 
     let committee_session =
         get_election_committee_session(&addr, &coordinator_cookie, election_id).await;
-    assert_eq!(committee_session.status, CommitteeSessionStatus::Created);
+    assert_eq!(committee_session["status"], "created");
 
     // Create 2 investigations
     assert_eq!(
@@ -173,10 +154,7 @@ async fn test_deletion_setting_committee_session_back_to_created_status(pool: Sq
 
     let committee_session =
         get_election_committee_session(&addr, &coordinator_cookie, election_id).await;
-    assert_eq!(
-        committee_session.status,
-        CommitteeSessionStatus::DataEntryNotStarted
-    );
+    assert_eq!(committee_session["status"], "data_entry_not_started");
 
     // Delete last investigation
     assert_eq!(
@@ -186,7 +164,7 @@ async fn test_deletion_setting_committee_session_back_to_created_status(pool: Sq
 
     let committee_session =
         get_election_committee_session(&addr, &coordinator_cookie, election_id).await;
-    assert_eq!(committee_session.status, CommitteeSessionStatus::Created);
+    assert_eq!(committee_session["status"], "created");
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_5_with_results", "users"))))]
@@ -198,10 +176,7 @@ async fn test_deletion_removes_polling_station_from_status(pool: SqlitePool) {
 
     let statuses = get_statuses(&addr, &coordinator_cookie, election_id).await;
     assert_eq!(statuses.len(), 1);
-    assert_eq!(
-        statuses[&polling_station_id].status,
-        DataEntryStatusName::Definitive
-    );
+    assert_eq!(statuses[&polling_station_id]["status"], "definitive");
 
     assert_eq!(
         delete_investigation(&addr, polling_station_id)
@@ -229,13 +204,11 @@ async fn test_partials_update(pool: SqlitePool) {
     );
 
     let election_details = get_election_details(&addr, &coordinator_cookie, election_id).await;
-    assert_eq!(election_details.investigations.len(), 1);
-    assert_eq!(
-        election_details.investigations[0].polling_station_id,
-        polling_station_id
-    );
-    assert_eq!(election_details.investigations[0].reason, "Test reason");
-    assert_eq!(election_details.investigations[0].findings, None);
+    let investigations = election_details["investigations"].as_array().unwrap();
+    assert_eq!(investigations.len(), 1);
+    assert_eq!(investigations[0]["polling_station_id"], polling_station_id);
+    assert_eq!(investigations[0]["reason"], "Test reason");
+    assert!(investigations[0]["findings"].is_null());
 
     // Update only the reason
     let updated = update_investigation(
@@ -250,16 +223,11 @@ async fn test_partials_update(pool: SqlitePool) {
     assert_eq!(updated.status(), StatusCode::OK);
 
     let election_details = get_election_details(&addr, &coordinator_cookie, election_id).await;
-    assert_eq!(election_details.investigations.len(), 1);
-    assert_eq!(
-        election_details.investigations[0].polling_station_id,
-        polling_station_id
-    );
-    assert_eq!(
-        election_details.investigations[0].reason,
-        "Partially updated reason"
-    );
-    assert_eq!(election_details.investigations[0].findings, None);
+    let investigations = election_details["investigations"].as_array().unwrap();
+    assert_eq!(investigations.len(), 1);
+    assert_eq!(investigations[0]["polling_station_id"], polling_station_id);
+    assert_eq!(investigations[0]["reason"], "Partially updated reason");
+    assert!(investigations[0]["findings"].is_null());
 
     let updated = update_investigation(
         &addr,
@@ -275,19 +243,11 @@ async fn test_partials_update(pool: SqlitePool) {
     assert_eq!(updated.status(), StatusCode::OK);
 
     let election_details = get_election_details(&addr, &coordinator_cookie, election_id).await;
-    assert_eq!(election_details.investigations.len(), 1);
-    assert_eq!(
-        election_details.investigations[0].polling_station_id,
-        polling_station_id
-    );
-    assert_eq!(
-        election_details.investigations[0].reason,
-        "Partially updated reason"
-    );
-    assert_eq!(
-        election_details.investigations[0].findings,
-        Some("Partially updated findings".to_string())
-    );
+    let investigations = election_details["investigations"].as_array().unwrap();
+    assert_eq!(investigations.len(), 1);
+    assert_eq!(investigations[0]["polling_station_id"], polling_station_id);
+    assert_eq!(investigations[0]["reason"], "Partially updated reason");
+    assert_eq!(investigations[0]["findings"], "Partially updated findings");
 
     let updated = update_investigation(
         &addr,
@@ -303,56 +263,48 @@ async fn test_partials_update(pool: SqlitePool) {
     assert_eq!(updated.status(), StatusCode::OK);
 
     let election_details = get_election_details(&addr, &coordinator_cookie, election_id).await;
-    assert_eq!(election_details.investigations.len(), 1);
-    assert_eq!(
-        election_details.investigations[0].polling_station_id,
-        polling_station_id
-    );
-    assert_eq!(
-        election_details.investigations[0].reason,
-        "Partially updated reason"
-    );
-    assert_eq!(election_details.investigations[0].findings, None);
-    assert_eq!(
-        election_details.investigations[0].corrected_results,
-        Some(true)
-    );
+    let investigations = election_details["investigations"].as_array().unwrap();
+    assert_eq!(investigations.len(), 1);
+    assert_eq!(investigations[0]["polling_station_id"], polling_station_id);
+    assert_eq!(investigations[0]["reason"], "Partially updated reason");
+    assert!(investigations[0]["findings"].is_null());
+    assert_eq!(investigations[0]["corrected_results"], true);
 }
 
-fn second_session_data_entry_two_political_groups() -> DataEntry {
-    DataEntry {
-        progress: 100,
-        data: PollingStationResults::CSONextSession(CSONextSessionResults {
-            voters_counts: VotersCounts {
-                poll_card_count: 15,
-                proxy_certificate_count: 0,
-                total_admitted_voters_count: 15,
+fn second_session_data_entry_two_political_groups() -> serde_json::Value {
+    serde_json::json!({
+        "progress": 100,
+        "data": {
+            "model": "CSONextSession",
+            "voters_counts": {
+                "poll_card_count": 15,
+                "proxy_certificate_count": 0,
+                "total_admitted_voters_count": 15,
             },
-            votes_counts: VotesCounts {
-                political_group_total_votes: vec![
-                    PoliticalGroupTotalVotes {
-                        number: 1,
-                        total: 10,
+            "votes_counts": {
+                "political_group_total_votes": [
+                    {
+                        "number": 1,
+                        "total": 10,
                     },
-                    PoliticalGroupTotalVotes {
-                        number: 2,
-                        total: 5,
+                    {
+                        "number": 2,
+                        "total": 5,
                     },
                 ],
-                total_votes_candidates_count: 15,
-                blank_votes_count: 0,
-                invalid_votes_count: 0,
-                total_votes_cast_count: 15,
+                "total_votes_candidates_count": 15,
+                "blank_votes_count": 0,
+                "invalid_votes_count": 0,
+                "total_votes_cast_count": 15,
             },
-
-            differences_counts: differences_counts_zero(),
-            political_group_votes: vec![
+            "differences_counts": differences_counts_zero(),
+            "political_group_votes": [
                 political_group_votes_from_test_data_auto(1, &[8, 2]),
                 political_group_votes_from_test_data_auto(2, &[5, 0]),
             ],
-        }),
-        client_state: ClientState::new_from_str(None).unwrap(),
-    }
+        },
+        "client_state": {},
+    })
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_7_four_sessions", "users"))))]
@@ -384,10 +336,7 @@ async fn test_update_with_result(pool: SqlitePool) {
     .await;
 
     let statuses = get_statuses(&addr, &coordinator_cookie, election_id).await;
-    assert_eq!(
-        statuses[&polling_station_id].status,
-        DataEntryStatusName::Definitive
-    );
+    assert_eq!(statuses[&polling_station_id]["status"], "definitive");
 
     // Try to update investigation corrected_results to false
     let mut investigation = serde_json::json!({
@@ -403,10 +352,7 @@ async fn test_update_with_result(pool: SqlitePool) {
 
     // Data entry result is still there
     let statuses = get_statuses(&addr, &coordinator_cookie, election_id).await;
-    assert_eq!(
-        statuses[&polling_station_id].status,
-        DataEntryStatusName::Definitive
-    );
+    assert_eq!(statuses[&polling_station_id]["status"], "definitive");
 
     // Accept deletion
     investigation["accept_data_entry_deletion"] = true.into();
@@ -450,8 +396,8 @@ async fn test_update_with_data_entry(pool: SqlitePool) {
 
     let statuses = get_statuses(&addr, &coordinator_cookie, election_id).await;
     assert_eq!(
-        statuses[&polling_station_id].status,
-        DataEntryStatusName::SecondEntryNotStarted
+        statuses[&polling_station_id]["status"],
+        "second_entry_not_started"
     );
 
     // Try to update investigation corrected_results to false
@@ -469,8 +415,8 @@ async fn test_update_with_data_entry(pool: SqlitePool) {
     // Data entry is still there
     let statuses = get_statuses(&addr, &coordinator_cookie, election_id).await;
     assert_eq!(
-        statuses[&polling_station_id].status,
-        DataEntryStatusName::SecondEntryNotStarted
+        statuses[&polling_station_id]["status"],
+        "second_entry_not_started"
     );
 
     // Accept deletion
@@ -496,10 +442,7 @@ async fn test_creation_for_committee_session_with_created_status(pool: SqlitePoo
 
     let committee_session =
         get_election_committee_session(&addr, &coordinator_cookie, election_id).await;
-    assert_eq!(
-        committee_session.status,
-        CommitteeSessionStatus::DataEntryNotStarted
-    );
+    assert_eq!(committee_session["status"], "data_entry_not_started");
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_7_four_sessions", "users"))))]
@@ -754,25 +697,19 @@ async fn check_finished_to_in_progress_on<F, Fut>(
         &coordinator_cookie,
         election_id,
         committee_session_id,
-        CommitteeSessionStatus::DataEntryFinished,
+        "data_entry_finished",
     )
     .await;
     let committee_session =
         get_election_committee_session(addr, &coordinator_cookie, election_id).await;
-    assert_eq!(
-        committee_session.status,
-        CommitteeSessionStatus::DataEntryFinished
-    );
+    assert_eq!(committee_session["status"], "data_entry_finished");
 
     let status = action().await.status();
     assert_eq!(status, expected_status, "Unexpected response status");
 
     let committee_session =
         get_election_committee_session(addr, &coordinator_cookie, election_id).await;
-    assert_eq!(
-        committee_session.status,
-        CommitteeSessionStatus::DataEntryInProgress
-    );
+    assert_eq!(committee_session["status"], "data_entry_in_progress");
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_5_with_results", "users"))))]
@@ -851,20 +788,17 @@ async fn test_finished_to_created_on_delete_last(pool: SqlitePool) {
         &coordinator_cookie,
         election_id,
         committee_session_id,
-        CommitteeSessionStatus::DataEntryFinished,
+        "data_entry_finished",
     )
     .await;
     let committee_session =
         get_election_committee_session(&addr, &coordinator_cookie, election_id).await;
-    assert_eq!(
-        committee_session.status,
-        CommitteeSessionStatus::DataEntryFinished
-    );
+    assert_eq!(committee_session["status"], "data_entry_finished");
 
     let status = delete_investigation(&addr, 741).await.status();
     assert_eq!(status, StatusCode::NO_CONTENT);
 
     let committee_session =
         get_election_committee_session(&addr, &coordinator_cookie, election_id).await;
-    assert_eq!(committee_session.status, CommitteeSessionStatus::Created);
+    assert_eq!(committee_session["status"], "created");
 }

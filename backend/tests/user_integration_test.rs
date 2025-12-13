@@ -4,8 +4,10 @@ use hyper::StatusCode;
 use sqlx::SqlitePool;
 use test_log::test;
 
-use crate::utils::serve_api;
-use abacus::authentication::{Role, UserListResponse};
+use crate::{
+    shared::{admin_login, coordinator_login, login, typist_login, typist2_login},
+    utils::serve_api,
+};
 
 pub mod shared;
 pub mod utils;
@@ -13,16 +15,16 @@ pub mod utils;
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("users"))))]
 async fn test_user_login(pool: SqlitePool) {
     let addr = serve_api(pool).await;
-    shared::admin_login(&addr).await;
-    shared::coordinator_login(&addr).await;
-    shared::typist_login(&addr).await;
-    shared::typist2_login(&addr).await;
+    admin_login(&addr).await;
+    coordinator_login(&addr).await;
+    typist_login(&addr).await;
+    typist2_login(&addr).await;
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
 async fn test_user_last_activity_at_updating(pool: SqlitePool) {
     let addr = serve_api(pool).await;
-    let admin_cookie = shared::admin_login(&addr).await;
+    let admin_cookie = admin_login(&addr).await;
 
     // Assert the user has no last activity timestamp yet
     let users_url = format!("http://{addr}/api/users");
@@ -33,16 +35,17 @@ async fn test_user_last_activity_at_updating(pool: SqlitePool) {
         .await
         .unwrap();
     assert_eq!(response.status(), StatusCode::OK);
-    let body: UserListResponse = response.json().await.unwrap();
-    let typist_user = body
-        .users
+    let body: serde_json::Value = response.json().await.unwrap();
+    let typist_user = body["users"]
+        .as_array()
+        .unwrap()
         .iter()
-        .find(|u| u.role() == Role::Typist)
+        .find(|u| u["role"] == "typist")
         .unwrap();
-    assert!(typist_user.last_activity_at().is_none());
+    assert!(typist_user["last_activity_at"].is_null());
 
     // Log in as the typist and call account to trigger an update
-    let typist_cookie = shared::typist_login(&addr).await;
+    let typist_cookie = typist_login(&addr).await;
     let url = format!("http://{addr}/api/account");
     let response = reqwest::Client::new()
         .get(&url)
@@ -60,15 +63,15 @@ async fn test_user_last_activity_at_updating(pool: SqlitePool) {
         .await
         .unwrap();
     assert_eq!(response.status(), StatusCode::OK);
-    let body: UserListResponse = response.json().await.unwrap();
-    let user = body.users.first().unwrap();
-    assert!(user.last_activity_at().is_some());
+    let body: serde_json::Value = response.json().await.unwrap();
+    let user = body["users"].as_array().unwrap().first().unwrap();
+    assert!(!user["last_activity_at"].is_null());
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("users"))))]
 async fn test_user_listing(pool: SqlitePool) {
     let addr = serve_api(pool).await;
-    let admin_cookie = shared::admin_login(&addr).await;
+    let admin_cookie = admin_login(&addr).await;
 
     let url = format!("http://{addr}/api/users");
     let response = reqwest::Client::new()
@@ -82,9 +85,10 @@ async fn test_user_listing(pool: SqlitePool) {
         StatusCode::OK,
         "Unexpected response status"
     );
-    let body: UserListResponse = response.json().await.unwrap();
-    assert_eq!(body.users.len(), 6);
-    assert!(body.users.iter().any(|ps| {
+    let body: serde_json::Value = response.json().await.unwrap();
+    let users = body["users"].as_array().unwrap();
+    assert_eq!(users.len(), 6);
+    assert!(users.iter().any(|ps| {
         [
             "admin1",
             "admin2",
@@ -94,14 +98,14 @@ async fn test_user_listing(pool: SqlitePool) {
             "typist2",
         ]
         .iter()
-        .any(|u| ps.username() == *u)
+        .any(|u| ps["username"] == *u)
     }))
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("users"))))]
 async fn test_user_creation(pool: SqlitePool) {
     let addr = serve_api(pool).await;
-    let admin_cookie = shared::admin_login(&addr).await;
+    let admin_cookie = admin_login(&addr).await;
 
     let url = format!("http://{addr}/api/users");
     let response = reqwest::Client::new()
@@ -131,7 +135,7 @@ async fn test_user_creation(pool: SqlitePool) {
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("users"))))]
 async fn test_user_creation_duplicate_username(pool: SqlitePool) {
     let addr = serve_api(pool).await;
-    let admin_cookie = shared::admin_login(&addr).await;
+    let admin_cookie = admin_login(&addr).await;
 
     let url = format!("http://{addr}/api/users");
     let response = reqwest::Client::new()
@@ -174,7 +178,7 @@ async fn test_user_creation_duplicate_username(pool: SqlitePool) {
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("users"))))]
 async fn test_user_creation_anonymous(pool: SqlitePool) {
     let addr = serve_api(pool).await;
-    let admin_cookie = shared::admin_login(&addr).await;
+    let admin_cookie = admin_login(&addr).await;
 
     let url = format!("http://{addr}/api/users");
     let response = reqwest::Client::new()
@@ -203,7 +207,7 @@ async fn test_user_creation_anonymous(pool: SqlitePool) {
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("users"))))]
 async fn test_user_creation_invalid_password(pool: SqlitePool) {
     let addr = serve_api(pool).await;
-    let admin_cookie = shared::admin_login(&addr).await;
+    let admin_cookie = admin_login(&addr).await;
 
     let url = format!("http://{addr}/api/users");
     let response = reqwest::Client::new()
@@ -223,7 +227,7 @@ async fn test_user_creation_invalid_password(pool: SqlitePool) {
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("users"))))]
 async fn test_user_update_password_invalid(pool: SqlitePool) {
     let addr = serve_api(pool).await;
-    let admin_cookie = shared::admin_login(&addr).await;
+    let admin_cookie = admin_login(&addr).await;
 
     let url = format!("http://{addr}/api/users/2");
     let response = reqwest::Client::new()
@@ -241,7 +245,7 @@ async fn test_user_update_password_invalid(pool: SqlitePool) {
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("users"))))]
 async fn test_user_update_not_found(pool: SqlitePool) {
     let addr = serve_api(pool).await;
-    let admin_cookie = shared::admin_login(&addr).await;
+    let admin_cookie = admin_login(&addr).await;
 
     let url = format!("http://{addr}/api/users/9999");
     let response = reqwest::Client::new()
@@ -259,7 +263,7 @@ async fn test_user_update_not_found(pool: SqlitePool) {
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("users"))))]
 async fn test_user_get(pool: SqlitePool) {
     let addr = serve_api(pool).await;
-    let admin_cookie = shared::admin_login(&addr).await;
+    let admin_cookie = admin_login(&addr).await;
 
     let url = format!("http://{addr}/api/users/1");
     let response = reqwest::Client::new()
@@ -279,7 +283,7 @@ async fn test_user_get(pool: SqlitePool) {
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("users"))))]
 async fn test_user_get_not_found(pool: SqlitePool) {
     let addr = serve_api(pool).await;
-    let admin_cookie = shared::admin_login(&addr).await;
+    let admin_cookie = admin_login(&addr).await;
 
     let url = format!("http://{addr}/api/users/40404");
     let response = reqwest::Client::new()
@@ -294,7 +298,7 @@ async fn test_user_get_not_found(pool: SqlitePool) {
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("users"))))]
 async fn test_user_delete(pool: SqlitePool) {
     let addr = serve_api(pool).await;
-    let admin_cookie = shared::admin_login(&addr).await;
+    let admin_cookie = admin_login(&addr).await;
 
     let url = format!("http://{addr}/api/users/2");
     let response = reqwest::Client::new()
@@ -317,7 +321,7 @@ async fn test_user_delete(pool: SqlitePool) {
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("users"))))]
 async fn test_user_delete_not_found(pool: SqlitePool) {
     let addr = serve_api(pool).await;
-    let admin_cookie = shared::admin_login(&addr).await;
+    let admin_cookie = admin_login(&addr).await;
 
     let url = format!("http://{addr}/api/users/9999");
     let response = reqwest::Client::new()
@@ -332,7 +336,7 @@ async fn test_user_delete_not_found(pool: SqlitePool) {
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("users"))))]
 async fn test_prevent_delete_own_account(pool: SqlitePool) {
     let addr = serve_api(pool).await;
-    let admin_cookie = shared::admin_login(&addr).await;
+    let admin_cookie = admin_login(&addr).await;
 
     let url = format!("http://{addr}/api/users/1");
     let response = reqwest::Client::new()
@@ -348,8 +352,8 @@ async fn test_prevent_delete_own_account(pool: SqlitePool) {
 async fn test_can_delete_logged_in_user(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     // Log in typist user
-    shared::typist_login(&addr).await;
-    let admin_cookie = shared::admin_login(&addr).await;
+    typist_login(&addr).await;
+    let admin_cookie = admin_login(&addr).await;
 
     // Try to delete typist user
     let url = format!("http://{addr}/api/users/5");
@@ -365,7 +369,7 @@ async fn test_can_delete_logged_in_user(pool: SqlitePool) {
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("users"))))]
 async fn test_coordinator_user_listing_only_typists(pool: SqlitePool) {
     let addr = serve_api(pool).await;
-    let coordinator_cookie = shared::coordinator_login(&addr).await;
+    let coordinator_cookie = coordinator_login(&addr).await;
 
     let url = format!("http://{addr}/api/users");
     let response = reqwest::Client::new()
@@ -375,19 +379,16 @@ async fn test_coordinator_user_listing_only_typists(pool: SqlitePool) {
         .await
         .unwrap();
     assert_eq!(response.status(), StatusCode::OK);
-    let body: UserListResponse = response.json().await.unwrap();
-    assert!(!body.users.is_empty());
-    assert!(
-        body.users
-            .into_iter()
-            .all(|user| user.role() == Role::Typist)
-    );
+    let body: serde_json::Value = response.json().await.unwrap();
+    let users = body["users"].as_array().unwrap();
+    assert!(!users.is_empty());
+    assert!(users.iter().all(|user| user["role"] == "typist"));
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("users"))))]
 async fn test_coordinator_can_only_create_typists(pool: SqlitePool) {
     let addr = serve_api(pool).await;
-    let coordinator_cookie = shared::coordinator_login(&addr).await;
+    let coordinator_cookie = coordinator_login(&addr).await;
 
     let url = format!("http://{addr}/api/users");
     let mut data = serde_json::json!({
@@ -432,7 +433,7 @@ async fn test_coordinator_can_only_create_typists(pool: SqlitePool) {
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("users"))))]
 async fn test_coordinator_can_only_get_typists(pool: SqlitePool) {
     let addr = serve_api(pool).await;
-    let coordinator_cookie = shared::coordinator_login(&addr).await;
+    let coordinator_cookie = coordinator_login(&addr).await;
 
     let typist_url = format!("http://{addr}/api/users/5");
     let response = reqwest::Client::new()
@@ -468,7 +469,7 @@ async fn test_coordinator_can_only_get_typists(pool: SqlitePool) {
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("users"))))]
 async fn test_coordinator_can_only_update_typists(pool: SqlitePool) {
     let addr = serve_api(pool).await;
-    let coordinator_cookie = shared::coordinator_login(&addr).await;
+    let coordinator_cookie = coordinator_login(&addr).await;
 
     let typist_url = format!("http://{addr}/api/users/5");
     let response = reqwest::Client::new()
@@ -506,7 +507,7 @@ async fn test_coordinator_can_only_update_typists(pool: SqlitePool) {
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("users"))))]
 async fn test_coordinator_can_only_delete_typists(pool: SqlitePool) {
     let addr = serve_api(pool).await;
-    let coordinator_cookie = shared::coordinator_login(&addr).await;
+    let coordinator_cookie = coordinator_login(&addr).await;
 
     let typist_url = format!("http://{addr}/api/users/5");
     let response = reqwest::Client::new()
@@ -539,7 +540,7 @@ async fn test_coordinator_can_only_delete_typists(pool: SqlitePool) {
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_1", "users"))))]
 async fn test_cant_do_anything_when_password_needs_change(pool: SqlitePool) {
     let addr = serve_api(pool).await;
-    let admin_cookie = shared::admin_login(&addr).await;
+    let admin_cookie = admin_login(&addr).await;
 
     let url = format!("http://{addr}/api/users/5");
     let response = reqwest::Client::new()
@@ -554,7 +555,7 @@ async fn test_cant_do_anything_when_password_needs_change(pool: SqlitePool) {
     assert_eq!(response.status(), StatusCode::OK);
 
     // Login again with the temporary password
-    let typist_cookie = shared::login(&addr, "typist1", "TotallyValidTempP4ssW0rd").await;
+    let typist_cookie = login(&addr, "typist1", "TotallyValidTempP4ssW0rd").await;
 
     // Can't call arbitrary endpoint
     let some_endpoint = format!("http://{addr}/api/elections/1/polling_stations");

@@ -968,13 +968,13 @@ async fn test_delete_with_investigation_works(pool: SqlitePool) {
     let election_id = ElectionId::from(5);
     let polling_station_id = 9;
 
-    let coordinator_cookie = coordinator_login(&addr).await;
     assert_eq!(
         create_investigation(&addr, polling_station_id)
             .await
             .status(),
         StatusCode::CREATED
     );
+    let coordinator_cookie = coordinator_login(&addr).await;
     let election_details = get_election_details(&addr, &coordinator_cookie, election_id).await;
     assert_eq!(election_details.investigations.len(), 2);
 
@@ -1258,21 +1258,23 @@ async fn test_finished_to_in_progress_on_update(pool: SqlitePool) {
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
 async fn test_finished_to_in_progress_on_delete(pool: SqlitePool) {
     let addr = serve_api(pool).await;
-    let coordinator_cookie = coordinator_login(&addr).await;
     let election_id = ElectionId::from(2);
 
     check_finished_to_in_progress_on(
         &addr,
-        || delete_polling_station(&addr, &coordinator_cookie, election_id, 2),
+        || async {
+            delete_polling_station(&addr, &coordinator_login(&addr).await, election_id, 2).await
+        },
         StatusCode::NO_CONTENT,
     )
     .await;
 
     // Delete last polling station
-    let response = delete_polling_station(&addr, &coordinator_cookie, election_id, 1).await;
+    let response =
+        delete_polling_station(&addr, &coordinator_login(&addr).await, election_id, 1).await;
     assert_eq!(response.status(), StatusCode::NO_CONTENT);
 
     let committee_session =
-        get_election_committee_session(&addr, &coordinator_cookie, election_id).await;
+        get_election_committee_session(&addr, &coordinator_login(&addr).await, election_id).await;
     assert_eq!(committee_session.status, CommitteeSessionStatus::Created);
 }

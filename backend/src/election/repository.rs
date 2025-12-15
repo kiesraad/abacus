@@ -1,5 +1,7 @@
 use sqlx::{Error, SqliteConnection, query_as, types::Json};
 
+use crate::election::ElectionId;
+
 use super::{Election, ElectionWithPoliticalGroups, NewElection};
 
 pub async fn list(conn: &mut SqliteConnection) -> Result<Vec<Election>, Error> {
@@ -13,10 +15,10 @@ pub async fn list(conn: &mut SqliteConnection) -> Result<Vec<Election>, Error> {
 
 pub async fn get(
     conn: &mut SqliteConnection,
-    id: u32,
+    election_id: ElectionId,
 ) -> Result<ElectionWithPoliticalGroups, Error> {
     let election: ElectionWithPoliticalGroups = query_as("SELECT * FROM elections WHERE id = ?")
-        .bind(id)
+        .bind(election_id)
         .fetch_one(conn)
         .await?;
     Ok(election)
@@ -73,7 +75,7 @@ pub async fn create(
 
 pub async fn change_number_of_voters(
     conn: &mut SqliteConnection,
-    election_id: u32,
+    election_id: ElectionId,
     number_of_voters: u32,
 ) -> Result<Election, Error> {
     query_as!(

@@ -1,8 +1,11 @@
 #![cfg(test)]
 
-use abacus::committee_session::{
-    CommitteeSession, CommitteeSessionStatusChangeRequest, CommitteeSessionUpdateRequest,
-    status::CommitteeSessionStatus,
+use abacus::{
+    committee_session::{
+        CommitteeSession, CommitteeSessionStatusChangeRequest, CommitteeSessionUpdateRequest,
+        status::CommitteeSessionStatus,
+    },
+    election::ElectionId,
 };
 use axum::http::StatusCode;
 use sqlx::SqlitePool;
@@ -23,7 +26,7 @@ pub mod utils;
 async fn test_committee_session_create_works(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let coordinator_cookie = coordinator_login(&addr).await;
-    let election_id = 5;
+    let election_id = ElectionId::from(5);
 
     change_status_committee_session(
         &addr,
@@ -86,7 +89,7 @@ async fn test_committee_session_create_current_committee_session_not_finalised(p
 async fn test_committee_session_delete_ok_status_created(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let coordinator_cookie = coordinator_login(&addr).await;
-    let election_id = 7;
+    let election_id = ElectionId::from(7);
     let committee_session_id = 704;
 
     let committee_session =
@@ -122,7 +125,7 @@ async fn test_committee_session_delete_ok_status_created(pool: SqlitePool) {
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_7_four_sessions", "users"))))]
 async fn test_committee_session_delete_fails_with_investigation(pool: SqlitePool) {
     let addr = serve_api(pool).await;
-    let election_id = 7;
+    let election_id = ElectionId::from(7);
     let committee_session_id = 704;
     let polling_station_id = 742;
 
@@ -150,7 +153,7 @@ async fn test_committee_session_delete_fails_with_investigation(pool: SqlitePool
 async fn test_committee_session_delete_not_ok_wrong_status(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let coordinator_cookie = coordinator_login(&addr).await;
-    let election_id = 5;
+    let election_id = ElectionId::from(5);
     let committee_session_id = 6;
 
     let url = format!(
@@ -239,7 +242,7 @@ async fn test_committee_session_delete_current_committee_session_but_its_the_fir
 ) {
     let addr = serve_api(pool).await;
     let coordinator_cookie = coordinator_login(&addr).await;
-    let election_id = 2;
+    let election_id = ElectionId::from(2);
     let committee_session_id = 2;
 
     change_status_committee_session(
@@ -454,7 +457,7 @@ async fn test_committee_session_status_change_finished_to_in_progress_deletes_fi
 ) {
     let addr = serve_api(pool).await;
     let coordinator_cookie = coordinator_login(&addr).await;
-    let election_id = 2;
+    let election_id = ElectionId::from(2);
     create_result(&addr, 1, election_id).await;
     create_result(&addr, 2, election_id).await;
 

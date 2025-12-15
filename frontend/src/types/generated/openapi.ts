@@ -1058,7 +1058,7 @@ export type PollingStationType = "FixedLocation" | "Special" | "Mobile";
 
 export interface PollingStationsRequest {
   file_name: string;
-  polling_stations: PollingStationRequest[];
+  polling_stations: string;
 }
 
 export type RandomRange = string;

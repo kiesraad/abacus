@@ -48,6 +48,10 @@ pub struct Typist(pub User);
 #[allow(unused)]
 pub struct AdminOrCoordinator(pub User);
 
+/// A user with potentially no fullname or needs_password_change=true
+#[allow(unused)]
+pub struct IncompleteUser(pub User);
+
 impl AdminOrCoordinator {
     /// Returns true if the user is an administrator
     pub fn is_administrator(&self) -> bool {

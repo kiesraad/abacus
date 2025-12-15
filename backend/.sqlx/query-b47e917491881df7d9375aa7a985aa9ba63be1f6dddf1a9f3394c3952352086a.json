@@ -1,6 +1,6 @@
 {
   "db_name": "SQLite",
-  "query": "\n        SELECT\n            id as \"id: u32\",\n            number as \"number: u32\",\n            election_id as \"election_id: u32\",\n            status as \"status: _\",\n            location,\n            start_date_time as \"start_date_time: _\",\n            results_eml as \"results_eml: _\",\n            results_pdf as \"results_pdf: _\",\n            overview_pdf as \"overview_pdf: _\"\n        FROM (\n            SELECT\n            id,\n            number,\n            election_id,\n            status,\n            location,\n            start_date_time,\n            results_eml,\n            results_pdf,\n            overview_pdf,\n            row_number() over (\n            PARTITION BY election_id\n            ORDER BY number DESC\n            ) AS row_number FROM committee_sessions\n        ) t WHERE t.row_number = 1\n        ",
+  "query": "\n        UPDATE committee_sessions\n        SET\n            results_eml = ?,\n            results_pdf = ?,\n            overview_pdf = ?\n        WHERE id = ?\n        RETURNING\n            id as \"id: u32\",\n            number as \"number: u32\",\n            election_id as \"election_id: ElectionId\",\n            status as \"status: _\",\n            location,\n            start_date_time as \"start_date_time: _\",\n            results_eml as \"results_eml: _\",\n            results_pdf as \"results_pdf: _\",\n            overview_pdf as \"overview_pdf: _\"\n        ",
   "describe": {
     "columns": [
       {
@@ -14,7 +14,7 @@
         "type_info": "Integer"
       },
       {
-        "name": "election_id: u32",
+        "name": "election_id: ElectionId",
         "ordinal": 2,
         "type_info": "Integer"
       },
@@ -50,7 +50,7 @@
       }
     ],
     "parameters": {
-      "Right": 0
+      "Right": 4
     },
     "nullable": [
       false,
@@ -64,5 +64,5 @@
       true
     ]
   },
-  "hash": "b15d204d09966c7103dc6758d45495d3e7619563dc4f54e16bd2834e243b2e3d"
+  "hash": "b47e917491881df7d9375aa7a985aa9ba63be1f6dddf1a9f3394c3952352086a"
 }

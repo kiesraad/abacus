@@ -52,6 +52,7 @@ pub mod report;
 pub mod summary;
 #[cfg(feature = "dev-database")]
 pub mod test_data_gen;
+pub mod util;
 pub mod zip;
 
 pub use app_error::AppError;

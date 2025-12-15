@@ -290,7 +290,7 @@ mod tests {
 
     use crate::{
         data_entry::CandidateVotes as DataEntryCandidateVotes,
-        election::{ElectionCategory, ElectionWithPoliticalGroups, VoteCountingMethod},
+        election::{ElectionCategory, ElectionId, ElectionWithPoliticalGroups, VoteCountingMethod},
     };
 
     fn sample_candidate(number: u32) -> Candidate {
@@ -319,7 +319,7 @@ mod tests {
 
     fn sample_election(group: PoliticalGroup) -> ElectionWithPoliticalGroups {
         ElectionWithPoliticalGroups {
-            id: 1,
+            id: ElectionId::from(1),
             name: "Test election".to_string(),
             counting_method: VoteCountingMethod::CSO,
             election_id: "Test_2025".to_string(),

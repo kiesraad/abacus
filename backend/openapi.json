@@ -320,9 +320,7 @@
             "description": "Election database id",
             "required": true,
             "schema": {
-              "type": "integer",
-              "format": "int32",
-              "minimum": 0
+              "$ref": "#/components/schemas/ElectionId"
             }
           }
         ],
@@ -390,9 +388,7 @@
             "description": "Election database id",
             "required": true,
             "schema": {
-              "type": "integer",
-              "format": "int32",
-              "minimum": 0
+              "$ref": "#/components/schemas/ElectionId"
             }
           }
         ],
@@ -478,9 +474,7 @@
             "description": "Election database id",
             "required": true,
             "schema": {
-              "type": "integer",
-              "format": "int32",
-              "minimum": 0
+              "$ref": "#/components/schemas/ElectionId"
             }
           },
           {
@@ -578,9 +572,7 @@
             "description": "Election database id",
             "required": true,
             "schema": {
-              "type": "integer",
-              "format": "int32",
-              "minimum": 0
+              "$ref": "#/components/schemas/ElectionId"
             }
           },
           {
@@ -670,9 +662,7 @@
             "description": "Election database id",
             "required": true,
             "schema": {
-              "type": "integer",
-              "format": "int32",
-              "minimum": 0
+              "$ref": "#/components/schemas/ElectionId"
             }
           },
           {
@@ -773,9 +763,7 @@
             "description": "Election database id",
             "required": true,
             "schema": {
-              "type": "integer",
-              "format": "int32",
-              "minimum": 0
+              "$ref": "#/components/schemas/ElectionId"
             }
           },
           {
@@ -876,9 +864,7 @@
             "description": "Election database id",
             "required": true,
             "schema": {
-              "type": "integer",
-              "format": "int32",
-              "minimum": 0
+              "$ref": "#/components/schemas/ElectionId"
             }
           },
           {
@@ -965,9 +951,7 @@
             "description": "Election database id",
             "required": true,
             "schema": {
-              "type": "integer",
-              "format": "int32",
-              "minimum": 0
+              "$ref": "#/components/schemas/ElectionId"
             }
           },
           {
@@ -1067,9 +1051,7 @@
             "description": "Election database id",
             "required": true,
             "schema": {
-              "type": "integer",
-              "format": "int32",
-              "minimum": 0
+              "$ref": "#/components/schemas/ElectionId"
             }
           }
         ],
@@ -1160,9 +1142,7 @@
             "description": "Election database id",
             "required": true,
             "schema": {
-              "type": "integer",
-              "format": "int32",
-              "minimum": 0
+              "$ref": "#/components/schemas/ElectionId"
             }
           }
         ],
@@ -1253,9 +1233,7 @@
             "description": "Election database id",
             "required": true,
             "schema": {
-              "type": "integer",
-              "format": "int32",
-              "minimum": 0
+              "$ref": "#/components/schemas/ElectionId"
             }
           }
         ],
@@ -1346,9 +1324,7 @@
             "description": "Election database id",
             "required": true,
             "schema": {
-              "type": "integer",
-              "format": "int32",
-              "minimum": 0
+              "$ref": "#/components/schemas/ElectionId"
             }
           }
         ],
@@ -1414,9 +1390,7 @@
             "description": "Election database id",
             "required": true,
             "schema": {
-              "type": "integer",
-              "format": "int32",
-              "minimum": 0
+              "$ref": "#/components/schemas/ElectionId"
             }
           }
         ],
@@ -1513,9 +1487,7 @@
             "description": "Election database id",
             "required": true,
             "schema": {
-              "type": "integer",
-              "format": "int32",
-              "minimum": 0
+              "$ref": "#/components/schemas/ElectionId"
             }
           }
         ],
@@ -1602,9 +1574,7 @@
             "description": "Election database id",
             "required": true,
             "schema": {
-              "type": "integer",
-              "format": "int32",
-              "minimum": 0
+              "$ref": "#/components/schemas/ElectionId"
             }
           }
         ],
@@ -1691,9 +1661,7 @@
             "description": "Election database id",
             "required": true,
             "schema": {
-              "type": "integer",
-              "format": "int32",
-              "minimum": 0
+              "$ref": "#/components/schemas/ElectionId"
             }
           },
           {
@@ -1770,9 +1738,7 @@
             "description": "Election database id",
             "required": true,
             "schema": {
-              "type": "integer",
-              "format": "int32",
-              "minimum": 0
+              "$ref": "#/components/schemas/ElectionId"
             }
           },
           {
@@ -1868,9 +1834,7 @@
             "description": "Election database id",
             "required": true,
             "schema": {
-              "type": "integer",
-              "format": "int32",
-              "minimum": 0
+              "$ref": "#/components/schemas/ElectionId"
             }
           },
           {
@@ -1961,9 +1925,7 @@
             "description": "Election database id",
             "required": true,
             "schema": {
-              "type": "integer",
-              "format": "int32",
-              "minimum": 0
+              "$ref": "#/components/schemas/ElectionId"
             }
           }
         ],
@@ -2031,9 +1993,7 @@
             "description": "Election database id",
             "required": true,
             "schema": {
-              "type": "integer",
-              "format": "int32",
-              "minimum": 0
+              "$ref": "#/components/schemas/ElectionId"
             }
           }
         ],
@@ -5390,9 +5350,7 @@
         ],
         "properties": {
           "election_id": {
-            "type": "integer",
-            "format": "int32",
-            "minimum": 0
+            "$ref": "#/components/schemas/ElectionId"
           },
           "id": {
             "type": "integer",
@@ -5443,9 +5401,7 @@
         ],
         "properties": {
           "session_election_id": {
-            "type": "integer",
-            "format": "int32",
-            "minimum": 0
+            "$ref": "#/components/schemas/ElectionId"
           },
           "session_id": {
             "type": "integer",
@@ -5869,9 +5825,7 @@
             "type": "string"
           },
           "id": {
-            "type": "integer",
-            "format": "int32",
-            "minimum": 0
+            "$ref": "#/components/schemas/ElectionId"
           },
           "location": {
             "type": "string"
@@ -6057,9 +6011,7 @@
             "type": "string"
           },
           "election_id": {
-            "type": "integer",
-            "format": "int32",
-            "minimum": 0
+            "$ref": "#/components/schemas/ElectionId"
           },
           "election_location": {
             "type": "string"
@@ -6121,6 +6073,11 @@
           }
         },
         "additionalProperties": false
+      },
+      "ElectionId": {
+        "type": "integer",
+        "format": "int32",
+        "minimum": 0
       },
       "ElectionListResponse": {
         "type": "object",
@@ -6264,9 +6221,7 @@
             "type": "string"
           },
           "id": {
-            "type": "integer",
-            "format": "int32",
-            "minimum": 0
+            "$ref": "#/components/schemas/ElectionId"
           },
           "location": {
             "type": "string"
@@ -6698,9 +6653,7 @@
             "minimum": 0
           },
           "election_id": {
-            "type": "integer",
-            "format": "int32",
-            "minimum": 0
+            "$ref": "#/components/schemas/ElectionId"
           },
           "id": {
             "type": "integer",
@@ -6759,9 +6712,7 @@
             "minimum": 0
           },
           "polling_station_election_id": {
-            "type": "integer",
-            "format": "int32",
-            "minimum": 0
+            "$ref": "#/components/schemas/ElectionId"
           },
           "polling_station_id": {
             "type": "integer",
@@ -6818,9 +6769,7 @@
         ],
         "properties": {
           "import_election_id": {
-            "type": "integer",
-            "format": "int32",
-            "minimum": 0
+            "$ref": "#/components/schemas/ElectionId"
           },
           "import_file_name": {
             "type": "string"

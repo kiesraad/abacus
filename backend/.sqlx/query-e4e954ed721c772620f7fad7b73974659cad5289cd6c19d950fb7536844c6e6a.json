@@ -1,6 +1,6 @@
 {
   "db_name": "SQLite",
-  "query": "\n        SELECT\n            p.id AS \"id: u32\",\n            c.election_id AS \"election_id: u32\",\n            p.committee_session_id AS \"committee_session_id: u32\",\n            p.id_prev_session AS \"id_prev_session: _\",\n            p.name,\n            p.number AS \"number: u32\",\n            p.number_of_voters AS \"number_of_voters: _\",\n            p.polling_station_type AS \"polling_station_type: _\",\n            p.address,\n            p.postal_code,\n            p.locality\n        FROM polling_stations AS p\n        JOIN committee_sessions AS c ON c.id = p.committee_session_id\n        WHERE c.id = $1\n        ",
+  "query": "\n        SELECT\n            p.id AS \"id: u32\",\n            c.election_id AS \"election_id: ElectionId\",\n            p.committee_session_id AS \"committee_session_id: u32\",\n            p.id_prev_session AS \"id_prev_session: _\",\n            p.name,\n            p.number AS \"number: u32\",\n            p.number_of_voters AS \"number_of_voters: _\",\n            p.polling_station_type AS \"polling_station_type: _\",\n            p.address,\n            p.postal_code,\n            p.locality\n        FROM polling_stations AS p\n        JOIN committee_sessions AS c ON c.id = p.committee_session_id\n        WHERE p.id = $1 AND c.number = (\n            SELECT MAX(c2.number)\n            FROM committee_sessions AS c2\n            WHERE c2.election_id = c.election_id\n        )\n        ",
   "describe": {
     "columns": [
       {
@@ -9,7 +9,7 @@
         "type_info": "Integer"
       },
       {
-        "name": "election_id: u32",
+        "name": "election_id: ElectionId",
         "ordinal": 1,
         "type_info": "Integer"
       },
@@ -76,5 +76,5 @@
       false
     ]
   },
-  "hash": "04d6e9d2cb45ec4f1321736e00a830ae3e3a10968ca05b9abb2ed8111f6e3b72"
+  "hash": "e4e954ed721c772620f7fad7b73974659cad5289cd6c19d950fb7536844c6e6a"
 }

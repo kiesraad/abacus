@@ -10,7 +10,7 @@ import { PollingStationAlert } from "./PollingStationAlert";
 import { PollingStationForm } from "./PollingStationForm";
 
 export function PollingStationCreatePage() {
-  const { election } = useElection();
+  const { election, refetch } = useElection();
   const { pushMessage } = useMessages();
   const navigate = useNavigate();
 
@@ -23,7 +23,7 @@ export function PollingStationCreatePage() {
         name: pollingStation.name,
       }),
     });
-
+    void refetch();
     void navigate(parentUrl);
   }
 

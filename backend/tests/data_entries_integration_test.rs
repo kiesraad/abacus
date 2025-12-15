@@ -8,6 +8,7 @@ use abacus::{
         ClaimDataEntryResponse, ElectionStatusResponse, SaveDataEntryResponse,
         ValidationResultCode, status::DataEntryStatusName::*,
     },
+    election::ElectionId,
 };
 use axum::http::HeaderValue;
 use reqwest::{Response, StatusCode};
@@ -388,7 +389,7 @@ async fn test_election_details_status(pool: SqlitePool) {
     let typist2_cookie = shared::typist2_login(&addr).await;
     let typist2_user_id = 6;
     let coordinator_cookie = shared::coordinator_login(&addr).await;
-    let election_id = 2;
+    let election_id = ElectionId::from(2);
 
     // Ensure the statuses are "NotStarted"
     let statuses = get_statuses(&addr, &coordinator_cookie, election_id).await;

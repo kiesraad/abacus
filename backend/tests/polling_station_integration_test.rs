@@ -2,7 +2,9 @@
 
 use std::net::SocketAddr;
 
-use abacus::{ErrorResponse, committee_session::status::CommitteeSessionStatus};
+use abacus::{
+    ErrorResponse, committee_session::status::CommitteeSessionStatus, election::ElectionId,
+};
 use axum::http::StatusCode;
 use hyper::http::HeaderValue;
 use reqwest::Response;
@@ -24,7 +26,7 @@ pub mod utils;
 async fn get_polling_station(
     addr: &SocketAddr,
     cookie: &HeaderValue,
-    election_id: u32,
+    election_id: ElectionId,
     polling_station_id: u32,
 ) -> Response {
     let url =
@@ -40,7 +42,7 @@ async fn get_polling_station(
 async fn import_polling_stations(
     addr: &SocketAddr,
     cookie: &HeaderValue,
-    election_id: u32,
+    election_id: ElectionId,
     file_name: &str,
     polling_stations: serde_json::Value,
 ) -> Response {
@@ -60,7 +62,7 @@ async fn import_polling_stations(
 async fn import_validate_polling_stations(
     addr: &SocketAddr,
     cookie: &HeaderValue,
-    election_id: u32,
+    election_id: ElectionId,
     data: &str,
 ) -> Response {
     let url = format!("http://{addr}/api/elections/{election_id}/polling_stations/validate-import");
@@ -78,7 +80,7 @@ async fn import_validate_polling_stations(
 async fn update_polling_station(
     addr: &SocketAddr,
     cookie: &HeaderValue,
-    election_id: u32,
+    election_id: ElectionId,
     polling_station_id: u32,
     body: serde_json::Value,
 ) -> Response {
@@ -97,7 +99,7 @@ async fn update_polling_station(
 async fn delete_polling_station(
     addr: &SocketAddr,
     cookie: &HeaderValue,
-    election_id: u32,
+    election_id: ElectionId,
     polling_station_id: u32,
 ) -> Response {
     let url =
@@ -148,7 +150,7 @@ async fn test_creation_for_committee_session_with_created_and_not_started_status
 ) {
     let addr = serve_api(pool).await;
     let coordinator_cookie = coordinator_login(&addr).await;
-    let election_id = 6;
+    let election_id = ElectionId::from(6);
 
     let committee_session =
         get_election_committee_session(&addr, &coordinator_cookie, election_id).await;
@@ -192,7 +194,7 @@ async fn test_creation_for_committee_session_with_created_and_not_started_status
 ) {
     let addr = serve_api(pool).await;
     let admin_cookie = admin_login(&addr).await;
-    let election_id = 6;
+    let election_id = ElectionId::from(6);
 
     let committee_session = get_election_committee_session(&addr, &admin_cookie, election_id).await;
     assert_eq!(committee_session.status, CommitteeSessionStatus::Created);
@@ -231,7 +233,7 @@ async fn test_creation_for_committee_session_with_in_progress_status_as_coordina
 ) {
     let addr = serve_api(pool).await;
     let coordinator_cookie = coordinator_login(&addr).await;
-    let election_id = 4;
+    let election_id = ElectionId::from(4);
 
     let committee_session =
         get_election_committee_session(&addr, &coordinator_cookie, election_id).await;
@@ -259,7 +261,7 @@ async fn test_creation_for_committee_session_with_in_progress_status_as_administ
 ) {
     let addr = serve_api(pool).await;
     let admin_cookie = admin_login(&addr).await;
-    let election_id = 4;
+    let election_id = ElectionId::from(4);
 
     let committee_session = get_election_committee_session(&addr, &admin_cookie, election_id).await;
     assert_eq!(
@@ -281,7 +283,7 @@ async fn test_get(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let coordinator_cookie = coordinator_login(&addr).await;
 
-    let response = get_polling_station(&addr, &coordinator_cookie, 7, 742).await;
+    let response = get_polling_station(&addr, &coordinator_cookie, ElectionId::from(7), 742).await;
     let body: serde_json::Value = response.json().await.unwrap();
     assert_eq!(body["committee_session_id"], 704);
     assert_eq!(body["id_prev_session"], 732);
@@ -294,7 +296,7 @@ async fn test_get_from_previous_committee_session_fails(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let coordinator_cookie = coordinator_login(&addr).await;
 
-    let response = get_polling_station(&addr, &coordinator_cookie, 5, 8).await;
+    let response = get_polling_station(&addr, &coordinator_cookie, ElectionId::from(5), 8).await;
 
     assert_eq!(
         response.status(),
@@ -309,7 +311,7 @@ async fn test_update_for_committee_session_with_created_status_as_coordinator_wo
 ) {
     let addr = serve_api(pool).await;
     let coordinator_cookie = coordinator_login(&addr).await;
-    let election_id = 7;
+    let election_id = ElectionId::from(7);
     let polling_station_id = 741;
 
     let committee_session =
@@ -361,7 +363,7 @@ async fn test_update_for_committee_session_with_created_status_as_administrator_
 ) {
     let addr = serve_api(pool).await;
     let admin_cookie = admin_login(&addr).await;
-    let election_id = 7;
+    let election_id = ElectionId::from(7);
     let polling_station_id = 741;
 
     let committee_session = get_election_committee_session(&addr, &admin_cookie, election_id).await;
@@ -413,7 +415,7 @@ async fn test_update_for_committee_session_with_not_started_status_as_coordinato
 ) {
     let addr = serve_api(pool).await;
     let coordinator_cookie = coordinator_login(&addr).await;
-    let election_id = 6;
+    let election_id = ElectionId::from(6);
 
     let committee_session =
         get_election_committee_session(&addr, &coordinator_cookie, election_id).await;
@@ -481,7 +483,7 @@ async fn test_update_for_committee_session_with_not_started_status_as_administra
 ) {
     let addr = serve_api(pool).await;
     let admin_cookie = admin_login(&addr).await;
-    let election_id = 6;
+    let election_id = ElectionId::from(6);
 
     let committee_session = get_election_committee_session(&addr, &admin_cookie, election_id).await;
     assert_eq!(committee_session.status, CommitteeSessionStatus::Created);
@@ -542,7 +544,7 @@ async fn test_update_for_committee_session_with_in_progress_status_as_coordinato
 ) {
     let addr = serve_api(pool).await;
     let coordinator_cookie = coordinator_login(&addr).await;
-    let election_id = 4;
+    let election_id = ElectionId::from(4);
     let polling_station_id = 7;
 
     let committee_session =
@@ -593,7 +595,7 @@ async fn test_update_for_committee_session_with_in_progress_status_as_administra
 ) {
     let addr = serve_api(pool).await;
     let admin_cookie = admin_login(&addr).await;
-    let election_id = 4;
+    let election_id = ElectionId::from(4);
     let polling_station_id = 7;
 
     let committee_session = get_election_committee_session(&addr, &admin_cookie, election_id).await;
@@ -633,7 +635,7 @@ async fn test_update_empty_type_ok(pool: SqlitePool) {
     let response = update_polling_station(
         &addr,
         &coordinator_cookie,
-        2,
+        ElectionId::from(2),
         2,
         serde_json::json!({
             "name": "Testverandering",
@@ -665,7 +667,7 @@ async fn test_update_from_previous_committee_session_fails(pool: SqlitePool) {
     let response = update_polling_station(
         &addr,
         &coordinator_cookie,
-        5,
+        ElectionId::from(5),
         8,
         serde_json::json!({
             "name": "Testverandering",
@@ -693,7 +695,7 @@ async fn test_update_not_found(pool: SqlitePool) {
     let response = update_polling_station(
         &addr,
         &coordinator_cookie,
-        2,
+        ElectionId::from(2),
         40404,
         serde_json::json!({
             "name": "Testverandering",
@@ -720,7 +722,7 @@ async fn test_delete_for_committee_session_with_created_status_as_coordinator_wo
 ) {
     let addr = serve_api(pool).await;
     let coordinator_cookie = coordinator_login(&addr).await;
-    let election_id = 7;
+    let election_id = ElectionId::from(7);
     let polling_station_id = 741;
 
     let committee_session =
@@ -743,7 +745,7 @@ async fn test_delete_for_committee_session_with_created_status_as_administrator_
 ) {
     let addr = serve_api(pool).await;
     let admin_cookie = admin_login(&addr).await;
-    let election_id = 7;
+    let election_id = ElectionId::from(7);
     let polling_station_id = 741;
 
     let committee_session = get_election_committee_session(&addr, &admin_cookie, election_id).await;
@@ -768,7 +770,7 @@ async fn test_delete_for_committee_session_with_not_started_status_as_coordinato
 ) {
     let addr = serve_api(pool).await;
     let coordinator_cookie = coordinator_login(&addr).await;
-    let election_id = 6;
+    let election_id = ElectionId::from(6);
 
     let committee_session =
         get_election_committee_session(&addr, &coordinator_cookie, election_id).await;
@@ -804,7 +806,7 @@ async fn test_delete_for_committee_session_with_not_started_status_as_administra
 ) {
     let addr = serve_api(pool).await;
     let admin_cookie = admin_login(&addr).await;
-    let election_id = 6;
+    let election_id = ElectionId::from(6);
 
     let committee_session = get_election_committee_session(&addr, &admin_cookie, election_id).await;
     assert_eq!(committee_session.status, CommitteeSessionStatus::Created);
@@ -835,7 +837,7 @@ async fn test_delete_for_committee_session_with_in_progress_status_as_coordinato
 ) {
     let addr = serve_api(pool).await;
     let coordinator_cookie = coordinator_login(&addr).await;
-    let election_id = 2;
+    let election_id = ElectionId::from(2);
 
     let committee_session =
         get_election_committee_session(&addr, &coordinator_cookie, election_id).await;
@@ -885,7 +887,7 @@ async fn test_delete_for_committee_session_with_in_progress_status_as_administra
 ) {
     let addr = serve_api(pool).await;
     let admin_cookie = admin_login(&addr).await;
-    let election_id = 2;
+    let election_id = ElectionId::from(2);
 
     let committee_session = get_election_committee_session(&addr, &admin_cookie, election_id).await;
     assert_eq!(
@@ -911,7 +913,7 @@ async fn test_delete_with_data_entry_fails(pool: SqlitePool) {
 
     let coordinator_cookie = coordinator_login(&addr).await;
 
-    let response = delete_polling_station(&addr, &coordinator_cookie, 2, 2).await;
+    let response = delete_polling_station(&addr, &coordinator_cookie, ElectionId::from(2), 2).await;
 
     assert_eq!(
         response.status(),
@@ -926,9 +928,9 @@ async fn test_delete_with_data_entry_fails(pool: SqlitePool) {
 async fn test_delete_with_results_fails(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let coordinator_cookie = coordinator_login(&addr).await;
-    create_result(&addr, 1, 2).await;
+    create_result(&addr, 1, ElectionId::from(2)).await;
 
-    let response = delete_polling_station(&addr, &coordinator_cookie, 2, 1).await;
+    let response = delete_polling_station(&addr, &coordinator_cookie, ElectionId::from(2), 1).await;
 
     assert_eq!(
         response.status(),
@@ -944,7 +946,7 @@ async fn test_delete_from_previous_committee_session_fails(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let coordinator_cookie = coordinator_login(&addr).await;
 
-    let response = delete_polling_station(&addr, &coordinator_cookie, 5, 8).await;
+    let response = delete_polling_station(&addr, &coordinator_cookie, ElectionId::from(5), 8).await;
 
     assert_eq!(
         response.status(),
@@ -958,7 +960,8 @@ async fn test_delete_not_found(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let coordinator_cookie = coordinator_login(&addr).await;
 
-    let response = delete_polling_station(&addr, &coordinator_cookie, 2, 40404).await;
+    let response =
+        delete_polling_station(&addr, &coordinator_cookie, ElectionId::from(2), 40404).await;
 
     assert_eq!(
         response.status(),
@@ -971,7 +974,7 @@ async fn test_delete_not_found(pool: SqlitePool) {
 async fn test_non_unique_number(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let coordinator_cookie = coordinator_login(&addr).await;
-    let election_id = 2;
+    let election_id = ElectionId::from(2);
 
     let response = create_polling_station(&addr, &coordinator_cookie, election_id, 33).await;
 
@@ -1004,7 +1007,7 @@ async fn test_import_validate_correct_file(pool: SqlitePool) {
     let response = import_validate_polling_stations(
         &addr,
         &coordinator_cookie,
-        2,
+        ElectionId::from(2),
         include_str!("../src/eml/tests/eml110b_test.eml.xml"),
     )
     .await;
@@ -1021,7 +1024,7 @@ async fn test_import_validate_wrong_file(pool: SqlitePool) {
     let response = import_validate_polling_stations(
         &addr,
         &coordinator_cookie,
-        2,
+        ElectionId::from(2),
         include_str!("../src/eml/tests/eml110a_test.eml.xml"),
     )
     .await;
@@ -1039,7 +1042,7 @@ async fn test_import_missing_data(pool: SqlitePool) {
     let response = import_polling_stations(
         &addr,
         &coordinator_cookie,
-        6,
+        ElectionId::from(6),
         "eml110b_test.eml.xml",
         serde_json::Value::Null,
     )
@@ -1052,7 +1055,7 @@ async fn test_import_missing_data(pool: SqlitePool) {
 async fn test_import_fails_when_polling_stations_exist(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let coordinator_cookie = coordinator_login(&addr).await;
-    let election_id = 7;
+    let election_id = ElectionId::from(7);
 
     let committee_session =
         get_election_committee_session(&addr, &coordinator_cookie, election_id).await;
@@ -1082,7 +1085,7 @@ async fn test_import_fails_when_polling_stations_exist(pool: SqlitePool) {
 async fn test_import_correct_file(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let coordinator_cookie = coordinator_login(&addr).await;
-    let election_id = 6;
+    let election_id = ElectionId::from(6);
 
     let committee_session =
         get_election_committee_session(&addr, &coordinator_cookie, election_id).await;
@@ -1120,7 +1123,7 @@ where
     Fut: Future<Output = Response>,
 {
     let coordinator_cookie = coordinator_login(addr).await;
-    let election_id = 2;
+    let election_id = ElectionId::from(2);
 
     create_result(addr, 1, election_id).await;
     create_result(addr, 2, election_id).await;
@@ -1156,7 +1159,7 @@ async fn test_finished_to_in_progress_on_create(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let coordinator_cookie = coordinator_login(&addr).await;
     check_finished_to_in_progress_on(&addr, || {
-        create_polling_station(&addr, &coordinator_cookie, 2, 35)
+        create_polling_station(&addr, &coordinator_cookie, ElectionId::from(2), 35)
     })
     .await;
 }
@@ -1170,7 +1173,7 @@ async fn test_finished_to_in_progress_on_update(pool: SqlitePool) {
         update_polling_station(
             &addr,
             &coordinator_cookie,
-            2,
+            ElectionId::from(2),
             1,
             serde_json::json!({
                 "name": "Testverandering",

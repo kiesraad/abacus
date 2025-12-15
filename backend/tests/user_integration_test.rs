@@ -633,7 +633,6 @@ async fn test_cant_do_anything_when_password_needs_change(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let url = format!("http://{addr}/api/user/5");
     let admin_cookie = shared::admin_login(&addr).await;
-    let typist_cookie = shared::typist_login(&addr).await;
 
     let response = reqwest::Client::new()
         .put(&url)
@@ -646,6 +645,9 @@ async fn test_cant_do_anything_when_password_needs_change(pool: SqlitePool) {
         .unwrap();
     assert_eq!(response.status(), StatusCode::OK);
 
+    // Login again with the temporary password
+    let typist_cookie = shared::login(&addr, "typist1", "TotallyValidTempP4ssW0rd").await;
+
     // Can't call arbitrary endpoint
     let some_endpoint = format!("http://{addr}/api/elections/1/polling_stations");
     let response = reqwest::Client::new()
@@ -655,9 +657,6 @@ async fn test_cant_do_anything_when_password_needs_change(pool: SqlitePool) {
         .await
         .unwrap();
     assert_eq!(response.status(), StatusCode::UNAUTHORIZED);
-
-    // Login again with the temporary password
-    let typist_cookie = shared::login(&addr, "typist1", "TotallyValidTempP4ssW0rd").await;
 
     // User sets password
     let url = format!("http://{addr}/api/account");

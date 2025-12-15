@@ -358,31 +358,32 @@ pub struct ElectionAndCandidatesDefinitionImportRequest {
     ),
     security(("cookie_auth" = ["administrator"])),
 )]
+#[allow(clippy::too_many_lines)]
 pub async fn election_import(
     _user: Admin,
     State(pool): State<SqlitePool>,
     audit_service: AuditService,
     Json(edu): Json<ElectionAndCandidatesDefinitionImportRequest>,
 ) -> Result<(StatusCode, Json<ElectionWithPoliticalGroups>), APIError> {
-    if edu.election_hash != EmlHash::from(edu.election_data.as_bytes()).chunks {
+    let election_data_hash = EmlHash::from(edu.election_data.as_bytes()).chunks;
+    if edu.election_hash != election_data_hash {
         return Err(APIError::InvalidHashError);
     }
-    if edu.candidate_hash != EmlHash::from(edu.candidate_data.as_bytes()).chunks {
+    let candidate_data_hash = EmlHash::from(edu.candidate_data.as_bytes()).chunks;
+    if edu.candidate_hash != candidate_data_hash {
         return Err(APIError::InvalidHashError);
     }
 
     let mut new_election = EML110::from_str(&edu.election_data)?.as_abacus_election()?;
     new_election = EML230::from_str(&edu.candidate_data)?.add_candidate_lists(new_election)?;
 
-    // Process polling stations
-    let mut polling_places = None;
-    if let Some(polling_station_data) = edu.polling_station_data {
+    // Validate polling stations
+    if let Some(polling_station_data) = edu.polling_station_data.as_ref() {
         // If polling stations are submitted, file name must be also
         if edu.polling_station_file_name.is_none() {
             return Err(APIError::EmlImportError(EMLImportError::MissingFileName));
         }
-
-        polling_places = Some(EML110::from_str(&polling_station_data)?.get_polling_stations()?);
+        EML110::from_str(polling_station_data)?.get_polling_stations()?;
     }
 
     // Set counting method
@@ -395,11 +396,16 @@ pub async fn election_import(
     // Create new election
     let mut tx = pool.begin_immediate().await?;
     let election = crate::election::repository::create(&mut tx, new_election).await?;
+    let message = format!(
+        "Election file hash: {}, candidates file hash: {}",
+        election_data_hash.join(" "),
+        candidate_data_hash.join(" ")
+    );
     audit_service
         .log(
             &mut tx,
             &AuditEvent::ElectionCreated(election.clone().into()),
-            None,
+            Some(message),
         )
         .await?;
 
@@ -421,12 +427,12 @@ pub async fn election_import(
         .await?;
 
     // Create polling stations
-    if let Some(places) = polling_places {
+    if let Some(polling_station_data) = edu.polling_station_data {
         let polling_stations_request = PollingStationsRequest {
             file_name: edu
                 .polling_station_file_name
                 .ok_or(EMLImportError::MissingFileName)?,
-            polling_stations: places,
+            polling_stations: polling_station_data,
         };
         create_imported_polling_stations(
             &mut tx,

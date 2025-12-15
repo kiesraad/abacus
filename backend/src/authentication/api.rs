@@ -13,7 +13,9 @@ use utoipa::ToSchema;
 use utoipa_axum::{router::OpenApiRouter, routes};
 
 use super::{
-    SECURE_COOKIES, SESSION_COOKIE_NAME, SESSION_LIFE_TIME, error::AuthenticationError, role::Role,
+    SECURE_COOKIES, SESSION_COOKIE_NAME, SESSION_LIFE_TIME,
+    error::AuthenticationError,
+    role::{IncompleteUser, Role},
     user::User,
 };
 use crate::{
@@ -219,7 +221,7 @@ async fn account(user: Option<User>) -> Result<impl IntoResponse, APIError> {
   security(("cookie_auth" = ["administrator", "coordinator", "typist"])),
 )]
 async fn account_update(
-    user: User,
+    IncompleteUser(user): IncompleteUser,
     State(pool): State<SqlitePool>,
     audit_service: AuditService,
     Json(account): Json<AccountUpdateRequest>,

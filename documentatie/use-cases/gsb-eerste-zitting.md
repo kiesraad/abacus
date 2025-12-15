@@ -13,17 +13,16 @@ __Hoofdscenario:__
     - (CSO) Het GSB doet de telling op lijst- en kandidaatsniveau en vult Na 31-2 Bijlage 1 in.
     - (DSO) Het GSB stelt vast dat de tellingen die het stembureau heeft vastgesteld in N 10-1, kloppen.
 4. De coördinator GSB stelt vast dat de verkiezing volledig en correct is aangemaakt.
-5. De coördinator GSB voert de locatie, startdatum en starttijd van de zitting in.
-6. [De coördinator GSB en de invoerders voeren alle gegevens in de applicatie in.](./gsb-invoer-eerste-zitting.md#de-coördinator-gsb-en-de-invoerders-voeren-alle-gegevens-in-de-applicatie-in-vlieger)
-7. [De coördinator GSB maakt het PV (DSO: Na 31-1, CSO: Na 31-2) en het tellingsbestand EML 510b aan.](#de-coördinator-gsb-maakt-het-pv-dso-na-31-1-cso-na-31-2-en-het-tellingsbestand-eml-510b-aan-zee)
-8. Het GSB voert het controleprotocol (handmatige controle optellingen software) uit en stelt geen verschillen vast.
-9. Het GSB stelt de gemeentelijke totalen vast o.b.v. het PV (DSO: Na 31-1, CSO: Na 31-2): controleren op compleetheid, voorlezen, geen additionele bezwaren en bijzonderheden, ondertekenen. En sluit daarmee de zitting.
-10. Het GSB stelt het tellingsbestand EML 510b beschikbaar aan het CSB voor de uitslagvaststelling.
-11. Het GSB stelt het PV GSB incl. bijlagen (DSO: Na 31-1, CSO: Na 31-2) beschikbaar aan de burgemeester.
-12. De burgemeester publiceert het PV GSB incl. bijlagen (DSO: Na 31-1, CSO: Na 31-2) en brengt het over naar het CSB.
+5. [De coördinator GSB en de invoerders voeren alle gegevens in de applicatie in.](./gsb-invoer-eerste-zitting.md#de-coördinator-gsb-en-de-invoerders-voeren-alle-gegevens-in-de-applicatie-in-vlieger)
+6. [De coördinator GSB maakt het PV (DSO: Na 31-1, CSO: Na 31-2) en het tellingsbestand EML 510b aan.](#de-coördinator-gsb-maakt-het-pv-dso-na-31-1-cso-na-31-2-en-het-tellingsbestand-eml-510b-aan-zee)
+7. Het GSB voert het controleprotocol (handmatige controle optellingen software) uit en stelt geen verschillen vast.
+8. Het GSB stelt de gemeentelijke totalen vast o.b.v. het PV (DSO: Na 31-1, CSO: Na 31-2): controleren op compleetheid,
+   voorlezen, geen additionele bezwaren en bijzonderheden, ondertekenen. En sluit daarmee de zitting.
+9. Het GSB stelt het tellingsbestand EML 510b beschikbaar aan het CSB voor de uitslagvaststelling.
+10. Het GSB stelt het PV GSB incl. bijlagen (DSO: Na 31-1, CSO: Na 31-2) beschikbaar aan de burgemeester.
+11. De burgemeester publiceert het PV GSB incl. bijlagen (DSO: Na 31-1, CSO: Na 31-2) en brengt het over naar het CSB.
 
-__Uitbreidingen:__  
-
+__Uitbreidingen:__
 3b. (DSO) Het GSB stelt vast dat de tellingen van het stembureau mogelijk niet kloppen:  
 &emsp; 3b1. Het GSB doet een (gedeeltelijke) hertelling van het stembureau.  
 &emsp; 3b1. Het GSB noteert de wijzigingen in een corrigendum Na 14-1.
@@ -34,23 +33,33 @@ __Uitbreidingen:__
 4b. De coördinator GSB ziet een fout in het aantal kiesgerechtigden:  
 &emsp; 4b1. De coördinator GSB of de beheerder past het aantal kiesgerechtigden aan.
 
-8a. Het GSB stelt verschillen vast d.m.v. het controleprotocol (handmatige controle optellingen software):  
-&emsp; 8a1. Het GSB controleert de resultaten van het controleprotocol.  
-&emsp; 8a2. Het GSB vindt een fout in de resultaten van het controleprotocol en corrigeert deze.  
-&emsp;&emsp; 8a2a. Het GSB vindt geen fout en bevestigt een verschil tussen de controles en de resultaten van de applicatie:  
-&emsp;&emsp;&emsp; 8a2a1. Het GSB neemt contact op met de Kiesraad.  
+5a. (CSO) Er moeten hertellingen uitgevoerd worden vanwege foutmeldingen en/of waarschuwingen:  
+&emsp; 5b1. Het GSB voert de hertelling uit.  
+&emsp; 5b2. Het GSB corrigeert de Na 31-2 Bijlage 1 of vult een nieuwe Na 31-2 Bijlage 1 in.  
+&emsp; 5b3. Het GSB voert de gecorrigeerde/nieuwe Na 31-2 Bijlage 1 in de applicatie in.
 
-9a. Het GSB stelt een probleem vast met het PV:  
-&emsp; 9a1. Het GSB stelt het bezwaar vast.  
-&emsp; 9a2. Het GSB gaat over tot hertelling. (zie uitbreiding 4b)
+5b. (DSO) Er zijn controles op de telresultaten van het stembureau uitgevoerd:  
+&emsp; 5c1. Het GSB vult het inlegvel "Controles en correcties" in.  
+&emsp; 5c2. Het GSB voegt het inlegvel toe aan het proces-verbaal N 10-1.
 
-9b. Er zijn bezwaren en/of bijzonderheden tijdens het voorlezen van het PV:  
-&emsp; 9b1. Het GSB voegt de bijzonderheden en/of bezwaren met de hand toe aan het papieren PV.
+7a. Het GSB stelt verschillen vast d.m.v. het controleprotocol (handmatige controle optellingen software):  
+&emsp; 7a1. Het GSB controleert de resultaten van het controleprotocol.  
+&emsp; 7a2. Het GSB vindt een fout in de resultaten van het controleprotocol en corrigeert deze.  
+&emsp;&emsp; 7a2a. Het GSB vindt geen fout en bevestigt een verschil tussen de controles en de resultaten van de
+applicatie:  
+&emsp;&emsp;&emsp; 7a2a1. Het GSB neemt contact op met de Kiesraad.
+
+8a. Het GSB stelt een probleem vast met het PV:  
+&emsp; 8a1. Het GSB stelt het bezwaar vast.  
+&emsp; 8a2. Het GSB gaat over tot hertelling. (zie uitbreiding 4b)
+
+8b. Er zijn bezwaren en/of bijzonderheden tijdens het voorlezen van het PV:  
+&emsp; 8b1. Het GSB voegt de bijzonderheden en/of bezwaren met de hand toe aan het papieren PV.
 
 
 ### Niet in scope
 
-- "8a1. Het GSB stelt het bezwaar vast." Wat gebeurt hier precies?
+- "7a1. Het GSB stelt het bezwaar vast." Wat gebeurt hier precies?
 - CSO: Invullen van "Bijlage 2: Bezwaren van aanwezigen op stembureaus" in de applicatie. Wordt wel handmatig toegevoegd aan het geprinte PV door coördinator GSB.
 - Gemeentes willen waarschijnlijk na de eerste zitting van het GSB de voorlopige zetelverdeling weten. Dit gaan we niet faciliteren in de applicatie.
 - Invoeren van het resultaat controleprotocol (handmatige controle optellingen software). N.B. Als het controleprotocol verschillen oplevert, dan is er een probleem met het PV uit de applicatie en kan dat PV dus niet gebruikt worden.

@@ -257,17 +257,25 @@ fn create_investigations_from_results(
     let mut investigations = Vec::new();
 
     if let Some(first_session_result) = result.as_cso_first_session() {
-        if first_session_result.investigation_other_reason_is_answered() {
+        if let Some(extra_investigation_other_reason) = first_session_result
+            .extra_investigation
+            .extra_investigation_other_reason
+            .as_bool()
+        {
             investigations.push(Investigation {
                 reason_code: InvestigationReason::InvestigatedOtherReason,
-                value: first_session_result.investigated_other_reason(),
+                value: extra_investigation_other_reason,
             });
         }
 
-        if first_session_result.investigation_ballots_recounted_is_answered() {
+        if let Some(ballots_recounted_extra_investigation) = first_session_result
+            .extra_investigation
+            .ballots_recounted_extra_investigation
+            .as_bool()
+        {
             investigations.push(Investigation {
                 reason_code: InvestigationReason::BallotsRecounted,
-                value: first_session_result.ballots_have_been_recounted(),
+                value: ballots_recounted_extra_investigation,
             });
         }
 

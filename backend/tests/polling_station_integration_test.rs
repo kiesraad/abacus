@@ -1199,6 +1199,7 @@ async fn check_finished_to_in_progress_on<F, Fut>(
     let status = action().await.status();
     assert_eq!(status, expected_status, "Unexpected response status");
 
+    let coordinator_cookie = coordinator_login(addr).await;
     let committee_session =
         get_election_committee_session(addr, &coordinator_cookie, election_id).await;
     assert_eq!(
@@ -1210,10 +1211,17 @@ async fn check_finished_to_in_progress_on<F, Fut>(
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
 async fn test_finished_to_in_progress_on_create(pool: SqlitePool) {
     let addr = serve_api(pool).await;
-    let coordinator_cookie = coordinator_login(&addr).await;
     check_finished_to_in_progress_on(
         &addr,
-        || create_polling_station(&addr, &coordinator_cookie, ElectionId::from(2), 35),
+        || async {
+            create_polling_station(
+                &addr,
+                &coordinator_login(&addr).await,
+                ElectionId::from(2),
+                35,
+            )
+            .await
+        },
         StatusCode::CREATED,
     )
     .await;
@@ -1222,14 +1230,13 @@ async fn test_finished_to_in_progress_on_create(pool: SqlitePool) {
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
 async fn test_finished_to_in_progress_on_update(pool: SqlitePool) {
     let addr = serve_api(pool).await;
-    let coordinator_cookie = coordinator_login(&addr).await;
 
     check_finished_to_in_progress_on(
         &addr,
-        || {
+        || async {
             update_polling_station(
                 &addr,
-                &coordinator_cookie,
+                &coordinator_login(&addr).await,
                 ElectionId::from(2),
                 1,
                 serde_json::json!({
@@ -1241,6 +1248,7 @@ async fn test_finished_to_in_progress_on_update(pool: SqlitePool) {
                     "locality": "Testdorp",
                 }),
             )
+            .await
         },
         StatusCode::OK,
     )

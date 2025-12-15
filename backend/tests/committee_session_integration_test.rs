@@ -125,7 +125,6 @@ async fn test_committee_session_delete_ok_status_created(pool: SqlitePool) {
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_7_four_sessions", "users"))))]
 async fn test_committee_session_delete_fails_with_investigation(pool: SqlitePool) {
     let addr = serve_api(pool).await;
-    let coordinator_cookie = coordinator_login(&addr).await;
     let election_id = ElectionId::from(7);
     let committee_session_id = 704;
     let polling_station_id = 742;
@@ -137,7 +136,7 @@ async fn test_committee_session_delete_fails_with_investigation(pool: SqlitePool
     );
     let response = reqwest::Client::new()
         .delete(&url)
-        .header("cookie", &coordinator_cookie)
+        .header("cookie", &coordinator_login(&addr).await)
         .send()
         .await
         .unwrap();

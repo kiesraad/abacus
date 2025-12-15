@@ -31,7 +31,7 @@ use crate::{
         status::{CommitteeSessionStatus, change_committee_session_status},
     },
     data_entry::repository::get_result,
-    election::{ElectionWithPoliticalGroups, PoliticalGroup},
+    election::{ElectionId, ElectionWithPoliticalGroups, PoliticalGroup},
     error::{ErrorReference, ErrorResponse},
     investigation::get_polling_station_investigation,
     polling_station::PollingStation,
@@ -1005,14 +1005,14 @@ pub struct ElectionStatusResponseEntry {
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
     params(
-        ("election_id" = u32, description = "Election database id"),
+        ("election_id" = ElectionId, description = "Election database id"),
     ),
     security(("cookie_auth" = ["administrator", "coordinator", "typist"])),
 )]
 async fn election_status(
     _user: User,
     State(pool): State<SqlitePool>,
-    Path(election_id): Path<u32>,
+    Path(election_id): Path<ElectionId>,
 ) -> Result<Json<ElectionStatusResponse>, APIError> {
     let mut conn = pool.acquire().await?;
 
@@ -2306,9 +2306,10 @@ mod tests {
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
     async fn test_statuses_first_session_all_polling_stations(pool: SqlitePool) {
         let user = User::test_user(Role::Coordinator, 1);
-        let response = election_status(user.clone(), State(pool.clone()), Path(2))
-            .await
-            .into_response();
+        let response =
+            election_status(user.clone(), State(pool.clone()), Path(ElectionId::from(2)))
+                .await
+                .into_response();
 
         assert_eq!(response.status(), StatusCode::OK);
         let body = response.into_body().collect().await.unwrap().to_bytes();
@@ -2320,9 +2321,10 @@ mod tests {
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_7_four_sessions"))))]
     async fn test_statuses_second_session_no_polling_stations(pool: SqlitePool) {
         let user = User::test_user(Role::Coordinator, 1);
-        let response = election_status(user.clone(), State(pool.clone()), Path(7))
-            .await
-            .into_response();
+        let response =
+            election_status(user.clone(), State(pool.clone()), Path(ElectionId::from(7)))
+                .await
+                .into_response();
 
         assert_eq!(response.status(), StatusCode::OK);
         let body = response.into_body().collect().await.unwrap().to_bytes();
@@ -2335,9 +2337,10 @@ mod tests {
     async fn test_statuses_second_session_with_investigation(pool: SqlitePool) {
         let user = User::test_user(Role::Coordinator, 1);
 
-        let response = election_status(user.clone(), State(pool.clone()), Path(5))
-            .await
-            .into_response();
+        let response =
+            election_status(user.clone(), State(pool.clone()), Path(ElectionId::from(5)))
+                .await
+                .into_response();
 
         assert_eq!(response.status(), StatusCode::OK);
         let body = response.into_body().collect().await.unwrap().to_bytes();

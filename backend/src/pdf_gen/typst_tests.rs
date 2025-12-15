@@ -12,8 +12,8 @@ use crate::{
         PoliticalGroupCandidateVotes, PoliticalGroupTotalVotes, VotersCounts, VotesCounts, YesNo,
     },
     election::{
-        Candidate, CandidateGender, ElectionCategory, ElectionWithPoliticalGroups, PoliticalGroup,
-        VoteCountingMethod,
+        Candidate, CandidateGender, ElectionCategory, ElectionId, ElectionWithPoliticalGroups,
+        PoliticalGroup, VoteCountingMethod,
     },
     investigation::PollingStationInvestigation,
     pdf_gen::{
@@ -109,7 +109,7 @@ fn random_election(
     none_where_possible: bool,
 ) -> ElectionWithPoliticalGroups {
     ElectionWithPoliticalGroups {
-        id: rng.random_range(0..5),
+        id: ElectionId::from(rng.random_range(0..5)),
         name: random_string(rng, string_length),
         counting_method: random_value(rng, &[VoteCountingMethod::CSO, VoteCountingMethod::DSO]),
         election_id: random_string(rng, string_length),
@@ -210,7 +210,7 @@ fn random_polling_stations(
 
 fn random_committee_session(
     rng: &mut impl Rng,
-    election_id: u32,
+    election_id: ElectionId,
     string_length: usize,
     none_where_possible: bool,
 ) -> CommitteeSession {

@@ -9,11 +9,13 @@ use utoipa::ToSchema;
 
 use crate::audit_log::ElectionDetails;
 
+crate::util::id!(ElectionId);
+
 /// Election without political groups
 #[derive(Serialize, Deserialize, ToSchema, Clone, Debug, PartialEq, Eq, Hash, FromRow)]
 #[serde(deny_unknown_fields)]
 pub struct Election {
-    pub id: u32,
+    pub id: ElectionId,
     pub name: String,
     pub counting_method: VoteCountingMethod,
     pub election_id: String,
@@ -32,7 +34,7 @@ pub struct Election {
 #[derive(Serialize, Deserialize, ToSchema, Clone, Debug, PartialEq, Eq, Hash, FromRow)]
 #[serde(deny_unknown_fields)]
 pub struct ElectionWithPoliticalGroups {
-    pub id: u32,
+    pub id: ElectionId,
     pub name: String,
     pub counting_method: VoteCountingMethod,
     pub election_id: String,
@@ -251,7 +253,7 @@ pub(crate) mod tests {
             .collect();
 
         ElectionWithPoliticalGroups {
-            id: 1,
+            id: ElectionId::from(1),
             name: "Test".to_string(),
             counting_method: VoteCountingMethod::CSO,
             election_id: "Test_2023".to_string(),

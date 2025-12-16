@@ -2915,9 +2915,6 @@ mod tests {
             );
 
             assert!(result.is_ok());
-
-            // Change number of the second candidate on the first list to a non-increasing number
-            political_group_votes[0].candidate_votes[1].number = CandidateNumber::from(1);
         }
 
         #[test]

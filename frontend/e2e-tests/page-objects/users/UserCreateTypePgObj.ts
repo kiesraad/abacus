@@ -6,8 +6,8 @@ export class UserCreateTypePgObj {
   continue: Locator;
 
   constructor(protected readonly page: Page) {
-    this.withName = page.getByLabel(/Op naam/);
-    this.anonymous = page.getByLabel(/Anonieme gebruikersnaam/);
+    this.withName = page.getByRole("radio", { name: "Op naam" });
+    this.anonymous = page.getByRole("radio", { name: "Anonieme gebruikersnaam" });
     this.continue = page.getByRole("button", { name: "Verder" });
   }
 }

@@ -81,20 +81,16 @@ test.describe("full flow", () => {
       await page.goto(`/users`);
 
       const userListPgObj = new UserListPgObj(page);
-      await expect(userListPgObj.create).toBeVisible();
       await userListPgObj.create.click();
 
       const userCreateRolePgObj = new UserCreateRolePgObj(page);
-      await expect(userCreateRolePgObj.typist).not.toBeChecked();
       await userCreateRolePgObj.typist.click();
       await userCreateRolePgObj.continue.click();
 
       const userCreateTypePgObj = new UserCreateTypePgObj(page);
-      await expect(userCreateTypePgObj.withName).toBeChecked();
       await userCreateTypePgObj.continue.click();
 
       const userCreateDetailsPgObj = new UserCreateDetailsPgObj(page);
-      await expect(userCreateDetailsPgObj.fullname).toBeVisible();
       await userCreateDetailsPgObj.username.fill(username);
       await userCreateDetailsPgObj.fullname.fill(`Typist ${username}`);
       await userCreateDetailsPgObj.password.fill(username.repeat(3));

@@ -6,7 +6,7 @@ use abacus::{
     polling_station::{PollingStation, PollingStationType},
 };
 
-use chrono::Utc;
+use chrono::NaiveDate;
 use libfuzzer_sys::{
     arbitrary::{self, Arbitrary},
     fuzz_target,
@@ -101,13 +101,13 @@ fn election() -> ElectionWithPoliticalGroups {
         name: "Test election".to_string(),
         counting_method: VoteCountingMethod::CSO,
         election_id: "Test_2025".to_string(),
-        location: "Test location".to_string(),
+        location: "Test locatie".to_string(),
         domain_id: "0000".to_string(),
         category: ElectionCategory::Municipal,
         number_of_seats: 18,
         number_of_voters: 1000,
-        election_date: Utc::now().date_naive(),
-        nomination_date: Utc::now().date_naive(),
+        election_date: NaiveDate::from_ymd_opt(2024, 1, 1).unwrap(),
+        nomination_date: NaiveDate::from_ymd_opt(2024, 1, 1).unwrap(),
         political_groups: vec![],
     }
 }

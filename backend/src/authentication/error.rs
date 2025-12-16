@@ -15,6 +15,7 @@ pub enum AuthenticationError {
     Unauthenticated,
     Unauthorized,
     UsernameAlreadyExists,
+    UserNotIncomplete,
     UserNotFound,
 }
 

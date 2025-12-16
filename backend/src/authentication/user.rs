@@ -150,6 +150,10 @@ where
             return Err(AuthenticationError::Unauthenticated.into());
         };
 
+        if user.fullname.is_some() && !user.needs_password_change() {
+            return Err(AuthenticationError::UserNotIncomplete.into());
+        }
+
         Ok(IncompleteUser(user.clone()))
     }
 }

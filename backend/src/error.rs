@@ -279,6 +279,10 @@ impl IntoResponse for APIError {
                         StatusCode::UNAUTHORIZED,
                         to_error("User not found", ErrorReference::UserNotFound, false),
                     ),
+                    AuthenticationError::UserNotIncomplete => (
+                        StatusCode::CONFLICT,
+                        to_error("Invalid user state", ErrorReference::Forbidden, false),
+                    ),
                     AuthenticationError::InvalidPassword => (
                         StatusCode::UNAUTHORIZED,
                         to_error(

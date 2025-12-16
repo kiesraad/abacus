@@ -5,7 +5,9 @@
 /// The tests cover various edge cases by varying the number of parties, candidates,
 /// string lengths, and the presence of optional fields.
 use crate::{
-    committee_session::{CommitteeSessionId, status::CommitteeSessionStatus, structs::CommitteeSession},
+    committee_session::{
+        CommitteeSessionId, status::CommitteeSessionStatus, structs::CommitteeSession,
+    },
     data_entry::structs::{
         CandidateVotes, CommonPollingStationResults,
         DifferenceCountsCompareVotesCastAdmittedVoters, DifferencesCounts,

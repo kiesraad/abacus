@@ -12,7 +12,8 @@ use crate::{
     audit_log::{AuditEvent, AuditService},
     authentication::Coordinator,
     committee_session::{
-        CommitteeSession, CommitteeSessionError, CommitteeSessionFilesUpdateRequest, CommitteeSessionId, repository::change_files, status::CommitteeSessionStatus
+        CommitteeSession, CommitteeSessionError, CommitteeSessionFilesUpdateRequest,
+        CommitteeSessionId, repository::change_files, status::CommitteeSessionStatus,
     },
     data_entry::{PollingStationResults, repository::are_results_complete_for_committee_session},
     election::{ElectionId, ElectionWithPoliticalGroups},
@@ -561,9 +562,10 @@ mod tests {
 
         // Files should be generated exactly once
         for _ in 1..=2 {
-            let (eml, pdf, overview, _) = generate_and_save_files(&pool, audit_service.clone(), CommitteeSessionId::from(5))
-                .await
-                .expect("should return files");
+            let (eml, pdf, overview, _) =
+                generate_and_save_files(&pool, audit_service.clone(), CommitteeSessionId::from(5))
+                    .await
+                    .expect("should return files");
             let eml = eml.expect("should have generated eml");
             let pdf = pdf.expect("should have generated pdf");
 
@@ -587,10 +589,13 @@ mod tests {
 
         // Files should be generated exactly once
         for _ in 1..=2 {
-            let (eml, pdf, overview, _) =
-                generate_and_save_files(&pool, audit_service.clone(), CommitteeSessionId::from(703))
-                    .await
-                    .expect("should return files");
+            let (eml, pdf, overview, _) = generate_and_save_files(
+                &pool,
+                audit_service.clone(),
+                CommitteeSessionId::from(703),
+            )
+            .await
+            .expect("should return files");
 
             let eml = eml.expect("should have generated eml");
             let pdf = pdf.expect("should have generated pdf");
@@ -623,10 +628,13 @@ mod tests {
 
         // File should be generated exactly once
         for _ in 1..=2 {
-            let (eml, pdf, overview, _) =
-                generate_and_save_files(&pool, audit_service.clone(), CommitteeSessionId::from(703))
-                    .await
-                    .expect("should return files");
+            let (eml, pdf, overview, _) = generate_and_save_files(
+                &pool,
+                audit_service.clone(),
+                CommitteeSessionId::from(703),
+            )
+            .await
+            .expect("should return files");
 
             // No EML and no model PDF should be generated at all
             assert_eq!(eml, None);

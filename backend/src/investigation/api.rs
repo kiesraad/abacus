@@ -34,7 +34,7 @@ use crate::{
         VotesTablesWithOnlyPreviousVotes, generate_pdf,
         models::{ModelNa14_2Bijlage1Input, ToPdfFileModel},
     },
-    polling_station::PollingStation,
+    polling_station::{PollingStation, PollingStationId},
 };
 
 pub fn router() -> OpenApiRouter<AppState> {
@@ -51,7 +51,7 @@ pub fn router() -> OpenApiRouter<AppState> {
 /// Validate that the committee session is in a state that allows mutations
 async fn validate_and_get_committee_session(
     conn: &mut SqliteConnection,
-    polling_station_id: u32,
+    polling_station_id: PollingStationId,
 ) -> Result<CommitteeSession, APIError> {
     let polling_station = crate::polling_station::repository::get(conn, polling_station_id).await?;
 
@@ -76,7 +76,7 @@ pub async fn delete_investigation_for_polling_station(
     conn: &mut SqliteConnection,
     audit_service: &AuditService,
     committee_session: &CommitteeSession,
-    polling_station_id: u32,
+    polling_station_id: PollingStationId,
 ) -> Result<(), APIError> {
     if let Some(investigation) =
         delete_polling_station_investigation(conn, polling_station_id).await?

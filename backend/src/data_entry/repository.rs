@@ -6,20 +6,20 @@ use super::{
     ElectionStatusResponseEntry, PollingStationDataEntry, PollingStationResult,
     PollingStationResults, status::DataEntryStatus,
 };
-use crate::{committee_session::CommitteeSessionId, polling_station::PollingStation};
+use crate::{committee_session::CommitteeSessionId, polling_station::{PollingStation, PollingStationId}};
 
 /// Get the full polling station data entry row for a given polling station
 /// id, or return an error if there is no data
 pub async fn get_data_entry(
     conn: &mut SqliteConnection,
-    polling_station_id: u32,
+    polling_station_id: PollingStationId,
     committee_session_id: CommitteeSessionId,
 ) -> Result<PollingStationDataEntry, Error> {
     query_as!(
         PollingStationDataEntry,
         r#"
             SELECT
-                polling_station_id AS "polling_station_id: u32",
+                polling_station_id AS "polling_station_id: PollingStationId",
                 committee_session_id AS "committee_session_id: CommitteeSessionId",
                 state AS "state: _",
                 updated_at AS "updated_at: _"
@@ -37,14 +37,14 @@ pub async fn get_data_entry(
 /// id, or return an error if there is no data
 pub async fn get_result(
     conn: &mut SqliteConnection,
-    polling_station_id: u32,
+    polling_station_id: PollingStationId,
     committee_session_id: CommitteeSessionId,
 ) -> Result<PollingStationResult, Error> {
     query_as!(
         PollingStationResult,
         r#"
             SELECT
-                polling_station_id AS "polling_station_id: u32",
+                polling_station_id AS "polling_station_id: PollingStationId",
                 committee_session_id AS "committee_session_id: CommitteeSessionId",
                 data AS "data: _",
                 created_at AS "created_at: _"
@@ -62,7 +62,7 @@ pub async fn get_result(
 /// given polling station id
 pub async fn get(
     conn: &mut SqliteConnection,
-    polling_station_id: u32,
+    polling_station_id: PollingStationId,
     committee_session_id: CommitteeSessionId,
 ) -> Result<DataEntryStatus, Error> {
     get_data_entry(conn, polling_station_id, committee_session_id)
@@ -74,14 +74,14 @@ pub async fn get(
 /// polling station id
 pub async fn get_or_default(
     conn: &mut SqliteConnection,
-    polling_station_id: u32,
+    polling_station_id: PollingStationId,
     committee_session_id: CommitteeSessionId,
 ) -> Result<DataEntryStatus, Error> {
     Ok(query_as!(
         PollingStationDataEntry,
         r#"
             SELECT
-                polling_station_id AS "polling_station_id: u32",
+                polling_station_id AS "polling_station_id: PollingStationId",
                 committee_session_id AS "committee_session_id: CommitteeSessionId",
                 state AS "state: _",
                 updated_at AS "updated_at: _"
@@ -100,7 +100,7 @@ pub async fn get_or_default(
 /// Saves the data entry or updates it if it already exists for a given polling station id
 pub async fn upsert(
     conn: &mut SqliteConnection,
-    polling_station_id: u32,
+    polling_station_id: PollingStationId,
     committee_session_id: CommitteeSessionId,
     state: &DataEntryStatus,
 ) -> Result<PollingStationDataEntry, Error> {
@@ -115,7 +115,7 @@ pub async fn upsert(
                 state = excluded.state,
                 updated_at = CURRENT_TIMESTAMP
             RETURNING
-                polling_station_id AS "polling_station_id: u32",
+                polling_station_id AS "polling_station_id: PollingStationId",
                 committee_session_id AS "committee_session_id: CommitteeSessionId",
                 state AS "state: _",
                 updated_at AS "updated_at: _"
@@ -130,7 +130,7 @@ pub async fn upsert(
 
 pub async fn delete_data_entry(
     conn: &mut SqliteConnection,
-    polling_station_id: u32,
+    polling_station_id: PollingStationId,
 ) -> Result<Option<PollingStationDataEntry>, Error> {
     query_as!(
         PollingStationDataEntry,
@@ -138,7 +138,7 @@ pub async fn delete_data_entry(
             DELETE FROM polling_station_data_entries
             WHERE polling_station_id = ?
             RETURNING
-                polling_station_id AS "polling_station_id: u32",
+                polling_station_id AS "polling_station_id: PollingStationId",
                 committee_session_id AS "committee_session_id: CommitteeSessionId",
                 state AS "state: _",
                 updated_at AS "updated_at: _"
@@ -151,7 +151,7 @@ pub async fn delete_data_entry(
 
 pub async fn delete_result(
     conn: &mut SqliteConnection,
-    polling_station_id: u32,
+    polling_station_id: PollingStationId,
 ) -> Result<Option<PollingStationResult>, Error> {
     query_as!(
         PollingStationResult,
@@ -159,7 +159,7 @@ pub async fn delete_result(
             DELETE FROM polling_station_results
             WHERE polling_station_id = ?
             RETURNING
-                polling_station_id AS "polling_station_id: u32",
+                polling_station_id AS "polling_station_id: PollingStationId",
                 committee_session_id AS "committee_session_id: CommitteeSessionId",
                 data AS "data: _",
                 created_at AS "created_at: _"
@@ -180,7 +180,7 @@ pub async fn statuses(
     query!(
         r#"
             SELECT
-                p.id AS "polling_station_id: u32",
+                p.id AS "polling_station_id: PollingStationId",
                 de.state AS "state: Json<DataEntryStatus>"
             FROM polling_stations AS p
             LEFT JOIN committee_sessions AS c ON c.id = p.committee_session_id
@@ -209,7 +209,7 @@ pub async fn statuses(
 
 pub async fn make_definitive(
     conn: &mut SqliteConnection,
-    polling_station_id: u32,
+    polling_station_id: PollingStationId,
     committee_session_id: CommitteeSessionId,
     new_state: &DataEntryStatus,
     definitive_entry: &PollingStationResults,
@@ -249,7 +249,10 @@ pub async fn make_definitive(
 }
 
 /// Check if a polling station has a data entry
-pub async fn data_entry_exists(conn: &mut SqliteConnection, polling_station_id: u32) -> Result<bool, Error> {
+pub async fn data_entry_exists(
+    conn: &mut SqliteConnection,
+    polling_station_id: PollingStationId,
+) -> Result<bool, Error> {
     let res = query!(
         r#"
         SELECT EXISTS(
@@ -264,7 +267,10 @@ pub async fn data_entry_exists(conn: &mut SqliteConnection, polling_station_id: 
 }
 
 /// Check if a polling station has a result
-pub async fn result_exists(conn: &mut SqliteConnection, polling_station_id: u32) -> Result<bool, Error> {
+pub async fn result_exists(
+    conn: &mut SqliteConnection,
+    polling_station_id: PollingStationId,
+) -> Result<bool, Error> {
     let res = query!(
         r#"
         SELECT EXISTS(
@@ -281,12 +287,12 @@ pub async fn result_exists(conn: &mut SqliteConnection, polling_station_id: u32)
 async fn fetch_results_for_committee_session(
     conn: &mut SqliteConnection,
     committee_session_id: CommitteeSessionId,
-    polling_station_id: Option<u32>,
+    polling_station_id: Option<PollingStationId>,
 ) -> Result<Vec<(PollingStation, PollingStationResults)>, Error> {
     let mut tx = conn.begin().await?;
 
     // Get and index polling stations by id for performance
-    let polling_stations: HashMap<u32, _> =
+    let polling_stations: HashMap<PollingStationId, _> =
         crate::polling_station::repository::list(&mut tx, committee_session_id)
             .await?
             .into_iter()
@@ -328,7 +334,7 @@ async fn fetch_results_for_committee_session(
             WHERE sc.data IS NULL AND sc.investigation IS NULL
         )
         SELECT
-            sc.original_id AS "original_id!: u32",
+            sc.original_id AS "original_id!: PollingStationId",
             sc.data AS "data: Json<PollingStationResults>"
         FROM polling_stations_chain AS sc
         WHERE sc.data IS NOT NULL
@@ -366,7 +372,7 @@ pub async fn list_results_for_committee_session(
 /// Uses the CTE in fetch_results_for_committee_session to look back through previous committee sessions.
 pub async fn previous_results_for_polling_station(
     conn: &mut SqliteConnection,
-    polling_station_id: u32,
+    polling_station_id: PollingStationId,
 ) -> Result<PollingStationResults, Error> {
     let polling_station = crate::polling_station::repository::get(conn, polling_station_id).await?;
     let ps_id_prev_session = polling_station.id_prev_session.ok_or(Error::RowNotFound)?;
@@ -443,7 +449,7 @@ pub async fn are_results_complete_for_committee_session(
 #[cfg(test)]
 pub async fn insert_test_result(
     conn: &mut SqliteConnection,
-    polling_station_id: u32,
+    polling_station_id: PollingStationId,
     committee_session_id: CommitteeSessionId,
     results: &PollingStationResults,
 ) -> Result<(), Error> {
@@ -769,14 +775,25 @@ mod tests {
                 .await
                 .unwrap();
 
-            insert_test_result(&mut conn, 733, CommitteeSessionId::from(703), &create_test_results(10))
-                .await
-                .unwrap();
+            insert_test_result(
+                &mut conn,
+                733,
+                CommitteeSessionId::from(703),
+                &create_test_results(10),
+            )
+            .await
+            .unwrap();
 
             // Add new polling station to fourth session, linked to the one in third session, but without investigation or results
-            insert_test_polling_station(&mut conn, 743, CommitteeSessionId::from(704), Some(733), 123)
-                .await
-                .unwrap();
+            insert_test_polling_station(
+                &mut conn,
+                743,
+                CommitteeSessionId::from(704),
+                Some(733),
+                123,
+            )
+            .await
+            .unwrap();
 
             let results = list_results_for_committee_session(&mut conn, committee_session_id)
                 .await
@@ -808,7 +825,7 @@ mod tests {
         use sqlx::{SqliteConnection, SqlitePool};
         use test_log::test;
 
-        async fn create_test_investigation(conn: &mut SqliteConnection, polling_station_id: u32) {
+        async fn create_test_investigation(conn: &mut SqliteConnection, polling_station_id: PollingStationId) {
             create_polling_station_investigation(
                 conn,
                 polling_station_id,
@@ -822,7 +839,7 @@ mod tests {
 
         async fn conclude_test_investigation(
             conn: &mut SqliteConnection,
-            polling_station_id: u32,
+            polling_station_id: PollingStationId,
             corrected_results: bool,
         ) {
             conclude_polling_station_investigation(
@@ -839,11 +856,16 @@ mod tests {
 
         async fn insert_test_polling_station_results(
             conn: &mut SqliteConnection,
-            polling_station_id: u32,
+            polling_station_id: PollingStationId,
         ) {
-            insert_test_result(conn, polling_station_id, CommitteeSessionId::from(704), &create_test_results(10))
-                .await
-                .unwrap();
+            insert_test_result(
+                conn,
+                polling_station_id,
+                CommitteeSessionId::from(704),
+                &create_test_results(10),
+            )
+            .await
+            .unwrap();
         }
 
         /// Test first session without results
@@ -862,9 +884,14 @@ mod tests {
         async fn test_first_session_without_results_on_one_polling_station(pool: SqlitePool) {
             let mut conn = pool.acquire().await.unwrap();
 
-            insert_test_result(&mut conn, 1, CommitteeSessionId::from(2), &create_test_results(10))
-                .await
-                .unwrap();
+            insert_test_result(
+                &mut conn,
+                1,
+                CommitteeSessionId::from(2),
+                &create_test_results(10),
+            )
+            .await
+            .unwrap();
 
             assert!(
                 !are_results_complete_for_committee_session(&mut conn, CommitteeSessionId::from(2))
@@ -878,12 +905,22 @@ mod tests {
         async fn test_first_session_with_results(pool: SqlitePool) {
             let mut conn = pool.acquire().await.unwrap();
 
-            insert_test_result(&mut conn, 1, CommitteeSessionId::from(2), &create_test_results(10))
-                .await
-                .unwrap();
-            insert_test_result(&mut conn, 2, CommitteeSessionId::from(2), &create_test_results(10))
-                .await
-                .unwrap();
+            insert_test_result(
+                &mut conn,
+                1,
+                CommitteeSessionId::from(2),
+                &create_test_results(10),
+            )
+            .await
+            .unwrap();
+            insert_test_result(
+                &mut conn,
+                2,
+                CommitteeSessionId::from(2),
+                &create_test_results(10),
+            )
+            .await
+            .unwrap();
 
             assert!(
                 are_results_complete_for_committee_session(&mut conn, CommitteeSessionId::from(2))
@@ -902,9 +939,12 @@ mod tests {
                 .unwrap();
 
             assert!(
-                !are_results_complete_for_committee_session(&mut conn, CommitteeSessionId::from(704))
-                    .await
-                    .unwrap()
+                !are_results_complete_for_committee_session(
+                    &mut conn,
+                    CommitteeSessionId::from(704)
+                )
+                .await
+                .unwrap()
             );
         }
 
@@ -916,14 +956,22 @@ mod tests {
             insert_test_polling_station(&mut conn, 743, CommitteeSessionId::from(704), None, 123)
                 .await
                 .unwrap();
-            insert_test_result(&mut conn, 743, CommitteeSessionId::from(704), &create_test_results(10))
-                .await
-                .unwrap();
+            insert_test_result(
+                &mut conn,
+                743,
+                CommitteeSessionId::from(704),
+                &create_test_results(10),
+            )
+            .await
+            .unwrap();
 
             assert!(
-                are_results_complete_for_committee_session(&mut conn, CommitteeSessionId::from(704))
-                    .await
-                    .unwrap()
+                are_results_complete_for_committee_session(
+                    &mut conn,
+                    CommitteeSessionId::from(704)
+                )
+                .await
+                .unwrap()
             );
         }
 
@@ -932,9 +980,12 @@ mod tests {
         async fn test_next_session_no_investigations(pool: SqlitePool) {
             let mut conn = pool.acquire().await.unwrap();
             assert!(
-                are_results_complete_for_committee_session(&mut conn, CommitteeSessionId::from(704))
-                    .await
-                    .unwrap()
+                are_results_complete_for_committee_session(
+                    &mut conn,
+                    CommitteeSessionId::from(704)
+                )
+                .await
+                .unwrap()
             );
         }
 
@@ -945,9 +996,12 @@ mod tests {
             create_test_investigation(&mut conn, 741).await;
 
             assert!(
-                !are_results_complete_for_committee_session(&mut conn, CommitteeSessionId::from(704))
-                    .await
-                    .unwrap()
+                !are_results_complete_for_committee_session(
+                    &mut conn,
+                    CommitteeSessionId::from(704)
+                )
+                .await
+                .unwrap()
             );
         }
 
@@ -960,9 +1014,12 @@ mod tests {
             conclude_test_investigation(&mut conn, 741, false).await;
 
             assert!(
-                are_results_complete_for_committee_session(&mut conn, CommitteeSessionId::from(704))
-                    .await
-                    .unwrap()
+                are_results_complete_for_committee_session(
+                    &mut conn,
+                    CommitteeSessionId::from(704)
+                )
+                .await
+                .unwrap()
             );
         }
 
@@ -978,9 +1035,12 @@ mod tests {
             insert_test_polling_station_results(&mut conn, 741).await;
 
             assert!(
-                are_results_complete_for_committee_session(&mut conn, CommitteeSessionId::from(704))
-                    .await
-                    .unwrap()
+                are_results_complete_for_committee_session(
+                    &mut conn,
+                    CommitteeSessionId::from(704)
+                )
+                .await
+                .unwrap()
             );
         }
 
@@ -995,9 +1055,12 @@ mod tests {
             conclude_test_investigation(&mut conn, 741, true).await;
 
             assert!(
-                !are_results_complete_for_committee_session(&mut conn, CommitteeSessionId::from(704))
-                    .await
-                    .unwrap()
+                !are_results_complete_for_committee_session(
+                    &mut conn,
+                    CommitteeSessionId::from(704)
+                )
+                .await
+                .unwrap()
             );
         }
 
@@ -1015,9 +1078,12 @@ mod tests {
             conclude_test_investigation(&mut conn, 742, true).await;
 
             assert!(
-                !are_results_complete_for_committee_session(&mut conn, CommitteeSessionId::from(704))
-                    .await
-                    .unwrap()
+                !are_results_complete_for_committee_session(
+                    &mut conn,
+                    CommitteeSessionId::from(704)
+                )
+                .await
+                .unwrap()
             );
         }
     }

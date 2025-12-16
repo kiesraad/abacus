@@ -8,7 +8,11 @@ use super::{
     repository::change_files,
 };
 use crate::{
-    APIError, audit_log::{AuditEvent, AuditService}, committee_session::CommitteeSessionId, data_entry::repository::are_results_complete_for_committee_session, investigation::list_investigations_for_committee_session
+    APIError,
+    audit_log::{AuditEvent, AuditService},
+    committee_session::CommitteeSessionId,
+    data_entry::repository::are_results_complete_for_committee_session,
+    investigation::list_investigations_for_committee_session,
 };
 
 /// Committee session status
@@ -250,7 +254,10 @@ mod tests {
         use crate::{
             APIError,
             audit_log::{AuditService, list_event_names},
-            committee_session::{self, CommitteeSessionFilesUpdateRequest, CommitteeSessionId, status::{CommitteeSessionStatus, change_committee_session_status}},
+            committee_session::{
+                self, CommitteeSessionFilesUpdateRequest, CommitteeSessionId,
+                status::{CommitteeSessionStatus, change_committee_session_status},
+            },
             files,
         };
         use chrono::Utc;
@@ -282,7 +289,8 @@ mod tests {
                 audit_service.clone(),
             )
             .await?;
-            let session = committee_session::repository::get(&mut conn, CommitteeSessionId::from(6)).await?;
+            let session =
+                committee_session::repository::get(&mut conn, CommitteeSessionId::from(6)).await?;
             assert_eq!(session.status, CommitteeSessionStatus::DataEntryFinished);
 
             // DataEntryFinished --> DataEntryInProgress
@@ -293,7 +301,8 @@ mod tests {
                 audit_service,
             )
             .await?;
-            let session = committee_session::repository::get(&mut conn, CommitteeSessionId::from(6)).await?;
+            let session =
+                committee_session::repository::get(&mut conn, CommitteeSessionId::from(6)).await?;
             assert_eq!(session.status, CommitteeSessionStatus::DataEntryInProgress);
 
             // No FileDeleted events should be logged
@@ -317,7 +326,8 @@ mod tests {
                 audit_service.clone(),
             )
             .await?;
-            let session = committee_session::repository::get(&mut conn, CommitteeSessionId::from(6)).await?;
+            let session =
+                committee_session::repository::get(&mut conn, CommitteeSessionId::from(6)).await?;
             assert_eq!(session.status, CommitteeSessionStatus::DataEntryFinished);
 
             let files_update = CommitteeSessionFilesUpdateRequest {
@@ -325,7 +335,12 @@ mod tests {
                 results_pdf: Some(generate_file(&mut conn).await?),
                 overview_pdf: Some(generate_file(&mut conn).await?),
             };
-            committee_session::repository::change_files(&mut conn, CommitteeSessionId::from(6), files_update).await?;
+            committee_session::repository::change_files(
+                &mut conn,
+                CommitteeSessionId::from(6),
+                files_update,
+            )
+            .await?;
 
             // DataEntryFinished --> DataEntryInProgress
             change_committee_session_status(
@@ -335,7 +350,8 @@ mod tests {
                 audit_service,
             )
             .await?;
-            let session = committee_session::repository::get(&mut conn, CommitteeSessionId::from(6)).await?;
+            let session =
+                committee_session::repository::get(&mut conn, CommitteeSessionId::from(6)).await?;
             assert_eq!(session.status, CommitteeSessionStatus::DataEntryInProgress);
 
             assert_eq!(
@@ -805,7 +821,9 @@ mod tests {
         .unwrap();
 
         // Save original result as corrected result
-        let first_session_result = get_result(&mut conn, 8, CommitteeSessionId::from(5)).await.unwrap();
+        let first_session_result = get_result(&mut conn, 8, CommitteeSessionId::from(5))
+            .await
+            .unwrap();
         get_or_default(&mut conn, polling_station_id, committee_session.id)
             .await
             .unwrap();

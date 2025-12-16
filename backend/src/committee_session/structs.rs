@@ -8,7 +8,9 @@ use sqlx::{FromRow, Type};
 use utoipa::ToSchema;
 
 use super::status::CommitteeSessionStatus;
-use crate::{audit_log, election::ElectionId, investigation::PollingStationInvestigation, util::id};
+use crate::{
+    audit_log, election::ElectionId, investigation::PollingStationInvestigation, util::id,
+};
 
 id!(CommitteeSessionId);
 

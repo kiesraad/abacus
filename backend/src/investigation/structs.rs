@@ -8,12 +8,12 @@ use serde::{Deserialize, Serialize};
 use sqlx::{FromRow, SqlitePool};
 use utoipa::ToSchema;
 
-use crate::{APIError, error::ErrorReference};
+use crate::{APIError, error::ErrorReference, polling_station::PollingStationId};
 
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq, ToSchema, FromRow)]
 #[serde(deny_unknown_fields)]
 pub struct PollingStationInvestigation {
-    pub polling_station_id: u32,
+    pub polling_station_id: PollingStationId,
     pub reason: String,
     #[serde(skip_serializing_if = "Option::is_none")]
     #[schema(nullable = false)]
@@ -57,7 +57,7 @@ pub struct PollingStationInvestigationUpdateRequest {
     pub accept_data_entry_deletion: Option<bool>,
 }
 
-pub struct CurrentSessionPollingStationId(pub u32);
+pub struct CurrentSessionPollingStationId(pub PollingStationId);
 
 impl<S> FromRequestParts<S> for CurrentSessionPollingStationId
 where
@@ -72,11 +72,11 @@ where
         let mut conn = pool.acquire().await?;
 
         if let Ok(Path(id)) = path_extractor
-            && crate::polling_station::repository::get(&mut conn, id)
+            && crate::polling_station::repository::get(&mut conn, PollingStationId::from(id))
                 .await
                 .is_ok()
         {
-            return Ok(CurrentSessionPollingStationId(id));
+            return Ok(CurrentSessionPollingStationId(PollingStationId::from(id)));
         }
 
         Err(APIError::NotFound(

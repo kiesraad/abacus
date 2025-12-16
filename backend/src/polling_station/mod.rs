@@ -181,14 +181,14 @@ async fn polling_station_create(
     ),
     params(
         ("election_id" = ElectionId, description = "Election database id"),
-        ("polling_station_id" = u32, description = "Polling station database id"),
+        ("polling_station_id" = PollingStationId, description = "Polling station database id"),
     ),
     security(("cookie_auth" = ["administrator", "coordinator", "typist"])),
 )]
 async fn polling_station_get(
     _user: User,
     State(pool): State<SqlitePool>,
-    Path((election_id, polling_station_id)): Path<(ElectionId, u32)>,
+    Path((election_id, polling_station_id)): Path<(ElectionId, PollingStationId)>,
 ) -> Result<(StatusCode, PollingStation), APIError> {
     let mut conn = pool.acquire().await?;
     Ok((
@@ -211,7 +211,7 @@ async fn polling_station_get(
     ),
     params(
         ("election_id" = ElectionId, description = "Election database id"),
-        ("polling_station_id" = u32, description = "Polling station database id"),
+        ("polling_station_id" = PollingStationId, description = "Polling station database id"),
     ),
     security(("cookie_auth" = ["administrator", "coordinator"])),
 )]
@@ -219,7 +219,7 @@ async fn polling_station_update(
     user: AdminOrCoordinator,
     State(pool): State<SqlitePool>,
     audit_service: AuditService,
-    Path((election_id, polling_station_id)): Path<(ElectionId, u32)>,
+    Path((election_id, polling_station_id)): Path<(ElectionId, PollingStationId)>,
     polling_station_update: PollingStationRequest,
 ) -> Result<(StatusCode, PollingStation), APIError> {
     let mut tx = pool.begin_immediate().await?;
@@ -275,7 +275,7 @@ async fn polling_station_update(
     ),
     params(
         ("election_id" = ElectionId, description = "Election database id"),
-        ("polling_station_id" = u32, description = "Polling station database id"),
+        ("polling_station_id" = PollingStationId, description = "Polling station database id"),
     ),
     security(("cookie_auth" = ["administrator", "coordinator"])),
 )]
@@ -283,7 +283,7 @@ async fn polling_station_delete(
     user: AdminOrCoordinator,
     State(pool): State<SqlitePool>,
     audit_service: AuditService,
-    Path((election_id, polling_station_id)): Path<(ElectionId, u32)>,
+    Path((election_id, polling_station_id)): Path<(ElectionId, PollingStationId)>,
 ) -> Result<StatusCode, APIError> {
     let mut tx = pool.begin_immediate().await?;
 

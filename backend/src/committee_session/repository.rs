@@ -204,7 +204,10 @@ pub async fn create(
 }
 
 /// Delete a committee session
-pub async fn delete(conn: &mut SqliteConnection, committee_session_id: CommitteeSessionId) -> Result<bool, Error> {
+pub async fn delete(
+    conn: &mut SqliteConnection,
+    committee_session_id: CommitteeSessionId,
+) -> Result<bool, Error> {
     let mut tx = conn.begin().await?;
 
     query!(
@@ -214,10 +217,13 @@ pub async fn delete(conn: &mut SqliteConnection, committee_session_id: Committee
     .execute(&mut *tx)
     .await?;
 
-    let rows_affected = query!(r#"DELETE FROM committee_sessions WHERE id = ?"#, committee_session_id)
-        .execute(&mut *tx)
-        .await?
-        .rows_affected();
+    let rows_affected = query!(
+        r#"DELETE FROM committee_sessions WHERE id = ?"#,
+        committee_session_id
+    )
+    .execute(&mut *tx)
+    .await?
+    .rows_affected();
 
     // something weird is happening, rollback
     if rows_affected != 1 {

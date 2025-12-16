@@ -561,7 +561,7 @@ mod tests {
 
         // Files should be generated exactly once
         for _ in 1..=2 {
-            let (eml, pdf, overview, _) = generate_and_save_files(&pool, audit_service.clone(), 5)
+            let (eml, pdf, overview, _) = generate_and_save_files(&pool, audit_service.clone(), CommitteeSessionId::from(5))
                 .await
                 .expect("should return files");
             let eml = eml.expect("should have generated eml");
@@ -588,7 +588,7 @@ mod tests {
         // Files should be generated exactly once
         for _ in 1..=2 {
             let (eml, pdf, overview, _) =
-                generate_and_save_files(&pool, audit_service.clone(), 703)
+                generate_and_save_files(&pool, audit_service.clone(), CommitteeSessionId::from(703))
                     .await
                     .expect("should return files");
 
@@ -624,7 +624,7 @@ mod tests {
         // File should be generated exactly once
         for _ in 1..=2 {
             let (eml, pdf, overview, _) =
-                generate_and_save_files(&pool, audit_service.clone(), 703)
+                generate_and_save_files(&pool, audit_service.clone(), CommitteeSessionId::from(703))
                     .await
                     .expect("should return files");
 

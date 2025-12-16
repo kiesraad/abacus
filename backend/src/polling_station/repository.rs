@@ -1,4 +1,4 @@
-use crate::election::ElectionId;
+use crate::{committee_session::CommitteeSessionId, election::ElectionId};
 
 use super::structs::{PollingStation, PollingStationRequest};
 use sqlx::{Connection, SqliteConnection, query, query_as};
@@ -6,7 +6,7 @@ use sqlx::{Connection, SqliteConnection, query, query_as};
 /// List all polling stations from a committee session
 pub async fn list(
     conn: &mut SqliteConnection,
-    committee_session_id: u32,
+    committee_session_id: CommitteeSessionId,
 ) -> Result<Vec<PollingStation>, sqlx::Error> {
     query_as!(
         PollingStation,
@@ -14,7 +14,7 @@ pub async fn list(
         SELECT
             p.id AS "id: u32",
             c.election_id AS "election_id: ElectionId",
-            p.committee_session_id AS "committee_session_id: u32",
+            p.committee_session_id AS "committee_session_id: CommitteeSessionId",
             p.id_prev_session AS "id_prev_session: _",
             p.name,
             p.number AS "number: u32",
@@ -41,7 +41,7 @@ pub async fn get(conn: &mut SqliteConnection, id: u32) -> Result<PollingStation,
         SELECT
             p.id AS "id: u32",
             c.election_id AS "election_id: ElectionId",
-            p.committee_session_id AS "committee_session_id: u32",
+            p.committee_session_id AS "committee_session_id: CommitteeSessionId",
             p.id_prev_session AS "id_prev_session: _",
             p.name,
             p.number AS "number: u32",
@@ -75,7 +75,7 @@ pub async fn get_by_previous_id(
         SELECT
             p.id AS "id: u32",
             c.election_id AS "election_id: ElectionId",
-            p.committee_session_id AS "committee_session_id: u32",
+            p.committee_session_id AS "committee_session_id: CommitteeSessionId",
             p.id_prev_session AS "id_prev_session: _",
             p.name,
             p.number AS "number: u32",
@@ -111,7 +111,7 @@ pub async fn get_for_election(
         SELECT
             p.id AS "id: u32",
             c.election_id AS "election_id: ElectionId",
-            p.committee_session_id AS "committee_session_id: u32",
+            p.committee_session_id AS "committee_session_id: CommitteeSessionId",
             p.id_prev_session AS "id_prev_session: _",
             p.name,
             p.number AS "number: u32",
@@ -166,7 +166,7 @@ pub async fn create(
         RETURNING
             id AS "id: u32",
             ? AS "election_id!: ElectionId", -- Workaround to get election_id in the result without a temporary struct
-            committee_session_id AS "committee_session_id: u32",
+            committee_session_id AS "committee_session_id: CommitteeSessionId",
             id_prev_session AS "id_prev_session: _",
             name,
             number AS "number: u32",
@@ -232,7 +232,7 @@ pub async fn create_many(
             RETURNING
                 id AS "id: u32",
                 ? AS "election_id!: ElectionId", -- Workaround to get election_id in the result without a temporary struct
-                committee_session_id AS "committee_session_id: u32",
+                committee_session_id AS "committee_session_id: CommitteeSessionId",
                 id_prev_session AS "id_prev_session: _",
                 name,
                 number AS "number: u32",
@@ -299,7 +299,7 @@ pub async fn update(
         RETURNING
             id AS "id: u32",
             ? AS "election_id!: ElectionId", -- Workaround to get election_id in the result without a temporary struct
-            committee_session_id AS "committee_session_id: u32",
+            committee_session_id AS "committee_session_id: CommitteeSessionId",
             id_prev_session AS "id_prev_session: _",
             name,
             number AS "number: u32",
@@ -354,8 +354,8 @@ pub async fn delete(
 
 pub async fn duplicate_for_committee_session(
     conn: &mut SqliteConnection,
-    from_committee_session_id: u32,
-    to_committee_session_id: u32,
+    from_committee_session_id: CommitteeSessionId,
+    to_committee_session_id: CommitteeSessionId,
 ) -> Result<(), sqlx::Error> {
     query!(
         r#"
@@ -395,7 +395,7 @@ pub async fn duplicate_for_committee_session(
 pub async fn insert_test_polling_station(
     conn: &mut SqliteConnection,
     id: u32,
-    committee_session_id: u32,
+    committee_session_id: CommitteeSessionId,
     id_prev_session: Option<u32>,
     number: u32,
 ) -> Result<(), sqlx::Error> {

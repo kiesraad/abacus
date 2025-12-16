@@ -1,7 +1,7 @@
 use chrono::NaiveDateTime;
 use sqlx::{Connection, Error, SqliteConnection, query, query_as};
 
-use crate::election::ElectionId;
+use crate::{committee_session::CommitteeSessionId, election::ElectionId};
 
 use super::{
     CommitteeSession, CommitteeSessionCreateRequest, CommitteeSessionFilesUpdateRequest,
@@ -10,13 +10,13 @@ use super::{
 
 pub async fn get(
     conn: &mut SqliteConnection,
-    committee_session_id: u32,
+    committee_session_id: CommitteeSessionId,
 ) -> Result<CommitteeSession, Error> {
     query_as!(
         CommitteeSession,
         r#"
         SELECT
-            id as "id: u32",
+            id as "id: CommitteeSessionId",
             number as "number: u32",
             election_id as "election_id: ElectionId",
             status as "status: _",
@@ -36,13 +36,13 @@ pub async fn get(
 
 pub async fn get_previous_session(
     conn: &mut SqliteConnection,
-    committee_session_id: u32,
+    committee_session_id: CommitteeSessionId,
 ) -> Result<Option<CommitteeSession>, Error> {
     query_as!(
         CommitteeSession,
         r#"
         SELECT
-            prev.id as "id: u32",
+            prev.id as "id: CommitteeSessionId",
             prev.number as "number: u32",
             prev.election_id as "election_id: ElectionId",
             prev.status as "status: _",
@@ -69,7 +69,7 @@ pub async fn get_election_committee_session_list(
         CommitteeSession,
         r#"
         SELECT
-            id as "id: u32",
+            id as "id: CommitteeSessionId",
             number as "number: u32",
             election_id as "election_id: ElectionId",
             status as "status: _",
@@ -96,7 +96,7 @@ pub async fn get_election_committee_session(
         CommitteeSession,
         r#"
         SELECT
-            id as "id: u32",
+            id as "id: CommitteeSessionId",
             number as "number: u32",
             election_id as "election_id: ElectionId",
             status as "status: _",
@@ -123,7 +123,7 @@ pub async fn get_committee_session_for_each_election(
         CommitteeSession,
         r#"
         SELECT
-            id as "id: u32",
+            id as "id: CommitteeSessionId",
             number as "number: u32",
             election_id as "election_id: ElectionId",
             status as "status: _",
@@ -173,7 +173,7 @@ pub async fn create(
             start_date_time
         ) VALUES (?, ?, "", NULL)
         RETURNING
-            id as "id: u32",
+            id as "id: CommitteeSessionId",
             number as "number: u32",
             election_id as "election_id: ElectionId",
             status as "status: _",
@@ -204,17 +204,17 @@ pub async fn create(
 }
 
 /// Delete a committee session
-pub async fn delete(conn: &mut SqliteConnection, id: u32) -> Result<bool, Error> {
+pub async fn delete(conn: &mut SqliteConnection, committee_session_id: CommitteeSessionId) -> Result<bool, Error> {
     let mut tx = conn.begin().await?;
 
     query!(
         "DELETE FROM polling_stations WHERE committee_session_id = ?",
-        id,
+        committee_session_id,
     )
     .execute(&mut *tx)
     .await?;
 
-    let rows_affected = query!(r#"DELETE FROM committee_sessions WHERE id = ?"#, id)
+    let rows_affected = query!(r#"DELETE FROM committee_sessions WHERE id = ?"#, committee_session_id)
         .execute(&mut *tx)
         .await?
         .rows_affected();
@@ -232,7 +232,7 @@ pub async fn delete(conn: &mut SqliteConnection, id: u32) -> Result<bool, Error>
 
 pub async fn update(
     conn: &mut SqliteConnection,
-    committee_session_id: u32,
+    committee_session_id: CommitteeSessionId,
     location: String,
     start_date_time: NaiveDateTime,
 ) -> Result<CommitteeSession, Error> {
@@ -245,7 +245,7 @@ pub async fn update(
             start_date_time = ?
         WHERE id = ?
         RETURNING
-            id as "id: u32",
+            id as "id: CommitteeSessionId",
             number as "number: u32",
             election_id as "election_id: ElectionId",
             status as "status: _",
@@ -265,7 +265,7 @@ pub async fn update(
 
 pub async fn change_status(
     conn: &mut SqliteConnection,
-    committee_session_id: u32,
+    committee_session_id: CommitteeSessionId,
     committee_session_status: CommitteeSessionStatus,
 ) -> Result<CommitteeSession, Error> {
     query_as!(
@@ -275,7 +275,7 @@ pub async fn change_status(
         SET status = ?
         WHERE id = ?
         RETURNING
-            id as "id: u32",
+            id as "id: CommitteeSessionId",
             number as "number: u32",
             election_id as "election_id: ElectionId",
             status as "status: _",
@@ -294,7 +294,7 @@ pub async fn change_status(
 
 pub async fn change_files(
     conn: &mut SqliteConnection,
-    committee_session_id: u32,
+    committee_session_id: CommitteeSessionId,
     committee_session_files_update: CommitteeSessionFilesUpdateRequest,
 ) -> Result<CommitteeSession, Error> {
     query_as!(
@@ -307,7 +307,7 @@ pub async fn change_files(
             overview_pdf = ?
         WHERE id = ?
         RETURNING
-            id as "id: u32",
+            id as "id: CommitteeSessionId",
             number as "number: u32",
             election_id as "election_id: ElectionId",
             status as "status: _",
@@ -329,10 +329,10 @@ pub async fn change_files(
 pub async fn get_current_id_for_election(
     conn: &mut SqliteConnection,
     election_id: ElectionId,
-) -> Result<Option<u32>, Error> {
+) -> Result<Option<CommitteeSessionId>, Error> {
     query!(
         r#"
-        SELECT id AS "id: u32"
+        SELECT id AS "id: CommitteeSessionId"
         FROM committee_sessions
         WHERE election_id = ?
         ORDER BY number DESC

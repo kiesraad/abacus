@@ -1039,7 +1039,7 @@ mod tests {
     use crate::{
         authentication::Role,
         committee_session::{
-            status::CommitteeSessionStatus, tests::change_status_committee_session,
+            CommitteeSessionId, status::CommitteeSessionStatus, tests::change_status_committee_session
         },
         data_entry::{
             ValidationResult, ValidationResultCode,
@@ -1069,7 +1069,7 @@ mod tests {
     async fn get_data_entry_status(
         pool: SqlitePool,
         polling_station_id: u32,
-        committee_session_id: u32,
+        committee_session_id: CommitteeSessionId,
     ) -> DataEntryStatus {
         let mut conn = pool.acquire().await.unwrap();
         crate::data_entry::repository::get(&mut conn, polling_station_id, committee_session_id)
@@ -1495,7 +1495,7 @@ mod tests {
             r#"
             SELECT
                 polling_station_id AS "polling_station_id: u32",
-                committee_session_id AS "committee_session_id: u32",
+                committee_session_id AS "committee_session_id: CommitteeSessionId",
                 state AS "state: _",
                 updated_at AS "updated_at: _"
             FROM polling_station_data_entries

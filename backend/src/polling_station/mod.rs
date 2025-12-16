@@ -492,7 +492,7 @@ mod tests {
     use sqlx::{SqlitePool, query};
     use test_log::test;
 
-    use crate::election::ElectionId;
+    use crate::{election::ElectionId, polling_station::PollingStationId};
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2", "election_3"))))]
     async fn test_polling_station_number_unique_per_election(pool: SqlitePool) {
@@ -643,7 +643,7 @@ VALUES
         let result = crate::polling_station::repository::update(
             &mut conn,
             ElectionId::from(7),
-            741,
+            PollingStationId::from(741),
             data.clone(),
         )
         .await;
@@ -652,7 +652,7 @@ VALUES
         // ... with number change
         data.number = Some(123);
         let result =
-            crate::polling_station::repository::update(&mut conn, ElectionId::from(7), 741, data)
+            crate::polling_station::repository::update(&mut conn, ElectionId::from(7), PollingStationId::from(741), data)
                 .await;
         assert!(result.is_err());
     }

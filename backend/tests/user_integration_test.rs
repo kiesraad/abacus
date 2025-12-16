@@ -19,6 +19,43 @@ async fn test_user_login(pool: SqlitePool) {
     shared::typist2_login(&addr).await;
 }
 
+#[test(sqlx::test(fixtures(path = "../fixtures", scripts("users"))))]
+async fn test_user_login_invalidates_old_session(pool: SqlitePool) {
+    let addr = serve_api(pool).await;
+    let url = format!("http://{addr}/api/whoami");
+
+    // Account 1: first login
+    let typist_cookie_session_1a = shared::typist_login(&addr).await;
+    // Account 1: second login, should invalidate first
+    let typist_cookie_session_1b = shared::typist_login(&addr).await;
+    // Account 2: shouldn't afffect account 1
+    let typist_cookie_session_2a = shared::typist2_login(&addr).await;
+
+    let response = reqwest::Client::new()
+        .get(&url)
+        .header("cookie", &typist_cookie_session_1a)
+        .send()
+        .await
+        .unwrap();
+    assert_eq!(response.status(), StatusCode::UNAUTHORIZED);
+
+    let response = reqwest::Client::new()
+        .get(&url)
+        .header("cookie", &typist_cookie_session_1b)
+        .send()
+        .await
+        .unwrap();
+    assert_eq!(response.status(), StatusCode::OK);
+
+    let response = reqwest::Client::new()
+        .get(&url)
+        .header("cookie", &typist_cookie_session_2a)
+        .send()
+        .await
+        .unwrap();
+    assert_eq!(response.status(), StatusCode::OK);
+}
+
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
 async fn test_user_last_activity_at_updating(pool: SqlitePool) {
     // Assert the user has no last activity timestamp yet

@@ -66,7 +66,3 @@ jobs:
           message: |
             ${{ steps.diff_summary.outputs.table }}
             ${{ steps.artifact-upload.outputs['artifact-id'] && env.DOWNLOAD_LINK }}
-
-concurrency:
-  group: ${{ github.head_ref || github.run_id }}
-  cancel-in-progress: true

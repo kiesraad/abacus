@@ -138,7 +138,3 @@ jobs:
           files: frontend/coverage/coverage-final.json
           disable_search: true
           fail_ci_if_error: true
-
-concurrency:
-  group: ${{ github.head_ref || github.run_id }}
-  cancel-in-progress: true

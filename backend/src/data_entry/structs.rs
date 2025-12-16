@@ -7,10 +7,7 @@ use utoipa::ToSchema;
 
 use super::status::{DataEntryStatus, DataEntryStatusName};
 use crate::{
-    APIError,
-    audit_log::{DataEntryDetails, ResultDetails},
-    election::{CandidateNumber, PGNumber, PoliticalGroup},
-    error::ErrorReference,
+    APIError, audit_log::{DataEntryDetails, ResultDetails}, committee_session::CommitteeSessionId, election::{CandidateNumber, PGNumber, PoliticalGroup}, error::ErrorReference
 };
 pub use yes_no::YesNo;
 
@@ -18,7 +15,7 @@ pub use yes_no::YesNo;
 #[serde(deny_unknown_fields)]
 pub struct PollingStationDataEntry {
     pub polling_station_id: u32,
-    pub committee_session_id: u32,
+    pub committee_session_id: CommitteeSessionId,
     #[schema(value_type = DataEntryStatus)]
     pub state: Json<DataEntryStatus>,
     #[schema(value_type = String)]
@@ -45,7 +42,7 @@ impl From<PollingStationDataEntry> for DataEntryDetails {
 #[serde(deny_unknown_fields)]
 pub struct PollingStationResult {
     pub polling_station_id: u32,
-    pub committee_session_id: u32,
+    pub committee_session_id: CommitteeSessionId,
     #[schema(value_type = PollingStationResults)]
     pub data: Json<PollingStationResults>,
     #[schema(value_type = String)]

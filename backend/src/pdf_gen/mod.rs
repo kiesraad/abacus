@@ -32,7 +32,7 @@ pub(crate) mod tests {
 
     use super::*;
     use crate::{
-        committee_session::tests::committee_session_fixture,
+        committee_session::{CommitteeSessionId, tests::committee_session_fixture},
         election::{
             ElectionCategory, ElectionId, ElectionWithPoliticalGroups, VoteCountingMethod,
             structs::tests::election_fixture,
@@ -47,7 +47,7 @@ pub(crate) mod tests {
 
     pub fn polling_stations_fixture(
         election: &ElectionWithPoliticalGroups,
-        committee_session_id: u32,
+        committee_session_id: CommitteeSessionId,
         polling_station_voter_count: &[u32],
     ) -> Vec<PollingStation> {
         let mut polling_stations = Vec::new();

@@ -12,6 +12,7 @@ macro_rules! id {
             utoipa::ToSchema,
             PartialEq,
             Eq,
+            Default,
         )]
         #[sqlx(transparent)]
         pub struct $identifier(u32);

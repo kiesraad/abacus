@@ -6,8 +6,7 @@ use utoipa::ToSchema;
 
 use super::AuditEventLevel;
 use crate::{
-    ErrorResponse, election::ElectionId, error::ErrorReference,
-    investigation::PollingStationInvestigation,
+    ErrorResponse, committee_session::CommitteeSessionId, election::ElectionId, error::ErrorReference, investigation::PollingStationInvestigation
 };
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, Eq, ToSchema)]
@@ -62,7 +61,7 @@ pub struct ElectionDetails {
 #[derive(Serialize, Deserialize, Debug, PartialEq, Eq, ToSchema)]
 #[serde(deny_unknown_fields)]
 pub struct CommitteeSessionDetails {
-    pub session_id: u32,
+    pub session_id: CommitteeSessionId,
     pub session_number: u32,
     pub session_election_id: ElectionId,
     pub session_location: String,
@@ -96,7 +95,7 @@ pub struct FileDetails {
 pub struct PollingStationDetails {
     pub polling_station_id: u32,
     pub polling_station_election_id: ElectionId,
-    pub polling_station_committee_session_id: u32,
+    pub polling_station_committee_session_id: CommitteeSessionId,
     #[serde(skip_serializing_if = "Option::is_none")]
     #[schema(nullable = false)]
     pub polling_station_id_prev_session: Option<u32>,
@@ -124,7 +123,7 @@ pub struct PollingStationImportDetails {
 #[serde(deny_unknown_fields)]
 pub struct DataEntryDetails {
     pub polling_station_id: u32,
-    pub committee_session_id: u32,
+    pub committee_session_id: CommitteeSessionId,
     pub data_entry_status: String,
     pub data_entry_progress: String,
     #[schema(value_type = Option<String>)]
@@ -137,7 +136,7 @@ pub struct DataEntryDetails {
 #[serde(deny_unknown_fields)]
 pub struct ResultDetails {
     pub polling_station_id: u32,
-    pub committee_session_id: u32,
+    pub committee_session_id: CommitteeSessionId,
     #[schema(value_type = String)]
     pub created_at: DateTime<Utc>,
 }

@@ -8,10 +8,7 @@ use super::{
     repository::change_files,
 };
 use crate::{
-    APIError,
-    audit_log::{AuditEvent, AuditService},
-    data_entry::repository::are_results_complete_for_committee_session,
-    investigation::list_investigations_for_committee_session,
+    APIError, audit_log::{AuditEvent, AuditService}, committee_session::CommitteeSessionId, data_entry::repository::are_results_complete_for_committee_session, investigation::list_investigations_for_committee_session
 };
 
 /// Committee session status
@@ -51,7 +48,7 @@ impl From<sqlx::Error> for CommitteeSessionError {
 #[allow(clippy::too_many_lines)]
 pub async fn change_committee_session_status(
     conn: &mut SqliteConnection,
-    committee_session_id: u32,
+    committee_session_id: CommitteeSessionId,
     status: CommitteeSessionStatus,
     audit_service: AuditService,
 ) -> Result<(), APIError> {

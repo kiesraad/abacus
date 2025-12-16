@@ -8,13 +8,15 @@ use sqlx::{FromRow, Type};
 use utoipa::ToSchema;
 
 use super::status::CommitteeSessionStatus;
-use crate::{audit_log, election::ElectionId, investigation::PollingStationInvestigation};
+use crate::{audit_log, election::ElectionId, investigation::PollingStationInvestigation, util::id};
+
+id!(CommitteeSessionId);
 
 /// Committee session
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq, ToSchema, Type, FromRow)]
 #[serde(deny_unknown_fields)]
 pub struct CommitteeSession {
-    pub id: u32,
+    pub id: CommitteeSessionId,
     pub number: u32,
     pub election_id: ElectionId,
     pub location: String,

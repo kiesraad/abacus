@@ -13,12 +13,7 @@ use super::{
     status::{CommitteeSessionStatus, change_committee_session_status},
 };
 use crate::{
-    APIError, AppState, ErrorResponse, SqlitePoolExt,
-    audit_log::{AuditEvent, AuditService},
-    authentication::Coordinator,
-    election::ElectionId,
-    error::ErrorReference,
-    investigation::list_investigations_for_committee_session,
+    APIError, AppState, ErrorResponse, SqlitePoolExt, audit_log::{AuditEvent, AuditService}, authentication::Coordinator, committee_session::CommitteeSessionId, election::ElectionId, error::ErrorReference, investigation::list_investigations_for_committee_session
 };
 
 #[derive(Debug, PartialEq, Eq)]
@@ -47,7 +42,7 @@ pub fn router() -> OpenApiRouter<AppState> {
 pub async fn validate_committee_session_is_current_committee_session(
     conn: &mut SqliteConnection,
     election_id: ElectionId,
-    committee_session_id: u32,
+    committee_session_id: CommitteeSessionId,
 ) -> Result<CommitteeSession, APIError> {
     // Get current committee session and check if the committee session id given
     // matches the current committee session id, return NOT_FOUND otherwise
@@ -135,7 +130,7 @@ pub async fn committee_session_create(
     ),
     params(
         ("election_id" = ElectionId, description = "Election database id"),
-        ("committee_session_id" = u32, description = "Committee session database id"),
+        ("committee_session_id" = CommitteeSessionId, description = "Committee session database id"),
     ),
     security(("cookie_auth" = ["coordinator"])),
 )]
@@ -143,7 +138,7 @@ pub async fn committee_session_delete(
     _user: Coordinator,
     State(pool): State<SqlitePool>,
     audit_service: AuditService,
-    Path((election_id, committee_session_id)): Path<(ElectionId, u32)>,
+    Path((election_id, committee_session_id)): Path<(ElectionId, CommitteeSessionId)>,
 ) -> Result<StatusCode, APIError> {
     let mut tx = pool.begin_immediate().await?;
 
@@ -195,7 +190,7 @@ pub async fn committee_session_delete(
     ),
     params(
         ("election_id" = ElectionId, description = "Election database id"),
-        ("committee_session_id" = u32, description = "Committee session database id"),
+        ("committee_session_id" = CommitteeSessionId, description = "Committee session database id"),
     ),
     security(("cookie_auth" = ["coordinator"])),
 )]
@@ -203,7 +198,7 @@ pub async fn committee_session_update(
     _user: Coordinator,
     State(pool): State<SqlitePool>,
     audit_service: AuditService,
-    Path((election_id, committee_session_id)): Path<(ElectionId, u32)>,
+    Path((election_id, committee_session_id)): Path<(ElectionId, CommitteeSessionId)>,
     Json(request): Json<CommitteeSessionUpdateRequest>,
 ) -> Result<StatusCode, APIError> {
     if request.location.is_empty() {
@@ -267,7 +262,7 @@ pub async fn committee_session_update(
     ),
     params(
         ("election_id" = ElectionId, description = "Election database id"),
-        ("committee_session_id" = u32, description = "Committee session database id"),
+        ("committee_session_id" = CommitteeSessionId, description = "Committee session database id"),
     ),
     security(("cookie_auth" = ["coordinator"])),
 )]
@@ -275,7 +270,7 @@ pub async fn committee_session_status_change(
     _user: Coordinator,
     State(pool): State<SqlitePool>,
     audit_service: AuditService,
-    Path((election_id, committee_session_id)): Path<(ElectionId, u32)>,
+    Path((election_id, committee_session_id)): Path<(ElectionId, CommitteeSessionId)>,
     Json(committee_session_request): Json<CommitteeSessionStatusChangeRequest>,
 ) -> Result<StatusCode, APIError> {
     let mut tx = pool.begin_immediate().await?;
@@ -312,14 +307,14 @@ pub async fn committee_session_status_change(
     ),
     params(
         ("election_id" = ElectionId, description = "Election database id"),
-        ("committee_session_id" = u32, description = "Committee session database id"),
+        ("committee_session_id" = CommitteeSessionId, description = "Committee session database id"),
     ),
     security(("cookie_auth" = ["coordinator"])),
 )]
 pub async fn committee_session_investigations(
     _user: Coordinator,
     State(pool): State<SqlitePool>,
-    Path((election_id, committee_session_id)): Path<(ElectionId, u32)>,
+    Path((election_id, committee_session_id)): Path<(ElectionId, CommitteeSessionId)>,
 ) -> Result<Json<InvestigationListResponse>, APIError> {
     let mut conn = pool.acquire().await?;
 
@@ -337,7 +332,7 @@ pub async fn committee_session_investigations(
 
 #[cfg(test)]
 pub mod tests {
-    use crate::election::ElectionId;
+    use crate::{committee_session::CommitteeSessionId, election::ElectionId};
     use chrono::NaiveDate;
     use sqlx::SqlitePool;
 
@@ -345,7 +340,7 @@ pub mod tests {
 
     pub async fn change_status_committee_session(
         pool: SqlitePool,
-        committee_session_id: u32,
+        committee_session_id: CommitteeSessionId,
         status: CommitteeSessionStatus,
     ) -> CommitteeSession {
         let mut conn = pool.acquire().await.unwrap();
@@ -357,7 +352,7 @@ pub mod tests {
     /// Create a test committee session.
     pub fn committee_session_fixture(election_id: ElectionId) -> CommitteeSession {
         CommitteeSession {
-            id: 1,
+            id: CommitteeSessionId::from(1),
             number: 1,
             election_id,
             location: "Test location".to_string(),

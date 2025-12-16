@@ -12,8 +12,7 @@ use crate::{
     audit_log::{AuditEvent, AuditService},
     authentication::Coordinator,
     committee_session::{
-        CommitteeSession, CommitteeSessionError, CommitteeSessionFilesUpdateRequest,
-        repository::change_files, status::CommitteeSessionStatus,
+        CommitteeSession, CommitteeSessionError, CommitteeSessionFilesUpdateRequest, CommitteeSessionId, repository::change_files, status::CommitteeSessionStatus
     },
     data_entry::{PollingStationResults, repository::are_results_complete_for_committee_session},
     election::{ElectionId, ElectionWithPoliticalGroups},
@@ -59,7 +58,7 @@ struct ResultsInput {
 impl ResultsInput {
     async fn new(
         conn: &mut SqliteConnection,
-        committee_session_id: u32,
+        committee_session_id: CommitteeSessionId,
         created_at: DateTime<Local>,
     ) -> Result<ResultsInput, APIError> {
         let committee_session =
@@ -286,7 +285,7 @@ fn xml_zip_filename(election: &ElectionWithPoliticalGroups) -> String {
 async fn generate_and_save_files(
     pool: &SqlitePool,
     audit_service: AuditService,
-    committee_session_id: u32,
+    committee_session_id: CommitteeSessionId,
 ) -> Result<(Option<File>, Option<File>, Option<File>, DateTime<Utc>), APIError> {
     let mut conn = pool.acquire().await?;
     let committee_session =
@@ -453,7 +452,7 @@ async fn generate_and_save_files(
     ),
     params(
         ("election_id" = ElectionId, description = "Election database id"),
-        ("committee_session_id" = u32, description = "Committee session database id"),
+        ("committee_session_id" = CommitteeSessionId, description = "Committee session database id"),
     ),
     security(("cookie_auth" = ["coordinator"])),
 )]
@@ -461,7 +460,7 @@ async fn election_download_zip_results(
     _user: Coordinator,
     State(pool): State<SqlitePool>,
     audit_service: AuditService,
-    Path((election_id, committee_session_id)): Path<(ElectionId, u32)>,
+    Path((election_id, committee_session_id)): Path<(ElectionId, CommitteeSessionId)>,
 ) -> Result<impl IntoResponse, APIError> {
     let mut conn = pool.acquire().await?;
     let election = crate::election::repository::get(&mut conn, election_id).await?;
@@ -525,7 +524,7 @@ async fn election_download_zip_results(
     ),
     params(
         ("election_id" = ElectionId, description = "Election database id"),
-        ("committee_session_id" = u32, description = "Committee session database id"),
+        ("committee_session_id" = CommitteeSessionId, description = "Committee session database id"),
     ),
     security(("cookie_auth" = ["coordinator"])),
 )]
@@ -533,7 +532,7 @@ async fn election_download_pdf_results(
     _user: Coordinator,
     State(pool): State<SqlitePool>,
     audit_service: AuditService,
-    Path((_election_id, committee_session_id)): Path<(ElectionId, u32)>,
+    Path((_election_id, committee_session_id)): Path<(ElectionId, CommitteeSessionId)>,
 ) -> Result<Attachment<Vec<u8>>, APIError> {
     let (_, pdf_file, _, _) =
         generate_and_save_files(&pool, audit_service, committee_session_id).await?;

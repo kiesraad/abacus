@@ -1,5 +1,7 @@
 use sqlx::{Error, SqliteConnection, query, query_as};
 
+use crate::committee_session::CommitteeSessionId;
+
 use super::structs::{
     PollingStationInvestigation, PollingStationInvestigationConcludeRequest,
     PollingStationInvestigationCreateRequest,
@@ -115,7 +117,7 @@ pub async fn delete_polling_station_investigation(
 
 pub async fn list_investigations_for_committee_session(
     conn: &mut SqliteConnection,
-    committee_session_id: u32,
+    committee_session_id: CommitteeSessionId,
 ) -> Result<Vec<PollingStationInvestigation>, Error> {
     query_as!(
         PollingStationInvestigation,

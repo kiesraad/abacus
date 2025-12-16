@@ -262,8 +262,8 @@ impl TryFrom<Candidate> for structs::Candidate {
             number: parsed
                 .candidate_identifier
                 .id
-                .parse()
-                .map(CandidateNumber::new)
+                .parse::<u32>()
+                .map(CandidateNumber::from)
                 .or(Err(EMLImportError::InvalidCandidate))?,
             initials: match parsed.candidate_full_name.person_name.name_line {
                 Some(line) => line.value,

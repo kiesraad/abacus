@@ -105,7 +105,7 @@ impl EML230 {
         }
 
         // extract initial listing of political groups with candidates
-        let mut previous_pg_number = PGNumber::new(0);
+        let mut previous_pg_number = PGNumber::from(0);
         election.political_groups = self
             .contest()
             .affiliations
@@ -114,8 +114,8 @@ impl EML230 {
                 let pg_number = aff
                     .affiliation_identifier
                     .id
-                    .parse()
-                    .map(PGNumber::new)
+                    .parse::<u32>()
+                    .map(PGNumber::from)
                     .or(Err(EMLImportError::TooManyPoliticalGroups))?;
                 if pg_number <= previous_pg_number {
                     return Err(EMLImportError::PoliticalGroupNumbersNotIncreasing {
@@ -124,7 +124,7 @@ impl EML230 {
                     });
                 }
 
-                let mut previous_can_number = CandidateNumber::new(0);
+                let mut previous_can_number = CandidateNumber::from(0);
                 let political_group = PoliticalGroup {
                     number: pg_number,
                     name: aff.affiliation_identifier.registered_name.clone(),
@@ -436,8 +436,8 @@ mod tests {
         let res = candidates.add_candidate_lists(new_election).unwrap_err();
 
         let expected = EMLImportError::PoliticalGroupNumbersNotIncreasing {
-            expected_larger_than: PGNumber::new(2),
-            found: PGNumber::new(1),
+            expected_larger_than: PGNumber::from(2),
+            found: PGNumber::from(1),
         };
         assert_eq!(res, expected);
     }
@@ -454,9 +454,9 @@ mod tests {
         let res = candidates.add_candidate_lists(new_election).unwrap_err();
 
         let expected = EMLImportError::CandidateNumbersNotIncreasing {
-            political_group_number: PGNumber::new(1),
-            expected_larger_than: CandidateNumber::new(1),
-            found: CandidateNumber::new(1),
+            political_group_number: PGNumber::from(1),
+            expected_larger_than: CandidateNumber::from(1),
+            found: CandidateNumber::from(1),
         };
         assert_eq!(res, expected);
     }

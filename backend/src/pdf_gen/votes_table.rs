@@ -308,11 +308,11 @@ mod tests {
 
     fn sample_group(number: u32, candidate_numbers: &[u32]) -> PoliticalGroup {
         PoliticalGroup {
-            number: PGNumber::new(number),
+            number: PGNumber::from(number),
             name: format!("Partij {number}"),
             candidates: candidate_numbers
                 .iter()
-                .map(|&candidate_number| sample_candidate(CandidateNumber::new(candidate_number)))
+                .map(|&candidate_number| sample_candidate(CandidateNumber::from(candidate_number)))
                 .collect(),
         }
     }
@@ -340,12 +340,12 @@ mod tests {
         entries: &[(u32, Count)],
     ) -> PoliticalGroupCandidateVotes {
         PoliticalGroupCandidateVotes {
-            number: PGNumber::new(group_number),
+            number: PGNumber::from(group_number),
             total,
             candidate_votes: entries
                 .iter()
                 .map(|&(candidate_number, votes)| DataEntryCandidateVotes {
-                    number: CandidateNumber::new(candidate_number),
+                    number: CandidateNumber::from(candidate_number),
                     votes,
                 })
                 .collect(),
@@ -422,7 +422,7 @@ mod tests {
         for (candidate_vote, (number, votes, previous_votes)) in column.votes.iter().zip(expected) {
             assert_eq!(
                 candidate_vote.candidate.number,
-                CandidateNumber::new(number)
+                CandidateNumber::from(number)
             );
             assert_eq!(candidate_vote.votes, Some(votes));
             assert_eq!(candidate_vote.previous_votes, Some(previous_votes));

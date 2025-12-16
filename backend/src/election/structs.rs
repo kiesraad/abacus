@@ -171,30 +171,7 @@ pub enum VoteCountingMethod {
     DSO,
 }
 
-#[derive(
-    Serialize, Deserialize, Clone, Copy, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Hash,
-)]
-pub struct PGNumber(u32);
-
-impl PGNumber {
-    pub fn new(number: u32) -> Self {
-        Self(number)
-    }
-}
-
-impl std::fmt::Display for PGNumber {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        self.0.fmt(f)
-    }
-}
-
-impl TryFrom<usize> for PGNumber {
-    type Error = std::num::TryFromIntError;
-
-    fn try_from(value: usize) -> Result<Self, Self::Error> {
-        Ok(Self::new(u32::try_from(value)?))
-    }
-}
+crate::util::id!(PGNumber);
 
 /// Political group with its candidates
 #[derive(Serialize, Deserialize, ToSchema, Clone, Debug, PartialEq, Eq, Hash)]
@@ -206,30 +183,7 @@ pub struct PoliticalGroup {
     pub candidates: Vec<Candidate>,
 }
 
-#[derive(
-    Serialize, Deserialize, Clone, Copy, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Hash,
-)]
-pub struct CandidateNumber(u32);
-
-impl CandidateNumber {
-    pub fn new(number: u32) -> Self {
-        Self(number)
-    }
-}
-
-impl std::fmt::Display for CandidateNumber {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        self.0.fmt(f)
-    }
-}
-
-impl TryFrom<usize> for CandidateNumber {
-    type Error = std::num::TryFromIntError;
-
-    fn try_from(value: usize) -> Result<Self, Self::Error> {
-        Ok(Self::new(u32::try_from(value)?))
-    }
-}
+crate::util::id!(CandidateNumber);
 
 /// Candidate
 #[derive(Serialize, Deserialize, ToSchema, Clone, Debug, PartialEq, Eq, Hash)]
@@ -285,7 +239,7 @@ pub(crate) mod tests {
                 name: format!("Political group {}", i + 1),
                 candidates: (0..candidates)
                     .map(|j| Candidate {
-                        number: CandidateNumber::new(j + 1),
+                        number: CandidateNumber::from(j + 1),
                         initials: "A.B.".to_string(),
                         first_name: Some(format!("Candidate {}", j + 1)),
                         last_name_prefix: Some("van".to_string()),

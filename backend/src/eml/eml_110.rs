@@ -143,7 +143,7 @@ impl EML110 {
             .map(|(idx, rp)| {
                 Ok(PoliticalGroup {
                     // temporary group number, actual group numbers will be imported from candidate list
-                    number: PGNumber::new(
+                    number: PGNumber::from(
                         u32::try_from(idx + 1).or(Err(EMLImportError::TooManyPoliticalGroups))?,
                     ),
                     name: rp.registered_appellation.clone(),

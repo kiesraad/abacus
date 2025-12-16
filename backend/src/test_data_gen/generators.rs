@@ -124,7 +124,7 @@ fn generate_election(rng: &mut impl rand::Rng, args: &GenerateElectionArgs) -> N
     info!("Generating {num_political_groups} political groups");
 
     for i in 1..=num_political_groups {
-        political_groups.push(generate_political_party(rng, PGNumber::new(i), args));
+        political_groups.push(generate_political_party(rng, PGNumber::from(i), args));
     }
 
     // generate a nomination date, and an election date not too long afterward
@@ -184,7 +184,7 @@ fn generate_political_party(
         let initials = super::data::initials(rng, first_name.as_deref());
         let (prefix, last_name) = super::data::last_name(rng);
         candidates.push(crate::election::Candidate {
-            number: CandidateNumber::new(i),
+            number: CandidateNumber::from(i),
             initials,
             first_name,
             last_name_prefix: prefix.map(ToOwned::to_owned),

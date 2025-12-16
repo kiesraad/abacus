@@ -809,11 +809,11 @@ mod tests {
             nomination_date: Utc::now().date_naive(),
             political_groups: (1..=2)
                 .map(|number| PoliticalGroup {
-                    number: PGNumber::new(number),
+                    number: PGNumber::from(number),
                     name: format!("Partij {number}"),
                     candidates: (1..=2)
                         .map(|number| Candidate {
-                            number: CandidateNumber::new(number),
+                            number: CandidateNumber::from(number),
                             initials: "A".to_string(),
                             first_name: None,
                             last_name_prefix: None,
@@ -1258,7 +1258,7 @@ mod tests {
                 },
                 votes_counts: VotesCounts {
                     political_group_total_votes: vec![PoliticalGroupTotalVotes {
-                        number: PGNumber::new(1),
+                        number: PGNumber::from(1),
                         total: 0,
                     }],
                     total_votes_candidates_count: 0,
@@ -1267,10 +1267,10 @@ mod tests {
                     total_votes_cast_count: 1,
                 },
                 political_group_votes: vec![PoliticalGroupCandidateVotes {
-                    number: PGNumber::new(1),
+                    number: PGNumber::from(1),
                     total: 0,
                     candidate_votes: vec![CandidateVotes {
-                        number: CandidateNumber::new(1),
+                        number: CandidateNumber::from(1),
                         votes: 0,
                     }],
                 }],
@@ -1287,7 +1287,7 @@ mod tests {
                 },
                 votes_counts: VotesCounts {
                     political_group_total_votes: vec![PoliticalGroupTotalVotes {
-                        number: PGNumber::new(1),
+                        number: PGNumber::from(1),
                         total: 1,
                     }],
                     total_votes_candidates_count: 1,
@@ -1296,10 +1296,10 @@ mod tests {
                     total_votes_cast_count: 1,
                 },
                 political_group_votes: vec![PoliticalGroupCandidateVotes {
-                    number: PGNumber::new(1),
+                    number: PGNumber::from(1),
                     total: 1,
                     candidate_votes: vec![CandidateVotes {
-                        number: CandidateNumber::new(1),
+                        number: CandidateNumber::from(1),
                         votes: 1,
                     }],
                 }],
@@ -1313,10 +1313,10 @@ mod tests {
                 &polling_station(),
                 &ElectionWithPoliticalGroups {
                     political_groups: vec![PoliticalGroup {
-                        number: PGNumber::new(1),
+                        number: PGNumber::from(1),
                         name: "Test group".to_string(),
                         candidates: vec![Candidate {
-                            number: CandidateNumber::new(1),
+                            number: CandidateNumber::from(1),
                             initials: "A.".to_string(),
                             first_name: None,
                             last_name_prefix: None,

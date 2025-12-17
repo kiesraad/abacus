@@ -6,4 +6,4 @@ Wanneer dit leidt tot een rapport wordt dit hier opgenomen, samen met de reactie
 ## Beschikbare rapporten
 
 1. SIG code review (maart 2025)
-2. Veritas beveiligingsonderzoek (juli 2025)
+2. Bureau Veritas beveiligingsonderzoek (juli 2025)

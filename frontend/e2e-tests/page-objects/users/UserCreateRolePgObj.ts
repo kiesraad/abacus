@@ -7,9 +7,9 @@ export class UserCreateRolePgObj {
   continue: Locator;
 
   constructor(protected readonly page: Page) {
-    this.administrator = page.getByLabel(/Beheerder/);
-    this.coordinator = page.getByLabel(/Coördinator/);
-    this.typist = page.getByLabel(/Invoerder/);
+    this.administrator = page.getByRole("radio", { name: "Beheerder" });
+    this.coordinator = page.getByRole("radio", { name: "Coördinator" });
+    this.typist = page.getByRole("radio", { name: "Invoerder" });
     this.continue = page.getByRole("button", { name: "Verder" });
   }
 }

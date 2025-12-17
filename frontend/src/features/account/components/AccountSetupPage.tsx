@@ -1,4 +1,5 @@
-import { Navigate, useNavigate } from "react-router";
+import { useState } from "react";
+import { Navigate } from "react-router";
 
 import { useApiState } from "@/api/useApiState";
 import { PageTitle } from "@/components/page_title/PageTitle";
@@ -8,15 +9,19 @@ import { LoginResponse } from "@/types/generated/openapi";
 import { AccountSetupForm } from "./AccountSetupForm";
 
 export function AccountSetupPage() {
-  const navigate = useNavigate();
   const { user, setUser } = useApiState();
+  const [setupComplete, setSetupComplete] = useState(false);
 
   function handleSaved(user: LoginResponse) {
     setUser(user);
-    void navigate("/elections#new-account");
+    setSetupComplete(true);
   }
 
-  if (!user) {
+  if (setupComplete) {
+    return <Navigate to="/elections#new-account" />;
+  }
+
+  if (!user || (user.fullname && !user.needs_password_change)) {
     return <Navigate to="/account/login" state={{ unauthorized: true }} />;
   }
 

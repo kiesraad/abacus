@@ -17,6 +17,10 @@ permissions:
 env:
   TZ: "Europe/Amsterdam"
 
+concurrency:
+  group: ${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
+
 jobs:
   backend:
     name: Backend
@@ -219,7 +223,3 @@ jobs:
         run: cargo install cargo-fuzz
       - name: Run the fuzzer
         run: cargo fuzz run data_entry_status -- -max_total_time=60
-
-concurrency:
-  group: ${{ github.head_ref || github.run_id }}
-  cancel-in-progress: true

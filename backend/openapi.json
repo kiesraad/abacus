@@ -7024,10 +7024,7 @@
             "type": "string"
           },
           "polling_stations": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/PollingStationRequest"
-            }
+            "type": "string"
           }
         }
       },

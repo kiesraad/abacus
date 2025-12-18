@@ -22,9 +22,9 @@ export class CandidatesListPage extends DataEntryBasePage {
     this.total = page.getByRole("textbox", { name: "Totaal" });
     this.next = page.getByRole("button", { name: "Volgende" });
 
-    this.acceptErrorsAndWarnings = page.getByLabel(
-      "Ik heb mijn invoer gecontroleerd met het papier en correct overgenomen.",
-    );
+    this.acceptErrorsAndWarnings = page.getByRole("checkbox", {
+      name: "Ik heb mijn invoer gecontroleerd met het papier en correct overgenomen.",
+    });
     this.acceptErrorsAndWarningsReminder = page
       .getByRole("alert")
       .filter({ hasText: "Je kan alleen verder als je het papieren proces-verbaal hebt gecontroleerd." });

@@ -45,14 +45,16 @@ export class DifferencesPage extends DataEntryBasePage {
     this.differenceCompletelyAccountedFor = this.fieldset.getByRole("group").filter({
       hasText: "Zijn er tijdens de stemming dingen opgeschreven die het verschil tussen D en H volledig verklaren?",
     });
-    this.differenceCompletelyAccountedForYes = this.differenceCompletelyAccountedFor.getByLabel("Ja");
-    this.differenceCompletelyAccountedForNo = this.differenceCompletelyAccountedFor.getByLabel(
-      "Nee, er is een onverklaard verschil",
-    );
+    this.differenceCompletelyAccountedForYes = this.differenceCompletelyAccountedFor.getByRole("checkbox", {
+      name: "Ja",
+    });
+    this.differenceCompletelyAccountedForNo = this.differenceCompletelyAccountedFor.getByRole("checkbox", {
+      name: "Nee, er is een onverklaard verschil",
+    });
 
-    this.acceptErrorsAndWarnings = page.getByLabel(
-      "Ik heb mijn invoer gecontroleerd met het papier en correct overgenomen.",
-    );
+    this.acceptErrorsAndWarnings = page.getByRole("checkbox", {
+      name: "Ik heb mijn invoer gecontroleerd met het papier en correct overgenomen.",
+    });
     this.acceptErrorsAndWarningsReminder = page
       .getByRole("alert")
       .filter({ hasText: "Je kan alleen verder als je het papieren proces-verbaal hebt gecontroleerd." });

@@ -62,7 +62,7 @@ describe("InvestigationReasonPage", () => {
     expect(
       await screen.findByRole("heading", { level: 2, name: "Aanleiding en opdracht van het centraal stembureau" }),
     ).toBeVisible();
-    expect(await screen.findByLabelText("Aanleiding en opdracht")).toBeVisible();
+    expect(await screen.findByRole("textbox", { name: "Aanleiding en opdracht" })).toBeVisible();
   });
 
   test("Displays an error message when submitting an empty form", async () => {
@@ -71,7 +71,7 @@ describe("InvestigationReasonPage", () => {
 
     await renderPage(3);
 
-    const reason = await screen.findByLabelText("Aanleiding en opdracht");
+    const reason = await screen.findByRole("textbox", { name: "Aanleiding en opdracht" });
     const submitButton = await screen.findByRole("button", { name: "Volgende" });
 
     submitButton.click();
@@ -91,7 +91,7 @@ describe("InvestigationReasonPage", () => {
 
     await renderPage(3);
 
-    const reason = await screen.findByLabelText("Aanleiding en opdracht");
+    const reason = await screen.findByRole("textbox", { name: "Aanleiding en opdracht" });
     const submitButton = await screen.findByRole("button", { name: "Volgende" });
 
     const user = userEvent.setup();
@@ -113,7 +113,7 @@ describe("InvestigationReasonPage", () => {
 
     await renderPage(3);
 
-    const reason = await screen.findByLabelText("Aanleiding en opdracht");
+    const reason = await screen.findByRole("textbox", { name: "Aanleiding en opdracht" });
     expect(reason).toHaveValue("Test reason 1");
 
     const user = userEvent.setup();
@@ -142,7 +142,7 @@ describe("InvestigationReasonPage", () => {
     expect(
       await screen.findByRole("heading", { level: 2, name: "Aanleiding en opdracht van het centraal stembureau" }),
     ).toBeVisible();
-    expect(await screen.findByLabelText("Aanleiding en opdracht")).toBeVisible();
+    expect(await screen.findByRole("textbox", { name: "Aanleiding en opdracht" })).toBeVisible();
 
     expect(screen.queryByRole("link", { name: "Verwijder onderzoek" })).not.toBeInTheDocument();
   });
@@ -155,7 +155,7 @@ describe("InvestigationReasonPage", () => {
     expect(
       await screen.findByRole("heading", { level: 2, name: "Aanleiding en opdracht van het centraal stembureau" }),
     ).toBeVisible();
-    expect(await screen.findByLabelText("Aanleiding en opdracht")).toBeVisible();
+    expect(await screen.findByRole("textbox", { name: "Aanleiding en opdracht" })).toBeVisible();
 
     const deleteButton = await screen.findByRole("button", { name: "Onderzoek verwijderen" });
     expect(deleteButton).toBeVisible();

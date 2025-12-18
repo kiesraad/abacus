@@ -132,10 +132,10 @@ async function inputElectionHash() {
   // Expect stub to be highlighted
   expect(screen.getByText("1")).toHaveRole("mark");
   expect(screen.getByText("2")).not.toHaveRole("mark");
-  const inputPart1 = screen.getByLabelText("Controle deel 1");
+  const inputPart1 = screen.getByRole("textbox", { name: "Controle deel 1" });
   await user.type(inputPart1, "zxcv");
 
-  const inputPart2 = screen.getByLabelText("Controle deel 2");
+  const inputPart2 = screen.getByRole("textbox", { name: "Controle deel 2" });
   await user.click(inputPart2);
   expect(screen.getByText("1")).not.toHaveRole("mark");
   expect(screen.getByText("2")).toHaveRole("mark");
@@ -190,10 +190,10 @@ async function inputCandidateHash() {
   // Override again
   overrideOnce("post", "/api/elections/import/validate", 200, electionValidateResponse(newElectionMockData));
 
-  const inputPart1 = screen.getByLabelText("Controle deel 1");
+  const inputPart1 = screen.getByRole("textbox", { name: "Controle deel 1" });
   await user.type(inputPart1, "zxcv");
 
-  const inputPart2 = screen.getByLabelText("Controle deel 2");
+  const inputPart2 = screen.getByRole("textbox", { name: "Controle deel 2" });
   await user.click(inputPart2);
   expect(screen.getByText("1")).not.toHaveRole("mark");
   expect(screen.getByText("2")).toHaveRole("mark");
@@ -273,9 +273,9 @@ describe("Election create pages", () => {
 
     // Wait for the page to be loaded and expect the election name to be present
     expect(await screen.findByText(newElectionMockData.name)).toBeInTheDocument();
-    const inputPart1 = screen.getByLabelText("Controle deel 1");
+    const inputPart1 = screen.getByRole("textbox", { name: "Controle deel 1" });
     await user.type(inputPart1, "zxcv");
-    const inputPart2 = screen.getByLabelText("Controle deel 2");
+    const inputPart2 = screen.getByRole("textbox", { name: "Controle deel 2" });
     await user.type(inputPart2, "123");
 
     await user.click(screen.getByRole("button", { name: "Volgende" }));

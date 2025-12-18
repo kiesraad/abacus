@@ -91,9 +91,9 @@ describe("ResolveDifferencesPage", () => {
     ]);
 
     expect(await screen.findByRole("heading", { level: 3, name: "Welke invoer moet bewaard blijven?" })).toBeVisible();
-    expect(await screen.findByLabelText(/De eerste invoer/)).toBeVisible();
-    expect(await screen.findByLabelText(/De tweede invoer/)).toBeVisible();
-    expect(await screen.findByLabelText(/Geen van beide/)).toBeVisible();
+    expect(await screen.findByRole("radio", { name: "De eerste invoer (Gebruiker01)" })).toBeVisible();
+    expect(await screen.findByRole("radio", { name: "De tweede invoer (Gebruiker02)" })).toBeVisible();
+    expect(await screen.findByRole("radio", { name: "Geen van beide: alles opnieuw invoeren" })).toBeVisible();
   });
 
   test("should show the selection in the table", async () => {
@@ -104,13 +104,13 @@ describe("ResolveDifferencesPage", () => {
     expect(firstEntry).not.toHaveClass(cls.keep!);
     expect(firstEntry).not.toHaveClass(cls.discard!);
 
-    await user.click(await screen.findByLabelText(/De eerste invoer/));
+    await user.click(await screen.findByRole("radio", { name: "De eerste invoer (Gebruiker01)" }));
     expect(firstEntry).toHaveClass(cls.keep!);
 
-    await user.click(await screen.findByLabelText(/De tweede invoer/));
+    await user.click(await screen.findByRole("radio", { name: "De tweede invoer (Gebruiker02)" }));
     expect(firstEntry).toHaveClass(cls.discard!);
 
-    await user.click(await screen.findByLabelText(/Geen van beide/));
+    await user.click(await screen.findByRole("radio", { name: "Geen van beide: alles opnieuw invoeren" }));
     expect(firstEntry).toHaveClass(cls.discard!);
   });
 
@@ -125,7 +125,7 @@ describe("ResolveDifferencesPage", () => {
     expect(resolve).not.toHaveBeenCalled();
 
     overrideResponseStatus("second_entry_not_started");
-    await user.click(await screen.findByLabelText(/De eerste invoer/));
+    await user.click(await screen.findByRole("radio", { name: "De eerste invoer (Gebruiker01)" }));
     await user.click(submit);
     expect(resolve).toHaveBeenCalledWith("keep_first_entry");
     expect(navigate).toHaveBeenCalledWith("/elections/1/status");
@@ -139,7 +139,7 @@ describe("ResolveDifferencesPage", () => {
     expect(getElectionStatus).toHaveBeenCalledTimes(1);
 
     overrideResponseStatus("second_entry_not_started");
-    await user.click(await screen.findByLabelText(/De tweede invoer/));
+    await user.click(await screen.findByRole("radio", { name: "De tweede invoer (Gebruiker02)" }));
     await user.click(await screen.findByRole("button", { name: "Opslaan" }));
 
     expect(getElectionStatus).toHaveBeenCalledTimes(2);
@@ -151,7 +151,7 @@ describe("ResolveDifferencesPage", () => {
 
     await renderPage();
     overrideResponseStatus("second_entry_not_started");
-    await user.click(await screen.findByLabelText("De eerste invoer (Gebruiker01)"));
+    await user.click(await screen.findByRole("radio", { name: "De eerste invoer (Gebruiker01)" }));
     await user.click(await screen.findByRole("button", { name: "Opslaan" }));
 
     expect(pushMessage).toHaveBeenCalledWith({
@@ -168,7 +168,7 @@ describe("ResolveDifferencesPage", () => {
 
     await renderPage();
     overrideResponseStatus("second_entry_not_started");
-    await user.click(await screen.findByLabelText("De tweede invoer (Gebruiker02)"));
+    await user.click(await screen.findByRole("radio", { name: "De tweede invoer (Gebruiker02)" }));
     await user.click(await screen.findByRole("button", { name: "Opslaan" }));
 
     expect(pushMessage).toHaveBeenCalledWith({
@@ -186,7 +186,7 @@ describe("ResolveDifferencesPage", () => {
     await renderPage();
 
     overrideResponseStatus("first_entry_not_started");
-    await user.click(await screen.findByLabelText(/Geen van beide/));
+    await user.click(await screen.findByRole("radio", { name: "Geen van beide: alles opnieuw invoeren" }));
     await user.click(await screen.findByRole("button", { name: "Opslaan" }));
 
     expect(pushMessage).toHaveBeenCalledWith({
@@ -202,7 +202,7 @@ describe("ResolveDifferencesPage", () => {
     await renderPage();
 
     overrideResponseStatus("first_entry_has_errors");
-    await user.click(await screen.findByLabelText(/De tweede invoer/));
+    await user.click(await screen.findByRole("radio", { name: "De tweede invoer (Gebruiker02)" }));
     await user.click(await screen.findByRole("button", { name: "Opslaan" }));
 
     expect(pushMessage).toHaveBeenCalledWith({

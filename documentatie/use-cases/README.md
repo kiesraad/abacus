@@ -2,102 +2,52 @@
 
 Scope van deze use cases zijn de Gemeenteraadsverkiezingen.
 
-Verwachting is dat de Eilandsraadverkiezingen makkelijk in dezelfde use cases opgenomen kunnen worden, omdat ze heel gelijkaardig zijn aan Gemeenteraadsverkiezingen.
-
-Voor alle andere verkiezingen wordt een eerste stap het bijhouden van een apart bestand met de belangrijkste verschillen met Gemeenteraadsverkiezingen. Tot dat bestand er is, zie ["Wie doet welke stembureaus"](../verkiezingsproces/wie-doet-welke-stembureaus.md) en ["Wie mag waarvoor stemmen"](../verkiezingsproces/wie-mag-waarvoor-stemmen.md).
-
-De use cases zijn niet specifiek over welke documenten (bijv. PVs) en bestanden (bijv. EMLs) gegenereerd of gebruikt worden. Hiervoor is een apart overzicht: ["Verloop verkiezingen"](../verkiezingsproces/verloop-verkiezingen.md).
 
 ## Werkwijze
 
-Deze beschrijving van use cases is gebaseerd op "Writing Effective Use Cases" van Alistair Cockburn (2000).
+Deze beschrijving van use cases is gebaseerd op *"Writing Effective Use Cases"* van Alistair Cockburn (2000). Zie ook zijn meer recente *"The Mini-Book on Use Cases: All you need but short!"* (2025) en *"Unifying User Stories, Use Cases, Story Maps: The power of verbs"* (2024).
 
 De belangrijkste ideeën uit dat boek zijn:
 
 - Use cases worden in tekst uitgewerkt, diagrammen (UML) zijn een aanvulling.
 - Use cases vormen een boomstructuur waarin elke stap in een use case uitgewerkt kan worden tot een onderliggende use case.
 - Use cases moeten niet uitgebreider/formeler/gedetailleerder zijn dan strikt nodig is.
+- Use cases worden iteratief en incrementeel uitgewerkt.
 
-Waarom deze werkwijze nuttig kan zijn:
 
-- De boomstructuur is makkelijk te lezen en te navigeren.
-- Het geeft een goed overzicht van stakeholders en hun belangen (daar zijn er veel van).
-- Het geeft een goed overzicht van varianten ('uitbreidingen') op het hoofdscenario (het 'main success scenario').
-- Het is een beschrijving van buitenaf wat de applicatie(s) moet(en) doen, niet hoe.
-- Het faciliteert feedback en reviews door stakeholders.
+## Onderdelen van een use case
 
-## Hoe use cases te schrijven
+### Titel
+De titel is de naam van de use case. Behalve van use cases op het hoogste niveau, is de titel van elke use cases ook een stap in een use case van een hoger niveau.
 
-### 1. Het grote plaatje
-
-- In/out of scope-lijst
-- Lijst van primaire actoren (menselijke en niet-menselijke)
-- Lijst van gebruikersdoelen (actor-doel-lijst)
-
-### 2. De uiterste use cases
-
-- Uiterste hoog-over use cases (één voor elke primaire actor)
-
-### 3. Verder uitwerken van use cases
-
-1. Kies één use case om verder uit te werken.
-2. Schrijf op welke stakeholders en belangen, precondities en garanties er zijn.
-3. Schrijf het hoofdscenario (meest eenvoudige succes-scenario) uit.
-4. Stel de lijst van uitbreidingen op, zowel scenario's waar de primaire actor zijn/haar doel bereikt, als waar dat niet lukt.
-5. Schrijf de stappen voor het behandelen van de uitbreidingen uit.
-6. Extraheer complexe flows tot onderliggende use cases.
-7. Herhaal het proces door weer bovenaan deze lijst te beginnen.
-
-## Use case template
-
-De meest minimale versie van een use case bestaat uit scope, niveau en beschrijving. De onderstaande lijst met minimale en optionele velden is dus niet definitief en kan aangepast worden. We kunnen ook velden toevoegen, zoals "verkiezingen" (voor welke verkiezingen geldt deze use case?) of input/output-bestanden (EMLs, PV's, CSV's, ...)
-
-Het huidige template is te vinden in [template-use-cases.md](./template-use-case.md).
-
-### Minimale velden
-
-__Niveau:__  
-
+### Niveau
+De mogelijke niveaus van een use case zijn:
 - Heel hoog-over (wolk) ☁️
 - Hoog-over (vlieger) 🪁
 - Gebruikersdoel (zee) 🌊
-  - 1 persoon, 1 sessie (ca. 2-20 minuten)
-  - Dit is het ideale niveau voor use cases.
+    - 1 persoon, 1 sessie (ca. 2-20 minuten)
 - Subfunctie (vis) 🐟
-  - Schrijf deze alleen wanneer dit echt nodig is.
+    - Schrijf deze alleen wanneer dit echt nodig is.
 - Te laag (schelp) 🐚
-  - Dit niveau is te granulair, gooi ze weg.
+    - Dit niveau is te granulair, gooi ze weg.
 
-__Trigger:__ trigger van de use case
+### Pre-condities (optioneel)
+Condities die waar moeten zijn voor de use case en die gecontroleerd worden (bijv. door de applicatie) vóór de start van de use case.
 
-__Hoofdscenario:__
+### Hoofdscenario
+Het hoofdscenario is het meest eenvoudige succes-scenario. Idealiter is het niet langer dan 5-9 stappen.
 
-- Dit is het meest eenvoudige succes-scenario.
-- Het scenario bevat 5-9 stappen.
-- Beschrijft de acties van actoren om het doel van de primaire actor te bereiken.
-- Er zijn drie soorten acties (stappen):
-  - Interactie tussen twee actoren om een doel te bereiken
-  - Een validatie om een stakeholder te beschermen
-  - Een *internal state change* namens een stakeholder
+De stappen in het hoofdscenario (en in uitbreidingen) worden als eenduidige acties beschreven. Dus actieve, geen passieve zinnen. En geen acties met meerdere mogelijke uitkomsten. (Dus niet "Er wordt gecontroleerd of ..." maar "De applicatie stelt vast dat...")
 
-__Uitbreidingen:__
+### Uitbreidingen
+De uitbreidingen zijn alternatieve successcenario's of foutscenario's (scenario's waarin de actor hun doel niet bereikt).
 
-- De nummering van een uitbreiding komt overeen met de stap in het hoofdscenario waarvan het een uitbreiding is.
+De notatie voor uitbreidingen is:
 
-__Open punten:__  
+- De situatie krijgt het nummer van de stap waar het een alternatief op is en een letter (bijv. "4a."). De beschrijving van de situatie eindigt met een dubbele punt.
+- Elke stap binnen een uitbreiding krijgt de aanduiding van de uitbreiding en een nummer (bijv. "4a1.", "4a2.", etc.). De beschrijving van de stap eindigt met een punt.
 
-- Schrijf hier open punten op die gerelateerd zijn aan deze use case.
-- Dit kopje is niet aanwezig als er geen open punten zijn.
+Binnen uitbreidingen kunnen ook weer uitbreidingen voorkomen. Als dat te onoverzichtelijk wordt, is het beter die in hun eigen use case uit te werken.
 
-### Mogelijke extra velden
-
-- Precondities
-- Stakeholders en belangen van stakeholders die door de use case beschermd worden
-- Minimale garanties
-- Succesgaranties
-- Primaire actor
-- Doel binnen de context
-- Prioriteit
-- Releases
-- Scope: organisatie, systeem of component; black-box of white-box
-- Verkiezingen: Tweede Kamer (TK), Europees Parlement (EP), Provinciale Staten (PS), Waterschappen (AB), Kiescolleges Eerste Kamer (KC), Eerste Kamer (EK), Eilandsraden (ER), Gemeenteraad/Herindeling (GR)
+### Open punten
+Schrijf hier open punten op gerelateerd aan de use case.

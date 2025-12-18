@@ -9,8 +9,8 @@ export class FirstLoginPgObj {
 
   constructor(protected readonly page: Page) {
     this.header = page.getByRole("heading", { level: 1, name: "Inloggen met account van beheerder" });
-    this.username = page.getByLabel("Gebruikersnaam");
-    this.password = page.getByLabel("Wachtwoord");
+    this.username = page.getByRole("textbox", { name: "Gebruikersnaam" });
+    this.password = page.getByRole("textbox", { name: "Wachtwoord" });
     this.loginBtn = page.getByRole("button", { name: "Inloggen" });
     this.alert = page.getByRole("alert");
   }

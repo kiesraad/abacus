@@ -13,8 +13,8 @@ export class InvestigationFindingsPgObj {
       name: "Bevindingen van het onderzoek door het gemeentelijk stembureau",
     });
     this.findingsField = page.getByRole("textbox", { name: "Bevindingen" });
-    this.correctedResultsYes = page.getByRole("checkbox", { name: "Ja" });
-    this.correctedResultsNo = page.getByRole("checkbox", { name: "Nee" });
+    this.correctedResultsYes = page.getByRole("radio", { name: "Ja" });
+    this.correctedResultsNo = page.getByRole("radio", { name: "Nee" });
     this.save = page.getByRole("button", { name: "Opslaan" });
   }
 

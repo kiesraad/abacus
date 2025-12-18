@@ -151,7 +151,7 @@ where
         };
 
         if user.fullname.is_some() && !user.needs_password_change() {
-            return Err(AuthenticationError::UserNotIncomplete.into());
+            return Err(AuthenticationError::UserAlreadySetup.into());
         }
 
         Ok(IncompleteUser(user.clone()))

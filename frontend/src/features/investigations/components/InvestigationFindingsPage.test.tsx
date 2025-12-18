@@ -69,13 +69,13 @@ describe("InvestigationFindingsPage", () => {
         name: "Bevindingen van het onderzoek door het gemeentelijk stembureau",
       }),
     ).toBeVisible();
-    expect(await screen.findByLabelText("Bevindingen")).toBeVisible();
+    expect(await screen.findByRole("textbox", { name: "Bevindingen" })).toBeVisible();
   });
 
   test("Displays an error message when submitting an empty form", async () => {
     await renderPage(3);
 
-    const findings = await screen.findByLabelText("Bevindingen");
+    const findings = await screen.findByRole("textbox", { name: "Bevindingen" });
     const submitButton = await screen.findByRole("button", { name: "Opslaan" });
 
     submitButton.click();
@@ -96,9 +96,9 @@ describe("InvestigationFindingsPage", () => {
 
     await renderPage(3);
 
-    const findings = await screen.findByLabelText("Bevindingen");
+    const findings = await screen.findByRole("textbox", { name: "Bevindingen" });
     const submitButton = await screen.findByRole("button", { name: "Opslaan" });
-    const noRadio = await screen.findByLabelText(/Nee/);
+    const noRadio = await screen.findByRole("radio", { name: /Nee/ });
 
     const user = userEvent.setup();
     await user.type(findings, "Bevindingen van het onderzoek");
@@ -128,7 +128,7 @@ describe("InvestigationFindingsPage", () => {
 
     await renderPage(2);
 
-    const findings = await screen.findByLabelText("Bevindingen");
+    const findings = await screen.findByRole("textbox", { name: "Bevindingen" });
     expect(findings).toHaveValue("Test findings 4");
 
     const user = userEvent.setup();
@@ -137,7 +137,7 @@ describe("InvestigationFindingsPage", () => {
 
     expect(findings).toHaveValue("New test findings 4");
 
-    const noRadio = await screen.findByLabelText(/Nee/);
+    const noRadio = await screen.findByRole("radio", { name: /Nee/ });
     noRadio.click();
 
     const submitButton = await screen.findByRole("button", { name: "Opslaan" });
@@ -258,7 +258,7 @@ describe("InvestigationFindingsPage", () => {
     );
 
     await renderPage(2);
-    const noRadio = await screen.findByLabelText(/Nee/);
+    const noRadio = await screen.findByRole("radio", { name: /Nee/ });
     noRadio.click();
 
     const submitButton = await screen.findByRole("button", { name: "Opslaan" });
@@ -311,7 +311,7 @@ describe("InvestigationFindingsPage", () => {
         name: "Bevindingen van het onderzoek door het gemeentelijk stembureau",
       }),
     ).toBeVisible();
-    expect(await screen.findByLabelText("Bevindingen")).toBeVisible();
+    expect(await screen.findByRole("textbox", { name: "Bevindingen" })).toBeVisible();
 
     const deleteButton = await screen.findByRole("button", { name: "Onderzoek verwijderen" });
     expect(deleteButton).toBeVisible();

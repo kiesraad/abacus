@@ -41,7 +41,7 @@ export class CheckAndSavePage extends DataEntryBasePage {
     this.acceptErrorsReminder = page
       .getByRole("alert")
       .filter({ hasText: "Je kan alleen verder als je dit met de coördinator hebt overlegd." });
-    this.acceptErrors = page.getByLabel("Ik heb de fouten besproken met de coördinator");
+    this.acceptErrors = page.getByRole("checkbox", { name: "Ik heb de fouten besproken met de coördinator" });
   }
 
   allSummaryListItems() {

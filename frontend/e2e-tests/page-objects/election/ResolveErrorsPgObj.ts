@@ -12,8 +12,8 @@ export class ResolveErrorsPgObj {
     this.alertDifferencesResolved = page.getByRole("alert").filter({ hasText: /Verschil opgelost/ });
     this.title = this.page.getByRole("heading", { name: "Alle fouten en waarschuwingen" });
     this.validationError = page.getByText(/Dit is een verplichte vraag/);
-    this.resumeFirstEntry = page.getByLabel(/Invoer bewaren/);
-    this.discardFirstEntry = page.getByLabel(/Stembureau opnieuw laten invoeren/);
+    this.resumeFirstEntry = page.getByRole("radio", { name: /Invoer bewaren/ });
+    this.discardFirstEntry = page.getByRole("radio", { name: /Stembureau opnieuw laten invoeren/ });
     this.save = page.getByRole("button", { name: "Opslaan" });
   }
 }

@@ -171,7 +171,7 @@ pub enum VoteCountingMethod {
     DSO,
 }
 
-pub type PGNumber = u32;
+crate::util::id!(PGNumber);
 
 /// Political group with its candidates
 #[derive(Serialize, Deserialize, ToSchema, Clone, Debug, PartialEq, Eq, Hash)]
@@ -183,7 +183,7 @@ pub struct PoliticalGroup {
     pub candidates: Vec<Candidate>,
 }
 
-pub type CandidateNumber = u32;
+crate::util::id!(CandidateNumber);
 
 /// Candidate
 #[derive(Serialize, Deserialize, ToSchema, Clone, Debug, PartialEq, Eq, Hash)]
@@ -235,11 +235,11 @@ pub(crate) mod tests {
             .iter()
             .enumerate()
             .map(|(i, &candidates)| PoliticalGroup {
-                number: u32::try_from(i + 1).unwrap(),
+                number: PGNumber::try_from(i + 1).unwrap(),
                 name: format!("Political group {}", i + 1),
                 candidates: (0..candidates)
                     .map(|j| Candidate {
-                        number: j + 1,
+                        number: CandidateNumber::from(j + 1),
                         initials: "A.B.".to_string(),
                         first_name: Some(format!("Candidate {}", j + 1)),
                         last_name_prefix: Some("van".to_string()),

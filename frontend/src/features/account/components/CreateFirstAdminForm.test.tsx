@@ -17,8 +17,8 @@ describe("CreateFirstAdminForm", () => {
     render(<CreateFirstAdminForm next={next} />);
 
     const user = userEvent.setup();
-    await user.type(screen.getByLabelText("Jouw naam (roepnaam + achternaam)"), "First Last");
-    await user.type(screen.getByLabelText("Kies een gebruikersnaam"), "firstlast");
+    await user.type(screen.getByRole("textbox", { name: "Jouw naam (roepnaam + achternaam)" }), "First Last");
+    await user.type(screen.getByRole("textbox", { name: "Kies een gebruikersnaam" }), "firstlast");
     await user.type(screen.getByLabelText("Kies een wachtwoord"), "password*password");
     await user.type(screen.getByLabelText("Herhaal wachtwoord"), "password*password");
 
@@ -42,11 +42,11 @@ describe("CreateFirstAdminForm", () => {
     const submitButton = screen.getByRole("button", { name: "Opslaan" });
     await user.click(submitButton);
 
-    const fullnameInput = screen.getByLabelText("Jouw naam (roepnaam + achternaam)");
+    const fullnameInput = screen.getByRole("textbox", { name: "Jouw naam (roepnaam + achternaam)" });
     expect(fullnameInput).toBeInvalid();
     expect(fullnameInput).toHaveAccessibleErrorMessage("Dit veld mag niet leeg zijn");
 
-    const usernameInput = screen.getByLabelText("Kies een gebruikersnaam");
+    const usernameInput = screen.getByRole("textbox", { name: "Kies een gebruikersnaam" });
     expect(usernameInput).toBeInvalid();
     expect(usernameInput).toHaveAccessibleErrorMessage("Dit veld mag niet leeg zijn");
 
@@ -69,8 +69,8 @@ describe("CreateFirstAdminForm", () => {
     const passwordRepeatInput = screen.getByLabelText("Herhaal wachtwoord");
 
     const user = userEvent.setup();
-    await user.type(screen.getByLabelText("Jouw naam (roepnaam + achternaam)"), "First Last");
-    await user.type(screen.getByLabelText("Kies een gebruikersnaam"), "firstlast");
+    await user.type(screen.getByRole("textbox", { name: "Jouw naam (roepnaam + achternaam)" }), "First Last");
+    await user.type(screen.getByRole("textbox", { name: "Kies een gebruikersnaam" }), "firstlast");
     await user.type(passwordInput, "password");
     await user.type(passwordRepeatInput, "password");
     const submitButton = screen.getByRole("button", { name: "Opslaan" });
@@ -100,8 +100,8 @@ describe("CreateFirstAdminForm", () => {
     });
 
     const user = userEvent.setup();
-    await user.type(screen.getByLabelText("Jouw naam (roepnaam + achternaam)"), "First Last");
-    await user.type(screen.getByLabelText("Kies een gebruikersnaam"), "firstlast");
+    await user.type(screen.getByRole("textbox", { name: "Jouw naam (roepnaam + achternaam)" }), "First Last");
+    await user.type(screen.getByRole("textbox", { name: "Kies een gebruikersnaam" }), "firstlast");
     await user.type(screen.getByLabelText("Kies een wachtwoord"), "password*password");
     await user.type(screen.getByLabelText("Herhaal wachtwoord"), "password*password");
     const submitButton = screen.getByRole("button", { name: "Opslaan" });

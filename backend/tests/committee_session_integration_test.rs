@@ -236,23 +236,17 @@ async fn test_committee_session_delete_not_ok_wrong_status(pool: SqlitePool) {
     );
 }
 
-#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
+#[test(sqlx::test(fixtures(
+    path = "../fixtures",
+    scripts("election_6_no_polling_stations", "users")
+)))]
 async fn test_committee_session_delete_current_committee_session_but_its_the_first(
     pool: SqlitePool,
 ) {
     let addr = serve_api(pool).await;
     let coordinator_cookie = coordinator_login(&addr).await;
-    let election_id = ElectionId::from(2);
-    let committee_session_id = 2;
-
-    change_status_committee_session(
-        &addr,
-        &coordinator_cookie,
-        election_id,
-        committee_session_id,
-        CommitteeSessionStatus::Created,
-    )
-    .await;
+    let election_id = ElectionId::from(6);
+    let committee_session_id = 7;
 
     let committee_session =
         get_election_committee_session(&addr, &coordinator_cookie, election_id).await;

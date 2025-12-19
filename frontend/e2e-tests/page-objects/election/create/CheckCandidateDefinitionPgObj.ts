@@ -1,24 +1,12 @@
-import { expect, type Locator, type Page } from "@playwright/test";
+import { type Locator, type Page } from "@playwright/test";
 
-export class CheckCandidateDefinitionPgObj {
+import { CheckDefinitionBasePgObj } from "./CheckDefinitionBasePgObj";
+
+export class CheckCandidateDefinitionPgObj extends CheckDefinitionBasePgObj {
   readonly header: Locator;
-  readonly hashInput1: Locator;
-  readonly hashInput2: Locator;
-  readonly next: Locator;
-  readonly error: Locator;
 
   constructor(protected readonly page: Page) {
+    super(page);
     this.header = page.getByRole("heading", { level: 2, name: "Controleer kandidatenlijsten" });
-    this.hashInput1 = page.getByLabel("Controle deel 1");
-    this.hashInput2 = page.getByLabel("Controle deel 2");
-    this.next = page.getByRole("button", { name: "Volgende" });
-    this.error = page.getByRole("strong").filter({ hasText: "Controle digitale vingerafdruk niet gelukt" });
-  }
-
-  async inputHash(hashInput1: string, hashInput2: string) {
-    await expect(this.hashInput1).toBeFocused();
-    await this.hashInput1.fill(hashInput1);
-    await this.hashInput2.fill(hashInput2);
-    await this.next.click();
   }
 }

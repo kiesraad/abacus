@@ -43,9 +43,9 @@ describe("UserCreateDetailsPage", () => {
 
     expect(await screen.findByRole("heading", { level: 1, name: "Coördinator toevoegen" })).toBeInTheDocument();
 
-    expect(await screen.findByLabelText("Gebruikersnaam")).toHaveValue("");
-    expect(await screen.findByLabelText("Volledige naam")).toHaveValue("");
-    expect(await screen.findByLabelText("Tijdelijk wachtwoord")).toHaveValue("");
+    expect(await screen.findByRole("textbox", { name: "Gebruikersnaam" })).toHaveValue("");
+    expect(await screen.findByRole("textbox", { name: "Volledige naam" })).toHaveValue("");
+    expect(await screen.findByRole("textbox", { name: "Tijdelijk wachtwoord" })).toHaveValue("");
   });
 
   test("Navigate to user list after submitting", async () => {
@@ -57,9 +57,9 @@ describe("UserCreateDetailsPage", () => {
     renderPage({ role: "coordinator", type: "fullname" });
 
     const user = userEvent.setup();
-    await user.type(await screen.findByLabelText("Gebruikersnaam"), "NieuweGebruiker");
-    await user.type(await screen.findByLabelText("Volledige naam"), "Nieuwe Gebruiker");
-    await user.type(await screen.findByLabelText("Tijdelijk wachtwoord"), "Wachtwoord12");
+    await user.type(await screen.findByRole("textbox", { name: "Gebruikersnaam" }), "NieuweGebruiker");
+    await user.type(await screen.findByRole("textbox", { name: "Volledige naam" }), "Nieuwe Gebruiker");
+    await user.type(await screen.findByRole("textbox", { name: "Tijdelijk wachtwoord" }), "Wachtwoord12");
     await user.click(await screen.findByRole("button", { name: "Opslaan" }));
 
     const message = "NieuweGebruiker is toegevoegd met de rol Coördinator";

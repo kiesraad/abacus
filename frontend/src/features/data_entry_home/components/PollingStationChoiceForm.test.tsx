@@ -567,7 +567,10 @@ describe("Test PollingStationChoiceForm", () => {
     test("Show message when searching", async () => {
       await renderPollingStationChoiceForm();
       const user = userEvent.setup();
-      await user.type(await screen.findByLabelText("Voer het nummer in:"), String(testPollingStation.number));
+      await user.type(
+        await screen.findByRole("textbox", { name: "Voer het nummer in:" }),
+        String(testPollingStation.number),
+      );
 
       const pollingStationFeedback = await screen.findByTestId("pollingStationSelectorFeedback");
       await waitFor(() => {

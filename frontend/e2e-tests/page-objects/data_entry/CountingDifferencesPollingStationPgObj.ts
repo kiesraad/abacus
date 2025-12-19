@@ -30,15 +30,19 @@ export class CountingDifferencesPollingStationPage extends DataEntryBasePage {
       hasText:
         "Was er in de telresultaten van het stembureau een onverklaard verschil tussen het totaal aantal getelde stembiljetten en het aantal toegelaten kiezers?",
     });
-    this.differenceBallotsPerListYes = this.differenceBallotsPerList.getByLabel("Ja");
-    this.differenceBallotsPerListNo = this.differenceBallotsPerList.getByLabel("Nee");
+    this.differenceBallotsPerListYes = this.differenceBallotsPerList.getByRole("checkbox", { name: "Ja" });
+    this.differenceBallotsPerListNo = this.differenceBallotsPerList.getByRole("checkbox", { name: "Nee" });
 
     this.unexplainedDifferenceBallotsVoters = this.fieldset.getByRole("group").filter({
       hasText:
         "Is er een verschil tussen het totaal aantal getelde stembiljetten per lijst zoals eerder vastgesteld door het stembureau en zoals door u geteld op het gemeentelijk stembureau?",
     });
-    this.unexplainedDifferenceBallotsVotersYes = this.unexplainedDifferenceBallotsVoters.getByLabel("Ja");
-    this.unexplainedDifferenceBallotsVotersNo = this.unexplainedDifferenceBallotsVoters.getByLabel("Nee");
+    this.unexplainedDifferenceBallotsVotersYes = this.unexplainedDifferenceBallotsVoters.getByRole("checkbox", {
+      name: "Ja",
+    });
+    this.unexplainedDifferenceBallotsVotersNo = this.unexplainedDifferenceBallotsVoters.getByRole("checkbox", {
+      name: "Nee",
+    });
 
     this.next = page.getByRole("button", { name: "Volgende" });
   }

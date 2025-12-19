@@ -7,8 +7,8 @@ export class LoginPgObj {
   readonly alert: Locator;
 
   constructor(protected readonly page: Page) {
-    this.username = page.getByLabel("Gebruikersnaam");
-    this.password = page.getByLabel("Wachtwoord");
+    this.username = page.getByRole("textbox", { name: "Gebruikersnaam" });
+    this.password = page.getByRole("textbox", { name: "Wachtwoord" });
     this.loginBtn = page.getByRole("button", { name: "Inloggen" });
     this.alert = page.getByRole("alert");
   }

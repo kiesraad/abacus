@@ -43,9 +43,9 @@ export class VotersAndVotesPage extends DataEntryBasePage {
     this.invalidVotesCount = page.getByRole("textbox", { name: "G Ongeldige stemmen" });
     this.totalVotesCastCount = page.getByRole("textbox", { name: "H Totaal uitgebrachte stemmen" });
 
-    this.acceptErrorsAndWarnings = page.getByLabel(
-      "Ik heb mijn invoer gecontroleerd met het papier en correct overgenomen.",
-    );
+    this.acceptErrorsAndWarnings = page.getByRole("checkbox", {
+      name: "Ik heb mijn invoer gecontroleerd met het papier en correct overgenomen.",
+    });
     this.acceptErrorsAndWarningsReminder = page
       .getByRole("alert")
       .filter({ hasText: "Je kan alleen verder als je het papieren proces-verbaal hebt gecontroleerd." });

@@ -14,6 +14,7 @@ pub enum AuthenticationError {
     SessionKeyNotFound,
     Unauthenticated,
     Unauthorized,
+    UserAlreadySetup,
     UsernameAlreadyExists,
     UserNotFound,
 }

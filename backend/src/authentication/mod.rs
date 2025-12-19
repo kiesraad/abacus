@@ -344,7 +344,13 @@ mod tests {
 
     #[test(sqlx::test(fixtures("../../fixtures/users.sql")))]
     async fn test_update_password(pool: SqlitePool) {
-        let app = create_app(pool);
+        let app = create_app(pool.clone());
+        let mut conn = pool.acquire().await.unwrap();
+
+        // Set admin as incomplete user
+        user::set_temporary_password(&mut conn, 1, "Admin1Password01")
+            .await
+            .unwrap();
 
         let cookie = login_as_admin(app.clone()).await;
 
@@ -400,8 +406,52 @@ mod tests {
     }
 
     #[test(sqlx::test(fixtures("../../fixtures/users.sql")))]
-    async fn test_update_password_fail(pool: SqlitePool) {
-        let app = create_app(pool);
+    async fn test_update_password_fail_same_password(pool: SqlitePool) {
+        let app = create_app(pool.clone());
+        let mut conn = pool.acquire().await.unwrap();
+
+        // Set admin as incomplete user
+        user::set_temporary_password(&mut conn, 1, "Admin1Password01")
+            .await
+            .unwrap();
+
+        let cookie = login_as_admin(app.clone()).await;
+
+        // Call the account update endpoint with incorrect user
+        let response = app
+            .clone()
+            .oneshot(
+                Request::builder()
+                    .method(Method::PUT)
+                    .uri("/api/account")
+                    .header(CONTENT_TYPE, "application/json")
+                    .header(USER_AGENT, TEST_USER_AGENT)
+                    .header(COOKIE, &cookie)
+                    .body(Body::from(
+                        serde_json::to_vec(&AccountUpdateRequest {
+                            username: "admin1".to_string(),
+                            password: "Admin1Password01".to_string(),
+                            fullname: None,
+                        })
+                        .unwrap(),
+                    ))
+                    .unwrap(),
+            )
+            .await
+            .unwrap();
+
+        assert_eq!(response.status(), StatusCode::BAD_REQUEST);
+    }
+
+    #[test(sqlx::test(fixtures("../../fixtures/users.sql")))]
+    async fn test_update_password_fail_wrong_username(pool: SqlitePool) {
+        let app = create_app(pool.clone());
+        let mut conn = pool.acquire().await.unwrap();
+
+        // Set admin as incomplete user
+        user::set_temporary_password(&mut conn, 1, "Admin1Password01")
+            .await
+            .unwrap();
 
         let cookie = login_as_admin(app.clone()).await;
 
@@ -429,6 +479,38 @@ mod tests {
             .unwrap();
 
         assert_eq!(response.status(), StatusCode::UNAUTHORIZED);
+    }
+
+    #[test(sqlx::test(fixtures("../../fixtures/users.sql")))]
+    async fn test_update_password_fail_complete_user(pool: SqlitePool) {
+        let app = create_app(pool);
+
+        let cookie = login_as_admin(app.clone()).await;
+
+        // Call the account update endpoint with incorrect user
+        let response = app
+            .clone()
+            .oneshot(
+                Request::builder()
+                    .method(Method::PUT)
+                    .uri("/api/account")
+                    .header(CONTENT_TYPE, "application/json")
+                    .header(USER_AGENT, TEST_USER_AGENT)
+                    .header(COOKIE, &cookie)
+                    .body(Body::from(
+                        serde_json::to_vec(&AccountUpdateRequest {
+                            username: "wrong_user".to_string(),
+                            password: "new_password".to_string(),
+                            fullname: Some("Wrong User".to_string()),
+                        })
+                        .unwrap(),
+                    ))
+                    .unwrap(),
+            )
+            .await
+            .unwrap();
+
+        assert_eq!(response.status(), StatusCode::CONFLICT);
     }
 
     #[test(sqlx::test(fixtures("../../fixtures/users.sql")))]

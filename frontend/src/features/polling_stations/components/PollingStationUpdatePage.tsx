@@ -7,6 +7,7 @@ import { Alert } from "@/components/ui/Alert/Alert";
 import { Button } from "@/components/ui/Button/Button";
 import { Loader } from "@/components/ui/Loader/Loader";
 import { useElection } from "@/hooks/election/useElection";
+import { useElectionStatus } from "@/hooks/election/useElectionStatus";
 import { useMessages } from "@/hooks/messages/useMessages";
 import { useNumericParam } from "@/hooks/useNumericParam";
 import { useUserRole } from "@/hooks/user/useUserRole";
@@ -22,35 +23,46 @@ import { PollingStationForm } from "./PollingStationForm";
 export function PollingStationUpdatePage() {
   const { isAdministrator, isCoordinator } = useUserRole();
   const pollingStationId = useNumericParam("pollingStationId");
-  const { election, currentCommitteeSession } = useElection();
+  const { election, currentCommitteeSession, investigation, refetch } = useElection(pollingStationId);
   const navigate = useNavigate();
   const { pushMessage } = useMessages();
 
   const { requestState } = usePollingStationGet(election.id, pollingStationId);
+  const electionStatuses = useElectionStatus();
+  const status = electionStatuses.statuses.find((status) => status.polling_station_id === pollingStationId);
   const [showDeleteModal, setShowDeleteModal] = React.useState(false);
 
   function toggleShowDeleteModal() {
     setShowDeleteModal(!showDeleteModal);
   }
 
-  const [error, setError] = React.useState<[string, string] | undefined>(undefined);
+  const [error, setError] = React.useState<string | undefined>();
 
   const parentUrl = `/elections/${election.id}/polling-stations`;
-  const isPreExistingPollingStation =
-    requestState.status === "success" && requestState.data.id_prev_session !== undefined;
 
   function closeError() {
     setError(undefined);
   }
 
   function handleSaved(pollingStation: PollingStation) {
-    pushMessage({
-      title: t("polling_station.message.polling_station_updated", {
-        number: pollingStation.number,
-        name: pollingStation.name,
-      }),
-    });
-
+    if (currentCommitteeSession.status === "data_entry_finished") {
+      pushMessage({
+        type: "warning",
+        title: t("generate_new_results"),
+        text: `${t("polling_station.message.polling_station_updated", {
+          number: pollingStation.number,
+          name: pollingStation.name,
+        })}. ${t("documents_are_invalidated")}`,
+      });
+    } else {
+      pushMessage({
+        title: t("polling_station.message.polling_station_updated", {
+          number: pollingStation.number,
+          name: pollingStation.name,
+        }),
+      });
+    }
+    void refetch();
     void navigate(parentUrl);
   }
 
@@ -60,19 +72,30 @@ export function PollingStationUpdatePage() {
 
   function handleDeleted(pollingStation: PollingStation) {
     toggleShowDeleteModal();
-    pushMessage({
-      title: t("polling_station.message.polling_station_deleted", {
-        number: pollingStation.number,
-        name: pollingStation.name,
-      }),
-    });
-
+    if (currentCommitteeSession.status === "data_entry_finished") {
+      pushMessage({
+        type: "warning",
+        title: t("generate_new_results"),
+        text: `${t("polling_station.message.polling_station_deleted", {
+          number: pollingStation.number,
+          name: pollingStation.name,
+        })}. ${t("documents_are_invalidated")}`,
+      });
+    } else {
+      pushMessage({
+        title: t("polling_station.message.polling_station_deleted", {
+          number: pollingStation.number,
+          name: pollingStation.name,
+        }),
+      });
+    }
+    void refetch();
     void navigate(parentUrl, { replace: true });
   }
 
   function handleDeleteError() {
     setShowDeleteModal(false);
-    setError([t("polling_station.message.delete_error_title"), t("polling_station.message.delete_error")]);
+    setError(t("polling_station.message.delete_error_title"));
   }
 
   React.useEffect(() => {
@@ -116,11 +139,11 @@ export function PollingStationUpdatePage() {
                 />
 
                 <div className="mt-md-lg">
-                  {isPreExistingPollingStation ? (
-                    <>
+                  {requestState.data.id_prev_session !== undefined ? (
+                    <section className="sm">
                       <strong>{t("polling_station.delete_not_possible.title")}</strong>
-                      <p>{t("polling_station.delete_not_possible.message")}</p>
-                    </>
+                      <p>{t("polling_station.delete_not_possible.pre_existing_polling_station")}</p>
+                    </section>
                   ) : (
                     <>
                       <Button variant="tertiary-destructive" leftIcon={<IconTrash />} onClick={toggleShowDeleteModal}>
@@ -130,6 +153,8 @@ export function PollingStationUpdatePage() {
                         <PollingStationDeleteModal
                           electionId={election.id}
                           pollingStation={requestState.data}
+                          existingInvestigation={!!investigation}
+                          existingDataEntry={status !== undefined && status.status !== "first_entry_not_started"}
                           onCancel={toggleShowDeleteModal}
                           onError={handleDeleteError}
                           onDeleted={handleDeleted}

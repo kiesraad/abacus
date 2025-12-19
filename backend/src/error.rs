@@ -55,7 +55,6 @@ pub enum ErrorReference {
     OwnAccountCannotBeDeleted,
     PasswordRejection,
     PdfGenerationError,
-    PollingStationCannotBeDeleted,
     PollingStationRepeated,
     PollingStationValidationErrors,
     RequestPayloadTooLarge,
@@ -278,6 +277,10 @@ impl IntoResponse for APIError {
                     AuthenticationError::UserNotFound => (
                         StatusCode::UNAUTHORIZED,
                         to_error("User not found", ErrorReference::UserNotFound, false),
+                    ),
+                    AuthenticationError::UserAlreadySetup => (
+                        StatusCode::CONFLICT,
+                        to_error("Invalid user state", ErrorReference::Forbidden, false),
                     ),
                     AuthenticationError::InvalidPassword => (
                         StatusCode::UNAUTHORIZED,

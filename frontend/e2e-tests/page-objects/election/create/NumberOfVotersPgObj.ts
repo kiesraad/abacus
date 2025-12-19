@@ -11,7 +11,7 @@ export class NumberOfVotersPgObj {
     this.header = page.getByRole("heading", { level: 2, name: "Hoeveel kiesgerechtigden telt de gemeente?" });
     this.hint = page.getByText("Ingelezen uit bestand met stembureaus");
     this.error = page.getByText("Vul het aantal kiesgerechtigden in");
-    this.input = page.getByLabel("Aantal kiesgerechtigden");
+    this.input = page.getByRole("textbox", { name: "Aantal kiesgerechtigden" });
     this.next = page.getByRole("button", { name: "Volgende" });
   }
 }

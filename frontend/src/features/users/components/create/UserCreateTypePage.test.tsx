@@ -37,15 +37,15 @@ describe("UserCreateTypePage", () => {
 
     expect(await screen.findByRole("heading", { level: 1, name: "Invoerder toevoegen" })).toBeInTheDocument();
 
-    expect(await screen.findByLabelText(/Op naam/)).toBeChecked();
-    expect(await screen.findByLabelText(/Anonieme gebruikersnaam/)).not.toBeChecked();
+    expect(await screen.findByRole("radio", { name: /Op naam/ })).toBeChecked();
+    expect(await screen.findByRole("radio", { name: /Anonieme gebruikersnaam/ })).not.toBeChecked();
   });
 
   test("Shows form previously selected", async () => {
     renderPage({ role: "typist", type: "anonymous" });
 
-    expect(await screen.findByLabelText(/Op naam/)).not.toBeChecked();
-    expect(await screen.findByLabelText(/Anonieme gebruikersnaam/)).toBeChecked();
+    expect(await screen.findByRole("radio", { name: /Op naam/ })).not.toBeChecked();
+    expect(await screen.findByRole("radio", { name: /Anonieme gebruikersnaam/ })).toBeChecked();
   });
 
   test("Continue after selecting fullname", async () => {
@@ -54,7 +54,7 @@ describe("UserCreateTypePage", () => {
 
     const user = userEvent.setup();
 
-    const fullname = await screen.findByLabelText(/Op naam/);
+    const fullname = await screen.findByRole("radio", { name: /Op naam/ });
     await user.click(fullname);
 
     const submit = await screen.findByRole("button", { name: "Verder" });
@@ -70,7 +70,7 @@ describe("UserCreateTypePage", () => {
 
     const user = userEvent.setup();
 
-    const anonymous = await screen.findByLabelText(/Anonieme gebruikersnaam/);
+    const anonymous = await screen.findByRole("radio", { name: /Anonieme gebruikersnaam/ });
     await user.click(anonymous);
 
     const submit = await screen.findByRole("button", { name: "Verder" });

@@ -6,7 +6,7 @@ export class UserUpdatePgObj {
   readonly delete: Locator;
 
   constructor(protected readonly page: Page) {
-    this.fullname = page.getByLabel("Volledige naam");
+    this.fullname = page.getByRole("textbox", { name: "Volledige naam" });
     this.save = page.getByRole("button", { name: "Opslaan" });
     this.delete = page.getByRole("button", { name: "Gebruiker verwijderen" });
   }

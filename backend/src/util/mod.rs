@@ -12,6 +12,8 @@ macro_rules! id {
             utoipa::ToSchema,
             PartialEq,
             Eq,
+            PartialOrd,
+            Ord,
         )]
         #[sqlx(transparent)]
         pub struct $identifier(u32);
@@ -33,6 +35,14 @@ macro_rules! id {
         impl std::fmt::Display for $identifier {
             fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
                 write!(f, "{}", self.0)
+            }
+        }
+
+        impl TryFrom<usize> for $identifier {
+            type Error = std::num::TryFromIntError;
+
+            fn try_from(value: usize) -> Result<Self, Self::Error> {
+                Ok(Self::from(u32::try_from(value)?))
             }
         }
     };

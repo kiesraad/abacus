@@ -37,8 +37,8 @@ describe("InitialiseApplicationPage", () => {
     });
 
     const user = userEvent.setup();
-    await user.type(screen.getByLabelText("Jouw naam (roepnaam + achternaam)"), "First Last");
-    await user.type(screen.getByLabelText("Kies een gebruikersnaam"), "firstlast");
+    await user.type(screen.getByRole("textbox", { name: "Jouw naam (roepnaam + achternaam)" }), "First Last");
+    await user.type(screen.getByRole("textbox", { name: "Kies een gebruikersnaam" }), "firstlast");
     await user.type(screen.getByLabelText("Kies een wachtwoord"), "password*password");
     await user.type(screen.getByLabelText("Herhaal wachtwoord"), "password*password");
 
@@ -56,8 +56,8 @@ describe("InitialiseApplicationPage", () => {
       expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent("Account voor beheerder aanmaken");
     });
 
-    await user.type(screen.getByLabelText("Jouw naam (roepnaam + achternaam)"), "First Last");
-    await user.type(screen.getByLabelText("Kies een gebruikersnaam"), "firstlast");
+    await user.type(screen.getByRole("textbox", { name: "Jouw naam (roepnaam + achternaam)" }), "First Last");
+    await user.type(screen.getByRole("textbox", { name: "Kies een gebruikersnaam" }), "firstlast");
     await user.type(screen.getByLabelText("Kies een wachtwoord"), "password*password");
     await user.type(screen.getByLabelText("Herhaal wachtwoord"), "password*password");
 
@@ -68,7 +68,7 @@ describe("InitialiseApplicationPage", () => {
       expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent("Inloggen met account van beheerder");
     });
 
-    await user.type(screen.getByLabelText("Gebruikersnaam"), "username");
+    await user.type(screen.getByRole("textbox", { name: "Gebruikersnaam" }), "username");
     await user.type(screen.getByLabelText("Wachtwoord"), "password*password");
 
     const loginButton = screen.getByRole("button", { name: "Inloggen" });

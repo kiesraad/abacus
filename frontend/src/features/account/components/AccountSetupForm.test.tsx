@@ -35,7 +35,7 @@ describe("AccountSetupForm", () => {
     const { onSaved } = await renderForm();
 
     const user = userEvent.setup();
-    await user.type(screen.getByLabelText("Jouw naam (roepnaam + achternaam)"), "First Last");
+    await user.type(screen.getByRole("textbox", { name: "Jouw naam (roepnaam + achternaam)" }), "First Last");
     await user.type(screen.getByLabelText("Kies nieuw wachtwoord"), "password*password");
     await user.type(screen.getByLabelText("Herhaal wachtwoord"), "password*password");
 
@@ -83,7 +83,7 @@ describe("AccountSetupForm", () => {
     const submitButton = screen.getByRole("button", { name: "Opslaan" });
     await user.click(submitButton);
 
-    const fullname = screen.getByLabelText("Jouw naam (roepnaam + achternaam)");
+    const fullname = screen.getByRole("textbox", { name: "Jouw naam (roepnaam + achternaam)" });
     expect(fullname).toBeInvalid();
     expect(fullname).toHaveAccessibleErrorMessage("Dit veld mag niet leeg zijn");
 
@@ -99,7 +99,7 @@ describe("AccountSetupForm", () => {
     const { onSaved } = await renderForm();
 
     const user = userEvent.setup();
-    await user.type(screen.getByLabelText("Jouw naam (roepnaam + achternaam)"), "First Last");
+    await user.type(screen.getByRole("textbox", { name: "Jouw naam (roepnaam + achternaam)" }), "First Last");
     await user.type(screen.getByLabelText("Kies nieuw wachtwoord"), "password*password");
 
     const passwordRepeat = screen.getByLabelText("Herhaal wachtwoord");
@@ -118,7 +118,7 @@ describe("AccountSetupForm", () => {
   test("Fullname prefilled", async () => {
     await renderForm({ fullname: "Roep Achternaam" });
 
-    const fullname = screen.getByLabelText("Jouw naam (roepnaam + achternaam)");
+    const fullname = screen.getByRole("textbox", { name: "Jouw naam (roepnaam + achternaam)" });
     expect(fullname).toHaveValue("Roep Achternaam");
 
     const user = userEvent.setup();

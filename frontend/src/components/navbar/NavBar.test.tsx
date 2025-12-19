@@ -21,7 +21,7 @@ async function renderNavBar(location: { pathname: string }, userRole: Role) {
   );
 
   // wait for the NavBar to be rendered
-  expect(await screen.findByLabelText("primary-navigation")).toBeInTheDocument();
+  expect(await screen.findByRole("navigation", { name: "primary-navigation" })).toBeInTheDocument();
 }
 
 function renderNavBarLinks(location: { pathname: string }) {

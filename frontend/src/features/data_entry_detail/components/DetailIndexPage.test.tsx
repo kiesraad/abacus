@@ -82,8 +82,10 @@ describe("DetailIndexPage", () => {
     expect(
       await screen.findByRole("heading", { level: 3, name: "Wat wil je doen met de invoer in Abacus?" }),
     ).toBeVisible();
-    expect(await screen.findByLabelText(/Invoer bewaren en correcties laten invoeren door Gebruiker01/)).toBeVisible();
-    expect(await screen.findByLabelText(/Stembureau opnieuw laten invoeren/)).toBeVisible();
+    expect(
+      await screen.findByRole("radio", { name: /Invoer bewaren en correcties laten invoeren door Gebruiker01/ }),
+    ).toBeVisible();
+    expect(await screen.findByRole("radio", { name: /Stembureau opnieuw laten invoeren/ })).toBeVisible();
   });
 
   test("should only submit after making a selection", async () => {
@@ -99,7 +101,9 @@ describe("DetailIndexPage", () => {
     await user.click(submit);
     expect(resolve).not.toHaveBeenCalled();
 
-    await user.click(await screen.findByLabelText(/Invoer bewaren/));
+    await user.click(
+      await screen.findByRole("radio", { name: /Invoer bewaren en correcties laten invoeren door Gebruiker01/ }),
+    );
     await user.click(submit);
 
     expect(resolve).toHaveBeenCalledWith("resume_first_entry");
@@ -120,7 +124,7 @@ describe("DetailIndexPage", () => {
 
     expect(getElectionStatus).toHaveBeenCalledTimes(1);
 
-    await user.click(await screen.findByLabelText(/Stembureau opnieuw laten invoeren/));
+    await user.click(await screen.findByRole("radio", { name: /Stembureau opnieuw laten invoeren/ }));
     await user.click(await screen.findByRole("button", { name: "Opslaan" }));
 
     expect(getElectionStatus).toHaveBeenCalledTimes(2);

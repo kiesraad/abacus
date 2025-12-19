@@ -681,7 +681,7 @@ describe("Test VotersAndVotesForm", () => {
       expect(acceptErrorsAndWarningsCheckbox).toBeVisible();
       expect(acceptErrorsAndWarningsCheckbox).not.toBeInvalid();
 
-      const input = await screen.findByLabelText("H Totaal uitgebrachte stemmen");
+      const input = await screen.findByRole("textbox", { name: "H Totaal uitgebrachte stemmen" });
       await user.type(input, "1");
 
       expect(acceptErrorsAndWarningsCheckbox).not.toBeVisible();
@@ -699,7 +699,7 @@ describe("Test VotersAndVotesForm", () => {
       });
       expect(acceptErrorsAndWarningsError).toBeVisible();
 
-      const input = await screen.findByLabelText("H Totaal uitgebrachte stemmen");
+      const input = await screen.findByRole("textbox", { name: "H Totaal uitgebrachte stemmen" });
       await user.type(input, "1");
 
       expect(acceptErrorsAndWarningsCheckbox).not.toBeVisible();

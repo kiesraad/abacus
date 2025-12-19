@@ -28,7 +28,7 @@ describe("LoginForm", () => {
 
     const user = userEvent.setup();
 
-    const username = screen.getByLabelText("Gebruikersnaam");
+    const username = screen.getByRole("textbox", { name: "Gebruikersnaam" });
     await user.type(username, "user");
     const password = screen.getByLabelText("Wachtwoord");
     await user.type(password, "password");
@@ -50,7 +50,7 @@ describe("LoginForm", () => {
 
     const user = userEvent.setup();
 
-    const username = screen.getByLabelText("Gebruikersnaam");
+    const username = screen.getByRole("textbox", { name: "Gebruikersnaam" });
     await user.type(username, "user");
     const password = screen.getByLabelText("Wachtwoord");
     await user.type(password, "wrong");
@@ -76,7 +76,7 @@ describe("LoginForm", () => {
 
     const user = userEvent.setup();
 
-    await user.type(await screen.findByLabelText("Gebruikersnaam"), "Invoerder01");
+    await user.type(await screen.findByRole("textbox", { name: "Gebruikersnaam" }), "Invoerder01");
     await user.type(await screen.findByLabelText("Wachtwoord"), "Wachtwoord");
     await user.click(await screen.findByRole("button", { name: "Inloggen" }));
 
@@ -95,7 +95,7 @@ describe("LoginForm", () => {
 
     const user = userEvent.setup();
 
-    await user.type(await screen.findByLabelText("Gebruikersnaam"), "Invoerder01");
+    await user.type(await screen.findByRole("textbox", { name: "Gebruikersnaam" }), "Invoerder01");
     await user.type(await screen.findByLabelText("Wachtwoord"), "Wachtwoord");
     await user.click(await screen.findByRole("button", { name: "Inloggen" }));
 
@@ -115,7 +115,7 @@ describe("LoginForm", () => {
 
     const user = userEvent.setup();
 
-    await user.type(await screen.findByLabelText("Gebruikersnaam"), "Invoerder01");
+    await user.type(await screen.findByRole("textbox", { name: "Gebruikersnaam" }), "Invoerder01");
     await user.type(await screen.findByLabelText("Wachtwoord"), "Wachtwoord");
     await user.click(await screen.findByRole("button", { name: "Inloggen" }));
 

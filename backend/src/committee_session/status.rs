@@ -152,7 +152,7 @@ impl CommitteeSessionStatus {
             | CommitteeSessionStatus::DataEntryPaused
             | CommitteeSessionStatus::DataEntryFinished => {
                 let polling_stations =
-                    crate::polling_station::repository::list(conn, committee_session.id).await?;
+                    crate::polling_station::list(conn, committee_session.id).await?;
                 if polling_stations.is_empty() {
                     return Ok(CommitteeSessionStatus::Created);
                 } else if committee_session.is_next_session() {
@@ -176,7 +176,7 @@ impl CommitteeSessionStatus {
         match self {
             CommitteeSessionStatus::Created => {
                 let polling_stations =
-                    crate::polling_station::repository::list(conn, committee_session.id).await?;
+                    crate::polling_station::list(conn, committee_session.id).await?;
                 if polling_stations.is_empty() {
                     Err(CommitteeSessionError::InvalidStatusTransition)
                 } else if committee_session.is_next_session() {

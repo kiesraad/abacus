@@ -3,7 +3,7 @@ use serde::{Deserialize, Serialize};
 use crate::{
     election::ElectionWithPoliticalGroups,
     pdf_gen::models::{PdfFileModel, PdfModel, ToPdfFileModel},
-    polling_station::structs::PollingStation,
+    polling_station::PollingStation,
 };
 
 #[derive(Serialize, Deserialize)]

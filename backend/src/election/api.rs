@@ -123,7 +123,7 @@ pub async fn election_details(
         .expect("There is always one committee session")
         .clone();
     let polling_stations =
-        crate::polling_station::repository::list(&mut conn, current_committee_session.id).await?;
+        crate::polling_station::list(&mut conn, current_committee_session.id).await?;
     let investigations = crate::investigation::list_investigations_for_committee_session(
         &mut conn,
         current_committee_session.id,

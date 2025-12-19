@@ -190,7 +190,7 @@ pub async fn create(
     .await?;
 
     if let Some(current_committee_session_id) = current_committee_session_id {
-        crate::polling_station::repository::duplicate_for_committee_session(
+        crate::polling_station::duplicate_for_committee_session(
             &mut tx,
             current_committee_session_id,
             next_committee_session.id,

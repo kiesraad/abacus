@@ -28,7 +28,7 @@ use crate::{
         VotesTables, VotesTablesWithPreviousVotes, generate_pdf,
         models::{ModelNa14_2Input, ModelNa31_2Input, ModelP2aInput, PdfFileModel, ToPdfFileModel},
     },
-    polling_station::structs::PollingStation,
+    polling_station::PollingStation,
     report::DEFAULT_DATE_TIME_FORMAT,
     summary::ElectionSummary,
     zip::{ZipResponse, ZipResponseError, slugify_filename, zip_single_file},
@@ -66,8 +66,7 @@ impl ResultsInput {
             crate::committee_session::repository::get(conn, committee_session_id).await?;
         let election =
             crate::election::repository::get(conn, committee_session.election_id).await?;
-        let polling_stations =
-            crate::polling_station::repository::list(conn, committee_session.id).await?;
+        let polling_stations = crate::polling_station::list(conn, committee_session.id).await?;
         let results = crate::data_entry::repository::list_results_for_committee_session(
             conn,
             committee_session.id,

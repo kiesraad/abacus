@@ -66,7 +66,7 @@ async fn election_download_n_10_2(
         )
         .await?;
     let polling_stations =
-        crate::polling_station::repository::list(&mut conn, current_committee_session.id).await?;
+        crate::polling_station::list(&mut conn, current_committee_session.id).await?;
     drop(conn);
 
     let zip_filename = format!(
@@ -149,7 +149,7 @@ async fn election_download_na_31_2_bijlage1(
         )
         .await?;
     let polling_stations =
-        crate::polling_station::repository::list(&mut conn, current_committee_session.id).await?;
+        crate::polling_station::list(&mut conn, current_committee_session.id).await?;
     drop(conn);
 
     let zip_filename = format!(

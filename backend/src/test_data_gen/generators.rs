@@ -234,7 +234,7 @@ async fn generate_polling_stations(
         };
         remaining_voters -= ps_num_voters;
 
-        let ps = crate::polling_station::repository::create(
+        let ps = crate::polling_station::create(
             conn,
             election.id,
             PollingStationRequest {

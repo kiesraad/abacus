@@ -53,7 +53,7 @@ async fn validate_and_get_committee_session(
     conn: &mut SqliteConnection,
     polling_station_id: u32,
 ) -> Result<CommitteeSession, APIError> {
-    let polling_station = crate::polling_station::repository::get(conn, polling_station_id).await?;
+    let polling_station = crate::polling_station::get(conn, polling_station_id).await?;
 
     // Get latest committee session for the election
     let committee_session = crate::committee_session::repository::get_election_committee_session(
@@ -198,8 +198,7 @@ async fn polling_station_investigation_conclude(
 
     let committee_session = validate_and_get_committee_session(&mut tx, polling_station_id).await?;
 
-    let polling_station =
-        crate::polling_station::repository::get(&mut tx, polling_station_id).await?;
+    let polling_station = crate::polling_station::get(&mut tx, polling_station_id).await?;
     if polling_station.id_prev_session.is_none() && !polling_station_investigation.corrected_results
     {
         return Err(APIError::Conflict(
@@ -270,8 +269,7 @@ async fn polling_station_investigation_update(
 
     let committee_session = validate_and_get_committee_session(&mut tx, polling_station_id).await?;
 
-    let polling_station =
-        crate::polling_station::repository::get(&mut tx, polling_station_id).await?;
+    let polling_station = crate::polling_station::get(&mut tx, polling_station_id).await?;
     if polling_station.id_prev_session.is_none()
         && polling_station_investigation.corrected_results != Some(true)
     {
@@ -290,8 +288,7 @@ async fn polling_station_investigation_update(
             || result_exists(&mut tx, polling_station_id).await?)
     {
         if polling_station_investigation.accept_data_entry_deletion == Some(true) {
-            let polling_station =
-                crate::polling_station::repository::get(&mut tx, polling_station_id).await?;
+            let polling_station = crate::polling_station::get(&mut tx, polling_station_id).await?;
             delete_data_entry_and_result_for_polling_station(
                 &mut tx,
                 &audit_service,
@@ -364,8 +361,7 @@ async fn polling_station_investigation_delete(
     let committee_session = validate_and_get_committee_session(&mut tx, polling_station_id).await?;
 
     get_polling_station_investigation(&mut tx, polling_station_id).await?;
-    let polling_station =
-        crate::polling_station::repository::get(&mut tx, polling_station_id).await?;
+    let polling_station = crate::polling_station::get(&mut tx, polling_station_id).await?;
 
     // Delete investigation
     delete_investigation_for_polling_station(
@@ -437,7 +433,7 @@ async fn polling_station_investigation_download_corrigendum_pdf(
     let investigation: PollingStationInvestigation =
         get_polling_station_investigation(&mut conn, polling_station_id).await?;
     let polling_station: PollingStation =
-        crate::polling_station::repository::get(&mut conn, polling_station_id).await?;
+        crate::polling_station::get(&mut conn, polling_station_id).await?;
     let election: ElectionWithPoliticalGroups =
         crate::election::repository::get(&mut conn, polling_station.election_id).await?;
 

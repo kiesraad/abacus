@@ -323,7 +323,7 @@ export const getElectionMockData = (
       ...election,
     },
     polling_stations: pollingStations,
-    investigations,
+    investigations: updatedCommitteeSession.number > 1 ? investigations : [],
   };
 };
 

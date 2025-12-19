@@ -9,6 +9,10 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+dialog {
+  color: var(--text-color-body);
+}
+
 h1,
 h2,
 h3,
@@ -110,6 +114,12 @@ a {
 
   &:active {
     color: var(--link-active);
+  }
+}
+
+.color-visited-link-default {
+  &:visited {
+    color: var(--link-default);
   }
 }
 

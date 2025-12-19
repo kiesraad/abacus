@@ -2,23 +2,21 @@
 
 use std::net::SocketAddr;
 
-use abacus::{
-    ErrorResponse, committee_session::status::CommitteeSessionStatus, election::ElectionId,
+use crate::{
+    shared::{
+        admin_login, change_status_committee_session, claim_data_entry, coordinator_login,
+        create_investigation, create_polling_station, create_result, example_data_entry,
+        get_election_committee_session, get_election_details, get_statuses, save_data_entry,
+        typist_login,
+    },
+    utils::serve_api,
 };
+use abacus::{committee_session::status::CommitteeSessionStatus, election::ElectionId};
 use axum::http::StatusCode;
 use hyper::http::HeaderValue;
 use reqwest::Response;
 use sqlx::SqlitePool;
 use test_log::test;
-
-use crate::{
-    shared::{
-        admin_login, change_status_committee_session, claim_data_entry, coordinator_login,
-        create_polling_station, create_result, example_data_entry, get_election_committee_session,
-        save_data_entry, typist_login,
-    },
-    utils::serve_api,
-};
 
 pub mod shared;
 pub mod utils;
@@ -905,40 +903,92 @@ async fn test_delete_for_committee_session_with_in_progress_status_as_administra
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
-async fn test_delete_with_data_entry_fails(pool: SqlitePool) {
+async fn test_delete_with_data_entry_works(pool: SqlitePool) {
     let addr = serve_api(pool).await;
+    let election_id = ElectionId::from(2);
+    let polling_station_id = 1;
+
     let typist_cookie = typist_login(&addr).await;
-    claim_data_entry(&addr, &typist_cookie, 2, 1).await;
-    save_data_entry(&addr, &typist_cookie, 2, 1, example_data_entry(None)).await;
+    claim_data_entry(&addr, &typist_cookie, polling_station_id, 1).await;
+    save_data_entry(
+        &addr,
+        &typist_cookie,
+        polling_station_id,
+        1,
+        example_data_entry(None),
+    )
+    .await;
 
     let coordinator_cookie = coordinator_login(&addr).await;
+    let statuses = get_statuses(&addr, &coordinator_cookie, election_id).await;
+    assert_eq!(statuses.len(), 2);
 
-    let response = delete_polling_station(&addr, &coordinator_cookie, ElectionId::from(2), 2).await;
+    let response =
+        delete_polling_station(&addr, &coordinator_cookie, election_id, polling_station_id).await;
 
     assert_eq!(
         response.status(),
-        StatusCode::CONFLICT,
+        StatusCode::NO_CONTENT,
         "Unexpected response status"
     );
-    let body: ErrorResponse = response.json().await.unwrap();
-    assert_eq!(body.error, "Polling station cannot be deleted.");
+
+    // Data entry is deleted
+    let statuses = get_statuses(&addr, &coordinator_cookie, election_id).await;
+    assert_eq!(statuses.len(), 1);
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
-async fn test_delete_with_results_fails(pool: SqlitePool) {
+async fn test_delete_with_result_works(pool: SqlitePool) {
     let addr = serve_api(pool).await;
-    let coordinator_cookie = coordinator_login(&addr).await;
-    create_result(&addr, 1, ElectionId::from(2)).await;
+    let election_id = ElectionId::from(2);
+    let polling_station_id = 1;
 
-    let response = delete_polling_station(&addr, &coordinator_cookie, ElectionId::from(2), 1).await;
+    let coordinator_cookie = coordinator_login(&addr).await;
+    create_result(&addr, polling_station_id, election_id).await;
+    let statuses = get_statuses(&addr, &coordinator_cookie, election_id).await;
+    assert_eq!(statuses.len(), 2);
+
+    let response =
+        delete_polling_station(&addr, &coordinator_cookie, election_id, polling_station_id).await;
 
     assert_eq!(
         response.status(),
-        StatusCode::CONFLICT,
+        StatusCode::NO_CONTENT,
         "Unexpected response status"
     );
-    let body: ErrorResponse = response.json().await.unwrap();
-    assert_eq!(body.error, "Polling station cannot be deleted.");
+
+    // Data entry result is deleted
+    let statuses = get_statuses(&addr, &coordinator_cookie, election_id).await;
+    assert_eq!(statuses.len(), 1);
+}
+
+#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_5_with_results", "users"))))]
+async fn test_delete_with_investigation_works(pool: SqlitePool) {
+    let addr = serve_api(pool).await;
+    let election_id = ElectionId::from(5);
+    let polling_station_id = 9;
+
+    assert_eq!(
+        create_investigation(&addr, polling_station_id)
+            .await
+            .status(),
+        StatusCode::CREATED
+    );
+    let coordinator_cookie = coordinator_login(&addr).await;
+    let election_details = get_election_details(&addr, &coordinator_cookie, election_id).await;
+    assert_eq!(election_details.investigations.len(), 2);
+
+    let response =
+        delete_polling_station(&addr, &coordinator_cookie, election_id, polling_station_id).await;
+
+    assert_eq!(
+        response.status(),
+        StatusCode::NO_CONTENT,
+        "Unexpected response status"
+    );
+
+    let election_details = get_election_details(&addr, &coordinator_cookie, election_id).await;
+    assert_eq!(election_details.investigations.len(), 1);
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_5_with_results", "users"))))]
@@ -1117,8 +1167,11 @@ async fn test_import_correct_file(pool: SqlitePool) {
     );
 }
 
-async fn check_finished_to_in_progress_on<F, Fut>(addr: &SocketAddr, action: F)
-where
+async fn check_finished_to_in_progress_on<F, Fut>(
+    addr: &SocketAddr,
+    action: F,
+    expected_status: StatusCode,
+) where
     F: FnOnce() -> Fut,
     Fut: Future<Output = Response>,
 {
@@ -1144,7 +1197,7 @@ where
     );
 
     let status = action().await.status();
-    assert!(status == StatusCode::OK || status == StatusCode::CREATED);
+    assert_eq!(status, expected_status, "Unexpected response status");
 
     let coordinator_cookie = coordinator_login(addr).await;
     let committee_session =
@@ -1158,15 +1211,19 @@ where
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
 async fn test_finished_to_in_progress_on_create(pool: SqlitePool) {
     let addr = serve_api(pool).await;
-    check_finished_to_in_progress_on(&addr, || async {
-        create_polling_station(
-            &addr,
-            &coordinator_login(&addr).await,
-            ElectionId::from(2),
-            35,
-        )
-        .await
-    })
+    check_finished_to_in_progress_on(
+        &addr,
+        || async {
+            create_polling_station(
+                &addr,
+                &coordinator_login(&addr).await,
+                ElectionId::from(2),
+                35,
+            )
+            .await
+        },
+        StatusCode::CREATED,
+    )
     .await;
 }
 
@@ -1174,22 +1231,50 @@ async fn test_finished_to_in_progress_on_create(pool: SqlitePool) {
 async fn test_finished_to_in_progress_on_update(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 
-    check_finished_to_in_progress_on(&addr, || async {
-        update_polling_station(
-            &addr,
-            &coordinator_login(&addr).await,
-            ElectionId::from(2),
-            1,
-            serde_json::json!({
-                "name": "Testverandering",
-                "number_of_voters": 2000,
-                "polling_station_type": "Special",
-                "address": "Teststraat 2a",
-                "postal_code": "1234 QY",
-                "locality": "Testdorp",
-            }),
-        )
-        .await
-    })
+    check_finished_to_in_progress_on(
+        &addr,
+        || async {
+            update_polling_station(
+                &addr,
+                &coordinator_login(&addr).await,
+                ElectionId::from(2),
+                1,
+                serde_json::json!({
+                    "name": "Testverandering",
+                    "number_of_voters": 2000,
+                    "polling_station_type": "Special",
+                    "address": "Teststraat 2a",
+                    "postal_code": "1234 QY",
+                    "locality": "Testdorp",
+                }),
+            )
+            .await
+        },
+        StatusCode::OK,
+    )
     .await;
+}
+
+#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
+async fn test_finished_to_in_progress_on_delete(pool: SqlitePool) {
+    let addr = serve_api(pool).await;
+    let election_id = ElectionId::from(2);
+
+    check_finished_to_in_progress_on(
+        &addr,
+        || async {
+            delete_polling_station(&addr, &coordinator_login(&addr).await, election_id, 2).await
+        },
+        StatusCode::NO_CONTENT,
+    )
+    .await;
+
+    // Delete last polling station
+    let response =
+        delete_polling_station(&addr, &coordinator_login(&addr).await, election_id, 1).await;
+    assert_eq!(response.status(), StatusCode::NO_CONTENT);
+
+    let committee_session =
+        get_election_committee_session(&addr, &coordinator_login(&addr).await, election_id).await;
+    assert_eq!(committee_session.status, CommitteeSessionStatus::Created);
 }

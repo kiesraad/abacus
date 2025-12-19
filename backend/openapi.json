@@ -6308,7 +6308,6 @@
           "OwnAccountCannotBeDeleted",
           "PasswordRejection",
           "PdfGenerationError",
-          "PollingStationCannotBeDeleted",
           "PollingStationRepeated",
           "PollingStationValidationErrors",
           "RequestPayloadTooLarge",

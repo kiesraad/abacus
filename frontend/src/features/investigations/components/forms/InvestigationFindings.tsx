@@ -30,7 +30,7 @@ const ACCEPTED = "accepted";
 export function InvestigationFindings({ pollingStationId }: InvestigationFindingsProps) {
   const navigate = useNavigate();
   const { hasMessages } = useMessages();
-  const { election, investigation, pollingStation, refetch } = useElection(pollingStationId);
+  const { currentCommitteeSession, election, investigation, pollingStation, refetch } = useElection(pollingStationId);
   const { pushMessage } = useMessages();
   const updatePath = `/api/polling_stations/${pollingStationId}/investigation`;
   const concludePath = `/api/polling_stations/${pollingStationId}/investigation/conclude`;
@@ -113,12 +113,23 @@ export function InvestigationFindings({ pollingStationId }: InvestigationFinding
     if (isSuccess(response)) {
       // Only push a message if there are no messages yet (e.g. from creating this investigation)
       if (!hasMessages()) {
-        pushMessage({
-          title: t("investigations.message.investigation_updated", {
-            number: pollingStation.number,
-            name: pollingStation.name,
-          }),
-        });
+        if (currentCommitteeSession.status === "data_entry_finished") {
+          pushMessage({
+            type: "warning",
+            title: t("generate_new_results"),
+            text: `${t("investigations.message.investigation_updated", {
+              number: pollingStation.number,
+              name: pollingStation.name,
+            })}. ${t("documents_are_invalidated")}`,
+          });
+        } else {
+          pushMessage({
+            title: t("investigations.message.investigation_updated", {
+              number: pollingStation.number,
+              name: pollingStation.name,
+            }),
+          });
+        }
       }
 
       await refetch();

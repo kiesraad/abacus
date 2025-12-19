@@ -88,7 +88,7 @@ describe("PollingStationUpdatePage", () => {
     saveButton.click();
 
     await waitFor(() => {
-      expect(pushMessage).toHaveBeenCalledWith({ title: "Wijzigingen stembureau 34 (Testplek) opgeslagen" });
+      expect(pushMessage).toHaveBeenCalledWith({ title: "Stembureau 34 (Testplek) aangepast" });
       expect(navigate).toHaveBeenCalledExactlyOnceWith("/elections/1/polling-stations");
     });
   });
@@ -106,7 +106,7 @@ describe("PollingStationUpdatePage", () => {
       expect(pushMessage).toHaveBeenCalledWith({
         type: "warning",
         title: "Maak een nieuw proces-verbaal voor deze zitting",
-        text: "Wijzigingen stembureau 34 (Testplek) opgeslagen. De eerder gemaakte documenten van deze zitting zijn daardoor niet meer geldig. Maak een nieuw proces-verbaal door de invoerfase opnieuw af te ronden.",
+        text: "Stembureau 34 (Testplek) aangepast. De eerder gemaakte documenten van deze zitting zijn daardoor niet meer geldig. Maak een nieuw proces-verbaal door de invoerfase opnieuw af te ronden.",
       });
       expect(navigate).toHaveBeenCalledExactlyOnceWith("/elections/1/polling-stations");
     });

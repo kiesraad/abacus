@@ -12,7 +12,7 @@ import { InvestigationDelete } from "./InvestigationDelete";
 
 export function InvestigationReasonPage() {
   const pollingStationId = useNumericParam("pollingStationId");
-  const { election, investigation, pollingStation } = useElection(pollingStationId);
+  const { currentCommitteeSession, election, investigation, pollingStation, refetch } = useElection(pollingStationId);
   const navigate = useNavigate();
   const { pushMessage } = useMessages();
 
@@ -21,13 +21,24 @@ export function InvestigationReasonPage() {
   }
 
   function handleDeleted(pollingStation: PollingStation) {
-    pushMessage({
-      title: t("investigations.message.investigation_deleted", {
-        number: pollingStation.number,
-        name: pollingStation.name,
-      }),
-    });
-
+    if (currentCommitteeSession.status === "data_entry_finished") {
+      pushMessage({
+        type: "warning",
+        title: t("generate_new_results"),
+        text: `${t("investigations.message.investigation_deleted", {
+          number: pollingStation.number,
+          name: pollingStation.name,
+        })}. ${t("documents_are_invalidated")}`,
+      });
+    } else {
+      pushMessage({
+        title: t("investigations.message.investigation_deleted", {
+          number: pollingStation.number,
+          name: pollingStation.name,
+        }),
+      });
+    }
+    void refetch();
     void navigate(`/elections/${election.id}/investigations`, { replace: true });
   }
 

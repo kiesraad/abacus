@@ -8,7 +8,7 @@ use abacus::{
         VotersCounts, VotesCounts,
         status::{ClientState, DataEntryStatusName},
     },
-    election::{ElectionDetailsResponse, ElectionId, PGNumber},
+    election::{ElectionId, PGNumber},
 };
 use axum::http::StatusCode;
 use reqwest::Response;

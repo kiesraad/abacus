@@ -2,13 +2,13 @@ use super::structs::{
     PollingStationInvestigation, PollingStationInvestigationConcludeRequest,
     PollingStationInvestigationCreateRequest,
 };
-use sqlx::{Error, SqliteConnection, query_as};
+use sqlx::{SqliteConnection, query_as};
 
 pub async fn create_polling_station_investigation(
     conn: &mut SqliteConnection,
     polling_station_id: u32,
     polling_station_investigation: PollingStationInvestigationCreateRequest,
-) -> Result<PollingStationInvestigation, Error> {
+) -> Result<PollingStationInvestigation, sqlx::Error> {
     query_as!(
         PollingStationInvestigation,
         r#"
@@ -33,7 +33,7 @@ pub async fn conclude_polling_station_investigation(
     conn: &mut SqliteConnection,
     polling_station_id: u32,
     polling_station_investigation: PollingStationInvestigationConcludeRequest,
-) -> Result<PollingStationInvestigation, Error> {
+) -> Result<PollingStationInvestigation, sqlx::Error> {
     query_as!(
         PollingStationInvestigation,
         r#"
@@ -61,7 +61,7 @@ pub async fn update_polling_station_investigation(
     conn: &mut SqliteConnection,
     polling_station_id: u32,
     polling_station_investigation: super::structs::PollingStationInvestigationUpdateRequest,
-) -> Result<PollingStationInvestigation, Error> {
+) -> Result<PollingStationInvestigation, sqlx::Error> {
     query_as!(
         PollingStationInvestigation,
         r#"
@@ -90,7 +90,7 @@ pub async fn update_polling_station_investigation(
 pub async fn get_polling_station_investigation(
     conn: &mut SqliteConnection,
     polling_station_id: u32,
-) -> Result<PollingStationInvestigation, Error> {
+) -> Result<PollingStationInvestigation, sqlx::Error> {
     query_as("SELECT * FROM polling_station_investigations WHERE polling_station_id = ?")
         .bind(polling_station_id)
         .fetch_one(conn)
@@ -100,7 +100,7 @@ pub async fn get_polling_station_investigation(
 pub async fn delete_polling_station_investigation(
     conn: &mut SqliteConnection,
     polling_station_id: u32,
-) -> Result<Option<PollingStationInvestigation>, Error> {
+) -> Result<Option<PollingStationInvestigation>, sqlx::Error> {
     query_as!(
         PollingStationInvestigation,
         r#"
@@ -121,7 +121,7 @@ pub async fn delete_polling_station_investigation(
 pub async fn list_investigations_for_committee_session(
     conn: &mut SqliteConnection,
     committee_session_id: u32,
-) -> Result<Vec<PollingStationInvestigation>, Error> {
+) -> Result<Vec<PollingStationInvestigation>, sqlx::Error> {
     query_as!(
         PollingStationInvestigation,
         r#"

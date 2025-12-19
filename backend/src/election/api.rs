@@ -26,7 +26,7 @@ use crate::{
     investigation::PollingStationInvestigation,
     polling_station::{
         PollingStation, PollingStationRequest, PollingStationsRequest,
-        create_imported_polling_stations,
+        create_imported_polling_stations, list_polling_stations,
     },
 };
 
@@ -122,8 +122,7 @@ pub async fn election_details(
         .first()
         .expect("There is always one committee session")
         .clone();
-    let polling_stations =
-        crate::polling_station::list(&mut conn, current_committee_session.id).await?;
+    let polling_stations = list_polling_stations(&mut conn, current_committee_session.id).await?;
     let investigations = crate::investigation::list_investigations_for_committee_session(
         &mut conn,
         current_committee_session.id,

@@ -7,7 +7,10 @@ use sqlx::{Connection, SqliteConnection, SqlitePool};
 use utoipa_axum::{router::OpenApiRouter, routes};
 
 use super::{
-    repository::{create, create_many, delete, get_for_election, list, update},
+    repository::{
+        create_many_polling_stations, create_polling_station, delete_polling_station,
+        get_polling_station_for_election, list_polling_stations, update_polling_station,
+    },
     structs::{
         PollingStation, PollingStationFileRequest, PollingStationListResponse,
         PollingStationRequest, PollingStationRequestListResponse, PollingStationsRequest,
@@ -67,7 +70,7 @@ async fn polling_station_list(
     let committee_session = get_election_committee_session(&mut conn, election_id).await?;
 
     Ok(PollingStationListResponse {
-        polling_stations: list(&mut conn, committee_session.id).await?,
+        polling_stations: list_polling_stations(&mut conn, committee_session.id).await?,
     })
 }
 
@@ -121,7 +124,7 @@ async fn polling_station_create(
 
     validate_user_is_allowed_to_perform_action(user, &committee_session).await?;
 
-    let polling_station = create(&mut tx, election_id, new_polling_station).await?;
+    let polling_station = create_polling_station(&mut tx, election_id, new_polling_station).await?;
 
     audit_service
         .log(
@@ -180,7 +183,7 @@ async fn polling_station_get(
     let mut conn = pool.acquire().await?;
     Ok((
         StatusCode::OK,
-        get_for_election(&mut conn, election_id, polling_station_id).await?,
+        get_polling_station_for_election(&mut conn, election_id, polling_station_id).await?,
     ))
 }
 
@@ -217,7 +220,7 @@ async fn polling_station_update(
 
     validate_user_is_allowed_to_perform_action(user, &committee_session).await?;
 
-    let polling_station = update(
+    let polling_station = update_polling_station(
         &mut tx,
         election_id,
         polling_station_id,
@@ -280,7 +283,8 @@ async fn polling_station_delete(
 
     validate_user_is_allowed_to_perform_action(user, &committee_session).await?;
 
-    let polling_station = get_for_election(&mut tx, election_id, polling_station_id).await?;
+    let polling_station =
+        get_polling_station_for_election(&mut tx, election_id, polling_station_id).await?;
 
     delete_data_entry_and_result_for_polling_station(
         &mut tx,
@@ -298,7 +302,7 @@ async fn polling_station_delete(
     )
     .await?;
 
-    delete(&mut tx, election_id, polling_station_id).await?;
+    delete_polling_station(&mut tx, election_id, polling_station_id).await?;
 
     audit_service
         .log(
@@ -308,7 +312,10 @@ async fn polling_station_delete(
         )
         .await?;
 
-    if list(&mut tx, committee_session.id).await?.is_empty() {
+    if list_polling_stations(&mut tx, committee_session.id)
+        .await?
+        .is_empty()
+    {
         change_committee_session_status(
             &mut tx,
             committee_session.id,
@@ -367,7 +374,8 @@ pub async fn create_imported_polling_stations(
     let file_hash = EmlHash::from(polling_stations_request.polling_stations.as_bytes()).chunks;
 
     // Create new polling stations
-    let polling_stations = create_many(&mut tx, election_id, polling_stations).await?;
+    let polling_stations =
+        create_many_polling_stations(&mut tx, election_id, polling_stations).await?;
 
     // Create audit event
     audit_service
@@ -432,7 +440,10 @@ async fn polling_station_import(
     crate::election::repository::get(&mut tx, election_id).await?;
     let committee_session = get_election_committee_session(&mut tx, election_id).await?;
 
-    if !list(&mut tx, committee_session.id).await?.is_empty() {
+    if !list_polling_stations(&mut tx, committee_session.id)
+        .await?
+        .is_empty()
+    {
         return Err(AuthenticationError::Forbidden.into());
     }
 
@@ -456,6 +467,10 @@ mod tests {
     use sqlx::{SqlitePool, query};
     use test_log::test;
 
+    use super::{
+        PollingStationRequest, create_many_polling_stations, create_polling_station,
+        update_polling_station,
+    };
     use crate::election::ElectionId;
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2", "election_3"))))]
@@ -501,7 +516,7 @@ VALUES
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_7_four_sessions"))))]
     async fn test_create_number_required(pool: SqlitePool) {
         let mut conn = pool.acquire().await.unwrap();
-        let mut data = crate::polling_station::structs::PollingStationRequest {
+        let mut data = PollingStationRequest {
             name: "Name".to_string(),
             number: None,
             number_of_voters: None,
@@ -510,24 +525,18 @@ VALUES
             postal_code: "1234 AB".to_string(),
             locality: "Locality".to_string(),
         };
-        let result = crate::polling_station::repository::create(
-            &mut conn,
-            ElectionId::from(7),
-            data.clone(),
-        )
-        .await;
+        let result = create_polling_station(&mut conn, ElectionId::from(7), data.clone()).await;
         assert!(result.is_err());
 
         data.number = Some(123);
-        let result =
-            crate::polling_station::repository::create(&mut conn, ElectionId::from(7), data).await;
+        let result = create_polling_station(&mut conn, ElectionId::from(7), data).await;
         assert!(result.is_ok());
     }
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_7_four_sessions"))))]
     async fn test_create_many_number_required(pool: SqlitePool) {
         let mut conn = pool.acquire().await.unwrap();
-        let mut data = crate::polling_station::structs::PollingStationRequest {
+        let mut data = PollingStationRequest {
             name: "Name".to_string(),
             number: None,
             number_of_voters: None,
@@ -536,28 +545,19 @@ VALUES
             postal_code: "1234 AB".to_string(),
             locality: "Locality".to_string(),
         };
-        let result = crate::polling_station::repository::create_many(
-            &mut conn,
-            ElectionId::from(7),
-            vec![data.clone()],
-        )
-        .await;
+        let result =
+            create_many_polling_stations(&mut conn, ElectionId::from(7), vec![data.clone()]).await;
         assert!(result.is_err());
 
         data.number = Some(123);
-        let result = crate::polling_station::repository::create_many(
-            &mut conn,
-            ElectionId::from(7),
-            vec![data],
-        )
-        .await;
+        let result = create_many_polling_stations(&mut conn, ElectionId::from(7), vec![data]).await;
         assert!(result.is_ok());
     }
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_7_four_sessions"))))]
     async fn test_update_number_allowed_when_no_prev_session(pool: SqlitePool) {
         let mut conn = pool.acquire().await.unwrap();
-        let mut data = crate::polling_station::structs::PollingStationRequest {
+        let mut data = PollingStationRequest {
             name: "Name".to_string(),
             number: Some(123),
             number_of_voters: None,
@@ -568,17 +568,13 @@ VALUES
         };
 
         // Add a new polling station
-        let polling_station = crate::polling_station::repository::create(
-            &mut conn,
-            ElectionId::from(7),
-            data.clone(),
-        )
-        .await
-        .unwrap();
+        let polling_station = create_polling_station(&mut conn, ElectionId::from(7), data.clone())
+            .await
+            .unwrap();
 
         // Update number
         data.number = Some(456);
-        let result = crate::polling_station::repository::update(
+        let result = update_polling_station(
             &mut conn,
             ElectionId::from(7),
             polling_station.id,
@@ -592,7 +588,7 @@ VALUES
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_7_four_sessions"))))]
     async fn test_update_number_restricted_when_prev_session(pool: SqlitePool) {
         let mut conn = pool.acquire().await.unwrap();
-        let mut data = crate::polling_station::structs::PollingStationRequest {
+        let mut data = PollingStationRequest {
             name: "Name".to_string(),
             number: None,
             number_of_voters: None,
@@ -604,20 +600,13 @@ VALUES
 
         // Update a polling station that has an id_prev_session reference
         // ... without number change
-        let result = crate::polling_station::repository::update(
-            &mut conn,
-            ElectionId::from(7),
-            741,
-            data.clone(),
-        )
-        .await;
+        let result =
+            update_polling_station(&mut conn, ElectionId::from(7), 741, data.clone()).await;
         assert!(result.is_ok());
 
         // ... with number change
         data.number = Some(123);
-        let result =
-            crate::polling_station::repository::update(&mut conn, ElectionId::from(7), 741, data)
-                .await;
+        let result = update_polling_station(&mut conn, ElectionId::from(7), 741, data).await;
         assert!(result.is_err());
     }
 

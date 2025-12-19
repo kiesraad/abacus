@@ -143,7 +143,7 @@ pub struct ElectionIdentifier {
 
 impl ElectionIdentifier {
     pub fn from_election(
-        election: &crate::election::structs::ElectionWithPoliticalGroups,
+        election: &structs::ElectionWithPoliticalGroups,
         include_nomination_date: bool,
     ) -> Self {
         let subcategory = if election.number_of_seats >= 19 {
@@ -255,7 +255,7 @@ pub struct Candidate {
 }
 
 impl TryFrom<Candidate> for structs::Candidate {
-    type Error = crate::eml::EMLImportError;
+    type Error = EMLImportError;
 
     fn try_from(parsed: Candidate) -> Result<Self, Self::Error> {
         Ok(structs::Candidate {

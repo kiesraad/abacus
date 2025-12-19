@@ -17,6 +17,10 @@ permissions:
 env:
   TZ: "Europe/Amsterdam"
 
+concurrency:
+  group: ${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
+
 jobs:
   backend:
     name: Backend
@@ -158,7 +162,7 @@ jobs:
           retention-days: 30
       - name: Upload test results to Codecov
         if: ${{ !cancelled() }}
-        uses: codecov/test-results-action@47f89e9acb64b76debcd5ea40642d25a4adced9f # v1
+        uses: codecov/codecov-action@5a1091511ad55cbe89839c7260b706298ca349f7 # v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           name: "Playwright e2e"

@@ -55,7 +55,7 @@ export async function fillCandidatesListPages(page: Page, results: PollingStatio
   expect(candidateListNames.length).toBe(results.political_group_votes.length);
 
   for (const { index, value } of results.political_group_votes.map((value, index) => ({ index, value }))) {
-    const candidatesListPage = new CandidatesListPage(page, index + 1, candidateListNames[index]!);
+    const candidatesListPage = new CandidatesListPage(page, index, candidateListNames[index]!);
     await expect(candidatesListPage.fieldset).toBeVisible();
 
     const candidateVotes: number[] = value.candidate_votes.map((candidate) => {

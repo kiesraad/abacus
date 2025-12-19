@@ -70,11 +70,11 @@ pub fn example_data_entry(client_state: Option<&str>) -> DataEntry {
             votes_counts: VotesCounts {
                 political_group_total_votes: vec![
                     PoliticalGroupTotalVotes {
-                        number: 1,
+                        number: PGNumber::from(1),
                         total: 60,
                     },
                     PoliticalGroupTotalVotes {
-                        number: 2,
+                        number: PGNumber::from(2),
                         total: 42,
                     },
                 ],
@@ -85,8 +85,8 @@ pub fn example_data_entry(client_state: Option<&str>) -> DataEntry {
             },
             differences_counts: differences_counts_zero(),
             political_group_votes: vec![
-                political_group_votes_from_test_data_auto(1, &[40, 20]),
-                political_group_votes_from_test_data_auto(2, &[30, 12]),
+                political_group_votes_from_test_data_auto(PGNumber::from(1), &[40, 20]),
+                political_group_votes_from_test_data_auto(PGNumber::from(2), &[30, 12]),
             ],
         }),
         client_state: ClientState::new_from_str(client_state).unwrap(),

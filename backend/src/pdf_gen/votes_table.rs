@@ -3,7 +3,7 @@ use serde::{Deserialize, Serialize};
 use crate::{
     APIError,
     data_entry::{CommonPollingStationResults, Count, PoliticalGroupCandidateVotes},
-    election::{Candidate, ElectionWithPoliticalGroups, PGNumber, PoliticalGroup},
+    election::{Candidate, CandidateNumber, ElectionWithPoliticalGroups, PGNumber, PoliticalGroup},
     summary::ElectionSummary,
 };
 
@@ -118,7 +118,7 @@ impl VotesTablesWithOnlyPreviousVotes {
 }
 
 fn get_votes_for_political_party(
-    political_group_number: u32,
+    political_group_number: PGNumber,
     political_group_votes: &[PoliticalGroupCandidateVotes],
 ) -> Result<&PoliticalGroupCandidateVotes, APIError> {
     political_group_votes
@@ -130,7 +130,7 @@ fn get_votes_for_political_party(
 }
 
 fn get_votes_for_candidate(
-    candidate_number: u32,
+    candidate_number: CandidateNumber,
     candidate_votes: Option<&PoliticalGroupCandidateVotes>,
 ) -> Result<Option<Count>, APIError> {
     let Some(candidate_votes) = candidate_votes else {
@@ -293,7 +293,7 @@ mod tests {
         election::{ElectionCategory, ElectionId, ElectionWithPoliticalGroups, VoteCountingMethod},
     };
 
-    fn sample_candidate(number: u32) -> Candidate {
+    fn sample_candidate(number: CandidateNumber) -> Candidate {
         Candidate {
             number,
             initials: "A.B.".to_string(),
@@ -308,11 +308,11 @@ mod tests {
 
     fn sample_group(number: u32, candidate_numbers: &[u32]) -> PoliticalGroup {
         PoliticalGroup {
-            number,
+            number: PGNumber::from(number),
             name: format!("Partij {number}"),
             candidates: candidate_numbers
                 .iter()
-                .map(|&candidate_number| sample_candidate(candidate_number))
+                .map(|&candidate_number| sample_candidate(CandidateNumber::from(candidate_number)))
                 .collect(),
         }
     }
@@ -340,12 +340,12 @@ mod tests {
         entries: &[(u32, Count)],
     ) -> PoliticalGroupCandidateVotes {
         PoliticalGroupCandidateVotes {
-            number: group_number,
+            number: PGNumber::from(group_number),
             total,
             candidate_votes: entries
                 .iter()
                 .map(|&(candidate_number, votes)| DataEntryCandidateVotes {
-                    number: candidate_number,
+                    number: CandidateNumber::from(candidate_number),
                     votes,
                 })
                 .collect(),
@@ -420,7 +420,10 @@ mod tests {
 
         let expected = [(1, 5, 4), (2, 7, 6), (3, 9, 8)];
         for (candidate_vote, (number, votes, previous_votes)) in column.votes.iter().zip(expected) {
-            assert_eq!(candidate_vote.candidate.number, number);
+            assert_eq!(
+                candidate_vote.candidate.number,
+                CandidateNumber::from(number)
+            );
             assert_eq!(candidate_vote.votes, Some(votes));
             assert_eq!(candidate_vote.previous_votes, Some(previous_votes));
         }

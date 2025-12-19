@@ -10,7 +10,7 @@ use super::{
     status::{DataEntryStatus, FirstEntryHasErrors, FirstEntryInProgress, SecondEntryNotStarted},
 };
 use crate::{
-    election::{ElectionWithPoliticalGroups, PGNumber},
+    election::{CandidateNumber, ElectionWithPoliticalGroups, PGNumber},
     polling_station::PollingStation,
 };
 
@@ -604,7 +604,7 @@ impl Validate for CommonPollingStationResults {
                 .political_group_total_votes
                 .iter()
                 .find(|pgtv| pgtv.number == pgcv.number)
-                .expect("political group total votes should exist");
+                .ok_or(DataError::new("political group total votes should exist"))?;
 
             // all candidate votes, cast to u64 to avoid overflow
             let candidate_votes_sum: u64 = pgcv
@@ -880,13 +880,15 @@ impl Validate for Vec<PoliticalGroupTotalVotes> {
         }
 
         // check each political group total votes
+        let mut previous_number = PGNumber::from(0);
         for (i, pgv) in self.iter().enumerate() {
             let number = pgv.number;
-            if number as usize != i + 1 {
+            if number <= previous_number {
                 return Err(DataError::new(
-                    "political group total votes numbers are not consecutive",
+                    "political group total votes numbers are not increasing",
                 ));
             }
+            previous_number = number;
 
             pgv.total.validate(
                 election,
@@ -940,13 +942,14 @@ impl Validate for Vec<PoliticalGroupCandidateVotes> {
         }
 
         // check each political group
+        let mut previous_number = PGNumber::from(0);
         for (i, pgv) in self.iter().enumerate() {
             let number = pgv.number;
-            if number as usize != i + 1 {
-                return Err(DataError::new(
-                    "political group numbers are not consecutive",
-                ));
+            if number <= previous_number {
+                return Err(DataError::new("political group numbers are not increasing"));
             }
+            previous_number = number;
+
             pgv.validate(
                 election,
                 polling_station,
@@ -969,8 +972,9 @@ impl Validate for PoliticalGroupCandidateVotes {
         // check if the list of candidates has the correct length
         let pg = election
             .political_groups
-            .get(self.number as usize - 1)
-            .expect("political group should exist");
+            .iter()
+            .find(|pg| pg.number == self.number)
+            .ok_or(DataError::new("political group should exist"))?;
 
         // check if the number of candidates is correct
         if pg.candidates.len() != self.candidate_votes.len() {
@@ -978,11 +982,13 @@ impl Validate for PoliticalGroupCandidateVotes {
         }
 
         // validate all candidates
+        let mut prev_number = CandidateNumber::from(0);
         for (i, cv) in self.candidate_votes.iter().enumerate() {
             let number = cv.number;
-            if number as usize != i + 1 {
-                return Err(DataError::new("candidate numbers are not consecutive"));
+            if number <= prev_number {
+                return Err(DataError::new("candidate numbers are not increasing"));
             }
+            prev_number = number;
 
             cv.validate(
                 election,
@@ -1390,7 +1396,7 @@ mod tests {
                 DataError, PoliticalGroupTotalVotes, Validate, ValidationResult,
                 ValidationResultCode, ValidationResults, VotesCounts,
             },
-            election::structs::tests::election_fixture,
+            election::{PGNumber, structs::tests::election_fixture},
             polling_station::structs::tests::polling_station_fixture,
         };
 
@@ -1406,7 +1412,7 @@ mod tests {
                     .iter()
                     .enumerate()
                     .map(|(i, &total)| PoliticalGroupTotalVotes {
-                        number: u32::try_from(i + 1).unwrap(),
+                        number: PGNumber::try_from(i + 1).unwrap(),
                         total,
                     })
                     .collect(),
@@ -2756,7 +2762,10 @@ mod tests {
                 CandidateVotes, DataError, PoliticalGroupCandidateVotes, Validate,
                 ValidationResults,
             },
-            election::{ElectionWithPoliticalGroups, PGNumber, structs::tests::election_fixture},
+            election::{
+                CandidateNumber, ElectionWithPoliticalGroups, PGNumber,
+                structs::tests::election_fixture,
+            },
             polling_station::structs::tests::polling_station_fixture,
         };
 
@@ -2820,12 +2829,33 @@ mod tests {
         }
 
         #[test]
-        fn test_err_political_group_numbers_not_consecutive() {
-            let (mut political_group_votes, election) =
+        fn test_ok_political_group_numbers_not_consecutive() {
+            let (mut political_group_votes, mut election) =
+                create_test_data(&[(&[10, 20, 30], 60), (&[5, 10, 15], 30)]);
+
+            // Change number of the last list
+            political_group_votes[1].number = PGNumber::from(3);
+            election.political_groups[1].number = PGNumber::from(3);
+
+            let mut validation_results = ValidationResults::default();
+            let result: Result<(), DataError> = political_group_votes.validate(
+                &election,
+                &polling_station_fixture(None),
+                &mut validation_results,
+                &"political_group_votes".into(),
+            );
+
+            assert!(result.is_ok());
+        }
+
+        #[test]
+        fn test_err_political_group_numbers_not_increasing() {
+            let (mut political_group_votes, mut election) =
                 create_test_data(&[(&[10, 20, 30], 60), (&[5, 10, 15], 30)]);
 
             // Change number of the first list
-            political_group_votes[0].number = 3;
+            political_group_votes[0].number = PGNumber::from(3);
+            election.political_groups[0].number = PGNumber::from(3);
 
             let mut validation_results = ValidationResults::default();
             let result: Result<(), DataError> = political_group_votes.validate(
@@ -2836,12 +2866,6 @@ mod tests {
             );
 
             assert!(result.is_err());
-            assert!(
-                result
-                    .unwrap_err()
-                    .message
-                    .eq("political group numbers are not consecutive"),
-            );
         }
 
         #[test]
@@ -2853,7 +2877,7 @@ mod tests {
             political_group_votes[0]
                 .candidate_votes
                 .push(CandidateVotes {
-                    number: 4,
+                    number: CandidateNumber::from(4),
                     votes: 0,
                 });
 
@@ -2875,12 +2899,31 @@ mod tests {
         }
 
         #[test]
-        fn test_err_candidate_numbers_not_consecutive() {
+        fn test_ok_candidate_numbers_not_consecutive() {
             let (mut political_group_votes, election) =
                 create_test_data(&[(&[10, 20, 30], 60), (&[5, 10, 15], 30)]);
 
-            // Change number of the second candidate on the first list
-            political_group_votes[0].candidate_votes[1].number = 5;
+            // Change number of the last candidate on the first list
+            political_group_votes[0].candidate_votes[2].number = CandidateNumber::from(5);
+
+            let mut validation_results = ValidationResults::default();
+            let result = political_group_votes.validate(
+                &election,
+                &polling_station_fixture(None),
+                &mut validation_results,
+                &"political_group_votes".into(),
+            );
+
+            assert!(result.is_ok());
+        }
+
+        #[test]
+        fn test_err_candidate_numbers_not_increasing() {
+            let (mut political_group_votes, election) =
+                create_test_data(&[(&[10, 20, 30], 60), (&[5, 10, 15], 30)]);
+
+            // Change number of the second candidate on the first list to a non-increasing number
+            political_group_votes[0].candidate_votes[1].number = CandidateNumber::from(1);
 
             let mut validation_results = ValidationResults::default();
             let result = political_group_votes.validate(
@@ -2891,12 +2934,6 @@ mod tests {
             );
 
             assert!(result.is_err());
-            assert!(
-                result
-                    .unwrap_err()
-                    .message
-                    .eq("candidate numbers are not consecutive"),
-            );
         }
     }
 
@@ -2908,7 +2945,7 @@ mod tests {
                 ValidationResultContext, ValidationResults, VotersCounts, VotesCounts,
                 tests::ValidDefault,
             },
-            election::structs::tests::election_fixture,
+            election::{PGNumber, structs::tests::election_fixture},
             polling_station::structs::tests::polling_station_fixture,
         };
 
@@ -2922,11 +2959,11 @@ mod tests {
                 votes_counts: VotesCounts {
                     political_group_total_votes: vec![
                         PoliticalGroupTotalVotes {
-                            number: 1,
+                            number: PGNumber::from(1),
                             total: 60,
                         },
                         PoliticalGroupTotalVotes {
-                            number: 2,
+                            number: PGNumber::from(2),
                             total: 30,
                         },
                     ],
@@ -2937,8 +2974,14 @@ mod tests {
                 },
                 differences_counts: ValidDefault::valid_default(),
                 political_group_votes: vec![
-                    PoliticalGroupCandidateVotes::from_test_data_auto(1, &[10, 20, 30]),
-                    PoliticalGroupCandidateVotes::from_test_data_auto(2, &[5, 10, 15]),
+                    PoliticalGroupCandidateVotes::from_test_data_auto(
+                        PGNumber::from(1),
+                        &[10, 20, 30],
+                    ),
+                    PoliticalGroupCandidateVotes::from_test_data_auto(
+                        PGNumber::from(2),
+                        &[5, 10, 15],
+                    ),
                 ],
             }
         }
@@ -3028,7 +3071,7 @@ mod tests {
                     code: ValidationResultCode::F401,
                     fields: vec!["data.political_group_votes[1].total".into()],
                     context: Some(ValidationResultContext {
-                        political_group_number: Some(2),
+                        political_group_number: Some(PGNumber::from(2)),
                     }),
                 }]
             );
@@ -3047,7 +3090,7 @@ mod tests {
                     code: ValidationResultCode::F401,
                     fields: vec!["data.political_group_votes[1].total".into()],
                     context: Some(ValidationResultContext {
-                        political_group_number: Some(2),
+                        political_group_number: Some(PGNumber::from(2)),
                     }),
                 }]
             );
@@ -3062,7 +3105,7 @@ mod tests {
                     code: ValidationResultCode::F401,
                     fields: vec!["data.political_group_votes[1].total".into()],
                     context: Some(ValidationResultContext {
-                        political_group_number: Some(2),
+                        political_group_number: Some(PGNumber::from(2)),
                     }),
                 }]
             );
@@ -3082,21 +3125,21 @@ mod tests {
                         code: ValidationResultCode::F402,
                         fields: vec!["data.political_group_votes[0]".into()],
                         context: Some(ValidationResultContext {
-                            political_group_number: Some(1),
+                            political_group_number: Some(PGNumber::from(1)),
                         }),
                     },
                     ValidationResult {
                         code: ValidationResultCode::F403,
                         fields: vec!["data.political_group_votes[0].total".into()],
                         context: Some(ValidationResultContext {
-                            political_group_number: Some(1),
+                            political_group_number: Some(PGNumber::from(1)),
                         }),
                     },
                     ValidationResult {
                         code: ValidationResultCode::F401,
                         fields: vec!["data.political_group_votes[1].total".into()],
                         context: Some(ValidationResultContext {
-                            political_group_number: Some(2),
+                            political_group_number: Some(PGNumber::from(2)),
                         }),
                     }
                 ]
@@ -3120,14 +3163,14 @@ mod tests {
                         code: ValidationResultCode::F401,
                         fields: vec!["data.political_group_votes[0].total".into()],
                         context: Some(ValidationResultContext {
-                            political_group_number: Some(1),
+                            political_group_number: Some(PGNumber::from(1)),
                         }),
                     },
                     ValidationResult {
                         code: ValidationResultCode::F402,
                         fields: vec!["data.political_group_votes[1]".into()],
                         context: Some(ValidationResultContext {
-                            political_group_number: Some(2),
+                            political_group_number: Some(PGNumber::from(2)),
                         }),
                     },
                 ]
@@ -3150,7 +3193,7 @@ mod tests {
                     code: ValidationResultCode::F401,
                     fields: vec!["data.political_group_votes[1].total".into()],
                     context: Some(ValidationResultContext {
-                        political_group_number: Some(2),
+                        political_group_number: Some(PGNumber::from(2)),
                     }),
                 }]
             );
@@ -3166,7 +3209,7 @@ mod tests {
                     code: ValidationResultCode::F402,
                     fields: vec!["data.political_group_votes[1]".into()],
                     context: Some(ValidationResultContext {
-                        political_group_number: Some(2),
+                        political_group_number: Some(PGNumber::from(2)),
                     }),
                 }]
             );
@@ -3187,7 +3230,7 @@ mod tests {
                     code: ValidationResultCode::F403,
                     fields: vec!["data.political_group_votes[1].total".into()],
                     context: Some(ValidationResultContext {
-                        political_group_number: Some(2),
+                        political_group_number: Some(PGNumber::from(2)),
                     }),
                 }],
             );
@@ -3203,14 +3246,14 @@ mod tests {
                         code: ValidationResultCode::F403,
                         fields: vec!["data.political_group_votes[0].total".into()],
                         context: Some(ValidationResultContext {
-                            political_group_number: Some(1),
+                            political_group_number: Some(PGNumber::from(1)),
                         }),
                     },
                     ValidationResult {
                         code: ValidationResultCode::F403,
                         fields: vec!["data.political_group_votes[1].total".into()],
                         context: Some(ValidationResultContext {
-                            political_group_number: Some(2),
+                            political_group_number: Some(PGNumber::from(2)),
                         }),
                     }
                 ],
@@ -3226,14 +3269,14 @@ mod tests {
                         code: ValidationResultCode::F403,
                         fields: vec!["data.political_group_votes[0].total".into()],
                         context: Some(ValidationResultContext {
-                            political_group_number: Some(1),
+                            political_group_number: Some(PGNumber::from(1)),
                         }),
                     },
                     ValidationResult {
                         code: ValidationResultCode::F401,
                         fields: vec!["data.political_group_votes[1].total".into()],
                         context: Some(ValidationResultContext {
-                            political_group_number: Some(2),
+                            political_group_number: Some(PGNumber::from(2)),
                         }),
                     }
                 ],

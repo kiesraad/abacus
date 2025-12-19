@@ -2,7 +2,7 @@ use chrono::NaiveDate;
 use serde::{Deserialize, Deserializer, Serialize};
 
 use crate::{
-    election::{PoliticalGroup, VoteCountingMethod},
+    election::{PGNumber, PoliticalGroup, VoteCountingMethod},
     eml::common::{AuthorityAddress, AuthorityIdentifier},
     polling_station::PollingStationRequest,
 };
@@ -143,8 +143,9 @@ impl EML110 {
             .map(|(idx, rp)| {
                 Ok(PoliticalGroup {
                     // temporary group number, actual group numbers will be imported from candidate list
-                    number: u32::try_from(idx + 1)
-                        .or(Err(EMLImportError::TooManyPoliticalGroups))?,
+                    number: PGNumber::from(
+                        u32::try_from(idx + 1).or(Err(EMLImportError::TooManyPoliticalGroups))?,
+                    ),
                     name: rp.registered_appellation.clone(),
                     candidates: vec![],
                 })

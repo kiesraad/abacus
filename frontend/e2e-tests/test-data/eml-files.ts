@@ -40,7 +40,16 @@ export const eml110b_single = {
   path: "../backend/src/eml/tests/eml110b_1_station.eml.xml",
 };
 
-export const eml230b = {
+export type Eml230b = {
+  filename: string;
+  path: string;
+  electionDate: string;
+  hashInput1: string;
+  hashInput2: string;
+  fullHash: string[];
+};
+
+export const eml230b: Eml230b = {
   filename: "eml230b_test.eml.xml",
   path: "../backend/src/eml/tests/eml230b_test.eml.xml",
   electionDate: "woensdag 16 maart 2022",
@@ -63,5 +72,31 @@ export const eml230b = {
     "083c",
     "c000",
     "7096",
+  ],
+};
+
+export const eml230b_with_gaps: Eml230b = {
+  filename: "eml230b_test_with_gaps.eml.xml",
+  path: "../backend/src/eml/tests/eml230b_test_with_gaps.eml.xml",
+  electionDate: "woensdag 16 maart 2022",
+  hashInput1: "02c2",
+  hashInput2: "0b83",
+  fullHash: [
+    "ed7b",
+    "2278",
+    "5ab0",
+    "d7b3",
+    "c28a",
+    "02c2",
+    "593f",
+    "8bc7",
+    "87e2",
+    "5b15",
+    "2465",
+    "f229",
+    "9307",
+    "0b83",
+    "9c8f",
+    "ce26",
   ],
 };

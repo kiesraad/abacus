@@ -23,7 +23,7 @@ import { DataEntryApiClient } from "./helpers-utils/api-clients";
 import { completePollingStationDataEntries } from "./helpers-utils/e2e-test-api-helpers";
 import { createRandomUsername } from "./helpers-utils/e2e-test-utils";
 import { EmlTestFile, generateEml } from "./helpers-utils/file-helpers";
-import { eml110a, eml230b } from "./test-data/eml-files";
+import { eml110a, Eml230b, eml230b } from "./test-data/eml-files";
 import {
   dataEntryRequest,
   dataEntryWithDifferencesRequest,
@@ -43,6 +43,7 @@ type Fixtures = {
   typistOne: { page: Page; request: APIRequestContext };
   // page and request fixture for typist two
   typistTwo: { page: Page; request: APIRequestContext };
+  eml230b: Eml230b;
   // Election without polling stations
   emptyElection: Election;
   // Election with two polling stations
@@ -107,7 +108,8 @@ export const test = base.extend<Fixtures>({
     await firstDataEntry.claim();
     await use(pollingStation);
   },
-  emptyElection: async ({ admin }, use) => {
+  eml230b: [eml230b, { option: true }],
+  emptyElection: async ({ admin, eml230b }, use) => {
     const { request } = admin;
     const url: ELECTION_IMPORT_REQUEST_PATH = `/api/elections/import`;
     const election_data = await readFile(eml110a.path, "utf8");

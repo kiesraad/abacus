@@ -8,7 +8,7 @@ use abacus::{
         VotersCounts, VotesCounts,
         status::{ClientState, DataEntryStatusName},
     },
-    election::ElectionId,
+    election::{ElectionId, PGNumber},
 };
 use axum::http::StatusCode;
 use reqwest::Response;
@@ -337,11 +337,11 @@ fn second_session_data_entry_two_political_groups() -> DataEntry {
             votes_counts: VotesCounts {
                 political_group_total_votes: vec![
                     PoliticalGroupTotalVotes {
-                        number: 1,
+                        number: PGNumber::from(1),
                         total: 10,
                     },
                     PoliticalGroupTotalVotes {
-                        number: 2,
+                        number: PGNumber::from(2),
                         total: 5,
                     },
                 ],
@@ -353,8 +353,8 @@ fn second_session_data_entry_two_political_groups() -> DataEntry {
 
             differences_counts: differences_counts_zero(),
             political_group_votes: vec![
-                political_group_votes_from_test_data_auto(1, &[8, 2]),
-                political_group_votes_from_test_data_auto(2, &[5, 0]),
+                political_group_votes_from_test_data_auto(PGNumber::from(1), &[8, 2]),
+                political_group_votes_from_test_data_auto(PGNumber::from(2), &[5, 0]),
             ],
         }),
         client_state: ClientState::new_from_str(None).unwrap(),

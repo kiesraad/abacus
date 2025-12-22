@@ -17,6 +17,10 @@ permissions:
 env:
   TZ: "Europe/Amsterdam"
 
+concurrency:
+  group: ${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
+
 jobs:
   backend:
     name: Backend
@@ -84,7 +88,7 @@ jobs:
         run: cargo --verbose --locked test --target=x86_64-unknown-linux-musl --features embed-typst -- --nocapture
       - name: Build
         run: cargo --verbose --locked build --target=x86_64-unknown-linux-musl --features memory-serve,embed-typst,storybook
-      - uses: actions/upload-artifact@v5
+      - uses: actions/upload-artifact@v6
         with:
           name: abacus
           path: backend/target/x86_64-unknown-linux-musl/debug/abacus
@@ -113,7 +117,7 @@ jobs:
         run: npm test
       - name: Build
         run: npm run build
-      - uses: actions/upload-artifact@v5
+      - uses: actions/upload-artifact@v6
         with:
           name: frontend-build
           path: frontend/dist
@@ -141,7 +145,7 @@ jobs:
       - name: Install Playwright Browsers
         run: npx playwright install --with-deps --no-shell
       - name: Download Abacus
-        uses: actions/download-artifact@v6
+        uses: actions/download-artifact@v7
         with:
           name: abacus
           path: builds/backend
@@ -150,7 +154,7 @@ jobs:
       - name: Run e2e playwright tests
         run: npm run test:e2e -- --shard=${{ matrix.shardIndex }}/${{ matrix.shardTotal }}
       - name: Upload Playwright report
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         if: ${{ !cancelled() }}
         with:
           name: playwright-report-ubuntu-latest-${{ matrix.shardIndex }}
@@ -158,7 +162,7 @@ jobs:
           retention-days: 30
       - name: Upload test results to Codecov
         if: ${{ !cancelled() }}
-        uses: codecov/test-results-action@47f89e9acb64b76debcd5ea40642d25a4adced9f # v1
+        uses: codecov/codecov-action@671740ac38dd9b0130fbe1cec585b89eea48d3de # v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           name: "Playwright e2e"
@@ -181,7 +185,7 @@ jobs:
     continue-on-error: true
     steps:
       - name: Download Abacus
-        uses: actions/download-artifact@v6
+        uses: actions/download-artifact@v7
         with:
           name: abacus
       - name: Strip debug symbols

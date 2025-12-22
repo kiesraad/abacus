@@ -2,101 +2,90 @@
 
 use std::{collections::BTreeMap, net::SocketAddr};
 
-use abacus::{
-    committee_session::{
-        CommitteeSession, CommitteeSessionStatusChangeRequest, status::CommitteeSessionStatus,
-    },
-    data_entry::{
-        CSOFirstSessionResults, CandidateVotes, Count, CountingDifferencesPollingStation,
-        DataEntry, DifferenceCountsCompareVotesCastAdmittedVoters, DifferencesCounts,
-        ElectionStatusResponse, ElectionStatusResponseEntry, PoliticalGroupCandidateVotes,
-        PoliticalGroupTotalVotes, PollingStationResults, VotersCounts, VotesCounts, YesNo,
-        status::{ClientState, DataEntryStatusName},
-    },
-    election::{CandidateNumber, ElectionDetailsResponse, ElectionId, PGNumber},
-};
-
 use axum::http::{HeaderValue, StatusCode};
 use hyper::header::CONTENT_TYPE;
-use reqwest::{Body, Response};
-use serde_json::json;
+use reqwest::Response;
 
-pub fn differences_counts_zero() -> DifferencesCounts {
-    DifferencesCounts {
-        more_ballots_count: 0,
-        fewer_ballots_count: 0,
-        compare_votes_cast_admitted_voters: DifferenceCountsCompareVotesCastAdmittedVoters {
-            admitted_voters_equal_votes_cast: true,
-            votes_cast_greater_than_admitted_voters: false,
-            votes_cast_smaller_than_admitted_voters: false,
+pub fn differences_counts_zero() -> serde_json::Value {
+    serde_json::json!({
+        "more_ballots_count": 0,
+        "fewer_ballots_count": 0,
+        "compare_votes_cast_admitted_voters": {
+            "admitted_voters_equal_votes_cast": true,
+            "votes_cast_greater_than_admitted_voters": false,
+            "votes_cast_smaller_than_admitted_voters": false,
         },
-        difference_completely_accounted_for: YesNo::yes(),
-    }
+        "difference_completely_accounted_for": {"yes": true, "no": false},
+    })
 }
 
 pub fn political_group_votes_from_test_data_auto(
-    number: PGNumber,
-    candidate_votes: &[Count],
-) -> PoliticalGroupCandidateVotes {
-    PoliticalGroupCandidateVotes {
-        number,
-        total: candidate_votes.iter().sum(),
-        candidate_votes: candidate_votes
-            .iter()
-            .enumerate()
-            .map(|(i, votes)| CandidateVotes {
-                number: CandidateNumber::try_from(i + 1).unwrap(),
-                votes: *votes,
-            })
-            .collect(),
-    }
+    number: u32,
+    candidate_votes: &[u32],
+) -> serde_json::Value {
+    serde_json::json!({
+    "number": number,
+    "total": candidate_votes.iter().sum::<u32>(),
+    "candidate_votes": candidate_votes
+        .iter()
+        .enumerate()
+        .map(|(i, votes)| serde_json::json!({
+            "number": i + 1,
+            "votes": *votes,
+        }))
+        .collect::<Vec<serde_json::Value>>(),
+    })
 }
 
 /// Example data entry for an election with two parties with two candidates.
-pub fn example_data_entry(client_state: Option<&str>) -> DataEntry {
-    DataEntry {
-        progress: 60,
-        data: PollingStationResults::CSOFirstSession(CSOFirstSessionResults {
-            extra_investigation: Default::default(),
-            counting_differences_polling_station: CountingDifferencesPollingStation {
-                difference_ballots_per_list: YesNo::no(),
-                unexplained_difference_ballots_voters: YesNo::no(),
+pub fn example_data_entry(client_state: Option<&str>) -> serde_json::Value {
+    serde_json::json!({
+        "progress": 60,
+        "data": {
+            "model": "CSOFirstSession",
+            "extra_investigation": {
+              "extra_investigation_other_reason": { "yes": false, "no": false },
+              "ballots_recounted_extra_investigation": { "yes": false, "no": false },
             },
-            voters_counts: VotersCounts {
-                poll_card_count: 102,
-                proxy_certificate_count: 2,
-                total_admitted_voters_count: 104,
+            "counting_differences_polling_station": {
+                "difference_ballots_per_list": {"yes": false, "no": true},
+                "unexplained_difference_ballots_voters": {"yes": false, "no": true},
             },
-            votes_counts: VotesCounts {
-                political_group_total_votes: vec![
-                    PoliticalGroupTotalVotes {
-                        number: PGNumber::from(1),
-                        total: 60,
+            "voters_counts": {
+                "poll_card_count": 102,
+                "proxy_certificate_count": 2,
+                "total_admitted_voters_count": 104,
+            },
+            "votes_counts": {
+                "political_group_total_votes": [
+                    {
+                        "number": 1,
+                        "total": 60,
                     },
-                    PoliticalGroupTotalVotes {
-                        number: PGNumber::from(2),
-                        total: 42,
+                    {
+                        "number": 2,
+                        "total": 42,
                     },
                 ],
-                total_votes_candidates_count: 102,
-                blank_votes_count: 1,
-                invalid_votes_count: 1,
-                total_votes_cast_count: 104,
+                "total_votes_candidates_count": 102,
+                "blank_votes_count": 1,
+                "invalid_votes_count": 1,
+                "total_votes_cast_count": 104,
             },
-            differences_counts: differences_counts_zero(),
-            political_group_votes: vec![
-                political_group_votes_from_test_data_auto(PGNumber::from(1), &[40, 20]),
-                political_group_votes_from_test_data_auto(PGNumber::from(2), &[30, 12]),
+            "differences_counts": differences_counts_zero(),
+            "political_group_votes": [
+                political_group_votes_from_test_data_auto(1, &[40, 20]),
+                political_group_votes_from_test_data_auto(2, &[30, 12]),
             ],
-        }),
-        client_state: ClientState::new_from_str(client_state).unwrap(),
-    }
+        },
+        "client_state": client_state,
+    })
 }
 
 pub async fn create_polling_station(
     addr: &SocketAddr,
     cookie: &HeaderValue,
-    election_id: ElectionId,
+    election_id: u32,
     number: u32,
 ) -> Response {
     let url = format!("http://{addr}/api/elections/{election_id}/polling_stations");
@@ -104,7 +93,7 @@ pub async fn create_polling_station(
         .post(&url)
         .header("cookie", cookie)
         .header("Content-Type", "application/json")
-        .json(&json!({
+        .json(&&serde_json::json!({
             "name": "Test polling station",
             "number": number,
             "number_of_voters": 123,
@@ -143,7 +132,7 @@ pub async fn save_data_entry(
     cookie: &HeaderValue,
     polling_station_id: u32,
     entry_number: u32,
-    data_entry: DataEntry,
+    data_entry: serde_json::Value,
 ) -> Response {
     let url = format!(
         "http://{addr}/api/polling_stations/{polling_station_id}/data_entries/{entry_number}"
@@ -185,7 +174,7 @@ pub async fn complete_data_entry(
     cookie: &HeaderValue,
     polling_station_id: u32,
     entry_number: u32,
-    data_entry: DataEntry,
+    data_entry: serde_json::Value,
 ) -> Response {
     claim_data_entry(addr, cookie, polling_station_id, entry_number).await;
     save_data_entry(addr, cookie, polling_station_id, entry_number, data_entry).await;
@@ -196,7 +185,7 @@ async fn check_data_entry_status_is_definitive(
     addr: &SocketAddr,
     cookie: &HeaderValue,
     polling_station_id: u32,
-    election_id: ElectionId,
+    election_id: u32,
 ) {
     // check that data entry status for this polling station is now Definitive
     let url = format!("http://{addr}/api/elections/{election_id}/status");
@@ -207,28 +196,27 @@ async fn check_data_entry_status_is_definitive(
         .await
         .unwrap();
     assert_eq!(response.status(), StatusCode::OK);
-    let body: ElectionStatusResponse = response.json().await.unwrap();
+    let body: serde_json::Value = response.json().await.unwrap();
+    let statuses = body["statuses"].as_array().unwrap();
     assert_eq!(
-        body.statuses
+        statuses
             .iter()
-            .find(|s| s.polling_station_id == polling_station_id)
-            .unwrap()
-            .status,
-        DataEntryStatusName::Definitive
+            .find(|s| s["polling_station_id"] == polling_station_id)
+            .unwrap()["status"],
+        "definitive"
     );
 }
 
 pub async fn create_investigation(addr: &SocketAddr, polling_station_id: u32) -> Response {
     let url = format!("http://{addr}/api/polling_stations/{polling_station_id}/investigation");
     let coordinator_cookie = coordinator_login(addr).await;
-    let body = json!({
-        "reason": "Test reason"
-    });
     reqwest::Client::new()
         .post(&url)
         .header("cookie", coordinator_cookie)
         .header("Content-Type", "application/json")
-        .body(body.to_string())
+        .json(&serde_json::json!({
+            "reason": "Test reason"
+        }))
         .send()
         .await
         .unwrap()
@@ -240,7 +228,7 @@ pub async fn update_investigation(
     body: Option<serde_json::Value>,
 ) -> Response {
     let coordinator_cookie = coordinator_login(addr).await;
-    let body = body.unwrap_or(json!({
+    let body = body.unwrap_or(serde_json::json!({
         "reason": "Updated reason",
         "findings": "updated test findings",
         "corrected_results": true
@@ -250,13 +238,13 @@ pub async fn update_investigation(
         .put(&url)
         .header("cookie", coordinator_cookie)
         .header("Content-Type", "application/json")
-        .body(body.to_string())
+        .json(&body)
         .send()
         .await
         .unwrap()
 }
 
-pub async fn create_result(addr: &SocketAddr, polling_station_id: u32, election_id: ElectionId) {
+pub async fn create_result(addr: &SocketAddr, polling_station_id: u32, election_id: u32) {
     let typist_cookie = typist_login(addr).await;
     complete_data_entry(
         addr,
@@ -282,8 +270,8 @@ pub async fn create_result(addr: &SocketAddr, polling_station_id: u32, election_
 pub async fn create_result_with_non_example_data_entry(
     addr: &SocketAddr,
     polling_station_id: u32,
-    election_id: ElectionId,
-    data_entry: DataEntry,
+    election_id: u32,
+    data_entry: serde_json::Value,
 ) {
     let typist_cookie = typist_login(addr).await;
     complete_data_entry(
@@ -303,8 +291,8 @@ pub async fn create_result_with_non_example_data_entry(
 pub async fn get_election_details(
     addr: &SocketAddr,
     cookie: &HeaderValue,
-    election_id: ElectionId,
-) -> ElectionDetailsResponse {
+    election_id: u32,
+) -> serde_json::Value {
     let url = format!("http://{addr}/api/elections/{election_id}");
     let response = reqwest::Client::new()
         .get(&url)
@@ -319,8 +307,8 @@ pub async fn get_election_details(
 pub async fn get_election_committee_session(
     addr: &SocketAddr,
     cookie: &HeaderValue,
-    election_id: ElectionId,
-) -> CommitteeSession {
+    election_id: u32,
+) -> serde_json::Value {
     let url = format!("http://{addr}/api/elections/{election_id}");
     let response = reqwest::Client::new()
         .get(&url)
@@ -329,16 +317,16 @@ pub async fn get_election_committee_session(
         .await
         .unwrap();
     assert_eq!(response.status(), StatusCode::OK);
-    let body: ElectionDetailsResponse = response.json().await.unwrap();
-    body.current_committee_session.clone()
+    let body: serde_json::Value = response.json().await.unwrap();
+    body["current_committee_session"].clone()
 }
 
 pub async fn change_status_committee_session(
     addr: &SocketAddr,
     cookie: &HeaderValue,
-    election_id: ElectionId,
+    election_id: u32,
     committee_session_id: u32,
-    status: CommitteeSessionStatus,
+    status: &str,
 ) {
     let url = format!(
         "http://{addr}/api/elections/{election_id}/committee_sessions/{committee_session_id}/status"
@@ -346,7 +334,7 @@ pub async fn change_status_committee_session(
     let response = reqwest::Client::new()
         .put(&url)
         .header("cookie", cookie)
-        .json(&CommitteeSessionStatusChangeRequest { status })
+        .json(&serde_json::json!({"status": status }))
         .send()
         .await
         .unwrap();
@@ -356,8 +344,8 @@ pub async fn change_status_committee_session(
 pub async fn get_statuses(
     addr: &SocketAddr,
     cookie: &HeaderValue,
-    election_id: ElectionId,
-) -> BTreeMap<u32, ElectionStatusResponseEntry> {
+    election_id: u32,
+) -> BTreeMap<u32, serde_json::Value> {
     let url = format!("http://{addr}/api/elections/{election_id}/status");
     let response = reqwest::Client::new()
         .get(url)
@@ -367,11 +355,16 @@ pub async fn get_statuses(
         .unwrap();
 
     assert_eq!(response.status(), StatusCode::OK);
-    let body: ElectionStatusResponse = response.json().await.unwrap();
-    body.statuses
-        .into_iter()
+    let body: serde_json::Value = response.json().await.unwrap();
+    body["statuses"]
+        .as_array()
+        .unwrap()
+        .iter()
         .fold(BTreeMap::new(), |mut acc, entry| {
-            acc.insert(entry.polling_station_id, entry);
+            acc.insert(
+                u32::try_from(entry["polling_station_id"].as_u64().unwrap()).unwrap(),
+                entry.clone(),
+            );
             acc
         })
 }
@@ -403,13 +396,10 @@ pub async fn login(addr: &SocketAddr, username: &str, password: &str) -> HeaderV
     let response = reqwest::Client::new()
         .post(&url)
         .header(CONTENT_TYPE, "application/json")
-        .body(Body::from(
-            json!({
-                "username": username,
-                "password": password,
-            })
-            .to_string(),
-        ))
+        .json(&serde_json::json!({
+            "username": username,
+            "password": password,
+        }))
         .send()
         .await
         .unwrap();

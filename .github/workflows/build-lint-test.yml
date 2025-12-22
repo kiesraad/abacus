@@ -107,12 +107,14 @@ jobs:
           node-version: 22
       - name: Install dependencies
         run: npm ci
+      - name: Run Biome
+        run: npx biome ci
+      - name: Run TypeScript compiler
+        run: npm run lint:tsc
+      - name: Run ESLint
+        run: npm run lint:eslint
       - name: Install Playwright Chromium Browser
         run: npx playwright install --with-deps chromium
-      - name: Check formatting
-        run: npx @biomejs/biome format
-      - name: Lint
-        run: npm run lint
       - name: Test
         run: npm test
       - name: Build

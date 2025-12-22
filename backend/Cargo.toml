@@ -83,6 +83,7 @@ memory-serve = { version = "1.2.2", optional = true }
 
 [lints.rust]
 unsafe_code = "forbid"
+unexpected_cfgs = { level = "warn", check-cfg = ['cfg(fuzzing)'] }
 
 [lints.clippy]
 cast_possible_truncation = "deny"

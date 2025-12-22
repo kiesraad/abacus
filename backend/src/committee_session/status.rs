@@ -5,13 +5,15 @@ use utoipa::ToSchema;
 
 use super::{
     CommitteeSession, CommitteeSessionError, CommitteeSessionFilesUpdateRequest,
-    repository::change_files,
+    repository::{change_files, change_status, get},
 };
 use crate::{
     APIError,
     audit_log::{AuditEvent, AuditService},
     data_entry::repository::are_results_complete_for_committee_session,
+    files::repository::delete_file,
     investigation::list_investigations_for_committee_session,
+    polling_station,
 };
 
 /// Committee session status
@@ -48,7 +50,43 @@ impl From<sqlx::Error> for CommitteeSessionError {
     }
 }
 
-#[allow(clippy::too_many_lines)]
+async fn delete_committee_session_files(
+    conn: &mut SqliteConnection,
+    audit_service: AuditService,
+    committee_session: CommitteeSession,
+) -> Result<(), APIError> {
+    let file_ids: Vec<u32> = [
+        committee_session.results_eml,
+        committee_session.results_pdf,
+        committee_session.overview_pdf,
+    ]
+    .into_iter()
+    .flatten()
+    .collect();
+
+    if !file_ids.is_empty() {
+        change_files(
+            conn,
+            committee_session.id,
+            CommitteeSessionFilesUpdateRequest {
+                results_eml: None,
+                results_pdf: None,
+                overview_pdf: None,
+            },
+        )
+        .await?;
+
+        for id in file_ids {
+            if let Some(file) = delete_file(conn, id).await? {
+                audit_service
+                    .log(conn, &AuditEvent::FileDeleted(file.into()), None)
+                    .await?;
+            }
+        }
+    }
+    Ok(())
+}
+
 pub async fn change_committee_session_status(
     conn: &mut SqliteConnection,
     committee_session_id: u32,
@@ -57,8 +95,7 @@ pub async fn change_committee_session_status(
 ) -> Result<(), APIError> {
     let mut tx = conn.begin().await?;
 
-    let committee_session =
-        crate::committee_session::repository::get(&mut tx, committee_session_id).await?;
+    let committee_session = get(&mut tx, committee_session_id).await?;
     let new_status = match status {
         CommitteeSessionStatus::Created => {
             committee_session
@@ -88,43 +125,10 @@ pub async fn change_committee_session_status(
     if committee_session.status == CommitteeSessionStatus::DataEntryFinished
         && new_status == CommitteeSessionStatus::DataEntryInProgress
     {
-        let file_ids: Vec<u32> = [
-            committee_session.results_eml,
-            committee_session.results_pdf,
-            committee_session.overview_pdf,
-        ]
-        .into_iter()
-        .flatten()
-        .collect();
-
-        if !file_ids.is_empty() {
-            change_files(
-                &mut tx,
-                committee_session.id,
-                CommitteeSessionFilesUpdateRequest {
-                    results_eml: None,
-                    results_pdf: None,
-                    overview_pdf: None,
-                },
-            )
-            .await?;
-
-            for id in file_ids {
-                if let Some(file) = crate::files::repository::delete_file(&mut tx, id).await? {
-                    audit_service
-                        .log(&mut tx, &AuditEvent::FileDeleted(file.into()), None)
-                        .await?;
-                }
-            }
-        }
+        delete_committee_session_files(&mut tx, audit_service.clone(), committee_session).await?;
     }
 
-    let committee_session = crate::committee_session::repository::change_status(
-        &mut tx,
-        committee_session_id,
-        new_status,
-    )
-    .await?;
+    let committee_session = change_status(&mut tx, committee_session_id, new_status).await?;
 
     audit_service
         .log(
@@ -152,7 +156,7 @@ impl CommitteeSessionStatus {
             | CommitteeSessionStatus::DataEntryPaused
             | CommitteeSessionStatus::DataEntryFinished => {
                 let polling_stations =
-                    crate::polling_station::repository::list(conn, committee_session.id).await?;
+                    polling_station::repository::list(conn, committee_session.id).await?;
                 if polling_stations.is_empty() {
                     return Ok(CommitteeSessionStatus::Created);
                 } else if committee_session.is_next_session() {
@@ -176,7 +180,7 @@ impl CommitteeSessionStatus {
         match self {
             CommitteeSessionStatus::Created => {
                 let polling_stations =
-                    crate::polling_station::repository::list(conn, committee_session.id).await?;
+                    polling_station::repository::list(conn, committee_session.id).await?;
                 if polling_stations.is_empty() {
                     Err(CommitteeSessionError::InvalidStatusTransition)
                 } else if committee_session.is_next_session() {

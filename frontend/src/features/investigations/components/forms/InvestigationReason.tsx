@@ -20,6 +20,8 @@ import {
 } from "@/types/generated/openapi";
 import { StringFormData } from "@/utils/stringFormData";
 
+import { getInvestigationUpdatedMessage } from "../../utils/messages";
+
 interface InvestigationReasonProps {
   pollingStationId: number;
 }
@@ -52,23 +54,7 @@ export function InvestigationReason({ pollingStationId }: InvestigationReasonPro
 
     const save = () => {
       if (investigation != undefined) {
-        if (currentCommitteeSession.status === "data_entry_finished") {
-          pushMessage({
-            type: "warning",
-            title: t("generate_new_results"),
-            text: `${t("investigations.message.investigation_updated", {
-              number: pollingStation.number,
-              name: pollingStation.name,
-            })}. ${t("documents_are_invalidated")}`,
-          });
-        } else {
-          pushMessage({
-            title: t("investigations.message.investigation_updated", {
-              number: pollingStation.number,
-              name: pollingStation.name,
-            }),
-          });
-        }
+        pushMessage(getInvestigationUpdatedMessage(pollingStation, currentCommitteeSession.status));
         void refetch();
         return update({
           reason,

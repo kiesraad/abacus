@@ -21,6 +21,8 @@ import {
 } from "@/types/generated/openapi";
 import { StringFormData } from "@/utils/stringFormData";
 
+import { getInvestigationUpdatedMessage } from "../../utils/messages";
+
 interface InvestigationFindingsProps {
   pollingStationId: number;
 }
@@ -113,23 +115,7 @@ export function InvestigationFindings({ pollingStationId }: InvestigationFinding
     if (isSuccess(response)) {
       // Only push a message if there are no messages yet (e.g. from creating this investigation)
       if (!hasMessages()) {
-        if (currentCommitteeSession.status === "data_entry_finished") {
-          pushMessage({
-            type: "warning",
-            title: t("generate_new_results"),
-            text: `${t("investigations.message.investigation_updated", {
-              number: pollingStation.number,
-              name: pollingStation.name,
-            })}. ${t("documents_are_invalidated")}`,
-          });
-        } else {
-          pushMessage({
-            title: t("investigations.message.investigation_updated", {
-              number: pollingStation.number,
-              name: pollingStation.name,
-            }),
-          });
-        }
+        pushMessage(getInvestigationUpdatedMessage(pollingStation, currentCommitteeSession.status));
       }
 
       await refetch();

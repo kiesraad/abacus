@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use sqlx::{Connection, SqliteConnection, query, query_as, types::Json};
+use sqlx::{Connection, Error, SqliteConnection, query, query_as, types::Json};
 
 use super::{
     ElectionStatusResponseEntry, PollingStationDataEntry, PollingStationResult,
@@ -14,7 +14,7 @@ pub async fn get_data_entry(
     conn: &mut SqliteConnection,
     polling_station_id: u32,
     committee_session_id: u32,
-) -> Result<PollingStationDataEntry, sqlx::Error> {
+) -> Result<PollingStationDataEntry, Error> {
     query_as!(
         PollingStationDataEntry,
         r#"
@@ -39,7 +39,7 @@ pub async fn get_result(
     conn: &mut SqliteConnection,
     polling_station_id: u32,
     committee_session_id: u32,
-) -> Result<PollingStationResult, sqlx::Error> {
+) -> Result<PollingStationResult, Error> {
     query_as!(
         PollingStationResult,
         r#"
@@ -64,7 +64,7 @@ pub async fn get(
     conn: &mut SqliteConnection,
     polling_station_id: u32,
     committee_session_id: u32,
-) -> Result<DataEntryStatus, sqlx::Error> {
+) -> Result<DataEntryStatus, Error> {
     get_data_entry(conn, polling_station_id, committee_session_id)
         .await
         .map(|psde| psde.state.0)
@@ -76,7 +76,7 @@ pub async fn get_or_default(
     conn: &mut SqliteConnection,
     polling_station_id: u32,
     committee_session_id: u32,
-) -> Result<DataEntryStatus, sqlx::Error> {
+) -> Result<DataEntryStatus, Error> {
     Ok(query_as!(
         PollingStationDataEntry,
         r#"
@@ -103,7 +103,7 @@ pub async fn upsert(
     polling_station_id: u32,
     committee_session_id: u32,
     state: &DataEntryStatus,
-) -> Result<PollingStationDataEntry, sqlx::Error> {
+) -> Result<PollingStationDataEntry, Error> {
     let state = Json(state);
     query_as!(
         PollingStationDataEntry,
@@ -131,7 +131,7 @@ pub async fn upsert(
 pub async fn delete_data_entry(
     conn: &mut SqliteConnection,
     polling_station_id: u32,
-) -> Result<Option<PollingStationDataEntry>, sqlx::Error> {
+) -> Result<Option<PollingStationDataEntry>, Error> {
     query_as!(
         PollingStationDataEntry,
         r#"
@@ -152,7 +152,7 @@ pub async fn delete_data_entry(
 pub async fn delete_result(
     conn: &mut SqliteConnection,
     polling_station_id: u32,
-) -> Result<Option<PollingStationResult>, sqlx::Error> {
+) -> Result<Option<PollingStationResult>, Error> {
     query_as!(
         PollingStationResult,
         r#"
@@ -174,7 +174,7 @@ pub async fn delete_result(
 pub async fn statuses(
     conn: &mut SqliteConnection,
     committee_session_id: u32,
-) -> Result<Vec<ElectionStatusResponseEntry>, sqlx::Error> {
+) -> Result<Vec<ElectionStatusResponseEntry>, Error> {
     // If this is not the first committee session, we only want to include
     // polling stations with corrected results in this committee session
     query!(
@@ -213,7 +213,7 @@ pub async fn make_definitive(
     committee_session_id: u32,
     new_state: &DataEntryStatus,
     definitive_entry: &PollingStationResults,
-) -> Result<(), sqlx::Error> {
+) -> Result<(), Error> {
     let mut tx = conn.begin().await?;
 
     let definitive_entry = Json(definitive_entry);
@@ -249,7 +249,7 @@ pub async fn make_definitive(
 }
 
 /// Check if a polling station has a data entry
-pub async fn data_entry_exists(conn: &mut SqliteConnection, id: u32) -> Result<bool, sqlx::Error> {
+pub async fn data_entry_exists(conn: &mut SqliteConnection, id: u32) -> Result<bool, Error> {
     let res = query!(
         r#"
         SELECT EXISTS(
@@ -264,7 +264,7 @@ pub async fn data_entry_exists(conn: &mut SqliteConnection, id: u32) -> Result<b
 }
 
 /// Check if a polling station has a result
-pub async fn result_exists(conn: &mut SqliteConnection, id: u32) -> Result<bool, sqlx::Error> {
+pub async fn result_exists(conn: &mut SqliteConnection, id: u32) -> Result<bool, Error> {
     let res = query!(
         r#"
         SELECT EXISTS(
@@ -282,7 +282,7 @@ async fn fetch_results_for_committee_session(
     conn: &mut SqliteConnection,
     committee_session_id: u32,
     polling_station_id: Option<u32>,
-) -> Result<Vec<(PollingStation, PollingStationResults)>, sqlx::Error> {
+) -> Result<Vec<(PollingStation, PollingStationResults)>, Error> {
     let mut tx = conn.begin().await?;
 
     // Get and index polling stations by id for performance
@@ -340,14 +340,14 @@ async fn fetch_results_for_committee_session(
             .get(&row.original_id)
             .cloned()
             .map(|ps| (ps, row.data.0))
-            .ok_or_else(|| sqlx::Error::RowNotFound)
+            .ok_or_else(|| Error::RowNotFound)
     })
     .fetch_all(&mut *tx)
     .await?;
     tx.commit().await?;
 
     if results.len() != polling_stations.len() {
-        Err(sqlx::Error::RowNotFound)
+        Err(Error::RowNotFound)
     } else {
         Ok(results)
     }
@@ -357,7 +357,7 @@ async fn fetch_results_for_committee_session(
 pub async fn list_results_for_committee_session(
     conn: &mut SqliteConnection,
     committee_session_id: u32,
-) -> Result<Vec<(PollingStation, PollingStationResults)>, sqlx::Error> {
+) -> Result<Vec<(PollingStation, PollingStationResults)>, Error> {
     fetch_results_for_committee_session(conn, committee_session_id, None).await
 }
 
@@ -366,18 +366,16 @@ pub async fn list_results_for_committee_session(
 pub async fn previous_results_for_polling_station(
     conn: &mut SqliteConnection,
     polling_station_id: u32,
-) -> Result<PollingStationResults, sqlx::Error> {
+) -> Result<PollingStationResults, Error> {
     let polling_station = polling_station::get(conn, polling_station_id).await?;
-    let ps_id_prev_session = polling_station
-        .id_prev_session
-        .ok_or(sqlx::Error::RowNotFound)?;
+    let ps_id_prev_session = polling_station.id_prev_session.ok_or(Error::RowNotFound)?;
 
     let prev_session_id = crate::committee_session::repository::get_previous_session(
         conn,
         polling_station.committee_session_id,
     )
     .await?
-    .ok_or(sqlx::Error::RowNotFound)?
+    .ok_or(Error::RowNotFound)?
     .id;
 
     fetch_results_for_committee_session(conn, prev_session_id, Some(ps_id_prev_session))
@@ -385,7 +383,7 @@ pub async fn previous_results_for_polling_station(
         .into_iter()
         .next()
         .map(|(_, data)| data)
-        .ok_or(sqlx::Error::RowNotFound)
+        .ok_or(Error::RowNotFound)
 }
 
 /// Checks if results are complete for a committee session by verifying that
@@ -395,7 +393,7 @@ pub async fn previous_results_for_polling_station(
 pub async fn are_results_complete_for_committee_session(
     conn: &mut SqliteConnection,
     committee_session_id: u32,
-) -> Result<bool, sqlx::Error> {
+) -> Result<bool, Error> {
     let mut tx = conn.begin().await?;
 
     let committee_session =
@@ -447,7 +445,7 @@ pub async fn insert_test_result(
     polling_station_id: u32,
     committee_session_id: u32,
     results: &PollingStationResults,
-) -> Result<(), sqlx::Error> {
+) -> Result<(), Error> {
     let results = Json(results);
     query!(
         "INSERT INTO polling_station_results (polling_station_id, committee_session_id, data) VALUES (?, ?, ?)",
@@ -532,7 +530,7 @@ mod tests {
 
             let results = list_results_for_committee_session(&mut conn, committee_session_id).await;
             assert!(results.is_err());
-            assert!(matches!(results.unwrap_err(), sqlx::Error::RowNotFound));
+            assert!(matches!(results.unwrap_err(), Error::RowNotFound));
         }
 
         /// Test with 4th session, one polling station with investigation, but no corrected results
@@ -609,7 +607,7 @@ mod tests {
 
             let results = list_results_for_committee_session(&mut conn, committee_session_id).await;
             assert!(results.is_err());
-            assert!(matches!(results.unwrap_err(), sqlx::Error::RowNotFound));
+            assert!(matches!(results.unwrap_err(), Error::RowNotFound));
         }
 
         /// Test with 4th session, new polling station with no investigation (error)
@@ -634,7 +632,7 @@ mod tests {
 
             let results = list_results_for_committee_session(&mut conn, committee_session_id).await;
             assert!(results.is_err());
-            assert!(matches!(results.unwrap_err(), sqlx::Error::RowNotFound));
+            assert!(matches!(results.unwrap_err(), Error::RowNotFound));
         }
 
         /// Test with 4th session, new polling station with investigation, but no corrected results (error)
@@ -665,7 +663,7 @@ mod tests {
 
             let results = list_results_for_committee_session(&mut conn, committee_session_id).await;
             assert!(results.is_err());
-            assert!(matches!(results.unwrap_err(), sqlx::Error::RowNotFound));
+            assert!(matches!(results.unwrap_err(), Error::RowNotFound));
         }
 
         /// Test with 4th session, new polling station with investigation, corrected results=true and results exist
@@ -746,7 +744,7 @@ mod tests {
 
             let results = list_results_for_committee_session(&mut conn, committee_session_id).await;
             assert!(results.is_err());
-            assert!(matches!(results.unwrap_err(), sqlx::Error::RowNotFound));
+            assert!(matches!(results.unwrap_err(), Error::RowNotFound));
         }
 
         /// Test with 4th session, new polling station with investigation, corrected results=true and results exist in 3rd session
@@ -1043,6 +1041,6 @@ mod tests {
 
         let results = previous_results_for_polling_station(&mut conn, polling_station_id).await;
         assert!(results.is_err());
-        assert!(matches!(results.unwrap_err(), sqlx::Error::RowNotFound));
+        assert!(matches!(results.unwrap_err(), Error::RowNotFound));
     }
 }

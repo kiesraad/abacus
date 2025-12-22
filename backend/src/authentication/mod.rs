@@ -517,7 +517,7 @@ mod tests {
     async fn test_list(pool: SqlitePool) {
         let app = create_app(pool.clone());
         let mut conn = pool.acquire().await.unwrap();
-        let session = session::create(
+        let session = super::session::create(
             &mut conn,
             1,
             TEST_USER_AGENT,
@@ -544,7 +544,7 @@ mod tests {
 
         assert_eq!(response.status(), StatusCode::OK);
         let body = response.into_body().collect().await.unwrap().to_bytes();
-        let result: UserListResponse = serde_json::from_slice(&body).unwrap();
+        let result: user_api::UserListResponse = serde_json::from_slice(&body).unwrap();
         assert_eq!(result.users.len(), 6);
     }
 
@@ -554,7 +554,7 @@ mod tests {
 
         // with a normal long-valid session the user should not get a new cookie
         let mut conn = pool.acquire().await.unwrap();
-        let session = session::create(
+        let session = super::session::create(
             &mut conn,
             1,
             TEST_USER_AGENT,
@@ -584,7 +584,7 @@ mod tests {
         assert_eq!(response.headers().get("set-cookie"), None);
 
         // with a session that is about to expire the user should get a new cookie, and the session lifetime should be extended
-        let session: session::Session = session::create(
+        let session: session::Session = super::session::create(
             &mut conn,
             1,
             TEST_USER_AGENT,
@@ -669,7 +669,7 @@ mod tests {
                     .header(USER_AGENT, TEST_USER_AGENT)
                     .header(COOKIE, cookie)
                     .body(Body::from(
-                        serde_json::to_vec(&UpdateUserRequest {
+                        serde_json::to_vec(&user_api::UpdateUserRequest {
                             fullname: Some("Test Full Name".to_string()),
                             temp_password: None,
                         })
@@ -693,7 +693,7 @@ mod tests {
         let app = create_app(pool.clone());
         // user id 5 is a typist
         let mut conn = pool.acquire().await.unwrap();
-        let session = session::create(
+        let session = super::session::create(
             &mut conn,
             5,
             TEST_USER_AGENT,

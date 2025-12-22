@@ -14,7 +14,7 @@ use abacus::{
     polling_station::PollingStation,
     report::DEFAULT_DATE_TIME_FORMAT,
     summary::ElectionSummary,
-    test_data_gen::{GenerateElectionArgs, RandomRange, create_test_election, parse_range},
+    test_data_gen::{GenerateElectionArgs, RandomRange, parse_range},
 };
 use clap::Parser;
 use std::{
@@ -132,7 +132,8 @@ async fn main() -> Result<(), AppError> {
     )
     .await?;
 
-    let test_election = create_test_election(args.clone().into(), pool).await?;
+    let test_election =
+        abacus::test_data_gen::create_test_election(args.clone().into(), pool).await?;
 
     if let Some(export_dir) = args.export_definition {
         // Export the election definition, candidate list and polling stations to a directory

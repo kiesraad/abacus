@@ -143,7 +143,7 @@ pub struct ElectionIdentifier {
 
 impl ElectionIdentifier {
     pub fn from_election(
-        election: &structs::ElectionWithPoliticalGroups,
+        election: &crate::election::structs::ElectionWithPoliticalGroups,
         include_nomination_date: bool,
     ) -> Self {
         let subcategory = if election.number_of_seats >= 19 {

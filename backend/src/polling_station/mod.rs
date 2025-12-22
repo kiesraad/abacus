@@ -7,7 +7,9 @@ mod structs;
 #[cfg(feature = "dev-database")]
 pub(crate) use self::repository::create_polling_station;
 pub use self::structs::PollingStation;
-#[cfg(any(feature = "dev-database", test, fuzzing))]
+#[cfg(fuzzing)]
+pub use self::structs::PollingStationType;
+#[cfg(all(any(feature = "dev-database", test), not(fuzzing)))]
 pub(crate) use self::structs::PollingStationType;
 pub(crate) use self::{
     api::{create_imported_polling_stations, router},

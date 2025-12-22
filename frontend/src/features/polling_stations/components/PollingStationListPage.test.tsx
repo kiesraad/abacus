@@ -97,33 +97,36 @@ describe("PollingStationListPage", () => {
     { status: "data_entry_in_progress", allowed: false },
     { status: "data_entry_paused", allowed: false },
     { status: "data_entry_finished", allowed: false },
-  ] satisfies Array<{ status: CommitteeSessionStatus; allowed: boolean }>)(
-    "Polling station update links and add button with committee session status=$status are allowed=$allowed for administrator",
-    async ({ status, allowed }) => {
-      const user = userEvent.setup();
-      overrideOnce("get", "/api/elections/1", 200, getElectionMockData({}, { status }));
+  ] satisfies Array<{
+    status: CommitteeSessionStatus;
+    allowed: boolean;
+  }>)("Polling station update links and add button with committee session status=$status are allowed=$allowed for administrator", async ({
+    status,
+    allowed,
+  }) => {
+    const user = userEvent.setup();
+    overrideOnce("get", "/api/elections/1", 200, getElectionMockData({}, { status }));
 
-      renderPage("administrator");
+    renderPage("administrator");
 
-      expect(await screen.findByRole("heading", { level: 1, name: "Stembureaus beheren" })).toBeVisible();
+    expect(await screen.findByRole("heading", { level: 1, name: "Stembureaus beheren" })).toBeVisible();
 
-      const table = await screen.findByRole("table");
-      expect(table).toBeVisible();
+    const table = await screen.findByRole("table");
+    expect(table).toBeVisible();
 
-      const tableRows = within(table).queryAllByRole("row");
-      await user.click(tableRows[1]!);
+    const tableRows = within(table).queryAllByRole("row");
+    await user.click(tableRows[1]!);
 
-      if (allowed) {
-        await waitFor(() => {
-          expect(navigate).toHaveBeenCalledExactlyOnceWith("1/update");
-        });
-        expect(await screen.findByRole("link", { name: "Stembureau toevoegen" })).toBeVisible();
-      } else {
-        expect(navigate).not.toHaveBeenCalled();
-        expect(screen.queryByRole("link", { name: "Stembureau toevoegen" })).not.toBeInTheDocument();
-        const infoAlert = await screen.findByRole("alert");
-        expect(within(infoAlert).getByRole("strong")).toHaveTextContent("Stembureaus kunnen niet aangepast worden");
-      }
-    },
-  );
+    if (allowed) {
+      await waitFor(() => {
+        expect(navigate).toHaveBeenCalledExactlyOnceWith("1/update");
+      });
+      expect(await screen.findByRole("link", { name: "Stembureau toevoegen" })).toBeVisible();
+    } else {
+      expect(navigate).not.toHaveBeenCalled();
+      expect(screen.queryByRole("link", { name: "Stembureau toevoegen" })).not.toBeInTheDocument();
+      const infoAlert = await screen.findByRole("alert");
+      expect(within(infoAlert).getByRole("strong")).toHaveTextContent("Stembureaus kunnen niet aangepast worden");
+    }
+  });
 });

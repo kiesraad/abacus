@@ -40,78 +40,82 @@ function renderComponent(onSubmit: (options?: SubmitCurrentFormOptions) => Promi
 
 describe("DataEntryNavigation", () => {
   describe("Blocker behaviour", () => {
-    test.each<Status>(["deleted", "finalised", "finalising", "aborted"])(
-      "Does not block navigation for status: %s",
-      async (status) => {
-        const state: DataEntryStateAndActionsLoaded = {
-          ...getDefaultDataEntryStateAndActionsLoaded(),
-          status,
-        };
+    test.each<Status>([
+      "deleted",
+      "finalised",
+      "finalising",
+      "aborted",
+    ])("Does not block navigation for status: %s", async (status) => {
+      const state: DataEntryStateAndActionsLoaded = {
+        ...getDefaultDataEntryStateAndActionsLoaded(),
+        status,
+      };
 
-        vi.spyOn(ReactRouter, "useParams").mockReturnValue({ sectionId: "test" });
-        vi.spyOn(useDataEntryContext, "useDataEntryContext").mockReturnValue(state);
-        vi.spyOn(useUser, "useUser").mockReturnValue(getTypistUser());
+      vi.spyOn(ReactRouter, "useParams").mockReturnValue({ sectionId: "test" });
+      vi.spyOn(useDataEntryContext, "useDataEntryContext").mockReturnValue(state);
+      vi.spyOn(useUser, "useUser").mockReturnValue(getTypistUser());
 
-        const router = renderComponent(vi.fn());
+      const router = renderComponent(vi.fn());
 
-        await router.navigate("/test");
-        expect(router.state.location.pathname).toBe("/test");
-      },
-    );
+      await router.navigate("/test");
+      expect(router.state.location.pathname).toBe("/test");
+    });
 
-    test.each<Status>(["idle", "saving", "deleting"])(
-      "Does not block navigation without changes for status: %s",
-      async (status) => {
-        const state: DataEntryStateAndActionsLoaded = {
-          ...getDefaultDataEntryStateAndActionsLoaded(),
-          status,
-        };
+    test.each<Status>([
+      "idle",
+      "saving",
+      "deleting",
+    ])("Does not block navigation without changes for status: %s", async (status) => {
+      const state: DataEntryStateAndActionsLoaded = {
+        ...getDefaultDataEntryStateAndActionsLoaded(),
+        status,
+      };
 
-        vi.spyOn(ReactRouter, "useParams").mockReturnValue({ sectionId: "differences_counts" });
-        vi.spyOn(useDataEntryContext, "useDataEntryContext").mockReturnValue(state);
-        vi.spyOn(useUser, "useUser").mockReturnValue(getTypistUser());
+      vi.spyOn(ReactRouter, "useParams").mockReturnValue({ sectionId: "differences_counts" });
+      vi.spyOn(useDataEntryContext, "useDataEntryContext").mockReturnValue(state);
+      vi.spyOn(useUser, "useUser").mockReturnValue(getTypistUser());
 
-        const router = renderComponent(vi.fn());
+      const router = renderComponent(vi.fn());
 
-        await router.navigate(testPath + "/differences_counts");
-        expect(router.state.location.pathname).toBe(testPath + "/differences_counts");
-      },
-    );
+      await router.navigate(testPath + "/differences_counts");
+      expect(router.state.location.pathname).toBe(testPath + "/differences_counts");
+    });
 
-    test.each<Status>(["idle", "saving", "deleting"])(
-      "Blocks navigation when form has changes for status: %s",
-      async (status) => {
-        const state: DataEntryStateAndActionsLoaded = {
-          ...getDefaultDataEntryStateAndActionsLoaded(),
-          formState: {
-            furthest: "differences_counts",
-            sections: {
-              ...getDefaultDataEntryState().formState.sections,
-              voters_votes_counts: {
-                ...getDefaultDataEntryState().formState.sections.voters_votes_counts!,
-                hasChanges: true,
-              },
+    test.each<Status>([
+      "idle",
+      "saving",
+      "deleting",
+    ])("Blocks navigation when form has changes for status: %s", async (status) => {
+      const state: DataEntryStateAndActionsLoaded = {
+        ...getDefaultDataEntryStateAndActionsLoaded(),
+        formState: {
+          furthest: "differences_counts",
+          sections: {
+            ...getDefaultDataEntryState().formState.sections,
+            voters_votes_counts: {
+              ...getDefaultDataEntryState().formState.sections.voters_votes_counts!,
+              hasChanges: true,
             },
           },
-          status,
-        };
+        },
+        status,
+      };
 
-        vi.spyOn(ReactRouter, "useParams").mockReturnValue({ sectionId: "voters_votes_counts" });
-        vi.spyOn(useDataEntryContext, "useDataEntryContext").mockReturnValue(state);
-        vi.spyOn(useUser, "useUser").mockReturnValue(getTypistUser());
+      vi.spyOn(ReactRouter, "useParams").mockReturnValue({ sectionId: "voters_votes_counts" });
+      vi.spyOn(useDataEntryContext, "useDataEntryContext").mockReturnValue(state);
+      vi.spyOn(useUser, "useUser").mockReturnValue(getTypistUser());
 
-        const router = renderComponent(vi.fn());
+      const router = renderComponent(vi.fn());
 
-        //navigate within data entry flow
-        await router.navigate(testPath + "/differences_counts");
-        expect(router.state.location.pathname).toBe(testPath);
+      //navigate within data entry flow
+      await router.navigate(testPath + "/differences_counts");
+      expect(router.state.location.pathname).toBe(testPath);
 
-        const modal = await screen.findByRole("dialog");
-        expect(modal).toBeVisible();
-        const title = within(modal).getByText("Let op: niet opgeslagen wijzigingen");
-        expect(title).toBeVisible();
-      },
-    );
+      const modal = await screen.findByRole("dialog");
+      expect(modal).toBeVisible();
+      const title = within(modal).getByText("Let op: niet opgeslagen wijzigingen");
+      expect(title).toBeVisible();
+    });
 
     test("Does not block navigation if user is null", async () => {
       const state: DataEntryStateAndActionsLoaded = {

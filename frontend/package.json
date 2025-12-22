@@ -94,8 +94,6 @@
     }
   },
   "msw": {
-    "workerDirectory": [
-      ""
-    ]
+    "workerDirectory": [""]
   }
 }

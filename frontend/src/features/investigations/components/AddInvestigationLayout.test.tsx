@@ -100,23 +100,28 @@ describe("AddInvestigationLayout", () => {
       { to: "print-corrigendum", status: "data_entry_not_started", expectShown: false },
       { to: "findings", status: "data_entry_not_started", expectShown: true },
       { to: "findings", status: "data_entry_in_progress", expectShown: false },
-    ] satisfies Array<{ to: string; status: CommitteeSessionStatus; expectShown: boolean }>)(
-      `When navigating to $to with status $status it should show => $expectShown`,
-      async ({ to, status, expectShown }) => {
-        overrideOnce("get", "/api/elections/1", 200, getElectionMockData({}, { number: 2, status }, []));
+    ] satisfies Array<{
+      to: string;
+      status: CommitteeSessionStatus;
+      expectShown: boolean;
+    }>)(`When navigating to $to with status $status it should show => $expectShown`, async ({
+      to,
+      status,
+      expectShown,
+    }) => {
+      overrideOnce("get", "/api/elections/1", 200, getElectionMockData({}, { number: 2, status }, []));
 
-        const router = await renderPage("reason");
-        await router.navigate(`../${to}`);
+      const router = await renderPage("reason");
+      await router.navigate(`../${to}`);
 
-        if (!expectShown) {
-          expect(screen.queryByTestId("modal-dialog")).toBeNull();
-          return;
-        }
+      if (!expectShown) {
+        expect(screen.queryByTestId("modal-dialog")).toBeNull();
+        return;
+      }
 
-        const modal = await screen.findByTestId("modal-dialog");
-        expect(modal).toHaveTextContent("Invoerfase starten?");
-      },
-    );
+      const modal = await screen.findByTestId("modal-dialog");
+      expect(modal).toHaveTextContent("Invoerfase starten?");
+    });
 
     test("When immediately navigating to findings with status=data_entry_not_started should show the modal", async () => {
       const electionData = getElectionMockData({}, { number: 2, status: "data_entry_not_started" }, []);

@@ -32,7 +32,7 @@ In de tweewekelijkse planningsmeeting wordt een duidelijk overzicht gemaakt van 
 issues worden bijgehouden op het [Abacus projectbord](https://github.com/orgs/kiesraad/projects/1).
 De taken worden aan een _epic_ gekoppeld en de epics worden gerangschikt op prioriteit.
 
-Het [ontwerp van de gebruikersinterface (in Figma)](https://www.figma.com/design/xHDfsv69Nhmk3IrWC0303B/Public---Kiesraad---Abacus-Software-voor-verkiezingsuitslagen-en-zetelverdeling?node-id=3190-11434) bevat ontwerpen voor alle features die een ontwerp vereisen.
+Het [ontwerp van de gebruikersinterface (in Figma)](https://www.figma.com/design/zZlFr8tYiRyp4I26sh6eqp/Kiesraad---Abacus-optelsoftware?node-id=3190-11434) bevat ontwerpen voor alle features die een ontwerp vereisen.
 Dit wordt ook in de context van het gehele design besproken met het team.
 
 Het aanmaken van een nieuw GitHub-issue voor een feature of change request gebeurt in overleg met het team.

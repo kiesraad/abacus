@@ -21,7 +21,7 @@ De functionele eisen en wensen voor versie 1.0 zijn te vinden via [Functionalite
 
 - [Codebase Backend](/backend/)
 - [Codebase Frontend](/frontend/)
-- [Ontwerp gebruikersinterface (Figma)](https://www.figma.com/design/xHDfsv69Nhmk3IrWC0303B/Public---Kiesraad---Abacus-optelsoftware?node-id=3190-28385&t=VnghjibSJMqrQepm-1)
+- [Ontwerp gebruikersinterface (Figma)](https://www.figma.com/design/zZlFr8tYiRyp4I26sh6eqp/Kiesraad---Abacus-optelsoftware?node-id=3190-11434)
 
 ## Wat is Abacus?
 

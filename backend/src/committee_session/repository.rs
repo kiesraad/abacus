@@ -169,9 +169,8 @@ pub async fn create(
         INSERT INTO committee_sessions (
             number,
             election_id,
-            location,
-            start_date_time
-        ) VALUES (?, ?, "", NULL)
+            location
+        ) VALUES (?, ?, ?)
         RETURNING
             id as "id: u32",
             number as "number: u32",
@@ -185,6 +184,7 @@ pub async fn create(
         "#,
         committee_session.number,
         committee_session.election_id,
+        ""
     )
     .fetch_one(&mut *tx)
     .await?;

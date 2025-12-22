@@ -19,7 +19,7 @@ use crate::{
             ModelN10_2Input, ModelNa31_2Bijlage1Input, ModelNa31_2InlegvelInput, ToPdfFileModel,
         },
     },
-    polling_station::list_polling_stations,
+    polling_station,
     zip::ZipResponse,
 };
 
@@ -66,7 +66,7 @@ async fn election_download_n_10_2(
             election.id,
         )
         .await?;
-    let polling_stations = list_polling_stations(&mut conn, current_committee_session.id).await?;
+    let polling_stations = polling_station::list(&mut conn, current_committee_session.id).await?;
     drop(conn);
 
     let zip_filename = format!(
@@ -148,7 +148,7 @@ async fn election_download_na_31_2_bijlage1(
             election.id,
         )
         .await?;
-    let polling_stations = list_polling_stations(&mut conn, current_committee_session.id).await?;
+    let polling_stations = polling_station::list(&mut conn, current_committee_session.id).await?;
     drop(conn);
 
     let zip_filename = format!(

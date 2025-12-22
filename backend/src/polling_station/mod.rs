@@ -5,7 +5,7 @@ mod repository;
 mod structs;
 
 #[cfg(feature = "dev-database")]
-pub(crate) use self::repository::create_polling_station;
+pub(crate) use self::repository::create;
 pub use self::structs::PollingStation;
 #[cfg(fuzzing)]
 pub use self::structs::PollingStationType;
@@ -13,7 +13,7 @@ pub use self::structs::PollingStationType;
 pub(crate) use self::structs::PollingStationType;
 pub(crate) use self::{
     api::{create_imported_polling_stations, router},
-    repository::{duplicate_for_committee_session, get_polling_station, list_polling_stations},
+    repository::{duplicate_for_committee_session, get, list},
     structs::{PollingStationRequest, PollingStationsRequest},
 };
 #[cfg(test)]

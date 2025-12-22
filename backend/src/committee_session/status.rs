@@ -12,7 +12,7 @@ use crate::{
     audit_log::{AuditEvent, AuditService},
     data_entry::repository::are_results_complete_for_committee_session,
     investigation::list_investigations_for_committee_session,
-    polling_station::list_polling_stations,
+    polling_station,
 };
 
 /// Committee session status
@@ -152,7 +152,7 @@ impl CommitteeSessionStatus {
             | CommitteeSessionStatus::DataEntryInProgress
             | CommitteeSessionStatus::DataEntryPaused
             | CommitteeSessionStatus::DataEntryFinished => {
-                let polling_stations = list_polling_stations(conn, committee_session.id).await?;
+                let polling_stations = polling_station::list(conn, committee_session.id).await?;
                 if polling_stations.is_empty() {
                     return Ok(CommitteeSessionStatus::Created);
                 } else if committee_session.is_next_session() {
@@ -175,7 +175,7 @@ impl CommitteeSessionStatus {
     ) -> Result<Self, CommitteeSessionError> {
         match self {
             CommitteeSessionStatus::Created => {
-                let polling_stations = list_polling_stations(conn, committee_session.id).await?;
+                let polling_stations = polling_station::list(conn, committee_session.id).await?;
                 if polling_stations.is_empty() {
                     Err(CommitteeSessionError::InvalidStatusTransition)
                 } else if committee_session.is_next_session() {

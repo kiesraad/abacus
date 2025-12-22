@@ -6,7 +6,7 @@ use super::{
     ElectionStatusResponseEntry, PollingStationDataEntry, PollingStationResult,
     PollingStationResults, status::DataEntryStatus,
 };
-use crate::polling_station::{PollingStation, get_polling_station, list_polling_stations};
+use crate::{polling_station, polling_station::PollingStation};
 
 /// Get the full polling station data entry row for a given polling station
 /// id, or return an error if there is no data
@@ -286,7 +286,7 @@ async fn fetch_results_for_committee_session(
     let mut tx = conn.begin().await?;
 
     // Get and index polling stations by id for performance
-    let polling_stations: HashMap<u32, _> = list_polling_stations(&mut tx, committee_session_id)
+    let polling_stations: HashMap<u32, _> = polling_station::list(&mut tx, committee_session_id)
         .await?
         .into_iter()
         .filter(|ps| polling_station_id.is_none_or(|id| ps.id == id))
@@ -367,7 +367,7 @@ pub async fn previous_results_for_polling_station(
     conn: &mut SqliteConnection,
     polling_station_id: u32,
 ) -> Result<PollingStationResults, sqlx::Error> {
-    let polling_station = get_polling_station(conn, polling_station_id).await?;
+    let polling_station = polling_station::get(conn, polling_station_id).await?;
     let ps_id_prev_session = polling_station
         .id_prev_session
         .ok_or(sqlx::Error::RowNotFound)?;

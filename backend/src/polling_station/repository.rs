@@ -4,7 +4,7 @@ use super::structs::{PollingStation, PollingStationRequest};
 use sqlx::{Connection, SqliteConnection, query, query_as};
 
 /// List all polling stations from a committee session
-pub async fn list_polling_stations(
+pub async fn list(
     conn: &mut SqliteConnection,
     committee_session_id: u32,
 ) -> Result<Vec<PollingStation>, sqlx::Error> {
@@ -34,10 +34,7 @@ pub async fn list_polling_stations(
 }
 
 /// Get a single polling station
-pub async fn get_polling_station(
-    conn: &mut SqliteConnection,
-    id: u32,
-) -> Result<PollingStation, sqlx::Error> {
+pub async fn get(conn: &mut SqliteConnection, id: u32) -> Result<PollingStation, sqlx::Error> {
     query_as!(
         PollingStation,
         r#"
@@ -68,7 +65,7 @@ pub async fn get_polling_station(
 }
 
 /// Get a single polling station for an election
-pub async fn get_polling_station_for_election(
+pub async fn get_for_election(
     conn: &mut SqliteConnection,
     election_id: ElectionId,
     id: u32,
@@ -105,7 +102,7 @@ pub async fn get_polling_station_for_election(
 }
 
 /// Create a single polling station for an election
-pub async fn create_polling_station(
+pub async fn create(
     conn: &mut SqliteConnection,
     election_id: ElectionId,
     new_polling_station: PollingStationRequest,
@@ -167,7 +164,7 @@ pub async fn create_polling_station(
 }
 
 /// Create many polling stations for an election
-pub async fn create_many_polling_stations(
+pub async fn create_many(
     conn: &mut SqliteConnection,
     election_id: ElectionId,
     new_polling_stations: Vec<PollingStationRequest>,
@@ -235,7 +232,7 @@ pub async fn create_many_polling_stations(
 }
 
 /// Update a single polling station for an election
-pub async fn update_polling_station(
+pub async fn update(
     conn: &mut SqliteConnection,
     election_id: ElectionId,
     polling_station_id: u32,
@@ -247,7 +244,7 @@ pub async fn update_polling_station(
             .await?
             .ok_or(sqlx::Error::RowNotFound)?;
 
-    let polling_station = get_polling_station(&mut tx, polling_station_id).await?;
+    let polling_station = get(&mut tx, polling_station_id).await?;
     if polling_station.id_prev_session.is_some() && polling_station_update.number.is_some() {
         return Err(sqlx::Error::InvalidArgument(
             "number cannot be updated for polling stations linked to a previous session"
@@ -300,7 +297,7 @@ pub async fn update_polling_station(
 }
 
 /// Delete a single polling station for an election
-pub async fn delete_polling_station(
+pub async fn delete(
     conn: &mut SqliteConnection,
     election_id: ElectionId,
     id: u32,

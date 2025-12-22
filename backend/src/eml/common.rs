@@ -255,7 +255,7 @@ pub struct Candidate {
 }
 
 impl TryFrom<Candidate> for structs::Candidate {
-    type Error = EMLImportError;
+    type Error = crate::eml::EMLImportError;
 
     fn try_from(parsed: Candidate) -> Result<Self, Self::Error> {
         Ok(structs::Candidate {

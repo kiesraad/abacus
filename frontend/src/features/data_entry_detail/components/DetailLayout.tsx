@@ -16,8 +16,8 @@ import { t } from "@/i18n/translate";
 import { getDataEntryStructure } from "@/utils/dataEntryStructure";
 
 import { usePollingStationDataEntryErrors } from "../hooks/usePollingStationDataEntryErrors";
-import { ReadOnlyDataEntryDelete } from "./delete/ReadOnlyDataEntryDelete";
 import { DetailNavigation } from "./DetailNavigation";
+import { ReadOnlyDataEntryDelete } from "./delete/ReadOnlyDataEntryDelete";
 
 export function DetailLayout() {
   const navigate = useNavigate();

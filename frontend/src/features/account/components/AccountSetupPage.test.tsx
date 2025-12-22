@@ -1,11 +1,9 @@
-import * as ReactRouter from "react-router";
-
 import { render as rtlRender } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import * as ReactRouter from "react-router";
 import { describe, expect, test, vi } from "vitest";
-
-import * as useApiState from "@/api/useApiState";
 import { ApiState } from "@/api/ApiProviderContext";
+import * as useApiState from "@/api/useApiState";
 import { ErrorBoundary } from "@/components/error/ErrorBoundary";
 import { AccountUpdateRequestHandler } from "@/testing/api-mocks/RequestHandlers";
 import { loginResponseMockData } from "@/testing/api-mocks/UserMockData";

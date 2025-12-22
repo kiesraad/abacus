@@ -1,8 +1,7 @@
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, test, vi } from "vitest";
-
-import * as useMessages from "@/hooks/messages/useMessages";
 import { ElectionProvider } from "@/hooks/election/ElectionProvider";
+import * as useMessages from "@/hooks/messages/useMessages";
 import { pollingStationRequestMockData } from "@/testing/api-mocks/PollingStationRequestMockData";
 import { ElectionRequestHandler, PollingStationListRequestHandler } from "@/testing/api-mocks/RequestHandlers";
 import { server } from "@/testing/server";

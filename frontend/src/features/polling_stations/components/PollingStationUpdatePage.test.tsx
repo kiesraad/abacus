@@ -1,11 +1,9 @@
-import * as ReactRouter from "react-router";
-
 import { userEvent } from "@testing-library/user-event";
+import * as ReactRouter from "react-router";
 import { beforeEach, describe, expect, test, vi } from "vitest";
-
-import * as useMessages from "@/hooks/messages/useMessages";
 import { ElectionProvider } from "@/hooks/election/ElectionProvider";
 import { ElectionStatusProvider } from "@/hooks/election/ElectionStatusProvider";
+import * as useMessages from "@/hooks/messages/useMessages";
 import { getElectionMockData } from "@/testing/api-mocks/ElectionMockData";
 import { getElectionStatusMockData } from "@/testing/api-mocks/ElectionStatusMockData";
 import {
@@ -16,8 +14,8 @@ import {
   PollingStationUpdateHandler,
 } from "@/testing/api-mocks/RequestHandlers";
 import { overrideOnce, server } from "@/testing/server";
-import { render, screen, spyOnHandler, waitFor, within } from "@/testing/test-utils";
 import { TestUserProvider } from "@/testing/TestUserProvider";
+import { render, screen, spyOnHandler, waitFor, within } from "@/testing/test-utils";
 import { CommitteeSessionStatus, DataEntryStatusName, PollingStation, Role } from "@/types/generated/openapi";
 
 import { PollingStationUpdatePage } from "./PollingStationUpdatePage";

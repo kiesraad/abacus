@@ -1,16 +1,14 @@
-import * as ReactRouter from "react-router";
-
 import { userEvent } from "@testing-library/user-event";
+import * as ReactRouter from "react-router";
 import { within } from "storybook/test";
 import { beforeEach, describe, expect, test, vi } from "vitest";
-
-import * as useMessages from "@/hooks/messages/useMessages";
 import { ElectionProvider } from "@/hooks/election/ElectionProvider";
+import * as useMessages from "@/hooks/messages/useMessages";
 import { getElectionMockData } from "@/testing/api-mocks/ElectionMockData";
 import { ElectionRequestHandler, PollingStationListRequestHandler } from "@/testing/api-mocks/RequestHandlers";
 import { overrideOnce, server } from "@/testing/server";
-import { render, screen, waitFor } from "@/testing/test-utils";
 import { TestUserProvider } from "@/testing/TestUserProvider";
+import { render, screen, waitFor } from "@/testing/test-utils";
 import { CommitteeSessionStatus, PollingStationListResponse, Role } from "@/types/generated/openapi";
 
 import { PollingStationListPage } from "./PollingStationListPage";

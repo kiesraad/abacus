@@ -1,9 +1,8 @@
 import * as ReactRouter from "react-router";
 
 import { describe, expect, test, vi } from "vitest";
-
-import * as useUser from "@/hooks/user/useUser";
 import { MessagesProvider } from "@/hooks/messages/MessagesProvider";
+import * as useUser from "@/hooks/user/useUser";
 import { electionMockData } from "@/testing/api-mocks/ElectionMockData";
 import { pollingStationMockData } from "@/testing/api-mocks/PollingStationMockData";
 import {

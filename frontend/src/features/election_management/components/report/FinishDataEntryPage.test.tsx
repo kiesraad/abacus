@@ -1,9 +1,8 @@
-import * as ReactRouter from "react-router";
-import { ReactNode } from "react";
-
 import { render as rtlRender } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { http, HttpResponse } from "msw";
+import { HttpResponse, http } from "msw";
+import { ReactNode } from "react";
+import * as ReactRouter from "react-router";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
 import { ApiProvider } from "@/api/ApiProvider";
@@ -20,6 +19,7 @@ import {
 } from "@/testing/api-mocks/RequestHandlers";
 import { getRouter, Router } from "@/testing/router";
 import { overrideOnce, server } from "@/testing/server";
+import { TestUserProvider } from "@/testing/TestUserProvider";
 import {
   expectConflictErrorPage,
   renderReturningRouter,
@@ -28,7 +28,6 @@ import {
   spyOnHandler,
   waitFor,
 } from "@/testing/test-utils";
-import { TestUserProvider } from "@/testing/TestUserProvider";
 import { ElectionDetailsResponse, ErrorResponse, PollingStation } from "@/types/generated/openapi";
 
 import { FinishDataEntryPage } from "./FinishDataEntryPage";

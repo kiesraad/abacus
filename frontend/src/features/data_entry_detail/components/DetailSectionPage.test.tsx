@@ -11,8 +11,8 @@ import {
   PollingStationDataEntryGetHandler,
 } from "@/testing/api-mocks/RequestHandlers";
 import { server } from "@/testing/server";
-import { render, screen } from "@/testing/test-utils";
 import { TestUserProvider } from "@/testing/TestUserProvider";
+import { render, screen } from "@/testing/test-utils";
 
 import { DetailSectionPage } from "./DetailSectionPage";
 

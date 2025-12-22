@@ -1,7 +1,6 @@
-import * as ReactRouter from "react-router";
-
 import { render as rtlRender, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import * as ReactRouter from "react-router";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
 import { ErrorBoundary } from "@/components/error/ErrorBoundary";

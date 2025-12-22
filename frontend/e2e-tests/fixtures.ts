@@ -1,5 +1,5 @@
-import { APIRequestContext, test as base, expect, Page } from "@playwright/test";
 import { readFile, unlink } from "node:fs/promises";
+import { APIRequestContext, test as base, expect, Page } from "@playwright/test";
 
 import {
   COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_BODY,
@@ -7,23 +7,23 @@ import {
   COMMITTEE_SESSION_UPDATE_REQUEST_BODY,
   COMMITTEE_SESSION_UPDATE_REQUEST_PATH,
   CommitteeSession,
-  Election,
   ELECTION_DETAILS_REQUEST_PATH,
   ELECTION_IMPORT_REQUEST_PATH,
+  Election,
   ElectionDetailsResponse,
   POLLING_STATION_CREATE_REQUEST_PATH,
   POLLING_STATION_GET_REQUEST_PATH,
   PollingStation,
-  User,
   USER_CREATE_REQUEST_BODY,
   USER_CREATE_REQUEST_PATH,
+  User,
 } from "@/types/generated/openapi";
 
 import { DataEntryApiClient } from "./helpers-utils/api-clients";
 import { completePollingStationDataEntries } from "./helpers-utils/e2e-test-api-helpers";
 import { createRandomUsername } from "./helpers-utils/e2e-test-utils";
 import { EmlTestFile, generateEml } from "./helpers-utils/file-helpers";
-import { eml110a, Eml230b, eml230b } from "./test-data/eml-files";
+import { Eml230b, eml110a, eml230b } from "./test-data/eml-files";
 import {
   dataEntryRequest,
   dataEntryWithDifferencesRequest,

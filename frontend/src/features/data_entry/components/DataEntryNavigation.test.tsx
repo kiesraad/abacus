@@ -1,6 +1,5 @@
-import * as ReactRouter from "react-router";
-
 import { render, screen, waitFor, within } from "@testing-library/react";
+import * as ReactRouter from "react-router";
 import { describe, expect, test, vi } from "vitest";
 
 import * as useUser from "@/hooks/user/useUser";

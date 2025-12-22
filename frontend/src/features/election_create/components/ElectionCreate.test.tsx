@@ -1,8 +1,7 @@
-import { ReactNode } from "react";
-import { RouterProvider } from "react-router";
-
 import { render as rtlRender } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { ReactNode } from "react";
+import { RouterProvider } from "react-router";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
 import { ApiProvider } from "@/api/ApiProvider";
@@ -11,8 +10,8 @@ import { pollingStationMockData } from "@/testing/api-mocks/PollingStationMockDa
 import { ElectionListRequestHandler, ElectionRequestHandler } from "@/testing/api-mocks/RequestHandlers";
 import { getRouter, Router } from "@/testing/router";
 import { overrideOnce, server } from "@/testing/server";
-import { screen, setupTestRouter } from "@/testing/test-utils";
 import { TestUserProvider } from "@/testing/TestUserProvider";
+import { screen, setupTestRouter } from "@/testing/test-utils";
 import { ElectionDefinitionValidateResponse, NewElection, PollingStationRequest } from "@/types/generated/openapi";
 
 import { electionCreateRoutes } from "../routes";

@@ -1,6 +1,5 @@
-import { FormEvent, useState } from "react";
-
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import { FormEvent, useState } from "react";
 
 import { Form } from "./Form";
 

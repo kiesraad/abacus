@@ -1,12 +1,11 @@
-import * as ReactRouter from "react-router";
-
 import { waitFor } from "@testing-library/react";
 import { userEvent } from "@testing-library/user-event";
+import * as ReactRouter from "react-router";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
 import { overrideOnce } from "@/testing/server";
 import { render, screen } from "@/testing/test-utils";
-import { User, USER_CREATE_REQUEST_PATH } from "@/types/generated/openapi";
+import { USER_CREATE_REQUEST_PATH, User } from "@/types/generated/openapi";
 
 import { IUserCreateContext, UserCreateContext } from "../../hooks/UserCreateContext";
 import { UserCreateDetailsPage } from "./UserCreateDetailsPage";

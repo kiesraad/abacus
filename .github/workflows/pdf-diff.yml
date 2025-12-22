@@ -53,7 +53,7 @@ jobs:
       - name: Upload diff artifacts
         id: artifact-upload
         if: ${{ steps.diff_summary.outputs.diff_found == '1' }}
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: pdf-diffs
           path: backend/tmp-pdf-gen/diffs/

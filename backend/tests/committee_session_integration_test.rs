@@ -103,7 +103,7 @@ async fn test_committee_session_delete_ok_status_created(pool: SqlitePool) {
 
     let committee_session =
         get_election_committee_session(&addr, &coordinator_cookie, election_id).await;
-    assert_eq!(committee_session["id"], 704);
+    assert_eq!(committee_session["id"], committee_session_id);
     assert_eq!(committee_session["status"], "created");
 
     let response = delete_committee_session(

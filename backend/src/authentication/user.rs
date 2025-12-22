@@ -4,7 +4,7 @@ use axum::{
 };
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
-use sqlx::{Error, FromRow, SqliteConnection, SqlitePool, query, query_as};
+use sqlx::{FromRow, SqliteConnection, SqlitePool, query, query_as};
 use utoipa::ToSchema;
 
 use super::{
@@ -66,7 +66,10 @@ impl User {
     /// Updates the `last_activity_at` field, but first checks if it has been
     /// longer than `MIN_UPDATE_LAST_ACTIVITY_AT_SECS`, to prevent excessive
     /// database writes.
-    pub async fn update_last_activity_at(&self, conn: &mut SqliteConnection) -> Result<(), Error> {
+    pub async fn update_last_activity_at(
+        &self,
+        conn: &mut SqliteConnection,
+    ) -> Result<(), sqlx::Error> {
         if self.should_update_last_activity_at() {
             update_last_activity_at(conn, self.id()).await?;
         }
@@ -381,7 +384,7 @@ pub async fn get_by_id(
 pub async fn list(
     conn: &mut SqliteConnection,
     only_allow_role: Option<Role>,
-) -> Result<Vec<User>, Error> {
+) -> Result<Vec<User>, sqlx::Error> {
     let users = query_as!(
         User,
         r#"SELECT
@@ -426,7 +429,10 @@ pub async fn admin_exists(conn: &mut SqliteConnection) -> Result<bool, Authentic
     Ok(result.is_some())
 }
 
-pub async fn username_by_id(conn: &mut SqliteConnection, user_id: u32) -> Result<String, Error> {
+pub async fn username_by_id(
+    conn: &mut SqliteConnection,
+    user_id: u32,
+) -> Result<String, sqlx::Error> {
     Ok(
         sqlx::query!("SELECT username FROM users WHERE id = ?", user_id)
             .fetch_one(conn)
@@ -438,7 +444,7 @@ pub async fn username_by_id(conn: &mut SqliteConnection, user_id: u32) -> Result
 pub async fn update_last_activity_at(
     conn: &mut SqliteConnection,
     user_id: u32,
-) -> Result<(), Error> {
+) -> Result<(), sqlx::Error> {
     query!(
         r#"UPDATE users SET last_activity_at = CURRENT_TIMESTAMP WHERE id = ?"#,
         user_id,

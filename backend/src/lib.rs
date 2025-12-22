@@ -1,6 +1,5 @@
 use std::{future::Future, net::SocketAddr, str::FromStr};
 
-use airgap::AirgapDetection;
 use axum::{
     Router,
     extract::{DefaultBodyLimit, FromRef},
@@ -85,7 +84,7 @@ impl SqlitePoolExt for SqlitePool {
 #[derive(FromRef, Clone)]
 pub struct AppState {
     pool: SqlitePool,
-    airgap_detection: AirgapDetection,
+    airgap_detection: airgap::AirgapDetection,
 }
 
 pub fn get_scopes_from_operation(operation: &Operation) -> Option<Vec<String>> {
@@ -115,13 +114,13 @@ pub fn openapi_router() -> OpenApiRouter<AppState> {
 
     struct SecurityAddon;
 
-    impl utoipa::Modify for SecurityAddon {
+    impl Modify for SecurityAddon {
         fn modify(&self, openapi: &mut utoipa::openapi::OpenApi) {
             if let Some(components) = openapi.components.as_mut() {
                 components.add_security_scheme(
                     "cookie_auth",
                     SecurityScheme::ApiKey(ApiKey::Cookie(ApiKeyValue::new(String::from(
-                        crate::authentication::SESSION_COOKIE_NAME,
+                        authentication::SESSION_COOKIE_NAME,
                     )))),
                 )
             }
@@ -328,7 +327,10 @@ fn add_security_headers(router: Router<AppState>) -> Router<AppState> {
 }
 
 /// Complete Axum router for the application
-pub fn router(pool: SqlitePool, airgap_detection: AirgapDetection) -> Result<Router, AppError> {
+pub fn router(
+    pool: SqlitePool,
+    airgap_detection: airgap::AirgapDetection,
+) -> Result<Router, AppError> {
     let router = axum_router_from_openapi(openapi_router());
     let state = AppState {
         pool,
@@ -355,11 +357,11 @@ pub async fn start_server(
     let airgap_detection = if enable_airgap_detection {
         info!("Airgap detection is enabled, starting airgap detection task...");
 
-        AirgapDetection::start(pool.clone()).await
+        airgap::AirgapDetection::start(pool.clone()).await
     } else {
         warn!("Airgap detection is disabled, this is not allowed in production.");
 
-        AirgapDetection::nop()
+        airgap::AirgapDetection::nop()
     };
 
     let app = router(pool.clone(), airgap_detection)?;

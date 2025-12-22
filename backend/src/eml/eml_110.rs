@@ -173,9 +173,7 @@ impl EML110 {
     ///
     /// Extract polling places from a 110b
     ///
-    pub fn get_polling_stations(
-        &self,
-    ) -> std::result::Result<Vec<PollingStationRequest>, EMLImportError> {
+    pub fn get_polling_stations(&self) -> Result<Vec<PollingStationRequest>, EMLImportError> {
         // we need to be importing from a 110b file
         if self.base.id != "110b" {
             return Err(EMLImportError::Needs110b);
@@ -200,7 +198,7 @@ impl EML110 {
     ///
     /// Get number of voters from 110b
     ///
-    pub fn get_number_of_voters(&self) -> std::result::Result<u32, EMLImportError> {
+    pub fn get_number_of_voters(&self) -> Result<u32, EMLImportError> {
         // we need to be importing from a 110b file
         if self.base.id != "110b" {
             return Err(EMLImportError::Needs110b);
@@ -226,7 +224,7 @@ impl EML110 {
     pub fn polling_station_definition_matches_election(
         &self,
         election: &crate::election::NewElection,
-    ) -> std::result::Result<bool, EMLImportError> {
+    ) -> Result<bool, EMLImportError> {
         // we need to be importing from a 110b file
         if self.base.id != "110b" {
             return Err(EMLImportError::Needs110b);

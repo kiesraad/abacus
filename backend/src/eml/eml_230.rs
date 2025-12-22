@@ -61,7 +61,7 @@ impl EML230 {
     pub fn add_candidate_lists(
         &self,
         mut election: NewElection,
-    ) -> std::result::Result<NewElection, EMLImportError> {
+    ) -> Result<NewElection, EMLImportError> {
         // we need to be importing from a 230b file
         if self.base.id != "230b" {
             return Err(EMLImportError::Needs230b);

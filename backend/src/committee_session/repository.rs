@@ -1,5 +1,5 @@
 use chrono::NaiveDateTime;
-use sqlx::{Connection, Error, SqliteConnection, query, query_as};
+use sqlx::{Connection, SqliteConnection, query, query_as};
 
 use crate::election::ElectionId;
 
@@ -11,7 +11,7 @@ use super::{
 pub async fn get(
     conn: &mut SqliteConnection,
     committee_session_id: u32,
-) -> Result<CommitteeSession, Error> {
+) -> Result<CommitteeSession, sqlx::Error> {
     query_as!(
         CommitteeSession,
         r#"
@@ -37,7 +37,7 @@ pub async fn get(
 pub async fn get_previous_session(
     conn: &mut SqliteConnection,
     committee_session_id: u32,
-) -> Result<Option<CommitteeSession>, Error> {
+) -> Result<Option<CommitteeSession>, sqlx::Error> {
     query_as!(
         CommitteeSession,
         r#"
@@ -64,7 +64,7 @@ pub async fn get_previous_session(
 pub async fn get_election_committee_session_list(
     conn: &mut SqliteConnection,
     election_id: ElectionId,
-) -> Result<Vec<CommitteeSession>, Error> {
+) -> Result<Vec<CommitteeSession>, sqlx::Error> {
     query_as!(
         CommitteeSession,
         r#"
@@ -91,7 +91,7 @@ pub async fn get_election_committee_session_list(
 pub async fn get_election_committee_session(
     conn: &mut SqliteConnection,
     election_id: ElectionId,
-) -> Result<CommitteeSession, Error> {
+) -> Result<CommitteeSession, sqlx::Error> {
     query_as!(
         CommitteeSession,
         r#"
@@ -118,7 +118,7 @@ pub async fn get_election_committee_session(
 
 pub async fn get_committee_session_for_each_election(
     conn: &mut SqliteConnection,
-) -> Result<Vec<CommitteeSession>, Error> {
+) -> Result<Vec<CommitteeSession>, sqlx::Error> {
     query_as!(
         CommitteeSession,
         r#"
@@ -157,7 +157,7 @@ pub async fn get_committee_session_for_each_election(
 pub async fn create(
     conn: &mut SqliteConnection,
     committee_session: CommitteeSessionCreateRequest,
-) -> Result<CommitteeSession, Error> {
+) -> Result<CommitteeSession, sqlx::Error> {
     let mut tx = conn.begin().await?;
 
     let current_committee_session_id =
@@ -204,7 +204,7 @@ pub async fn create(
 }
 
 /// Delete a committee session
-pub async fn delete(conn: &mut SqliteConnection, id: u32) -> Result<bool, Error> {
+pub async fn delete(conn: &mut SqliteConnection, id: u32) -> Result<bool, sqlx::Error> {
     let mut tx = conn.begin().await?;
 
     query!(
@@ -235,7 +235,7 @@ pub async fn update(
     committee_session_id: u32,
     location: String,
     start_date_time: NaiveDateTime,
-) -> Result<CommitteeSession, Error> {
+) -> Result<CommitteeSession, sqlx::Error> {
     query_as!(
         CommitteeSession,
         r#"
@@ -267,7 +267,7 @@ pub async fn change_status(
     conn: &mut SqliteConnection,
     committee_session_id: u32,
     committee_session_status: CommitteeSessionStatus,
-) -> Result<CommitteeSession, Error> {
+) -> Result<CommitteeSession, sqlx::Error> {
     query_as!(
         CommitteeSession,
         r#"
@@ -296,7 +296,7 @@ pub async fn change_files(
     conn: &mut SqliteConnection,
     committee_session_id: u32,
     committee_session_files_update: CommitteeSessionFilesUpdateRequest,
-) -> Result<CommitteeSession, Error> {
+) -> Result<CommitteeSession, sqlx::Error> {
     query_as!(
         CommitteeSession,
         r#"
@@ -329,7 +329,7 @@ pub async fn change_files(
 pub async fn get_current_id_for_election(
     conn: &mut SqliteConnection,
     election_id: ElectionId,
-) -> Result<Option<u32>, Error> {
+) -> Result<Option<u32>, sqlx::Error> {
     query!(
         r#"
         SELECT id AS "id: u32"

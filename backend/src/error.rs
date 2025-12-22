@@ -9,7 +9,6 @@ use axum::{
 use hyper::header::InvalidHeaderValue;
 use quick_xml::{DeError, SeError};
 use serde::{Deserialize, Serialize};
-use sqlx::Error::RowNotFound;
 use tracing::error;
 use utoipa::ToSchema;
 
@@ -161,7 +160,7 @@ impl IntoResponse for APIError {
                     to_error("Internal server error", ErrorReference::InvalidJson, true),
                 )
             }
-            APIError::SqlxError(RowNotFound) => (
+            APIError::SqlxError(sqlx::Error::RowNotFound) => (
                 StatusCode::NOT_FOUND,
                 to_error("Resource not found", ErrorReference::EntryNotFound, true),
             ),
@@ -424,7 +423,7 @@ impl From<ZipResponseError> for APIError {
 impl From<sqlx::Error> for APIError {
     fn from(err: sqlx::Error) -> Self {
         match &err {
-            RowNotFound => {
+            sqlx::Error::RowNotFound => {
                 APIError::NotFound("Item not found".to_string(), ErrorReference::EntryNotFound)
             }
             sqlx::Error::Database(db_error) => match db_error.kind() {

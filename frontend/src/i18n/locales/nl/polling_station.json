@@ -42,7 +42,7 @@
     "no_polling_stations": "Er zijn nog geen stembureaus ingevoerd voor deze verkiezing. Kies hoe je stembureaus gaat toevoegen.",
     "polling_station_created": "Stembureau {number} ({name}) toegevoegd",
     "polling_station_deleted": "Stembureau {number} ({name}) verwijderd",
-    "polling_station_updated": "Wijzigingen stembureau {number} ({name}) opgeslagen",
+    "polling_station_updated": "Stembureau {number} ({name}) aangepast",
     "polling_stations_imported": "Er zijn {number} stembureaus geïmporteerd"
   },
   "postal_code": "Postcode",

@@ -114,7 +114,7 @@ describe("InvestigationFindingsPage", () => {
       corrected_results: false,
     });
     expect(pushMessage).toHaveBeenCalledWith({
-      title: "Wijzigingen in onderzoek stembureau 35 (Testschool) opgeslagen",
+      title: "Onderzoek voor stembureau 35 (Testschool) aangepast",
     });
   });
 
@@ -152,7 +152,50 @@ describe("InvestigationFindingsPage", () => {
       corrected_results: false,
       accept_data_entry_deletion: false,
     });
-    expect(pushMessage).toHaveBeenCalledWith({ title: "Wijzigingen in onderzoek stembureau 34 (Testplek) opgeslagen" });
+    expect(pushMessage).toHaveBeenCalledWith({ title: "Onderzoek voor stembureau 34 (Testplek) aangepast" });
+  });
+
+  test("Navigates back on save with a warning message when data entry finished", async () => {
+    overrideOnce("get", "/api/elections/1", 200, getElectionMockData({}, { number: 2, status: "data_entry_finished" }));
+    server.use(PollingStationInvestigationUpdateHandler);
+    const update = spyOnHandler(
+      overrideOnce("put", "/api/polling_stations/2/investigation", 200, {
+        findings: "New test findings 4",
+        corrected_results: false,
+      }),
+    );
+
+    await renderPage(2);
+
+    const findings = await screen.findByLabelText("Bevindingen");
+    expect(findings).toHaveValue("Test findings 4");
+
+    const user = userEvent.setup();
+    await user.clear(findings);
+    await user.type(findings, "New test findings 4");
+
+    expect(findings).toHaveValue("New test findings 4");
+
+    const noRadio = await screen.findByLabelText(/Nee/);
+    noRadio.click();
+
+    const submitButton = await screen.findByRole("button", { name: "Opslaan" });
+    submitButton.click();
+
+    await waitFor(() => {
+      expect(navigate).toHaveBeenCalledWith("/elections/1/investigations");
+    });
+    expect(update).toHaveBeenCalledWith({
+      reason: "Test reason 4",
+      findings: "New test findings 4",
+      corrected_results: false,
+      accept_data_entry_deletion: false,
+    });
+    expect(pushMessage).toHaveBeenCalledWith({
+      type: "warning",
+      title: "Maak een nieuw proces-verbaal voor deze zitting",
+      text: "Onderzoek voor stembureau 34 (Testplek) aangepast. De eerder gemaakte documenten van deze zitting zijn daardoor niet meer geldig. Maak een nieuw proces-verbaal door de invoerfase opnieuw af te ronden.",
+    });
   });
 
   test("Disables corrected results and forces corrected_results=true for new polling stations", async () => {
@@ -296,11 +339,11 @@ describe("InvestigationFindingsPage", () => {
 
     expect(update).toHaveBeenCalledTimes(2);
     expect(pushMessage).toHaveBeenCalledWith({
-      title: "Wijzigingen in onderzoek stembureau 34 (Testplek) opgeslagen",
+      title: "Onderzoek voor stembureau 34 (Testplek) aangepast",
     });
   });
 
-  test("Renders delete button on update investigation and delete works", async () => {
+  test("Returns to list page with a success message when clicking delete investigation", async () => {
     server.use(PollingStationInvestigationDeleteHandler);
     const user = userEvent.setup();
     await renderPage(3);
@@ -329,6 +372,45 @@ describe("InvestigationFindingsPage", () => {
     expect(deleteInvestigation).toHaveBeenCalled();
 
     expect(pushMessage).toHaveBeenCalledWith({ title: "Onderzoek voor stembureau 35 (Testschool) verwijderd" });
+    await waitFor(() => {
+      expect(navigate).toHaveBeenCalledExactlyOnceWith("/elections/1/investigations", { replace: true });
+    });
+  });
+
+  test("Returns to list page with a warning message when clicking delete investigation when data entry finished", async () => {
+    overrideOnce("get", "/api/elections/1", 200, getElectionMockData({}, { number: 2, status: "data_entry_finished" }));
+    server.use(PollingStationInvestigationDeleteHandler);
+    const user = userEvent.setup();
+    await renderPage(3);
+
+    expect(
+      await screen.findByRole("heading", {
+        level: 2,
+        name: "Bevindingen van het onderzoek door het gemeentelijk stembureau",
+      }),
+    ).toBeVisible();
+    expect(await screen.findByLabelText("Bevindingen")).toBeVisible();
+
+    const deleteButton = await screen.findByRole("button", { name: "Onderzoek verwijderen" });
+    expect(deleteButton).toBeVisible();
+
+    await user.click(deleteButton);
+
+    const modal = await screen.findByTestId("modal-dialog");
+    expect(modal).toHaveTextContent("Onderzoek verwijderen?");
+
+    const deleteInvestigation = spyOnHandler(PollingStationInvestigationDeleteHandler);
+
+    const confirmButton = await within(modal).findByRole("button", { name: "Verwijderen" });
+    await user.click(confirmButton);
+
+    expect(deleteInvestigation).toHaveBeenCalled();
+
+    expect(pushMessage).toHaveBeenCalledWith({
+      type: "warning",
+      title: "Maak een nieuw proces-verbaal voor deze zitting",
+      text: "Onderzoek voor stembureau 35 (Testschool) verwijderd. De eerder gemaakte documenten van deze zitting zijn daardoor niet meer geldig. Maak een nieuw proces-verbaal door de invoerfase opnieuw af te ronden.",
+    });
     await waitFor(() => {
       expect(navigate).toHaveBeenCalledExactlyOnceWith("/elections/1/investigations", { replace: true });
     });

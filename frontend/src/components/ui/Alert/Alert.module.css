@@ -78,7 +78,7 @@
     > button:hover {
       background: var(--color-error-hover);
     }
-    svg {
+    aside > svg {
       fill: var(--color-error-darker);
     }
   }
@@ -93,7 +93,7 @@
     > button:hover {
       background: var(--color-warning-hover);
     }
-    svg {
+    aside > svg {
       fill: var(--color-warning-darker);
     }
   }
@@ -108,7 +108,7 @@
     > button:hover {
       background: var(--color-notify-hover);
     }
-    svg {
+    aside > svg {
       fill: var(--color-notify);
     }
   }
@@ -123,7 +123,7 @@
     > button:hover {
       background: var(--color-success-hover);
     }
-    svg {
+    aside > svg {
       fill: var(--color-success);
     }
   }

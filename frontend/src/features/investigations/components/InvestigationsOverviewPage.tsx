@@ -71,6 +71,8 @@ export function InvestigationsOverviewPage() {
         </section>
       </header>
 
+      <Messages />
+
       {isCoordinator &&
         allInvestigationsHandled &&
         currentCommitteeSession.status !== "data_entry_finished" &&
@@ -108,7 +110,6 @@ export function InvestigationsOverviewPage() {
             </Button>
           </Alert>
         ))}
-      <Messages />
 
       <main>
         <section>

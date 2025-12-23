@@ -1,25 +1,29 @@
 use chrono::{Datelike, Days, NaiveDate, TimeDelta};
 use rand::{SeedableRng, rngs::StdRng, seq::IndexedRandom};
-use sqlx::SqlitePool;
+use sqlx::{SqliteConnection, SqlitePool};
 use std::error::Error;
 use tracing::info;
 
 use crate::{
-    SqlitePoolExt,
+    SqlitePoolExt, committee_session,
     committee_session::{
         CommitteeSession, CommitteeSessionCreateRequest, status::CommitteeSessionStatus,
     },
+    data_entry,
     data_entry::{
         CSOFirstSessionResults, CandidateVotes, CountingDifferencesPollingStation,
         DifferenceCountsCompareVotesCastAdmittedVoters, DifferencesCounts, ExtraInvestigation,
         FieldPath, PoliticalGroupCandidateVotes, PoliticalGroupTotalVotes, PollingStationResults,
         Validate, ValidationResults, VotersCounts, VotesCounts, YesNo,
+        repository::list_results_for_committee_session,
         status::{DataEntryStatus, Definitive, SecondEntryNotStarted},
     },
+    election,
     election::{
         CandidateGender, CandidateNumber, ElectionCategory, ElectionWithPoliticalGroups,
         NewElection, PGNumber, PoliticalGroup, VoteCountingMethod,
     },
+    polling_station,
     polling_station::{PollingStation, PollingStationRequest, PollingStationType},
     test_data_gen::GenerateElectionArgs,
 };
@@ -32,7 +36,33 @@ pub struct CreateTestElectionResult {
     pub data_entry_completed: bool,
 }
 
-#[allow(clippy::too_many_lines)]
+async fn generate_data_entries_and_return_whether_data_entry_completed(
+    conn: &mut SqliteConnection,
+    rng: &mut StdRng,
+    args: GenerateElectionArgs,
+    committee_session: &CommitteeSession,
+    election: &ElectionWithPoliticalGroups,
+    polling_stations: &[PollingStation],
+) -> Result<bool, Box<dyn Error>> {
+    let committee_session = committee_session::repository::change_status(
+        conn,
+        committee_session.id,
+        CommitteeSessionStatus::DataEntryInProgress,
+    )
+    .await?;
+
+    let (_, second_entries) = generate_data_entry(
+        &committee_session,
+        election,
+        polling_stations,
+        rng,
+        conn,
+        &args,
+    )
+    .await;
+    Ok(second_entries == polling_stations.len())
+}
+
 pub async fn create_test_election(
     args: GenerateElectionArgs,
     pool: SqlitePool,
@@ -43,10 +73,10 @@ pub async fn create_test_election(
 
     // generate and store the election
     let election =
-        crate::election::repository::create(&mut tx, generate_election(&mut rng, &args)).await?;
+        election::repository::create(&mut tx, generate_election(&mut rng, &args)).await?;
 
     // generate the committee session for the election
-    let mut committee_session = crate::committee_session::repository::create(
+    let mut committee_session = committee_session::repository::create(
         &mut tx,
         CommitteeSessionCreateRequest {
             number: 1,
@@ -64,7 +94,7 @@ pub async fn create_test_election(
     );
 
     if !polling_stations.is_empty() {
-        committee_session = crate::committee_session::repository::change_status(
+        committee_session = committee_session::repository::change_status(
             &mut tx,
             committee_session.id,
             CommitteeSessionStatus::DataEntryNotStarted,
@@ -73,33 +103,21 @@ pub async fn create_test_election(
     }
 
     let data_entry_completed = if args.with_data_entry && !polling_stations.is_empty() {
-        committee_session = crate::committee_session::repository::change_status(
+        generate_data_entries_and_return_whether_data_entry_completed(
             &mut tx,
-            committee_session.id,
-            CommitteeSessionStatus::DataEntryInProgress,
-        )
-        .await?;
-
-        let (_, second_entries) = generate_data_entry(
+            &mut rng,
+            args,
             &committee_session,
             &election,
             &polling_stations,
-            &mut rng,
-            &mut tx,
-            &args,
         )
-        .await;
-        second_entries == polling_stations.len()
+        .await?
     } else {
         false
     };
 
     let results = if data_entry_completed {
-        crate::data_entry::repository::list_results_for_committee_session(
-            &mut tx,
-            committee_session.id,
-        )
-        .await?
+        list_results_for_committee_session(&mut tx, committee_session.id).await?
     } else {
         vec![]
     };
@@ -182,7 +200,7 @@ fn generate_political_party(
         // initials are required, but if a first name is known, base initials on that
         let initials = super::data::initials(rng, first_name.as_deref());
         let (prefix, last_name) = super::data::last_name(rng);
-        candidates.push(crate::election::Candidate {
+        candidates.push(election::Candidate {
             number: CandidateNumber::from(i),
             initials,
             first_name,
@@ -210,7 +228,7 @@ fn generate_political_party(
 async fn generate_polling_stations(
     rng: &mut impl rand::Rng,
     election: &ElectionWithPoliticalGroups,
-    conn: &mut sqlx::SqliteConnection,
+    conn: &mut SqliteConnection,
     args: &GenerateElectionArgs,
 ) -> Vec<PollingStation> {
     let number_of_ps = rng.random_range(args.polling_stations.clone());
@@ -233,7 +251,7 @@ async fn generate_polling_stations(
         };
         remaining_voters -= ps_num_voters;
 
-        let ps = crate::polling_station::repository::create(
+        let ps = polling_station::repository::create(
             conn,
             election.id,
             PollingStationRequest {
@@ -261,7 +279,7 @@ async fn generate_data_entry(
     election: &ElectionWithPoliticalGroups,
     polling_stations: &[PollingStation],
     rng: &mut impl rand::Rng,
-    conn: &mut sqlx::SqliteConnection,
+    conn: &mut SqliteConnection,
     args: &GenerateElectionArgs,
 ) -> (usize, usize) {
     info!("Generating data entries for election");
@@ -332,7 +350,7 @@ async fn generate_data_entry(
                     finalised_with_warnings: validation_results.has_warnings(),
                 });
 
-                crate::data_entry::repository::make_definitive(
+                data_entry::repository::make_definitive(
                     conn,
                     ps.id,
                     committee_session.id,
@@ -350,7 +368,7 @@ async fn generate_data_entry(
                     first_entry_finished_at: ts,
                     finalised_with_warnings: validation_results.has_warnings(),
                 });
-                crate::data_entry::repository::upsert(conn, ps.id, committee_session.id, &state)
+                data_entry::repository::upsert(conn, ps.id, committee_session.id, &state)
                     .await
                     .expect("Could not create first data entry");
                 generated_first_entries += 1;

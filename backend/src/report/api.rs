@@ -160,39 +160,83 @@ impl ResultsInput {
         }
     }
 
-    #[allow(clippy::too_many_lines)]
+    fn get_p2a_pdf_file(&self, overview_filename: String) -> PdfFileModel {
+        ModelP2aInput {
+            committee_session: self.committee_session.clone(),
+            election: self.election.clone(),
+            investigations: self
+                .investigations
+                .iter()
+                .map(|inv| {
+                    let ps = self
+                        .polling_stations
+                        .iter()
+                        .find(|ps| ps.id == inv.polling_station_id)
+                        .cloned()
+                        .expect("Polling station for investigation should exist");
+                    (ps, inv.clone())
+                })
+                .collect(),
+        }
+        .to_pdf_file_model(overview_filename)
+    }
+
+    fn get_na14_2_pdf_file(
+        &self,
+        previous_summary: &ElectionSummary,
+        previous_committee_session: &CommitteeSession,
+        hash: String,
+        creation_date_time: String,
+        results_pdf_filename: String,
+    ) -> Result<PdfFileModel, APIError> {
+        let pdf_file: PdfFileModel = ModelNa14_2Input {
+            votes_tables: VotesTablesWithPreviousVotes::new(
+                &self.election,
+                &self.summary,
+                previous_summary,
+            )?,
+            committee_session: self.committee_session.clone(),
+            election: self.election.clone().into(),
+            summary: self.summary.clone().into(),
+            previous_summary: previous_summary.clone().into(),
+            previous_committee_session: previous_committee_session.clone(),
+            hash,
+            creation_date_time,
+        }
+        .to_pdf_file_model(results_pdf_filename);
+        Ok(pdf_file)
+    }
+
+    fn get_na31_2_pdf_file(
+        self,
+        hash: String,
+        creation_date_time: String,
+        results_pdf_filename: String,
+    ) -> Result<PdfFileModel, APIError> {
+        let pdf_file: PdfFileModel = ModelNa31_2Input {
+            votes_tables: VotesTables::new(&self.election, &self.summary)?,
+            committee_session: self.committee_session,
+            polling_stations: self.polling_stations,
+            summary: self.summary.into(),
+            election: self.election.into(),
+            hash,
+            creation_date_time,
+        }
+        .to_pdf_file_model(results_pdf_filename);
+        Ok(pdf_file)
+    }
+
     fn into_pdf_file_models(self, xml_hash: impl Into<String>) -> Result<PdfModelList, APIError> {
         let hash = xml_hash.into();
         let creation_date_time = self.created_at.format(DEFAULT_DATE_TIME_FORMAT).to_string();
 
-        let overview_pdf = if let Some(overview_filename) = self.overview_pdf_filename() {
-            Some(
-                ModelP2aInput {
-                    committee_session: self.committee_session.clone(),
-                    election: self.election.clone(),
-                    investigations: self
-                        .investigations
-                        .iter()
-                        .map(|inv| {
-                            let ps = self
-                                .polling_stations
-                                .iter()
-                                .find(|ps| ps.id == inv.polling_station_id)
-                                .cloned()
-                                .expect("Polling station for investigation should exist");
-                            (ps, inv.clone())
-                        })
-                        .collect(),
-                }
-                .to_pdf_file_model(overview_filename),
-            )
-        } else {
-            None
-        };
+        let overview_pdf = self
+            .overview_pdf_filename()
+            .map(|overview_filename| self.get_p2a_pdf_file(overview_filename));
 
         let results_pdf_filename = self.results_pdf_filename();
         let results_pdf = if self.committee_session.is_next_session() {
-            let Some(previous_summary) = self.previous_summary else {
+            let Some(previous_summary) = &self.previous_summary else {
                 return Err(APIError::DataIntegrityError(
                 "Previous summary is required for generating results PDF for next committee sessions"
                     .to_string(),
@@ -206,32 +250,15 @@ impl ResultsInput {
             ));
             };
 
-            ModelNa14_2Input {
-                votes_tables: VotesTablesWithPreviousVotes::new(
-                    &self.election,
-                    &self.summary,
-                    &previous_summary,
-                )?,
-                committee_session: self.committee_session,
-                election: self.election.into(),
-                summary: self.summary.into(),
-                previous_summary: previous_summary.into(),
-                previous_committee_session: previous_committee_session.clone(),
+            self.get_na14_2_pdf_file(
+                previous_summary,
+                previous_committee_session,
                 hash,
                 creation_date_time,
-            }
-            .to_pdf_file_model(results_pdf_filename)
+                results_pdf_filename,
+            )?
         } else {
-            ModelNa31_2Input {
-                votes_tables: VotesTables::new(&self.election, &self.summary)?,
-                committee_session: self.committee_session,
-                polling_stations: self.polling_stations,
-                summary: self.summary.into(),
-                election: self.election.into(),
-                hash,
-                creation_date_time,
-            }
-            .to_pdf_file_model(results_pdf_filename)
+            self.get_na31_2_pdf_file(hash, creation_date_time, results_pdf_filename)?
         };
 
         Ok(PdfModelList {

@@ -11,7 +11,7 @@ use crate::{
     APIError,
     audit_log::{AuditEvent, AuditService},
     data_entry::repository::are_results_complete_for_committee_session,
-    files::repository::delete_file,
+    files::delete_file,
     investigation::list_investigations_for_committee_session,
     polling_station,
 };
@@ -77,11 +77,7 @@ async fn delete_committee_session_files(
         .await?;
 
         for id in file_ids {
-            if let Some(file) = delete_file(conn, id).await? {
-                audit_service
-                    .log(conn, &AuditEvent::FileDeleted(file.into()), None)
-                    .await?;
-            }
+            delete_file(conn, &audit_service, id).await?;
         }
     }
     Ok(())
@@ -291,8 +287,8 @@ mod tests {
         use sqlx::{SqliteConnection, SqlitePool};
         use std::net::Ipv4Addr;
 
-        async fn generate_file(conn: &mut SqliteConnection) -> Result<u32, APIError> {
-            let file = files::repository::create_file(
+        async fn generate_test_file(conn: &mut SqliteConnection) -> Result<u32, APIError> {
+            let file = files::repository::create(
                 conn,
                 "filename.txt".into(),
                 &[97, 98, 97, 99, 117, 115, 0],
@@ -355,9 +351,9 @@ mod tests {
             assert_eq!(session.status, CommitteeSessionStatus::DataEntryFinished);
 
             let files_update = CommitteeSessionFilesUpdateRequest {
-                results_eml: Some(generate_file(&mut conn).await?),
-                results_pdf: Some(generate_file(&mut conn).await?),
-                overview_pdf: Some(generate_file(&mut conn).await?),
+                results_eml: Some(generate_test_file(&mut conn).await?),
+                results_pdf: Some(generate_test_file(&mut conn).await?),
+                overview_pdf: Some(generate_test_file(&mut conn).await?),
             };
             committee_session::repository::change_files(&mut conn, 6, files_update).await?;
 

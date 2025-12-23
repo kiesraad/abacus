@@ -240,6 +240,40 @@ async fn polling_station_investigation_conclude(
     Ok(investigation)
 }
 
+async fn update_investigation(
+    conn: &mut SqliteConnection,
+    audit_service: &AuditService,
+    committee_session: &CommitteeSession,
+    investigation_update_request: PollingStationInvestigationUpdateRequest,
+    polling_station_id: u32,
+) -> Result<PollingStationInvestigation, APIError> {
+    let investigation = update_polling_station_investigation(
+        conn,
+        polling_station_id,
+        investigation_update_request,
+    )
+    .await?;
+
+    audit_service
+        .log(
+            conn,
+            &AuditEvent::PollingStationInvestigationUpdated(investigation.clone()),
+            None,
+        )
+        .await?;
+
+    if committee_session.status == CommitteeSessionStatus::DataEntryFinished {
+        change_committee_session_status(
+            conn,
+            committee_session.id,
+            CommitteeSessionStatus::DataEntryInProgress,
+            audit_service.clone(),
+        )
+        .await?;
+    }
+    Ok(investigation)
+}
+
 /// Update an investigation for a polling station
 #[utoipa::path(
     put,
@@ -258,13 +292,12 @@ async fn polling_station_investigation_conclude(
     ),
     security(("cookie_auth" = ["coordinator"])),
 )]
-#[allow(clippy::too_many_lines)]
 async fn polling_station_investigation_update(
     _user: Coordinator,
     State(pool): State<SqlitePool>,
     audit_service: AuditService,
     CurrentSessionPollingStationId(polling_station_id): CurrentSessionPollingStationId,
-    Json(polling_station_investigation): Json<PollingStationInvestigationUpdateRequest>,
+    Json(investigation_update_request): Json<PollingStationInvestigationUpdateRequest>,
 ) -> Result<PollingStationInvestigation, APIError> {
     let mut tx = pool.begin_immediate().await?;
 
@@ -273,7 +306,7 @@ async fn polling_station_investigation_update(
     let polling_station =
         crate::polling_station::repository::get(&mut tx, polling_station_id).await?;
     if polling_station.id_prev_session.is_none()
-        && polling_station_investigation.corrected_results != Some(true)
+        && investigation_update_request.corrected_results != Some(true)
     {
         return Err(APIError::Conflict(
             "Investigation requires corrected results, because it is not part of a previous session".into(),
@@ -283,13 +316,13 @@ async fn polling_station_investigation_update(
 
     // If corrected_results is changed from yes to no, check if there are data entries or results.
     // If deleting them is accepted, delete them. If not, return an error.
-    if polling_station_investigation.corrected_results == Some(false)
+    if investigation_update_request.corrected_results == Some(false)
         && let Ok(current) = get_polling_station_investigation(&mut tx, polling_station_id).await
         && current.corrected_results == Some(true)
         && (data_entry_exists(&mut tx, polling_station_id).await?
             || result_exists(&mut tx, polling_station_id).await?)
     {
-        if polling_station_investigation.accept_data_entry_deletion == Some(true) {
+        if investigation_update_request.accept_data_entry_deletion == Some(true) {
             let polling_station =
                 crate::polling_station::repository::get(&mut tx, polling_station_id).await?;
             delete_data_entry_and_result_for_polling_station(
@@ -307,30 +340,14 @@ async fn polling_station_investigation_update(
         }
     }
 
-    let investigation = update_polling_station_investigation(
+    let investigation = update_investigation(
         &mut tx,
+        &audit_service,
+        &committee_session,
+        investigation_update_request,
         polling_station_id,
-        polling_station_investigation,
     )
     .await?;
-
-    audit_service
-        .log(
-            &mut tx,
-            &AuditEvent::PollingStationInvestigationUpdated(investigation.clone()),
-            None,
-        )
-        .await?;
-
-    if committee_session.status == CommitteeSessionStatus::DataEntryFinished {
-        change_committee_session_status(
-            &mut tx,
-            committee_session.id,
-            CommitteeSessionStatus::DataEntryInProgress,
-            audit_service,
-        )
-        .await?;
-    }
 
     tx.commit().await?;
 

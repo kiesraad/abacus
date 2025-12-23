@@ -21,7 +21,7 @@ async function renderNavBar(location: { pathname: string }, userRole: Role) {
   );
 
   // wait for the NavBar to be rendered
-  expect(await screen.findByLabelText("primary-navigation")).toBeInTheDocument();
+  expect(await screen.findByRole("navigation", { name: "primary-navigation" })).toBeInTheDocument();
 }
 
 function renderNavBarLinks(location: { pathname: string }) {
@@ -108,7 +108,8 @@ describe("NavBar", () => {
 
   test.each([
     { pathname: "/elections/1/status/1/resolve-differences" },
-    { pathname: "/elections/1/status/1/resolve-errors" },
+    { pathname: "/elections/1/status/1/detail" },
+    { pathname: "/elections/1/status/1/detail/extra_investigation" },
   ])("election status links for $pathname", async (location) => {
     await renderNavBar(location, "coordinator");
 

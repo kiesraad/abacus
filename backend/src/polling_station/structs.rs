@@ -7,23 +7,26 @@ use serde::{Deserialize, Serialize};
 use sqlx::{FromRow, Type};
 use utoipa::ToSchema;
 
-use crate::{APIError, audit_log::PollingStationDetails};
+use crate::{APIError, audit_log::PollingStationDetails, election::ElectionId};
+
+pub type PollingStationNumber = u32;
 
 /// Polling station of a certain [crate::election::Election]
 #[derive(Serialize, Deserialize, ToSchema, Debug, FromRow, Clone)]
 #[serde(deny_unknown_fields)]
 pub struct PollingStation {
     pub id: u32,
-    pub election_id: u32,
+    pub election_id: ElectionId,
     pub committee_session_id: u32,
     #[serde(skip_serializing_if = "Option::is_none")]
     #[schema(nullable = false)]
     pub id_prev_session: Option<u32>,
     pub name: String,
-    pub number: u32,
+    #[schema(value_type = u32)]
+    pub number: PollingStationNumber,
     #[serde(skip_serializing_if = "Option::is_none")]
     #[schema(nullable = false)]
-    pub number_of_voters: Option<i64>,
+    pub number_of_voters: Option<u32>,
     #[serde(skip_serializing_if = "Option::is_none")]
     #[schema(nullable = false)]
     pub polling_station_type: Option<PollingStationType>,
@@ -63,11 +66,11 @@ impl From<PollingStation> for PollingStationDetails {
 pub struct PollingStationRequest {
     pub name: String,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[schema(nullable = false)]
-    pub number: Option<i64>,
+    #[schema(nullable = false, value_type = u32)]
+    pub number: Option<PollingStationNumber>,
     #[serde(skip_serializing_if = "Option::is_none")]
     #[schema(nullable = false)]
-    pub number_of_voters: Option<i64>,
+    pub number_of_voters: Option<u32>,
     #[serde(skip_serializing_if = "Option::is_none")]
     #[schema(nullable = false)]
     pub polling_station_type: Option<PollingStationType>,
@@ -102,11 +105,12 @@ impl From<String> for PollingStationType {
 pub(crate) mod tests {
     use super::*;
     use crate::{
-        committee_session::tests::committee_session_fixture, election::tests::election_fixture,
+        committee_session::tests::committee_session_fixture,
+        election::structs::tests::election_fixture,
     };
 
     /// Create a test polling station.
-    pub fn polling_station_fixture(number_of_voters: Option<i64>) -> PollingStation {
+    pub fn polling_station_fixture(number_of_voters: Option<u32>) -> PollingStation {
         let election = election_fixture(&[]);
         let committee_session = committee_session_fixture(election.id);
 

@@ -40,7 +40,7 @@ const testCases: TestCases = {
         buttonsCurrentSession: ["Details van de zitting"],
       },
       data_entry_not_started: {
-        buttonsCurrentSession: ["Details van de zitting", "Start steminvoer"],
+        buttonsCurrentSession: ["Details van de zitting", "Start invoer"],
       },
       data_entry_in_progress: {
         buttonsCurrentSession: ["Details van de zitting"],
@@ -50,7 +50,7 @@ const testCases: TestCases = {
         buttonsCurrentSession: ["Hervatten of voortgang bekijken", "Details van de zitting"],
       },
       data_entry_finished: {
-        buttonsCurrentSession: ["Resultaten en documenten", "Steminvoer bekijken"],
+        buttonsCurrentSession: ["Resultaten en documenten", "Invoer bekijken"],
         buttonsNotCurrentSession: ["Resultaten en documenten"],
       },
     },
@@ -64,7 +64,7 @@ const testCases: TestCases = {
           "Aangevraagde onderzoeken",
           "Details van de zitting",
           "Zitting verwijderen",
-          "Start steminvoer",
+          "Start invoer",
         ],
       },
       data_entry_in_progress: {
@@ -73,13 +73,13 @@ const testCases: TestCases = {
       },
       data_entry_paused: {
         buttonsCurrentSession: [
-          "Aangevraagde onderzoeken",
           "Hervatten of voortgang bekijken",
+          "Aangevraagde onderzoeken",
           "Details van de zitting",
         ],
       },
       data_entry_finished: {
-        buttonsCurrentSession: ["Resultaten en documenten", "Aangevraagde onderzoeken", "Steminvoer bekijken"],
+        buttonsCurrentSession: ["Resultaten en documenten", "Aangevraagde onderzoeken", "Invoer bekijken"],
         buttonsNotCurrentSession: ["Resultaten en documenten"],
       },
     },
@@ -96,7 +96,7 @@ const testCases: TestCases = {
         buttonsCurrentSession: ["Bekijk voortgang"],
       },
       data_entry_finished: {
-        buttonsCurrentSession: ["Steminvoer bekijken"],
+        buttonsCurrentSession: ["Invoer bekijken"],
       },
     },
     {
@@ -112,10 +112,10 @@ const testCases: TestCases = {
         actionButton: "Bekijk voortgang",
       },
       data_entry_paused: {
-        buttonsCurrentSession: ["Aangevraagde onderzoeken", "Bekijk voortgang"],
+        buttonsCurrentSession: ["Bekijk voortgang", "Aangevraagde onderzoeken"],
       },
       data_entry_finished: {
-        buttonsCurrentSession: ["Aangevraagde onderzoeken", "Steminvoer bekijken"],
+        buttonsCurrentSession: ["Aangevraagde onderzoeken", "Invoer bekijken"],
       },
     },
   ],
@@ -145,10 +145,10 @@ describe("UI component: CommitteeSessionCard", () => {
       const expectedSubtitle =
         {
           created: "— Zitting voorbereiden",
-          data_entry_not_started: "— Klaar voor steminvoer",
-          data_entry_in_progress: "— Steminvoer bezig",
-          data_entry_paused: "— Steminvoer gepauzeerd",
-          data_entry_finished: "— Steminvoer afgerond",
+          data_entry_not_started: "— Klaar voor invoer",
+          data_entry_in_progress: "— Invoer bezig",
+          data_entry_paused: "— Invoer gepauzeerd",
+          data_entry_finished: "— Invoer afgerond",
         }[status] || "";
 
       const committeeSession = getCommitteeSessionMockData({
@@ -215,7 +215,7 @@ describe("UI component: CommitteeSessionCard", () => {
     });
     render(<CommitteeSessionCard committeeSession={committeeSession} isCurrentSession={true} />);
 
-    const dataEntryButton = await screen.findByRole("button", { name: "Start steminvoer" });
+    const dataEntryButton = await screen.findByRole("button", { name: "Start invoer" });
     await user.click(dataEntryButton);
     expect(statusChange).toHaveBeenCalledWith({ status: "data_entry_in_progress" });
     expect(navigate).toHaveBeenCalledWith("status");

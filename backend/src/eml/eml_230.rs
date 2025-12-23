@@ -10,7 +10,10 @@ use super::{
 };
 
 use crate::{
-    election::{CandidateGender, ElectionWithPoliticalGroups, NewElection, PoliticalGroup},
+    election::{
+        CandidateGender, CandidateNumber, ElectionWithPoliticalGroups, NewElection, PGNumber,
+        PoliticalGroup,
+    },
     eml::common::{
         AuthorityAddress, AuthorityIdentifier, CandidateFullName, Country, Gender, Locality,
         NameLine, PersonName, QualifyingAddress, QualifyingAddressData,
@@ -54,6 +57,7 @@ impl EML230 {
         self.election_identifier().election_domain.as_ref()
     }
 
+    #[allow(clippy::too_many_lines)]
     pub fn add_candidate_lists(
         &self,
         mut election: NewElection,
@@ -101,37 +105,66 @@ impl EML230 {
         }
 
         // extract initial listing of political groups with candidates
+        let mut previous_pg_number = PGNumber::from(0);
         election.political_groups = self
             .contest()
             .affiliations
             .iter()
             .map(|aff| {
-                Ok(
-                        PoliticalGroup {
-                            number: aff
-                                .affiliation_identifier
-                                .id
-                                .parse()
-                                .or(Err(EMLImportError::TooManyPoliticalGroups))?,
-                            name: aff.affiliation_identifier.registered_name.clone(),
-                            candidates:
-                                aff.candidates
-                                    .iter()
-                                    .map(|can| {
-                                        crate::election::structs::Candidate::try_from(can.clone())
-                                    })
-                                    .collect::<Result<
-                                        Vec<crate::election::structs::Candidate>,
-                                        EMLImportError,
-                                    >>()?,
-                        },
-                    )
+                let pg_number = aff
+                    .affiliation_identifier
+                    .id
+                    .parse::<u32>()
+                    .map(PGNumber::from)
+                    .or(Err(EMLImportError::TooManyPoliticalGroups))?;
+                if pg_number <= previous_pg_number {
+                    return Err(EMLImportError::PoliticalGroupNumbersNotIncreasing {
+                        expected_larger_than: previous_pg_number,
+                        found: pg_number,
+                    });
+                }
+
+                let mut previous_can_number = CandidateNumber::from(0);
+                let political_group = PoliticalGroup {
+                    number: pg_number,
+                    name: aff.affiliation_identifier.registered_name.clone(),
+                    candidates:
+                        aff.candidates
+                            .iter()
+                            .map(|can| {
+                                let candidate =
+                                    crate::election::structs::Candidate::try_from(
+                                        can.clone(),
+                                    )?;
+
+                                if candidate.number <= previous_can_number {
+                                    return Err(
+                                        EMLImportError::CandidateNumbersNotIncreasing {
+                                            political_group_number: pg_number,
+                                            expected_larger_than: previous_can_number,
+                                            found: candidate.number,
+                                        },
+                                    );
+                                }
+
+                                previous_can_number = candidate.number;
+                                Ok(candidate)
+                            })
+                            .collect::<Result<
+                                Vec<crate::election::structs::Candidate>,
+                                EMLImportError,
+                            >>()?,
+                };
+
+                previous_pg_number = pg_number;
+                Ok(political_group)
             })
             .collect::<Result<Vec<PoliticalGroup>, EMLImportError>>()?;
 
         Ok(election)
     }
 
+    #[allow(clippy::too_many_lines)]
     pub fn candidates_from_abacus_election(
         election: &ElectionWithPoliticalGroups,
         transaction_id: &str,
@@ -299,7 +332,10 @@ pub struct ListData {
 
 #[cfg(test)]
 mod tests {
-    use crate::eml::{EML110, EML230, EMLDocument, EMLImportError};
+    use crate::{
+        election::{CandidateNumber, PGNumber},
+        eml::{EML110, EML230, EMLDocument, EMLImportError},
+    };
     use quick_xml::DeError;
 
     #[test]
@@ -375,6 +411,54 @@ mod tests {
         let candidate_data = include_str!("./tests/eml230b_test.eml.xml");
         let candidates = EML230::from_str(candidate_data).unwrap();
         candidates.add_candidate_lists(new_election).unwrap();
+    }
+
+    #[test]
+    fn test_add_candidates_for_correct_election_with_gaps() {
+        let data = include_str!("./tests/eml110a_test.eml.xml");
+        let doc = EML110::from_str(data).unwrap();
+        let new_election = doc.as_abacus_election().unwrap();
+
+        let candidate_data = include_str!("./tests/eml230b_test_with_gaps.eml.xml");
+        let candidates = EML230::from_str(candidate_data).unwrap();
+        candidates.add_candidate_lists(new_election).unwrap();
+    }
+
+    #[test]
+    fn test_add_candidates_for_affiliation_id_not_increasing() {
+        let data = include_str!("./tests/eml110a_test.eml.xml");
+        let doc = EML110::from_str(data).unwrap();
+        let new_election = doc.as_abacus_election().unwrap();
+
+        let candidate_data =
+            include_str!("./tests/eml230b_invalid_affiliation_id_not_increasing.eml.xml");
+        let candidates = EML230::from_str(candidate_data).unwrap();
+        let res = candidates.add_candidate_lists(new_election).unwrap_err();
+
+        let expected = EMLImportError::PoliticalGroupNumbersNotIncreasing {
+            expected_larger_than: PGNumber::from(2),
+            found: PGNumber::from(1),
+        };
+        assert_eq!(res, expected);
+    }
+
+    #[test]
+    fn test_add_candidates_for_candidate_id_not_increasing() {
+        let data = include_str!("./tests/eml110a_test.eml.xml");
+        let doc = EML110::from_str(data).unwrap();
+        let new_election = doc.as_abacus_election().unwrap();
+
+        let candidate_data =
+            include_str!("./tests/eml230b_invalid_candidate_id_not_increasing.eml.xml");
+        let candidates = EML230::from_str(candidate_data).unwrap();
+        let res = candidates.add_candidate_lists(new_election).unwrap_err();
+
+        let expected = EMLImportError::CandidateNumbersNotIncreasing {
+            political_group_number: PGNumber::from(1),
+            expected_larger_than: CandidateNumber::from(1),
+            found: CandidateNumber::from(1),
+        };
+        assert_eq!(res, expected);
     }
 
     #[test]

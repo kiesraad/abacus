@@ -25,7 +25,7 @@ describe("NumberOfVoters component", () => {
     await renderPage();
 
     const user = userEvent.setup();
-    const input = screen.getByLabelText("Aantal kiesgerechtigden");
+    const input = screen.getByRole("textbox", { name: "Aantal kiesgerechtigden" });
     await user.type(input, "1337");
     await user.click(screen.getByRole("button", { name: "Volgende" }));
 
@@ -45,7 +45,7 @@ describe("NumberOfVoters component", () => {
     const user = userEvent.setup();
     await user.click(screen.getByRole("button", { name: "Volgende" }));
 
-    const input = screen.getByLabelText("Aantal kiesgerechtigden");
+    const input = screen.getByRole("textbox", { name: "Aantal kiesgerechtigden" });
     expect(input).toBeInvalid();
     expect(input).toHaveAccessibleErrorMessage("Vul het aantal kiesgerechtigden in");
     expect(dispatch).not.toHaveBeenCalled();
@@ -57,7 +57,7 @@ describe("NumberOfVoters component", () => {
     vi.spyOn(useElectionCreateContext, "useElectionCreateContext").mockReturnValue({ state, dispatch });
     await renderPage();
 
-    expect(screen.getByLabelText("Aantal kiesgerechtigden")).toHaveValue("1234");
+    expect(screen.getByRole("textbox", { name: "Aantal kiesgerechtigden" })).toHaveValue("1234");
     expect(screen.getByText("Ingelezen uit bestand met stembureaus")).toBeVisible();
   });
 });

@@ -1,0 +1,44 @@
+{
+  "db_name": "SQLite",
+  "query": "DELETE FROM files WHERE id = ? RETURNING id AS \"id: u32\", data, name, mime_type, created_at AS \"created_at: _\" ",
+  "describe": {
+    "columns": [
+      {
+        "name": "id: u32",
+        "ordinal": 0,
+        "type_info": "Integer"
+      },
+      {
+        "name": "data",
+        "ordinal": 1,
+        "type_info": "Blob"
+      },
+      {
+        "name": "name",
+        "ordinal": 2,
+        "type_info": "Text"
+      },
+      {
+        "name": "mime_type",
+        "ordinal": 3,
+        "type_info": "Text"
+      },
+      {
+        "name": "created_at: _",
+        "ordinal": 4,
+        "type_info": "Text"
+      }
+    ],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "c759aa6bbcccf33cf87aeade9de9822a9a78b8aa842364f8f457548eda4f51be"
+}

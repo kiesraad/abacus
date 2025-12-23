@@ -7,9 +7,8 @@ use serde::{Deserialize, Serialize};
 use sqlx::{FromRow, Type};
 use utoipa::ToSchema;
 
-use crate::audit_log;
-
 use super::status::CommitteeSessionStatus;
+use crate::{audit_log, election::ElectionId, investigation::PollingStationInvestigation};
 
 /// Committee session
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq, ToSchema, Type, FromRow)]
@@ -17,13 +16,12 @@ use super::status::CommitteeSessionStatus;
 pub struct CommitteeSession {
     pub id: u32,
     pub number: u32,
-    pub election_id: u32,
+    pub election_id: ElectionId,
     pub location: String,
     #[serde(skip_serializing_if = "Option::is_none")]
     #[schema(value_type = String, format = "date-time", nullable = false)]
     pub start_date_time: Option<NaiveDateTime>,
     pub status: CommitteeSessionStatus,
-    pub number_of_voters: u32,
     #[serde(skip_serializing_if = "Option::is_none")]
     #[schema(nullable = false)]
     pub results_eml: Option<u32>,
@@ -51,7 +49,6 @@ impl From<CommitteeSession> for audit_log::CommitteeSessionDetails {
             session_location: value.location,
             session_start_date_time: value.start_date_time,
             session_status: value.status.to_string(),
-            session_number_of_voters: value.number_of_voters,
             session_results_eml: value.results_eml,
             session_results_pdf: value.results_pdf,
             session_overview_pdf: value.overview_pdf,
@@ -70,8 +67,7 @@ impl IntoResponse for CommitteeSession {
 #[serde(deny_unknown_fields)]
 pub struct CommitteeSessionCreateRequest {
     pub number: u32,
-    pub election_id: u32,
-    pub number_of_voters: u32,
+    pub election_id: ElectionId,
 }
 
 /// Committee session update request
@@ -81,13 +77,6 @@ pub struct CommitteeSessionUpdateRequest {
     pub location: String,
     pub start_date: String,
     pub start_time: String,
-}
-
-/// Committee session number of voters change request
-#[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq, ToSchema, Type, FromRow)]
-#[serde(deny_unknown_fields)]
-pub struct CommitteeSessionNumberOfVotersChangeRequest {
-    pub number_of_voters: u32,
 }
 
 /// Committee session status change request
@@ -104,4 +93,17 @@ pub struct CommitteeSessionFilesUpdateRequest {
     pub results_eml: Option<u32>,
     pub results_pdf: Option<u32>,
     pub overview_pdf: Option<u32>,
+}
+
+/// Investigation list response
+#[derive(Serialize, Deserialize, ToSchema, Debug)]
+#[serde(deny_unknown_fields)]
+pub struct InvestigationListResponse {
+    pub investigations: Vec<PollingStationInvestigation>,
+}
+
+impl IntoResponse for InvestigationListResponse {
+    fn into_response(self) -> Response {
+        Json(self).into_response()
+    }
 }

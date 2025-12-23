@@ -41,7 +41,7 @@ describe("UserUpdateForm", () => {
 
   test("fullname field", async () => {
     const { onSaved } = await renderForm({ fullname: "Voor en Achternaam" });
-    const fullnameInput = screen.getByLabelText("Volledige naam");
+    const fullnameInput = screen.getByRole("textbox", { name: "Volledige naam" });
     expect(fullnameInput).toBeInTheDocument();
     expect(fullnameInput).toHaveValue("Voor en Achternaam");
 
@@ -66,7 +66,7 @@ describe("UserUpdateForm", () => {
 
   test("without fullname", async () => {
     const { onSaved } = await renderForm({ fullname: undefined });
-    expect(screen.queryByLabelText("Volledige naam")).not.toBeInTheDocument();
+    expect(screen.queryByRole("textbox", { name: "Volledige naam" })).not.toBeInTheDocument();
 
     const user = userEvent.setup();
     await user.click(screen.getByRole("button", { name: "Wijzigingen opslaan" }));
@@ -78,7 +78,7 @@ describe("UserUpdateForm", () => {
   test("password field", async () => {
     const { onSaved } = await renderForm();
 
-    overrideOnce("put", "/api/user/1" satisfies USER_UPDATE_REQUEST_PATH, 400, {
+    overrideOnce("put", "/api/users/1" satisfies USER_UPDATE_REQUEST_PATH, 400, {
       error: "Invalid password",
       fatal: false,
       reference: "PasswordRejection",
@@ -117,7 +117,7 @@ describe("UserUpdateForm", () => {
   test("abort update", async () => {
     const { onAbort, onSaved } = await renderForm();
     const user = userEvent.setup();
-    await user.click(await screen.findByRole("button", { name: "Annuleren" }));
+    await user.click(screen.getByRole("button", { name: "Annuleren" }));
     expect(onAbort).toHaveBeenCalledOnce();
     expect(updateUser).not.toHaveBeenCalled();
     expect(onSaved).not.toHaveBeenCalled();

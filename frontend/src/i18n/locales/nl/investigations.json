@@ -38,7 +38,7 @@
   "message": {
     "investigation_created": "Onderzoek voor stembureau {number} ({name}) toegevoegd",
     "investigation_deleted": "Onderzoek voor stembureau {number} ({name}) verwijderd",
-    "investigation_updated": "Wijzigingen in onderzoek stembureau {number} ({name}) opgeslagen"
+    "investigation_updated": "Onderzoek voor stembureau {number} ({name}) aangepast"
   },
   "missing_investigations": "Invoerfase kan niet worden afgerond",
   "missing_investigations_description_plural": "Sinds de vorige zitting van het GSB zijn nieuwe stembureaus toegevoegd in Abacus. Het gaat om de stembureaus met nummer {numbers}. Je kan het proces-verbaal van deze zitting pas maken als voor deze stembureaus de aanleiding en bevindingen van het onderzoek zijn ingevoerd.\n\n→ <Link to=\"./add\">Onderzoek toevoegen</Link> of <Link to=\"../polling-stations\">verwijder de toegevoegde stembureaus</Link>",
@@ -80,6 +80,6 @@
   "you_cannot_add_another_investigation": "Je hebt voor alle stembureaus al een onderzoek toegevoegd.\nJe kan niet nog een onderzoek toevoegen.",
   "warning_data_entry_finished": {
     "title": "Invoerfase al afgerond",
-    "description": "Als je wijzigingen aanbrengt in deze zitting door onderzoeken toe te voegen, te bewerken of te verwijderen, wordt de invoerfase heropent. Bij het afronden van de invoerfase wordt een nieuw proces-verbaal gemaakt."
+    "description": "Als je wijzigingen aanbrengt in deze zitting door onderzoeken toe te voegen, te bewerken of te verwijderen, wordt de invoerfase heropend. Bij het afronden van de invoerfase wordt een nieuw proces-verbaal gemaakt."
   }
 }

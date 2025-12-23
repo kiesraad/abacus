@@ -56,6 +56,7 @@ export function AuthorizationDialog() {
   if (
     !loading &&
     sessionValidFor !== null &&
+    user !== null &&
     !hideDialog &&
     sessionValidFor > 0 &&
     sessionValidFor < EXPIRATION_DIALOG_SECONDS

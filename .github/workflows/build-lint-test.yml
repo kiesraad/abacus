@@ -8,6 +8,7 @@ on:
   push:
     branches:
       - main
+      - release-*
 
 permissions:
   contents: read
@@ -15,6 +16,10 @@ permissions:
 
 env:
   TZ: "Europe/Amsterdam"
+
+concurrency:
+  group: ${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
 
 jobs:
   backend:
@@ -27,7 +32,22 @@ jobs:
       CARGO_TERM_COLOR: always
       SQLX_OFFLINE: "true"
     steps:
-      - uses: actions/checkout@v5
+      # Free up runner disk space, so that our job has enough space to run
+      # https://dev.to/mathio/squeezing-disk-space-from-github-actions-runners-an-engineers-guide-3pjg
+      - name: Free up runner disk space
+        working-directory: /
+        run: >
+          df -h
+          &&
+          echo "Freeing up disk space..."
+          &&
+          sudo rm -rf
+          /usr/local/.ghcup
+          /usr/share/dotnet
+          /usr/share/swift
+          &&
+          df -h
+      - uses: actions/checkout@v6
       # Build frontend so that it can be included in the backend build
       - name: Setup Node
         uses: actions/setup-node@v6
@@ -55,7 +75,7 @@ jobs:
           rustup target add x86_64-unknown-linux-musl &&
           rustup component add --toolchain stable clippy rustfmt
       - name: Cargo cache
-        uses: Swatinem/rust-cache@f13886b937689c021905a6b90929199931d60db1 # v2
+        uses: Swatinem/rust-cache@779680da715d629ac1d338a641029a2f4372abb5 # v2
         with:
           workspaces: "backend -> target"
       - name: Check rustfmt
@@ -68,7 +88,7 @@ jobs:
         run: cargo --verbose --locked test --target=x86_64-unknown-linux-musl --features embed-typst -- --nocapture
       - name: Build
         run: cargo --verbose --locked build --target=x86_64-unknown-linux-musl --features memory-serve,embed-typst,storybook
-      - uses: actions/upload-artifact@v5
+      - uses: actions/upload-artifact@v6
         with:
           name: abacus
           path: backend/target/x86_64-unknown-linux-musl/debug/abacus
@@ -80,7 +100,7 @@ jobs:
       run:
         working-directory: frontend
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - name: Setup Node
         uses: actions/setup-node@v6
         with:
@@ -97,7 +117,7 @@ jobs:
         run: npm test
       - name: Build
         run: npm run build
-      - uses: actions/upload-artifact@v5
+      - uses: actions/upload-artifact@v6
         with:
           name: frontend-build
           path: frontend/dist
@@ -115,7 +135,7 @@ jobs:
       run:
         working-directory: frontend
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - name: Setup Node
         uses: actions/setup-node@v6
         with:
@@ -125,7 +145,7 @@ jobs:
       - name: Install Playwright Browsers
         run: npx playwright install --with-deps --no-shell
       - name: Download Abacus
-        uses: actions/download-artifact@v6
+        uses: actions/download-artifact@v7
         with:
           name: abacus
           path: builds/backend
@@ -134,7 +154,7 @@ jobs:
       - name: Run e2e playwright tests
         run: npm run test:e2e -- --shard=${{ matrix.shardIndex }}/${{ matrix.shardTotal }}
       - name: Upload Playwright report
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         if: ${{ !cancelled() }}
         with:
           name: playwright-report-ubuntu-latest-${{ matrix.shardIndex }}
@@ -142,7 +162,7 @@ jobs:
           retention-days: 30
       - name: Upload test results to Codecov
         if: ${{ !cancelled() }}
-        uses: codecov/test-results-action@47f89e9acb64b76debcd5ea40642d25a4adced9f # v1
+        uses: codecov/codecov-action@671740ac38dd9b0130fbe1cec585b89eea48d3de # v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           name: "Playwright e2e"
@@ -165,7 +185,7 @@ jobs:
     continue-on-error: true
     steps:
       - name: Download Abacus
-        uses: actions/download-artifact@v6
+        uses: actions/download-artifact@v7
         with:
           name: abacus
       - name: Strip debug symbols
@@ -177,3 +197,29 @@ jobs:
           -H "Authorization: Bearer ${{ secrets.ABACUS_TEST_API_KEY }}" \
           -T ./abacus \
           https://abacus-test.nl/etes/api/v1/executable/${{ github.event.pull_request.head.sha || github.sha }}/${{ github.sha }}
+
+  fuzz:
+    name: Backend fuzzer
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./backend
+    env:
+      CARGO_TERM_COLOR: always
+      SQLX_OFFLINE: "true"
+    steps:
+      - uses: actions/checkout@v6
+      - name: Setup Rust Nightly
+        shell: bash
+        run: >
+          rustup update nightly &&
+          rustup default nightly
+      - name: Cargo cache
+        uses: Swatinem/rust-cache@779680da715d629ac1d338a641029a2f4372abb5 # v2
+        with:
+          workspaces: "backend -> fuzz -> target"
+          shared-key: "fuzzer"
+      - name: Install cargo fuzz
+        run: cargo install cargo-fuzz
+      - name: Run the fuzzer
+        run: cargo fuzz run data_entry_status -- -max_total_time=60

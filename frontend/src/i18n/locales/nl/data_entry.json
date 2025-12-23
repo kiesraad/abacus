@@ -2,7 +2,7 @@
   "abort": {
     "action": "Invoer afbreken",
     "description": "<p>Ga je op een later moment verder met het invoeren van dit stembureau? Dan kan je de invoer die je al hebt gedaan bewaren.</p><p>Twijfel je? Overleg dan met de coördinator.</p>",
-    "discard_input": "Niet bewaren",
+    "discard_input": "Verwijder invoer",
     "save_input": "Invoer bewaren",
     "title": "Wat wil je doen met je invoer?"
   },

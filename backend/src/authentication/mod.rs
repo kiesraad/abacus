@@ -25,6 +25,9 @@ pub const SESSION_LIFE_TIME: TimeDelta = TimeDelta::seconds(60 * 30); // 30 minu
 /// Minimum session lifetime, refresh if only this much time or less is left before expiration
 pub const SESSION_MIN_LIFE_TIME: TimeDelta = TimeDelta::seconds(60 * 15); // 15 minutes
 
+/// Security scheme name for OpenAPI documentation
+pub const SECURITY_SCHEME_NAME: &str = "cookie_auth";
+
 /// Session cookie name
 pub const SESSION_COOKIE_NAME: &str = "ABACUS_SESSION";
 
@@ -263,7 +266,7 @@ mod tests {
     }
 
     #[test(sqlx::test(fixtures("../../fixtures/users.sql")))]
-    async fn test_whoami(pool: SqlitePool) {
+    async fn test_account(pool: SqlitePool) {
         let app = create_app(pool);
 
         let cookie = login_as_admin(app.clone()).await;
@@ -273,7 +276,7 @@ mod tests {
             .oneshot(
                 Request::builder()
                     .method(Method::GET)
-                    .uri("/api/whoami")
+                    .uri("/api/account")
                     .header(USER_AGENT, TEST_USER_AGENT)
                     .header(COOKIE, &cookie)
                     .body(Body::empty())
@@ -312,7 +315,7 @@ mod tests {
             .oneshot(
                 Request::builder()
                     .method(Method::GET)
-                    .uri("/api/whoami")
+                    .uri("/api/account")
                     .header(USER_AGENT, TEST_USER_AGENT)
                     .header(COOKIE, &cookie)
                     .body(Body::empty())
@@ -329,7 +332,7 @@ mod tests {
             .oneshot(
                 Request::builder()
                     .method(Method::GET)
-                    .uri("/api/whoami")
+                    .uri("/api/account")
                     .body(Body::empty())
                     .unwrap(),
             )
@@ -341,7 +344,13 @@ mod tests {
 
     #[test(sqlx::test(fixtures("../../fixtures/users.sql")))]
     async fn test_update_password(pool: SqlitePool) {
-        let app = create_app(pool);
+        let app = create_app(pool.clone());
+        let mut conn = pool.acquire().await.unwrap();
+
+        // Set admin as incomplete user
+        user::set_temporary_password(&mut conn, 1, "Admin1Password01")
+            .await
+            .unwrap();
 
         let cookie = login_as_admin(app.clone()).await;
 
@@ -397,8 +406,52 @@ mod tests {
     }
 
     #[test(sqlx::test(fixtures("../../fixtures/users.sql")))]
-    async fn test_update_password_fail(pool: SqlitePool) {
-        let app = create_app(pool);
+    async fn test_update_password_fail_same_password(pool: SqlitePool) {
+        let app = create_app(pool.clone());
+        let mut conn = pool.acquire().await.unwrap();
+
+        // Set admin as incomplete user
+        user::set_temporary_password(&mut conn, 1, "Admin1Password01")
+            .await
+            .unwrap();
+
+        let cookie = login_as_admin(app.clone()).await;
+
+        // Call the account update endpoint with incorrect user
+        let response = app
+            .clone()
+            .oneshot(
+                Request::builder()
+                    .method(Method::PUT)
+                    .uri("/api/account")
+                    .header(CONTENT_TYPE, "application/json")
+                    .header(USER_AGENT, TEST_USER_AGENT)
+                    .header(COOKIE, &cookie)
+                    .body(Body::from(
+                        serde_json::to_vec(&AccountUpdateRequest {
+                            username: "admin1".to_string(),
+                            password: "Admin1Password01".to_string(),
+                            fullname: None,
+                        })
+                        .unwrap(),
+                    ))
+                    .unwrap(),
+            )
+            .await
+            .unwrap();
+
+        assert_eq!(response.status(), StatusCode::BAD_REQUEST);
+    }
+
+    #[test(sqlx::test(fixtures("../../fixtures/users.sql")))]
+    async fn test_update_password_fail_wrong_username(pool: SqlitePool) {
+        let app = create_app(pool.clone());
+        let mut conn = pool.acquire().await.unwrap();
+
+        // Set admin as incomplete user
+        user::set_temporary_password(&mut conn, 1, "Admin1Password01")
+            .await
+            .unwrap();
 
         let cookie = login_as_admin(app.clone()).await;
 
@@ -429,6 +482,38 @@ mod tests {
     }
 
     #[test(sqlx::test(fixtures("../../fixtures/users.sql")))]
+    async fn test_update_password_fail_complete_user(pool: SqlitePool) {
+        let app = create_app(pool);
+
+        let cookie = login_as_admin(app.clone()).await;
+
+        // Call the account update endpoint with incorrect user
+        let response = app
+            .clone()
+            .oneshot(
+                Request::builder()
+                    .method(Method::PUT)
+                    .uri("/api/account")
+                    .header(CONTENT_TYPE, "application/json")
+                    .header(USER_AGENT, TEST_USER_AGENT)
+                    .header(COOKIE, &cookie)
+                    .body(Body::from(
+                        serde_json::to_vec(&AccountUpdateRequest {
+                            username: "wrong_user".to_string(),
+                            password: "new_password".to_string(),
+                            fullname: Some("Wrong User".to_string()),
+                        })
+                        .unwrap(),
+                    ))
+                    .unwrap(),
+            )
+            .await
+            .unwrap();
+
+        assert_eq!(response.status(), StatusCode::CONFLICT);
+    }
+
+    #[test(sqlx::test(fixtures("../../fixtures/users.sql")))]
     async fn test_list(pool: SqlitePool) {
         let app = create_app(pool.clone());
         let mut conn = pool.acquire().await.unwrap();
@@ -448,7 +533,7 @@ mod tests {
             .oneshot(
                 Request::builder()
                     .method(Method::GET)
-                    .uri("/api/user")
+                    .uri("/api/users")
                     .header(USER_AGENT, TEST_USER_AGENT)
                     .header(COOKIE, cookie.encoded().to_string())
                     .body(Body::empty())
@@ -486,7 +571,7 @@ mod tests {
             .oneshot(
                 Request::builder()
                     .method(Method::GET)
-                    .uri("/api/whoami")
+                    .uri("/api/account")
                     .header(USER_AGENT, TEST_USER_AGENT)
                     .header(COOKIE, cookie.encoded().to_string())
                     .body(Body::empty())
@@ -516,7 +601,7 @@ mod tests {
             .oneshot(
                 Request::builder()
                     .method(Method::GET)
-                    .uri("/api/whoami")
+                    .uri("/api/account")
                     .header(USER_AGENT, TEST_USER_AGENT)
                     .header(COOKIE, cookie.encoded().to_string())
                     .body(Body::empty())
@@ -544,7 +629,7 @@ mod tests {
             .oneshot(
                 Request::builder()
                     .method(Method::POST)
-                    .uri("/api/user")
+                    .uri("/api/users")
                     .header(CONTENT_TYPE, "application/json")
                     .header(USER_AGENT, TEST_USER_AGENT)
                     .header(COOKIE, cookie)
@@ -579,7 +664,7 @@ mod tests {
             .oneshot(
                 Request::builder()
                     .method(Method::PUT)
-                    .uri("/api/user/1")
+                    .uri("/api/users/1")
                     .header(CONTENT_TYPE, "application/json")
                     .header(USER_AGENT, TEST_USER_AGENT)
                     .header(COOKIE, cookie)
@@ -624,7 +709,7 @@ mod tests {
             .oneshot(
                 Request::builder()
                     .method(Method::GET)
-                    .uri("/api/user")
+                    .uri("/api/users")
                     .header(USER_AGENT, TEST_USER_AGENT)
                     .header(COOKIE, cookie.encoded().to_string())
                     .body(Body::empty())
@@ -649,7 +734,7 @@ mod tests {
             .oneshot(
                 Request::builder()
                     .method(Method::GET)
-                    .uri("/api/whoami")
+                    .uri("/api/account")
                     .header(USER_AGENT, "DifferentAgent/2.0")
                     .header(COOKIE, &cookie)
                     .body(Body::empty())
@@ -671,7 +756,7 @@ mod tests {
 
         let mut request = Request::builder()
             .method(Method::GET)
-            .uri("/api/whoami")
+            .uri("/api/account")
             .header(USER_AGENT, TEST_USER_AGENT)
             .header(COOKIE, &cookie)
             .body(Body::empty())

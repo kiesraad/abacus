@@ -16,8 +16,12 @@ use super::{
 use crate::{
     APIError, AppState, ErrorResponse, SqlitePoolExt,
     audit_log::{AuditEvent, AuditService},
-    authentication::{Admin, User},
-    committee_session::{CommitteeSession, CommitteeSessionCreateRequest},
+    authentication::{Admin, AdminOrCoordinator, User},
+    committee_session::{
+        CommitteeSession, CommitteeSessionCreateRequest, CommitteeSessionError,
+        status::CommitteeSessionStatus,
+    },
+    election::{ElectionId, ElectionNumberOfVotersChangeRequest},
     eml::{EML110, EML230, EMLDocument, EMLImportError, EmlHash, RedactedEmlHash},
     investigation::PollingStationInvestigation,
     polling_station::{
@@ -32,6 +36,7 @@ pub fn router() -> OpenApiRouter<AppState> {
         .routes(routes!(election_import))
         .routes(routes!(election_list))
         .routes(routes!(election_details))
+        .routes(routes!(election_number_of_voters_change))
 }
 
 /// Election list response
@@ -67,6 +72,7 @@ pub struct ElectionDetailsResponse {
         (status = 401, description = "Unauthorized", body = ErrorResponse),
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
+    security(("cookie_auth" = ["administrator", "coordinator", "typist"])),
 )]
 pub async fn election_list(
     _user: User,
@@ -84,7 +90,7 @@ pub async fn election_list(
 }
 
 /// Get election details including the election's candidate list (political groups),
-/// its polling stations and the current committee session
+/// its polling stations and the current committee session and its investigations
 #[utoipa::path(
     get,
     path = "/api/elections/{election_id}",
@@ -95,19 +101,23 @@ pub async fn election_list(
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
     params(
-        ("election_id" = u32, description = "Election database id"),
+        ("election_id" = ElectionId, description = "Election database id"),
     ),
+    security(("cookie_auth" = ["administrator", "coordinator", "typist"])),
 )]
 pub async fn election_details(
     _user: User,
     State(pool): State<SqlitePool>,
-    Path(id): Path<u32>,
+    Path(election_id): Path<ElectionId>,
 ) -> Result<Json<ElectionDetailsResponse>, APIError> {
     let mut conn = pool.acquire().await?;
-    let election = crate::election::repository::get(&mut conn, id).await?;
+    let election = crate::election::repository::get(&mut conn, election_id).await?;
     let committee_sessions =
-        crate::committee_session::repository::get_election_committee_session_list(&mut conn, id)
-            .await?;
+        crate::committee_session::repository::get_election_committee_session_list(
+            &mut conn,
+            election_id,
+        )
+        .await?;
     let current_committee_session = committee_sessions
         .first()
         .expect("There is always one committee session")
@@ -127,6 +137,70 @@ pub async fn election_details(
         polling_stations,
         investigations,
     }))
+}
+
+/// Change the number of voters of an [Election].
+#[utoipa::path(
+    put,
+    path = "/api/elections/{election_id}/voters",
+    request_body = ElectionNumberOfVotersChangeRequest,
+    responses(
+        (status = 204, description = "Election number of voters changed successfully"),
+        (status = 401, description = "Unauthorized", body = ErrorResponse),
+        (status = 403, description = "Forbidden", body = ErrorResponse),
+        (status = 404, description = "Election not found", body = ErrorResponse),
+        (status = 409, description = "Request cannot be completed", body = ErrorResponse),
+        (status = 500, description = "Internal server error", body = ErrorResponse),
+    ),
+    params(
+        ("election_id" = ElectionId, description = "Election database id"),
+    ),
+    security(("cookie_auth" = ["administrator", "coordinator"])),
+)]
+pub async fn election_number_of_voters_change(
+    _user: AdminOrCoordinator,
+    State(pool): State<SqlitePool>,
+    audit_service: AuditService,
+    Path(election_id): Path<ElectionId>,
+    Json(request): Json<ElectionNumberOfVotersChangeRequest>,
+) -> Result<StatusCode, APIError> {
+    let mut tx = pool.begin_immediate().await?;
+
+    crate::election::repository::get(&mut tx, election_id).await?;
+    let current_committee_session =
+        crate::committee_session::repository::get_election_committee_session(&mut tx, election_id)
+            .await?;
+
+    // Only allow if this is a first and not yet started committee session
+    if !current_committee_session.is_next_session()
+        && (current_committee_session.status == CommitteeSessionStatus::Created
+            || current_committee_session.status == CommitteeSessionStatus::DataEntryNotStarted)
+    {
+        let election = crate::election::repository::change_number_of_voters(
+            &mut tx,
+            election_id,
+            request.number_of_voters,
+        )
+        .await?;
+
+        audit_service
+            .log(
+                &mut tx,
+                &AuditEvent::ElectionUpdated(election.clone().into()),
+                None,
+            )
+            .await?;
+
+        tx.commit().await?;
+
+        Ok(StatusCode::NO_CONTENT)
+    } else {
+        tx.rollback().await?;
+
+        Err(APIError::CommitteeSession(
+            CommitteeSessionError::InvalidCommitteeSessionStatus,
+        ))
+    }
 }
 
 #[derive(Debug, Deserialize, Serialize, Clone, ToSchema)]
@@ -188,26 +262,27 @@ pub struct ElectionDefinitionValidateResponse {
         (status = 403, description = "Forbidden", body = ErrorResponse),
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
+    security(("cookie_auth" = ["administrator"])),
 )]
 pub async fn election_import_validate(
     _user: Admin,
     Json(edu): Json<ElectionAndCandidateDefinitionValidateRequest>,
 ) -> Result<Json<ElectionDefinitionValidateResponse>, APIError> {
     // parse and validate election
-    if let Some(user_hash) = edu.election_hash {
-        if user_hash != EmlHash::from(edu.election_data.as_bytes()).chunks {
-            return Err(APIError::InvalidHashError);
-        }
+    if let Some(user_hash) = edu.election_hash
+        && user_hash != EmlHash::from(edu.election_data.as_bytes()).chunks
+    {
+        return Err(APIError::InvalidHashError);
     }
     let mut hash = RedactedEmlHash::from(edu.election_data.as_bytes());
     let mut election = EML110::from_str(&edu.election_data)?.as_abacus_election()?;
 
     // parse and validate candidates, if available
     if let Some(data) = edu.candidate_data.clone() {
-        if let Some(user_hash) = edu.candidate_hash {
-            if user_hash != EmlHash::from(data.as_bytes()).chunks {
-                return Err(APIError::InvalidHashError);
-            }
+        if let Some(user_hash) = edu.candidate_hash
+            && user_hash != EmlHash::from(data.as_bytes()).chunks
+        {
+            return Err(APIError::InvalidHashError);
         }
 
         hash = RedactedEmlHash::from(data.as_bytes());
@@ -281,46 +356,56 @@ pub struct ElectionAndCandidatesDefinitionImportRequest {
         (status = 403, description = "Forbidden", body = ErrorResponse),
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
+    security(("cookie_auth" = ["administrator"])),
 )]
+#[allow(clippy::too_many_lines)]
 pub async fn election_import(
     _user: Admin,
     State(pool): State<SqlitePool>,
     audit_service: AuditService,
     Json(edu): Json<ElectionAndCandidatesDefinitionImportRequest>,
 ) -> Result<(StatusCode, Json<ElectionWithPoliticalGroups>), APIError> {
-    if edu.election_hash != EmlHash::from(edu.election_data.as_bytes()).chunks {
+    let election_data_hash = EmlHash::from(edu.election_data.as_bytes()).chunks;
+    if edu.election_hash != election_data_hash {
         return Err(APIError::InvalidHashError);
     }
-    if edu.candidate_hash != EmlHash::from(edu.candidate_data.as_bytes()).chunks {
+    let candidate_data_hash = EmlHash::from(edu.candidate_data.as_bytes()).chunks;
+    if edu.candidate_hash != candidate_data_hash {
         return Err(APIError::InvalidHashError);
     }
 
     let mut new_election = EML110::from_str(&edu.election_data)?.as_abacus_election()?;
     new_election = EML230::from_str(&edu.candidate_data)?.add_candidate_lists(new_election)?;
 
-    // Process polling stations
-    let mut polling_places = None;
-    if let Some(polling_station_data) = edu.polling_station_data {
+    // Validate polling stations
+    if let Some(polling_station_data) = edu.polling_station_data.as_ref() {
         // If polling stations are submitted, file name must be also
         if edu.polling_station_file_name.is_none() {
             return Err(APIError::EmlImportError(EMLImportError::MissingFileName));
         }
-
-        polling_places = Some(EML110::from_str(&polling_station_data)?.get_polling_stations()?);
+        EML110::from_str(polling_station_data)?.get_polling_stations()?;
     }
 
     // Set counting method
     // Note: not used yet in the frontend, only CSO is implemented for now
     new_election.counting_method = edu.counting_method;
 
+    // Set number of voters based on input
+    new_election.number_of_voters = edu.number_of_voters;
+
     // Create new election
     let mut tx = pool.begin_immediate().await?;
     let election = crate::election::repository::create(&mut tx, new_election).await?;
+    let message = format!(
+        "Election file hash: {}, candidates file hash: {}",
+        election_data_hash.join(" "),
+        candidate_data_hash.join(" ")
+    );
     audit_service
         .log(
             &mut tx,
             &AuditEvent::ElectionCreated(election.clone().into()),
-            None,
+            Some(message),
         )
         .await?;
 
@@ -330,7 +415,6 @@ pub async fn election_import(
         CommitteeSessionCreateRequest {
             number: 1,
             election_id: election.id,
-            number_of_voters: edu.number_of_voters,
         },
     )
     .await?;
@@ -343,12 +427,12 @@ pub async fn election_import(
         .await?;
 
     // Create polling stations
-    if let Some(places) = polling_places {
+    if let Some(polling_station_data) = edu.polling_station_data {
         let polling_stations_request = PollingStationsRequest {
             file_name: edu
                 .polling_station_file_name
                 .ok_or(EMLImportError::MissingFileName)?,
-            polling_stations: places,
+            polling_stations: polling_station_data,
         };
         create_imported_polling_stations(
             &mut tx,

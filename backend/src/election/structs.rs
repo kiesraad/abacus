@@ -9,11 +9,13 @@ use utoipa::ToSchema;
 
 use crate::audit_log::ElectionDetails;
 
+crate::util::id!(ElectionId);
+
 /// Election without political groups
 #[derive(Serialize, Deserialize, ToSchema, Clone, Debug, PartialEq, Eq, Hash, FromRow)]
 #[serde(deny_unknown_fields)]
 pub struct Election {
-    pub id: u32,
+    pub id: ElectionId,
     pub name: String,
     pub counting_method: VoteCountingMethod,
     pub election_id: String,
@@ -21,6 +23,7 @@ pub struct Election {
     pub domain_id: String,
     pub category: ElectionCategory,
     pub number_of_seats: u32,
+    pub number_of_voters: u32,
     #[schema(value_type = String, format = "date")]
     pub election_date: NaiveDate,
     #[schema(value_type = String, format = "date")]
@@ -31,7 +34,7 @@ pub struct Election {
 #[derive(Serialize, Deserialize, ToSchema, Clone, Debug, PartialEq, Eq, Hash, FromRow)]
 #[serde(deny_unknown_fields)]
 pub struct ElectionWithPoliticalGroups {
-    pub id: u32,
+    pub id: ElectionId,
     pub name: String,
     pub counting_method: VoteCountingMethod,
     pub election_id: String,
@@ -39,6 +42,7 @@ pub struct ElectionWithPoliticalGroups {
     pub domain_id: String,
     pub category: ElectionCategory,
     pub number_of_seats: u32,
+    pub number_of_voters: u32,
     #[schema(value_type = String, format = "date")]
     pub election_date: NaiveDate,
     #[schema(value_type = String, format = "date")]
@@ -58,6 +62,7 @@ impl From<ElectionWithPoliticalGroups> for Election {
             domain_id: value.domain_id,
             category: value.category,
             number_of_seats: value.number_of_seats,
+            number_of_voters: value.number_of_voters,
             election_date: value.election_date,
             nomination_date: value.nomination_date,
         }
@@ -75,6 +80,7 @@ impl From<Election> for ElectionDetails {
             election_domain_id: value.domain_id,
             election_category: value.category.to_string(),
             election_number_of_seats: value.number_of_seats,
+            election_number_of_voters: value.number_of_voters,
             election_election_date: value.election_date,
             election_nomination_date: value.nomination_date,
         }
@@ -92,6 +98,7 @@ impl From<ElectionWithPoliticalGroups> for ElectionDetails {
             election_domain_id: value.domain_id,
             election_category: value.category.to_string(),
             election_number_of_seats: value.number_of_seats,
+            election_number_of_voters: value.number_of_voters,
             election_election_date: value.election_date,
             election_nomination_date: value.nomination_date,
         }
@@ -121,11 +128,19 @@ pub struct NewElection {
     pub domain_id: String,
     pub category: ElectionCategory,
     pub number_of_seats: u32,
+    pub number_of_voters: u32,
     #[schema(value_type = String, format = "date")]
     pub election_date: NaiveDate,
     #[schema(value_type = String, format = "date")]
     pub nomination_date: NaiveDate,
     pub political_groups: Vec<PoliticalGroup>,
+}
+
+/// Election number of voters change request
+#[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq, ToSchema, Type, FromRow)]
+#[serde(deny_unknown_fields)]
+pub struct ElectionNumberOfVotersChangeRequest {
+    pub number_of_voters: u32,
 }
 
 /// Election category (limited for now)
@@ -156,7 +171,7 @@ pub enum VoteCountingMethod {
     DSO,
 }
 
-pub type PGNumber = u32;
+crate::util::id!(PGNumber);
 
 /// Political group with its candidates
 #[derive(Serialize, Deserialize, ToSchema, Clone, Debug, PartialEq, Eq, Hash)]
@@ -168,7 +183,7 @@ pub struct PoliticalGroup {
     pub candidates: Vec<Candidate>,
 }
 
-pub type CandidateNumber = u32;
+crate::util::id!(CandidateNumber);
 
 /// Candidate
 #[derive(Serialize, Deserialize, ToSchema, Clone, Debug, PartialEq, Eq, Hash)]
@@ -220,11 +235,11 @@ pub(crate) mod tests {
             .iter()
             .enumerate()
             .map(|(i, &candidates)| PoliticalGroup {
-                number: u32::try_from(i + 1).unwrap(),
+                number: PGNumber::try_from(i + 1).unwrap(),
                 name: format!("Political group {}", i + 1),
                 candidates: (0..candidates)
                     .map(|j| Candidate {
-                        number: j + 1,
+                        number: CandidateNumber::from(j + 1),
                         initials: "A.B.".to_string(),
                         first_name: Some(format!("Candidate {}", j + 1)),
                         last_name_prefix: Some("van".to_string()),
@@ -238,7 +253,7 @@ pub(crate) mod tests {
             .collect();
 
         ElectionWithPoliticalGroups {
-            id: 1,
+            id: ElectionId::from(1),
             name: "Test".to_string(),
             counting_method: VoteCountingMethod::CSO,
             election_id: "Test_2023".to_string(),
@@ -246,6 +261,7 @@ pub(crate) mod tests {
             domain_id: "0000".to_string(),
             category: ElectionCategory::Municipal,
             number_of_seats,
+            number_of_voters: 1000,
             election_date: NaiveDate::from_ymd_opt(2023, 11, 1).unwrap(),
             nomination_date: NaiveDate::from_ymd_opt(2023, 11, 1).unwrap(),
             political_groups,

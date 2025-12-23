@@ -32,8 +32,8 @@ export const DefaultModal: StoryObj = {
             <p>Twijfel je? Overleg dan met de coördinator.</p>
             <nav>
               <Button size="xl">Invoer bewaren</Button>
-              <Button size="xl" variant="secondary">
-                Niet bewaren
+              <Button size="lg" variant="tertiary-destructive">
+                Verwijder invoer
               </Button>
             </nav>
           </Modal>
@@ -50,7 +50,7 @@ export const DefaultModal: StoryObj = {
       await expect(heading).toHaveFocus();
 
       // Test closing modal with X button
-      const closeButton = within(modal).getByRole("button", { name: "Annuleren" });
+      const closeButton = within(modal).getByRole("button", { name: "Venster sluiten" });
       await userEvent.click(closeButton);
     });
 

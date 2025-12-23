@@ -33,7 +33,6 @@ export function ElectionHomePage() {
     useElection();
   const { isCoordinator } = useUserRole();
   const [showAddCommitteeSessionModal, setShowAddCommitteeSessionModal] = useState(false);
-  const isFirstCommitteeSession = currentCommitteeSession.number === 1;
   const createPath: COMMITTEE_SESSION_CREATE_REQUEST_PATH = `/api/elections/${election.id}/committee_sessions`;
   const removePath: COMMITTEE_SESSION_DELETE_REQUEST_PATH = `/api/elections/${currentCommitteeSession.election_id}/committee_sessions/${currentCommitteeSession.id}`;
   const { create, remove } = useCrud({ createPath, removePath, throwAllErrors: true });
@@ -155,7 +154,7 @@ export function ElectionHomePage() {
           <div className="mb-xl">
             <div>
               <h2>
-                {/* TODO: Change to conditional GSB/HSB/CSB when implemented */}
+                {/* TODO (post 1.0): Change to conditional GSB/HSB/CSB when implemented */}
                 {t("GSB")} {election.location}
               </h2>
             </div>
@@ -181,11 +180,11 @@ export function ElectionHomePage() {
             <h3 className={cls.tableTitle}>{t("election_management.about_this_election")}</h3>
             <ElectionInformationTable
               election={election}
+              committeeSession={currentCommitteeSession}
               numberOfPollingStations={pollingStations.length}
-              numberOfVoters={currentCommitteeSession.number_of_voters}
             />
           </div>
-          {isFirstCommitteeSession && (
+          {currentCommitteeSession.number === 1 ? (
             <div className={cn(cls.downloadModels, "mt-xl")}>
               <h3 className={cls.tableTitle}>{t("election_management.empty_documents_title")}</h3>
               <p>{t("election_management.empty_documents_description")}</p>
@@ -196,6 +195,7 @@ export function ElectionHomePage() {
                 </Table.Header>
                 <Table.Body>
                   <Table.ClickRow
+                    downloadIcon
                     onClick={() => {
                       directDownload(`/api/elections/${election.id}/download_na_31_2_bijlage1`);
                     }}
@@ -204,6 +204,7 @@ export function ElectionHomePage() {
                     <Table.Cell>{t("election_management.document_na_31_2_bijlage_1")}</Table.Cell>
                   </Table.ClickRow>
                   <Table.ClickRow
+                    downloadIcon
                     onClick={() => {
                       directDownload(`/api/elections/${election.id}/download_n_10_2`);
                     }}
@@ -214,6 +215,30 @@ export function ElectionHomePage() {
                 </Table.Body>
               </Table>
             </div>
+          ) : (
+            currentCommitteeSession.number === 2 && (
+              <div className={cn(cls.downloadModels, "mt-xl")}>
+                <h3 className={cls.tableTitle}>{t("election_management.empty_document_title")}</h3>
+                <p>{t("election_management.empty_document_description")}</p>
+                <Table className={cn(cls.electionInformationTable)} variant="information">
+                  <Table.Header>
+                    <Table.HeaderCell scope="col">{t("election_management.document_model")}</Table.HeaderCell>
+                    <Table.HeaderCell scope="col">{t("election_management.document_purpose")}</Table.HeaderCell>
+                  </Table.Header>
+                  <Table.Body>
+                    <Table.ClickRow
+                      downloadIcon
+                      onClick={() => {
+                        directDownload(`/api/elections/${election.id}/download_na_31_2_inlegvel`);
+                      }}
+                    >
+                      <Table.Cell>Na 31-2 Inlegvel</Table.Cell>
+                      <Table.Cell>{t("election_management.document_na_31_2_inlegvel")}</Table.Cell>
+                    </Table.ClickRow>
+                  </Table.Body>
+                </Table>
+              </div>
+            )
           )}
         </article>
       </main>

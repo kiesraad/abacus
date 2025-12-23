@@ -7,10 +7,10 @@ use super::{
     CandidateVotes, CommonPollingStationResults, Compare, Count, CountingDifferencesPollingStation,
     DifferencesCounts, ExtraInvestigation, PoliticalGroupCandidateVotes, PoliticalGroupTotalVotes,
     PollingStationResults, VotersCounts, VotesCounts,
-    status::{DataEntryStatus, FirstEntryHasErrors, FirstEntryInProgress},
+    status::{DataEntryStatus, FirstEntryHasErrors, FirstEntryInProgress, SecondEntryNotStarted},
 };
 use crate::{
-    election::{ElectionWithPoliticalGroups, PGNumber},
+    election::{CandidateNumber, ElectionWithPoliticalGroups, PGNumber},
     polling_station::PollingStation,
 };
 
@@ -222,27 +222,30 @@ pub trait Validate {
     ) -> Result<(), DataError>;
 }
 
-pub fn validate_data_entry_status(
-    data_entry_status: &DataEntryStatus,
-    polling_station: &PollingStation,
-    election: &ElectionWithPoliticalGroups,
-) -> Result<ValidationResults, DataError> {
-    let mut validation_results = ValidationResults::default();
-    data_entry_status.validate(
-        election,
-        polling_station,
-        &mut validation_results,
-        &"data".into(),
-    )?;
-    validation_results
-        .errors
-        .sort_by(|a, b| a.code.cmp(&b.code));
-    validation_results
-        .warnings
-        .sort_by(|a, b| a.code.cmp(&b.code));
-    Ok(validation_results)
+pub trait ValidateRoot: Validate {
+    fn start_validate(
+        &self,
+        polling_station: &PollingStation,
+        election: &ElectionWithPoliticalGroups,
+    ) -> Result<ValidationResults, DataError> {
+        let mut validation_results = ValidationResults::default();
+        self.validate(
+            election,
+            polling_station,
+            &mut validation_results,
+            &"data".into(),
+        )?;
+        validation_results
+            .errors
+            .sort_by(|a, b| a.code.cmp(&b.code));
+        validation_results
+            .warnings
+            .sort_by(|a, b| a.code.cmp(&b.code));
+        Ok(validation_results)
+    }
 }
 
+#[allow(clippy::too_many_lines)]
 pub fn validate_differences_counts(
     differences_counts: &DifferencesCounts,
     total_voters_count: u32,
@@ -259,10 +262,6 @@ pub fn validate_differences_counts(
     let votes_cast_smaller_than_admitted_voters = differences_counts
         .compare_votes_cast_admitted_voters
         .votes_cast_smaller_than_admitted_voters;
-    let difference_completely_accounted_for_yes =
-        differences_counts.difference_completely_accounted_for.yes;
-    let difference_completely_accounted_for_no =
-        differences_counts.difference_completely_accounted_for.no;
 
     if admitted_voters_equal_votes_cast && (total_voters_count != total_votes_count) {
         validation_results.errors.push(ValidationResult {
@@ -413,9 +412,10 @@ pub fn validate_differences_counts(
         });
     }
 
-    let difference_completely_accounted_matches = difference_completely_accounted_for_yes as u8
-        + difference_completely_accounted_for_no as u8;
-    if (total_voters_count != total_votes_count) && (difference_completely_accounted_matches != 1) {
+    let accounted_for = &differences_counts.difference_completely_accounted_for;
+    if (total_voters_count != total_votes_count)
+        && (accounted_for.is_empty() || (accounted_for.is_both()))
+    {
         validation_results.errors.push(ValidationResult {
             fields: vec![
                 differences_counts_path
@@ -429,6 +429,8 @@ pub fn validate_differences_counts(
 
     Ok(())
 }
+
+impl ValidateRoot for DataEntryStatus {}
 
 impl Validate for DataEntryStatus {
     fn validate(
@@ -444,6 +446,10 @@ impl Validate for DataEntryStatus {
                 ..
             })
             | DataEntryStatus::FirstEntryHasErrors(FirstEntryHasErrors {
+                finalised_first_entry: entry,
+                ..
+            })
+            | DataEntryStatus::SecondEntryNotStarted(SecondEntryNotStarted {
                 finalised_first_entry: entry,
                 ..
             }) => {
@@ -482,6 +488,8 @@ impl Validate for DataEntryStatus {
     }
 }
 
+impl ValidateRoot for PollingStationResults {}
+
 impl Validate for PollingStationResults {
     fn validate(
         &self,
@@ -518,6 +526,7 @@ impl Validate for PollingStationResults {
 }
 
 impl Validate for CommonPollingStationResults {
+    #[allow(clippy::too_many_lines)]
     fn validate(
         &self,
         election: &ElectionWithPoliticalGroups,
@@ -595,7 +604,7 @@ impl Validate for CommonPollingStationResults {
                 .political_group_total_votes
                 .iter()
                 .find(|pgtv| pgtv.number == pgcv.number)
-                .expect("political group total votes should exist");
+                .ok_or(DataError::new("political group total votes should exist"))?;
 
             // all candidate votes, cast to u64 to avoid overflow
             let candidate_votes_sum: u64 = pgcv
@@ -647,8 +656,8 @@ impl Validate for ExtraInvestigation {
         validation_results: &mut ValidationResults,
         path: &FieldPath,
     ) -> Result<(), DataError> {
-        if self.extra_investigation_other_reason.is_answered()
-            != self.ballots_recounted_extra_investigation.is_answered()
+        if self.extra_investigation_other_reason.is_empty()
+            != self.ballots_recounted_extra_investigation.is_empty()
         {
             validation_results.errors.push(ValidationResult {
                 fields: vec![path.to_string()],
@@ -656,8 +665,9 @@ impl Validate for ExtraInvestigation {
                 context: None,
             });
         }
-        if self.extra_investigation_other_reason.is_invalid()
-            || self.ballots_recounted_extra_investigation.is_invalid()
+
+        if self.extra_investigation_other_reason.is_both()
+            || self.ballots_recounted_extra_investigation.is_both()
         {
             validation_results.errors.push(ValidationResult {
                 fields: vec![path.to_string()],
@@ -665,6 +675,7 @@ impl Validate for ExtraInvestigation {
                 context: None,
             });
         }
+
         Ok(())
     }
 }
@@ -677,8 +688,8 @@ impl Validate for CountingDifferencesPollingStation {
         validation_results: &mut ValidationResults,
         path: &FieldPath,
     ) -> Result<(), DataError> {
-        if !self.unexplained_difference_ballots_voters.is_answered()
-            || !self.difference_ballots_per_list.is_answered()
+        if self.unexplained_difference_ballots_voters.is_empty()
+            || self.difference_ballots_per_list.is_empty()
         {
             validation_results.errors.push(ValidationResult {
                 fields: vec![path.to_string()],
@@ -686,8 +697,9 @@ impl Validate for CountingDifferencesPollingStation {
                 context: None,
             });
         }
-        if self.unexplained_difference_ballots_voters.is_invalid()
-            || self.difference_ballots_per_list.is_invalid()
+
+        if self.unexplained_difference_ballots_voters.is_both()
+            || self.difference_ballots_per_list.is_both()
         {
             validation_results.errors.push(ValidationResult {
                 fields: vec![path.to_string()],
@@ -695,6 +707,7 @@ impl Validate for CountingDifferencesPollingStation {
                 context: None,
             });
         }
+
         Ok(())
     }
 }
@@ -743,6 +756,7 @@ impl Validate for VotersCounts {
 }
 
 impl Validate for VotesCounts {
+    #[allow(clippy::too_many_lines)]
     fn validate(
         &self,
         election: &ElectionWithPoliticalGroups,
@@ -866,13 +880,15 @@ impl Validate for Vec<PoliticalGroupTotalVotes> {
         }
 
         // check each political group total votes
+        let mut previous_number = PGNumber::from(0);
         for (i, pgv) in self.iter().enumerate() {
             let number = pgv.number;
-            if number as usize != i + 1 {
+            if number <= previous_number {
                 return Err(DataError::new(
-                    "political group total votes numbers are not consecutive",
+                    "political group total votes numbers are not increasing",
                 ));
             }
+            previous_number = number;
 
             pgv.total.validate(
                 election,
@@ -926,13 +942,14 @@ impl Validate for Vec<PoliticalGroupCandidateVotes> {
         }
 
         // check each political group
+        let mut previous_number = PGNumber::from(0);
         for (i, pgv) in self.iter().enumerate() {
             let number = pgv.number;
-            if number as usize != i + 1 {
-                return Err(DataError::new(
-                    "political group numbers are not consecutive",
-                ));
+            if number <= previous_number {
+                return Err(DataError::new("political group numbers are not increasing"));
             }
+            previous_number = number;
+
             pgv.validate(
                 election,
                 polling_station,
@@ -955,8 +972,9 @@ impl Validate for PoliticalGroupCandidateVotes {
         // check if the list of candidates has the correct length
         let pg = election
             .political_groups
-            .get(self.number as usize - 1)
-            .expect("political group should exist");
+            .iter()
+            .find(|pg| pg.number == self.number)
+            .ok_or(DataError::new("political group should exist"))?;
 
         // check if the number of candidates is correct
         if pg.candidates.len() != self.candidate_votes.len() {
@@ -964,11 +982,13 @@ impl Validate for PoliticalGroupCandidateVotes {
         }
 
         // validate all candidates
+        let mut prev_number = CandidateNumber::from(0);
         for (i, cv) in self.candidate_votes.iter().enumerate() {
             let number = cv.number;
-            if number as usize != i + 1 {
-                return Err(DataError::new("candidate numbers are not consecutive"));
+            if number <= prev_number {
+                return Err(DataError::new("candidate numbers are not increasing"));
             }
+            prev_number = number;
 
             cv.validate(
                 election,
@@ -1028,7 +1048,8 @@ mod tests {
 
     use super::*;
     use crate::{
-        election::tests::election_fixture, polling_station::structs::tests::polling_station_fixture,
+        election::structs::tests::election_fixture,
+        polling_station::structs::tests::polling_station_fixture,
     };
 
     mod extra_investigation {
@@ -1037,7 +1058,7 @@ mod tests {
                 DataError, ExtraInvestigation, Validate, ValidationResult, ValidationResultCode,
                 ValidationResults, YesNo,
             },
-            election::tests::election_fixture,
+            election::structs::tests::election_fixture,
             polling_station::structs::tests::polling_station_fixture,
         };
 
@@ -1048,14 +1069,8 @@ mod tests {
             recounted_no: bool,
         ) -> Result<ValidationResults, DataError> {
             let extra_investigation = ExtraInvestigation {
-                extra_investigation_other_reason: YesNo {
-                    yes: investigation_yes,
-                    no: investigation_no,
-                },
-                ballots_recounted_extra_investigation: YesNo {
-                    yes: recounted_yes,
-                    no: recounted_no,
-                },
+                extra_investigation_other_reason: YesNo::new(investigation_yes, investigation_no),
+                ballots_recounted_extra_investigation: YesNo::new(recounted_yes, recounted_no),
             };
 
             let mut validation_results = ValidationResults::default();
@@ -1169,7 +1184,7 @@ mod tests {
                 CountingDifferencesPollingStation, DataError, Validate, ValidationResult,
                 ValidationResultCode, ValidationResults, YesNo,
             },
-            election::tests::election_fixture,
+            election::structs::tests::election_fixture,
             polling_station::structs::tests::polling_station_fixture,
         };
 
@@ -1180,14 +1195,8 @@ mod tests {
             ballots_no: bool,
         ) -> Result<ValidationResults, DataError> {
             let counting_differences_polling_station = CountingDifferencesPollingStation {
-                unexplained_difference_ballots_voters: YesNo {
-                    yes: unexplained_yes,
-                    no: unexplained_no,
-                },
-                difference_ballots_per_list: YesNo {
-                    yes: ballots_yes,
-                    no: ballots_no,
-                },
+                unexplained_difference_ballots_voters: YesNo::new(unexplained_yes, unexplained_no),
+                difference_ballots_per_list: YesNo::new(ballots_yes, ballots_no),
             };
 
             let mut validation_results = ValidationResults::default();
@@ -1331,7 +1340,7 @@ mod tests {
                 DataError, Validate, ValidationResult, ValidationResultCode, ValidationResults,
                 VotersCounts,
             },
-            election::tests::election_fixture,
+            election::structs::tests::election_fixture,
             polling_station::structs::tests::polling_station_fixture,
         };
 
@@ -1387,7 +1396,7 @@ mod tests {
                 DataError, PoliticalGroupTotalVotes, Validate, ValidationResult,
                 ValidationResultCode, ValidationResults, VotesCounts,
             },
-            election::tests::election_fixture,
+            election::{PGNumber, structs::tests::election_fixture},
             polling_station::structs::tests::polling_station_fixture,
         };
 
@@ -1403,7 +1412,7 @@ mod tests {
                     .iter()
                     .enumerate()
                     .map(|(i, &total)| PoliticalGroupTotalVotes {
-                        number: u32::try_from(i + 1).unwrap(),
+                        number: PGNumber::try_from(i + 1).unwrap(),
                         total,
                     })
                     .collect(),
@@ -1611,7 +1620,7 @@ mod tests {
     mod differences_counts {
         use crate::data_entry::{
             DataError, DifferencesCounts, ValidationResult, ValidationResultCode,
-            ValidationResults, validate_differences_counts,
+            ValidationResults, YesNo, validate_differences_counts,
         };
 
         fn validate(
@@ -1639,7 +1648,7 @@ mod tests {
             let mut data = DifferencesCounts::zero();
             data.compare_votes_cast_admitted_voters
                 .admitted_voters_equal_votes_cast = true;
-            data.difference_completely_accounted_for.yes = true;
+            data.difference_completely_accounted_for = YesNo::yes();
 
             let validation_results = validate(data, 105, 105)?;
 
@@ -1649,7 +1658,7 @@ mod tests {
             let mut data = DifferencesCounts::zero();
             data.compare_votes_cast_admitted_voters
                 .admitted_voters_equal_votes_cast = true;
-            data.difference_completely_accounted_for.yes = true;
+            data.difference_completely_accounted_for = YesNo::yes();
 
             let validation_results = validate(data, 105, 104)?;
 
@@ -1661,7 +1670,7 @@ mod tests {
                         "differences_counts.compare_votes_cast_admitted_voters.admitted_voters_equal_votes_cast".into(),
                     ],
                     context: None,
-                },ValidationResult {
+                }, ValidationResult {
                     code: ValidationResultCode::F308,
                     fields: vec![
                         "differences_counts.fewer_ballots_count".into(),
@@ -1681,7 +1690,7 @@ mod tests {
             data.more_ballots_count = 1;
             data.compare_votes_cast_admitted_voters
                 .votes_cast_greater_than_admitted_voters = true;
-            data.difference_completely_accounted_for.yes = true;
+            data.difference_completely_accounted_for = YesNo::yes();
 
             let validation_results = validate(data, 104, 105)?;
 
@@ -1691,7 +1700,7 @@ mod tests {
             let mut data = DifferencesCounts::zero();
             data.compare_votes_cast_admitted_voters
                 .votes_cast_greater_than_admitted_voters = true;
-            data.difference_completely_accounted_for.yes = true;
+            data.difference_completely_accounted_for = YesNo::yes();
 
             let validation_results = validate(data, 105, 104)?;
 
@@ -1703,7 +1712,7 @@ mod tests {
                         "differences_counts.compare_votes_cast_admitted_voters.votes_cast_greater_than_admitted_voters".into(),
                     ],
                     context: None,
-                },ValidationResult {
+                }, ValidationResult {
                     code: ValidationResultCode::F308,
                     fields: vec![
                         "differences_counts.fewer_ballots_count".into(),
@@ -1716,7 +1725,7 @@ mod tests {
             let mut data = DifferencesCounts::zero();
             data.compare_votes_cast_admitted_voters
                 .votes_cast_greater_than_admitted_voters = true;
-            data.difference_completely_accounted_for.yes = true;
+            data.difference_completely_accounted_for = YesNo::yes();
 
             let validation_results = validate(data, 105, 105)?;
 
@@ -1743,7 +1752,7 @@ mod tests {
             data.fewer_ballots_count = 1;
             data.compare_votes_cast_admitted_voters
                 .votes_cast_smaller_than_admitted_voters = true;
-            data.difference_completely_accounted_for.yes = true;
+            data.difference_completely_accounted_for = YesNo::yes();
 
             let validation_results = validate(data, 104, 103)?;
 
@@ -1754,7 +1763,7 @@ mod tests {
 
             data.compare_votes_cast_admitted_voters
                 .votes_cast_smaller_than_admitted_voters = true;
-            data.difference_completely_accounted_for.yes = true;
+            data.difference_completely_accounted_for = YesNo::yes();
 
             let validation_results = validate(data, 103, 104)?;
 
@@ -1779,7 +1788,7 @@ mod tests {
 
             data.compare_votes_cast_admitted_voters
                 .votes_cast_smaller_than_admitted_voters = true;
-            data.difference_completely_accounted_for.yes = true;
+            data.difference_completely_accounted_for = YesNo::yes();
 
             let validation_results = validate(data, 103, 103)?;
 
@@ -1805,7 +1814,7 @@ mod tests {
 
             data.compare_votes_cast_admitted_voters
                 .admitted_voters_equal_votes_cast = true;
-            data.difference_completely_accounted_for.yes = true;
+            data.difference_completely_accounted_for = YesNo::yes();
 
             let validation_results = validate(data, 105, 105)?;
 
@@ -1814,7 +1823,7 @@ mod tests {
             // None checked
             let mut data = DifferencesCounts::zero();
 
-            data.difference_completely_accounted_for.yes = true;
+            data.difference_completely_accounted_for = YesNo::yes();
 
             let validation_results = validate(data, 105, 105)?;
 
@@ -1840,7 +1849,7 @@ mod tests {
                 .admitted_voters_equal_votes_cast = true;
             data.compare_votes_cast_admitted_voters
                 .votes_cast_smaller_than_admitted_voters = true;
-            data.difference_completely_accounted_for.yes = true;
+            data.difference_completely_accounted_for = YesNo::yes();
 
             let validation_results = validate(data, 105, 104)?;
 
@@ -1883,7 +1892,7 @@ mod tests {
                 .votes_cast_greater_than_admitted_voters = true;
             data.compare_votes_cast_admitted_voters
                 .votes_cast_smaller_than_admitted_voters = true;
-            data.difference_completely_accounted_for.yes = true;
+            data.difference_completely_accounted_for = YesNo::yes();
 
             let validation_results = validate(data, 105, 104)?;
 
@@ -1931,7 +1940,7 @@ mod tests {
             data.more_ballots_count = 4;
             data.compare_votes_cast_admitted_voters
                 .admitted_voters_equal_votes_cast = true;
-            data.difference_completely_accounted_for.yes = true;
+            data.difference_completely_accounted_for = YesNo::yes();
 
             let validation_results = validate(data, 52, 52)?;
 
@@ -1956,7 +1965,7 @@ mod tests {
             data.fewer_ballots_count = 4;
             data.compare_votes_cast_admitted_voters
                 .admitted_voters_equal_votes_cast = true;
-            data.difference_completely_accounted_for.yes = true;
+            data.difference_completely_accounted_for = YesNo::yes();
 
             let validation_results = validate(data, 52, 52)?;
 
@@ -1973,6 +1982,7 @@ mod tests {
         }
 
         /// CSO | F.305 (Als D = H) I en/of J zijn ingevuld
+        #[allow(clippy::too_many_lines)]
         #[test]
         fn test_f305_more_and_fewer_ballots_count() -> Result<(), DataError> {
             // D = H & I and J not filled in
@@ -1980,7 +1990,7 @@ mod tests {
 
             data.compare_votes_cast_admitted_voters
                 .admitted_voters_equal_votes_cast = true;
-            data.difference_completely_accounted_for.yes = true;
+            data.difference_completely_accounted_for = YesNo::yes();
 
             let validation_results = validate(data, 52, 52)?;
 
@@ -1991,7 +2001,7 @@ mod tests {
 
             data.compare_votes_cast_admitted_voters
                 .admitted_voters_equal_votes_cast = true;
-            data.difference_completely_accounted_for.yes = true;
+            data.difference_completely_accounted_for = YesNo::yes();
 
             let validation_results = validate(data, 52, 53)?;
 
@@ -2016,7 +2026,7 @@ mod tests {
 
             data.compare_votes_cast_admitted_voters
                 .admitted_voters_equal_votes_cast = true;
-            data.difference_completely_accounted_for.yes = true;
+            data.difference_completely_accounted_for = YesNo::yes();
 
             let validation_results = validate(data, 53, 52)?;
 
@@ -2043,7 +2053,7 @@ mod tests {
             data.fewer_ballots_count = 4;
             data.compare_votes_cast_admitted_voters
                 .admitted_voters_equal_votes_cast = true;
-            data.difference_completely_accounted_for.yes = true;
+            data.difference_completely_accounted_for = YesNo::yes();
 
             let validation_results = validate(data, 52, 52)?;
 
@@ -2071,7 +2081,7 @@ mod tests {
             data.more_ballots_count = 20;
             data.compare_votes_cast_admitted_voters
                 .votes_cast_greater_than_admitted_voters = true;
-            data.difference_completely_accounted_for.yes = true;
+            data.difference_completely_accounted_for = YesNo::yes();
 
             let validation_results = validate(data, 52, 72)?;
 
@@ -2089,7 +2099,7 @@ mod tests {
             data.more_ballots_count = 10;
             data.compare_votes_cast_admitted_voters
                 .admitted_voters_equal_votes_cast = true;
-            data.difference_completely_accounted_for.yes = true;
+            data.difference_completely_accounted_for = YesNo::yes();
 
             let validation_results = validate(data, 52, 52)?;
 
@@ -2108,7 +2118,7 @@ mod tests {
             data.more_ballots_count = 30;
             data.compare_votes_cast_admitted_voters
                 .admitted_voters_equal_votes_cast = true;
-            data.difference_completely_accounted_for.yes = true;
+            data.difference_completely_accounted_for = YesNo::yes();
 
             let validation_results = validate(data, 52, 52)?;
 
@@ -2133,7 +2143,7 @@ mod tests {
             data.more_ballots_count = 30;
             data.compare_votes_cast_admitted_voters
                 .votes_cast_smaller_than_admitted_voters = true;
-            data.difference_completely_accounted_for.yes = true;
+            data.difference_completely_accounted_for = YesNo::yes();
 
             let validation_results = validate(data, 72, 52)?;
 
@@ -2162,7 +2172,7 @@ mod tests {
             data.more_ballots_count = 4;
             data.compare_votes_cast_admitted_voters
                 .votes_cast_smaller_than_admitted_voters = true;
-            data.difference_completely_accounted_for.yes = true;
+            data.difference_completely_accounted_for = YesNo::yes();
 
             let validation_results = validate(data, 72, 52)?;
 
@@ -2197,7 +2207,7 @@ mod tests {
             data.more_ballots_count = 4;
             data.compare_votes_cast_admitted_voters
                 .votes_cast_greater_than_admitted_voters = true;
-            data.difference_completely_accounted_for.yes = true;
+            data.difference_completely_accounted_for = YesNo::yes();
 
             let validation_results = validate(data, 52, 72)?;
 
@@ -2216,7 +2226,7 @@ mod tests {
             data.more_ballots_count = 24;
             data.compare_votes_cast_admitted_voters
                 .votes_cast_greater_than_admitted_voters = true;
-            data.difference_completely_accounted_for.yes = true;
+            data.difference_completely_accounted_for = YesNo::yes();
 
             let validation_results = validate(data, 52, 72)?;
 
@@ -2233,6 +2243,7 @@ mod tests {
         }
 
         /// CSO | F.307 (Als H > D) J is ingevuld
+        #[allow(clippy::too_many_lines)]
         #[test]
         fn test_f307_votes_greater_than_voters() -> Result<(), DataError> {
             // H > D & J == 0
@@ -2240,7 +2251,7 @@ mod tests {
 
             data.compare_votes_cast_admitted_voters
                 .votes_cast_greater_than_admitted_voters = true;
-            data.difference_completely_accounted_for.yes = true;
+            data.difference_completely_accounted_for = YesNo::yes();
 
             let validation_results = validate(data, 52, 62)?;
 
@@ -2259,7 +2270,7 @@ mod tests {
             data.fewer_ballots_count = 3;
             data.compare_votes_cast_admitted_voters
                 .votes_cast_greater_than_admitted_voters = true;
-            data.difference_completely_accounted_for.yes = true;
+            data.difference_completely_accounted_for = YesNo::yes();
 
             let validation_results = validate(data, 52, 62)?;
 
@@ -2288,7 +2299,7 @@ mod tests {
             data.fewer_ballots_count = 30;
             data.compare_votes_cast_admitted_voters
                 .votes_cast_greater_than_admitted_voters = true;
-            data.difference_completely_accounted_for.yes = true;
+            data.difference_completely_accounted_for = YesNo::yes();
 
             let validation_results = validate(data, 52, 62)?;
 
@@ -2323,7 +2334,7 @@ mod tests {
             data.fewer_ballots_count = 3;
             data.compare_votes_cast_admitted_voters
                 .admitted_voters_equal_votes_cast = true;
-            data.difference_completely_accounted_for.yes = true;
+            data.difference_completely_accounted_for = YesNo::yes();
 
             let validation_results = validate(data, 52, 52)?;
 
@@ -2348,7 +2359,7 @@ mod tests {
             data.fewer_ballots_count = 3;
             data.compare_votes_cast_admitted_voters
                 .votes_cast_smaller_than_admitted_voters = true;
-            data.difference_completely_accounted_for.yes = true;
+            data.difference_completely_accounted_for = YesNo::yes();
 
             let validation_results = validate(data, 62, 52)?;
 
@@ -2373,7 +2384,7 @@ mod tests {
             data.fewer_ballots_count = 2;
             data.compare_votes_cast_admitted_voters
                 .votes_cast_smaller_than_admitted_voters = true;
-            data.difference_completely_accounted_for.yes = true;
+            data.difference_completely_accounted_for = YesNo::yes();
 
             let validation_results = validate(data, 46, 44)?;
 
@@ -2385,7 +2396,7 @@ mod tests {
             data.fewer_ballots_count = 1;
             data.compare_votes_cast_admitted_voters
                 .votes_cast_smaller_than_admitted_voters = true;
-            data.difference_completely_accounted_for.yes = true;
+            data.difference_completely_accounted_for = YesNo::yes();
 
             let validation_results = validate(data, 46, 44)?;
 
@@ -2404,7 +2415,7 @@ mod tests {
             data.fewer_ballots_count = 5;
             data.compare_votes_cast_admitted_voters
                 .votes_cast_smaller_than_admitted_voters = true;
-            data.difference_completely_accounted_for.yes = true;
+            data.difference_completely_accounted_for = YesNo::yes();
 
             let validation_results = validate(data, 46, 44)?;
 
@@ -2429,7 +2440,7 @@ mod tests {
             data.fewer_ballots_count = 5;
             data.compare_votes_cast_admitted_voters
                 .votes_cast_smaller_than_admitted_voters = true;
-            data.difference_completely_accounted_for.yes = true;
+            data.difference_completely_accounted_for = YesNo::yes();
 
             let validation_results = validate(data, 44, 44)?;
 
@@ -2439,7 +2450,7 @@ mod tests {
                     code: ValidationResultCode::F303,
                     fields: vec!["differences_counts.compare_votes_cast_admitted_voters.votes_cast_smaller_than_admitted_voters".into()],
                     context: None,
-                },ValidationResult {
+                }, ValidationResult {
                     code: ValidationResultCode::F305,
                     fields: vec!["differences_counts.fewer_ballots_count".into()],
                     context: None,
@@ -2457,7 +2468,7 @@ mod tests {
 
             data.compare_votes_cast_admitted_voters
                 .votes_cast_smaller_than_admitted_voters = true;
-            data.difference_completely_accounted_for.yes = true;
+            data.difference_completely_accounted_for = YesNo::yes();
 
             let validation_results = validate(data, 48, 44)?;
 
@@ -2476,7 +2487,7 @@ mod tests {
             data.more_ballots_count = 5;
             data.compare_votes_cast_admitted_voters
                 .votes_cast_smaller_than_admitted_voters = true;
-            data.difference_completely_accounted_for.yes = true;
+            data.difference_completely_accounted_for = YesNo::yes();
 
             let validation_results = validate(data, 48, 44)?;
 
@@ -2511,7 +2522,7 @@ mod tests {
             data.more_ballots_count = 3;
             data.compare_votes_cast_admitted_voters
                 .votes_cast_smaller_than_admitted_voters = true;
-            data.difference_completely_accounted_for.yes = true;
+            data.difference_completely_accounted_for = YesNo::yes();
 
             let validation_results = validate(data, 44, 44)?;
 
@@ -2520,7 +2531,7 @@ mod tests {
                 [
                     ValidationResult {
                         code: ValidationResultCode::F303,
-                        fields: vec!["differences_counts.compare_votes_cast_admitted_voters.votes_cast_smaller_than_admitted_voters".into(),],
+                        fields: vec!["differences_counts.compare_votes_cast_admitted_voters.votes_cast_smaller_than_admitted_voters".into()],
                         context: None,
                     },
                     ValidationResult {
@@ -2542,7 +2553,7 @@ mod tests {
 
             data.compare_votes_cast_admitted_voters
                 .votes_cast_smaller_than_admitted_voters = true;
-            data.difference_completely_accounted_for.yes = true;
+            data.difference_completely_accounted_for = YesNo::yes();
 
             let validation_results = validate(data, 48, 44)?;
 
@@ -2561,7 +2572,7 @@ mod tests {
             data.more_ballots_count = 5;
             data.compare_votes_cast_admitted_voters
                 .votes_cast_smaller_than_admitted_voters = true;
-            data.difference_completely_accounted_for.yes = true;
+            data.difference_completely_accounted_for = YesNo::yes();
 
             let validation_results = validate(data, 48, 44)?;
 
@@ -2596,7 +2607,7 @@ mod tests {
             data.more_ballots_count = 4;
             data.compare_votes_cast_admitted_voters
                 .votes_cast_greater_than_admitted_voters = true;
-            data.difference_completely_accounted_for.yes = true;
+            data.difference_completely_accounted_for = YesNo::yes();
 
             let validation_results = validate(data, 44, 48)?;
 
@@ -2608,7 +2619,7 @@ mod tests {
             data.fewer_ballots_count = 4;
             data.compare_votes_cast_admitted_voters
                 .votes_cast_smaller_than_admitted_voters = true;
-            data.difference_completely_accounted_for.yes = true;
+            data.difference_completely_accounted_for = YesNo::yes();
 
             let validation_results = validate(data, 48, 44)?;
 
@@ -2620,7 +2631,7 @@ mod tests {
             data.more_ballots_count = 4;
             data.compare_votes_cast_admitted_voters
                 .votes_cast_greater_than_admitted_voters = true;
-            data.difference_completely_accounted_for.no = true;
+            data.difference_completely_accounted_for = YesNo::no();
 
             let validation_results = validate(data, 44, 48)?;
 
@@ -2632,7 +2643,7 @@ mod tests {
             data.fewer_ballots_count = 4;
             data.compare_votes_cast_admitted_voters
                 .votes_cast_smaller_than_admitted_voters = true;
-            data.difference_completely_accounted_for.no = true;
+            data.difference_completely_accounted_for = YesNo::no();
 
             let validation_results = validate(data, 48, 44)?;
 
@@ -2709,8 +2720,7 @@ mod tests {
             data.more_ballots_count = 4;
             data.compare_votes_cast_admitted_voters
                 .votes_cast_greater_than_admitted_voters = true;
-            data.difference_completely_accounted_for.yes = true;
-            data.difference_completely_accounted_for.no = true;
+            data.difference_completely_accounted_for = YesNo::both();
 
             let validation_results = validate(data, 44, 48)?;
 
@@ -2729,8 +2739,7 @@ mod tests {
             data.fewer_ballots_count = 4;
             data.compare_votes_cast_admitted_voters
                 .votes_cast_smaller_than_admitted_voters = true;
-            data.difference_completely_accounted_for.yes = true;
-            data.difference_completely_accounted_for.no = true;
+            data.difference_completely_accounted_for = YesNo::both();
 
             let validation_results = validate(data, 48, 44)?;
 
@@ -2753,7 +2762,10 @@ mod tests {
                 CandidateVotes, DataError, PoliticalGroupCandidateVotes, Validate,
                 ValidationResults,
             },
-            election::{ElectionWithPoliticalGroups, PGNumber, tests::election_fixture},
+            election::{
+                CandidateNumber, ElectionWithPoliticalGroups, PGNumber,
+                structs::tests::election_fixture,
+            },
             polling_station::structs::tests::polling_station_fixture,
         };
 
@@ -2817,12 +2829,33 @@ mod tests {
         }
 
         #[test]
-        fn test_err_political_group_numbers_not_consecutive() {
-            let (mut political_group_votes, election) =
+        fn test_ok_political_group_numbers_not_consecutive() {
+            let (mut political_group_votes, mut election) =
+                create_test_data(&[(&[10, 20, 30], 60), (&[5, 10, 15], 30)]);
+
+            // Change number of the last list
+            political_group_votes[1].number = PGNumber::from(3);
+            election.political_groups[1].number = PGNumber::from(3);
+
+            let mut validation_results = ValidationResults::default();
+            let result: Result<(), DataError> = political_group_votes.validate(
+                &election,
+                &polling_station_fixture(None),
+                &mut validation_results,
+                &"political_group_votes".into(),
+            );
+
+            assert!(result.is_ok());
+        }
+
+        #[test]
+        fn test_err_political_group_numbers_not_increasing() {
+            let (mut political_group_votes, mut election) =
                 create_test_data(&[(&[10, 20, 30], 60), (&[5, 10, 15], 30)]);
 
             // Change number of the first list
-            political_group_votes[0].number = 3;
+            political_group_votes[0].number = PGNumber::from(3);
+            election.political_groups[0].number = PGNumber::from(3);
 
             let mut validation_results = ValidationResults::default();
             let result: Result<(), DataError> = political_group_votes.validate(
@@ -2833,12 +2866,6 @@ mod tests {
             );
 
             assert!(result.is_err());
-            assert!(
-                result
-                    .unwrap_err()
-                    .message
-                    .eq("political group numbers are not consecutive"),
-            );
         }
 
         #[test]
@@ -2850,7 +2877,7 @@ mod tests {
             political_group_votes[0]
                 .candidate_votes
                 .push(CandidateVotes {
-                    number: 4,
+                    number: CandidateNumber::from(4),
                     votes: 0,
                 });
 
@@ -2872,12 +2899,31 @@ mod tests {
         }
 
         #[test]
-        fn test_err_candidate_numbers_not_consecutive() {
+        fn test_ok_candidate_numbers_not_consecutive() {
             let (mut political_group_votes, election) =
                 create_test_data(&[(&[10, 20, 30], 60), (&[5, 10, 15], 30)]);
 
-            // Change number of the second candidate on the first list
-            political_group_votes[0].candidate_votes[1].number = 5;
+            // Change number of the last candidate on the first list
+            political_group_votes[0].candidate_votes[2].number = CandidateNumber::from(5);
+
+            let mut validation_results = ValidationResults::default();
+            let result = political_group_votes.validate(
+                &election,
+                &polling_station_fixture(None),
+                &mut validation_results,
+                &"political_group_votes".into(),
+            );
+
+            assert!(result.is_ok());
+        }
+
+        #[test]
+        fn test_err_candidate_numbers_not_increasing() {
+            let (mut political_group_votes, election) =
+                create_test_data(&[(&[10, 20, 30], 60), (&[5, 10, 15], 30)]);
+
+            // Change number of the second candidate on the first list to a non-increasing number
+            political_group_votes[0].candidate_votes[1].number = CandidateNumber::from(1);
 
             let mut validation_results = ValidationResults::default();
             let result = political_group_votes.validate(
@@ -2888,12 +2934,6 @@ mod tests {
             );
 
             assert!(result.is_err());
-            assert!(
-                result
-                    .unwrap_err()
-                    .message
-                    .eq("candidate numbers are not consecutive"),
-            );
         }
     }
 
@@ -2905,7 +2945,7 @@ mod tests {
                 ValidationResultContext, ValidationResults, VotersCounts, VotesCounts,
                 tests::ValidDefault,
             },
-            election::tests::election_fixture,
+            election::{PGNumber, structs::tests::election_fixture},
             polling_station::structs::tests::polling_station_fixture,
         };
 
@@ -2919,11 +2959,11 @@ mod tests {
                 votes_counts: VotesCounts {
                     political_group_total_votes: vec![
                         PoliticalGroupTotalVotes {
-                            number: 1,
+                            number: PGNumber::from(1),
                             total: 60,
                         },
                         PoliticalGroupTotalVotes {
-                            number: 2,
+                            number: PGNumber::from(2),
                             total: 30,
                         },
                     ],
@@ -2934,8 +2974,14 @@ mod tests {
                 },
                 differences_counts: ValidDefault::valid_default(),
                 political_group_votes: vec![
-                    PoliticalGroupCandidateVotes::from_test_data_auto(1, &[10, 20, 30]),
-                    PoliticalGroupCandidateVotes::from_test_data_auto(2, &[5, 10, 15]),
+                    PoliticalGroupCandidateVotes::from_test_data_auto(
+                        PGNumber::from(1),
+                        &[10, 20, 30],
+                    ),
+                    PoliticalGroupCandidateVotes::from_test_data_auto(
+                        PGNumber::from(2),
+                        &[5, 10, 15],
+                    ),
                 ],
             }
         }
@@ -3010,6 +3056,7 @@ mod tests {
         }
 
         /// CSO | F.401 `Er zijn (stemmen op kandidaten of het lijsttotaal van corresponderende E.x is groter dan 0) en het totaal aantal stemmen op een lijst = leeg of 0`
+        #[allow(clippy::too_many_lines)]
         #[test]
         fn test_f401() -> Result<(), DataError> {
             // Only F.401 is triggered.
@@ -3024,7 +3071,7 @@ mod tests {
                     code: ValidationResultCode::F401,
                     fields: vec!["data.political_group_votes[1].total".into()],
                     context: Some(ValidationResultContext {
-                        political_group_number: Some(2),
+                        political_group_number: Some(PGNumber::from(2)),
                     }),
                 }]
             );
@@ -3043,7 +3090,7 @@ mod tests {
                     code: ValidationResultCode::F401,
                     fields: vec!["data.political_group_votes[1].total".into()],
                     context: Some(ValidationResultContext {
-                        political_group_number: Some(2),
+                        political_group_number: Some(PGNumber::from(2)),
                     }),
                 }]
             );
@@ -3058,7 +3105,7 @@ mod tests {
                     code: ValidationResultCode::F401,
                     fields: vec!["data.political_group_votes[1].total".into()],
                     context: Some(ValidationResultContext {
-                        political_group_number: Some(2),
+                        political_group_number: Some(PGNumber::from(2)),
                     }),
                 }]
             );
@@ -3078,21 +3125,21 @@ mod tests {
                         code: ValidationResultCode::F402,
                         fields: vec!["data.political_group_votes[0]".into()],
                         context: Some(ValidationResultContext {
-                            political_group_number: Some(1),
+                            political_group_number: Some(PGNumber::from(1)),
                         }),
                     },
                     ValidationResult {
                         code: ValidationResultCode::F403,
                         fields: vec!["data.political_group_votes[0].total".into()],
                         context: Some(ValidationResultContext {
-                            political_group_number: Some(1),
+                            political_group_number: Some(PGNumber::from(1)),
                         }),
                     },
                     ValidationResult {
                         code: ValidationResultCode::F401,
                         fields: vec!["data.political_group_votes[1].total".into()],
                         context: Some(ValidationResultContext {
-                            political_group_number: Some(2),
+                            political_group_number: Some(PGNumber::from(2)),
                         }),
                     }
                 ]
@@ -3116,14 +3163,14 @@ mod tests {
                         code: ValidationResultCode::F401,
                         fields: vec!["data.political_group_votes[0].total".into()],
                         context: Some(ValidationResultContext {
-                            political_group_number: Some(1),
+                            political_group_number: Some(PGNumber::from(1)),
                         }),
                     },
                     ValidationResult {
                         code: ValidationResultCode::F402,
                         fields: vec!["data.political_group_votes[1]".into()],
                         context: Some(ValidationResultContext {
-                            political_group_number: Some(2),
+                            political_group_number: Some(PGNumber::from(2)),
                         }),
                     },
                 ]
@@ -3146,7 +3193,7 @@ mod tests {
                     code: ValidationResultCode::F401,
                     fields: vec!["data.political_group_votes[1].total".into()],
                     context: Some(ValidationResultContext {
-                        political_group_number: Some(2),
+                        political_group_number: Some(PGNumber::from(2)),
                     }),
                 }]
             );
@@ -3162,7 +3209,7 @@ mod tests {
                     code: ValidationResultCode::F402,
                     fields: vec!["data.political_group_votes[1]".into()],
                     context: Some(ValidationResultContext {
-                        political_group_number: Some(2),
+                        political_group_number: Some(PGNumber::from(2)),
                     }),
                 }]
             );
@@ -3183,7 +3230,7 @@ mod tests {
                     code: ValidationResultCode::F403,
                     fields: vec!["data.political_group_votes[1].total".into()],
                     context: Some(ValidationResultContext {
-                        political_group_number: Some(2),
+                        political_group_number: Some(PGNumber::from(2)),
                     }),
                 }],
             );
@@ -3199,14 +3246,14 @@ mod tests {
                         code: ValidationResultCode::F403,
                         fields: vec!["data.political_group_votes[0].total".into()],
                         context: Some(ValidationResultContext {
-                            political_group_number: Some(1),
+                            political_group_number: Some(PGNumber::from(1)),
                         }),
                     },
                     ValidationResult {
                         code: ValidationResultCode::F403,
                         fields: vec!["data.political_group_votes[1].total".into()],
                         context: Some(ValidationResultContext {
-                            political_group_number: Some(2),
+                            political_group_number: Some(PGNumber::from(2)),
                         }),
                     }
                 ],
@@ -3222,14 +3269,14 @@ mod tests {
                         code: ValidationResultCode::F403,
                         fields: vec!["data.political_group_votes[0].total".into()],
                         context: Some(ValidationResultContext {
-                            political_group_number: Some(1),
+                            political_group_number: Some(PGNumber::from(1)),
                         }),
                     },
                     ValidationResult {
                         code: ValidationResultCode::F401,
                         fields: vec!["data.political_group_votes[1].total".into()],
                         context: Some(ValidationResultContext {
-                            political_group_number: Some(2),
+                            political_group_number: Some(PGNumber::from(2)),
                         }),
                     }
                 ],

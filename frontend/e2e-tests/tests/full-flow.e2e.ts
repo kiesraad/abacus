@@ -3,11 +3,13 @@ import { test } from "e2e-tests/fixtures";
 import { getTestPassword } from "e2e-tests/helpers-utils/e2e-test-api-helpers";
 import {
   createInvestigation,
+  fillCandidatesListPages,
   fillDataEntryPagesAndSave,
   uploadCandidatesAndInputHash,
   uploadElectionAndInputHash,
   uploadPollingStations,
 } from "e2e-tests/helpers-utils/e2e-test-browser-helpers";
+import { AccountSetupPgObj } from "e2e-tests/page-objects/authentication/AccountSetupPgObj";
 import { LoginPgObj } from "e2e-tests/page-objects/authentication/LoginPgObj";
 import { CandidatesListPage } from "e2e-tests/page-objects/data_entry/CandidatesListPgObj";
 import { CheckAndSavePage } from "e2e-tests/page-objects/data_entry/CheckAndSavePgObj";
@@ -15,6 +17,7 @@ import { DataEntryHomePage } from "e2e-tests/page-objects/data_entry/DataEntryHo
 import { DifferencesPage } from "e2e-tests/page-objects/data_entry/DifferencesPgObj";
 import { ExtraInvestigationPage } from "e2e-tests/page-objects/data_entry/ExtraInvestigationPgObj";
 import { ProgressList } from "e2e-tests/page-objects/data_entry/ProgressListPgObj";
+import { VotersAndVotesPage } from "e2e-tests/page-objects/data_entry/VotersAndVotesPgObj";
 import { CheckAndSavePgObj } from "e2e-tests/page-objects/election/create/CheckAndSavePgObj";
 import { CountingMethodTypePgObj } from "e2e-tests/page-objects/election/create/CountingMethodTypePgObj";
 import { NumberOfVotersPgObj } from "e2e-tests/page-objects/election/create/NumberOfVotersPgObj";
@@ -25,11 +28,17 @@ import { ElectionReport } from "e2e-tests/page-objects/election/ElectionReportPg
 import { ElectionsOverviewPgObj } from "e2e-tests/page-objects/election/ElectionsOverviewPgObj";
 import { ElectionStatus } from "e2e-tests/page-objects/election/ElectionStatusPgObj";
 import { FinishDataEntry } from "e2e-tests/page-objects/election/FinishDataEntryPgObj";
+import { AddInvestigationPgObj } from "e2e-tests/page-objects/investigations/AddInvestigationPgObj";
 import { InvestigationFindingsPgObj } from "e2e-tests/page-objects/investigations/InvestigationFindingsPgObj";
 import { InvestigationOverviewPgObj } from "e2e-tests/page-objects/investigations/InvestigationOverviewPgObj";
+import { AdminNavBar } from "e2e-tests/page-objects/nav_bar/AdminNavBarPgObj";
 import { CoordinatorNavBarPgObj } from "e2e-tests/page-objects/nav_bar/CoordinatorNavBarPgObj";
 import { PollingStationFormPgObj } from "e2e-tests/page-objects/polling_station/PollingStationFormPgObj";
 import { PollingStationListPgObj } from "e2e-tests/page-objects/polling_station/PollingStationListPgObj";
+import { UserCreateDetailsPgObj } from "e2e-tests/page-objects/users/UserCreateDetailsPgObj";
+import { UserCreateRolePgObj } from "e2e-tests/page-objects/users/UserCreateRolePgObj";
+import { UserCreateTypePgObj } from "e2e-tests/page-objects/users/UserCreateTypePgObj";
+import { UserListPgObj } from "e2e-tests/page-objects/users/UserListPgObj";
 import { eml110b_single } from "e2e-tests/test-data/eml-files";
 import { noRecountNoDifferencesDataEntry } from "e2e-tests/test-data/request-response-templates";
 import { stat } from "node:fs/promises";
@@ -43,18 +52,59 @@ const investigations = [
     findings: "Geen probleem",
     correctedResults: false,
   },
+  {
+    number: "5",
+    name: "Sportfondsenbad",
+    reason: "Stembureau vergeten te importeren",
+    findings: "Stembureau toegevoegd en ingevoerd",
+    correctedResults: true,
+  },
 ];
+
+const typistUsers = ["typist3", "typist4"];
 
 test.describe.configure({ mode: "serial" });
 
 test.describe("full flow", () => {
   let electionId: number | null = null;
 
+  test(`create typists for flow`, async ({ page }) => {
+    await page.goto("/account/login");
+
+    const loginPage = new LoginPgObj(page);
+    await loginPage.login("admin2", getTestPassword("admin2"));
+
+    const navBar = new AdminNavBar(page);
+    await expect(navBar.username).toHaveText(`Jef van Reybrouck`);
+
+    for (const username of typistUsers) {
+      await page.goto(`/users`);
+
+      const userListPgObj = new UserListPgObj(page);
+      await userListPgObj.create.click();
+
+      const userCreateRolePgObj = new UserCreateRolePgObj(page);
+      await userCreateRolePgObj.typist.click();
+      await userCreateRolePgObj.continue.click();
+
+      const userCreateTypePgObj = new UserCreateTypePgObj(page);
+      await userCreateTypePgObj.continue.click();
+
+      const userCreateDetailsPgObj = new UserCreateDetailsPgObj(page);
+      await userCreateDetailsPgObj.username.fill(username);
+      await userCreateDetailsPgObj.fullname.fill(`Typist ${username}`);
+      await userCreateDetailsPgObj.password.fill(username.repeat(3));
+      await userCreateDetailsPgObj.save.click();
+
+      await expect(userListPgObj.alert).toContainText(`${username} is toegevoegd met de rol Invoerder`);
+    }
+  });
+
   test("create election and a new polling station", async ({ page }) => {
     await page.goto("/account/login");
 
     const loginPage = new LoginPgObj(page);
-    await loginPage.login("admin1", getTestPassword("admin1"));
+    await loginPage.login("admin2", getTestPassword("admin2"));
 
     const electionsOverviewPage = new ElectionsOverviewPgObj(page);
     await electionsOverviewPage.create.click();
@@ -91,7 +141,7 @@ test.describe("full flow", () => {
     const electionHomePage = new ElectionHome(page);
     await expect(electionHomePage.header).toContainText("Gemeenteraad Test 2022");
     const sessionCard = electionHomePage.getCommitteeSessionCard(1);
-    await expect(sessionCard).toContainText("Eerste zitting — Klaar voor steminvoer");
+    await expect(sessionCard).toContainText("Eerste zitting — Klaar voor invoer");
 
     await electionHomePage.pollingStationsRow.click();
     const pollingStationListPage = new PollingStationListPgObj(page);
@@ -111,7 +161,7 @@ test.describe("full flow", () => {
     await page.goto("/account/login");
 
     const loginPage = new LoginPgObj(page);
-    await loginPage.login("coordinator1", getTestPassword("coordinator1"));
+    await loginPage.login("coordinator2", getTestPassword("coordinator2"));
 
     const overviewPage = new ElectionsOverviewPgObj(page);
     await expect(overviewPage.header).toBeVisible();
@@ -133,6 +183,65 @@ test.describe("full flow", () => {
     await expect(electionStatus.header).toContainText("Eerste zitting");
   });
 
+  test("download Na 31-2 documents", async ({ page }) => {
+    await page.goto("/account/login");
+
+    const loginPage = new LoginPgObj(page);
+    await loginPage.login("coordinator2", getTestPassword("coordinator2"));
+
+    const overviewPage = new ElectionsOverviewPgObj(page);
+    await expect(overviewPage.header).toBeVisible();
+    await overviewPage.findElectionRowById(electionId!).click();
+
+    const electionHomePage = new ElectionHome(page);
+    await expect(electionHomePage.header).toContainText("Gemeenteraad Test 2022");
+
+    const downloadPromise = page.waitForEvent("download");
+    await electionHomePage.downloadBijlage1.click();
+    const download = await downloadPromise;
+
+    expect(download.suggestedFilename()).toBe("GR2022_Test_na_31_2_bijlage1.zip");
+    expect((await stat(await download.path())).size).toBeGreaterThan(1024);
+  });
+
+  test("download N10-2 documents", async ({ page }) => {
+    await page.goto("/account/login");
+
+    const loginPage = new LoginPgObj(page);
+    await loginPage.login("coordinator2", getTestPassword("coordinator2"));
+
+    const overviewPage = new ElectionsOverviewPgObj(page);
+    await expect(overviewPage.header).toBeVisible();
+    await overviewPage.findElectionRowById(electionId!).click();
+
+    const electionHomePage = new ElectionHome(page);
+    await expect(electionHomePage.header).toContainText("Gemeenteraad Test 2022");
+
+    const downloadPromise = page.waitForEvent("download");
+    await electionHomePage.downloadN10_2.click();
+    const download = await downloadPromise;
+
+    expect(download.suggestedFilename()).toBe("GR2022_Test_n_10_2.zip");
+    expect((await stat(await download.path())).size).toBeGreaterThan(1024);
+  });
+
+  for (const typist of typistUsers) {
+    test(`complete account for ${typist}`, async ({ page }) => {
+      await page.goto("/account/login");
+      const loginPage = new LoginPgObj(page);
+      await loginPage.login(typist, typist.repeat(3));
+
+      const password = getTestPassword(typist);
+      const accountSetupPage = new AccountSetupPgObj(page);
+      await accountSetupPage.password.fill(password);
+      await accountSetupPage.passwordRepeat.fill(password);
+      await accountSetupPage.saveBtn.click();
+
+      const overviewPage = new ElectionsOverviewPgObj(page);
+      await expect(overviewPage.alert).toBeVisible();
+    });
+  }
+
   for (const station of [
     { number: "1", name: "Stadhuis" },
     { number: "2", name: "Basisschool de Regenboog" },
@@ -141,7 +250,7 @@ test.describe("full flow", () => {
       await page.goto("/account/login");
 
       const loginPage = new LoginPgObj(page);
-      await loginPage.login("typist1", getTestPassword("typist1"));
+      await loginPage.login("typist3", getTestPassword("typist3"));
 
       const overviewPage = new ElectionsOverviewPgObj(page);
       await expect(overviewPage.header).toBeVisible();
@@ -160,7 +269,7 @@ test.describe("full flow", () => {
       await page.goto("/account/login");
 
       const loginPage = new LoginPgObj(page);
-      await loginPage.login("typist2", getTestPassword("typist2"));
+      await loginPage.login("typist4", getTestPassword("typist4"));
 
       const overviewPage = new ElectionsOverviewPgObj(page);
       await expect(overviewPage.header).toBeVisible();
@@ -180,7 +289,7 @@ test.describe("full flow", () => {
     await page.goto("/account/login");
 
     const loginPage = new LoginPgObj(page);
-    await loginPage.login("coordinator1", getTestPassword("coordinator1"));
+    await loginPage.login("coordinator2", getTestPassword("coordinator2"));
 
     const overviewPage = new ElectionsOverviewPgObj(page);
     await expect(overviewPage.header).toBeVisible();
@@ -202,7 +311,7 @@ test.describe("full flow", () => {
 
     const download = await downloadPromise;
 
-    expect(download.suggestedFilename()).toBe("election_result_GR2022_Test.zip");
+    expect(download.suggestedFilename()).toMatch(/definitieve-documenten_gr2022_test_gemeente_test-\d{8}-\d{6}.zip/);
     expect((await stat(await download.path())).size).toBeGreaterThan(1024);
   });
 
@@ -210,7 +319,7 @@ test.describe("full flow", () => {
     await page.goto("/account/login");
 
     const loginPage = new LoginPgObj(page);
-    await loginPage.login("coordinator1", getTestPassword("coordinator1"));
+    await loginPage.login("coordinator2", getTestPassword("coordinator2"));
 
     const overviewPage = new ElectionsOverviewPgObj(page);
     await expect(overviewPage.header).toBeVisible();
@@ -219,6 +328,63 @@ test.describe("full flow", () => {
     const electionDetailsPage = new ElectionDetailsPgObj(page);
     await electionDetailsPage.newSessionButton.click();
     await electionDetailsPage.newSessionModalConfirmButton.click();
+
+    await expect(electionDetailsPage.investigationsOverviewButton).toBeVisible();
+  });
+
+  test("download Na 31-2 inlegvel", async ({ page }) => {
+    await page.goto("/account/login");
+
+    const loginPage = new LoginPgObj(page);
+    await loginPage.login("coordinator2", getTestPassword("coordinator2"));
+
+    const overviewPage = new ElectionsOverviewPgObj(page);
+    await expect(overviewPage.header).toBeVisible();
+    await overviewPage.findElectionRowById(electionId!).click();
+
+    const electionHomePage = new ElectionHome(page);
+    await expect(electionHomePage.header).toContainText("Gemeenteraad Test 2022");
+
+    const downloadPromise = page.waitForEvent("download");
+    await electionHomePage.downloadInlegvel.click();
+    const download = await downloadPromise;
+
+    expect(download.suggestedFilename()).toBe("Model_Na_31_2_Inlegvel.pdf");
+    expect((await stat(await download.path())).size).toBeGreaterThan(1024);
+  });
+
+  test("add missing polling station", async ({ page }) => {
+    await page.goto("/account/login");
+
+    const loginPage = new LoginPgObj(page);
+    await loginPage.login("coordinator2", getTestPassword("coordinator2"));
+
+    const overviewPage = new ElectionsOverviewPgObj(page);
+    await expect(overviewPage.header).toBeVisible();
+    await overviewPage.findElectionRowById(electionId!).click();
+
+    const electionDetailsPage = new ElectionDetailsPgObj(page);
+    await expect(electionDetailsPage.header).toContainText("Gemeenteraad Test 2022");
+    await electionDetailsPage.investigationsOverviewButton.click();
+
+    const investigationsOverviewPage = new InvestigationOverviewPgObj(page);
+    await investigationsOverviewPage.addInvestigationButton.click();
+
+    const addInvestigationPage = new AddInvestigationPgObj(page);
+    await expect(addInvestigationPage.header).toBeVisible();
+    await addInvestigationPage.addPollingStation.click();
+
+    const form = new PollingStationFormPgObj(page);
+
+    await form.fillIn({
+      number: 5,
+      name: "Sportfondsenbad",
+    });
+
+    await form.create.click();
+
+    const pollingStationListPage = new PollingStationListPgObj(page);
+    expect(await pollingStationListPage.alert.textContent()).toContain("Stembureau 5 (Sportfondsenbad) toegevoegd");
   });
 
   for (const station of investigations) {
@@ -226,7 +392,7 @@ test.describe("full flow", () => {
       await page.goto("/account/login");
 
       const loginPage = new LoginPgObj(page);
-      await loginPage.login("coordinator1", getTestPassword("coordinator1"));
+      await loginPage.login("coordinator2", getTestPassword("coordinator2"));
 
       const overviewPage = new ElectionsOverviewPgObj(page);
       await expect(overviewPage.header).toBeVisible();
@@ -240,7 +406,7 @@ test.describe("full flow", () => {
     await page.goto("/account/login");
 
     const loginPage = new LoginPgObj(page);
-    await loginPage.login("coordinator1", getTestPassword("coordinator1"));
+    await loginPage.login("coordinator2", getTestPassword("coordinator2"));
 
     const overviewPage = new ElectionsOverviewPgObj(page);
     await expect(overviewPage.header).toBeVisible();
@@ -248,6 +414,9 @@ test.describe("full flow", () => {
 
     const electionDetailsPage = new ElectionDetailsPgObj(page);
     await electionDetailsPage.startDataEntryButton.click();
+
+    const electionStatus = new ElectionStatus(page);
+    await expect(electionStatus.header).toContainText("Tweede zitting");
   });
 
   for (const station of investigations) {
@@ -255,7 +424,7 @@ test.describe("full flow", () => {
       await page.goto("/account/login");
 
       const loginPage = new LoginPgObj(page);
-      await loginPage.login("coordinator1", getTestPassword("coordinator1"));
+      await loginPage.login("coordinator2", getTestPassword("coordinator2"));
 
       const overviewPage = new ElectionsOverviewPgObj(page);
       await expect(overviewPage.header).toBeVisible();
@@ -283,7 +452,7 @@ test.describe("full flow", () => {
     });
   }
 
-  for (const typist of ["typist1", "typist2"]) {
+  for (const typist of typistUsers) {
     test(`corrected data entry with ${typist}`, async ({ page }) => {
       await page.goto("/account/login");
 
@@ -311,19 +480,58 @@ test.describe("full flow", () => {
       const progressList = new ProgressList(page);
       const [firstListName, secondListName, thirdListName] = await progressList.allListNames();
 
-      const firstCandidatesPage = new CandidatesListPage(page, 1, firstListName!);
+      const firstCandidatesPage = new CandidatesListPage(page, 0, firstListName!);
       await firstCandidatesPage.fillCandidate(0, 1336);
       await firstCandidatesPage.fillCandidate(1, 424);
       await firstCandidatesPage.next.click();
 
-      const secondCandidatesPage = new CandidatesListPage(page, 2, secondListName!);
+      const secondCandidatesPage = new CandidatesListPage(page, 1, secondListName!);
       await secondCandidatesPage.next.click();
 
-      const thirdCandidatesPage = new CandidatesListPage(page, 3, thirdListName!);
+      const thirdCandidatesPage = new CandidatesListPage(page, 2, thirdListName!);
       await thirdCandidatesPage.next.click();
 
       const checkAndSavePage = new CheckAndSavePage(page);
       await checkAndSavePage.save.click();
+
+      await expect(dataEntryHomePage.dataEntrySaved).toBeVisible();
+    });
+  }
+
+  for (const typist of typistUsers) {
+    test(`data entry for new pollings station with ${typist}`, async ({ page }) => {
+      await page.goto("/account/login");
+
+      const loginPage = new LoginPgObj(page);
+      await loginPage.login(typist, getTestPassword(typist));
+
+      const overviewPage = new ElectionsOverviewPgObj(page);
+      await expect(overviewPage.header).toBeVisible();
+      await overviewPage.findElectionRowById(electionId!).click();
+
+      const dataEntryHomePage = new DataEntryHomePage(page);
+      await expect(dataEntryHomePage.fieldset).toBeVisible();
+      await dataEntryHomePage.pollingStationNumber.fill("5");
+      await expect(dataEntryHomePage.pollingStationFeedback).toContainText("Sportfondsenbad");
+      await dataEntryHomePage.clickStart();
+
+      const votersAndVotesPage = new VotersAndVotesPage(page);
+      await expect(votersAndVotesPage.fieldset).toBeVisible();
+      await votersAndVotesPage.fillInPageAndClickNext(
+        noRecountNoDifferencesDataEntry.voters_counts,
+        noRecountNoDifferencesDataEntry.votes_counts,
+      );
+
+      const differencesPage = new DifferencesPage(page);
+      await expect(differencesPage.fieldset).toBeVisible();
+      await differencesPage.fillInPageAndClickNext(noRecountNoDifferencesDataEntry.differences_counts);
+
+      await fillCandidatesListPages(page, noRecountNoDifferencesDataEntry);
+
+      const checkAndSavePage = new CheckAndSavePage(page);
+      await checkAndSavePage.save.click();
+
+      await expect(dataEntryHomePage.dataEntrySaved).toBeVisible();
     });
   }
 
@@ -331,7 +539,7 @@ test.describe("full flow", () => {
     await page.goto("/account/login");
 
     const loginPage = new LoginPgObj(page);
-    await loginPage.login("coordinator1", getTestPassword("coordinator1"));
+    await loginPage.login("coordinator2", getTestPassword("coordinator2"));
 
     const overviewPage = new ElectionsOverviewPgObj(page);
     await expect(overviewPage.header).toBeVisible();
@@ -364,8 +572,7 @@ test.describe("full flow", () => {
     await electionHomePage.downloadSecondSessionZip.click();
 
     const download = await downloadPromise;
-
-    expect(download.suggestedFilename()).toBe("election_result_GR2022_Test.zip");
+    expect(download.suggestedFilename()).toMatch(/correctie_gr2022_test_gemeente_test-\d{8}-\d{6}.zip/);
     expect((await stat(await download.path())).size).toBeGreaterThan(1024);
   });
 });

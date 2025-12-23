@@ -30,24 +30,24 @@ function renderWithRouter() {
 
 const rolePage = {
   radioGroup: () => screen.findByRole("group", { name: "Kies een rol" }),
-  administrator: () => screen.getByLabelText(/Beheerder/),
-  coordinator: () => screen.getByLabelText(/Coördinator/),
-  typist: () => screen.getByLabelText(/Invoerder/),
+  administrator: () => screen.getByRole("radio", { name: /Beheerder/ }),
+  coordinator: () => screen.getByRole("radio", { name: /Coördinator/ }),
+  typist: () => screen.getByRole("radio", { name: /Invoerder/ }),
   continue: () => screen.getByRole("button", { name: "Verder" }),
 };
 
 const typePage = {
   radioGroup: () => screen.findByRole("group", { name: "Type account" }),
-  withName: () => screen.getByLabelText(/Op naam/),
-  anonymous: () => screen.getByLabelText(/Anonieme gebruikersnaam/),
+  withName: () => screen.getByRole("radio", { name: /Op naam/ }),
+  anonymous: () => screen.getByRole("radio", { name: /Anonieme gebruikersnaam/ }),
   continue: () => screen.getByRole("button", { name: "Verder" }),
 };
 
 const detailsPage = {
   title: () => screen.findByRole("heading", { level: 2, name: "Details van het account" }),
-  username: () => screen.getByLabelText("Gebruikersnaam"),
-  fullname: () => screen.getByLabelText("Volledige naam"),
-  fullnameQuery: () => screen.queryByLabelText("Volledige naam"),
+  username: () => screen.getByRole("textbox", { name: "Gebruikersnaam" }),
+  fullname: () => screen.getByRole("textbox", { name: "Volledige naam" }),
+  fullnameQuery: () => screen.queryByRole("textbox", { name: "Volledige naam" }),
   password: () => screen.getByLabelText("Tijdelijk wachtwoord"),
   save: () => screen.getByRole("button", { name: "Opslaan" }),
 };
@@ -103,7 +103,7 @@ describe("User create pages integration test", () => {
   describe("Save user", () => {
     test("Successfully", async () => {
       server.use(UserListRequestHandler);
-      overrideOnce("post", "/api/user", 201, {
+      overrideOnce("post", "/api/users", 201, {
         id: 10,
         username: "GuusGeluk",
         fullname: "Guus Geluk",
@@ -132,7 +132,7 @@ describe("User create pages integration test", () => {
     });
 
     test("Showing a unique username error", async () => {
-      overrideOnce("post", "/api/user", 409, {
+      overrideOnce("post", "/api/users", 409, {
         error: "Username already exists",
         fatal: false,
         reference: "UsernameNotUnique",

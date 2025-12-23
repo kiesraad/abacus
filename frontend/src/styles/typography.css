@@ -9,6 +9,10 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+dialog {
+  color: var(--text-color-body);
+}
+
 h1,
 h2,
 h3,
@@ -113,6 +117,12 @@ a {
   }
 }
 
+.color-visited-link-default {
+  &:visited {
+    color: var(--link-default);
+  }
+}
+
 .underlined {
   text-decoration: underline;
   color: var(--link-default);
@@ -161,4 +171,9 @@ a {
 .font-number {
   font-family: var(--font-number);
   font-feature-settings: "ss09" on;
+}
+
+/* Slashed zero */
+.font-number-slashed-0 {
+  font-family: var(--font-number);
 }

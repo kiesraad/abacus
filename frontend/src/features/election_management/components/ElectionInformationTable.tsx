@@ -1,7 +1,6 @@
 import { Table } from "@/components/ui/Table/Table";
-import { useUserRole } from "@/hooks/user/useUserRole";
 import { t } from "@/i18n/translate";
-import { ElectionWithPoliticalGroups } from "@/types/generated/openapi";
+import { CommitteeSession, ElectionWithPoliticalGroups } from "@/types/generated/openapi";
 import { cn } from "@/utils/classnames";
 import { formatNumber } from "@/utils/number";
 
@@ -9,8 +8,8 @@ import cls from "./ElectionManagement.module.css";
 
 interface ElectionInformationTableProps {
   election: ElectionWithPoliticalGroups;
+  committeeSession: CommitteeSession;
   numberOfPollingStations: number;
-  numberOfVoters: number;
 }
 
 function getListsAndCandidatesLabel(election: ElectionWithPoliticalGroups) {
@@ -26,17 +25,16 @@ function getListsAndCandidatesLabel(election: ElectionWithPoliticalGroups) {
 
 export function ElectionInformationTable({
   election,
+  committeeSession,
   numberOfPollingStations,
-  numberOfVoters,
 }: ElectionInformationTableProps) {
-  const { isCoordinator } = useUserRole();
-
+  const rowLink =
+    committeeSession.number === 1 &&
+    (committeeSession.status === "created" || committeeSession.status === "data_entry_not_started")
+      ? "number-of-voters"
+      : undefined;
   return (
-    <Table
-      id="election-information-table"
-      variant="information"
-      className={cn(cls.table, cls.electionInformationTable)}
-    >
+    <Table id="election-information-table" variant="information" className={cn(cls.electionInformationTable)}>
       <Table.Body>
         <Table.Row>
           <Table.HeaderCell scope="row" className="normal">
@@ -61,35 +59,24 @@ export function ElectionInformationTable({
           </Table.HeaderCell>
           <Table.Cell>{getListsAndCandidatesLabel(election)}</Table.Cell>
         </Table.Row>
-        {isCoordinator ? (
-          <Table.LinkRow to={"number-of-voters"}>
-            <Table.HeaderCell scope="row" className="normal">
-              {t("number_of_voters")}
-            </Table.HeaderCell>
-            <Table.Cell className="underlined">
-              {numberOfVoters ? formatNumber(numberOfVoters) : t("election_management.still_to_input")}
-            </Table.Cell>
-          </Table.LinkRow>
-        ) : (
-          <Table.Row>
-            <Table.HeaderCell scope="row" className="normal">
-              {t("number_of_voters")}
-            </Table.HeaderCell>
-            <Table.Cell>
-              {numberOfVoters ? formatNumber(numberOfVoters) : t("election_management.still_to_input_by_a_coordinator")}
-            </Table.Cell>
-          </Table.Row>
-        )}
+        <Table.Row to={rowLink}>
+          <Table.HeaderCell scope="row" className="normal">
+            {t("number_of_voters")}
+          </Table.HeaderCell>
+          <Table.Cell className={rowLink && "underlined"}>
+            {election.number_of_voters ? formatNumber(election.number_of_voters) : "0"}
+          </Table.Cell>
+        </Table.Row>
         <Table.Row>
           <Table.HeaderCell scope="row" className="normal">
             {t("election_management.to_do_data_entry_for")}
           </Table.HeaderCell>
           <Table.Cell>
-            {/* TODO: Change to conditional GSB/HSB/CSB when implemented */}
+            {/* TODO (post 1.0): Change to conditional GSB/HSB/CSB when implemented */}
             {t("GSB")}
           </Table.Cell>
         </Table.Row>
-        <Table.LinkRow key={election.id} to="polling-stations">
+        <Table.Row key={election.id} to="polling-stations">
           <Table.HeaderCell scope="row" className="normal">
             {t("polling_station.title.plural")}
           </Table.HeaderCell>
@@ -97,7 +84,7 @@ export function ElectionInformationTable({
             {numberOfPollingStations}{" "}
             {t(`polling_station.title.${numberOfPollingStations === 1 ? "singular" : "plural"}`).toLowerCase()}
           </Table.Cell>
-        </Table.LinkRow>
+        </Table.Row>
         <Table.Row>
           <Table.HeaderCell scope="row" className="normal">
             {t("counting_method_type")}

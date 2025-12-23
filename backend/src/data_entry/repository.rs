@@ -200,6 +200,7 @@ pub async fn statuses(
             first_entry_progress: state.get_first_entry_progress(),
             second_entry_progress: state.get_second_entry_progress(),
             finished_at: state.finished_at().cloned(),
+            finalised_with_warnings: state.finalised_with_warnings().cloned(),
         }
     })
     .fetch_all(conn)
@@ -553,16 +554,10 @@ mod tests {
             assert_eq!(results.len(), 2);
 
             assert_eq!(results[0].0.id, 742);
-            assert_eq!(
-                results[0].1.voters_counts().total_admitted_voters_count,
-                297
-            );
+            assert_eq!(results[0].1.voters_counts().proxy_certificate_count, 4);
 
             assert_eq!(results[1].0.id, 741);
-            assert_eq!(
-                results[1].1.voters_counts().total_admitted_voters_count,
-                297
-            );
+            assert_eq!(results[1].1.voters_counts().proxy_certificate_count, 3);
         }
 
         /// Test with 4th session, one polling station with investigation, corrected results=true and results exist

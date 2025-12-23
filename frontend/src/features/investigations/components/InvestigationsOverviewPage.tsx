@@ -71,7 +71,10 @@ export function InvestigationsOverviewPage() {
         </section>
       </header>
 
-      {allInvestigationsHandled &&
+      <Messages />
+
+      {isCoordinator &&
+        allInvestigationsHandled &&
         currentCommitteeSession.status !== "data_entry_finished" &&
         (missingInvestigations.length > 0 ? (
           <Alert type="warning">
@@ -97,7 +100,7 @@ export function InvestigationsOverviewPage() {
             <p>{t("investigations.all_investigations_finished_description")}</p>
             <Button
               variant="primary"
-              size="sm"
+              size="md"
               onClick={() => {
                 finishDataEntry();
               }}
@@ -107,7 +110,6 @@ export function InvestigationsOverviewPage() {
             </Button>
           </Alert>
         ))}
-      <Messages />
 
       <main>
         <section>

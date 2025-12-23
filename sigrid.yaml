@@ -211,6 +211,7 @@ languages:
         - ".*/gen-test-election[.]rs"
         - ".*/test_data_gen/.*[.]rs"
         - ".*/typst_tests[.]rs"
+        - ".*/backend/fuzz/.*"
     generated:
       include:
         - ".*/gen/.*[.]rs"

@@ -1,4 +1,4 @@
-#import "common/style.typ": conf, document_numbering, attachment_numbering
+#import "common/style.typ": attachment_numbering, conf
 #import "common/scripts.typ": *
 #let input = json("inputs/model-na-14-2-bijlage1.json")
 

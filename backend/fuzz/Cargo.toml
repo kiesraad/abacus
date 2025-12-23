@@ -1,0 +1,22 @@
+[package]
+name = "abacus-fuzz"
+version = "0.0.0"
+publish = false
+edition = "2024"
+
+[package.metadata]
+cargo-fuzz = true
+
+[dependencies]
+libfuzzer-sys = { version = "0.4", features = ["arbitrary-derive"] }
+chrono = { version = "0.4", features = ["alloc", "std", "serde"] }
+
+[dependencies.abacus]
+path = ".."
+
+[[bin]]
+name = "data_entry_status"
+path = "fuzz_targets/data_entry_status.rs"
+test = false
+doc = false
+bench = false

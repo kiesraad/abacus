@@ -34,6 +34,16 @@ describe("AuthorizationDialog", () => {
     expect(screen.queryByTestId("modal-title")).toHaveTextContent("Je wordt bijna uitgelogd");
   });
 
+  test("Does not show dialog when the user is not logged in", () => {
+    render(
+      <TestUserProvider userRole={null} overrideExpiration={new Date(Date.now() + 1000)}>
+        <AuthorizationDialog />
+      </TestUserProvider>,
+    );
+
+    expect(screen.queryByTestId("modal-title")).not.toBeInTheDocument();
+  });
+
   test("Dialog can be closed", async () => {
     render(
       <TestUserProvider userRole="typist" overrideExpiration={new Date(Date.now() + 1000)}>
@@ -41,7 +51,7 @@ describe("AuthorizationDialog", () => {
       </TestUserProvider>,
     );
 
-    await userEvent.click(await screen.findByRole("button", { name: "Annuleren" }));
+    await userEvent.click(await screen.findByRole("button", { name: "Venster sluiten" }));
 
     await waitFor(() => {
       expect(screen.queryByTestId("modal-title")).toBeNull();

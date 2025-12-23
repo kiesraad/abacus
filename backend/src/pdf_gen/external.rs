@@ -1,5 +1,6 @@
 use rand::{Rng, distr::Alphanumeric};
 use std::{path::PathBuf, time::Instant};
+use strum::Display;
 use tracing::{error, info};
 
 use super::PdfGenResult;
@@ -9,6 +10,8 @@ use crate::{
 };
 
 /// Create a PDF file for each model in the provided vector and send them through the provided channel.
+#[allow(clippy::too_many_lines)]
+#[allow(clippy::cognitive_complexity)]
 pub async fn generate_pdfs(
     models: Vec<PdfFileModel>,
     mut zip_writer: ZipResponseWriter,
@@ -132,7 +135,7 @@ fn copy_dir(
     Ok(())
 }
 
-#[derive(Debug)]
+#[derive(Debug, Display)]
 pub enum PdfGenError {
     Io(std::io::Error),
     Join(tokio::task::JoinError),
@@ -141,6 +144,8 @@ pub enum PdfGenError {
     ZipError(ZipResponseError),
     ChannelClosed,
 }
+
+impl std::error::Error for PdfGenError {}
 
 impl From<std::io::Error> for PdfGenError {
     fn from(err: std::io::Error) -> Self {

@@ -1,3 +1,5 @@
+#![allow(clippy::cognitive_complexity)]
+#![allow(clippy::too_many_lines)]
 use abacus::{
     AppError,
     committee_session::CommitteeSession,
@@ -10,6 +12,7 @@ use abacus::{
         models::{ModelNa31_2Input, ToPdfFileModel},
     },
     polling_station::PollingStation,
+    report::DEFAULT_DATE_TIME_FORMAT,
     summary::ElectionSummary,
     test_data_gen::{GenerateElectionArgs, RandomRange, parse_range},
 };
@@ -171,12 +174,8 @@ async fn export_election(
 
     info!("Converting election to EML definitions");
     let definition_eml = EML110::definition_from_abacus_election(election, transaction_id);
-    let polling_stations_eml = EML110::polling_stations_from_election(
-        committee_session,
-        election,
-        polling_stations,
-        transaction_id,
-    );
+    let polling_stations_eml =
+        EML110::polling_stations_from_election(election, polling_stations, transaction_id);
     let candidates_eml = EML230::candidates_from_abacus_election(election, transaction_id);
 
     info!("Converting EML definitions to XML strings");
@@ -225,7 +224,9 @@ async fn export_election(
             polling_stations: polling_stations.iter().map(Clone::clone).collect(),
             election: election.clone().into(),
             hash: "0000".to_string(),
-            creation_date_time: chrono::Utc::now().format("%d-%m-%Y %H:%M").to_string(),
+            creation_date_time: chrono::Utc::now()
+                .format(DEFAULT_DATE_TIME_FORMAT)
+                .to_string(),
         }
         .to_pdf_file_model("file.pdf".to_string());
         let input_json = input.model.get_input().expect("Failed to get model input");

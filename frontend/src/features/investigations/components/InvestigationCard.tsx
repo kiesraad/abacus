@@ -64,7 +64,7 @@ export function InvestigationCard({ investigation }: InvestigationCardProps) {
         <pre>{investigation.findings}</pre>
       ) : (
         isCoordinator && (
-          <Button variant="underlined" onClick={goToFindings}>
+          <Button variant="underlined" size="md" onClick={goToFindings}>
             {t("investigations.findings.fill")}
           </Button>
         )

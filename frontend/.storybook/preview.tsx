@@ -1,7 +1,7 @@
 import { StaticRouter } from "react-router";
 
 import type { Preview } from "@storybook/react-vite";
-import { configure, expect } from "storybook/test";
+import { configure, expect, sb } from "storybook/test";
 
 import { ApiResponseStatus } from "@/api/ApiResult";
 import { ElectionProviderContext } from "@/hooks/election/ElectionProviderContext";
@@ -17,13 +17,13 @@ import { matchers } from "@/testing/matchers";
 import { TestUserProvider } from "@/testing/TestUserProvider";
 import { Role } from "@/types/generated/openapi";
 
+sb.mock("react-router", { spy: true });
+
+configure({ testIdAttribute: "id" });
+
+expect.extend(matchers);
+
 const preview: Preview = {
-  beforeAll: () => {
-    configure({
-      testIdAttribute: "id",
-    });
-    expect.extend(matchers);
-  },
   parameters: {
     controls: {
       matchers: {

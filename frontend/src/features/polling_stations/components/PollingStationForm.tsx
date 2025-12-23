@@ -12,7 +12,7 @@ import { t } from "@/i18n/translate";
 import { PollingStation, PollingStationRequest } from "@/types/generated/openapi";
 
 import { useForm } from "../hooks/useForm";
-import { FormFields, ValidationError } from "../utils/form";
+import { FormFields } from "../utils/form";
 
 export interface PollingStationFormProps {
   electionId: number;
@@ -36,7 +36,9 @@ export function PollingStationForm({ electionId, pollingStation, onSaved, onCanc
   const isPreExistingPollingStation = isUpdate && pollingStation.id_prev_session !== undefined;
 
   const formFields: FormFields<PollingStationRequest> = {
-    number: isPreExistingPollingStation ? { type: "disabled" } : { required: true, type: "number", min: 1 },
+    number: isPreExistingPollingStation
+      ? { type: "disabled" }
+      : { required: true, type: "number", min: 1, max: 999999 },
     name: { required: true, type: "string" },
     polling_station_type: { type: "string", mapUndefined: true },
     number_of_voters: { type: "number" },
@@ -73,11 +75,7 @@ export function PollingStationForm({ electionId, pollingStation, onSaved, onCanc
 
   let numberFieldError;
   if (validationResult.number) {
-    const errorTextKey: ValidationError =
-      validationResult.number === "FORM_VALIDATION_RESULT_MIN"
-        ? "FORM_VALIDATION_RESULT_INVALID_NUMBER"
-        : validationResult.number;
-    numberFieldError = t(`form_errors.${errorTextKey}`);
+    numberFieldError = t(`form_errors.${validationResult.number}`);
   } else if (isValid && error instanceof ApiError && error.reference === "EntryNotUnique") {
     numberFieldError = t("polling_station.form.not_unique.error");
   }
@@ -121,6 +119,7 @@ export function PollingStationForm({ electionId, pollingStation, onSaved, onCanc
                   ? { value: pollingStation.number }
                   : { defaultValue: pollingStation?.number })}
                 error={numberFieldError}
+                maxLength={6}
                 hideErrorMessage={error instanceof ApiError ? error.reference !== "EntryNotUnique" : false}
               />
               <InputField

@@ -44,14 +44,14 @@ describe("UserDelete", () => {
 
     expect(await screen.findByRole("dialog")).toBeInTheDocument();
 
-    await user.click(screen.getAllByRole("button", { name: "Annuleren" })[0]!);
+    await user.click(screen.getByRole("button", { name: "Annuleren" }));
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
     expect(deleteUser).not.toHaveBeenCalledOnce();
     expect(onDeleted).not.toHaveBeenCalledOnce();
   });
 
   test("on error", async () => {
-    overrideOnce("delete", "/api/user/1" satisfies USER_DELETE_REQUEST_PATH, 401, {
+    overrideOnce("delete", "/api/users/1" satisfies USER_DELETE_REQUEST_PATH, 401, {
       error: "Invalid session",
       fatal: false,
       reference: "InvalidSession",

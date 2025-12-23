@@ -7,10 +7,55 @@
       "name": "EUPL-1.2",
       "identifier": "EUPL-1.2"
     },
-    "version": "0.1.0"
+    "version": "1.1.0"
   },
   "paths": {
     "/api/account": {
+      "get": {
+        "summary": "Get current logged-in user endpoint",
+        "operationId": "account",
+        "responses": {
+          "200": {
+            "description": "The current user name and id",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LoginResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid user session",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "cookie_auth": [
+              "administrator",
+              "coordinator",
+              "typist"
+            ]
+          }
+        ]
+      },
       "put": {
         "summary": "Update the user's account with a new password and optionally new fullname",
         "operationId": "account_update",
@@ -55,7 +100,16 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "cookie_auth": [
+              "administrator",
+              "coordinator",
+              "typist"
+            ]
+          }
+        ]
       }
     },
     "/api/elections": {
@@ -93,7 +147,16 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "cookie_auth": [
+              "administrator",
+              "coordinator",
+              "typist"
+            ]
+          }
+        ]
       }
     },
     "/api/elections/import": {
@@ -161,7 +224,14 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "cookie_auth": [
+              "administrator"
+            ]
+          }
+        ]
       }
     },
     "/api/elections/import/validate": {
@@ -229,12 +299,19 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "cookie_auth": [
+              "administrator"
+            ]
+          }
+        ]
       }
     },
     "/api/elections/{election_id}": {
       "get": {
-        "summary": "Get election details including the election's candidate list (political groups),\nits polling stations and the current committee session",
+        "summary": "Get election details including the election's candidate list (political groups),\nits polling stations and the current committee session and its investigations",
         "operationId": "election_details",
         "parameters": [
           {
@@ -243,9 +320,7 @@
             "description": "Election database id",
             "required": true,
             "schema": {
-              "type": "integer",
-              "format": "int32",
-              "minimum": 0
+              "$ref": "#/components/schemas/ElectionId"
             }
           }
         ],
@@ -290,7 +365,16 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "cookie_auth": [
+              "administrator",
+              "coordinator",
+              "typist"
+            ]
+          }
+        ]
       }
     },
     "/api/elections/{election_id}/committee_sessions": {
@@ -304,9 +388,7 @@
             "description": "Election database id",
             "required": true,
             "schema": {
-              "type": "integer",
-              "format": "int32",
-              "minimum": 0
+              "$ref": "#/components/schemas/ElectionId"
             }
           }
         ],
@@ -371,7 +453,14 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "cookie_auth": [
+              "coordinator"
+            ]
+          }
+        ]
       }
     },
     "/api/elections/{election_id}/committee_sessions/{committee_session_id}": {
@@ -385,9 +474,7 @@
             "description": "Election database id",
             "required": true,
             "schema": {
-              "type": "integer",
-              "format": "int32",
-              "minimum": 0
+              "$ref": "#/components/schemas/ElectionId"
             }
           },
           {
@@ -466,7 +553,14 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "cookie_auth": [
+              "coordinator"
+            ]
+          }
+        ]
       },
       "delete": {
         "summary": "Delete a [CommitteeSession].",
@@ -478,9 +572,7 @@
             "description": "Election database id",
             "required": true,
             "schema": {
-              "type": "integer",
-              "format": "int32",
-              "minimum": 0
+              "$ref": "#/components/schemas/ElectionId"
             }
           },
           {
@@ -549,7 +641,14 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "cookie_auth": [
+              "coordinator"
+            ]
+          }
+        ]
       }
     },
     "/api/elections/{election_id}/committee_sessions/{committee_session_id}/download_pdf_results": {
@@ -563,9 +662,7 @@
             "description": "Election database id",
             "required": true,
             "schema": {
-              "type": "integer",
-              "format": "int32",
-              "minimum": 0
+              "$ref": "#/components/schemas/ElectionId"
             }
           },
           {
@@ -645,7 +742,14 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "cookie_auth": [
+              "coordinator"
+            ]
+          }
+        ]
       }
     },
     "/api/elections/{election_id}/committee_sessions/{committee_session_id}/download_zip_results": {
@@ -659,9 +763,7 @@
             "description": "Election database id",
             "required": true,
             "schema": {
-              "type": "integer",
-              "format": "int32",
-              "minimum": 0
+              "$ref": "#/components/schemas/ElectionId"
             }
           },
           {
@@ -741,7 +843,101 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "cookie_auth": [
+              "coordinator"
+            ]
+          }
+        ]
+      }
+    },
+    "/api/elections/{election_id}/committee_sessions/{committee_session_id}/investigations": {
+      "get": {
+        "summary": "Get a list of all [Investigation]s for a committee session",
+        "operationId": "committee_session_investigations",
+        "parameters": [
+          {
+            "name": "election_id",
+            "in": "path",
+            "description": "Election database id",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/ElectionId"
+            }
+          },
+          {
+            "name": "committee_session_id",
+            "in": "path",
+            "description": "Committee session database id",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "minimum": 0
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Investigation listing successful",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InvestigationListResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Committee session not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "cookie_auth": [
+              "coordinator"
+            ]
+          }
+        ]
       }
     },
     "/api/elections/{election_id}/committee_sessions/{committee_session_id}/status": {
@@ -755,9 +951,7 @@
             "description": "Election database id",
             "required": true,
             "schema": {
-              "type": "integer",
-              "format": "int32",
-              "minimum": 0
+              "$ref": "#/components/schemas/ElectionId"
             }
           },
           {
@@ -836,92 +1030,14 @@
               }
             }
           }
-        }
-      }
-    },
-    "/api/elections/{election_id}/committee_sessions/{committee_session_id}/voters": {
-      "put": {
-        "summary": "Change the number of voters of a [CommitteeSession].",
-        "operationId": "committee_session_number_of_voters_change",
-        "parameters": [
-          {
-            "name": "election_id",
-            "in": "path",
-            "description": "Election database id",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int32",
-              "minimum": 0
-            }
-          },
-          {
-            "name": "committee_session_id",
-            "in": "path",
-            "description": "Committee session database id",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int32",
-              "minimum": 0
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CommitteeSessionNumberOfVotersChangeRequest"
-              }
-            }
-          },
-          "required": true
         },
-        "responses": {
-          "204": {
-            "description": "Committee session number of voters changed successfully"
-          },
-          "401": {
-            "description": "Unauthorized",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "Forbidden",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Committee session not found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Internal server error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
+        "security": [
+          {
+            "cookie_auth": [
+              "coordinator"
+            ]
           }
-        }
+        ]
       }
     },
     "/api/elections/{election_id}/download_n_10_2": {
@@ -934,9 +1050,7 @@
             "description": "Election database id",
             "required": true,
             "schema": {
-              "type": "integer",
-              "format": "int32",
-              "minimum": 0
+              "$ref": "#/components/schemas/ElectionId"
             }
           }
         ],
@@ -1005,7 +1119,15 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "cookie_auth": [
+              "administrator",
+              "coordinator"
+            ]
+          }
+        ]
       }
     },
     "/api/elections/{election_id}/download_na_31_2_bijlage1": {
@@ -1018,9 +1140,7 @@
             "description": "Election database id",
             "required": true,
             "schema": {
-              "type": "integer",
-              "format": "int32",
-              "minimum": 0
+              "$ref": "#/components/schemas/ElectionId"
             }
           }
         ],
@@ -1089,7 +1209,105 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "cookie_auth": [
+              "administrator",
+              "coordinator"
+            ]
+          }
+        ]
+      }
+    },
+    "/api/elections/{election_id}/download_na_31_2_inlegvel": {
+      "get": {
+        "operationId": "election_download_na_31_2_inlegvel",
+        "parameters": [
+          {
+            "name": "election_id",
+            "in": "path",
+            "description": "Election database id",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/ElectionId"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "PDF",
+            "headers": {
+              "Content-Disposition": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "attachment; filename=\"filename.pdf\""
+              }
+            },
+            "content": {
+              "application/pdf": {}
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Request cannot be completed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "cookie_auth": [
+              "administrator",
+              "coordinator"
+            ]
+          }
+        ]
       }
     },
     "/api/elections/{election_id}/polling_stations": {
@@ -1103,9 +1321,7 @@
             "description": "Election database id",
             "required": true,
             "schema": {
-              "type": "integer",
-              "format": "int32",
-              "minimum": 0
+              "$ref": "#/components/schemas/ElectionId"
             }
           }
         ],
@@ -1150,7 +1366,16 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "cookie_auth": [
+              "administrator",
+              "coordinator",
+              "typist"
+            ]
+          }
+        ]
       },
       "post": {
         "summary": "Create a new [PollingStation]",
@@ -1162,9 +1387,7 @@
             "description": "Election database id",
             "required": true,
             "schema": {
-              "type": "integer",
-              "format": "int32",
-              "minimum": 0
+              "$ref": "#/components/schemas/ElectionId"
             }
           }
         ],
@@ -1239,7 +1462,15 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "cookie_auth": [
+              "administrator",
+              "coordinator"
+            ]
+          }
+        ]
       }
     },
     "/api/elections/{election_id}/polling_stations/import": {
@@ -1253,9 +1484,7 @@
             "description": "Election database id",
             "required": true,
             "schema": {
-              "type": "integer",
-              "format": "int32",
-              "minimum": 0
+              "$ref": "#/components/schemas/ElectionId"
             }
           }
         ],
@@ -1320,7 +1549,15 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "cookie_auth": [
+              "administrator",
+              "coordinator"
+            ]
+          }
+        ]
       }
     },
     "/api/elections/{election_id}/polling_stations/validate-import": {
@@ -1334,9 +1571,7 @@
             "description": "Election database id",
             "required": true,
             "schema": {
-              "type": "integer",
-              "format": "int32",
-              "minimum": 0
+              "$ref": "#/components/schemas/ElectionId"
             }
           }
         ],
@@ -1401,7 +1636,15 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "cookie_auth": [
+              "administrator",
+              "coordinator"
+            ]
+          }
+        ]
       }
     },
     "/api/elections/{election_id}/polling_stations/{polling_station_id}": {
@@ -1415,9 +1658,7 @@
             "description": "Election database id",
             "required": true,
             "schema": {
-              "type": "integer",
-              "format": "int32",
-              "minimum": 0
+              "$ref": "#/components/schemas/ElectionId"
             }
           },
           {
@@ -1473,7 +1714,16 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "cookie_auth": [
+              "administrator",
+              "coordinator",
+              "typist"
+            ]
+          }
+        ]
       },
       "put": {
         "summary": "Update a [PollingStation]",
@@ -1485,9 +1735,7 @@
             "description": "Election database id",
             "required": true,
             "schema": {
-              "type": "integer",
-              "format": "int32",
-              "minimum": 0
+              "$ref": "#/components/schemas/ElectionId"
             }
           },
           {
@@ -1563,7 +1811,15 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "cookie_auth": [
+              "administrator",
+              "coordinator"
+            ]
+          }
+        ]
       },
       "delete": {
         "summary": "Delete a [PollingStation]",
@@ -1575,9 +1831,7 @@
             "description": "Election database id",
             "required": true,
             "schema": {
-              "type": "integer",
-              "format": "int32",
-              "minimum": 0
+              "$ref": "#/components/schemas/ElectionId"
             }
           },
           {
@@ -1626,8 +1880,8 @@
               }
             }
           },
-          "422": {
-            "description": "Polling station deletion is not possible",
+          "409": {
+            "description": "Request cannot be completed",
             "content": {
               "application/json": {
                 "schema": {
@@ -1646,7 +1900,15 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "cookie_auth": [
+              "administrator",
+              "coordinator"
+            ]
+          }
+        ]
       }
     },
     "/api/elections/{election_id}/status": {
@@ -1660,9 +1922,7 @@
             "description": "Election database id",
             "required": true,
             "schema": {
-              "type": "integer",
-              "format": "int32",
-              "minimum": 0
+              "$ref": "#/components/schemas/ElectionId"
             }
           }
         ],
@@ -1707,7 +1967,106 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "cookie_auth": [
+              "administrator",
+              "coordinator",
+              "typist"
+            ]
+          }
+        ]
+      }
+    },
+    "/api/elections/{election_id}/voters": {
+      "put": {
+        "summary": "Change the number of voters of an [Election].",
+        "operationId": "election_number_of_voters_change",
+        "parameters": [
+          {
+            "name": "election_id",
+            "in": "path",
+            "description": "Election database id",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/ElectionId"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ElectionNumberOfVotersChangeRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "Election number of voters changed successfully"
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Election not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Request cannot be completed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "cookie_auth": [
+              "administrator",
+              "coordinator"
+            ]
+          }
+        ]
       }
     },
     "/api/generate_test_election": {
@@ -1989,7 +2348,15 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "cookie_auth": [
+              "administrator",
+              "coordinator"
+            ]
+          }
+        ]
       }
     },
     "/api/log-users": {
@@ -2040,7 +2407,15 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "cookie_auth": [
+              "administrator",
+              "coordinator"
+            ]
+          }
+        ]
       }
     },
     "/api/login": {
@@ -2193,7 +2568,14 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "cookie_auth": [
+              "coordinator"
+            ]
+          }
+        ]
       }
     },
     "/api/polling_stations/{polling_station_id}/data_entries/get": {
@@ -2245,7 +2627,7 @@
             }
           },
           "404": {
-            "description": "No data entry with accepted errors found",
+            "description": "Data entry not found",
             "content": {
               "application/json": {
                 "schema": {
@@ -2274,7 +2656,14 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "cookie_auth": [
+              "coordinator"
+            ]
+          }
+        ]
       }
     },
     "/api/polling_stations/{polling_station_id}/data_entries/resolve_differences": {
@@ -2355,7 +2744,14 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "cookie_auth": [
+              "coordinator"
+            ]
+          }
+        ]
       },
       "post": {
         "summary": "Resolve data entry differences by providing a `ResolveDifferencesAction`",
@@ -2454,7 +2850,14 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "cookie_auth": [
+              "coordinator"
+            ]
+          }
+        ]
       }
     },
     "/api/polling_stations/{polling_station_id}/data_entries/resolve_errors": {
@@ -2555,7 +2958,14 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "cookie_auth": [
+              "coordinator"
+            ]
+          }
+        ]
       }
     },
     "/api/polling_stations/{polling_station_id}/data_entries/{entry_number}": {
@@ -2667,7 +3077,14 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "cookie_auth": [
+              "typist"
+            ]
+          }
+        ]
       },
       "delete": {
         "summary": "Delete an in-progress (not finalised) data entry for a polling station",
@@ -2750,7 +3167,14 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "cookie_auth": [
+              "typist"
+            ]
+          }
+        ]
       }
     },
     "/api/polling_stations/{polling_station_id}/data_entries/{entry_number}/claim": {
@@ -2822,6 +3246,16 @@
               }
             }
           },
+          "422": {
+            "description": "Invalid data",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
           "500": {
             "description": "Internal server error",
             "content": {
@@ -2832,7 +3266,14 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "cookie_auth": [
+              "typist"
+            ]
+          }
+        ]
       }
     },
     "/api/polling_stations/{polling_station_id}/data_entries/{entry_number}/finalise": {
@@ -2934,7 +3375,14 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "cookie_auth": [
+              "typist"
+            ]
+          }
+        ]
       }
     },
     "/api/polling_stations/{polling_station_id}/investigation": {
@@ -3025,7 +3473,14 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "cookie_auth": [
+              "coordinator"
+            ]
+          }
+        ]
       },
       "post": {
         "summary": "Create an investigation for a polling station",
@@ -3114,7 +3569,14 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "cookie_auth": [
+              "coordinator"
+            ]
+          }
+        ]
       },
       "delete": {
         "summary": "Delete an investigation for a polling station",
@@ -3176,7 +3638,14 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "cookie_auth": [
+              "coordinator"
+            ]
+          }
+        ]
       }
     },
     "/api/polling_stations/{polling_station_id}/investigation/conclude": {
@@ -3267,7 +3736,14 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "cookie_auth": [
+              "coordinator"
+            ]
+          }
+        ]
       }
     },
     "/api/polling_stations/{polling_station_id}/investigation/download_corrigendum_pdf": {
@@ -3352,10 +3828,17 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "cookie_auth": [
+              "coordinator"
+            ]
+          }
+        ]
       }
     },
-    "/api/user": {
+    "/api/users": {
       "get": {
         "summary": "Lists all users",
         "operationId": "user_list",
@@ -3400,7 +3883,15 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "cookie_auth": [
+              "administrator",
+              "coordinator"
+            ]
+          }
+        ]
       },
       "post": {
         "summary": "Create a new user",
@@ -3476,10 +3967,18 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "cookie_auth": [
+              "administrator",
+              "coordinator"
+            ]
+          }
+        ]
       }
     },
-    "/api/user/{user_id}": {
+    "/api/users/{user_id}": {
       "get": {
         "summary": "Get a user",
         "operationId": "user_get",
@@ -3547,7 +4046,15 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "cookie_auth": [
+              "administrator",
+              "coordinator"
+            ]
+          }
+        ]
       },
       "put": {
         "summary": "Update a user",
@@ -3635,7 +4142,15 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "cookie_auth": [
+              "administrator",
+              "coordinator"
+            ]
+          }
+        ]
       },
       "delete": {
         "summary": "Delete a user",
@@ -3696,45 +4211,15 @@
               }
             }
           }
-        }
-      }
-    },
-    "/api/whoami": {
-      "get": {
-        "summary": "Get current logged-in user endpoint",
-        "operationId": "whoami",
-        "responses": {
-          "200": {
-            "description": "The current user name and id",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/LoginResponse"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Invalid user session",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Internal server error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
+        },
+        "security": [
+          {
+            "cookie_auth": [
+              "administrator",
+              "coordinator"
+            ]
           }
-        }
+        ]
       }
     }
   },
@@ -3758,6 +4243,21 @@
           }
         },
         "additionalProperties": false
+      },
+      "ApplicationStartedDetails": {
+        "type": "object",
+        "required": [
+          "version",
+          "commit"
+        ],
+        "properties": {
+          "commit": {
+            "type": "string"
+          },
+          "version": {
+            "type": "string"
+          }
+        }
       },
       "AuditEvent": {
         "oneOf": [
@@ -3937,6 +4437,27 @@
                     "type": "string",
                     "enum": [
                       "ElectionCreated"
+                    ]
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ElectionDetails"
+              },
+              {
+                "type": "object",
+                "required": [
+                  "event_type"
+                ],
+                "properties": {
+                  "event_type": {
+                    "type": "string",
+                    "enum": [
+                      "ElectionUpdated"
                     ]
                   }
                 }
@@ -4478,6 +4999,27 @@
           {
             "allOf": [
               {
+                "$ref": "#/components/schemas/ApplicationStartedDetails"
+              },
+              {
+                "type": "object",
+                "required": [
+                  "event_type"
+                ],
+                "properties": {
+                  "event_type": {
+                    "type": "string",
+                    "enum": [
+                      "ApplicationStarted"
+                    ]
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "allOf": [
+              {
                 "$ref": "#/components/schemas/ErrorDetails"
               },
               {
@@ -4801,14 +5343,11 @@
           "number",
           "election_id",
           "location",
-          "status",
-          "number_of_voters"
+          "status"
         ],
         "properties": {
           "election_id": {
-            "type": "integer",
-            "format": "int32",
-            "minimum": 0
+            "$ref": "#/components/schemas/ElectionId"
           },
           "id": {
             "type": "integer",
@@ -4819,11 +5358,6 @@
             "type": "string"
           },
           "number": {
-            "type": "integer",
-            "format": "int32",
-            "minimum": 0
-          },
-          "number_of_voters": {
             "type": "integer",
             "format": "int32",
             "minimum": 0
@@ -4860,14 +5394,11 @@
           "session_number",
           "session_election_id",
           "session_location",
-          "session_status",
-          "session_number_of_voters"
+          "session_status"
         ],
         "properties": {
           "session_election_id": {
-            "type": "integer",
-            "format": "int32",
-            "minimum": 0
+            "$ref": "#/components/schemas/ElectionId"
           },
           "session_id": {
             "type": "integer",
@@ -4878,11 +5409,6 @@
             "type": "string"
           },
           "session_number": {
-            "type": "integer",
-            "format": "int32",
-            "minimum": 0
-          },
-          "session_number_of_voters": {
             "type": "integer",
             "format": "int32",
             "minimum": 0
@@ -4911,21 +5437,6 @@
           },
           "session_status": {
             "type": "string"
-          }
-        },
-        "additionalProperties": false
-      },
-      "CommitteeSessionNumberOfVotersChangeRequest": {
-        "type": "object",
-        "description": "Committee session number of voters change request",
-        "required": [
-          "number_of_voters"
-        ],
-        "properties": {
-          "number_of_voters": {
-            "type": "integer",
-            "format": "int32",
-            "minimum": 0
           }
         },
         "additionalProperties": false
@@ -5289,6 +5800,7 @@
           "domain_id",
           "category",
           "number_of_seats",
+          "number_of_voters",
           "election_date",
           "nomination_date"
         ],
@@ -5310,9 +5822,7 @@
             "type": "string"
           },
           "id": {
-            "type": "integer",
-            "format": "int32",
-            "minimum": 0
+            "$ref": "#/components/schemas/ElectionId"
           },
           "location": {
             "type": "string"
@@ -5325,6 +5835,11 @@
             "format": "date"
           },
           "number_of_seats": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "number_of_voters": {
             "type": "integer",
             "format": "int32",
             "minimum": 0
@@ -5471,6 +5986,7 @@
           "election_domain_id",
           "election_category",
           "election_number_of_seats",
+          "election_number_of_voters",
           "election_election_date",
           "election_nomination_date"
         ],
@@ -5492,9 +6008,7 @@
             "type": "string"
           },
           "election_id": {
-            "type": "integer",
-            "format": "int32",
-            "minimum": 0
+            "$ref": "#/components/schemas/ElectionId"
           },
           "election_location": {
             "type": "string"
@@ -5507,6 +6021,11 @@
             "format": "date"
           },
           "election_number_of_seats": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "election_number_of_voters": {
             "type": "integer",
             "format": "int32",
             "minimum": 0
@@ -5552,6 +6071,11 @@
         },
         "additionalProperties": false
       },
+      "ElectionId": {
+        "type": "integer",
+        "format": "int32",
+        "minimum": 0
+      },
       "ElectionListResponse": {
         "type": "object",
         "description": "Election list response\n\nAlso includes a list of the current committee session for each election.\nDoes not include the candidate list (political groups) to keep the response size small.",
@@ -5571,6 +6095,21 @@
             "items": {
               "$ref": "#/components/schemas/Election"
             }
+          }
+        },
+        "additionalProperties": false
+      },
+      "ElectionNumberOfVotersChangeRequest": {
+        "type": "object",
+        "description": "Election number of voters change request",
+        "required": [
+          "number_of_voters"
+        ],
+        "properties": {
+          "number_of_voters": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
           }
         },
         "additionalProperties": false
@@ -5599,6 +6138,10 @@
           "status"
         ],
         "properties": {
+          "finalised_with_warnings": {
+            "type": "boolean",
+            "description": "Whether the finalised first or second data entry has warnings"
+          },
           "finished_at": {
             "type": "string",
             "description": "Time when the data entry was finalised"
@@ -5652,6 +6195,7 @@
           "domain_id",
           "category",
           "number_of_seats",
+          "number_of_voters",
           "election_date",
           "nomination_date",
           "political_groups"
@@ -5674,9 +6218,7 @@
             "type": "string"
           },
           "id": {
-            "type": "integer",
-            "format": "int32",
-            "minimum": 0
+            "$ref": "#/components/schemas/ElectionId"
           },
           "location": {
             "type": "string"
@@ -5689,6 +6231,11 @@
             "format": "date"
           },
           "number_of_seats": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "number_of_voters": {
             "type": "integer",
             "format": "int32",
             "minimum": 0
@@ -5812,9 +6359,13 @@
           "file_id",
           "file_name",
           "file_mime_type",
-          "file_size_bytes"
+          "file_size_bytes",
+          "file_created_at"
         ],
         "properties": {
+          "file_created_at": {
+            "type": "string"
+          },
           "file_id": {
             "type": "integer",
             "format": "int32",
@@ -5895,6 +6446,22 @@
           }
         }
       },
+      "InvestigationListResponse": {
+        "type": "object",
+        "description": "Investigation list response",
+        "required": [
+          "investigations"
+        ],
+        "properties": {
+          "investigations": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PollingStationInvestigation"
+            }
+          }
+        },
+        "additionalProperties": false
+      },
       "LoginResponse": {
         "type": "object",
         "required": [
@@ -5935,6 +6502,7 @@
           "domain_id",
           "category",
           "number_of_seats",
+          "number_of_voters",
           "election_date",
           "nomination_date",
           "political_groups"
@@ -5967,6 +6535,11 @@
             "format": "date"
           },
           "number_of_seats": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "number_of_voters": {
             "type": "integer",
             "format": "int32",
             "minimum": 0
@@ -6076,9 +6649,7 @@
             "minimum": 0
           },
           "election_id": {
-            "type": "integer",
-            "format": "int32",
-            "minimum": 0
+            "$ref": "#/components/schemas/ElectionId"
           },
           "id": {
             "type": "integer",
@@ -6103,7 +6674,8 @@
           },
           "number_of_voters": {
             "type": "integer",
-            "format": "int64"
+            "format": "int32",
+            "minimum": 0
           },
           "polling_station_type": {
             "$ref": "#/components/schemas/PollingStationType"
@@ -6136,9 +6708,7 @@
             "minimum": 0
           },
           "polling_station_election_id": {
-            "type": "integer",
-            "format": "int32",
-            "minimum": 0
+            "$ref": "#/components/schemas/ElectionId"
           },
           "polling_station_id": {
             "type": "integer",
@@ -6163,7 +6733,8 @@
           },
           "polling_station_number_of_voters": {
             "type": "integer",
-            "format": "int64"
+            "format": "int32",
+            "minimum": 0
           },
           "polling_station_postal_code": {
             "type": "string"
@@ -6194,9 +6765,7 @@
         ],
         "properties": {
           "import_election_id": {
-            "type": "integer",
-            "format": "int32",
-            "minimum": 0
+            "$ref": "#/components/schemas/ElectionId"
           },
           "import_file_name": {
             "type": "string"
@@ -6318,11 +6887,13 @@
           },
           "number": {
             "type": "integer",
-            "format": "int64"
+            "format": "int32",
+            "minimum": 0
           },
           "number_of_voters": {
             "type": "integer",
-            "format": "int64"
+            "format": "int32",
+            "minimum": 0
           },
           "polling_station_type": {
             "$ref": "#/components/schemas/PollingStationType"
@@ -6418,10 +6989,7 @@
             "type": "string"
           },
           "polling_stations": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/PollingStationRequest"
-            }
+            "type": "string"
           }
         }
       },

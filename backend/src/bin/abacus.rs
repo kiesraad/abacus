@@ -1,20 +1,33 @@
 use std::{
     io::ErrorKind,
-    net::{Ipv4Addr, SocketAddr},
+    net::{Ipv6Addr, SocketAddr},
     process,
 };
 
 use abacus::{AppError, create_sqlite_pool, start_server};
 use clap::Parser;
+use socket2::{Domain, Protocol, Socket, Type};
 use tokio::net::TcpListener;
 use tracing::{error, level_filters::LevelFilter};
 use tracing_subscriber::EnvFilter;
+
+/// Get the default port for the server, 8080 in debug builds and 80 for release builds
+fn get_default_port() -> u16 {
+    #[cfg(debug_assertions)]
+    {
+        8080
+    }
+    #[cfg(not(debug_assertions))]
+    {
+        80
+    }
+}
 
 /// Abacus API and asset server
 #[derive(Parser, Debug)]
 struct Args {
     /// Server port, optional
-    #[arg(short, long, default_value_t = 8080, env = "ABACUS_PORT")]
+    #[arg(short, long, default_value_t = get_default_port(), env = "ABACUS_PORT")]
     port: u16,
 
     /// Location of the database file, will be created if it doesn't exist
@@ -35,6 +48,10 @@ struct Args {
     #[cfg(not(feature = "airgap-detection"))]
     #[arg(short, long, env = "ABACUS_AIRGAP_DETECTION")]
     airgap_detection: bool,
+
+    /// Show version
+    #[arg(short = 'V', long)]
+    version: bool,
 }
 
 /// Main entry point for the application. Sets up the database, and starts the
@@ -57,6 +74,11 @@ async fn run() -> Result<(), AppError> {
         .init();
 
     let args = Args::parse();
+    if args.version {
+        println!(env!("ABACUS_GIT_VERSION"));
+        return Ok(());
+    }
+
     let pool = create_sqlite_pool(
         &args.database,
         #[cfg(feature = "dev-database")]
@@ -73,14 +95,19 @@ async fn run() -> Result<(), AppError> {
     #[cfg(not(feature = "airgap-detection"))]
     let enable_airgap_detection = args.airgap_detection;
 
-    let address = SocketAddr::from((Ipv4Addr::UNSPECIFIED, args.port));
+    let socket = Socket::new(Domain::IPV6, Type::STREAM, Some(Protocol::TCP))?;
+    socket.set_nonblocking(true)?;
+    socket.set_only_v6(false)?;
 
-    let listener = TcpListener::bind(&address)
-        .await
-        .map_err(|e| match e.kind() {
-            ErrorKind::AddrInUse => AppError::PortAlreadyInUse(args.port),
-            _ => AppError::Io(e),
-        })?;
+    let address = SocketAddr::from((Ipv6Addr::UNSPECIFIED, args.port));
+    socket.bind(&address.into()).map_err(|e| match e.kind() {
+        ErrorKind::AddrInUse => AppError::PortAlreadyInUse(args.port),
+        ErrorKind::PermissionDenied => AppError::PermissionDeniedToBindPort(args.port),
+        _ => AppError::Io(e),
+    })?;
+    socket.listen(1024)?;
+
+    let listener = TcpListener::from_std(socket.into())?;
 
     start_server(pool, listener, enable_airgap_detection).await
 }

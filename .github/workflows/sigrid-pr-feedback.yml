@@ -2,6 +2,8 @@ name: Sigrid PR Feedback
 
 on:
   pull_request:
+    branches:
+      - main
 
 permissions:
   contents: read
@@ -15,11 +17,11 @@ jobs:
       pull-requests: write
     steps:
       - name: Check out repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
       - name: Sigrid CI
-        uses: Software-Improvement-Group/sigridci@51868a350bf15badc1befd5e5d016692fc2009ce # main
+        uses: Software-Improvement-Group/sigridci@6a9655e7946a8566f60f82933e39c6bd9d716283 # main
         with:
           customer: kiesraad
           system: abacus

@@ -57,7 +57,7 @@ describe("LogsHomePage", () => {
     expect(await screen.findByRole("heading", { level: 1, name: "Activiteitenlog" })).toBeVisible();
 
     const firstRow = await screen.findByRole("row", {
-      name: "24 11 mrt 10:02 Succes Gebruiker ingelogd 1, admin (Beheerder)",
+      name: "24 11 mrt om 10:02 Succes Gebruiker ingelogd 1, admin (Beheerder)",
     });
     await user.click(firstRow);
 
@@ -85,7 +85,7 @@ describe("LogsHomePage", () => {
       ].join(""),
     );
 
-    const closeButton = await screen.findByRole("button", { name: "Annuleren" });
+    const closeButton = await screen.findByRole("button", { name: "Venster sluiten" });
     await user.click(closeButton);
 
     expect(list).not.toBeVisible();

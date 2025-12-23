@@ -12,6 +12,7 @@ use crate::{
     election::{CandidateNumber, PGNumber, PoliticalGroup},
     error::ErrorReference,
 };
+pub use yes_no::YesNo;
 
 #[derive(Serialize, Deserialize, Clone, ToSchema, Debug, FromRow, Default)]
 #[serde(deny_unknown_fields)]
@@ -348,45 +349,22 @@ pub struct CSOFirstSessionResults {
 impl CSOFirstSessionResults {
     /// The admitted voters have been recounted in this session
     pub fn admitted_voters_have_been_recounted(&self) -> bool {
-        self.counting_differences_polling_station
-            .unexplained_difference_ballots_voters
-            .yes
-            || self
-                .counting_differences_polling_station
+        matches!(
+            self.counting_differences_polling_station
+                .unexplained_difference_ballots_voters
+                .as_bool(),
+            Some(true)
+        ) || matches!(
+            self.counting_differences_polling_station
                 .difference_ballots_per_list
-                .yes
-            || self
-                .differences_counts
+                .as_bool(),
+            Some(true)
+        ) || matches!(
+            self.differences_counts
                 .difference_completely_accounted_for
-                .no
-    }
-
-    /// The results have been investigated for another reason
-    pub fn investigated_other_reason(&self) -> bool {
-        self.extra_investigation
-            .extra_investigation_other_reason
-            .yes
-    }
-
-    /// There have been recounted ballots in this session
-    pub fn ballots_have_been_recounted(&self) -> bool {
-        self.extra_investigation
-            .ballots_recounted_extra_investigation
-            .yes
-    }
-
-    /// The extra investigation for another reason field has a value
-    pub fn investigation_other_reason_is_answered(&self) -> bool {
-        self.extra_investigation
-            .extra_investigation_other_reason
-            .is_answered()
-    }
-
-    /// The ballots recounted extra investigation field has a value
-    pub fn investigation_ballots_recounted_is_answered(&self) -> bool {
-        self.extra_investigation
-            .ballots_recounted_extra_investigation
-            .is_answered()
+                .as_bool(),
+            Some(false)
+        )
     }
 }
 
@@ -562,34 +540,52 @@ impl DifferencesCounts {
     }
 }
 
-/// Yes/No response structure for boolean questions with separate yes and no fields.
-#[derive(Serialize, Deserialize, ToSchema, Clone, Debug, Default, PartialEq, Eq, Hash)]
-#[serde(deny_unknown_fields)]
-pub struct YesNo {
-    pub yes: bool,
-    pub no: bool,
-}
+mod yes_no {
+    use super::*;
 
-impl YesNo {
-    pub fn is_answered(&self) -> bool {
-        self.yes || self.no
+    /// Yes/No response structure for boolean questions with separate yes and no fields.
+    #[derive(Serialize, Deserialize, ToSchema, Clone, Debug, Default, PartialEq, Eq, Hash)]
+    #[serde(deny_unknown_fields)]
+    pub struct YesNo {
+        yes: bool,
+        no: bool,
     }
 
-    pub fn is_invalid(&self) -> bool {
-        self.yes && self.no
-    }
-
-    pub fn yes() -> Self {
-        Self {
-            yes: true,
-            no: false,
+    impl YesNo {
+        pub fn new(yes: bool, no: bool) -> Self {
+            Self { yes, no }
         }
-    }
 
-    pub fn no() -> Self {
-        Self {
-            yes: false,
-            no: true,
+        pub fn yes() -> Self {
+            Self::new(true, false)
+        }
+
+        pub fn no() -> Self {
+            Self::new(false, true)
+        }
+
+        pub fn both() -> Self {
+            Self::new(true, true)
+        }
+
+        /// true if both `yes` and `no` are false
+        pub fn is_empty(&self) -> bool {
+            !self.yes && !self.no
+        }
+
+        /// true if both `yes` and `no` are true
+        pub fn is_both(&self) -> bool {
+            self.yes && self.no
+        }
+
+        /// Some(true) if `yes` is true and `no` is false,
+        /// Some(false) if `yes` is false and `no` is true, otherwise None
+        pub fn as_bool(&self) -> Option<bool> {
+            match (self.yes, self.no) {
+                (true, false) => Some(true),
+                (false, true) => Some(false),
+                _ => None,
+            }
         }
     }
 }
@@ -619,7 +615,7 @@ pub struct CountingDifferencesPollingStation {
     pub difference_ballots_per_list: YesNo,
 }
 
-#[derive(Serialize, Deserialize, ToSchema, Clone, Debug, Default, PartialEq, Eq, Hash)]
+#[derive(Serialize, Deserialize, ToSchema, Clone, Debug, PartialEq, Eq, Hash)]
 #[serde(deny_unknown_fields)]
 pub struct PoliticalGroupCandidateVotes {
     #[schema(value_type = u32)]
@@ -681,7 +677,7 @@ impl PoliticalGroupCandidateVotes {
     }
 }
 
-#[derive(Serialize, Deserialize, ToSchema, Clone, Debug, Default, PartialEq, Eq, Hash)]
+#[derive(Serialize, Deserialize, ToSchema, Clone, Debug, PartialEq, Eq, Hash)]
 #[serde(deny_unknown_fields)]
 pub struct PoliticalGroupTotalVotes {
     #[schema(value_type = u32)]
@@ -764,6 +760,84 @@ pub mod tests {
         }
     }
 
+    pub fn example_polling_station_results() -> PollingStationResults {
+        PollingStationResults::CSOFirstSession(CSOFirstSessionResults {
+            extra_investigation: ValidDefault::valid_default(),
+            counting_differences_polling_station: ValidDefault::valid_default(),
+            voters_counts: VotersCounts {
+                poll_card_count: 99,
+                proxy_certificate_count: 1,
+                total_admitted_voters_count: 100,
+            },
+            votes_counts: VotesCounts {
+                political_group_total_votes: vec![
+                    PoliticalGroupTotalVotes {
+                        number: PGNumber::from(1),
+                        total: 56,
+                    },
+                    PoliticalGroupTotalVotes {
+                        number: PGNumber::from(2),
+                        total: 40,
+                    },
+                ],
+                total_votes_candidates_count: 96,
+                blank_votes_count: 2,
+                invalid_votes_count: 2,
+                total_votes_cast_count: 100,
+            },
+            differences_counts: DifferencesCounts {
+                more_ballots_count: 0,
+                fewer_ballots_count: 0,
+                compare_votes_cast_admitted_voters:
+                    DifferenceCountsCompareVotesCastAdmittedVoters {
+                        admitted_voters_equal_votes_cast: true,
+                        votes_cast_greater_than_admitted_voters: false,
+                        votes_cast_smaller_than_admitted_voters: false,
+                    },
+                difference_completely_accounted_for: YesNo::yes(),
+            },
+            political_group_votes: vec![
+                PoliticalGroupCandidateVotes::from_test_data_auto(PGNumber::from(1), &[36, 20]),
+                PoliticalGroupCandidateVotes::from_test_data_auto(PGNumber::from(2), &[30, 10]),
+            ],
+        })
+    }
+
+    impl PollingStationResults {
+        pub fn with_warning(mut self) -> Self {
+            let extra_blank_votes: Count = 100;
+
+            let voters_counts = self.voters_counts_mut();
+            voters_counts.poll_card_count += extra_blank_votes;
+            voters_counts.total_admitted_voters_count += extra_blank_votes;
+
+            let votes_counts = self.votes_counts_mut();
+            votes_counts.blank_votes_count += extra_blank_votes;
+            votes_counts.total_votes_cast_count += extra_blank_votes;
+
+            self
+        }
+
+        pub fn with_error(mut self) -> Self {
+            let voters_counts = self.voters_counts_mut();
+            voters_counts.poll_card_count = 10;
+            voters_counts.proxy_certificate_count = 10;
+            voters_counts.total_admitted_voters_count = 80;
+
+            self
+        }
+
+        pub fn with_difference(mut self) -> Self {
+            let extra_proxy_certificate: Count = 10;
+
+            let voters_counts = self.voters_counts_mut();
+            voters_counts.poll_card_count -= extra_proxy_certificate;
+            voters_counts.proxy_certificate_count += extra_proxy_certificate;
+
+            self
+        }
+    }
+
     mod polling_station_results {
         use crate::data_entry::PollingStationResults;
 
@@ -820,6 +894,7 @@ pub mod tests {
         use crate::{
             APIError,
             data_entry::{PoliticalGroupTotalVotes, VotesCounts},
+            election::PGNumber,
             error::ErrorReference,
         };
 
@@ -828,11 +903,11 @@ pub mod tests {
             let mut curr_votes = VotesCounts {
                 political_group_total_votes: vec![
                     PoliticalGroupTotalVotes {
-                        number: 1,
+                        number: PGNumber::from(1),
                         total: 10,
                     },
                     PoliticalGroupTotalVotes {
-                        number: 2,
+                        number: PGNumber::from(2),
                         total: 20,
                     },
                 ],
@@ -846,11 +921,11 @@ pub mod tests {
                 .add(&VotesCounts {
                     political_group_total_votes: vec![
                         PoliticalGroupTotalVotes {
-                            number: 1,
+                            number: PGNumber::from(1),
                             total: 11,
                         },
                         PoliticalGroupTotalVotes {
-                            number: 2,
+                            number: PGNumber::from(2),
                             total: 12,
                         },
                     ],
@@ -875,7 +950,7 @@ pub mod tests {
         fn test_votes_addition_error() {
             let mut curr_votes = VotesCounts {
                 political_group_total_votes: vec![PoliticalGroupTotalVotes {
-                    number: 1,
+                    number: PGNumber::from(1),
                     total: 10,
                 }],
                 total_votes_candidates_count: 2,
@@ -886,7 +961,7 @@ pub mod tests {
 
             let mut other = VotesCounts {
                 political_group_total_votes: vec![PoliticalGroupTotalVotes {
-                    number: 2,
+                    number: PGNumber::from(2),
                     total: 20,
                 }],
                 total_votes_candidates_count: 1,

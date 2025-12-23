@@ -5,7 +5,10 @@ use strum::VariantNames;
 use utoipa::ToSchema;
 
 use super::AuditEventLevel;
-use crate::{ErrorResponse, error::ErrorReference, investigation::PollingStationInvestigation};
+use crate::{
+    ErrorResponse, election::ElectionId, error::ErrorReference,
+    investigation::PollingStationInvestigation,
+};
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, Eq, ToSchema)]
 #[serde(deny_unknown_fields)]
@@ -41,7 +44,7 @@ pub struct UserDetails {
 #[derive(Serialize, Deserialize, Debug, PartialEq, Eq, ToSchema)]
 #[serde(deny_unknown_fields)]
 pub struct ElectionDetails {
-    pub election_id: u32,
+    pub election_id: ElectionId,
     pub election_name: String,
     pub election_counting_method: String,
     pub election_election_id: String,
@@ -49,6 +52,7 @@ pub struct ElectionDetails {
     pub election_domain_id: String,
     pub election_category: String,
     pub election_number_of_seats: u32,
+    pub election_number_of_voters: u32,
     #[schema(value_type = String, format = "date")]
     pub election_election_date: NaiveDate,
     #[schema(value_type = String, format = "date")]
@@ -60,12 +64,11 @@ pub struct ElectionDetails {
 pub struct CommitteeSessionDetails {
     pub session_id: u32,
     pub session_number: u32,
-    pub session_election_id: u32,
+    pub session_election_id: ElectionId,
     pub session_location: String,
     #[schema(value_type = Option<String>, format = "date-time")]
     pub session_start_date_time: Option<NaiveDateTime>,
     pub session_status: String,
-    pub session_number_of_voters: u32,
     #[serde(skip_serializing_if = "Option::is_none")]
     #[schema(nullable = false)]
     pub session_results_eml: Option<u32>,
@@ -84,13 +87,15 @@ pub struct FileDetails {
     pub file_name: String,
     pub file_mime_type: String,
     pub file_size_bytes: u64,
+    #[schema(value_type = String)]
+    pub file_created_at: DateTime<Utc>,
 }
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, Eq, ToSchema)]
 #[serde(deny_unknown_fields)]
 pub struct PollingStationDetails {
     pub polling_station_id: u32,
-    pub polling_station_election_id: u32,
+    pub polling_station_election_id: ElectionId,
     pub polling_station_committee_session_id: u32,
     #[serde(skip_serializing_if = "Option::is_none")]
     #[schema(nullable = false)]
@@ -99,7 +104,7 @@ pub struct PollingStationDetails {
     pub polling_station_number: u32,
     #[serde(skip_serializing_if = "Option::is_none")]
     #[schema(nullable = false)]
-    pub polling_station_number_of_voters: Option<i64>,
+    pub polling_station_number_of_voters: Option<u32>,
     #[serde(skip_serializing_if = "Option::is_none")]
     #[schema(nullable = false)]
     pub polling_station_type: Option<String>,
@@ -110,7 +115,7 @@ pub struct PollingStationDetails {
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, Eq, ToSchema)]
 pub struct PollingStationImportDetails {
-    pub import_election_id: u32,
+    pub import_election_id: ElectionId,
     pub import_file_name: String,
     pub import_number_of_polling_stations: u64,
 }
@@ -180,6 +185,7 @@ pub enum AuditEvent {
     UserDeleted(UserDetails),
     // election events
     ElectionCreated(ElectionDetails),
+    ElectionUpdated(ElectionDetails),
     // committee session events
     CommitteeSessionCreated(CommitteeSessionDetails),
     CommitteeSessionDeleted(CommitteeSessionDetails),
@@ -213,10 +219,18 @@ pub enum AuditEvent {
     // airgap detection events
     AirGapViolationDetected,
     AirGapViolationResolved,
+    // system events
+    ApplicationStarted(ApplicationStartedDetails),
     // api errors
     Error(ErrorDetails),
     #[default]
     UnknownEvent,
+}
+
+#[derive(Serialize, Deserialize, Debug, PartialEq, Eq, ToSchema)]
+pub struct ApplicationStartedDetails {
+    pub version: String,
+    pub commit: String,
 }
 
 impl From<serde_json::Value> for AuditEvent {
@@ -243,6 +257,7 @@ impl AuditEvent {
             AuditEvent::UserUpdated(_) => AuditEventLevel::Success,
             AuditEvent::UserDeleted(_) => AuditEventLevel::Info,
             AuditEvent::ElectionCreated(_) => AuditEventLevel::Success,
+            AuditEvent::ElectionUpdated(_) => AuditEventLevel::Success,
             AuditEvent::CommitteeSessionCreated(_) => AuditEventLevel::Success,
             AuditEvent::CommitteeSessionDeleted(_) => AuditEventLevel::Info,
             AuditEvent::CommitteeSessionUpdated(_) => AuditEventLevel::Success,
@@ -262,6 +277,7 @@ impl AuditEvent {
             AuditEvent::DataEntryDeleted(_) => AuditEventLevel::Info,
             AuditEvent::DataEntryFinalised(_) => AuditEventLevel::Success,
             AuditEvent::ResultDeleted(_) => AuditEventLevel::Success,
+            AuditEvent::ApplicationStarted(_) => AuditEventLevel::Info,
             AuditEvent::Error(ErrorDetails { level, .. }) => *level,
             AuditEvent::UnknownEvent => AuditEventLevel::Warning,
             AuditEvent::DataEntryDiscardedFirst(_) => AuditEventLevel::Info,

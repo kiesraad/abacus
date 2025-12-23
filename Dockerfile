@@ -1,16 +1,16 @@
-FROM node:22 as frontend-builder
+FROM node:22 AS frontend-builder
 WORKDIR /build
 COPY . .
 WORKDIR /build/frontend
 RUN npm ci --omit=dev
 RUN npm run build
 
-FROM rust:bookworm as backend-builder
+FROM rust:bookworm AS backend-builder
 WORKDIR /build
 COPY ./backend ./backend
 COPY --from=frontend-builder /build/frontend/dist ./frontend/dist
 WORKDIR /build/backend
-RUN cargo build --release --features memory-serve
+RUN cargo build --release --features memory-serve,embed-typst
 
 FROM debian:bookworm-slim
 WORKDIR /abacus
@@ -21,4 +21,4 @@ COPY --from=backend-builder /build/backend/target/release/abacus /usr/local/bin/
 USER 999
 ENTRYPOINT ["/usr/local/bin/abacus"]
 CMD ["--seed-data"]
-EXPOSE 8080
+EXPOSE 80

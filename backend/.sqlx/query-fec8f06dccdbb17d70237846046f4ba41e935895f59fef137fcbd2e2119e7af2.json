@@ -1,0 +1,44 @@
+{
+  "db_name": "SQLite",
+  "query": "\n        INSERT INTO files (\n            data,\n            name,\n            mime_type,\n            created_at\n        ) VALUES (?, ?, ?, ?)\n        RETURNING\n            id AS \"id: u32\",\n            data,\n            name,\n            mime_type,\n            created_at AS \"created_at: _\"\n        ",
+  "describe": {
+    "columns": [
+      {
+        "name": "id: u32",
+        "ordinal": 0,
+        "type_info": "Integer"
+      },
+      {
+        "name": "data",
+        "ordinal": 1,
+        "type_info": "Blob"
+      },
+      {
+        "name": "name",
+        "ordinal": 2,
+        "type_info": "Text"
+      },
+      {
+        "name": "mime_type",
+        "ordinal": 3,
+        "type_info": "Text"
+      },
+      {
+        "name": "created_at: _",
+        "ordinal": 4,
+        "type_info": "Text"
+      }
+    ],
+    "parameters": {
+      "Right": 4
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "fec8f06dccdbb17d70237846046f4ba41e935895f59fef137fcbd2e2119e7af2"
+}

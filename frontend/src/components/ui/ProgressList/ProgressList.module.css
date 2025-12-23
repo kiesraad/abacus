@@ -2,7 +2,8 @@
   flex: 1;
   display: flex;
   flex-direction: column;
-  overflow: hidden;
+  overflow-x: hidden;
+  gap: 1rem;
 
   ul {
     list-style: none;
@@ -175,7 +176,6 @@ section.scroll {
   display: flex;
   flex-direction: column;
   align-items: stretch;
-  min-height: 12rem;
 
   ul {
     width: 100%;
@@ -186,26 +186,34 @@ section.scroll {
     scrollbar-color: rgba(0, 0, 0, 0.3) transparent;
   }
 
-  &::before,
-  &::after {
-    content: "";
-    position: absolute;
-    left: 0;
-    right: 0.5rem;
-    height: 1.8rem; /* Height of the gradient */
-    z-index: 1;
-    pointer-events: none; /* So the gradient doesn't block interaction with the list */
-    opacity: 0;
-    transition: opacity 0.3s;
-  }
+  &.hasScrolling {
+    border-top: 1px solid var(--border-color-default);
+    border-bottom: 1px solid var(--border-color-default);
 
-  &::before {
-    top: 0;
-    background: linear-gradient(to bottom, var(--bg-gray) 0%, rgba(249, 250, 251, 0) 100%);
-  }
-  &::after {
-    bottom: 0;
-    background: linear-gradient(to top, var(--bg-gray) 0%, rgba(249, 250, 251, 0) 100%);
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+
+    &::before,
+    &::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      right: 0.5rem;
+      height: 3rem; /* Height of the gradient */
+      z-index: 1;
+      pointer-events: none; /* So the gradient doesn't block interaction with the list */
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+
+    &::before {
+      top: 0;
+      background: linear-gradient(to bottom, var(--bg-gray) 0%, rgba(249, 250, 251, 0) 100%);
+    }
+    &::after {
+      bottom: 0;
+      background: linear-gradient(to top, var(--bg-gray) 0%, rgba(249, 250, 251, 0) 100%);
+    }
   }
 
   &.showTopGradient {
@@ -217,15 +225,5 @@ section.scroll {
     &::after {
       opacity: 1;
     }
-  }
-
-  &.hasScrolling {
-    border-top: 1px solid var(--border-color-default);
-    border-bottom: 1px solid var(--border-color-default);
-
-    margin-top: 1rem;
-    margin-bottom: 1rem;
-    padding-top: 0.5rem;
-    padding-bottom: 0.5rem;
   }
 }

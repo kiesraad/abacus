@@ -17,7 +17,7 @@ describe("FirstLoginForm", () => {
     render(<FirstLoginForm prev={prev} />);
 
     const user = userEvent.setup();
-    await user.type(screen.getByLabelText("Gebruikersnaam"), "username");
+    await user.type(screen.getByRole("textbox", { name: "Gebruikersnaam" }), "username");
     await user.type(screen.getByLabelText("Wachtwoord"), "password*password");
 
     const submitButton = screen.getByRole("button", { name: "Inloggen" });
@@ -38,7 +38,7 @@ describe("FirstLoginForm", () => {
     render(<FirstLoginForm prev={prev} />);
 
     const user = userEvent.setup();
-    await user.type(screen.getByLabelText("Gebruikersnaam"), "username");
+    await user.type(screen.getByRole("textbox", { name: "Gebruikersnaam" }), "username");
     await user.type(screen.getByLabelText("Wachtwoord"), "password*password");
 
     const submitButton = screen.getByRole("button", { name: "Inloggen" });

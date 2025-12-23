@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, test } from "vitest";
 
-import { WhoAmIRequestHandler } from "@/testing/api-mocks/RequestHandlers";
+import { AccountRequestHandler } from "@/testing/api-mocks/RequestHandlers";
 import { overrideOnce, server } from "@/testing/server";
 import { renderHook, waitFor } from "@/testing/test-utils";
 
@@ -9,7 +9,7 @@ import useSessionState from "./useSessionState";
 
 describe("Test useSessionState", () => {
   beforeEach(() => {
-    server.use(WhoAmIRequestHandler);
+    server.use(AccountRequestHandler);
   });
 
   test("Initial user request should occur", async () => {
@@ -48,7 +48,7 @@ describe("Test useSessionState", () => {
       expect(result.current.user?.role).toBe("administrator");
     });
 
-    overrideOnce("get", "/api/whoami", 200, {
+    overrideOnce("get", "/api/account", 200, {
       user_id: 2,
       username: "typist",
       role: "typist",

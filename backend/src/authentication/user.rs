@@ -12,7 +12,7 @@ use super::{
     password::{HashedPassword, ValidatedPassword, hash_password, verify_password},
     role::Role,
 };
-use crate::{APIError, audit_log::UserDetails};
+use crate::{APIError, audit_log::UserDetails, authentication::role::IncompleteUser};
 
 const MIN_UPDATE_LAST_ACTIVITY_AT_SECS: i64 = 60; // 1 minute
 
@@ -129,7 +129,32 @@ where
             return Err(AuthenticationError::Unauthenticated.into());
         };
 
+        if user.fullname.is_none() || user.needs_password_change() {
+            return Err(AuthenticationError::Unauthenticated.into());
+        }
+
         Ok(user.clone())
+    }
+}
+
+/// Implement the FromRequestParts trait for IncompleteUser,
+/// for endpoints that are needed to fully set up the account
+impl<S> FromRequestParts<S> for IncompleteUser
+where
+    S: Send + Sync,
+{
+    type Rejection = APIError;
+
+    async fn from_request_parts(parts: &mut Parts, _state: &S) -> Result<Self, Self::Rejection> {
+        let Some(user) = parts.extensions.get::<User>() else {
+            return Err(AuthenticationError::Unauthenticated.into());
+        };
+
+        if user.fullname.is_some() && !user.needs_password_change() {
+            return Err(AuthenticationError::UserAlreadySetup.into());
+        }
+
+        Ok(IncompleteUser(user.clone()))
     }
 }
 

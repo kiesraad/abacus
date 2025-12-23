@@ -30,14 +30,14 @@ export class ExtraInvestigationPage extends DataEntryBasePage {
       hasText:
         "Heeft het gemeentelijk stembureau extra onderzoek gedaan vanwege een andere reden dan een onverklaard verschil?",
     });
-    this.extraInvestigationOtherReasonYes = this.extraInvestigationOtherReason.getByLabel("Ja");
-    this.extraInvestigationOtherReasonNo = this.extraInvestigationOtherReason.getByLabel("Nee");
+    this.extraInvestigationOtherReasonYes = this.extraInvestigationOtherReason.getByRole("checkbox", { name: "Ja" });
+    this.extraInvestigationOtherReasonNo = this.extraInvestigationOtherReason.getByRole("checkbox", { name: "Nee" });
 
     this.ballotsRecounted = this.fieldset.getByRole("group").filter({
       hasText: "Zijn de stembiljetten naar aanleiding van het extra onderzoek (gedeeltelijk) herteld?",
     });
-    this.ballotsRecountedYes = this.ballotsRecounted.getByLabel("Ja");
-    this.ballotsRecountedNo = this.ballotsRecounted.getByLabel("Nee");
+    this.ballotsRecountedYes = this.ballotsRecounted.getByRole("checkbox", { name: "Ja" });
+    this.ballotsRecountedNo = this.ballotsRecounted.getByRole("checkbox", { name: "Nee" });
 
     this.next = page.getByRole("button", { name: "Volgende" });
   }

@@ -10,12 +10,13 @@ __Niveau:__ hoog-over, wolk, ☁️
 
 __Hoofdscenario:__  
 1. Het GSB ontvangt één of meerdere verzoeken tot onderzoek/hertelling van het CSB.
-2. De coördinator GSB maakt de nieuwe zitting aan in de applicatie. Hiermee wordt de vorige zitting in de applicatie gesloten.
+2. De coördinator GSB maakt de nieuwe zitting aan in de applicatie. De applicatie sluit hierbij de vorige zitting.
 3. [De coördinator GSB bereidt de documenten voor de zitting voor.](#de-coördinator-gsb-bereidt-de-documenten-voor-de-zitting-voor-zee)
 4. Het GSB opent de zitting. (Wanneer dat gebeurt, is een afweging van het GSB: het liefst pas als alle verzoeken binnen zijn, maar ook niet te lang wachten).
 5. (gedurende de zitting) Het GSB houdt tijd en locatie bij van de aanwezigheid van elk lid van het GSB.
 6. De coördinator GSB voert de locatie, startdatum en starttijd van de zitting in.
-7. (voor elk verzoek) [Het GSB behandelt een verzoek tot onderzoek/hertelling.](#het-gsb-behandelt-een-verzoek-tot-onderzoekhertelling-vlieger)
+7. (voor elk
+   verzoek) [Het GSB voert het onderzoek en de eventuele hertelling uit.](#het-gsb-voert-het-onderzoek-en-de-eventuele-hertelling-uit-vlieger)
 8. [De coördinator GSB maakt het PV P 2a en evt. het PV Na 14-2 en tellingsbestand EML 510b aan.](#de-coördinator-gsb-maakt-het-pv-p-2a-en-evt-het-pv-na-14-2-en-tellingsbestand-eml-510b-aan-zee)
 9. Het GSB voert de andere onderdelen van de PVs (P 2a en evt. Na 14-2) in.
 10. Het GSB leest de PVs voor: P 2a (Verslag tweede zitting), evt. Na 14-2 (Corrigendum GSB), Na 14-1 versie 2 (DSO, één per SB) of Na 14-2 Bijlage 1 (CSO, één bijlage per SB).
@@ -107,8 +108,7 @@ __Uitbreidingen op hoofdscenario 2:__
 1a. Het stembureau was foutievelijk aangemaakt:  
 &emsp; 1a1. De coördinator GSB verwijdert het stembureau.
 
-
-## Het GSB behandelt een verzoek tot onderzoek/hertelling (vlieger)
+## Het GSB voert het onderzoek en de eventuele hertelling uit (vlieger)
 
 __Niveau:__ hoog-over, vlieger, 🪁
 

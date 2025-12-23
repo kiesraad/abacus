@@ -4,6 +4,7 @@ import {
   ElectionDetailsResponse,
   ElectionListResponse,
   ElectionWithPoliticalGroups,
+  InvestigationListResponse,
   NewElection,
   PoliticalGroup,
   PollingStationInvestigation,
@@ -259,6 +260,7 @@ export const electionListMockResponse: ElectionListResponse = {
       domain_id: "0035",
       category: "Municipal",
       number_of_seats: 29,
+      number_of_voters: 2000,
       election_date: "2024-11-30",
       nomination_date: "2024-11-01",
     },
@@ -321,10 +323,19 @@ export const getElectionMockData = (
       ...election,
     },
     polling_stations: pollingStations,
+    investigations: updatedCommitteeSession.number > 1 ? investigations : [],
+  };
+};
+
+export const getInvestigationMockData = (
+  investigations: PollingStationInvestigation[] = mockInvestigations,
+): InvestigationListResponse => {
+  return {
     investigations,
   };
 };
 
+export const investigationListMockResponse: InvestigationListResponse = getInvestigationMockData();
 export const electionDetailsMockResponse: Required<ElectionDetailsResponse> = getElectionMockData();
 export const electionMockData = electionDetailsMockResponse.election;
 export const newElectionMockData = {
@@ -341,6 +352,7 @@ export const electionImportMockResponse: ElectionWithPoliticalGroups = {
   domain_id: "0000",
   category: "Municipal",
   number_of_seats: 45,
+  number_of_voters: 2000,
   election_date: "2022-03-16",
   nomination_date: "2022-01-31",
   political_groups: politicalGroupsMockData,

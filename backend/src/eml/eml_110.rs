@@ -2,7 +2,7 @@ use chrono::NaiveDate;
 use serde::{Deserialize, Deserializer, Serialize};
 
 use crate::{
-    election::{PoliticalGroup, VoteCountingMethod},
+    election::{PGNumber, PoliticalGroup, VoteCountingMethod},
     eml::common::{AuthorityAddress, AuthorityIdentifier},
     polling_station::PollingStationRequest,
 };
@@ -52,6 +52,7 @@ impl EML110 {
         &self.election().contest
     }
 
+    #[allow(clippy::too_many_lines)]
     pub fn as_abacus_election(&self) -> Result<crate::election::NewElection, EMLImportError> {
         // we need to be importing from a 110a file
         if self.base.id != "110a" {
@@ -142,8 +143,9 @@ impl EML110 {
             .map(|(idx, rp)| {
                 Ok(PoliticalGroup {
                     // temporary group number, actual group numbers will be imported from candidate list
-                    number: u32::try_from(idx + 1)
-                        .or(Err(EMLImportError::TooManyPoliticalGroups))?,
+                    number: PGNumber::from(
+                        u32::try_from(idx + 1).or(Err(EMLImportError::TooManyPoliticalGroups))?,
+                    ),
                     name: rp.registered_appellation.clone(),
                     candidates: vec![],
                 })
@@ -159,6 +161,7 @@ impl EML110 {
             domain_id: election_domain.id.clone(),
             category: crate::election::ElectionCategory::Municipal,
             number_of_seats,
+            number_of_voters: 0,
             election_date,
             nomination_date,
             political_groups,
@@ -278,7 +281,6 @@ impl EML110 {
     }
 
     pub fn polling_stations_from_election(
-        committee_session: &crate::committee_session::CommitteeSession,
         election: &crate::election::ElectionWithPoliticalGroups,
         polling_stations: &[crate::polling_station::PollingStation],
         transaction_id: &str,
@@ -305,7 +307,7 @@ impl EML110 {
                     contest: Contest {
                         contest_identifier: Some(ContestIdentifier::geen()),
                         voting_method: VotingMethod::Unknown,
-                        max_votes: Some(committee_session.number_of_voters.to_string()),
+                        max_votes: Some(election.number_of_voters.to_string()),
                         polling_places: polling_stations
                             .iter()
                             .map(|ps| PollingPlace {
@@ -323,7 +325,7 @@ impl EML110 {
                                         },
                                     },
                                     polling_station: PollingStation {
-                                        number_of_voters: ps.number_of_voters,
+                                        number_of_voters: ps.number_of_voters.map(|n| n as i64),
                                         id: ps.id.to_string(),
                                     },
                                 },
@@ -460,10 +462,18 @@ impl TryInto<PollingStationRequest> for &PollingPlace {
                 self.physical_location
                     .polling_station
                     .id
-                    .parse::<i64>()
+                    .parse::<u32>()
                     .or(Err(EMLImportError::InvalidPollingStation))?,
             ),
-            number_of_voters: self.physical_location.polling_station.number_of_voters,
+            number_of_voters: self
+                .physical_location
+                .polling_station
+                .number_of_voters
+                .map(|n| {
+                    n.try_into()
+                        .map_err(|_| EMLImportError::InvalidPollingStation)
+                })
+                .transpose()?,
             polling_station_type: None,
             address: "".to_string(),
             postal_code: match self.physical_location.address.locality.postal_code.clone() {

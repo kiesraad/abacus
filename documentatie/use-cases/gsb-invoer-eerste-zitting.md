@@ -10,33 +10,24 @@ __Hoofdscenario:__
 1. De coördinator GSB stelt de invoer open.
 2. (voor elk stembureau) [De invoerders vullen de resultaten van de tellingen in.](#de-invoerders-vullen-de-resultaten-van-de-tellingen-in-vlieger)
 3. (parallel aan invoer stembureaus) [De coördinator GSB voert details zitting, bezwaren, bijzonderheden, etc. van de GSB-zitting in.](#de-coördinator-gsb-voert-details-zitting-bezwaren-bijzonderheden-etc-van-de-gsb-zitting-in-zee)
-4. De coördinator GSB sluit de invoer.
-5. De applicatie stelt vast dat voor alle stembureaus resultaten zijn ingevoerd.
-6. De applicatie stelt vast dat er geen stembureaus met waarschuwingen zijn.
+4. De applicatie stelt vast dat voor alle stembureaus de resultaten zijn ingevoerd.
+5. De coördinator GSB sluit de invoer.
 
-__Uitbreidingen:__  
-2a. De eerste invoer in de applicatie is gebruikt om verschillende optellingen te controleren:  
-
-2b. (CSO) Er moeten hertellingen uitgevoerd worden vanwege foutmeldingen en/of waarschuwingen:  
-&emsp; 2b1. Het GSB voert de hertelling uit.  
-&emsp; 2b2. Het GSB corrigeert de Na 31-2 Bijlage 1 of vult een nieuwe Na 31-2 Bijlage 1 in.  
-&emsp; 2b3. Het GSB voert de gecorrigeerde/nieuwe Na 31-2 Bijlage 1 in de applicatie in.  
-
-2c. (DSO) Er zijn controles op de telresultaten van het stembureau uitgevoerd:  
-&emsp; 2c1. Het GSB vult het inlegvel "Controles en correcties" in.  
-&emsp; 2c2. Het GSB voegt het inlegvel toe aan het proces-verbaal N 10-1.  
-
+__Uitbreidingen:__
 2-3a. Tijdens invoer is er reden om de invoer (tijdelijk) te stoppen:  
 &emsp; 2-3a1. De coördinator GSB pauzeert de invoer.  
 &emsp; 2-3a2. De applicatie blokkeert verdere invoer.
 
 2-3b. De telling van het stembureau moet worden gecorrigeerd nadat deze al twee keer was ingevoerd:  
 &emsp; 2-3b1. De coördinator GSB verwijdert de invoer van het stembureau.  
-&emsp; 2-3b2. De coördinator GSB laat het stembureau twee keer invoeren.  
+&emsp; 2-3b2. De applicatie zet de invoer terug naar de initiële status.  
+&emsp; 2-3b3. De applicatie stelt vast dat het PV (DSO: Na 31-1, CSO: Na 31-2) en het tellingsbestand EML 510b van de zitting niet zijn gegenereerd.  
+&emsp;&emsp; 2-3b3a. De applicatie stelt vast dat het PV en het tellingsbestand van de zitting zijn gegenereerd:  
+&emsp;&emsp;&emsp; 2-3b3a1. De applicatie verwijdert de gegenereerde documenten.  
+&emsp; 2-3b4. De coördinator GSB laat het stembureau twee keer invoeren.
 
-5a. De applicatie stelt vast dat niet voor alle stembureaus resultaten zijn ingevoerd:
-
-6a. De applicatie stelt vast dat er stembureaus met geaccepteerde waarschuwingen zijn:
+4a. De applicatie stelt vast dat niet voor alle stembureaus de resultaten zijn ingevoerd:  
+&emsp; 4a1. De applicatie laat niet toe dat de coördinator GSB de invoer sluit.
 
 ### Niet in scope
 
@@ -82,7 +73,7 @@ __Trigger:__ De coördinator GSB ontvangt een SB PV evt. met corrigendum.
 __Hoofdscenario:__
 
 1. De coördinator GSB geeft het SB PV (DSO: N 10-1 evt. met Na 14-1 versie 1, CSO: Na 31-2 Bijlage 1) aan de eerste invoerder.
-2. (tijdens invoer) De coördinator GSB monitort de voortgang op het statusoverzicht van de steminvoer.
+2. (tijdens invoer) De coördinator GSB monitort de voortgang op het statusoverzicht van de invoer.
 3. [De eerste invoerder voert de resultaten van de telling in.](#de-eerste-of-tweede-invoerder-voert-de-resultaten-van-de-telling-in-zee)
 4. De applicatie stelt vast dat de eerste invoer geen geaccepteerde fouten bevat.
 5. De applicatie stelt vast dat de eerste invoer geen geaccepteerde waarschuwingen bevat.
@@ -96,16 +87,13 @@ __Uitbreidingen:__
 4a. De applicatie stelt vast dat een invoerder fouten heeft geaccepteerd:  
 &emsp; 4a1. [De coördinator GSB beoordeelt de geaccepteerde fouten.](#de-coördinator-gsb-beoordeelt-de-geaccepteerde-fouten-zee)
 
-5a. De applicatie stelt vast dat een invoerder waarschuwingen heeft geaccepteerd:  
+5a. De applicatie stelt vast dat een invoerder waarschuwingen heeft geaccepteerd in de eerste invoer:  
 &emsp; 5a1. De coördinator GSB beoordeelt de geaccepteerde waarschuwingen.
-
-8a. De applicatie stelt vast dat een invoerder waarschuwingen heeft geaccepteerd:  
-&emsp; 8a1. De coördinator GSB beoordeelt de geaccepteerde waarschuwingen.
 
 8a. De applicatie stelt vast dat beide invoeren niet gelijk zijn:  
 &emsp; 8a1. [De coördinator GSB beoordeelt de verschillen tussen de twee invoeren.](#de-coördinator-gsb-beoordeelt-de-verschillen-tussen-de-twee-invoeren-zee)
 
-9a. De applicatie stelt vast dat een invoerder waarschuwingen heeft geaccepteerd:  
+9a. De applicatie stelt vast dat een invoerder waarschuwingen heeft geaccepteerd in de tweede invoer:  
 &emsp; 9a1. De coördinator GSB beoordeelt de geaccepteerde waarschuwingen.
 
 ### Open punten
@@ -141,7 +129,7 @@ __Uitbreidingen:__
 1c. De invoerder selecteert een ander stembureau dan op het PV staat:  
 &emsp; 1c1. De invoerder merkt de fout op (naam en nummer stembureau komen niet overeen).  
 &emsp; 1c2. De invoerder breekt de invoer af en kiest ervoor om de invoer niet te bewaren.  
-1d. De invoerder selecteert een stembureau waar iemand anders mee bezig is:  
+1d. De invoerder selecteert een stembureau waar een andere invoerder of een coördinator GSB mee bezig is:  
 &emsp; 1d1. De applicatie voorkomt dat de invoer wordt gestart.  
 1e. De invoerder selecteert een stembureau waar een andere gebruiker invoer voor heeft opgeslagen:  
 &emsp; 1e1. De applicatie voorkomt dat de invoer wordt gestart.  
@@ -194,14 +182,13 @@ __Niveau:__ gebruikersdoel, zee, 🌊
 __Hoofdscenario:__
 
 1. De coördinator GSB bekijkt de geaccepteerde fouten en eventuele waarschuwingen.
-2. Het PV wordt onderzocht om te bepalen of er fouten hersteld kunnen worden.
-3. De coördinator GSB stelt vast het PV fouten bevat die kunnen worden opgelost.
-4. De coördinator laat de fouten in het PV corrigeren en laat de invoerder verder gaan met diens invoer.
+2. De coördinator GSB stelt vast het PV fouten bevat die kunnen worden opgelost.
+3. De coördinator laat de fouten in het PV corrigeren en laat de invoerder verdergaan met diens invoer.
 
 __Uitbreidingen:__  
-3a. Het PV bevat fouten die niet opgelost kunnen worden:  
-&emsp; 3a1. De coördinator GSB verwijdert de invoer.  
-&emsp; 3a2. De coördinator GSB laat het stembureau opnieuw invoeren.
+2a. Het PV bevat fouten die niet opgelost kunnen worden:  
+&emsp; 2a1. De coördinator GSB verwijdert de invoer.  
+&emsp; 2a2. De coördinator GSB laat het stembureau opnieuw invoeren.
 
 ## De invoerder handelt de fout(en) en/of waarschuwing(en) af (vis)
 

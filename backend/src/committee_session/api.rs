@@ -8,16 +8,17 @@ use sqlx::{SqliteConnection, SqlitePool};
 use utoipa_axum::{router::OpenApiRouter, routes};
 
 use super::{
-    CommitteeSession, CommitteeSessionCreateRequest, CommitteeSessionNumberOfVotersChangeRequest,
-    CommitteeSessionStatusChangeRequest,
+    CommitteeSession, CommitteeSessionCreateRequest, CommitteeSessionStatusChangeRequest,
+    CommitteeSessionUpdateRequest, InvestigationListResponse,
     status::{CommitteeSessionStatus, change_committee_session_status},
 };
 use crate::{
     APIError, AppState, ErrorResponse, SqlitePoolExt,
     audit_log::{AuditEvent, AuditService},
     authentication::Coordinator,
-    committee_session::CommitteeSessionUpdateRequest,
+    election::ElectionId,
     error::ErrorReference,
+    investigation::list_investigations_for_committee_session,
 };
 
 #[derive(Debug, PartialEq, Eq)]
@@ -39,13 +40,13 @@ pub fn router() -> OpenApiRouter<AppState> {
         .routes(routes!(committee_session_create))
         .routes(routes!(committee_session_delete))
         .routes(routes!(committee_session_update))
-        .routes(routes!(committee_session_number_of_voters_change))
         .routes(routes!(committee_session_status_change))
+        .routes(routes!(committee_session_investigations))
 }
 
 pub async fn validate_committee_session_is_current_committee_session(
     conn: &mut SqliteConnection,
-    election_id: u32,
+    election_id: ElectionId,
     committee_session_id: u32,
 ) -> Result<CommitteeSession, APIError> {
     // Get current committee session and check if the committee session id given
@@ -76,14 +77,15 @@ pub async fn validate_committee_session_is_current_committee_session(
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
     params(
-        ("election_id" = u32, description = "Election database id"),
+        ("election_id" = ElectionId, description = "Election database id"),
     ),
+    security(("cookie_auth" = ["coordinator"])),
 )]
 pub async fn committee_session_create(
     _user: Coordinator,
     State(pool): State<SqlitePool>,
     audit_service: AuditService,
-    Path(election_id): Path<u32>,
+    Path(election_id): Path<ElectionId>,
 ) -> Result<(StatusCode, CommitteeSession), APIError> {
     let mut tx = pool.begin_immediate().await?;
 
@@ -96,7 +98,6 @@ pub async fn committee_session_create(
             CommitteeSessionCreateRequest {
                 election_id,
                 number: current_committee_session.number + 1,
-                number_of_voters: current_committee_session.number_of_voters,
             }
         })
         .await?;
@@ -133,15 +134,16 @@ pub async fn committee_session_create(
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
     params(
-        ("election_id" = u32, description = "Election database id"),
+        ("election_id" = ElectionId, description = "Election database id"),
         ("committee_session_id" = u32, description = "Committee session database id"),
     ),
+    security(("cookie_auth" = ["coordinator"])),
 )]
 pub async fn committee_session_delete(
     _user: Coordinator,
     State(pool): State<SqlitePool>,
     audit_service: AuditService,
-    Path((election_id, committee_session_id)): Path<(u32, u32)>,
+    Path((election_id, committee_session_id)): Path<(ElectionId, u32)>,
 ) -> Result<StatusCode, APIError> {
     let mut tx = pool.begin_immediate().await?;
 
@@ -192,15 +194,16 @@ pub async fn committee_session_delete(
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
     params(
-        ("election_id" = u32, description = "Election database id"),
+        ("election_id" = ElectionId, description = "Election database id"),
         ("committee_session_id" = u32, description = "Committee session database id"),
     ),
+    security(("cookie_auth" = ["coordinator"])),
 )]
 pub async fn committee_session_update(
     _user: Coordinator,
     State(pool): State<SqlitePool>,
     audit_service: AuditService,
-    Path((election_id, committee_session_id)): Path<(u32, u32)>,
+    Path((election_id, committee_session_id)): Path<(ElectionId, u32)>,
     Json(request): Json<CommitteeSessionUpdateRequest>,
 ) -> Result<StatusCode, APIError> {
     if request.location.is_empty() {
@@ -249,59 +252,6 @@ pub async fn committee_session_update(
     Ok(StatusCode::NO_CONTENT)
 }
 
-/// Change the number of voters of a [CommitteeSession].
-#[utoipa::path(
-    put,
-    path = "/api/elections/{election_id}/committee_sessions/{committee_session_id}/voters",
-    request_body = CommitteeSessionNumberOfVotersChangeRequest,
-    responses(
-        (status = 204, description = "Committee session number of voters changed successfully"),
-        (status = 401, description = "Unauthorized", body = ErrorResponse),
-        (status = 403, description = "Forbidden", body = ErrorResponse),
-        (status = 404, description = "Committee session not found", body = ErrorResponse),
-        (status = 500, description = "Internal server error", body = ErrorResponse),
-    ),
-    params(
-        ("election_id" = u32, description = "Election database id"),
-        ("committee_session_id" = u32, description = "Committee session database id"),
-    ),
-)]
-pub async fn committee_session_number_of_voters_change(
-    _user: Coordinator,
-    State(pool): State<SqlitePool>,
-    audit_service: AuditService,
-    Path((election_id, committee_session_id)): Path<(u32, u32)>,
-    Json(committee_session_request): Json<CommitteeSessionNumberOfVotersChangeRequest>,
-) -> Result<StatusCode, APIError> {
-    let mut tx = pool.begin_immediate().await?;
-
-    validate_committee_session_is_current_committee_session(
-        &mut tx,
-        election_id,
-        committee_session_id,
-    )
-    .await?;
-
-    let committee_session = crate::committee_session::repository::change_number_of_voters(
-        &mut tx,
-        committee_session_id,
-        committee_session_request.number_of_voters,
-    )
-    .await?;
-
-    audit_service
-        .log(
-            &mut tx,
-            &AuditEvent::CommitteeSessionUpdated(committee_session.clone().into()),
-            None,
-        )
-        .await?;
-
-    tx.commit().await?;
-
-    Ok(StatusCode::NO_CONTENT)
-}
-
 /// Change the status of a [CommitteeSession].
 #[utoipa::path(
     put,
@@ -316,15 +266,16 @@ pub async fn committee_session_number_of_voters_change(
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
     params(
-        ("election_id" = u32, description = "Election database id"),
+        ("election_id" = ElectionId, description = "Election database id"),
         ("committee_session_id" = u32, description = "Committee session database id"),
     ),
+    security(("cookie_auth" = ["coordinator"])),
 )]
 pub async fn committee_session_status_change(
     _user: Coordinator,
     State(pool): State<SqlitePool>,
     audit_service: AuditService,
-    Path((election_id, committee_session_id)): Path<(u32, u32)>,
+    Path((election_id, committee_session_id)): Path<(ElectionId, u32)>,
     Json(committee_session_request): Json<CommitteeSessionStatusChangeRequest>,
 ) -> Result<StatusCode, APIError> {
     let mut tx = pool.begin_immediate().await?;
@@ -348,8 +299,45 @@ pub async fn committee_session_status_change(
     Ok(StatusCode::NO_CONTENT)
 }
 
+/// Get a list of all [Investigation]s for a committee session
+#[utoipa::path(
+    get,
+    path = "/api/elections/{election_id}/committee_sessions/{committee_session_id}/investigations",
+    responses(
+        (status = 200, description = "Investigation listing successful", body = InvestigationListResponse),
+        (status = 401, description = "Unauthorized", body = ErrorResponse),
+        (status = 403, description = "Forbidden", body = ErrorResponse),
+        (status = 404, description = "Committee session not found", body = ErrorResponse),
+        (status = 500, description = "Internal server error", body = ErrorResponse),
+    ),
+    params(
+        ("election_id" = ElectionId, description = "Election database id"),
+        ("committee_session_id" = u32, description = "Committee session database id"),
+    ),
+    security(("cookie_auth" = ["coordinator"])),
+)]
+pub async fn committee_session_investigations(
+    _user: Coordinator,
+    State(pool): State<SqlitePool>,
+    Path((election_id, committee_session_id)): Path<(ElectionId, u32)>,
+) -> Result<Json<InvestigationListResponse>, APIError> {
+    let mut conn = pool.acquire().await?;
+
+    // Check if the election exists, will respond with NOT_FOUND otherwise
+    crate::election::repository::get(&mut conn, election_id).await?;
+
+    let committee_session =
+        crate::committee_session::repository::get(&mut conn, committee_session_id).await?;
+
+    Ok(Json(InvestigationListResponse {
+        investigations: list_investigations_for_committee_session(&mut conn, committee_session.id)
+            .await?,
+    }))
+}
+
 #[cfg(test)]
 pub mod tests {
+    use crate::election::ElectionId;
     use chrono::NaiveDate;
     use sqlx::SqlitePool;
 
@@ -367,7 +355,7 @@ pub mod tests {
     }
 
     /// Create a test committee session.
-    pub fn committee_session_fixture(election_id: u32) -> CommitteeSession {
+    pub fn committee_session_fixture(election_id: ElectionId) -> CommitteeSession {
         CommitteeSession {
             id: 1,
             number: 1,
@@ -376,7 +364,6 @@ pub mod tests {
             start_date_time: NaiveDate::from_ymd_opt(2025, 10, 22)
                 .and_then(|d| d.and_hms_opt(9, 15, 0)),
             status: CommitteeSessionStatus::DataEntryFinished,
-            number_of_voters: 100,
             results_eml: None,
             results_pdf: None,
             overview_pdf: None,

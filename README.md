@@ -11,15 +11,17 @@
 - Voor informatie over het installeren, starten en gebruiken van Abacus ga je naar de website [Abacus Documentatie](https://kiesraad.github.io/abacus-documentatie/). Hier vind je niet alleen alle beschikbare gebruikersdocumentatie, maar bieden we ook uitleg over het verkiezingsproces.
 - Alle documentatie met betrekking tot de ontwikkeling van Abacus vind je op de [Hoofdpagina voor documentatie](/documentatie/README.md) in deze repository. Hier staat documentatie over de functionaliteit, de softwarearchitectuur, ons ontwikkelproces en specifieke facetten van het verkiezingsproces.
 
-### Functionaliteit
+### Versie 1.0 voor gemeenteraadsverkiezingen 2026 (GR26)
 
-- De functionele eisen en wensen voor versie 1.0 zijn te vinden via [Functionaliteit van Abacus: eisen en wensen](/documentatie/functionaliteit/functionaliteit-eisen-en-wensen.md).
+Voor de gemeenteraadsverkiezingen 2026 (GR26) wordt Abacus 1.0 gebruikt, te vinden in de branch [`release-1.0-GR26`](https://github.com/kiesraad/abacus/tree/release-1.0-GR26).
+
+De functionele eisen en wensen voor versie 1.0 zijn te vinden via [Functionaliteit van Abacus: eisen en wensen](https://github.com/kiesraad/abacus/blob/release-1.0-GR26/documentatie/functionaliteit/functionaliteit-eisen-en-wensen.md).
 
 ### Projectstructuur
 
 - [Codebase Backend](/backend/)
 - [Codebase Frontend](/frontend/)
-- [Ontwerp gebruikersinterface (Figma)](https://www.figma.com/design/xHDfsv69Nhmk3IrWC0303B/Public---Kiesraad---Abacus-optelsoftware?node-id=3190-28385&t=VnghjibSJMqrQepm-1)
+- [Ontwerp gebruikersinterface (Figma)](https://www.figma.com/design/zZlFr8tYiRyp4I26sh6eqp/Kiesraad---Abacus-optelsoftware?node-id=3190-11434)
 
 ## Wat is Abacus?
 

@@ -5,12 +5,15 @@ use hyper::Method;
 use sqlx::SqlitePool;
 use test_log::test;
 
+use crate::utils::serve_api_with_airgap_detection;
+use abacus::router::openapi_router;
+
 pub mod utils;
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
 async fn test_airgap_detection(pool: SqlitePool) {
-    let openapi = abacus::router::openapi_router().into_openapi();
-    let addr = utils::serve_api_with_airgap_detection(pool).await;
+    let openapi = openapi_router().into_openapi();
+    let addr = serve_api_with_airgap_detection(pool).await;
 
     // loop through all the paths in the openapi spec
     for (path, item) in openapi.paths.paths.iter() {

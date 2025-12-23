@@ -1,6 +1,7 @@
 import { useBlocker, useParams } from "react-router";
 
 import { ApiError, FatalApiError } from "@/api/ApiResult";
+import { IconTrash } from "@/components/generated/icons";
 import { Button } from "@/components/ui/Button/Button";
 import { Modal } from "@/components/ui/Modal/Modal";
 import { useUser } from "@/hooks/user/useUser";
@@ -166,7 +167,7 @@ export function DataEntryNavigation({ onSubmit, currentValues = {} }: DataEntryN
       {tx("data_entry.abort.description")}
       <nav>
         <Button
-          size="xl"
+          size="lg"
           onClick={() => {
             void onAbortModalSave();
           }}
@@ -176,8 +177,9 @@ export function DataEntryNavigation({ onSubmit, currentValues = {} }: DataEntryN
           {t("data_entry.abort.save_input")}
         </Button>
         <Button
-          size="xl"
-          variant="secondary"
+          leftIcon={<IconTrash />}
+          size="lg"
+          variant="tertiary-destructive"
           onClick={() => {
             void onAbortModalDelete();
           }}

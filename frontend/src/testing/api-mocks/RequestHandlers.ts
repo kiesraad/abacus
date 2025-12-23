@@ -1,6 +1,8 @@
 import { http, type HttpHandler, HttpResponse } from "msw";
 
 import {
+  ACCOUNT_REQUEST_PARAMS,
+  ACCOUNT_REQUEST_PATH,
   ACCOUNT_UPDATE_REQUEST_BODY,
   ACCOUNT_UPDATE_REQUEST_PARAMS,
   ACCOUNT_UPDATE_REQUEST_PATH,
@@ -16,9 +18,8 @@ import {
   COMMITTEE_SESSION_CREATE_REQUEST_PATH,
   COMMITTEE_SESSION_DELETE_REQUEST_PARAMS,
   COMMITTEE_SESSION_DELETE_REQUEST_PATH,
-  COMMITTEE_SESSION_NUMBER_OF_VOTERS_CHANGE_REQUEST_BODY,
-  COMMITTEE_SESSION_NUMBER_OF_VOTERS_CHANGE_REQUEST_PARAMS,
-  COMMITTEE_SESSION_NUMBER_OF_VOTERS_CHANGE_REQUEST_PATH,
+  COMMITTEE_SESSION_INVESTIGATIONS_REQUEST_PARAMS,
+  COMMITTEE_SESSION_INVESTIGATIONS_REQUEST_PATH,
   COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_BODY,
   COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_PARAMS,
   COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_PATH,
@@ -42,6 +43,9 @@ import {
   ELECTION_IMPORT_VALIDATE_REQUEST_PATH,
   ELECTION_LIST_REQUEST_PARAMS,
   ELECTION_LIST_REQUEST_PATH,
+  ELECTION_NUMBER_OF_VOTERS_CHANGE_REQUEST_BODY,
+  ELECTION_NUMBER_OF_VOTERS_CHANGE_REQUEST_PARAMS,
+  ELECTION_NUMBER_OF_VOTERS_CHANGE_REQUEST_PATH,
   ELECTION_STATUS_REQUEST_PARAMS,
   ELECTION_STATUS_REQUEST_PATH,
   ElectionDefinitionValidateResponse,
@@ -52,12 +56,15 @@ import {
   ErrorResponse,
   INITIALISED_REQUEST_PARAMS,
   INITIALISED_REQUEST_PATH,
+  InvestigationListResponse,
   LOGIN_REQUEST_BODY,
   LOGIN_REQUEST_PARAMS,
   LOGIN_REQUEST_PATH,
   LoginResponse,
   POLLING_STATION_CREATE_REQUEST_BODY,
   POLLING_STATION_CREATE_REQUEST_PARAMS,
+  POLLING_STATION_DATA_ENTRIES_AND_RESULT_DELETE_REQUEST_PARAMS,
+  POLLING_STATION_DATA_ENTRIES_AND_RESULT_DELETE_REQUEST_PATH,
   POLLING_STATION_DATA_ENTRY_CLAIM_REQUEST_PARAMS,
   POLLING_STATION_DATA_ENTRY_CLAIM_REQUEST_PATH,
   POLLING_STATION_DATA_ENTRY_DELETE_REQUEST_PARAMS,
@@ -115,14 +122,12 @@ import {
   USER_UPDATE_REQUEST_PARAMS,
   USER_UPDATE_REQUEST_PATH,
   UserListResponse,
-  WHOAMI_REQUEST_PARAMS,
-  WHOAMI_REQUEST_PATH,
 } from "@/types/generated/openapi";
 
 import { getCommitteeSessionMockData } from "./CommitteeSessionMockData";
 import {
   claimDataEntryResponse,
-  dataEntryGetMockResponse,
+  dataEntryHasErrorsGetMockResponse,
   dataEntryStatusDifferences,
   saveDataEntryResponse,
 } from "./DataEntryMockData";
@@ -131,6 +136,7 @@ import {
   electionImportMockResponse,
   electionImportValidateMockResponse,
   electionListMockResponse,
+  investigationListMockResponse,
 } from "./ElectionMockData";
 import { statusResponseMock } from "./ElectionStatusMockData";
 import { logMockResponse } from "./LogMockData";
@@ -160,6 +166,15 @@ export const pingHandler = http.post<PingParams, PingRequestBody, PingResponseBo
   });
 });
 
+export const AccountRequestHandler = http.get<ACCOUNT_REQUEST_PARAMS, null, LoginResponse>(
+  "/api/account" satisfies ACCOUNT_REQUEST_PATH,
+  () =>
+    HttpResponse.json(loginResponseMockData, {
+      status: 200,
+      headers: { "x-session-expires-at": new Date(Date.now() + 1000 * 60 * 30).toString() },
+    }),
+);
+
 export const AccountUpdateRequestHandler = http.put<
   ACCOUNT_UPDATE_REQUEST_PARAMS,
   ACCOUNT_UPDATE_REQUEST_BODY,
@@ -186,14 +201,6 @@ export const CommitteeSessionStatusChangeRequestHandler = http.put<
   HttpResponse.json(null, { status: 200 }),
 );
 
-export const CommitteeSessionChangeNumberOfVotersHandler = http.put<
-  ParamsToString<COMMITTEE_SESSION_NUMBER_OF_VOTERS_CHANGE_REQUEST_PARAMS>,
-  COMMITTEE_SESSION_NUMBER_OF_VOTERS_CHANGE_REQUEST_BODY
->(
-  "/api/elections/1/committee_sessions/1/voters" satisfies COMMITTEE_SESSION_NUMBER_OF_VOTERS_CHANGE_REQUEST_PATH,
-  () => new HttpResponse(null, { status: 200 }),
-);
-
 export const CommitteeSessionUpdateHandler = http.put<
   ParamsToString<COMMITTEE_SESSION_UPDATE_REQUEST_PARAMS>,
   COMMITTEE_SESSION_UPDATE_REQUEST_BODY
@@ -214,6 +221,15 @@ export const CommitteeSessionCreateHandler = http.post<
 export const CommitteeSessionDeleteHandler = http.delete<ParamsToString<COMMITTEE_SESSION_DELETE_REQUEST_PARAMS>>(
   "/api/elections/1/committee_sessions/4" satisfies COMMITTEE_SESSION_DELETE_REQUEST_PATH,
   () => new HttpResponse(null, { status: 200 }),
+);
+
+// get investigation list handler
+export const InvestigationListRequestHandler = http.get<
+  ParamsToString<COMMITTEE_SESSION_INVESTIGATIONS_REQUEST_PARAMS>,
+  null,
+  InvestigationListResponse
+>("/api/elections/1/committee_sessions/1/investigations" satisfies COMMITTEE_SESSION_INVESTIGATIONS_REQUEST_PATH, () =>
+  HttpResponse.json(investigationListMockResponse, { status: 200 }),
 );
 
 // investigation handlers
@@ -310,6 +326,14 @@ export const ElectionImportValidateRequestHandler = http.post<
   HttpResponse.json(electionImportValidateMockResponse, { status: 200 }),
 );
 
+export const ElectionChangeNumberOfVotersHandler = http.put<
+  ParamsToString<ELECTION_NUMBER_OF_VOTERS_CHANGE_REQUEST_PARAMS>,
+  ELECTION_NUMBER_OF_VOTERS_CHANGE_REQUEST_BODY
+>(
+  "/api/elections/1/voters" satisfies ELECTION_NUMBER_OF_VOTERS_CHANGE_REQUEST_PATH,
+  () => new HttpResponse(null, { status: 200 }),
+);
+
 export const LoginHandler = http.post<LOGIN_REQUEST_PARAMS, LOGIN_REQUEST_BODY, LoginResponse>(
   "/api/login" satisfies LOGIN_REQUEST_PATH,
   () => HttpResponse.json(loginResponseMockData, { status: 200 }),
@@ -334,7 +358,7 @@ export const PollingStationDataEntryGetHandler = http.get<
   null,
   DataEntryGetResponse
 >("/api/polling_stations/5/data_entries/get" satisfies POLLING_STATION_DATA_ENTRY_GET_REQUEST_PATH, () =>
-  HttpResponse.json(dataEntryGetMockResponse, { status: 200 }),
+  HttpResponse.json(dataEntryHasErrorsGetMockResponse, { status: 200 }),
 );
 
 export const PollingStationDataEntryResolveDifferencesHandler = http.post<
@@ -400,6 +424,14 @@ export const PollingStationDataEntryFinaliseHandler = http.post<
   HttpResponse.json({ status: "second_entry_not_started" }, { status: 200 }),
 );
 
+// delete data entries and result handler
+export const PollingStationDataEntriesAndResultDeleteHandler = http.delete<
+  ParamsToString<POLLING_STATION_DATA_ENTRIES_AND_RESULT_DELETE_REQUEST_PARAMS>
+>(
+  "/api/polling_stations/5/data_entries" satisfies POLLING_STATION_DATA_ENTRIES_AND_RESULT_DELETE_REQUEST_PATH,
+  () => new HttpResponse(null, { status: 204 }),
+);
+
 export const PollingStationCreateHandler = http.post<
   ParamsToString<POLLING_STATION_CREATE_REQUEST_PARAMS>,
   POLLING_STATION_CREATE_REQUEST_BODY,
@@ -430,7 +462,7 @@ export const PollingStationGetHandler = http.get<
 );
 
 export const UserCreateRequestHandler = http.post<USER_CREATE_REQUEST_PARAMS, USER_CREATE_REQUEST_BODY, User>(
-  "/api/user" satisfies USER_CREATE_REQUEST_PATH,
+  "/api/users" satisfies USER_CREATE_REQUEST_PATH,
   () => HttpResponse.json(userMockData[0], { status: 200 }),
 );
 
@@ -448,12 +480,12 @@ export const AdminExistsRequestHandler = http.get<ParamsToString<ADMIN_EXISTS_RE
 );
 
 export const UserGetRequestHandler = http.get<ParamsToString<USER_GET_REQUEST_PARAMS>>(
-  "/api/user/1" satisfies USER_GET_REQUEST_PATH,
+  "/api/users/1" satisfies USER_GET_REQUEST_PATH,
   () => HttpResponse.json(userMockData[0], { status: 200 }),
 );
 
 export const UserListRequestHandler = http.get<USER_LIST_REQUEST_PARAMS, null, UserListResponse>(
-  "/api/user" satisfies USER_LIST_REQUEST_PATH,
+  "/api/users" satisfies USER_LIST_REQUEST_PATH,
   () => HttpResponse.json({ users: userMockData }, { status: 200 }),
 );
 
@@ -461,33 +493,24 @@ export const UserUpdateRequestHandler = http.put<
   ParamsToString<USER_UPDATE_REQUEST_PARAMS>,
   USER_UPDATE_REQUEST_BODY,
   User
->("/api/user/1" satisfies USER_UPDATE_REQUEST_PATH, () => HttpResponse.json(userMockData[0], { status: 200 }));
+>("/api/users/1" satisfies USER_UPDATE_REQUEST_PATH, () => HttpResponse.json(userMockData[0], { status: 200 }));
 
 export const UserDeleteRequestHandler = http.delete<ParamsToString<USER_DELETE_REQUEST_PARAMS>>(
-  "/api/user/1" satisfies USER_DELETE_REQUEST_PATH,
+  "/api/users/1" satisfies USER_DELETE_REQUEST_PATH,
   () => new HttpResponse(null, { status: 200 }),
-);
-
-// get user handler
-export const WhoAmIRequestHandler = http.get<WHOAMI_REQUEST_PARAMS, null, LoginResponse>(
-  "/api/whoami" satisfies WHOAMI_REQUEST_PATH,
-  () =>
-    HttpResponse.json(loginResponseMockData, {
-      status: 200,
-      headers: { "x-session-expires-at": new Date(Date.now() + 1000 * 60 * 30).toString() },
-    }),
 );
 
 export const handlers: HttpHandler[] = [
   pingHandler,
+  AccountRequestHandler,
   AccountUpdateRequestHandler,
   LogRequestHandler,
   LogUsersRequestHandler,
   CommitteeSessionStatusChangeRequestHandler,
-  CommitteeSessionChangeNumberOfVotersHandler,
   CommitteeSessionUpdateHandler,
   CommitteeSessionCreateHandler,
   CommitteeSessionDeleteHandler,
+  InvestigationListRequestHandler,
   PollingStationInvestigationCreateHandler,
   PollingStationInvestigationConcludeHandler,
   PollingStationInvestigationUpdateHandler,
@@ -496,6 +519,7 @@ export const handlers: HttpHandler[] = [
   ElectionStatusRequestHandler,
   ElectionImportRequestHandler,
   ElectionImportValidateRequestHandler,
+  ElectionChangeNumberOfVotersHandler,
   LoginHandler,
   InitialisedHandler,
   PollingStationDataEntryGetDifferencesHandler,
@@ -507,6 +531,7 @@ export const handlers: HttpHandler[] = [
   PollingStationDataEntryClaimHandler,
   PollingStationDataEntryDeleteHandler,
   PollingStationDataEntryFinaliseHandler,
+  PollingStationDataEntriesAndResultDeleteHandler,
   PollingStationCreateHandler,
   PollingStationDeleteHandler,
   PollingStationUpdateHandler,
@@ -518,5 +543,4 @@ export const handlers: HttpHandler[] = [
   UserListRequestHandler,
   UserUpdateRequestHandler,
   UserDeleteRequestHandler,
-  WhoAmIRequestHandler,
 ];

@@ -23,8 +23,8 @@ describe("UserCreateDetailsForm", () => {
   test("Render empty form", async () => {
     renderForm("coordinator", true);
 
-    expect(await screen.findByLabelText("Gebruikersnaam")).toHaveValue("");
-    expect(await screen.findByLabelText("Volledige naam")).toHaveValue("");
+    expect(await screen.findByRole("textbox", { name: "Gebruikersnaam" })).toHaveValue("");
+    expect(await screen.findByRole("textbox", { name: "Volledige naam" })).toHaveValue("");
     expect(await screen.findByLabelText("Tijdelijk wachtwoord")).toHaveValue("");
   });
 
@@ -36,11 +36,11 @@ describe("UserCreateDetailsForm", () => {
     const submit = await screen.findByRole("button", { name: "Opslaan" });
     await user.click(submit);
 
-    const username = await screen.findByLabelText("Gebruikersnaam");
+    const username = await screen.findByRole("textbox", { name: "Gebruikersnaam" });
     expect(username).toBeInvalid();
     expect(username).toHaveAccessibleErrorMessage("Dit veld mag niet leeg zijn");
 
-    const fullname = await screen.findByLabelText("Volledige naam");
+    const fullname = await screen.findByRole("textbox", { name: "Volledige naam" });
     expect(fullname).toBeInvalid();
     expect(fullname).toHaveAccessibleErrorMessage("Dit veld mag niet leeg zijn");
 
@@ -50,7 +50,7 @@ describe("UserCreateDetailsForm", () => {
   });
 
   test("Show username must be unique error", async () => {
-    overrideOnce("post", "/api/user" satisfies USER_CREATE_REQUEST_PATH, 409, {
+    overrideOnce("post", "/api/users" satisfies USER_CREATE_REQUEST_PATH, 409, {
       error: "Username already exists",
       fatal: false,
       reference: "UsernameNotUnique",
@@ -59,7 +59,7 @@ describe("UserCreateDetailsForm", () => {
     const { onSubmitted } = renderForm("typist", false);
 
     const user = userEvent.setup();
-    const username = await screen.findByLabelText("Gebruikersnaam");
+    const username = await screen.findByRole("textbox", { name: "Gebruikersnaam" });
     const password = await screen.findByLabelText("Tijdelijk wachtwoord");
 
     await user.type(username, "Dubbel");
@@ -94,8 +94,8 @@ describe("UserCreateDetailsForm", () => {
     const createUser = spyOnHandler(UserCreateRequestHandler);
 
     const user = userEvent.setup();
-    await user.type(await screen.findByLabelText("Gebruikersnaam"), "NieuweGebruiker");
-    await user.type(await screen.findByLabelText("Volledige naam"), "Nieuwe Gebruiker");
+    await user.type(await screen.findByRole("textbox", { name: "Gebruikersnaam" }), "NieuweGebruiker");
+    await user.type(await screen.findByRole("textbox", { name: "Volledige naam" }), "Nieuwe Gebruiker");
     await user.type(await screen.findByLabelText("Tijdelijk wachtwoord"), "Wachtwoord12");
     await user.click(await screen.findByRole("button", { name: "Opslaan" }));
 
@@ -114,11 +114,11 @@ describe("UserCreateDetailsForm", () => {
 
     const user = userEvent.setup();
 
-    expect(await screen.findByLabelText("Gebruikersnaam")).toHaveValue("");
-    expect(screen.queryByLabelText("Volledige naam")).not.toBeInTheDocument();
+    expect(await screen.findByRole("textbox", { name: "Gebruikersnaam" })).toHaveValue("");
+    expect(screen.queryByRole("textbox", { name: "Volledige naam" })).not.toBeInTheDocument();
     expect(await screen.findByLabelText("Tijdelijk wachtwoord")).toHaveValue("");
 
-    await user.type(await screen.findByLabelText("Gebruikersnaam"), "NieuweGebruiker");
+    await user.type(await screen.findByRole("textbox", { name: "Gebruikersnaam" }), "NieuweGebruiker");
     await user.type(await screen.findByLabelText("Tijdelijk wachtwoord"), "Wachtwoord12");
 
     const submit = await screen.findByRole("button", { name: "Opslaan" });

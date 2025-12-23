@@ -3,7 +3,7 @@ use std::{future::Future, net::SocketAddr, str::FromStr};
 use airgap::AirgapDetection;
 use axum::{extract::FromRef, serve::ListenerExt};
 use sqlx::{
-    Sqlite, SqlitePool,
+    Sqlite, SqliteConnection, SqlitePool,
     sqlite::{SqliteConnectOptions, SqliteJournalMode},
 };
 use tokio::{net::TcpListener, signal};
@@ -30,10 +30,13 @@ pub mod router;
 pub mod summary;
 #[cfg(feature = "dev-database")]
 pub mod test_data_gen;
+pub mod util;
 pub mod zip;
 
 pub use app_error::AppError;
 pub use error::{APIError, ErrorResponse};
+
+use crate::app_error::{DatabaseErrorWithPath, DatabaseMigrationErrorWithPath};
 
 /// Maximum size of the request body in megabytes.
 pub const MAX_BODY_SIZE_MB: usize = 12;
@@ -61,11 +64,13 @@ pub struct AppState {
 }
 
 /// Start the API server on the given port, using the given database pool.
+#[allow(clippy::cognitive_complexity)]
 pub async fn start_server(
     pool: SqlitePool,
     listener: TcpListener,
     enable_airgap_detection: bool,
 ) -> Result<(), AppError> {
+    info!("Starting Abacus (version {})", env!("ABACUS_GIT_VERSION"));
     let airgap_detection = if enable_airgap_detection {
         info!("Airgap detection is enabled, starting airgap detection task...");
 
@@ -76,9 +81,9 @@ pub async fn start_server(
         AirgapDetection::nop()
     };
 
-    let app = router::create_router(pool, airgap_detection)?;
+    let app = router::create_router(pool.clone(), airgap_detection)?;
 
-    info!("Starting API server on http://{}", listener.local_addr()?);
+    info!("Starting Abacus on http://{}", listener.local_addr()?);
     let listener = listener.tap_io(|tcp_stream| {
         if let Err(err) = tcp_stream.set_nodelay(true) {
             trace!("failed to set TCP_NODELAY on incoming connection: {err:#}");
@@ -91,6 +96,11 @@ pub async fn start_server(
     )
     .with_graceful_shutdown(shutdown_signal())
     .await?;
+
+    // close the database, this will flush the shm and wal files for sqlite
+    pool.close().await;
+
+    info!("Abacus has shut down gracefully.");
 
     Ok(())
 }
@@ -110,18 +120,63 @@ pub async fn shutdown_signal() {
     #[cfg(unix)]
     let terminate = async {
         signal::unix::signal(signal::unix::SignalKind::terminate())
-            .expect("failed to install signal handler")
+            .expect("failed to install terminate signal handler")
             .recv()
             .await;
     };
 
-    #[cfg(not(unix))]
+    #[cfg(unix)]
+    let quit = async {
+        signal::unix::signal(signal::unix::SignalKind::quit())
+            .expect("failed to install quit signal handler")
+            .recv()
+            .await;
+    };
+
+    #[cfg(windows)]
+    let terminate = async {
+        signal::windows::ctrl_close()
+            .expect("failed to install CTRL_CLOSE handler")
+            .recv()
+            .await
+    };
+
+    #[cfg(windows)]
+    let quit = async {
+        signal::windows::ctrl_shutdown()
+            .expect("failed to install CTRL_SHUTDOWN handler")
+            .recv()
+            .await
+    };
+
+    #[cfg(not(any(unix, windows)))]
     let terminate = std::future::pending::<()>();
+
+    #[cfg(not(any(unix, windows)))]
+    let quit = std::future::pending::<()>();
 
     tokio::select! {
         _ = ctrl_c => {},
         _ = terminate => {},
+        _ = quit => {},
     }
+}
+
+/// Log that the application started and thereby check that the database is writeable
+/// This maps common sqlite errors to an AppError
+async fn log_app_started(conn: &mut SqliteConnection, db_path: &str) -> Result<(), AppError> {
+    Ok(audit_log::create(
+        conn,
+        &audit_log::AuditEvent::ApplicationStarted(audit_log::ApplicationStartedDetails {
+            version: env!("ABACUS_GIT_VERSION").to_string(),
+            commit: env!("ABACUS_GIT_REV").to_string(),
+        }),
+        None,
+        None,
+        None,
+    )
+    .await
+    .map_err(DatabaseErrorWithPath::with_path(db_path))?)
 }
 
 /// Create a SQLite database if needed, then connect to it and run migrations.
@@ -145,12 +200,21 @@ pub async fn create_sqlite_pool(
     }
 
     let pool = SqlitePool::connect_with(opts).await?;
-    sqlx::migrate!().run(&pool).await?;
+
+    // run database migrations, this creates the necessary tables if they don't exist yet
+    sqlx::migrate!()
+        .run(&pool)
+        .await
+        .map_err(DatabaseMigrationErrorWithPath::with_path(database))?;
 
     #[cfg(feature = "dev-database")]
     if seed_data {
         fixtures::seed_fixture_data(&pool).await?;
     }
+
+    // log startup event and verify the database is writeable
+    let mut connection = pool.acquire().await?;
+    log_app_started(&mut connection, database).await?;
 
     Ok(pool)
 }
@@ -160,6 +224,8 @@ mod test {
     use sqlx::SqlitePool;
     use test_log::test;
     use tokio::net::TcpListener;
+
+    use crate::{AppError, create_sqlite_pool};
 
     use super::start_server;
 
@@ -186,11 +252,11 @@ mod test {
         let _ = server_task.await;
     }
 
-    /// Test that Abacus server starts and the whoami endpoint returns 401 Unauthorized
+    /// Test that Abacus server starts and the account endpoint returns 401 Unauthorized
     #[test(sqlx::test)]
     async fn test_abacus_starts(pool: SqlitePool) {
         run_server_test(pool, |base_url| async move {
-            let result = reqwest::get(format!("{base_url}/api/whoami"))
+            let result = reqwest::get(format!("{base_url}/api/account"))
                 .await
                 .unwrap();
 
@@ -203,7 +269,7 @@ mod test {
     #[test(sqlx::test)]
     async fn test_security_headers(pool: SqlitePool) {
         run_server_test(pool, |base_url| async move {
-            let response = reqwest::get(format!("{base_url}/api/whoami"))
+            let response = reqwest::get(format!("{base_url}/api/account"))
                 .await
                 .unwrap();
 
@@ -266,7 +332,7 @@ mod test {
     #[test(sqlx::test)]
     async fn test_cache_headers(pool: SqlitePool) {
         run_server_test(pool, |base_url| async move {
-            let response = reqwest::get(format!("{base_url}/api/whoami"))
+            let response = reqwest::get(format!("{base_url}/api/account"))
                 .await
                 .unwrap();
             assert_eq!(response.headers()["cache-control"], "no-store");
@@ -303,12 +369,28 @@ mod test {
             assert_eq!(response.status(), 404);
 
             // Test that valid API endpoints still work
-            let response = reqwest::get(format!("{base_url}/api/whoami"))
+            let response = reqwest::get(format!("{base_url}/api/account"))
                 .await
                 .unwrap();
             // Should return 401 (Unauthorized) since we're not logged in
             assert_eq!(response.status(), 401);
         })
         .await;
+    }
+
+    #[test(tokio::test)]
+    async fn test_readonly_database_error() {
+        // Create a read-only in-memory database
+        let db_url = "sqlite::memory:?mode=ro";
+        let result = create_sqlite_pool(
+            db_url,
+            #[cfg(feature = "dev-database")]
+            false,
+            #[cfg(feature = "dev-database")]
+            false,
+        )
+        .await;
+
+        assert!(matches!(result, Err(AppError::DatabaseReadOnly(_))));
     }
 }

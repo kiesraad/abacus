@@ -17,6 +17,7 @@ import {
   CommitteeSessionStatusChangeRequestHandler,
   ElectionRequestHandler,
   ElectionStatusRequestHandler,
+  InvestigationListRequestHandler,
 } from "@/testing/api-mocks/RequestHandlers";
 import { getRouter, Router } from "@/testing/router";
 import { overrideOnce, server } from "@/testing/server";
@@ -69,7 +70,12 @@ const renderPage = () => {
 
 describe("ElectionReportPage", () => {
   beforeEach(() => {
-    server.use(CommitteeSessionStatusChangeRequestHandler, ElectionRequestHandler, ElectionStatusRequestHandler);
+    server.use(
+      CommitteeSessionStatusChangeRequestHandler,
+      InvestigationListRequestHandler,
+      ElectionRequestHandler,
+      ElectionStatusRequestHandler,
+    );
     vi.spyOn(ReactRouter, "useNavigate").mockImplementation(() => navigate);
     vi.spyOn(ReactRouter, "Navigate").mockImplementation((props) => {
       navigate(props.to);
@@ -91,15 +97,11 @@ describe("ElectionReportPage", () => {
   test("Shows page and click on back to overview", async () => {
     const user = userEvent.setup();
     const statusChange = spyOnHandler(CommitteeSessionStatusChangeRequestHandler);
-    overrideOnce(
-      "get",
-      "/api/elections/1",
-      200,
-      getElectionMockData(
-        {},
-        { status: "data_entry_finished", location: "Den Haag", start_date_time: "2026-03-18T21:36:00" },
-      ),
+    const electionData = getElectionMockData(
+      {},
+      { status: "data_entry_finished", location: "Den Haag", start_date_time: "2026-03-18T21:36:00" },
     );
+    overrideOnce("get", "/api/elections/1", 200, electionData);
 
     const router = renderPage();
 
@@ -114,7 +116,7 @@ describe("ElectionReportPage", () => {
     ).toBeVisible();
     expect(await screen.findByRole("link", { name: /Download definitieve documenten eerste zitting/ })).toBeVisible();
     expect(await screen.findByRole("link", { name: "Terug naar overzicht" })).toBeVisible();
-    expect(await screen.findByRole("button", { name: "Steminvoer hervatten" })).toBeVisible();
+    expect(await screen.findByRole("button", { name: "Invoer hervatten" })).toBeVisible();
 
     const backButton = screen.getByRole("link", { name: "Terug naar overzicht" });
     expect(backButton).toBeVisible();
@@ -127,15 +129,11 @@ describe("ElectionReportPage", () => {
   test("Shows page and click on resume data entry", async () => {
     const user = userEvent.setup();
     const statusChange = spyOnHandler(CommitteeSessionStatusChangeRequestHandler);
-    overrideOnce(
-      "get",
-      "/api/elections/1",
-      200,
-      getElectionMockData(
-        {},
-        { status: "data_entry_finished", location: "Den Haag", start_date_time: "2026-03-18T21:36:00" },
-      ),
+    const electionData = getElectionMockData(
+      {},
+      { status: "data_entry_finished", location: "Den Haag", start_date_time: "2026-03-18T21:36:00" },
     );
+    overrideOnce("get", "/api/elections/1", 200, electionData);
 
     renderPage();
 
@@ -151,7 +149,7 @@ describe("ElectionReportPage", () => {
     expect(await screen.findByRole("link", { name: /Download definitieve documenten eerste zitting/ })).toBeVisible();
     expect(await screen.findByRole("link", { name: "Terug naar overzicht" })).toBeVisible();
 
-    const resumeButton = screen.getByRole("button", { name: "Steminvoer hervatten" });
+    const resumeButton = screen.getByRole("button", { name: "Invoer hervatten" });
     expect(resumeButton).toBeVisible();
     await user.click(resumeButton);
 
@@ -185,7 +183,7 @@ describe("ElectionReportPage", () => {
     ).toBeVisible();
     expect(await screen.findByRole("link", { name: /Download definitieve documenten eerste zitting/ })).toBeVisible();
     expect(await screen.findByRole("link", { name: "Terug naar overzicht" })).toBeVisible();
-    expect(screen.queryByRole("button", { name: "Steminvoer hervatten" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Invoer hervatten" })).not.toBeInTheDocument();
   });
 
   test("Shows error page when resume data entry call returns an error", async () => {
@@ -235,7 +233,7 @@ describe("ElectionReportPage", () => {
     expect(await screen.findByRole("link", { name: /Download definitieve documenten eerste zitting/ })).toBeVisible();
     expect(await screen.findByRole("link", { name: "Terug naar overzicht" })).toBeVisible();
 
-    const resumeButton = screen.getByRole("button", { name: "Steminvoer hervatten" });
+    const resumeButton = screen.getByRole("button", { name: "Invoer hervatten" });
     expect(resumeButton).toBeVisible();
     await user.click(resumeButton);
 
@@ -281,7 +279,7 @@ describe("ElectionReportPage", () => {
     const router = renderPage();
     const electionData = getElectionMockData(
       {},
-      { status: "data_entry_finished", location: "Den Haag", start_date_time: "2026-03-18T21:36:00" },
+      { number: 2, status: "data_entry_finished", location: "Den Haag", start_date_time: "2026-03-18T21:36:00" },
     );
 
     // Set to second session and update investigations
@@ -309,7 +307,7 @@ describe("ElectionReportPage", () => {
       }),
     ).toBeVisible();
 
-    expect(screen.getByText("In het Zip bestand zitten drie documenten:")).toBeInTheDocument();
+    expect(screen.getByText("In het ZIP-bestand zitten drie documenten:")).toBeInTheDocument();
     expect(await screen.findByRole("link", { name: /Download definitieve documenten tweede zitting/ })).toBeVisible();
   });
 
@@ -317,7 +315,7 @@ describe("ElectionReportPage", () => {
     const router = renderPage();
     const electionData = getElectionMockData(
       {},
-      { status: "data_entry_finished", location: "Den Haag", start_date_time: "2026-03-18T21:36:00" },
+      { number: 2, status: "data_entry_finished", location: "Den Haag", start_date_time: "2026-03-18T21:36:00" },
     );
 
     // Set to second session and update investigations
@@ -345,7 +343,7 @@ describe("ElectionReportPage", () => {
       }),
     ).toBeVisible();
 
-    expect(screen.getByText("In het Zip bestand zit één document:")).toBeInTheDocument();
+    expect(screen.getByText("In het ZIP-bestand zit één document:")).toBeInTheDocument();
     expect(await screen.findByRole("link", { name: /Download definitieve documenten tweede zitting/ })).toBeVisible();
   });
 });

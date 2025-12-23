@@ -4,10 +4,13 @@ import { DataEntryModel, DataEntrySection, DataEntryStructure, InputGridSubsecti
 import { getCandidateFullName } from "@/utils/candidate";
 import { formatPoliticalGroupName } from "@/utils/politicalGroup";
 
-export const createVotersAndVotesSection = (election: ElectionWithPoliticalGroups): DataEntrySection => {
+export const createVotersAndVotesSection = (
+  model: DataEntryModel,
+  election: ElectionWithPoliticalGroups,
+): DataEntrySection => {
   const rowsPerPoliticalGroup: InputGridSubsectionRow[] = election.political_groups.map((politicalGroup, index) => ({
     code: `E.${politicalGroup.number}`,
-    path: `votes_counts.political_group_total_votes[${politicalGroup.number - 1}].total`,
+    path: `votes_counts.political_group_total_votes[${index}].total`,
     title: `${t("total")} ${formatPoliticalGroupName(politicalGroup)}`,
     addSeparator: index === election.political_groups.length - 1,
   }));
@@ -16,7 +19,7 @@ export const createVotersAndVotesSection = (election: ElectionWithPoliticalGroup
     id: "voters_votes_counts",
     title: t("voters_votes_counts.form_title"),
     short_title: t("voters_votes_counts.short_title"),
-    sectionNumber: t("voters_votes_counts.section_number"),
+    sectionNumber: t(`voters_votes_counts.section_number.${model}`),
     subsections: [
       {
         type: "inputGrid",
@@ -71,15 +74,15 @@ export const createVotersAndVotesSection = (election: ElectionWithPoliticalGroup
   };
 };
 
-export const differencesSection: DataEntrySection = {
+export const differencesSection = (model: DataEntryModel): DataEntrySection => ({
   id: "differences_counts",
   title: t("differences_counts.form_title"),
   short_title: t("differences_counts.short_title"),
-  sectionNumber: t("differences_counts.section_number"),
+  sectionNumber: t(`differences_counts.section_number.${model}`),
   subsections: [
     {
       type: "checkboxes",
-      title: tx("differences_counts.compare_votes_cast_admitted_voters.title"),
+      title: tx(`differences_counts.compare_votes_cast_admitted_voters.title.${model}`),
       short_title: t("differences_counts.compare_votes_cast_admitted_voters.short_title"),
       error_path: "differences_counts.compare_votes_cast_admitted_voters",
       error_message: t("differences_counts.validation_error"),
@@ -120,7 +123,7 @@ export const differencesSection: DataEntrySection = {
     },
     {
       type: "checkboxes",
-      title: tx("differences_counts.difference_completely_accounted_for.title"),
+      title: tx(`differences_counts.difference_completely_accounted_for.title.${model}`),
       short_title: t("differences_counts.difference_completely_accounted_for.short_title"),
       error_path: "differences_counts.difference_completely_accounted_for",
       error_message: t("differences_counts.validation_error"),
@@ -132,13 +135,15 @@ export const differencesSection: DataEntrySection = {
         },
         {
           path: "differences_counts.difference_completely_accounted_for.no",
-          label: t("no"),
-          short_label: t("no"),
+          label: t("differences_counts.difference_completely_accounted_for.no_there_is_an_unexplained_difference"),
+          short_label: t(
+            "differences_counts.difference_completely_accounted_for.no_there_is_an_unexplained_difference",
+          ),
         },
       ],
     },
   ],
-};
+});
 
 export const extraInvestigationSection: DataEntrySection = {
   id: "extra_investigation",
@@ -258,22 +263,22 @@ export const countingDifferencesPollingStation: DataEntrySection = {
  * @returns Array of DataEntrySection objects for each political group
  */
 export function createPoliticalGroupSections(election: ElectionWithPoliticalGroups): DataEntrySection[] {
-  return election.political_groups.map((politicalGroup: PoliticalGroup): DataEntrySection => {
+  return election.political_groups.map((politicalGroup: PoliticalGroup, pgIndex: number): DataEntrySection => {
     const rows: InputGridSubsectionRow[] = [];
 
     // Add candidate vote fields
-    politicalGroup.candidates.forEach((candidate, index) => {
+    politicalGroup.candidates.forEach((candidate, candidateIndex) => {
       rows.push({
         code: `${candidate.number}`,
-        path: `political_group_votes[${politicalGroup.number - 1}].candidate_votes[${index}].votes`,
+        path: `political_group_votes[${pgIndex}].candidate_votes[${candidateIndex}].votes`,
         title: getCandidateFullName(candidate),
-        autoFocusInput: index === 0,
-        addSeparator: (index + 1) % 25 === 0 && index + 1 !== politicalGroup.candidates.length,
+        autoFocusInput: candidateIndex === 0,
+        addSeparator: (candidateIndex + 1) % 25 === 0 && candidateIndex + 1 !== politicalGroup.candidates.length,
       });
     });
 
     rows.push({
-      path: `political_group_votes[${politicalGroup.number - 1}].total`,
+      path: `political_group_votes[${pgIndex}].total`,
       title: t("totals_list", { group_number: politicalGroup.number }),
       isListTotal: true,
     });
@@ -301,12 +306,16 @@ function buildDataEntryStructure(model: DataEntryModel, election: ElectionWithPo
       return [
         extraInvestigationSection,
         countingDifferencesPollingStation,
-        createVotersAndVotesSection(election),
-        differencesSection,
+        createVotersAndVotesSection(model, election),
+        differencesSection(model),
         ...createPoliticalGroupSections(election),
       ];
     case "CSONextSession":
-      return [createVotersAndVotesSection(election), differencesSection, ...createPoliticalGroupSections(election)];
+      return [
+        createVotersAndVotesSection(model, election),
+        differencesSection(model),
+        ...createPoliticalGroupSections(election),
+      ];
   }
 }
 

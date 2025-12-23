@@ -107,8 +107,9 @@ To use `cross` on Apple silicon, set the `CROSS_CONTAINER_OPTS` environment vari
 The following dependencies (crates) are used:
 
 - `argon2`: password hashing implementation (Argon2id).
-- `axum`: web application framework that focuses on ergonomics and modularity.
+- `async_zip`: creating a zip of the EML_NL and PDF PV.
 - `axum-extra`: handling for attachments and cookies in `axum`.
+- `axum`: web application framework that focuses on ergonomics and modularity.
 - `chrono`: date and time library.
 - `clap`: library for command-line argument parsing.
 - `cookie`: dependency of axum_extra, for encoding and parsing cookies.
@@ -117,23 +118,23 @@ The following dependencies (crates) are used:
 - `password_hash`: password hashing interfaces.
 - `quick-xml`: reading and writing EML_NL XML files.
 - `rand`: create a random session key.
-- `serde`: framework for serializing and deserializing data structures.
 - `serde_json`: JSON support for Serde.
+- `serde`: framework for serializing and deserializing data structures.
 - `sha2`: generating a hash of the EML_NL XML files for inclusion in the PDF.
+- `socket2`: Utilities for creating and using network sockets.
 - `sqlx`: async SQL library featuring compile-time checked queries.
-- `tokio`: runtime for writing asynchronous applications.
-- `tokio-util`: used for download streaming.
-- `tower`: a library of modular and reusable components for building robust networking clients and servers.
-- `tower-http`: Tower middleware and utilities for HTTP clients and servers.
-- `tracing`: a framework for instrumenting Rust programs to collect structured, event-based diagnostic information.
-- `tracing-subscriber`: utilities for implementing and composing `tracing` subscribers.
-- `typst`: a new markup-based typesetting system that is powerful and easy to learn.
-- `typst-pdf`: a PDF exporter for Typst.
-- `utoipa`: library for documenting REST APIs using OpenAPI.
-- `utoipa-swagger-ui`: Swagger UI for the OpenAPI specification.
-- `async_zip`: creating a zip of the EML_NL and PDF PV.
 - `strum`: Converting enums from their string representation and back
-
+- `tokio-util`: used for download streaming.
+- `tokio`: runtime for writing asynchronous applications.
+- `tower-http`: Tower middleware and utilities for HTTP clients and servers.
+- `tower`: a library of modular and reusable components for building robust networking clients and servers.
+- `tracing-subscriber`: utilities for implementing and composing `tracing` subscribers.
+- `tracing`: a framework for instrumenting Rust programs to collect structured, event-based diagnostic information.
+- `ttf-parser`: for parsing TrueType fonts.
+- `typst-pdf`: a PDF exporter for Typst.
+- `typst`: a new markup-based typesetting system that is powerful and easy to learn.
+- `utoipa-swagger-ui`: Swagger UI for the OpenAPI specification.
+- `utoipa`: library for documenting REST APIs using OpenAPI.
 
 Additionally, the following development dependencies are used:
 
@@ -191,10 +192,12 @@ Options:
   -p, --port <PORT>          Server port, optional [env: ABACUS_PORT=] [default: 8080]
   -d, --database <DATABASE>  Location of the database file, will be created if it doesn't exist [env: ABACUS_DATABASE=] [default: db.sqlite]
   -a, --airgap-detection     Enable airgap detection [env: ABACUS_AIRGAP_DETECTION=]
+  -V, --version              Show version
   -h, --help                 Print help
 ```
 
 Note that airgap-detection is forced in our (pre-)releases.
+For release builds the default port number is 80.
 
 A development build also supports the following arguments:
 

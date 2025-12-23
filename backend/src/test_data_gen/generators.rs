@@ -1,5 +1,7 @@
+#![allow(clippy::too_many_lines)]
+#![allow(clippy::cognitive_complexity)]
 use chrono::{Datelike, Days, NaiveDate, TimeDelta};
-use rand::{Rng, SeedableRng, rngs::StdRng, seq::IndexedRandom};
+use rand::{SeedableRng, rngs::StdRng, seq::IndexedRandom};
 use sqlx::SqlitePool;
 use std::error::Error;
 use tracing::info;
@@ -17,8 +19,8 @@ use crate::{
         status::{DataEntryStatus, Definitive, SecondEntryNotStarted},
     },
     election::{
-        CandidateGender, ElectionCategory, ElectionWithPoliticalGroups, NewElection,
-        PoliticalGroup, VoteCountingMethod,
+        CandidateGender, CandidateNumber, ElectionCategory, ElectionWithPoliticalGroups,
+        NewElection, PGNumber, PoliticalGroup, VoteCountingMethod,
     },
     polling_station::{PollingStation, PollingStationRequest, PollingStationType},
     test_data_gen::GenerateElectionArgs,
@@ -50,23 +52,12 @@ pub async fn create_test_election(
         CommitteeSessionCreateRequest {
             number: 1,
             election_id: election.id,
-            number_of_voters: 0,
         },
     )
     .await?;
 
-    let number_of_voters = rng.random_range(args.voters.clone());
-    committee_session.number_of_voters = number_of_voters;
-    crate::committee_session::repository::change_number_of_voters(
-        &mut tx,
-        committee_session.id,
-        number_of_voters,
-    )
-    .await?;
-
     // generate the polling stations for the election
-    let polling_stations =
-        generate_polling_stations(&mut rng, &committee_session, &election, &mut tx, &args).await;
+    let polling_stations = generate_polling_stations(&mut rng, &election, &mut tx, &args).await;
 
     info!(
         "Election generated with election id: {}, election name: '{}'",
@@ -133,7 +124,7 @@ fn generate_election(rng: &mut impl rand::Rng, args: &GenerateElectionArgs) -> N
     info!("Generating {num_political_groups} political groups");
 
     for i in 1..=num_political_groups {
-        political_groups.push(generate_political_party(rng, i, args));
+        political_groups.push(generate_political_party(rng, PGNumber::from(i), args));
     }
 
     // generate a nomination date, and an election date not too long afterward
@@ -165,6 +156,7 @@ fn generate_election(rng: &mut impl rand::Rng, args: &GenerateElectionArgs) -> N
         location: locality,
         category: ElectionCategory::Municipal,
         number_of_seats: rng.random_range(args.seats.clone()),
+        number_of_voters: rng.random_range(args.voters.clone()),
         election_date,
         nomination_date,
         political_groups,
@@ -174,7 +166,7 @@ fn generate_election(rng: &mut impl rand::Rng, args: &GenerateElectionArgs) -> N
 /// Generate a single political party using the limits from args
 fn generate_political_party(
     rng: &mut impl rand::Rng,
-    pg_number: u32,
+    pg_number: PGNumber,
     args: &GenerateElectionArgs,
 ) -> PoliticalGroup {
     let mut candidates = vec![];
@@ -192,7 +184,7 @@ fn generate_political_party(
         let initials = super::data::initials(rng, first_name.as_deref());
         let (prefix, last_name) = super::data::last_name(rng);
         candidates.push(crate::election::Candidate {
-            number: i,
+            number: CandidateNumber::from(i),
             initials,
             first_name,
             last_name_prefix: prefix.map(ToOwned::to_owned),
@@ -218,7 +210,6 @@ fn generate_political_party(
 /// Generate the polling stations for the given election using the limits from args
 async fn generate_polling_stations(
     rng: &mut impl rand::Rng,
-    committee_session: &CommitteeSession,
     election: &ElectionWithPoliticalGroups,
     conn: &mut sqlx::SqliteConnection,
     args: &GenerateElectionArgs,
@@ -227,7 +218,7 @@ async fn generate_polling_stations(
     info!("Generating {number_of_ps} polling stations for election");
 
     let mut polling_stations = vec![];
-    let mut remaining_voters = committee_session.number_of_voters;
+    let mut remaining_voters = election.number_of_voters;
     for i in 1..=number_of_ps {
         // compute a some somewhat distributed number of voters for each polling station
         let remaining_ps = number_of_ps - i + 1;
@@ -248,8 +239,8 @@ async fn generate_polling_stations(
             election.id,
             PollingStationRequest {
                 name: super::data::polling_station_name(rng),
-                number: Some(i64::from(i)),
-                number_of_voters: Some(ps_num_voters.into()),
+                number: Some(i),
+                number_of_voters: Some(ps_num_voters),
                 polling_station_type: Some(PollingStationType::FixedLocation),
                 address: super::data::address(rng),
                 postal_code: super::data::postal_code(rng),
@@ -292,13 +283,14 @@ async fn generate_data_entry(
 
             // extract number of voters from polling station, or generate some approx default
             let voters_available = ps.number_of_voters.unwrap_or_else(|| {
-                committee_session.number_of_voters as i64 / polling_stations.len() as i64
+                election.number_of_voters / u32::try_from(polling_stations.len()).expect(
+                    "Failed to convert polling station length to u32 for voter count estimation",
+                )
             });
 
             // number of voters that actually came and voted
-            let turnout = rng.random_range(args.turnout.clone()) as i64;
-            let voters_turned_out = u32::try_from((voters_available * turnout) / 100)
-                .expect("Failed to convert voters turned out to u32");
+            let turnout = rng.random_range(args.turnout.clone());
+            let voters_turned_out = (voters_available * turnout) / 100;
 
             let candidate_slope =
                 rng.random_range(args.candidate_distribution_slope.clone()) as f64 / 1000.0;
@@ -337,6 +329,7 @@ async fn generate_data_entry(
                     first_entry_user_id: 5,  // first typist from users in fixtures
                     second_entry_user_id: 6, // second typist from users in fixtures
                     finished_at: ts,
+                    finalised_with_warnings: validation_results.has_warnings(),
                 });
 
                 crate::data_entry::repository::make_definitive(
@@ -355,6 +348,7 @@ async fn generate_data_entry(
                     first_entry_user_id: 5, // first typist from users in fixtures
                     finalised_first_entry: results.clone(),
                     first_entry_finished_at: ts,
+                    finalised_with_warnings: validation_results.has_warnings(),
                 });
                 crate::data_entry::repository::upsert(conn, ps.id, committee_session.id, &state)
                     .await

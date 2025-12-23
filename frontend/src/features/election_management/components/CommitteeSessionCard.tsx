@@ -170,7 +170,6 @@ export function CommitteeSessionCard({
       }
       break;
     case "data_entry_paused":
-      addIf(investigationsButtonLink, isCurrentSession && isNextSession);
       addIf(
         {
           id: committeeSession.id,
@@ -179,6 +178,7 @@ export function CommitteeSessionCard({
         },
         isCurrentSession,
       );
+      addIf(investigationsButtonLink, isCurrentSession && isNextSession);
       addIf(detailsButtonLink, isCurrentSession && isCoordinator);
       break;
     case "data_entry_finished":

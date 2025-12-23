@@ -20,10 +20,10 @@ import {
 } from "@/types/generated/openapi";
 
 import { DataEntryApiClient } from "./helpers-utils/api-clients";
-import { completePollingStationDataEntries, loginAs } from "./helpers-utils/e2e-test-api-helpers";
+import { completePollingStationDataEntries } from "./helpers-utils/e2e-test-api-helpers";
 import { createRandomUsername } from "./helpers-utils/e2e-test-utils";
 import { EmlTestFile, generateEml } from "./helpers-utils/file-helpers";
-import { eml110a, eml230b } from "./test-data/eml-files";
+import { eml110a, Eml230b, eml230b } from "./test-data/eml-files";
 import {
   dataEntryRequest,
   dataEntryWithDifferencesRequest,
@@ -35,12 +35,15 @@ export const FIXTURE_TYPIST_TEMP_PASSWORD: string = "temp_password_9876";
 
 // Regular fixtures need to be passed into the test's arguments.
 type Fixtures = {
+  // page and request fixture for admin
+  admin: { page: Page; request: APIRequestContext };
   // page and request fixture for coordinator
   coordinator: { page: Page; request: APIRequestContext };
   // page and request fixture for typist one
   typistOne: { page: Page; request: APIRequestContext };
   // page and request fixture for typist two
   typistTwo: { page: Page; request: APIRequestContext };
+  eml230b: Eml230b;
   // Election without polling stations
   emptyElection: Election;
   // Election with two polling stations
@@ -74,6 +77,12 @@ type Fixtures = {
 };
 
 export const test = base.extend<Fixtures>({
+  admin: async ({ browser }, use) => {
+    const context = await browser.newContext({ storageState: "e2e-tests/state/admin1.json" });
+    const page = await context.newPage();
+    await use({ page: page, request: context.request });
+    await context.close();
+  },
   coordinator: async ({ browser }, use) => {
     const context = await browser.newContext({ storageState: "e2e-tests/state/coordinator1.json" });
     const page = await context.newPage();
@@ -94,14 +103,14 @@ export const test = base.extend<Fixtures>({
   },
   pollingStationFirstEntryClaimed: async ({ typistOne, pollingStation }, use) => {
     const { request } = typistOne;
-    await loginAs(request, "typist1");
 
     const firstDataEntry = new DataEntryApiClient(request, pollingStation.id, 1);
     await firstDataEntry.claim();
     await use(pollingStation);
   },
-  emptyElection: async ({ request }, use) => {
-    await loginAs(request, "admin1");
+  eml230b: [eml230b, { option: true }],
+  emptyElection: async ({ admin, eml230b }, use) => {
+    const { request } = admin;
     const url: ELECTION_IMPORT_REQUEST_PATH = `/api/elections/import`;
     const election_data = await readFile(eml110a.path, "utf8");
     const candidate_data = await readFile(eml230b.path, "utf8");
@@ -120,26 +129,24 @@ export const test = base.extend<Fixtures>({
 
     await use(election);
   },
-  election: async ({ request, emptyElection }, use) => {
-    await loginAs(request, "admin1");
+  election: async ({ admin, coordinator, emptyElection }, use) => {
     // create polling stations in the existing emptyElection
     const url: POLLING_STATION_CREATE_REQUEST_PATH = `/api/elections/${emptyElection.id}/polling_stations`;
     for (const pollingStationRequest of pollingStationRequests) {
-      const pollingStationResponse = await request.post(url, { data: pollingStationRequest });
+      const pollingStationResponse = await admin.request.post(url, { data: pollingStationRequest });
       expect(pollingStationResponse.ok()).toBeTruthy();
     }
 
     // get election details
     const electionUrl: ELECTION_DETAILS_REQUEST_PATH = `/api/elections/${emptyElection.id}`;
-    const electionResponse = await request.get(electionUrl);
+    const electionResponse = await admin.request.get(electionUrl);
     expect(electionResponse.ok()).toBeTruthy();
     const response = (await electionResponse.json()) as ElectionDetailsResponse;
 
     // Set committee session status to DataEntryInProgress
-    await loginAs(request, "coordinator1");
     const statusChangeUrl: COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_PATH = `/api/elections/${response.current_committee_session.election_id}/committee_sessions/${response.current_committee_session.id}/status`;
     const statusChangeData: COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_BODY = { status: "data_entry_in_progress" };
-    const statusChangeResponse = await request.put(statusChangeUrl, { data: statusChangeData });
+    const statusChangeResponse = await coordinator.request.put(statusChangeUrl, { data: statusChangeData });
     expect(statusChangeResponse.ok()).toBeTruthy();
 
     // Fill in committee session details
@@ -149,13 +156,13 @@ export const test = base.extend<Fixtures>({
       start_date: "2026-03-18",
       start_time: "21:45",
     };
-    const detailsUpdateResponse = await request.put(detailsUpdateUrl, { data: detailsUpdateData });
+    const detailsUpdateResponse = await coordinator.request.put(detailsUpdateUrl, { data: detailsUpdateData });
     expect(detailsUpdateResponse.ok()).toBeTruthy();
 
     await use(response);
   },
-  pollingStation: async ({ request, election }, use) => {
-    await loginAs(request, "admin1");
+  pollingStation: async ({ admin, election }, use) => {
+    const { request } = admin;
     // get the first polling station of the existing election
     const url: POLLING_STATION_GET_REQUEST_PATH = `/api/elections/${election.election.id}/polling_stations/${election.polling_stations[0]?.id ?? 0}`;
     const response = await request.get(url);
@@ -164,8 +171,8 @@ export const test = base.extend<Fixtures>({
 
     await use(pollingStation);
   },
-  pollingStationFirstEntryDone: async ({ request, pollingStation }, use) => {
-    await loginAs(request, "typist1");
+  pollingStationFirstEntryDone: async ({ pollingStation, typistOne }, use) => {
+    const { request } = typistOne;
 
     const firstDataEntry = new DataEntryApiClient(request, pollingStation.id, 1);
     await firstDataEntry.claim();
@@ -174,8 +181,8 @@ export const test = base.extend<Fixtures>({
 
     await use(pollingStation);
   },
-  pollingStationFirstEntryHasErrors: async ({ request, pollingStation }, use) => {
-    await loginAs(request, "typist1");
+  pollingStationFirstEntryHasErrors: async ({ pollingStation, typistOne }, use) => {
+    const { request } = typistOne;
 
     const firstDataEntry = new DataEntryApiClient(request, pollingStation.id, 1);
     await firstDataEntry.claim();
@@ -184,30 +191,37 @@ export const test = base.extend<Fixtures>({
 
     await use(pollingStation);
   },
-  pollingStationDefinitive: async ({ request, pollingStation }, use) => {
-    await completePollingStationDataEntries(request, pollingStation.id);
+  pollingStationDefinitive: async ({ pollingStation, typistOne, typistTwo }, use) => {
+    await completePollingStationDataEntries(pollingStation.id, typistOne.request, typistTwo.request);
 
     await use(pollingStation);
   },
-  pollingStationEntriesDifferent: async ({ request, pollingStation }, use) => {
+  pollingStationEntriesDifferent: async ({ pollingStation, typistOne, typistTwo }, use) => {
     await completePollingStationDataEntries(
-      request,
       pollingStation.id,
+      typistOne.request,
+      typistTwo.request,
       dataEntryRequest,
       dataEntryWithDifferencesRequest,
     );
 
     await use(pollingStation);
   },
-  pollingStationEntriesDifferentWithErrors: async ({ request, pollingStation }, use) => {
-    await completePollingStationDataEntries(request, pollingStation.id, dataEntryRequest, dataEntryWithErrorRequest);
+  pollingStationEntriesDifferentWithErrors: async ({ pollingStation, typistOne, typistTwo }, use) => {
+    await completePollingStationDataEntries(
+      pollingStation.id,
+      typistOne.request,
+      typistTwo.request,
+      dataEntryRequest,
+      dataEntryWithErrorRequest,
+    );
 
     await use(pollingStation);
   },
-  completedElection: async ({ request, election }, use) => {
+  completedElection: async ({ election, typistOne, typistTwo }, use) => {
     // finalise both data entries for all polling stations
     for (const pollingStationId of election.polling_stations.map((ps) => ps.id)) {
-      await completePollingStationDataEntries(request, pollingStationId);
+      await completePollingStationDataEntries(pollingStationId, typistOne.request, typistTwo.request);
     }
 
     await use(election.election);
@@ -215,10 +229,10 @@ export const test = base.extend<Fixtures>({
   currentCommitteeSession: async ({ election }, use) => {
     await use(election.current_committee_session);
   },
-  newTypist: async ({ request }, use) => {
-    await loginAs(request, "admin1");
+  newTypist: async ({ admin }, use) => {
+    const { request } = admin;
     // create a new user
-    const url: USER_CREATE_REQUEST_PATH = "/api/user";
+    const url: USER_CREATE_REQUEST_PATH = "/api/users";
     const data: USER_CREATE_REQUEST_BODY = {
       role: "typist",
       username: createRandomUsername(),

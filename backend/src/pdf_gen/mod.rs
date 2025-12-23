@@ -34,8 +34,8 @@ pub(crate) mod tests {
     use crate::{
         committee_session::tests::committee_session_fixture,
         election::{
-            ElectionCategory, ElectionWithPoliticalGroups, VoteCountingMethod,
-            tests::election_fixture,
+            ElectionCategory, ElectionId, ElectionWithPoliticalGroups, VoteCountingMethod,
+            structs::tests::election_fixture,
         },
         pdf_gen::{
             models::{PdfFileModel, PdfModel, ToPdfFileModel},
@@ -48,7 +48,7 @@ pub(crate) mod tests {
     pub fn polling_stations_fixture(
         election: &ElectionWithPoliticalGroups,
         committee_session_id: u32,
-        polling_station_voter_count: &[i64],
+        polling_station_voter_count: &[u32],
     ) -> Vec<PollingStation> {
         let mut polling_stations = Vec::new();
         for (i, voter_count) in polling_station_voter_count.iter().enumerate() {
@@ -60,11 +60,7 @@ pub(crate) mod tests {
                 id_prev_session: None,
                 name: format!("Testplek {idx}"),
                 number: u32::try_from(idx).unwrap() + 30,
-                number_of_voters: if *voter_count < 0 {
-                    None
-                } else {
-                    Some(*voter_count)
-                },
+                number_of_voters: Some(*voter_count),
                 polling_station_type: Some(PollingStationType::Special),
                 address: "Teststraat 2a".to_string(),
                 postal_code: "1234 QY".to_string(),
@@ -77,7 +73,7 @@ pub(crate) mod tests {
     #[test(tokio::test)]
     async fn it_generates_a_pdf() {
         let election = ElectionWithPoliticalGroups {
-            id: 1,
+            id: ElectionId::from(1),
             name: "Municipal Election".to_string(),
             counting_method: VoteCountingMethod::CSO,
             election_id: "MunicipalElection_2025".to_string(),
@@ -85,6 +81,7 @@ pub(crate) mod tests {
             domain_id: "0000".to_string(),
             category: ElectionCategory::Municipal,
             number_of_seats: 29,
+            number_of_voters: 25000,
             election_date: Utc::now().date_naive(),
             nomination_date: Utc::now().date_naive(),
             political_groups: vec![],
@@ -93,7 +90,7 @@ pub(crate) mod tests {
         let content = generate_pdf(ModelNa31_2Input {
             summary: ElectionSummary::zero().into(),
             votes_tables: VotesTables::new(&election, &ElectionSummary::zero()).unwrap(),
-            committee_session: committee_session_fixture(1),
+            committee_session: committee_session_fixture(ElectionId::from(1)),
             election: election.into(),
             polling_stations: vec![],
             hash: "ed36 60eb 017a 0d3a d3ef 72b1 6865 f991 a36a 9f92 72d9 1516 39cd 422b 4756 d161"

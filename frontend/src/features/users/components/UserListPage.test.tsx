@@ -21,17 +21,17 @@ describe("PollingStationListPage", () => {
     expect(table).toBeVisible();
     expect(table).toHaveTableContent([
       ["Gebruikersnaam", "Rol", "Volledige naam", "Laatste activiteit"],
-      ["Sanne", "Beheerder", "Sanne Molenaar", "vandaag 10:20"],
-      ["Jayden", "Coördinator", "Jayden Ahmen", "gisteren 10:20"],
-      ["Gebruiker01", "Invoerder", "Nog niet gebruikt", "–"],
-      ["Gebruiker02", "Invoerder", "Nog niet gebruikt", "–"],
-      ["Gebruiker03", "Invoerder", "Nog niet gebruikt", "–"],
+      ["Sanne", "Beheerder", "Sanne Molenaar", "vandaag om 10:20"],
+      ["Jayden", "Coördinator", "Jayden Ahmen", "gisteren om 10:20"],
+      ["Gebruiker01", "Invoerder", "Account nog niet gebruikt", "–"],
+      ["Gebruiker02", "Invoerder", "Account nog niet gebruikt", "–"],
+      ["Gebruiker03", "Invoerder", "Account nog niet gebruikt", "–"],
     ]);
   });
 
   test("Show users - table sorts data by default", async () => {
     const users = [userMockData[2], userMockData[1], userMockData[4], userMockData[0], userMockData[3]];
-    overrideOnce("get", "/api/user", 200, { users });
+    overrideOnce("get", "/api/users", 200, { users });
     render(<UserListPage />);
 
     expect(await screen.findByRole("heading", { level: 1, name: "Gebruikers beheren" })).toBeVisible();
@@ -40,11 +40,11 @@ describe("PollingStationListPage", () => {
     expect(table).toBeVisible();
     expect(table).toHaveTableContent([
       ["Gebruikersnaam", "Rol", "Volledige naam", "Laatste activiteit"],
-      ["Sanne", "Beheerder", "Sanne Molenaar", "vandaag 10:20"],
-      ["Jayden", "Coördinator", "Jayden Ahmen", "gisteren 10:20"],
-      ["Gebruiker01", "Invoerder", "Nog niet gebruikt", "–"],
-      ["Gebruiker02", "Invoerder", "Nog niet gebruikt", "–"],
-      ["Gebruiker03", "Invoerder", "Nog niet gebruikt", "–"],
+      ["Sanne", "Beheerder", "Sanne Molenaar", "vandaag om 10:20"],
+      ["Jayden", "Coördinator", "Jayden Ahmen", "gisteren om 10:20"],
+      ["Gebruiker01", "Invoerder", "Account nog niet gebruikt", "–"],
+      ["Gebruiker02", "Invoerder", "Account nog niet gebruikt", "–"],
+      ["Gebruiker03", "Invoerder", "Account nog niet gebruikt", "–"],
     ]);
   });
 });

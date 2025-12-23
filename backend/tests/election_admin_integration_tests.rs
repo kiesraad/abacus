@@ -1,13 +1,13 @@
 #![cfg(test)]
 
-use abacus::{
-    committee_session::status::CommitteeSessionStatus,
-    election::{ElectionDefinitionValidateResponse, ElectionWithPoliticalGroups},
-};
 use axum::http::StatusCode;
 use sqlx::SqlitePool;
 use test_log::test;
-use utils::serve_api;
+
+use crate::{
+    shared::{admin_login, get_election_details},
+    utils::serve_api,
+};
 
 pub mod shared;
 pub mod utils;
@@ -17,7 +17,7 @@ async fn test_election_validate_valid(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 
     let url = format!("http://{addr}/api/elections/import/validate");
-    let admin_cookie = shared::admin_login(&addr).await;
+    let admin_cookie = admin_login(&addr).await;
     let response = reqwest::Client::new()
         .post(&url)
         .header("cookie", admin_cookie)
@@ -37,7 +37,7 @@ async fn test_election_validate_invalid_election_subcategory(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 
     let url = format!("http://{addr}/api/elections/import/validate");
-    let admin_cookie = shared::admin_login(&addr).await;
+    let admin_cookie = admin_login(&addr).await;
     let response = reqwest::Client::new()
         .post(&url)
         .header("cookie", admin_cookie)
@@ -57,7 +57,7 @@ async fn test_election_validate_invalid_election_number_of_seats(pool: SqlitePoo
     let addr = serve_api(pool).await;
 
     let url = format!("http://{addr}/api/elections/import/validate");
-    let admin_cookie = shared::admin_login(&addr).await;
+    let admin_cookie = admin_login(&addr).await;
     let response = reqwest::Client::new()
         .post(&url)
         .header("cookie", admin_cookie)
@@ -77,7 +77,7 @@ async fn test_election_validate_invalid_xml(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 
     let url = format!("http://{addr}/api/elections/import/validate");
-    let admin_cookie = shared::admin_login(&addr).await;
+    let admin_cookie = admin_login(&addr).await;
     let response = reqwest::Client::new()
         .post(&url)
         .header("cookie", admin_cookie)
@@ -95,7 +95,7 @@ async fn test_election_validate_invalid_xml(pool: SqlitePool) {
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("users"))))]
 async fn test_election_candidates_validate_valid(pool: SqlitePool) {
     let addr = serve_api(pool).await;
-    let admin_cookie = shared::admin_login(&addr).await;
+    let admin_cookie = admin_login(&addr).await;
     let url = format!("http://{addr}/api/elections/import/validate");
     let response = reqwest::Client::new()
         .post(&url)
@@ -123,7 +123,7 @@ async fn test_election_candidates_validate_wrong_file(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 
     let url = format!("http://{addr}/api/elections/import/validate");
-    let admin_cookie = shared::admin_login(&addr).await;
+    let admin_cookie = admin_login(&addr).await;
     let response = reqwest::Client::new()
         .post(&url)
         .header("cookie", admin_cookie)
@@ -149,7 +149,7 @@ async fn test_election_candidates_validate_missing_authority(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 
     let url = format!("http://{addr}/api/elections/import/validate");
-    let admin_cookie = shared::admin_login(&addr).await;
+    let admin_cookie = admin_login(&addr).await;
     let response = reqwest::Client::new()
         .post(&url)
         .header("cookie", admin_cookie)
@@ -175,7 +175,7 @@ async fn test_election_candidates_validate_wrong_election_type(pool: SqlitePool)
     let addr = serve_api(pool).await;
 
     let url = format!("http://{addr}/api/elections/import/validate");
-    let admin_cookie = shared::admin_login(&addr).await;
+    let admin_cookie = admin_login(&addr).await;
     let response = reqwest::Client::new()
         .post(&url)
         .header("cookie", admin_cookie)
@@ -201,7 +201,7 @@ async fn test_election_candidates_validate_wrong_election_id(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 
     let url = format!("http://{addr}/api/elections/import/validate");
-    let admin_cookie = shared::admin_login(&addr).await;
+    let admin_cookie = admin_login(&addr).await;
     let response = reqwest::Client::new()
         .post(&url)
         .header("cookie", admin_cookie)
@@ -227,7 +227,7 @@ async fn test_election_candidates_validate_missing_election_domain(pool: SqliteP
     let addr = serve_api(pool).await;
 
     let url = format!("http://{addr}/api/elections/import/validate");
-    let admin_cookie = shared::admin_login(&addr).await;
+    let admin_cookie = admin_login(&addr).await;
     let response = reqwest::Client::new()
         .post(&url)
         .header("cookie", admin_cookie)
@@ -253,7 +253,7 @@ async fn test_election_candidates_validate_wrong_domain_id(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 
     let url = format!("http://{addr}/api/elections/import/validate");
-    let admin_cookie = shared::admin_login(&addr).await;
+    let admin_cookie = admin_login(&addr).await;
     let response = reqwest::Client::new()
         .post(&url)
         .header("cookie", admin_cookie)
@@ -279,7 +279,7 @@ async fn test_election_candidates_validate_wrong_election_date(pool: SqlitePool)
     let addr = serve_api(pool).await;
 
     let url = format!("http://{addr}/api/elections/import/validate");
-    let admin_cookie = shared::admin_login(&addr).await;
+    let admin_cookie = admin_login(&addr).await;
     let response = reqwest::Client::new()
         .post(&url)
         .header("cookie", admin_cookie)
@@ -305,7 +305,7 @@ async fn test_election_candidates_validate_empty_affiliates(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 
     let url = format!("http://{addr}/api/elections/import/validate");
-    let admin_cookie = shared::admin_login(&addr).await;
+    let admin_cookie = admin_login(&addr).await;
     let response = reqwest::Client::new()
         .post(&url)
         .header("cookie", admin_cookie)
@@ -331,7 +331,7 @@ async fn test_election_candidates_validate_empty_candidates(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 
     let url = format!("http://{addr}/api/elections/import/validate");
-    let admin_cookie = shared::admin_login(&addr).await;
+    let admin_cookie = admin_login(&addr).await;
     let response = reqwest::Client::new()
         .post(&url)
         .header("cookie", admin_cookie)
@@ -359,7 +359,7 @@ async fn test_election_import_save_with_polling_stations(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 
     let url = format!("http://{addr}/api/elections/import");
-    let admin_cookie = shared::admin_login(&addr).await;
+    let admin_cookie = admin_login(&addr).await;
     let response = reqwest::Client::new()
         .post(&url)
         .header("cookie", &admin_cookie)
@@ -388,12 +388,18 @@ async fn test_election_import_save_with_polling_stations(pool: SqlitePool) {
         .unwrap();
 
     assert_eq!(response.status(), StatusCode::CREATED);
-    let body: ElectionWithPoliticalGroups = response.json().await.unwrap();
-    let committee_session =
-        shared::get_election_committee_session(&addr, &admin_cookie, body.id).await;
+    let body: serde_json::Value = response.json().await.unwrap();
+    let election_details = get_election_details(
+        &addr,
+        &admin_cookie,
+        u32::try_from(body["id"].as_u64().unwrap()).unwrap(),
+    )
+    .await;
+    assert_eq!(election_details["election"]["counting_method"], "CSO");
+    assert_eq!(election_details["election"]["number_of_voters"], 1234);
     assert_eq!(
-        committee_session.status,
-        CommitteeSessionStatus::DataEntryNotStarted,
+        election_details["current_committee_session"]["status"],
+        "data_entry_not_started"
     );
 }
 
@@ -402,7 +408,7 @@ async fn test_election_import_save_without_polling_stations(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 
     let url = format!("http://{addr}/api/elections/import");
-    let admin_cookie = shared::admin_login(&addr).await;
+    let admin_cookie = admin_login(&addr).await;
     let response = reqwest::Client::new()
         .post(&url)
         .header("cookie", &admin_cookie)
@@ -429,10 +435,19 @@ async fn test_election_import_save_without_polling_stations(pool: SqlitePool) {
         .unwrap();
 
     assert_eq!(response.status(), StatusCode::CREATED);
-    let body: ElectionWithPoliticalGroups = response.json().await.unwrap();
-    let committee_session =
-        shared::get_election_committee_session(&addr, &admin_cookie, body.id).await;
-    assert_eq!(committee_session.status, CommitteeSessionStatus::Created);
+    let body: serde_json::Value = response.json().await.unwrap();
+    let election_details = get_election_details(
+        &addr,
+        &admin_cookie,
+        u32::try_from(body["id"].as_u64().unwrap()).unwrap(),
+    )
+    .await;
+    assert_eq!(election_details["election"]["counting_method"], "CSO");
+    assert_eq!(election_details["election"]["number_of_voters"], 1234);
+    assert_eq!(
+        election_details["current_committee_session"]["status"],
+        "created"
+    );
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("users"))))]
@@ -440,7 +455,7 @@ async fn test_election_import_save_empty_stubs(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 
     let url = format!("http://{addr}/api/elections/import");
-    let admin_cookie = shared::admin_login(&addr).await;
+    let admin_cookie = admin_login(&addr).await;
     let response = reqwest::Client::new()
         .post(&url)
         .header("cookie", admin_cookie)
@@ -476,7 +491,7 @@ async fn test_election_import_save_empty_candidate_stubs(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 
     let url = format!("http://{addr}/api/elections/import");
-    let admin_cookie = shared::admin_login(&addr).await;
+    let admin_cookie = admin_login(&addr).await;
     let response = reqwest::Client::new()
         .post(&url)
         .header("cookie", admin_cookie)
@@ -512,7 +527,7 @@ async fn test_election_import_save_wrong_hash(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 
     let url = format!("http://{addr}/api/elections/import");
-    let admin_cookie = shared::admin_login(&addr).await;
+    let admin_cookie = admin_login(&addr).await;
     let response = reqwest::Client::new()
         .post(&url)
         .header("cookie", admin_cookie)
@@ -548,7 +563,7 @@ async fn test_election_import_missing_file_name(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 
     let url = format!("http://{addr}/api/elections/import");
-    let admin_cookie = shared::admin_login(&addr).await;
+    let admin_cookie = admin_login(&addr).await;
     let response = reqwest::Client::new()
         .post(&url)
         .header("cookie", admin_cookie)
@@ -581,7 +596,7 @@ async fn test_election_import_missing_file_name(pool: SqlitePool) {
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("users"))))]
 async fn test_election_polling_stations_not_matching_election(pool: SqlitePool) {
     let addr = serve_api(pool).await;
-    let admin_cookie = shared::admin_login(&addr).await;
+    let admin_cookie = admin_login(&addr).await;
     let url = format!("http://{addr}/api/elections/import/validate");
     let response = reqwest::Client::new()
         .post(&url)
@@ -612,20 +627,14 @@ async fn test_election_polling_stations_not_matching_election(pool: SqlitePool) 
 
     // Ensure the response is what we expect
     assert_eq!(response.status(), StatusCode::OK);
-    assert_eq!(
-        response
-            .json::<ElectionDefinitionValidateResponse>()
-            .await
-            .unwrap()
-            .polling_station_definition_matches_election,
-        Some(false)
-    );
+    let body: serde_json::Value = response.json().await.unwrap();
+    assert_eq!(body["polling_station_definition_matches_election"], false);
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("users"))))]
 async fn test_election_polling_stations_validate_valid(pool: SqlitePool) {
     let addr = serve_api(pool).await;
-    let admin_cookie = shared::admin_login(&addr).await;
+    let admin_cookie = admin_login(&addr).await;
     let url = format!("http://{addr}/api/elections/import/validate");
     let response = reqwest::Client::new()
         .post(&url)
@@ -656,20 +665,14 @@ async fn test_election_polling_stations_validate_valid(pool: SqlitePool) {
 
     // Ensure the response is what we expect
     assert_eq!(response.status(), StatusCode::OK);
-    assert_eq!(
-        response
-            .json::<ElectionDefinitionValidateResponse>()
-            .await
-            .unwrap()
-            .polling_station_definition_matches_election,
-        Some(true)
-    );
+    let body: serde_json::Value = response.json().await.unwrap();
+    assert_eq!(body["polling_station_definition_matches_election"], true);
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("users"))))]
 async fn test_election_polling_stations_validate_missing_filename(pool: SqlitePool) {
     let addr = serve_api(pool).await;
-    let admin_cookie = shared::admin_login(&addr).await;
+    let admin_cookie = admin_login(&addr).await;
     let url = format!("http://{addr}/api/elections/import/validate");
     let response = reqwest::Client::new()
         .post(&url)
@@ -702,7 +705,7 @@ async fn test_election_polling_stations_validate_missing_filename(pool: SqlitePo
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("users"))))]
 async fn test_election_polling_stations_validate_invalid(pool: SqlitePool) {
     let addr = serve_api(pool).await;
-    let admin_cookie = shared::admin_login(&addr).await;
+    let admin_cookie = admin_login(&addr).await;
     let url = format!("http://{addr}/api/elections/import/validate");
     let response = reqwest::Client::new()
         .post(&url)

@@ -3,6 +3,8 @@
 /** PATHS **/
 
 // /api/account
+export type ACCOUNT_REQUEST_PARAMS = Record<string, never>;
+export type ACCOUNT_REQUEST_PATH = `/api/account`;
 export type ACCOUNT_UPDATE_REQUEST_PARAMS = Record<string, never>;
 export type ACCOUNT_UPDATE_REQUEST_PATH = `/api/account`;
 export type ACCOUNT_UPDATE_REQUEST_BODY = AccountUpdateRequest;
@@ -23,123 +25,136 @@ export type ELECTION_IMPORT_VALIDATE_REQUEST_BODY = ElectionAndCandidateDefiniti
 
 // /api/elections/{election_id}
 export interface ELECTION_DETAILS_REQUEST_PARAMS {
-  election_id: number;
+  election_id: ElectionId;
 }
-export type ELECTION_DETAILS_REQUEST_PATH = `/api/elections/${number}`;
+export type ELECTION_DETAILS_REQUEST_PATH = `/api/elections/${ElectionId}`;
 
 // /api/elections/{election_id}/committee_sessions
 export interface COMMITTEE_SESSION_CREATE_REQUEST_PARAMS {
-  election_id: number;
+  election_id: ElectionId;
 }
-export type COMMITTEE_SESSION_CREATE_REQUEST_PATH = `/api/elections/${number}/committee_sessions`;
+export type COMMITTEE_SESSION_CREATE_REQUEST_PATH = `/api/elections/${ElectionId}/committee_sessions`;
 
 // /api/elections/{election_id}/committee_sessions/{committee_session_id}
 export interface COMMITTEE_SESSION_UPDATE_REQUEST_PARAMS {
-  election_id: number;
+  election_id: ElectionId;
   committee_session_id: number;
 }
-export type COMMITTEE_SESSION_UPDATE_REQUEST_PATH = `/api/elections/${number}/committee_sessions/${number}`;
+export type COMMITTEE_SESSION_UPDATE_REQUEST_PATH = `/api/elections/${ElectionId}/committee_sessions/${number}`;
 export type COMMITTEE_SESSION_UPDATE_REQUEST_BODY = CommitteeSessionUpdateRequest;
 export interface COMMITTEE_SESSION_DELETE_REQUEST_PARAMS {
-  election_id: number;
+  election_id: ElectionId;
   committee_session_id: number;
 }
-export type COMMITTEE_SESSION_DELETE_REQUEST_PATH = `/api/elections/${number}/committee_sessions/${number}`;
+export type COMMITTEE_SESSION_DELETE_REQUEST_PATH = `/api/elections/${ElectionId}/committee_sessions/${number}`;
 
 // /api/elections/{election_id}/committee_sessions/{committee_session_id}/download_pdf_results
 export interface ELECTION_DOWNLOAD_PDF_RESULTS_REQUEST_PARAMS {
-  election_id: number;
+  election_id: ElectionId;
   committee_session_id: number;
 }
 export type ELECTION_DOWNLOAD_PDF_RESULTS_REQUEST_PATH =
-  `/api/elections/${number}/committee_sessions/${number}/download_pdf_results`;
+  `/api/elections/${ElectionId}/committee_sessions/${number}/download_pdf_results`;
 
 // /api/elections/{election_id}/committee_sessions/{committee_session_id}/download_zip_results
 export interface ELECTION_DOWNLOAD_ZIP_RESULTS_REQUEST_PARAMS {
-  election_id: number;
+  election_id: ElectionId;
   committee_session_id: number;
 }
 export type ELECTION_DOWNLOAD_ZIP_RESULTS_REQUEST_PATH =
-  `/api/elections/${number}/committee_sessions/${number}/download_zip_results`;
+  `/api/elections/${ElectionId}/committee_sessions/${number}/download_zip_results`;
+
+// /api/elections/{election_id}/committee_sessions/{committee_session_id}/investigations
+export interface COMMITTEE_SESSION_INVESTIGATIONS_REQUEST_PARAMS {
+  election_id: ElectionId;
+  committee_session_id: number;
+}
+export type COMMITTEE_SESSION_INVESTIGATIONS_REQUEST_PATH =
+  `/api/elections/${ElectionId}/committee_sessions/${number}/investigations`;
 
 // /api/elections/{election_id}/committee_sessions/{committee_session_id}/status
 export interface COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_PARAMS {
-  election_id: number;
+  election_id: ElectionId;
   committee_session_id: number;
 }
 export type COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_PATH =
-  `/api/elections/${number}/committee_sessions/${number}/status`;
+  `/api/elections/${ElectionId}/committee_sessions/${number}/status`;
 export type COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_BODY = CommitteeSessionStatusChangeRequest;
-
-// /api/elections/{election_id}/committee_sessions/{committee_session_id}/voters
-export interface COMMITTEE_SESSION_NUMBER_OF_VOTERS_CHANGE_REQUEST_PARAMS {
-  election_id: number;
-  committee_session_id: number;
-}
-export type COMMITTEE_SESSION_NUMBER_OF_VOTERS_CHANGE_REQUEST_PATH =
-  `/api/elections/${number}/committee_sessions/${number}/voters`;
-export type COMMITTEE_SESSION_NUMBER_OF_VOTERS_CHANGE_REQUEST_BODY = CommitteeSessionNumberOfVotersChangeRequest;
 
 // /api/elections/{election_id}/download_n_10_2
 export interface ELECTION_DOWNLOAD_N_10_2_REQUEST_PARAMS {
-  election_id: number;
+  election_id: ElectionId;
 }
-export type ELECTION_DOWNLOAD_N_10_2_REQUEST_PATH = `/api/elections/${number}/download_n_10_2`;
+export type ELECTION_DOWNLOAD_N_10_2_REQUEST_PATH = `/api/elections/${ElectionId}/download_n_10_2`;
 
 // /api/elections/{election_id}/download_na_31_2_bijlage1
 export interface ELECTION_DOWNLOAD_NA_31_2_BIJLAGE1_REQUEST_PARAMS {
-  election_id: number;
+  election_id: ElectionId;
 }
-export type ELECTION_DOWNLOAD_NA_31_2_BIJLAGE1_REQUEST_PATH = `/api/elections/${number}/download_na_31_2_bijlage1`;
+export type ELECTION_DOWNLOAD_NA_31_2_BIJLAGE1_REQUEST_PATH = `/api/elections/${ElectionId}/download_na_31_2_bijlage1`;
+
+// /api/elections/{election_id}/download_na_31_2_inlegvel
+export interface ELECTION_DOWNLOAD_NA_31_2_INLEGVEL_REQUEST_PARAMS {
+  election_id: ElectionId;
+}
+export type ELECTION_DOWNLOAD_NA_31_2_INLEGVEL_REQUEST_PATH = `/api/elections/${ElectionId}/download_na_31_2_inlegvel`;
 
 // /api/elections/{election_id}/polling_stations
 export interface POLLING_STATION_LIST_REQUEST_PARAMS {
-  election_id: number;
+  election_id: ElectionId;
 }
-export type POLLING_STATION_LIST_REQUEST_PATH = `/api/elections/${number}/polling_stations`;
+export type POLLING_STATION_LIST_REQUEST_PATH = `/api/elections/${ElectionId}/polling_stations`;
 export interface POLLING_STATION_CREATE_REQUEST_PARAMS {
-  election_id: number;
+  election_id: ElectionId;
 }
-export type POLLING_STATION_CREATE_REQUEST_PATH = `/api/elections/${number}/polling_stations`;
+export type POLLING_STATION_CREATE_REQUEST_PATH = `/api/elections/${ElectionId}/polling_stations`;
 export type POLLING_STATION_CREATE_REQUEST_BODY = PollingStationRequest;
 
 // /api/elections/{election_id}/polling_stations/import
 export interface POLLING_STATION_IMPORT_REQUEST_PARAMS {
-  election_id: number;
+  election_id: ElectionId;
 }
-export type POLLING_STATION_IMPORT_REQUEST_PATH = `/api/elections/${number}/polling_stations/import`;
+export type POLLING_STATION_IMPORT_REQUEST_PATH = `/api/elections/${ElectionId}/polling_stations/import`;
 export type POLLING_STATION_IMPORT_REQUEST_BODY = PollingStationsRequest;
 
 // /api/elections/{election_id}/polling_stations/validate-import
 export interface POLLING_STATION_VALIDATE_IMPORT_REQUEST_PARAMS {
-  election_id: number;
+  election_id: ElectionId;
 }
-export type POLLING_STATION_VALIDATE_IMPORT_REQUEST_PATH = `/api/elections/${number}/polling_stations/validate-import`;
+export type POLLING_STATION_VALIDATE_IMPORT_REQUEST_PATH =
+  `/api/elections/${ElectionId}/polling_stations/validate-import`;
 export type POLLING_STATION_VALIDATE_IMPORT_REQUEST_BODY = PollingStationFileRequest;
 
 // /api/elections/{election_id}/polling_stations/{polling_station_id}
 export interface POLLING_STATION_GET_REQUEST_PARAMS {
-  election_id: number;
+  election_id: ElectionId;
   polling_station_id: number;
 }
-export type POLLING_STATION_GET_REQUEST_PATH = `/api/elections/${number}/polling_stations/${number}`;
+export type POLLING_STATION_GET_REQUEST_PATH = `/api/elections/${ElectionId}/polling_stations/${number}`;
 export interface POLLING_STATION_UPDATE_REQUEST_PARAMS {
-  election_id: number;
+  election_id: ElectionId;
   polling_station_id: number;
 }
-export type POLLING_STATION_UPDATE_REQUEST_PATH = `/api/elections/${number}/polling_stations/${number}`;
+export type POLLING_STATION_UPDATE_REQUEST_PATH = `/api/elections/${ElectionId}/polling_stations/${number}`;
 export type POLLING_STATION_UPDATE_REQUEST_BODY = PollingStationRequest;
 export interface POLLING_STATION_DELETE_REQUEST_PARAMS {
-  election_id: number;
+  election_id: ElectionId;
   polling_station_id: number;
 }
-export type POLLING_STATION_DELETE_REQUEST_PATH = `/api/elections/${number}/polling_stations/${number}`;
+export type POLLING_STATION_DELETE_REQUEST_PATH = `/api/elections/${ElectionId}/polling_stations/${number}`;
 
 // /api/elections/{election_id}/status
 export interface ELECTION_STATUS_REQUEST_PARAMS {
-  election_id: number;
+  election_id: ElectionId;
 }
-export type ELECTION_STATUS_REQUEST_PATH = `/api/elections/${number}/status`;
+export type ELECTION_STATUS_REQUEST_PATH = `/api/elections/${ElectionId}/status`;
+
+// /api/elections/{election_id}/voters
+export interface ELECTION_NUMBER_OF_VOTERS_CHANGE_REQUEST_PARAMS {
+  election_id: ElectionId;
+}
+export type ELECTION_NUMBER_OF_VOTERS_CHANGE_REQUEST_PATH = `/api/elections/${ElectionId}/voters`;
+export type ELECTION_NUMBER_OF_VOTERS_CHANGE_REQUEST_BODY = ElectionNumberOfVotersChangeRequest;
 
 // /api/generate_test_election
 export type GENERATE_ELECTION_HANDLER_REQUEST_PARAMS = Record<string, never>;
@@ -277,31 +292,27 @@ export interface POLLING_STATION_INVESTIGATION_DOWNLOAD_CORRIGENDUM_PDF_REQUEST_
 export type POLLING_STATION_INVESTIGATION_DOWNLOAD_CORRIGENDUM_PDF_REQUEST_PATH =
   `/api/polling_stations/${number}/investigation/download_corrigendum_pdf`;
 
-// /api/user
+// /api/users
 export type USER_LIST_REQUEST_PARAMS = Record<string, never>;
-export type USER_LIST_REQUEST_PATH = `/api/user`;
+export type USER_LIST_REQUEST_PATH = `/api/users`;
 export type USER_CREATE_REQUEST_PARAMS = Record<string, never>;
-export type USER_CREATE_REQUEST_PATH = `/api/user`;
+export type USER_CREATE_REQUEST_PATH = `/api/users`;
 export type USER_CREATE_REQUEST_BODY = CreateUserRequest;
 
-// /api/user/{user_id}
+// /api/users/{user_id}
 export interface USER_GET_REQUEST_PARAMS {
   user_id: number;
 }
-export type USER_GET_REQUEST_PATH = `/api/user/${number}`;
+export type USER_GET_REQUEST_PATH = `/api/users/${number}`;
 export interface USER_UPDATE_REQUEST_PARAMS {
   user_id: number;
 }
-export type USER_UPDATE_REQUEST_PATH = `/api/user/${number}`;
+export type USER_UPDATE_REQUEST_PATH = `/api/users/${number}`;
 export type USER_UPDATE_REQUEST_BODY = UpdateUserRequest;
 export interface USER_DELETE_REQUEST_PARAMS {
   user_id: number;
 }
-export type USER_DELETE_REQUEST_PATH = `/api/user/${number}`;
-
-// /api/whoami
-export type WHOAMI_REQUEST_PARAMS = Record<string, never>;
-export type WHOAMI_REQUEST_PATH = `/api/whoami`;
+export type USER_DELETE_REQUEST_PATH = `/api/users/${number}`;
 
 /** TYPES **/
 
@@ -309,6 +320,11 @@ export interface AccountUpdateRequest {
   fullname?: string;
   password: string;
   username: string;
+}
+
+export interface ApplicationStartedDetails {
+  commit: string;
+  version: string;
 }
 
 export type AuditEvent =
@@ -321,6 +337,7 @@ export type AuditEvent =
   | (UserDetails & { event_type: "UserUpdated" })
   | (UserDetails & { event_type: "UserDeleted" })
   | (ElectionDetails & { event_type: "ElectionCreated" })
+  | (ElectionDetails & { event_type: "ElectionUpdated" })
   | (CommitteeSessionDetails & { event_type: "CommitteeSessionCreated" })
   | (CommitteeSessionDetails & { event_type: "CommitteeSessionDeleted" })
   | (CommitteeSessionDetails & { event_type: "CommitteeSessionUpdated" })
@@ -347,6 +364,7 @@ export type AuditEvent =
   | (DataEntryDetails & { event_type: "DataEntryDiscardedBoth" })
   | { event_type: "AirGapViolationDetected" }
   | { event_type: "AirGapViolationResolved" }
+  | (ApplicationStartedDetails & { event_type: "ApplicationStarted" })
   | (ErrorDetails & { event_type: "Error" })
   | { event_type: "UnknownEvent" };
 
@@ -460,11 +478,10 @@ export interface ClaimDataEntryResponse {
  * Committee session
  */
 export interface CommitteeSession {
-  election_id: number;
+  election_id: ElectionId;
   id: number;
   location: string;
   number: number;
-  number_of_voters: number;
   overview_pdf?: number;
   results_eml?: number;
   results_pdf?: number;
@@ -473,23 +490,15 @@ export interface CommitteeSession {
 }
 
 export interface CommitteeSessionDetails {
-  session_election_id: number;
+  session_election_id: ElectionId;
   session_id: number;
   session_location: string;
   session_number: number;
-  session_number_of_voters: number;
   session_overview_pdf?: number;
   session_results_eml?: number;
   session_results_pdf?: number;
   session_start_date_time?: string | null;
   session_status: string;
-}
-
-/**
- * Committee session number of voters change request
- */
-export interface CommitteeSessionNumberOfVotersChangeRequest {
-  number_of_voters: number;
 }
 
 /**
@@ -650,11 +659,12 @@ export interface Election {
   domain_id: string;
   election_date: string;
   election_id: string;
-  id: number;
+  id: ElectionId;
   location: string;
   name: string;
   nomination_date: string;
   number_of_seats: number;
+  number_of_voters: number;
 }
 
 export interface ElectionAndCandidateDefinitionValidateRequest {
@@ -698,11 +708,12 @@ export interface ElectionDetails {
   election_domain_id: string;
   election_election_date: string;
   election_election_id: string;
-  election_id: number;
+  election_id: ElectionId;
   election_location: string;
   election_name: string;
   election_nomination_date: string;
   election_number_of_seats: number;
+  election_number_of_voters: number;
 }
 
 /**
@@ -717,6 +728,8 @@ export interface ElectionDetailsResponse {
   polling_stations: PollingStation[];
 }
 
+export type ElectionId = number;
+
 /**
  * Election list response
  *
@@ -726,6 +739,13 @@ export interface ElectionDetailsResponse {
 export interface ElectionListResponse {
   committee_sessions: CommitteeSession[];
   elections: Election[];
+}
+
+/**
+ * Election number of voters change request
+ */
+export interface ElectionNumberOfVotersChangeRequest {
+  number_of_voters: number;
 }
 
 /**
@@ -739,6 +759,8 @@ export interface ElectionStatusResponse {
  * Election polling stations data entry statuses response
  */
 export interface ElectionStatusResponseEntry {
+  /** Whether the finalised first or second data entry has warnings */
+  finalised_with_warnings?: boolean;
   /** Time when the data entry was finalised */
   finished_at?: string;
   /** First entry progress as a percentage (0 to 100) */
@@ -764,11 +786,12 @@ export interface ElectionWithPoliticalGroups {
   domain_id: string;
   election_date: string;
   election_id: string;
-  id: number;
+  id: ElectionId;
   location: string;
   name: string;
   nomination_date: string;
   number_of_seats: number;
+  number_of_voters: number;
   political_groups: PoliticalGroup[];
 }
 
@@ -843,6 +866,7 @@ export interface ExtraInvestigation {
 }
 
 export interface FileDetails {
+  file_created_at: string;
   file_id: number;
   file_mime_type: string;
   file_name: string;
@@ -875,6 +899,13 @@ export interface GenerateElectionArgs {
   with_data_entry: boolean;
 }
 
+/**
+ * Investigation list response
+ */
+export interface InvestigationListResponse {
+  investigations: PollingStationInvestigation[];
+}
+
 export interface LoginResponse {
   fullname?: string;
   needs_password_change: boolean;
@@ -896,6 +927,7 @@ export interface NewElection {
   name: string;
   nomination_date: string;
   number_of_seats: number;
+  number_of_voters: number;
   political_groups: PoliticalGroup[];
 }
 
@@ -925,7 +957,7 @@ export interface PoliticalGroupTotalVotes {
 export interface PollingStation {
   address: string;
   committee_session_id: number;
-  election_id: number;
+  election_id: ElectionId;
   id: number;
   id_prev_session?: number;
   locality: string;
@@ -939,7 +971,7 @@ export interface PollingStation {
 export interface PollingStationDetails {
   polling_station_address: string;
   polling_station_committee_session_id: number;
-  polling_station_election_id: number;
+  polling_station_election_id: ElectionId;
   polling_station_id: number;
   polling_station_id_prev_session?: number;
   polling_station_locality: string;
@@ -955,7 +987,7 @@ export interface PollingStationFileRequest {
 }
 
 export interface PollingStationImportDetails {
-  import_election_id: number;
+  import_election_id: ElectionId;
   import_file_name: string;
   import_number_of_polling_stations: number;
 }
@@ -1025,7 +1057,7 @@ export type PollingStationType = "FixedLocation" | "Special" | "Mobile";
 
 export interface PollingStationsRequest {
   file_name: string;
-  polling_stations: PollingStationRequest[];
+  polling_stations: string;
 }
 
 export type RandomRange = string;

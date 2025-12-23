@@ -10,18 +10,38 @@ use tower_http::{
     trace::{self, TraceLayer},
 };
 use tracing::Level;
-use utoipa::OpenApi;
+use utoipa::{OpenApi, openapi::path::Operation};
 use utoipa_axum::router::OpenApiRouter;
 #[cfg(feature = "openapi")]
 use utoipa_swagger_ui::SwaggerUi;
 
+#[cfg(feature = "dev-database")]
+use crate::test_data_gen;
 use crate::{
     AppError, AppState, MAX_BODY_SIZE_MB, airgap, audit_log, authentication, committee_session,
     data_entry, document, election, error, investigation, polling_station, report,
 };
 
-#[cfg(feature = "dev-database")]
-use crate::test_data_gen;
+pub fn get_scopes_from_operation(operation: &Operation) -> Option<Vec<String>> {
+    let security_reqs = operation.security.as_ref()?;
+
+    let scopes: Vec<String> = security_reqs
+        .iter()
+        .filter_map(|req| {
+            // Serialization to access private BTreeMap values of SecurityRequirement
+            // Proposed change upstream: https://github.com/juhaku/utoipa/pull/1494
+            serde_json::to_value(req).ok().and_then(|v| {
+                v.as_object()?
+                    .get(authentication::SECURITY_SCHEME_NAME)?
+                    .as_array()
+                    .cloned()
+            })
+        })
+        .flat_map(|arr| arr.into_iter().filter_map(|v| v.as_str().map(String::from)))
+        .collect();
+
+    Some(scopes)
+}
 
 pub fn openapi_router() -> OpenApiRouter<AppState> {
     #[derive(utoipa::OpenApi)]

@@ -31,17 +31,17 @@ describe("UserCreateRolePage", () => {
 
     expect(await screen.findByRole("heading", { level: 1, name: "Gebruiker toevoegen" })).toBeInTheDocument();
 
-    expect(await screen.findByLabelText(/Beheerder/)).not.toBeChecked();
-    expect(await screen.findByLabelText(/Coördinator/)).not.toBeChecked();
-    expect(await screen.findByLabelText(/Invoerder/)).not.toBeChecked();
+    expect(await screen.findByRole("radio", { name: /Beheerder/ })).not.toBeChecked();
+    expect(await screen.findByRole("radio", { name: /Coördinator/ })).not.toBeChecked();
+    expect(await screen.findByRole("radio", { name: /Invoerder/ })).not.toBeChecked();
   });
 
   test("Shows form previously selected", async () => {
     renderPage({ role: "typist" });
 
-    expect(await screen.findByLabelText(/Beheerder/)).not.toBeChecked();
-    expect(await screen.findByLabelText(/Coördinator/)).not.toBeChecked();
-    expect(await screen.findByLabelText(/Invoerder/)).toBeChecked();
+    expect(await screen.findByRole("radio", { name: /Beheerder/ })).not.toBeChecked();
+    expect(await screen.findByRole("radio", { name: /Coördinator/ })).not.toBeChecked();
+    expect(await screen.findByRole("radio", { name: /Invoerder/ })).toBeChecked();
   });
 
   test("Shows validation error when nothing selected", async () => {
@@ -53,7 +53,7 @@ describe("UserCreateRolePage", () => {
     const submit = await screen.findByRole("button", { name: "Verder" });
     await user.click(submit);
 
-    const errorMessage = screen.getByText(/Dit is een verplichte vraag./);
+    const errorMessage = screen.getByText("Dit is een verplichte vraag. Maak een keuze uit de opties hieronder.");
     expect(errorMessage).toBeInTheDocument();
 
     expect(setRole).not.toHaveBeenCalled();
@@ -66,7 +66,7 @@ describe("UserCreateRolePage", () => {
     renderPage({ setRole, setType });
 
     const user = userEvent.setup();
-    await user.click(await screen.findByLabelText(/Beheerder/));
+    await user.click(await screen.findByRole("radio", { name: /Beheerder/ }));
     await user.click(await screen.findByRole("button", { name: "Verder" }));
 
     expect(setRole).toHaveBeenCalledExactlyOnceWith("administrator");
@@ -80,7 +80,7 @@ describe("UserCreateRolePage", () => {
     renderPage({ setRole, setType });
 
     const user = userEvent.setup();
-    await user.click(await screen.findByLabelText(/Coördinator/));
+    await user.click(await screen.findByRole("radio", { name: /Coördinator/ }));
     await user.click(await screen.findByRole("button", { name: "Verder" }));
 
     expect(setRole).toHaveBeenCalledExactlyOnceWith("coordinator");
@@ -94,7 +94,7 @@ describe("UserCreateRolePage", () => {
     renderPage({ setRole, setType });
 
     const user = userEvent.setup();
-    await user.click(await screen.findByLabelText(/Invoerder/));
+    await user.click(await screen.findByRole("radio", { name: /Invoerder/ }));
     await user.click(await screen.findByRole("button", { name: "Verder" }));
 
     expect(setRole).toHaveBeenCalledExactlyOnceWith("typist");

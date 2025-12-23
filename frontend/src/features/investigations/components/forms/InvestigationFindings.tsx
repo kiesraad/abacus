@@ -21,6 +21,8 @@ import {
 } from "@/types/generated/openapi";
 import { StringFormData } from "@/utils/stringFormData";
 
+import { getInvestigationUpdatedMessage } from "../../utils/messages";
+
 interface InvestigationFindingsProps {
   pollingStationId: number;
 }
@@ -30,7 +32,7 @@ const ACCEPTED = "accepted";
 export function InvestigationFindings({ pollingStationId }: InvestigationFindingsProps) {
   const navigate = useNavigate();
   const { hasMessages } = useMessages();
-  const { election, investigation, pollingStation, refetch } = useElection(pollingStationId);
+  const { currentCommitteeSession, election, investigation, pollingStation, refetch } = useElection(pollingStationId);
   const { pushMessage } = useMessages();
   const updatePath = `/api/polling_stations/${pollingStationId}/investigation`;
   const concludePath = `/api/polling_stations/${pollingStationId}/investigation/conclude`;
@@ -113,12 +115,7 @@ export function InvestigationFindings({ pollingStationId }: InvestigationFinding
     if (isSuccess(response)) {
       // Only push a message if there are no messages yet (e.g. from creating this investigation)
       if (!hasMessages()) {
-        pushMessage({
-          title: t("investigations.message.investigation_updated", {
-            number: pollingStation.number,
-            name: pollingStation.name,
-          }),
-        });
+        pushMessage(getInvestigationUpdatedMessage(pollingStation, currentCommitteeSession.status));
       }
 
       await refetch();
@@ -157,16 +154,6 @@ export function InvestigationFindings({ pollingStationId }: InvestigationFinding
               </ChoiceList.Error>
             )}
             <ChoiceList.Radio
-              id="corrected_results_yes"
-              name="corrected_results"
-              value="yes"
-              label={t("yes")}
-              disabled={requiresCorrectedResults}
-              defaultChecked={requiresCorrectedResults || investigation.corrected_results === true}
-            >
-              {t("investigations.findings.corrected_result_yes")}
-            </ChoiceList.Radio>
-            <ChoiceList.Radio
               id="corrected_results_no"
               name="corrected_results"
               value="no"
@@ -175,6 +162,16 @@ export function InvestigationFindings({ pollingStationId }: InvestigationFinding
               defaultChecked={investigation.corrected_results === false}
             >
               {t("investigations.findings.corrected_result_no")}
+            </ChoiceList.Radio>
+            <ChoiceList.Radio
+              id="corrected_results_yes"
+              name="corrected_results"
+              value="yes"
+              label={t("yes")}
+              disabled={requiresCorrectedResults}
+              defaultChecked={requiresCorrectedResults || investigation.corrected_results === true}
+            >
+              {t("investigations.findings.corrected_result_yes")}
             </ChoiceList.Radio>
           </ChoiceList>
 

@@ -19,6 +19,7 @@ import {
   PollingStationListResponse,
   PollingStationRequest,
   PollingStationRequestListResponse,
+  PollingStationsRequest,
 } from "@/types/generated/openapi";
 import { fileTooLargeError, isFileTooLarge } from "@/utils/uploadFileSize";
 
@@ -42,8 +43,11 @@ export function PollingStationImportPage() {
   /**
    * Import the polling stations
    */
-  async function importPollingStations(pollingStationsFileName: string) {
-    const response = await postImport({ file_name: pollingStationsFileName, polling_stations: pollingStations });
+  async function importPollingStations(file: File) {
+    const response = await postImport({
+      file_name: file.name,
+      polling_stations: await file.text(),
+    } satisfies PollingStationsRequest);
 
     if (isSuccess(response)) {
       pushMessage({
@@ -138,7 +142,7 @@ export function PollingStationImportPage() {
             <PollingStationsPreview pollingStations={pollingStations} />
           </FormLayout.Section>
           <FormLayout.Controls>
-            <Button type="button" onClick={() => void importPollingStations(file.name)}>
+            <Button type="button" onClick={() => void importPollingStations(file)}>
               {t("polling_station.import")}
             </Button>
           </FormLayout.Controls>

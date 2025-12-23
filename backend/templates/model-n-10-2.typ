@@ -1,4 +1,4 @@
-#import "common/style.typ": conf, document_numbering, default_header
+#import "common/style.typ": conf, default_header, document_numbering
 #import "common/scripts.typ": *
 #let input = json("inputs/model-n-10-2.json")
 
@@ -25,12 +25,12 @@
   "",
   [#input.election.name #format_date(input.election.election_date)],
   [
-    Verslag en telresultaten per lijst \
+    Verslag en telresultaten per lijst –
     Model N 10-2
   ]
 )
 
-== Details van het #if is_mobile { "mobiel stembureau" } else { "stembureau" }
+== Details van het #if is_mobile { "mobiele stembureau" } else { "stembureau" }
 
 #location_name #sym.arrow.r Stembureau #input.polling_station.number
 
@@ -46,12 +46,12 @@
 
 // *Op deze locatie waren meerdere stembureaus>*
 
-== Process-verbaal
+== Proces-verbaal
 
-Elk stembureau maakt bij een verkiezing een verslag: het proces-verbaal. Hierin staat hoe het stemmen en het tellen van de stemmen is verlopen
+Elk stembureau maakt bij een verkiezing een verslag: het proces-verbaal. Hierin staat hoe het stemmen en het tellen van de stemmen is verlopen.
 
 #emph_block[
-  In #this_location is gekozen voor centrale stemopneming. Het stembureau telt na het stemmen het aantal kiezers, en hoeveel stemmen elke lijst heeft gekregen. Het #location_type telt 1 of 2 dagen later de stemmen per kandidaat op een centrale tellocatie. Die telresultaten staan in het verslag van het #location_type.
+  In #this_location is gekozen voor *centrale stemopneming*. Het stembureau telt na het stemmen het aantal kiezers, en hoeveel stemmen elke lijst heeft gekregen. Het #location_type telt 1 of 2 dagen later de stemmen per kandidaat op een centrale tellocatie. Die telresultaten staan in het verslag van het #location_type.
 ]
 
 == Inhoudsopgave
@@ -190,7 +190,7 @@ Bijvoorbeeld als er meerdere verkiezingen tegelijk werden georganiseerd, en een 
 
 == Uitgebrachte stemmen <cast_votes>
 
-=== Beoordeel de stembiljetten en tel het aantal stembiljetten per kandidaat. Bereken het aantal stemmen per lijst. Tel de blanco en ongeldige stembiljetten.
+=== Beoordeel de stembiljetten en tel het aantal stembiljetten per lijst. En tel de blanco en ongeldige stembiljetten.
 
 #if input.election.political_groups.len() > 0 [
   #sum(
@@ -265,7 +265,7 @@ Zo komt het handtekeningen-blad altijd op een losse pagina, ook als het verslag 
 
 #textbox[Naam:][Handtekening:]
 
-=== #is_municipality[Twee][Vier] leden van het #location_type
+=== Twee leden van het stembureau:
 
 #stack(spacing: 0.5em, ..range(0, 2).map(_ => textbox[Naam:][Handtekening:]))
 
@@ -274,3 +274,7 @@ Zo komt het handtekeningen-blad altijd op een losse pagina, ook als het verslag 
 === Extra ondertekening: (niet verplicht)
 
 #stack(spacing: 0.5em, ..range(0, 4).map(_ => textbox[Naam:][Handtekening:]))
+
+#pagebreak(weak: true)
+
+#stack(spacing: 0.5em, ..range(0, 12).map(_ => textbox[Naam:][Handtekening:]))

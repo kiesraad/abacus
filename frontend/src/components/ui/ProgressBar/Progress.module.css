@@ -15,7 +15,10 @@ div.progress {
   }
 }
 
-span:global(.item) {
+span:global(.item),
+a:global(.item) {
+  text-decoration: none;
+  color: inherit;
   display: flex;
   flex-direction: row;
   align-items: center;

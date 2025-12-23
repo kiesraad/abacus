@@ -7,9 +7,9 @@ export class UserCreateDetailsPgObj {
   readonly save: Locator;
 
   constructor(protected readonly page: Page) {
-    this.username = page.getByLabel("Gebruikersnaam");
-    this.fullname = page.getByLabel("Volledige naam");
-    this.password = page.getByLabel("Tijdelijk wachtwoord");
+    this.username = page.getByRole("textbox", { name: "Gebruikersnaam" });
+    this.fullname = page.getByRole("textbox", { name: "Volledige naam" });
+    this.password = page.getByRole("textbox", { name: "Tijdelijk wachtwoord" });
     this.save = page.getByRole("button", { name: "Opslaan" });
   }
 }

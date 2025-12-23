@@ -19,7 +19,7 @@ export function PollingStationsList({ pollingStations }: PollingStationsListProp
         {pollingStations.map(
           (pollingStation) =>
             pollingStation.statusEntry && (
-              <Table.LinkRow
+              <Table.Row
                 key={pollingStation.number}
                 to={getUrlForDataEntry(
                   pollingStation.election_id,
@@ -32,7 +32,7 @@ export function PollingStationsList({ pollingStations }: PollingStationsListProp
                   <span>{pollingStation.name}</span>
                   <Badge type={pollingStation.statusEntry.status} showIcon />
                 </Table.Cell>
-              </Table.LinkRow>
+              </Table.Row>
             ),
         )}
       </Table.Body>

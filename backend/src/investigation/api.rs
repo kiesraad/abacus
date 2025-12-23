@@ -72,6 +72,36 @@ async fn validate_and_get_committee_session(
     Ok(committee_session)
 }
 
+pub async fn delete_investigation_for_polling_station(
+    conn: &mut SqliteConnection,
+    audit_service: &AuditService,
+    committee_session: &CommitteeSession,
+    polling_station_id: u32,
+) -> Result<(), APIError> {
+    if let Some(investigation) =
+        delete_polling_station_investigation(conn, polling_station_id).await?
+    {
+        audit_service
+            .log(
+                conn,
+                &AuditEvent::PollingStationInvestigationDeleted(investigation),
+                None,
+            )
+            .await?;
+
+        if committee_session.status == CommitteeSessionStatus::DataEntryFinished {
+            change_committee_session_status(
+                conn,
+                committee_session.id,
+                CommitteeSessionStatus::DataEntryInProgress,
+                audit_service.clone(),
+            )
+            .await?;
+        }
+    }
+    Ok(())
+}
+
 /// Create an investigation for a polling station
 #[utoipa::path(
     post,
@@ -88,6 +118,7 @@ async fn validate_and_get_committee_session(
     params(
         ("polling_station_id" = u32, description = "Polling station database id"),
     ),
+    security(("cookie_auth" = ["coordinator"])),
 )]
 async fn polling_station_investigation_create(
     _user: Coordinator,
@@ -154,6 +185,7 @@ async fn polling_station_investigation_create(
     params(
         ("polling_station_id" = u32, description = "Polling station database id"),
     ),
+    security(("cookie_auth" = ["coordinator"])),
 )]
 async fn polling_station_investigation_conclude(
     _user: Coordinator,
@@ -224,7 +256,9 @@ async fn polling_station_investigation_conclude(
     params(
         ("polling_station_id" = u32, description = "Polling station database id"),
     ),
+    security(("cookie_auth" = ["coordinator"])),
 )]
+#[allow(clippy::too_many_lines)]
 async fn polling_station_investigation_update(
     _user: Coordinator,
     State(pool): State<SqlitePool>,
@@ -249,29 +283,27 @@ async fn polling_station_investigation_update(
 
     // If corrected_results is changed from yes to no, check if there are data entries or results.
     // If deleting them is accepted, delete them. If not, return an error.
-    if polling_station_investigation.corrected_results == Some(false) {
-        if let Ok(current) = get_polling_station_investigation(&mut tx, polling_station_id).await {
-            if current.corrected_results == Some(true)
-                && (data_entry_exists(&mut tx, polling_station_id).await?
-                    || result_exists(&mut tx, polling_station_id).await?)
-            {
-                if polling_station_investigation.accept_data_entry_deletion == Some(true) {
-                    let polling_station =
-                        crate::polling_station::repository::get(&mut tx, polling_station_id)
-                            .await?;
-                    delete_data_entry_and_result_for_polling_station(
-                        &mut tx,
-                        &audit_service,
-                        polling_station.id,
-                    )
-                    .await?;
-                } else {
-                    return Err(APIError::Conflict(
-                        "Investigation has data entries or results".into(),
-                        ErrorReference::InvestigationHasDataEntryOrResult,
-                    ));
-                }
-            }
+    if polling_station_investigation.corrected_results == Some(false)
+        && let Ok(current) = get_polling_station_investigation(&mut tx, polling_station_id).await
+        && current.corrected_results == Some(true)
+        && (data_entry_exists(&mut tx, polling_station_id).await?
+            || result_exists(&mut tx, polling_station_id).await?)
+    {
+        if polling_station_investigation.accept_data_entry_deletion == Some(true) {
+            let polling_station =
+                crate::polling_station::repository::get(&mut tx, polling_station_id).await?;
+            delete_data_entry_and_result_for_polling_station(
+                &mut tx,
+                &audit_service,
+                &committee_session,
+                polling_station.id,
+            )
+            .await?;
+        } else {
+            return Err(APIError::Conflict(
+                "Investigation has data entries or results".into(),
+                ErrorReference::InvestigationHasDataEntryOrResult,
+            ));
         }
     }
 
@@ -319,6 +351,7 @@ async fn polling_station_investigation_update(
     params(
         ("polling_station_id" = u32, description = "Polling station database id"),
     ),
+    security(("cookie_auth" = ["coordinator"])),
 )]
 async fn polling_station_investigation_delete(
     _user: Coordinator,
@@ -330,61 +363,45 @@ async fn polling_station_investigation_delete(
 
     let committee_session = validate_and_get_committee_session(&mut tx, polling_station_id).await?;
 
-    let investigation = get_polling_station_investigation(&mut tx, polling_station_id).await?;
+    get_polling_station_investigation(&mut tx, polling_station_id).await?;
     let polling_station =
         crate::polling_station::repository::get(&mut tx, polling_station_id).await?;
 
     // Delete investigation
-    if delete_polling_station_investigation(&mut tx, polling_station_id).await? {
-        audit_service
-            .log(
-                &mut tx,
-                &AuditEvent::PollingStationInvestigationDeleted(investigation.clone()),
-                None,
-            )
-            .await?;
+    delete_investigation_for_polling_station(
+        &mut tx,
+        &audit_service,
+        &committee_session,
+        polling_station_id,
+    )
+    .await?;
 
-        // Delete potential data entry and result linked to the polling station
-        delete_data_entry_and_result_for_polling_station(
+    // Delete potential data entry and result linked to the polling station
+    delete_data_entry_and_result_for_polling_station(
+        &mut tx,
+        &audit_service,
+        &committee_session,
+        polling_station.id,
+    )
+    .await?;
+
+    // Change committee session status if last investigation is deleted
+    if list_investigations_for_committee_session(&mut tx, committee_session.id)
+        .await?
+        .is_empty()
+    {
+        change_committee_session_status(
             &mut tx,
-            &audit_service,
-            polling_station.id,
+            committee_session.id,
+            CommitteeSessionStatus::Created,
+            audit_service,
         )
         .await?;
-
-        // Change committee session status if last investigation is deleted
-        if list_investigations_for_committee_session(&mut tx, committee_session.id)
-            .await?
-            .is_empty()
-        {
-            change_committee_session_status(
-                &mut tx,
-                committee_session.id,
-                CommitteeSessionStatus::Created,
-                audit_service,
-            )
-            .await?;
-        } else if committee_session.status == CommitteeSessionStatus::DataEntryFinished {
-            change_committee_session_status(
-                &mut tx,
-                committee_session.id,
-                CommitteeSessionStatus::DataEntryInProgress,
-                audit_service,
-            )
-            .await?;
-        }
-
-        tx.commit().await?;
-
-        Ok(StatusCode::NO_CONTENT)
-    } else {
-        tx.commit().await?;
-
-        Err(APIError::NotFound(
-            "Investigation to delete not found".to_string(),
-            ErrorReference::EntryNotFound,
-        ))
     }
+
+    tx.commit().await?;
+
+    Ok(StatusCode::NO_CONTENT)
 }
 
 /// Download a corrigendum for a polling station
@@ -409,6 +426,7 @@ async fn polling_station_investigation_delete(
     params(
         ("polling_station_id" = u32, description = "Polling station database id"),
     ),
+    security(("cookie_auth" = ["coordinator"])),
 )]
 async fn polling_station_investigation_download_corrigendum_pdf(
     _user: Coordinator,

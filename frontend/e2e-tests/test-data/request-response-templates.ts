@@ -340,3 +340,101 @@ export const noErrorsWarningsResponse: SaveDataEntryResponse = {
     warnings: [],
   },
 };
+
+export const noRecountNoDifferencesDataEntryWithGaps: PollingStationResults = {
+  model: "CSOFirstSession",
+  extra_investigation: {
+    extra_investigation_other_reason: { yes: false, no: true },
+    ballots_recounted_extra_investigation: { yes: false, no: true },
+  },
+  counting_differences_polling_station: {
+    unexplained_difference_ballots_voters: { yes: false, no: true },
+    difference_ballots_per_list: { yes: false, no: true },
+  },
+  voters_counts: {
+    poll_card_count: 2058,
+    proxy_certificate_count: 150,
+    total_admitted_voters_count: 2208,
+  },
+  votes_counts: {
+    political_group_total_votes: [
+      { number: 1, total: 2173 },
+      { number: 3, total: 0 },
+    ],
+    total_votes_candidates_count: 2173,
+    blank_votes_count: 20,
+    invalid_votes_count: 15,
+    total_votes_cast_count: 2208,
+  },
+  differences_counts: {
+    more_ballots_count: 0,
+    fewer_ballots_count: 0,
+    compare_votes_cast_admitted_voters: {
+      admitted_voters_equal_votes_cast: true,
+      votes_cast_greater_than_admitted_voters: false,
+      votes_cast_smaller_than_admitted_voters: false,
+    },
+    difference_completely_accounted_for: { yes: true, no: false },
+  },
+  political_group_votes: [
+    {
+      number: 1,
+      total: 2173,
+      candidate_votes: [
+        {
+          number: 2,
+          votes: 1337,
+        },
+        {
+          number: 3,
+          votes: 423,
+        },
+        {
+          number: 6,
+          votes: 300,
+        },
+        {
+          number: 8,
+          votes: 0,
+        },
+        {
+          number: 9,
+          votes: 0,
+        },
+        {
+          number: 11,
+          votes: 113,
+        },
+        {
+          number: 12,
+          votes: 0,
+        },
+      ],
+    },
+    {
+      number: 3,
+      total: 0,
+      candidate_votes: [
+        {
+          number: 1,
+          votes: 0,
+        },
+        {
+          number: 2,
+          votes: 0,
+        },
+      ],
+    },
+  ],
+};
+
+export const dataEntryRequestWithGaps: DataEntry = {
+  progress: 86,
+  data: noRecountNoDifferencesDataEntryWithGaps,
+  client_state: {
+    furthest: "political_group_votes_3",
+    current: "political_group_votes_3",
+    acceptedErrorsAndWarnings: [],
+    continue: true,
+  },
+};

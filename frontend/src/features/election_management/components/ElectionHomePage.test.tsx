@@ -66,17 +66,15 @@ describe("ElectionHomePage", () => {
     const committee_session_cards = await screen.findByTestId("committee-session-cards");
     expect(committee_session_cards).toBeVisible();
 
-    expect(within(committee_session_cards).getByTestId("session-4")).toHaveTextContent(
-      /Vierde zitting — Steminvoer bezig/,
-    );
+    expect(within(committee_session_cards).getByTestId("session-4")).toHaveTextContent(/Vierde zitting — Invoer bezig/);
     expect(within(committee_session_cards).getByTestId("session-3")).toHaveTextContent(
-      /Derde zitting — Steminvoer afgerond/,
+      /Derde zitting — Invoer afgerond/,
     );
     expect(within(committee_session_cards).getByTestId("session-2")).toHaveTextContent(
-      /Tweede zitting — Steminvoer afgerond/,
+      /Tweede zitting — Invoer afgerond/,
     );
     expect(within(committee_session_cards).getByTestId("session-1")).toHaveTextContent(
-      /Eerste zitting — Steminvoer afgerond/,
+      /Eerste zitting — Invoer afgerond/,
     );
 
     expect(screen.queryByRole("button", { name: "Nieuwe zitting voorbereiden" })).not.toBeInTheDocument();
@@ -112,7 +110,7 @@ describe("ElectionHomePage", () => {
     const committee_session_cards = await screen.findByTestId("committee-session-cards");
     expect(committee_session_cards).toBeVisible();
     expect(within(committee_session_cards).getByTestId("session-1")).toHaveTextContent(
-      /Eerste zitting — Steminvoer afgerond/,
+      /Eerste zitting — Invoer afgerond/,
     );
     expect(screen.queryByRole("button", { name: "Zitting verwijderen" })).not.toBeInTheDocument();
 
@@ -146,7 +144,7 @@ describe("ElectionHomePage", () => {
     const committee_session_cards = await screen.findByTestId("committee-session-cards");
     expect(committee_session_cards).toBeVisible();
     expect(within(committee_session_cards).getByTestId("session-1")).toHaveTextContent(
-      /Eerste zitting — Steminvoer afgerond/,
+      /Eerste zitting — Invoer afgerond/,
     );
 
     expect(screen.queryByRole("button", { name: "Nieuwe zitting voorbereiden" })).not.toBeInTheDocument();
@@ -167,7 +165,7 @@ describe("ElectionHomePage", () => {
   });
 
   describe("Delete committee session", () => {
-    test("Shows button for coodinator", async () => {
+    test("Shows button for coordinator", async () => {
       const committeeSessionData: Partial<CommitteeSession> = { id: 4, number: 4, status: "created" };
       const electionData = getElectionMockData({}, committeeSessionData);
       server.use(
@@ -313,9 +311,9 @@ describe("ElectionHomePage", () => {
     const committee_session_cards = await screen.findByTestId("committee-session-cards");
     expect(committee_session_cards).toBeVisible();
     const session4 = within(committee_session_cards).getByTestId("session-4");
-    expect(session4).toHaveTextContent(/Vierde zitting — Klaar voor steminvoer/);
+    expect(session4).toHaveTextContent(/Vierde zitting — Klaar voor invoer/);
 
-    const startButton = within(session4).getByRole("button", { name: "Start steminvoer" });
+    const startButton = within(session4).getByRole("button", { name: "Start invoer" });
     expect(startButton).toBeVisible();
 
     await user.click(startButton);
@@ -372,9 +370,30 @@ describe("ElectionHomePage", () => {
     expect(screen.getByText("N 10-2")).toBeVisible();
   });
 
-  test("Does not show empty documents section for second committee session", async () => {
+  test("Shows empty document section for second committee session", async () => {
     const electionDataSecondSession = getElectionMockData({}, { id: 2, number: 2 });
     electionDataSecondSession.committee_sessions = getCommitteeSessionListMockData().slice(2, 3);
+    server.use(
+      http.get("/api/elections/1", () =>
+        HttpResponse.json(electionDataSecondSession satisfies ElectionDetailsResponse, { status: 200 }),
+      ),
+    );
+
+    await renderPage("coordinator");
+
+    expect(await screen.findByRole("heading", { level: 3, name: "Leeg inlegvel voor deze verkiezing" })).toBeVisible();
+    expect(screen.getByText("Na 31-2 Inlegvel")).toBeVisible();
+
+    expect(
+      screen.queryByRole("heading", { level: 3, name: "Lege processen-verbaal voor deze verkiezing" }),
+    ).not.toBeInTheDocument();
+    expect(screen.queryByText("Na 31-2 Bijlage 1")).not.toBeInTheDocument();
+    expect(screen.queryByText("N 10-2")).not.toBeInTheDocument();
+  });
+
+  test("Does not show empty documents section for third committee session", async () => {
+    const electionDataSecondSession = getElectionMockData({}, { id: 2, number: 3 });
+    electionDataSecondSession.committee_sessions = getCommitteeSessionListMockData().slice(1, 3);
     server.use(
       http.get("/api/elections/1", () =>
         HttpResponse.json(electionDataSecondSession satisfies ElectionDetailsResponse, { status: 200 }),
@@ -386,6 +405,11 @@ describe("ElectionHomePage", () => {
     expect(
       screen.queryByRole("heading", { level: 3, name: "Lege processen-verbaal voor deze verkiezing" }),
     ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole("heading", { level: 3, name: "Leeg inlegvel voor deze verkiezing" }),
+    ).not.toBeInTheDocument();
     expect(screen.queryByText("Na 31-2 Bijlage 1")).not.toBeInTheDocument();
+    expect(screen.queryByText("N 10-2")).not.toBeInTheDocument();
+    expect(screen.queryByText("Na 31-2 Inlegvel")).not.toBeInTheDocument();
   });
 });

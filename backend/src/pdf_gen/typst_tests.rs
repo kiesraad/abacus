@@ -12,8 +12,8 @@ use crate::{
         PoliticalGroupCandidateVotes, PoliticalGroupTotalVotes, VotersCounts, VotesCounts, YesNo,
     },
     election::{
-        Candidate, CandidateGender, ElectionCategory, ElectionWithPoliticalGroups, PoliticalGroup,
-        VoteCountingMethod,
+        Candidate, CandidateGender, CandidateNumber, ElectionCategory, ElectionId,
+        ElectionWithPoliticalGroups, PGNumber, PoliticalGroup, VoteCountingMethod,
     },
     investigation::PollingStationInvestigation,
     pdf_gen::{
@@ -28,45 +28,45 @@ use crate::{
         },
     },
     polling_station::structs::{PollingStation, PollingStationType},
+    report::DEFAULT_DATE_TIME_FORMAT,
     summary::{ElectionSummary, PollingStationInvestigations, SumCount, SummaryDifferencesCounts},
 };
 
-use chrono::{NaiveDate, NaiveDateTime, NaiveTime};
+use chrono::{DateTime, Local, NaiveDate, NaiveDateTime, Utc};
 use rand::{Rng, seq::IndexedRandom};
 use test_log::test;
 
-fn random_string(rng: &mut impl rand::Rng, length: usize) -> String {
+fn random_string(rng: &mut impl Rng, length: usize) -> String {
     rng.sample_iter(&rand::distr::Alphanumeric)
         .take(length)
         .map(char::from)
         .collect()
 }
 
-fn random_value<T: Copy>(rng: &mut impl rand::Rng, variants: &[T]) -> T {
+fn random_value<T: Copy>(rng: &mut impl Rng, variants: &[T]) -> T {
     *variants.choose(rng).unwrap()
 }
 
-fn random_date(rng: &mut impl rand::Rng) -> NaiveDate {
-    NaiveDate::from_ymd_opt(
-        rng.random_range(1900..=2100),
-        rng.random_range(1..=12),
-        rng.random_range(1..=28),
-    )
-    .unwrap()
+fn random_date_time(rng: &mut impl Rng) -> DateTime<Local> {
+    let now = Local::now().timestamp();
+    let about_ten_years = 10 * 365 * 24 * 60 * 60;
+    let date_range = now - about_ten_years..now + about_ten_years;
+    let secs = rng.random_range(date_range);
+
+    DateTime::<Utc>::from_timestamp(secs, 0)
+        .unwrap()
+        .with_timezone(&Local)
 }
 
-fn random_date_time(rng: &mut impl rand::Rng) -> NaiveDateTime {
-    random_date(rng).and_time(
-        NaiveTime::from_hms_opt(
-            rng.random_range(0..24),
-            rng.random_range(0..60),
-            rng.random_range(0..60),
-        )
-        .unwrap(),
-    )
+fn random_date(rng: &mut impl Rng) -> NaiveDate {
+    random_date_time(rng).date_naive()
 }
 
-fn random_option<T>(rng: &mut impl rand::Rng, value: T, none_where_possible: bool) -> Option<T> {
+fn random_naive_date_time(rng: &mut impl Rng) -> NaiveDateTime {
+    random_date_time(rng).naive_local()
+}
+
+fn random_option<T>(rng: &mut impl Rng, value: T, none_where_possible: bool) -> Option<T> {
     if none_where_possible {
         return None;
     }
@@ -79,7 +79,7 @@ fn random_option<T>(rng: &mut impl rand::Rng, value: T, none_where_possible: boo
 }
 
 fn random_string_option(
-    rng: &mut impl rand::Rng,
+    rng: &mut impl Rng,
     string_length: usize,
     none_where_possible: bool,
 ) -> Option<String> {
@@ -92,30 +92,24 @@ fn random_string_option(
     random_option(rng, value, none_where_possible)
 }
 
-fn random_yes_no(rng: &mut impl rand::Rng) -> YesNo {
+fn random_yes_no(rng: &mut impl Rng) -> YesNo {
     match rng.random_range(0..4) {
-        0 => YesNo {
-            yes: false,
-            no: false,
-        },
-        1 => YesNo {
-            yes: true,
-            no: true,
-        },
+        0 => YesNo::default(),
+        1 => YesNo::both(),
         2 => YesNo::yes(),
         _ => YesNo::no(),
     }
 }
 
 fn random_election(
-    rng: &mut impl rand::Rng,
+    rng: &mut impl Rng,
     parties: u32,
     candidates: u32,
     string_length: usize,
     none_where_possible: bool,
 ) -> ElectionWithPoliticalGroups {
     ElectionWithPoliticalGroups {
-        id: rng.random_range(0..5),
+        id: ElectionId::from(rng.random_range(0..5)),
         name: random_string(rng, string_length),
         counting_method: random_value(rng, &[VoteCountingMethod::CSO, VoteCountingMethod::DSO]),
         election_id: random_string(rng, string_length),
@@ -123,11 +117,12 @@ fn random_election(
         domain_id: random_string(rng, string_length),
         category: ElectionCategory::Municipal,
         number_of_seats: rng.random_range(0..5),
+        number_of_voters: rng.random_range(0..=10_000),
         election_date: random_date(rng),
         nomination_date: random_date(rng),
         political_groups: (0..parties)
             .map(|party_index| PoliticalGroup {
-                number: party_index + 1,
+                number: PGNumber::from(party_index + 1),
                 name: random_string(rng, string_length),
                 candidates: (0..candidates)
                     .map(|candidate_index| {
@@ -141,7 +136,7 @@ fn random_election(
                         );
 
                         Candidate {
-                            number: candidate_index + 1,
+                            number: CandidateNumber::from(candidate_index + 1),
                             initials: random_string(rng, string_length),
                             first_name: random_string_option(
                                 rng,
@@ -170,7 +165,7 @@ fn random_election(
 }
 
 fn random_polling_station(
-    rng: &mut impl rand::Rng,
+    rng: &mut impl Rng,
     election: &ElectionWithPoliticalGroups,
     string_length: usize,
     none_where_possible: bool,
@@ -193,7 +188,7 @@ fn random_polling_station(
         id_prev_session: random_option(rng, id_prev_session, none_where_possible),
         name: random_string(rng, string_length),
         number: rng.random_range(0..5),
-        number_of_voters: random_option(rng, number_of_voters as i64, none_where_possible),
+        number_of_voters: random_option(rng, number_of_voters, none_where_possible),
         polling_station_type: random_option(rng, polling_station_type, none_where_possible),
         address: random_string(rng, string_length),
         postal_code: random_string(rng, string_length),
@@ -202,7 +197,7 @@ fn random_polling_station(
 }
 
 fn random_polling_stations(
-    rng: &mut impl rand::Rng,
+    rng: &mut impl Rng,
     election: &ElectionWithPoliticalGroups,
     string_length: usize,
     none_where_possible: bool,
@@ -214,8 +209,8 @@ fn random_polling_stations(
 }
 
 fn random_committee_session(
-    rng: &mut impl rand::Rng,
-    election_id: u32,
+    rng: &mut impl Rng,
+    election_id: ElectionId,
     string_length: usize,
     none_where_possible: bool,
 ) -> CommitteeSession {
@@ -228,7 +223,7 @@ fn random_committee_session(
         election_id,
         location: random_string(rng, string_length),
         // a start_date_time is required for our typst models, this is validated in the code
-        start_date_time: Some(random_date_time(rng)),
+        start_date_time: Some(random_naive_date_time(rng)),
         status: random_value(
             rng,
             &[
@@ -239,7 +234,6 @@ fn random_committee_session(
                 CommitteeSessionStatus::DataEntryFinished,
             ],
         ),
-        number_of_voters: rng.random_range(0..=10_000),
         results_eml: random_option(rng, results_eml, none_where_possible),
         results_pdf: random_option(rng, results_pdf, none_where_possible),
         overview_pdf: random_option(rng, results_pdf, none_where_possible),
@@ -247,7 +241,7 @@ fn random_committee_session(
 }
 
 fn random_polling_station_result(
-    rng: &mut impl rand::Rng,
+    rng: &mut impl Rng,
     election: &ElectionWithPoliticalGroups,
 ) -> CommonPollingStationResults {
     CommonPollingStationResults {
@@ -303,10 +297,7 @@ fn random_polling_station_result(
     }
 }
 
-fn random_station_subset(
-    rng: &mut impl rand::Rng,
-    polling_stations: &[PollingStation],
-) -> Vec<u32> {
+fn random_station_subset(rng: &mut impl Rng, polling_stations: &[PollingStation]) -> Vec<u32> {
     polling_stations
         .iter()
         .filter(|_| rng.random_bool(0.5))
@@ -314,7 +305,7 @@ fn random_station_subset(
         .collect()
 }
 
-fn random_sum_count(rng: &mut impl rand::Rng, polling_stations: &[PollingStation]) -> SumCount {
+fn random_sum_count(rng: &mut impl Rng, polling_stations: &[PollingStation]) -> SumCount {
     SumCount {
         count: rng.random_range(0..500),
         polling_stations: random_station_subset(rng, polling_stations),
@@ -322,7 +313,7 @@ fn random_sum_count(rng: &mut impl rand::Rng, polling_stations: &[PollingStation
 }
 
 fn random_election_summary(
-    rng: &mut impl rand::Rng,
+    rng: &mut impl Rng,
     election: &ElectionWithPoliticalGroups,
     polling_stations: &[PollingStation],
 ) -> ElectionSummary {
@@ -345,7 +336,7 @@ fn random_election_summary(
 }
 
 fn random_investigation(
-    rng: &mut impl rand::Rng,
+    rng: &mut impl Rng,
     polling_station: &PollingStation,
     string_length: usize,
     none_where_possible: bool,
@@ -361,7 +352,7 @@ fn random_investigation(
 }
 
 fn random_finished_investigation(
-    rng: &mut impl rand::Rng,
+    rng: &mut impl Rng,
     polling_station: &PollingStation,
     string_length: usize,
 ) -> PollingStationInvestigation {
@@ -423,7 +414,7 @@ async fn test_na_14_2() {
 
         let hash = random_string(&mut rng, 64);
         let creation_date_time = random_date_time(&mut rng)
-            .format("%Y-%m-%dT%H:%M:%S")
+            .format(DEFAULT_DATE_TIME_FORMAT)
             .to_string();
 
         let model = PdfModel::ModelNa14_2(Box::new(ModelNa14_2Input {
@@ -496,7 +487,7 @@ async fn test_na_31_2() {
         let summary = random_election_summary(&mut rng, &election, &polling_stations);
         let hash = random_string(&mut rng, 64);
         let creation_date_time = random_date_time(&mut rng)
-            .format("%Y-%m-%dT%H:%M:%S")
+            .format(DEFAULT_DATE_TIME_FORMAT)
             .to_string();
 
         let model = PdfModel::ModelNa31_2(Box::new(ModelNa31_2Input {
@@ -590,17 +581,10 @@ async fn test_p_2a() {
             .collect::<Vec<_>>();
         investigations.retain(|_| rng.random_bool(0.8));
 
-        let hash = random_string(&mut rng, 64);
-        let creation_date_time = random_date_time(&mut rng)
-            .format("%Y-%m-%dT%H:%M:%S")
-            .to_string();
-
         let model = PdfModel::ModelP2a(Box::new(ModelP2aInput {
             committee_session,
             election,
             investigations,
-            hash,
-            creation_date_time,
         }));
 
         test_pdf(model).await;

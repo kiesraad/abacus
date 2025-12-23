@@ -71,13 +71,12 @@ where
         let pool = SqlitePool::from_ref(state);
         let mut conn = pool.acquire().await?;
 
-        if let Ok(Path(id)) = path_extractor {
-            if crate::polling_station::repository::get(&mut conn, id)
+        if let Ok(Path(id)) = path_extractor
+            && crate::polling_station::repository::get(&mut conn, id)
                 .await
                 .is_ok()
-            {
-                return Ok(CurrentSessionPollingStationId(id));
-            }
+        {
+            return Ok(CurrentSessionPollingStationId(id));
         }
 
         Err(APIError::NotFound(

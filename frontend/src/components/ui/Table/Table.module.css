@@ -78,6 +78,17 @@
     }
   }
 
+  tr.downloadIcon {
+    /* Replace the chevron icon with the download icon */
+    td:last-of-type {
+      background-image: url("../../../assets/icons/download.svg");
+    }
+  }
+
+  tr.active {
+    background: var(--gray-200);
+  }
+
   tr.rowTotal {
     td {
       font-weight: bold;

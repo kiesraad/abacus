@@ -7,6 +7,7 @@ import { ElectionLayout } from "@/components/layout/ElectionLayout";
 import { ElectionStatusLayout } from "@/components/layout/ElectionStatusLayout";
 import { accountRoutes } from "@/features/account/routes";
 import { dataEntryRoutes } from "@/features/data_entry/routes";
+import { detailRoutes } from "@/features/data_entry_detail/routes";
 import { dataEntryHomeRoutes } from "@/features/data_entry_home/routes";
 import { devRoutes } from "@/features/dev/routes";
 import { electionCreateRoutes } from "@/features/election_create/routes";
@@ -18,7 +19,6 @@ import { investigationRoutes } from "@/features/investigations/routes";
 import { logsRoutes } from "@/features/logs/routes";
 import { pollingStationsRoutes } from "@/features/polling_stations/routes";
 import { resolveDifferencesRoutes } from "@/features/resolve_differences/routes";
-import { resolveErrorsRoutes } from "@/features/resolve_errors/routes";
 import { usersRoutes } from "@/features/users/routes";
 
 import { RootLayout } from "./RootLayout";
@@ -33,7 +33,7 @@ export const routes: RouteObject[] = [
       {
         index: true,
         path: "/",
-        element: showDevPage ? <Navigate to="/dev" replace /> : <Navigate to="/account/login" replace />,
+        element: showDevPage ? <Navigate to="/dev" replace /> : <Navigate to="/elections" replace />,
         handle: { public: true },
       },
       { path: "account", children: accountRoutes },
@@ -71,8 +71,8 @@ export const routes: RouteObject[] = [
                     children: resolveDifferencesRoutes,
                   },
                   {
-                    path: ":pollingStationId/resolve-errors",
-                    children: resolveErrorsRoutes,
+                    path: ":pollingStationId/detail",
+                    children: detailRoutes,
                   },
                 ],
               },

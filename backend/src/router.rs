@@ -10,7 +10,13 @@ use tower_http::{
     trace::{self, TraceLayer},
 };
 use tracing::Level;
-use utoipa::{OpenApi, openapi::path::Operation};
+use utoipa::{
+    Modify, OpenApi,
+    openapi::{
+        path::Operation,
+        security::{ApiKey, ApiKeyValue, SecurityScheme},
+    },
+};
 use utoipa_axum::router::OpenApiRouter;
 #[cfg(feature = "openapi")]
 use utoipa_swagger_ui::SwaggerUi;
@@ -47,7 +53,55 @@ pub fn openapi_router() -> OpenApiRouter<AppState> {
     #[derive(utoipa::OpenApi)]
     struct ApiDoc;
 
-    let router = OpenApiRouter::with_openapi(ApiDoc::openapi())
+    struct SecurityAddon;
+
+    impl utoipa::Modify for SecurityAddon {
+        fn modify(&self, openapi: &mut utoipa::openapi::OpenApi) {
+            if let Some(components) = openapi.components.as_mut() {
+                components.add_security_scheme(
+                    "cookie_auth",
+                    SecurityScheme::ApiKey(ApiKey::Cookie(ApiKeyValue::new(String::from(
+                        authentication::SESSION_COOKIE_NAME,
+                    )))),
+                )
+            }
+
+            // Add scopes to operation summaries
+            for path_item in openapi.paths.paths.values_mut() {
+                for operation in [
+                    &mut path_item.get,
+                    &mut path_item.post,
+                    &mut path_item.put,
+                    &mut path_item.delete,
+                    &mut path_item.patch,
+                ]
+                .into_iter()
+                .flatten()
+                {
+                    let scopes = get_scopes_from_operation(operation);
+
+                    if let Some(scopes) = scopes {
+                        let extra = scopes.join(", ");
+                        operation.summary = Some(match &operation.summary {
+                            Some(existing) => format!("{} ({})", existing, extra),
+                            None => extra,
+                        });
+                    }
+                }
+            }
+        }
+    }
+
+    let mut router = build_routes(ApiDoc::openapi());
+
+    // Modify schema to add security schemes after building routes
+    SecurityAddon.modify(router.get_openapi_mut());
+
+    router
+}
+
+fn build_routes(doc: utoipa::openapi::OpenApi) -> OpenApiRouter<AppState> {
+    let router = OpenApiRouter::with_openapi(doc)
         .merge(audit_log::router())
         .merge(authentication::router())
         .merge(authentication::user_router())

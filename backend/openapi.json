@@ -12,7 +12,7 @@
   "paths": {
     "/api/account": {
       "get": {
-        "summary": "Get current logged-in user endpoint",
+        "summary": "Get current logged-in user endpoint (administrator, coordinator, typist)",
         "operationId": "account",
         "responses": {
           "200": {
@@ -57,7 +57,7 @@
         ]
       },
       "put": {
-        "summary": "Update the user's account with a new password and optionally new fullname",
+        "summary": "Update the user's account with a new password and optionally new fullname (administrator, coordinator, typist)",
         "operationId": "account_update",
         "requestBody": {
           "content": {
@@ -114,7 +114,7 @@
     },
     "/api/elections": {
       "get": {
-        "summary": "Get a list of all elections, without their candidate lists and\na list of the current committee session for each election",
+        "summary": "Get a list of all elections, without their candidate lists and\na list of the current committee session for each election (administrator, coordinator, typist)",
         "operationId": "election_list",
         "responses": {
           "200": {
@@ -161,7 +161,7 @@
     },
     "/api/elections/import": {
       "post": {
-        "summary": "Uploads election definition, validates it, saves it to the database, and returns the created election",
+        "summary": "Uploads election definition, validates it, saves it to the database, and returns the created election (administrator)",
         "operationId": "election_import",
         "requestBody": {
           "content": {
@@ -236,7 +236,7 @@
     },
     "/api/elections/import/validate": {
       "post": {
-        "summary": "Uploads election definition, validates it and returns the associated election data and\na redacted hash, to be filled by the administrator.",
+        "summary": "Uploads election definition, validates it and returns the associated election data and\na redacted hash, to be filled by the administrator. (administrator)",
         "operationId": "election_import_validate",
         "requestBody": {
           "content": {
@@ -311,7 +311,7 @@
     },
     "/api/elections/{election_id}": {
       "get": {
-        "summary": "Get election details including the election's candidate list (political groups),\nits polling stations and the current committee session and its investigations",
+        "summary": "Get election details including the election's candidate list (political groups),\nits polling stations and the current committee session and its investigations (administrator, coordinator, typist)",
         "operationId": "election_details",
         "parameters": [
           {
@@ -379,7 +379,7 @@
     },
     "/api/elections/{election_id}/committee_sessions": {
       "post": {
-        "summary": "Create a new [CommitteeSession].",
+        "summary": "Create a new [CommitteeSession]. (coordinator)",
         "operationId": "committee_session_create",
         "parameters": [
           {
@@ -465,7 +465,7 @@
     },
     "/api/elections/{election_id}/committee_sessions/{committee_session_id}": {
       "put": {
-        "summary": "Update a [CommitteeSession].",
+        "summary": "Update a [CommitteeSession]. (coordinator)",
         "operationId": "committee_session_update",
         "parameters": [
           {
@@ -563,7 +563,7 @@
         ]
       },
       "delete": {
-        "summary": "Delete a [CommitteeSession].",
+        "summary": "Delete a [CommitteeSession]. (coordinator)",
         "operationId": "committee_session_delete",
         "parameters": [
           {
@@ -653,7 +653,7 @@
     },
     "/api/elections/{election_id}/committee_sessions/{committee_session_id}/download_pdf_results": {
       "get": {
-        "summary": "Download a generated PDF with election results",
+        "summary": "Download a generated PDF with election results (coordinator)",
         "operationId": "election_download_pdf_results",
         "parameters": [
           {
@@ -754,7 +754,7 @@
     },
     "/api/elections/{election_id}/committee_sessions/{committee_session_id}/download_zip_results": {
       "get": {
-        "summary": "Download a zip containing a PDF for the PV and the EML with election results",
+        "summary": "Download a zip containing a PDF for the PV and the EML with election results (coordinator)",
         "operationId": "election_download_zip_results",
         "parameters": [
           {
@@ -855,7 +855,7 @@
     },
     "/api/elections/{election_id}/committee_sessions/{committee_session_id}/investigations": {
       "get": {
-        "summary": "Get a list of all [Investigation]s for a committee session",
+        "summary": "Get a list of all [Investigation]s for a committee session (coordinator)",
         "operationId": "committee_session_investigations",
         "parameters": [
           {
@@ -942,7 +942,7 @@
     },
     "/api/elections/{election_id}/committee_sessions/{committee_session_id}/status": {
       "put": {
-        "summary": "Change the status of a [CommitteeSession].",
+        "summary": "Change the status of a [CommitteeSession]. (coordinator)",
         "operationId": "committee_session_status_change",
         "parameters": [
           {
@@ -1042,6 +1042,7 @@
     },
     "/api/elections/{election_id}/download_n_10_2": {
       "get": {
+        "summary": "administrator, coordinator",
         "operationId": "election_download_n_10_2",
         "parameters": [
           {
@@ -1132,6 +1133,7 @@
     },
     "/api/elections/{election_id}/download_na_31_2_bijlage1": {
       "get": {
+        "summary": "administrator, coordinator",
         "operationId": "election_download_na_31_2_bijlage1",
         "parameters": [
           {
@@ -1222,6 +1224,7 @@
     },
     "/api/elections/{election_id}/download_na_31_2_inlegvel": {
       "get": {
+        "summary": "administrator, coordinator",
         "operationId": "election_download_na_31_2_inlegvel",
         "parameters": [
           {
@@ -1312,7 +1315,7 @@
     },
     "/api/elections/{election_id}/polling_stations": {
       "get": {
-        "summary": "Get a list of all [PollingStation]s for an election",
+        "summary": "Get a list of all [PollingStation]s for an election (administrator, coordinator, typist)",
         "operationId": "polling_station_list",
         "parameters": [
           {
@@ -1378,7 +1381,7 @@
         ]
       },
       "post": {
-        "summary": "Create a new [PollingStation]",
+        "summary": "Create a new [PollingStation] (administrator, coordinator)",
         "operationId": "polling_station_create",
         "parameters": [
           {
@@ -1475,7 +1478,7 @@
     },
     "/api/elections/{election_id}/polling_stations/import": {
       "post": {
-        "summary": "Import file with Polling Stations",
+        "summary": "Import file with Polling Stations (administrator, coordinator)",
         "operationId": "polling_station_import",
         "parameters": [
           {
@@ -1562,7 +1565,7 @@
     },
     "/api/elections/{election_id}/polling_stations/validate-import": {
       "post": {
-        "summary": "Validate a file with Polling Stations",
+        "summary": "Validate a file with Polling Stations (administrator, coordinator)",
         "operationId": "polling_station_validate_import",
         "parameters": [
           {
@@ -1649,7 +1652,7 @@
     },
     "/api/elections/{election_id}/polling_stations/{polling_station_id}": {
       "get": {
-        "summary": "Get a [PollingStation]",
+        "summary": "Get a [PollingStation] (administrator, coordinator, typist)",
         "operationId": "polling_station_get",
         "parameters": [
           {
@@ -1726,7 +1729,7 @@
         ]
       },
       "put": {
-        "summary": "Update a [PollingStation]",
+        "summary": "Update a [PollingStation] (administrator, coordinator)",
         "operationId": "polling_station_update",
         "parameters": [
           {
@@ -1822,7 +1825,7 @@
         ]
       },
       "delete": {
-        "summary": "Delete a [PollingStation]",
+        "summary": "Delete a [PollingStation] (administrator, coordinator)",
         "operationId": "polling_station_delete",
         "parameters": [
           {
@@ -1913,7 +1916,7 @@
     },
     "/api/elections/{election_id}/status": {
       "get": {
-        "summary": "Get election polling stations data entry statuses",
+        "summary": "Get election polling stations data entry statuses (administrator, coordinator, typist)",
         "operationId": "election_status",
         "parameters": [
           {
@@ -1981,7 +1984,7 @@
     },
     "/api/elections/{election_id}/voters": {
       "put": {
-        "summary": "Change the number of voters of an [Election].",
+        "summary": "Change the number of voters of an [Election]. (administrator, coordinator)",
         "operationId": "election_number_of_voters_change",
         "parameters": [
           {
@@ -2230,7 +2233,7 @@
     },
     "/api/log": {
       "get": {
-        "summary": "List audit events",
+        "summary": "List audit events (administrator, coordinator)",
         "operationId": "audit_log_list",
         "parameters": [
           {
@@ -2361,7 +2364,7 @@
     },
     "/api/log-users": {
       "get": {
-        "summary": "Lists all users that appear in the audit log",
+        "summary": "Lists all users that appear in the audit log (administrator, coordinator)",
         "operationId": "audit_log_list_users",
         "responses": {
           "200": {
@@ -2499,7 +2502,7 @@
     },
     "/api/polling_stations/{polling_station_id}/data_entries": {
       "delete": {
-        "summary": "Delete data entries and result for a polling station",
+        "summary": "Delete data entries and result for a polling station (coordinator)",
         "operationId": "polling_station_data_entries_and_result_delete",
         "parameters": [
           {
@@ -2580,7 +2583,7 @@
     },
     "/api/polling_stations/{polling_station_id}/data_entries/get": {
       "get": {
-        "summary": "Get data entry with validation results",
+        "summary": "Get data entry with validation results (coordinator)",
         "operationId": "polling_station_data_entry_get",
         "parameters": [
           {
@@ -2668,7 +2671,7 @@
     },
     "/api/polling_stations/{polling_station_id}/data_entries/resolve_differences": {
       "get": {
-        "summary": "Get data entry differences to be resolved",
+        "summary": "Get data entry differences to be resolved (coordinator)",
         "operationId": "polling_station_data_entry_get_differences",
         "parameters": [
           {
@@ -2754,7 +2757,7 @@
         ]
       },
       "post": {
-        "summary": "Resolve data entry differences by providing a `ResolveDifferencesAction`",
+        "summary": "Resolve data entry differences by providing a `ResolveDifferencesAction` (coordinator)",
         "operationId": "polling_station_data_entry_resolve_differences",
         "parameters": [
           {
@@ -2862,7 +2865,7 @@
     },
     "/api/polling_stations/{polling_station_id}/data_entries/resolve_errors": {
       "post": {
-        "summary": "Resolve accepted data entry errors by providing a `ResolveErrorsAction`",
+        "summary": "Resolve accepted data entry errors by providing a `ResolveErrorsAction` (coordinator)",
         "operationId": "polling_station_data_entry_resolve_errors",
         "parameters": [
           {
@@ -2970,7 +2973,7 @@
     },
     "/api/polling_stations/{polling_station_id}/data_entries/{entry_number}": {
       "post": {
-        "summary": "Save a data entry for a polling station",
+        "summary": "Save a data entry for a polling station (typist)",
         "operationId": "polling_station_data_entry_save",
         "parameters": [
           {
@@ -3087,7 +3090,7 @@
         ]
       },
       "delete": {
-        "summary": "Delete an in-progress (not finalised) data entry for a polling station",
+        "summary": "Delete an in-progress (not finalised) data entry for a polling station (typist)",
         "operationId": "polling_station_data_entry_delete",
         "parameters": [
           {
@@ -3179,7 +3182,7 @@
     },
     "/api/polling_stations/{polling_station_id}/data_entries/{entry_number}/claim": {
       "post": {
-        "summary": "Claim a data entry for a polling station, returning any existing progress",
+        "summary": "Claim a data entry for a polling station, returning any existing progress (typist)",
         "operationId": "polling_station_data_entry_claim",
         "parameters": [
           {
@@ -3278,7 +3281,7 @@
     },
     "/api/polling_stations/{polling_station_id}/data_entries/{entry_number}/finalise": {
       "post": {
-        "summary": "Finalise the data entry for a polling station",
+        "summary": "Finalise the data entry for a polling station (typist)",
         "operationId": "polling_station_data_entry_finalise",
         "parameters": [
           {
@@ -3387,7 +3390,7 @@
     },
     "/api/polling_stations/{polling_station_id}/investigation": {
       "put": {
-        "summary": "Update an investigation for a polling station",
+        "summary": "Update an investigation for a polling station (coordinator)",
         "operationId": "polling_station_investigation_update",
         "parameters": [
           {
@@ -3483,7 +3486,7 @@
         ]
       },
       "post": {
-        "summary": "Create an investigation for a polling station",
+        "summary": "Create an investigation for a polling station (coordinator)",
         "operationId": "polling_station_investigation_create",
         "parameters": [
           {
@@ -3579,7 +3582,7 @@
         ]
       },
       "delete": {
-        "summary": "Delete an investigation for a polling station",
+        "summary": "Delete an investigation for a polling station (coordinator)",
         "operationId": "polling_station_investigation_delete",
         "parameters": [
           {
@@ -3650,7 +3653,7 @@
     },
     "/api/polling_stations/{polling_station_id}/investigation/conclude": {
       "post": {
-        "summary": "Conclude an investigation for a polling station",
+        "summary": "Conclude an investigation for a polling station (coordinator)",
         "operationId": "polling_station_investigation_conclude",
         "parameters": [
           {
@@ -3748,7 +3751,7 @@
     },
     "/api/polling_stations/{polling_station_id}/investigation/download_corrigendum_pdf": {
       "get": {
-        "summary": "Download a corrigendum for a polling station",
+        "summary": "Download a corrigendum for a polling station (coordinator)",
         "operationId": "polling_station_investigation_download_corrigendum_pdf",
         "parameters": [
           {
@@ -3840,7 +3843,7 @@
     },
     "/api/users": {
       "get": {
-        "summary": "Lists all users",
+        "summary": "Lists all users (administrator, coordinator)",
         "operationId": "user_list",
         "responses": {
           "200": {
@@ -3894,7 +3897,7 @@
         ]
       },
       "post": {
-        "summary": "Create a new user",
+        "summary": "Create a new user (administrator, coordinator)",
         "operationId": "user_create",
         "requestBody": {
           "content": {
@@ -3980,7 +3983,7 @@
     },
     "/api/users/{user_id}": {
       "get": {
-        "summary": "Get a user",
+        "summary": "Get a user (administrator, coordinator)",
         "operationId": "user_get",
         "parameters": [
           {
@@ -4057,7 +4060,7 @@
         ]
       },
       "put": {
-        "summary": "Update a user",
+        "summary": "Update a user (administrator, coordinator)",
         "operationId": "user_update",
         "parameters": [
           {
@@ -4153,7 +4156,7 @@
         ]
       },
       "delete": {
-        "summary": "Delete a user",
+        "summary": "Delete a user (administrator, coordinator)",
         "operationId": "user_delete",
         "parameters": [
           {
@@ -7399,6 +7402,13 @@
           }
         },
         "additionalProperties": false
+      }
+    },
+    "securitySchemes": {
+      "cookie_auth": {
+        "type": "apiKey",
+        "in": "cookie",
+        "name": "ABACUS_SESSION"
       }
     }
   }

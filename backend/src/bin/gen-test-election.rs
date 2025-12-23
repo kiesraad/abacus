@@ -1,5 +1,3 @@
-#![allow(clippy::cognitive_complexity)]
-#![allow(clippy::too_many_lines)]
 use abacus::{
     AppError,
     committee_session::CommitteeSession,
@@ -83,7 +81,7 @@ struct Args {
     #[arg(long, default_value = "1100", value_parser = parse_range::<u32>)]
     political_group_distribution_slope: Range<u32>,
 
-    /// Export the election defintion, candidate list and polling stations to a directory
+    /// Export the election definition, candidate list and polling stations to a directory
     #[arg(long)]
     export_definition: Option<PathBuf>,
 }
@@ -152,6 +150,8 @@ async fn main() -> Result<(), AppError> {
 }
 
 /// Export an election (in EML) to the specified directory
+#[allow(clippy::too_many_lines)]
+#[allow(clippy::cognitive_complexity)]
 async fn export_election(
     export_dir: &Path,
     committee_session: &CommitteeSession,

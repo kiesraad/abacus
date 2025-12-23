@@ -1,5 +1,3 @@
-#![allow(clippy::too_many_lines)]
-#![allow(clippy::cognitive_complexity)]
 use chrono::{Datelike, Days, NaiveDate, TimeDelta};
 use rand::{SeedableRng, rngs::StdRng, seq::IndexedRandom};
 use sqlx::SqlitePool;
@@ -34,6 +32,7 @@ pub struct CreateTestElectionResult {
     pub data_entry_completed: bool,
 }
 
+#[allow(clippy::too_many_lines)]
 pub async fn create_test_election(
     args: GenerateElectionArgs,
     pool: SqlitePool,
@@ -256,6 +255,7 @@ async fn generate_polling_stations(
 }
 
 /// Generate and store data entries for the given election based on arguments
+#[allow(clippy::too_many_lines)]
 async fn generate_data_entry(
     committee_session: &CommitteeSession,
     election: &ElectionWithPoliticalGroups,
@@ -360,6 +360,7 @@ async fn generate_data_entry(
     (generated_first_entries, generated_second_entries)
 }
 
+#[allow(clippy::too_many_lines)]
 fn generate_cso_first_session_results(
     rng: &mut impl rand::Rng,
     political_groups: &[PoliticalGroup],

@@ -1,10 +1,10 @@
-use sqlx::{Error, SqliteConnection, query_as, types::Json};
+use sqlx::{SqliteConnection, query_as, types::Json};
 
 use crate::election::ElectionId;
 
 use super::{Election, ElectionWithPoliticalGroups, NewElection};
 
-pub async fn list(conn: &mut SqliteConnection) -> Result<Vec<Election>, Error> {
+pub async fn list(conn: &mut SqliteConnection) -> Result<Vec<Election>, sqlx::Error> {
     let elections: Vec<Election> = query_as(
         "SELECT id, name, counting_method, election_id, location, domain_id, category, number_of_seats, number_of_voters, election_date, nomination_date FROM elections",
     )
@@ -16,7 +16,7 @@ pub async fn list(conn: &mut SqliteConnection) -> Result<Vec<Election>, Error> {
 pub async fn get(
     conn: &mut SqliteConnection,
     election_id: ElectionId,
-) -> Result<ElectionWithPoliticalGroups, Error> {
+) -> Result<ElectionWithPoliticalGroups, sqlx::Error> {
     let election: ElectionWithPoliticalGroups = query_as("SELECT * FROM elections WHERE id = ?")
         .bind(election_id)
         .fetch_one(conn)
@@ -27,7 +27,7 @@ pub async fn get(
 pub async fn create(
     conn: &mut SqliteConnection,
     election: NewElection,
-) -> Result<ElectionWithPoliticalGroups, Error> {
+) -> Result<ElectionWithPoliticalGroups, sqlx::Error> {
     query_as(
         r#"
         INSERT INTO elections (
@@ -77,7 +77,7 @@ pub async fn change_number_of_voters(
     conn: &mut SqliteConnection,
     election_id: ElectionId,
     number_of_voters: u32,
-) -> Result<Election, Error> {
+) -> Result<Election, sqlx::Error> {
     query_as!(
         Election,
         r#"

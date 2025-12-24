@@ -1,4 +1,7 @@
-use abacus::pdf_gen::models::{PdfFileModel, PdfModel};
+use abacus::pdf_gen::{
+    generate_pdf,
+    models::{PdfFileModel, PdfModel},
+};
 use clap::Parser;
 use tokio::{fs, process::Command};
 
@@ -64,7 +67,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         let file_name = format!("{path}/{}.pdf", model.as_model_name());
         let file_model = PdfFileModel::new(file_name.clone(), model);
 
-        let pdf = match abacus::pdf_gen::generate_pdf(file_model).await {
+        let pdf = match generate_pdf(file_model).await {
             Ok(pdf) => pdf,
             Err(e) => {
                 eprintln!("Error generating PDF {file_name}: {e:?}");

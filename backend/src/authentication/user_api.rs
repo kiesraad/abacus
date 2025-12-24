@@ -4,7 +4,7 @@ use axum::{
     response::Json,
 };
 use serde::{Deserialize, Serialize};
-use sqlx::{Error, SqlitePool};
+use sqlx::SqlitePool;
 use utoipa::ToSchema;
 use utoipa_axum::{router::OpenApiRouter, routes};
 
@@ -138,7 +138,7 @@ async fn user_get(
     let mut conn = pool.acquire().await?;
     let user = super::user::get_by_id(&mut conn, user_id)
         .await?
-        .ok_or(Error::RowNotFound)?;
+        .ok_or(sqlx::Error::RowNotFound)?;
 
     // Coordinators can only fetch Typists
     if logged_in_user.is_coordinator() && user.role() != Role::Typist {
@@ -175,7 +175,7 @@ pub async fn user_update(
         let mut conn = pool.acquire().await?;
         let target_user = super::user::get_by_id(&mut conn, user_id)
             .await?
-            .ok_or(Error::RowNotFound)?;
+            .ok_or(sqlx::Error::RowNotFound)?;
 
         // Coordinators can only update Typists
         if target_user.role() != Role::Typist {
@@ -197,7 +197,7 @@ pub async fn user_update(
 
     let user = super::user::get_by_id(&mut tx, user_id)
         .await?
-        .ok_or(Error::RowNotFound)?;
+        .ok_or(sqlx::Error::RowNotFound)?;
 
     audit_service
         .log(&mut tx, &AuditEvent::UserUpdated(user.clone().into()), None)
@@ -232,7 +232,7 @@ async fn user_delete(
         let mut conn = pool.acquire().await?;
         let target_user = super::user::get_by_id(&mut conn, user_id)
             .await?
-            .ok_or(Error::RowNotFound)?;
+            .ok_or(sqlx::Error::RowNotFound)?;
 
         // Coordinators can only delete Typists
         if target_user.role() != Role::Typist {
@@ -244,7 +244,7 @@ async fn user_delete(
 
     let user = super::user::get_by_id(&mut tx, user_id)
         .await?
-        .ok_or(Error::RowNotFound)?;
+        .ok_or(sqlx::Error::RowNotFound)?;
 
     // Prevent user from deleting their own account
     if logged_in_user.0.id() == user_id {
@@ -264,6 +264,6 @@ async fn user_delete(
     } else {
         tx.rollback().await?;
 
-        Err(Error::RowNotFound.into())
+        Err(sqlx::Error::RowNotFound.into())
     }
 }

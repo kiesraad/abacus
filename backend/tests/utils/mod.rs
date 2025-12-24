@@ -12,7 +12,7 @@ async fn serve_api_inner(pool: SqlitePool, airgap_detection: AirgapDetection) ->
     let addr = listener.local_addr().unwrap();
 
     tokio::spawn(async move {
-        let app = router(pool, airgap_detection).unwrap();
+        let app = router::create_router(pool, airgap_detection).unwrap();
 
         axum::serve(
             listener,

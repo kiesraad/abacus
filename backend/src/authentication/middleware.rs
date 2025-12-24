@@ -63,7 +63,7 @@ pub async fn extend_session(
     user: Option<User>,
     mut response: Response,
 ) -> Response {
-    // check that there is a authenticated user and a session
+    // check that there is an authenticated user and a session
     let (Some(session), Some(user)) = (session, user) else {
         return response;
     };

@@ -1,12 +1,11 @@
 use chrono::NaiveDateTime;
 use sqlx::{Connection, Error, SqliteConnection, query, query_as};
 
-use crate::election::ElectionId;
-
 use super::{
     CommitteeSession, CommitteeSessionCreateRequest, CommitteeSessionFilesUpdateRequest,
     status::CommitteeSessionStatus,
 };
+use crate::{election::ElectionId, polling_station::duplicate_for_committee_session};
 
 pub async fn get(
     conn: &mut SqliteConnection,
@@ -190,7 +189,7 @@ pub async fn create(
     .await?;
 
     if let Some(current_committee_session_id) = current_committee_session_id {
-        crate::polling_station::repository::duplicate_for_committee_session(
+        duplicate_for_committee_session(
             &mut tx,
             current_committee_session_id,
             next_committee_session.id,

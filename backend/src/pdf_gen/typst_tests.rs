@@ -27,7 +27,7 @@ use crate::{
             VotesTablesWithPreviousVotes,
         },
     },
-    polling_station::structs::{PollingStation, PollingStationType},
+    polling_station::{PollingStation, PollingStationType},
     report::DEFAULT_DATE_TIME_FORMAT,
     summary::{ElectionSummary, PollingStationInvestigations, SumCount, SummaryDifferencesCounts},
 };

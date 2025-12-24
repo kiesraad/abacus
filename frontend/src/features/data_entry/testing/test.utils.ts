@@ -5,8 +5,8 @@ import { screen, within } from "@/testing/test-utils";
 import {
   ClaimDataEntryResponse,
   CSOFirstSessionResults,
-  PoliticalGroup,
   POLLING_STATION_DATA_ENTRY_CLAIM_REQUEST_PATH,
+  PoliticalGroup,
 } from "@/types/generated/openapi";
 import { getCandidateFullName } from "@/utils/candidate";
 

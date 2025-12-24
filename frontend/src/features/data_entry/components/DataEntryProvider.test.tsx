@@ -1,10 +1,8 @@
-import * as ReactRouter from "react-router";
-
 import { waitFor } from "@testing-library/react";
+import * as ReactRouter from "react-router";
 import { beforeEach, describe, expect, test, vi } from "vitest";
-
-import * as useMessages from "@/hooks/messages/useMessages";
 import { DataEntryProvider } from "@/features/data_entry/components/DataEntryProvider";
+import * as useMessages from "@/hooks/messages/useMessages";
 import { electionMockData } from "@/testing/api-mocks/ElectionMockData";
 import { pollingStationMockData } from "@/testing/api-mocks/PollingStationMockData";
 import { ElectionRequestHandler, PollingStationDataEntryClaimHandler } from "@/testing/api-mocks/RequestHandlers";

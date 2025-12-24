@@ -6,7 +6,7 @@ use sqlx::SqlitePool;
 use test_log::test;
 
 use crate::utils::serve_api_with_airgap_detection;
-use abacus::openapi_router;
+use abacus::router::openapi_router;
 
 pub mod utils;
 

@@ -36,7 +36,7 @@ use crate::{
         models::{ModelNa14_2Input, ModelNa31_2Input, ModelP2aInput, PdfFileModel, ToPdfFileModel},
     },
     polling_station,
-    polling_station::structs::PollingStation,
+    polling_station::PollingStation,
     summary::ElectionSummary,
     zip::{ZipResponse, ZipResponseError, slugify_filename, zip_single_file},
 };
@@ -72,8 +72,7 @@ impl ResultsInput {
         let committee_session =
             committee_session::repository::get(conn, committee_session_id).await?;
         let election = election::repository::get(conn, committee_session.election_id).await?;
-        let polling_stations =
-            polling_station::repository::list(conn, committee_session.id).await?;
+        let polling_stations = polling_station::list(conn, committee_session.id).await?;
         let results = list_results_for_committee_session(conn, committee_session.id).await?;
 
         // get investigations if this is not the first session

@@ -79,6 +79,35 @@ pub struct PollingStationRequest {
     pub locality: String,
 }
 
+#[derive(Debug, Deserialize, Serialize, Clone, ToSchema)]
+pub struct PollingStationsRequest {
+    pub file_name: String,
+    pub polling_stations: String,
+}
+
+/// Polling station list response
+#[derive(Serialize, Deserialize, ToSchema, Debug)]
+#[serde(deny_unknown_fields)]
+pub struct PollingStationListResponse {
+    pub polling_stations: Vec<PollingStation>,
+}
+
+impl IntoResponse for PollingStationListResponse {
+    fn into_response(self) -> Response {
+        Json(self).into_response()
+    }
+}
+
+#[derive(Debug, Deserialize, Serialize, Clone, ToSchema)]
+pub struct PollingStationFileRequest {
+    pub data: String,
+}
+
+#[derive(Serialize, Deserialize, ToSchema, Debug)]
+pub struct PollingStationRequestListResponse {
+    pub polling_stations: Vec<PollingStationRequest>,
+}
+
 /// Type of Polling station
 #[derive(
     Serialize, Deserialize, strum::Display, ToSchema, Clone, Copy, Debug, PartialEq, Eq, Hash, Type,

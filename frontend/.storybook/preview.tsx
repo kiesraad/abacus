@@ -1,6 +1,5 @@
-import { StaticRouter } from "react-router";
-
 import type { Preview } from "@storybook/react-vite";
+import { StaticRouter } from "react-router";
 import { configure, expect, sb } from "storybook/test";
 
 import { ApiResponseStatus } from "@/api/ApiResult";

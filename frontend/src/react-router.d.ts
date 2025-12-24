@@ -3,7 +3,7 @@ import { Role } from "./types/generated/openapi";
 type Handle = { public?: never; roles: Role[] } | { public: true; roles?: never };
 
 declare module "react-router" {
-  import { IndexRouteObject, NonIndexRouteObject, useMatches, UIMatch } from "react-router";
+  import { IndexRouteObject, NonIndexRouteObject, UIMatch } from "react-router";
 
   type RouteObject =
     // Replace handle for routes with index=true

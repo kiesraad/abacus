@@ -1,9 +1,8 @@
-import * as ReactRouter from "react-router";
-import { ReactNode } from "react";
-
 import { render as rtlRender } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { http, HttpResponse } from "msw";
+import { HttpResponse, http } from "msw";
+import { ReactNode } from "react";
+import * as ReactRouter from "react-router";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
 import { ApiProvider } from "@/api/ApiProvider";
@@ -21,6 +20,7 @@ import {
 } from "@/testing/api-mocks/RequestHandlers";
 import { getRouter, Router } from "@/testing/router";
 import { overrideOnce, server } from "@/testing/server";
+import { TestUserProvider } from "@/testing/TestUserProvider";
 import {
   expectConflictErrorPage,
   renderReturningRouter,
@@ -29,7 +29,6 @@ import {
   spyOnHandler,
   waitFor,
 } from "@/testing/test-utils";
-import { TestUserProvider } from "@/testing/TestUserProvider";
 import { CommitteeSession, ElectionDetailsResponse, ErrorResponse } from "@/types/generated/openapi";
 
 import { ElectionReportPage } from "./ElectionReportPage";
@@ -284,7 +283,9 @@ describe("ElectionReportPage", () => {
 
     // Set to second session and update investigations
     electionData.current_committee_session.number = 2;
-    electionData.investigations.map((i) => (i.corrected_results = true));
+    electionData.investigations.forEach((i) => {
+      i.corrected_results = true;
+    });
 
     server.use(
       http.get("/api/elections/1", () =>
@@ -320,7 +321,9 @@ describe("ElectionReportPage", () => {
 
     // Set to second session and update investigations
     electionData.current_committee_session.number = 2;
-    electionData.investigations.map((i) => (i.corrected_results = false));
+    electionData.investigations.forEach((i) => {
+      i.corrected_results = false;
+    });
 
     server.use(
       http.get("/api/elections/1", () =>

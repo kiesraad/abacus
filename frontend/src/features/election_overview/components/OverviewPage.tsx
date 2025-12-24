@@ -16,7 +16,7 @@ import { Toolbar } from "@/components/ui/Toolbar/Toolbar";
 import { useLiveData } from "@/hooks/useLiveData";
 import { useUserRole } from "@/hooks/user/useUserRole";
 import { t, tx } from "@/i18n/translate";
-import { Election, ELECTION_LIST_REQUEST_PATH, ElectionListResponse } from "@/types/generated/openapi";
+import { ELECTION_LIST_REQUEST_PATH, Election, ElectionListResponse } from "@/types/generated/openapi";
 import { committeeSessionLabel } from "@/utils/committeeSession";
 
 import cls from "./OverviewPage.module.css";
@@ -88,7 +88,7 @@ export function OverviewPage() {
     const committeeSession = committeeSessionList.find(
       (committeeSession) => committeeSession.election_id === election.id,
     );
-    let electionLink = undefined;
+    let electionLink;
     let committeeSessionStatus = <></>;
     let committeeSessionString = "";
     if (isAdminOrCoordinator) {

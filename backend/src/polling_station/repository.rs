@@ -64,36 +64,6 @@ pub async fn get(conn: &mut SqliteConnection, id: u32) -> Result<PollingStation,
     .await
 }
 
-#[cfg(test)]
-pub async fn get_by_previous_id(
-    conn: &mut SqliteConnection,
-    previous_id: u32,
-) -> Result<PollingStation, sqlx::Error> {
-    query_as!(
-        PollingStation,
-        r#"
-        SELECT
-            p.id AS "id: u32",
-            c.election_id AS "election_id: ElectionId",
-            p.committee_session_id AS "committee_session_id: u32",
-            p.id_prev_session AS "id_prev_session: _",
-            p.name,
-            p.number AS "number: u32",
-            p.number_of_voters AS "number_of_voters: _",
-            p.polling_station_type AS "polling_station_type: _",
-            p.address,
-            p.postal_code,
-            p.locality
-        FROM polling_stations AS p
-        JOIN committee_sessions AS c ON c.id = p.committee_session_id
-        WHERE p.id_prev_session = $1
-        "#,
-        previous_id
-    )
-    .fetch_one(conn)
-    .await
-}
-
 /// Get a single polling station for an election
 pub async fn get_for_election(
     conn: &mut SqliteConnection,

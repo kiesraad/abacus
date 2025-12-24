@@ -1048,8 +1048,7 @@ mod tests {
 
     use super::*;
     use crate::{
-        election::structs::tests::election_fixture,
-        polling_station::structs::tests::polling_station_fixture,
+        election::structs::tests::election_fixture, polling_station::polling_station_fixture,
     };
 
     mod extra_investigation {
@@ -1059,7 +1058,7 @@ mod tests {
                 ValidationResults, YesNo,
             },
             election::structs::tests::election_fixture,
-            polling_station::structs::tests::polling_station_fixture,
+            polling_station::polling_station_fixture,
         };
 
         fn validate(
@@ -1185,7 +1184,7 @@ mod tests {
                 ValidationResultCode, ValidationResults, YesNo,
             },
             election::structs::tests::election_fixture,
-            polling_station::structs::tests::polling_station_fixture,
+            polling_station::polling_station_fixture,
         };
 
         fn validate(
@@ -1341,7 +1340,7 @@ mod tests {
                 VotersCounts,
             },
             election::structs::tests::election_fixture,
-            polling_station::structs::tests::polling_station_fixture,
+            polling_station::polling_station_fixture,
         };
 
         fn validate(
@@ -1397,7 +1396,7 @@ mod tests {
                 ValidationResultCode, ValidationResults, VotesCounts,
             },
             election::{PGNumber, structs::tests::election_fixture},
-            polling_station::structs::tests::polling_station_fixture,
+            polling_station::polling_station_fixture,
         };
 
         fn validate(
@@ -2766,7 +2765,7 @@ mod tests {
                 CandidateNumber, ElectionWithPoliticalGroups, PGNumber,
                 structs::tests::election_fixture,
             },
-            polling_station::structs::tests::polling_station_fixture,
+            polling_station::polling_station_fixture,
         };
 
         /// Takes a list of tuples where each tuple contains:
@@ -2946,7 +2945,7 @@ mod tests {
                 tests::ValidDefault,
             },
             election::{PGNumber, structs::tests::election_fixture},
-            polling_station::structs::tests::polling_station_fixture,
+            polling_station::polling_station_fixture,
         };
 
         fn create_test_data() -> CommonPollingStationResults {

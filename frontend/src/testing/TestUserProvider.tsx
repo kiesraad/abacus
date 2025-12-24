@@ -40,7 +40,7 @@ export function TestUserProvider({ userRole, children, overrideExpiration }: Tes
     loading: false,
     airGapError: false,
     expiration,
-    extendSession: function (): Promise<void> {
+    extendSession: (): Promise<void> => {
       expiration.setMinutes(expiration.getMinutes() + 30);
 
       return Promise.resolve();

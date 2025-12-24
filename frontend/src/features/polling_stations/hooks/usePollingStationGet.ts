@@ -1,4 +1,4 @@
-import { useInitialApiGet, UseInitialApiGetReturn } from "@/api/useInitialApiGet";
+import { UseInitialApiGetReturn, useInitialApiGet } from "@/api/useInitialApiGet";
 import { POLLING_STATION_GET_REQUEST_PATH, PollingStation } from "@/types/generated/openapi";
 
 export function usePollingStationGet(

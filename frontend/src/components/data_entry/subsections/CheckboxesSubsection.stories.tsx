@@ -1,6 +1,5 @@
-import { useState } from "react";
-
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import { useState } from "react";
 import { expect, fn, userEvent } from "storybook/test";
 
 import type { CheckboxesSubsection, SectionValues } from "@/types/types";

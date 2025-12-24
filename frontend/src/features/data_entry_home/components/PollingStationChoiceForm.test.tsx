@@ -1,10 +1,9 @@
 import { userEvent } from "@testing-library/user-event";
-import { http, HttpResponse } from "msw";
+import { HttpResponse, http } from "msw";
 import { beforeEach, describe, expect, test, vi } from "vitest";
-
-import * as useUser from "@/hooks/user/useUser";
 import { ElectionProvider } from "@/hooks/election/ElectionProvider";
 import { ElectionStatusProvider } from "@/hooks/election/ElectionStatusProvider";
+import * as useUser from "@/hooks/user/useUser";
 import { electionDetailsMockResponse, getElectionMockData } from "@/testing/api-mocks/ElectionMockData";
 import { statusResponseMock } from "@/testing/api-mocks/ElectionStatusMockData";
 import { pollingStationMockData } from "@/testing/api-mocks/PollingStationMockData";
@@ -149,30 +148,31 @@ describe("Test PollingStationChoiceForm", () => {
         selectorFeedback: "Je mag stembureau 39 niet nog een keer invoeren",
         submitFeedback: "Je mag stembureau 39 niet nog een keer invoeren",
       },
-    ])(
-      "Inputting and submitting an invalid polling station shows feedback and alert: $testDescription",
-      async ({ pollingStationInput, selectorFeedback, submitFeedback }) => {
-        overrideOnce("get", "/api/elections/1", 200, electionDetailsMockResponse);
-        overrideOnce("get", "/api/elections/1/status", 200, statusResponseMock);
+    ])("Inputting and submitting an invalid polling station shows feedback and alert: $testDescription", async ({
+      pollingStationInput,
+      selectorFeedback,
+      submitFeedback,
+    }) => {
+      overrideOnce("get", "/api/elections/1", 200, electionDetailsMockResponse);
+      overrideOnce("get", "/api/elections/1/status", 200, statusResponseMock);
 
-        const user = userEvent.setup();
-        await renderPollingStationChoiceForm();
+      const user = userEvent.setup();
+      await renderPollingStationChoiceForm();
 
-        const pollingStation = await screen.findByTestId("pollingStation");
-        await user.type(pollingStation, pollingStationInput);
+      const pollingStation = await screen.findByTestId("pollingStation");
+      await user.type(pollingStation, pollingStationInput);
 
-        const pollingStationSelectFeedback = await screen.findByTestId("pollingStationSelectorFeedback");
-        await waitFor(() => {
-          expect(pollingStationSelectFeedback).toHaveTextContent(selectorFeedback);
-        });
+      const pollingStationSelectFeedback = await screen.findByTestId("pollingStationSelectorFeedback");
+      await waitFor(() => {
+        expect(pollingStationSelectFeedback).toHaveTextContent(selectorFeedback);
+      });
 
-        const submitButton = screen.getByRole("button", { name: "Beginnen" });
-        await user.click(submitButton);
+      const submitButton = screen.getByRole("button", { name: "Beginnen" });
+      await user.click(submitButton);
 
-        const pollingStationSubmitFeedback = await screen.findByTestId("pollingStationSubmitFeedback");
-        expect(pollingStationSubmitFeedback).toHaveTextContent(submitFeedback);
-      },
-    );
+      const pollingStationSubmitFeedback = await screen.findByTestId("pollingStationSubmitFeedback");
+      expect(pollingStationSubmitFeedback).toHaveTextContent(submitFeedback);
+    });
 
     test("Selecting a non-existing polling station", async () => {
       overrideOnce("get", "/api/elections/1", 200, electionDetailsMockResponse);

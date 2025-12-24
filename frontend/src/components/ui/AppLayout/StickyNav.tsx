@@ -11,7 +11,7 @@ export function StickyNav({ children }: StickyNavProps) {
 
   React.useEffect(() => {
     const nav = navRef.current;
-    const parent = nav && nav.parentElement;
+    const parent = nav?.parentElement;
     if (nav && parent) {
       nav.style.removeProperty("--sticky-nav-offset");
 
@@ -21,7 +21,7 @@ export function StickyNav({ children }: StickyNavProps) {
       const updateTopAndBottomOffset = () => {
         const navTop = nav.getBoundingClientRect().top;
 
-        const parentPaddingBottom = parseInt(getComputedStyle(parent).paddingBottom);
+        const parentPaddingBottom = parseInt(getComputedStyle(parent).paddingBottom, 10);
         const parentBottom = parent.getBoundingClientRect().bottom;
 
         // Calculate visible parent bottom padding, based on element distance to bottom of viewport

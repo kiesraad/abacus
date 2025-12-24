@@ -142,9 +142,6 @@ label.button {
     padding: calc(0.75rem - var(--button-border-width)) calc(1.25rem - var(--button-border-width));
   }
 
-  &.lg {
-  }
-
   &.xl {
     min-width: 13rem;
   }

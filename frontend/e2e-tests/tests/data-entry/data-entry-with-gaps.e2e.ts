@@ -77,7 +77,7 @@ test.describe("full data entry flow with gaps in party/candidate numbers", () =>
     await expect(candidatesListPage_2.getCandidate(0)).toBeFocused();
 
     await candidatesListPage_2.fillCandidatesAndTotal([0, 0], 0);
-    const responsePromise = page.waitForResponse(new RegExp("/api/polling_stations/(\\d+)/data_entries/([12])"));
+    const responsePromise = page.waitForResponse(/\/api\/polling_stations\/(\d+)\/data_entries\/([12])/);
     await candidatesListPage_2.next.click();
 
     const response = await responsePromise;

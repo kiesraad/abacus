@@ -7,7 +7,7 @@ import { t, tx } from "@/i18n/translate";
 import { ErrorReference } from "@/types/generated/openapi";
 import { isDevelopment } from "@/utils/env";
 
-import { Error } from "./Error";
+import { ErrorMessage } from "./ErrorMessage";
 
 interface FatalErrorPageProps {
   title?: TranslationPath;
@@ -23,7 +23,7 @@ export function FatalErrorPage({ title = "error.title", message, code, reference
       <AppLayout>
         {/* Show NavBar for / to avoid call to useElection outside ElectionProvider */}
         <NavBar location={{ pathname: "/" }} />
-        <Error title={t(title)} error={error}>
+        <ErrorMessage title={t(title)} error={error}>
           {(code || reference) && (
             <p>
               {code && (
@@ -41,7 +41,7 @@ export function FatalErrorPage({ title = "error.title", message, code, reference
               <p>
                 {tx("error.instruction.content", {
                   link: (content) => (
-                    <a href="https://github.com/kiesraad/abacus" target="_blank">
+                    <a href="https://github.com/kiesraad/abacus" target="_blank" rel="noopener">
                       {content}
                     </a>
                   ),
@@ -49,7 +49,7 @@ export function FatalErrorPage({ title = "error.title", message, code, reference
               </p>
             </>
           )}
-        </Error>
+        </ErrorMessage>
         <Footer />
       </AppLayout>
     </AppFrame>

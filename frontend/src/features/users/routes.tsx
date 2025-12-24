@@ -4,8 +4,8 @@ import { UserCreateDetailsPage } from "./components/create/UserCreateDetailsPage
 import { UserCreateLayout } from "./components/create/UserCreateLayout";
 import { UserCreateRolePage } from "./components/create/UserCreateRolePage";
 import { UserCreateTypePage } from "./components/create/UserCreateTypePage";
-import { UserUpdatePage } from "./components/update/UserUpdatePage";
 import { UserListPage } from "./components/UserListPage";
+import { UserUpdatePage } from "./components/update/UserUpdatePage";
 
 export const usersRoutes: RouteObject[] = [
   { index: true, Component: UserListPage, handle: { roles: ["administrator", "coordinator"] } },

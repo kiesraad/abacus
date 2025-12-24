@@ -109,7 +109,7 @@ export function CommitteeSessionCard({
     ? formatDateTimeFull(new Date(committeeSession.start_date_time))
     : undefined;
   const buttonLinks: ButtonLink[] = [];
-  let cardButton = undefined;
+  let cardButton;
 
   const addIf = (item: ButtonLink, condition: boolean) => {
     if (condition) {

@@ -1,4 +1,4 @@
-import { http, type HttpHandler, HttpResponse } from "msw";
+import { type HttpHandler, HttpResponse, http } from "msw";
 
 import {
   ACCOUNT_REQUEST_PARAMS,
@@ -108,7 +108,6 @@ import {
   PollingStationInvestigation,
   PollingStationListResponse,
   SaveDataEntryResponse,
-  User,
   USER_CREATE_REQUEST_BODY,
   USER_CREATE_REQUEST_PARAMS,
   USER_CREATE_REQUEST_PATH,
@@ -121,6 +120,7 @@ import {
   USER_UPDATE_REQUEST_BODY,
   USER_UPDATE_REQUEST_PARAMS,
   USER_UPDATE_REQUEST_PATH,
+  User,
   UserListResponse,
 } from "@/types/generated/openapi";
 

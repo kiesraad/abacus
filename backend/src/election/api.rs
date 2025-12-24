@@ -23,6 +23,7 @@ use crate::{
     },
     eml::{EML110, EML230, EMLDocument, EMLImportError, EmlHash, RedactedEmlHash},
     investigation::PollingStationInvestigation,
+    polling_station,
     polling_station::{
         PollingStation, PollingStationRequest, PollingStationsRequest,
         create_imported_polling_stations,
@@ -121,8 +122,7 @@ pub async fn election_details(
         .first()
         .expect("There is always one committee session")
         .clone();
-    let polling_stations =
-        crate::polling_station::repository::list(&mut conn, current_committee_session.id).await?;
+    let polling_stations = polling_station::list(&mut conn, current_committee_session.id).await?;
     let investigations = crate::investigation::list_investigations_for_committee_session(
         &mut conn,
         current_committee_session.id,

@@ -1,6 +1,5 @@
-import { ComponentProps } from "react";
-
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import { ComponentProps } from "react";
 import { expect } from "storybook/test";
 
 import { validationResultMockData } from "@/testing/api-mocks/ValidationResultMockData";

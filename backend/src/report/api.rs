@@ -7,30 +7,36 @@ use chrono::{DateTime, Local, Utc};
 use sqlx::{SqliteConnection, SqlitePool};
 use utoipa_axum::{router::OpenApiRouter, routes};
 
+use super::DEFAULT_DATE_TIME_FORMAT;
 use crate::{
     APIError, AppState, ErrorResponse, SqlitePoolExt,
-    audit_log::{AuditEvent, AuditService},
+    audit_log::AuditService,
     authentication::Coordinator,
+    committee_session,
     committee_session::{
         CommitteeSession, CommitteeSessionError, CommitteeSessionFilesUpdateRequest,
-        repository::change_files, status::CommitteeSessionStatus,
+        repository::{change_files, get_previous_session},
+        status::CommitteeSessionStatus,
     },
-    data_entry::{PollingStationResults, repository::are_results_complete_for_committee_session},
+    data_entry::{
+        PollingStationResults,
+        repository::{
+            are_results_complete_for_committee_session, list_results_for_committee_session,
+        },
+    },
+    election,
     election::{ElectionId, ElectionWithPoliticalGroups},
     eml::{EML510, EMLDocument, EmlHash},
     error::ErrorReference,
-    files::{
-        File,
-        repository::{create_file, get_file},
-    },
-    investigation::PollingStationInvestigation,
+    files,
+    files::{File, create_file},
+    investigation::{PollingStationInvestigation, list_investigations_for_committee_session},
     pdf_gen::{
         VotesTables, VotesTablesWithPreviousVotes, generate_pdf,
         models::{ModelNa14_2Input, ModelNa31_2Input, ModelP2aInput, PdfFileModel, ToPdfFileModel},
     },
     polling_station,
     polling_station::PollingStation,
-    report::DEFAULT_DATE_TIME_FORMAT,
     summary::ElectionSummary,
     zip::{ZipResponse, ZipResponseError, slugify_filename, zip_single_file},
 };
@@ -64,31 +70,21 @@ impl ResultsInput {
         created_at: DateTime<Local>,
     ) -> Result<ResultsInput, APIError> {
         let committee_session =
-            crate::committee_session::repository::get(conn, committee_session_id).await?;
-        let election =
-            crate::election::repository::get(conn, committee_session.election_id).await?;
+            committee_session::repository::get(conn, committee_session_id).await?;
+        let election = election::repository::get(conn, committee_session.election_id).await?;
         let polling_stations = polling_station::list(conn, committee_session.id).await?;
-        let results = crate::data_entry::repository::list_results_for_committee_session(
-            conn,
-            committee_session.id,
-        )
-        .await?;
+        let results = list_results_for_committee_session(conn, committee_session.id).await?;
 
         // get investigations if this is not the first session
         let investigations = if committee_session.is_next_session() {
-            crate::investigation::list_investigations_for_committee_session(
-                conn,
-                committee_session.id,
-            )
-            .await?
+            list_investigations_for_committee_session(conn, committee_session.id).await?
         } else {
             vec![]
         };
 
         // get the previous committee session if this is not the first session
         let previous_committee_session = if committee_session.is_next_session() {
-            crate::committee_session::repository::get_previous_session(conn, committee_session.id)
-                .await?
+            get_previous_session(conn, committee_session.id).await?
         } else {
             None
         };
@@ -97,11 +93,7 @@ impl ResultsInput {
         let previous_summary = if let Some(previous_committee_session) = &previous_committee_session
         {
             let previous_results =
-                crate::data_entry::repository::list_results_for_committee_session(
-                    conn,
-                    previous_committee_session.id,
-                )
-                .await?;
+                list_results_for_committee_session(conn, previous_committee_session.id).await?;
             let previous_summary = ElectionSummary::from_results(&election, &previous_results)?;
             Some(previous_summary)
         } else {
@@ -160,39 +152,83 @@ impl ResultsInput {
         }
     }
 
-    #[allow(clippy::too_many_lines)]
+    fn get_p2a_pdf_file(&self, overview_filename: String) -> PdfFileModel {
+        ModelP2aInput {
+            committee_session: self.committee_session.clone(),
+            election: self.election.clone(),
+            investigations: self
+                .investigations
+                .iter()
+                .map(|inv| {
+                    let ps = self
+                        .polling_stations
+                        .iter()
+                        .find(|ps| ps.id == inv.polling_station_id)
+                        .cloned()
+                        .expect("Polling station for investigation should exist");
+                    (ps, inv.clone())
+                })
+                .collect(),
+        }
+        .to_pdf_file_model(overview_filename)
+    }
+
+    fn get_na14_2_pdf_file(
+        &self,
+        previous_summary: &ElectionSummary,
+        previous_committee_session: &CommitteeSession,
+        hash: String,
+        creation_date_time: String,
+        results_pdf_filename: String,
+    ) -> Result<PdfFileModel, APIError> {
+        let pdf_file: PdfFileModel = ModelNa14_2Input {
+            votes_tables: VotesTablesWithPreviousVotes::new(
+                &self.election,
+                &self.summary,
+                previous_summary,
+            )?,
+            committee_session: self.committee_session.clone(),
+            election: self.election.clone().into(),
+            summary: self.summary.clone().into(),
+            previous_summary: previous_summary.clone().into(),
+            previous_committee_session: previous_committee_session.clone(),
+            hash,
+            creation_date_time,
+        }
+        .to_pdf_file_model(results_pdf_filename);
+        Ok(pdf_file)
+    }
+
+    fn get_na31_2_pdf_file(
+        self,
+        hash: String,
+        creation_date_time: String,
+        results_pdf_filename: String,
+    ) -> Result<PdfFileModel, APIError> {
+        let pdf_file: PdfFileModel = ModelNa31_2Input {
+            votes_tables: VotesTables::new(&self.election, &self.summary)?,
+            committee_session: self.committee_session,
+            polling_stations: self.polling_stations,
+            summary: self.summary.into(),
+            election: self.election.into(),
+            hash,
+            creation_date_time,
+        }
+        .to_pdf_file_model(results_pdf_filename);
+        Ok(pdf_file)
+    }
+
     fn into_pdf_file_models(self, xml_hash: impl Into<String>) -> Result<PdfModelList, APIError> {
         let hash = xml_hash.into();
         let creation_date_time = self.created_at.format(DEFAULT_DATE_TIME_FORMAT).to_string();
 
-        let overview_pdf = if let Some(overview_filename) = self.overview_pdf_filename() {
-            Some(
-                ModelP2aInput {
-                    committee_session: self.committee_session.clone(),
-                    election: self.election.clone(),
-                    investigations: self
-                        .investigations
-                        .iter()
-                        .map(|inv| {
-                            let ps = self
-                                .polling_stations
-                                .iter()
-                                .find(|ps| ps.id == inv.polling_station_id)
-                                .cloned()
-                                .expect("Polling station for investigation should exist");
-                            (ps, inv.clone())
-                        })
-                        .collect(),
-                }
-                .to_pdf_file_model(overview_filename),
-            )
-        } else {
-            None
-        };
+        let overview_pdf = self
+            .overview_pdf_filename()
+            .map(|overview_filename| self.get_p2a_pdf_file(overview_filename));
 
         let results_pdf_filename = self.results_pdf_filename();
         let results_pdf = if self.committee_session.is_next_session() {
-            let Some(previous_summary) = self.previous_summary else {
+            let Some(previous_summary) = &self.previous_summary else {
                 return Err(APIError::DataIntegrityError(
                 "Previous summary is required for generating results PDF for next committee sessions"
                     .to_string(),
@@ -206,32 +242,15 @@ impl ResultsInput {
             ));
             };
 
-            ModelNa14_2Input {
-                votes_tables: VotesTablesWithPreviousVotes::new(
-                    &self.election,
-                    &self.summary,
-                    &previous_summary,
-                )?,
-                committee_session: self.committee_session,
-                election: self.election.into(),
-                summary: self.summary.into(),
-                previous_summary: previous_summary.into(),
-                previous_committee_session: previous_committee_session.clone(),
+            self.get_na14_2_pdf_file(
+                previous_summary,
+                previous_committee_session,
                 hash,
                 creation_date_time,
-            }
-            .to_pdf_file_model(results_pdf_filename)
+                results_pdf_filename,
+            )?
         } else {
-            ModelNa31_2Input {
-                votes_tables: VotesTables::new(&self.election, &self.summary)?,
-                committee_session: self.committee_session,
-                polling_stations: self.polling_stations,
-                summary: self.summary.into(),
-                election: self.election.into(),
-                hash,
-                creation_date_time,
-            }
-            .to_pdf_file_model(results_pdf_filename)
+            self.get_na31_2_pdf_file(hash, creation_date_time, results_pdf_filename)?
         };
 
         Ok(PdfModelList {
@@ -281,21 +300,114 @@ fn xml_zip_filename(election: &ElectionWithPoliticalGroups) -> String {
     ))
 }
 
-#[allow(clippy::cognitive_complexity)]
-#[allow(clippy::too_many_lines)]
 async fn generate_and_save_files(
+    conn: &mut SqliteConnection,
+    audit_service: &AuditService,
+    committee_session: CommitteeSession,
+    corrections: bool,
+    input: ResultsInput,
+) -> Result<(Option<File>, Option<File>, Option<File>), APIError> {
+    let mut eml_file: Option<File> = None;
+    let mut pdf_file: Option<File> = None;
+    let mut overview_pdf_file: Option<File> = None;
+    let created_at = input.created_at.with_timezone(&Utc);
+    let xml_string = input.as_xml().to_xml_string()?;
+
+    let xml_hash = EmlHash::from(xml_string.as_bytes());
+    let xml_filename = input.xml_filename();
+    let pdf_files = input.into_pdf_file_models(xml_hash)?;
+
+    // For the first session, or if there are corrections, we also store the EML and count PDF
+    // For next sessions without corrections, we don't store these
+    if !committee_session.is_next_session() || corrections {
+        let eml = create_file(
+            conn,
+            audit_service,
+            xml_filename,
+            xml_string.as_bytes(),
+            EML_MIME_TYPE.to_string(),
+            created_at,
+        )
+        .await?;
+
+        let pdf = create_file(
+            conn,
+            audit_service,
+            pdf_files.results.file_name.clone(),
+            &generate_pdf(pdf_files.results).await?.buffer,
+            PDF_MIME_TYPE.to_string(),
+            created_at,
+        )
+        .await?;
+
+        eml_file = Some(eml);
+        pdf_file = Some(pdf);
+    }
+
+    // Store the overview PDF for next sessions
+    if let Some(overview_pdf) = pdf_files.overview {
+        let overview_pdf = create_file(
+            conn,
+            audit_service,
+            overview_pdf.file_name.clone(),
+            &generate_pdf(overview_pdf).await?.buffer,
+            PDF_MIME_TYPE.to_string(),
+            created_at,
+        )
+        .await?;
+
+        overview_pdf_file = Some(overview_pdf);
+    }
+    change_files(
+        conn,
+        committee_session.id,
+        CommitteeSessionFilesUpdateRequest {
+            results_eml: eml_file.as_ref().map(|eml| eml.id),
+            results_pdf: pdf_file.as_ref().map(|pdf| pdf.id),
+            overview_pdf: overview_pdf_file.as_ref().map(|overview| overview.id),
+        },
+    )
+    .await?;
+
+    Ok((eml_file, pdf_file, overview_pdf_file))
+}
+
+async fn get_existing_files(
+    conn: &mut SqliteConnection,
+    committee_session: &CommitteeSession,
+) -> Result<(Option<File>, Option<File>, Option<File>, DateTime<Utc>), APIError> {
+    let mut created_at = Utc::now();
+    let mut eml_file: Option<File> = None;
+    let mut pdf_file: Option<File> = None;
+    let mut overview_pdf_file: Option<File> = None;
+    if let Some(eml_id) = committee_session.results_eml {
+        let file = files::repository::get(conn, eml_id).await?;
+        created_at = file.created_at;
+        eml_file = Some(file);
+    }
+    if let Some(pdf_id) = committee_session.results_pdf {
+        let file = files::repository::get(conn, pdf_id).await?;
+        created_at = file.created_at;
+        pdf_file = Some(file);
+    }
+    if let Some(overview_pdf_id) = committee_session.overview_pdf {
+        let file = files::repository::get(conn, overview_pdf_id).await?;
+        created_at = file.created_at;
+        overview_pdf_file = Some(file);
+    }
+    Ok((eml_file, pdf_file, overview_pdf_file, created_at))
+}
+
+async fn get_files(
     pool: &SqlitePool,
     audit_service: AuditService,
     committee_session_id: u32,
 ) -> Result<(Option<File>, Option<File>, Option<File>, DateTime<Utc>), APIError> {
     let mut conn = pool.acquire().await?;
     let committee_session =
-        crate::committee_session::repository::get(&mut conn, committee_session_id).await?;
-    let investigations = crate::investigation::list_investigations_for_committee_session(
-        &mut conn,
-        committee_session.id,
-    )
-    .await?;
+        committee_session::repository::get(&mut conn, committee_session_id).await?;
+    let investigations =
+        list_investigations_for_committee_session(&mut conn, committee_session.id).await?;
     let corrections = investigations
         .iter()
         .any(|inv| matches!(inv.corrected_results, Some(true)));
@@ -310,27 +422,9 @@ async fn generate_and_save_files(
         ));
     }
 
-    let mut created_at = Utc::now();
-    let mut eml_file: Option<File> = None;
-    let mut pdf_file: Option<File> = None;
-    let mut overview_pdf_file: Option<File> = None;
-
     // Check if files exist, if so, get files from database
-    if let Some(eml_id) = committee_session.results_eml {
-        let file = get_file(&mut conn, eml_id).await?;
-        created_at = file.created_at;
-        eml_file = Some(file);
-    }
-    if let Some(pdf_id) = committee_session.results_pdf {
-        let file = get_file(&mut conn, pdf_id).await?;
-        created_at = file.created_at;
-        pdf_file = Some(file);
-    }
-    if let Some(overview_pdf_id) = committee_session.overview_pdf {
-        let file = get_file(&mut conn, overview_pdf_id).await?;
-        created_at = file.created_at;
-        overview_pdf_file = Some(file);
-    }
+    let (mut eml_file, mut pdf_file, mut overview_pdf_file, mut created_at) =
+        get_existing_files(&mut conn, &committee_session).await?;
     drop(conn);
 
     // Determine if we need to generate any of the files
@@ -348,84 +442,20 @@ async fn generate_and_save_files(
     if generate_files {
         created_at = Utc::now();
         let mut tx = pool.begin_immediate().await?;
-
         let input = ResultsInput::new(
             &mut tx,
             committee_session.id,
             created_at.with_timezone(&Local),
         )
         .await?;
-        let xml = input.as_xml();
-        let xml_string = xml.to_xml_string()?;
-
-        let xml_hash = EmlHash::from(xml_string.as_bytes());
-        let xml_filename = input.xml_filename();
-        let pdf_files = input.into_pdf_file_models(xml_hash)?;
-
-        // For the first session, or if there are corrections, we also store the EML and count PDF
-        // For next sessions without corrections, we don't store these
-        if !committee_session.is_next_session() || corrections {
-            let eml = create_file(
-                &mut tx,
-                xml_filename,
-                xml_string.as_bytes(),
-                EML_MIME_TYPE.to_string(),
-                created_at,
-            )
-            .await?;
-
-            audit_service
-                .log(&mut tx, &AuditEvent::FileCreated(eml.clone().into()), None)
-                .await?;
-
-            let pdf = create_file(
-                &mut tx,
-                pdf_files.results.file_name.clone(),
-                &generate_pdf(pdf_files.results).await?.buffer,
-                PDF_MIME_TYPE.to_string(),
-                created_at,
-            )
-            .await?;
-
-            audit_service
-                .log(&mut tx, &AuditEvent::FileCreated(pdf.clone().into()), None)
-                .await?;
-
-            eml_file = Some(eml);
-            pdf_file = Some(pdf);
-        }
-
-        // Store the overview PDF for next sessions
-        if let Some(overview_pdf) = pdf_files.overview {
-            let overview_pdf = create_file(
-                &mut tx,
-                overview_pdf.file_name.clone(),
-                &generate_pdf(overview_pdf).await?.buffer,
-                PDF_MIME_TYPE.to_string(),
-                created_at,
-            )
-            .await?;
-            audit_service
-                .log(
-                    &mut tx,
-                    &AuditEvent::FileCreated(overview_pdf.clone().into()),
-                    None,
-                )
-                .await?;
-            overview_pdf_file = Some(overview_pdf);
-        }
-
-        change_files(
+        (eml_file, pdf_file, overview_pdf_file) = generate_and_save_files(
             &mut tx,
-            committee_session.id,
-            CommitteeSessionFilesUpdateRequest {
-                results_eml: eml_file.as_ref().map(|eml| eml.id),
-                results_pdf: pdf_file.as_ref().map(|pdf| pdf.id),
-                overview_pdf: overview_pdf_file.as_ref().map(|overview| overview.id),
-            },
+            &audit_service,
+            committee_session,
+            corrections,
+            input,
         )
         .await?;
-
         tx.commit().await?;
     }
 
@@ -464,11 +494,11 @@ async fn election_download_zip_results(
     Path((election_id, committee_session_id)): Path<(ElectionId, u32)>,
 ) -> Result<impl IntoResponse, APIError> {
     let mut conn = pool.acquire().await?;
-    let election = crate::election::repository::get(&mut conn, election_id).await?;
+    let election = election::repository::get(&mut conn, election_id).await?;
     let committee_session =
-        crate::committee_session::repository::get(&mut conn, committee_session_id).await?;
+        committee_session::repository::get(&mut conn, committee_session_id).await?;
     let (eml_file, pdf_file, overview_file, created_at) =
-        generate_and_save_files(&pool, audit_service, committee_session.id).await?;
+        get_files(&pool, audit_service, committee_session.id).await?;
     drop(conn);
 
     let download_zip_filename = download_zip_filename(
@@ -535,8 +565,7 @@ async fn election_download_pdf_results(
     audit_service: AuditService,
     Path((_election_id, committee_session_id)): Path<(ElectionId, u32)>,
 ) -> Result<Attachment<Vec<u8>>, APIError> {
-    let (_, pdf_file, _, _) =
-        generate_and_save_files(&pool, audit_service, committee_session_id).await?;
+    let (_, pdf_file, _, _) = get_files(&pool, audit_service, committee_session_id).await?;
 
     let pdf_file = pdf_file.ok_or(APIError::BadRequest(
         "PDF results are not generated".to_string(),
@@ -556,13 +585,13 @@ mod tests {
     use test_log::test;
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_5_with_results"))))]
-    async fn test_generate_and_save_files_first_session(pool: SqlitePool) {
+    async fn test_get_files_first_session(pool: SqlitePool) {
         let mut conn = pool.acquire().await.unwrap();
         let audit_service = AuditService::new(None, None);
 
         // Files should be generated exactly once
         for _ in 1..=2 {
-            let (eml, pdf, overview, _) = generate_and_save_files(&pool, audit_service.clone(), 5)
+            let (eml, pdf, overview, _) = get_files(&pool, audit_service.clone(), 5)
                 .await
                 .expect("should return files");
             let eml = eml.expect("should have generated eml");
@@ -582,16 +611,15 @@ mod tests {
     }
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_7_four_sessions"))))]
-    async fn test_generate_and_save_files_next_session(pool: SqlitePool) {
+    async fn test_get_files_next_session(pool: SqlitePool) {
         let mut conn = pool.acquire().await.unwrap();
         let audit_service = AuditService::new(None, None);
 
         // Files should be generated exactly once
         for _ in 1..=2 {
-            let (eml, pdf, overview, _) =
-                generate_and_save_files(&pool, audit_service.clone(), 703)
-                    .await
-                    .expect("should return files");
+            let (eml, pdf, overview, _) = get_files(&pool, audit_service.clone(), 703)
+                .await
+                .expect("should return files");
 
             let eml = eml.expect("should have generated eml");
             let pdf = pdf.expect("should have generated pdf");
@@ -612,7 +640,7 @@ mod tests {
     }
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_7_four_sessions"))))]
-    async fn test_generate_and_save_files_next_session_without_corrections(pool: SqlitePool) {
+    async fn test_get_files_next_session_without_corrections(pool: SqlitePool) {
         let audit_service = AuditService::new(None, None);
         let mut conn = pool.acquire().await.unwrap();
 
@@ -624,10 +652,9 @@ mod tests {
 
         // File should be generated exactly once
         for _ in 1..=2 {
-            let (eml, pdf, overview, _) =
-                generate_and_save_files(&pool, audit_service.clone(), 703)
-                    .await
-                    .expect("should return files");
+            let (eml, pdf, overview, _) = get_files(&pool, audit_service.clone(), 703)
+                .await
+                .expect("should return files");
 
             // No EML and no model PDF should be generated at all
             assert_eq!(eml, None);

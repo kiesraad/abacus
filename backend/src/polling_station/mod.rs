@@ -14,7 +14,7 @@ pub(crate) use self::structs::PollingStationType;
 pub(crate) use self::{
     api::{create_imported_polling_stations, router},
     repository::{duplicate_for_committee_session, get, list},
-    structs::{PollingStationRequest, PollingStationsRequest},
+    structs::{PollingStationNumber, PollingStationRequest, PollingStationsRequest},
 };
 #[cfg(test)]
 pub(crate) use self::{

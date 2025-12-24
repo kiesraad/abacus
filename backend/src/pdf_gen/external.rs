@@ -9,29 +9,34 @@ use crate::{
     zip::{ZipResponseError, ZipResponseWriter},
 };
 
+async fn generate_file(
+    file_name: &String,
+    file_model: PdfFileModel,
+) -> Result<PdfGenResult, PdfGenError> {
+    let start = Instant::now();
+    let content = generate_pdf(file_model).await?;
+
+    info!(
+        "Generated PDF {file_name} in {} ms",
+        start.elapsed().as_millis()
+    );
+    Ok(content)
+}
+
 /// Create a PDF file for each model in the provided vector and send them through the provided channel.
-#[allow(clippy::too_many_lines)]
-#[allow(clippy::cognitive_complexity)]
 pub async fn generate_pdfs(
     models: Vec<PdfFileModel>,
     mut zip_writer: ZipResponseWriter,
 ) -> Result<(), PdfGenError> {
     for file_model in models.into_iter() {
         let file_name = file_model.file_name.clone();
-        let start = Instant::now();
-
-        let content = match generate_pdf(file_model).await {
+        let content = match generate_file(&file_name, file_model).await {
             Ok(content) => content,
             Err(e) => {
                 error!("Failed to generate PDF {file_name}: {e:?}");
                 continue;
             }
         };
-
-        info!(
-            "Generated PDF {file_name} in {} ms",
-            start.elapsed().as_millis()
-        );
 
         zip_writer.add_file(&file_name, &content.buffer).await?;
     }
@@ -49,7 +54,7 @@ pub async fn generate_pdf(file_model: PdfFileModel) -> Result<PdfGenResult, PdfG
     // create a temporary copy of the template files
     let tmp_path = tokio::task::spawn_blocking(prep_tmp_templates_dir).await??;
 
-    // write json data to model input file
+    // write JSON data to model input file
     let json_path = {
         let mut full_path = tmp_path.clone();
         full_path.push(file_model.model.as_input_path());
@@ -118,7 +123,7 @@ fn prep_tmp_templates_dir() -> Result<PathBuf, std::io::Error> {
     Ok(temp_dir)
 }
 
-/// Copy a directory recusively to another location
+/// Copy a directory recursively to another location
 fn copy_dir(
     source: impl AsRef<std::path::Path>,
     dest: impl AsRef<std::path::Path>,

@@ -1,4 +1,5 @@
 use serde::{Deserialize, Serialize};
+use std::slice::Iter;
 
 use crate::{
     APIError,
@@ -166,58 +167,21 @@ pub(super) struct VotesTable {
 }
 
 impl VotesTable {
-    #[allow(clippy::too_many_lines)]
     pub fn new(
         group: &PoliticalGroup,
         candidate_votes: Option<&PoliticalGroupCandidateVotes>,
         previous_candidate_votes: Option<&PoliticalGroupCandidateVotes>,
         column_sizes: [usize; 4],
     ) -> Result<Self, APIError> {
-        let mut columns = Vec::new();
         let mut candidate_iterator = group.candidates.iter();
+        let columns = get_votes_table_columns(
+            &mut candidate_iterator,
+            candidate_votes,
+            previous_candidate_votes,
+            column_sizes,
+        )?;
 
-        for max_per_column in &column_sizes {
-            let mut column_votes = Vec::new();
-
-            for candidate in candidate_iterator.by_ref().take(*max_per_column) {
-                let mut votes = get_votes_for_candidate(candidate.number, candidate_votes)?;
-                let previous_votes =
-                    get_votes_for_candidate(candidate.number, previous_candidate_votes)?;
-
-                if candidate_votes.is_some() && votes.is_none() {
-                    votes = Some(votes.unwrap_or_default())
-                }
-
-                column_votes.push(CandidateVotes {
-                    candidate: candidate.clone(),
-                    votes,
-                    previous_votes,
-                });
-            }
-
-            if column_votes.is_empty() {
-                break;
-            }
-
-            let column_total = column_votes
-                .iter()
-                .map(|cv| cv.votes)
-                .collect::<Option<Vec<_>>>()
-                .map(|votes| votes.into_iter().sum());
-
-            let previous_column_total = column_votes
-                .iter()
-                .map(|cv| cv.previous_votes)
-                .collect::<Option<Vec<_>>>()
-                .map(|votes| votes.into_iter().sum());
-
-            columns.push(VotesTableColumn {
-                column_total,
-                previous_column_total,
-                votes: column_votes,
-            });
-        }
-
+        // sanity check: there should not be more candidates than expected in political group
         if candidate_iterator.next().is_some() {
             return Err(APIError::DataIntegrityError(format!(
                 "More candidates than expected in political group {}",
@@ -271,6 +235,58 @@ pub(super) struct VotesTableColumn {
     previous_column_total: Option<Count>,
     /// Votes per candidate in this column
     votes: Vec<CandidateVotes>,
+}
+
+pub fn get_votes_table_columns(
+    candidate_iterator: &mut Iter<Candidate>,
+    candidate_votes: Option<&PoliticalGroupCandidateVotes>,
+    previous_candidate_votes: Option<&PoliticalGroupCandidateVotes>,
+    column_sizes: [usize; 4],
+) -> Result<Vec<VotesTableColumn>, APIError> {
+    let mut columns = Vec::new();
+
+    for max_per_column in &column_sizes {
+        let mut column_votes = Vec::new();
+
+        for candidate in candidate_iterator.by_ref().take(*max_per_column) {
+            let mut votes = get_votes_for_candidate(candidate.number, candidate_votes)?;
+            let previous_votes =
+                get_votes_for_candidate(candidate.number, previous_candidate_votes)?;
+
+            if candidate_votes.is_some() && votes.is_none() {
+                votes = Some(votes.unwrap_or_default())
+            }
+
+            column_votes.push(CandidateVotes {
+                candidate: candidate.clone(),
+                votes,
+                previous_votes,
+            });
+        }
+
+        if column_votes.is_empty() {
+            break;
+        }
+
+        let column_total = column_votes
+            .iter()
+            .map(|cv| cv.votes)
+            .collect::<Option<Vec<_>>>()
+            .map(|votes| votes.into_iter().sum());
+
+        let previous_column_total = column_votes
+            .iter()
+            .map(|cv| cv.previous_votes)
+            .collect::<Option<Vec<_>>>()
+            .map(|votes| votes.into_iter().sum());
+
+        columns.push(VotesTableColumn {
+            column_total,
+            previous_column_total,
+            votes: column_votes,
+        });
+    }
+    Ok(columns)
 }
 
 #[derive(Debug, Serialize, Deserialize)]

@@ -1,6 +1,5 @@
-import * as React from "react";
-
 import type { Meta, StoryFn } from "@storybook/react-vite";
+import * as React from "react";
 
 import { TestUserProvider } from "@/testing/TestUserProvider";
 import { Role } from "@/types/generated/openapi";

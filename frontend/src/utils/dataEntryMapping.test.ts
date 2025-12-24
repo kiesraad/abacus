@@ -534,7 +534,7 @@ describe("mapResultsToSectionValues", () => {
 
     const formValues = mapResultsToSectionValues(testSectionWithRadio, results);
 
-    expect(formValues["test"]).toBe(expected);
+    expect(formValues.test).toBe(expected);
   });
 
   test("should extract voters_votes_counts section fields", () => {
@@ -782,7 +782,7 @@ describe("mapResultsToSectionValues", () => {
     const formValues = mapResultsToSectionValues(mixedSection, results);
 
     expect(Object.keys(formValues).length).toBe(2);
-    expect(formValues["test"]).toBe("true");
+    expect(formValues.test).toBe("true");
     expect(formValues["voters_counts.poll_card_count"]).toBe("100");
   });
 

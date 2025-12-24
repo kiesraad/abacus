@@ -1,3 +1,4 @@
+import { stat } from "node:fs/promises";
 import { expect, Page } from "@playwright/test";
 import { CandidatesListPage } from "e2e-tests/page-objects/data_entry/CandidatesListPgObj";
 import { CheckAndSavePage } from "e2e-tests/page-objects/data_entry/CheckAndSavePgObj";
@@ -18,7 +19,6 @@ import { AddInvestigationPgObj } from "e2e-tests/page-objects/investigations/Add
 import { InvestigationOverviewPgObj } from "e2e-tests/page-objects/investigations/InvestigationOverviewPgObj";
 import { InvestigationPrintCorrigendumPgObj } from "e2e-tests/page-objects/investigations/InvestigationPrintCorrigendumPgObj";
 import { InvestigationReasonPgObj } from "e2e-tests/page-objects/investigations/InvestigationReasonPgObj";
-import { stat } from "node:fs/promises";
 
 import { PollingStationResults } from "@/types/generated/openapi";
 

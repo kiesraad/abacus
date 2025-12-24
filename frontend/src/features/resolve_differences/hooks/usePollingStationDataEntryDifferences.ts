@@ -84,7 +84,7 @@ export function usePollingStationDataEntryDifferences(
     if (isSuccess(response)) {
       // reload the election status data then navigate according to new status
       await electionContext?.refetch();
-      let firstEntryUserId = undefined;
+      let firstEntryUserId;
       if (differences && action === "keep_first_entry") {
         firstEntryUserId = differences.first_entry_user_id;
       } else if (differences && action === "keep_second_entry") {

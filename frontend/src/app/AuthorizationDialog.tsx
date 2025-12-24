@@ -12,7 +12,8 @@ import { EXPIRATION_DIALOG_SECONDS } from "./authorizationConstants";
 export function AuthorizationDialog() {
   const { user, loading, expiration, extendSession, setUser } = useApiState();
   const [sessionValidFor, setSessionValidFor] = useState<number | null>(
-    expiration !== null ? (expiration.getTime() - new Date().getTime()) / 1000 : null,
+    // eslint-disable-next-line react-hooks/purity -- TODO: find pure alternative for Date.now()
+    expiration !== null ? (expiration.getTime() - Date.now()) / 1000 : null,
   );
   const [hideDialog, setHideDialog] = useState(false);
 

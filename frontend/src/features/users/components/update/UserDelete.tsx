@@ -6,7 +6,7 @@ import { IconTrash } from "@/components/generated/icons";
 import { Button } from "@/components/ui/Button/Button";
 import { Modal } from "@/components/ui/Modal/Modal";
 import { t } from "@/i18n/translate";
-import { User, USER_DELETE_REQUEST_PATH } from "@/types/generated/openapi";
+import { USER_DELETE_REQUEST_PATH, User } from "@/types/generated/openapi";
 
 interface UserDeleteProps {
   user: User;

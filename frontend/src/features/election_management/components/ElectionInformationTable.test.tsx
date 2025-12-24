@@ -1,11 +1,10 @@
-import * as ReactRouter from "react-router";
-
 import { waitFor } from "@testing-library/react";
+import * as ReactRouter from "react-router";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
 import { committeeSessionMockData } from "@/testing/api-mocks/CommitteeSessionMockData";
-import { render, screen, within } from "@/testing/test-utils";
 import { TestUserProvider } from "@/testing/TestUserProvider";
+import { render, screen, within } from "@/testing/test-utils";
 import { CommitteeSessionStatus, Role } from "@/types/generated/openapi";
 
 import { ElectionInformationTable } from "./ElectionInformationTable";

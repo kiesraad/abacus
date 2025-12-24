@@ -1,14 +1,12 @@
-import * as ReactRouter from "react-router";
-
 import { within } from "@testing-library/dom";
 import { render } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import * as ReactRouter from "react-router";
 import { beforeEach, describe, expect, test, vi } from "vitest";
-
-import * as useMessages from "@/hooks/messages/useMessages";
 import cls from "@/features/resolve_differences/components/ResolveDifferences.module.css";
 import { ElectionProvider } from "@/hooks/election/ElectionProvider";
 import { ElectionStatusProvider } from "@/hooks/election/ElectionStatusProvider";
+import * as useMessages from "@/hooks/messages/useMessages";
 import { UsersProvider } from "@/hooks/user/UsersProvider";
 import {
   ElectionListRequestHandler,
@@ -19,8 +17,8 @@ import {
   UserListRequestHandler,
 } from "@/testing/api-mocks/RequestHandlers";
 import { overrideOnce, server } from "@/testing/server";
-import { screen, spyOnHandler } from "@/testing/test-utils";
 import { TestUserProvider } from "@/testing/TestUserProvider";
+import { screen, spyOnHandler } from "@/testing/test-utils";
 import { DataEntryStatusName } from "@/types/generated/openapi";
 
 import { ResolveDifferencesPage } from "./ResolveDifferencesPage";

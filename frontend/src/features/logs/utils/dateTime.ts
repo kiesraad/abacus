@@ -5,7 +5,7 @@ export function timestampToDateString(timestamp: string | undefined): string {
   }
 
   const d = new Date();
-  const time = new Date(parseInt(timestamp) * 1000 - d.getTimezoneOffset() * 60000);
+  const time = new Date(parseInt(timestamp, 10) * 1000 - d.getTimezoneOffset() * 60000);
 
   return time.toISOString().slice(0, 16);
 }

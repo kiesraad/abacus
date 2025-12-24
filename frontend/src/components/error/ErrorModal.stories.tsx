@@ -24,7 +24,7 @@ export const UnknownServerErrorModal = {
   args: {
     // we need to disable the linter to test the method with an unknown translation key
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
+    // @ts-expect-error
     error: new ApiError(ApiResponseStatus.ServerError, 543, "Unknown Server Error", "UnknownServerError"),
   },
 } satisfies Story;

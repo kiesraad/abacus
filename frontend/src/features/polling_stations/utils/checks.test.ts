@@ -26,10 +26,12 @@ describe("Test isPollingStationCreateAndUpdateAllowed", () => {
     isAdministrator: boolean;
     status: CommitteeSessionStatus;
     expected: boolean;
-  }>)(
-    "isPollingStationCreateAndUpdateAllowed for isCoordinator=$isCoordinator and isAdministrator=$isAdministrator with committee session status=$status should return $expected",
-    ({ isCoordinator, isAdministrator, status, expected }) => {
-      expect(isPollingStationCreateAndUpdateAllowed(isCoordinator, isAdministrator, status)).toEqual(expected);
-    },
-  );
+  }>)("isPollingStationCreateAndUpdateAllowed for isCoordinator=$isCoordinator and isAdministrator=$isAdministrator with committee session status=$status should return $expected", ({
+    isCoordinator,
+    isAdministrator,
+    status,
+    expected,
+  }) => {
+    expect(isPollingStationCreateAndUpdateAllowed(isCoordinator, isAdministrator, status)).toEqual(expected);
+  });
 });

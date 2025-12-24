@@ -9,7 +9,7 @@ import { Form } from "@/components/ui/Form/Form";
 import { FormLayout } from "@/components/ui/Form/FormLayout";
 import { InputField } from "@/components/ui/InputField/InputField";
 import { t } from "@/i18n/translate";
-import { ErrorReference, UpdateUserRequest, User, USER_UPDATE_REQUEST_PATH } from "@/types/generated/openapi";
+import { ErrorReference, UpdateUserRequest, USER_UPDATE_REQUEST_PATH, User } from "@/types/generated/openapi";
 import { StringFormData } from "@/utils/stringFormData";
 
 export interface UserUpdateFormProps {

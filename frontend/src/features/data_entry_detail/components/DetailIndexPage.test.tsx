@@ -1,12 +1,10 @@
-import * as ReactRouter from "react-router";
-
 import { waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import * as ReactRouter from "react-router";
 import { beforeEach, describe, expect, test, vi } from "vitest";
-
-import * as useMessages from "@/hooks/messages/useMessages";
 import { ElectionProvider } from "@/hooks/election/ElectionProvider";
 import { ElectionStatusProvider } from "@/hooks/election/ElectionStatusProvider";
+import * as useMessages from "@/hooks/messages/useMessages";
 import { UsersProvider } from "@/hooks/user/UsersProvider";
 import {
   dataEntryHasWarningsGetMockResponse,
@@ -22,8 +20,8 @@ import {
   UserListRequestHandler,
 } from "@/testing/api-mocks/RequestHandlers";
 import { overrideOnce, server } from "@/testing/server";
-import { renderReturningRouter, screen, spyOnHandler } from "@/testing/test-utils";
 import { TestUserProvider } from "@/testing/TestUserProvider";
+import { renderReturningRouter, screen, spyOnHandler } from "@/testing/test-utils";
 import { DataEntryGetResponse } from "@/types/generated/openapi";
 
 import { DetailIndexPage } from "./DetailIndexPage";

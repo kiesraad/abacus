@@ -37,7 +37,7 @@ export class VotersAndVotesPage extends DataEntryBasePage {
     this.totalAdmittedVotersCount = page.getByRole("textbox", { name: "D Totaal toegelaten kiezers" });
 
     // votes counts
-    this.politicalGroupTotalVotes = this.page.getByRole("textbox", { name: new RegExp(`E\\.\\d+\\sTotaal Lijst`) });
+    this.politicalGroupTotalVotes = this.page.getByRole("textbox", { name: /E\.\d+\sTotaal Lijst/ });
     this.totalVotesCandidatesCount = page.getByRole("textbox", { name: "E Totaal stemmen op kandidaten" });
     this.blankVotesCount = page.getByRole("textbox", { name: "F Blanco stemmen" });
     this.invalidVotesCount = page.getByRole("textbox", { name: "G Ongeldige stemmen" });

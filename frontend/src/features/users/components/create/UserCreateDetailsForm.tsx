@@ -8,7 +8,7 @@ import { Form } from "@/components/ui/Form/Form";
 import { FormLayout } from "@/components/ui/Form/FormLayout";
 import { InputField } from "@/components/ui/InputField/InputField";
 import { t } from "@/i18n/translate";
-import { CreateUserRequest, Role, User, USER_CREATE_REQUEST_PATH } from "@/types/generated/openapi";
+import { CreateUserRequest, Role, USER_CREATE_REQUEST_PATH, User } from "@/types/generated/openapi";
 import { StringFormData } from "@/utils/stringFormData";
 
 export interface UserCreateDetailsFormProps {

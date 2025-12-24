@@ -143,7 +143,7 @@ The application uses the following dependencies:
 - `jsdom`: a pure-JavaScript implementation of many web standards for use with Node.js
 - `testing-library`: (React) component and dom test utilities
 - `playwright`: e2e testing framework
-- `prettier`: Opinionated code formatter
+- `biome`: formatter and linter
 - `eslint`: Linter
 
 ### Scripts

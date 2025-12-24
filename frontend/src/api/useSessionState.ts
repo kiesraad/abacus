@@ -4,8 +4,8 @@ import {
   ACCOUNT_REQUEST_PATH,
   LOGIN_REQUEST_BODY,
   LOGIN_REQUEST_PATH,
-  LoginResponse,
   LOGOUT_REQUEST_PATH,
+  LoginResponse,
 } from "@/types/generated/openapi";
 
 import { ApiClient, DEFAULT_CANCEL_REASON } from "./ApiClient";

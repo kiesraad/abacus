@@ -1,10 +1,8 @@
-import * as ReactRouter from "react-router";
-
 import { userEvent } from "@testing-library/user-event/dist/cjs/index.js";
+import * as ReactRouter from "react-router";
 import { beforeEach, describe, expect, test, vi } from "vitest";
-
-import * as useMessages from "@/hooks/messages/useMessages";
 import { ElectionProvider } from "@/hooks/election/ElectionProvider";
+import * as useMessages from "@/hooks/messages/useMessages";
 import { getElectionMockData } from "@/testing/api-mocks/ElectionMockData";
 import { ElectionRequestHandler, PollingStationCreateHandler } from "@/testing/api-mocks/RequestHandlers";
 import { overrideOnce, server } from "@/testing/server";

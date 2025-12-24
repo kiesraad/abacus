@@ -23,5 +23,5 @@ export function Loader() {
     return null;
   }
 
-  return <div className={cls["loader"]}>{t("loading")}</div>;
+  return <div className={cls.loader}>{t("loading")}</div>;
 }

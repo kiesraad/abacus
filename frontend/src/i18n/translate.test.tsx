@@ -18,7 +18,7 @@ describe("i18n", () => {
 
     // we need to disable the linter to test the method with an unknown translation key
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
+    // @ts-expect-error
     expect(translate("foo.bar")).toEqual("foo.bar");
 
     // simple translation

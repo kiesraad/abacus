@@ -1,10 +1,8 @@
-import { RouterProvider } from "react-router";
-
 import { render } from "@testing-library/react";
+import { RouterProvider } from "react-router";
 import { beforeEach, describe, expect, test, vi } from "vitest";
-
-import * as useElection from "@/hooks/election/useElection";
 import { ApiResponseStatus } from "@/api/ApiResult";
+import * as useElection from "@/hooks/election/useElection";
 import { committeeSessionMockData } from "@/testing/api-mocks/CommitteeSessionMockData";
 import { electionMockData } from "@/testing/api-mocks/ElectionMockData";
 import { screen, setupTestRouter } from "@/testing/test-utils";

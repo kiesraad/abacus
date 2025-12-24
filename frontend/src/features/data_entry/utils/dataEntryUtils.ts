@@ -26,7 +26,7 @@ export function resetFormSectionState(formState: FormState) {
 export function getNextSectionID(formState: FormState, currentSectionId: FormSectionId) {
   const currentSection = formState.sections[currentSectionId];
 
-  if (currentSection && currentSection.isSubmitted && formSectionComplete(currentSection)) {
+  if (currentSection?.isSubmitted && formSectionComplete(currentSection)) {
     for (const section of Object.values(formState.sections)) {
       if (
         (formState.furthest === "save" && !section.errors.isEmpty() && !section.acceptErrorsAndWarnings) ||
@@ -110,7 +110,7 @@ export function getInitialFormState(dataEntryStructure: DataEntryStructure): For
     sections[section.id] = createFormSection(section.id, index);
   });
 
-  sections["save"] = createFormSection("save", dataEntryStructure.length);
+  sections.save = createFormSection("save", dataEntryStructure.length);
 
   return { furthest, sections };
 }
@@ -246,7 +246,7 @@ export function addValidationResultsToFormState(
 ) {
   for (const section of dataEntryStructure) {
     const formSection = formState.sections[section.id];
-    if (formSection && formSection.isSaved) {
+    if (formSection?.isSaved) {
       for (const validationResult of validationResults) {
         if (doesValidationResultApplyToSection(validationResult, section)) {
           formSection[errorsOrWarnings].add(validationResult);

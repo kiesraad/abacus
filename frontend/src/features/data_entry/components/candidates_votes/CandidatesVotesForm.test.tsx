@@ -1,10 +1,8 @@
-import * as ReactRouter from "react-router";
-
 import { userEvent } from "@testing-library/user-event";
+import * as ReactRouter from "react-router";
 import { beforeEach, describe, expect, test, vi } from "vitest";
-
-import * as useUser from "@/hooks/user/useUser";
 import { MessagesProvider } from "@/hooks/messages/MessagesProvider";
+import * as useUser from "@/hooks/user/useUser";
 import { electionMockData, politicalGroupMockData } from "@/testing/api-mocks/ElectionMockData";
 import { pollingStationMockData } from "@/testing/api-mocks/PollingStationMockData";
 import {
@@ -17,8 +15,8 @@ import { getUrlMethodAndBody, render, screen, waitFor, within } from "@/testing/
 import {
   ElectionWithPoliticalGroups,
   LoginResponse,
-  PoliticalGroup,
   POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_BODY,
+  PoliticalGroup,
 } from "@/types/generated/openapi";
 
 import { getDefaultDataEntryState, getEmptyDataEntryRequest } from "../../testing/mock-data";

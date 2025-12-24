@@ -15,8 +15,8 @@ Tests uitgevoerd door externe partijen (pen test, wettelijke toets) zijn niet op
 - Overige units: bijvoorbeeld API code, utility functies.
 
 ### Tooling
-- [eslint][eslint]: Linting
-- [prettier][prettier]: Formatting 
+- [ESLint][eslint]: Linting
+- [Biome][biome]: Formatting 
 - [Vitest][vitest]: Test runner voor alle tests behalve Playwright-tests
 - [Playwright][playwright]: Test framework inclusief runner tegen browser-engine
 - [Mock Service Worker][mock-service-worker]: Mock server
@@ -167,7 +167,7 @@ Nog te bepalen.
 [github-secret-scanning]: https://docs.github.com/en/code-security/secret-scanning/introduction/about-secret-scanning
 [mock-service-worker]: https://mswjs.io
 [playwright]: https://playwright.dev/
-[prettier]: https://prettier.io/
+[biome]: https://biomejs.dev/
 [react-testing-library]: https://testing-library.com/docs/react-testing-library/intro
 [reqwest]: https://crates.io/crates/reqwest
 [rustfmt]: https://github.com/rust-lang/rustfmt

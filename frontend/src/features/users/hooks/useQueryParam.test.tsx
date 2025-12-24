@@ -1,6 +1,5 @@
-import * as ReactRouter from "react-router";
-
 import { act, renderHook } from "@testing-library/react";
+import * as ReactRouter from "react-router";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
 import { useQueryParam } from "./useQueryParam";

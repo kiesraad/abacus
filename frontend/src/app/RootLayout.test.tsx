@@ -1,14 +1,12 @@
-import { RouteObject } from "react-router";
-
 import { render as rtlRender } from "@testing-library/react";
+import { RouteObject } from "react-router";
 import { describe, expect, test, vi } from "vitest";
-
-import * as useUser from "@/hooks/user/useUser";
-import * as userMockData from "@/testing/user-mock-data";
 import { ErrorBoundary } from "@/components/error/ErrorBoundary";
 import { LoginPage } from "@/features/account/components/LoginPage";
+import * as useUser from "@/hooks/user/useUser";
 import { Providers } from "@/testing/Providers";
 import { setupTestRouter } from "@/testing/test-utils";
+import * as userMockData from "@/testing/user-mock-data";
 import { Role } from "@/types/generated/openapi";
 
 import { RootLayout } from "./RootLayout";

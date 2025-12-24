@@ -1,14 +1,12 @@
-import * as ReactRouter from "react-router";
-
 import { render as rtlRender, waitFor, within } from "@testing-library/react";
 import { userEvent } from "@testing-library/user-event";
-import { http, HttpResponse } from "msw";
+import { HttpResponse, http } from "msw";
+import * as ReactRouter from "react-router";
 import { beforeEach, describe, expect, test, vi } from "vitest";
-
-import * as useUser from "@/hooks/user/useUser";
 import { ErrorBoundary } from "@/components/error/ErrorBoundary";
 import { ElectionLayout } from "@/components/layout/ElectionLayout";
 import { ElectionStatusLayout } from "@/components/layout/ElectionStatusLayout";
+import * as useUser from "@/hooks/user/useUser";
 import { getElectionMockData } from "@/testing/api-mocks/ElectionMockData";
 import {
   CommitteeSessionStatusChangeRequestHandler,
@@ -73,37 +71,37 @@ describe("ElectionStatusPage", () => {
     vi.spyOn(ReactRouter, "useNavigate").mockImplementation(() => navigate);
   });
 
-  test.each<LoginResponse>([getCoordinatorUser(), getAdminUser()])(
-    "Page render when committee session status is created for user: %s",
-    async (loginResponse) => {
-      vi.spyOn(useUser, "useUser").mockReturnValue(loginResponse);
-      const user = userEvent.setup();
-      server.use(
-        http.get("/api/elections/1", () =>
-          HttpResponse.json(getElectionMockData({}, { status: "created" }) satisfies ElectionDetailsResponse, {
-            status: 200,
-          }),
-        ),
-      );
+  test.each<LoginResponse>([
+    getCoordinatorUser(),
+    getAdminUser(),
+  ])("Page render when committee session status is created for user: %s", async (loginResponse) => {
+    vi.spyOn(useUser, "useUser").mockReturnValue(loginResponse);
+    const user = userEvent.setup();
+    server.use(
+      http.get("/api/elections/1", () =>
+        HttpResponse.json(getElectionMockData({}, { status: "created" }) satisfies ElectionDetailsResponse, {
+          status: 200,
+        }),
+      ),
+    );
 
-      await renderPage();
+    await renderPage();
 
-      // Test that the data entry finished and data entry paused alerts don't exist
-      expect(screen.queryByText("Alle stembureaus zijn twee keer ingevoerd")).not.toBeInTheDocument();
-      expect(screen.queryByRole("button", { name: "Invoerfase afronden" })).not.toBeInTheDocument();
-      expect(screen.queryByText("Het invoeren van stemmen is gepauzeerd")).not.toBeInTheDocument();
-      expect(screen.queryByRole("button", { name: "Invoer hervatten" })).not.toBeInTheDocument();
+    // Test that the data entry finished and data entry paused alerts don't exist
+    expect(screen.queryByText("Alle stembureaus zijn twee keer ingevoerd")).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Invoerfase afronden" })).not.toBeInTheDocument();
+    expect(screen.queryByText("Het invoeren van stemmen is gepauzeerd")).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Invoer hervatten" })).not.toBeInTheDocument();
 
-      expect(await screen.findByText("Zitting voorbereiden")).toBeVisible();
+    expect(await screen.findByText("Zitting voorbereiden")).toBeVisible();
 
-      const pollingStationsButton = screen.getByRole("button", { name: "Stembureaus" });
-      expect(pollingStationsButton).toBeVisible();
+    const pollingStationsButton = screen.getByRole("button", { name: "Stembureaus" });
+    expect(pollingStationsButton).toBeVisible();
 
-      await user.click(pollingStationsButton);
+    await user.click(pollingStationsButton);
 
-      expect(navigate).toHaveBeenCalledWith("/elections/1/polling-stations");
-    },
-  );
+    expect(navigate).toHaveBeenCalledWith("/elections/1/polling-stations");
+  });
 
   test("Page render when committee session status is data_entry_not_started for coordinator", async () => {
     vi.spyOn(useUser, "useUser").mockReturnValue(getCoordinatorUser());
@@ -358,36 +356,36 @@ describe("ElectionStatusPage", () => {
     expect(screen.queryByRole("button", { name: "Hervatten" })).not.toBeInTheDocument();
   });
 
-  test.each<LoginResponse>([getCoordinatorUser(), getAdminUser()])(
-    "Page render when committee session status is data_entry_finished for role: %s",
-    async (loginResponse) => {
-      vi.spyOn(useUser, "useUser").mockReturnValue(loginResponse);
-      server.use(
-        http.get("/api/elections/1", () =>
-          HttpResponse.json(
-            getElectionMockData({}, { status: "data_entry_finished" }) satisfies ElectionDetailsResponse,
-            { status: 200 },
-          ),
+  test.each<LoginResponse>([
+    getCoordinatorUser(),
+    getAdminUser(),
+  ])("Page render when committee session status is data_entry_finished for role: %s", async (loginResponse) => {
+    vi.spyOn(useUser, "useUser").mockReturnValue(loginResponse);
+    server.use(
+      http.get("/api/elections/1", () =>
+        HttpResponse.json(
+          getElectionMockData({}, { status: "data_entry_finished" }) satisfies ElectionDetailsResponse,
+          { status: 200 },
         ),
-      );
-      overrideOnce("get", "/api/elections/1/status", 200, {
-        statuses: [
-          { polling_station_id: 1, status: "definitive" },
-          { polling_station_id: 2, status: "definitive" },
-        ],
-      });
+      ),
+    );
+    overrideOnce("get", "/api/elections/1/status", 200, {
+      statuses: [
+        { polling_station_id: 1, status: "definitive" },
+        { polling_station_id: 2, status: "definitive" },
+      ],
+    });
 
-      await renderPage();
+    await renderPage();
 
-      // Test that the data entry finished and data entry paused alerts don't exist
-      expect(screen.queryByText("Alle stembureaus zijn twee keer ingevoerd")).not.toBeInTheDocument();
-      expect(screen.queryByRole("button", { name: "Invoerfase afronden" })).not.toBeInTheDocument();
-      expect(screen.queryByText("Het invoeren van stemmen is gepauzeerd")).not.toBeInTheDocument();
-      expect(screen.queryByRole("button", { name: "Invoer hervatten" })).not.toBeInTheDocument();
+    // Test that the data entry finished and data entry paused alerts don't exist
+    expect(screen.queryByText("Alle stembureaus zijn twee keer ingevoerd")).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Invoerfase afronden" })).not.toBeInTheDocument();
+    expect(screen.queryByText("Het invoeren van stemmen is gepauzeerd")).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Invoer hervatten" })).not.toBeInTheDocument();
 
-      expect(await screen.findByText("Invoer afgerond")).toBeVisible();
-    },
-  );
+    expect(await screen.findByText("Invoer afgerond")).toBeVisible();
+  });
 
   test("Shows error page when user is not allowed to view the page", async () => {
     vi.spyOn(useUser, "useUser").mockReturnValue(getTypistUser());

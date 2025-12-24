@@ -4,8 +4,8 @@ import { beforeEach, describe, expect, test } from "vitest";
 import { ElectionProvider } from "@/hooks/election/ElectionProvider";
 import { ElectionRequestHandler } from "@/testing/api-mocks/RequestHandlers";
 import { server } from "@/testing/server";
-import { render, screen } from "@/testing/test-utils";
 import { TestUserProvider } from "@/testing/TestUserProvider";
+import { render, screen } from "@/testing/test-utils";
 import { Role } from "@/types/generated/openapi";
 
 import { NavBar } from "./NavBar";

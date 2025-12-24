@@ -11,8 +11,11 @@
     "dev:msw": "cross-env API_MODE=mock vite",
     "build": "vite build --config vite-prod.config.ts",
     "build:msw": "cross-env API_MODE=mock vite build && cp mockServiceWorker.js dist/",
-    "lint": "tsc && cross-env ESLINT_ENV=production eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
-    "prettier": "prettier --ignore-unknown --write .",
+    "lint": "npm run lint:biome && npm run lint:tsc && npm run lint:eslint",
+    "lint:biome": "biome check",
+    "lint:tsc": "tsc",
+    "lint:eslint": "cross-env ESLINT_ENV=production eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+    "format": "biome format --write",
     "preview": "vite preview",
     "test": "vitest",
     "test:e2e": "cross-env LOCAL_CI=true RUST_LOG=tower_http-warning playwright test",
@@ -39,6 +42,7 @@
     "vite": "^6.4.1"
   },
   "devDependencies": {
+    "@biomejs/biome": "2.3.10",
     "@codecov/vite-plugin": "^1.9.1",
     "@eslint/js": "^9.39.2",
     "@playwright/test": "^1.57.0",
@@ -48,7 +52,6 @@
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.1",
     "@testing-library/user-event": "^14.6.1",
-    "@trivago/prettier-plugin-sort-imports": "^6.0.0",
     "@types/node": "^22.19.3",
     "@types/react": "^19.2.7",
     "@types/react-dom": "^19.2.3",
@@ -72,7 +75,6 @@
     "lefthook": "^2.0.12",
     "msw": "^2.12.4",
     "playwright": "^1.53.2",
-    "prettier": "^3.7.4",
     "storybook": "^10.1.10",
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.49.0",
@@ -93,8 +95,6 @@
     }
   },
   "msw": {
-    "workerDirectory": [
-      ""
-    ]
+    "workerDirectory": [""]
   }
 }

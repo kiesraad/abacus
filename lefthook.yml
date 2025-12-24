@@ -31,9 +31,17 @@ pre-commit:
         git add src/types/generated/openapi.ts
     frontend-formatter:
       root: "frontend/"
-      run: npx prettier --ignore-unknown --write {staged_files}
+      run: npm run format -- --staged
       stage_fixed: true
-    frontend-linter:
+    frontend-lint-biome:
+      root: "frontend/"
+      run: npm run lint:biome -- --write --staged
+      stage_fixed: true
+    frontend-lint-tsc:
       root: "frontend/"
       glob: "*.{ts,tsx}"
-      run: npm run lint {staged_files}
+      run: npm run lint:tsc
+    frontend-lint-eslint:
+      root: "frontend/"
+      glob: "*.{ts,tsx}"
+      run: npm run lint:eslint

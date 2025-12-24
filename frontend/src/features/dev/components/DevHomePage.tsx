@@ -13,8 +13,8 @@ import { useUserRole } from "@/hooks/user/useUserRole";
 import { t } from "@/i18n/translate";
 import {
   CommitteeSession,
-  Election,
   ELECTION_LIST_REQUEST_PATH,
+  Election,
   ElectionListResponse,
   LoginResponse,
 } from "@/types/generated/openapi";

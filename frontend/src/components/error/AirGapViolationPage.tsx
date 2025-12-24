@@ -7,7 +7,7 @@ import { AppFrame } from "@/components/ui/AppFrame/AppFrame";
 import { AppLayout } from "@/components/ui/AppLayout/AppLayout";
 import { t, tx } from "@/i18n/translate";
 
-import cls from "./Error.module.css";
+import cls from "./ErrorMessage.module.css";
 
 export function AirGapViolationPage() {
   return (

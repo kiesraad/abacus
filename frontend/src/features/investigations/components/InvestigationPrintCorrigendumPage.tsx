@@ -4,15 +4,15 @@ import { Loader } from "@/components/ui/Loader/Loader";
 import { useElection } from "@/hooks/election/useElection";
 import { useMessages } from "@/hooks/messages/useMessages";
 import { useNumericParam } from "@/hooks/useNumericParam";
-import { t } from "@/i18n/translate";
 import { PollingStation } from "@/types/generated/openapi";
 
+import { getInvestigationDeletedMessage } from "../utils/messages";
 import { InvestigationPrintCorrigendum } from "./forms/InvestigationPrintCorrigendum";
 import { InvestigationDelete } from "./InvestigationDelete";
 
 export function InvestigationPrintCorrigendumPage() {
   const pollingStationId = useNumericParam("pollingStationId");
-  const { election, pollingStation } = useElection(pollingStationId);
+  const { currentCommitteeSession, election, pollingStation, refetch } = useElection(pollingStationId);
   const navigate = useNavigate();
   const { pushMessage } = useMessages();
 
@@ -21,13 +21,8 @@ export function InvestigationPrintCorrigendumPage() {
   }
 
   function handleDeleted(pollingStation: PollingStation) {
-    pushMessage({
-      title: t("investigations.message.investigation_deleted", {
-        number: pollingStation.number,
-        name: pollingStation.name,
-      }),
-    });
-
+    pushMessage(getInvestigationDeletedMessage(pollingStation, currentCommitteeSession.status));
+    void refetch();
     void navigate(`/elections/${election.id}/investigations`, { replace: true });
   }
 

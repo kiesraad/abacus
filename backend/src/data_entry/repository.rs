@@ -6,7 +6,7 @@ use super::{
     ElectionStatusResponseEntry, PollingStationDataEntry, PollingStationResult,
     PollingStationResults, status::DataEntryStatus,
 };
-use crate::polling_station::PollingStation;
+use crate::{polling_station, polling_station::PollingStation};
 
 /// Get the full polling station data entry row for a given polling station
 /// id, or return an error if there is no data
@@ -286,13 +286,12 @@ async fn fetch_results_for_committee_session(
     let mut tx = conn.begin().await?;
 
     // Get and index polling stations by id for performance
-    let polling_stations: HashMap<u32, _> =
-        crate::polling_station::repository::list(&mut tx, committee_session_id)
-            .await?
-            .into_iter()
-            .filter(|ps| polling_station_id.is_none_or(|id| ps.id == id))
-            .map(|ps| (ps.id, ps))
-            .collect();
+    let polling_stations: HashMap<u32, _> = polling_station::list(&mut tx, committee_session_id)
+        .await?
+        .into_iter()
+        .filter(|ps| polling_station_id.is_none_or(|id| ps.id == id))
+        .map(|ps| (ps.id, ps))
+        .collect();
 
     // This is a recursive Common Table Expression (CTE)
     // It traverses polling stations through previous committee sessions to find the most recent results
@@ -368,7 +367,7 @@ pub async fn previous_results_for_polling_station(
     conn: &mut SqliteConnection,
     polling_station_id: u32,
 ) -> Result<PollingStationResults, sqlx::Error> {
-    let polling_station = crate::polling_station::repository::get(conn, polling_station_id).await?;
+    let polling_station = polling_station::get(conn, polling_station_id).await?;
     let ps_id_prev_session = polling_station
         .id_prev_session
         .ok_or(sqlx::Error::RowNotFound)?;
@@ -491,8 +490,7 @@ mod tests {
     mod list_results_for_committee_session {
         use super::{super::*, create_test_results};
         use crate::{
-            investigation::insert_test_investigation,
-            polling_station::repository::insert_test_polling_station,
+            investigation::insert_test_investigation, polling_station::insert_test_polling_station,
         };
         use sqlx::SqlitePool;
         use test_log::test;
@@ -805,7 +803,7 @@ mod tests {
                 PollingStationInvestigationCreateRequest, conclude_polling_station_investigation,
                 create_polling_station_investigation,
             },
-            polling_station::repository::insert_test_polling_station,
+            polling_station::insert_test_polling_station,
         };
         use sqlx::{SqliteConnection, SqlitePool};
         use test_log::test;

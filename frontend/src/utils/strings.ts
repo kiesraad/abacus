@@ -2,7 +2,7 @@
 // Returns undefined when non-numeric characters are encountered
 export function parseIntStrict(text: string): number | undefined {
   const num = parseInt(text, 10);
-  return !isNaN(num) && num.toString() === text ? num : undefined;
+  return !Number.isNaN(num) && num.toString() === text ? num : undefined;
 }
 
 // Removes leading zeroes from a string, making sure 1 zero is left if there are no other characters
@@ -18,7 +18,7 @@ export function removeLeadingZeros(input: string) {
 // Returns undefined when non-numeric characters are encountered
 export function parseIntUserInput(text: string): number | undefined {
   const num = parseInt(text, 10);
-  return !isNaN(num) && num.toString() === removeLeadingZeros(text) ? num : undefined;
+  return !Number.isNaN(num) && num.toString() === removeLeadingZeros(text) ? num : undefined;
 }
 
 // Formats a list of strings into a list with a conjunction before the last item

@@ -1,16 +1,14 @@
-import { RouterProvider } from "react-router";
-
 import { render as rtlRender, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { RouterProvider } from "react-router";
 import { describe, expect, test, vi } from "vitest";
 
 import { InitialisedHandler } from "@/testing/api-mocks/RequestHandlers";
 import { server } from "@/testing/server";
-import { render, screen, setupTestRouter, waitFor } from "@/testing/test-utils";
 import { TestUserProvider } from "@/testing/TestUserProvider";
-
-import { EXPIRATION_DIALOG_SECONDS } from "./authorizationConstants";
+import { render, screen, setupTestRouter, waitFor } from "@/testing/test-utils";
 import { AuthorizationDialog } from "./AuthorizationDialog";
+import { EXPIRATION_DIALOG_SECONDS } from "./authorizationConstants";
 import { routes } from "./routes";
 
 describe("AuthorizationDialog", () => {

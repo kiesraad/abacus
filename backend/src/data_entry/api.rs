@@ -34,6 +34,7 @@ use crate::{
     election::{ElectionId, ElectionWithPoliticalGroups, PoliticalGroup},
     error::{ErrorReference, ErrorResponse},
     investigation::get_polling_station_investigation,
+    polling_station,
     polling_station::PollingStation,
 };
 
@@ -99,7 +100,7 @@ async fn validate_and_get_data(
     ),
     APIError,
 > {
-    let polling_station = crate::polling_station::repository::get(conn, polling_station_id).await?;
+    let polling_station = polling_station::get(conn, polling_station_id).await?;
     let committee_session =
         crate::committee_session::repository::get(conn, polling_station.committee_session_id)
             .await?;
@@ -641,8 +642,7 @@ async fn polling_station_data_entries_and_result_delete(
 ) -> Result<StatusCode, APIError> {
     let mut tx = pool.begin_immediate().await?;
 
-    let polling_station =
-        crate::polling_station::repository::get(&mut tx, polling_station_id).await?;
+    let polling_station = polling_station::get(&mut tx, polling_station_id).await?;
     let committee_session =
         crate::committee_session::repository::get(&mut tx, polling_station.committee_session_id)
             .await?;
@@ -1047,7 +1047,7 @@ mod tests {
             structs::tests::example_polling_station_results,
         },
         investigation::insert_test_investigation,
-        polling_station::repository::insert_test_polling_station,
+        polling_station::insert_test_polling_station,
     };
 
     fn example_data_entry() -> DataEntry {

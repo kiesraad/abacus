@@ -7,7 +7,7 @@
  *
  * https://github.com/oxidecomputer/console/blob/8dcddcef62b8d10dfcd3adb470439212b23b3d5e/test/unit/server.ts
  */
-import { delay, http, HttpResponse, JsonBodyType } from "msw";
+import { delay, HttpResponse, http, JsonBodyType } from "msw";
 import { setupServer } from "msw/node";
 
 export const server = setupServer();

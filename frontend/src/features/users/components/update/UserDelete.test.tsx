@@ -4,7 +4,7 @@ import { beforeEach, describe, expect, Mock, test, vi } from "vitest";
 import { UserDeleteRequestHandler } from "@/testing/api-mocks/RequestHandlers";
 import { overrideOnce, server } from "@/testing/server";
 import { render, screen, spyOnHandler } from "@/testing/test-utils";
-import { User, USER_DELETE_REQUEST_PATH } from "@/types/generated/openapi";
+import { USER_DELETE_REQUEST_PATH, User } from "@/types/generated/openapi";
 
 import { UserDelete } from "./UserDelete";
 

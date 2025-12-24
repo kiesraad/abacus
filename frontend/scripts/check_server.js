@@ -17,7 +17,7 @@ async function waitForPort(port = PORT, tries = TRIES) {
       process.exit(0);
 
       /* eslint-disable-next-line no-unused-vars */
-    } catch (err) {
+    } catch (_err) {
       // try again in 1 second
       await new Promise((resolve) => setTimeout(resolve, 1000));
     }

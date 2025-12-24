@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/Button/Button";
 import { t } from "@/i18n/translate";
 import { isDevelopment } from "@/utils/env";
 
-import cls from "./Error.module.css";
+import cls from "./ErrorMessage.module.css";
 
 interface ErrorProps {
   title: string;
@@ -15,7 +15,7 @@ interface ErrorProps {
   error?: Error;
 }
 
-export function Error({ title, error, children }: ErrorProps) {
+export function ErrorMessage({ title, error, children }: ErrorProps) {
   const navigate = useNavigate();
 
   return (

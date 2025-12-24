@@ -1,15 +1,14 @@
 import { waitForElementToBeRemoved } from "@testing-library/dom";
 import { render as rtlRender } from "@testing-library/react";
 import { userEvent } from "@testing-library/user-event";
-import { http, HttpResponse } from "msw";
+import { HttpResponse, http } from "msw";
 import { beforeEach, describe, expect, test, vi } from "vitest";
-
-import * as useUser from "@/hooks/user/useUser";
 import { ErrorBoundary } from "@/components/error/ErrorBoundary";
 import { ElectionLayout } from "@/components/layout/ElectionLayout";
 import { ElectionProvider } from "@/hooks/election/ElectionProvider";
 import { ElectionStatusProvider } from "@/hooks/election/ElectionStatusProvider";
 import { MessagesProvider } from "@/hooks/messages/MessagesProvider";
+import * as useUser from "@/hooks/user/useUser";
 import { electionDetailsMockResponse, getElectionMockData } from "@/testing/api-mocks/ElectionMockData";
 import {
   ElectionListRequestHandler,

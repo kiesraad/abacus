@@ -20,13 +20,15 @@ import {
 } from "@/types/generated/openapi";
 import { StringFormData } from "@/utils/stringFormData";
 
+import { getInvestigationUpdatedMessage } from "../../utils/messages";
+
 interface InvestigationReasonProps {
   pollingStationId: number;
 }
 
 export function InvestigationReason({ pollingStationId }: InvestigationReasonProps) {
   const navigate = useNavigate();
-  const { investigation, pollingStation, refetch } = useElection(pollingStationId);
+  const { currentCommitteeSession, investigation, pollingStation, refetch } = useElection(pollingStationId);
   const { pushMessage } = useMessages();
   const [nonEmptyError, setNonEmptyError] = useState(false);
   const updatePath: POLLING_STATION_INVESTIGATION_UPDATE_REQUEST_PATH = `/api/polling_stations/${pollingStationId}/investigation`;
@@ -52,26 +54,32 @@ export function InvestigationReason({ pollingStationId }: InvestigationReasonPro
 
     const save = () => {
       if (investigation != undefined) {
-        pushMessage({
-          title: t("investigations.message.investigation_updated", {
-            number: pollingStation.number,
-            name: pollingStation.name,
-          }),
-        });
-
+        pushMessage(getInvestigationUpdatedMessage(pollingStation, currentCommitteeSession.status));
+        void refetch();
         return update({
           reason,
           findings: investigation.findings,
           corrected_results: investigation.corrected_results,
         } satisfies PollingStationInvestigationUpdateRequest);
       } else {
-        pushMessage({
-          title: t("investigations.message.investigation_created", {
-            number: pollingStation.number,
-            name: pollingStation.name,
-          }),
-        });
-
+        if (currentCommitteeSession.status === "data_entry_finished") {
+          pushMessage({
+            type: "warning",
+            title: t("generate_new_results"),
+            text: `${t("investigations.message.investigation_created", {
+              number: pollingStation.number,
+              name: pollingStation.name,
+            })}. ${t("documents_are_invalidated")}`,
+          });
+        } else {
+          pushMessage({
+            title: t("investigations.message.investigation_created", {
+              number: pollingStation.number,
+              name: pollingStation.name,
+            }),
+          });
+        }
+        void refetch();
         return create({ reason } satisfies PollingStationInvestigationCreateRequest);
       }
     };

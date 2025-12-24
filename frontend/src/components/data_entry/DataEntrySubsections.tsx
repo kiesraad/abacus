@@ -29,6 +29,7 @@ export function DataEntrySubsections({
 }: DataEntrySubsectionsProps) {
   return (
     <>
+      {/** biome-ignore lint/suspicious/useIterableCallbackReturn: switch statement is exhaustive, so it always returns a value */}
       {section.subsections.map((subsection, subsectionIdx) => {
         switch (subsection.type) {
           case "heading":

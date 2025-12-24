@@ -13,8 +13,10 @@ export function useFormKeyboardNavigation(): RefObject<HTMLFormElement | null> {
         return;
       }
 
+      const activeElement = document.activeElement;
+
       // check whether the activeElement is inside the form
-      if (!innerRef.current.contains(document.activeElement)) {
+      if (!activeElement || !innerRef.current.contains(activeElement)) {
         return;
       }
 
@@ -29,6 +31,7 @@ export function useFormKeyboardNavigation(): RefObject<HTMLFormElement | null> {
       // Note that targetIndex might be -1 if the active element is not in the list
       // (e.g. if the user is focused on a button or link outside of the input elements, but within the form)
       // In this case, the down button will focus to the first input element
+      // biome-ignore lint/complexity/useIndexOf: can't use useIndexOf because types in predicate are different
       let targetIndex = elements.findIndex((element) => document.activeElement === element);
 
       switch (dir) {

@@ -2,14 +2,6 @@
 
 use std::net::SocketAddr;
 
-use abacus::{
-    ErrorResponse,
-    data_entry::{
-        ClaimDataEntryResponse, ElectionStatusResponse, SaveDataEntryResponse,
-        ValidationResultCode, status::DataEntryStatusName::*,
-    },
-    election::ElectionId,
-};
 use axum::http::HeaderValue;
 use reqwest::{Response, StatusCode};
 use serde_json::json;
@@ -18,8 +10,8 @@ use test_log::test;
 
 use crate::{
     shared::{
-        claim_data_entry, complete_data_entry, example_data_entry, finalise_data_entry,
-        get_statuses, save_data_entry,
+        claim_data_entry, complete_data_entry, coordinator_login, example_data_entry,
+        finalise_data_entry, get_statuses, save_data_entry, typist_login, typist2_login,
     },
     utils::serve_api,
 };
@@ -30,14 +22,26 @@ pub mod utils;
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
 async fn test_polling_station_data_entry_valid(pool: SqlitePool) {
     let addr = serve_api(pool).await;
-    let typist_cookie = shared::typist_login(&addr).await;
+    let typist_cookie = typist_login(&addr).await;
 
     claim_data_entry(&addr, &typist_cookie, 1, 1).await;
 
-    let res = save_data_entry(&addr, &typist_cookie, 1, 1, example_data_entry(None)).await;
-    let validation_results: SaveDataEntryResponse = res.json().await.unwrap();
-    assert_eq!(validation_results.validation_results.errors.len(), 0);
-    assert_eq!(validation_results.validation_results.warnings.len(), 0);
+    let response = save_data_entry(&addr, &typist_cookie, 1, 1, example_data_entry(None)).await;
+    let validation_results: serde_json::Value = response.json().await.unwrap();
+    assert_eq!(
+        validation_results["validation_results"]["errors"]
+            .as_array()
+            .unwrap()
+            .len(),
+        0
+    );
+    assert_eq!(
+        validation_results["validation_results"]["warnings"]
+            .as_array()
+            .unwrap()
+            .len(),
+        0
+    );
 
     finalise_data_entry(&addr, &typist_cookie, 1, 1).await;
 }
@@ -45,7 +49,7 @@ async fn test_polling_station_data_entry_valid(pool: SqlitePool) {
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
 async fn test_polling_station_data_entry_validation(pool: SqlitePool) {
     let addr = serve_api(pool).await;
-    let typist_cookie = shared::typist_login(&addr).await;
+    let typist_cookie = typist_login(&addr).await;
 
     let url = format!("http://{addr}/api/polling_stations/1/data_entries/1/claim");
     let response = reqwest::Client::new()
@@ -130,7 +134,7 @@ async fn test_polling_station_data_entry_validation(pool: SqlitePool) {
         ]
       },
       "progress": 60,
-      "client_state": {"foo": "bar"}
+      "client_state": {}
     });
 
     let url = format!("http://{addr}/api/polling_stations/1/data_entries/1");
@@ -144,76 +148,93 @@ async fn test_polling_station_data_entry_validation(pool: SqlitePool) {
 
     // Ensure the response is what we expect
     assert_eq!(response.status(), StatusCode::OK);
-    let body: SaveDataEntryResponse = response.json().await.unwrap();
-    let errors = body.validation_results.errors;
+    let body: serde_json::Value = response.json().await.unwrap();
+    let errors = body["validation_results"]["errors"].as_array().unwrap();
     assert_eq!(errors.len(), 5);
     // error 1
-    assert_eq!(errors[0].code, ValidationResultCode::F201);
+    assert_eq!(errors[0]["code"], "F201");
+    let error_1_fields = errors[0]["fields"].as_array().unwrap();
+    assert_eq!(error_1_fields[0], "data.voters_counts.poll_card_count");
     assert_eq!(
-        errors[0].fields,
-        vec![
-            "data.voters_counts.poll_card_count",
-            "data.voters_counts.proxy_certificate_count",
-            "data.voters_counts.total_admitted_voters_count",
-        ]
+        error_1_fields[1],
+        "data.voters_counts.proxy_certificate_count"
+    );
+    assert_eq!(
+        error_1_fields[2],
+        "data.voters_counts.total_admitted_voters_count"
     );
     // error 2
-    assert_eq!(errors[1].code, ValidationResultCode::F202);
+    assert_eq!(errors[1]["code"], "F202");
+    let error_2_fields = errors[1]["fields"].as_array().unwrap();
     assert_eq!(
-        errors[1].fields,
-        vec![
-            "data.votes_counts.political_group_total_votes[0].total",
-            "data.votes_counts.political_group_total_votes[1].total",
-            "data.votes_counts.total_votes_candidates_count"
-        ]
+        error_2_fields[0],
+        "data.votes_counts.political_group_total_votes[0].total"
+    );
+    assert_eq!(
+        error_2_fields[1],
+        "data.votes_counts.political_group_total_votes[1].total"
+    );
+    assert_eq!(
+        error_2_fields[2],
+        "data.votes_counts.total_votes_candidates_count"
     );
     // error 3
-    assert_eq!(errors[2].code, ValidationResultCode::F203);
+    assert_eq!(errors[2]["code"], "F203");
+    let error_3_fields = errors[2]["fields"].as_array().unwrap();
     assert_eq!(
-        errors[2].fields,
-        vec![
-            "data.votes_counts.total_votes_candidates_count",
-            "data.votes_counts.blank_votes_count",
-            "data.votes_counts.invalid_votes_count",
-            "data.votes_counts.total_votes_cast_count",
-        ]
+        error_3_fields[0],
+        "data.votes_counts.total_votes_candidates_count"
+    );
+    assert_eq!(error_3_fields[1], "data.votes_counts.blank_votes_count");
+    assert_eq!(error_3_fields[2], "data.votes_counts.invalid_votes_count");
+    assert_eq!(
+        error_3_fields[3],
+        "data.votes_counts.total_votes_cast_count"
     );
     // error 4
-    assert_eq!(errors[3].code, ValidationResultCode::F402);
-    assert_eq!(errors[3].fields, vec!["data.political_group_votes[0]"]);
+    assert_eq!(errors[3]["code"], "F402");
+    assert_eq!(
+        errors[3]["fields"].as_array().unwrap()[0],
+        "data.political_group_votes[0]"
+    );
     // error 5
-    assert_eq!(errors[4].code, ValidationResultCode::F402);
-    assert_eq!(errors[4].fields, vec!["data.political_group_votes[1]"]);
+    assert_eq!(errors[4]["code"], "F402");
+    assert_eq!(
+        errors[4]["fields"].as_array().unwrap()[0],
+        "data.political_group_votes[1]"
+    );
 
-    let warnings = body.validation_results.warnings;
+    let warnings = body["validation_results"]["warnings"].as_array().unwrap();
     assert_eq!(warnings.len(), 3);
     // warning 1
-    assert_eq!(warnings[0].code, ValidationResultCode::W201);
+    assert_eq!(warnings[0]["code"], "W201");
     assert_eq!(
-        warnings[0].fields,
-        vec!["data.votes_counts.blank_votes_count",]
+        warnings[0]["fields"].as_array().unwrap()[0],
+        "data.votes_counts.blank_votes_count"
     );
     // warning 2
-    assert_eq!(warnings[1].code, ValidationResultCode::W202);
+    assert_eq!(warnings[1]["code"], "W202");
     assert_eq!(
-        warnings[1].fields,
-        vec!["data.votes_counts.invalid_votes_count"]
+        warnings[1]["fields"].as_array().unwrap()[0],
+        "data.votes_counts.invalid_votes_count"
     );
     // warning 3
-    assert_eq!(warnings[2].code, ValidationResultCode::W203);
+    assert_eq!(warnings[2]["code"], "W203");
+    let warning_3_fields = warnings[2]["fields"].as_array().unwrap();
     assert_eq!(
-        warnings[2].fields,
-        vec![
-            "data.voters_counts.total_admitted_voters_count",
-            "data.votes_counts.total_votes_cast_count",
-        ]
+        warning_3_fields[0],
+        "data.voters_counts.total_admitted_voters_count"
     );
+    assert_eq!(
+        warning_3_fields[1],
+        "data.votes_counts.total_votes_cast_count"
+    )
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("users"))))]
 async fn test_polling_station_data_entry_invalid(pool: SqlitePool) {
     let addr = serve_api(pool).await;
-    let typist_cookie = shared::typist_login(&addr).await;
+    let typist_cookie = typist_login(&addr).await;
     let url = format!("http://{addr}/api/polling_stations/1/data_entries/1");
     let response = reqwest::Client::new()
         .post(&url)
@@ -226,9 +247,9 @@ async fn test_polling_station_data_entry_invalid(pool: SqlitePool) {
 
     // Ensure the response is what we expect
     assert_eq!(response.status(), StatusCode::UNPROCESSABLE_ENTITY);
-    let body: ErrorResponse = response.json().await.unwrap();
+    let body: serde_json::Value = response.json().await.unwrap();
     assert_eq!(
-        body.error,
+        body["error"],
         "Failed to deserialize the JSON body into the target type: data: \
          invalid type: null, expected internally tagged enum PollingStationResults at line 1 column 12"
     );
@@ -237,7 +258,7 @@ async fn test_polling_station_data_entry_invalid(pool: SqlitePool) {
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
 async fn test_polling_station_data_entry_only_for_existing(pool: SqlitePool) {
     let addr = serve_api(pool).await;
-    let typist_cookie = shared::typist_login(&addr).await;
+    let typist_cookie = typist_login(&addr).await;
 
     let request_body = example_data_entry(None);
     let invalid_id = 123_456_789;
@@ -271,7 +292,7 @@ async fn test_polling_station_data_entry_only_for_existing(pool: SqlitePool) {
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
 async fn test_polling_station_data_entry_claim(pool: SqlitePool) {
     let addr = serve_api(pool).await;
-    let typist_cookie = shared::typist_login(&addr).await;
+    let typist_cookie = typist_login(&addr).await;
 
     let request_body = example_data_entry(None);
 
@@ -295,7 +316,7 @@ async fn test_polling_station_data_entry_claim(pool: SqlitePool) {
         .await
         .unwrap();
     assert_eq!(response.status(), StatusCode::OK);
-    let save_response: SaveDataEntryResponse = response.json().await.unwrap();
+    let save_response: serde_json::Value = response.json().await.unwrap();
 
     // claim the data entry again
     let response = reqwest::Client::new()
@@ -307,22 +328,19 @@ async fn test_polling_station_data_entry_claim(pool: SqlitePool) {
     assert_eq!(response.status(), StatusCode::OK);
 
     // check that the data entry is the same
-    let claim_response: ClaimDataEntryResponse = response.json().await.unwrap();
-    assert_eq!(claim_response.data, request_body.data);
+    let claim_response: serde_json::Value = response.json().await.unwrap();
+    assert_eq!(claim_response["data"], request_body["data"]);
+    assert_eq!(claim_response["client_state"], request_body["client_state"]);
     assert_eq!(
-        claim_response.client_state.as_ref(),
-        request_body.client_state.as_ref()
-    );
-    assert_eq!(
-        claim_response.validation_results,
-        save_response.validation_results
+        claim_response["validation_results"],
+        save_response["validation_results"]
     );
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
 async fn test_polling_station_data_entry_claim_finalised(pool: SqlitePool) {
     let addr = serve_api(pool).await;
-    let typist_cookie = shared::typist_login(&addr).await;
+    let typist_cookie = typist_login(&addr).await;
     complete_data_entry(&addr, &typist_cookie, 1, 1, example_data_entry(None)).await;
 
     // claim the data entry and expect 409 Conflict
@@ -339,7 +357,7 @@ async fn test_polling_station_data_entry_claim_finalised(pool: SqlitePool) {
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
 async fn test_polling_station_data_entry_deletion(pool: SqlitePool) {
     let addr = serve_api(pool).await;
-    let typist_cookie = shared::typist_login(&addr).await;
+    let typist_cookie = typist_login(&addr).await;
     let request_body = example_data_entry(None);
 
     // claim a data entry
@@ -384,26 +402,26 @@ async fn test_polling_station_data_entry_deletion(pool: SqlitePool) {
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
 async fn test_election_details_status(pool: SqlitePool) {
     let addr = serve_api(pool).await;
-    let typist_cookie = shared::typist_login(&addr).await;
+    let typist_cookie = typist_login(&addr).await;
     let typist_user_id = 5;
-    let typist2_cookie = shared::typist2_login(&addr).await;
+    let typist2_cookie = typist2_login(&addr).await;
     let typist2_user_id = 6;
-    let coordinator_cookie = shared::coordinator_login(&addr).await;
-    let election_id = ElectionId::from(2);
+    let coordinator_cookie = coordinator_login(&addr).await;
+    let election_id = 2;
 
     // Ensure the statuses are "NotStarted"
     let statuses = get_statuses(&addr, &coordinator_cookie, election_id).await;
 
-    assert_eq!(statuses[&1].status, FirstEntryNotStarted);
-    assert_eq!(statuses[&1].first_entry_user_id, None);
-    assert_eq!(statuses[&1].second_entry_user_id, None);
-    assert_eq!(statuses[&1].first_entry_progress, None);
-    assert_eq!(statuses[&1].second_entry_progress, None);
-    assert_eq!(statuses[&2].status, FirstEntryNotStarted);
-    assert_eq!(statuses[&2].first_entry_user_id, None);
-    assert_eq!(statuses[&2].second_entry_user_id, None);
-    assert_eq!(statuses[&2].first_entry_progress, None);
-    assert_eq!(statuses[&2].second_entry_progress, None);
+    assert_eq!(statuses[&1]["status"], "first_entry_not_started");
+    assert!(statuses[&1]["first_entry_user_id"].is_null());
+    assert!(statuses[&1]["second_entry_user_id"].is_null());
+    assert!(statuses[&1]["first_entry_progress"].is_null());
+    assert!(statuses[&1]["second_entry_progress"].is_null());
+    assert_eq!(statuses[&2]["status"], "first_entry_not_started");
+    assert!(statuses[&2]["first_entry_user_id"].is_null());
+    assert!(statuses[&2]["second_entry_user_id"].is_null());
+    assert!(statuses[&2]["first_entry_progress"].is_null());
+    assert!(statuses[&2]["second_entry_progress"].is_null());
 
     // Finalise the first data entry for polling station 1
     complete_data_entry(&addr, &typist_cookie, 1, 1, example_data_entry(None)).await;
@@ -422,17 +440,17 @@ async fn test_election_details_status(pool: SqlitePool) {
     // polling station 1's first entry is now complete, polling station 2 is still incomplete and set to in progress
     let statuses = get_statuses(&addr, &coordinator_cookie, election_id).await;
 
-    assert_eq!(statuses[&1].status, SecondEntryNotStarted);
-    assert_eq!(statuses[&1].first_entry_user_id, Some(typist_user_id));
-    assert_eq!(statuses[&1].second_entry_user_id, None);
-    assert_eq!(statuses[&1].first_entry_progress, Some(100));
-    assert_eq!(statuses[&1].second_entry_progress, None);
+    assert_eq!(statuses[&1]["status"], "second_entry_not_started");
+    assert_eq!(statuses[&1]["first_entry_user_id"], typist_user_id);
+    assert!(statuses[&1]["second_entry_user_id"].is_null());
+    assert_eq!(statuses[&1]["first_entry_progress"], 100);
+    assert!(statuses[&1]["second_entry_progress"].is_null());
 
-    assert_eq!(statuses[&2].status, FirstEntryInProgress);
-    assert_eq!(statuses[&2].first_entry_user_id, Some(typist_user_id));
-    assert_eq!(statuses[&2].second_entry_user_id, None);
-    assert_eq!(statuses[&2].first_entry_progress, Some(60));
-    assert_eq!(statuses[&2].second_entry_progress, None);
+    assert_eq!(statuses[&2]["status"], "first_entry_in_progress");
+    assert_eq!(statuses[&2]["first_entry_user_id"], typist_user_id);
+    assert!(statuses[&2]["second_entry_user_id"].is_null());
+    assert_eq!(statuses[&2]["first_entry_progress"], 60);
+    assert!(statuses[&2]["second_entry_progress"].is_null());
 
     // Claim and save the entries
     claim_data_entry(&addr, &typist2_cookie, 1, 2).await;
@@ -456,17 +474,17 @@ async fn test_election_details_status(pool: SqlitePool) {
     // polling station 1 should now be SecondEntryInProgress, polling station 2 is still in the FirstEntryInProgress state
     let statuses = get_statuses(&addr, &coordinator_cookie, election_id).await;
 
-    assert_eq!(statuses[&1].status, SecondEntryInProgress);
-    assert_eq!(statuses[&1].first_entry_user_id, Some(typist_user_id));
-    assert_eq!(statuses[&1].second_entry_user_id, Some(typist2_user_id));
-    assert_eq!(statuses[&1].first_entry_progress, Some(100));
-    assert_eq!(statuses[&1].second_entry_progress, Some(60));
+    assert_eq!(statuses[&1]["status"], "second_entry_in_progress");
+    assert_eq!(statuses[&1]["first_entry_user_id"], typist_user_id);
+    assert_eq!(statuses[&1]["second_entry_user_id"], typist2_user_id);
+    assert_eq!(statuses[&1]["first_entry_progress"], 100);
+    assert_eq!(statuses[&1]["second_entry_progress"], 60);
 
-    assert_eq!(statuses[&2].status, FirstEntryInProgress);
-    assert_eq!(statuses[&2].first_entry_user_id, Some(typist_user_id));
-    assert_eq!(statuses[&2].second_entry_user_id, None);
-    assert_eq!(statuses[&2].first_entry_progress, Some(60));
-    assert_eq!(statuses[&2].second_entry_progress, None);
+    assert_eq!(statuses[&2]["status"], "first_entry_in_progress");
+    assert_eq!(statuses[&2]["first_entry_user_id"], typist_user_id);
+    assert!(statuses[&2]["second_entry_user_id"].is_null());
+    assert_eq!(statuses[&2]["first_entry_progress"], 60);
+    assert!(statuses[&2]["second_entry_progress"].is_null());
 
     // finalise second data entry for polling station 1
     complete_data_entry(&addr, &typist2_cookie, 1, 2, example_data_entry(None)).await;
@@ -474,24 +492,24 @@ async fn test_election_details_status(pool: SqlitePool) {
     // polling station 1 should now be definitive
     let statuses = get_statuses(&addr, &coordinator_cookie, election_id).await;
 
-    assert_eq!(statuses[&1].status, Definitive);
-    assert_eq!(statuses[&1].first_entry_user_id, Some(typist_user_id));
-    assert_eq!(statuses[&1].second_entry_user_id, Some(typist2_user_id));
-    assert_eq!(statuses[&1].first_entry_progress, Some(100));
-    assert_eq!(statuses[&1].second_entry_progress, Some(100));
+    assert_eq!(statuses[&1]["status"], "definitive");
+    assert_eq!(statuses[&1]["first_entry_user_id"], typist_user_id);
+    assert_eq!(statuses[&1]["second_entry_user_id"], typist2_user_id);
+    assert_eq!(statuses[&1]["first_entry_progress"], 100);
+    assert_eq!(statuses[&1]["second_entry_progress"], 100);
 
-    assert_eq!(statuses[&2].status, FirstEntryInProgress);
-    assert_eq!(statuses[&2].first_entry_user_id, Some(typist_user_id));
-    assert_eq!(statuses[&2].second_entry_user_id, None);
-    assert_eq!(statuses[&2].first_entry_progress, Some(60));
-    assert_eq!(statuses[&2].second_entry_progress, None);
+    assert_eq!(statuses[&2]["status"], "first_entry_in_progress");
+    assert_eq!(statuses[&2]["first_entry_user_id"], typist_user_id);
+    assert!(statuses[&2]["second_entry_user_id"].is_null());
+    assert_eq!(statuses[&2]["first_entry_progress"], 60);
+    assert!(statuses[&2]["second_entry_progress"].is_null());
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "election_3", "users"))))]
 async fn test_election_details_status_no_other_election_statuses(pool: SqlitePool) {
     let addr = serve_api(pool).await;
-    let coordinator_cookie = shared::coordinator_login(&addr).await;
-    let typist_cookie = shared::typist_login(&addr).await;
+    let coordinator_cookie = coordinator_login(&addr).await;
+    let typist_cookie = typist_login(&addr).await;
 
     // Save data entry for election 1, polling station 1
     claim_data_entry(&addr, &typist_cookie, 1, 1).await;
@@ -525,14 +543,9 @@ async fn test_election_details_status_no_other_election_statuses(pool: SqlitePoo
         .unwrap();
 
     assert_eq!(response.status(), StatusCode::OK);
-    let body: ElectionStatusResponse = response.json().await.unwrap();
-
-    assert_eq!(
-        body.statuses.len(),
-        1,
-        "there can be only one {:?}",
-        body.statuses
-    );
-    assert_eq!(body.statuses[0].polling_station_id, 3);
-    assert_eq!(body.statuses[0].status, FirstEntryInProgress);
+    let body: serde_json::Value = response.json().await.unwrap();
+    let statuses = body["statuses"].as_array().unwrap();
+    assert_eq!(statuses.len(), 1);
+    assert_eq!(statuses[0]["polling_station_id"], 3);
+    assert_eq!(statuses[0]["status"], "first_entry_in_progress");
 }

@@ -22,6 +22,7 @@ use crate::{
         CandidateGender, CandidateNumber, ElectionCategory, ElectionWithPoliticalGroups,
         NewElection, PGNumber, PoliticalGroup, VoteCountingMethod,
     },
+    polling_station,
     polling_station::{PollingStation, PollingStationRequest, PollingStationType},
     test_data_gen::GenerateElectionArgs,
 };
@@ -234,7 +235,7 @@ async fn generate_polling_stations(
         };
         remaining_voters -= ps_num_voters;
 
-        let ps = crate::polling_station::repository::create(
+        let ps = polling_station::create(
             conn,
             election.id,
             PollingStationRequest {

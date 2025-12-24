@@ -9,7 +9,7 @@ use crate::{
         models::{PdfFileModel, PdfModel, ToPdfFileModel},
         votes_table::{VotesTablesWithOnlyPreviousVotes, VotesTablesWithPreviousVotes},
     },
-    polling_station::structs::PollingStation,
+    polling_station::PollingStation,
     summary::ElectionSummaryWithoutVotes,
 };
 

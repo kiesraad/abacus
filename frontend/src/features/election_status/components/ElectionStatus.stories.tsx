@@ -1,6 +1,5 @@
-import { useNavigate } from "react-router";
-
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import { useNavigate } from "react-router";
 import { expect, fn, mocked, within } from "storybook/test";
 
 import { committeeSessionMockData } from "@/testing/api-mocks/CommitteeSessionMockData";

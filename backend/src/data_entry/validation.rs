@@ -572,13 +572,15 @@ fn validate_political_group_votes_errors(
     results: &CommonPollingStationResults,
     political_group_candidate_votes: &PoliticalGroupCandidateVotes,
     validation_results: &mut ValidationResults,
-    political_group_candidate_votes_path: &FieldPath,
+    path: &FieldPath,
 ) -> Result<(), DataError> {
-    let pgtv = results
+    let political_group_total_votes = results
         .votes_counts
         .political_group_total_votes
         .iter()
-        .find(|pgtv| pgtv.number == political_group_candidate_votes.number)
+        .find(|political_group_total_votes| {
+            political_group_total_votes.number == political_group_candidate_votes.number
+        })
         .ok_or(DataError::new("political group total votes should exist"))?;
 
     // all candidate votes, cast to u64 to avoid overflow
@@ -588,22 +590,20 @@ fn validate_political_group_votes_errors(
         .map(|cv| cv.votes as u64)
         .sum::<u64>();
 
-    if (candidate_votes_sum > 0 || pgtv.total > 0) && political_group_candidate_votes.total == 0 {
+    if (candidate_votes_sum > 0 || political_group_total_votes.total > 0)
+        && political_group_candidate_votes.total == 0
+    {
         validation_results.errors.push(ValidationResult {
-            fields: vec![
-                political_group_candidate_votes_path
-                    .field("total")
-                    .to_string(),
-            ],
+            fields: vec![path.field("total").to_string()],
             code: ValidationResultCode::F401,
             context: Some(ValidationResultContext {
-                political_group_number: Some(pgtv.number),
+                political_group_number: Some(political_group_total_votes.number),
             }),
         });
     } else {
         if political_group_candidate_votes.total as u64 != candidate_votes_sum {
             validation_results.errors.push(ValidationResult {
-                fields: vec![political_group_candidate_votes_path.to_string()],
+                fields: vec![path.to_string()],
                 code: ValidationResultCode::F402,
                 context: Some(ValidationResultContext {
                     political_group_number: Some(political_group_candidate_votes.number),
@@ -611,13 +611,9 @@ fn validate_political_group_votes_errors(
             });
         }
 
-        if political_group_candidate_votes.total != pgtv.total {
+        if political_group_candidate_votes.total != political_group_total_votes.total {
             validation_results.errors.push(ValidationResult {
-                fields: vec![
-                    political_group_candidate_votes_path
-                        .field("total")
-                        .to_string(),
-                ],
+                fields: vec![path.field("total").to_string()],
                 code: ValidationResultCode::F403,
                 context: Some(ValidationResultContext {
                     political_group_number: Some(political_group_candidate_votes.number),

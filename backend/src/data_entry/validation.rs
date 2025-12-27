@@ -1981,9 +1981,8 @@ mod tests {
         }
 
         /// CSO | F.305 (Als D = H) I en/of J zijn ingevuld
-        #[allow(clippy::too_many_lines)]
         #[test]
-        fn test_f305_more_and_fewer_ballots_count() -> Result<(), DataError> {
+        fn test_f305_more_and_fewer_ballots_count_not_filled() -> Result<(), DataError> {
             // D = H & I and J not filled in
             let mut data = DifferencesCounts::zero();
 
@@ -2045,6 +2044,11 @@ mod tests {
                 ]
             );
 
+            Ok(())
+        }
+
+        #[test]
+        fn test_f305_more_and_fewer_ballots_count_both_filled() -> Result<(), DataError> {
             // D = H & I and J filled in
             let mut data = DifferencesCounts::zero();
 
@@ -2242,9 +2246,8 @@ mod tests {
         }
 
         /// CSO | F.307 (Als H > D) J is ingevuld
-        #[allow(clippy::too_many_lines)]
         #[test]
-        fn test_f307_votes_greater_than_voters() -> Result<(), DataError> {
+        fn test_f307_votes_greater_than_voters_fewer_ballots_count_zero() -> Result<(), DataError> {
             // H > D & J == 0
             let mut data = DifferencesCounts::zero();
 
@@ -2263,6 +2266,12 @@ mod tests {
                 }]
             );
 
+            Ok(())
+        }
+
+        #[test]
+        fn test_f307_votes_greater_than_voters_fewer_ballots_count_filled() -> Result<(), DataError>
+        {
             // H > D & J < 0
             let mut data = DifferencesCounts::zero();
 
@@ -3055,7 +3064,6 @@ mod tests {
         }
 
         /// CSO | F.401 `Er zijn (stemmen op kandidaten of het lijsttotaal van corresponderende E.x is groter dan 0) en het totaal aantal stemmen op een lijst = leeg of 0`
-        #[allow(clippy::too_many_lines)]
         #[test]
         fn test_f401() -> Result<(), DataError> {
             // Only F.401 is triggered.
@@ -3109,12 +3117,20 @@ mod tests {
                 }]
             );
 
+            Ok(())
+        }
+
+        #[test]
+        fn test_f401_multiple_errors() -> Result<(), DataError> {
+            let mut data = create_test_data();
             // Covers multiple errors over different political groups:
             // Following 2 tests check that F.401 is triggered for both political group votes.
             // - Expect F.402 and F.403 for group 1.
             // - Expect only F.401 for group 2 (F.401, F.402 and F.403 are triggered)
             data.political_group_votes[0].candidate_votes[0].votes = 0;
             data.political_group_votes[0].total = 30;
+            data.political_group_votes[1].candidate_votes[0].votes = 10;
+            data.political_group_votes[1].total = 0;
 
             let validation_results = validate(data.clone())?;
             assert_eq!(

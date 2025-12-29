@@ -75,6 +75,7 @@ export const InteractiveTooltip: StoryObj<TooltipProps> = {
           }}
         >
           <button
+            type="button"
             onClick={() => {
               setShowTooltip(true);
             }}

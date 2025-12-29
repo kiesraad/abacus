@@ -58,7 +58,6 @@
         "noLabelWithoutControl": "off",
         "noStaticElementInteractions": "off",
         "noSvgWithoutTitle": "off",
-        "useButtonType": "off",
         "useSemanticElements": "off",
         "useValidAnchor": "off"
       },

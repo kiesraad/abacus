@@ -66,6 +66,7 @@ function ButtonLinkList({ buttonLinks, firstRowBold }: ButtonLinkListProps) {
         <Fragment key={`${buttonLink.id}-${buttonLink.label}`}>
           {index !== 0 && <div className={cls.border}></div>}
           <button
+            type="button"
             onClick={() => {
               void navigate(buttonLink.to, buttonLink.options || {});
             }}

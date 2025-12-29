@@ -12,11 +12,11 @@ import { server } from "./server";
 const customRender = (ui: ReactElement, options?: Omit<RenderOptions, "wrapper">) =>
   render(ui, { wrapper: Providers, ...options });
 
-/* eslint-disable import/export */
+/* eslint-disable import-x/export */
 // Re-export everything in RTL but shadow the original `render` with our custom implementation.
 export * from "@testing-library/react";
 export { customRender as render };
-/* eslint-enable import/export */
+/* eslint-enable import-x/export */
 
 export const setupTestRouter = (routes: RouteObject[]) => {
   return createMemoryRouter(routes);

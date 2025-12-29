@@ -1,6 +1,6 @@
 import eslint from "@eslint/js";
 import tsParser from "@typescript-eslint/parser";
-import importPlugin from "eslint-plugin-import";
+import { importX } from "eslint-plugin-import-x";
 import playwright from "eslint-plugin-playwright";
 import reactHooks from "eslint-plugin-react-hooks";
 import storybook from "eslint-plugin-storybook";
@@ -35,12 +35,12 @@ export default tseslint.config(
     extends: [
       eslint.configs.recommended,
       tseslint.configs.strictTypeChecked,
-      importPlugin.flatConfigs.recommended,
-      importPlugin.flatConfigs.typescript,
+      importX.flatConfigs.recommended,
+      importX.flatConfigs.typescript,
       reactHooks.configs["recommended-latest"],
     ],
     rules: {
-      "import/namespace": "off",
+      "import-x/namespace": "off",
       "@typescript-eslint/no-unsafe-type-assertion": "error",
       "@typescript-eslint/restrict-template-expressions": [
         "error",
@@ -49,7 +49,7 @@ export default tseslint.config(
           allowBoolean: true,
         },
       ],
-      "import/no-restricted-paths": [
+      "import-x/no-restricted-paths": [
         "error",
         {
           zones: [
@@ -76,7 +76,7 @@ export default tseslint.config(
       ],
     },
     settings: {
-      "import/resolver": {
+      "import-x/resolver": {
         typescript: true,
         node: true,
       },
@@ -91,7 +91,7 @@ export default tseslint.config(
   },
   {
     files: ["**/*.js"],
-    extends: [eslint.configs.recommended, importPlugin.flatConfigs.recommended],
+    extends: [eslint.configs.recommended, importX.flatConfigs.recommended],
     languageOptions: {
       ecmaVersion: 2020,
       globals: {

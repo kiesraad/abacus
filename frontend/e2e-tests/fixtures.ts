@@ -244,19 +244,22 @@ export const test = base.extend<Fixtures>({
 
     await use((await userResponse.json()) as User);
   },
-  eml110aTooLargeTestFile: async (_, use) => {
+  // biome-ignore lint/correctness/noEmptyPattern: the argument should use the object destructuring pattern
+  eml110aTooLargeTestFile: async ({}, use) => {
     const minimumSize = 5 * 1024 * 1024; // 5MB
     const { filename, path } = await generateEml("eml110a", minimumSize);
     await use({ filename, path });
     await unlink(path);
   },
-  eml110bTooLargeTestFile: async (_, use) => {
+  // biome-ignore lint/correctness/noEmptyPattern: the argument should use the object destructuring pattern
+  eml110bTooLargeTestFile: async ({}, use) => {
     const minimumSize = 5 * 1024 * 1024; // 5MB
     const { filename, path } = await generateEml("eml110b", minimumSize);
     await use({ filename, path });
     await unlink(path);
   },
-  eml230bTooLargeTestFile: async (_, use) => {
+  // biome-ignore lint/correctness/noEmptyPattern: the argument should use the object destructuring pattern
+  eml230bTooLargeTestFile: async ({}, use) => {
     const minimumSize = 5 * 1024 * 1024; // 5MB
     const { filename, path } = await generateEml("eml230b", minimumSize);
     await use({ filename, path });

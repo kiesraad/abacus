@@ -63,8 +63,7 @@
         "useValidAnchor": "off"
       },
       "complexity": {
-        "noImportantStyles": "off",
-        "noUselessFragments": "off"
+        "noImportantStyles": "off"
       },
       "correctness": {
         "noEmptyPattern": "off",

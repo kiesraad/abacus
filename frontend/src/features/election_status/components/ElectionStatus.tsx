@@ -39,92 +39,88 @@ export function ElectionStatus({
   );
 
   return (
-    <>
-      <div className={cls.container}>
-        <div className={cls.statusTitle} id="status-heading">
-          <h2>{t("election_status.main_title")}</h2>
-          <div className={cls.buttons}>
-            {committeeSession.number === 1 ? (
-              <Button
-                size="md"
-                variant="secondary"
-                onClick={() => {
-                  navigate(`/elections/${election.id}/polling-stations`);
-                }}
-              >
-                {t("polling_station.title.plural")}
-              </Button>
-            ) : (
-              <Button
-                size="md"
-                variant="secondary"
-                onClick={() => {
-                  navigate(`/elections/${election.id}/investigations`);
-                }}
-              >
-                {t("investigations.title")}
-              </Button>
-            )}
-          </div>
-        </div>
-        <div className={cls.statusSection}>
-          <Progress>
-            <div id="polling-stations-per-status" className="column">
-              <h3>{t("election_status.polling_stations_per_status")}</h3>
-              {statusCategories.map((cat) => (
-                <a
-                  className="item"
-                  key={`item-progress-${categoryColorClass[cat]}`}
-                  id={`item-progress-${categoryColorClass[cat]}`}
-                  href={`#item-table-${categoryColorClass[cat]}`}
-                >
-                  <Circle size="xxs" color={categoryColorClass[cat]} />
-                  {t(`status.${cat}`)} ({categoryCounts[cat]})
-                </a>
-              ))}
-            </div>
-            <div id="progress" className="column">
-              <h3>{t("progress")}</h3>
-              <ProgressBar key="all" id="all" data={progressBarData} spacing="small" />
-            </div>
-          </Progress>
-          <article className={cls.statusArticle}>
-            {statuses.length === 0 && committeeSession.number === 1 && (
-              <p>{t("election_status.no_polling_stations")}</p>
-            )}
-            {statuses.length === 0 && committeeSession.number > 1 && (
-              <p>{t("election_status.no_investigations_with_corrected_results")}</p>
-            )}
-            {statuses.length > 0 &&
-              tableCategories.map((cat) => (
-                <div key={`item-table-${categoryColorClass[cat]}`} id={`item-table-${categoryColorClass[cat]}`}>
-                  <span className="item">
-                    <Circle size="xs" color={categoryColorClass[cat]} />
-                    <h3>
-                      {t(`status.${cat}`)} <span className="normal">({categoryCounts[cat]})</span>
-                    </h3>
-                  </span>
-                  <Table id={cat} key={cat} aria-label={t(`status.${cat}`)}>
-                    <CategoryHeader category={cat} />
-                    <Table.Body key={cat} className="fs-sm">
-                      {pollingStationWithStatusAndTypist
-                        .filter((ps) => ps.status !== undefined && statusesForCategory[cat].includes(ps.status))
-                        .map((ps) => (
-                          <CategoryRow
-                            key={`${cat}-${ps.id}`}
-                            category={cat}
-                            pollingStation={ps}
-                            addLink={addLinks}
-                            warning={ps.finalised_with_warnings}
-                          />
-                        ))}
-                    </Table.Body>
-                  </Table>
-                </div>
-              ))}
-          </article>
+    <div className={cls.container}>
+      <div className={cls.statusTitle} id="status-heading">
+        <h2>{t("election_status.main_title")}</h2>
+        <div className={cls.buttons}>
+          {committeeSession.number === 1 ? (
+            <Button
+              size="md"
+              variant="secondary"
+              onClick={() => {
+                navigate(`/elections/${election.id}/polling-stations`);
+              }}
+            >
+              {t("polling_station.title.plural")}
+            </Button>
+          ) : (
+            <Button
+              size="md"
+              variant="secondary"
+              onClick={() => {
+                navigate(`/elections/${election.id}/investigations`);
+              }}
+            >
+              {t("investigations.title")}
+            </Button>
+          )}
         </div>
       </div>
-    </>
+      <div className={cls.statusSection}>
+        <Progress>
+          <div id="polling-stations-per-status" className="column">
+            <h3>{t("election_status.polling_stations_per_status")}</h3>
+            {statusCategories.map((cat) => (
+              <a
+                className="item"
+                key={`item-progress-${categoryColorClass[cat]}`}
+                id={`item-progress-${categoryColorClass[cat]}`}
+                href={`#item-table-${categoryColorClass[cat]}`}
+              >
+                <Circle size="xxs" color={categoryColorClass[cat]} />
+                {t(`status.${cat}`)} ({categoryCounts[cat]})
+              </a>
+            ))}
+          </div>
+          <div id="progress" className="column">
+            <h3>{t("progress")}</h3>
+            <ProgressBar key="all" id="all" data={progressBarData} spacing="small" />
+          </div>
+        </Progress>
+        <article className={cls.statusArticle}>
+          {statuses.length === 0 && committeeSession.number === 1 && <p>{t("election_status.no_polling_stations")}</p>}
+          {statuses.length === 0 && committeeSession.number > 1 && (
+            <p>{t("election_status.no_investigations_with_corrected_results")}</p>
+          )}
+          {statuses.length > 0 &&
+            tableCategories.map((cat) => (
+              <div key={`item-table-${categoryColorClass[cat]}`} id={`item-table-${categoryColorClass[cat]}`}>
+                <span className="item">
+                  <Circle size="xs" color={categoryColorClass[cat]} />
+                  <h3>
+                    {t(`status.${cat}`)} <span className="normal">({categoryCounts[cat]})</span>
+                  </h3>
+                </span>
+                <Table id={cat} key={cat} aria-label={t(`status.${cat}`)}>
+                  <CategoryHeader category={cat} />
+                  <Table.Body key={cat} className="fs-sm">
+                    {pollingStationWithStatusAndTypist
+                      .filter((ps) => ps.status !== undefined && statusesForCategory[cat].includes(ps.status))
+                      .map((ps) => (
+                        <CategoryRow
+                          key={`${cat}-${ps.id}`}
+                          category={cat}
+                          pollingStation={ps}
+                          addLink={addLinks}
+                          warning={ps.finalised_with_warnings}
+                        />
+                      ))}
+                  </Table.Body>
+                </Table>
+              </div>
+            ))}
+        </article>
+      </div>
+    </div>
   );
 }

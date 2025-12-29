@@ -27,7 +27,7 @@ export const Buttons: StoryObj<Props> = {
       {buttonVariants.map((variant) => (
         <div key={variant} className="mb-lg">
           <h2>{variant}</h2>
-          <Button id={"button-variant-" + variant} size={size} variant={variant} onClick={onClick}>
+          <Button id={`button-variant-${variant}`} size={size} variant={variant} onClick={onClick}>
             {text}
           </Button>
         </div>
@@ -63,7 +63,7 @@ export const ButtonsDisabled: StoryObj<Props> = {
       {buttonVariants.map((variant) => (
         <div key={variant} className="mb-lg">
           <h2>{variant}</h2>
-          <Button id={"button-variant-" + variant} size={size} variant={variant} disabled={disabled} onClick={onClick}>
+          <Button id={`button-variant-${variant}`} size={size} variant={variant} disabled={disabled} onClick={onClick}>
             {text}
           </Button>
         </div>
@@ -101,7 +101,7 @@ export const ButtonLinks: StoryObj<Props> = {
         <div key={variant} className="mb-lg">
           <h2>{variant}</h2>
           <Button.Link
-            id={"button-variant-" + variant}
+            id={`button-variant-${variant}`}
             size={size}
             variant={variant}
             disabled={disabled}
@@ -123,7 +123,7 @@ export const ButtonLabel: StoryObj<Props> = {
         <div key={variant} className="mb-lg">
           <h2>{variant}</h2>
           <Button.Label
-            id={"button-variant-" + variant}
+            id={`button-variant-${variant}`}
             size={size}
             variant={variant}
             disabled={disabled}

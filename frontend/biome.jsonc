@@ -77,8 +77,7 @@
         "noDescendingSpecificity": "off",
         "useConst": "off",
         "useImportType": "off",
-        "useNodejsImportProtocol": "off",
-        "useTemplate": "off"
+        "useNodejsImportProtocol": "off"
       },
       "suspicious": {
         "noArrayIndexKey": "off",

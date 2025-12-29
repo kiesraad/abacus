@@ -14,5 +14,5 @@ export function getCandidateFullName(candidate: Candidate): string {
 export function getCandidateFullNameWithGender(candidate: Candidate): string {
   const fullName = getCandidateFullName(candidate);
   const gender = candidate.gender ? t(`candidate.${candidate.gender}`) : undefined;
-  return gender ? fullName + ` (${gender})` : fullName;
+  return gender ? `${fullName} (${gender})` : fullName;
 }

@@ -84,14 +84,14 @@ export function doesValidationResultApplyToSection(
     for (const subsection of section.subsections) {
       switch (subsection.type) {
         case "radio":
-          if (subsection.path.startsWith(normalizedFieldName + ".")) {
+          if (subsection.path.startsWith(`${normalizedFieldName}.`)) {
             return true;
           }
           break;
 
         case "inputGrid":
           for (const row of subsection.rows) {
-            if (row.path.startsWith(normalizedFieldName + ".") || row.path.startsWith(normalizedFieldName + "[")) {
+            if (row.path.startsWith(`${normalizedFieldName}.`) || row.path.startsWith(`${normalizedFieldName}[`)) {
               return true;
             }
           }
@@ -99,7 +99,7 @@ export function doesValidationResultApplyToSection(
 
         case "checkboxes":
           for (const option of subsection.options) {
-            if (option.path.startsWith(normalizedFieldName + ".")) {
+            if (option.path.startsWith(`${normalizedFieldName}.`)) {
               return true;
             }
           }

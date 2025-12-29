@@ -61,7 +61,7 @@ describe("LogsHomePage", () => {
     });
     await user.click(firstRow);
 
-    const list = (await screen.findAllByRole("list"))[0] as HTMLDataListElement;
+    const list = (await screen.findAllByRole("presentation"))[0] as HTMLDListElement;
     expect(list).toBeVisible();
 
     const formattedDate = formatDateTimeFull(new Date("2025-03-11T09:02:36Z"));

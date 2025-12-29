@@ -8,7 +8,7 @@ import { Modal } from "@/components/ui/Modal/Modal";
 import { useElection } from "@/hooks/election/useElection";
 import { useElectionStatus } from "@/hooks/election/useElectionStatus";
 import { t, tx } from "@/i18n/translate";
-import { PollingStation } from "@/types/generated/openapi";
+import type { PollingStation } from "@/types/generated/openapi";
 
 export interface InvestigationDeleteModalProps {
   pollingStation: PollingStation;

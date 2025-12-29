@@ -1,7 +1,7 @@
 import { startTransition, useEffect, useRef, useState } from "react";
 
 import { Alert } from "@/components/ui/Alert/Alert";
-import { Message } from "@/hooks/messages/MessagesContext";
+import type { Message } from "@/hooks/messages/MessagesContext";
 import { useMessages } from "@/hooks/messages/useMessages";
 
 export function Messages() {

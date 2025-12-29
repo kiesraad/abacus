@@ -2,10 +2,10 @@ import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router";
 
 import { useInitialApiGet } from "@/api/useInitialApiGet";
-import { AUDIT_LOG_LIST_REQUEST_PATH, AuditLogEvent, AuditLogListResponse } from "@/types/generated/openapi";
+import type { AUDIT_LOG_LIST_REQUEST_PATH, AuditLogEvent, AuditLogListResponse } from "@/types/generated/openapi";
 
 import { clearEmptySince, getLogFilterOptionsFromSearchParams, hasLogFilters } from "../utils/searchParamFilter";
-import { LogFilterName } from "./useLogFilterOptions";
+import type { LogFilterName } from "./useLogFilterOptions";
 
 interface Pagination {
   page: number;
@@ -33,7 +33,7 @@ export function useAuditLog() {
     setFilterState(getLogFilterOptionsFromSearchParams(searchParams));
   }, [searchParams]);
 
-  // Set the since date time filter
+  // Set the "since" date time filter
   const setSince = (since: string) => {
     setSearchParams({ ...clearEmptySince({ ...filterState, since }) });
   };

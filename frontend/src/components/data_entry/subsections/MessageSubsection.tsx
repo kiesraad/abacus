@@ -1,4 +1,4 @@
-import { MessageSubsection } from "@/types/types";
+import type { MessageSubsection } from "@/types/types";
 
 import cls from "./MessageSubsection.module.css";
 

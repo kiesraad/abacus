@@ -1,9 +1,9 @@
-import * as React from "react";
+import type { ReactNode } from "react";
 
 import cls from "./AppFrame.module.css";
 
 export interface AppFrameProps {
-  children: React.ReactNode;
+  children: ReactNode;
 }
 
 //Low in functionality, but it provides an entry point into the UI library loading all styles.

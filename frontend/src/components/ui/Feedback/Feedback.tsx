@@ -1,8 +1,8 @@
-import { ReactNode, useEffect, useRef } from "react";
+import { type ReactNode, useEffect, useRef } from "react";
 
 import { hasTranslation, t, tx } from "@/i18n/translate";
-import { Role, ValidationResult } from "@/types/generated/openapi";
-import { AlertType, FeedbackId } from "@/types/ui";
+import type { Role, ValidationResult } from "@/types/generated/openapi";
+import type { AlertType, FeedbackId } from "@/types/ui";
 import { cn } from "@/utils/classnames";
 import { dottedCode } from "@/utils/ValidationResults";
 

@@ -1,4 +1,4 @@
-import { To, useNavigate } from "react-router";
+import { type To, useNavigate } from "react-router";
 
 import { isSuccess } from "@/api/ApiResult";
 import { useCrud } from "@/api/useCrud";
@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/Button/Button";
 import { Modal } from "@/components/ui/Modal/Modal";
 import { useElection } from "@/hooks/election/useElection";
 import { t } from "@/i18n/translate";
-import {
+import type {
   COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_BODY,
   COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_PATH,
 } from "@/types/generated/openapi";

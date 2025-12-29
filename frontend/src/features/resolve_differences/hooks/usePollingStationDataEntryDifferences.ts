@@ -1,12 +1,12 @@
 import { useContext, useState } from "react";
 
-import { AnyApiError, isSuccess, NotFoundError } from "@/api/ApiResult";
+import { type AnyApiError, isSuccess, NotFoundError } from "@/api/ApiResult";
 import { useApiClient } from "@/api/useApiClient";
 import { useInitialApiGet } from "@/api/useInitialApiGet";
 import { ElectionStatusProviderContext } from "@/hooks/election/ElectionStatusProviderContext";
 import { useElection } from "@/hooks/election/useElection";
 import { t } from "@/i18n/translate";
-import {
+import type {
   DataEntryGetDifferencesResponse,
   DataEntryStatusName,
   DataEntryStatusResponse,
@@ -17,7 +17,7 @@ import {
   PollingStation,
   ResolveDifferencesAction,
 } from "@/types/generated/openapi";
-import { DataEntryStructure } from "@/types/types";
+import type { DataEntryStructure } from "@/types/types";
 import { getDataEntryStructure } from "@/utils/dataEntryStructure";
 
 interface PollingStationDataEntryDifferences {

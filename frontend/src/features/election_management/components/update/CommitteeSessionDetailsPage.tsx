@@ -1,7 +1,7 @@
-import { FormEvent, useState } from "react";
+import { type FormEvent, useState } from "react";
 import { useLocation, useNavigate } from "react-router";
 
-import { AnyApiError, ApiError, isSuccess } from "@/api/ApiResult";
+import { type AnyApiError, ApiError, isSuccess } from "@/api/ApiResult";
 import { useCrud } from "@/api/useCrud";
 import { Footer } from "@/components/footer/Footer";
 import { Alert } from "@/components/ui/Alert/Alert";
@@ -11,7 +11,7 @@ import { FormLayout } from "@/components/ui/Form/FormLayout";
 import { InputField } from "@/components/ui/InputField/InputField";
 import { useElection } from "@/hooks/election/useElection";
 import { t, tx } from "@/i18n/translate";
-import { COMMITTEE_SESSION_UPDATE_REQUEST_PATH, CommitteeSessionUpdateRequest } from "@/types/generated/openapi";
+import type { COMMITTEE_SESSION_UPDATE_REQUEST_PATH, CommitteeSessionUpdateRequest } from "@/types/generated/openapi";
 import { committeeSessionLabel } from "@/utils/committeeSession";
 import { convertNLDateToISODate, isValidNLDate, isValidTime } from "@/utils/dateTime";
 

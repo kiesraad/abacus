@@ -4,7 +4,7 @@ import { describe, expect, test } from "vitest";
 import { electionMockData } from "@/testing/api-mocks/ElectionMockData";
 import { validationResultMockData } from "@/testing/api-mocks/ValidationResultMockData";
 import { render } from "@/testing/test-utils";
-import { ValidationResults } from "@/types/generated/openapi";
+import type { ValidationResults } from "@/types/generated/openapi";
 import { getDataEntryStructure } from "@/utils/dataEntryStructure";
 
 import { ErrorsAndWarningsOverview } from "./ErrorsAndWarningsOverview";

@@ -1,4 +1,4 @@
-import { Navigate, RouteObject } from "react-router";
+import { Navigate, type RouteObject } from "react-router";
 
 import { ErrorBoundary } from "@/components/error/ErrorBoundary";
 import { NotFoundPage } from "@/components/error/NotFoundPage";

@@ -1,11 +1,11 @@
-import * as React from "react";
+import { type ReactNode, useEffect, useRef } from "react";
 
 import { cn } from "@/utils/classnames";
 
 import cls from "./ProgressList.module.css";
 
 export interface ProgressListScrollProps {
-  children: React.ReactNode;
+  children: ReactNode;
 }
 
 function throwMissingClass(): never {
@@ -13,15 +13,15 @@ function throwMissingClass(): never {
 }
 
 export function ProgressListScroll({ children }: ProgressListScrollProps) {
-  const containerRef = React.useRef<HTMLDivElement>(null);
-  const listRef = React.useRef<HTMLUListElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const listRef = useRef<HTMLUListElement>(null);
 
   const clsHasScrolling = cls.hasScrolling ?? throwMissingClass();
   const clsShowTopGradient = cls.showTopGradient ?? throwMissingClass();
   const clsShowBottomGradient = cls.showBottomGradient ?? throwMissingClass();
   const clsScroll = cls.scroll ?? throwMissingClass();
 
-  React.useEffect(() => {
+  useEffect(() => {
     const scrollContainer = containerRef.current;
     const scrollList = listRef.current;
 

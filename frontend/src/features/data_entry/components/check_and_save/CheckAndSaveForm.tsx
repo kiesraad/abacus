@@ -1,4 +1,5 @@
-import * as React from "react";
+import { type FormEvent, type ReactElement, useCallback, useEffect, useMemo, useRef, useState } from "react";
+
 import { Link, useNavigate, useParams } from "react-router";
 
 import { ApiError, FatalApiError } from "@/api/ApiResult";
@@ -13,14 +14,14 @@ import { KeyboardKeys } from "@/components/ui/KeyboardKeys/KeyboardKeys";
 import { StatusList } from "@/components/ui/StatusList/StatusList";
 import { useElection } from "@/hooks/election/useElection";
 import { t, tx } from "@/i18n/translate";
-import { FormSectionId } from "@/types/types";
-import { KeyboardKey, MenuStatus } from "@/types/ui";
+import type { FormSectionId } from "@/types/types";
+import { KeyboardKey, type MenuStatus } from "@/types/ui";
 import { dottedCode } from "@/utils/ValidationResults";
 
 import { useDataEntryContext } from "../../hooks/useDataEntryContext";
 import { useFormKeyboardNavigation } from "../../hooks/useFormKeyboardNavigation";
-import { SubmitCurrentFormOptions } from "../../types/types";
-import { DataEntryFormSectionStatus } from "../../utils/dataEntryUtils";
+import type { SubmitCurrentFormOptions } from "../../types/types";
+import type { DataEntryFormSectionStatus } from "../../utils/dataEntryUtils";
 import { getUrlForFormSectionID } from "../../utils/utils";
 import { DataEntryNavigation } from "../DataEntryNavigation";
 
@@ -29,8 +30,8 @@ export function CheckAndSaveForm() {
 
   const navigate = useNavigate();
   const { election } = useElection();
-  const [isConfirmed, setIsConfirmed] = React.useState(false);
-  const [isConfirmedError, setIsConfirmedError] = React.useState<string | null>(null);
+  const [isConfirmed, setIsConfirmed] = useState(false);
+  const [isConfirmedError, setIsConfirmedError] = useState<string | null>(null);
   const {
     error,
     dataEntryStructure,
@@ -41,7 +42,7 @@ export function CheckAndSaveForm() {
     pollingStationId,
     entryNumber,
   } = useDataEntryContext();
-  const acceptCheckboxRef = React.useRef<HTMLInputElement>(null);
+  const acceptCheckboxRef = useRef<HTMLInputElement>(null);
 
   const params = useParams<{ sectionId: FormSectionId }>();
   const sectionId = params.sectionId ?? null;
@@ -50,14 +51,14 @@ export function CheckAndSaveForm() {
     throw new Error(`CheckAndSaveForm can only be used with sectionId "save", not "${sectionId}"`);
   }
 
-  const getUrlForFormSection = React.useCallback(
+  const getUrlForFormSection = useCallback(
     (id: FormSectionId) => {
       return getUrlForFormSectionID(election.id, pollingStationId, entryNumber, id);
     },
     [election, pollingStationId, entryNumber],
   );
 
-  const [notableFormSections, hasWarnings, hasErrors, allFeedbackAccepted] = React.useMemo(() => {
+  const [notableFormSections, hasWarnings, hasErrors, allFeedbackAccepted] = useMemo(() => {
     const sections = Object.values(formState.sections).filter(
       (section) => !section.errors.isEmpty() || !section.warnings.isEmpty(),
     );
@@ -82,7 +83,7 @@ export function CheckAndSaveForm() {
   }, [formState]);
 
   // Scroll unaccepted warnings/errors checkbox into view when error for it is triggered
-  React.useEffect(() => {
+  useEffect(() => {
     if (isConfirmedError) {
       acceptCheckboxRef.current?.focus();
       requestAnimationFrame(() => {
@@ -129,7 +130,7 @@ export function CheckAndSaveForm() {
 
   return (
     <Form
-      onSubmit={(event: React.FormEvent<HTMLFormElement>) => {
+      onSubmit={(event: FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         void onFinalise();
       }}
@@ -202,7 +203,7 @@ export function CheckAndSaveForm() {
             {!hasErrors && <StatusList.Item status="accept">{t("check_and_save.counts_add_up_title")}</StatusList.Item>}
 
             {notableFormSections.map((section) => {
-              const link = (title: React.ReactElement) => <Link to={getUrlForFormSection(section.id)}>{title}</Link>;
+              const link = (title: ReactElement) => <Link to={getUrlForFormSection(section.id)}>{title}</Link>;
               const title = dataEntryStructure.find((s) => s.id === section.id)?.title || section.id;
               let status: DataEntryFormSectionStatus;
               if (!section.errors.isEmpty()) {

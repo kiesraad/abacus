@@ -1,8 +1,8 @@
 /* eslint-disable no-console */
-import { RouteObject } from "react-router";
+import type { RouteObject } from "react-router";
 
 import { routes } from "@/app/routes";
-import { Role } from "@/types/generated/openapi";
+import type { Role } from "@/types/generated/openapi";
 
 interface RouteInfo {
   path: string;

@@ -2,7 +2,7 @@ import type { Meta, StoryFn } from "@storybook/react-vite";
 
 import { electionMockData } from "@/testing/api-mocks/ElectionMockData";
 import { validationResultMockData } from "@/testing/api-mocks/ValidationResultMockData";
-import { ValidationResults } from "@/types/generated/openapi";
+import type { ValidationResults } from "@/types/generated/openapi";
 import { getDataEntryStructure } from "@/utils/dataEntryStructure";
 
 import { ErrorsAndWarningsOverview } from "./ErrorsAndWarningsOverview";

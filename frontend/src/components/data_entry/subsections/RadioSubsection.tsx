@@ -1,5 +1,5 @@
 import { ChoiceList } from "@/components/ui/CheckboxAndRadio/ChoiceList";
-import { RadioSubsection, SectionValues } from "@/types/types";
+import type { RadioSubsection, SectionValues } from "@/types/types";
 
 import cls from "./CheckboxesRadioSubsection.module.css";
 

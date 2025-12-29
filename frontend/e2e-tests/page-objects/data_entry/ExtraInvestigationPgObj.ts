@@ -1,6 +1,6 @@
-import { type Locator, type Page } from "@playwright/test";
+import type { Locator, Page } from "@playwright/test";
 
-import { ExtraInvestigation } from "@/types/generated/openapi";
+import type { ExtraInvestigation } from "@/types/generated/openapi";
 
 import { DataEntryBasePage } from "./DataEntryBasePgObj";
 
@@ -68,23 +68,5 @@ export class ExtraInvestigationPage extends DataEntryBasePage {
     }
 
     await this.next.click();
-  }
-
-  async getExtraInvestigation(): Promise<ExtraInvestigation> {
-    const extraInvestigationOtherReasonYes = await this.extraInvestigationOtherReasonYes.isChecked();
-    const extraInvestigationOtherReasonNo = await this.extraInvestigationOtherReasonNo.isChecked();
-    const ballotsRecountedExtraInvestigationYes = await this.ballotsRecountedYes.isChecked();
-    const ballotsRecountedExtraInvestigationNo = await this.ballotsRecountedNo.isChecked();
-
-    return {
-      extra_investigation_other_reason: {
-        yes: extraInvestigationOtherReasonYes,
-        no: extraInvestigationOtherReasonNo,
-      },
-      ballots_recounted_extra_investigation: {
-        yes: ballotsRecountedExtraInvestigationYes,
-        no: ballotsRecountedExtraInvestigationNo,
-      },
-    };
   }
 }

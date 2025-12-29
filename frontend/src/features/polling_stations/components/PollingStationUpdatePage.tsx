@@ -1,4 +1,4 @@
-import * as React from "react";
+import { useEffect, useState } from "react";
 import { Navigate, useNavigate } from "react-router";
 
 import { IconTrash } from "@/components/generated/icons";
@@ -12,7 +12,7 @@ import { useMessages } from "@/hooks/messages/useMessages";
 import { useNumericParam } from "@/hooks/useNumericParam";
 import { useUserRole } from "@/hooks/user/useUserRole";
 import { t } from "@/i18n/translate";
-import { PollingStation } from "@/types/generated/openapi";
+import type { PollingStation } from "@/types/generated/openapi";
 
 import { usePollingStationGet } from "../hooks/usePollingStationGet";
 import { isPollingStationCreateAndUpdateAllowed } from "../utils/checks";
@@ -30,13 +30,13 @@ export function PollingStationUpdatePage() {
   const { requestState } = usePollingStationGet(election.id, pollingStationId);
   const electionStatuses = useElectionStatus();
   const status = electionStatuses.statuses.find((status) => status.polling_station_id === pollingStationId);
-  const [showDeleteModal, setShowDeleteModal] = React.useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
 
   function toggleShowDeleteModal() {
     setShowDeleteModal(!showDeleteModal);
   }
 
-  const [error, setError] = React.useState<string | undefined>();
+  const [error, setError] = useState<string | undefined>();
 
   const parentUrl = `/elections/${election.id}/polling-stations`;
 
@@ -98,7 +98,7 @@ export function PollingStationUpdatePage() {
     setError(t("polling_station.message.delete_error_title"));
   }
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (error) {
       window.scrollTo(0, 0);
     }

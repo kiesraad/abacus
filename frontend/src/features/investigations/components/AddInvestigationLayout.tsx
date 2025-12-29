@@ -10,7 +10,7 @@ import { ProgressList } from "@/components/ui/ProgressList/ProgressList";
 import { useElection } from "@/hooks/election/useElection";
 import { useNumericParam } from "@/hooks/useNumericParam";
 import { t } from "@/i18n/translate";
-import { MenuStatus } from "@/types/ui";
+import type { MenuStatus } from "@/types/ui";
 
 import { StartDataEntryModal } from "./StartDataEntryModal";
 

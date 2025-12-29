@@ -1,17 +1,17 @@
+import type { ReactNode } from "react";
 import { Footer } from "@/components/footer/Footer";
 import { NavBar } from "@/components/navbar/NavBar";
 import { AppFrame } from "@/components/ui/AppFrame/AppFrame";
 import { AppLayout } from "@/components/ui/AppLayout/AppLayout";
-import { TranslationPath } from "@/i18n/i18n.types";
+import type { TranslationPath } from "@/i18n/i18n.types";
 import { t, tx } from "@/i18n/translate";
-import { ErrorReference } from "@/types/generated/openapi";
+import type { ErrorReference } from "@/types/generated/openapi";
 import { isDevelopment } from "@/utils/env";
-
 import { ErrorMessage } from "./ErrorMessage";
 
 interface FatalErrorPageProps {
   title?: TranslationPath;
-  message?: string | React.ReactNode;
+  message?: string | ReactNode;
   reference?: ErrorReference;
   code?: number;
   error?: Error;

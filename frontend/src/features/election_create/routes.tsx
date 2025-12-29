@@ -1,4 +1,4 @@
-import { RouteObject } from "react-router";
+import type { RouteObject } from "react-router";
 
 import { CheckAndSave } from "./components/CheckAndSave";
 import { CountingMethodType } from "./components/CountingMethodType";

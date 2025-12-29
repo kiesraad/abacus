@@ -1,4 +1,4 @@
-import { MouseEvent, useState } from "react";
+import { type MouseEvent, useState } from "react";
 import { Link, useNavigate } from "react-router";
 
 import { IconCheckmark, IconMinus, IconPencil, IconPrinter } from "@/components/generated/icons";
@@ -6,7 +6,7 @@ import { PollingStationNumber } from "@/components/ui/Badge/PollingStationNumber
 import { Button } from "@/components/ui/Button/Button";
 import { Icon } from "@/components/ui/Icon/Icon";
 import { useElection } from "@/hooks/election/useElection";
-import { PollingStationInvestigationWithStatus } from "@/hooks/election/useInvestigations";
+import type { PollingStationInvestigationWithStatus } from "@/hooks/election/useInvestigations";
 import { useUserRole } from "@/hooks/user/useUserRole";
 import { t } from "@/i18n/translate";
 

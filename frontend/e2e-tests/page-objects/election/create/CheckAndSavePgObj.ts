@@ -1,6 +1,6 @@
 import { expect, type Locator, type Page } from "@playwright/test";
 
-import { Election } from "@/types/generated/openapi";
+import type { Election } from "@/types/generated/openapi";
 
 export class CheckAndSavePgObj {
   readonly header: Locator;

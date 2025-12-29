@@ -1,9 +1,16 @@
-import * as React from "react";
-
+import {
+  type ClipboardEventHandler,
+  type DetailedHTMLProps,
+  type FocusEvent,
+  type FormEvent,
+  forwardRef,
+  type InputHTMLAttributes,
+  useCallback,
+  useState,
+} from "react";
 import { IconWarningSquare } from "@/components/generated/icons";
 import { tx } from "@/i18n/translate";
 import { formatNumber, validateNumberString } from "@/utils/number";
-
 import { Icon } from "../Icon/Icon";
 import { Tooltip } from "../Tooltip/Tooltip";
 import cls from "./NumberInput.module.css";
@@ -20,14 +27,14 @@ function ellipsis(text: string, maxLength: number = 20): string {
   return normalizedText.substring(0, maxLength - 3) + "...";
 }
 
-export type NumberInputProps = React.DetailedHTMLProps<React.InputHTMLAttributes<HTMLInputElement>, HTMLInputElement>;
+export type NumberInputProps = DetailedHTMLProps<InputHTMLAttributes<HTMLInputElement>, HTMLInputElement>;
 
-export const NumberInput = React.forwardRef<HTMLInputElement, NumberInputProps>(function NumberInput(
+export const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(function NumberInput(
   { id, ...inputProps },
   ref,
 ) {
-  const [tooltipInvalidValue, setTooltipInvalidValue] = React.useState<string | null>(null);
-  const [formattedOverlay, setFormattedOverlay] = React.useState<string | undefined>(
+  const [tooltipInvalidValue, setTooltipInvalidValue] = useState<string | null>(null);
+  const [formattedOverlay, setFormattedOverlay] = useState<string | undefined>(
     formatNumber(inputProps.value !== undefined ? inputProps.value : inputProps.defaultValue),
   );
 
@@ -43,7 +50,7 @@ export const NumberInput = React.forwardRef<HTMLInputElement, NumberInputProps>(
     setTooltipInvalidValue(null);
   };
 
-  const onPaste: React.ClipboardEventHandler<HTMLInputElement> = React.useCallback(
+  const onPaste: ClipboardEventHandler<HTMLInputElement> = useCallback(
     (event) => {
       const pastedInput = event.clipboardData.getData("text/plain");
       if (!validateNumberString(pastedInput)) {
@@ -65,7 +72,7 @@ export const NumberInput = React.forwardRef<HTMLInputElement, NumberInputProps>(
     setFormattedOverlay(undefined);
   }
 
-  function onBlur(event: React.FocusEvent<HTMLInputElement>) {
+  function onBlur(event: FocusEvent<HTMLInputElement>) {
     setFormattedOverlay(formatNumber(event.target.value));
   }
 
@@ -93,7 +100,7 @@ export const NumberInput = React.forwardRef<HTMLInputElement, NumberInputProps>(
 });
 
 //only accept numbers
-function onInput(event: React.FormEvent<HTMLInputElement>) {
+function onInput(event: FormEvent<HTMLInputElement>) {
   const input = event.currentTarget;
   input.value = input.value.replace(/[^0-9]/g, "");
 }

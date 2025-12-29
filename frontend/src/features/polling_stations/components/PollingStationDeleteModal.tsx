@@ -4,7 +4,7 @@ import { IconTrash } from "@/components/generated/icons";
 import { Button } from "@/components/ui/Button/Button";
 import { Modal } from "@/components/ui/Modal/Modal";
 import { t, tx } from "@/i18n/translate";
-import { POLLING_STATION_DELETE_REQUEST_PATH, PollingStation } from "@/types/generated/openapi";
+import type { POLLING_STATION_DELETE_REQUEST_PATH, PollingStation } from "@/types/generated/openapi";
 
 export interface PollingStationDeleteModalProps {
   electionId: number;

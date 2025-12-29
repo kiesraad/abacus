@@ -1,5 +1,5 @@
-import { Fragment, HTMLAttributes, ReactNode } from "react";
-import { NavigateOptions, To, useNavigate } from "react-router";
+import { Fragment, type HTMLAttributes, type ReactNode } from "react";
+import { type NavigateOptions, type To, useNavigate } from "react-router";
 
 import { isSuccess } from "@/api/ApiResult";
 import { useCrud } from "@/api/useCrud";
@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/Button/Button";
 import { CommitteeSessionStatusIcon } from "@/components/ui/Icon/CommitteeSessionStatusIcon";
 import { useUserRole } from "@/hooks/user/useUserRole";
 import { t } from "@/i18n/translate";
-import {
+import type {
   COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_BODY,
   COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_PATH,
   CommitteeSession,

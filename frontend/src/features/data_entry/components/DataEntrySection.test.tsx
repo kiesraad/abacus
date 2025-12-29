@@ -1,4 +1,4 @@
-import { UserEvent, userEvent } from "@testing-library/user-event";
+import { type UserEvent, userEvent } from "@testing-library/user-event";
 import * as ReactRouter from "react-router";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 import { MessagesProvider } from "@/hooks/messages/MessagesProvider";
@@ -13,7 +13,7 @@ import { validationResultMockData } from "@/testing/api-mocks/ValidationResultMo
 import { overrideOnce, server } from "@/testing/server";
 import { renderReturningRouter, screen, spyOnHandler, waitFor, within } from "@/testing/test-utils";
 import { getTypistUser } from "@/testing/user-mock-data";
-import { ErrorResponse, SaveDataEntryResponse } from "@/types/generated/openapi";
+import type { ErrorResponse, SaveDataEntryResponse } from "@/types/generated/openapi";
 import { getDataEntryStructure } from "@/utils/dataEntryStructure";
 
 import { DataEntryProvider } from "./DataEntryProvider";

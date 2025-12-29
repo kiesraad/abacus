@@ -4,7 +4,12 @@ import { Progress } from "@/components/ui/ProgressBar/Progress";
 import { ProgressBar } from "@/components/ui/ProgressBar/ProgressBar";
 import { Table } from "@/components/ui/Table/Table";
 import { t } from "@/i18n/translate";
-import { CommitteeSession, Election, ElectionStatusResponseEntry, PollingStation } from "@/types/generated/openapi";
+import type {
+  CommitteeSession,
+  Election,
+  ElectionStatusResponseEntry,
+  PollingStation,
+} from "@/types/generated/openapi";
 
 import {
   categoryColorClass,

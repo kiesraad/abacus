@@ -8,7 +8,7 @@ import { getTypistUser } from "@/testing/user-mock-data";
 
 import * as useDataEntryContext from "../hooks/useDataEntryContext";
 import { getDefaultDataEntryState, getDefaultDataEntryStateAndActionsLoaded } from "../testing/mock-data";
-import { DataEntryStateAndActionsLoaded, Status, SubmitCurrentFormOptions } from "../types/types";
+import type { DataEntryStateAndActionsLoaded, Status, SubmitCurrentFormOptions } from "../types/types";
 import { DataEntryNavigation } from "./DataEntryNavigation";
 
 const baseMockData = getDefaultDataEntryStateAndActionsLoaded();

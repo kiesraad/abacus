@@ -1,17 +1,17 @@
-import { ApiClient } from "@/api/ApiClient";
-import { ApiResult, isSuccess } from "@/api/ApiResult";
+import type { ApiClient } from "@/api/ApiClient";
+import { type ApiResult, isSuccess } from "@/api/ApiResult";
 import { assertStateIsLoaded } from "@/features/data_entry/utils/utils";
-import {
+import type {
   DataEntry,
   DataEntryStatusResponse,
   PollingStationResults,
   SaveDataEntryResponse,
 } from "@/types/generated/openapi";
-import { DataEntryResults, FormSectionId, SectionValues } from "@/types/types";
+import type { DataEntryResults, FormSectionId, SectionValues } from "@/types/types";
 import { mapSectionValues } from "@/utils/dataEntryMapping";
 import { isRecord } from "@/utils/typeChecks";
 
-import {
+import type {
   DataEntryDispatch,
   DataEntryState,
   FormSection,

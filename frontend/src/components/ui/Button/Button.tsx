@@ -1,19 +1,17 @@
-import * as React from "react";
-import { Link, LinkProps } from "react-router";
-
-import { ButtonVariant, Size } from "@/types/ui";
+import type { ButtonHTMLAttributes, LabelHTMLAttributes, ReactNode } from "react";
+import { Link, type LinkProps } from "react-router";
+import type { ButtonVariant, Size } from "@/types/ui";
 import { cn } from "@/utils/classnames";
-
 import cls from "./Button.module.css";
 
-export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   isDisabled?: boolean;
   isLoading?: boolean;
   variant?: ButtonVariant;
   size?: Size;
-  leftIcon?: React.ReactNode;
-  rightIcon?: React.ReactNode;
-  children: React.ReactNode;
+  leftIcon?: ReactNode;
+  rightIcon?: ReactNode;
+  children: ReactNode;
 }
 
 export function Button({
@@ -56,11 +54,11 @@ function ButtonLink({ disabled, variant = "primary", size = "md", children, ...l
 
 Button.Link = ButtonLink;
 
-export interface ButtonLabelProps extends React.LabelHTMLAttributes<HTMLLabelElement> {
+export interface ButtonLabelProps extends LabelHTMLAttributes<HTMLLabelElement> {
   disabled?: boolean;
   variant?: ButtonVariant;
   size?: Size;
-  children: React.ReactNode;
+  children: ReactNode;
 }
 
 function ButtonLabel({ disabled, variant = "primary", size = "md", children, ...labelProps }: ButtonLabelProps) {

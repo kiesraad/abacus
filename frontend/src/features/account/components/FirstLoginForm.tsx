@@ -1,4 +1,4 @@
-import { FormEvent, useState } from "react";
+import { type FormEvent, type ReactNode, useState } from "react";
 import { useNavigate } from "react-router";
 
 import { isError } from "@/api/ApiResult";
@@ -37,7 +37,7 @@ export function FirstLoginForm({ prev }: FirstLoginFormProps) {
     }
   }
 
-  const link = (content: React.ReactNode) => (
+  const link = (content: ReactNode) => (
     <a
       href="#previous"
       onClick={(e) => {

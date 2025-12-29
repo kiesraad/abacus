@@ -56,9 +56,9 @@ function OverviewItem({ data: { code, context }, status }: { data: ValidationRes
 
   return (
     <StatusList.Item status={status}>
-      <div className="bold" role="heading" aria-level={4}>
+      <h4 className={cls.heading}>
         {dottedCode(code)} {title}
-      </div>
+      </h4>
       {content && <div className="content">{content}</div>}
       {actions && <div className={cls.actions}>{actions}</div>}
     </StatusList.Item>

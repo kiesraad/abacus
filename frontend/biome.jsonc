@@ -82,6 +82,12 @@
       },
       "suspicious": {
         "noArrayIndexKey": "off",
+        "noConsole": {
+          "level": "on",
+          "options": {
+            "allow": ["error", "warn"]
+          }
+        },
         "noDoubleEquals": "off",
         "noImplicitAnyLet": "off",
         "noPrototypeBuiltins": "off"
@@ -111,6 +117,17 @@
           },
           "suspicious": {
             "noExplicitAny": "off"
+          }
+        }
+      }
+    },
+    // Scripts can log to console
+    {
+      "includes": ["scripts/*.js", "scripts/*.ts"],
+      "linter": {
+        "rules": {
+          "suspicious": {
+            "noConsole": "off"
           }
         }
       }

@@ -55,7 +55,6 @@ export default tseslint.config(
           allowBoolean: true,
         },
       ],
-      "no-console": process.env.ESLINT_ENV === "production" ? ["error", { allow: ["warn", "error"] }] : "off",
       "import/no-restricted-paths": [
         "error",
         {

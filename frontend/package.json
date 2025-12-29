@@ -14,7 +14,7 @@
     "lint": "npm run lint:biome && npm run lint:tsc && npm run lint:eslint",
     "lint:biome": "biome check",
     "lint:tsc": "tsc",
-    "lint:eslint": "cross-env ESLINT_ENV=production eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+    "lint:eslint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "format": "biome format --write",
     "preview": "vite preview",
     "test": "vitest",

@@ -1,5 +1,5 @@
-import { FormEvent, useState } from "react";
-import { useNavigate } from "react-router";
+import { FormEvent, ReactNode, useState } from "react";
+import { Link, useNavigate } from "react-router";
 
 import { isError } from "@/api/ApiResult";
 import { useApiState } from "@/api/useApiState";
@@ -37,16 +37,16 @@ export function FirstLoginForm({ prev }: FirstLoginFormProps) {
     }
   }
 
-  const link = (content: React.ReactNode) => (
-    <a
-      href="#previous"
+  const link = (content: ReactNode) => (
+    <Link
+      to="#previous"
       onClick={(e) => {
         e.preventDefault();
         prev();
       }}
     >
       {content}
-    </a>
+    </Link>
   );
 
   return (

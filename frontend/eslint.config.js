@@ -3,7 +3,6 @@ import tsParser from "@typescript-eslint/parser";
 import importPlugin from "eslint-plugin-import";
 import playwright from "eslint-plugin-playwright";
 import reactHooks from "eslint-plugin-react-hooks";
-import reactRefresh from "eslint-plugin-react-refresh";
 import storybook from "eslint-plugin-storybook";
 import { readdirSync } from "fs";
 import globals from "globals";
@@ -38,12 +37,10 @@ export default tseslint.config(
       tseslint.configs.strictTypeChecked,
       importPlugin.flatConfigs.recommended,
       importPlugin.flatConfigs.typescript,
-      reactRefresh.configs.recommended,
       reactHooks.configs["recommended-latest"],
     ],
     rules: {
       "import/namespace": "off",
-      "react-refresh/only-export-components": ["warn", { allowConstantExport: true }],
       "@typescript-eslint/no-unsafe-type-assertion": "error",
       "@typescript-eslint/restrict-template-expressions": [
         "error",

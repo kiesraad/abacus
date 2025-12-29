@@ -5,7 +5,7 @@ import { committeeSessionLabel } from "@/utils/committeeSession";
 
 import cls from "./CommitteeSessionStatus.module.css";
 
-export function CommitteeSessionStatusLabel(status: CommitteeSessionStatus, role: "coordinator" | "typist"): string {
+function CommitteeSessionStatusLabel(status: CommitteeSessionStatus, role: "coordinator" | "typist"): string {
   return t(`committee_session_status.${role}.${status}`);
 }
 

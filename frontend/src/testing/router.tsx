@@ -1,4 +1,3 @@
-/* eslint-disable react-refresh/only-export-components */
 import { ReactNode } from "react";
 import { createMemoryRouter, useRouteError } from "react-router";
 

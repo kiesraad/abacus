@@ -3,7 +3,6 @@ import { NavigateOptions, To, useNavigate } from "react-router";
 
 import { isSuccess } from "@/api/ApiResult";
 import { useCrud } from "@/api/useCrud";
-import { CommitteeSessionStatusLabel } from "@/components/committee_session/CommitteeSessionStatus";
 import { Button } from "@/components/ui/Button/Button";
 import { CommitteeSessionStatusIcon } from "@/components/ui/Icon/CommitteeSessionStatusIcon";
 import { useUserRole } from "@/hooks/user/useUserRole";
@@ -104,7 +103,7 @@ export function CommitteeSessionCard({
 
   const icon = CommitteeSessionStatusIcon({ status: committeeSession.status, size: "xl" });
   const label = committeeSessionLabel(committeeSession.number);
-  const status = CommitteeSessionStatusLabel(committeeSession.status, "coordinator");
+  const status = t(`committee_session_status.coordinator.${committeeSession.status}`);
   const date = committeeSession.start_date_time
     ? formatDateTimeFull(new Date(committeeSession.start_date_time))
     : undefined;

@@ -75,6 +75,12 @@
       },
       "style": {
         "noDescendingSpecificity": "off",
+        "useComponentExportOnlyModules": {
+          "level": "on",
+          "options": {
+            "allowConstantExport": true
+          }
+        },
         "useConst": "off",
         "useImportType": "off",
         "useNodejsImportProtocol": "off",
@@ -113,7 +119,8 @@
       "linter": {
         "rules": {
           "style": {
-            "noNonNullAssertion": "off"
+            "noNonNullAssertion": "off",
+            "useComponentExportOnlyModules": "off"
           },
           "suspicious": {
             "noExplicitAny": "off"

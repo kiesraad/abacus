@@ -1,7 +1,8 @@
 import eslint from "@eslint/js";
 import tsParser from "@typescript-eslint/parser";
 import { defineConfig } from "eslint/config";
-import { importX } from "eslint-plugin-import-x";
+import { createTypeScriptImportResolver } from "eslint-import-resolver-typescript";
+import { createNodeResolver, importX } from "eslint-plugin-import-x";
 import playwright from "eslint-plugin-playwright";
 import reactHooks from "eslint-plugin-react-hooks";
 import storybook from "eslint-plugin-storybook";
@@ -76,10 +77,7 @@ export default defineConfig(
       ],
     },
     settings: {
-      "import-x/resolver": {
-        typescript: true,
-        node: true,
-      },
+      "import-x/resolver-next": [createTypeScriptImportResolver(), createNodeResolver()],
     },
     languageOptions: {
       parser: tsParser,

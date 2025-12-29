@@ -1,5 +1,6 @@
 import eslint from "@eslint/js";
 import tsParser from "@typescript-eslint/parser";
+import { defineConfig } from "eslint/config";
 import { importX } from "eslint-plugin-import-x";
 import playwright from "eslint-plugin-playwright";
 import reactHooks from "eslint-plugin-react-hooks";
@@ -18,7 +19,7 @@ const restrictFeatureImports = readdirSync("./src/features", { withFileTypes: tr
     message: "Cross-feature imports are not allowed.",
   }));
 
-export default tseslint.config(
+export default defineConfig(
   {
     // global ignores
     ignores: [

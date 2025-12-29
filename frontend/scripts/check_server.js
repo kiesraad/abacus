@@ -15,8 +15,6 @@ async function waitForPort(port = PORT, tries = TRIES) {
 
       console.log(`\n✅ Backend is running on port ${port}`);
       process.exit(0);
-
-      /* eslint-disable-next-line no-unused-vars */
     } catch (_err) {
       // try again in 1 second
       await new Promise((resolve) => setTimeout(resolve, 1000));

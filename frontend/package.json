@@ -80,17 +80,6 @@
     "vitest-fail-on-console": "0.10.1",
     "xstate": "5.25.0"
   },
-  "overrides": {
-    "eslint-plugin-playwright": {
-      "globals": ">=14"
-    },
-    "@eslint/eslintrc": {
-      "globals": ">=14"
-    },
-    "@babel/traverse": {
-      "globals": ">=14"
-    }
-  },
   "msw": {
     "workerDirectory": [""]
   }

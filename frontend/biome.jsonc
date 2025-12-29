@@ -83,8 +83,7 @@
       "suspicious": {
         "noArrayIndexKey": "off",
         "noDoubleEquals": "off",
-        "noImplicitAnyLet": "off",
-        "noPrototypeBuiltins": "off"
+        "noImplicitAnyLet": "off"
       }
     }
   },

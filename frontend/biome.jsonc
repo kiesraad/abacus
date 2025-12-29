@@ -67,14 +67,12 @@
         "noUselessFragments": "off"
       },
       "correctness": {
-        "noEmptyPattern": "off",
         "useExhaustiveDependencies": "off"
       },
       "performance": {
         "noAccumulatingSpread": "off"
       },
       "style": {
-        "noDescendingSpecificity": "off",
         "useConst": "off",
         "useImportType": "off",
         "useNodejsImportProtocol": "off",

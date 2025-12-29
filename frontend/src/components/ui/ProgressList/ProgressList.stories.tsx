@@ -1,12 +1,12 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import * as React from "react";
+import { CSSProperties } from "react";
 
 import { electionMockData } from "@/testing/api-mocks/ElectionMockData";
 import { getDataEntryStructure } from "@/utils/dataEntryStructure";
 
 import { ProgressList } from "./ProgressList";
 
-const style: React.CSSProperties = {
+const style: CSSProperties = {
   height: 480,
   width: 300,
   display: "flex",

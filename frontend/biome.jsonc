@@ -67,8 +67,7 @@
         "noUselessFragments": "off"
       },
       "correctness": {
-        "noEmptyPattern": "off",
-        "useExhaustiveDependencies": "off"
+        "noEmptyPattern": "off"
       },
       "performance": {
         "noAccumulatingSpread": "off"

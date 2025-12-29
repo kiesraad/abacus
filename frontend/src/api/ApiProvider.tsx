@@ -32,7 +32,7 @@ export function ApiProvider({ children, fetchInitialUser = true }: ApiProviderPr
     };
 
     return client.subscribeToApiErrors(callback);
-  }, [user, setUser, setAirGapError]);
+  }, [user, setUser]);
 
   // Store the next session expiration time in the user state
   useEffect(() => {
@@ -43,7 +43,7 @@ export function ApiProvider({ children, fetchInitialUser = true }: ApiProviderPr
     };
 
     return client.subscribeToSessionExpiration(callback);
-  }, [user, setUser, expiration, setExpiration]);
+  }, [expiration, setExpiration]);
 
   const apiState: ApiState = {
     client,

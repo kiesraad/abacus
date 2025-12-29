@@ -43,6 +43,7 @@ export const NumberInput = React.forwardRef<HTMLInputElement, NumberInputProps>(
     setTooltipInvalidValue(null);
   };
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: setTooltipInvalidValue is needed to preserve existing memoization
   const onPaste: React.ClipboardEventHandler<HTMLInputElement> = React.useCallback(
     (event) => {
       const pastedInput = event.clipboardData.getData("text/plain");

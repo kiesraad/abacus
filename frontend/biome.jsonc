@@ -77,7 +77,6 @@
         "noDescendingSpecificity": "off",
         "useConst": "off",
         "useImportType": "off",
-        "useNodejsImportProtocol": "off",
         "useTemplate": "off"
       },
       "suspicious": {

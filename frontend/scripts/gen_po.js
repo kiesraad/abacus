@@ -1,4 +1,4 @@
-import fs from "fs";
+import fs from "node:fs";
 
 // eslint-disable-next-line import/no-unresolved -- the @ alias is resolved by Vite, which ESLint doesn't know about
 import { translations } from "@/i18n/i18n";

@@ -1,5 +1,5 @@
-import fs from "fs";
-import readline from "readline";
+import fs from "node:fs";
+import readline from "node:readline";
 
 // let the user confirm that all current translation json files will be overwritten
 const io = readline.createInterface({

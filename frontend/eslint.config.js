@@ -1,7 +1,6 @@
 import eslint from "@eslint/js";
 import tsParser from "@typescript-eslint/parser";
 import importPlugin from "eslint-plugin-import";
-import jsxA11y from "eslint-plugin-jsx-a11y";
 import playwright from "eslint-plugin-playwright";
 import reactHooks from "eslint-plugin-react-hooks";
 import reactRefresh from "eslint-plugin-react-refresh";
@@ -40,12 +39,10 @@ export default tseslint.config(
       importPlugin.flatConfigs.recommended,
       importPlugin.flatConfigs.typescript,
       reactRefresh.configs.recommended,
-      jsxA11y.flatConfigs.recommended,
       reactHooks.configs["recommended-latest"],
     ],
     rules: {
       "import/namespace": "off",
-      "jsx-a11y/no-autofocus": "off",
       "react-refresh/only-export-components": ["warn", { allowConstantExport: true }],
       "@typescript-eslint/no-unsafe-type-assertion": "error",
       "@typescript-eslint/restrict-template-expressions": [

@@ -63,6 +63,7 @@ export const DefaultProgressList: StoryObj<Props> = {
 
         <ProgressList.Scroll>
           {Array.from({ length: 10 }).map((_, index) => (
+            // biome-ignore lint/suspicious/noArrayIndexKey: we can use the index as key since the input is static
             <ProgressList.Item key={index} status="idle" active={active === index} id={`scroll-item-${index + 1}`}>
               <span>Scroll {index + 1}</span>
             </ProgressList.Item>

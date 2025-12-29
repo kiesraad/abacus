@@ -51,7 +51,7 @@ function SectionTable({ section, first, second, action }: SectionTableProps) {
   return (
     <div>
       {/** biome-ignore lint/suspicious/useIterableCallbackReturn: switch statement is exhaustive, so it always returns a value */}
-      {section.subsections.map((subsection, subsectionIdx) => {
+      {section.subsections.map((subsection) => {
         switch (subsection.type) {
           case "heading":
             // only used to override title
@@ -76,7 +76,7 @@ function SectionTable({ section, first, second, action }: SectionTableProps) {
 
             return (
               <DifferencesTable
-                key={`${section.id}-${subsectionIdx}`}
+                key={`${section.id}-${subsection.type}`}
                 title={title}
                 headers={headers}
                 rows={[row]}
@@ -114,7 +114,7 @@ function SectionTable({ section, first, second, action }: SectionTableProps) {
 
               return (
                 <DifferencesTable
-                  key={`${section.id}-${subsectionIdx}`}
+                  key={`${section.id}-${subsection.type}`}
                   title={title}
                   headers={headers}
                   rows={checkboxRows}
@@ -141,7 +141,7 @@ function SectionTable({ section, first, second, action }: SectionTableProps) {
 
             return (
               <DifferencesTable
-                key={`${section.id}-${subsectionIdx}`}
+                key={`${section.id}-${subsection.type}`}
                 title={title}
                 headers={headers}
                 rows={rows}

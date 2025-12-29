@@ -68,6 +68,7 @@ export function DifferencesTable({ title, headers, rows, action }: DifferencesTa
               const gapRow = differenceIndex > 0 && differences[differenceIndex - 1] !== rowIndex - 1;
 
               return (
+                // biome-ignore lint/suspicious/noArrayIndexKey: we can use the index as key since the input is static
                 <Fragment key={differenceIndex}>
                   {gapRow && (
                     <Table.Row>

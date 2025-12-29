@@ -43,12 +43,12 @@ export function ProgressBar({ id, data, title, spacing, showPercentage = false }
       ) : (
         <section>
           <div id="multi-outer-bar" className={cls.progressbarOuter} style={{ height: "0.75rem" }}>
-            {data.map((bar, index) => {
+            {data.map((bar) => {
               return (
                 <div
                   className={cn(cls.progressbarInner, bar.class, bar.percentage === 0 ? "hidden" : undefined)}
                   style={{ width: `${bar.percentage}%` }}
-                  key={`inner-bar-${index}`}
+                  key={`inner-bar-${bar.class}`}
                 />
               );
             })}

@@ -36,7 +36,8 @@ pub struct CreateTestElectionResult {
     pub data_entry_completed: bool,
 }
 
-async fn generate_data_entries_and_return_whether_data_entry_completed(
+/// Generate data entries and return whether data entry is completed
+async fn generate_data_entries(
     conn: &mut SqliteConnection,
     rng: &mut StdRng,
     args: GenerateElectionArgs,
@@ -103,7 +104,7 @@ pub async fn create_test_election(
     }
 
     let data_entry_completed = if args.with_data_entry && !polling_stations.is_empty() {
-        generate_data_entries_and_return_whether_data_entry_completed(
+        generate_data_entries(
             &mut tx,
             &mut rng,
             args,

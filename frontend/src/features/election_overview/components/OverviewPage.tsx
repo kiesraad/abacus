@@ -88,7 +88,7 @@ export function OverviewPage() {
     const committeeSession = committeeSessionList.find(
       (committeeSession) => committeeSession.election_id === election.id,
     );
-    let electionLink;
+    let electionLink: string | undefined;
     let committeeSessionStatus = <></>;
     let committeeSessionString = "";
     if (isAdminOrCoordinator) {

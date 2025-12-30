@@ -69,33 +69,30 @@ export function InvestigationCard({ investigation }: InvestigationCardProps) {
           </Button>
         )
       )}
-      {investigation.corrected_results !== undefined && (
-        <>
-          {investigation.corrected_results ? (
-            <>
-              <h4>
-                {t("investigations.corrected_results")}
-                <Icon color="default" size="sm" icon={<IconCheckmark />} />
-              </h4>
-              {investigation.status === "definitive" ? (
-                <p>{t("investigations.corrected_results_inserted")}</p>
-              ) : investigation.status === "first_entry_not_started" ? (
-                <p>{t("investigations.corrected_results_not_yet_inserted")}</p>
-              ) : (
-                <p className={cls.flex}>
-                  {t("investigations.corrigendum_data_entry_in_progress")}&nbsp;-&nbsp;
-                  <Link to={`/elections/${election.id}/status`}>{t("view_progress").toLowerCase()}</Link>
-                </p>
-              )}
-            </>
-          ) : (
+      {investigation.corrected_results !== undefined &&
+        (investigation.corrected_results ? (
+          <>
             <h4>
-              {t("investigations.no_corrected_results")}
-              <Icon color="muted" size="sm" icon={<IconMinus />} />
+              {t("investigations.corrected_results")}
+              <Icon color="default" size="sm" icon={<IconCheckmark />} />
             </h4>
-          )}
-        </>
-      )}
+            {investigation.status === "definitive" ? (
+              <p>{t("investigations.corrected_results_inserted")}</p>
+            ) : investigation.status === "first_entry_not_started" ? (
+              <p>{t("investigations.corrected_results_not_yet_inserted")}</p>
+            ) : (
+              <p className={cls.flex}>
+                {t("investigations.corrigendum_data_entry_in_progress")}&nbsp;-&nbsp;
+                <Link to={`/elections/${election.id}/status`}>{t("view_progress").toLowerCase()}</Link>
+              </p>
+            )}
+          </>
+        ) : (
+          <h4>
+            {t("investigations.no_corrected_results")}
+            <Icon color="muted" size="sm" icon={<IconMinus />} />
+          </h4>
+        ))}
       {showModal && <StartDataEntryModal onClose={closeModal} to={`./${investigation.pollingStation.id}/findings`} />}
     </div>
   );

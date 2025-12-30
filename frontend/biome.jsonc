@@ -49,6 +49,11 @@
       "!mockServiceWorker.js",
       "!vitest.shims.d.ts"
     ],
+    "domains": {
+      "project": "recommended",
+      "react": "recommended",
+      "test": "recommended"
+    },
     "rules": {
       "recommended": true,
       // TODO: all disabled rules below should be enabled again and fixed
@@ -59,22 +64,18 @@
         "noStaticElementInteractions": "off",
         "noSvgWithoutTitle": "off",
         "useButtonType": "off",
-        "useSemanticElements": "off",
-        "useValidAnchor": "off"
+        "useSemanticElements": "off"
       },
       "complexity": {
-        "noImportantStyles": "off",
-        "noUselessFragments": "off"
+        "noImportantStyles": "off"
       },
       "correctness": {
-        "noEmptyPattern": "off",
         "useExhaustiveDependencies": "off"
       },
       "performance": {
         "noAccumulatingSpread": "off"
       },
       "style": {
-        "noDescendingSpecificity": "off",
         "useComponentExportOnlyModules": {
           "level": "on",
           "options": {
@@ -83,7 +84,6 @@
         },
         "useConst": "off",
         "useImportType": "off",
-        "useNodejsImportProtocol": "off",
         "useTemplate": "off"
       },
       "suspicious": {
@@ -94,8 +94,6 @@
             "allow": ["error", "warn"]
           }
         },
-        "noDoubleEquals": "off",
-        "noImplicitAnyLet": "off",
         "noPrototypeBuiltins": "off"
       }
     }

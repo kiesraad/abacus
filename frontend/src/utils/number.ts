@@ -17,7 +17,7 @@ export function formatNumber(s: string | number | null | undefined | readonly st
 
 export function deformatNumber(s: string) {
   const cleaned = s.replace(/[.]/g, "");
-  if (cleaned == "") {
+  if (cleaned === "") {
     // An empty value should be parsed as 0
     return 0;
   } else {

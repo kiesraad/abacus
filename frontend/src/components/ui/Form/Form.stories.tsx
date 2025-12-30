@@ -29,20 +29,18 @@ export const DefaultForm: StoryObj<StoryProps> = {
     }
 
     return (
-      <>
-        <div className="mb-lg">
-          <Form title={title} onSubmit={handleFormSubmit}>
-            <input id="inp1" />
-            <br />
-            <input id="inp2" />
-            <br />
-            <input id="inp3" />
-            <br />
-            <button type="submit">Submit</button>
-          </Form>
-          {formSubmitted && "Submitted!"}
-        </div>
-      </>
+      <div className="mb-lg">
+        <Form title={title} onSubmit={handleFormSubmit}>
+          <input id="inp1" />
+          <br />
+          <input id="inp2" />
+          <br />
+          <input id="inp3" />
+          <br />
+          <button type="submit">Submit</button>
+        </Form>
+        {formSubmitted && "Submitted!"}
+      </div>
     );
   },
 };

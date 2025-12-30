@@ -60,8 +60,7 @@
       "a11y": {
         "noAutofocus": "off",
         "noLabelWithoutControl": "off",
-        "noStaticElementInteractions": "off",
-        "noSvgWithoutTitle": "off"
+        "noStaticElementInteractions": "off"
       },
       "complexity": {
         "noImportantStyles": "off"

@@ -147,7 +147,7 @@ describe("PollingStationUpdatePage", () => {
 
       const deletePollingStation = spyOnHandler(PollingStationDeleteHandler);
 
-      const confirmButton = await within(modal).findByRole("button", { name: "Verwijderen" });
+      const confirmButton = await within(modal).findByRole("button", { name: /Verwijderen/ });
       await user.click(confirmButton);
 
       expect(deletePollingStation).toHaveBeenCalled();
@@ -174,7 +174,7 @@ describe("PollingStationUpdatePage", () => {
 
       const deletePollingStation = spyOnHandler(PollingStationDeleteHandler);
 
-      const confirmButton = await within(modal).findByRole("button", { name: "Verwijderen" });
+      const confirmButton = await within(modal).findByRole("button", { name: /Verwijderen/ });
       await user.click(confirmButton);
 
       expect(deletePollingStation).toHaveBeenCalled();

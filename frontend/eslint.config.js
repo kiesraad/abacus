@@ -81,7 +81,7 @@ export default defineConfig(
     },
     languageOptions: {
       parser: tsParser,
-      ecmaVersion: 2020,
+      ecmaVersion: 2022,
       parserOptions: {
         project: "**/tsconfig.json",
       },

@@ -5,7 +5,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { promisify } from "node:util";
 
-import {
+import type {
   NonArraySchemaObjectType,
   OpenAPIV3,
   OperationObject,
@@ -120,7 +120,7 @@ function addDefinition(name: string, v: ReferenceObject | SchemaObject) {
   const result: string[] = [];
   if (v.description) {
     result.push("/**");
-    result.push(" * " + v.description.split("\n").join("\n * "));
+    result.push(` * ${v.description.split("\n").join("\n * ")}`);
     result.push(" */");
   }
 

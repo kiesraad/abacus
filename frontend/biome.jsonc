@@ -77,9 +77,7 @@
           "options": {
             "allowConstantExport": true
           }
-        },
-        "useImportType": "off",
-        "useTemplate": "off"
+        }
       },
       "suspicious": {
         "noConsole": {
@@ -87,8 +85,7 @@
           "options": {
             "allow": ["error", "warn"]
           }
-        },
-        "noPrototypeBuiltins": "off"
+        }
       }
     }
   },

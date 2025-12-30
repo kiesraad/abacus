@@ -1,10 +1,6 @@
 /// Checks if the given EventTarget is a Node
 export function isNode(e: EventTarget | null): e is Node {
-  if (!e || !("nodeType" in e)) {
-    return false;
-  }
-
-  return true;
+  return !(!e || !("nodeType" in e));
 }
 
 /// Checks if the given state has a boolean property with the specified key
@@ -13,7 +9,7 @@ export function hasBooleanProperty<T extends string>(state: unknown, key: T): st
     return false;
   }
 
-  if (!Object.prototype.hasOwnProperty.call(state, key)) {
+  if (!Object.hasOwn(state, key)) {
     return false;
   }
 

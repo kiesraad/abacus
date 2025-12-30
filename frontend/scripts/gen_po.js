@@ -1,4 +1,4 @@
-import fs from "fs";
+import fs from "node:fs";
 
 // eslint-disable-next-line import/no-unresolved -- the @ alias is resolved by Vite, which ESLint doesn't know about
 import { translations } from "@/i18n/i18n";
@@ -10,7 +10,7 @@ if (!fs.existsSync("./translations")) {
 
 // flatten the translations object
 function flatten(obj, parent, result = {}) {
-  for (let key in obj) {
+  for (const key in obj) {
     const path = parent ? `${parent}.${key}` : key;
 
     if (typeof obj[key] === "object") {

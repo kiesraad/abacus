@@ -13,7 +13,7 @@ function flatten(obj, parent, result = {}) {
   for (let key in obj) {
     const path = parent ? `${parent}.${key}` : key;
 
-    if (typeof obj[key] == "object") {
+    if (typeof obj[key] === "object") {
       flatten(obj[key], path, result);
     } else {
       result[path] = obj[key];

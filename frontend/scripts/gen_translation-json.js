@@ -8,7 +8,7 @@ const io = readline.createInterface({
 });
 
 io.question("Do you want to import .po files and overwrite all translation json files? (y/n) ", (ans) => {
-  if (ans == "y" || ans == "yes") {
+  if (ans === "y" || ans === "yes") {
     importPoFiles();
   } else {
     console.log("Ok, bye");
@@ -62,7 +62,7 @@ function expandObject(object) {
 
 function countNested(object) {
   return Object.values(object).reduce(
-    (count, value) => (typeof value == "string" ? count + 1 : count + countNested(value)),
+    (count, value) => (typeof value === "string" ? count + 1 : count + countNested(value)),
     0,
   );
 }

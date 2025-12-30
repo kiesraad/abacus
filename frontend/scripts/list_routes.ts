@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 import type { RouteObject } from "react-router";
 
 import { routes } from "@/app/routes";

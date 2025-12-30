@@ -124,5 +124,3 @@ export function GenerateTestElectionForm() {
     </Form>
   );
 }
-
-export default GenerateTestElectionForm;

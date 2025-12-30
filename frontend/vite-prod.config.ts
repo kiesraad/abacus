@@ -70,12 +70,12 @@ export default defineConfig(({ command }) => {
 
   // print environment variables on CI
   if (process.env.CI) {
-    // eslint-disable-next-line no-console
+    // biome-ignore-start lint/suspicious/noConsole: only for debugging CI
     console.log("Vite build environment:");
     Object.entries(define).forEach(([key, value]) => {
-      // eslint-disable-next-line no-console
       console.log(`${key}: ${value}`);
     });
+    // biome-ignore-end lint/suspicious/noConsole: only for debugging CI
   }
 
   return {

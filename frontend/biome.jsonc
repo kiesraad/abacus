@@ -70,6 +70,22 @@
       },
       "correctness": {
         "useExhaustiveDependencies": "off"
+      },
+      "style": {
+        "useComponentExportOnlyModules": {
+          "level": "on",
+          "options": {
+            "allowConstantExport": true
+          }
+        }
+      },
+      "suspicious": {
+        "noConsole": {
+          "level": "on",
+          "options": {
+            "allow": ["error", "warn"]
+          }
+        }
       }
     }
   },
@@ -92,10 +108,22 @@
       "linter": {
         "rules": {
           "style": {
-            "noNonNullAssertion": "off"
+            "noNonNullAssertion": "off",
+            "useComponentExportOnlyModules": "off"
           },
           "suspicious": {
             "noExplicitAny": "off"
+          }
+        }
+      }
+    },
+    // Scripts can log to console
+    {
+      "includes": ["scripts/*.js", "scripts/*.ts"],
+      "linter": {
+        "rules": {
+          "suspicious": {
+            "noConsole": "off"
           }
         }
       }

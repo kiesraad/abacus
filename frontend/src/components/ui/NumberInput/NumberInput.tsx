@@ -17,7 +17,7 @@ function ellipsis(text: string, maxLength: number = 20): string {
     return normalizedText;
   }
 
-  return normalizedText.substring(0, maxLength - 3) + "...";
+  return `${normalizedText.substring(0, maxLength - 3)}...`;
 }
 
 export type NumberInputProps = React.DetailedHTMLProps<React.InputHTMLAttributes<HTMLInputElement>, HTMLInputElement>;

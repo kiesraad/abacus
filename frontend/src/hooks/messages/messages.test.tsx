@@ -18,8 +18,12 @@ function TestComponent({ onPopMessages }: { onPopMessages: Mock }) {
 
   return (
     <>
-      <button onClick={handlePush}>Push message</button>
-      <button onClick={handlePop}>Pop messages</button>
+      <button type="button" onClick={handlePush}>
+        Push message
+      </button>
+      <button type="button" onClick={handlePop}>
+        Pop messages
+      </button>
     </>
   );
 }

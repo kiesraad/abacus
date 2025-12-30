@@ -62,7 +62,6 @@
         "noInteractiveElementToNoninteractiveRole": "off",
         "noStaticElementInteractions": "off",
         "noSvgWithoutTitle": "off",
-        "useButtonType": "off",
         "useSemanticElements": "off"
       },
       "complexity": {
@@ -71,16 +70,10 @@
       "correctness": {
         "useExhaustiveDependencies": "off"
       },
-      "performance": {
-        "noAccumulatingSpread": "off"
-      },
       "style": {
-        "useConst": "off",
-        "useImportType": "off",
-        "useTemplate": "off"
+        "useImportType": "off"
       },
       "suspicious": {
-        "noArrayIndexKey": "off",
         "noPrototypeBuiltins": "off"
       }
     }

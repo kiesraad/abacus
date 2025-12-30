@@ -30,6 +30,7 @@ export function RedactedHash({ hash, stubs }: RedactedHashProps) {
             const error = stub.error.length > 0;
 
             return (
+              // biome-ignore lint/suspicious/noArrayIndexKey: we can use the index as key since there is no unique id
               <Fragment key={hashIndex}>
                 <span
                   className={cn(
@@ -48,6 +49,7 @@ export function RedactedHash({ hash, stubs }: RedactedHashProps) {
           }
 
           return (
+            // biome-ignore lint/suspicious/noArrayIndexKey: we can use the index as key since there is no unique id
             <Fragment key={hashIndex}>
               <span className={cls.chunk}>{chunk}</span>
               <span className={cls.delimiter}>{prefix}</span>

@@ -57,7 +57,7 @@ describe("PollingStationForm", () => {
         number: 1,
         name: "test",
         address: "Teststraat 1",
-        postal_code: "1234",
+        postal_code: "1234 AB",
         locality: "test",
         polling_station_type: "FixedLocation",
         number_of_voters: 1,
@@ -147,7 +147,7 @@ describe("PollingStationForm", () => {
         number: 42,
         name: "test",
         address: "Teststraat 5A",
-        postal_code: "1234",
+        postal_code: "1234 AB",
         locality: "test",
         polling_station_type: "FixedLocation",
         number_of_voters: 1,
@@ -173,53 +173,27 @@ describe("PollingStationForm", () => {
   });
 
   describe("PollingStationForm update", () => {
-    test("Successful update", async () => {
-      const testPollingStation: PollingStation = {
-        id: 1,
-        election_id: 1,
-        committee_session_id: 1,
-        number: 1,
-        name: "test",
-        address: "Teststraat 2",
-        postal_code: "1234",
-        locality: "test",
-        polling_station_type: "FixedLocation",
-        number_of_voters: 1,
-      };
-
-      const onSaved = vi.fn();
-      render(<PollingStationForm electionId={1} onSaved={onSaved} pollingStation={testPollingStation} />);
-
-      const user = userEvent.setup();
-
-      const input = await screen.findByRole("textbox", { name: "Naam" });
-      await user.clear(input);
-      await user.type(input, "test2");
-
-      await user.click(screen.getByRole("button", { name: "Wijzigingen opslaan" }));
-
-      await waitFor(() => {
-        expect(onSaved).toHaveBeenCalled();
-      });
-    });
+    const testPollingStation: PollingStation = {
+      id: 1,
+      election_id: 1,
+      committee_session_id: 1,
+      number: 123,
+      name: "test",
+      address: "Teststraat 2",
+      postal_code: "1234 AB",
+      locality: "test",
+      polling_station_type: "FixedLocation",
+      number_of_voters: 1,
+    };
 
     test.each([undefined, 42])("Successful update", async (id_prev_session) => {
-      const testPollingStation: PollingStation = {
-        id: 1,
-        election_id: 1,
-        committee_session_id: 1,
+      const testObj: PollingStation = {
+        ...testPollingStation,
         id_prev_session,
-        number: 1,
-        name: "test",
-        address: "Teststraat 2",
-        postal_code: "1234",
-        locality: "test",
-        polling_station_type: "FixedLocation",
-        number_of_voters: 1,
       };
 
       const onSaved = vi.fn();
-      render(<PollingStationForm electionId={1} onSaved={onSaved} pollingStation={testPollingStation} />);
+      render(<PollingStationForm electionId={1} onSaved={onSaved} pollingStation={testObj} />);
 
       const user = userEvent.setup();
 
@@ -235,29 +209,27 @@ describe("PollingStationForm", () => {
     });
 
     test("Number should be disabled when polling station is linked to previous session", () => {
-      const testPollingStation: PollingStation = {
-        id: 1,
-        election_id: 1,
-        committee_session_id: 1,
+      const testObj: PollingStation = {
+        ...testPollingStation,
         id_prev_session: 42,
-        number: 1234,
-        name: "test",
-        address: "Teststraat 2",
-        postal_code: "1234",
-        locality: "test",
-        polling_station_type: "FixedLocation",
-        number_of_voters: 1,
       };
       const onSaved = vi.fn();
 
       // Disabled with id_prev_session defined
-      render(<PollingStationForm electionId={1} onSaved={onSaved} pollingStation={testPollingStation} />);
+      render(<PollingStationForm electionId={1} onSaved={onSaved} pollingStation={testObj} />);
       expect(screen.queryByRole("textbox", { name: "Nummer" })).not.toBeInTheDocument();
-      expect(screen.getByText("1234")).toHaveClass("disabled_input");
+      expect(screen.getByText("123")).toHaveClass("disabled_input");
+    });
+
+    test("Number should be enabled when polling station is not linked to previous session", () => {
+      const testObj: PollingStation = {
+        ...testPollingStation,
+        id_prev_session: undefined,
+      };
+      const onSaved = vi.fn();
 
       // Enabled with id_prev_session undefined
-      testPollingStation.id_prev_session = undefined;
-      render(<PollingStationForm electionId={1} onSaved={onSaved} pollingStation={testPollingStation} />);
+      render(<PollingStationForm electionId={1} onSaved={onSaved} pollingStation={testObj} />);
       expect(screen.queryByRole("textbox", { name: "Nummer" })).toBeInTheDocument();
     });
   });
@@ -269,7 +241,7 @@ describe("PollingStationForm", () => {
 
     const user = userEvent.setup();
 
-    //generate server error:
+    // generate server error
     overrideOnce("post", `/api/elections/1/polling_stations`, 409, {
       error: "Polling station already exists",
       fatal: false,
@@ -284,7 +256,7 @@ describe("PollingStationForm", () => {
     expect(within(alert).getByRole("strong")).toHaveTextContent("Er bestaat al een stembureau met nummer 42.");
     expect(within(alert).getByRole("paragraph")).toHaveTextContent("Het nummer van het stembureau moet uniek zijn.");
 
-    //generate client error:
+    // generate client error
     await user.type(inputs.number, "asd");
     await user.click(screen.getByRole("button", { name: "Opslaan en toevoegen" }));
 

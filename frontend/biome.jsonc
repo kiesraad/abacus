@@ -73,9 +73,6 @@
       },
       "style": {
         "useImportType": "off"
-      },
-      "suspicious": {
-        "noPrototypeBuiltins": "off"
       }
     }
   },

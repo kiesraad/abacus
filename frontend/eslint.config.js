@@ -90,7 +90,7 @@ export default tseslint.config(
     },
     languageOptions: {
       parser: tsParser,
-      ecmaVersion: 2020,
+      ecmaVersion: 2022,
       parserOptions: {
         project: "**/tsconfig.json",
       },
@@ -100,7 +100,7 @@ export default tseslint.config(
     files: ["**/*.js"],
     extends: [eslint.configs.recommended, importPlugin.flatConfigs.recommended],
     languageOptions: {
-      ecmaVersion: 2020,
+      ecmaVersion: 2022,
       globals: {
         ...globals.browser,
         ...globals.node,

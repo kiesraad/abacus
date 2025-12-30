@@ -1,4 +1,4 @@
-import { ChangeEvent, ReactNode, useState } from "react";
+import { type ChangeEvent, type ReactNode, useState } from "react";
 import { Navigate, useNavigate } from "react-router";
 
 import { ApiError, isError, isSuccess } from "@/api/ApiResult";
@@ -8,7 +8,10 @@ import { FileInput } from "@/components/ui/FileInput/FileInput";
 import { Form } from "@/components/ui/Form/Form";
 import { FormLayout } from "@/components/ui/Form/FormLayout";
 import { t, tx } from "@/i18n/translate";
-import { ELECTION_IMPORT_VALIDATE_REQUEST_PATH, ElectionDefinitionValidateResponse } from "@/types/generated/openapi";
+import type {
+  ELECTION_IMPORT_VALIDATE_REQUEST_PATH,
+  ElectionDefinitionValidateResponse,
+} from "@/types/generated/openapi";
 import { fileTooLargeError, isFileTooLarge } from "@/utils/uploadFileSize";
 
 import { useElectionCreateContext } from "../hooks/useElectionCreateContext";

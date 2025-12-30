@@ -1,16 +1,16 @@
 import { useReducer } from "react";
 
 import { useApiClient } from "@/api/useApiClient";
-import {
+import type {
   ElectionWithPoliticalGroups,
   POLLING_STATION_DATA_ENTRY_CLAIM_REQUEST_PATH,
   POLLING_STATION_DATA_ENTRY_DELETE_REQUEST_PATH,
   POLLING_STATION_DATA_ENTRY_FINALISE_REQUEST_PATH,
   POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_PATH,
 } from "@/types/generated/openapi";
-import { FormSectionId } from "@/types/types";
+import type { FormSectionId } from "@/types/types";
 
-import { DataEntryStateAndActions } from "../types/types";
+import type { DataEntryStateAndActions } from "../types/types";
 import { onDeleteDataEntry, onFinaliseDataEntry, onSubmitForm, setCache, updateFormSection } from "../utils/actions";
 import dataEntryReducer, { getInitialState } from "../utils/reducer";
 import useDataEntryNavigation from "./useDataEntryNavigation";

@@ -49,41 +49,38 @@
       "!mockServiceWorker.js",
       "!vitest.shims.d.ts"
     ],
+    "domains": {
+      "project": "recommended",
+      "react": "recommended",
+      "test": "recommended"
+    },
     "rules": {
       "recommended": true,
       // TODO: all disabled rules below should be enabled again and fixed
       "a11y": {
         "noAutofocus": "off",
-        "noInteractiveElementToNoninteractiveRole": "off",
         "noLabelWithoutControl": "off",
         "noStaticElementInteractions": "off",
-        "noSvgWithoutTitle": "off",
-        "useButtonType": "off",
-        "useSemanticElements": "off",
-        "useValidAnchor": "off"
+        "noSvgWithoutTitle": "off"
       },
       "complexity": {
-        "noImportantStyles": "off",
-        "noUselessFragments": "off"
-      },
-      "correctness": {
-        "noEmptyPattern": "off"
-      },
-      "performance": {
-        "noAccumulatingSpread": "off"
+        "noImportantStyles": "off"
       },
       "style": {
-        "noDescendingSpecificity": "off",
-        "useConst": "off",
-        "useImportType": "off",
-        "useNodejsImportProtocol": "off",
-        "useTemplate": "off"
+        "useComponentExportOnlyModules": {
+          "level": "on",
+          "options": {
+            "allowConstantExport": true
+          }
+        }
       },
       "suspicious": {
-        "noArrayIndexKey": "off",
-        "noDoubleEquals": "off",
-        "noImplicitAnyLet": "off",
-        "noPrototypeBuiltins": "off"
+        "noConsole": {
+          "level": "on",
+          "options": {
+            "allow": ["error", "warn"]
+          }
+        }
       }
     }
   },
@@ -106,10 +103,22 @@
       "linter": {
         "rules": {
           "style": {
-            "noNonNullAssertion": "off"
+            "noNonNullAssertion": "off",
+            "useComponentExportOnlyModules": "off"
           },
           "suspicious": {
             "noExplicitAny": "off"
+          }
+        }
+      }
+    },
+    // Scripts can log to console
+    {
+      "includes": ["scripts/*.js", "scripts/*.ts"],
+      "linter": {
+        "rules": {
+          "suspicious": {
+            "noConsole": "off"
           }
         }
       }

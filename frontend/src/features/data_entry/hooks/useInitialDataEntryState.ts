@@ -1,10 +1,10 @@
 import { useEffect } from "react";
 
-import { ApiClient, DEFAULT_CANCEL_REASON } from "@/api/ApiClient";
+import { type ApiClient, DEFAULT_CANCEL_REASON } from "@/api/ApiClient";
 import { isSuccess } from "@/api/ApiResult";
-import { ClaimDataEntryResponse } from "@/types/generated/openapi";
+import type { ClaimDataEntryResponse } from "@/types/generated/openapi";
 
-import { DataEntryDispatch } from "../types/types";
+import type { DataEntryDispatch } from "../types/types";
 
 export function useInitialDataEntryState(client: ApiClient, dispatch: DataEntryDispatch, claimRequestPath: string) {
   useEffect(() => {

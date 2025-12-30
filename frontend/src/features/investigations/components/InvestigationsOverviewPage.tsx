@@ -14,7 +14,7 @@ import { useElectionStatus } from "@/hooks/election/useElectionStatus";
 import useInvestigations from "@/hooks/election/useInvestigations";
 import { useUserRole } from "@/hooks/user/useUserRole";
 import { t, tx } from "@/i18n/translate";
-import {
+import type {
   COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_BODY,
   COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_PATH,
 } from "@/types/generated/openapi";
@@ -132,14 +132,14 @@ export function InvestigationsOverviewPage() {
               </Button.Link>
             </nav>
           )}
-          {currentInvestigations.map((investigation, index) => (
-            <InvestigationCard investigation={investigation} key={index} />
+          {currentInvestigations.map((investigation) => (
+            <InvestigationCard investigation={investigation} key={investigation.polling_station_id} />
           ))}
           {handledInvestigations.length > 0 && (
             <>
               <h3 className="mb-lg mt-lg">{t("investigations.handled_investigations")}</h3>
-              {handledInvestigations.map((investigation, index) => (
-                <InvestigationCard investigation={investigation} key={index} />
+              {handledInvestigations.map((investigation) => (
+                <InvestigationCard investigation={investigation} key={investigation.polling_station_id} />
               ))}
             </>
           )}

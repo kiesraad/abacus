@@ -1,7 +1,7 @@
 import { render as rtlRender } from "@testing-library/react";
 import { userEvent } from "@testing-library/user-event";
 import { HttpResponse, http } from "msw";
-import { ReactNode } from "react";
+import type { ReactNode } from "react";
 import { RouterProvider } from "react-router";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
@@ -17,11 +17,11 @@ import {
   CommitteeSessionDeleteHandler,
   ElectionRequestHandler,
 } from "@/testing/api-mocks/RequestHandlers";
-import { getRouter, Router } from "@/testing/router";
+import { getRouter, type Router } from "@/testing/router";
 import { overrideOnce, server } from "@/testing/server";
 import { TestUserProvider } from "@/testing/TestUserProvider";
 import { expectConflictErrorPage, render, screen, setupTestRouter, spyOnHandler, within } from "@/testing/test-utils";
-import { CommitteeSession, ElectionDetailsResponse, ErrorResponse, Role } from "@/types/generated/openapi";
+import type { CommitteeSession, ElectionDetailsResponse, ErrorResponse, Role } from "@/types/generated/openapi";
 
 import { ElectionHomePage } from "./ElectionHomePage";
 

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router";
 
-import { AnyApiError, ApiError } from "@/api/ApiResult";
+import { type AnyApiError, ApiError } from "@/api/ApiResult";
 import { useInitialApiGetWithErrors } from "@/api/useInitialApiGet";
 import { PageTitle } from "@/components/page_title/PageTitle";
 import { Alert } from "@/components/ui/Alert/Alert";
@@ -10,7 +10,7 @@ import { Loader } from "@/components/ui/Loader/Loader";
 import { useNumericParam } from "@/hooks/useNumericParam";
 import { useUser } from "@/hooks/user/useUser";
 import { t } from "@/i18n/translate";
-import { USER_GET_REQUEST_PATH, User } from "@/types/generated/openapi";
+import type { USER_GET_REQUEST_PATH, User } from "@/types/generated/openapi";
 
 import { UserDelete } from "./UserDelete";
 import { UserUpdateForm } from "./UserUpdateForm";

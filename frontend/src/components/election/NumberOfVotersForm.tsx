@@ -1,4 +1,4 @@
-import { FormEvent } from "react";
+import type { FormEvent } from "react";
 
 import { Button } from "@/components/ui/Button/Button";
 import { Form } from "@/components/ui/Form/Form";

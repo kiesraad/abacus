@@ -3,7 +3,7 @@ import { useParams } from "react-router";
 import { Loader } from "@/components/ui/Loader/Loader";
 import { useElection } from "@/hooks/election/useElection";
 import { useNumericParam } from "@/hooks/useNumericParam";
-import { FormSectionId } from "@/types/types";
+import type { FormSectionId } from "@/types/types";
 import { getDataEntryStructure } from "@/utils/dataEntryStructure";
 
 import { usePollingStationDataEntryErrors } from "../hooks/usePollingStationDataEntryErrors";

@@ -1,12 +1,12 @@
 import { useState } from "react";
 
-import { AnyApiError, isSuccess } from "@/api/ApiResult";
+import { type AnyApiError, isSuccess } from "@/api/ApiResult";
 import { useCrud } from "@/api/useCrud";
 import { IconTrash } from "@/components/generated/icons";
 import { Button } from "@/components/ui/Button/Button";
 import { Modal } from "@/components/ui/Modal/Modal";
 import { t } from "@/i18n/translate";
-import { USER_DELETE_REQUEST_PATH, User } from "@/types/generated/openapi";
+import type { USER_DELETE_REQUEST_PATH, User } from "@/types/generated/openapi";
 
 interface UserDeleteProps {
   user: User;

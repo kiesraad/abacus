@@ -1,6 +1,6 @@
 import { useInitialApiGet } from "@/api/useInitialApiGet";
 import { locale, translations } from "@/i18n/i18n";
-import { AUDIT_LOG_LIST_USERS_REQUEST_PATH, AuditLogUser } from "@/types/generated/openapi";
+import type { AUDIT_LOG_LIST_USERS_REQUEST_PATH, AuditLogUser } from "@/types/generated/openapi";
 
 export const LogFilterNames = ["level", "user", "event"] as const;
 export type LogFilterName = (typeof LogFilterNames)[number];

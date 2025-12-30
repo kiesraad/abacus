@@ -1,6 +1,6 @@
-import { createContext, Dispatch } from "react";
+import { createContext, type Dispatch } from "react";
 
-import { ElectionCreateAction, ElectionCreateState } from "../components/ElectionCreateContextProvider";
+import type { ElectionCreateAction, ElectionCreateState } from "../components/ElectionCreateContextProvider";
 
 export interface IElectionCreateContext {
   state: ElectionCreateState;

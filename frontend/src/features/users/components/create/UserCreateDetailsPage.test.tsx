@@ -5,9 +5,9 @@ import { beforeEach, describe, expect, test, vi } from "vitest";
 
 import { overrideOnce } from "@/testing/server";
 import { render, screen } from "@/testing/test-utils";
-import { USER_CREATE_REQUEST_PATH, User } from "@/types/generated/openapi";
+import type { USER_CREATE_REQUEST_PATH, User } from "@/types/generated/openapi";
 
-import { IUserCreateContext, UserCreateContext } from "../../hooks/UserCreateContext";
+import { type IUserCreateContext, UserCreateContext } from "../../hooks/UserCreateContext";
 import { UserCreateDetailsPage } from "./UserCreateDetailsPage";
 
 const navigate = vi.fn();

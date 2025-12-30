@@ -1,21 +1,20 @@
-import * as React from "react";
-
+import { type ChangeEvent, forwardRef, type InputHTMLAttributes, type ReactElement, type ReactNode } from "react";
 import cls from "./CheckboxAndRadio.module.css";
 
-export interface CheckboxAndRadioProps extends React.InputHTMLAttributes<HTMLInputElement> {
+export interface CheckboxAndRadioProps extends InputHTMLAttributes<HTMLInputElement> {
   id: string;
   type?: "checkbox" | "radio";
-  label: string | React.ReactElement;
+  label: string | ReactElement;
   checked?: boolean;
-  children?: React.ReactNode;
+  children?: ReactNode;
   indeterminate?: boolean;
   hasError?: boolean;
   defaultChecked?: boolean;
   autoFocus?: boolean;
-  onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onChange?: (e: ChangeEvent<HTMLInputElement>) => void;
 }
 
-export const CheckboxAndRadio = React.forwardRef<HTMLInputElement, CheckboxAndRadioProps>(
+export const CheckboxAndRadio = forwardRef<HTMLInputElement, CheckboxAndRadioProps>(
   (
     {
       id,
@@ -65,10 +64,10 @@ export const CheckboxAndRadio = React.forwardRef<HTMLInputElement, CheckboxAndRa
 
 CheckboxAndRadio.displayName = "CheckboxAndRadio";
 
-export const Checkbox = React.forwardRef<HTMLInputElement, CheckboxAndRadioProps>((props, ref) => {
+export const Checkbox = forwardRef<HTMLInputElement, CheckboxAndRadioProps>((props, ref) => {
   return <CheckboxAndRadio {...props} type="checkbox" ref={ref} />;
 });
 
-export const Radio = React.forwardRef<HTMLInputElement, CheckboxAndRadioProps>((props, ref) => {
+export const Radio = forwardRef<HTMLInputElement, CheckboxAndRadioProps>((props, ref) => {
   return <CheckboxAndRadio {...props} type="radio" ref={ref} />;
 });

@@ -1,6 +1,6 @@
-import { ReactNode, RefObject } from "react";
+import type { ReactNode, RefObject } from "react";
 
-import { Checkbox, CheckboxAndRadioProps, Radio } from "./CheckboxAndRadio";
+import { Checkbox, type CheckboxAndRadioProps, Radio } from "./CheckboxAndRadio";
 import cls from "./CheckboxAndRadio.module.css";
 
 export interface ChoiceListProps {

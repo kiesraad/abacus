@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Outlet, useNavigate } from "react-router";
 
-import { AnyApiError, ApiError, NotFoundError } from "@/api/ApiResult";
+import { type AnyApiError, ApiError, NotFoundError } from "@/api/ApiResult";
 import { Messages } from "@/components/messages/Messages";
 import { PageTitle } from "@/components/page_title/PageTitle";
 import { Alert } from "@/components/ui/Alert/Alert";

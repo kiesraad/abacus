@@ -1,4 +1,4 @@
-import * as React from "react";
+import { type FormEvent, useState } from "react";
 
 import { ApiError, isSuccess } from "@/api/ApiResult";
 import { useCrud } from "@/api/useCrud";
@@ -9,10 +9,10 @@ import { Form } from "@/components/ui/Form/Form";
 import { FormLayout } from "@/components/ui/Form/FormLayout";
 import { InputField } from "@/components/ui/InputField/InputField";
 import { t } from "@/i18n/translate";
-import { PollingStation, PollingStationRequest } from "@/types/generated/openapi";
+import type { PollingStation, PollingStationRequest } from "@/types/generated/openapi";
 
 import { useForm } from "../hooks/useForm";
-import { FormFields } from "../utils/form";
+import type { FormFields } from "../utils/form";
 
 export interface PollingStationFormProps {
   electionId: number;
@@ -30,7 +30,7 @@ interface HTMLForm extends HTMLFormElement {
 }
 
 export function PollingStationForm({ electionId, pollingStation, onSaved, onCancel }: PollingStationFormProps) {
-  const [lastSubmit, setLastSubmit] = React.useState<PollingStationRequest>();
+  const [lastSubmit, setLastSubmit] = useState<PollingStationRequest>();
 
   const isUpdate = !!pollingStation;
   const isPreExistingPollingStation = isUpdate && pollingStation.id_prev_session !== undefined;
@@ -53,7 +53,7 @@ export function PollingStationForm({ electionId, pollingStation, onSaved, onCanc
     updatePath: isUpdate ? `/api/elections/${electionId}/polling_stations/${pollingStation.id}` : undefined,
   });
 
-  const handleSubmit = (event: React.FormEvent<HTMLForm>) => {
+  const handleSubmit = (event: FormEvent<HTMLForm>) => {
     event.preventDefault();
     const elements = event.currentTarget.elements;
 

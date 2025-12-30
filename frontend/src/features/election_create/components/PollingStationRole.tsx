@@ -1,4 +1,4 @@
-import { FormEvent } from "react";
+import type { FormEvent } from "react";
 import { Navigate, useNavigate } from "react-router";
 
 import { Button } from "@/components/ui/Button/Button";

@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
 import { getCommitteeSessionMockData } from "@/testing/api-mocks/CommitteeSessionMockData";
-import { CommitteeSessionStatus } from "@/types/generated/openapi";
+import type { CommitteeSessionStatus } from "@/types/generated/openapi";
 
 import { CommitteeSessionCard } from "./CommitteeSessionCard";
 

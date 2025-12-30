@@ -1,5 +1,5 @@
 import type { Meta, StoryFn } from "@storybook/react-vite";
-import { FormEvent, useState } from "react";
+import { type FormEvent, useState } from "react";
 
 import { Form } from "@/components/ui/Form/Form";
 
@@ -16,20 +16,18 @@ export const FormKeyboardNavigation: StoryFn = () => {
   }
 
   return (
-    <>
-      <div className="mb-lg">
-        <Form title="Form with keyboard navigation" ref={ref} onSubmit={handleKeyboardFormSubmit}>
-          <input id="inp1" />
-          <br />
-          <input id="inp2" />
-          <br />
-          <input id="inp3" />
-          <br />
-          <button type="submit">Submit</button>
-        </Form>
-        {keyboardFormSubmitted && "Submitted!"}
-      </div>
-    </>
+    <div className="mb-lg">
+      <Form title="Form with keyboard navigation" ref={ref} onSubmit={handleKeyboardFormSubmit}>
+        <input id="inp1" />
+        <br />
+        <input id="inp2" />
+        <br />
+        <input id="inp3" />
+        <br />
+        <button type="submit">Submit</button>
+      </Form>
+      {keyboardFormSubmitted && "Submitted!"}
+    </div>
   );
 };
 

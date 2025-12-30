@@ -1,6 +1,6 @@
 import { type HttpHandler, HttpResponse, http } from "msw";
 
-import {
+import type {
   ACCOUNT_REQUEST_PARAMS,
   ACCOUNT_REQUEST_PATH,
   ACCOUNT_UPDATE_REQUEST_BODY,

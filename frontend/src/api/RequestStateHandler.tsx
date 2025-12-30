@@ -1,9 +1,9 @@
-import { ReactNode } from "react";
+import type { ReactNode } from "react";
 
 import { Loader } from "@/components/ui/Loader/Loader";
-import { TranslationPath } from "@/i18n/i18n.types";
+import type { TranslationPath } from "@/i18n/i18n.types";
 
-import { ApiRequestState } from "./ApiRequestState";
+import type { ApiRequestState } from "./ApiRequestState";
 import { NotFoundError } from "./ApiResult";
 
 interface RequestStateHandlerProps<T> {

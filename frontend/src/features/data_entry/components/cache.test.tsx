@@ -11,12 +11,12 @@ import {
 } from "@/testing/api-mocks/RequestHandlers";
 import { server } from "@/testing/server";
 import { render, screen } from "@/testing/test-utils";
-import { LoginResponse } from "@/types/generated/openapi";
-import { SectionValues } from "@/types/types";
+import type { LoginResponse } from "@/types/generated/openapi";
+import type { SectionValues } from "@/types/types";
 
 import * as useDataEntryContext from "../hooks/useDataEntryContext";
 import { getDefaultDataEntryStateAndActionsLoaded } from "../testing/mock-data";
-import { DataEntryStateAndActionsLoaded } from "../types/types";
+import type { DataEntryStateAndActionsLoaded } from "../types/types";
 import { DataEntryProvider } from "./DataEntryProvider";
 import { DataEntrySection } from "./DataEntrySection";
 

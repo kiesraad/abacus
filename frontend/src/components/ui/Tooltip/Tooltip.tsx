@@ -1,15 +1,15 @@
-import * as React from "react";
+import { type ReactNode, useEffect } from "react";
 
 import cls from "./Tooltip.module.css";
 
 export interface TooltipProps {
-  children: React.ReactNode;
-  content?: React.ReactNode;
+  children: ReactNode;
+  content?: ReactNode;
   onClose: () => void;
 }
 
-export function Tooltip({ children, content, onClose }: TooltipProps): React.ReactNode {
-  React.useEffect(() => {
+export function Tooltip({ children, content, onClose }: TooltipProps): ReactNode {
+  useEffect(() => {
     document.addEventListener("mousedown", onClose);
     document.addEventListener("keydown", onClose);
     return () => {

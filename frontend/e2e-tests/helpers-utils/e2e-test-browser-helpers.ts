@@ -1,5 +1,5 @@
 import { stat } from "node:fs/promises";
-import { expect, Page } from "@playwright/test";
+import { expect, type Page } from "@playwright/test";
 import { CandidatesListPage } from "e2e-tests/page-objects/data_entry/CandidatesListPgObj";
 import { CheckAndSavePage } from "e2e-tests/page-objects/data_entry/CheckAndSavePgObj";
 import { CountingDifferencesPollingStationPage } from "e2e-tests/page-objects/data_entry/CountingDifferencesPollingStationPgObj";
@@ -20,7 +20,7 @@ import { InvestigationOverviewPgObj } from "e2e-tests/page-objects/investigation
 import { InvestigationPrintCorrigendumPgObj } from "e2e-tests/page-objects/investigations/InvestigationPrintCorrigendumPgObj";
 import { InvestigationReasonPgObj } from "e2e-tests/page-objects/investigations/InvestigationReasonPgObj";
 
-import { PollingStationResults } from "@/types/generated/openapi";
+import type { PollingStationResults } from "@/types/generated/openapi";
 
 import { eml110a, eml110b, eml230b } from "../test-data/eml-files";
 
@@ -122,10 +122,10 @@ export async function createInvestigation(page: Page, pollingStation: string, re
   const addInvestigationPage = new AddInvestigationPgObj(page);
   await expect(addInvestigationPage.header).toBeVisible();
   await addInvestigationPage.selectPollingStation(pollingStation);
-  const investionReasonPage = new InvestigationReasonPgObj(page);
-  await expect(investionReasonPage.header).toBeVisible();
-  await investionReasonPage.reasonField.fill(reason);
-  await investionReasonPage.nextButton.click();
+  const investigationReasonPage = new InvestigationReasonPgObj(page);
+  await expect(investigationReasonPage.header).toBeVisible();
+  await investigationReasonPage.reasonField.fill(reason);
+  await investigationReasonPage.nextButton.click();
   const investigationPrintCorrigendumPage = new InvestigationPrintCorrigendumPgObj(page);
   await expect(investigationPrintCorrigendumPage.header).toBeVisible();
   const downloadPromise = page.waitForEvent("download");

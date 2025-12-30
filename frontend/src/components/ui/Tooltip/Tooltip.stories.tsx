@@ -6,7 +6,7 @@ import { IconWarningSquare } from "@/components/generated/icons";
 import { tx } from "@/i18n/translate";
 
 import { Icon } from "../Icon/Icon";
-import { Tooltip, TooltipProps } from "./Tooltip";
+import { Tooltip, type TooltipProps } from "./Tooltip";
 
 export const PermanentTooltip: StoryObj = {
   render: () => {
@@ -75,6 +75,7 @@ export const InteractiveTooltip: StoryObj<TooltipProps> = {
           }}
         >
           <button
+            type="button"
             onClick={() => {
               setShowTooltip(true);
             }}

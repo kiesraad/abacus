@@ -2,7 +2,7 @@ import { userEvent } from "@testing-library/user-event";
 import { describe, expect, test, vi } from "vitest";
 
 import { render, screen } from "@/testing/test-utils";
-import { NewElection } from "@/types/generated/openapi";
+import type { NewElection } from "@/types/generated/openapi";
 
 import * as useElectionCreateContext from "../hooks/useElectionCreateContext";
 import { NumberOfVoters } from "./NumberOfVoters";

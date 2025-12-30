@@ -19,7 +19,7 @@ import {
 import { overrideOnce, server } from "@/testing/server";
 import { TestUserProvider } from "@/testing/TestUserProvider";
 import { screen, spyOnHandler } from "@/testing/test-utils";
-import { DataEntryStatusName } from "@/types/generated/openapi";
+import type { DataEntryStatusName } from "@/types/generated/openapi";
 
 import { ResolveDifferencesPage } from "./ResolveDifferencesPage";
 

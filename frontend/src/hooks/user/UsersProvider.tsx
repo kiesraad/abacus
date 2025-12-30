@@ -1,13 +1,11 @@
-import * as React from "react";
-
+import type { ReactNode } from "react";
 import RequestStateHandler from "@/api/RequestStateHandler";
 import { useInitialApiGetWithErrors } from "@/api/useInitialApiGet";
 import { t } from "@/i18n/translate";
-import { USER_LIST_REQUEST_PATH, UserListResponse } from "@/types/generated/openapi";
-
+import type { USER_LIST_REQUEST_PATH, UserListResponse } from "@/types/generated/openapi";
 import { UsersProviderContext } from "./UsersProviderContext";
 
-export function UsersProvider({ children }: { children: React.ReactNode }) {
+export function UsersProvider({ children }: { children: ReactNode }) {
   const path: USER_LIST_REQUEST_PATH = "/api/users";
   const { requestState } = useInitialApiGetWithErrors<UserListResponse>(path);
 

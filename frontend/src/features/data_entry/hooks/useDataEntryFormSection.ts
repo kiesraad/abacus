@@ -1,11 +1,11 @@
-import * as React from "react";
+import { useEffect, useState } from "react";
 import { useParams } from "react-router";
 
-import { FormSectionId, SectionValues } from "@/types/types";
+import type { FormSectionId, SectionValues } from "@/types/types";
 import { mapResultsToSectionValues } from "@/utils/dataEntryMapping";
 import { mapValidationResultSetsToFields } from "@/utils/ValidationResults";
 
-import { SubmitCurrentFormOptions } from "../types/types";
+import type { SubmitCurrentFormOptions } from "../types/types";
 import { useDataEntryContext } from "./useDataEntryContext";
 import { useFormKeyboardNavigation } from "./useFormKeyboardNavigation";
 
@@ -35,7 +35,7 @@ export function useDataEntryFormSection() {
   const previousValues = previousResults ? mapResultsToSectionValues(section, previousResults) : undefined;
 
   // Local form state
-  const [currentValues, setCurrentValues] = React.useState<SectionValues>((): SectionValues => {
+  const [currentValues, setCurrentValues] = useState<SectionValues>((): SectionValues => {
     if (cache?.key === sectionId) {
       return cache.data;
     } else {
@@ -85,7 +85,7 @@ export function useDataEntryFormSection() {
   };
 
   // scroll to top when saved
-  React.useEffect(() => {
+  useEffect(() => {
     if (isSaved || error) {
       window.scrollTo(0, 0);
     }

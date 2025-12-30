@@ -14,7 +14,7 @@ import { ValidationResultSet } from "@/utils/ValidationResults";
 
 import { getDefaultFormSection } from "../testing/mock-data";
 import { overrideServerClaimDataEntryResponse } from "../testing/test.utils";
-import { FormState } from "../types/types";
+import type { FormState } from "../types/types";
 import { DataEntryProgress } from "./DataEntryProgress";
 import { DataEntryProvider } from "./DataEntryProvider";
 

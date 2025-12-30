@@ -1,10 +1,10 @@
-import { UserEvent, userEvent } from "@testing-library/user-event";
+import { type UserEvent, userEvent } from "@testing-library/user-event";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
 import { PollingStationCreateHandler, PollingStationUpdateHandler } from "@/testing/api-mocks/RequestHandlers";
 import { overrideOnce, server } from "@/testing/server";
 import { render, screen, waitFor, within } from "@/testing/test-utils";
-import { ErrorResponse, PollingStation } from "@/types/generated/openapi";
+import type { ErrorResponse, PollingStation } from "@/types/generated/openapi";
 
 import { PollingStationForm } from "./PollingStationForm";
 

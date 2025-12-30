@@ -1,14 +1,14 @@
-import { Dispatch } from "react";
+import type { Dispatch } from "react";
 
-import { AnyApiError } from "@/api/ApiResult";
-import {
+import type { AnyApiError } from "@/api/ApiResult";
+import type {
   ClaimDataEntryResponse,
   DataEntryStatusResponse,
   ElectionWithPoliticalGroups,
   ValidationResults,
 } from "@/types/generated/openapi";
-import { DataEntryResults, DataEntryStructure, FormSectionId, SectionValues } from "@/types/types";
-import { ValidationResultSet } from "@/utils/ValidationResults";
+import type { DataEntryResults, DataEntryStructure, FormSectionId, SectionValues } from "@/types/types";
+import type { ValidationResultSet } from "@/utils/ValidationResults";
 
 export interface DataEntryState {
   // state from providers

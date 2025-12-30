@@ -1,4 +1,4 @@
-import { APIRequestContext } from "@playwright/test";
+import type { APIRequestContext } from "@playwright/test";
 
 import { dataEntryRequest } from "../test-data/request-response-templates";
 import { DataEntryApiClient } from "./api-clients";

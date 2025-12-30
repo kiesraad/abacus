@@ -4,9 +4,9 @@ import { ProgressList } from "@/components/ui/ProgressList/ProgressList";
 import { showIndexPage } from "@/features/data_entry_detail/utils/validationResults";
 import { useNumericParam } from "@/hooks/useNumericParam";
 import { t } from "@/i18n/translate";
-import { DataEntryStatusName, ValidationResults } from "@/types/generated/openapi";
-import { DataEntrySection } from "@/types/types";
-import { MenuStatus } from "@/types/ui";
+import type { DataEntryStatusName, ValidationResults } from "@/types/generated/openapi";
+import type { DataEntrySection } from "@/types/types";
+import type { MenuStatus } from "@/types/ui";
 import { getValidationResultSetForSection } from "@/utils/ValidationResults";
 
 interface DetailNavigationProps {

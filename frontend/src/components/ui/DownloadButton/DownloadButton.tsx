@@ -1,11 +1,9 @@
-import * as React from "react";
-
+import type { AnchorHTMLAttributes } from "react";
 import { IconDownload, IconFile } from "@/components/generated/icons";
 import { cn } from "@/utils/classnames";
-
 import cls from "./DownloadButton.module.css";
 
-export interface DownloadButtonProps extends React.AnchorHTMLAttributes<HTMLAnchorElement> {
+export interface DownloadButtonProps extends AnchorHTMLAttributes<HTMLAnchorElement> {
   icon: "file" | "download";
   title: string;
   href: string;

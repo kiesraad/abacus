@@ -12,7 +12,7 @@ import {
 import { validationResultMockData } from "@/testing/api-mocks/ValidationResultMockData";
 import { overrideOnce, server } from "@/testing/server";
 import { getUrlMethodAndBody, render, screen, waitFor, within } from "@/testing/test-utils";
-import {
+import type {
   ElectionWithPoliticalGroups,
   LoginResponse,
   POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_BODY,

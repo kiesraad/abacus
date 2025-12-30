@@ -1,14 +1,13 @@
-import { Fragment, HTMLAttributes, ReactNode } from "react";
-import { NavigateOptions, To, useNavigate } from "react-router";
+import { Fragment, type HTMLAttributes, type ReactElement, type ReactNode } from "react";
+import { type NavigateOptions, type To, useNavigate } from "react-router";
 
 import { isSuccess } from "@/api/ApiResult";
 import { useCrud } from "@/api/useCrud";
-import { CommitteeSessionStatusLabel } from "@/components/committee_session/CommitteeSessionStatus";
 import { Button } from "@/components/ui/Button/Button";
 import { CommitteeSessionStatusIcon } from "@/components/ui/Icon/CommitteeSessionStatusIcon";
 import { useUserRole } from "@/hooks/user/useUserRole";
 import { t } from "@/i18n/translate";
-import {
+import type {
   COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_BODY,
   COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_PATH,
   CommitteeSession,
@@ -66,6 +65,7 @@ function ButtonLinkList({ buttonLinks, firstRowBold }: ButtonLinkListProps) {
         <Fragment key={`${buttonLink.id}-${buttonLink.label}`}>
           {index !== 0 && <div className={cls.border}></div>}
           <button
+            type="button"
             onClick={() => {
               void navigate(buttonLink.to, buttonLink.options || {});
             }}
@@ -104,12 +104,12 @@ export function CommitteeSessionCard({
 
   const icon = CommitteeSessionStatusIcon({ status: committeeSession.status, size: "xl" });
   const label = committeeSessionLabel(committeeSession.number);
-  const status = CommitteeSessionStatusLabel(committeeSession.status, "coordinator");
+  const status = t(`committee_session_status.coordinator.${committeeSession.status}`);
   const date = committeeSession.start_date_time
     ? formatDateTimeFull(new Date(committeeSession.start_date_time))
     : undefined;
   const buttonLinks: ButtonLink[] = [];
-  let cardButton;
+  let cardButton: ReactElement | undefined;
 
   const addIf = (item: ButtonLink, condition: boolean) => {
     if (condition) {

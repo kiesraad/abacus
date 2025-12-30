@@ -1,4 +1,4 @@
-import { HeadingSubsection } from "@/types/types";
+import type { HeadingSubsection } from "@/types/types";
 
 export interface HeadingSubsectionProps {
   subsection: HeadingSubsection;

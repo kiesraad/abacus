@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
-import { Size } from "@/types/ui";
+import type { Size } from "@/types/ui";
 
 import { Spinner } from "./Spinner";
 

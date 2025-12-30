@@ -1,6 +1,6 @@
-import { Message } from "@/hooks/messages/MessagesContext";
+import type { Message } from "@/hooks/messages/MessagesContext";
 import { t } from "@/i18n/translate";
-import { CommitteeSessionStatus, PollingStation } from "@/types/generated/openapi";
+import type { CommitteeSessionStatus, PollingStation } from "@/types/generated/openapi";
 
 export function getInvestigationDeletedMessage(
   pollingStation: PollingStation,

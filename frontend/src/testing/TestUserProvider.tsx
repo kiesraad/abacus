@@ -1,9 +1,9 @@
-import { ReactNode } from "react";
+import type { ReactNode } from "react";
 
 import { ApiClient } from "@/api/ApiClient";
-import { ApiProviderContext, ApiState } from "@/api/ApiProviderContext";
-import { ApiResult } from "@/api/ApiResult";
-import { LoginResponse, Role } from "@/types/generated/openapi";
+import { ApiProviderContext, type ApiState } from "@/api/ApiProviderContext";
+import type { ApiResult } from "@/api/ApiResult";
+import type { LoginResponse, Role } from "@/types/generated/openapi";
 
 interface TestUserProviderProps {
   userRole: Role | null;

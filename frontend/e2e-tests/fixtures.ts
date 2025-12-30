@@ -1,7 +1,7 @@
 import { readFile, unlink } from "node:fs/promises";
-import { APIRequestContext, test as base, expect, Page } from "@playwright/test";
+import { type APIRequestContext, test as base, expect, type Page } from "@playwright/test";
 
-import {
+import type {
   COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_BODY,
   COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_PATH,
   COMMITTEE_SESSION_UPDATE_REQUEST_BODY,
@@ -22,8 +22,8 @@ import {
 import { DataEntryApiClient } from "./helpers-utils/api-clients";
 import { completePollingStationDataEntries } from "./helpers-utils/e2e-test-api-helpers";
 import { createRandomUsername } from "./helpers-utils/e2e-test-utils";
-import { EmlTestFile, generateEml } from "./helpers-utils/file-helpers";
-import { Eml230b, eml110a, eml230b } from "./test-data/eml-files";
+import { type EmlTestFile, generateEml } from "./helpers-utils/file-helpers";
+import { type Eml230b, eml110a, eml230b } from "./test-data/eml-files";
 import {
   dataEntryRequest,
   dataEntryWithDifferencesRequest,
@@ -244,18 +244,21 @@ export const test = base.extend<Fixtures>({
 
     await use((await userResponse.json()) as User);
   },
+  // biome-ignore lint/correctness/noEmptyPattern: the argument should use the object destructuring pattern
   eml110aTooLargeTestFile: async ({}, use) => {
     const minimumSize = 5 * 1024 * 1024; // 5MB
     const { filename, path } = await generateEml("eml110a", minimumSize);
     await use({ filename, path });
     await unlink(path);
   },
+  // biome-ignore lint/correctness/noEmptyPattern: the argument should use the object destructuring pattern
   eml110bTooLargeTestFile: async ({}, use) => {
     const minimumSize = 5 * 1024 * 1024; // 5MB
     const { filename, path } = await generateEml("eml110b", minimumSize);
     await use({ filename, path });
     await unlink(path);
   },
+  // biome-ignore lint/correctness/noEmptyPattern: the argument should use the object destructuring pattern
   eml230bTooLargeTestFile: async ({}, use) => {
     const minimumSize = 5 * 1024 * 1024; // 5MB
     const { filename, path } = await generateEml("eml230b", minimumSize);

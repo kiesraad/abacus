@@ -1,4 +1,4 @@
-import { ReactElement } from "react";
+import type { ReactElement } from "react";
 
 import errorImage from "@/assets/images/airgap-error.webp";
 import { Footer } from "@/components/footer/Footer";

@@ -8,7 +8,7 @@ import { getTypistUser } from "@/testing/user-mock-data";
 
 import * as useDataEntryContext from "../hooks/useDataEntryContext";
 import { getDefaultDataEntryState, getDefaultDataEntryStateAndActionsLoaded } from "../testing/mock-data";
-import { DataEntryStateAndActionsLoaded, Status, SubmitCurrentFormOptions } from "../types/types";
+import type { DataEntryStateAndActionsLoaded, Status, SubmitCurrentFormOptions } from "../types/types";
 import { DataEntryNavigation } from "./DataEntryNavigation";
 
 const baseMockData = getDefaultDataEntryStateAndActionsLoaded();
@@ -76,8 +76,8 @@ describe("DataEntryNavigation", () => {
 
       const router = renderComponent(vi.fn());
 
-      await router.navigate(testPath + "/differences_counts");
-      expect(router.state.location.pathname).toBe(testPath + "/differences_counts");
+      await router.navigate(`${testPath}/differences_counts`);
+      expect(router.state.location.pathname).toBe(`${testPath}/differences_counts`);
     });
 
     test.each<Status>([
@@ -107,7 +107,7 @@ describe("DataEntryNavigation", () => {
       const router = renderComponent(vi.fn());
 
       //navigate within data entry flow
-      await router.navigate(testPath + "/differences_counts");
+      await router.navigate(`${testPath}/differences_counts`);
       expect(router.state.location.pathname).toBe(testPath);
 
       const modal = await screen.findByRole("dialog");
@@ -174,9 +174,9 @@ describe("DataEntryNavigation", () => {
       const router = renderComponent(vi.fn());
 
       //navigate within data entry flow
-      await router.navigate(testPath + "/differences_counts");
+      await router.navigate(`${testPath}/differences_counts`);
       expect(setCache).toHaveBeenCalled();
-      expect(router.state.location.pathname).toBe(testPath + "/differences_counts");
+      expect(router.state.location.pathname).toBe(`${testPath}/differences_counts`);
     });
   });
 
@@ -354,7 +354,7 @@ describe("DataEntryNavigation", () => {
       const router = renderComponent(vi.fn());
 
       //navigate within data entry flow
-      await router.navigate(testPath + "/differences_counts");
+      await router.navigate(`${testPath}/differences_counts`);
 
       const modal = await screen.findByRole("dialog");
       const noSaveButton = within(modal).getByRole("button", { name: "Niet bewaren" });
@@ -365,7 +365,7 @@ describe("DataEntryNavigation", () => {
       });
 
       await waitFor(() => {
-        expect(router.state.location.pathname).toBe(testPath + "/differences_counts");
+        expect(router.state.location.pathname).toBe(`${testPath}/differences_counts`);
       });
     });
 
@@ -396,7 +396,7 @@ describe("DataEntryNavigation", () => {
       const router = renderComponent(onSubmit);
 
       //navigate within data entry flow
-      await router.navigate(testPath + "/differences_counts");
+      await router.navigate(`${testPath}/differences_counts`);
 
       const modal = await screen.findByRole("dialog");
       const saveButton = within(modal).getByRole("button", { name: "Wijzigingen opslaan" });
@@ -405,7 +405,7 @@ describe("DataEntryNavigation", () => {
       expect(onSubmit).toHaveBeenCalled();
 
       await waitFor(() => {
-        expect(router.state.location.pathname).toBe(testPath + "/differences_counts");
+        expect(router.state.location.pathname).toBe(`${testPath}/differences_counts`);
       });
     });
 
@@ -434,7 +434,7 @@ describe("DataEntryNavigation", () => {
       const router = renderComponent(vi.fn());
 
       //navigate within data entry flow
-      await router.navigate(testPath + "/differences_counts");
+      await router.navigate(`${testPath}/differences_counts`);
 
       const modal = await screen.findByRole("dialog");
       const closeButton = within(modal).getByRole("button", { name: "Venster sluiten" });

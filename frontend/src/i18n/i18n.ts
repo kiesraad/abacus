@@ -1,4 +1,4 @@
-import { Locale, Translation } from "./i18n.types";
+import { Locale, type Translation } from "./i18n.types";
 import nl from "./locales/nl/nl";
 
 export let locale: Locale = Locale.nl;

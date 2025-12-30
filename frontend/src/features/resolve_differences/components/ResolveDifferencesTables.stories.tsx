@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 
 import { Alert } from "@/components/ui/Alert/Alert";
 import { electionMockData } from "@/testing/api-mocks/ElectionMockData";
-import { ResolveDifferencesAction } from "@/types/generated/openapi";
+import type { ResolveDifferencesAction } from "@/types/generated/openapi";
 import { getDataEntryStructure } from "@/utils/dataEntryStructure";
 
 import { pollingStationResultsMockData } from "../testing/polling-station-results";

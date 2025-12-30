@@ -1,4 +1,4 @@
-import { LoginResponse, User } from "@/types/generated/openapi";
+import type { LoginResponse, User } from "@/types/generated/openapi";
 
 const today = new Date();
 today.setHours(10, 20);

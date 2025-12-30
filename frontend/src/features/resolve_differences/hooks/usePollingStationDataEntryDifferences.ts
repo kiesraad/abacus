@@ -1,12 +1,12 @@
 import { useContext, useState } from "react";
 
-import { AnyApiError, isSuccess, NotFoundError } from "@/api/ApiResult";
+import { type AnyApiError, isSuccess, NotFoundError } from "@/api/ApiResult";
 import { useApiClient } from "@/api/useApiClient";
 import { useInitialApiGet } from "@/api/useInitialApiGet";
 import { ElectionStatusProviderContext } from "@/hooks/election/ElectionStatusProviderContext";
 import { useElection } from "@/hooks/election/useElection";
 import { t } from "@/i18n/translate";
-import {
+import type {
   DataEntryGetDifferencesResponse,
   DataEntryStatusName,
   DataEntryStatusResponse,
@@ -17,7 +17,7 @@ import {
   PollingStation,
   ResolveDifferencesAction,
 } from "@/types/generated/openapi";
-import { DataEntryStructure } from "@/types/types";
+import type { DataEntryStructure } from "@/types/types";
 import { getDataEntryStructure } from "@/utils/dataEntryStructure";
 
 interface PollingStationDataEntryDifferences {
@@ -84,7 +84,7 @@ export function usePollingStationDataEntryDifferences(
     if (isSuccess(response)) {
       // reload the election status data then navigate according to new status
       await electionContext?.refetch();
-      let firstEntryUserId;
+      let firstEntryUserId: number | undefined;
       if (differences && action === "keep_first_entry") {
         firstEntryUserId = differences.first_entry_user_id;
       } else if (differences && action === "keep_second_entry") {

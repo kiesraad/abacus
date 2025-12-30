@@ -1,11 +1,10 @@
-import * as React from "react";
-import { useState } from "react";
+import { type ReactNode, useState } from "react";
 
-import { Role } from "@/types/generated/openapi";
+import type { Role } from "@/types/generated/openapi";
 
-import { IUserCreateContext, UserCreateContext, UserType } from "../../hooks/UserCreateContext";
+import { type IUserCreateContext, UserCreateContext, type UserType } from "../../hooks/UserCreateContext";
 
-export function UserCreateContextProvider({ children }: { children: React.ReactNode }) {
+export function UserCreateContextProvider({ children }: { children: ReactNode }) {
   const [role, setRole] = useState<Role | undefined>(undefined);
   const [type, setType] = useState<UserType | undefined>(undefined);
 

@@ -1,5 +1,5 @@
 import { render, screen } from "@testing-library/react";
-import { describe, expect, Mock, test, vi } from "vitest";
+import { describe, expect, type Mock, test, vi } from "vitest";
 
 import { useMessages } from "@/hooks/messages/useMessages";
 
@@ -18,8 +18,12 @@ function TestComponent({ onPopMessages }: { onPopMessages: Mock }) {
 
   return (
     <>
-      <button onClick={handlePush}>Push message</button>
-      <button onClick={handlePop}>Pop messages</button>
+      <button type="button" onClick={handlePush}>
+        Push message
+      </button>
+      <button type="button" onClick={handlePop}>
+        Pop messages
+      </button>
     </>
   );
 }

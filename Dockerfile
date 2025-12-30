@@ -1,9 +1,12 @@
-FROM node:22 AS frontend-builder
+FROM node:22-slim AS frontend-builder
+ENV PNPM_HOME="/pnpm"
+ENV PATH="$PNPM_HOME:$PATH"
+RUN corepack enable
 WORKDIR /build
 COPY . .
 WORKDIR /build/frontend
-RUN npm ci --omit=dev
-RUN npm run build
+RUN pnpm install --prod
+RUN pnpm build
 
 FROM rust:bookworm AS backend-builder
 WORKDIR /build

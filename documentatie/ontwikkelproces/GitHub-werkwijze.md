@@ -24,7 +24,7 @@ Er zijn meerdere manieren om deze stappen te zetten.
     - Test de functionaliteit, schrijf zover zinvol tests (unit, integration etc).
     - Push ook tussentijdse commits naar GitHub.
     - Dit project gebruikt [Lefthook] om de Git pre-commit hook te beheren. Lefthook zal
-      automatisch geïnstalleerd worden wanneer `npm install` wordt uitgevoerd in de `frontend`
+      automatisch geïnstalleerd worden wanneer `pnpm install` wordt uitgevoerd in de `frontend`
       directory.
 
 - Maak een pull request (PR) aan:

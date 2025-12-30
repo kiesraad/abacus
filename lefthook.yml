@@ -27,21 +27,21 @@ pre-commit:
         cargo run --package abacus --bin gen-openapi &&
         git add openapi.json &&
         cd ../frontend &&
-        npm run gen:openapi &&
+        pnpm gen:openapi &&
         git add src/types/generated/openapi.ts
     frontend-formatter:
       root: "frontend/"
-      run: npm run format -- --staged
+      run: pnpm format --staged --no-errors-on-unmatched --colors=off
       stage_fixed: true
     frontend-lint-biome:
       root: "frontend/"
-      run: npm run lint:biome -- --write --staged
+      run: pnpm lint:biome --write --no-errors-on-unmatched --colors=off
       stage_fixed: true
     frontend-lint-tsc:
       root: "frontend/"
       glob: "*.{ts,tsx}"
-      run: npm run lint:tsc
+      run: pnpm lint:tsc
     frontend-lint-eslint:
       root: "frontend/"
       glob: "*.{ts,tsx}"
-      run: npm run lint:eslint
+      run: pnpm lint:eslint

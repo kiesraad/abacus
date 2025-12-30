@@ -49,20 +49,26 @@ jobs:
           df -h
       - uses: actions/checkout@v6
       # Build frontend so that it can be included in the backend build
+      - name: Install pnpm
+        uses: pnpm/action-setup@41ff72655975bd51cab0327fa583b6e92b6d3061 # v4
+        with:
+          version: 10
       - name: Setup Node
         uses: actions/setup-node@v6
         with:
           node-version: 22
-      - name: Install npm dependencies
-        run: npm ci
+          cache: "pnpm"
+          cache-dependency-path: ./frontend/pnpm-lock.yaml
+      - name: Install frontend dependencies
+        run: pnpm install
         working-directory: ./frontend
       - name: Build frontend
-        run: npm run build
+        run: pnpm build
         working-directory: ./frontend
         env:
           INCLUDE_STORYBOOK_LINK: true
       - name: Build Storybook
-        run: npm run build:storybook
+        run: pnpm build:storybook
         working-directory: ./frontend
       # Compile and test backend
       - name: Install musl
@@ -101,24 +107,30 @@ jobs:
         working-directory: frontend
     steps:
       - uses: actions/checkout@v6
+      - name: Install pnpm
+        uses: pnpm/action-setup@41ff72655975bd51cab0327fa583b6e92b6d3061 # v4
+        with:
+          version: 10
       - name: Setup Node
         uses: actions/setup-node@v6
         with:
           node-version: 22
+          cache: "pnpm"
+          cache-dependency-path: ./frontend/pnpm-lock.yaml
       - name: Install dependencies
-        run: npm ci
+        run: pnpm install
       - name: Run Biome
-        run: npx biome ci
+        run: pnpm biome ci
       - name: Run TypeScript compiler
-        run: npm run lint:tsc
+        run: pnpm lint:tsc
       - name: Run ESLint
-        run: npm run lint:eslint
+        run: pnpm lint:eslint
       - name: Install Playwright Chromium Browser
-        run: npx playwright install --with-deps chromium
+        run: pnpm playwright install --with-deps chromium
       - name: Test
-        run: npm test
+        run: pnpm test
       - name: Build
-        run: npm run build
+        run: pnpm build
       - uses: actions/upload-artifact@v6
         with:
           name: frontend-build
@@ -138,14 +150,20 @@ jobs:
         working-directory: frontend
     steps:
       - uses: actions/checkout@v6
+      - name: Install pnpm
+        uses: pnpm/action-setup@41ff72655975bd51cab0327fa583b6e92b6d3061 # v4
+        with:
+          version: 10
       - name: Setup Node
         uses: actions/setup-node@v6
         with:
           node-version: 22
+          cache: "pnpm"
+          cache-dependency-path: ./frontend/pnpm-lock.yaml
       - name: Install dependencies
-        run: npm ci
+        run: pnpm install
       - name: Install Playwright Browsers
-        run: npx playwright install --with-deps --no-shell
+        run: pnpm playwright install --with-deps --no-shell
       - name: Download Abacus
         uses: actions/download-artifact@v7
         with:
@@ -154,7 +172,7 @@ jobs:
       - name: Make Abacus executable
         run: chmod a+x ../builds/backend/abacus
       - name: Run e2e playwright tests
-        run: npm run test:e2e -- --shard=${{ matrix.shardIndex }}/${{ matrix.shardTotal }}
+        run: pnpm test:e2e --shard=${{ matrix.shardIndex }}/${{ matrix.shardTotal }}
       - name: Upload Playwright report
         uses: actions/upload-artifact@v6
         if: ${{ !cancelled() }}

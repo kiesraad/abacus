@@ -24,7 +24,7 @@ describe("useSingleCall", () => {
     const { result } = renderHook(() => useSingleCall(mockFn));
 
     const call = result.current[0];
-    let returnValue;
+    let returnValue: string | undefined;
     act(() => {
       returnValue = call("bar");
     });

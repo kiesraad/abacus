@@ -49,7 +49,7 @@ export function NavBarMenuButton() {
   };
 
   return (
-    <button className={cls.navBarMenuContainer} onClick={toggleMenu} title={t("menu")}>
+    <button className={cls.navBarMenuContainer} onClick={toggleMenu} title={t("menu")} type="button">
       <IconHamburger />
       {isMenuVisible && <NavBarMenu />}
     </button>

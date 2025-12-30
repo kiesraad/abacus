@@ -63,7 +63,6 @@
         "noLabelWithoutControl": "off",
         "noStaticElementInteractions": "off",
         "noSvgWithoutTitle": "off",
-        "useButtonType": "off",
         "useSemanticElements": "off"
       },
       "complexity": {
@@ -72,15 +71,10 @@
       "correctness": {
         "useExhaustiveDependencies": "off"
       },
-      "performance": {
-        "noAccumulatingSpread": "off"
-      },
       "style": {
-        "useConst": "off",
         "useTemplate": "off"
       },
       "suspicious": {
-        "noArrayIndexKey": "off",
         "noPrototypeBuiltins": "off"
       }
     }

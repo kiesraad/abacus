@@ -22,6 +22,7 @@ export const WideInputField: StoryObj = {
     return (
       <>
         <InputField
+          id="default_small_wide"
           name="default-small-wide"
           label="Default Small Wide"
           subtext="with subtext"
@@ -29,13 +30,20 @@ export const WideInputField: StoryObj = {
           fieldSize="small"
         />
         <InputField
+          id="default_medium_wide"
           name="default-medium-wide"
           label="Default Medium Wide"
           hint="Default Medium Wide hint"
           fieldSize="medium"
         />
-        <InputField name="default-large-wide" label="Default Large Wide" hint="Default Large Wide hint" />
         <InputField
+          id="default_large_wide"
+          name="default-large-wide"
+          label="Default Large Wide"
+          hint="Default Large Wide hint"
+        />
+        <InputField
+          id="disabled_large_wide"
           name="disabled-large-wide"
           label="Disabled Large Wide"
           hint="Disabled Large Wide hint"
@@ -43,6 +51,7 @@ export const WideInputField: StoryObj = {
           disabled
         />
         <InputField
+          id="error_large_wide"
           name="error-large-wide"
           label="Error Large Wide"
           hint="Error Large Wide hint"
@@ -78,6 +87,7 @@ export const NarrowInputField: StoryObj = {
     return (
       <>
         <InputField
+          id="default_small_narrow"
           name="default-small-narrow"
           label="Default Small Narrow"
           hint="Default Small Narrow hint"
@@ -86,6 +96,7 @@ export const NarrowInputField: StoryObj = {
           maxLength={9}
         />
         <InputField
+          id="default_medium_narrow"
           name="default-medium-narrow"
           label="Default Medium Narrow"
           subtext="with subtext"
@@ -94,12 +105,14 @@ export const NarrowInputField: StoryObj = {
           fieldWidth="narrow"
         />
         <InputField
+          id="default_large_narrow"
           name="default-large-narrow"
           label="Default Large Narrow"
           hint="Default Large Narrow hint"
           fieldWidth="narrow"
         />
         <InputField
+          id="disabled_large_narrow"
           name="disabled-large-narrow"
           label="Disabled Large Narrow"
           hint="Disabled Large Narrow hint"
@@ -108,6 +121,7 @@ export const NarrowInputField: StoryObj = {
           disabled
         />
         <InputField
+          id="error_large_narrow"
           name="error-large-narrow"
           label="Error Large Narrow"
           hint="Error Large Narrow hint"
@@ -144,6 +158,7 @@ export const TextAreaInputField: StoryObj = {
     return (
       <>
         <InputField
+          id="default_text_area"
           name="default-text-area"
           label="Default Text Area"
           subtext="with subtext"
@@ -151,6 +166,7 @@ export const TextAreaInputField: StoryObj = {
           fieldSize="text-area"
         />
         <InputField
+          id="disabled_text_area"
           name="disabled-text-area"
           label="Disabled Text Area"
           hint="Disabled Text Area hint"
@@ -159,6 +175,7 @@ export const TextAreaInputField: StoryObj = {
           disabled
         />
         <InputField
+          id="error_text_area"
           name="error-text-area"
           label="Error Text Area"
           hint="Error Text Area hint"
@@ -194,6 +211,7 @@ export const CustomizableInputField: StoryObj<Props> = {
   render: ({ label, subtext, hint, value, type, fieldSize, fieldWidth, error, disabled, maxLength, numberInput }) => {
     return (
       <InputField
+        id="input_field"
         name="input-field"
         label={label}
         subtext={subtext}

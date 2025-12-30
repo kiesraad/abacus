@@ -124,6 +124,7 @@ export const ButtonLabel: StoryObj<Props> = {
           <h2>{variant}</h2>
           <Button.Label
             id={"button-variant-" + variant}
+            htmlFor={`input-variant-${variant}`}
             size={size}
             variant={variant}
             disabled={disabled}
@@ -131,6 +132,7 @@ export const ButtonLabel: StoryObj<Props> = {
           >
             {text}
           </Button.Label>
+          <input id={`input-variant-${variant}`} type="file" name="file_input" style={{ display: "none" }} />
         </div>
       ))}
     </>

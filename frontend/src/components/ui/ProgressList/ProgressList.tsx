@@ -62,7 +62,7 @@ ProgressList.Item = function ProgressListItem({
       <aside>
         <StatusIcon status={active ? "active" : status} />
       </aside>
-      <label>{children}</label>
+      <div>{children}</div>
     </li>
   );
 };
@@ -87,7 +87,7 @@ ProgressList.OverviewItem = function ProgressListOverviewItem({
       <aside>
         <StatusIcon status={status} />
       </aside>
-      <label>{children}</label>
+      <div>{children}</div>
     </li>
   );
 };

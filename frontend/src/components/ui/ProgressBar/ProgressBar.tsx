@@ -25,7 +25,7 @@ export interface ProgressBarProps {
 export function ProgressBar({ id, data, title, spacing, showPercentage = false }: ProgressBarProps) {
   return (
     <div className={cn(cls.progressbarContainer, spacing)} id={`progressbar-${id}`}>
-      {title && <label id="progressbar-label">{title}</label>}
+      {title && <span id="progressbar-label">{title}</span>}
       {!Array.isArray(data) ? (
         <section>
           <div

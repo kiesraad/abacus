@@ -89,6 +89,7 @@ export function CreateFirstAdminForm({ next }: CreateFirstAdminFormProps) {
               <FormLayout.Section title={t("initialise.account_details")}>
                 <p>{t("initialise.store_in_safe_place")}</p>
                 <InputField
+                  id="fullname"
                   name="fullname"
                   label={t("account.fullname")}
                   subtext={t("account.fullname_subtext")}
@@ -96,12 +97,14 @@ export function CreateFirstAdminForm({ next }: CreateFirstAdminFormProps) {
                   error={validationErrors?.fullname}
                 />
                 <InputField
+                  id="username"
                   name="username"
                   label={t("initialise.username")}
                   hint={t("initialise.username_hint")}
                   error={validationErrors?.username}
                 />
                 <InputField
+                  id="password"
                   name="password"
                   label={t("initialise.password")}
                   hint={t("initialise.password_hint")}
@@ -109,6 +112,7 @@ export function CreateFirstAdminForm({ next }: CreateFirstAdminFormProps) {
                   error={validationErrors?.password}
                 />
                 <InputField
+                  id="password_repeat"
                   name="password_repeat"
                   label={t("account.password_repeat")}
                   type="password"

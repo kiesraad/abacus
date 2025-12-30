@@ -8,6 +8,7 @@ import cls from "./FileInput.module.css";
 type InputProps = DetailedHTMLProps<InputHTMLAttributes<HTMLInputElement>, HTMLInputElement>;
 
 interface FileInputProps extends InputProps {
+  id: string;
   file?: File | undefined;
 }
 

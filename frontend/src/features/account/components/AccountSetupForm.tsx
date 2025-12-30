@@ -93,6 +93,7 @@ export function AccountSetupForm({ user, onSaved }: AccountSetupFormProps) {
         <FormLayout disabled={isLoading}>
           <FormLayout.Section>
             <InputField
+              id="fullname"
               name="fullname"
               label={t("account.fullname")}
               subtext={t("account.fullname_subtext")}
@@ -101,6 +102,7 @@ export function AccountSetupForm({ user, onSaved }: AccountSetupFormProps) {
               defaultValue={user.fullname}
             />
             <InputField
+              id="username"
               name="username"
               label={t("account.username")}
               hint={t("account.username_hint")}
@@ -108,6 +110,7 @@ export function AccountSetupForm({ user, onSaved }: AccountSetupFormProps) {
               disabled
             />
             <InputField
+              id="password"
               name="password"
               label={t("account.password_new")}
               hint={t("account.password_hint")}
@@ -115,6 +118,7 @@ export function AccountSetupForm({ user, onSaved }: AccountSetupFormProps) {
               error={validationErrors?.password}
             />
             <InputField
+              id="password_repeat"
               name="password_repeat"
               label={t("account.password_repeat")}
               type="password"

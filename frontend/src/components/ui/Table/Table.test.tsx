@@ -16,22 +16,20 @@ describe("Table", () => {
     ];
 
     const router = renderReturningRouter(
-      <>
-        <Table id="link_table">
-          <Table.Header>
-            <Table.HeaderCell>Number</Table.HeaderCell>
-            <Table.HeaderCell>Click me</Table.HeaderCell>
-          </Table.Header>
-          <Table.Body>
-            {data.map((row) => (
-              <Table.Row key={row[0]} to={`#row${row[0]}`}>
-                <Table.NumberCell>{row[0]}</Table.NumberCell>
-                <Table.Cell>{row[1]}</Table.Cell>
-              </Table.Row>
-            ))}
-          </Table.Body>
-        </Table>
-      </>,
+      <Table id="link_table">
+        <Table.Header>
+          <Table.HeaderCell>Number</Table.HeaderCell>
+          <Table.HeaderCell>Click me</Table.HeaderCell>
+        </Table.Header>
+        <Table.Body>
+          {data.map((row) => (
+            <Table.Row key={row[0]} to={`#row${row[0]}`}>
+              <Table.NumberCell>{row[0]}</Table.NumberCell>
+              <Table.Cell>{row[1]}</Table.Cell>
+            </Table.Row>
+          ))}
+        </Table.Body>
+      </Table>,
     );
 
     const table = await screen.findByTestId("link_table");

@@ -62,29 +62,19 @@
         "noInteractiveElementToNoninteractiveRole": "off",
         "noLabelWithoutControl": "off",
         "noStaticElementInteractions": "off",
-        "noSvgWithoutTitle": "off",
-        "useButtonType": "off"
+        "noSvgWithoutTitle": "off"
       },
       "complexity": {
-        "noImportantStyles": "off",
-        "noUselessFragments": "off"
+        "noImportantStyles": "off"
       },
       "correctness": {
-        "noEmptyPattern": "off",
         "useExhaustiveDependencies": "off"
       },
-      "performance": {
-        "noAccumulatingSpread": "off"
-      },
       "style": {
-        "noDescendingSpecificity": "off",
-        "useConst": "off",
         "useImportType": "off",
-        "useNodejsImportProtocol": "off",
         "useTemplate": "off"
       },
       "suspicious": {
-        "noArrayIndexKey": "off",
         "noPrototypeBuiltins": "off"
       }
     }

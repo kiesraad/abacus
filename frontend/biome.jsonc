@@ -71,9 +71,6 @@
       "correctness": {
         "useExhaustiveDependencies": "off"
       },
-      "performance": {
-        "noAccumulatingSpread": "off"
-      },
       "style": {
         "useImportType": "off",
         "useTemplate": "off"

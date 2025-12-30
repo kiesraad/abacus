@@ -64,7 +64,7 @@ export function Feedback({ id, type, data, userRole, shouldFocus = true }: Feedb
   return (
     <article id={id} className={cn(cls.feedback, cls[type])}>
       {feedbackList.map((feedback, index) => (
-        <div key={`feedback-${index}`} className={cls.item}>
+        <div key={`feedback-${feedback.codes.join("-")}`} className={cls.item}>
           <header>
             <AlertIcon type={type} />
             <h3 tabIndex={-1} ref={index === 0 ? feedbackHeader : undefined} className="feedback-header">

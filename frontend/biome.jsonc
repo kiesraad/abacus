@@ -59,7 +59,6 @@
       // TODO: all disabled rules below should be enabled again and fixed
       "a11y": {
         "noAutofocus": "off",
-        "noInteractiveElementToNoninteractiveRole": "off",
         "noLabelWithoutControl": "off",
         "noStaticElementInteractions": "off",
         "noSvgWithoutTitle": "off"

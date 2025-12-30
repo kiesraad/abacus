@@ -1,9 +1,9 @@
+import assert from "node:assert";
 import { exec } from "node:child_process";
+import { mkdtemp, readFile, rmdir, unlink, writeFile } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import { promisify } from "node:util";
-import assert from "assert";
-import { mkdtemp, readFile, rmdir, unlink, writeFile } from "fs/promises";
-import { tmpdir } from "os";
-import { join } from "path";
 
 import type {
   NonArraySchemaObjectType,

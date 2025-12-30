@@ -1,7 +1,7 @@
 import { execSync } from "node:child_process";
+import path from "node:path";
 import browserslist from "browserslist";
 import { browserslistToTargets } from "lightningcss";
-import path from "path";
 import { defineConfig, type UserConfig } from "vite";
 
 import pkgjson from "./package.json";

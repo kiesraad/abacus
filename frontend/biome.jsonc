@@ -70,16 +70,13 @@
         "noImportantStyles": "off"
       },
       "correctness": {
-        "noEmptyPattern": "off",
         "useExhaustiveDependencies": "off"
       },
       "performance": {
         "noAccumulatingSpread": "off"
       },
       "style": {
-        "noDescendingSpecificity": "off",
         "useConst": "off",
-        "useNodejsImportProtocol": "off",
         "useTemplate": "off"
       },
       "suspicious": {

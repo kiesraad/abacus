@@ -38,7 +38,7 @@ export function DataEntrySection() {
   } = useDataEntryFormSection();
   const acceptCheckboxRef = useRef<HTMLInputElement>(null);
 
-  const formId = section.id + "_form";
+  const formId = `${section.id}_form`;
 
   const lastSubsection = section.subsections[section.subsections.length - 1];
   const bottomBarType = lastSubsection?.type === "inputGrid" ? "inputGrid" : "form";

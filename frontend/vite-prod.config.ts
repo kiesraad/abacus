@@ -44,7 +44,7 @@ export default defineConfig(({ command }) => {
 
     // fallback to dev-<commit> if no tag found
     if (gitVersion === undefined && gitCommit !== undefined) {
-      gitVersion = "dev-" + gitCommit.slice(0, 7);
+      gitVersion = `dev-${gitCommit.slice(0, 7)}`;
     }
 
     // append -dirty suffix if needed to version

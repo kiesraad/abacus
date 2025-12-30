@@ -71,9 +71,6 @@
       "correctness": {
         "useExhaustiveDependencies": "off"
       },
-      "style": {
-        "useTemplate": "off"
-      },
       "suspicious": {
         "noPrototypeBuiltins": "off"
       }

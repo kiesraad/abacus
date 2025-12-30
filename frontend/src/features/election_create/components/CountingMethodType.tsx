@@ -34,7 +34,7 @@ export function CountingMethodType() {
   return (
     <section className="md">
       <Form
-        title={t("election.voting_method_type.title") + " " + state.election.location}
+        title={`${t("election.voting_method_type.title")} ${state.election.location}`}
         onSubmit={(e) => void handleSubmit(e)}
       >
         <FormLayout>

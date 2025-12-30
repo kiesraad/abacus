@@ -1,6 +1,6 @@
 import { Table } from "@/components/ui/Table/Table";
 import { t } from "@/i18n/translate";
-import { CommitteeSession, ElectionWithPoliticalGroups } from "@/types/generated/openapi";
+import type { CommitteeSession, ElectionWithPoliticalGroups } from "@/types/generated/openapi";
 import { cn } from "@/utils/classnames";
 import { formatNumber } from "@/utils/number";
 

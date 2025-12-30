@@ -1,11 +1,9 @@
-import * as React from "react";
-import { To, useNavigate } from "react-router";
-
+import type { ReactNode, TableHTMLAttributes } from "react";
+import { type To, useNavigate } from "react-router";
 import { cn } from "@/utils/classnames";
-
 import cls from "./Table.module.css";
 
-interface TableProps extends React.TableHTMLAttributes<HTMLTableElement> {
+interface TableProps extends TableHTMLAttributes<HTMLTableElement> {
   variant?: "default" | "information";
 }
 
@@ -26,7 +24,7 @@ Table.TotalRow = TotalRow;
 Table.Cell = Cell;
 Table.NumberCell = NumberCell;
 
-function Header({ children, className }: { children: React.ReactNode; className?: string }) {
+function Header({ children, className }: { children: ReactNode; className?: string }) {
   return (
     <thead>
       <tr className={className}>{children}</tr>
@@ -41,7 +39,7 @@ function HeaderCell({
   numberWidth,
   className,
 }: {
-  children?: React.ReactNode;
+  children?: ReactNode;
   scope?: "col" | "row";
   span?: number;
   numberWidth?: boolean;
@@ -59,11 +57,11 @@ function HeaderCell({
   );
 }
 
-function Body({ children, className }: { children: React.ReactNode; className?: string }) {
+function Body({ children, className }: { children: ReactNode; className?: string }) {
   return <tbody className={className}>{children}</tbody>;
 }
 
-function Row({ id, children, to, className }: { id?: string; children: React.ReactNode; to?: To; className?: string }) {
+function Row({ id, children, to, className }: { id?: string; children: ReactNode; to?: To; className?: string }) {
   const navigate = useNavigate();
 
   if (to) {
@@ -88,7 +86,7 @@ function ClickRow({
   active,
   className,
 }: {
-  children: React.ReactNode;
+  children: ReactNode;
   onClick: () => void;
   downloadIcon?: boolean;
   active?: boolean;
@@ -104,11 +102,11 @@ function ClickRow({
   );
 }
 
-function TotalRow({ children, className }: { children?: React.ReactNode; className?: string }) {
+function TotalRow({ children, className }: { children?: ReactNode; className?: string }) {
   return <tr className={cn(cls.rowTotal, className)}>{children}</tr>;
 }
 
-function Cell({ children, colSpan, className }: { children?: React.ReactNode; colSpan?: number; className?: string }) {
+function Cell({ children, colSpan, className }: { children?: ReactNode; colSpan?: number; className?: string }) {
   return (
     <td colSpan={colSpan} className={className}>
       {children}
@@ -116,15 +114,7 @@ function Cell({ children, colSpan, className }: { children?: React.ReactNode; co
   );
 }
 
-function NumberCell({
-  children,
-  colSpan,
-  className,
-}: {
-  children?: React.ReactNode;
-  colSpan?: number;
-  className?: string;
-}) {
+function NumberCell({ children, colSpan, className }: { children?: ReactNode; colSpan?: number; className?: string }) {
   return (
     <td colSpan={colSpan} className={cn(cls.numberCell, className)}>
       {children}

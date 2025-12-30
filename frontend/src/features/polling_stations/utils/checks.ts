@@ -1,4 +1,4 @@
-import { CommitteeSessionStatus } from "@/types/generated/openapi";
+import type { CommitteeSessionStatus } from "@/types/generated/openapi";
 
 export function isPollingStationCreateAndUpdateAllowed(
   isCoordinator: boolean,

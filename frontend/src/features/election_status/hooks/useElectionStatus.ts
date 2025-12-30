@@ -1,8 +1,8 @@
 import { useMemo } from "react";
 
-import { PercentageAndColorClass, ProgressBarColorClass } from "@/components/ui/ProgressBar/ProgressBar";
+import type { PercentageAndColorClass, ProgressBarColorClass } from "@/components/ui/ProgressBar/ProgressBar";
 import { useUsers } from "@/hooks/user/useUsers";
-import { DataEntryStatusName, ElectionStatusResponseEntry, PollingStation } from "@/types/generated/openapi";
+import type { DataEntryStatusName, ElectionStatusResponseEntry, PollingStation } from "@/types/generated/openapi";
 
 export const statusCategories = [
   "errors_and_warnings",

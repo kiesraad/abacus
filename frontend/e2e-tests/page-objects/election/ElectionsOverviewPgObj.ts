@@ -1,4 +1,4 @@
-import { type Locator, type Page } from "@playwright/test";
+import type { Locator, Page } from "@playwright/test";
 
 export class ElectionsOverviewPgObj {
   readonly main: Locator;
@@ -19,9 +19,5 @@ export class ElectionsOverviewPgObj {
 
   findElectionRowById(electionId: number) {
     return this.page.getByTestId(`election-row-${electionId}`);
-  }
-
-  getLastElectionRow() {
-    return this.elections.last();
   }
 }

@@ -2,7 +2,7 @@ import { describe, expect, test } from "vitest";
 
 import { electionMockData } from "@/testing/api-mocks/ElectionMockData";
 import { validationResultMockData } from "@/testing/api-mocks/ValidationResultMockData";
-import { ValidationResult } from "@/types/generated/openapi";
+import type { ValidationResult } from "@/types/generated/openapi";
 
 import { getDataEntryStructure } from "./dataEntryStructure";
 import {

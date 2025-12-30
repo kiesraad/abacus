@@ -8,7 +8,7 @@ import { ElectionListRequestHandler } from "@/testing/api-mocks/RequestHandlers"
 import { server } from "@/testing/server";
 import { TestUserProvider } from "@/testing/TestUserProvider";
 import { render, renderReturningRouter, screen, spyOnHandler, waitFor } from "@/testing/test-utils";
-import { ElectionListResponse, Role } from "@/types/generated/openapi";
+import type { ElectionListResponse, Role } from "@/types/generated/openapi";
 
 import { OverviewPage } from "./OverviewPage";
 

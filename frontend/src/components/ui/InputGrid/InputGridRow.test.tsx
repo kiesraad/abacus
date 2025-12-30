@@ -5,7 +5,7 @@ import { render, screen } from "@/testing/test-utils";
 
 import { InputGrid } from "./InputGrid";
 import cls from "./InputGrid.module.css";
-import { InputGridRow, InputGridRowProps } from "./InputGridRow";
+import { InputGridRow, type InputGridRowProps } from "./InputGridRow";
 
 const defaultProps: InputGridRowProps = {
   id: "this-row-id",

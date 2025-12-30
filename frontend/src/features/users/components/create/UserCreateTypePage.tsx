@@ -1,4 +1,4 @@
-import { FormEvent } from "react";
+import type { FormEvent } from "react";
 import { Navigate, useNavigate } from "react-router";
 
 import { PageTitle } from "@/components/page_title/PageTitle";

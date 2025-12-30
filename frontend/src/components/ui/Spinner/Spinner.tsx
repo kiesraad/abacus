@@ -1,13 +1,13 @@
-import * as React from "react";
+import type { ReactNode } from "react";
 
-import { Size } from "@/types/ui";
+import type { Size } from "@/types/ui";
 import { cn } from "@/utils/classnames";
 
 import cls from "./Spinner.module.css";
 
 export interface SpinnerProps {
   size?: Size;
-  children?: React.ReactNode;
+  children?: ReactNode;
 }
 
 export function Spinner({ size = "md", children }: SpinnerProps) {

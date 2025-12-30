@@ -1,6 +1,6 @@
-import { ReactElement } from "react";
+import type { ReactElement } from "react";
 
-import { PollingStationResults } from "./generated/openapi";
+import type { PollingStationResults } from "./generated/openapi";
 
 export type FormSectionId = string;
 export type PollingStationResultsPath = string;

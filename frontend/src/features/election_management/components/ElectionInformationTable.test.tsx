@@ -5,7 +5,7 @@ import { beforeEach, describe, expect, test, vi } from "vitest";
 import { committeeSessionMockData } from "@/testing/api-mocks/CommitteeSessionMockData";
 import { TestUserProvider } from "@/testing/TestUserProvider";
 import { render, screen, within } from "@/testing/test-utils";
-import { CommitteeSessionStatus, Role } from "@/types/generated/openapi";
+import type { CommitteeSessionStatus, Role } from "@/types/generated/openapi";
 
 import { ElectionInformationTable } from "./ElectionInformationTable";
 

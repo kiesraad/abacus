@@ -10,11 +10,11 @@ use crate::{
     },
     election::ElectionWithPoliticalGroups,
     error::ErrorReference,
-    polling_station::PollingStation,
+    polling_station::{PollingStation, PollingStationNumber},
 };
 
 /// Contains a summary of the election results, added up from the votes of all polling stations.
-#[derive(Serialize, Deserialize, Debug, ToSchema)]
+#[derive(Serialize, Deserialize, Debug, ToSchema, Clone)]
 #[serde(deny_unknown_fields)]
 pub struct ElectionSummary {
     /// The total number of voters
@@ -51,44 +51,13 @@ impl ElectionSummary {
         }
     }
 
-    /// Add all the votes from the given polling stations together, using the
-    /// data from the election for candidates and political groups.
-    #[allow(clippy::too_many_lines)]
-    pub fn from_results(
+    fn process_polling_station_results(
         election: &ElectionWithPoliticalGroups,
         results: &[(PollingStation, PollingStationResults)],
+        totals: &mut ElectionSummary,
     ) -> Result<ElectionSummary, APIError> {
-        // running totals
-        let mut totals = ElectionSummary::zero();
-
-        // initialize political group votes to zero
-        for group in election.political_groups.iter() {
-            totals
-                .votes_counts
-                .political_group_total_votes
-                .push(PoliticalGroupTotalVotes {
-                    number: group.number,
-                    total: 0,
-                });
-
-            totals
-                .political_group_votes
-                .push(PoliticalGroupCandidateVotes {
-                    number: group.number,
-                    total: 0,
-                    candidate_votes: group
-                        .candidates
-                        .iter()
-                        .map(|c| CandidateVotes {
-                            number: c.number,
-                            votes: 0,
-                        })
-                        .collect(),
-                });
-        }
-
         // list of polling stations for which we processed results
-        let mut touched_polling_stations = vec![];
+        let mut touched_polling_stations: Vec<PollingStationNumber> = vec![];
 
         // loop over results and add them to the running total
         for (polling_station, result) in results {
@@ -149,6 +118,46 @@ impl ElectionSummary {
 
             touched_polling_stations.push(polling_station.number);
         }
+
+        Ok(totals.clone())
+    }
+
+    /// Add all the votes from the given polling stations together, using the
+    /// data from the election for candidates and political groups.
+    pub fn from_results(
+        election: &ElectionWithPoliticalGroups,
+        results: &[(PollingStation, PollingStationResults)],
+    ) -> Result<ElectionSummary, APIError> {
+        // running totals
+        let mut totals = ElectionSummary::zero();
+
+        // initialize political group votes to zero
+        for group in election.political_groups.iter() {
+            totals
+                .votes_counts
+                .political_group_total_votes
+                .push(PoliticalGroupTotalVotes {
+                    number: group.number,
+                    total: 0,
+                });
+
+            totals
+                .political_group_votes
+                .push(PoliticalGroupCandidateVotes {
+                    number: group.number,
+                    total: 0,
+                    candidate_votes: group
+                        .candidates
+                        .iter()
+                        .map(|c| CandidateVotes {
+                            number: c.number,
+                            votes: 0,
+                        })
+                        .collect(),
+                });
+        }
+
+        totals = Self::process_polling_station_results(election, results, &mut totals)?;
 
         Ok(totals)
     }

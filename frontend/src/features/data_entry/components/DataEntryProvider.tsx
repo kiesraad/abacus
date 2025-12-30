@@ -1,11 +1,11 @@
-import { ReactNode, useEffect } from "react";
+import { type ReactNode, useEffect } from "react";
 import { Navigate, useNavigate, useParams } from "react-router";
 
 import { ApiError, FatalApiError, NotFoundError } from "@/api/ApiResult";
 import { useMessages } from "@/hooks/messages/useMessages";
 import { t } from "@/i18n/translate";
-import { ElectionWithPoliticalGroups, PollingStation } from "@/types/generated/openapi";
-import { FormSectionId } from "@/types/types";
+import type { ElectionWithPoliticalGroups, PollingStation } from "@/types/generated/openapi";
+import type { FormSectionId } from "@/types/types";
 
 import { DataEntryContext } from "../hooks/DataEntryContext";
 import useDataEntry from "../hooks/useDataEntry";
@@ -59,7 +59,7 @@ export function DataEntryProvider({ election, pollingStation, entryNumber, child
   }
 
   if (!isStateLoaded(stateAndActions)) {
-    // if sectionId is set the corresponsing section will render an error modal if needed
+    // if sectionId is set the corresponding section will render an error modal if needed
     // otherwise we have to throw the error here to show the full page error
     // this is the case when the data entry claim failed initially on invalid data
     if (!sectionId && stateAndActions.error instanceof ApiError && stateAndActions.error.reference === "InvalidData") {

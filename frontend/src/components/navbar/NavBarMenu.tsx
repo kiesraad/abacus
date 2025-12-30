@@ -1,4 +1,4 @@
-import * as React from "react";
+import { useEffect, useState } from "react";
 import { NavLink } from "react-router";
 
 import { IconCompass, IconHamburger, IconLogs, IconUsers } from "@/components/generated/icons";
@@ -27,9 +27,9 @@ export function NavBarMenu() {
 }
 
 export function NavBarMenuButton() {
-  const [isMenuVisible, setMenuVisible] = React.useState(false);
+  const [isMenuVisible, setMenuVisible] = useState(false);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (isMenuVisible) {
       const handleClickOutside = (event: MouseEvent) => {
         if (!isNode(event.target) || !document.querySelector(`.${cls.navBarMenu}`)?.contains(event.target)) {
@@ -49,7 +49,7 @@ export function NavBarMenuButton() {
   };
 
   return (
-    <button className={cls.navBarMenuContainer} onClick={toggleMenu} title={t("menu")}>
+    <button className={cls.navBarMenuContainer} onClick={toggleMenu} title={t("menu")} type="button">
       <IconHamburger />
       {isMenuVisible && <NavBarMenu />}
     </button>

@@ -1,6 +1,6 @@
 import { t } from "@/i18n/translate";
-import { ResolveDifferencesAction } from "@/types/generated/openapi";
-import {
+import type { ResolveDifferencesAction } from "@/types/generated/openapi";
+import type {
   DataEntryResults,
   DataEntrySection,
   DataEntryStructure,

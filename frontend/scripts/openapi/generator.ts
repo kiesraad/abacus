@@ -1,11 +1,11 @@
+import assert from "node:assert";
 import { exec } from "node:child_process";
+import { mkdtemp, readFile, rmdir, unlink, writeFile } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import { promisify } from "node:util";
-import assert from "assert";
-import { mkdtemp, readFile, rmdir, unlink, writeFile } from "fs/promises";
-import { tmpdir } from "os";
-import { join } from "path";
 
-import {
+import type {
   NonArraySchemaObjectType,
   OpenAPIV3,
   OperationObject,
@@ -120,7 +120,7 @@ function addDefinition(name: string, v: ReferenceObject | SchemaObject) {
   const result: string[] = [];
   if (v.description) {
     result.push("/**");
-    result.push(" * " + v.description.split("\n").join("\n * "));
+    result.push(` * ${v.description.split("\n").join("\n * ")}`);
     result.push(" */");
   }
 

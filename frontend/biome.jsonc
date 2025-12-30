@@ -59,32 +59,30 @@
       // TODO: all disabled rules below should be enabled again and fixed
       "a11y": {
         "noAutofocus": "off",
-        "noInteractiveElementToNoninteractiveRole": "off",
         "noLabelWithoutControl": "off",
-        "noStaticElementInteractions": "off",
-        "useButtonType": "off",
-        "useSemanticElements": "off"
+        "noStaticElementInteractions": "off"
       },
       "complexity": {
         "noImportantStyles": "off"
       },
       "correctness": {
-        "noEmptyPattern": "off",
         "useExhaustiveDependencies": "off"
       },
-      "performance": {
-        "noAccumulatingSpread": "off"
-      },
       "style": {
-        "noDescendingSpecificity": "off",
-        "useConst": "off",
-        "useImportType": "off",
-        "useNodejsImportProtocol": "off",
-        "useTemplate": "off"
+        "useComponentExportOnlyModules": {
+          "level": "on",
+          "options": {
+            "allowConstantExport": true
+          }
+        }
       },
       "suspicious": {
-        "noArrayIndexKey": "off",
-        "noPrototypeBuiltins": "off"
+        "noConsole": {
+          "level": "on",
+          "options": {
+            "allow": ["error", "warn"]
+          }
+        }
       }
     }
   },
@@ -107,10 +105,22 @@
       "linter": {
         "rules": {
           "style": {
-            "noNonNullAssertion": "off"
+            "noNonNullAssertion": "off",
+            "useComponentExportOnlyModules": "off"
           },
           "suspicious": {
             "noExplicitAny": "off"
+          }
+        }
+      }
+    },
+    // Scripts can log to console
+    {
+      "includes": ["scripts/*.js", "scripts/*.ts"],
+      "linter": {
+        "rules": {
+          "suspicious": {
+            "noConsole": "off"
           }
         }
       }

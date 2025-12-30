@@ -1,7 +1,7 @@
 import { startTransition, useEffect, useRef, useState } from "react";
 
 import { Alert } from "@/components/ui/Alert/Alert";
-import { Message } from "@/hooks/messages/MessagesContext";
+import type { Message } from "@/hooks/messages/MessagesContext";
 import { useMessages } from "@/hooks/messages/useMessages";
 
 export function Messages() {
@@ -29,6 +29,7 @@ export function Messages() {
   }
 
   return messages.map((message, index) => (
+    // biome-ignore lint/suspicious/noArrayIndexKey: we can use the index as key since there is no unique id
     <Alert key={index} type={message.type ?? "success"} onClose={closeHandler(index)}>
       {message.title && <strong className="heading-md">{message.title}</strong>}
       {message.text && <p>{message.text}</p>}

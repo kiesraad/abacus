@@ -1,5 +1,5 @@
-import fs from "fs";
-import readline from "readline";
+import fs from "node:fs";
+import readline from "node:readline";
 
 // let the user confirm that all current translation json files will be overwritten
 const io = readline.createInterface({
@@ -91,7 +91,7 @@ function importPoFiles() {
       } else {
         fs.writeFileSync(
           `${localesDir}/${locale}/${key}.json`,
-          JSON.stringify(translations[locale][key], null, 2) + "\n",
+          `${JSON.stringify(translations[locale][key], null, 2)}\n`,
         );
         const count = countNested(translations[locale][key]);
         totalCount += count;
@@ -99,7 +99,7 @@ function importPoFiles() {
       }
     }
 
-    fs.writeFileSync(`${localesDir}/${locale}/generic.json`, JSON.stringify(generic, null, 2) + "\n");
+    fs.writeFileSync(`${localesDir}/${locale}/generic.json`, `${JSON.stringify(generic, null, 2)}\n`);
     const count = Object.keys(generic).length;
     totalCount += count;
     console.log(`Wrote ${count} entries to ${locale}/generic.json`);

@@ -6,10 +6,10 @@ import { Button } from "@/components/ui/Button/Button";
 import { Modal } from "@/components/ui/Modal/Modal";
 import { useUser } from "@/hooks/user/useUser";
 import { t, tx } from "@/i18n/translate";
-import { FormSectionId, SectionValues } from "@/types/types";
+import type { FormSectionId, SectionValues } from "@/types/types";
 
 import { useDataEntryContext } from "../hooks/useDataEntryContext";
-import { SubmitCurrentFormOptions } from "../types/types";
+import type { SubmitCurrentFormOptions } from "../types/types";
 import { redirectToHomePageErrorReferences } from "../utils/errors";
 
 export interface DataEntryNavigationProps {

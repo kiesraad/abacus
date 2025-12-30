@@ -1,5 +1,5 @@
 import { t } from "@/i18n/translate";
-import { Candidate } from "@/types/generated/openapi";
+import type { Candidate } from "@/types/generated/openapi";
 
 export function getCandidateFullName(candidate: Candidate): string {
   const lastName = candidate.last_name_prefix
@@ -14,5 +14,5 @@ export function getCandidateFullName(candidate: Candidate): string {
 export function getCandidateFullNameWithGender(candidate: Candidate): string {
   const fullName = getCandidateFullName(candidate);
   const gender = candidate.gender ? t(`candidate.${candidate.gender}`) : undefined;
-  return gender ? fullName + ` (${gender})` : fullName;
+  return gender ? `${fullName} (${gender})` : fullName;
 }

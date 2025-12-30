@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/no-unsafe-type-assertion -- this file relies on many TypeScript unsafe type assertions */
-import { Fragment, ReactElement } from "react";
+import { Fragment, type JSX, type ReactElement } from "react";
 import { Link } from "react-router";
 
-import { RenderFunction } from "./i18n.types";
+import type { RenderFunction } from "./i18n.types";
 
 type AST = Array<Element | string>;
 
@@ -112,12 +112,12 @@ export function renderAst(
   input: AST,
   elements: Record<string, RenderFunction> = DEFAULT_RENDER_FUNCTIONS,
 ): ReactElement {
-  // we can use the index as key since the input is static
   return (
     <>
       {input.map((element, i) => {
         // if the element is a string, just render it
         if (typeof element === "string") {
+          // biome-ignore lint/suspicious/noArrayIndexKey: we can use the index as key since the input is static
           return <Fragment key={i}>{element}</Fragment>;
         }
 
@@ -125,11 +125,13 @@ export function renderAst(
 
         // if the tag registered as a render function, call the function
         if (elements[tag] !== undefined && elements[tag] instanceof Function) {
+          // biome-ignore lint/suspicious/noArrayIndexKey: we can use the index as key since the input is static
           return <Fragment key={i}>{elements[tag](renderAst(children, elements), element.attributes)}</Fragment>;
         }
 
         // handle line breaks
         if (tag === "br") {
+          // biome-ignore lint/suspicious/noArrayIndexKey: we can use the index as key since the input is static
           return <br key={i} />;
         }
 
@@ -139,8 +141,9 @@ export function renderAst(
         }
 
         // otherwise, render the tag
-        const Element = tag as keyof React.JSX.IntrinsicElements;
+        const Element = tag as keyof JSX.IntrinsicElements;
 
+        // biome-ignore lint/suspicious/noArrayIndexKey: we can use the index as key since the input is static
         return <Element key={i}>{renderAst(children, elements)}</Element>;
       })}
     </>

@@ -17,7 +17,7 @@ import {
 import { Providers } from "@/testing/Providers";
 import { overrideOnce, server } from "@/testing/server";
 import { screen, setupTestRouter, spyOnHandler, within } from "@/testing/test-utils";
-import { ErrorResponse, PollingStationInvestigation } from "@/types/generated/openapi";
+import type { ErrorResponse, PollingStationInvestigation } from "@/types/generated/openapi";
 
 import { investigationRoutes } from "../routes";
 

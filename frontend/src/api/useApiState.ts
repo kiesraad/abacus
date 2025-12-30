@@ -1,6 +1,6 @@
 import { useContext } from "react";
 
-import { ApiProviderContext, ApiState } from "./ApiProviderContext";
+import { ApiProviderContext, type ApiState } from "./ApiProviderContext";
 
 export function useApiState(): ApiState {
   const apiState = useContext<ApiState | null>(ApiProviderContext);

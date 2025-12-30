@@ -1,5 +1,5 @@
-import { UseInitialApiGetReturn, useInitialApiGet } from "@/api/useInitialApiGet";
-import { POLLING_STATION_GET_REQUEST_PATH, PollingStation } from "@/types/generated/openapi";
+import { type UseInitialApiGetReturn, useInitialApiGet } from "@/api/useInitialApiGet";
+import type { POLLING_STATION_GET_REQUEST_PATH, PollingStation } from "@/types/generated/openapi";
 
 export function usePollingStationGet(
   electionId: number,

@@ -7,7 +7,7 @@ import { NumberOfVotersForm } from "@/components/election/NumberOfVotersForm";
 import { Footer } from "@/components/footer/Footer";
 import { useElection } from "@/hooks/election/useElection";
 import { t } from "@/i18n/translate";
-import {
+import type {
   ELECTION_NUMBER_OF_VOTERS_CHANGE_REQUEST_BODY,
   ELECTION_NUMBER_OF_VOTERS_CHANGE_REQUEST_PATH,
 } from "@/types/generated/openapi";

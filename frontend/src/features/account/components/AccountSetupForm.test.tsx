@@ -1,11 +1,11 @@
 import userEvent from "@testing-library/user-event";
-import { beforeEach, describe, expect, Mock, test, vi } from "vitest";
+import { beforeEach, describe, expect, type Mock, test, vi } from "vitest";
 
 import { AccountUpdateRequestHandler } from "@/testing/api-mocks/RequestHandlers";
 import { loginResponseMockData } from "@/testing/api-mocks/UserMockData";
 import { server } from "@/testing/server";
 import { render, screen, spyOnHandler, within } from "@/testing/test-utils";
-import { LoginResponse } from "@/types/generated/openapi";
+import type { LoginResponse } from "@/types/generated/openapi";
 
 import { AccountSetupForm } from "./AccountSetupForm";
 

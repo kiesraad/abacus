@@ -4,7 +4,7 @@ import { Loader } from "@/components/ui/Loader/Loader";
 import { useElection } from "@/hooks/election/useElection";
 import { useMessages } from "@/hooks/messages/useMessages";
 import { useNumericParam } from "@/hooks/useNumericParam";
-import { PollingStation } from "@/types/generated/openapi";
+import type { PollingStation } from "@/types/generated/openapi";
 
 import { getInvestigationDeletedMessage } from "../utils/messages";
 import { InvestigationFindings } from "./forms/InvestigationFindings";

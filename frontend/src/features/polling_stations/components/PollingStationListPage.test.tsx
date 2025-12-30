@@ -9,7 +9,7 @@ import { ElectionRequestHandler, PollingStationListRequestHandler } from "@/test
 import { overrideOnce, server } from "@/testing/server";
 import { TestUserProvider } from "@/testing/TestUserProvider";
 import { render, screen, waitFor } from "@/testing/test-utils";
-import { CommitteeSessionStatus, PollingStationListResponse, Role } from "@/types/generated/openapi";
+import type { CommitteeSessionStatus, PollingStationListResponse, Role } from "@/types/generated/openapi";
 
 import { PollingStationListPage } from "./PollingStationListPage";
 

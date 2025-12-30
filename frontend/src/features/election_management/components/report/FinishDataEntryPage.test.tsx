@@ -1,7 +1,7 @@
 import { render as rtlRender } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { HttpResponse, http } from "msw";
-import { ReactNode } from "react";
+import type { ReactNode } from "react";
 import * as ReactRouter from "react-router";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
@@ -17,7 +17,7 @@ import {
   ElectionRequestHandler,
   ElectionStatusRequestHandler,
 } from "@/testing/api-mocks/RequestHandlers";
-import { getRouter, Router } from "@/testing/router";
+import { getRouter, type Router } from "@/testing/router";
 import { overrideOnce, server } from "@/testing/server";
 import { TestUserProvider } from "@/testing/TestUserProvider";
 import {
@@ -28,7 +28,7 @@ import {
   spyOnHandler,
   waitFor,
 } from "@/testing/test-utils";
-import { ElectionDetailsResponse, ErrorResponse, PollingStation } from "@/types/generated/openapi";
+import type { ElectionDetailsResponse, ErrorResponse, PollingStation } from "@/types/generated/openapi";
 
 import { FinishDataEntryPage } from "./FinishDataEntryPage";
 

@@ -14,7 +14,7 @@ import { statusResponseMock } from "@/testing/api-mocks/ElectionStatusMockData";
 import { userMockData } from "@/testing/api-mocks/UserMockData";
 import { matchers } from "@/testing/matchers";
 import { TestUserProvider } from "@/testing/TestUserProvider";
-import { Role } from "@/types/generated/openapi";
+import type { Role } from "@/types/generated/openapi";
 
 sb.mock("react-router", { spy: true });
 

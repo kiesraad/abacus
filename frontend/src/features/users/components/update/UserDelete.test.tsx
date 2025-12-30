@@ -1,10 +1,10 @@
 import { userEvent } from "@testing-library/user-event";
-import { beforeEach, describe, expect, Mock, test, vi } from "vitest";
+import { beforeEach, describe, expect, type Mock, test, vi } from "vitest";
 
 import { UserDeleteRequestHandler } from "@/testing/api-mocks/RequestHandlers";
 import { overrideOnce, server } from "@/testing/server";
 import { render, screen, spyOnHandler } from "@/testing/test-utils";
-import { USER_DELETE_REQUEST_PATH, User } from "@/types/generated/openapi";
+import type { USER_DELETE_REQUEST_PATH, User } from "@/types/generated/openapi";
 
 import { UserDelete } from "./UserDelete";
 

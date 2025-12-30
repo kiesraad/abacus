@@ -1,14 +1,14 @@
-import * as React from "react";
+import type { HTMLAttributes, ReactNode } from "react";
 
-import { MenuStatus } from "@/types/ui";
+import type { MenuStatus } from "@/types/ui";
 import { cn } from "@/utils/classnames";
 
 import { StatusIcon } from "../Icon/StatusIcon";
 import cls from "./StatusList.module.css";
 
-export interface StatusListProps extends React.HTMLAttributes<HTMLUListElement> {
+export interface StatusListProps extends HTMLAttributes<HTMLUListElement> {
   gap?: "sm" | "md";
-  children: React.ReactNode;
+  children: ReactNode;
 }
 export function StatusList({ gap = "md", children, ...props }: StatusListProps) {
   return (
@@ -18,9 +18,9 @@ export function StatusList({ gap = "md", children, ...props }: StatusListProps) 
   );
 }
 
-export interface StatusListItemProps extends React.HTMLAttributes<HTMLLIElement> {
+export interface StatusListItemProps extends HTMLAttributes<HTMLLIElement> {
   status: MenuStatus;
-  children: React.ReactNode;
+  children: ReactNode;
   className?: string;
 }
 
@@ -35,7 +35,7 @@ StatusList.Item = function StatusListItem({ status, children, className, ...prop
   );
 };
 
-StatusList.Title = function StatusListTitle({ id, children }: { id?: string; children: React.ReactNode }) {
+StatusList.Title = function StatusListTitle({ id, children }: { id?: string; children: ReactNode }) {
   return (
     <div id={id} className={cls.title}>
       {children}
@@ -43,8 +43,8 @@ StatusList.Title = function StatusListTitle({ id, children }: { id?: string; chi
   );
 };
 
-export interface StatusListSectionProps extends React.HTMLAttributes<HTMLDivElement> {
-  children: React.ReactNode;
+export interface StatusListSectionProps extends HTMLAttributes<HTMLDivElement> {
+  children: ReactNode;
 }
 
 // Use to wrap StatusList.Title and StatusList components
@@ -57,6 +57,6 @@ StatusList.Section = function StatusListContainer({ children, ...props }: Status
 };
 
 // Use to wrap multiple StatusList.Section components
-StatusList.Wrapper = function StatusListWrapper({ children }: { children: React.ReactNode }) {
+StatusList.Wrapper = function StatusListWrapper({ children }: { children: ReactNode }) {
   return <div className={cls.wrapper}>{children}</div>;
 };

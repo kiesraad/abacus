@@ -3,7 +3,7 @@ import { HeadingSubsectionComponent } from "@/components/data_entry/subsections/
 import { InputGridSubsectionComponent } from "@/components/data_entry/subsections/InputGridSubsection";
 import { MessageSubsectionComponent } from "@/components/data_entry/subsections/MessageSubsection";
 import { RadioSubsectionComponent } from "@/components/data_entry/subsections/RadioSubsection";
-import { DataEntrySection, SectionValues } from "@/types/types";
+import type { DataEntrySection, SectionValues } from "@/types/types";
 
 export interface DataEntrySubsectionsProps {
   section: DataEntrySection;
@@ -33,13 +33,13 @@ export function DataEntrySubsections({
       {section.subsections.map((subsection, subsectionIdx) => {
         switch (subsection.type) {
           case "heading":
-            return <HeadingSubsectionComponent key={`heading-${subsectionIdx}`} subsection={subsection} />;
+            return <HeadingSubsectionComponent key={`${subsection.type}-${subsectionIdx}`} subsection={subsection} />;
           case "message":
-            return <MessageSubsectionComponent key={`message-${subsectionIdx}`} subsection={subsection} />;
+            return <MessageSubsectionComponent key={`${subsection.type}-${subsectionIdx}`} subsection={subsection} />;
           case "radio":
             return (
               <RadioSubsectionComponent
-                key={`radio-${subsectionIdx}`}
+                key={`${subsection.type}-${subsectionIdx}`}
                 subsection={subsection}
                 currentValues={currentValues}
                 setValues={setValues}
@@ -50,7 +50,7 @@ export function DataEntrySubsections({
           case "inputGrid":
             return (
               <InputGridSubsectionComponent
-                key={`input-grid-${subsectionIdx}`}
+                key={`${subsection.type}-${subsectionIdx}`}
                 subsection={subsection}
                 previousValues={previousValues}
                 currentValues={currentValues}
@@ -63,7 +63,7 @@ export function DataEntrySubsections({
           case "checkboxes":
             return (
               <CheckboxesSubsectionComponent
-                key={`checkboxes-${subsectionIdx}`}
+                key={`${subsection.type}-${subsectionIdx}`}
                 subsection={subsection}
                 currentValues={currentValues}
                 setValues={setValues}

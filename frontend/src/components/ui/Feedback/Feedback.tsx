@@ -1,8 +1,8 @@
-import { ReactNode, useEffect, useRef } from "react";
+import { type ReactNode, useEffect, useRef } from "react";
 
 import { hasTranslation, t, tx } from "@/i18n/translate";
-import { Role, ValidationResult } from "@/types/generated/openapi";
-import { AlertType, FeedbackId } from "@/types/ui";
+import type { Role, ValidationResult } from "@/types/generated/openapi";
+import type { AlertType, FeedbackId } from "@/types/ui";
 import { cn } from "@/utils/classnames";
 import { dottedCode } from "@/utils/ValidationResults";
 
@@ -64,7 +64,7 @@ export function Feedback({ id, type, data, userRole, shouldFocus = true }: Feedb
   return (
     <article id={id} className={cn(cls.feedback, cls[type])}>
       {feedbackList.map((feedback, index) => (
-        <div key={`feedback-${index}`} className={cls.item}>
+        <div key={`feedback-${feedback.codes.join("-")}`} className={cls.item}>
           <header>
             <AlertIcon type={type} />
             <h3 tabIndex={-1} ref={index === 0 ? feedbackHeader : undefined} className="feedback-header">

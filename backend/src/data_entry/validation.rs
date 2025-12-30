@@ -245,7 +245,187 @@ pub trait ValidateRoot: Validate {
     }
 }
 
-#[allow(clippy::too_many_lines)]
+impl DifferencesCounts {
+    fn validate_differences_checkboxes(
+        &self,
+        total_voters_count: u32,
+        total_votes_count: u32,
+        validation_results: &mut ValidationResults,
+        path: &FieldPath,
+    ) {
+        let equal_checked = self
+            .compare_votes_cast_admitted_voters
+            .admitted_voters_equal_votes_cast;
+        let greater_than_checked = self
+            .compare_votes_cast_admitted_voters
+            .votes_cast_greater_than_admitted_voters;
+        let smaller_than_checked = self
+            .compare_votes_cast_admitted_voters
+            .votes_cast_smaller_than_admitted_voters;
+
+        if equal_checked && (total_voters_count != total_votes_count) {
+            validation_results.errors.push(ValidationResult {
+                fields: vec![
+                    path.field(
+                        "compare_votes_cast_admitted_voters.admitted_voters_equal_votes_cast",
+                    )
+                    .to_string(),
+                ],
+                code: ValidationResultCode::F301,
+                context: None,
+            });
+        }
+
+        if greater_than_checked && total_votes_count <= total_voters_count {
+            validation_results.errors.push(ValidationResult {
+                fields: vec![
+                    path.field(
+                        "compare_votes_cast_admitted_voters.votes_cast_greater_than_admitted_voters",
+                    )
+                      .to_string(),
+                ],
+                code: ValidationResultCode::F302,
+                context: None,
+            });
+        }
+
+        if smaller_than_checked && total_votes_count >= total_voters_count {
+            validation_results.errors.push(ValidationResult {
+                fields: vec![
+                    path.field(
+                        "compare_votes_cast_admitted_voters.votes_cast_smaller_than_admitted_voters",
+                    )
+                      .to_string(),
+                ],
+                code: ValidationResultCode::F303,
+                context: None,
+            });
+        }
+
+        // Check if all or multiple fields are checked or none at all.
+        let compare_matches = [equal_checked, greater_than_checked, smaller_than_checked]
+            .into_iter()
+            .filter(|b| *b)
+            .count();
+
+        if compare_matches != 1 {
+            validation_results.errors.push(ValidationResult {
+                fields: vec![path.field("compare_votes_cast_admitted_voters").to_string()],
+                code: ValidationResultCode::F304,
+                context: None,
+            });
+        }
+    }
+
+    fn validate_no_differences(
+        &self,
+        total_voters_count: u32,
+        total_votes_count: u32,
+        validation_results: &mut ValidationResults,
+        path: &FieldPath,
+    ) {
+        if total_voters_count == total_votes_count
+            && (self.more_ballots_count != 0 || self.fewer_ballots_count != 0)
+        {
+            let mut fields = vec![];
+            if self.more_ballots_count != 0 {
+                fields.push(path.field("more_ballots_count").to_string());
+            }
+            if self.fewer_ballots_count != 0 {
+                fields.push(path.field("fewer_ballots_count").to_string());
+            }
+
+            if !fields.is_empty() {
+                validation_results.errors.push(ValidationResult {
+                    fields,
+                    code: ValidationResultCode::F305,
+                    context: None,
+                });
+            }
+        }
+    }
+
+    fn validate_votes_count_larger_than_voters_count(
+        &self,
+        total_voters_count: u32,
+        total_votes_count: u32,
+        validation_results: &mut ValidationResults,
+        path: &FieldPath,
+    ) {
+        if total_votes_count > total_voters_count
+            && self.more_ballots_count != (total_votes_count - total_voters_count)
+        {
+            validation_results.errors.push(ValidationResult {
+                fields: vec![path.field("more_ballots_count").to_string()],
+                code: ValidationResultCode::F306,
+                context: None,
+            });
+        }
+
+        if total_votes_count > total_voters_count && self.fewer_ballots_count != 0 {
+            validation_results.errors.push(ValidationResult {
+                fields: vec![
+                    path.field("more_ballots_count").to_string(),
+                    path.field("fewer_ballots_count").to_string(),
+                ],
+                code: ValidationResultCode::F307,
+                context: None,
+            });
+        }
+    }
+
+    fn validate_votes_count_smaller_than_voters_count(
+        &self,
+        total_voters_count: u32,
+        total_votes_count: u32,
+        validation_results: &mut ValidationResults,
+        path: &FieldPath,
+    ) {
+        if total_votes_count < total_voters_count
+            && self.fewer_ballots_count != (total_voters_count - total_votes_count)
+        {
+            validation_results.errors.push(ValidationResult {
+                fields: vec![path.field("fewer_ballots_count").to_string()],
+                code: ValidationResultCode::F308,
+                context: None,
+            });
+        }
+
+        if total_votes_count < total_voters_count && self.more_ballots_count != 0 {
+            validation_results.errors.push(ValidationResult {
+                fields: vec![
+                    path.field("more_ballots_count").to_string(),
+                    path.field("fewer_ballots_count").to_string(),
+                ],
+                code: ValidationResultCode::F309,
+                context: None,
+            });
+        }
+    }
+
+    fn validate_accounted_for(
+        &self,
+        total_voters_count: u32,
+        total_votes_count: u32,
+        validation_results: &mut ValidationResults,
+        path: &FieldPath,
+    ) {
+        let accounted_for = &self.difference_completely_accounted_for;
+        if (total_voters_count != total_votes_count)
+            && (accounted_for.is_empty() || (accounted_for.is_both()))
+        {
+            validation_results.errors.push(ValidationResult {
+                fields: vec![
+                    path.field("difference_completely_accounted_for")
+                        .to_string(),
+                ],
+                code: ValidationResultCode::F310,
+                context: None,
+            });
+        }
+    }
+}
+
 pub fn validate_differences_counts(
     differences_counts: &DifferencesCounts,
     total_voters_count: u32,
@@ -253,179 +433,40 @@ pub fn validate_differences_counts(
     validation_results: &mut ValidationResults,
     differences_counts_path: &FieldPath,
 ) -> Result<(), DataError> {
-    let admitted_voters_equal_votes_cast = differences_counts
-        .compare_votes_cast_admitted_voters
-        .admitted_voters_equal_votes_cast;
-    let votes_cast_greater_than_admitted_voters = differences_counts
-        .compare_votes_cast_admitted_voters
-        .votes_cast_greater_than_admitted_voters;
-    let votes_cast_smaller_than_admitted_voters = differences_counts
-        .compare_votes_cast_admitted_voters
-        .votes_cast_smaller_than_admitted_voters;
+    differences_counts.validate_differences_checkboxes(
+        total_voters_count,
+        total_votes_count,
+        validation_results,
+        differences_counts_path,
+    );
 
-    if admitted_voters_equal_votes_cast && (total_voters_count != total_votes_count) {
-        validation_results.errors.push(ValidationResult {
-            fields: vec![
-                differences_counts_path
-                    .field("compare_votes_cast_admitted_voters.admitted_voters_equal_votes_cast")
-                    .to_string(),
-            ],
-            code: ValidationResultCode::F301,
-            context: None,
-        });
-    }
+    differences_counts.validate_no_differences(
+        total_voters_count,
+        total_votes_count,
+        validation_results,
+        differences_counts_path,
+    );
 
-    if votes_cast_greater_than_admitted_voters && total_votes_count <= total_voters_count {
-        validation_results.errors.push(ValidationResult {
-            fields: vec![
-                differences_counts_path
-                    .field(
-                        "compare_votes_cast_admitted_voters.votes_cast_greater_than_admitted_voters",
-                    )
-                    .to_string(),
-            ],
-            code: ValidationResultCode::F302,
-            context: None,
-        });
-    }
+    differences_counts.validate_votes_count_larger_than_voters_count(
+        total_voters_count,
+        total_votes_count,
+        validation_results,
+        differences_counts_path,
+    );
 
-    if votes_cast_smaller_than_admitted_voters && total_votes_count >= total_voters_count {
-        validation_results.errors.push(ValidationResult {
-            fields: vec![
-                differences_counts_path
-                    .field(
-                        "compare_votes_cast_admitted_voters.votes_cast_smaller_than_admitted_voters",
-                    )
-                    .to_string(),
-            ],
-            code: ValidationResultCode::F303,
-            context: None,
-        });
-    }
+    differences_counts.validate_votes_count_smaller_than_voters_count(
+        total_voters_count,
+        total_votes_count,
+        validation_results,
+        differences_counts_path,
+    );
 
-    // Check if all or multiple fields are checked or none at all.
-    let compare_matches = [
-        admitted_voters_equal_votes_cast,
-        votes_cast_greater_than_admitted_voters,
-        votes_cast_smaller_than_admitted_voters,
-    ]
-    .into_iter()
-    .filter(|b| *b)
-    .count();
-
-    if compare_matches != 1 {
-        validation_results.errors.push(ValidationResult {
-            fields: vec![
-                differences_counts_path
-                    .field("compare_votes_cast_admitted_voters")
-                    .to_string(),
-            ],
-            code: ValidationResultCode::F304,
-            context: None,
-        });
-    }
-
-    if total_voters_count == total_votes_count
-        && (differences_counts.more_ballots_count != 0
-            || differences_counts.fewer_ballots_count != 0)
-    {
-        let mut fields = vec![];
-        if differences_counts.more_ballots_count != 0 {
-            fields.push(
-                differences_counts_path
-                    .field("more_ballots_count")
-                    .to_string(),
-            );
-        }
-        if differences_counts.fewer_ballots_count != 0 {
-            fields.push(
-                differences_counts_path
-                    .field("fewer_ballots_count")
-                    .to_string(),
-            );
-        }
-
-        if !fields.is_empty() {
-            validation_results.errors.push(ValidationResult {
-                fields,
-                code: ValidationResultCode::F305,
-                context: None,
-            });
-        }
-    }
-
-    if total_votes_count > total_voters_count
-        && differences_counts.more_ballots_count != (total_votes_count - total_voters_count)
-    {
-        validation_results.errors.push(ValidationResult {
-            fields: vec![
-                differences_counts_path
-                    .field("more_ballots_count")
-                    .to_string(),
-            ],
-            code: ValidationResultCode::F306,
-            context: None,
-        });
-    }
-
-    if total_votes_count > total_voters_count && differences_counts.fewer_ballots_count != 0 {
-        validation_results.errors.push(ValidationResult {
-            fields: vec![
-                differences_counts_path
-                    .field("more_ballots_count")
-                    .to_string(),
-                differences_counts_path
-                    .field("fewer_ballots_count")
-                    .to_string(),
-            ],
-            code: ValidationResultCode::F307,
-            context: None,
-        });
-    }
-
-    if total_votes_count < total_voters_count
-        && differences_counts.fewer_ballots_count != (total_voters_count - total_votes_count)
-    {
-        validation_results.errors.push(ValidationResult {
-            fields: vec![
-                differences_counts_path
-                    .field("fewer_ballots_count")
-                    .to_string(),
-            ],
-            code: ValidationResultCode::F308,
-            context: None,
-        });
-    }
-
-    if total_votes_count < total_voters_count && differences_counts.more_ballots_count != 0 {
-        validation_results.errors.push(ValidationResult {
-            fields: vec![
-                differences_counts_path
-                    .field("more_ballots_count")
-                    .to_string(),
-                differences_counts_path
-                    .field("fewer_ballots_count")
-                    .to_string(),
-            ],
-            code: ValidationResultCode::F309,
-            context: None,
-        });
-    }
-
-    let accounted_for = &differences_counts.difference_completely_accounted_for;
-    if (total_voters_count != total_votes_count)
-        && (accounted_for.is_empty() || (accounted_for.is_both()))
-    {
-        validation_results.errors.push(ValidationResult {
-            fields: vec![
-                differences_counts_path
-                    .field("difference_completely_accounted_for")
-                    .to_string(),
-            ],
-            code: ValidationResultCode::F310,
-            context: None,
-        });
-    }
+    differences_counts.validate_accounted_for(
+        total_voters_count,
+        total_votes_count,
+        validation_results,
+        differences_counts_path,
+    );
 
     Ok(())
 }
@@ -525,8 +566,66 @@ impl Validate for PollingStationResults {
     }
 }
 
+impl CommonPollingStationResults {
+    fn validate_political_group_votes_errors(
+        &self,
+        political_group_candidate_votes: &PoliticalGroupCandidateVotes,
+        validation_results: &mut ValidationResults,
+        path: &FieldPath,
+    ) -> Result<(), DataError> {
+        let political_group_total_votes = self
+            .votes_counts
+            .political_group_total_votes
+            .iter()
+            .find(|political_group_total_votes| {
+                political_group_total_votes.number == political_group_candidate_votes.number
+            })
+            .ok_or(DataError::new("political group total votes should exist"))?;
+
+        // all candidate votes, cast to u64 to avoid overflow
+        let candidate_votes_sum: u64 = political_group_candidate_votes
+            .candidate_votes
+            .iter()
+            .map(|cv| cv.votes as u64)
+            .sum::<u64>();
+
+        if (candidate_votes_sum > 0 || political_group_total_votes.total > 0)
+            && political_group_candidate_votes.total == 0
+        {
+            validation_results.errors.push(ValidationResult {
+                fields: vec![path.field("total").to_string()],
+                code: ValidationResultCode::F401,
+                context: Some(ValidationResultContext {
+                    political_group_number: Some(political_group_total_votes.number),
+                }),
+            });
+        } else {
+            if political_group_candidate_votes.total as u64 != candidate_votes_sum {
+                validation_results.errors.push(ValidationResult {
+                    fields: vec![path.to_string()],
+                    code: ValidationResultCode::F402,
+                    context: Some(ValidationResultContext {
+                        political_group_number: Some(political_group_candidate_votes.number),
+                    }),
+                });
+            }
+
+            if political_group_candidate_votes.total != political_group_total_votes.total {
+                validation_results.errors.push(ValidationResult {
+                    fields: vec![path.field("total").to_string()],
+                    code: ValidationResultCode::F403,
+                    context: Some(ValidationResultContext {
+                        political_group_number: Some(political_group_candidate_votes.number),
+                    }),
+                });
+            }
+        }
+
+        Ok(())
+    }
+}
+
 impl Validate for CommonPollingStationResults {
-    #[allow(clippy::too_many_lines)]
     fn validate(
         &self,
         election: &ElectionWithPoliticalGroups,
@@ -598,50 +697,7 @@ impl Validate for CommonPollingStationResults {
 
         for (i, pgcv) in self.political_group_votes.iter().enumerate() {
             let pgcv_path = path.field("political_group_votes").index(i);
-
-            let pgtv = self
-                .votes_counts
-                .political_group_total_votes
-                .iter()
-                .find(|pgtv| pgtv.number == pgcv.number)
-                .ok_or(DataError::new("political group total votes should exist"))?;
-
-            // all candidate votes, cast to u64 to avoid overflow
-            let candidate_votes_sum: u64 = pgcv
-                .candidate_votes
-                .iter()
-                .map(|cv| cv.votes as u64)
-                .sum::<u64>();
-
-            if (candidate_votes_sum > 0 || pgtv.total > 0) && pgcv.total == 0 {
-                validation_results.errors.push(ValidationResult {
-                    fields: vec![pgcv_path.field("total").to_string()],
-                    code: ValidationResultCode::F401,
-                    context: Some(ValidationResultContext {
-                        political_group_number: Some(pgtv.number),
-                    }),
-                });
-            } else {
-                if pgcv.total as u64 != candidate_votes_sum {
-                    validation_results.errors.push(ValidationResult {
-                        fields: vec![pgcv_path.to_string()],
-                        code: ValidationResultCode::F402,
-                        context: Some(ValidationResultContext {
-                            political_group_number: Some(pgcv.number),
-                        }),
-                    });
-                }
-
-                if pgcv.total != pgtv.total {
-                    validation_results.errors.push(ValidationResult {
-                        fields: vec![pgcv_path.field("total").to_string()],
-                        code: ValidationResultCode::F403,
-                        context: Some(ValidationResultContext {
-                            political_group_number: Some(pgcv.number),
-                        }),
-                    });
-                }
-            }
+            self.validate_political_group_votes_errors(pgcv, validation_results, &pgcv_path)?;
         }
 
         Ok(())
@@ -755,47 +811,12 @@ impl Validate for VotersCounts {
     }
 }
 
-impl Validate for VotesCounts {
-    #[allow(clippy::too_many_lines)]
-    fn validate(
+impl VotesCounts {
+    fn validate_votes_counts_errors(
         &self,
-        election: &ElectionWithPoliticalGroups,
-        polling_station: &PollingStation,
         validation_results: &mut ValidationResults,
         path: &FieldPath,
-    ) -> Result<(), DataError> {
-        // validate all counts
-        self.political_group_total_votes.validate(
-            election,
-            polling_station,
-            validation_results,
-            &path.field("political_group_total_votes"),
-        )?;
-        self.total_votes_candidates_count.validate(
-            election,
-            polling_station,
-            validation_results,
-            &path.field("total_votes_candidates_count"),
-        )?;
-        self.blank_votes_count.validate(
-            election,
-            polling_station,
-            validation_results,
-            &path.field("blank_votes_count"),
-        )?;
-        self.invalid_votes_count.validate(
-            election,
-            polling_station,
-            validation_results,
-            &path.field("invalid_votes_count"),
-        )?;
-        self.total_votes_cast_count.validate(
-            election,
-            polling_station,
-            validation_results,
-            &path.field("total_votes_cast_count"),
-        )?;
-
+    ) {
         let political_group_total_votes_sum: u64 = self
             .political_group_total_votes
             .iter()
@@ -836,7 +857,13 @@ impl Validate for VotesCounts {
                 context: None,
             });
         }
+    }
 
+    fn validate_votes_counts_warnings(
+        &self,
+        validation_results: &mut ValidationResults,
+        path: &FieldPath,
+    ) {
         if above_percentage_threshold(self.blank_votes_count, self.total_votes_cast_count, 3) {
             validation_results.warnings.push(ValidationResult {
                 fields: vec![path.field("blank_votes_count").to_string()],
@@ -860,6 +887,53 @@ impl Validate for VotesCounts {
                 context: None,
             });
         }
+    }
+}
+
+impl Validate for VotesCounts {
+    fn validate(
+        &self,
+        election: &ElectionWithPoliticalGroups,
+        polling_station: &PollingStation,
+        validation_results: &mut ValidationResults,
+        path: &FieldPath,
+    ) -> Result<(), DataError> {
+        // validate all counts
+        self.political_group_total_votes.validate(
+            election,
+            polling_station,
+            validation_results,
+            &path.field("political_group_total_votes"),
+        )?;
+        self.total_votes_candidates_count.validate(
+            election,
+            polling_station,
+            validation_results,
+            &path.field("total_votes_candidates_count"),
+        )?;
+        self.blank_votes_count.validate(
+            election,
+            polling_station,
+            validation_results,
+            &path.field("blank_votes_count"),
+        )?;
+        self.invalid_votes_count.validate(
+            election,
+            polling_station,
+            validation_results,
+            &path.field("invalid_votes_count"),
+        )?;
+        self.total_votes_cast_count.validate(
+            election,
+            polling_station,
+            validation_results,
+            &path.field("total_votes_cast_count"),
+        )?;
+
+        self.validate_votes_counts_errors(validation_results, path);
+
+        self.validate_votes_counts_warnings(validation_results, path);
+
         Ok(())
     }
 }
@@ -1981,9 +2055,8 @@ mod tests {
         }
 
         /// CSO | F.305 (Als D = H) I en/of J zijn ingevuld
-        #[allow(clippy::too_many_lines)]
         #[test]
-        fn test_f305_more_and_fewer_ballots_count() -> Result<(), DataError> {
+        fn test_f305_more_and_fewer_ballots_count_not_filled() -> Result<(), DataError> {
             // D = H & I and J not filled in
             let mut data = DifferencesCounts::zero();
 
@@ -2045,6 +2118,11 @@ mod tests {
                 ]
             );
 
+            Ok(())
+        }
+
+        #[test]
+        fn test_f305_more_and_fewer_ballots_count_both_filled() -> Result<(), DataError> {
             // D = H & I and J filled in
             let mut data = DifferencesCounts::zero();
 
@@ -2242,9 +2320,8 @@ mod tests {
         }
 
         /// CSO | F.307 (Als H > D) J is ingevuld
-        #[allow(clippy::too_many_lines)]
         #[test]
-        fn test_f307_votes_greater_than_voters() -> Result<(), DataError> {
+        fn test_f307_votes_greater_than_voters_fewer_ballots_count_zero() -> Result<(), DataError> {
             // H > D & J == 0
             let mut data = DifferencesCounts::zero();
 
@@ -2263,6 +2340,12 @@ mod tests {
                 }]
             );
 
+            Ok(())
+        }
+
+        #[test]
+        fn test_f307_votes_greater_than_voters_fewer_ballots_count_filled() -> Result<(), DataError>
+        {
             // H > D & J < 0
             let mut data = DifferencesCounts::zero();
 
@@ -3055,7 +3138,6 @@ mod tests {
         }
 
         /// CSO | F.401 `Er zijn (stemmen op kandidaten of het lijsttotaal van corresponderende E.x is groter dan 0) en het totaal aantal stemmen op een lijst = leeg of 0`
-        #[allow(clippy::too_many_lines)]
         #[test]
         fn test_f401() -> Result<(), DataError> {
             // Only F.401 is triggered.
@@ -3109,12 +3191,20 @@ mod tests {
                 }]
             );
 
+            Ok(())
+        }
+
+        #[test]
+        fn test_f401_multiple_errors() -> Result<(), DataError> {
+            let mut data = create_test_data();
             // Covers multiple errors over different political groups:
             // Following 2 tests check that F.401 is triggered for both political group votes.
             // - Expect F.402 and F.403 for group 1.
             // - Expect only F.401 for group 2 (F.401, F.402 and F.403 are triggered)
             data.political_group_votes[0].candidate_votes[0].votes = 0;
             data.political_group_votes[0].total = 30;
+            data.political_group_votes[1].candidate_votes[0].votes = 10;
+            data.political_group_votes[1].total = 0;
 
             let validation_results = validate(data.clone())?;
             assert_eq!(

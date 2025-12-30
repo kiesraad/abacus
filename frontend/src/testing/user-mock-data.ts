@@ -1,4 +1,4 @@
-import { LoginResponse } from "@/types/generated/openapi";
+import type { LoginResponse } from "@/types/generated/openapi";
 
 export function getTypistUser(): LoginResponse {
   return {

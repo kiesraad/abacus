@@ -1,4 +1,4 @@
-import { ChangeEvent, FormEvent, Fragment, useState } from "react";
+import { type ChangeEvent, type FormEvent, Fragment, useState } from "react";
 
 import { isSuccess } from "@/api/ApiResult";
 import { useApiClient } from "@/api/useApiClient";
@@ -61,10 +61,8 @@ export function GenerateTestElectionForm() {
 
   const submitForm = async () => {
     const payload = RANGE_FIELDS.reduce<Record<string, string | boolean>>(
-      (acc, field) => ({
-        ...acc,
-        [field.key]: formState[field.key] ? formState[field.key] : field.placeholder,
-      }),
+      (acc, field) =>
+        Object.assign(acc, { [field.key]: formState[field.key] ? formState[field.key] : field.placeholder }),
       { with_data_entry: formState.with_data_entry },
     );
 
@@ -126,5 +124,3 @@ export function GenerateTestElectionForm() {
     </Form>
   );
 }
-
-export default GenerateTestElectionForm;

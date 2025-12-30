@@ -5,12 +5,12 @@ use axum::{
 };
 use quick_xml::{DeError, SeError};
 use serde::{Deserialize, Serialize};
-use sqlx::SqlitePool;
+use sqlx::{SqliteConnection, SqlitePool};
 use utoipa::ToSchema;
 use utoipa_axum::{router::OpenApiRouter, routes};
 
 use super::{
-    NewElection, VoteCountingMethod,
+    ElectionId, ElectionNumberOfVotersChangeRequest, NewElection, VoteCountingMethod,
     structs::{Election, ElectionWithPoliticalGroups},
 };
 use crate::{
@@ -19,9 +19,8 @@ use crate::{
     authentication::{Admin, AdminOrCoordinator, User},
     committee_session::{
         CommitteeSession, CommitteeSessionCreateRequest, CommitteeSessionError,
-        status::CommitteeSessionStatus,
+        create_committee_session, status::CommitteeSessionStatus,
     },
-    election::{ElectionId, ElectionNumberOfVotersChangeRequest},
     eml::{EML110, EML230, EMLDocument, EMLImportError, EmlHash, RedactedEmlHash},
     investigation::PollingStationInvestigation,
     polling_station,
@@ -344,6 +343,29 @@ pub struct ElectionAndCandidatesDefinitionImportRequest {
     polling_station_file_name: Option<String>,
 }
 
+async fn create_election(
+    conn: &mut SqliteConnection,
+    audit_service: &AuditService,
+    new_election: NewElection,
+    election_data_hash: [String; 16],
+    candidate_data_hash: [String; 16],
+) -> Result<ElectionWithPoliticalGroups, APIError> {
+    let election = crate::election::repository::create(conn, new_election).await?;
+    let message = format!(
+        "Election file hash: {}, candidates file hash: {}",
+        election_data_hash.join(" "),
+        candidate_data_hash.join(" ")
+    );
+    audit_service
+        .log(
+            conn,
+            &AuditEvent::ElectionCreated(election.clone().into()),
+            Some(message),
+        )
+        .await?;
+    Ok(election)
+}
+
 /// Uploads election definition, validates it, saves it to the database, and returns the created election
 #[utoipa::path(
     post,
@@ -358,7 +380,6 @@ pub struct ElectionAndCandidatesDefinitionImportRequest {
     ),
     security(("cookie_auth" = ["administrator"])),
 )]
-#[allow(clippy::too_many_lines)]
 pub async fn election_import(
     _user: Admin,
     State(pool): State<SqlitePool>,
@@ -395,36 +416,25 @@ pub async fn election_import(
 
     // Create new election
     let mut tx = pool.begin_immediate().await?;
-    let election = crate::election::repository::create(&mut tx, new_election).await?;
-    let message = format!(
-        "Election file hash: {}, candidates file hash: {}",
-        election_data_hash.join(" "),
-        candidate_data_hash.join(" ")
-    );
-    audit_service
-        .log(
-            &mut tx,
-            &AuditEvent::ElectionCreated(election.clone().into()),
-            Some(message),
-        )
-        .await?;
+    let election = create_election(
+        &mut tx,
+        &audit_service,
+        new_election,
+        election_data_hash,
+        candidate_data_hash,
+    )
+    .await?;
 
     // Create first committee session for the election
-    let committee_session = crate::committee_session::repository::create(
+    create_committee_session(
         &mut tx,
+        &audit_service,
         CommitteeSessionCreateRequest {
             number: 1,
             election_id: election.id,
         },
     )
     .await?;
-    audit_service
-        .log(
-            &mut tx,
-            &AuditEvent::CommitteeSessionCreated(committee_session.clone().into()),
-            None,
-        )
-        .await?;
 
     // Create polling stations
     if let Some(polling_station_data) = edu.polling_station_data {

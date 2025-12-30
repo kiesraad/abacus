@@ -1,4 +1,4 @@
-import { ApiError, FatalApiError } from "./ApiResult";
+import type { ApiError, FatalApiError } from "./ApiResult";
 
 export class ApiErrorEvent extends Event {
   constructor(public error: ApiError | FatalApiError) {

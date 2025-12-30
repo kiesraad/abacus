@@ -1,10 +1,10 @@
 import eslint from "@eslint/js";
 import tsParser from "@typescript-eslint/parser";
-import importPlugin from "eslint-plugin-import";
-import jsxA11y from "eslint-plugin-jsx-a11y";
+import { defineConfig } from "eslint/config";
+import { createTypeScriptImportResolver } from "eslint-import-resolver-typescript";
+import { createNodeResolver, importX } from "eslint-plugin-import-x";
 import playwright from "eslint-plugin-playwright";
 import reactHooks from "eslint-plugin-react-hooks";
-import reactRefresh from "eslint-plugin-react-refresh";
 import storybook from "eslint-plugin-storybook";
 import { readdirSync } from "fs";
 import globals from "globals";
@@ -20,7 +20,7 @@ const restrictFeatureImports = readdirSync("./src/features", { withFileTypes: tr
     message: "Cross-feature imports are not allowed.",
   }));
 
-export default tseslint.config(
+export default defineConfig(
   {
     // global ignores
     ignores: [
@@ -33,20 +33,15 @@ export default tseslint.config(
     ],
   },
   {
-    files: ["**/*.ts", "**/*.tsx"],
+    files: ["**/*.ts{,x}"],
     extends: [
       eslint.configs.recommended,
       tseslint.configs.strictTypeChecked,
-      importPlugin.flatConfigs.recommended,
-      importPlugin.flatConfigs.typescript,
-      reactRefresh.configs.recommended,
-      jsxA11y.flatConfigs.recommended,
-      reactHooks.configs["recommended-latest"],
+      importX.flatConfigs.recommended,
+      importX.flatConfigs.typescript,
     ],
     rules: {
-      "import/namespace": "off",
-      "jsx-a11y/no-autofocus": "off",
-      "react-refresh/only-export-components": ["warn", { allowConstantExport: true }],
+      "import-x/namespace": "off",
       "@typescript-eslint/no-unsafe-type-assertion": "error",
       "@typescript-eslint/restrict-template-expressions": [
         "error",
@@ -55,8 +50,7 @@ export default tseslint.config(
           allowBoolean: true,
         },
       ],
-      "no-console": process.env.ESLINT_ENV === "production" ? ["error", { allow: ["warn", "error"] }] : "off",
-      "import/no-restricted-paths": [
+      "import-x/no-restricted-paths": [
         "error",
         {
           zones: [
@@ -83,61 +77,44 @@ export default tseslint.config(
       ],
     },
     settings: {
-      "import/resolver": {
-        typescript: true,
-        node: true,
-      },
+      "import-x/resolver-next": [createTypeScriptImportResolver(), createNodeResolver()],
     },
     languageOptions: {
       parser: tsParser,
-      ecmaVersion: 2020,
+      ecmaVersion: 2022,
       parserOptions: {
         project: "**/tsconfig.json",
       },
     },
   },
+  // Enforce Rules of React for frontend code
   {
-    files: ["**/*.js"],
-    extends: [eslint.configs.recommended, importPlugin.flatConfigs.recommended],
-    languageOptions: {
-      ecmaVersion: 2020,
-      globals: {
-        ...globals.browser,
-        ...globals.node,
-      },
-    },
+    files: ["src/**/*.ts{,x}"],
+    extends: [reactHooks.configs["recommended-latest"]],
   },
+  // Enable Playwright rules for e2e tests
   {
-    files: ["**/*.test.ts{,x}", "src/testing/**/*.ts{,x}"],
-    rules: {
-      "@typescript-eslint/no-non-null-assertion": "off",
-      "@typescript-eslint/no-unsafe-type-assertion": "off",
-      "@typescript-eslint/restrict-template-expressions": "off",
-    },
-  },
-  {
-    files: ["**/*.e2e.ts", "e2e-tests/**/*"],
+    files: ["e2e-tests/**/*"],
     extends: [playwright.configs["flat/recommended"]],
-    rules: {
-      "@typescript-eslint/no-floating-promises": "error",
-      "react-hooks/rules-of-hooks": "off",
-      "@typescript-eslint/no-non-null-assertion": "off",
-      "@typescript-eslint/no-unsafe-type-assertion": "off",
-      "@typescript-eslint/restrict-template-expressions": "off",
-    },
   },
+  // Enable Storybook rules for stories
   {
     files: ["**/*.stories.tsx"],
     extends: [storybook.configs["flat/recommended"]],
+  },
+  // Be more lenient for non-production code (test code, e2e test code, Storybook configuration and stories)
+  {
+    files: [
+      "**/*.stories.tsx",
+      "**/*.test.ts{,x}",
+      ".storybook/**/*.ts{,x}",
+      "e2e-tests/**/*",
+      "src/testing/**/*.ts{,x}",
+    ],
     rules: {
       "@typescript-eslint/no-non-null-assertion": "off",
       "@typescript-eslint/no-unsafe-type-assertion": "off",
-    },
-  },
-  {
-    files: [".storybook/**/*.ts{,x}"],
-    rules: {
-      "@typescript-eslint/no-unsafe-type-assertion": "off",
+      "@typescript-eslint/restrict-template-expressions": "off",
     },
   },
 );

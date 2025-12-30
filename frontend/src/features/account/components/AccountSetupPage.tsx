@@ -5,7 +5,7 @@ import { ApplicationError } from "@/api/ApiResult";
 import { useApiState } from "@/api/useApiState";
 import { PageTitle } from "@/components/page_title/PageTitle";
 import { t } from "@/i18n/translate";
-import { LoginResponse } from "@/types/generated/openapi";
+import type { LoginResponse } from "@/types/generated/openapi";
 
 import { AccountSetupForm } from "./AccountSetupForm";
 

@@ -33,7 +33,7 @@ test.describe("resolve differences", () => {
     await expect(resolveDifferencesPage.secondValue).toHaveClass(/discard/);
     await resolveDifferencesPage.save.click();
 
-    await expect(electionStatusPage.firstEntryFinished).toContainText(pollingStation.name + "Sam Kuijpers");
+    await expect(electionStatusPage.firstEntryFinished).toContainText(`${pollingStation.name}Sam Kuijpers`);
     await expect(electionStatusPage.alertDifferencesResolved).toBeVisible();
     await expect(electionStatusPage.alertDifferencesResolved).toContainText(
       "Omdat er nog maar één invoer over is, moet er een nieuwe tweede invoer gedaan worden. Kies hiervoor een andere invoerder dan Sam Kuijpers.",
@@ -52,7 +52,7 @@ test.describe("resolve differences", () => {
     await expect(resolveDifferencesPage.secondValue).toHaveClass(/keep/);
     await resolveDifferencesPage.save.click();
 
-    await expect(electionStatusPage.firstEntryFinished).toContainText(pollingStation.name + "Aliyah van den Berg");
+    await expect(electionStatusPage.firstEntryFinished).toContainText(`${pollingStation.name}Aliyah van den Berg`);
     await expect(electionStatusPage.alertDifferencesResolved).toBeVisible();
     await expect(electionStatusPage.alertDifferencesResolved).toContainText(
       "Omdat er nog maar één invoer over is, moet er een nieuwe tweede invoer gedaan worden. Kies hiervoor een andere invoerder dan Aliyah van den Berg.",

@@ -72,8 +72,7 @@
         "useExhaustiveDependencies": "off"
       },
       "style": {
-        "useImportType": "off",
-        "useTemplate": "off"
+        "useImportType": "off"
       }
     }
   },

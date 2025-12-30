@@ -1,4 +1,5 @@
 use serde::{Deserialize, Serialize};
+use std::slice::Iter;
 
 use crate::{
     APIError,
@@ -166,15 +167,13 @@ pub(super) struct VotesTable {
 }
 
 impl VotesTable {
-    #[allow(clippy::too_many_lines)]
-    pub fn new(
-        group: &PoliticalGroup,
+    fn get_votes_table_columns(
+        candidate_iterator: &mut Iter<Candidate>,
         candidate_votes: Option<&PoliticalGroupCandidateVotes>,
         previous_candidate_votes: Option<&PoliticalGroupCandidateVotes>,
         column_sizes: [usize; 4],
-    ) -> Result<Self, APIError> {
+    ) -> Result<Vec<VotesTableColumn>, APIError> {
         let mut columns = Vec::new();
-        let mut candidate_iterator = group.candidates.iter();
 
         for max_per_column in &column_sizes {
             let mut column_votes = Vec::new();
@@ -217,7 +216,24 @@ impl VotesTable {
                 votes: column_votes,
             });
         }
+        Ok(columns)
+    }
 
+    pub fn new(
+        group: &PoliticalGroup,
+        candidate_votes: Option<&PoliticalGroupCandidateVotes>,
+        previous_candidate_votes: Option<&PoliticalGroupCandidateVotes>,
+        column_sizes: [usize; 4],
+    ) -> Result<Self, APIError> {
+        let mut candidate_iterator = group.candidates.iter();
+        let columns = Self::get_votes_table_columns(
+            &mut candidate_iterator,
+            candidate_votes,
+            previous_candidate_votes,
+            column_sizes,
+        )?;
+
+        // sanity check: there should not be more candidates than expected in political group
         if candidate_iterator.next().is_some() {
             return Err(APIError::DataIntegrityError(format!(
                 "More candidates than expected in political group {}",

@@ -68,7 +68,7 @@ export function LogDetailsModal({ details, setDetails }: LogDetailsModalProps) {
       }}
     >
       <div>
-        <dl className={cls.details} role="list">
+        <dl id="log_description_list" className={cls.details}>
           <dt>{t("log.id")}</dt>
           <dd>{details.id}</dd>
           <dt>{t("log.header.time")}</dt>
@@ -105,7 +105,7 @@ export function LogDetailsModal({ details, setDetails }: LogDetailsModalProps) {
         {filteredDetails.length > 0 && (
           <>
             <h3>{t("log.header.details")}</h3>
-            <dl className={cls.details} role="list">
+            <dl id="log_details_description_list" className={cls.details}>
               {filteredDetails.map(([key, translationKey, value]) => (
                 <Fragment key={key}>
                   <dt>{t(translationKey)}</dt>

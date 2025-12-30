@@ -228,7 +228,7 @@ describe("InvestigationReasonPage", () => {
 
     const deleteInvestigation = spyOnHandler(PollingStationInvestigationDeleteHandler);
 
-    const confirmButton = await within(modal).findByRole("button", { name: "Verwijderen" });
+    const confirmButton = await within(modal).findByRole("button", { name: /Verwijderen/ });
     await user.click(confirmButton);
 
     expect(deleteInvestigation).toHaveBeenCalled();
@@ -260,7 +260,7 @@ describe("InvestigationReasonPage", () => {
 
     const deleteInvestigation = spyOnHandler(PollingStationInvestigationDeleteHandler);
 
-    const confirmButton = await within(modal).findByRole("button", { name: "Verwijderen" });
+    const confirmButton = await within(modal).findByRole("button", { name: /Verwijderen/ });
     await user.click(confirmButton);
 
     expect(deleteInvestigation).toHaveBeenCalled();

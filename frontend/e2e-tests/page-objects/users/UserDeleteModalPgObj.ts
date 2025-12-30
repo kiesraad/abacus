@@ -6,6 +6,6 @@ export class UserDeleteModal {
 
   constructor(protected readonly page: Page) {
     this.modal = page.getByRole("dialog");
-    this.delete = this.modal.getByRole("button", { name: "Verwijderen" });
+    this.delete = this.modal.getByRole("button", { name: /Verwijderen/ });
   }
 }

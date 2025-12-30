@@ -27,11 +27,11 @@ describe("UserDelete", () => {
     const { onDeleted } = renderComponent();
 
     const user = userEvent.setup();
-    await user.click(screen.getByRole("button", { name: "Gebruiker verwijderen" }));
+    await user.click(screen.getByRole("button", { name: /Gebruiker verwijderen/ }));
 
     expect(await screen.findByRole("dialog")).toBeInTheDocument();
 
-    await user.click(screen.getByRole("button", { name: "Verwijderen" }));
+    await user.click(screen.getByRole("button", { name: /Verwijderen/ }));
     expect(deleteUser).toHaveBeenCalledOnce();
     expect(onDeleted).toHaveBeenCalledOnce();
   });
@@ -40,7 +40,7 @@ describe("UserDelete", () => {
     const { onDeleted } = renderComponent();
 
     const user = userEvent.setup();
-    await user.click(screen.getByRole("button", { name: "Gebruiker verwijderen" }));
+    await user.click(screen.getByRole("button", { name: /Gebruiker verwijderen/ }));
 
     expect(await screen.findByRole("dialog")).toBeInTheDocument();
 
@@ -60,11 +60,11 @@ describe("UserDelete", () => {
     const { onDeleted, onError } = renderComponent();
 
     const user = userEvent.setup();
-    await user.click(screen.getByRole("button", { name: "Gebruiker verwijderen" }));
+    await user.click(screen.getByRole("button", { name: /Gebruiker verwijderen/ }));
 
     expect(await screen.findByRole("dialog")).toBeInTheDocument();
 
-    await user.click(screen.getByRole("button", { name: "Verwijderen" }));
+    await user.click(screen.getByRole("button", { name: /Verwijderen/ }));
 
     expect(onError).toHaveBeenCalledOnce();
     expect(onDeleted).not.toHaveBeenCalledOnce();

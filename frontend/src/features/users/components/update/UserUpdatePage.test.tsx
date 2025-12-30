@@ -39,10 +39,10 @@ describe("UserUpdatePage", () => {
     expect(await screen.findByRole("heading", { level: 2, name: "Details van het account" })).toBeInTheDocument();
 
     const user = userEvent.setup();
-    await user.click(screen.getByRole("button", { name: "Gebruiker verwijderen" }));
+    await user.click(screen.getByRole("button", { name: /Gebruiker verwijderen/ }));
     expect(await screen.findByRole("dialog")).toBeVisible();
 
-    await user.click(screen.getByRole("button", { name: "Verwijderen" }));
+    await user.click(screen.getByRole("button", { name: /Verwijderen/ }));
 
     const expectedMessage = "Het account van Sanne Molenaar is verwijderd";
     expect(navigate).toHaveBeenCalledExactlyOnceWith(`/users?deleted=${encodeURIComponent(expectedMessage)}`, {
@@ -57,7 +57,7 @@ describe("UserUpdatePage", () => {
     render(<UserUpdatePage></UserUpdatePage>);
     await screen.findByRole("heading", { level: 2, name: "Details van het account" });
 
-    expect(screen.queryByRole("button", { name: "Gebruiker verwijderen" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /Gebruiker verwijderen/ })).not.toBeInTheDocument();
   });
 
   test("delete button should be visible if its a different user", async () => {
@@ -67,7 +67,7 @@ describe("UserUpdatePage", () => {
     render(<UserUpdatePage></UserUpdatePage>);
     await screen.findByRole("heading", { level: 2, name: "Details van het account" });
 
-    expect(screen.queryByRole("button", { name: "Gebruiker verwijderen" })).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /Gebruiker verwijderen/ })).toBeInTheDocument();
   });
 
   test("Authorization error should be shown when insufficient rights", async () => {

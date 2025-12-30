@@ -57,7 +57,7 @@ function formatTable(routeInfos: RouteInfo[]) {
   const BOLD = "\x1b[1m";
 
   console.log(`\n${BOLD}${"Route path".padEnd(maxPathLength)} | Authorisation${RESET}`);
-  console.log("-".repeat(maxPathLength) + "-+-" + "-".repeat(maxAccessLength));
+  console.log(`${"-".repeat(maxPathLength)}-+-${"-".repeat(maxAccessLength)}`);
 
   let errorCount = 0;
   for (const route of sorted) {

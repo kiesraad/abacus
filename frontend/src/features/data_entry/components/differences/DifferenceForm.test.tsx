@@ -415,8 +415,8 @@ describe("Test DifferencesForm", () => {
         differencesFieldIds.isDifferenceCompletelyAccountedForNo,
       ];
       const expectedInvalidInputFieldIds = [
-        "data." + differencesFieldIds.moreBallotsCount,
-        "data." + differencesFieldIds.fewerBallotsCount,
+        `data.${differencesFieldIds.moreBallotsCount}`,
+        `data.${differencesFieldIds.fewerBallotsCount}`,
       ];
       expectCheckboxToBeValidAndToNotHaveAccessibleErrorMessage(expectedValidCheckboxFieldIds);
       expectFieldsToHaveIconAndToHaveAccessibleName(expectedInvalidInputFieldIds, "bevat een fout");
@@ -457,7 +457,7 @@ describe("Test DifferencesForm", () => {
         differencesFieldIds.isDifferenceCompletelyAccountedForNo,
       ];
       const expectedValidInputFieldIds = [differencesFieldIds.fewerBallotsCount];
-      const expectedInvalidInputFieldIds = ["data." + differencesFieldIds.moreBallotsCount];
+      const expectedInvalidInputFieldIds = [`data.${differencesFieldIds.moreBallotsCount}`];
       expectCheckboxToBeValidAndToNotHaveAccessibleErrorMessage(expectedValidCheckboxFieldIds);
       expectInputToBeValidAndToNotHaveAccessibleErrorMessage(expectedValidInputFieldIds);
       expectInputToNotHaveIcon(expectedValidInputFieldIds);
@@ -499,8 +499,8 @@ describe("Test DifferencesForm", () => {
         differencesFieldIds.isDifferenceCompletelyAccountedForNo,
       ];
       const expectedInvalidInputFieldIds = [
-        "data." + differencesFieldIds.moreBallotsCount,
-        "data." + differencesFieldIds.fewerBallotsCount,
+        `data.${differencesFieldIds.moreBallotsCount}`,
+        `data.${differencesFieldIds.fewerBallotsCount}`,
       ];
       expectCheckboxToBeValidAndToNotHaveAccessibleErrorMessage(expectedValidCheckboxFieldIds);
       expectFieldsToHaveIconAndToHaveAccessibleName(expectedInvalidInputFieldIds, "bevat een fout");
@@ -541,7 +541,7 @@ describe("Test DifferencesForm", () => {
         differencesFieldIds.isDifferenceCompletelyAccountedForNo,
       ];
       const expectedValidInputFieldIds = [differencesFieldIds.moreBallotsCount];
-      const expectedInvalidInputFieldIds = ["data." + differencesFieldIds.fewerBallotsCount];
+      const expectedInvalidInputFieldIds = [`data.${differencesFieldIds.fewerBallotsCount}`];
       expectCheckboxToBeValidAndToNotHaveAccessibleErrorMessage(expectedValidCheckboxFieldIds);
       expectInputToBeValidAndToNotHaveAccessibleErrorMessage(expectedValidInputFieldIds);
       expectInputToNotHaveIcon(expectedValidInputFieldIds);
@@ -583,8 +583,8 @@ describe("Test DifferencesForm", () => {
         differencesFieldIds.isDifferenceCompletelyAccountedForNo,
       ];
       const expectedInvalidInputFieldIds = [
-        "data." + differencesFieldIds.moreBallotsCount,
-        "data." + differencesFieldIds.fewerBallotsCount,
+        `data.${differencesFieldIds.moreBallotsCount}`,
+        `data.${differencesFieldIds.fewerBallotsCount}`,
       ];
       expectCheckboxToBeValidAndToNotHaveAccessibleErrorMessage(expectedValidCheckboxFieldIds);
       expectFieldsToHaveIconAndToHaveAccessibleName(expectedInvalidInputFieldIds, "bevat een fout");

@@ -86,8 +86,7 @@
         "useTemplate": "off"
       },
       "suspicious": {
-        "noArrayIndexKey": "off",
-        "noImplicitAnyLet": "off"
+        "noArrayIndexKey": "off"
       }
     }
   },

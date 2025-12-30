@@ -37,10 +37,12 @@ export function DifferencesTable({ title, headers, rows, action }: DifferencesTa
   const id = useId();
   // An array of indices for rows that are different, also used to detect row gaps.
   // Two falsy values are considered equal (e.g. 0 and undefined)
-  const differences = rows.reduce<number[]>(
-    (show, row, index) => (row.first === row.second || (!row.first && !row.second) ? show : [...show, index]),
-    [],
-  );
+  const differences = rows.reduce<number[]>((show, row, index) => {
+    if (row.first !== row.second && (row.first || row.second)) {
+      show.push(index);
+    }
+    return show;
+  }, []);
 
   if (differences.length === 0) {
     return null;

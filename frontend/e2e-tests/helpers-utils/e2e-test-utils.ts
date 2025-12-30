@@ -1,4 +1,4 @@
-import { webcrypto as crypto } from "crypto";
+import { webcrypto as crypto } from "node:crypto";
 
 const numberFormatter = new Intl.NumberFormat("nl-NL", {
   maximumFractionDigits: 0,

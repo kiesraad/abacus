@@ -1,5 +1,5 @@
-import fs from "fs/promises";
-import path from "path";
+import fs from "node:fs/promises";
+import path from "node:path";
 import { describe, expect, test } from "vitest";
 
 import { generate } from "../../scripts/openapi/generator";

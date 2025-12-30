@@ -76,7 +76,6 @@
         "noAccumulatingSpread": "off"
       },
       "style": {
-        "useConst": "off",
         "useImportType": "off",
         "useTemplate": "off"
       },

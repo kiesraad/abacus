@@ -1,6 +1,6 @@
-import { ReactNode, useRef } from "react";
+import { type ReactNode, useRef } from "react";
 
-import { Message, MessagesContext } from "@/hooks/messages/MessagesContext";
+import { type Message, MessagesContext } from "@/hooks/messages/MessagesContext";
 
 export function MessagesProvider({ children }: { children: ReactNode }) {
   const messages = useRef<Message[]>([]);

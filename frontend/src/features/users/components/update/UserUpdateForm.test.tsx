@@ -1,11 +1,11 @@
 import { userEvent } from "@testing-library/user-event";
-import { beforeEach, describe, expect, Mock, test, vi } from "vitest";
+import { beforeEach, describe, expect, type Mock, test, vi } from "vitest";
 
 import { UserUpdateRequestHandler } from "@/testing/api-mocks/RequestHandlers";
 import { userMockData } from "@/testing/api-mocks/UserMockData";
 import { overrideOnce, server } from "@/testing/server";
 import { render, screen, spyOnHandler } from "@/testing/test-utils";
-import { USER_UPDATE_REQUEST_PATH, User } from "@/types/generated/openapi";
+import type { USER_UPDATE_REQUEST_PATH, User } from "@/types/generated/openapi";
 
 import { UserUpdateForm } from "./UserUpdateForm";
 

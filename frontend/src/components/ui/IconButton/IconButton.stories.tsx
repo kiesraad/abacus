@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 import { expect } from "storybook/test";
 
 import { IconCross } from "@/components/generated/icons";
-import { ButtonVariant, Size } from "@/types/ui";
+import type { ButtonVariant, Size } from "@/types/ui";
 
 import { IconButton } from "./IconButton";
 

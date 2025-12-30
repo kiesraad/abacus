@@ -1,4 +1,4 @@
-import { Dispatch, ReactNode, SetStateAction } from "react";
+import type { Dispatch, ReactNode, SetStateAction } from "react";
 
 import { IconError, IconWarning } from "@/components/generated/icons";
 import { Badge } from "@/components/ui/Badge/Badge";
@@ -10,7 +10,7 @@ import { cn } from "@/utils/classnames";
 import { removeLeadingZeros } from "@/utils/strings";
 
 import { useSingleCall } from "../hooks/useSingleCall";
-import { PollingStationUserStatus, PollingStationWithStatus } from "../utils/util";
+import { PollingStationUserStatus, type PollingStationWithStatus } from "../utils/util";
 import cls from "./PollingStationChoice.module.css";
 
 interface FeedbackMessageProps {

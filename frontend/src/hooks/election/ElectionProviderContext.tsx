@@ -1,7 +1,7 @@
 import { createContext } from "react";
 
-import { ApiResult } from "@/api/ApiResult";
-import {
+import type { ApiResult } from "@/api/ApiResult";
+import type {
   CommitteeSession,
   ElectionDetailsResponse,
   ElectionWithPoliticalGroups,

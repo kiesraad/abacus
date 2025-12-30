@@ -1,5 +1,5 @@
 import { useInitialApiGetWithErrors } from "@/api/useInitialApiGet";
-import {
+import type {
   CommitteeSession,
   ELECTION_DETAILS_REQUEST_PATH,
   ElectionWithPoliticalGroups,

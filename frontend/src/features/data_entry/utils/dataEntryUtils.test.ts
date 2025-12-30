@@ -1,8 +1,8 @@
 import { describe, expect, test } from "vitest";
 
 import { validationResultMockData } from "@/testing/api-mocks/ValidationResultMockData";
-import { ValidationResult, ValidationResultCode } from "@/types/generated/openapi";
-import { DataEntrySection } from "@/types/types";
+import type { ValidationResult, ValidationResultCode } from "@/types/generated/openapi";
+import type { DataEntrySection } from "@/types/types";
 import { ValidationResultSet } from "@/utils/ValidationResults";
 
 import {

@@ -6,7 +6,7 @@ import { ElectionRequestHandler } from "@/testing/api-mocks/RequestHandlers";
 import { server } from "@/testing/server";
 import { TestUserProvider } from "@/testing/TestUserProvider";
 import { render, screen } from "@/testing/test-utils";
-import { Role } from "@/types/generated/openapi";
+import type { Role } from "@/types/generated/openapi";
 
 import { NavBar } from "./NavBar";
 import { NavBarLinks } from "./NavBarLinks";

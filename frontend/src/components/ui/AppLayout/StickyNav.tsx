@@ -1,15 +1,15 @@
-import * as React from "react";
+import { type ReactNode, useEffect, useRef } from "react";
 
 import cls from "./StickyNav.module.css";
 
 export interface StickyNavProps {
-  children: React.ReactNode;
+  children: ReactNode;
 }
 
 export function StickyNav({ children }: StickyNavProps) {
-  const navRef = React.useRef<HTMLDivElement>(null);
+  const navRef = useRef<HTMLDivElement>(null);
 
-  React.useEffect(() => {
+  useEffect(() => {
     const nav = navRef.current;
     const parent = nav?.parentElement;
     if (nav && parent) {
@@ -17,7 +17,7 @@ export function StickyNav({ children }: StickyNavProps) {
 
       // The sticky nav element is used inside a parent element (main)
       // the nav needs to stretch to the available height of the viewport,
-      // but adjusted with a top and bottom offset that is used to set the max-height in css
+      // but adjusted with a top and bottom offset that is used to set the max-height in CSS
       const updateTopAndBottomOffset = () => {
         const navTop = nav.getBoundingClientRect().top;
 

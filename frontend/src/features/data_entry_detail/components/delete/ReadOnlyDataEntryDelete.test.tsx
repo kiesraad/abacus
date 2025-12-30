@@ -1,11 +1,11 @@
 import { userEvent } from "@testing-library/user-event";
-import { beforeEach, describe, expect, Mock, test, vi } from "vitest";
+import { beforeEach, describe, expect, type Mock, test, vi } from "vitest";
 
 import { pollingStationMockData } from "@/testing/api-mocks/PollingStationMockData";
 import { PollingStationDataEntriesAndResultDeleteHandler } from "@/testing/api-mocks/RequestHandlers";
 import { overrideOnce, server } from "@/testing/server";
 import { render, screen, spyOnHandler } from "@/testing/test-utils";
-import {
+import type {
   DataEntryStatusName,
   POLLING_STATION_DATA_ENTRIES_AND_RESULT_DELETE_REQUEST_PATH,
 } from "@/types/generated/openapi";

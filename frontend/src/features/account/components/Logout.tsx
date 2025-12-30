@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 
-import { AnyApiError, isError } from "@/api/ApiResult";
+import { type AnyApiError, isError } from "@/api/ApiResult";
 import { useApiState } from "@/api/useApiState";
 import { Loader } from "@/components/ui/Loader/Loader";
 

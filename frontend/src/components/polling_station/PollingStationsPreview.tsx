@@ -3,7 +3,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/Button/Button";
 import { Table } from "@/components/ui/Table/Table";
 import { t } from "@/i18n/translate";
-import { PollingStationRequest } from "@/types/generated/openapi";
+import type { PollingStationRequest } from "@/types/generated/openapi";
 
 export interface PollingStationsPreviewProps {
   pollingStations: PollingStationRequest[];

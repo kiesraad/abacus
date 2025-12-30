@@ -14,7 +14,7 @@ import { useElectionStatus } from "@/hooks/election/useElectionStatus";
 import { useLiveData } from "@/hooks/useLiveData";
 import { useUserRole } from "@/hooks/user/useUserRole";
 import { t } from "@/i18n/translate";
-import {
+import type {
   COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_BODY,
   COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_PATH,
   CommitteeSessionStatus,

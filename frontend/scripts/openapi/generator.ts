@@ -5,7 +5,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { promisify } from "node:util";
 
-import {
+import type {
   NonArraySchemaObjectType,
   OpenAPIV3,
   OperationObject,

@@ -10,7 +10,7 @@ import { KeyboardKeys } from "@/components/ui/KeyboardKeys/KeyboardKeys";
 import { useElection } from "@/hooks/election/useElection";
 import { useElectionStatus } from "@/hooks/election/useElectionStatus";
 import { useUser } from "@/hooks/user/useUser";
-import { TranslationPath } from "@/i18n/i18n.types";
+import type { TranslationPath } from "@/i18n/i18n.types";
 import { t, tx } from "@/i18n/translate";
 import { KeyboardKey } from "@/types/ui";
 import { cn } from "@/utils/classnames";
@@ -21,7 +21,7 @@ import {
   getPollingStationWithStatusList,
   getUrlForDataEntry,
   PollingStationUserStatus,
-  PollingStationWithStatus,
+  type PollingStationWithStatus,
 } from "../utils/util";
 import cls from "./PollingStationChoice.module.css";
 import { PollingStationLink } from "./PollingStationLink";

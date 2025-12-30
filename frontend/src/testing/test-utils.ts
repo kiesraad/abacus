@@ -1,8 +1,8 @@
-import { RenderOptions, render, screen } from "@testing-library/react";
-import { UserEvent } from "@testing-library/user-event";
-import { HttpHandler } from "msw";
-import { ReactElement } from "react";
-import { createMemoryRouter, RouteObject } from "react-router";
+import { type RenderOptions, render, screen } from "@testing-library/react";
+import type { UserEvent } from "@testing-library/user-event";
+import type { HttpHandler } from "msw";
+import type { ReactElement } from "react";
+import { createMemoryRouter, type RouteObject } from "react-router";
 import { expect, vi } from "vitest";
 
 import { Providers } from "./Providers";
@@ -12,11 +12,11 @@ import { server } from "./server";
 const customRender = (ui: ReactElement, options?: Omit<RenderOptions, "wrapper">) =>
   render(ui, { wrapper: Providers, ...options });
 
-/* eslint-disable import/export */
+/* eslint-disable import-x/export */
 // Re-export everything in RTL but shadow the original `render` with our custom implementation.
 export * from "@testing-library/react";
 export { customRender as render };
-/* eslint-enable import/export */
+/* eslint-enable import-x/export */
 
 export const setupTestRouter = (routes: RouteObject[]) => {
   return createMemoryRouter(routes);

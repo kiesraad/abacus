@@ -1,5 +1,5 @@
-import { TranslationPath } from "@/i18n/i18n.types";
-import { ErrorReference } from "@/types/generated/openapi";
+import type { TranslationPath } from "@/i18n/i18n.types";
+import type { ErrorReference } from "@/types/generated/openapi";
 
 export class FatalError extends Error {}
 
@@ -101,8 +101,4 @@ export function isError<T>(result: ApiResult<T>): result is Error {
 
 export function isSuccess<T>(result: ApiResult<T>): result is ApiResponse<T> {
   return !isError(result);
-}
-
-export function isFatalError(error: ApiResult<unknown>): error is FatalError {
-  return error instanceof FatalError;
 }

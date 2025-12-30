@@ -1,4 +1,4 @@
-import { FormEvent, useState } from "react";
+import { type FormEvent, useState } from "react";
 import { useNavigate } from "react-router";
 
 import { isSuccess } from "@/api/ApiResult";
@@ -11,7 +11,7 @@ import { Loader } from "@/components/ui/Loader/Loader";
 import { useElection } from "@/hooks/election/useElection";
 import { useMessages } from "@/hooks/messages/useMessages";
 import { t } from "@/i18n/translate";
-import {
+import type {
   POLLING_STATION_INVESTIGATION_CREATE_REQUEST_PATH,
   POLLING_STATION_INVESTIGATION_UPDATE_REQUEST_PATH,
   PollingStationInvestigation,

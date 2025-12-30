@@ -2,12 +2,12 @@ import { useCallback, useEffect, useState } from "react";
 
 import { DEFAULT_CANCEL_REASON } from "./ApiClient";
 import {
-  ApiRequestState,
-  ApiRequestStateWithoutFatalErrors,
+  type ApiRequestState,
+  type ApiRequestStateWithoutFatalErrors,
   fromApiResult,
   isFatalRequestState,
 } from "./ApiRequestState";
-import { AbortedError, ApiResult } from "./ApiResult";
+import { AbortedError, type ApiResult } from "./ApiResult";
 import { useApiClient } from "./useApiClient";
 
 /// Header to indicate that the session should not be extended, only the existence is checked, not the value

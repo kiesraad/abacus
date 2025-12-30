@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/no-unsafe-type-assertion -- this file relies on many TypeScript unsafe type assertions */
-import { Fragment, JSX, ReactElement } from "react";
+import { Fragment, type JSX, type ReactElement } from "react";
 import { Link } from "react-router";
 
-import { RenderFunction } from "./i18n.types";
+import type { RenderFunction } from "./i18n.types";
 
 type AST = Array<Element | string>;
 

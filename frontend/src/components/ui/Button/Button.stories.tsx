@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { expect, fireEvent, fn } from "storybook/test";
 
-import { ButtonVariant, Size } from "@/types/ui";
+import type { ButtonVariant, Size } from "@/types/ui";
 
 import { Button } from "./Button";
 

@@ -1,6 +1,6 @@
-import { FormEvent, useState } from "react";
+import { type FormEvent, useState } from "react";
 
-import { AnyApiError, ApiError, isSuccess } from "@/api/ApiResult";
+import { type AnyApiError, ApiError, isSuccess } from "@/api/ApiResult";
 import { useCrud } from "@/api/useCrud";
 import { Alert } from "@/components/ui/Alert/Alert";
 import { Button } from "@/components/ui/Button/Button";
@@ -8,10 +8,10 @@ import { Form } from "@/components/ui/Form/Form";
 import { FormLayout } from "@/components/ui/Form/FormLayout";
 import { InputField } from "@/components/ui/InputField/InputField";
 import { t } from "@/i18n/translate";
-import { ACCOUNT_UPDATE_REQUEST_PATH, AccountUpdateRequest, LoginResponse } from "@/types/generated/openapi";
+import type { ACCOUNT_UPDATE_REQUEST_PATH, AccountUpdateRequest, LoginResponse } from "@/types/generated/openapi";
 import { StringFormData } from "@/utils/stringFormData";
 
-import { UserValidationErrors, validateUpdateUser } from "../util/validate";
+import { type UserValidationErrors, validateUpdateUser } from "../util/validate";
 
 interface AccountSetupFormProps {
   user: LoginResponse;

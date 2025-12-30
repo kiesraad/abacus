@@ -1,4 +1,4 @@
-import { DataEntryResults, DataEntrySection } from "@/types/types";
+import type { DataEntryResults, DataEntrySection } from "@/types/types";
 import { mapResultsToSectionValues } from "@/utils/dataEntryMapping";
 
 export function sectionHasDifferences(

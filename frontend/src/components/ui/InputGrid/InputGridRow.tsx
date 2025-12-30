@@ -1,5 +1,4 @@
-import * as React from "react";
-import { ReactNode } from "react";
+import { type ChangeEvent, type ReactNode, useEffect, useRef } from "react";
 
 import { cn } from "@/utils/classnames";
 import { formatNumber } from "@/utils/number";
@@ -23,7 +22,7 @@ export interface InputGridRowProps {
   addSeparator?: boolean;
   autoFocusInput?: boolean;
   value?: string | number;
-  onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onChange?: (e: ChangeEvent<HTMLInputElement>) => void;
   readOnly?: boolean;
 }
 
@@ -53,9 +52,9 @@ export function InputGridRow({
   const errorMessage =
     errorMessageId || (hasError ? "feedback-error" : hasUnacceptedWarning ? "feedback-warning" : undefined);
 
-  const inputRef = React.useRef<HTMLInputElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (errorMessageId) {
       inputRef.current?.focus();
       // calling scrollIntoView directly doesn't always scroll properly

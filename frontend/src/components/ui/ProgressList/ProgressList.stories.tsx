@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { CSSProperties } from "react";
+import type { CSSProperties } from "react";
 
 import { electionMockData } from "@/testing/api-mocks/ElectionMockData";
 import { getDataEntryStructure } from "@/utils/dataEntryStructure";

@@ -4,7 +4,7 @@ import { PageTitle } from "@/components/page_title/PageTitle";
 import { useElection } from "@/hooks/election/useElection";
 import { useMessages } from "@/hooks/messages/useMessages";
 import { t } from "@/i18n/translate";
-import { PollingStation } from "@/types/generated/openapi";
+import type { PollingStation } from "@/types/generated/openapi";
 
 import { PollingStationAlert } from "./PollingStationAlert";
 import { PollingStationForm } from "./PollingStationForm";

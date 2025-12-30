@@ -1,5 +1,5 @@
-import { DataEntryState, DataEntryStateLoaded } from "@/features/data_entry/types/types";
-import { FormSectionId } from "@/types/types";
+import type { DataEntryState, DataEntryStateLoaded } from "@/features/data_entry/types/types";
+import type { FormSectionId } from "@/types/types";
 
 export function getBaseUrl(electionId: number, pollingStationId: number, entryNumber: number) {
   return `/elections/${electionId}/data-entry/${pollingStationId}/${entryNumber}`;

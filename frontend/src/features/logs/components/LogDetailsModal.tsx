@@ -1,9 +1,9 @@
 import { Fragment } from "react";
 
 import { Modal } from "@/components/ui/Modal/Modal";
-import { TranslationPath } from "@/i18n/i18n.types";
+import type { TranslationPath } from "@/i18n/i18n.types";
 import { t } from "@/i18n/translate";
-import { AuditEvent, AuditLogEvent } from "@/types/generated/openapi";
+import type { AuditEvent, AuditLogEvent } from "@/types/generated/openapi";
 import { formatDateTimeFull } from "@/utils/dateTime";
 
 import cls from "./LogsHomePage.module.css";
@@ -68,7 +68,7 @@ export function LogDetailsModal({ details, setDetails }: LogDetailsModalProps) {
       }}
     >
       <div>
-        <dl className={cls.details} role="list">
+        <dl id="log_description_list" className={cls.details}>
           <dt>{t("log.id")}</dt>
           <dd>{details.id}</dd>
           <dt>{t("log.header.time")}</dt>
@@ -105,7 +105,7 @@ export function LogDetailsModal({ details, setDetails }: LogDetailsModalProps) {
         {filteredDetails.length > 0 && (
           <>
             <h3>{t("log.header.details")}</h3>
-            <dl className={cls.details} role="list">
+            <dl id="log_details_description_list" className={cls.details}>
               {filteredDetails.map(([key, translationKey, value]) => (
                 <Fragment key={key}>
                   <dt>{t(translationKey)}</dt>

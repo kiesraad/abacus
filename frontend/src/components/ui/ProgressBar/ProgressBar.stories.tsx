@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
-import { ProgressBar, ProgressBarProps } from "./ProgressBar";
+import { ProgressBar, type ProgressBarProps } from "./ProgressBar";
 
 export const DefaultProgressBar: StoryObj<ProgressBarProps> = {
   render: ({ id = "test", title, data = { percentage: 47, class: "default" }, spacing, showPercentage = true }) => (

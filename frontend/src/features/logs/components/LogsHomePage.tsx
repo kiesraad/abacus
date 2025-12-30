@@ -8,7 +8,7 @@ import { Loader } from "@/components/ui/Loader/Loader";
 import { Pagination } from "@/components/ui/Pagination/Pagination";
 import { Toolbar } from "@/components/ui/Toolbar/Toolbar";
 import { t } from "@/i18n/translate";
-import { AuditLogEvent } from "@/types/generated/openapi";
+import type { AuditLogEvent } from "@/types/generated/openapi";
 
 import { useAuditLog } from "../hooks/useAuditLog";
 import { LogDetailsModal } from "./LogDetailsModal";

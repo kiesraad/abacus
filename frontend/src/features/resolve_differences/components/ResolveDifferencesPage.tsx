@@ -11,7 +11,7 @@ import { useMessages } from "@/hooks/messages/useMessages";
 import { useNumericParam } from "@/hooks/useNumericParam";
 import { useUsers } from "@/hooks/user/useUsers";
 import { t } from "@/i18n/translate";
-import { DataEntryStatusName } from "@/types/generated/openapi";
+import type { DataEntryStatusName } from "@/types/generated/openapi";
 
 import { usePollingStationDataEntryDifferences } from "../hooks/usePollingStationDataEntryDifferences";
 import cls from "./ResolveDifferences.module.css";

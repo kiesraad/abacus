@@ -2,8 +2,8 @@ import { Link } from "react-router";
 
 import { StatusList } from "@/components/ui/StatusList/StatusList";
 import { hasTranslation, t, tx } from "@/i18n/translate";
-import { ValidationResult, ValidationResults } from "@/types/generated/openapi";
-import { DataEntrySection } from "@/types/types";
+import type { ValidationResult, ValidationResults } from "@/types/generated/openapi";
+import type { DataEntrySection } from "@/types/types";
 import { dottedCode, getValidationResultSetForSection } from "@/utils/ValidationResults";
 
 import cls from "./ErrorsAndWarningsOverview.module.css";
@@ -56,9 +56,9 @@ function OverviewItem({ data: { code, context }, status }: { data: ValidationRes
 
   return (
     <StatusList.Item status={status}>
-      <div className="bold" role="heading" aria-level={4}>
+      <h4 className={cls.heading}>
         {dottedCode(code)} {title}
-      </div>
+      </h4>
       {content && <div className="content">{content}</div>}
       {actions && <div className={cls.actions}>{actions}</div>}
     </StatusList.Item>

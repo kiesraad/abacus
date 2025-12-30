@@ -1,5 +1,5 @@
 import { render, screen } from "@testing-library/react";
-import { describe, expect, Mock, test, vi } from "vitest";
+import { describe, expect, type Mock, test, vi } from "vitest";
 
 import { useMessages } from "@/hooks/messages/useMessages";
 

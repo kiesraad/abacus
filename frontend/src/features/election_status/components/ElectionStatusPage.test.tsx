@@ -25,7 +25,7 @@ import {
   spyOnHandler,
 } from "@/testing/test-utils";
 import { getAdminUser, getCoordinatorUser, getTypistUser } from "@/testing/user-mock-data";
-import {
+import type {
   ElectionDetailsResponse,
   ElectionStatusResponse,
   ErrorResponse,

@@ -1,9 +1,9 @@
 import { useState } from "react";
 
-import { AnyApiError, ApiError } from "@/api/ApiResult";
+import { type AnyApiError, ApiError } from "@/api/ApiResult";
 import { Button } from "@/components/ui/Button/Button";
 import { Modal } from "@/components/ui/Modal/Modal";
-import { TranslationPath } from "@/i18n/i18n.types";
+import type { TranslationPath } from "@/i18n/i18n.types";
 import { t } from "@/i18n/translate";
 
 interface ErrorModalProps {

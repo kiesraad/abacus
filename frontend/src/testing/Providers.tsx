@@ -1,16 +1,16 @@
-import * as React from "react";
+import type { ReactNode } from "react";
 import { RouterProvider } from "react-router";
 
 import { ApiProvider } from "@/api/ApiProvider";
 
-import { getRouter, Router } from "./router";
+import { getRouter, type Router } from "./router";
 
 export const Providers = ({
   children,
   router = getRouter(children),
   fetchInitialUser = false,
 }: {
-  children?: React.ReactNode;
+  children?: ReactNode;
   router?: Router;
   fetchInitialUser?: boolean;
 }) => {

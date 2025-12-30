@@ -1,4 +1,4 @@
-import * as React from "react";
+import { type FormEvent, useEffect, useMemo, useRef } from "react";
 
 import { ApiError, FatalApiError } from "@/api/ApiResult";
 import { CommitteeSessionPausedModal } from "@/components/data_entry/CommitteeSessionPausedModal";
@@ -36,7 +36,7 @@ export function DataEntrySection() {
     showAcceptErrorsAndWarnings,
     section,
   } = useDataEntryFormSection();
-  const acceptCheckboxRef = React.useRef<HTMLInputElement>(null);
+  const acceptCheckboxRef = useRef<HTMLInputElement>(null);
 
   const formId = `${section.id}_form`;
 
@@ -49,14 +49,14 @@ export function DataEntrySection() {
   const missingTotalError = formSection.errors.includes("F401");
 
   // Memoize errors to prevent unnecessary focus triggers in Feedback
-  const memoizedErrors = React.useMemo(
+  const memoizedErrors = useMemo(
     () => formSection.errors.getAll().filter((result) => result.code !== "F401"),
     [formSection.errors],
   );
-  const memoizedWarnings = React.useMemo(() => formSection.warnings.getAll(), [formSection.warnings]);
+  const memoizedWarnings = useMemo(() => formSection.warnings.getAll(), [formSection.warnings]);
 
   // Scroll unaccepted warnings/errors checkbox into view when error for it is triggered
-  React.useEffect(() => {
+  useEffect(() => {
     if (formSection.acceptErrorsAndWarningsError) {
       acceptCheckboxRef.current?.focus();
       requestAnimationFrame(() => {
@@ -65,7 +65,7 @@ export function DataEntrySection() {
     }
   }, [formSection]);
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     void onSubmit();
   };

@@ -1,4 +1,4 @@
-import { ValidationResult, ValidationResultCode } from "@/types/generated/openapi";
+import type { ValidationResult, ValidationResultCode } from "@/types/generated/openapi";
 
 type ErrorWarningsMap<Code extends ValidationResultCode> = {
   [C in Code]: ValidationResult & { code: C };

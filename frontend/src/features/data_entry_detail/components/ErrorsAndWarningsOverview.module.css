@@ -1,3 +1,9 @@
+.heading {
+  font-weight: bold;
+  font-size: var(--font-size-md);
+  color: var(--text-color-body);
+}
+
 .actions {
   margin-top: var(--space-sm);
 

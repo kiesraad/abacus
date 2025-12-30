@@ -1,4 +1,4 @@
-import { RefObject, useCallback, useEffect, useRef } from "react";
+import { type RefObject, useCallback, useEffect, useRef } from "react";
 
 import { isNode } from "@/utils/typeChecks";
 
@@ -29,7 +29,7 @@ export function useFormKeyboardNavigation(): RefObject<HTMLFormElement | null> {
       }
 
       // Note that targetIndex might be -1 if the active element is not in the list
-      // (e.g. if the user is focused on a button or link outside of the input elements, but within the form)
+      // (e.g. if the user is focused on a button or link outside the input elements, but within the form)
       // In this case, the down button will focus to the first input element
       // biome-ignore lint/complexity/useIndexOf: can't use useIndexOf because types in predicate are different
       let targetIndex = elements.findIndex((element) => document.activeElement === element);

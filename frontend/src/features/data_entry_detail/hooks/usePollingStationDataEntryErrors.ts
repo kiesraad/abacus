@@ -1,13 +1,13 @@
 import { useContext, useState } from "react";
 import { useNavigate } from "react-router";
 
-import { AnyApiError, isSuccess, NotFoundError } from "@/api/ApiResult";
+import { type AnyApiError, isSuccess, NotFoundError } from "@/api/ApiResult";
 import { useApiClient } from "@/api/useApiClient";
 import { useInitialApiGet } from "@/api/useInitialApiGet";
 import { ElectionStatusProviderContext } from "@/hooks/election/ElectionStatusProviderContext";
 import { useElection } from "@/hooks/election/useElection";
 import { t } from "@/i18n/translate";
-import {
+import type {
   DataEntryGetResponse,
   ElectionWithPoliticalGroups,
   POLLING_STATION_DATA_ENTRY_GET_REQUEST_PATH,

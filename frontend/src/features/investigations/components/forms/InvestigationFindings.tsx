@@ -1,7 +1,7 @@
-import { FormEvent, useState } from "react";
+import { type FormEvent, useState } from "react";
 import { useNavigate } from "react-router";
 
-import { AnyApiError, ApiError, ApiResult, isSuccess } from "@/api/ApiResult";
+import { type AnyApiError, ApiError, type ApiResult, isSuccess } from "@/api/ApiResult";
 import { useCrud } from "@/api/useCrud";
 import { Alert } from "@/components/ui/Alert/Alert";
 import { Button } from "@/components/ui/Button/Button";
@@ -14,7 +14,7 @@ import { Loader } from "@/components/ui/Loader/Loader";
 import { useElection } from "@/hooks/election/useElection";
 import { useMessages } from "@/hooks/messages/useMessages";
 import { t } from "@/i18n/translate";
-import {
+import type {
   PollingStationInvestigation,
   PollingStationInvestigationConcludeRequest,
   PollingStationInvestigationUpdateRequest,

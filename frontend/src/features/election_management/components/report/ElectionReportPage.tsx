@@ -13,7 +13,7 @@ import { Loader } from "@/components/ui/Loader/Loader";
 import { useElection } from "@/hooks/election/useElection";
 import { useNumericParam } from "@/hooks/useNumericParam";
 import { t, tx } from "@/i18n/translate";
-import {
+import type {
   COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_BODY,
   COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_PATH,
 } from "@/types/generated/openapi";

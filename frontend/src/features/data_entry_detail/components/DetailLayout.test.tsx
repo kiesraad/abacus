@@ -19,7 +19,7 @@ import {
 import { overrideOnce, server } from "@/testing/server";
 import { TestUserProvider } from "@/testing/TestUserProvider";
 import { render, screen, spyOnHandler, waitFor, within } from "@/testing/test-utils";
-import { ErrorResponse } from "@/types/generated/openapi";
+import type { ErrorResponse } from "@/types/generated/openapi";
 
 import { DetailLayout } from "./DetailLayout";
 

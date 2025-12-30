@@ -37,10 +37,12 @@ export function DifferencesTable({ title, headers, rows, action }: DifferencesTa
   const id = useId();
   // An array of indices for rows that are different, also used to detect row gaps.
   // Two falsy values are considered equal (e.g. 0 and undefined)
-  const differences = rows.reduce<number[]>(
-    (show, row, index) => (row.first === row.second || (!row.first && !row.second) ? show : [...show, index]),
-    [],
-  );
+  const differences = rows.reduce<number[]>((show, row, index) => {
+    if (row.first !== row.second && (row.first || row.second)) {
+      show.push(index);
+    }
+    return show;
+  }, []);
 
   if (differences.length === 0) {
     return null;
@@ -68,6 +70,7 @@ export function DifferencesTable({ title, headers, rows, action }: DifferencesTa
               const gapRow = differenceIndex > 0 && differences[differenceIndex - 1] !== rowIndex - 1;
 
               return (
+                // biome-ignore lint/suspicious/noArrayIndexKey: we can use the index as key since the input is static
                 <Fragment key={differenceIndex}>
                   {gapRow && (
                     <Table.Row>

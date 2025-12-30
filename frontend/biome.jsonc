@@ -71,9 +71,6 @@
       "correctness": {
         "useExhaustiveDependencies": "off"
       },
-      "performance": {
-        "noAccumulatingSpread": "off"
-      },
       "style": {
         "useComponentExportOnlyModules": {
           "level": "on",
@@ -85,7 +82,6 @@
         "useTemplate": "off"
       },
       "suspicious": {
-        "noArrayIndexKey": "off",
         "noConsole": {
           "level": "on",
           "options": {

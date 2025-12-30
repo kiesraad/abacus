@@ -132,14 +132,14 @@ export function InvestigationsOverviewPage() {
               </Button.Link>
             </nav>
           )}
-          {currentInvestigations.map((investigation, index) => (
-            <InvestigationCard investigation={investigation} key={index} />
+          {currentInvestigations.map((investigation) => (
+            <InvestigationCard investigation={investigation} key={investigation.polling_station_id} />
           ))}
           {handledInvestigations.length > 0 && (
             <>
               <h3 className="mb-lg mt-lg">{t("investigations.handled_investigations")}</h3>
-              {handledInvestigations.map((investigation, index) => (
-                <InvestigationCard investigation={investigation} key={index} />
+              {handledInvestigations.map((investigation) => (
+                <InvestigationCard investigation={investigation} key={investigation.polling_station_id} />
               ))}
             </>
           )}

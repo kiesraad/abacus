@@ -76,7 +76,6 @@
         "useTemplate": "off"
       },
       "suspicious": {
-        "noArrayIndexKey": "off",
         "noPrototypeBuiltins": "off"
       }
     }

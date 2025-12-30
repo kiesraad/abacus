@@ -53,7 +53,7 @@ export function InvestigationReason({ pollingStationId }: InvestigationReasonPro
     setNonEmptyError(false);
 
     const save = () => {
-      if (investigation != undefined) {
+      if (investigation !== undefined) {
         pushMessage(getInvestigationUpdatedMessage(pollingStation, currentCommitteeSession.status));
         void refetch();
         return update({

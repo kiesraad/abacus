@@ -38,15 +38,16 @@ export function FirstLoginForm({ prev }: FirstLoginFormProps) {
   }
 
   const link = (content: ReactNode) => (
-    <a
-      href="#previous"
+    <Button
+      variant="underlined"
+      size="md"
       onClick={(e) => {
         e.preventDefault();
         prev();
       }}
     >
       {content}
-    </a>
+    </Button>
   );
 
   return (

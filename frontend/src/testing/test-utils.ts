@@ -46,9 +46,9 @@ export const expectNotFound = async (message?: string) => {
 };
 
 export function getUrlMethodAndBody(call: [input: string | URL | Request, init?: RequestInit | undefined][]) {
-  let url;
-  let method;
-  let body;
+  let url: string | URL | Request | undefined;
+  let method: string | undefined;
+  let body: object | undefined;
 
   if (call.length > 0) {
     if (call[0] && call[0].length > 1) {

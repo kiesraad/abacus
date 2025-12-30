@@ -20,7 +20,7 @@ export default defineConfig(({ command }) => {
     __GIT_VERSION__: undefined as string | undefined,
   };
 
-  if (command == "build") {
+  if (command === "build") {
     let gitDirty: boolean | undefined;
     let gitBranch: string | undefined;
     let gitCommit: string | undefined;

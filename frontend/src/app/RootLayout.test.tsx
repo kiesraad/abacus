@@ -7,7 +7,7 @@ import * as useUser from "@/hooks/user/useUser";
 import { Providers } from "@/testing/Providers";
 import { setupTestRouter } from "@/testing/test-utils";
 import * as userMockData from "@/testing/user-mock-data";
-import type { Role } from "@/types/generated/openapi";
+import type { LoginResponse, Role } from "@/types/generated/openapi";
 
 import { RootLayout } from "./RootLayout";
 
@@ -36,7 +36,7 @@ describe("Route authorisation is handled", () => {
     vi.spyOn(console, "error").mockImplementation(() => {});
 
     if (ownRole) {
-      let user;
+      let user: LoginResponse | undefined;
       switch (ownRole) {
         case "administrator":
           user = userMockData.getAdminUser();

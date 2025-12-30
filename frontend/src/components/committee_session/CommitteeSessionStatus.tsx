@@ -19,7 +19,7 @@ export function HeaderCommitteeSessionStatusWithIcon({
   userRole,
   committeeSessionNumber,
 }: CommitteeSessionStatusWithIconProps & { committeeSessionNumber: number }) {
-  let sessionLabel;
+  let sessionLabel: string | undefined;
   if (status === "data_entry_finished" && userRole === "coordinator") {
     sessionLabel = `(${committeeSessionLabel(committeeSessionNumber).toLowerCase()})`;
   }

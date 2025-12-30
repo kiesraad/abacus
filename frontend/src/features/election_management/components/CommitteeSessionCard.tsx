@@ -1,4 +1,4 @@
-import { Fragment, type HTMLAttributes, type ReactNode } from "react";
+import { Fragment, type HTMLAttributes, type ReactElement, type ReactNode } from "react";
 import { type NavigateOptions, type To, useNavigate } from "react-router";
 
 import { isSuccess } from "@/api/ApiResult";
@@ -109,7 +109,7 @@ export function CommitteeSessionCard({
     ? formatDateTimeFull(new Date(committeeSession.start_date_time))
     : undefined;
   const buttonLinks: ButtonLink[] = [];
-  let cardButton;
+  let cardButton: ReactElement | undefined;
 
   const addIf = (item: ButtonLink, condition: boolean) => {
     if (condition) {

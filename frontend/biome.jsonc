@@ -63,7 +63,6 @@
         "noLabelWithoutControl": "off",
         "noStaticElementInteractions": "off",
         "noSvgWithoutTitle": "off",
-        "useButtonType": "off",
         "useSemanticElements": "off"
       },
       "complexity": {
@@ -82,7 +81,6 @@
             "allowConstantExport": true
           }
         },
-        "useConst": "off",
         "useImportType": "off",
         "useTemplate": "off"
       },

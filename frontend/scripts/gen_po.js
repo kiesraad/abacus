@@ -9,7 +9,7 @@ if (!fs.existsSync("./translations")) {
 
 // flatten the translations object
 function flatten(obj, parent, result = {}) {
-  for (let key in obj) {
+  for (const key in obj) {
     const path = parent ? `${parent}.${key}` : key;
 
     if (typeof obj[key] === "object") {

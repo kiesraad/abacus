@@ -8,7 +8,7 @@ import { pollingStationMockData } from "@/testing/api-mocks/PollingStationMockDa
 import { ElectionRequestHandler, PollingStationDataEntryClaimHandler } from "@/testing/api-mocks/RequestHandlers";
 import { overrideOnce, server } from "@/testing/server";
 import { render, screen } from "@/testing/test-utils";
-import { ErrorResponse } from "@/types/generated/openapi";
+import type { ErrorResponse } from "@/types/generated/openapi";
 
 function renderProvider() {
   vi.spyOn(ReactRouter, "useParams").mockReturnValue({ sectionId: "test" });

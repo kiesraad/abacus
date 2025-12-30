@@ -1,6 +1,6 @@
-import * as React from "react";
+import { type ReactNode, useEffect, useRef } from "react";
 
-import { MenuStatus } from "@/types/ui";
+import type { MenuStatus } from "@/types/ui";
 import { cn } from "@/utils/classnames";
 
 import { StatusIcon } from "../Icon/StatusIcon";
@@ -8,14 +8,14 @@ import cls from "./ProgressList.module.css";
 import { ProgressListScroll } from "./ProgressListScroll";
 
 export interface ProgressListProps {
-  children?: React.ReactNode;
+  children?: ReactNode;
 }
 
 export function ProgressList({ children }: ProgressListProps) {
   return <div className={cls.progressList}>{children}</div>;
 }
 
-ProgressList.Fixed = ({ children }: { children: React.ReactNode }) => (
+ProgressList.Fixed = ({ children }: { children: ReactNode }) => (
   <section className="fixed">
     <ul className="fixed">{children}</ul>
   </section>
@@ -29,7 +29,7 @@ export type ProgressListItemProps = {
   status: MenuStatus;
   active?: boolean;
   disabled?: boolean;
-  children?: React.ReactNode;
+  children?: ReactNode;
   id?: string;
   scrollIntoView?: boolean;
   addSpace?: boolean;
@@ -44,9 +44,9 @@ ProgressList.Item = function ProgressListItem({
   scrollIntoView,
   addSpace = false,
 }: ProgressListItemProps) {
-  const liRef = React.useRef<HTMLLIElement>(null);
+  const liRef = useRef<HTMLLIElement>(null);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (scrollIntoView && active) {
       liRef.current?.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "nearest" });
     }
@@ -71,7 +71,7 @@ export type ProgressListOverviewItemProps = {
   status: "warning" | "idle";
   addSpace?: boolean;
   id?: string;
-  children?: React.ReactNode;
+  children?: ReactNode;
 };
 
 ProgressList.OverviewItem = function ProgressListOverviewItem({
@@ -80,7 +80,7 @@ ProgressList.OverviewItem = function ProgressListOverviewItem({
   id,
   children,
 }: ProgressListOverviewItemProps) {
-  const ref = React.useRef<HTMLLIElement>(null);
+  const ref = useRef<HTMLLIElement>(null);
 
   return (
     <li ref={ref} id={id} className={cn(cls.overviewItem, status, addSpace && cls.addSpace)}>

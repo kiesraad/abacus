@@ -1,7 +1,7 @@
 import { useState } from "react";
 
-import { ApiRequestState, isFatalRequestState } from "./ApiRequestState";
-import { AnyApiError, ApiResult } from "./ApiResult";
+import { type ApiRequestState, isFatalRequestState } from "./ApiRequestState";
+import type { AnyApiError, ApiResult } from "./ApiResult";
 import { useApiClient } from "./useApiClient";
 import { handleApiResult } from "./useInitialApiGet";
 

@@ -1,6 +1,6 @@
-import * as React from "react";
+import { useCallback, useState } from "react";
 
-import { FormFields, processForm, ValidationResult } from "../utils/form";
+import { type FormFields, processForm, type ValidationResult } from "../utils/form";
 
 export interface UseFormReturn<RequestObject> {
   process: (elements: { [key in keyof RequestObject]: HTMLInputElement }) => {
@@ -12,13 +12,13 @@ export interface UseFormReturn<RequestObject> {
 }
 
 export function useForm<RequestObject>(fields: FormFields<RequestObject>): UseFormReturn<RequestObject> {
-  const [isValid, setIsValid] = React.useState(false);
-  const [validationResult, setValidationResult] = React.useState<ValidationResult<RequestObject>>(
+  const [isValid, setIsValid] = useState(false);
+  const [validationResult, setValidationResult] = useState<ValidationResult<RequestObject>>(
     // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
     {} as ValidationResult<RequestObject>,
   );
 
-  const process = React.useCallback(
+  const process = useCallback(
     (elements: { [key in keyof RequestObject]: HTMLInputElement }) => {
       const { requestObject, validationResult, isValid } = processForm(fields, elements);
       setValidationResult(validationResult);

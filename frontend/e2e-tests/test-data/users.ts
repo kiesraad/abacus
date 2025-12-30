@@ -1,4 +1,4 @@
-import { Role } from "@/types/generated/openapi";
+import type { Role } from "@/types/generated/openapi";
 
 export const firstAdmin = {
   username: "admin1",

@@ -1,9 +1,9 @@
-import { ValidationResult, ValidationResults } from "@/types/generated/openapi";
-import { DataEntryResults, DataEntryStructure, FormSectionId } from "@/types/types";
+import type { ValidationResult, ValidationResults } from "@/types/generated/openapi";
+import type { DataEntryResults, DataEntryStructure, FormSectionId } from "@/types/types";
 import { extractFieldInfoFromSection, getValueAtPath } from "@/utils/dataEntryMapping";
 import { doesValidationResultApplyToSection, ValidationResultSet } from "@/utils/ValidationResults";
 
-import { ClientState, FormSection, FormState } from "../types/types";
+import type { ClientState, FormSection, FormState } from "../types/types";
 
 export function formSectionComplete(section: FormSection): boolean {
   return (
@@ -73,16 +73,6 @@ export function isFormSectionEmpty(
 }
 
 export type DataEntryFormSectionStatus = "empty" | "unaccepted-warnings" | "accepted-warnings" | "errors";
-export type DataEntrySummary = {
-  countsAddUp: boolean;
-  hasBlocks: boolean;
-  hasWarnings: boolean;
-  hasErrors: boolean;
-  notableFormSections: {
-    status: DataEntryFormSectionStatus;
-    formSection: FormSection;
-  }[];
-};
 
 function createFormSection(id: FormSectionId, index: number): FormSection {
   return {

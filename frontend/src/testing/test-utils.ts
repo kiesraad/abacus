@@ -1,8 +1,8 @@
-import { RenderOptions, render, screen } from "@testing-library/react";
-import { UserEvent } from "@testing-library/user-event";
-import { HttpHandler } from "msw";
-import { ReactElement } from "react";
-import { createMemoryRouter, RouteObject } from "react-router";
+import { type RenderOptions, render, screen } from "@testing-library/react";
+import type { UserEvent } from "@testing-library/user-event";
+import type { HttpHandler } from "msw";
+import type { ReactElement } from "react";
+import { createMemoryRouter, type RouteObject } from "react-router";
 import { expect, vi } from "vitest";
 
 import { Providers } from "./Providers";

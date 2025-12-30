@@ -1,8 +1,6 @@
-import { ReactElement } from "react";
+import type { ReactElement } from "react";
 
-import nl from "./locales/nl/nl";
-
-export type TranslationKey = keyof Translation;
+import type nl from "./locales/nl/nl";
 
 export enum Locale {
   nl = "nl",

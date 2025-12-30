@@ -1,4 +1,4 @@
-import { RouteObject } from "react-router";
+import type { RouteObject } from "react-router";
 
 import { ResolveDifferencesPage } from "./components/ResolveDifferencesPage";
 

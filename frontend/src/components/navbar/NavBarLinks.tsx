@@ -4,7 +4,7 @@ import { IconChevronRight } from "@/components/generated/icons";
 import { useElection } from "@/hooks/election/useElection";
 import { useUserRole } from "@/hooks/user/useUserRole";
 import { t } from "@/i18n/translate";
-import { Election } from "@/types/generated/openapi";
+import type { Election } from "@/types/generated/openapi";
 import { committeeSessionLabel } from "@/utils/committeeSession";
 
 import { NavBarMenuButton } from "./NavBarMenu";

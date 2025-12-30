@@ -8,7 +8,7 @@ import { PollingStationNumber } from "@/components/ui/Badge/PollingStationNumber
 import { useElection } from "@/hooks/election/useElection";
 import { useNumericParam } from "@/hooks/useNumericParam";
 import { t } from "@/i18n/translate";
-import { FormSectionId } from "@/types/types";
+import type { FormSectionId } from "@/types/types";
 
 import { usePollingStationStatus } from "../hooks/usePollingStationStatus";
 import { AbortDataEntryControl } from "./AbortDataEntryControl";

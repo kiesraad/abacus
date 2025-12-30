@@ -1,8 +1,8 @@
 import { describe, expect, test } from "vitest";
 
 import { electionMockData } from "@/testing/api-mocks/ElectionMockData";
-import { PollingStationResults } from "@/types/generated/openapi";
-import { DataEntrySection } from "@/types/types";
+import type { PollingStationResults } from "@/types/generated/openapi";
+import type { DataEntrySection } from "@/types/types";
 
 import { correctedValue, determineCorrections, mapResultsToSectionValues, mapSectionValues } from "./dataEntryMapping";
 import { createVotersAndVotesSection, differencesSection } from "./dataEntryStructure";

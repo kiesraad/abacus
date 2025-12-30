@@ -1,6 +1,6 @@
 import { createContext } from "react";
 
-import { AlertType } from "@/types/ui";
+import type { AlertType } from "@/types/ui";
 
 export interface Message {
   type?: AlertType;

@@ -1,9 +1,8 @@
-import * as React from "react";
-
+import type { ReactElement, ReactNode } from "react";
 import cls from "./FormLayout.module.css";
 
 export interface FormLayoutProps {
-  children: React.ReactNode;
+  children: ReactNode;
   disabled?: boolean;
 }
 
@@ -17,7 +16,7 @@ export function FormLayout({ children, disabled }: FormLayoutProps) {
   );
 }
 
-function FormSection({ children, title }: { children: React.ReactNode; title?: string | React.ReactElement }) {
+function FormSection({ children, title }: { children: ReactNode; title?: string | ReactElement }) {
   return (
     <section className={cls.formSection}>
       {title && <h3>{title}</h3>}
@@ -26,11 +25,11 @@ function FormSection({ children, title }: { children: React.ReactNode; title?: s
   );
 }
 
-function FormRow({ children }: { children: React.ReactNode }) {
+function FormRow({ children }: { children: ReactNode }) {
   return <div className={cls.formRow}>{children}</div>;
 }
 
-function FormField({ label, children }: { children: React.ReactNode; label?: string }) {
+function FormField({ label, children }: { children: ReactNode; label?: string }) {
   return (
     <div className={cls.formField}>
       {label && <span className="label">{label}</span>}
@@ -39,11 +38,11 @@ function FormField({ label, children }: { children: React.ReactNode; label?: str
   );
 }
 
-function FormControls({ children }: { children: React.ReactNode }) {
+function FormControls({ children }: { children: ReactNode }) {
   return <div className={cls.formControls}>{children}</div>;
 }
 
-function FormAlert({ children }: { children: React.ReactNode }) {
+function FormAlert({ children }: { children: ReactNode }) {
   return <div className={cls.formAlert}>{children}</div>;
 }
 

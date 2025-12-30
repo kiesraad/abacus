@@ -1,8 +1,8 @@
-import * as React from "react";
+import { type ReactNode, useId } from "react";
 
 import { IconCross } from "@/components/generated/icons";
 import { t } from "@/i18n/translate";
-import { AlertType } from "@/types/ui";
+import type { AlertType } from "@/types/ui";
 import { cn } from "@/utils/classnames";
 
 import { AlertIcon } from "../Icon/AlertIcon";
@@ -16,7 +16,7 @@ export interface AlertProps {
   inline?: boolean;
   small?: boolean;
   margin?: "mb-0" | "mb-sm" | "mb-md" | "mb-md-lg" | "mb-lg";
-  children: React.ReactNode;
+  children: ReactNode;
   onClose?: () => void;
 }
 
@@ -30,7 +30,7 @@ export function Alert({
   inline,
   variant = "default",
 }: AlertProps) {
-  const id = React.useId();
+  const id = useId();
   return (
     <div
       className={cn(inline ? cls.inlineAlert : cls.alert, cls[type], margin, variant, { small })}

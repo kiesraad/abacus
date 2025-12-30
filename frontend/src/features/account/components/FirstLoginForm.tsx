@@ -1,4 +1,4 @@
-import { FormEvent, ReactNode, useState } from "react";
+import { type FormEvent, type ReactNode, useState } from "react";
 import { useNavigate } from "react-router";
 
 import { isError } from "@/api/ApiResult";

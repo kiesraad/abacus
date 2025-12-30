@@ -1,8 +1,8 @@
 import type { Meta, StoryFn } from "@storybook/react-vite";
-import * as React from "react";
+import { Fragment } from "react";
 
 import { TestUserProvider } from "@/testing/TestUserProvider";
-import { Role } from "@/types/generated/openapi";
+import type { Role } from "@/types/generated/openapi";
 
 import { NavBar } from "./NavBar";
 import cls from "./NavBar.module.css";
@@ -43,7 +43,7 @@ const locations: { pathname: string; userRole: Role }[] = [
 export const AllRoutes: StoryFn = () => (
   <>
     {locations.map((location) => (
-      <React.Fragment key={location.pathname + location.userRole}>
+      <Fragment key={location.pathname + location.userRole}>
         <TestUserProvider userRole={location.userRole}>
           <code>
             {location.pathname} ({location.userRole})
@@ -51,7 +51,7 @@ export const AllRoutes: StoryFn = () => (
           <NavBar />
           <br />
         </TestUserProvider>
-      </React.Fragment>
+      </Fragment>
     ))}
   </>
 );

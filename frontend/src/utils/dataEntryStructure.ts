@@ -1,6 +1,6 @@
 import { t, tx } from "@/i18n/translate";
-import { ElectionWithPoliticalGroups, PoliticalGroup } from "@/types/generated/openapi";
-import { DataEntryModel, DataEntrySection, DataEntryStructure, InputGridSubsectionRow } from "@/types/types";
+import type { ElectionWithPoliticalGroups, PoliticalGroup } from "@/types/generated/openapi";
+import type { DataEntryModel, DataEntrySection, DataEntryStructure, InputGridSubsectionRow } from "@/types/types";
 import { getCandidateFullName } from "@/utils/candidate";
 import { formatPoliticalGroupName } from "@/utils/politicalGroup";
 

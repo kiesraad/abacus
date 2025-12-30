@@ -1,4 +1,4 @@
-import { Size } from "@/types/ui";
+import type { Size } from "@/types/ui";
 import { cn } from "@/utils/classnames";
 
 import cls from "./Spinner.module.css";

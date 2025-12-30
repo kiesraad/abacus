@@ -2,8 +2,8 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 
 import { electionMockData } from "@/testing/api-mocks/ElectionMockData";
 import { validationResultMockData } from "@/testing/api-mocks/ValidationResultMockData";
-import { PollingStationResults, ValidationResults } from "@/types/generated/openapi";
-import { FormSectionId } from "@/types/types";
+import type { PollingStationResults, ValidationResults } from "@/types/generated/openapi";
+import type { FormSectionId } from "@/types/types";
 import { getDataEntryStructure } from "@/utils/dataEntryStructure";
 
 import { ReadOnlyDataEntrySection } from "./ReadOnlyDataEntrySection";

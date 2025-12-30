@@ -1,7 +1,7 @@
 import { render, screen } from "@testing-library/react";
 import { describe, expect, test } from "vitest";
 
-import { CommitteeSessionStatus } from "@/types/generated/openapi";
+import type { CommitteeSessionStatus } from "@/types/generated/openapi";
 
 import { CommitteeSessionStatusWithIcon, HeaderCommitteeSessionStatusWithIcon } from "./CommitteeSessionStatus";
 

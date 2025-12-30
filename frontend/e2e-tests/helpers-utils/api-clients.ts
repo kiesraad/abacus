@@ -1,6 +1,6 @@
-import { APIRequestContext, expect } from "@playwright/test";
+import { type APIRequestContext, expect } from "@playwright/test";
 
-import {
+import type {
   DataEntry,
   POLLING_STATION_DATA_ENTRY_CLAIM_REQUEST_PATH,
   POLLING_STATION_DATA_ENTRY_FINALISE_REQUEST_PATH,
@@ -9,7 +9,7 @@ import {
 
 export class DataEntryApiClient {
   private session: APIRequestContext;
-  private baseUrl: POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_PATH;
+  private readonly baseUrl: POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_PATH;
 
   public constructor(request: APIRequestContext, pollingStationId: number, entryNumber: number) {
     this.session = request;

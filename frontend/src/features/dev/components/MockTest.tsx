@@ -1,4 +1,4 @@
-import * as React from "react";
+import { useEffect, useState } from "react";
 
 interface PongResponse {
   pong: string;
@@ -11,9 +11,9 @@ function isPongResponse(data: unknown): data is PongResponse {
 }
 
 export function MockTest() {
-  const [message, setMessage] = React.useState("...");
+  const [message, setMessage] = useState("...");
 
-  React.useEffect(() => {
+  useEffect(() => {
     const action = async () => {
       const response = await fetch("/ping", {
         method: "POST",

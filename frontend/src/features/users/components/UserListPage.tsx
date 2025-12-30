@@ -6,7 +6,7 @@ import { Loader } from "@/components/ui/Loader/Loader";
 import { Table } from "@/components/ui/Table/Table";
 import { Toolbar } from "@/components/ui/Toolbar/Toolbar";
 import { t } from "@/i18n/translate";
-import { Role } from "@/types/generated/openapi";
+import type { Role } from "@/types/generated/openapi";
 import { formatDateTime } from "@/utils/dateTime";
 
 import { useQueryParam } from "../hooks/useQueryParam";

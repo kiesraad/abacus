@@ -8,7 +8,7 @@ import { CommitteeSessionStatusChangeRequestHandler } from "@/testing/api-mocks/
 import { server } from "@/testing/server";
 import { render, screen, spyOnHandler } from "@/testing/test-utils";
 import { getAdminUser, getCoordinatorUser } from "@/testing/user-mock-data";
-import { CommitteeSessionStatus, Role } from "@/types/generated/openapi";
+import type { CommitteeSessionStatus, Role } from "@/types/generated/openapi";
 
 import { CommitteeSessionCard } from "./CommitteeSessionCard";
 

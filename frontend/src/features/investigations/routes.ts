@@ -1,4 +1,4 @@
-import { RouteObject } from "react-router";
+import type { RouteObject } from "react-router";
 
 import { AddInvestigationLayout } from "./components/AddInvestigationLayout";
 import { AddInvestigationPage } from "./components/AddInvestigationPage";

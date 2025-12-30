@@ -22,7 +22,7 @@ import {
 import { overrideOnce, server } from "@/testing/server";
 import { TestUserProvider } from "@/testing/TestUserProvider";
 import { renderReturningRouter, screen, spyOnHandler } from "@/testing/test-utils";
-import { DataEntryGetResponse } from "@/types/generated/openapi";
+import type { DataEntryGetResponse } from "@/types/generated/openapi";
 
 import { DetailIndexPage } from "./DetailIndexPage";
 

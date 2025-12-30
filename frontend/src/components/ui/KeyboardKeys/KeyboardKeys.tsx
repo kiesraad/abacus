@@ -1,4 +1,4 @@
-import * as React from "react";
+import type { JSX, ReactNode } from "react";
 
 import {
   IconArrowBlockUp,
@@ -15,7 +15,7 @@ export interface KeyboardKeysProps {
   keys: KeyboardKey[];
 }
 
-function renderKey(keyboardKey: KeyboardKey, index: number): React.JSX.Element {
+function renderKey(keyboardKey: KeyboardKey, index: number): JSX.Element {
   switch (keyboardKey) {
     case KeyboardKey.Enter:
       return (
@@ -52,6 +52,6 @@ export function KeyboardKeys({ keys }: KeyboardKeysProps) {
   return <div className={cn(cls.keyboardKeys)}>{keys.map((keyboardKey, index) => renderKey(keyboardKey, index))}</div>;
 }
 
-KeyboardKeys.HintText = function KeyboardKeysHintText({ children }: { children: React.ReactNode }) {
+KeyboardKeys.HintText = function KeyboardKeysHintText({ children }: { children: ReactNode }) {
   return <div className={cls.keyboardKeysHintText}>{children}</div>;
 };

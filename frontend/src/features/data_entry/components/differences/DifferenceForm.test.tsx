@@ -12,7 +12,7 @@ import {
 import { validationResultMockData } from "@/testing/api-mocks/ValidationResultMockData";
 import { overrideOnce, server } from "@/testing/server";
 import { getUrlMethodAndBody, render, screen, userTypeInputs } from "@/testing/test-utils";
-import { LoginResponse, POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_BODY } from "@/types/generated/openapi";
+import type { LoginResponse, POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_BODY } from "@/types/generated/openapi";
 
 import { getDefaultDataEntryState, getEmptyDataEntryRequest } from "../../testing/mock-data";
 import {

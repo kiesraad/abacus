@@ -69,12 +69,6 @@
       },
       "correctness": {
         "useExhaustiveDependencies": "off"
-      },
-      "style": {
-        "useImportType": "off"
-      },
-      "suspicious": {
-        "noPrototypeBuiltins": "off"
       }
     }
   },

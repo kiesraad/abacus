@@ -4,8 +4,8 @@ import { Checkbox } from "@/components/ui/CheckboxAndRadio/CheckboxAndRadio";
 import { InputField } from "@/components/ui/InputField/InputField";
 import { t } from "@/i18n/translate";
 
-import { LogFilterState } from "../hooks/useAuditLog";
-import { LogFilterName, useLogFilterOptions } from "../hooks/useLogFilterOptions";
+import type { LogFilterState } from "../hooks/useAuditLog";
+import { type LogFilterName, useLogFilterOptions } from "../hooks/useLogFilterOptions";
 import { dateToTimestampString, timestampToDateString } from "../utils/dateTime";
 import cls from "./LogsHomePage.module.css";
 

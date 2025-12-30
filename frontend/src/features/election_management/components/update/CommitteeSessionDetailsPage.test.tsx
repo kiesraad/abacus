@@ -1,6 +1,6 @@
 import { render as rtlRender } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { ReactNode } from "react";
+import type { ReactNode } from "react";
 import * as ReactRouter from "react-router";
 import { within } from "storybook/test";
 import { beforeEach, describe, expect, test, vi } from "vitest";
@@ -10,11 +10,11 @@ import { ErrorBoundary } from "@/components/error/ErrorBoundary";
 import { ElectionProvider } from "@/hooks/election/ElectionProvider";
 import { getElectionMockData } from "@/testing/api-mocks/ElectionMockData";
 import { CommitteeSessionUpdateHandler, ElectionRequestHandler } from "@/testing/api-mocks/RequestHandlers";
-import { getRouter, Router } from "@/testing/router";
+import { getRouter, type Router } from "@/testing/router";
 import { overrideOnce, server } from "@/testing/server";
 import { TestUserProvider } from "@/testing/TestUserProvider";
 import { expectNotFound, renderReturningRouter, screen, setupTestRouter, spyOnHandler } from "@/testing/test-utils";
-import { ErrorResponse } from "@/types/generated/openapi";
+import type { ErrorResponse } from "@/types/generated/openapi";
 
 import { electionManagementRoutes } from "../../routes";
 import { CommitteeSessionDetailsPage } from "./CommitteeSessionDetailsPage";

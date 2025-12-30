@@ -1,10 +1,10 @@
 import { electionMockData } from "@/testing/api-mocks/ElectionMockData";
-import { CSOFirstSessionResults, POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_BODY } from "@/types/generated/openapi";
-import { DataEntryModel, DataEntryStructure, FormSectionId } from "@/types/types";
+import type { CSOFirstSessionResults, POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_BODY } from "@/types/generated/openapi";
+import type { DataEntryModel, DataEntryStructure, FormSectionId } from "@/types/types";
 import { getDataEntryStructure } from "@/utils/dataEntryStructure";
 import { ValidationResultSet } from "@/utils/ValidationResults";
 
-import { DataEntryStateAndActionsLoaded, DataEntryStateLoaded, FormSection } from "../types/types";
+import type { DataEntryStateAndActionsLoaded, DataEntryStateLoaded, FormSection } from "../types/types";
 
 export function getInitialValues(election = electionMockData): CSOFirstSessionResults {
   return {

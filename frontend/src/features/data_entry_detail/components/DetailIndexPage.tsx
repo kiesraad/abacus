@@ -10,7 +10,7 @@ import { useMessages } from "@/hooks/messages/useMessages";
 import { useNumericParam } from "@/hooks/useNumericParam";
 import { useUsers } from "@/hooks/user/useUsers";
 import { t, tx } from "@/i18n/translate";
-import { ResolveErrorsAction } from "@/types/generated/openapi";
+import type { ResolveErrorsAction } from "@/types/generated/openapi";
 import { getDataEntryStructure } from "@/utils/dataEntryStructure";
 
 import { usePollingStationDataEntryErrors } from "../hooks/usePollingStationDataEntryErrors";

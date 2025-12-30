@@ -1,4 +1,4 @@
-import { RouteObject } from "react-router";
+import type { RouteObject } from "react-router";
 
 import { DetailIndexPage } from "./components/DetailIndexPage";
 import { DetailLayout } from "./components/DetailLayout";

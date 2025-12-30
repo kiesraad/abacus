@@ -1,4 +1,4 @@
-import { CommitteeSession } from "@/types/generated/openapi";
+import type { CommitteeSession } from "@/types/generated/openapi";
 
 export const committeeSessionMockData: CommitteeSession = {
   id: 1,

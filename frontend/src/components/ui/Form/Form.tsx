@@ -1,11 +1,11 @@
-import * as React from "react";
+import { type FormHTMLAttributes, forwardRef, type ReactNode } from "react";
 
-export interface FormProps extends React.FormHTMLAttributes<HTMLFormElement> {
+export interface FormProps extends FormHTMLAttributes<HTMLFormElement> {
   title?: string;
-  children: React.ReactNode;
+  children: ReactNode;
 }
 
-export const Form = React.forwardRef<HTMLFormElement, FormProps>(({ title, children, ...formProps }, ref) => {
+export const Form = forwardRef<HTMLFormElement, FormProps>(({ title, children, ...formProps }, ref) => {
   return (
     <form ref={ref} {...formProps}>
       <fieldset>

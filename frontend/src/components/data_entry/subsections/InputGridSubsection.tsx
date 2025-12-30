@@ -3,7 +3,7 @@ import { useState } from "react";
 import { InputGrid } from "@/components/ui/InputGrid/InputGrid";
 import { InputGridRow } from "@/components/ui/InputGrid/InputGridRow";
 import { t } from "@/i18n/translate";
-import { InputGridSubsection, InputGridSubsectionRow, SectionValues } from "@/types/types";
+import type { InputGridSubsection, InputGridSubsectionRow, SectionValues } from "@/types/types";
 import { correctedValue, determineCorrections } from "@/utils/dataEntryMapping";
 
 export interface InputGridSubsectionProps {

@@ -1,4 +1,4 @@
-import { DataEntryResults, DataEntrySection, SectionValues } from "@/types/types";
+import type { DataEntryResults, DataEntrySection, SectionValues } from "@/types/types";
 import { parseIntUserInput } from "@/utils/strings";
 
 type PathSegment = string | number;

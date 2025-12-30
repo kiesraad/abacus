@@ -1,6 +1,6 @@
 import { createContext } from "react";
 
-import { User } from "@/types/generated/openapi";
+import type { User } from "@/types/generated/openapi";
 
 export interface iUsersProviderContext {
   users: User[];

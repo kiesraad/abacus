@@ -1,5 +1,5 @@
 import { t } from "@/i18n/translate";
-import { AccountUpdateRequest, CreateUserRequest } from "@/types/generated/openapi";
+import type { AccountUpdateRequest, CreateUserRequest } from "@/types/generated/openapi";
 
 export type UserValidationErrors = {
   fullname?: string;

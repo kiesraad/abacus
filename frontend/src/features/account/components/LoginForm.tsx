@@ -1,13 +1,13 @@
-import { FormEvent, useState } from "react";
+import { type FormEvent, useState } from "react";
 import { Form, useLocation, useNavigate } from "react-router";
 
-import { AnyApiError, FatalError, isError } from "@/api/ApiResult";
+import { type AnyApiError, FatalError, isError } from "@/api/ApiResult";
 import { useApiState } from "@/api/useApiState";
 import { Alert } from "@/components/ui/Alert/Alert";
 import { Button } from "@/components/ui/Button/Button";
 import { FormLayout } from "@/components/ui/Form/FormLayout";
 import { InputField } from "@/components/ui/InputField/InputField";
-import { TranslationPath } from "@/i18n/i18n.types";
+import type { TranslationPath } from "@/i18n/i18n.types";
 import { t, tx } from "@/i18n/translate";
 import { hasBooleanProperty } from "@/utils/typeChecks";
 

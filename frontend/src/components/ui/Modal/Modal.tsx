@@ -1,4 +1,4 @@
-import { ReactElement, ReactNode, useEffect, useRef } from "react";
+import { type ReactElement, type ReactNode, useEffect, useRef } from "react";
 
 import { IconCross } from "@/components/generated/icons";
 import { t } from "@/i18n/translate";

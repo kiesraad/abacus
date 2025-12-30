@@ -1,8 +1,8 @@
-import * as React from "react";
+import type { PropsWithChildren } from "react";
 
 import cls from "./Badge.module.css";
 
-interface PollingStationNumberProps extends React.PropsWithChildren {
+interface PollingStationNumberProps extends PropsWithChildren {
   size?: "sm" | "md";
 }
 

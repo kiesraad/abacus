@@ -5,8 +5,8 @@ import {
   IconHourglass,
   IconSettings,
 } from "@/components/generated/icons";
-import { CommitteeSessionStatus } from "@/types/generated/openapi";
-import { Size } from "@/types/ui";
+import type { CommitteeSessionStatus } from "@/types/generated/openapi";
+import type { Size } from "@/types/ui";
 
 import { Icon } from "./Icon";
 

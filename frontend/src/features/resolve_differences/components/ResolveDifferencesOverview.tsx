@@ -1,5 +1,5 @@
 import { ProgressList } from "@/components/ui/ProgressList/ProgressList";
-import { DataEntryResults, DataEntryStructure } from "@/types/types";
+import type { DataEntryResults, DataEntryStructure } from "@/types/types";
 
 import { sectionHasDifferences } from "../utils/differences";
 

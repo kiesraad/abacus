@@ -1,12 +1,10 @@
-import * as React from "react";
-
+import type { ReactNode } from "react";
 import RequestStateHandler from "@/api/RequestStateHandler";
-
 import { ElectionStatusProviderContext } from "./ElectionStatusProviderContext";
 import { useElectionStatusRequest } from "./useElectionStatusRequest";
 
 export interface ElectionStatusProviderProps {
-  children: React.ReactNode;
+  children: ReactNode;
   electionId: number;
 }
 

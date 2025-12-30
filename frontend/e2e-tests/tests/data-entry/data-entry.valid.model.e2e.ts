@@ -15,7 +15,7 @@ import { VotersAndVotesPage } from "e2e-tests/page-objects/data_entry/VotersAndV
 import { TypistNavBar } from "e2e-tests/page-objects/nav_bar/TypistNavBarPgObj";
 import { createMachine } from "xstate";
 
-import { VotersCounts, VotesCounts } from "@/types/generated/openapi";
+import type { VotersCounts, VotesCounts } from "@/types/generated/openapi";
 
 import { test } from "../../fixtures";
 import {

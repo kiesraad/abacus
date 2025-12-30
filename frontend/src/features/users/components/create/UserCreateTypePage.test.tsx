@@ -4,7 +4,7 @@ import { beforeEach, describe, expect, test, vi } from "vitest";
 
 import { render, screen } from "@/testing/test-utils";
 
-import { IUserCreateContext, UserCreateContext } from "../../hooks/UserCreateContext";
+import { type IUserCreateContext, UserCreateContext } from "../../hooks/UserCreateContext";
 import { UserCreateTypePage } from "./UserCreateTypePage";
 
 const navigate = vi.fn();

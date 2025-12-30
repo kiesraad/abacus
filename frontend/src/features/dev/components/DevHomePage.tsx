@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router";
 
-import { ApiResult, isError } from "@/api/ApiResult";
+import { type ApiResult, isError } from "@/api/ApiResult";
 import { useApiState } from "@/api/useApiState";
 import { useInitialApiGet } from "@/api/useInitialApiGet";
 import { PageTitle } from "@/components/page_title/PageTitle";
@@ -11,7 +11,7 @@ import { Loader } from "@/components/ui/Loader/Loader";
 import { Modal } from "@/components/ui/Modal/Modal";
 import { useUserRole } from "@/hooks/user/useUserRole";
 import { t } from "@/i18n/translate";
-import {
+import type {
   CommitteeSession,
   ELECTION_LIST_REQUEST_PATH,
   Election,

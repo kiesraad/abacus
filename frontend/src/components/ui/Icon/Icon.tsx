@@ -1,13 +1,11 @@
-import * as React from "react";
-
-import { Size } from "@/types/ui";
+import type { ReactNode } from "react";
+import type { Size } from "@/types/ui";
 import { cn } from "@/utils/classnames";
-
-import { ProgressBarColorClass } from "../ProgressBar/ProgressBar";
+import type { ProgressBarColorClass } from "../ProgressBar/ProgressBar";
 import cls from "./Icon.module.css";
 
 export interface IconProps {
-  icon: React.ReactNode;
+  icon: ReactNode;
   size?: Size;
   color?: "primary" | "warning" | "error" | "accept" | "muted" | "status-not-started" | ProgressBarColorClass;
   spacing?: number;

@@ -1,7 +1,7 @@
-import { Fragment, ReactElement, useId } from "react";
+import { Fragment, type ReactElement, useId } from "react";
 
 import { Table } from "@/components/ui/Table/Table";
-import { ResolveDifferencesAction } from "@/types/generated/openapi";
+import type { ResolveDifferencesAction } from "@/types/generated/openapi";
 import { cn } from "@/utils/classnames";
 import { formatNumber, validateNumberString } from "@/utils/number";
 

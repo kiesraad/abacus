@@ -1,8 +1,8 @@
 import { describe, expect, test } from "vitest";
 
 import { electionMockData } from "@/testing/api-mocks/ElectionMockData";
-import { Candidate, ElectionWithPoliticalGroups } from "@/types/generated/openapi";
-import { DataEntryModel, InputGridSubsection } from "@/types/types";
+import type { Candidate, ElectionWithPoliticalGroups } from "@/types/generated/openapi";
+import type { DataEntryModel, InputGridSubsection } from "@/types/types";
 
 import {
   createPoliticalGroupSections,

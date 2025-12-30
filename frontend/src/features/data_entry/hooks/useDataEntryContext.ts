@@ -1,6 +1,6 @@
 import { useContext } from "react";
 
-import { DataEntryStateAndActionsLoaded } from "../types/types";
+import type { DataEntryStateAndActionsLoaded } from "../types/types";
 import { DataEntryContext } from "./DataEntryContext";
 
 export function useDataEntryContext(): DataEntryStateAndActionsLoaded {

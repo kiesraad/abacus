@@ -5,7 +5,7 @@ import type { DataEntrySection } from "@/types/types";
  * A set of validation results.
  */
 export class ValidationResultSet {
-  private entries: Set<ValidationResult>;
+  private readonly entries: Set<ValidationResult>;
 
   constructor(entries?: ValidationResult[]) {
     this.entries = new Set(entries);

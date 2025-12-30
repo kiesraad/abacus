@@ -1,4 +1,4 @@
-import { AnyApiError, ApiError, ApiResult, FatalApiError, NetworkError, NotFoundError } from "./ApiResult";
+import { type AnyApiError, ApiError, type ApiResult, FatalApiError, NetworkError, NotFoundError } from "./ApiResult";
 
 export type ApiRequestStateWithoutErrors<T> =
   | {

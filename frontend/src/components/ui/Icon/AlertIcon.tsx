@@ -1,6 +1,6 @@
 import { IconError, IconInfo, IconThumbsUp, IconWarning } from "@/components/generated/icons";
 import { t } from "@/i18n/translate";
-import { AlertType } from "@/types/ui";
+import type { AlertType } from "@/types/ui";
 
 export function AlertIcon({ type }: { type: AlertType }) {
   switch (type) {

@@ -4,7 +4,7 @@ import { Progress } from "@/components/ui/ProgressBar/Progress";
 import { ProgressBar } from "@/components/ui/ProgressBar/ProgressBar";
 import { useElectionStatus } from "@/hooks/election/useElectionStatus";
 import { t } from "@/i18n/translate";
-import { DataEntryStatusName } from "@/types/generated/openapi";
+import type { DataEntryStatusName } from "@/types/generated/openapi";
 
 type Stat = {
   title: string;

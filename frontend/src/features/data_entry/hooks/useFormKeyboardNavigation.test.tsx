@@ -1,5 +1,5 @@
 import { userEvent } from "@testing-library/user-event";
-import { FormEvent, FormEventHandler, ReactNode } from "react";
+import type { FormEvent, FormEventHandler, ReactNode } from "react";
 import { describe, expect, test, vi } from "vitest";
 
 import { Form } from "@/components/ui/Form/Form";

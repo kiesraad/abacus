@@ -6,7 +6,7 @@ import { NavBar } from "@/components/navbar/NavBar";
 import { PageTitle } from "@/components/page_title/PageTitle";
 import { AppLayout } from "@/components/ui/AppLayout/AppLayout";
 import { t } from "@/i18n/translate";
-import { ADMIN_EXISTS_REQUEST_PATH } from "@/types/generated/openapi";
+import type { ADMIN_EXISTS_REQUEST_PATH } from "@/types/generated/openapi";
 
 import { CreateFirstAdminForm } from "./CreateFirstAdminForm";
 import { FirstLoginForm } from "./FirstLoginForm";
@@ -58,7 +58,7 @@ export function InitialiseApplicationPage() {
   const url: ADMIN_EXISTS_REQUEST_PATH = "/api/initialise/admin-exists";
   const adminExists = useInitialApiGetWithErrors(url);
 
-  // navigate to login if admin exists
+  // navigate to login page if admin exists
   useEffect(() => {
     if (adminExists.requestState.status !== "success") {
       return;

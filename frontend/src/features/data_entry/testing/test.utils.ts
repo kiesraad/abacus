@@ -2,7 +2,7 @@ import { expect } from "vitest";
 
 import { overrideOnce } from "@/testing/server";
 import { screen, within } from "@/testing/test-utils";
-import {
+import type {
   ClaimDataEntryResponse,
   CSOFirstSessionResults,
   POLLING_STATION_DATA_ENTRY_CLAIM_REQUEST_PATH,
@@ -10,7 +10,7 @@ import {
 } from "@/types/generated/openapi";
 import { getCandidateFullName } from "@/utils/candidate";
 
-import { FormState } from "../types/types";
+import type { FormState } from "../types/types";
 import { getClientState } from "../utils/dataEntryUtils";
 import { getInitialValues } from "./mock-data";
 

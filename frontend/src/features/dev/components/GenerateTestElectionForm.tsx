@@ -1,4 +1,4 @@
-import { ChangeEvent, FormEvent, Fragment, useState } from "react";
+import { type ChangeEvent, type FormEvent, Fragment, useState } from "react";
 
 import { isSuccess } from "@/api/ApiResult";
 import { useApiClient } from "@/api/useApiClient";

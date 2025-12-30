@@ -6,7 +6,7 @@ import { beforeEach, describe, expect, test, vi } from "vitest";
 import { InitialisedHandler, LoginHandler } from "@/testing/api-mocks/RequestHandlers";
 import { overrideOnce, server } from "@/testing/server";
 import { render, screen, spyOnHandler, waitFor } from "@/testing/test-utils";
-import { LOGIN_REQUEST_PATH, LoginResponse } from "@/types/generated/openapi";
+import type { LOGIN_REQUEST_PATH, LoginResponse } from "@/types/generated/openapi";
 
 import { LoginForm } from "./LoginForm";
 

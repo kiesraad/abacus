@@ -1,7 +1,7 @@
 import type { StoryObj } from "@storybook/react-vite";
 import { expect, within } from "storybook/test";
 
-import { Badge, BadgeProps, BadgeType } from "./Badge";
+import { Badge, type BadgeProps, type BadgeType } from "./Badge";
 
 const expectedBadgeLabel: Record<BadgeType, string> = {
   first_entry_not_started: "1e invoer",

@@ -1,4 +1,4 @@
-import { UserEvent, userEvent } from "@testing-library/user-event";
+import { type UserEvent, userEvent } from "@testing-library/user-event";
 import * as ReactRouter from "react-router";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 import { MessagesProvider } from "@/hooks/messages/MessagesProvider";
@@ -19,7 +19,7 @@ import {
   userTypeInputsArray,
   waitFor,
 } from "@/testing/test-utils";
-import {
+import type {
   LoginResponse,
   POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_BODY,
   PollingStationResults,

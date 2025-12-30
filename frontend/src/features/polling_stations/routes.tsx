@@ -1,4 +1,4 @@
-import { RouteObject } from "react-router";
+import type { RouteObject } from "react-router";
 
 import { PollingStationCreatePage } from "./components/PollingStationCreatePage";
 import { PollingStationImportPage } from "./components/PollingStationImportPage";

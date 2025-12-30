@@ -3,7 +3,7 @@ import { HeadingSubsectionComponent } from "@/components/data_entry/subsections/
 import { InputGridSubsectionComponent } from "@/components/data_entry/subsections/InputGridSubsection";
 import { MessageSubsectionComponent } from "@/components/data_entry/subsections/MessageSubsection";
 import { RadioSubsectionComponent } from "@/components/data_entry/subsections/RadioSubsection";
-import { DataEntrySection, SectionValues } from "@/types/types";
+import type { DataEntrySection, SectionValues } from "@/types/types";
 
 export interface DataEntrySubsectionsProps {
   section: DataEntrySection;

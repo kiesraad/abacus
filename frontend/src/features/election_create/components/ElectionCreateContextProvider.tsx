@@ -1,6 +1,6 @@
-import { ReactNode, useReducer } from "react";
+import { type ReactNode, useReducer } from "react";
 
-import {
+import type {
   ElectionDefinitionValidateResponse,
   NewElection,
   PollingStationRequest,
@@ -8,7 +8,7 @@ import {
   VoteCountingMethod,
 } from "@/types/generated/openapi";
 
-import { ElectionCreateContext, IElectionCreateContext } from "../hooks/ElectionCreateContext";
+import { ElectionCreateContext, type IElectionCreateContext } from "../hooks/ElectionCreateContext";
 
 export type ElectionCreateAction =
   | {

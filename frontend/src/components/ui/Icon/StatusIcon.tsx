@@ -7,7 +7,7 @@ import {
   IconWarning,
 } from "@/components/generated/icons";
 import { t } from "@/i18n/translate";
-import { MenuStatus } from "@/types/ui";
+import type { MenuStatus } from "@/types/ui";
 
 export function StatusIcon({ status }: { status: MenuStatus }) {
   switch (status) {

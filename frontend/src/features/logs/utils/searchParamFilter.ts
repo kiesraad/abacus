@@ -1,4 +1,4 @@
-import { LogFilterState } from "../hooks/useAuditLog";
+import type { LogFilterState } from "../hooks/useAuditLog";
 import { LogFilterNames } from "../hooks/useLogFilterOptions";
 
 export function getLogFilterOptionsFromSearchParams(searchParams: URLSearchParams): LogFilterState {

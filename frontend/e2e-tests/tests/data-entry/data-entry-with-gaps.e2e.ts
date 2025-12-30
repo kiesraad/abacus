@@ -15,7 +15,7 @@ import { VotersAndVotesPage } from "e2e-tests/page-objects/data_entry/VotersAndV
 import { eml230b_with_gaps } from "e2e-tests/test-data/eml-files";
 import { dataEntryRequestWithGaps, noErrorsWarningsResponse } from "e2e-tests/test-data/request-response-templates";
 
-import { VotersCounts, VotesCounts } from "@/types/generated/openapi";
+import type { VotersCounts, VotesCounts } from "@/types/generated/openapi";
 
 import { test } from "../../fixtures";
 

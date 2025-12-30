@@ -4,7 +4,10 @@ import { isSuccess } from "@/api/ApiResult";
 import { useCrud } from "@/api/useCrud";
 import { Button } from "@/components/ui/Button/Button";
 import { t } from "@/i18n/translate";
-import { ELECTION_IMPORT_REQUEST_PATH, ElectionAndCandidatesDefinitionImportRequest } from "@/types/generated/openapi";
+import type {
+  ELECTION_IMPORT_REQUEST_PATH,
+  ElectionAndCandidatesDefinitionImportRequest,
+} from "@/types/generated/openapi";
 import { formatNumber } from "@/utils/number";
 
 import { useElectionCreateContext } from "../hooks/useElectionCreateContext";

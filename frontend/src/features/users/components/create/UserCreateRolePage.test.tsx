@@ -6,7 +6,7 @@ import * as useUser from "@/hooks/user/useUser";
 import { render, screen, waitFor } from "@/testing/test-utils";
 import { getAdminUser, getCoordinatorUser } from "@/testing/user-mock-data";
 
-import { IUserCreateContext, UserCreateContext } from "../../hooks/UserCreateContext";
+import { type IUserCreateContext, UserCreateContext } from "../../hooks/UserCreateContext";
 import { UserCreateRolePage } from "./UserCreateRolePage";
 
 const navigate = vi.fn();

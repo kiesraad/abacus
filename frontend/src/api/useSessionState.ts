@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-import {
+import type {
   ACCOUNT_REQUEST_PATH,
   LOGIN_REQUEST_BODY,
   LOGIN_REQUEST_PATH,
@@ -8,8 +8,8 @@ import {
   LoginResponse,
 } from "@/types/generated/openapi";
 
-import { ApiClient, DEFAULT_CANCEL_REASON } from "./ApiClient";
-import { AbortedError, ApiResult, isSuccess } from "./ApiResult";
+import { type ApiClient, DEFAULT_CANCEL_REASON } from "./ApiClient";
+import { AbortedError, type ApiResult, isSuccess } from "./ApiResult";
 
 export interface SessionState {
   user: LoginResponse | null;

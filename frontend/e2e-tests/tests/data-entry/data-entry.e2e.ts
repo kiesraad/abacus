@@ -9,8 +9,8 @@ import {
 import { DataEntryHomePage } from "e2e-tests/page-objects/data_entry/DataEntryHomePgObj";
 import {
   DifferencesPage,
-  FewerBallotsFields,
-  MoreBallotsFields,
+  type FewerBallotsFields,
+  type MoreBallotsFields,
 } from "e2e-tests/page-objects/data_entry/DifferencesPgObj";
 import {
   ExtraInvestigationPage,
@@ -24,7 +24,7 @@ import {
   noRecountNoDifferencesDataEntry,
 } from "e2e-tests/test-data/request-response-templates";
 
-import { VotersCounts, VotesCounts } from "@/types/generated/openapi";
+import type { VotersCounts, VotesCounts } from "@/types/generated/openapi";
 
 import { test } from "../../fixtures";
 

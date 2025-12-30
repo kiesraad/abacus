@@ -1,5 +1,5 @@
 import { t } from "@/i18n/translate";
-import { Candidate } from "@/types/generated/openapi";
+import type { Candidate } from "@/types/generated/openapi";
 
 export function getCandidateFullName(candidate: Candidate): string {
   const lastName = candidate.last_name_prefix

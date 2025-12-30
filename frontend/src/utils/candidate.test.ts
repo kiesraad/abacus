@@ -1,6 +1,6 @@
 import { describe, expect, test } from "vitest";
 
-import { Candidate } from "@/types/generated/openapi";
+import type { Candidate } from "@/types/generated/openapi";
 
 import { getCandidateFullName, getCandidateFullNameWithGender } from "./candidate";
 

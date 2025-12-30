@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
 import { IconCheckHeart } from "@/components/generated/icons";
-import { Size } from "@/types/ui";
+import type { Size } from "@/types/ui";
 
 import { Icon } from "./Icon";
 

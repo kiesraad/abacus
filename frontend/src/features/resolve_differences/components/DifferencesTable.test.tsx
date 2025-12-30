@@ -1,9 +1,9 @@
 import { describe, expect, test } from "vitest";
 
 import { render, screen } from "@/testing/test-utils";
-import { ResolveDifferencesAction } from "@/types/generated/openapi";
+import type { ResolveDifferencesAction } from "@/types/generated/openapi";
 
-import { DifferencesRow, DifferencesTable } from "./DifferencesTable";
+import { type DifferencesRow, DifferencesTable } from "./DifferencesTable";
 import cls from "./ResolveDifferences.module.css";
 
 const tableHeaders = ["Code", "First", "Second", "Description"];

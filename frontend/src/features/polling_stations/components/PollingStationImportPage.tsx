@@ -1,4 +1,4 @@
-import { ChangeEvent, ReactNode, useState } from "react";
+import { type ChangeEvent, type ReactNode, useState } from "react";
 import { useNavigate } from "react-router";
 
 import { ApiError, isSuccess } from "@/api/ApiResult";
@@ -13,7 +13,7 @@ import { FormLayout } from "@/components/ui/Form/FormLayout";
 import { useElection } from "@/hooks/election/useElection";
 import { useMessages } from "@/hooks/messages/useMessages";
 import { t, tx } from "@/i18n/translate";
-import {
+import type {
   POLLING_STATION_IMPORT_REQUEST_PATH,
   POLLING_STATION_VALIDATE_IMPORT_REQUEST_PATH,
   PollingStationListResponse,

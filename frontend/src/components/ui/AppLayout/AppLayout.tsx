@@ -1,9 +1,9 @@
-import * as React from "react";
+import type { ReactNode } from "react";
 
 import cls from "./AppLayout.module.css";
 
 export interface AppLayoutProps {
-  children: React.ReactNode;
+  children: ReactNode;
 }
 
 export function AppLayout({ children }: AppLayoutProps) {

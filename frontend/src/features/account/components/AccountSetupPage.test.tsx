@@ -2,7 +2,7 @@ import { render as rtlRender } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import * as ReactRouter from "react-router";
 import { describe, expect, test, vi } from "vitest";
-import { ApiState } from "@/api/ApiProviderContext";
+import type { ApiState } from "@/api/ApiProviderContext";
 import * as useApiState from "@/api/useApiState";
 import { ErrorBoundary } from "@/components/error/ErrorBoundary";
 import { AccountUpdateRequestHandler } from "@/testing/api-mocks/RequestHandlers";
@@ -10,7 +10,7 @@ import { loginResponseMockData } from "@/testing/api-mocks/UserMockData";
 import { Providers } from "@/testing/Providers";
 import { server } from "@/testing/server";
 import { expectConflictErrorPage, render, screen, setupTestRouter } from "@/testing/test-utils";
-import { LoginResponse } from "@/types/generated/openapi";
+import type { LoginResponse } from "@/types/generated/openapi";
 
 import { accountRoutes } from "../routes";
 import { AccountSetupPage } from "./AccountSetupPage";

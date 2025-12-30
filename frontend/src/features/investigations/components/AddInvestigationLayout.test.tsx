@@ -14,7 +14,7 @@ import {
 import { Providers } from "@/testing/Providers";
 import { overrideOnce, server } from "@/testing/server";
 import { screen, setupTestRouter, spyOnHandler, within } from "@/testing/test-utils";
-import { CommitteeSessionStatus } from "@/types/generated/openapi";
+import type { CommitteeSessionStatus } from "@/types/generated/openapi";
 
 import { investigationRoutes } from "../routes";
 

@@ -1,9 +1,9 @@
-import { type Locator, type Page } from "@playwright/test";
+import type { Locator, Page } from "@playwright/test";
 
 import { DataEntryBasePage } from "./DataEntryBasePgObj";
 
 export class CandidatesListPage extends DataEntryBasePage {
-  private pgIndex: number;
+  private readonly pgIndex: number;
 
   readonly fieldset: Locator;
 

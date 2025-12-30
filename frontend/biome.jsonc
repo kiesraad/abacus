@@ -70,9 +70,6 @@
       },
       "correctness": {
         "useExhaustiveDependencies": "off"
-      },
-      "style": {
-        "useImportType": "off"
       }
     }
   },

@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { ComponentProps } from "react";
+import type { ComponentProps } from "react";
 import { expect } from "storybook/test";
 
 import { validationResultMockData } from "@/testing/api-mocks/ValidationResultMockData";
-import { ValidationResultCode } from "@/types/generated/openapi";
+import type { ValidationResultCode } from "@/types/generated/openapi";
 
 import { Feedback } from "./Feedback";
 

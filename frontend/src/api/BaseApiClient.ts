@@ -1,11 +1,11 @@
-import { ErrorResponse } from "@/types/generated/openapi";
+import type { ErrorResponse } from "@/types/generated/openapi";
 
 import { ApiErrorEvent, ApiResponseEvent } from "./ApiEvents";
 import {
   AbortedError,
   ApiError,
   ApiResponseStatus,
-  ApiResult,
+  type ApiResult,
   FatalApiError,
   NetworkError,
   NotFoundError,

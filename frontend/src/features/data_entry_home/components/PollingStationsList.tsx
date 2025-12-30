@@ -2,7 +2,7 @@ import { Badge } from "@/components/ui/Badge/Badge";
 import { Table } from "@/components/ui/Table/Table";
 import { t } from "@/i18n/translate";
 
-import { getUrlForDataEntry, PollingStationWithStatus } from "../utils/util";
+import { getUrlForDataEntry, type PollingStationWithStatus } from "../utils/util";
 
 export interface PollingStationsListProps {
   pollingStations: PollingStationWithStatus[];

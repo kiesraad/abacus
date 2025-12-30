@@ -4,7 +4,7 @@ import { useArgs } from "storybook/preview-api";
 import { expect } from "storybook/test";
 
 import { electionMockData } from "@/testing/api-mocks/ElectionMockData";
-import { DataEntryModel, InputGridSubsection, SectionValues } from "@/types/types";
+import type { DataEntryModel, InputGridSubsection, SectionValues } from "@/types/types";
 import { createVotersAndVotesSection } from "@/utils/dataEntryStructure";
 
 import { InputGridSubsectionComponent } from "./InputGridSubsection";

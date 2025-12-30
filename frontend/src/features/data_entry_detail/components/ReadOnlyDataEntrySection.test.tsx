@@ -4,8 +4,8 @@ import { emptyPollingStationResults } from "@/testing/api-mocks/DataEntryMockDat
 import { getElectionMockData } from "@/testing/api-mocks/ElectionMockData";
 import { validationResultMockData } from "@/testing/api-mocks/ValidationResultMockData";
 import { render, screen, within } from "@/testing/test-utils";
-import { PollingStationResults, ValidationResults } from "@/types/generated/openapi";
-import { DataEntrySection } from "@/types/types";
+import type { PollingStationResults, ValidationResults } from "@/types/generated/openapi";
+import type { DataEntrySection } from "@/types/types";
 import { getDataEntryStructure } from "@/utils/dataEntryStructure";
 
 import { ReadOnlyDataEntrySection } from "./ReadOnlyDataEntrySection";

@@ -1,4 +1,4 @@
-import { RouteObject } from "react-router";
+import type { RouteObject } from "react-router";
 
 import { UserCreateDetailsPage } from "./components/create/UserCreateDetailsPage";
 import { UserCreateLayout } from "./components/create/UserCreateLayout";

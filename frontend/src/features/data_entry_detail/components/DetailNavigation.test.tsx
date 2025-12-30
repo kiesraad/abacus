@@ -5,8 +5,8 @@ import { beforeEach, describe, expect, test, vi } from "vitest";
 import { getElectionMockData } from "@/testing/api-mocks/ElectionMockData";
 import { validationResultMockData } from "@/testing/api-mocks/ValidationResultMockData";
 import { render, screen, within } from "@/testing/test-utils";
-import { DataEntryStatusName, ValidationResults } from "@/types/generated/openapi";
-import { DataEntryStructure } from "@/types/types";
+import type { DataEntryStatusName, ValidationResults } from "@/types/generated/openapi";
+import type { DataEntryStructure } from "@/types/types";
 import { getDataEntryStructure } from "@/utils/dataEntryStructure";
 
 import { DetailNavigation } from "./DetailNavigation";

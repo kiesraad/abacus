@@ -1,4 +1,4 @@
-import { ReactNode } from "react";
+import type { ReactNode } from "react";
 
 import { IconWarning } from "@/components/generated/icons";
 import { Badge } from "@/components/ui/Badge/Badge";
@@ -6,10 +6,10 @@ import { Icon } from "@/components/ui/Icon/Icon";
 import { ProgressBar } from "@/components/ui/ProgressBar/ProgressBar";
 import { Table } from "@/components/ui/Table/Table";
 import { t } from "@/i18n/translate";
-import { DataEntryStatusName } from "@/types/generated/openapi";
+import type { DataEntryStatusName } from "@/types/generated/openapi";
 import { formatDateTime } from "@/utils/dateTime";
 
-import { PollingStationWithStatusAndTypist, StatusCategory } from "../hooks/useElectionStatus";
+import type { PollingStationWithStatusAndTypist, StatusCategory } from "../hooks/useElectionStatus";
 
 interface CategoryRowProps {
   category: StatusCategory;

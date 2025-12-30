@@ -1,15 +1,16 @@
-import * as React from "react";
+import { useCallback } from "react";
+
 import { Link, useParams } from "react-router";
 
 import { ProgressList } from "@/components/ui/ProgressList/ProgressList";
 import { useElection } from "@/hooks/election/useElection";
 import { useNumericParam } from "@/hooks/useNumericParam";
 import { t } from "@/i18n/translate";
-import { FormSectionId } from "@/types/types";
-import { MenuStatus } from "@/types/ui";
+import type { FormSectionId } from "@/types/types";
+import type { MenuStatus } from "@/types/ui";
 
 import { useDataEntryContext } from "../hooks/useDataEntryContext";
-import { FormSection } from "../types/types";
+import type { FormSection } from "../types/types";
 import { isFormSectionEmpty } from "../utils/dataEntryUtils";
 import { getUrlForFormSectionID } from "../utils/utils";
 
@@ -20,7 +21,7 @@ export function DataEntryProgress() {
   const params = useParams<{ sectionId: FormSectionId }>();
   const sectionId = params.sectionId ?? null;
 
-  const menuStatusForFormSection = React.useCallback(
+  const menuStatusForFormSection = useCallback(
     (formSection?: FormSection): Exclude<MenuStatus, "active"> => {
       if (!formSection) return "idle";
 
@@ -54,7 +55,7 @@ export function DataEntryProgress() {
 
   const currentIndex = formState.sections[formState.furthest]?.index || 0;
 
-  const renderProgressItem = React.useCallback(
+  const renderProgressItem = useCallback(
     (
       section: { id: FormSectionId; short_title: string },
       options: {

@@ -7,7 +7,7 @@ import { pollingStationMockData } from "@/testing/api-mocks/PollingStationMockDa
 import { Providers } from "@/testing/Providers";
 import { overrideOnce } from "@/testing/server";
 import { renderHook, waitFor } from "@/testing/test-utils";
-import {
+import type {
   ElectionDetailsResponse,
   ElectionStatusResponse,
   PollingStationInvestigation,

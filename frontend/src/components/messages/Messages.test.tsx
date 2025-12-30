@@ -1,6 +1,6 @@
 import { render, screen, within } from "@testing-library/react";
-import { beforeEach, describe, expect, Mock, test, vi } from "vitest";
-import { Message } from "@/hooks/messages/MessagesContext";
+import { beforeEach, describe, expect, type Mock, test, vi } from "vitest";
+import type { Message } from "@/hooks/messages/MessagesContext";
 import * as useMessages from "@/hooks/messages/useMessages";
 
 import { Messages } from "./Messages";

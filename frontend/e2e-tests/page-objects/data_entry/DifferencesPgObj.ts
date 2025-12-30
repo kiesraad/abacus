@@ -1,6 +1,6 @@
-import { type Locator, type Page } from "@playwright/test";
+import type { Locator, Page } from "@playwright/test";
 
-import { DifferencesCounts } from "@/types/generated/openapi";
+import type { DifferencesCounts } from "@/types/generated/openapi";
 
 import { DataEntryBasePage } from "./DataEntryBasePgObj";
 

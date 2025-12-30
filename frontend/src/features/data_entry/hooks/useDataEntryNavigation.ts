@@ -1,10 +1,10 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router";
 
-import { ElectionWithPoliticalGroups } from "@/types/generated/openapi";
-import { FormSectionId } from "@/types/types";
+import type { ElectionWithPoliticalGroups } from "@/types/generated/openapi";
+import type { FormSectionId } from "@/types/types";
 
-import { DataEntryDispatch, DataEntryState } from "../types/types";
+import type { DataEntryDispatch, DataEntryState } from "../types/types";
 import { getBaseUrl, getUrlForFormSectionID } from "../utils/utils";
 
 export default function useDataEntryNavigation(

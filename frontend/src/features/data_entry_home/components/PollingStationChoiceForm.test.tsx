@@ -10,7 +10,7 @@ import { pollingStationMockData } from "@/testing/api-mocks/PollingStationMockDa
 import { ElectionRequestHandler, ElectionStatusRequestHandler } from "@/testing/api-mocks/RequestHandlers";
 import { overrideOnce, server } from "@/testing/server";
 import { render, renderReturningRouter, screen, waitFor, within } from "@/testing/test-utils";
-import { ElectionStatusResponse, LoginResponse } from "@/types/generated/openapi";
+import type { ElectionStatusResponse, LoginResponse } from "@/types/generated/openapi";
 
 import { PollingStationChoiceForm } from "./PollingStationChoiceForm";
 

@@ -1,5 +1,5 @@
 import { ApiErrorEvent, ApiResponseEvent } from "./ApiEvents";
-import { ApiError, ApiResult, FatalApiError } from "./ApiResult";
+import type { ApiError, ApiResult, FatalApiError } from "./ApiResult";
 import { BaseApiClient } from "./BaseApiClient";
 
 export const DEFAULT_CANCEL_REASON = "Component unmounted";

@@ -19,7 +19,7 @@ import { Providers } from "@/testing/Providers";
 import { overrideOnce, server } from "@/testing/server";
 import { render, screen, setupTestRouter, within } from "@/testing/test-utils";
 import { getTypistUser } from "@/testing/user-mock-data";
-import { ElectionDetailsResponse, ElectionStatusResponse } from "@/types/generated/openapi";
+import type { ElectionDetailsResponse, ElectionStatusResponse } from "@/types/generated/openapi";
 
 import { dataEntryHomeRoutes } from "../routes";
 import { DataEntryHomePage } from "./DataEntryHomePage";

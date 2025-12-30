@@ -2,8 +2,8 @@ import { Link } from "react-router";
 
 import { StatusList } from "@/components/ui/StatusList/StatusList";
 import { hasTranslation, t, tx } from "@/i18n/translate";
-import { ValidationResult, ValidationResults } from "@/types/generated/openapi";
-import { DataEntrySection } from "@/types/types";
+import type { ValidationResult, ValidationResults } from "@/types/generated/openapi";
+import type { DataEntrySection } from "@/types/types";
 import { dottedCode, getValidationResultSetForSection } from "@/utils/ValidationResults";
 
 import cls from "./ErrorsAndWarningsOverview.module.css";

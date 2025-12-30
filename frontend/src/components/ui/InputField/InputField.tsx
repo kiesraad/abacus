@@ -1,10 +1,9 @@
-import * as React from "react";
-import { ReactElement } from "react";
+import type { DetailedHTMLProps, InputHTMLAttributes, ReactElement, ReactNode } from "react";
 
 import { NumberInput } from "../NumberInput/NumberInput";
 import cls from "./InputField.module.css";
 
-export interface InputFieldProps extends React.InputHTMLAttributes<HTMLInputElement> {
+export interface InputFieldProps extends InputHTMLAttributes<HTMLInputElement> {
   name: string;
   label: string;
   subtext?: string;
@@ -43,8 +42,8 @@ export function InputField({
   hideErrorMessage,
   ...inputFieldProps
 }: InputFieldProps) {
-  let inputEl: React.ReactNode;
-  const commonProps: React.DetailedHTMLProps<React.InputHTMLAttributes<HTMLInputElement>, HTMLInputElement> = {
+  let inputEl: ReactNode;
+  const commonProps: DetailedHTMLProps<InputHTMLAttributes<HTMLInputElement>, HTMLInputElement> = {
     name,
     value,
     type,

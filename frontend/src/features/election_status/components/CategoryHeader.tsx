@@ -1,9 +1,9 @@
-import { ReactNode } from "react";
+import type { ReactNode } from "react";
 
 import { Table } from "@/components/ui/Table/Table";
 import { t } from "@/i18n/translate";
 
-import { StatusCategory } from "../hooks/useElectionStatus";
+import type { StatusCategory } from "../hooks/useElectionStatus";
 
 interface CategoryHeaderProps {
   category: StatusCategory;

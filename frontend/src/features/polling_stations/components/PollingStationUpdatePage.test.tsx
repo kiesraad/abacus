@@ -16,7 +16,7 @@ import {
 import { overrideOnce, server } from "@/testing/server";
 import { TestUserProvider } from "@/testing/TestUserProvider";
 import { render, screen, spyOnHandler, waitFor, within } from "@/testing/test-utils";
-import { CommitteeSessionStatus, DataEntryStatusName, PollingStation, Role } from "@/types/generated/openapi";
+import type { CommitteeSessionStatus, DataEntryStatusName, PollingStation, Role } from "@/types/generated/openapi";
 
 import { PollingStationUpdatePage } from "./PollingStationUpdatePage";
 

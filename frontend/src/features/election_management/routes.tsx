@@ -1,4 +1,4 @@
-import { RouteObject } from "react-router";
+import type { RouteObject } from "react-router";
 
 import { NotAvailableInMock } from "@/components/error/NotAvailableInMock";
 import { t } from "@/i18n/translate";

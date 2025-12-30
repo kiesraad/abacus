@@ -1,6 +1,6 @@
 import { useElection } from "@/hooks/election/useElection";
 import { useElectionStatus } from "@/hooks/election/useElectionStatus";
-import { DataEntryStatusName, PollingStation, PollingStationInvestigation } from "@/types/generated/openapi";
+import type { DataEntryStatusName, PollingStation, PollingStationInvestigation } from "@/types/generated/openapi";
 
 export interface PollingStationInvestigationWithStatus extends PollingStationInvestigation {
   pollingStation: PollingStation;

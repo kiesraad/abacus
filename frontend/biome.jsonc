@@ -86,7 +86,6 @@
         "useTemplate": "off"
       },
       "suspicious": {
-        "noImplicitAnyLet": "off",
         "noPrototypeBuiltins": "off"
       }
     }

@@ -70,9 +70,6 @@
       },
       "correctness": {
         "useExhaustiveDependencies": "off"
-      },
-      "suspicious": {
-        "noPrototypeBuiltins": "off"
       }
     }
   },

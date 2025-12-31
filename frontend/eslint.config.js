@@ -89,7 +89,7 @@ export default defineConfig(
   // Enforce Rules of React for frontend code
   {
     files: ["src/**/*.ts{,x}"],
-    extends: [reactHooks.configs["recommended-latest"]],
+    extends: [reactHooks.configs.flat["recommended-latest"]],
   },
   // Enable Playwright rules for e2e tests
   {

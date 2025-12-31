@@ -58,13 +58,21 @@ export interface ButtonLabelProps extends LabelHTMLAttributes<HTMLLabelElement> 
   disabled?: boolean;
   variant?: ButtonVariant;
   size?: Size;
+  htmlFor: string;
   children: ReactNode;
 }
 
-function ButtonLabel({ disabled, variant = "primary", size = "md", children, ...labelProps }: ButtonLabelProps) {
+function ButtonLabel({
+  disabled,
+  variant = "primary",
+  size = "md",
+  htmlFor,
+  children,
+  ...labelProps
+}: ButtonLabelProps) {
   const className = cn(cls.button, cls[variant], cls[size], disabled ? cls.disabled : undefined);
   return (
-    <label className={className} {...labelProps}>
+    <label className={className} htmlFor={htmlFor} {...labelProps}>
       {children}
     </label>
   );

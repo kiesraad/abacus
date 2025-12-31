@@ -106,6 +106,7 @@ export function InvestigationReason({ pollingStationId }: InvestigationReasonPro
             </ul>
           </section>
           <InputField
+            id="reason"
             type="text"
             fieldSize="text-area"
             name="reason"

@@ -103,6 +103,7 @@ export function CheckHash({ date, title, header, description, redactedHash, erro
             {stubs.map((stub, stubIndex) => (
               <InputField
                 className="font-number-slashed-0"
+                id={stub.index.toString()}
                 key={stub.index}
                 name={stub.index.toString()}
                 type="text"

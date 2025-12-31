@@ -32,7 +32,7 @@ function FormRow({ children }: { children: ReactNode }) {
 function FormField({ label, children }: { children: ReactNode; label?: string }) {
   return (
     <div className={cls.formField}>
-      {label && <label>{label}</label>}
+      {label && <span className="label">{label}</span>}
       {children}
     </div>
   );

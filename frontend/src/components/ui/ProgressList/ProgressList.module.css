@@ -32,8 +32,8 @@
 
     &.item:hover {
       background-color: var(--color-hover);
-      &:has(label > a:focus),
-      &:has(label > a:focus-visible) {
+      &:has(div > a:focus),
+      &:has(div > a:focus-visible) {
         background-color: transparent;
       }
     }
@@ -67,7 +67,7 @@
       overflow: hidden;
     }
 
-    label {
+    div {
       flex: 1 0 0;
       text-overflow: ellipsis;
       overflow: hidden;

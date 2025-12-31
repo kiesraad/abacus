@@ -1,5 +1,6 @@
 import { execSync } from "node:child_process";
 import path from "node:path";
+import react from "@vitejs/plugin-react";
 import browserslist from "browserslist";
 import { browserslistToTargets } from "lightningcss";
 import { defineConfig, type UserConfig } from "vite";
@@ -79,6 +80,13 @@ export default defineConfig(({ command }) => {
   }
 
   return {
+    plugins: [
+      react({
+        babel: {
+          plugins: ["babel-plugin-react-compiler"],
+        },
+      }),
+    ],
     build: {
       outDir: path.resolve(__dirname, "dist"),
       emptyOutDir: true,

@@ -1,5 +1,4 @@
 import { codecovVitePlugin } from "@codecov/vite-plugin";
-import react from "@vitejs/plugin-react-swc";
 import { defineConfig, mergeConfig } from "vite";
 
 import viteConfig from "./vite-prod.config";
@@ -9,7 +8,6 @@ export default defineConfig((configEnv) =>
     viteConfig(configEnv),
     defineConfig({
       plugins: [
-        react(),
         codecovVitePlugin({
           enableBundleAnalysis: process.env.CODECOV_TOKEN !== undefined,
           bundleName: "abacus-frontend",

@@ -48,10 +48,6 @@ export function PollingStationChoiceForm({ anotherEntry }: PollingStationChoiceF
     void electionStatus.refetch();
   };
 
-  document.getElementById("polling_station_details")?.addEventListener("toggle", () => {
-    refetchStatuses();
-  });
-
   const pollingStationsWithStatus = useMemo(() => {
     return getPollingStationWithStatusList({
       pollingStations,
@@ -189,7 +185,7 @@ export function PollingStationChoiceForm({ anotherEntry }: PollingStationChoiceF
         </BottomBar>
       </fieldset>
       <div className={cls.dataEntryList}>
-        <details id="polling_station_details">
+        <details id="polling_station_details" onToggle={refetchStatuses}>
           <summary>
             {t("polling_station_choice.unknown_number")}
             <br />

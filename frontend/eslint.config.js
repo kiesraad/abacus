@@ -7,7 +7,6 @@ import playwright from "eslint-plugin-playwright";
 import reactHooks from "eslint-plugin-react-hooks";
 import storybook from "eslint-plugin-storybook";
 import { readdirSync } from "fs";
-import globals from "globals";
 import tseslint from "typescript-eslint";
 
 const restrictFeatureImports = readdirSync("./src/features", { withFileTypes: true })

@@ -30,7 +30,7 @@ export default defineConfig((configEnv) =>
             plugins: [
               storybookTest({
                 configDir: path.join(dirname, ".storybook"),
-                storybookScript: "npm run storybook -- --ci",
+                storybookScript: "pnpm storybook --ci",
               }),
             ],
             test: {

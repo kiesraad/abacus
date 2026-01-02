@@ -63,6 +63,7 @@
         "noSvgWithoutTitle": "off"
       },
       "complexity": {
+        "noUselessFragments": "warn",
         "noImportantStyles": "off"
       },
       "correctness": {

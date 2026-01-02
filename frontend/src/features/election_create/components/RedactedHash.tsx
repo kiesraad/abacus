@@ -25,7 +25,7 @@ export function RedactedHash({ hash, stubs }: RedactedHashProps) {
           // Either render a stub marker, or just return the prefix and chunk text
           if (stubIndex !== -1) {
             const stub = stubs[stubIndex];
-            if (!stub) return <></>;
+            if (!stub) return null;
             const selected = stub.selected;
             const error = stub.error.length > 0;
 

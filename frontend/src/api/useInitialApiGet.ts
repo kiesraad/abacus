@@ -76,7 +76,7 @@ function useInitialApiGetInner<T>(
     return () => {
       controller.abort(DEFAULT_CANCEL_REASON);
     };
-  }, [client, path, throwFatalErrors]);
+  }, [client, path]);
 
   return {
     requestState,

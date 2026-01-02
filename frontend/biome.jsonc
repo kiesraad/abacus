@@ -64,9 +64,6 @@
       "complexity": {
         "noImportantStyles": "off"
       },
-      "correctness": {
-        "useExhaustiveDependencies": "off"
-      },
       "style": {
         "useComponentExportOnlyModules": {
           "level": "on",

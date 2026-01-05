@@ -49,16 +49,16 @@ jobs:
           df -h
       - uses: actions/checkout@v6
       # Build frontend so that it can be included in the backend build
-      - name: Install pnpm
-        uses: pnpm/action-setup@41ff72655975bd51cab0327fa583b6e92b6d3061 # v4
-        with:
-          version: 10
       - name: Setup Node
         uses: actions/setup-node@v6
         with:
           node-version: 22
-          cache: "pnpm"
-          cache-dependency-path: ./frontend/pnpm-lock.yaml
+          package-manager-cache: false
+      - name: Install pnpm
+        run: >
+          npm install --global corepack@latest &&
+          corepack enable &&
+          corepack prepare pnpm@latest-10 --activate
       - name: Install frontend dependencies
         run: pnpm install
         working-directory: ./frontend
@@ -107,16 +107,16 @@ jobs:
         working-directory: frontend
     steps:
       - uses: actions/checkout@v6
-      - name: Install pnpm
-        uses: pnpm/action-setup@41ff72655975bd51cab0327fa583b6e92b6d3061 # v4
-        with:
-          version: 10
       - name: Setup Node
         uses: actions/setup-node@v6
         with:
           node-version: 22
-          cache: "pnpm"
-          cache-dependency-path: ./frontend/pnpm-lock.yaml
+          package-manager-cache: false
+      - name: Install pnpm
+        run: >
+          npm install --global corepack@latest &&
+          corepack enable &&
+          corepack prepare pnpm@latest-10 --activate
       - name: Install dependencies
         run: pnpm install
       - name: Run Biome
@@ -150,16 +150,16 @@ jobs:
         working-directory: frontend
     steps:
       - uses: actions/checkout@v6
-      - name: Install pnpm
-        uses: pnpm/action-setup@41ff72655975bd51cab0327fa583b6e92b6d3061 # v4
-        with:
-          version: 10
       - name: Setup Node
         uses: actions/setup-node@v6
         with:
           node-version: 22
-          cache: "pnpm"
-          cache-dependency-path: ./frontend/pnpm-lock.yaml
+          package-manager-cache: false
+      - name: Install pnpm
+        run: >
+          npm install --global corepack@latest &&
+          corepack enable &&
+          corepack prepare pnpm@latest-10 --activate
       - name: Install dependencies
         run: pnpm install
       - name: Install Playwright Browsers

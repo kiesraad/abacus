@@ -32,7 +32,6 @@
     "gen:po": "vite-node scripts/gen_po.js",
     "gen:translation-json": "vite-node scripts/gen_translation-json.js",
     "check-server": "vite-node scripts/check_server.js",
-    "serve": "pnpm build:msw && pnpx serve dist",
     "storybook": "storybook dev -p 6006",
     "build:storybook": "storybook build -o dist-storybook"
   },

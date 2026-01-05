@@ -22,8 +22,6 @@ ProgressList.Fixed = ({ children }: { children: ReactNode }) => (
 );
 ProgressList.Scroll = ProgressListScroll;
 
-ProgressList.Ruler = () => <li className="ruler">&nbsp;</li>;
-
 // active is not a status since we might want to show both concurrently.
 export type ProgressListItemProps = {
   status: MenuStatus;

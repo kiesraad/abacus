@@ -23,7 +23,8 @@ listing.forEach((file) => {
   if (!content.includes("aria-hidden=")) {
     content = content.replace(/^<svg /, '<svg aria-hidden="true" ');
   }
-  content = content.replace(/>/, "{...props} >");
+  // inject React props into the opening <svg> tag
+  content = content.replace(/^<svg\b([^>]*)>/, "<svg$1 {...props} >");
 
   result.push(`export const ${iconComponent} = (props:SVGAttributes<SVGElement>) => (${content});\n`);
 });

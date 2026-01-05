@@ -35,20 +35,21 @@ EML_NL 210 (kandidatenlijst voor een politieke groepering) wordt niet gebruikt, 
 
 ### Documenten
 
-| Model(onderdeel)  | DSO | CSO | Doel                               | 'leeg' document uit Abacus | input voor Abacus | output van Abacus |
-|-------------------|:---:|:---:|------------------------------------|:--------------------------:|:-----------------:|:-----------------:|
-| N 10-1            |  X  |     | PV SB                              |             X              |         X         |                   |
-| Na 14-1 versie 1  |  X  |     | Corrigendum SB - eerste zitting    |             X              |         X         |                   |
-| N 10-2            |     |  X  | PV SB                              |             X              |         X         |                   |
-| N 5               |  X  |  X  | Overdrachtsdocument GSB            |                            |                   |                   |
-| Na 31-2 Bijlage 1 |     |  X  | Telresultaten SB                   |             X              |         X         |                   |
-| Na 31-2 Bijlage 2 |     |  X  | Bezwaren SB's                      |                            |                   |                   |
-| Na 31-1           |  X  |     | PV GSB - eerste zitting            |                            |                   |         X         |
-| Na 31-2           |     |  X  | PV GSB - eerste zitting            |                            |                   |         X         |
-| Na 14-1 versie 2  |  X  |     | Corrigendum SB - volgende zitting  |             X              |         X         |                   |
-| Na 14-2 Bijlage 1 |     |  X  | Corrigendum SB - volgende zitting  |             X              |         X         |                   |
-| Na 14-2           |  X  |  X  | Corrigendum GSB - volgende zitting |                            |                   |         X         |
-| P 2a              |  X  |  X  | Verslag volgende zitting           |                            |                   |         X         |
+| Model(onderdeel)  | DSO | CSO | Doel                                | 'leeg' document uit Abacus | input voor Abacus | output van Abacus |
+|-------------------|:---:|:---:|-------------------------------------|:--------------------------:|:-----------------:|:-----------------:|
+| N 10-1            |  X  |     | PV SB                               |             X              |         X         |                   |
+| Na 14-1 versie 1  |  X  |     | Corrigendum SB - eerste zitting     |             X              |         X         |                   |
+| N 10-2            |     |  X  | PV SB                               |             X              |         X         |                   |
+| N 5               |  X  |  X  | Overdrachtsdocument GSB             |                            |                   |                   |
+| Na 31-2 Bijlage 1 |     |  X  | Telresultaten SB                    |             X              |         X         |                   |
+| Na 31-2 Bijlage 2 |     |  X  | Bezwaren SB's                       |                            |                   |                   |
+| Na 31-1           |  X  |     | PV GSB - eerste zitting             |                            |                   |         X         |
+| Na 31-2           |     |  X  | PV GSB - eerste zitting             |                            |                   |         X         |
+| Na 14-1 versie 2  |  X  |     | Corrigendum SB - volgende zitting   |             X              |         X         |                   |
+| Na 14-2 Bijlage 1 |     |  X  | Corrigendum SB - volgende zitting   |             X              |         X         |                   |
+| Na 14-2           |  X  |  X  | Corrigendum GSB - volgende zitting  |                            |                   |         X         |
+| P 2a              |  X  |  X  | Verslag volgende zitting            |                            |                   |         X         |
+| Na 31-2 Inlegvel  |     |  X  | Inlegvel n.a.v. controle i.o.v. CSB |             X              |                   |                   |
 
 #### N 10-1 (DSO) en N 10-2 (CSO): PV op SB-niveau
 
@@ -98,6 +99,12 @@ EML_NL 210 (kandidatenlijst voor een politieke groepering) wordt niet gebruikt, 
 #### P 2a (DSO en CSO): Verslag volgende zitting
 
 - gegenereerd door Abacus, alleen als er een volgende zitting is
+
+#### Na 31-2 Inlegvel (CSO): Inlegvel PV GSB eerste zitting n.a.v. controles in opdracht van CSB
+
+- lege versie gegenereerd door Abacus voor een tweede (en alleen tweede) zitting
+- wordt toegevoegd aan Na 31-2 om aan te geven dat het GSB een onderzoek heeft uitgevoerd en of er wel/geen gecorrigeerde telresultaten zijn
+
 
 ### Tellingsbestanden
 

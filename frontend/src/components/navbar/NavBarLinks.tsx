@@ -47,7 +47,7 @@ function ElectionManagementLinks({ location }: NavBarLinksProps) {
   const { currentCommitteeSession, election } = useElection();
 
   if (location.pathname.match(/^\/elections\/\d+\/?$/)) {
-    return <></>;
+    return null;
   }
 
   return (
@@ -108,5 +108,5 @@ export function NavBarLinks({ location }: NavBarLinksProps) {
     return <ElectionManagementLinks location={location} />;
   }
 
-  return <></>;
+  return null;
 }

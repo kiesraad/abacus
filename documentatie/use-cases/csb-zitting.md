@@ -28,6 +28,7 @@ __Uitbreidingen:__
 3a. Het GSB PV geeft aanleiding tot een terugverwijzing:  
 &emsp; 3a1. Het CSB verwijst terug naar het GSB.  
 &emsp; 3a2. [Gemeentelijk stembureau (GSB) stelt uitkomst vast in tweede zitting (corrigenda) (wolk)](./gsb-tweede-zitting.md#gemeentelijk-stembureau-gsb-stelt-uitkomst-vast-in-tweede-zitting-corrigenda-wolk)  
+&emsp; 3a3. (CSO) Het CSB voegt het Inlegvel Na 31-2 toe aan het PV Na 31-2.
 
 4-11a. Het CSB moet nieuwe aantallen invoeren ter correctie van de eerder ingevoerde tellingen:  
 &emsp; 4-11a1. Het CSB corrigeert de eerder ingevoerde aantallen in de applicatie. Er is dus geen tweede CSB-zitting.

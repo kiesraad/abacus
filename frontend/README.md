@@ -5,19 +5,20 @@
 ### Prerequisites
 
 - [Node](https://nodejs.org) v22
+- [pnpm](https://pnpm.io/) v10
 
 ### Building
 
 Install JavaScript dependencies:
 
 ```sh
-npm install
+pnpm install
 ```
 
 Install Playwright dependencies:
 
 ```sh
-npx playwright install --with-deps --no-shell
+pnpm playwright install --with-deps --no-shell
 ```
 
 ### Running
@@ -25,19 +26,19 @@ npx playwright install --with-deps --no-shell
 To run with the backend API server, first [start the API server](../backend/README.md#running) and use:
 
 ```sh
-npm run dev
+pnpm dev
 ```
 
 This runs the client with a (client-side) mock API:
 
 ```sh
-npm run dev:msw
+pnpm dev:msw
 ```
 
 ### Linting
 
 ```sh
-npm run lint
+pnpm lint
 ```
 
 ### Testing
@@ -45,7 +46,7 @@ npm run lint
 Unit tests
 
 ```sh
-npm run test
+pnpm test
 ```
 
 Browser tests using Playwright:
@@ -54,12 +55,12 @@ Browser tests using Playwright:
 # tests for frontend with backend and database
 # tests use database at backend/target/debug/playwright.sqlite
 # build frontend, build backend, setup fresh seeded database:
-npm run test:e2e
+pnpm test:e2e
 # run tests, expect builds and database to be available:
-npm run test:e2e-dev
+pnpm test:e2e-dev
 
 # view reports and traces, e.g. the ones saved by our pipeline:
-npx playwright show-report <path-to-unzipped-report-folder>
+pnpm playwright show-report <path-to-unzipped-report-folder>
 ```
 
 When manually debugging Playwright tests in developer mode, it is important to have Abacus in the correct state:
@@ -70,7 +71,7 @@ When manually debugging Playwright tests in developer mode, it is important to h
   ```
 - Run the Abacus frontend in developer mode (here in `../frontend`):
   ```sh
-  npm run dev
+  pnpm dev
   ```
 - Start Playwright in debug mode (also here in `../frontend`):
   ```
@@ -90,10 +91,10 @@ When manually debugging Playwright tests in developer mode, it is important to h
 
 ```sh
 # Start Storybook development server
-npm run storybook
+pnpm storybook
 
 # Run Storybook tests
-npm run test -- --project storybook
+pnpm test --project storybook
 ```
 
 Storybook runs on [http://localhost:6006](http://localhost:6006) and provides an interactive component library for developing and testing UI components in isolation.
@@ -103,17 +104,18 @@ Storybook runs on [http://localhost:6006](http://localhost:6006) and provides an
 Prerequisites:
 
 - [Node](https://nodejs.org) v22
+- [pnpm](https://pnpm.io/) v10
 
 Install npm dependencies, skipping development dependencies:
 
 ```sh
-npm clean-install --omit=dev
+pnpm install --prod
 ```
 
 Build the frontend:
 
 ```sh
-npm run build
+pnpm build
 ```
 
 The built frontend is located in the `dist` directory.
@@ -153,7 +155,7 @@ The application uses the following dependencies:
 Generate Typescript types from `/backend/openapi.json`:
 
 ```sh
-npm run gen:openapi
+pnpm gen:openapi
 ```
 
 This results in `/frontend/src/types/generated/openapi.ts`.
@@ -163,7 +165,7 @@ This results in `/frontend/src/types/generated/openapi.ts`.
 Generate React components from icons located in `/frontend/src/assets/icons`:
 
 ```sh
-npm run gen:icons
+pnpm gen:icons
 ```
 
 This results in `/frontend/src/components/generated/icons.tsx`.
@@ -174,7 +176,7 @@ Use this script to create `.po` files (one for every defined locale) that can de
 This script generates `.po` translation files from the current json translations in `/frontend/src/i18n/locales/<locale>/*.json`:
 
 ```sh
-npm run gen:po
+pnpm gen:po
 ```
 
 This results in `/frontend/translations/<locale>.po`. These can be imported into translation software.
@@ -185,7 +187,7 @@ Use this script to convert modified `.po` files back to our application json tra
 This script generates json translation files from `.po` translation files in `/frontend/translations/<locale>.po`:
 
 ```sh
-npm run gen:translation-json
+pnpm gen:translation-json
 ```
 
 This results in `/frontend/src/i18n/locales/<locale>/*.json`. These contain the texts used by the application.

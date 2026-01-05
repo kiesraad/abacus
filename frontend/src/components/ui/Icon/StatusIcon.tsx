@@ -24,6 +24,6 @@ export function StatusIcon({ status }: { status: MenuStatus }) {
     case "error":
       return <IconError aria-label={t("contains_error")} />; // "Ingevoerd, met openstaande fouten"
     default:
-      return <></>;
+      return null;
   }
 }

@@ -83,6 +83,7 @@ export function FirstLoginForm({ prev }: FirstLoginFormProps) {
                 {tx("initialise.login_to_finish_setup", { link })}
 
                 <InputField
+                  id="username"
                   name="username"
                   label={t("account.username")}
                   hint={t("initialise.username_login_hint")}
@@ -94,6 +95,7 @@ export function FirstLoginForm({ prev }: FirstLoginFormProps) {
                   }}
                 />
                 <InputField
+                  id="password"
                   name="password"
                   label={t("account.password")}
                   hint={t("initialise.password_login_hint")}

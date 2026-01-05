@@ -67,7 +67,7 @@ jobs:
           workspaces: "backend -> target"
           cache-bin: "false"
       - name: Install Binstall
-        uses: cargo-bins/cargo-binstall@ea60fcf749c6a52a729e0eaabb5eb33391d44823 # main
+        uses: cargo-bins/cargo-binstall@80aaafe04903087c333980fa2686259ddd34b2d9 # main
       - name: Install cargo-llvm-cov
         run: cargo binstall cargo-llvm-cov
       - name: Install Nextest
@@ -111,16 +111,22 @@ jobs:
         uses: actions/setup-node@v6
         with:
           node-version: 22
+          package-manager-cache: false
+      - name: Install pnpm
+        run: >
+          npm install --global corepack@latest &&
+          corepack enable &&
+          corepack prepare pnpm@latest-10 --activate
       - name: Install dependencies
-        run: npm ci
+        run: pnpm install
       - name: Install Playwright Chromium Browser
-        run: npx playwright install --with-deps chromium
+        run: pnpm playwright install --with-deps chromium
       - name: Run Vite build to report bundle size
-        run: npx vite build --config vite.config.ts
+        run: pnpm vite build --config vite.config.ts
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
       - name: Run tests with coverage
-        run: npx vitest run --coverage --reporter=junit --outputFile=test-report.junit.xml
+        run: pnpm vitest run --coverage --reporter=junit --outputFile=test-report.junit.xml
       - name: Upload test results to Codecov
         if: ${{ !cancelled() }}
         uses: codecov/codecov-action@671740ac38dd9b0130fbe1cec585b89eea48d3de # v5

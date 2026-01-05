@@ -86,6 +86,7 @@ export function LoginForm() {
       <FormLayout>
         <FormLayout.Section>
           <InputField
+            id="username"
             name="username"
             label={t("account.username")}
             hint={t("account.username_login_hint")}
@@ -97,6 +98,7 @@ export function LoginForm() {
             }}
           />
           <InputField
+            id="password"
             name="password"
             label={t("account.password")}
             hint={t("account.password_login_hint")}

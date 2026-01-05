@@ -8,6 +8,6 @@ export class UserUpdatePgObj {
   constructor(protected readonly page: Page) {
     this.fullname = page.getByRole("textbox", { name: "Volledige naam" });
     this.save = page.getByRole("button", { name: "Opslaan" });
-    this.delete = page.getByRole("button", { name: /Gebruiker verwijderen/ });
+    this.delete = page.getByRole("button", { name: "Gebruiker verwijderen" });
   }
 }

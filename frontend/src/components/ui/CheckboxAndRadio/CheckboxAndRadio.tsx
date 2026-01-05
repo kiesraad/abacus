@@ -47,6 +47,7 @@ export const CheckboxAndRadio = forwardRef<HTMLInputElement, CheckboxAndRadioPro
           ref={ref}
           onChange={onChange}
           disabled={disabled}
+          // biome-ignore lint/a11y/noAutofocus: for usability we have to use autofocus
           autoFocus={autoFocus}
           aria-invalid={hasError}
           {...inputProps}

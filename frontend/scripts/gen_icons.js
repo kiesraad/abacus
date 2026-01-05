@@ -33,7 +33,7 @@ function ucfirst(s) {
 }
 
 function kebabToCamelCase(s) {
-  const keepAsIs = ["aria-label"];
+  const keepAsIs = ["aria-label", "aria-hidden"];
 
   if (keepAsIs.includes(s)) {
     return s;

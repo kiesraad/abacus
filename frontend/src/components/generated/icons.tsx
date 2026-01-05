@@ -7,7 +7,7 @@ export const IconArrowBlockUp = (props: SVGAttributes<SVGElement>) => (
     {...props}
     viewBox="0 0 24 24"
     role="img"
-    aria-label="Omhoog wijzende pijl"
+    aria-hidden="true"
     xmlns="http://www.w3.org/2000/svg"
     version="1.1"
   >
@@ -21,7 +21,7 @@ export const IconArrowLeft = (props: SVGAttributes<SVGElement>) => (
     {...props}
     viewBox="0 0 24 24"
     role="img"
-    aria-label="Naar links wijzende pijl"
+    aria-hidden="true"
     xmlns="http://www.w3.org/2000/svg"
     version="1.1"
   >
@@ -35,7 +35,7 @@ export const IconArrowNarrowDown = (props: SVGAttributes<SVGElement>) => (
     {...props}
     viewBox="0 0 16 16"
     role="img"
-    aria-label="Naar beneden wijzende pijl"
+    aria-hidden="true"
     xmlns="http://www.w3.org/2000/svg"
     version="1.1"
   >
@@ -49,7 +49,6 @@ export const IconArrowNarrowRight = (props: SVGAttributes<SVGElement>) => (
     {...props}
     viewBox="0 0 24 24"
     role="img"
-    aria-label="Naar rechts wijzende pijl"
     xmlns="http://www.w3.org/2000/svg"
     version="1.1"
   >
@@ -63,11 +62,25 @@ export const IconArrowNarrowUp = (props: SVGAttributes<SVGElement>) => (
     {...props}
     viewBox="0 0 16 16"
     role="img"
-    aria-label="Naar boven wijzende pijl"
+    aria-hidden="true"
     xmlns="http://www.w3.org/2000/svg"
     version="1.1"
   >
     <path d="M7.907 2.186 C 7.863 2.196,7.791 2.224,7.747 2.247 C 7.631 2.309,3.614 6.342,3.559 6.451 C 3.358 6.855,3.813 7.309,4.215 7.107 C 4.266 7.082,5.024 6.346,5.900 5.471 L 7.493 3.881 7.500 8.667 L 7.507 13.453 7.577 13.574 C 7.771 13.903,8.237 13.900,8.427 13.569 L 8.493 13.453 8.500 8.667 L 8.507 3.881 10.100 5.471 C 10.976 6.346,11.734 7.082,11.785 7.107 C 12.188 7.309,12.642 6.854,12.440 6.451 C 12.381 6.332,8.393 2.336,8.253 2.255 C 8.128 2.182,8.018 2.160,7.907 2.186" />
+  </svg>
+);
+
+export const IconArrowRight = (props: SVGAttributes<SVGElement>) => (
+  <svg
+    data-icon="IconArrowRight"
+    {...props}
+    viewBox="0 0 14 14"
+    role="img"
+    aria-hidden="true"
+    xmlns="http://www.w3.org/2000/svg"
+    version="1.1"
+  >
+    <path d="M6.515.026c-.529.089-.823.684-.585 1.183.041.084.573.631 2.305 2.367l2.253 2.257-4.818.001c-3.205 0-4.868.008-4.967.024a.8.8 0 0 0-.677.67.828.828 0 0 0 .464.89l.128.06 4.93.006c2.711.004 4.929.014 4.929.023 0 .01-1.013 1.031-2.25 2.27-1.505 1.506-2.265 2.283-2.297 2.348a.9.9 0 0 0 .001.748.923.923 0 0 0 .392.378c.11.052.161.061.35.061.197 0 .236-.008.352-.066.109-.055.631-.567 3.153-3.092 2.443-2.446 3.033-3.048 3.078-3.142.047-.098.056-.153.056-.339 0-.398.274-.091-3.09-3.46C8.585 1.573 7.192.196 7.128.154a.817.817 0 0 0-.613-.128" />
   </svg>
 );
 
@@ -77,7 +90,7 @@ export const IconAsterisk = (props: SVGAttributes<SVGElement>) => (
     {...props}
     viewBox="0 0 24 24"
     role="img"
-    aria-label="Asterisk"
+    aria-hidden="true"
     xmlns="http://www.w3.org/2000/svg"
     version="1.1"
   >
@@ -91,7 +104,7 @@ export const IconCheckHeart = (props: SVGAttributes<SVGElement>) => (
     {...props}
     viewBox="0 0 24 24"
     role="img"
-    aria-label="Hart met vinkje"
+    aria-hidden="true"
     xmlns="http://www.w3.org/2000/svg"
     version="1.1"
   >
@@ -105,7 +118,7 @@ export const IconCheckVerified = (props: SVGAttributes<SVGElement>) => (
     {...props}
     viewBox="0 0 32 32"
     role="img"
-    aria-label="Vorm met vinkje"
+    aria-hidden="true"
     xmlns="http://www.w3.org/2000/svg"
     version="1.1"
   >
@@ -124,7 +137,6 @@ export const IconCheckmark = (props: SVGAttributes<SVGElement>) => (
     y="0px"
     viewBox="0 0 24 24"
     role="img"
-    aria-label="Vinkje"
     xmlns="http://www.w3.org/2000/svg"
     version="1.1"
   >
@@ -138,7 +150,7 @@ export const IconCheckmarkSmall = (props: SVGAttributes<SVGElement>) => (
     {...props}
     viewBox="0 0 14 14"
     role="img"
-    aria-label="Vinkje"
+    aria-hidden="true"
     xmlns="http://www.w3.org/2000/svg"
     version="1.1"
   >
@@ -153,7 +165,7 @@ export const IconChevronRight = (props: SVGAttributes<SVGElement>) => (
     fill="#475467"
     viewBox="0 0 20 20"
     role="img"
-    aria-label="Naar rechts wijzende chevron"
+    aria-hidden="true"
     xmlns="http://www.w3.org/2000/svg"
     version="1.1"
   >
@@ -167,7 +179,7 @@ export const IconClock = (props: SVGAttributes<SVGElement>) => (
     {...props}
     viewBox="0 0 24 24"
     role="img"
-    aria-label="Klok"
+    aria-hidden="true"
     xmlns="http://www.w3.org/2000/svg"
     version="1.1"
   >
@@ -181,7 +193,7 @@ export const IconCompass = (props: SVGAttributes<SVGElement>) => (
     {...props}
     viewBox="0 0 24 24"
     role="img"
-    aria-label="Kompas"
+    aria-hidden="true"
     xmlns="http://www.w3.org/2000/svg"
     version="1.1"
   >
@@ -196,7 +208,7 @@ export const IconCornerDownLeft = (props: SVGAttributes<SVGElement>) => (
     {...props}
     viewBox="0 0 16 16"
     role="img"
-    aria-label="Naar links wijzende gebogen pijl"
+    aria-hidden="true"
     xmlns="http://www.w3.org/2000/svg"
     version="1.1"
   >
@@ -212,7 +224,7 @@ export const IconCross = (props: SVGAttributes<SVGElement>) => (
     y="0px"
     viewBox="0 0 20 20"
     role="img"
-    aria-label="Kruisje"
+    aria-hidden="true"
     xmlns="http://www.w3.org/2000/svg"
     version="1.1"
   >
@@ -229,7 +241,7 @@ export const IconDot = (props: SVGAttributes<SVGElement>) => (
     {...props}
     viewBox="0 0 24 24"
     role="img"
-    aria-label="Stip"
+    aria-hidden="true"
     xmlns="http://www.w3.org/2000/svg"
     version="1.1"
   >
@@ -244,7 +256,7 @@ export const IconDownload = (props: SVGAttributes<SVGElement>) => (
     fill="#475467"
     viewBox="0 0 24 24"
     role="img"
-    aria-label="Download bestand"
+    aria-hidden="true"
     xmlns="http://www.w3.org/2000/svg"
     version="1.1"
   >
@@ -256,15 +268,7 @@ export const IconDownload = (props: SVGAttributes<SVGElement>) => (
 );
 
 export const IconEdit = (props: SVGAttributes<SVGElement>) => (
-  <svg
-    data-icon="IconEdit"
-    {...props}
-    viewBox="0 0 24 24"
-    role="img"
-    aria-label="Potlood"
-    xmlns="http://www.w3.org/2000/svg"
-    version="1.1"
-  >
+  <svg data-icon="IconEdit" {...props} viewBox="0 0 24 24" role="img" xmlns="http://www.w3.org/2000/svg" version="1.1">
     <path d="M5.84,19.65c-.26,0-.52-.1-.71-.29-.21-.21-.32-.52-.29-.82l.25-2.26c.03-.31.06-.51.13-.74.07-.2.16-.39.27-.57.13-.2.28-.35.5-.56l6.79-6.79s0,0,.01-.01c0,0,0,0,.01-.01l1.99-1.99c1.12-1.12,2.96-1.13,4.08,0s1.12,2.96,0,4.08l-8.8,8.8c-.22.22-.36.36-.56.5-.18.12-.37.21-.57.27-.22.07-.42.09-.71.13l-2.28.25s-.07,0-.11,0ZM13.51,9.73l-6.1,6.1c-.12.12-.19.18-.24.25-.06.16-.06.25-.08.42l-.11,1.02,1.01-.11c.18-.02.27-.02.34-.04.15-.08.21-.15.33-.28l6.1-6.1-1.25-1.25ZM14.92,8.31l1.25,1.25,1.29-1.29c.34-.35.34-.91,0-1.25s-.91-.35-1.25,0l-1.29,1.29Z" />
   </svg>
 );
@@ -276,7 +280,6 @@ export const IconError = (props: SVGAttributes<SVGElement>) => (
     fill="#d03651"
     viewBox="0 0 24 24"
     role="img"
-    aria-label="Vorm met uitroepteken"
     xmlns="http://www.w3.org/2000/svg"
     version="1.1"
   >
@@ -290,7 +293,7 @@ export const IconFile = (props: SVGAttributes<SVGElement>) => (
     {...props}
     viewBox="0 0 24 24"
     role="img"
-    aria-label="Bestand"
+    aria-hidden="true"
     xmlns="http://www.w3.org/2000/svg"
     version="1.1"
   >
@@ -307,7 +310,7 @@ export const IconFilePlus = (props: SVGAttributes<SVGElement>) => (
     {...props}
     viewBox="0 0 24 24"
     role="img"
-    aria-label="Bestand toevoegen"
+    aria-hidden="true"
     xmlns="http://www.w3.org/2000/svg"
     version="1.1"
   >
@@ -324,7 +327,7 @@ export const IconFilter = (props: SVGAttributes<SVGElement>) => (
     {...props}
     viewBox="0 0 20 20"
     role="img"
-    aria-label="Filter"
+    aria-hidden="true"
     xmlns="http://www.w3.org/2000/svg"
     version="1.1"
   >
@@ -341,7 +344,7 @@ export const IconHamburger = (props: SVGAttributes<SVGElement>) => (
     {...props}
     viewBox="0 0 24 24"
     role="img"
-    aria-label="Hamburger menu"
+    aria-hidden="true"
     xmlns="http://www.w3.org/2000/svg"
     version="1.1"
   >
@@ -356,7 +359,7 @@ export const IconHourglass = (props: SVGAttributes<SVGElement>) => (
     {...props}
     viewBox="0 0 24 24"
     role="img"
-    aria-label="Zandloper"
+    aria-hidden="true"
     xmlns="http://www.w3.org/2000/svg"
     version="1.1"
   >
@@ -365,15 +368,7 @@ export const IconHourglass = (props: SVGAttributes<SVGElement>) => (
 );
 
 export const IconInfo = (props: SVGAttributes<SVGElement>) => (
-  <svg
-    data-icon="IconInfo"
-    {...props}
-    viewBox="0 0 24 24"
-    role="img"
-    aria-label="Informatie"
-    xmlns="http://www.w3.org/2000/svg"
-    version="1.1"
-  >
+  <svg data-icon="IconInfo" {...props} viewBox="0 0 24 24" role="img" xmlns="http://www.w3.org/2000/svg" version="1.1">
     <path d="M12,23c-6.1,0-11-4.9-11-11S5.9,1,12,1s11,4.9,11,11-4.9,11-11,11ZM12,3C7,3,3,7,3,12s4,9,9,9,9-4,9-9S17,3,12,3ZM12,17c-.6,0-1-.4-1-1v-4c0-.6.4-1,1-1s1,.4,1,1v4c0,.6-.4,1-1,1ZM12,9c-.6,0-1-.4-1-1s.4-1,1-1h0c.6,0,1,.4,1,1s-.4,1-1,1Z" />
   </svg>
 );
@@ -384,7 +379,7 @@ export const IconLaptop = (props: SVGAttributes<SVGElement>) => (
     {...props}
     viewBox="0 0 24 24"
     role="img"
-    aria-label="Laptop"
+    aria-hidden="true"
     xmlns="http://www.w3.org/2000/svg"
     version="1.1"
   >
@@ -398,7 +393,7 @@ export const IconLock = (props: SVGAttributes<SVGElement>) => (
     {...props}
     viewBox="0 0 24 24"
     role="img"
-    aria-label="Dicht slot"
+    aria-hidden="true"
     xmlns="http://www.w3.org/2000/svg"
     version="1.1"
   >
@@ -412,7 +407,7 @@ export const IconLogs = (props: SVGAttributes<SVGElement>) => (
     {...props}
     viewBox="0 0 24 24"
     role="img"
-    aria-label="Logbestand"
+    aria-hidden="true"
     xmlns="http://www.w3.org/2000/svg"
     version="1.1"
   >
@@ -421,15 +416,7 @@ export const IconLogs = (props: SVGAttributes<SVGElement>) => (
 );
 
 export const IconMinus = (props: SVGAttributes<SVGElement>) => (
-  <svg
-    data-icon="IconMinus"
-    {...props}
-    viewBox="0 0 14 14"
-    role="img"
-    aria-label="Minus"
-    xmlns="http://www.w3.org/2000/svg"
-    version="1.1"
-  >
+  <svg data-icon="IconMinus" {...props} viewBox="0 0 14 14" role="img" xmlns="http://www.w3.org/2000/svg" version="1.1">
     <path d="M2.730 6.023 C 2.454 6.069,2.147 6.301,2.023 6.559 C 1.898 6.817,1.891 7.154,2.005 7.408 C 2.071 7.557,2.224 7.732,2.378 7.835 C 2.650 8.017,2.334 8.006,7.082 7.998 L 11.305 7.992 11.437 7.938 C 11.696 7.834,11.920 7.609,12.019 7.356 C 12.092 7.167,12.093 6.834,12.020 6.646 C 11.951 6.470,11.831 6.318,11.662 6.193 C 11.387 5.991,11.817 6.009,7.070 6.005 C 4.629 6.003,2.804 6.011,2.730 6.023 " />
   </svg>
 );
@@ -440,7 +427,7 @@ export const IconPencil = (props: SVGAttributes<SVGElement>) => (
     {...props}
     viewBox="0 0 20 20"
     role="img"
-    aria-label="Potlood"
+    aria-hidden="true"
     xmlns="http://www.w3.org/2000/svg"
     version="1.1"
   >
@@ -457,7 +444,7 @@ export const IconPlus = (props: SVGAttributes<SVGElement>) => (
     {...props}
     viewBox="0 0 20 20"
     role="img"
-    aria-label="Plusje"
+    aria-hidden="true"
     xmlns="http://www.w3.org/2000/svg"
     version="1.1"
   >
@@ -471,7 +458,7 @@ export const IconPrinter = (props: SVGAttributes<SVGElement>) => (
     {...props}
     viewBox="0 0 20 20"
     role="img"
-    aria-label="Printer"
+    aria-hidden="true"
     xmlns="http://www.w3.org/2000/svg"
     version="1.1"
   >
@@ -488,7 +475,7 @@ export const IconSettings = (props: SVGAttributes<SVGElement>) => (
     {...props}
     viewBox="0 0 40 40"
     role="img"
-    aria-label="Tandwiel"
+    aria-hidden="true"
     xmlns="http://www.w3.org/2000/svg"
     version="1.1"
   >
@@ -502,7 +489,6 @@ export const IconThumbsUp = (props: SVGAttributes<SVGElement>) => (
     {...props}
     viewBox="0 0 24 24"
     role="img"
-    aria-label="Duim omhoog"
     xmlns="http://www.w3.org/2000/svg"
     version="1.1"
   >
@@ -516,7 +502,7 @@ export const IconTrash = (props: SVGAttributes<SVGElement>) => (
     {...props}
     viewBox="0 0 24 24"
     role="img"
-    aria-label="Afvalbak"
+    aria-hidden="true"
     xmlns="http://www.w3.org/2000/svg"
     version="1.1"
   >
@@ -530,7 +516,7 @@ export const IconUser = (props: SVGAttributes<SVGElement>) => (
     {...props}
     viewBox="0 0 24 24"
     role="img"
-    aria-label="Gebruiker"
+    aria-hidden="true"
     xmlns="http://www.w3.org/2000/svg"
     version="1.1"
   >
@@ -544,7 +530,7 @@ export const IconUsers = (props: SVGAttributes<SVGElement>) => (
     {...props}
     viewBox="0 0 24 24"
     role="img"
-    aria-label="Gebruikers"
+    aria-hidden="true"
     xmlns="http://www.w3.org/2000/svg"
     version="1.1"
   >
@@ -560,7 +546,6 @@ export const IconWarning = (props: SVGAttributes<SVGElement>) => (
     y="0px"
     viewBox="0 0 24 24"
     role="img"
-    aria-label="Driehoek met uitroepteken"
     xmlns="http://www.w3.org/2000/svg"
     version="1.1"
   >
@@ -574,7 +559,7 @@ export const IconWarningSquare = (props: SVGAttributes<SVGElement>) => (
     {...props}
     viewBox="0 0 24 24"
     role="img"
-    aria-label="Vierkant met uitroepteken"
+    aria-hidden="true"
     xmlns="http://www.w3.org/2000/svg"
     version="1.1"
   >

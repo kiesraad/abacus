@@ -18,13 +18,14 @@ __Hoofdscenario:__
 7. (voor elk
    verzoek) [Het GSB voert het onderzoek en de eventuele hertelling uit.](#het-gsb-voert-het-onderzoek-en-de-eventuele-hertelling-uit-vlieger)
 8. [De coördinator GSB maakt het PV P 2a en evt. het PV Na 14-2 en tellingsbestand EML 510b aan.](#de-coördinator-gsb-maakt-het-pv-p-2a-en-evt-het-pv-na-14-2-en-tellingsbestand-eml-510b-aan-zee)
-9. Het GSB voert de andere onderdelen van de PVs (P 2a en evt. Na 14-2) in.
-10. Het GSB leest de PVs voor: P 2a (Verslag tweede zitting), evt. Na 14-2 (Corrigendum GSB), Na 14-1 versie 2 (DSO, één per SB) of Na 14-2 Bijlage 1 (CSO, één bijlage per SB).
-11. Het GSB ondertekent de PVs (P2a, evt. Na 14-2, DSO: Na 14-1 versie 2).
-12. Het GSB sluit de zitting.
-13. Het GSB stelt de benodigde bestanden beschikbaar aan het CSB voor de uitslagvaststelling.
-14. Het GSB stelt de PVs GSB beschikbaar aan de burgemeester.
-15. De burgemeester publiceert de PVs GSB en brengt die over naar het CSB.
+9. (CSO, tweede zitting) De coördinator GSB drukt het Inlegvel Na 31-2 af en vult het in.
+10. Het GSB voert de andere onderdelen van de PVs (P 2a en evt. Na 14-2) in.
+11. Het GSB leest de PVs voor: P 2a (Verslag tweede zitting), evt. Na 14-2 (Corrigendum GSB), Na 14-1 versie 2 (DSO, één per SB) of Na 14-2 Bijlage 1 (CSO, één bijlage per SB).
+12. Het GSB ondertekent de PVs (P2a, evt. Na 14-2, DSO: Na 14-1 versie 2, CSO tweede zitting: Inlegvel Na 31-2).
+13. Het GSB sluit de zitting.
+14. Het GSB stelt de benodigde bestanden beschikbaar aan het CSB voor de uitslagvaststelling.
+15. Het GSB stelt de PVs GSB beschikbaar aan de burgemeester.
+16. De burgemeester publiceert de PVs GSB en brengt die over naar het CSB.
 
 __Uitbreidingen:__
 
@@ -41,12 +42,12 @@ __Uitbreidingen:__
 
 4-7a. Het GSB schorst de zitting, omdat er mogelijk nog een verzoek komt:
 
-10a. Het GSB stelt een probleem vast met het PV:  
-&emsp; 10a1. Het GSB stelt het bezwaar vast.  
-&emsp; 10a2. Het GSB gaat over tot hertelling.
+11a. Het GSB stelt een probleem vast met het PV:  
+&emsp; 11a1. Het GSB stelt het bezwaar vast.  
+&emsp; 11a2. Het GSB gaat over tot hertelling.
 
-10b. Er zijn bezwaren en/of bijzonderheden tijdens het voorlezen van het PV:  
-&emsp; 10b1. Het GSB voegt de bijzonderheden en/of bezwaren met de hand toe aan het papieren PV.
+11b. Er zijn bezwaren en/of bijzonderheden tijdens het voorlezen van het PV:  
+&emsp; 11b1. Het GSB voegt de bijzonderheden en/of bezwaren met de hand toe aan het papieren PV.
 
 ## De coördinator GSB bereidt de documenten voor de zitting voor (zee)
 

@@ -94,7 +94,7 @@ Gebruik dit script om `.po`-bestanden te maken (één voor elke gedefinieerde lo
 Dit script genereert `.po`-vertaalbestanden van de huidige JSON-vertalingen in `/frontend/src/i18n/locales/<locale>/*.json`:
 
 ```sh
-npm run gen:po
+pnpm gen:po
 ```
 
 Dit resulteert in `/frontend/translations/<locale>.po`. Deze kunnen geïmporteerd worden in vertaalsoftware.
@@ -105,7 +105,7 @@ Gebruik dit script om aangepaste `.po`-bestanden terug te converteren naar onze 
 Dit script genereert JSON-vertaalbestanden van `.po`-vertaalbestanden in `/frontend/translations/<locale>.po`:
 
 ```sh
-npm run gen:translation-json
+pnpm gen:translation-json
 ```
 
 Dit resulteert in `/frontend/src/i18n/locales/<locale>/*.json`. Deze bevatten de teksten die door de applicatie worden gebruikt.

@@ -90,7 +90,7 @@ export function InvestigationCard({ investigation }: InvestigationCardProps) {
         ) : (
           <h4>
             {t("investigations.no_corrected_results")}
-            <Icon color="muted" size="sm" icon={<IconMinus aria-hidden="true" />} />
+            <Icon color="muted" size="sm" icon={<IconMinus />} />
           </h4>
         ))}
       {showModal && <StartDataEntryModal onClose={closeModal} to={`./${investigation.pollingStation.id}/findings`} />}

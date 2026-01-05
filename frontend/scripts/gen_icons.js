@@ -14,11 +14,16 @@ listing.forEach((file) => {
   // replace kebab-case with camelCase in attribute names
   // regex captures two or more groups of letters separated by dashes, if followed by an equal sign
   content = content.replace(/[A-Za-z]+(-[A-Za-z]+)+(?==)/g, kebabToCamelCase);
-  content = content.replace(/^<svg /, `<svg data-icon="${iconComponent}" {...props} `);
-  //check for role="img" and add it if not present
+  content = content.replace(/^<svg /, `<svg data-icon="${iconComponent}"`);
+  // check for role and add role="img" if not present
   if (!content.includes("role=")) {
     content = content.replace(/^<svg /, '<svg role="img" ');
   }
+  // check for aria-hidden and add aria-hidden="true" if not present
+  if (!content.includes("aria-hidden=")) {
+    content = content.replace(/^<svg /, '<svg aria-hidden="true" ');
+  }
+  content = content.replace(/>/, "{...props} >");
 
   result.push(`export const ${iconComponent} = (props:SVGAttributes<SVGElement>) => (${content});\n`);
 });

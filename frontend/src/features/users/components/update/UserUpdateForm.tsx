@@ -117,7 +117,7 @@ export function UserUpdateForm({ user, onSaved, onAbort }: UserUpdateFormProps) 
                     setEditPassword(true);
                   }}
                 >
-                  <IconEdit aria-hidden="true" />
+                  <IconEdit />
                   {t("users.change_password")}
                 </Button>
               </FormLayout.Field>

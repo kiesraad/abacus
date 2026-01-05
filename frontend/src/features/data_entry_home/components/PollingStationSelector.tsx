@@ -59,7 +59,7 @@ export function PollingStationSelector({
     <FeedbackMessage
       messageType="warning"
       content={content}
-      icon={<IconWarning aria-label={t("contains_warning")} />}
+      icon={<IconWarning aria-label={t("contains_warning")} aria-hidden="false" />}
     />
   );
 
@@ -130,7 +130,7 @@ export function PollingStationSelector({
         content={t("polling_station_choice.no_polling_station_found_with_number", {
           nr: removeLeadingZeros(pollingStationNumber),
         })}
-        icon={<IconError aria-label={t("contains_error")} />}
+        icon={<IconError aria-label={t("contains_error")} aria-hidden="false" />}
       />
     );
   };

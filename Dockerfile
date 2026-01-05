@@ -5,7 +5,7 @@ RUN corepack enable
 WORKDIR /build
 COPY . .
 WORKDIR /build/frontend
-RUN pnpm install --prod
+RUN pnpm install --prod --frozen-lockfile
 RUN pnpm build
 
 FROM rust:bookworm AS backend-builder

@@ -27,7 +27,7 @@ Sommige iconen kunnen zich anders gedragen, maar hier zijn enkele richtlijnen vo
 Voer vanuit `frontend/` uit:
 
 ```sh
-npm run gen:icons
+pnpm gen:icons
 ```
 
 Dit zal `frontend/src/components/generated/icons.tsx` maken met alle iconen.

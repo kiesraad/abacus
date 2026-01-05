@@ -20,13 +20,13 @@ The built binary will be located in `target/release/`.
 Use `cargo run` to run the API on port 8080 (http://localhost:8080).
 
 To let the API server serve the frontend, first compile the frontend using
-`npm run build` in the `frontend` directory. Then run the API server with the
+`pnpm build` in the `frontend` directory. Then run the API server with the
 `memory-serve` feature enabled:
 
 ```shell
 cd frontend
-npm install
-npm run build
+pnpm install
+pnpm build
 cd ../backend
 sqlx database setup
 cargo run --features memory-serve
@@ -84,8 +84,8 @@ For example:
 ```shell
 # build the frontend
 cd frontend
-npm install
-npm run build
+pnpm install
+pnpm build
 cd ..
 
 # build for ARMv6 32-bit Linux (like the Raspberry Pi 1/2/Zero)

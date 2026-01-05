@@ -23,16 +23,5 @@
     },
     "types": ["node", "vite/client", "vitest/importMeta"]
   },
-  "include": [
-    ".storybook/**/*",
-    "src/**/*",
-    "scripts/**/*",
-    "playwright.config.ts",
-    "vite.config.ts",
-    "vite-prod.config.ts",
-    "vitest.config.ts",
-    "vitest.d.ts",
-    "__mocks__/**/*",
-    "e2e-tests/**/*"
-  ]
+  "include": [".storybook/**/*", "src/**/*", "scripts/**/*", "*.ts", "e2e-tests/**/*", "@types/*"]
 }

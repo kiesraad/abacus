@@ -26,6 +26,7 @@ export interface InputFieldProps extends InputHTMLAttributes<HTMLInputElement> {
 }
 
 export function InputField({
+  id,
   name,
   label,
   subtext = "",
@@ -44,6 +45,7 @@ export function InputField({
 }: InputFieldProps) {
   let inputEl: ReactNode;
   const commonProps: DetailedHTMLProps<InputHTMLAttributes<HTMLInputElement>, HTMLInputElement> = {
+    id,
     name,
     value,
     type,
@@ -57,6 +59,7 @@ export function InputField({
   if (fieldSize === "text-area") {
     inputEl = (
       <textarea
+        id={id}
         name={name}
         value={value}
         defaultValue={inputFieldProps.defaultValue}
@@ -75,7 +78,7 @@ export function InputField({
 
   return (
     <div className={`${cls.inputfield} ${margin}`}>
-      <label className={`${fieldSize} ${fieldWidth} ${error ? "error" : ""}`}>
+      <label className={`${fieldSize} ${fieldWidth} ${error ? "error" : ""}`} htmlFor={id}>
         <span className="label">
           {label} {subtext && <span className="subtext">{subtext}</span>}
         </span>

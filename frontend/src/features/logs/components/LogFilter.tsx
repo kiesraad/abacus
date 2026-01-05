@@ -27,6 +27,7 @@ export function LogFilter({ onClose, setSince, filterState, toggleFilter }: LogF
       <div className={cls.filters}>
         <div>
           <InputField
+            id="since"
             type="datetime-local"
             name="since"
             fieldWidth="parent"

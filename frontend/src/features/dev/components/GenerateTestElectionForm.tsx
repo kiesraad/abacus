@@ -91,6 +91,7 @@ export function GenerateTestElectionForm() {
         {RANGE_FIELDS.map((field) => {
           const input = (
             <InputField
+              id={field.key}
               key={field.key}
               name={field.key}
               label={field.label}

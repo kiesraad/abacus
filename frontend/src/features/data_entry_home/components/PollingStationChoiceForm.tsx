@@ -185,8 +185,8 @@ export function PollingStationChoiceForm({ anotherEntry }: PollingStationChoiceF
         </BottomBar>
       </fieldset>
       <div className={cls.dataEntryList}>
-        <details>
-          <summary onClick={refetchStatuses}>
+        <details onToggle={refetchStatuses}>
+          <summary>
             {t("polling_station_choice.unknown_number")}
             <br />
             <span id="openPollingStationList" className={cn("underlined", cls.pointer)}>

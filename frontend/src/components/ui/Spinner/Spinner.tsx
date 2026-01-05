@@ -1,5 +1,3 @@
-import type { ReactNode } from "react";
-
 import type { Size } from "@/types/ui";
 import { cn } from "@/utils/classnames";
 
@@ -7,10 +5,9 @@ import cls from "./Spinner.module.css";
 
 export interface SpinnerProps {
   size?: Size;
-  children?: ReactNode;
 }
 
-export function Spinner({ size = "md", children }: SpinnerProps) {
+export function Spinner({ size = "md" }: SpinnerProps) {
   return (
     <div className={cn(cls.container, size)} role="progressbar" aria-busy={true}>
       <div className={cls.spinner}>
@@ -25,7 +22,6 @@ export function Spinner({ size = "md", children }: SpinnerProps) {
           <rect />
         </svg>
       </div>
-      {children && <label>{children}</label>}
     </div>
   );
 }

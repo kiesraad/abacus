@@ -58,11 +58,10 @@
       "recommended": true,
       // TODO: all disabled rules below should be enabled again and fixed
       "a11y": {
-        "noAutofocus": "off",
-        "noLabelWithoutControl": "off",
-        "noStaticElementInteractions": "off"
+        "noAutofocus": "off"
       },
       "complexity": {
+        "noUselessFragments": "warn",
         "noImportantStyles": "off"
       },
       "correctness": {

@@ -138,6 +138,7 @@ export function InvestigationFindings({ pollingStationId }: InvestigationFinding
             <li>{t("investigations.findings.indicate_how_result_was_determined")}</li>
           </ul>
           <InputField
+            id="findings"
             type="text"
             fieldSize="text-area"
             name="findings"

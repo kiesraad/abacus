@@ -22,14 +22,14 @@ export const DefaultFormLayout: StoryFn = () => (
           FormLayout and never more than that, even though the title has a larger maximum width.
         </p>
         <FormLayout.Row>
-          <InputField name="inp1" label="Input 1" fieldWidth="narrow" />
-          <InputField name="inp2" label="Input 2" />
+          <InputField id="inp1" name="inp1" label="Input 1" fieldWidth="narrow" />
+          <InputField id="inp2" name="inp2" label="Input 2" />
         </FormLayout.Row>
       </FormLayout.Section>
 
       <FormLayout.Section title="Section 2">
-        <InputField name="inp3" label="Input 3" />
-        <InputField name="inp4" label="Input 4" />
+        <InputField id="inp3" name="inp3" label="Input 3" />
+        <InputField id="inp4" name="inp4" label="Input 4" />
       </FormLayout.Section>
 
       <FormLayout.Section title="Section 3">
@@ -47,7 +47,7 @@ export const DefaultFormLayout: StoryFn = () => (
             </ChoiceList.Radio>
           </ChoiceList>
         </FormLayout.Field>
-        <InputField name="inp5" label="Input 5" />
+        <InputField id="inp5" name="inp5" label="Input 5" />
       </FormLayout.Section>
       <FormLayout.Controls>
         <Button>Submit your changes</Button>
@@ -74,7 +74,7 @@ export const DisabledFormLayout: StoryFn = () => (
           </ChoiceList.Radio>
         </ChoiceList>
       </FormLayout.Field>
-      <InputField name="inp5" label="Input 5" value="some text here already" />
+      <InputField id="inp1" name="inp1" label="Input 1" value="some text here already" />
       <FormLayout.Controls>
         <Button>Submit your changes</Button>
         <Button variant="secondary">Cancel</Button>

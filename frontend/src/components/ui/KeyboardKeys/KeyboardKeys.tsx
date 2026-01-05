@@ -15,7 +15,7 @@ export interface KeyboardKeysProps {
   keys: KeyboardKey[];
 }
 
-function renderKey(keyboardKey: KeyboardKey, index: number): JSX.Element {
+function renderKey(keyboardKey: KeyboardKey, index: number): JSX.Element | null {
   switch (keyboardKey) {
     case KeyboardKey.Enter:
       return (
@@ -44,7 +44,7 @@ function renderKey(keyboardKey: KeyboardKey, index: number): JSX.Element {
         </kbd>
       );
     default:
-      return <></>;
+      return null;
   }
 }
 

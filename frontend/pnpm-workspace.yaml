@@ -8,6 +8,7 @@ blockExoticSubdeps: true
 minimumReleaseAge: 4320
 trustPolicy: no-downgrade
 engineStrict: true
+sideEffectsCache: false
 overrides:
   # Storybook currently uses @vitest/expect 3.2.4 which doesn't work with our vitest.d.ts
   "@vitest/expect": "4.0.16"

@@ -18,11 +18,6 @@
     > a {
       text-decoration: none;
       color: inherit;
-
-      &:hover,
-      &:active {
-        color: inherit !important;
-      }
     }
 
     > a,
@@ -58,11 +53,6 @@
     a {
       text-decoration: underline;
       color: inherit;
-
-      &:hover,
-      &:active {
-        color: inherit !important;
-      }
     }
   }
 

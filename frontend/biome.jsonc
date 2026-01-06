@@ -58,12 +58,10 @@
       "recommended": true,
       // TODO: all disabled rules below should be enabled again and fixed
       "a11y": {
-        "noAutofocus": "off",
-        "noSvgWithoutTitle": "off"
+        "noAutofocus": "off"
       },
       "complexity": {
-        "noUselessFragments": "warn",
-        "noImportantStyles": "off"
+        "noUselessFragments": "warn"
       },
       "style": {
         "useComponentExportOnlyModules": {

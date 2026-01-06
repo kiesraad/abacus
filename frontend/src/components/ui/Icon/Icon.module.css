@@ -74,6 +74,12 @@
     }
   }
 
+  &.link-default {
+    svg {
+      fill: var(--link-default);
+    }
+  }
+
   &.xs {
     width: 1rem;
     height: 1rem;

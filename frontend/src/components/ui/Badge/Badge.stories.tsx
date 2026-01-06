@@ -51,7 +51,7 @@ export const BadgesWithIcons: StoryObj = {
   play: async ({ canvas }) => {
     const badgesWithIcons = badgeTypes.filter((badgeType) => {
       const badge = canvas.getByTestId(badgeType);
-      return within(badge).queryByRole("img") !== null;
+      return within(badge).queryByRole("img", { hidden: true }) !== null;
     });
 
     await expect(badgesWithIcons).toEqual(["first_entry_in_progress", "second_entry_in_progress"]);

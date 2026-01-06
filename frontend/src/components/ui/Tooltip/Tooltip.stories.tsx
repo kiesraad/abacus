@@ -35,7 +35,7 @@ export const PermanentTooltip: StoryObj = {
     await expect(tooltip).toBeVisible();
 
     // Test tooltip content
-    const warningIcon = within(tooltip).getByRole("img");
+    const warningIcon = within(tooltip).getByRole("img", { hidden: true });
     await expect(warningIcon).toHaveAttribute("data-icon", "IconWarningSquare");
 
     // Test tooltip text content

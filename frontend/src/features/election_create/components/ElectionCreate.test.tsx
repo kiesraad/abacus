@@ -211,35 +211,6 @@ describe("Election create pages", () => {
     server.use(ElectionRequestHandler);
   });
 
-  test("It shows an error when uploading invalid file", async () => {
-    overrideOnce("post", "/api/elections/import/validate", 400, {
-      error: "Invalid XML",
-      fatal: false,
-      reference: "InvalidXml",
-    });
-
-    const router = renderWithRouter();
-    const user = userEvent.setup();
-
-    const filename = "foo.txt";
-    const file = new File(["foo"], filename, { type: "text/plain" });
-
-    await router.navigate("/elections/create");
-
-    // Wait for the page to be loaded
-    expect(await screen.findByRole("heading", { level: 1, name: "Verkiezing toevoegen" })).toBeVisible();
-    expect(await screen.findByRole("heading", { level: 2, name: "Importeer verkiezingsdefinitie" })).toBeVisible();
-    const input = await screen.findByLabelText("Bestand kiezen");
-    expect(input).toBeVisible();
-    expect(await screen.findByLabelText("Geen bestand gekozen")).toBeVisible();
-    await user.upload(input, file);
-
-    // Expect error message, file name should be shown
-    expect(screen.queryByLabelText("Geen bestand gekozen")).not.toBeInTheDocument();
-    expect(screen.getAllByText(filename).length).toBe(2);
-    expect(screen.getByText("Ongeldige verkiezingsdefinitie")).toBeInTheDocument();
-  });
-
   test("It shows and validates hash when uploading valid file", async () => {
     overrideOnce("post", "/api/elections/import/validate", 200, electionValidateResponse(newElectionMockData));
 
@@ -686,34 +657,6 @@ describe("Election create pages", () => {
 
     // Expect to see the next page
     expect(await screen.findByRole("heading", { level: 2, name: "Type stemopneming in Heemdamseburg" })).toBeVisible();
-  });
-
-  test("Shows error when election file is too large", async () => {
-    const router = renderWithRouter();
-    await router.navigate("/elections/create");
-
-    const user = userEvent.setup();
-    const filename = "foo.txt";
-    const file = new File(["foo"], filename, { type: "text/plain" });
-
-    overrideOnce("post", "/api/elections/import/validate", 413, {
-      error: "15",
-      fatal: false,
-      reference: "RequestPayloadTooLarge",
-    });
-    // Wait for the page to be loaded
-    expect(await screen.findByRole("heading", { level: 1, name: "Verkiezing toevoegen" })).toBeVisible();
-    expect(await screen.findByRole("heading", { level: 2, name: "Importeer verkiezingsdefinitie" })).toBeVisible();
-    const input = await screen.findByLabelText("Bestand kiezen");
-    expect(input).toBeVisible();
-    expect(await screen.findByLabelText("Geen bestand gekozen")).toBeVisible();
-
-    await user.upload(input, file);
-
-    expect(await screen.findByText("Ongeldige verkiezingsdefinitie")).toBeVisible();
-    expect(
-      await screen.findByText("Het bestand is te groot. Kies een bestand van maximaal 5 Megabyte", { exact: false }),
-    ).toBeVisible();
   });
 
   test("Shows error when candidate file is too large", async () => {

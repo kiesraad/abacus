@@ -13,4 +13,7 @@ engineStrict: true
 sideEffectsCache: false
 overrides:
   # Storybook currently uses @vitest/expect 3.2.4 which doesn't work with our vitest.d.ts
-  "@vitest/expect": "4.0.16"
+  "@vitest/expect": "$@vitest/expect"
+  # @codecov/vite-plugin does not have official support for Vite 7, but works:
+  # https://github.com/codecov/codecov-javascript-bundler-plugins/issues/264
+  "vite": "$vite"

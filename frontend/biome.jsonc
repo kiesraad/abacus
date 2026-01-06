@@ -57,9 +57,6 @@
     "rules": {
       "recommended": true,
       // TODO: all disabled rules below should be enabled again and fixed
-      "a11y": {
-        "noAutofocus": "off"
-      },
       "complexity": {
         "noUselessFragments": "warn"
       },

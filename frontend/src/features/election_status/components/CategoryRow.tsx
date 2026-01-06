@@ -91,7 +91,9 @@ function CategoryRowContent({ category, pollingStation, warning }: CategoryRowCo
       {(category === "first_entry_finished" || category === "definitive") && (
         <Table.Cell key={`${pollingStation.id}-time`}>
           <span>{pollingStation.finished_at ? formatDateTime(new Date(pollingStation.finished_at)) : ""}</span>
-          {warning && <Icon color="warning" icon={<IconWarning aria-label={t("contains_warning")} />} />}
+          {warning && (
+            <Icon color="warning" icon={<IconWarning aria-label={t("contains_warning")} aria-hidden="false" />} />
+          )}
         </Table.Cell>
       )}
     </>

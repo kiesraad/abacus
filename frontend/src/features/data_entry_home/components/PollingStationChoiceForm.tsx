@@ -165,7 +165,7 @@ export function PollingStationChoiceForm({ anotherEntry }: PollingStationChoiceF
         {alert && (
           <div id="pollingStationSubmitFeedback" className={cn(cls.message, cls.submit, cls.error)}>
             <span className={cls.icon}>
-              <Icon icon={<IconError aria-label={t("contains_error")} />} color="error" />
+              <Icon icon={<IconError aria-label={t("contains_error")} aria-hidden="false" />} color="error" />
             </span>
             <span>{alert}</span>
           </div>

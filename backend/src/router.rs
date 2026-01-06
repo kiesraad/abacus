@@ -297,14 +297,15 @@ mod tests {
     use test_log::test;
 
     use crate::{
-        authentication::{Role, session::create, set_default_cookie_properties},
+        SqlitePoolExt,
+        authentication::{Role, session},
         test::run_server_test,
     };
 
     use super::*;
 
     async fn get_user_cookie(conn: &mut SqliteConnection, user_id: u32) -> String {
-        let mut cookie = create(
+        session::create(
             conn,
             user_id,
             "TestAgent/1.0",
@@ -313,35 +314,33 @@ mod tests {
         )
         .await
         .unwrap()
-        .get_cookie();
-
-        set_default_cookie_properties(cookie.as_mut());
-        cookie.to_string()
+        .get_cookie()
+        .stripped()
+        .to_string()
     }
 
     #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
     async fn test_route_authorization(pool: SqlitePool) {
-        let mut conn = pool.acquire().await.unwrap();
         let openapi = openapi_router().into_openapi();
 
         // Possible auth-related error statuses
         let auth_errors = [StatusCode::UNAUTHORIZED, StatusCode::FORBIDDEN];
+
         // Get cookies for all roles
+        let mut tx = pool.begin_immediate().await.unwrap();
         let auth_states = [
             (None, None),
             (
                 Some(Role::Administrator),
-                Some(get_user_cookie(&mut conn, 1).await),
+                Some(get_user_cookie(&mut tx, 1).await),
             ),
             (
                 Some(Role::Coordinator),
-                Some(get_user_cookie(&mut conn, 3).await),
+                Some(get_user_cookie(&mut tx, 3).await),
             ),
-            (
-                Some(Role::Typist),
-                Some(get_user_cookie(&mut conn, 5).await),
-            ),
+            (Some(Role::Typist), Some(get_user_cookie(&mut tx, 5).await)),
         ];
+        tx.commit().await.unwrap();
 
         let client = reqwest::Client::new();
         let mut failures = Vec::new();

@@ -41,7 +41,7 @@
     "react": "19.2.3",
     "react-dom": "19.2.3",
     "react-router": "7.10.1",
-    "vite": "6.4.1"
+    "vite": "7.3.0"
   },
   "devDependencies": {
     "@biomejs/biome": "2.3.10",

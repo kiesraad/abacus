@@ -61,8 +61,7 @@
         "noAutofocus": "off"
       },
       "complexity": {
-        "noUselessFragments": "warn",
-        "noImportantStyles": "off"
+        "noUselessFragments": "warn"
       },
       "correctness": {
         "useExhaustiveDependencies": "off"

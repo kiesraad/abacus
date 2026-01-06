@@ -305,18 +305,12 @@ mod tests {
     use super::*;
 
     async fn get_user_cookie(conn: &mut SqliteConnection, user_id: u32) -> String {
-        session::create(
-            conn,
-            user_id,
-            "TestAgent/1.0",
-            "0.0.0.0",
-            TimeDelta::seconds(60 * 30),
-        )
-        .await
-        .unwrap()
-        .get_cookie()
-        .stripped()
-        .to_string()
+        session::create(conn, user_id, "", "127.0.0.1", TimeDelta::seconds(60 * 30))
+            .await
+            .unwrap()
+            .get_cookie()
+            .stripped()
+            .to_string()
     }
 
     #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]

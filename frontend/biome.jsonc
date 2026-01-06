@@ -56,7 +56,6 @@
     },
     "rules": {
       "recommended": true,
-      // TODO: all disabled rules below should be enabled again and fixed
       "complexity": {
         "noUselessFragments": "warn"
       },

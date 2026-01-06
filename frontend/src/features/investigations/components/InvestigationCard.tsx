@@ -1,7 +1,7 @@
 import { type MouseEvent, useState } from "react";
 import { Link, useNavigate } from "react-router";
 
-import { IconCheckmark, IconMinus, IconPencil, IconPrinter } from "@/components/generated/icons";
+import { IconCheckmarkSmall, IconMinus, IconPencil, IconPrinter } from "@/components/generated/icons";
 import { PollingStationNumber } from "@/components/ui/Badge/PollingStationNumber";
 import { Button } from "@/components/ui/Button/Button";
 import { Icon } from "@/components/ui/Icon/Icon";
@@ -74,7 +74,7 @@ export function InvestigationCard({ investigation }: InvestigationCardProps) {
           <>
             <h4>
               {t("investigations.corrected_results")}
-              <Icon color="default" size="sm" icon={<IconCheckmark />} />
+              <Icon color="default" size="sm" icon={<IconCheckmarkSmall />} />
             </h4>
             {investigation.status === "definitive" ? (
               <p>{t("investigations.corrected_results_inserted")}</p>

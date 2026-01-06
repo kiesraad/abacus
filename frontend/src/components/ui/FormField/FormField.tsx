@@ -13,9 +13,9 @@ export interface FormFieldProps {
 export function FormField({ id, children, hasError, hasWarning }: FormFieldProps) {
   let icon: ReactNode | null = null;
   if (hasError) {
-    icon = <IconError aria-label={t("contains_error")} className={cls.errorIcon} />;
+    icon = <IconError aria-label={t("contains_error")} aria-hidden="false" className={cls.errorIcon} />;
   } else if (hasWarning) {
-    icon = <IconWarning aria-label={t("contains_warning")} className={cls.warningIcon} />;
+    icon = <IconWarning aria-label={t("contains_warning")} aria-hidden="false" className={cls.warningIcon} />;
   }
 
   return (

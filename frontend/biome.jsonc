@@ -57,12 +57,8 @@
     "rules": {
       "recommended": true,
       // TODO: all disabled rules below should be enabled again and fixed
-      "a11y": {
-        "noSvgWithoutTitle": "off"
-      },
       "complexity": {
-        "noUselessFragments": "warn",
-        "noImportantStyles": "off"
+        "noUselessFragments": "warn"
       },
       "correctness": {
         "useExhaustiveDependencies": "off"

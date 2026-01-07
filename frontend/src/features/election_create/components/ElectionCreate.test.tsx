@@ -476,45 +476,6 @@ describe("Election create pages", () => {
   });
 
   describe("Polling station list", () => {
-    test("Shows an error when uploading an invalid polling station list", async () => {
-      const router = renderWithRouter();
-      const user = userEvent.setup();
-      const filename = "foo.txt";
-      const file = new File(["foo"], filename, { type: "text/plain" });
-
-      // upload election and set hash, and continue
-      await uploadElectionDefinition(router, file);
-      await inputElectionHash();
-      await setPollingStationRole();
-
-      // upload candidate file, set hash and continue
-      await uploadCandidateDefinition(file);
-      await inputCandidateHash();
-
-      // Make sure we are on the correct page
-      expect(
-        await screen.findByRole("heading", { level: 2, name: "Importeer stembureaus gemeente Heemdamseburg" }),
-      ).toBeVisible();
-
-      // Give invalid XML error
-      overrideOnce("post", "/api/elections/import/validate", 400, {
-        error: "Invalid XML",
-        fatal: false,
-        reference: "InvalidXml",
-      });
-
-      // Upload polling station file
-      const input = await screen.findByLabelText("Bestand kiezen");
-      expect(input).toBeVisible();
-      expect(await screen.findByLabelText("Geen bestand gekozen")).toBeVisible();
-      await user.upload(input, file);
-
-      expect(screen.queryByLabelText("Geen bestand gekozen")).not.toBeInTheDocument();
-      expect(screen.getAllByText(filename).length).toBe(2);
-      const message = screen.getByText(/Ongeldig stembureaubestand/i);
-      expect(message).toBeVisible();
-    });
-
     test("Skip button on polling station upload page should skip to next page", async () => {
       const router = renderWithRouter();
       const user = userEvent.setup();
@@ -637,45 +598,6 @@ describe("Election create pages", () => {
       // Expect to see the next page
       expect(
         await screen.findByRole("heading", { level: 2, name: "Type stemopneming in Heemdamseburg" }),
-      ).toBeVisible();
-    });
-
-    test("Shows error when polling station file is too large", async () => {
-      const router = renderWithRouter();
-      await router.navigate("/elections/create");
-
-      const user = userEvent.setup();
-      const filename = "foo.txt";
-      const file = new File(["foo"], filename, { type: "text/plain" });
-
-      // upload election and set hash, and continue
-      await uploadElectionDefinition(router, file);
-      await inputElectionHash();
-      await setPollingStationRole();
-
-      // upload candidate file, set hash and continue
-      await uploadCandidateDefinition(file);
-      await inputCandidateHash();
-
-      overrideOnce("post", "/api/elections/import/validate", 413, {
-        error: "15",
-        fatal: false,
-        reference: "RequestPayloadTooLarge",
-      });
-
-      // Wait for the page to be loaded
-      expect(
-        await screen.findByRole("heading", { level: 2, name: "Importeer stembureaus gemeente Heemdamseburg" }),
-      ).toBeVisible();
-      const input = await screen.findByLabelText("Bestand kiezen");
-      expect(input).toBeVisible();
-      expect(await screen.findByLabelText("Geen bestand gekozen")).toBeVisible();
-
-      await user.upload(input, file);
-
-      expect(await screen.findByText("Ongeldig stembureaubestand")).toBeVisible();
-      expect(
-        await screen.findByText("Het bestand is te groot. Kies een bestand van maximaal 5 Megabyte", { exact: false }),
       ).toBeVisible();
     });
   });

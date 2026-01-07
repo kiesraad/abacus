@@ -252,7 +252,7 @@ describe("Election create pages", () => {
       await user.click(screen.getByRole("button", { name: "Volgende" }));
 
       // Expect error to be shown
-      expect(await screen.findByText("Controle digitale vingerafdruk niet gelukt")).toBeInTheDocument();
+      expect(await screen.findByRole("alert")).toHaveTextContent("Controle digitale vingerafdruk niet gelukt");
     });
   });
 
@@ -539,8 +539,8 @@ describe("Election create pages", () => {
       expect(await screen.findByRole("table")).toBeVisible();
       expect(await screen.findAllByRole("row")).toHaveLength(8);
 
-      // Make sure the warning is not shown
-      expect(await screen.findByText(/Afwijkende verkiezing/i)).toBeVisible();
+      // Make sure the warning is shown
+      expect(await screen.findByRole("alert")).toHaveTextContent("Afwijkende verkiezing");
 
       // click next
       await user.click(screen.getByRole("button", { name: "Volgende" }));
@@ -590,7 +590,7 @@ describe("Election create pages", () => {
       expect(await screen.findAllByRole("row")).toHaveLength(8);
 
       // Make sure the warning is not shown
-      expect(screen.queryByText(/Afwijkende verkiezing/i)).toBeNull();
+      expect(screen.queryByRole("alert")).toBeNull();
 
       // click next
       await user.click(screen.getByRole("button", { name: "Volgende" }));

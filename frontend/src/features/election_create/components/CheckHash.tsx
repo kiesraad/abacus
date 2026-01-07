@@ -8,7 +8,7 @@ import { InputField } from "@/components/ui/InputField/InputField";
 import { t } from "@/i18n/translate";
 import type { RedactedEmlHash } from "@/types/generated/openapi";
 import { formatDateFull } from "@/utils/dateTime";
-
+import cls from "./CheckHash.module.css";
 import { RedactedHash, type Stub } from "./RedactedHash";
 
 interface CheckHashProps {
@@ -85,19 +85,21 @@ export function CheckHash({ date, title, header, description, redactedHash, erro
               </Alert>
             )}
             <p>{description}</p>
-            <Alert type="notify" variant="no-icon" small>
-              <p>
-                <strong>{title}</strong>
-                <br />
-                <span className="capitalize-first">{formatDateFull(new Date(date))}</span>
-              </p>
-              <div>
-                <span>
-                  <strong>{t("digital_signature")}</strong> ({t("hashcode")}):
-                </span>
-                <RedactedHash hash={redactedHash.chunks} stubs={stubs} />
-              </div>
-            </Alert>
+            <div className={cls.checkHash}>
+              <section>
+                <p>
+                  <strong>{title}</strong>
+                  <br />
+                  <span className="capitalize-first">{formatDateFull(new Date(date))}</span>
+                </p>
+                <div>
+                  <span>
+                    <strong>{t("digital_signature")}</strong> ({t("hashcode")}):
+                  </span>
+                  <RedactedHash hash={redactedHash.chunks} stubs={stubs} />
+                </div>
+              </section>
+            </div>
             <p>{t("election.check_eml.check_hash.description")}</p>
 
             {stubs.map((stub, stubIndex) => (

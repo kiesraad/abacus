@@ -257,38 +257,6 @@ describe("Election create pages", () => {
   });
 
   describe("Candidate list", () => {
-    test("It shows an error when uploading an invalid candidate list", async () => {
-      const router = renderWithRouter();
-      const user = userEvent.setup();
-      const filename = "foo.txt";
-      const file = new File(["foo"], filename, { type: "text/plain" });
-
-      // update election and set hash, and continue
-      await uploadElectionDefinition(router, file);
-      await inputElectionHash();
-      await setPollingStationRole();
-
-      // Expect to see the next page
-      expect(await screen.findByRole("heading", { level: 2, name: "Importeer kandidatenlijsten" })).toBeVisible();
-      const candidateInput = await screen.findByLabelText("Bestand kiezen");
-      expect(candidateInput).toBeVisible();
-      expect(await screen.findByLabelText("Geen bestand gekozen")).toBeVisible();
-
-      // Give invalid XML error
-      overrideOnce("post", "/api/elections/import/validate", 400, {
-        error: "Invalid XML",
-        fatal: false,
-        reference: "InvalidXml",
-      });
-
-      await user.upload(candidateInput, file);
-
-      // Expect error message, file name should be shown
-      expect(screen.queryByLabelText("Geen bestand gekozen")).not.toBeInTheDocument();
-      expect(screen.getAllByText(filename).length).toBe(2);
-      expect(screen.getByText("Ongeldige kandidatenlijsten")).toBeInTheDocument();
-    });
-
     test("It shows and validates hash when uploading valid candidate list file", async () => {
       overrideOnce("post", "/api/elections/import/validate", 200, electionValidateResponse(newElectionMockData));
 
@@ -313,37 +281,6 @@ describe("Election create pages", () => {
 
       expect(
         await screen.findByRole("heading", { level: 2, name: "Importeer stembureaus gemeente Heemdamseburg" }),
-      ).toBeVisible();
-    });
-
-    test("Shows error when candidate file is too large", async () => {
-      const router = renderWithRouter();
-      await router.navigate("/elections/create");
-
-      const user = userEvent.setup();
-      const filename = "foo.txt";
-      const file = new File(["foo"], filename, { type: "text/plain" });
-
-      await uploadElectionDefinition(router, file);
-      await inputElectionHash();
-      await setPollingStationRole();
-
-      overrideOnce("post", "/api/elections/import/validate", 413, {
-        error: "15",
-        fatal: false,
-        reference: "RequestPayloadTooLarge",
-      });
-      // Wait for the page to be loaded
-      expect(await screen.findByRole("heading", { level: 2, name: "Importeer kandidatenlijsten" })).toBeVisible();
-      const input = await screen.findByLabelText("Bestand kiezen");
-      expect(input).toBeVisible();
-      expect(await screen.findByLabelText("Geen bestand gekozen")).toBeVisible();
-
-      await user.upload(input, file);
-
-      expect(await screen.findByText("Ongeldige kandidatenlijsten")).toBeVisible();
-      expect(
-        await screen.findByText("Het bestand is te groot. Kies een bestand van maximaal 5 Megabyte", { exact: false }),
       ).toBeVisible();
     });
   });

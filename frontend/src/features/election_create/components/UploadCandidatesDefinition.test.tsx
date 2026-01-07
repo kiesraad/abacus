@@ -18,7 +18,7 @@ const election = { name: "Naam", location: "Plek" } as NewElection;
 const filename = "foo.txt";
 const file = new File(["foo"], filename, { type: "text/plain" });
 
-describe("UploadcandidatesDefinition component", () => {
+describe("UploadCandidatesDefinition component", () => {
   test("It shows an error when uploading invalid candidates list file", async () => {
     const state = { election, numberOfVoters: 0, electionDefinitionData: "mocked" };
     const dispatch = vi.fn();

@@ -88,7 +88,7 @@ impl From<LoginResponse> for UserDetails {
 }
 
 /// Set default session cookie properties
-pub fn set_default_cookie_properties(cookie: &mut Cookie) {
+pub(super) fn set_default_cookie_properties(cookie: &mut Cookie) {
     cookie.set_path("/");
     cookie.set_http_only(true);
     cookie.set_secure(SECURE_COOKIES);

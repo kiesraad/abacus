@@ -126,15 +126,14 @@ function addDefinition(name: string, v: ReferenceObject | SchemaObject) {
 
   if (v.type === "object") {
     result.push(`export interface ${name} ${tsType(v)}`);
+  } else if (v.enum) {
+    const valuesString = `${name[0]?.toLowerCase()}${name.slice(1)}Values`;
+    result.push(
+      `export const ${valuesString} = [${v.enum.map((e) => `"${e}"`).join(", ")}] as const;
+        export type ${name} = (typeof ${valuesString})[number];`,
+    );
   } else {
-    if (v.enum) {
-      result.push(
-        `export const ${name}Values = [${v.enum.map((e) => `"${e}"`).join(", ")}] as const;
-        export type ${name} = typeof ${name}Values[number];`,
-      );
-    } else {
-      result.push(`export type ${name} = ${tsType(v)};`);
-    }
+    result.push(`export type ${name} = ${tsType(v)};`);
   }
 
   return result.join("\n");

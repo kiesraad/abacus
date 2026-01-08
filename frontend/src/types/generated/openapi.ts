@@ -368,8 +368,8 @@ export type AuditEvent =
   | (ErrorDetails & { event_type: "Error" })
   | { event_type: "UnknownEvent" };
 
-export const AuditEventLevelValues = ["info", "success", "warning", "error"] as const;
-export type AuditEventLevel = (typeof AuditEventLevelValues)[number];
+export const auditEventLevelValues = ["info", "success", "warning", "error"] as const;
+export type AuditEventLevel = (typeof auditEventLevelValues)[number];
 
 export interface AuditLogEvent {
   event: AuditEvent;
@@ -458,8 +458,8 @@ export interface Candidate {
 /**
  * Candidate gender
  */
-export const CandidateGenderValues = ["Male", "Female", "X"] as const;
-export type CandidateGender = (typeof CandidateGenderValues)[number];
+export const candidateGenderValues = ["Male", "Female", "X"] as const;
+export type CandidateGender = (typeof candidateGenderValues)[number];
 
 export interface CandidateVotes {
   number: number;
@@ -506,14 +506,14 @@ export interface CommitteeSessionDetails {
 /**
  * Committee session status
  */
-export const CommitteeSessionStatusValues = [
+export const committeeSessionStatusValues = [
   "created",
   "data_entry_not_started",
   "data_entry_in_progress",
   "data_entry_paused",
   "data_entry_finished",
 ] as const;
-export type CommitteeSessionStatus = (typeof CommitteeSessionStatusValues)[number];
+export type CommitteeSessionStatus = (typeof committeeSessionStatusValues)[number];
 
 /**
  * Committee session status change request
@@ -609,7 +609,7 @@ export interface DataEntryGetResponse {
   validation_results: ValidationResults;
 }
 
-export const DataEntryStatusNameValues = [
+export const dataEntryStatusNameValues = [
   "first_entry_not_started",
   "first_entry_in_progress",
   "first_entry_has_errors",
@@ -618,7 +618,7 @@ export const DataEntryStatusNameValues = [
   "entries_different",
   "definitive",
 ] as const;
-export type DataEntryStatusName = (typeof DataEntryStatusNameValues)[number];
+export type DataEntryStatusName = (typeof dataEntryStatusNameValues)[number];
 
 export interface DataEntryStatusResponse {
   status: DataEntryStatusName;
@@ -698,8 +698,8 @@ export interface ElectionAndCandidatesDefinitionImportRequest {
 /**
  * Election category (limited for now)
  */
-export const ElectionCategoryValues = ["Municipal"] as const;
-export type ElectionCategory = (typeof ElectionCategoryValues)[number];
+export const electionCategoryValues = ["Municipal"] as const;
+export type ElectionCategory = (typeof electionCategoryValues)[number];
 
 export interface ElectionDefinitionValidateResponse {
   election: NewElection;
@@ -811,7 +811,7 @@ export interface ErrorDetails {
 /**
  * Error reference used to show the corresponding error message to the end-user
  */
-export const ErrorReferenceValues = [
+export const errorReferenceValues = [
   "AirgapViolation",
   "AlreadyInitialised",
   "CommitteeSessionPaused",
@@ -851,7 +851,7 @@ export const ErrorReferenceValues = [
   "UsernameNotUnique",
   "UserNotFound",
 ] as const;
-export type ErrorReference = (typeof ErrorReferenceValues)[number];
+export type ErrorReference = (typeof errorReferenceValues)[number];
 
 /**
  * Response structure for errors
@@ -1062,8 +1062,8 @@ export type PollingStationResults =
 /**
  * Type of Polling station
  */
-export const PollingStationTypeValues = ["FixedLocation", "Special", "Mobile"] as const;
-export type PollingStationType = (typeof PollingStationTypeValues)[number];
+export const pollingStationTypeValues = ["FixedLocation", "Special", "Mobile"] as const;
+export type PollingStationType = (typeof pollingStationTypeValues)[number];
 
 export interface PollingStationsRequest {
   file_name: string;
@@ -1079,15 +1079,15 @@ export interface RedactedEmlHash {
   redacted_indexes: number[];
 }
 
-export const ResolveDifferencesActionValues = [
+export const resolveDifferencesActionValues = [
   "keep_first_entry",
   "keep_second_entry",
   "discard_both_entries",
 ] as const;
-export type ResolveDifferencesAction = (typeof ResolveDifferencesActionValues)[number];
+export type ResolveDifferencesAction = (typeof resolveDifferencesActionValues)[number];
 
-export const ResolveErrorsActionValues = ["discard_first_entry", "resume_first_entry"] as const;
-export type ResolveErrorsAction = (typeof ResolveErrorsActionValues)[number];
+export const resolveErrorsActionValues = ["discard_first_entry", "resume_first_entry"] as const;
+export type ResolveErrorsAction = (typeof resolveErrorsActionValues)[number];
 
 export interface ResultDetails {
   committee_session_id: number;
@@ -1095,8 +1095,8 @@ export interface ResultDetails {
   polling_station_id: number;
 }
 
-export const RoleValues = ["administrator", "typist", "coordinator"] as const;
-export type Role = (typeof RoleValues)[number];
+export const roleValues = ["administrator", "typist", "coordinator"] as const;
+export type Role = (typeof roleValues)[number];
 
 /**
  * Response structure for saving data entry of polling station results
@@ -1154,7 +1154,7 @@ export interface ValidationResult {
   fields: string[];
 }
 
-export const ValidationResultCodeValues = [
+export const validationResultCodeValues = [
   "F101",
   "F102",
   "F111",
@@ -1181,7 +1181,7 @@ export const ValidationResultCodeValues = [
   "W203",
   "W204",
 ] as const;
-export type ValidationResultCode = (typeof ValidationResultCodeValues)[number];
+export type ValidationResultCode = (typeof validationResultCodeValues)[number];
 
 export interface ValidationResultContext {
   political_group_number?: number;
@@ -1192,8 +1192,8 @@ export interface ValidationResults {
   warnings: ValidationResult[];
 }
 
-export const VoteCountingMethodValues = ["CSO", "DSO"] as const;
-export type VoteCountingMethod = (typeof VoteCountingMethodValues)[number];
+export const voteCountingMethodValues = ["CSO", "DSO"] as const;
+export type VoteCountingMethod = (typeof voteCountingMethodValues)[number];
 
 /**
  * Voters counts, part of the polling station results.

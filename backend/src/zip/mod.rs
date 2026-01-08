@@ -1,10 +1,11 @@
+use std::io::Cursor;
+
 use async_zip::{Compression, ZipDateTime, ZipEntryBuilder, tokio::write::ZipFileWriter};
 use axum::{
     body::Body,
     response::{IntoResponse, Response},
 };
 use axum_extra::response::Attachment;
-use std::io::Cursor;
 use tokio::io::{AsyncWriteExt, DuplexStream};
 use tokio_util::{compat::TokioAsyncWriteCompatExt, io::ReaderStream};
 

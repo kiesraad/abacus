@@ -1,16 +1,16 @@
-use chrono::{Datelike, Timelike};
 use std::{fmt::Debug, time::Instant};
+
+use chrono::{Datelike, Timelike};
 use strum::Display;
 use tracing::{debug, error, info, warn};
 use typst::{comemo, diag::SourceDiagnostic, ecow::EcoVec, foundations::Datetime};
 use typst_pdf::{PdfOptions, PdfStandard, PdfStandards, Timestamp};
 
-use crate::zip::{ZipResponseError, ZipResponseWriter};
-
 use super::{
     PdfGenResult,
     models::{PdfFileModel, PdfModel},
 };
+use crate::zip::{ZipResponseError, ZipResponseWriter};
 
 mod world;
 

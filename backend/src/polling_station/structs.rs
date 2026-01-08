@@ -35,6 +35,26 @@ pub struct PollingStation {
     pub locality: String,
 }
 
+impl PollingStation {
+    /// Create a test polling station.
+    #[cfg(test)]
+    pub fn polling_station_fixture(number_of_voters: Option<u32>) -> PollingStation {
+        PollingStation {
+            id: 1,
+            election_id: ElectionId::from(1),
+            committee_session_id: 1,
+            id_prev_session: None,
+            name: "Testplek".to_string(),
+            number: 34,
+            number_of_voters,
+            polling_station_type: Some(PollingStationType::Special),
+            address: "Teststraat 2a".to_string(),
+            postal_code: "1234 QY".to_string(),
+            locality: "Testdorp".to_string(),
+        }
+    }
+}
+
 impl IntoResponse for PollingStation {
     fn into_response(self) -> Response {
         Json(self).into_response()
@@ -131,30 +151,4 @@ impl From<String> for PollingStationType {
 }
 
 #[cfg(test)]
-pub(crate) mod tests {
-    use super::*;
-    use crate::{
-        committee_session::tests::committee_session_fixture,
-        election::structs::tests::election_fixture,
-    };
-
-    /// Create a test polling station.
-    pub fn polling_station_fixture(number_of_voters: Option<u32>) -> PollingStation {
-        let election = election_fixture(&[]);
-        let committee_session = committee_session_fixture(election.id);
-
-        PollingStation {
-            id: 1,
-            election_id: election.id,
-            committee_session_id: committee_session.id,
-            id_prev_session: None,
-            name: "Testplek".to_string(),
-            number: 34,
-            number_of_voters,
-            polling_station_type: Some(PollingStationType::Special),
-            address: "Teststraat 2a".to_string(),
-            postal_code: "1234 QY".to_string(),
-            locality: "Testdorp".to_string(),
-        }
-    }
-}
+pub(crate) mod tests {}

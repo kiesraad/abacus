@@ -1,9 +1,10 @@
-use sqlx::SqlitePool;
 use std::{
     net::{IpAddr, Ipv4Addr, Ipv6Addr},
     sync::{Arc, RwLock, atomic::AtomicBool},
     time::{Duration, Instant},
 };
+
+use sqlx::SqlitePool;
 use tokio::{task::JoinSet, time::timeout};
 use tracing::{debug, error, info, trace, warn};
 
@@ -201,13 +202,13 @@ impl AirgapDetection {
 
 #[cfg(test)]
 mod tests {
-    use crate::airgap::block_request_on_airgap_violation;
-
-    use super::*;
     use axum::{Router, body::Body, http::Request, middleware, routing::get};
     use hyper::StatusCode;
     use test_log::test;
     use tower::ServiceExt;
+
+    use super::*;
+    use crate::airgap::block_request_on_airgap_violation;
 
     #[tokio::test]
     async fn test_block_request_on_airgap_violation() {

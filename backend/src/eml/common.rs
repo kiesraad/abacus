@@ -1,5 +1,6 @@
-use crate::election::{CandidateGender, CandidateNumber, PGNumber, structs};
 use serde::{Deserialize, Serialize};
+
+use crate::election::{CandidateGender, CandidateNumber, PGNumber, structs};
 
 /// Managing authority for the EML document
 #[derive(Debug, Clone, Serialize, Deserialize)]

@@ -1,11 +1,11 @@
 use chrono::TimeDelta;
+pub use middleware::*;
+pub use role::{Admin, AdminOrCoordinator, Coordinator, Role, Typist};
 use serde::{Deserialize, Serialize};
+pub use user::User;
 use utoipa::ToSchema;
 
 pub use self::{api::*, user_api::*};
-pub use middleware::*;
-pub use role::{Admin, AdminOrCoordinator, Coordinator, Role, Typist};
-pub use user::User;
 
 pub mod api;
 pub mod error;

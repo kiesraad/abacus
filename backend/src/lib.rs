@@ -225,9 +225,8 @@ mod test {
     use test_log::test;
     use tokio::net::TcpListener;
 
-    use crate::{AppError, create_sqlite_pool};
-
     use super::start_server;
+    use crate::{AppError, create_sqlite_pool};
 
     async fn run_server_test<F, Fut>(pool: SqlitePool, test_fn: F)
     where

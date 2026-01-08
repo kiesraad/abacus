@@ -15,7 +15,6 @@ mod typst_tests;
 pub use embedded::{PdfGenError, generate_pdf, generate_pdfs};
 #[cfg(not(feature = "embed-typst"))]
 pub use external::{PdfGenError, generate_pdf, generate_pdfs};
-
 pub use votes_table::{
     CandidatesTables, VotesTables, VotesTablesWithOnlyPreviousVotes, VotesTablesWithPreviousVotes,
 };
@@ -33,10 +32,7 @@ pub(crate) mod tests {
     use super::*;
     use crate::{
         committee_session::tests::committee_session_fixture,
-        election::{
-            ElectionCategory, ElectionId, ElectionWithPoliticalGroups, VoteCountingMethod,
-            structs::tests::election_fixture,
-        },
+        election::{ElectionCategory, ElectionId, ElectionWithPoliticalGroups, VoteCountingMethod},
         pdf_gen::{
             models::{PdfFileModel, PdfModel, ToPdfFileModel},
             votes_table::VotesTables,
@@ -147,7 +143,7 @@ pub(crate) mod tests {
 
     #[test(tokio::test)]
     async fn it_generates_a_pdf_with_polling_stations() {
-        let election = election_fixture(&[2, 3]);
+        let election = ElectionWithPoliticalGroups::election_fixture(&[2, 3]);
         let committee_session = committee_session_fixture(election.id);
         let summary = ElectionSummary::from_results(&election, &[]).unwrap();
 

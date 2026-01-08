@@ -22,7 +22,7 @@ use crate::{
         repository::get_election_committee_session,
         status::{CommitteeSessionStatus, change_committee_session_status},
     },
-    data_entry::delete_data_entry_and_result_for_polling_station,
+    data_entry::service::delete_data_entry_and_result_for_polling_station,
     election::ElectionId,
     eml::{EML110, EMLDocument, EMLImportError, EmlHash},
     investigation::delete_investigation_for_polling_station,

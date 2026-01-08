@@ -1,8 +1,13 @@
+use std::{
+    ops::Range,
+    path::{Path, PathBuf},
+};
+
 use abacus::{
     AppError,
     committee_session::CommitteeSession,
     create_sqlite_pool,
-    data_entry::PollingStationResults,
+    data_entry::domain::polling_station_results::PollingStationResults,
     election::ElectionWithPoliticalGroups,
     eml::{EML110, EML230, EMLDocument},
     pdf_gen::{
@@ -15,10 +20,6 @@ use abacus::{
     test_data_gen::{GenerateElectionArgs, RandomRange, create_test_election, parse_range},
 };
 use clap::Parser;
-use std::{
-    ops::Range,
-    path::{Path, PathBuf},
-};
 use tracing::{info, level_filters::LevelFilter};
 use tracing_subscriber::EnvFilter;
 

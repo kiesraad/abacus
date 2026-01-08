@@ -89,8 +89,9 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
     use std::{fs, path::PathBuf};
+
+    use super::*;
 
     fn inputs_dir() -> PathBuf {
         PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("templates/inputs")

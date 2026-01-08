@@ -4,12 +4,24 @@
 /// The generated PDFs are checked to a minimum size to ensure that the generation was successful.
 /// The tests cover various edge cases by varying the number of parties, candidates,
 /// string lengths, and the presence of optional fields.
+use chrono::{DateTime, Local, NaiveDate, NaiveDateTime, Utc};
+use rand::{Rng, seq::IndexedRandom};
+use test_log::test;
+
 use crate::{
     committee_session::{status::CommitteeSessionStatus, structs::CommitteeSession},
-    data_entry::structs::{
-        CandidateVotes, CommonPollingStationResults,
-        DifferenceCountsCompareVotesCastAdmittedVoters, DifferencesCounts,
-        PoliticalGroupCandidateVotes, PoliticalGroupTotalVotes, VotersCounts, VotesCounts, YesNo,
+    data_entry::domain::{
+        political_group_total_votes::PoliticalGroupTotalVotes,
+        polling_station_results::{
+            common_polling_station_results::CommonPollingStationResults,
+            differences_counts::{
+                DifferenceCountsCompareVotesCastAdmittedVoters, DifferencesCounts,
+            },
+            political_group_candidate_votes::{CandidateVotes, PoliticalGroupCandidateVotes},
+            voters_counts::VotersCounts,
+            votes_counts::VotesCounts,
+        },
+        yes_no::YesNo,
     },
     election::{
         Candidate, CandidateGender, CandidateNumber, ElectionCategory, ElectionId,
@@ -31,10 +43,6 @@ use crate::{
     report::DEFAULT_DATE_TIME_FORMAT,
     summary::{ElectionSummary, PollingStationInvestigations, SumCount, SummaryDifferencesCounts},
 };
-
-use chrono::{DateTime, Local, NaiveDate, NaiveDateTime, Utc};
-use rand::{Rng, seq::IndexedRandom};
-use test_log::test;
 
 fn random_string(rng: &mut impl Rng, length: usize) -> String {
     rng.sample_iter(&rand::distr::Alphanumeric)

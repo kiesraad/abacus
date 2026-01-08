@@ -1,8 +1,9 @@
+use sqlx::{SqliteConnection, query_as};
+
 use super::structs::{
     PollingStationInvestigation, PollingStationInvestigationConcludeRequest,
     PollingStationInvestigationCreateRequest,
 };
-use sqlx::{SqliteConnection, query_as};
 
 pub async fn create_polling_station_investigation(
     conn: &mut SqliteConnection,

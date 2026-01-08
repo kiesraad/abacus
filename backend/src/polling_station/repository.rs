@@ -1,7 +1,7 @@
-use crate::election::ElectionId;
+use sqlx::{Connection, SqliteConnection, query, query_as};
 
 use super::structs::{PollingStation, PollingStationRequest};
-use sqlx::{Connection, SqliteConnection, query, query_as};
+use crate::election::ElectionId;
 
 /// List all polling stations from a committee session
 pub async fn list(

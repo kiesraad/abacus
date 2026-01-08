@@ -1,12 +1,12 @@
 #![cfg(test)]
 #![cfg(all(feature = "openapi", feature = "airgap-detection"))]
 
+use abacus::router::openapi_router;
 use hyper::Method;
 use sqlx::SqlitePool;
 use test_log::test;
 
 use crate::utils::serve_api_with_airgap_detection;
-use abacus::router::openapi_router;
 
 pub mod utils;
 

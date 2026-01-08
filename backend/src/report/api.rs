@@ -19,10 +19,9 @@ use crate::{
         status::CommitteeSessionStatus,
     },
     data_entry::{
-        PollingStationResults,
-        repository::{
-            are_results_complete_for_committee_session, list_results_for_committee_session,
-        },
+        domain::polling_station_results::PollingStationResults,
+        repository::polling_station_result_repo,
+        service::are_results_complete_for_committee_session,
     },
     election,
     election::{ElectionId, ElectionWithPoliticalGroups},
@@ -73,7 +72,11 @@ impl ResultsInput {
             committee_session::repository::get(conn, committee_session_id).await?;
         let election = election::repository::get(conn, committee_session.election_id).await?;
         let polling_stations = polling_station::list(conn, committee_session.id).await?;
-        let results = list_results_for_committee_session(conn, committee_session.id).await?;
+        let results = polling_station_result_repo::list_results_for_committee_session(
+            conn,
+            committee_session.id,
+        )
+        .await?;
 
         // get investigations if this is not the first session
         let investigations = if committee_session.is_next_session() {
@@ -92,8 +95,11 @@ impl ResultsInput {
         // get the previous results summary from the previous committee session if it exists
         let previous_summary = if let Some(previous_committee_session) = &previous_committee_session
         {
-            let previous_results =
-                list_results_for_committee_session(conn, previous_committee_session.id).await?;
+            let previous_results = polling_station_result_repo::list_results_for_committee_session(
+                conn,
+                previous_committee_session.id,
+            )
+            .await?;
             let previous_summary = ElectionSummary::from_results(&election, &previous_results)?;
             Some(previous_summary)
         } else {
@@ -579,10 +585,10 @@ async fn election_download_pdf_results(
 
 #[cfg(test)]
 mod tests {
-    use super::*;
-
-    use crate::audit_log::list_event_names;
     use test_log::test;
+
+    use super::*;
+    use crate::audit_log::list_event_names;
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_5_with_results"))))]
     async fn test_get_files_first_session(pool: SqlitePool) {

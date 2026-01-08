@@ -1,7 +1,8 @@
+use std::error::Error;
+
 use chrono::{Datelike, Days, NaiveDate, TimeDelta};
 use rand::{SeedableRng, rngs::StdRng, seq::IndexedRandom};
 use sqlx::{SqliteConnection, SqlitePool};
-use std::error::Error;
 use tracing::info;
 
 use crate::{
@@ -9,14 +10,28 @@ use crate::{
     committee_session::{
         CommitteeSession, CommitteeSessionCreateRequest, status::CommitteeSessionStatus,
     },
-    data_entry,
     data_entry::{
-        CSOFirstSessionResults, CandidateVotes, CountingDifferencesPollingStation,
-        DifferenceCountsCompareVotesCastAdmittedVoters, DifferencesCounts, ExtraInvestigation,
-        FieldPath, PoliticalGroupCandidateVotes, PoliticalGroupTotalVotes, PollingStationResults,
-        Validate, ValidationResults, VotersCounts, VotesCounts, YesNo,
-        repository::list_results_for_committee_session,
-        status::{DataEntryStatus, Definitive, SecondEntryNotStarted},
+        domain::{
+            data_entry_status::{DataEntryStatus, Definitive, SecondEntryNotStarted},
+            field_path::FieldPath,
+            political_group_total_votes::PoliticalGroupTotalVotes,
+            polling_station_results::{
+                PollingStationResults,
+                counting_differences_polling_station::CountingDifferencesPollingStation,
+                cso_first_session_results::CSOFirstSessionResults,
+                differences_counts::{
+                    DifferenceCountsCompareVotesCastAdmittedVoters, DifferencesCounts,
+                },
+                extra_investigation::ExtraInvestigation,
+                political_group_candidate_votes::{CandidateVotes, PoliticalGroupCandidateVotes},
+                voters_counts::VotersCounts,
+                votes_counts::VotesCounts,
+            },
+            validate::{Validate, ValidationResults},
+            yes_no::YesNo,
+        },
+        repository::{data_entry_repo, polling_station_result_repo},
+        service::make_definitive,
     },
     election,
     election::{
@@ -118,7 +133,11 @@ pub async fn create_test_election(
     };
 
     let results = if data_entry_completed {
-        list_results_for_committee_session(&mut tx, committee_session.id).await?
+        polling_station_result_repo::list_results_for_committee_session(
+            &mut tx,
+            committee_session.id,
+        )
+        .await?
     } else {
         vec![]
     };
@@ -351,15 +370,9 @@ async fn generate_data_entry(
                     finalised_with_warnings: validation_results.has_warnings(),
                 });
 
-                data_entry::repository::make_definitive(
-                    conn,
-                    ps.id,
-                    committee_session.id,
-                    &state,
-                    &results,
-                )
-                .await
-                .expect("Could not create definitive data entry");
+                make_definitive(conn, ps.id, committee_session.id, &state, &results)
+                    .await
+                    .expect("Could not create definitive data entry");
                 generated_second_entries += 1;
             } else {
                 // generate only a first data entry
@@ -369,7 +382,7 @@ async fn generate_data_entry(
                     first_entry_finished_at: ts,
                     finalised_with_warnings: validation_results.has_warnings(),
                 });
-                data_entry::repository::upsert(conn, ps.id, committee_session.id, &state)
+                data_entry_repo::upsert(conn, ps.id, committee_session.id, &state)
                     .await
                     .expect("Could not create first data entry");
                 generated_first_entries += 1;

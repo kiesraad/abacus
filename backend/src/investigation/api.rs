@@ -26,8 +26,12 @@ use crate::{
         status::{CommitteeSessionStatus, change_committee_session_status},
     },
     data_entry::{
-        PollingStationResults, delete_data_entry_and_result_for_polling_station,
-        repository::{data_entry_exists, previous_results_for_polling_station, result_exists},
+        domain::polling_station_results::PollingStationResults,
+        repository::{
+            data_entry_repo::data_entry_exists,
+            polling_station_result_repo::{previous_results_for_polling_station, result_exists},
+        },
+        service::delete_data_entry_and_result_for_polling_station,
     },
     election::ElectionWithPoliticalGroups,
     error::ErrorReference,

@@ -1,6 +1,5 @@
 use std::time::Instant;
 
-use crate::APIError;
 use axum::{
     extract::{Request, State},
     middleware::Next,
@@ -8,6 +7,7 @@ use axum::{
 };
 
 use super::{AirgapDetection, detect::AIRGAP_DETECTION_INTERVAL};
+use crate::APIError;
 
 const API_PREFIX: &str = "/api/";
 

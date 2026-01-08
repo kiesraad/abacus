@@ -1,13 +1,14 @@
 #![cfg(test)]
 #![cfg(feature = "openapi")]
 
+use std::panic;
+
 use abacus::{
     authentication::Role,
     router::{get_scopes_from_operation, openapi_router},
 };
 use hyper::{Method, StatusCode};
 use sqlx::SqlitePool;
-use std::panic;
 use test_log::test;
 
 use crate::{

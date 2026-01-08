@@ -10,7 +10,10 @@ use super::{
 };
 use crate::{
     committee_session::CommitteeSession,
-    data_entry::{PoliticalGroupCandidateVotes, PollingStationResults},
+    data_entry::domain::polling_station_results::{
+        PollingStationResults, political_group_candidate_votes::PoliticalGroupCandidateVotes,
+    },
+    election::{ElectionCategory::Municipal, ElectionWithPoliticalGroups},
     polling_station::PollingStation,
     summary::ElectionSummary,
 };
@@ -32,7 +35,7 @@ pub struct EML510 {
 
 impl EML510 {
     pub fn from_results(
-        election: &crate::election::ElectionWithPoliticalGroups,
+        election: &ElectionWithPoliticalGroups,
         committee_session: &CommitteeSession,
         results: &[(PollingStation, PollingStationResults)],
         summary: &ElectionSummary,
@@ -96,12 +99,10 @@ impl EML510 {
 
 impl super::base::EMLDocument for EML510 {}
 
-fn election_subcategory(
-    election: &crate::election::ElectionWithPoliticalGroups,
-) -> Option<ElectionSubcategory> {
+fn election_subcategory(election: &ElectionWithPoliticalGroups) -> Option<ElectionSubcategory> {
     match (&election.category, election.number_of_seats) {
-        (crate::election::ElectionCategory::Municipal, ..19) => Some(ElectionSubcategory::GR1),
-        (crate::election::ElectionCategory::Municipal, 19..) => Some(ElectionSubcategory::GR2),
+        (Municipal, ..19) => Some(ElectionSubcategory::GR1),
+        (Municipal, 19..) => Some(ElectionSubcategory::GR2),
     }
 }
 
@@ -153,7 +154,7 @@ pub struct TotalVotes {
 
 impl TotalVotes {
     pub fn from_summary(
-        election: &crate::election::ElectionWithPoliticalGroups,
+        election: &ElectionWithPoliticalGroups,
         summary: &ElectionSummary,
     ) -> TotalVotes {
         TotalVotes {
@@ -290,7 +291,7 @@ fn create_investigations_from_results(
 
 impl ReportingUnitVotes {
     pub fn from_polling_station(
-        election: &crate::election::ElectionWithPoliticalGroups,
+        election: &ElectionWithPoliticalGroups,
         committee_session: &CommitteeSession,
         authority_id: &str,
         polling_station: &PollingStation,
@@ -455,7 +456,7 @@ pub struct Selection {
 
 impl Selection {
     pub fn from_political_group_votes(
-        election: &crate::election::ElectionWithPoliticalGroups,
+        election: &ElectionWithPoliticalGroups,
         votes: &[PoliticalGroupCandidateVotes],
     ) -> Vec<Selection> {
         let mut selections = vec![];

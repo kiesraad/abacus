@@ -10,7 +10,7 @@ use super::{
 use crate::{
     APIError,
     audit_log::{AuditEvent, AuditService},
-    data_entry::repository::are_results_complete_for_committee_session,
+    data_entry::service::are_results_complete_for_committee_session,
     files::delete_file,
     investigation::list_investigations_for_committee_session,
     polling_station,
@@ -255,6 +255,10 @@ mod tests {
     use crate::committee_session::repository::get;
 
     mod change_committee_session_status {
+        use std::net::Ipv4Addr;
+
+        use chrono::Utc;
+        use sqlx::{SqliteConnection, SqlitePool};
         use test_log::test;
 
         use super::{
@@ -266,9 +270,6 @@ mod tests {
             audit_log::{AuditService, list_event_names},
             files,
         };
-        use chrono::Utc;
-        use sqlx::{SqliteConnection, SqlitePool};
-        use std::net::Ipv4Addr;
 
         async fn generate_test_file(conn: &mut SqliteConnection) -> Result<u32, APIError> {
             let file = files::repository::create(
@@ -366,13 +367,13 @@ mod tests {
     }
 
     mod prepare_data_entry {
+        use sqlx::SqlitePool;
         use test_log::test;
 
         use super::{CommitteeSessionError, CommitteeSessionStatus, get};
         use crate::investigation::{
             PollingStationInvestigationCreateRequest, create_polling_station_investigation,
         };
-        use sqlx::SqlitePool;
 
         /// Created --> Created
         #[test(sqlx::test(fixtures(
@@ -664,13 +665,13 @@ mod tests {
     }
 
     mod ready_for_data_entry {
+        use sqlx::SqlitePool;
         use test_log::test;
 
         use super::{CommitteeSessionError, CommitteeSessionStatus, get};
         use crate::investigation::{
             PollingStationInvestigationCreateRequest, create_polling_station_investigation,
         };
-        use sqlx::SqlitePool;
 
         /// Created --> DataEntryNotStarted
         #[test(sqlx::test(fixtures(
@@ -897,12 +898,22 @@ mod tests {
     }
 
     mod finish_data_entry {
+        use chrono::Utc;
+        use sqlx::SqlitePool;
+        use test_log::test;
+
         use super::{CommitteeSessionError, CommitteeSessionStatus, get};
         use crate::{
             data_entry::{
-                PollingStationResults,
-                repository::{get_or_default, get_result, insert_test_result, make_definitive},
-                status::{DataEntryStatus, Definitive},
+                domain::{
+                    data_entry_status::{DataEntryStatus, Definitive},
+                    polling_station_results::PollingStationResults,
+                },
+                repository::{
+                    data_entry_repo::get_or_default,
+                    polling_station_result_repo::{get_result, insert_test_result},
+                },
+                service::make_definitive,
             },
             investigation::{
                 PollingStationInvestigationConcludeRequest,
@@ -910,9 +921,6 @@ mod tests {
                 create_polling_station_investigation,
             },
         };
-        use chrono::Utc;
-        use sqlx::SqlitePool;
-        use test_log::test;
 
         /// Created --> DataEntryFinished
         #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]

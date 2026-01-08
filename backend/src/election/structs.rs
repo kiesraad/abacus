@@ -51,6 +51,50 @@ pub struct ElectionWithPoliticalGroups {
     pub political_groups: Vec<PoliticalGroup>,
 }
 
+impl ElectionWithPoliticalGroups {
+    #[cfg(test)]
+    /// Create a test election with some political groups.
+    /// The number of political groups is the length of the `political_groups_candidates` slice.
+    /// The number of candidates in each political group is equal to the value in the slice at that index.
+    pub fn election_fixture(political_groups_candidates: &[u32]) -> ElectionWithPoliticalGroups {
+        let political_groups = political_groups_candidates
+            .iter()
+            .enumerate()
+            .map(|(i, &candidates)| PoliticalGroup {
+                number: PGNumber::try_from(i + 1).unwrap(),
+                name: format!("Political group {}", i + 1),
+                candidates: (0..candidates)
+                    .map(|j| Candidate {
+                        number: CandidateNumber::from(j + 1),
+                        initials: "A.B.".to_string(),
+                        first_name: Some(format!("Candidate {}", j + 1)),
+                        last_name_prefix: Some("van".to_string()),
+                        last_name: format!("PG {}", i + 1),
+                        locality: "Juinen".to_string(),
+                        country_code: Some("NL".to_string()),
+                        gender: Some(CandidateGender::X),
+                    })
+                    .collect(),
+            })
+            .collect();
+
+        ElectionWithPoliticalGroups {
+            id: ElectionId::from(1),
+            name: "Test".to_string(),
+            counting_method: VoteCountingMethod::CSO,
+            election_id: "Test_2023".to_string(),
+            location: "Test".to_string(),
+            domain_id: "0000".to_string(),
+            category: ElectionCategory::Municipal,
+            number_of_seats: 29,
+            number_of_voters: 1000,
+            election_date: NaiveDate::from_ymd_opt(2023, 11, 1).unwrap(),
+            nomination_date: NaiveDate::from_ymd_opt(2023, 11, 1).unwrap(),
+            political_groups,
+        }
+    }
+}
+
 impl From<ElectionWithPoliticalGroups> for Election {
     fn from(value: ElectionWithPoliticalGroups) -> Self {
         Self {
@@ -106,12 +150,6 @@ impl From<ElectionWithPoliticalGroups> for ElectionDetails {
 }
 
 impl IntoResponse for Election {
-    fn into_response(self) -> Response {
-        Json(self).into_response()
-    }
-}
-
-impl IntoResponse for ElectionWithPoliticalGroups {
     fn into_response(self) -> Response {
         Json(self).into_response()
     }
@@ -215,63 +253,4 @@ pub enum CandidateGender {
     Male,
     Female,
     X,
-}
-
-#[cfg(test)]
-pub(crate) mod tests {
-    use chrono::NaiveDate;
-
-    use super::*;
-    use crate::election::{Candidate, CandidateGender::X, ElectionCategory, PoliticalGroup};
-
-    /// Create a test election with some political groups and a given number of seats.
-    /// The number of political groups is the length of the `political_groups_candidates` slice.
-    /// The number of candidates in each political group is equal to the value in the slice at that index.
-    pub fn election_fixture_with_given_number_of_seats(
-        political_groups_candidates: &[u32],
-        number_of_seats: u32,
-    ) -> ElectionWithPoliticalGroups {
-        let political_groups = political_groups_candidates
-            .iter()
-            .enumerate()
-            .map(|(i, &candidates)| PoliticalGroup {
-                number: PGNumber::try_from(i + 1).unwrap(),
-                name: format!("Political group {}", i + 1),
-                candidates: (0..candidates)
-                    .map(|j| Candidate {
-                        number: CandidateNumber::from(j + 1),
-                        initials: "A.B.".to_string(),
-                        first_name: Some(format!("Candidate {}", j + 1)),
-                        last_name_prefix: Some("van".to_string()),
-                        last_name: format!("PG {}", i + 1),
-                        locality: "Juinen".to_string(),
-                        country_code: Some("NL".to_string()),
-                        gender: Some(X),
-                    })
-                    .collect(),
-            })
-            .collect();
-
-        ElectionWithPoliticalGroups {
-            id: ElectionId::from(1),
-            name: "Test".to_string(),
-            counting_method: VoteCountingMethod::CSO,
-            election_id: "Test_2023".to_string(),
-            location: "Test".to_string(),
-            domain_id: "0000".to_string(),
-            category: ElectionCategory::Municipal,
-            number_of_seats,
-            number_of_voters: 1000,
-            election_date: NaiveDate::from_ymd_opt(2023, 11, 1).unwrap(),
-            nomination_date: NaiveDate::from_ymd_opt(2023, 11, 1).unwrap(),
-            political_groups,
-        }
-    }
-
-    /// Create a test election with some political groups.
-    /// The number of political groups is the length of the `political_groups_candidates` slice.
-    /// The number of candidates in each political group is equal to the value in the slice at that index.
-    pub fn election_fixture(political_groups_candidates: &[u32]) -> ElectionWithPoliticalGroups {
-        election_fixture_with_given_number_of_seats(political_groups_candidates, 29)
-    }
 }

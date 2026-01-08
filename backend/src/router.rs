@@ -106,7 +106,7 @@ fn build_routes(doc: utoipa::openapi::OpenApi) -> OpenApiRouter<AppState> {
         .merge(authentication::router())
         .merge(authentication::user_router())
         .merge(committee_session::router())
-        .merge(data_entry::router())
+        .merge(data_entry::api::router())
         .merge(election::router())
         .merge(polling_station::router())
         .merge(report::router())

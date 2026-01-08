@@ -1,18 +1,17 @@
 use chrono::NaiveDate;
 use serde::{Deserialize, Deserializer, Serialize};
 
-use crate::{
-    election::{PGNumber, PoliticalGroup, VoteCountingMethod},
-    eml::common::{AuthorityAddress, AuthorityIdentifier},
-    polling_station::PollingStationRequest,
-};
-
 use super::{
     EMLBase,
     common::{
         ContestIdentifier, EMLImportError, ElectionCategory, ElectionDomain, ElectionIdentifier,
         ElectionSubcategory, ManagingAuthority,
     },
+};
+use crate::{
+    election::{ElectionWithPoliticalGroups, PGNumber, PoliticalGroup, VoteCountingMethod},
+    eml::common::{AuthorityAddress, AuthorityIdentifier},
+    polling_station::PollingStationRequest,
 };
 
 /// Election definition (110a and 110b)
@@ -236,7 +235,7 @@ impl EML110 {
     }
 
     pub fn definition_from_abacus_election(
-        election: &crate::election::ElectionWithPoliticalGroups,
+        election: &ElectionWithPoliticalGroups,
         transaction_id: &str,
     ) -> Self {
         let now = chrono::Utc::now();
@@ -281,7 +280,7 @@ impl EML110 {
     }
 
     pub fn polling_stations_from_election(
-        election: &crate::election::ElectionWithPoliticalGroups,
+        election: &ElectionWithPoliticalGroups,
         polling_stations: &[crate::polling_station::PollingStation],
         transaction_id: &str,
     ) -> Self {

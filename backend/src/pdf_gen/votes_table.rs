@@ -1,9 +1,13 @@
-use serde::{Deserialize, Serialize};
 use std::slice::Iter;
+
+use serde::{Deserialize, Serialize};
 
 use crate::{
     APIError,
-    data_entry::{CommonPollingStationResults, Count, PoliticalGroupCandidateVotes},
+    data_entry::domain::polling_station_results::{
+        common_polling_station_results::CommonPollingStationResults, count::Count,
+        political_group_candidate_votes::PoliticalGroupCandidateVotes,
+    },
     election::{Candidate, CandidateNumber, ElectionWithPoliticalGroups, PGNumber, PoliticalGroup},
     summary::ElectionSummary,
 };
@@ -301,12 +305,12 @@ pub(super) struct CandidateVotes {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
     use chrono::NaiveDate;
 
+    use super::*;
     use crate::{
-        data_entry::CandidateVotes as DataEntryCandidateVotes,
-        election::{ElectionCategory, ElectionId, ElectionWithPoliticalGroups, VoteCountingMethod},
+        data_entry::domain::polling_station_results::political_group_candidate_votes,
+        election::{ElectionCategory, ElectionId, VoteCountingMethod},
     };
 
     fn sample_candidate(number: CandidateNumber) -> Candidate {
@@ -360,10 +364,12 @@ mod tests {
             total,
             candidate_votes: entries
                 .iter()
-                .map(|&(candidate_number, votes)| DataEntryCandidateVotes {
-                    number: CandidateNumber::from(candidate_number),
-                    votes,
-                })
+                .map(
+                    |&(candidate_number, votes)| political_group_candidate_votes::CandidateVotes {
+                        number: CandidateNumber::from(candidate_number),
+                        votes,
+                    },
+                )
                 .collect(),
         }
     }

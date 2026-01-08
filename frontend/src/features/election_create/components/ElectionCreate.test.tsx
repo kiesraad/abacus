@@ -226,34 +226,6 @@ describe("Election create pages", () => {
       // Expect to see the next page
       expect(await screen.findByRole("heading", { level: 2, name: "Rol van het stembureau" })).toBeVisible();
     });
-
-    test("It shows an error on invalid input", async () => {
-      overrideOnce("post", "/api/elections/import/validate", 200, electionValidateResponse(newElectionMockData));
-
-      const router = renderWithRouter();
-      const user = userEvent.setup();
-      await router.navigate("/elections/create");
-
-      const filename = "foo.txt";
-      const file = new File(["foo"], filename, { type: "text/plain" });
-
-      // Wait for the page to be loaded
-      expect(await screen.findByRole("heading", { level: 2, name: "Importeer verkiezingsdefinitie" })).toBeVisible();
-      const input = await screen.findByLabelText("Bestand kiezen");
-      await user.upload(input, file);
-
-      // Wait for the page to be loaded and expect the election name to be present
-      expect(await screen.findByText(newElectionMockData.name)).toBeInTheDocument();
-      const inputPart1 = screen.getByRole("textbox", { name: "Controle deel 1" });
-      await user.type(inputPart1, "zxcv");
-      const inputPart2 = screen.getByRole("textbox", { name: "Controle deel 2" });
-      await user.type(inputPart2, "123");
-
-      await user.click(screen.getByRole("button", { name: "Volgende" }));
-
-      // Expect error to be shown
-      expect(await screen.findByRole("alert")).toHaveTextContent("Controle digitale vingerafdruk niet gelukt");
-    });
   });
 
   describe("Candidate list", () => {

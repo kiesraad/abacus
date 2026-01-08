@@ -123,27 +123,12 @@ async function inputElectionHash() {
   // Wait for the page to be loaded and expect the election name to be present
   expect(await screen.findByText(newElectionMockData.name)).toBeInTheDocument();
 
-  // Expect parts of the hash to be shown
-  expect(screen.getByText("asdf")).toBeInTheDocument();
-  // Expect redacted chunks to be stubs
-  expect(screen.queryByText("zxcv")).not.toBeInTheDocument();
-
-  // Expect stub to be highlighted
-  expect(screen.getByText("1")).toHaveRole("mark");
-  expect(screen.getByText("2")).not.toHaveRole("mark");
   const inputPart1 = screen.getByRole("textbox", { name: "Controle deel 1" });
   await user.type(inputPart1, "zxcv");
 
   const inputPart2 = screen.getByRole("textbox", { name: "Controle deel 2" });
-  await user.click(inputPart2);
-  expect(screen.getByText("1")).not.toHaveRole("mark");
-  expect(screen.getByText("2")).toHaveRole("mark");
-
-  // Click somewhere arbitrary and expect no highlights
-  await user.click(screen.getByRole("heading", { level: 2, name: "Controleer verkiezingsdefinitie" }));
-  expect(screen.getByText("1")).not.toHaveRole("mark");
-  expect(screen.getByText("2")).not.toHaveRole("mark");
   await user.type(inputPart2, "gfsd");
+
   await user.click(screen.getByRole("button", { name: "Volgende" }));
 }
 
@@ -177,31 +162,12 @@ async function inputCandidateHash() {
   const user = userEvent.setup();
   overrideOnce("post", "/api/elections/import/validate", 200, electionValidateResponse(newElectionMockData));
 
-  // Expect parts of the hash to be shown
-  expect(screen.getByText("asdf")).toBeInTheDocument();
-  // Expect redacted chunks to be stubs
-  expect(screen.queryByText("zxcv")).not.toBeInTheDocument();
-
-  // Expect stub to be highlighted
-  expect(screen.getByText("1")).toHaveRole("mark");
-  expect(screen.getByText("2")).not.toHaveRole("mark");
-
-  // Override again
-  overrideOnce("post", "/api/elections/import/validate", 200, electionValidateResponse(newElectionMockData));
-
   const inputPart1 = screen.getByRole("textbox", { name: "Controle deel 1" });
   await user.type(inputPart1, "zxcv");
 
   const inputPart2 = screen.getByRole("textbox", { name: "Controle deel 2" });
-  await user.click(inputPart2);
-  expect(screen.getByText("1")).not.toHaveRole("mark");
-  expect(screen.getByText("2")).toHaveRole("mark");
-
-  // Click somewhere arbitrary and expect no highlights
-  await user.click(screen.getByRole("heading", { level: 2, name: "Controleer kandidatenlijsten" }));
-  expect(screen.getByText("1")).not.toHaveRole("mark");
-  expect(screen.getByText("2")).not.toHaveRole("mark");
   await user.type(inputPart2, "gfsd");
+
   await user.click(screen.getByRole("button", { name: "Volgende" }));
 }
 

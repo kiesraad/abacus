@@ -5,6 +5,25 @@ import { CheckHash } from "./CheckHash";
 
 const onSubmit = vi.fn();
 
+const hashChunks = [
+  "asdf",
+  "qwer",
+  "zxcv",
+  "tyui",
+  "",
+  "bnml",
+  "1234",
+  "5678",
+  "8765",
+  "gfsd",
+  "a345",
+  "",
+  "lgmg",
+  "thnr",
+  "nytf",
+  "sdfr",
+];
+
 function renderPage(error = false) {
   render(
     <CheckHash
@@ -13,33 +32,61 @@ function renderPage(error = false) {
       header={"Controleer bestand"}
       description={"Het bestand <naam bestand> is geïmporteerd etc etc"}
       redactedHash={{
-        chunks: [
-          "asdf",
-          "qwer",
-          "zxcv",
-          "tyui",
-          "",
-          "bnml",
-          "1234",
-          "5678",
-          "8765",
-          "gfsd",
-          "a345",
-          "qwer",
-          "lgmg",
-          "",
-          "nytf",
-          "sdfr",
-        ],
+        chunks: hashChunks,
         redacted_indexes: [4, 11],
-      }} // redact these?
+      }}
       error={error}
       onSubmit={onSubmit}
     />,
   );
 }
 
+function joinHashChunksAsRendered(chunks: string[]): string {
+  let result = chunks.shift()!;
+  let obfuscationIndex = 1;
+
+  chunks.forEach((chunk) => {
+    if (chunk === "") {
+      result += `-${obfuscationIndex}`;
+      obfuscationIndex += 1;
+    } else {
+      result += `-${chunk}`;
+    }
+  });
+
+  return result;
+}
+
 describe("CheckHash component", () => {
+  test("It displays hash and it marks hash element matching active input field", async () => {
+    renderPage();
+
+    const user = userEvent.setup();
+
+    expect(await screen.findByRole("heading", { level: 2, name: "Controleer bestand" })).toBeVisible();
+
+    const displayedHash = screen.getByTestId("hash");
+    expect(displayedHash).toHaveTextContent(joinHashChunksAsRendered(hashChunks));
+
+    const inputPart1 = screen.getByRole("textbox", { name: "Controle deel 1" });
+    expect(inputPart1).toHaveFocus();
+    expect(screen.getByText("1")).toHaveRole("mark");
+    expect(screen.getByText("2")).not.toHaveRole("mark");
+
+    const inputPart2 = screen.getByRole("textbox", { name: "Controle deel 2" });
+    await user.click(inputPart2);
+    expect(inputPart2).toHaveFocus();
+    expect(screen.getByText("1")).not.toHaveRole("mark");
+    expect(screen.getByText("2")).toHaveRole("mark");
+
+    // Click somewhere arbitrary and expect no highlights
+    await user.click(screen.getByRole("heading", { level: 2, name: "Controleer bestand" }));
+    expect(inputPart1).not.toHaveFocus();
+    expect(inputPart2).not.toHaveFocus();
+    expect(screen.getByText("1")).not.toHaveRole("mark");
+    expect(screen.getByText("2")).not.toHaveRole("mark");
+  });
+
   test("It submits for a valid hash input", async () => {
     renderPage();
 

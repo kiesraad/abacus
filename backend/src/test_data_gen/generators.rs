@@ -6,10 +6,7 @@ use sqlx::{SqliteConnection, SqlitePool};
 use tracing::info;
 
 use crate::{
-    SqlitePoolExt, committee_session,
-    committee_session::{
-        CommitteeSession, CommitteeSessionCreateRequest, status::CommitteeSessionStatus,
-    },
+    SqlitePoolExt,
     data_entry::{
         domain::{
             data_entry_status::{DataEntryStatus, Definitive, SecondEntryNotStarted},
@@ -33,10 +30,14 @@ use crate::{
         repository::{data_entry_repo, polling_station_result_repo},
         service::make_definitive,
     },
-    election,
     election::{
-        CandidateGender, CandidateNumber, ElectionCategory, ElectionWithPoliticalGroups,
-        NewElection, PGNumber, PoliticalGroup, VoteCountingMethod,
+        domain::{
+            Candidate, CandidateGender, CandidateNumber, ElectionCategory,
+            ElectionWithPoliticalGroups, NewElection, PGNumber, PoliticalGroup, VoteCountingMethod,
+            committee_session::{CommitteeSession, CommitteeSessionCreateRequest},
+            committee_session_status::CommitteeSessionStatus,
+        },
+        repository::{committee_session_repo, election_repo},
     },
     polling_station,
     polling_station::{PollingStation, PollingStationRequest, PollingStationType},
@@ -60,7 +61,7 @@ async fn generate_data_entries(
     election: &ElectionWithPoliticalGroups,
     polling_stations: &[PollingStation],
 ) -> Result<bool, Box<dyn Error>> {
-    let committee_session = committee_session::repository::change_status(
+    let committee_session = committee_session_repo::change_status(
         conn,
         committee_session.id,
         CommitteeSessionStatus::DataEntryInProgress,
@@ -88,11 +89,10 @@ pub async fn create_test_election(
     let mut tx = pool.begin_immediate().await?;
 
     // generate and store the election
-    let election =
-        election::repository::create(&mut tx, generate_election(&mut rng, &args)).await?;
+    let election = election_repo::create(&mut tx, generate_election(&mut rng, &args)).await?;
 
     // generate the committee session for the election
-    let mut committee_session = committee_session::repository::create(
+    let mut committee_session = committee_session_repo::create(
         &mut tx,
         CommitteeSessionCreateRequest {
             number: 1,
@@ -110,7 +110,7 @@ pub async fn create_test_election(
     );
 
     if !polling_stations.is_empty() {
-        committee_session = committee_session::repository::change_status(
+        committee_session = committee_session_repo::change_status(
             &mut tx,
             committee_session.id,
             CommitteeSessionStatus::DataEntryNotStarted,
@@ -220,7 +220,7 @@ fn generate_political_party(
         // initials are required, but if a first name is known, base initials on that
         let initials = super::data::initials(rng, first_name.as_deref());
         let (prefix, last_name) = super::data::last_name(rng);
-        candidates.push(election::Candidate {
+        candidates.push(Candidate {
             number: CandidateNumber::from(i),
             initials,
             first_name,
@@ -603,7 +603,7 @@ fn distribute_power_law(
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::{election::repository as election_repo, test_data_gen::RandomRange};
+    use crate::test_data_gen::RandomRange;
 
     #[sqlx::test]
     async fn test_create_test_election(pool: SqlitePool) {

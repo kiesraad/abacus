@@ -14,8 +14,9 @@ use utoipa::ToSchema;
 
 use crate::{
     MAX_BODY_SIZE_MB, authentication::error::AuthenticationError,
-    committee_session::CommitteeSessionError, data_entry::domain::validate::DataError,
-    eml::EMLImportError, pdf_gen::PdfGenError, zip::ZipResponseError,
+    data_entry::domain::validate::DataError,
+    election::api::committee_session::CommitteeSessionError, eml::EMLImportError,
+    pdf_gen::PdfGenError, zip::ZipResponseError,
 };
 
 /// Error reference used to show the corresponding error message to the end-user

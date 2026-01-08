@@ -12,19 +12,24 @@ use crate::{
     APIError, AppState, ErrorResponse, SqlitePoolExt,
     audit_log::AuditService,
     authentication::Coordinator,
-    committee_session,
-    committee_session::{
-        CommitteeSession, CommitteeSessionError, CommitteeSessionFilesUpdateRequest,
-        repository::{change_files, get_previous_session},
-        status::CommitteeSessionStatus,
-    },
     data_entry::{
         domain::polling_station_results::PollingStationResults,
         repository::polling_station_result_repo,
         service::are_results_complete_for_committee_session,
     },
-    election,
-    election::{ElectionId, ElectionWithPoliticalGroups},
+    election::{
+        api::committee_session::CommitteeSessionError,
+        domain::{
+            ElectionId, ElectionWithPoliticalGroups,
+            committee_session::{CommitteeSession, CommitteeSessionFilesUpdateRequest},
+            committee_session_status::CommitteeSessionStatus,
+        },
+        repository,
+        repository::{
+            committee_session_repo::{change_files, get_previous_session},
+            election_repo,
+        },
+    },
     eml::{EML510, EMLDocument, EmlHash},
     error::ErrorReference,
     files,
@@ -69,8 +74,8 @@ impl ResultsInput {
         created_at: DateTime<Local>,
     ) -> Result<ResultsInput, APIError> {
         let committee_session =
-            committee_session::repository::get(conn, committee_session_id).await?;
-        let election = election::repository::get(conn, committee_session.election_id).await?;
+            repository::committee_session_repo::get(conn, committee_session_id).await?;
+        let election = election_repo::get(conn, committee_session.election_id).await?;
         let polling_stations = polling_station::list(conn, committee_session.id).await?;
         let results = polling_station_result_repo::list_results_for_committee_session(
             conn,
@@ -411,7 +416,7 @@ async fn get_files(
 ) -> Result<(Option<File>, Option<File>, Option<File>, DateTime<Utc>), APIError> {
     let mut conn = pool.acquire().await?;
     let committee_session =
-        committee_session::repository::get(&mut conn, committee_session_id).await?;
+        repository::committee_session_repo::get(&mut conn, committee_session_id).await?;
     let investigations =
         list_investigations_for_committee_session(&mut conn, committee_session.id).await?;
     let corrections = investigations
@@ -500,9 +505,9 @@ async fn election_download_zip_results(
     Path((election_id, committee_session_id)): Path<(ElectionId, u32)>,
 ) -> Result<impl IntoResponse, APIError> {
     let mut conn = pool.acquire().await?;
-    let election = election::repository::get(&mut conn, election_id).await?;
+    let election = election_repo::get(&mut conn, election_id).await?;
     let committee_session =
-        committee_session::repository::get(&mut conn, committee_session_id).await?;
+        repository::committee_session_repo::get(&mut conn, committee_session_id).await?;
     let (eml_file, pdf_file, overview_file, created_at) =
         get_files(&pool, audit_service, committee_session.id).await?;
     drop(conn);

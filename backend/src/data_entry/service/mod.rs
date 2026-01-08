@@ -4,17 +4,21 @@ use crate::{
     APIError,
     audit_log::{AuditEvent, AuditService},
     authentication::{Role, User, error::AuthenticationError},
-    committee_session::{
-        CommitteeSession, CommitteeSessionError,
-        status::{CommitteeSessionStatus, change_committee_session_status},
-    },
     data_entry::{
         domain::{
             data_entry_status::DataEntryStatus, polling_station_results::PollingStationResults,
         },
         repository::{data_entry_repo, polling_station_result_repo},
     },
-    election::ElectionWithPoliticalGroups,
+    election::{
+        api::committee_session::CommitteeSessionError,
+        domain::{
+            ElectionWithPoliticalGroups,
+            committee_session::CommitteeSession,
+            committee_session_status::{CommitteeSessionStatus, change_committee_session_status},
+        },
+        repository::{committee_session_repo, election_repo},
+    },
     error::ErrorReference,
     investigation::get_polling_station_investigation,
     polling_station,
@@ -102,8 +106,7 @@ pub async fn are_results_complete_for_committee_session(
 ) -> Result<bool, sqlx::Error> {
     let mut tx = conn.begin().await?;
 
-    let committee_session =
-        crate::committee_session::repository::get(&mut tx, committee_session_id).await?;
+    let committee_session = committee_session_repo::get(&mut tx, committee_session_id).await?;
 
     let all_new_ps_have_data = query!(
         r#"
@@ -160,9 +163,8 @@ pub async fn validate_and_get_data(
 > {
     let polling_station = polling_station::get(conn, polling_station_id).await?;
     let committee_session =
-        crate::committee_session::repository::get(conn, polling_station.committee_session_id)
-            .await?;
-    let election = crate::election::repository::get(conn, committee_session.election_id).await?;
+        committee_session_repo::get(conn, polling_station.committee_session_id).await?;
+    let election = election_repo::get(conn, committee_session.election_id).await?;
 
     let data_entry_status =
         data_entry_repo::get_or_default(conn, polling_station_id, committee_session.id).await?;

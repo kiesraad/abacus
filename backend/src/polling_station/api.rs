@@ -17,13 +17,15 @@ use crate::{
     APIError, AppState, ErrorResponse, SqlitePoolExt,
     audit_log::{AuditEvent, AuditService, PollingStationImportDetails},
     authentication::{AdminOrCoordinator, User, error::AuthenticationError},
-    committee_session::{
-        CommitteeSession,
-        repository::get_election_committee_session,
-        status::{CommitteeSessionStatus, change_committee_session_status},
-    },
     data_entry::service::delete_data_entry_and_result_for_polling_station,
-    election::ElectionId,
+    election::{
+        domain::{
+            ElectionId,
+            committee_session::CommitteeSession,
+            committee_session_status::{CommitteeSessionStatus, change_committee_session_status},
+        },
+        repository::{committee_session_repo::get_election_committee_session, election_repo},
+    },
     eml::{EML110, EMLDocument, EMLImportError, EmlHash},
     investigation::delete_investigation_for_polling_station,
 };
@@ -62,7 +64,7 @@ async fn polling_station_list(
     let mut conn = pool.acquire().await?;
 
     // Check if the election exists, will respond with NOT_FOUND otherwise
-    crate::election::repository::get(&mut conn, election_id).await?;
+    election_repo::get(&mut conn, election_id).await?;
 
     let committee_session = get_election_committee_session(&mut conn, election_id).await?;
 
@@ -116,7 +118,7 @@ async fn polling_station_create(
     let mut tx = pool.begin_immediate().await?;
 
     // Check if the election and a committee session exist, will respond with NOT_FOUND otherwise
-    crate::election::repository::get(&mut tx, election_id).await?;
+    election_repo::get(&mut tx, election_id).await?;
     let committee_session = get_election_committee_session(&mut tx, election_id).await?;
 
     validate_user_is_allowed_to_perform_action(user, &committee_session).await?;
@@ -212,7 +214,7 @@ async fn polling_station_update(
     let mut tx = pool.begin_immediate().await?;
 
     // Check if the election and a committee session exist, will respond with NOT_FOUND otherwise
-    crate::election::repository::get(&mut tx, election_id).await?;
+    election_repo::get(&mut tx, election_id).await?;
     let committee_session = get_election_committee_session(&mut tx, election_id).await?;
 
     validate_user_is_allowed_to_perform_action(user, &committee_session).await?;
@@ -275,7 +277,7 @@ async fn polling_station_delete(
     let mut tx = pool.begin_immediate().await?;
 
     // Check if the election and a committee session exist, will respond with NOT_FOUND otherwise
-    crate::election::repository::get(&mut tx, election_id).await?;
+    election_repo::get(&mut tx, election_id).await?;
     let committee_session = get_election_committee_session(&mut tx, election_id).await?;
 
     validate_user_is_allowed_to_perform_action(user, &committee_session).await?;
@@ -429,7 +431,7 @@ async fn polling_station_import(
     let mut tx = pool.begin_immediate().await?;
 
     // Check if the election and a committee session exist, will respond with NOT_FOUND otherwise
-    crate::election::repository::get(&mut tx, election_id).await?;
+    election_repo::get(&mut tx, election_id).await?;
     let committee_session = get_election_committee_session(&mut tx, election_id).await?;
 
     if !list(&mut tx, committee_session.id).await?.is_empty() {
@@ -457,7 +459,7 @@ mod tests {
     use test_log::test;
 
     use super::{PollingStationRequest, create, create_many, update};
-    use crate::election::ElectionId;
+    use crate::election::domain::ElectionId;
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2", "election_3"))))]
     async fn test_polling_station_number_unique_per_election(pool: SqlitePool) {

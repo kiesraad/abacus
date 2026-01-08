@@ -152,13 +152,14 @@ pub mod tests {
     use super::*;
     use crate::{
         authentication::{Role, User},
-        committee_session::{
-            status::CommitteeSessionStatus, tests::change_status_committee_session,
-        },
         data_entry::{
             api::{data_entry_claim::tests::claim, data_entry_finalise::tests::finalise},
             domain::data_entry_status::DataEntryStatus,
             repository::polling_station_result_repo,
+        },
+        election::{
+            api::committee_session::tests::change_status_committee_session,
+            domain::committee_session_status::CommitteeSessionStatus,
         },
         error::ErrorReference,
     };

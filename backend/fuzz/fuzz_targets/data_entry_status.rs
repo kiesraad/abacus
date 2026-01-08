@@ -2,7 +2,7 @@
 
 use abacus::{
     data_entry::{status::*, *},
-    election::{ElectionCategory, ElectionId, ElectionWithPoliticalGroups, VoteCountingMethod},
+    election::domain::{ElectionCategory, ElectionId, ElectionWithPoliticalGroups, VoteCountingMethod},
     polling_station::{PollingStation, PollingStationType},
 };
 

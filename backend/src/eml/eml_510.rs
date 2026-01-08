@@ -9,11 +9,13 @@ use super::{
     },
 };
 use crate::{
-    committee_session::CommitteeSession,
     data_entry::domain::polling_station_results::{
         PollingStationResults, political_group_candidate_votes::PoliticalGroupCandidateVotes,
     },
-    election::{ElectionCategory::Municipal, ElectionWithPoliticalGroups},
+    election::domain::{
+        ElectionCategory::Municipal, ElectionWithPoliticalGroups,
+        committee_session::CommitteeSession,
+    },
     polling_station::PollingStation,
     summary::ElectionSummary,
 };

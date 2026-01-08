@@ -4,7 +4,7 @@ use crate::{
         field_path::FieldPath,
         validate::{DataError, Validate, ValidationResults},
     },
-    election::ElectionWithPoliticalGroups,
+    election::domain::ElectionWithPoliticalGroups,
     polling_station::PollingStation,
 };
 

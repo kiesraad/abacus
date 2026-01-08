@@ -13,7 +13,6 @@ pub mod airgap;
 pub mod app_error;
 pub mod audit_log;
 pub mod authentication;
-pub mod committee_session;
 pub mod data_entry;
 pub mod document;
 pub mod election;

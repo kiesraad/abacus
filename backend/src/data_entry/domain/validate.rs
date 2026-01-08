@@ -6,7 +6,7 @@ use utoipa::ToSchema;
 use crate::{
     APIError,
     data_entry::domain::field_path::FieldPath,
-    election::{ElectionWithPoliticalGroups, PGNumber},
+    election::domain::{ElectionWithPoliticalGroups, PGNumber},
     polling_station::PollingStation,
 };
 

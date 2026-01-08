@@ -12,7 +12,7 @@ use crate::{
             DataError, Validate, ValidationResult, ValidationResultCode, ValidationResults,
         },
     },
-    election::ElectionWithPoliticalGroups,
+    election::domain::ElectionWithPoliticalGroups,
     polling_station::PollingStation,
 };
 
@@ -116,7 +116,7 @@ mod tests {
                 votes_counts::VotesCounts,
             },
         },
-        election::PGNumber,
+        election::domain::PGNumber,
     };
 
     #[test]

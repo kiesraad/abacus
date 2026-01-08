@@ -9,7 +9,7 @@ use crate::{
         polling_station_results::count::Count,
         validate::{DataError, Validate, ValidationResults},
     },
-    election::{CandidateNumber, ElectionWithPoliticalGroups, PGNumber},
+    election::domain::{CandidateNumber, ElectionWithPoliticalGroups, PGNumber},
     error::ErrorReference,
     polling_station::PollingStation,
 };

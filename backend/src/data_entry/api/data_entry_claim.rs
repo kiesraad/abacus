@@ -10,7 +10,6 @@ use crate::{
     APIError, ErrorResponse, SqlitePoolExt,
     audit_log::{AuditEvent, AuditService},
     authentication::Typist,
-    committee_session::CommitteeSession,
     data_entry::{
         domain::{
             data_entry_status::{CurrentDataEntry, DataEntryStatus},
@@ -24,7 +23,7 @@ use crate::{
         repository::{data_entry_repo, polling_station_result_repo},
         service::validate_and_get_data,
     },
-    election::PoliticalGroup,
+    election::domain::{PoliticalGroup, committee_session::CommitteeSession},
 };
 
 /// Claim a data entry for a polling station, returning any existing progress
@@ -194,10 +193,11 @@ pub mod tests {
     use super::*;
     use crate::{
         authentication::{Role, User},
-        committee_session::{
-            status::CommitteeSessionStatus, tests::change_status_committee_session,
-        },
         data_entry::domain::polling_station_data_entry::PollingStationDataEntry,
+        election::{
+            api::committee_session::tests::change_status_committee_session,
+            domain::committee_session_status::CommitteeSessionStatus,
+        },
         error::ErrorReference,
         investigation::insert_test_investigation,
         polling_station::insert_test_polling_station,

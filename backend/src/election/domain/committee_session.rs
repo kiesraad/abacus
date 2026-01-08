@@ -7,8 +7,10 @@ use serde::{Deserialize, Serialize};
 use sqlx::{FromRow, Type};
 use utoipa::ToSchema;
 
-use super::status::CommitteeSessionStatus;
-use crate::{audit_log, election::ElectionId, investigation::PollingStationInvestigation};
+use crate::{
+    audit_log,
+    election::domain::{ElectionId, committee_session_status::CommitteeSessionStatus},
+};
 
 /// Committee session
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq, ToSchema, Type, FromRow)]
@@ -79,13 +81,6 @@ pub struct CommitteeSessionUpdateRequest {
     pub start_time: String,
 }
 
-/// Committee session status change request
-#[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq, ToSchema, Type, FromRow)]
-#[serde(deny_unknown_fields)]
-pub struct CommitteeSessionStatusChangeRequest {
-    pub status: CommitteeSessionStatus,
-}
-
 /// Committee session files update request
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq, ToSchema, Type, FromRow)]
 #[serde(deny_unknown_fields)]
@@ -93,17 +88,4 @@ pub struct CommitteeSessionFilesUpdateRequest {
     pub results_eml: Option<u32>,
     pub results_pdf: Option<u32>,
     pub overview_pdf: Option<u32>,
-}
-
-/// Investigation list response
-#[derive(Serialize, Deserialize, ToSchema, Debug)]
-#[serde(deny_unknown_fields)]
-pub struct InvestigationListResponse {
-    pub investigations: Vec<PollingStationInvestigation>,
-}
-
-impl IntoResponse for InvestigationListResponse {
-    fn into_response(self) -> Response {
-        Json(self).into_response()
-    }
 }

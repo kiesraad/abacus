@@ -16,7 +16,7 @@ use crate::{
             ValidationResults,
         },
     },
-    election::ElectionWithPoliticalGroups,
+    election::domain::ElectionWithPoliticalGroups,
     error::ErrorReference,
     polling_station::PollingStation,
 };
@@ -813,7 +813,7 @@ mod tests {
             },
             valid_default::ValidDefault,
         },
-        election::{
+        election::domain::{
             Candidate, CandidateNumber, ElectionCategory, ElectionId, PGNumber, PoliticalGroup,
             VoteCountingMethod,
         },

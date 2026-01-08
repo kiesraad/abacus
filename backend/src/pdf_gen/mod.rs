@@ -31,8 +31,12 @@ pub(crate) mod tests {
 
     use super::*;
     use crate::{
-        committee_session::tests::committee_session_fixture,
-        election::{ElectionCategory, ElectionId, ElectionWithPoliticalGroups, VoteCountingMethod},
+        election::{
+            api::committee_session::tests::committee_session_fixture,
+            domain::{
+                ElectionCategory, ElectionId, ElectionWithPoliticalGroups, VoteCountingMethod,
+            },
+        },
         pdf_gen::{
             models::{PdfFileModel, PdfModel, ToPdfFileModel},
             votes_table::VotesTables,

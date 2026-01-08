@@ -10,7 +10,7 @@ use crate::{
         },
         yes_no::YesNo,
     },
-    election::ElectionWithPoliticalGroups,
+    election::domain::ElectionWithPoliticalGroups,
     polling_station::PollingStation,
 };
 
@@ -85,7 +85,7 @@ mod tests {
             },
             yes_no::YesNo,
         },
-        election::ElectionWithPoliticalGroups,
+        election::domain::ElectionWithPoliticalGroups,
         polling_station::PollingStation,
     };
 

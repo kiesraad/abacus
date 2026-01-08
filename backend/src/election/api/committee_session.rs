@@ -2,24 +2,29 @@ use axum::{
     Json,
     extract::{Path, State},
     http::StatusCode,
+    response::{IntoResponse, Response},
 };
 use chrono::NaiveDateTime;
-use sqlx::{SqliteConnection, SqlitePool};
-use utoipa_axum::{router::OpenApiRouter, routes};
+use serde::{Deserialize, Serialize};
+use sqlx::{FromRow, SqliteConnection, SqlitePool, Type};
+use utoipa::ToSchema;
 
-use super::{
-    CommitteeSession, CommitteeSessionCreateRequest, CommitteeSessionStatusChangeRequest,
-    CommitteeSessionUpdateRequest, InvestigationListResponse,
-    repository::{create, delete, get, get_election_committee_session, update},
-    status::{CommitteeSessionStatus, change_committee_session_status},
-};
 use crate::{
-    APIError, AppState, ErrorResponse, SqlitePoolExt,
+    APIError, ErrorResponse, SqlitePoolExt,
     audit_log::{AuditEvent, AuditService},
     authentication::Coordinator,
-    election::ElectionId,
+    election::{
+        domain::{
+            ElectionId,
+            committee_session::{
+                CommitteeSession, CommitteeSessionCreateRequest, CommitteeSessionUpdateRequest,
+            },
+            committee_session_status::{CommitteeSessionStatus, change_committee_session_status},
+        },
+        repository::{committee_session_repo, election_repo},
+    },
     error::ErrorReference,
-    investigation::list_investigations_for_committee_session,
+    investigation::{PollingStationInvestigation, list_investigations_for_committee_session},
 };
 
 #[derive(Debug, PartialEq, Eq)]
@@ -36,15 +41,6 @@ impl From<CommitteeSessionError> for APIError {
     }
 }
 
-pub fn router() -> OpenApiRouter<AppState> {
-    OpenApiRouter::default()
-        .routes(routes!(committee_session_create))
-        .routes(routes!(committee_session_delete))
-        .routes(routes!(committee_session_update))
-        .routes(routes!(committee_session_status_change))
-        .routes(routes!(committee_session_investigations))
-}
-
 pub async fn validate_committee_session_is_current_committee_session(
     conn: &mut SqliteConnection,
     election_id: ElectionId,
@@ -52,7 +48,8 @@ pub async fn validate_committee_session_is_current_committee_session(
 ) -> Result<CommitteeSession, APIError> {
     // Get current committee session and check if the committee session id given
     // matches the current committee session id, return NOT_FOUND otherwise
-    let current_committee_session = get_election_committee_session(conn, election_id).await?;
+    let current_committee_session =
+        committee_session_repo::get_election_committee_session(conn, election_id).await?;
     if committee_session_id != current_committee_session.id {
         Err(APIError::NotFound(
             "Committee session is not current committee session".to_string(),
@@ -68,7 +65,8 @@ pub async fn create_committee_session(
     audit_service: &AuditService,
     committee_session_create_request: CommitteeSessionCreateRequest,
 ) -> Result<CommitteeSession, APIError> {
-    let committee_session = create(conn, committee_session_create_request).await?;
+    let committee_session =
+        committee_session_repo::create(conn, committee_session_create_request).await?;
     audit_service
         .log(
             conn,
@@ -104,7 +102,8 @@ pub async fn committee_session_create(
 ) -> Result<(StatusCode, CommitteeSession), APIError> {
     let mut tx = pool.begin_immediate().await?;
 
-    let current_committee_session = get_election_committee_session(&mut tx, election_id).await?;
+    let current_committee_session =
+        committee_session_repo::get_election_committee_session(&mut tx, election_id).await?;
 
     if current_committee_session.status == CommitteeSessionStatus::DataEntryFinished {
         let next_committee_session = create_committee_session(&mut tx, &audit_service, {
@@ -163,7 +162,7 @@ pub async fn committee_session_delete(
         && (committee_session.status == CommitteeSessionStatus::Created
             || committee_session.status == CommitteeSessionStatus::DataEntryNotStarted)
     {
-        delete(&mut tx, committee_session_id).await?;
+        committee_session_repo::delete(&mut tx, committee_session_id).await?;
 
         audit_service
             .log(
@@ -237,7 +236,8 @@ pub async fn committee_session_update(
     .await?;
 
     let committee_session =
-        update(&mut tx, committee_session_id, request.location, date_time).await?;
+        committee_session_repo::update(&mut tx, committee_session_id, request.location, date_time)
+            .await?;
 
     audit_service
         .log(
@@ -250,6 +250,13 @@ pub async fn committee_session_update(
     tx.commit().await?;
 
     Ok(StatusCode::NO_CONTENT)
+}
+
+/// Committee session status change request
+#[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq, ToSchema, Type, FromRow)]
+#[serde(deny_unknown_fields)]
+pub struct CommitteeSessionStatusChangeRequest {
+    pub status: CommitteeSessionStatus,
 }
 
 /// Change the status of a [CommitteeSession].
@@ -299,6 +306,19 @@ pub async fn committee_session_status_change(
     Ok(StatusCode::NO_CONTENT)
 }
 
+/// Investigation list response
+#[derive(Serialize, Deserialize, ToSchema, Debug)]
+#[serde(deny_unknown_fields)]
+pub struct InvestigationListResponse {
+    pub investigations: Vec<PollingStationInvestigation>,
+}
+
+impl IntoResponse for InvestigationListResponse {
+    fn into_response(self) -> Response {
+        Json(self).into_response()
+    }
+}
+
 /// Get a list of all [Investigation]s for a committee session
 #[utoipa::path(
     get,
@@ -324,9 +344,9 @@ pub async fn committee_session_investigations(
     let mut conn = pool.acquire().await?;
 
     // Check if the election exists, will respond with NOT_FOUND otherwise
-    crate::election::repository::get(&mut conn, election_id).await?;
+    election_repo::get(&mut conn, election_id).await?;
 
-    let committee_session = get(&mut conn, committee_session_id).await?;
+    let committee_session = committee_session_repo::get(&mut conn, committee_session_id).await?;
 
     Ok(Json(InvestigationListResponse {
         investigations: list_investigations_for_committee_session(&mut conn, committee_session.id)
@@ -339,8 +359,7 @@ pub mod tests {
     use chrono::NaiveDate;
     use sqlx::SqlitePool;
 
-    use super::{CommitteeSession, CommitteeSessionStatus};
-    use crate::{committee_session::repository::change_status, election::ElectionId};
+    use super::*;
 
     pub async fn change_status_committee_session(
         pool: SqlitePool,
@@ -348,7 +367,7 @@ pub mod tests {
         status: CommitteeSessionStatus,
     ) -> CommitteeSession {
         let mut conn = pool.acquire().await.unwrap();
-        change_status(&mut conn, committee_session_id, status)
+        committee_session_repo::change_status(&mut conn, committee_session_id, status)
             .await
             .unwrap()
     }

@@ -20,11 +20,6 @@ use crate::{
     APIError, AppState, ErrorResponse, SqlitePoolExt,
     audit_log::{AuditEvent, AuditService},
     authentication::Coordinator,
-    committee_session::{
-        CommitteeSession, CommitteeSessionError,
-        repository::get_election_committee_session,
-        status::{CommitteeSessionStatus, change_committee_session_status},
-    },
     data_entry::{
         domain::polling_station_results::PollingStationResults,
         repository::{
@@ -33,7 +28,15 @@ use crate::{
         },
         service::delete_data_entry_and_result_for_polling_station,
     },
-    election::ElectionWithPoliticalGroups,
+    election::{
+        api::committee_session::CommitteeSessionError,
+        domain::{
+            ElectionWithPoliticalGroups,
+            committee_session::CommitteeSession,
+            committee_session_status::{CommitteeSessionStatus, change_committee_session_status},
+        },
+        repository::{committee_session_repo::get_election_committee_session, election_repo},
+    },
     error::ErrorReference,
     pdf_gen::{
         VotesTablesWithOnlyPreviousVotes, generate_pdf,
@@ -455,7 +458,7 @@ async fn polling_station_investigation_download_corrigendum_pdf(
     let polling_station: PollingStation =
         polling_station::get(&mut conn, polling_station_id).await?;
     let election: ElectionWithPoliticalGroups =
-        crate::election::repository::get(&mut conn, polling_station.election_id).await?;
+        election_repo::get(&mut conn, polling_station.election_id).await?;
 
     let previous_results = match polling_station.id_prev_session {
         Some(_) => {

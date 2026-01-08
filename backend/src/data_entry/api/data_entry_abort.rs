@@ -91,9 +91,6 @@ mod tests {
     use super::*;
     use crate::{
         authentication::{Coordinator, Role, User},
-        committee_session::{
-            status::CommitteeSessionStatus, tests::change_status_committee_session,
-        },
         data_entry::{
             api::{
                 data_entry_abort,
@@ -104,6 +101,10 @@ mod tests {
                 data_entry_save::{DataEntry, tests::save},
             },
             domain::validate::ValidationResultCode,
+        },
+        election::{
+            api::committee_session::tests::change_status_committee_session,
+            domain::committee_session_status::CommitteeSessionStatus,
         },
         error::ErrorReference,
     };

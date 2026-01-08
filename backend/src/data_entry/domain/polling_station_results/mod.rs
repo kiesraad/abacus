@@ -26,7 +26,7 @@ use crate::{
         },
         validate::{DataError, Validate, ValidateRoot, ValidationResults},
     },
-    election::{ElectionWithPoliticalGroups, PoliticalGroup},
+    election::domain::{ElectionWithPoliticalGroups, PoliticalGroup},
     polling_station::PollingStation,
 };
 
@@ -258,7 +258,7 @@ impl PollingStationResults {
     pub fn example_polling_station_results() -> PollingStationResults {
         use crate::{
             data_entry::domain::{valid_default::ValidDefault, yes_no::YesNo},
-            election::PGNumber,
+            election::domain::PGNumber,
         };
 
         PollingStationResults::CSOFirstSession(CSOFirstSessionResults {

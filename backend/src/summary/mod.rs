@@ -16,7 +16,7 @@ use crate::{
         },
         validate::{Validate, ValidationResults},
     },
-    election::ElectionWithPoliticalGroups,
+    election::domain::ElectionWithPoliticalGroups,
     error::ErrorReference,
     polling_station::{PollingStation, PollingStationNumber},
 };
@@ -304,12 +304,11 @@ mod tests {
 
     use super::*;
     use crate::{
-        committee_session::tests::committee_session_fixture,
         data_entry::domain::{
             polling_station_results::extra_investigation::ExtraInvestigation,
             valid_default::ValidDefault, yes_no::YesNo,
         },
-        election::PGNumber,
+        election::{api::committee_session::tests::committee_session_fixture, domain::PGNumber},
         pdf_gen::tests::polling_stations_fixture,
     };
 

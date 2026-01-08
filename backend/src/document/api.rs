@@ -11,7 +11,7 @@ use utoipa_axum::{router::OpenApiRouter, routes};
 use crate::{
     APIError, AppState, ErrorResponse,
     authentication::AdminOrCoordinator,
-    election::ElectionId,
+    election::{domain::ElectionId, repository::election_repo},
     error::ErrorReference,
     pdf_gen::{
         CandidatesTables, generate_pdf, generate_pdfs,
@@ -59,9 +59,9 @@ async fn election_download_n_10_2(
     Path(election_id): Path<ElectionId>,
 ) -> Result<impl IntoResponse, APIError> {
     let mut conn = pool.acquire().await?;
-    let election = crate::election::repository::get(&mut conn, election_id).await?;
+    let election = election_repo::get(&mut conn, election_id).await?;
     let current_committee_session =
-        crate::committee_session::repository::get_election_committee_session(
+        crate::election::repository::committee_session_repo::get_election_committee_session(
             &mut conn,
             election.id,
         )
@@ -141,9 +141,9 @@ async fn election_download_na_31_2_bijlage1(
     Path(election_id): Path<ElectionId>,
 ) -> Result<impl IntoResponse, APIError> {
     let mut conn = pool.acquire().await?;
-    let election = crate::election::repository::get(&mut conn, election_id).await?;
+    let election = election_repo::get(&mut conn, election_id).await?;
     let current_committee_session =
-        crate::committee_session::repository::get_election_committee_session(
+        crate::election::repository::committee_session_repo::get_election_committee_session(
             &mut conn,
             election.id,
         )
@@ -224,7 +224,7 @@ async fn election_download_na_31_2_inlegvel(
     Path(election_id): Path<ElectionId>,
 ) -> Result<impl IntoResponse, APIError> {
     let mut conn = pool.acquire().await?;
-    let election = crate::election::repository::get(&mut conn, election_id).await?;
+    let election = election_repo::get(&mut conn, election_id).await?;
     drop(conn);
 
     let name = "Model_Na_31_2_Inlegvel.pdf".to_string();

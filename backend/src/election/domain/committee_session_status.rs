@@ -3,14 +3,15 @@ use sqlx::{Connection, SqliteConnection, Type};
 use strum::VariantNames;
 use utoipa::ToSchema;
 
-use super::{
-    CommitteeSession, CommitteeSessionError, CommitteeSessionFilesUpdateRequest,
-    repository::{change_files, change_status, get},
-};
 use crate::{
     APIError,
     audit_log::{AuditEvent, AuditService},
     data_entry::service::are_results_complete_for_committee_session,
+    election::{
+        api::committee_session::CommitteeSessionError,
+        domain::committee_session::{CommitteeSession, CommitteeSessionFilesUpdateRequest},
+        repository::committee_session_repo,
+    },
     files::delete_file,
     investigation::list_investigations_for_committee_session,
     polling_station,
@@ -65,7 +66,7 @@ async fn delete_committee_session_files(
     .collect();
 
     if !file_ids.is_empty() {
-        change_files(
+        committee_session_repo::change_files(
             conn,
             committee_session.id,
             CommitteeSessionFilesUpdateRequest {
@@ -91,7 +92,7 @@ pub async fn change_committee_session_status(
 ) -> Result<(), APIError> {
     let mut tx = conn.begin().await?;
 
-    let committee_session = get(&mut tx, committee_session_id).await?;
+    let committee_session = committee_session_repo::get(&mut tx, committee_session_id).await?;
     let new_status = match status {
         CommitteeSessionStatus::Created => {
             committee_session
@@ -124,7 +125,8 @@ pub async fn change_committee_session_status(
         delete_committee_session_files(&mut tx, audit_service.clone(), committee_session).await?;
     }
 
-    let committee_session = change_status(&mut tx, committee_session_id, new_status).await?;
+    let committee_session =
+        committee_session_repo::change_status(&mut tx, committee_session_id, new_status).await?;
 
     audit_service
         .log(
@@ -252,7 +254,6 @@ impl CommitteeSessionStatus {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::committee_session::repository::get;
 
     mod change_committee_session_status {
         use std::net::Ipv4Addr;
@@ -261,12 +262,8 @@ mod tests {
         use sqlx::{SqliteConnection, SqlitePool};
         use test_log::test;
 
-        use super::{
-            CommitteeSessionFilesUpdateRequest, CommitteeSessionStatus,
-            change_committee_session_status, change_files, get,
-        };
+        use super::*;
         use crate::{
-            APIError,
             audit_log::{AuditService, list_event_names},
             files,
         };
@@ -283,7 +280,10 @@ mod tests {
             Ok(file.id)
         }
 
-        #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_5_with_results"))))]
+        #[test(sqlx::test(fixtures(
+            path = "../../../fixtures",
+            scripts("election_5_with_results")
+        )))]
         async fn test_delete_files_on_resume_no_files(pool: SqlitePool) -> Result<(), APIError> {
             let mut conn = pool.acquire().await?;
             let audit_service = AuditService::new(None, Some(Ipv4Addr::new(203, 0, 113, 0).into()));
@@ -296,7 +296,7 @@ mod tests {
                 audit_service.clone(),
             )
             .await?;
-            let session = get(&mut conn, 6).await?;
+            let session = committee_session_repo::get(&mut conn, 6).await?;
             assert_eq!(session.status, CommitteeSessionStatus::DataEntryFinished);
 
             // DataEntryFinished --> DataEntryInProgress
@@ -307,7 +307,7 @@ mod tests {
                 audit_service,
             )
             .await?;
-            let session = get(&mut conn, 6).await?;
+            let session = committee_session_repo::get(&mut conn, 6).await?;
             assert_eq!(session.status, CommitteeSessionStatus::DataEntryInProgress);
 
             // No FileDeleted events should be logged
@@ -318,7 +318,10 @@ mod tests {
             Ok(())
         }
 
-        #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_5_with_results"))))]
+        #[test(sqlx::test(fixtures(
+            path = "../../../fixtures",
+            scripts("election_5_with_results")
+        )))]
         async fn test_delete_files_on_resume_with_files(pool: SqlitePool) -> Result<(), APIError> {
             let mut conn = pool.acquire().await?;
             let audit_service = AuditService::new(None, Some(Ipv4Addr::new(203, 0, 113, 0).into()));
@@ -331,7 +334,7 @@ mod tests {
                 audit_service.clone(),
             )
             .await?;
-            let session = get(&mut conn, 6).await?;
+            let session = committee_session_repo::get(&mut conn, 6).await?;
             assert_eq!(session.status, CommitteeSessionStatus::DataEntryFinished);
 
             let files_update = CommitteeSessionFilesUpdateRequest {
@@ -339,7 +342,7 @@ mod tests {
                 results_pdf: Some(generate_test_file(&mut conn).await?),
                 overview_pdf: Some(generate_test_file(&mut conn).await?),
             };
-            change_files(&mut conn, 6, files_update).await?;
+            committee_session_repo::change_files(&mut conn, 6, files_update).await?;
 
             // DataEntryFinished --> DataEntryInProgress
             change_committee_session_status(
@@ -349,7 +352,7 @@ mod tests {
                 audit_service,
             )
             .await?;
-            let session = get(&mut conn, 6).await?;
+            let session = committee_session_repo::get(&mut conn, 6).await?;
             assert_eq!(session.status, CommitteeSessionStatus::DataEntryInProgress);
 
             assert_eq!(
@@ -370,19 +373,19 @@ mod tests {
         use sqlx::SqlitePool;
         use test_log::test;
 
-        use super::{CommitteeSessionError, CommitteeSessionStatus, get};
+        use super::*;
         use crate::investigation::{
             PollingStationInvestigationCreateRequest, create_polling_station_investigation,
         };
 
         /// Created --> Created
         #[test(sqlx::test(fixtures(
-            path = "../../fixtures",
+            path = "../../../fixtures",
             scripts("election_6_no_polling_stations")
         )))]
         async fn created_to_created_no_polling_stations(pool: SqlitePool) {
             let mut conn = pool.acquire().await.unwrap();
-            let committee_session = get(&mut conn, 7).await.unwrap();
+            let committee_session = committee_session_repo::get(&mut conn, 7).await.unwrap();
             assert_eq!(
                 CommitteeSessionStatus::Created
                     .prepare_data_entry(&mut conn, &committee_session)
@@ -393,12 +396,12 @@ mod tests {
 
         /// DataEntryNotStarted --> Created
         #[test(sqlx::test(fixtures(
-            path = "../../fixtures",
+            path = "../../../fixtures",
             scripts("election_6_no_polling_stations")
         )))]
         async fn data_entry_not_started_to_created_no_polling_stations(pool: SqlitePool) {
             let mut conn = pool.acquire().await.unwrap();
-            let committee_session = get(&mut conn, 7).await.unwrap();
+            let committee_session = committee_session_repo::get(&mut conn, 7).await.unwrap();
             assert_eq!(
                 CommitteeSessionStatus::DataEntryNotStarted
                     .prepare_data_entry(&mut conn, &committee_session)
@@ -408,10 +411,10 @@ mod tests {
         }
 
         /// DataEntryNotStarted --> Created
-        #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
+        #[test(sqlx::test(fixtures(path = "../../../fixtures", scripts("election_2"))))]
         async fn data_entry_not_started_to_created_with_polling_stations(pool: SqlitePool) {
             let mut conn = pool.acquire().await.unwrap();
-            let committee_session = get(&mut conn, 2).await.unwrap();
+            let committee_session = committee_session_repo::get(&mut conn, 2).await.unwrap();
             assert_eq!(
                 CommitteeSessionStatus::DataEntryNotStarted
                     .prepare_data_entry(&mut conn, &committee_session)
@@ -422,12 +425,12 @@ mod tests {
 
         /// DataEntryNotStarted --> Created
         #[test(sqlx::test(fixtures(
-            path = "../../fixtures",
+            path = "../../../fixtures",
             scripts("election_7_four_sessions")
         )))]
         async fn data_entry_not_started_to_created_next_session_no_investigation(pool: SqlitePool) {
             let mut conn = pool.acquire().await.unwrap();
-            let committee_session = get(&mut conn, 704).await.unwrap();
+            let committee_session = committee_session_repo::get(&mut conn, 704).await.unwrap();
             assert_eq!(
                 CommitteeSessionStatus::DataEntryNotStarted
                     .prepare_data_entry(&mut conn, &committee_session)
@@ -437,12 +440,15 @@ mod tests {
         }
 
         /// DataEntryNotStarted --> Created
-        #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_5_with_results"))))]
+        #[test(sqlx::test(fixtures(
+            path = "../../../fixtures",
+            scripts("election_5_with_results")
+        )))]
         async fn data_entry_not_started_to_created_next_session_with_investigation(
             pool: SqlitePool,
         ) {
             let mut conn = pool.acquire().await.unwrap();
-            let committee_session = get(&mut conn, 6).await.unwrap();
+            let committee_session = committee_session_repo::get(&mut conn, 6).await.unwrap();
             create_polling_station_investigation(
                 &mut conn,
                 9,
@@ -462,12 +468,12 @@ mod tests {
 
         /// DataEntryInProgress --> Created
         #[test(sqlx::test(fixtures(
-            path = "../../fixtures",
+            path = "../../../fixtures",
             scripts("election_6_no_polling_stations")
         )))]
         async fn data_entry_in_progress_to_created_no_polling_stations(pool: SqlitePool) {
             let mut conn = pool.acquire().await.unwrap();
-            let committee_session = get(&mut conn, 7).await.unwrap();
+            let committee_session = committee_session_repo::get(&mut conn, 7).await.unwrap();
             assert_eq!(
                 CommitteeSessionStatus::DataEntryInProgress
                     .prepare_data_entry(&mut conn, &committee_session)
@@ -477,10 +483,10 @@ mod tests {
         }
 
         /// DataEntryInProgress --> Created
-        #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
+        #[test(sqlx::test(fixtures(path = "../../../fixtures", scripts("election_2"))))]
         async fn data_entry_in_progress_to_created_with_polling_stations(pool: SqlitePool) {
             let mut conn = pool.acquire().await.unwrap();
-            let committee_session = get(&mut conn, 2).await.unwrap();
+            let committee_session = committee_session_repo::get(&mut conn, 2).await.unwrap();
             assert_eq!(
                 CommitteeSessionStatus::DataEntryInProgress
                     .prepare_data_entry(&mut conn, &committee_session)
@@ -491,12 +497,12 @@ mod tests {
 
         /// DataEntryInProgress --> Created
         #[test(sqlx::test(fixtures(
-            path = "../../fixtures",
+            path = "../../../fixtures",
             scripts("election_7_four_sessions")
         )))]
         async fn data_entry_in_progress_to_created_next_session_no_investigation(pool: SqlitePool) {
             let mut conn = pool.acquire().await.unwrap();
-            let committee_session = get(&mut conn, 704).await.unwrap();
+            let committee_session = committee_session_repo::get(&mut conn, 704).await.unwrap();
             assert_eq!(
                 CommitteeSessionStatus::DataEntryInProgress
                     .prepare_data_entry(&mut conn, &committee_session)
@@ -506,12 +512,15 @@ mod tests {
         }
 
         /// DataEntryInProgress --> Created
-        #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_5_with_results"))))]
+        #[test(sqlx::test(fixtures(
+            path = "../../../fixtures",
+            scripts("election_5_with_results")
+        )))]
         async fn data_entry_in_progress_to_created_next_session_with_investigation(
             pool: SqlitePool,
         ) {
             let mut conn = pool.acquire().await.unwrap();
-            let committee_session = get(&mut conn, 6).await.unwrap();
+            let committee_session = committee_session_repo::get(&mut conn, 6).await.unwrap();
             create_polling_station_investigation(
                 &mut conn,
                 9,
@@ -531,12 +540,12 @@ mod tests {
 
         /// DataEntryPaused --> Created
         #[test(sqlx::test(fixtures(
-            path = "../../fixtures",
+            path = "../../../fixtures",
             scripts("election_6_no_polling_stations")
         )))]
         async fn data_entry_paused_to_created_no_polling_stations(pool: SqlitePool) {
             let mut conn = pool.acquire().await.unwrap();
-            let committee_session = get(&mut conn, 7).await.unwrap();
+            let committee_session = committee_session_repo::get(&mut conn, 7).await.unwrap();
             assert_eq!(
                 CommitteeSessionStatus::DataEntryPaused
                     .prepare_data_entry(&mut conn, &committee_session)
@@ -546,10 +555,10 @@ mod tests {
         }
 
         /// DataEntryPaused --> Created
-        #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
+        #[test(sqlx::test(fixtures(path = "../../../fixtures", scripts("election_2"))))]
         async fn data_entry_paused_to_created_with_polling_stations(pool: SqlitePool) {
             let mut conn = pool.acquire().await.unwrap();
-            let committee_session = get(&mut conn, 2).await.unwrap();
+            let committee_session = committee_session_repo::get(&mut conn, 2).await.unwrap();
             assert_eq!(
                 CommitteeSessionStatus::DataEntryPaused
                     .prepare_data_entry(&mut conn, &committee_session)
@@ -560,12 +569,12 @@ mod tests {
 
         /// DataEntryPaused --> Created
         #[test(sqlx::test(fixtures(
-            path = "../../fixtures",
+            path = "../../../fixtures",
             scripts("election_7_four_sessions")
         )))]
         async fn data_entry_paused_to_created_next_session_no_investigation(pool: SqlitePool) {
             let mut conn = pool.acquire().await.unwrap();
-            let committee_session = get(&mut conn, 704).await.unwrap();
+            let committee_session = committee_session_repo::get(&mut conn, 704).await.unwrap();
             assert_eq!(
                 CommitteeSessionStatus::DataEntryPaused
                     .prepare_data_entry(&mut conn, &committee_session)
@@ -575,10 +584,13 @@ mod tests {
         }
 
         /// DataEntryPaused --> Created
-        #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_5_with_results"))))]
+        #[test(sqlx::test(fixtures(
+            path = "../../../fixtures",
+            scripts("election_5_with_results")
+        )))]
         async fn data_entry_paused_to_created_next_session_with_investigation(pool: SqlitePool) {
             let mut conn = pool.acquire().await.unwrap();
-            let committee_session = get(&mut conn, 6).await.unwrap();
+            let committee_session = committee_session_repo::get(&mut conn, 6).await.unwrap();
             create_polling_station_investigation(
                 &mut conn,
                 9,
@@ -598,12 +610,12 @@ mod tests {
 
         /// DataEntryFinished --> Created
         #[test(sqlx::test(fixtures(
-            path = "../../fixtures",
+            path = "../../../fixtures",
             scripts("election_6_no_polling_stations")
         )))]
         async fn data_entry_finished_to_created_no_polling_stations(pool: SqlitePool) {
             let mut conn = pool.acquire().await.unwrap();
-            let committee_session = get(&mut conn, 7).await.unwrap();
+            let committee_session = committee_session_repo::get(&mut conn, 7).await.unwrap();
             assert_eq!(
                 CommitteeSessionStatus::DataEntryFinished
                     .prepare_data_entry(&mut conn, &committee_session)
@@ -613,10 +625,10 @@ mod tests {
         }
 
         /// DataEntryFinished --> Created
-        #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
+        #[test(sqlx::test(fixtures(path = "../../../fixtures", scripts("election_2"))))]
         async fn data_entry_finished_to_created_with_polling_stations(pool: SqlitePool) {
             let mut conn = pool.acquire().await.unwrap();
-            let committee_session = get(&mut conn, 2).await.unwrap();
+            let committee_session = committee_session_repo::get(&mut conn, 2).await.unwrap();
             assert_eq!(
                 CommitteeSessionStatus::DataEntryFinished
                     .prepare_data_entry(&mut conn, &committee_session)
@@ -627,12 +639,12 @@ mod tests {
 
         /// DataEntryFinished --> Created
         #[test(sqlx::test(fixtures(
-            path = "../../fixtures",
+            path = "../../../fixtures",
             scripts("election_7_four_sessions")
         )))]
         async fn data_entry_finished_to_created_next_session_no_investigation(pool: SqlitePool) {
             let mut conn = pool.acquire().await.unwrap();
-            let committee_session = get(&mut conn, 704).await.unwrap();
+            let committee_session = committee_session_repo::get(&mut conn, 704).await.unwrap();
             assert_eq!(
                 CommitteeSessionStatus::DataEntryFinished
                     .prepare_data_entry(&mut conn, &committee_session)
@@ -642,10 +654,13 @@ mod tests {
         }
 
         /// DataEntryFinished --> Created
-        #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_5_with_results"))))]
+        #[test(sqlx::test(fixtures(
+            path = "../../../fixtures",
+            scripts("election_5_with_results")
+        )))]
         async fn data_entry_finished_to_created_next_session_with_investigation(pool: SqlitePool) {
             let mut conn = pool.acquire().await.unwrap();
-            let committee_session = get(&mut conn, 6).await.unwrap();
+            let committee_session = committee_session_repo::get(&mut conn, 6).await.unwrap();
             create_polling_station_investigation(
                 &mut conn,
                 9,
@@ -668,19 +683,25 @@ mod tests {
         use sqlx::SqlitePool;
         use test_log::test;
 
-        use super::{CommitteeSessionError, CommitteeSessionStatus, get};
-        use crate::investigation::{
-            PollingStationInvestigationCreateRequest, create_polling_station_investigation,
+        use crate::{
+            election::{
+                api::committee_session::CommitteeSessionError,
+                domain::committee_session_status::CommitteeSessionStatus,
+                repository::committee_session_repo,
+            },
+            investigation::{
+                PollingStationInvestigationCreateRequest, create_polling_station_investigation,
+            },
         };
 
         /// Created --> DataEntryNotStarted
         #[test(sqlx::test(fixtures(
-            path = "../../fixtures",
+            path = "../../../fixtures",
             scripts("election_6_no_polling_stations")
         )))]
         async fn created_to_data_entry_not_started_no_polling_stations(pool: SqlitePool) {
             let mut conn = pool.acquire().await.unwrap();
-            let committee_session = get(&mut conn, 7).await.unwrap();
+            let committee_session = committee_session_repo::get(&mut conn, 7).await.unwrap();
             assert_eq!(
                 CommitteeSessionStatus::Created
                     .ready_for_data_entry(&mut conn, &committee_session)
@@ -690,10 +711,10 @@ mod tests {
         }
 
         /// Created --> DataEntryNotStarted
-        #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
+        #[test(sqlx::test(fixtures(path = "../../../fixtures", scripts("election_2"))))]
         async fn created_to_data_entry_not_started_with_polling_stations(pool: SqlitePool) {
             let mut conn = pool.acquire().await.unwrap();
-            let committee_session = get(&mut conn, 2).await.unwrap();
+            let committee_session = committee_session_repo::get(&mut conn, 2).await.unwrap();
             assert_eq!(
                 CommitteeSessionStatus::Created
                     .ready_for_data_entry(&mut conn, &committee_session)
@@ -704,12 +725,12 @@ mod tests {
 
         /// Created --> DataEntryNotStarted
         #[test(sqlx::test(fixtures(
-            path = "../../fixtures",
+            path = "../../../fixtures",
             scripts("election_7_four_sessions")
         )))]
         async fn created_to_data_entry_not_started_next_session_no_investigation(pool: SqlitePool) {
             let mut conn = pool.acquire().await.unwrap();
-            let committee_session = get(&mut conn, 704).await.unwrap();
+            let committee_session = committee_session_repo::get(&mut conn, 704).await.unwrap();
             assert_eq!(
                 CommitteeSessionStatus::Created
                     .ready_for_data_entry(&mut conn, &committee_session)
@@ -719,12 +740,15 @@ mod tests {
         }
 
         /// Created --> DataEntryNotStarted
-        #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_5_with_results"))))]
+        #[test(sqlx::test(fixtures(
+            path = "../../../fixtures",
+            scripts("election_5_with_results")
+        )))]
         async fn created_to_data_entry_not_started_next_session_with_investigation(
             pool: SqlitePool,
         ) {
             let mut conn = pool.acquire().await.unwrap();
-            let committee_session = get(&mut conn, 6).await.unwrap();
+            let committee_session = committee_session_repo::get(&mut conn, 6).await.unwrap();
             create_polling_station_investigation(
                 &mut conn,
                 9,
@@ -743,10 +767,10 @@ mod tests {
         }
 
         /// DataEntryNotStarted --> DataEntryNotStarted
-        #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
+        #[test(sqlx::test(fixtures(path = "../../../fixtures", scripts("election_2"))))]
         async fn data_entry_not_started_to_data_entry_not_started(pool: SqlitePool) {
             let mut conn = pool.acquire().await.unwrap();
-            let committee_session = get(&mut conn, 2).await.unwrap();
+            let committee_session = committee_session_repo::get(&mut conn, 2).await.unwrap();
             assert_eq!(
                 CommitteeSessionStatus::DataEntryNotStarted
                     .ready_for_data_entry(&mut conn, &committee_session)
@@ -756,10 +780,10 @@ mod tests {
         }
 
         /// DataEntryInProgress --> DataEntryNotStarted
-        #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
+        #[test(sqlx::test(fixtures(path = "../../../fixtures", scripts("election_2"))))]
         async fn data_entry_in_progress_to_data_entry_not_started(pool: SqlitePool) {
             let mut conn = pool.acquire().await.unwrap();
-            let committee_session = get(&mut conn, 2).await.unwrap();
+            let committee_session = committee_session_repo::get(&mut conn, 2).await.unwrap();
             assert_eq!(
                 CommitteeSessionStatus::DataEntryInProgress
                     .ready_for_data_entry(&mut conn, &committee_session)
@@ -769,10 +793,10 @@ mod tests {
         }
 
         /// DataEntryPaused --> DataEntryNotStarted
-        #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
+        #[test(sqlx::test(fixtures(path = "../../../fixtures", scripts("election_2"))))]
         async fn data_entry_paused_to_data_entry_not_started(pool: SqlitePool) {
             let mut conn = pool.acquire().await.unwrap();
-            let committee_session = get(&mut conn, 2).await.unwrap();
+            let committee_session = committee_session_repo::get(&mut conn, 2).await.unwrap();
             assert_eq!(
                 CommitteeSessionStatus::DataEntryPaused
                     .ready_for_data_entry(&mut conn, &committee_session)
@@ -782,10 +806,10 @@ mod tests {
         }
 
         /// DataEntryFinished --> DataEntryNotStarted
-        #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
+        #[test(sqlx::test(fixtures(path = "../../../fixtures", scripts("election_2"))))]
         async fn data_entry_finished_to_data_entry_not_started(pool: SqlitePool) {
             let mut conn = pool.acquire().await.unwrap();
-            let committee_session = get(&mut conn, 2).await.unwrap();
+            let committee_session = committee_session_repo::get(&mut conn, 2).await.unwrap();
             assert_eq!(
                 CommitteeSessionStatus::DataEntryFinished
                     .ready_for_data_entry(&mut conn, &committee_session)
@@ -798,7 +822,10 @@ mod tests {
     mod start_data_entry {
         use test_log::test;
 
-        use super::{CommitteeSessionError, CommitteeSessionStatus};
+        use crate::election::{
+            api::committee_session::CommitteeSessionError,
+            domain::committee_session_status::CommitteeSessionStatus,
+        };
 
         /// Created --> DataEntryInProgress
         #[test]
@@ -849,7 +876,10 @@ mod tests {
     mod pause_data_entry {
         use test_log::test;
 
-        use super::{CommitteeSessionError, CommitteeSessionStatus};
+        use crate::election::{
+            api::committee_session::CommitteeSessionError,
+            domain::committee_session_status::CommitteeSessionStatus,
+        };
 
         /// Created --> DataEntryPaused
         #[test]
@@ -902,17 +932,14 @@ mod tests {
         use sqlx::SqlitePool;
         use test_log::test;
 
-        use super::{CommitteeSessionError, CommitteeSessionStatus, get};
+        use super::*;
         use crate::{
             data_entry::{
                 domain::{
                     data_entry_status::{DataEntryStatus, Definitive},
                     polling_station_results::PollingStationResults,
                 },
-                repository::{
-                    data_entry_repo::get_or_default,
-                    polling_station_result_repo::{get_result, insert_test_result},
-                },
+                repository::{data_entry_repo, polling_station_result_repo},
                 service::make_definitive,
             },
             investigation::{
@@ -923,10 +950,10 @@ mod tests {
         };
 
         /// Created --> DataEntryFinished
-        #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
+        #[test(sqlx::test(fixtures(path = "../../../fixtures", scripts("election_2"))))]
         async fn created_to_data_entry_finished(pool: SqlitePool) {
             let mut conn = pool.acquire().await.unwrap();
-            let committee_session = get(&mut conn, 2).await.unwrap();
+            let committee_session = committee_session_repo::get(&mut conn, 2).await.unwrap();
             assert_eq!(
                 CommitteeSessionStatus::Created
                     .finish_data_entry(&mut conn, &committee_session)
@@ -936,10 +963,10 @@ mod tests {
         }
 
         /// DataEntryNotStarted --> DataEntryFinished
-        #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
+        #[test(sqlx::test(fixtures(path = "../../../fixtures", scripts("election_2"))))]
         async fn data_entry_not_started_to_data_entry_finished(pool: SqlitePool) {
             let mut conn = pool.acquire().await.unwrap();
-            let committee_session = get(&mut conn, 2).await.unwrap();
+            let committee_session = committee_session_repo::get(&mut conn, 2).await.unwrap();
             assert_eq!(
                 CommitteeSessionStatus::DataEntryNotStarted
                     .finish_data_entry(&mut conn, &committee_session)
@@ -949,13 +976,13 @@ mod tests {
         }
 
         /// DataEntryInProgress --> DataEntryFinished
-        #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
+        #[test(sqlx::test(fixtures(path = "../../../fixtures", scripts("election_2"))))]
         async fn data_entry_in_progress_to_data_entry_finished(pool: SqlitePool) {
             let mut conn = pool.acquire().await.unwrap();
-            let committee_session = get(&mut conn, 2).await.unwrap();
+            let committee_session = committee_session_repo::get(&mut conn, 2).await.unwrap();
 
             // Ensure there is some data in the results table
-            insert_test_result(
+            polling_station_result_repo::insert_test_result(
                 &mut conn,
                 1,
                 2,
@@ -964,7 +991,7 @@ mod tests {
             .await
             .unwrap();
 
-            insert_test_result(
+            polling_station_result_repo::insert_test_result(
                 &mut conn,
                 2,
                 2,
@@ -982,12 +1009,15 @@ mod tests {
         }
 
         /// DataEntryInProgress --> DataEntryFinished
-        #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_5_with_results"))))]
+        #[test(sqlx::test(fixtures(
+            path = "../../../fixtures",
+            scripts("election_5_with_results")
+        )))]
         async fn data_entry_in_progress_to_data_entry_finished_next_session_not_finished(
             pool: SqlitePool,
         ) {
             let mut conn = pool.acquire().await.unwrap();
-            let committee_session = get(&mut conn, 6).await.unwrap();
+            let committee_session = committee_session_repo::get(&mut conn, 6).await.unwrap();
             create_polling_station_investigation(
                 &mut conn,
                 9,
@@ -1006,12 +1036,15 @@ mod tests {
         }
 
         /// DataEntryInProgress --> DataEntryFinished
-        #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_5_with_results"))))]
+        #[test(sqlx::test(fixtures(
+            path = "../../../fixtures",
+            scripts("election_5_with_results")
+        )))]
         async fn data_entry_in_progress_to_data_entry_finished_next_session_not_finished_no_results(
             pool: SqlitePool,
         ) {
             let mut conn = pool.acquire().await.unwrap();
-            let committee_session = get(&mut conn, 6).await.unwrap();
+            let committee_session = committee_session_repo::get(&mut conn, 6).await.unwrap();
             create_polling_station_investigation(
                 &mut conn,
                 9,
@@ -1040,12 +1073,15 @@ mod tests {
         }
 
         /// DataEntryInProgress --> DataEntryFinished
-        #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_5_with_results"))))]
+        #[test(sqlx::test(fixtures(
+            path = "../../../fixtures",
+            scripts("election_5_with_results")
+        )))]
         async fn data_entry_in_progress_to_data_entry_finished_next_session_finished(
             pool: SqlitePool,
         ) {
             let mut conn = pool.acquire().await.unwrap();
-            let committee_session = get(&mut conn, 6).await.unwrap();
+            let committee_session = committee_session_repo::get(&mut conn, 6).await.unwrap();
             create_polling_station_investigation(
                 &mut conn,
                 9,
@@ -1074,12 +1110,15 @@ mod tests {
         }
 
         /// DataEntryInProgress --> DataEntryFinished
-        #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_5_with_results"))))]
+        #[test(sqlx::test(fixtures(
+            path = "../../../fixtures",
+            scripts("election_5_with_results")
+        )))]
         async fn data_entry_in_progress_to_data_entry_finished_next_session_finished_with_result(
             pool: SqlitePool,
         ) {
             let mut conn = pool.acquire().await.unwrap();
-            let committee_session = get(&mut conn, 6).await.unwrap();
+            let committee_session = committee_session_repo::get(&mut conn, 6).await.unwrap();
             let polling_station_id = 9;
 
             // Add investigation with corrected results
@@ -1104,8 +1143,10 @@ mod tests {
             .unwrap();
 
             // Save original result as corrected result
-            let first_session_result = get_result(&mut conn, 8, 5).await.unwrap();
-            get_or_default(&mut conn, polling_station_id, committee_session.id)
+            let first_session_result = polling_station_result_repo::get_result(&mut conn, 8, 5)
+                .await
+                .unwrap();
+            data_entry_repo::get_or_default(&mut conn, polling_station_id, committee_session.id)
                 .await
                 .unwrap();
             let state = DataEntryStatus::Definitive(Definitive {
@@ -1133,10 +1174,13 @@ mod tests {
         }
 
         /// DataEntryPaused --> DataEntryFinished
-        #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_5_with_results"))))]
+        #[test(sqlx::test(fixtures(
+            path = "../../../fixtures",
+            scripts("election_5_with_results")
+        )))]
         async fn data_entry_paused_to_data_entry_finished(pool: SqlitePool) {
             let mut conn = pool.acquire().await.unwrap();
-            let committee_session = get(&mut conn, 6).await.unwrap();
+            let committee_session = committee_session_repo::get(&mut conn, 6).await.unwrap();
 
             assert_eq!(
                 CommitteeSessionStatus::DataEntryPaused
@@ -1147,10 +1191,13 @@ mod tests {
         }
 
         /// DataEntryFinished --> DataEntryFinished
-        #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_5_with_results"))))]
+        #[test(sqlx::test(fixtures(
+            path = "../../../fixtures",
+            scripts("election_5_with_results")
+        )))]
         async fn data_entry_finished_to_data_entry_finished(pool: SqlitePool) {
             let mut conn = pool.acquire().await.unwrap();
-            let committee_session = get(&mut conn, 6).await.unwrap();
+            let committee_session = committee_session_repo::get(&mut conn, 6).await.unwrap();
             assert_eq!(
                 CommitteeSessionStatus::DataEntryFinished
                     .finish_data_entry(&mut conn, &committee_session)

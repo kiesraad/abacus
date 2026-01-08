@@ -12,6 +12,7 @@ use crate::{
         domain::data_entry_status::DataEntryStatusName, repository::data_entry_repo,
         service::delete_data_entry_and_result_for_polling_station,
     },
+    election::repository::committee_session_repo,
     error::ErrorReference,
     polling_station,
 };
@@ -43,8 +44,7 @@ pub async fn polling_station_data_entries_and_result_delete(
 
     let polling_station = polling_station::get(&mut tx, polling_station_id).await?;
     let committee_session =
-        crate::committee_session::repository::get(&mut tx, polling_station.committee_session_id)
-            .await?;
+        committee_session_repo::get(&mut tx, polling_station.committee_session_id).await?;
 
     let data_entry =
         data_entry_repo::get_data_entry(&mut tx, polling_station_id, committee_session.id).await?;
@@ -83,9 +83,6 @@ mod tests {
     use super::*;
     use crate::{
         authentication::{Role, User},
-        committee_session::{
-            status::CommitteeSessionStatus, tests::change_status_committee_session,
-        },
         data_entry::{
             api::{
                 data_entry_claim::tests::claim,
@@ -96,6 +93,10 @@ mod tests {
             },
             domain::entry_number::EntryNumber,
             repository::polling_station_result_repo,
+        },
+        election::{
+            api::committee_session::tests::change_status_committee_session,
+            domain::committee_session_status::CommitteeSessionStatus,
         },
     };
 
@@ -210,9 +211,7 @@ mod tests {
         );
 
         // Check that the committee session status is changed to DataEntryInProgress
-        let committee_session = crate::committee_session::repository::get(&mut conn, 3)
-            .await
-            .unwrap();
+        let committee_session = committee_session_repo::get(&mut conn, 3).await.unwrap();
 
         assert_eq!(
             committee_session.status,

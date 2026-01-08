@@ -10,7 +10,7 @@ use crate::{
     data_entry::{
         domain::election_status::ElectionStatusResponse, repository::election_status_repo,
     },
-    election::ElectionId,
+    election::{domain::ElectionId, repository::committee_session_repo},
 };
 
 /// Get election polling stations data entry statuses
@@ -36,11 +36,7 @@ pub async fn election_status(
     let mut conn = pool.acquire().await?;
 
     let current_committee_session =
-        crate::committee_session::repository::get_election_committee_session(
-            &mut conn,
-            election_id,
-        )
-        .await?;
+        committee_session_repo::get_election_committee_session(&mut conn, election_id).await?;
 
     let statuses = election_status_repo::statuses(&mut conn, current_committee_session.id).await?;
     Ok(Json(ElectionStatusResponse { statuses }))

@@ -1,9 +1,8 @@
 use serde::{Deserialize, Serialize};
 
 use crate::{
-    committee_session::CommitteeSession,
     data_entry::domain::polling_station_results::common_polling_station_results::CommonPollingStationResultsWithoutVotes,
-    election::Election,
+    election::domain::{Election, committee_session::CommitteeSession},
     investigation::PollingStationInvestigation,
     pdf_gen::{
         models::{PdfFileModel, PdfModel, ToPdfFileModel},

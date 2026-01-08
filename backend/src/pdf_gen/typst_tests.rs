@@ -9,7 +9,6 @@ use rand::{Rng, seq::IndexedRandom};
 use test_log::test;
 
 use crate::{
-    committee_session::{status::CommitteeSessionStatus, structs::CommitteeSession},
     data_entry::domain::{
         political_group_total_votes::PoliticalGroupTotalVotes,
         polling_station_results::{
@@ -23,9 +22,10 @@ use crate::{
         },
         yes_no::YesNo,
     },
-    election::{
+    election::domain::{
         Candidate, CandidateGender, CandidateNumber, ElectionCategory, ElectionId,
         ElectionWithPoliticalGroups, PGNumber, PoliticalGroup, VoteCountingMethod,
+        committee_session::CommitteeSession, committee_session_status::CommitteeSessionStatus,
     },
     investigation::PollingStationInvestigation,
     pdf_gen::{

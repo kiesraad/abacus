@@ -8,7 +8,7 @@ use crate::{
         polling_station_results::count::Count,
         validate::{DataError, Validate, ValidationResults},
     },
-    election::{ElectionWithPoliticalGroups, PGNumber},
+    election::domain::{ElectionWithPoliticalGroups, PGNumber},
     polling_station::PollingStation,
 };
 

@@ -7,6 +7,7 @@ use crate::{
         polling_station_result::PollingStationResult,
         polling_station_results::PollingStationResults,
     },
+    election::repository::committee_session_repo,
     polling_station,
     polling_station::PollingStation,
 };
@@ -166,13 +167,11 @@ pub async fn previous_results_for_polling_station(
         .id_prev_session
         .ok_or(sqlx::Error::RowNotFound)?;
 
-    let prev_session_id = crate::committee_session::repository::get_previous_session(
-        conn,
-        polling_station.committee_session_id,
-    )
-    .await?
-    .ok_or(sqlx::Error::RowNotFound)?
-    .id;
+    let prev_session_id =
+        committee_session_repo::get_previous_session(conn, polling_station.committee_session_id)
+            .await?
+            .ok_or(sqlx::Error::RowNotFound)?
+            .id;
 
     fetch_results_for_committee_session(conn, prev_session_id, Some(ps_id_prev_session))
         .await?

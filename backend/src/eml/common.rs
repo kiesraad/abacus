@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 
-use crate::election::{CandidateGender, CandidateNumber, PGNumber, structs};
+use crate::election::domain as election;
 
 /// Managing authority for the EML document
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -67,10 +67,10 @@ pub enum ElectionCategory {
     IR,
 }
 
-impl From<crate::election::ElectionCategory> for ElectionCategory {
-    fn from(value: crate::election::ElectionCategory) -> Self {
+impl From<election::ElectionCategory> for ElectionCategory {
+    fn from(value: election::ElectionCategory) -> Self {
         match value {
-            crate::election::ElectionCategory::Municipal => ElectionCategory::GR,
+            election::ElectionCategory::Municipal => ElectionCategory::GR,
         }
     }
 }
@@ -144,7 +144,7 @@ pub struct ElectionIdentifier {
 
 impl ElectionIdentifier {
     pub fn from_election(
-        election: &structs::ElectionWithPoliticalGroups,
+        election: &election::ElectionWithPoliticalGroups,
         include_nomination_date: bool,
     ) -> Self {
         let subcategory = if election.number_of_seats >= 19 {
@@ -210,13 +210,13 @@ pub enum EMLImportError {
     OnlyMunicipalSupported,
     TooManyPoliticalGroups,
     PoliticalGroupNumbersNotIncreasing {
-        expected_larger_than: PGNumber,
-        found: PGNumber,
+        expected_larger_than: election::PGNumber,
+        found: election::PGNumber,
     },
     CandidateNumbersNotIncreasing {
-        political_group_number: PGNumber,
-        expected_larger_than: CandidateNumber,
-        found: CandidateNumber,
+        political_group_number: election::PGNumber,
+        expected_larger_than: election::CandidateNumber,
+        found: election::CandidateNumber,
     },
 }
 
@@ -255,8 +255,8 @@ pub struct Candidate {
     pub qualifying_address: Option<QualifyingAddress>,
 }
 
-impl From<structs::Candidate> for Candidate {
-    fn from(candidate: structs::Candidate) -> Self {
+impl From<election::Candidate> for Candidate {
+    fn from(candidate: election::Candidate) -> Self {
         Candidate {
             candidate_identifier: CandidateIdentifier {
                 id: candidate.number.to_string(),
@@ -273,9 +273,9 @@ impl From<structs::Candidate> for Candidate {
                 },
             },
             gender: candidate.gender.as_ref().map(|gender| match gender {
-                CandidateGender::Male => Gender::Male,
-                CandidateGender::Female => Gender::Female,
-                CandidateGender::X => Gender::Unknown,
+                election::CandidateGender::Male => Gender::Male,
+                election::CandidateGender::Female => Gender::Female,
+                election::CandidateGender::X => Gender::Unknown,
             }),
             qualifying_address: if candidate.locality.trim().is_empty() {
                 None
@@ -299,16 +299,16 @@ impl From<structs::Candidate> for Candidate {
     }
 }
 
-impl TryFrom<Candidate> for structs::Candidate {
+impl TryFrom<Candidate> for election::Candidate {
     type Error = EMLImportError;
 
     fn try_from(parsed: Candidate) -> Result<Self, Self::Error> {
-        Ok(structs::Candidate {
+        Ok(election::Candidate {
             number: parsed
                 .candidate_identifier
                 .id
                 .parse::<u32>()
-                .map(CandidateNumber::from)
+                .map(election::CandidateNumber::from)
                 .or(Err(EMLImportError::InvalidCandidate))?,
             initials: match parsed.candidate_full_name.person_name.name_line {
                 Some(line) => line.value,
@@ -330,8 +330,8 @@ impl TryFrom<Candidate> for structs::Candidate {
             gender: match parsed.gender {
                 None => None,
                 Some(gender) => match gender {
-                    Gender::Male => Some(CandidateGender::Male),
-                    Gender::Female => Some(CandidateGender::Female),
+                    Gender::Male => Some(election::CandidateGender::Male),
+                    Gender::Female => Some(election::CandidateGender::Female),
                     Gender::Unknown => None,
                 },
             },

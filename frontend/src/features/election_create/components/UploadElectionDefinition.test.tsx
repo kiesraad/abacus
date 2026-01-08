@@ -1,4 +1,5 @@
 import { userEvent } from "@testing-library/user-event";
+import * as ReactRouter from "react-router";
 import { describe, expect, test, vi } from "vitest";
 import { newElectionMockData } from "@/testing/api-mocks/ElectionMockData";
 import { overrideOnce } from "@/testing/server";
@@ -19,6 +20,8 @@ const election = { name: "Naam", location: "Plek" } as NewElection;
 
 const filename = "foo.txt";
 const file = new File(["foo"], filename, { type: "text/plain" });
+
+const navigate = vi.fn();
 
 function electionValidateResponse(
   election: NewElection,
@@ -55,6 +58,41 @@ function electionValidateResponse(
 }
 
 describe("UploadElectionDefinition component", () => {
+  test("It navigates to the next page when providing correct hash", async () => {
+    vi.spyOn(ReactRouter, "useNavigate").mockImplementation(() => navigate);
+    vi.spyOn(useElectionCreateContext, "useElectionCreateContext");
+
+    render(
+      <ElectionCreateContextProvider>
+        <UploadElectionDefinition />
+      </ElectionCreateContextProvider>,
+    );
+
+    const user = userEvent.setup();
+
+    expect(await screen.findByRole("heading", { level: 2, name: "Importeer verkiezingsdefinitie" })).toBeVisible();
+    const input = await screen.findByLabelText("Bestand kiezen");
+    expect(input).toBeVisible();
+    expect(await screen.findByLabelText("Geen bestand gekozen")).toBeVisible();
+
+    overrideOnce("post", "/api/elections/import/validate", 200, electionValidateResponse(newElectionMockData));
+    await user.upload(input, file);
+
+    expect(screen.queryByLabelText("Geen bestand gekozen")).not.toBeInTheDocument();
+    expect(screen.getAllByText(filename).length).toBe(1);
+
+    const inputPart1 = screen.getByRole("textbox", { name: "Controle deel 1" });
+    await user.type(inputPart1, "zxcv");
+
+    const inputPart2 = screen.getByRole("textbox", { name: "Controle deel 2" });
+    await user.type(inputPart2, "gfsd");
+
+    overrideOnce("post", "/api/elections/import/validate", 200, electionValidateResponse(newElectionMockData));
+    await user.click(screen.getByRole("button", { name: "Volgende" }));
+
+    expect(navigate).toHaveBeenCalledWith("/elections/create/polling-station-role");
+  });
+
   test("It shows error when providing incorrect hash", async () => {
     render(
       <ElectionCreateContextProvider>

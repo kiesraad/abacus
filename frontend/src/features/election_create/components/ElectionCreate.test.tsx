@@ -177,23 +177,6 @@ describe("Election create pages", () => {
     server.use(ElectionRequestHandler);
   });
 
-  describe("Election definition", () => {
-    test("It shows and validates hash when uploading valid file", async () => {
-      overrideOnce("post", "/api/elections/import/validate", 200, electionValidateResponse(newElectionMockData));
-
-      const router = renderWithRouter();
-      const filename = "foo.txt";
-      const file = new File(["foo"], filename, { type: "text/plain" });
-
-      // update election and set hash, and continue
-      await uploadElectionDefinition(router, file);
-      await inputElectionHash();
-
-      // Expect to see the next page
-      expect(await screen.findByRole("heading", { level: 2, name: "Rol van het stembureau" })).toBeVisible();
-    });
-  });
-
   describe("Candidate list", () => {
     test("It shows and validates hash when uploading valid candidate list file", async () => {
       overrideOnce("post", "/api/elections/import/validate", 200, electionValidateResponse(newElectionMockData));

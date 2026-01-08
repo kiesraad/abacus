@@ -243,3 +243,4 @@ jobs:
         run: cargo install cargo-fuzz
       - name: Run the fuzzer
         run: cargo fuzz run data_entry_status -- -max_total_time=60
+#bla

@@ -1,7 +1,7 @@
 #![cfg(test)]
 #![cfg(feature = "openapi")]
 
-use abacus::{
+use abacus_crate::{
     authentication::Role,
     router::{get_scopes_from_operation, openapi_router},
 };

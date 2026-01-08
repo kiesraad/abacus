@@ -1,4 +1,4 @@
-use abacus::pdf_gen::{
+use abacus_crate::pdf_gen::{
     generate_pdf,
     models::{PdfFileModel, PdfModel},
 };

@@ -72,7 +72,7 @@ async fn test_election_details_works(pool: SqlitePool) {
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("users"))))]
 async fn test_election_import_payload_too_large(pool: SqlitePool) {
-    use abacus::MAX_BODY_SIZE_MB;
+    use abacus_crate::MAX_BODY_SIZE_MB;
     use reqwest::Body;
 
     let addr = serve_api(pool).await;
@@ -97,7 +97,7 @@ async fn test_election_import_payload_too_large(pool: SqlitePool) {
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("users"))))]
 async fn test_election_import_payload_not_too_large(pool: SqlitePool) {
-    use abacus::MAX_BODY_SIZE_MB;
+    use abacus_crate::MAX_BODY_SIZE_MB;
     use reqwest::Body;
 
     let addr = serve_api(pool).await;

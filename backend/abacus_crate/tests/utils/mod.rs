@@ -5,7 +5,7 @@ use std::net::SocketAddr;
 use sqlx::SqlitePool;
 use tokio::net::TcpListener;
 
-use abacus::{airgap::AirgapDetection, router, shutdown_signal};
+use abacus_crate::{airgap::AirgapDetection, router, shutdown_signal};
 
 async fn serve_api_inner(pool: SqlitePool, airgap_detection: AirgapDetection) -> SocketAddr {
     let listener = TcpListener::bind("127.0.0.1:0").await.unwrap();

@@ -1,7 +1,2 @@
-/.cargo
 /target
 /target-docker/
-*.sqlite*
-/templates/**/*.pdf
-/tmp-pdf-gen
-cobertura.xml

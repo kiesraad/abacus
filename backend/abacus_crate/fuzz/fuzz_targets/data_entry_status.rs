@@ -1,6 +1,6 @@
 #![no_main]
 
-use abacus::{
+use abacus_crate::{
     data_entry::{status::*, *},
     election::{ElectionCategory, ElectionId, ElectionWithPoliticalGroups, VoteCountingMethod},
     polling_station::{PollingStation, PollingStationType},

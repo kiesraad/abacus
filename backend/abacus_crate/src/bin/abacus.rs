@@ -4,7 +4,7 @@ use std::{
     process,
 };
 
-use abacus::{AppError, create_sqlite_pool, start_server};
+use abacus_crate::{AppError, create_sqlite_pool, start_server};
 use clap::Parser;
 use socket2::{Domain, Protocol, Socket, Type};
 use tokio::net::TcpListener;

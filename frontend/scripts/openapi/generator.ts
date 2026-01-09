@@ -56,13 +56,13 @@ export async function generate(openApiString: string): Promise<string> {
   return s;
 }
 
-function addPath(path: string, v: PathsObject | undefined) {
-  if (!v) return "";
+function addPath(path: string, pathItem: PathsObject | undefined) {
+  if (!pathItem) return "";
 
   const result: string[] = [`// ${path}`];
-  for (const method in v) {
+  for (const method in pathItem) {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
-    result.push(addRequest(path, v[method] as OperationObject));
+    result.push(addRequest(path, pathItem[method] as OperationObject));
   }
 
   return result.join("\n");

@@ -20,7 +20,7 @@ pub async fn serve_api(pool: SqlitePool) -> SocketAddr {
         )
         .with_graceful_shutdown(shutdown_signal())
         .await
-        .unwrap();
+        .expect("Failed to start test server in serve_api");
     });
 
     addr

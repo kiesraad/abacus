@@ -69,7 +69,7 @@ export default defineConfig(
             {
               target: ["./src/components", "./src/hooks", "./src/lib", "./src/types", "./src/utils"],
               from: ["./src/features", "./src/app"],
-              message: "Imports from shared folders are not allowed in features and app.",
+              message: "Imports from features and app are not allowed in shared folders.",
             },
           ],
         },
@@ -82,7 +82,7 @@ export default defineConfig(
       parser: tsParser,
       ecmaVersion: 2022,
       parserOptions: {
-        project: "**/tsconfig.json",
+        projectService: true,
       },
     },
   },

@@ -11,7 +11,9 @@ export function useInitialDataEntryState(client: ApiClient, dispatch: DataEntryD
     const abortController = new AbortController();
 
     const claimDataEntry = async () => {
-      const result = await client.postRequest<ClaimDataEntryResponse>(claimRequestPath);
+      const result = await client.postRequest<ClaimDataEntryResponse>(claimRequestPath, {
+        signal: abortController.signal,
+      });
 
       if (isSuccess(result)) {
         const dataEntry = result.data;

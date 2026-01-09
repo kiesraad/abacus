@@ -20,7 +20,7 @@ export function Messages() {
     startTransition(() => {
       setMessages(popMessages());
     });
-  }, [messages, popMessages]);
+  }, [popMessages]);
 
   function closeHandler(index: number) {
     return () => {

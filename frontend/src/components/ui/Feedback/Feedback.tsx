@@ -59,7 +59,7 @@ export function Feedback({ id, type, data, userRole, shouldFocus = true }: Feedb
     if (shouldFocus) {
       feedbackHeader.current?.focus();
     }
-  }, [data, shouldFocus]);
+  }, [shouldFocus]);
 
   return (
     <article id={id} className={cn(cls.feedback, cls[type])}>

@@ -286,3 +286,7 @@ pub fn create_router(
     let router = router.with_state(state);
     Ok(router)
 }
+
+pub fn create_router_without_airgap_detection(pool: SqlitePool) -> Result<Router, AppError> {
+    create_router(pool, AirgapDetection::nop())
+}

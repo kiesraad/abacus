@@ -150,9 +150,9 @@ The application uses the following dependencies:
 
 ### Scripts
 
-#### gen_openapi_types
+#### gen_openapi
 
-Generate Typescript types from `/backend/openapi.json`:
+Generate TypeScript types from `/backend/openapi.json`:
 
 ```sh
 pnpm gen:openapi
@@ -173,7 +173,7 @@ This results in `/frontend/src/components/generated/icons.tsx`.
 #### gen_po
 
 Use this script to create `.po` files (one for every defined locale) that can de used in translation software.
-This script generates `.po` translation files from the current json translations in `/frontend/src/i18n/locales/<locale>/*.json`:
+This script generates `.po` translation files from the current JSON translations in `/frontend/src/i18n/locales/<locale>/*.json`:
 
 ```sh
 pnpm gen:po
@@ -183,8 +183,8 @@ This results in `/frontend/translations/<locale>.po`. These can be imported into
 
 #### gen_translation-json
 
-Use this script to convert modified `.po` files back to our application json translation files.
-This script generates json translation files from `.po` translation files in `/frontend/translations/<locale>.po`:
+Use this script to convert modified `.po` files back to our application JSON translation files.
+This script generates JSON translation files from `.po` translation files in `/frontend/translations/<locale>.po`:
 
 ```sh
 pnpm gen:translation-json

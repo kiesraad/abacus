@@ -201,12 +201,22 @@ impl AirgapDetection {
 
 #[cfg(test)]
 mod tests {
-    use crate::airgap::block_request_on_airgap_violation;
+    use crate::{
+        airgap::block_request_on_airgap_violation, router, router::openapi_router, shutdown_signal,
+    };
+    use std::net::SocketAddr;
 
     use super::*;
-    use axum::{Router, body::Body, http::Request, middleware, routing::get};
+    use axum::{
+        Router,
+        body::Body,
+        http::{Method, Request},
+        middleware,
+        routing::get,
+    };
     use hyper::StatusCode;
     use test_log::test;
+    use tokio::net::TcpListener;
     use tower::ServiceExt;
 
     #[tokio::test]
@@ -333,5 +343,87 @@ mod tests {
             .unwrap();
 
         assert_eq!(res.status(), StatusCode::SERVICE_UNAVAILABLE);
+    }
+
+    async fn serve_api_with_airgap_detection(pool: SqlitePool) -> SocketAddr {
+        let airgap_detection = AirgapDetection::start(pool.clone()).await;
+        let mut violation_detected = false;
+
+        for i in 0..=200 {
+            if i == 200 {
+                panic!("Airgap detection failed to detect violation after 10 seconds");
+            }
+
+            if airgap_detection.violation_detected() {
+                violation_detected = true;
+                break;
+            }
+
+            tokio::time::sleep(Duration::from_millis(50)).await;
+        }
+
+        assert!(violation_detected, "Airgap detection did not run");
+
+        let listener = TcpListener::bind("127.0.0.1:0").await.unwrap();
+        let addr = listener.local_addr().unwrap();
+
+        tokio::spawn(async move {
+            let app = router::create_router(pool, airgap_detection).unwrap();
+
+            axum::serve(
+                listener,
+                app.into_make_service_with_connect_info::<SocketAddr>(),
+            )
+            .with_graceful_shutdown(shutdown_signal())
+            .await
+            .unwrap();
+        });
+
+        addr
+    }
+
+    #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2", "users"))))]
+    async fn test_airgap_detection(pool: SqlitePool) {
+        let openapi = openapi_router().into_openapi();
+        let addr = serve_api_with_airgap_detection(pool).await;
+
+        // loop through all the paths in the openapi spec
+        for (path, item) in openapi.paths.paths.iter() {
+            let operations = [
+                (Method::GET, &item.get),
+                (Method::POST, &item.post),
+                (Method::PUT, &item.put),
+                (Method::PATCH, &item.patch),
+                (Method::DELETE, &item.delete),
+            ];
+
+            // loop through all the operations for each path
+            for (method, operation) in operations.into_iter() {
+                if let Some(operation) = operation {
+                    let mut path = path.to_string();
+
+                    // replace path parameters with (dummy) values
+                    if let Some(parameters) = operation.parameters.as_ref() {
+                        for param in parameters.iter() {
+                            path = path.replace(&format!("{{{}}}", &param.name), "1");
+                        }
+                    }
+
+                    // make a request, given the path and a method
+                    let url = format!("http://{addr}{path}");
+                    let response = reqwest::Client::new()
+                        .request(method.clone(), url)
+                        .send()
+                        .await
+                        .unwrap();
+
+                    assert_eq!(
+                        response.status(),
+                        503,
+                        "expected response code 503 for {method} {path} when airgap violation is detected",
+                    );
+                }
+            }
+        }
     }
 }

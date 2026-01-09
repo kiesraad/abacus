@@ -30,7 +30,7 @@ export default function useDataEntry(
   const deleteRequestPath: POLLING_STATION_DATA_ENTRY_DELETE_REQUEST_PATH = `/api/polling_stations/${pollingStationId}/data_entries/${entryNumber}`;
   const finaliseRequestPath: POLLING_STATION_DATA_ENTRY_FINALISE_REQUEST_PATH = `/api/polling_stations/${pollingStationId}/data_entries/${entryNumber}/finalise`;
   const claimRequestPath: POLLING_STATION_DATA_ENTRY_CLAIM_REQUEST_PATH = `${saveRequestPath}/claim`;
-  useInitialDataEntryState(client, dispatch, election, saveRequestPath, claimRequestPath);
+  useInitialDataEntryState(client, dispatch, claimRequestPath);
 
   // navigate to the correct section
   useDataEntryNavigation(state, dispatch, election, pollingStationId, entryNumber, sectionId);

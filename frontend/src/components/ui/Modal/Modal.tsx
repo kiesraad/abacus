@@ -38,7 +38,7 @@ export function Modal({ title, noFlex = false, autoWidth = false, onClose, child
       dialogRef.current.showModal();
       document.getElementById("modal-title")?.focus();
     }
-  }, [dialogRef]);
+  }, []);
 
   // handle cancel / close actions for the modal
   useEffect(() => {
@@ -59,7 +59,7 @@ export function Modal({ title, noFlex = false, autoWidth = false, onClose, child
         dialog.removeEventListener("cancel", cancel);
       };
     }
-  }, [dialogRef, onClose]);
+  }, [onClose]);
 
   return (
     <dialog id="modal-dialog" className={cls.modal} ref={dialogRef} aria-labelledby="modal-title">

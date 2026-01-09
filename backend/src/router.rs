@@ -287,13 +287,16 @@ pub fn create_router(
     Ok(router)
 }
 
+pub fn create_router_without_airgap_detection(pool: SqlitePool) -> Result<Router, AppError> {
+    create_router(pool, AirgapDetection::nop())
+}
+
 #[cfg(test)]
 mod tests {
-    use std::panic;
-
     use chrono::TimeDelta;
     use hyper::{Method, header::COOKIE};
     use sqlx::SqliteConnection;
+    use std::panic;
     use test_log::test;
 
     use crate::{

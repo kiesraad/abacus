@@ -202,7 +202,7 @@ pub async fn create_sqlite_pool(
     let pool = SqlitePool::connect_with(opts).await?;
 
     // run database migrations, this creates the necessary tables if they don't exist yet
-    sqlx::migrate!()
+    sqlx::migrate!("../migrations")
         .run(&pool)
         .await
         .map_err(DatabaseMigrationErrorWithPath::with_path(database))?;

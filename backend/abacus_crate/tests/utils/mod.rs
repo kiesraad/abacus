@@ -5,7 +5,7 @@ use std::net::SocketAddr;
 use sqlx::SqlitePool;
 use tokio::net::TcpListener;
 
-use abacus::{router, shutdown_signal};
+use abacus_crate::{router, shutdown_signal};
 
 pub async fn serve_api(pool: SqlitePool) -> SocketAddr {
     let listener = TcpListener::bind("127.0.0.1:0").await.unwrap();

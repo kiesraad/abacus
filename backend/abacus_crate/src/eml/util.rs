@@ -1,7 +1,7 @@
 /// Utility that wraps a list of elements into a parent element.
 ///
 /// This can be used to have a property `elements: Vec<Element>`, that is converted
-/// to this xml:
+/// to this XML:
 ///
 /// ```xml
 /// <Elements>
@@ -15,7 +15,7 @@
 ///
 /// ```
 /// mod example {
-///     # use abacus::gen_wrap_list;
+///     # use abacus_crate::gen_wrap_list;
 ///     #[derive(serde::Deserialize, serde::Serialize)]
 ///     pub struct Element {}
 ///

@@ -8,7 +8,7 @@ pre-commit:
       glob: "*.rs"
       run: >
         cargo sqlx database reset -y -D sqlite://sqlx-cache-tmp.sqlite &&
-        cargo sqlx prepare -D sqlite://sqlx-cache-tmp.sqlite -- --all-targets &&
+        cargo sqlx prepare --workspace -D sqlite://sqlx-cache-tmp.sqlite -- --all-targets &&
         git add .sqlx &&
         rm sqlx-cache-tmp.sqlite
     backend-formatter:
@@ -24,7 +24,7 @@ pre-commit:
       root: "backend/"
       glob: "*.rs"
       run: >
-        cargo run --package abacus --bin gen-openapi &&
+        cargo run --package abacus_crate --bin gen-openapi &&
         git add openapi.json &&
         cd ../frontend &&
         pnpm gen:openapi &&

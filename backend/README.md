@@ -32,7 +32,7 @@ sqlx database setup
 cargo run --features memory-serve
 ```
 
-By default Abacus will use an external typst binary which should be available on
+By default, Abacus will use an external typst binary which should be available on
 your `$PATH` in order to generate PDF output. You can download typst for your
 platform on the [typst releases page] or by running `cargo install typst-cli`.
 You can also build Abacus to include typst in the binary itself. To do this, you
@@ -98,7 +98,7 @@ cross build --release --features memory-serve,embed-typst,airgap-detection --man
 cross build --release --features memory-serve,embed-typst,airgap-detection  --manifest-path backend/Cargo.toml --target aarch64-unknown-linux-gnu
 ```
 
-To use `cross` on Apple silicon, set the `CROSS_CONTAINER_OPTS` environment variable to `--platform linux/amd64` when running the command.
+To use `cross` on Apple Silicon, set the `CROSS_CONTAINER_OPTS` environment variable to `--platform linux/amd64` when running the command.
 
 ## Structure
 

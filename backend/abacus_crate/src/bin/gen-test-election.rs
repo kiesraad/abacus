@@ -1,4 +1,4 @@
-use abacus::{
+use abacus_crate::{
     AppError,
     committee_session::CommitteeSession,
     create_sqlite_pool,

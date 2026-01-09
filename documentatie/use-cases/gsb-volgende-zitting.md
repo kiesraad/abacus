@@ -1,8 +1,6 @@
-# GSB: Tweede zitting
+# GSB: Volgende zitting
 
-N.B. Alle use cases voor de tweede zitting gelden ook voor elke latere zitting (derde, etc.).
-
-## Gemeentelijk stembureau (GSB) stelt uitkomst vast in tweede zitting (corrigenda) (wolk)
+## Gemeentelijk stembureau (GSB) stelt uitkomst vast in volgende zitting (corrigenda) (wolk)
 
 __Niveau:__ hoog-over, wolk, ☁️
 
@@ -18,10 +16,10 @@ __Hoofdscenario:__
 6. (voor elk
    verzoek) [Het GSB voert het onderzoek en de eventuele hertelling uit.](#het-gsb-voert-het-onderzoek-en-de-eventuele-hertelling-uit-vlieger)
 7. [De coördinator GSB maakt het PV P 2a en evt. het PV Na 14-2 en tellingsbestand EML 510b aan.](#de-coördinator-gsb-maakt-het-pv-p-2a-en-evt-het-pv-na-14-2-en-tellingsbestand-eml-510b-aan-zee)
-8. (CSO, tweede zitting) De coördinator GSB drukt het Inlegvel Na 31-2 af en vult het in.
+8. (CSO, volgende zitting) De coördinator GSB drukt het Inlegvel Na 31-2 af en vult het in.
 9. Het GSB voert de andere onderdelen van de PVs (P 2a en evt. Na 14-2) in.
-10. Het GSB leest de PVs voor: P 2a (Verslag tweede zitting), evt. Na 14-2 (Corrigendum GSB), Na 14-1 versie 2 (DSO, één per SB) of Na 14-2 Bijlage 1 (CSO, één bijlage per SB).
-11. Het GSB ondertekent de PVs (P2a, evt. Na 14-2, DSO: Na 14-1 versie 2, CSO tweede zitting: Inlegvel Na 31-2).
+10. Het GSB leest de PVs voor: P 2a (Verslag volgende zitting), evt. Na 14-2 (Corrigendum GSB), Na 14-1 versie 2 (DSO, één per SB) of Na 14-2 Bijlage 1 (CSO, één bijlage per SB).
+11. Het GSB ondertekent de PVs (P2a, evt. Na 14-2, DSO: Na 14-1 versie 2, CSO volgende zitting: Inlegvel Na 31-2).
 12. Het GSB sluit de zitting.
 13. Het GSB stelt de benodigde bestanden beschikbaar aan het CSB voor de uitslagvaststelling.
 14. Het GSB stelt de PVs GSB beschikbaar aan de burgemeester.
@@ -76,13 +74,13 @@ __Uitbreidingen:__
 &emsp; 1c1. Het GSB maakt een corrigendum naar 0 stemmen voor dit stembureau.  
 
 1d. De coördinator GSB ontdekt een fout in de gegevens van een stembureau met resultaten uit een vorige zitting:  
-&emsp; 1d1. [De coördinator GSB bewerkt de stembureaus tijdens de tweede zitting](#de-coördinator-gsb-bewerkt-de-stembureaus-tijdens-de-tweede-zitting-zee)
+&emsp; 1d1. [De coördinator GSB bewerkt de stembureaus tijdens de volgende zitting](#de-coördinator-gsb-bewerkt-de-stembureaus-tijdens-de-volgende-zitting-zee)
 
 1e. De coördinator GSB ontdekt een fout in de gegevens van een stembureau dat voor de huidige zitting is toegevoegd:  
-&emsp; 1e1. [De coördinator GSB bewerkt de stembureaus tijdens de tweede zitting](#de-coördinator-gsb-bewerkt-de-stembureaus-tijdens-de-tweede-zitting-zee)
+&emsp; 1e1. [De coördinator GSB bewerkt de stembureaus tijdens de volgende zitting](#de-coördinator-gsb-bewerkt-de-stembureaus-tijdens-de-volgende-zitting-zee)
 
 
-## De coördinator GSB bewerkt de stembureaus tijdens de tweede zitting (zee)
+## De coördinator GSB bewerkt de stembureaus tijdens de volgende zitting (zee)
 
 __Niveau:__ gebruikersdoel, zee, 🌊
 

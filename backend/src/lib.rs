@@ -229,7 +229,7 @@ mod test {
 
     use super::start_server;
 
-    pub async fn run_server_test<F, Fut>(pool: SqlitePool, test_fn: F)
+    pub(crate) async fn run_server_test<F, Fut>(pool: SqlitePool, test_fn: F)
     where
         F: FnOnce(String) -> Fut,
         Fut: Future<Output = ()>,

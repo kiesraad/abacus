@@ -5,14 +5,25 @@
   position: relative;
   max-width: 51rem;
   width: fit-content;
+  color: var(--gray-600);
 
   section {
+    display: inline-flex;
+    flex-direction: column;
+    gap: 0.625rem;
     max-width: 40rem;
     word-break: break-word;
 
-    p {
+    > p {
       margin: 0;
       width: 100%;
+      color: var(--gray-600);
+    }
+
+    > div {
+      display: inline-flex;
+      flex-direction: column;
+      gap: 0.25rem;
     }
   }
 }

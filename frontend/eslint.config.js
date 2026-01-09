@@ -9,21 +9,15 @@ import storybook from "eslint-plugin-storybook";
 import { readdirSync } from "fs";
 import tseslint from "typescript-eslint";
 
-let restrictFeatureImports = [];
-
-try {
-  restrictFeatureImports = readdirSync("./src/features", { withFileTypes: true })
-    .filter((file) => file.isDirectory())
-    .map((dir) => dir.name)
-    .map((feature) => ({
-      target: `./src/features/${feature}`,
-      from: "./src/features",
-      except: [feature],
-      message: "Cross-feature imports are not allowed.",
-    }));
-} catch {
-  // If the features directory does not exist or is inaccessible, fall back to no restrictions.
-}
+const restrictFeatureImports = readdirSync("./src/features", { withFileTypes: true })
+  .filter((file) => file.isDirectory())
+  .map((dir) => dir.name)
+  .map((feature) => ({
+    target: `./src/features/${feature}`,
+    from: "./src/features",
+    except: [feature],
+    message: "Cross-feature imports are not allowed.",
+  }));
 
 export default defineConfig(
   {

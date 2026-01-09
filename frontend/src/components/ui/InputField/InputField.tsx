@@ -57,17 +57,11 @@ export function InputField({
   };
 
   if (fieldSize === "text-area") {
+    const { type: _ignoredType, ...textAreaProps } = commonProps;
     inputEl = (
       <textarea
-        id={id}
-        name={name}
-        value={value}
+        {...textAreaProps}
         defaultValue={inputFieldProps.defaultValue}
-        autoComplete="off"
-        // biome-ignore lint/a11y/noAutofocus: for usability we have to use autofocus
-        autoFocus={autoFocus}
-        aria-invalid={error ? "true" : "false"}
-        aria-errormessage={error ? `${name}-hint_or_error` : undefined}
         rows={7}
       />
     );

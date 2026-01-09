@@ -16,8 +16,8 @@ export function ProgressList({ children }: ProgressListProps) {
 }
 
 ProgressList.Fixed = ({ children }: { children: ReactNode }) => (
-  <section className="fixed">
-    <ul className="fixed">{children}</ul>
+  <section className={cls.fixed}>
+    <ul className={cls.fixed}>{children}</ul>
   </section>
 );
 ProgressList.Scroll = ProgressListScroll;

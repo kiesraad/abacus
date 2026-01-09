@@ -1,4 +1,4 @@
-import type { DetailedHTMLProps, InputHTMLAttributes, ReactElement, ReactNode } from "react";
+import type { InputHTMLAttributes, ReactElement, ReactNode } from "react";
 
 import { NumberInput } from "../NumberInput/NumberInput";
 import cls from "./InputField.module.css";
@@ -32,6 +32,7 @@ export function InputField({
   subtext = "",
   hint = "",
   value = undefined,
+  defaultValue = undefined,
   type = "text",
   fieldSize = "large",
   fieldWidth = "wide",
@@ -44,31 +45,23 @@ export function InputField({
   ...inputFieldProps
 }: InputFieldProps) {
   let inputEl: ReactNode;
-  const commonProps: DetailedHTMLProps<InputHTMLAttributes<HTMLInputElement>, HTMLInputElement> = {
-    id,
-    name,
-    value,
-    type,
+  const commonProps = {
+    id: id,
+    name: name,
+    value: value,
+    defaultValue: defaultValue,
     autoComplete: "off",
-    autoFocus,
-    "aria-invalid": error ? "true" : "false",
+    autoFocus: autoFocus,
+    "aria-invalid": !!error,
     "aria-errormessage": error ? `${name}-hint_or_error` : undefined,
-    ...inputFieldProps,
   };
 
   if (fieldSize === "text-area") {
-    const { type: _ignoredType, ...textAreaProps } = commonProps;
-    inputEl = (
-      <textarea
-        {...textAreaProps}
-        defaultValue={inputFieldProps.defaultValue}
-        rows={7}
-      />
-    );
+    inputEl = <textarea {...commonProps} rows={7} />;
   } else if (numberInput) {
-    inputEl = <NumberInput {...commonProps} />;
+    inputEl = <NumberInput {...commonProps} type={type} {...inputFieldProps} />;
   } else {
-    inputEl = <input {...commonProps} />;
+    inputEl = <input {...commonProps} type={type} {...inputFieldProps} />;
   }
 
   return (

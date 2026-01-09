@@ -27,7 +27,7 @@ export default defineConfig(
       "coverage/**",
       "dist-storybook/**",
       "playwright-report/**",
-      "eslint.config.js",
+      "**/eslint.config.*",
       "mockServiceWorker.js",
     ],
   },

@@ -12,7 +12,8 @@ pub async fn serve_api(pool: SqlitePool) -> SocketAddr {
     let addr = listener.local_addr().unwrap();
 
     tokio::spawn(async move {
-        let app = router::create_router_without_airgap_detection(pool).unwrap();
+        let app = router::create_router_without_airgap_detection(pool)
+            .expect("failed to create router for test server");
 
         axum::serve(
             listener,

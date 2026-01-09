@@ -39,21 +39,21 @@ export async function generate(openApiString: string): Promise<string> {
   result.push("/** TYPES **/\n\n");
   result.push(types.join("\n\n"));
 
-  let generatedCode = result.join("\n");
+  let output = result.join("\n");
 
   // Format with Biome CLI
   const tempDir = await mkdtemp(join(tmpdir(), "abacus-openapi-generator-"));
   const tempFile = join(tempDir, "openapi.ts");
   try {
-    await writeFile(tempFile, generatedCode, { mode: 0o600 });
+    await writeFile(tempFile, output, { mode: 0o600 });
     await promisify(exec)(`npx @biomejs/biome format --write ${tempFile}`);
-    generatedCode = await readFile(tempFile, "utf8");
+    output = await readFile(tempFile, "utf8");
   } finally {
     await unlink(tempFile);
     await rmdir(tempDir);
   }
 
-  return generatedCode;
+  return output;
 }
 
 function addPath(path: string, pathItem: PathsObject | undefined) {
@@ -139,67 +139,67 @@ function addDefinition(name: string, schema: ReferenceObject | SchemaObject) {
   return result.join("\n");
 }
 
-function tsType(s: ReferenceObject | SchemaObject | undefined): string {
-  if (!s) return "unknown";
+function tsType(schema: ReferenceObject | SchemaObject | undefined): string {
+  if (!schema) return "unknown";
 
-  if ("$ref" in s) {
-    return s.$ref.substring(s.$ref.lastIndexOf("/") + 1);
+  if ("$ref" in schema) {
+    return schema.$ref.substring(schema.$ref.lastIndexOf("/") + 1);
   }
 
-  if (s.allOf) {
-    return s.allOf.map((s2) => tsType(s2)).join(" & ");
+  if (schema.allOf) {
+    return schema.allOf.map((s2) => tsType(s2)).join(" & ");
   }
 
-  if (s.oneOf) {
-    return s.oneOf.map((obj) => tsType(obj)).join(" | ");
+  if (schema.oneOf) {
+    return schema.oneOf.map((obj) => tsType(obj)).join(" | ");
   }
 
-  if (s.enum) {
-    return s.enum.map((e) => `"${e}"`).join(" | ");
+  if (schema.enum) {
+    return schema.enum.map((e) => `"${e}"`).join(" | ");
   }
 
   let type = "unknown";
 
-  switch (s.type) {
+  switch (schema.type) {
     case "string":
     case "boolean":
-      type = s.type;
+      type = schema.type;
       break;
     case "integer":
     case "number":
       type = "number";
       break;
     case "array":
-      type = `${tsType(s.items)}[]`;
+      type = `${tsType(schema.items)}[]`;
       break;
     case "object":
-      if (s.properties) {
+      if (schema.properties) {
         type = "{";
-        Object.entries(s.properties).forEach(([k, v2]) => {
+        Object.entries(schema.properties).forEach(([k, v2]) => {
           if ("description" in v2 && v2.description) {
             type += `\n  /** ${v2.description} */\n`;
           }
-          type += `  ${k}${isRequired(k, s.required)}: ${tsType(v2)};`;
+          type += `  ${k}${isRequired(k, schema.required)}: ${tsType(v2)};`;
         });
         type += "}";
       }
       break;
   }
 
-  if (s.nullable) {
+  if (schema.nullable) {
     type += " | null";
   }
 
-  if (Array.isArray(s.type)) {
-    type = s.type
+  if (Array.isArray(schema.type)) {
+    type = schema.type
       .map((t: NonArraySchemaObjectType | "null" | "array") => {
         if (t === "null") {
           return "null";
         }
 
         if (t === "array") {
-          if ("items" in s) {
-            return tsType({ type: t, items: s.items });
+          if ("items" in schema) {
+            return tsType({ type: t, items: schema.items });
           } else {
             return "unknown";
           }

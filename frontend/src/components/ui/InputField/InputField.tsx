@@ -87,7 +87,7 @@ export function InputField({
       </label>
       {!hideErrorMessage && (error || hint) && (
         <span id={`${name}-hint_or_error`} className={error ? "error" : "hint"}>
-          {error || hint || <>&nbsp;</>}
+          {error || hint}
         </span>
       )}
     </div>

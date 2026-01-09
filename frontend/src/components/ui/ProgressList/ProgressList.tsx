@@ -16,8 +16,8 @@ export function ProgressList({ children }: ProgressListProps) {
 }
 
 ProgressList.Fixed = ({ children }: { children: ReactNode }) => (
-  <section className={cls.fixed}>
-    <ul className={cls.fixed}>{children}</ul>
+  <section>
+    <ul>{children}</ul>
   </section>
 );
 ProgressList.Scroll = ProgressListScroll;
@@ -78,10 +78,8 @@ ProgressList.OverviewItem = function ProgressListOverviewItem({
   id,
   children,
 }: ProgressListOverviewItemProps) {
-  const liRef = useRef<HTMLLIElement>(null);
-
   return (
-    <li ref={liRef} id={id} className={cn(cls.overviewItem, status, addSpace && cls.addSpace)}>
+    <li id={id} className={cn(cls.overviewItem, status, addSpace && cls.addSpace)}>
       <aside>
         <StatusIcon status={status} />
       </aside>

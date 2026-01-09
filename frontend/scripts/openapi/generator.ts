@@ -39,21 +39,21 @@ export async function generate(openApiString: string): Promise<string> {
   result.push("/** TYPES **/\n\n");
   result.push(types.join("\n\n"));
 
-  let s = result.join("\n");
+  let generatedCode = result.join("\n");
 
   // Format with Biome CLI
   const tempDir = await mkdtemp(join(tmpdir(), "abacus-openapi-generator-"));
   const tempFile = join(tempDir, "openapi.ts");
   try {
-    await writeFile(tempFile, s, { mode: 0o600 });
+    await writeFile(tempFile, generatedCode, { mode: 0o600 });
     await promisify(exec)(`npx @biomejs/biome format --write ${tempFile}`);
-    s = await readFile(tempFile, "utf8");
+    generatedCode = await readFile(tempFile, "utf8");
   } finally {
     await unlink(tempFile);
     await rmdir(tempDir);
   }
 
-  return s;
+  return generatedCode;
 }
 
 function addPath(path: string, pathItem: PathsObject | undefined) {

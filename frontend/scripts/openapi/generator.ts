@@ -112,28 +112,28 @@ function addRequest(requestPath: string, request: OperationObject) {
   return result.join("\n");
 }
 
-function addDefinition(name: string, v: ReferenceObject | SchemaObject) {
-  if ("$ref" in v) {
-    return tsType(v);
+function addDefinition(name: string, schema: ReferenceObject | SchemaObject) {
+  if ("$ref" in schema) {
+    return tsType(schema);
   }
 
   const result: string[] = [];
-  if (v.description) {
+  if (schema.description) {
     result.push("/**");
-    result.push(` * ${v.description.split("\n").join("\n * ")}`);
+    result.push(` * ${schema.description.split("\n").join("\n * ")}`);
     result.push(" */");
   }
 
-  if (v.type === "object") {
-    result.push(`export interface ${name} ${tsType(v)}`);
-  } else if (v.enum) {
+  if (schema.type === "object") {
+    result.push(`export interface ${name} ${tsType(schema)}`);
+  } else if (schema.enum) {
     const valuesString = `${name[0]?.toLowerCase()}${name.slice(1)}Values`;
     result.push(
-      `export const ${valuesString} = [${v.enum.map((e) => `"${e}"`).join(", ")}] as const;
+      `export const ${valuesString} = [${schema.enum.map((e) => `"${e}"`).join(", ")}] as const;
         export type ${name} = (typeof ${valuesString})[number];`,
     );
   } else {
-    result.push(`export type ${name} = ${tsType(v)};`);
+    result.push(`export type ${name} = ${tsType(schema)};`);
   }
 
   return result.join("\n");

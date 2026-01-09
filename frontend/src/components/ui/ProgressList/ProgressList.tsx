@@ -78,10 +78,10 @@ ProgressList.OverviewItem = function ProgressListOverviewItem({
   id,
   children,
 }: ProgressListOverviewItemProps) {
-  const ref = useRef<HTMLLIElement>(null);
+  const liRef = useRef<HTMLLIElement>(null);
 
   return (
-    <li ref={ref} id={id} className={cn(cls.overviewItem, status, addSpace && cls.addSpace)}>
+    <li ref={liRef} id={id} className={cn(cls.overviewItem, status, addSpace && cls.addSpace)}>
       <aside>
         <StatusIcon status={status} />
       </aside>

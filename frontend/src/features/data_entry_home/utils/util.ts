@@ -70,6 +70,7 @@ export function getUrlForDataEntry(
   pollingStationId: number,
   pollingStationStatus?: DataEntryStatusName,
 ): string {
-  const entryNumber = pollingStationStatus?.startsWith("second_entry") ? 2 : 1;
+  const entryNumber =
+    pollingStationStatus === "first_entry_finalised" || pollingStationStatus === "second_entry_in_progress" ? 2 : 1;
   return `/elections/${electionId}/data-entry/${pollingStationId}/${entryNumber}`;
 }

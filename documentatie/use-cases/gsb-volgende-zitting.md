@@ -122,7 +122,7 @@ __Hoofdscenario:__
 3. Het GSB besluit dat er een hertelling nodig is.
 4. Het GSB stelt een ander resultaat vast in de hertelling.
 5. De coördinator voert de uitkomst van het onderzoek in de applicatie in.
-6. De invoerders voeren de hertelling in de applicatie in volgens de systematiek die voor de eerste invoer wordt gebruikt.
+6. [De coördinator GSB en de invoerders voeren alle gegevens in de applicatie in.](gsb-invoer.md#de-coördinator-gsb-en-de-invoerders-voeren-alle-gegevens-in-de-applicatie-in-vlieger)
 7. Het GSB voegt het corrigendum (DSO: Na 14-1 versie 2, CSO: Na 14-2 Bijlage 1) toe aan de PV's van de zitting.
 
 __Uitbreidingen:__
@@ -133,11 +133,7 @@ __Uitbreidingen:__
 
 4a. Het GSB bevestigt het oorspronkelijke resultaat in de hertelling:  
 &emsp; 4a1. De coördinator GSB voert de uitkomst van het onderzoek in de applicatie in.  
-&emsp; 4a2. Het GSB voegt het corrigendum (DSO: Na 14-1 versie 2, CSO: Na 14-2 Bijlage 1) toe aan de PV's van de zitting.  
-
-6a. Tijdens invoer is er reden om de invoer (tijdelijk) te stoppen:  
-&emsp; 6a1. De coördinator GSB pauzeert de invoer.  
-&emsp; 6a2. De applicatie blokkeert verdere invoer.  
+&emsp; 4a2. Het GSB voegt het corrigendum (DSO: Na 14-1 versie 2, CSO: Na 14-2 Bijlage 1) toe aan de PV's van de zitting.
 
 ## De coördinator GSB maakt het PV P 2a en evt. het PV Na 14-2 en tellingsbestand EML 510b aan (zee)
 

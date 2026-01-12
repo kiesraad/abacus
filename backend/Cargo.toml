@@ -1,3 +1,7 @@
+[workspace]
+resolver = "3"
+members = ["."]
+
 [package]
 name = "abacus"
 version = "1.1.0"

@@ -589,7 +589,7 @@ mod tests {
             path = "../../fixtures",
             scripts("election_6_no_polling_stations")
         )))]
-        async fn data_entry_completed_to_created_no_polling_stations(pool: SqlitePool) {
+        async fn completed_to_created_no_polling_stations(pool: SqlitePool) {
             let mut conn = pool.acquire().await.unwrap();
             let committee_session = get(&mut conn, 7).await.unwrap();
             assert_eq!(
@@ -602,7 +602,7 @@ mod tests {
 
         /// Completed --> Created
         #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
-        async fn data_entry_completed_to_created_with_polling_stations(pool: SqlitePool) {
+        async fn completed_to_created_with_polling_stations(pool: SqlitePool) {
             let mut conn = pool.acquire().await.unwrap();
             let committee_session = get(&mut conn, 2).await.unwrap();
             assert_eq!(
@@ -618,7 +618,7 @@ mod tests {
             path = "../../fixtures",
             scripts("election_7_four_sessions")
         )))]
-        async fn data_entry_completed_to_created_next_session_no_investigation(pool: SqlitePool) {
+        async fn completed_to_created_next_session_no_investigation(pool: SqlitePool) {
             let mut conn = pool.acquire().await.unwrap();
             let committee_session = get(&mut conn, 704).await.unwrap();
             assert_eq!(
@@ -631,7 +631,7 @@ mod tests {
 
         /// Completed --> Created
         #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_5_with_results"))))]
-        async fn data_entry_completed_to_created_next_session_with_investigation(pool: SqlitePool) {
+        async fn completed_to_created_next_session_with_investigation(pool: SqlitePool) {
             let mut conn = pool.acquire().await.unwrap();
             let committee_session = get(&mut conn, 6).await.unwrap();
             create_polling_station_investigation(
@@ -769,7 +769,7 @@ mod tests {
 
         /// Completed --> InPreparation
         #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
-        async fn data_entry_completed_to_in_preparation(pool: SqlitePool) {
+        async fn completed_to_in_preparation(pool: SqlitePool) {
             let mut conn = pool.acquire().await.unwrap();
             let committee_session = get(&mut conn, 2).await.unwrap();
             assert_eq!(
@@ -824,7 +824,7 @@ mod tests {
 
         /// Completed --> DataEntry
         #[test]
-        fn data_entry_completed_to_data_entry() {
+        fn completed_to_data_entry() {
             assert_eq!(
                 CommitteeSessionStatus::Completed.start_data_entry(),
                 Ok(CommitteeSessionStatus::DataEntry)
@@ -875,7 +875,7 @@ mod tests {
 
         /// Completed --> Paused
         #[test]
-        fn data_entry_completed_to_paused() {
+        fn completed_to_paused() {
             assert_eq!(
                 CommitteeSessionStatus::Completed.pause_data_entry(),
                 Err(CommitteeSessionError::InvalidStatusTransition)

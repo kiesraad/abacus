@@ -107,12 +107,7 @@ describe("InvestigationReasonPage", () => {
   test("Navigate to the next page when submitting a reason when data entry finished", async () => {
     server.use(PollingStationInvestigationCreateHandler);
     const create = spyOnHandler(PollingStationInvestigationCreateHandler);
-    overrideOnce(
-      "get",
-      "/api/elections/1",
-      200,
-      getElectionMockData({}, { number: 2, status: "data_entry_finished" }, []),
-    );
+    overrideOnce("get", "/api/elections/1", 200, getElectionMockData({}, { number: 2, status: "completed" }, []));
 
     await renderPage(3);
 
@@ -166,7 +161,7 @@ describe("InvestigationReasonPage", () => {
   });
 
   test("Navigates on save with a warning message when data entry finished", async () => {
-    overrideOnce("get", "/api/elections/1", 200, getElectionMockData({}, { number: 2, status: "data_entry_finished" }));
+    overrideOnce("get", "/api/elections/1", 200, getElectionMockData({}, { number: 2, status: "completed" }));
     server.use(PollingStationInvestigationUpdateHandler);
     const update = spyOnHandler(PollingStationInvestigationUpdateHandler);
 
@@ -240,7 +235,7 @@ describe("InvestigationReasonPage", () => {
   });
 
   test("Returns to list page with a warning message when clicking delete investigation when data entry finished", async () => {
-    overrideOnce("get", "/api/elections/1", 200, getElectionMockData({}, { number: 2, status: "data_entry_finished" }));
+    overrideOnce("get", "/api/elections/1", 200, getElectionMockData({}, { number: 2, status: "completed" }));
     server.use(PollingStationInvestigationDeleteHandler);
     const user = userEvent.setup();
     await renderPage(3);

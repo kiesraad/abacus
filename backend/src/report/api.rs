@@ -412,8 +412,8 @@ async fn get_files(
         .iter()
         .any(|inv| matches!(inv.corrected_results, Some(true)));
 
-    // Only generate files if the committee session is finished and has all the data needed
-    if committee_session.status != CommitteeSessionStatus::DataEntryFinished
+    // Only generate files if the committee session is completed and has all the data needed
+    if committee_session.status != CommitteeSessionStatus::Completed
         || committee_session.start_date_time.is_none()
         || !are_results_complete_for_committee_session(&mut conn, committee_session.id).await?
     {

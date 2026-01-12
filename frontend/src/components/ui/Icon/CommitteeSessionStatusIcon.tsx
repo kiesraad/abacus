@@ -23,7 +23,7 @@ export function CommitteeSessionStatusIcon({
 }: CommitteeSessionStatusIconProps) {
   switch (status) {
     case "created":
-    case "data_entry_not_started":
+    case "in_preparation":
       return (
         <Icon
           size={size}
@@ -31,11 +31,11 @@ export function CommitteeSessionStatusIcon({
           icon={role === "coordinator" ? <IconSettings /> : <IconClock />}
         />
       );
-    case "data_entry_in_progress":
+    case "data_entry":
       return <Icon size={size} color="accept" icon={<IconCheckHeart />} />;
-    case "data_entry_paused":
+    case "paused":
       return <Icon size={size} color="warning" icon={<IconHourglass />} />;
-    case "data_entry_finished":
+    case "completed":
       return <Icon size={size} color="default" icon={<IconCheckVerified />} />;
   }
 }

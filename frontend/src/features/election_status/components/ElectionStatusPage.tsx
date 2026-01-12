@@ -51,20 +51,20 @@ export function ElectionStatusPage() {
   }
 
   function getLink() {
-    if (currentCommitteeSession.status === "data_entry_not_started") {
+    if (currentCommitteeSession.status === "in_preparation") {
       return (
         <Button
           key="start"
           variant="underlined"
           size="md"
           onClick={() => {
-            handleStatusChange("data_entry_in_progress");
+            handleStatusChange("data_entry");
           }}
         >
           {t("election_status.start")}
         </Button>
       );
-    } else if (currentCommitteeSession.status === "data_entry_in_progress") {
+    } else if (currentCommitteeSession.status === "data_entry") {
       return (
         <Button
           key="pause"
@@ -77,14 +77,14 @@ export function ElectionStatusPage() {
           {t("election_status.pause")}
         </Button>
       );
-    } else if (currentCommitteeSession.status === "data_entry_paused") {
+    } else if (currentCommitteeSession.status === "paused") {
       return (
         <Button
           key="resume"
           variant="underlined"
           size="md"
           onClick={() => {
-            handleStatusChange("data_entry_in_progress");
+            handleStatusChange("data_entry");
           }}
         >
           {t("election_status.resume")}
@@ -122,7 +122,7 @@ export function ElectionStatusPage() {
               variant="primary"
               size="xl"
               onClick={() => {
-                handleStatusChange("data_entry_paused");
+                handleStatusChange("paused");
                 togglePauseModal();
               }}
             >
@@ -136,7 +136,7 @@ export function ElectionStatusPage() {
       )}
 
       {isCoordinator &&
-      currentCommitteeSession.status !== "data_entry_finished" &&
+      currentCommitteeSession.status !== "completed" &&
       statuses.length > 0 &&
       statuses.every((s) => s.status === "definitive") ? (
         <Alert type="success">
@@ -148,13 +148,13 @@ export function ElectionStatusPage() {
         </Alert>
       ) : (
         isCoordinator &&
-        currentCommitteeSession.status === "data_entry_paused" && (
+        currentCommitteeSession.status === "paused" && (
           <Alert type="warning">
             <strong className="heading-md">{t("election_status.data_entry_is_paused")}</strong>
             <p>{t("election_status.paused_status_information")}</p>
             <Button
               onClick={() => {
-                handleStatusChange("data_entry_in_progress");
+                handleStatusChange("data_entry");
               }}
               size="md"
             >
@@ -172,8 +172,7 @@ export function ElectionStatusPage() {
           statuses={statuses}
           addLinks={
             isCoordinator &&
-            (currentCommitteeSession.status === "data_entry_in_progress" ||
-              currentCommitteeSession.status === "data_entry_paused")
+            (currentCommitteeSession.status === "data_entry" || currentCommitteeSession.status === "paused")
           }
           navigate={(path) => void navigate(path)}
         />

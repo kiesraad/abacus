@@ -5,7 +5,7 @@
     "election_id": 2,
     "location": "Juinen",
     "start_date_time": "2035-01-12T09:00:00",
-    "status": "data_entry_finished"
+    "status": "completed"
   },
   "election": {
     "id": 2,

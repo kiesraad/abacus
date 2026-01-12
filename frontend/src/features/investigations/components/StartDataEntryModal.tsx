@@ -23,7 +23,7 @@ export function StartDataEntryModal({ onClose, to }: StartDataEntryModalProps) {
   const { update, isLoading } = useCrud({ updatePath, throwAllErrors: true });
 
   function startDataEntry() {
-    const body: COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_BODY = { status: "data_entry_in_progress" };
+    const body: COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_BODY = { status: "data_entry" };
     void update(body).then((result) => {
       if (isSuccess(result)) {
         void refetch().then(() => {

@@ -106,7 +106,7 @@ pub async fn committee_session_create(
 
     let current_committee_session = get_election_committee_session(&mut tx, election_id).await?;
 
-    if current_committee_session.status == CommitteeSessionStatus::DataEntryFinished {
+    if current_committee_session.status == CommitteeSessionStatus::Completed {
         let next_committee_session = create_committee_session(&mut tx, &audit_service, {
             CommitteeSessionCreateRequest {
                 election_id,
@@ -161,7 +161,7 @@ pub async fn committee_session_delete(
 
     if committee_session.is_next_session()
         && (committee_session.status == CommitteeSessionStatus::Created
-            || committee_session.status == CommitteeSessionStatus::DataEntryNotStarted)
+            || committee_session.status == CommitteeSessionStatus::InPreparation)
     {
         delete(&mut tx, committee_session_id).await?;
 
@@ -362,7 +362,7 @@ pub mod tests {
             location: "Test location".to_string(),
             start_date_time: NaiveDate::from_ymd_opt(2025, 10, 22)
                 .and_then(|d| d.and_hms_opt(9, 15, 0)),
-            status: CommitteeSessionStatus::DataEntryFinished,
+            status: CommitteeSessionStatus::Completed,
             results_eml: None,
             results_pdf: None,
             overview_pdf: None,

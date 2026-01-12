@@ -173,7 +173,7 @@ pub async fn election_number_of_voters_change(
     // Only allow if this is a first and not yet started committee session
     if !current_committee_session.is_next_session()
         && (current_committee_session.status == CommitteeSessionStatus::Created
-            || current_committee_session.status == CommitteeSessionStatus::DataEntryNotStarted)
+            || current_committee_session.status == CommitteeSessionStatus::InPreparation)
     {
         let election = crate::election::repository::change_number_of_voters(
             &mut tx,

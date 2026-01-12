@@ -60,7 +60,7 @@ describe("FinishDataEntryPage", () => {
   test("Shows page and click on finish data entry phase", async () => {
     const user = userEvent.setup();
     const statusChange = spyOnHandler(CommitteeSessionStatusChangeRequestHandler);
-    overrideOnce("get", "/api/elections/1", 200, getElectionMockData({}, { status: "data_entry_in_progress" }));
+    overrideOnce("get", "/api/elections/1", 200, getElectionMockData({}, { status: "data_entry" }));
 
     await renderPage(1);
 
@@ -68,13 +68,13 @@ describe("FinishDataEntryPage", () => {
     expect(await screen.findByRole("heading", { level: 2, name: "Invoerfase afronden?" })).toBeVisible();
     expect(await screen.findByRole("link", { name: "In invoerfase blijven" })).toBeVisible();
 
-    overrideOnce("get", "/api/elections/1", 200, getElectionMockData({}, { status: "data_entry_finished" }));
+    overrideOnce("get", "/api/elections/1", 200, getElectionMockData({}, { status: "completed" }));
 
     const finishButton = screen.getByRole("button", { name: "Invoerfase afronden" });
     expect(finishButton).toBeVisible();
     await user.click(finishButton);
 
-    expect(statusChange).toHaveBeenCalledWith({ status: "data_entry_finished" });
+    expect(statusChange).toHaveBeenCalledWith({ status: "completed" });
     await waitFor(() => {
       expect(navigate).toHaveBeenCalledWith("/elections/1/report/committee-session/1/download");
     });
@@ -117,7 +117,7 @@ describe("FinishDataEntryPage", () => {
       },
     ]);
     const user = userEvent.setup();
-    const electionData = getElectionMockData({}, { status: "data_entry_finished" });
+    const electionData = getElectionMockData({}, { status: "completed" });
     server.use(
       http.get("/api/elections/1", () =>
         HttpResponse.json(electionData satisfies ElectionDetailsResponse, { status: 200 }),
@@ -138,7 +138,7 @@ describe("FinishDataEntryPage", () => {
     expect(await screen.findByRole("heading", { level: 2, name: "Invoerfase afronden?" })).toBeVisible();
     expect(await screen.findByRole("link", { name: "In invoerfase blijven" })).toBeVisible();
 
-    overrideOnce("get", "/api/elections/1", 200, getElectionMockData({}, { status: "data_entry_finished" }));
+    overrideOnce("get", "/api/elections/1", 200, getElectionMockData({}, { status: "completed" }));
 
     const finishButton = screen.getByRole("button", { name: "Invoerfase afronden" });
     expect(finishButton).toBeVisible();
@@ -151,7 +151,7 @@ describe("FinishDataEntryPage", () => {
   test("Shows page and click on stay in data entry phase", async () => {
     const user = userEvent.setup();
     const statusChange = spyOnHandler(CommitteeSessionStatusChangeRequestHandler);
-    overrideOnce("get", "/api/elections/1", 200, getElectionMockData({}, { status: "data_entry_in_progress" }));
+    overrideOnce("get", "/api/elections/1", 200, getElectionMockData({}, { status: "data_entry" }));
 
     const router = await renderPage(1);
 
@@ -226,8 +226,8 @@ describe("FinishDataEntryPage", () => {
     });
   });
 
-  test("Redirect to report download page when committee session status is already data_entry_finished", async () => {
-    overrideOnce("get", "/api/elections/1", 200, getElectionMockData({}, { status: "data_entry_finished" }));
+  test("Redirect to report download page when committee session status is already completed", async () => {
+    overrideOnce("get", "/api/elections/1", 200, getElectionMockData({}, { status: "completed" }));
 
     await renderPage(1);
 

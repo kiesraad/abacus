@@ -30,7 +30,7 @@ export function ElectionInformationTable({
 }: ElectionInformationTableProps) {
   const rowLink =
     committeeSession.number === 1 &&
-    (committeeSession.status === "created" || committeeSession.status === "data_entry_not_started")
+    (committeeSession.status === "created" || committeeSession.status === "in_preparation")
       ? "number-of-voters"
       : undefined;
   return (
@@ -42,7 +42,10 @@ export function ElectionInformationTable({
           </Table.HeaderCell>
           <Table.Cell>
             {election.name},{" "}
-            {new Date(election.election_date).toLocaleString(t("date_locale"), { day: "numeric", month: "long" })}
+            {new Date(election.election_date).toLocaleString(t("date_locale"), {
+              day: "numeric",
+              month: "long",
+            })}
           </Table.Cell>
         </Table.Row>
         <Table.Row>

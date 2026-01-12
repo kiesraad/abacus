@@ -94,7 +94,7 @@ export function CommitteeSessionCard({
   const { update } = useCrud({ updatePath, throwAllErrors: true });
 
   function handleStart() {
-    const body: COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_BODY = { status: "data_entry_in_progress" };
+    const body: COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_BODY = { status: "data_entry" };
     void update(body).then((result) => {
       if (isSuccess(result)) {
         void navigate("status");
@@ -144,7 +144,7 @@ export function CommitteeSessionCard({
       addIf(detailsButtonLink, isCurrentSession && isCoordinator);
       addIf(deleteButtonLink, isCurrentSession && isCoordinator && isNextSession);
       break;
-    case "data_entry_not_started":
+    case "in_preparation":
       addIf(investigationsButtonLink, isCurrentSession && isNextSession);
       addIf(detailsButtonLink, isCurrentSession && isCoordinator);
       addIf(deleteButtonLink, isCurrentSession && isCoordinator && isNextSession);
@@ -157,7 +157,7 @@ export function CommitteeSessionCard({
         );
       }
       break;
-    case "data_entry_in_progress":
+    case "data_entry":
       addIf(investigationsButtonLink, isCurrentSession && isNextSession);
       addIf(detailsButtonLink, isCurrentSession && isCoordinator);
 
@@ -169,7 +169,7 @@ export function CommitteeSessionCard({
         );
       }
       break;
-    case "data_entry_paused":
+    case "paused":
       addIf(
         {
           id: committeeSession.id,
@@ -181,7 +181,7 @@ export function CommitteeSessionCard({
       addIf(investigationsButtonLink, isCurrentSession && isNextSession);
       addIf(detailsButtonLink, isCurrentSession && isCoordinator);
       break;
-    case "data_entry_finished":
+    case "completed":
       addIf(
         {
           id: committeeSession.id,

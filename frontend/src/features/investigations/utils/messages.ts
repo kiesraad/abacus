@@ -6,7 +6,7 @@ export function getInvestigationDeletedMessage(
   pollingStation: PollingStation,
   currentCommitteeSessionStatus: CommitteeSessionStatus,
 ) {
-  if (currentCommitteeSessionStatus === "data_entry_finished") {
+  if (currentCommitteeSessionStatus === "completed") {
     return {
       type: "warning",
       title: t("generate_new_results"),
@@ -29,7 +29,7 @@ export function getInvestigationUpdatedMessage(
   pollingStation: PollingStation,
   currentCommitteeSessionStatus: CommitteeSessionStatus,
 ) {
-  if (currentCommitteeSessionStatus === "data_entry_finished") {
+  if (currentCommitteeSessionStatus === "completed") {
     return {
       type: "warning",
       title: t("generate_new_results"),

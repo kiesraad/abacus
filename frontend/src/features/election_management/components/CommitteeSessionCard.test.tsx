@@ -38,17 +38,17 @@ const testCases: TestCases = {
       created: {
         buttonsCurrentSession: ["Details van de zitting"],
       },
-      data_entry_not_started: {
+      in_preparation: {
         buttonsCurrentSession: ["Details van de zitting", "Start invoer"],
       },
-      data_entry_in_progress: {
+      data_entry: {
         buttonsCurrentSession: ["Details van de zitting"],
         actionButton: "Bekijk voortgang",
       },
-      data_entry_paused: {
+      paused: {
         buttonsCurrentSession: ["Hervatten of voortgang bekijken", "Details van de zitting"],
       },
-      data_entry_finished: {
+      completed: {
         buttonsCurrentSession: ["Resultaten en documenten", "Invoer bekijken"],
         buttonsNotCurrentSession: ["Resultaten en documenten"],
       },
@@ -58,7 +58,7 @@ const testCases: TestCases = {
       created: {
         buttonsCurrentSession: ["Aangevraagde onderzoeken", "Details van de zitting", "Zitting verwijderen"],
       },
-      data_entry_not_started: {
+      in_preparation: {
         buttonsCurrentSession: [
           "Aangevraagde onderzoeken",
           "Details van de zitting",
@@ -66,18 +66,18 @@ const testCases: TestCases = {
           "Start invoer",
         ],
       },
-      data_entry_in_progress: {
+      data_entry: {
         buttonsCurrentSession: ["Aangevraagde onderzoeken", "Details van de zitting"],
         actionButton: "Bekijk voortgang",
       },
-      data_entry_paused: {
+      paused: {
         buttonsCurrentSession: [
           "Hervatten of voortgang bekijken",
           "Aangevraagde onderzoeken",
           "Details van de zitting",
         ],
       },
-      data_entry_finished: {
+      completed: {
         buttonsCurrentSession: ["Resultaten en documenten", "Aangevraagde onderzoeken", "Invoer bekijken"],
         buttonsNotCurrentSession: ["Resultaten en documenten"],
       },
@@ -87,14 +87,14 @@ const testCases: TestCases = {
     {
       // First session
       created: {},
-      data_entry_not_started: {},
-      data_entry_in_progress: {
+      in_preparation: {},
+      data_entry: {
         actionButton: "Bekijk voortgang",
       },
-      data_entry_paused: {
+      paused: {
         buttonsCurrentSession: ["Bekijk voortgang"],
       },
-      data_entry_finished: {
+      completed: {
         buttonsCurrentSession: ["Invoer bekijken"],
       },
     },
@@ -103,17 +103,17 @@ const testCases: TestCases = {
       created: {
         buttonsCurrentSession: ["Aangevraagde onderzoeken"],
       },
-      data_entry_not_started: {
+      in_preparation: {
         buttonsCurrentSession: ["Aangevraagde onderzoeken"],
       },
-      data_entry_in_progress: {
+      data_entry: {
         buttonsCurrentSession: ["Aangevraagde onderzoeken"],
         actionButton: "Bekijk voortgang",
       },
-      data_entry_paused: {
+      paused: {
         buttonsCurrentSession: ["Bekijk voortgang", "Aangevraagde onderzoeken"],
       },
-      data_entry_finished: {
+      completed: {
         buttonsCurrentSession: ["Aangevraagde onderzoeken", "Invoer bekijken"],
       },
     },
@@ -144,10 +144,10 @@ describe("UI component: CommitteeSessionCard", () => {
       const expectedSubtitle =
         {
           created: "— Zitting voorbereiden",
-          data_entry_not_started: "— Klaar voor invoer",
-          data_entry_in_progress: "— Invoer bezig",
-          data_entry_paused: "— Invoer gepauzeerd",
-          data_entry_finished: "— Invoer afgerond",
+          in_preparation: "— Klaar voor invoer",
+          data_entry: "— Invoer bezig",
+          paused: "— Invoer gepauzeerd",
+          completed: "— Invoer afgerond",
         }[status] || "";
 
       const committeeSession = getCommitteeSessionMockData({
@@ -208,7 +208,7 @@ describe("UI component: CommitteeSessionCard", () => {
     const user = userEvent.setup();
     const committeeSession = getCommitteeSessionMockData({
       number: 1,
-      status: "data_entry_not_started",
+      status: "in_preparation",
       start_date_time: "",
       location: "Juinen",
     });
@@ -216,7 +216,7 @@ describe("UI component: CommitteeSessionCard", () => {
 
     const dataEntryButton = await screen.findByRole("button", { name: "Start invoer" });
     await user.click(dataEntryButton);
-    expect(statusChange).toHaveBeenCalledWith({ status: "data_entry_in_progress" });
+    expect(statusChange).toHaveBeenCalledWith({ status: "data_entry" });
     expect(navigate).toHaveBeenCalledWith("status");
   });
 
@@ -227,7 +227,7 @@ describe("UI component: CommitteeSessionCard", () => {
     const user = userEvent.setup();
     const committeeSession = getCommitteeSessionMockData({
       number: 2,
-      status: "data_entry_not_started",
+      status: "in_preparation",
       start_date_time: "",
       location: "Juinen",
     });

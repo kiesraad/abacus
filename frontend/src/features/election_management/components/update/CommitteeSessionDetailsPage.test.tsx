@@ -80,7 +80,12 @@ describe("CommitteeSessionDetailsPage", () => {
     expect(
       await screen.findByRole("heading", { level: 1, name: "Gemeentelijk stembureau Heemdamseburg" }),
     ).toBeInTheDocument();
-    expect(await screen.findByRole("heading", { level: 2, name: "Details van de eerste zitting" })).toBeInTheDocument();
+    expect(
+      await screen.findByRole("heading", {
+        level: 2,
+        name: "Details van de eerste zitting",
+      }),
+    ).toBeInTheDocument();
     expect(await screen.findByRole("heading", { level: 3, name: "Start van de zitting" })).toBeInTheDocument();
 
     // Check that the fields are empty
@@ -140,7 +145,7 @@ describe("CommitteeSessionDetailsPage", () => {
         {},
         {
           number: 2,
-          status: "data_entry_not_started",
+          status: "in_preparation",
           location: "Den Haag",
           start_date_time: "2026-03-18T21:36:00",
         },
@@ -153,7 +158,12 @@ describe("CommitteeSessionDetailsPage", () => {
     expect(
       await screen.findByRole("heading", { level: 1, name: "Gemeentelijk stembureau Heemdamseburg" }),
     ).toBeInTheDocument();
-    expect(await screen.findByRole("heading", { level: 2, name: "Details van de tweede zitting" })).toBeInTheDocument();
+    expect(
+      await screen.findByRole("heading", {
+        level: 2,
+        name: "Details van de tweede zitting",
+      }),
+    ).toBeInTheDocument();
     expect(
       await screen.findByRole("heading", {
         level: 3,
@@ -180,7 +190,7 @@ describe("CommitteeSessionDetailsPage", () => {
       getElectionMockData(
         {},
         {
-          status: "data_entry_not_started",
+          status: "in_preparation",
           location: "Den Haag",
           start_date_time: "2026-03-18T21:36:00",
         },
@@ -213,7 +223,7 @@ describe("CommitteeSessionDetailsPage", () => {
       getElectionMockData(
         {},
         {
-          status: "data_entry_not_started",
+          status: "in_preparation",
           location: "Den Haag",
           start_date_time: "2026-03-18T21:36:00",
         },
@@ -249,7 +259,7 @@ describe("CommitteeSessionDetailsPage", () => {
         {},
         {
           number: 6,
-          status: "data_entry_in_progress",
+          status: "data_entry",
           location: "Den Haag",
           start_date_time: "2026-03-18T21:36:00",
         },

@@ -439,7 +439,9 @@ test.describe("Data entry model test - errors", () => {
         type MachineStates = typeof dataEntryMachineDefinition.states;
         type MachineStateKey = keyof MachineStates;
         type MachineEventKey = {
-          [StateKey in MachineStateKey]: MachineStates[StateKey] extends { on: Record<infer EventKey, string> }
+          [StateKey in MachineStateKey]: MachineStates[StateKey] extends {
+            on: Record<infer EventKey, string>;
+          }
             ? EventKey
             : never;
         }[MachineStateKey];

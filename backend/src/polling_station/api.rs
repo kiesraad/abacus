@@ -80,7 +80,7 @@ pub async fn validate_user_is_allowed_to_perform_action(
     if user.is_coordinator()
         || (user.is_administrator()
             && (committee_session.status == CommitteeSessionStatus::Created
-                || committee_session.status == CommitteeSessionStatus::DataEntryNotStarted))
+                || committee_session.status == CommitteeSessionStatus::InPreparation))
     {
         Ok(())
     } else {
@@ -137,15 +137,15 @@ async fn polling_station_create(
         change_committee_session_status(
             &mut tx,
             committee_session.id,
-            CommitteeSessionStatus::DataEntryNotStarted,
+            CommitteeSessionStatus::InPreparation,
             audit_service,
         )
         .await?;
-    } else if committee_session.status == CommitteeSessionStatus::DataEntryFinished {
+    } else if committee_session.status == CommitteeSessionStatus::Completed {
         change_committee_session_status(
             &mut tx,
             committee_session.id,
-            CommitteeSessionStatus::DataEntryInProgress,
+            CommitteeSessionStatus::DataEntry,
             audit_service,
         )
         .await?;
@@ -233,11 +233,11 @@ async fn polling_station_update(
         )
         .await?;
 
-    if committee_session.status == CommitteeSessionStatus::DataEntryFinished {
+    if committee_session.status == CommitteeSessionStatus::Completed {
         change_committee_session_status(
             &mut tx,
             committee_session.id,
-            CommitteeSessionStatus::DataEntryInProgress,
+            CommitteeSessionStatus::DataEntry,
             audit_service,
         )
         .await?;
@@ -387,11 +387,11 @@ pub async fn create_imported_polling_stations(
         .await?;
 
     if committee_session.status == CommitteeSessionStatus::Created {
-        // Change committee session status to DataEntryNotStarted
+        // Change committee session status to InPreparation
         change_committee_session_status(
             &mut tx,
             committee_session.id,
-            CommitteeSessionStatus::DataEntryNotStarted,
+            CommitteeSessionStatus::InPreparation,
             audit_service,
         )
         .await?;

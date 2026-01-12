@@ -9,7 +9,7 @@
   "corrected_results": "Er is een gecorrigeerde uitkomst",
   "corrected_results_inserted": "De gecorrigeerde uitkomst is ingevoerd",
   "corrected_results_not_yet_inserted": "Laat twee invoerders het corrigendum overnemen in Abacus",
-  "corrigendum_data_entry_in_progress": "Invoer corrigendum bezig",
+  "corrigendum_data_entry": "Invoer corrigendum bezig",
   "delete_are_you_sure": "Je kan dit niet ongedaan maken. Weet je zeker dat je dit onderzoek wilt verwijderen?",
   "delete_data_entry": "<strong>Let op:</strong> De gecorrigeerde telresultaten die al zijn ingevoerd worden ook verwijderd.",
   "delete_investigation": "Onderzoek verwijderen",
@@ -78,7 +78,7 @@
   "start_data_entry_question": "Invoerfase starten?",
   "title": "Onderzoeken",
   "you_cannot_add_another_investigation": "Je hebt voor alle stembureaus al een onderzoek toegevoegd.\nJe kan niet nog een onderzoek toevoegen.",
-  "warning_data_entry_finished": {
+  "warning_completed": {
     "title": "Invoerfase al afgerond",
     "description": "Als je wijzigingen aanbrengt in deze zitting door onderzoeken toe te voegen, te bewerken of te verwijderen, wordt de invoerfase heropend. Bij het afronden van de invoerfase wordt een nieuw proces-verbaal gemaakt."
   }

@@ -129,15 +129,15 @@ async fn validate_and_get_data(
     // Validate state based on user role
     match user.role() {
         Role::Typist => {
-            if committee_session.status == CommitteeSessionStatus::DataEntryPaused {
+            if committee_session.status == CommitteeSessionStatus::Paused {
                 return Err(CommitteeSessionError::CommitteeSessionPaused.into());
-            } else if committee_session.status != CommitteeSessionStatus::DataEntryInProgress {
+            } else if committee_session.status != CommitteeSessionStatus::DataEntry {
                 return Err(CommitteeSessionError::InvalidCommitteeSessionStatus.into());
             }
         }
         Role::Coordinator => {
-            if committee_session.status != CommitteeSessionStatus::DataEntryInProgress
-                && committee_session.status != CommitteeSessionStatus::DataEntryPaused
+            if committee_session.status != CommitteeSessionStatus::DataEntry
+                && committee_session.status != CommitteeSessionStatus::Paused
             {
                 return Err(CommitteeSessionError::InvalidCommitteeSessionStatus.into());
             }
@@ -170,11 +170,11 @@ pub async fn delete_data_entry_and_result_for_polling_station(
         audit_service
             .log(conn, &AuditEvent::ResultDeleted(result.into()), None)
             .await?;
-        if committee_session.status == CommitteeSessionStatus::DataEntryFinished {
+        if committee_session.status == CommitteeSessionStatus::Completed {
             change_committee_session_status(
                 conn,
                 committee_session.id,
-                CommitteeSessionStatus::DataEntryInProgress,
+                CommitteeSessionStatus::DataEntry,
                 audit_service.clone(),
             )
             .await?;
@@ -1291,9 +1291,8 @@ mod tests {
     }
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
-    async fn test_claim_data_entry_committee_session_status_is_data_entry_paused(pool: SqlitePool) {
-        change_status_committee_session(pool.clone(), 2, CommitteeSessionStatus::DataEntryPaused)
-            .await;
+    async fn test_claim_data_entry_committee_session_status_is_paused(pool: SqlitePool) {
+        change_status_committee_session(pool.clone(), 2, CommitteeSessionStatus::Paused).await;
 
         let response = claim(pool.clone(), 1, EntryNumber::FirstEntry).await;
         assert_eq!(response.status(), StatusCode::CONFLICT);
@@ -1307,11 +1306,10 @@ mod tests {
     }
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
-    async fn test_claim_data_entry_committee_session_status_not_data_entry_paused_or_in_progress(
+    async fn test_claim_data_entry_committee_session_status_not_paused_or_in_progress(
         pool: SqlitePool,
     ) {
-        change_status_committee_session(pool.clone(), 2, CommitteeSessionStatus::DataEntryFinished)
-            .await;
+        change_status_committee_session(pool.clone(), 2, CommitteeSessionStatus::Completed).await;
 
         let response = claim(pool.clone(), 1, EntryNumber::FirstEntry).await;
         assert_eq!(response.status(), StatusCode::CONFLICT);
@@ -1368,12 +1366,7 @@ mod tests {
             .await
             .unwrap();
 
-        change_status_committee_session(
-            pool.clone(),
-            704,
-            CommitteeSessionStatus::DataEntryInProgress,
-        )
-        .await;
+        change_status_committee_session(pool.clone(), 704, CommitteeSessionStatus::DataEntry).await;
 
         let response = claim(pool.clone(), 742, EntryNumber::FirstEntry).await;
         assert_eq!(response.status(), StatusCode::OK);
@@ -1403,16 +1396,13 @@ mod tests {
     }
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
-    async fn test_create_data_entry_committee_session_status_is_data_entry_paused(
-        pool: SqlitePool,
-    ) {
+    async fn test_create_data_entry_committee_session_status_is_paused(pool: SqlitePool) {
         let request_body = example_data_entry();
 
         let response = claim(pool.clone(), 1, EntryNumber::FirstEntry).await;
         assert_eq!(response.status(), StatusCode::OK);
 
-        change_status_committee_session(pool.clone(), 2, CommitteeSessionStatus::DataEntryPaused)
-            .await;
+        change_status_committee_session(pool.clone(), 2, CommitteeSessionStatus::Paused).await;
 
         let response = save(
             pool.clone(),
@@ -1437,7 +1427,7 @@ mod tests {
     }
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
-    async fn test_create_data_entry_committee_session_status_not_data_entry_paused_or_in_progress(
+    async fn test_create_data_entry_committee_session_status_not_paused_or_in_progress(
         pool: SqlitePool,
     ) {
         let request_body = example_data_entry();
@@ -1445,8 +1435,7 @@ mod tests {
         let response = claim(pool.clone(), 1, EntryNumber::FirstEntry).await;
         assert_eq!(response.status(), StatusCode::OK);
 
-        change_status_committee_session(pool.clone(), 2, CommitteeSessionStatus::DataEntryFinished)
-            .await;
+        change_status_committee_session(pool.clone(), 2, CommitteeSessionStatus::Completed).await;
 
         let response = save(
             pool.clone(),
@@ -1567,9 +1556,7 @@ mod tests {
     }
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
-    async fn test_finalise_data_entry_committee_session_status_is_data_entry_paused(
-        pool: SqlitePool,
-    ) {
+    async fn test_finalise_data_entry_committee_session_status_is_paused(pool: SqlitePool) {
         let request_body = example_data_entry();
 
         let response = claim(pool.clone(), 1, EntryNumber::FirstEntry).await;
@@ -1583,8 +1570,7 @@ mod tests {
         .await;
         assert_eq!(response.status(), StatusCode::OK);
 
-        change_status_committee_session(pool.clone(), 2, CommitteeSessionStatus::DataEntryPaused)
-            .await;
+        change_status_committee_session(pool.clone(), 2, CommitteeSessionStatus::Paused).await;
 
         let response = finalise(pool.clone(), 1, EntryNumber::FirstEntry).await;
         assert_eq!(response.status(), StatusCode::CONFLICT);
@@ -1594,7 +1580,7 @@ mod tests {
     }
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
-    async fn test_finalise_data_entry_committee_session_status_not_data_entry_paused_or_in_progress(
+    async fn test_finalise_data_entry_committee_session_status_not_paused_or_in_progress(
         pool: SqlitePool,
     ) {
         let request_body = example_data_entry();
@@ -1610,8 +1596,7 @@ mod tests {
         .await;
         assert_eq!(response.status(), StatusCode::OK);
 
-        change_status_committee_session(pool.clone(), 2, CommitteeSessionStatus::DataEntryFinished)
-            .await;
+        change_status_committee_session(pool.clone(), 2, CommitteeSessionStatus::Completed).await;
 
         let response = finalise(pool.clone(), 1, EntryNumber::FirstEntry).await;
         assert_eq!(response.status(), StatusCode::CONFLICT);
@@ -1847,7 +1832,7 @@ mod tests {
     }
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
-    async fn test_polling_station_data_entry_delete_committee_session_status_is_data_entry_paused(
+    async fn test_polling_station_data_entry_delete_committee_session_status_is_paused(
         pool: SqlitePool,
     ) {
         // create data entry
@@ -1863,8 +1848,7 @@ mod tests {
         .await;
         assert_eq!(response.status(), StatusCode::OK);
 
-        change_status_committee_session(pool.clone(), 2, CommitteeSessionStatus::DataEntryPaused)
-            .await;
+        change_status_committee_session(pool.clone(), 2, CommitteeSessionStatus::Paused).await;
 
         // delete data entry
         let response = delete(pool.clone(), 1, EntryNumber::FirstEntry).await;
@@ -1881,7 +1865,7 @@ mod tests {
     }
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
-    async fn test_polling_station_data_entry_delete_committee_session_status_not_data_entry_paused_or_in_progress(
+    async fn test_polling_station_data_entry_delete_committee_session_status_not_paused_or_in_progress(
         pool: SqlitePool,
     ) {
         // create data entry
@@ -1897,8 +1881,7 @@ mod tests {
         .await;
         assert_eq!(response.status(), StatusCode::OK);
 
-        change_status_committee_session(pool.clone(), 2, CommitteeSessionStatus::DataEntryFinished)
-            .await;
+        change_status_committee_session(pool.clone(), 2, CommitteeSessionStatus::Completed).await;
 
         // delete data entry
         let response = delete(pool.clone(), 1, EntryNumber::FirstEntry).await;
@@ -2029,8 +2012,7 @@ mod tests {
         );
         assert!(result_exists(&mut conn, polling_station_id).await.unwrap());
 
-        change_status_committee_session(pool.clone(), 3, CommitteeSessionStatus::DataEntryFinished)
-            .await;
+        change_status_committee_session(pool.clone(), 3, CommitteeSessionStatus::Completed).await;
 
         // delete data entry with status Definitive
         let response = delete_data_entries_and_result(pool.clone(), polling_station_id).await;
@@ -2044,15 +2026,12 @@ mod tests {
         );
         assert!(!result_exists(&mut conn, polling_station_id).await.unwrap());
 
-        // Check that the committee session status is changed to DataEntryInProgress
+        // Check that the committee session status is changed to DataEntry
         let committee_session = crate::committee_session::repository::get(&mut conn, 3)
             .await
             .unwrap();
 
-        assert_eq!(
-            committee_session.status,
-            CommitteeSessionStatus::DataEntryInProgress
-        );
+        assert_eq!(committee_session.status, CommitteeSessionStatus::DataEntry);
     }
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
@@ -2124,8 +2103,7 @@ mod tests {
     async fn test_data_entry_resolve_differences_keep_second(pool: SqlitePool) {
         finalise_different_entries(pool.clone()).await;
 
-        change_status_committee_session(pool.clone(), 2, CommitteeSessionStatus::DataEntryPaused)
-            .await;
+        change_status_committee_session(pool.clone(), 2, CommitteeSessionStatus::Paused).await;
 
         let response =
             resolve_differences(pool.clone(), 1, ResolveDifferencesAction::KeepSecondEntry).await;
@@ -2173,8 +2151,7 @@ mod tests {
     async fn test_data_entry_resolve_differences_committee_session_status_not_ok(pool: SqlitePool) {
         finalise_different_entries(pool.clone()).await;
 
-        change_status_committee_session(pool.clone(), 2, CommitteeSessionStatus::DataEntryFinished)
-            .await;
+        change_status_committee_session(pool.clone(), 2, CommitteeSessionStatus::Completed).await;
 
         let response = resolve_differences(
             pool.clone(),
@@ -2229,8 +2206,7 @@ mod tests {
     async fn test_data_entry_resolve_errors_committee_session_status_not_ok(pool: SqlitePool) {
         finalise_with_errors(pool.clone()).await;
 
-        change_status_committee_session(pool.clone(), 2, CommitteeSessionStatus::DataEntryFinished)
-            .await;
+        change_status_committee_session(pool.clone(), 2, CommitteeSessionStatus::Completed).await;
 
         let response =
             resolve_errors(pool.clone(), 1, ResolveErrorsAction::DiscardFirstEntry).await;
@@ -2272,12 +2248,7 @@ mod tests {
             .await
             .unwrap();
 
-        change_status_committee_session(
-            pool.clone(),
-            704,
-            CommitteeSessionStatus::DataEntryInProgress,
-        )
-        .await;
+        change_status_committee_session(pool.clone(), 704, CommitteeSessionStatus::DataEntry).await;
 
         assert!(claim_previous_results(pool.clone(), 743).await.is_none());
     }
@@ -2290,12 +2261,7 @@ mod tests {
             .await
             .unwrap();
 
-        change_status_committee_session(
-            pool.clone(),
-            704,
-            CommitteeSessionStatus::DataEntryInProgress,
-        )
-        .await;
+        change_status_committee_session(pool.clone(), 704, CommitteeSessionStatus::DataEntry).await;
 
         let previous_results = claim_previous_results(pool.clone(), 742).await.unwrap();
         // Check by difference in fixture results data

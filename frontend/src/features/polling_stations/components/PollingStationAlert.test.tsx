@@ -27,7 +27,7 @@ describe("PollingStationAlert", () => {
   });
 
   test("Renders warning when data entry is finished", async () => {
-    const electionData = getElectionMockData({}, { id: 1, number: 1, status: "data_entry_finished" }, []);
+    const electionData = getElectionMockData({}, { id: 1, number: 1, status: "completed" }, []);
     overrideOnce("get", "/api/elections/1", 200, electionData);
     await renderPage();
 

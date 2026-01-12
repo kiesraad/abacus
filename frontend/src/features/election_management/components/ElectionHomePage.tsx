@@ -169,7 +169,7 @@ export function ElectionHomePage() {
                 />
               ))}
             </div>
-            {isCoordinator && currentCommitteeSession.status === "data_entry_finished" && (
+            {isCoordinator && currentCommitteeSession.status === "completed" && (
               <Button variant="secondary" size="sm" onClick={toggleAddCommitteeSessionModal}>
                 {t("election_management.prepare_new_session")}
               </Button>

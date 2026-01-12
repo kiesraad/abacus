@@ -85,6 +85,7 @@ export function OverviewPage() {
         </>
       );
     }
+
     const committeeSession = committeeSessionList.find(
       (committeeSession) => committeeSession.election_id === election.id,
     );
@@ -93,7 +94,7 @@ export function OverviewPage() {
     let committeeSessionString = "";
     if (isAdminOrCoordinator) {
       electionLink = `/elections/${election.id}`;
-    } else if (committeeSession && committeeSession.status === "data_entry_in_progress") {
+    } else if (committeeSession && committeeSession.status === "data_entry") {
       electionLink = `/elections/${election.id}/data-entry`;
     }
     if (committeeSession) {

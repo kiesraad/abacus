@@ -38,10 +38,10 @@ use crate::{
 pub enum CommitteeSessionStatus {
     #[default]
     Created,
-    DataEntryNotStarted,
-    DataEntryInProgress,
-    DataEntryPaused,
-    DataEntryFinished,
+    InPreparation,
+    DataEntry,
+    Paused,
+    Completed,
 }
 
 impl From<sqlx::Error> for CommitteeSessionError {
@@ -99,17 +99,15 @@ pub async fn change_committee_session_status(
                 .prepare_data_entry(&mut tx, &committee_session)
                 .await?
         }
-        CommitteeSessionStatus::DataEntryNotStarted => {
+        CommitteeSessionStatus::InPreparation => {
             committee_session
                 .status
                 .ready_for_data_entry(&mut tx, &committee_session)
                 .await?
         }
-        CommitteeSessionStatus::DataEntryInProgress => {
-            committee_session.status.start_data_entry()?
-        }
-        CommitteeSessionStatus::DataEntryPaused => committee_session.status.pause_data_entry()?,
-        CommitteeSessionStatus::DataEntryFinished => {
+        CommitteeSessionStatus::DataEntry => committee_session.status.start_data_entry()?,
+        CommitteeSessionStatus::Paused => committee_session.status.pause_data_entry()?,
+        CommitteeSessionStatus::Completed => {
             committee_session
                 .status
                 .finish_data_entry(&mut tx, &committee_session)
@@ -118,8 +116,8 @@ pub async fn change_committee_session_status(
     };
 
     // If resuming committee session, delete all files from committee session and files tables
-    if committee_session.status == CommitteeSessionStatus::DataEntryFinished
-        && new_status == CommitteeSessionStatus::DataEntryInProgress
+    if committee_session.status == CommitteeSessionStatus::Completed
+        && new_status == CommitteeSessionStatus::DataEntry
     {
         delete_committee_session_files(&mut tx, audit_service.clone(), committee_session).await?;
     }
@@ -147,10 +145,10 @@ impl CommitteeSessionStatus {
     ) -> Result<Self, CommitteeSessionError> {
         match self {
             CommitteeSessionStatus::Created => Ok(self),
-            CommitteeSessionStatus::DataEntryNotStarted
-            | CommitteeSessionStatus::DataEntryInProgress
-            | CommitteeSessionStatus::DataEntryPaused
-            | CommitteeSessionStatus::DataEntryFinished => {
+            CommitteeSessionStatus::InPreparation
+            | CommitteeSessionStatus::DataEntry
+            | CommitteeSessionStatus::Paused
+            | CommitteeSessionStatus::Completed => {
                 let polling_stations = polling_station::list(conn, committee_session.id).await?;
                 if polling_stations.is_empty() {
                     return Ok(CommitteeSessionStatus::Created);
@@ -184,16 +182,16 @@ impl CommitteeSessionStatus {
                     if investigations.is_empty() {
                         Err(CommitteeSessionError::InvalidStatusTransition)
                     } else {
-                        Ok(CommitteeSessionStatus::DataEntryNotStarted)
+                        Ok(CommitteeSessionStatus::InPreparation)
                     }
                 } else {
-                    Ok(CommitteeSessionStatus::DataEntryNotStarted)
+                    Ok(CommitteeSessionStatus::InPreparation)
                 }
             }
-            CommitteeSessionStatus::DataEntryNotStarted => Ok(self),
-            CommitteeSessionStatus::DataEntryInProgress
-            | CommitteeSessionStatus::DataEntryPaused
-            | CommitteeSessionStatus::DataEntryFinished => {
+            CommitteeSessionStatus::InPreparation => Ok(self),
+            CommitteeSessionStatus::DataEntry
+            | CommitteeSessionStatus::Paused
+            | CommitteeSessionStatus::Completed => {
                 Err(CommitteeSessionError::InvalidStatusTransition)
             }
         }
@@ -202,26 +200,22 @@ impl CommitteeSessionStatus {
     pub fn start_data_entry(self) -> Result<Self, CommitteeSessionError> {
         match self {
             CommitteeSessionStatus::Created => Err(CommitteeSessionError::InvalidStatusTransition),
-            CommitteeSessionStatus::DataEntryNotStarted => {
-                Ok(CommitteeSessionStatus::DataEntryInProgress)
-            }
-            CommitteeSessionStatus::DataEntryInProgress => Ok(self),
-            CommitteeSessionStatus::DataEntryPaused | CommitteeSessionStatus::DataEntryFinished => {
-                Ok(CommitteeSessionStatus::DataEntryInProgress)
+            CommitteeSessionStatus::InPreparation => Ok(CommitteeSessionStatus::DataEntry),
+            CommitteeSessionStatus::DataEntry => Ok(self),
+            CommitteeSessionStatus::Paused | CommitteeSessionStatus::Completed => {
+                Ok(CommitteeSessionStatus::DataEntry)
             }
         }
     }
 
     pub fn pause_data_entry(self) -> Result<Self, CommitteeSessionError> {
         match self {
-            CommitteeSessionStatus::Created | CommitteeSessionStatus::DataEntryNotStarted => {
+            CommitteeSessionStatus::Created | CommitteeSessionStatus::InPreparation => {
                 Err(CommitteeSessionError::InvalidStatusTransition)
             }
-            CommitteeSessionStatus::DataEntryInProgress => {
-                Ok(CommitteeSessionStatus::DataEntryPaused)
-            }
-            CommitteeSessionStatus::DataEntryPaused => Ok(self),
-            CommitteeSessionStatus::DataEntryFinished => {
+            CommitteeSessionStatus::DataEntry => Ok(CommitteeSessionStatus::Paused),
+            CommitteeSessionStatus::Paused => Ok(self),
+            CommitteeSessionStatus::Completed => {
                 Err(CommitteeSessionError::InvalidStatusTransition)
             }
         }
@@ -233,18 +227,17 @@ impl CommitteeSessionStatus {
         committee_session: &CommitteeSession,
     ) -> Result<Self, CommitteeSessionError> {
         match self {
-            CommitteeSessionStatus::Created | CommitteeSessionStatus::DataEntryNotStarted => {
+            CommitteeSessionStatus::Created | CommitteeSessionStatus::InPreparation => {
                 Err(CommitteeSessionError::InvalidStatusTransition)
             }
-            CommitteeSessionStatus::DataEntryInProgress
-            | CommitteeSessionStatus::DataEntryPaused => {
+            CommitteeSessionStatus::DataEntry | CommitteeSessionStatus::Paused => {
                 if !are_results_complete_for_committee_session(conn, committee_session.id).await? {
                     Err(CommitteeSessionError::InvalidStatusTransition)
                 } else {
-                    Ok(CommitteeSessionStatus::DataEntryFinished)
+                    Ok(CommitteeSessionStatus::Completed)
                 }
             }
-            CommitteeSessionStatus::DataEntryFinished => Ok(self),
+            CommitteeSessionStatus::Completed => Ok(self),
         }
     }
 }
@@ -287,27 +280,27 @@ mod tests {
             let mut conn = pool.acquire().await?;
             let audit_service = AuditService::new(None, Some(Ipv4Addr::new(203, 0, 113, 0).into()));
 
-            // DataEntryInProgress --> DataEntryFinished
+            // DataEntry --> Completed
             change_committee_session_status(
                 &mut conn,
                 6,
-                CommitteeSessionStatus::DataEntryFinished,
+                CommitteeSessionStatus::Completed,
                 audit_service.clone(),
             )
             .await?;
             let session = get(&mut conn, 6).await?;
-            assert_eq!(session.status, CommitteeSessionStatus::DataEntryFinished);
+            assert_eq!(session.status, CommitteeSessionStatus::Completed);
 
-            // DataEntryFinished --> DataEntryInProgress
+            // Completed --> DataEntry
             change_committee_session_status(
                 &mut conn,
                 6,
-                CommitteeSessionStatus::DataEntryInProgress,
+                CommitteeSessionStatus::DataEntry,
                 audit_service,
             )
             .await?;
             let session = get(&mut conn, 6).await?;
-            assert_eq!(session.status, CommitteeSessionStatus::DataEntryInProgress);
+            assert_eq!(session.status, CommitteeSessionStatus::DataEntry);
 
             // No FileDeleted events should be logged
             assert_eq!(
@@ -322,16 +315,16 @@ mod tests {
             let mut conn = pool.acquire().await?;
             let audit_service = AuditService::new(None, Some(Ipv4Addr::new(203, 0, 113, 0).into()));
 
-            // DataEntryInProgress --> DataEntryFinished
+            // DataEntry --> Completed
             change_committee_session_status(
                 &mut conn,
                 6,
-                CommitteeSessionStatus::DataEntryFinished,
+                CommitteeSessionStatus::Completed,
                 audit_service.clone(),
             )
             .await?;
             let session = get(&mut conn, 6).await?;
-            assert_eq!(session.status, CommitteeSessionStatus::DataEntryFinished);
+            assert_eq!(session.status, CommitteeSessionStatus::Completed);
 
             let files_update = CommitteeSessionFilesUpdateRequest {
                 results_eml: Some(generate_test_file(&mut conn).await?),
@@ -340,16 +333,16 @@ mod tests {
             };
             change_files(&mut conn, 6, files_update).await?;
 
-            // DataEntryFinished --> DataEntryInProgress
+            // Completed --> DataEntry
             change_committee_session_status(
                 &mut conn,
                 6,
-                CommitteeSessionStatus::DataEntryInProgress,
+                CommitteeSessionStatus::DataEntry,
                 audit_service,
             )
             .await?;
             let session = get(&mut conn, 6).await?;
-            assert_eq!(session.status, CommitteeSessionStatus::DataEntryInProgress);
+            assert_eq!(session.status, CommitteeSessionStatus::DataEntry);
 
             assert_eq!(
                 list_event_names(&mut conn).await?,
@@ -390,56 +383,54 @@ mod tests {
             );
         }
 
-        /// DataEntryNotStarted --> Created
+        /// InPreparation --> Created
         #[test(sqlx::test(fixtures(
             path = "../../fixtures",
             scripts("election_6_no_polling_stations")
         )))]
-        async fn data_entry_not_started_to_created_no_polling_stations(pool: SqlitePool) {
+        async fn in_preparation_to_created_no_polling_stations(pool: SqlitePool) {
             let mut conn = pool.acquire().await.unwrap();
             let committee_session = get(&mut conn, 7).await.unwrap();
             assert_eq!(
-                CommitteeSessionStatus::DataEntryNotStarted
+                CommitteeSessionStatus::InPreparation
                     .prepare_data_entry(&mut conn, &committee_session)
                     .await,
                 Ok(CommitteeSessionStatus::Created)
             );
         }
 
-        /// DataEntryNotStarted --> Created
+        /// InPreparation --> Created
         #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
-        async fn data_entry_not_started_to_created_with_polling_stations(pool: SqlitePool) {
+        async fn in_preparation_to_created_with_polling_stations(pool: SqlitePool) {
             let mut conn = pool.acquire().await.unwrap();
             let committee_session = get(&mut conn, 2).await.unwrap();
             assert_eq!(
-                CommitteeSessionStatus::DataEntryNotStarted
+                CommitteeSessionStatus::InPreparation
                     .prepare_data_entry(&mut conn, &committee_session)
                     .await,
                 Err(CommitteeSessionError::InvalidStatusTransition)
             );
         }
 
-        /// DataEntryNotStarted --> Created
+        /// InPreparation --> Created
         #[test(sqlx::test(fixtures(
             path = "../../fixtures",
             scripts("election_7_four_sessions")
         )))]
-        async fn data_entry_not_started_to_created_next_session_no_investigation(pool: SqlitePool) {
+        async fn in_preparation_to_created_next_session_no_investigation(pool: SqlitePool) {
             let mut conn = pool.acquire().await.unwrap();
             let committee_session = get(&mut conn, 704).await.unwrap();
             assert_eq!(
-                CommitteeSessionStatus::DataEntryNotStarted
+                CommitteeSessionStatus::InPreparation
                     .prepare_data_entry(&mut conn, &committee_session)
                     .await,
                 Ok(CommitteeSessionStatus::Created)
             );
         }
 
-        /// DataEntryNotStarted --> Created
+        /// InPreparation --> Created
         #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_5_with_results"))))]
-        async fn data_entry_not_started_to_created_next_session_with_investigation(
-            pool: SqlitePool,
-        ) {
+        async fn in_preparation_to_created_next_session_with_investigation(pool: SqlitePool) {
             let mut conn = pool.acquire().await.unwrap();
             let committee_session = get(&mut conn, 6).await.unwrap();
             create_polling_station_investigation(
@@ -452,63 +443,61 @@ mod tests {
             .await
             .unwrap();
             assert_eq!(
-                CommitteeSessionStatus::DataEntryNotStarted
+                CommitteeSessionStatus::InPreparation
                     .prepare_data_entry(&mut conn, &committee_session)
                     .await,
                 Err(CommitteeSessionError::InvalidStatusTransition)
             );
         }
 
-        /// DataEntryInProgress --> Created
+        /// DataEntry --> Created
         #[test(sqlx::test(fixtures(
             path = "../../fixtures",
             scripts("election_6_no_polling_stations")
         )))]
-        async fn data_entry_in_progress_to_created_no_polling_stations(pool: SqlitePool) {
+        async fn data_entry_to_created_no_polling_stations(pool: SqlitePool) {
             let mut conn = pool.acquire().await.unwrap();
             let committee_session = get(&mut conn, 7).await.unwrap();
             assert_eq!(
-                CommitteeSessionStatus::DataEntryInProgress
+                CommitteeSessionStatus::DataEntry
                     .prepare_data_entry(&mut conn, &committee_session)
                     .await,
                 Ok(CommitteeSessionStatus::Created)
             );
         }
 
-        /// DataEntryInProgress --> Created
+        /// DataEntry --> Created
         #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
-        async fn data_entry_in_progress_to_created_with_polling_stations(pool: SqlitePool) {
+        async fn data_entry_to_created_with_polling_stations(pool: SqlitePool) {
             let mut conn = pool.acquire().await.unwrap();
             let committee_session = get(&mut conn, 2).await.unwrap();
             assert_eq!(
-                CommitteeSessionStatus::DataEntryInProgress
+                CommitteeSessionStatus::DataEntry
                     .prepare_data_entry(&mut conn, &committee_session)
                     .await,
                 Err(CommitteeSessionError::InvalidStatusTransition)
             );
         }
 
-        /// DataEntryInProgress --> Created
+        /// DataEntry --> Created
         #[test(sqlx::test(fixtures(
             path = "../../fixtures",
             scripts("election_7_four_sessions")
         )))]
-        async fn data_entry_in_progress_to_created_next_session_no_investigation(pool: SqlitePool) {
+        async fn data_entry_to_created_next_session_no_investigation(pool: SqlitePool) {
             let mut conn = pool.acquire().await.unwrap();
             let committee_session = get(&mut conn, 704).await.unwrap();
             assert_eq!(
-                CommitteeSessionStatus::DataEntryInProgress
+                CommitteeSessionStatus::DataEntry
                     .prepare_data_entry(&mut conn, &committee_session)
                     .await,
                 Ok(CommitteeSessionStatus::Created)
             );
         }
 
-        /// DataEntryInProgress --> Created
+        /// DataEntry --> Created
         #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_5_with_results"))))]
-        async fn data_entry_in_progress_to_created_next_session_with_investigation(
-            pool: SqlitePool,
-        ) {
+        async fn data_entry_to_created_next_session_with_investigation(pool: SqlitePool) {
             let mut conn = pool.acquire().await.unwrap();
             let committee_session = get(&mut conn, 6).await.unwrap();
             create_polling_station_investigation(
@@ -521,61 +510,61 @@ mod tests {
             .await
             .unwrap();
             assert_eq!(
-                CommitteeSessionStatus::DataEntryInProgress
+                CommitteeSessionStatus::DataEntry
                     .prepare_data_entry(&mut conn, &committee_session)
                     .await,
                 Err(CommitteeSessionError::InvalidStatusTransition)
             );
         }
 
-        /// DataEntryPaused --> Created
+        /// Paused --> Created
         #[test(sqlx::test(fixtures(
             path = "../../fixtures",
             scripts("election_6_no_polling_stations")
         )))]
-        async fn data_entry_paused_to_created_no_polling_stations(pool: SqlitePool) {
+        async fn paused_to_created_no_polling_stations(pool: SqlitePool) {
             let mut conn = pool.acquire().await.unwrap();
             let committee_session = get(&mut conn, 7).await.unwrap();
             assert_eq!(
-                CommitteeSessionStatus::DataEntryPaused
+                CommitteeSessionStatus::Paused
                     .prepare_data_entry(&mut conn, &committee_session)
                     .await,
                 Ok(CommitteeSessionStatus::Created)
             );
         }
 
-        /// DataEntryPaused --> Created
+        /// Paused --> Created
         #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
-        async fn data_entry_paused_to_created_with_polling_stations(pool: SqlitePool) {
+        async fn paused_to_created_with_polling_stations(pool: SqlitePool) {
             let mut conn = pool.acquire().await.unwrap();
             let committee_session = get(&mut conn, 2).await.unwrap();
             assert_eq!(
-                CommitteeSessionStatus::DataEntryPaused
+                CommitteeSessionStatus::Paused
                     .prepare_data_entry(&mut conn, &committee_session)
                     .await,
                 Err(CommitteeSessionError::InvalidStatusTransition)
             );
         }
 
-        /// DataEntryPaused --> Created
+        /// Paused --> Created
         #[test(sqlx::test(fixtures(
             path = "../../fixtures",
             scripts("election_7_four_sessions")
         )))]
-        async fn data_entry_paused_to_created_next_session_no_investigation(pool: SqlitePool) {
+        async fn paused_to_created_next_session_no_investigation(pool: SqlitePool) {
             let mut conn = pool.acquire().await.unwrap();
             let committee_session = get(&mut conn, 704).await.unwrap();
             assert_eq!(
-                CommitteeSessionStatus::DataEntryPaused
+                CommitteeSessionStatus::Paused
                     .prepare_data_entry(&mut conn, &committee_session)
                     .await,
                 Ok(CommitteeSessionStatus::Created)
             );
         }
 
-        /// DataEntryPaused --> Created
+        /// Paused --> Created
         #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_5_with_results"))))]
-        async fn data_entry_paused_to_created_next_session_with_investigation(pool: SqlitePool) {
+        async fn paused_to_created_next_session_with_investigation(pool: SqlitePool) {
             let mut conn = pool.acquire().await.unwrap();
             let committee_session = get(&mut conn, 6).await.unwrap();
             create_polling_station_investigation(
@@ -588,61 +577,61 @@ mod tests {
             .await
             .unwrap();
             assert_eq!(
-                CommitteeSessionStatus::DataEntryPaused
+                CommitteeSessionStatus::Paused
                     .prepare_data_entry(&mut conn, &committee_session)
                     .await,
                 Err(CommitteeSessionError::InvalidStatusTransition)
             );
         }
 
-        /// DataEntryFinished --> Created
+        /// Completed --> Created
         #[test(sqlx::test(fixtures(
             path = "../../fixtures",
             scripts("election_6_no_polling_stations")
         )))]
-        async fn data_entry_finished_to_created_no_polling_stations(pool: SqlitePool) {
+        async fn data_entry_completed_to_created_no_polling_stations(pool: SqlitePool) {
             let mut conn = pool.acquire().await.unwrap();
             let committee_session = get(&mut conn, 7).await.unwrap();
             assert_eq!(
-                CommitteeSessionStatus::DataEntryFinished
+                CommitteeSessionStatus::Completed
                     .prepare_data_entry(&mut conn, &committee_session)
                     .await,
                 Ok(CommitteeSessionStatus::Created)
             );
         }
 
-        /// DataEntryFinished --> Created
+        /// Completed --> Created
         #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
-        async fn data_entry_finished_to_created_with_polling_stations(pool: SqlitePool) {
+        async fn data_entry_completed_to_created_with_polling_stations(pool: SqlitePool) {
             let mut conn = pool.acquire().await.unwrap();
             let committee_session = get(&mut conn, 2).await.unwrap();
             assert_eq!(
-                CommitteeSessionStatus::DataEntryFinished
+                CommitteeSessionStatus::Completed
                     .prepare_data_entry(&mut conn, &committee_session)
                     .await,
                 Err(CommitteeSessionError::InvalidStatusTransition)
             );
         }
 
-        /// DataEntryFinished --> Created
+        /// Completed --> Created
         #[test(sqlx::test(fixtures(
             path = "../../fixtures",
             scripts("election_7_four_sessions")
         )))]
-        async fn data_entry_finished_to_created_next_session_no_investigation(pool: SqlitePool) {
+        async fn data_entry_completed_to_created_next_session_no_investigation(pool: SqlitePool) {
             let mut conn = pool.acquire().await.unwrap();
             let committee_session = get(&mut conn, 704).await.unwrap();
             assert_eq!(
-                CommitteeSessionStatus::DataEntryFinished
+                CommitteeSessionStatus::Completed
                     .prepare_data_entry(&mut conn, &committee_session)
                     .await,
                 Ok(CommitteeSessionStatus::Created)
             );
         }
 
-        /// DataEntryFinished --> Created
+        /// Completed --> Created
         #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_5_with_results"))))]
-        async fn data_entry_finished_to_created_next_session_with_investigation(pool: SqlitePool) {
+        async fn data_entry_completed_to_created_next_session_with_investigation(pool: SqlitePool) {
             let mut conn = pool.acquire().await.unwrap();
             let committee_session = get(&mut conn, 6).await.unwrap();
             create_polling_station_investigation(
@@ -655,7 +644,7 @@ mod tests {
             .await
             .unwrap();
             assert_eq!(
-                CommitteeSessionStatus::DataEntryFinished
+                CommitteeSessionStatus::Completed
                     .prepare_data_entry(&mut conn, &committee_session)
                     .await,
                 Err(CommitteeSessionError::InvalidStatusTransition)
@@ -672,12 +661,12 @@ mod tests {
         };
         use sqlx::SqlitePool;
 
-        /// Created --> DataEntryNotStarted
+        /// Created --> InPreparation
         #[test(sqlx::test(fixtures(
             path = "../../fixtures",
             scripts("election_6_no_polling_stations")
         )))]
-        async fn created_to_data_entry_not_started_no_polling_stations(pool: SqlitePool) {
+        async fn created_to_in_preparation_no_polling_stations(pool: SqlitePool) {
             let mut conn = pool.acquire().await.unwrap();
             let committee_session = get(&mut conn, 7).await.unwrap();
             assert_eq!(
@@ -688,25 +677,25 @@ mod tests {
             );
         }
 
-        /// Created --> DataEntryNotStarted
+        /// Created --> InPreparation
         #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
-        async fn created_to_data_entry_not_started_with_polling_stations(pool: SqlitePool) {
+        async fn created_to_in_preparation_with_polling_stations(pool: SqlitePool) {
             let mut conn = pool.acquire().await.unwrap();
             let committee_session = get(&mut conn, 2).await.unwrap();
             assert_eq!(
                 CommitteeSessionStatus::Created
                     .ready_for_data_entry(&mut conn, &committee_session)
                     .await,
-                Ok(CommitteeSessionStatus::DataEntryNotStarted)
+                Ok(CommitteeSessionStatus::InPreparation)
             );
         }
 
-        /// Created --> DataEntryNotStarted
+        /// Created --> InPreparation
         #[test(sqlx::test(fixtures(
             path = "../../fixtures",
             scripts("election_7_four_sessions")
         )))]
-        async fn created_to_data_entry_not_started_next_session_no_investigation(pool: SqlitePool) {
+        async fn created_to_in_preparation_next_session_no_investigation(pool: SqlitePool) {
             let mut conn = pool.acquire().await.unwrap();
             let committee_session = get(&mut conn, 704).await.unwrap();
             assert_eq!(
@@ -717,11 +706,9 @@ mod tests {
             );
         }
 
-        /// Created --> DataEntryNotStarted
+        /// Created --> InPreparation
         #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_5_with_results"))))]
-        async fn created_to_data_entry_not_started_next_session_with_investigation(
-            pool: SqlitePool,
-        ) {
+        async fn created_to_in_preparation_next_session_with_investigation(pool: SqlitePool) {
             let mut conn = pool.acquire().await.unwrap();
             let committee_session = get(&mut conn, 6).await.unwrap();
             create_polling_station_investigation(
@@ -737,56 +724,56 @@ mod tests {
                 CommitteeSessionStatus::Created
                     .ready_for_data_entry(&mut conn, &committee_session)
                     .await,
-                Ok(CommitteeSessionStatus::DataEntryNotStarted)
+                Ok(CommitteeSessionStatus::InPreparation)
             );
         }
 
-        /// DataEntryNotStarted --> DataEntryNotStarted
+        /// InPreparation --> InPreparation
         #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
-        async fn data_entry_not_started_to_data_entry_not_started(pool: SqlitePool) {
+        async fn in_preparation_to_in_preparation(pool: SqlitePool) {
             let mut conn = pool.acquire().await.unwrap();
             let committee_session = get(&mut conn, 2).await.unwrap();
             assert_eq!(
-                CommitteeSessionStatus::DataEntryNotStarted
+                CommitteeSessionStatus::InPreparation
                     .ready_for_data_entry(&mut conn, &committee_session)
                     .await,
-                Ok(CommitteeSessionStatus::DataEntryNotStarted)
+                Ok(CommitteeSessionStatus::InPreparation)
             );
         }
 
-        /// DataEntryInProgress --> DataEntryNotStarted
+        /// DataEntry --> InPreparation
         #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
-        async fn data_entry_in_progress_to_data_entry_not_started(pool: SqlitePool) {
+        async fn data_entry_to_in_preparation(pool: SqlitePool) {
             let mut conn = pool.acquire().await.unwrap();
             let committee_session = get(&mut conn, 2).await.unwrap();
             assert_eq!(
-                CommitteeSessionStatus::DataEntryInProgress
-                    .ready_for_data_entry(&mut conn, &committee_session)
-                    .await,
-                Err(CommitteeSessionError::InvalidStatusTransition)
-            );
-        }
-
-        /// DataEntryPaused --> DataEntryNotStarted
-        #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
-        async fn data_entry_paused_to_data_entry_not_started(pool: SqlitePool) {
-            let mut conn = pool.acquire().await.unwrap();
-            let committee_session = get(&mut conn, 2).await.unwrap();
-            assert_eq!(
-                CommitteeSessionStatus::DataEntryPaused
+                CommitteeSessionStatus::DataEntry
                     .ready_for_data_entry(&mut conn, &committee_session)
                     .await,
                 Err(CommitteeSessionError::InvalidStatusTransition)
             );
         }
 
-        /// DataEntryFinished --> DataEntryNotStarted
+        /// Paused --> InPreparation
         #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
-        async fn data_entry_finished_to_data_entry_not_started(pool: SqlitePool) {
+        async fn paused_to_in_preparation(pool: SqlitePool) {
             let mut conn = pool.acquire().await.unwrap();
             let committee_session = get(&mut conn, 2).await.unwrap();
             assert_eq!(
-                CommitteeSessionStatus::DataEntryFinished
+                CommitteeSessionStatus::Paused
+                    .ready_for_data_entry(&mut conn, &committee_session)
+                    .await,
+                Err(CommitteeSessionError::InvalidStatusTransition)
+            );
+        }
+
+        /// Completed --> InPreparation
+        #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
+        async fn data_entry_completed_to_in_preparation(pool: SqlitePool) {
+            let mut conn = pool.acquire().await.unwrap();
+            let committee_session = get(&mut conn, 2).await.unwrap();
+            assert_eq!(
+                CommitteeSessionStatus::Completed
                     .ready_for_data_entry(&mut conn, &committee_session)
                     .await,
                 Err(CommitteeSessionError::InvalidStatusTransition)
@@ -799,48 +786,48 @@ mod tests {
 
         use super::{CommitteeSessionError, CommitteeSessionStatus};
 
-        /// Created --> DataEntryInProgress
+        /// Created --> DataEntry
         #[test]
-        fn created_to_data_entry_in_progress() {
+        fn created_to_data_entry() {
             assert_eq!(
                 CommitteeSessionStatus::Created.start_data_entry(),
                 Err(CommitteeSessionError::InvalidStatusTransition)
             );
         }
 
-        /// DataEntryNotStarted --> DataEntryInProgress
+        /// InPreparation --> DataEntry
         #[test]
-        fn data_entry_not_started_to_data_entry_in_progress() {
+        fn in_preparation_to_data_entry() {
             assert_eq!(
-                CommitteeSessionStatus::DataEntryNotStarted.start_data_entry(),
-                Ok(CommitteeSessionStatus::DataEntryInProgress)
+                CommitteeSessionStatus::InPreparation.start_data_entry(),
+                Ok(CommitteeSessionStatus::DataEntry)
             );
         }
 
-        /// DataEntryInProgress --> DataEntryInProgress
+        /// DataEntry --> DataEntry
         #[test]
-        fn data_entry_in_progress_to_data_entry_in_progress() {
+        fn data_entry_to_data_entry() {
             assert_eq!(
-                CommitteeSessionStatus::DataEntryInProgress.start_data_entry(),
-                Ok(CommitteeSessionStatus::DataEntryInProgress)
+                CommitteeSessionStatus::DataEntry.start_data_entry(),
+                Ok(CommitteeSessionStatus::DataEntry)
             );
         }
 
-        /// DataEntryPaused --> DataEntryInProgress
+        /// Paused --> DataEntry
         #[test]
-        fn data_entry_paused_to_data_entry_in_progress() {
+        fn paused_to_data_entry() {
             assert_eq!(
-                CommitteeSessionStatus::DataEntryPaused.start_data_entry(),
-                Ok(CommitteeSessionStatus::DataEntryInProgress)
+                CommitteeSessionStatus::Paused.start_data_entry(),
+                Ok(CommitteeSessionStatus::DataEntry)
             );
         }
 
-        /// DataEntryFinished --> DataEntryInProgress
+        /// Completed --> DataEntry
         #[test]
-        fn data_entry_finished_to_data_entry_in_progress() {
+        fn data_entry_completed_to_data_entry() {
             assert_eq!(
-                CommitteeSessionStatus::DataEntryFinished.start_data_entry(),
-                Ok(CommitteeSessionStatus::DataEntryInProgress)
+                CommitteeSessionStatus::Completed.start_data_entry(),
+                Ok(CommitteeSessionStatus::DataEntry)
             );
         }
     }
@@ -850,47 +837,47 @@ mod tests {
 
         use super::{CommitteeSessionError, CommitteeSessionStatus};
 
-        /// Created --> DataEntryPaused
+        /// Created --> Paused
         #[test]
-        fn created_to_data_entry_paused() {
+        fn created_to_paused() {
             assert_eq!(
                 CommitteeSessionStatus::Created.pause_data_entry(),
                 Err(CommitteeSessionError::InvalidStatusTransition)
             );
         }
 
-        /// DataEntryNotStarted --> DataEntryPaused
+        /// InPreparation --> Paused
         #[test]
-        fn data_entry_not_started_to_data_entry_paused() {
+        fn in_preparation_to_paused() {
             assert_eq!(
-                CommitteeSessionStatus::DataEntryNotStarted.pause_data_entry(),
+                CommitteeSessionStatus::InPreparation.pause_data_entry(),
                 Err(CommitteeSessionError::InvalidStatusTransition)
             );
         }
 
-        /// DataEntryInProgress --> DataEntryPaused
+        /// DataEntry --> Paused
         #[test]
-        fn data_entry_in_progress_to_data_entry_paused() {
+        fn data_entry_to_paused() {
             assert_eq!(
-                CommitteeSessionStatus::DataEntryInProgress.pause_data_entry(),
-                Ok(CommitteeSessionStatus::DataEntryPaused)
+                CommitteeSessionStatus::DataEntry.pause_data_entry(),
+                Ok(CommitteeSessionStatus::Paused)
             );
         }
 
-        /// DataEntryPaused --> DataEntryPaused
+        /// Paused --> Paused
         #[test]
-        fn data_entry_paused_to_data_entry_paused() {
+        fn paused_to_paused() {
             assert_eq!(
-                CommitteeSessionStatus::DataEntryPaused.pause_data_entry(),
-                Ok(CommitteeSessionStatus::DataEntryPaused)
+                CommitteeSessionStatus::Paused.pause_data_entry(),
+                Ok(CommitteeSessionStatus::Paused)
             );
         }
 
-        /// DataEntryFinished --> DataEntryPaused
+        /// Completed --> Paused
         #[test]
-        fn data_entry_finished_to_data_entry_paused() {
+        fn data_entry_completed_to_paused() {
             assert_eq!(
-                CommitteeSessionStatus::DataEntryFinished.pause_data_entry(),
+                CommitteeSessionStatus::Completed.pause_data_entry(),
                 Err(CommitteeSessionError::InvalidStatusTransition)
             );
         }
@@ -914,9 +901,9 @@ mod tests {
         use sqlx::SqlitePool;
         use test_log::test;
 
-        /// Created --> DataEntryFinished
+        /// Created --> Completed
         #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
-        async fn created_to_data_entry_finished(pool: SqlitePool) {
+        async fn created_to_completed(pool: SqlitePool) {
             let mut conn = pool.acquire().await.unwrap();
             let committee_session = get(&mut conn, 2).await.unwrap();
             assert_eq!(
@@ -927,22 +914,22 @@ mod tests {
             );
         }
 
-        /// DataEntryNotStarted --> DataEntryFinished
+        /// InPreparation --> Completed
         #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
-        async fn data_entry_not_started_to_data_entry_finished(pool: SqlitePool) {
+        async fn in_preparation_to_completed(pool: SqlitePool) {
             let mut conn = pool.acquire().await.unwrap();
             let committee_session = get(&mut conn, 2).await.unwrap();
             assert_eq!(
-                CommitteeSessionStatus::DataEntryNotStarted
+                CommitteeSessionStatus::InPreparation
                     .finish_data_entry(&mut conn, &committee_session)
                     .await,
                 Err(CommitteeSessionError::InvalidStatusTransition)
             );
         }
 
-        /// DataEntryInProgress --> DataEntryFinished
+        /// DataEntry --> Completed
         #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
-        async fn data_entry_in_progress_to_data_entry_finished(pool: SqlitePool) {
+        async fn data_entry_to_completed(pool: SqlitePool) {
             let mut conn = pool.acquire().await.unwrap();
             let committee_session = get(&mut conn, 2).await.unwrap();
 
@@ -966,18 +953,16 @@ mod tests {
             .unwrap();
 
             assert_eq!(
-                CommitteeSessionStatus::DataEntryInProgress
+                CommitteeSessionStatus::DataEntry
                     .finish_data_entry(&mut conn, &committee_session)
                     .await,
-                Ok(CommitteeSessionStatus::DataEntryFinished)
+                Ok(CommitteeSessionStatus::Completed)
             );
         }
 
-        /// DataEntryInProgress --> DataEntryFinished
+        /// DataEntry --> Completed
         #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_5_with_results"))))]
-        async fn data_entry_in_progress_to_data_entry_finished_next_session_not_finished(
-            pool: SqlitePool,
-        ) {
+        async fn data_entry_to_completed_next_session_not_finished(pool: SqlitePool) {
             let mut conn = pool.acquire().await.unwrap();
             let committee_session = get(&mut conn, 6).await.unwrap();
             create_polling_station_investigation(
@@ -990,18 +975,16 @@ mod tests {
             .await
             .unwrap();
             assert_eq!(
-                CommitteeSessionStatus::DataEntryInProgress
+                CommitteeSessionStatus::DataEntry
                     .finish_data_entry(&mut conn, &committee_session)
                     .await,
                 Err(CommitteeSessionError::InvalidStatusTransition)
             );
         }
 
-        /// DataEntryInProgress --> DataEntryFinished
+        /// DataEntry --> Completed
         #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_5_with_results"))))]
-        async fn data_entry_in_progress_to_data_entry_finished_next_session_not_finished_no_results(
-            pool: SqlitePool,
-        ) {
+        async fn data_entry_to_completed_next_session_not_finished_no_results(pool: SqlitePool) {
             let mut conn = pool.acquire().await.unwrap();
             let committee_session = get(&mut conn, 6).await.unwrap();
             create_polling_station_investigation(
@@ -1024,18 +1007,16 @@ mod tests {
             .await
             .unwrap();
             assert_eq!(
-                CommitteeSessionStatus::DataEntryInProgress
+                CommitteeSessionStatus::DataEntry
                     .finish_data_entry(&mut conn, &committee_session)
                     .await,
                 Err(CommitteeSessionError::InvalidStatusTransition)
             );
         }
 
-        /// DataEntryInProgress --> DataEntryFinished
+        /// DataEntry --> Completed
         #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_5_with_results"))))]
-        async fn data_entry_in_progress_to_data_entry_finished_next_session_finished(
-            pool: SqlitePool,
-        ) {
+        async fn data_entry_to_completed_next_session_finished(pool: SqlitePool) {
             let mut conn = pool.acquire().await.unwrap();
             let committee_session = get(&mut conn, 6).await.unwrap();
             create_polling_station_investigation(
@@ -1058,18 +1039,16 @@ mod tests {
             .await
             .unwrap();
             assert_eq!(
-                CommitteeSessionStatus::DataEntryInProgress
+                CommitteeSessionStatus::DataEntry
                     .finish_data_entry(&mut conn, &committee_session)
                     .await,
-                Ok(CommitteeSessionStatus::DataEntryFinished)
+                Ok(CommitteeSessionStatus::Completed)
             );
         }
 
-        /// DataEntryInProgress --> DataEntryFinished
+        /// DataEntry --> Completed
         #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_5_with_results"))))]
-        async fn data_entry_in_progress_to_data_entry_finished_next_session_finished_with_result(
-            pool: SqlitePool,
-        ) {
+        async fn data_entry_to_completed_next_session_finished_with_result(pool: SqlitePool) {
             let mut conn = pool.acquire().await.unwrap();
             let committee_session = get(&mut conn, 6).await.unwrap();
             let polling_station_id = 9;
@@ -1117,37 +1096,37 @@ mod tests {
             .unwrap();
 
             assert_eq!(
-                CommitteeSessionStatus::DataEntryInProgress
+                CommitteeSessionStatus::DataEntry
                     .finish_data_entry(&mut conn, &committee_session)
                     .await,
-                Ok(CommitteeSessionStatus::DataEntryFinished)
+                Ok(CommitteeSessionStatus::Completed)
             );
         }
 
-        /// DataEntryPaused --> DataEntryFinished
+        /// Paused --> Completed
         #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_5_with_results"))))]
-        async fn data_entry_paused_to_data_entry_finished(pool: SqlitePool) {
+        async fn paused_to_completed(pool: SqlitePool) {
             let mut conn = pool.acquire().await.unwrap();
             let committee_session = get(&mut conn, 6).await.unwrap();
 
             assert_eq!(
-                CommitteeSessionStatus::DataEntryPaused
+                CommitteeSessionStatus::Paused
                     .finish_data_entry(&mut conn, &committee_session)
                     .await,
-                Ok(CommitteeSessionStatus::DataEntryFinished)
+                Ok(CommitteeSessionStatus::Completed)
             );
         }
 
-        /// DataEntryFinished --> DataEntryFinished
+        /// Completed --> Completed
         #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_5_with_results"))))]
-        async fn data_entry_finished_to_data_entry_finished(pool: SqlitePool) {
+        async fn completed_to_completed(pool: SqlitePool) {
             let mut conn = pool.acquire().await.unwrap();
             let committee_session = get(&mut conn, 6).await.unwrap();
             assert_eq!(
-                CommitteeSessionStatus::DataEntryFinished
+                CommitteeSessionStatus::Completed
                     .finish_data_entry(&mut conn, &committee_session)
                     .await,
-                Ok(CommitteeSessionStatus::DataEntryFinished)
+                Ok(CommitteeSessionStatus::Completed)
             );
         }
     }

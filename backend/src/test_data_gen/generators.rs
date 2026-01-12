@@ -48,7 +48,7 @@ async fn generate_data_entries(
     let committee_session = committee_session::repository::change_status(
         conn,
         committee_session.id,
-        CommitteeSessionStatus::DataEntryInProgress,
+        CommitteeSessionStatus::DataEntry,
     )
     .await?;
 
@@ -98,7 +98,7 @@ pub async fn create_test_election(
         committee_session = committee_session::repository::change_status(
             &mut tx,
             committee_session.id,
-            CommitteeSessionStatus::DataEntryNotStarted,
+            CommitteeSessionStatus::InPreparation,
         )
         .await?;
     }

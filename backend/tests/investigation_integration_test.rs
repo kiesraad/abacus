@@ -157,7 +157,7 @@ async fn test_deletion_setting_committee_session_back_to_created_status(pool: Sq
 
     let committee_session =
         get_election_committee_session(&addr, &coordinator_login(&addr).await, election_id).await;
-    assert_eq!(committee_session["status"], "data_entry_not_started");
+    assert_eq!(committee_session["status"], "in_preparation");
 
     // Delete last investigation
     assert_eq!(
@@ -444,7 +444,7 @@ async fn test_creation_for_committee_session_with_created_status(pool: SqlitePoo
 
     let committee_session =
         get_election_committee_session(&addr, &coordinator_login(&addr).await, election_id).await;
-    assert_eq!(committee_session["status"], "data_entry_not_started");
+    assert_eq!(committee_session["status"], "in_preparation");
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_7_four_sessions", "users"))))]
@@ -698,12 +698,12 @@ async fn check_finished_to_in_progress_on<F, Fut>(
         &coordinator_cookie,
         election_id,
         committee_session_id,
-        "data_entry_finished",
+        "completed",
     )
     .await;
     let committee_session =
         get_election_committee_session(addr, &coordinator_cookie, election_id).await;
-    assert_eq!(committee_session["status"], "data_entry_finished");
+    assert_eq!(committee_session["status"], "completed");
 
     let status = action().await.status();
     assert_eq!(status, expected_status, "Unexpected response status");
@@ -711,7 +711,7 @@ async fn check_finished_to_in_progress_on<F, Fut>(
     let coordinator_cookie = coordinator_login(addr).await;
     let committee_session =
         get_election_committee_session(addr, &coordinator_cookie, election_id).await;
-    assert_eq!(committee_session["status"], "data_entry_in_progress");
+    assert_eq!(committee_session["status"], "data_entry");
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_5_with_results", "users"))))]
@@ -790,12 +790,12 @@ async fn test_finished_to_created_on_delete_last(pool: SqlitePool) {
         &coordinator_cookie,
         election_id,
         committee_session_id,
-        "data_entry_finished",
+        "completed",
     )
     .await;
     let committee_session =
         get_election_committee_session(&addr, &coordinator_cookie, election_id).await;
-    assert_eq!(committee_session["status"], "data_entry_finished");
+    assert_eq!(committee_session["status"], "completed");
 
     let status = delete_investigation(&addr, 741).await.status();
     assert_eq!(status, StatusCode::NO_CONTENT);

@@ -506,13 +506,7 @@ export interface CommitteeSessionDetails {
 /**
  * Committee session status
  */
-export const committeeSessionStatusValues = [
-  "created",
-  "data_entry_not_started",
-  "data_entry_in_progress",
-  "data_entry_paused",
-  "data_entry_finished",
-] as const;
+export const committeeSessionStatusValues = ["created", "in_preparation", "data_entry", "paused", "completed"] as const;
 export type CommitteeSessionStatus = (typeof committeeSessionStatusValues)[number];
 
 /**

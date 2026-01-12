@@ -8,6 +8,6 @@ export function isPollingStationCreateAndUpdateAllowed(
   return (
     isCoordinator ||
     (isAdministrator &&
-      (currentCommitteeSessionStatus === "created" || currentCommitteeSessionStatus === "data_entry_not_started"))
+      (currentCommitteeSessionStatus === "created" || currentCommitteeSessionStatus === "in_preparation"))
   );
 }

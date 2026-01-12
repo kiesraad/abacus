@@ -61,7 +61,7 @@ describe("PollingStationCreatePage", () => {
   });
 
   test("Navigates back on save with a warning message when data entry finished", async () => {
-    overrideOnce("get", "/api/elections/1", 200, getElectionMockData({}, { status: "data_entry_finished" }));
+    overrideOnce("get", "/api/elections/1", 200, getElectionMockData({}, { status: "completed" }));
     const user = userEvent.setup();
 
     renderPage();

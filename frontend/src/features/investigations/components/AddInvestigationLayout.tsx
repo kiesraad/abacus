@@ -32,7 +32,7 @@ export function AddInvestigationLayout() {
   const shouldShowModal = useCallback(
     (path: string) => {
       const section = path.split("/").pop();
-      return section === "findings" && currentCommitteeSession.status === "data_entry_not_started";
+      return section === "findings" && currentCommitteeSession.status === "in_preparation";
     },
     [currentCommitteeSession.status],
   );
@@ -82,10 +82,10 @@ export function AddInvestigationLayout() {
           <h1>{pollingStation.name}</h1>
         </section>
       </header>
-      {currentCommitteeSession.status === "data_entry_finished" && (
+      {currentCommitteeSession.status === "completed" && (
         <Alert type="warning">
-          <strong className="heading-md">{t("investigations.warning_data_entry_finished.title")}</strong>
-          <p>{t("investigations.warning_data_entry_finished.description")}</p>
+          <strong className="heading-md">{t("investigations.warning_completed.title")}</strong>
+          <p>{t("investigations.warning_completed.description")}</p>
         </Alert>
       )}
       <main>

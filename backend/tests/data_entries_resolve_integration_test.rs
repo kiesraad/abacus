@@ -141,7 +141,7 @@ async fn test_polling_station_data_entry_get_errors(pool: SqlitePool) {
         serde_json::json!([])
     );
 
-    change_status_committee_session(&addr, &coordinator_cookie, 2, 2, "data_entry_paused").await;
+    change_status_committee_session(&addr, &coordinator_cookie, 2, 2, "paused").await;
 
     let response = get_data_entry(&addr, &coordinator_cookie, 1).await;
     assert_eq!(response.status(), StatusCode::OK);
@@ -197,7 +197,7 @@ async fn test_polling_station_data_entry_resolve_errors_resume(pool: SqlitePool)
 
     let coordinator_cookie = coordinator_login(&addr).await;
 
-    change_status_committee_session(&addr, &coordinator_cookie, 2, 2, "data_entry_paused").await;
+    change_status_committee_session(&addr, &coordinator_cookie, 2, 2, "paused").await;
 
     let res = resolve_errors(&addr, &coordinator_cookie, 1, "resume_first_entry").await;
     assert_eq!(res.status(), StatusCode::OK);
@@ -256,7 +256,7 @@ async fn test_polling_station_data_entry_get_differences(pool: SqlitePool) {
         result["second_entry"]["voters_counts"]["poll_card_count"]
     );
 
-    change_status_committee_session(&addr, &coordinator_cookie, 2, 2, "data_entry_paused").await;
+    change_status_committee_session(&addr, &coordinator_cookie, 2, 2, "paused").await;
 
     let res = get_resolve_differences(&addr, &coordinator_cookie, 1).await;
     assert_eq!(res.status(), StatusCode::OK);

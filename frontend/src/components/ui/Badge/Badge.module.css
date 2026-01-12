@@ -65,7 +65,7 @@
   color: var(--badge-extra-entry);
 }
 
-.first_entry_not_started,
+.empty,
 .first_entry_in_progress,
 .first_entry_has_errors,
 .first_entry_finalised {
@@ -78,7 +78,7 @@
   color: var(--badge-objections);
 }
 
-.second_entry_not_started,
+.first_entry_finalised,
 .second_entry_in_progress,
 .entries_different {
   background: var(--badge-second-entry-bg);

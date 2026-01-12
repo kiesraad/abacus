@@ -78,7 +78,7 @@ export function InvestigationCard({ investigation }: InvestigationCardProps) {
             </h4>
             {investigation.status === "definitive" ? (
               <p>{t("investigations.corrected_results_inserted")}</p>
-            ) : investigation.status === "first_entry_not_started" ? (
+            ) : investigation.status === "empty" ? (
               <p>{t("investigations.corrected_results_not_yet_inserted")}</p>
             ) : (
               <p className={cls.flex}>

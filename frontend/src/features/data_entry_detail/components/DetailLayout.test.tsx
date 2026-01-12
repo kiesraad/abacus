@@ -74,12 +74,12 @@ describe("DetailLayout", () => {
     });
   });
 
-  test("Render badge for second_entry_not_started as 1e invoer", async () => {
+  test("Render badge for first_entry_finalised as 1e invoer", async () => {
     overrideOnce("get", "/api/polling_stations/5/data_entries/get", 200, dataEntryHasWarningsGetMockResponse);
 
     renderLayout();
 
-    // Data entry has status "second_entry_not_started".
+    // Data entry has status "first_entry_finalised".
     // In Badge, "1e invoer" is overruled as label instead of "2e invoer".
     const banner = await screen.findByRole("banner");
     expect(within(banner).getByText("1e invoer")).toBeInTheDocument();

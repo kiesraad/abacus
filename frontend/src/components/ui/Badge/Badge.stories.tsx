@@ -1,20 +1,20 @@
 import type { StoryObj } from "@storybook/react-vite";
 import { expect, within } from "storybook/test";
 
-import { Badge, type BadgeProps, type BadgeType } from "./Badge";
+import type { DataEntryStatusName } from "@/types/generated/openapi";
+import { Badge, type BadgeProps } from "./Badge";
 
-const expectedBadgeLabel: Record<BadgeType, string> = {
-  first_entry_not_started: "1e invoer",
+const expectedBadgeLabel: Record<DataEntryStatusName, string> = {
+  empty: "1e invoer",
   first_entry_in_progress: "1e invoer",
   first_entry_has_errors: "1e invoer",
   first_entry_finalised: "1e invoer",
-  second_entry_not_started: "2e invoer",
   second_entry_in_progress: "2e invoer",
   entries_different: "2e invoer",
   definitive: "Definitief",
 };
 
-const badgeTypes = Object.keys(expectedBadgeLabel) as BadgeType[];
+const badgeTypes = Object.keys(expectedBadgeLabel) as DataEntryStatusName[];
 
 export const Badges: StoryObj = {
   render: () => {
@@ -60,7 +60,7 @@ export const BadgesWithIcons: StoryObj = {
 
 export const CustomizableBadge: StoryObj<BadgeProps> = {
   args: {
-    type: "first_entry_not_started",
+    type: "empty",
     showIcon: false,
   },
   argTypes: {

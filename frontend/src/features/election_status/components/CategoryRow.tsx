@@ -30,7 +30,7 @@ function getCategoryRowUrl(
   pollingStationId: number,
 ): string | null {
   switch (pollingStationStatus) {
-    case "first_entry_not_started":
+    case "empty":
       return null;
     case "entries_different":
       return `./${pollingStationId}/resolve-differences`;

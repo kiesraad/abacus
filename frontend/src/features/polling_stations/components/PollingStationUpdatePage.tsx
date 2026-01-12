@@ -154,7 +154,7 @@ export function PollingStationUpdatePage() {
                           electionId={election.id}
                           pollingStation={requestState.data}
                           existingInvestigation={!!investigation}
-                          existingDataEntry={status !== undefined && status.status !== "first_entry_not_started"}
+                          existingDataEntry={status !== undefined && status.status !== "empty"}
                           onCancel={toggleShowDeleteModal}
                           onError={handleDeleteError}
                           onDeleted={handleDeleted}

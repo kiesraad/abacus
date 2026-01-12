@@ -269,7 +269,7 @@ describe("Test PollingStationChoiceForm", () => {
               statuses: [
                 {
                   polling_station_id: 1,
-                  status: "second_entry_not_started",
+                  status: "first_entry_finalised",
                 },
                 {
                   polling_station_id: 2,
@@ -406,7 +406,7 @@ describe("Test PollingStationChoiceForm", () => {
               statuses: [
                 {
                   polling_station_id: 1,
-                  status: "second_entry_not_started",
+                  status: "first_entry_finalised",
                 },
                 {
                   polling_station_id: 2,
@@ -438,7 +438,7 @@ describe("Test PollingStationChoiceForm", () => {
       server.use(ElectionRequestHandler);
       overrideOnce("get", "api/elections/1/status", 200, {
         statuses: [
-          { polling_station_id: 1, status: "first_entry_not_started" },
+          { polling_station_id: 1, status: "empty" },
           {
             polling_station_id: 2,
             status: "first_entry_in_progress",

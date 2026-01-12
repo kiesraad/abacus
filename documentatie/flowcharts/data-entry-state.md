@@ -6,25 +6,25 @@ The "save" endpoint which is used for [First/Second]EntryInProgress states is ke
 
 ```mermaid
 stateDiagram-v2
-  [*] --> FirstEntryNotStarted
-  FirstEntryNotStarted --> FirstEntryInProgress: claim
+  [*] --> Empty
+  Empty --> FirstEntryInProgress: claim
   %% FirstEntryInProgress --> FirstEntryInProgress: save
 
   state first_has_errors <<choice>>
   FirstEntryInProgress --> first_has_errors: finalise
-  FirstEntryInProgress --> FirstEntryNotStarted: discard
+  FirstEntryInProgress --> Empty: discard
   
-  first_has_errors --> SecondEntryNotStarted: errors? no
+  first_has_errors --> FirstEntryFinalised: errors? no
   first_has_errors --> FirstEntryHasErrors: errors? yes
 
-  SecondEntryNotStarted --> SecondEntryInProgress: claim
+  FirstEntryFinalised --> SecondEntryInProgress: claim
   %% SecondEntryInProgress --> SecondEntryInProgress: save
-  SecondEntryInProgress --> SecondEntryNotStarted: discard
+  SecondEntryInProgress --> FirstEntryFinalised: discard
 
   state first_resolve_errors <<choice>>
   FirstEntryHasErrors --> first_resolve_errors: resolve errors
   first_resolve_errors --> FirstEntryInProgress: resume first entry
-  first_resolve_errors --> FirstEntryNotStarted: discard first entry
+  first_resolve_errors --> Empty: discard first entry
   
   state is_different <<choice>>
   SecondEntryInProgress --> is_different: finalise
@@ -34,11 +34,11 @@ stateDiagram-v2
   state resolve <<choice>>
   EntriesDifferent --> resolve: resolve differences
   resolve --> first_has_errors: keep one entry
-  resolve --> FirstEntryNotStarted: discard both entries
-  FirstEntryInProgress --> FirstEntryNotStarted: delete
-  SecondEntryNotStarted --> FirstEntryNotStarted: delete
-  SecondEntryInProgress --> SecondEntryNotStarted: delete
-  Definitive --> FirstEntryNotStarted: delete
+  resolve --> Empty: discard both entries
+  FirstEntryInProgress --> Empty: delete
+  FirstEntryFinalised --> Empty: delete
+  SecondEntryInProgress --> FirstEntryFinalised: delete
+  Definitive --> Empty: delete
 
   Definitive --> [*]
 ```

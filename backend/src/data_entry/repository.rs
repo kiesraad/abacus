@@ -94,7 +94,7 @@ pub async fn get_or_default(
     .fetch_optional(conn)
     .await?
     .map(|psde| psde.state.0)
-    .unwrap_or(DataEntryStatus::FirstEntryNotStarted))
+    .unwrap_or(DataEntryStatus::Empty))
 }
 
 /// Saves the data entry or updates it if it already exists for a given polling station id

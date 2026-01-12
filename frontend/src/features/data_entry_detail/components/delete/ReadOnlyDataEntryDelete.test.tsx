@@ -35,7 +35,7 @@ describe("ReadOnlyDataEntryDelete", () => {
   });
 
   test("delete after confirm", async () => {
-    const { onDeleted } = renderComponent("second_entry_not_started");
+    const { onDeleted } = renderComponent("first_entry_finalised");
 
     const user = userEvent.setup();
     await user.click(screen.getByRole("button", { name: "Invoer verwijderen" }));
@@ -71,7 +71,7 @@ describe("ReadOnlyDataEntryDelete", () => {
   });
 
   test("cancel delete", async () => {
-    const { onDeleted } = renderComponent("second_entry_not_started");
+    const { onDeleted } = renderComponent("first_entry_finalised");
 
     const user = userEvent.setup();
     await user.click(screen.getByRole("button", { name: "Invoer verwijderen" }));
@@ -96,7 +96,7 @@ describe("ReadOnlyDataEntryDelete", () => {
       },
     );
 
-    const { onDeleted, onError } = renderComponent("second_entry_not_started");
+    const { onDeleted, onError } = renderComponent("first_entry_finalised");
 
     const user = userEvent.setup();
     await user.click(screen.getByRole("button", { name: "Invoer verwijderen" }));

@@ -8,11 +8,11 @@ __Niveau:__ gebruikersdoel, zee, 🌊
 
 __Hoofdscenario:__
 
-1. De gebruiker voert de gebruikersnaam en het wachtwoord in die de coördinator heeft gegeven en logt in
-2. De gebruiker kan optioneel de ingevulde naam aanpassen
-3. De gebruiker vult tweemaal een nieuw wachtwoord in
-4. De gebruiker slaat de nieuwe gegevens op
-5. De applicatie controleert de ingevulde gegevens
+1. De gebruiker voert de gebruikersnaam en het wachtwoord in die de coördinator heeft gegeven en logt in.
+2. De gebruiker kan optioneel de ingevulde naam aanpassen.
+3. De gebruiker vult tweemaal een nieuw wachtwoord in.
+4. De gebruiker slaat de nieuwe gegevens op.
+5. De applicatie controleert de ingevulde gegevens.
 
 __Uitbreidingen:__
 
@@ -33,10 +33,10 @@ __Niveau:__ gebruikersdoel, zee, 🌊
 
 __Hoofdscenario:__
 
-1. De gebruiker voert de gebruikersnaam en het wachtwoord in en logt in
-2. De applicatie controleert of er al een andere sessie voor deze gebruiker was
+1. De gebruiker voert de gebruikersnaam en het wachtwoord in en logt in.
+2. De applicatie controleert of er al een andere sessie voor deze gebruiker was.
 
 __Uitbreidingen:__
 
-2a. De gebruiker was al ingelogd op een andere computer:
-&emsp; 3a1. De sessie van de gebruiker op de andere computer wordt uitgelogd
+2a. De gebruiker was ingelogd op een andere plek:
+&emsp; 3a1. De andere sessies van de gebruiker worden uitgelogd.

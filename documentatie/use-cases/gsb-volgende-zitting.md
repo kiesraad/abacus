@@ -74,10 +74,10 @@ __Uitbreidingen:__
 &emsp; 1c1. Het GSB maakt een corrigendum naar 0 stemmen voor dit stembureau.  
 
 1d. De coördinator GSB ontdekt een fout in de gegevens van een stembureau met resultaten uit een vorige zitting:  
-&emsp; 1d1. [De coördinator GSB bewerkt de stembureaus tijdens de volgende zitting](#de-coördinator-gsb-bewerkt-de-stembureaus-tijdens-de-volgende-zitting-zee)
+&emsp; 1d1. [De coördinator GSB bewerkt de stembureaus tijdens de volgende zitting](#de-coördinator-gsb-bewerkt-de-stembureaus-tijdens-de-volgende-zitting-zee).
 
 1e. De coördinator GSB ontdekt een fout in de gegevens van een stembureau dat voor de huidige zitting is toegevoegd:  
-&emsp; 1e1. [De coördinator GSB bewerkt de stembureaus tijdens de volgende zitting](#de-coördinator-gsb-bewerkt-de-stembureaus-tijdens-de-volgende-zitting-zee)
+&emsp; 1e1. [De coördinator GSB bewerkt de stembureaus tijdens de volgende zitting](#de-coördinator-gsb-bewerkt-de-stembureaus-tijdens-de-volgende-zitting-zee).
 
 
 ## De coördinator GSB bewerkt de stembureaus tijdens de volgende zitting (zee)

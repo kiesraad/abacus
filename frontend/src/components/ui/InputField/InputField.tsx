@@ -46,12 +46,12 @@ export function InputField({
 }: InputFieldProps) {
   let inputEl: ReactNode;
   const commonProps = {
-    id: id,
-    name: name,
-    value: value,
-    defaultValue: defaultValue,
+    id,
+    name,
+    value,
+    autoFocus,
+    defaultValue,
     autoComplete: "off",
-    autoFocus: autoFocus,
     "aria-invalid": !!error,
     "aria-errormessage": error ? `${name}-hint_or_error` : undefined,
   };

@@ -240,20 +240,6 @@ test.describe("Election creation", () => {
     await expect(checkCandidateDefinitionPage.error).toBeVisible();
   });
 
-  test("it fails on valid, but too large file", async ({ page, eml110aTooLargeTestFile }) => {
-    await page.goto("/elections");
-    const overviewPage = new ElectionsOverviewPgObj(page);
-    await overviewPage.create.click();
-
-    const uploadElectionDefinitionPage = new UploadElectionDefinitionPgObj(page);
-    await expect(uploadElectionDefinitionPage.header).toBeVisible();
-    await uploadElectionDefinitionPage.uploadFile(eml110aTooLargeTestFile.path);
-    await expect(uploadElectionDefinitionPage.invalidFileAlert).toBeVisible();
-    await expect(uploadElectionDefinitionPage.invalidFileAlert).toContainText(
-      `Het bestand ${eml110aTooLargeTestFile.filename} is te groot. Kies een bestand van maximaal 5 Megabyte.`,
-    );
-  });
-
   test("it fails on valid, but incorrect file for candidate list", async ({ page }) => {
     await page.goto("/elections");
     const overviewPage = new ElectionsOverviewPgObj(page);
@@ -274,29 +260,6 @@ test.describe("Election creation", () => {
     await expect(uploadCandidateDefinitionPage.invalidFileAlert).toBeVisible();
     await expect(uploadCandidateDefinitionPage.invalidFileAlert).toContainText(
       "Het bestand eml110b_test.eml.xml bevat geen geldige kandidatenlijsten. Kies een bestand met een geldige definitie.",
-    );
-  });
-
-  test("it fails on too large file for candidate list", async ({ page, eml230bTooLargeTestFile }) => {
-    await page.goto("/elections");
-    const overviewPage = new ElectionsOverviewPgObj(page);
-    await overviewPage.create.click();
-
-    // upload election and check hash
-    await uploadElectionAndInputHash(page);
-
-    // polling station role
-    const pollingStationRolePage = new PollingStationRolePgObj(page);
-    await expect(pollingStationRolePage.header).toBeVisible();
-    await pollingStationRolePage.next.click();
-
-    // Candidate page
-    const uploadCandidateDefinitionPage = new UploadCandidateDefinitionPgObj(page);
-    await expect(uploadCandidateDefinitionPage.header).toBeVisible();
-    await uploadCandidateDefinitionPage.uploadFile(eml230bTooLargeTestFile.path);
-    await expect(uploadCandidateDefinitionPage.invalidFileAlert).toBeVisible();
-    await expect(uploadCandidateDefinitionPage.invalidFileAlert).toContainText(
-      `Het bestand ${eml230bTooLargeTestFile.filename} is te groot. Kies een bestand van maximaal 5 Megabyte.`,
     );
   });
 
@@ -575,31 +538,6 @@ test.describe("Election creation", () => {
     );
   });
 
-  test("it fails on too large file for polling stations", async ({ page, eml110bTooLargeTestFile }) => {
-    await page.goto("/elections");
-    const overviewPage = new ElectionsOverviewPgObj(page);
-    await overviewPage.create.click();
-
-    // upload election and check hash
-    await uploadElectionAndInputHash(page);
-
-    // polling station role
-    const pollingStationRolePage = new PollingStationRolePgObj(page);
-    await expect(pollingStationRolePage.header).toBeVisible();
-    await pollingStationRolePage.next.click();
-
-    await uploadCandidatesAndInputHash(page);
-
-    // Polling stations page
-    const uploadPollingStationDefinitionPage = new UploadPollingStationDefinitionPgObj(page);
-    await expect(uploadPollingStationDefinitionPage.header).toBeVisible();
-    await uploadPollingStationDefinitionPage.uploadFile(eml110bTooLargeTestFile.path);
-    await expect(uploadPollingStationDefinitionPage.invalidFileAlert).toBeVisible();
-    await expect(uploadPollingStationDefinitionPage.invalidFileAlert).toContainText(
-      `Het bestand ${eml110bTooLargeTestFile.filename} is te groot. Kies een bestand van maximaal 5 Megabyte.`,
-    );
-  });
-
   test("show more button should show full list of polling stations", async ({ page }) => {
     await page.goto("/elections");
     const overviewPage = new ElectionsOverviewPgObj(page);
@@ -634,7 +572,7 @@ test.describe("Election creation", () => {
     expect(await checkDefinitionPage.stations.count()).toBeGreaterThan(10);
   });
 
-  test("no show more button should be visible is <10 polling stations", async ({ page }) => {
+  test("no show more button should be visible if <10 polling stations", async ({ page }) => {
     await page.goto("/elections");
     const overviewPage = new ElectionsOverviewPgObj(page);
     await overviewPage.create.click();

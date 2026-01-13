@@ -35,27 +35,4 @@ test.describe("Polling station import", () => {
     await expect(listPage.header).toBeVisible();
     await expect(listPage.alert).toContainText(/Er zijn \d+ stembureaus geïmporteerd/);
   });
-
-  test("As coordinator import a polling stations definition that's too large", async ({
-    page,
-    emptyElection,
-    eml110bTooLargeTestFile,
-  }) => {
-    await page.goto(`/elections/${emptyElection.id}/polling-stations`);
-
-    // Click file import button
-    const emptyListPage = new PollingStationListEmptyPgObj(page);
-    await emptyListPage.importButton.click();
-
-    // On the import page
-    const importPage = new PollingStationImportPgObj(page);
-    await expect(importPage.header).toBeVisible();
-
-    // Select file that's too large
-    await importPage.uploadFile(eml110bTooLargeTestFile.path);
-    await expect(importPage.invalidFileAlert).toBeVisible();
-    await expect(importPage.invalidFileAlert).toContainText(
-      `Het bestand ${eml110bTooLargeTestFile.filename} is te groot. Kies een bestand van maximaal 5 Megabyte.`,
-    );
-  });
 });

@@ -35,8 +35,7 @@ use crate::{
         VotesTablesWithOnlyPreviousVotes, generate_pdf,
         models::{ModelNa14_2Bijlage1Input, ToPdfFileModel},
     },
-    polling_station,
-    polling_station::PollingStation,
+    polling_station::{self, PollingStation, PollingStationId},
 };
 
 pub fn router() -> OpenApiRouter<AppState> {
@@ -53,7 +52,7 @@ pub fn router() -> OpenApiRouter<AppState> {
 /// Validate that the committee session is in a state that allows mutations
 async fn validate_and_get_committee_session(
     conn: &mut SqliteConnection,
-    polling_station_id: u32,
+    polling_station_id: PollingStationId,
 ) -> Result<CommitteeSession, APIError> {
     let polling_station = polling_station::get(conn, polling_station_id).await?;
 
@@ -75,7 +74,7 @@ pub async fn delete_investigation_for_polling_station(
     conn: &mut SqliteConnection,
     audit_service: &AuditService,
     committee_session: &CommitteeSession,
-    polling_station_id: u32,
+    polling_station_id: PollingStationId,
 ) -> Result<(), APIError> {
     if let Some(investigation) =
         delete_polling_station_investigation(conn, polling_station_id).await?
@@ -243,7 +242,7 @@ async fn update_investigation(
     audit_service: &AuditService,
     committee_session: &CommitteeSession,
     investigation_update_request: PollingStationInvestigationUpdateRequest,
-    polling_station_id: u32,
+    polling_station_id: PollingStationId,
 ) -> Result<PollingStationInvestigation, APIError> {
     let investigation = update_polling_station_investigation(
         conn,
@@ -499,11 +498,13 @@ mod tests {
     use sqlx::SqlitePool;
     use test_log::test;
 
+    use crate::polling_station::PollingStationId;
+
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_7_four_sessions"))))]
     async fn test_validation_ok(pool: SqlitePool) {
         let mut conn = pool.acquire().await.unwrap();
 
-        let polling_station_id = 741; // session 4 (last)
+        let polling_station_id = PollingStationId::from(741); // session 4 (last)
         let res = super::validate_and_get_committee_session(&mut conn, polling_station_id).await;
         assert!(res.is_ok());
 
@@ -515,7 +516,7 @@ mod tests {
     async fn test_validation_err_not_last_session(pool: SqlitePool) {
         let mut conn = pool.acquire().await.unwrap();
 
-        let polling_station_id = 731; // session 3 (out of 4)
+        let polling_station_id = PollingStationId::from(731); // session 3 (out of 4)
         let res = super::validate_and_get_committee_session(&mut conn, polling_station_id).await;
         assert!(res.is_err());
     }
@@ -524,7 +525,7 @@ mod tests {
     async fn test_validation_err_first_session(pool: SqlitePool) {
         let mut conn = pool.acquire().await.unwrap();
 
-        let polling_station_id = 33; // part of first and only session
+        let polling_station_id = PollingStationId::from(33); // part of first and only session
         let res = super::validate_and_get_committee_session(&mut conn, polling_station_id).await;
         assert!(res.is_err());
     }

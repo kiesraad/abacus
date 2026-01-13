@@ -34,8 +34,7 @@ use crate::{
     election::{ElectionId, ElectionWithPoliticalGroups, PoliticalGroup},
     error::{ErrorReference, ErrorResponse},
     investigation::get_polling_station_investigation,
-    polling_station,
-    polling_station::PollingStation,
+    polling_station::{self, PollingStation, PollingStationId},
 };
 
 impl From<DataError> for APIError {
@@ -89,7 +88,7 @@ pub fn router() -> OpenApiRouter<AppState> {
 
 async fn validate_and_get_data(
     conn: &mut SqliteConnection,
-    polling_station_id: u32,
+    polling_station_id: PollingStationId,
     user: &User,
 ) -> Result<
     (
@@ -159,7 +158,7 @@ pub async fn delete_data_entry_and_result_for_polling_station(
     conn: &mut SqliteConnection,
     audit_service: &AuditService,
     committee_session: &CommitteeSession,
-    polling_station_id: u32,
+    polling_station_id: PollingStationId,
 ) -> Result<(), APIError> {
     if let Some(data_entry) = delete_data_entry(conn, polling_station_id).await? {
         audit_service
@@ -256,7 +255,7 @@ impl ResolveDifferencesAction {
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
     params(
-        ("polling_station_id" = u32, description = "Polling station database id"),
+        ("polling_station_id" = PollingStationId, description = "Polling station database id"),
         ("entry_number" = u8, description = "Data entry number (first or second data entry)"),
     ),
     security(("cookie_auth" = ["typist"])),
@@ -264,7 +263,7 @@ impl ResolveDifferencesAction {
 async fn polling_station_data_entry_claim(
     user: Typist,
     State(pool): State<SqlitePool>,
-    Path((polling_station_id, entry_number)): Path<(u32, EntryNumber)>,
+    Path((polling_station_id, entry_number)): Path<(PollingStationId, EntryNumber)>,
     audit_service: AuditService,
 ) -> Result<Json<ClaimDataEntryResponse>, APIError> {
     let mut tx = pool.begin_immediate().await?;
@@ -384,7 +383,7 @@ impl IntoResponse for SaveDataEntryResponse {
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
     params(
-        ("polling_station_id" = u32, description = "Polling station database id"),
+        ("polling_station_id" = PollingStationId, description = "Polling station database id"),
         ("entry_number" = u8, description = "Data entry number (first or second data entry)"),
     ),
     security(("cookie_auth" = ["typist"])),
@@ -392,7 +391,7 @@ impl IntoResponse for SaveDataEntryResponse {
 async fn polling_station_data_entry_save(
     user: Typist,
     State(pool): State<SqlitePool>,
-    Path((polling_station_id, entry_number)): Path<(u32, EntryNumber)>,
+    Path((polling_station_id, entry_number)): Path<(PollingStationId, EntryNumber)>,
     audit_service: AuditService,
     data_entry_request: DataEntry,
 ) -> Result<SaveDataEntryResponse, APIError> {
@@ -454,7 +453,7 @@ async fn polling_station_data_entry_save(
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
     params(
-        ("polling_station_id" = u32, description = "Polling station database id"),
+        ("polling_station_id" = PollingStationId, description = "Polling station database id"),
         ("entry_number" = u8, description = "Data entry number (first or second data entry)"),
     ),
     security(("cookie_auth" = ["typist"])),
@@ -462,7 +461,7 @@ async fn polling_station_data_entry_save(
 async fn polling_station_data_entry_delete(
     user: Typist,
     State(pool): State<SqlitePool>,
-    Path((polling_station_id, entry_number)): Path<(u32, EntryNumber)>,
+    Path((polling_station_id, entry_number)): Path<(PollingStationId, EntryNumber)>,
     audit_service: AuditService,
 ) -> Result<StatusCode, APIError> {
     let mut tx = pool.begin_immediate().await?;
@@ -521,7 +520,7 @@ async fn polling_station_data_entry_delete(
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
     params(
-        ("polling_station_id" = u32, description = "Polling station database id"),
+        ("polling_station_id" = PollingStationId, description = "Polling station database id"),
         ("entry_number" = u8, description = "Data entry number (first or second data entry)"),
     ),
     security(("cookie_auth" = ["typist"])),
@@ -529,7 +528,7 @@ async fn polling_station_data_entry_delete(
 async fn polling_station_data_entry_finalise(
     user: Typist,
     State(pool): State<SqlitePool>,
-    Path((polling_station_id, entry_number)): Path<(u32, EntryNumber)>,
+    Path((polling_station_id, entry_number)): Path<(PollingStationId, EntryNumber)>,
     audit_service: AuditService,
 ) -> Result<Json<DataEntryStatusResponse>, APIError> {
     let mut tx = pool.begin_immediate().await?;
@@ -630,14 +629,14 @@ impl ResolveErrorsAction {
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
     params(
-        ("polling_station_id" = u32, description = "Polling station database id"),
+        ("polling_station_id" = PollingStationId, description = "Polling station database id"),
     ),
     security(("cookie_auth" = ["coordinator"])),
 )]
 async fn polling_station_data_entries_and_result_delete(
     _user: Coordinator,
     State(pool): State<SqlitePool>,
-    Path(polling_station_id): Path<u32>,
+    Path(polling_station_id): Path<PollingStationId>,
     audit_service: AuditService,
 ) -> Result<StatusCode, APIError> {
     let mut tx = pool.begin_immediate().await?;
@@ -698,14 +697,14 @@ pub struct DataEntryGetResponse {
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
     params(
-        ("polling_station_id" = u32, description = "Polling station database id"),
+        ("polling_station_id" = PollingStationId, description = "Polling station database id"),
     ),
     security(("cookie_auth" = ["coordinator"])),
 )]
 async fn polling_station_data_entry_get(
     user: Coordinator,
     State(pool): State<SqlitePool>,
-    Path(polling_station_id): Path<u32>,
+    Path(polling_station_id): Path<PollingStationId>,
 ) -> Result<Json<DataEntryGetResponse>, APIError> {
     let mut conn = pool.acquire().await?;
 
@@ -780,14 +779,14 @@ async fn polling_station_data_entry_get(
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
     params(
-        ("polling_station_id" = u32, description = "Polling station database id"),
+        ("polling_station_id" = PollingStationId, description = "Polling station database id"),
     ),
     security(("cookie_auth" = ["coordinator"])),
 )]
 async fn polling_station_data_entry_resolve_errors(
     user: Coordinator,
     State(pool): State<SqlitePool>,
-    Path(polling_station_id): Path<u32>,
+    Path(polling_station_id): Path<PollingStationId>,
     audit_service: AuditService,
     action: ResolveErrorsAction,
 ) -> Result<Json<DataEntryStatusResponse>, APIError> {
@@ -851,14 +850,14 @@ pub struct DataEntryGetDifferencesResponse {
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
     params(
-        ("polling_station_id" = u32, description = "Polling station database id"),
+        ("polling_station_id" = PollingStationId, description = "Polling station database id"),
     ),
     security(("cookie_auth" = ["coordinator"])),
 )]
 async fn polling_station_data_entry_get_differences(
     user: Coordinator,
     State(pool): State<SqlitePool>,
-    Path(polling_station_id): Path<u32>,
+    Path(polling_station_id): Path<PollingStationId>,
 ) -> Result<Json<DataEntryGetDifferencesResponse>, APIError> {
     let mut conn = pool.acquire().await?;
 
@@ -899,14 +898,14 @@ async fn polling_station_data_entry_get_differences(
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
     params(
-        ("polling_station_id" = u32, description = "Polling station database id"),
+        ("polling_station_id" = PollingStationId, description = "Polling station database id"),
     ),
     security(("cookie_auth" = ["coordinator"])),
 )]
 async fn polling_station_data_entry_resolve_differences(
     user: Coordinator,
     State(pool): State<SqlitePool>,
-    Path(polling_station_id): Path<u32>,
+    Path(polling_station_id): Path<PollingStationId>,
     audit_service: AuditService,
     action: ResolveDifferencesAction,
 ) -> Result<Json<DataEntryStatusResponse>, APIError> {
@@ -965,7 +964,7 @@ pub struct ElectionStatusResponse {
 #[serde(deny_unknown_fields)]
 pub struct ElectionStatusResponseEntry {
     /// Polling station id
-    pub polling_station_id: u32,
+    pub polling_station_id: PollingStationId,
     /// Data entry status
     pub status: DataEntryStatusName,
     /// First entry user id
@@ -1069,7 +1068,7 @@ mod tests {
 
     async fn get_data_entry_status(
         pool: SqlitePool,
-        polling_station_id: u32,
+        polling_station_id: PollingStationId,
         committee_session_id: CommitteeSessionId,
     ) -> DataEntryStatus {
         let mut conn = pool.acquire().await.unwrap();
@@ -1080,7 +1079,7 @@ mod tests {
 
     async fn claim(
         pool: SqlitePool,
-        polling_station_id: u32,
+        polling_station_id: PollingStationId,
         entry_number: EntryNumber,
     ) -> Response {
         let user = match entry_number {
@@ -1100,7 +1099,7 @@ mod tests {
     async fn save(
         pool: SqlitePool,
         request_body: DataEntry,
-        polling_station_id: u32,
+        polling_station_id: PollingStationId,
         entry_number: EntryNumber,
     ) -> Response {
         let user = match entry_number {
@@ -1120,7 +1119,7 @@ mod tests {
 
     async fn delete(
         pool: SqlitePool,
-        polling_station_id: u32,
+        polling_station_id: PollingStationId,
         entry_number: EntryNumber,
     ) -> Response {
         let user = match entry_number {
@@ -1137,7 +1136,10 @@ mod tests {
         .into_response()
     }
 
-    async fn delete_data_entries_and_result(pool: SqlitePool, polling_station_id: u32) -> Response {
+    async fn delete_data_entries_and_result(
+        pool: SqlitePool,
+        polling_station_id: PollingStationId,
+    ) -> Response {
         let user = User::test_user(Role::Coordinator, 1);
         polling_station_data_entries_and_result_delete(
             Coordinator(user.clone()),
@@ -1151,7 +1153,7 @@ mod tests {
 
     async fn finalise(
         pool: SqlitePool,
-        polling_station_id: u32,
+        polling_station_id: PollingStationId,
         entry_number: EntryNumber,
     ) -> Response {
         let user = match entry_number {
@@ -1170,7 +1172,7 @@ mod tests {
 
     async fn resolve_differences(
         pool: SqlitePool,
-        polling_station_id: u32,
+        polling_station_id: PollingStationId,
         action: ResolveDifferencesAction,
     ) -> Response {
         let user = User::test_user(Role::Coordinator, 1);
@@ -1187,7 +1189,7 @@ mod tests {
 
     async fn resolve_errors(
         pool: SqlitePool,
-        polling_station_id: u32,
+        polling_station_id: PollingStationId,
         action: ResolveErrorsAction,
     ) -> Response {
         let user = User::test_user(Role::Coordinator, 1);
@@ -1515,7 +1517,7 @@ mod tests {
             PollingStationDataEntry,
             r#"
             SELECT
-                polling_station_id AS "polling_station_id: u32",
+                polling_station_id AS "polling_station_id: PollingStationId",
                 committee_session_id AS "committee_session_id: CommitteeSessionId",
                 state AS "state: _",
                 updated_at AS "updated_at: _"
@@ -2328,7 +2330,7 @@ mod tests {
 
     async fn claim_previous_results(
         pool: SqlitePool,
-        polling_station_id: u32,
+        polling_station_id: PollingStationId,
     ) -> Option<CommonPollingStationResults> {
         let response = claim(pool.clone(), polling_station_id, EntryNumber::FirstEntry).await;
         assert_eq!(response.status(), StatusCode::OK);
@@ -2439,7 +2441,7 @@ mod tests {
 
         async fn call_polling_station_data_entry_get(
             pool: SqlitePool,
-            polling_station_id: u32,
+            polling_station_id: PollingStationId,
         ) -> Result<DataEntryGetResponse, ErrorResponse> {
             let user = User::test_user(Role::Coordinator, 1);
             let response = polling_station_data_entry_get(

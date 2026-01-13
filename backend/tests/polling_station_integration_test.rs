@@ -25,7 +25,7 @@ async fn get_polling_station(
     addr: &SocketAddr,
     cookie: &HeaderValue,
     election_id: u32,
-    polling_station_id: u32,
+    polling_station_id: PollingStationId,
 ) -> Response {
     let url =
         format!("http://{addr}/api/elections/{election_id}/polling_stations/{polling_station_id}");
@@ -79,7 +79,7 @@ async fn update_polling_station(
     addr: &SocketAddr,
     cookie: &HeaderValue,
     election_id: u32,
-    polling_station_id: u32,
+    polling_station_id: PollingStationId,
     body: serde_json::Value,
 ) -> Response {
     let url =
@@ -98,7 +98,7 @@ async fn delete_polling_station(
     addr: &SocketAddr,
     cookie: &HeaderValue,
     election_id: u32,
-    polling_station_id: u32,
+    polling_station_id: PollingStationId,
 ) -> Response {
     let url =
         format!("http://{addr}/api/elections/{election_id}/polling_stations/{polling_station_id}");

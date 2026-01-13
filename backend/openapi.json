@@ -1658,9 +1658,7 @@
             "description": "Polling station database id",
             "required": true,
             "schema": {
-              "type": "integer",
-              "format": "int32",
-              "minimum": 0
+              "$ref": "#/components/schemas/PollingStationId"
             }
           }
         ],
@@ -1735,9 +1733,7 @@
             "description": "Polling station database id",
             "required": true,
             "schema": {
-              "type": "integer",
-              "format": "int32",
-              "minimum": 0
+              "$ref": "#/components/schemas/PollingStationId"
             }
           }
         ],
@@ -1831,9 +1827,7 @@
             "description": "Polling station database id",
             "required": true,
             "schema": {
-              "type": "integer",
-              "format": "int32",
-              "minimum": 0
+              "$ref": "#/components/schemas/PollingStationId"
             }
           }
         ],
@@ -2499,9 +2493,7 @@
             "description": "Polling station database id",
             "required": true,
             "schema": {
-              "type": "integer",
-              "format": "int32",
-              "minimum": 0
+              "$ref": "#/components/schemas/PollingStationId"
             }
           }
         ],
@@ -2580,9 +2572,7 @@
             "description": "Polling station database id",
             "required": true,
             "schema": {
-              "type": "integer",
-              "format": "int32",
-              "minimum": 0
+              "$ref": "#/components/schemas/PollingStationId"
             }
           }
         ],
@@ -2668,9 +2658,7 @@
             "description": "Polling station database id",
             "required": true,
             "schema": {
-              "type": "integer",
-              "format": "int32",
-              "minimum": 0
+              "$ref": "#/components/schemas/PollingStationId"
             }
           }
         ],
@@ -2754,9 +2742,7 @@
             "description": "Polling station database id",
             "required": true,
             "schema": {
-              "type": "integer",
-              "format": "int32",
-              "minimum": 0
+              "$ref": "#/components/schemas/PollingStationId"
             }
           }
         ],
@@ -2862,9 +2848,7 @@
             "description": "Polling station database id",
             "required": true,
             "schema": {
-              "type": "integer",
-              "format": "int32",
-              "minimum": 0
+              "$ref": "#/components/schemas/PollingStationId"
             }
           }
         ],
@@ -2970,9 +2954,7 @@
             "description": "Polling station database id",
             "required": true,
             "schema": {
-              "type": "integer",
-              "format": "int32",
-              "minimum": 0
+              "$ref": "#/components/schemas/PollingStationId"
             }
           },
           {
@@ -3087,9 +3069,7 @@
             "description": "Polling station database id",
             "required": true,
             "schema": {
-              "type": "integer",
-              "format": "int32",
-              "minimum": 0
+              "$ref": "#/components/schemas/PollingStationId"
             }
           },
           {
@@ -3179,9 +3159,7 @@
             "description": "Polling station database id",
             "required": true,
             "schema": {
-              "type": "integer",
-              "format": "int32",
-              "minimum": 0
+              "$ref": "#/components/schemas/PollingStationId"
             }
           },
           {
@@ -3278,9 +3256,7 @@
             "description": "Polling station database id",
             "required": true,
             "schema": {
-              "type": "integer",
-              "format": "int32",
-              "minimum": 0
+              "$ref": "#/components/schemas/PollingStationId"
             }
           },
           {
@@ -5629,9 +5605,7 @@
             "minimum": 0
           },
           "polling_station_id": {
-            "type": "integer",
-            "format": "int32",
-            "minimum": 0
+            "$ref": "#/components/schemas/PollingStationId"
           },
           "second_entry_user_id": {
             "type": [
@@ -6149,10 +6123,8 @@
             "minimum": 0
           },
           "polling_station_id": {
-            "type": "integer",
-            "format": "int32",
-            "description": "Polling station id",
-            "minimum": 0
+            "$ref": "#/components/schemas/PollingStationId",
+            "description": "Polling station id"
           },
           "second_entry_progress": {
             "type": "integer",
@@ -6640,14 +6612,10 @@
             "$ref": "#/components/schemas/ElectionId"
           },
           "id": {
-            "type": "integer",
-            "format": "int32",
-            "minimum": 0
+            "$ref": "#/components/schemas/PollingStationId"
           },
           "id_prev_session": {
-            "type": "integer",
-            "format": "int32",
-            "minimum": 0
+            "$ref": "#/components/schemas/PollingStationId"
           },
           "locality": {
             "type": "string"
@@ -6697,14 +6665,10 @@
             "$ref": "#/components/schemas/ElectionId"
           },
           "polling_station_id": {
-            "type": "integer",
-            "format": "int32",
-            "minimum": 0
+            "$ref": "#/components/schemas/PollingStationId"
           },
           "polling_station_id_prev_session": {
-            "type": "integer",
-            "format": "int32",
-            "minimum": 0
+            "$ref": "#/components/schemas/PollingStationId"
           },
           "polling_station_locality": {
             "type": "string"
@@ -6742,6 +6706,11 @@
           }
         }
       },
+      "PollingStationId": {
+        "type": "integer",
+        "format": "int32",
+        "minimum": 0
+      },
       "PollingStationImportDetails": {
         "type": "object",
         "required": [
@@ -6777,9 +6746,7 @@
             "type": "string"
           },
           "polling_station_id": {
-            "type": "integer",
-            "format": "int32",
-            "minimum": 0
+            "$ref": "#/components/schemas/PollingStationId"
           },
           "reason": {
             "type": "string"
@@ -7036,9 +7003,7 @@
             "type": "string"
           },
           "polling_station_id": {
-            "type": "integer",
-            "format": "int32",
-            "minimum": 0
+            "$ref": "#/components/schemas/PollingStationId"
           }
         },
         "additionalProperties": false

@@ -369,14 +369,14 @@ pub async fn duplicate_for_committee_session(
 #[cfg(test)]
 pub async fn insert_test_polling_station(
     conn: &mut SqliteConnection,
-    id: u32,
+    polling_station_id: PollingStationId,
     committee_session_id: CommitteeSessionId,
-    id_prev_session: Option<u32>,
+    id_prev_session: Option<PollingStationId>,
     number: u32,
 ) -> Result<(), sqlx::Error> {
     query!(
         "INSERT INTO polling_stations (id, committee_session_id, id_prev_session, name, number, address, postal_code, locality) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
-        id,
+        polling_station_id,
         committee_session_id,
         id_prev_session,
         "Test name",

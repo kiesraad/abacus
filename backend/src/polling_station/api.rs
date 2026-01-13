@@ -457,7 +457,7 @@ mod tests {
     use test_log::test;
 
     use super::{PollingStationRequest, create, create_many, update};
-    use crate::election::ElectionId;
+    use crate::{election::ElectionId, polling_station::PollingStationId};
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2", "election_3"))))]
     async fn test_polling_station_number_unique_per_election(pool: SqlitePool) {
@@ -583,14 +583,17 @@ VALUES
             locality: "Locality".to_string(),
         };
 
+        let election_id = ElectionId::from(7);
+        let polling_station_id = PollingStationId::from(741);
+
         // Update a polling station that has an id_prev_session reference
         // ... without number change
-        let result = update(&mut conn, ElectionId::from(7), 741, data.clone()).await;
+        let result = update(&mut conn, election_id, polling_station_id, data.clone()).await;
         assert!(result.is_ok());
 
         // ... with number change
         data.number = Some(123);
-        let result = update(&mut conn, ElectionId::from(7), 741, data).await;
+        let result = update(&mut conn, election_id, polling_station_id, data).await;
         assert!(result.is_err());
     }
 

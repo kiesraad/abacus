@@ -3,17 +3,20 @@ import userEvent from "@testing-library/user-event";
 import type { ReactNode } from "react";
 import { RouterProvider } from "react-router";
 import { beforeEach, describe, expect, test, vi } from "vitest";
-
 import { ApiProvider } from "@/api/ApiProvider";
+import * as useMessages from "@/hooks/messages/useMessages";
 import { newElectionMockData } from "@/testing/api-mocks/ElectionMockData";
 import { pollingStationMockData } from "@/testing/api-mocks/PollingStationMockData";
-import { ElectionListRequestHandler, ElectionRequestHandler } from "@/testing/api-mocks/RequestHandlers";
+import {
+  ElectionImportRequestHandler,
+  ElectionListRequestHandler,
+  ElectionRequestHandler,
+} from "@/testing/api-mocks/RequestHandlers";
 import { getRouter, type Router } from "@/testing/router";
 import { overrideOnce, server } from "@/testing/server";
 import { TestUserProvider } from "@/testing/TestUserProvider";
-import { screen, setupTestRouter } from "@/testing/test-utils";
+import { screen, setupTestRouter, waitFor } from "@/testing/test-utils";
 import type { ElectionDefinitionValidateResponse, NewElection, PollingStationRequest } from "@/types/generated/openapi";
-
 import { electionCreateRoutes } from "../routes";
 
 const Providers = ({
@@ -60,6 +63,7 @@ function electionValidateResponse(
   election: NewElection,
   polling_stations: PollingStationRequest[] | undefined = undefined,
   matching_election: boolean | undefined = undefined,
+  number_of_voters: number = 0,
 ): ElectionDefinitionValidateResponse {
   return {
     hash: {
@@ -88,7 +92,7 @@ function electionValidateResponse(
     },
     election,
     polling_stations,
-    number_of_voters: 0,
+    number_of_voters,
     polling_station_definition_matches_election: matching_election,
   };
 }
@@ -173,13 +177,13 @@ async function inputCandidateHash() {
   await user.click(screen.getByRole("button", { name: "Volgende" }));
 }
 
-async function uploadPollingStationList(file: File, matching_election: boolean) {
+async function uploadPollingStationList(file: File, matching_election: boolean, number_of_voters: number = 0) {
   const user = userEvent.setup();
   overrideOnce(
     "post",
     "/api/elections/import/validate",
     200,
-    electionValidateResponse(newElectionMockData, pollingStationMockData, matching_election),
+    electionValidateResponse(newElectionMockData, pollingStationMockData, matching_election, number_of_voters),
   );
 
   // Wait for the polling station list page to be loaded
@@ -476,6 +480,66 @@ describe("Election create pages", () => {
       expect(
         await screen.findByRole("heading", { level: 2, name: "Type stemopneming in Heemdamseburg" }),
       ).toBeVisible();
+    });
+  });
+
+  describe("Full flow", () => {
+    const pushMessage = vi.fn();
+
+    beforeEach(() => {
+      server.use(ElectionImportRequestHandler);
+      vi.spyOn(useMessages, "useMessages").mockReturnValue({
+        pushMessage,
+        popMessages: vi.fn(() => []),
+        hasMessages: vi.fn(() => false),
+      });
+    });
+
+    test("Adds new election when finishing election import", async () => {
+      vi.spyOn(console, "warn").mockImplementation(() => {});
+      const router = renderWithRouter();
+      const user = userEvent.setup();
+      const file = new File(["foo"], "foo.txt", { type: "text/plain" });
+
+      // upload election and set hash, and continue
+      await uploadElectionDefinition(router, file);
+      await inputElectionHash();
+      await setPollingStationRole();
+
+      // upload candidate file, set hash and continue
+      await uploadCandidateDefinition(file);
+      await inputCandidateHash();
+
+      // upload polling station list file
+      await uploadPollingStationList(file, true, 1234);
+
+      // We should be at the check polling stations page
+      expect(await screen.findByRole("heading", { level: 2, name: "Controleer stembureaus" })).toBeVisible();
+
+      // click next
+      await user.click(screen.getByRole("button", { name: "Volgende" }));
+
+      // Expect to see the vote counting type page
+      expect(
+        await screen.findByRole("heading", { level: 2, name: "Type stemopneming in Heemdamseburg" }),
+      ).toBeVisible();
+
+      // click next
+      await user.click(screen.getByRole("button", { name: "Volgende" }));
+
+      expect(await screen.findByRole("heading", { name: "Hoeveel kiesgerechtigden telt de gemeente?" })).toBeVisible();
+
+      // click next
+      await user.click(screen.getByRole("button", { name: "Volgende" }));
+
+      expect(await screen.findByRole("heading", { name: "Controleren en opslaan" })).toBeVisible();
+
+      // click save
+      await user.click(screen.getByRole("button", { name: "Opslaan" }));
+
+      await waitFor(() => {
+        expect(pushMessage).toHaveBeenCalledWith({ title: "Verkiezing GSB Gemeenteraad Test 2022 toegevoegd" });
+      });
     });
   });
 });

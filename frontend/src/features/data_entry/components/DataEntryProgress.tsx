@@ -23,6 +23,7 @@ export function DataEntryProgress() {
   const sectionId = params.sectionId ?? null;
 
   const menuStatusForFormSection = useCallback(
+    // biome-ignore lint/complexity/noExcessiveCognitiveComplexity: TODO function should be refactored
     (formSection?: FormSection): Exclude<MenuStatus, "active"> => {
       if (!formSection) return "idle";
 

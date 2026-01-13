@@ -51,6 +51,7 @@ export type AnyFormField = FormFieldNumber | FormFieldString | FormFieldStringUn
 export type FormFields<T> = Record<keyof T, AnyFormField>;
 export type ValidationResult<T> = Record<keyof T, ValidationError | undefined>;
 
+// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: TODO function should be refactored
 export function processForm<RequestObject>(
   fields: FormFields<RequestObject>,
   elements: { [key in keyof RequestObject]: HTMLInputElement },
@@ -110,6 +111,7 @@ export function processForm<RequestObject>(
   return { requestObject, validationResult, isValid: isEmpty };
 }
 
+// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: TODO function should be refactored
 export function validateFormValue(field: AnyFormField, value: string | number | undefined): ValidationError | null {
   switch (field.type) {
     case "string":

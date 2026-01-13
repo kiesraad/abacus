@@ -84,6 +84,7 @@ export interface CommitteeSessionCardProps {
 }
 
 // biome-ignore lint/complexity/noExcessiveLinesPerFunction: TODO function should be refactored
+// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: TODO function should be refactored
 export function CommitteeSessionCard({
   committeeSession,
   isCurrentSession,

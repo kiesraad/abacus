@@ -8,6 +8,7 @@ import pkgjson from "./package.json";
 
 // https://vitejs.dev/config/
 // biome-ignore lint/complexity/noExcessiveLinesPerFunction: TODO function should be refactored
+// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: TODO function should be refactored
 export default defineConfig(({ command }) => {
   const mswEnabled = process.env.API_MODE === "mock";
   const includeStorybookLink = process.env.INCLUDE_STORYBOOK_LINK === "true";

@@ -63,6 +63,12 @@
           "options": {
             "maxLines": 50
           }
+        },
+        "noExcessiveCognitiveComplexity": {
+          "level": "warn",
+          "options": {
+            "maxAllowedComplexity": 15
+          }
         }
       },
       "style": {
@@ -102,7 +108,8 @@
       "linter": {
         "rules": {
           "complexity": {
-            "noExcessiveLinesPerFunction": "off"
+            "noExcessiveLinesPerFunction": "off",
+            "noExcessiveCognitiveComplexity": "off"
           },
           "style": {
             "noNonNullAssertion": "off",

@@ -20,6 +20,7 @@ const DEFAULT_RENDER_FUNCTIONS: Record<string, RenderFunction> = {
 
 // parse the input string into an AST
 // biome-ignore lint/complexity/noExcessiveLinesPerFunction: TODO function should be refactored
+// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: TODO function should be refactored
 export function parse(input: string, allowed = DEFAULT_ALLOWED_TAGS): AST {
   const ast: AST = [];
 

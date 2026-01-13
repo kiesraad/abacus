@@ -52,60 +52,17 @@ function SectionTable({ section, first, second, action }: SectionTableProps) {
   return (
     <div>
       {/** biome-ignore lint/suspicious/useIterableCallbackReturn: switch statement is exhaustive, so it always returns a value */}
-      {section.subsections.map((subsection, subsectionIdx) => {
-        switch (subsection.type) {
-          case "heading":
-            // only used to override title
-            return;
-          case "message":
-            // message is not rendered
-            return;
-          case "radio": {
-            const headers = [
-              t("resolve_differences.headers.field"),
-              t("resolve_differences.headers.first_entry"),
-              t("resolve_differences.headers.second_entry"),
-              t("resolve_differences.headers.description"),
-            ];
-
-            const row = {
-              code: "",
-              first: mapRadioValue(firstValues[subsection.path], subsection.options),
-              second: mapRadioValue(secondValues[subsection.path], subsection.options),
-              description: subsection.short_title,
-            };
-
-            return (
-              <DifferencesTable
-                key={`${section.id}-${subsectionIdx}`}
-                title={title}
-                headers={headers}
-                rows={[row]}
-                action={action}
-              />
-            );
-          }
-          case "checkboxes": {
-            const getSelectedOptions = (values: SectionValues) => {
-              return subsection.options
-                .filter((option) => values[option.path] === "true")
-                .map((option) => option.short_label)
-                .join(", ");
-            };
-
-            const row = {
-              code: "",
-              first: getSelectedOptions(firstValues) || "-",
-              second: getSelectedOptions(secondValues) || "-",
-              description: subsection.short_title,
-            };
-
-            checkboxRows.push(row);
-
-            if (
-              checkboxRows.length ===
-              section.subsections.filter((subsection) => subsection.type === "checkboxes").length
-            ) {
+      {section.subsections.map(
+        // biome-ignore lint/complexity/noExcessiveLinesPerFunction: TODO function should be refactored
+        (subsection, subsectionIdx) => {
+          switch (subsection.type) {
+            case "heading":
+              // only used to override title
+              return;
+            case "message":
+              // message is not rendered
+              return;
+            case "radio": {
               const headers = [
                 t("resolve_differences.headers.field"),
                 t("resolve_differences.headers.first_entry"),
@@ -113,45 +70,91 @@ function SectionTable({ section, first, second, action }: SectionTableProps) {
                 t("resolve_differences.headers.description"),
               ];
 
+              const row = {
+                code: "",
+                first: mapRadioValue(firstValues[subsection.path], subsection.options),
+                second: mapRadioValue(secondValues[subsection.path], subsection.options),
+                description: subsection.short_title,
+              };
+
               return (
                 <DifferencesTable
                   key={`${section.id}-${subsectionIdx}`}
                   title={title}
                   headers={headers}
-                  rows={checkboxRows}
+                  rows={[row]}
                   action={action}
                 />
               );
             }
-            break;
-          }
-          case "inputGrid": {
-            const headers = [
-              subsection.headers[0],
-              t("resolve_differences.headers.first_entry"),
-              t("resolve_differences.headers.second_entry"),
-              subsection.headers[2],
-            ];
+            case "checkboxes": {
+              const getSelectedOptions = (values: SectionValues) => {
+                return subsection.options
+                  .filter((option) => values[option.path] === "true")
+                  .map((option) => option.short_label)
+                  .join(", ");
+              };
 
-            const rows = subsection.rows.map((row) => ({
-              code: row.code,
-              first: firstValues[row.path],
-              second: secondValues[row.path],
-              description: row.title,
-            }));
+              const row = {
+                code: "",
+                first: getSelectedOptions(firstValues) || "-",
+                second: getSelectedOptions(secondValues) || "-",
+                description: subsection.short_title,
+              };
 
-            return (
-              <DifferencesTable
-                key={`${section.id}-${subsectionIdx}`}
-                title={title}
-                headers={headers}
-                rows={rows}
-                action={action}
-              />
-            );
+              checkboxRows.push(row);
+
+              if (
+                checkboxRows.length ===
+                section.subsections.filter((subsection) => subsection.type === "checkboxes").length
+              ) {
+                const headers = [
+                  t("resolve_differences.headers.field"),
+                  t("resolve_differences.headers.first_entry"),
+                  t("resolve_differences.headers.second_entry"),
+                  t("resolve_differences.headers.description"),
+                ];
+
+                return (
+                  <DifferencesTable
+                    key={`${section.id}-${subsectionIdx}`}
+                    title={title}
+                    headers={headers}
+                    rows={checkboxRows}
+                    action={action}
+                  />
+                );
+              }
+              break;
+            }
+            case "inputGrid": {
+              const headers = [
+                subsection.headers[0],
+                t("resolve_differences.headers.first_entry"),
+                t("resolve_differences.headers.second_entry"),
+                subsection.headers[2],
+              ];
+
+              const rows = subsection.rows.map((row) => ({
+                code: row.code,
+                first: firstValues[row.path],
+                second: secondValues[row.path],
+                description: row.title,
+              }));
+
+              return (
+                <DifferencesTable
+                  key={`${section.id}-${subsectionIdx}`}
+                  title={title}
+                  headers={headers}
+                  rows={rows}
+                  action={action}
+                />
+              );
+            }
           }
-        }
-      })}
+        },
+      )}
     </div>
   );
 }

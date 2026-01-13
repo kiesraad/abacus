@@ -58,6 +58,7 @@ export function onSubmitForm(
       continueToNextSection = true,
       showAcceptErrorsAndWarnings = true,
     }: SubmitCurrentFormOptions = {},
+    // biome-ignore lint/complexity/noExcessiveCognitiveComplexity: TODO function should be refactored
   ): Promise<boolean> => {
     assertStateIsLoaded(state);
     const currentSection = state.formState.sections[sectionId];

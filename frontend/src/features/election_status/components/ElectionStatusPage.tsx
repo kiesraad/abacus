@@ -23,6 +23,7 @@ import { committeeSessionLabel } from "@/utils/committeeSession";
 
 import { ElectionStatus } from "./ElectionStatus";
 
+// biome-ignore lint/complexity/noExcessiveLinesPerFunction: TODO function should be refactored
 export function ElectionStatusPage() {
   const navigate = useNavigate();
   const { currentCommitteeSession, election, pollingStations, refetch: refetchElection } = useElection();

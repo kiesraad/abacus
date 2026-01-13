@@ -23,6 +23,7 @@ import { formatList } from "@/utils/strings";
 
 import { InvestigationCard } from "./InvestigationCard";
 
+// biome-ignore lint/complexity/noExcessiveLinesPerFunction: TODO function should be refactored
 export function InvestigationsOverviewPage() {
   const { currentCommitteeSession } = useElection();
   const { investigations, currentInvestigations, handledInvestigations, missingInvestigations } = useInvestigations();

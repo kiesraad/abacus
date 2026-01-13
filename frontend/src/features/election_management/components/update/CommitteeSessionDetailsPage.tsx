@@ -23,6 +23,7 @@ type ValidationErrors = {
   start_time?: string;
 };
 
+// biome-ignore lint/complexity/noExcessiveLinesPerFunction: TODO function should be refactored
 export function CommitteeSessionDetailsPage() {
   const location = useLocation();
   const navigate = useNavigate();

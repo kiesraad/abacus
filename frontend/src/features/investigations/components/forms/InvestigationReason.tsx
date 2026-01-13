@@ -26,6 +26,7 @@ interface InvestigationReasonProps {
   pollingStationId: number;
 }
 
+// biome-ignore lint/complexity/noExcessiveLinesPerFunction: TODO function should be refactored
 export function InvestigationReason({ pollingStationId }: InvestigationReasonProps) {
   const navigate = useNavigate();
   const { currentCommitteeSession, investigation, pollingStation, refetch } = useElection(pollingStationId);

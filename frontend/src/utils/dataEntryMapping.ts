@@ -62,6 +62,7 @@ export function mapResultsToSectionValues(section: DataEntrySection, results: Da
   return formValues;
 }
 
+// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: TODO function should be refactored
 function setValueAtPath(
   results: DataEntryResults,
   path: string,
@@ -141,6 +142,7 @@ function valueToString(value: PathValue): string {
   return String(value);
 }
 
+// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: TODO function should be refactored
 function parsePathSegments(path: string): PathSegment[] {
   const segments: PathSegment[] = [];
   let current = "";

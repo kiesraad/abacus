@@ -29,6 +29,8 @@ interface HTMLForm extends HTMLFormElement {
   readonly elements: FormElements;
 }
 
+// biome-ignore lint/complexity/noExcessiveLinesPerFunction: TODO function should be refactored
+// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: TODO function should be refactored
 export function PollingStationForm({ electionId, pollingStation, onSaved, onCancel }: PollingStationFormProps) {
   const [lastSubmit, setLastSubmit] = useState<PollingStationRequest>();
 

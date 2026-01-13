@@ -19,6 +19,7 @@ export interface LogFilterState {
   since?: string;
 }
 
+// biome-ignore lint/complexity/noExcessiveLinesPerFunction: TODO function should be refactored
 export function useAuditLog() {
   const path: AUDIT_LOG_LIST_REQUEST_PATH = "/api/log";
   const [searchParams, setSearchParams] = useSearchParams();

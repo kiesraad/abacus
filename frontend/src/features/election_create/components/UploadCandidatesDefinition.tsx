@@ -17,6 +17,7 @@ import { fileTooLargeError, isFileTooLarge } from "@/utils/uploadFileSize";
 import { useElectionCreateContext } from "../hooks/useElectionCreateContext";
 import { CheckHash } from "./CheckHash";
 
+// biome-ignore lint/complexity/noExcessiveLinesPerFunction: TODO function should be refactored
 export function UploadCandidatesDefinition() {
   const { state, dispatch } = useElectionCreateContext();
   const navigate = useNavigate();
@@ -30,6 +31,7 @@ export function UploadCandidatesDefinition() {
     return <Navigate to="/elections/create" />;
   }
 
+  // biome-ignore lint/complexity/noExcessiveCognitiveComplexity: TODO function should be refactored
   async function onFileChange(e: ChangeEvent<HTMLInputElement>) {
     const currentFile = e.target.files ? e.target.files[0] : undefined;
     if (currentFile !== undefined) {

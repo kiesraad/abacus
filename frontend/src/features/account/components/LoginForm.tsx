@@ -11,6 +11,7 @@ import type { TranslationPath } from "@/i18n/i18n.types";
 import { t, tx } from "@/i18n/translate";
 import { hasBooleanProperty } from "@/utils/typeChecks";
 
+// biome-ignore lint/complexity/noExcessiveLinesPerFunction: TODO function should be refactored
 export function LoginForm() {
   const navigate = useNavigate();
   const location = useLocation();

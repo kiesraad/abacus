@@ -901,6 +901,7 @@ mod tests {
         use super::{CommitteeSessionError, CommitteeSessionStatus, get};
         use crate::{
             committee_session::CommitteeSessionId,
+            authentication::user::UserId,
             data_entry::{
                 PollingStationResults,
                 repository::{get_or_default, get_result, insert_test_result, make_definitive},
@@ -1103,8 +1104,8 @@ mod tests {
                 .await
                 .unwrap();
             let state = DataEntryStatus::Definitive(Definitive {
-                first_entry_user_id: 5,
-                second_entry_user_id: 6,
+                first_entry_user_id: UserId::from(5),
+                second_entry_user_id: UserId::from(6),
                 finished_at: Utc::now(),
                 finalised_with_warnings: false,
             });

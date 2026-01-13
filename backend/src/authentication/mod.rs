@@ -77,6 +77,7 @@ mod tests {
             api::{AccountUpdateRequest, Credentials},
             middleware::extend_session,
             role::Role,
+            user::UserId,
             *,
         },
         error::ErrorReference,
@@ -159,7 +160,7 @@ mod tests {
         let body = response.into_body().collect().await.unwrap().to_bytes();
         let result: LoginResponse = serde_json::from_slice(&body).unwrap();
 
-        assert_eq!(result.user_id, 1);
+        assert_eq!(result.user_id, UserId::from(1));
         assert_eq!(result.username, "admin1");
     }
 
@@ -290,7 +291,7 @@ mod tests {
         let body = response.into_body().collect().await.unwrap().to_bytes();
         let result: LoginResponse = serde_json::from_slice(&body).unwrap();
 
-        assert_eq!(result.user_id, 1);
+        assert_eq!(result.user_id, UserId::from(1));
         assert_eq!(result.username, "admin1");
 
         // logout the current user
@@ -348,7 +349,7 @@ mod tests {
         let mut conn = pool.acquire().await.unwrap();
 
         // Set admin as incomplete user
-        user::set_temporary_password(&mut conn, 1, "Admin1Password01")
+        user::set_temporary_password(&mut conn, UserId::from(1), "Admin1Password01")
             .await
             .unwrap();
 
@@ -411,7 +412,7 @@ mod tests {
         let mut conn = pool.acquire().await.unwrap();
 
         // Set admin as incomplete user
-        user::set_temporary_password(&mut conn, 1, "Admin1Password01")
+        user::set_temporary_password(&mut conn, UserId::from(1), "Admin1Password01")
             .await
             .unwrap();
 
@@ -449,7 +450,7 @@ mod tests {
         let mut conn = pool.acquire().await.unwrap();
 
         // Set admin as incomplete user
-        user::set_temporary_password(&mut conn, 1, "Admin1Password01")
+        user::set_temporary_password(&mut conn, UserId::from(1), "Admin1Password01")
             .await
             .unwrap();
 
@@ -519,7 +520,7 @@ mod tests {
         let mut conn = pool.acquire().await.unwrap();
         let session = session::create(
             &mut conn,
-            1,
+            UserId::from(1),
             TEST_USER_AGENT,
             TEST_IP_ADDRESS,
             SESSION_LIFE_TIME,
@@ -556,7 +557,7 @@ mod tests {
         let mut conn = pool.acquire().await.unwrap();
         let session = session::create(
             &mut conn,
-            1,
+            UserId::from(1),
             TEST_USER_AGENT,
             TEST_IP_ADDRESS,
             SESSION_LIFE_TIME,
@@ -586,7 +587,7 @@ mod tests {
         // with a session that is about to expire the user should get a new cookie, and the session lifetime should be extended
         let session: session::Session = session::create(
             &mut conn,
-            1,
+            UserId::from(1),
             TEST_USER_AGENT,
             TEST_IP_ADDRESS,
             SESSION_MIN_LIFE_TIME / 2,
@@ -695,7 +696,7 @@ mod tests {
         let mut conn = pool.acquire().await.unwrap();
         let session = session::create(
             &mut conn,
-            5,
+            UserId::from(5),
             TEST_USER_AGENT,
             TEST_IP_ADDRESS,
             SESSION_LIFE_TIME,

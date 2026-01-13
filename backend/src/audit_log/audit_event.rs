@@ -6,8 +6,9 @@ use utoipa::ToSchema;
 
 use super::AuditEventLevel;
 use crate::{
-    ErrorResponse, committee_session::CommitteeSessionId, election::ElectionId,
-    error::ErrorReference, files::FileId, investigation::PollingStationInvestigation,
+    ErrorResponse, authentication::user::UserId, election::ElectionId, error::ErrorReference,
+    committee_session::CommitteeSessionId,
+    files::FileId, investigation::PollingStationInvestigation,
     polling_station::PollingStationId,
 };
 
@@ -34,7 +35,7 @@ pub struct UserLoggedOutDetails {
 #[derive(Serialize, Deserialize, Debug, PartialEq, Eq, ToSchema)]
 #[serde(deny_unknown_fields)]
 pub struct UserDetails {
-    pub user_id: u32,
+    pub user_id: UserId,
     #[serde(skip_serializing_if = "Option::is_none")]
     #[schema(value_type = String, nullable = false)]
     pub fullname: Option<String>,
@@ -130,8 +131,8 @@ pub struct DataEntryDetails {
     pub data_entry_progress: String,
     #[schema(value_type = Option<String>)]
     pub finished_at: Option<DateTime<Utc>>,
-    pub first_entry_user_id: Option<u32>,
-    pub second_entry_user_id: Option<u32>,
+    pub first_entry_user_id: Option<UserId>,
+    pub second_entry_user_id: Option<UserId>,
 }
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, Eq, ToSchema)]

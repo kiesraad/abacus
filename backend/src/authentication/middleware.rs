@@ -142,6 +142,7 @@ mod test {
         audit_log::AuditService,
         authentication::{
             DO_NOT_EXTEND_SESSION_HEADER, Role, SESSION_LIFE_TIME, SESSION_MIN_LIFE_TIME, User,
+            user::UserId,
         },
     };
 
@@ -157,7 +158,7 @@ mod test {
             "inject_user should not inject a user if there is no session cookie"
         );
 
-        let user = User::test_user(Role::Administrator, 1);
+        let user = User::test_user(Role::Administrator, UserId::from(1));
         let mut conn = pool.acquire().await.unwrap();
         let session = crate::authentication::session::create(
             &mut conn,
@@ -198,7 +199,7 @@ mod test {
 
     #[test(sqlx::test(fixtures("../../fixtures/users.sql")))]
     async fn test_extend_session(pool: SqlitePool) {
-        let user = User::test_user(Role::Administrator, 1);
+        let user = User::test_user(Role::Administrator, UserId::from(1));
 
         let audit_service = AuditService::new(
             Some(user.clone()),
@@ -301,7 +302,7 @@ mod test {
 
     #[test(sqlx::test(fixtures("../../fixtures/users.sql")))]
     async fn test_extend_session_do_not_extend_header(pool: SqlitePool) {
-        let user = User::test_user(Role::Administrator, 1);
+        let user = User::test_user(Role::Administrator, UserId::from(1));
 
         let audit_service = AuditService::new(
             Some(user.clone()),

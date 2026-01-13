@@ -1,10 +1,10 @@
 {
   "db_name": "SQLite",
-  "query": "\n        UPDATE polling_station_investigations\n        SET\n          reason = ?,\n          findings = ?,\n          corrected_results = ?\n        WHERE\n          polling_station_id = ?\n        RETURNING\n          polling_station_id as \"polling_station_id: u32\",\n          reason,\n          findings,\n          corrected_results as \"corrected_results: bool\"\n        ",
+  "query": "\n        UPDATE polling_station_investigations\n        SET\n          reason = ?,\n          findings = ?,\n          corrected_results = ?\n        WHERE\n          polling_station_id = ?\n        RETURNING\n          polling_station_id as \"polling_station_id: PollingStationId\",\n          reason,\n          findings,\n          corrected_results as \"corrected_results: bool\"\n        ",
   "describe": {
     "columns": [
       {
-        "name": "polling_station_id: u32",
+        "name": "polling_station_id: PollingStationId",
         "ordinal": 0,
         "type_info": "Integer"
       },
@@ -34,5 +34,5 @@
       true
     ]
   },
-  "hash": "19d54e7b6d192e6d7658c9e0da112304ef9e20b3780e933dc12c76baab4564e9"
+  "hash": "4bb95f9923e6dfc035ace5447d57acfae577578d98f1e3b0135cff174d0abf18"
 }

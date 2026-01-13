@@ -9,21 +9,22 @@ use utoipa::ToSchema;
 
 use crate::{
     APIError, audit_log::PollingStationDetails, committee_session::CommitteeSessionId,
-    election::ElectionId,
+    election::ElectionId, util::id,
 };
 
 pub type PollingStationNumber = u32;
+id!(PollingStationId);
 
 /// Polling station of a certain [crate::election::Election]
 #[derive(Serialize, Deserialize, ToSchema, Debug, FromRow, Clone)]
 #[serde(deny_unknown_fields)]
 pub struct PollingStation {
-    pub id: u32,
+    pub id: PollingStationId,
     pub election_id: ElectionId,
     pub committee_session_id: CommitteeSessionId,
     #[serde(skip_serializing_if = "Option::is_none")]
     #[schema(nullable = false)]
-    pub id_prev_session: Option<u32>,
+    pub id_prev_session: Option<PollingStationId>,
     pub name: String,
     #[schema(value_type = u32)]
     pub number: PollingStationNumber,
@@ -147,7 +148,7 @@ pub(crate) mod tests {
         let committee_session = committee_session_fixture(election.id);
 
         PollingStation {
-            id: 1,
+            id: PollingStationId::from(1),
             election_id: election.id,
             committee_session_id: committee_session.id,
             id_prev_session: None,

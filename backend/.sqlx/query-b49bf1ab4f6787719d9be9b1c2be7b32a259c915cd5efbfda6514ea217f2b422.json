@@ -1,10 +1,10 @@
 {
   "db_name": "SQLite",
-  "query": "\n            DELETE FROM polling_station_investigations\n            WHERE polling_station_id = ?\n            RETURNING\n                polling_station_id AS \"polling_station_id: u32\",\n                reason,\n                findings,\n                corrected_results as \"corrected_results: bool\"\n        ",
+  "query": "\n        SELECT\n            psi.polling_station_id as \"polling_station_id: PollingStationId\",\n            psi.reason,\n            psi.findings,\n            psi.corrected_results as \"corrected_results: bool\"\n        FROM polling_station_investigations psi\n        JOIN polling_stations ps ON ps.id = psi.polling_station_id\n        WHERE ps.committee_session_id = ?\n        ",
   "describe": {
     "columns": [
       {
-        "name": "polling_station_id: u32",
+        "name": "polling_station_id: PollingStationId",
         "ordinal": 0,
         "type_info": "Integer"
       },
@@ -34,5 +34,5 @@
       true
     ]
   },
-  "hash": "1883c9e114d28bfce8e07911da11f50385fba95ca646a0f823b3ba53af761a67"
+  "hash": "b49bf1ab4f6787719d9be9b1c2be7b32a259c915cd5efbfda6514ea217f2b422"
 }

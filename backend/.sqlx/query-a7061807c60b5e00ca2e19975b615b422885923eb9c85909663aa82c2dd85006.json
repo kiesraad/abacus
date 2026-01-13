@@ -1,0 +1,26 @@
+{
+  "db_name": "SQLite",
+  "query": "SELECT event_name, json(event) as \"event: serde_json::Value\" FROM audit_log ORDER BY id DESC LIMIT 1",
+  "describe": {
+    "columns": [
+      {
+        "name": "event_name",
+        "ordinal": 0,
+        "type_info": "Text"
+      },
+      {
+        "name": "event: serde_json::Value",
+        "ordinal": 1,
+        "type_info": "Null"
+      }
+    ],
+    "parameters": {
+      "Right": 0
+    },
+    "nullable": [
+      false,
+      null
+    ]
+  },
+  "hash": "a7061807c60b5e00ca2e19975b615b422885923eb9c85909663aa82c2dd85006"
+}

@@ -38,7 +38,7 @@ pub async fn get(
 
 pub async fn get_previous_session(
     conn: &mut SqliteConnection,
-    committee_session_id: super::CommitteeSessionId,
+    committee_session_id: CommitteeSessionId,
 ) -> Result<Option<CommitteeSession>, sqlx::Error> {
     query_as!(
         CommitteeSession,

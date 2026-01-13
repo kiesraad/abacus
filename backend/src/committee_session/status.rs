@@ -289,7 +289,7 @@ mod tests {
             let mut conn = pool.acquire().await?;
             let audit_service = AuditService::new(None, Some(Ipv4Addr::new(203, 0, 113, 0).into()));
 
-            let committee_session_id = crate::committee_session::CommitteeSessionId::from(6);
+            let committee_session_id = CommitteeSessionId::from(6);
 
             // DataEntryInProgress --> DataEntryFinished
             change_committee_session_status(

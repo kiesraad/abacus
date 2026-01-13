@@ -147,6 +147,8 @@ async function uploadCandidateDefinition(file: File) {
   expect(await screen.findByLabelText("Geen bestand gekozen")).toBeVisible();
 
   await user.upload(input, file);
+
+  expect(await screen.findByRole("heading", { level: 2, name: "Controleer kandidatenlijsten" })).toBeVisible();
 }
 
 /**
@@ -171,6 +173,25 @@ async function inputCandidateHash() {
   await user.click(screen.getByRole("button", { name: "Volgende" }));
 }
 
+async function uploadPollingStationList(file: File, matching_election: boolean) {
+  const user = userEvent.setup();
+  overrideOnce(
+    "post",
+    "/api/elections/import/validate",
+    200,
+    electionValidateResponse(newElectionMockData, pollingStationMockData, matching_election),
+  );
+
+  // Wait for the polling station list page to be loaded
+  expect(
+    await screen.findByRole("heading", { level: 2, name: "Importeer stembureaus gemeente Heemdamseburg" }),
+  ).toBeVisible();
+  const input = await screen.findByLabelText("Bestand kiezen");
+  expect(input).toBeVisible();
+  expect(await screen.findByLabelText("Geen bestand gekozen")).toBeVisible();
+  await user.upload(input, file);
+}
+
 describe("Election create pages", () => {
   beforeEach(() => {
     server.use(ElectionListRequestHandler);
@@ -182,19 +203,12 @@ describe("Election create pages", () => {
       overrideOnce("post", "/api/elections/import/validate", 200, electionValidateResponse(newElectionMockData));
 
       const router = renderWithRouter();
-      const filename = "foo.txt";
-      const file = new File(["foo"], filename, { type: "text/plain" });
+      const file = new File(["foo"], "foo.txt", { type: "text/plain" });
 
       // update election and set hash, and continue
       await uploadElectionDefinition(router, file);
       await inputElectionHash();
       await setPollingStationRole();
-
-      // Wait for the candidate page to be loaded
-      expect(await screen.findByRole("heading", { level: 2, name: "Importeer kandidatenlijsten" })).toBeVisible();
-      const input = await screen.findByLabelText("Bestand kiezen");
-      expect(input).toBeVisible();
-      expect(await screen.findByLabelText("Geen bestand gekozen")).toBeVisible();
 
       // upload candidate file, set hash and continue
       await uploadCandidateDefinition(file);
@@ -213,20 +227,15 @@ describe("Election create pages", () => {
       const router = renderWithRouter();
       const user = userEvent.setup();
 
-      const filename = "foo.txt";
-      const file = new File(["foo"], filename, { type: "text/plain" });
+      const file = new File(["foo"], "foo.txt", { type: "text/plain" });
 
       // update election and set hash, and continue
       await uploadElectionDefinition(router, file);
       await inputElectionHash();
       await setPollingStationRole();
 
-      // Wait for the page to be loaded
-      expect(await screen.findByRole("heading", { level: 2, name: "Importeer kandidatenlijsten" })).toBeVisible();
-      const input = await screen.findByLabelText("Bestand kiezen");
-      expect(input).toBeVisible();
-      expect(await screen.findByLabelText("Geen bestand gekozen")).toBeVisible();
-      await user.upload(input, file);
+      // upload candidate file
+      await uploadCandidateDefinition(file);
 
       // Click the Afbreken button
       const button = screen.getByRole("button", { name: "Afbreken" });
@@ -241,20 +250,15 @@ describe("Election create pages", () => {
       const router = renderWithRouter();
       const user = userEvent.setup();
 
-      const filename = "foo.txt";
-      const file = new File(["foo"], filename, { type: "text/plain" });
+      const file = new File(["foo"], "foo.txt", { type: "text/plain" });
 
       // update election and set hash, and continue
       await uploadElectionDefinition(router, file);
       await inputElectionHash();
       await setPollingStationRole();
 
-      // Wait for the page to be loaded
-      expect(await screen.findByRole("heading", { level: 2, name: "Importeer kandidatenlijsten" })).toBeVisible();
-      const input = await screen.findByLabelText("Bestand kiezen");
-      expect(input).toBeVisible();
-      expect(await screen.findByLabelText("Geen bestand gekozen")).toBeVisible();
-      await user.upload(input, file);
+      // upload candidate file
+      await uploadCandidateDefinition(file);
 
       // Click the 'Verkiezingen' nav item
       const nav_item = screen.getByRole("link", { name: "Verkiezingen" });
@@ -290,22 +294,15 @@ describe("Election create pages", () => {
 
       const router = renderWithRouter();
       const user = userEvent.setup();
-
-      const filename = "foo.txt";
-      const file = new File(["foo"], filename, { type: "text/plain" });
+      const file = new File(["foo"], "foo.txt", { type: "text/plain" });
 
       // update election and set hash, and continue
       await uploadElectionDefinition(router, file);
       await inputElectionHash();
       await setPollingStationRole();
 
-      // Wait for the page to be loaded
-      expect(await screen.findByRole("heading", { level: 2, name: "Importeer kandidatenlijsten" })).toBeVisible();
-      const input = await screen.findByLabelText("Bestand kiezen");
-      expect(input).toBeVisible();
-      expect(await screen.findByLabelText("Geen bestand gekozen")).toBeVisible();
-      await user.upload(input, file);
-      expect(await screen.findByRole("heading", { level: 2, name: "Controleer kandidatenlijsten" })).toBeVisible();
+      // upload candidate file
+      await uploadCandidateDefinition(file);
 
       // Click the 'Verkiezingen' nav item
       const nav_item = screen.getByRole("link", { name: "Verkiezingen" });
@@ -327,21 +324,15 @@ describe("Election create pages", () => {
 
       const router = renderWithRouter();
       const user = userEvent.setup();
-      const filename = "foo.txt";
-      const file = new File(["foo"], filename, { type: "text/plain" });
+      const file = new File(["foo"], "foo.txt", { type: "text/plain" });
 
       // update election and set hash, and continue
       await uploadElectionDefinition(router, file);
       await inputElectionHash();
       await setPollingStationRole();
 
-      // Wait for the page to be loaded
-      expect(await screen.findByRole("heading", { level: 2, name: "Importeer kandidatenlijsten" })).toBeVisible();
-      const input = await screen.findByLabelText("Bestand kiezen");
-      expect(input).toBeVisible();
-      expect(await screen.findByLabelText("Geen bestand gekozen")).toBeVisible();
-      await user.upload(input, file);
-      expect(await screen.findByRole("heading", { level: 2, name: "Controleer kandidatenlijsten" })).toBeVisible();
+      // upload candidate file
+      await uploadCandidateDefinition(file);
 
       // Click the 'Verkiezingen' nav item
       const nav_item = screen.getByRole("link", { name: "Verkiezingen" });
@@ -364,21 +355,15 @@ describe("Election create pages", () => {
 
       const router = renderWithRouter();
       const user = userEvent.setup();
-      const filename = "foo.txt";
-      const file = new File(["foo"], filename, { type: "text/plain" });
+      const file = new File(["foo"], "foo.txt", { type: "text/plain" });
 
       // update election and set hash, and continue
       await uploadElectionDefinition(router, file);
       await inputElectionHash();
       await setPollingStationRole();
 
-      // Wait for the page to be loaded
-      expect(await screen.findByRole("heading", { level: 2, name: "Importeer kandidatenlijsten" })).toBeVisible();
-      const input = await screen.findByLabelText("Bestand kiezen");
-      expect(input).toBeVisible();
-      expect(await screen.findByLabelText("Geen bestand gekozen")).toBeVisible();
-      await user.upload(input, file);
-      expect(await screen.findByRole("heading", { level: 2, name: "Controleer kandidatenlijsten" })).toBeVisible();
+      // upload candidate file
+      await uploadCandidateDefinition(file);
 
       // Click the 'Verkiezingen' nav item
       const nav_item = screen.getByRole("link", { name: "Verkiezingen" });
@@ -400,8 +385,7 @@ describe("Election create pages", () => {
     test("Skip button on polling station upload page should skip to next page", async () => {
       const router = renderWithRouter();
       const user = userEvent.setup();
-      const filename = "foo.txt";
-      const file = new File(["foo"], filename, { type: "text/plain" });
+      const file = new File(["foo"], "foo.txt", { type: "text/plain" });
 
       // upload election and set hash, and continue
       await uploadElectionDefinition(router, file);
@@ -425,8 +409,7 @@ describe("Election create pages", () => {
     test("Shows warning when uploading a polling stations file with not matching election id", async () => {
       const router = renderWithRouter();
       const user = userEvent.setup();
-      const filename = "foo.txt";
-      const file = new File(["foo"], filename, { type: "text/plain" });
+      const file = new File(["foo"], "foo.txt", { type: "text/plain" });
 
       // upload election and set hash, and continue
       await uploadElectionDefinition(router, file);
@@ -437,21 +420,8 @@ describe("Election create pages", () => {
       await uploadCandidateDefinition(file);
       await inputCandidateHash();
 
-      overrideOnce(
-        "post",
-        "/api/elections/import/validate",
-        200,
-        electionValidateResponse(newElectionMockData, pollingStationMockData, false),
-      );
-
-      // Make sure we are on the correct page
-      expect(
-        await screen.findByRole("heading", { level: 2, name: "Importeer stembureaus gemeente Heemdamseburg" }),
-      ).toBeVisible();
-      const input = await screen.findByLabelText("Bestand kiezen");
-      expect(input).toBeVisible();
-      expect(await screen.findByLabelText("Geen bestand gekozen")).toBeVisible();
-      await user.upload(input, file);
+      // upload polling station list file
+      await uploadPollingStationList(file, false);
 
       // We should be at the check polling stations page
       expect(await screen.findByRole("heading", { level: 2, name: "Controleer stembureaus" })).toBeVisible();
@@ -475,8 +445,7 @@ describe("Election create pages", () => {
     test("Shows overview when uploading valid polling station file", async () => {
       const router = renderWithRouter();
       const user = userEvent.setup();
-      const filename = "foo.txt";
-      const file = new File(["foo"], filename, { type: "text/plain" });
+      const file = new File(["foo"], "foo.txt", { type: "text/plain" });
 
       // upload election and set hash, and continue
       await uploadElectionDefinition(router, file);
@@ -487,21 +456,8 @@ describe("Election create pages", () => {
       await uploadCandidateDefinition(file);
       await inputCandidateHash();
 
-      overrideOnce(
-        "post",
-        "/api/elections/import/validate",
-        200,
-        electionValidateResponse(newElectionMockData, pollingStationMockData, true),
-      );
-
-      // Make sure we are on the correct page
-      expect(
-        await screen.findByRole("heading", { level: 2, name: "Importeer stembureaus gemeente Heemdamseburg" }),
-      ).toBeVisible();
-      const input = await screen.findByLabelText("Bestand kiezen");
-      expect(input).toBeVisible();
-      expect(await screen.findByLabelText("Geen bestand gekozen")).toBeVisible();
-      await user.upload(input, file);
+      // upload polling station list file
+      await uploadPollingStationList(file, true);
 
       // We should be at the check polling stations page
       expect(await screen.findByRole("heading", { level: 2, name: "Controleer stembureaus" })).toBeVisible();

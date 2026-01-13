@@ -238,7 +238,7 @@ test.describe("full flow", () => {
       await accountSetupPage.saveBtn.click();
 
       const overviewPage = new ElectionsOverviewPgObj(page);
-      await expect(overviewPage.alert).toBeVisible();
+      await expect(overviewPage.alertAccountSetup).toBeVisible();
     });
   }
 

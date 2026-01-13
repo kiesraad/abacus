@@ -87,6 +87,7 @@ test.describe("Election creation", () => {
     // Back to the check and save page to test saving the election
     const election = await checkAndSavePage.saveElection();
     await expect(overviewPage.adminHeader).toBeVisible();
+    await expect(overviewPage.alertElectionCreated).toBeVisible();
 
     const electionRow = overviewPage.findElectionRowById(election.id);
     await expect(electionRow).toBeVisible();

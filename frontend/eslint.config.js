@@ -16,7 +16,7 @@ const restrictFeatureImports = readdirSync(FEATURES_DIR, { withFileTypes: true }
   .map((dir) => dir.name)
   .map((feature) => ({
     target: `${FEATURES_DIR}/${feature}`,
-    from: `${FEATURES_DIR}/`,
+    from: FEATURES_DIR,
     except: [feature],
     message: "Cross-feature imports are not allowed.",
   }));
@@ -62,7 +62,7 @@ export default defineConfig(
             // enforce unidirectional codebase:
             // e.g. src/app can import from src/features but not the other way around
             {
-              target: "./src/features",
+              target: FEATURES_DIR,
               from: "./src/app",
               message: "Imports from app are not allowed in features.",
             },
@@ -70,7 +70,7 @@ export default defineConfig(
             // e.g. src/features and src/app can import from these shared modules but not the other way around
             {
               target: ["./src/components", "./src/hooks", "./src/lib", "./src/types", "./src/utils"],
-              from: ["./src/features", "./src/app"],
+              from: [FEATURES_DIR, "./src/app"],
               message: "Imports from features and app are not allowed in shared folders.",
             },
           ],

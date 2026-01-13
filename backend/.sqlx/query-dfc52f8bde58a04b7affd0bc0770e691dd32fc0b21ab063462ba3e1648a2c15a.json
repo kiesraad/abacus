@@ -1,6 +1,6 @@
 {
   "db_name": "SQLite",
-  "query": "\n            SELECT\n                polling_station_id AS \"polling_station_id: PollingStationId\",\n                committee_session_id AS \"committee_session_id: CommitteeSessionId\",\n                state AS \"state: _\",\n                updated_at AS \"updated_at: _\"\n            FROM polling_station_data_entries\n            WHERE polling_station_id = 9\n            ",
+  "query": "\n            SELECT\n                polling_station_id AS \"polling_station_id: PollingStationId\",\n                committee_session_id AS \"committee_session_id: CommitteeSessionId\",\n                state AS \"state: _\",\n                updated_at AS \"updated_at: _\"\n            FROM polling_station_data_entries\n            WHERE polling_station_id = ?\n            ",
   "describe": {
     "columns": [
       {
@@ -25,7 +25,7 @@
       }
     ],
     "parameters": {
-      "Right": 0
+      "Right": 1
     },
     "nullable": [
       false,
@@ -34,5 +34,5 @@
       false
     ]
   },
-  "hash": "c5d3f9d8219c2ca8d56bb40e8392a58710ae4f04f44e60a8818aa6cc34394d4d"
+  "hash": "dfc52f8bde58a04b7affd0bc0770e691dd32fc0b21ab063462ba3e1648a2c15a"
 }

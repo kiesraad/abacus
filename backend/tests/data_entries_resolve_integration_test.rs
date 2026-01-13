@@ -47,7 +47,7 @@ pub fn different_data_entries() -> (serde_json::Value, serde_json::Value) {
 async fn get_data_entry(
     addr: &SocketAddr,
     cookie: &HeaderValue,
-    polling_station_id: PollingStationId,
+    polling_station_id: u32,
 ) -> Response {
     let url = format!("http://{addr}/api/polling_stations/{polling_station_id}/data_entries/get");
     Client::new()
@@ -61,7 +61,7 @@ async fn get_data_entry(
 async fn resolve_errors(
     addr: &SocketAddr,
     cookie: &HeaderValue,
-    polling_station_id: PollingStationId,
+    polling_station_id: u32,
     action: &str,
 ) -> Response {
     let url = format!(
@@ -79,7 +79,7 @@ async fn resolve_errors(
 async fn get_resolve_differences(
     addr: &SocketAddr,
     cookie: &HeaderValue,
-    polling_station_id: PollingStationId,
+    polling_station_id: u32,
 ) -> Response {
     let url = format!(
         "http://{addr}/api/polling_stations/{polling_station_id}/data_entries/resolve_differences"
@@ -95,7 +95,7 @@ async fn get_resolve_differences(
 async fn resolve_differences(
     addr: &SocketAddr,
     cookie: &HeaderValue,
-    polling_station_id: PollingStationId,
+    polling_station_id: u32,
     action: &str,
 ) -> Response {
     let url = format!(

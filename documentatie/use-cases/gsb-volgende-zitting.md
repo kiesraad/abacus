@@ -1,6 +1,6 @@
 # GSB: Volgende zitting
 
-## Gemeentelijk stembureau (GSB) stelt uitkomst vast in volgende zitting (corrigenda) (wolk)
+## Gemeentelijk stembureau (GSB) stelt uitkomst vast in volgende zitting (corrigendum) (wolk)
 
 __Niveau:__ hoog-over, wolk, ☁️
 

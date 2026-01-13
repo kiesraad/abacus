@@ -17,11 +17,8 @@ __Uitbreidingen:__
 2a. De gebruiker wil ook diens naam aanpassen:  
 &emsp; 2a1. De gebruiker past de naam aan.
 
-3a. De applicatie stelt vast dat het ingevulde nieuwe wachtwoord korter dan 13 tekens is:  
-&emsp; 3a1. De gebruiker past het ingevulde nieuwe wachtwoord aan naar een lengte van minimaal 13 tekens
-
-3b. De applicatie stelt vast dat het ingevulde nieuwe wachtwoord gelijk is aan de gebruikersnaam:  
-&emsp; 3b1. De gebruiker past het ingevulde nieuwe wachtwoord aan naar iets anders dan de gebruikersnaam
+3a. De applicatie stelt vast dat het ingevulde nieuwe wachtwoord voldoet aan de eisen:  
+&emsp; 3a1. De gebruiker past het ingevulde nieuwe wachtwoord aan de eisen aan
 
 ### Open punten
 

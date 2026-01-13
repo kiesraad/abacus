@@ -79,6 +79,7 @@
 }
 
 .first_entry_finalised,
+.first_entry_finalised_for_typist,
 .second_entry_in_progress,
 .entries_different {
   background: var(--badge-second-entry-bg);

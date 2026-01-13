@@ -115,7 +115,14 @@ export function PollingStationSelector({
                 content={
                   <>
                     <span className="bold">{currentPollingStation.name}</span>
-                    <Badge type={currentPollingStation.statusEntry.status} showIcon />
+                    <Badge
+                      type={
+                        currentPollingStation.statusEntry.status === "first_entry_finalised"
+                          ? "first_entry_finalised_for_typist"
+                          : currentPollingStation.statusEntry.status
+                      }
+                      showIcon
+                    />
                   </>
                 }
               />

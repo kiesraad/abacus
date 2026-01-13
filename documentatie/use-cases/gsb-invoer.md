@@ -1,4 +1,4 @@
-# GSB: Invoer eerste zitting
+# GSB: Invoer
 
 ## De coördinator GSB en de invoerders voeren alle gegevens in de applicatie in (vlieger)
 

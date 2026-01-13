@@ -4,6 +4,7 @@ import { isNode } from "@/utils/typeChecks";
 
 type Dir = "up" | "down" | "first" | "last";
 
+// biome-ignore lint/complexity/noExcessiveLinesPerFunction: TODO function should be refactored
 export function useFormKeyboardNavigation(): RefObject<HTMLFormElement | null> {
   const innerRef = useRef<HTMLFormElement>(null);
 

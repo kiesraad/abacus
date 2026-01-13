@@ -25,6 +25,7 @@ import { fileTooLargeError, isFileTooLarge } from "@/utils/uploadFileSize";
 
 import { PollingStationAlert } from "./PollingStationAlert";
 
+// biome-ignore lint/complexity/noExcessiveLinesPerFunction: TODO function should be refactored
 export function PollingStationImportPage() {
   const { election } = useElection();
   const { pushMessage } = useMessages();

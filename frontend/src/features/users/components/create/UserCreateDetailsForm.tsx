@@ -19,6 +19,7 @@ export interface UserCreateDetailsFormProps {
 
 type ValidationErrors = Partial<CreateUserRequest>;
 
+// biome-ignore lint/complexity/noExcessiveLinesPerFunction: TODO function should be refactored
 export function UserCreateDetailsForm({ role, showFullname, onSubmitted }: UserCreateDetailsFormProps) {
   const [validationErrors, setValidationErrors] = useState<ValidationErrors | null>(null);
   const createPath: USER_CREATE_REQUEST_PATH = "/api/users";

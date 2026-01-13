@@ -20,6 +20,7 @@ export interface UserUpdateFormProps {
 
 type ValidationErrors = Partial<UpdateUserRequest>;
 
+// biome-ignore lint/complexity/noExcessiveLinesPerFunction: TODO function should be refactored
 export function UserUpdateForm({ user, onSaved, onAbort }: UserUpdateFormProps) {
   const [editPassword, setEditPassword] = useState(false);
   const [validationErrors, setValidationErrors] = useState<ValidationErrors>();

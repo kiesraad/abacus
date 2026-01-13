@@ -25,6 +25,7 @@ export function getInitialState(
   };
 }
 
+// biome-ignore lint/complexity/noExcessiveLinesPerFunction: TODO function should be refactored
 export default function dataEntryReducer(state: DataEntryState, action: DataEntryAction): DataEntryState {
   switch (action.type) {
     case "DATA_ENTRY_CLAIMED": {

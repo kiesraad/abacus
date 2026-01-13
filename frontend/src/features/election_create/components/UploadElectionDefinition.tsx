@@ -17,6 +17,7 @@ import { fileTooLargeError, isFileTooLarge } from "@/utils/uploadFileSize";
 import { useElectionCreateContext } from "../hooks/useElectionCreateContext";
 import { CheckHash } from "./CheckHash";
 
+// biome-ignore lint/complexity/noExcessiveLinesPerFunction: TODO function should be refactored
 export function UploadElectionDefinition() {
   const { state, dispatch } = useElectionCreateContext();
   const navigate = useNavigate();

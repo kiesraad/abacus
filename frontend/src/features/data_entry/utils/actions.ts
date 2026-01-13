@@ -42,12 +42,14 @@ export function updateFormSection(dispatch: DataEntryDispatch) {
   };
 }
 
+// biome-ignore lint/complexity/noExcessiveLinesPerFunction: TODO function should be refactored
 export function onSubmitForm(
   client: ApiClient,
   requestPath: string,
   dispatch: DataEntryDispatch,
   state: DataEntryState,
 ) {
+  // biome-ignore lint/complexity/noExcessiveLinesPerFunction: TODO function should be refactored
   return async (
     sectionId: FormSectionId,
     currentValues: SectionValues,

@@ -14,6 +14,7 @@ import type { FormSection } from "../types/types";
 import { isFormSectionEmpty } from "../utils/dataEntryUtils";
 import { getUrlForFormSectionID } from "../utils/utils";
 
+// biome-ignore lint/complexity/noExcessiveLinesPerFunction: TODO function should be refactored
 export function DataEntryProgress() {
   const pollingStationId = useNumericParam("pollingStationId");
   const { election } = useElection();

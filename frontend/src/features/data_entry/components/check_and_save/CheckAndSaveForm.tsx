@@ -25,6 +25,7 @@ import type { DataEntryFormSectionStatus } from "../../utils/dataEntryUtils";
 import { getUrlForFormSectionID } from "../../utils/utils";
 import { DataEntryNavigation } from "../DataEntryNavigation";
 
+// biome-ignore lint/complexity/noExcessiveLinesPerFunction: TODO function should be refactored
 export function CheckAndSaveForm() {
   const formRef = useFormKeyboardNavigation();
 

@@ -17,6 +17,7 @@ export interface DataEntryNavigationProps {
   currentValues?: SectionValues;
 }
 
+// biome-ignore lint/complexity/noExcessiveLinesPerFunction: TODO function should be refactored
 export function DataEntryNavigation({ onSubmit, currentValues = {} }: DataEntryNavigationProps) {
   const {
     error,

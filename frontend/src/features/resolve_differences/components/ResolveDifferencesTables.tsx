@@ -35,6 +35,7 @@ interface SectionTableProps {
   action?: ResolveDifferencesAction;
 }
 
+// biome-ignore lint/complexity/noExcessiveLinesPerFunction: TODO function should be refactored
 function SectionTable({ section, first, second, action }: SectionTableProps) {
   const titleFromHeading = section.subsections.find((s) => s.type === "heading")?.title;
   const title = titleFromHeading ?? section.title;

@@ -18,6 +18,7 @@ import cls from "./ResolveDifferences.module.css";
 import { ResolveDifferencesOverview } from "./ResolveDifferencesOverview";
 import { ResolveDifferencesTables } from "./ResolveDifferencesTables";
 
+// biome-ignore lint/complexity/noExcessiveLinesPerFunction: TODO function should be refactored
 export function ResolveDifferencesPage() {
   const { pushMessage } = useMessages();
   const navigate = useNavigate();

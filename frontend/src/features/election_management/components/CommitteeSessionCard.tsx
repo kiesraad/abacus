@@ -83,6 +83,7 @@ export interface CommitteeSessionCardProps {
   isCurrentSession: boolean;
 }
 
+// biome-ignore lint/complexity/noExcessiveLinesPerFunction: TODO function should be refactored
 export function CommitteeSessionCard({
   committeeSession,
   isCurrentSession,

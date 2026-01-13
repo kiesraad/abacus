@@ -29,6 +29,7 @@ interface InvestigationFindingsProps {
 
 const ACCEPTED = "accepted";
 
+// biome-ignore lint/complexity/noExcessiveLinesPerFunction: TODO function should be refactored
 export function InvestigationFindings({ pollingStationId }: InvestigationFindingsProps) {
   const navigate = useNavigate();
   const { hasMessages } = useMessages();
@@ -57,6 +58,7 @@ export function InvestigationFindings({ pollingStationId }: InvestigationFinding
 
   const requiresCorrectedResults = !pollingStation.id_prev_session;
 
+  // biome-ignore lint/complexity/noExcessiveLinesPerFunction: TODO function should be refactored
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 

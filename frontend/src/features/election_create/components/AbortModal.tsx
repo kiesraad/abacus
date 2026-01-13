@@ -7,6 +7,7 @@ import { t, tx } from "@/i18n/translate";
 
 import { useElectionCreateContext } from "../hooks/useElectionCreateContext";
 
+// biome-ignore lint/complexity/noExcessiveLinesPerFunction: TODO function should be refactored
 export function AbortModal() {
   const { state } = useElectionCreateContext();
   const user = useUser();

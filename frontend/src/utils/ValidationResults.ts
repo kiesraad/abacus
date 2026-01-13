@@ -49,6 +49,7 @@ export function doesValidationResultApplyToSection(
   validationResult: ValidationResult,
   section: DataEntrySection,
 ): boolean {
+  // biome-ignore lint/complexity/noExcessiveCognitiveComplexity: TODO function should be refactored
   return validationResult.fields.some((fieldName) => {
     // Remove "data." prefix if present
     const normalizedFieldName = fieldName.startsWith("data.") ? fieldName.substring(5) : fieldName;

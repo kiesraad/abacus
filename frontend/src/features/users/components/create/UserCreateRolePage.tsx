@@ -12,6 +12,7 @@ import { StringFormData } from "@/utils/stringFormData";
 
 import { useUserCreateContext } from "../../hooks/useUserCreateContext";
 
+// biome-ignore lint/complexity/noExcessiveLinesPerFunction: TODO function should be refactored
 export function UserCreateRolePage() {
   const navigate = useNavigate();
   const [error, setError] = useState<string>("");

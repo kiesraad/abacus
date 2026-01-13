@@ -20,6 +20,7 @@ const formSections = [
   { key: "investigation_findings", label: t("investigations.findings.nav_title"), path: "findings" },
 ];
 
+// biome-ignore lint/complexity/noExcessiveLinesPerFunction: TODO function should be refactored
 export function AddInvestigationLayout() {
   const location = useLocation();
   const pollingStationId = useNumericParam("pollingStationId");

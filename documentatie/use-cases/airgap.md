@@ -6,9 +6,12 @@ __Niveau:__ gebruikersdoel, zee  (🌊)
 
 ### Hoofdscenario en uitbreidingen
 
+__Hoofdscenario:__
+
 1. Regelmatig: de applicatie stelt vast dat er geen internetverbinding is (elke 30 seconden).
 
-__Uitbreidingen:__  
+__Uitbreidingen:__
+
 1a. De server stelt vast dat er een internetverbinding is:  
 &emsp; 1a1. De server blokkeert de invoer en aanpassingen aan de configuratie.  
 &emsp; 1a2. De server logt alle details met betrekking tot de geconstateerde internetverbinding.  

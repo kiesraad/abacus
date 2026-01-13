@@ -25,6 +25,7 @@ import { fileTooLargeError, isFileTooLarge } from "@/utils/uploadFileSize";
 
 import { PollingStationAlert } from "./PollingStationAlert";
 
+// biome-ignore lint/complexity/noExcessiveLinesPerFunction: TODO function should be refactored
 export function PollingStationImportPage() {
   const { election } = useElection();
   const { pushMessage } = useMessages();
@@ -64,6 +65,7 @@ export function PollingStationImportPage() {
   /**
    * When a file is uploaded, backend validate the contents
    */
+  // biome-ignore lint/complexity/noExcessiveCognitiveComplexity: TODO function should be refactored
   async function onFileChange(e: ChangeEvent<HTMLInputElement>) {
     const currentFile = e.target.files ? e.target.files[0] : undefined;
     if (currentFile !== undefined) {

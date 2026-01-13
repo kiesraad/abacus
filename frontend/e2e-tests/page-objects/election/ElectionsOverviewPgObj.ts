@@ -17,8 +17,7 @@ export class ElectionsOverviewPgObj {
     this.elections = page.getByTestId("overview").locator("tbody").getByRole("row");
 
     this.alertAccountSetup = page.getByRole("alert").filter({ hasText: "Je account is ingesteld" });
-
-    this.alertElectionCreated = page.getByRole("alert").filter({ hasText: /Verkiezing GSB \w+ toegevoegd/ });
+    this.alertElectionCreated = page.getByRole("alert").filter({ hasText: /^Verkiezing GSB [\w|\s]+ toegevoegd$/ });
   }
 
   findElectionRowById(electionId: number) {

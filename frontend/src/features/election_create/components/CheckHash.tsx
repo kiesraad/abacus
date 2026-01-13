@@ -21,6 +21,7 @@ interface CheckHashProps {
   onSubmit: (chunks: string[]) => void;
 }
 
+// biome-ignore lint/complexity/noExcessiveLinesPerFunction: TODO function should be refactored
 export function CheckHash({ date, title, header, description, redactedHash, error, onSubmit }: CheckHashProps) {
   const [changed, setChanged] = useState<boolean>(true);
   const [stubs, setStubs] = useState<Stub[]>(

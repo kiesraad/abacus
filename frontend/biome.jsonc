@@ -57,7 +57,19 @@
     "rules": {
       "recommended": true,
       "complexity": {
-        "noUselessFragments": "warn"
+        "noUselessFragments": "warn",
+        "noExcessiveLinesPerFunction": {
+          "level": "warn",
+          "options": {
+            "maxLines": 50
+          }
+        },
+        "noExcessiveCognitiveComplexity": {
+          "level": "warn",
+          "options": {
+            "maxAllowedComplexity": 15
+          }
+        }
       },
       "style": {
         "useComponentExportOnlyModules": {
@@ -95,6 +107,10 @@
       ],
       "linter": {
         "rules": {
+          "complexity": {
+            "noExcessiveLinesPerFunction": "off",
+            "noExcessiveCognitiveComplexity": "off"
+          },
           "style": {
             "noNonNullAssertion": "off",
             "useComponentExportOnlyModules": "off"

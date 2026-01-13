@@ -45,6 +45,7 @@ const INITIAL_FORM_STATE: FormState = {
   with_data_entry: true,
 };
 
+// biome-ignore lint/complexity/noExcessiveLinesPerFunction: TODO function should be refactored
 export function GenerateTestElectionForm() {
   const client = useApiClient();
   const [formState, setFormState] = useState<FormState>(INITIAL_FORM_STATE);

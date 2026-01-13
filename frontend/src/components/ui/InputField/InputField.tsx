@@ -1,4 +1,4 @@
-import type { DetailedHTMLProps, InputHTMLAttributes, ReactElement, ReactNode } from "react";
+import type { InputHTMLAttributes, ReactElement, ReactNode } from "react";
 
 import { NumberInput } from "../NumberInput/NumberInput";
 import cls from "./InputField.module.css";
@@ -32,6 +32,7 @@ export function InputField({
   subtext = "",
   hint = "",
   value = undefined,
+  defaultValue = undefined,
   type = "text",
   fieldSize = "large",
   fieldWidth = "wide",
@@ -44,37 +45,23 @@ export function InputField({
   ...inputFieldProps
 }: InputFieldProps) {
   let inputEl: ReactNode;
-  const commonProps: DetailedHTMLProps<InputHTMLAttributes<HTMLInputElement>, HTMLInputElement> = {
+  const commonProps = {
     id,
     name,
     value,
-    type,
-    autoComplete: "off",
     autoFocus,
-    "aria-invalid": error ? "true" : "false",
+    defaultValue,
+    autoComplete: "off",
+    "aria-invalid": !!error,
     "aria-errormessage": error ? `${name}-hint_or_error` : undefined,
-    ...inputFieldProps,
   };
 
   if (fieldSize === "text-area") {
-    inputEl = (
-      <textarea
-        id={id}
-        name={name}
-        value={value}
-        defaultValue={inputFieldProps.defaultValue}
-        autoComplete="off"
-        // biome-ignore lint/a11y/noAutofocus: for usability we have to use autofocus
-        autoFocus={autoFocus}
-        aria-invalid={error ? "true" : "false"}
-        aria-errormessage={error ? `${name}-hint_or_error` : undefined}
-        rows={7}
-      />
-    );
+    inputEl = <textarea {...commonProps} rows={7} />;
   } else if (numberInput) {
-    inputEl = <NumberInput {...commonProps} />;
+    inputEl = <NumberInput {...commonProps} type={type} {...inputFieldProps} />;
   } else {
-    inputEl = <input {...commonProps} />;
+    inputEl = <input {...commonProps} type={type} {...inputFieldProps} />;
   }
 
   return (
@@ -87,7 +74,7 @@ export function InputField({
       </label>
       {!hideErrorMessage && (error || hint) && (
         <span id={`${name}-hint_or_error`} className={error ? "error" : "hint"}>
-          {error || hint || <>&nbsp;</>}
+          {error || hint}
         </span>
       )}
     </div>

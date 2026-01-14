@@ -85,7 +85,6 @@ export function OverviewPage() {
         </>
       );
     }
-
     const committeeSession = committeeSessionList.find(
       (committeeSession) => committeeSession.election_id === election.id,
     );

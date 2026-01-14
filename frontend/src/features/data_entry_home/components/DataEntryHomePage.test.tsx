@@ -84,11 +84,7 @@ describe("DataEntryHomePage", () => {
   test("Resume input visible when some are unfinished", async () => {
     overrideOnce("get", "/api/elections/1/status", 200, {
       statuses: [
-        {
-          polling_station_id: 1,
-          status: "first_entry_in_progress",
-          first_entry_user_id: getTypistUser().user_id,
-        },
+        { polling_station_id: 1, status: "first_entry_in_progress", first_entry_user_id: getTypistUser().user_id },
         { polling_station_id: 2, status: "first_entry_not_started" },
       ],
     } satisfies ElectionStatusResponse);

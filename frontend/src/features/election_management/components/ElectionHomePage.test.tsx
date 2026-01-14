@@ -380,12 +380,7 @@ describe("ElectionHomePage", () => {
 
     await renderPage("coordinator");
 
-    expect(
-      await screen.findByRole("heading", {
-        level: 3,
-        name: "Leeg inlegvel voor deze verkiezing",
-      }),
-    ).toBeVisible();
+    expect(await screen.findByRole("heading", { level: 3, name: "Leeg inlegvel voor deze verkiezing" })).toBeVisible();
     expect(screen.getByText("Na 31-2 Inlegvel")).toBeVisible();
 
     expect(

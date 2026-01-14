@@ -80,12 +80,7 @@ describe("CommitteeSessionDetailsPage", () => {
     expect(
       await screen.findByRole("heading", { level: 1, name: "Gemeentelijk stembureau Heemdamseburg" }),
     ).toBeInTheDocument();
-    expect(
-      await screen.findByRole("heading", {
-        level: 2,
-        name: "Details van de eerste zitting",
-      }),
-    ).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { level: 2, name: "Details van de eerste zitting" })).toBeInTheDocument();
     expect(await screen.findByRole("heading", { level: 3, name: "Start van de zitting" })).toBeInTheDocument();
 
     // Check that the fields are empty
@@ -158,12 +153,7 @@ describe("CommitteeSessionDetailsPage", () => {
     expect(
       await screen.findByRole("heading", { level: 1, name: "Gemeentelijk stembureau Heemdamseburg" }),
     ).toBeInTheDocument();
-    expect(
-      await screen.findByRole("heading", {
-        level: 2,
-        name: "Details van de tweede zitting",
-      }),
-    ).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { level: 2, name: "Details van de tweede zitting" })).toBeInTheDocument();
     expect(
       await screen.findByRole("heading", {
         level: 3,

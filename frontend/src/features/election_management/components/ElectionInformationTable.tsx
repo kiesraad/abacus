@@ -42,10 +42,7 @@ export function ElectionInformationTable({
           </Table.HeaderCell>
           <Table.Cell>
             {election.name},{" "}
-            {new Date(election.election_date).toLocaleString(t("date_locale"), {
-              day: "numeric",
-              month: "long",
-            })}
+            {new Date(election.election_date).toLocaleString(t("date_locale"), { day: "numeric", month: "long" })}
           </Table.Cell>
         </Table.Row>
         <Table.Row>

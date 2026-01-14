@@ -41,7 +41,15 @@ export function DataEntryPage() {
         <section className="smaller-gap">
           <PollingStationNumber>{pollingStation.number}</PollingStationNumber>
           <h1>{pollingStation.name}</h1>
-          {pollingStationStatus.status && <Badge type={pollingStationStatus.status} />}
+          {pollingStationStatus.status && (
+            <Badge
+              type={
+                pollingStationStatus.status === "first_entry_finalised"
+                  ? "first_entry_finalised_for_typist"
+                  : pollingStationStatus.status
+              }
+            />
+          )}
         </section>
         <section>
           <AbortDataEntryControl />

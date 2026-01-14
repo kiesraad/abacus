@@ -13,11 +13,11 @@ use crate::{
         PollingStationResults, political_group_candidate_votes::PoliticalGroupCandidateVotes,
     },
     election::domain::{
-        ElectionCategory::Municipal, ElectionWithPoliticalGroups,
         committee_session::CommitteeSession,
+        election::{ElectionCategory::Municipal, ElectionWithPoliticalGroups},
+        polling_station::PollingStation,
     },
-    polling_station::PollingStation,
-    summary::ElectionSummary,
+    pdf_gen::summary::ElectionSummary,
 };
 
 /// Vote count data for EML_NL 510

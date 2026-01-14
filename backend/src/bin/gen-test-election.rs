@@ -6,15 +6,17 @@ use std::{
 use abacus::{
     AppError, create_sqlite_pool,
     data_entry::domain::polling_station_results::PollingStationResults,
-    election::domain::{ElectionWithPoliticalGroups, committee_session::CommitteeSession},
+    election::domain::{
+        committee_session::CommitteeSession, election::ElectionWithPoliticalGroups,
+        polling_station::PollingStation,
+    },
     eml::{EML110, EML230, EMLDocument},
     pdf_gen::{
         VotesTables,
         models::{ModelNa31_2Input, ToPdfFileModel},
+        summary::ElectionSummary,
     },
-    polling_station::PollingStation,
     report::DEFAULT_DATE_TIME_FORMAT,
-    summary::ElectionSummary,
     test_data_gen::{GenerateElectionArgs, RandomRange, create_test_election, parse_range},
 };
 use clap::Parser;

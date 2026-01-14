@@ -6,8 +6,10 @@ use utoipa::ToSchema;
 use crate::{
     APIError,
     data_entry::domain::field_path::FieldPath,
-    election::domain::{ElectionWithPoliticalGroups, PGNumber},
-    polling_station::PollingStation,
+    election::domain::{
+        election::{ElectionWithPoliticalGroups, PGNumber},
+        polling_station::PollingStation,
+    },
 };
 
 #[derive(Serialize, Deserialize, ToSchema, Debug, Default, PartialEq, Eq)]

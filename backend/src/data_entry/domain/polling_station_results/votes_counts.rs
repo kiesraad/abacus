@@ -14,9 +14,8 @@ use crate::{
             DataError, Validate, ValidationResult, ValidationResultCode, ValidationResults,
         },
     },
-    election::domain::ElectionWithPoliticalGroups,
+    election::domain::{election::ElectionWithPoliticalGroups, polling_station::PollingStation},
     error::ErrorReference,
-    polling_station::PollingStation,
 };
 
 /// Votes counts, part of the polling station results.
@@ -275,7 +274,7 @@ pub mod tests {
     use super::*;
     use crate::{
         data_entry::domain::political_group_total_votes::PoliticalGroupTotalVotes,
-        election::domain::PGNumber,
+        election::domain::election::PGNumber,
     };
 
     #[test]

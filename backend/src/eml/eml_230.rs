@@ -8,7 +8,7 @@ use super::{
         ElectionCategory, ElectionDomain, ElectionIdentifier, ManagingAuthority,
     },
 };
-use crate::election::domain as election;
+use crate::election::domain::election;
 
 /// Candidate list (230b)
 ///
@@ -272,7 +272,7 @@ mod tests {
     use quick_xml::DeError;
 
     use crate::{
-        election::domain::{CandidateNumber, PGNumber},
+        election::domain::election::{CandidateNumber, PGNumber},
         eml::{EML110, EML230, EMLDocument, EMLImportError},
     };
 

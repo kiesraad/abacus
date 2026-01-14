@@ -16,9 +16,8 @@ use crate::{
             ValidationResults,
         },
     },
-    election::domain::ElectionWithPoliticalGroups,
+    election::domain::{election::ElectionWithPoliticalGroups, polling_station::PollingStation},
     error::ErrorReference,
-    polling_station::PollingStation,
 };
 
 #[derive(Debug, PartialEq, Eq)]
@@ -814,10 +813,12 @@ mod tests {
             valid_default::ValidDefault,
         },
         election::domain::{
-            Candidate, CandidateNumber, ElectionCategory, ElectionId, PGNumber, PoliticalGroup,
-            VoteCountingMethod,
+            election::{
+                Candidate, CandidateNumber, ElectionCategory, ElectionId, PGNumber, PoliticalGroup,
+                VoteCountingMethod,
+            },
+            polling_station::{PollingStation, PollingStationType},
         },
-        polling_station::{PollingStation, PollingStationType},
     };
 
     fn cso_first_session_result() -> CSOFirstSessionResults {

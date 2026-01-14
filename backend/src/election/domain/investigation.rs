@@ -8,7 +8,7 @@ use serde::{Deserialize, Serialize};
 use sqlx::{FromRow, SqlitePool};
 use utoipa::ToSchema;
 
-use crate::{APIError, error::ErrorReference, polling_station};
+use crate::{APIError, election::repository::polling_station_repo, error::ErrorReference};
 
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq, ToSchema, FromRow)]
 #[serde(deny_unknown_fields)]
@@ -72,7 +72,7 @@ where
         let mut conn = pool.acquire().await?;
 
         if let Ok(Path(id)) = path_extractor
-            && polling_station::get(&mut conn, id).await.is_ok()
+            && polling_station_repo::get(&mut conn, id).await.is_ok()
         {
             return Ok(CurrentSessionPollingStationId(id));
         }

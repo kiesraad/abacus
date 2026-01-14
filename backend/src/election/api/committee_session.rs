@@ -15,16 +15,19 @@ use crate::{
     authentication::Coordinator,
     election::{
         domain::{
-            ElectionId,
             committee_session::{
                 CommitteeSession, CommitteeSessionCreateRequest, CommitteeSessionUpdateRequest,
             },
             committee_session_status::{CommitteeSessionStatus, change_committee_session_status},
+            election::ElectionId,
+            investigation::PollingStationInvestigation,
         },
-        repository::{committee_session_repo, election_repo},
+        repository::{
+            committee_session_repo, election_repo,
+            investigation_repo::list_investigations_for_committee_session,
+        },
     },
     error::ErrorReference,
-    investigation::{PollingStationInvestigation, list_investigations_for_committee_session},
 };
 
 #[derive(Debug, PartialEq, Eq)]

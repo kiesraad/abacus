@@ -13,16 +13,17 @@ use crate::{
     election::{
         api::committee_session::CommitteeSessionError,
         domain::{
-            ElectionWithPoliticalGroups,
             committee_session::CommitteeSession,
             committee_session_status::{CommitteeSessionStatus, change_committee_session_status},
+            election::ElectionWithPoliticalGroups,
+            polling_station::PollingStation,
         },
-        repository::{committee_session_repo, election_repo},
+        repository::{
+            committee_session_repo, election_repo,
+            investigation_repo::get_polling_station_investigation, polling_station_repo,
+        },
     },
     error::ErrorReference,
-    investigation::get_polling_station_investigation,
-    polling_station,
-    polling_station::PollingStation,
 };
 
 pub async fn make_definitive(
@@ -161,7 +162,7 @@ pub async fn validate_and_get_data(
     ),
     APIError,
 > {
-    let polling_station = polling_station::get(conn, polling_station_id).await?;
+    let polling_station = polling_station_repo::get(conn, polling_station_id).await?;
     let committee_session =
         committee_session_repo::get(conn, polling_station.committee_session_id).await?;
     let election = election_repo::get(conn, committee_session.election_id).await?;
@@ -224,12 +225,19 @@ mod tests {
             data_entry::repository::polling_station_result_repo::{
                 insert_test_result, tests::create_test_results,
             },
-            investigation::{
-                PollingStationInvestigationConcludeRequest,
-                PollingStationInvestigationCreateRequest, conclude_polling_station_investigation,
-                create_polling_station_investigation,
+            election::{
+                domain::investigation::{
+                    PollingStationInvestigationConcludeRequest,
+                    PollingStationInvestigationCreateRequest,
+                },
+                repository::{
+                    investigation_repo::{
+                        conclude_polling_station_investigation,
+                        create_polling_station_investigation,
+                    },
+                    polling_station_repo::insert_test_polling_station,
+                },
             },
-            polling_station::insert_test_polling_station,
         };
 
         async fn create_test_investigation(conn: &mut SqliteConnection, polling_station_id: u32) {

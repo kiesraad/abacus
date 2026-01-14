@@ -5,8 +5,8 @@ use strum::Display;
 use tracing::{error, info};
 
 use super::PdfGenResult;
-use crate::{
-    pdf_gen::models::PdfFileModel,
+use crate::pdf_gen::{
+    models::PdfFileModel,
     zip::{ZipResponseError, ZipResponseWriter},
 };
 

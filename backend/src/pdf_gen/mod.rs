@@ -8,8 +8,10 @@ mod embedded;
 #[cfg(not(feature = "embed-typst"))]
 mod external;
 
+pub mod summary;
 #[cfg(test)]
 mod typst_tests;
+pub mod zip;
 
 #[cfg(feature = "embed-typst")]
 pub use embedded::{PdfGenError, generate_pdf, generate_pdfs};
@@ -34,15 +36,17 @@ pub(crate) mod tests {
         election::{
             api::committee_session::tests::committee_session_fixture,
             domain::{
-                ElectionCategory, ElectionId, ElectionWithPoliticalGroups, VoteCountingMethod,
+                election::{
+                    ElectionCategory, ElectionId, ElectionWithPoliticalGroups, VoteCountingMethod,
+                },
+                polling_station::{PollingStation, PollingStationType},
             },
         },
         pdf_gen::{
             models::{PdfFileModel, PdfModel, ToPdfFileModel},
+            summary::ElectionSummary,
             votes_table::VotesTables,
         },
-        polling_station::{PollingStation, PollingStationType},
-        summary::ElectionSummary,
     };
 
     pub fn polling_stations_fixture(

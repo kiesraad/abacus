@@ -1,7 +1,12 @@
 use sqlx::{Connection, SqliteConnection, query, query_as};
 
-use super::structs::{PollingStation, PollingStationRequest};
-use crate::election::{domain::ElectionId, repository::committee_session_repo};
+use crate::election::{
+    domain::{
+        election::ElectionId,
+        polling_station::{PollingStation, PollingStationRequest},
+    },
+    repository::committee_session_repo,
+};
 
 /// List all polling stations from a committee session
 pub async fn list(
@@ -102,6 +107,7 @@ pub async fn get_for_election(
 }
 
 /// Create a single polling station for an election
+#[cfg(feature = "dev-database")]
 pub async fn create(
     conn: &mut SqliteConnection,
     election_id: ElectionId,
@@ -162,6 +168,7 @@ pub async fn create(
     tx.commit().await?;
     Ok(res)
 }
+
 #[allow(clippy::too_many_lines)]
 /// Create many polling stations for an election
 pub async fn create_many(

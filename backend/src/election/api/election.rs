@@ -13,22 +13,25 @@ use crate::{
     audit_log::{AuditEvent, AuditService},
     authentication::{Admin, AdminOrCoordinator, User},
     election::{
-        api::committee_session::{CommitteeSessionError, create_committee_session},
+        api::{
+            committee_session::{CommitteeSessionError, create_committee_session},
+            polling_station::create_imported_polling_stations,
+        },
         domain::{
-            Election, ElectionId, ElectionNumberOfVotersChangeRequest, ElectionWithPoliticalGroups,
-            NewElection, VoteCountingMethod,
             committee_session::{CommitteeSession, CommitteeSessionCreateRequest},
             committee_session_status::CommitteeSessionStatus,
+            election::{
+                Election, ElectionId, ElectionNumberOfVotersChangeRequest,
+                ElectionWithPoliticalGroups, NewElection, VoteCountingMethod,
+            },
+            investigation::PollingStationInvestigation,
+            polling_station::{PollingStation, PollingStationRequest, PollingStationsRequest},
         },
-        repository::{committee_session_repo, election_repo},
+        repository::{
+            committee_session_repo, election_repo, investigation_repo, polling_station_repo,
+        },
     },
     eml::{EML110, EML230, EMLDocument, EMLImportError, EmlHash, RedactedEmlHash},
-    investigation::PollingStationInvestigation,
-    polling_station,
-    polling_station::{
-        PollingStation, PollingStationRequest, PollingStationsRequest,
-        create_imported_polling_stations,
-    },
 };
 
 /// Election list response
@@ -109,8 +112,9 @@ pub async fn election_details(
         .first()
         .expect("There is always one committee session")
         .clone();
-    let polling_stations = polling_station::list(&mut conn, current_committee_session.id).await?;
-    let investigations = crate::investigation::list_investigations_for_committee_session(
+    let polling_stations =
+        polling_station_repo::list(&mut conn, current_committee_session.id).await?;
+    let investigations = investigation_repo::list_investigations_for_committee_session(
         &mut conn,
         current_committee_session.id,
     )

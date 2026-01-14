@@ -11,8 +11,7 @@ use crate::{
         },
         yes_no::YesNo,
     },
-    election::domain::ElectionWithPoliticalGroups,
-    polling_station::PollingStation,
+    election::domain::{election::ElectionWithPoliticalGroups, polling_station::PollingStation},
 };
 
 /// Differences counts, part of the polling station results.
@@ -375,7 +374,7 @@ mod tests {
             },
             valid_default::ValidDefault,
         },
-        election::domain::PGNumber,
+        election::domain::election::PGNumber,
     };
 
     impl ValidDefault for DifferencesCounts {

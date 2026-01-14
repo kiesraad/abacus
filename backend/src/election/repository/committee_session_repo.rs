@@ -1,15 +1,15 @@
 use chrono::NaiveDateTime;
 use sqlx::{Connection, SqliteConnection, query, query_as};
 
-use crate::{
-    election::domain::{
-        ElectionId,
+use crate::election::{
+    domain::{
         committee_session::{
             CommitteeSession, CommitteeSessionCreateRequest, CommitteeSessionFilesUpdateRequest,
         },
         committee_session_status::CommitteeSessionStatus,
+        election::ElectionId,
     },
-    polling_station::duplicate_for_committee_session,
+    repository::polling_station_repo::duplicate_for_committee_session,
 };
 
 pub async fn get(

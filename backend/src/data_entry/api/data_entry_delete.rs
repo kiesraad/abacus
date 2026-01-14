@@ -12,9 +12,8 @@ use crate::{
         domain::data_entry_status::DataEntryStatusName, repository::data_entry_repo,
         service::delete_data_entry_and_result_for_polling_station,
     },
-    election::repository::committee_session_repo,
+    election::repository::{committee_session_repo, polling_station_repo},
     error::ErrorReference,
-    polling_station,
 };
 
 /// Delete data entries and result for a polling station
@@ -42,7 +41,7 @@ pub async fn polling_station_data_entries_and_result_delete(
 ) -> Result<StatusCode, APIError> {
     let mut tx = pool.begin_immediate().await?;
 
-    let polling_station = polling_station::get(&mut tx, polling_station_id).await?;
+    let polling_station = polling_station_repo::get(&mut tx, polling_station_id).await?;
     let committee_session =
         committee_session_repo::get(&mut tx, polling_station.committee_session_id).await?;
 

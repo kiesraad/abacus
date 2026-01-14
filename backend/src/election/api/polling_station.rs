@@ -4,42 +4,32 @@ use axum::{
     http::StatusCode,
 };
 use sqlx::{Connection, SqliteConnection, SqlitePool};
-use utoipa_axum::{router::OpenApiRouter, routes};
 
-use super::{
-    repository::{create, create_many, delete, get_for_election, list, update},
-    structs::{
-        PollingStation, PollingStationFileRequest, PollingStationListResponse,
-        PollingStationRequest, PollingStationRequestListResponse, PollingStationsRequest,
-    },
-};
 use crate::{
-    APIError, AppState, ErrorResponse, SqlitePoolExt,
+    APIError, SqlitePoolExt,
     audit_log::{AuditEvent, AuditService, PollingStationImportDetails},
     authentication::{AdminOrCoordinator, User, error::AuthenticationError},
     data_entry::service::delete_data_entry_and_result_for_polling_station,
     election::{
+        api::investigation::delete_investigation_for_polling_station,
         domain::{
-            ElectionId,
             committee_session::CommitteeSession,
             committee_session_status::{CommitteeSessionStatus, change_committee_session_status},
+            election::ElectionId,
+            polling_station::{
+                PollingStation, PollingStationFileRequest, PollingStationListResponse,
+                PollingStationRequest, PollingStationRequestListResponse, PollingStationsRequest,
+            },
         },
-        repository::{committee_session_repo::get_election_committee_session, election_repo},
+        repository::{
+            committee_session_repo::get_election_committee_session,
+            election_repo, polling_station_repo,
+            polling_station_repo::{create_many, delete, get_for_election, update},
+        },
     },
     eml::{EML110, EMLDocument, EMLImportError, EmlHash},
-    investigation::delete_investigation_for_polling_station,
+    error::ErrorResponse,
 };
-
-pub fn router() -> OpenApiRouter<AppState> {
-    OpenApiRouter::default()
-        .routes(routes!(polling_station_list))
-        .routes(routes!(polling_station_create))
-        .routes(routes!(polling_station_get))
-        .routes(routes!(polling_station_update))
-        .routes(routes!(polling_station_delete))
-        .routes(routes!(polling_station_validate_import))
-        .routes(routes!(polling_station_import))
-}
 
 /// Get a list of all [PollingStation]s for an election
 #[utoipa::path(
@@ -56,7 +46,7 @@ pub fn router() -> OpenApiRouter<AppState> {
     ),
     security(("cookie_auth" = ["administrator", "coordinator", "typist"])),
 )]
-async fn polling_station_list(
+pub async fn polling_station_list(
     _user: User,
     State(pool): State<SqlitePool>,
     Path(election_id): Path<ElectionId>,
@@ -69,7 +59,7 @@ async fn polling_station_list(
     let committee_session = get_election_committee_session(&mut conn, election_id).await?;
 
     Ok(PollingStationListResponse {
-        polling_stations: list(&mut conn, committee_session.id).await?,
+        polling_stations: polling_station_repo::list(&mut conn, committee_session.id).await?,
     })
 }
 
@@ -108,7 +98,7 @@ pub async fn validate_user_is_allowed_to_perform_action(
     ),
     security(("cookie_auth" = ["administrator", "coordinator"])),
 )]
-async fn polling_station_create(
+pub async fn polling_station_create(
     user: AdminOrCoordinator,
     State(pool): State<SqlitePool>,
     Path(election_id): Path<ElectionId>,
@@ -123,7 +113,8 @@ async fn polling_station_create(
 
     validate_user_is_allowed_to_perform_action(user, &committee_session).await?;
 
-    let polling_station = create(&mut tx, election_id, new_polling_station).await?;
+    let polling_station =
+        polling_station_repo::create(&mut tx, election_id, new_polling_station).await?;
 
     audit_service
         .log(
@@ -174,7 +165,7 @@ async fn polling_station_create(
     ),
     security(("cookie_auth" = ["administrator", "coordinator", "typist"])),
 )]
-async fn polling_station_get(
+pub async fn polling_station_get(
     _user: User,
     State(pool): State<SqlitePool>,
     Path((election_id, polling_station_id)): Path<(ElectionId, u32)>,
@@ -204,7 +195,7 @@ async fn polling_station_get(
     ),
     security(("cookie_auth" = ["administrator", "coordinator"])),
 )]
-async fn polling_station_update(
+pub async fn polling_station_update(
     user: AdminOrCoordinator,
     State(pool): State<SqlitePool>,
     audit_service: AuditService,
@@ -268,7 +259,7 @@ async fn polling_station_update(
     ),
     security(("cookie_auth" = ["administrator", "coordinator"])),
 )]
-async fn polling_station_delete(
+pub async fn polling_station_delete(
     user: AdminOrCoordinator,
     State(pool): State<SqlitePool>,
     audit_service: AuditService,
@@ -310,7 +301,10 @@ async fn polling_station_delete(
         )
         .await?;
 
-    if list(&mut tx, committee_session.id).await?.is_empty() {
+    if polling_station_repo::list(&mut tx, committee_session.id)
+        .await?
+        .is_empty()
+    {
         change_committee_session_status(
             &mut tx,
             committee_session.id,
@@ -342,7 +336,7 @@ async fn polling_station_delete(
     ),
     security(("cookie_auth" = ["administrator", "coordinator"])),
 )]
-async fn polling_station_validate_import(
+pub async fn polling_station_validate_import(
     _user: AdminOrCoordinator,
     Json(polling_station_request): Json<PollingStationFileRequest>,
 ) -> Result<(StatusCode, Json<PollingStationRequestListResponse>), APIError> {
@@ -421,7 +415,7 @@ pub async fn create_imported_polling_stations(
     ),
     security(("cookie_auth" = ["administrator", "coordinator"])),
 )]
-async fn polling_station_import(
+pub async fn polling_station_import(
     _user: AdminOrCoordinator,
     State(pool): State<SqlitePool>,
     Path(election_id): Path<ElectionId>,
@@ -434,7 +428,10 @@ async fn polling_station_import(
     election_repo::get(&mut tx, election_id).await?;
     let committee_session = get_election_committee_session(&mut tx, election_id).await?;
 
-    if !list(&mut tx, committee_session.id).await?.is_empty() {
+    if !polling_station_repo::list(&mut tx, committee_session.id)
+        .await?
+        .is_empty()
+    {
         return Err(AuthenticationError::Forbidden.into());
     }
 
@@ -458,10 +455,12 @@ mod tests {
     use sqlx::{SqlitePool, query};
     use test_log::test;
 
-    use super::{PollingStationRequest, create, create_many, update};
-    use crate::election::domain::ElectionId;
+    use crate::election::{
+        domain::{election::ElectionId, polling_station::PollingStationRequest},
+        repository::polling_station_repo::{create, create_many, update},
+    };
 
-    #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2", "election_3"))))]
+    #[test(sqlx::test(fixtures(path = "../../../fixtures", scripts("election_2", "election_3"))))]
     async fn test_polling_station_number_unique_per_election(pool: SqlitePool) {
         query!("DELETE FROM polling_stations")
             .execute(&pool)
@@ -501,7 +500,7 @@ VALUES
         assert!(result.is_err());
     }
 
-    #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_7_four_sessions"))))]
+    #[test(sqlx::test(fixtures(path = "../../../fixtures", scripts("election_7_four_sessions"))))]
     async fn test_create_number_required(pool: SqlitePool) {
         let mut conn = pool.acquire().await.unwrap();
         let mut data = PollingStationRequest {
@@ -521,7 +520,7 @@ VALUES
         assert!(result.is_ok());
     }
 
-    #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_7_four_sessions"))))]
+    #[test(sqlx::test(fixtures(path = "../../../fixtures", scripts("election_7_four_sessions"))))]
     async fn test_create_many_number_required(pool: SqlitePool) {
         let mut conn = pool.acquire().await.unwrap();
         let mut data = PollingStationRequest {
@@ -541,7 +540,7 @@ VALUES
         assert!(result.is_ok());
     }
 
-    #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_7_four_sessions"))))]
+    #[test(sqlx::test(fixtures(path = "../../../fixtures", scripts("election_7_four_sessions"))))]
     async fn test_update_number_allowed_when_no_prev_session(pool: SqlitePool) {
         let mut conn = pool.acquire().await.unwrap();
         let mut data = PollingStationRequest {
@@ -572,7 +571,7 @@ VALUES
         assert!(result.is_ok());
     }
 
-    #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_7_four_sessions"))))]
+    #[test(sqlx::test(fixtures(path = "../../../fixtures", scripts("election_7_four_sessions"))))]
     async fn test_update_number_restricted_when_prev_session(pool: SqlitePool) {
         let mut conn = pool.acquire().await.unwrap();
         let mut data = PollingStationRequest {
@@ -596,7 +595,7 @@ VALUES
         assert!(result.is_err());
     }
 
-    #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_7_four_sessions"))))]
+    #[test(sqlx::test(fixtures(path = "../../../fixtures", scripts("election_7_four_sessions"))))]
     async fn test_delete_restricted_when_prev_session(pool: SqlitePool) {
         // Try to delete a polling station that has an id_prev_session reference
         let result = query!("DELETE FROM polling_stations WHERE id = 721")

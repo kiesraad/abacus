@@ -14,23 +14,17 @@ pub mod app_error;
 pub mod audit_log;
 pub mod authentication;
 pub mod data_entry;
-pub mod document;
 pub mod election;
 pub mod eml;
 mod error;
-pub mod files;
 #[cfg(feature = "dev-database")]
 pub mod fixtures;
-pub mod investigation;
 pub mod pdf_gen;
-pub mod polling_station;
 pub mod report;
 pub mod router;
-pub mod summary;
 #[cfg(feature = "dev-database")]
 pub mod test_data_gen;
 pub mod util;
-pub mod zip;
 
 pub use app_error::AppError;
 pub use error::{APIError, ErrorResponse};

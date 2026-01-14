@@ -5,276 +5,37 @@ use axum::{
 use axum_extra::response::Attachment;
 use chrono::{DateTime, Local, Utc};
 use sqlx::{SqliteConnection, SqlitePool};
-use utoipa_axum::{router::OpenApiRouter, routes};
 
-use super::DEFAULT_DATE_TIME_FORMAT;
 use crate::{
-    APIError, AppState, ErrorResponse, SqlitePoolExt,
-    audit_log::AuditService,
+    APIError, ErrorResponse, SqlitePoolExt,
+    audit_log::{AuditEvent, AuditService},
     authentication::Coordinator,
-    data_entry::{
-        domain::polling_station_results::PollingStationResults,
-        repository::polling_station_result_repo,
-        service::are_results_complete_for_committee_session,
-    },
+    data_entry::service::are_results_complete_for_committee_session,
     election::{
         api::committee_session::CommitteeSessionError,
         domain::{
-            ElectionId, ElectionWithPoliticalGroups,
             committee_session::{CommitteeSession, CommitteeSessionFilesUpdateRequest},
             committee_session_status::CommitteeSessionStatus,
+            election::{ElectionId, ElectionWithPoliticalGroups},
+            file::File,
         },
         repository,
         repository::{
-            committee_session_repo::{change_files, get_previous_session},
-            election_repo,
+            committee_session_repo::change_files, election_repo, file_repo,
+            investigation_repo::list_investigations_for_committee_session,
         },
     },
-    eml::{EML510, EMLDocument, EmlHash},
+    eml::{EMLDocument, EmlHash},
     error::ErrorReference,
-    files,
-    files::{File, create_file},
-    investigation::{PollingStationInvestigation, list_investigations_for_committee_session},
     pdf_gen::{
-        VotesTables, VotesTablesWithPreviousVotes, generate_pdf,
-        models::{ModelNa14_2Input, ModelNa31_2Input, ModelP2aInput, PdfFileModel, ToPdfFileModel},
+        generate_pdf,
+        zip::{ZipResponse, ZipResponseError, zip_single_file},
     },
-    polling_station,
-    polling_station::PollingStation,
-    summary::ElectionSummary,
-    zip::{ZipResponse, ZipResponseError, slugify_filename, zip_single_file},
+    report::domain::results_input::ResultsInput,
 };
 
 const EML_MIME_TYPE: &str = "text/xml";
 const PDF_MIME_TYPE: &str = "application/pdf";
-
-pub fn router() -> OpenApiRouter<AppState> {
-    OpenApiRouter::default()
-        .routes(routes!(election_download_zip_results))
-        .routes(routes!(election_download_pdf_results))
-}
-
-#[derive(Debug)]
-struct ResultsInput {
-    committee_session: CommitteeSession,
-    election: ElectionWithPoliticalGroups,
-    polling_stations: Vec<PollingStation>,
-    investigations: Vec<PollingStationInvestigation>,
-    results: Vec<(PollingStation, PollingStationResults)>,
-    summary: ElectionSummary,
-    previous_summary: Option<ElectionSummary>,
-    previous_committee_session: Option<CommitteeSession>,
-    created_at: DateTime<Local>,
-}
-
-impl ResultsInput {
-    async fn new(
-        conn: &mut SqliteConnection,
-        committee_session_id: u32,
-        created_at: DateTime<Local>,
-    ) -> Result<ResultsInput, APIError> {
-        let committee_session =
-            repository::committee_session_repo::get(conn, committee_session_id).await?;
-        let election = election_repo::get(conn, committee_session.election_id).await?;
-        let polling_stations = polling_station::list(conn, committee_session.id).await?;
-        let results = polling_station_result_repo::list_results_for_committee_session(
-            conn,
-            committee_session.id,
-        )
-        .await?;
-
-        // get investigations if this is not the first session
-        let investigations = if committee_session.is_next_session() {
-            list_investigations_for_committee_session(conn, committee_session.id).await?
-        } else {
-            vec![]
-        };
-
-        // get the previous committee session if this is not the first session
-        let previous_committee_session = if committee_session.is_next_session() {
-            get_previous_session(conn, committee_session.id).await?
-        } else {
-            None
-        };
-
-        // get the previous results summary from the previous committee session if it exists
-        let previous_summary = if let Some(previous_committee_session) = &previous_committee_session
-        {
-            let previous_results = polling_station_result_repo::list_results_for_committee_session(
-                conn,
-                previous_committee_session.id,
-            )
-            .await?;
-            let previous_summary = ElectionSummary::from_results(&election, &previous_results)?;
-            Some(previous_summary)
-        } else {
-            None
-        };
-
-        Ok(ResultsInput {
-            committee_session,
-            previous_summary,
-            summary: ElectionSummary::from_results(&election, &results)?,
-            created_at,
-            election,
-            polling_stations,
-            investigations,
-            results,
-            previous_committee_session,
-        })
-    }
-
-    fn as_xml(&self) -> EML510 {
-        EML510::from_results(
-            &self.election,
-            &self.committee_session,
-            &self.results,
-            &self.summary,
-            &self.created_at,
-        )
-    }
-
-    fn xml_filename(&self) -> String {
-        use chrono::Datelike;
-        let location_without_whitespace: String =
-            self.election.location.split_whitespace().collect();
-        slugify_filename(&format!(
-            "Telling {}{} {}.eml.xml",
-            self.election.category.to_eml_code(),
-            self.election.election_date.year(),
-            location_without_whitespace
-        ))
-    }
-
-    fn results_pdf_filename(&self) -> String {
-        let name = if self.committee_session.is_next_session() {
-            "Model Na14-2.pdf"
-        } else {
-            "Model Na31-2.pdf"
-        };
-        slugify_filename(name)
-    }
-
-    fn overview_pdf_filename(&self) -> Option<String> {
-        if self.committee_session.is_next_session() {
-            Some(slugify_filename("Leeg Model P2a.pdf"))
-        } else {
-            None
-        }
-    }
-
-    fn get_p2a_pdf_file(&self, overview_filename: String) -> PdfFileModel {
-        ModelP2aInput {
-            committee_session: self.committee_session.clone(),
-            election: self.election.clone(),
-            investigations: self
-                .investigations
-                .iter()
-                .map(|inv| {
-                    let ps = self
-                        .polling_stations
-                        .iter()
-                        .find(|ps| ps.id == inv.polling_station_id)
-                        .cloned()
-                        .expect("Polling station for investigation should exist");
-                    (ps, inv.clone())
-                })
-                .collect(),
-        }
-        .to_pdf_file_model(overview_filename)
-    }
-
-    fn get_na14_2_pdf_file(
-        &self,
-        previous_summary: &ElectionSummary,
-        previous_committee_session: &CommitteeSession,
-        hash: String,
-        creation_date_time: String,
-        results_pdf_filename: String,
-    ) -> Result<PdfFileModel, APIError> {
-        let pdf_file: PdfFileModel = ModelNa14_2Input {
-            votes_tables: VotesTablesWithPreviousVotes::new(
-                &self.election,
-                &self.summary,
-                previous_summary,
-            )?,
-            committee_session: self.committee_session.clone(),
-            election: self.election.clone().into(),
-            summary: self.summary.clone().into(),
-            previous_summary: previous_summary.clone().into(),
-            previous_committee_session: previous_committee_session.clone(),
-            hash,
-            creation_date_time,
-        }
-        .to_pdf_file_model(results_pdf_filename);
-        Ok(pdf_file)
-    }
-
-    fn get_na31_2_pdf_file(
-        self,
-        hash: String,
-        creation_date_time: String,
-        results_pdf_filename: String,
-    ) -> Result<PdfFileModel, APIError> {
-        let pdf_file: PdfFileModel = ModelNa31_2Input {
-            votes_tables: VotesTables::new(&self.election, &self.summary)?,
-            committee_session: self.committee_session,
-            polling_stations: self.polling_stations,
-            summary: self.summary.into(),
-            election: self.election.into(),
-            hash,
-            creation_date_time,
-        }
-        .to_pdf_file_model(results_pdf_filename);
-        Ok(pdf_file)
-    }
-
-    fn into_pdf_file_models(self, xml_hash: impl Into<String>) -> Result<PdfModelList, APIError> {
-        let hash = xml_hash.into();
-        let creation_date_time = self.created_at.format(DEFAULT_DATE_TIME_FORMAT).to_string();
-
-        let overview_pdf = self
-            .overview_pdf_filename()
-            .map(|overview_filename| self.get_p2a_pdf_file(overview_filename));
-
-        let results_pdf_filename = self.results_pdf_filename();
-        let results_pdf = if self.committee_session.is_next_session() {
-            let Some(previous_summary) = &self.previous_summary else {
-                return Err(APIError::DataIntegrityError(
-                "Previous summary is required for generating results PDF for next committee sessions"
-                    .to_string(),
-            ));
-            };
-
-            let Some(previous_committee_session) = &self.previous_committee_session else {
-                return Err(APIError::DataIntegrityError(
-                "Previous committee session is required for generating results PDF for next committee sessions"
-                    .to_string(),
-            ));
-            };
-
-            self.get_na14_2_pdf_file(
-                previous_summary,
-                previous_committee_session,
-                hash,
-                creation_date_time,
-                results_pdf_filename,
-            )?
-        } else {
-            self.get_na31_2_pdf_file(hash, creation_date_time, results_pdf_filename)?
-        };
-
-        Ok(PdfModelList {
-            results: results_pdf,
-            overview: overview_pdf,
-        })
-    }
-}
-
-struct PdfModelList {
-    results: PdfFileModel,
-    overview: Option<PdfFileModel>,
-}
 
 fn download_zip_filename(
     election: &ElectionWithPoliticalGroups,
@@ -282,6 +43,8 @@ fn download_zip_filename(
     created_at: DateTime<Local>,
 ) -> String {
     use chrono::Datelike;
+
+    use crate::pdf_gen::zip::slugify_filename;
     let location = election.location.to_lowercase();
     let location_without_whitespace: String = location.split_whitespace().collect();
     slugify_filename(&format!(
@@ -302,6 +65,8 @@ fn download_zip_filename(
 
 fn xml_zip_filename(election: &ElectionWithPoliticalGroups) -> String {
     use chrono::Datelike;
+
+    use crate::pdf_gen::zip::slugify_filename;
     let location_without_whitespace: String = election.location.split_whitespace().collect();
     slugify_filename(&format!(
         "Telling {}{} {}.zip",
@@ -383,6 +148,22 @@ async fn generate_and_save_files(
     Ok((eml_file, pdf_file, overview_pdf_file))
 }
 
+pub async fn create_file(
+    conn: &mut SqliteConnection,
+    audit_service: &AuditService,
+    filename: String,
+    data: &[u8],
+    mime_type: String,
+    created_at: DateTime<Utc>,
+) -> Result<File, APIError> {
+    let file = file_repo::create(conn, filename, data, mime_type, created_at).await?;
+
+    audit_service
+        .log(conn, &AuditEvent::FileCreated(file.clone().into()), None)
+        .await?;
+    Ok(file)
+}
+
 async fn get_existing_files(
     conn: &mut SqliteConnection,
     committee_session: &CommitteeSession,
@@ -392,17 +173,17 @@ async fn get_existing_files(
     let mut pdf_file: Option<File> = None;
     let mut overview_pdf_file: Option<File> = None;
     if let Some(eml_id) = committee_session.results_eml {
-        let file = files::repository::get(conn, eml_id).await?;
+        let file = file_repo::get(conn, eml_id).await?;
         created_at = file.created_at;
         eml_file = Some(file);
     }
     if let Some(pdf_id) = committee_session.results_pdf {
-        let file = files::repository::get(conn, pdf_id).await?;
+        let file = file_repo::get(conn, pdf_id).await?;
         created_at = file.created_at;
         pdf_file = Some(file);
     }
     if let Some(overview_pdf_id) = committee_session.overview_pdf {
-        let file = files::repository::get(conn, overview_pdf_id).await?;
+        let file = file_repo::get(conn, overview_pdf_id).await?;
         created_at = file.created_at;
         overview_pdf_file = Some(file);
     }
@@ -498,7 +279,7 @@ async fn get_files(
     ),
     security(("cookie_auth" = ["coordinator"])),
 )]
-async fn election_download_zip_results(
+pub async fn election_download_zip_results(
     _user: Coordinator,
     State(pool): State<SqlitePool>,
     audit_service: AuditService,
@@ -570,7 +351,7 @@ async fn election_download_zip_results(
     ),
     security(("cookie_auth" = ["coordinator"])),
 )]
-async fn election_download_pdf_results(
+pub async fn election_download_pdf_results(
     _user: Coordinator,
     State(pool): State<SqlitePool>,
     audit_service: AuditService,
@@ -595,7 +376,7 @@ mod tests {
     use super::*;
     use crate::audit_log::list_event_names;
 
-    #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_5_with_results"))))]
+    #[test(sqlx::test(fixtures(path = "../../../fixtures", scripts("election_5_with_results"))))]
     async fn test_get_files_first_session(pool: SqlitePool) {
         let mut conn = pool.acquire().await.unwrap();
         let audit_service = AuditService::new(None, None);
@@ -621,7 +402,7 @@ mod tests {
         }
     }
 
-    #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_7_four_sessions"))))]
+    #[test(sqlx::test(fixtures(path = "../../../fixtures", scripts("election_7_four_sessions"))))]
     async fn test_get_files_next_session(pool: SqlitePool) {
         let mut conn = pool.acquire().await.unwrap();
         let audit_service = AuditService::new(None, None);
@@ -650,7 +431,7 @@ mod tests {
         }
     }
 
-    #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_7_four_sessions"))))]
+    #[test(sqlx::test(fixtures(path = "../../../fixtures", scripts("election_7_four_sessions"))))]
     async fn test_get_files_next_session_without_corrections(pool: SqlitePool) {
         let audit_service = AuditService::new(None, None);
         let mut conn = pool.acquire().await.unwrap();

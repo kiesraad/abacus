@@ -24,8 +24,8 @@ use utoipa_swagger_ui::SwaggerUi;
 #[cfg(feature = "dev-database")]
 use crate::test_data_gen;
 use crate::{
-    AppError, AppState, MAX_BODY_SIZE_MB, airgap, audit_log, authentication, data_entry, document,
-    election, error, investigation, polling_station, report,
+    AppError, AppState, MAX_BODY_SIZE_MB, airgap, audit_log, authentication, data_entry, election,
+    error, report,
 };
 
 pub fn get_scopes_from_operation(operation: &Operation) -> Option<Vec<String>> {
@@ -107,10 +107,7 @@ fn build_routes(doc: utoipa::openapi::OpenApi) -> OpenApiRouter<AppState> {
         .merge(authentication::user_router())
         .merge(data_entry::api::router())
         .merge(election::api::router())
-        .merge(polling_station::router())
-        .merge(report::router())
-        .merge(document::router())
-        .merge(investigation::router());
+        .merge(report::api::router());
 
     #[cfg(feature = "dev-database")]
     let router = router.merge(test_data_gen::router());

@@ -4,8 +4,7 @@ use crate::{
         field_path::FieldPath,
         validate::{DataError, Validate, ValidationResults},
     },
-    election::domain::ElectionWithPoliticalGroups,
-    polling_station::PollingStation,
+    election::domain::{election::ElectionWithPoliticalGroups, polling_station::PollingStation},
 };
 
 pub type Count = u32;

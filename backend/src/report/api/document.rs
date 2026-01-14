@@ -6,29 +6,23 @@ use axum_extra::response::Attachment;
 use chrono::Datelike;
 use sqlx::SqlitePool;
 use tracing::error;
-use utoipa_axum::{router::OpenApiRouter, routes};
 
 use crate::{
-    APIError, AppState, ErrorResponse,
+    APIError, ErrorResponse,
     authentication::AdminOrCoordinator,
-    election::{domain::ElectionId, repository::election_repo},
+    election::{
+        domain::election::ElectionId,
+        repository::{election_repo, polling_station_repo},
+    },
     error::ErrorReference,
     pdf_gen::{
         CandidatesTables, generate_pdf, generate_pdfs,
         models::{
             ModelN10_2Input, ModelNa31_2Bijlage1Input, ModelNa31_2InlegvelInput, ToPdfFileModel,
         },
+        zip::ZipResponse,
     },
-    polling_station,
-    zip::ZipResponse,
 };
-
-pub fn router() -> OpenApiRouter<AppState> {
-    OpenApiRouter::default()
-        .routes(routes!(election_download_n_10_2))
-        .routes(routes!(election_download_na_31_2_bijlage1))
-        .routes(routes!(election_download_na_31_2_inlegvel))
-}
 
 #[utoipa::path(
     get,
@@ -53,7 +47,7 @@ pub fn router() -> OpenApiRouter<AppState> {
     ),
     security(("cookie_auth" = ["administrator", "coordinator"])),
 )]
-async fn election_download_n_10_2(
+pub async fn election_download_n_10_2(
     _user: AdminOrCoordinator,
     State(pool): State<SqlitePool>,
     Path(election_id): Path<ElectionId>,
@@ -66,7 +60,8 @@ async fn election_download_n_10_2(
             election.id,
         )
         .await?;
-    let polling_stations = polling_station::list(&mut conn, current_committee_session.id).await?;
+    let polling_stations =
+        polling_station_repo::list(&mut conn, current_committee_session.id).await?;
     drop(conn);
 
     let zip_filename = format!(
@@ -135,7 +130,7 @@ async fn election_download_n_10_2(
     ),
     security(("cookie_auth" = ["administrator", "coordinator"])),
 )]
-async fn election_download_na_31_2_bijlage1(
+pub async fn election_download_na_31_2_bijlage1(
     _user: AdminOrCoordinator,
     State(pool): State<SqlitePool>,
     Path(election_id): Path<ElectionId>,
@@ -148,7 +143,8 @@ async fn election_download_na_31_2_bijlage1(
             election.id,
         )
         .await?;
-    let polling_stations = polling_station::list(&mut conn, current_committee_session.id).await?;
+    let polling_stations =
+        polling_station_repo::list(&mut conn, current_committee_session.id).await?;
     drop(conn);
 
     let zip_filename = format!(
@@ -218,7 +214,7 @@ async fn election_download_na_31_2_bijlage1(
     ),
     security(("cookie_auth" = ["administrator", "coordinator"])),
 )]
-async fn election_download_na_31_2_inlegvel(
+pub async fn election_download_na_31_2_inlegvel(
     _user: AdminOrCoordinator,
     State(pool): State<SqlitePool>,
     Path(election_id): Path<ElectionId>,

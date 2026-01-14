@@ -12,8 +12,7 @@ use crate::{
             DataError, Validate, ValidationResult, ValidationResultCode, ValidationResults,
         },
     },
-    election::domain::ElectionWithPoliticalGroups,
-    polling_station::PollingStation,
+    election::domain::{election::ElectionWithPoliticalGroups, polling_station::PollingStation},
 };
 
 /// Voters counts, part of the polling station results.
@@ -116,7 +115,7 @@ mod tests {
                 votes_counts::VotesCounts,
             },
         },
-        election::domain::PGNumber,
+        election::domain::election::PGNumber,
     };
 
     #[test]

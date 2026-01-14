@@ -10,8 +10,7 @@ use crate::{
         },
         yes_no::YesNo,
     },
-    election::domain::ElectionWithPoliticalGroups,
-    polling_station::PollingStation,
+    election::domain::{election::ElectionWithPoliticalGroups, polling_station::PollingStation},
 };
 
 /// Extra investigation, part of the polling station results ("B1-1 Alleen bij extra onderzoek")
@@ -85,8 +84,9 @@ mod tests {
             },
             yes_no::YesNo,
         },
-        election::domain::ElectionWithPoliticalGroups,
-        polling_station::PollingStation,
+        election::domain::{
+            election::ElectionWithPoliticalGroups, polling_station::PollingStation,
+        },
     };
 
     impl ValidDefault for ExtraInvestigation {

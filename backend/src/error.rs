@@ -13,10 +13,12 @@ use tracing::error;
 use utoipa::ToSchema;
 
 use crate::{
-    MAX_BODY_SIZE_MB, authentication::error::AuthenticationError,
+    MAX_BODY_SIZE_MB,
+    authentication::error::AuthenticationError,
     data_entry::domain::validate::DataError,
-    election::api::committee_session::CommitteeSessionError, eml::EMLImportError,
-    pdf_gen::PdfGenError, zip::ZipResponseError,
+    election::api::committee_session::CommitteeSessionError,
+    eml::EMLImportError,
+    pdf_gen::{PdfGenError, zip::ZipResponseError},
 };
 
 /// Error reference used to show the corresponding error message to the end-user

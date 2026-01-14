@@ -2,14 +2,15 @@ use serde::{Deserialize, Serialize};
 
 use crate::{
     data_entry::domain::polling_station_results::common_polling_station_results::CommonPollingStationResultsWithoutVotes,
-    election::domain::{Election, committee_session::CommitteeSession},
-    investigation::PollingStationInvestigation,
+    election::domain::{
+        committee_session::CommitteeSession, election::Election,
+        investigation::PollingStationInvestigation, polling_station::PollingStation,
+    },
     pdf_gen::{
         models::{PdfFileModel, PdfModel, ToPdfFileModel},
+        summary::ElectionSummaryWithoutVotes,
         votes_table::{VotesTablesWithOnlyPreviousVotes, VotesTablesWithPreviousVotes},
     },
-    polling_station::PollingStation,
-    summary::ElectionSummaryWithoutVotes,
 };
 
 #[derive(Serialize, Deserialize)]

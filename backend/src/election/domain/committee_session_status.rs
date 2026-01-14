@@ -10,11 +10,11 @@ use crate::{
     election::{
         api::committee_session::CommitteeSessionError,
         domain::committee_session::{CommitteeSession, CommitteeSessionFilesUpdateRequest},
-        repository::committee_session_repo,
+        repository::{
+            committee_session_repo, file_repo,
+            investigation_repo::list_investigations_for_committee_session, polling_station_repo,
+        },
     },
-    files::delete_file,
-    investigation::list_investigations_for_committee_session,
-    polling_station,
 };
 
 /// Committee session status
@@ -80,6 +80,19 @@ async fn delete_committee_session_files(
         for id in file_ids {
             delete_file(conn, &audit_service, id).await?;
         }
+    }
+    Ok(())
+}
+
+pub async fn delete_file(
+    conn: &mut SqliteConnection,
+    audit_service: &AuditService,
+    id: u32,
+) -> Result<(), APIError> {
+    if let Some(file) = file_repo::delete(conn, id).await? {
+        audit_service
+            .log(conn, &AuditEvent::FileDeleted(file.into()), None)
+            .await?;
     }
     Ok(())
 }
@@ -153,7 +166,8 @@ impl CommitteeSessionStatus {
             | CommitteeSessionStatus::DataEntryInProgress
             | CommitteeSessionStatus::DataEntryPaused
             | CommitteeSessionStatus::DataEntryFinished => {
-                let polling_stations = polling_station::list(conn, committee_session.id).await?;
+                let polling_stations =
+                    polling_station_repo::list(conn, committee_session.id).await?;
                 if polling_stations.is_empty() {
                     return Ok(CommitteeSessionStatus::Created);
                 } else if committee_session.is_next_session() {
@@ -176,7 +190,8 @@ impl CommitteeSessionStatus {
     ) -> Result<Self, CommitteeSessionError> {
         match self {
             CommitteeSessionStatus::Created => {
-                let polling_stations = polling_station::list(conn, committee_session.id).await?;
+                let polling_stations =
+                    polling_station_repo::list(conn, committee_session.id).await?;
                 if polling_stations.is_empty() {
                     Err(CommitteeSessionError::InvalidStatusTransition)
                 } else if committee_session.is_next_session() {
@@ -265,11 +280,11 @@ mod tests {
         use super::*;
         use crate::{
             audit_log::{AuditService, list_event_names},
-            files,
+            election::repository,
         };
 
         async fn generate_test_file(conn: &mut SqliteConnection) -> Result<u32, APIError> {
-            let file = files::repository::create(
+            let file = repository::file_repo::create(
                 conn,
                 "filename.txt".into(),
                 &[97, 98, 97, 99, 117, 115, 0],
@@ -374,8 +389,9 @@ mod tests {
         use test_log::test;
 
         use super::*;
-        use crate::investigation::{
-            PollingStationInvestigationCreateRequest, create_polling_station_investigation,
+        use crate::election::{
+            domain::investigation::PollingStationInvestigationCreateRequest,
+            repository::investigation_repo::create_polling_station_investigation,
         };
 
         /// Created --> Created
@@ -683,14 +699,14 @@ mod tests {
         use sqlx::SqlitePool;
         use test_log::test;
 
-        use crate::{
-            election::{
-                api::committee_session::CommitteeSessionError,
-                domain::committee_session_status::CommitteeSessionStatus,
-                repository::committee_session_repo,
+        use crate::election::{
+            api::committee_session::CommitteeSessionError,
+            domain::{
+                committee_session_status::CommitteeSessionStatus,
+                investigation::PollingStationInvestigationCreateRequest,
             },
-            investigation::{
-                PollingStationInvestigationCreateRequest, create_polling_station_investigation,
+            repository::{
+                committee_session_repo, investigation_repo::create_polling_station_investigation,
             },
         };
 
@@ -942,10 +958,14 @@ mod tests {
                 repository::{data_entry_repo, polling_station_result_repo},
                 service::make_definitive,
             },
-            investigation::{
-                PollingStationInvestigationConcludeRequest,
-                PollingStationInvestigationCreateRequest, conclude_polling_station_investigation,
-                create_polling_station_investigation,
+            election::{
+                domain::investigation::{
+                    PollingStationInvestigationConcludeRequest,
+                    PollingStationInvestigationCreateRequest,
+                },
+                repository::investigation_repo::{
+                    conclude_polling_station_investigation, create_polling_station_investigation,
+                },
             },
         };
 

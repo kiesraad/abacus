@@ -15,8 +15,7 @@ use crate::{
             ValidationResults,
         },
     },
-    election::domain::ElectionWithPoliticalGroups,
-    polling_station::PollingStation,
+    election::domain::{election::ElectionWithPoliticalGroups, polling_station::PollingStation},
 };
 
 /// CommonPollingStationResults contains the common fields for polling station results,
@@ -211,7 +210,7 @@ mod tests {
         data_entry::domain::{
             political_group_total_votes::PoliticalGroupTotalVotes, valid_default::ValidDefault,
         },
-        election::domain::PGNumber,
+        election::domain::election::PGNumber,
     };
 
     fn create_test_data() -> CommonPollingStationResults {

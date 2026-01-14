@@ -10,7 +10,7 @@ use crate::{
     data_entry::{
         domain::election_status::ElectionStatusResponse, repository::election_status_repo,
     },
-    election::{domain::ElectionId, repository::committee_session_repo},
+    election::{domain::election::ElectionId, repository::committee_session_repo},
 };
 
 /// Get election polling stations data entry statuses

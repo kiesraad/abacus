@@ -23,7 +23,7 @@ use crate::{
         repository::{data_entry_repo, polling_station_result_repo},
         service::validate_and_get_data,
     },
-    election::domain::{PoliticalGroup, committee_session::CommitteeSession},
+    election::domain::{committee_session::CommitteeSession, election::PoliticalGroup},
 };
 
 /// Claim a data entry for a polling station, returning any existing progress
@@ -197,10 +197,12 @@ pub mod tests {
         election::{
             api::committee_session::tests::change_status_committee_session,
             domain::committee_session_status::CommitteeSessionStatus,
+            repository::{
+                investigation_repo::insert_test_investigation,
+                polling_station_repo::insert_test_polling_station,
+            },
         },
         error::ErrorReference,
-        investigation::insert_test_investigation,
-        polling_station::insert_test_polling_station,
     };
 
     pub async fn claim(

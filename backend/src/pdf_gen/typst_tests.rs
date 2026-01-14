@@ -23,25 +23,30 @@ use crate::{
         yes_no::YesNo,
     },
     election::domain::{
-        Candidate, CandidateGender, CandidateNumber, ElectionCategory, ElectionId,
-        ElectionWithPoliticalGroups, PGNumber, PoliticalGroup, VoteCountingMethod,
-        committee_session::CommitteeSession, committee_session_status::CommitteeSessionStatus,
+        committee_session::CommitteeSession,
+        committee_session_status::CommitteeSessionStatus,
+        election::{
+            Candidate, CandidateGender, CandidateNumber, ElectionCategory, ElectionId,
+            ElectionWithPoliticalGroups, PGNumber, PoliticalGroup, VoteCountingMethod,
+        },
+        investigation::PollingStationInvestigation,
+        polling_station::{PollingStation, PollingStationType},
     },
-    investigation::PollingStationInvestigation,
     pdf_gen::{
         generate_pdf,
         models::{
             ModelN10_2Input, ModelNa14_2Bijlage1Input, ModelNa14_2Input, ModelNa31_2Bijlage1Input,
             ModelNa31_2Input, ModelP2aInput, PdfFileModel, PdfModel,
         },
+        summary::{
+            ElectionSummary, PollingStationInvestigations, SumCount, SummaryDifferencesCounts,
+        },
         votes_table::{
             CandidatesTables, VotesTables, VotesTablesWithOnlyPreviousVotes,
             VotesTablesWithPreviousVotes,
         },
     },
-    polling_station::{PollingStation, PollingStationType},
     report::DEFAULT_DATE_TIME_FORMAT,
-    summary::{ElectionSummary, PollingStationInvestigations, SumCount, SummaryDifferencesCounts},
 };
 
 fn random_string(rng: &mut impl Rng, length: usize) -> String {

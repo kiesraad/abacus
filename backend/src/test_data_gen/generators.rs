@@ -32,15 +32,17 @@ use crate::{
     },
     election::{
         domain::{
-            Candidate, CandidateGender, CandidateNumber, ElectionCategory,
-            ElectionWithPoliticalGroups, NewElection, PGNumber, PoliticalGroup, VoteCountingMethod,
             committee_session::{CommitteeSession, CommitteeSessionCreateRequest},
             committee_session_status::CommitteeSessionStatus,
+            election::{
+                Candidate, CandidateGender, CandidateNumber, ElectionCategory,
+                ElectionWithPoliticalGroups, NewElection, PGNumber, PoliticalGroup,
+                VoteCountingMethod,
+            },
+            polling_station::{PollingStation, PollingStationRequest, PollingStationType},
         },
-        repository::{committee_session_repo, election_repo},
+        repository::{committee_session_repo, election_repo, polling_station_repo},
     },
-    polling_station,
-    polling_station::{PollingStation, PollingStationRequest, PollingStationType},
     test_data_gen::GenerateElectionArgs,
 };
 
@@ -271,7 +273,7 @@ async fn generate_polling_stations(
         };
         remaining_voters -= ps_num_voters;
 
-        let ps = polling_station::create(
+        let ps = polling_station_repo::create(
             conn,
             election.id,
             PollingStationRequest {

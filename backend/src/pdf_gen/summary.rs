@@ -16,9 +16,11 @@ use crate::{
         },
         validate::{Validate, ValidationResults},
     },
-    election::domain::ElectionWithPoliticalGroups,
+    election::domain::{
+        election::ElectionWithPoliticalGroups,
+        polling_station::{PollingStation, PollingStationNumber},
+    },
     error::ErrorReference,
-    polling_station::{PollingStation, PollingStationNumber},
 };
 
 /// Contains a summary of the election results, added up from the votes of all polling stations.
@@ -308,7 +310,9 @@ mod tests {
             polling_station_results::extra_investigation::ExtraInvestigation,
             valid_default::ValidDefault, yes_no::YesNo,
         },
-        election::{api::committee_session::tests::committee_session_fixture, domain::PGNumber},
+        election::{
+            api::committee_session::tests::committee_session_fixture, domain::election::PGNumber,
+        },
         pdf_gen::tests::polling_stations_fixture,
     };
 

@@ -9,7 +9,7 @@ use utoipa::ToSchema;
 
 use crate::{
     audit_log,
-    election::domain::{ElectionId, committee_session_status::CommitteeSessionStatus},
+    election::domain::{committee_session_status::CommitteeSessionStatus, election::ElectionId},
 };
 
 /// Committee session

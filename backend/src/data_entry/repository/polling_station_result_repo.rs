@@ -7,9 +7,10 @@ use crate::{
         polling_station_result::PollingStationResult,
         polling_station_results::PollingStationResults,
     },
-    election::repository::committee_session_repo,
-    polling_station,
-    polling_station::PollingStation,
+    election::{
+        domain::polling_station::PollingStation,
+        repository::{committee_session_repo, polling_station_repo},
+    },
 };
 
 /// Get the full polling station result row for a given polling station
@@ -81,12 +82,13 @@ async fn fetch_results_for_committee_session(
     let mut tx = conn.begin().await?;
 
     // Get and index polling stations by id for performance
-    let polling_stations: HashMap<u32, _> = polling_station::list(&mut tx, committee_session_id)
-        .await?
-        .into_iter()
-        .filter(|ps| polling_station_id.is_none_or(|id| ps.id == id))
-        .map(|ps| (ps.id, ps))
-        .collect();
+    let polling_stations: HashMap<u32, _> =
+        polling_station_repo::list(&mut tx, committee_session_id)
+            .await?
+            .into_iter()
+            .filter(|ps| polling_station_id.is_none_or(|id| ps.id == id))
+            .map(|ps| (ps.id, ps))
+            .collect();
 
     // This is a recursive Common Table Expression (CTE)
     // It traverses polling stations through previous committee sessions to find the most recent results
@@ -162,7 +164,7 @@ pub async fn previous_results_for_polling_station(
     conn: &mut SqliteConnection,
     polling_station_id: u32,
 ) -> Result<PollingStationResults, sqlx::Error> {
-    let polling_station = polling_station::get(conn, polling_station_id).await?;
+    let polling_station = polling_station_repo::get(conn, polling_station_id).await?;
     let ps_id_prev_session = polling_station
         .id_prev_session
         .ok_or(sqlx::Error::RowNotFound)?;
@@ -237,8 +239,9 @@ pub mod tests {
         use test_log::test;
 
         use super::*;
-        use crate::{
-            investigation::insert_test_investigation, polling_station::insert_test_polling_station,
+        use crate::election::repository::{
+            investigation_repo::insert_test_investigation,
+            polling_station_repo::insert_test_polling_station,
         };
 
         /// Test with first session, 2 polling stations with results

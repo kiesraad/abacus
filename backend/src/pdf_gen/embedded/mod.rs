@@ -10,7 +10,7 @@ use super::{
     PdfGenResult,
     models::{PdfFileModel, PdfModel},
 };
-use crate::zip::{ZipResponseError, ZipResponseWriter};
+use crate::pdf_gen::zip::{ZipResponseError, ZipResponseWriter};
 
 mod world;
 

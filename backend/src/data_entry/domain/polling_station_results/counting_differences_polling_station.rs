@@ -10,8 +10,7 @@ use crate::{
         },
         yes_no::YesNo,
     },
-    election::domain::ElectionWithPoliticalGroups,
-    polling_station::PollingStation,
+    election::domain::{election::ElectionWithPoliticalGroups, polling_station::PollingStation},
 };
 
 /// Counting Differences Polling Station,

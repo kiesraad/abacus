@@ -8,10 +8,10 @@ use crate::{
         common_polling_station_results::CommonPollingStationResults, count::Count,
         political_group_candidate_votes::PoliticalGroupCandidateVotes,
     },
-    election::domain::{
+    election::domain::election::{
         Candidate, CandidateNumber, ElectionWithPoliticalGroups, PGNumber, PoliticalGroup,
     },
-    summary::ElectionSummary,
+    pdf_gen::summary::ElectionSummary,
 };
 
 const DEFAULT_CANDIDATES_PER_COLUMN: [usize; 4] = [25, 25, 15, 15];
@@ -312,7 +312,7 @@ mod tests {
     use super::*;
     use crate::{
         data_entry::domain::polling_station_results::political_group_candidate_votes,
-        election::domain::{ElectionCategory, ElectionId, VoteCountingMethod},
+        election::domain::election::{ElectionCategory, ElectionId, VoteCountingMethod},
     };
 
     fn sample_candidate(number: CandidateNumber) -> Candidate {

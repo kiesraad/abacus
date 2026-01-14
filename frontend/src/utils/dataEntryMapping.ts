@@ -1,7 +1,6 @@
 import type { DataEntryResults, DataEntrySection, SectionValues } from "@/types/types";
 import { parseIntUserInput } from "@/utils/strings";
 
-type PathSegment = string | number;
 type PathValue = boolean | number | string | undefined;
 
 /**
@@ -44,7 +43,7 @@ export function mapSectionValues<T extends DataEntryResults>(
 
   Object.entries(formValues).forEach(([path, value]) => {
     const valueType = fieldInfoMap.get(path);
-    setValueAtPath(newResults, path, value, valueType);
+    (newResults as Record<string, PathValue>)[path] = processValue(value, valueType);
   });
 
   return newResults;
@@ -55,68 +54,13 @@ export function mapResultsToSectionValues(section: DataEntrySection, results: Da
 
   const fieldInfoMap = extractFieldInfoFromSection(section);
   for (const path of fieldInfoMap.keys()) {
-    const value = getValueAtPath(results, path);
-    formValues[path] = valueToString(value);
+    formValues[path] = valueToString((results as Record<string, PathValue>)[path]);
   }
 
   return formValues;
 }
 
 // biome-ignore lint/complexity/noExcessiveCognitiveComplexity: TODO function should be refactored
-function setValueAtPath(
-  results: DataEntryResults,
-  path: string,
-  value: string,
-  valueType: "boolean" | "number" | undefined,
-): void {
-  const segments = parsePathSegments(path);
-  const processedValue = processValue(value, valueType);
-
-  let current: unknown = results;
-
-  for (let i = 0; i < segments.length - 1; i++) {
-    const segment = segments[i];
-    const nextSegment = segments[i + 1];
-
-    if (segment === undefined) continue;
-
-    if (typeof segment === "number") {
-      if (Array.isArray(current)) {
-        ensureArrayLength(current, segment + 1);
-        current = current[segment];
-      }
-    } else {
-      if (isRecord(current)) {
-        if (!(segment in current)) {
-          current[segment] = typeof nextSegment === "number" ? [] : {};
-        }
-        current = current[segment];
-      }
-    }
-  }
-
-  const finalSegment = segments[segments.length - 1];
-  if (finalSegment !== undefined && isRecord(current)) {
-    current[finalSegment] = processedValue;
-  }
-}
-
-export function getValueAtPath(results: DataEntryResults, path: string): PathValue {
-  const segments = parsePathSegments(path);
-
-  const result = segments.reduce<unknown>((current, segment) => {
-    if (current === undefined) return undefined;
-
-    if (typeof segment === "number") {
-      return Array.isArray(current) && segment < current.length ? current[segment] : undefined;
-    } else {
-      return isRecord(current) && segment in current ? current[segment] : undefined;
-    }
-  }, results);
-
-  return isPathValue(result) ? result : undefined;
-}
-
 function processValue(
   value: string,
   valueType: "boolean" | "number" | undefined,
@@ -143,65 +87,6 @@ function valueToString(value: PathValue): string {
 }
 
 // biome-ignore lint/complexity/noExcessiveCognitiveComplexity: TODO function should be refactored
-function parsePathSegments(path: string): PathSegment[] {
-  const segments: PathSegment[] = [];
-  let current = "";
-  let i = 0;
-
-  while (i < path.length) {
-    const char = path[i];
-    if (!char) break;
-
-    if (char === ".") {
-      if (current) {
-        segments.push(current);
-        current = "";
-      }
-    } else if (char === "[") {
-      if (current) {
-        segments.push(current);
-        current = "";
-      }
-      i++;
-      while (i < path.length && path[i] !== "]") {
-        const char = path[i];
-        if (char) {
-          current += char;
-        }
-        i++;
-      }
-      if (current && /^\d+$/.test(current)) {
-        segments.push(parseInt(current, 10));
-        current = "";
-      }
-    } else if (char !== "]") {
-      current += char;
-    }
-
-    i++;
-  }
-
-  if (current) {
-    segments.push(current);
-  }
-
-  return segments;
-}
-
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === "object" && value !== null && !Array.isArray(value);
-}
-
-function isPathValue(value: unknown): value is PathValue {
-  return typeof value === "boolean" || typeof value === "number" || typeof value === "string" || value === undefined;
-}
-
-function ensureArrayLength(arr: unknown[], minLength: number): void {
-  while (arr.length < minLength) {
-    arr.push({});
-  }
-}
-
 /**
  * Combine the previousValue and correction by returning previousValue if correction is empty and else the correction.
  * Note that this also returns the correction if it is set to zero.

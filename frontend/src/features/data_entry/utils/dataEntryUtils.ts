@@ -1,6 +1,6 @@
 import type { ValidationResult, ValidationResults } from "@/types/generated/openapi";
 import type { DataEntryResults, DataEntryStructure, FormSectionId } from "@/types/types";
-import { extractFieldInfoFromSection, getValueAtPath } from "@/utils/dataEntryMapping";
+import { extractFieldInfoFromSection } from "@/utils/dataEntryMapping";
 import { doesValidationResultApplyToSection, ValidationResultSet } from "@/utils/ValidationResults";
 
 import type { ClientState, FormSection, FormState } from "../types/types";
@@ -53,7 +53,7 @@ export function isFormSectionEmpty(
 
   const fieldInfoMap = extractFieldInfoFromSection(dataEntrySection);
   for (const [path, fieldType] of fieldInfoMap) {
-    const value = getValueAtPath(results, path);
+    const value = results[path as keyof DataEntryResults];
 
     switch (fieldType) {
       case "boolean":

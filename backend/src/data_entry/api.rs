@@ -1,3 +1,4 @@
+use crate::dot_serializer;
 use axum::{
     Json,
     extract::{FromRequest, Path, State},
@@ -64,6 +65,7 @@ impl From<DataEntryTransitionError> for APIError {
 #[derive(Serialize, Deserialize, ToSchema, Debug)]
 #[serde(deny_unknown_fields)]
 pub struct ClaimDataEntryResponse {
+    #[serde(serialize_with = "dot_serializer::serialize")]
     pub data: PollingStationResults,
     #[schema(value_type = Object)]
     pub client_state: Option<serde_json::Value>,
@@ -350,6 +352,7 @@ pub struct DataEntry {
     #[schema(maximum = 100)]
     pub progress: u8,
     /// Data entry for a polling station
+    #[serde(deserialize_with = "dot_serializer::deserialize")]
     pub data: PollingStationResults,
     #[schema(value_type = Object)]
     /// Client state for the data entry (arbitrary JSON)

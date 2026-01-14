@@ -16,6 +16,7 @@ pub mod authentication;
 pub mod committee_session;
 pub mod data_entry;
 pub mod document;
+pub mod dot_serializer;
 pub mod election;
 pub mod eml;
 mod error;

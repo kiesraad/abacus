@@ -166,443 +166,453 @@ test.describe("Election creation", () => {
     await expect(session).toContainText("Klaar voor invoer");
   });
 
-  test("it fails on incorrect hash", async ({ page }) => {
-    await page.goto("/elections");
-    const overviewPage = new ElectionsOverviewPgObj(page);
-    await overviewPage.create.click();
+  test.describe("election definition", () => {
+    test("it fails on incorrect hash for election definition", async ({ page }) => {
+      await page.goto("/elections");
+      const overviewPage = new ElectionsOverviewPgObj(page);
+      await overviewPage.create.click();
 
-    // Upload election
-    const uploadElectionDefinitionPage = new UploadElectionDefinitionPgObj(page);
-    await expect(uploadElectionDefinitionPage.header).toBeVisible();
-    await uploadElectionDefinitionPage.uploadFile(eml110a.path);
+      // Upload election
+      const uploadElectionDefinitionPage = new UploadElectionDefinitionPgObj(page);
+      await expect(uploadElectionDefinitionPage.header).toBeVisible();
+      await uploadElectionDefinitionPage.uploadFile(eml110a.path);
 
-    // Wrong hash
-    const checkDefinitionPage = new CheckElectionDefinitionPgObj(page);
-    await expect(checkDefinitionPage.hashInput1).toBeFocused();
-    await checkDefinitionPage.inputHash("1234", "abcd");
-    await expect(checkDefinitionPage.error).toBeVisible();
+      // Wrong hash
+      const checkDefinitionPage = new CheckElectionDefinitionPgObj(page);
+      await expect(checkDefinitionPage.hashInput1).toBeFocused();
+      await checkDefinitionPage.inputHash("1234", "abcd");
+      await expect(checkDefinitionPage.error).toBeVisible();
+    });
+
+    test("it succeeds on incorrect case of election definition hash", async ({ page }) => {
+      await page.goto("/elections");
+      const overviewPage = new ElectionsOverviewPgObj(page);
+      await overviewPage.create.click();
+
+      // Upload election
+      const uploadElectionDefinitionPage = new UploadElectionDefinitionPgObj(page);
+      await expect(uploadElectionDefinitionPage.header).toBeVisible();
+      await uploadElectionDefinitionPage.uploadFile(eml110a.path);
+
+      // Correct hash, incorrect case
+      const checkDefinitionPage = new CheckElectionDefinitionPgObj(page);
+      await expect(checkDefinitionPage.hashInput1).toBeFocused();
+      await checkDefinitionPage.inputHash("476B", "C0DE");
+      const pollingStationRolePage = new PollingStationRolePgObj(page);
+      await expect(pollingStationRolePage.header).toBeVisible();
+    });
+
+    test("it fails on valid, but incorrect file", async ({ page }) => {
+      await page.goto("/elections");
+      const overviewPage = new ElectionsOverviewPgObj(page);
+      await overviewPage.create.click();
+
+      // Incorrect file
+      const uploadElectionDefinitionPage = new UploadElectionDefinitionPgObj(page);
+      await expect(uploadElectionDefinitionPage.header).toBeVisible();
+      await uploadElectionDefinitionPage.uploadFile(eml110b.path);
+      await expect(uploadElectionDefinitionPage.invalidFileAlert).toBeVisible();
+      await expect(uploadElectionDefinitionPage.invalidFileAlert).toContainText(
+        "Het bestand eml110b_test.eml.xml bevat geen geldige verkiezingsdefinitie. Kies een bestand met een geldige definitie.",
+      );
+    });
   });
 
-  test("it succeeds on incorrect case", async ({ page }) => {
-    await page.goto("/elections");
-    const overviewPage = new ElectionsOverviewPgObj(page);
-    await overviewPage.create.click();
+  test.describe("candidate list", () => {
+    test("it fails on incorrect hash for candidate list", async ({ page }) => {
+      await page.goto("/elections");
+      const overviewPage = new ElectionsOverviewPgObj(page);
+      await overviewPage.create.click();
 
-    // Upload election
-    const uploadElectionDefinitionPage = new UploadElectionDefinitionPgObj(page);
-    await expect(uploadElectionDefinitionPage.header).toBeVisible();
-    await uploadElectionDefinitionPage.uploadFile(eml110a.path);
+      // upload election and check hash
+      await uploadElectionAndInputHash(page);
 
-    // Correct hash, incorrect case
-    const checkDefinitionPage = new CheckElectionDefinitionPgObj(page);
-    await expect(checkDefinitionPage.hashInput1).toBeFocused();
-    await checkDefinitionPage.inputHash("476B", "C0DE");
-    const pollingStationRolePage = new PollingStationRolePgObj(page);
-    await expect(pollingStationRolePage.header).toBeVisible();
+      // polling station role
+      const pollingStationRolePage = new PollingStationRolePgObj(page);
+      await expect(pollingStationRolePage.header).toBeVisible();
+      await pollingStationRolePage.next.click();
+
+      // Candidate page
+      const uploadCandidateDefinitionPage = new UploadCandidateDefinitionPgObj(page);
+      await expect(uploadCandidateDefinitionPage.header).toBeVisible();
+      await uploadCandidateDefinitionPage.uploadFile(eml230b.path);
+
+      // Wrong hash
+      const checkCandidateDefinitionPage = new CheckCandidateDefinitionPgObj(page);
+      await expect(checkCandidateDefinitionPage.header).toBeVisible();
+      await checkCandidateDefinitionPage.inputHash("1234", "abcd");
+      await expect(checkCandidateDefinitionPage.error).toBeVisible();
+    });
+
+    test("it fails on valid, but incorrect file for candidate list", async ({ page }) => {
+      await page.goto("/elections");
+      const overviewPage = new ElectionsOverviewPgObj(page);
+      await overviewPage.create.click();
+
+      // upload election and check hash
+      await uploadElectionAndInputHash(page);
+
+      // polling station role
+      const pollingStationRolePage = new PollingStationRolePgObj(page);
+      await expect(pollingStationRolePage.header).toBeVisible();
+      await pollingStationRolePage.next.click();
+
+      // Candidate page
+      const uploadCandidateDefinitionPage = new UploadCandidateDefinitionPgObj(page);
+      await expect(uploadCandidateDefinitionPage.header).toBeVisible();
+      await uploadCandidateDefinitionPage.uploadFile(eml110b.path);
+      await expect(uploadCandidateDefinitionPage.invalidFileAlert).toBeVisible();
+      await expect(uploadCandidateDefinitionPage.invalidFileAlert).toContainText(
+        "Het bestand eml110b_test.eml.xml bevat geen geldige kandidatenlijsten. Kies een bestand met een geldige definitie.",
+      );
+    });
   });
 
-  test("it fails on valid, but incorrect file", async ({ page }) => {
-    await page.goto("/elections");
-    const overviewPage = new ElectionsOverviewPgObj(page);
-    await overviewPage.create.click();
+  test.describe("modal", () => {
+    test("warning modal close button should stay on page", async ({ page }) => {
+      await page.goto("/elections");
+      const overviewPage = new ElectionsOverviewPgObj(page);
+      await overviewPage.create.click();
 
-    // Incorrect file
-    const uploadElectionDefinitionPage = new UploadElectionDefinitionPgObj(page);
-    await expect(uploadElectionDefinitionPage.header).toBeVisible();
-    await uploadElectionDefinitionPage.uploadFile(eml110b.path);
-    await expect(uploadElectionDefinitionPage.invalidFileAlert).toBeVisible();
-    await expect(uploadElectionDefinitionPage.invalidFileAlert).toContainText(
-      "Het bestand eml110b_test.eml.xml bevat geen geldige verkiezingsdefinitie. Kies een bestand met een geldige definitie.",
-    );
+      const uploadElectionDefinitionPage = new UploadElectionDefinitionPgObj(page);
+      await expect(uploadElectionDefinitionPage.header).toBeVisible();
+      await uploadElectionDefinitionPage.uploadFile(eml110a.path);
+
+      const checkDefinitionPage = new CheckElectionDefinitionPgObj(page);
+      await expect(checkDefinitionPage.header).toBeVisible();
+
+      // Menu button back to election overview
+      const navBar = new AdminNavBar(page);
+      await navBar.electionOverviewButton.click();
+
+      // Abort modal should have stopped navigation
+      const abortModal = new AbortModalPgObj(page);
+      await expect(abortModal.header).toBeVisible();
+
+      // Click close, assert we are still on the election create page
+      await abortModal.closeButton.click();
+      await expect(checkDefinitionPage.header).toBeVisible();
+    });
+
+    test("warning modal cancel button should stay on page", async ({ page }) => {
+      await page.goto("/elections");
+      const overviewPage = new ElectionsOverviewPgObj(page);
+      await overviewPage.create.click();
+
+      const uploadElectionDefinitionPage = new UploadElectionDefinitionPgObj(page);
+      await expect(uploadElectionDefinitionPage.header).toBeVisible();
+      await uploadElectionDefinitionPage.uploadFile(eml110a.path);
+
+      const checkDefinitionPage = new CheckElectionDefinitionPgObj(page);
+      await expect(checkDefinitionPage.header).toBeVisible();
+
+      // Menu button back to election overview
+      const navBarPage = new AdminNavBar(page);
+      await navBarPage.electionOverviewButton.click();
+
+      // Abort modal should have stopped navigation
+      const abortModal = new AbortModalPgObj(page);
+      await expect(abortModal.header).toBeVisible();
+
+      // Click cancel, assert we are still on the election create page
+      await abortModal.cancelButton.click();
+      await expect(checkDefinitionPage.header).toBeVisible();
+    });
+
+    test("warning modal delete button should continue navigation", async ({ page }) => {
+      await page.goto("/elections");
+      const overviewPage = new ElectionsOverviewPgObj(page);
+      await overviewPage.create.click();
+
+      const uploadElectionDefinitionPage = new UploadElectionDefinitionPgObj(page);
+      await expect(uploadElectionDefinitionPage.header).toBeVisible();
+      await uploadElectionDefinitionPage.uploadFile(eml110a.path);
+
+      const checkDefinitionPage = new CheckElectionDefinitionPgObj(page);
+      await expect(checkDefinitionPage.header).toBeVisible();
+
+      // Menu button back to election overview
+      const navBarPage = new AdminNavBar(page);
+      await navBarPage.electionOverviewButton.click();
+
+      // Abort modal should have stopped navigation
+      const abortModal = new AbortModalPgObj(page);
+      await expect(abortModal.header).toBeVisible();
+
+      // Click delete, assert we are back at the overview
+      await abortModal.deleteButton.click();
+      await expect(overviewPage.adminHeader).toBeVisible();
+    });
+
+    test("uploading a candidate list, then navigating should trigger the modal", async ({ page }) => {
+      await page.goto("/elections");
+      const overviewPage = new ElectionsOverviewPgObj(page);
+      await overviewPage.create.click();
+
+      // upload election and check hash
+      await uploadElectionAndInputHash(page);
+
+      // polling station role
+      const pollingStationRolePage = new PollingStationRolePgObj(page);
+      await expect(pollingStationRolePage.header).toBeVisible();
+      await pollingStationRolePage.next.click();
+
+      // Candidate page
+      const uploadCandidateDefinitionPage = new UploadCandidateDefinitionPgObj(page);
+      await expect(uploadCandidateDefinitionPage.header).toBeVisible();
+      await uploadCandidateDefinitionPage.uploadFile(eml230b.path);
+
+      // Menu button back to election overview
+      const navBarPage = new AdminNavBar(page);
+      await navBarPage.electionOverviewButton.click();
+
+      // Abort modal should have stopped navigation
+      const AbortModal = new AbortModalPgObj(page);
+      await expect(AbortModal.header).toBeVisible();
+    });
   });
 
-  test("it fails on incorrect hash for candidate list", async ({ page }) => {
-    await page.goto("/elections");
-    const overviewPage = new ElectionsOverviewPgObj(page);
-    await overviewPage.create.click();
+  test.describe("navigation", () => {
+    test("after election upload, moving back to election page resets election", async ({ page }) => {
+      await page.goto("/elections");
+      const overviewPage = new ElectionsOverviewPgObj(page);
+      await overviewPage.create.click();
 
-    // upload election and check hash
-    await uploadElectionAndInputHash(page);
+      // upload election and check hash
+      await uploadElectionAndInputHash(page);
 
-    // polling station role
-    const pollingStationRolePage = new PollingStationRolePgObj(page);
-    await expect(pollingStationRolePage.header).toBeVisible();
-    await pollingStationRolePage.next.click();
+      // polling station role
+      const pollingStationRolePage = new PollingStationRolePgObj(page);
+      await expect(pollingStationRolePage.header).toBeVisible();
+      await pollingStationRolePage.next.click();
 
-    // Candidate page
-    const uploadCandidateDefinitionPage = new UploadCandidateDefinitionPgObj(page);
-    await expect(uploadCandidateDefinitionPage.header).toBeVisible();
-    await uploadCandidateDefinitionPage.uploadFile(eml230b.path);
+      // Candidate page
+      const uploadCandidateDefinitionPage = new UploadCandidateDefinitionPgObj(page);
+      await expect(uploadCandidateDefinitionPage.header).toBeVisible();
 
-    // Wrong hash
-    const checkCandidateDefinitionPage = new CheckCandidateDefinitionPgObj(page);
-    await expect(checkCandidateDefinitionPage.header).toBeVisible();
-    await checkCandidateDefinitionPage.inputHash("1234", "abcd");
-    await expect(checkCandidateDefinitionPage.error).toBeVisible();
+      // Back button
+      await page.goBack();
+      await expect(pollingStationRolePage.header).toBeVisible();
+    });
+
+    test("after candidate upload, moving back to candidate page resets candidates", async ({ page }) => {
+      await page.goto("/elections");
+      const overviewPage = new ElectionsOverviewPgObj(page);
+      await overviewPage.create.click();
+
+      // upload election and check hash
+      await uploadElectionAndInputHash(page);
+
+      // polling station role
+      const pollingStationRolePage = new PollingStationRolePgObj(page);
+      await expect(pollingStationRolePage.header).toBeVisible();
+      await pollingStationRolePage.next.click();
+
+      // upload candidates list and check hash
+      await uploadCandidatesAndInputHash(page);
+
+      // Now we should be at the polling station upload page
+      const uploadPollingStationDefinitionPage = new UploadPollingStationDefinitionPgObj(page);
+      await expect(uploadPollingStationDefinitionPage.header).toBeVisible();
+
+      // Back button
+      await page.goBack();
+
+      // We should be back at the candidate page
+      const uploadCandidateDefinitionPage = new UploadCandidateDefinitionPgObj(page);
+      await expect(uploadCandidateDefinitionPage.header).toBeVisible();
+    });
+
+    test("navigating to list-of-candidates should redirect to create", async ({ page }) => {
+      await page.goto("/elections/create/list-of-candidates");
+
+      // Upload election
+      const uploadElectionDefinitionPage = new UploadElectionDefinitionPgObj(page);
+      await expect(uploadElectionDefinitionPage.header).toBeVisible();
+    });
+
+    test("navigate to check-and-save should redirect to create", async ({ page }) => {
+      await page.goto("/elections/create/check-and-save");
+
+      // Upload election
+      const uploadElectionDefinitionPage = new UploadElectionDefinitionPgObj(page);
+      await expect(uploadElectionDefinitionPage.header).toBeVisible();
+    });
+
+    // upload election and candidates, then go to start and upload new election,
+    // use browser back button should redirect back to election
+    test("after resetting an election upload, the back button should redirect to the beginning", async ({ page }) => {
+      await page.goto("/elections");
+      const overviewPage = new ElectionsOverviewPgObj(page);
+      await overviewPage.create.click();
+
+      // upload election and check hash
+      await uploadElectionAndInputHash(page);
+
+      // polling station role
+      const pollingStationRolePage = new PollingStationRolePgObj(page);
+      await expect(pollingStationRolePage.header).toBeVisible();
+      await pollingStationRolePage.next.click();
+
+      // upload candidates list and check hash
+      await uploadCandidatesAndInputHash(page);
+
+      // Now we should be at the polling station upload page
+      const uploadPollingStationDefinitionPage = new UploadPollingStationDefinitionPgObj(page);
+      await expect(uploadPollingStationDefinitionPage.header).toBeVisible();
+
+      // Now upload a new election
+      const uploadElectionDefinitionPage = new UploadElectionDefinitionPgObj(page);
+      await page.goto("/elections/create");
+      await expect(uploadElectionDefinitionPage.header).toBeVisible();
+      await uploadElectionDefinitionPage.uploadFile(eml110a.path);
+
+      // Back button
+      await page.goBack();
+      await expect(uploadElectionDefinitionPage.header).toBeVisible();
+    });
+
+    test("after the successful creation of new election, the back button should redirect to the beginning", async ({
+      page,
+    }) => {
+      await page.goto("/elections");
+      const overviewPage = new ElectionsOverviewPgObj(page);
+      await overviewPage.create.click();
+
+      // upload election and check hash
+      await uploadElectionAndInputHash(page);
+
+      // polling station role
+      const pollingStationRolePage = new PollingStationRolePgObj(page);
+      await expect(pollingStationRolePage.header).toBeVisible();
+      await pollingStationRolePage.next.click();
+
+      // upload candidates list and check hash
+      await uploadCandidatesAndInputHash(page);
+
+      // upload polling stations
+      await uploadPollingStations(page);
+
+      // Now we should be at the check and save page
+      const countingMethodPage = new CountingMethodTypePgObj(page);
+      await expect(countingMethodPage.header).toBeVisible();
+      await countingMethodPage.next.click();
+
+      // Number of voters page
+      const numberOfVotersPage = new NumberOfVotersPgObj(page);
+      await expect(numberOfVotersPage.header).toBeVisible();
+      await numberOfVotersPage.next.click();
+
+      // Now we should be at the check and save page
+      const checkAndSavePage = new CheckAndSavePgObj(page);
+      await expect(checkAndSavePage.header).toBeVisible();
+      await checkAndSavePage.save.click();
+
+      // Redefine the Overview page, so we can locate the newly
+      await expect(overviewPage.adminHeader).toBeVisible();
+
+      // Back button
+      await page.goBack();
+
+      // We should be at the election upload page, not the check-and-save
+      const uploadElectionDefinitionPage = new UploadElectionDefinitionPgObj(page);
+      await expect(uploadElectionDefinitionPage.header).toBeVisible();
+    });
   });
 
-  test("it fails on valid, but incorrect file for candidate list", async ({ page }) => {
-    await page.goto("/elections");
-    const overviewPage = new ElectionsOverviewPgObj(page);
-    await overviewPage.create.click();
-
-    // upload election and check hash
-    await uploadElectionAndInputHash(page);
-
-    // polling station role
-    const pollingStationRolePage = new PollingStationRolePgObj(page);
-    await expect(pollingStationRolePage.header).toBeVisible();
-    await pollingStationRolePage.next.click();
-
-    // Candidate page
-    const uploadCandidateDefinitionPage = new UploadCandidateDefinitionPgObj(page);
-    await expect(uploadCandidateDefinitionPage.header).toBeVisible();
-    await uploadCandidateDefinitionPage.uploadFile(eml110b.path);
-    await expect(uploadCandidateDefinitionPage.invalidFileAlert).toBeVisible();
-    await expect(uploadCandidateDefinitionPage.invalidFileAlert).toContainText(
-      "Het bestand eml110b_test.eml.xml bevat geen geldige kandidatenlijsten. Kies een bestand met een geldige definitie.",
-    );
-  });
-
-  test("warning modal close button should stay on page", async ({ page }) => {
-    await page.goto("/elections");
-    const overviewPage = new ElectionsOverviewPgObj(page);
-    await overviewPage.create.click();
-
-    const uploadElectionDefinitionPage = new UploadElectionDefinitionPgObj(page);
-    await expect(uploadElectionDefinitionPage.header).toBeVisible();
-    await uploadElectionDefinitionPage.uploadFile(eml110a.path);
-
-    const checkDefinitionPage = new CheckElectionDefinitionPgObj(page);
-    await expect(checkDefinitionPage.header).toBeVisible();
-
-    // Menu button back to election overview
-    const navBar = new AdminNavBar(page);
-    await navBar.electionOverviewButton.click();
-
-    // Abort modal should have stopped navigation
-    const abortModal = new AbortModalPgObj(page);
-    await expect(abortModal.header).toBeVisible();
-
-    // Click close, assert we are still on the election create page
-    await abortModal.closeButton.click();
-    await expect(checkDefinitionPage.header).toBeVisible();
-  });
-
-  test("warning modal cancel button should stay on page", async ({ page }) => {
-    await page.goto("/elections");
-    const overviewPage = new ElectionsOverviewPgObj(page);
-    await overviewPage.create.click();
-
-    const uploadElectionDefinitionPage = new UploadElectionDefinitionPgObj(page);
-    await expect(uploadElectionDefinitionPage.header).toBeVisible();
-    await uploadElectionDefinitionPage.uploadFile(eml110a.path);
-
-    const checkDefinitionPage = new CheckElectionDefinitionPgObj(page);
-    await expect(checkDefinitionPage.header).toBeVisible();
-
-    // Menu button back to election overview
-    const navBarPage = new AdminNavBar(page);
-    await navBarPage.electionOverviewButton.click();
-
-    // Abort modal should have stopped navigation
-    const abortModal = new AbortModalPgObj(page);
-    await expect(abortModal.header).toBeVisible();
-
-    // Click cancel, assert we are still on the election create page
-    await abortModal.cancelButton.click();
-    await expect(checkDefinitionPage.header).toBeVisible();
-  });
-
-  test("warning modal delete button should continue navigation", async ({ page }) => {
-    await page.goto("/elections");
-    const overviewPage = new ElectionsOverviewPgObj(page);
-    await overviewPage.create.click();
-
-    const uploadElectionDefinitionPage = new UploadElectionDefinitionPgObj(page);
-    await expect(uploadElectionDefinitionPage.header).toBeVisible();
-    await uploadElectionDefinitionPage.uploadFile(eml110a.path);
-
-    const checkDefinitionPage = new CheckElectionDefinitionPgObj(page);
-    await expect(checkDefinitionPage.header).toBeVisible();
-
-    // Menu button back to election overview
-    const navBarPage = new AdminNavBar(page);
-    await navBarPage.electionOverviewButton.click();
-
-    // Abort modal should have stopped navigation
-    const abortModal = new AbortModalPgObj(page);
-    await expect(abortModal.header).toBeVisible();
-
-    // Click delete, assert we are back at the overview
-    await abortModal.deleteButton.click();
-    await expect(overviewPage.adminHeader).toBeVisible();
-  });
-
-  test("uploading a candidate list, then navigating should trigger the modal", async ({ page }) => {
-    await page.goto("/elections");
-    const overviewPage = new ElectionsOverviewPgObj(page);
-    await overviewPage.create.click();
-
-    // upload election and check hash
-    await uploadElectionAndInputHash(page);
-
-    // polling station role
-    const pollingStationRolePage = new PollingStationRolePgObj(page);
-    await expect(pollingStationRolePage.header).toBeVisible();
-    await pollingStationRolePage.next.click();
-
-    // Candidate page
-    const uploadCandidateDefinitionPage = new UploadCandidateDefinitionPgObj(page);
-    await expect(uploadCandidateDefinitionPage.header).toBeVisible();
-    await uploadCandidateDefinitionPage.uploadFile(eml230b.path);
-
-    // Menu button back to election overview
-    const navBarPage = new AdminNavBar(page);
-    await navBarPage.electionOverviewButton.click();
-
-    // Abort modal should have stopped navigation
-    const AbortModal = new AbortModalPgObj(page);
-    await expect(AbortModal.header).toBeVisible();
-  });
-
-  test("after election upload, moving back to election page resets election", async ({ page }) => {
-    await page.goto("/elections");
-    const overviewPage = new ElectionsOverviewPgObj(page);
-    await overviewPage.create.click();
-
-    // upload election and check hash
-    await uploadElectionAndInputHash(page);
-
-    // polling station role
-    const pollingStationRolePage = new PollingStationRolePgObj(page);
-    await expect(pollingStationRolePage.header).toBeVisible();
-    await pollingStationRolePage.next.click();
-
-    // Candidate page
-    const uploadCandidateDefinitionPage = new UploadCandidateDefinitionPgObj(page);
-    await expect(uploadCandidateDefinitionPage.header).toBeVisible();
-
-    // Back button
-    await page.goBack();
-    await expect(pollingStationRolePage.header).toBeVisible();
-  });
-
-  test("after candidate upload, moving back to candidate page resets candidates", async ({ page }) => {
-    await page.goto("/elections");
-    const overviewPage = new ElectionsOverviewPgObj(page);
-    await overviewPage.create.click();
-
-    // upload election and check hash
-    await uploadElectionAndInputHash(page);
-
-    // polling station role
-    const pollingStationRolePage = new PollingStationRolePgObj(page);
-    await expect(pollingStationRolePage.header).toBeVisible();
-    await pollingStationRolePage.next.click();
-
-    // upload candidates list and check hash
-    await uploadCandidatesAndInputHash(page);
-
-    // Now we should be at the polling station upload page
-    const uploadPollingStationDefinitionPage = new UploadPollingStationDefinitionPgObj(page);
-    await expect(uploadPollingStationDefinitionPage.header).toBeVisible();
-
-    // Back button
-    await page.goBack();
-
-    // We should be back at the candidate page
-    const uploadCandidateDefinitionPage = new UploadCandidateDefinitionPgObj(page);
-    await expect(uploadCandidateDefinitionPage.header).toBeVisible();
-  });
-
-  test("navigating to list-of-candidates should redirect to create", async ({ page }) => {
-    await page.goto("/elections/create/list-of-candidates");
-
-    // Upload election
-    const uploadElectionDefinitionPage = new UploadElectionDefinitionPgObj(page);
-    await expect(uploadElectionDefinitionPage.header).toBeVisible();
-  });
-
-  test("navigate to check-and-save should redirect to create", async ({ page }) => {
-    await page.goto("/elections/create/check-and-save");
-
-    // Upload election
-    const uploadElectionDefinitionPage = new UploadElectionDefinitionPgObj(page);
-    await expect(uploadElectionDefinitionPage.header).toBeVisible();
-  });
-
-  // upload election and candidates, then go to start and upload new election,
-  // use browser back button should redirect back to election
-  test("after resetting an election upload, the back button should redirect to the beginning", async ({ page }) => {
-    await page.goto("/elections");
-    const overviewPage = new ElectionsOverviewPgObj(page);
-    await overviewPage.create.click();
-
-    // upload election and check hash
-    await uploadElectionAndInputHash(page);
-
-    // polling station role
-    const pollingStationRolePage = new PollingStationRolePgObj(page);
-    await expect(pollingStationRolePage.header).toBeVisible();
-    await pollingStationRolePage.next.click();
-
-    // upload candidates list and check hash
-    await uploadCandidatesAndInputHash(page);
-
-    // Now we should be at the polling station upload page
-    const uploadPollingStationDefinitionPage = new UploadPollingStationDefinitionPgObj(page);
-    await expect(uploadPollingStationDefinitionPage.header).toBeVisible();
-
-    // Now upload a new election
-    const uploadElectionDefinitionPage = new UploadElectionDefinitionPgObj(page);
-    await page.goto("/elections/create");
-    await expect(uploadElectionDefinitionPage.header).toBeVisible();
-    await uploadElectionDefinitionPage.uploadFile(eml110a.path);
-
-    // Back button
-    await page.goBack();
-    await expect(uploadElectionDefinitionPage.header).toBeVisible();
-  });
-
-  test("after the successful creation of new election, the back button should redirect to the beginning", async ({
-    page,
-  }) => {
-    await page.goto("/elections");
-    const overviewPage = new ElectionsOverviewPgObj(page);
-    await overviewPage.create.click();
-
-    // upload election and check hash
-    await uploadElectionAndInputHash(page);
-
-    // polling station role
-    const pollingStationRolePage = new PollingStationRolePgObj(page);
-    await expect(pollingStationRolePage.header).toBeVisible();
-    await pollingStationRolePage.next.click();
-
-    // upload candidates list and check hash
-    await uploadCandidatesAndInputHash(page);
-
-    // upload polling stations
-    await uploadPollingStations(page);
-
-    // Now we should be at the check and save page
-    const countingMethodPage = new CountingMethodTypePgObj(page);
-    await expect(countingMethodPage.header).toBeVisible();
-    await countingMethodPage.next.click();
-
-    // Number of voters page
-    const numberOfVotersPage = new NumberOfVotersPgObj(page);
-    await expect(numberOfVotersPage.header).toBeVisible();
-    await numberOfVotersPage.next.click();
-
-    // Now we should be at the check and save page
-    const checkAndSavePage = new CheckAndSavePgObj(page);
-    await expect(checkAndSavePage.header).toBeVisible();
-    await checkAndSavePage.save.click();
-
-    // Redefine the Overview page, so we can locate the newly
-    await expect(overviewPage.adminHeader).toBeVisible();
-
-    // Back button
-    await page.goBack();
-
-    // We should be at the election upload page, not the check-and-save
-    const uploadElectionDefinitionPage = new UploadElectionDefinitionPgObj(page);
-    await expect(uploadElectionDefinitionPage.header).toBeVisible();
-  });
-
-  test("it fails on valid, but incorrect polling station file", async ({ page }) => {
-    await page.goto("/elections");
-    const overviewPage = new ElectionsOverviewPgObj(page);
-    await overviewPage.create.click();
-
-    // upload election and check hash
-    await uploadElectionAndInputHash(page);
-
-    // polling station role
-    const pollingStationRolePage = new PollingStationRolePgObj(page);
-    await expect(pollingStationRolePage.header).toBeVisible();
-    await pollingStationRolePage.next.click();
-
-    // upload candidates list and check hash
-    await uploadCandidatesAndInputHash(page);
-
-    // upload wrong file
-    const uploadElectionDefinitionPage = new UploadPollingStationDefinitionPgObj(page);
-    await expect(uploadElectionDefinitionPage.header).toBeVisible();
-    await uploadElectionDefinitionPage.uploadFile(eml110a.path);
-    await expect(uploadElectionDefinitionPage.main).toContainText(eml110a.filename);
-    await expect(uploadElectionDefinitionPage.invalidFileAlert).toBeVisible();
-    await expect(uploadElectionDefinitionPage.invalidFileAlert).toContainText(
-      "Het bestand eml110a_test.eml.xml bevat geen geldige lijst met stembureaus. Kies een ander bestand.",
-    );
-  });
-
-  test("show more button should show full list of polling stations", async ({ page }) => {
-    await page.goto("/elections");
-    const overviewPage = new ElectionsOverviewPgObj(page);
-    await overviewPage.create.click();
-
-    // upload election and check hash
-    await uploadElectionAndInputHash(page);
-
-    // polling station role
-    const pollingStationRolePage = new PollingStationRolePgObj(page);
-    await expect(pollingStationRolePage.header).toBeVisible();
-    await pollingStationRolePage.next.click();
-
-    // upload candidates list and check hash
-    await uploadCandidatesAndInputHash(page);
-
-    const uploadElectionDefinitionPage = new UploadPollingStationDefinitionPgObj(page);
-    await expect(uploadElectionDefinitionPage.header).toBeVisible();
-    await uploadElectionDefinitionPage.uploadFile(eml110b.path);
-    await expect(uploadElectionDefinitionPage.main).toContainText(eml110b.filename);
-
-    // Check list of polling stations
-    const checkDefinitionPage = new CheckPollingStationDefinitionPgObj(page);
-    await expect(checkDefinitionPage.header).toBeVisible();
-
-    // Check the overview table
-    await expect(checkDefinitionPage.table).toBeVisible();
-    expect(await checkDefinitionPage.stations.count()).toBe(10);
-
-    // Click button
-    await checkDefinitionPage.showMore.click();
-    expect(await checkDefinitionPage.stations.count()).toBeGreaterThan(10);
-  });
-
-  test("no show more button should be visible if <10 polling stations", async ({ page }) => {
-    await page.goto("/elections");
-    const overviewPage = new ElectionsOverviewPgObj(page);
-    await overviewPage.create.click();
-
-    // upload election and check hash
-    await uploadElectionAndInputHash(page);
-
-    // polling station role
-    const pollingStationRolePage = new PollingStationRolePgObj(page);
-    await expect(pollingStationRolePage.header).toBeVisible();
-    await pollingStationRolePage.next.click();
-
-    // upload candidates list and check hash
-    await uploadCandidatesAndInputHash(page);
-
-    const uploadElectionDefinitionPage = new UploadPollingStationDefinitionPgObj(page);
-    await expect(uploadElectionDefinitionPage.header).toBeVisible();
-    await uploadElectionDefinitionPage.uploadFile(eml110b_short.path);
-    await expect(uploadElectionDefinitionPage.main).toContainText(eml110b_short.filename);
-
-    // Check list of polling stations
-    const checkDefinitionPage = new CheckPollingStationDefinitionPgObj(page);
-    await expect(checkDefinitionPage.header).toBeVisible();
-
-    // Check the overview table
-    await expect(checkDefinitionPage.table).toBeVisible();
-    expect(await checkDefinitionPage.stations.count()).toBe(9);
-
-    // Click button should not exist
-    await expect(checkDefinitionPage.showMore).toBeHidden();
+  test.describe("polling stations", () => {
+    test("it fails on valid, but incorrect polling station file", async ({ page }) => {
+      await page.goto("/elections");
+      const overviewPage = new ElectionsOverviewPgObj(page);
+      await overviewPage.create.click();
+
+      // upload election and check hash
+      await uploadElectionAndInputHash(page);
+
+      // polling station role
+      const pollingStationRolePage = new PollingStationRolePgObj(page);
+      await expect(pollingStationRolePage.header).toBeVisible();
+      await pollingStationRolePage.next.click();
+
+      // upload candidates list and check hash
+      await uploadCandidatesAndInputHash(page);
+
+      // upload wrong file
+      const uploadElectionDefinitionPage = new UploadPollingStationDefinitionPgObj(page);
+      await expect(uploadElectionDefinitionPage.header).toBeVisible();
+      await uploadElectionDefinitionPage.uploadFile(eml110a.path);
+      await expect(uploadElectionDefinitionPage.main).toContainText(eml110a.filename);
+      await expect(uploadElectionDefinitionPage.invalidFileAlert).toBeVisible();
+      await expect(uploadElectionDefinitionPage.invalidFileAlert).toContainText(
+        "Het bestand eml110a_test.eml.xml bevat geen geldige lijst met stembureaus. Kies een ander bestand.",
+      );
+    });
+
+    test("show more button should show full list of polling stations", async ({ page }) => {
+      await page.goto("/elections");
+      const overviewPage = new ElectionsOverviewPgObj(page);
+      await overviewPage.create.click();
+
+      // upload election and check hash
+      await uploadElectionAndInputHash(page);
+
+      // polling station role
+      const pollingStationRolePage = new PollingStationRolePgObj(page);
+      await expect(pollingStationRolePage.header).toBeVisible();
+      await pollingStationRolePage.next.click();
+
+      // upload candidates list and check hash
+      await uploadCandidatesAndInputHash(page);
+
+      const uploadElectionDefinitionPage = new UploadPollingStationDefinitionPgObj(page);
+      await expect(uploadElectionDefinitionPage.header).toBeVisible();
+      await uploadElectionDefinitionPage.uploadFile(eml110b.path);
+      await expect(uploadElectionDefinitionPage.main).toContainText(eml110b.filename);
+
+      // Check list of polling stations
+      const checkDefinitionPage = new CheckPollingStationDefinitionPgObj(page);
+      await expect(checkDefinitionPage.header).toBeVisible();
+
+      // Check the overview table
+      await expect(checkDefinitionPage.table).toBeVisible();
+      expect(await checkDefinitionPage.stations.count()).toBe(10);
+
+      // Click button
+      await checkDefinitionPage.showMore.click();
+      expect(await checkDefinitionPage.stations.count()).toBeGreaterThan(10);
+    });
+
+    test("no show more button should be visible if <10 polling stations", async ({ page }) => {
+      await page.goto("/elections");
+      const overviewPage = new ElectionsOverviewPgObj(page);
+      await overviewPage.create.click();
+
+      // upload election and check hash
+      await uploadElectionAndInputHash(page);
+
+      // polling station role
+      const pollingStationRolePage = new PollingStationRolePgObj(page);
+      await expect(pollingStationRolePage.header).toBeVisible();
+      await pollingStationRolePage.next.click();
+
+      // upload candidates list and check hash
+      await uploadCandidatesAndInputHash(page);
+
+      const uploadElectionDefinitionPage = new UploadPollingStationDefinitionPgObj(page);
+      await expect(uploadElectionDefinitionPage.header).toBeVisible();
+      await uploadElectionDefinitionPage.uploadFile(eml110b_short.path);
+      await expect(uploadElectionDefinitionPage.main).toContainText(eml110b_short.filename);
+
+      // Check list of polling stations
+      const checkDefinitionPage = new CheckPollingStationDefinitionPgObj(page);
+      await expect(checkDefinitionPage.header).toBeVisible();
+
+      // Check the overview table
+      await expect(checkDefinitionPage.table).toBeVisible();
+      expect(await checkDefinitionPage.stations.count()).toBe(9);
+
+      // Click button should not exist
+      await expect(checkDefinitionPage.showMore).toBeHidden();
+    });
   });
 });

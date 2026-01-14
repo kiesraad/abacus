@@ -12,8 +12,8 @@ use tracing::{debug, error, info};
 use super::{SESSION_MIN_LIFE_TIME, session::Session};
 use crate::{
     SqlitePoolExt,
-    audit_log::{AuditEvent, AuditService},
     authentication::{User, request_data::RequestSessionData, set_default_cookie_properties},
+    service::audit_log::{AuditEvent, AuditService},
 };
 
 /// Inject user and session
@@ -139,10 +139,10 @@ mod test {
 
     use super::{extend_session, inject_user};
     use crate::{
-        audit_log::AuditService,
         authentication::{
             DO_NOT_EXTEND_SESSION_HEADER, Role, SESSION_LIFE_TIME, SESSION_MIN_LIFE_TIME, User,
         },
+        service::audit_log::AuditService,
     };
 
     const TEST_USER_AGENT: &str = "TestAgent/1.0";

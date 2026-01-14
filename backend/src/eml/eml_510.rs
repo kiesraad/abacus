@@ -8,16 +8,14 @@ use super::{
         ManagingAuthority,
     },
 };
-use crate::{
-    data_entry::domain::polling_station_results::{
+use crate::domain::{
+    committee_session::CommitteeSession,
+    election::{ElectionCategory::Municipal, ElectionWithPoliticalGroups},
+    polling_station::PollingStation,
+    polling_station_results::{
         PollingStationResults, political_group_candidate_votes::PoliticalGroupCandidateVotes,
     },
-    election::domain::{
-        committee_session::CommitteeSession,
-        election::{ElectionCategory::Municipal, ElectionWithPoliticalGroups},
-        polling_station::PollingStation,
-    },
-    pdf_gen::summary::ElectionSummary,
+    summary::ElectionSummary,
 };
 
 /// Vote count data for EML_NL 510

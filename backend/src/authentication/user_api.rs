@@ -11,8 +11,8 @@ use utoipa_axum::{router::OpenApiRouter, routes};
 use super::{AdminOrCoordinator, error::AuthenticationError, user::User};
 use crate::{
     APIError, AppState, ErrorResponse, SqlitePoolExt,
-    audit_log::{AuditEvent, AuditService},
     authentication::{CreateUserRequest, Role},
+    service::audit_log::{AuditEvent, AuditService},
 };
 
 pub fn user_router() -> OpenApiRouter<AppState> {

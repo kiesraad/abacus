@@ -9,7 +9,7 @@ use super::{
     },
 };
 use crate::{
-    election::domain::{
+    domain::{
         election::{
             self, ElectionWithPoliticalGroups, NewElection, PGNumber, PoliticalGroup,
             VoteCountingMethod,
@@ -286,7 +286,7 @@ impl EML110 {
 
     pub fn polling_stations_from_election(
         election: &ElectionWithPoliticalGroups,
-        polling_stations: &[crate::election::domain::polling_station::PollingStation],
+        polling_stations: &[crate::domain::polling_station::PollingStation],
         transaction_id: &str,
     ) -> Self {
         let now = chrono::Utc::now();

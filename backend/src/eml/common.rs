@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 
-use crate::election::domain::election;
+use crate::domain::election;
 
 /// Managing authority for the EML document
 #[derive(Debug, Clone, Serialize, Deserialize)]

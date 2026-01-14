@@ -20,12 +20,12 @@ use super::{
 };
 use crate::{
     APIError, AppState, ErrorResponse, SqlitePoolExt,
-    audit_log::{
+    authentication::CreateUserRequest,
+    error::ErrorReference,
+    service::audit_log::{
         AuditEvent, AuditService, UserDetails, UserLoggedInDetails, UserLoggedOutDetails,
         UserLoginFailedDetails,
     },
-    authentication::CreateUserRequest,
-    error::ErrorReference,
 };
 
 impl From<AuthenticationError> for APIError {

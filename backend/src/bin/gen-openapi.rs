@@ -1,6 +1,6 @@
 use std::fs;
 
-use abacus::router::openapi_router;
+use abacus::api::router::openapi_router;
 
 /// Write OpenAPI JSON documentation to `openapi.json`.
 fn main() {

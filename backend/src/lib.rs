@@ -1,6 +1,7 @@
 use std::{future::Future, net::SocketAddr, str::FromStr};
 
 use airgap::AirgapDetection;
+use api::router;
 use axum::{extract::FromRef, serve::ListenerExt};
 use sqlx::{
     Sqlite, SqliteConnection, SqlitePool,
@@ -10,24 +11,21 @@ use tokio::{net::TcpListener, signal};
 use tracing::{info, trace, warn};
 
 pub mod airgap;
+pub mod api;
 pub mod app_error;
-pub mod audit_log;
 pub mod authentication;
-pub mod data_entry;
-pub mod election;
+pub mod domain;
 pub mod eml;
 mod error;
 #[cfg(feature = "dev-database")]
 pub mod fixtures;
-pub mod pdf_gen;
-pub mod report;
-pub mod router;
-#[cfg(feature = "dev-database")]
-pub mod test_data_gen;
-pub mod util;
+pub mod infra;
+pub mod repository;
+pub mod service;
 
 pub use app_error::AppError;
 pub use error::{APIError, ErrorResponse};
+use service::audit_log;
 
 use crate::app_error::{DatabaseErrorWithPath, DatabaseMigrationErrorWithPath};
 

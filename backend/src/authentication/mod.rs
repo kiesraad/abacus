@@ -72,7 +72,6 @@ mod tests {
     use crate::{
         AppState, ErrorResponse,
         airgap::AirgapDetection,
-        audit_log::{AuditEvent, LogFilter, UserLoginFailedDetails},
         authentication::{
             api::{AccountUpdateRequest, Credentials},
             middleware::extend_session,
@@ -80,6 +79,7 @@ mod tests {
             *,
         },
         error::ErrorReference,
+        service::audit_log::{AuditEvent, LogFilter, UserLoginFailedDetails},
     };
 
     const TEST_USER_AGENT: &str = "TestAgent/1.0";

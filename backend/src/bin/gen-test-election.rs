@@ -5,19 +5,22 @@ use std::{
 
 use abacus::{
     AppError, create_sqlite_pool,
-    data_entry::domain::polling_station_results::PollingStationResults,
-    election::domain::{
-        committee_session::CommitteeSession, election::ElectionWithPoliticalGroups,
-        polling_station::PollingStation,
-    },
-    eml::{EML110, EML230, EMLDocument},
-    pdf_gen::{
-        VotesTables,
+    domain::{
+        committee_session::CommitteeSession,
+        election::ElectionWithPoliticalGroups,
         models::{ModelNa31_2Input, ToPdfFileModel},
+        polling_station::PollingStation,
+        polling_station_results::PollingStationResults,
         summary::ElectionSummary,
     },
-    report::DEFAULT_DATE_TIME_FORMAT,
-    test_data_gen::{GenerateElectionArgs, RandomRange, create_test_election, parse_range},
+    eml::{EML110, EML230, EMLDocument},
+    service::{
+        generate_test_data::{
+            GenerateElectionArgs, RandomRange, generators::create_test_election, parse_range,
+        },
+        pdf_gen::VotesTables,
+        report::DEFAULT_DATE_TIME_FORMAT,
+    },
 };
 use clap::Parser;
 use tracing::{info, level_filters::LevelFilter};

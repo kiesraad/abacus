@@ -17,6 +17,7 @@ import { usePollingStationDataEntryErrors } from "../hooks/usePollingStationData
 import cls from "./detail.module.css";
 import { ErrorsAndWarningsOverview } from "./ErrorsAndWarningsOverview";
 
+// biome-ignore lint/complexity/noExcessiveLinesPerFunction: TODO function should be refactored
 export function DetailIndexPage() {
   const { pushMessage } = useMessages();
   const navigate = useNavigate();

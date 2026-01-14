@@ -17,6 +17,7 @@ import { fileTooLargeError, isFileTooLarge } from "@/utils/uploadFileSize";
 import { useElectionCreateContext } from "../hooks/useElectionCreateContext";
 import { CheckHash } from "./CheckHash";
 
+// biome-ignore lint/complexity/noExcessiveLinesPerFunction: TODO function should be refactored
 export function UploadElectionDefinition() {
   const { state, dispatch } = useElectionCreateContext();
   const navigate = useNavigate();
@@ -25,6 +26,7 @@ export function UploadElectionDefinition() {
   const createPath: ELECTION_IMPORT_VALIDATE_REQUEST_PATH = `/api/elections/import/validate`;
   const { create } = useCrud<ElectionDefinitionValidateResponse>({ createPath });
 
+  // biome-ignore lint/complexity/noExcessiveCognitiveComplexity: TODO function should be refactored
   async function onFileChange(e: ChangeEvent<HTMLInputElement>) {
     const currentFile = e.target.files ? e.target.files[0] : undefined;
     if (currentFile !== undefined) {

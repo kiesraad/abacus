@@ -38,47 +38,49 @@ export type COMMITTEE_SESSION_CREATE_REQUEST_PATH = `/api/elections/${ElectionId
 // /api/elections/{election_id}/committee_sessions/{committee_session_id}
 export interface COMMITTEE_SESSION_UPDATE_REQUEST_PARAMS {
   election_id: ElectionId;
-  committee_session_id: number;
+  committee_session_id: CommitteeSessionId;
 }
-export type COMMITTEE_SESSION_UPDATE_REQUEST_PATH = `/api/elections/${ElectionId}/committee_sessions/${number}`;
+export type COMMITTEE_SESSION_UPDATE_REQUEST_PATH =
+  `/api/elections/${ElectionId}/committee_sessions/${CommitteeSessionId}`;
 export type COMMITTEE_SESSION_UPDATE_REQUEST_BODY = CommitteeSessionUpdateRequest;
 export interface COMMITTEE_SESSION_DELETE_REQUEST_PARAMS {
   election_id: ElectionId;
-  committee_session_id: number;
+  committee_session_id: CommitteeSessionId;
 }
-export type COMMITTEE_SESSION_DELETE_REQUEST_PATH = `/api/elections/${ElectionId}/committee_sessions/${number}`;
+export type COMMITTEE_SESSION_DELETE_REQUEST_PATH =
+  `/api/elections/${ElectionId}/committee_sessions/${CommitteeSessionId}`;
 
 // /api/elections/{election_id}/committee_sessions/{committee_session_id}/download_pdf_results
 export interface ELECTION_DOWNLOAD_PDF_RESULTS_REQUEST_PARAMS {
   election_id: ElectionId;
-  committee_session_id: number;
+  committee_session_id: CommitteeSessionId;
 }
 export type ELECTION_DOWNLOAD_PDF_RESULTS_REQUEST_PATH =
-  `/api/elections/${ElectionId}/committee_sessions/${number}/download_pdf_results`;
+  `/api/elections/${ElectionId}/committee_sessions/${CommitteeSessionId}/download_pdf_results`;
 
 // /api/elections/{election_id}/committee_sessions/{committee_session_id}/download_zip_results
 export interface ELECTION_DOWNLOAD_ZIP_RESULTS_REQUEST_PARAMS {
   election_id: ElectionId;
-  committee_session_id: number;
+  committee_session_id: CommitteeSessionId;
 }
 export type ELECTION_DOWNLOAD_ZIP_RESULTS_REQUEST_PATH =
-  `/api/elections/${ElectionId}/committee_sessions/${number}/download_zip_results`;
+  `/api/elections/${ElectionId}/committee_sessions/${CommitteeSessionId}/download_zip_results`;
 
 // /api/elections/{election_id}/committee_sessions/{committee_session_id}/investigations
 export interface COMMITTEE_SESSION_INVESTIGATIONS_REQUEST_PARAMS {
   election_id: ElectionId;
-  committee_session_id: number;
+  committee_session_id: CommitteeSessionId;
 }
 export type COMMITTEE_SESSION_INVESTIGATIONS_REQUEST_PATH =
-  `/api/elections/${ElectionId}/committee_sessions/${number}/investigations`;
+  `/api/elections/${ElectionId}/committee_sessions/${CommitteeSessionId}/investigations`;
 
 // /api/elections/{election_id}/committee_sessions/{committee_session_id}/status
 export interface COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_PARAMS {
   election_id: ElectionId;
-  committee_session_id: number;
+  committee_session_id: CommitteeSessionId;
 }
 export type COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_PATH =
-  `/api/elections/${ElectionId}/committee_sessions/${number}/status`;
+  `/api/elections/${ElectionId}/committee_sessions/${CommitteeSessionId}/status`;
 export type COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_BODY = CommitteeSessionStatusChangeRequest;
 
 // /api/elections/{election_id}/download_n_10_2
@@ -481,7 +483,7 @@ export interface ClaimDataEntryResponse {
  */
 export interface CommitteeSession {
   election_id: ElectionId;
-  id: number;
+  id: CommitteeSessionId;
   location: string;
   number: number;
   overview_pdf?: number;
@@ -493,7 +495,7 @@ export interface CommitteeSession {
 
 export interface CommitteeSessionDetails {
   session_election_id: ElectionId;
-  session_id: number;
+  session_id: CommitteeSessionId;
   session_location: string;
   session_number: number;
   session_overview_pdf?: number;
@@ -502,6 +504,8 @@ export interface CommitteeSessionDetails {
   session_start_date_time?: string | null;
   session_status: string;
 }
+
+export type CommitteeSessionId = number;
 
 /**
  * Committee session status
@@ -580,7 +584,7 @@ export interface DataEntry {
 }
 
 export interface DataEntryDetails {
-  committee_session_id: number;
+  committee_session_id: CommitteeSessionId;
   data_entry_progress: string;
   data_entry_status: string;
   finished_at?: string | null;
@@ -959,7 +963,7 @@ export interface PoliticalGroupTotalVotes {
  */
 export interface PollingStation {
   address: string;
-  committee_session_id: number;
+  committee_session_id: CommitteeSessionId;
   election_id: ElectionId;
   id: number;
   id_prev_session?: number;
@@ -973,7 +977,7 @@ export interface PollingStation {
 
 export interface PollingStationDetails {
   polling_station_address: string;
-  polling_station_committee_session_id: number;
+  polling_station_committee_session_id: CommitteeSessionId;
   polling_station_election_id: ElectionId;
   polling_station_id: number;
   polling_station_id_prev_session?: number;
@@ -1084,7 +1088,7 @@ export const resolveErrorsActionValues = ["discard_first_entry", "resume_first_e
 export type ResolveErrorsAction = (typeof resolveErrorsActionValues)[number];
 
 export interface ResultDetails {
-  committee_session_id: number;
+  committee_session_id: CommitteeSessionId;
   created_at: string;
   polling_station_id: number;
 }

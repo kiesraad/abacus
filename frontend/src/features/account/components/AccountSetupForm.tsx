@@ -18,6 +18,7 @@ interface AccountSetupFormProps {
   onSaved: (user: LoginResponse) => void;
 }
 
+// biome-ignore lint/complexity/noExcessiveLinesPerFunction: TODO function should be refactored
 export function AccountSetupForm({ user, onSaved }: AccountSetupFormProps) {
   const [showLoginSuccess, setShowLoginSuccess] = useState(true);
   const [validationErrors, setValidationErrors] = useState<UserValidationErrors | null>(null);

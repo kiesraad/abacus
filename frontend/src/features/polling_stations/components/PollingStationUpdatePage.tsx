@@ -20,6 +20,7 @@ import { PollingStationAlert } from "./PollingStationAlert";
 import { PollingStationDeleteModal } from "./PollingStationDeleteModal";
 import { PollingStationForm } from "./PollingStationForm";
 
+// biome-ignore lint/complexity/noExcessiveLinesPerFunction: TODO function should be refactored
 export function PollingStationUpdatePage() {
   const { isAdministrator, isCoordinator } = useUserRole();
   const pollingStationId = useNumericParam("pollingStationId");

@@ -14,6 +14,7 @@ interface FirstLoginFormProps {
   prev: () => void;
 }
 
+// biome-ignore lint/complexity/noExcessiveLinesPerFunction: TODO function should be refactored
 export function FirstLoginForm({ prev }: FirstLoginFormProps) {
   const { login } = useApiState();
   const navigator = useNavigate();

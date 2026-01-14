@@ -37,6 +37,7 @@ function AddFirstElection() {
   );
 }
 
+// biome-ignore lint/complexity/noExcessiveLinesPerFunction: TODO function should be refactored
 export function OverviewPage() {
   const navigate = useNavigate();
   const location = useLocation();

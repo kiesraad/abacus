@@ -5,7 +5,9 @@
 /// The tests cover various edge cases by varying the number of parties, candidates,
 /// string lengths, and the presence of optional fields.
 use crate::{
-    committee_session::{status::CommitteeSessionStatus, structs::CommitteeSession},
+    committee_session::{
+        CommitteeSessionId, status::CommitteeSessionStatus, structs::CommitteeSession,
+    },
     data_entry::structs::{
         CandidateVotes, CommonPollingStationResults,
         DifferenceCountsCompareVotesCastAdmittedVoters, DifferencesCounts,
@@ -184,7 +186,7 @@ fn random_polling_station(
     PollingStation {
         id: rng.random_range(0..5),
         election_id: election.id,
-        committee_session_id: rng.random_range(0..5),
+        committee_session_id: CommitteeSessionId::from(rng.random_range(0..5)),
         id_prev_session: random_option(rng, id_prev_session, none_where_possible),
         name: random_string(rng, string_length),
         number: rng.random_range(0..5),
@@ -218,7 +220,7 @@ fn random_committee_session(
     let results_pdf = rng.random_range(0..1_000);
 
     CommitteeSession {
-        id: rng.random_range(0..5),
+        id: CommitteeSessionId::from(rng.random_range(0..5)),
         number: rng.random_range(1..=2),
         election_id,
         location: random_string(rng, string_length),

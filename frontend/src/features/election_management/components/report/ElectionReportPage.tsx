@@ -24,6 +24,7 @@ import { formatDateTimeFull } from "@/utils/dateTime";
 import { useCommitteeSessionInvestigationListRequest } from "../../hooks/useCommitteeSessionInvestigationListRequest";
 import cls from "../ElectionManagement.module.css";
 
+// biome-ignore lint/complexity/noExcessiveLinesPerFunction: TODO function should be refactored
 export function ElectionReportPage() {
   const { currentCommitteeSession, committeeSessions, election } = useElection();
   const navigate = useNavigate();

@@ -17,6 +17,7 @@ interface CreateFirstAdminFormProps {
   next: () => void;
 }
 
+// biome-ignore lint/complexity/noExcessiveLinesPerFunction: TODO function should be refactored
 export function CreateFirstAdminForm({ next }: CreateFirstAdminFormProps) {
   const [validationErrors, setValidationErrors] = useState<UserValidationErrors | null>(null);
   const createPath: CREATE_FIRST_ADMIN_REQUEST_PATH = "/api/initialise/first-admin";

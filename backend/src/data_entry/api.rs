@@ -1039,7 +1039,8 @@ mod tests {
     use crate::{
         authentication::Role,
         committee_session::{
-            status::CommitteeSessionStatus, tests::change_status_committee_session,
+            CommitteeSessionId, status::CommitteeSessionStatus,
+            tests::change_status_committee_session,
         },
         data_entry::{
             ValidationResult, ValidationResultCode,
@@ -1069,7 +1070,7 @@ mod tests {
     async fn get_data_entry_status(
         pool: SqlitePool,
         polling_station_id: u32,
-        committee_session_id: u32,
+        committee_session_id: CommitteeSessionId,
     ) -> DataEntryStatus {
         let mut conn = pool.acquire().await.unwrap();
         crate::data_entry::repository::get(&mut conn, polling_station_id, committee_session_id)
@@ -1291,8 +1292,13 @@ mod tests {
     }
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
-    async fn test_claim_data_entry_committee_session_status_is_paused(pool: SqlitePool) {
-        change_status_committee_session(pool.clone(), 2, CommitteeSessionStatus::Paused).await;
+    async fn test_claim_data_entry_committee_session_status_is_data_entry_paused(pool: SqlitePool) {
+        change_status_committee_session(
+            pool.clone(),
+            CommitteeSessionId::from(2),
+            CommitteeSessionStatus::Paused,
+        )
+        .await;
 
         let response = claim(pool.clone(), 1, EntryNumber::FirstEntry).await;
         assert_eq!(response.status(), StatusCode::CONFLICT);
@@ -1309,7 +1315,12 @@ mod tests {
     async fn test_claim_data_entry_committee_session_status_not_paused_or_in_progress(
         pool: SqlitePool,
     ) {
-        change_status_committee_session(pool.clone(), 2, CommitteeSessionStatus::Completed).await;
+        change_status_committee_session(
+            pool.clone(),
+            CommitteeSessionId::from(2),
+            CommitteeSessionStatus::Completed,
+        )
+        .await;
 
         let response = claim(pool.clone(), 1, EntryNumber::FirstEntry).await;
         assert_eq!(response.status(), StatusCode::CONFLICT);
@@ -1366,7 +1377,12 @@ mod tests {
             .await
             .unwrap();
 
-        change_status_committee_session(pool.clone(), 704, CommitteeSessionStatus::DataEntry).await;
+        change_status_committee_session(
+            pool.clone(),
+            CommitteeSessionId::from(704),
+            CommitteeSessionStatus::DataEntry,
+        )
+        .await;
 
         let response = claim(pool.clone(), 742, EntryNumber::FirstEntry).await;
         assert_eq!(response.status(), StatusCode::OK);
@@ -1402,7 +1418,12 @@ mod tests {
         let response = claim(pool.clone(), 1, EntryNumber::FirstEntry).await;
         assert_eq!(response.status(), StatusCode::OK);
 
-        change_status_committee_session(pool.clone(), 2, CommitteeSessionStatus::Paused).await;
+        change_status_committee_session(
+            pool.clone(),
+            CommitteeSessionId::from(2),
+            CommitteeSessionStatus::Paused,
+        )
+        .await;
 
         let response = save(
             pool.clone(),
@@ -1418,7 +1439,9 @@ mod tests {
 
         // Check that the row was not updated
         let mut conn = pool.acquire().await.unwrap();
-        let data_entry = get_data_entry(&mut conn, 1, 2).await.unwrap();
+        let data_entry = get_data_entry(&mut conn, 1, CommitteeSessionId::from(2))
+            .await
+            .unwrap();
         let status: DataEntryStatus = data_entry.state.0;
         let DataEntryStatus::FirstEntryInProgress(state) = status else {
             panic!("Expected entry to be in FirstEntryInProgress state");
@@ -1435,7 +1458,12 @@ mod tests {
         let response = claim(pool.clone(), 1, EntryNumber::FirstEntry).await;
         assert_eq!(response.status(), StatusCode::OK);
 
-        change_status_committee_session(pool.clone(), 2, CommitteeSessionStatus::Completed).await;
+        change_status_committee_session(
+            pool.clone(),
+            CommitteeSessionId::from(2),
+            CommitteeSessionStatus::Completed,
+        )
+        .await;
 
         let response = save(
             pool.clone(),
@@ -1454,7 +1482,9 @@ mod tests {
 
         // Check that the row was not updated
         let mut conn = pool.acquire().await.unwrap();
-        let data_entry = get_data_entry(&mut conn, 1, 2).await.unwrap();
+        let data_entry = get_data_entry(&mut conn, 1, CommitteeSessionId::from(2))
+            .await
+            .unwrap();
         let status: DataEntryStatus = data_entry.state.0;
         let DataEntryStatus::FirstEntryInProgress(state) = status else {
             panic!("Expected entry to be in FirstEntryInProgress state");
@@ -1484,7 +1514,7 @@ mod tests {
             r#"
             SELECT
                 polling_station_id AS "polling_station_id: u32",
-                committee_session_id AS "committee_session_id: u32",
+                committee_session_id AS "committee_session_id: CommitteeSessionId",
                 state AS "state: _",
                 updated_at AS "updated_at: _"
             FROM polling_station_data_entries
@@ -1495,7 +1525,7 @@ mod tests {
         .await
         .expect("No data found");
         assert_eq!(data.len(), 1);
-        assert_eq!(data[0].committee_session_id, 6);
+        assert_eq!(data[0].committee_session_id, CommitteeSessionId::from(6));
     }
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
@@ -1518,7 +1548,9 @@ mod tests {
         assert!(data_entry_exists(&mut conn, 1).await.unwrap());
 
         // Check if the data was updated
-        let data_entry = get_data_entry(&mut conn, 1, 2).await.unwrap();
+        let data_entry = get_data_entry(&mut conn, 1, CommitteeSessionId::from(2))
+            .await
+            .unwrap();
         let status: DataEntryStatus = data_entry.state.0;
         let DataEntryStatus::FirstEntryInProgress(state) = status else {
             panic!("Expected entry to be in FirstEntryInProgress state");
@@ -1570,7 +1602,12 @@ mod tests {
         .await;
         assert_eq!(response.status(), StatusCode::OK);
 
-        change_status_committee_session(pool.clone(), 2, CommitteeSessionStatus::Paused).await;
+        change_status_committee_session(
+            pool.clone(),
+            CommitteeSessionId::from(2),
+            CommitteeSessionStatus::Paused,
+        )
+        .await;
 
         let response = finalise(pool.clone(), 1, EntryNumber::FirstEntry).await;
         assert_eq!(response.status(), StatusCode::CONFLICT);
@@ -1596,7 +1633,12 @@ mod tests {
         .await;
         assert_eq!(response.status(), StatusCode::OK);
 
-        change_status_committee_session(pool.clone(), 2, CommitteeSessionStatus::Completed).await;
+        change_status_committee_session(
+            pool.clone(),
+            CommitteeSessionId::from(2),
+            CommitteeSessionStatus::Completed,
+        )
+        .await;
 
         let response = finalise(pool.clone(), 1, EntryNumber::FirstEntry).await;
         assert_eq!(response.status(), StatusCode::CONFLICT);
@@ -1656,7 +1698,9 @@ mod tests {
 
         // Check if entry is now in SecondEntryInProgress state
         let mut conn = pool.acquire().await.unwrap();
-        let data_entry = get_data_entry(&mut conn, 1, 2).await.unwrap();
+        let data_entry = get_data_entry(&mut conn, 1, CommitteeSessionId::from(2))
+            .await
+            .unwrap();
         let status: DataEntryStatus = data_entry.state.0;
         assert!(matches!(status, DataEntryStatus::SecondEntryInProgress(_)));
 
@@ -1701,7 +1745,7 @@ mod tests {
         assert!(result_exists(&mut conn, 1).await.unwrap());
 
         // Check that the status is 'Definitive'
-        let status = get_data_entry_status(pool.clone(), 1, 2).await;
+        let status = get_data_entry_status(pool.clone(), 1, CommitteeSessionId::from(2)).await;
         assert!(matches!(status, DataEntryStatus::Definitive(_)));
 
         // Check that we can't save a new data entry after finalising
@@ -1730,7 +1774,9 @@ mod tests {
 
         // Check if entry is now in EntriesDifferent state
         let mut conn = pool.acquire().await.unwrap();
-        let data_entry = get_data_entry(&mut conn, 1, 2).await.unwrap();
+        let data_entry = get_data_entry(&mut conn, 1, CommitteeSessionId::from(2))
+            .await
+            .unwrap();
         let status: DataEntryStatus = data_entry.state.0;
         assert!(matches!(status, DataEntryStatus::EntriesDifferent(_)));
 
@@ -1817,7 +1863,9 @@ mod tests {
         assert_eq!(response.status(), StatusCode::OK);
 
         // Check that the data entry is in SecondEntryInProgress state
-        let data_entry = get_data_entry(&mut conn, 1, 2).await.unwrap();
+        let data_entry = get_data_entry(&mut conn, 1, CommitteeSessionId::from(2))
+            .await
+            .unwrap();
         let status: DataEntryStatus = data_entry.state.0;
         assert!(matches!(status, DataEntryStatus::SecondEntryInProgress(_)));
 
@@ -1826,7 +1874,9 @@ mod tests {
         assert_eq!(response.status(), StatusCode::NO_CONTENT);
 
         // Check that the second data entry is deleted
-        let data_entry = get_data_entry(&mut conn, 1, 2).await.unwrap();
+        let data_entry = get_data_entry(&mut conn, 1, CommitteeSessionId::from(2))
+            .await
+            .unwrap();
         let status: DataEntryStatus = data_entry.state.0;
         assert!(matches!(status, DataEntryStatus::SecondEntryNotStarted(_)));
     }
@@ -1848,7 +1898,12 @@ mod tests {
         .await;
         assert_eq!(response.status(), StatusCode::OK);
 
-        change_status_committee_session(pool.clone(), 2, CommitteeSessionStatus::Paused).await;
+        change_status_committee_session(
+            pool.clone(),
+            CommitteeSessionId::from(2),
+            CommitteeSessionStatus::Paused,
+        )
+        .await;
 
         // delete data entry
         let response = delete(pool.clone(), 1, EntryNumber::FirstEntry).await;
@@ -1859,7 +1914,9 @@ mod tests {
 
         // Check if entry is still in FirstEntryInProgress state
         let mut conn = pool.acquire().await.unwrap();
-        let data_entry = get_data_entry(&mut conn, 1, 2).await.unwrap();
+        let data_entry = get_data_entry(&mut conn, 1, CommitteeSessionId::from(2))
+            .await
+            .unwrap();
         let status: DataEntryStatus = data_entry.state.0;
         assert!(matches!(status, DataEntryStatus::FirstEntryInProgress(_)));
     }
@@ -1881,7 +1938,12 @@ mod tests {
         .await;
         assert_eq!(response.status(), StatusCode::OK);
 
-        change_status_committee_session(pool.clone(), 2, CommitteeSessionStatus::Completed).await;
+        change_status_committee_session(
+            pool.clone(),
+            CommitteeSessionId::from(2),
+            CommitteeSessionStatus::Completed,
+        )
+        .await;
 
         // delete data entry
         let response = delete(pool.clone(), 1, EntryNumber::FirstEntry).await;
@@ -1895,7 +1957,9 @@ mod tests {
 
         // Check if entry is still in FirstEntryInProgress state
         let mut conn = pool.acquire().await.unwrap();
-        let data_entry = get_data_entry(&mut conn, 1, 2).await.unwrap();
+        let data_entry = get_data_entry(&mut conn, 1, CommitteeSessionId::from(2))
+            .await
+            .unwrap();
         let status: DataEntryStatus = data_entry.state.0;
         assert!(matches!(status, DataEntryStatus::FirstEntryInProgress(_)));
     }
@@ -2012,7 +2076,12 @@ mod tests {
         );
         assert!(result_exists(&mut conn, polling_station_id).await.unwrap());
 
-        change_status_committee_session(pool.clone(), 3, CommitteeSessionStatus::Completed).await;
+        change_status_committee_session(
+            pool.clone(),
+            CommitteeSessionId::from(3),
+            CommitteeSessionStatus::Completed,
+        )
+        .await;
 
         // delete data entry with status Definitive
         let response = delete_data_entries_and_result(pool.clone(), polling_station_id).await;
@@ -2027,9 +2096,10 @@ mod tests {
         assert!(!result_exists(&mut conn, polling_station_id).await.unwrap());
 
         // Check that the committee session status is changed to DataEntry
-        let committee_session = crate::committee_session::repository::get(&mut conn, 3)
-            .await
-            .unwrap();
+        let committee_session =
+            crate::committee_session::repository::get(&mut conn, CommitteeSessionId::from(3))
+                .await
+                .unwrap();
 
         assert_eq!(committee_session.status, CommitteeSessionStatus::DataEntry);
     }
@@ -2082,7 +2152,9 @@ mod tests {
         assert_eq!(response.status(), StatusCode::OK);
 
         let mut conn = pool.acquire().await.unwrap();
-        let data_entry = get_data_entry(&mut conn, 1, 2).await.unwrap();
+        let data_entry = get_data_entry(&mut conn, 1, CommitteeSessionId::from(2))
+            .await
+            .unwrap();
         let status: DataEntryStatus = data_entry.state.0;
         if let DataEntryStatus::SecondEntryNotStarted(entry) = status {
             assert_eq!(
@@ -2103,14 +2175,21 @@ mod tests {
     async fn test_data_entry_resolve_differences_keep_second(pool: SqlitePool) {
         finalise_different_entries(pool.clone()).await;
 
-        change_status_committee_session(pool.clone(), 2, CommitteeSessionStatus::Paused).await;
+        change_status_committee_session(
+            pool.clone(),
+            CommitteeSessionId::from(2),
+            CommitteeSessionStatus::Paused,
+        )
+        .await;
 
         let response =
             resolve_differences(pool.clone(), 1, ResolveDifferencesAction::KeepSecondEntry).await;
         assert_eq!(response.status(), StatusCode::OK);
 
         let mut conn = pool.acquire().await.unwrap();
-        let data_entry = get_data_entry(&mut conn, 1, 2).await.unwrap();
+        let data_entry = get_data_entry(&mut conn, 1, CommitteeSessionId::from(2))
+            .await
+            .unwrap();
         let status: DataEntryStatus = data_entry.state.0;
         if let DataEntryStatus::SecondEntryNotStarted(entry) = status {
             assert_eq!(
@@ -2151,7 +2230,12 @@ mod tests {
     async fn test_data_entry_resolve_differences_committee_session_status_not_ok(pool: SqlitePool) {
         finalise_different_entries(pool.clone()).await;
 
-        change_status_committee_session(pool.clone(), 2, CommitteeSessionStatus::Completed).await;
+        change_status_committee_session(
+            pool.clone(),
+            CommitteeSessionId::from(2),
+            CommitteeSessionStatus::Completed,
+        )
+        .await;
 
         let response = resolve_differences(
             pool.clone(),
@@ -2168,7 +2252,9 @@ mod tests {
         );
 
         let mut conn = pool.acquire().await.unwrap();
-        let data_entry = get_data_entry(&mut conn, 1, 2).await.unwrap();
+        let data_entry = get_data_entry(&mut conn, 1, CommitteeSessionId::from(2))
+            .await
+            .unwrap();
         let status: DataEntryStatus = data_entry.state.0;
         assert!(matches!(status, DataEntryStatus::EntriesDifferent(_)));
     }
@@ -2181,7 +2267,9 @@ mod tests {
         assert_eq!(response.status(), StatusCode::OK);
 
         let mut conn = pool.acquire().await.unwrap();
-        let data_entry = get_data_entry(&mut conn, 1, 2).await.unwrap();
+        let data_entry = get_data_entry(&mut conn, 1, CommitteeSessionId::from(2))
+            .await
+            .unwrap();
         let status: DataEntryStatus = data_entry.state.0;
         assert!(matches!(status, DataEntryStatus::FirstEntryInProgress(_)));
     }
@@ -2206,7 +2294,12 @@ mod tests {
     async fn test_data_entry_resolve_errors_committee_session_status_not_ok(pool: SqlitePool) {
         finalise_with_errors(pool.clone()).await;
 
-        change_status_committee_session(pool.clone(), 2, CommitteeSessionStatus::Completed).await;
+        change_status_committee_session(
+            pool.clone(),
+            CommitteeSessionId::from(2),
+            CommitteeSessionStatus::Completed,
+        )
+        .await;
 
         let response =
             resolve_errors(pool.clone(), 1, ResolveErrorsAction::DiscardFirstEntry).await;
@@ -2219,7 +2312,9 @@ mod tests {
         );
 
         let mut conn = pool.acquire().await.unwrap();
-        let data_entry = get_data_entry(&mut conn, 1, 2).await.unwrap();
+        let data_entry = get_data_entry(&mut conn, 1, CommitteeSessionId::from(2))
+            .await
+            .unwrap();
         let status: DataEntryStatus = data_entry.state.0;
         assert!(matches!(status, DataEntryStatus::FirstEntryHasErrors(_)));
     }
@@ -2238,17 +2333,29 @@ mod tests {
     /// No previous results, should return none
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_7_four_sessions"))))]
     async fn test_previous_results_none(pool: SqlitePool) {
+        let committee_session_id = CommitteeSessionId::from(704);
         // Add new polling station
-        insert_test_polling_station(&mut pool.acquire().await.unwrap(), 743, 704, None, 123)
-            .await
-            .unwrap();
+        insert_test_polling_station(
+            &mut pool.acquire().await.unwrap(),
+            743,
+            committee_session_id,
+            None,
+            123,
+        )
+        .await
+        .unwrap();
 
         // Add investigation with corrected_results to be able to claim the polling station
         insert_test_investigation(&mut pool.acquire().await.unwrap(), 743, Some(true))
             .await
             .unwrap();
 
-        change_status_committee_session(pool.clone(), 704, CommitteeSessionStatus::DataEntry).await;
+        change_status_committee_session(
+            pool.clone(),
+            committee_session_id,
+            CommitteeSessionStatus::DataEntry,
+        )
+        .await;
 
         assert!(claim_previous_results(pool.clone(), 743).await.is_none());
     }
@@ -2261,7 +2368,12 @@ mod tests {
             .await
             .unwrap();
 
-        change_status_committee_session(pool.clone(), 704, CommitteeSessionStatus::DataEntry).await;
+        change_status_committee_session(
+            pool.clone(),
+            CommitteeSessionId::from(704),
+            CommitteeSessionStatus::DataEntry,
+        )
+        .await;
 
         let previous_results = claim_previous_results(pool.clone(), 742).await.unwrap();
         // Check by difference in fixture results data

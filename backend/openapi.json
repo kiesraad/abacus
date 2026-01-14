@@ -483,9 +483,7 @@
             "description": "Committee session database id",
             "required": true,
             "schema": {
-              "type": "integer",
-              "format": "int32",
-              "minimum": 0
+              "$ref": "#/components/schemas/CommitteeSessionId"
             }
           }
         ],
@@ -581,9 +579,7 @@
             "description": "Committee session database id",
             "required": true,
             "schema": {
-              "type": "integer",
-              "format": "int32",
-              "minimum": 0
+              "$ref": "#/components/schemas/CommitteeSessionId"
             }
           }
         ],
@@ -671,9 +667,7 @@
             "description": "Committee session database id",
             "required": true,
             "schema": {
-              "type": "integer",
-              "format": "int32",
-              "minimum": 0
+              "$ref": "#/components/schemas/CommitteeSessionId"
             }
           }
         ],
@@ -772,9 +766,7 @@
             "description": "Committee session database id",
             "required": true,
             "schema": {
-              "type": "integer",
-              "format": "int32",
-              "minimum": 0
+              "$ref": "#/components/schemas/CommitteeSessionId"
             }
           }
         ],
@@ -873,9 +865,7 @@
             "description": "Committee session database id",
             "required": true,
             "schema": {
-              "type": "integer",
-              "format": "int32",
-              "minimum": 0
+              "$ref": "#/components/schemas/CommitteeSessionId"
             }
           }
         ],
@@ -960,9 +950,7 @@
             "description": "Committee session database id",
             "required": true,
             "schema": {
-              "type": "integer",
-              "format": "int32",
-              "minimum": 0
+              "$ref": "#/components/schemas/CommitteeSessionId"
             }
           }
         ],
@@ -5353,9 +5341,7 @@
             "$ref": "#/components/schemas/ElectionId"
           },
           "id": {
-            "type": "integer",
-            "format": "int32",
-            "minimum": 0
+            "$ref": "#/components/schemas/CommitteeSessionId"
           },
           "location": {
             "type": "string"
@@ -5404,9 +5390,7 @@
             "$ref": "#/components/schemas/ElectionId"
           },
           "session_id": {
-            "type": "integer",
-            "format": "int32",
-            "minimum": 0
+            "$ref": "#/components/schemas/CommitteeSessionId"
           },
           "session_location": {
             "type": "string"
@@ -5443,6 +5427,11 @@
           }
         },
         "additionalProperties": false
+      },
+      "CommitteeSessionId": {
+        "type": "integer",
+        "format": "int32",
+        "minimum": 0
       },
       "CommitteeSessionStatus": {
         "type": "string",
@@ -5617,9 +5606,7 @@
         ],
         "properties": {
           "committee_session_id": {
-            "type": "integer",
-            "format": "int32",
-            "minimum": 0
+            "$ref": "#/components/schemas/CommitteeSessionId"
           },
           "data_entry_progress": {
             "type": "string"
@@ -6647,9 +6634,7 @@
             "type": "string"
           },
           "committee_session_id": {
-            "type": "integer",
-            "format": "int32",
-            "minimum": 0
+            "$ref": "#/components/schemas/CommitteeSessionId"
           },
           "election_id": {
             "$ref": "#/components/schemas/ElectionId"
@@ -6706,9 +6691,7 @@
             "type": "string"
           },
           "polling_station_committee_session_id": {
-            "type": "integer",
-            "format": "int32",
-            "minimum": 0
+            "$ref": "#/components/schemas/CommitteeSessionId"
           },
           "polling_station_election_id": {
             "$ref": "#/components/schemas/ElectionId"
@@ -7047,9 +7030,7 @@
         ],
         "properties": {
           "committee_session_id": {
-            "type": "integer",
-            "format": "int32",
-            "minimum": 0
+            "$ref": "#/components/schemas/CommitteeSessionId"
           },
           "created_at": {
             "type": "string"

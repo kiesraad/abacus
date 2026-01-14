@@ -1,6 +1,6 @@
 {
   "db_name": "SQLite",
-  "query": "\n            SELECT\n                polling_station_id AS \"polling_station_id: u32\",\n                committee_session_id AS \"committee_session_id: u32\",\n                state AS \"state: _\",\n                updated_at AS \"updated_at: _\"\n            FROM polling_station_data_entries\n            WHERE polling_station_id = 9\n            ",
+  "query": "\n            DELETE FROM polling_station_data_entries\n            WHERE polling_station_id = ?\n            RETURNING\n                polling_station_id AS \"polling_station_id: u32\",\n                committee_session_id AS \"committee_session_id: CommitteeSessionId\",\n                state AS \"state: _\",\n                updated_at AS \"updated_at: _\"\n        ",
   "describe": {
     "columns": [
       {
@@ -9,7 +9,7 @@
         "type_info": "Integer"
       },
       {
-        "name": "committee_session_id: u32",
+        "name": "committee_session_id: CommitteeSessionId",
         "ordinal": 1,
         "type_info": "Integer"
       },
@@ -25,7 +25,7 @@
       }
     ],
     "parameters": {
-      "Right": 0
+      "Right": 1
     },
     "nullable": [
       false,
@@ -34,5 +34,5 @@
       false
     ]
   },
-  "hash": "9d43817510d5d18f4becea74829ac252fb9f37eb04981f0c6f9173fec969847d"
+  "hash": "3771ab74167dfbe9baeb3afcef9d5a3f322f440da844d722aec90dcd3105db1a"
 }

@@ -121,6 +121,7 @@ function AdministratorCoordinatorLinks({ electionList, committeeSessions }: Link
   );
 }
 
+// biome-ignore lint/complexity/noExcessiveLinesPerFunction: TODO function should be refactored
 function DevLinks() {
   const { user, login, logout } = useApiState();
   const [response, setResponse] = useState<ApiResult<LoginResponse> | null>(null);

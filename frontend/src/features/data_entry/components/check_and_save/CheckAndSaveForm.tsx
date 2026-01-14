@@ -25,6 +25,8 @@ import type { DataEntryFormSectionStatus } from "../../utils/dataEntryUtils";
 import { getUrlForFormSectionID } from "../../utils/utils";
 import { DataEntryNavigation } from "../DataEntryNavigation";
 
+// biome-ignore lint/complexity/noExcessiveLinesPerFunction: TODO function should be refactored
+// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: TODO function should be refactored
 export function CheckAndSaveForm() {
   const formRef = useFormKeyboardNavigation();
 
@@ -58,6 +60,7 @@ export function CheckAndSaveForm() {
     [election, pollingStationId, entryNumber],
   );
 
+  // biome-ignore lint/complexity/noExcessiveCognitiveComplexity: TODO function should be refactored
   const [notableFormSections, hasWarnings, hasErrors, allFeedbackAccepted] = useMemo(() => {
     const sections = Object.values(formState.sections).filter(
       (section) => !section.errors.isEmpty() || !section.warnings.isEmpty(),

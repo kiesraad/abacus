@@ -1,4 +1,4 @@
-# GSB: Invoer eerste zitting
+# GSB: Invoer
 
 ## De coördinator GSB en de invoerders voeren alle gegevens in de applicatie in (vlieger)
 
@@ -6,7 +6,8 @@ __Niveau:__ hoog-over, vlieger, 🪁
 
 ### Hoofdscenario en uitbreidingen
 
-__Hoofdscenario:__ 
+__Hoofdscenario:__
+
 1. De coördinator GSB stelt de invoer open.
 2. (voor elk stembureau) [De invoerders vullen de resultaten van de tellingen in.](#de-invoerders-vullen-de-resultaten-van-de-tellingen-in-vlieger)
 3. (parallel aan invoer stembureaus) [De coördinator GSB voert details zitting, bezwaren, bijzonderheden, etc. van de GSB-zitting in.](#de-coördinator-gsb-voert-details-zitting-bezwaren-bijzonderheden-etc-van-de-gsb-zitting-in-zee)
@@ -14,6 +15,7 @@ __Hoofdscenario:__
 5. De coördinator GSB sluit de invoer.
 
 __Uitbreidingen:__
+
 2-3a. Tijdens invoer is er reden om de invoer (tijdelijk) te stoppen:  
 &emsp; 2-3a1. De coördinator GSB pauzeert de invoer.  
 &emsp; 2-3a2. De applicatie blokkeert verdere invoer.
@@ -35,7 +37,6 @@ __Uitbreidingen:__
   - Controle "mogelijke omwisseling van kandidaatstemmen"
   - Controle "verschilpercentage van 50% of hoger"
 
-
 ## De coördinator GSB voert details zitting, bezwaren, bijzonderheden, etc. van de GSB-zitting in. (zee)
 
 __Niveau:__ gebruikersdoel, zee, 🌊
@@ -44,7 +45,7 @@ __Niveau:__ gebruikersdoel, zee, 🌊
 
 __Hoofdscenario:__
 
-1. De coördinator GSB voert de datum, tijd en locatie van de zitting in.
+1. De coördinator GSB voert de locatie, startdatum en starttijd van de zitting in.
 2. De coördinator GSB voert de aanwezige leden van het GSB in.
 3. De coördinator GSB voert de bezwaren van kiezers/belangstellenden tijdens de zitting in.
 4. De coördinator GSB voert onregelmatigheden of bijzonderheden tijdens de zitting in.
@@ -83,7 +84,8 @@ __Hoofdscenario:__
 9. De applicatie stelt vast dat de tweede invoer geen geaccepteerde waarschuwingen bevat.
 10. De applicatie slaat het definitieve resultaat van het stembureau op.
 
-__Uitbreidingen:__  
+__Uitbreidingen:__
+
 4a. De applicatie stelt vast dat een invoerder fouten heeft geaccepteerd:  
 &emsp; 4a1. [De coördinator GSB beoordeelt de geaccepteerde fouten.](#de-coördinator-gsb-beoordeelt-de-geaccepteerde-fouten-zee)
 
@@ -98,8 +100,6 @@ __Uitbreidingen:__
 
 ### Open punten
 - Waar in het scenario kan de coördinator GSB verklaringen maken over de waarschuwingen, zodat het CSB deze beter kan beoordelen? Na de eerste of tweede invoer? Of pas nadat het resultaat van een stembureau definitief is?
-
-
 
 ## De eerste of tweede invoerder voert de resultaten van de telling in (zee)
 
@@ -118,7 +118,8 @@ __Hoofdscenario:__
    de [validatieregels voor fouten](./validatieregels-plausibiliteitschecks-tellingen.md#validatieregels-geven-fouten) en de [plausibiliteitschecks](./validatieregels-plausibiliteitschecks-tellingen.md#plausibiliteitschecks-geven-waarschuwingen).
 5. De invoerder bevestigt in de applicatie klaar te zijn met de invoer van het stembureau.
 
-__Uitbreidingen:__  
+__Uitbreidingen:__
+
 1a. De invoerder kan het stembureau op het PV niet in de applicatie vinden:  
 &emsp; 1a1. De invoerder verwittigt de coördinator GSB.  
 &emsp; 1a2. De coördinator GSB en de invoerder vinden alsnog het stembureau.  
@@ -164,7 +165,8 @@ __Hoofdscenario:__
 4. De applicatie behandelt de geaccepteerde invoer als een eerste invoer. (Dus bij nieuwe tweede invoer: waarschuwingen over verschillen met geaccepteerde invoer.)
 5. De coördinator GSB geeft het PV aan een invoerder om nogmaals in te voeren.
 
-__Uitbreidingen:__  
+__Uitbreidingen:__
+
 2a. Geen van beide invoeren komt overeen met het papier:  
 &emsp; 2a1. De coördinator GSB verwijdert beide invoeren.  
 &emsp; 2a2. De coördinator GSB laat het stembureau opnieuw invoeren door twee invoerders.
@@ -185,7 +187,8 @@ __Hoofdscenario:__
 2. De coördinator GSB stelt vast het PV fouten bevat die kunnen worden opgelost.
 3. De coördinator laat de fouten in het PV corrigeren en laat de invoerder verdergaan met diens invoer.
 
-__Uitbreidingen:__  
+__Uitbreidingen:__
+
 2a. Het PV bevat fouten die niet opgelost kunnen worden:  
 &emsp; 2a1. De coördinator GSB verwijdert de invoer.  
 &emsp; 2a2. De coördinator GSB laat het stembureau opnieuw invoeren.
@@ -200,14 +203,15 @@ __Niveau:__ subfunctie, vis, 🐟
 
 *Waarschuwing*: De ingevoerde waardes zijn mogelijk niet correct. Bijvoorbeeld: er is een groot aantal blanco stemmen of de tweede invoer klopt niet met de eerste invoer. Zie de [plausibiliteitschecks](./validatieregels-plausibiliteitschecks-tellingen.md#plausibiliteitschecks-geven-waarschuwingen) voor de volledige lijst.
 
-__Hoofdscenario:__  
+__Hoofdscenario:__
+
 Voor elke fout of waarschuwing:  
 
 1. De invoerder controleert de fout of waarschuwing.
 2. De invoerder constateert dat de invoer klopt met het PV.
 3. De invoerder accepteert de fouten en waarschuwingen in de applicatie.
 
-__Uitbreidingen:__  
+__Uitbreidingen:__
+
 2a. De invoerder constateert dat hij/zij een fout heeft gemaakt in de invoer.  
 &emsp; 2a1. De invoerder corrigeert de fout in de invoer.  
-

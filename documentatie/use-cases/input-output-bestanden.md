@@ -168,12 +168,10 @@ EML_NL 510a (tellingsbestand stembureau) wordt niet gebruikt.
   - dus niet bij terugverwijzing door CSB vóór invoer in Abacus
   - dus niet bij hertelling op verzoek van gemeenteraad ([Artikel V 4a Kieswet](https://wetten.overheid.nl/jci1.3:c:BWBR0004627&afdeling=IV&hoofdstuk=V&paragraaf=1&artikel=V_4a&z=2025-02-12&g=2025-02-12))
 
-
 ### Benoemingsbrieven en geloofsbrieven
 
 - niet in scope Abacus
 - zie open punt over beschikbaar stellen van adresgegevens voor benoemings- en geloofsbrieven
-
 
 ### Tellingsbestanden
 
@@ -187,4 +185,4 @@ EML_NL 510a (tellingsbestand stembureau) wordt niet gebruikt.
 - Resultaat 520: verkozen kandidaten
   - output van Abacus - CSB
 
-EML_NL 510c (tellingsbestand hoofdstembureau) wordt niet gebruikt binnen de huidige scope, n.l. gemeenteraadsverkiezingen.
+EML_NL 510c (tellingsbestand hoofdstembureau) wordt niet gebruikt binnen de huidige scope, namelijk gemeenteraadsverkiezingen.

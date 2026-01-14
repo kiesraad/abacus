@@ -8,9 +8,9 @@ Logging van acties in de applicatie kan helpen bij het oplossen van problemen en
 
 ## De applicatie logt acties (zee)
 
-__Niveau:__ gebruikersdoel, zee  (🌊)
+__Niveau:__ gebruikersdoel, zee, 🌊
 
-De applicatie logt de interactie van gebruikers dwz alle belangrijke stappen in het proces, accountbeheer, het inrichten van de applicatie, etc.
+De applicatie logt de interactie van gebruikers d.w.z. alle belangrijke stappen in het proces, accountbeheer, het inrichten van de applicatie, etc.
 
 Een niet-uitputtende lijst van te loggen acties: 
 
@@ -19,7 +19,7 @@ Een niet-uitputtende lijst van te loggen acties:
 - im- en exporteren van eml-bestanden
 - aanmaken, aanpassen, verwijderen van records in de database zoals verkiezingen, zittingen, gebruikers, stembureaus
 
-Van elke gelogde actie is in elk geval de volgende informatie beschikaar:
+Van elke gelogde actie is in elk geval de volgende informatie beschikbaar:
 
 - actie: de gebeurtenis of handeling die heeft plaatsgevonden,
 - object: waarop de gebeurtenis of handeling effect had (bijv. welk bestand, proces of systeem),
@@ -31,13 +31,13 @@ Van elke gelogde actie is in elk geval de volgende informatie beschikaar:
 
 ## De beheerder / coördinator bekijkt de logging om het gebruik te monitoren (zee)
 
-__Niveau:__ gebruikersdoel, zee  (🌊)
+__Niveau:__ gebruikersdoel, zee, 🌊
 
 De beheerder / coördinator bekijkt de gelogde acties om het gebruik te monitoren. Ze kunnen de logging filteren op eigenschappen van de gelogde acties.
 
 ## De Kiesraad bekijkt de logging bij het afhandelen van een incident (zee)
 
-__Niveau:__ gebruikersdoel, zee  (🌊)
+__Niveau:__ gebruikersdoel, zee, 🌊
 
 De Kiesraad gebruikt de logging als informatiebron bij het afhandelen van een incident. Hiervoor kan de volledige database van de betreffende installatie worden opgevraagd.
 
@@ -45,7 +45,7 @@ De Kiesraad gebruikt de logging als informatiebron bij het afhandelen van een in
 
 ### De beheerder / coördinator bekijkt statistieken over het gebruik
 
-__Niveau:__ gebruikersdoel, zee  (🌊)
+__Niveau:__ gebruikersdoel, zee, 🌊
 
 De beheerder / coördinator bekijkt de statistieken over het gebruik van de applicatie met als doel o.a.:
 - het maken van de capaciteitsplanning

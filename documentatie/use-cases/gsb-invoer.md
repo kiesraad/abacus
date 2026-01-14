@@ -99,6 +99,7 @@ __Uitbreidingen:__
 &emsp; 9a1. De coördinator GSB beoordeelt de geaccepteerde waarschuwingen.
 
 ### Open punten
+
 - Waar in het scenario kan de coördinator GSB verklaringen maken over de waarschuwingen, zodat het CSB deze beter kan beoordelen? Na de eerste of tweede invoer? Of pas nadat het resultaat van een stembureau definitief is?
 
 ## De eerste of tweede invoerder voert de resultaten van de telling in (zee)
@@ -123,8 +124,8 @@ __Uitbreidingen:__
 1a. De invoerder kan het stembureau op het PV niet in de applicatie vinden:  
 &emsp; 1a1. De invoerder verwittigt de coördinator GSB.  
 &emsp; 1a2. De coördinator GSB en de invoerder vinden alsnog het stembureau.  
-&emsp; &emsp; 1a2a. Het stembureau is niet aanwezig in de applicatie:  
-&emsp; &emsp; &emsp; 1a2a1. De coördinator GSB voegt het stembureau toe in de applicatie.  
+&emsp;&emsp; 1a2a. Het stembureau is niet aanwezig in de applicatie:  
+&emsp;&emsp;&emsp; 1a2a1. De coördinator GSB voegt het stembureau toe in de applicatie.  
 1b. De tweede invoerder heeft ook de eerste invoer gedaan:  
 &emsp; 1b1. De applicatie voorkomt dat de invoer wordt gestart.  
 1c. De invoerder selecteert een ander stembureau dan op het PV staat:  

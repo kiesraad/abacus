@@ -1,0 +1,26 @@
+{
+  "db_name": "SQLite",
+  "query": "\n        WITH RECURSIVE polling_stations_chain(original_id, id, id_prev_session, data, investigation) AS (\n            SELECT ps.id AS original_id, ps.id, ps.id_prev_session, r.data, psi.polling_station_id\n            FROM polling_stations AS ps\n            LEFT JOIN polling_station_results AS r ON r.polling_station_id = ps.id\n            LEFT JOIN polling_station_investigations AS psi ON psi.polling_station_id = ps.id AND psi.corrected_results = 1\n            WHERE ps.committee_session_id = $1 AND ($2 IS NULL OR ps.id = $2)\n\n            UNION ALL\n\n            SELECT sc.original_id, ps.id, ps.id_prev_session, r.data, psi.polling_station_id\n            FROM polling_stations_chain AS sc\n            JOIN polling_stations AS ps ON ps.id = sc.id_prev_session\n            LEFT JOIN polling_station_results AS r ON r.polling_station_id = ps.id\n            LEFT JOIN polling_station_investigations AS psi ON psi.polling_station_id = ps.id AND psi.corrected_results = 1\n            WHERE sc.data IS NULL AND sc.investigation IS NULL\n        )\n        SELECT\n            sc.original_id AS \"original_id!: PollingStationId\",\n            sc.data AS \"data: Json<PollingStationResults>\"\n        FROM polling_stations_chain AS sc\n        WHERE sc.data IS NOT NULL\n        ",
+  "describe": {
+    "columns": [
+      {
+        "name": "original_id!: PollingStationId",
+        "ordinal": 0,
+        "type_info": "Integer"
+      },
+      {
+        "name": "data: Json<PollingStationResults>",
+        "ordinal": 1,
+        "type_info": "Text"
+      }
+    ],
+    "parameters": {
+      "Right": 2
+    },
+    "nullable": [
+      null,
+      false
+    ]
+  },
+  "hash": "6fd920f285eae4f806597feec61491d3d83e2b851ea5d2214131fcdd1eaef914"
+}

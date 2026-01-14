@@ -1,6 +1,7 @@
 #![no_main]
 
 use abacus::{
+    committee_session::CommitteeSessionId,
     data_entry::{status::*, *},
     election::{ElectionCategory, ElectionId, ElectionWithPoliticalGroups, VoteCountingMethod},
     polling_station::{PollingStation, PollingStationType},
@@ -83,7 +84,7 @@ fn polling_station() -> PollingStation {
     PollingStation {
         id: 1,
         election_id: ElectionId::from(1),
-        committee_session_id: 1,
+        committee_session_id: CommitteeSessionId::from(1),
         id_prev_session: None,
         name: "Test polling station".to_string(),
         number: 1,

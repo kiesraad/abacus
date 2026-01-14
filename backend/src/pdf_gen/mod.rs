@@ -32,7 +32,7 @@ pub(crate) mod tests {
 
     use super::*;
     use crate::{
-        committee_session::tests::committee_session_fixture,
+        committee_session::{CommitteeSessionId, tests::committee_session_fixture},
         election::{
             ElectionCategory, ElectionId, ElectionWithPoliticalGroups, VoteCountingMethod,
             structs::tests::election_fixture,
@@ -41,20 +41,20 @@ pub(crate) mod tests {
             models::{PdfFileModel, PdfModel, ToPdfFileModel},
             votes_table::VotesTables,
         },
-        polling_station::{PollingStation, PollingStationType},
+        polling_station::{PollingStation, PollingStationId, PollingStationType},
         summary::ElectionSummary,
     };
 
     pub fn polling_stations_fixture(
         election: &ElectionWithPoliticalGroups,
-        committee_session_id: u32,
+        committee_session_id: CommitteeSessionId,
         polling_station_voter_count: &[u32],
     ) -> Vec<PollingStation> {
         let mut polling_stations = Vec::new();
         for (i, voter_count) in polling_station_voter_count.iter().enumerate() {
             let idx = i + 1;
             polling_stations.push(PollingStation {
-                id: u32::try_from(idx).unwrap(),
+                id: PollingStationId::from(u32::try_from(idx).unwrap()),
                 election_id: election.id,
                 committee_session_id,
                 id_prev_session: None,

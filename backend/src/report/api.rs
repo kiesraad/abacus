@@ -12,9 +12,9 @@ use crate::{
     APIError, AppState, ErrorResponse, SqlitePoolExt,
     audit_log::AuditService,
     authentication::Coordinator,
-    committee_session,
     committee_session::{
-        CommitteeSession, CommitteeSessionError, CommitteeSessionFilesUpdateRequest,
+        self, CommitteeSession, CommitteeSessionError, CommitteeSessionFilesUpdateRequest,
+        CommitteeSessionId,
         repository::{change_files, get_previous_session},
         status::CommitteeSessionStatus,
     },
@@ -24,19 +24,16 @@ use crate::{
             are_results_complete_for_committee_session, list_results_for_committee_session,
         },
     },
-    election,
-    election::{ElectionId, ElectionWithPoliticalGroups},
+    election::{self, ElectionId, ElectionWithPoliticalGroups},
     eml::{EML510, EMLDocument, EmlHash},
     error::ErrorReference,
-    files,
-    files::{File, create_file},
+    files::{self, File, create_file},
     investigation::{PollingStationInvestigation, list_investigations_for_committee_session},
     pdf_gen::{
         VotesTables, VotesTablesWithPreviousVotes, generate_pdf,
         models::{ModelNa14_2Input, ModelNa31_2Input, ModelP2aInput, PdfFileModel, ToPdfFileModel},
     },
-    polling_station,
-    polling_station::PollingStation,
+    polling_station::{self, PollingStation},
     summary::ElectionSummary,
     zip::{ZipResponse, ZipResponseError, slugify_filename, zip_single_file},
 };
@@ -66,7 +63,7 @@ struct ResultsInput {
 impl ResultsInput {
     async fn new(
         conn: &mut SqliteConnection,
-        committee_session_id: u32,
+        committee_session_id: CommitteeSessionId,
         created_at: DateTime<Local>,
     ) -> Result<ResultsInput, APIError> {
         let committee_session =
@@ -401,7 +398,7 @@ async fn get_existing_files(
 async fn get_files(
     pool: &SqlitePool,
     audit_service: AuditService,
-    committee_session_id: u32,
+    committee_session_id: CommitteeSessionId,
 ) -> Result<(Option<File>, Option<File>, Option<File>, DateTime<Utc>), APIError> {
     let mut conn = pool.acquire().await?;
     let committee_session =
@@ -483,7 +480,7 @@ async fn get_files(
     ),
     params(
         ("election_id" = ElectionId, description = "Election database id"),
-        ("committee_session_id" = u32, description = "Committee session database id"),
+        ("committee_session_id" = CommitteeSessionId, description = "Committee session database id"),
     ),
     security(("cookie_auth" = ["coordinator"])),
 )]
@@ -491,7 +488,7 @@ async fn election_download_zip_results(
     _user: Coordinator,
     State(pool): State<SqlitePool>,
     audit_service: AuditService,
-    Path((election_id, committee_session_id)): Path<(ElectionId, u32)>,
+    Path((election_id, committee_session_id)): Path<(ElectionId, CommitteeSessionId)>,
 ) -> Result<impl IntoResponse, APIError> {
     let mut conn = pool.acquire().await?;
     let election = election::repository::get(&mut conn, election_id).await?;
@@ -555,7 +552,7 @@ async fn election_download_zip_results(
     ),
     params(
         ("election_id" = ElectionId, description = "Election database id"),
-        ("committee_session_id" = u32, description = "Committee session database id"),
+        ("committee_session_id" = CommitteeSessionId, description = "Committee session database id"),
     ),
     security(("cookie_auth" = ["coordinator"])),
 )]
@@ -563,7 +560,7 @@ async fn election_download_pdf_results(
     _user: Coordinator,
     State(pool): State<SqlitePool>,
     audit_service: AuditService,
-    Path((_election_id, committee_session_id)): Path<(ElectionId, u32)>,
+    Path((_election_id, committee_session_id)): Path<(ElectionId, CommitteeSessionId)>,
 ) -> Result<Attachment<Vec<u8>>, APIError> {
     let (_, pdf_file, _, _) = get_files(&pool, audit_service, committee_session_id).await?;
 
@@ -591,9 +588,10 @@ mod tests {
 
         // Files should be generated exactly once
         for _ in 1..=2 {
-            let (eml, pdf, overview, _) = get_files(&pool, audit_service.clone(), 5)
-                .await
-                .expect("should return files");
+            let (eml, pdf, overview, _) =
+                get_files(&pool, audit_service.clone(), CommitteeSessionId::from(5))
+                    .await
+                    .expect("should return files");
             let eml = eml.expect("should have generated eml");
             let pdf = pdf.expect("should have generated pdf");
 
@@ -617,9 +615,10 @@ mod tests {
 
         // Files should be generated exactly once
         for _ in 1..=2 {
-            let (eml, pdf, overview, _) = get_files(&pool, audit_service.clone(), 703)
-                .await
-                .expect("should return files");
+            let (eml, pdf, overview, _) =
+                get_files(&pool, audit_service.clone(), CommitteeSessionId::from(703))
+                    .await
+                    .expect("should return files");
 
             let eml = eml.expect("should have generated eml");
             let pdf = pdf.expect("should have generated pdf");
@@ -652,9 +651,10 @@ mod tests {
 
         // File should be generated exactly once
         for _ in 1..=2 {
-            let (eml, pdf, overview, _) = get_files(&pool, audit_service.clone(), 703)
-                .await
-                .expect("should return files");
+            let (eml, pdf, overview, _) =
+                get_files(&pool, audit_service.clone(), CommitteeSessionId::from(703))
+                    .await
+                    .expect("should return files");
 
             // No EML and no model PDF should be generated at all
             assert_eq!(eml, None);

@@ -6,6 +6,7 @@ macro_rules! id {
             Clone,
             Copy,
             Debug,
+            Default,
             Hash,
             sqlx::Type,
             sqlx::FromRow,

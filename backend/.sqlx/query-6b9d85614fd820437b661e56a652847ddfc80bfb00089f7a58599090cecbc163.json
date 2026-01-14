@@ -1,6 +1,6 @@
 {
   "db_name": "SQLite",
-  "query": "\n        INSERT INTO polling_stations (\n            committee_session_id,\n            id_prev_session,\n            name,\n            number,\n            number_of_voters,\n            polling_station_type,\n            address,\n            postal_code,\n            locality\n        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)\n        RETURNING\n            id AS \"id: u32\",\n            ? AS \"election_id!: ElectionId\", -- Workaround to get election_id in the result without a temporary struct\n            committee_session_id AS \"committee_session_id: u32\",\n            id_prev_session AS \"id_prev_session: _\",\n            name,\n            number AS \"number: u32\",\n            number_of_voters AS \"number_of_voters: _\",\n            polling_station_type AS \"polling_station_type: _\",\n            address,\n            postal_code,\n            locality\n        ",
+  "query": "\n        UPDATE polling_stations\n        SET\n            name = ?,\n            number = COALESCE(?, number),\n            number_of_voters = ?,\n            polling_station_type = ?,\n            address = ?,\n            postal_code = ?,\n            locality = ?\n        WHERE\n            id = ? AND committee_session_id = ?\n        RETURNING\n            id AS \"id: u32\",\n            ? AS \"election_id!: ElectionId\", -- Workaround to get election_id in the result without a temporary struct\n            committee_session_id AS \"committee_session_id: CommitteeSessionId\",\n            id_prev_session AS \"id_prev_session: _\",\n            name,\n            number AS \"number: u32\",\n            number_of_voters AS \"number_of_voters: _\",\n            polling_station_type AS \"polling_station_type: _\",\n            address,\n            postal_code,\n            locality\n        ",
   "describe": {
     "columns": [
       {
@@ -14,7 +14,7 @@
         "type_info": "Null"
       },
       {
-        "name": "committee_session_id: u32",
+        "name": "committee_session_id: CommitteeSessionId",
         "ordinal": 2,
         "type_info": "Integer"
       },
@@ -64,7 +64,7 @@
     },
     "nullable": [
       false,
-      null,
+      true,
       false,
       true,
       false,
@@ -76,5 +76,5 @@
       false
     ]
   },
-  "hash": "1c77ef78a7d3ffc7bc2688dc3740cc25effa5f875b0bf2a673bf7d30ced78454"
+  "hash": "6b9d85614fd820437b661e56a652847ddfc80bfb00089f7a58599090cecbc163"
 }

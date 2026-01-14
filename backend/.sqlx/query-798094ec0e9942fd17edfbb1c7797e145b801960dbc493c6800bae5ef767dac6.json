@@ -1,10 +1,10 @@
 {
   "db_name": "SQLite",
-  "query": "\n        SELECT\n            id as \"id: u32\",\n            number as \"number: u32\",\n            election_id as \"election_id: ElectionId\",\n            status as \"status: _\",\n            location,\n            start_date_time as \"start_date_time: _\",\n            results_eml as \"results_eml: _\",\n            results_pdf as \"results_pdf: _\",\n            overview_pdf as \"overview_pdf: _\"\n        FROM committee_sessions\n        WHERE election_id = ?\n        ORDER BY number DESC\n        ",
+  "query": "\n        SELECT\n            id as \"id: CommitteeSessionId\",\n            number as \"number: u32\",\n            election_id as \"election_id: ElectionId\",\n            status as \"status: _\",\n            location,\n            start_date_time as \"start_date_time: _\",\n            results_eml as \"results_eml: _\",\n            results_pdf as \"results_pdf: _\",\n            overview_pdf as \"overview_pdf: _\"\n        FROM committee_sessions\n        WHERE id = ?\n        ",
   "describe": {
     "columns": [
       {
-        "name": "id: u32",
+        "name": "id: CommitteeSessionId",
         "ordinal": 0,
         "type_info": "Integer"
       },
@@ -64,5 +64,5 @@
       true
     ]
   },
-  "hash": "2ff8e50a6ea847f65d5f72921cdbb89b90794a60a5a6323980ec2730c85452ac"
+  "hash": "798094ec0e9942fd17edfbb1c7797e145b801960dbc493c6800bae5ef767dac6"
 }

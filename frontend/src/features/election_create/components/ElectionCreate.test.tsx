@@ -161,6 +161,7 @@ async function uploadCandidateDefinition(file: File) {
 async function setPollingStationRole() {
   const user = userEvent.setup();
   expect(await screen.findByRole("heading", { level: 2, name: "Rol van het stembureau" })).toBeVisible();
+  expect(screen.getByRole("checkbox", { name: "Gemeentelijk stembureau (GSB)" })).toBeChecked();
   await user.click(screen.getByRole("button", { name: "Volgende" }));
 }
 
@@ -200,28 +201,6 @@ describe("Election create pages", () => {
   beforeEach(() => {
     server.use(ElectionListRequestHandler);
     server.use(ElectionRequestHandler);
-  });
-
-  describe("Candidate list", () => {
-    test("It shows and validates hash when uploading valid candidate list file", async () => {
-      overrideOnce("post", "/api/elections/import/validate", 200, electionValidateResponse(newElectionMockData));
-
-      const router = renderWithRouter();
-      const file = new File(["foo"], "foo.txt", { type: "text/plain" });
-
-      // update election and set hash, and continue
-      await uploadElectionDefinition(router, file);
-      await inputElectionHash();
-      await setPollingStationRole();
-
-      // upload candidate file, set hash and continue
-      await uploadCandidateDefinition(file);
-      await inputCandidateHash();
-
-      expect(
-        await screen.findByRole("heading", { level: 2, name: "Importeer stembureaus gemeente Heemdamseburg" }),
-      ).toBeVisible();
-    });
   });
 
   describe("Confirmation modal", () => {
@@ -445,42 +424,6 @@ describe("Election create pages", () => {
         await screen.findByRole("heading", { level: 2, name: "Type stemopneming in Heemdamseburg" }),
       ).toBeVisible();
     });
-
-    test("Shows overview when uploading valid polling station file", async () => {
-      const router = renderWithRouter();
-      const user = userEvent.setup();
-      const file = new File(["foo"], "foo.txt", { type: "text/plain" });
-
-      // upload election and set hash, and continue
-      await uploadElectionDefinition(router, file);
-      await inputElectionHash();
-      await setPollingStationRole();
-
-      // upload candidate file, set hash and continue
-      await uploadCandidateDefinition(file);
-      await inputCandidateHash();
-
-      // upload polling station list file
-      await uploadPollingStationList(file, true);
-
-      // We should be at the check polling stations page
-      expect(await screen.findByRole("heading", { level: 2, name: "Controleer stembureaus" })).toBeVisible();
-
-      // Check the overview table
-      expect(await screen.findByRole("table")).toBeVisible();
-      expect(await screen.findAllByRole("row")).toHaveLength(8);
-
-      // Make sure the warning is not shown
-      expect(screen.queryByRole("alert")).toBeNull();
-
-      // click next
-      await user.click(screen.getByRole("button", { name: "Volgende" }));
-
-      // Expect to see the next page
-      expect(
-        await screen.findByRole("heading", { level: 2, name: "Type stemopneming in Heemdamseburg" }),
-      ).toBeVisible();
-    });
   });
 
   describe("Full flow", () => {
@@ -516,6 +459,13 @@ describe("Election create pages", () => {
       // We should be at the check polling stations page
       expect(await screen.findByRole("heading", { level: 2, name: "Controleer stembureaus" })).toBeVisible();
 
+      // Check the overview table
+      expect(await screen.findByRole("table")).toBeVisible();
+      expect(await screen.findAllByRole("row")).toHaveLength(8);
+
+      // Make sure the warning is not shown
+      expect(screen.queryByRole("alert")).not.toBeInTheDocument();
+
       // click next
       await user.click(screen.getByRole("button", { name: "Volgende" }));
 
@@ -523,6 +473,7 @@ describe("Election create pages", () => {
       expect(
         await screen.findByRole("heading", { level: 2, name: "Type stemopneming in Heemdamseburg" }),
       ).toBeVisible();
+      expect(screen.getByRole("radio", { name: /Centrale stemopneming \(CSO\)/ })).toBeChecked();
 
       // click next
       await user.click(screen.getByRole("button", { name: "Volgende" }));

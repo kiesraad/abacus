@@ -19,7 +19,9 @@ export function validateUpdateUser(
   }
 
   if (accountUpdate.password.length === 0) {
-    errors.password = t("account.password_rules");
+    errors.password = t("account.password_length_rule");
+  } else if (accountUpdate.password === accountUpdate.username) {
+    errors.password = t("account.password_username_rule");
   }
 
   if (accountUpdate.password !== passwordRepeat) {
@@ -30,12 +32,12 @@ export function validateUpdateUser(
 }
 
 export function validateCreateUser(
-  accountCreate: Required<CreateUserRequest>,
-  passwordRepeat: string,
+  accountCreate: CreateUserRequest,
+  passwordRepeat: string | undefined,
 ): UserValidationErrors {
   const errors: UserValidationErrors = {};
 
-  if (accountCreate.fullname.length === 0) {
+  if (accountCreate.fullname?.length === 0) {
     errors.fullname = t("form_errors.FORM_VALIDATION_RESULT_REQUIRED");
   }
 
@@ -44,10 +46,12 @@ export function validateCreateUser(
   }
 
   if (accountCreate.temp_password.length === 0) {
-    errors.password = t("initialise.password_rules");
+    errors.password = t("account.password_length_rule");
+  } else if (accountCreate.temp_password === accountCreate.username) {
+    errors.password = t("account.password_username_rule");
   }
 
-  if (accountCreate.temp_password !== passwordRepeat) {
+  if (passwordRepeat !== undefined && accountCreate.temp_password !== passwordRepeat) {
     errors.password_repeat = t("account.password_mismatch");
   }
 

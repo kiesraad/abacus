@@ -18,7 +18,7 @@ __Uitbreidingen:__
 &emsp; 2a1. De gebruiker past de naam aan.
 
 3a. De applicatie stelt vast dat het ingevulde nieuwe wachtwoord voldoet aan de eisen:  
-&emsp; 3a1. De gebruiker past het ingevulde nieuwe wachtwoord aan de eisen aan
+&emsp; 3a1. De gebruiker past het ingevulde nieuwe wachtwoord aan de eisen aan.
 
 ### Open punten
 
@@ -37,5 +37,5 @@ __Hoofdscenario:__
 
 __Uitbreidingen:__
 
-2a. De gebruiker was al ingelogd op een andere plek:
-&emsp; 3a1. De andere sessies van de gebruiker worden uitgelogd.
+2a. De gebruiker was al ingelogd op een andere plek:  
+&emsp; 2a1. De andere sessies van de gebruiker worden uitgelogd.

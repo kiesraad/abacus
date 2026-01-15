@@ -2,7 +2,7 @@
 
 ## Gemeentelijk stembureau (GSB) stelt uitkomst vast in eerste zitting (wolk)
 
-_Niveau:_ hoog-over, wolk, ☁️
+__Niveau:__ hoog-over, wolk, ☁️
 
 ### Hoofdscenario en uitbreidingen
 
@@ -84,7 +84,7 @@ __Hoofdscenario 1:__
 3. De coördinator GSB verwijdert het stembureau.
 4. De applicatie vraagt om een verklaring van de wijziging. Deze verklaring wordt opgenomen in het PV (DSO: Na 31-1, CSO: Na 31-2).
 
-__Uitbreidingen__
+__Uitbreidingen:__
 
 3a. De coördinator GSB verwijdert het laatste stembureau:  
 &emsp; 3a1. Invoer is niet meer mogelijk, tot een nieuw stembureau is toegevoegd.  
@@ -95,7 +95,7 @@ __Hoofdscenario 2:__
 2. De coördinator GSB corrigeert de stembureaus in de applicatie.
 3. De applicatie vraagt om een verklaring van de wijziging. Deze verklaring wordt opgenomen in het PV (DSO: Na 31-1, CSO: Na 31-2).
 
-__Uitbreidingen__
+__Uitbreidingen:__
 
 2a. De coördinator GSB verwijdert het laatste stembureau:  
 &emsp; 2a1. Invoer is niet meer mogelijk, tot een nieuw stembureau is toegevoegd.  
@@ -118,7 +118,7 @@ __Hoofdscenario:__
 4. De coördinator GSB genereert het PV (DSO: Na 31-1, CSO: Na 31-2) en het tellingsbestand (EML 510 b).
 5. De coördinator GSB voegt "Bijlage 2: Bezwaren van aanwezigen op stembureaus" toe aan het PV.
 
-__Uitbreidingen__
+__Uitbreidingen:__
 
 3a. De gegevens van de zitting zijn nog niet ingevuld:  
 &emsp; 3a1. De coördinator GSB voert de locatie, startdatum en starttijd van de zitting in.

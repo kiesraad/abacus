@@ -25,7 +25,7 @@ die de zetelverdeling vaststelt en daarvoor een proces-verbaal genereert.
 ## Rollen en rechten
 
 | Functionaliteit \ Rol                            | Beheerder | Coördinator GSB | Coördinator CSB | Invoerder GSB | Invoerder CSB |
-| ------------------------------------------------ | :-------: | :-------------: | :-------------: | :-----------: | :-----------: |
+|--------------------------------------------------|:---------:|:---------------:|:---------------:|:-------------:|:-------------:|
 | **Voorbereiding**                                |           |                 |                 |               |               |
 | Applicatie installeren                           |     X     |                 |                 |               |               |
 | Verkiezing configureren                          |     X     |                 |                 |               |               |

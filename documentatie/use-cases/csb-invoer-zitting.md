@@ -6,7 +6,7 @@ __Niveau:__ hoog-over, vlieger, 🪁
 
 ### Hoofdscenario en uitbreidingen
 
-__Hoofdscenario:__  
+__Hoofdscenario:__
 
 1. [De coördinator CSB leest de resultaten van de laatste GSB-zitting in als eerste invoer van het CSB.](#de-coördinator-csb-leest-de-resultaten-van-de-laatste-gsb-zitting-in-als-eerste-invoer-van-het-csb-zee)
 2. Het CSB voert de resultaten handmatig in als tweede invoer.
@@ -21,7 +21,6 @@ __Uitbreidingen:__
 ### Open punten
 - De startdatum en -tijd van de zitting CSB zijn bekend, hoewel de zitting pas plaats vindt, nadat alle gegevens in de applicatie zijn ingevoerd. Willen we dat de coördinator de gegevens van de zitting alvast invoert?
 - Anders dan bij het GSB, gebeurt de invoer CSB vóór het openen van de zitting. Dus laten we alleen de invoer openstellen door de coördinator CSB en moet deze niet aangeven in de applicatie dat de zitting geopend is?
-
 
 ## De coördinator CSB leest de resultaten van de laatste GSB-zitting in als eerste invoer van het CSB (zee)
 
@@ -51,7 +50,6 @@ __Uitbreidingen:__
 &emsp;&emsp;&emsp; 2a1a1. De coördinator CSB neemt contact op met het GSB.  
 &emsp; 2a2. De coördinator CSB corrigeert de ingevoerde hash.
 
-
 ## De coördinator CSB beoordeelt de verschillen tussen de twee invoeren (zee)
 
 __Niveau:__ gebruikersdoel, zee, 🌊
@@ -59,12 +57,14 @@ __Niveau:__ gebruikersdoel, zee, 🌊
 ### Hoofdscenario en uitbreidingen
 
 __Hoofdscenario:__
+
 1. De coördinator CSB vergelijkt de eerste en tweede invoer met het papieren PV (DSO: Na 31-1, CSO: Na 31-2; evt. Na 14-2).  
 2. De coördinator CSB stelt vast dat de digitale invoer correct is, maar de handmatige invoer niet.
 3. De coördinator CSB gooit de handmatige invoer weg.
 4. De coördinator CSB laat opnieuw handmatig invoeren.
 
-__Uitbreidingen:__  
+__Uitbreidingen:__
+
 2a. De coördinator CSB stelt vast dat de digitale invoer incorrect is, maar de handmatige wel correct is:  
 &emsp; 2a1. De coördinator CSB gooit de digitale invoer weg.  
 &emsp; 2a2. De coördinator CSB laat een keer extra handmatig invoeren.

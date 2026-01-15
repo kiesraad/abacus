@@ -98,7 +98,7 @@ __Uitbreidingen:__
 
 1a. De fout zit in het nummer van het stembureau:  
 &emsp; 1a1. De coördinator GSB voert een vermelding van de fout in de applicatie in.  
-&emsp; 1c2. De applicatie neemt de verklaring op in het PV Na 14-2.  
+&emsp; 1a2. De applicatie neemt de verklaring op in het PV Na 14-2.  
 
 __Hoofdscenario 2:__
 

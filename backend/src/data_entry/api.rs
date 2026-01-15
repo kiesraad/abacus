@@ -309,7 +309,7 @@ async fn polling_station_data_entry_claim(
     let data_entry = get_data_entry(&mut tx, polling_station_id, committee_session.id).await?;
 
     match state {
-        DataEntryStatus::FirstEntryNotStarted | DataEntryStatus::SecondEntryNotStarted(_) => {
+        DataEntryStatus::Empty | DataEntryStatus::FirstEntryFinalised(_) => {
             audit_service
                 .log(
                     &mut tx,
@@ -480,7 +480,7 @@ async fn polling_station_data_entry_delete(
 
     let mut data_entry = get_data_entry(&mut tx, polling_station_id, committee_session.id).await?;
 
-    if new_state == DataEntryStatus::FirstEntryNotStarted {
+    if new_state == DataEntryStatus::Empty {
         // The database entry of the data entry is fully deleted when the first entry is deleted
         delete_data_entry(&mut tx, polling_station_id).await?;
     } else {
@@ -729,10 +729,10 @@ async fn polling_station_data_entry_get(
                 validation_results: state.start_validate(&polling_station, &election)?,
             }))
         }
-        DataEntryStatus::SecondEntryNotStarted(second_entry_not_started_state) => {
+        DataEntryStatus::FirstEntryFinalised(first_entry_finalised_state) => {
             Ok(Json(DataEntryGetResponse {
-                user_id: Some(second_entry_not_started_state.first_entry_user_id),
-                data: second_entry_not_started_state.finalised_first_entry,
+                user_id: Some(first_entry_finalised_state.first_entry_user_id),
+                data: first_entry_finalised_state.finalised_first_entry,
                 status: state.status_name(),
                 validation_results: state.start_validate(&polling_station, &election)?,
             }))
@@ -801,7 +801,7 @@ async fn polling_station_data_entry_resolve_errors(
         ResolveErrorsAction::ResumeFirstEntry => state.resume_first_entry()?,
     };
 
-    if new_state == DataEntryStatus::FirstEntryNotStarted {
+    if new_state == DataEntryStatus::Empty {
         // The database entry of the data entry is fully deleted when the first entry is discarded
         delete_data_entry_and_result_for_polling_station(
             &mut tx,
@@ -925,7 +925,7 @@ async fn polling_station_data_entry_resolve_differences(
         ResolveDifferencesAction::DiscardBothEntries => state.delete_entries()?,
     };
 
-    if new_state == DataEntryStatus::FirstEntryNotStarted {
+    if new_state == DataEntryStatus::Empty {
         // The database entry of the data entry is fully deleted when the entries are discarded
         delete_data_entry_and_result_for_polling_station(
             &mut tx,
@@ -1882,7 +1882,7 @@ mod tests {
             .await
             .unwrap();
         let status: DataEntryStatus = data_entry.state.0;
-        assert!(matches!(status, DataEntryStatus::SecondEntryNotStarted(_)));
+        assert!(matches!(status, DataEntryStatus::FirstEntryFinalised(_)));
     }
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
@@ -2163,7 +2163,7 @@ mod tests {
             .await
             .unwrap();
         let status: DataEntryStatus = data_entry.state.0;
-        if let DataEntryStatus::SecondEntryNotStarted(entry) = status {
+        if let DataEntryStatus::FirstEntryFinalised(entry) = status {
             assert_eq!(
                 entry
                     .finalised_first_entry
@@ -2198,7 +2198,7 @@ mod tests {
             .await
             .unwrap();
         let status: DataEntryStatus = data_entry.state.0;
-        if let DataEntryStatus::SecondEntryNotStarted(entry) = status {
+        if let DataEntryStatus::FirstEntryFinalised(entry) = status {
             assert_eq!(
                 entry
                     .finalised_first_entry
@@ -2461,7 +2461,7 @@ mod tests {
         }
 
         #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
-        async fn test_status_first_entry_not_started(pool: SqlitePool) {
+        async fn test_status_empty(pool: SqlitePool) {
             let result = call_polling_station_data_entry_get(pool.clone(), 1)
                 .await
                 .err()
@@ -2516,7 +2516,7 @@ mod tests {
         }
 
         #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
-        async fn test_status_second_entry_not_started(pool: SqlitePool) {
+        async fn test_status_first_entry_finalised(pool: SqlitePool) {
             claim(pool.clone(), 1, EntryNumber::FirstEntry).await;
             save(
                 pool.clone(),
@@ -2531,7 +2531,7 @@ mod tests {
                 .await
                 .unwrap();
 
-            assert_eq!(result.status, DataEntryStatusName::SecondEntryNotStarted);
+            assert_eq!(result.status, DataEntryStatusName::FirstEntryFinalised);
             assert_eq!(result.user_id, Some(1));
             assert_eq!(result.data.as_common().voters_counts.poll_card_count, 199);
             assert!(!result.validation_results.has_errors());

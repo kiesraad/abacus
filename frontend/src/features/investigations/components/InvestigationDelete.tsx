@@ -46,7 +46,7 @@ export function InvestigationDelete({ pollingStation, onDeleted }: Investigation
       {showModal && (
         <Modal title={`${t("investigations.delete_investigation")}?`} onClose={toggleModal}>
           <p>{t("investigations.delete_are_you_sure")}</p>
-          {status && status.status !== "first_entry_not_started" && <p>{tx("investigations.delete_data_entry")}</p>}
+          {status && status.status !== "empty" && <p>{tx("investigations.delete_data_entry")}</p>}
           <nav>
             <Button
               leftIcon={<IconTrash />}

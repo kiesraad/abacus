@@ -56,7 +56,7 @@ export function getPollingStationWithStatusList({
       } else {
         result.userStatus = PollingStationUserStatus.InProgressOtherUser;
       }
-    } else if (statusEntry.status === "second_entry_not_started" && statusEntry.first_entry_user_id === user?.user_id) {
+    } else if (statusEntry.status === "first_entry_finalised" && statusEntry.first_entry_user_id === user?.user_id) {
       result.userStatus = PollingStationUserStatus.SecondEntryNotAllowed;
     } else if (statusEntry.status === "first_entry_has_errors") {
       result.userStatus = PollingStationUserStatus.HasErrors;
@@ -71,6 +71,7 @@ export function getUrlForDataEntry(
   pollingStationId: number,
   pollingStationStatus?: DataEntryStatusName,
 ): string {
-  const entryNumber = pollingStationStatus?.startsWith("second_entry") ? 2 : 1;
+  const entryNumber =
+    pollingStationStatus === "first_entry_finalised" || pollingStationStatus === "second_entry_in_progress" ? 2 : 1;
   return `/elections/${electionId}/data-entry/${pollingStationId}/${entryNumber}`;
 }

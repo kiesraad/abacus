@@ -7,15 +7,14 @@ import type { DataEntryStatusName } from "@/types/generated/openapi";
 import { Icon } from "../Icon/Icon";
 import cls from "./Badge.module.css";
 
-// Also accept "first_entry_finalised" be able to show "Eerste invoer" for second_entry_not_started
-export type BadgeType = DataEntryStatusName | "first_entry_finalised";
+export type BadgeType = DataEntryStatusName | "first_entry_finalised_for_typist";
 
 const typeToLabel: { [T in BadgeType]: { label: string; icon?: ReactElement } } = {
-  first_entry_not_started: { label: t("data_entry.first_entry") },
+  empty: { label: t("data_entry.first_entry") },
   first_entry_in_progress: { label: t("data_entry.first_entry"), icon: <Icon size="sm" icon={<IconEdit />} /> },
   first_entry_has_errors: { label: t("data_entry.first_entry") },
   first_entry_finalised: { label: t("data_entry.first_entry") },
-  second_entry_not_started: { label: t("data_entry.second_entry") },
+  first_entry_finalised_for_typist: { label: t("data_entry.second_entry") },
   second_entry_in_progress: { label: t("data_entry.second_entry"), icon: <Icon size="sm" icon={<IconEdit />} /> },
   entries_different: { label: t("data_entry.second_entry") },
   definitive: { label: t("data_entry.definitive") },

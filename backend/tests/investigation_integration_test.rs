@@ -400,7 +400,7 @@ async fn test_update_with_data_entry(pool: SqlitePool) {
     let statuses = get_statuses(&addr, &coordinator_login(&addr).await, election_id).await;
     assert_eq!(
         statuses[&polling_station_id]["status"],
-        "second_entry_not_started"
+        "first_entry_finalised"
     );
 
     // Try to update investigation corrected_results to false
@@ -419,7 +419,7 @@ async fn test_update_with_data_entry(pool: SqlitePool) {
     let statuses = get_statuses(&addr, &coordinator_login(&addr).await, election_id).await;
     assert_eq!(
         statuses[&polling_station_id]["status"],
-        "second_entry_not_started"
+        "first_entry_finalised"
     );
 
     // Accept deletion

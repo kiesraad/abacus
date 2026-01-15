@@ -188,10 +188,10 @@ describe("PollingStationUpdatePage", () => {
     });
 
     test.each([
-      { status: "first_entry_not_started", extra_warning: false },
+      { status: "empty", extra_warning: false },
       { status: "first_entry_in_progress", extra_warning: true },
       { status: "first_entry_has_errors", extra_warning: true },
-      { status: "second_entry_not_started", extra_warning: true },
+      { status: "first_entry_finalised", extra_warning: true },
       { status: "second_entry_in_progress", extra_warning: true },
       { status: "definitive", extra_warning: true },
       { status: "entries_different", extra_warning: true },
@@ -225,10 +225,10 @@ describe("PollingStationUpdatePage", () => {
     });
 
     test.each([
-      { status: "first_entry_not_started", double_warning: false },
+      { status: "empty", double_warning: false },
       { status: "first_entry_in_progress", double_warning: true },
       { status: "first_entry_has_errors", double_warning: true },
-      { status: "second_entry_not_started", double_warning: true },
+      { status: "first_entry_finalised", double_warning: true },
       { status: "second_entry_in_progress", double_warning: true },
       { status: "definitive", double_warning: true },
       { status: "entries_different", double_warning: true },

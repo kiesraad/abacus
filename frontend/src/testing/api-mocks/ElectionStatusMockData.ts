@@ -6,7 +6,7 @@ today.setHours(10, 20);
 export const electionStatusesMock: ElectionStatusResponseEntry[] = [
   {
     polling_station_id: 1,
-    status: "first_entry_not_started",
+    status: "empty",
   },
   {
     polling_station_id: 2,
@@ -48,7 +48,7 @@ export const electionStatusesMock: ElectionStatusResponseEntry[] = [
   },
   {
     polling_station_id: 7,
-    status: "second_entry_not_started",
+    status: "first_entry_finalised",
     first_entry_user_id: 1,
     first_entry_progress: 100,
     finished_at: today.toISOString(),
@@ -56,7 +56,7 @@ export const electionStatusesMock: ElectionStatusResponseEntry[] = [
   },
   {
     polling_station_id: 8,
-    status: "second_entry_not_started",
+    status: "first_entry_finalised",
     first_entry_user_id: 2,
     first_entry_progress: 100,
     finished_at: today.toISOString(),

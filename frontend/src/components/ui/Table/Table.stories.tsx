@@ -123,7 +123,7 @@ export const StyledTable: StoryObj = {
             <Table.NumberCell className="bg-gray">34</Table.NumberCell>
             <Table.Cell>
               <span>Testplek</span>
-              <Badge type="first_entry_not_started" />
+              <Badge type="empty" />
             </Table.Cell>
           </Table.Row>
         </Table.Body>

@@ -19,7 +19,7 @@ export function ElectionProgress() {
     const total = statuses.length;
     const firstAndSecondEntryFinished: DataEntryStatusName[] = ["entries_different", "definitive"];
     const firstEntryFinished: DataEntryStatusName[] = [
-      "second_entry_not_started",
+      "first_entry_finalised",
       "second_entry_in_progress",
       ...firstAndSecondEntryFinished,
     ];

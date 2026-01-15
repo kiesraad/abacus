@@ -155,7 +155,7 @@ async fn test_polling_station_data_entry_no_errors(pool: SqlitePool) {
     let data_entry_no_errors = example_data_entry(None);
     let res = complete_data_entry(&addr, &typist, 1, 1, data_entry_no_errors).await;
     let data_entry_status: serde_json::Value = res.json().await.unwrap();
-    assert_eq!(data_entry_status["status"], "second_entry_not_started");
+    assert_eq!(data_entry_status["status"], "first_entry_finalised");
 
     let coordinator_cookie = coordinator_login(&addr).await;
     let res = get_data_entry(&addr, &coordinator_cookie, 1).await;
@@ -183,7 +183,7 @@ async fn test_polling_station_data_entry_resolve_errors_discard(pool: SqlitePool
     let res = resolve_errors(&addr, &coordinator_cookie, 1, "discard_first_entry").await;
     assert_eq!(res.status(), StatusCode::OK);
     let body: serde_json::Value = res.json().await.unwrap();
-    assert_eq!(body["status"], "first_entry_not_started");
+    assert_eq!(body["status"], "empty");
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
@@ -270,7 +270,7 @@ async fn test_polling_station_data_entry_differences_not_found(pool: SqlitePool)
     let data_entry = example_data_entry(None);
     let res = complete_data_entry(&addr, &typist, 1, 1, data_entry).await;
     let data_entry_status: serde_json::Value = res.json().await.unwrap();
-    assert_eq!(data_entry_status["status"], "second_entry_not_started");
+    assert_eq!(data_entry_status["status"], "first_entry_finalised");
 
     let coordinator_cookie = coordinator_login(&addr).await;
     let res = get_resolve_differences(&addr, &coordinator_cookie, 1).await;
@@ -299,7 +299,7 @@ async fn test_polling_station_data_entry_resolve_differences(pool: SqlitePool) {
     let typist = typist_login(&addr).await;
     let res = complete_data_entry(&addr, &typist, 1, 1, first_data_entry).await;
     let data_entry_status: serde_json::Value = res.json().await.unwrap();
-    assert_eq!(data_entry_status["status"], "second_entry_not_started");
+    assert_eq!(data_entry_status["status"], "first_entry_finalised");
 
     let typist2 = typist2_login(&addr).await;
     let res = complete_data_entry(&addr, &typist2, 1, 2, second_data_entry).await;
@@ -310,7 +310,7 @@ async fn test_polling_station_data_entry_resolve_differences(pool: SqlitePool) {
     let res = resolve_differences(&addr, &coordinator_cookie, 1, "keep_first_entry").await;
     assert_eq!(res.status(), StatusCode::OK);
     let body: serde_json::Value = res.json().await.unwrap();
-    assert_eq!(body["status"], "second_entry_not_started");
+    assert_eq!(body["status"], "first_entry_finalised");
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
@@ -324,7 +324,7 @@ async fn test_polling_station_data_entry_resolve_differences_then_resolve_errors
     let typist = typist_login(&addr).await;
     let res = complete_data_entry(&addr, &typist, 1, 1, first_data_entry).await;
     let data_entry_status: serde_json::Value = res.json().await.unwrap();
-    assert_eq!(data_entry_status["status"], "second_entry_not_started");
+    assert_eq!(data_entry_status["status"], "first_entry_finalised");
 
     let typist2 = typist2_login(&addr).await;
     let res = complete_data_entry(&addr, &typist2, 1, 2, second_data_entry).await;

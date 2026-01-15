@@ -122,7 +122,7 @@ describe("ResolveDifferencesPage", () => {
     await user.click(submit);
     expect(resolve).not.toHaveBeenCalled();
 
-    overrideResponseStatus("second_entry_not_started");
+    overrideResponseStatus("first_entry_finalised");
     await user.click(await screen.findByRole("radio", { name: "De eerste invoer (Gebruiker01)" }));
     await user.click(submit);
     expect(resolve).toHaveBeenCalledWith("keep_first_entry");
@@ -136,7 +136,7 @@ describe("ResolveDifferencesPage", () => {
     await renderPage();
     expect(getElectionStatus).toHaveBeenCalledTimes(1);
 
-    overrideResponseStatus("second_entry_not_started");
+    overrideResponseStatus("first_entry_finalised");
     await user.click(await screen.findByRole("radio", { name: "De tweede invoer (Gebruiker02)" }));
     await user.click(await screen.findByRole("button", { name: "Opslaan" }));
 
@@ -148,7 +148,7 @@ describe("ResolveDifferencesPage", () => {
     const user = userEvent.setup();
 
     await renderPage();
-    overrideResponseStatus("second_entry_not_started");
+    overrideResponseStatus("first_entry_finalised");
     await user.click(await screen.findByRole("radio", { name: "De eerste invoer (Gebruiker01)" }));
     await user.click(await screen.findByRole("button", { name: "Opslaan" }));
 
@@ -165,7 +165,7 @@ describe("ResolveDifferencesPage", () => {
     const user = userEvent.setup();
 
     await renderPage();
-    overrideResponseStatus("second_entry_not_started");
+    overrideResponseStatus("first_entry_finalised");
     await user.click(await screen.findByRole("radio", { name: "De tweede invoer (Gebruiker02)" }));
     await user.click(await screen.findByRole("button", { name: "Opslaan" }));
 
@@ -183,7 +183,7 @@ describe("ResolveDifferencesPage", () => {
 
     await renderPage();
 
-    overrideResponseStatus("first_entry_not_started");
+    overrideResponseStatus("empty");
     await user.click(await screen.findByRole("radio", { name: "Geen van beide: alles opnieuw invoeren" }));
     await user.click(await screen.findByRole("button", { name: "Opslaan" }));
 

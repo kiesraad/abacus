@@ -375,6 +375,6 @@ describe("onFinaliseDataEntry", () => {
       { type: "SET_STATUS", status: "finalised" } satisfies DataEntryAction,
     ]);
 
-    expect(result?.status).toBe("second_entry_not_started");
+    expect(result?.status).toBe("first_entry_finalised");
   });
 });

@@ -7,9 +7,9 @@
   "first_entry_finished": "Eerste invoer klaar",
   "first_entry_has_errors": "Fouten in proces-verbaal",
   "first_entry_in_progress": "Eerste invoer bezig",
-  "first_entry_not_started": "Eerste invoer nog niet gestart",
+  "empty": "Eerste invoer nog niet gestart",
   "in_progress": "Invoer bezig",
   "not_started": "Werkvoorraad",
   "second_entry_in_progress": "Tweede invoer bezig",
-  "second_entry_not_started": "Tweede invoer nog niet gestart"
+  "first_entry_finalised": "Tweede invoer nog niet gestart"
 }

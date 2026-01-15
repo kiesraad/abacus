@@ -11,11 +11,11 @@ describe("ElectionProgress", () => {
       statuses: [
         {
           polling_station_id: 1,
-          status: "first_entry_not_started",
+          status: "empty",
         },
         {
           polling_station_id: 2,
-          status: "second_entry_not_started",
+          status: "first_entry_finalised",
         },
         {
           polling_station_id: 3,

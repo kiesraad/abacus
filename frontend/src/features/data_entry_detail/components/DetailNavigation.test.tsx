@@ -54,7 +54,7 @@ describe("DetailNavigation", () => {
   });
 
   test("renders overview link and links to all sections", () => {
-    renderNavigation(mockValidationResultsWithWarnings, "second_entry_not_started");
+    renderNavigation(mockValidationResultsWithWarnings, "first_entry_finalised");
 
     const items = screen.getAllByRole("link").map((link) => link.textContent);
     expect(items).toEqual([
@@ -109,19 +109,19 @@ describe("DetailNavigation", () => {
   });
 
   test("show warnings overview link when viewing data entry details with warnings", () => {
-    renderNavigation(mockValidationResultsWithWarnings, "second_entry_not_started");
+    renderNavigation(mockValidationResultsWithWarnings, "first_entry_finalised");
     const firstItem = screen.getAllByRole("link")[0]!;
     expect(firstItem.textContent).toEqual("Waarschuwingen");
   });
 
   test("do not show errors or warnings overview section when there are none", () => {
-    renderNavigation(mockValidationResultsNoErrors, "second_entry_not_started");
+    renderNavigation(mockValidationResultsNoErrors, "first_entry_finalised");
     const firstItem = screen.getAllByRole("link")[0]!;
     expect(firstItem.textContent).toEqual("Extra onderzoek");
   });
 
   test("shows no icons when there are no validation results", () => {
-    renderNavigation(mockValidationResultsNoErrors, "second_entry_not_started");
+    renderNavigation(mockValidationResultsNoErrors, "first_entry_finalised");
 
     expect(screen.queryByRole("img", { name: "bevat een fout" })).not.toBeInTheDocument();
     expect(screen.queryByRole("img", { name: "bevat een waarschuwing" })).not.toBeInTheDocument();
@@ -147,7 +147,7 @@ describe("DetailNavigation", () => {
       sectionId: "voters_votes_counts",
     });
 
-    renderNavigation(mockValidationResultsWithWarnings, "second_entry_not_started");
+    renderNavigation(mockValidationResultsWithWarnings, "first_entry_finalised");
 
     const activeItem = screen.getByRole("link", { name: "Aantal kiezers en stemmen" }).closest("li");
     expect(activeItem).toHaveAttribute("aria-current", "step");
@@ -157,7 +157,7 @@ describe("DetailNavigation", () => {
   });
 
   test("uses correct links", () => {
-    renderNavigation(mockValidationResultsWithWarnings, "second_entry_not_started");
+    renderNavigation(mockValidationResultsWithWarnings, "first_entry_finalised");
 
     const overviewLink = screen.getByRole("link", { name: "Waarschuwingen" });
     expect(overviewLink).toHaveAttribute("href", "/elections/1/status/5/detail");

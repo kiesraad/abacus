@@ -85,7 +85,7 @@ describe("DataEntryHomePage", () => {
     overrideOnce("get", "/api/elections/1/status", 200, {
       statuses: [
         { polling_station_id: 1, status: "first_entry_in_progress", first_entry_user_id: getTypistUser().user_id },
-        { polling_station_id: 2, status: "first_entry_not_started" },
+        { polling_station_id: 2, status: "empty" },
       ],
     } satisfies ElectionStatusResponse);
 
@@ -100,7 +100,7 @@ describe("DataEntryHomePage", () => {
   test("Resume input invisible when none are unfinished", async () => {
     overrideOnce("get", "/api/elections/1/status", 200, {
       statuses: [
-        { polling_station_id: 1, status: "first_entry_not_started" },
+        { polling_station_id: 1, status: "empty" },
         { polling_station_id: 2, status: "definitive" },
       ],
     });

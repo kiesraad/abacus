@@ -30,7 +30,14 @@ export function PollingStationsList({ pollingStations }: PollingStationsListProp
                 <Table.NumberCell>{pollingStation.number}</Table.NumberCell>
                 <Table.Cell>
                   <span>{pollingStation.name}</span>
-                  <Badge type={pollingStation.statusEntry.status} showIcon />
+                  <Badge
+                    type={
+                      pollingStation.statusEntry.status === "first_entry_finalised"
+                        ? "first_entry_finalised_for_typist"
+                        : pollingStation.statusEntry.status
+                    }
+                    showIcon
+                  />
                 </Table.Cell>
               </Table.Row>
             ),

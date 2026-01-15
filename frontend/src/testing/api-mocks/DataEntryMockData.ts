@@ -227,7 +227,7 @@ export const dataEntryHasErrorsGetMockResponse: DataEntryGetResponse = {
 export const dataEntryHasWarningsGetMockResponse: DataEntryGetResponse = {
   user_id: 3,
   data: emptyPollingStationResults(),
-  status: "second_entry_not_started",
+  status: "first_entry_finalised",
   validation_results: {
     errors: [],
     warnings: [validationResultMockData.W001, validationResultMockData.W201, validationResultMockData.W202],
@@ -237,7 +237,7 @@ export const dataEntryHasWarningsGetMockResponse: DataEntryGetResponse = {
 export const dataEntryValidGetMockResponse: DataEntryGetResponse = {
   user_id: 3,
   data: emptyPollingStationResults(),
-  status: "second_entry_not_started",
+  status: "first_entry_finalised",
   validation_results: {
     errors: [],
     warnings: [],

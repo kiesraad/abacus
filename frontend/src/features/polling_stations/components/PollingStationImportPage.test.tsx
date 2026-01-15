@@ -6,7 +6,7 @@ import { pollingStationRequestMockData } from "@/testing/api-mocks/PollingStatio
 import { ElectionRequestHandler } from "@/testing/api-mocks/RequestHandlers";
 import { overrideOnce, server } from "@/testing/server";
 import { render, screen } from "@/testing/test-utils";
-
+import * as uploadFileSize from "@/utils/uploadFileSize";
 import { PollingStationImportPage } from "./PollingStationImportPage";
 
 async function renderPage() {
@@ -57,6 +57,58 @@ describe("PollingStationImportPage", () => {
     expect(screen.queryByLabelText("Geen bestand gekozen")).not.toBeInTheDocument();
     expect(screen.getAllByText(filename).length).toBe(2);
     expect(screen.getByText("Ongeldig stembureaubestand")).toBeInTheDocument();
+  });
+
+  test("It shows error when frontend determines polling stations file is too large", async () => {
+    const user = userEvent.setup();
+    const filename = "foo.txt";
+    const file = new File(["foo"], filename, { type: "text/plain" });
+
+    vi.spyOn(uploadFileSize, "isFileTooLarge").mockResolvedValueOnce(true);
+
+    await renderPage();
+
+    expect(await screen.findByRole("heading", { level: 1, name: "Stembureaus importeren" })).toBeVisible();
+    const input = await screen.findByLabelText("Bestand kiezen");
+    expect(input).toBeVisible();
+    expect(await screen.findByLabelText("Geen bestand gekozen")).toBeVisible();
+
+    await user.upload(input, file);
+
+    expect(screen.getByLabelText("Geen bestand gekozen")).toBeInTheDocument();
+    expect(screen.getAllByText(filename).length).toBe(1);
+    expect(screen.getByRole("alert")).toHaveTextContent("Ongeldig stembureaubestand");
+    expect(screen.getByRole("alert")).toHaveTextContent(
+      `Het bestand ${filename} is te groot. Kies een bestand van maximaal 5 Megabyte`,
+    );
+  });
+
+  test("It shows error when backend determines polling stations file is too large", async () => {
+    const user = userEvent.setup();
+    const filename = "foo.txt";
+    const file = new File(["foo"], filename, { type: "text/plain" });
+
+    overrideOnce("post", "/api/elections/1/polling_stations/validate-import", 413, {
+      error: "15",
+      fatal: false,
+      reference: "RequestPayloadTooLarge",
+    });
+
+    await renderPage();
+
+    expect(await screen.findByRole("heading", { level: 1, name: "Stembureaus importeren" })).toBeVisible();
+    const input = await screen.findByLabelText("Bestand kiezen");
+    expect(input).toBeVisible();
+    expect(await screen.findByLabelText("Geen bestand gekozen")).toBeVisible();
+
+    await user.upload(input, file);
+
+    expect(screen.queryByLabelText("Geen bestand gekozen")).not.toBeInTheDocument();
+    expect(screen.getAllByText(filename).length).toBe(2);
+    expect(screen.getByRole("alert")).toHaveTextContent("Ongeldig stembureaubestand");
+    expect(screen.getByRole("alert")).toHaveTextContent(
+      `Het bestand ${filename} is te groot. Kies een bestand van maximaal 5 Megabyte`,
+    );
   });
 
   test("Upload a file, show preview", async () => {

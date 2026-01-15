@@ -58,6 +58,6 @@ test.describe("authentication", () => {
 
     const overviewPage = new ElectionsOverviewPgObj(page);
     await expect(navBar.username).toHaveText(newTypist.fullname!);
-    await expect(overviewPage.alert).toBeVisible();
+    await expect(overviewPage.alertAccountSetup).toBeVisible();
   });
 });

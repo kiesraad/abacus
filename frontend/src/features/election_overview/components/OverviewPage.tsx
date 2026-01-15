@@ -5,6 +5,7 @@ import { useInitialApiGet } from "@/api/useInitialApiGet";
 import { CommitteeSessionStatusWithIcon } from "@/components/committee_session/CommitteeSessionStatus";
 import { Footer } from "@/components/footer/Footer";
 import { IconPlus } from "@/components/generated/icons";
+import { Messages } from "@/components/messages/Messages";
 import { NavBar } from "@/components/navbar/NavBar";
 import { PageTitle } from "@/components/page_title/PageTitle";
 import { Alert } from "@/components/ui/Alert/Alert";
@@ -126,6 +127,9 @@ export function OverviewPage() {
           <h1>{isAdministrator ? t("election.manage") : t("election.title.plural")}</h1>
         </section>
       </header>
+
+      <Messages />
+
       {isNewAccount && (
         <Alert type="success" onClose={closeNewAccountAlert}>
           <strong className="heading-md">{t("account_configured")}</strong>

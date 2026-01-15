@@ -42,19 +42,8 @@ function renderPage(error = false) {
 }
 
 function joinHashChunksAsRendered(chunks: string[]): string {
-  let result = chunks.shift()!;
   let obfuscationIndex = 1;
-
-  chunks.forEach((chunk) => {
-    if (chunk === "") {
-      result += `-${obfuscationIndex}`;
-      obfuscationIndex += 1;
-    } else {
-      result += `-${chunk}`;
-    }
-  });
-
-  return result;
+  return chunks.map((chunk) => (chunk === "" ? obfuscationIndex++ : chunk)).join("-");
 }
 
 describe("CheckHash component", () => {

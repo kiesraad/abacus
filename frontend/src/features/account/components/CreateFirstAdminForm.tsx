@@ -11,7 +11,7 @@ import { t } from "@/i18n/translate";
 import type { CREATE_FIRST_ADMIN_REQUEST_PATH, CreateUserRequest, LoginResponse } from "@/types/generated/openapi";
 import { StringFormData } from "@/utils/stringFormData";
 
-import { type UserValidationErrors, validateCreateUser } from "../util/validate";
+import { type UserValidationErrors, validateCreateUser } from "@/utils/validateUserAccount";
 
 interface CreateFirstAdminFormProps {
   next: () => void;
@@ -49,10 +49,13 @@ export function CreateFirstAdminForm({ next }: CreateFirstAdminFormProps) {
     void create(account).then((result) => {
       if (isSuccess(result)) {
         next();
-      } else if (result instanceof ApiError && result.reference === "PasswordRejection") {
-        setValidationErrors({
-          password: t("initialise.password_rules"),
-        });
+      } else if (
+        result instanceof ApiError &&
+        (result.reference === "NewPasswordSameAsOldPassword" ||
+          result.reference === "PasswordSameAsUsername" ||
+          result.reference === "PasswordTooShort")
+      ) {
+        setValidationErrors({ password: t(`error.api_error.${result.reference}`) });
       } else if (result instanceof ApiError) {
         setApiError(result);
       }

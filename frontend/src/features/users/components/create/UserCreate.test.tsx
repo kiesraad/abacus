@@ -29,7 +29,7 @@ function renderWithRouter() {
 }
 
 const rolePage = {
-  radioGroup: () => screen.findByRole("group", { name: "Kies een rol" }),
+  radioGroup: () => screen.getByRole("group", { name: "Kies een rol" }),
   administrator: () => screen.getByRole("radio", { name: /Beheerder/ }),
   coordinator: () => screen.getByRole("radio", { name: /Coördinator/ }),
   typist: () => screen.getByRole("radio", { name: /Invoerder/ }),
@@ -37,14 +37,14 @@ const rolePage = {
 };
 
 const typePage = {
-  radioGroup: () => screen.findByRole("group", { name: "Type account" }),
+  radioGroup: () => screen.getByRole("group", { name: "Type account" }),
   withName: () => screen.getByRole("radio", { name: /Op naam/ }),
   anonymous: () => screen.getByRole("radio", { name: /Anonieme gebruikersnaam/ }),
   continue: () => screen.getByRole("button", { name: "Verder" }),
 };
 
 const detailsPage = {
-  title: () => screen.findByRole("heading", { level: 2, name: "Details van het account" }),
+  title: () => screen.getByRole("heading", { level: 2, name: "Details van het account" }),
   username: () => screen.getByRole("textbox", { name: "Gebruikersnaam" }),
   fullname: () => screen.getByRole("textbox", { name: "Volledige naam" }),
   fullnameQuery: () => screen.queryByRole("textbox", { name: "Volledige naam" }),
@@ -157,7 +157,7 @@ describe("User create pages integration test", () => {
       expect(within(alert).getByRole("strong")).toHaveTextContent(
         "Er bestaat al een gebruiker met gebruikersnaam GuusGeluk",
       );
-      expect(await detailsPage.title()).toBeInTheDocument();
+      expect(detailsPage.title()).toBeInTheDocument();
     });
   });
 });

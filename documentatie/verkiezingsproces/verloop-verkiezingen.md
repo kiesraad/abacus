@@ -9,6 +9,7 @@ Dit document beschrijft het verloop van de verschillende verkiezingstypen. Ook b
 - GSB: Gemeentelijk Stembureau
 - SOL: Stembureau Openbaar Lichaam
 - HSB: Hoofdstembureau
+- NBSB: Nationaal Briefstembureau
 - CSB: Centraal Stembureau
 - PV: Proces-verbaal, papier met telling van stempassen en stemmen
 - EML: Election Markup Language, digitale versie van PV

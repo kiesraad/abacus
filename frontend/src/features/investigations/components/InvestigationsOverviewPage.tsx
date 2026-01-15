@@ -35,7 +35,7 @@ export function InvestigationsOverviewPage() {
   const allInvestigationsHandled = investigations.length > 0 && investigations.length === handledInvestigations.length;
 
   function finishDataEntry() {
-    const body: COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_BODY = { status: "data_entry_finished" };
+    const body: COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_BODY = { status: "completed" };
     void update(body).then((result) => {
       if (isSuccess(result)) {
         void navigate("../");
@@ -76,7 +76,7 @@ export function InvestigationsOverviewPage() {
 
       {isCoordinator &&
         allInvestigationsHandled &&
-        currentCommitteeSession.status !== "data_entry_finished" &&
+        currentCommitteeSession.status !== "completed" &&
         (missingInvestigations.length > 0 ? (
           <Alert type="warning">
             <strong className="heading-md">{t("investigations.missing_investigations")}</strong>

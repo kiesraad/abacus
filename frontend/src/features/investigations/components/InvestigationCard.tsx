@@ -30,7 +30,7 @@ export function InvestigationCard({ investigation }: InvestigationCardProps) {
   const goToFindings = (e: MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
 
-    if (currentCommitteeSession.status === "data_entry_not_started") {
+    if (currentCommitteeSession.status === "in_preparation") {
       setShowModal(true);
     } else {
       void navigate(`./${investigation.pollingStation.id}/findings`);
@@ -82,7 +82,7 @@ export function InvestigationCard({ investigation }: InvestigationCardProps) {
               <p>{t("investigations.corrected_results_not_yet_inserted")}</p>
             ) : (
               <p className={cls.flex}>
-                {t("investigations.corrigendum_data_entry_in_progress")}&nbsp;-&nbsp;
+                {t("investigations.corrigendum_data_entry")}&nbsp;-&nbsp;
                 <Link to={`/elections/${election.id}/status`}>{t("view_progress").toLowerCase()}</Link>
               </p>
             )}

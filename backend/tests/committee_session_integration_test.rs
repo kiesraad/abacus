@@ -40,17 +40,10 @@ async fn test_committee_session_create_works(pool: SqlitePool) {
     let coordinator_cookie = coordinator_login(&addr).await;
     let election_id = 5;
 
-    change_status_committee_session(
-        &addr,
-        &coordinator_cookie,
-        election_id,
-        6,
-        "data_entry_finished",
-    )
-    .await;
+    change_status_committee_session(&addr, &coordinator_cookie, election_id, 6, "completed").await;
     let committee_session =
         get_election_committee_session(&addr, &coordinator_cookie, election_id).await;
-    assert_eq!(committee_session["status"], "data_entry_finished");
+    assert_eq!(committee_session["status"], "completed");
 
     let url = format!("http://{addr}/api/elections/{election_id}/committee_sessions");
     let response = reqwest::Client::new()
@@ -122,7 +115,7 @@ async fn test_committee_session_delete_ok_status_created(pool: SqlitePool) {
     let committee_session =
         get_election_committee_session(&addr, &coordinator_cookie, election_id).await;
     assert_eq!(committee_session["id"], 703);
-    assert_eq!(committee_session["status"], "data_entry_finished");
+    assert_eq!(committee_session["status"], "completed");
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_7_four_sessions", "users"))))]
@@ -170,19 +163,19 @@ async fn test_committee_session_delete_not_ok_wrong_status(pool: SqlitePool) {
         "Unexpected response status"
     );
 
-    // Set status to DataEntryPaused
+    // Set status to Paused
     change_status_committee_session(
         &addr,
         &coordinator_cookie,
         election_id,
         committee_session_id,
-        "data_entry_paused",
+        "paused",
     )
     .await;
 
     let committee_session =
         get_election_committee_session(&addr, &coordinator_cookie, election_id).await;
-    assert_eq!(committee_session["status"], "data_entry_paused");
+    assert_eq!(committee_session["status"], "paused");
 
     let response = delete_committee_session(
         &addr,
@@ -198,19 +191,19 @@ async fn test_committee_session_delete_not_ok_wrong_status(pool: SqlitePool) {
         "Unexpected response status"
     );
 
-    // Set status to DataEntryFinished
+    // Set status to Completed
     change_status_committee_session(
         &addr,
         &coordinator_cookie,
         election_id,
         committee_session_id,
-        "data_entry_finished",
+        "completed",
     )
     .await;
 
     let committee_session =
         get_election_committee_session(&addr, &coordinator_cookie, election_id).await;
-    assert_eq!(committee_session["status"], "data_entry_finished");
+    assert_eq!(committee_session["status"], "completed");
 
     let response = delete_committee_session(
         &addr,
@@ -404,7 +397,7 @@ async fn test_committee_session_status_change_works(pool: SqlitePool) {
     let response = reqwest::Client::new()
         .put(&url)
         .header("cookie", coordinator_cookie)
-        .json(&serde_json::json!({"status": "data_entry_finished"}))
+        .json(&serde_json::json!({"status": "completed"}))
         .send()
         .await
         .unwrap();
@@ -427,12 +420,12 @@ async fn test_committee_session_status_change_finished_to_in_progress_deletes_fi
     create_result(&addr, 1, election_id).await;
     create_result(&addr, 2, election_id).await;
 
-    // Change committee session status to DataEntryFinished
+    // Change committee session status to Completed
     let url = format!("http://{addr}/api/elections/{election_id}/committee_sessions/2/status");
     let response = reqwest::Client::new()
         .put(&url)
         .header("cookie", &coordinator_cookie)
-        .json(&serde_json::json!({"status": "data_entry_finished"}))
+        .json(&serde_json::json!({"status": "completed"}))
         .send()
         .await
         .unwrap();
@@ -446,7 +439,7 @@ async fn test_committee_session_status_change_finished_to_in_progress_deletes_fi
 
     let committee_session =
         get_election_committee_session(&addr, &coordinator_cookie, election_id).await;
-    assert_eq!(committee_session["status"], "data_entry_finished");
+    assert_eq!(committee_session["status"], "completed");
 
     // Generate and download results files
     let file_download_url = format!(
@@ -471,11 +464,11 @@ async fn test_committee_session_status_change_finished_to_in_progress_deletes_fi
     assert_eq!(committee_session["results_eml"], 1);
     assert_eq!(committee_session["results_pdf"], 2);
 
-    // Change committee session status to DataEntryInProgress
+    // Change committee session status to DataEntry
     let response = reqwest::Client::new()
         .put(&url)
         .header("cookie", &coordinator_cookie)
-        .json(&serde_json::json!({"status": "data_entry_in_progress"}))
+        .json(&serde_json::json!({"status": "data_entry"}))
         .send()
         .await
         .unwrap();
@@ -489,7 +482,7 @@ async fn test_committee_session_status_change_finished_to_in_progress_deletes_fi
 
     let committee_session =
         get_election_committee_session(&addr, &coordinator_cookie, election_id).await;
-    assert_eq!(committee_session["status"], "data_entry_in_progress");
+    assert_eq!(committee_session["status"], "data_entry");
     assert!(committee_session["results_eml"].is_null());
     assert!(committee_session["results_pdf"].is_null());
 }
@@ -503,7 +496,7 @@ async fn test_committee_session_status_change_invalid_status(pool: SqlitePool) {
     let response = reqwest::Client::new()
         .put(&url)
         .header("cookie", coordinator_cookie)
-        .json(&serde_json::json!({"status": "data_entry_not_started"}))
+        .json(&serde_json::json!({"status": "in_preparation"}))
         .send()
         .await
         .unwrap();
@@ -521,7 +514,7 @@ async fn test_committee_session_status_change_not_found(pool: SqlitePool) {
     let response = reqwest::Client::new()
         .put(&url)
         .header("cookie", coordinator_cookie)
-        .json(&serde_json::json!({"status": "data_entry_paused"}))
+        .json(&serde_json::json!({"status": "paused"}))
         .send()
         .await
         .unwrap();
@@ -539,7 +532,7 @@ async fn test_committee_session_status_change_previous_committee_session_fails(p
     let response = reqwest::Client::new()
         .put(&url)
         .header("cookie", coordinator_cookie)
-        .json(&serde_json::json!({"status": "data_entry_in_progress"}))
+        .json(&serde_json::json!({"status": "data_entry"}))
         .send()
         .await
         .unwrap();

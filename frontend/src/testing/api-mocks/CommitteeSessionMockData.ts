@@ -4,7 +4,7 @@ export const committeeSessionMockData: CommitteeSession = {
   id: 1,
   number: 1,
   election_id: 1,
-  status: "data_entry_in_progress",
+  status: "data_entry",
   location: "",
   start_date_time: "",
 };
@@ -31,17 +31,17 @@ export const getCommitteeSessionListMockData = (
       ...committeeSessionMockData,
       id: 3,
       number: 3,
-      status: "data_entry_finished",
+      status: "completed",
     },
     {
       ...committeeSessionMockData,
       id: 2,
       number: 2,
-      status: "data_entry_finished",
+      status: "completed",
     },
     {
       ...committeeSessionMockData,
-      status: "data_entry_finished",
+      status: "completed",
     },
   ];
 };

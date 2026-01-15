@@ -205,7 +205,7 @@ describe("InvestigationsOverviewPage", () => {
   });
 
   test("Shows finish data entry message when all investigations are handled and session status != finished", async () => {
-    const electionData = getElectionMockData({}, { number: 2, status: "data_entry_in_progress" }, [
+    const electionData = getElectionMockData({}, { number: 2, status: "data_entry" }, [
       {
         polling_station_id: 1,
         reason: "Test reason 1",
@@ -227,7 +227,7 @@ describe("InvestigationsOverviewPage", () => {
 
   test("Doesn't show finish data entry message when all investigations are handled and session status = finished", async () => {
     server.use(CommitteeSessionStatusChangeRequestHandler);
-    const electionData = getElectionMockData({}, { number: 2, status: "data_entry_finished" }, [
+    const electionData = getElectionMockData({}, { number: 2, status: "completed" }, [
       {
         polling_station_id: 1,
         reason: "Test reason 1",
@@ -248,7 +248,7 @@ describe("InvestigationsOverviewPage", () => {
     server.use(CommitteeSessionStatusChangeRequestHandler);
     const updateCommitteeSession = spyOnHandler(CommitteeSessionStatusChangeRequestHandler);
 
-    const electionData = getElectionMockData({}, { number: 2, status: "data_entry_in_progress" }, [
+    const electionData = getElectionMockData({}, { number: 2, status: "data_entry" }, [
       {
         polling_station_id: 1,
         reason: "Test reason 1",
@@ -266,7 +266,7 @@ describe("InvestigationsOverviewPage", () => {
 
     await waitFor(() => {
       expect(updateCommitteeSession).toHaveBeenCalledExactlyOnceWith({
-        status: "data_entry_finished",
+        status: "completed",
       });
     });
   });
@@ -274,7 +274,7 @@ describe("InvestigationsOverviewPage", () => {
   test("Shows start data entry modal when clicking fill findings button", async () => {
     server.use(CommitteeSessionStatusChangeRequestHandler);
 
-    const electionData = getElectionMockData({}, { number: 2, status: "data_entry_not_started" }, [
+    const electionData = getElectionMockData({}, { number: 2, status: "in_preparation" }, [
       {
         polling_station_id: 1,
         reason: "Test reason 1",
@@ -299,7 +299,7 @@ describe("InvestigationsOverviewPage", () => {
 
     await waitFor(() => {
       expect(updateCommitteeSession).toHaveBeenCalledExactlyOnceWith({
-        status: "data_entry_in_progress",
+        status: "data_entry",
       });
     });
   });

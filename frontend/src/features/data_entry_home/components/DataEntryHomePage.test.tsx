@@ -232,7 +232,7 @@ describe("DataEntryHomePage", () => {
   test("Alert when committee session is paused is shown", async () => {
     server.use(
       http.get("/api/elections/1", () =>
-        HttpResponse.json(getElectionMockData({}, { status: "data_entry_paused" }) satisfies ElectionDetailsResponse, {
+        HttpResponse.json(getElectionMockData({}, { status: "paused" }) satisfies ElectionDetailsResponse, {
           status: 200,
         }),
       ),

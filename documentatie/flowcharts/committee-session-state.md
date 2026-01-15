@@ -9,18 +9,18 @@ committee session, and an "investigation" in any subsequent committee session.
 ```mermaid
 stateDiagram-v2
   [*] --> Created
-  Created --> DataEntryNotStarted: add <br/> PS/Inv
-  DataEntryNotStarted --> DataEntryInProgress: click start <br/> data entry
-  DataEntryNotStarted --> Created: delete last <br/> PS/Inv
-  DataEntryInProgress --> Created: delete last <br/> PS/Inv
-  DataEntryInProgress --> DataEntryFinished: click finish <br/> data entry
-  DataEntryInProgress --> DataEntryPaused: click pause <br/> data entry
-  DataEntryPaused --> DataEntryInProgress: click resume <br/> data entry
-  DataEntryPaused --> Created: delete last <br/> PS/Inv
-  DataEntryPaused --> DataEntryFinished: click finish <br/> data entry
-  DataEntryFinished --> DataEntryInProgress: add/update <br/> PS/Inv
-  DataEntryFinished --> DataEntryInProgress: delete polling <br/> station result/Inv
-  DataEntryFinished --> DataEntryInProgress: click resume <br/> data entry
-  DataEntryFinished --> Created: delete last <br/> PS/Inv
-  DataEntryFinished --> [*]
+  Created --> InPreparation: add <br/> PS/Inv
+  InPreparation --> DataEntry: click start <br/> data entry
+  InPreparation --> Created: delete last <br/> PS/Inv
+  DataEntry --> Created: delete last <br/> PS/Inv
+  DataEntry --> Completed: click finish <br/> data entry
+  DataEntry --> Paused: click pause <br/> data entry
+  Paused --> DataEntry: click resume <br/> data entry
+  Paused --> Created: delete last <br/> PS/Inv
+  Paused --> Completed: click finish <br/> data entry
+  Completed --> DataEntry: add/update <br/> PS/Inv
+  Completed --> DataEntry: delete polling <br/> station result/Inv
+  Completed --> DataEntry: click resume <br/> data entry
+  Completed --> Created: delete last <br/> PS/Inv
+  Completed --> [*]
 ```

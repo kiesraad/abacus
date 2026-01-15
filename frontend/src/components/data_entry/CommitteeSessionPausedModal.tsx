@@ -9,7 +9,7 @@ interface CommitteeSessionPausedModalProps {
 
 export function CommitteeSessionPausedModal({ showUnsavedChanges }: CommitteeSessionPausedModalProps) {
   return (
-    <Modal title={<CommitteeSessionStatusWithRightIcon status="data_entry_paused" userRole="typist" />}>
+    <Modal title={<CommitteeSessionStatusWithRightIcon status="paused" userRole="typist" />}>
       <p>
         {t("error.api_error.CommitteeSessionPaused")}
         {showUnsavedChanges && ` [${t("data_entry.changes_are_not_saved")}]`}

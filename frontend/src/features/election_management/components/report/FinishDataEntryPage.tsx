@@ -35,13 +35,13 @@ export function FinishDataEntryPage() {
     }
 
     // Redirect to report download if committee session data entry phase is already finished
-    if (currentCommitteeSession.status === "data_entry_finished") {
+    if (currentCommitteeSession.status === "completed") {
       void navigate(`/elections/${election.id}/report/committee-session/${currentCommitteeSession.id}/download`);
     }
   }, [currentCommitteeSession, election, incompleteInvestigations, navigate]);
 
   function handleFinish() {
-    const body: COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_BODY = { status: "data_entry_finished" };
+    const body: COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_BODY = { status: "completed" };
     void update(body).then(() => {
       void refetch();
     });

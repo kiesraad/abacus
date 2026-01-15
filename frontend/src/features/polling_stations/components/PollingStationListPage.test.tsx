@@ -91,10 +91,10 @@ describe("PollingStationListPage", () => {
 
   test.each([
     { status: "created", allowed: true },
-    { status: "data_entry_not_started", allowed: true },
-    { status: "data_entry_in_progress", allowed: false },
-    { status: "data_entry_paused", allowed: false },
-    { status: "data_entry_finished", allowed: false },
+    { status: "in_preparation", allowed: true },
+    { status: "data_entry", allowed: false },
+    { status: "paused", allowed: false },
+    { status: "completed", allowed: false },
   ] satisfies Array<{
     status: CommitteeSessionStatus;
     allowed: boolean;

@@ -399,7 +399,7 @@ async fn test_election_import_save_with_polling_stations(pool: SqlitePool) {
     assert_eq!(election_details["election"]["number_of_voters"], 1234);
     assert_eq!(
         election_details["current_committee_session"]["status"],
-        "data_entry_not_started"
+        "in_preparation"
     );
 }
 

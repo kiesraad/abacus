@@ -6,10 +6,10 @@ export function PollingStationAlert() {
   const { currentCommitteeSession } = useElection();
 
   return (
-    currentCommitteeSession.status === "data_entry_finished" && (
+    currentCommitteeSession.status === "completed" && (
       <Alert type="warning">
-        <strong className="heading-md">{t("polling_station.warning_data_entry_finished.title")}</strong>
-        <p>{t("polling_station.warning_data_entry_finished.description")}</p>
+        <strong className="heading-md">{t("polling_station.warning_completed.title")}</strong>
+        <p>{t("polling_station.warning_completed.description")}</p>
       </Alert>
     )
   );

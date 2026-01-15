@@ -412,7 +412,7 @@ VALUES (4, 'Test Election < 19 seats', 'CSO', 'TestLocation_2026', 'Test Locatio
         ]');
 
 INSERT INTO committee_sessions (id, number, election_id, status, location, start_date_time)
-VALUES (4, 1, 4, 'data_entry_in_progress', '', NULL);
+VALUES (4, 1, 4, 'data_entry', '', NULL);
 
 INSERT INTO polling_stations (id, committee_session_id, id_prev_session, name, number, number_of_voters, polling_station_type, address,
                               postal_code, locality)

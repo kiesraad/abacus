@@ -140,7 +140,7 @@ describe("CommitteeSessionDetailsPage", () => {
         {},
         {
           number: 2,
-          status: "data_entry_not_started",
+          status: "in_preparation",
           location: "Den Haag",
           start_date_time: "2026-03-18T21:36:00",
         },
@@ -180,7 +180,7 @@ describe("CommitteeSessionDetailsPage", () => {
       getElectionMockData(
         {},
         {
-          status: "data_entry_not_started",
+          status: "in_preparation",
           location: "Den Haag",
           start_date_time: "2026-03-18T21:36:00",
         },
@@ -213,7 +213,7 @@ describe("CommitteeSessionDetailsPage", () => {
       getElectionMockData(
         {},
         {
-          status: "data_entry_not_started",
+          status: "in_preparation",
           location: "Den Haag",
           start_date_time: "2026-03-18T21:36:00",
         },
@@ -249,7 +249,7 @@ describe("CommitteeSessionDetailsPage", () => {
         {},
         {
           number: 6,
-          status: "data_entry_in_progress",
+          status: "data_entry",
           location: "Den Haag",
           start_date_time: "2026-03-18T21:36:00",
         },

@@ -5,7 +5,7 @@
     "election_id": 4,
     "location": "Den Haag",
     "start_date_time": "2025-09-24T10:12:00",
-    "status": "data_entry_finished"
+    "status": "completed"
   },
   "previous_committee_session": {
     "id": 6,
@@ -13,7 +13,7 @@
     "election_id": 4,
     "location": "Den Haag",
     "start_date_time": "2025-09-23T22:08:00",
-    "status": "data_entry_finished"
+    "status": "completed"
   },
   "election": {
     "id": 4,

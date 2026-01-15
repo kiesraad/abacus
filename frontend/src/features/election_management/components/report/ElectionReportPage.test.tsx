@@ -84,7 +84,7 @@ describe("ElectionReportPage", () => {
   });
 
   test("Redirects to CommitteeSessionDetailsPage when details are not filled in", async () => {
-    overrideOnce("get", "/api/elections/1", 200, getElectionMockData({}, { status: "data_entry_finished" }));
+    overrideOnce("get", "/api/elections/1", 200, getElectionMockData({}, { status: "completed" }));
 
     renderPage();
 
@@ -98,7 +98,7 @@ describe("ElectionReportPage", () => {
     const statusChange = spyOnHandler(CommitteeSessionStatusChangeRequestHandler);
     const electionData = getElectionMockData(
       {},
-      { status: "data_entry_finished", location: "Den Haag", start_date_time: "2026-03-18T21:36:00" },
+      { status: "completed", location: "Den Haag", start_date_time: "2026-03-18T21:36:00" },
     );
     overrideOnce("get", "/api/elections/1", 200, electionData);
 
@@ -130,7 +130,7 @@ describe("ElectionReportPage", () => {
     const statusChange = spyOnHandler(CommitteeSessionStatusChangeRequestHandler);
     const electionData = getElectionMockData(
       {},
-      { status: "data_entry_finished", location: "Den Haag", start_date_time: "2026-03-18T21:36:00" },
+      { status: "completed", location: "Den Haag", start_date_time: "2026-03-18T21:36:00" },
     );
     overrideOnce("get", "/api/elections/1", 200, electionData);
 
@@ -152,13 +152,13 @@ describe("ElectionReportPage", () => {
     expect(resumeButton).toBeVisible();
     await user.click(resumeButton);
 
-    expect(statusChange).toHaveBeenCalledWith({ status: "data_entry_in_progress" });
+    expect(statusChange).toHaveBeenCalledWith({ status: "data_entry" });
     expect(navigate).toHaveBeenCalledWith("../../status");
   });
 
   test("Does not show resume data entry button when not current committee session", async () => {
     const committeeSessionData: Partial<CommitteeSession> = {
-      status: "data_entry_finished",
+      status: "completed",
       location: "Den Haag",
       start_date_time: "2026-03-18T21:36:00",
     };
@@ -203,7 +203,7 @@ describe("ElectionReportPage", () => {
     const user = userEvent.setup();
     const electionData = getElectionMockData(
       {},
-      { status: "data_entry_finished", location: "Den Haag", start_date_time: "2026-03-18T21:36:00" },
+      { status: "completed", location: "Den Haag", start_date_time: "2026-03-18T21:36:00" },
     );
     server.use(
       http.get("/api/elections/1", () =>
@@ -240,7 +240,7 @@ describe("ElectionReportPage", () => {
     expect(console.error).toHaveBeenCalled();
   });
 
-  test("Error when committee session status is not DataEntryFinished", async () => {
+  test("Error when committee session status is not Completed", async () => {
     // error is expected
     vi.spyOn(console, "error").mockImplementation(() => {});
     const router = setupTestRouter([
@@ -260,10 +260,7 @@ describe("ElectionReportPage", () => {
       "get",
       "/api/elections/1",
       200,
-      getElectionMockData(
-        {},
-        { status: "data_entry_in_progress", location: "Den Haag", start_date_time: "2026-03-18T21:36:00" },
-      ),
+      getElectionMockData({}, { status: "data_entry", location: "Den Haag", start_date_time: "2026-03-18T21:36:00" }),
     );
 
     await router.navigate("/elections/1/report/committee-session/1/download");
@@ -278,7 +275,7 @@ describe("ElectionReportPage", () => {
     const router = renderPage();
     const electionData = getElectionMockData(
       {},
-      { number: 2, status: "data_entry_finished", location: "Den Haag", start_date_time: "2026-03-18T21:36:00" },
+      { number: 2, status: "completed", location: "Den Haag", start_date_time: "2026-03-18T21:36:00" },
     );
 
     // Set to second session and update investigations
@@ -316,7 +313,7 @@ describe("ElectionReportPage", () => {
     const router = renderPage();
     const electionData = getElectionMockData(
       {},
-      { number: 2, status: "data_entry_finished", location: "Den Haag", start_date_time: "2026-03-18T21:36:00" },
+      { number: 2, status: "completed", location: "Den Haag", start_date_time: "2026-03-18T21:36:00" },
     );
 
     // Set to second session and update investigations

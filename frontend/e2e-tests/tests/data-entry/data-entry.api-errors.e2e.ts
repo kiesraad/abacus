@@ -5,7 +5,6 @@ import {
   noExtraInvestigation,
 } from "e2e-tests/page-objects/data_entry/ExtraInvestigationPgObj";
 import { ErrorModalPgObj } from "e2e-tests/page-objects/ErrorModalPgObj";
-
 import { test } from "../../fixtures";
 
 test.use({

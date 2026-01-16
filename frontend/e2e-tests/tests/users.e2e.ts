@@ -1,13 +1,12 @@
 import { expect } from "@playwright/test";
-
+import { createRandomUsername } from "e2e-tests/helpers-utils/e2e-test-utils";
+import { UserCreateDetailsPgObj } from "e2e-tests/page-objects/users/UserCreateDetailsPgObj";
+import { UserCreateRolePgObj } from "e2e-tests/page-objects/users/UserCreateRolePgObj";
+import { UserCreateTypePgObj } from "e2e-tests/page-objects/users/UserCreateTypePgObj";
+import { UserDeleteModal } from "e2e-tests/page-objects/users/UserDeleteModalPgObj";
+import { UserListPgObj } from "e2e-tests/page-objects/users/UserListPgObj";
+import { UserUpdatePgObj } from "e2e-tests/page-objects/users/UserUpdatePgObj";
 import { test } from "../fixtures";
-import { createRandomUsername } from "../helpers-utils/e2e-test-utils";
-import { UserCreateDetailsPgObj } from "../page-objects/users/UserCreateDetailsPgObj";
-import { UserCreateRolePgObj } from "../page-objects/users/UserCreateRolePgObj";
-import { UserCreateTypePgObj } from "../page-objects/users/UserCreateTypePgObj";
-import { UserDeleteModal } from "../page-objects/users/UserDeleteModalPgObj";
-import { UserListPgObj } from "../page-objects/users/UserListPgObj";
-import { UserUpdatePgObj } from "../page-objects/users/UserUpdatePgObj";
 
 test.use({
   storageState: "e2e-tests/state/admin1.json",

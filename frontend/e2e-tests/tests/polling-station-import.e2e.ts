@@ -1,10 +1,9 @@
 import { expect } from "@playwright/test";
 import { PollingStationImportPgObj } from "e2e-tests/page-objects/polling_station/PollingStationImportPgObj";
 import { PollingStationListEmptyPgObj } from "e2e-tests/page-objects/polling_station/PollingStationListEmptyPgObj";
-
+import { PollingStationListPgObj } from "e2e-tests/page-objects/polling_station/PollingStationListPgObj";
+import { eml110a, eml110b } from "e2e-tests/test-data/eml-files";
 import { test } from "../fixtures";
-import { PollingStationListPgObj } from "../page-objects/polling_station/PollingStationListPgObj";
-import { eml110a, eml110b } from "../test-data/eml-files";
 
 test.use({
   storageState: "e2e-tests/state/coordinator1.json",

@@ -18,7 +18,6 @@ export function CheckAndSave() {
 
   // if no election, election data, candidate data or counting method is found in the state, go back to the beginning
   if (!state.election || !state.electionDefinitionData || !state.candidateDefinitionData || !state.countingMethod) {
-    console.log("hoi");
     return <Navigate to="/elections/create" />;
   }
 

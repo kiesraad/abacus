@@ -137,6 +137,9 @@ describe("UploadElectionDefinition component", () => {
     expect(screen.queryByLabelText("Geen bestand gekozen")).not.toBeInTheDocument();
     expect(screen.getAllByText(filename).length).toBe(2);
     expect(screen.getByRole("alert")).toHaveTextContent("Ongeldige verkiezingsdefinitie");
+    expect(screen.getByRole("alert")).toHaveTextContent(
+      "Het bestand foo.txt bevat geen geldige verkiezingsdefinitie. Kies een bestand met een geldige definitie.",
+    );
     expect(dispatch).not.toHaveBeenCalled();
   });
 

@@ -60,6 +60,9 @@ describe("UploadPollingStationDefinition component", () => {
     expect(screen.queryByLabelText("Geen bestand gekozen")).not.toBeInTheDocument();
     expect(screen.getAllByText(filename).length).toBe(2);
     expect(screen.getByRole("alert")).toHaveTextContent("Ongeldig stembureaubestand");
+    expect(screen.getByRole("alert")).toHaveTextContent(
+      "Het bestand foo.txt bevat geen geldige lijst met stembureaus. Kies een ander bestand.",
+    );
     expect(dispatch).not.toHaveBeenCalled();
   });
 

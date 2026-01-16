@@ -15,11 +15,7 @@ describe("CountingMethodType component", () => {
     const state = {};
     const dispatch = vi.fn();
     vi.spyOn(useElectionCreateContext, "useElectionCreateContext").mockReturnValue({ state, dispatch });
-    const router = renderReturningRouter(
-      <ElectionCreateContextProvider>
-        <CountingMethodType />
-      </ElectionCreateContextProvider>,
-    );
+    const router = renderReturningRouter(<CountingMethodType />);
 
     expect(router.state.location.pathname).toEqual("/elections/create");
   });

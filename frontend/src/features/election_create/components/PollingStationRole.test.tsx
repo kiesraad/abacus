@@ -15,11 +15,7 @@ describe("PollingStationRole component", () => {
     const state = {};
     const dispatch = vi.fn();
     vi.spyOn(useElectionCreateContext, "useElectionCreateContext").mockReturnValue({ state, dispatch });
-    const router = renderReturningRouter(
-      <ElectionCreateContextProvider>
-        <PollingStationRole />
-      </ElectionCreateContextProvider>,
-    );
+    const router = renderReturningRouter(<PollingStationRole />);
 
     expect(router.state.location.pathname).toEqual("/elections/create");
   });

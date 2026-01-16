@@ -51,7 +51,7 @@ describe("NumberOfVoters component", () => {
     });
   });
 
-  test("Show an error when number of voters is empty", async () => {
+  test("Shows an error when number of voters is empty", async () => {
     const state = { election, numberOfVoters: 0 };
     const dispatch = vi.fn();
     vi.spyOn(useElectionCreateContext, "useElectionCreateContext").mockReturnValue({ state, dispatch });

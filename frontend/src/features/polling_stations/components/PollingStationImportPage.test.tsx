@@ -46,7 +46,7 @@ describe("PollingStationImportPage", () => {
     await renderPage();
   });
 
-  test("Upload an incorrect file", async () => {
+  test("Shows an error when uploading invalid polling stations file", async () => {
     overrideOnce("post", "/api/elections/1/polling_stations/validate-import", 400, {
       error: "Invalid XML",
       fatal: false,
@@ -64,7 +64,7 @@ describe("PollingStationImportPage", () => {
     );
   });
 
-  test("It shows error when frontend determines polling stations file is too large", async () => {
+  test("Shows an error when frontend determines polling stations file is too large", async () => {
     vi.spyOn(uploadFileSize, "isFileTooLarge").mockResolvedValueOnce(true);
 
     await renderPage();
@@ -78,7 +78,7 @@ describe("PollingStationImportPage", () => {
     );
   });
 
-  test("It shows error when backend determines polling stations file is too large", async () => {
+  test("Shows an error when backend determines polling stations file is too large", async () => {
     overrideOnce("post", "/api/elections/1/polling_stations/validate-import", 413, {
       error: "15",
       fatal: false,

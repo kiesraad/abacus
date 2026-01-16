@@ -3,7 +3,6 @@ import { expect } from "@playwright/test";
 import { ElectionReport } from "e2e-tests/page-objects/election/ElectionReportPgObj";
 import { ElectionStatus } from "e2e-tests/page-objects/election/ElectionStatusPgObj";
 import { FinishDataEntry } from "e2e-tests/page-objects/election/FinishDataEntryPgObj";
-
 import { test } from "../fixtures";
 
 test.use({

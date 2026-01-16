@@ -1,13 +1,13 @@
 import { expect, test } from "@playwright/test";
 
-import { getTestPassword } from "../helpers-utils/e2e-test-api-helpers";
-import { CreateFirstAdminPgObj } from "../page-objects/authentication/CreateFirstAdminPgObj";
-import { FirstLoginPgObj } from "../page-objects/authentication/FirstLoginPgObj";
-import { InitialiseWelcomePgObj } from "../page-objects/authentication/InitialiseWelcomePgObj";
-import { LoginPgObj } from "../page-objects/authentication/LoginPgObj";
-import { ElectionsOverviewPgObj } from "../page-objects/election/ElectionsOverviewPgObj";
-import { AdminNavBar } from "../page-objects/nav_bar/AdminNavBarPgObj";
-import { firstAdmin } from "../test-data/users";
+import { getTestPassword } from "e2e-tests/helpers-utils/e2e-test-api-helpers";
+import { CreateFirstAdminPgObj } from "e2e-tests/page-objects/authentication/CreateFirstAdminPgObj";
+import { FirstLoginPgObj } from "e2e-tests/page-objects/authentication/FirstLoginPgObj";
+import { InitialiseWelcomePgObj } from "e2e-tests/page-objects/authentication/InitialiseWelcomePgObj";
+import { LoginPgObj } from "e2e-tests/page-objects/authentication/LoginPgObj";
+import { ElectionsOverviewPgObj } from "e2e-tests/page-objects/election/ElectionsOverviewPgObj";
+import { AdminNavBar } from "e2e-tests/page-objects/nav_bar/AdminNavBarPgObj";
+import { firstAdmin } from "e2e-tests/test-data/users";
 
 test.describe.configure({ mode: "serial" });
 

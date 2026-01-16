@@ -23,9 +23,7 @@ import {
   noErrorsWarningsResponse,
   noRecountNoDifferencesDataEntry,
 } from "e2e-tests/test-data/request-response-templates";
-
 import type { VotersCounts, VotesCounts } from "@/types/generated/openapi";
-
 import { test } from "../../fixtures";
 
 test.use({

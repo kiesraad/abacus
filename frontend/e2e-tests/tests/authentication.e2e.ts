@@ -1,12 +1,11 @@
 import { expect } from "@playwright/test";
 import { getTestPassword } from "e2e-tests/helpers-utils/e2e-test-api-helpers";
-
+import { AccountSetupPgObj } from "e2e-tests/page-objects/authentication/AccountSetupPgObj";
+import { LoginPgObj } from "e2e-tests/page-objects/authentication/LoginPgObj";
+import { ElectionsOverviewPgObj } from "e2e-tests/page-objects/election/ElectionsOverviewPgObj";
+import { AdminNavBar } from "e2e-tests/page-objects/nav_bar/AdminNavBarPgObj";
+import { TypistNavBar } from "e2e-tests/page-objects/nav_bar/TypistNavBarPgObj";
 import { FIXTURE_TYPIST_TEMP_PASSWORD, test } from "../fixtures";
-import { AccountSetupPgObj } from "../page-objects/authentication/AccountSetupPgObj";
-import { LoginPgObj } from "../page-objects/authentication/LoginPgObj";
-import { ElectionsOverviewPgObj } from "../page-objects/election/ElectionsOverviewPgObj";
-import { AdminNavBar } from "../page-objects/nav_bar/AdminNavBarPgObj";
-import { TypistNavBar } from "../page-objects/nav_bar/TypistNavBarPgObj";
 
 test.describe("authentication", () => {
   test("login happy path", async ({ page }) => {

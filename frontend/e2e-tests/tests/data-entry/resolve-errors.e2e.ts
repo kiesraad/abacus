@@ -1,7 +1,6 @@
 import { expect } from "@playwright/test";
 import { ElectionStatus } from "e2e-tests/page-objects/election/ElectionStatusPgObj";
 import { ResolveErrorsPgObj } from "e2e-tests/page-objects/election/ResolveErrorsPgObj";
-
 import { test } from "../../fixtures";
 
 test.use({

@@ -1,7 +1,6 @@
 import { expect, request, test } from "@playwright/test";
-
-import { getTestPassword, loginAs } from "./helpers-utils/e2e-test-api-helpers";
-import { testUsers } from "./test-data/users";
+import { getTestPassword, loginAs } from "e2e-tests/helpers-utils/e2e-test-api-helpers";
+import { testUsers } from "e2e-tests/test-data/users";
 
 test.describe("setup test users", () => {
   test("create test user accounts", async () => {

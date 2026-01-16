@@ -16,6 +16,11 @@ export function CheckAndSave() {
   const createPath: ELECTION_IMPORT_REQUEST_PATH = `/api/elections/import`;
   const { create } = useCrud<ElectionWithPoliticalGroups>({ createPath, throwAllErrors: true });
 
+  // if no election, election data, candidate data or counting method is found in the state, go back to the beginning
+  if (!state.election || !state.electionDefinitionData || !state.candidateDefinitionData || !state.countingMethod) {
+    return <Navigate to="/elections/create" />;
+  }
+
   function handleSubmit() {
     void create({
       election_data: state.electionDefinitionData,
@@ -37,11 +42,6 @@ export function CheckAndSave() {
         void navigate("/elections", { state: { success: true } });
       }
     });
-  }
-
-  // if no election, election data, candidate data or counting method is found in the state, go back to the beginning
-  if (!state.election || !state.electionDefinitionData || !state.candidateDefinitionData || !state.countingMethod) {
-    return <Navigate to="/elections/create" />;
   }
 
   return (

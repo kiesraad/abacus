@@ -13,11 +13,9 @@ import {
   noExtraInvestigation,
 } from "e2e-tests/page-objects/data_entry/ExtraInvestigationPgObj";
 import { VotersAndVotesPage } from "e2e-tests/page-objects/data_entry/VotersAndVotesPgObj";
-
+import { emptyCSOFirstSessionResults } from "e2e-tests/test-data/request-response-templates";
 import type { ClaimDataEntryResponse, PollingStation, VotersCounts, VotesCounts } from "@/types/generated/openapi";
-
 import { test } from "../../fixtures";
-import { emptyCSOFirstSessionResults } from "../../test-data/request-response-templates";
 
 test.use({
   storageState: "e2e-tests/state/typist1.json",

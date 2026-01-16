@@ -1,9 +1,8 @@
 import { expect } from "@playwright/test";
 import { ElectionStatus } from "e2e-tests/page-objects/election/ElectionStatusPgObj";
 import { ResolveDifferencesPgObj } from "e2e-tests/page-objects/election/ResolveDifferencesPgObj";
-
+import { ResolveErrorsPgObj } from "e2e-tests/page-objects/election/ResolveErrorsPgObj";
 import { test } from "../../fixtures";
-import { ResolveErrorsPgObj } from "../../page-objects/election/ResolveErrorsPgObj";
 
 test.use({
   storageState: "e2e-tests/state/coordinator1.json",

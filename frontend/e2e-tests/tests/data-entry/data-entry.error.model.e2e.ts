@@ -1,5 +1,9 @@
 import { expect } from "@playwright/test";
 import { createTestModel } from "@xstate/graph";
+import {
+  assertMachineAndImplementationMatches,
+  typeCheckedMachineDefinition,
+} from "e2e-tests/helpers-utils/xstate-helpers";
 import { AbortInputModal } from "e2e-tests/page-objects/data_entry/AbortInputModalPgObj";
 import {
   CountingDifferencesPollingStationPage,
@@ -14,14 +18,8 @@ import {
 import { VotersAndVotesPage } from "e2e-tests/page-objects/data_entry/VotersAndVotesPgObj";
 import { TypistNavBar } from "e2e-tests/page-objects/nav_bar/TypistNavBarPgObj";
 import { createMachine } from "xstate";
-
 import type { VotersCounts, VotesCounts } from "@/types/generated/openapi";
-
 import { test } from "../../fixtures";
-import {
-  assertMachineAndImplementationMatches,
-  typeCheckedMachineDefinition,
-} from "../../helpers-utils/xstate-helpers";
 
 /*
 This model-based e2e test covers the state changes from one section (the voters and votes page) that trigger errors.

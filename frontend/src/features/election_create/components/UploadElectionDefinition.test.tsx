@@ -11,9 +11,22 @@ import { ElectionCreateContextProvider } from "./ElectionCreateContextProvider";
 import { UploadElectionDefinition } from "./UploadElectionDefinition";
 
 async function renderPage() {
-  render(<UploadElectionDefinition />);
+  render(
+    <ElectionCreateContextProvider>
+      <UploadElectionDefinition />
+    </ElectionCreateContextProvider>,
+  );
 
   expect(await screen.findByRole("heading", { level: 2, name: "Importeer verkiezingsdefinitie" })).toBeInTheDocument();
+}
+
+async function uploadFile(file: File) {
+  const user = userEvent.setup();
+
+  const input = await screen.findByLabelText("Bestand kiezen");
+  expect(input).toBeVisible();
+  expect(await screen.findByLabelText("Geen bestand gekozen")).toBeVisible();
+  await user.upload(input, file);
 }
 
 const election = { name: "Naam", location: "Plek" } as NewElection;
@@ -58,25 +71,14 @@ function electionValidateResponse(
 }
 
 describe("UploadElectionDefinition component", () => {
-  test("It navigates to the next page when providing correct hash", async () => {
+  test("Navigates to the next page when providing correct hash", async () => {
     vi.spyOn(ReactRouter, "useNavigate").mockImplementation(() => navigate);
     vi.spyOn(useElectionCreateContext, "useElectionCreateContext");
-
-    render(
-      <ElectionCreateContextProvider>
-        <UploadElectionDefinition />
-      </ElectionCreateContextProvider>,
-    );
-
+    overrideOnce("post", "/api/elections/import/validate", 200, electionValidateResponse(newElectionMockData));
     const user = userEvent.setup();
 
-    expect(await screen.findByRole("heading", { level: 2, name: "Importeer verkiezingsdefinitie" })).toBeVisible();
-    const input = await screen.findByLabelText("Bestand kiezen");
-    expect(input).toBeVisible();
-    expect(await screen.findByLabelText("Geen bestand gekozen")).toBeVisible();
-
-    overrideOnce("post", "/api/elections/import/validate", 200, electionValidateResponse(newElectionMockData));
-    await user.upload(input, file);
+    await renderPage();
+    await uploadFile(file);
 
     expect(screen.queryByLabelText("Geen bestand gekozen")).not.toBeInTheDocument();
     expect(screen.getAllByText(filename).length).toBe(1);
@@ -93,22 +95,12 @@ describe("UploadElectionDefinition component", () => {
     expect(navigate).toHaveBeenCalledWith("/elections/create/polling-station-role");
   });
 
-  test("It shows error when providing incorrect hash", async () => {
-    render(
-      <ElectionCreateContextProvider>
-        <UploadElectionDefinition />
-      </ElectionCreateContextProvider>,
-    );
-
+  test("Shows an error when providing incorrect hash", async () => {
+    overrideOnce("post", "/api/elections/import/validate", 200, electionValidateResponse(newElectionMockData));
     const user = userEvent.setup();
 
-    expect(await screen.findByRole("heading", { level: 2, name: "Importeer verkiezingsdefinitie" })).toBeVisible();
-    const input = await screen.findByLabelText("Bestand kiezen");
-    expect(input).toBeVisible();
-    expect(await screen.findByLabelText("Geen bestand gekozen")).toBeVisible();
-
-    overrideOnce("post", "/api/elections/import/validate", 200, electionValidateResponse(newElectionMockData));
-    await user.upload(input, file);
+    await renderPage();
+    await uploadFile(file);
 
     expect(screen.queryByLabelText("Geen bestand gekozen")).not.toBeInTheDocument();
     expect(screen.getAllByText(filename).length).toBe(1);
@@ -129,25 +121,18 @@ describe("UploadElectionDefinition component", () => {
     expect(await screen.findByRole("alert")).toHaveTextContent("Controle digitale vingerafdruk niet gelukt");
   });
 
-  test("It shows an error when uploading invalid file", async () => {
+  test("Shows an error when uploading invalid file", async () => {
     const state = { election, numberOfVoters: 0 };
     const dispatch = vi.fn();
     vi.spyOn(useElectionCreateContext, "useElectionCreateContext").mockReturnValue({ state, dispatch });
-    await renderPage();
-
-    const user = userEvent.setup();
-
     overrideOnce("post", "/api/elections/import/validate", 400, {
       error: "Invalid XML",
       fatal: false,
       reference: "InvalidXml",
     });
 
-    expect(await screen.findByRole("heading", { level: 2, name: "Importeer verkiezingsdefinitie" })).toBeVisible();
-    const input = await screen.findByLabelText("Bestand kiezen");
-    expect(input).toBeVisible();
-    expect(await screen.findByLabelText("Geen bestand gekozen")).toBeVisible();
-    await user.upload(input, file);
+    await renderPage();
+    await uploadFile(file);
 
     expect(screen.queryByLabelText("Geen bestand gekozen")).not.toBeInTheDocument();
     expect(screen.getAllByText(filename).length).toBe(2);
@@ -155,22 +140,14 @@ describe("UploadElectionDefinition component", () => {
     expect(dispatch).not.toHaveBeenCalled();
   });
 
-  test("It shows error when frontend determines election file is too large", async () => {
+  test("Shows an error when frontend determines election file is too large", async () => {
     const state = { election, numberOfVoters: 0 };
     const dispatch = vi.fn();
     vi.spyOn(useElectionCreateContext, "useElectionCreateContext").mockReturnValue({ state, dispatch });
-    await renderPage();
-
     vi.spyOn(uploadFileSize, "isFileTooLarge").mockResolvedValueOnce(true);
 
-    const user = userEvent.setup();
-
-    expect(await screen.findByRole("heading", { level: 2, name: "Importeer verkiezingsdefinitie" })).toBeVisible();
-    const input = await screen.findByLabelText("Bestand kiezen");
-    expect(input).toBeVisible();
-    expect(await screen.findByLabelText("Geen bestand gekozen")).toBeVisible();
-
-    await user.upload(input, file);
+    await renderPage();
+    await uploadFile(file);
 
     expect(screen.getByLabelText("Geen bestand gekozen")).toBeInTheDocument();
     expect(screen.getAllByText(filename).length).toBe(1);
@@ -181,26 +158,18 @@ describe("UploadElectionDefinition component", () => {
     expect(dispatch).not.toHaveBeenCalled();
   });
 
-  test("It shows error when backend determines election file is too large", async () => {
+  test("Shows an error when backend determines election file is too large", async () => {
     const state = { election, numberOfVoters: 0 };
     const dispatch = vi.fn();
     vi.spyOn(useElectionCreateContext, "useElectionCreateContext").mockReturnValue({ state, dispatch });
-    await renderPage();
-
-    const user = userEvent.setup();
-
     overrideOnce("post", "/api/elections/import/validate", 413, {
       error: "15",
       fatal: false,
       reference: "RequestPayloadTooLarge",
     });
 
-    expect(await screen.findByRole("heading", { level: 2, name: "Importeer verkiezingsdefinitie" })).toBeVisible();
-    const input = await screen.findByLabelText("Bestand kiezen");
-    expect(input).toBeVisible();
-    expect(await screen.findByLabelText("Geen bestand gekozen")).toBeVisible();
-
-    await user.upload(input, file);
+    await renderPage();
+    await uploadFile(file);
 
     expect(screen.queryByLabelText("Geen bestand gekozen")).not.toBeInTheDocument();
     expect(screen.getAllByText(filename).length).toBe(2);

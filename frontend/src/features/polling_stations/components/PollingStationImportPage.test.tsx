@@ -20,6 +20,18 @@ async function renderPage() {
   expect(await screen.findByRole("heading", { level: 1, name: "Stembureaus importeren" })).toBeVisible();
 }
 
+async function uploadFile(file: File) {
+  const user = userEvent.setup();
+
+  const input = await screen.findByLabelText("Bestand kiezen");
+  expect(input).toBeVisible();
+  expect(await screen.findByLabelText("Geen bestand gekozen")).toBeVisible();
+  await user.upload(input, file);
+}
+
+const filename = "foo.txt";
+const file = new File(["foo"], filename, { type: "text/plain" });
+
 describe("PollingStationImportPage", () => {
   beforeEach(() => {
     server.use(ElectionRequestHandler);
@@ -35,10 +47,6 @@ describe("PollingStationImportPage", () => {
   });
 
   test("Upload an incorrect file", async () => {
-    const user = userEvent.setup();
-    const filename = "foo.txt";
-    const file = new File(["foo"], filename, { type: "text/plain" });
-
     overrideOnce("post", "/api/elections/1/polling_stations/validate-import", 400, {
       error: "Invalid XML",
       fatal: false,
@@ -46,34 +54,21 @@ describe("PollingStationImportPage", () => {
     });
 
     await renderPage();
-
-    expect(await screen.findByRole("heading", { level: 1, name: "Stembureaus importeren" })).toBeVisible();
-    const input = await screen.findByLabelText("Bestand kiezen");
-    expect(input).toBeVisible();
-    expect(await screen.findByLabelText("Geen bestand gekozen")).toBeVisible();
-
-    await user.upload(input, file);
+    await uploadFile(file);
 
     expect(screen.queryByLabelText("Geen bestand gekozen")).not.toBeInTheDocument();
     expect(screen.getAllByText(filename).length).toBe(2);
-    expect(screen.getByText("Ongeldig stembureaubestand")).toBeInTheDocument();
+    expect(screen.getByRole("alert")).toHaveTextContent("Ongeldig stembureaubestand");
+    expect(screen.getByRole("alert")).toHaveTextContent(
+      "Het bestand foo.txt bevat geen geldige lijst met stembureaus. Kies een ander bestand.",
+    );
   });
 
   test("It shows error when frontend determines polling stations file is too large", async () => {
-    const user = userEvent.setup();
-    const filename = "foo.txt";
-    const file = new File(["foo"], filename, { type: "text/plain" });
-
     vi.spyOn(uploadFileSize, "isFileTooLarge").mockResolvedValueOnce(true);
 
     await renderPage();
-
-    expect(await screen.findByRole("heading", { level: 1, name: "Stembureaus importeren" })).toBeVisible();
-    const input = await screen.findByLabelText("Bestand kiezen");
-    expect(input).toBeVisible();
-    expect(await screen.findByLabelText("Geen bestand gekozen")).toBeVisible();
-
-    await user.upload(input, file);
+    await uploadFile(file);
 
     expect(screen.getByLabelText("Geen bestand gekozen")).toBeInTheDocument();
     expect(screen.getAllByText(filename).length).toBe(1);
@@ -84,10 +79,6 @@ describe("PollingStationImportPage", () => {
   });
 
   test("It shows error when backend determines polling stations file is too large", async () => {
-    const user = userEvent.setup();
-    const filename = "foo.txt";
-    const file = new File(["foo"], filename, { type: "text/plain" });
-
     overrideOnce("post", "/api/elections/1/polling_stations/validate-import", 413, {
       error: "15",
       fatal: false,
@@ -95,13 +86,7 @@ describe("PollingStationImportPage", () => {
     });
 
     await renderPage();
-
-    expect(await screen.findByRole("heading", { level: 1, name: "Stembureaus importeren" })).toBeVisible();
-    const input = await screen.findByLabelText("Bestand kiezen");
-    expect(input).toBeVisible();
-    expect(await screen.findByLabelText("Geen bestand gekozen")).toBeVisible();
-
-    await user.upload(input, file);
+    await uploadFile(file);
 
     expect(screen.queryByLabelText("Geen bestand gekozen")).not.toBeInTheDocument();
     expect(screen.getAllByText(filename).length).toBe(2);
@@ -112,21 +97,12 @@ describe("PollingStationImportPage", () => {
   });
 
   test("Upload a file, show preview", async () => {
-    const user = userEvent.setup();
-    const filename = "foo.txt";
-    const file = new File(["foo"], filename, { type: "text/plain" });
     overrideOnce("post", "/api/elections/1/polling_stations/validate-import", 200, {
       polling_stations: pollingStationRequestMockData,
     });
 
     await renderPage();
-
-    expect(await screen.findByRole("heading", { level: 1, name: "Stembureaus importeren" })).toBeVisible();
-    const input = await screen.findByLabelText("Bestand kiezen");
-    expect(input).toBeVisible();
-    expect(await screen.findByLabelText("Geen bestand gekozen")).toBeVisible();
-
-    await user.upload(input, file);
+    await uploadFile(file);
 
     // Check the overview table
     expect(await screen.findByRole("table")).toBeVisible();

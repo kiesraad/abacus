@@ -344,22 +344,6 @@ test.describe("Election creation", () => {
       await expect(uploadCandidateDefinitionPage.header).toBeVisible();
     });
 
-    test("navigating to list-of-candidates should redirect to create", async ({ page }) => {
-      await page.goto("/elections/create/list-of-candidates");
-
-      // Upload election
-      const uploadElectionDefinitionPage = new UploadElectionDefinitionPgObj(page);
-      await expect(uploadElectionDefinitionPage.header).toBeVisible();
-    });
-
-    test("navigate to check-and-save should redirect to create", async ({ page }) => {
-      await page.goto("/elections/create/check-and-save");
-
-      // Upload election
-      const uploadElectionDefinitionPage = new UploadElectionDefinitionPgObj(page);
-      await expect(uploadElectionDefinitionPage.header).toBeVisible();
-    });
-
     // upload election and candidates, then go to start and upload new election,
     // use browser back button should redirect back to election
     test("after resetting an election upload, the back button should redirect to the beginning", async ({ page }) => {

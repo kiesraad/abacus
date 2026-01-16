@@ -4,6 +4,7 @@ import type { ReactNode } from "react";
 import { RouterProvider } from "react-router";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 import { ApiProvider } from "@/api/ApiProvider";
+import { MessagesProvider } from "@/hooks/messages/MessagesProvider";
 import * as useMessages from "@/hooks/messages/useMessages";
 import { newElectionMockData } from "@/testing/api-mocks/ElectionMockData";
 import { pollingStationMockData } from "@/testing/api-mocks/PollingStationMockData";
@@ -29,11 +30,13 @@ const Providers = ({
   fetchInitialUser?: boolean;
 }) => {
   return (
-    <ApiProvider fetchInitialUser={fetchInitialUser}>
-      <TestUserProvider userRole="administrator">
-        <RouterProvider router={router} />
-      </TestUserProvider>
-    </ApiProvider>
+    <MessagesProvider>
+      <ApiProvider fetchInitialUser={fetchInitialUser}>
+        <TestUserProvider userRole="administrator">
+          <RouterProvider router={router} />
+        </TestUserProvider>
+      </ApiProvider>
+    </MessagesProvider>
   );
 };
 
@@ -396,6 +399,7 @@ describe("Election create pages", () => {
       expect(
         await screen.findByRole("heading", { level: 2, name: "Type stemopneming in Heemdamseburg" }),
       ).toBeVisible();
+      expect(router.state.location.pathname).toEqual("/elections/create/counting-method-type");
     });
 
     test("Shows warning when uploading a polling stations file with not matching election id", async () => {

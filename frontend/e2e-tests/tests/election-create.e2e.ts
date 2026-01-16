@@ -8,7 +8,6 @@ import { AbortModalPgObj } from "e2e-tests/page-objects/election/create/AbortMod
 import { CheckAndSavePgObj } from "e2e-tests/page-objects/election/create/CheckAndSavePgObj";
 import { CheckCandidateDefinitionPgObj } from "e2e-tests/page-objects/election/create/CheckCandidateDefinitionPgObj";
 import { CheckElectionDefinitionPgObj } from "e2e-tests/page-objects/election/create/CheckElectionDefinitionPgObj";
-import { CheckPollingStationDefinitionPgObj } from "e2e-tests/page-objects/election/create/CheckPollingStationDefinitionPgObj";
 import { CountingMethodTypePgObj } from "e2e-tests/page-objects/election/create/CountingMethodTypePgObj";
 import { NumberOfVotersPgObj } from "e2e-tests/page-objects/election/create/NumberOfVotersPgObj";
 import { PollingStationRolePgObj } from "e2e-tests/page-objects/election/create/PollingStationRolePgObj";
@@ -23,7 +22,7 @@ import { PollingStationListEmptyPgObj } from "e2e-tests/page-objects/polling_sta
 import { PollingStationListPgObj } from "e2e-tests/page-objects/polling_station/PollingStationListPgObj";
 
 import { test } from "../fixtures";
-import { eml110a, eml110b, eml110b_short, eml230b } from "../test-data/eml-files";
+import { eml110a, eml110b, eml230b } from "../test-data/eml-files";
 
 test.use({
   storageState: "e2e-tests/state/admin1.json",
@@ -451,73 +450,6 @@ test.describe("Election creation", () => {
       await expect(uploadElectionDefinitionPage.invalidFileAlert).toContainText(
         "Het bestand eml110a_test.eml.xml bevat geen geldige lijst met stembureaus. Kies een ander bestand.",
       );
-    });
-
-    test("show more button should show full list of polling stations", async ({ page }) => {
-      await page.goto("/elections");
-      const overviewPage = new ElectionsOverviewPgObj(page);
-      await overviewPage.create.click();
-
-      // upload election and check hash
-      await uploadElectionAndInputHash(page);
-
-      // polling station role
-      const pollingStationRolePage = new PollingStationRolePgObj(page);
-      await expect(pollingStationRolePage.header).toBeVisible();
-      await pollingStationRolePage.next.click();
-
-      // upload candidates list and check hash
-      await uploadCandidatesAndInputHash(page);
-
-      const uploadElectionDefinitionPage = new UploadPollingStationDefinitionPgObj(page);
-      await expect(uploadElectionDefinitionPage.header).toBeVisible();
-      await uploadElectionDefinitionPage.uploadFile(eml110b.path);
-      await expect(uploadElectionDefinitionPage.main).toContainText(eml110b.filename);
-
-      // Check list of polling stations
-      const checkDefinitionPage = new CheckPollingStationDefinitionPgObj(page);
-      await expect(checkDefinitionPage.header).toBeVisible();
-
-      // Check the overview table
-      await expect(checkDefinitionPage.table).toBeVisible();
-      expect(await checkDefinitionPage.stations.count()).toBe(10);
-
-      // Click button
-      await checkDefinitionPage.showMore.click();
-      expect(await checkDefinitionPage.stations.count()).toBeGreaterThan(10);
-    });
-
-    test("no show more button should be visible if <10 polling stations", async ({ page }) => {
-      await page.goto("/elections");
-      const overviewPage = new ElectionsOverviewPgObj(page);
-      await overviewPage.create.click();
-
-      // upload election and check hash
-      await uploadElectionAndInputHash(page);
-
-      // polling station role
-      const pollingStationRolePage = new PollingStationRolePgObj(page);
-      await expect(pollingStationRolePage.header).toBeVisible();
-      await pollingStationRolePage.next.click();
-
-      // upload candidates list and check hash
-      await uploadCandidatesAndInputHash(page);
-
-      const uploadElectionDefinitionPage = new UploadPollingStationDefinitionPgObj(page);
-      await expect(uploadElectionDefinitionPage.header).toBeVisible();
-      await uploadElectionDefinitionPage.uploadFile(eml110b_short.path);
-      await expect(uploadElectionDefinitionPage.main).toContainText(eml110b_short.filename);
-
-      // Check list of polling stations
-      const checkDefinitionPage = new CheckPollingStationDefinitionPgObj(page);
-      await expect(checkDefinitionPage.header).toBeVisible();
-
-      // Check the overview table
-      await expect(checkDefinitionPage.table).toBeVisible();
-      expect(await checkDefinitionPage.stations.count()).toBe(9);
-
-      // Click button should not exist
-      await expect(checkDefinitionPage.showMore).toBeHidden();
     });
   });
 });

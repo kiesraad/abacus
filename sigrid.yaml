@@ -57,15 +57,21 @@ components:
   - name: "(Backend) bin/gen-openapi"
     include:
       - ".*/backend/src/bin/gen-test-election.rs"
-  - name: "(Backend) error"
+  - name: "(Backend) App error"
+    include:
+      - ".*/backend/src/app_error.rs"
+  - name: "(Backend) Error"
     include:
       - ".*/backend/src/error.rs"
-  - name: "(Backend) fixtures"
+  - name: "(Backend) Fixtures"
     include:
       - ".*/backend/src/fixtures.rs"
-  - name: "(Backend) lib"
+  - name: "(Backend) Lib"
     include:
       - ".*/backend/src/lib.rs"
+  - name: "(Backend) Router"
+    include:
+      - ".*/backend/src/router.rs"
   - name: "(Backend) Integration tests"
     include:
       - ".*/backend/tests/.*"

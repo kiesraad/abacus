@@ -127,6 +127,9 @@ components:
   - name: "(Frontend) Modules/data_entry"
     include:
       - ".*/frontend/src/features/data_entry/.*"
+  - name: "(Frontend) Modules/data_entry_detail"
+    include:
+      - ".*/frontend/src/features/data_entry_detail/.*"
   - name: "(Frontend) Modules/data_entry_home"
     include:
       - ".*/frontend/src/features/data_entry_home/.*"
@@ -240,6 +243,7 @@ languages:
 
 exclude:
   - ".*/backend/[.]sqlx/.*"
+  - ".*/documentatie/.*"
   - ".*/frontend/scripts/.*"
   - ".*[.]d[.]ts"
   - ".*[.]config[.]ts"

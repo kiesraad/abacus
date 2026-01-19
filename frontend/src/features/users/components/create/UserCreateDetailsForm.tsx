@@ -57,9 +57,9 @@ export function UserCreateDetailsForm({ role, showFullname, onSubmitted }: UserC
         setValidationErrors({ username: t("users.username_unique") });
       } else if (
         result instanceof ApiError &&
-        (result.reference === "NewPasswordSameAsOldPassword" ||
-          result.reference === "PasswordSameAsUsername" ||
-          result.reference === "PasswordTooShort")
+        (result.reference === "PasswordRejectionSameAsOld" ||
+          result.reference === "PasswordRejectionSameAsUsername" ||
+          result.reference === "PasswordRejectionTooShort")
       ) {
         setValidationErrors({ temp_password: t(`error.api_error.${result.reference}`) });
       } else {

@@ -155,7 +155,7 @@ describe("AccountSetupForm", () => {
       overrideOnce("put", "/api/account" satisfies ACCOUNT_UPDATE_REQUEST_PATH, 400, {
         error: "Invalid password",
         fatal: false,
-        reference: "NewPasswordSameAsOldPassword",
+        reference: "PasswordRejectionSameAsOld",
       });
 
       await user.type(screen.getByRole("textbox", { name: "Jouw naam (roepnaam + achternaam)" }), "First Last");
@@ -188,7 +188,7 @@ describe("AccountSetupForm", () => {
       overrideOnce("put", "/api/account" satisfies ACCOUNT_UPDATE_REQUEST_PATH, 400, {
         error: "Invalid password",
         fatal: false,
-        reference: "PasswordTooShort",
+        reference: "PasswordRejectionTooShort",
       });
 
       await user.type(screen.getByRole("textbox", { name: "Jouw naam (roepnaam + achternaam)" }), "First Last");
@@ -224,7 +224,7 @@ describe("AccountSetupForm", () => {
       overrideOnce("put", "/api/account" satisfies ACCOUNT_UPDATE_REQUEST_PATH, 400, {
         error: "Invalid password",
         fatal: false,
-        reference: "PasswordSameAsUsername",
+        reference: "PasswordRejectionSameAsUsername",
       });
 
       await user.type(screen.getByRole("textbox", { name: "Jouw naam (roepnaam + achternaam)" }), "First Last");

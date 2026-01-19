@@ -110,7 +110,7 @@ describe("UserUpdateForm", () => {
       overrideOnce("put", "/api/users/1" satisfies USER_UPDATE_REQUEST_PATH, 400, {
         error: "Invalid password",
         fatal: false,
-        reference: "NewPasswordSameAsOldPassword",
+        reference: "PasswordRejectionSameAsOld",
       });
 
       expect(screen.queryByLabelText("Nieuw wachtwoord")).not.toBeInTheDocument();
@@ -142,7 +142,7 @@ describe("UserUpdateForm", () => {
       overrideOnce("put", "/api/users/1" satisfies USER_UPDATE_REQUEST_PATH, 400, {
         error: "Invalid password",
         fatal: false,
-        reference: "PasswordTooShort",
+        reference: "PasswordRejectionTooShort",
       });
 
       expect(screen.queryByLabelText("Nieuw wachtwoord")).not.toBeInTheDocument();
@@ -174,7 +174,7 @@ describe("UserUpdateForm", () => {
       overrideOnce("put", "/api/users/1" satisfies USER_UPDATE_REQUEST_PATH, 400, {
         error: "Invalid password",
         fatal: false,
-        reference: "PasswordSameAsUsername",
+        reference: "PasswordRejectionSameAsUsername",
       });
 
       expect(screen.queryByLabelText("Nieuw wachtwoord")).not.toBeInTheDocument();

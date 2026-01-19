@@ -163,7 +163,7 @@ describe("UserCreateDetailsForm", () => {
       overrideOnce("post", "/api/users" satisfies USER_CREATE_REQUEST_PATH, 400, {
         error: "Invalid password",
         fatal: false,
-        reference: "PasswordSameAsUsername",
+        reference: "PasswordRejectionSameAsUsername",
       });
 
       await user.type(screen.getByRole("textbox", { name: "Gebruikersnaam" }), "Invoerder0123");
@@ -191,7 +191,7 @@ describe("UserCreateDetailsForm", () => {
       overrideOnce("post", "/api/users" satisfies USER_CREATE_REQUEST_PATH, 400, {
         error: "Invalid password",
         fatal: false,
-        reference: "PasswordTooShort",
+        reference: "PasswordRejectionTooShort",
       });
 
       await user.type(screen.getByRole("textbox", { name: "Gebruikersnaam" }), "Invoerder0123");

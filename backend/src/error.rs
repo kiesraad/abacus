@@ -50,11 +50,11 @@ pub enum ErrorReference {
     InvalidXml,
     InvestigationHasDataEntryOrResult,
     InvestigationRequiresCorrectedResults,
-    NewPasswordSameAsOldPassword,
     NotInitialised,
     OwnAccountCannotBeDeleted,
-    PasswordSameAsUsername,
-    PasswordTooShort,
+    PasswordRejectionSameAsOld,
+    PasswordRejectionSameAsUsername,
+    PasswordRejectionTooShort,
     PdfGenerationError,
     PollingStationRepeated,
     PollingStationValidationErrors,
@@ -304,25 +304,29 @@ impl IntoResponse for APIError {
                         StatusCode::FORBIDDEN,
                         to_error("Forbidden", ErrorReference::Forbidden, true),
                     ),
-                    AuthenticationError::NewPasswordSameAsOldPassword => (
+                    AuthenticationError::PasswordRejectionSameAsOld => (
                         StatusCode::BAD_REQUEST,
                         to_error(
                             "Invalid password",
-                            ErrorReference::NewPasswordSameAsOldPassword,
+                            ErrorReference::PasswordRejectionSameAsOld,
                             false,
                         ),
                     ),
-                    AuthenticationError::PasswordSameAsUsername => (
+                    AuthenticationError::PasswordRejectionSameAsUsername => (
                         StatusCode::BAD_REQUEST,
                         to_error(
                             "Invalid password",
-                            ErrorReference::PasswordSameAsUsername,
+                            ErrorReference::PasswordRejectionSameAsUsername,
                             false,
                         ),
                     ),
-                    AuthenticationError::PasswordTooShort => (
+                    AuthenticationError::PasswordRejectionTooShort => (
                         StatusCode::BAD_REQUEST,
-                        to_error("Invalid password", ErrorReference::PasswordTooShort, false),
+                        to_error(
+                            "Invalid password",
+                            ErrorReference::PasswordRejectionTooShort,
+                            false,
+                        ),
                     ),
                     AuthenticationError::OwnAccountCannotBeDeleted => (
                         StatusCode::FORBIDDEN,

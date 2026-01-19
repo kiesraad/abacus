@@ -51,9 +51,9 @@ export function CreateFirstAdminForm({ next }: CreateFirstAdminFormProps) {
         next();
       } else if (
         result instanceof ApiError &&
-        (result.reference === "NewPasswordSameAsOldPassword" ||
-          result.reference === "PasswordSameAsUsername" ||
-          result.reference === "PasswordTooShort")
+        (result.reference === "PasswordRejectionSameAsOld" ||
+          result.reference === "PasswordRejectionSameAsUsername" ||
+          result.reference === "PasswordRejectionTooShort")
       ) {
         setValidationErrors({ password: t(`error.api_error.${result.reference}`) });
       } else if (result instanceof ApiError) {

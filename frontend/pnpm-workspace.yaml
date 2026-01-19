@@ -1,7 +1,6 @@
 onlyBuiltDependencies:
   - '@swc/core'
   - esbuild
-  - lefthook
   - msw
   - unrs-resolver
 blockExoticSubdeps: true

@@ -53,7 +53,7 @@ describe("DataEntryHomePage", () => {
     ).toBeVisible();
   });
 
-  test("Alert not visible when not finished", async () => {
+  test("Alert not visible when uncompleted", async () => {
     renderDataEntryHomePage();
 
     // Wait for the page to be loaded
@@ -68,7 +68,7 @@ describe("DataEntryHomePage", () => {
     expect(screen.queryByText("Alle stembureaus zijn ingevoerd")).not.toBeInTheDocument();
   });
 
-  test("Alert visible when finished", async () => {
+  test("Alert visible when completed", async () => {
     overrideOnce("get", "/api/elections/1/status", 200, {
       statuses: [
         { polling_station_id: 1, status: "definitive" },
@@ -81,7 +81,7 @@ describe("DataEntryHomePage", () => {
     expect(await screen.findByText("Alle stembureaus zijn ingevoerd")).toBeVisible();
   });
 
-  test("Resume input visible when some are unfinished", async () => {
+  test("Resume input visible when some are uncompleted", async () => {
     overrideOnce("get", "/api/elections/1/status", 200, {
       statuses: [
         { polling_station_id: 1, status: "first_entry_in_progress", first_entry_user_id: getTypistUser().user_id },

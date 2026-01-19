@@ -104,7 +104,7 @@ describe("InvestigationReasonPage", () => {
     expect(pushMessage).toHaveBeenCalledWith({ title: "Onderzoek voor stembureau 35 (Testschool) toegevoegd" });
   });
 
-  test("Navigate to the next page when submitting a reason when data entry finished", async () => {
+  test("Navigate to the next page when submitting a reason when data entry completed", async () => {
     server.use(PollingStationInvestigationCreateHandler);
     const create = spyOnHandler(PollingStationInvestigationCreateHandler);
     overrideOnce("get", "/api/elections/1", 200, getElectionMockData({}, { number: 2, status: "completed" }, []));
@@ -160,7 +160,7 @@ describe("InvestigationReasonPage", () => {
     });
   });
 
-  test("Navigates on save with a warning message when data entry finished", async () => {
+  test("Navigates on save with a warning message when data entry completed", async () => {
     overrideOnce("get", "/api/elections/1", 200, getElectionMockData({}, { number: 2, status: "completed" }));
     server.use(PollingStationInvestigationUpdateHandler);
     const update = spyOnHandler(PollingStationInvestigationUpdateHandler);
@@ -234,7 +234,7 @@ describe("InvestigationReasonPage", () => {
     });
   });
 
-  test("Returns to list page with a warning message when clicking delete investigation when data entry finished", async () => {
+  test("Returns to list page with a warning message when clicking delete investigation when data entry completed", async () => {
     overrideOnce("get", "/api/elections/1", 200, getElectionMockData({}, { number: 2, status: "completed" }));
     server.use(PollingStationInvestigationDeleteHandler);
     const user = userEvent.setup();

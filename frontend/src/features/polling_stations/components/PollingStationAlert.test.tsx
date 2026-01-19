@@ -26,7 +26,7 @@ describe("PollingStationAlert", () => {
     server.use(ElectionRequestHandler);
   });
 
-  test("Renders warning when data entry is finished", async () => {
+  test("Renders warning when data entry is completed", async () => {
     const electionData = getElectionMockData({}, { id: 1, number: 1, status: "completed" }, []);
     overrideOnce("get", "/api/elections/1", 200, electionData);
     await renderPage();
@@ -35,7 +35,7 @@ describe("PollingStationAlert", () => {
     expect(within(alert).getByRole("strong")).toHaveTextContent("Invoerfase al afgerond");
   });
 
-  test("Does not render warning when data entry is not finished", async () => {
+  test("Does not render warning when data entry is not completed", async () => {
     await renderPage();
 
     expect(screen.queryByRole("alert")).not.toBeInTheDocument();

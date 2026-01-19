@@ -353,7 +353,7 @@ describe("Test PollingStationChoiceForm", () => {
       );
     });
 
-    test("All data entries of polling stations are finished, polling station list shows message", async () => {
+    test("All data entries of polling stations are completed, polling station list shows message", async () => {
       overrideOnce("get", "/api/elections/1", 200, electionDetailsMockResponse);
 
       server.use(
@@ -587,7 +587,7 @@ describe("Test PollingStationChoiceForm", () => {
     });
   });
 
-  test("Show unfinished data entries for current user", async () => {
+  test("Show uncompleted data entries for current user", async () => {
     server.use(ElectionRequestHandler);
     const testPollingStation = pollingStationMockData[0]!;
     // Have the server return an in progress polling station that is owned by a logged-in user.

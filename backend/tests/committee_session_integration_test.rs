@@ -411,7 +411,7 @@ async fn test_committee_session_status_change_works(pool: SqlitePool) {
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
-async fn test_committee_session_status_change_finished_to_in_progress_deletes_files(
+async fn test_committee_session_status_change_finished_to_data_entry_deletes_files(
     pool: SqlitePool,
 ) {
     let addr = serve_api(pool).await;

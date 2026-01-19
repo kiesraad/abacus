@@ -72,7 +72,7 @@ describe("AddInvestigationLayout", () => {
     expect(await screen.findByRole("button", { name: "Opslaan" })).toBeVisible();
   });
 
-  test("Renders warning when data entry is finished", async () => {
+  test("Renders warning when data entry is completed", async () => {
     const electionData = getElectionMockData({}, { number: 2, status: "completed" }, []);
     overrideOnce("get", "/api/elections/1", 200, electionData);
 
@@ -82,7 +82,7 @@ describe("AddInvestigationLayout", () => {
     expect(within(alert).getByRole("strong")).toHaveTextContent("Invoerfase al afgerond");
   });
 
-  test("Does not render warning when data entry is not finished", async () => {
+  test("Does not render warning when data entry is not completed", async () => {
     const electionData = getElectionMockData({}, { number: 2, status: "data_entry" }, []);
     overrideOnce("get", "/api/elections/1", 200, electionData);
 

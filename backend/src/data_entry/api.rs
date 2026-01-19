@@ -1292,7 +1292,7 @@ mod tests {
     }
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
-    async fn test_claim_data_entry_committee_session_status_is_data_entry_paused(pool: SqlitePool) {
+    async fn test_claim_data_entry_committee_session_status_is_paused(pool: SqlitePool) {
         change_status_committee_session(
             pool.clone(),
             CommitteeSessionId::from(2),
@@ -1312,7 +1312,7 @@ mod tests {
     }
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
-    async fn test_claim_data_entry_committee_session_status_not_paused_or_in_progress(
+    async fn test_claim_data_entry_committee_session_status_not_paused_or_data_entry(
         pool: SqlitePool,
     ) {
         change_status_committee_session(
@@ -1450,7 +1450,7 @@ mod tests {
     }
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
-    async fn test_create_data_entry_committee_session_status_not_paused_or_in_progress(
+    async fn test_create_data_entry_committee_session_status_not_paused_or_data_entry(
         pool: SqlitePool,
     ) {
         let request_body = example_data_entry();
@@ -1617,7 +1617,7 @@ mod tests {
     }
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
-    async fn test_finalise_data_entry_committee_session_status_not_paused_or_in_progress(
+    async fn test_finalise_data_entry_committee_session_status_not_paused_or_data_entry(
         pool: SqlitePool,
     ) {
         let request_body = example_data_entry();
@@ -1922,7 +1922,7 @@ mod tests {
     }
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
-    async fn test_polling_station_data_entry_delete_committee_session_status_not_paused_or_in_progress(
+    async fn test_polling_station_data_entry_delete_committee_session_status_not_paused_or_data_entry(
         pool: SqlitePool,
     ) {
         // create data entry

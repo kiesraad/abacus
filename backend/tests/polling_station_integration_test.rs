@@ -143,7 +143,7 @@ async fn test_listing(pool: SqlitePool) {
     path = "../fixtures",
     scripts("election_6_no_polling_stations", "users")
 )))]
-async fn test_creation_for_committee_session_with_created_and_not_started_status_as_coordinator_works(
+async fn test_creation_for_committee_session_with_created_and_in_preparation_status_as_coordinator_works(
     pool: SqlitePool,
 ) {
     let addr = serve_api(pool).await;
@@ -184,7 +184,7 @@ async fn test_creation_for_committee_session_with_created_and_not_started_status
     path = "../fixtures",
     scripts("election_6_no_polling_stations", "users")
 )))]
-async fn test_creation_for_committee_session_with_created_and_not_started_status_as_administrator_works(
+async fn test_creation_for_committee_session_with_created_and_in_preparation_status_as_administrator_works(
     pool: SqlitePool,
 ) {
     let addr = serve_api(pool).await;
@@ -220,7 +220,7 @@ async fn test_creation_for_committee_session_with_created_and_not_started_status
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_4", "users"))))]
-async fn test_creation_for_committee_session_with_in_progress_status_as_coordinator_works(
+async fn test_creation_for_committee_session_with_data_entry_status_as_coordinator_works(
     pool: SqlitePool,
 ) {
     let addr = serve_api(pool).await;
@@ -245,7 +245,7 @@ async fn test_creation_for_committee_session_with_in_progress_status_as_coordina
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_4", "users"))))]
-async fn test_creation_for_committee_session_with_in_progress_status_as_administrator_fails(
+async fn test_creation_for_committee_session_with_data_entry_status_as_administrator_fails(
     pool: SqlitePool,
 ) {
     let addr = serve_api(pool).await;
@@ -396,7 +396,7 @@ async fn test_update_for_committee_session_with_created_status_as_administrator_
     path = "../fixtures",
     scripts("election_6_no_polling_stations", "users")
 )))]
-async fn test_update_for_committee_session_with_not_started_status_as_coordinator_works(
+async fn test_update_for_committee_session_with_in_preparation_status_as_coordinator_works(
     pool: SqlitePool,
 ) {
     let addr = serve_api(pool).await;
@@ -458,7 +458,7 @@ async fn test_update_for_committee_session_with_not_started_status_as_coordinato
     path = "../fixtures",
     scripts("election_6_no_polling_stations", "users")
 )))]
-async fn test_update_for_committee_session_with_not_started_status_as_administrator_works(
+async fn test_update_for_committee_session_with_in_preparation_status_as_administrator_works(
     pool: SqlitePool,
 ) {
     let addr = serve_api(pool).await;
@@ -513,7 +513,7 @@ async fn test_update_for_committee_session_with_not_started_status_as_administra
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_4", "users"))))]
-async fn test_update_for_committee_session_with_in_progress_status_as_coordinator_works(
+async fn test_update_for_committee_session_with_data_entry_status_as_coordinator_works(
     pool: SqlitePool,
 ) {
     let addr = serve_api(pool).await;
@@ -561,7 +561,7 @@ async fn test_update_for_committee_session_with_in_progress_status_as_coordinato
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_4", "users"))))]
-async fn test_update_for_committee_session_with_in_progress_status_as_administrator_fails(
+async fn test_update_for_committee_session_with_data_entry_status_as_administrator_fails(
     pool: SqlitePool,
 ) {
     let addr = serve_api(pool).await;
@@ -733,7 +733,7 @@ async fn test_delete_for_committee_session_with_created_status_as_administrator_
     path = "../fixtures",
     scripts("election_6_no_polling_stations", "users")
 )))]
-async fn test_delete_for_committee_session_with_not_started_status_as_coordinator_works(
+async fn test_delete_for_committee_session_with_in_preparation_status_as_coordinator_works(
     pool: SqlitePool,
 ) {
     let addr = serve_api(pool).await;
@@ -766,7 +766,7 @@ async fn test_delete_for_committee_session_with_not_started_status_as_coordinato
     path = "../fixtures",
     scripts("election_6_no_polling_stations", "users")
 )))]
-async fn test_delete_for_committee_session_with_not_started_status_as_administrator_works(
+async fn test_delete_for_committee_session_with_in_preparation_status_as_administrator_works(
     pool: SqlitePool,
 ) {
     let addr = serve_api(pool).await;
@@ -794,7 +794,7 @@ async fn test_delete_for_committee_session_with_not_started_status_as_administra
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
-async fn test_delete_for_committee_session_with_in_progress_status_as_coordinator_works(
+async fn test_delete_for_committee_session_with_data_entry_status_as_coordinator_works(
     pool: SqlitePool,
 ) {
     let addr = serve_api(pool).await;
@@ -838,7 +838,7 @@ async fn test_delete_for_committee_session_with_in_progress_status_as_coordinato
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
-async fn test_delete_for_committee_session_with_in_progress_status_as_administrator_fails(
+async fn test_delete_for_committee_session_with_data_entry_status_as_administrator_fails(
     pool: SqlitePool,
 ) {
     let addr = serve_api(pool).await;
@@ -1124,7 +1124,7 @@ async fn test_import_correct_file(pool: SqlitePool) {
     assert_eq!(committee_session["status"], "in_preparation");
 }
 
-async fn check_finished_to_in_progress_on<F, Fut>(
+async fn check_finished_to_data_entry_on<F, Fut>(
     addr: &SocketAddr,
     action: F,
     expected_status: StatusCode,
@@ -1153,9 +1153,9 @@ async fn check_finished_to_in_progress_on<F, Fut>(
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
-async fn test_finished_to_in_progress_on_create(pool: SqlitePool) {
+async fn test_finished_to_data_entry_on_create(pool: SqlitePool) {
     let addr = serve_api(pool).await;
-    check_finished_to_in_progress_on(
+    check_finished_to_data_entry_on(
         &addr,
         || async { create_polling_station(&addr, &coordinator_login(&addr).await, 2, 35).await },
         StatusCode::CREATED,
@@ -1164,10 +1164,10 @@ async fn test_finished_to_in_progress_on_create(pool: SqlitePool) {
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
-async fn test_finished_to_in_progress_on_update(pool: SqlitePool) {
+async fn test_finished_to_data_entry_on_update(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 
-    check_finished_to_in_progress_on(
+    check_finished_to_data_entry_on(
         &addr,
         || async {
             update_polling_station(
@@ -1192,11 +1192,11 @@ async fn test_finished_to_in_progress_on_update(pool: SqlitePool) {
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
-async fn test_finished_to_in_progress_on_delete(pool: SqlitePool) {
+async fn test_finished_to_data_entry_on_delete(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let election_id = 2;
 
-    check_finished_to_in_progress_on(
+    check_finished_to_data_entry_on(
         &addr,
         || async {
             delete_polling_station(&addr, &coordinator_login(&addr).await, election_id, 2).await

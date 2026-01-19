@@ -91,7 +91,7 @@ describe("PollingStationUpdatePage", () => {
     });
   });
 
-  test("Navigates back on save with a warning message when data entry finished", async () => {
+  test("Navigates back on save with a warning message when data entry completed", async () => {
     overrideOnce("get", "/api/elections/1", 200, getElectionMockData({}, { status: "completed" }));
 
     renderPage("coordinator");
@@ -156,7 +156,7 @@ describe("PollingStationUpdatePage", () => {
       expect(navigate).toHaveBeenCalledExactlyOnceWith("/elections/1/polling-stations", { replace: true });
     });
 
-    test("Returns to list page with a warning message when clicking delete polling station when data entry finished", async () => {
+    test("Returns to list page with a warning message when clicking delete polling station when data entry completed", async () => {
       server.use(PollingStationDeleteHandler);
       overrideOnce("get", "/api/elections/1", 200, getElectionMockData({}, { status: "completed" }));
 

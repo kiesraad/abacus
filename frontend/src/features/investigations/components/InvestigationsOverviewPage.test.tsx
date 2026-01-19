@@ -204,7 +204,7 @@ describe("InvestigationsOverviewPage", () => {
     expect(within(alert).getByRole("link", { name: "verwijder de toegevoegde stembureaus" })).toBeVisible();
   });
 
-  test("Shows finish data entry message when all investigations are handled and session status != finished", async () => {
+  test("Shows finish data entry message when all investigations are handled and session status != completed", async () => {
     const electionData = getElectionMockData({}, { number: 2, status: "data_entry" }, [
       {
         polling_station_id: 1,
@@ -225,7 +225,7 @@ describe("InvestigationsOverviewPage", () => {
     expect(within(alert).getByRole("button", { name: "Invoerfase afronden" })).toBeVisible();
   });
 
-  test("Doesn't show finish data entry message when all investigations are handled and session status = finished", async () => {
+  test("Doesn't show finish data entry message when all investigations are handled and session status = completed", async () => {
     server.use(CommitteeSessionStatusChangeRequestHandler);
     const electionData = getElectionMockData({}, { number: 2, status: "completed" }, [
       {

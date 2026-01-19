@@ -60,7 +60,7 @@ describe("PollingStationCreatePage", () => {
     });
   });
 
-  test("Navigates back on save with a warning message when data entry finished", async () => {
+  test("Navigates back on save with a warning message when data entry completed", async () => {
     overrideOnce("get", "/api/elections/1", 200, getElectionMockData({}, { status: "completed" }));
     const user = userEvent.setup();
 

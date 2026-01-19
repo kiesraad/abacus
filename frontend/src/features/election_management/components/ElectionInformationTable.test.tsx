@@ -89,7 +89,7 @@ describe("ElectionInformationTable", () => {
     });
   });
 
-  test("renders a table with the election information for first committee session status not_started for coordinator", async () => {
+  test("renders a table with the election information for first committee session status in_preparation for coordinator", async () => {
     renderTable("coordinator", 1234, 1, "in_preparation");
 
     const election_information_table = await screen.findByTestId("election-information-table");
@@ -112,7 +112,7 @@ describe("ElectionInformationTable", () => {
     });
   });
 
-  test("renders a table with the election information for first committee session status in_progress for coordinator", async () => {
+  test("renders a table with the election information for first committee session status data_entry for coordinator", async () => {
     renderTable("coordinator", 1234, 1, "data_entry");
 
     const election_information_table = await screen.findByTestId("election-information-table");

@@ -114,7 +114,7 @@ pub async fn delete_investigation_for_polling_station(
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
     params(
-        ("polling_station_id" = u32, description = "Polling station database id"),
+        ("polling_station_id" = PollingStationId, description = "Polling station database id"),
     ),
     security(("cookie_auth" = ["coordinator"])),
 )]
@@ -181,7 +181,7 @@ async fn polling_station_investigation_create(
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
     params(
-        ("polling_station_id" = u32, description = "Polling station database id"),
+        ("polling_station_id" = PollingStationId, description = "Polling station database id"),
     ),
     security(("cookie_auth" = ["coordinator"])),
 )]
@@ -285,7 +285,7 @@ async fn update_investigation(
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
     params(
-        ("polling_station_id" = u32, description = "Polling station database id"),
+        ("polling_station_id" = PollingStationId, description = "Polling station database id"),
     ),
     security(("cookie_auth" = ["coordinator"])),
 )]
@@ -361,7 +361,7 @@ async fn polling_station_investigation_update(
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
     params(
-        ("polling_station_id" = u32, description = "Polling station database id"),
+        ("polling_station_id" = PollingStationId, description = "Polling station database id"),
     ),
     security(("cookie_auth" = ["coordinator"])),
 )]
@@ -435,7 +435,7 @@ async fn polling_station_investigation_delete(
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
     params(
-        ("polling_station_id" = u32, description = "Polling station database id"),
+        ("polling_station_id" = PollingStationId, description = "Polling station database id"),
     ),
     security(("cookie_auth" = ["coordinator"])),
 )]

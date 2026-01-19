@@ -267,34 +267,37 @@ export type POLLING_STATION_DATA_ENTRY_FINALISE_REQUEST_PATH =
 
 // /api/polling_stations/{polling_station_id}/investigation
 export interface POLLING_STATION_INVESTIGATION_UPDATE_REQUEST_PARAMS {
-  polling_station_id: number;
+  polling_station_id: PollingStationId;
 }
-export type POLLING_STATION_INVESTIGATION_UPDATE_REQUEST_PATH = `/api/polling_stations/${number}/investigation`;
+export type POLLING_STATION_INVESTIGATION_UPDATE_REQUEST_PATH =
+  `/api/polling_stations/${PollingStationId}/investigation`;
 export type POLLING_STATION_INVESTIGATION_UPDATE_REQUEST_BODY = PollingStationInvestigationUpdateRequest;
 export interface POLLING_STATION_INVESTIGATION_CREATE_REQUEST_PARAMS {
-  polling_station_id: number;
+  polling_station_id: PollingStationId;
 }
-export type POLLING_STATION_INVESTIGATION_CREATE_REQUEST_PATH = `/api/polling_stations/${number}/investigation`;
+export type POLLING_STATION_INVESTIGATION_CREATE_REQUEST_PATH =
+  `/api/polling_stations/${PollingStationId}/investigation`;
 export type POLLING_STATION_INVESTIGATION_CREATE_REQUEST_BODY = PollingStationInvestigationCreateRequest;
 export interface POLLING_STATION_INVESTIGATION_DELETE_REQUEST_PARAMS {
-  polling_station_id: number;
+  polling_station_id: PollingStationId;
 }
-export type POLLING_STATION_INVESTIGATION_DELETE_REQUEST_PATH = `/api/polling_stations/${number}/investigation`;
+export type POLLING_STATION_INVESTIGATION_DELETE_REQUEST_PATH =
+  `/api/polling_stations/${PollingStationId}/investigation`;
 
 // /api/polling_stations/{polling_station_id}/investigation/conclude
 export interface POLLING_STATION_INVESTIGATION_CONCLUDE_REQUEST_PARAMS {
-  polling_station_id: number;
+  polling_station_id: PollingStationId;
 }
 export type POLLING_STATION_INVESTIGATION_CONCLUDE_REQUEST_PATH =
-  `/api/polling_stations/${number}/investigation/conclude`;
+  `/api/polling_stations/${PollingStationId}/investigation/conclude`;
 export type POLLING_STATION_INVESTIGATION_CONCLUDE_REQUEST_BODY = PollingStationInvestigationConcludeRequest;
 
 // /api/polling_stations/{polling_station_id}/investigation/download_corrigendum_pdf
 export interface POLLING_STATION_INVESTIGATION_DOWNLOAD_CORRIGENDUM_PDF_REQUEST_PARAMS {
-  polling_station_id: number;
+  polling_station_id: PollingStationId;
 }
 export type POLLING_STATION_INVESTIGATION_DOWNLOAD_CORRIGENDUM_PDF_REQUEST_PATH =
-  `/api/polling_stations/${number}/investigation/download_corrigendum_pdf`;
+  `/api/polling_stations/${PollingStationId}/investigation/download_corrigendum_pdf`;
 
 // /api/users
 export type USER_LIST_REQUEST_PARAMS = Record<string, never>;

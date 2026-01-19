@@ -3363,9 +3363,7 @@
             "description": "Polling station database id",
             "required": true,
             "schema": {
-              "type": "integer",
-              "format": "int32",
-              "minimum": 0
+              "$ref": "#/components/schemas/PollingStationId"
             }
           }
         ],
@@ -3459,9 +3457,7 @@
             "description": "Polling station database id",
             "required": true,
             "schema": {
-              "type": "integer",
-              "format": "int32",
-              "minimum": 0
+              "$ref": "#/components/schemas/PollingStationId"
             }
           }
         ],
@@ -3555,9 +3551,7 @@
             "description": "Polling station database id",
             "required": true,
             "schema": {
-              "type": "integer",
-              "format": "int32",
-              "minimum": 0
+              "$ref": "#/components/schemas/PollingStationId"
             }
           }
         ],
@@ -3626,9 +3620,7 @@
             "description": "Polling station database id",
             "required": true,
             "schema": {
-              "type": "integer",
-              "format": "int32",
-              "minimum": 0
+              "$ref": "#/components/schemas/PollingStationId"
             }
           }
         ],
@@ -3724,9 +3716,7 @@
             "description": "Polling station database id",
             "required": true,
             "schema": {
-              "type": "integer",
-              "format": "int32",
-              "minimum": 0
+              "$ref": "#/components/schemas/PollingStationId"
             }
           }
         ],

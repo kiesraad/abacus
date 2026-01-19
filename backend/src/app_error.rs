@@ -9,7 +9,7 @@ pub enum AppError {
     // server specific
     PortAlreadyInUse(u16),
     PermissionDeniedToBindPort(u16),
-    // sqlite specifc
+    // sqlite specific
     DatabaseBusy(String),
     DatabaseReadOnly(String),
     DatabaseDiskFull(String),

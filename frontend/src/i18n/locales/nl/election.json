@@ -47,7 +47,9 @@
     "description": "Het bestand <file>filename</file> bevat geen geldige lijst met stembureaus. Kies een ander bestand.",
     "title": "Ongeldig stembureaubestand"
   },
-
+  "message": {
+    "election_created": "Verkiezing {role} {name} toegevoegd"
+  },
   "polling_station_definition_does_not_match_election": {
     "title": "Afwijkende verkiezing",
     "description": "Het bestand <file>filename</file> bevat stembureaus voor een andere verkiezing. Controleer voor je verder gaat of de stembureaus juist zijn."

@@ -180,9 +180,9 @@ mod tests {
     use super::*;
     use crate::{
         AppState,
-        airgap::AirgapDetection,
         api::audit_log::{audit_log_list, audit_log_list_users},
         authentication::{User, inject_user},
+        infra::airgap::AirgapDetection,
         service::audit_log::{AuditEvent, AuditLogUser, AuditService, UserLoggedInDetails},
     };
 

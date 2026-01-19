@@ -1,8 +1,8 @@
 use std::{future::Future, net::SocketAddr, str::FromStr};
 
-use airgap::AirgapDetection;
 use api::router;
 use axum::{extract::FromRef, serve::ListenerExt};
+use infra::airgap::AirgapDetection;
 use sqlx::{
     Sqlite, SqliteConnection, SqlitePool,
     sqlite::{SqliteConnectOptions, SqliteJournalMode},
@@ -10,7 +10,6 @@ use sqlx::{
 use tokio::{net::TcpListener, signal};
 use tracing::{info, trace, warn};
 
-pub mod airgap;
 pub mod api;
 pub mod app_error;
 pub mod authentication;

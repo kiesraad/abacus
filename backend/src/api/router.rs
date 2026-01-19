@@ -1,4 +1,3 @@
-use airgap::AirgapDetection;
 use axum::{
     Router, extract::DefaultBodyLimit, http::StatusCode, middleware, response::IntoResponse,
     routing::any,
@@ -22,9 +21,12 @@ use utoipa_axum::router::OpenApiRouter;
 use utoipa_swagger_ui::SwaggerUi;
 
 #[cfg(feature = "dev-database")]
+use crate::infra::airgap;
+use crate::infra::airgap::AirgapDetection;
+#[cfg(feature = "dev-database")]
 use crate::service::audit_log;
 #[cfg(feature = "dev-database")]
-use crate::{AppError, AppState, MAX_BODY_SIZE_MB, airgap, api, authentication, error};
+use crate::{AppError, AppState, MAX_BODY_SIZE_MB, api, authentication, error};
 
 pub fn get_scopes_from_operation(operation: &Operation) -> Option<Vec<String>> {
     let security_reqs = operation.security.as_ref()?;

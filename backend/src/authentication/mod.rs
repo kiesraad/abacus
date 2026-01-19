@@ -71,7 +71,6 @@ mod tests {
 
     use crate::{
         AppState, ErrorResponse,
-        airgap::AirgapDetection,
         authentication::{
             api::{AccountUpdateRequest, Credentials},
             middleware::extend_session,
@@ -79,6 +78,7 @@ mod tests {
             *,
         },
         error::ErrorReference,
+        infra::airgap::AirgapDetection,
         service::audit_log::{AuditEvent, LogFilter, UserLoginFailedDetails},
     };
 

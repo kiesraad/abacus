@@ -208,7 +208,7 @@ mod tests {
     use tower::ServiceExt;
 
     use super::*;
-    use crate::airgap::block_request_on_airgap_violation;
+    use crate::infra::airgap::block_request_on_airgap_violation;
 
     #[tokio::test]
     async fn test_block_request_on_airgap_violation() {

@@ -63,10 +63,10 @@ components:
   - name: "(Backend) Error"
     include:
       - ".*/backend/src/error.rs"
-  - name: "(Backend) Fixtures"
+  - name: "(Backend) fixtures"
     include:
       - ".*/backend/src/fixtures.rs"
-  - name: "(Backend) Lib"
+  - name: "(Backend) lib"
     include:
       - ".*/backend/src/lib.rs"
   - name: "(Backend) Router"
@@ -127,7 +127,7 @@ components:
   - name: "(Frontend) Modules/data_entry"
     include:
       - ".*/frontend/src/features/data_entry/.*"
-  - name: "(Frontend) Modules/data_entry_detail"
+  - name: "(Frontend) features/data_entry_detail"
     include:
       - ".*/frontend/src/features/data_entry_detail/.*"
   - name: "(Frontend) Modules/data_entry_home"

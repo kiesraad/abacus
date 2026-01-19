@@ -157,13 +157,26 @@ describe("UserCreateDetailsForm", () => {
       expect(onSubmitted).not.toHaveBeenCalled();
     });
 
-    test("Password is the same as username error", async () => {
+    test.each([
+      {
+        error: "PasswordRejectionSameAsOld",
+        expectedErrorMessage: "Het nieuwe wachtwoord mag niet gelijk zijn aan het oude wachtwoord.",
+      },
+      {
+        error: "PasswordRejectionSameAsUsername",
+        expectedErrorMessage: "Het wachtwoord mag niet gelijk zijn aan de gebruikersnaam.",
+      },
+      {
+        error: "PasswordRejectionTooShort",
+        expectedErrorMessage: "Het wachtwoord moet minimaal 13 karakters lang zijn.",
+      },
+    ])("shows expected error message for $error", async ({ error, expectedErrorMessage }) => {
       const { onSubmitted } = renderForm("typist", false);
       const user = userEvent.setup();
       overrideOnce("post", "/api/users" satisfies USER_CREATE_REQUEST_PATH, 400, {
         error: "Invalid password",
         fatal: false,
-        reference: "PasswordRejectionSameAsUsername",
+        reference: error,
       });
 
       await user.type(screen.getByRole("textbox", { name: "Gebruikersnaam" }), "Invoerder0123");
@@ -176,37 +189,9 @@ describe("UserCreateDetailsForm", () => {
 
       expect(passwordInput).toBeInvalid();
       expect(passwordInput).toHaveAccessibleErrorMessage(
-        "Het opgegeven wachtwoord voldoet niet aan de eisen. Het wachtwoord mag niet gelijk zijn aan de gebruikersnaam.",
+        `Het opgegeven wachtwoord voldoet niet aan de eisen. ${expectedErrorMessage}`,
       );
 
-      await user.click(saveButton);
-
-      expect(passwordInput).toBeValid();
-      expect(onSubmitted).toHaveBeenCalledExactlyOnceWith(userMockData[0]);
-    });
-
-    test("Password is too short error", async () => {
-      const { onSubmitted } = renderForm("typist", false);
-      const user = userEvent.setup();
-      overrideOnce("post", "/api/users" satisfies USER_CREATE_REQUEST_PATH, 400, {
-        error: "Invalid password",
-        fatal: false,
-        reference: "PasswordRejectionTooShort",
-      });
-
-      await user.type(screen.getByRole("textbox", { name: "Gebruikersnaam" }), "Invoerder0123");
-      const passwordInput = await screen.findByLabelText("Tijdelijk wachtwoord");
-      await user.type(passwordInput, "Vol");
-
-      const saveButton = screen.getByRole("button", { name: "Opslaan" });
-      await user.click(saveButton);
-
-      expect(passwordInput).toBeInvalid();
-      expect(passwordInput).toHaveAccessibleErrorMessage(
-        "Het opgegeven wachtwoord voldoet niet aan de eisen. Het wachtwoord moet minimaal 13 karakters lang zijn.",
-      );
-
-      await user.type(passwordInput, "doendeKarakters01");
       await user.click(saveButton);
 
       expect(passwordInput).toBeValid();

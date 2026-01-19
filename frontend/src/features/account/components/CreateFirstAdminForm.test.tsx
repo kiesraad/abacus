@@ -127,59 +127,41 @@ describe("CreateFirstAdminForm", () => {
       );
     });
 
-    test("Password is the same as username error", async () => {
+    test.each([
+      {
+        error: "PasswordRejectionSameAsOld",
+        expectedErrorMessage: "Het nieuwe wachtwoord mag niet gelijk zijn aan het oude wachtwoord.",
+      },
+      {
+        error: "PasswordRejectionSameAsUsername",
+        expectedErrorMessage: "Het wachtwoord mag niet gelijk zijn aan de gebruikersnaam.",
+      },
+      {
+        error: "PasswordRejectionTooShort",
+        expectedErrorMessage: "Het wachtwoord moet minimaal 13 karakters lang zijn.",
+      },
+    ])("shows expected error message for $error", async ({ error, expectedErrorMessage }) => {
       render(<CreateFirstAdminForm next={next} />);
       const user = userEvent.setup();
       overrideOnce("post", "/api/initialise/first-admin" satisfies CREATE_FIRST_ADMIN_REQUEST_PATH, 400, {
         error: "Invalid password",
         fatal: false,
-        reference: "PasswordRejectionSameAsUsername",
+        reference: error,
       });
 
       await user.type(screen.getByRole("textbox", { name: "Jouw naam (roepnaam + achternaam)" }), "First Last");
       await user.type(screen.getByRole("textbox", { name: "Kies een gebruikersnaam" }), "Administrator");
-      const passwordInput = screen.getByLabelText("Kies een wachtwoord");
-      await user.type(passwordInput, "Administrator0");
-      await user.type(screen.getByLabelText("Herhaal wachtwoord"), "Administrator0");
+      const password = screen.getByLabelText("Kies een wachtwoord");
+      await user.type(password, "password*password");
+      await user.type(screen.getByLabelText("Herhaal wachtwoord"), "password*password");
 
-      const saveButton = screen.getByRole("button", { name: "Opslaan" });
-      await user.click(saveButton);
+      const submitButton = screen.getByRole("button", { name: "Opslaan" });
+      await user.click(submitButton);
 
-      expect(passwordInput).toBeInvalid();
-      expect(passwordInput).toHaveAccessibleErrorMessage(
-        "Het opgegeven wachtwoord voldoet niet aan de eisen. Het wachtwoord mag niet gelijk zijn aan de gebruikersnaam.",
+      expect(password).toBeInvalid();
+      expect(password).toHaveAccessibleErrorMessage(
+        `Het opgegeven wachtwoord voldoet niet aan de eisen. ${expectedErrorMessage}`,
       );
-    });
-
-    test("Password is too short error", async () => {
-      render(<CreateFirstAdminForm next={next} />);
-      const user = userEvent.setup();
-      overrideOnce("post", "/api/initialise/first-admin" satisfies CREATE_FIRST_ADMIN_REQUEST_PATH, 400, {
-        error: "Invalid password",
-        fatal: false,
-        reference: "PasswordRejectionTooShort",
-      });
-
-      await user.type(screen.getByRole("textbox", { name: "Jouw naam (roepnaam + achternaam)" }), "First Last");
-      await user.type(screen.getByRole("textbox", { name: "Kies een gebruikersnaam" }), "Administrator");
-      const passwordInput = screen.getByLabelText("Kies een wachtwoord");
-      await user.type(passwordInput, "Vol");
-      const passwordRepeat = screen.getByLabelText("Herhaal wachtwoord");
-      await user.type(passwordRepeat, "Vol");
-
-      const saveButton = screen.getByRole("button", { name: "Opslaan" });
-      await user.click(saveButton);
-
-      expect(passwordInput).toBeInvalid();
-      expect(passwordInput).toHaveAccessibleErrorMessage(
-        "Het opgegeven wachtwoord voldoet niet aan de eisen. Het wachtwoord moet minimaal 13 karakters lang zijn.",
-      );
-
-      await user.type(passwordInput, "doendeKarakters01");
-      await user.type(passwordRepeat, "doendeKarakters01");
-      await user.click(saveButton);
-
-      expect(passwordInput).toBeValid();
     });
   });
 });

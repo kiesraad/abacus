@@ -104,13 +104,26 @@ describe("UserUpdateForm", () => {
   });
 
   describe("API error handling", () => {
-    test("New password is the same as old password error", async () => {
+    test.each([
+      {
+        error: "PasswordRejectionSameAsOld",
+        expectedErrorMessage: "Het nieuwe wachtwoord mag niet gelijk zijn aan het oude wachtwoord.",
+      },
+      {
+        error: "PasswordRejectionSameAsUsername",
+        expectedErrorMessage: "Het wachtwoord mag niet gelijk zijn aan de gebruikersnaam.",
+      },
+      {
+        error: "PasswordRejectionTooShort",
+        expectedErrorMessage: "Het wachtwoord moet minimaal 13 karakters lang zijn.",
+      },
+    ])("shows expected error message for $error", async ({ error, expectedErrorMessage }) => {
       const { onSaved } = await renderForm();
       const user = userEvent.setup();
       overrideOnce("put", "/api/users/1" satisfies USER_UPDATE_REQUEST_PATH, 400, {
         error: "Invalid password",
         fatal: false,
-        reference: "PasswordRejectionSameAsOld",
+        reference: error,
       });
 
       expect(screen.queryByLabelText("Nieuw wachtwoord")).not.toBeInTheDocument();
@@ -125,7 +138,7 @@ describe("UserUpdateForm", () => {
 
       expect(passwordInput).toBeInvalid();
       expect(passwordInput).toHaveAccessibleErrorMessage(
-        "Het opgegeven wachtwoord voldoet niet aan de eisen. Het nieuwe wachtwoord mag niet gelijk zijn aan het oude wachtwoord.",
+        `Het opgegeven wachtwoord voldoet niet aan de eisen. ${expectedErrorMessage}`,
       );
 
       await user.type(passwordInput, "4");
@@ -133,70 +146,6 @@ describe("UserUpdateForm", () => {
 
       expect(passwordInput).toBeValid();
       expect(updateUser).toHaveBeenCalledWith({ temp_password: "Wachtwoord01234" });
-      expect(onSaved).toHaveBeenCalledExactlyOnceWith(userMockData[0]);
-    });
-
-    test("Password is too short error", async () => {
-      const { onSaved } = await renderForm();
-      const user = userEvent.setup();
-      overrideOnce("put", "/api/users/1" satisfies USER_UPDATE_REQUEST_PATH, 400, {
-        error: "Invalid password",
-        fatal: false,
-        reference: "PasswordRejectionTooShort",
-      });
-
-      expect(screen.queryByLabelText("Nieuw wachtwoord")).not.toBeInTheDocument();
-      await user.click(screen.getByRole("button", { name: "Wijzig wachtwoord" }));
-
-      const passwordInput = await screen.findByLabelText("Nieuw wachtwoord");
-      expect(passwordInput).toBeInTheDocument();
-      await user.type(passwordInput, "Vol");
-
-      const save = screen.getByRole("button", { name: "Wijzigingen opslaan" });
-      await user.click(save);
-
-      expect(passwordInput).toBeInvalid();
-      expect(passwordInput).toHaveAccessibleErrorMessage(
-        "Het opgegeven wachtwoord voldoet niet aan de eisen. Het wachtwoord moet minimaal 13 karakters lang zijn.",
-      );
-
-      await user.type(passwordInput, "doendeKarakters01");
-      await user.click(save);
-
-      expect(passwordInput).toBeValid();
-      expect(updateUser).toHaveBeenCalledWith({ temp_password: "VoldoendeKarakters01" });
-      expect(onSaved).toHaveBeenCalledExactlyOnceWith(userMockData[0]);
-    });
-
-    test("Password is the same as username error", async () => {
-      const { onSaved } = await renderForm();
-      const user = userEvent.setup();
-      overrideOnce("put", "/api/users/1" satisfies USER_UPDATE_REQUEST_PATH, 400, {
-        error: "Invalid password",
-        fatal: false,
-        reference: "PasswordRejectionSameAsUsername",
-      });
-
-      expect(screen.queryByLabelText("Nieuw wachtwoord")).not.toBeInTheDocument();
-      await user.click(screen.getByRole("button", { name: "Wijzig wachtwoord" }));
-
-      const passwordInput = await screen.findByLabelText("Nieuw wachtwoord");
-      expect(passwordInput).toBeInTheDocument();
-      await user.type(passwordInput, "Gebruiker0123");
-
-      const save = screen.getByRole("button", { name: "Wijzigingen opslaan" });
-      await user.click(save);
-
-      expect(passwordInput).toBeInvalid();
-      expect(passwordInput).toHaveAccessibleErrorMessage(
-        "Het opgegeven wachtwoord voldoet niet aan de eisen. Het wachtwoord mag niet gelijk zijn aan de gebruikersnaam.",
-      );
-
-      await user.type(passwordInput, "4");
-      await user.click(save);
-
-      expect(passwordInput).toBeValid();
-      expect(updateUser).toHaveBeenCalledWith({ temp_password: "Gebruiker01234" });
       expect(onSaved).toHaveBeenCalledExactlyOnceWith(userMockData[0]);
     });
   });

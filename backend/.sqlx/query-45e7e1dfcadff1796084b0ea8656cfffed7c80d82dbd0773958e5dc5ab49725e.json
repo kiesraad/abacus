@@ -1,10 +1,10 @@
 {
   "db_name": "SQLite",
-  "query": "\n        SELECT\n            p.id AS \"id: u32\",\n            c.election_id AS \"election_id: ElectionId\",\n            p.committee_session_id AS \"committee_session_id: CommitteeSessionId\",\n            p.id_prev_session AS \"id_prev_session: _\",\n            p.name,\n            p.number AS \"number: u32\",\n            p.number_of_voters AS \"number_of_voters: _\",\n            p.polling_station_type AS \"polling_station_type: _\",\n            p.address,\n            p.postal_code,\n            p.locality\n        FROM polling_stations AS p\n        JOIN committee_sessions AS c ON c.id = p.committee_session_id\n        WHERE p.id = $1 AND c.id = $2\n        ",
+  "query": "\n        SELECT\n            p.id AS \"id: PollingStationId\",\n            c.election_id AS \"election_id: ElectionId\",\n            p.committee_session_id AS \"committee_session_id: CommitteeSessionId\",\n            p.id_prev_session AS \"id_prev_session: _\",\n            p.name,\n            p.number AS \"number: u32\",\n            p.number_of_voters AS \"number_of_voters: _\",\n            p.polling_station_type AS \"polling_station_type: _\",\n            p.address,\n            p.postal_code,\n            p.locality\n        FROM polling_stations AS p\n        JOIN committee_sessions AS c ON c.id = p.committee_session_id\n        WHERE p.id = $1 AND c.id = $2\n        ",
   "describe": {
     "columns": [
       {
-        "name": "id: u32",
+        "name": "id: PollingStationId",
         "ordinal": 0,
         "type_info": "Integer"
       },
@@ -76,5 +76,5 @@
       false
     ]
   },
-  "hash": "72b792729b994d7dd09dad80445e520fec77369d84fce9e702a185f07e586c4e"
+  "hash": "45e7e1dfcadff1796084b0ea8656cfffed7c80d82dbd0773958e5dc5ab49725e"
 }

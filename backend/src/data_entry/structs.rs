@@ -12,13 +12,14 @@ use crate::{
     committee_session::CommitteeSessionId,
     election::{CandidateNumber, PGNumber, PoliticalGroup},
     error::ErrorReference,
+    polling_station::PollingStationId,
 };
 pub use yes_no::YesNo;
 
 #[derive(Serialize, Deserialize, Clone, ToSchema, Debug, FromRow, Default)]
 #[serde(deny_unknown_fields)]
 pub struct PollingStationDataEntry {
-    pub polling_station_id: u32,
+    pub polling_station_id: PollingStationId,
     pub committee_session_id: CommitteeSessionId,
     #[schema(value_type = DataEntryStatus)]
     pub state: Json<DataEntryStatus>,
@@ -45,7 +46,7 @@ impl From<PollingStationDataEntry> for DataEntryDetails {
 #[derive(Serialize, Deserialize, Clone, ToSchema, Debug, FromRow)]
 #[serde(deny_unknown_fields)]
 pub struct PollingStationResult {
-    pub polling_station_id: u32,
+    pub polling_station_id: PollingStationId,
     pub committee_session_id: CommitteeSessionId,
     #[schema(value_type = PollingStationResults)]
     pub data: Json<PollingStationResults>,

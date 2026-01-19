@@ -29,7 +29,7 @@ use crate::{
             VotesTablesWithPreviousVotes,
         },
     },
-    polling_station::{PollingStation, PollingStationType},
+    polling_station::{PollingStation, PollingStationId, PollingStationType},
     report::DEFAULT_DATE_TIME_FORMAT,
     summary::{ElectionSummary, PollingStationInvestigations, SumCount, SummaryDifferencesCounts},
 };
@@ -172,7 +172,7 @@ fn random_polling_station(
     string_length: usize,
     none_where_possible: bool,
 ) -> PollingStation {
-    let id_prev_session = rng.random_range(0..5);
+    let id_prev_session = PollingStationId::from(rng.random_range(0..5));
     let number_of_voters = rng.random_range(0..=1000);
     let polling_station_type = random_value(
         rng,
@@ -184,7 +184,7 @@ fn random_polling_station(
     );
 
     PollingStation {
-        id: rng.random_range(0..5),
+        id: PollingStationId::from(rng.random_range(0..5)),
         election_id: election.id,
         committee_session_id: CommitteeSessionId::from(rng.random_range(0..5)),
         id_prev_session: random_option(rng, id_prev_session, none_where_possible),

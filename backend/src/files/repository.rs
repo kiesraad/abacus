@@ -1,9 +1,7 @@
 use chrono::{DateTime, Utc};
 use sqlx::{SqliteConnection, query_as};
 
-use crate::files::FileId;
-
-use super::File;
+use super::{File, FileId};
 
 /// Get a single file
 pub async fn get(conn: &mut SqliteConnection, id: FileId) -> Result<File, sqlx::Error> {

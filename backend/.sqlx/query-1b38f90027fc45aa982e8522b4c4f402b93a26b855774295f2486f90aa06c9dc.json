@@ -1,10 +1,10 @@
 {
   "db_name": "SQLite",
-  "query": "\n            INSERT INTO polling_stations (\n                committee_session_id,\n                id_prev_session,\n                name,\n                number,\n                number_of_voters,\n                polling_station_type,\n                address,\n                postal_code,\n                locality\n            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)\n            RETURNING\n                id AS \"id: u32\",\n                ? AS \"election_id!: ElectionId\", -- Workaround to get election_id in the result without a temporary struct\n                committee_session_id AS \"committee_session_id: CommitteeSessionId\",\n                id_prev_session AS \"id_prev_session: _\",\n                name,\n                number AS \"number: u32\",\n                number_of_voters AS \"number_of_voters: _\",\n                polling_station_type AS \"polling_station_type: _\",\n                address,\n                postal_code,\n                locality\n            ",
+  "query": "\n            INSERT INTO polling_stations (\n                committee_session_id,\n                id_prev_session,\n                name,\n                number,\n                number_of_voters,\n                polling_station_type,\n                address,\n                postal_code,\n                locality\n            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)\n            RETURNING\n                id AS \"id: PollingStationId\",\n                ? AS \"election_id!: ElectionId\", -- Workaround to get election_id in the result without a temporary struct\n                committee_session_id AS \"committee_session_id: CommitteeSessionId\",\n                id_prev_session AS \"id_prev_session: _\",\n                name,\n                number AS \"number: u32\",\n                number_of_voters AS \"number_of_voters: _\",\n                polling_station_type AS \"polling_station_type: _\",\n                address,\n                postal_code,\n                locality\n            ",
   "describe": {
     "columns": [
       {
-        "name": "id: u32",
+        "name": "id: PollingStationId",
         "ordinal": 0,
         "type_info": "Integer"
       },
@@ -76,5 +76,5 @@
       false
     ]
   },
-  "hash": "3a4cf01ac4a55ad941b74b32f18f432b1b82300ddbf463496b9cd6737bd255f5"
+  "hash": "1b38f90027fc45aa982e8522b4c4f402b93a26b855774295f2486f90aa06c9dc"
 }

@@ -253,7 +253,7 @@ pub async fn update(
             start_date_time = ?
         WHERE id = ?
         RETURNING
-            id as "id: u32",
+            id as "id: CommitteeSessionId",
             number as "number: u32",
             election_id as "election_id: ElectionId",
             status as "status: _",

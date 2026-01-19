@@ -85,7 +85,7 @@ pub async fn change_number_of_voters(
         SET number_of_voters = ?
         WHERE id = ?
         RETURNING
-            id as "id: u32",
+            id as "id: ElectionId",
             name,
             counting_method as "counting_method: _", 
             election_id,

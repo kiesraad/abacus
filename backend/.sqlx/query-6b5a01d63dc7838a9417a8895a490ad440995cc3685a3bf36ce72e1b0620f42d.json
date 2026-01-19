@@ -1,10 +1,10 @@
 {
   "db_name": "SQLite",
-  "query": "\n        UPDATE elections\n        SET number_of_voters = ?\n        WHERE id = ?\n        RETURNING\n            id as \"id: u32\",\n            name,\n            counting_method as \"counting_method: _\", \n            election_id,\n            location,\n            domain_id,\n            category as \"category: _\",\n            number_of_seats as \"number_of_seats: u32\",\n            number_of_voters as \"number_of_voters: u32\",\n            election_date as \"election_date: _\",\n            nomination_date as \"nomination_date: _\"\n        ",
+  "query": "\n        UPDATE elections\n        SET number_of_voters = ?\n        WHERE id = ?\n        RETURNING\n            id as \"id: ElectionId\",\n            name,\n            counting_method as \"counting_method: _\", \n            election_id,\n            location,\n            domain_id,\n            category as \"category: _\",\n            number_of_seats as \"number_of_seats: u32\",\n            number_of_voters as \"number_of_voters: u32\",\n            election_date as \"election_date: _\",\n            nomination_date as \"nomination_date: _\"\n        ",
   "describe": {
     "columns": [
       {
-        "name": "id: u32",
+        "name": "id: ElectionId",
         "ordinal": 0,
         "type_info": "Integer"
       },
@@ -76,5 +76,5 @@
       false
     ]
   },
-  "hash": "da8f4aef994777242db385df064595a27b44df8a984187e7b805f5308e432288"
+  "hash": "6b5a01d63dc7838a9417a8895a490ad440995cc3685a3bf36ce72e1b0620f42d"
 }

@@ -4,7 +4,7 @@ use abacus::{
     committee_session::CommitteeSessionId,
     data_entry::{status::*, *},
     election::{ElectionCategory, ElectionId, ElectionWithPoliticalGroups, VoteCountingMethod},
-    polling_station::{PollingStation, PollingStationType},
+    polling_station::{PollingStationId, PollingStation, PollingStationType},
 };
 
 use chrono::NaiveDate;
@@ -82,7 +82,7 @@ fn get_cde(user_id: u32, correct_entry: bool) -> CurrentDataEntry {
 
 fn polling_station() -> PollingStation {
     PollingStation {
-        id: 1,
+        id: PollingStationId::from(1),
         election_id: ElectionId::from(1),
         committee_session_id: CommitteeSessionId::from(1),
         id_prev_session: None,

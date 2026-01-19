@@ -976,7 +976,7 @@ mod tests {
 
         /// DataEntry --> Completed
         #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_5_with_results"))))]
-        async fn data_entry_to_completed_next_session_not_finished(pool: SqlitePool) {
+        async fn data_entry_to_completed_next_session_not_completed(pool: SqlitePool) {
             let mut conn = pool.acquire().await.unwrap();
             let committee_session = get(&mut conn, CommitteeSessionId::from(6)).await.unwrap();
             create_polling_station_investigation(
@@ -998,7 +998,7 @@ mod tests {
 
         /// DataEntry --> Completed
         #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_5_with_results"))))]
-        async fn data_entry_to_completed_next_session_not_finished_no_results(pool: SqlitePool) {
+        async fn data_entry_to_completed_next_session_not_completed_no_results(pool: SqlitePool) {
             let mut conn = pool.acquire().await.unwrap();
             let committee_session = get(&mut conn, CommitteeSessionId::from(6)).await.unwrap();
             create_polling_station_investigation(
@@ -1030,7 +1030,7 @@ mod tests {
 
         /// DataEntry --> Completed
         #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_5_with_results"))))]
-        async fn data_entry_to_completed_next_session_finished(pool: SqlitePool) {
+        async fn data_entry_to_completed_next_session_completed(pool: SqlitePool) {
             let mut conn = pool.acquire().await.unwrap();
             let committee_session = get(&mut conn, CommitteeSessionId::from(6)).await.unwrap();
             create_polling_station_investigation(
@@ -1062,7 +1062,7 @@ mod tests {
 
         /// DataEntry --> Completed
         #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_5_with_results"))))]
-        async fn data_entry_to_completed_next_session_finished_with_result(pool: SqlitePool) {
+        async fn data_entry_to_completed_next_session_completed_with_result(pool: SqlitePool) {
             let mut conn = pool.acquire().await.unwrap();
             let committee_session = get(&mut conn, CommitteeSessionId::from(6)).await.unwrap();
             let polling_station_id = 9;

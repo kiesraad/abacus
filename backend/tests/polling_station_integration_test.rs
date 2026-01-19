@@ -1124,7 +1124,7 @@ async fn test_import_correct_file(pool: SqlitePool) {
     assert_eq!(committee_session["status"], "in_preparation");
 }
 
-async fn check_finished_to_data_entry_on<F, Fut>(
+async fn check_completed_to_data_entry_on<F, Fut>(
     addr: &SocketAddr,
     action: F,
     expected_status: StatusCode,
@@ -1153,9 +1153,9 @@ async fn check_finished_to_data_entry_on<F, Fut>(
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
-async fn test_finished_to_data_entry_on_create(pool: SqlitePool) {
+async fn test_completed_to_data_entry_on_create(pool: SqlitePool) {
     let addr = serve_api(pool).await;
-    check_finished_to_data_entry_on(
+    check_completed_to_data_entry_on(
         &addr,
         || async { create_polling_station(&addr, &coordinator_login(&addr).await, 2, 35).await },
         StatusCode::CREATED,
@@ -1164,10 +1164,10 @@ async fn test_finished_to_data_entry_on_create(pool: SqlitePool) {
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
-async fn test_finished_to_data_entry_on_update(pool: SqlitePool) {
+async fn test_completed_to_data_entry_on_update(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 
-    check_finished_to_data_entry_on(
+    check_completed_to_data_entry_on(
         &addr,
         || async {
             update_polling_station(
@@ -1192,11 +1192,11 @@ async fn test_finished_to_data_entry_on_update(pool: SqlitePool) {
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
-async fn test_finished_to_data_entry_on_delete(pool: SqlitePool) {
+async fn test_completed_to_data_entry_on_delete(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let election_id = 2;
 
-    check_finished_to_data_entry_on(
+    check_completed_to_data_entry_on(
         &addr,
         || async {
             delete_polling_station(&addr, &coordinator_login(&addr).await, election_id, 2).await

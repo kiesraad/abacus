@@ -17,6 +17,7 @@ use crate::{
         Candidate, CandidateGender, CandidateNumber, ElectionCategory, ElectionId,
         ElectionWithPoliticalGroups, PGNumber, PoliticalGroup, VoteCountingMethod,
     },
+    files::FileId,
     investigation::PollingStationInvestigation,
     pdf_gen::{
         generate_pdf,
@@ -216,8 +217,8 @@ fn random_committee_session(
     string_length: usize,
     none_where_possible: bool,
 ) -> CommitteeSession {
-    let results_eml = rng.random_range(0..1_000);
-    let results_pdf = rng.random_range(0..1_000);
+    let results_eml = FileId::from(rng.random_range(0..1_000));
+    let results_pdf = FileId::from(rng.random_range(0..1_000));
 
     CommitteeSession {
         id: CommitteeSessionId::from(rng.random_range(0..5)),

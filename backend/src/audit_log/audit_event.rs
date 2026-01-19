@@ -7,7 +7,7 @@ use utoipa::ToSchema;
 use super::AuditEventLevel;
 use crate::{
     ErrorResponse, committee_session::CommitteeSessionId, election::ElectionId,
-    error::ErrorReference, investigation::PollingStationInvestigation,
+    error::ErrorReference, files::FileId, investigation::PollingStationInvestigation,
     polling_station::PollingStationId,
 };
 
@@ -72,19 +72,19 @@ pub struct CommitteeSessionDetails {
     pub session_status: String,
     #[serde(skip_serializing_if = "Option::is_none")]
     #[schema(nullable = false)]
-    pub session_results_eml: Option<u32>,
+    pub session_results_eml: Option<FileId>,
     #[serde(skip_serializing_if = "Option::is_none")]
     #[schema(nullable = false)]
-    pub session_results_pdf: Option<u32>,
+    pub session_results_pdf: Option<FileId>,
     #[serde(skip_serializing_if = "Option::is_none")]
     #[schema(nullable = false)]
-    pub session_overview_pdf: Option<u32>,
+    pub session_overview_pdf: Option<FileId>,
 }
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, Eq, ToSchema)]
 #[serde(deny_unknown_fields)]
 pub struct FileDetails {
-    pub file_id: u32,
+    pub file_id: FileId,
     pub file_name: String,
     pub file_mime_type: String,
     pub file_size_bytes: u64,

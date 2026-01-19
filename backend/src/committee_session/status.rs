@@ -12,7 +12,7 @@ use crate::{
     audit_log::{AuditEvent, AuditService},
     committee_session::CommitteeSessionId,
     data_entry::repository::are_results_complete_for_committee_session,
-    files::delete_file,
+    files::{FileId, delete_file},
     investigation::list_investigations_for_committee_session,
     polling_station,
 };
@@ -56,7 +56,7 @@ async fn delete_committee_session_files(
     audit_service: AuditService,
     committee_session: CommitteeSession,
 ) -> Result<(), APIError> {
-    let file_ids: Vec<u32> = [
+    let file_ids: Vec<FileId> = [
         committee_session.results_eml,
         committee_session.results_pdf,
         committee_session.overview_pdf,
@@ -266,13 +266,13 @@ mod tests {
             APIError,
             audit_log::{AuditService, list_event_names},
             committee_session::CommitteeSessionId,
-            files,
+            files::{self, FileId},
         };
         use chrono::Utc;
         use sqlx::{SqliteConnection, SqlitePool};
         use std::net::Ipv4Addr;
 
-        async fn generate_test_file(conn: &mut SqliteConnection) -> Result<u32, APIError> {
+        async fn generate_test_file(conn: &mut SqliteConnection) -> Result<FileId, APIError> {
             let file = files::repository::create(
                 conn,
                 "filename.txt".into(),

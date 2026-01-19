@@ -578,7 +578,7 @@ async fn election_download_pdf_results(
 mod tests {
     use super::*;
 
-    use crate::audit_log::list_event_names;
+    use crate::{audit_log::list_event_names, files::FileId};
     use test_log::test;
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_5_with_results"))))]
@@ -596,9 +596,9 @@ mod tests {
             let pdf = pdf.expect("should have generated pdf");
 
             assert_eq!(eml.name, "Telling_GR2026_GroteStad.eml.xml");
-            assert_eq!(eml.id, 1);
+            assert_eq!(eml.id, FileId::from(1));
             assert_eq!(pdf.name, "Model_Na31-2.pdf");
-            assert_eq!(pdf.id, 2);
+            assert_eq!(pdf.id, FileId::from(2));
             assert!(overview.is_none());
 
             assert_eq!(
@@ -625,11 +625,11 @@ mod tests {
             let overview = overview.expect("should have generated overview");
 
             assert_eq!(eml.name, "Telling_GR2026_GroteStad.eml.xml");
-            assert_eq!(eml.id, 1);
+            assert_eq!(eml.id, FileId::from(1));
             assert_eq!(pdf.name, "Model_Na14-2.pdf");
-            assert_eq!(pdf.id, 2);
+            assert_eq!(pdf.id, FileId::from(2));
             assert_eq!(overview.name, "Leeg_Model_P2a.pdf");
-            assert_eq!(overview.id, 3);
+            assert_eq!(overview.id, FileId::from(3));
 
             assert_eq!(
                 list_event_names(&mut conn).await.unwrap(),
@@ -662,7 +662,7 @@ mod tests {
             let overview = overview.expect("should have generated overview");
 
             assert_eq!(overview.name, "Leeg_Model_P2a.pdf");
-            assert_eq!(overview.id, 1);
+            assert_eq!(overview.id, FileId::from(1));
 
             assert_eq!(list_event_names(&mut conn).await.unwrap(), ["FileCreated"]);
         }

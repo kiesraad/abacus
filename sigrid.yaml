@@ -60,7 +60,7 @@ components:
   - name: "(Backend) App error"
     include:
       - ".*/backend/src/app_error.rs"
-  - name: "(Backend) Error"
+  - name: "(Backend) error"
     include:
       - ".*/backend/src/error.rs"
   - name: "(Backend) fixtures"

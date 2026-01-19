@@ -1,10 +1,10 @@
 {
   "db_name": "SQLite",
-  "query": "SELECT\n            audit_log.id as \"id: u32\",\n            time as \"time: _\",\n            json(event) as \"event!: Json<AuditEvent>\",\n            event_level as \"event_level: _\",\n            message,\n            ip as \"ip: String\",\n            user_id as \"user_id: u32\",\n            username,\n            user_fullname,\n            user_role as \"user_role: Role\"\n        FROM audit_log\n        ORDER BY time DESC\n        ",
+  "query": "SELECT\n            audit_log.id as \"id: AuditLogEventId\",\n            time as \"time: _\",\n            json(event) as \"event!: Json<AuditEvent>\",\n            event_level as \"event_level: _\",\n            message,\n            ip as \"ip: String\",\n            user_id as \"user_id: u32\",\n            audit_log.username,\n            user_fullname,\n            user_role as \"user_role: Role\"\n        FROM audit_log\n        WHERE (json_array_length($1) = 0 OR event_level IN (SELECT value FROM json_each($1)))\n            AND (json_array_length($2) = 0 OR event ->> 'eventType' IN (SELECT value FROM json_each($2)))\n            AND (json_array_length($3) = 0 OR user_id IN (SELECT value FROM json_each($3)))\n            AND ($4 IS NULL OR unixepoch(time) >= $4)\n        ORDER BY\n            CASE WHEN $4 IS NULL THEN time ELSE 1 END DESC,\n            CASE WHEN $4 IS NULL THEN 1 ELSE time END ASC\n        LIMIT $5 OFFSET $6\n        ",
   "describe": {
     "columns": [
       {
-        "name": "id: u32",
+        "name": "id: AuditLogEventId",
         "ordinal": 0,
         "type_info": "Integer"
       },
@@ -55,7 +55,7 @@
       }
     ],
     "parameters": {
-      "Right": 0
+      "Right": 6
     },
     "nullable": [
       false,
@@ -70,5 +70,5 @@
       true
     ]
   },
-  "hash": "b1027ac7f5c49ba5721422715f7a15ec13d0eb69a56ac65c6a165de4ad5e9fca"
+  "hash": "2481c91c3e4fd61efeb17074d588158e98f3e2b7067a1a31c18f29a34cc1e1f6"
 }

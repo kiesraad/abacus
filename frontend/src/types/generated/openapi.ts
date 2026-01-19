@@ -381,7 +381,7 @@ export type AuditEventLevel = (typeof auditEventLevelValues)[number];
 export interface AuditLogEvent {
   event: AuditEvent;
   event_level: AuditEventLevel;
-  id: number;
+  id: AuditLogEventId;
   ip: string;
   message?: string;
   time: string;
@@ -390,6 +390,8 @@ export interface AuditLogEvent {
   user_role?: Role;
   username?: string;
 }
+
+export type AuditLogEventId = number;
 
 export interface AuditLogListResponse {
   events: AuditLogEvent[];

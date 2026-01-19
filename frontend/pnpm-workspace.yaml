@@ -20,3 +20,5 @@ overrides:
   # @codecov/vite-plugin does not have official support for Vite 7, but works:
   # https://github.com/codecov/codecov-javascript-bundler-plugins/issues/264
   "vite": "$vite"
+  # Fix GHSA-g9mf-h72j-4rw9 / CVE-2026-22036
+  "undici@<6.23.0": ">=6.23.0"

@@ -14,6 +14,7 @@
   "password": "Wachtwoord",
   "password_changed": "Je wachtwoord is succesvol gewijzigd",
   "password_hint": "Je hebt dit wachtwoord nodig als je na een pauze opnieuw wilt inloggen. Gebruik minimaal 13 karakters.",
+  "password_length_rule": "Gebruik minimaal 13 karakters",
   "password_login_hint": "Eerder ingelogd? Vul het wachtwoord in dat je zelf hebt ingesteld. Nog niet eerder ingelogd? Gebruik het wachtwoord dat je van de coördinator hebt gekregen.",
   "password_mismatch": "De wachtwoorden komen niet overeen",
   "password_new": "Kies nieuw wachtwoord",

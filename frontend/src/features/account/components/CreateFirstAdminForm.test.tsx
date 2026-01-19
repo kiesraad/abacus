@@ -1,19 +1,21 @@
 import userEvent from "@testing-library/user-event";
-import { describe, expect, test, vi } from "vitest";
+import { beforeEach, describe, expect, test, vi } from "vitest";
 
 import { CreateFirstAdminRequestHandler } from "@/testing/api-mocks/RequestHandlers";
 import { overrideOnce, server } from "@/testing/server";
-import { render, screen, spyOnHandler, waitFor } from "@/testing/test-utils";
-
+import { render, screen, spyOnHandler } from "@/testing/test-utils";
+import type { CREATE_FIRST_ADMIN_REQUEST_PATH } from "@/types/generated/openapi";
 import { CreateFirstAdminForm } from "./CreateFirstAdminForm";
 
 const next = vi.fn();
 
 describe("CreateFirstAdminForm", () => {
-  test("Create the first admin user", async () => {
+  beforeEach(() => {
     server.use(CreateFirstAdminRequestHandler);
-    const createAdmin = spyOnHandler(CreateFirstAdminRequestHandler);
+  });
 
+  test("Create the first admin user", async () => {
+    const createAdmin = spyOnHandler(CreateFirstAdminRequestHandler);
     render(<CreateFirstAdminForm next={next} />);
 
     const user = userEvent.setup();
@@ -34,81 +36,111 @@ describe("CreateFirstAdminForm", () => {
     expect(next).toHaveBeenCalledOnce();
   });
 
-  test("Create the first admin user form errors", async () => {
-    render(<CreateFirstAdminForm next={next} />);
+  describe("Validation", () => {
+    test("Required fields", async () => {
+      const createAdmin = spyOnHandler(CreateFirstAdminRequestHandler);
+      render(<CreateFirstAdminForm next={next} />);
 
-    // error on empty fields
-    const user = userEvent.setup();
-    const submitButton = screen.getByRole("button", { name: "Opslaan" });
-    await user.click(submitButton);
+      const user = userEvent.setup();
+      const submitButton = screen.getByRole("button", { name: "Opslaan" });
+      await user.click(submitButton);
 
-    const fullnameInput = screen.getByRole("textbox", { name: "Jouw naam (roepnaam + achternaam)" });
-    expect(fullnameInput).toBeInvalid();
-    expect(fullnameInput).toHaveAccessibleErrorMessage("Dit veld mag niet leeg zijn");
+      const fullnameInput = screen.getByRole("textbox", { name: "Jouw naam (roepnaam + achternaam)" });
+      expect(fullnameInput).toBeInvalid();
+      expect(fullnameInput).toHaveAccessibleErrorMessage("Dit veld mag niet leeg zijn");
 
-    const usernameInput = screen.getByRole("textbox", { name: "Kies een gebruikersnaam" });
-    expect(usernameInput).toBeInvalid();
-    expect(usernameInput).toHaveAccessibleErrorMessage("Dit veld mag niet leeg zijn");
+      const usernameInput = screen.getByRole("textbox", { name: "Kies een gebruikersnaam" });
+      expect(usernameInput).toBeInvalid();
+      expect(usernameInput).toHaveAccessibleErrorMessage("Dit veld mag niet leeg zijn");
 
-    const passwordInput = screen.getByLabelText("Kies een wachtwoord");
-    expect(passwordInput).toBeInvalid();
-    expect(passwordInput).toHaveAccessibleErrorMessage("Het wachtwoord moet minimaal 13 karakters lang zijn.");
-  });
-
-  test("Create the first admin user form password errors", async () => {
-    // error on invalid password
-    overrideOnce("post", "/api/initialise/first-admin", 400, {
-      error: "Invalid password",
-      fatal: false,
-      reference: "PasswordRejection",
-    });
-
-    render(<CreateFirstAdminForm next={next} />);
-
-    const passwordInput = screen.getByLabelText("Kies een wachtwoord");
-    const passwordRepeatInput = screen.getByLabelText("Herhaal wachtwoord");
-
-    const user = userEvent.setup();
-    await user.type(screen.getByRole("textbox", { name: "Jouw naam (roepnaam + achternaam)" }), "First Last");
-    await user.type(screen.getByRole("textbox", { name: "Kies een gebruikersnaam" }), "firstlast");
-    await user.type(passwordInput, "password");
-    await user.type(passwordRepeatInput, "password");
-    const submitButton = screen.getByRole("button", { name: "Opslaan" });
-    await user.click(submitButton);
-
-    await waitFor(() => {
+      const passwordInput = screen.getByLabelText("Kies een wachtwoord");
       expect(passwordInput).toBeInvalid();
+      expect(passwordInput).toHaveAccessibleErrorMessage("Gebruik minimaal 13 karakters");
+
+      expect(createAdmin).not.toHaveBeenCalled();
+      expect(next).not.toHaveBeenCalled();
     });
 
-    expect(passwordInput).toHaveAccessibleErrorMessage("Het wachtwoord moet minimaal 13 karakters lang zijn.");
+    test("Password mismatch", async () => {
+      const createAdmin = spyOnHandler(CreateFirstAdminRequestHandler);
+      render(<CreateFirstAdminForm next={next} />);
 
-    // error on password repeat mismatch
-    await user.type(passwordInput, "password1");
-    await user.type(passwordRepeatInput, "password2");
-    await user.click(submitButton);
+      const user = userEvent.setup();
+      await user.type(screen.getByRole("textbox", { name: "Jouw naam (roepnaam + achternaam)" }), "First Last");
+      await user.type(screen.getByRole("textbox", { name: "Kies een gebruikersnaam" }), "Invoerder0123");
+      await user.type(screen.getByLabelText("Kies een wachtwoord"), "password*password");
 
-    expect(passwordRepeatInput).toHaveAccessibleErrorMessage("De wachtwoorden komen niet overeen");
+      const passwordRepeat = screen.getByLabelText("Herhaal wachtwoord");
+      await user.type(passwordRepeat, "something_else");
+
+      const submitButton = screen.getByRole("button", { name: "Opslaan" });
+      await user.click(submitButton);
+
+      expect(passwordRepeat).toBeInvalid();
+      expect(passwordRepeat).toHaveAccessibleErrorMessage("De wachtwoorden komen niet overeen");
+
+      expect(createAdmin).not.toHaveBeenCalled();
+      expect(next).not.toHaveBeenCalled();
+    });
   });
 
-  test("Create the first admin user api error", async () => {
-    render(<CreateFirstAdminForm next={next} />);
+  describe("API error handling", () => {
+    test("Create the first admin user api error", async () => {
+      render(<CreateFirstAdminForm next={next} />);
+      const user = userEvent.setup();
+      overrideOnce("post", "/api/initialise/first-admin" satisfies CREATE_FIRST_ADMIN_REQUEST_PATH, 400, {
+        error: "Application already initialised",
+        fatal: false,
+        reference: "AlreadyInitialised",
+      });
 
-    overrideOnce("post", "/api/initialise/first-admin", 400, {
-      error: "Application already initialised",
-      fatal: false,
-      reference: "AlreadyInitialised",
+      await user.type(screen.getByRole("textbox", { name: "Jouw naam (roepnaam + achternaam)" }), "First Last");
+      await user.type(screen.getByRole("textbox", { name: "Kies een gebruikersnaam" }), "firstlast");
+      await user.type(screen.getByLabelText("Kies een wachtwoord"), "password*password");
+      await user.type(screen.getByLabelText("Herhaal wachtwoord"), "password*password");
+      const saveButton = screen.getByRole("button", { name: "Opslaan" });
+      await user.click(saveButton);
+
+      expect(await screen.findByRole("alert")).toHaveTextContent(
+        "De applicatie is al geconfigureerd. Je kan geen nieuwe beheerder aanmaken.",
+      );
     });
 
-    const user = userEvent.setup();
-    await user.type(screen.getByRole("textbox", { name: "Jouw naam (roepnaam + achternaam)" }), "First Last");
-    await user.type(screen.getByRole("textbox", { name: "Kies een gebruikersnaam" }), "firstlast");
-    await user.type(screen.getByLabelText("Kies een wachtwoord"), "password*password");
-    await user.type(screen.getByLabelText("Herhaal wachtwoord"), "password*password");
-    const submitButton = screen.getByRole("button", { name: "Opslaan" });
+    test.each([
+      {
+        error: "PasswordRejectionSameAsOld",
+        expectedErrorMessage: "Het nieuwe wachtwoord mag niet gelijk zijn aan het oude wachtwoord.",
+      },
+      {
+        error: "PasswordRejectionSameAsUsername",
+        expectedErrorMessage: "Het wachtwoord mag niet gelijk zijn aan de gebruikersnaam.",
+      },
+      {
+        error: "PasswordRejectionTooShort",
+        expectedErrorMessage: "Het wachtwoord moet minimaal 13 karakters lang zijn.",
+      },
+    ])("shows expected error message for $error", async ({ error, expectedErrorMessage }) => {
+      render(<CreateFirstAdminForm next={next} />);
+      const user = userEvent.setup();
+      overrideOnce("post", "/api/initialise/first-admin" satisfies CREATE_FIRST_ADMIN_REQUEST_PATH, 400, {
+        error: "Invalid password",
+        fatal: false,
+        reference: error,
+      });
 
-    await user.click(submitButton);
-    expect(await screen.findByRole("alert")).toHaveTextContent(
-      "De applicatie is al geconfigureerd. Je kan geen nieuwe beheerder aanmaken.",
-    );
+      await user.type(screen.getByRole("textbox", { name: "Jouw naam (roepnaam + achternaam)" }), "First Last");
+      await user.type(screen.getByRole("textbox", { name: "Kies een gebruikersnaam" }), "Administrator");
+      const password = screen.getByLabelText("Kies een wachtwoord");
+      await user.type(password, "password*password");
+      await user.type(screen.getByLabelText("Herhaal wachtwoord"), "password*password");
+
+      const submitButton = screen.getByRole("button", { name: "Opslaan" });
+      await user.click(submitButton);
+
+      expect(password).toBeInvalid();
+      expect(password).toHaveAccessibleErrorMessage(
+        `Het opgegeven wachtwoord voldoet niet aan de eisen. ${expectedErrorMessage}`,
+      );
+    });
   });
 });

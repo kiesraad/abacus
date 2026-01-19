@@ -94,26 +94,6 @@ describe("UserCreateDetailsForm", () => {
       expect(createUser).not.toHaveBeenCalled();
       expect(onSubmitted).not.toHaveBeenCalled();
     });
-
-    test("Password equal to username", async () => {
-      const { onSubmitted } = renderForm("coordinator", true);
-      const createUser = spyOnHandler(UserCreateRequestHandler);
-      const user = userEvent.setup();
-
-      await user.type(screen.getByRole("textbox", { name: "Volledige naam" }), "First Last");
-      await user.type(screen.getByRole("textbox", { name: "Gebruikersnaam" }), "Coordinator01");
-      const password = screen.getByLabelText("Tijdelijk wachtwoord");
-      await user.type(password, "Coordinator01");
-
-      const submitButton = screen.getByRole("button", { name: "Opslaan" });
-      await user.click(submitButton);
-
-      expect(password).toBeInvalid();
-      expect(password).toHaveAccessibleErrorMessage("Het wachtwoord mag niet gelijk zijn aan de gebruikersnaam");
-
-      expect(createUser).not.toHaveBeenCalled();
-      expect(onSubmitted).not.toHaveBeenCalled();
-    });
   });
 
   describe("API error handling", () => {

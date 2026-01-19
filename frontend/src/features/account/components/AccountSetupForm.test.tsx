@@ -108,25 +108,6 @@ describe("AccountSetupForm", () => {
       expect(onSaved).not.toHaveBeenCalled();
     });
 
-    test("Password equal to username", async () => {
-      const { onSaved } = await renderForm();
-      const user = userEvent.setup();
-
-      await user.type(screen.getByRole("textbox", { name: "Jouw naam (roepnaam + achternaam)" }), "First Last");
-      const password = screen.getByLabelText("Kies nieuw wachtwoord");
-      await user.type(password, "Invoerder0123");
-      await user.type(screen.getByLabelText("Herhaal wachtwoord"), "Invoerder0123");
-
-      const submitButton = screen.getByRole("button", { name: "Opslaan" });
-      await user.click(submitButton);
-
-      expect(password).toBeInvalid();
-      expect(password).toHaveAccessibleErrorMessage("Het wachtwoord mag niet gelijk zijn aan de gebruikersnaam");
-
-      expect(updateAccount).not.toHaveBeenCalled();
-      expect(onSaved).not.toHaveBeenCalled();
-    });
-
     test("Password mismatch", async () => {
       const { onSaved } = await renderForm();
       const user = userEvent.setup();

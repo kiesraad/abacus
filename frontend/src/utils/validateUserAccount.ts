@@ -20,8 +20,6 @@ export function validateUpdateUser(
 
   if (accountUpdate.password.length === 0) {
     errors.password = t("account.password_length_rule");
-  } else if (accountUpdate.password === accountUpdate.username) {
-    errors.password = t("account.password_username_rule");
   }
 
   if (accountUpdate.password !== passwordRepeat) {
@@ -47,8 +45,6 @@ export function validateCreateUser(
 
   if (accountCreate.temp_password.length === 0) {
     errors.password = t("account.password_length_rule");
-  } else if (accountCreate.temp_password === accountCreate.username) {
-    errors.password = t("account.password_username_rule");
   }
 
   if (passwordRepeat !== undefined && accountCreate.temp_password !== passwordRepeat) {

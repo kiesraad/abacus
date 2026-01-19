@@ -61,27 +61,6 @@ describe("CreateFirstAdminForm", () => {
       expect(next).not.toHaveBeenCalled();
     });
 
-    test("Password equal to username", async () => {
-      const createAdmin = spyOnHandler(CreateFirstAdminRequestHandler);
-      render(<CreateFirstAdminForm next={next} />);
-
-      const user = userEvent.setup();
-      await user.type(screen.getByRole("textbox", { name: "Jouw naam (roepnaam + achternaam)" }), "First Last");
-      await user.type(screen.getByRole("textbox", { name: "Kies een gebruikersnaam" }), "Invoerder0123");
-      const password = screen.getByLabelText("Kies een wachtwoord");
-      await user.type(password, "Invoerder0123");
-      await user.type(screen.getByLabelText("Herhaal wachtwoord"), "Invoerder0123");
-
-      const submitButton = screen.getByRole("button", { name: "Opslaan" });
-      await user.click(submitButton);
-
-      expect(password).toBeInvalid();
-      expect(password).toHaveAccessibleErrorMessage("Het wachtwoord mag niet gelijk zijn aan de gebruikersnaam");
-
-      expect(createAdmin).not.toHaveBeenCalled();
-      expect(next).not.toHaveBeenCalled();
-    });
-
     test("Password mismatch", async () => {
       const createAdmin = spyOnHandler(CreateFirstAdminRequestHandler);
       render(<CreateFirstAdminForm next={next} />);

@@ -9,6 +9,7 @@ import type { SubmitCurrentFormOptions } from "../types/types";
 import { useDataEntryContext } from "./useDataEntryContext";
 import { useFormKeyboardNavigation } from "./useFormKeyboardNavigation";
 
+// biome-ignore lint/complexity/noExcessiveLinesPerFunction: TODO function should be refactored
 export function useDataEntryFormSection() {
   const {
     error,

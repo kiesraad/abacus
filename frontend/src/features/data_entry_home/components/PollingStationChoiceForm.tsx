@@ -34,6 +34,7 @@ export interface PollingStationChoiceFormProps {
   anotherEntry?: boolean;
 }
 
+// biome-ignore lint/complexity/noExcessiveLinesPerFunction: TODO function should be refactored
 export function PollingStationChoiceForm({ anotherEntry }: PollingStationChoiceFormProps) {
   const navigate = useNavigate();
   const user = useUser();

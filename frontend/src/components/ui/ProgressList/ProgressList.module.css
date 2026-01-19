@@ -11,10 +11,6 @@
     margin: 0;
     width: 19.5rem;
 
-    &:global(.fixed) {
-      flex: 0 0 auto;
-    }
-
     &:last-of-type {
       border-bottom: none;
     }

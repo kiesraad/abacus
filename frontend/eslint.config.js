@@ -9,12 +9,14 @@ import storybook from "eslint-plugin-storybook";
 import { readdirSync } from "fs";
 import tseslint from "typescript-eslint";
 
-const restrictFeatureImports = readdirSync("./src/features", { withFileTypes: true })
+const FEATURES_DIR = "./src/features";
+
+const restrictFeatureImports = readdirSync(FEATURES_DIR, { withFileTypes: true })
   .filter((file) => file.isDirectory())
   .map((dir) => dir.name)
   .map((feature) => ({
-    target: `./src/features/${feature}`,
-    from: "./src/features",
+    target: `${FEATURES_DIR}/${feature}`,
+    from: FEATURES_DIR,
     except: [feature],
     message: "Cross-feature imports are not allowed.",
   }));
@@ -22,14 +24,7 @@ const restrictFeatureImports = readdirSync("./src/features", { withFileTypes: tr
 export default defineConfig(
   {
     // global ignores
-    ignores: [
-      "dist/**",
-      "coverage/**",
-      "dist-storybook/**",
-      "playwright-report/**",
-      "eslint.config.js",
-      "mockServiceWorker.js",
-    ],
+    ignores: ["dist/**", "coverage/**", "dist-storybook/**", "playwright-report/**", "mockServiceWorker.js"],
   },
   {
     files: ["**/*.ts{,x}"],
@@ -60,7 +55,7 @@ export default defineConfig(
             // enforce unidirectional codebase:
             // e.g. src/app can import from src/features but not the other way around
             {
-              target: "./src/features",
+              target: FEATURES_DIR,
               from: "./src/app",
               message: "Imports from app are not allowed in features.",
             },
@@ -68,7 +63,7 @@ export default defineConfig(
             // e.g. src/features and src/app can import from these shared modules but not the other way around
             {
               target: ["./src/components", "./src/hooks", "./src/lib", "./src/types", "./src/utils"],
-              from: ["./src/features", "./src/app"],
+              from: [FEATURES_DIR, "./src/app"],
               message: "Imports from features and app are not allowed in shared folders.",
             },
           ],

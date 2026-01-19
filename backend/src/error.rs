@@ -52,7 +52,9 @@ pub enum ErrorReference {
     InvestigationRequiresCorrectedResults,
     NotInitialised,
     OwnAccountCannotBeDeleted,
-    PasswordRejection,
+    PasswordRejectionSameAsOld,
+    PasswordRejectionSameAsUsername,
+    PasswordRejectionTooShort,
     PdfGenerationError,
     PollingStationRepeated,
     PollingStationValidationErrors,
@@ -302,9 +304,29 @@ impl IntoResponse for APIError {
                         StatusCode::FORBIDDEN,
                         to_error("Forbidden", ErrorReference::Forbidden, true),
                     ),
-                    AuthenticationError::PasswordRejection => (
+                    AuthenticationError::PasswordRejectionSameAsOld => (
                         StatusCode::BAD_REQUEST,
-                        to_error("Invalid password", ErrorReference::PasswordRejection, false),
+                        to_error(
+                            "Invalid password",
+                            ErrorReference::PasswordRejectionSameAsOld,
+                            false,
+                        ),
+                    ),
+                    AuthenticationError::PasswordRejectionSameAsUsername => (
+                        StatusCode::BAD_REQUEST,
+                        to_error(
+                            "Invalid password",
+                            ErrorReference::PasswordRejectionSameAsUsername,
+                            false,
+                        ),
+                    ),
+                    AuthenticationError::PasswordRejectionTooShort => (
+                        StatusCode::BAD_REQUEST,
+                        to_error(
+                            "Invalid password",
+                            ErrorReference::PasswordRejectionTooShort,
+                            false,
+                        ),
                     ),
                     AuthenticationError::OwnAccountCannotBeDeleted => (
                         StatusCode::FORBIDDEN,

@@ -10,6 +10,7 @@ import { InputField } from "@/components/ui/InputField/InputField";
 import { t } from "@/i18n/translate";
 import type { CreateUserRequest, Role, USER_CREATE_REQUEST_PATH, User } from "@/types/generated/openapi";
 import { StringFormData } from "@/utils/stringFormData";
+import { type UserValidationErrors, validateCreateUser } from "@/utils/validateUserAccount";
 
 export interface UserCreateDetailsFormProps {
   role: Role;
@@ -19,6 +20,7 @@ export interface UserCreateDetailsFormProps {
 
 type ValidationErrors = Partial<CreateUserRequest>;
 
+// biome-ignore lint/complexity/noExcessiveLinesPerFunction: TODO function should be refactored
 export function UserCreateDetailsForm({ role, showFullname, onSubmitted }: UserCreateDetailsFormProps) {
   const [validationErrors, setValidationErrors] = useState<ValidationErrors | null>(null);
   const createPath: USER_CREATE_REQUEST_PATH = "/api/users";
@@ -53,8 +55,13 @@ export function UserCreateDetailsForm({ role, showFullname, onSubmitted }: UserC
       } else if (result instanceof ApiError && result.reference === "UsernameNotUnique") {
         setUsernameUniqueError(t("users.username_not_unique_error", { username: user.username }));
         setValidationErrors({ username: t("users.username_unique") });
-      } else if (result instanceof ApiError && result.reference === "PasswordRejection") {
-        setValidationErrors({ temp_password: t("error.api_error.PasswordRejection") });
+      } else if (
+        result instanceof ApiError &&
+        (result.reference === "PasswordRejectionSameAsOld" ||
+          result.reference === "PasswordRejectionSameAsUsername" ||
+          result.reference === "PasswordRejectionTooShort")
+      ) {
+        setValidationErrors({ temp_password: t(`error.api_error.${result.reference}`) });
       } else {
         setError(result);
       }
@@ -62,20 +69,10 @@ export function UserCreateDetailsForm({ role, showFullname, onSubmitted }: UserC
   }
 
   function validate(user: CreateUserRequest): boolean {
-    const errors: ValidationErrors = {};
-
-    const required = t("form_errors.FORM_VALIDATION_RESULT_REQUIRED");
-
-    if (user.username.length === 0) {
-      errors.username = required;
-    }
-
-    if (user.fullname !== undefined && user.fullname.length === 0) {
-      errors.fullname = required;
-    }
-
-    if (user.temp_password.length === 0) {
-      errors.temp_password = required;
+    const userValidationErrors: UserValidationErrors = validateCreateUser(user, undefined);
+    const errors: ValidationErrors = { ...userValidationErrors };
+    if (userValidationErrors.password) {
+      errors.temp_password = userValidationErrors.password;
     }
 
     const isValid = Object.keys(errors).length === 0;

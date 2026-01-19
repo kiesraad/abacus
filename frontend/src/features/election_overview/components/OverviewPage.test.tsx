@@ -3,16 +3,25 @@ import { HttpResponse, http } from "msw";
 import * as ReactRouter from "react-router";
 import { within } from "storybook/test";
 import { beforeEach, describe, expect, test, vi } from "vitest";
-
+import { MessagesProvider } from "@/hooks/messages/MessagesProvider";
 import { ElectionListRequestHandler } from "@/testing/api-mocks/RequestHandlers";
 import { server } from "@/testing/server";
 import { TestUserProvider } from "@/testing/TestUserProvider";
-import { render, renderReturningRouter, screen, spyOnHandler, waitFor } from "@/testing/test-utils";
+import { renderReturningRouter, screen, spyOnHandler, waitFor } from "@/testing/test-utils";
 import type { ElectionListResponse, Role } from "@/types/generated/openapi";
-
 import { OverviewPage } from "./OverviewPage";
 
 const navigate = vi.fn();
+
+function renderOverviewPage(userRole: Role) {
+  return renderReturningRouter(
+    <MessagesProvider>
+      <TestUserProvider userRole={userRole}>
+        <OverviewPage />
+      </TestUserProvider>
+    </MessagesProvider>,
+  );
+}
 
 describe("OverviewPage", () => {
   beforeEach(() => {
@@ -22,11 +31,7 @@ describe("OverviewPage", () => {
 
   test("Renders elections for typist", async () => {
     const user = userEvent.setup();
-    render(
-      <TestUserProvider userRole="typist">
-        <OverviewPage />
-      </TestUserProvider>,
-    );
+    renderOverviewPage("typist");
 
     // Wait for the page to be loaded
     expect(await screen.findByRole("heading", { level: 1, name: "Verkiezingen" })).toBeVisible();
@@ -49,11 +54,7 @@ describe("OverviewPage", () => {
 
   test("Renders elections and does not show create election link for coordinator", async () => {
     const user = userEvent.setup();
-    render(
-      <TestUserProvider userRole="coordinator">
-        <OverviewPage />
-      </TestUserProvider>,
-    );
+    renderOverviewPage("coordinator");
 
     // Wait for the page to be loaded
     expect(await screen.findByRole("heading", { level: 1, name: "Verkiezingen" })).toBeVisible();
@@ -76,11 +77,7 @@ describe("OverviewPage", () => {
 
   test("Renders elections and create election link for administrator", async () => {
     const user = userEvent.setup();
-    render(
-      <TestUserProvider userRole="administrator">
-        <OverviewPage />
-      </TestUserProvider>,
-    );
+    renderOverviewPage("administrator");
 
     // Wait for the page to be loaded
     expect(await screen.findByRole("heading", { level: 1, name: "Verkiezingen beheren" })).toBeVisible();
@@ -114,11 +111,7 @@ describe("OverviewPage", () => {
       ),
     );
 
-    render(
-      <TestUserProvider userRole="typist">
-        <OverviewPage />
-      </TestUserProvider>,
-    );
+    renderOverviewPage("typist");
 
     // Wait for the page to be loaded
     expect(await screen.findByRole("heading", { level: 1, name: "Verkiezingen" })).toBeVisible();
@@ -143,11 +136,7 @@ describe("OverviewPage", () => {
       ),
     );
 
-    render(
-      <TestUserProvider userRole="coordinator">
-        <OverviewPage />
-      </TestUserProvider>,
-    );
+    renderOverviewPage("coordinator");
 
     // Wait for the page to be loaded
     expect(await screen.findByRole("heading", { level: 1, name: "Verkiezingen" })).toBeVisible();
@@ -173,11 +162,7 @@ describe("OverviewPage", () => {
       ),
     );
 
-    const router = renderReturningRouter(
-      <TestUserProvider userRole="administrator">
-        <OverviewPage />
-      </TestUserProvider>,
-    );
+    const router = renderOverviewPage("administrator");
 
     // Wait for the page to be loaded
     expect(await screen.findByRole("heading", { level: 1, name: "Verkiezingen beheren" })).toBeVisible();
@@ -198,11 +183,7 @@ describe("OverviewPage", () => {
 
   test("Refetches data every 30 seconds", async () => {
     vi.useFakeTimers();
-    render(
-      <TestUserProvider userRole="typist">
-        <OverviewPage />
-      </TestUserProvider>,
-    );
+    renderOverviewPage("typist");
 
     // Wait for the page to be loaded
     await vi.waitFor(() => {
@@ -228,11 +209,7 @@ describe("OverviewPage", () => {
     const alertBody = "Zodra je een proces-verbaal van een stembureau hebt gekregen kan je beginnen met invoeren.";
 
     async function render(role: Role) {
-      const router = renderReturningRouter(
-        <TestUserProvider userRole={role}>
-          <OverviewPage />
-        </TestUserProvider>,
-      );
+      const router = renderOverviewPage(role);
       await router.navigate({ hash: "new-account" });
     }
 

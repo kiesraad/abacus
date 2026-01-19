@@ -32,6 +32,7 @@ interface PollingStationDataEntryDifferences {
   validationError: string | undefined;
 }
 
+// biome-ignore lint/complexity/noExcessiveLinesPerFunction: TODO function should be refactored
 export function usePollingStationDataEntryDifferences(
   pollingStationId: number,
   afterSave: (status: DataEntryStatusName, firstEntryUserId: number | undefined) => void,

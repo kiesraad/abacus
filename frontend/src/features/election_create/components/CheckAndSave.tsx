@@ -3,20 +3,18 @@ import { Navigate, useNavigate } from "react-router";
 import { isSuccess } from "@/api/ApiResult";
 import { useCrud } from "@/api/useCrud";
 import { Button } from "@/components/ui/Button/Button";
+import { useMessages } from "@/hooks/messages/useMessages";
 import { t } from "@/i18n/translate";
-import type {
-  ELECTION_IMPORT_REQUEST_PATH,
-  ElectionAndCandidatesDefinitionImportRequest,
-} from "@/types/generated/openapi";
+import type { ELECTION_IMPORT_REQUEST_PATH, ElectionWithPoliticalGroups } from "@/types/generated/openapi";
 import { formatNumber } from "@/utils/number";
-
 import { useElectionCreateContext } from "../hooks/useElectionCreateContext";
 
 export function CheckAndSave() {
+  const { pushMessage } = useMessages();
   const navigate = useNavigate();
   const { state } = useElectionCreateContext();
   const createPath: ELECTION_IMPORT_REQUEST_PATH = `/api/elections/import`;
-  const { create } = useCrud<ElectionAndCandidatesDefinitionImportRequest>({ createPath, throwAllErrors: true });
+  const { create } = useCrud<ElectionWithPoliticalGroups>({ createPath, throwAllErrors: true });
 
   function handleSubmit() {
     void create({
@@ -30,6 +28,12 @@ export function CheckAndSave() {
       number_of_voters: state.numberOfVoters,
     }).then((result) => {
       if (isSuccess(result)) {
+        pushMessage({
+          title: t("election.message.election_created", {
+            role: "GSB",
+            name: result.data.name,
+          }),
+        });
         void navigate("/elections", { state: { success: true } });
       }
     });

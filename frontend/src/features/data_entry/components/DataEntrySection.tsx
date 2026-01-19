@@ -20,6 +20,7 @@ import { useDataEntryFormSection } from "../hooks/useDataEntryFormSection";
 import { DataEntryNavigation } from "./DataEntryNavigation";
 import cls from "./DataEntrySection.module.css";
 
+// biome-ignore lint/complexity/noExcessiveLinesPerFunction: TODO function should be refactored
 export function DataEntrySection() {
   const user = useUser();
   const {

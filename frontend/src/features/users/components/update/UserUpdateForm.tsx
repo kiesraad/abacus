@@ -20,6 +20,7 @@ export interface UserUpdateFormProps {
 
 type ValidationErrors = Partial<UpdateUserRequest>;
 
+// biome-ignore lint/complexity/noExcessiveLinesPerFunction: TODO function should be refactored
 export function UserUpdateForm({ user, onSaved, onAbort }: UserUpdateFormProps) {
   const [editPassword, setEditPassword] = useState(false);
   const [validationErrors, setValidationErrors] = useState<ValidationErrors>();
@@ -44,7 +45,7 @@ export function UserUpdateForm({ user, onSaved, onAbort }: UserUpdateFormProps) 
     if (editPassword) {
       userUpdate.temp_password = formData.getString("temp_password");
       if (userUpdate.temp_password.length === 0) {
-        errors.temp_password = t("form_errors.FORM_VALIDATION_RESULT_REQUIRED");
+        errors.temp_password = t("account.password_length_rule");
       }
     }
 
@@ -55,8 +56,13 @@ export function UserUpdateForm({ user, onSaved, onAbort }: UserUpdateFormProps) 
       void update(userUpdate).then((result) => {
         if (isSuccess(result)) {
           onSaved(result.data);
-        } else if (result instanceof ApiError && result.reference === "PasswordRejection") {
-          setValidationErrors({ temp_password: t("error.api_error.PasswordRejection") });
+        } else if (
+          result instanceof ApiError &&
+          (result.reference === "PasswordRejectionSameAsOld" ||
+            result.reference === "PasswordRejectionSameAsUsername" ||
+            result.reference === "PasswordRejectionTooShort")
+        ) {
+          setValidationErrors({ temp_password: t(`error.api_error.${result.reference}`) });
         } else if (result instanceof ApiError) {
           setError(result.reference);
         }

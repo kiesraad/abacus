@@ -67,6 +67,7 @@ export interface ElectionCreateState {
   isNumberOfVotersUserEdited?: boolean;
 }
 
+// biome-ignore lint/complexity/noExcessiveLinesPerFunction: TODO function should be refactored
 function reducer(state: ElectionCreateState, action: ElectionCreateAction): ElectionCreateState {
   switch (action.type) {
     case "SELECT_ELECTION_DEFINITION":

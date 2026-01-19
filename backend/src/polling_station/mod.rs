@@ -4,6 +4,8 @@ mod repository;
 
 mod structs;
 
+pub use self::structs::PollingStationId;
+
 #[cfg(feature = "dev-database")]
 pub(crate) use self::repository::create;
 pub use self::structs::PollingStation;

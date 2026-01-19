@@ -4,9 +4,11 @@ import { isNode } from "@/utils/typeChecks";
 
 type Dir = "up" | "down" | "first" | "last";
 
+// biome-ignore lint/complexity/noExcessiveLinesPerFunction: TODO function should be refactored
 export function useFormKeyboardNavigation(): RefObject<HTMLFormElement | null> {
   const innerRef = useRef<HTMLFormElement>(null);
 
+  // biome-ignore lint/complexity/noExcessiveCognitiveComplexity: TODO function should be refactored
   const moveFocus = useCallback((dir: Dir) => {
     if (!innerRef.current) {
       return;
@@ -64,6 +66,7 @@ export function useFormKeyboardNavigation(): RefObject<HTMLFormElement | null> {
   }, []);
 
   useEffect(() => {
+    // biome-ignore lint/complexity/noExcessiveCognitiveComplexity: TODO function should be refactored
     const handleKeyDown = (event: KeyboardEvent) => {
       switch (event.key) {
         case "ArrowUp":

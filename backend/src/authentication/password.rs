@@ -23,18 +23,18 @@ impl<'pw> ValidatedPassword<'pw> {
     ) -> Result<Self, AuthenticationError> {
         // Total length
         if password.len() < MIN_PASSWORD_LEN {
-            return Err(AuthenticationError::PasswordRejection);
+            return Err(AuthenticationError::PasswordRejectionTooShort);
         }
 
         // Password cannot be the same as the username
         if username == password {
-            return Err(AuthenticationError::PasswordRejection);
+            return Err(AuthenticationError::PasswordRejectionSameAsUsername);
         }
 
         // Password cannot be the same as the old password
         match old_password {
             Some(old_pw) if verify_password(password, old_pw) => {
-                Err(AuthenticationError::PasswordRejection)
+                Err(AuthenticationError::PasswordRejectionSameAsOld)
             }
             Some(_) | None => Ok(Self(password)),
         }

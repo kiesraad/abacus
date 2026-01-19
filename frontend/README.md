@@ -136,7 +136,6 @@ The application uses the following dependencies:
 
 - `typescript`: Strongly typed layer on top of JavaScript
 - `msw`: Mock Service Worker for mocking the server, client side
-- `lefthook`: git hook automation
 - `cross-env`: for building on Windows
 
 #### Testing / linting dependencies

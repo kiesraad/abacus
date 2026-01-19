@@ -26,6 +26,7 @@ import { CommitteeSessionCard } from "./CommitteeSessionCard";
 import { ElectionInformationTable } from "./ElectionInformationTable";
 import cls from "./ElectionManagement.module.css";
 
+// biome-ignore lint/complexity/noExcessiveLinesPerFunction: TODO function should be refactored
 export function ElectionHomePage() {
   const location = useLocation();
   const navigate = useNavigate();

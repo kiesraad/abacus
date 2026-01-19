@@ -44,6 +44,7 @@ export interface PollingStationSelectorProps {
   refetchStatuses: () => void;
 }
 
+// biome-ignore lint/complexity/noExcessiveLinesPerFunction: TODO function should be refactored
 export function PollingStationSelector({
   pollingStationNumber,
   updatePollingStationNumber,
@@ -67,6 +68,7 @@ export function PollingStationSelector({
     />
   );
 
+  // biome-ignore lint/complexity/noExcessiveLinesPerFunction: TODO function should be refactored
   const getFeedbackContent = () => {
     if (loading) {
       return (

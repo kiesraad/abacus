@@ -17,6 +17,7 @@ export interface DataEntryNavigationProps {
   currentValues?: SectionValues;
 }
 
+// biome-ignore lint/complexity/noExcessiveLinesPerFunction: TODO function should be refactored
 export function DataEntryNavigation({ onSubmit, currentValues = {} }: DataEntryNavigationProps) {
   const {
     error,
@@ -39,6 +40,7 @@ export function DataEntryNavigation({ onSubmit, currentValues = {} }: DataEntryN
     pathname.startsWith(`/elections/${election.id}/data-entry/${pollingStationId}/${entryNumber}`);
 
   // block navigation if there are unsaved changes
+  // biome-ignore lint/complexity/noExcessiveCognitiveComplexity: TODO function should be refactored
   const blocker = useBlocker(({ currentLocation, nextLocation }) => {
     // do not block when user is logged out or an error is redirecting to the data entry home page
     if (

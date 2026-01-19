@@ -11,13 +11,14 @@ import { t } from "@/i18n/translate";
 import type { ACCOUNT_UPDATE_REQUEST_PATH, AccountUpdateRequest, LoginResponse } from "@/types/generated/openapi";
 import { StringFormData } from "@/utils/stringFormData";
 
-import { type UserValidationErrors, validateUpdateUser } from "../util/validate";
+import { type UserValidationErrors, validateUpdateUser } from "@/utils/validateUserAccount";
 
 interface AccountSetupFormProps {
   user: LoginResponse;
   onSaved: (user: LoginResponse) => void;
 }
 
+// biome-ignore lint/complexity/noExcessiveLinesPerFunction: TODO function should be refactored
 export function AccountSetupForm({ user, onSaved }: AccountSetupFormProps) {
   const [showLoginSuccess, setShowLoginSuccess] = useState(true);
   const [validationErrors, setValidationErrors] = useState<UserValidationErrors | null>(null);
@@ -54,10 +55,13 @@ export function AccountSetupForm({ user, onSaved }: AccountSetupFormProps) {
     void update(account).then((result) => {
       if (isSuccess(result)) {
         onSaved(result.data);
-      } else if (result instanceof ApiError && result.reference === "PasswordRejection") {
-        setValidationErrors({
-          password: t("account.password_rules"),
-        });
+      } else if (
+        result instanceof ApiError &&
+        (result.reference === "PasswordRejectionSameAsOld" ||
+          result.reference === "PasswordRejectionSameAsUsername" ||
+          result.reference === "PasswordRejectionTooShort")
+      ) {
+        setValidationErrors({ password: t(`error.api_error.${result.reference}`) });
       } else {
         setApiError(result);
       }

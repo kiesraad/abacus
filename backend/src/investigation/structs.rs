@@ -8,12 +8,16 @@ use serde::{Deserialize, Serialize};
 use sqlx::{FromRow, SqlitePool};
 use utoipa::ToSchema;
 
-use crate::{APIError, error::ErrorReference, polling_station};
+use crate::{
+    APIError,
+    error::ErrorReference,
+    polling_station::{self, PollingStationId},
+};
 
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq, ToSchema, FromRow)]
 #[serde(deny_unknown_fields)]
 pub struct PollingStationInvestigation {
-    pub polling_station_id: u32,
+    pub polling_station_id: PollingStationId,
     pub reason: String,
     #[serde(skip_serializing_if = "Option::is_none")]
     #[schema(nullable = false)]
@@ -57,7 +61,7 @@ pub struct PollingStationInvestigationUpdateRequest {
     pub accept_data_entry_deletion: Option<bool>,
 }
 
-pub struct CurrentSessionPollingStationId(pub u32);
+pub struct CurrentSessionPollingStationId(pub PollingStationId);
 
 impl<S> FromRequestParts<S> for CurrentSessionPollingStationId
 where
@@ -67,7 +71,7 @@ where
     type Rejection = APIError;
 
     async fn from_request_parts(parts: &mut Parts, state: &S) -> Result<Self, Self::Rejection> {
-        let path_extractor = Path::<u32>::from_request_parts(parts, state).await;
+        let path_extractor = Path::<PollingStationId>::from_request_parts(parts, state).await;
         let pool = SqlitePool::from_ref(state);
         let mut conn = pool.acquire().await?;
 

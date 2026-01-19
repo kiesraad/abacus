@@ -34,8 +34,7 @@ use crate::{
     election::{ElectionId, ElectionWithPoliticalGroups, PoliticalGroup},
     error::{ErrorReference, ErrorResponse},
     investigation::get_polling_station_investigation,
-    polling_station,
-    polling_station::PollingStation,
+    polling_station::{self, PollingStation, PollingStationId},
 };
 
 impl From<DataError> for APIError {
@@ -89,7 +88,7 @@ pub fn router() -> OpenApiRouter<AppState> {
 
 async fn validate_and_get_data(
     conn: &mut SqliteConnection,
-    polling_station_id: u32,
+    polling_station_id: PollingStationId,
     user: &User,
 ) -> Result<
     (
@@ -159,7 +158,7 @@ pub async fn delete_data_entry_and_result_for_polling_station(
     conn: &mut SqliteConnection,
     audit_service: &AuditService,
     committee_session: &CommitteeSession,
-    polling_station_id: u32,
+    polling_station_id: PollingStationId,
 ) -> Result<(), APIError> {
     if let Some(data_entry) = delete_data_entry(conn, polling_station_id).await? {
         audit_service
@@ -256,7 +255,7 @@ impl ResolveDifferencesAction {
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
     params(
-        ("polling_station_id" = u32, description = "Polling station database id"),
+        ("polling_station_id" = PollingStationId, description = "Polling station database id"),
         ("entry_number" = u8, description = "Data entry number (first or second data entry)"),
     ),
     security(("cookie_auth" = ["typist"])),
@@ -264,7 +263,7 @@ impl ResolveDifferencesAction {
 async fn polling_station_data_entry_claim(
     user: Typist,
     State(pool): State<SqlitePool>,
-    Path((polling_station_id, entry_number)): Path<(u32, EntryNumber)>,
+    Path((polling_station_id, entry_number)): Path<(PollingStationId, EntryNumber)>,
     audit_service: AuditService,
 ) -> Result<Json<ClaimDataEntryResponse>, APIError> {
     let mut tx = pool.begin_immediate().await?;
@@ -384,7 +383,7 @@ impl IntoResponse for SaveDataEntryResponse {
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
     params(
-        ("polling_station_id" = u32, description = "Polling station database id"),
+        ("polling_station_id" = PollingStationId, description = "Polling station database id"),
         ("entry_number" = u8, description = "Data entry number (first or second data entry)"),
     ),
     security(("cookie_auth" = ["typist"])),
@@ -392,7 +391,7 @@ impl IntoResponse for SaveDataEntryResponse {
 async fn polling_station_data_entry_save(
     user: Typist,
     State(pool): State<SqlitePool>,
-    Path((polling_station_id, entry_number)): Path<(u32, EntryNumber)>,
+    Path((polling_station_id, entry_number)): Path<(PollingStationId, EntryNumber)>,
     audit_service: AuditService,
     data_entry_request: DataEntry,
 ) -> Result<SaveDataEntryResponse, APIError> {
@@ -454,7 +453,7 @@ async fn polling_station_data_entry_save(
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
     params(
-        ("polling_station_id" = u32, description = "Polling station database id"),
+        ("polling_station_id" = PollingStationId, description = "Polling station database id"),
         ("entry_number" = u8, description = "Data entry number (first or second data entry)"),
     ),
     security(("cookie_auth" = ["typist"])),
@@ -462,7 +461,7 @@ async fn polling_station_data_entry_save(
 async fn polling_station_data_entry_delete(
     user: Typist,
     State(pool): State<SqlitePool>,
-    Path((polling_station_id, entry_number)): Path<(u32, EntryNumber)>,
+    Path((polling_station_id, entry_number)): Path<(PollingStationId, EntryNumber)>,
     audit_service: AuditService,
 ) -> Result<StatusCode, APIError> {
     let mut tx = pool.begin_immediate().await?;
@@ -521,7 +520,7 @@ async fn polling_station_data_entry_delete(
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
     params(
-        ("polling_station_id" = u32, description = "Polling station database id"),
+        ("polling_station_id" = PollingStationId, description = "Polling station database id"),
         ("entry_number" = u8, description = "Data entry number (first or second data entry)"),
     ),
     security(("cookie_auth" = ["typist"])),
@@ -529,7 +528,7 @@ async fn polling_station_data_entry_delete(
 async fn polling_station_data_entry_finalise(
     user: Typist,
     State(pool): State<SqlitePool>,
-    Path((polling_station_id, entry_number)): Path<(u32, EntryNumber)>,
+    Path((polling_station_id, entry_number)): Path<(PollingStationId, EntryNumber)>,
     audit_service: AuditService,
 ) -> Result<Json<DataEntryStatusResponse>, APIError> {
     let mut tx = pool.begin_immediate().await?;
@@ -630,14 +629,14 @@ impl ResolveErrorsAction {
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
     params(
-        ("polling_station_id" = u32, description = "Polling station database id"),
+        ("polling_station_id" = PollingStationId, description = "Polling station database id"),
     ),
     security(("cookie_auth" = ["coordinator"])),
 )]
 async fn polling_station_data_entries_and_result_delete(
     _user: Coordinator,
     State(pool): State<SqlitePool>,
-    Path(polling_station_id): Path<u32>,
+    Path(polling_station_id): Path<PollingStationId>,
     audit_service: AuditService,
 ) -> Result<StatusCode, APIError> {
     let mut tx = pool.begin_immediate().await?;
@@ -698,14 +697,14 @@ pub struct DataEntryGetResponse {
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
     params(
-        ("polling_station_id" = u32, description = "Polling station database id"),
+        ("polling_station_id" = PollingStationId, description = "Polling station database id"),
     ),
     security(("cookie_auth" = ["coordinator"])),
 )]
 async fn polling_station_data_entry_get(
     user: Coordinator,
     State(pool): State<SqlitePool>,
-    Path(polling_station_id): Path<u32>,
+    Path(polling_station_id): Path<PollingStationId>,
 ) -> Result<Json<DataEntryGetResponse>, APIError> {
     let mut conn = pool.acquire().await?;
 
@@ -780,14 +779,14 @@ async fn polling_station_data_entry_get(
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
     params(
-        ("polling_station_id" = u32, description = "Polling station database id"),
+        ("polling_station_id" = PollingStationId, description = "Polling station database id"),
     ),
     security(("cookie_auth" = ["coordinator"])),
 )]
 async fn polling_station_data_entry_resolve_errors(
     user: Coordinator,
     State(pool): State<SqlitePool>,
-    Path(polling_station_id): Path<u32>,
+    Path(polling_station_id): Path<PollingStationId>,
     audit_service: AuditService,
     action: ResolveErrorsAction,
 ) -> Result<Json<DataEntryStatusResponse>, APIError> {
@@ -851,14 +850,14 @@ pub struct DataEntryGetDifferencesResponse {
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
     params(
-        ("polling_station_id" = u32, description = "Polling station database id"),
+        ("polling_station_id" = PollingStationId, description = "Polling station database id"),
     ),
     security(("cookie_auth" = ["coordinator"])),
 )]
 async fn polling_station_data_entry_get_differences(
     user: Coordinator,
     State(pool): State<SqlitePool>,
-    Path(polling_station_id): Path<u32>,
+    Path(polling_station_id): Path<PollingStationId>,
 ) -> Result<Json<DataEntryGetDifferencesResponse>, APIError> {
     let mut conn = pool.acquire().await?;
 
@@ -899,14 +898,14 @@ async fn polling_station_data_entry_get_differences(
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
     params(
-        ("polling_station_id" = u32, description = "Polling station database id"),
+        ("polling_station_id" = PollingStationId, description = "Polling station database id"),
     ),
     security(("cookie_auth" = ["coordinator"])),
 )]
 async fn polling_station_data_entry_resolve_differences(
     user: Coordinator,
     State(pool): State<SqlitePool>,
-    Path(polling_station_id): Path<u32>,
+    Path(polling_station_id): Path<PollingStationId>,
     audit_service: AuditService,
     action: ResolveDifferencesAction,
 ) -> Result<Json<DataEntryStatusResponse>, APIError> {
@@ -965,7 +964,7 @@ pub struct ElectionStatusResponse {
 #[serde(deny_unknown_fields)]
 pub struct ElectionStatusResponseEntry {
     /// Polling station id
-    pub polling_station_id: u32,
+    pub polling_station_id: PollingStationId,
     /// Data entry status
     pub status: DataEntryStatusName,
     /// First entry user id
@@ -1039,7 +1038,8 @@ mod tests {
     use crate::{
         authentication::Role,
         committee_session::{
-            status::CommitteeSessionStatus, tests::change_status_committee_session,
+            CommitteeSessionId, status::CommitteeSessionStatus,
+            tests::change_status_committee_session,
         },
         data_entry::{
             ValidationResult, ValidationResultCode,
@@ -1068,8 +1068,8 @@ mod tests {
 
     async fn get_data_entry_status(
         pool: SqlitePool,
-        polling_station_id: u32,
-        committee_session_id: u32,
+        polling_station_id: PollingStationId,
+        committee_session_id: CommitteeSessionId,
     ) -> DataEntryStatus {
         let mut conn = pool.acquire().await.unwrap();
         crate::data_entry::repository::get(&mut conn, polling_station_id, committee_session_id)
@@ -1079,7 +1079,7 @@ mod tests {
 
     async fn claim(
         pool: SqlitePool,
-        polling_station_id: u32,
+        polling_station_id: PollingStationId,
         entry_number: EntryNumber,
     ) -> Response {
         let user = match entry_number {
@@ -1099,7 +1099,7 @@ mod tests {
     async fn save(
         pool: SqlitePool,
         request_body: DataEntry,
-        polling_station_id: u32,
+        polling_station_id: PollingStationId,
         entry_number: EntryNumber,
     ) -> Response {
         let user = match entry_number {
@@ -1119,7 +1119,7 @@ mod tests {
 
     async fn delete(
         pool: SqlitePool,
-        polling_station_id: u32,
+        polling_station_id: PollingStationId,
         entry_number: EntryNumber,
     ) -> Response {
         let user = match entry_number {
@@ -1136,7 +1136,10 @@ mod tests {
         .into_response()
     }
 
-    async fn delete_data_entries_and_result(pool: SqlitePool, polling_station_id: u32) -> Response {
+    async fn delete_data_entries_and_result(
+        pool: SqlitePool,
+        polling_station_id: PollingStationId,
+    ) -> Response {
         let user = User::test_user(Role::Coordinator, 1);
         polling_station_data_entries_and_result_delete(
             Coordinator(user.clone()),
@@ -1150,7 +1153,7 @@ mod tests {
 
     async fn finalise(
         pool: SqlitePool,
-        polling_station_id: u32,
+        polling_station_id: PollingStationId,
         entry_number: EntryNumber,
     ) -> Response {
         let user = match entry_number {
@@ -1169,7 +1172,7 @@ mod tests {
 
     async fn resolve_differences(
         pool: SqlitePool,
-        polling_station_id: u32,
+        polling_station_id: PollingStationId,
         action: ResolveDifferencesAction,
     ) -> Response {
         let user = User::test_user(Role::Coordinator, 1);
@@ -1186,7 +1189,7 @@ mod tests {
 
     async fn resolve_errors(
         pool: SqlitePool,
-        polling_station_id: u32,
+        polling_station_id: PollingStationId,
         action: ResolveErrorsAction,
     ) -> Response {
         let user = User::test_user(Role::Coordinator, 1);
@@ -1204,17 +1207,18 @@ mod tests {
     async fn finalise_different_entries(pool: SqlitePool) {
         // Save and finalise the first data entry
         let request_body = example_data_entry();
-        let response = claim(pool.clone(), 1, EntryNumber::FirstEntry).await;
+        let polling_station_id = PollingStationId::from(1);
+        let response = claim(pool.clone(), polling_station_id, EntryNumber::FirstEntry).await;
         assert_eq!(response.status(), StatusCode::OK);
         let response = save(
             pool.clone(),
             request_body.clone(),
-            1,
+            polling_station_id,
             EntryNumber::FirstEntry,
         )
         .await;
         assert_eq!(response.status(), StatusCode::OK);
-        let response = finalise(pool.clone(), 1, EntryNumber::FirstEntry).await;
+        let response = finalise(pool.clone(), polling_station_id, EntryNumber::FirstEntry).await;
         assert_eq!(response.status(), StatusCode::OK);
 
         // Save and finalise a different second data entry
@@ -1231,17 +1235,17 @@ mod tests {
             .unwrap()
             .voters_counts
             .proxy_certificate_count = 0;
-        let response = claim(pool.clone(), 1, EntryNumber::SecondEntry).await;
+        let response = claim(pool.clone(), polling_station_id, EntryNumber::SecondEntry).await;
         assert_eq!(response.status(), StatusCode::OK);
         let response = save(
             pool.clone(),
             request_body.clone(),
-            1,
+            polling_station_id,
             EntryNumber::SecondEntry,
         )
         .await;
         assert_eq!(response.status(), StatusCode::OK);
-        let response = finalise(pool.clone(), 1, EntryNumber::SecondEntry).await;
+        let response = finalise(pool.clone(), polling_station_id, EntryNumber::SecondEntry).await;
         assert_eq!(response.status(), StatusCode::OK);
 
         let body = response.into_body().collect().await.unwrap().to_bytes();
@@ -1252,6 +1256,8 @@ mod tests {
 
     async fn finalise_with_errors(pool: SqlitePool) {
         let mut request_body = example_data_entry();
+        let polling_station_id = PollingStationId::from(1);
+
         request_body
             .data
             .as_cso_first_session_mut()
@@ -1259,19 +1265,19 @@ mod tests {
             .voters_counts
             .poll_card_count = 100; // incorrect value
 
-        let response = claim(pool.clone(), 1, EntryNumber::FirstEntry).await;
+        let response = claim(pool.clone(), polling_station_id, EntryNumber::FirstEntry).await;
         assert_eq!(response.status(), StatusCode::OK);
         let response = save(
             pool.clone(),
             request_body.clone(),
-            1,
+            polling_station_id,
             EntryNumber::FirstEntry,
         )
         .await;
         assert_eq!(response.status(), StatusCode::OK);
 
         // Check that finalise with errors results in FirstEntryHasErrors
-        let response = finalise(pool.clone(), 1, EntryNumber::FirstEntry).await;
+        let response = finalise(pool.clone(), polling_station_id, EntryNumber::FirstEntry).await;
         assert_eq!(response.status(), StatusCode::OK);
 
         let body = response.into_body().collect().await.unwrap().to_bytes();
@@ -1282,20 +1288,30 @@ mod tests {
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
     async fn test_claim_data_entry_ok(pool: SqlitePool) {
-        let response = claim(pool.clone(), 1, EntryNumber::FirstEntry).await;
+        let polling_station_id = PollingStationId::from(1);
+        let response = claim(pool.clone(), polling_station_id, EntryNumber::FirstEntry).await;
         assert_eq!(response.status(), StatusCode::OK);
 
         // Check that row was created
         let mut conn = pool.acquire().await.unwrap();
-        assert!(data_entry_exists(&mut conn, 1).await.unwrap());
+        assert!(
+            data_entry_exists(&mut conn, polling_station_id)
+                .await
+                .unwrap()
+        );
     }
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
     async fn test_claim_data_entry_committee_session_status_is_data_entry_paused(pool: SqlitePool) {
-        change_status_committee_session(pool.clone(), 2, CommitteeSessionStatus::DataEntryPaused)
-            .await;
+        let polling_station_id = PollingStationId::from(1);
+        change_status_committee_session(
+            pool.clone(),
+            CommitteeSessionId::from(2),
+            CommitteeSessionStatus::DataEntryPaused,
+        )
+        .await;
 
-        let response = claim(pool.clone(), 1, EntryNumber::FirstEntry).await;
+        let response = claim(pool.clone(), polling_station_id, EntryNumber::FirstEntry).await;
         assert_eq!(response.status(), StatusCode::CONFLICT);
         let body = response.into_body().collect().await.unwrap().to_bytes();
         let result: ErrorResponse = serde_json::from_slice(&body).unwrap();
@@ -1303,17 +1319,26 @@ mod tests {
 
         // Check that no row was created
         let mut conn = pool.acquire().await.unwrap();
-        assert!(!data_entry_exists(&mut conn, 1).await.unwrap());
+        assert!(
+            !data_entry_exists(&mut conn, polling_station_id)
+                .await
+                .unwrap()
+        );
     }
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
     async fn test_claim_data_entry_committee_session_status_not_data_entry_paused_or_in_progress(
         pool: SqlitePool,
     ) {
-        change_status_committee_session(pool.clone(), 2, CommitteeSessionStatus::DataEntryFinished)
-            .await;
+        let polling_station_id = PollingStationId::from(1);
+        change_status_committee_session(
+            pool.clone(),
+            CommitteeSessionId::from(2),
+            CommitteeSessionStatus::DataEntryFinished,
+        )
+        .await;
 
-        let response = claim(pool.clone(), 1, EntryNumber::FirstEntry).await;
+        let response = claim(pool.clone(), polling_station_id, EntryNumber::FirstEntry).await;
         assert_eq!(response.status(), StatusCode::CONFLICT);
         let body = response.into_body().collect().await.unwrap().to_bytes();
         let result: ErrorResponse = serde_json::from_slice(&body).unwrap();
@@ -1324,12 +1349,17 @@ mod tests {
 
         // Check that no row was created
         let mut conn = pool.acquire().await.unwrap();
-        assert!(!data_entry_exists(&mut conn, 1).await.unwrap());
+        assert!(
+            !data_entry_exists(&mut conn, polling_station_id)
+                .await
+                .unwrap()
+        );
     }
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_7_four_sessions"))))]
     async fn test_claim_data_entry_next_session_err_no_investigation(pool: SqlitePool) {
-        let response = claim(pool.clone(), 742, EntryNumber::FirstEntry).await;
+        let polling_station_id = PollingStationId::from(742);
+        let response = claim(pool.clone(), polling_station_id, EntryNumber::FirstEntry).await;
         assert_eq!(response.status(), StatusCode::CONFLICT);
         let body = response.into_body().collect().await.unwrap().to_bytes();
         let result: ErrorResponse = serde_json::from_slice(&body).unwrap();
@@ -1337,7 +1367,11 @@ mod tests {
 
         // Check that no row was created
         let mut conn = pool.acquire().await.unwrap();
-        assert!(!data_entry_exists(&mut conn, 742).await.unwrap());
+        assert!(
+            !data_entry_exists(&mut conn, polling_station_id)
+                .await
+                .unwrap()
+        );
     }
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_7_four_sessions"))))]
@@ -1345,53 +1379,64 @@ mod tests {
         pool: SqlitePool,
     ) {
         let mut conn = pool.acquire().await.unwrap();
+        let polling_station_id = PollingStationId::from(742);
         // Insert investigation
-        insert_test_investigation(&mut conn, 742, Some(false))
+        insert_test_investigation(&mut conn, polling_station_id, Some(false))
             .await
             .unwrap();
 
-        let response = claim(pool.clone(), 742, EntryNumber::FirstEntry).await;
+        let response = claim(pool.clone(), polling_station_id, EntryNumber::FirstEntry).await;
         assert_eq!(response.status(), StatusCode::CONFLICT);
         let body = response.into_body().collect().await.unwrap().to_bytes();
         let result: ErrorResponse = serde_json::from_slice(&body).unwrap();
         assert_eq!(result.reference, ErrorReference::DataEntryNotAllowed);
 
         // Check that no row was created
-        assert!(!data_entry_exists(&mut conn, 742).await.unwrap());
+        assert!(
+            !data_entry_exists(&mut conn, polling_station_id)
+                .await
+                .unwrap()
+        );
     }
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_7_four_sessions"))))]
     async fn test_claim_data_entry_next_session_ok(pool: SqlitePool) {
         let mut conn = pool.acquire().await.unwrap();
+        let polling_station_id = PollingStationId::from(742);
         // Insert investigation
-        insert_test_investigation(&mut conn, 742, Some(true))
+        insert_test_investigation(&mut conn, polling_station_id, Some(true))
             .await
             .unwrap();
 
         change_status_committee_session(
             pool.clone(),
-            704,
+            CommitteeSessionId::from(704),
             CommitteeSessionStatus::DataEntryInProgress,
         )
         .await;
 
-        let response = claim(pool.clone(), 742, EntryNumber::FirstEntry).await;
+        let response = claim(pool.clone(), polling_station_id, EntryNumber::FirstEntry).await;
         assert_eq!(response.status(), StatusCode::OK);
 
         // Check that row was created
-        assert!(data_entry_exists(&mut conn, 742).await.unwrap());
+        assert!(
+            data_entry_exists(&mut conn, polling_station_id)
+                .await
+                .unwrap()
+        );
     }
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
     async fn test_create_data_entry(pool: SqlitePool) {
         let request_body = example_data_entry();
+        let polling_station_id = PollingStationId::from(1);
 
-        let response = claim(pool.clone(), 1, EntryNumber::FirstEntry).await;
+        let response = claim(pool.clone(), polling_station_id, EntryNumber::FirstEntry).await;
         assert_eq!(response.status(), StatusCode::OK);
         let response = save(
             pool.clone(),
             request_body.clone(),
-            1,
+            polling_station_id,
             EntryNumber::FirstEntry,
         )
         .await;
@@ -1399,7 +1444,11 @@ mod tests {
 
         // Check if a row was created
         let mut conn = pool.acquire().await.unwrap();
-        assert!(data_entry_exists(&mut conn, 1).await.unwrap());
+        assert!(
+            data_entry_exists(&mut conn, polling_station_id)
+                .await
+                .unwrap()
+        );
     }
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
@@ -1407,17 +1456,22 @@ mod tests {
         pool: SqlitePool,
     ) {
         let request_body = example_data_entry();
+        let polling_station_id = PollingStationId::from(1);
 
-        let response = claim(pool.clone(), 1, EntryNumber::FirstEntry).await;
+        let response = claim(pool.clone(), polling_station_id, EntryNumber::FirstEntry).await;
         assert_eq!(response.status(), StatusCode::OK);
 
-        change_status_committee_session(pool.clone(), 2, CommitteeSessionStatus::DataEntryPaused)
-            .await;
+        change_status_committee_session(
+            pool.clone(),
+            CommitteeSessionId::from(2),
+            CommitteeSessionStatus::DataEntryPaused,
+        )
+        .await;
 
         let response = save(
             pool.clone(),
             request_body.clone(),
-            1,
+            polling_station_id,
             EntryNumber::FirstEntry,
         )
         .await;
@@ -1428,7 +1482,9 @@ mod tests {
 
         // Check that the row was not updated
         let mut conn = pool.acquire().await.unwrap();
-        let data_entry = get_data_entry(&mut conn, 1, 2).await.unwrap();
+        let data_entry = get_data_entry(&mut conn, polling_station_id, CommitteeSessionId::from(2))
+            .await
+            .unwrap();
         let status: DataEntryStatus = data_entry.state.0;
         let DataEntryStatus::FirstEntryInProgress(state) = status else {
             panic!("Expected entry to be in FirstEntryInProgress state");
@@ -1440,18 +1496,23 @@ mod tests {
     async fn test_create_data_entry_committee_session_status_not_data_entry_paused_or_in_progress(
         pool: SqlitePool,
     ) {
+        let polling_station_id = PollingStationId::from(1);
         let request_body = example_data_entry();
 
-        let response = claim(pool.clone(), 1, EntryNumber::FirstEntry).await;
+        let response = claim(pool.clone(), polling_station_id, EntryNumber::FirstEntry).await;
         assert_eq!(response.status(), StatusCode::OK);
 
-        change_status_committee_session(pool.clone(), 2, CommitteeSessionStatus::DataEntryFinished)
-            .await;
+        change_status_committee_session(
+            pool.clone(),
+            CommitteeSessionId::from(2),
+            CommitteeSessionStatus::DataEntryFinished,
+        )
+        .await;
 
         let response = save(
             pool.clone(),
             request_body.clone(),
-            1,
+            polling_station_id,
             EntryNumber::FirstEntry,
         )
         .await;
@@ -1465,7 +1526,9 @@ mod tests {
 
         // Check that the row was not updated
         let mut conn = pool.acquire().await.unwrap();
-        let data_entry = get_data_entry(&mut conn, 1, 2).await.unwrap();
+        let data_entry = get_data_entry(&mut conn, polling_station_id, CommitteeSessionId::from(2))
+            .await
+            .unwrap();
         let status: DataEntryStatus = data_entry.state.0;
         let DataEntryStatus::FirstEntryInProgress(state) = status else {
             panic!("Expected entry to be in FirstEntryInProgress state");
@@ -1477,48 +1540,60 @@ mod tests {
     async fn test_create_data_entry_uniqueness(pool: SqlitePool) {
         let mut conn = pool.acquire().await.unwrap();
 
+        let polling_station_id = PollingStationId::from(9);
+
         // Add investigation with corrected_results to be able to claim the polling station
-        insert_test_investigation(&mut pool.acquire().await.unwrap(), 9, Some(true))
-            .await
-            .unwrap();
+        insert_test_investigation(
+            &mut pool.acquire().await.unwrap(),
+            polling_station_id,
+            Some(true),
+        )
+        .await
+        .unwrap();
 
         // Claim a polling station that had entries/a result in the previous committee session
-        let response = claim(pool.clone(), 9, EntryNumber::FirstEntry).await;
+        let response = claim(pool.clone(), polling_station_id, EntryNumber::FirstEntry).await;
         assert_eq!(response.status(), StatusCode::OK);
 
         // Check that a new row was created
-        assert!(data_entry_exists(&mut conn, 9).await.unwrap());
+        assert!(
+            data_entry_exists(&mut conn, polling_station_id)
+                .await
+                .unwrap()
+        );
 
         // Check that the new data entry is linked to the new committee session
         let data = query_as!(
             PollingStationDataEntry,
             r#"
             SELECT
-                polling_station_id AS "polling_station_id: u32",
-                committee_session_id AS "committee_session_id: u32",
+                polling_station_id AS "polling_station_id: PollingStationId",
+                committee_session_id AS "committee_session_id: CommitteeSessionId",
                 state AS "state: _",
                 updated_at AS "updated_at: _"
             FROM polling_station_data_entries
-            WHERE polling_station_id = 9
-            "#
+            WHERE polling_station_id = ?
+            "#,
+            polling_station_id,
         )
         .fetch_all(&pool)
         .await
         .expect("No data found");
         assert_eq!(data.len(), 1);
-        assert_eq!(data[0].committee_session_id, 6);
+        assert_eq!(data[0].committee_session_id, CommitteeSessionId::from(6));
     }
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
     async fn test_update_data_entry(pool: SqlitePool) {
         let request_body = example_data_entry();
+        let polling_station_id = PollingStationId::from(1);
 
-        let response = claim(pool.clone(), 1, EntryNumber::FirstEntry).await;
+        let response = claim(pool.clone(), polling_station_id, EntryNumber::FirstEntry).await;
         assert_eq!(response.status(), StatusCode::OK);
         let response = save(
             pool.clone(),
             request_body.clone(),
-            1,
+            polling_station_id,
             EntryNumber::FirstEntry,
         )
         .await;
@@ -1526,10 +1601,16 @@ mod tests {
 
         // Check if the row is there
         let mut conn = pool.acquire().await.unwrap();
-        assert!(data_entry_exists(&mut conn, 1).await.unwrap());
+        assert!(
+            data_entry_exists(&mut conn, polling_station_id)
+                .await
+                .unwrap()
+        );
 
         // Check if the data was updated
-        let data_entry = get_data_entry(&mut conn, 1, 2).await.unwrap();
+        let data_entry = get_data_entry(&mut conn, polling_station_id, CommitteeSessionId::from(2))
+            .await
+            .unwrap();
         let status: DataEntryStatus = data_entry.state.0;
         let DataEntryStatus::FirstEntryInProgress(state) = status else {
             panic!("Expected entry to be in FirstEntryInProgress state");
@@ -1551,18 +1632,19 @@ mod tests {
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
     async fn test_finalise_data_entry(pool: SqlitePool) {
         let request_body = example_data_entry();
+        let polling_station_id = PollingStationId::from(1);
 
-        let response = claim(pool.clone(), 1, EntryNumber::FirstEntry).await;
+        let response = claim(pool.clone(), polling_station_id, EntryNumber::FirstEntry).await;
         assert_eq!(response.status(), StatusCode::OK);
         let response = save(
             pool.clone(),
             request_body.clone(),
-            1,
+            polling_station_id,
             EntryNumber::FirstEntry,
         )
         .await;
         assert_eq!(response.status(), StatusCode::OK);
-        let response = finalise(pool.clone(), 1, EntryNumber::FirstEntry).await;
+        let response = finalise(pool.clone(), polling_station_id, EntryNumber::FirstEntry).await;
         assert_eq!(response.status(), StatusCode::OK);
     }
 
@@ -1571,22 +1653,27 @@ mod tests {
         pool: SqlitePool,
     ) {
         let request_body = example_data_entry();
+        let polling_station_id = PollingStationId::from(1);
 
-        let response = claim(pool.clone(), 1, EntryNumber::FirstEntry).await;
+        let response = claim(pool.clone(), polling_station_id, EntryNumber::FirstEntry).await;
         assert_eq!(response.status(), StatusCode::OK);
         let response = save(
             pool.clone(),
             request_body.clone(),
-            1,
+            polling_station_id,
             EntryNumber::FirstEntry,
         )
         .await;
         assert_eq!(response.status(), StatusCode::OK);
 
-        change_status_committee_session(pool.clone(), 2, CommitteeSessionStatus::DataEntryPaused)
-            .await;
+        change_status_committee_session(
+            pool.clone(),
+            CommitteeSessionId::from(2),
+            CommitteeSessionStatus::DataEntryPaused,
+        )
+        .await;
 
-        let response = finalise(pool.clone(), 1, EntryNumber::FirstEntry).await;
+        let response = finalise(pool.clone(), polling_station_id, EntryNumber::FirstEntry).await;
         assert_eq!(response.status(), StatusCode::CONFLICT);
         let body = response.into_body().collect().await.unwrap().to_bytes();
         let result: ErrorResponse = serde_json::from_slice(&body).unwrap();
@@ -1598,22 +1685,27 @@ mod tests {
         pool: SqlitePool,
     ) {
         let request_body = example_data_entry();
+        let polling_station_id = PollingStationId::from(1);
 
-        let response = claim(pool.clone(), 1, EntryNumber::FirstEntry).await;
+        let response = claim(pool.clone(), polling_station_id, EntryNumber::FirstEntry).await;
         assert_eq!(response.status(), StatusCode::OK);
         let response = save(
             pool.clone(),
             request_body.clone(),
-            1,
+            polling_station_id,
             EntryNumber::FirstEntry,
         )
         .await;
         assert_eq!(response.status(), StatusCode::OK);
 
-        change_status_committee_session(pool.clone(), 2, CommitteeSessionStatus::DataEntryFinished)
-            .await;
+        change_status_committee_session(
+            pool.clone(),
+            CommitteeSessionId::from(2),
+            CommitteeSessionStatus::DataEntryFinished,
+        )
+        .await;
 
-        let response = finalise(pool.clone(), 1, EntryNumber::FirstEntry).await;
+        let response = finalise(pool.clone(), polling_station_id, EntryNumber::FirstEntry).await;
         assert_eq!(response.status(), StatusCode::CONFLICT);
         let body = response.into_body().collect().await.unwrap().to_bytes();
         let result: ErrorResponse = serde_json::from_slice(&body).unwrap();
@@ -1642,28 +1734,29 @@ mod tests {
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
     async fn test_save_second_data_entry(pool: SqlitePool) {
         let request_body = example_data_entry();
+        let polling_station_id = PollingStationId::from(1);
 
         // Save the first data entry and finalise it
-        let response = claim(pool.clone(), 1, EntryNumber::FirstEntry).await;
+        let response = claim(pool.clone(), polling_station_id, EntryNumber::FirstEntry).await;
         assert_eq!(response.status(), StatusCode::OK);
         let response = save(
             pool.clone(),
             request_body.clone(),
-            1,
+            polling_station_id,
             EntryNumber::FirstEntry,
         )
         .await;
         assert_eq!(response.status(), StatusCode::OK);
-        let response = finalise(pool.clone(), 1, EntryNumber::FirstEntry).await;
+        let response = finalise(pool.clone(), polling_station_id, EntryNumber::FirstEntry).await;
         assert_eq!(response.status(), StatusCode::OK);
 
         // Save a second data entry
-        let response = claim(pool.clone(), 1, EntryNumber::SecondEntry).await;
+        let response = claim(pool.clone(), polling_station_id, EntryNumber::SecondEntry).await;
         assert_eq!(response.status(), StatusCode::OK);
         let response = save(
             pool.clone(),
             request_body.clone(),
-            1,
+            polling_station_id,
             EntryNumber::SecondEntry,
         )
         .await;
@@ -1671,59 +1764,67 @@ mod tests {
 
         // Check if entry is now in SecondEntryInProgress state
         let mut conn = pool.acquire().await.unwrap();
-        let data_entry = get_data_entry(&mut conn, 1, 2).await.unwrap();
+        let data_entry = get_data_entry(&mut conn, polling_station_id, CommitteeSessionId::from(2))
+            .await
+            .unwrap();
         let status: DataEntryStatus = data_entry.state.0;
         assert!(matches!(status, DataEntryStatus::SecondEntryInProgress(_)));
 
         // Check that nothing is added to polling_station_results yet
-        assert!(!result_exists(&mut conn, 1).await.unwrap());
+        assert!(!result_exists(&mut conn, polling_station_id).await.unwrap());
     }
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
     async fn test_finalise_second_data_entry(pool: SqlitePool) {
         let request_body = example_data_entry();
+        let polling_station_id = PollingStationId::from(1);
 
         // Save and finalise the first data entry
-        let response = claim(pool.clone(), 1, EntryNumber::FirstEntry).await;
+        let response = claim(pool.clone(), polling_station_id, EntryNumber::FirstEntry).await;
         assert_eq!(response.status(), StatusCode::OK);
         let response = save(
             pool.clone(),
             request_body.clone(),
-            1,
+            polling_station_id,
             EntryNumber::FirstEntry,
         )
         .await;
         assert_eq!(response.status(), StatusCode::OK);
-        let response = finalise(pool.clone(), 1, EntryNumber::FirstEntry).await;
+        let response = finalise(pool.clone(), polling_station_id, EntryNumber::FirstEntry).await;
         assert_eq!(response.status(), StatusCode::OK);
 
         // Save and finalise the second data entry
-        let response = claim(pool.clone(), 1, EntryNumber::SecondEntry).await;
+        let response = claim(pool.clone(), polling_station_id, EntryNumber::SecondEntry).await;
         assert_eq!(response.status(), StatusCode::OK);
         let response = save(
             pool.clone(),
             request_body.clone(),
-            1,
+            polling_station_id,
             EntryNumber::SecondEntry,
         )
         .await;
         assert_eq!(response.status(), StatusCode::OK);
-        let response = finalise(pool.clone(), 1, EntryNumber::SecondEntry).await;
+        let response = finalise(pool.clone(), polling_station_id, EntryNumber::SecondEntry).await;
         assert_eq!(response.status(), StatusCode::OK);
 
         // Check that polling_station_results contains the finalised result and that the data entries are deleted
         let mut conn = pool.acquire().await.unwrap();
-        assert!(result_exists(&mut conn, 1).await.unwrap());
+        assert!(result_exists(&mut conn, polling_station_id).await.unwrap());
 
         // Check that the status is 'Definitive'
-        let status = get_data_entry_status(pool.clone(), 1, 2).await;
+        let status = get_data_entry_status(
+            pool.clone(),
+            polling_station_id,
+            CommitteeSessionId::from(2),
+        )
+        .await;
         assert!(matches!(status, DataEntryStatus::Definitive(_)));
 
         // Check that we can't save a new data entry after finalising
         let response = save(
             pool.clone(),
             request_body.clone(),
-            1,
+            polling_station_id,
             EntryNumber::FirstEntry,
         )
         .await;
@@ -1731,7 +1832,7 @@ mod tests {
         let response = save(
             pool.clone(),
             request_body.clone(),
-            1,
+            polling_station_id,
             EntryNumber::SecondEntry,
         )
         .await;
@@ -1742,66 +1843,84 @@ mod tests {
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
     async fn test_first_second_data_entry_different(pool: SqlitePool) {
         finalise_different_entries(pool.clone()).await;
+        let polling_station_id = PollingStationId::from(1);
 
         // Check if entry is now in EntriesDifferent state
         let mut conn = pool.acquire().await.unwrap();
-        let data_entry = get_data_entry(&mut conn, 1, 2).await.unwrap();
+        let data_entry = get_data_entry(&mut conn, polling_station_id, CommitteeSessionId::from(2))
+            .await
+            .unwrap();
         let status: DataEntryStatus = data_entry.state.0;
         assert!(matches!(status, DataEntryStatus::EntriesDifferent(_)));
 
         // Check that no result has been created
-        assert!(!result_exists(&mut conn, 1).await.unwrap());
+        assert!(!result_exists(&mut conn, polling_station_id).await.unwrap());
     }
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
     async fn test_polling_station_data_entry_delete_first_entry(pool: SqlitePool) {
         // create data entry
         let request_body = example_data_entry();
-        let response = claim(pool.clone(), 1, EntryNumber::FirstEntry).await;
+        let polling_station_id = PollingStationId::from(1);
+
+        let response = claim(pool.clone(), polling_station_id, EntryNumber::FirstEntry).await;
         assert_eq!(response.status(), StatusCode::OK);
         let response = save(
             pool.clone(),
             request_body.clone(),
-            1,
+            polling_station_id,
             EntryNumber::FirstEntry,
         )
         .await;
         assert_eq!(response.status(), StatusCode::OK);
 
         let mut conn = pool.acquire().await.unwrap();
-        assert!(data_entry_exists(&mut conn, 1).await.unwrap());
+        assert!(
+            data_entry_exists(&mut conn, polling_station_id)
+                .await
+                .unwrap()
+        );
 
         // delete data entry
-        let response = delete(pool.clone(), 1, EntryNumber::FirstEntry).await;
+        let response = delete(pool.clone(), polling_station_id, EntryNumber::FirstEntry).await;
         assert_eq!(response.status(), StatusCode::NO_CONTENT);
 
         // Check that the data entry is deleted
-        assert!(!data_entry_exists(&mut conn, 1).await.unwrap());
+        assert!(
+            !data_entry_exists(&mut conn, polling_station_id)
+                .await
+                .unwrap()
+        );
     }
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
     async fn test_polling_station_data_entry_delete_second_entry(pool: SqlitePool) {
         // create data entry with warning
         let request_body = example_data_entry_with_warning();
-        let response = claim(pool.clone(), 1, EntryNumber::FirstEntry).await;
+        let polling_station_id = PollingStationId::from(1);
+
+        let response = claim(pool.clone(), polling_station_id, EntryNumber::FirstEntry).await;
         assert_eq!(response.status(), StatusCode::OK);
 
         let response = save(
             pool.clone(),
             request_body.clone(),
-            1,
+            polling_station_id,
             EntryNumber::FirstEntry,
         )
         .await;
         assert_eq!(response.status(), StatusCode::OK);
-        let response = finalise(pool.clone(), 1, EntryNumber::FirstEntry).await;
+        let response = finalise(pool.clone(), polling_station_id, EntryNumber::FirstEntry).await;
         assert_eq!(response.status(), StatusCode::OK);
 
         let user = User::test_user(Role::Coordinator, 1);
-        let response =
-            polling_station_data_entry_get(Coordinator(user), State(pool.clone()), Path(1))
-                .await
-                .into_response();
+        let response = polling_station_data_entry_get(
+            Coordinator(user),
+            State(pool.clone()),
+            Path(polling_station_id),
+        )
+        .await
+        .into_response();
         assert_eq!(response.status(), StatusCode::OK);
         let body = response.into_body().collect().await.unwrap().to_bytes();
         let result: DataEntryGetResponse = serde_json::from_slice(&body).unwrap();
@@ -1818,30 +1937,38 @@ mod tests {
 
         // Check that the data entry is created
         let mut conn = pool.acquire().await.unwrap();
-        assert!(data_entry_exists(&mut conn, 1).await.unwrap());
+        assert!(
+            data_entry_exists(&mut conn, polling_station_id)
+                .await
+                .unwrap()
+        );
 
-        let response = claim(pool.clone(), 1, EntryNumber::SecondEntry).await;
+        let response = claim(pool.clone(), polling_station_id, EntryNumber::SecondEntry).await;
         assert_eq!(response.status(), StatusCode::OK);
         let response = save(
             pool.clone(),
             request_body.clone(),
-            1,
+            polling_station_id,
             EntryNumber::SecondEntry,
         )
         .await;
         assert_eq!(response.status(), StatusCode::OK);
 
         // Check that the data entry is in SecondEntryInProgress state
-        let data_entry = get_data_entry(&mut conn, 1, 2).await.unwrap();
+        let data_entry = get_data_entry(&mut conn, polling_station_id, CommitteeSessionId::from(2))
+            .await
+            .unwrap();
         let status: DataEntryStatus = data_entry.state.0;
         assert!(matches!(status, DataEntryStatus::SecondEntryInProgress(_)));
 
         // delete second data entry
-        let response = delete(pool.clone(), 1, EntryNumber::SecondEntry).await;
+        let response = delete(pool.clone(), polling_station_id, EntryNumber::SecondEntry).await;
         assert_eq!(response.status(), StatusCode::NO_CONTENT);
 
         // Check that the second data entry is deleted
-        let data_entry = get_data_entry(&mut conn, 1, 2).await.unwrap();
+        let data_entry = get_data_entry(&mut conn, polling_station_id, CommitteeSessionId::from(2))
+            .await
+            .unwrap();
         let status: DataEntryStatus = data_entry.state.0;
         assert!(matches!(status, DataEntryStatus::FirstEntryFinalised(_)));
     }
@@ -1852,22 +1979,28 @@ mod tests {
     ) {
         // create data entry
         let request_body = example_data_entry();
-        let response = claim(pool.clone(), 1, EntryNumber::FirstEntry).await;
+        let polling_station_id = PollingStationId::from(1);
+
+        let response = claim(pool.clone(), polling_station_id, EntryNumber::FirstEntry).await;
         assert_eq!(response.status(), StatusCode::OK);
         let response = save(
             pool.clone(),
             request_body.clone(),
-            1,
+            polling_station_id,
             EntryNumber::FirstEntry,
         )
         .await;
         assert_eq!(response.status(), StatusCode::OK);
 
-        change_status_committee_session(pool.clone(), 2, CommitteeSessionStatus::DataEntryPaused)
-            .await;
+        change_status_committee_session(
+            pool.clone(),
+            CommitteeSessionId::from(2),
+            CommitteeSessionStatus::DataEntryPaused,
+        )
+        .await;
 
         // delete data entry
-        let response = delete(pool.clone(), 1, EntryNumber::FirstEntry).await;
+        let response = delete(pool.clone(), polling_station_id, EntryNumber::FirstEntry).await;
         assert_eq!(response.status(), StatusCode::CONFLICT);
         let body = response.into_body().collect().await.unwrap().to_bytes();
         let result: ErrorResponse = serde_json::from_slice(&body).unwrap();
@@ -1875,7 +2008,9 @@ mod tests {
 
         // Check if entry is still in FirstEntryInProgress state
         let mut conn = pool.acquire().await.unwrap();
-        let data_entry = get_data_entry(&mut conn, 1, 2).await.unwrap();
+        let data_entry = get_data_entry(&mut conn, polling_station_id, CommitteeSessionId::from(2))
+            .await
+            .unwrap();
         let status: DataEntryStatus = data_entry.state.0;
         assert!(matches!(status, DataEntryStatus::FirstEntryInProgress(_)));
     }
@@ -1886,22 +2021,28 @@ mod tests {
     ) {
         // create data entry
         let request_body = example_data_entry();
-        let response = claim(pool.clone(), 1, EntryNumber::FirstEntry).await;
+        let polling_station_id = PollingStationId::from(1);
+
+        let response = claim(pool.clone(), polling_station_id, EntryNumber::FirstEntry).await;
         assert_eq!(response.status(), StatusCode::OK);
         let response = save(
             pool.clone(),
             request_body.clone(),
-            1,
+            polling_station_id,
             EntryNumber::FirstEntry,
         )
         .await;
         assert_eq!(response.status(), StatusCode::OK);
 
-        change_status_committee_session(pool.clone(), 2, CommitteeSessionStatus::DataEntryFinished)
-            .await;
+        change_status_committee_session(
+            pool.clone(),
+            CommitteeSessionId::from(2),
+            CommitteeSessionStatus::DataEntryFinished,
+        )
+        .await;
 
         // delete data entry
-        let response = delete(pool.clone(), 1, EntryNumber::FirstEntry).await;
+        let response = delete(pool.clone(), polling_station_id, EntryNumber::FirstEntry).await;
         assert_eq!(response.status(), StatusCode::CONFLICT);
         let body = response.into_body().collect().await.unwrap().to_bytes();
         let result: ErrorResponse = serde_json::from_slice(&body).unwrap();
@@ -1912,7 +2053,9 @@ mod tests {
 
         // Check if entry is still in FirstEntryInProgress state
         let mut conn = pool.acquire().await.unwrap();
-        let data_entry = get_data_entry(&mut conn, 1, 2).await.unwrap();
+        let data_entry = get_data_entry(&mut conn, polling_station_id, CommitteeSessionId::from(2))
+            .await
+            .unwrap();
         let status: DataEntryStatus = data_entry.state.0;
         assert!(matches!(status, DataEntryStatus::FirstEntryInProgress(_)));
     }
@@ -1924,7 +2067,7 @@ mod tests {
         let response = polling_station_data_entry_delete(
             Typist(User::test_user(Role::Typist, 1)),
             State(pool.clone()),
-            Path((1, EntryNumber::FirstEntry)),
+            Path((PollingStationId::from(1), EntryNumber::FirstEntry)),
             AuditService::new(Some(user), None),
         )
         .await
@@ -1936,28 +2079,39 @@ mod tests {
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
     async fn test_data_entry_delete_finalised_not_possible(pool: SqlitePool) {
         let mut conn = pool.acquire().await.unwrap();
+        let polling_station_id = PollingStationId::from(1);
 
         for entry_number in 1..=2 {
             let entry_number = EntryNumber::try_from(entry_number).unwrap();
             // create and finalise the first data entry
             let request_body = example_data_entry();
-            let response = claim(pool.clone(), 1, entry_number).await;
+            let response = claim(pool.clone(), polling_station_id, entry_number).await;
             assert_eq!(response.status(), StatusCode::OK);
-            let response = save(pool.clone(), request_body.clone(), 1, entry_number).await;
+            let response = save(
+                pool.clone(),
+                request_body.clone(),
+                polling_station_id,
+                entry_number,
+            )
+            .await;
             assert_eq!(response.status(), StatusCode::OK);
-            let response = finalise(pool.clone(), 1, entry_number).await;
+            let response = finalise(pool.clone(), polling_station_id, entry_number).await;
             assert_eq!(response.status(), StatusCode::OK);
 
             // check that deleting finalised or non-existent data entry returns 404
             for _entry_number in 1..=2 {
-                let response = delete(pool.clone(), 1, entry_number).await;
+                let response = delete(pool.clone(), polling_station_id, entry_number).await;
                 assert_eq!(response.status(), StatusCode::CONFLICT);
             }
 
             // after the first data entry, check if it is still in the database
             // (after the second data entry, the results are finalised so we do not expect rows)
             if entry_number == EntryNumber::FirstEntry {
-                assert!(data_entry_exists(&mut conn, 1).await.unwrap());
+                assert!(
+                    data_entry_exists(&mut conn, polling_station_id)
+                        .await
+                        .unwrap()
+                );
             }
         }
     }
@@ -1967,32 +2121,41 @@ mod tests {
         pool: SqlitePool,
     ) {
         // create data entry
+        let polling_station_id = PollingStationId::from(1);
         let request_body = example_data_entry();
-        let response = claim(pool.clone(), 1, EntryNumber::FirstEntry).await;
+        let response = claim(pool.clone(), polling_station_id, EntryNumber::FirstEntry).await;
         assert_eq!(response.status(), StatusCode::OK);
         let response = save(
             pool.clone(),
             request_body.clone(),
-            1,
+            polling_station_id,
             EntryNumber::FirstEntry,
         )
         .await;
         assert_eq!(response.status(), StatusCode::OK);
 
         let mut conn = pool.acquire().await.unwrap();
-        assert!(data_entry_exists(&mut conn, 1).await.unwrap());
+        assert!(
+            data_entry_exists(&mut conn, polling_station_id)
+                .await
+                .unwrap()
+        );
 
         // delete data entry with status FirstEntryInProgress
-        let response = delete_data_entries_and_result(pool.clone(), 1).await;
+        let response = delete_data_entries_and_result(pool.clone(), polling_station_id).await;
         assert_eq!(response.status(), StatusCode::NO_CONTENT);
 
         // Check that the data entry is deleted
-        assert!(!data_entry_exists(&mut conn, 1).await.unwrap());
+        assert!(
+            !data_entry_exists(&mut conn, polling_station_id)
+                .await
+                .unwrap()
+        );
     }
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_3"))))]
     async fn test_polling_station_data_entries_and_result_delete_definitive(pool: SqlitePool) {
-        let polling_station_id = 3;
+        let polling_station_id = PollingStationId::from(3);
 
         // create data entry
         let request_body = example_data_entry();
@@ -2029,8 +2192,12 @@ mod tests {
         );
         assert!(result_exists(&mut conn, polling_station_id).await.unwrap());
 
-        change_status_committee_session(pool.clone(), 3, CommitteeSessionStatus::DataEntryFinished)
-            .await;
+        change_status_committee_session(
+            pool.clone(),
+            CommitteeSessionId::from(3),
+            CommitteeSessionStatus::DataEntryFinished,
+        )
+        .await;
 
         // delete data entry with status Definitive
         let response = delete_data_entries_and_result(pool.clone(), polling_station_id).await;
@@ -2045,9 +2212,10 @@ mod tests {
         assert!(!result_exists(&mut conn, polling_station_id).await.unwrap());
 
         // Check that the committee session status is changed to DataEntryInProgress
-        let committee_session = crate::committee_session::repository::get(&mut conn, 3)
-            .await
-            .unwrap();
+        let committee_session =
+            crate::committee_session::repository::get(&mut conn, CommitteeSessionId::from(3))
+                .await
+                .unwrap();
 
         assert_eq!(
             committee_session.status,
@@ -2059,51 +2227,76 @@ mod tests {
     async fn test_polling_station_data_entries_and_result_delete_fails_entries_different(
         pool: SqlitePool,
     ) {
+        let polling_station_id = PollingStationId::from(1);
         finalise_different_entries(pool.clone()).await;
 
         let mut conn = pool.acquire().await.unwrap();
-        assert!(data_entry_exists(&mut conn, 1).await.unwrap());
+        assert!(
+            data_entry_exists(&mut conn, polling_station_id)
+                .await
+                .unwrap()
+        );
 
         // delete data entry with status EntriesDifferent fails
-        let response = delete_data_entries_and_result(pool.clone(), 1).await;
+        let response = delete_data_entries_and_result(pool.clone(), polling_station_id).await;
         assert_eq!(response.status(), StatusCode::CONFLICT);
         let body = response.into_body().collect().await.unwrap().to_bytes();
         let result: ErrorResponse = serde_json::from_slice(&body).unwrap();
         assert_eq!(result.reference, ErrorReference::DataEntryCannotBeDeleted);
 
         // Check that the data entry is not deleted
-        assert!(data_entry_exists(&mut conn, 1).await.unwrap());
+        assert!(
+            data_entry_exists(&mut conn, polling_station_id)
+                .await
+                .unwrap()
+        );
     }
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
     async fn test_polling_station_data_entries_and_result_delete_fails_first_entry_has_errors(
         pool: SqlitePool,
     ) {
+        let polling_station_id = PollingStationId::from(1);
         finalise_with_errors(pool.clone()).await;
 
         let mut conn = pool.acquire().await.unwrap();
-        assert!(data_entry_exists(&mut conn, 1).await.unwrap());
+        assert!(
+            data_entry_exists(&mut conn, polling_station_id)
+                .await
+                .unwrap()
+        );
 
         // delete data entry with status FirstEntryHasErrors fails
-        let response = delete_data_entries_and_result(pool.clone(), 1).await;
+        let response = delete_data_entries_and_result(pool.clone(), polling_station_id).await;
         assert_eq!(response.status(), StatusCode::CONFLICT);
         let body = response.into_body().collect().await.unwrap().to_bytes();
         let result: ErrorResponse = serde_json::from_slice(&body).unwrap();
         assert_eq!(result.reference, ErrorReference::DataEntryCannotBeDeleted);
 
         // Check that the data entry is not deleted
-        assert!(data_entry_exists(&mut conn, 1).await.unwrap());
+        assert!(
+            data_entry_exists(&mut conn, polling_station_id)
+                .await
+                .unwrap()
+        );
     }
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
     async fn test_data_entry_resolve_differences_keep_first(pool: SqlitePool) {
+        let polling_station_id = PollingStationId::from(1);
         finalise_different_entries(pool.clone()).await;
-        let response =
-            resolve_differences(pool.clone(), 1, ResolveDifferencesAction::KeepFirstEntry).await;
+        let response = resolve_differences(
+            pool.clone(),
+            polling_station_id,
+            ResolveDifferencesAction::KeepFirstEntry,
+        )
+        .await;
         assert_eq!(response.status(), StatusCode::OK);
 
         let mut conn = pool.acquire().await.unwrap();
-        let data_entry = get_data_entry(&mut conn, 1, 2).await.unwrap();
+        let data_entry = get_data_entry(&mut conn, polling_station_id, CommitteeSessionId::from(2))
+            .await
+            .unwrap();
         let status: DataEntryStatus = data_entry.state.0;
         if let DataEntryStatus::FirstEntryFinalised(entry) = status {
             assert_eq!(
@@ -2122,17 +2315,28 @@ mod tests {
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
     async fn test_data_entry_resolve_differences_keep_second(pool: SqlitePool) {
+        let polling_station_id = PollingStationId::from(1);
         finalise_different_entries(pool.clone()).await;
 
-        change_status_committee_session(pool.clone(), 2, CommitteeSessionStatus::DataEntryPaused)
-            .await;
+        change_status_committee_session(
+            pool.clone(),
+            CommitteeSessionId::from(2),
+            CommitteeSessionStatus::DataEntryPaused,
+        )
+        .await;
 
-        let response =
-            resolve_differences(pool.clone(), 1, ResolveDifferencesAction::KeepSecondEntry).await;
+        let response = resolve_differences(
+            pool.clone(),
+            polling_station_id,
+            ResolveDifferencesAction::KeepSecondEntry,
+        )
+        .await;
         assert_eq!(response.status(), StatusCode::OK);
 
         let mut conn = pool.acquire().await.unwrap();
-        let data_entry = get_data_entry(&mut conn, 1, 2).await.unwrap();
+        let data_entry = get_data_entry(&mut conn, polling_station_id, CommitteeSessionId::from(2))
+            .await
+            .unwrap();
         let status: DataEntryStatus = data_entry.state.0;
         if let DataEntryStatus::FirstEntryFinalised(entry) = status {
             assert_eq!(
@@ -2151,34 +2355,48 @@ mod tests {
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
     async fn test_data_entry_resolve_differences_discard_both(pool: SqlitePool) {
+        let polling_station_id = PollingStationId::from(1);
         finalise_different_entries(pool.clone()).await;
 
         // Check that the data entry is created
         let mut conn = pool.acquire().await.unwrap();
-        assert!(data_entry_exists(&mut conn, 1).await.unwrap());
+        assert!(
+            data_entry_exists(&mut conn, polling_station_id)
+                .await
+                .unwrap()
+        );
 
         let response = resolve_differences(
             pool.clone(),
-            1,
+            polling_station_id,
             ResolveDifferencesAction::DiscardBothEntries,
         )
         .await;
         assert_eq!(response.status(), StatusCode::OK);
 
         // Check that the data entry is deleted
-        assert!(!data_entry_exists(&mut conn, 1).await.unwrap());
+        assert!(
+            !data_entry_exists(&mut conn, polling_station_id)
+                .await
+                .unwrap()
+        );
     }
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
     async fn test_data_entry_resolve_differences_committee_session_status_not_ok(pool: SqlitePool) {
+        let polling_station_id = PollingStationId::from(1);
         finalise_different_entries(pool.clone()).await;
 
-        change_status_committee_session(pool.clone(), 2, CommitteeSessionStatus::DataEntryFinished)
-            .await;
+        change_status_committee_session(
+            pool.clone(),
+            CommitteeSessionId::from(2),
+            CommitteeSessionStatus::DataEntryFinished,
+        )
+        .await;
 
         let response = resolve_differences(
             pool.clone(),
-            1,
+            polling_station_id,
             ResolveDifferencesAction::DiscardBothEntries,
         )
         .await;
@@ -2191,49 +2409,81 @@ mod tests {
         );
 
         let mut conn = pool.acquire().await.unwrap();
-        let data_entry = get_data_entry(&mut conn, 1, 2).await.unwrap();
+        let data_entry = get_data_entry(&mut conn, polling_station_id, CommitteeSessionId::from(2))
+            .await
+            .unwrap();
         let status: DataEntryStatus = data_entry.state.0;
         assert!(matches!(status, DataEntryStatus::EntriesDifferent(_)));
     }
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
     async fn test_data_entry_resolve_errors_resume_first(pool: SqlitePool) {
+        let polling_station_id = PollingStationId::from(1);
         finalise_with_errors(pool.clone()).await;
 
-        let response = resolve_errors(pool.clone(), 1, ResolveErrorsAction::ResumeFirstEntry).await;
+        let response = resolve_errors(
+            pool.clone(),
+            polling_station_id,
+            ResolveErrorsAction::ResumeFirstEntry,
+        )
+        .await;
         assert_eq!(response.status(), StatusCode::OK);
 
         let mut conn = pool.acquire().await.unwrap();
-        let data_entry = get_data_entry(&mut conn, 1, 2).await.unwrap();
+        let data_entry = get_data_entry(&mut conn, polling_station_id, CommitteeSessionId::from(2))
+            .await
+            .unwrap();
         let status: DataEntryStatus = data_entry.state.0;
         assert!(matches!(status, DataEntryStatus::FirstEntryInProgress(_)));
     }
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
     async fn test_data_entry_resolve_errors_discard_first(pool: SqlitePool) {
+        let polling_station_id = PollingStationId::from(1);
         finalise_with_errors(pool.clone()).await;
 
         // Check that the data entry is created
         let mut conn = pool.acquire().await.unwrap();
-        assert!(data_entry_exists(&mut conn, 1).await.unwrap());
+        assert!(
+            data_entry_exists(&mut conn, polling_station_id)
+                .await
+                .unwrap()
+        );
 
-        let response =
-            resolve_errors(pool.clone(), 1, ResolveErrorsAction::DiscardFirstEntry).await;
+        let response = resolve_errors(
+            pool.clone(),
+            polling_station_id,
+            ResolveErrorsAction::DiscardFirstEntry,
+        )
+        .await;
         assert_eq!(response.status(), StatusCode::OK);
 
         // Check that the data entry is deleted
-        assert!(!data_entry_exists(&mut conn, 1).await.unwrap());
+        assert!(
+            !data_entry_exists(&mut conn, polling_station_id)
+                .await
+                .unwrap()
+        );
     }
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
     async fn test_data_entry_resolve_errors_committee_session_status_not_ok(pool: SqlitePool) {
+        let polling_station_id = PollingStationId::from(1);
         finalise_with_errors(pool.clone()).await;
 
-        change_status_committee_session(pool.clone(), 2, CommitteeSessionStatus::DataEntryFinished)
-            .await;
+        change_status_committee_session(
+            pool.clone(),
+            CommitteeSessionId::from(2),
+            CommitteeSessionStatus::DataEntryFinished,
+        )
+        .await;
 
-        let response =
-            resolve_errors(pool.clone(), 1, ResolveErrorsAction::DiscardFirstEntry).await;
+        let response = resolve_errors(
+            pool.clone(),
+            polling_station_id,
+            ResolveErrorsAction::DiscardFirstEntry,
+        )
+        .await;
         assert_eq!(response.status(), StatusCode::CONFLICT);
         let body = response.into_body().collect().await.unwrap().to_bytes();
         let result: ErrorResponse = serde_json::from_slice(&body).unwrap();
@@ -2243,14 +2493,16 @@ mod tests {
         );
 
         let mut conn = pool.acquire().await.unwrap();
-        let data_entry = get_data_entry(&mut conn, 1, 2).await.unwrap();
+        let data_entry = get_data_entry(&mut conn, polling_station_id, CommitteeSessionId::from(2))
+            .await
+            .unwrap();
         let status: DataEntryStatus = data_entry.state.0;
         assert!(matches!(status, DataEntryStatus::FirstEntryHasErrors(_)));
     }
 
     async fn claim_previous_results(
         pool: SqlitePool,
-        polling_station_id: u32,
+        polling_station_id: PollingStationId,
     ) -> Option<CommonPollingStationResults> {
         let response = claim(pool.clone(), polling_station_id, EntryNumber::FirstEntry).await;
         assert_eq!(response.status(), StatusCode::OK);
@@ -2262,42 +2514,65 @@ mod tests {
     /// No previous results, should return none
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_7_four_sessions"))))]
     async fn test_previous_results_none(pool: SqlitePool) {
+        let committee_session_id = CommitteeSessionId::from(704);
+        let polling_station_id = PollingStationId::from(743);
         // Add new polling station
-        insert_test_polling_station(&mut pool.acquire().await.unwrap(), 743, 704, None, 123)
-            .await
-            .unwrap();
+        insert_test_polling_station(
+            &mut pool.acquire().await.unwrap(),
+            polling_station_id,
+            committee_session_id,
+            None,
+            123,
+        )
+        .await
+        .unwrap();
 
         // Add investigation with corrected_results to be able to claim the polling station
-        insert_test_investigation(&mut pool.acquire().await.unwrap(), 743, Some(true))
-            .await
-            .unwrap();
+        insert_test_investigation(
+            &mut pool.acquire().await.unwrap(),
+            polling_station_id,
+            Some(true),
+        )
+        .await
+        .unwrap();
 
         change_status_committee_session(
             pool.clone(),
-            704,
+            committee_session_id,
             CommitteeSessionStatus::DataEntryInProgress,
         )
         .await;
 
-        assert!(claim_previous_results(pool.clone(), 743).await.is_none());
+        assert!(
+            claim_previous_results(pool.clone(), polling_station_id)
+                .await
+                .is_none()
+        );
     }
 
     /// Should get result from third session, even though there were also results in the first session
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_7_four_sessions"))))]
     async fn test_previous_results(pool: SqlitePool) {
+        let polling_station_id = PollingStationId::from(742);
         // Add investigation with corrected_results to be able to claim the polling station
-        insert_test_investigation(&mut pool.acquire().await.unwrap(), 742, Some(true))
-            .await
-            .unwrap();
+        insert_test_investigation(
+            &mut pool.acquire().await.unwrap(),
+            polling_station_id,
+            Some(true),
+        )
+        .await
+        .unwrap();
 
         change_status_committee_session(
             pool.clone(),
-            704,
+            CommitteeSessionId::from(704),
             CommitteeSessionStatus::DataEntryInProgress,
         )
         .await;
 
-        let previous_results = claim_previous_results(pool.clone(), 742).await.unwrap();
+        let previous_results = claim_previous_results(pool.clone(), polling_station_id)
+            .await
+            .unwrap();
         // Check by difference in fixture results data
         assert_eq!(previous_results.voters_counts.proxy_certificate_count, 4);
     }
@@ -2354,7 +2629,7 @@ mod tests {
 
         async fn call_polling_station_data_entry_get(
             pool: SqlitePool,
-            polling_station_id: u32,
+            polling_station_id: PollingStationId,
         ) -> Result<DataEntryGetResponse, ErrorResponse> {
             let user = User::test_user(Role::Coordinator, 1);
             let response = polling_station_data_entry_get(
@@ -2377,21 +2652,28 @@ mod tests {
 
         #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
         async fn test_status_empty(pool: SqlitePool) {
-            let result = call_polling_station_data_entry_get(pool.clone(), 1)
-                .await
-                .err()
-                .unwrap();
+            let result =
+                call_polling_station_data_entry_get(pool.clone(), PollingStationId::from(1))
+                    .await
+                    .err()
+                    .unwrap();
 
             assert_eq!(result.reference, ErrorReference::DataEntryGetNotAllowed);
         }
 
         #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
         async fn test_status_first_entry_in_progress(pool: SqlitePool) {
-            claim(pool.clone(), 1, EntryNumber::FirstEntry).await;
+            claim(
+                pool.clone(),
+                PollingStationId::from(1),
+                EntryNumber::FirstEntry,
+            )
+            .await;
 
-            let result = call_polling_station_data_entry_get(pool.clone(), 1)
-                .await
-                .unwrap();
+            let result =
+                call_polling_station_data_entry_get(pool.clone(), PollingStationId::from(1))
+                    .await
+                    .unwrap();
 
             assert_eq!(result.status, DataEntryStatusName::FirstEntryInProgress);
             assert_eq!(result.user_id, Some(1));
@@ -2403,13 +2685,21 @@ mod tests {
         #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
         async fn test_status_first_entry_has_errors(pool: SqlitePool) {
             let mut data_entry_body = example_data_entry();
+            let polling_station_id = PollingStationId::from(1);
+
             data_entry_body.data.voters_counts_mut().poll_card_count = 1234; // incorrect value
 
-            claim(pool.clone(), 1, EntryNumber::FirstEntry).await;
-            save(pool.clone(), data_entry_body, 1, EntryNumber::FirstEntry).await;
-            finalise(pool.clone(), 1, EntryNumber::FirstEntry).await;
+            claim(pool.clone(), polling_station_id, EntryNumber::FirstEntry).await;
+            save(
+                pool.clone(),
+                data_entry_body,
+                polling_station_id,
+                EntryNumber::FirstEntry,
+            )
+            .await;
+            finalise(pool.clone(), polling_station_id, EntryNumber::FirstEntry).await;
 
-            let result = call_polling_station_data_entry_get(pool.clone(), 1)
+            let result = call_polling_station_data_entry_get(pool.clone(), polling_station_id)
                 .await
                 .unwrap();
 
@@ -2432,17 +2722,18 @@ mod tests {
 
         #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
         async fn test_status_first_entry_finalised(pool: SqlitePool) {
-            claim(pool.clone(), 1, EntryNumber::FirstEntry).await;
+            let polling_station_id = PollingStationId::from(1);
+            claim(pool.clone(), polling_station_id, EntryNumber::FirstEntry).await;
             save(
                 pool.clone(),
                 example_data_entry_with_warning(),
-                1,
+                polling_station_id,
                 EntryNumber::FirstEntry,
             )
             .await;
-            finalise(pool.clone(), 1, EntryNumber::FirstEntry).await;
+            finalise(pool.clone(), polling_station_id, EntryNumber::FirstEntry).await;
 
-            let result = call_polling_station_data_entry_get(pool.clone(), 1)
+            let result = call_polling_station_data_entry_get(pool.clone(), polling_station_id)
                 .await
                 .unwrap();
 
@@ -2457,14 +2748,22 @@ mod tests {
         async fn test_status_second_entry_in_progress(pool: SqlitePool) {
             // Complete first entry
             let data_entry_body = example_data_entry_with_warning();
-            claim(pool.clone(), 1, EntryNumber::FirstEntry).await;
-            save(pool.clone(), data_entry_body, 1, EntryNumber::FirstEntry).await;
-            finalise(pool.clone(), 1, EntryNumber::FirstEntry).await;
+            let polling_station_id = PollingStationId::from(1);
+
+            claim(pool.clone(), polling_station_id, EntryNumber::FirstEntry).await;
+            save(
+                pool.clone(),
+                data_entry_body,
+                polling_station_id,
+                EntryNumber::FirstEntry,
+            )
+            .await;
+            finalise(pool.clone(), polling_station_id, EntryNumber::FirstEntry).await;
 
             // Start second entry
-            claim(pool.clone(), 1, EntryNumber::SecondEntry).await;
+            claim(pool.clone(), polling_station_id, EntryNumber::SecondEntry).await;
 
-            let result = call_polling_station_data_entry_get(pool.clone(), 1)
+            let result = call_polling_station_data_entry_get(pool.clone(), polling_station_id)
                 .await
                 .unwrap();
 
@@ -2477,11 +2776,19 @@ mod tests {
 
         #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
         async fn test_status_entries_different(pool: SqlitePool) {
+            let polling_station_id = PollingStationId::from(1);
+
             // Complete first entry
             let data_entry_body = example_data_entry();
-            claim(pool.clone(), 1, EntryNumber::FirstEntry).await;
-            save(pool.clone(), data_entry_body, 1, EntryNumber::FirstEntry).await;
-            finalise(pool.clone(), 1, EntryNumber::FirstEntry).await;
+            claim(pool.clone(), polling_station_id, EntryNumber::FirstEntry).await;
+            save(
+                pool.clone(),
+                data_entry_body,
+                polling_station_id,
+                EntryNumber::FirstEntry,
+            )
+            .await;
+            finalise(pool.clone(), polling_station_id, EntryNumber::FirstEntry).await;
 
             // Start and complete second entry with different values
             let mut data_entry_body = example_data_entry();
@@ -2491,11 +2798,17 @@ mod tests {
                 .voters_counts_mut()
                 .proxy_certificate_count = 20;
 
-            claim(pool.clone(), 1, EntryNumber::SecondEntry).await;
-            save(pool.clone(), data_entry_body, 1, EntryNumber::SecondEntry).await;
-            finalise(pool.clone(), 1, EntryNumber::SecondEntry).await;
+            claim(pool.clone(), polling_station_id, EntryNumber::SecondEntry).await;
+            save(
+                pool.clone(),
+                data_entry_body,
+                polling_station_id,
+                EntryNumber::SecondEntry,
+            )
+            .await;
+            finalise(pool.clone(), polling_station_id, EntryNumber::SecondEntry).await;
 
-            let result = call_polling_station_data_entry_get(pool.clone(), 1)
+            let result = call_polling_station_data_entry_get(pool.clone(), polling_station_id)
                 .await
                 .err()
                 .unwrap();
@@ -2507,17 +2820,31 @@ mod tests {
         async fn test_status_definitive(pool: SqlitePool) {
             // Complete first entry
             let data_entry_body = example_data_entry_with_warning();
-            claim(pool.clone(), 1, EntryNumber::FirstEntry).await;
-            save(pool.clone(), data_entry_body, 1, EntryNumber::FirstEntry).await;
-            finalise(pool.clone(), 1, EntryNumber::FirstEntry).await;
+            let polling_station_id = PollingStationId::from(1);
+
+            claim(pool.clone(), polling_station_id, EntryNumber::FirstEntry).await;
+            save(
+                pool.clone(),
+                data_entry_body,
+                polling_station_id,
+                EntryNumber::FirstEntry,
+            )
+            .await;
+            finalise(pool.clone(), polling_station_id, EntryNumber::FirstEntry).await;
 
             // Complete second entry
             let data_entry_body = example_data_entry_with_warning();
-            claim(pool.clone(), 1, EntryNumber::SecondEntry).await;
-            save(pool.clone(), data_entry_body, 1, EntryNumber::SecondEntry).await;
-            finalise(pool.clone(), 1, EntryNumber::SecondEntry).await;
+            claim(pool.clone(), polling_station_id, EntryNumber::SecondEntry).await;
+            save(
+                pool.clone(),
+                data_entry_body,
+                polling_station_id,
+                EntryNumber::SecondEntry,
+            )
+            .await;
+            finalise(pool.clone(), polling_station_id, EntryNumber::SecondEntry).await;
 
-            let result = call_polling_station_data_entry_get(pool.clone(), 1)
+            let result = call_polling_station_data_entry_get(pool.clone(), polling_station_id)
                 .await
                 .unwrap();
 

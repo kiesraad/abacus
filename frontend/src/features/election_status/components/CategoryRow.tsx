@@ -5,10 +5,10 @@ import { Badge } from "@/components/ui/Badge/Badge";
 import { Icon } from "@/components/ui/Icon/Icon";
 import { ProgressBar } from "@/components/ui/ProgressBar/ProgressBar";
 import { Table } from "@/components/ui/Table/Table";
+import { useUser } from "@/hooks/user/useUser.ts";
 import { t } from "@/i18n/translate";
 import type { DataEntryStatusName } from "@/types/generated/openapi";
 import { formatDateTime } from "@/utils/dateTime";
-
 import type { PollingStationWithStatusAndTypist, StatusCategory } from "../hooks/useElectionStatus";
 
 interface CategoryRowProps {
@@ -63,12 +63,20 @@ interface CategoryRowContentProps {
 }
 
 function CategoryRowContent({ category, pollingStation, warning }: CategoryRowContentProps): ReactNode {
+  const user = useUser();
+
+  if (!user) {
+    return null;
+  }
+
   return (
     <>
       <Table.NumberCell key={`${pollingStation.id}-number`}>{pollingStation.number}</Table.NumberCell>
       <Table.Cell key={`${pollingStation.id}-name`}>
         <span>{pollingStation.name}</span>
-        {pollingStation.status && SHOW_BADGE.includes(pollingStation.status) && <Badge type={pollingStation.status} />}
+        {pollingStation.status && SHOW_BADGE.includes(pollingStation.status) && (
+          <Badge type={pollingStation.status} userRole={user.role} />
+        )}
       </Table.Cell>
       {(category === "in_progress" || category === "first_entry_finished") && (
         <Table.Cell key={`${pollingStation.id}-typist`}>{pollingStation.typist}</Table.Cell>

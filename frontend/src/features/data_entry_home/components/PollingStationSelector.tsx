@@ -5,10 +5,10 @@ import { Badge } from "@/components/ui/Badge/Badge";
 import { Icon } from "@/components/ui/Icon/Icon";
 import { InputField } from "@/components/ui/InputField/InputField";
 import { Spinner } from "@/components/ui/Spinner/Spinner";
+import { useUser } from "@/hooks/user/useUser.ts";
 import { t, tx } from "@/i18n/translate";
 import { cn } from "@/utils/classnames";
 import { removeLeadingZeros } from "@/utils/strings";
-
 import { useSingleCall } from "../hooks/useSingleCall";
 import { PollingStationUserStatus, type PollingStationWithStatus } from "../utils/util";
 import cls from "./PollingStationChoice.module.css";
@@ -54,6 +54,10 @@ export function PollingStationSelector({
   refetchStatuses,
 }: PollingStationSelectorProps) {
   const [refetch, reset] = useSingleCall(refetchStatuses);
+  const user = useUser();
+  if (!user) {
+    return false;
+  }
 
   const renderWarningMessage = (content: ReactNode) => (
     <FeedbackMessage
@@ -115,14 +119,7 @@ export function PollingStationSelector({
                 content={
                   <>
                     <span className="bold">{currentPollingStation.name}</span>
-                    <Badge
-                      type={
-                        currentPollingStation.statusEntry.status === "first_entry_finalised"
-                          ? "first_entry_finalised_for_typist"
-                          : currentPollingStation.statusEntry.status
-                      }
-                      showIcon
-                    />
+                    <Badge type={currentPollingStation.statusEntry.status} userRole={user.role} showIcon />
                   </>
                 }
               />

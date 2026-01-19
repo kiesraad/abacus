@@ -7,9 +7,9 @@ import { Badge } from "@/components/ui/Badge/Badge";
 import { PollingStationNumber } from "@/components/ui/Badge/PollingStationNumber";
 import { useElection } from "@/hooks/election/useElection";
 import { useNumericParam } from "@/hooks/useNumericParam";
+import { useUser } from "@/hooks/user/useUser.ts";
 import { t } from "@/i18n/translate";
 import type { FormSectionId } from "@/types/types";
-
 import { usePollingStationStatus } from "../hooks/usePollingStationStatus";
 import { AbortDataEntryControl } from "./AbortDataEntryControl";
 import { CheckAndSaveForm } from "./check_and_save/CheckAndSaveForm";
@@ -22,6 +22,7 @@ export function DataEntryPage() {
   const entryNumber = useNumericParam("entryNumber");
   const { election, pollingStation } = useElection(pollingStationId);
   const pollingStationStatus = usePollingStationStatus(pollingStation?.id);
+  const user = useUser();
 
   if (!pollingStation) {
     throw new NotFoundError("error.polling_station_not_found");
@@ -34,6 +35,10 @@ export function DataEntryPage() {
   const params = useParams<{ sectionId: FormSectionId }>();
   const sectionId = params.sectionId ?? null;
 
+  if (!user) {
+    return false;
+  }
+
   return (
     <DataEntryProvider election={election} pollingStation={pollingStation} entryNumber={entryNumber}>
       <PageTitle title={`${t("data_entry.title")} ${pollingStation.number} ${pollingStation.name} - Abacus`} />
@@ -41,15 +46,7 @@ export function DataEntryPage() {
         <section className="smaller-gap">
           <PollingStationNumber>{pollingStation.number}</PollingStationNumber>
           <h1>{pollingStation.name}</h1>
-          {pollingStationStatus.status && (
-            <Badge
-              type={
-                pollingStationStatus.status === "first_entry_finalised"
-                  ? "first_entry_finalised_for_typist"
-                  : pollingStationStatus.status
-              }
-            />
-          )}
+          {pollingStationStatus.status && <Badge type={pollingStationStatus.status} userRole={user.role} />}
         </section>
         <section>
           <AbortDataEntryControl />

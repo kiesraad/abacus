@@ -12,9 +12,9 @@ import { FormLayout } from "@/components/ui/Form/FormLayout";
 import { useElection } from "@/hooks/election/useElection";
 import { useMessages } from "@/hooks/messages/useMessages";
 import { useNumericParam } from "@/hooks/useNumericParam";
+import { useUser } from "@/hooks/user/useUser.ts";
 import { t } from "@/i18n/translate";
 import { getDataEntryStructure } from "@/utils/dataEntryStructure";
-
 import { usePollingStationDataEntryErrors } from "../hooks/usePollingStationDataEntryErrors";
 import { DetailNavigation } from "./DetailNavigation";
 import { ReadOnlyDataEntryDelete } from "./delete/ReadOnlyDataEntryDelete";
@@ -26,6 +26,7 @@ export function DetailLayout() {
   const { election, pollingStation } = useElection(pollingStationId);
   const { loading, dataEntry } = usePollingStationDataEntryErrors(pollingStationId);
   const [error, setError] = useState<AnyApiError>();
+  const user = useUser();
 
   if (error && !(error instanceof ApiError)) {
     throw error;
@@ -35,7 +36,7 @@ export function DetailLayout() {
     throw new NotFoundError("error.polling_station_not_found");
   }
 
-  if (loading || !dataEntry) {
+  if (loading || !dataEntry || !user) {
     return null;
   }
 
@@ -68,7 +69,7 @@ export function DetailLayout() {
         <section className="smaller-gap">
           <PollingStationNumber>{pollingStation.number}</PollingStationNumber>
           <h1>{pollingStation.name}</h1>
-          <Badge type={dataEntry.status} />
+          <Badge type={dataEntry.status} userRole={user.role} />
         </section>
         {dataEntry.status !== "first_entry_has_errors" && (
           <section>

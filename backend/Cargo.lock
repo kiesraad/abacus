@@ -6,6 +6,7 @@ version = 4
 name = "abacus"
 version = "1.1.0"
 dependencies = [
+ "apportionment",
  "argon2",
  "async_zip",
  "axum",
@@ -134,6 +135,13 @@ dependencies = [
  "anstyle",
  "once_cell_polyfill",
  "windows-sys 0.61.2",
+]
+
+[[package]]
+name = "apportionment"
+version = "1.1.0"
+dependencies = [
+ "tracing",
 ]
 
 [[package]]

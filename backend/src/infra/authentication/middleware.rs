@@ -12,7 +12,10 @@ use tracing::{debug, error, info};
 use super::{SESSION_MIN_LIFE_TIME, session::Session};
 use crate::{
     SqlitePoolExt,
-    authentication::{User, request_data::RequestSessionData, set_default_cookie_properties},
+    infra::authentication::{
+        User, request_data::RequestSessionData, util::set_default_cookie_properties,
+    },
+    repository::user_repo,
     service::audit_log::{AuditEvent, AuditService},
 };
 
@@ -40,7 +43,7 @@ pub async fn inject_user(
     extensions.insert(session);
 
     // fetch the user from the database
-    let Ok(Some(user)) = super::user::get_by_id(&mut conn, session_id).await else {
+    let Ok(Some(user)) = user_repo::get_by_id(&mut conn, session_id).await else {
         return request;
     };
 
@@ -139,7 +142,7 @@ mod test {
 
     use super::{extend_session, inject_user};
     use crate::{
-        authentication::{
+        infra::authentication::{
             DO_NOT_EXTEND_SESSION_HEADER, Role, SESSION_LIFE_TIME, SESSION_MIN_LIFE_TIME, User,
         },
         service::audit_log::AuditService,
@@ -148,7 +151,7 @@ mod test {
     const TEST_USER_AGENT: &str = "TestAgent/1.0";
     const TEST_IP_ADDRESS: &str = "0.0.0.0";
 
-    #[test(sqlx::test(fixtures("../../fixtures/users.sql")))]
+    #[test(sqlx::test(fixtures("../../../fixtures/users.sql")))]
     async fn test_inject_user(pool: SqlitePool) {
         let request = inject_user(State(pool.clone()), Request::new(Body::empty())).await;
 
@@ -159,7 +162,7 @@ mod test {
 
         let user = User::test_user(Role::Administrator, 1);
         let mut conn = pool.acquire().await.unwrap();
-        let session = crate::authentication::session::create(
+        let session = crate::infra::authentication::session::create(
             &mut conn,
             user.id(),
             TEST_USER_AGENT,
@@ -184,7 +187,7 @@ mod test {
             "inject_user should inject a user if there is a session cookie"
         );
 
-        crate::authentication::user::delete(&mut conn, user.id())
+        crate::repository::user_repo::delete(&mut conn, user.id())
             .await
             .unwrap();
 
@@ -196,7 +199,7 @@ mod test {
         );
     }
 
-    #[test(sqlx::test(fixtures("../../fixtures/users.sql")))]
+    #[test(sqlx::test(fixtures("../../../fixtures/users.sql")))]
     async fn test_extend_session(pool: SqlitePool) {
         let user = User::test_user(Role::Administrator, 1);
 
@@ -225,7 +228,7 @@ mod test {
 
         let life_time = SESSION_MIN_LIFE_TIME + TimeDelta::seconds(30); // min life time + 30 seconds
         let mut conn = pool.acquire().await.unwrap();
-        let session = crate::authentication::session::create(
+        let session = crate::infra::authentication::session::create(
             &mut conn,
             user.id(),
             TEST_USER_AGENT,
@@ -259,7 +262,7 @@ mod test {
         );
 
         let life_time = SESSION_MIN_LIFE_TIME - TimeDelta::seconds(30); // min life time - 30 seconds
-        let session = crate::authentication::session::create(
+        let session = crate::infra::authentication::session::create(
             &mut conn,
             user.id(),
             TEST_USER_AGENT,
@@ -282,10 +285,11 @@ mod test {
         let cookie = updated_response.headers().get(SET_COOKIE).unwrap();
         let cookie = Cookie::from_str(cookie.to_str().unwrap()).unwrap();
 
-        let new_session = crate::authentication::session::get_by_key(&mut conn, cookie.value())
-            .await
-            .unwrap()
-            .unwrap();
+        let new_session =
+            crate::infra::authentication::session::get_by_key(&mut conn, cookie.value())
+                .await
+                .unwrap()
+                .unwrap();
 
         assert_eq!(
             updated_response
@@ -299,7 +303,7 @@ mod test {
         );
     }
 
-    #[test(sqlx::test(fixtures("../../fixtures/users.sql")))]
+    #[test(sqlx::test(fixtures("../../../fixtures/users.sql")))]
     async fn test_extend_session_do_not_extend_header(pool: SqlitePool) {
         let user = User::test_user(Role::Administrator, 1);
 
@@ -310,7 +314,7 @@ mod test {
 
         let life_time = SESSION_MIN_LIFE_TIME - TimeDelta::seconds(30); // min life time - 30 seconds
         let mut conn = pool.acquire().await.unwrap();
-        let session = crate::authentication::session::create(
+        let session = crate::infra::authentication::session::create(
             &mut conn,
             user.id(),
             TEST_USER_AGENT,

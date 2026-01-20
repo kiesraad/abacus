@@ -8,13 +8,13 @@ use utoipa::ToSchema;
 
 use crate::{
     APIError, ErrorResponse,
-    authentication::Coordinator,
     domain::{
         data_entry_status::{DataEntryStatus, DataEntryStatusName},
         polling_station_results::PollingStationResults,
         validate::{ValidateRoot, ValidationResults},
     },
     error::ErrorReference,
+    infra::authentication::Coordinator,
     repository::polling_station_result_repo,
     service::data_entry::validate_and_get_data,
 };
@@ -128,11 +128,11 @@ mod tests {
             data_entry_finalise::tests::finalise,
             data_entry_save::{DataEntry, tests::save},
         },
-        authentication::{Role, User},
         domain::{
             entry_number::EntryNumber,
             validate::{ValidationResult, ValidationResultCode},
         },
+        infra::authentication::{Role, User},
     };
 
     async fn call_polling_station_data_entry_get(

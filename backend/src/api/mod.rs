@@ -1,4 +1,5 @@
 pub mod audit_log;
+pub mod authentication;
 pub mod data_entry;
 pub mod election;
 #[cfg(feature = "dev-database")]

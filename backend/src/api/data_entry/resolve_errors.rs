@@ -8,11 +8,11 @@ use utoipa::ToSchema;
 
 use crate::{
     APIError, ErrorResponse, SqlitePoolExt,
-    authentication::Coordinator,
     domain::{
         data_entry_status::DataEntryStatus, data_entry_status_response::DataEntryStatusResponse,
         polling_station_data_entry::PollingStationDataEntry,
     },
+    infra::authentication::Coordinator,
     repository::data_entry_repo,
     service::{
         audit_log::{AuditEvent, AuditService},
@@ -120,9 +120,9 @@ mod tests {
             data_entry::{data_entry_finalise::tests::finalise_with_errors, resolve_errors},
             election::committee_session::tests::change_status_committee_session,
         },
-        authentication::{Role, User},
         domain::committee_session_status::CommitteeSessionStatus,
         error::ErrorReference,
+        infra::authentication::{Role, User},
     };
 
     async fn resolve_errors(

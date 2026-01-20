@@ -9,7 +9,6 @@ use sqlx::{SqliteConnection, SqlitePool};
 use crate::{
     APIError, ErrorResponse, SqlitePoolExt,
     api::election::committee_session::CommitteeSessionError,
-    authentication::Coordinator,
     domain::{
         committee_session::{CommitteeSession, CommitteeSessionFilesUpdateRequest},
         committee_session_status::CommitteeSessionStatus,
@@ -19,7 +18,10 @@ use crate::{
     },
     eml::{EMLDocument, EmlHash},
     error::ErrorReference,
-    infra::zip::{ZipResponse, ZipResponseError, zip_single_file},
+    infra::{
+        authentication::Coordinator,
+        zip::{ZipResponse, ZipResponseError, zip_single_file},
+    },
     repository::{
         committee_session_repo::change_files, election_repo, file_repo,
         investigation_repo::list_investigations_for_committee_session,

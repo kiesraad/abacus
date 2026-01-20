@@ -7,12 +7,15 @@ use serde::{Deserialize, Serialize};
 use sqlx::{FromRow, SqliteConnection, SqlitePool, query, query_as};
 use utoipa::ToSchema;
 
-use super::{
-    error::AuthenticationError,
-    password::{HashedPassword, ValidatedPassword, hash_password, verify_password},
-    role::Role,
+use crate::{
+    APIError,
+    infra::authentication::{
+        error::AuthenticationError,
+        password::{HashedPassword, ValidatedPassword, hash_password, verify_password},
+        role::{IncompleteUser, Role},
+    },
+    service::audit_log::UserDetails,
 };
-use crate::{APIError, authentication::role::IncompleteUser, service::audit_log::UserDetails};
 
 const MIN_UPDATE_LAST_ACTIVITY_AT_SECS: i64 = 60; // 1 minute
 
@@ -459,7 +462,10 @@ mod tests {
     use sqlx::SqlitePool;
     use test_log::test;
 
-    use crate::authentication::{error::AuthenticationError, password, role::Role, user::User};
+    use crate::{
+        infra::authentication::{error::AuthenticationError, password, role::Role},
+        repository::user_repo::User,
+    };
 
     #[test(sqlx::test)]
     async fn test_create_user(pool: SqlitePool) {

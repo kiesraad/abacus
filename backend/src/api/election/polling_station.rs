@@ -8,7 +8,6 @@ use sqlx::{Connection, SqliteConnection, SqlitePool};
 use crate::{
     APIError, SqlitePoolExt,
     api::election::investigation::delete_investigation_for_polling_station,
-    authentication::{AdminOrCoordinator, User, error::AuthenticationError},
     domain::{
         committee_session::CommitteeSession,
         committee_session_status::{CommitteeSessionStatus, change_committee_session_status},
@@ -20,6 +19,7 @@ use crate::{
     },
     eml::{EML110, EMLDocument, EMLImportError, EmlHash},
     error::ErrorResponse,
+    infra::authentication::{AdminOrCoordinator, User, error::AuthenticationError},
     repository::{
         committee_session_repo::get_election_committee_session,
         election_repo, polling_station_repo,

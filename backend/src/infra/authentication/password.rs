@@ -10,7 +10,7 @@ use sqlx::Type;
 use super::error::AuthenticationError;
 
 /// Helper newtype for password validation. Makes sure that password rules are followed when constructed with `new()`.
-pub(super) struct ValidatedPassword<'a>(&'a str);
+pub(crate) struct ValidatedPassword<'a>(&'a str);
 
 /// Minimum length of a password
 const MIN_PASSWORD_LEN: usize = 13;
@@ -47,7 +47,7 @@ impl<'pw> ValidatedPassword<'pw> {
 #[derive(Deserialize, Default, PartialEq, Eq, Clone, Debug, Hash, Type)]
 #[serde(deny_unknown_fields)]
 #[sqlx(transparent)]
-pub(super) struct HashedPassword(String);
+pub(crate) struct HashedPassword(String);
 
 impl Deref for HashedPassword {
     type Target = String;
@@ -64,7 +64,7 @@ impl From<String> for HashedPassword {
 }
 
 /// Hash a string password with Argon2id v19 and return the string representation of the hash/salt/params
-pub(super) fn hash_password(
+pub(crate) fn hash_password(
     password: ValidatedPassword,
 ) -> Result<HashedPassword, AuthenticationError> {
     let salt = SaltString::generate(&mut OsRng);
@@ -80,7 +80,7 @@ pub(super) fn hash_password(
 }
 
 /// Verify a password against a password hash created with hash_password
-pub(super) fn verify_password(password: &str, password_hash: &HashedPassword) -> bool {
+pub(crate) fn verify_password(password: &str, password_hash: &HashedPassword) -> bool {
     let Ok(parsed_hash) = PasswordHash::new(&password_hash.0) else {
         return false;
     };

@@ -9,7 +9,7 @@ use utoipa_axum::{router::OpenApiRouter, routes};
 
 use crate::{
     APIError, AppState, ErrorResponse,
-    authentication::AdminOrCoordinator,
+    infra::authentication::AdminOrCoordinator,
     service::audit_log::{AuditEvent, AuditEventLevel, AuditLogEvent, AuditLogUser, LogFilter},
 };
 
@@ -181,8 +181,10 @@ mod tests {
     use crate::{
         AppState,
         api::audit_log::{audit_log_list, audit_log_list_users},
-        authentication::{User, inject_user},
-        infra::airgap::AirgapDetection,
+        infra::{
+            airgap::AirgapDetection,
+            authentication::{User, inject_user},
+        },
         service::audit_log::{AuditEvent, AuditLogUser, AuditService, UserLoggedInDetails},
     };
 
@@ -195,7 +197,7 @@ mod tests {
 
     async fn create_log_entries(pool: SqlitePool) {
         let mut conn = pool.acquire().await.unwrap();
-        let user = crate::authentication::user::get_by_username(&mut conn, "admin1")
+        let user = crate::repository::user_repo::get_by_username(&mut conn, "admin1")
             .await
             .unwrap()
             .unwrap();
@@ -217,7 +219,7 @@ mod tests {
         };
 
         let mut conn = pool.acquire().await.unwrap();
-        let session = crate::authentication::session::create(
+        let session = crate::infra::authentication::session::create(
             &mut conn,
             1,
             TEST_USER_AGENT,
@@ -287,7 +289,7 @@ mod tests {
         };
 
         let mut conn = pool.acquire().await.unwrap();
-        let session = crate::authentication::session::create(
+        let session = crate::infra::authentication::session::create(
             &mut conn,
             1,
             TEST_USER_AGENT,

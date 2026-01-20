@@ -8,7 +8,6 @@ use utoipa::ToSchema;
 
 use crate::{
     APIError, ErrorResponse, SqlitePoolExt,
-    authentication::Typist,
     domain::{
         committee_session::CommitteeSession,
         data_entry_status::{CurrentDataEntry, DataEntryStatus},
@@ -20,6 +19,7 @@ use crate::{
         },
         validate::{ValidateRoot, ValidationResults},
     },
+    infra::authentication::Typist,
     repository::{data_entry_repo, polling_station_result_repo},
     service::{
         audit_log::{AuditEvent, AuditService},
@@ -194,12 +194,12 @@ pub mod tests {
     use super::*;
     use crate::{
         api::election::committee_session::tests::change_status_committee_session,
-        authentication::{Role, User},
         domain::{
             committee_session_status::CommitteeSessionStatus,
             polling_station_data_entry::PollingStationDataEntry,
         },
         error::ErrorReference,
+        infra::authentication::{Role, User},
         repository::{
             investigation_repo::insert_test_investigation,
             polling_station_repo::insert_test_polling_station,

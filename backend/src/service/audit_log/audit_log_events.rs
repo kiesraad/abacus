@@ -9,7 +9,7 @@ use utoipa::ToSchema;
 use super::AuditEvent;
 use crate::{
     APIError,
-    authentication::{Role, User},
+    infra::authentication::{Role, User},
 };
 
 #[derive(

@@ -6,11 +6,11 @@ use sqlx::SqlitePool;
 
 use crate::{
     APIError, ErrorResponse, SqlitePoolExt,
-    authentication::Typist,
     domain::{
         data_entry_status::DataEntryStatus, data_entry_status_response::DataEntryStatusResponse,
         entry_number::EntryNumber,
     },
+    infra::authentication::Typist,
     repository::data_entry_repo,
     service::{
         audit_log::{AuditEvent, AuditService},
@@ -128,12 +128,12 @@ pub mod tests {
             },
             election::committee_session::tests::change_status_committee_session,
         },
-        authentication::{Role, User},
         domain::{
             committee_session_status::CommitteeSessionStatus,
             data_entry_status::DataEntryStatusName,
         },
         error::ErrorReference,
+        infra::authentication::{Role, User},
         repository::{data_entry_repo, polling_station_result_repo},
     };
 

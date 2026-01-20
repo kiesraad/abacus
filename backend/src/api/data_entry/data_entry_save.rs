@@ -9,13 +9,13 @@ use utoipa::ToSchema;
 
 use crate::{
     APIError, ErrorResponse, SqlitePoolExt,
-    authentication::Typist,
     domain::{
         data_entry_status::{ClientState, CurrentDataEntry},
         entry_number::EntryNumber,
         polling_station_results::PollingStationResults,
         validate::{ValidateRoot, ValidationResults},
     },
+    infra::authentication::Typist,
     repository::data_entry_repo,
     service::{
         audit_log::{AuditEvent, AuditService},
@@ -155,11 +155,11 @@ pub mod tests {
             data_entry::{data_entry_claim::tests::claim, data_entry_finalise::tests::finalise},
             election::committee_session::tests::change_status_committee_session,
         },
-        authentication::{Role, User},
         domain::{
             committee_session_status::CommitteeSessionStatus, data_entry_status::DataEntryStatus,
         },
         error::ErrorReference,
+        infra::authentication::{Role, User},
         repository::polling_station_result_repo,
     };
 

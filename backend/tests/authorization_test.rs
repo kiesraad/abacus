@@ -5,7 +5,7 @@ use std::panic;
 
 use abacus::{
     api::router::{get_scopes_from_operation, openapi_router},
-    authentication::Role,
+    infra::authentication::Role,
 };
 use hyper::{Method, StatusCode};
 use sqlx::SqlitePool;

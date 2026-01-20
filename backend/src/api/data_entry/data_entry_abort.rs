@@ -6,8 +6,8 @@ use sqlx::SqlitePool;
 
 use crate::{
     APIError, ErrorResponse, SqlitePoolExt,
-    authentication::Typist,
     domain::{data_entry_status::DataEntryStatus, entry_number::EntryNumber},
+    infra::authentication::Typist,
     repository::data_entry_repo,
     service::{
         audit_log::{AuditEvent, AuditService},
@@ -101,11 +101,11 @@ mod tests {
             },
             election::committee_session::tests::change_status_committee_session,
         },
-        authentication::{Coordinator, Role, User},
         domain::{
             committee_session_status::CommitteeSessionStatus, validate::ValidationResultCode,
         },
         error::ErrorReference,
+        infra::authentication::{Coordinator, Role, User},
     };
 
     async fn delete(

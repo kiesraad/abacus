@@ -6,8 +6,8 @@ use sqlx::SqlitePool;
 
 use crate::{
     APIError, ErrorResponse,
-    authentication::User,
     domain::{election::ElectionId, election_status::ElectionStatusResponse},
+    infra::authentication::User,
     repository::{committee_session_repo, election_status_repo},
 };
 
@@ -47,7 +47,7 @@ mod tests {
     use test_log::test;
 
     use super::*;
-    use crate::{api::data_entry::election_status, authentication::Role};
+    use crate::{api::data_entry::election_status, infra::authentication::Role};
 
     /// First committee session, should return all polling station statuses
     #[test(sqlx::test(fixtures(path = "../../../fixtures", scripts("election_2"))))]

@@ -2,21 +2,17 @@ use chrono::TimeDelta;
 pub use middleware::*;
 pub use role::{Admin, AdminOrCoordinator, Coordinator, Role, Typist};
 use serde::{Deserialize, Serialize};
-pub use user::User;
 use utoipa::ToSchema;
 
-pub use self::{api::*, user_api::*};
+pub use crate::repository::user_repo::User;
 
-pub mod api;
 pub mod error;
 mod middleware;
-mod password;
+pub mod password;
 pub mod request_data;
-mod role;
+pub mod role;
 pub mod session;
-pub mod user;
-pub mod user_api;
-mod util;
+pub mod util;
 
 /// Session lifetime, for both cookie and database
 /// Also change the translation string "users.session_expired" in the frontend if this value is changed
@@ -69,16 +65,23 @@ mod tests {
     use test_log::test;
     use tower::ServiceExt;
 
+    use super::*;
     use crate::{
         AppState, ErrorResponse,
-        authentication::{
-            api::{AccountUpdateRequest, Credentials},
-            middleware::extend_session,
-            role::Role,
-            *,
+        api::authentication::{
+            account::AccountUpdateRequest,
+            login::{Credentials, LoginResponse},
+            router,
+            users::{UpdateUserRequest, UserListResponse},
         },
         error::ErrorReference,
-        infra::airgap::AirgapDetection,
+        infra::{
+            airgap::AirgapDetection,
+            authentication::{
+                middleware::extend_session, role::Role, util::set_default_cookie_properties,
+            },
+        },
+        repository::user_repo,
         service::audit_log::{AuditEvent, LogFilter, UserLoginFailedDetails},
     };
 
@@ -92,7 +95,6 @@ mod tests {
         };
 
         Router::from(router())
-            .merge(user_router())
             .layer(middleware::map_response_with_state(
                 state.clone(),
                 extend_session,
@@ -130,7 +132,7 @@ mod tests {
         response.headers().get("set-cookie").unwrap().clone()
     }
 
-    #[test(sqlx::test(fixtures("../../fixtures/users.sql")))]
+    #[test(sqlx::test(fixtures("../../../fixtures/users.sql")))]
     async fn test_login_success(pool: SqlitePool) {
         let app = create_app(pool);
 
@@ -163,7 +165,7 @@ mod tests {
         assert_eq!(result.username, "admin1");
     }
 
-    #[test(sqlx::test(fixtures("../../fixtures/users.sql")))]
+    #[test(sqlx::test(fixtures("../../../fixtures/users.sql")))]
     async fn test_login_error(pool: SqlitePool) {
         let app = create_app(pool.clone());
 
@@ -209,7 +211,7 @@ mod tests {
         );
     }
 
-    #[test(sqlx::test(fixtures("../../fixtures/users.sql")))]
+    #[test(sqlx::test(fixtures("../../../fixtures/users.sql")))]
     async fn test_logout(pool: SqlitePool) {
         let app = create_app(pool);
 
@@ -265,7 +267,7 @@ mod tests {
         );
     }
 
-    #[test(sqlx::test(fixtures("../../fixtures/users.sql")))]
+    #[test(sqlx::test(fixtures("../../../fixtures/users.sql")))]
     async fn test_account(pool: SqlitePool) {
         let app = create_app(pool);
 
@@ -342,13 +344,13 @@ mod tests {
         assert_eq!(response.status(), StatusCode::UNAUTHORIZED);
     }
 
-    #[test(sqlx::test(fixtures("../../fixtures/users.sql")))]
+    #[test(sqlx::test(fixtures("../../../fixtures/users.sql")))]
     async fn test_update_password(pool: SqlitePool) {
         let app = create_app(pool.clone());
         let mut conn = pool.acquire().await.unwrap();
 
         // Set admin as incomplete user
-        user::set_temporary_password(&mut conn, 1, "Admin1Password01")
+        user_repo::set_temporary_password(&mut conn, 1, "Admin1Password01")
             .await
             .unwrap();
 
@@ -405,13 +407,13 @@ mod tests {
         assert_eq!(response.status(), StatusCode::OK);
     }
 
-    #[test(sqlx::test(fixtures("../../fixtures/users.sql")))]
+    #[test(sqlx::test(fixtures("../../../fixtures/users.sql")))]
     async fn test_update_password_fail_same_password(pool: SqlitePool) {
         let app = create_app(pool.clone());
         let mut conn = pool.acquire().await.unwrap();
 
         // Set admin as incomplete user
-        user::set_temporary_password(&mut conn, 1, "Admin1Password01")
+        user_repo::set_temporary_password(&mut conn, 1, "Admin1Password01")
             .await
             .unwrap();
 
@@ -443,13 +445,13 @@ mod tests {
         assert_eq!(response.status(), StatusCode::BAD_REQUEST);
     }
 
-    #[test(sqlx::test(fixtures("../../fixtures/users.sql")))]
+    #[test(sqlx::test(fixtures("../../../fixtures/users.sql")))]
     async fn test_update_password_fail_wrong_username(pool: SqlitePool) {
         let app = create_app(pool.clone());
         let mut conn = pool.acquire().await.unwrap();
 
         // Set admin as incomplete user
-        user::set_temporary_password(&mut conn, 1, "Admin1Password01")
+        user_repo::set_temporary_password(&mut conn, 1, "Admin1Password01")
             .await
             .unwrap();
 
@@ -481,7 +483,7 @@ mod tests {
         assert_eq!(response.status(), StatusCode::UNAUTHORIZED);
     }
 
-    #[test(sqlx::test(fixtures("../../fixtures/users.sql")))]
+    #[test(sqlx::test(fixtures("../../../fixtures/users.sql")))]
     async fn test_update_password_fail_complete_user(pool: SqlitePool) {
         let app = create_app(pool);
 
@@ -513,7 +515,7 @@ mod tests {
         assert_eq!(response.status(), StatusCode::CONFLICT);
     }
 
-    #[test(sqlx::test(fixtures("../../fixtures/users.sql")))]
+    #[test(sqlx::test(fixtures("../../../fixtures/users.sql")))]
     async fn test_list(pool: SqlitePool) {
         let app = create_app(pool.clone());
         let mut conn = pool.acquire().await.unwrap();
@@ -548,7 +550,7 @@ mod tests {
         assert_eq!(result.users.len(), 6);
     }
 
-    #[test(sqlx::test(fixtures("../../fixtures/users.sql")))]
+    #[test(sqlx::test(fixtures("../../../fixtures/users.sql")))]
     async fn test_extend_session(pool: SqlitePool) {
         let app = create_app(pool.clone());
 
@@ -620,7 +622,7 @@ mod tests {
         assert!(response_cookie.contains(&format!("Max-Age={}", SESSION_LIFE_TIME.num_seconds())));
     }
 
-    #[test(sqlx::test(fixtures("../../fixtures/users.sql")))]
+    #[test(sqlx::test(fixtures("../../../fixtures/users.sql")))]
     async fn test_create(pool: SqlitePool) {
         let app = create_app(pool.clone());
         let cookie = login_as_admin(app.clone()).await;
@@ -655,7 +657,7 @@ mod tests {
         assert_eq!(result.role(), Role::Administrator);
     }
 
-    #[test(sqlx::test(fixtures("../../fixtures/users.sql")))]
+    #[test(sqlx::test(fixtures("../../../fixtures/users.sql")))]
     async fn test_update_user(pool: SqlitePool) {
         let app = create_app(pool.clone());
         let cookie = login_as_admin(app.clone()).await;
@@ -688,7 +690,7 @@ mod tests {
         assert_eq!(result.role(), Role::Administrator);
     }
 
-    #[test(sqlx::test(fixtures("../../fixtures/users.sql")))]
+    #[test(sqlx::test(fixtures("../../../fixtures/users.sql")))]
     async fn test_forbidden_on_wrong_user_role(pool: SqlitePool) {
         let app = create_app(pool.clone());
         // user id 5 is a typist
@@ -724,7 +726,7 @@ mod tests {
         assert_eq!(result.reference, ErrorReference::Forbidden);
     }
 
-    #[test(sqlx::test(fixtures("../../fixtures/users.sql")))]
+    #[test(sqlx::test(fixtures("../../../fixtures/users.sql")))]
     async fn test_denied_on_different_user_agent(pool: SqlitePool) {
         let app = create_app(pool.clone());
         let cookie = login_as_admin(app.clone()).await;
@@ -749,7 +751,7 @@ mod tests {
         assert_eq!(result.reference, ErrorReference::UserNotFound);
     }
 
-    #[test(sqlx::test(fixtures("../../fixtures/users.sql")))]
+    #[test(sqlx::test(fixtures("../../../fixtures/users.sql")))]
     async fn test_denied_on_different_client_ip(pool: SqlitePool) {
         let app = create_app(pool.clone());
         let cookie = login_as_admin(app.clone()).await;

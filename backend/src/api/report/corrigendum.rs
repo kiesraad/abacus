@@ -5,7 +5,6 @@ use sqlx::SqlitePool;
 
 use crate::{
     APIError, ErrorResponse,
-    authentication::Coordinator,
     domain::{
         election::ElectionWithPoliticalGroups,
         investigation::{CurrentSessionPollingStationId, PollingStationInvestigation},
@@ -14,6 +13,7 @@ use crate::{
         polling_station_results::PollingStationResults,
     },
     error::ErrorReference,
+    infra::authentication::Coordinator,
     repository::{
         election_repo, investigation_repo::get_polling_station_investigation, polling_station_repo,
         polling_station_result_repo::previous_results_for_polling_station,

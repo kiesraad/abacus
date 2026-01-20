@@ -14,7 +14,6 @@ use crate::{
         committee_session::{CommitteeSessionError, create_committee_session},
         polling_station::create_imported_polling_stations,
     },
-    authentication::{Admin, AdminOrCoordinator, User},
     domain::{
         committee_session::{CommitteeSession, CommitteeSessionCreateRequest},
         committee_session_status::CommitteeSessionStatus,
@@ -26,6 +25,7 @@ use crate::{
         polling_station::{PollingStation, PollingStationRequest, PollingStationsRequest},
     },
     eml::{EML110, EML230, EMLDocument, EMLImportError, EmlHash, RedactedEmlHash},
+    infra::authentication::{Admin, AdminOrCoordinator, User},
     repository::{committee_session_repo, election_repo, investigation_repo, polling_station_repo},
     service::audit_log::{AuditEvent, AuditService},
 };

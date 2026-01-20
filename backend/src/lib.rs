@@ -12,7 +12,6 @@ use tracing::{info, trace, warn};
 
 pub mod api;
 pub mod app_error;
-pub mod authentication;
 pub mod domain;
 pub mod eml;
 mod error;

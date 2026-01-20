@@ -24,9 +24,11 @@ use utoipa_swagger_ui::SwaggerUi;
 use crate::infra::airgap;
 use crate::infra::airgap::AirgapDetection;
 #[cfg(feature = "dev-database")]
+use crate::infra::authentication;
+#[cfg(feature = "dev-database")]
 use crate::service::audit_log;
 #[cfg(feature = "dev-database")]
-use crate::{AppError, AppState, MAX_BODY_SIZE_MB, api, authentication, error};
+use crate::{AppError, AppState, MAX_BODY_SIZE_MB, api, error};
 
 pub fn get_scopes_from_operation(operation: &Operation) -> Option<Vec<String>> {
     let security_reqs = operation.security.as_ref()?;
@@ -103,8 +105,7 @@ pub fn openapi_router() -> OpenApiRouter<AppState> {
 fn build_routes(doc: utoipa::openapi::OpenApi) -> OpenApiRouter<AppState> {
     let router = OpenApiRouter::with_openapi(doc)
         .merge(api::audit_log::router())
-        .merge(authentication::router())
-        .merge(authentication::user_router())
+        .merge(api::authentication::router())
         .merge(api::data_entry::router())
         .merge(api::election::router())
         .merge(api::report::router());

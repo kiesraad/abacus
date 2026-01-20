@@ -9,7 +9,6 @@ use tracing::error;
 
 use crate::{
     APIError, ErrorResponse,
-    authentication::AdminOrCoordinator,
     domain::{
         election::ElectionId,
         models::{
@@ -17,7 +16,7 @@ use crate::{
         },
     },
     error::ErrorReference,
-    infra::zip::ZipResponse,
+    infra::{authentication::AdminOrCoordinator, zip::ZipResponse},
     repository::{election_repo, polling_station_repo},
     service::pdf_gen::{CandidatesTables, generate_pdf, generate_pdfs},
 };

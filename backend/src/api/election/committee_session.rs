@@ -11,7 +11,6 @@ use utoipa::ToSchema;
 
 use crate::{
     APIError, ErrorResponse, SqlitePoolExt,
-    authentication::Coordinator,
     domain::{
         committee_session::{
             CommitteeSession, CommitteeSessionCreateRequest, CommitteeSessionUpdateRequest,
@@ -21,6 +20,7 @@ use crate::{
         investigation::PollingStationInvestigation,
     },
     error::ErrorReference,
+    infra::authentication::Coordinator,
     repository::{
         committee_session_repo, election_repo,
         investigation_repo::list_investigations_for_committee_session,

@@ -6,9 +6,9 @@ use sqlx::SqlitePool;
 
 use crate::{
     APIError, ErrorResponse, SqlitePoolExt,
-    authentication::Coordinator,
     domain::data_entry_status::DataEntryStatusName,
     error::ErrorReference,
+    infra::authentication::Coordinator,
     repository::{committee_session_repo, data_entry_repo, polling_station_repo},
     service::{
         audit_log::AuditService, data_entry::delete_data_entry_and_result_for_polling_station,
@@ -90,8 +90,8 @@ mod tests {
             },
             election::committee_session::tests::change_status_committee_session,
         },
-        authentication::{Role, User},
         domain::{committee_session_status::CommitteeSessionStatus, entry_number::EntryNumber},
+        infra::authentication::{Role, User},
         repository::polling_station_result_repo,
     };
 

@@ -3,7 +3,6 @@ use sqlx::{Connection, SqliteConnection, query, types::Json};
 use crate::{
     APIError,
     api::election::committee_session::CommitteeSessionError,
-    authentication::{Role, User, error::AuthenticationError},
     domain::{
         committee_session::CommitteeSession,
         committee_session_status::{CommitteeSessionStatus, change_committee_session_status},
@@ -13,6 +12,7 @@ use crate::{
         polling_station_results::PollingStationResults,
     },
     error::ErrorReference,
+    infra::authentication::{Role, User, error::AuthenticationError},
     repository::{
         committee_session_repo, data_entry_repo, election_repo,
         investigation_repo::get_polling_station_investigation, polling_station_repo,

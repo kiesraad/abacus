@@ -4,7 +4,6 @@ use sqlx::{SqliteConnection, SqlitePool};
 use crate::{
     APIError, ErrorResponse, SqlitePoolExt,
     api::election::committee_session::CommitteeSessionError,
-    authentication::Coordinator,
     domain::{
         committee_session::CommitteeSession,
         committee_session_status::{CommitteeSessionStatus, change_committee_session_status},
@@ -15,6 +14,7 @@ use crate::{
         },
     },
     error::ErrorReference,
+    infra::authentication::Coordinator,
     repository::{
         committee_session_repo::get_election_committee_session,
         data_entry_repo::data_entry_exists,

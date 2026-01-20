@@ -7,7 +7,7 @@ use sqlx::SqlitePool;
 use utoipa::ToSchema;
 
 use crate::{
-    APIError, ErrorResponse, SqlitePoolExt,
+    APIError, ErrorResponse,
     domain::{
         committee_session::CommitteeSession,
         data_entry_status::{CurrentDataEntry, DataEntryStatus},
@@ -19,12 +19,13 @@ use crate::{
         },
         validate::{ValidateRoot, ValidationResults},
     },
-    infra::authentication::Typist,
-    repository::{data_entry_repo, polling_station_result_repo},
-    service::{
+    infra::{
         audit_log::{AuditEvent, AuditService},
-        data_entry::validate_and_get_data,
+        authentication::Typist,
+        db::SqlitePoolExt,
     },
+    repository::{data_entry_repo, polling_station_result_repo},
+    service::data_entry::validate_and_get_data,
 };
 
 /// Claim a data entry for a polling station, returning any existing progress

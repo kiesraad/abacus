@@ -24,11 +24,16 @@ use utoipa_swagger_ui::SwaggerUi;
 use crate::infra::airgap;
 use crate::infra::airgap::AirgapDetection;
 #[cfg(feature = "dev-database")]
+use crate::infra::app::AppState;
+#[cfg(feature = "dev-database")]
+use crate::infra::audit_log;
+#[cfg(feature = "dev-database")]
 use crate::infra::authentication;
 #[cfg(feature = "dev-database")]
-use crate::service::audit_log;
-#[cfg(feature = "dev-database")]
-use crate::{AppError, AppState, MAX_BODY_SIZE_MB, api, error};
+use crate::{AppError, api, error};
+
+/// Maximum size of the request body in megabytes.
+pub const MAX_BODY_SIZE_MB: usize = 12;
 
 pub fn get_scopes_from_operation(operation: &Operation) -> Option<Vec<String>> {
     let security_reqs = operation.security.as_ref()?;
@@ -270,10 +275,7 @@ pub fn create_router(
     airgap_detection: AirgapDetection,
 ) -> Result<Router, AppError> {
     let router = axum_router_from_openapi(openapi_router());
-    let state = AppState {
-        pool,
-        airgap_detection,
-    };
+    let state = AppState::new(pool, airgap_detection);
     let router = add_middleware(router, &state);
     #[cfg(feature = "memory-serve")]
     let router = add_frontend_memory_serve(router);

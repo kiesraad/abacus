@@ -9,7 +9,7 @@ use crate::{
         summary::ElectionSummaryWithoutVotes,
         votes_table::VotesTables,
     },
-    service::pdf_gen::CandidatesTables,
+    infra::pdf_gen::CandidatesTables,
 };
 
 #[derive(Serialize, Deserialize)]

@@ -9,7 +9,7 @@ use sqlx::{SqliteConnection, SqlitePool};
 use utoipa::ToSchema;
 
 use crate::{
-    APIError, ErrorResponse, SqlitePoolExt,
+    APIError, ErrorResponse,
     api::election::{
         committee_session::{CommitteeSessionError, create_committee_session},
         polling_station::create_imported_polling_stations,
@@ -25,9 +25,12 @@ use crate::{
         polling_station::{PollingStation, PollingStationRequest, PollingStationsRequest},
     },
     eml::{EML110, EML230, EMLDocument, EMLImportError, EmlHash, RedactedEmlHash},
-    infra::authentication::{Admin, AdminOrCoordinator, User},
+    infra::{
+        audit_log::{AuditEvent, AuditService},
+        authentication::{Admin, AdminOrCoordinator, User},
+        db::SqlitePoolExt,
+    },
     repository::{committee_session_repo, election_repo, investigation_repo, polling_station_repo},
-    service::audit_log::{AuditEvent, AuditService},
 };
 
 /// Election list response

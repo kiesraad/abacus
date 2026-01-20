@@ -5,17 +5,18 @@ use axum::{
 use sqlx::SqlitePool;
 
 use crate::{
-    APIError, ErrorResponse, SqlitePoolExt,
+    APIError, ErrorResponse,
     domain::{
         data_entry_status::DataEntryStatus, data_entry_status_response::DataEntryStatusResponse,
         entry_number::EntryNumber,
     },
-    infra::authentication::Typist,
-    repository::data_entry_repo,
-    service::{
+    infra::{
         audit_log::{AuditEvent, AuditService},
-        data_entry::{make_definitive, validate_and_get_data},
+        authentication::Typist,
+        db::SqlitePoolExt,
     },
+    repository::data_entry_repo,
+    service::data_entry::{make_definitive, validate_and_get_data},
 };
 
 /// Finalise the data entry for a polling station

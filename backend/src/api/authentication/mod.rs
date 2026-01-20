@@ -1,6 +1,6 @@
 use utoipa_axum::{router::OpenApiRouter, routes};
 
-use crate::AppState;
+use crate::infra::app::AppState;
 
 pub mod account;
 mod initialise;

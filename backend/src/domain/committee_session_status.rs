@@ -7,14 +7,12 @@ use crate::{
     APIError,
     api::election::committee_session::CommitteeSessionError,
     domain::committee_session::{CommitteeSession, CommitteeSessionFilesUpdateRequest},
+    infra::audit_log::{AuditEvent, AuditService},
     repository::{
         committee_session_repo, file_repo,
         investigation_repo::list_investigations_for_committee_session, polling_station_repo,
     },
-    service::{
-        audit_log::{AuditEvent, AuditService},
-        data_entry::are_results_complete_for_committee_session,
-    },
+    service::data_entry::are_results_complete_for_committee_session,
 };
 
 /// Committee session status
@@ -278,7 +276,7 @@ mod tests {
         use test_log::test;
 
         use super::*;
-        use crate::service::audit_log::{AuditService, list_event_names};
+        use crate::infra::audit_log::{AuditService, list_event_names};
 
         async fn generate_test_file(conn: &mut SqliteConnection) -> Result<u32, APIError> {
             let file = crate::repository::file_repo::create(

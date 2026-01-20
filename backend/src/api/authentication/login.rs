@@ -12,16 +12,19 @@ use sqlx::SqlitePool;
 use utoipa::ToSchema;
 
 use crate::{
-    APIError, ErrorResponse, SqlitePoolExt,
-    infra::authentication::{
-        Role, SESSION_COOKIE_NAME, SESSION_LIFE_TIME, User, error::AuthenticationError, session,
-        util,
+    APIError, ErrorResponse,
+    infra::{
+        audit_log::{
+            AuditEvent, AuditService, UserDetails, UserLoggedInDetails, UserLoggedOutDetails,
+            UserLoginFailedDetails,
+        },
+        authentication::{
+            Role, SESSION_COOKIE_NAME, SESSION_LIFE_TIME, User, error::AuthenticationError,
+            session, util,
+        },
+        db::SqlitePoolExt,
     },
     repository::user_repo,
-    service::audit_log::{
-        AuditEvent, AuditService, UserDetails, UserLoggedInDetails, UserLoggedOutDetails,
-        UserLoginFailedDetails,
-    },
 };
 
 #[derive(Debug, Serialize, Deserialize, ToSchema)]

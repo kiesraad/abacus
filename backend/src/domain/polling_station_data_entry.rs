@@ -3,7 +3,7 @@ use serde::{Deserialize, Serialize};
 use sqlx::{FromRow, types::Json};
 use utoipa::ToSchema;
 
-use crate::{domain::data_entry_status::DataEntryStatus, service::audit_log::DataEntryDetails};
+use crate::{domain::data_entry_status::DataEntryStatus, infra::audit_log::DataEntryDetails};
 
 #[derive(Serialize, Deserialize, Clone, ToSchema, Debug, FromRow, Default)]
 #[serde(deny_unknown_fields)]

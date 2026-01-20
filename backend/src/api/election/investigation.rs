@@ -2,7 +2,7 @@ use axum::{Json, extract::State, http::StatusCode};
 use sqlx::{SqliteConnection, SqlitePool};
 
 use crate::{
-    APIError, ErrorResponse, SqlitePoolExt,
+    APIError, ErrorResponse,
     api::election::committee_session::CommitteeSessionError,
     domain::{
         committee_session::CommitteeSession,
@@ -14,7 +14,11 @@ use crate::{
         },
     },
     error::ErrorReference,
-    infra::authentication::Coordinator,
+    infra::{
+        audit_log::{AuditEvent, AuditService},
+        authentication::Coordinator,
+        db::SqlitePoolExt,
+    },
     repository::{
         committee_session_repo::get_election_committee_session,
         data_entry_repo::data_entry_exists,
@@ -27,10 +31,7 @@ use crate::{
         polling_station_repo,
         polling_station_result_repo::result_exists,
     },
-    service::{
-        audit_log::{AuditEvent, AuditService},
-        data_entry::delete_data_entry_and_result_for_polling_station,
-    },
+    service::data_entry::delete_data_entry_and_result_for_polling_station,
 };
 
 /// Validate that the committee session is in a state that allows mutations

@@ -309,7 +309,7 @@ mod tests {
             election::PGNumber, polling_station_results::extra_investigation::ExtraInvestigation,
             valid_default::ValidDefault, yes_no::YesNo,
         },
-        service::pdf_gen::tests::polling_stations_fixture,
+        infra::pdf_gen::tests::polling_stations_fixture,
     };
 
     fn polling_station_results_fixture_a() -> PollingStationResults {

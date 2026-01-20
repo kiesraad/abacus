@@ -13,12 +13,14 @@ use crate::{
         polling_station_results::PollingStationResults,
     },
     error::ErrorReference,
-    infra::authentication::Coordinator,
+    infra::{
+        authentication::Coordinator,
+        pdf_gen::{VotesTablesWithOnlyPreviousVotes, generate_pdf},
+    },
     repository::{
         election_repo, investigation_repo::get_polling_station_investigation, polling_station_repo,
         polling_station_result_repo::previous_results_for_polling_station,
     },
-    service::pdf_gen::{VotesTablesWithOnlyPreviousVotes, generate_pdf},
 };
 
 /// Download a corrigendum for a polling station

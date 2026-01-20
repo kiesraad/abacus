@@ -5,14 +5,15 @@ use axum::{
 use sqlx::SqlitePool;
 
 use crate::{
-    APIError, ErrorResponse, SqlitePoolExt,
+    APIError, ErrorResponse,
     domain::{data_entry_status::DataEntryStatus, entry_number::EntryNumber},
-    infra::authentication::Typist,
-    repository::data_entry_repo,
-    service::{
+    infra::{
         audit_log::{AuditEvent, AuditService},
-        data_entry::validate_and_get_data,
+        authentication::Typist,
+        db::SqlitePoolExt,
     },
+    repository::data_entry_repo,
+    service::data_entry::validate_and_get_data,
 };
 
 /// Delete an in-progress (not finalised) data entry for a polling station

@@ -2,7 +2,7 @@
 
 use std::net::SocketAddr;
 
-use abacus::{api::router, infra::airgap::AirgapDetection, shutdown_signal};
+use abacus::infra::{airgap::AirgapDetection, app::shutdown_signal, router};
 use sqlx::SqlitePool;
 use tokio::net::TcpListener;
 

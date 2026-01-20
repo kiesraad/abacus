@@ -32,6 +32,7 @@ use crate::{
             voters_counts::VotersCounts,
             votes_counts::VotesCounts,
         },
+        results_input::DEFAULT_DATE_TIME_FORMAT,
         summary::{
             ElectionSummary, PollingStationInvestigations, SumCount, SummaryDifferencesCounts,
         },
@@ -41,7 +42,7 @@ use crate::{
         },
         yes_no::YesNo,
     },
-    service::{pdf_gen::generate_pdf, report::DEFAULT_DATE_TIME_FORMAT},
+    infra::pdf_gen::generate_pdf,
 };
 
 fn random_string(rng: &mut impl Rng, length: usize) -> String {

@@ -10,7 +10,7 @@ use sqlx::{FromRow, SqliteConnection, SqlitePool, Type};
 use utoipa::ToSchema;
 
 use crate::{
-    APIError, ErrorResponse, SqlitePoolExt,
+    APIError, ErrorResponse,
     domain::{
         committee_session::{
             CommitteeSession, CommitteeSessionCreateRequest, CommitteeSessionUpdateRequest,
@@ -20,12 +20,15 @@ use crate::{
         investigation::PollingStationInvestigation,
     },
     error::ErrorReference,
-    infra::authentication::Coordinator,
+    infra::{
+        audit_log::{AuditEvent, AuditService},
+        authentication::Coordinator,
+        db::SqlitePoolExt,
+    },
     repository::{
         committee_session_repo, election_repo,
         investigation_repo::list_investigations_for_committee_session,
     },
-    service::audit_log::{AuditEvent, AuditService},
 };
 
 #[derive(Debug, PartialEq, Eq)]

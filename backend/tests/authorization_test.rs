@@ -3,9 +3,9 @@
 
 use std::panic;
 
-use abacus::{
-    api::router::{get_scopes_from_operation, openapi_router},
-    infra::authentication::Role,
+use abacus::infra::{
+    authentication::Role,
+    router::{get_scopes_from_operation, openapi_router},
 };
 use hyper::{Method, StatusCode};
 use sqlx::SqlitePool;

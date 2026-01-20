@@ -4,7 +4,7 @@ pub mod results;
 
 use utoipa_axum::{router::OpenApiRouter, routes};
 
-use crate::AppState;
+use crate::infra::app::AppState;
 
 pub fn router() -> OpenApiRouter<AppState> {
     OpenApiRouter::default()

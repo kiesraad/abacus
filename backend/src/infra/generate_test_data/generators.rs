@@ -6,7 +6,6 @@ use sqlx::{SqliteConnection, SqlitePool};
 use tracing::info;
 
 use crate::{
-    SqlitePoolExt,
     domain::{
         committee_session::{CommitteeSession, CommitteeSessionCreateRequest},
         committee_session_status::CommitteeSessionStatus,
@@ -33,11 +32,12 @@ use crate::{
         validate::{Validate, ValidationResults},
         yes_no::YesNo,
     },
+    infra::{db::SqlitePoolExt, generate_test_data::GenerateElectionArgs},
     repository::{
         committee_session_repo, data_entry_repo, election_repo, polling_station_repo,
         polling_station_result_repo,
     },
-    service::{data_entry::make_definitive, generate_test_data::GenerateElectionArgs},
+    service::data_entry::make_definitive,
 };
 
 pub struct CreateTestElectionResult {
@@ -599,7 +599,7 @@ fn distribute_power_law(
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::service::generate_test_data::RandomRange;
+    use crate::infra::generate_test_data::RandomRange;
 
     #[sqlx::test]
     async fn test_create_test_election(pool: SqlitePool) {

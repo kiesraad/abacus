@@ -3,8 +3,11 @@ use sqlx::SqlitePool;
 use utoipa_axum::{router::OpenApiRouter, routes};
 
 use crate::{
-    APIError, AppState, ErrorResponse,
-    service::generate_test_data::{GenerateElectionArgs, generators::create_test_election},
+    APIError, ErrorResponse,
+    infra::{
+        app::AppState,
+        generate_test_data::{GenerateElectionArgs, generators::create_test_election},
+    },
 };
 
 /// Router for the test data generation API

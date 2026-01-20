@@ -3,7 +3,7 @@ use serde::{Deserialize, Serialize};
 use sqlx::{FromRow, Type};
 use utoipa::ToSchema;
 
-use crate::service::audit_log::FileDetails;
+use crate::infra::audit_log::FileDetails;
 
 /// File
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq, ToSchema, Type, FromRow)]

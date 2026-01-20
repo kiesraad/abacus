@@ -4,22 +4,23 @@ use std::{
 };
 
 use abacus::{
-    AppError, create_sqlite_pool,
+    AppError,
     domain::{
         committee_session::CommitteeSession,
         election::ElectionWithPoliticalGroups,
         models::{ModelNa31_2Input, ToPdfFileModel},
         polling_station::PollingStation,
         polling_station_results::PollingStationResults,
+        results_input::DEFAULT_DATE_TIME_FORMAT,
         summary::ElectionSummary,
     },
     eml::{EML110, EML230, EMLDocument},
-    service::{
+    infra::{
+        db::create_sqlite_pool,
         generate_test_data::{
             GenerateElectionArgs, RandomRange, generators::create_test_election, parse_range,
         },
         pdf_gen::VotesTables,
-        report::DEFAULT_DATE_TIME_FORMAT,
     },
 };
 use clap::Parser;

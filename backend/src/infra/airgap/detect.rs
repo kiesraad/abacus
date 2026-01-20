@@ -8,8 +8,7 @@ use sqlx::SqlitePool;
 use tokio::{task::JoinSet, time::timeout};
 use tracing::{debug, error, info, trace, warn};
 
-use crate::service::audit_log::AuditEvent;
-
+use crate::infra::{audit_log, audit_log::AuditEvent};
 #[derive(Clone)]
 pub struct AirgapDetection {
     enabled: bool,
@@ -84,8 +83,7 @@ impl AirgapDetection {
 
         if let Some(pool) = &self.pool {
             if let Ok(mut conn) = pool.acquire().await {
-                if let Err(e) = crate::audit_log::create(&mut conn, &event, None, None, None).await
-                {
+                if let Err(e) = audit_log::create(&mut conn, &event, None, None, None).await {
                     error!("Failed to log air gap status change: {e:#?}");
                 }
             } else {
@@ -267,7 +265,7 @@ mod tests {
 
         for _ in 0..20 {
             let mut conn = pool.acquire().await.unwrap();
-            events = crate::audit_log::list_all(&mut conn).await.unwrap();
+            events = audit_log::list_all(&mut conn).await.unwrap();
 
             if events.len() == 1 {
                 break;

@@ -7,16 +7,19 @@ use sqlx::SqlitePool;
 use utoipa::ToSchema;
 
 use crate::{
-    APIError, ErrorResponse, SqlitePoolExt,
+    APIError, ErrorResponse,
     domain::{
         data_entry_status::DataEntryStatus, data_entry_status_response::DataEntryStatusResponse,
         polling_station_data_entry::PollingStationDataEntry,
     },
-    infra::authentication::Coordinator,
-    repository::data_entry_repo,
-    service::{
+    infra::{
         audit_log::{AuditEvent, AuditService},
-        data_entry::{delete_data_entry_and_result_for_polling_station, validate_and_get_data},
+        authentication::Coordinator,
+        db::SqlitePoolExt,
+    },
+    repository::data_entry_repo,
+    service::data_entry::{
+        delete_data_entry_and_result_for_polling_station, validate_and_get_data,
     },
 };
 

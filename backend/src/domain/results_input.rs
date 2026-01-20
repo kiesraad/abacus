@@ -13,17 +13,19 @@ use crate::{
         summary::ElectionSummary,
     },
     eml::EML510,
-    infra::zip::slugify_filename,
+    infra::{
+        pdf_gen::{VotesTables, VotesTablesWithPreviousVotes},
+        zip::slugify_filename,
+    },
     repository::{
         committee_session_repo::get_previous_session, election_repo,
         investigation_repo::list_investigations_for_committee_session, polling_station_repo,
         polling_station_result_repo,
     },
-    service::{
-        pdf_gen::{VotesTables, VotesTablesWithPreviousVotes},
-        report::DEFAULT_DATE_TIME_FORMAT,
-    },
 };
+
+/// Default date time format for reports
+pub const DEFAULT_DATE_TIME_FORMAT: &str = "%d-%m-%Y %H:%M:%S %Z";
 
 pub struct PdfModelList {
     pub results: PdfFileModel,

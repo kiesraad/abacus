@@ -9,12 +9,14 @@ use utoipa::ToSchema;
 
 use crate::{
     APIError,
-    infra::authentication::{
-        error::AuthenticationError,
-        password::{HashedPassword, ValidatedPassword, hash_password, verify_password},
-        role::{IncompleteUser, Role},
+    infra::{
+        audit_log::UserDetails,
+        authentication::{
+            error::AuthenticationError,
+            password::{HashedPassword, ValidatedPassword, hash_password, verify_password},
+            role::{IncompleteUser, Role},
+        },
     },
-    service::audit_log::UserDetails,
 };
 
 const MIN_UPDATE_LAST_ACTIVITY_AT_SECS: i64 = 60; // 1 minute

@@ -7,7 +7,7 @@ use chrono::{DateTime, Local, Utc};
 use sqlx::{SqliteConnection, SqlitePool};
 
 use crate::{
-    APIError, ErrorResponse, SqlitePoolExt,
+    APIError, ErrorResponse,
     api::election::committee_session::CommitteeSessionError,
     domain::{
         committee_session::{CommitteeSession, CommitteeSessionFilesUpdateRequest},
@@ -19,18 +19,17 @@ use crate::{
     eml::{EMLDocument, EmlHash},
     error::ErrorReference,
     infra::{
+        audit_log::{AuditEvent, AuditService},
         authentication::Coordinator,
+        db::SqlitePoolExt,
+        pdf_gen::generate_pdf,
         zip::{ZipResponse, ZipResponseError, zip_single_file},
     },
     repository::{
-        committee_session_repo::change_files, election_repo, file_repo,
+        committee_session_repo, committee_session_repo::change_files, election_repo, file_repo,
         investigation_repo::list_investigations_for_committee_session,
     },
-    service::{
-        audit_log::{AuditEvent, AuditService},
-        data_entry::are_results_complete_for_committee_session,
-        pdf_gen::generate_pdf,
-    },
+    service::data_entry::are_results_complete_for_committee_session,
 };
 
 const EML_MIME_TYPE: &str = "text/xml";
@@ -195,8 +194,7 @@ async fn get_files(
     committee_session_id: u32,
 ) -> Result<(Option<File>, Option<File>, Option<File>, DateTime<Utc>), APIError> {
     let mut conn = pool.acquire().await?;
-    let committee_session =
-        crate::repository::committee_session_repo::get(&mut conn, committee_session_id).await?;
+    let committee_session = committee_session_repo::get(&mut conn, committee_session_id).await?;
     let investigations =
         list_investigations_for_committee_session(&mut conn, committee_session.id).await?;
     let corrections = investigations
@@ -286,8 +284,7 @@ pub async fn election_download_zip_results(
 ) -> Result<impl IntoResponse, APIError> {
     let mut conn = pool.acquire().await?;
     let election = election_repo::get(&mut conn, election_id).await?;
-    let committee_session =
-        crate::repository::committee_session_repo::get(&mut conn, committee_session_id).await?;
+    let committee_session = committee_session_repo::get(&mut conn, committee_session_id).await?;
     let (eml_file, pdf_file, overview_file, created_at) =
         get_files(&pool, audit_service, committee_session.id).await?;
     drop(conn);
@@ -373,7 +370,7 @@ mod tests {
     use test_log::test;
 
     use super::*;
-    use crate::service::audit_log::list_event_names;
+    use crate::infra::audit_log::list_event_names;
 
     #[test(sqlx::test(fixtures(path = "../../../fixtures", scripts("election_5_with_results"))))]
     async fn test_get_files_first_session(pool: SqlitePool) {

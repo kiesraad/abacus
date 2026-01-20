@@ -1,6 +1,6 @@
 use abacus::{
     domain::models::{PdfFileModel, PdfModel},
-    service::pdf_gen::generate_pdf,
+    infra::pdf_gen::generate_pdf,
 };
 use clap::Parser;
 use tokio::{fs, process::Command};

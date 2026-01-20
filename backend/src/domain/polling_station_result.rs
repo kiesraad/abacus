@@ -4,7 +4,7 @@ use sqlx::{FromRow, types::Json};
 use utoipa::ToSchema;
 
 use crate::{
-    domain::polling_station_results::PollingStationResults, service::audit_log::ResultDetails,
+    domain::polling_station_results::PollingStationResults, infra::audit_log::ResultDetails,
 };
 
 #[derive(Serialize, Deserialize, Clone, ToSchema, Debug, FromRow)]

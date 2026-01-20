@@ -67,7 +67,7 @@ mod tests {
 
     use super::*;
     use crate::{
-        AppState, ErrorResponse,
+        ErrorResponse,
         api::authentication::{
             account::AccountUpdateRequest,
             login::{Credentials, LoginResponse},
@@ -77,22 +77,21 @@ mod tests {
         error::ErrorReference,
         infra::{
             airgap::AirgapDetection,
+            app::AppState,
+            audit_log,
+            audit_log::{AuditEvent, LogFilter, UserLoginFailedDetails},
             authentication::{
                 middleware::extend_session, role::Role, util::set_default_cookie_properties,
             },
         },
         repository::user_repo,
-        service::audit_log::{AuditEvent, LogFilter, UserLoginFailedDetails},
     };
 
     const TEST_USER_AGENT: &str = "TestAgent/1.0";
     const TEST_IP_ADDRESS: &str = "0.0.0.0";
 
     fn create_app(pool: SqlitePool) -> Router {
-        let state = AppState {
-            pool: pool.clone(),
-            airgap_detection: AirgapDetection::nop(),
-        };
+        let state = AppState::new(pool.clone(), AirgapDetection::nop());
 
         Router::from(router())
             .layer(middleware::map_response_with_state(
@@ -191,7 +190,7 @@ mod tests {
         assert_eq!(response.status(), StatusCode::UNAUTHORIZED);
 
         let mut conn = pool.acquire().await.unwrap();
-        let events = crate::audit_log::list(
+        let events = audit_log::list(
             &mut conn,
             &LogFilter {
                 limit: 10,

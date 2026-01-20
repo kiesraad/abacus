@@ -7,7 +7,7 @@ use serde::{Deserialize, Serialize};
 use sqlx::{FromRow, Type};
 use utoipa::ToSchema;
 
-use crate::{APIError, domain::election::ElectionId, service::audit_log::PollingStationDetails};
+use crate::{APIError, domain::election::ElectionId, infra::audit_log::PollingStationDetails};
 
 pub type PollingStationNumber = u32;
 

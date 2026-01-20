@@ -12,13 +12,15 @@ use crate::{
         polling_station_results::PollingStationResults,
     },
     error::ErrorReference,
-    infra::authentication::{Role, User, error::AuthenticationError},
+    infra::{
+        audit_log::{AuditEvent, AuditService},
+        authentication::{Role, User, error::AuthenticationError},
+    },
     repository::{
         committee_session_repo, data_entry_repo, election_repo,
         investigation_repo::get_polling_station_investigation, polling_station_repo,
         polling_station_result_repo,
     },
-    service::audit_log::{AuditEvent, AuditService},
 };
 
 pub async fn make_definitive(

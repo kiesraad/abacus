@@ -16,9 +16,12 @@ use crate::{
         },
     },
     error::ErrorReference,
-    infra::{authentication::AdminOrCoordinator, zip::ZipResponse},
+    infra::{
+        authentication::AdminOrCoordinator,
+        pdf_gen::{CandidatesTables, generate_pdf, generate_pdfs},
+        zip::ZipResponse,
+    },
     repository::{election_repo, polling_station_repo},
-    service::pdf_gen::{CandidatesTables, generate_pdf, generate_pdfs},
 };
 
 #[utoipa::path(

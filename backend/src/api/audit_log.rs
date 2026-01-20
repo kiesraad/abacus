@@ -8,9 +8,13 @@ use utoipa::{IntoParams, ToSchema};
 use utoipa_axum::{router::OpenApiRouter, routes};
 
 use crate::{
-    APIError, AppState, ErrorResponse,
-    infra::authentication::AdminOrCoordinator,
-    service::audit_log::{AuditEvent, AuditEventLevel, AuditLogEvent, AuditLogUser, LogFilter},
+    APIError, ErrorResponse,
+    infra::{
+        app::AppState,
+        audit_log,
+        audit_log::{AuditEvent, AuditEventLevel, AuditLogEvent, AuditLogUser, LogFilter},
+        authentication::AdminOrCoordinator,
+    },
 };
 
 pub fn router() -> OpenApiRouter<AppState> {
@@ -118,8 +122,8 @@ async fn audit_log_list(
     let filter = LogFilter::from_query(&filter_query);
 
     let mut conn = pool.acquire().await?;
-    let events = crate::audit_log::list(&mut conn, &filter).await?;
-    let count = crate::audit_log::count(&mut conn, &filter).await?;
+    let events = audit_log::list(&mut conn, &filter).await?;
+    let count = audit_log::count(&mut conn, &filter).await?;
 
     let pages = if count > 0 && filter.limit > 0 {
         count.div_ceil(filter.limit)
@@ -152,7 +156,7 @@ async fn audit_log_list_users(
     State(pool): State<SqlitePool>,
 ) -> Result<Json<Vec<AuditLogUser>>, APIError> {
     let mut conn = pool.acquire().await?;
-    let users = crate::audit_log::list_users(&mut conn).await?;
+    let users = audit_log::list_users(&mut conn).await?;
 
     Ok(Json(users))
 }
@@ -179,13 +183,13 @@ mod tests {
 
     use super::*;
     use crate::{
-        AppState,
         api::audit_log::{audit_log_list, audit_log_list_users},
         infra::{
             airgap::AirgapDetection,
+            app::AppState,
+            audit_log::{AuditEvent, AuditLogUser, AuditService, UserLoggedInDetails},
             authentication::{User, inject_user},
         },
-        service::audit_log::{AuditEvent, AuditLogUser, AuditService, UserLoggedInDetails},
     };
 
     const TEST_USER_AGENT: &str = "TestAgent/1.0";
@@ -213,10 +217,7 @@ mod tests {
 
     #[test(sqlx::test(fixtures("../../fixtures/users.sql")))]
     async fn test_list(pool: SqlitePool) {
-        let state = AppState {
-            pool: pool.clone(),
-            airgap_detection: AirgapDetection::nop(),
-        };
+        let state = AppState::new(pool.clone(), AirgapDetection::nop());
 
         let mut conn = pool.acquire().await.unwrap();
         let session = crate::infra::authentication::session::create(
@@ -283,10 +284,7 @@ mod tests {
 
     #[test(sqlx::test(fixtures("../../fixtures/users.sql")))]
     async fn test_list_users(pool: SqlitePool) {
-        let state = AppState {
-            pool: pool.clone(),
-            airgap_detection: AirgapDetection::nop(),
-        };
+        let state = AppState::new(pool.clone(), AirgapDetection::nop());
 
         let mut conn = pool.acquire().await.unwrap();
         let session = crate::infra::authentication::session::create(

@@ -2,11 +2,14 @@ use axum::{Json, extract::State, http::StatusCode, response::IntoResponse};
 use sqlx::SqlitePool;
 
 use crate::{
-    APIError, ErrorResponse, SqlitePoolExt,
+    APIError, ErrorResponse,
     error::ErrorReference,
-    infra::authentication::{CreateUserRequest, Role, User, error::AuthenticationError},
+    infra::{
+        audit_log::{AuditEvent, AuditService},
+        authentication::{CreateUserRequest, Role, User, error::AuthenticationError},
+        db::SqlitePoolExt,
+    },
     repository::user_repo,
-    service::audit_log::{AuditEvent, AuditService},
 };
 
 /// Check whether the application is initialised (an admin user exists + has logged in at least once)

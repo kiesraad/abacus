@@ -7,7 +7,10 @@ use axum::{
 use sqlx::{SqliteConnection, SqlitePool};
 
 use super::AuditEvent;
-use crate::{APIError, infra::authentication::User};
+use crate::{
+    APIError,
+    infra::{audit_log, authentication::User},
+};
 
 #[derive(Clone)]
 pub struct AuditService {
@@ -59,7 +62,7 @@ impl AuditService {
         event: &AuditEvent,
         message: Option<String>,
     ) -> Result<(), APIError> {
-        Ok(crate::audit_log::create(conn, event, self.user.as_ref(), message, self.ip).await?)
+        Ok(audit_log::create(conn, event, self.user.as_ref(), message, self.ip).await?)
     }
 }
 
@@ -72,9 +75,9 @@ mod test {
     use test_log::test;
 
     use super::*;
-    use crate::{
-        SqlitePoolExt,
-        service::audit_log::{AuditEventLevel, UserLoggedInDetails},
+    use crate::infra::{
+        audit_log::{AuditEventLevel, UserLoggedInDetails},
+        db::SqlitePoolExt,
     };
 
     #[test(sqlx::test(fixtures("../../../fixtures/users.sql")))]
@@ -98,7 +101,7 @@ mod test {
         let mut conn = pool.acquire().await.unwrap();
 
         // Verify the event was logged by checking the audit log
-        let logged_events = crate::audit_log::list_all(&mut conn).await.unwrap();
+        let logged_events = audit_log::list_all(&mut conn).await.unwrap();
         let event = logged_events.first().unwrap();
 
         assert_eq!(

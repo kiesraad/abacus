@@ -4,11 +4,14 @@ use sqlx::SqlitePool;
 use utoipa::ToSchema;
 
 use crate::{
-    APIError, ErrorResponse, SqlitePoolExt,
+    APIError, ErrorResponse,
     api::authentication::login::LoginResponse,
-    infra::authentication::{User, error::AuthenticationError, role::IncompleteUser},
+    infra::{
+        audit_log::{AuditEvent, AuditService},
+        authentication::{User, error::AuthenticationError, role::IncompleteUser},
+        db::SqlitePoolExt,
+    },
     repository::user_repo,
-    service::audit_log::{AuditEvent, AuditService},
 };
 
 #[derive(Debug, Serialize, Deserialize, ToSchema)]

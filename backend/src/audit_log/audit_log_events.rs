@@ -10,7 +10,10 @@ use super::{AuditEvent, AuditLogUser, LogFilterQuery};
 use crate::{
     APIError,
     authentication::{Role, User},
+    util::id,
 };
+
+id!(AuditLogEventId);
 
 #[derive(
     Serialize, Deserialize, VariantNames, Clone, Copy, Debug, PartialEq, Eq, Hash, ToSchema, Type,
@@ -38,7 +41,7 @@ impl From<Option<String>> for Ip {
 #[derive(Serialize, Deserialize, Debug, FromRow, ToSchema)]
 #[serde(deny_unknown_fields)]
 pub struct AuditLogEvent {
-    id: u32,
+    id: AuditLogEventId,
     #[schema(value_type = String)]
     time: DateTime<Utc>,
     event: AuditEvent,
@@ -198,7 +201,7 @@ pub async fn list_all(conn: &mut SqliteConnection) -> Result<Vec<AuditLogEvent>,
     sqlx::query_as!(
         AuditLogEvent,
         r#"SELECT
-            audit_log.id as "id: u32",
+            audit_log.id as "id: AuditLogEventId",
             time as "time: _",
             json(event) as "event!: Json<AuditEvent>",
             event_level as "event_level: _",
@@ -235,7 +238,7 @@ pub async fn list(
     let events = sqlx::query_as!(
         AuditLogEvent,
         r#"SELECT
-            audit_log.id as "id: u32",
+            audit_log.id as "id: AuditLogEventId",
             time as "time: _",
             json(event) as "event!: Json<AuditEvent>",
             event_level as "event_level: _",

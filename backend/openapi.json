@@ -5037,9 +5037,7 @@
             "$ref": "#/components/schemas/AuditEventLevel"
           },
           "id": {
-            "type": "integer",
-            "format": "int32",
-            "minimum": 0
+            "$ref": "#/components/schemas/AuditLogEventId"
           },
           "ip": {
             "type": "string"
@@ -5066,6 +5064,11 @@
           }
         },
         "additionalProperties": false
+      },
+      "AuditLogEventId": {
+        "type": "integer",
+        "format": "int32",
+        "minimum": 0
       },
       "AuditLogListResponse": {
         "type": "object",

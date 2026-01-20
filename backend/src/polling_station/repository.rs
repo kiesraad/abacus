@@ -14,7 +14,7 @@ pub async fn list(
         PollingStation,
         r#"
         SELECT
-            p.id AS "id: u32",
+            p.id AS "id: PollingStationId",
             c.election_id AS "election_id: ElectionId",
             p.committee_session_id AS "committee_session_id: CommitteeSessionId",
             p.id_prev_session AS "id_prev_session: _",
@@ -44,7 +44,7 @@ pub async fn get(
         PollingStation,
         r#"
         SELECT
-            p.id AS "id: u32",
+            p.id AS "id: PollingStationId",
             c.election_id AS "election_id: ElectionId",
             p.committee_session_id AS "committee_session_id: CommitteeSessionId",
             p.id_prev_session AS "id_prev_session: _",
@@ -139,7 +139,7 @@ pub async fn create(
             locality
         ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
         RETURNING
-            id AS "id: u32",
+            id AS "id: PollingStationId",
             ? AS "election_id!: ElectionId", -- Workaround to get election_id in the result without a temporary struct
             committee_session_id AS "committee_session_id: CommitteeSessionId",
             id_prev_session AS "id_prev_session: _",
@@ -205,7 +205,7 @@ pub async fn create_many(
                 locality
             ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
             RETURNING
-                id AS "id: u32",
+                id AS "id: PollingStationId",
                 ? AS "election_id!: ElectionId", -- Workaround to get election_id in the result without a temporary struct
                 committee_session_id AS "committee_session_id: CommitteeSessionId",
                 id_prev_session AS "id_prev_session: _",
@@ -272,7 +272,7 @@ pub async fn update(
         WHERE
             id = ? AND committee_session_id = ?
         RETURNING
-            id AS "id: u32",
+            id AS "id: PollingStationId",
             ? AS "election_id!: ElectionId", -- Workaround to get election_id in the result without a temporary struct
             committee_session_id AS "committee_session_id: CommitteeSessionId",
             id_prev_session AS "id_prev_session: _",

@@ -5,7 +5,7 @@ import * as useElectionCreateContext from "../hooks/useElectionCreateContext";
 import { CheckAndSave } from "./CheckAndSave";
 
 describe("CheckAndSave component", () => {
-  test("Navigates to election create page when no election, electionDefinitionData, candidateDefinitionData and countingMethod", () => {
+  test("Navigates to election create page when no election, electionDefinitionData, candidateDefinitionData or countingMethod", () => {
     const state = {};
     const dispatch = vi.fn();
     vi.spyOn(useElectionCreateContext, "useElectionCreateContext").mockReturnValue({ state, dispatch });

@@ -9,7 +9,8 @@ use utoipa::ToSchema;
 
 use super::status::CommitteeSessionStatus;
 use crate::{
-    audit_log, election::ElectionId, investigation::PollingStationInvestigation, util::id,
+    audit_log, election::ElectionId, files::FileId, investigation::PollingStationInvestigation,
+    util::id,
 };
 
 id!(CommitteeSessionId);
@@ -28,13 +29,13 @@ pub struct CommitteeSession {
     pub status: CommitteeSessionStatus,
     #[serde(skip_serializing_if = "Option::is_none")]
     #[schema(nullable = false)]
-    pub results_eml: Option<u32>,
+    pub results_eml: Option<FileId>,
     #[serde(skip_serializing_if = "Option::is_none")]
     #[schema(nullable = false)]
-    pub results_pdf: Option<u32>,
+    pub results_pdf: Option<FileId>,
     #[serde(skip_serializing_if = "Option::is_none")]
     #[schema(nullable = false)]
-    pub overview_pdf: Option<u32>,
+    pub overview_pdf: Option<FileId>,
 }
 
 impl CommitteeSession {
@@ -94,9 +95,9 @@ pub struct CommitteeSessionStatusChangeRequest {
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq, ToSchema, Type, FromRow)]
 #[serde(deny_unknown_fields)]
 pub struct CommitteeSessionFilesUpdateRequest {
-    pub results_eml: Option<u32>,
-    pub results_pdf: Option<u32>,
-    pub overview_pdf: Option<u32>,
+    pub results_eml: Option<FileId>,
+    pub results_pdf: Option<FileId>,
+    pub overview_pdf: Option<FileId>,
 }
 
 /// Investigation list response

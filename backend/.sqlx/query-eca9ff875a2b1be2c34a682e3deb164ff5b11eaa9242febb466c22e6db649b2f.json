@@ -1,10 +1,10 @@
 {
   "db_name": "SQLite",
-  "query": "\n        SELECT\n            id AS \"id: u32\",\n            data,\n            name,\n            mime_type,\n            created_at AS \"created_at: _\"\n        FROM files\n        WHERE id = $1\n        ",
+  "query": "DELETE FROM files WHERE id = ? RETURNING id AS \"id: FileId\", data, name, mime_type, created_at AS \"created_at: _\" ",
   "describe": {
     "columns": [
       {
-        "name": "id: u32",
+        "name": "id: FileId",
         "ordinal": 0,
         "type_info": "Integer"
       },
@@ -40,5 +40,5 @@
       false
     ]
   },
-  "hash": "5251ce67fd22aec610d890fa57799e3ac1cbb113543f0411abdd4d249f5f1eba"
+  "hash": "eca9ff875a2b1be2c34a682e3deb164ff5b11eaa9242febb466c22e6db649b2f"
 }

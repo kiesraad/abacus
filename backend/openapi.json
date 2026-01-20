@@ -5321,19 +5321,13 @@
             "minimum": 0
           },
           "overview_pdf": {
-            "type": "integer",
-            "format": "int32",
-            "minimum": 0
+            "$ref": "#/components/schemas/FileId"
           },
           "results_eml": {
-            "type": "integer",
-            "format": "int32",
-            "minimum": 0
+            "$ref": "#/components/schemas/FileId"
           },
           "results_pdf": {
-            "type": "integer",
-            "format": "int32",
-            "minimum": 0
+            "$ref": "#/components/schemas/FileId"
           },
           "start_date_time": {
             "type": "string",
@@ -5370,19 +5364,13 @@
             "minimum": 0
           },
           "session_overview_pdf": {
-            "type": "integer",
-            "format": "int32",
-            "minimum": 0
+            "$ref": "#/components/schemas/FileId"
           },
           "session_results_eml": {
-            "type": "integer",
-            "format": "int32",
-            "minimum": 0
+            "$ref": "#/components/schemas/FileId"
           },
           "session_results_pdf": {
-            "type": "integer",
-            "format": "int32",
-            "minimum": 0
+            "$ref": "#/components/schemas/FileId"
           },
           "session_start_date_time": {
             "type": [
@@ -6324,9 +6312,7 @@
             "type": "string"
           },
           "file_id": {
-            "type": "integer",
-            "format": "int32",
-            "minimum": 0
+            "$ref": "#/components/schemas/FileId"
           },
           "file_mime_type": {
             "type": "string"
@@ -6341,6 +6327,11 @@
           }
         },
         "additionalProperties": false
+      },
+      "FileId": {
+        "type": "integer",
+        "format": "int32",
+        "minimum": 0
       },
       "GenerateElectionArgs": {
         "type": "object",

@@ -8,13 +8,16 @@ use utoipa::ToSchema;
 use crate::{
     APIError,
     audit_log::{AuditEvent, AuditService, FileDetails},
+    util::id,
 };
+
+id!(FileId);
 
 /// File
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq, ToSchema, Type, FromRow)]
 #[serde(deny_unknown_fields)]
 pub struct File {
-    pub id: u32,
+    pub id: FileId,
     pub data: Vec<u8>,
     pub name: String,
     pub mime_type: String,
@@ -53,7 +56,7 @@ pub async fn create_file(
 pub async fn delete_file(
     conn: &mut SqliteConnection,
     audit_service: &AuditService,
-    id: u32,
+    id: FileId,
 ) -> Result<(), APIError> {
     if let Some(file) = repository::delete(conn, id).await? {
         audit_service

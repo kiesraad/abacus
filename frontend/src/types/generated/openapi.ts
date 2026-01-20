@@ -493,9 +493,9 @@ export interface CommitteeSession {
   id: CommitteeSessionId;
   location: string;
   number: number;
-  overview_pdf?: number;
-  results_eml?: number;
-  results_pdf?: number;
+  overview_pdf?: FileId;
+  results_eml?: FileId;
+  results_pdf?: FileId;
   start_date_time?: string;
   status: CommitteeSessionStatus;
 }
@@ -505,9 +505,9 @@ export interface CommitteeSessionDetails {
   session_id: CommitteeSessionId;
   session_location: string;
   session_number: number;
-  session_overview_pdf?: number;
-  session_results_eml?: number;
-  session_results_pdf?: number;
+  session_overview_pdf?: FileId;
+  session_results_eml?: FileId;
+  session_results_pdf?: FileId;
   session_start_date_time?: string | null;
   session_status: string;
 }
@@ -889,11 +889,13 @@ export interface ExtraInvestigation {
 
 export interface FileDetails {
   file_created_at: string;
-  file_id: number;
+  file_id: FileId;
   file_mime_type: string;
   file_name: string;
   file_size_bytes: number;
 }
+
+export type FileId = number;
 
 /**
  * Abacus API and asset server

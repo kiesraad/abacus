@@ -729,7 +729,7 @@ mod tests {
             Candidate, CandidateNumber, ElectionCategory, ElectionId, ElectionWithPoliticalGroups,
             PGNumber, PoliticalGroup, VoteCountingMethod,
         },
-        polling_station::{PollingStation, PollingStationType},
+        polling_station::{PollingStation, PollingStationId, PollingStationType},
     };
 
     fn cso_first_session_result() -> CSOFirstSessionResults {
@@ -781,7 +781,7 @@ mod tests {
 
     fn polling_station() -> PollingStation {
         PollingStation {
-            id: 1,
+            id: PollingStationId::from(1),
             election_id: ElectionId::from(1),
             committee_session_id: CommitteeSessionId::from(1),
             id_prev_session: None,

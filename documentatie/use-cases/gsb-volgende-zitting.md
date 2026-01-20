@@ -94,17 +94,17 @@ __Hoofdscenario 1:__
 4. De coördinator GSB voert een verklaring voor de wijziging in.  
 5. De applicatie neemt de verklaring op in het PV Na 14-2.  
 
-__Uitbreidingen op hoofdscenario 1:__
+__Uitbreidingen:__
 
 1a. De fout zit in het nummer van het stembureau:  
 &emsp; 1a1. De coördinator GSB voert een vermelding van de fout in de applicatie in.  
-&emsp; 1c2. De applicatie neemt de verklaring op in het PV Na 14-2.  
+&emsp; 1a2. De applicatie neemt de verklaring op in het PV Na 14-2.  
 
 __Hoofdscenario 2:__
 
 1. De coördinator GSB corrigeert de gegevens van een stembureau dat voor de huidige zitting is aangemaakt.
 
-__Uitbreidingen op hoofdscenario 2:__
+__Uitbreidingen:__
 
 1a. Het stembureau was foutief aangemaakt:  
 &emsp; 1a1. De coördinator GSB verwijdert het stembureau.

@@ -1,4 +1,4 @@
-import { readFile, unlink } from "node:fs/promises";
+import { readFile } from "node:fs/promises";
 import { type APIRequestContext, test as base, expect, type Page } from "@playwright/test";
 
 import type {
@@ -22,7 +22,6 @@ import type {
 import { DataEntryApiClient } from "./helpers-utils/api-clients";
 import { completePollingStationDataEntries } from "./helpers-utils/e2e-test-api-helpers";
 import { createRandomUsername } from "./helpers-utils/e2e-test-utils";
-import { type EmlTestFile, generateEml } from "./helpers-utils/file-helpers";
 import { type Eml230b, eml110a, eml230b } from "./test-data/eml-files";
 import {
   dataEntryRequest,
@@ -68,12 +67,6 @@ type Fixtures = {
   currentCommitteeSession: CommitteeSession;
   // Newly created User
   newTypist: User;
-  // A generated EML110a test file that is too large to upload
-  eml110aTooLargeTestFile: EmlTestFile;
-  // A generated EML110b test file that is too large to upload
-  eml110bTooLargeTestFile: EmlTestFile;
-  // A generated EML230b test file that is too large to upload
-  eml230bTooLargeTestFile: EmlTestFile;
 };
 
 export const test = base.extend<Fixtures>({
@@ -243,26 +236,5 @@ export const test = base.extend<Fixtures>({
     expect(userResponse.ok()).toBeTruthy();
 
     await use((await userResponse.json()) as User);
-  },
-  // biome-ignore lint/correctness/noEmptyPattern: the argument should use the object destructuring pattern
-  eml110aTooLargeTestFile: async ({}, use) => {
-    const minimumSize = 5 * 1024 * 1024; // 5MB
-    const { filename, path } = await generateEml("eml110a", minimumSize);
-    await use({ filename, path });
-    await unlink(path);
-  },
-  // biome-ignore lint/correctness/noEmptyPattern: the argument should use the object destructuring pattern
-  eml110bTooLargeTestFile: async ({}, use) => {
-    const minimumSize = 5 * 1024 * 1024; // 5MB
-    const { filename, path } = await generateEml("eml110b", minimumSize);
-    await use({ filename, path });
-    await unlink(path);
-  },
-  // biome-ignore lint/correctness/noEmptyPattern: the argument should use the object destructuring pattern
-  eml230bTooLargeTestFile: async ({}, use) => {
-    const minimumSize = 5 * 1024 * 1024; // 5MB
-    const { filename, path } = await generateEml("eml230b", minimumSize);
-    await use({ filename, path });
-    await unlink(path);
   },
 });

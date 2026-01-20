@@ -57,6 +57,9 @@ components:
   - name: "(Backend) bin/gen-openapi"
     include:
       - ".*/backend/src/bin/gen-test-election.rs"
+  - name: "(Backend) App error"
+    include:
+      - ".*/backend/src/app_error.rs"
   - name: "(Backend) error"
     include:
       - ".*/backend/src/error.rs"
@@ -66,6 +69,9 @@ components:
   - name: "(Backend) lib"
     include:
       - ".*/backend/src/lib.rs"
+  - name: "(Backend) Router"
+    include:
+      - ".*/backend/src/router.rs"
   - name: "(Backend) Integration tests"
     include:
       - ".*/backend/tests/.*"
@@ -121,6 +127,9 @@ components:
   - name: "(Frontend) Modules/data_entry"
     include:
       - ".*/frontend/src/features/data_entry/.*"
+  - name: "(Frontend) features/data_entry_detail"
+    include:
+      - ".*/frontend/src/features/data_entry_detail/.*"
   - name: "(Frontend) Modules/data_entry_home"
     include:
       - ".*/frontend/src/features/data_entry_home/.*"
@@ -234,6 +243,7 @@ languages:
 
 exclude:
   - ".*/backend/[.]sqlx/.*"
+  - ".*/documentatie/.*"
   - ".*/frontend/scripts/.*"
   - ".*[.]d[.]ts"
   - ".*[.]config[.]ts"

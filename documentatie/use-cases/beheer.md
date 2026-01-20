@@ -28,7 +28,8 @@ __Hoofdscenario:__
 6. (voor elk invoerstation) De beheerder bereidt de computer als invoerstation voor.
 7. (voor elk invoerstation) De beheerder zorgt dat het invoerstation met de server kan verbinden.
 
-__Uitbreidingen:__  
+__Uitbreidingen:__
+
 1a. De beheerder bereidt één of meerdere reserve-servers voor:  
 &emsp; 1a1. De beheerder doorloopt de installatiestappen op alle servers.
 
@@ -44,7 +45,8 @@ __Niveau:__ subfunctie, vis, 🐟
 
 ### Hoofdscenario en uitbreidingen
 
-__Hoofdscenario:__  
+__Hoofdscenario:__
+
 1. [De beheerder leest de verkiezingsdefinitie (EML 110a) in.](#de-beheerder-leest-de-verkiezingsdefinitie-eml-110a-in-vis)
 2. De beheerder leest de kandidatenlijsten (EML 230b) in.
 3. [De beheerder leest het bestand met stembureaus en aantal kiesgerechtigden (EML 110b) in.](#de-beheerder-leest-het-bestand-met-stembureaus-en-aantal-kiesgerechtigden-eml-110b-in-vis)
@@ -52,7 +54,8 @@ __Hoofdscenario:__
 5. De beheerder bevestigt het aantal kiesgerechtigden in de gemeente.
 6. De applicatie maakt de verkiezing GSB, de verkiezing CSB, en het GSB als stembureau voor het CSB aan.
 
-__Uitbreidingen:__  
+__Uitbreidingen:__
+
 2a. De applicatie geeft een foutmelding bij het inlezen van de kandidatenlijsten (EML 230b):  
 &emsp; 2a1. De beheerder stelt vast dat die het verkeerde bestand heeft ingelezen.  
 &emsp;&emsp; 2a1a. De beheerder stelt vast dat het bestand geen geldige kandidatenlijsten bevat:  
@@ -73,16 +76,17 @@ __Uitbreidingen:__
 
 - Inlezen totalenlijst (kandidatenlijsten met adresgegevens). Deze gegevens zijn relevant voor de benoemingsbrieven en de kennisgevingen tot geloofsbrief.
 
-
 ## De beheerder leest de verkiezingsdefinitie (EML 110a) in (vis)
 
 __Niveau:__ subfunctie, vis, 🐟
 
 __Hoofdscenario:__
+
 1. De beheerder leest de verkiezingsdefinitie (EML 110a) in.
 2. De beheerder stelt vast dat de hash van de verkiezingsdefinitie klopt.
 
-__Uitbreidingen:__  
+__Uitbreidingen:__
+
 1a. De applicatie geeft een foutmelding bij het inlezen van de verkiezingsdefinitie (EML 110a):  
 &emsp; 1a1. De beheerder stelt vast dat het verkeerde bestand is ingelezen.  
 &emsp;&emsp; 1a1a. De beheerder stelt vast dat het bestand geen geldige verkiezingsdefinitie bevat:  
@@ -95,7 +99,6 @@ __Uitbreidingen:__
 &emsp;&emsp;&emsp; 2a1a1. De beheerder neemt contact op met het CSB.  
 &emsp; 2a2. De beheerder corrigeert de ingevoerde hash.
 
-
 ## De beheerder leest het bestand met stembureaus en aantal kiesgerechtigden (EML 110b) in (vis)
 
 __Niveau:__ subfunctie, vis, 🐟
@@ -103,11 +106,13 @@ __Niveau:__ subfunctie, vis, 🐟
 ### Hoofdscenario en uitbreidingen
 
 __Hoofdscenario:__
+
 1. De beheerder importeert het bestand met de stembureaus en het aantal kiesgerechtigden op gemeenteniveau (EML 110b).
 2. De applicatie stelt vast dat het bestand aan de validatieregels voldoet.
 3. De beheerder stelt vast dat de stembureaus in de applicatie kloppen met de door de gemeente vooraf gepubliceerde lijst.
 
-__Uitbreidingen:__  
+__Uitbreidingen:__
+
 2a. De applicatie geeft een foutmelding bij het inlezen van de lijst met stembureaus (EML 110b):  
 &emsp; 2a1. De beheerder stelt vast dat die het verkeerde bestand heeft ingelezen.  
 &emsp;&emsp; 2a1a. De beheerder stelt vast dat het bestand geen geldige lijst met stembureaus bevat:  
@@ -135,7 +140,7 @@ __Hoofdscenario:__
 3. De applicatie negeert het aantal kiesgerechtigden in het bestand.
 4. De beheerder stelt vast dat de stembureaus in de applicatie kloppen met de door de gemeente vooraf gepubliceerde lijst.
 
-__Uitbreidingen:__  
+__Uitbreidingen:__
 
 1a. Er is geen te importeren bestand met stembureaus:  
 &emsp; 1a1. De beheerder of coördinator voert de stembureaus handmatig in.
@@ -151,7 +156,7 @@ __Niveau:__ gebruikersdoel, zee, 🌊
 
 ### Hoofdscenario en uitbreidingen
 
-__Hoofdscenario__:
+__Hoofdscenario:__
 
 1. De beheerder exporteert de stembureaus.
 2. De beheerder slaat de geëxporteerde stembureaus op, zodat ze geïmporteerd kunnen worden bij een volgende verkiezing.

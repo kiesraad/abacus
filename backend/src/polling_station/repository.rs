@@ -1,4 +1,6 @@
-use crate::{committee_session::CommitteeSessionId, election::ElectionId};
+use crate::{
+    committee_session::CommitteeSessionId, election::ElectionId, polling_station::PollingStationId,
+};
 
 use super::structs::{PollingStation, PollingStationRequest};
 use sqlx::{Connection, SqliteConnection, query, query_as};
@@ -34,7 +36,10 @@ pub async fn list(
 }
 
 /// Get a single polling station
-pub async fn get(conn: &mut SqliteConnection, id: u32) -> Result<PollingStation, sqlx::Error> {
+pub async fn get(
+    conn: &mut SqliteConnection,
+    polling_station_id: PollingStationId,
+) -> Result<PollingStation, sqlx::Error> {
     query_as!(
         PollingStation,
         r#"
@@ -58,7 +63,7 @@ pub async fn get(conn: &mut SqliteConnection, id: u32) -> Result<PollingStation,
             WHERE c2.election_id = c.election_id
         )
         "#,
-        id
+        polling_station_id,
     )
     .fetch_one(conn)
     .await
@@ -68,7 +73,7 @@ pub async fn get(conn: &mut SqliteConnection, id: u32) -> Result<PollingStation,
 pub async fn get_for_election(
     conn: &mut SqliteConnection,
     election_id: ElectionId,
-    id: u32,
+    polling_station_id: PollingStationId,
 ) -> Result<PollingStation, sqlx::Error> {
     let committee_session_id =
         crate::committee_session::repository::get_current_id_for_election(conn, election_id)
@@ -79,7 +84,7 @@ pub async fn get_for_election(
         PollingStation,
         r#"
         SELECT
-            p.id AS "id: u32",
+            p.id AS "id: PollingStationId",
             c.election_id AS "election_id: ElectionId",
             p.committee_session_id AS "committee_session_id: CommitteeSessionId",
             p.id_prev_session AS "id_prev_session: _",
@@ -94,7 +99,7 @@ pub async fn get_for_election(
         JOIN committee_sessions AS c ON c.id = p.committee_session_id
         WHERE p.id = $1 AND c.id = $2
         "#,
-        id,
+        polling_station_id,
         committee_session_id
     )
     .fetch_one(&mut *conn)
@@ -235,7 +240,7 @@ pub async fn create_many(
 pub async fn update(
     conn: &mut SqliteConnection,
     election_id: ElectionId,
-    polling_station_id: u32,
+    polling_station_id: PollingStationId,
     polling_station_update: PollingStationRequest,
 ) -> Result<PollingStation, sqlx::Error> {
     let mut tx = conn.begin().await?;
@@ -300,7 +305,7 @@ pub async fn update(
 pub async fn delete(
     conn: &mut SqliteConnection,
     election_id: ElectionId,
-    id: u32,
+    polling_station_id: PollingStationId,
 ) -> Result<bool, sqlx::Error> {
     let mut tx = conn.begin().await?;
     let committee_session_id =
@@ -310,7 +315,7 @@ pub async fn delete(
 
     let rows_affected = query!(
         r#"DELETE FROM polling_stations WHERE id = ? AND committee_session_id = ?"#,
-        id,
+        polling_station_id,
         committee_session_id,
     )
     .execute(&mut *tx)
@@ -364,14 +369,14 @@ pub async fn duplicate_for_committee_session(
 #[cfg(test)]
 pub async fn insert_test_polling_station(
     conn: &mut SqliteConnection,
-    id: u32,
+    polling_station_id: PollingStationId,
     committee_session_id: CommitteeSessionId,
-    id_prev_session: Option<u32>,
+    id_prev_session: Option<PollingStationId>,
     number: u32,
 ) -> Result<(), sqlx::Error> {
     query!(
         "INSERT INTO polling_stations (id, committee_session_id, id_prev_session, name, number, address, postal_code, locality) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
-        id,
+        polling_station_id,
         committee_session_id,
         id_prev_session,
         "Test name",

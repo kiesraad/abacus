@@ -23,9 +23,10 @@ Er zijn meerdere manieren om deze stappen te zetten.
     - Implementeer de functionaliteit die wordt beschreven in het issue.
     - Test de functionaliteit, schrijf zover zinvol tests (unit, integration etc).
     - Push ook tussentijdse commits naar GitHub.
-    - Dit project gebruikt [Lefthook] om de Git pre-commit hook te beheren. Lefthook zal
-      automatisch geïnstalleerd worden wanneer `pnpm install` wordt uitgevoerd in de `frontend`
-      directory.
+    - Dit project gebruikt [Lefthook] om de Git pre-commit hook te beheren.
+      Lefthook moet daarvoor worden [geïnstalleerd][lefthook-install], waarna
+      `lefthook install` kan worden uitgevoerd om de Git pre-commit hook in te
+      stellen.
 
 - Maak een pull request (PR) aan:
     - Als de branch commits bevat die al eerder gemerged zijn, kun je die verwijderen met een _interactive rebase_:
@@ -46,5 +47,6 @@ Er zijn meerdere manieren om deze stappen te zetten.
 
 [draft pull request]: https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/about-pull-requests#draft-pull-requests
 [Lefthook]: https://github.com/evilmartians/lefthook
+[lefthook-install]: https://lefthook.dev/installation/
 [merge queue]: https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/incorporating-changes-from-a-pull-request/merging-a-pull-request-with-a-merge-queue
 ["Pull Requests (PRs)"]: /documentatie/ontwikkelproces/pull-requests.md

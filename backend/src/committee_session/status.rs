@@ -373,6 +373,7 @@ mod tests {
             investigation::{
                 PollingStationInvestigationCreateRequest, create_polling_station_investigation,
             },
+            polling_station::PollingStationId,
         };
         use sqlx::SqlitePool;
 
@@ -444,7 +445,7 @@ mod tests {
             let committee_session = get(&mut conn, CommitteeSessionId::from(6)).await.unwrap();
             create_polling_station_investigation(
                 &mut conn,
-                9,
+                PollingStationId::from(9),
                 PollingStationInvestigationCreateRequest {
                     reason: "Test reason".to_string(),
                 },
@@ -511,7 +512,7 @@ mod tests {
             let committee_session = get(&mut conn, CommitteeSessionId::from(6)).await.unwrap();
             create_polling_station_investigation(
                 &mut conn,
-                9,
+                PollingStationId::from(9),
                 PollingStationInvestigationCreateRequest {
                     reason: "Test reason".to_string(),
                 },
@@ -578,7 +579,7 @@ mod tests {
             let committee_session = get(&mut conn, CommitteeSessionId::from(6)).await.unwrap();
             create_polling_station_investigation(
                 &mut conn,
-                9,
+                PollingStationId::from(9),
                 PollingStationInvestigationCreateRequest {
                     reason: "Test reason".to_string(),
                 },
@@ -645,7 +646,7 @@ mod tests {
             let committee_session = get(&mut conn, CommitteeSessionId::from(6)).await.unwrap();
             create_polling_station_investigation(
                 &mut conn,
-                9,
+                PollingStationId::from(9),
                 PollingStationInvestigationCreateRequest {
                     reason: "Test reason".to_string(),
                 },
@@ -670,6 +671,7 @@ mod tests {
             investigation::{
                 PollingStationInvestigationCreateRequest, create_polling_station_investigation,
             },
+            polling_station::PollingStationId,
         };
         use sqlx::SqlitePool;
 
@@ -725,7 +727,7 @@ mod tests {
             let committee_session = get(&mut conn, CommitteeSessionId::from(6)).await.unwrap();
             create_polling_station_investigation(
                 &mut conn,
-                9,
+                PollingStationId::from(9),
                 PollingStationInvestigationCreateRequest {
                     reason: "Test reason".to_string(),
                 },
@@ -909,6 +911,7 @@ mod tests {
                 PollingStationInvestigationCreateRequest, conclude_polling_station_investigation,
                 create_polling_station_investigation,
             },
+            polling_station::PollingStationId,
         };
         use chrono::Utc;
         use sqlx::SqlitePool;
@@ -950,7 +953,7 @@ mod tests {
             // Ensure there is some data in the results table
             insert_test_result(
                 &mut conn,
-                1,
+                PollingStationId::from(1),
                 committee_session_id,
                 &PollingStationResults::empty_cso_first_session(&[]),
             )
@@ -959,7 +962,7 @@ mod tests {
 
             insert_test_result(
                 &mut conn,
-                2,
+                PollingStationId::from(2),
                 committee_session_id,
                 &PollingStationResults::empty_cso_first_session(&[]),
             )
@@ -981,7 +984,7 @@ mod tests {
             let committee_session = get(&mut conn, CommitteeSessionId::from(6)).await.unwrap();
             create_polling_station_investigation(
                 &mut conn,
-                9,
+                PollingStationId::from(9),
                 PollingStationInvestigationCreateRequest {
                     reason: "Test reason".to_string(),
                 },
@@ -1003,7 +1006,7 @@ mod tests {
             let committee_session = get(&mut conn, CommitteeSessionId::from(6)).await.unwrap();
             create_polling_station_investigation(
                 &mut conn,
-                9,
+                PollingStationId::from(9),
                 PollingStationInvestigationCreateRequest {
                     reason: "Test reason".to_string(),
                 },
@@ -1012,7 +1015,7 @@ mod tests {
             .unwrap();
             conclude_polling_station_investigation(
                 &mut conn,
-                9,
+                PollingStationId::from(9),
                 PollingStationInvestigationConcludeRequest {
                     findings: "Test findings".to_string(),
                     corrected_results: true,
@@ -1035,7 +1038,7 @@ mod tests {
             let committee_session = get(&mut conn, CommitteeSessionId::from(6)).await.unwrap();
             create_polling_station_investigation(
                 &mut conn,
-                9,
+                PollingStationId::from(9),
                 PollingStationInvestigationCreateRequest {
                     reason: "Test reason".to_string(),
                 },
@@ -1044,7 +1047,7 @@ mod tests {
             .unwrap();
             conclude_polling_station_investigation(
                 &mut conn,
-                9,
+                PollingStationId::from(9),
                 PollingStationInvestigationConcludeRequest {
                     findings: "Test findings".to_string(),
                     corrected_results: false,
@@ -1065,7 +1068,7 @@ mod tests {
         async fn data_entry_to_completed_next_session_completed_with_result(pool: SqlitePool) {
             let mut conn = pool.acquire().await.unwrap();
             let committee_session = get(&mut conn, CommitteeSessionId::from(6)).await.unwrap();
-            let polling_station_id = 9;
+            let polling_station_id = PollingStationId::from(9);
 
             // Add investigation with corrected results
             create_polling_station_investigation(
@@ -1089,9 +1092,13 @@ mod tests {
             .unwrap();
 
             // Save original result as corrected result
-            let first_session_result = get_result(&mut conn, 8, CommitteeSessionId::from(5))
-                .await
-                .unwrap();
+            let first_session_result = get_result(
+                &mut conn,
+                PollingStationId::from(8),
+                CommitteeSessionId::from(5),
+            )
+            .await
+            .unwrap();
             get_or_default(&mut conn, polling_station_id, committee_session.id)
                 .await
                 .unwrap();

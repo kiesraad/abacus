@@ -9,7 +9,7 @@ use utoipa_axum::{router::OpenApiRouter, routes};
 use super::{
     repository::{create, create_many, delete, get_for_election, list, update},
     structs::{
-        PollingStation, PollingStationFileRequest, PollingStationListResponse,
+        PollingStation, PollingStationFileRequest, PollingStationId, PollingStationListResponse,
         PollingStationRequest, PollingStationRequestListResponse, PollingStationsRequest,
     },
 };
@@ -168,14 +168,14 @@ async fn polling_station_create(
     ),
     params(
         ("election_id" = ElectionId, description = "Election database id"),
-        ("polling_station_id" = u32, description = "Polling station database id"),
+        ("polling_station_id" = PollingStationId, description = "Polling station database id"),
     ),
     security(("cookie_auth" = ["administrator", "coordinator", "typist"])),
 )]
 async fn polling_station_get(
     _user: User,
     State(pool): State<SqlitePool>,
-    Path((election_id, polling_station_id)): Path<(ElectionId, u32)>,
+    Path((election_id, polling_station_id)): Path<(ElectionId, PollingStationId)>,
 ) -> Result<(StatusCode, PollingStation), APIError> {
     let mut conn = pool.acquire().await?;
     Ok((
@@ -198,7 +198,7 @@ async fn polling_station_get(
     ),
     params(
         ("election_id" = ElectionId, description = "Election database id"),
-        ("polling_station_id" = u32, description = "Polling station database id"),
+        ("polling_station_id" = PollingStationId, description = "Polling station database id"),
     ),
     security(("cookie_auth" = ["administrator", "coordinator"])),
 )]
@@ -206,7 +206,7 @@ async fn polling_station_update(
     user: AdminOrCoordinator,
     State(pool): State<SqlitePool>,
     audit_service: AuditService,
-    Path((election_id, polling_station_id)): Path<(ElectionId, u32)>,
+    Path((election_id, polling_station_id)): Path<(ElectionId, PollingStationId)>,
     polling_station_update: PollingStationRequest,
 ) -> Result<(StatusCode, PollingStation), APIError> {
     let mut tx = pool.begin_immediate().await?;
@@ -262,7 +262,7 @@ async fn polling_station_update(
     ),
     params(
         ("election_id" = ElectionId, description = "Election database id"),
-        ("polling_station_id" = u32, description = "Polling station database id"),
+        ("polling_station_id" = PollingStationId, description = "Polling station database id"),
     ),
     security(("cookie_auth" = ["administrator", "coordinator"])),
 )]
@@ -270,7 +270,7 @@ async fn polling_station_delete(
     user: AdminOrCoordinator,
     State(pool): State<SqlitePool>,
     audit_service: AuditService,
-    Path((election_id, polling_station_id)): Path<(ElectionId, u32)>,
+    Path((election_id, polling_station_id)): Path<(ElectionId, PollingStationId)>,
 ) -> Result<StatusCode, APIError> {
     let mut tx = pool.begin_immediate().await?;
 
@@ -457,7 +457,7 @@ mod tests {
     use test_log::test;
 
     use super::{PollingStationRequest, create, create_many, update};
-    use crate::election::ElectionId;
+    use crate::{election::ElectionId, polling_station::PollingStationId};
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2", "election_3"))))]
     async fn test_polling_station_number_unique_per_election(pool: SqlitePool) {
@@ -583,14 +583,17 @@ VALUES
             locality: "Locality".to_string(),
         };
 
+        let election_id = ElectionId::from(7);
+        let polling_station_id = PollingStationId::from(741);
+
         // Update a polling station that has an id_prev_session reference
         // ... without number change
-        let result = update(&mut conn, ElectionId::from(7), 741, data.clone()).await;
+        let result = update(&mut conn, election_id, polling_station_id, data.clone()).await;
         assert!(result.is_ok());
 
         // ... with number change
         data.number = Some(123);
-        let result = update(&mut conn, ElectionId::from(7), 741, data).await;
+        let result = update(&mut conn, election_id, polling_station_id, data).await;
         assert!(result.is_err());
     }
 

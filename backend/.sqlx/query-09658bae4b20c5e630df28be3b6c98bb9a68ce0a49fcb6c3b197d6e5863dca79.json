@@ -1,10 +1,10 @@
 {
   "db_name": "SQLite",
-  "query": "\n        SELECT\n            psi.polling_station_id as \"polling_station_id: u32\",\n            psi.reason,\n            psi.findings,\n            psi.corrected_results as \"corrected_results: bool\"\n        FROM polling_station_investigations psi\n        JOIN polling_stations ps ON ps.id = psi.polling_station_id\n        WHERE ps.committee_session_id = ?\n        ",
+  "query": "\n        INSERT INTO polling_station_investigations (\n          polling_station_id,\n          reason\n        ) VALUES (?,?)\n        RETURNING\n          polling_station_id as \"polling_station_id: PollingStationId\",\n          reason,\n          findings,\n          corrected_results as \"corrected_results: bool\"\n        ",
   "describe": {
     "columns": [
       {
-        "name": "polling_station_id: u32",
+        "name": "polling_station_id: PollingStationId",
         "ordinal": 0,
         "type_info": "Integer"
       },
@@ -25,7 +25,7 @@
       }
     ],
     "parameters": {
-      "Right": 1
+      "Right": 2
     },
     "nullable": [
       false,
@@ -34,5 +34,5 @@
       true
     ]
   },
-  "hash": "af11026556b623550adbef974a9e7fb2a481a5e6d68ea9cb9adb61f510532499"
+  "hash": "09658bae4b20c5e630df28be3b6c98bb9a68ce0a49fcb6c3b197d6e5863dca79"
 }

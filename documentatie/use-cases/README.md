@@ -2,7 +2,6 @@
 
 Scope van deze use cases zijn de Gemeenteraadsverkiezingen.
 
-
 ## Werkwijze
 
 Deze beschrijving van use cases is gebaseerd op *"Writing Effective Use Cases"* van Alistair Cockburn (2000). Zie ook zijn meer recente *"The Mini-Book on Use Cases: All you need but short!"* (2025) en *"Unifying User Stories, Use Cases, Story Maps: The power of verbs"* (2024).
@@ -13,7 +12,6 @@ De belangrijkste ideeën uit dat boek zijn:
 - Use cases vormen een boomstructuur waarin elke stap in een use case uitgewerkt kan worden tot een onderliggende use case.
 - Use cases moeten niet uitgebreider/formeler/gedetailleerder zijn dan strikt nodig is.
 - Use cases worden iteratief en incrementeel uitgewerkt.
-
 
 ## Onderdelen van een use case
 

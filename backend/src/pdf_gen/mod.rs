@@ -41,7 +41,7 @@ pub(crate) mod tests {
             models::{PdfFileModel, PdfModel, ToPdfFileModel},
             votes_table::VotesTables,
         },
-        polling_station::{PollingStation, PollingStationType},
+        polling_station::{PollingStation, PollingStationId, PollingStationType},
         summary::ElectionSummary,
     };
 
@@ -54,7 +54,7 @@ pub(crate) mod tests {
         for (i, voter_count) in polling_station_voter_count.iter().enumerate() {
             let idx = i + 1;
             polling_stations.push(PollingStation {
-                id: u32::try_from(idx).unwrap(),
+                id: PollingStationId::from(u32::try_from(idx).unwrap()),
                 election_id: election.id,
                 committee_session_id,
                 id_prev_session: None,

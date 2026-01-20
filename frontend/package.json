@@ -72,7 +72,6 @@
     "eslint-plugin-react-hooks": "7.0.1",
     "eslint-plugin-storybook": "10.1.10",
     "jsdom": "27.3.0",
-    "lefthook": "2.0.12",
     "msw": "2.12.4",
     "playwright": "1.57.0",
     "storybook": "10.1.10",

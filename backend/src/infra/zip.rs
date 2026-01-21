@@ -9,10 +9,7 @@ use axum_extra::response::Attachment;
 use tokio::io::{AsyncWriteExt, DuplexStream};
 use tokio_util::{compat::TokioAsyncWriteCompatExt, io::ReaderStream};
 
-/// Slugify a filename by replacing spaces with underscores and slashes with dashes.
-pub fn slugify_filename(filename: &str) -> String {
-    filename.replace(" ", "_").replace("/", "-")
-}
+use crate::domain::results_input::slugify_filename;
 
 /// A ZIP file response, that streams its contents to the client every time a file is added
 pub struct ZipResponse {

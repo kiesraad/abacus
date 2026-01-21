@@ -1,5 +1,4 @@
 use chrono::{DateTime, Local};
-use sqlx::SqliteConnection;
 
 use crate::{
     APIError,
@@ -13,15 +12,7 @@ use crate::{
         summary::ElectionSummary,
     },
     eml::EML510,
-    infra::{
-        pdf_gen::{VotesTables, VotesTablesWithPreviousVotes},
-        zip::slugify_filename,
-    },
-    repository::{
-        committee_session_repo::get_previous_session, election_repo,
-        investigation_repo::list_investigations_for_committee_session, polling_station_repo,
-        polling_station_result_repo,
-    },
+    infra::pdf_gen::{VotesTables, VotesTablesWithPreviousVotes},
 };
 
 /// Default date time format for reports
@@ -34,74 +25,18 @@ pub struct PdfModelList {
 
 #[derive(Debug)]
 pub struct ResultsInput {
-    committee_session: CommitteeSession,
-    election: ElectionWithPoliticalGroups,
-    polling_stations: Vec<PollingStation>,
-    investigations: Vec<PollingStationInvestigation>,
-    results: Vec<(PollingStation, PollingStationResults)>,
-    summary: ElectionSummary,
-    previous_summary: Option<ElectionSummary>,
-    previous_committee_session: Option<CommitteeSession>,
+    pub committee_session: CommitteeSession,
+    pub election: ElectionWithPoliticalGroups,
+    pub polling_stations: Vec<PollingStation>,
+    pub investigations: Vec<PollingStationInvestigation>,
+    pub results: Vec<(PollingStation, PollingStationResults)>,
+    pub summary: ElectionSummary,
+    pub previous_summary: Option<ElectionSummary>,
+    pub previous_committee_session: Option<CommitteeSession>,
     pub created_at: DateTime<Local>,
 }
 
 impl ResultsInput {
-    pub async fn new(
-        conn: &mut SqliteConnection,
-        committee_session_id: u32,
-        created_at: DateTime<Local>,
-    ) -> Result<ResultsInput, APIError> {
-        let committee_session =
-            crate::repository::committee_session_repo::get(conn, committee_session_id).await?;
-        let election = election_repo::get(conn, committee_session.election_id).await?;
-        let polling_stations = polling_station_repo::list(conn, committee_session.id).await?;
-        let results = polling_station_result_repo::list_results_for_committee_session(
-            conn,
-            committee_session.id,
-        )
-        .await?;
-
-        // get investigations if this is not the first session
-        let investigations = if committee_session.is_next_session() {
-            list_investigations_for_committee_session(conn, committee_session.id).await?
-        } else {
-            vec![]
-        };
-
-        // get the previous committee session if this is not the first session
-        let previous_committee_session = if committee_session.is_next_session() {
-            get_previous_session(conn, committee_session.id).await?
-        } else {
-            None
-        };
-
-        // get the previous results summary from the previous committee session if it exists
-        let previous_summary = if let Some(previous_committee_session) = &previous_committee_session
-        {
-            let previous_results = polling_station_result_repo::list_results_for_committee_session(
-                conn,
-                previous_committee_session.id,
-            )
-            .await?;
-            let previous_summary = ElectionSummary::from_results(&election, &previous_results)?;
-            Some(previous_summary)
-        } else {
-            None
-        };
-
-        Ok(ResultsInput {
-            committee_session,
-            previous_summary,
-            summary: ElectionSummary::from_results(&election, &results)?,
-            created_at,
-            election,
-            polling_stations,
-            investigations,
-            results,
-            previous_committee_session,
-        })
-    }
-
     pub fn as_xml(&self) -> EML510 {
         EML510::from_results(
             &self.election,
@@ -115,7 +50,6 @@ impl ResultsInput {
     pub fn xml_filename(&self) -> String {
         use chrono::Datelike;
 
-        use crate::infra::zip::slugify_filename;
         let location_without_whitespace: String =
             self.election.location.split_whitespace().collect();
         slugify_filename(&format!(
@@ -252,4 +186,9 @@ impl ResultsInput {
             overview: overview_pdf,
         })
     }
+}
+
+/// Slugify a filename by replacing spaces with underscores and slashes with dashes.
+pub fn slugify_filename(filename: &str) -> String {
+    filename.replace(" ", "_").replace("/", "-")
 }

@@ -11,12 +11,12 @@ use utoipa::ToSchema;
 use crate::{
     APIError, ErrorResponse,
     api::election::{
-        committee_session::{CommitteeSessionError, create_committee_session},
+        committee_session::create_committee_session,
         polling_station::create_imported_polling_stations,
     },
     domain::{
         committee_session::{CommitteeSession, CommitteeSessionCreateRequest},
-        committee_session_status::CommitteeSessionStatus,
+        committee_session_status::{CommitteeSessionError, CommitteeSessionStatus},
         election::{
             Election, ElectionId, ElectionNumberOfVotersChangeRequest, ElectionWithPoliticalGroups,
             NewElection, VoteCountingMethod,

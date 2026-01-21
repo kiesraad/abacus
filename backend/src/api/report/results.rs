@@ -8,13 +8,13 @@ use sqlx::{SqliteConnection, SqlitePool};
 
 use crate::{
     APIError, ErrorResponse,
-    api::election::committee_session::CommitteeSessionError,
     domain::{
         committee_session::{CommitteeSession, CommitteeSessionFilesUpdateRequest},
-        committee_session_status::CommitteeSessionStatus,
+        committee_session_status::{CommitteeSessionError, CommitteeSessionStatus},
         election::{ElectionId, ElectionWithPoliticalGroups},
         file::File,
         results_input::ResultsInput,
+        summary::ElectionSummary,
     },
     eml::{EMLDocument, EmlHash},
     error::ErrorReference,
@@ -26,8 +26,8 @@ use crate::{
         zip::{ZipResponse, ZipResponseError, zip_single_file},
     },
     repository::{
-        committee_session_repo, committee_session_repo::change_files, election_repo, file_repo,
-        investigation_repo::list_investigations_for_committee_session,
+        committee_session_repo, election_repo, file_repo, investigation_repo, polling_station_repo,
+        polling_station_result_repo,
     },
     service::data_entry::are_results_complete_for_committee_session,
 };
@@ -42,7 +42,7 @@ fn download_zip_filename(
 ) -> String {
     use chrono::Datelike;
 
-    use crate::infra::zip::slugify_filename;
+    use crate::domain::results_input::slugify_filename;
     let location = election.location.to_lowercase();
     let location_without_whitespace: String = location.split_whitespace().collect();
     slugify_filename(&format!(
@@ -64,7 +64,7 @@ fn download_zip_filename(
 fn xml_zip_filename(election: &ElectionWithPoliticalGroups) -> String {
     use chrono::Datelike;
 
-    use crate::infra::zip::slugify_filename;
+    use crate::domain::results_input::slugify_filename;
     let location_without_whitespace: String = election.location.split_whitespace().collect();
     slugify_filename(&format!(
         "Telling {}{} {}.zip",
@@ -132,7 +132,7 @@ async fn generate_and_save_files(
 
         overview_pdf_file = Some(overview_pdf);
     }
-    change_files(
+    committee_session_repo::change_files(
         conn,
         committee_session.id,
         CommitteeSessionFilesUpdateRequest {
@@ -195,8 +195,11 @@ async fn get_files(
 ) -> Result<(Option<File>, Option<File>, Option<File>, DateTime<Utc>), APIError> {
     let mut conn = pool.acquire().await?;
     let committee_session = committee_session_repo::get(&mut conn, committee_session_id).await?;
-    let investigations =
-        list_investigations_for_committee_session(&mut conn, committee_session.id).await?;
+    let investigations = investigation_repo::list_investigations_for_committee_session(
+        &mut conn,
+        committee_session.id,
+    )
+    .await?;
     let corrections = investigations
         .iter()
         .any(|inv| matches!(inv.corrected_results, Some(true)));
@@ -231,7 +234,7 @@ async fn get_files(
     if generate_files {
         created_at = Utc::now();
         let mut tx = pool.begin_immediate().await?;
-        let input = ResultsInput::new(
+        let input = get_results_input(
             &mut tx,
             committee_session.id,
             created_at.with_timezone(&Local),
@@ -249,6 +252,60 @@ async fn get_files(
     }
 
     Ok((eml_file, pdf_file, overview_pdf_file, created_at))
+}
+
+async fn get_results_input(
+    conn: &mut SqliteConnection,
+    committee_session_id: u32,
+    created_at: DateTime<Local>,
+) -> Result<ResultsInput, APIError> {
+    let committee_session = committee_session_repo::get(conn, committee_session_id).await?;
+    let election = election_repo::get(conn, committee_session.election_id).await?;
+    let polling_stations = polling_station_repo::list(conn, committee_session.id).await?;
+    let results =
+        polling_station_result_repo::list_results_for_committee_session(conn, committee_session.id)
+            .await?;
+    let summary = ElectionSummary::from_results(&election, &results)?;
+
+    // get investigations if this is not the first session
+    let investigations = if committee_session.is_next_session() {
+        investigation_repo::list_investigations_for_committee_session(conn, committee_session.id)
+            .await?
+    } else {
+        vec![]
+    };
+
+    // get the previous committee session if this is not the first session
+    let previous_committee_session = if committee_session.is_next_session() {
+        committee_session_repo::get_previous_session(conn, committee_session.id).await?
+    } else {
+        None
+    };
+
+    // get the previous results summary from the previous committee session if it exists
+    let previous_summary = if let Some(previous_committee_session) = &previous_committee_session {
+        let previous_results = polling_station_result_repo::list_results_for_committee_session(
+            conn,
+            previous_committee_session.id,
+        )
+        .await?;
+        let previous_summary = ElectionSummary::from_results(&election, &previous_results)?;
+        Some(previous_summary)
+    } else {
+        None
+    };
+
+    Ok(ResultsInput {
+        committee_session,
+        previous_summary,
+        summary,
+        created_at,
+        election,
+        polling_stations,
+        investigations,
+        results,
+        previous_committee_session,
+    })
 }
 
 /// Download a zip containing a PDF for the PV and the EML with election results

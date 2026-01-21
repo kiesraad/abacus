@@ -3,14 +3,16 @@ use sqlx::{SqliteConnection, SqlitePool};
 
 use crate::{
     APIError, ErrorResponse,
-    api::election::committee_session::CommitteeSessionError,
+    api::{
+        extractors::CurrentSessionPollingStationId,
+        util::change_committee_session_status::change_committee_session_status,
+    },
     domain::{
         committee_session::CommitteeSession,
-        committee_session_status::{CommitteeSessionStatus, change_committee_session_status},
+        committee_session_status::{CommitteeSessionError, CommitteeSessionStatus},
         investigation::{
-            CurrentSessionPollingStationId, PollingStationInvestigation,
-            PollingStationInvestigationConcludeRequest, PollingStationInvestigationCreateRequest,
-            PollingStationInvestigationUpdateRequest,
+            PollingStationInvestigation, PollingStationInvestigationConcludeRequest,
+            PollingStationInvestigationCreateRequest, PollingStationInvestigationUpdateRequest,
         },
     },
     error::ErrorReference,

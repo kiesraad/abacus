@@ -7,10 +7,13 @@ use sqlx::{Connection, SqliteConnection, SqlitePool};
 
 use crate::{
     APIError,
-    api::election::investigation::delete_investigation_for_polling_station,
+    api::{
+        election::investigation::delete_investigation_for_polling_station,
+        util::change_committee_session_status::change_committee_session_status,
+    },
     domain::{
         committee_session::CommitteeSession,
-        committee_session_status::{CommitteeSessionStatus, change_committee_session_status},
+        committee_session_status::CommitteeSessionStatus,
         election::ElectionId,
         polling_station::{
             PollingStation, PollingStationFileRequest, PollingStationListResponse,

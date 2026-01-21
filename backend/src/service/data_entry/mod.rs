@@ -2,10 +2,10 @@ use sqlx::{Connection, SqliteConnection, query, types::Json};
 
 use crate::{
     APIError,
-    api::election::committee_session::CommitteeSessionError,
+    api::util::change_committee_session_status::change_committee_session_status,
     domain::{
         committee_session::CommitteeSession,
-        committee_session_status::{CommitteeSessionStatus, change_committee_session_status},
+        committee_session_status::{CommitteeSessionError, CommitteeSessionStatus},
         data_entry_status::DataEntryStatus,
         election::ElectionWithPoliticalGroups,
         polling_station::PollingStation,

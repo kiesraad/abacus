@@ -13,8 +13,7 @@ use tracing::error;
 use utoipa::ToSchema;
 
 use crate::{
-    api::election::committee_session::CommitteeSessionError,
-    domain::validate::DataError,
+    domain::{committee_session_status::CommitteeSessionError, validate::DataError},
     eml::EMLImportError,
     infra::{
         authentication::error::AuthenticationError, pdf_gen::PdfGenError, router::MAX_BODY_SIZE_MB,

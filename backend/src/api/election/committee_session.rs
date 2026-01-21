@@ -11,11 +11,12 @@ use utoipa::ToSchema;
 
 use crate::{
     APIError, ErrorResponse,
+    api::util::change_committee_session_status::change_committee_session_status,
     domain::{
         committee_session::{
             CommitteeSession, CommitteeSessionCreateRequest, CommitteeSessionUpdateRequest,
         },
-        committee_session_status::{CommitteeSessionStatus, change_committee_session_status},
+        committee_session_status::{CommitteeSessionError, CommitteeSessionStatus},
         election::ElectionId,
         investigation::PollingStationInvestigation,
     },
@@ -30,14 +31,6 @@ use crate::{
         investigation_repo::list_investigations_for_committee_session,
     },
 };
-
-#[derive(Debug, PartialEq, Eq)]
-pub enum CommitteeSessionError {
-    CommitteeSessionPaused,
-    InvalidCommitteeSessionStatus,
-    InvalidDetails,
-    InvalidStatusTransition,
-}
 
 impl From<CommitteeSessionError> for APIError {
     fn from(err: CommitteeSessionError) -> Self {

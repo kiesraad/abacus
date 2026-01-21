@@ -5,9 +5,10 @@ use sqlx::SqlitePool;
 
 use crate::{
     APIError, ErrorResponse,
+    api::extractors::CurrentSessionPollingStationId,
     domain::{
         election::ElectionWithPoliticalGroups,
-        investigation::{CurrentSessionPollingStationId, PollingStationInvestigation},
+        investigation::PollingStationInvestigation,
         models::{ModelNa14_2Bijlage1Input, ToPdfFileModel},
         polling_station::PollingStation,
         polling_station_results::PollingStationResults,

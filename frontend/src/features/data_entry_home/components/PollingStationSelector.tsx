@@ -57,7 +57,7 @@ export function PollingStationSelector({
   const [refetch, reset] = useSingleCall(refetchStatuses);
   const user = useUser();
   if (!user) {
-    return false;
+    return null;
   }
 
   const renderWarningMessage = (content: ReactNode) => (

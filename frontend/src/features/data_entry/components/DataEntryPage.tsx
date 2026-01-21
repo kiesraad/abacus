@@ -36,7 +36,7 @@ export function DataEntryPage() {
   const sectionId = params.sectionId ?? null;
 
   if (!user) {
-    return false;
+    return null;
   }
 
   return (

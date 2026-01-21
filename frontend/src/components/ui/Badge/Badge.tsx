@@ -14,12 +14,14 @@ export interface LabelProps {
   icon?: ReactElement;
 }
 
-function typeToLabel(userRole: Role, badgeType: string): LabelProps {
+function typeToLabel(userRole: Role, badgeType: BadgeType): LabelProps {
   if (badgeType === "first_entry_finalised" && userRole === "typist") {
     badgeType = "first_entry_finalised_for_typist";
   }
 
   switch (badgeType) {
+    case "empty":
+      return { label: t("data_entry.first_entry") };
     case "first_entry_in_progress":
       return { label: t("data_entry.first_entry"), icon: <Icon size="sm" icon={<IconEdit />} /> };
     case "first_entry_has_errors":
@@ -34,10 +36,6 @@ function typeToLabel(userRole: Role, badgeType: string): LabelProps {
       return { label: t("data_entry.second_entry") };
     case "definitive":
       return { label: t("data_entry.definitive") };
-    case "empty":
-      return { label: t("data_entry.first_entry") };
-    default:
-      return { label: t("data_entry.first_entry") };
   }
 }
 

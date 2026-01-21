@@ -4,6 +4,7 @@ import type { ReactNode } from "react";
 import { RouterProvider } from "react-router";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 import { ApiProvider } from "@/api/ApiProvider";
+import { MessagesProvider } from "@/hooks/messages/MessagesProvider";
 import * as useMessages from "@/hooks/messages/useMessages";
 import { newElectionMockData } from "@/testing/api-mocks/ElectionMockData";
 import { pollingStationMockData } from "@/testing/api-mocks/PollingStationMockData";
@@ -29,11 +30,13 @@ const Providers = ({
   fetchInitialUser?: boolean;
 }) => {
   return (
-    <ApiProvider fetchInitialUser={fetchInitialUser}>
-      <TestUserProvider userRole="administrator">
-        <RouterProvider router={router} />
-      </TestUserProvider>
-    </ApiProvider>
+    <MessagesProvider>
+      <ApiProvider fetchInitialUser={fetchInitialUser}>
+        <TestUserProvider userRole="administrator">
+          <RouterProvider router={router} />
+        </TestUserProvider>
+      </ApiProvider>
+    </MessagesProvider>
   );
 };
 
@@ -213,7 +216,7 @@ describe("Election create pages", () => {
   });
 
   describe("Confirmation modal", () => {
-    test("It shows the confirmation modal when the abort button is clicked", async () => {
+    test("Shown when the abort button is clicked", async () => {
       overrideOnce("post", "/api/elections/import/validate", 200, electionValidateResponse(newElectionMockData));
 
       const router = renderWithRouter();
@@ -236,7 +239,7 @@ describe("Election create pages", () => {
       expect(await screen.findByRole("heading", { level: 3, name: "Niet opgeslagen wijzigingen" })).toBeVisible();
     });
 
-    test("It shows the confirmation modal when attempting to navigate away", async () => {
+    test("Shown when attempting to navigate away", async () => {
       overrideOnce("post", "/api/elections/import/validate", 200, electionValidateResponse(newElectionMockData));
 
       const router = renderWithRouter();
@@ -261,7 +264,7 @@ describe("Election create pages", () => {
       expect(await screen.findByRole("heading", { level: 3, name: "Niet opgeslagen wijzigingen" })).toBeVisible();
     });
 
-    test("It does not show the confirmation modal when attempting to navigate away if nothing was done", async () => {
+    test("Not shown when attempting to navigate away if nothing was done", async () => {
       vi.spyOn(console, "warn").mockImplementation(() => {});
       overrideOnce("post", "/api/elections/import/validate", 200, electionValidateResponse(newElectionMockData));
 
@@ -281,7 +284,7 @@ describe("Election create pages", () => {
       expect(screen.queryAllByText("Niet opgeslagen wijzigingen").length).toBe(0);
     });
 
-    test("That the confirmation modal cancel button closes the modal", async () => {
+    test("Cancel button closes the modal", async () => {
       overrideOnce("post", "/api/elections/import/validate", 200, electionValidateResponse(newElectionMockData));
 
       const router = renderWithRouter();
@@ -311,7 +314,7 @@ describe("Election create pages", () => {
       expect(await screen.findByRole("heading", { level: 2, name: "Controleer kandidatenlijsten" })).toBeVisible();
     });
 
-    test("That the confirmation modal delete button closes the modal", async () => {
+    test("Delete button closes the modal", async () => {
       overrideOnce("post", "/api/elections/import/validate", 200, electionValidateResponse(newElectionMockData));
 
       const router = renderWithRouter();
@@ -342,7 +345,7 @@ describe("Election create pages", () => {
       expect(screen.queryAllByText("Controleer kandidatenlijsten").length).toBe(0);
     });
 
-    test("That the confirmation modal close button closes the modal", async () => {
+    test("Close button closes the modal", async () => {
       overrideOnce("post", "/api/elections/import/validate", 200, electionValidateResponse(newElectionMockData));
 
       const router = renderWithRouter();
@@ -396,6 +399,7 @@ describe("Election create pages", () => {
       expect(
         await screen.findByRole("heading", { level: 2, name: "Type stemopneming in Heemdamseburg" }),
       ).toBeVisible();
+      expect(router.state.location.pathname).toEqual("/elections/create/counting-method-type");
     });
 
     test("Shows warning when uploading a polling stations file with not matching election id", async () => {

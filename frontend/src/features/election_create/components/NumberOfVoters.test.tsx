@@ -1,14 +1,19 @@
 import { userEvent } from "@testing-library/user-event";
 import { describe, expect, test, vi } from "vitest";
 
-import { render, screen } from "@/testing/test-utils";
+import { render, renderReturningRouter, screen } from "@/testing/test-utils";
 import type { NewElection } from "@/types/generated/openapi";
 
 import * as useElectionCreateContext from "../hooks/useElectionCreateContext";
+import { ElectionCreateContextProvider } from "./ElectionCreateContextProvider";
 import { NumberOfVoters } from "./NumberOfVoters";
 
 async function renderPage() {
-  render(<NumberOfVoters />);
+  render(
+    <ElectionCreateContextProvider>
+      <NumberOfVoters />
+    </ElectionCreateContextProvider>,
+  );
 
   expect(
     await screen.findByRole("heading", { name: "Hoeveel kiesgerechtigden telt de gemeente?" }),
@@ -18,13 +23,23 @@ async function renderPage() {
 const election = { name: "Naam", location: "Plek" } as NewElection;
 
 describe("NumberOfVoters component", () => {
-  test("should dispatch number of voters", async () => {
+  test("Navigates to election create page when no election", () => {
+    const state = {};
+    const dispatch = vi.fn();
+    vi.spyOn(useElectionCreateContext, "useElectionCreateContext").mockReturnValue({ state, dispatch });
+    const router = renderReturningRouter(<NumberOfVoters />);
+
+    expect(router.state.location.pathname).toEqual("/elections/create");
+  });
+
+  test("Dispatches number of voters", async () => {
     const state = { election, numberOfVoters: 0 };
     const dispatch = vi.fn();
     vi.spyOn(useElectionCreateContext, "useElectionCreateContext").mockReturnValue({ state, dispatch });
+    const user = userEvent.setup();
+
     await renderPage();
 
-    const user = userEvent.setup();
     const input = screen.getByRole("textbox", { name: "Aantal kiesgerechtigden" });
     await user.type(input, "1337");
     await user.click(screen.getByRole("button", { name: "Volgende" }));
@@ -36,13 +51,14 @@ describe("NumberOfVoters component", () => {
     });
   });
 
-  test("should show error when number of voters is empty", async () => {
+  test("Shows an error when number of voters is empty", async () => {
     const state = { election, numberOfVoters: 0 };
     const dispatch = vi.fn();
     vi.spyOn(useElectionCreateContext, "useElectionCreateContext").mockReturnValue({ state, dispatch });
+    const user = userEvent.setup();
+
     await renderPage();
 
-    const user = userEvent.setup();
     await user.click(screen.getByRole("button", { name: "Volgende" }));
 
     const input = screen.getByRole("textbox", { name: "Aantal kiesgerechtigden" });
@@ -51,10 +67,11 @@ describe("NumberOfVoters component", () => {
     expect(dispatch).not.toHaveBeenCalled();
   });
 
-  test("should prefill number of voters from the eml", async () => {
+  test("Prefills number of voters from the EML", async () => {
     const state = { election, numberOfVoters: 1234 };
     const dispatch = vi.fn();
     vi.spyOn(useElectionCreateContext, "useElectionCreateContext").mockReturnValue({ state, dispatch });
+
     await renderPage();
 
     expect(screen.getByRole("textbox", { name: "Aantal kiesgerechtigden" })).toHaveValue("1234");

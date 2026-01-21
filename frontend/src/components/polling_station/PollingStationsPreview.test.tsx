@@ -49,4 +49,17 @@ describe("PollingStationsPreview", () => {
 
     expect(await screen.findAllByRole("row")).toHaveLength(11);
   });
+
+  test("Show no show more button if <=10 polling stations", async () => {
+    render(
+      <ElectionProvider electionId={1}>
+        <PollingStationsPreview pollingStations={pollingStationRequestMockData.slice(0, 10)} />
+      </ElectionProvider>,
+    );
+
+    expect(await screen.findByRole("table")).toBeVisible();
+    expect(await screen.findAllByRole("row")).toHaveLength(10);
+
+    expect(screen.queryByRole("button", { name: /Toon alle \d+ stembureaus/ })).not.toBeInTheDocument();
+  });
 });

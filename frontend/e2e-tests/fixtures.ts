@@ -1,6 +1,15 @@
 import { readFile } from "node:fs/promises";
 import { type APIRequestContext, test as base, expect, type Page } from "@playwright/test";
-
+import { DataEntryApiClient } from "e2e-tests/helpers-utils/api-clients";
+import { completePollingStationDataEntries } from "e2e-tests/helpers-utils/e2e-test-api-helpers";
+import { createRandomUsername } from "e2e-tests/helpers-utils/e2e-test-utils";
+import { type Eml230b, eml110a, eml230b } from "e2e-tests/test-data/eml-files";
+import {
+  dataEntryRequest,
+  dataEntryWithDifferencesRequest,
+  dataEntryWithErrorRequest,
+  pollingStationRequests,
+} from "e2e-tests/test-data/request-response-templates";
 import type {
   COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_BODY,
   COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_PATH,
@@ -18,17 +27,6 @@ import type {
   USER_CREATE_REQUEST_PATH,
   User,
 } from "@/types/generated/openapi";
-
-import { DataEntryApiClient } from "./helpers-utils/api-clients";
-import { completePollingStationDataEntries } from "./helpers-utils/e2e-test-api-helpers";
-import { createRandomUsername } from "./helpers-utils/e2e-test-utils";
-import { type Eml230b, eml110a, eml230b } from "./test-data/eml-files";
-import {
-  dataEntryRequest,
-  dataEntryWithDifferencesRequest,
-  dataEntryWithErrorRequest,
-  pollingStationRequests,
-} from "./test-data/request-response-templates";
 
 export const FIXTURE_TYPIST_TEMP_PASSWORD: string = "temp_password_9876";
 

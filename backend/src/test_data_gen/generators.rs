@@ -16,7 +16,7 @@ use crate::{
         FieldPath, PoliticalGroupCandidateVotes, PoliticalGroupTotalVotes, PollingStationResults,
         Validate, ValidationResults, VotersCounts, VotesCounts, YesNo,
         repository::list_results_for_committee_session,
-        status::{DataEntryStatus, Definitive, SecondEntryNotStarted},
+        status::{DataEntryStatus, Definitive, FirstEntryFinalised},
     },
     election,
     election::{
@@ -363,7 +363,7 @@ async fn generate_data_entry(
                 generated_second_entries += 1;
             } else {
                 // generate only a first data entry
-                let state = DataEntryStatus::SecondEntryNotStarted(SecondEntryNotStarted {
+                let state = DataEntryStatus::FirstEntryFinalised(FirstEntryFinalised {
                     first_entry_user_id: 5, // first typist from users in fixtures
                     finalised_first_entry: results.clone(),
                     first_entry_finished_at: ts,

@@ -6,6 +6,7 @@ import { committeeSessionMockData } from "@/testing/api-mocks/CommitteeSessionMo
 import { electionMockData } from "@/testing/api-mocks/ElectionMockData";
 import { electionStatusesMock } from "@/testing/api-mocks/ElectionStatusMockData";
 import { pollingStationMockData } from "@/testing/api-mocks/PollingStationMockData";
+import { TestUserProvider } from "@/testing/TestUserProvider";
 
 import { ElectionStatus } from "./ElectionStatus";
 
@@ -25,14 +26,16 @@ export const ElectionStatusNoLinks: StoryObj<StoryProps> = {
   },
   render: ({ addLinks, buttonNavigate }) => {
     return (
-      <ElectionStatus
-        statuses={mockStatuses}
-        committeeSession={committeeSessionMockData}
-        election={electionMockData}
-        pollingStations={pollingStationMockData}
-        addLinks={addLinks}
-        navigate={buttonNavigate}
-      />
+      <TestUserProvider userRole={"coordinator"}>
+        <ElectionStatus
+          statuses={mockStatuses}
+          committeeSession={committeeSessionMockData}
+          election={electionMockData}
+          pollingStations={pollingStationMockData}
+          addLinks={addLinks}
+          navigate={buttonNavigate}
+        />
+      </TestUserProvider>
     );
   },
   play: async ({ canvas, step }) => {
@@ -148,14 +151,16 @@ export const ElectionStatusWithLinks: StoryObj<StoryProps> = {
   },
   render: ({ addLinks, buttonNavigate }) => {
     return (
-      <ElectionStatus
-        statuses={mockStatuses}
-        committeeSession={committeeSessionMockData}
-        election={electionMockData}
-        pollingStations={pollingStationMockData}
-        addLinks={addLinks}
-        navigate={buttonNavigate}
-      />
+      <TestUserProvider userRole={"coordinator"}>
+        <ElectionStatus
+          statuses={mockStatuses}
+          committeeSession={committeeSessionMockData}
+          election={electionMockData}
+          pollingStations={pollingStationMockData}
+          addLinks={addLinks}
+          navigate={buttonNavigate}
+        />
+      </TestUserProvider>
     );
   },
   play: async ({ canvas, step, userEvent }) => {
@@ -225,14 +230,16 @@ export const ElectionStatusWithLinks: StoryObj<StoryProps> = {
 
 export const Empty: StoryObj<StoryProps> = {
   render: ({ addLinks, buttonNavigate }) => (
-    <ElectionStatus
-      statuses={[]}
-      election={electionMockData}
-      committeeSession={committeeSessionMockData}
-      pollingStations={[]}
-      addLinks={addLinks}
-      navigate={buttonNavigate}
-    />
+    <TestUserProvider userRole={"coordinator"}>
+      <ElectionStatus
+        statuses={[]}
+        election={electionMockData}
+        committeeSession={committeeSessionMockData}
+        pollingStations={[]}
+        addLinks={addLinks}
+        navigate={buttonNavigate}
+      />
+    </TestUserProvider>
   ),
   play: async ({ canvas }) => {
     await expect(
@@ -259,14 +266,16 @@ export const NextSession: StoryObj<StoryProps> = {
     today.setHours(10, 20);
 
     return (
-      <ElectionStatus
-        statuses={mockStatuses}
-        committeeSession={{ ...committeeSessionMockData, number: 2 }}
-        election={electionMockData}
-        pollingStations={pollingStationMockData}
-        addLinks={addLinks}
-        navigate={buttonNavigate}
-      />
+      <TestUserProvider userRole={"coordinator"}>
+        <ElectionStatus
+          statuses={mockStatuses}
+          committeeSession={{ ...committeeSessionMockData, number: 2 }}
+          election={electionMockData}
+          pollingStations={pollingStationMockData}
+          addLinks={addLinks}
+          navigate={buttonNavigate}
+        />
+      </TestUserProvider>
     );
   },
   play: async ({ canvas, step }) => {
@@ -284,14 +293,16 @@ export const NextSession: StoryObj<StoryProps> = {
 
 export const NextSessionEmpty: StoryObj<StoryProps> = {
   render: ({ addLinks, buttonNavigate }) => (
-    <ElectionStatus
-      statuses={[]}
-      election={electionMockData}
-      committeeSession={{ ...committeeSessionMockData, number: 2 }}
-      pollingStations={[]}
-      addLinks={addLinks}
-      navigate={buttonNavigate}
-    />
+    <TestUserProvider userRole={"coordinator"}>
+      <ElectionStatus
+        statuses={[]}
+        election={electionMockData}
+        committeeSession={{ ...committeeSessionMockData, number: 2 }}
+        pollingStations={[]}
+        addLinks={addLinks}
+        navigate={buttonNavigate}
+      />
+    </TestUserProvider>
   ),
   play: async ({ canvas }) => {
     await expect(

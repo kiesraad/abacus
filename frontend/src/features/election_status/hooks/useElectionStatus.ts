@@ -29,9 +29,9 @@ export const categoryColorClass: Record<StatusCategory, ProgressBarColorClass> =
 export const statusesForCategory: Record<StatusCategory, DataEntryStatusName[]> = {
   errors_and_warnings: ["entries_different", "first_entry_has_errors"],
   in_progress: ["first_entry_in_progress", "second_entry_in_progress"],
-  first_entry_finished: ["second_entry_not_started"],
+  first_entry_finished: ["first_entry_finalised"],
   definitive: ["definitive"],
-  not_started: ["first_entry_not_started"],
+  not_started: ["empty"],
 };
 
 export function statusCount(entries: ElectionStatusResponseEntry[], category: StatusCategory): number {
@@ -41,7 +41,7 @@ export function statusCount(entries: ElectionStatusResponseEntry[], category: St
 function getTypist(status: ElectionStatusResponseEntry | undefined): number | undefined {
   switch (status?.status) {
     case "first_entry_in_progress":
-    case "second_entry_not_started":
+    case "first_entry_finalised":
       return status.first_entry_user_id;
     case "second_entry_in_progress":
       return status.second_entry_user_id;

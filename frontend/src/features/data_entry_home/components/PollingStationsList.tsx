@@ -1,5 +1,6 @@
 import { Badge } from "@/components/ui/Badge/Badge";
 import { Table } from "@/components/ui/Table/Table";
+import { useUser } from "@/hooks/user/useUser";
 import { t } from "@/i18n/translate";
 
 import { getUrlForDataEntry, type PollingStationWithStatus } from "../utils/util";
@@ -9,6 +10,12 @@ export interface PollingStationsListProps {
 }
 
 export function PollingStationsList({ pollingStations }: PollingStationsListProps) {
+  const user = useUser();
+
+  if (!user) {
+    return null;
+  }
+
   return (
     <Table id="polling_station_list">
       <Table.Header>
@@ -30,7 +37,7 @@ export function PollingStationsList({ pollingStations }: PollingStationsListProp
                 <Table.NumberCell>{pollingStation.number}</Table.NumberCell>
                 <Table.Cell>
                   <span>{pollingStation.name}</span>
-                  <Badge type={pollingStation.statusEntry.status} showIcon />
+                  <Badge type={pollingStation.statusEntry.status} userRole={user.role} showIcon />
                 </Table.Cell>
               </Table.Row>
             ),

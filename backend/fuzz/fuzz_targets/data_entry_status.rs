@@ -147,7 +147,7 @@ fn is_as_expected(
 ) -> bool {
     match (state, transition) {
         // ClaimFirstEntry
-        (DataEntryStatus::FirstEntryNotStarted, Transition::ClaimFirstEntry) => matches!(
+        (DataEntryStatus::Empty, Transition::ClaimFirstEntry) => matches!(
             resulting_state,
             Ok(DataEntryStatus::FirstEntryInProgress(_))
         ),
@@ -166,14 +166,14 @@ fn is_as_expected(
         }
         // DeleteFirstEntry
         (DataEntryStatus::FirstEntryInProgress(_), Transition::DeleteFirstEntry(true)) => {
-            matches!(resulting_state, Ok(DataEntryStatus::FirstEntryNotStarted))
+            matches!(resulting_state, Ok(DataEntryStatus::Empty))
         }
         // FinaliseFirstEntry
         (DataEntryStatus::FirstEntryInProgress(_), Transition::FinaliseFirstEntry(true)) => {
             if first_entry_correct {
                 matches!(
                     resulting_state,
-                    Ok(DataEntryStatus::SecondEntryNotStarted(_))
+                    Ok(DataEntryStatus::FirstEntryFinalised(_))
                 )
             } else {
                 matches!(resulting_state, Ok(DataEntryStatus::FirstEntryHasErrors(_)))
@@ -181,7 +181,7 @@ fn is_as_expected(
         }
         // DiscardFirstEntry
         (DataEntryStatus::FirstEntryHasErrors(_), Transition::DiscardFirstEntry) => {
-            matches!(resulting_state, Ok(DataEntryStatus::FirstEntryNotStarted))
+            matches!(resulting_state, Ok(DataEntryStatus::Empty))
         }
         // ResumeFirstEntry
         (DataEntryStatus::FirstEntryHasErrors(_), Transition::ResumeFirstEntry) => {
@@ -191,7 +191,7 @@ fn is_as_expected(
             )
         }
         // ClaimSecondEntry
-        (DataEntryStatus::SecondEntryNotStarted(_), Transition::ClaimSecondEntry(true)) => {
+        (DataEntryStatus::FirstEntryFinalised(_), Transition::ClaimSecondEntry(true)) => {
             matches!(
                 resulting_state,
                 Ok(DataEntryStatus::SecondEntryInProgress(_))
@@ -204,7 +204,7 @@ fn is_as_expected(
                 Ok(DataEntryStatus::SecondEntryInProgress(_))
             )
         }
-        // SecondEntryNotStarted self loop, only allowed with same user
+        // FirstEntryFinalised self loop, only allowed with same user
         (DataEntryStatus::SecondEntryInProgress(_), Transition::ClaimSecondEntry(true)) => {
             matches!(
                 resulting_state,
@@ -215,7 +215,7 @@ fn is_as_expected(
         (DataEntryStatus::SecondEntryInProgress(_), Transition::DeleteSecondEntry(true)) => {
             matches!(
                 resulting_state,
-                Ok(DataEntryStatus::SecondEntryNotStarted(_))
+                Ok(DataEntryStatus::FirstEntryFinalised(_))
             )
         }
         // FinaliseSecondEntry
@@ -230,7 +230,7 @@ fn is_as_expected(
         (DataEntryStatus::EntriesDifferent(_), Transition::KeepFirstEntry) => {
             matches!(
                 resulting_state,
-                Ok(DataEntryStatus::SecondEntryNotStarted(_))
+                Ok(DataEntryStatus::FirstEntryFinalised(_))
             )
         }
         // KeepSecondEntry
@@ -238,7 +238,7 @@ fn is_as_expected(
             if second_entry_correct {
                 matches!(
                     resulting_state,
-                    Ok(DataEntryStatus::SecondEntryNotStarted(_))
+                    Ok(DataEntryStatus::FirstEntryFinalised(_))
                 )
             } else {
                 matches!(resulting_state, Ok(DataEntryStatus::FirstEntryHasErrors(_)))
@@ -246,10 +246,10 @@ fn is_as_expected(
         }
         // DiscardBothEntries
         (DataEntryStatus::EntriesDifferent(_), Transition::DeleteBothEntries) => {
-            matches!(resulting_state, Ok(DataEntryStatus::FirstEntryNotStarted))
+            matches!(resulting_state, Ok(DataEntryStatus::Empty))
         }
         // Expected error: SecondEntryNeedsDifferentUser
-        (DataEntryStatus::SecondEntryNotStarted(_), Transition::ClaimSecondEntry(false)) => {
+        (DataEntryStatus::FirstEntryFinalised(_), Transition::ClaimSecondEntry(false)) => {
             matches!(
                 resulting_state,
                 Err(DataEntryTransitionError::SecondEntryNeedsDifferentUser)
@@ -292,7 +292,7 @@ fn is_as_expected(
             matches!(resulting_state, Err(DataEntryTransitionError::Invalid))
         }
         (
-            DataEntryStatus::SecondEntryNotStarted(_) | DataEntryStatus::SecondEntryInProgress(_),
+            DataEntryStatus::FirstEntryFinalised(_) | DataEntryStatus::SecondEntryInProgress(_),
             Transition::FinaliseFirstEntry(_)
             | Transition::ClaimFirstEntry
             | Transition::UpdateFirstEntry(_, _)
@@ -371,7 +371,7 @@ fuzz_target!(|transitions: Vec<Transition>| {
         // Apply transition
         let next_state = match transition {
             Transition::ClaimFirstEntry => {
-                if prev_state == DataEntryStatus::FirstEntryNotStarted {
+                if prev_state == DataEntryStatus::Empty {
                     first_entry_correct = true;
                 }
                 state.claim_first_entry(get_cde(users.first, true))
@@ -394,7 +394,7 @@ fuzz_target!(|transitions: Vec<Transition>| {
             }
             Transition::DiscardFirstEntry => state.discard_first_entry(),
             Transition::ClaimSecondEntry(correct_user) => {
-                if matches!(prev_state, DataEntryStatus::SecondEntryNotStarted(_)) {
+                if matches!(prev_state, DataEntryStatus::FirstEntryFinalised(_)) {
                     second_entry_correct = true;
                 }
                 state.claim_second_entry(get_cde(users.second(correct_user), true))

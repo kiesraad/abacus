@@ -4,11 +4,11 @@ import { expect, within } from "storybook/test";
 import { Badge, type BadgeProps, type BadgeType } from "./Badge";
 
 const expectedBadgeLabel: Record<BadgeType, string> = {
-  first_entry_not_started: "1e invoer",
+  empty: "1e invoer",
   first_entry_in_progress: "1e invoer",
   first_entry_has_errors: "1e invoer",
   first_entry_finalised: "1e invoer",
-  second_entry_not_started: "2e invoer",
+  first_entry_finalised_for_typist: "2e invoer",
   second_entry_in_progress: "2e invoer",
   entries_different: "2e invoer",
   definitive: "Definitief",
@@ -21,7 +21,7 @@ export const Badges: StoryObj = {
     return (
       <>
         {badgeTypes.map((type) => (
-          <Badge id={type} key={type} type={type} />
+          <Badge id={type} key={type} type={type} userRole={"coordinator"} />
         ))}
       </>
     );
@@ -42,7 +42,7 @@ export const BadgesWithIcons: StoryObj = {
     return (
       <>
         {badgeTypes.map((type) => (
-          <Badge id={type} key={type} type={type} showIcon />
+          <Badge id={type} key={type} type={type} showIcon userRole={"coordinator"} />
         ))}
       </>
     );
@@ -60,7 +60,7 @@ export const BadgesWithIcons: StoryObj = {
 
 export const CustomizableBadge: StoryObj<BadgeProps> = {
   args: {
-    type: "first_entry_not_started",
+    type: "empty",
     showIcon: false,
   },
   argTypes: {
@@ -73,7 +73,7 @@ export const CustomizableBadge: StoryObj<BadgeProps> = {
       control: { type: "radio" },
     },
   },
-  render: ({ type, showIcon }) => <Badge type={type} showIcon={showIcon} />,
+  render: ({ type, showIcon }) => <Badge type={type} showIcon={showIcon} userRole={"coordinator"} />,
 };
 
 export default {};

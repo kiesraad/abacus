@@ -367,7 +367,7 @@ export const PollingStationDataEntryResolveDifferencesHandler = http.post<
   DataEntryStatusResponse
 >(
   "/api/polling_stations/3/data_entries/resolve_differences" satisfies POLLING_STATION_DATA_ENTRY_RESOLVE_DIFFERENCES_REQUEST_PATH,
-  () => HttpResponse.json({ status: "first_entry_not_started" }, { status: 200 }),
+  () => HttpResponse.json({ status: "empty" }, { status: 200 }),
 );
 
 export const PollingStationDataEntryResolveErrorsHandler = http.post<
@@ -376,7 +376,7 @@ export const PollingStationDataEntryResolveErrorsHandler = http.post<
   DataEntryStatusResponse
 >(
   "/api/polling_stations/5/data_entries/resolve_errors" satisfies POLLING_STATION_DATA_ENTRY_RESOLVE_ERRORS_REQUEST_PATH,
-  () => HttpResponse.json({ status: "first_entry_not_started" }, { status: 200 }),
+  () => HttpResponse.json({ status: "empty" }, { status: 200 }),
 );
 
 // get polling stations
@@ -421,7 +421,7 @@ export const PollingStationDataEntryFinaliseHandler = http.post<
   null,
   DataEntryStatusResponse | ErrorResponse
 >("/api/polling_stations/1/data_entries/1/finalise" satisfies POLLING_STATION_DATA_ENTRY_FINALISE_REQUEST_PATH, () =>
-  HttpResponse.json({ status: "second_entry_not_started" }, { status: 200 }),
+  HttpResponse.json({ status: "first_entry_finalised" }, { status: 200 }),
 );
 
 // delete data entries and result handler

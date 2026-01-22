@@ -45,14 +45,14 @@ export function ResolveDifferencesPage() {
         });
         void navigate(`/elections/${election.id}/status/${pollingStationId}/detail`);
         break;
-      case "second_entry_not_started":
+      case "first_entry_finalised":
         pushMessage({
           title: t("election_status.success.differences_resolved", { nr: pollingStation.number }),
           text: t("election_status.success.data_entry_kept", { typist: getName(firstEntryUserId) }),
         });
         void navigate(`/elections/${election.id}/status`);
         break;
-      case "first_entry_not_started":
+      case "empty":
         pushMessage({
           title: t("election_status.success.differences_resolved", { nr: pollingStation.number }),
           text: t("election_status.success.data_entries_discarded", { nr: pollingStation.number }),

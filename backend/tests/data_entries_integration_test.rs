@@ -412,12 +412,12 @@ async fn test_election_details_status(pool: SqlitePool) {
     // Ensure the statuses are "NotStarted"
     let statuses = get_statuses(&addr, &coordinator_cookie, election_id).await;
 
-    assert_eq!(statuses[&1]["status"], "first_entry_not_started");
+    assert_eq!(statuses[&1]["status"], "empty");
     assert!(statuses[&1]["first_entry_user_id"].is_null());
     assert!(statuses[&1]["second_entry_user_id"].is_null());
     assert!(statuses[&1]["first_entry_progress"].is_null());
     assert!(statuses[&1]["second_entry_progress"].is_null());
-    assert_eq!(statuses[&2]["status"], "first_entry_not_started");
+    assert_eq!(statuses[&2]["status"], "empty");
     assert!(statuses[&2]["first_entry_user_id"].is_null());
     assert!(statuses[&2]["second_entry_user_id"].is_null());
     assert!(statuses[&2]["first_entry_progress"].is_null());
@@ -440,7 +440,7 @@ async fn test_election_details_status(pool: SqlitePool) {
     // polling station 1's first entry is now complete, polling station 2 is still incomplete and set to in progress
     let statuses = get_statuses(&addr, &coordinator_cookie, election_id).await;
 
-    assert_eq!(statuses[&1]["status"], "second_entry_not_started");
+    assert_eq!(statuses[&1]["status"], "first_entry_finalised");
     assert_eq!(statuses[&1]["first_entry_user_id"], typist_user_id);
     assert!(statuses[&1]["second_entry_user_id"].is_null());
     assert_eq!(statuses[&1]["first_entry_progress"], 100);

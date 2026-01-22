@@ -48,7 +48,7 @@ describe("ElectionHomePage", () => {
 
   test("Shows committee session card(s) and election information table", async () => {
     const committeeSessionData: Partial<CommitteeSession> = {
-      status: "data_entry_in_progress",
+      status: "data_entry",
       location: "Den Haag",
       start_date_time: "2026-03-18T21:36:00",
     };
@@ -97,7 +97,7 @@ describe("ElectionHomePage", () => {
     const user = userEvent.setup();
     server.use(CommitteeSessionCreateHandler);
     const sessionCreateRequestSpy = spyOnHandler(CommitteeSessionCreateHandler);
-    const electionData = getElectionMockData({}, { status: "data_entry_finished" });
+    const electionData = getElectionMockData({}, { status: "completed" });
     server.use(
       http.get("/api/elections/1", () =>
         HttpResponse.json(electionData satisfies ElectionDetailsResponse, { status: 200 }),
@@ -131,7 +131,7 @@ describe("ElectionHomePage", () => {
   });
 
   test("Does not show create new committee session button for administrator", async () => {
-    const electionData = getElectionMockData({}, { status: "data_entry_finished" });
+    const electionData = getElectionMockData({}, { status: "completed" });
     server.use(
       http.get("/api/elections/1", () =>
         HttpResponse.json(electionData satisfies ElectionDetailsResponse, { status: 200 }),
@@ -284,7 +284,7 @@ describe("ElectionHomePage", () => {
       },
     ]);
     const user = userEvent.setup();
-    const committeeSessionData: Partial<CommitteeSession> = { status: "data_entry_not_started" };
+    const committeeSessionData: Partial<CommitteeSession> = { status: "in_preparation" };
     const electionData = getElectionMockData({}, committeeSessionData);
     electionData.committee_sessions = getCommitteeSessionListMockData(committeeSessionData);
     server.use(

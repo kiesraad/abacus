@@ -63,7 +63,7 @@ export function InvestigationReason({ pollingStationId }: InvestigationReasonPro
           corrected_results: investigation.corrected_results,
         } satisfies PollingStationInvestigationUpdateRequest);
       } else {
-        if (currentCommitteeSession.status === "data_entry_finished") {
+        if (currentCommitteeSession.status === "completed") {
           pushMessage({
             type: "warning",
             title: t("generate_new_results"),

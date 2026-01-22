@@ -196,11 +196,9 @@ describe("Test PollingStationChoiceForm", () => {
 
     test("Selecting a polling station in next session without corrected_results=true", async () => {
       // Set to session 2, with an investigation on polling station 1 without corrected_results=true
-      const electionDataSecondSession = getElectionMockData(
-        {},
-        { id: 1, number: 2, status: "data_entry_not_started" },
-        [{ polling_station_id: 1, reason: "Test reason 1" }],
-      );
+      const electionDataSecondSession = getElectionMockData({}, { id: 1, number: 2, status: "in_preparation" }, [
+        { polling_station_id: 1, reason: "Test reason 1" },
+      ]);
       overrideOnce("get", "/api/elections/1", 200, electionDataSecondSession);
       server.use(http.get("/api/elections/1/status", () => HttpResponse.json({ statuses: [] }, { status: 200 })));
 
@@ -355,7 +353,7 @@ describe("Test PollingStationChoiceForm", () => {
       );
     });
 
-    test("All data entries of polling stations are finished, polling station list shows message", async () => {
+    test("All data entries of polling stations are completed, polling station list shows message", async () => {
       overrideOnce("get", "/api/elections/1", 200, electionDetailsMockResponse);
 
       server.use(
@@ -589,7 +587,7 @@ describe("Test PollingStationChoiceForm", () => {
     });
   });
 
-  test("Show unfinished data entries for current user", async () => {
+  test("Show uncompleted data entries for current user", async () => {
     server.use(ElectionRequestHandler);
     const testPollingStation = pollingStationMockData[0]!;
     // Have the server return an in progress polling station that is owned by a logged-in user.

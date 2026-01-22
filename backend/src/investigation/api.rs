@@ -87,11 +87,11 @@ pub async fn delete_investigation_for_polling_station(
             )
             .await?;
 
-        if committee_session.status == CommitteeSessionStatus::DataEntryFinished {
+        if committee_session.status == CommitteeSessionStatus::Completed {
             change_committee_session_status(
                 conn,
                 committee_session.id,
-                CommitteeSessionStatus::DataEntryInProgress,
+                CommitteeSessionStatus::DataEntry,
                 audit_service.clone(),
             )
             .await?;
@@ -148,15 +148,15 @@ async fn polling_station_investigation_create(
         change_committee_session_status(
             &mut tx,
             committee_session.id,
-            CommitteeSessionStatus::DataEntryNotStarted,
+            CommitteeSessionStatus::InPreparation,
             audit_service,
         )
         .await?;
-    } else if committee_session.status == CommitteeSessionStatus::DataEntryFinished {
+    } else if committee_session.status == CommitteeSessionStatus::Completed {
         change_committee_session_status(
             &mut tx,
             committee_session.id,
-            CommitteeSessionStatus::DataEntryInProgress,
+            CommitteeSessionStatus::DataEntry,
             audit_service,
         )
         .await?;
@@ -220,13 +220,13 @@ async fn polling_station_investigation_conclude(
         )
         .await?;
 
-    if committee_session.status == CommitteeSessionStatus::DataEntryNotStarted
-        || committee_session.status == CommitteeSessionStatus::DataEntryFinished
+    if committee_session.status == CommitteeSessionStatus::InPreparation
+        || committee_session.status == CommitteeSessionStatus::Completed
     {
         change_committee_session_status(
             &mut tx,
             committee_session.id,
-            CommitteeSessionStatus::DataEntryInProgress,
+            CommitteeSessionStatus::DataEntry,
             audit_service,
         )
         .await?;
@@ -259,11 +259,11 @@ async fn update_investigation(
         )
         .await?;
 
-    if committee_session.status == CommitteeSessionStatus::DataEntryFinished {
+    if committee_session.status == CommitteeSessionStatus::Completed {
         change_committee_session_status(
             conn,
             committee_session.id,
-            CommitteeSessionStatus::DataEntryInProgress,
+            CommitteeSessionStatus::DataEntry,
             audit_service.clone(),
         )
         .await?;

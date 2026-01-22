@@ -46,7 +46,7 @@ export function PollingStationUpdatePage() {
   }
 
   function handleSaved(pollingStation: PollingStation) {
-    if (currentCommitteeSession.status === "data_entry_finished") {
+    if (currentCommitteeSession.status === "completed") {
       pushMessage({
         type: "warning",
         title: t("generate_new_results"),
@@ -73,7 +73,7 @@ export function PollingStationUpdatePage() {
 
   function handleDeleted(pollingStation: PollingStation) {
     toggleShowDeleteModal();
-    if (currentCommitteeSession.status === "data_entry_finished") {
+    if (currentCommitteeSession.status === "completed") {
       pushMessage({
         type: "warning",
         title: t("generate_new_results"),

@@ -39,7 +39,7 @@ async fn test_election_list_works(pool: SqlitePool) {
     let committee_sessions = body["committee_sessions"].as_array().unwrap();
     assert_eq!(committee_sessions.len(), 2);
     assert_eq!(committee_sessions[1]["number"], 2);
-    assert_eq!(committee_sessions[1]["status"], "data_entry_in_progress");
+    assert_eq!(committee_sessions[1]["status"], "data_entry");
     assert_eq!(body["elections"].as_array().unwrap().len(), 2);
 }
 
@@ -59,10 +59,7 @@ async fn test_election_details_works(pool: SqlitePool) {
     // Ensure the response is what we expect
     assert_eq!(response.status(), StatusCode::OK);
     let body: serde_json::Value = response.json().await.unwrap();
-    assert_eq!(
-        body["current_committee_session"]["status"],
-        "data_entry_in_progress"
-    );
+    assert_eq!(body["current_committee_session"]["status"], "data_entry");
     assert_eq!(body["committee_sessions"].as_array().unwrap().len(), 2);
     assert_eq!(body["election"]["name"], "Corrigendum 2026");
     let polling_stations = body["polling_stations"].as_array().unwrap();
@@ -175,7 +172,7 @@ async fn test_election_number_of_voters_change_first_session_created_works_for_c
     path = "../fixtures",
     scripts("election_6_no_polling_stations", "users")
 )))]
-async fn test_election_number_of_voters_change_first_session_not_started_works_for_administrator(
+async fn test_election_number_of_voters_change_first_session_in_preparation_works_for_administrator(
     pool: SqlitePool,
 ) {
     let addr = serve_api(pool).await;
@@ -190,7 +187,7 @@ async fn test_election_number_of_voters_change_first_session_not_started_works_f
 
     let committee_session =
         get_election_committee_session(&addr, &coordinator_cookie, election_id).await;
-    assert_eq!(committee_session["status"], "data_entry_not_started");
+    assert_eq!(committee_session["status"], "in_preparation");
 
     let url = format!("http://{addr}/api/elections/{election_id}/voters");
     let admin_cookie = admin_login(&addr).await;
@@ -288,17 +285,10 @@ async fn test_election_pdf_download_works(pool: SqlitePool) {
     create_result(&addr, 1, election_id).await;
     create_result(&addr, 2, election_id).await;
 
-    change_status_committee_session(
-        &addr,
-        &coordinator_cookie,
-        election_id,
-        2,
-        "data_entry_finished",
-    )
-    .await;
+    change_status_committee_session(&addr, &coordinator_cookie, election_id, 2, "completed").await;
     let committee_session =
         get_election_committee_session(&addr, &coordinator_cookie, election_id).await;
-    assert_eq!(committee_session["status"], "data_entry_finished");
+    assert_eq!(committee_session["status"], "completed");
     assert!(committee_session["results_eml"].is_null());
     assert!(committee_session["results_pdf"].is_null());
 
@@ -381,17 +371,10 @@ async fn test_election_zip_download_works(pool: SqlitePool) {
     create_result(&addr, 1, election_id).await;
     create_result(&addr, 2, election_id).await;
 
-    change_status_committee_session(
-        &addr,
-        &coordinator_cookie,
-        election_id,
-        2,
-        "data_entry_finished",
-    )
-    .await;
+    change_status_committee_session(&addr, &coordinator_cookie, election_id, 2, "completed").await;
     let committee_session =
         get_election_committee_session(&addr, &coordinator_cookie, election_id).await;
-    assert_eq!(committee_session["status"], "data_entry_finished");
+    assert_eq!(committee_session["status"], "completed");
     assert!(committee_session["results_eml"].is_null());
     assert!(committee_session["results_pdf"].is_null());
 

@@ -54,7 +54,7 @@ export function ElectionReportPage() {
   }
 
   // Safeguard so users cannot circumvent the check via the browser's address bar
-  if (committeeSession.status !== "data_entry_finished") {
+  if (committeeSession.status !== "completed") {
     throw new ApplicationError(t("error.forbidden_message"), "InvalidCommitteeSessionStatus");
   }
 
@@ -63,7 +63,7 @@ export function ElectionReportPage() {
   const wasCorrected = requestState.data.investigations.some((i) => i.corrected_results);
 
   function handleResume() {
-    const body: COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_BODY = { status: "data_entry_in_progress" };
+    const body: COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_BODY = { status: "data_entry" };
     void update(body).then((result) => {
       if (isSuccess(result)) {
         void navigate("../../status");

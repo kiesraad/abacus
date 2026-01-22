@@ -91,8 +91,8 @@ describe("PollingStationUpdatePage", () => {
     });
   });
 
-  test("Navigates back on save with a warning message when data entry finished", async () => {
-    overrideOnce("get", "/api/elections/1", 200, getElectionMockData({}, { status: "data_entry_finished" }));
+  test("Navigates back on save with a warning message when data entry completed", async () => {
+    overrideOnce("get", "/api/elections/1", 200, getElectionMockData({}, { status: "completed" }));
 
     renderPage("coordinator");
 
@@ -156,9 +156,9 @@ describe("PollingStationUpdatePage", () => {
       expect(navigate).toHaveBeenCalledExactlyOnceWith("/elections/1/polling-stations", { replace: true });
     });
 
-    test("Returns to list page with a warning message when clicking delete polling station when data entry finished", async () => {
+    test("Returns to list page with a warning message when clicking delete polling station when data entry completed", async () => {
       server.use(PollingStationDeleteHandler);
-      overrideOnce("get", "/api/elections/1", 200, getElectionMockData({}, { status: "data_entry_finished" }));
+      overrideOnce("get", "/api/elections/1", 200, getElectionMockData({}, { status: "completed" }));
 
       const user = userEvent.setup();
 
@@ -267,10 +267,10 @@ describe("PollingStationUpdatePage", () => {
 
   test.each([
     { status: "created", allowed: true },
-    { status: "data_entry_not_started", allowed: true },
-    { status: "data_entry_in_progress", allowed: false },
-    { status: "data_entry_paused", allowed: false },
-    { status: "data_entry_finished", allowed: false },
+    { status: "in_preparation", allowed: true },
+    { status: "data_entry", allowed: false },
+    { status: "paused", allowed: false },
+    { status: "completed", allowed: false },
   ] satisfies Array<{
     status: CommitteeSessionStatus;
     allowed: boolean;

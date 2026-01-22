@@ -30,7 +30,7 @@ export function ElectionInformationTable({
 }: ElectionInformationTableProps) {
   const rowLink =
     committeeSession.number === 1 &&
-    (committeeSession.status === "created" || committeeSession.status === "data_entry_not_started")
+    (committeeSession.status === "created" || committeeSession.status === "in_preparation")
       ? "number-of-voters"
       : undefined;
   return (

@@ -134,9 +134,9 @@ export const test = base.extend<Fixtures>({
     expect(electionResponse.ok()).toBeTruthy();
     const response = (await electionResponse.json()) as ElectionDetailsResponse;
 
-    // Set committee session status to DataEntryInProgress
+    // Set committee session status to DataEntry
     const statusChangeUrl: COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_PATH = `/api/elections/${response.current_committee_session.election_id}/committee_sessions/${response.current_committee_session.id}/status`;
-    const statusChangeData: COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_BODY = { status: "data_entry_in_progress" };
+    const statusChangeData: COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_BODY = { status: "data_entry" };
     const statusChangeResponse = await coordinator.request.put(statusChangeUrl, { data: statusChangeData });
     expect(statusChangeResponse.ok()).toBeTruthy();
 

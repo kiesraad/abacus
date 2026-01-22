@@ -27,7 +27,7 @@ export const DefaultCommitteeSessionCard: StoryObj<Props> = {
 export default {
   args: {
     number: 1,
-    status: "data_entry_in_progress",
+    status: "data_entry",
     startDateTime: "2025-11-08T09:15:00",
     isCurrentSession: true,
   },
@@ -37,13 +37,7 @@ export default {
       control: { type: "radio" },
     },
     status: {
-      options: [
-        "created",
-        "data_entry_not_started",
-        "data_entry_in_progress",
-        "data_entry_paused",
-        "data_entry_finished",
-      ],
+      options: ["created", "in_preparation", "data_entry", "paused", "completed"],
       control: { type: "radio" },
     },
     startDateTime: {

@@ -72,8 +72,8 @@ describe("AddInvestigationLayout", () => {
     expect(await screen.findByRole("button", { name: "Opslaan" })).toBeVisible();
   });
 
-  test("Renders warning when data entry is finished", async () => {
-    const electionData = getElectionMockData({}, { number: 2, status: "data_entry_finished" }, []);
+  test("Renders warning when data entry is completed", async () => {
+    const electionData = getElectionMockData({}, { number: 2, status: "completed" }, []);
     overrideOnce("get", "/api/elections/1", 200, electionData);
 
     await renderPage("reason");
@@ -82,8 +82,8 @@ describe("AddInvestigationLayout", () => {
     expect(within(alert).getByRole("strong")).toHaveTextContent("Invoerfase al afgerond");
   });
 
-  test("Does not render warning when data entry is not finished", async () => {
-    const electionData = getElectionMockData({}, { number: 2, status: "data_entry_in_progress" }, []);
+  test("Does not render warning when data entry is not completed", async () => {
+    const electionData = getElectionMockData({}, { number: 2, status: "data_entry" }, []);
     overrideOnce("get", "/api/elections/1", 200, electionData);
 
     await renderPage("reason");
@@ -96,9 +96,9 @@ describe("AddInvestigationLayout", () => {
 
   describe("Navigation: data entry modal", () => {
     test.each([
-      { to: "print-corrigendum", status: "data_entry_not_started", expectShown: false },
-      { to: "findings", status: "data_entry_not_started", expectShown: true },
-      { to: "findings", status: "data_entry_in_progress", expectShown: false },
+      { to: "print-corrigendum", status: "in_preparation", expectShown: false },
+      { to: "findings", status: "in_preparation", expectShown: true },
+      { to: "findings", status: "data_entry", expectShown: false },
     ] satisfies Array<{
       to: string;
       status: CommitteeSessionStatus;
@@ -122,8 +122,8 @@ describe("AddInvestigationLayout", () => {
       expect(modal).toHaveTextContent("Invoerfase starten?");
     });
 
-    test("When immediately navigating to findings with status=data_entry_not_started should show the modal", async () => {
-      const electionData = getElectionMockData({}, { number: 2, status: "data_entry_not_started" }, []);
+    test("When immediately navigating to findings with status=in_preparation should show the modal", async () => {
+      const electionData = getElectionMockData({}, { number: 2, status: "in_preparation" }, []);
       overrideOnce("get", "/api/elections/1", 200, electionData);
 
       await renderPage("findings");
@@ -132,8 +132,8 @@ describe("AddInvestigationLayout", () => {
       expect(modal).toHaveTextContent("Invoerfase starten?");
     });
 
-    test("When immediately navigating to findings with status=data_entry_in_progress should not show the modal", async () => {
-      const electionData = getElectionMockData({}, { number: 2, status: "data_entry_in_progress" }, []);
+    test("When immediately navigating to findings with status=data_entry should not show the modal", async () => {
+      const electionData = getElectionMockData({}, { number: 2, status: "data_entry" }, []);
       overrideOnce("get", "/api/elections/1", 200, electionData);
 
       await renderPage("findings");
@@ -145,7 +145,7 @@ describe("AddInvestigationLayout", () => {
       server.use(CommitteeSessionStatusChangeRequestHandler);
       const updateCommitteeSession = spyOnHandler(CommitteeSessionStatusChangeRequestHandler);
 
-      const electionData = getElectionMockData({}, { number: 2, status: "data_entry_not_started" }, []);
+      const electionData = getElectionMockData({}, { number: 2, status: "in_preparation" }, []);
       overrideOnce("get", "/api/elections/1", 200, electionData);
 
       await renderPage("findings");
@@ -165,7 +165,7 @@ describe("AddInvestigationLayout", () => {
       server.use(CommitteeSessionStatusChangeRequestHandler);
       const updateCommitteeSession = spyOnHandler(CommitteeSessionStatusChangeRequestHandler);
 
-      const electionData = getElectionMockData({}, { number: 2, status: "data_entry_not_started" }, []);
+      const electionData = getElectionMockData({}, { number: 2, status: "in_preparation" }, []);
       overrideOnce("get", "/api/elections/1", 200, electionData);
 
       await renderPage("print-corrigendum");
@@ -187,7 +187,7 @@ describe("AddInvestigationLayout", () => {
       server.use(CommitteeSessionStatusChangeRequestHandler);
       const updateCommitteeSession = spyOnHandler(CommitteeSessionStatusChangeRequestHandler);
 
-      let electionData = getElectionMockData({}, { number: 2, status: "data_entry_not_started" }, []);
+      let electionData = getElectionMockData({}, { number: 2, status: "in_preparation" }, []);
       overrideOnce("get", "/api/elections/1", 200, electionData);
 
       await renderPage("print-corrigendum");
@@ -195,8 +195,8 @@ describe("AddInvestigationLayout", () => {
       const continueButton = await screen.findByRole("link", { name: "Verder naar bevindingen" });
       await user.click(continueButton);
 
-      // Change status to data_entry_in_progress to simulate the backend change
-      electionData = getElectionMockData({}, { number: 2, status: "data_entry_in_progress" }, []);
+      // Change status to data_entry to simulate the backend change
+      electionData = getElectionMockData({}, { number: 2, status: "data_entry" }, []);
       overrideOnce("get", "/api/elections/1", 200, electionData);
 
       const modal = await screen.findByTestId("modal-dialog");

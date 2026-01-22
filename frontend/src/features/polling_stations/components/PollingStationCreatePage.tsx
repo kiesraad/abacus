@@ -17,7 +17,7 @@ export function PollingStationCreatePage() {
   const parentUrl = `/elections/${election.id}/polling-stations`;
 
   function handleSaved(pollingStation: PollingStation) {
-    if (currentCommitteeSession.status === "data_entry_finished") {
+    if (currentCommitteeSession.status === "completed") {
       pushMessage({
         type: "warning",
         title: t("generate_new_results"),

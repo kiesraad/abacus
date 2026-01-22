@@ -128,15 +128,15 @@ async fn validate_and_get_data(
     // Validate state based on user role
     match user.role() {
         Role::Typist => {
-            if committee_session.status == CommitteeSessionStatus::DataEntryPaused {
+            if committee_session.status == CommitteeSessionStatus::Paused {
                 return Err(CommitteeSessionError::CommitteeSessionPaused.into());
-            } else if committee_session.status != CommitteeSessionStatus::DataEntryInProgress {
+            } else if committee_session.status != CommitteeSessionStatus::DataEntry {
                 return Err(CommitteeSessionError::InvalidCommitteeSessionStatus.into());
             }
         }
         Role::Coordinator => {
-            if committee_session.status != CommitteeSessionStatus::DataEntryInProgress
-                && committee_session.status != CommitteeSessionStatus::DataEntryPaused
+            if committee_session.status != CommitteeSessionStatus::DataEntry
+                && committee_session.status != CommitteeSessionStatus::Paused
             {
                 return Err(CommitteeSessionError::InvalidCommitteeSessionStatus.into());
             }
@@ -169,11 +169,11 @@ pub async fn delete_data_entry_and_result_for_polling_station(
         audit_service
             .log(conn, &AuditEvent::ResultDeleted(result.into()), None)
             .await?;
-        if committee_session.status == CommitteeSessionStatus::DataEntryFinished {
+        if committee_session.status == CommitteeSessionStatus::Completed {
             change_committee_session_status(
                 conn,
                 committee_session.id,
-                CommitteeSessionStatus::DataEntryInProgress,
+                CommitteeSessionStatus::DataEntry,
                 audit_service.clone(),
             )
             .await?;
@@ -1302,12 +1302,12 @@ mod tests {
     }
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
-    async fn test_claim_data_entry_committee_session_status_is_data_entry_paused(pool: SqlitePool) {
+    async fn test_claim_data_entry_committee_session_status_is_paused(pool: SqlitePool) {
         let polling_station_id = PollingStationId::from(1);
         change_status_committee_session(
             pool.clone(),
             CommitteeSessionId::from(2),
-            CommitteeSessionStatus::DataEntryPaused,
+            CommitteeSessionStatus::Paused,
         )
         .await;
 
@@ -1327,14 +1327,14 @@ mod tests {
     }
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
-    async fn test_claim_data_entry_committee_session_status_not_data_entry_paused_or_in_progress(
+    async fn test_claim_data_entry_committee_session_status_not_paused_or_data_entry(
         pool: SqlitePool,
     ) {
         let polling_station_id = PollingStationId::from(1);
         change_status_committee_session(
             pool.clone(),
             CommitteeSessionId::from(2),
-            CommitteeSessionStatus::DataEntryFinished,
+            CommitteeSessionStatus::Completed,
         )
         .await;
 
@@ -1411,7 +1411,7 @@ mod tests {
         change_status_committee_session(
             pool.clone(),
             CommitteeSessionId::from(704),
-            CommitteeSessionStatus::DataEntryInProgress,
+            CommitteeSessionStatus::DataEntry,
         )
         .await;
 
@@ -1452,9 +1452,7 @@ mod tests {
     }
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
-    async fn test_create_data_entry_committee_session_status_is_data_entry_paused(
-        pool: SqlitePool,
-    ) {
+    async fn test_create_data_entry_committee_session_status_is_paused(pool: SqlitePool) {
         let request_body = example_data_entry();
         let polling_station_id = PollingStationId::from(1);
 
@@ -1464,7 +1462,7 @@ mod tests {
         change_status_committee_session(
             pool.clone(),
             CommitteeSessionId::from(2),
-            CommitteeSessionStatus::DataEntryPaused,
+            CommitteeSessionStatus::Paused,
         )
         .await;
 
@@ -1493,7 +1491,7 @@ mod tests {
     }
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
-    async fn test_create_data_entry_committee_session_status_not_data_entry_paused_or_in_progress(
+    async fn test_create_data_entry_committee_session_status_not_paused_or_data_entry(
         pool: SqlitePool,
     ) {
         let polling_station_id = PollingStationId::from(1);
@@ -1505,7 +1503,7 @@ mod tests {
         change_status_committee_session(
             pool.clone(),
             CommitteeSessionId::from(2),
-            CommitteeSessionStatus::DataEntryFinished,
+            CommitteeSessionStatus::Completed,
         )
         .await;
 
@@ -1649,9 +1647,7 @@ mod tests {
     }
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
-    async fn test_finalise_data_entry_committee_session_status_is_data_entry_paused(
-        pool: SqlitePool,
-    ) {
+    async fn test_finalise_data_entry_committee_session_status_is_paused(pool: SqlitePool) {
         let request_body = example_data_entry();
         let polling_station_id = PollingStationId::from(1);
 
@@ -1669,7 +1665,7 @@ mod tests {
         change_status_committee_session(
             pool.clone(),
             CommitteeSessionId::from(2),
-            CommitteeSessionStatus::DataEntryPaused,
+            CommitteeSessionStatus::Paused,
         )
         .await;
 
@@ -1681,7 +1677,7 @@ mod tests {
     }
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
-    async fn test_finalise_data_entry_committee_session_status_not_data_entry_paused_or_in_progress(
+    async fn test_finalise_data_entry_committee_session_status_not_paused_or_data_entry(
         pool: SqlitePool,
     ) {
         let request_body = example_data_entry();
@@ -1701,7 +1697,7 @@ mod tests {
         change_status_committee_session(
             pool.clone(),
             CommitteeSessionId::from(2),
-            CommitteeSessionStatus::DataEntryFinished,
+            CommitteeSessionStatus::Completed,
         )
         .await;
 
@@ -1974,7 +1970,7 @@ mod tests {
     }
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
-    async fn test_polling_station_data_entry_delete_committee_session_status_is_data_entry_paused(
+    async fn test_polling_station_data_entry_delete_committee_session_status_is_paused(
         pool: SqlitePool,
     ) {
         // create data entry
@@ -1995,7 +1991,7 @@ mod tests {
         change_status_committee_session(
             pool.clone(),
             CommitteeSessionId::from(2),
-            CommitteeSessionStatus::DataEntryPaused,
+            CommitteeSessionStatus::Paused,
         )
         .await;
 
@@ -2016,7 +2012,7 @@ mod tests {
     }
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
-    async fn test_polling_station_data_entry_delete_committee_session_status_not_data_entry_paused_or_in_progress(
+    async fn test_polling_station_data_entry_delete_committee_session_status_not_paused_or_data_entry(
         pool: SqlitePool,
     ) {
         // create data entry
@@ -2037,7 +2033,7 @@ mod tests {
         change_status_committee_session(
             pool.clone(),
             CommitteeSessionId::from(2),
-            CommitteeSessionStatus::DataEntryFinished,
+            CommitteeSessionStatus::Completed,
         )
         .await;
 
@@ -2195,7 +2191,7 @@ mod tests {
         change_status_committee_session(
             pool.clone(),
             CommitteeSessionId::from(3),
-            CommitteeSessionStatus::DataEntryFinished,
+            CommitteeSessionStatus::Completed,
         )
         .await;
 
@@ -2211,16 +2207,13 @@ mod tests {
         );
         assert!(!result_exists(&mut conn, polling_station_id).await.unwrap());
 
-        // Check that the committee session status is changed to DataEntryInProgress
+        // Check that the committee session status is changed to DataEntry
         let committee_session =
             crate::committee_session::repository::get(&mut conn, CommitteeSessionId::from(3))
                 .await
                 .unwrap();
 
-        assert_eq!(
-            committee_session.status,
-            CommitteeSessionStatus::DataEntryInProgress
-        );
+        assert_eq!(committee_session.status, CommitteeSessionStatus::DataEntry);
     }
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
@@ -2321,7 +2314,7 @@ mod tests {
         change_status_committee_session(
             pool.clone(),
             CommitteeSessionId::from(2),
-            CommitteeSessionStatus::DataEntryPaused,
+            CommitteeSessionStatus::Paused,
         )
         .await;
 
@@ -2390,7 +2383,7 @@ mod tests {
         change_status_committee_session(
             pool.clone(),
             CommitteeSessionId::from(2),
-            CommitteeSessionStatus::DataEntryFinished,
+            CommitteeSessionStatus::Completed,
         )
         .await;
 
@@ -2474,7 +2467,7 @@ mod tests {
         change_status_committee_session(
             pool.clone(),
             CommitteeSessionId::from(2),
-            CommitteeSessionStatus::DataEntryFinished,
+            CommitteeSessionStatus::Completed,
         )
         .await;
 
@@ -2539,7 +2532,7 @@ mod tests {
         change_status_committee_session(
             pool.clone(),
             committee_session_id,
-            CommitteeSessionStatus::DataEntryInProgress,
+            CommitteeSessionStatus::DataEntry,
         )
         .await;
 
@@ -2566,7 +2559,7 @@ mod tests {
         change_status_committee_session(
             pool.clone(),
             CommitteeSessionId::from(704),
-            CommitteeSessionStatus::DataEntryInProgress,
+            CommitteeSessionStatus::DataEntry,
         )
         .await;
 

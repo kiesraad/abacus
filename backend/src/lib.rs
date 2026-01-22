@@ -11,6 +11,7 @@ use tracing::{info, trace, warn};
 
 pub mod airgap;
 pub mod app_error;
+pub mod apportionment;
 pub mod audit_log;
 pub mod authentication;
 pub mod committee_session;

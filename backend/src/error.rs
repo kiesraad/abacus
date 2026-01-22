@@ -1,5 +1,6 @@
 use std::error::Error;
 
+use apportionment::ApportionmentError;
 use axum::{
     Json,
     extract::rejection::JsonRejection,
@@ -24,6 +25,10 @@ use crate::{
 pub enum ErrorReference {
     AirgapViolation,
     AlreadyInitialised,
+    ApportionmentAllListsExhausted,
+    ApportionmentDrawingOfLotsRequired,
+    ApportionmentNotAvailableUntilDataEntryFinalised,
+    ApportionmentZeroVotesCast,
     CommitteeSessionPaused,
     DatabaseError,
     DataEntryAlreadyClaimed,
@@ -85,6 +90,7 @@ impl IntoResponse for ErrorResponse {
 pub enum APIError {
     AddError(String, ErrorReference),
     AirgapViolation(String),
+    Apportionment(ApportionmentError),
     Authentication(AuthenticationError),
     BadRequest(String, ErrorReference),
     CommitteeSession(CommitteeSessionError),
@@ -366,6 +372,44 @@ impl IntoResponse for APIError {
                     StatusCode::BAD_REQUEST,
                     to_error("EML import error", ErrorReference::EmlImportError, false),
                 )
+            }
+            APIError::Apportionment(err) => {
+                error!("Apportionment error: {:?}", err);
+
+                match err {
+                    ApportionmentError::AllListsExhausted => (
+                        StatusCode::UNPROCESSABLE_ENTITY,
+                        to_error(
+                            "All lists are exhausted, not enough candidates to fill all seats",
+                            ErrorReference::ApportionmentAllListsExhausted,
+                            false,
+                        ),
+                    ),
+                    ApportionmentError::ApportionmentNotAvailableUntilDataEntryFinalised => (
+                        StatusCode::PRECONDITION_FAILED,
+                        to_error(
+                            "Election data entry first needs to be finalised",
+                            ErrorReference::ApportionmentNotAvailableUntilDataEntryFinalised,
+                            false,
+                        ),
+                    ),
+                    ApportionmentError::DrawingOfLotsNotImplemented => (
+                        StatusCode::UNPROCESSABLE_ENTITY,
+                        to_error(
+                            "Drawing of lots is required",
+                            ErrorReference::ApportionmentDrawingOfLotsRequired,
+                            false,
+                        ),
+                    ),
+                    ApportionmentError::ZeroVotesCast => (
+                        StatusCode::UNPROCESSABLE_ENTITY,
+                        to_error(
+                            "No votes on candidates cast",
+                            ErrorReference::ApportionmentZeroVotesCast,
+                            false,
+                        ),
+                    ),
+                }
             }
             APIError::CommitteeSession(err) => {
                 error!("Committee session status error: {:?}", err);

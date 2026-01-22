@@ -377,6 +377,104 @@
         ]
       }
     },
+    "/api/elections/{election_id}/apportionment": {
+      "post": {
+        "summary": "Get the apportionment for an election (coordinator)",
+        "operationId": "election_apportionment",
+        "parameters": [
+          {
+            "name": "election_id",
+            "in": "path",
+            "description": "Election database id",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "minimum": 0
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Election Apportionment",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ElectionApportionmentResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "412": {
+            "description": "Election apportionment is not yet available",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Election apportionment is not possible",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "cookie_auth": [
+              "coordinator"
+            ]
+          }
+        ]
+      }
+    },
     "/api/elections/{election_id}/committee_sessions": {
       "post": {
         "summary": "Create a new [CommitteeSession]. (coordinator)",
@@ -4613,6 +4711,27 @@
           {
             "allOf": [
               {
+                "$ref": "#/components/schemas/ElectionDetails"
+              },
+              {
+                "type": "object",
+                "required": [
+                  "event_type"
+                ],
+                "properties": {
+                  "event_type": {
+                    "type": "string",
+                    "enum": [
+                      "ApportionmentCreated"
+                    ]
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "allOf": [
+              {
                 "$ref": "#/components/schemas/PollingStationDetails"
               },
               {
@@ -5882,6 +6001,17 @@
         },
         "additionalProperties": false
       },
+      "ElectionApportionmentResponse": {
+        "type": "object",
+        "required": [
+          "summary"
+        ],
+        "properties": {
+          "summary": {
+            "$ref": "#/components/schemas/ElectionSummary"
+          }
+        }
+      },
       "ElectionCategory": {
         "type": "string",
         "description": "Election category (limited for now)",
@@ -6126,6 +6256,43 @@
         },
         "additionalProperties": false
       },
+      "ElectionSummary": {
+        "type": "object",
+        "description": "Contains a summary of the election results, added up from the votes of all polling stations.",
+        "required": [
+          "voters_counts",
+          "votes_counts",
+          "differences_counts",
+          "political_group_votes",
+          "polling_station_investigations"
+        ],
+        "properties": {
+          "differences_counts": {
+            "$ref": "#/components/schemas/SummaryDifferencesCounts",
+            "description": "The differences between voters and votes"
+          },
+          "political_group_votes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PoliticalGroupCandidateVotes"
+            },
+            "description": "The summary votes for each political group (and each candidate within)"
+          },
+          "polling_station_investigations": {
+            "$ref": "#/components/schemas/PollingStationInvestigations",
+            "description": "Polling stations where results were investigated by the GSB"
+          },
+          "voters_counts": {
+            "$ref": "#/components/schemas/VotersCounts",
+            "description": "The total number of voters"
+          },
+          "votes_counts": {
+            "$ref": "#/components/schemas/VotesCounts",
+            "description": "The total number of votes"
+          }
+        },
+        "additionalProperties": false
+      },
       "ElectionWithPoliticalGroups": {
         "type": "object",
         "description": "Election with political groups",
@@ -6218,6 +6385,10 @@
         "enum": [
           "AirgapViolation",
           "AlreadyInitialised",
+          "ApportionmentAllListsExhausted",
+          "ApportionmentDrawingOfLotsRequired",
+          "ApportionmentNotAvailableUntilDataEntryFinalised",
+          "ApportionmentZeroVotesCast",
           "CommitteeSessionPaused",
           "DatabaseError",
           "DataEntryAlreadyClaimed",
@@ -6789,6 +6960,45 @@
         },
         "additionalProperties": false
       },
+      "PollingStationInvestigations": {
+        "type": "object",
+        "description": "Polling stations where results were investigated by the GSB,\nas vectors of polling station numbers",
+        "required": [
+          "admitted_voters_recounted",
+          "investigated_other_reason",
+          "ballots_recounted"
+        ],
+        "properties": {
+          "admitted_voters_recounted": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32",
+              "minimum": 0
+            },
+            "description": "Admitted voters were recounted\n(\"Toegelaten kiezers opnieuw vastgesteld?\")"
+          },
+          "ballots_recounted": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32",
+              "minimum": 0
+            },
+            "description": "Ballots were (partially) recounted\n(\"Stembiljetten (deels) herteld?\")"
+          },
+          "investigated_other_reason": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32",
+              "minimum": 0
+            },
+            "description": "Investigated for other reasons than unexplained difference\n(\"Onderzocht vanwege andere reden dan onverklaard verschil?\")"
+          }
+        },
+        "additionalProperties": false
+      },
       "PollingStationListResponse": {
         "type": "object",
         "description": "Polling station list response",
@@ -7011,6 +7221,47 @@
         "properties": {
           "validation_results": {
             "$ref": "#/components/schemas/ValidationResults"
+          }
+        },
+        "additionalProperties": false
+      },
+      "SumCount": {
+        "type": "object",
+        "description": "Contains a summary count, containing both the count and a list of polling\nstations that contributed to it.",
+        "required": [
+          "count",
+          "polling_stations"
+        ],
+        "properties": {
+          "count": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "polling_stations": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32",
+              "minimum": 0
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "SummaryDifferencesCounts": {
+        "type": "object",
+        "description": "Contains a summary of the differences, containing which polling stations had differences.",
+        "required": [
+          "more_ballots_count",
+          "fewer_ballots_count"
+        ],
+        "properties": {
+          "fewer_ballots_count": {
+            "$ref": "#/components/schemas/SumCount"
+          },
+          "more_ballots_count": {
+            "$ref": "#/components/schemas/SumCount"
           }
         },
         "additionalProperties": false

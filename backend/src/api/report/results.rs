@@ -8,6 +8,7 @@ use sqlx::{SqliteConnection, SqlitePool};
 
 use crate::{
     APIError, ErrorResponse,
+    api::adapters::CommitteeSessionResultsQueriesAdapter,
     domain::{
         committee_session::{CommitteeSession, CommitteeSessionFilesUpdateRequest},
         committee_session_status::{CommitteeSessionError, CommitteeSessionStatus},
@@ -29,7 +30,6 @@ use crate::{
         committee_session_repo, election_repo, file_repo, investigation_repo, polling_station_repo,
         polling_station_result_repo,
     },
-    service::data_entry::are_results_complete_for_committee_session,
 };
 
 const EML_MIME_TYPE: &str = "text/xml";
@@ -207,7 +207,9 @@ async fn get_files(
     // Only generate files if the committee session is finished and has all the data needed
     if committee_session.status != CommitteeSessionStatus::DataEntryFinished
         || committee_session.start_date_time.is_none()
-        || !are_results_complete_for_committee_session(&mut conn, committee_session.id).await?
+        || !committee_session
+            .are_results_complete(&mut CommitteeSessionResultsQueriesAdapter(&mut conn))
+            .await?
     {
         return Err(APIError::CommitteeSession(
             CommitteeSessionError::InvalidCommitteeSessionStatus,

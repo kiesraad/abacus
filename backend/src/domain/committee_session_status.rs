@@ -3,7 +3,7 @@ use sqlx::Type;
 use strum::VariantNames;
 use utoipa::ToSchema;
 
-use crate::domain::committee_session::CommitteeSession;
+use crate::domain::committee_session::{CommitteeSession, CommitteeSessionResultsQueries};
 
 /// Committee session status
 #[derive(
@@ -45,17 +45,12 @@ pub trait CommitteeSessionStatusQueries {
     fn has_polling_stations(
         &mut self,
         committee_session_id: u32,
-    ) -> impl Future<Output = Result<bool, CommitteeSessionError>> + Send;
+    ) -> impl Future<Output = Result<bool, CommitteeSessionError>>;
 
     fn has_investigations(
         &mut self,
         committee_session_id: u32,
-    ) -> impl Future<Output = Result<bool, CommitteeSessionError>> + Send;
-
-    fn results_complete(
-        &mut self,
-        committee_session_id: u32,
-    ) -> impl Future<Output = Result<bool, CommitteeSessionError>> + Send;
+    ) -> impl Future<Output = Result<bool, CommitteeSessionError>>;
 }
 
 impl CommitteeSessionStatus {
@@ -139,8 +134,8 @@ impl CommitteeSessionStatus {
 
     pub async fn finish_data_entry(
         self,
-        committee_session_id: u32,
-        queries: &mut impl CommitteeSessionStatusQueries,
+        committee_session: &CommitteeSession,
+        results_queries: &mut impl CommitteeSessionResultsQueries,
     ) -> Result<Self, CommitteeSessionError> {
         match self {
             CommitteeSessionStatus::Created | CommitteeSessionStatus::DataEntryNotStarted => {
@@ -148,7 +143,10 @@ impl CommitteeSessionStatus {
             }
             CommitteeSessionStatus::DataEntryInProgress
             | CommitteeSessionStatus::DataEntryPaused => {
-                if !queries.results_complete(committee_session_id).await? {
+                if !committee_session
+                    .are_results_complete(results_queries)
+                    .await?
+                {
                     Err(CommitteeSessionError::InvalidStatusTransition)
                 } else {
                     Ok(CommitteeSessionStatus::DataEntryFinished)
@@ -163,33 +161,10 @@ impl CommitteeSessionStatus {
 mod tests {
     use super::*;
 
-    impl CommitteeSession {
-        fn first_session() -> Self {
-            CommitteeSession {
-                number: 1,
-                id: 0,
-                election_id: 0.into(),
-                location: "".to_string(),
-                start_date_time: None,
-                status: CommitteeSessionStatus::Created,
-                results_eml: None,
-                results_pdf: None,
-                overview_pdf: None,
-            }
-        }
-        fn next_session() -> Self {
-            CommitteeSession {
-                number: 2,
-                ..CommitteeSession::first_session()
-            }
-        }
-    }
-
     #[derive(Default)]
     struct CommitteeSessionStatusQueriesMock {
         has_polling_stations: bool,
         has_investigations: bool,
-        results_complete: bool,
     }
 
     impl CommitteeSessionStatusQueries for CommitteeSessionStatusQueriesMock {
@@ -200,9 +175,20 @@ mod tests {
         async fn has_investigations(&mut self, _: u32) -> Result<bool, CommitteeSessionError> {
             Ok(self.has_investigations)
         }
+    }
 
-        async fn results_complete(&mut self, _: u32) -> Result<bool, CommitteeSessionError> {
-            Ok(self.results_complete)
+    struct CommitteeSessionResultsQueriesMock(bool);
+
+    impl CommitteeSessionResultsQueries for CommitteeSessionResultsQueriesMock {
+        async fn polling_stations_finished(
+            &mut self,
+            _: u32,
+        ) -> Result<bool, CommitteeSessionError> {
+            Ok(self.0)
+        }
+
+        async fn investigations_finished(&mut self, _: u32) -> Result<bool, CommitteeSessionError> {
+            panic!("should not call investigations_finished()")
         }
     }
 
@@ -249,7 +235,6 @@ mod tests {
                         &mut CommitteeSessionStatusQueriesMock {
                             has_polling_stations: true,
                             has_investigations: false,
-                            results_complete: false,
                         }
                     )
                     .await,
@@ -281,7 +266,6 @@ mod tests {
                         &mut CommitteeSessionStatusQueriesMock {
                             has_polling_stations: true,
                             has_investigations: true,
-                            results_complete: false,
                         }
                     )
                     .await,
@@ -313,7 +297,6 @@ mod tests {
                         &mut CommitteeSessionStatusQueriesMock {
                             has_polling_stations: true,
                             has_investigations: false,
-                            results_complete: false,
                         }
                     )
                     .await,
@@ -331,7 +314,6 @@ mod tests {
                         &mut CommitteeSessionStatusQueriesMock {
                             has_polling_stations: true,
                             has_investigations: false,
-                            results_complete: false,
                         }
                     )
                     .await,
@@ -349,7 +331,6 @@ mod tests {
                         &mut CommitteeSessionStatusQueriesMock {
                             has_polling_stations: true,
                             has_investigations: true,
-                            results_complete: false,
                         }
                     )
                     .await,
@@ -381,7 +362,6 @@ mod tests {
                         &mut CommitteeSessionStatusQueriesMock {
                             has_polling_stations: true,
                             has_investigations: true,
-                            results_complete: false,
                         }
                     )
                     .await,
@@ -399,7 +379,6 @@ mod tests {
                         &mut CommitteeSessionStatusQueriesMock {
                             has_polling_stations: true,
                             has_investigations: false,
-                            results_complete: false,
                         }
                     )
                     .await,
@@ -417,7 +396,6 @@ mod tests {
                         &mut CommitteeSessionStatusQueriesMock {
                             has_polling_stations: true,
                             has_investigations: true,
-                            results_complete: false,
                         }
                     )
                     .await,
@@ -435,7 +413,6 @@ mod tests {
                         &mut CommitteeSessionStatusQueriesMock {
                             has_polling_stations: false,
                             has_investigations: false,
-                            results_complete: false,
                         }
                     )
                     .await,
@@ -453,7 +430,6 @@ mod tests {
                         &mut CommitteeSessionStatusQueriesMock {
                             has_polling_stations: true,
                             has_investigations: false,
-                            results_complete: false,
                         }
                     )
                     .await,
@@ -471,7 +447,6 @@ mod tests {
                         &mut CommitteeSessionStatusQueriesMock {
                             has_polling_stations: true,
                             has_investigations: false,
-                            results_complete: false,
                         }
                     )
                     .await,
@@ -489,7 +464,6 @@ mod tests {
                         &mut CommitteeSessionStatusQueriesMock {
                             has_polling_stations: true,
                             has_investigations: true,
-                            results_complete: false,
                         }
                     )
                     .await,
@@ -527,7 +501,6 @@ mod tests {
                         &mut CommitteeSessionStatusQueriesMock {
                             has_polling_stations: true,
                             has_investigations: false,
-                            results_complete: false,
                         }
                     )
                     .await,
@@ -545,7 +518,6 @@ mod tests {
                         &mut CommitteeSessionStatusQueriesMock {
                             has_polling_stations: true,
                             has_investigations: false,
-                            results_complete: false,
                         }
                     )
                     .await,
@@ -563,7 +535,6 @@ mod tests {
                         &mut CommitteeSessionStatusQueriesMock {
                             has_polling_stations: true,
                             has_investigations: true,
-                            results_complete: false,
                         }
                     )
                     .await,
@@ -623,7 +594,6 @@ mod tests {
                         &mut CommitteeSessionStatusQueriesMock {
                             has_polling_stations: true,
                             has_investigations: false,
-                            results_complete: false,
                         }
                     )
                     .await,
@@ -744,7 +714,10 @@ mod tests {
         async fn created_to_data_entry_finished() {
             assert_eq!(
                 CommitteeSessionStatus::Created
-                    .finish_data_entry(99, &mut CommitteeSessionStatusQueriesMock::default())
+                    .finish_data_entry(
+                        &CommitteeSession::first_session(),
+                        &mut CommitteeSessionResultsQueriesMock(false)
+                    )
                     .await,
                 Err(CommitteeSessionError::InvalidStatusTransition)
             );
@@ -756,12 +729,8 @@ mod tests {
             assert_eq!(
                 CommitteeSessionStatus::DataEntryNotStarted
                     .finish_data_entry(
-                        99,
-                        &mut CommitteeSessionStatusQueriesMock {
-                            has_polling_stations: true,
-                            has_investigations: false,
-                            results_complete: false,
-                        }
+                        &CommitteeSession::first_session(),
+                        &mut CommitteeSessionResultsQueriesMock(false),
                     )
                     .await,
                 Err(CommitteeSessionError::InvalidStatusTransition)
@@ -774,12 +743,8 @@ mod tests {
             assert_eq!(
                 CommitteeSessionStatus::DataEntryInProgress
                     .finish_data_entry(
-                        99,
-                        &mut CommitteeSessionStatusQueriesMock {
-                            has_polling_stations: true,
-                            has_investigations: false,
-                            results_complete: true,
-                        }
+                        &CommitteeSession::first_session(),
+                        &mut CommitteeSessionResultsQueriesMock(true),
                     )
                     .await,
                 Ok(CommitteeSessionStatus::DataEntryFinished)
@@ -792,52 +757,11 @@ mod tests {
             assert_eq!(
                 CommitteeSessionStatus::DataEntryInProgress
                     .finish_data_entry(
-                        99,
-                        &mut CommitteeSessionStatusQueriesMock {
-                            has_polling_stations: true,
-                            has_investigations: true,
-                            results_complete: false
-                        }
+                        &CommitteeSession::first_session(),
+                        &mut CommitteeSessionResultsQueriesMock(false),
                     )
                     .await,
                 Err(CommitteeSessionError::InvalidStatusTransition)
-            );
-        }
-
-        /// DataEntryInProgress --> DataEntryFinished
-        #[test(tokio::test)]
-        async fn data_entry_in_progress_to_data_entry_finished_next_session_not_finished_no_results()
-         {
-            assert_eq!(
-                CommitteeSessionStatus::DataEntryInProgress
-                    .finish_data_entry(
-                        99,
-                        &mut CommitteeSessionStatusQueriesMock {
-                            has_polling_stations: true,
-                            has_investigations: true,
-                            results_complete: false
-                        }
-                    )
-                    .await,
-                Err(CommitteeSessionError::InvalidStatusTransition)
-            );
-        }
-
-        /// DataEntryInProgress --> DataEntryFinished
-        #[test(tokio::test)]
-        async fn data_entry_in_progress_to_data_entry_finished_next_session_finished() {
-            assert_eq!(
-                CommitteeSessionStatus::DataEntryInProgress
-                    .finish_data_entry(
-                        99,
-                        &mut CommitteeSessionStatusQueriesMock {
-                            has_polling_stations: true,
-                            has_investigations: true,
-                            results_complete: true
-                        }
-                    )
-                    .await,
-                Ok(CommitteeSessionStatus::DataEntryFinished)
             );
         }
 
@@ -847,12 +771,8 @@ mod tests {
             assert_eq!(
                 CommitteeSessionStatus::DataEntryPaused
                     .finish_data_entry(
-                        99,
-                        &mut CommitteeSessionStatusQueriesMock {
-                            has_polling_stations: true,
-                            has_investigations: true,
-                            results_complete: true
-                        }
+                        &CommitteeSession::first_session(),
+                        &mut CommitteeSessionResultsQueriesMock(true),
                     )
                     .await,
                 Ok(CommitteeSessionStatus::DataEntryFinished)
@@ -864,7 +784,10 @@ mod tests {
         async fn data_entry_finished_to_data_entry_finished() {
             assert_eq!(
                 CommitteeSessionStatus::DataEntryFinished
-                    .finish_data_entry(99, &mut CommitteeSessionStatusQueriesMock::default())
+                    .finish_data_entry(
+                        &CommitteeSession::first_session(),
+                        &mut CommitteeSessionResultsQueriesMock(false),
+                    )
                     .await,
                 Ok(CommitteeSessionStatus::DataEntryFinished)
             );

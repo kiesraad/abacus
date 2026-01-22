@@ -180,6 +180,44 @@ pub async fn previous_results_for_polling_station(
         .ok_or(sqlx::Error::RowNotFound)
 }
 
+pub async fn all_polling_stations_have_results(
+    conn: &mut SqliteConnection,
+    committee_session_id: u32,
+) -> Result<bool, sqlx::Error> {
+    query!(
+        r#"
+        SELECT COUNT(*) = 0 as "result: bool"
+        FROM polling_stations AS ps
+        LEFT JOIN polling_station_results AS r ON r.polling_station_id = ps.id
+        WHERE ps.committee_session_id = ? AND ps.id_prev_session IS NULL AND r.data IS NULL
+        "#,
+        committee_session_id
+    )
+    .fetch_one(conn)
+    .await
+    .map(|r| r.result)
+}
+
+pub async fn all_investigations_finished(
+    conn: &mut SqliteConnection,
+    committee_session_id: u32,
+) -> Result<bool, sqlx::Error> {
+    query!(
+        r#"
+        SELECT COUNT(*) = 0 as "result: bool"
+        FROM polling_station_investigations AS psi
+        JOIN polling_stations AS ps ON ps.id = psi.polling_station_id
+        LEFT JOIN polling_station_results AS r ON psi.polling_station_id = r.polling_station_id
+        WHERE ps.committee_session_id = ?
+        AND (psi.corrected_results IS NULL OR (psi.corrected_results = 1 AND r.data IS NULL))
+        "#,
+        committee_session_id
+    )
+    .fetch_one(conn)
+    .await
+    .map(|r| r.result)
+}
+
 #[cfg(test)]
 pub async fn insert_test_result(
     conn: &mut SqliteConnection,
@@ -562,5 +600,219 @@ pub mod tests {
         let results = previous_results_for_polling_station(&mut conn, polling_station_id).await;
         assert!(results.is_err());
         assert!(matches!(results.unwrap_err(), sqlx::Error::RowNotFound));
+    }
+
+    mod all_polling_stations_have_results {
+        use test_log::test;
+
+        use super::*;
+        use crate::repository::polling_station_repo::insert_test_polling_station;
+
+        /// Test first session without results
+        #[test(sqlx::test(fixtures("../../fixtures/election_2.sql")))]
+        async fn test_first_session_without_results(pool: SqlitePool) {
+            let mut conn = pool.acquire().await.unwrap();
+            assert!(
+                !all_polling_stations_have_results(&mut conn, 2)
+                    .await
+                    .unwrap()
+            );
+        }
+
+        /// Test first session without results on one polling station
+        #[test(sqlx::test(fixtures("../../fixtures/election_2.sql")))]
+        async fn test_first_session_without_results_on_one_polling_station(pool: SqlitePool) {
+            let mut conn = pool.acquire().await.unwrap();
+
+            insert_test_result(&mut conn, 1, 2, &create_test_results(10))
+                .await
+                .unwrap();
+
+            assert!(
+                !all_polling_stations_have_results(&mut conn, 2)
+                    .await
+                    .unwrap()
+            );
+        }
+
+        /// Test first session with results
+        #[test(sqlx::test(fixtures("../../fixtures/election_2.sql")))]
+        async fn test_first_session_with_results(pool: SqlitePool) {
+            let mut conn = pool.acquire().await.unwrap();
+
+            insert_test_result(&mut conn, 1, 2, &create_test_results(10))
+                .await
+                .unwrap();
+            insert_test_result(&mut conn, 2, 2, &create_test_results(10))
+                .await
+                .unwrap();
+
+            assert!(
+                all_polling_stations_have_results(&mut conn, 2)
+                    .await
+                    .unwrap()
+            );
+        }
+
+        /// Test next session with new polling station, without results
+        #[test(sqlx::test(fixtures("../../fixtures/election_7_four_sessions.sql")))]
+        async fn test_next_session_new_polling_station_without_results(pool: SqlitePool) {
+            let mut conn = pool.acquire().await.unwrap();
+
+            insert_test_polling_station(&mut conn, 743, 704, None, 123)
+                .await
+                .unwrap();
+
+            assert!(
+                !all_polling_stations_have_results(&mut conn, 704)
+                    .await
+                    .unwrap()
+            );
+        }
+
+        /// Test next session with new polling station, with results
+        #[test(sqlx::test(fixtures("../../fixtures/election_7_four_sessions.sql")))]
+        async fn test_next_session_new_polling_station_with_results(pool: SqlitePool) {
+            let mut conn = pool.acquire().await.unwrap();
+
+            insert_test_polling_station(&mut conn, 743, 704, None, 123)
+                .await
+                .unwrap();
+            insert_test_result(&mut conn, 743, 704, &create_test_results(10))
+                .await
+                .unwrap();
+
+            assert!(
+                all_polling_stations_have_results(&mut conn, 704)
+                    .await
+                    .unwrap()
+            );
+        }
+
+        /// Test next session without investigations or new polling stations
+        #[test(sqlx::test(fixtures("../../fixtures/election_7_four_sessions.sql")))]
+        async fn test_next_session_no_investigations(pool: SqlitePool) {
+            let mut conn = pool.acquire().await.unwrap();
+            assert!(
+                all_polling_stations_have_results(&mut conn, 704)
+                    .await
+                    .unwrap()
+            );
+        }
+    }
+    mod all_investigations_finished {
+        use test_log::test;
+
+        use super::*;
+        use crate::{
+            domain::investigation::{
+                PollingStationInvestigationConcludeRequest,
+                PollingStationInvestigationCreateRequest,
+            },
+            repository::investigation_repo::{
+                conclude_polling_station_investigation, create_polling_station_investigation,
+            },
+        };
+
+        async fn create_test_investigation(conn: &mut SqliteConnection, polling_station_id: u32) {
+            create_polling_station_investigation(
+                conn,
+                polling_station_id,
+                PollingStationInvestigationCreateRequest {
+                    reason: "Test investigation reason".to_string(),
+                },
+            )
+            .await
+            .unwrap();
+        }
+
+        async fn conclude_test_investigation(
+            conn: &mut SqliteConnection,
+            polling_station_id: u32,
+            corrected_results: bool,
+        ) {
+            conclude_polling_station_investigation(
+                conn,
+                polling_station_id,
+                PollingStationInvestigationConcludeRequest {
+                    findings: "Test findings".to_string(),
+                    corrected_results,
+                },
+            )
+            .await
+            .unwrap();
+        }
+
+        /// Test next session without investigations or new polling stations
+        #[test(sqlx::test(fixtures("../../fixtures/election_7_four_sessions.sql")))]
+        async fn test_next_session_no_investigations(pool: SqlitePool) {
+            let mut conn = pool.acquire().await.unwrap();
+            assert!(all_investigations_finished(&mut conn, 704).await.unwrap());
+        }
+
+        /// Test next session with new investigation, not concluded
+        #[test(sqlx::test(fixtures("../../fixtures/election_7_four_sessions.sql")))]
+        async fn test_next_session_new_investigation_not_concluded(pool: SqlitePool) {
+            let mut conn = pool.acquire().await.unwrap();
+            create_test_investigation(&mut conn, 741).await;
+
+            assert!(!all_investigations_finished(&mut conn, 704).await.unwrap());
+        }
+
+        /// Test next session with new investigation, concluded with corrected_results = false
+        #[test(sqlx::test(fixtures("../../fixtures/election_7_four_sessions.sql")))]
+        async fn test_next_session_new_investigation_corrected_results_false(pool: SqlitePool) {
+            let mut conn = pool.acquire().await.unwrap();
+
+            create_test_investigation(&mut conn, 741).await;
+            conclude_test_investigation(&mut conn, 741, false).await;
+
+            assert!(all_investigations_finished(&mut conn, 704).await.unwrap());
+        }
+
+        /// Test next session with new investigation, concluded with corrected_results = true, results exist
+        #[test(sqlx::test(fixtures("../../fixtures/election_7_four_sessions.sql")))]
+        async fn test_next_session_new_investigation_corrected_results_true_and_complete(
+            pool: SqlitePool,
+        ) {
+            let mut conn = pool.acquire().await.unwrap();
+
+            create_test_investigation(&mut conn, 741).await;
+            conclude_test_investigation(&mut conn, 741, true).await;
+            insert_test_result(&mut conn, 741, 704, &create_test_results(10))
+                .await
+                .unwrap();
+
+            assert!(all_investigations_finished(&mut conn, 704).await.unwrap());
+        }
+
+        /// Test next session with new investigation, concluded with corrected_results = true, results don't exist
+        #[test(sqlx::test(fixtures("../../fixtures/election_7_four_sessions.sql")))]
+        async fn test_next_session_new_investigation_corrected_results_true_and_incomplete(
+            pool: SqlitePool,
+        ) {
+            let mut conn = pool.acquire().await.unwrap();
+
+            create_test_investigation(&mut conn, 741).await;
+            conclude_test_investigation(&mut conn, 741, true).await;
+
+            assert!(!all_investigations_finished(&mut conn, 704).await.unwrap());
+        }
+
+        /// Test with multiple investigations, one not finished
+        #[test(sqlx::test(fixtures("../../fixtures/election_7_four_sessions.sql")))]
+        async fn test_next_session_new_investigations_one_not_finished(pool: SqlitePool) {
+            let mut conn = pool.acquire().await.unwrap();
+
+            // Create first investigation with corrected_results = false (finished)
+            create_test_investigation(&mut conn, 741).await;
+            conclude_test_investigation(&mut conn, 741, false).await;
+
+            // Create second investigation with corrected_results = true but no result (not finished)
+            create_test_investigation(&mut conn, 742).await;
+            conclude_test_investigation(&mut conn, 742, true).await;
+
+            assert!(!all_investigations_finished(&mut conn, 704).await.unwrap());
+        }
     }
 }

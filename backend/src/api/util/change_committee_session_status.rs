@@ -2,7 +2,7 @@ use sqlx::SqliteConnection;
 
 use crate::{
     APIError,
-    api::adapters::CommitteeSessionStatusQueriesAdapter,
+    api::adapters::{CommitteeSessionResultsQueriesAdapter, CommitteeSessionStatusQueriesAdapter},
     domain::{
         committee_session::{CommitteeSession, CommitteeSessionFilesUpdateRequest},
         committee_session_status::CommitteeSessionStatus,
@@ -83,9 +83,10 @@ pub async fn change_committee_session_status(
         }
         CommitteeSessionStatus::DataEntryPaused => committee_session.status.pause_data_entry()?,
         CommitteeSessionStatus::DataEntryFinished => {
+            let mut results_queries = CommitteeSessionResultsQueriesAdapter(tx);
             committee_session
                 .status
-                .finish_data_entry(committee_session.id, &mut queries)
+                .finish_data_entry(&committee_session, &mut results_queries)
                 .await?
         }
     };

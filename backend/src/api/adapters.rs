@@ -1,9 +1,11 @@
 use sqlx::SqliteConnection;
 
 use crate::{
-    domain::committee_session_status::{CommitteeSessionError, CommitteeSessionStatusQueries},
-    repository::{investigation_repo, polling_station_repo},
-    service::data_entry::are_results_complete_for_committee_session,
+    domain::{
+        committee_session::CommitteeSessionResultsQueries,
+        committee_session_status::{CommitteeSessionError, CommitteeSessionStatusQueries},
+    },
+    repository::{investigation_repo, polling_station_repo, polling_station_result_repo},
 };
 
 pub struct CommitteeSessionStatusQueriesAdapter<'a>(pub &'a mut SqliteConnection);
@@ -34,12 +36,30 @@ impl CommitteeSessionStatusQueries for CommitteeSessionStatusQueriesAdapter<'_> 
         .await?;
         Ok(!investigations.is_empty())
     }
+}
 
-    async fn results_complete(
+pub struct CommitteeSessionResultsQueriesAdapter<'a>(pub &'a mut SqliteConnection);
+
+impl CommitteeSessionResultsQueries for CommitteeSessionResultsQueriesAdapter<'_> {
+    async fn polling_stations_finished(
         &mut self,
         committee_session_id: u32,
     ) -> Result<bool, CommitteeSessionError> {
-        Ok(are_results_complete_for_committee_session(self.0, committee_session_id).await?)
-        // if !are_results_complete_for_committee_session(conn, committee_session.id).await? {
+        let all_new_ps_have_data = polling_station_result_repo::all_polling_stations_have_results(
+            self.0,
+            committee_session_id,
+        )
+        .await?;
+        Ok(all_new_ps_have_data)
+    }
+
+    async fn investigations_finished(
+        &mut self,
+        committee_session_id: u32,
+    ) -> Result<bool, CommitteeSessionError> {
+        let all_investigations_finished =
+            polling_station_result_repo::all_investigations_finished(self.0, committee_session_id)
+                .await?;
+        Ok(all_investigations_finished)
     }
 }

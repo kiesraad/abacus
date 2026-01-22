@@ -17,12 +17,7 @@ import { cn } from "@/utils/classnames";
 import { parseIntUserInput } from "@/utils/strings";
 
 import { useDebouncedCallback } from "../hooks/useDebouncedCallback";
-import {
-  getPollingStationWithStatusList,
-  getUrlForDataEntry,
-  PollingStationUserStatus,
-  type PollingStationWithStatus,
-} from "../utils/util";
+import { getPollingStationWithStatusList, getUrlForDataEntry, PollingStationUserStatus } from "../utils/util";
 import cls from "./PollingStationChoice.module.css";
 import { PollingStationLink } from "./PollingStationLink";
 import { PollingStationSelector } from "./PollingStationSelector";
@@ -42,7 +37,6 @@ export function PollingStationChoiceForm({ anotherEntry }: PollingStationChoiceF
   const [pollingStationNumber, setPollingStationNumber] = useState<string>("");
   const [alert, setAlert] = useState<string | undefined>(undefined);
   const [loading, setLoading] = useState<boolean>(false);
-  const [currentPollingStation, setCurrentPollingStation] = useState<PollingStationWithStatus | undefined>(undefined);
   const electionStatus = useElectionStatus();
 
   const refetchStatuses = () => {
@@ -57,17 +51,20 @@ export function PollingStationChoiceForm({ anotherEntry }: PollingStationChoiceF
     });
   }, [electionStatus, pollingStations, user]);
 
-  const debouncedCallback = useDebouncedCallback((pollingStation: PollingStationWithStatus | undefined) => {
+  const currentPollingStation = useMemo(() => {
+    const parsedInt = parseIntUserInput(pollingStationNumber);
+    return pollingStationsWithStatus.find((ps) => ps.number === parsedInt);
+  }, [pollingStationNumber, pollingStationsWithStatus]);
+
+  const debouncedCallback = useDebouncedCallback(() => {
     setLoading(false);
-    setCurrentPollingStation(pollingStation);
   }, USER_INPUT_DEBOUNCE);
 
   // set polling station number and trigger debounced lookup
   const updatePollingStationNumber = (n: string) => {
     setPollingStationNumber(n);
-    const parsedInt = parseIntUserInput(n);
     setLoading(true);
-    debouncedCallback(pollingStationsWithStatus.find((pollingStation) => pollingStation.number === parsedInt));
+    debouncedCallback();
   };
 
   const handleSubmit = () => {

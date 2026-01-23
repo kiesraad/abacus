@@ -10,7 +10,7 @@ export function PrivacyStatementPage() {
   return (
     <AppFrame>
       <AppLayout>
-        <NavBar location={{ pathname: "/elections" }} />
+        <NavBar />
         <PageTitle title="Dev Homepage - Abacus" />
         <header>
           <section>

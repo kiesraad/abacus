@@ -85,12 +85,39 @@ describe("NavBar", () => {
     { pathname: "/users/create" },
     { pathname: "/users/create/details" },
     { pathname: "/logs" },
-  ])("top level management links for $pathname", async (location) => {
+    { pathname: "/privacy-statement" },
+  ])("top level management links for $pathname for administrator", async (location) => {
     await renderNavBar(location, "administrator");
 
     expect(screen.queryByRole("link", { name: "Verkiezingen" })).toBeVisible();
     expect(screen.queryByRole("link", { name: "Gebruikers" })).toBeVisible();
     expect(screen.queryByRole("link", { name: "Logs" })).toBeVisible();
+  });
+
+  test.each([
+    { pathname: "/elections" },
+    { pathname: "/elections/1" },
+    { pathname: "/elections/create" },
+    { pathname: "/users" },
+    { pathname: "/users/create" },
+    { pathname: "/users/create/details" },
+    { pathname: "/logs" },
+    { pathname: "/privacy-statement" },
+  ])("top level management links for $pathname for coordinator", async (location) => {
+    await renderNavBar(location, "coordinator");
+
+    expect(screen.queryByRole("link", { name: "Verkiezingen" })).toBeVisible();
+    expect(screen.queryByRole("link", { name: "Gebruikers" })).toBeVisible();
+    expect(screen.queryByRole("link", { name: "Logs" })).toBeVisible();
+  });
+
+  test("elections link for '/privacy-statement' for typist", async () => {
+    await renderNavBar({ pathname: "/privacy-statement" }, "typist");
+
+    expect(screen.queryByRole("link", { name: "Verkiezingen" })).toBeVisible();
+    expect(
+      screen.queryByRole("link", { name: "Heemdamseburg — Gemeenteraadsverkiezingen 2026" }),
+    ).not.toBeInTheDocument();
   });
 
   test.each([

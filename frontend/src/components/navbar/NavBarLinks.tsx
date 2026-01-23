@@ -89,15 +89,20 @@ function TopLevelManagementLinks() {
 }
 
 export function NavBarLinks({ location }: NavBarLinksProps) {
-  const { isAdministrator, isCoordinator } = useUserRole();
+  const { isAdministrator, isCoordinator, isTypist } = useUserRole();
 
   if (
     (location.pathname.match(/^\/elections(\/\d+)?$/) && (isAdministrator || isCoordinator)) ||
     location.pathname.startsWith("/elections/create") ||
     location.pathname.startsWith("/users") ||
-    location.pathname === "/logs"
+    location.pathname === "/logs" ||
+    (location.pathname === "/privacy-statement" && (isAdministrator || isCoordinator))
   ) {
     return <TopLevelManagementLinks />;
+  }
+
+  if (location.pathname === "/privacy-statement" && isTypist) {
+    return <Link to={"/elections"}>{t("election.title.plural")}</Link>;
   }
 
   if (location.pathname.match(/^\/elections\/\d+\/data-entry/)) {

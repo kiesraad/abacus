@@ -1,7 +1,7 @@
 import { Link } from "react-router";
 import { t } from "@/i18n/translate";
 
-export function Footer() {
+export function Footer({ showPrivacyStatementLink = true }: { showPrivacyStatementLink?: boolean }) {
   const gitBranch = __GIT_BRANCH__;
   let gitBranchShort = __GIT_BRANCH__;
   if (gitBranch && gitBranch.length > 32) {
@@ -14,9 +14,11 @@ export function Footer() {
     <footer>
       <section>
         Kiesraad - Abacus ({t("version")} {gitVersion}){" "}
-        <Link to={"/privacy-statement"} className="privacy_statement">
-          {t("privacy_statement.title").toLowerCase()}
-        </Link>
+        {showPrivacyStatementLink && (
+          <Link to={"/privacy-statement"} className="privacy_statement">
+            {t("privacy_statement.title").toLowerCase()}
+          </Link>
+        )}
       </section>
       {__SHOW_DEV_PAGE__ && (
         <section>

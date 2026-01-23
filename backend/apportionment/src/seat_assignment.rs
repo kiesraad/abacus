@@ -560,12 +560,12 @@ pub fn seat_assignment(
         return Err(ApportionmentError::ZeroVotesCast);
     }
 
-    // [Artikel P 5 Kieswet](https://wetten.overheid.nl/jci1.3:c:BWBR0004627&afdeling=II&hoofdstuk=P&paragraaf=2&artikel=P_5&z=2025-02-12&g=2025-02-12)
+    // [Artikel P 5 Kieswet](https://wetten.overheid.nl/BWBR0004627/2026-01-01/#AfdelingII_HoofdstukP_Paragraaf2_ArtikelP5)
     // Calculate electoral quota (kiesdeler) as a proper fraction
     let quota = Fraction::from(input.total_votes) / Fraction::from(input.number_of_seats);
     info!("Quota: {}", quota);
 
-    // [Artikel P 6 Kieswet](https://wetten.overheid.nl/jci1.3:c:BWBR0004627&afdeling=II&hoofdstuk=P&paragraaf=2&artikel=P_6&z=2025-02-12&g=2025-02-12)
+    // [Artikel P 6 Kieswet](https://wetten.overheid.nl/BWBR0004627/2026-01-01/#AfdelingII_HoofdstukP_Paragraaf2_ArtikelP6)
     let initial_standing =
         initial_full_seats_per_political_group(&input.political_group_votes, quota);
     let full_seats = initial_standing.iter().map(|pg| pg.full_seats).sum::<u32>();
@@ -585,7 +585,7 @@ pub fn seat_assignment(
         (vec![], initial_standing)
     };
 
-    // [Artikel P 9 Kieswet](https://wetten.overheid.nl/jci1.3:c:BWBR0004627&afdeling=II&hoofdstuk=P&paragraaf=2&artikel=P_9&z=2025-02-12&g=2025-02-12)
+    // [Artikel P 9 Kieswet](https://wetten.overheid.nl/BWBR0004627/2026-01-01/#AfdelingII_HoofdstukP_Paragraaf2_ArtikelP9)
     let (cumulative_standings, assigned_seat) = if let Some(last_step) = steps.last() {
         reassign_residual_seat_for_absolute_majority(
             input.number_of_seats,
@@ -606,10 +606,10 @@ pub fn seat_assignment(
         });
     }
 
-    // TODO: #797 [Artikel P 19a Kieswet](https://wetten.overheid.nl/jci1.3:c:BWBR0004627&afdeling=II&hoofdstuk=P&paragraaf=3&artikel=P_19a&z=2025-02-12&g=2025-02-12)
+    // TODO: #797 [Artikel P 19a Kieswet](https://wetten.overheid.nl/BWBR0004627/2026-01-01/#AfdelingII_HoofdstukP_Paragraaf3_ArtikelP19a)
     //  mark deceased candidates
 
-    // [Artikel P 10 Kieswet](https://wetten.overheid.nl/jci1.3:c:BWBR0004627&afdeling=II&hoofdstuk=P&paragraaf=2&artikel=P_10&z=2025-02-12&g=2025-02-12)
+    // [Artikel P 10 Kieswet](https://wetten.overheid.nl/BWBR0004627/2026-01-01/#AfdelingII_HoofdstukP_Paragraaf2_ArtikelP10)
     let (final_steps, final_standing) = reassign_residual_seats_for_exhausted_lists(
         cumulative_standings,
         input.number_of_seats,
@@ -656,7 +656,7 @@ fn assign_remainder(
 
         let change = if seats >= 19 {
             debug!("Assign residual seat using highest averages method");
-            // [Artikel P 7 Kieswet](https://wetten.overheid.nl/jci1.3:c:BWBR0004627&afdeling=II&hoofdstuk=P&paragraaf=2&artikel=P_7&z=2025-02-12&g=2025-02-12)
+            // [Artikel P 7 Kieswet](https://wetten.overheid.nl/BWBR0004627/2026-01-01/#AfdelingII_HoofdstukP_Paragraaf2_ArtikelP7)
             step_assign_remainder_using_highest_averages(
                 current_standings.iter(),
                 residual_seats,
@@ -665,7 +665,7 @@ fn assign_remainder(
                 false,
             )?
         } else {
-            // [Artikel P 8 Kieswet](https://wetten.overheid.nl/jci1.3:c:BWBR0004627&afdeling=II&hoofdstuk=P&paragraaf=2&artikel=P_8&z=2025-02-12&g=2025-02-12)
+            // [Artikel P 8 Kieswet](https://wetten.overheid.nl/BWBR0004627/2026-01-01/#AfdelingII_HoofdstukP_Paragraaf2_ArtikelP8)
             step_assign_remainder_using_largest_remainder(
                 &current_standings,
                 residual_seats,

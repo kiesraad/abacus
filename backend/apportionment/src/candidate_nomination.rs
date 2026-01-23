@@ -166,14 +166,14 @@ fn candidate_nomination_per_political_group(
             pg_seats,
         )?;
 
-        // [Artikel P 17 Kieswet](https://wetten.overheid.nl/jci1.3:c:BWBR0004627&afdeling=II&hoofdstuk=P&paragraaf=3&artikel=P_17&z=2025-02-12&g=2025-02-12)
+        // [Artikel P 17 Kieswet](https://wetten.overheid.nl/BWBR0004627/2026-01-01/#AfdelingII_HoofdstukP_Paragraaf3_ArtikelP17)
         let other_candidate_nomination = other_candidate_nomination(
             &preferential_candidate_nomination,
             candidate_votes,
             pg_seats as usize - preferential_candidate_nomination.len(),
         );
 
-        // [Artikel P 19 Kieswet](https://wetten.overheid.nl/jci1.3:c:BWBR0004627&afdeling=II&hoofdstuk=P&paragraaf=3&artikel=P_19&z=2025-02-12&g=2025-02-12)
+        // [Artikel P 19 Kieswet](https://wetten.overheid.nl/BWBR0004627/2026-01-01/#AfdelingII_HoofdstukP_Paragraaf3_ArtikelP19)
         let updated_candidate_ranking: Vec<u32> = if candidate_votes_meeting_preference_threshold
             .is_empty()
             || (seats >= 19 && pg_seats == 0)
@@ -247,7 +247,7 @@ pub fn candidate_nomination(
 ) -> Result<CandidateNominationResult, ApportionmentError> {
     info!("Candidate nomination");
 
-    // [Artikel P 15 Kieswet](https://wetten.overheid.nl/jci1.3:c:BWBR0004627&afdeling=II&hoofdstuk=P&paragraaf=3&artikel=P_15&z=2025-02-12&g=2025-02-12)
+    // [Artikel P 15 Kieswet](https://wetten.overheid.nl/BWBR0004627/2026-01-01/#AfdelingII_HoofdstukP_Paragraaf3_ArtikelP15)
     // Calculate preference threshold as a proper fraction
     let preference_threshold_percentage = if input.number_of_seats >= 19 { 25 } else { 50 };
     let preference_threshold = input.quota * Fraction::new(preference_threshold_percentage, 100);

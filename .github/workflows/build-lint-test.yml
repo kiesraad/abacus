@@ -87,11 +87,11 @@ jobs:
       - name: Check rustfmt
         run: cargo --verbose --locked fmt --all -- --check
       - name: Check Clippy with all features
-        run: cargo --verbose --locked clippy --target=x86_64-unknown-linux-musl --all-targets --all-features -- -D warnings
+        run: cargo --verbose --locked clippy --target=x86_64-unknown-linux-musl --workspace --all-targets --all-features -- -D warnings
       - name: Check Clippy without default features
-        run: cargo --verbose --locked clippy --target=x86_64-unknown-linux-musl --all-targets --no-default-features -- -D warnings
+        run: cargo --verbose --locked clippy --target=x86_64-unknown-linux-musl --workspace --all-targets --no-default-features -- -D warnings
       - name: Run tests
-        run: cargo --verbose --locked test --target=x86_64-unknown-linux-musl --features embed-typst --workspace -- --nocapture
+        run: cargo --verbose --locked test --target=x86_64-unknown-linux-musl --workspace --features embed-typst -- --nocapture
       - name: Build
         run: cargo --verbose --locked build --target=x86_64-unknown-linux-musl --features memory-serve,embed-typst,storybook
       - uses: actions/upload-artifact@v6

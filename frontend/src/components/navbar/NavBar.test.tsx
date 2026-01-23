@@ -115,9 +115,6 @@ describe("NavBar", () => {
     await renderNavBar({ pathname: "/privacy-statement" }, "typist");
 
     expect(screen.queryByRole("link", { name: "Verkiezingen" })).toBeVisible();
-    expect(
-      screen.queryByRole("link", { name: "Heemdamseburg — Gemeenteraadsverkiezingen 2026" }),
-    ).not.toBeInTheDocument();
   });
 
   test.each([

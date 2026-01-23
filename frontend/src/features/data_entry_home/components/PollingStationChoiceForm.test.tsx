@@ -434,24 +434,31 @@ describe("Test PollingStationChoiceForm", () => {
   describe("Polling station in progress", () => {
     test("Show polling stations as 'in progress'", async () => {
       server.use(ElectionRequestHandler);
-      overrideOnce("get", "api/elections/1/status", 200, {
-        statuses: [
-          { polling_station_id: 1, status: "empty" },
-          {
-            polling_station_id: 2,
-            status: "first_entry_in_progress",
-            first_entry_user_id: 1,
-            first_entry_progress: 42,
-          },
-          {
-            polling_station_id: 3,
-            status: "first_entry_in_progress",
-            first_entry_user_id: 1,
-            first_entry_progress: 42,
-          },
-          { polling_station_id: 4, status: "definitive", first_entry_user_id: 1, second_entry_user_id: 2 },
-        ],
-      } satisfies ElectionStatusResponse);
+      server.use(
+        http.get("/api/elections/1/status", () =>
+          HttpResponse.json(
+            {
+              statuses: [
+                { polling_station_id: 1, status: "empty" },
+                {
+                  polling_station_id: 2,
+                  status: "first_entry_in_progress",
+                  first_entry_user_id: 1,
+                  first_entry_progress: 42,
+                },
+                {
+                  polling_station_id: 3,
+                  status: "first_entry_in_progress",
+                  first_entry_user_id: 1,
+                  first_entry_progress: 42,
+                },
+                { polling_station_id: 4, status: "definitive", first_entry_user_id: 1, second_entry_user_id: 2 },
+              ],
+            } satisfies ElectionStatusResponse,
+            { status: 200 },
+          ),
+        ),
+      );
 
       await renderPollingStationChoiceForm();
 
@@ -591,16 +598,23 @@ describe("Test PollingStationChoiceForm", () => {
     server.use(ElectionRequestHandler);
     const testPollingStation = pollingStationMockData[0]!;
     // Have the server return an in progress polling station that is owned by a logged-in user.
-    overrideOnce("get", "api/elections/1/status", 200, {
-      statuses: [
-        {
-          polling_station_id: testPollingStation.id,
-          status: "first_entry_in_progress",
-          first_entry_user_id: testUser.user_id,
-          first_entry_progress: 42,
-        },
-      ],
-    } satisfies ElectionStatusResponse);
+    server.use(
+      http.get("/api/elections/1/status", () =>
+        HttpResponse.json(
+          {
+            statuses: [
+              {
+                polling_station_id: testPollingStation.id,
+                status: "first_entry_in_progress",
+                first_entry_user_id: testUser.user_id,
+                first_entry_progress: 42,
+              },
+            ],
+          } satisfies ElectionStatusResponse,
+          { status: 200 },
+        ),
+      ),
+    );
 
     await renderPollingStationChoiceForm();
 

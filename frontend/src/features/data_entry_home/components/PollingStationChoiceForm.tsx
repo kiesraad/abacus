@@ -9,13 +9,13 @@ import { Icon } from "@/components/ui/Icon/Icon";
 import { KeyboardKeys } from "@/components/ui/KeyboardKeys/KeyboardKeys";
 import { useElection } from "@/hooks/election/useElection";
 import { useElectionStatus } from "@/hooks/election/useElectionStatus";
+import { useLiveData } from "@/hooks/useLiveData";
 import { useUser } from "@/hooks/user/useUser";
 import type { TranslationPath } from "@/i18n/i18n.types";
 import { t, tx } from "@/i18n/translate";
 import { KeyboardKey } from "@/types/ui";
 import { cn } from "@/utils/classnames";
 import { parseIntUserInput } from "@/utils/strings";
-
 import { useDebouncedCallback } from "../hooks/useDebouncedCallback";
 import { getPollingStationWithStatusList, getUrlForDataEntry, PollingStationUserStatus } from "../utils/util";
 import cls from "./PollingStationChoice.module.css";
@@ -38,6 +38,8 @@ export function PollingStationChoiceForm({ anotherEntry }: PollingStationChoiceF
   const [alert, setAlert] = useState<string | undefined>(undefined);
   const [loading, setLoading] = useState<boolean>(false);
   const electionStatus = useElectionStatus();
+
+  useLiveData(electionStatus.refetch, true);
 
   const refetchStatuses = () => {
     void electionStatus.refetch();

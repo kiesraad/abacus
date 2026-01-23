@@ -17,7 +17,12 @@ use crate::{
     APIError, AppState, ErrorResponse,
     audit_log::{AuditEvent, AuditService},
     authentication::Coordinator,
-    data_entry::{CandidateVotes, PoliticalGroupCandidateVotes, status::DataEntryStatusName},
+    committee_session::repository::get_election_committee_session,
+    data_entry::{
+        CandidateVotes, PoliticalGroupCandidateVotes,
+        repository::{list_results_for_committee_session, statuses},
+        status::DataEntryStatusName,
+    },
     election::{ElectionId, ElectionWithPoliticalGroups},
     summary::ElectionSummary,
 };
@@ -120,14 +125,8 @@ async fn election_apportionment(
 ) -> Result<Json<ElectionApportionmentResponse>, APIError> {
     let mut conn = pool.acquire().await?;
     let election = crate::election::repository::get(&mut conn, id).await?;
-    let current_committee_session =
-        crate::committee_session::repository::get_election_committee_session(
-            &mut conn,
-            election.id,
-        )
-        .await?;
-    let statuses =
-        crate::data_entry::repository::statuses(&mut conn, current_committee_session.id).await?;
+    let current_committee_session = get_election_committee_session(&mut conn, election.id).await?;
+    let statuses = statuses(&mut conn, current_committee_session.id).await?;
 
     // Committee session must have all data entries as definitive
     // Or, if this is a next session, no (corrected) data entries
@@ -137,11 +136,8 @@ async fn election_apportionment(
             .all(|s| s.status == DataEntryStatusName::Definitive))
         || (current_committee_session.number > 1 && statuses.is_empty())
     {
-        let results = crate::data_entry::repository::list_results_for_committee_session(
-            &mut conn,
-            current_committee_session.id,
-        )
-        .await?;
+        let results =
+            list_results_for_committee_session(&mut conn, current_committee_session.id).await?;
 
         let input = ElectionPoliticalGroupSummary {
             election: election.clone(),

@@ -16,10 +16,13 @@ mod structs;
 #[cfg(test)]
 pub(crate) mod test_helpers;
 
-pub use crate::candidate_nomination::CandidateNominationResult;
-pub use crate::seat_assignment::SeatAssignmentResult;
-pub use crate::structs::{
-    ApportionmentError, ApportionmentInput, CandidateVotesTrait, PoliticalGroupVotesTrait,
+pub use crate::{
+    candidate_nomination::CandidateNominationResult,
+    fraction::Fraction,
+    seat_assignment::SeatAssignmentResult,
+    structs::{
+        ApportionmentError, ApportionmentInput, CandidateVotesTrait, PoliticalGroupVotesTrait,
+    },
 };
 
 // Place somewhere

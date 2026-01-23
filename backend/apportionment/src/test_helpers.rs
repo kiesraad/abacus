@@ -16,7 +16,6 @@ pub fn candidate_nomination_fixture_with_given_number_of_seats(
     CandidateNominationInput {
         number_of_seats: seat_assignment_input.number_of_seats,
         political_group_votes: seat_assignment_input.political_group_votes,
-
         quota,
         total_seats,
     }

@@ -16,8 +16,6 @@ pub enum ApportionmentError {
     ZeroVotesCast,
 }
 
-// Apportionment below, abacus above
-
 pub trait ApportionmentInput {
     type Pg: PoliticalGroupVotesTrait;
 
@@ -43,7 +41,6 @@ pub trait CandidateVotesTrait {
 pub(crate) struct SeatAssignmentInput {
     pub number_of_seats: u32,
     pub total_votes: u32,
-
     pub political_group_votes: Vec<PoliticalGroupVotes>,
 }
 
@@ -98,7 +95,6 @@ pub(crate) struct CandidateNominationInput {
     // TODO: Rename to election_seats?
     pub number_of_seats: u32,
     pub political_group_votes: Vec<PoliticalGroupVotes>,
-
     pub quota: Fraction,
     // TODO: Rename to political_group_seats? Should be mapped by PGNumber, not index
     pub total_seats: Vec<u32>,
@@ -112,7 +108,6 @@ where
         CandidateNominationInput {
             number_of_seats: input.0.number_of_seats(),
             political_group_votes: political_group_votes_from_input(input.0),
-
             quota: input.1.quota,
             total_seats: get_total_seats_from_apportionment_result(input.1),
         }

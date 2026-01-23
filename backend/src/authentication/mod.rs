@@ -5,7 +5,7 @@ use utoipa::ToSchema;
 pub use self::{api::*, user_api::*};
 pub use middleware::*;
 pub use role::{Admin, AdminOrCoordinator, Coordinator, Role, Typist};
-pub use user::User;
+pub use user::{User, UserId};
 
 pub mod api;
 pub mod error;

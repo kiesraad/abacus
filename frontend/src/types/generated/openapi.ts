@@ -595,9 +595,9 @@ export interface DataEntryDetails {
   data_entry_progress: string;
   data_entry_status: string;
   finished_at?: string | null;
-  first_entry_user_id?: unknown | UserId;
+  first_entry_user_id?: UserId;
   polling_station_id: PollingStationId;
-  second_entry_user_id?: unknown | UserId;
+  second_entry_user_id?: UserId;
 }
 
 export interface DataEntryGetDifferencesResponse {

@@ -130,7 +130,11 @@ pub struct DataEntryDetails {
     pub data_entry_progress: String,
     #[schema(value_type = Option<String>)]
     pub finished_at: Option<DateTime<Utc>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[schema(nullable = false)]
     pub first_entry_user_id: Option<UserId>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[schema(nullable = false)]
     pub second_entry_user_id: Option<UserId>,
 }
 

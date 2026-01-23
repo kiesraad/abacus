@@ -5572,27 +5572,13 @@
             ]
           },
           "first_entry_user_id": {
-            "oneOf": [
-              {
-                "type": "null"
-              },
-              {
-                "$ref": "#/components/schemas/UserId"
-              }
-            ]
+            "$ref": "#/components/schemas/UserId"
           },
           "polling_station_id": {
             "$ref": "#/components/schemas/PollingStationId"
           },
           "second_entry_user_id": {
-            "oneOf": [
-              {
-                "type": "null"
-              },
-              {
-                "$ref": "#/components/schemas/UserId"
-              }
-            ]
+            "$ref": "#/components/schemas/UserId"
           }
         },
         "additionalProperties": false

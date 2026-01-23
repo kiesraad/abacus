@@ -6,10 +6,9 @@ use utoipa::ToSchema;
 
 use super::AuditEventLevel;
 use crate::{
-    ErrorResponse, authentication::user::UserId, election::ElectionId, error::ErrorReference,
-    committee_session::CommitteeSessionId,
-    files::FileId, investigation::PollingStationInvestigation,
-    polling_station::PollingStationId,
+    ErrorResponse, authentication::user::UserId, committee_session::CommitteeSessionId,
+    election::ElectionId, error::ErrorReference, files::FileId,
+    investigation::PollingStationInvestigation, polling_station::PollingStationId,
 };
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, Eq, ToSchema)]

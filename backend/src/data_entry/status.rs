@@ -978,7 +978,11 @@ mod tests {
     #[test]
     fn first_entry_finalised_finalise_first_entry_error() {
         assert_eq!(
-            first_entry_finalised().finalise_first_entry(&polling_station(), &election(), UserId::from(0)),
+            first_entry_finalised().finalise_first_entry(
+                &polling_station(),
+                &election(),
+                UserId::from(0)
+            ),
             Err(DataEntryTransitionError::FirstEntryAlreadyFinalised)
         );
     }
@@ -1028,7 +1032,9 @@ mod tests {
     fn first_entry_in_progress_to_empty() {
         // Happy path
         assert!(matches!(
-            first_entry_in_progress().delete_first_entry(UserId::from(0)).unwrap(),
+            first_entry_in_progress()
+                .delete_first_entry(UserId::from(0))
+                .unwrap(),
             DataEntryStatus::Empty
         ));
     }

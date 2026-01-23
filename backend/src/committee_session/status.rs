@@ -900,8 +900,8 @@ mod tests {
     mod finish_data_entry {
         use super::{CommitteeSessionError, CommitteeSessionStatus, get};
         use crate::{
-            committee_session::CommitteeSessionId,
             authentication::user::UserId,
+            committee_session::CommitteeSessionId,
             data_entry::{
                 PollingStationResults,
                 repository::{get_or_default, get_result, insert_test_result, make_definitive},

@@ -5131,7 +5131,7 @@
       },
       "CSOFirstSessionResults": {
         "type": "object",
-        "description": "CSOFirstSessionResults, following the fields in Model Na 31-2 Bijlage 2.\n\nSee \"Model Na 31-2. Proces-verbaal van een gemeentelijk stembureau/stembureau voor het openbaar\nlichaam in een gemeente/openbaar lichaam waar een centrale stemopneming wordt verricht,\nBijlage 2: uitkomsten per stembureau\" from the\n[Kiesregeling](https://wetten.overheid.nl/BWBR0034180/2024-04-01#Bijlage1_DivisieNa31.2) or\n[Verkiezingstoolbox](https://www.rijksoverheid.nl/onderwerpen/verkiezingen/verkiezingentoolkit/modellen).",
+        "description": "CSOFirstSessionResults, following the fields in Model Na 31-2 Bijlage 2.\n\nSee \"Model Na 31-2. Proces-verbaal van een gemeentelijk stembureau/stembureau voor het openbaar\nlichaam in een gemeente/openbaar lichaam waar een centrale stemopneming wordt verricht,\nBijlage 2: uitkomsten per stembureau\" from the\n[Kiesregeling](https://wetten.overheid.nl/BWBR0034180/2026-01-01#Bijlage1_DivisieNa31.2) or\n[Verkiezingstoolbox](https://www.rijksoverheid.nl/onderwerpen/verkiezingen/verkiezingentoolkit/modellen).",
         "required": [
           "extra_investigation",
           "counting_differences_polling_station",
@@ -5173,7 +5173,7 @@
       },
       "CSONextSessionResults": {
         "type": "object",
-        "description": "CSONextSessionResults, following the fields in Model Na 14-2 Bijlage 1.\n\nSee \"Model Na 14-2. Corrigendum bij het proces-verbaal van een gemeentelijk stembureau/\nstembureau voor het openbaar lichaam, Bijlage 1: uitkomsten per stembureau\" from the\n[Kiesregeling](https://wetten.overheid.nl/BWBR0034180/2024-04-01#Bijlage1_DivisieNa14.2) or\n[Verkiezingstoolbox](https://www.rijksoverheid.nl/onderwerpen/verkiezingen/verkiezingentoolkit/modellen).",
+        "description": "CSONextSessionResults, following the fields in Model Na 14-2 Bijlage 1.\n\nSee \"Model Na 14-2. Corrigendum bij het proces-verbaal van een gemeentelijk stembureau/\nstembureau voor het openbaar lichaam, Bijlage 1: uitkomsten per stembureau\" from the\n[Kiesregeling](https://wetten.overheid.nl/BWBR0034180/2026-01-01#Bijlage1_DivisieNa14.2) or\n[Verkiezingstoolbox](https://www.rijksoverheid.nl/onderwerpen/verkiezingen/verkiezingentoolkit/modellen).",
         "required": [
           "voters_counts",
           "votes_counts",

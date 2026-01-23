@@ -329,7 +329,7 @@ impl From<CommonPollingStationResults> for CommonPollingStationResultsWithoutVot
 /// See "Model Na 31-2. Proces-verbaal van een gemeentelijk stembureau/stembureau voor het openbaar
 /// lichaam in een gemeente/openbaar lichaam waar een centrale stemopneming wordt verricht,
 /// Bijlage 2: uitkomsten per stembureau" from the
-/// [Kiesregeling](https://wetten.overheid.nl/BWBR0034180/2024-04-01#Bijlage1_DivisieNa31.2) or
+/// [Kiesregeling](https://wetten.overheid.nl/BWBR0034180/2026-01-01#Bijlage1_DivisieNa31.2) or
 /// [Verkiezingstoolbox](https://www.rijksoverheid.nl/onderwerpen/verkiezingen/verkiezingentoolkit/modellen).
 #[derive(Serialize, Deserialize, ToSchema, Clone, Debug, Default, PartialEq, Eq, Hash)]
 #[serde(deny_unknown_fields)]
@@ -374,7 +374,7 @@ impl CSOFirstSessionResults {
 ///
 /// See "Model Na 14-2. Corrigendum bij het proces-verbaal van een gemeentelijk stembureau/
 /// stembureau voor het openbaar lichaam, Bijlage 1: uitkomsten per stembureau" from the
-/// [Kiesregeling](https://wetten.overheid.nl/BWBR0034180/2024-04-01#Bijlage1_DivisieNa14.2) or
+/// [Kiesregeling](https://wetten.overheid.nl/BWBR0034180/2026-01-01#Bijlage1_DivisieNa14.2) or
 /// [Verkiezingstoolbox](https://www.rijksoverheid.nl/onderwerpen/verkiezingen/verkiezingentoolkit/modellen).
 #[derive(Serialize, Deserialize, ToSchema, Clone, Debug, Default, PartialEq, Eq, Hash)]
 #[serde(deny_unknown_fields)]

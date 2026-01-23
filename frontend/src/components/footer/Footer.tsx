@@ -1,3 +1,4 @@
+import { Link } from "react-router";
 import { t } from "@/i18n/translate";
 
 export function Footer() {
@@ -12,7 +13,10 @@ export function Footer() {
   return (
     <footer>
       <section>
-        Kiesraad - Abacus ({t("version")} {gitVersion})
+        Kiesraad - Abacus ({t("version")} {gitVersion}){" "}
+        <Link to={"/privacy-statement"} className="privacy_statement">
+          {t("privacy_statement.title").toLowerCase()}
+        </Link>
       </section>
       {__SHOW_DEV_PAGE__ && (
         <section>

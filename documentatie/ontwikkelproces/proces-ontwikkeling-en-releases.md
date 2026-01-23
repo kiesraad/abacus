@@ -62,10 +62,9 @@ aantal wijzigingen tussen de getoetste en de definitieve versie minimaal blijft.
 
 Een release moet aan een aantal vereisten voldoen:
 
-[//]: # (TODO: link voor toets op de wettelijke kaders werkt niet meer. Bijlage 2 en Artikel 2a zijn vervallen per 01-08-2025)
 - Alle issues en epics in de milestone voor de release zijn klaar.
 - Alle functionaliteit is voldoende getest, zie [Testen en kwaliteit](</documentatie/ontwikkelproces/testen-en-kwaliteit.md>).
-- De formele checks zijn geslaagd (pentest en [toets op de wettelijke kaders](https://wetten.overheid.nl/BWBR0034180/2026-01-01#Bijlage2))
+- De formele checks zijn geslaagd (pentest en [toets op de wettelijke kaders](https://zoek.officielebekendmakingen.nl/stb-2025-172.html))
 - Alle documentatie is bijgewerkt voor de wijzigingen in deze release.
 - De release is voorzien van release notes.
 

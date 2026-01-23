@@ -57,7 +57,9 @@ export function PollingStationChoiceForm({ anotherEntry }: PollingStationChoiceF
   }, [pollingStationNumber, pollingStationsWithStatus]);
 
   const debouncedCallback = useDebouncedCallback(() => {
-    setLoading(false);
+    void electionStatus.refetch().then(() => {
+      setLoading(false);
+    });
   }, USER_INPUT_DEBOUNCE);
 
   // set polling station number and trigger debounced lookup

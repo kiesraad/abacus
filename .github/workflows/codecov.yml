@@ -73,7 +73,7 @@ jobs:
       - name: Install Nextest
         run: cargo binstall cargo-nextest
       - name: Run tests with coverage
-        run: cargo llvm-cov nextest --branch --profile ci --features embed-typst,airgap-detection
+        run: cargo llvm-cov nextest --workspace --branch --profile ci --features embed-typst,airgap-detection
       - name: Upload test results to Codecov
         if: ${{ !cancelled() }}
         uses: codecov/codecov-action@671740ac38dd9b0130fbe1cec585b89eea48d3de # v5

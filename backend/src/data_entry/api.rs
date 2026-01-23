@@ -984,8 +984,8 @@ pub struct ElectionStatusResponseEntry {
     #[schema(value_type = u8)]
     pub second_entry_progress: Option<u8>,
     /// Time when the data entry was finalised
-    #[schema(value_type = String)]
     #[serde(skip_serializing_if = "Option::is_none")]
+    #[schema(value_type = String)]
     pub finished_at: Option<DateTime<Utc>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     #[schema(nullable = false)]

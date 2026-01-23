@@ -508,7 +508,7 @@ export interface CommitteeSessionDetails {
   session_overview_pdf?: FileId;
   session_results_eml?: FileId;
   session_results_pdf?: FileId;
-  session_start_date_time?: string | null;
+  session_start_date_time?: string;
   session_status: string;
 }
 
@@ -594,10 +594,10 @@ export interface DataEntryDetails {
   committee_session_id: CommitteeSessionId;
   data_entry_progress: string;
   data_entry_status: string;
-  finished_at?: string | null;
-  first_entry_user_id?: number | null;
+  finished_at?: string;
+  first_entry_user_id?: number;
   polling_station_id: PollingStationId;
-  second_entry_user_id?: number | null;
+  second_entry_user_id?: number;
 }
 
 export interface DataEntryGetDifferencesResponse {
@@ -679,7 +679,7 @@ export interface Election {
 }
 
 export interface ElectionAndCandidateDefinitionValidateRequest {
-  candidate_data?: string | null;
+  candidate_data?: string;
   candidate_hash?: string[];
   counting_method?: VoteCountingMethod;
   election_data: string;

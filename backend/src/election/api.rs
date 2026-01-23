@@ -213,6 +213,8 @@ pub struct ElectionAndCandidateDefinitionValidateRequest {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[schema(value_type = Option<Vec<String>>, nullable = false)]
     candidate_hash: Option<[String; crate::eml::hash::CHUNK_COUNT]>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[schema(nullable = false)]
     candidate_data: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -223,12 +225,12 @@ pub struct ElectionAndCandidateDefinitionValidateRequest {
     #[schema(value_type = Option<VoteCountingMethod>, nullable = false)]
     counting_method: Option<VoteCountingMethod>,
 
-    #[schema(nullable = false)]
     #[serde(skip_serializing_if = "Option::is_none")]
+    #[schema(nullable = false)]
     number_of_voters: Option<u32>,
 
-    #[schema(nullable = false)]
     #[serde(skip_serializing_if = "Option::is_none")]
+    #[schema(nullable = false)]
     polling_station_file_name: Option<String>,
 }
 
@@ -241,8 +243,8 @@ pub struct ElectionDefinitionValidateResponse {
     #[schema(nullable = false)]
     polling_stations: Option<Vec<PollingStationRequest>>,
 
-    #[schema(nullable = false)]
     #[serde(skip_serializing_if = "Option::is_none")]
+    #[schema(nullable = false)]
     pub polling_station_definition_matches_election: Option<bool>,
 
     number_of_voters: u32,
@@ -338,8 +340,8 @@ pub struct ElectionAndCandidatesDefinitionImportRequest {
     polling_station_data: Option<String>,
     counting_method: VoteCountingMethod,
     number_of_voters: u32,
-    #[schema(nullable = false)]
     #[serde(skip_serializing_if = "Option::is_none")]
+    #[schema(nullable = false)]
     polling_station_file_name: Option<String>,
 }
 

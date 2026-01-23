@@ -5373,10 +5373,7 @@
             "$ref": "#/components/schemas/FileId"
           },
           "session_start_date_time": {
-            "type": [
-              "string",
-              "null"
-            ],
+            "type": "string",
             "format": "date-time"
           },
           "session_status": {
@@ -5572,16 +5569,10 @@
             "type": "string"
           },
           "finished_at": {
-            "type": [
-              "string",
-              "null"
-            ]
+            "type": "string"
           },
           "first_entry_user_id": {
-            "type": [
-              "integer",
-              "null"
-            ],
+            "type": "integer",
             "format": "int32",
             "minimum": 0
           },
@@ -5589,10 +5580,7 @@
             "$ref": "#/components/schemas/PollingStationId"
           },
           "second_entry_user_id": {
-            "type": [
-              "integer",
-              "null"
-            ],
+            "type": "integer",
             "format": "int32",
             "minimum": 0
           }
@@ -5799,10 +5787,7 @@
         ],
         "properties": {
           "candidate_data": {
-            "type": [
-              "string",
-              "null"
-            ]
+            "type": "string"
           },
           "candidate_hash": {
             "type": "array",

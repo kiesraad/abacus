@@ -3946,9 +3946,7 @@
             "description": "User id",
             "required": true,
             "schema": {
-              "type": "integer",
-              "format": "int32",
-              "minimum": 0
+              "$ref": "#/components/schemas/UserId"
             }
           }
         ],
@@ -4020,11 +4018,10 @@
           {
             "name": "user_id",
             "in": "path",
+            "description": "User id",
             "required": true,
             "schema": {
-              "type": "integer",
-              "format": "int32",
-              "minimum": 0
+              "$ref": "#/components/schemas/UserId"
             }
           }
         ],
@@ -4116,11 +4113,10 @@
           {
             "name": "user_id",
             "in": "path",
+            "description": "User id",
             "required": true,
             "schema": {
-              "type": "integer",
-              "format": "int32",
-              "minimum": 0
+              "$ref": "#/components/schemas/UserId"
             }
           }
         ],
@@ -5052,9 +5048,7 @@
             "type": "string"
           },
           "user_id": {
-            "type": "integer",
-            "format": "int32",
-            "minimum": 0
+            "$ref": "#/components/schemas/UserId"
           },
           "user_role": {
             "$ref": "#/components/schemas/Role"
@@ -5578,23 +5572,13 @@
             ]
           },
           "first_entry_user_id": {
-            "type": [
-              "integer",
-              "null"
-            ],
-            "format": "int32",
-            "minimum": 0
+            "$ref": "#/components/schemas/UserId"
           },
           "polling_station_id": {
             "$ref": "#/components/schemas/PollingStationId"
           },
           "second_entry_user_id": {
-            "type": [
-              "integer",
-              "null"
-            ],
-            "format": "int32",
-            "minimum": 0
+            "$ref": "#/components/schemas/UserId"
           }
         },
         "additionalProperties": false
@@ -5612,17 +5596,13 @@
             "$ref": "#/components/schemas/PollingStationResults"
           },
           "first_entry_user_id": {
-            "type": "integer",
-            "format": "int32",
-            "minimum": 0
+            "$ref": "#/components/schemas/UserId"
           },
           "second_entry": {
             "$ref": "#/components/schemas/PollingStationResults"
           },
           "second_entry_user_id": {
-            "type": "integer",
-            "format": "int32",
-            "minimum": 0
+            "$ref": "#/components/schemas/UserId"
           }
         },
         "additionalProperties": false
@@ -5642,9 +5622,7 @@
             "$ref": "#/components/schemas/DataEntryStatusName"
           },
           "user_id": {
-            "type": "integer",
-            "format": "int32",
-            "minimum": 0
+            "$ref": "#/components/schemas/UserId"
           },
           "validation_results": {
             "$ref": "#/components/schemas/ValidationResults"
@@ -6429,9 +6407,7 @@
             "$ref": "#/components/schemas/Role"
           },
           "user_id": {
-            "type": "integer",
-            "format": "int32",
-            "minimum": 0
+            "$ref": "#/components/schemas/UserId"
           },
           "username": {
             "type": "string"
@@ -7045,9 +7021,7 @@
             "type": "string"
           },
           "id": {
-            "type": "integer",
-            "format": "int32",
-            "minimum": 0
+            "$ref": "#/components/schemas/UserId"
           },
           "last_activity_at": {
             "type": "string"
@@ -7078,15 +7052,18 @@
             "type": "string"
           },
           "user_id": {
-            "type": "integer",
-            "format": "int32",
-            "minimum": 0
+            "$ref": "#/components/schemas/UserId"
           },
           "username": {
             "type": "string"
           }
         },
         "additionalProperties": false
+      },
+      "UserId": {
+        "type": "integer",
+        "format": "int32",
+        "minimum": 0
       },
       "UserListResponse": {
         "type": "object",

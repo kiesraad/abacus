@@ -155,7 +155,7 @@ mod tests {
             AuditEvent, AuditLogListResponse, AuditLogUser, AuditService, UserLoggedInDetails,
             api::{audit_log_list, audit_log_list_users},
         },
-        authentication::{User, inject_user},
+        authentication::{User, inject_user, user::UserId},
     };
 
     const TEST_USER_AGENT: &str = "TestAgent/1.0";
@@ -191,7 +191,7 @@ mod tests {
         let mut conn = pool.acquire().await.unwrap();
         let session = crate::authentication::session::create(
             &mut conn,
-            1,
+            UserId::from(1),
             TEST_USER_AGENT,
             TEST_IP_ADDRESS,
             TimeDelta::seconds(60 * 30),
@@ -261,7 +261,7 @@ mod tests {
         let mut conn = pool.acquire().await.unwrap();
         let session = crate::authentication::session::create(
             &mut conn,
-            1,
+            UserId::from(1),
             TEST_USER_AGENT,
             TEST_IP_ADDRESS,
             TimeDelta::seconds(60 * 30),

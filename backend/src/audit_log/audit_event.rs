@@ -68,7 +68,7 @@ pub struct CommitteeSessionDetails {
     pub session_election_id: ElectionId,
     pub session_location: String,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[schema(value_type = Option<String>, format = "date-time", nullable = false)]
+    #[schema(value_type = String, format = "date-time", nullable = false)]
     pub session_start_date_time: Option<NaiveDateTime>,
     pub session_status: String,
     #[serde(skip_serializing_if = "Option::is_none")]

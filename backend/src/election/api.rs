@@ -218,11 +218,11 @@ pub struct ElectionAndCandidateDefinitionValidateRequest {
     candidate_data: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[schema(value_type = Option<String>, nullable = false)]
+    #[schema(nullable = false)]
     polling_station_data: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[schema(value_type = Option<VoteCountingMethod>, nullable = false)]
+    #[schema(nullable = false)]
     counting_method: Option<VoteCountingMethod>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -336,7 +336,7 @@ pub struct ElectionAndCandidatesDefinitionImportRequest {
     candidate_hash: [String; crate::eml::hash::CHUNK_COUNT],
     candidate_data: String,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[schema(value_type = Option<String>, nullable = false)]
+    #[schema(nullable = false)]
     polling_station_data: Option<String>,
     counting_method: VoteCountingMethod,
     number_of_voters: u32,

@@ -5,26 +5,24 @@ use std::error::Error;
 use tracing::info;
 
 use crate::{
-    SqlitePoolExt, committee_session,
+    SqlitePoolExt,
+    authentication::user::UserId,
     committee_session::{
-        CommitteeSession, CommitteeSessionCreateRequest, status::CommitteeSessionStatus,
+        self, CommitteeSession, CommitteeSessionCreateRequest, status::CommitteeSessionStatus,
     },
-    data_entry,
     data_entry::{
-        CSOFirstSessionResults, CandidateVotes, CountingDifferencesPollingStation,
+        self, CSOFirstSessionResults, CandidateVotes, CountingDifferencesPollingStation,
         DifferenceCountsCompareVotesCastAdmittedVoters, DifferencesCounts, ExtraInvestigation,
         FieldPath, PoliticalGroupCandidateVotes, PoliticalGroupTotalVotes, PollingStationResults,
         Validate, ValidationResults, VotersCounts, VotesCounts, YesNo,
         repository::list_results_for_committee_session,
         status::{DataEntryStatus, Definitive, FirstEntryFinalised},
     },
-    election,
     election::{
-        CandidateGender, CandidateNumber, ElectionCategory, ElectionWithPoliticalGroups,
+        self, CandidateGender, CandidateNumber, ElectionCategory, ElectionWithPoliticalGroups,
         NewElection, PGNumber, PoliticalGroup, VoteCountingMethod,
     },
-    polling_station,
-    polling_station::{PollingStation, PollingStationRequest, PollingStationType},
+    polling_station::{self, PollingStation, PollingStationRequest, PollingStationType},
     test_data_gen::GenerateElectionArgs,
 };
 
@@ -345,8 +343,8 @@ async fn generate_data_entry(
             if rng.random_ratio(second_entry_chance, 100) {
                 // generate a definitive data entry
                 let state = DataEntryStatus::Definitive(Definitive {
-                    first_entry_user_id: 5,  // first typist from users in fixtures
-                    second_entry_user_id: 6, // second typist from users in fixtures
+                    first_entry_user_id: UserId::from(5), // first typist from users in fixtures
+                    second_entry_user_id: UserId::from(6), // second typist from users in fixtures
                     finished_at: ts,
                     finalised_with_warnings: validation_results.has_warnings(),
                 });
@@ -364,7 +362,7 @@ async fn generate_data_entry(
             } else {
                 // generate only a first data entry
                 let state = DataEntryStatus::FirstEntryFinalised(FirstEntryFinalised {
-                    first_entry_user_id: 5, // first typist from users in fixtures
+                    first_entry_user_id: UserId::from(5), // first typist from users in fixtures
                     finalised_first_entry: results.clone(),
                     first_entry_finished_at: ts,
                     finalised_with_warnings: validation_results.has_warnings(),

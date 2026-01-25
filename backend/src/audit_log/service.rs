@@ -75,6 +75,7 @@ mod test {
     use crate::{
         SqlitePoolExt,
         audit_log::{AuditEventLevel, UserLoggedInDetails},
+        authentication::user::UserId,
     };
 
     #[test(sqlx::test(fixtures("../../fixtures/users.sql")))]
@@ -111,7 +112,7 @@ mod test {
 
         assert_eq!(event.event_level(), &AuditEventLevel::Success);
         assert_eq!(event.message(), Some(&"User logged in".to_string()));
-        assert_eq!(event.user_id(), Some(1));
+        assert_eq!(event.user_id(), Some(UserId::from(1)));
         assert_eq!(event.username(), Some("admin1"));
         assert_eq!(event.ip(), Some(IpAddr::V4(Ipv4Addr::new(203, 0, 113, 0))));
     }

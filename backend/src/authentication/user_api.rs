@@ -12,7 +12,7 @@ use super::{AdminOrCoordinator, error::AuthenticationError, user::User};
 use crate::{
     APIError, AppState, ErrorResponse, SqlitePoolExt,
     audit_log::{AuditEvent, AuditService},
-    authentication::{CreateUserRequest, Role},
+    authentication::{CreateUserRequest, Role, user::UserId},
 };
 
 pub fn user_router() -> OpenApiRouter<AppState> {
@@ -126,14 +126,14 @@ pub async fn user_create(
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
     params(
-        ("user_id" = u32, description = "User id"),
+        ("user_id" = UserId, description = "User id"),
     ),
     security(("cookie_auth" = ["administrator", "coordinator"])),
 )]
 async fn user_get(
     logged_in_user: AdminOrCoordinator,
     State(pool): State<SqlitePool>,
-    Path(user_id): Path<u32>,
+    Path(user_id): Path<UserId>,
 ) -> Result<Json<User>, APIError> {
     let mut conn = pool.acquire().await?;
     let user = super::user::get_by_id(&mut conn, user_id)
@@ -161,13 +161,16 @@ async fn user_get(
         (status = 404, description = "User not found", body = ErrorResponse),
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
+    params(
+        ("user_id" = UserId, description = "User id"),
+    ),
     security(("cookie_auth" = ["administrator", "coordinator"])),
 )]
 pub async fn user_update(
     logged_in_user: AdminOrCoordinator,
     State(pool): State<SqlitePool>,
     audit_service: AuditService,
-    Path(user_id): Path<u32>,
+    Path(user_id): Path<UserId>,
     Json(update_user_req): Json<UpdateUserRequest>,
 ) -> Result<Json<User>, APIError> {
     // fetch the current user
@@ -219,13 +222,16 @@ pub async fn user_update(
         (status = 404, description = "User not found", body = ErrorResponse),
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
+    params(
+        ("user_id" = UserId, description = "User id"),
+    ),
     security(("cookie_auth" = ["administrator", "coordinator"])),
 )]
 async fn user_delete(
     logged_in_user: AdminOrCoordinator,
     State(pool): State<SqlitePool>,
     audit_service: AuditService,
-    Path(user_id): Path<u32>,
+    Path(user_id): Path<UserId>,
 ) -> Result<StatusCode, APIError> {
     // fetch the current user
     if logged_in_user.is_coordinator() {

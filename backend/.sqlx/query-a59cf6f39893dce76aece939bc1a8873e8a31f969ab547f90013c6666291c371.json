@@ -1,6 +1,6 @@
 {
   "db_name": "SQLite",
-  "query": "INSERT INTO sessions (session_key, user_id, user_agent, ip_address, expires_at, created_at)\n        VALUES (?, ?, ?, ?, ?, ?)\n        RETURNING\n            session_key,\n            user_id as \"user_id: u32\",\n            user_agent,\n            ip_address,\n            expires_at as \"expires_at: _\",\n            created_at as \"created_at: _\"\n        ",
+  "query": "\n        SELECT\n            session_key,\n            user_id as \"user_id: UserId\",\n            user_agent,\n            ip_address,\n            expires_at as \"expires_at: _\",\n            created_at as \"created_at: _\"\n        FROM sessions\n        WHERE session_key = ?\n        AND user_agent = ?\n        AND ip_address = ?\n        AND expires_at > ?\n        ",
   "describe": {
     "columns": [
       {
@@ -9,7 +9,7 @@
         "type_info": "Text"
       },
       {
-        "name": "user_id: u32",
+        "name": "user_id: UserId",
         "ordinal": 1,
         "type_info": "Integer"
       },
@@ -35,7 +35,7 @@
       }
     ],
     "parameters": {
-      "Right": 6
+      "Right": 4
     },
     "nullable": [
       false,
@@ -46,5 +46,5 @@
       false
     ]
   },
-  "hash": "d28c89a762715596b82a5760afbf45072fe36dc4c00f21edb94dcb0897944d86"
+  "hash": "a59cf6f39893dce76aece939bc1a8873e8a31f969ab547f90013c6666291c371"
 }

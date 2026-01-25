@@ -9,7 +9,7 @@ use utoipa::ToSchema;
 use super::{AuditEvent, AuditLogUser, LogFilterQuery};
 use crate::{
     APIError,
-    authentication::{Role, User},
+    authentication::{Role, User, user::UserId},
     util::id,
 };
 
@@ -51,7 +51,7 @@ pub struct AuditLogEvent {
     message: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     #[schema(nullable = false)]
-    user_id: Option<u32>,
+    user_id: Option<UserId>,
     #[serde(skip_serializing_if = "Option::is_none")]
     #[schema(nullable = false)]
     username: Option<String>,
@@ -79,7 +79,7 @@ impl AuditLogEvent {
         self.message.as_ref()
     }
 
-    pub fn user_id(&self) -> Option<u32> {
+    pub fn user_id(&self) -> Option<UserId> {
         self.user_id
     }
 
@@ -207,7 +207,7 @@ pub async fn list_all(conn: &mut SqliteConnection) -> Result<Vec<AuditLogEvent>,
             event_level as "event_level: _",
             message,
             ip as "ip: String",
-            user_id as "user_id: u32",
+            user_id as "user_id: UserId",
             username,
             user_fullname,
             user_role as "user_role: Role"
@@ -244,7 +244,7 @@ pub async fn list(
             event_level as "event_level: _",
             message,
             ip as "ip: String",
-            user_id as "user_id: u32",
+            user_id as "user_id: UserId",
             audit_log.username,
             user_fullname,
             user_role as "user_role: Role"

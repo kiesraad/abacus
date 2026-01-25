@@ -6,9 +6,9 @@ use utoipa::ToSchema;
 
 use super::AuditEventLevel;
 use crate::{
-    ErrorResponse, committee_session::CommitteeSessionId, election::ElectionId,
-    error::ErrorReference, files::FileId, investigation::PollingStationInvestigation,
-    polling_station::PollingStationId,
+    ErrorResponse, authentication::user::UserId, committee_session::CommitteeSessionId,
+    election::ElectionId, error::ErrorReference, files::FileId,
+    investigation::PollingStationInvestigation, polling_station::PollingStationId,
 };
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, Eq, ToSchema)]
@@ -34,7 +34,7 @@ pub struct UserLoggedOutDetails {
 #[derive(Serialize, Deserialize, Debug, PartialEq, Eq, ToSchema)]
 #[serde(deny_unknown_fields)]
 pub struct UserDetails {
-    pub user_id: u32,
+    pub user_id: UserId,
     #[serde(skip_serializing_if = "Option::is_none")]
     #[schema(value_type = String, nullable = false)]
     pub fullname: Option<String>,
@@ -134,10 +134,10 @@ pub struct DataEntryDetails {
     pub finished_at: Option<DateTime<Utc>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     #[schema(nullable = false)]
-    pub first_entry_user_id: Option<u32>,
+    pub first_entry_user_id: Option<UserId>,
     #[serde(skip_serializing_if = "Option::is_none")]
     #[schema(nullable = false)]
-    pub second_entry_user_id: Option<u32>,
+    pub second_entry_user_id: Option<UserId>,
 }
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, Eq, ToSchema)]

@@ -139,7 +139,6 @@ function addDefinition(name: string, v: ReferenceObject | SchemaObject) {
   return result.join("\n");
 }
 
-// biome-ignore lint/complexity/noExcessiveLinesPerFunction: TODO function should be refactored
 function tsType(s: ReferenceObject | SchemaObject | undefined): string {
   if (!s) return "unknown";
 

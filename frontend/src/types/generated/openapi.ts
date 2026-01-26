@@ -178,12 +178,12 @@ export type INITIALISED_REQUEST_PATH = `/api/initialised`;
 
 // /api/log
 export interface AUDIT_LOG_LIST_REQUEST_PARAMS {
-  page: number;
-  per_page: number;
-  level: string[];
-  event: string[];
-  user: number[];
-  since: number;
+  page?: number;
+  per_page?: number;
+  level?: string[];
+  event?: string[];
+  user?: number[];
+  since?: number;
 }
 export type AUDIT_LOG_LIST_REQUEST_PATH = `/api/log`;
 

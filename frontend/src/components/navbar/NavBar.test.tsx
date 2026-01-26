@@ -11,7 +11,7 @@ import type { Role } from "@/types/generated/openapi";
 import { NavBar } from "./NavBar";
 import { NavBarLinks } from "./NavBarLinks";
 
-async function renderNavBar(location: { pathname: string }, userRole: Role) {
+async function renderNavBar(location: { pathname: string }, userRole: Role | null) {
   render(
     <TestUserProvider userRole={userRole}>
       <ElectionProvider electionId={1}>
@@ -111,8 +111,14 @@ describe("NavBar", () => {
     expect(screen.queryByRole("link", { name: "Logs" })).toBeVisible();
   });
 
-  test("elections link for '/privacy-statement' for typist", async () => {
+  test("no elections link for '/privacy-statement' for typist", async () => {
     await renderNavBar({ pathname: "/privacy-statement" }, "typist");
+
+    expect(screen.queryByRole("link", { name: "Verkiezingen" })).not.toBeInTheDocument();
+  });
+
+  test("no elections link for '/privacy-statement' for not logged in user", async () => {
+    await renderNavBar({ pathname: "/privacy-statement" }, null);
 
     expect(screen.queryByRole("link", { name: "Verkiezingen" })).not.toBeInTheDocument();
   });

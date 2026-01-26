@@ -13,7 +13,9 @@ export function Footer({ showPrivacyStatementLink = true }: { showPrivacyStateme
   return (
     <footer>
       <section>
-        Kiesraad - Abacus ({t("version")} {gitVersion})&nbsp;&nbsp;{" "}
+        <span className="mr-sm">
+          Kiesraad - Abacus ({t("version")} {gitVersion})
+        </span>
         {showPrivacyStatementLink && (
           <Link to={"/privacy-statement"} className="privacy_statement">
             {t("privacy_statement.title").toLowerCase()}
@@ -22,7 +24,9 @@ export function Footer({ showPrivacyStatementLink = true }: { showPrivacyStateme
       </section>
       {__SHOW_DEV_PAGE__ && (
         <section>
-          <strong>{t("server")}</strong> {__API_MSW__ ? "Mock Service Worker" : "Live"}&nbsp;&nbsp;{" "}
+          <span className="mr-sm">
+            <strong>{t("server")}</strong> {__API_MSW__ ? "Mock Service Worker" : "Live"}
+          </span>
           {gitBranch && (
             <>
               <strong>Branch</strong>{" "}

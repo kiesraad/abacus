@@ -23,6 +23,15 @@ mod tests {
     use super::*;
 
     #[test]
+    fn check_openapi_json_for_null_type() {
+        let result = get_openapi_json();
+        assert!(
+            result.find("null").is_none(),
+            "Add #[serde(skip_serializing_if = \"Option::is_none\")] where Option is used."
+        );
+    }
+
+    #[test]
     fn generated_openapi_json_is_up_to_date() {
         let newest = get_openapi_json();
         let current = fs::read_to_string("./openapi.json").expect("Could not read openapi.json");

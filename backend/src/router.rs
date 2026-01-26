@@ -301,13 +301,13 @@ mod tests {
 
     use crate::{
         SqlitePoolExt,
-        authentication::{Role, session},
+        authentication::{Role, session, user::UserId},
         test::run_server_test,
     };
 
     use super::*;
 
-    async fn get_user_cookie(conn: &mut SqliteConnection, user_id: u32) -> String {
+    async fn get_user_cookie(conn: &mut SqliteConnection, user_id: UserId) -> String {
         session::create(conn, user_id, "", "127.0.0.1", TimeDelta::seconds(60 * 30))
             .await
             .unwrap()
@@ -329,13 +329,16 @@ mod tests {
             (None, None),
             (
                 Some(Role::Administrator),
-                Some(get_user_cookie(&mut tx, 1).await),
+                Some(get_user_cookie(&mut tx, UserId::from(1)).await),
             ),
             (
                 Some(Role::Coordinator),
-                Some(get_user_cookie(&mut tx, 3).await),
+                Some(get_user_cookie(&mut tx, UserId::from(3)).await),
             ),
-            (Some(Role::Typist), Some(get_user_cookie(&mut tx, 5).await)),
+            (
+                Some(Role::Typist),
+                Some(get_user_cookie(&mut tx, UserId::from(5)).await),
+            ),
         ];
         tx.commit().await.unwrap();
 

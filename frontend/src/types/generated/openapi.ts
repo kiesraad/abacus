@@ -308,18 +308,18 @@ export type USER_CREATE_REQUEST_BODY = CreateUserRequest;
 
 // /api/users/{user_id}
 export interface USER_GET_REQUEST_PARAMS {
-  user_id: number;
+  user_id: UserId;
 }
-export type USER_GET_REQUEST_PATH = `/api/users/${number}`;
+export type USER_GET_REQUEST_PATH = `/api/users/${UserId}`;
 export interface USER_UPDATE_REQUEST_PARAMS {
-  user_id: number;
+  user_id: UserId;
 }
-export type USER_UPDATE_REQUEST_PATH = `/api/users/${number}`;
+export type USER_UPDATE_REQUEST_PATH = `/api/users/${UserId}`;
 export type USER_UPDATE_REQUEST_BODY = UpdateUserRequest;
 export interface USER_DELETE_REQUEST_PARAMS {
-  user_id: number;
+  user_id: UserId;
 }
-export type USER_DELETE_REQUEST_PATH = `/api/users/${number}`;
+export type USER_DELETE_REQUEST_PATH = `/api/users/${UserId}`;
 
 /** TYPES **/
 
@@ -386,7 +386,7 @@ export interface AuditLogEvent {
   message?: string;
   time: string;
   user_fullname?: string;
-  user_id?: number;
+  user_id?: UserId;
   user_role?: Role;
   username?: string;
 }
@@ -413,7 +413,7 @@ export interface AuditLogUser {
  * See "Model Na 31-2. Proces-verbaal van een gemeentelijk stembureau/stembureau voor het openbaar
  * lichaam in een gemeente/openbaar lichaam waar een centrale stemopneming wordt verricht,
  * Bijlage 2: uitkomsten per stembureau" from the
- * [Kiesregeling](https://wetten.overheid.nl/BWBR0034180/2024-04-01#Bijlage1_DivisieNa31.2) or
+ * [Kiesregeling](https://wetten.overheid.nl/BWBR0034180/2026-01-01#Bijlage1_DivisieNa31.2) or
  * [Verkiezingstoolbox](https://www.rijksoverheid.nl/onderwerpen/verkiezingen/verkiezingentoolkit/modellen).
  */
 export interface CSOFirstSessionResults {
@@ -436,7 +436,7 @@ export interface CSOFirstSessionResults {
  *
  * See "Model Na 14-2. Corrigendum bij het proces-verbaal van een gemeentelijk stembureau/
  * stembureau voor het openbaar lichaam, Bijlage 1: uitkomsten per stembureau" from the
- * [Kiesregeling](https://wetten.overheid.nl/BWBR0034180/2024-04-01#Bijlage1_DivisieNa14.2) or
+ * [Kiesregeling](https://wetten.overheid.nl/BWBR0034180/2026-01-01#Bijlage1_DivisieNa14.2) or
  * [Verkiezingstoolbox](https://www.rijksoverheid.nl/onderwerpen/verkiezingen/verkiezingentoolkit/modellen).
  */
 export interface CSONextSessionResults {
@@ -595,22 +595,22 @@ export interface DataEntryDetails {
   data_entry_progress: string;
   data_entry_status: string;
   finished_at?: string | null;
-  first_entry_user_id?: number | null;
+  first_entry_user_id?: UserId;
   polling_station_id: PollingStationId;
-  second_entry_user_id?: number | null;
+  second_entry_user_id?: UserId;
 }
 
 export interface DataEntryGetDifferencesResponse {
   first_entry: PollingStationResults;
-  first_entry_user_id: number;
+  first_entry_user_id: UserId;
   second_entry: PollingStationResults;
-  second_entry_user_id: number;
+  second_entry_user_id: UserId;
 }
 
 export interface DataEntryGetResponse {
   data: PollingStationResults;
   status: DataEntryStatusName;
-  user_id?: number;
+  user_id?: UserId;
   validation_results: ValidationResults;
 }
 
@@ -928,7 +928,7 @@ export interface LoginResponse {
   fullname?: string;
   needs_password_change: boolean;
   role: Role;
-  user_id: number;
+  user_id: UserId;
   username: string;
 }
 
@@ -1127,7 +1127,7 @@ export interface UpdateUserRequest {
 export interface User {
   created_at: string;
   fullname?: string;
-  id: number;
+  id: UserId;
   last_activity_at?: string;
   role: Role;
   updated_at: string;
@@ -1137,9 +1137,11 @@ export interface User {
 export interface UserDetails {
   fullname?: string;
   role: string;
-  user_id: number;
+  user_id: UserId;
   username: string;
 }
+
+export type UserId = number;
 
 export interface UserListResponse {
   users: User[];

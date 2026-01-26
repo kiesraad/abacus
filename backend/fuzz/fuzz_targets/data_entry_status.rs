@@ -1,6 +1,7 @@
 #![no_main]
 
 use abacus::{
+    authentication::UserId,
     committee_session::CommitteeSessionId,
     data_entry::{status::*, *},
     election::{ElectionCategory, ElectionId, ElectionWithPoliticalGroups, VoteCountingMethod},
@@ -67,7 +68,7 @@ fn invalid_polling_station_result() -> PollingStationResults {
     })
 }
 
-fn get_cde(user_id: u32, correct_entry: bool) -> CurrentDataEntry {
+fn get_cde(user_id: UserId, correct_entry: bool) -> CurrentDataEntry {
     CurrentDataEntry {
         progress: None,
         user_id,
@@ -322,12 +323,12 @@ fn is_as_expected(
 }
 
 struct Users {
-    first: u32,  // used for first entry
-    second: u32, // used for second entry
+    first: UserId,  // used for first entry
+    second: UserId, // used for second entry
 }
 
 impl Users {
-    fn first(&self, correct_user: bool) -> u32 {
+    fn first(&self, correct_user: bool) -> UserId {
         if correct_user {
             self.first
         } else {
@@ -335,7 +336,7 @@ impl Users {
         }
     }
 
-    fn second(&self, correct_user: bool) -> u32 {
+    fn second(&self, correct_user: bool) -> UserId {
         if correct_user {
             self.second
         } else {
@@ -361,8 +362,8 @@ fuzz_target!(|transitions: Vec<Transition>| {
     let mut second_entry_correct = true;
 
     let mut users = Users {
-        first: 0,
-        second: 1,
+        first: UserId::from(0),
+        second: UserId::from(1),
     };
 
     for transition in transitions {

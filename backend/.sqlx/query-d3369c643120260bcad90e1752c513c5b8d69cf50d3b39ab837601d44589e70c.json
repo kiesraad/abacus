@@ -1,6 +1,6 @@
 {
   "db_name": "SQLite",
-  "query": "\n        SELECT\n            session_key,\n            user_id as \"user_id: u32\",\n            user_agent,\n            ip_address,\n            expires_at as \"expires_at: _\",\n            created_at as \"created_at: _\"\n        FROM sessions\n        WHERE session_key = ?\n        AND user_agent = ?\n        AND ip_address = ?\n        AND expires_at > ?\n        ",
+  "query": "\n        UPDATE sessions\n        SET expires_at = ?\n        WHERE session_key = ?\n        RETURNING\n            session_key,\n            user_id as \"user_id: UserId\",\n            user_agent,\n            ip_address,\n            expires_at as \"expires_at: _\",\n            created_at as \"created_at: _\"\n        ",
   "describe": {
     "columns": [
       {
@@ -9,7 +9,7 @@
         "type_info": "Text"
       },
       {
-        "name": "user_id: u32",
+        "name": "user_id: UserId",
         "ordinal": 1,
         "type_info": "Integer"
       },
@@ -35,7 +35,7 @@
       }
     ],
     "parameters": {
-      "Right": 4
+      "Right": 2
     },
     "nullable": [
       false,
@@ -46,5 +46,5 @@
       false
     ]
   },
-  "hash": "a0bfa52e7ccc015213721e9fc4b0e0db078a19f85fd2b5e5a5f15f5ba978bba5"
+  "hash": "d3369c643120260bcad90e1752c513c5b8d69cf50d3b39ab837601d44589e70c"
 }

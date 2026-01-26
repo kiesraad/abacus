@@ -27,8 +27,8 @@ In de onderstaande tabel is aangegeven welke partijen of instanties fungeren als
 - In de Kieswet, Afdeling II artikel E.5.3, staat "Onze Minister van Binnenlandse Zaken en Koninkrijksrelaties kan, in overeenstemming met burgemeester en wethouders van de desbetreffende gemeente, voor elke verkiezing van de leden van de Tweede Kamer een gemeente aanwijzen waar door burgemeester en wethouders ook een briefstembureau wordt ingesteld."[^2]
 - In de Kieswet, Afdeling II artikel H.11.1-2, staat "Voor de Tweede Kamer-verkiezingen kan een partij ofwel een gelijkluidende lijst indienen (zelfde lijst in alle kieskringen) ofwel een lijstengroep (verschillende lijsten, wel met zelfde partijnaam of zelfde eerste kandidaat)."[^3]
 
-[^2]: [Afdeling II Artikel E.5 Kieswet](https://wetten.overheid.nl/jci1.3:c:BWBR0004627&afdeling=II&hoofdstuk=E&paragraaf=2&artikel=E_5&z=2025-02-12&g=2025-02-12)
-[^3]: [Afdeling II Artikel H.11 Kieswet](https://wetten.overheid.nl/jci1.3:c:BWBR0004627&afdeling=II&hoofdstuk=H&artikel=H_11&z=2025-02-12&g=2025-02-12)
+[^2]: [Afdeling II Artikel E.5 Kieswet](https://wetten.overheid.nl/BWBR0004627/2026-01-01/#AfdelingII_HoofdstukE_Paragraaf2_ArtikelE5)
+[^3]: [Afdeling II Artikel H.11 Kieswet](https://wetten.overheid.nl/BWBR0004627/2026-01-01/#AfdelingII_HoofdstukH_ArtikelH11)
 
 ### Europees Parlement
 
@@ -39,7 +39,7 @@ Bij Europees Parlementsverkiezingen is er geen Europees stembureau, want elk lan
 - In de Kieswet, Afdeling II artikel E.1.2, staat "Provinciale Staten kunnen voor de verkiezing van de leden van provinciale staten deze kieskringen in meer kieskringen verdelen."[^4]
 - Bij Provinciale Statenverkiezingen vallen 8 van de 12 kieskringen samen met een provincie.
 
-[^4]: [Afdeling II Artikel E.1 Kieswet](https://wetten.overheid.nl/jci1.3:c:BWBR0004627&afdeling=II&hoofdstuk=E&paragraaf=1&artikel=E_1&z=2025-02-12&g=2025-02-12)
+[^4]: [Afdeling II Artikel E.1 Kieswet](https://wetten.overheid.nl/BWBR0004627/2026-01-01/#AfdelingII_HoofdstukE_Paragraaf1_ArtikelE1)
 
 ### Waterschappen
 
@@ -51,8 +51,8 @@ Bij Waterschapsverkiezingen vallen gemeentes in 1-4(?) waterschappen.
 - In de Kieswet, Afdeling II artikel E.3.2, staat "De stembureaus voor de verkiezing van de leden van provinciale staten zijn tevens de stembureaus voor de verkiezing van de leden van het algemeen bestuur."[^5]
 - In de Kieswet, Afdeling Va artikel Ya 24, staat "De stembureaus, het stembureau van het openbaar lichaam en het centraal stembureau voor de verkiezing van de leden van de eilandsraad zijn tevens de stembureaus, het stembureau van het openbaar lichaam onderscheidenlijk het centraal stembureau voor de verkiezing van de leden van het kiescollege."[^6]
 
-[^5]: [Afdeling II Artikel E.3 Kieswet](https://wetten.overheid.nl/jci1.3:c:BWBR0004627&afdeling=II&hoofdstuk=E&paragraaf=2&artikel=E_3&z=2025-02-12&g=2025-02-12)
-[^6]: [Afdeling Va Artikel Ya 24 Kieswet](https://wetten.overheid.nl/jci1.3:c:BWBR0004627&afdeling=Va&hoofdstuk=Ya&paragraaf=3a&artikel=Ya_24&z=2025-02-12&g=2025-02-12)
+[^5]: [Afdeling II Artikel E.3 Kieswet](https://wetten.overheid.nl/BWBR0004627/2026-01-01/#AfdelingII_HoofdstukE_Paragraaf2_ArtikelE3)
+[^6]: [Afdeling Va Artikel Ya 24 Kieswet](https://wetten.overheid.nl/BWBR0004627/2026-01-01/#AfdelingVa_HoofdstukYa_Paragraaf3a_ArtikelYa24)
 
 ### Stemlokalen
 
@@ -67,7 +67,7 @@ De EU erkent binnen Nederland de volgende Landen en Gebieden Overzee (LGO): Arub
 - Dit zijn de drie bijzondere gemeentes die samen Caribisch Nederland heten. Ze heten ook wel BES-eilanden en zijn geclassificeerd als openbare lichamen.
 - In artikel 5 van de Wet openbare lichamen Bonaire, Sint Eustatius en Saba staat "In elk openbaar lichaam is een eilandsraad, een bestuurscollege, een gezaghebber en een kiescollege voor de Eerste Kamer."[^7]
 
-[^7]: [Artikel 5 Wet openbare lichamen Bonaire, Sint Eustatius en Saba](https://wetten.overheid.nl/jci1.3:c:BWBR0028142&hoofdstuk=III&afdeling=I&artikel=5&z=2023-04-01&g=2023-04-01)
+[^7]: [Artikel 5 Wet openbare lichamen Bonaire, Sint Eustatius en Saba](https://wetten.overheid.nl/BWBR0028142/2025-02-12/#HoofdstukIII_AfdelingI_Artikel5)
 
 #### Aruba, Curaçao en Sint Maarten
 

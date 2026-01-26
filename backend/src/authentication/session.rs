@@ -12,14 +12,17 @@ use super::{
     error::AuthenticationError,
     util::{create_new_session_key, get_expires_at},
 };
-use crate::{APIError, authentication::request_data::RequestSessionData};
+use crate::{
+    APIError,
+    authentication::{request_data::RequestSessionData, user::UserId},
+};
 
 /// A session object, corresponds to a row in the sessions table
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Hash, FromRow)]
 #[serde(deny_unknown_fields)]
 pub struct Session {
     session_key: String,
-    user_id: u32,
+    user_id: UserId,
     user_agent: String,
     ip_address: String,
     expires_at: DateTime<Utc>,
@@ -43,7 +46,7 @@ where
 impl Session {
     // Create a new session for a specific user
     pub(super) fn new(
-        user_id: u32,
+        user_id: UserId,
         user_agent: String,
         ip_address: String,
         life_time: TimeDelta,
@@ -63,7 +66,7 @@ impl Session {
     }
 
     /// Get the session user id
-    pub(super) fn user_id(&self) -> u32 {
+    pub(super) fn user_id(&self) -> UserId {
         self.user_id
     }
 
@@ -98,7 +101,7 @@ impl Session {
 /// Create a new session, note this converts any i64 timestamps to i64
 pub(crate) async fn create(
     conn: &mut SqliteConnection,
-    user_id: u32,
+    user_id: UserId,
     user_agent: &str,
     ip_address: &str,
     life_time: TimeDelta,
@@ -116,7 +119,7 @@ pub(crate) async fn create(
         VALUES (?, ?, ?, ?, ?, ?)
         RETURNING
             session_key,
-            user_id as "user_id: u32",
+            user_id as "user_id: UserId",
             user_agent,
             ip_address,
             expires_at as "expires_at: _",
@@ -149,7 +152,7 @@ pub(super) async fn get_by_request_data(
         r#"
         SELECT
             session_key,
-            user_id as "user_id: u32",
+            user_id as "user_id: UserId",
             user_agent,
             ip_address,
             expires_at as "expires_at: _",
@@ -182,7 +185,7 @@ pub(super) async fn get_by_key(
         r#"
         SELECT
             session_key,
-            user_id as "user_id: u32",
+            user_id as "user_id: UserId",
             user_agent,
             ip_address,
             expires_at as "expires_at: _",
@@ -215,7 +218,7 @@ pub async fn delete(
 /// Delete a session for a certain user
 pub async fn delete_user_session(
     conn: &mut SqliteConnection,
-    user_id: u32,
+    user_id: UserId,
 ) -> Result<(), AuthenticationError> {
     sqlx::query!("DELETE FROM sessions WHERE user_id = ?", user_id)
         .execute(conn)
@@ -264,7 +267,7 @@ pub(super) async fn extend_session(
         WHERE session_key = ?
         RETURNING
             session_key,
-            user_id as "user_id: u32",
+            user_id as "user_id: UserId",
             user_agent,
             ip_address,
             expires_at as "expires_at: _",
@@ -285,6 +288,8 @@ mod test {
     use sqlx::SqlitePool;
     use test_log::test;
 
+    use crate::authentication::user::UserId;
+
     const TEST_USER_AGENT: &str = "TestAgent/1.0";
     const TEST_IP_ADDRESS: &str = "0.0.0.0";
 
@@ -293,7 +298,7 @@ mod test {
         let mut conn = pool.acquire().await.unwrap();
         let session = super::create(
             &mut conn,
-            1,
+            UserId::from(1),
             TEST_USER_AGENT,
             TEST_IP_ADDRESS,
             TimeDelta::seconds(60),
@@ -314,7 +319,7 @@ mod test {
         let mut conn = pool.acquire().await.unwrap();
         let session = super::create(
             &mut conn,
-            1,
+            UserId::from(1),
             TEST_USER_AGENT,
             TEST_IP_ADDRESS,
             TimeDelta::seconds(60),
@@ -343,7 +348,7 @@ mod test {
         let mut conn = pool.acquire().await.unwrap();
         let session = super::create(
             &mut conn,
-            1,
+            UserId::from(1),
             TEST_USER_AGENT,
             TEST_IP_ADDRESS,
             TimeDelta::seconds(0),
@@ -365,7 +370,7 @@ mod test {
         let mut conn = pool.acquire().await.unwrap();
         let _active_session1 = super::create(
             &mut conn,
-            1,
+            UserId::from(1),
             TEST_USER_AGENT,
             TEST_IP_ADDRESS,
             TimeDelta::seconds(60),
@@ -374,7 +379,7 @@ mod test {
         .unwrap();
         let _active_session2 = super::create(
             &mut conn,
-            2,
+            UserId::from(2),
             TEST_USER_AGENT,
             TEST_IP_ADDRESS,
             TimeDelta::seconds(120),
@@ -383,7 +388,7 @@ mod test {
         .unwrap();
         let _expired_session = super::create(
             &mut conn,
-            2,
+            UserId::from(2),
             TEST_USER_AGENT,
             TEST_IP_ADDRESS,
             TimeDelta::seconds(0),

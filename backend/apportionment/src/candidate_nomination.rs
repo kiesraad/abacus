@@ -3,14 +3,14 @@ use tracing::{debug, info};
 use super::{
     ApportionmentError, PGNumber,
     fraction::Fraction,
-    structs::{CandidateNominationInput, CandidateVotes, PoliticalGroupVotes},
+    structs::{CandidateNominationInput, CandidateVotes, ListVotes},
 };
 
 /// Contains information about the chosen candidates and the candidate list ranking
-/// for a specific political group.
+/// for a specific list.
 #[derive(Debug, PartialEq)]
-pub struct PoliticalGroupCandidateNomination {
-    /// Political group number for which this nomination applies
+pub struct ListCandidateNomination {
+    /// List number for which this nomination applies
     pg_number: PGNumber,
     /// The number of seats assigned to this group
     pub pg_seats: u32,
@@ -34,15 +34,15 @@ pub struct PreferenceThreshold {
 /// This contains the preference threshold and percentage that was used.  
 /// It contains a list of all chosen candidates in alphabetical order.  
 /// It also contains the preferential nomination of candidates, the remaining
-/// nomination of candidates and the final ranking of candidates for each political group.
+/// nomination of candidates and the final ranking of candidates for each list.
 #[derive(Debug, PartialEq)]
 pub struct CandidateNominationResult {
     /// Preference threshold percentage and number of votes
     pub preference_threshold: PreferenceThreshold,
     /// List of chosen candidates in alphabetical order
     pub chosen_candidates: Vec<Candidate>,
-    /// List of chosen candidates and candidate list ranking per political group
-    pub political_group_candidate_nomination: Vec<PoliticalGroupCandidateNomination>,
+    /// List of chosen candidates and candidate list ranking per list
+    pub list_candidate_nomination: Vec<ListCandidateNomination>,
 }
 
 #[derive(Debug, PartialEq)]
@@ -89,7 +89,7 @@ fn preferential_candidate_nomination(
                     .collect();
             // Check if we can actually nominate all these candidates, otherwise we would need to draw lots
             if same_votes_candidates.len() > non_assigned_seats as usize {
-                // TODO: #788 if multiple political groups have the same largest remainder and not enough residual seats are available, use drawing of lots
+                // TODO: #788 if multiple lists have the same largest remainder and not enough residual seats are available, use drawing of lots
                 info!(
                     "Drawing of lots is required for candidates: {:?}, only {non_assigned_seats} seat(s) available",
                     candidate_votes_numbers(&same_votes_candidates)
@@ -145,17 +145,17 @@ fn update_candidate_ranking(
     updated_candidate_ranking
 }
 
-/// This function nominates candidates for the seats each political group has been assigned.  
+/// This function nominates candidates for the seats each list has been assigned.  
 /// The candidate nomination is first done based on preferential votes and then the other
 /// candidates are nominated.
-fn candidate_nomination_per_political_group(
+fn candidate_nomination_per_list(
     seats: u32,
-    political_group_votes: &Vec<PoliticalGroupVotes>,
+    list_votes: &Vec<ListVotes>,
     preference_threshold: Fraction,
     total_seats: &[u32],
-) -> Result<Vec<PoliticalGroupCandidateNomination>, ApportionmentError> {
-    let mut political_group_candidate_nomination: Vec<PoliticalGroupCandidateNomination> = vec![];
-    for pg in political_group_votes {
+) -> Result<Vec<ListCandidateNomination>, ApportionmentError> {
+    let mut list_candidate_nomination: Vec<ListCandidateNomination> = vec![];
+    for pg in list_votes {
         let pg_index = pg.number as usize - 1;
         let pg_seats = total_seats[pg_index];
         let candidate_votes = &pg.candidate_votes;
@@ -196,7 +196,7 @@ fn candidate_nomination_per_political_group(
             }
         };
 
-        political_group_candidate_nomination.push(PoliticalGroupCandidateNomination {
+        list_candidate_nomination.push(ListCandidateNomination {
             pg_number: pg.number,
             pg_seats,
             preferential_candidate_nomination,
@@ -204,17 +204,17 @@ fn candidate_nomination_per_political_group(
             updated_candidate_ranking,
         });
     }
-    Ok(political_group_candidate_nomination)
+    Ok(list_candidate_nomination)
 }
 
 fn all_sorted_chosen_candidates(
-    political_group_votes: &Vec<PoliticalGroupVotes>,
-    political_group_candidate_nomination: &[PoliticalGroupCandidateNomination],
+    list_votes: &Vec<ListVotes>,
+    list_candidate_nomination: &[ListCandidateNomination],
 ) -> Vec<Candidate> {
     let mut chosen_candidates: Vec<Candidate> = vec![];
-    for pg in political_group_votes {
+    for pg in list_votes {
         // TODO: don't use index
-        let pg_candidate_nomination = &political_group_candidate_nomination[pg.number as usize - 1];
+        let pg_candidate_nomination = &list_candidate_nomination[pg.number as usize - 1];
         chosen_candidates.extend(
             pg.candidate_votes
                 .iter()
@@ -240,10 +240,6 @@ fn all_sorted_chosen_candidates(
 /// Candidate nomination
 pub fn candidate_nomination(
     input: CandidateNominationInput,
-    // election: &ElectionWithPoliticalGroups,
-    // quota: Fraction,
-    // totals: &ElectionSummary,
-    // total_seats: Vec<u32>,
 ) -> Result<CandidateNominationResult, ApportionmentError> {
     info!("Candidate nomination");
 
@@ -257,22 +253,20 @@ pub fn candidate_nomination(
     );
     info!("Preference threshold: {}", preference_threshold);
 
-    let political_group_candidate_nomination = candidate_nomination_per_political_group(
+    let list_candidate_nomination = candidate_nomination_per_list(
         input.number_of_seats,
-        &input.political_group_votes,
+        &input.list_votes,
         preference_threshold,
         &input.total_seats,
     )?;
     debug!(
-        "Political group candidate nomination: {:#?}",
-        political_group_candidate_nomination
+        "List candidate nomination: {:#?}",
+        list_candidate_nomination
     );
 
     // Create chosen candidates list
-    let chosen_candidates = all_sorted_chosen_candidates(
-        &input.political_group_votes,
-        &political_group_candidate_nomination,
-    );
+    let chosen_candidates =
+        all_sorted_chosen_candidates(&input.list_votes, &list_candidate_nomination);
     debug!("Chosen candidates: {:#?}", chosen_candidates);
 
     Ok(CandidateNominationResult {
@@ -281,7 +275,7 @@ pub fn candidate_nomination(
             number_of_votes: preference_threshold,
         },
         chosen_candidates,
-        political_group_candidate_nomination,
+        list_candidate_nomination,
     })
 }
 
@@ -300,16 +294,15 @@ mod tests {
     use crate::{
         ApportionmentError,
         candidate_nomination::{
-            Candidate, PoliticalGroupCandidateNomination, candidate_nomination,
-            candidate_votes_numbers,
+            Candidate, ListCandidateNomination, candidate_nomination, candidate_votes_numbers,
         },
         fraction::Fraction,
         structs::CandidateVotes,
         test_helpers::candidate_nomination_fixture_with_given_number_of_seats,
     };
 
-    fn check_political_group_candidate_nomination(
-        nomination: &PoliticalGroupCandidateNomination,
+    fn check_list_candidate_nomination(
+        nomination: &ListCandidateNomination,
         expected_preferential_nomination: &[u32],
         expected_other_nomination: &[u32],
         expected_updated_ranking: &[u32],
@@ -406,38 +399,18 @@ mod tests {
             result.preference_threshold.number_of_votes,
             quota * Fraction::new(result.preference_threshold.percentage, 100)
         );
-        check_political_group_candidate_nomination(
-            &result.political_group_candidate_nomination[0],
+        check_list_candidate_nomination(
+            &result.list_candidate_nomination[0],
             &[1, 3, 2, 4],
             &[5, 6, 7, 8],
             &[1, 3, 2, 4, 5, 6, 7, 8, 9, 10, 11, 12],
         );
-        check_political_group_candidate_nomination(
-            &result.political_group_candidate_nomination[1],
-            &[1],
-            &[2, 3],
-            &[],
-        );
-        check_political_group_candidate_nomination(
-            &result.political_group_candidate_nomination[2],
-            &[1],
-            &[2],
-            &[],
-        );
-        check_political_group_candidate_nomination(
-            &result.political_group_candidate_nomination[3],
-            &[1],
-            &[],
-            &[],
-        );
-        check_political_group_candidate_nomination(
-            &result.political_group_candidate_nomination[4],
-            &[1],
-            &[],
-            &[],
-        );
+        check_list_candidate_nomination(&result.list_candidate_nomination[1], &[1], &[2, 3], &[]);
+        check_list_candidate_nomination(&result.list_candidate_nomination[2], &[1], &[2], &[]);
+        check_list_candidate_nomination(&result.list_candidate_nomination[3], &[1], &[], &[]);
+        check_list_candidate_nomination(&result.list_candidate_nomination[4], &[1], &[], &[]);
 
-        let pgs = input.political_group_votes;
+        let pgs = input.list_votes;
         check_chosen_candidates(
             &result.chosen_candidates,
             &pgs[0].number,
@@ -500,38 +473,13 @@ mod tests {
             result.preference_threshold.number_of_votes,
             quota * Fraction::new(result.preference_threshold.percentage, 100)
         );
-        check_political_group_candidate_nomination(
-            &result.political_group_candidate_nomination[0],
-            &[],
-            &[1],
-            &[],
-        );
-        check_political_group_candidate_nomination(
-            &result.political_group_candidate_nomination[1],
-            &[],
-            &[1],
-            &[],
-        );
-        check_political_group_candidate_nomination(
-            &result.political_group_candidate_nomination[2],
-            &[],
-            &[1],
-            &[],
-        );
-        check_political_group_candidate_nomination(
-            &result.political_group_candidate_nomination[3],
-            &[],
-            &[1],
-            &[],
-        );
-        check_political_group_candidate_nomination(
-            &result.political_group_candidate_nomination[4],
-            &[],
-            &[1],
-            &[],
-        );
+        check_list_candidate_nomination(&result.list_candidate_nomination[0], &[], &[1], &[]);
+        check_list_candidate_nomination(&result.list_candidate_nomination[1], &[], &[1], &[]);
+        check_list_candidate_nomination(&result.list_candidate_nomination[2], &[], &[1], &[]);
+        check_list_candidate_nomination(&result.list_candidate_nomination[3], &[], &[1], &[]);
+        check_list_candidate_nomination(&result.list_candidate_nomination[4], &[], &[1], &[]);
 
-        let pgs = input.political_group_votes;
+        let pgs = input.list_votes;
         check_chosen_candidates(
             &result.chosen_candidates,
             &pgs[0].number,
@@ -590,26 +538,26 @@ mod tests {
             result.preference_threshold.number_of_votes,
             quota * Fraction::new(result.preference_threshold.percentage, 100)
         );
-        check_political_group_candidate_nomination(
-            &result.political_group_candidate_nomination[0],
+        check_list_candidate_nomination(
+            &result.list_candidate_nomination[0],
             &[1, 2, 3, 4, 5, 6, 7],
             &[8, 9, 10, 11],
             &[],
         );
-        check_political_group_candidate_nomination(
-            &result.political_group_candidate_nomination[1],
+        check_list_candidate_nomination(
+            &result.list_candidate_nomination[1],
             &[1, 2, 3, 4],
             &[5, 6, 7],
             &[],
         );
-        check_political_group_candidate_nomination(
-            &result.political_group_candidate_nomination[2],
+        check_list_candidate_nomination(
+            &result.list_candidate_nomination[2],
             &[],
             &[],
             &[5, 1, 2, 3, 4],
         );
 
-        let pgs = input.political_group_votes;
+        let pgs = input.list_votes;
         check_chosen_candidates(
             &result.chosen_candidates,
             &pgs[0].number,
@@ -655,38 +603,28 @@ mod tests {
             result.preference_threshold.number_of_votes,
             quota * Fraction::new(result.preference_threshold.percentage, 100)
         );
-        check_political_group_candidate_nomination(
-            &result.political_group_candidate_nomination[0],
+        check_list_candidate_nomination(
+            &result.list_candidate_nomination[0],
             &[1, 2, 3, 4, 5],
             &[6],
             &[],
         );
-        check_political_group_candidate_nomination(
-            &result.political_group_candidate_nomination[1],
+        check_list_candidate_nomination(
+            &result.list_candidate_nomination[1],
             &[1, 2, 3, 4],
             &[5, 6],
             &[],
         );
-        check_political_group_candidate_nomination(
-            &result.political_group_candidate_nomination[2],
+        check_list_candidate_nomination(
+            &result.list_candidate_nomination[2],
             &[1, 2, 3, 4],
             &[5],
             &[],
         );
-        check_political_group_candidate_nomination(
-            &result.political_group_candidate_nomination[3],
-            &[1, 2],
-            &[],
-            &[],
-        );
-        check_political_group_candidate_nomination(
-            &result.political_group_candidate_nomination[4],
-            &[],
-            &[],
-            &[],
-        );
+        check_list_candidate_nomination(&result.list_candidate_nomination[3], &[1, 2], &[], &[]);
+        check_list_candidate_nomination(&result.list_candidate_nomination[4], &[], &[], &[]);
 
-        let pgs = input.political_group_votes;
+        let pgs = input.list_votes;
         check_chosen_candidates(
             &result.chosen_candidates,
             &pgs[0].number,
@@ -755,8 +693,8 @@ mod tests {
         );
         let pg_0_preferential_nominated_candidate_numbers = &[1, 3, 4, 5, 6, 7];
         let pg_0_other_nominated_candidate_numbers = &[];
-        check_political_group_candidate_nomination(
-            &result.political_group_candidate_nomination[0],
+        check_list_candidate_nomination(
+            &result.list_candidate_nomination[0],
             pg_0_preferential_nominated_candidate_numbers,
             pg_0_other_nominated_candidate_numbers,
             &[1, 3, 4, 5, 6, 7, 2],
@@ -764,8 +702,8 @@ mod tests {
 
         let pg_1_preferential_nominated_candidate_numbers = &[1, 2, 4, 5, 6];
         let pg_1_other_nominated_candidate_numbers = &[];
-        check_political_group_candidate_nomination(
-            &result.political_group_candidate_nomination[1],
+        check_list_candidate_nomination(
+            &result.list_candidate_nomination[1],
             pg_1_preferential_nominated_candidate_numbers,
             pg_1_other_nominated_candidate_numbers,
             &[1, 2, 4, 5, 6, 7, 3],
@@ -773,8 +711,8 @@ mod tests {
 
         let pg_2_preferential_nominated_candidate_numbers = &[1, 2, 3, 5];
         let pg_2_other_nominated_candidate_numbers = &[];
-        check_political_group_candidate_nomination(
-            &result.political_group_candidate_nomination[2],
+        check_list_candidate_nomination(
+            &result.list_candidate_nomination[2],
             pg_2_preferential_nominated_candidate_numbers,
             pg_2_other_nominated_candidate_numbers,
             &[1, 2, 3, 5, 6, 7, 4],
@@ -782,8 +720,8 @@ mod tests {
 
         let pg_3_preferential_nominated_candidate_numbers = &[1, 2];
         let pg_3_other_nominated_candidate_numbers = &[];
-        check_political_group_candidate_nomination(
-            &result.political_group_candidate_nomination[3],
+        check_list_candidate_nomination(
+            &result.list_candidate_nomination[3],
             pg_3_preferential_nominated_candidate_numbers,
             pg_3_other_nominated_candidate_numbers,
             &[1, 2, 3, 4, 6, 7, 5],
@@ -791,14 +729,14 @@ mod tests {
 
         let pg_4_preferential_nominated_candidate_numbers = &[1, 2];
         let pg_4_other_nominated_candidate_numbers = &[];
-        check_political_group_candidate_nomination(
-            &result.political_group_candidate_nomination[4],
+        check_list_candidate_nomination(
+            &result.list_candidate_nomination[4],
             pg_4_preferential_nominated_candidate_numbers,
             pg_4_other_nominated_candidate_numbers,
             &[],
         );
 
-        let pgs = input.political_group_votes;
+        let pgs = input.list_votes;
         let (pg_0_chosen_candidates, pg_0_not_chosen_candidates) =
             get_chosen_and_not_chosen_candidates_for_a_pg(
                 pgs[0].candidate_votes.as_slice(),

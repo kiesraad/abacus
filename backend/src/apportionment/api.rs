@@ -2,7 +2,7 @@ use std::ops::Deref;
 
 use apportionment::{
     ApportionmentError, ApportionmentInput, CandidateNominationResult, CandidateVotesTrait,
-    PoliticalGroupVotesTrait, SeatAssignmentResult,
+    ListVotesTrait, SeatAssignmentResult,
 };
 use axum::{
     Json,
@@ -54,12 +54,12 @@ impl ApportionmentInput for ElectionPoliticalGroupSummary {
         self.summary.votes_counts.total_votes_candidates_count
     }
 
-    fn political_group_votes(&self) -> &[Self::Pg] {
+    fn list_votes(&self) -> &[Self::Pg] {
         &self.summary.political_group_votes
     }
 }
 
-impl PoliticalGroupVotesTrait for PoliticalGroupCandidateVotes {
+impl ListVotesTrait for PoliticalGroupCandidateVotes {
     type Cv = CandidateVotes;
 
     fn number(&self) -> u32 {

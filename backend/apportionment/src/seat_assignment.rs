@@ -5,13 +5,13 @@ use tracing::{debug, info};
 use super::{
     PGNumber,
     fraction::Fraction,
-    structs::{ApportionmentError, PoliticalGroupVotes, SeatAssignmentInput},
+    structs::{ApportionmentError, ListVotes, SeatAssignmentInput},
 };
 
 /// The result of the seat assignment procedure. This contains the number of seats and the quota
 /// that was used. It then contains the initial standing after full seats were assigned,
 /// and each of the changes and intermediate standings. The final standing contains the
-/// number of seats per political group that was assigned after all seats were assigned.
+/// number of seats per list that was assigned after all seats were assigned.
 #[derive(Debug, PartialEq)]
 pub struct SeatAssignmentResult {
     pub seats: u32,
@@ -19,17 +19,17 @@ pub struct SeatAssignmentResult {
     pub residual_seats: u32,
     pub quota: Fraction,
     pub steps: Vec<SeatChangeStep>,
-    pub final_standing: Vec<PoliticalGroupSeatAssignment>,
+    pub final_standing: Vec<ListSeatAssignment>,
 }
 
-/// Contains information about the final assignment of seats for a specific political group.
+/// Contains information about the final assignment of seats for a specific list.
 #[derive(Debug, PartialEq)]
-pub struct PoliticalGroupSeatAssignment {
-    /// Political group number for which this assignment applies
+pub struct ListSeatAssignment {
+    /// List number for which this assignment applies
     pg_number: PGNumber,
     /// The number of votes cast for this group
     votes_cast: u64,
-    /// The remainder votes that were not used to get full seats assigned to this political group
+    /// The remainder votes that were not used to get full seats assigned to this list
     remainder_votes: Fraction,
     /// Whether this group met the threshold for largest remainder seat assignment
     meets_remainder_threshold: bool,
@@ -41,9 +41,9 @@ pub struct PoliticalGroupSeatAssignment {
     pub total_seats: u32,
 }
 
-impl From<PoliticalGroupStanding> for PoliticalGroupSeatAssignment {
-    fn from(pg: PoliticalGroupStanding) -> Self {
-        PoliticalGroupSeatAssignment {
+impl From<ListStanding> for ListSeatAssignment {
+    fn from(pg: ListStanding) -> Self {
+        ListSeatAssignment {
             pg_number: pg.pg_number,
             votes_cast: pg.votes_cast,
             remainder_votes: pg.remainder_votes,
@@ -55,11 +55,11 @@ impl From<PoliticalGroupStanding> for PoliticalGroupSeatAssignment {
     }
 }
 
-/// Contains the standing for a specific political group. This is all the information
-/// that is needed to compute the apportionment for that specific political group.
+/// Contains the standing for a specific list. This is all the information
+/// that is needed to compute the apportionment for that specific list.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
-pub struct PoliticalGroupStanding {
-    /// Political group number for which this standing applies
+pub struct ListStanding {
+    /// List number for which this standing applies
     pg_number: PGNumber,
     /// The number of votes cast for this group
     votes_cast: u64,
@@ -69,16 +69,16 @@ pub struct PoliticalGroupStanding {
     meets_remainder_threshold: bool,
     /// The number of votes per seat if a new seat would be added to the current residual seats
     next_votes_per_seat: Fraction,
-    /// The number of full seats this political group got assigned
+    /// The number of full seats this list got assigned
     full_seats: u32,
-    /// The current number of residual seats this political group got assigned
+    /// The current number of residual seats this list got assigned
     residual_seats: u32,
 }
 
-impl PoliticalGroupStanding {
+impl ListStanding {
     /// Create a new instance computing the whole number of seats that
-    /// were assigned to a political group.
-    fn new(pg: &PoliticalGroupVotes, quota: Fraction) -> Self {
+    /// were assigned to a list.
+    fn new(pg: &ListVotes, quota: Fraction) -> Self {
         let votes_cast = Fraction::from(pg.list_votes);
         let pg_seats = if votes_cast > Fraction::ZERO {
             u32::try_from((votes_cast / quota).integer_part()).expect("pg_seats fit in u32")
@@ -89,10 +89,10 @@ impl PoliticalGroupStanding {
         let remainder_votes = votes_cast - (Fraction::from(pg_seats) * quota);
 
         debug!(
-            "Political group {} has {pg_seats} full seats with {} votes",
+            "List {} has {pg_seats} full seats with {} votes",
             pg.number, pg.list_votes
         );
-        PoliticalGroupStanding {
+        ListStanding {
             pg_number: pg.number,
             votes_cast: pg.list_votes.into(),
             remainder_votes,
@@ -103,10 +103,10 @@ impl PoliticalGroupStanding {
         }
     }
 
-    /// Add a residual seat to the political group and return the updated instance
+    /// Add a residual seat to the list and return the updated instance
     fn add_residual_seat(self) -> Self {
-        info!("Adding residual seat to political group {}", self.pg_number);
-        PoliticalGroupStanding {
+        info!("Adding residual seat to list {}", self.pg_number);
+        ListStanding {
             residual_seats: self.residual_seats + 1,
             next_votes_per_seat: Fraction::from(self.votes_cast)
                 / Fraction::from(self.total_seats() + 2),
@@ -114,7 +114,7 @@ impl PoliticalGroupStanding {
         }
     }
 
-    /// Returns the total number of seats assigned to this political group
+    /// Returns the total number of seats assigned to this list
     fn total_seats(&self) -> u32 {
         self.full_seats + self.residual_seats
     }
@@ -126,10 +126,10 @@ impl PoliticalGroupStanding {
 pub struct SeatChangeStep {
     residual_seat_number: Option<u32>,
     change: SeatChange,
-    standings: Vec<PoliticalGroupStanding>,
+    standings: Vec<ListStanding>,
 }
 
-/// Records the political group and specific change for a specific residual seat
+/// Records the list and specific change for a specific residual seat
 #[derive(Clone, Debug, PartialEq)]
 pub enum SeatChange {
     HighestAverageAssignment(HighestAverageAssignedSeat),
@@ -140,8 +140,8 @@ pub enum SeatChange {
 }
 
 impl SeatChange {
-    /// Get the political group number for the group this step has assigned a seat to
-    fn political_group_number_assigned(&self) -> PGNumber {
+    /// Get the list number for the list this step has assigned a seat to
+    fn list_number_assigned(&self) -> PGNumber {
         match self {
             Self::HighestAverageAssignment(highest_average_assigned_seat) => {
                 highest_average_assigned_seat.selected_pg_number
@@ -159,8 +159,8 @@ impl SeatChange {
         }
     }
 
-    /// Get the political group number for the group this step has retracted a seat from
-    fn political_group_number_retracted(&self) -> PGNumber {
+    /// Get the list number for the list this step has retracted a seat from
+    fn list_number_retracted(&self) -> PGNumber {
         match self {
             Self::HighestAverageAssignment(_) => unimplemented!(),
             Self::UniqueHighestAverageAssignment(_) => unimplemented!(),
@@ -174,7 +174,7 @@ impl SeatChange {
         }
     }
 
-    /// Get the list of political groups with the same average, that have not been assigned a seat
+    /// Get the list of lists with the same average, that have not been assigned a seat
     fn pg_options(&self) -> Vec<PGNumber> {
         match self {
             Self::HighestAverageAssignment(highest_average_assigned_seat) => {
@@ -191,7 +191,7 @@ impl SeatChange {
         }
     }
 
-    /// Get the list of political groups with the same average, that have been assigned a seat
+    /// Get the list of lists with the same average, that have been assigned a seat
     fn pg_assigned(&self) -> Vec<PGNumber> {
         match self {
             Self::HighestAverageAssignment(highest_average_assigned_seat) => {
@@ -232,83 +232,80 @@ impl SeatChange {
 /// Contains the details for an assigned seat, assigned through the highest average method.
 #[derive(Clone, Debug, PartialEq)]
 pub struct HighestAverageAssignedSeat {
-    /// The political group that was selected for this seat has this political group number
+    /// The list that was selected for this seat has this list number
     selected_pg_number: PGNumber,
-    /// The list of political groups with the same average, that have not been assigned a seat
+    /// Collection of lists with the same average, that have not been assigned a seat
     pg_options: Vec<PGNumber>,
-    /// The list of political groups with the same average, that have been assigned a seat
+    /// Collection of lists with the same average, that have been assigned a seat
     pg_assigned: Vec<PGNumber>,
-    /// The list of political groups that are exhausted, and will not be assigned a seat
+    /// Collection of lists that are exhausted, and will not be assigned a seat
     pg_exhausted: Vec<PGNumber>,
-    /// This is the votes per seat achieved by the selected political group
+    /// This is the votes per seat achieved by the selected list
     votes_per_seat: Fraction,
 }
 
 /// Contains the details for an assigned seat, assigned through the largest remainder method.
 #[derive(Clone, Debug, PartialEq)]
 pub struct LargestRemainderAssignedSeat {
-    /// The political group that was selected for this seat has this political group number
+    /// The list that was selected for this seat has this list number
     selected_pg_number: PGNumber,
-    /// The list of political groups with the same remainder, that have not been assigned a seat
+    /// Collection of lists with the same remainder, that have not been assigned a seat
     pg_options: Vec<PGNumber>,
-    /// The list of political groups with the same remainder, that have been assigned a seat
+    /// Collection of lists with the same remainder, that have been assigned a seat
     pg_assigned: Vec<PGNumber>,
-    /// The number of remainder votes achieved by the selected political group
+    /// The number of remainder votes achieved by the selected list
     remainder_votes: Fraction,
 }
 
 /// Contains information about the enactment of article P 9 of the Kieswet.
 #[derive(Clone, Debug, PartialEq)]
 pub struct AbsoluteMajorityReassignedSeat {
-    /// Political group number which the residual seat is retracted from
+    /// List number which the residual seat is retracted from
     pg_retracted_seat: PGNumber,
-    /// Political group number which the residual seat is assigned to
+    /// List number which the residual seat is assigned to
     pg_assigned_seat: PGNumber,
 }
 
 /// Contains information about the enactment of article P 10 of the Kieswet.
 #[derive(Clone, Debug, PartialEq)]
 pub struct ListExhaustionRemovedSeat {
-    /// Political group number which the seat is retracted from
+    /// List number which the seat is retracted from
     pg_retracted_seat: PGNumber,
     /// Whether the removed seat was a full seat
     full_seat: bool,
 }
 
-/// Initial construction of the data required per political group
-fn initial_full_seats_per_political_group(
-    pg_votes: &[PoliticalGroupVotes],
-    quota: Fraction,
-) -> Vec<PoliticalGroupStanding> {
+/// Initial construction of the data required per list
+fn initial_full_seats_per_list(pg_votes: &[ListVotes], quota: Fraction) -> Vec<ListStanding> {
     pg_votes
         .iter()
-        .map(|pg| PoliticalGroupStanding::new(pg, quota))
+        .map(|pg| ListStanding::new(pg, quota))
         .collect()
 }
 
-/// Compute the political groups with the highest average votes per seats.  
+/// Compute the lists with the highest average votes per seats.  
 /// This is determined based on seeing what would happen to the average votes
-/// per seat if one additional seat would be assigned to each political group.
+/// per seat if one additional seat would be assigned to each list.
 ///
-/// It then returns all the political groups for which this fraction is the largest.  
-/// If there are more political groups than there are residual seats to be assigned,
+/// It then returns all the lists for which this fraction is the largest.  
+/// If there are more lists than there are residual seats to be assigned,
 /// a drawing of lots is required.
 ///
 /// This function will always return at least one group.
-fn political_groups_with_highest_average<'a>(
-    standings: impl Iterator<Item = &'a PoliticalGroupStanding>,
+fn lists_with_highest_average<'a>(
+    standings: impl Iterator<Item = &'a ListStanding>,
     residual_seats: u32,
-) -> Result<Vec<&'a PoliticalGroupStanding>, ApportionmentError> {
-    // We are now going to find the political groups that have the highest average
+) -> Result<Vec<&'a ListStanding>, ApportionmentError> {
+    // We are now going to find the lists that have the highest average
     // votes per seat if we would were to add one additional seat to them
-    let (max_average, political_groups) = standings.fold(
+    let (max_average, lists) = standings.fold(
         (Fraction::ZERO, vec![]),
         |(current_max, mut max_groups), s| {
             // If this average is higher than any previously seen, we reset the list of groups matching
             if s.next_votes_per_seat > current_max {
                 (s.next_votes_per_seat, vec![s])
             } else {
-                // If the next average seats for this political group is the same as the
+                // If the next average seats for this list is the same as the
                 // max we add it to the list of groups that have that current maximum
                 if s.next_votes_per_seat == current_max {
                     max_groups.push(s);
@@ -318,47 +315,47 @@ fn political_groups_with_highest_average<'a>(
         },
     );
 
-    // Programming error if political groups is empty at this point
-    debug_assert!(!political_groups.is_empty());
+    // Programming error if lists is empty at this point
+    debug_assert!(!lists.is_empty());
 
     debug!(
-        "Found {max_average} votes per seat as the maximum for political groups: {:?}",
-        political_group_numbers(&political_groups)
+        "Found {max_average} votes per seat as the maximum for lists: {:?}",
+        list_numbers(&lists)
     );
 
-    // Check if we can actually assign all these political groups a seat, otherwise we would need to draw lots
-    if political_groups.len() > residual_seats as usize {
-        // TODO: #788 if multiple political groups have the same highest average and not enough residual seats are available, use drawing of lots
+    // Check if we can actually assign all these lists a seat, otherwise we would need to draw lots
+    if lists.len() > residual_seats as usize {
+        // TODO: #788 if multiple lists have the same highest average and not enough residual seats are available, use drawing of lots
         info!(
-            "Drawing of lots is required for political groups: {:?}, only {residual_seats} seat(s) available",
-            political_group_numbers(&political_groups)
+            "Drawing of lots is required for lists: {:?}, only {residual_seats} seat(s) available",
+            list_numbers(&lists)
         );
         Err(ApportionmentError::DrawingOfLotsNotImplemented)
     } else {
-        Ok(political_groups)
+        Ok(lists)
     }
 }
 
-/// Compute the political groups with the largest votes remainder.
+/// Compute the lists with the largest votes remainder.
 ///
-/// It returns all the political groups for which this remainder fraction is the largest.  
-/// If there are more political groups than there are residual seats to be assigned,
+/// It returns all the lists for which this remainder fraction is the largest.  
+/// If there are more lists than there are residual seats to be assigned,
 /// a drawing of lots is required.
 ///
 /// This function will always return at least one group.
-fn political_groups_with_largest_remainder<'a>(
-    standings: impl Iterator<Item = &'a PoliticalGroupStanding>,
+fn lists_with_largest_remainder<'a>(
+    standings: impl Iterator<Item = &'a ListStanding>,
     residual_seats: u32,
-) -> Result<Vec<&'a PoliticalGroupStanding>, ApportionmentError> {
-    // We are now going to find the political groups that have the largest remainder
-    let (max_remainder, political_groups) = standings.fold(
+) -> Result<Vec<&'a ListStanding>, ApportionmentError> {
+    // We are now going to find the lists that have the largest remainder
+    let (max_remainder, lists) = standings.fold(
         (Fraction::ZERO, vec![]),
         |(current_max, mut max_groups), s| {
             // If this remainder is higher than any previously seen, we reset the list of groups matching
             if s.remainder_votes > current_max {
                 (s.remainder_votes, vec![s])
             } else {
-                // If the remainder for this political group is the same as the
+                // If the remainder for this list is the same as the
                 // max we add it to the list of groups that have that current maximum
                 if s.remainder_votes == current_max {
                     max_groups.push(s);
@@ -368,41 +365,41 @@ fn political_groups_with_largest_remainder<'a>(
         },
     );
 
-    // Programming error if zero political groups were selected at this point
-    debug_assert!(!political_groups.is_empty());
+    // Programming error if zero lists were selected at this point
+    debug_assert!(!lists.is_empty());
 
     debug!(
-        "Found {max_remainder} remainder votes as the maximum for political groups: {:?}",
-        political_group_numbers(&political_groups)
+        "Found {max_remainder} remainder votes as the maximum for lists: {:?}",
+        list_numbers(&lists)
     );
 
-    // Check if we can actually assign all these political groups
-    if political_groups.len() > residual_seats as usize {
-        // TODO: #788 if multiple political groups have the same largest remainder and not enough residual seats are available, use drawing of lots
+    // Check if we can actually assign all these lists
+    if lists.len() > residual_seats as usize {
+        // TODO: #788 if multiple lists have the same largest remainder and not enough residual seats are available, use drawing of lots
         info!(
-            "Drawing of lots is required for political groups: {:?}, only {residual_seats} seat(s) available",
-            political_group_numbers(&political_groups)
+            "Drawing of lots is required for lists: {:?}, only {residual_seats} seat(s) available",
+            list_numbers(&lists)
         );
         Err(ApportionmentError::DrawingOfLotsNotImplemented)
     } else {
-        Ok(political_groups)
+        Ok(lists)
     }
 }
 
-/// If a political group got the absolute majority of votes but not the absolute majority of seats,
-/// re-assign the last residual seat to the political group with the absolute majority.  
+/// If a list got the absolute majority of votes but not the absolute majority of seats,
+/// re-assign the last residual seat to the list with the absolute majority.  
 /// This re-assignment is done according to article P 9 of the Kieswet.
 fn reassign_residual_seat_for_absolute_majority(
     seats: u32,
     total_votes: u32,
-    political_group_votes: &[PoliticalGroupVotes],
+    list_votes: &[ListVotes],
     pgs_last_residual_seat: &[PGNumber],
-    standings: Vec<PoliticalGroupStanding>,
-) -> Result<(Vec<PoliticalGroupStanding>, Option<SeatChange>), ApportionmentError> {
+    standings: Vec<ListStanding>,
+) -> Result<(Vec<ListStanding>, Option<SeatChange>), ApportionmentError> {
     let half_of_votes_count: Fraction = Fraction::from(total_votes) * Fraction::new(1, 2);
 
-    // Find political group with an absolute majority of votes. Return early if we find none
-    let Some(majority_pg_votes) = political_group_votes
+    // Find list with an absolute majority of votes. Return early if we find none
+    let Some(majority_pg_votes) = list_votes
         .iter()
         .find(|pg| Fraction::from(pg.list_votes) > half_of_votes_count)
     else {
@@ -420,7 +417,7 @@ fn reassign_residual_seat_for_absolute_majority(
     if pg_seats <= half_of_seats_count {
         if pgs_last_residual_seat.len() > 1 {
             info!(
-                "Drawing of lots is required for political groups: {:?} to pick a political group which the residual seat gets retracted from",
+                "Drawing of lots is required for lists: {:?} to pick a list which the residual seat gets retracted from",
                 pgs_last_residual_seat
             );
             return Err(ApportionmentError::DrawingOfLotsNotImplemented);
@@ -450,16 +447,13 @@ fn reassign_residual_seat_for_absolute_majority(
 }
 
 fn pg_numbers_with_exhausted_seats<'a>(
-    standings: impl Iterator<Item = &'a PoliticalGroupStanding>,
-    political_group_votes: &[PoliticalGroupVotes],
+    standings: impl Iterator<Item = &'a ListStanding>,
+    list_votes: &[ListVotes],
 ) -> Vec<(PGNumber, u32)> {
     standings.fold(vec![], |mut exhausted_pg_numbers_and_seats, s| {
-        let number_of_candidates = u32::try_from(
-            political_group_votes[s.pg_number as usize - 1]
-                .candidate_votes
-                .len(),
-        )
-        .expect("Number of candidates fits in u32");
+        let number_of_candidates =
+            u32::try_from(list_votes[s.pg_number as usize - 1].candidate_votes.len())
+                .expect("Number of candidates fits in u32");
 
         if number_of_candidates.cmp(&s.total_seats()) == Ordering::Less {
             exhausted_pg_numbers_and_seats
@@ -470,16 +464,13 @@ fn pg_numbers_with_exhausted_seats<'a>(
 }
 
 fn pg_numbers_without_empty_seats<'a>(
-    standings: impl Iterator<Item = &'a PoliticalGroupStanding>,
-    political_group_votes: &[PoliticalGroupVotes],
+    standings: impl Iterator<Item = &'a ListStanding>,
+    list_votes: &[ListVotes],
 ) -> Vec<PGNumber> {
     standings.fold(vec![], |mut pg_numbers_without_empty_seats, s| {
-        let number_of_candidates = u32::try_from(
-            political_group_votes[s.pg_number as usize - 1]
-                .candidate_votes
-                .len(),
-        )
-        .expect("Number of candidates fits in u32");
+        let number_of_candidates =
+            u32::try_from(list_votes[s.pg_number as usize - 1].candidate_votes.len())
+                .expect("Number of candidates fits in u32");
 
         if number_of_candidates.cmp(&s.total_seats()) == Ordering::Equal {
             pg_numbers_without_empty_seats.push(s.pg_number)
@@ -488,18 +479,17 @@ fn pg_numbers_without_empty_seats<'a>(
     })
 }
 
-/// If political groups got more seats than candidates on their lists,
-/// re-assign those excess seats to other political groups without exhausted lists.  
+/// If lists got more seats than candidates on their lists,
+/// re-assign those excess seats to other lists without exhausted lists.  
 /// This re-assignment is done according to article P 10 of the Kieswet.
 fn reassign_residual_seats_for_exhausted_lists(
-    previous_standings: Vec<PoliticalGroupStanding>,
+    previous_standings: Vec<ListStanding>,
     seats: u32,
-    political_group_votes: Vec<PoliticalGroupVotes>,
+    list_votes: Vec<ListVotes>,
     assigned_residual_seats: u32,
     previous_steps: Vec<SeatChangeStep>,
-) -> Result<(Vec<SeatChangeStep>, Vec<PoliticalGroupStanding>), ApportionmentError> {
-    let exhausted_lists =
-        pg_numbers_with_exhausted_seats(previous_standings.iter(), &political_group_votes);
+) -> Result<(Vec<SeatChangeStep>, Vec<ListStanding>), ApportionmentError> {
+    let exhausted_lists = pg_numbers_with_exhausted_seats(previous_standings.iter(), &list_votes);
     if !exhausted_lists.is_empty() {
         let mut current_standings = previous_standings.clone();
         let mut seats_to_reassign = 0;
@@ -540,7 +530,7 @@ fn reassign_residual_seats_for_exhausted_lists(
             assigned_residual_seats + seats_to_reassign,
             assigned_residual_seats,
             &current_steps,
-            Some(&political_group_votes),
+            Some(&list_votes),
         )?;
         Ok((current_steps, current_standings))
     } else {
@@ -566,8 +556,7 @@ pub fn seat_assignment(
     info!("Quota: {}", quota);
 
     // [Artikel P 6 Kieswet](https://wetten.overheid.nl/BWBR0004627/2026-01-01/#AfdelingII_HoofdstukP_Paragraaf2_ArtikelP6)
-    let initial_standing =
-        initial_full_seats_per_political_group(&input.political_group_votes, quota);
+    let initial_standing = initial_full_seats_per_list(&input.list_votes, quota);
     let full_seats = initial_standing.iter().map(|pg| pg.full_seats).sum::<u32>();
     let residual_seats = input.number_of_seats - full_seats;
 
@@ -590,7 +579,7 @@ pub fn seat_assignment(
         reassign_residual_seat_for_absolute_majority(
             input.number_of_seats,
             input.total_votes,
-            &input.political_group_votes,
+            &input.list_votes,
             &last_step.change.pg_assigned(),
             current_standings,
         )?
@@ -613,7 +602,7 @@ pub fn seat_assignment(
     let (final_steps, final_standing) = reassign_residual_seats_for_exhausted_lists(
         cumulative_standings,
         input.number_of_seats,
-        input.political_group_votes,
+        input.list_votes,
         residual_seats,
         steps,
     )?;
@@ -635,13 +624,13 @@ pub fn seat_assignment(
 /// These residual seats are assigned through two different procedures,
 /// depending on how many total seats are available in the election.
 fn assign_remainder(
-    initial_standings: &[PoliticalGroupStanding],
+    initial_standings: &[ListStanding],
     seats: u32,
     total_residual_seats: u32,
     current_residual_seat_number: u32,
     previous_steps: &[SeatChangeStep],
-    exclude_exhausted_lists: Option<&Vec<PoliticalGroupVotes>>,
-) -> Result<(Vec<SeatChangeStep>, Vec<PoliticalGroupStanding>), ApportionmentError> {
+    exclude_exhausted_lists: Option<&Vec<ListVotes>>,
+) -> Result<(Vec<SeatChangeStep>, Vec<ListStanding>), ApportionmentError> {
     let mut steps: Vec<SeatChangeStep> = previous_steps.to_vec();
     let mut residual_seat_number = current_residual_seat_number;
     let mut current_standings = initial_standings.to_vec();
@@ -681,7 +670,7 @@ fn assign_remainder(
         current_standings = current_standings
             .into_iter()
             .map(|s| {
-                if s.pg_number == change.political_group_number_assigned() {
+                if s.pg_number == change.list_number_assigned() {
                     s.add_residual_seat()
                 } else {
                     s
@@ -700,12 +689,12 @@ fn assign_remainder(
     Ok((steps, current_standings))
 }
 
-/// Get a vector with the political group number that was assigned the last residual seat.  
-/// If the last residual seat was assigned to a political group with the same
-/// remainder/votes per seat as political groups assigned a seat in previous steps,
-/// return all political group numbers that had the same remainder/votes per seat.
+/// Get a vector with the list number that was assigned the last residual seat.  
+/// If the last residual seat was assigned to a list with the same
+/// remainder/votes per seat as lists assigned a seat in previous steps,
+/// return all list numbers that had the same remainder/votes per seat.
 fn pg_assigned_from_previous_step(
-    selected_pg: &PoliticalGroupStanding,
+    selected_pg: &ListStanding,
     previous_steps: &[SeatChangeStep],
     matcher: fn(&SeatChange) -> bool,
 ) -> Vec<PGNumber> {
@@ -723,11 +712,11 @@ fn pg_assigned_from_previous_step(
     pg_assigned
 }
 
-/// Get an iterator that lists all the political group standings without exhausted lists.  
-fn non_exhausted_political_group_standings<'a>(
-    standings: impl IntoIterator<Item = &'a PoliticalGroupStanding>,
+/// Get an iterator that lists all the list standings without exhausted lists.  
+fn non_exhausted_list_standings<'a>(
+    standings: impl IntoIterator<Item = &'a ListStanding>,
     exhausted_pg_numbers: &[PGNumber],
-) -> impl Iterator<Item = &'a PoliticalGroupStanding> {
+) -> impl Iterator<Item = &'a ListStanding> {
     standings
         .into_iter()
         .filter(|&s| !exhausted_pg_numbers.contains(&s.pg_number))
@@ -736,18 +725,18 @@ fn non_exhausted_political_group_standings<'a>(
 /// Assign the next residual seat, and return which group that seat was assigned to.  
 /// This assignment is done according to the rules for elections with 19 seats or more.
 fn step_assign_remainder_using_highest_averages<'a>(
-    standings: impl Iterator<Item = &'a PoliticalGroupStanding>,
+    standings: impl Iterator<Item = &'a ListStanding>,
     residual_seats: u32,
     previous_steps: &[SeatChangeStep],
     exhausted_pg_numbers: &[PGNumber],
     unique: bool,
 ) -> Result<SeatChange, ApportionmentError> {
     let mut qualifying_for_highest_average =
-        non_exhausted_political_group_standings(standings, exhausted_pg_numbers).peekable();
+        non_exhausted_list_standings(standings, exhausted_pg_numbers).peekable();
 
     if qualifying_for_highest_average.peek().is_some() {
         let selected_pgs =
-            political_groups_with_highest_average(qualifying_for_highest_average, residual_seats)?;
+            lists_with_highest_average(qualifying_for_highest_average, residual_seats)?;
         let selected_pg = selected_pgs[0];
         let assigned_seat: HighestAverageAssignedSeat = HighestAverageAssignedSeat {
             selected_pg_number: selected_pg.pg_number,
@@ -775,7 +764,7 @@ fn step_assign_remainder_using_highest_averages<'a>(
     }
 }
 
-fn political_group_largest_remainder_assigned_seats(
+fn list_largest_remainder_assigned_seats(
     previous_steps: &[SeatChangeStep],
     pg_number: PGNumber,
 ) -> usize {
@@ -783,12 +772,12 @@ fn political_group_largest_remainder_assigned_seats(
         .iter()
         .filter(|prev| {
             prev.change.is_changed_by_largest_remainder_assignment()
-                && prev.change.political_group_number_assigned() == pg_number
+                && prev.change.list_number_assigned() == pg_number
         })
         .count()
 }
 
-fn political_group_unique_highest_average_assigned_seats(
+fn list_unique_highest_average_assigned_seats(
     previous_steps: &[SeatChangeStep],
     pg_number: PGNumber,
 ) -> usize {
@@ -797,12 +786,12 @@ fn political_group_unique_highest_average_assigned_seats(
         .filter(|prev| {
             prev.change
                 .is_changed_by_unique_highest_average_assignment()
-                && prev.change.political_group_number_assigned() == pg_number
+                && prev.change.list_number_assigned() == pg_number
         })
         .count()
 }
 
-fn political_group_qualifies_for_extra_seat(
+fn list_qualifies_for_extra_seat(
     number_of_seats_largest_remainders: usize,
     number_of_seats_unique_highest_averages_option: Option<usize>,
     previous_steps: &[SeatChangeStep],
@@ -810,7 +799,7 @@ fn political_group_qualifies_for_extra_seat(
 ) -> bool {
     let has_retracted_seat: bool = previous_steps.iter().any(|prev| {
         prev.change.is_changed_by_absolute_majority_reassignment()
-            && prev.change.political_group_number_retracted() == pg_number
+            && prev.change.list_number_retracted() == pg_number
     });
     if number_of_seats_unique_highest_averages_option.is_none() {
         number_of_seats_largest_remainders == 0
@@ -827,23 +816,23 @@ fn political_group_qualifies_for_extra_seat(
     }
 }
 
-/// Get an iterator that lists all the political groups that qualify for getting a seat through
+/// Get an iterator that lists all the lists that qualify for getting a seat through
 /// the largest remainder process.  
-/// This checks the previously assigned seats to make sure that only political groups that didn't
+/// This checks the previously assigned seats to make sure that only lists that didn't
 /// previously get a seat assigned are allowed to still get a seat through the remainder process,
 /// except when a seat was retracted.
-/// Additionally only political groups that met the threshold are considered for this process.
+/// Additionally only lists that met the threshold are considered for this process.
 /// This also removes groups that do not have more candidates to be assigned seats.
-fn political_group_standings_qualifying_for_largest_remainder<'a>(
-    standings: &'a [PoliticalGroupStanding],
+fn list_standings_qualifying_for_largest_remainder<'a>(
+    standings: &'a [ListStanding],
     previous_steps: &'a [SeatChangeStep],
     exhausted_pg_numbers: &[PGNumber],
-) -> impl Iterator<Item = &'a PoliticalGroupStanding> {
+) -> impl Iterator<Item = &'a ListStanding> {
     standings.iter().filter(|&s| {
         s.meets_remainder_threshold
             && !exhausted_pg_numbers.contains(&s.pg_number)
-            && political_group_qualifies_for_extra_seat(
-                political_group_largest_remainder_assigned_seats(previous_steps, s.pg_number),
+            && list_qualifies_for_extra_seat(
+                list_largest_remainder_assigned_seats(previous_steps, s.pg_number),
                 None,
                 previous_steps,
                 s.pg_number,
@@ -851,20 +840,20 @@ fn political_group_standings_qualifying_for_largest_remainder<'a>(
     })
 }
 
-/// Get an iterator that lists all the political groups that qualify for unique highest average.
-/// This checks the previously assigned seats to make sure that every group that already
+/// Get an iterator that lists all the lists that qualify for unique highest average.
+/// This checks the previously assigned seats to make sure that every list that already
 /// got a residual seat through the highest average procedure does not qualify
 /// except when a seat was retracted.
-fn political_group_standings_qualifying_for_unique_highest_average<'a>(
-    standings: &'a [PoliticalGroupStanding],
+fn list_standings_qualifying_for_unique_highest_average<'a>(
+    standings: &'a [ListStanding],
     previous_steps: &'a [SeatChangeStep],
     exhausted_pg_numbers: &[PGNumber],
-) -> impl Iterator<Item = &'a PoliticalGroupStanding> {
+) -> impl Iterator<Item = &'a ListStanding> {
     standings.iter().filter(|&s| {
         !exhausted_pg_numbers.contains(&s.pg_number)
-            && political_group_qualifies_for_extra_seat(
-                political_group_largest_remainder_assigned_seats(previous_steps, s.pg_number),
-                Some(political_group_unique_highest_average_assigned_seats(
+            && list_qualifies_for_extra_seat(
+                list_largest_remainder_assigned_seats(previous_steps, s.pg_number),
+                Some(list_unique_highest_average_assigned_seats(
                     previous_steps,
                     s.pg_number,
                 )),
@@ -877,13 +866,13 @@ fn political_group_standings_qualifying_for_unique_highest_average<'a>(
 /// Assign the next residual seat, and return which group that seat was assigned to.  
 /// This assignment is done according to the rules for elections with less than 19 seats.
 fn step_assign_remainder_using_largest_remainder(
-    standings: &[PoliticalGroupStanding],
+    standings: &[ListStanding],
     residual_seats: u32,
     previous_steps: &[SeatChangeStep],
     exhausted_pg_numbers: &[PGNumber],
 ) -> Result<SeatChange, ApportionmentError> {
-    // first we check if there are any political groups that still qualify for a largest remainder assigned seat
-    let mut qualifying_for_remainder = political_group_standings_qualifying_for_largest_remainder(
+    // first we check if there are any lists that still qualify for a largest remainder assigned seat
+    let mut qualifying_for_remainder = list_standings_qualifying_for_largest_remainder(
         standings,
         previous_steps,
         exhausted_pg_numbers,
@@ -893,8 +882,7 @@ fn step_assign_remainder_using_largest_remainder(
     // If there is at least one element in the iterator, we know we can still do a largest remainder assignment
     if qualifying_for_remainder.peek().is_some() {
         debug!("Assign residual seat using largest remainders method");
-        let selected_pgs =
-            political_groups_with_largest_remainder(qualifying_for_remainder, residual_seats)?;
+        let selected_pgs = lists_with_largest_remainder(qualifying_for_remainder, residual_seats)?;
         let selected_pg = selected_pgs[0];
         Ok(SeatChange::LargestRemainderAssignment(
             LargestRemainderAssignedSeat {
@@ -911,9 +899,9 @@ fn step_assign_remainder_using_largest_remainder(
     } else {
         // We've now exhausted the largest remainder seats, we now do unique highest average instead:
         // we allow every group to get a seat, not allowing any group to get a second residual seat
-        // while there are still political groups that did not get a residual seat.
+        // while there are still lists that did not get a residual seat.
         let mut qualifying_for_unique_highest_average =
-            political_group_standings_qualifying_for_unique_highest_average(
+            list_standings_qualifying_for_unique_highest_average(
                 standings,
                 previous_steps,
                 exhausted_pg_numbers,
@@ -945,8 +933,8 @@ fn step_assign_remainder_using_largest_remainder(
     }
 }
 
-/// Create a vector containing just the political group numbers from an iterator of the current standing
-fn political_group_numbers(standing: &[&PoliticalGroupStanding]) -> Vec<PGNumber> {
+/// Create a vector containing just the list numbers from an iterator of the current standing
+fn list_numbers(standing: &[&ListStanding]) -> Vec<PGNumber> {
     standing.iter().map(|s| s.pg_number).collect()
 }
 
@@ -962,7 +950,7 @@ pub fn get_total_seats_from_apportionment_result(result: &SeatAssignmentResult) 
 mod tests {
     use crate::{
         fraction::Fraction,
-        seat_assignment::{PoliticalGroupStanding, SeatChange, political_group_numbers},
+        seat_assignment::{ListStanding, SeatChange, list_numbers},
     };
     use test_log::test;
 
@@ -974,9 +962,9 @@ mod tests {
     }
 
     #[test]
-    fn test_political_group_numbers() {
+    fn test_list_numbers() {
         let standing = [
-            &PoliticalGroupStanding {
+            &ListStanding {
                 pg_number: 2,
                 votes_cast: 1249,
                 remainder_votes: Fraction::new(14975, 24),
@@ -985,7 +973,7 @@ mod tests {
                 full_seats: 1,
                 residual_seats: 0,
             },
-            &PoliticalGroupStanding {
+            &ListStanding {
                 pg_number: 3,
                 votes_cast: 1249,
                 remainder_votes: Fraction::new(14975, 24),
@@ -994,7 +982,7 @@ mod tests {
                 full_seats: 1,
                 residual_seats: 0,
             },
-            &PoliticalGroupStanding {
+            &ListStanding {
                 pg_number: 4,
                 votes_cast: 1249,
                 remainder_votes: Fraction::new(14975, 24),
@@ -1003,7 +991,7 @@ mod tests {
                 full_seats: 1,
                 residual_seats: 0,
             },
-            &PoliticalGroupStanding {
+            &ListStanding {
                 pg_number: 5,
                 votes_cast: 1249,
                 remainder_votes: Fraction::new(14975, 24),
@@ -1012,7 +1000,7 @@ mod tests {
                 full_seats: 1,
                 residual_seats: 0,
             },
-            &PoliticalGroupStanding {
+            &ListStanding {
                 pg_number: 6,
                 votes_cast: 1249,
                 remainder_votes: Fraction::new(14975, 24),
@@ -1022,7 +1010,7 @@ mod tests {
                 residual_seats: 0,
             },
         ];
-        assert_eq!(political_group_numbers(&standing), vec![2, 3, 4, 5, 6]);
+        assert_eq!(list_numbers(&standing), vec![2, 3, 4, 5, 6]);
     }
 
     /// Tests apportionment for councils with less than 19 seats
@@ -1068,8 +1056,8 @@ mod tests {
             assert_eq!(result.full_seats, 13);
             assert_eq!(result.residual_seats, 2);
             assert_eq!(result.steps.len(), 2);
-            assert_eq!(result.steps[0].change.political_group_number_assigned(), 1);
-            assert_eq!(result.steps[1].change.political_group_number_assigned(), 7);
+            assert_eq!(result.steps[0].change.list_number_assigned(), 1);
+            assert_eq!(result.steps[1].change.list_number_assigned(), 7);
             let total_seats = get_total_seats_from_apportionment_result(&result);
             assert_eq!(total_seats, vec![7, 2, 2, 1, 1, 1, 1, 0]);
         }
@@ -1079,7 +1067,7 @@ mod tests {
         /// Full seats: [10, 0, 0, 0, 0, 0, 0, 0] - Remainder seats: 5  
         /// Remainders: [8, 59, 58, 57, 56, 55, 54, 53], only votes of list 1 meet the threshold of 75% of the quota  
         /// 1 - largest remainder: seat assigned to list 1  
-        /// 1st round of highest averages method (assignment to unique political groups):  
+        /// 1st round of highest averages method (assignment to unique lists):  
         /// 2 - highest average: [67 4/12, 59, 58, 57, 56, 55, 54, 53] seat assigned to list 1  
         /// 3 - highest average: [62 2/13, 59, 58, 57, 56, 55, 54, 53] seat assigned to list 2  
         /// 4 - highest average: [62 2/13, 29 1/2, 58, 57, 56, 55, 54, 53] seat assigned to list 3  
@@ -1094,11 +1082,11 @@ mod tests {
             assert_eq!(result.full_seats, 10);
             assert_eq!(result.residual_seats, 5);
             assert_eq!(result.steps.len(), 5);
-            assert_eq!(result.steps[0].change.political_group_number_assigned(), 1);
-            assert_eq!(result.steps[1].change.political_group_number_assigned(), 1);
-            assert_eq!(result.steps[2].change.political_group_number_assigned(), 2);
-            assert_eq!(result.steps[3].change.political_group_number_assigned(), 3);
-            assert_eq!(result.steps[4].change.political_group_number_assigned(), 4);
+            assert_eq!(result.steps[0].change.list_number_assigned(), 1);
+            assert_eq!(result.steps[1].change.list_number_assigned(), 1);
+            assert_eq!(result.steps[2].change.list_number_assigned(), 2);
+            assert_eq!(result.steps[3].change.list_number_assigned(), 3);
+            assert_eq!(result.steps[4].change.list_number_assigned(), 4);
             let total_seats = get_total_seats_from_apportionment_result(&result);
             assert_eq!(total_seats, vec![12, 1, 1, 1, 0, 0, 0, 0]);
         }
@@ -1120,9 +1108,9 @@ mod tests {
             assert_eq!(result.full_seats, 12);
             assert_eq!(result.residual_seats, 3);
             assert_eq!(result.steps.len(), 3);
-            assert_eq!(result.steps[0].change.political_group_number_assigned(), 1);
-            assert_eq!(result.steps[1].change.political_group_number_assigned(), 2);
-            assert_eq!(result.steps[2].change.political_group_number_assigned(), 3);
+            assert_eq!(result.steps[0].change.list_number_assigned(), 1);
+            assert_eq!(result.steps[1].change.list_number_assigned(), 2);
+            assert_eq!(result.steps[2].change.list_number_assigned(), 3);
             let total_seats = get_total_seats_from_apportionment_result(&result);
             assert_eq!(total_seats, vec![7, 4, 4, 0, 0, 0, 0, 0]);
         }
@@ -1131,7 +1119,7 @@ mod tests {
         ///
         /// Full seats: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0] - Remainder seats: 3  
         /// Remainders: [8, 7, 6, 5, 4, 3, 2, 1, 1, 1], no lists meet the threshold of 75% of the quota  
-        /// 1st round of highest averages method (assignment to unique political groups):  
+        /// 1st round of highest averages method (assignment to unique lists):  
         /// 1 - highest average: [8, 7, 6, 5, 4, 3, 2, 1, 1, 1] seat assigned to list 1  
         /// 2 - highest average: [4, 7, 6, 5, 4, 3, 2, 1, 1, 1] seat assigned to list 2  
         /// 3 - highest average: [4, 3 1/2, 6, 5, 4, 3, 2, 1, 1, 1] seat assigned to list 3
@@ -1145,9 +1133,9 @@ mod tests {
             assert_eq!(result.full_seats, 0);
             assert_eq!(result.residual_seats, 3);
             assert_eq!(result.steps.len(), 3);
-            assert_eq!(result.steps[0].change.political_group_number_assigned(), 1);
-            assert_eq!(result.steps[1].change.political_group_number_assigned(), 2);
-            assert_eq!(result.steps[2].change.political_group_number_assigned(), 3);
+            assert_eq!(result.steps[0].change.list_number_assigned(), 1);
+            assert_eq!(result.steps[1].change.list_number_assigned(), 2);
+            assert_eq!(result.steps[2].change.list_number_assigned(), 3);
             let total_seats = get_total_seats_from_apportionment_result(&result);
             assert_eq!(total_seats, vec![1, 1, 1, 0, 0, 0, 0, 0, 0, 0]);
         }
@@ -1157,7 +1145,7 @@ mod tests {
         /// Full seats: [0, 0, 0, 0, 0, 7] - Remainder seats: 3  
         /// Remainders: [0/10, 3, 5, 6, 7, 9], only votes of list 6 meet the threshold of 75% of the quota  
         ///  1 - largest remainder: seat assigned to list 6  
-        /// 1st round of highest averages method (assignment to unique political groups):  
+        /// 1st round of highest averages method (assignment to unique lists):  
         ///  2 - highest average: [0/1, 3, 5, 6, 7, 8 7/8] seat assigned to list 6  
         ///  3 - highest average: [0/1, 3, 5, 6, 7, 7 9/10] seat assigned to list 5
         #[test]
@@ -1168,9 +1156,9 @@ mod tests {
             assert_eq!(result.full_seats, 7);
             assert_eq!(result.residual_seats, 3);
             assert_eq!(result.steps.len(), 3);
-            assert_eq!(result.steps[0].change.political_group_number_assigned(), 6);
-            assert_eq!(result.steps[1].change.political_group_number_assigned(), 6);
-            assert_eq!(result.steps[2].change.political_group_number_assigned(), 5);
+            assert_eq!(result.steps[0].change.list_number_assigned(), 6);
+            assert_eq!(result.steps[1].change.list_number_assigned(), 6);
+            assert_eq!(result.steps[2].change.list_number_assigned(), 5);
             let total_seats = get_total_seats_from_apportionment_result(&result);
             assert_eq!(total_seats, [0, 0, 0, 0, 1, 9]);
         }
@@ -1204,16 +1192,16 @@ mod tests {
             assert_eq!(result.full_seats, 12);
             assert_eq!(result.residual_seats, 3);
             assert_eq!(result.steps.len(), 4);
-            assert_eq!(result.steps[0].change.political_group_number_assigned(), 2);
-            assert_eq!(result.steps[1].change.political_group_number_assigned(), 3);
-            assert_eq!(result.steps[2].change.political_group_number_assigned(), 4);
+            assert_eq!(result.steps[0].change.list_number_assigned(), 2);
+            assert_eq!(result.steps[1].change.list_number_assigned(), 3);
+            assert_eq!(result.steps[2].change.list_number_assigned(), 4);
             assert!(
                 result.steps[3]
                     .change
                     .is_changed_by_absolute_majority_reassignment()
             );
-            assert_eq!(result.steps[3].change.political_group_number_retracted(), 4);
-            assert_eq!(result.steps[3].change.political_group_number_assigned(), 1);
+            assert_eq!(result.steps[3].change.list_number_retracted(), 4);
+            assert_eq!(result.steps[3].change.list_number_assigned(), 1);
             let total_seats = get_total_seats_from_apportionment_result(&result);
             assert_eq!(total_seats, vec![8, 3, 2, 1, 1]);
         }
@@ -1234,7 +1222,7 @@ mod tests {
             /// 1 - largest remainder: seat assigned to list 2  
             /// 2 - largest remainder: seat assigned to list 3  
             /// 3 - largest remainder: seat assigned to list 4  
-            /// 4 - Drawing of lots is required for political groups: [2, 3, 4] to pick a political group which the residual seat gets retracted from
+            /// 4 - Drawing of lots is required for lists: [2, 3, 4] to pick a list which the residual seat gets retracted from
             #[test]
             fn test_with_absolute_majority_of_votes_but_not_seats_with_drawing_of_lots_error() {
                 let input = seat_assignment_fixture_with_default_50_candidates(
@@ -1250,7 +1238,7 @@ mod tests {
             /// Full seats: [6, 2, 2, 1, 1, 1, 0, 0] - Remainder seats: 2  
             /// Remainders: [60, 0/15, 0/15, 0/15, 0/15, 0/15, 55, 45]  
             /// 1 - largest remainder: seat assigned to list 1  
-            /// 2 - Drawing of lots is required for political groups: [2, 3, 4, 5, 6], only 1 seat available
+            /// 2 - Drawing of lots is required for lists: [2, 3, 4, 5, 6], only 1 seat available
             #[test]
             fn test_with_0_remainders_drawing_of_lots_error() {
                 let input = seat_assignment_fixture_with_default_50_candidates(
@@ -1265,7 +1253,7 @@ mod tests {
             ///
             /// Full seats: [6, 1, 1, 1, 1, 1] - Remainder seats: 4  
             /// Remainders: [20, 60, 60, 60, 60, 60]  
-            /// 1 - Drawing of lots is required for political groups: [2, 3, 4, 5, 6], only 4 seats available
+            /// 1 - Drawing of lots is required for lists: [2, 3, 4, 5, 6], only 4 seats available
             #[test]
             fn test_with_drawing_of_lots_error() {
                 let input = seat_assignment_fixture_with_default_50_candidates(
@@ -1315,8 +1303,8 @@ mod tests {
                         .change
                         .is_changed_by_list_exhaustion_removal()
                 );
-                assert_eq!(result.steps[0].change.political_group_number_retracted(), 1);
-                assert_eq!(result.steps[1].change.political_group_number_assigned(), 5);
+                assert_eq!(result.steps[0].change.list_number_retracted(), 1);
+                assert_eq!(result.steps[1].change.list_number_assigned(), 5);
                 let total_seats = get_total_seats_from_apportionment_result(&result);
                 assert_eq!(total_seats, vec![4, 4, 3, 2, 2]);
             }
@@ -1358,22 +1346,19 @@ mod tests {
                 assert_eq!(result.full_seats, 11);
                 assert_eq!(result.residual_seats, 6);
                 assert_eq!(result.steps.len(), 8);
-                assert_eq!(result.steps[0].change.political_group_number_assigned(), 3);
-                assert_eq!(result.steps[1].change.political_group_number_assigned(), 11);
-                assert_eq!(result.steps[2].change.political_group_number_assigned(), 9);
-                assert_eq!(result.steps[3].change.political_group_number_assigned(), 10);
-                assert_eq!(result.steps[4].change.political_group_number_assigned(), 1);
-                assert_eq!(result.steps[5].change.political_group_number_assigned(), 4);
+                assert_eq!(result.steps[0].change.list_number_assigned(), 3);
+                assert_eq!(result.steps[1].change.list_number_assigned(), 11);
+                assert_eq!(result.steps[2].change.list_number_assigned(), 9);
+                assert_eq!(result.steps[3].change.list_number_assigned(), 10);
+                assert_eq!(result.steps[4].change.list_number_assigned(), 1);
+                assert_eq!(result.steps[5].change.list_number_assigned(), 4);
                 assert!(
                     result.steps[6]
                         .change
                         .is_changed_by_list_exhaustion_removal()
                 );
-                assert_eq!(
-                    result.steps[6].change.political_group_number_retracted(),
-                    10
-                );
-                assert_eq!(result.steps[7].change.political_group_number_assigned(), 6);
+                assert_eq!(result.steps[6].change.list_number_retracted(), 10);
+                assert_eq!(result.steps[7].change.list_number_assigned(), 6);
                 let total_seats = get_total_seats_from_apportionment_result(&result);
                 assert_eq!(total_seats, vec![3, 1, 2, 2, 1, 2, 1, 0, 3, 1, 1]);
             }
@@ -1383,7 +1368,7 @@ mod tests {
             /// Full seats: [0, 0, 0, 0, 0, 7] - Remainder seats: 3  
             /// Remainders: [0/10, 3, 5, 6, 7, 9], only votes of list 6 meet the threshold of 75% of the quota  
             ///  1 - largest remainder: seat assigned to list 6  
-            /// 1st round of highest averages method (assignment to unique political groups):  
+            /// 1st round of highest averages method (assignment to unique lists):  
             ///  2 - highest average: [0/1, 3, 5, 6, 7, 8 7/8] seat assigned to list 6  
             ///  3 - highest average: [0/1, 3, 5, 6, 7, 7 9/10] seat assigned to list 5  
             ///  4 - Seat first assigned to list 6 has been removed and
@@ -1407,16 +1392,16 @@ mod tests {
                 assert_eq!(result.full_seats, 7);
                 assert_eq!(result.residual_seats, 3);
                 assert_eq!(result.steps.len(), 5);
-                assert_eq!(result.steps[0].change.political_group_number_assigned(), 6);
-                assert_eq!(result.steps[1].change.political_group_number_assigned(), 6);
-                assert_eq!(result.steps[2].change.political_group_number_assigned(), 5);
+                assert_eq!(result.steps[0].change.list_number_assigned(), 6);
+                assert_eq!(result.steps[1].change.list_number_assigned(), 6);
+                assert_eq!(result.steps[2].change.list_number_assigned(), 5);
                 assert!(
                     result.steps[3]
                         .change
                         .is_changed_by_list_exhaustion_removal()
                 );
-                assert_eq!(result.steps[3].change.political_group_number_retracted(), 6);
-                assert_eq!(result.steps[4].change.political_group_number_assigned(), 4);
+                assert_eq!(result.steps[3].change.list_number_retracted(), 6);
+                assert_eq!(result.steps[4].change.list_number_assigned(), 4);
                 let total_seats = get_total_seats_from_apportionment_result(&result);
                 assert_eq!(total_seats, [0, 0, 0, 1, 1, 8]);
             }
@@ -1434,10 +1419,10 @@ mod tests {
             ///      will be assigned to another list in accordance with Article P 10 Kieswet  
             ///  5 - Seat first assigned to list 3 has been removed and
             ///      will be assigned to another list in accordance with Article P 10 Kieswet  
-            /// 1st round of highest averages method (assignment to unique political groups):  
+            /// 1st round of highest averages method (assignment to unique lists):  
             ///  6 - highest average: [5, 5, 7 1/7] seat assigned to list 1  
             ///  7 - highest average: [2 1/2, 5, 7 1/7] seat assigned to list 2  
-            /// 2nd round of highest averages method (assignment to any political group):  
+            /// 2nd round of highest averages method (assignment to any list):  
             ///  8 - highest average: [2 1/2, 2 1/2, 7 1/7] seat assigned to list 1  
             ///  9 - highest average: [1 2/3, 2 1/2, 7 1/7] seat assigned to list 2
             #[test]
@@ -1451,35 +1436,35 @@ mod tests {
                 assert_eq!(result.full_seats, 2);
                 assert_eq!(result.residual_seats, 4);
                 assert_eq!(result.steps.len(), 9);
-                assert_eq!(result.steps[0].change.political_group_number_assigned(), 3);
+                assert_eq!(result.steps[0].change.list_number_assigned(), 3);
                 assert!(
                     result.steps[1]
                         .change
                         .is_changed_by_list_exhaustion_removal()
                 );
-                assert_eq!(result.steps[1].change.political_group_number_retracted(), 3);
+                assert_eq!(result.steps[1].change.list_number_retracted(), 3);
                 assert!(
                     result.steps[2]
                         .change
                         .is_changed_by_list_exhaustion_removal()
                 );
-                assert_eq!(result.steps[2].change.political_group_number_retracted(), 3);
+                assert_eq!(result.steps[2].change.list_number_retracted(), 3);
                 assert!(
                     result.steps[3]
                         .change
                         .is_changed_by_list_exhaustion_removal()
                 );
-                assert_eq!(result.steps[3].change.political_group_number_retracted(), 3);
+                assert_eq!(result.steps[3].change.list_number_retracted(), 3);
                 assert!(
                     result.steps[4]
                         .change
                         .is_changed_by_list_exhaustion_removal()
                 );
-                assert_eq!(result.steps[4].change.political_group_number_retracted(), 3);
-                assert_eq!(result.steps[5].change.political_group_number_assigned(), 1);
-                assert_eq!(result.steps[6].change.political_group_number_assigned(), 2);
-                assert_eq!(result.steps[7].change.political_group_number_assigned(), 1);
-                assert_eq!(result.steps[8].change.political_group_number_assigned(), 2);
+                assert_eq!(result.steps[4].change.list_number_retracted(), 3);
+                assert_eq!(result.steps[5].change.list_number_assigned(), 1);
+                assert_eq!(result.steps[6].change.list_number_assigned(), 2);
+                assert_eq!(result.steps[7].change.list_number_assigned(), 1);
+                assert_eq!(result.steps[8].change.list_number_assigned(), 2);
                 let total_seats = get_total_seats_from_apportionment_result(&result);
                 assert_eq!(total_seats, [2, 2, 2]);
             }
@@ -1497,10 +1482,10 @@ mod tests {
             ///      will be assigned to another list in accordance with Article P 10 Kieswet  
             ///  5 - Seat first assigned to list 3 has been removed and
             ///      will be assigned to another list in accordance with Article P 10 Kieswet  
-            /// 1st round of highest averages method (assignment to unique political groups):  
+            /// 1st round of highest averages method (assignment to unique lists):  
             ///  6 - highest average: [6, 4, 7 1/7] seat assigned to list 1  
             ///  7 - highest average: [3, 4, 7 1/7] seat assigned to list 2  
-            /// 2nd round of highest averages method (assignment to any political group):  
+            /// 2nd round of highest averages method (assignment to any list):  
             ///  8 - highest average: [3, 2, 7 1/7] seat assigned to list 1  
             ///  9 - highest average: [2, 2, 7 1/7] seat assigned to list 2
             #[test]
@@ -1514,35 +1499,35 @@ mod tests {
                 assert_eq!(result.full_seats, 2);
                 assert_eq!(result.residual_seats, 4);
                 assert_eq!(result.steps.len(), 9);
-                assert_eq!(result.steps[0].change.political_group_number_assigned(), 3);
+                assert_eq!(result.steps[0].change.list_number_assigned(), 3);
                 assert!(
                     result.steps[1]
                         .change
                         .is_changed_by_list_exhaustion_removal()
                 );
-                assert_eq!(result.steps[1].change.political_group_number_retracted(), 3);
+                assert_eq!(result.steps[1].change.list_number_retracted(), 3);
                 assert!(
                     result.steps[2]
                         .change
                         .is_changed_by_list_exhaustion_removal()
                 );
-                assert_eq!(result.steps[2].change.political_group_number_retracted(), 3);
+                assert_eq!(result.steps[2].change.list_number_retracted(), 3);
                 assert!(
                     result.steps[3]
                         .change
                         .is_changed_by_list_exhaustion_removal()
                 );
-                assert_eq!(result.steps[3].change.political_group_number_retracted(), 3);
+                assert_eq!(result.steps[3].change.list_number_retracted(), 3);
                 assert!(
                     result.steps[4]
                         .change
                         .is_changed_by_list_exhaustion_removal()
                 );
-                assert_eq!(result.steps[4].change.political_group_number_retracted(), 3);
-                assert_eq!(result.steps[5].change.political_group_number_assigned(), 1);
-                assert_eq!(result.steps[6].change.political_group_number_assigned(), 2);
-                assert_eq!(result.steps[7].change.political_group_number_assigned(), 1);
-                assert_eq!(result.steps[8].change.political_group_number_assigned(), 2);
+                assert_eq!(result.steps[4].change.list_number_retracted(), 3);
+                assert_eq!(result.steps[5].change.list_number_assigned(), 1);
+                assert_eq!(result.steps[6].change.list_number_assigned(), 2);
+                assert_eq!(result.steps[7].change.list_number_assigned(), 1);
+                assert_eq!(result.steps[8].change.list_number_assigned(), 2);
                 let total_seats = get_total_seats_from_apportionment_result(&result);
                 assert_eq!(total_seats, [2, 2, 2]);
             }
@@ -1575,23 +1560,23 @@ mod tests {
                 assert_eq!(result.full_seats, 12);
                 assert_eq!(result.residual_seats, 3);
                 assert_eq!(result.steps.len(), 6);
-                assert_eq!(result.steps[0].change.political_group_number_assigned(), 2);
-                assert_eq!(result.steps[1].change.political_group_number_assigned(), 3);
-                assert_eq!(result.steps[2].change.political_group_number_assigned(), 4);
+                assert_eq!(result.steps[0].change.list_number_assigned(), 2);
+                assert_eq!(result.steps[1].change.list_number_assigned(), 3);
+                assert_eq!(result.steps[2].change.list_number_assigned(), 4);
                 assert!(
                     result.steps[3]
                         .change
                         .is_changed_by_absolute_majority_reassignment()
                 );
-                assert_eq!(result.steps[3].change.political_group_number_retracted(), 4);
-                assert_eq!(result.steps[3].change.political_group_number_assigned(), 1);
+                assert_eq!(result.steps[3].change.list_number_retracted(), 4);
+                assert_eq!(result.steps[3].change.list_number_assigned(), 1);
                 assert!(
                     result.steps[4]
                         .change
                         .is_changed_by_list_exhaustion_removal()
                 );
-                assert_eq!(result.steps[4].change.political_group_number_retracted(), 1);
-                assert_eq!(result.steps[5].change.political_group_number_assigned(), 4);
+                assert_eq!(result.steps[4].change.list_number_retracted(), 1);
+                assert_eq!(result.steps[5].change.list_number_assigned(), 4);
                 let total_seats = get_total_seats_from_apportionment_result(&result);
                 assert_eq!(total_seats, vec![7, 3, 2, 2, 1]);
             }
@@ -1608,7 +1593,7 @@ mod tests {
             /// 4 - Seat first assigned to list 2 has been removed and
             ///     will be assigned to another list in accordance with Article P 10 Kieswet  
             /// 5 - largest remainder: seat assigned to list 1  
-            /// 1st round of highest averages method (assignment to unique political groups):  
+            /// 1st round of highest averages method (assignment to unique lists):  
             /// 6 - highest average: [6 2/5, 8 1/5, 7] seat assigned to list 3
             #[test]
             fn test_with_absolute_majority_of_votes_but_not_seats_and_list_exhaustion_triggering_unique_highest_averages_assignment()
@@ -1621,28 +1606,28 @@ mod tests {
                 assert_eq!(result.full_seats, 6);
                 assert_eq!(result.residual_seats, 2);
                 assert_eq!(result.steps.len(), 6);
-                assert_eq!(result.steps[0].change.political_group_number_assigned(), 1);
+                assert_eq!(result.steps[0].change.list_number_assigned(), 1);
                 assert!(
                     result.steps[1]
                         .change
                         .is_changed_by_absolute_majority_reassignment()
                 );
-                assert_eq!(result.steps[1].change.political_group_number_retracted(), 1);
-                assert_eq!(result.steps[1].change.political_group_number_assigned(), 2);
+                assert_eq!(result.steps[1].change.list_number_retracted(), 1);
+                assert_eq!(result.steps[1].change.list_number_assigned(), 2);
                 assert!(
                     result.steps[2]
                         .change
                         .is_changed_by_list_exhaustion_removal()
                 );
-                assert_eq!(result.steps[2].change.political_group_number_retracted(), 2);
+                assert_eq!(result.steps[2].change.list_number_retracted(), 2);
                 assert!(
                     result.steps[3]
                         .change
                         .is_changed_by_list_exhaustion_removal()
                 );
-                assert_eq!(result.steps[3].change.political_group_number_retracted(), 2);
-                assert_eq!(result.steps[4].change.political_group_number_assigned(), 1);
-                assert_eq!(result.steps[5].change.political_group_number_assigned(), 3);
+                assert_eq!(result.steps[3].change.list_number_retracted(), 2);
+                assert_eq!(result.steps[4].change.list_number_assigned(), 1);
+                assert_eq!(result.steps[5].change.list_number_assigned(), 3);
                 let total_seats = get_total_seats_from_apportionment_result(&result);
                 assert_eq!(total_seats, [4, 3, 1]);
             }
@@ -1661,7 +1646,7 @@ mod tests {
             /// 5 - Seat first assigned to list 1 has been removed and
             ///     will be assigned to another list in accordance with Article P 10 Kieswet  
             /// 6 - largest remainder: seat assigned to list 3  
-            /// 1st round of highest averages method (assignment to unique political groups):  
+            /// 1st round of highest averages method (assignment to unique lists):  
             /// 7 - highest average: [107 2/5, 10, 85 1/5] seat assigned to list 3  
             /// 8 - highest average: [107 2/5, 10, 71] seat assigned to list 2
             #[test]
@@ -1675,35 +1660,35 @@ mod tests {
                 assert_eq!(result.full_seats, 5);
                 assert_eq!(result.residual_seats, 3);
                 assert_eq!(result.steps.len(), 8);
-                assert_eq!(result.steps[0].change.political_group_number_assigned(), 3);
+                assert_eq!(result.steps[0].change.list_number_assigned(), 3);
                 assert!(
                     result.steps[1]
                         .change
                         .is_changed_by_absolute_majority_reassignment()
                 );
-                assert_eq!(result.steps[1].change.political_group_number_retracted(), 3);
-                assert_eq!(result.steps[1].change.political_group_number_assigned(), 1);
+                assert_eq!(result.steps[1].change.list_number_retracted(), 3);
+                assert_eq!(result.steps[1].change.list_number_assigned(), 1);
                 assert!(
                     result.steps[2]
                         .change
                         .is_changed_by_list_exhaustion_removal()
                 );
-                assert_eq!(result.steps[2].change.political_group_number_retracted(), 1);
+                assert_eq!(result.steps[2].change.list_number_retracted(), 1);
                 assert!(
                     result.steps[3]
                         .change
                         .is_changed_by_list_exhaustion_removal()
                 );
-                assert_eq!(result.steps[3].change.political_group_number_retracted(), 1);
+                assert_eq!(result.steps[3].change.list_number_retracted(), 1);
                 assert!(
                     result.steps[4]
                         .change
                         .is_changed_by_list_exhaustion_removal()
                 );
-                assert_eq!(result.steps[4].change.political_group_number_retracted(), 1);
-                assert_eq!(result.steps[5].change.political_group_number_assigned(), 3);
-                assert_eq!(result.steps[6].change.political_group_number_assigned(), 3);
-                assert_eq!(result.steps[7].change.political_group_number_assigned(), 2);
+                assert_eq!(result.steps[4].change.list_number_retracted(), 1);
+                assert_eq!(result.steps[5].change.list_number_assigned(), 3);
+                assert_eq!(result.steps[6].change.list_number_assigned(), 3);
+                assert_eq!(result.steps[7].change.list_number_assigned(), 2);
                 let total_seats = get_total_seats_from_apportionment_result(&result);
                 assert_eq!(total_seats, [2, 1, 5]);
             }
@@ -1803,10 +1788,10 @@ mod tests {
             assert_eq!(result.full_seats, 19);
             assert_eq!(result.residual_seats, 4);
             assert_eq!(result.steps.len(), 4);
-            assert_eq!(result.steps[0].change.political_group_number_assigned(), 5);
-            assert_eq!(result.steps[1].change.political_group_number_assigned(), 2);
-            assert_eq!(result.steps[2].change.political_group_number_assigned(), 1);
-            assert_eq!(result.steps[3].change.political_group_number_assigned(), 4);
+            assert_eq!(result.steps[0].change.list_number_assigned(), 5);
+            assert_eq!(result.steps[1].change.list_number_assigned(), 2);
+            assert_eq!(result.steps[2].change.list_number_assigned(), 1);
+            assert_eq!(result.steps[3].change.list_number_assigned(), 4);
             let total_seats = get_total_seats_from_apportionment_result(&result);
             assert_eq!(total_seats, vec![12, 6, 1, 2, 2]);
         }
@@ -1831,13 +1816,13 @@ mod tests {
             assert_eq!(result.full_seats, 12);
             assert_eq!(result.residual_seats, 7);
             assert_eq!(result.steps.len(), 7);
-            assert_eq!(result.steps[0].change.political_group_number_assigned(), 1);
-            assert_eq!(result.steps[1].change.political_group_number_assigned(), 1);
-            assert_eq!(result.steps[2].change.political_group_number_assigned(), 2);
-            assert_eq!(result.steps[3].change.political_group_number_assigned(), 3);
-            assert_eq!(result.steps[4].change.political_group_number_assigned(), 4);
-            assert_eq!(result.steps[5].change.political_group_number_assigned(), 5);
-            assert_eq!(result.steps[6].change.political_group_number_assigned(), 1);
+            assert_eq!(result.steps[0].change.list_number_assigned(), 1);
+            assert_eq!(result.steps[1].change.list_number_assigned(), 1);
+            assert_eq!(result.steps[2].change.list_number_assigned(), 2);
+            assert_eq!(result.steps[3].change.list_number_assigned(), 3);
+            assert_eq!(result.steps[4].change.list_number_assigned(), 4);
+            assert_eq!(result.steps[5].change.list_number_assigned(), 5);
+            assert_eq!(result.steps[6].change.list_number_assigned(), 1);
             let total_seats = get_total_seats_from_apportionment_result(&result);
             assert_eq!(total_seats, vec![15, 1, 1, 1, 1, 0, 0, 0, 0]);
         }
@@ -1873,19 +1858,19 @@ mod tests {
             assert_eq!(result.full_seats, 18);
             assert_eq!(result.residual_seats, 6);
             assert_eq!(result.steps.len(), 7);
-            assert_eq!(result.steps[0].change.political_group_number_assigned(), 2);
-            assert_eq!(result.steps[1].change.political_group_number_assigned(), 3);
-            assert_eq!(result.steps[2].change.political_group_number_assigned(), 4);
-            assert_eq!(result.steps[3].change.political_group_number_assigned(), 5);
-            assert_eq!(result.steps[4].change.political_group_number_assigned(), 6);
-            assert_eq!(result.steps[5].change.political_group_number_assigned(), 7);
+            assert_eq!(result.steps[0].change.list_number_assigned(), 2);
+            assert_eq!(result.steps[1].change.list_number_assigned(), 3);
+            assert_eq!(result.steps[2].change.list_number_assigned(), 4);
+            assert_eq!(result.steps[3].change.list_number_assigned(), 5);
+            assert_eq!(result.steps[4].change.list_number_assigned(), 6);
+            assert_eq!(result.steps[5].change.list_number_assigned(), 7);
             assert!(
                 result.steps[6]
                     .change
                     .is_changed_by_absolute_majority_reassignment()
             );
-            assert_eq!(result.steps[6].change.political_group_number_retracted(), 7);
-            assert_eq!(result.steps[6].change.political_group_number_assigned(), 1);
+            assert_eq!(result.steps[6].change.list_number_retracted(), 7);
+            assert_eq!(result.steps[6].change.list_number_assigned(), 1);
             let total_seats = get_total_seats_from_apportionment_result(&result);
             assert_eq!(total_seats, vec![13, 2, 2, 2, 2, 2, 1, 0]);
         }
@@ -1908,7 +1893,7 @@ mod tests {
             /// 4 - highest average: [577, 416 1/3, 416 1/3, 416 1/3, 624 1/2, 624, 624, 8] seat assigned to list 5  
             /// 5 - highest average: [577, 416 1/3, 416 1/3, 416 1/3, 416 1/3, 624, 624, 8] seat assigned to list 6  
             /// 6 - highest average: [577, 416 1/3, 416 1/3, 416 1/3, 416 1/3, 416, 624, 8] seat assigned to list 7  
-            /// 7 - Drawing of lots is required for political groups: [6, 7] to pick a political group which the residual seat gets retracted from
+            /// 7 - Drawing of lots is required for lists: [6, 7] to pick a list which the residual seat gets retracted from
             #[test]
             fn test_with_absolute_majority_of_votes_but_not_seats_with_drawing_of_lots_error() {
                 let input = seat_assignment_fixture_with_default_50_candidates(
@@ -1923,7 +1908,7 @@ mod tests {
             ///
             /// Full seats: [9, 2, 2, 2, 2, 2] - Remainder seats: 4  
             /// 1 - highest average: [50, 46 2/3, 46 2/3, 46 2/3, 46 2/3, 46 2/3] seat assigned to list 1  
-            /// 2 - Drawing of lots is required for political groups: [2, 3, 4, 5, 6], only 3 seats available
+            /// 2 - Drawing of lots is required for lists: [2, 3, 4, 5, 6], only 3 seats available
             #[test]
             fn test_with_drawing_of_lots_error() {
                 let input = seat_assignment_fixture_with_default_50_candidates(
@@ -1972,8 +1957,8 @@ mod tests {
                         .change
                         .is_changed_by_list_exhaustion_removal()
                 );
-                assert_eq!(result.steps[0].change.political_group_number_retracted(), 1);
-                assert_eq!(result.steps[1].change.political_group_number_assigned(), 5);
+                assert_eq!(result.steps[0].change.list_number_retracted(), 1);
+                assert_eq!(result.steps[1].change.list_number_assigned(), 5);
                 let total_seats = get_total_seats_from_apportionment_result(&result);
                 assert_eq!(total_seats, vec![4, 5, 4, 4, 3]);
             }
@@ -2002,14 +1987,14 @@ mod tests {
                 assert_eq!(result.full_seats, 18);
                 assert_eq!(result.residual_seats, 1);
                 assert_eq!(result.steps.len(), 3);
-                assert_eq!(result.steps[0].change.political_group_number_assigned(), 5);
+                assert_eq!(result.steps[0].change.list_number_assigned(), 5);
                 assert!(
                     result.steps[1]
                         .change
                         .is_changed_by_list_exhaustion_removal()
                 );
-                assert_eq!(result.steps[1].change.political_group_number_retracted(), 5);
-                assert_eq!(result.steps[2].change.political_group_number_assigned(), 1);
+                assert_eq!(result.steps[1].change.list_number_retracted(), 5);
+                assert_eq!(result.steps[2].change.list_number_assigned(), 1);
                 let total_seats = get_total_seats_from_apportionment_result(&result);
                 assert_eq!(total_seats, vec![5, 4, 4, 4, 2]);
             }
@@ -2047,26 +2032,26 @@ mod tests {
                 assert_eq!(result.full_seats, 18);
                 assert_eq!(result.residual_seats, 6);
                 assert_eq!(result.steps.len(), 9);
-                assert_eq!(result.steps[0].change.political_group_number_assigned(), 2);
-                assert_eq!(result.steps[1].change.political_group_number_assigned(), 3);
-                assert_eq!(result.steps[2].change.political_group_number_assigned(), 4);
-                assert_eq!(result.steps[3].change.political_group_number_assigned(), 5);
-                assert_eq!(result.steps[4].change.political_group_number_assigned(), 6);
-                assert_eq!(result.steps[5].change.political_group_number_assigned(), 7);
+                assert_eq!(result.steps[0].change.list_number_assigned(), 2);
+                assert_eq!(result.steps[1].change.list_number_assigned(), 3);
+                assert_eq!(result.steps[2].change.list_number_assigned(), 4);
+                assert_eq!(result.steps[3].change.list_number_assigned(), 5);
+                assert_eq!(result.steps[4].change.list_number_assigned(), 6);
+                assert_eq!(result.steps[5].change.list_number_assigned(), 7);
                 assert!(
                     result.steps[6]
                         .change
                         .is_changed_by_absolute_majority_reassignment()
                 );
-                assert_eq!(result.steps[6].change.political_group_number_retracted(), 7);
-                assert_eq!(result.steps[6].change.political_group_number_assigned(), 1);
+                assert_eq!(result.steps[6].change.list_number_retracted(), 7);
+                assert_eq!(result.steps[6].change.list_number_assigned(), 1);
                 assert!(
                     result.steps[7]
                         .change
                         .is_changed_by_list_exhaustion_removal()
                 );
-                assert_eq!(result.steps[7].change.political_group_number_retracted(), 1);
-                assert_eq!(result.steps[8].change.political_group_number_assigned(), 7);
+                assert_eq!(result.steps[7].change.list_number_retracted(), 1);
+                assert_eq!(result.steps[8].change.list_number_assigned(), 7);
                 let total_seats = get_total_seats_from_apportionment_result(&result);
                 assert_eq!(total_seats, vec![12, 2, 2, 2, 2, 2, 2, 0]);
             }

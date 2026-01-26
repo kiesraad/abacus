@@ -20,9 +20,7 @@ pub use crate::{
     candidate_nomination::CandidateNominationResult,
     fraction::Fraction,
     seat_assignment::SeatAssignmentResult,
-    structs::{
-        ApportionmentError, ApportionmentInput, CandidateVotesTrait, PoliticalGroupVotesTrait,
-    },
+    structs::{ApportionmentError, ApportionmentInput, CandidateVotesTrait, ListVotesTrait},
 };
 
 // Place somewhere

@@ -1,5 +1,3 @@
-// TODO: use "list" iso "political group"
-
 #[cfg(test)]
 use crate::PGNumber;
 use crate::{
@@ -17,14 +15,14 @@ pub enum ApportionmentError {
 }
 
 pub trait ApportionmentInput {
-    type Pg: PoliticalGroupVotesTrait;
+    type Pg: ListVotesTrait;
 
     fn number_of_seats(&self) -> u32;
     fn total_votes(&self) -> u32;
-    fn political_group_votes(&self) -> &[Self::Pg];
+    fn list_votes(&self) -> &[Self::Pg];
 }
 
-pub trait PoliticalGroupVotesTrait {
+pub trait ListVotesTrait {
     type Cv: CandidateVotesTrait;
 
     fn number(&self) -> u32;
@@ -41,7 +39,7 @@ pub trait CandidateVotesTrait {
 pub(crate) struct SeatAssignmentInput {
     pub number_of_seats: u32,
     pub total_votes: u32,
-    pub political_group_votes: Vec<PoliticalGroupVotes>,
+    pub list_votes: Vec<ListVotes>,
 }
 
 impl<T> From<&T> for SeatAssignmentInput
@@ -52,24 +50,24 @@ where
         SeatAssignmentInput {
             number_of_seats: input.number_of_seats(),
             total_votes: input.total_votes(),
-            political_group_votes: political_group_votes_from_input(input),
+            list_votes: list_votes_from_input(input),
         }
     }
 }
 
 #[derive(Clone, Debug, PartialEq)]
-pub(crate) struct PoliticalGroupVotes {
+pub(crate) struct ListVotes {
     pub number: u32,
     pub list_votes: u32,
     pub candidate_votes: Vec<CandidateVotes>,
 }
 
-impl PoliticalGroupVotes {
+impl ListVotes {
     #[cfg(test)]
     pub fn from_test_data_auto(number: PGNumber, candidate_votes: &[u32]) -> Self {
         use crate::structs::CandidateVotes;
 
-        PoliticalGroupVotes {
+        ListVotes {
             number,
             list_votes: candidate_votes.iter().sum(),
             candidate_votes: candidate_votes
@@ -94,7 +92,7 @@ pub struct CandidateVotes {
 pub(crate) struct CandidateNominationInput {
     // TODO: Rename to election_seats?
     pub number_of_seats: u32,
-    pub political_group_votes: Vec<PoliticalGroupVotes>,
+    pub list_votes: Vec<ListVotes>,
     pub quota: Fraction,
     // TODO: Rename to political_group_seats? Should be mapped by PGNumber, not index
     pub total_seats: Vec<u32>,
@@ -107,7 +105,7 @@ where
     fn from(input: (&T, &SeatAssignmentResult)) -> Self {
         CandidateNominationInput {
             number_of_seats: input.0.number_of_seats(),
-            political_group_votes: political_group_votes_from_input(input.0),
+            list_votes: list_votes_from_input(input.0),
             quota: input.1.quota,
             total_seats: get_total_seats_from_apportionment_result(input.1),
         }
@@ -119,7 +117,7 @@ where
 //     pub fn new(input: impl ApportionmentInput, seat_assignment: &SeatAssignmentResult) -> Self {
 //         CandidateNominationInput {
 //             number_of_seats: input.number_of_seats(),
-//             political_group_votes: political_group_votes_from_input(&input),
+//             list_votes: list_votes_from_input(&input),
 
 //             quota: seat_assignment.quota,
 //             total_seats: get_total_seats_from_apportionment_result(&seat_assignment),
@@ -127,11 +125,11 @@ where
 //     }
 // }
 
-fn political_group_votes_from_input<T: ApportionmentInput>(input: &T) -> Vec<PoliticalGroupVotes> {
+fn list_votes_from_input<T: ApportionmentInput>(input: &T) -> Vec<ListVotes> {
     input
-        .political_group_votes()
+        .list_votes()
         .iter()
-        .map(|pg| PoliticalGroupVotes {
+        .map(|pg| ListVotes {
             number: pg.number(),
             list_votes: pg.total(),
             candidate_votes: pg

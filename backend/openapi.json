@@ -2284,10 +2284,7 @@
             "description": "Only show events since the specified timestamp",
             "required": false,
             "schema": {
-              "type": [
-                "integer",
-                "null"
-              ],
+              "type": "integer",
               "format": "int64"
             }
           }

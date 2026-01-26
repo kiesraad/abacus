@@ -183,7 +183,7 @@ export interface AUDIT_LOG_LIST_REQUEST_PARAMS {
   level: string[];
   event: string[];
   user: number[];
-  since: number | null;
+  since: number;
 }
 export type AUDIT_LOG_LIST_REQUEST_PATH = `/api/log`;
 

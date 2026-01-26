@@ -26,7 +26,7 @@ mod tests {
     fn check_openapi_json_for_null_type() {
         let result = get_openapi_json();
         assert!(
-            result.find("null").is_none(),
+            !result.contains("null"),
             "Add #[serde(skip_serializing_if = \"Option::is_none\")] where Option is used."
         );
     }

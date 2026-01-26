@@ -114,7 +114,7 @@ describe("NavBar", () => {
   test("elections link for '/privacy-statement' for typist", async () => {
     await renderNavBar({ pathname: "/privacy-statement" }, "typist");
 
-    expect(screen.queryByRole("link", { name: "Verkiezingen" })).toBeVisible();
+    expect(screen.queryByRole("link", { name: "Verkiezingen" })).not.toBeInTheDocument();
   });
 
   test.each([

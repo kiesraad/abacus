@@ -18,7 +18,7 @@ export function PrivacyStatementPage() {
           </section>
         </header>
         <main>
-          <article>
+          <article className={cls.privacy_statement}>
             <div className={cls.section}>
               <p className="bold">{t("version")} 26-01-2025</p>
               {t("privacy_statement.introduction")}

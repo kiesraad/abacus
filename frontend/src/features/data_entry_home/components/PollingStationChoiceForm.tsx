@@ -9,20 +9,15 @@ import { Icon } from "@/components/ui/Icon/Icon";
 import { KeyboardKeys } from "@/components/ui/KeyboardKeys/KeyboardKeys";
 import { useElection } from "@/hooks/election/useElection";
 import { useElectionStatus } from "@/hooks/election/useElectionStatus";
+import { useLiveData } from "@/hooks/useLiveData";
 import { useUser } from "@/hooks/user/useUser";
 import type { TranslationPath } from "@/i18n/i18n.types";
 import { t, tx } from "@/i18n/translate";
 import { KeyboardKey } from "@/types/ui";
 import { cn } from "@/utils/classnames";
 import { parseIntUserInput } from "@/utils/strings";
-
 import { useDebouncedCallback } from "../hooks/useDebouncedCallback";
-import {
-  getPollingStationWithStatusList,
-  getUrlForDataEntry,
-  PollingStationUserStatus,
-  type PollingStationWithStatus,
-} from "../utils/util";
+import { getPollingStationWithStatusList, getUrlForDataEntry, PollingStationUserStatus } from "../utils/util";
 import cls from "./PollingStationChoice.module.css";
 import { PollingStationLink } from "./PollingStationLink";
 import { PollingStationSelector } from "./PollingStationSelector";
@@ -42,8 +37,9 @@ export function PollingStationChoiceForm({ anotherEntry }: PollingStationChoiceF
   const [pollingStationNumber, setPollingStationNumber] = useState<string>("");
   const [alert, setAlert] = useState<string | undefined>(undefined);
   const [loading, setLoading] = useState<boolean>(false);
-  const [currentPollingStation, setCurrentPollingStation] = useState<PollingStationWithStatus | undefined>(undefined);
   const electionStatus = useElectionStatus();
+
+  useLiveData(electionStatus.refetch, true);
 
   const refetchStatuses = () => {
     void electionStatus.refetch();
@@ -57,17 +53,22 @@ export function PollingStationChoiceForm({ anotherEntry }: PollingStationChoiceF
     });
   }, [electionStatus, pollingStations, user]);
 
-  const debouncedCallback = useDebouncedCallback((pollingStation: PollingStationWithStatus | undefined) => {
-    setLoading(false);
-    setCurrentPollingStation(pollingStation);
+  const currentPollingStation = useMemo(() => {
+    const parsedInt = parseIntUserInput(pollingStationNumber);
+    return pollingStationsWithStatus.find((ps) => ps.number === parsedInt);
+  }, [pollingStationNumber, pollingStationsWithStatus]);
+
+  const debouncedCallback = useDebouncedCallback(() => {
+    void electionStatus.refetch().then(() => {
+      setLoading(false);
+    });
   }, USER_INPUT_DEBOUNCE);
 
   // set polling station number and trigger debounced lookup
   const updatePollingStationNumber = (n: string) => {
     setPollingStationNumber(n);
-    const parsedInt = parseIntUserInput(n);
     setLoading(true);
-    debouncedCallback(pollingStationsWithStatus.find((pollingStation) => pollingStation.number === parsedInt));
+    debouncedCallback();
   };
 
   const handleSubmit = () => {

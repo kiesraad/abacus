@@ -3,7 +3,7 @@ import { NavBar } from "@/components/navbar/NavBar";
 import { PageTitle } from "@/components/page_title/PageTitle";
 import { AppFrame } from "@/components/ui/AppFrame/AppFrame";
 import { AppLayout } from "@/components/ui/AppLayout/AppLayout";
-import { t, tx } from "@/i18n/translate";
+import { t } from "@/i18n/translate";
 import cls from "./PrivacyStatement.module.css";
 
 export function PrivacyStatementPage() {
@@ -20,7 +20,7 @@ export function PrivacyStatementPage() {
         <main>
           <article>
             <div className={cls.section}>
-              <p className="bold">{t("version")} 18-11-2025</p>
+              <p className="bold">{t("version")} 26-01-2025</p>
               {t("privacy_statement.introduction")}
             </div>
             <div className={cls.section}>
@@ -57,6 +57,7 @@ export function PrivacyStatementPage() {
                 {t("privacy_statement.abacus_uses_these_data")}
               </p>
               <p>{t("privacy_statement.data_not_automatically_shared")}</p>
+              <p>{t("privacy_statement.paper_documents_will_be_stored")}</p>
               <p>{t("privacy_statement.no_automated_decision_making")}</p>
             </div>
             <div className={cls.section}>
@@ -72,13 +73,7 @@ export function PrivacyStatementPage() {
               </p>
               <p>{t("privacy_statement.more_information_on_abacus_usage")}</p>
               <p>{t("privacy_statement.more_information_on_abacus")}</p>
-              <p>
-                <h3>Kiesraad</h3>
-                <ul>
-                  <li className="mb-md">{tx("privacy_statement.information_point_elections")}</li>
-                  <li>{tx("privacy_statement.view_source_code")}</li>
-                </ul>
-              </p>
+              <p>{t("privacy_statement.view_source_code")}</p>
             </div>
           </article>
         </main>

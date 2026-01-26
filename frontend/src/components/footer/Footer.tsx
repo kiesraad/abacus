@@ -13,7 +13,7 @@ export function Footer({ showPrivacyStatementLink = true }: { showPrivacyStateme
   return (
     <footer>
       <section>
-        Kiesraad - Abacus ({t("version")} {gitVersion}){" "}
+        Kiesraad - Abacus ({t("version")} {gitVersion})&nbsp;&nbsp;{" "}
         {showPrivacyStatementLink && (
           <Link to={"/privacy-statement"} className="privacy_statement">
             {t("privacy_statement.title").toLowerCase()}

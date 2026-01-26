@@ -5,7 +5,7 @@ use crate::{
 };
 
 // TODO: Temp
-pub type PGNumber = u32;
+pub type ListNumber = u32;
 
 // TODO: Fix positions of struct, fix visibilities
 mod candidate_nomination;

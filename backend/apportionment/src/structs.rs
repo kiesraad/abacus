@@ -1,5 +1,5 @@
 #[cfg(test)]
-use crate::PGNumber;
+use crate::ListNumber;
 use crate::{
     fraction::Fraction,
     seat_assignment::{SeatAssignmentResult, get_total_seats_from_apportionment_result},
@@ -15,11 +15,11 @@ pub enum ApportionmentError {
 }
 
 pub trait ApportionmentInput {
-    type Pg: ListVotesTrait;
+    type List: ListVotesTrait;
 
     fn number_of_seats(&self) -> u32;
     fn total_votes(&self) -> u32;
-    fn list_votes(&self) -> &[Self::Pg];
+    fn list_votes(&self) -> &[Self::List];
 }
 
 pub trait ListVotesTrait {
@@ -64,7 +64,7 @@ pub(crate) struct ListVotes {
 
 impl ListVotes {
     #[cfg(test)]
-    pub fn from_test_data_auto(number: PGNumber, candidate_votes: &[u32]) -> Self {
+    pub fn from_test_data_auto(number: ListNumber, candidate_votes: &[u32]) -> Self {
         use crate::structs::CandidateVotes;
 
         ListVotes {
@@ -94,7 +94,7 @@ pub(crate) struct CandidateNominationInput {
     pub number_of_seats: u32,
     pub list_votes: Vec<ListVotes>,
     pub quota: Fraction,
-    // TODO: Rename to political_group_seats? Should be mapped by PGNumber, not index
+    // TODO: Rename to political_group_seats? Should be mapped by ListNumber, not index
     pub total_seats: Vec<u32>,
 }
 
@@ -129,10 +129,10 @@ fn list_votes_from_input<T: ApportionmentInput>(input: &T) -> Vec<ListVotes> {
     input
         .list_votes()
         .iter()
-        .map(|pg| ListVotes {
-            number: pg.number(),
-            list_votes: pg.total(),
-            candidate_votes: pg
+        .map(|list| ListVotes {
+            number: list.number(),
+            list_votes: list.total(),
+            candidate_votes: list
                 .candidate_votes()
                 .iter()
                 .map(|cv| CandidateVotes {

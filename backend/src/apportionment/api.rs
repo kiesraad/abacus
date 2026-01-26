@@ -44,7 +44,7 @@ pub struct ElectionPoliticalGroupSummary {
 }
 
 impl ApportionmentInput for ElectionPoliticalGroupSummary {
-    type Pg = PoliticalGroupCandidateVotes;
+    type List = PoliticalGroupCandidateVotes;
 
     fn number_of_seats(&self) -> u32 {
         self.election.number_of_seats
@@ -54,7 +54,7 @@ impl ApportionmentInput for ElectionPoliticalGroupSummary {
         self.summary.votes_counts.total_votes_candidates_count
     }
 
-    fn list_votes(&self) -> &[Self::Pg] {
+    fn list_votes(&self) -> &[Self::List] {
         &self.summary.political_group_votes
     }
 }

@@ -3,7 +3,7 @@ use std::cmp::Ordering;
 use tracing::{debug, info};
 
 use super::{
-    PGNumber,
+    ListNumber,
     fraction::Fraction,
     structs::{ApportionmentError, ListVotes, SeatAssignmentInput},
 };
@@ -26,7 +26,7 @@ pub struct SeatAssignmentResult {
 #[derive(Debug, PartialEq)]
 pub struct ListSeatAssignment {
     /// List number for which this assignment applies
-    pg_number: PGNumber,
+    list_number: ListNumber,
     /// The number of votes cast for this group
     votes_cast: u64,
     /// The remainder votes that were not used to get full seats assigned to this list
@@ -42,15 +42,15 @@ pub struct ListSeatAssignment {
 }
 
 impl From<ListStanding> for ListSeatAssignment {
-    fn from(pg: ListStanding) -> Self {
+    fn from(list: ListStanding) -> Self {
         ListSeatAssignment {
-            pg_number: pg.pg_number,
-            votes_cast: pg.votes_cast,
-            remainder_votes: pg.remainder_votes,
-            meets_remainder_threshold: pg.meets_remainder_threshold,
-            full_seats: pg.full_seats,
-            residual_seats: pg.residual_seats,
-            total_seats: pg.total_seats(),
+            list_number: list.list_number,
+            votes_cast: list.votes_cast,
+            remainder_votes: list.remainder_votes,
+            meets_remainder_threshold: list.meets_remainder_threshold,
+            full_seats: list.full_seats,
+            residual_seats: list.residual_seats,
+            total_seats: list.total_seats(),
         }
     }
 }
@@ -60,7 +60,7 @@ impl From<ListStanding> for ListSeatAssignment {
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct ListStanding {
     /// List number for which this standing applies
-    pg_number: PGNumber,
+    list_number: ListNumber,
     /// The number of votes cast for this group
     votes_cast: u64,
     /// The remainder of votes that was not used to get full seats (does not have to be a whole number of votes)
@@ -78,34 +78,34 @@ pub struct ListStanding {
 impl ListStanding {
     /// Create a new instance computing the whole number of seats that
     /// were assigned to a list.
-    fn new(pg: &ListVotes, quota: Fraction) -> Self {
-        let votes_cast = Fraction::from(pg.list_votes);
-        let pg_seats = if votes_cast > Fraction::ZERO {
-            u32::try_from((votes_cast / quota).integer_part()).expect("pg_seats fit in u32")
+    fn new(list: &ListVotes, quota: Fraction) -> Self {
+        let votes_cast = Fraction::from(list.list_votes);
+        let list_seats = if votes_cast > Fraction::ZERO {
+            u32::try_from((votes_cast / quota).integer_part()).expect("list_seats fit in u32")
         } else {
             0
         };
 
-        let remainder_votes = votes_cast - (Fraction::from(pg_seats) * quota);
+        let remainder_votes = votes_cast - (Fraction::from(list_seats) * quota);
 
         debug!(
-            "List {} has {pg_seats} full seats with {} votes",
-            pg.number, pg.list_votes
+            "List {} has {list_seats} full seats with {} votes",
+            list.number, list.list_votes
         );
         ListStanding {
-            pg_number: pg.number,
-            votes_cast: pg.list_votes.into(),
+            list_number: list.number,
+            votes_cast: list.list_votes.into(),
             remainder_votes,
             meets_remainder_threshold: votes_cast >= quota * Fraction::new(3, 4),
-            next_votes_per_seat: votes_cast / Fraction::from(pg_seats + 1),
-            full_seats: pg_seats,
+            next_votes_per_seat: votes_cast / Fraction::from(list_seats + 1),
+            full_seats: list_seats,
             residual_seats: 0,
         }
     }
 
     /// Add a residual seat to the list and return the updated instance
     fn add_residual_seat(self) -> Self {
-        info!("Adding residual seat to list {}", self.pg_number);
+        info!("Adding residual seat to list {}", self.list_number);
         ListStanding {
             residual_seats: self.residual_seats + 1,
             next_votes_per_seat: Fraction::from(self.votes_cast)
@@ -141,50 +141,50 @@ pub enum SeatChange {
 
 impl SeatChange {
     /// Get the list number for the list this step has assigned a seat to
-    fn list_number_assigned(&self) -> PGNumber {
+    fn list_number_assigned(&self) -> ListNumber {
         match self {
             Self::HighestAverageAssignment(highest_average_assigned_seat) => {
-                highest_average_assigned_seat.selected_pg_number
+                highest_average_assigned_seat.selected_list_number
             }
             Self::UniqueHighestAverageAssignment(unique_highest_average_assigned_seat) => {
-                unique_highest_average_assigned_seat.selected_pg_number
+                unique_highest_average_assigned_seat.selected_list_number
             }
             Self::LargestRemainderAssignment(largest_remainder_assigned_seat) => {
-                largest_remainder_assigned_seat.selected_pg_number
+                largest_remainder_assigned_seat.selected_list_number
             }
             Self::AbsoluteMajorityReassignment(absolute_majority_reassigned_seat) => {
-                absolute_majority_reassigned_seat.pg_assigned_seat
+                absolute_majority_reassigned_seat.list_assigned_seat
             }
             Self::ListExhaustionRemoval(_) => unimplemented!(),
         }
     }
 
     /// Get the list number for the list this step has retracted a seat from
-    fn list_number_retracted(&self) -> PGNumber {
+    fn list_number_retracted(&self) -> ListNumber {
         match self {
             Self::HighestAverageAssignment(_) => unimplemented!(),
             Self::UniqueHighestAverageAssignment(_) => unimplemented!(),
             Self::LargestRemainderAssignment(_) => unimplemented!(),
             Self::AbsoluteMajorityReassignment(absolute_majority_reassigned_seat) => {
-                absolute_majority_reassigned_seat.pg_retracted_seat
+                absolute_majority_reassigned_seat.list_retracted_seat
             }
             Self::ListExhaustionRemoval(list_exhaustion_removed_seat) => {
-                list_exhaustion_removed_seat.pg_retracted_seat
+                list_exhaustion_removed_seat.list_retracted_seat
             }
         }
     }
 
     /// Get the list of lists with the same average, that have not been assigned a seat
-    fn pg_options(&self) -> Vec<PGNumber> {
+    fn list_options(&self) -> Vec<ListNumber> {
         match self {
             Self::HighestAverageAssignment(highest_average_assigned_seat) => {
-                highest_average_assigned_seat.pg_options.clone()
+                highest_average_assigned_seat.list_options.clone()
             }
             Self::UniqueHighestAverageAssignment(unique_highest_average_assigned_seat) => {
-                unique_highest_average_assigned_seat.pg_options.clone()
+                unique_highest_average_assigned_seat.list_options.clone()
             }
             Self::LargestRemainderAssignment(largest_remainder_assigned_seat) => {
-                largest_remainder_assigned_seat.pg_options.clone()
+                largest_remainder_assigned_seat.list_options.clone()
             }
             Self::AbsoluteMajorityReassignment(_) => unimplemented!(),
             Self::ListExhaustionRemoval(_) => unimplemented!(),
@@ -192,16 +192,16 @@ impl SeatChange {
     }
 
     /// Get the list of lists with the same average, that have been assigned a seat
-    fn pg_assigned(&self) -> Vec<PGNumber> {
+    fn list_assigned(&self) -> Vec<ListNumber> {
         match self {
             Self::HighestAverageAssignment(highest_average_assigned_seat) => {
-                highest_average_assigned_seat.pg_assigned.clone()
+                highest_average_assigned_seat.list_assigned.clone()
             }
             Self::UniqueHighestAverageAssignment(unique_highest_average_assigned_seat) => {
-                unique_highest_average_assigned_seat.pg_assigned.clone()
+                unique_highest_average_assigned_seat.list_assigned.clone()
             }
             Self::LargestRemainderAssignment(largest_remainder_assigned_seat) => {
-                largest_remainder_assigned_seat.pg_assigned.clone()
+                largest_remainder_assigned_seat.list_assigned.clone()
             }
             Self::AbsoluteMajorityReassignment(_) => unimplemented!(),
             Self::ListExhaustionRemoval(_) => unimplemented!(),
@@ -233,13 +233,13 @@ impl SeatChange {
 #[derive(Clone, Debug, PartialEq)]
 pub struct HighestAverageAssignedSeat {
     /// The list that was selected for this seat has this list number
-    selected_pg_number: PGNumber,
+    selected_list_number: ListNumber,
     /// Collection of lists with the same average, that have not been assigned a seat
-    pg_options: Vec<PGNumber>,
+    list_options: Vec<ListNumber>,
     /// Collection of lists with the same average, that have been assigned a seat
-    pg_assigned: Vec<PGNumber>,
+    list_assigned: Vec<ListNumber>,
     /// Collection of lists that are exhausted, and will not be assigned a seat
-    pg_exhausted: Vec<PGNumber>,
+    list_exhausted: Vec<ListNumber>,
     /// This is the votes per seat achieved by the selected list
     votes_per_seat: Fraction,
 }
@@ -248,11 +248,11 @@ pub struct HighestAverageAssignedSeat {
 #[derive(Clone, Debug, PartialEq)]
 pub struct LargestRemainderAssignedSeat {
     /// The list that was selected for this seat has this list number
-    selected_pg_number: PGNumber,
+    selected_list_number: ListNumber,
     /// Collection of lists with the same remainder, that have not been assigned a seat
-    pg_options: Vec<PGNumber>,
+    list_options: Vec<ListNumber>,
     /// Collection of lists with the same remainder, that have been assigned a seat
-    pg_assigned: Vec<PGNumber>,
+    list_assigned: Vec<ListNumber>,
     /// The number of remainder votes achieved by the selected list
     remainder_votes: Fraction,
 }
@@ -261,25 +261,25 @@ pub struct LargestRemainderAssignedSeat {
 #[derive(Clone, Debug, PartialEq)]
 pub struct AbsoluteMajorityReassignedSeat {
     /// List number which the residual seat is retracted from
-    pg_retracted_seat: PGNumber,
+    list_retracted_seat: ListNumber,
     /// List number which the residual seat is assigned to
-    pg_assigned_seat: PGNumber,
+    list_assigned_seat: ListNumber,
 }
 
 /// Contains information about the enactment of article P 10 of the Kieswet.
 #[derive(Clone, Debug, PartialEq)]
 pub struct ListExhaustionRemovedSeat {
     /// List number which the seat is retracted from
-    pg_retracted_seat: PGNumber,
+    list_retracted_seat: ListNumber,
     /// Whether the removed seat was a full seat
     full_seat: bool,
 }
 
 /// Initial construction of the data required per list
-fn initial_full_seats_per_list(pg_votes: &[ListVotes], quota: Fraction) -> Vec<ListStanding> {
-    pg_votes
+fn initial_full_seats_per_list(list_votes: &[ListVotes], quota: Fraction) -> Vec<ListStanding> {
+    list_votes
         .iter()
-        .map(|pg| ListStanding::new(pg, quota))
+        .map(|list| ListStanding::new(list, quota))
         .collect()
 }
 
@@ -393,51 +393,51 @@ fn reassign_residual_seat_for_absolute_majority(
     seats: u32,
     total_votes: u32,
     list_votes: &[ListVotes],
-    pgs_last_residual_seat: &[PGNumber],
+    lists_last_residual_seat: &[ListNumber],
     standings: Vec<ListStanding>,
 ) -> Result<(Vec<ListStanding>, Option<SeatChange>), ApportionmentError> {
     let half_of_votes_count: Fraction = Fraction::from(total_votes) * Fraction::new(1, 2);
 
     // Find list with an absolute majority of votes. Return early if we find none
-    let Some(majority_pg_votes) = list_votes
+    let Some(majority_list_votes) = list_votes
         .iter()
-        .find(|pg| Fraction::from(pg.list_votes) > half_of_votes_count)
+        .find(|list| Fraction::from(list.list_votes) > half_of_votes_count)
     else {
         return Ok((standings, None));
     };
 
     let half_of_seats_count: Fraction = Fraction::from(seats) * Fraction::new(1, 2);
-    let standing_of_pg_with_majority_votes = standings
+    let standing_of_list_with_majority_votes = standings
         .iter()
-        .find(|pg_standing| pg_standing.pg_number == majority_pg_votes.number)
+        .find(|list_standing| list_standing.list_number == majority_list_votes.number)
         .expect("Standing exists");
 
-    let pg_seats = Fraction::from(standing_of_pg_with_majority_votes.total_seats());
+    let list_seats = Fraction::from(standing_of_list_with_majority_votes.total_seats());
 
-    if pg_seats <= half_of_seats_count {
-        if pgs_last_residual_seat.len() > 1 {
+    if list_seats <= half_of_seats_count {
+        if lists_last_residual_seat.len() > 1 {
             info!(
                 "Drawing of lots is required for lists: {:?} to pick a list which the residual seat gets retracted from",
-                pgs_last_residual_seat
+                lists_last_residual_seat
             );
             return Err(ApportionmentError::DrawingOfLotsNotImplemented);
         }
 
         // Reassign the seat
         let mut standing = standings.clone();
-        standing[pgs_last_residual_seat[0] as usize - 1].residual_seats -= 1;
-        standing[majority_pg_votes.number as usize - 1].residual_seats += 1;
+        standing[lists_last_residual_seat[0] as usize - 1].residual_seats -= 1;
+        standing[majority_list_votes.number as usize - 1].residual_seats += 1;
 
         info!(
             "Seat first assigned to list {} has been reassigned to list {} in accordance with Article P 9 Kieswet",
-            pgs_last_residual_seat[0], majority_pg_votes.number
+            lists_last_residual_seat[0], majority_list_votes.number
         );
         Ok((
             standing,
             Some(SeatChange::AbsoluteMajorityReassignment(
                 AbsoluteMajorityReassignedSeat {
-                    pg_retracted_seat: pgs_last_residual_seat[0],
-                    pg_assigned_seat: majority_pg_votes.number,
+                    list_retracted_seat: lists_last_residual_seat[0],
+                    list_assigned_seat: majority_list_votes.number,
                 },
             )),
         ))
@@ -446,36 +446,38 @@ fn reassign_residual_seat_for_absolute_majority(
     }
 }
 
-fn pg_numbers_with_exhausted_seats<'a>(
+fn list_numbers_with_exhausted_seats<'a>(
     standings: impl Iterator<Item = &'a ListStanding>,
     list_votes: &[ListVotes],
-) -> Vec<(PGNumber, u32)> {
-    standings.fold(vec![], |mut exhausted_pg_numbers_and_seats, s| {
+) -> Vec<(ListNumber, u32)> {
+    standings.fold(vec![], |mut exhausted_list_numbers_and_seats, s| {
         let number_of_candidates =
-            u32::try_from(list_votes[s.pg_number as usize - 1].candidate_votes.len())
+            u32::try_from(list_votes[s.list_number as usize - 1].candidate_votes.len())
                 .expect("Number of candidates fits in u32");
 
         if number_of_candidates.cmp(&s.total_seats()) == Ordering::Less {
-            exhausted_pg_numbers_and_seats
-                .push((s.pg_number, number_of_candidates.abs_diff(s.total_seats())))
+            exhausted_list_numbers_and_seats.push((
+                s.list_number,
+                number_of_candidates.abs_diff(s.total_seats()),
+            ))
         }
-        exhausted_pg_numbers_and_seats
+        exhausted_list_numbers_and_seats
     })
 }
 
-fn pg_numbers_without_empty_seats<'a>(
+fn list_numbers_without_empty_seats<'a>(
     standings: impl Iterator<Item = &'a ListStanding>,
     list_votes: &[ListVotes],
-) -> Vec<PGNumber> {
-    standings.fold(vec![], |mut pg_numbers_without_empty_seats, s| {
+) -> Vec<ListNumber> {
+    standings.fold(vec![], |mut list_numbers_without_empty_seats, s| {
         let number_of_candidates =
-            u32::try_from(list_votes[s.pg_number as usize - 1].candidate_votes.len())
+            u32::try_from(list_votes[s.list_number as usize - 1].candidate_votes.len())
                 .expect("Number of candidates fits in u32");
 
         if number_of_candidates.cmp(&s.total_seats()) == Ordering::Equal {
-            pg_numbers_without_empty_seats.push(s.pg_number)
+            list_numbers_without_empty_seats.push(s.list_number)
         }
-        pg_numbers_without_empty_seats
+        list_numbers_without_empty_seats
     })
 }
 
@@ -489,32 +491,32 @@ fn reassign_residual_seats_for_exhausted_lists(
     assigned_residual_seats: u32,
     previous_steps: Vec<SeatChangeStep>,
 ) -> Result<(Vec<SeatChangeStep>, Vec<ListStanding>), ApportionmentError> {
-    let exhausted_lists = pg_numbers_with_exhausted_seats(previous_standings.iter(), &list_votes);
+    let exhausted_lists = list_numbers_with_exhausted_seats(previous_standings.iter(), &list_votes);
     if !exhausted_lists.is_empty() {
         let mut current_standings = previous_standings.clone();
         let mut seats_to_reassign = 0;
         let mut list_exhaustion_steps: Vec<SeatChangeStep> = vec![];
 
         // Remove excess seats from exhausted lists
-        for (pg_number, seats) in exhausted_lists {
+        for (list_number, seats) in exhausted_lists {
             seats_to_reassign += seats;
             let mut full_seat: bool = false;
             for _ in 1..=seats {
-                if current_standings[pg_number as usize - 1].residual_seats > 0 {
-                    current_standings[pg_number as usize - 1].residual_seats -= 1;
+                if current_standings[list_number as usize - 1].residual_seats > 0 {
+                    current_standings[list_number as usize - 1].residual_seats -= 1;
                 } else {
-                    current_standings[pg_number as usize - 1].full_seats -= 1;
+                    current_standings[list_number as usize - 1].full_seats -= 1;
                     full_seat = true;
                 }
                 info!(
                     "Seat first assigned to list {} has been removed and will be assigned to another list in accordance with Article P 10 Kieswet",
-                    pg_number
+                    list_number
                 );
                 list_exhaustion_steps.push(SeatChangeStep {
                     standings: current_standings.clone(),
                     residual_seat_number: None,
                     change: SeatChange::ListExhaustionRemoval(ListExhaustionRemovedSeat {
-                        pg_retracted_seat: pg_number,
+                        list_retracted_seat: list_number,
                         full_seat,
                     }),
                 });
@@ -557,7 +559,10 @@ pub fn seat_assignment(
 
     // [Artikel P 6 Kieswet](https://wetten.overheid.nl/BWBR0004627/2026-01-01/#AfdelingII_HoofdstukP_Paragraaf2_ArtikelP6)
     let initial_standing = initial_full_seats_per_list(&input.list_votes, quota);
-    let full_seats = initial_standing.iter().map(|pg| pg.full_seats).sum::<u32>();
+    let full_seats = initial_standing
+        .iter()
+        .map(|list| list.full_seats)
+        .sum::<u32>();
     let residual_seats = input.number_of_seats - full_seats;
 
     let (mut steps, current_standings) = if residual_seats > 0 {
@@ -580,7 +585,7 @@ pub fn seat_assignment(
             input.number_of_seats,
             input.total_votes,
             &input.list_votes,
-            &last_step.change.pg_assigned(),
+            &last_step.change.list_assigned(),
             current_standings,
         )?
     } else {
@@ -607,7 +612,10 @@ pub fn seat_assignment(
         steps,
     )?;
 
-    let final_full_seats = final_standing.iter().map(|pg| pg.full_seats).sum::<u32>();
+    let final_full_seats = final_standing
+        .iter()
+        .map(|list| list.full_seats)
+        .sum::<u32>();
     let final_residual_seats = input.number_of_seats - final_full_seats;
 
     Ok(SeatAssignmentResult {
@@ -638,9 +646,9 @@ fn assign_remainder(
     while residual_seat_number != total_residual_seats {
         let residual_seats = total_residual_seats - residual_seat_number;
         residual_seat_number += 1;
-        let exhausted_pg_numbers: Vec<PGNumber> = exclude_exhausted_lists
-            .map_or_else(Vec::new, |pgv| {
-                pg_numbers_without_empty_seats(current_standings.iter(), pgv)
+        let exhausted_list_numbers: Vec<ListNumber> = exclude_exhausted_lists
+            .map_or_else(Vec::new, |list_votes| {
+                list_numbers_without_empty_seats(current_standings.iter(), list_votes)
             });
 
         let change = if seats >= 19 {
@@ -650,7 +658,7 @@ fn assign_remainder(
                 current_standings.iter(),
                 residual_seats,
                 &steps,
-                &exhausted_pg_numbers,
+                &exhausted_list_numbers,
                 false,
             )?
         } else {
@@ -659,7 +667,7 @@ fn assign_remainder(
                 &current_standings,
                 residual_seats,
                 &steps,
-                &exhausted_pg_numbers,
+                &exhausted_list_numbers,
             )?
         };
 
@@ -670,7 +678,7 @@ fn assign_remainder(
         current_standings = current_standings
             .into_iter()
             .map(|s| {
-                if s.pg_number == change.list_number_assigned() {
+                if s.list_number == change.list_number_assigned() {
                     s.add_residual_seat()
                 } else {
                     s
@@ -693,33 +701,33 @@ fn assign_remainder(
 /// If the last residual seat was assigned to a list with the same
 /// remainder/votes per seat as lists assigned a seat in previous steps,
 /// return all list numbers that had the same remainder/votes per seat.
-fn pg_assigned_from_previous_step(
-    selected_pg: &ListStanding,
+fn list_assigned_from_previous_step(
+    selected_list: &ListStanding,
     previous_steps: &[SeatChangeStep],
     matcher: fn(&SeatChange) -> bool,
-) -> Vec<PGNumber> {
-    let mut pg_assigned = Vec::new();
+) -> Vec<ListNumber> {
+    let mut list_assigned = Vec::new();
     if let Some(previous_step) = previous_steps.last()
         && matcher(&previous_step.change)
         && previous_step
             .change
-            .pg_options()
-            .contains(&selected_pg.pg_number)
+            .list_options()
+            .contains(&selected_list.list_number)
     {
-        pg_assigned = previous_step.change.pg_assigned()
+        list_assigned = previous_step.change.list_assigned()
     }
-    pg_assigned.push(selected_pg.pg_number);
-    pg_assigned
+    list_assigned.push(selected_list.list_number);
+    list_assigned
 }
 
 /// Get an iterator that lists all the list standings without exhausted lists.  
 fn non_exhausted_list_standings<'a>(
     standings: impl IntoIterator<Item = &'a ListStanding>,
-    exhausted_pg_numbers: &[PGNumber],
+    exhausted_list_numbers: &[ListNumber],
 ) -> impl Iterator<Item = &'a ListStanding> {
     standings
         .into_iter()
-        .filter(|&s| !exhausted_pg_numbers.contains(&s.pg_number))
+        .filter(|&s| !exhausted_list_numbers.contains(&s.list_number))
 }
 
 /// Assign the next residual seat, and return which group that seat was assigned to.  
@@ -728,20 +736,20 @@ fn step_assign_remainder_using_highest_averages<'a>(
     standings: impl Iterator<Item = &'a ListStanding>,
     residual_seats: u32,
     previous_steps: &[SeatChangeStep],
-    exhausted_pg_numbers: &[PGNumber],
+    exhausted_list_numbers: &[ListNumber],
     unique: bool,
 ) -> Result<SeatChange, ApportionmentError> {
     let mut qualifying_for_highest_average =
-        non_exhausted_list_standings(standings, exhausted_pg_numbers).peekable();
+        non_exhausted_list_standings(standings, exhausted_list_numbers).peekable();
 
     if qualifying_for_highest_average.peek().is_some() {
-        let selected_pgs =
+        let selected_lists =
             lists_with_highest_average(qualifying_for_highest_average, residual_seats)?;
-        let selected_pg = selected_pgs[0];
+        let selected_list = selected_lists[0];
         let assigned_seat: HighestAverageAssignedSeat = HighestAverageAssignedSeat {
-            selected_pg_number: selected_pg.pg_number,
-            pg_assigned: pg_assigned_from_previous_step(
-                selected_pg,
+            selected_list_number: selected_list.list_number,
+            list_assigned: list_assigned_from_previous_step(
+                selected_list,
                 previous_steps,
                 if unique {
                     SeatChange::is_changed_by_unique_highest_average_assignment
@@ -749,9 +757,9 @@ fn step_assign_remainder_using_highest_averages<'a>(
                     SeatChange::is_changed_by_highest_average_assignment
                 },
             ),
-            pg_options: selected_pgs.iter().map(|pg| pg.pg_number).collect(),
-            pg_exhausted: exhausted_pg_numbers.to_vec(),
-            votes_per_seat: selected_pg.next_votes_per_seat,
+            list_options: selected_lists.iter().map(|list| list.list_number).collect(),
+            list_exhausted: exhausted_list_numbers.to_vec(),
+            votes_per_seat: selected_list.next_votes_per_seat,
         };
         if unique {
             Ok(SeatChange::UniqueHighestAverageAssignment(assigned_seat))
@@ -766,27 +774,27 @@ fn step_assign_remainder_using_highest_averages<'a>(
 
 fn list_largest_remainder_assigned_seats(
     previous_steps: &[SeatChangeStep],
-    pg_number: PGNumber,
+    list_number: ListNumber,
 ) -> usize {
     previous_steps
         .iter()
         .filter(|prev| {
             prev.change.is_changed_by_largest_remainder_assignment()
-                && prev.change.list_number_assigned() == pg_number
+                && prev.change.list_number_assigned() == list_number
         })
         .count()
 }
 
 fn list_unique_highest_average_assigned_seats(
     previous_steps: &[SeatChangeStep],
-    pg_number: PGNumber,
+    list_number: ListNumber,
 ) -> usize {
     previous_steps
         .iter()
         .filter(|prev| {
             prev.change
                 .is_changed_by_unique_highest_average_assignment()
-                && prev.change.list_number_assigned() == pg_number
+                && prev.change.list_number_assigned() == list_number
         })
         .count()
 }
@@ -795,11 +803,11 @@ fn list_qualifies_for_extra_seat(
     number_of_seats_largest_remainders: usize,
     number_of_seats_unique_highest_averages_option: Option<usize>,
     previous_steps: &[SeatChangeStep],
-    pg_number: PGNumber,
+    list_number: ListNumber,
 ) -> bool {
     let has_retracted_seat: bool = previous_steps.iter().any(|prev| {
         prev.change.is_changed_by_absolute_majority_reassignment()
-            && prev.change.list_number_retracted() == pg_number
+            && prev.change.list_number_retracted() == list_number
     });
     if number_of_seats_unique_highest_averages_option.is_none() {
         number_of_seats_largest_remainders == 0
@@ -826,16 +834,16 @@ fn list_qualifies_for_extra_seat(
 fn list_standings_qualifying_for_largest_remainder<'a>(
     standings: &'a [ListStanding],
     previous_steps: &'a [SeatChangeStep],
-    exhausted_pg_numbers: &[PGNumber],
+    exhausted_list_numbers: &[ListNumber],
 ) -> impl Iterator<Item = &'a ListStanding> {
     standings.iter().filter(|&s| {
         s.meets_remainder_threshold
-            && !exhausted_pg_numbers.contains(&s.pg_number)
+            && !exhausted_list_numbers.contains(&s.list_number)
             && list_qualifies_for_extra_seat(
-                list_largest_remainder_assigned_seats(previous_steps, s.pg_number),
+                list_largest_remainder_assigned_seats(previous_steps, s.list_number),
                 None,
                 previous_steps,
-                s.pg_number,
+                s.list_number,
             )
     })
 }
@@ -847,18 +855,18 @@ fn list_standings_qualifying_for_largest_remainder<'a>(
 fn list_standings_qualifying_for_unique_highest_average<'a>(
     standings: &'a [ListStanding],
     previous_steps: &'a [SeatChangeStep],
-    exhausted_pg_numbers: &[PGNumber],
+    exhausted_list_numbers: &[ListNumber],
 ) -> impl Iterator<Item = &'a ListStanding> {
     standings.iter().filter(|&s| {
-        !exhausted_pg_numbers.contains(&s.pg_number)
+        !exhausted_list_numbers.contains(&s.list_number)
             && list_qualifies_for_extra_seat(
-                list_largest_remainder_assigned_seats(previous_steps, s.pg_number),
+                list_largest_remainder_assigned_seats(previous_steps, s.list_number),
                 Some(list_unique_highest_average_assigned_seats(
                     previous_steps,
-                    s.pg_number,
+                    s.list_number,
                 )),
                 previous_steps,
-                s.pg_number,
+                s.list_number,
             )
     })
 }
@@ -869,31 +877,32 @@ fn step_assign_remainder_using_largest_remainder(
     standings: &[ListStanding],
     residual_seats: u32,
     previous_steps: &[SeatChangeStep],
-    exhausted_pg_numbers: &[PGNumber],
+    exhausted_list_numbers: &[ListNumber],
 ) -> Result<SeatChange, ApportionmentError> {
     // first we check if there are any lists that still qualify for a largest remainder assigned seat
     let mut qualifying_for_remainder = list_standings_qualifying_for_largest_remainder(
         standings,
         previous_steps,
-        exhausted_pg_numbers,
+        exhausted_list_numbers,
     )
     .peekable();
 
     // If there is at least one element in the iterator, we know we can still do a largest remainder assignment
     if qualifying_for_remainder.peek().is_some() {
         debug!("Assign residual seat using largest remainders method");
-        let selected_pgs = lists_with_largest_remainder(qualifying_for_remainder, residual_seats)?;
-        let selected_pg = selected_pgs[0];
+        let selected_lists =
+            lists_with_largest_remainder(qualifying_for_remainder, residual_seats)?;
+        let selected_list = selected_lists[0];
         Ok(SeatChange::LargestRemainderAssignment(
             LargestRemainderAssignedSeat {
-                selected_pg_number: selected_pg.pg_number,
-                pg_assigned: pg_assigned_from_previous_step(
-                    selected_pg,
+                selected_list_number: selected_list.list_number,
+                list_assigned: list_assigned_from_previous_step(
+                    selected_list,
                     previous_steps,
                     SeatChange::is_changed_by_largest_remainder_assignment,
                 ),
-                pg_options: selected_pgs.iter().map(|pg| pg.pg_number).collect(),
-                remainder_votes: selected_pg.remainder_votes,
+                list_options: selected_lists.iter().map(|list| list.list_number).collect(),
+                remainder_votes: selected_list.remainder_votes,
             },
         ))
     } else {
@@ -904,7 +913,7 @@ fn step_assign_remainder_using_largest_remainder(
             list_standings_qualifying_for_unique_highest_average(
                 standings,
                 previous_steps,
-                exhausted_pg_numbers,
+                exhausted_list_numbers,
             )
             .peekable();
         if qualifying_for_unique_highest_average.peek().is_some() {
@@ -913,7 +922,7 @@ fn step_assign_remainder_using_largest_remainder(
                 qualifying_for_unique_highest_average,
                 residual_seats,
                 previous_steps,
-                exhausted_pg_numbers,
+                exhausted_list_numbers,
                 true,
             )
         } else {
@@ -926,7 +935,7 @@ fn step_assign_remainder_using_largest_remainder(
                 standings.iter(),
                 residual_seats,
                 previous_steps,
-                exhausted_pg_numbers,
+                exhausted_list_numbers,
                 false,
             )
         }
@@ -934,8 +943,8 @@ fn step_assign_remainder_using_largest_remainder(
 }
 
 /// Create a vector containing just the list numbers from an iterator of the current standing
-fn list_numbers(standing: &[&ListStanding]) -> Vec<PGNumber> {
-    standing.iter().map(|s| s.pg_number).collect()
+fn list_numbers(standing: &[&ListStanding]) -> Vec<ListNumber> {
+    standing.iter().map(|s| s.list_number).collect()
 }
 
 pub fn get_total_seats_from_apportionment_result(result: &SeatAssignmentResult) -> Vec<u32> {
@@ -965,7 +974,7 @@ mod tests {
     fn test_list_numbers() {
         let standing = [
             &ListStanding {
-                pg_number: 2,
+                list_number: 2,
                 votes_cast: 1249,
                 remainder_votes: Fraction::new(14975, 24),
                 meets_remainder_threshold: true,
@@ -974,7 +983,7 @@ mod tests {
                 residual_seats: 0,
             },
             &ListStanding {
-                pg_number: 3,
+                list_number: 3,
                 votes_cast: 1249,
                 remainder_votes: Fraction::new(14975, 24),
                 meets_remainder_threshold: true,
@@ -983,7 +992,7 @@ mod tests {
                 residual_seats: 0,
             },
             &ListStanding {
-                pg_number: 4,
+                list_number: 4,
                 votes_cast: 1249,
                 remainder_votes: Fraction::new(14975, 24),
                 meets_remainder_threshold: true,
@@ -992,7 +1001,7 @@ mod tests {
                 residual_seats: 0,
             },
             &ListStanding {
-                pg_number: 5,
+                list_number: 5,
                 votes_cast: 1249,
                 remainder_votes: Fraction::new(14975, 24),
                 meets_remainder_threshold: true,
@@ -1001,7 +1010,7 @@ mod tests {
                 residual_seats: 0,
             },
             &ListStanding {
-                pg_number: 6,
+                list_number: 6,
                 votes_cast: 1249,
                 remainder_votes: Fraction::new(14975, 24),
                 meets_remainder_threshold: true,

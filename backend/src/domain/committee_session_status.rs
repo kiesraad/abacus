@@ -13,11 +13,11 @@ use crate::{
         file::{FileId, delete_file},
     },
     infra::audit_log::{AuditEvent, AuditService},
-    investigation::list_investigations_for_committee_session,
     polling_station,
     repository::{
         committee_session_repo::{change_files, change_status, get},
         data_entry_repo::are_results_complete_for_committee_session,
+        investigation_repo::list_investigations_for_committee_session,
     },
 };
 
@@ -371,10 +371,9 @@ mod tests {
 
         use super::*;
         use crate::{
-            investigation::{
-                PollingStationInvestigationCreateRequest, create_polling_station_investigation,
-            },
+            domain::investigation::PollingStationInvestigationCreateRequest,
             polling_station::PollingStationId,
+            repository::investigation_repo::create_polling_station_investigation,
         };
 
         /// Created --> Created
@@ -668,10 +667,9 @@ mod tests {
 
         use super::*;
         use crate::{
-            investigation::{
-                PollingStationInvestigationCreateRequest, create_polling_station_investigation,
-            },
+            domain::investigation::PollingStationInvestigationCreateRequest,
             polling_station::PollingStationId,
+            repository::investigation_repo::create_polling_station_investigation,
         };
 
         /// Created --> InPreparation
@@ -905,17 +903,19 @@ mod tests {
         use crate::{
             domain::{
                 data_entry::PollingStationResults,
+                investigation::{
+                    PollingStationInvestigationConcludeRequest,
+                    PollingStationInvestigationCreateRequest,
+                },
                 status::{DataEntryStatus, Definitive},
-            },
-            investigation::{
-                PollingStationInvestigationConcludeRequest,
-                PollingStationInvestigationCreateRequest, conclude_polling_station_investigation,
-                create_polling_station_investigation,
             },
             polling_station::PollingStationId,
             repository::{
                 data_entry_repo::{
                     get_or_default, get_result, insert_test_result, make_definitive,
+                },
+                investigation_repo::{
+                    conclude_polling_station_investigation, create_polling_station_investigation,
                 },
                 user_repo::UserId,
             },

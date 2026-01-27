@@ -19,19 +19,19 @@ use crate::{
             Election, ElectionId, ElectionNumberOfVotersChangeRequest, ElectionWithPoliticalGroups,
             NewElection, VoteCountingMethod,
         },
+        investigation::PollingStationInvestigation,
     },
     eml::{EML110, EML230, EMLDocument, EMLImportError, EmlHash, RedactedEmlHash},
     infra::{
         audit_log::{AuditEvent, AuditService},
         authentication::{Admin, AdminOrCoordinator, User},
     },
-    investigation::PollingStationInvestigation,
     polling_station,
     polling_station::{
         PollingStation, PollingStationRequest, PollingStationsRequest,
         create_imported_polling_stations,
     },
-    repository::{committee_session_repo, election_repo},
+    repository::{committee_session_repo, election_repo, investigation_repo},
 };
 
 pub fn router() -> OpenApiRouter<AppState> {
@@ -122,7 +122,7 @@ pub async fn election_details(
         .expect("There is always one committee session")
         .clone();
     let polling_stations = polling_station::list(&mut conn, current_committee_session.id).await?;
-    let investigations = crate::investigation::list_investigations_for_committee_session(
+    let investigations = investigation_repo::list_investigations_for_committee_session(
         &mut conn,
         current_committee_session.id,
     )

@@ -3,9 +3,8 @@ use serde::{Deserialize, Serialize};
 use crate::{
     domain::{
         committee_session::CommitteeSession, data_entry::CommonPollingStationResultsWithoutVotes,
-        election::Election,
+        election::Election, investigation::PollingStationInvestigation,
     },
-    investigation::PollingStationInvestigation,
     pdf_gen::{
         models::{PdfFileModel, PdfModel, ToPdfFileModel},
         votes_table::{VotesTablesWithOnlyPreviousVotes, VotesTablesWithPreviousVotes},

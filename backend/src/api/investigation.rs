@@ -4,18 +4,6 @@ use chrono::Datelike;
 use sqlx::{SqliteConnection, SqlitePool};
 use utoipa_axum::{router::OpenApiRouter, routes};
 
-use super::{
-    repository::{
-        conclude_polling_station_investigation, create_polling_station_investigation,
-        delete_polling_station_investigation, get_polling_station_investigation,
-        list_investigations_for_committee_session, update_polling_station_investigation,
-    },
-    structs::{
-        CurrentSessionPollingStationId, PollingStationInvestigation,
-        PollingStationInvestigationConcludeRequest, PollingStationInvestigationCreateRequest,
-        PollingStationInvestigationUpdateRequest,
-    },
-};
 use crate::{
     APIError, AppState, ErrorResponse, SqlitePoolExt,
     api::{
@@ -27,6 +15,11 @@ use crate::{
         committee_session_status::{CommitteeSessionStatus, change_committee_session_status},
         data_entry::PollingStationResults,
         election::ElectionWithPoliticalGroups,
+        investigation::{
+            CurrentSessionPollingStationId, PollingStationInvestigation,
+            PollingStationInvestigationConcludeRequest, PollingStationInvestigationCreateRequest,
+            PollingStationInvestigationUpdateRequest,
+        },
     },
     error::ErrorReference,
     infra::{
@@ -42,6 +35,11 @@ use crate::{
         committee_session_repo::get_election_committee_session,
         data_entry_repo::{data_entry_exists, previous_results_for_polling_station, result_exists},
         election_repo,
+        investigation_repo::{
+            conclude_polling_station_investigation, create_polling_station_investigation,
+            delete_polling_station_investigation, get_polling_station_investigation,
+            list_investigations_for_committee_session, update_polling_station_investigation,
+        },
     },
 };
 

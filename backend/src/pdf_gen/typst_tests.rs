@@ -23,8 +23,8 @@ use crate::{
             ElectionWithPoliticalGroups, PGNumber, PoliticalGroup, VoteCountingMethod,
         },
         file::FileId,
+        investigation::PollingStationInvestigation,
     },
-    investigation::PollingStationInvestigation,
     pdf_gen::{
         generate_pdf,
         models::{

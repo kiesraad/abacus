@@ -33,7 +33,6 @@ use crate::{
         audit_log::{AuditEvent, AuditService},
         authentication::{Coordinator, Role, Typist, User, error::AuthenticationError},
     },
-    investigation::get_polling_station_investigation,
     polling_station::{self, PollingStation, PollingStationId},
     repository::{
         committee_session_repo, data_entry_repo,
@@ -42,6 +41,7 @@ use crate::{
             previous_results_for_polling_station,
         },
         election_repo,
+        investigation_repo::get_polling_station_investigation,
         user_repo::UserId,
     },
 };
@@ -1042,9 +1042,11 @@ mod tests {
             validation::{ValidationResult, ValidationResultCode},
         },
         infra::authentication::Role,
-        investigation::insert_test_investigation,
         polling_station::insert_test_polling_station,
-        repository::data_entry_repo::{data_entry_exists, result_exists},
+        repository::{
+            data_entry_repo::{data_entry_exists, result_exists},
+            investigation_repo::insert_test_investigation,
+        },
     };
 
     fn example_data_entry() -> DataEntry {

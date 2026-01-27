@@ -500,9 +500,10 @@ mod tests {
         use sqlx::SqlitePool;
         use test_log::test;
 
-        use super::{super::*, create_test_results};
+        use super::*;
         use crate::{
-            investigation::insert_test_investigation, polling_station::insert_test_polling_station,
+            polling_station::insert_test_polling_station,
+            repository::investigation_repo::insert_test_investigation,
         };
 
         /// Test with first session, 2 polling stations with results
@@ -841,15 +842,19 @@ mod tests {
         use sqlx::{SqliteConnection, SqlitePool};
         use test_log::test;
 
-        use super::{super::*, create_test_results};
+        use super::*;
         use crate::{
-            investigation::{
+            domain::investigation::{
                 PollingStationInvestigationConcludeRequest,
-                PollingStationInvestigationCreateRequest, conclude_polling_station_investigation,
-                create_polling_station_investigation,
+                PollingStationInvestigationCreateRequest,
             },
             polling_station::insert_test_polling_station,
-            repository::data_entry_repo::insert_test_result,
+            repository::{
+                data_entry_repo::insert_test_result,
+                investigation_repo::{
+                    conclude_polling_station_investigation, create_polling_station_investigation,
+                },
+            },
         };
 
         async fn create_test_investigation(

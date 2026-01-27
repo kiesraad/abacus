@@ -15,7 +15,10 @@ use super::{
 };
 use crate::{
     APIError, AppState, ErrorResponse, SqlitePoolExt,
-    api::data_entry::delete_data_entry_and_result_for_polling_station,
+    api::{
+        data_entry::delete_data_entry_and_result_for_polling_station,
+        investigation::delete_investigation_for_polling_station,
+    },
     domain::{
         committee_session::CommitteeSession,
         committee_session_status::{CommitteeSessionStatus, change_committee_session_status},
@@ -26,7 +29,6 @@ use crate::{
         audit_log::{AuditEvent, AuditService, PollingStationImportDetails},
         authentication::{AdminOrCoordinator, User, error::AuthenticationError},
     },
-    investigation::delete_investigation_for_polling_station,
     repository::{committee_session_repo::get_election_committee_session, election_repo},
 };
 

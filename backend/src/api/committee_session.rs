@@ -23,10 +23,10 @@ use crate::{
         audit_log::{AuditEvent, AuditService},
         authentication::Coordinator,
     },
-    investigation::list_investigations_for_committee_session,
     repository::{
         committee_session_repo::{create, delete, get, get_election_committee_session, update},
         election_repo,
+        investigation_repo::list_investigations_for_committee_session,
     },
 };
 

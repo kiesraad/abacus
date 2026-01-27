@@ -1,10 +1,15 @@
 use sqlx::{SqliteConnection, query_as};
 
-use super::structs::{
-    PollingStationInvestigation, PollingStationInvestigationConcludeRequest,
-    PollingStationInvestigationCreateRequest,
+use crate::{
+    domain::{
+        committee_session::CommitteeSessionId,
+        investigation::{
+            PollingStationInvestigation, PollingStationInvestigationConcludeRequest,
+            PollingStationInvestigationCreateRequest, PollingStationInvestigationUpdateRequest,
+        },
+    },
+    polling_station::PollingStationId,
 };
-use crate::{domain::committee_session::CommitteeSessionId, polling_station::PollingStationId};
 
 pub async fn create_polling_station_investigation(
     conn: &mut SqliteConnection,
@@ -62,7 +67,7 @@ pub async fn conclude_polling_station_investigation(
 pub async fn update_polling_station_investigation(
     conn: &mut SqliteConnection,
     polling_station_id: PollingStationId,
-    polling_station_investigation: super::structs::PollingStationInvestigationUpdateRequest,
+    polling_station_investigation: PollingStationInvestigationUpdateRequest,
 ) -> Result<PollingStationInvestigation, sqlx::Error> {
     query_as!(
         PollingStationInvestigation,

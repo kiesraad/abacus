@@ -20,13 +20,14 @@ use crate::{
             self, CandidateGender, CandidateNumber, ElectionCategory, ElectionWithPoliticalGroups,
             NewElection, PGNumber, PoliticalGroup, VoteCountingMethod,
         },
+        polling_station::{PollingStation, PollingStationRequest, PollingStationType},
         status::{DataEntryStatus, Definitive, FirstEntryFinalised},
         validation::{FieldPath, Validate, ValidationResults},
     },
-    polling_station::{self, PollingStation, PollingStationRequest, PollingStationType},
     repository::{
         committee_session_repo, data_entry_repo,
-        data_entry_repo::list_results_for_committee_session, election_repo, user_repo::UserId,
+        data_entry_repo::list_results_for_committee_session, election_repo, polling_station_repo,
+        user_repo::UserId,
     },
     test_data_gen::GenerateElectionArgs,
 };
@@ -254,7 +255,7 @@ async fn generate_polling_stations(
         };
         remaining_voters -= ps_num_voters;
 
-        let ps = polling_station::create(
+        let ps = polling_station_repo::create(
             conn,
             election.id,
             PollingStationRequest {

@@ -7,9 +7,9 @@ use crate::{
         election::Election,
         investigation::PollingStationInvestigation,
         models::{PdfFileModel, PdfModel, ToPdfFileModel},
+        polling_station::PollingStation,
         votes_table::{VotesTablesWithOnlyPreviousVotes, VotesTablesWithPreviousVotes},
     },
-    polling_station::PollingStation,
     summary::ElectionSummaryWithoutVotes,
 };
 

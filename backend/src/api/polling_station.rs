@@ -6,13 +6,6 @@ use axum::{
 use sqlx::{Connection, SqliteConnection, SqlitePool};
 use utoipa_axum::{router::OpenApiRouter, routes};
 
-use super::{
-    repository::{create, create_many, delete, get_for_election, list, update},
-    structs::{
-        PollingStation, PollingStationFileRequest, PollingStationId, PollingStationListResponse,
-        PollingStationRequest, PollingStationRequestListResponse, PollingStationsRequest,
-    },
-};
 use crate::{
     APIError, AppState, ErrorResponse, SqlitePoolExt,
     api::{
@@ -23,13 +16,22 @@ use crate::{
         committee_session::CommitteeSession,
         committee_session_status::{CommitteeSessionStatus, change_committee_session_status},
         election::ElectionId,
+        polling_station::{
+            PollingStation, PollingStationFileRequest, PollingStationId,
+            PollingStationListResponse, PollingStationRequest, PollingStationRequestListResponse,
+            PollingStationsRequest,
+        },
     },
     eml::{EML110, EMLDocument, EMLImportError, EmlHash},
     infra::{
         audit_log::{AuditEvent, AuditService, PollingStationImportDetails},
         authentication::{AdminOrCoordinator, User, error::AuthenticationError},
     },
-    repository::{committee_session_repo::get_election_committee_session, election_repo},
+    repository::{
+        committee_session_repo::get_election_committee_session,
+        election_repo,
+        polling_station_repo::{create, create_many, delete, get_for_election, list, update},
+    },
 };
 
 pub fn router() -> OpenApiRouter<AppState> {
@@ -461,7 +463,7 @@ mod tests {
     use test_log::test;
 
     use super::{PollingStationRequest, create, create_many, update};
-    use crate::{domain::election::ElectionId, polling_station::PollingStationId};
+    use crate::domain::{election::ElectionId, polling_station::PollingStationId};
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2", "election_3"))))]
     async fn test_polling_station_number_unique_per_election(pool: SqlitePool) {

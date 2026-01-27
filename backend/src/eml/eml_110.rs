@@ -9,9 +9,12 @@ use super::{
     },
 };
 use crate::{
-    domain::election::{self, PGNumber, PoliticalGroup, VoteCountingMethod},
+    domain::{
+        election::{self, PGNumber, PoliticalGroup, VoteCountingMethod},
+        polling_station,
+        polling_station::PollingStationRequest,
+    },
     eml::common::{AuthorityAddress, AuthorityIdentifier},
-    polling_station::PollingStationRequest,
 };
 
 /// Election definition (110a and 110b)
@@ -281,7 +284,7 @@ impl EML110 {
 
     pub fn polling_stations_from_election(
         election: &election::ElectionWithPoliticalGroups,
-        polling_stations: &[crate::polling_station::PollingStation],
+        polling_stations: &[polling_station::PollingStation],
         transaction_id: &str,
     ) -> Self {
         let now = chrono::Utc::now();

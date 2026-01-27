@@ -13,8 +13,8 @@ use crate::{
         committee_session::CommitteeSession,
         data_entry::{PoliticalGroupCandidateVotes, PollingStationResults},
         election,
+        polling_station::PollingStation,
     },
-    polling_station::PollingStation,
     summary::ElectionSummary,
 };
 

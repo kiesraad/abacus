@@ -3,18 +3,16 @@ use std::fmt;
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
 
-use crate::{
-    domain::{
-        comparison::Compare,
-        data_entry::{
-            CandidateVotes, CommonPollingStationResults, Count, CountingDifferencesPollingStation,
-            DifferencesCounts, ExtraInvestigation, PoliticalGroupCandidateVotes,
-            PoliticalGroupTotalVotes, PollingStationResults, VotersCounts, VotesCounts,
-        },
-        election::{CandidateNumber, ElectionWithPoliticalGroups, PGNumber},
-        status::{DataEntryStatus, FirstEntryFinalised, FirstEntryHasErrors, FirstEntryInProgress},
+use crate::domain::{
+    comparison::Compare,
+    data_entry::{
+        CandidateVotes, CommonPollingStationResults, Count, CountingDifferencesPollingStation,
+        DifferencesCounts, ExtraInvestigation, PoliticalGroupCandidateVotes,
+        PoliticalGroupTotalVotes, PollingStationResults, VotersCounts, VotesCounts,
     },
+    election::{CandidateNumber, ElectionWithPoliticalGroups, PGNumber},
     polling_station::PollingStation,
+    status::{DataEntryStatus, FirstEntryFinalised, FirstEntryHasErrors, FirstEntryInProgress},
 };
 
 #[derive(Serialize, Deserialize, ToSchema, Debug, Default, PartialEq, Eq)]
@@ -1124,12 +1122,10 @@ mod tests {
     use test_log::test;
 
     use super::*;
-    use crate::{
-        domain::{
-            data_entry::{YesNo, tests::ValidDefault},
-            election::tests::election_fixture,
-        },
-        polling_station::polling_station_fixture,
+    use crate::domain::{
+        data_entry::{YesNo, tests::ValidDefault},
+        election::tests::election_fixture,
+        polling_station::tests::polling_station_fixture,
     };
 
     mod extra_investigation {

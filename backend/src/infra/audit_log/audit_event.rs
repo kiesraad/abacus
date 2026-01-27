@@ -9,10 +9,9 @@ use crate::{
     ErrorResponse,
     domain::{
         committee_session::CommitteeSessionId, election::ElectionId, file::FileId,
-        investigation::PollingStationInvestigation,
+        investigation::PollingStationInvestigation, polling_station::PollingStationId,
     },
     error::ErrorReference,
-    polling_station::PollingStationId,
     repository::user_repo::UserId,
 };
 

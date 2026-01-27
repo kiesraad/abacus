@@ -21,12 +21,12 @@ use crate::{
         file::{File, create_file},
         investigation::PollingStationInvestigation,
         models::{ModelNa14_2Input, ModelNa31_2Input, ModelP2aInput, PdfFileModel, ToPdfFileModel},
+        polling_station::PollingStation,
         votes_table::{VotesTables, VotesTablesWithPreviousVotes},
     },
     eml::{EML510, EMLDocument, EmlHash},
     error::ErrorReference,
     infra::{audit_log::AuditService, authentication::Coordinator, pdf_gen::generate_pdf},
-    polling_station::{self, PollingStation},
     repository::{
         committee_session_repo,
         committee_session_repo::{change_files, get_previous_session},
@@ -35,6 +35,7 @@ use crate::{
         },
         election_repo, file_repo,
         investigation_repo::list_investigations_for_committee_session,
+        polling_station_repo,
     },
     summary::ElectionSummary,
     zip::{ZipResponse, ZipResponseError, slugify_filename, zip_single_file},
@@ -70,7 +71,7 @@ impl ResultsInput {
     ) -> Result<ResultsInput, APIError> {
         let committee_session = committee_session_repo::get(conn, committee_session_id).await?;
         let election = election_repo::get(conn, committee_session.election_id).await?;
-        let polling_stations = polling_station::list(conn, committee_session.id).await?;
+        let polling_stations = polling_station_repo::list(conn, committee_session.id).await?;
         let results = list_results_for_committee_session(conn, committee_session.id).await?;
 
         // get investigations if this is not the first session

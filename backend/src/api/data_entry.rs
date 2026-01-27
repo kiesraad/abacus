@@ -22,6 +22,7 @@ use crate::{
         },
         election::{ElectionId, ElectionWithPoliticalGroups, PoliticalGroup},
         entry_number::EntryNumber,
+        polling_station::{PollingStation, PollingStationId},
         status::{
             ClientState, CurrentDataEntry, DataEntryStatus, DataEntryStatusName,
             DataEntryTransitionError, EntriesDifferent,
@@ -33,7 +34,6 @@ use crate::{
         audit_log::{AuditEvent, AuditService},
         authentication::{Coordinator, Role, Typist, User, error::AuthenticationError},
     },
-    polling_station::{self, PollingStation, PollingStationId},
     repository::{
         committee_session_repo, data_entry_repo,
         data_entry_repo::{
@@ -42,6 +42,7 @@ use crate::{
         },
         election_repo,
         investigation_repo::get_polling_station_investigation,
+        polling_station_repo,
         user_repo::UserId,
     },
 };
@@ -108,7 +109,7 @@ async fn validate_and_get_data(
     ),
     APIError,
 > {
-    let polling_station = polling_station::get(conn, polling_station_id).await?;
+    let polling_station = polling_station_repo::get(conn, polling_station_id).await?;
     let committee_session =
         committee_session_repo::get(conn, polling_station.committee_session_id).await?;
     let election = election_repo::get(conn, committee_session.election_id).await?;
@@ -645,7 +646,7 @@ async fn polling_station_data_entries_and_result_delete(
 ) -> Result<StatusCode, APIError> {
     let mut tx = pool.begin_immediate().await?;
 
-    let polling_station = polling_station::get(&mut tx, polling_station_id).await?;
+    let polling_station = polling_station_repo::get(&mut tx, polling_station_id).await?;
     let committee_session =
         committee_session_repo::get(&mut tx, polling_station.committee_session_id).await?;
 
@@ -1042,10 +1043,10 @@ mod tests {
             validation::{ValidationResult, ValidationResultCode},
         },
         infra::authentication::Role,
-        polling_station::insert_test_polling_station,
         repository::{
             data_entry_repo::{data_entry_exists, result_exists},
             investigation_repo::insert_test_investigation,
+            polling_station_repo::insert_test_polling_station,
         },
     };
 

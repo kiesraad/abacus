@@ -5,9 +5,9 @@ use crate::{
         committee_session::CommitteeSession,
         election::Election,
         models::{PdfFileModel, PdfModel, ToPdfFileModel},
+        polling_station::PollingStation,
         votes_table::{CandidatesTables, VotesTables},
     },
-    polling_station::PollingStation,
     summary::ElectionSummaryWithoutVotes,
 };
 

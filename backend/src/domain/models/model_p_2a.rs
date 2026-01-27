@@ -1,12 +1,10 @@
 use serde::{Deserialize, Serialize};
 
-use crate::{
-    domain::{
-        committee_session::CommitteeSession,
-        election::ElectionWithPoliticalGroups,
-        investigation::PollingStationInvestigation,
-        models::{PdfFileModel, PdfModel, ToPdfFileModel},
-    },
+use crate::domain::{
+    committee_session::CommitteeSession,
+    election::ElectionWithPoliticalGroups,
+    investigation::PollingStationInvestigation,
+    models::{PdfFileModel, PdfModel, ToPdfFileModel},
     polling_station::PollingStation,
 };
 

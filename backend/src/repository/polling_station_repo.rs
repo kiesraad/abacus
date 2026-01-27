@@ -1,9 +1,11 @@
 use sqlx::{Connection, SqliteConnection, query, query_as};
 
-use super::structs::{PollingStation, PollingStationRequest};
 use crate::{
-    domain::{committee_session::CommitteeSessionId, election::ElectionId},
-    polling_station::PollingStationId,
+    domain::{
+        committee_session::CommitteeSessionId,
+        election::ElectionId,
+        polling_station::{PollingStation, PollingStationId, PollingStationRequest},
+    },
     repository::committee_session_repo,
 };
 

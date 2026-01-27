@@ -7,10 +7,10 @@ use crate::{
     domain::{
         committee_session::CommitteeSessionId,
         data_entry::{PollingStationDataEntry, PollingStationResult, PollingStationResults},
+        polling_station::{PollingStation, PollingStationId},
         status::DataEntryStatus,
     },
-    polling_station::{self, PollingStation, PollingStationId},
-    repository::committee_session_repo,
+    repository::{committee_session_repo, polling_station_repo},
 };
 
 /// Get the full polling station data entry row for a given polling station
@@ -298,7 +298,7 @@ async fn fetch_results_for_committee_session(
 
     // Get and index polling stations by id for performance
     let polling_stations: HashMap<PollingStationId, _> =
-        polling_station::list(&mut tx, committee_session_id)
+        polling_station_repo::list(&mut tx, committee_session_id)
             .await?
             .into_iter()
             .filter(|ps| polling_station_id.is_none_or(|id| ps.id == id))
@@ -379,7 +379,7 @@ pub async fn previous_results_for_polling_station(
     conn: &mut SqliteConnection,
     polling_station_id: PollingStationId,
 ) -> Result<PollingStationResults, sqlx::Error> {
-    let polling_station = polling_station::get(conn, polling_station_id).await?;
+    let polling_station = polling_station_repo::get(conn, polling_station_id).await?;
     let ps_id_prev_session = polling_station
         .id_prev_session
         .ok_or(sqlx::Error::RowNotFound)?;
@@ -501,9 +501,9 @@ mod tests {
         use test_log::test;
 
         use super::*;
-        use crate::{
-            polling_station::insert_test_polling_station,
-            repository::investigation_repo::insert_test_investigation,
+        use crate::repository::{
+            investigation_repo::insert_test_investigation,
+            polling_station_repo::insert_test_polling_station,
         };
 
         /// Test with first session, 2 polling stations with results
@@ -848,12 +848,12 @@ mod tests {
                 PollingStationInvestigationConcludeRequest,
                 PollingStationInvestigationCreateRequest,
             },
-            polling_station::insert_test_polling_station,
             repository::{
                 data_entry_repo::insert_test_result,
                 investigation_repo::{
                     conclude_polling_station_investigation, create_polling_station_investigation,
                 },
+                polling_station_repo::insert_test_polling_station,
             },
         };
 

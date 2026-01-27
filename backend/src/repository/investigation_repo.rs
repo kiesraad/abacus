@@ -1,12 +1,10 @@
 use sqlx::{SqliteConnection, query_as};
 
-use crate::{
-    domain::{
-        committee_session::CommitteeSessionId,
-        investigation::{
-            PollingStationInvestigation, PollingStationInvestigationConcludeRequest,
-            PollingStationInvestigationCreateRequest, PollingStationInvestigationUpdateRequest,
-        },
+use crate::domain::{
+    committee_session::CommitteeSessionId,
+    investigation::{
+        PollingStationInvestigation, PollingStationInvestigationConcludeRequest,
+        PollingStationInvestigationCreateRequest, PollingStationInvestigationUpdateRequest,
     },
     polling_station::PollingStationId,
 };

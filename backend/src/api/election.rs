@@ -11,7 +11,10 @@ use utoipa_axum::{router::OpenApiRouter, routes};
 
 use crate::{
     APIError, AppState, ErrorResponse, SqlitePoolExt,
-    api::committee_session::{CommitteeSessionError, create_committee_session},
+    api::{
+        committee_session::{CommitteeSessionError, create_committee_session},
+        polling_station::create_imported_polling_stations,
+    },
     domain::{
         committee_session::{CommitteeSession, CommitteeSessionCreateRequest},
         committee_session_status::CommitteeSessionStatus,
@@ -20,18 +23,14 @@ use crate::{
             NewElection, VoteCountingMethod,
         },
         investigation::PollingStationInvestigation,
+        polling_station::{PollingStation, PollingStationRequest, PollingStationsRequest},
     },
     eml::{EML110, EML230, EMLDocument, EMLImportError, EmlHash, RedactedEmlHash},
     infra::{
         audit_log::{AuditEvent, AuditService},
         authentication::{Admin, AdminOrCoordinator, User},
     },
-    polling_station,
-    polling_station::{
-        PollingStation, PollingStationRequest, PollingStationsRequest,
-        create_imported_polling_stations,
-    },
-    repository::{committee_session_repo, election_repo, investigation_repo},
+    repository::{committee_session_repo, election_repo, investigation_repo, polling_station_repo},
 };
 
 pub fn router() -> OpenApiRouter<AppState> {
@@ -121,7 +120,8 @@ pub async fn election_details(
         .first()
         .expect("There is always one committee session")
         .clone();
-    let polling_stations = polling_station::list(&mut conn, current_committee_session.id).await?;
+    let polling_stations =
+        polling_station_repo::list(&mut conn, current_committee_session.id).await?;
     let investigations = investigation_repo::list_investigations_for_committee_session(
         &mut conn,
         current_committee_session.id,

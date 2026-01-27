@@ -10,10 +10,10 @@ use crate::{
             VotersCounts, VotesCounts,
         },
         election::ElectionWithPoliticalGroups,
+        polling_station::{PollingStation, PollingStationNumber},
         validation::{Validate, ValidationResults},
     },
     error::ErrorReference,
-    polling_station::{PollingStation, PollingStationNumber},
 };
 
 /// Contains a summary of the election results, added up from the votes of all polling stations.

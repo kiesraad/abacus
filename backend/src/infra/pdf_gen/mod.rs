@@ -31,9 +31,9 @@ pub(crate) mod tests {
                 tests::election_fixture,
             },
             models::{ModelNa31_2Input, PdfFileModel, PdfModel, ToPdfFileModel, filter_input},
+            polling_station::{PollingStation, PollingStationId, PollingStationType},
             votes_table::VotesTables,
         },
-        polling_station::{PollingStation, PollingStationId, PollingStationType},
         summary::ElectionSummary,
     };
 

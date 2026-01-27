@@ -11,11 +11,11 @@ use crate::{
     domain::{
         committee_session::CommitteeSessionId,
         election::{CandidateNumber, PGNumber, PoliticalGroup},
+        polling_station::PollingStationId,
         status::{DataEntryStatus, DataEntryStatusName},
     },
     error::ErrorReference,
     infra::audit_log::{DataEntryDetails, ResultDetails},
-    polling_station::PollingStationId,
 };
 
 #[derive(Serialize, Deserialize, Clone, ToSchema, Debug, FromRow, Default)]

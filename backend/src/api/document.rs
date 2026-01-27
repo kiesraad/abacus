@@ -22,8 +22,7 @@ use crate::{
         authentication::AdminOrCoordinator,
         pdf_gen::{generate_pdf, generate_pdfs},
     },
-    polling_station,
-    repository::{committee_session_repo, election_repo},
+    repository::{committee_session_repo, election_repo, polling_station_repo},
     zip::ZipResponse,
 };
 
@@ -66,7 +65,8 @@ async fn election_download_n_10_2(
     let election = election_repo::get(&mut conn, election_id).await?;
     let current_committee_session =
         committee_session_repo::get_election_committee_session(&mut conn, election.id).await?;
-    let polling_stations = polling_station::list(&mut conn, current_committee_session.id).await?;
+    let polling_stations =
+        polling_station_repo::list(&mut conn, current_committee_session.id).await?;
     drop(conn);
 
     let zip_filename = format!(
@@ -144,7 +144,8 @@ async fn election_download_na_31_2_bijlage1(
     let election = election_repo::get(&mut conn, election_id).await?;
     let current_committee_session =
         committee_session_repo::get_election_committee_session(&mut conn, election.id).await?;
-    let polling_stations = polling_station::list(&mut conn, current_committee_session.id).await?;
+    let polling_stations =
+        polling_station_repo::list(&mut conn, current_committee_session.id).await?;
     drop(conn);
 
     let zip_filename = format!(

@@ -10,7 +10,7 @@ use crate::{
         committee_session_status::CommitteeSessionStatus,
         election::ElectionId,
     },
-    polling_station::duplicate_for_committee_session,
+    repository::polling_station_repo::duplicate_for_committee_session,
 };
 
 pub async fn get(

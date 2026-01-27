@@ -21,6 +21,7 @@ use crate::{
             PollingStationInvestigationUpdateRequest,
         },
         models::{ModelNa14_2Bijlage1Input, ToPdfFileModel},
+        polling_station::{PollingStation, PollingStationId},
         votes_table::VotesTablesWithOnlyPreviousVotes,
     },
     error::ErrorReference,
@@ -29,7 +30,6 @@ use crate::{
         authentication::Coordinator,
         pdf_gen::generate_pdf,
     },
-    polling_station::{self, PollingStation, PollingStationId},
     repository::{
         committee_session_repo::get_election_committee_session,
         data_entry_repo::{data_entry_exists, previous_results_for_polling_station, result_exists},
@@ -39,6 +39,7 @@ use crate::{
             delete_polling_station_investigation, get_polling_station_investigation,
             list_investigations_for_committee_session, update_polling_station_investigation,
         },
+        polling_station_repo,
     },
 };
 
@@ -58,7 +59,7 @@ async fn validate_and_get_committee_session(
     conn: &mut SqliteConnection,
     polling_station_id: PollingStationId,
 ) -> Result<CommitteeSession, APIError> {
-    let polling_station = polling_station::get(conn, polling_station_id).await?;
+    let polling_station = polling_station_repo::get(conn, polling_station_id).await?;
 
     // Get latest committee session for the election
     let committee_session =
@@ -200,7 +201,7 @@ async fn polling_station_investigation_conclude(
 
     let committee_session = validate_and_get_committee_session(&mut tx, polling_station_id).await?;
 
-    let polling_station = polling_station::get(&mut tx, polling_station_id).await?;
+    let polling_station = polling_station_repo::get(&mut tx, polling_station_id).await?;
     if polling_station.id_prev_session.is_none() && !polling_station_investigation.corrected_results
     {
         return Err(APIError::Conflict(
@@ -304,7 +305,7 @@ async fn polling_station_investigation_update(
 
     let committee_session = validate_and_get_committee_session(&mut tx, polling_station_id).await?;
 
-    let polling_station = polling_station::get(&mut tx, polling_station_id).await?;
+    let polling_station = polling_station_repo::get(&mut tx, polling_station_id).await?;
     if polling_station.id_prev_session.is_none()
         && investigation_update_request.corrected_results != Some(true)
     {
@@ -323,7 +324,7 @@ async fn polling_station_investigation_update(
             || result_exists(&mut tx, polling_station_id).await?)
     {
         if investigation_update_request.accept_data_entry_deletion == Some(true) {
-            let polling_station = polling_station::get(&mut tx, polling_station_id).await?;
+            let polling_station = polling_station_repo::get(&mut tx, polling_station_id).await?;
             delete_data_entry_and_result_for_polling_station(
                 &mut tx,
                 &audit_service,
@@ -380,7 +381,7 @@ async fn polling_station_investigation_delete(
     let committee_session = validate_and_get_committee_session(&mut tx, polling_station_id).await?;
 
     get_polling_station_investigation(&mut tx, polling_station_id).await?;
-    let polling_station = polling_station::get(&mut tx, polling_station_id).await?;
+    let polling_station = polling_station_repo::get(&mut tx, polling_station_id).await?;
 
     // Delete investigation
     delete_investigation_for_polling_station(
@@ -452,7 +453,7 @@ async fn polling_station_investigation_download_corrigendum_pdf(
     let investigation: PollingStationInvestigation =
         get_polling_station_investigation(&mut conn, polling_station_id).await?;
     let polling_station: PollingStation =
-        polling_station::get(&mut conn, polling_station_id).await?;
+        polling_station_repo::get(&mut conn, polling_station_id).await?;
     let election: ElectionWithPoliticalGroups =
         election_repo::get(&mut conn, polling_station.election_id).await?;
 
@@ -502,7 +503,7 @@ mod tests {
     use sqlx::SqlitePool;
     use test_log::test;
 
-    use crate::polling_station::PollingStationId;
+    use crate::domain::polling_station::PollingStationId;
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_7_four_sessions"))))]
     async fn test_validation_ok(pool: SqlitePool) {

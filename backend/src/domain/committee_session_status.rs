@@ -13,11 +13,11 @@ use crate::{
         file::{FileId, delete_file},
     },
     infra::audit_log::{AuditEvent, AuditService},
-    polling_station,
     repository::{
         committee_session_repo::{change_files, change_status, get},
         data_entry_repo::are_results_complete_for_committee_session,
         investigation_repo::list_investigations_for_committee_session,
+        polling_station_repo,
     },
 };
 
@@ -154,7 +154,8 @@ impl CommitteeSessionStatus {
             | CommitteeSessionStatus::DataEntry
             | CommitteeSessionStatus::Paused
             | CommitteeSessionStatus::Completed => {
-                let polling_stations = polling_station::list(conn, committee_session.id).await?;
+                let polling_stations =
+                    polling_station_repo::list(conn, committee_session.id).await?;
                 if polling_stations.is_empty() {
                     return Ok(CommitteeSessionStatus::Created);
                 } else if committee_session.is_next_session() {
@@ -177,7 +178,8 @@ impl CommitteeSessionStatus {
     ) -> Result<Self, CommitteeSessionError> {
         match self {
             CommitteeSessionStatus::Created => {
-                let polling_stations = polling_station::list(conn, committee_session.id).await?;
+                let polling_stations =
+                    polling_station_repo::list(conn, committee_session.id).await?;
                 if polling_stations.is_empty() {
                     Err(CommitteeSessionError::InvalidStatusTransition)
                 } else if committee_session.is_next_session() {
@@ -371,8 +373,10 @@ mod tests {
 
         use super::*;
         use crate::{
-            domain::investigation::PollingStationInvestigationCreateRequest,
-            polling_station::PollingStationId,
+            domain::{
+                investigation::PollingStationInvestigationCreateRequest,
+                polling_station::PollingStationId,
+            },
             repository::investigation_repo::create_polling_station_investigation,
         };
 
@@ -667,8 +671,10 @@ mod tests {
 
         use super::*;
         use crate::{
-            domain::investigation::PollingStationInvestigationCreateRequest,
-            polling_station::PollingStationId,
+            domain::{
+                investigation::PollingStationInvestigationCreateRequest,
+                polling_station::PollingStationId,
+            },
             repository::investigation_repo::create_polling_station_investigation,
         };
 
@@ -907,9 +913,9 @@ mod tests {
                     PollingStationInvestigationConcludeRequest,
                     PollingStationInvestigationCreateRequest,
                 },
+                polling_station::PollingStationId,
                 status::{DataEntryStatus, Definitive},
             },
-            polling_station::PollingStationId,
             repository::{
                 data_entry_repo::{
                     get_or_default, get_result, insert_test_result, make_definitive,

@@ -28,13 +28,13 @@ use crate::{
             ModelN10_2Input, ModelNa14_2Bijlage1Input, ModelNa14_2Input, ModelNa31_2Bijlage1Input,
             ModelNa31_2Input, ModelP2aInput, PdfFileModel, PdfModel,
         },
+        polling_station::{PollingStation, PollingStationId, PollingStationType},
         votes_table::{
             CandidatesTables, VotesTables, VotesTablesWithOnlyPreviousVotes,
             VotesTablesWithPreviousVotes,
         },
     },
     infra::pdf_gen::generate_pdf,
-    polling_station::{PollingStation, PollingStationId, PollingStationType},
     report::DEFAULT_DATE_TIME_FORMAT,
     summary::{ElectionSummary, PollingStationInvestigations, SumCount, SummaryDifferencesCounts},
 };

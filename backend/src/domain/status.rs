@@ -9,9 +9,9 @@ use crate::{
     domain::{
         data_entry::PollingStationResults,
         election::ElectionWithPoliticalGroups,
+        polling_station::PollingStation,
         validation::{DataError, ValidateRoot, ValidationResults},
     },
-    polling_station::PollingStation,
     repository::user_repo::UserId,
 };
 
@@ -715,18 +715,16 @@ impl Display for DataEntryTransitionError {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::{
-        domain::{
-            committee_session::CommitteeSessionId,
-            data_entry::{
-                CSOFirstSessionResults, CandidateVotes, PoliticalGroupCandidateVotes,
-                PoliticalGroupTotalVotes, VotersCounts, VotesCounts,
-                tests::{ValidDefault, example_polling_station_results},
-            },
-            election::{
-                Candidate, CandidateNumber, ElectionCategory, ElectionId, PGNumber, PoliticalGroup,
-                VoteCountingMethod,
-            },
+    use crate::domain::{
+        committee_session::CommitteeSessionId,
+        data_entry::{
+            CSOFirstSessionResults, CandidateVotes, PoliticalGroupCandidateVotes,
+            PoliticalGroupTotalVotes, VotersCounts, VotesCounts,
+            tests::{ValidDefault, example_polling_station_results},
+        },
+        election::{
+            Candidate, CandidateNumber, ElectionCategory, ElectionId, PGNumber, PoliticalGroup,
+            VoteCountingMethod,
         },
         polling_station::{PollingStation, PollingStationId, PollingStationType},
     };

@@ -6,7 +6,6 @@ use utoipa::ToSchema;
 use crate::{
     APIError,
     api::committee_session::CommitteeSessionError,
-    data_entry::repository::are_results_complete_for_committee_session,
     domain::committee_session::{
         CommitteeSession, CommitteeSessionFilesUpdateRequest, CommitteeSessionId,
     },
@@ -14,7 +13,10 @@ use crate::{
     infra::audit_log::{AuditEvent, AuditService},
     investigation::list_investigations_for_committee_session,
     polling_station,
-    repository::committee_session_repo::{change_files, change_status, get},
+    repository::{
+        committee_session_repo::{change_files, change_status, get},
+        data_entry_repo::are_results_complete_for_committee_session,
+    },
 };
 
 /// Committee session status
@@ -898,9 +900,8 @@ mod tests {
 
         use super::*;
         use crate::{
-            data_entry::{
-                PollingStationResults,
-                repository::{get_or_default, get_result, insert_test_result, make_definitive},
+            domain::{
+                data_entry::PollingStationResults,
                 status::{DataEntryStatus, Definitive},
             },
             investigation::{
@@ -909,7 +910,12 @@ mod tests {
                 create_polling_station_investigation,
             },
             polling_station::PollingStationId,
-            repository::user_repo::UserId,
+            repository::{
+                data_entry_repo::{
+                    get_or_default, get_result, insert_test_result, make_definitive,
+                },
+                user_repo::UserId,
+            },
         };
 
         /// Created --> Completed

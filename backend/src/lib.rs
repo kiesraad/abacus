@@ -11,7 +11,6 @@ use tracing::{info, trace, warn};
 
 pub mod api;
 pub mod app_error;
-pub mod data_entry;
 pub mod document;
 pub mod domain;
 pub mod election;

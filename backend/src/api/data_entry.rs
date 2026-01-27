@@ -10,25 +10,22 @@ use sqlx::{SqliteConnection, SqlitePool};
 use utoipa::ToSchema;
 use utoipa_axum::{router::OpenApiRouter, routes};
 
-use super::{
-    CSONextSessionResults, CommonPollingStationResults, DataEntryStatusResponse, DataError,
-    PollingStationDataEntry, PollingStationResults, ValidateRoot, ValidationResults,
-    entry_number::EntryNumber,
-    repository::{
-        delete_data_entry, delete_result, get_data_entry, previous_results_for_polling_station,
-    },
-    status::{
-        ClientState, CurrentDataEntry, DataEntryStatus, DataEntryStatusName,
-        DataEntryTransitionError, EntriesDifferent,
-    },
-};
 use crate::{
     APIError, AppState, SqlitePoolExt,
     api::committee_session::CommitteeSessionError,
-    data_entry::repository::get_result,
     domain::{
         committee_session::CommitteeSession,
         committee_session_status::{CommitteeSessionStatus, change_committee_session_status},
+        data_entry::{
+            CSONextSessionResults, CommonPollingStationResults, DataEntryStatusResponse,
+            PollingStationDataEntry, PollingStationResults,
+        },
+        entry_number::EntryNumber,
+        status::{
+            ClientState, CurrentDataEntry, DataEntryStatus, DataEntryStatusName,
+            DataEntryTransitionError, EntriesDifferent,
+        },
+        validation::{DataError, ValidateRoot, ValidationResults},
     },
     election::{ElectionId, ElectionWithPoliticalGroups, PoliticalGroup},
     error::{ErrorReference, ErrorResponse},
@@ -38,7 +35,14 @@ use crate::{
     },
     investigation::get_polling_station_investigation,
     polling_station::{self, PollingStation, PollingStationId},
-    repository::{committee_session_repo, user_repo::UserId},
+    repository::{
+        committee_session_repo, data_entry_repo,
+        data_entry_repo::{
+            delete_data_entry, delete_result, get_data_entry, get_result,
+            previous_results_for_polling_station,
+        },
+        user_repo::UserId,
+    },
 };
 
 impl From<DataError> for APIError {
@@ -108,12 +112,8 @@ async fn validate_and_get_data(
         committee_session_repo::get(conn, polling_station.committee_session_id).await?;
     let election = crate::election::repository::get(conn, committee_session.election_id).await?;
 
-    let data_entry_status = crate::data_entry::repository::get_or_default(
-        conn,
-        polling_station_id,
-        committee_session.id,
-    )
-    .await?;
+    let data_entry_status =
+        data_entry_repo::get_or_default(conn, polling_station_id, committee_session.id).await?;
 
     // Validate polling station
     if committee_session.is_next_session() {
@@ -300,7 +300,7 @@ async fn polling_station_data_entry_claim(
     let validation_results = new_state.start_validate(&polling_station, &election)?;
 
     // Save the new data entry state
-    crate::data_entry::repository::upsert(
+    data_entry_repo::upsert(
         &mut tx,
         polling_station_id,
         committee_session.id,
@@ -420,7 +420,7 @@ async fn polling_station_data_entry_save(
     let validation_results = new_state.start_validate(&polling_station, &election)?;
 
     // Save the new data entry state
-    crate::data_entry::repository::upsert(
+    data_entry_repo::upsert(
         &mut tx,
         polling_station_id,
         committee_session.id,
@@ -487,7 +487,7 @@ async fn polling_station_data_entry_delete(
         delete_data_entry(&mut tx, polling_station_id).await?;
     } else {
         // The status of the data entry is updated when the second entry is deleted
-        data_entry = crate::data_entry::repository::upsert(
+        data_entry = data_entry_repo::upsert(
             &mut tx,
             polling_station_id,
             committee_session.id,
@@ -543,7 +543,7 @@ async fn polling_station_data_entry_finalise(
     match entry_number {
         EntryNumber::FirstEntry => {
             let new_state = state.finalise_first_entry(&polling_station, &election, user_id)?;
-            crate::data_entry::repository::upsert(
+            data_entry_repo::upsert(
                 &mut tx,
                 polling_station_id,
                 committee_session.id,
@@ -558,7 +558,7 @@ async fn polling_station_data_entry_finalise(
             match (&new_state, data) {
                 (DataEntryStatus::Definitive(_), Some(data)) => {
                     // Save the data to the database
-                    crate::data_entry::repository::make_definitive(
+                    data_entry_repo::make_definitive(
                         &mut tx,
                         polling_station_id,
                         committee_session.id,
@@ -571,7 +571,7 @@ async fn polling_station_data_entry_finalise(
                     unreachable!("Data entry is in definitive state but no data is present");
                 }
                 (new_state, _) => {
-                    crate::data_entry::repository::upsert(
+                    data_entry_repo::upsert(
                         &mut tx,
                         polling_station_id,
                         committee_session.id,
@@ -813,7 +813,7 @@ async fn polling_station_data_entry_resolve_errors(
         .await?;
     } else {
         // The status of the data entry is updated when the first entry is resumed
-        let data_entry = crate::data_entry::repository::upsert(
+        let data_entry = data_entry_repo::upsert(
             &mut tx,
             polling_station_id,
             committee_session.id,
@@ -937,7 +937,7 @@ async fn polling_station_data_entry_resolve_differences(
         .await?;
     } else {
         // The status of the data entry is updated when the first or second entry is kept
-        let data_entry = crate::data_entry::repository::upsert(
+        let data_entry = data_entry_repo::upsert(
             &mut tx,
             polling_station_id,
             committee_session.id,
@@ -1020,8 +1020,7 @@ async fn election_status(
     let current_committee_session =
         committee_session_repo::get_election_committee_session(&mut conn, election_id).await?;
 
-    let statuses =
-        crate::data_entry::repository::statuses(&mut conn, current_committee_session.id).await?;
+    let statuses = data_entry_repo::statuses(&mut conn, current_committee_session.id).await?;
     Ok(Json(ElectionStatusResponse { statuses }))
 }
 
@@ -1035,17 +1034,16 @@ mod tests {
     use super::*;
     use crate::{
         api::committee_session::tests::change_status_committee_session,
-        data_entry::{
-            ValidationResult, ValidationResultCode,
-            repository::{data_entry_exists, result_exists},
-            structs::tests::example_polling_station_results,
-        },
         domain::{
-            committee_session::CommitteeSessionId, committee_session_status::CommitteeSessionStatus,
+            committee_session::CommitteeSessionId,
+            committee_session_status::CommitteeSessionStatus,
+            data_entry::tests::example_polling_station_results,
+            validation::{ValidationResult, ValidationResultCode},
         },
         infra::authentication::Role,
         investigation::insert_test_investigation,
         polling_station::insert_test_polling_station,
+        repository::data_entry_repo::{data_entry_exists, result_exists},
     };
 
     fn example_data_entry() -> DataEntry {
@@ -1070,7 +1068,7 @@ mod tests {
         committee_session_id: CommitteeSessionId,
     ) -> DataEntryStatus {
         let mut conn = pool.acquire().await.unwrap();
-        crate::data_entry::repository::get(&mut conn, polling_station_id, committee_session_id)
+        data_entry_repo::get(&mut conn, polling_station_id, committee_session_id)
             .await
             .unwrap()
     }

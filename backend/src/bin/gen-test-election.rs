@@ -5,8 +5,7 @@ use std::{
 
 use abacus::{
     AppError, create_sqlite_pool,
-    data_entry::PollingStationResults,
-    domain::committee_session::CommitteeSession,
+    domain::{committee_session::CommitteeSession, data_entry::PollingStationResults},
     election::ElectionWithPoliticalGroups,
     eml::{EML110, EML230, EMLDocument},
     pdf_gen::{

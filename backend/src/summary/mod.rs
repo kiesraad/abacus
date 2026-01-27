@@ -3,10 +3,13 @@ use utoipa::ToSchema;
 
 use crate::{
     APIError,
-    data_entry::{
-        CSOFirstSessionResults, CandidateVotes, Count, DifferencesCounts,
-        PoliticalGroupCandidateVotes, PoliticalGroupTotalVotes, PollingStationResults, Validate,
-        ValidationResults, VotersCounts, VotesCounts,
+    domain::{
+        data_entry::{
+            CSOFirstSessionResults, CandidateVotes, Count, DifferencesCounts,
+            PoliticalGroupCandidateVotes, PoliticalGroupTotalVotes, PollingStationResults,
+            VotersCounts, VotesCounts,
+        },
+        validation::{Validate, ValidationResults},
     },
     election::ElectionWithPoliticalGroups,
     error::ErrorReference,
@@ -297,10 +300,7 @@ mod tests {
     use super::*;
     use crate::{
         api::committee_session::tests::committee_session_fixture,
-        data_entry::{
-            CSOFirstSessionResults, ExtraInvestigation, PoliticalGroupTotalVotes, YesNo,
-            tests::ValidDefault,
-        },
+        domain::data_entry::{ExtraInvestigation, YesNo, tests::ValidDefault},
         election::{PGNumber, structs::tests::election_fixture},
         pdf_gen::tests::polling_stations_fixture,
     };

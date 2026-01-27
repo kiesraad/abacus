@@ -11,17 +11,12 @@ use super::DEFAULT_DATE_TIME_FORMAT;
 use crate::{
     APIError, AppState, ErrorResponse, SqlitePoolExt,
     api::committee_session::CommitteeSessionError,
-    data_entry::{
-        PollingStationResults,
-        repository::{
-            are_results_complete_for_committee_session, list_results_for_committee_session,
-        },
-    },
     domain::{
         committee_session::{
             CommitteeSession, CommitteeSessionFilesUpdateRequest, CommitteeSessionId,
         },
         committee_session_status::CommitteeSessionStatus,
+        data_entry::PollingStationResults,
     },
     election::{self, ElectionId, ElectionWithPoliticalGroups},
     eml::{EML510, EMLDocument, EmlHash},
@@ -37,6 +32,9 @@ use crate::{
     repository::{
         committee_session_repo,
         committee_session_repo::{change_files, get_previous_session},
+        data_entry_repo::{
+            are_results_complete_for_committee_session, list_results_for_committee_session,
+        },
     },
     summary::ElectionSummary,
     zip::{ZipResponse, ZipResponseError, slugify_filename, zip_single_file},

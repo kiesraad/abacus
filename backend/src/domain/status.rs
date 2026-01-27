@@ -5,10 +5,14 @@ use serde::{Deserialize, Serialize};
 use sqlx::Type;
 use utoipa::ToSchema;
 
-use super::{DataError, ValidateRoot, ValidationResults};
 use crate::{
-    data_entry::PollingStationResults, election::ElectionWithPoliticalGroups,
-    polling_station::PollingStation, repository::user_repo::UserId,
+    domain::{
+        data_entry::PollingStationResults,
+        validation::{DataError, ValidateRoot, ValidationResults},
+    },
+    election::ElectionWithPoliticalGroups,
+    polling_station::PollingStation,
+    repository::user_repo::UserId,
 };
 
 #[derive(Debug, PartialEq, Eq)]
@@ -712,12 +716,14 @@ impl Display for DataEntryTransitionError {
 mod tests {
     use super::*;
     use crate::{
-        data_entry::{
-            CSOFirstSessionResults, CandidateVotes, PoliticalGroupCandidateVotes,
-            PoliticalGroupTotalVotes, VotersCounts, VotesCounts,
-            structs::tests::{ValidDefault, example_polling_station_results},
+        domain::{
+            committee_session::CommitteeSessionId,
+            data_entry::{
+                CSOFirstSessionResults, CandidateVotes, PoliticalGroupCandidateVotes,
+                PoliticalGroupTotalVotes, VotersCounts, VotesCounts,
+                tests::{ValidDefault, example_polling_station_results},
+            },
         },
-        domain::committee_session::CommitteeSessionId,
         election::{
             Candidate, CandidateNumber, ElectionCategory, ElectionId, ElectionWithPoliticalGroups,
             PGNumber, PoliticalGroup, VoteCountingMethod,
@@ -1615,8 +1621,8 @@ mod tests {
 
     mod finalised_with_warnings {
         use crate::{
-            data_entry::{
-                PollingStationResults,
+            domain::{
+                data_entry::PollingStationResults,
                 status::{
                     DataEntryStatus,
                     tests::{

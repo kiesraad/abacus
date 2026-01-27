@@ -2,12 +2,13 @@ use std::collections::HashMap;
 
 use sqlx::{Connection, SqliteConnection, query, query_as, types::Json};
 
-use super::{
-    ElectionStatusResponseEntry, PollingStationDataEntry, PollingStationResult,
-    PollingStationResults, status::DataEntryStatus,
-};
 use crate::{
-    domain::committee_session::CommitteeSessionId,
+    api::data_entry::ElectionStatusResponseEntry,
+    domain::{
+        committee_session::CommitteeSessionId,
+        data_entry::{PollingStationDataEntry, PollingStationResult, PollingStationResults},
+        status::DataEntryStatus,
+    },
     polling_station::{self, PollingStation, PollingStationId},
     repository::committee_session_repo,
 };
@@ -474,9 +475,8 @@ mod tests {
     use test_log::test;
 
     use super::*;
-    use crate::data_entry::{
-        CSOFirstSessionResults, DifferencesCounts, PollingStationResults, VotersCounts,
-        VotesCounts, structs::tests::ValidDefault,
+    use crate::domain::data_entry::{
+        CSOFirstSessionResults, DifferencesCounts, VotersCounts, VotesCounts, tests::ValidDefault,
     };
 
     fn create_test_results(proxy_certificate_count: u32) -> PollingStationResults {
@@ -843,13 +843,13 @@ mod tests {
 
         use super::{super::*, create_test_results};
         use crate::{
-            data_entry::repository::insert_test_result,
             investigation::{
                 PollingStationInvestigationConcludeRequest,
                 PollingStationInvestigationCreateRequest, conclude_polling_station_investigation,
                 create_polling_station_investigation,
             },
             polling_station::insert_test_polling_station,
+            repository::data_entry_repo::insert_test_result,
         };
 
         async fn create_test_investigation(

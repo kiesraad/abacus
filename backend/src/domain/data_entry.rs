@@ -6,10 +6,12 @@ use sqlx::{FromRow, types::Json};
 use utoipa::ToSchema;
 pub use yes_no::YesNo;
 
-use super::status::{DataEntryStatus, DataEntryStatusName};
 use crate::{
     APIError,
-    domain::committee_session::CommitteeSessionId,
+    domain::{
+        committee_session::CommitteeSessionId,
+        status::{DataEntryStatus, DataEntryStatusName},
+    },
     election::{CandidateNumber, PGNumber, PoliticalGroup},
     error::ErrorReference,
     infra::audit_log::{DataEntryDetails, ResultDetails},
@@ -841,7 +843,9 @@ pub mod tests {
     }
 
     mod polling_station_results {
-        use crate::data_entry::PollingStationResults;
+        use test_log::test;
+
+        use super::*;
 
         #[test]
         fn test_cso_first_session_as() {
@@ -893,12 +897,10 @@ pub mod tests {
     }
 
     mod votes_counts {
-        use crate::{
-            APIError,
-            data_entry::{PoliticalGroupTotalVotes, VotesCounts},
-            election::PGNumber,
-            error::ErrorReference,
-        };
+        use test_log::test;
+
+        use super::*;
+        use crate::{APIError, election::PGNumber, error::ErrorReference};
 
         #[test]
         fn test_votes_addition() {
@@ -987,7 +989,9 @@ pub mod tests {
     }
 
     mod voters_counts {
-        use crate::data_entry::VotersCounts;
+        use test_log::test;
+
+        use super::*;
 
         #[test]
         fn test_voters_addition() {

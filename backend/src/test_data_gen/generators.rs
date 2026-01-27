@@ -7,24 +7,27 @@ use tracing::info;
 
 use crate::{
     SqlitePoolExt,
-    data_entry::{
-        self, CSOFirstSessionResults, CandidateVotes, CountingDifferencesPollingStation,
-        DifferenceCountsCompareVotesCastAdmittedVoters, DifferencesCounts, ExtraInvestigation,
-        FieldPath, PoliticalGroupCandidateVotes, PoliticalGroupTotalVotes, PollingStationResults,
-        Validate, ValidationResults, VotersCounts, VotesCounts, YesNo,
-        repository::list_results_for_committee_session,
-        status::{DataEntryStatus, Definitive, FirstEntryFinalised},
-    },
     domain::{
         committee_session::{CommitteeSession, CommitteeSessionCreateRequest},
         committee_session_status::CommitteeSessionStatus,
+        data_entry::{
+            CSOFirstSessionResults, CandidateVotes, CountingDifferencesPollingStation,
+            DifferenceCountsCompareVotesCastAdmittedVoters, DifferencesCounts, ExtraInvestigation,
+            PoliticalGroupCandidateVotes, PoliticalGroupTotalVotes, PollingStationResults,
+            VotersCounts, VotesCounts, YesNo,
+        },
+        status::{DataEntryStatus, Definitive, FirstEntryFinalised},
+        validation::{FieldPath, Validate, ValidationResults},
     },
     election::{
         self, CandidateGender, CandidateNumber, ElectionCategory, ElectionWithPoliticalGroups,
         NewElection, PGNumber, PoliticalGroup, VoteCountingMethod,
     },
     polling_station::{self, PollingStation, PollingStationRequest, PollingStationType},
-    repository::{committee_session_repo, user_repo::UserId},
+    repository::{
+        committee_session_repo, data_entry_repo,
+        data_entry_repo::list_results_for_committee_session, user_repo::UserId,
+    },
     test_data_gen::GenerateElectionArgs,
 };
 
@@ -351,7 +354,7 @@ async fn generate_data_entry(
                     finalised_with_warnings: validation_results.has_warnings(),
                 });
 
-                data_entry::repository::make_definitive(
+                data_entry_repo::make_definitive(
                     conn,
                     ps.id,
                     committee_session.id,
@@ -369,7 +372,7 @@ async fn generate_data_entry(
                     first_entry_finished_at: ts,
                     finalised_with_warnings: validation_results.has_warnings(),
                 });
-                data_entry::repository::upsert(conn, ps.id, committee_session.id, &state)
+                data_entry_repo::upsert(conn, ps.id, committee_session.id, &state)
                     .await
                     .expect("Could not create first data entry");
                 generated_first_entries += 1;

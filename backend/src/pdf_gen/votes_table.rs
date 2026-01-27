@@ -4,7 +4,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::{
     APIError,
-    data_entry::{CommonPollingStationResults, Count, PoliticalGroupCandidateVotes},
+    domain::data_entry::{CommonPollingStationResults, Count, PoliticalGroupCandidateVotes},
     election::{Candidate, CandidateNumber, ElectionWithPoliticalGroups, PGNumber, PoliticalGroup},
     summary::ElectionSummary,
 };
@@ -303,10 +303,11 @@ pub(super) struct CandidateVotes {
 #[cfg(test)]
 mod tests {
     use chrono::NaiveDate;
+    use test_log::test;
 
     use super::*;
     use crate::{
-        data_entry::CandidateVotes as DataEntryCandidateVotes,
+        domain::data_entry,
         election::{ElectionCategory, ElectionId, ElectionWithPoliticalGroups, VoteCountingMethod},
     };
 
@@ -361,7 +362,7 @@ mod tests {
             total,
             candidate_votes: entries
                 .iter()
-                .map(|&(candidate_number, votes)| DataEntryCandidateVotes {
+                .map(|&(candidate_number, votes)| data_entry::CandidateVotes {
                     number: CandidateNumber::from(candidate_number),
                     votes,
                 })

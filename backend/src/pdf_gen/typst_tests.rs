@@ -9,14 +9,15 @@ use rand::{Rng, seq::IndexedRandom};
 use test_log::test;
 
 use crate::{
-    data_entry::structs::{
-        CandidateVotes, CommonPollingStationResults,
-        DifferenceCountsCompareVotesCastAdmittedVoters, DifferencesCounts,
-        PoliticalGroupCandidateVotes, PoliticalGroupTotalVotes, VotersCounts, VotesCounts, YesNo,
-    },
     domain::{
         committee_session::{CommitteeSession, CommitteeSessionId},
         committee_session_status::CommitteeSessionStatus,
+        data_entry::{
+            CandidateVotes, CommonPollingStationResults,
+            DifferenceCountsCompareVotesCastAdmittedVoters, DifferencesCounts,
+            PoliticalGroupCandidateVotes, PoliticalGroupTotalVotes, VotersCounts, VotesCounts,
+            YesNo,
+        },
     },
     election::{
         Candidate, CandidateGender, CandidateNumber, ElectionCategory, ElectionId,

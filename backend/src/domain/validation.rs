@@ -3,13 +3,16 @@ use std::fmt;
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
 
-use super::{
-    CandidateVotes, CommonPollingStationResults, Compare, Count, CountingDifferencesPollingStation,
-    DifferencesCounts, ExtraInvestigation, PoliticalGroupCandidateVotes, PoliticalGroupTotalVotes,
-    PollingStationResults, VotersCounts, VotesCounts,
-    status::{DataEntryStatus, FirstEntryFinalised, FirstEntryHasErrors, FirstEntryInProgress},
-};
 use crate::{
+    domain::{
+        comparison::Compare,
+        data_entry::{
+            CandidateVotes, CommonPollingStationResults, Count, CountingDifferencesPollingStation,
+            DifferencesCounts, ExtraInvestigation, PoliticalGroupCandidateVotes,
+            PoliticalGroupTotalVotes, PollingStationResults, VotersCounts, VotesCounts,
+        },
+        status::{DataEntryStatus, FirstEntryFinalised, FirstEntryHasErrors, FirstEntryInProgress},
+    },
     election::{CandidateNumber, ElectionWithPoliticalGroups, PGNumber},
     polling_station::PollingStation,
 };
@@ -1122,18 +1125,15 @@ mod tests {
 
     use super::*;
     use crate::{
-        election::structs::tests::election_fixture, polling_station::polling_station_fixture,
+        domain::data_entry::{YesNo, tests::ValidDefault},
+        election::structs::tests::election_fixture,
+        polling_station::polling_station_fixture,
     };
 
     mod extra_investigation {
-        use crate::{
-            data_entry::{
-                DataError, ExtraInvestigation, Validate, ValidationResult, ValidationResultCode,
-                ValidationResults, YesNo,
-            },
-            election::structs::tests::election_fixture,
-            polling_station::polling_station_fixture,
-        };
+        use test_log::test;
+
+        use super::*;
 
         fn validate(
             investigation_yes: bool,
@@ -1252,14 +1252,9 @@ mod tests {
     }
 
     mod counting_differences_polling_station {
-        use crate::{
-            data_entry::{
-                CountingDifferencesPollingStation, DataError, Validate, ValidationResult,
-                ValidationResultCode, ValidationResults, YesNo,
-            },
-            election::structs::tests::election_fixture,
-            polling_station::polling_station_fixture,
-        };
+        use test_log::test;
+
+        use super::*;
 
         fn validate(
             unexplained_yes: bool,
@@ -1408,14 +1403,9 @@ mod tests {
     }
 
     mod voters_counts {
-        use crate::{
-            data_entry::{
-                DataError, Validate, ValidationResult, ValidationResultCode, ValidationResults,
-                VotersCounts,
-            },
-            election::structs::tests::election_fixture,
-            polling_station::polling_station_fixture,
-        };
+        use test_log::test;
+
+        use super::*;
 
         fn validate(
             poll_card_count: u32,
@@ -1464,14 +1454,9 @@ mod tests {
     }
 
     mod votes_counts {
-        use crate::{
-            data_entry::{
-                DataError, PoliticalGroupTotalVotes, Validate, ValidationResult,
-                ValidationResultCode, ValidationResults, VotesCounts,
-            },
-            election::{PGNumber, structs::tests::election_fixture},
-            polling_station::polling_station_fixture,
-        };
+        use test_log::test;
+
+        use super::*;
 
         fn validate(
             political_group_total_votes: &[u32],
@@ -1691,10 +1676,9 @@ mod tests {
     }
 
     mod differences_counts {
-        use crate::data_entry::{
-            DataError, DifferencesCounts, ValidationResult, ValidationResultCode,
-            ValidationResults, YesNo, validate_differences_counts,
-        };
+        use test_log::test;
+
+        use super::*;
 
         fn validate(
             data: DifferencesCounts,
@@ -2839,17 +2823,9 @@ mod tests {
     }
 
     mod political_group_votes {
-        use crate::{
-            data_entry::{
-                CandidateVotes, DataError, PoliticalGroupCandidateVotes, Validate,
-                ValidationResults,
-            },
-            election::{
-                CandidateNumber, ElectionWithPoliticalGroups, PGNumber,
-                structs::tests::election_fixture,
-            },
-            polling_station::polling_station_fixture,
-        };
+        use test_log::test;
+
+        use super::*;
 
         /// Takes a list of tuples where each tuple contains:
         /// - Candidate vote counts for the political group
@@ -3020,16 +2996,9 @@ mod tests {
     }
 
     mod common_polling_station_results {
-        use crate::{
-            data_entry::{
-                CommonPollingStationResults, DataError, PoliticalGroupCandidateVotes,
-                PoliticalGroupTotalVotes, Validate, ValidationResult, ValidationResultCode,
-                ValidationResultContext, ValidationResults, VotersCounts, VotesCounts,
-                tests::ValidDefault,
-            },
-            election::{PGNumber, structs::tests::election_fixture},
-            polling_station::polling_station_fixture,
-        };
+        use test_log::test;
+
+        use super::*;
 
         fn create_test_data() -> CommonPollingStationResults {
             CommonPollingStationResults {

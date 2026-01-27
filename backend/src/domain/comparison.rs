@@ -1,8 +1,11 @@
-use super::{
-    CSOFirstSessionResults, CSONextSessionResults, CandidateVotes, Count,
-    CountingDifferencesPollingStation, DifferenceCountsCompareVotesCastAdmittedVoters,
-    DifferencesCounts, ExtraInvestigation, FieldPath, PoliticalGroupCandidateVotes,
-    PoliticalGroupTotalVotes, PollingStationResults, VotersCounts, VotesCounts, YesNo,
+use crate::domain::{
+    data_entry::{
+        CSOFirstSessionResults, CSONextSessionResults, CandidateVotes, Count,
+        CountingDifferencesPollingStation, DifferenceCountsCompareVotesCastAdmittedVoters,
+        DifferencesCounts, ExtraInvestigation, PoliticalGroupCandidateVotes,
+        PoliticalGroupTotalVotes, PollingStationResults, VotersCounts, VotesCounts, YesNo,
+    },
+    validation::FieldPath,
 };
 
 pub trait Compare {

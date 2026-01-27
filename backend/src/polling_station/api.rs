@@ -15,7 +15,7 @@ use super::{
 };
 use crate::{
     APIError, AppState, ErrorResponse, SqlitePoolExt,
-    data_entry::delete_data_entry_and_result_for_polling_station,
+    api::data_entry::delete_data_entry_and_result_for_polling_station,
     domain::{
         committee_session::CommitteeSession,
         committee_session_status::{CommitteeSessionStatus, change_committee_session_status},

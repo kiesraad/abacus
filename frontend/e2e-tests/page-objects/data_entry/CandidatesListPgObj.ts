@@ -31,7 +31,7 @@ export class CandidatesListPage extends DataEntryBasePage {
   }
 
   getCandidate(index: number) {
-    return this.page.getByTestId(`data.political_group_votes[${this.pgIndex}].candidate_votes[${index}].votes`);
+    return this.page.getByTestId(`data.political_group_votes.${this.pgIndex}.candidate_votes.${index}.votes`);
   }
 
   async fillCandidate(index: number, count: number) {

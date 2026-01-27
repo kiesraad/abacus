@@ -30,10 +30,7 @@ export const validationResultMockData: ErrorWarningsMap<ValidationResultCode> = 
     code: "F201",
   },
   F202: {
-    fields: [
-      "data.votes_counts.political_group_total_votes[0].total",
-      "data.votes_counts.total_votes_candidates_count",
-    ],
+    fields: ["data.votes_counts.political_group_total_votes.0.total", "data.votes_counts.total_votes_candidates_count"],
     code: "F202",
   },
   F203: {
@@ -83,17 +80,17 @@ export const validationResultMockData: ErrorWarningsMap<ValidationResultCode> = 
     code: "F310",
   },
   F401: {
-    fields: ["data.political_group_votes[0].total"],
+    fields: ["data.political_group_votes.0.total"],
     context: { political_group_number: 1 },
     code: "F401",
   },
   F402: {
-    fields: ["data.political_group_votes[0]"],
+    fields: ["data.political_group_votes.0"],
     context: { political_group_number: 1 },
     code: "F402",
   },
   F403: {
-    fields: ["data.political_group_votes[0].total", "data.votes_counts.political_group_total_votes[0].total"],
+    fields: ["data.political_group_votes.0.total", "data.votes_counts.political_group_total_votes.0.total"],
     context: { political_group_number: 1 },
     code: "F403",
   },

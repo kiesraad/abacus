@@ -218,7 +218,7 @@ describe("addValidationResultToFormState", () => {
 
     const validationResults: ValidationResult[] = [
       {
-        fields: ["data.votes_counts.total_votes_candidates_count", "data.political_group_votes[0].total"],
+        fields: ["data.votes_counts.total_votes_candidates_count", "data.political_group_votes.0.total"],
         code: "F000" as ValidationResultCode,
       },
     ];

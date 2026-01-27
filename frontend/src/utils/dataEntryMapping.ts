@@ -1,7 +1,6 @@
 import type { DataEntryResults, DataEntrySection, SectionValues } from "@/types/types";
 import { parseIntUserInput } from "@/utils/strings";
 
-type PathSegment = string | number;
 type PathValue = boolean | number | string | undefined;
 
 /**
@@ -62,6 +61,10 @@ export function mapResultsToSectionValues(section: DataEntrySection, results: Da
   return formValues;
 }
 
+function stringIsInteger(str: string): boolean {
+  return /^\d+$/.test(str);
+}
+
 // biome-ignore lint/complexity/noExcessiveCognitiveComplexity: TODO function should be refactored
 function setValueAtPath(
   results: DataEntryResults,
@@ -69,7 +72,7 @@ function setValueAtPath(
   value: string,
   valueType: "boolean" | "number" | undefined,
 ): void {
-  const segments = parsePathSegments(path);
+  const segments = path.split(".");
   const processedValue = processValue(value, valueType);
 
   let current: unknown = results;
@@ -80,15 +83,18 @@ function setValueAtPath(
 
     if (segment === undefined) continue;
 
-    if (typeof segment === "number") {
+    if (stringIsInteger(segment)) {
+      const index = parseInt(segment, 10);
+
       if (Array.isArray(current)) {
-        ensureArrayLength(current, segment + 1);
-        current = current[segment];
+        ensureArrayLength(current, index + 1);
+        current = current[index];
       }
     } else {
       if (isRecord(current)) {
         if (!(segment in current)) {
-          current[segment] = typeof nextSegment === "number" ? [] : {};
+          // If next segment is a number, this should be an array, otherwise object
+          current[segment] = nextSegment && stringIsInteger(nextSegment) ? [] : {};
         }
         current = current[segment];
       }
@@ -102,13 +108,14 @@ function setValueAtPath(
 }
 
 export function getValueAtPath(results: DataEntryResults, path: string): PathValue {
-  const segments = parsePathSegments(path);
+  const segments = path.split(".");
 
   const result = segments.reduce<unknown>((current, segment) => {
     if (current === undefined) return undefined;
 
-    if (typeof segment === "number") {
-      return Array.isArray(current) && segment < current.length ? current[segment] : undefined;
+    if (stringIsInteger(segment)) {
+      const index = parseInt(segment, 10);
+      return Array.isArray(current) && index < current.length ? current[index] : undefined;
     } else {
       return isRecord(current) && segment in current ? current[segment] : undefined;
     }
@@ -140,52 +147,6 @@ function valueToString(value: PathValue): string {
     return "";
   }
   return String(value);
-}
-
-// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: TODO function should be refactored
-function parsePathSegments(path: string): PathSegment[] {
-  const segments: PathSegment[] = [];
-  let current = "";
-  let i = 0;
-
-  while (i < path.length) {
-    const char = path[i];
-    if (!char) break;
-
-    if (char === ".") {
-      if (current) {
-        segments.push(current);
-        current = "";
-      }
-    } else if (char === "[") {
-      if (current) {
-        segments.push(current);
-        current = "";
-      }
-      i++;
-      while (i < path.length && path[i] !== "]") {
-        const char = path[i];
-        if (char) {
-          current += char;
-        }
-        i++;
-      }
-      if (current && /^\d+$/.test(current)) {
-        segments.push(parseInt(current, 10));
-        current = "";
-      }
-    } else if (char !== "]") {
-      current += char;
-    }
-
-    i++;
-  }
-
-  if (current) {
-    segments.push(current);
-  }
-
-  return segments;
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {

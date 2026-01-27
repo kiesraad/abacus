@@ -23,10 +23,6 @@
   margin-top: var(--space-xl);
 }
 
-.mr-sm {
-  margin-right: var(--space-sm);
-}
-
 .mb-0 {
   margin-bottom: 0;
 }

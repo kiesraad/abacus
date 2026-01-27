@@ -1,4 +1,9 @@
 components:
+  # Backend crates
+  - name: "(Backend) Apportionment crate"
+    include:
+      - ".*/backend/apportionment/.*"
+
   # Backend modules
   - name: "(Backend) Airgap detection"
     include:

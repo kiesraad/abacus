@@ -7,7 +7,6 @@ use tracing::info;
 
 use crate::{
     SqlitePoolExt,
-    authentication::user::UserId,
     committee_session::{
         self, CommitteeSession, CommitteeSessionCreateRequest, status::CommitteeSessionStatus,
     },
@@ -24,6 +23,7 @@ use crate::{
         NewElection, PGNumber, PoliticalGroup, VoteCountingMethod,
     },
     polling_station::{self, PollingStation, PollingStationRequest, PollingStationType},
+    repository::user_repo::UserId,
     test_data_gen::GenerateElectionArgs,
 };
 

@@ -10,9 +10,9 @@ use utoipa_axum::{router::OpenApiRouter, routes};
 
 use crate::{
     APIError, AppState, ErrorResponse,
-    authentication::AdminOrCoordinator,
     election::ElectionId,
     error::ErrorReference,
+    infra::authentication::AdminOrCoordinator,
     pdf_gen::{
         CandidatesTables, generate_pdf, generate_pdfs,
         models::{

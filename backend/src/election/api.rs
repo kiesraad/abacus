@@ -15,13 +15,15 @@ use super::{
 };
 use crate::{
     APIError, AppState, ErrorResponse, SqlitePoolExt,
-    authentication::{Admin, AdminOrCoordinator, User},
     committee_session::{
         CommitteeSession, CommitteeSessionCreateRequest, CommitteeSessionError,
         create_committee_session, status::CommitteeSessionStatus,
     },
     eml::{EML110, EML230, EMLDocument, EMLImportError, EmlHash, RedactedEmlHash},
-    infra::audit_log::{AuditEvent, AuditService},
+    infra::{
+        audit_log::{AuditEvent, AuditService},
+        authentication::{Admin, AdminOrCoordinator, User},
+    },
     investigation::PollingStationInvestigation,
     polling_station,
     polling_station::{

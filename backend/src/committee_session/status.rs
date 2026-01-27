@@ -905,7 +905,6 @@ mod tests {
 
         use super::{CommitteeSessionError, CommitteeSessionStatus, get};
         use crate::{
-            authentication::user::UserId,
             committee_session::CommitteeSessionId,
             data_entry::{
                 PollingStationResults,
@@ -918,6 +917,7 @@ mod tests {
                 create_polling_station_investigation,
             },
             polling_station::PollingStationId,
+            repository::user_repo::UserId,
         };
 
         /// Created --> Completed

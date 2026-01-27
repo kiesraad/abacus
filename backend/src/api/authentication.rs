@@ -12,20 +12,20 @@ use sqlx::SqlitePool;
 use utoipa::ToSchema;
 use utoipa_axum::{router::OpenApiRouter, routes};
 
-use super::{
-    SECURE_COOKIES, SESSION_COOKIE_NAME, SESSION_LIFE_TIME,
-    error::AuthenticationError,
-    role::{IncompleteUser, Role},
-    user::User,
-};
 use crate::{
     APIError, AppState, ErrorResponse, SqlitePoolExt,
-    authentication::{CreateUserRequest, user::UserId},
     error::ErrorReference,
-    infra::audit_log::{
-        AuditEvent, AuditService, UserDetails, UserLoggedInDetails, UserLoggedOutDetails,
-        UserLoginFailedDetails,
+    infra::{
+        audit_log::{
+            AuditEvent, AuditService, UserDetails, UserLoggedInDetails, UserLoggedOutDetails,
+            UserLoginFailedDetails,
+        },
+        authentication::{
+            CreateUserRequest, IncompleteUser, Role, SECURE_COOKIES, SESSION_COOKIE_NAME,
+            SESSION_LIFE_TIME, error::AuthenticationError, session,
+        },
     },
+    repository::user_repo::{self, User, UserId},
 };
 
 impl From<AuthenticationError> for APIError {
@@ -88,7 +88,7 @@ impl From<LoginResponse> for UserDetails {
 }
 
 /// Set default session cookie properties
-pub(super) fn set_default_cookie_properties(cookie: &mut Cookie) {
+pub(crate) fn set_default_cookie_properties(cookie: &mut Cookie) {
     cookie.set_path("/");
     cookie.set_http_only(true);
     cookie.set_secure(SECURE_COOKIES);
@@ -119,7 +119,7 @@ async fn login(
 
     // Check the username + password combination, do not leak information about usernames etc.
     // Log when the attempt fails
-    let user = match super::user::authenticate(&pool, &username, &password).await {
+    let user = match user_repo::authenticate(&pool, &username, &password).await {
         Ok(u) => Ok(u),
         Err(AuthenticationError::UserNotFound) | Err(AuthenticationError::InvalidPassword) => {
             let mut tx = pool.begin_immediate().await?;
@@ -142,10 +142,10 @@ async fn login(
     let mut tx = pool.begin_immediate().await?;
 
     // Remove expired sessions, we do this after a login to prevent the necessity of periodical cleanup jobs
-    super::session::delete_expired_sessions(&mut tx).await?;
+    session::delete_expired_sessions(&mut tx).await?;
 
     // Remove possible old session for this user
-    super::session::delete_user_session(&mut tx, user.id()).await?;
+    session::delete_user_session(&mut tx, user.id()).await?;
 
     // Get the client IP address if available
     let ip = audit_service
@@ -154,11 +154,10 @@ async fn login(
         .to_string();
 
     // Create a new session and cookie
-    let session =
-        super::session::create(&mut tx, user.id(), &user_agent, &ip, SESSION_LIFE_TIME).await?;
+    let session = session::create(&mut tx, user.id(), &user_agent, &ip, SESSION_LIFE_TIME).await?;
 
     // Log the login event
-    let logged_in_users_count = super::session::count(&mut tx).await?;
+    let logged_in_users_count = session::count(&mut tx).await?;
     audit_service
         .with_user(user.clone())
         .log(
@@ -233,14 +232,14 @@ async fn account_update(
     }
 
     // Update the password
-    super::user::update_password(&mut tx, user.id(), &account.username, &account.password).await?;
+    user_repo::update_password(&mut tx, user.id(), &account.username, &account.password).await?;
 
     // Update the fullname
     if let Some(fullname) = account.fullname {
-        super::user::update_fullname(&mut tx, user.id(), &fullname).await?;
+        user_repo::update_fullname(&mut tx, user.id(), &fullname).await?;
     }
 
-    let Some(updated_user) = super::user::get_by_username(&mut tx, user.username()).await? else {
+    let Some(updated_user) = user_repo::get_by_username(&mut tx, user.username()).await? else {
         return Err(AuthenticationError::UserNotFound.into());
     };
 
@@ -271,7 +270,7 @@ async fn account_update(
 )]
 async fn initialised(State(pool): State<SqlitePool>) -> Result<impl IntoResponse, APIError> {
     let mut conn = pool.acquire().await?;
-    if super::user::has_active_users(&mut conn).await? {
+    if user_repo::has_active_users(&mut conn).await? {
         Ok(StatusCode::NO_CONTENT)
     } else {
         Err(AuthenticationError::NotInitialised.into())
@@ -297,15 +296,15 @@ async fn create_first_admin(
 ) -> Result<(StatusCode, Json<User>), APIError> {
     let mut tx = pool.begin_immediate().await?;
 
-    if super::user::has_active_users(&mut tx).await? {
+    if user_repo::has_active_users(&mut tx).await? {
         return Err(AuthenticationError::AlreadyInitialised.into());
     }
 
     // Delete any existing admin user
-    let users = super::user::list(&mut tx, None).await?;
+    let users = user_repo::list(&mut tx, None).await?;
     for user in users {
         if user.role() == Role::Administrator {
-            super::user::delete(&mut tx, user.id()).await?;
+            user_repo::delete(&mut tx, user.id()).await?;
 
             audit_service
                 .log(&mut tx, &AuditEvent::UserDeleted(user.into()), None)
@@ -314,7 +313,7 @@ async fn create_first_admin(
     }
 
     // Create the first admin user
-    let user = super::user::create(
+    let user = user_repo::create(
         &mut tx,
         &create_user_req.username,
         create_user_req.fullname.as_deref(),
@@ -345,11 +344,11 @@ async fn create_first_admin(
 )]
 async fn admin_exists(State(pool): State<SqlitePool>) -> Result<StatusCode, APIError> {
     let mut conn = pool.acquire().await?;
-    if super::user::has_active_users(&mut conn).await? {
+    if user_repo::has_active_users(&mut conn).await? {
         return Err(AuthenticationError::AlreadyInitialised.into());
     }
 
-    if super::user::admin_exists(&mut conn).await? {
+    if user_repo::admin_exists(&mut conn).await? {
         return Ok(StatusCode::NO_CONTENT);
     }
 
@@ -389,7 +388,7 @@ async fn logout(
     // Log audit event when a valid session exists
     let mut tx = pool.begin_immediate().await?;
 
-    if let Some(session) = super::session::get_by_key(&mut tx, session_key)
+    if let Some(session) = session::get_by_key(&mut tx, session_key)
         .await
         .ok()
         .flatten()
@@ -407,7 +406,7 @@ async fn logout(
     }
 
     // Remove session from the database
-    super::session::delete(&mut tx, session_key).await?;
+    session::delete(&mut tx, session_key).await?;
 
     // Commit the transaction
     tx.commit().await?;
@@ -433,10 +432,11 @@ mod tests {
 
     use crate::{
         APIError,
-        authentication::{
-            CreateUserRequest, Role, SECURE_COOKIES, api::set_default_cookie_properties,
-            error::AuthenticationError, user::update_last_activity_at,
+        api::authentication::set_default_cookie_properties,
+        infra::authentication::{
+            CreateUserRequest, Role, SECURE_COOKIES, error::AuthenticationError,
         },
+        repository::{user_repo, user_repo::update_last_activity_at},
     };
 
     #[test(tokio::test)]
@@ -464,7 +464,7 @@ mod tests {
 
         // Create an admin user to mark the application as initialised
         let mut conn = pool.acquire().await.unwrap();
-        let admin = crate::authentication::user::create(
+        let admin = user_repo::create(
             &mut conn,
             "admin",
             Some("Admin User"),

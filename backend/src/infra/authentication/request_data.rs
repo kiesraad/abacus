@@ -9,7 +9,7 @@ use cookie::Cookie;
 
 use crate::{
     APIError,
-    authentication::{SESSION_COOKIE_NAME, error::AuthenticationError},
+    infra::authentication::{SESSION_COOKIE_NAME, error::AuthenticationError},
 };
 
 #[derive(Debug)]

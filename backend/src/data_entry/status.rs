@@ -7,8 +7,8 @@ use utoipa::ToSchema;
 
 use super::{DataError, ValidateRoot, ValidationResults};
 use crate::{
-    authentication::user::UserId, data_entry::PollingStationResults,
-    election::ElectionWithPoliticalGroups, polling_station::PollingStation,
+    data_entry::PollingStationResults, election::ElectionWithPoliticalGroups,
+    polling_station::PollingStation, repository::user_repo::UserId,
 };
 
 #[derive(Debug, PartialEq, Eq)]
@@ -1615,7 +1615,6 @@ mod tests {
 
     mod finalised_with_warnings {
         use crate::{
-            authentication::user::UserId,
             data_entry::{
                 PollingStationResults,
                 status::{
@@ -1626,6 +1625,7 @@ mod tests {
                     },
                 },
             },
+            repository::user_repo::UserId,
         };
 
         impl DataEntryStatus {

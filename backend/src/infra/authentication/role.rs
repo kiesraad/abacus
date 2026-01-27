@@ -6,8 +6,8 @@ use serde::{Deserialize, Serialize};
 use sqlx::{SqlitePool, Type};
 use utoipa::ToSchema;
 
-use super::{error::AuthenticationError, user::User};
-use crate::APIError;
+use super::error::AuthenticationError;
+use crate::{APIError, repository::user_repo::User};
 
 #[derive(
     Serialize, Deserialize, strum::Display, Clone, Copy, Debug, PartialEq, Eq, Hash, ToSchema, Type,

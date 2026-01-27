@@ -23,9 +23,8 @@ use utoipa_swagger_ui::SwaggerUi;
 #[cfg(feature = "dev-database")]
 use crate::test_data_gen;
 use crate::{
-    AppError, AppState, MAX_BODY_SIZE_MB, authentication, committee_session, data_entry, document,
-    election, error,
-    infra::{airgap, airgap::AirgapDetection, audit_log},
+    AppError, AppState, MAX_BODY_SIZE_MB, committee_session, data_entry, document, election, error,
+    infra::{airgap, airgap::AirgapDetection, audit_log, authentication},
     investigation, polling_station, report,
 };
 
@@ -304,7 +303,8 @@ mod tests {
     use super::*;
     use crate::{
         SqlitePoolExt,
-        authentication::{Role, session, user::UserId},
+        infra::authentication::{Role, session},
+        repository::user_repo::UserId,
         test::run_server_test,
     };
 

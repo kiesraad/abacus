@@ -3,7 +3,7 @@ use rand::{Rng, distr::Alphanumeric};
 
 /// Create a new session key, a secure random alphanumeric string of 24 characters
 /// Which corresponds to ~142 bits of entropy
-pub(super) fn create_new_session_key() -> String {
+pub(crate) fn create_new_session_key() -> String {
     rand::rng()
         .sample_iter(&Alphanumeric)
         .take(24)
@@ -14,7 +14,7 @@ pub(super) fn create_new_session_key() -> String {
 /// Get the time when the session expires
 /// Note this will return the current time if adding the duration would be out of range,
 /// which will not happen in the next 260117 years, since the duration is only set using constants in out codebase
-pub(super) fn get_expires_at(duration: TimeDelta) -> DateTime<Utc> {
+pub(crate) fn get_expires_at(duration: TimeDelta) -> DateTime<Utc> {
     Utc::now()
         .checked_add_signed(duration)
         .unwrap_or(Utc::now())

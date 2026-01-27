@@ -8,11 +8,15 @@ use sqlx::SqlitePool;
 use utoipa::ToSchema;
 use utoipa_axum::{router::OpenApiRouter, routes};
 
-use super::{AdminOrCoordinator, error::AuthenticationError, user::User};
 use crate::{
     APIError, AppState, ErrorResponse, SqlitePoolExt,
-    authentication::{CreateUserRequest, Role, user::UserId},
-    infra::audit_log::{AuditEvent, AuditService},
+    infra::{
+        audit_log::{AuditEvent, AuditService},
+        authentication::{
+            AdminOrCoordinator, CreateUserRequest, Role, error::AuthenticationError, session,
+        },
+    },
+    repository::user_repo::{self, User, UserId},
 };
 
 pub fn user_router() -> OpenApiRouter<AppState> {
@@ -55,7 +59,7 @@ async fn user_list(
     };
 
     Ok(Json(UserListResponse {
-        users: super::user::list(&mut conn, only_allow_role).await?,
+        users: user_repo::list(&mut conn, only_allow_role).await?,
     }))
 }
 
@@ -97,7 +101,7 @@ pub async fn user_create(
     }
 
     let mut tx = pool.begin_immediate().await?;
-    let user = super::user::create(
+    let user = user_repo::create(
         &mut tx,
         &create_user_req.username,
         create_user_req.fullname.as_deref(),
@@ -136,7 +140,7 @@ async fn user_get(
     Path(user_id): Path<UserId>,
 ) -> Result<Json<User>, APIError> {
     let mut conn = pool.acquire().await?;
-    let user = super::user::get_by_id(&mut conn, user_id)
+    let user = user_repo::get_by_id(&mut conn, user_id)
         .await?
         .ok_or(sqlx::Error::RowNotFound)?;
 
@@ -176,7 +180,7 @@ pub async fn user_update(
     // fetch the current user
     if logged_in_user.is_coordinator() {
         let mut conn = pool.acquire().await?;
-        let target_user = super::user::get_by_id(&mut conn, user_id)
+        let target_user = user_repo::get_by_id(&mut conn, user_id)
             .await?
             .ok_or(sqlx::Error::RowNotFound)?;
 
@@ -189,16 +193,16 @@ pub async fn user_update(
     let mut tx = pool.begin_immediate().await?;
 
     if let Some(fullname) = update_user_req.fullname {
-        super::user::update_fullname(&mut tx, user_id, &fullname).await?
+        user_repo::update_fullname(&mut tx, user_id, &fullname).await?
     };
 
     if let Some(temp_password) = update_user_req.temp_password {
-        super::user::set_temporary_password(&mut tx, user_id, &temp_password).await?;
+        user_repo::set_temporary_password(&mut tx, user_id, &temp_password).await?;
 
-        super::session::delete_user_session(&mut tx, user_id).await?;
+        session::delete_user_session(&mut tx, user_id).await?;
     };
 
-    let user = super::user::get_by_id(&mut tx, user_id)
+    let user = user_repo::get_by_id(&mut tx, user_id)
         .await?
         .ok_or(sqlx::Error::RowNotFound)?;
 
@@ -236,7 +240,7 @@ async fn user_delete(
     // fetch the current user
     if logged_in_user.is_coordinator() {
         let mut conn = pool.acquire().await?;
-        let target_user = super::user::get_by_id(&mut conn, user_id)
+        let target_user = user_repo::get_by_id(&mut conn, user_id)
             .await?
             .ok_or(sqlx::Error::RowNotFound)?;
 
@@ -248,7 +252,7 @@ async fn user_delete(
 
     let mut tx = pool.begin_immediate().await?;
 
-    let user = super::user::get_by_id(&mut tx, user_id)
+    let user = user_repo::get_by_id(&mut tx, user_id)
         .await?
         .ok_or(sqlx::Error::RowNotFound)?;
 
@@ -257,7 +261,7 @@ async fn user_delete(
         return Err(AuthenticationError::OwnAccountCannotBeDeleted.into());
     }
 
-    let deleted = super::user::delete(&mut tx, user_id).await?;
+    let deleted = user_repo::delete(&mut tx, user_id).await?;
 
     if deleted {
         audit_service

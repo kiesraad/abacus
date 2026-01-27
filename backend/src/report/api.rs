@@ -10,7 +10,6 @@ use utoipa_axum::{router::OpenApiRouter, routes};
 use super::DEFAULT_DATE_TIME_FORMAT;
 use crate::{
     APIError, AppState, ErrorResponse, SqlitePoolExt,
-    authentication::Coordinator,
     committee_session::{
         self, CommitteeSession, CommitteeSessionError, CommitteeSessionFilesUpdateRequest,
         CommitteeSessionId,
@@ -27,7 +26,7 @@ use crate::{
     eml::{EML510, EMLDocument, EmlHash},
     error::ErrorReference,
     files::{self, File, create_file},
-    infra::audit_log::AuditService,
+    infra::{audit_log::AuditService, authentication::Coordinator},
     investigation::{PollingStationInvestigation, list_investigations_for_committee_session},
     pdf_gen::{
         VotesTables, VotesTablesWithPreviousVotes, generate_pdf,

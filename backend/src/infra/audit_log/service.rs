@@ -7,7 +7,7 @@ use axum::{
 use sqlx::{SqliteConnection, SqlitePool};
 
 use super::AuditEvent;
-use crate::{APIError, authentication::User};
+use crate::{APIError, infra::authentication::User};
 
 #[derive(Clone)]
 pub struct AuditService {
@@ -74,8 +74,8 @@ mod test {
     use super::*;
     use crate::{
         SqlitePoolExt,
-        authentication::user::UserId,
         infra::audit_log::{AuditEventLevel, UserLoggedInDetails},
+        repository::user_repo::{self, UserId},
     };
 
     #[test(sqlx::test(fixtures("../../../fixtures/users.sql")))]
@@ -83,9 +83,7 @@ mod test {
         let mut tx = pool.begin_immediate().await.unwrap();
         let service = AuditService {
             ip: Some(IpAddr::V4(Ipv4Addr::new(203, 0, 113, 0))),
-            user: crate::authentication::user::get_by_username(&mut tx, "admin1")
-                .await
-                .unwrap(),
+            user: user_repo::get_by_username(&mut tx, "admin1").await.unwrap(),
         };
 
         let audit_event = AuditEvent::UserLoggedIn(UserLoggedInDetails {

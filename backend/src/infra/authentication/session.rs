@@ -13,8 +13,8 @@ use super::{
     util::{create_new_session_key, get_expires_at},
 };
 use crate::{
-    APIError,
-    authentication::{request_data::RequestSessionData, user::UserId},
+    APIError, infra::authentication::request_data::RequestSessionData,
+    repository::user_repo::UserId,
 };
 
 /// A session object, corresponds to a row in the sessions table
@@ -45,7 +45,7 @@ where
 
 impl Session {
     // Create a new session for a specific user
-    pub(super) fn new(
+    pub(crate) fn new(
         user_id: UserId,
         user_agent: String,
         ip_address: String,
@@ -66,22 +66,22 @@ impl Session {
     }
 
     /// Get the session user id
-    pub(super) fn user_id(&self) -> UserId {
+    pub(crate) fn user_id(&self) -> UserId {
         self.user_id
     }
 
     /// Get the session key
-    pub(super) fn session_key(&self) -> &str {
+    pub(crate) fn session_key(&self) -> &str {
         &self.session_key
     }
 
     /// Get the session expiration time
-    pub(super) fn expires_at(&self) -> DateTime<Utc> {
+    pub(crate) fn expires_at(&self) -> DateTime<Utc> {
         self.expires_at
     }
 
     /// Get the age of a session
-    pub(super) fn duration(&self) -> Duration {
+    pub fn duration(&self) -> Duration {
         Utc::now()
             .signed_duration_since(self.created_at)
             .to_std()
@@ -139,7 +139,7 @@ pub(crate) async fn create(
 }
 
 /// Get a session by its key and validate user agent and IP address
-pub(super) async fn get_by_request_data(
+pub(crate) async fn get_by_request_data(
     conn: &mut SqliteConnection,
     request_data: &RequestSessionData,
 ) -> Result<Option<Session>, AuthenticationError> {
@@ -175,7 +175,7 @@ pub(super) async fn get_by_request_data(
 }
 
 /// Get a session by its key
-pub(super) async fn get_by_key(
+pub async fn get_by_key(
     conn: &mut SqliteConnection,
     session_key: &str,
 ) -> Result<Option<Session>, AuthenticationError> {
@@ -252,7 +252,7 @@ pub async fn count(conn: &mut SqliteConnection) -> Result<u32, AuthenticationErr
     Ok(count)
 }
 
-pub(super) async fn extend_session(
+pub(crate) async fn extend_session(
     conn: &mut SqliteConnection,
     session: &Session,
 ) -> Result<Session, AuthenticationError> {
@@ -288,12 +288,12 @@ mod test {
     use sqlx::SqlitePool;
     use test_log::test;
 
-    use crate::authentication::user::UserId;
+    use crate::repository::user_repo::UserId;
 
     const TEST_USER_AGENT: &str = "TestAgent/1.0";
     const TEST_IP_ADDRESS: &str = "0.0.0.0";
 
-    #[test(sqlx::test(fixtures("../../fixtures/users.sql")))]
+    #[test(sqlx::test(fixtures("../../../fixtures/users.sql")))]
     async fn test_create_and_get_session(pool: SqlitePool) {
         let mut conn = pool.acquire().await.unwrap();
         let session = super::create(
@@ -314,7 +314,7 @@ mod test {
         assert_eq!(session, session_from_db);
     }
 
-    #[test(sqlx::test(fixtures("../../fixtures/users.sql")))]
+    #[test(sqlx::test(fixtures("../../../fixtures/users.sql")))]
     async fn test_delete_session(pool: SqlitePool) {
         let mut conn = pool.acquire().await.unwrap();
         let session = super::create(
@@ -343,7 +343,7 @@ mod test {
         assert_eq!(None, session_from_db);
     }
 
-    #[test(sqlx::test(fixtures("../../fixtures/users.sql")))]
+    #[test(sqlx::test(fixtures("../../../fixtures/users.sql")))]
     async fn test_delete_old_sessions(pool: SqlitePool) {
         let mut conn = pool.acquire().await.unwrap();
         let session = super::create(
@@ -365,7 +365,7 @@ mod test {
         assert_eq!(None, session_from_db);
     }
 
-    #[test(sqlx::test(fixtures("../../fixtures/users.sql")))]
+    #[test(sqlx::test(fixtures("../../../fixtures/users.sql")))]
     async fn test_session_count(pool: SqlitePool) {
         let mut conn = pool.acquire().await.unwrap();
         let _active_session1 = super::create(

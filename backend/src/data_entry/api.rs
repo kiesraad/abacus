@@ -24,7 +24,6 @@ use super::{
 };
 use crate::{
     APIError, AppState, SqlitePoolExt,
-    authentication::{Coordinator, Role, Typist, User, error::AuthenticationError, user::UserId},
     committee_session::{
         CommitteeSession, CommitteeSessionError,
         status::{CommitteeSessionStatus, change_committee_session_status},
@@ -32,9 +31,13 @@ use crate::{
     data_entry::repository::get_result,
     election::{ElectionId, ElectionWithPoliticalGroups, PoliticalGroup},
     error::{ErrorReference, ErrorResponse},
-    infra::audit_log::{AuditEvent, AuditService},
+    infra::{
+        audit_log::{AuditEvent, AuditService},
+        authentication::{Coordinator, Role, Typist, User, error::AuthenticationError},
+    },
     investigation::get_polling_station_investigation,
     polling_station::{self, PollingStation, PollingStationId},
+    repository::user_repo::UserId,
 };
 
 impl From<DataError> for APIError {
@@ -1036,7 +1039,6 @@ mod tests {
 
     use super::*;
     use crate::{
-        authentication::Role,
         committee_session::{
             CommitteeSessionId, status::CommitteeSessionStatus,
             tests::change_status_committee_session,
@@ -1046,6 +1048,7 @@ mod tests {
             repository::{data_entry_exists, result_exists},
             structs::tests::example_polling_station_results,
         },
+        infra::authentication::Role,
         investigation::insert_test_investigation,
         polling_station::insert_test_polling_station,
     };

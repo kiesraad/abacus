@@ -4,7 +4,9 @@ use std::{
 };
 
 use abacus::{
-    AppError, create_sqlite_pool,
+    AppError,
+    api::report::DEFAULT_DATE_TIME_FORMAT,
+    create_sqlite_pool,
     domain::{
         committee_session::CommitteeSession,
         data_entry::PollingStationResults,
@@ -14,7 +16,6 @@ use abacus::{
         votes_table::VotesTables,
     },
     eml::{EML110, EML230, EMLDocument},
-    report::DEFAULT_DATE_TIME_FORMAT,
     summary::ElectionSummary,
     test_data_gen::{GenerateElectionArgs, RandomRange, create_test_election, parse_range},
 };

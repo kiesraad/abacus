@@ -24,10 +24,11 @@ use utoipa_swagger_ui::SwaggerUi;
 use crate::test_data_gen;
 use crate::{
     AppError, AppState, MAX_BODY_SIZE_MB,
-    api::{committee_session, data_entry, document, election, investigation, polling_station},
+    api::{
+        committee_session, data_entry, document, election, investigation, polling_station, report,
+    },
     error,
     infra::{airgap, airgap::AirgapDetection, audit_log, authentication},
-    report,
 };
 
 pub fn get_scopes_from_operation(operation: &Operation) -> Option<Vec<String>> {

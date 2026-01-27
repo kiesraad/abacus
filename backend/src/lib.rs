@@ -17,7 +17,6 @@ mod error;
 #[cfg(feature = "dev-database")]
 pub mod fixtures;
 pub mod infra;
-pub mod report;
 pub mod repository;
 pub mod router;
 pub mod summary;

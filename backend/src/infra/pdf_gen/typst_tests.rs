@@ -9,6 +9,7 @@ use rand::{Rng, seq::IndexedRandom};
 use test_log::test;
 
 use crate::{
+    api::report::DEFAULT_DATE_TIME_FORMAT,
     domain::{
         committee_session::{CommitteeSession, CommitteeSessionId},
         committee_session_status::CommitteeSessionStatus,
@@ -35,7 +36,6 @@ use crate::{
         },
     },
     infra::pdf_gen::generate_pdf,
-    report::DEFAULT_DATE_TIME_FORMAT,
     summary::{ElectionSummary, PollingStationInvestigations, SumCount, SummaryDifferencesCounts},
 };
 

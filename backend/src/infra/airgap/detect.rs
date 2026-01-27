@@ -218,7 +218,7 @@ mod tests {
 
     use super::*;
     use crate::{
-        infra::airgap::block_request_on_airgap_violation, router, router::openapi_router,
+        infra::{airgap::block_request_on_airgap_violation, router, router::openapi_router},
         shutdown_signal,
     };
 

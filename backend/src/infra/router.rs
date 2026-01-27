@@ -320,7 +320,7 @@ mod tests {
             .to_string()
     }
 
-    #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
+    #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2", "users"))))]
     async fn test_route_authorization(pool: SqlitePool) {
         let openapi = openapi_router().into_openapi();
 

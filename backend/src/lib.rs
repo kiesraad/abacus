@@ -14,17 +14,16 @@ pub mod app_error;
 pub mod domain;
 pub mod eml;
 mod error;
-#[cfg(feature = "dev-database")]
-pub mod fixtures;
 pub mod infra;
 pub mod repository;
-pub mod router;
 #[cfg(feature = "dev-database")]
 pub mod test_data_gen;
 
 pub use app_error::AppError;
 pub use error::{APIError, ErrorResponse};
-use infra::audit_log;
+#[cfg(feature = "dev-database")]
+use infra::seed_data;
+use infra::{audit_log, router};
 
 use crate::app_error::{DatabaseErrorWithPath, DatabaseMigrationErrorWithPath};
 
@@ -199,7 +198,7 @@ pub async fn create_sqlite_pool(
 
     #[cfg(feature = "dev-database")]
     if seed_data {
-        fixtures::seed_fixture_data(&pool).await?;
+        seed_data::seed_fixture_data(&pool).await?;
     }
 
     // log startup event and verify the database is writeable

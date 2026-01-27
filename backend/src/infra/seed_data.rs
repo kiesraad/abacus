@@ -7,7 +7,7 @@ use crate::AppError;
 macro_rules! load_fixture {
     ($fixture:literal) => {
         Fixture {
-            data: include_str!(concat!("../fixtures/", $fixture, ".sql")),
+            data: include_str!(concat!("../../fixtures/", $fixture, ".sql")),
         }
     };
 }

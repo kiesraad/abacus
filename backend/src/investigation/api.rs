@@ -82,7 +82,7 @@ pub async fn delete_investigation_for_polling_station(
         audit_service
             .log(
                 conn,
-                &AuditEvent::PollingStationInvestigationDeleted(investigation),
+                &AuditEvent::PollingStationInvestigationDeleted(serde_json::to_value(&investigation)?),
                 None,
             )
             .await?;
@@ -139,7 +139,7 @@ async fn polling_station_investigation_create(
     audit_service
         .log(
             &mut tx,
-            &AuditEvent::PollingStationInvestigationCreated(investigation.clone()),
+            &AuditEvent::PollingStationInvestigationCreated(serde_json::to_value(&investigation)?),
             None,
         )
         .await?;
@@ -215,7 +215,7 @@ async fn polling_station_investigation_conclude(
     audit_service
         .log(
             &mut tx,
-            &AuditEvent::PollingStationInvestigationConcluded(investigation.clone()),
+            &AuditEvent::PollingStationInvestigationConcluded(serde_json::to_value(&investigation)?),
             None,
         )
         .await?;
@@ -254,7 +254,7 @@ async fn update_investigation(
     audit_service
         .log(
             conn,
-            &AuditEvent::PollingStationInvestigationUpdated(investigation.clone()),
+            &AuditEvent::PollingStationInvestigationUpdated(serde_json::to_value(&investigation)?),
             None,
         )
         .await?;

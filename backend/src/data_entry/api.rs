@@ -162,12 +162,12 @@ pub async fn delete_data_entry_and_result_for_polling_station(
 ) -> Result<(), APIError> {
     if let Some(data_entry) = delete_data_entry(conn, polling_station_id).await? {
         audit_service
-            .log(conn, &AuditEvent::DataEntryDeleted(data_entry.into()), None)
+            .log(conn, &AuditEvent::DataEntryDeleted(serde_json::to_value(&data_entry)?), None)
             .await?;
     }
     if let Some(result) = delete_result(conn, polling_station_id).await? {
         audit_service
-            .log(conn, &AuditEvent::ResultDeleted(result.into()), None)
+            .log(conn, &AuditEvent::ResultDeleted(serde_json::to_value(&result)?), None)
             .await?;
         if committee_session.status == CommitteeSessionStatus::Completed {
             change_committee_session_status(
@@ -312,7 +312,7 @@ async fn polling_station_data_entry_claim(
             audit_service
                 .log(
                     &mut tx,
-                    &AuditEvent::DataEntryStarted(data_entry.into()),
+                    &AuditEvent::DataEntryStarted(serde_json::to_value(&data_entry)?),
                     None,
                 )
                 .await?;
@@ -321,7 +321,7 @@ async fn polling_station_data_entry_claim(
             audit_service
                 .log(
                     &mut tx,
-                    &AuditEvent::DataEntryResumed(data_entry.into()),
+                    &AuditEvent::DataEntryResumed(serde_json::to_value(&data_entry)?),
                     None,
                 )
                 .await?;
@@ -430,7 +430,7 @@ async fn polling_station_data_entry_save(
     audit_service
         .log(
             &mut tx,
-            &AuditEvent::DataEntrySaved(data_entry.into()),
+            &AuditEvent::DataEntrySaved(serde_json::to_value(&data_entry)?),
             None,
         )
         .await?;
@@ -496,7 +496,7 @@ async fn polling_station_data_entry_delete(
     audit_service
         .log(
             &mut tx,
-            &AuditEvent::DataEntryDeleted(data_entry.into()),
+            &AuditEvent::DataEntryDeleted(serde_json::to_value(&data_entry)?),
             None,
         )
         .await?;
@@ -585,7 +585,7 @@ async fn polling_station_data_entry_finalise(
     audit_service
         .log(
             &mut tx,
-            &AuditEvent::DataEntryFinalised(data_entry.clone().into()),
+            &AuditEvent::DataEntryFinalised(serde_json::to_value(&data_entry)?),
             None,
         )
         .await?;
@@ -607,10 +607,10 @@ impl ResolveErrorsAction {
     pub fn audit_event(&self, data_entry: PollingStationDataEntry) -> AuditEvent {
         match self {
             ResolveErrorsAction::DiscardFirstEntry => {
-                AuditEvent::DataEntryDiscardedFirst(data_entry.into())
+                AuditEvent::DataEntryDiscardedFirst(??? -> Can we `expect` here?)
             }
             ResolveErrorsAction::ResumeFirstEntry => {
-                AuditEvent::DataEntryReturnedFirst(data_entry.into())
+                AuditEvent::DataEntryReturnedFirst(???)
             }
         }
     }

@@ -8,7 +8,7 @@ use super::AuditEventLevel;
 use crate::{
     ErrorResponse, authentication::user::UserId, committee_session::CommitteeSessionId,
     election::ElectionId, error::ErrorReference, files::FileId,
-    investigation::PollingStationInvestigation, polling_station::PollingStationId,
+    polling_station::PollingStationId,
 };
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, Eq, ToSchema)]
@@ -179,45 +179,45 @@ impl ErrorDetails {
 #[serde(rename_all = "PascalCase", tag = "event_type")]
 pub enum AuditEvent {
     // authentication and account events
-    UserLoggedIn(UserLoggedInDetails),
-    UserLoginFailed(UserLoginFailedDetails),
-    UserLoggedOut(UserLoggedOutDetails),
-    UserAccountUpdated(UserDetails),
+    UserLoggedIn(serde_json::Value),
+    UserLoginFailed(serde_json::Value),
+    UserLoggedOut(serde_json::Value),
+    UserAccountUpdated(serde_json::Value),
     UserSessionExtended,
     // user management events
-    UserCreated(UserDetails),
-    UserUpdated(UserDetails),
-    UserDeleted(UserDetails),
+    UserCreated(serde_json::Value),
+    UserUpdated(serde_json::Value),
+    UserDeleted(serde_json::Value),
     // election events
-    ElectionCreated(ElectionDetails),
-    ElectionUpdated(ElectionDetails),
+    ElectionCreated(serde_json::Value),
+    ElectionUpdated(serde_json::Value),
     // committee session events
-    CommitteeSessionCreated(CommitteeSessionDetails),
-    CommitteeSessionDeleted(CommitteeSessionDetails),
-    CommitteeSessionUpdated(CommitteeSessionDetails),
+    CommitteeSessionCreated(serde_json::Value),
+    CommitteeSessionDeleted(serde_json::Value),
+    CommitteeSessionUpdated(serde_json::Value),
     // investigation events
-    PollingStationInvestigationCreated(PollingStationInvestigation),
-    PollingStationInvestigationConcluded(PollingStationInvestigation),
-    PollingStationInvestigationUpdated(PollingStationInvestigation),
-    PollingStationInvestigationDeleted(PollingStationInvestigation),
+    PollingStationInvestigationCreated(serde_json::Value),
+    PollingStationInvestigationConcluded(serde_json::Value),
+    PollingStationInvestigationUpdated(serde_json::Value),
+    PollingStationInvestigationDeleted(serde_json::Value),
     // file events
-    FileCreated(FileDetails),
-    FileDeleted(FileDetails),
+    FileCreated(serde_json::Value),
+    FileDeleted(serde_json::Value),
     // polling station events
-    PollingStationCreated(PollingStationDetails),
-    PollingStationUpdated(PollingStationDetails),
-    PollingStationDeleted(PollingStationDetails),
-    PollingStationsImported(PollingStationImportDetails),
+    PollingStationCreated(serde_json::Value),
+    PollingStationUpdated(serde_json::Value),
+    PollingStationDeleted(serde_json::Value),
+    PollingStationsImported(serde_json::Value),
     // data entry events
-    DataEntryStarted(DataEntryDetails),
-    DataEntrySaved(DataEntryDetails),
-    DataEntryResumed(DataEntryDetails),
-    DataEntryDeleted(DataEntryDetails),
-    DataEntryFinalised(DataEntryDetails),
-    ResultDeleted(ResultDetails),
+    DataEntryStarted(serde_json::Value),
+    DataEntrySaved(serde_json::Value),
+    DataEntryResumed(serde_json::Value),
+    DataEntryDeleted(serde_json::Value),
+    DataEntryFinalised(serde_json::Value),
+    ResultDeleted(serde_json::Value),
     // data entry resolving events
-    DataEntryDiscardedFirst(DataEntryDetails),
-    DataEntryReturnedFirst(DataEntryDetails),
+    DataEntryDiscardedFirst(serde_json::Value),
+    DataEntryReturnedFirst(serde_json::Value),
     DataEntryKeptFirst(DataEntryDetails),
     DataEntryKeptSecond(DataEntryDetails),
     DataEntryDiscardedBoth(DataEntryDetails),
@@ -225,7 +225,7 @@ pub enum AuditEvent {
     AirGapViolationDetected,
     AirGapViolationResolved,
     // system events
-    ApplicationStarted(ApplicationStartedDetails),
+    ApplicationStarted(serde_json::Value),
     // api errors
     Error(ErrorDetails),
     #[default]

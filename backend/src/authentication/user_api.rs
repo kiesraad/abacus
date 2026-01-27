@@ -107,7 +107,7 @@ pub async fn user_create(
     )
     .await?;
     audit_service
-        .log(&mut tx, &AuditEvent::UserCreated(user.clone().into()), None)
+        .log(&mut tx, &AuditEvent::UserCreated(serde_json::to_value(&user)?), None)
         .await?;
     tx.commit().await?;
 
@@ -203,7 +203,7 @@ pub async fn user_update(
         .ok_or(sqlx::Error::RowNotFound)?;
 
     audit_service
-        .log(&mut tx, &AuditEvent::UserUpdated(user.clone().into()), None)
+        .log(&mut tx, &AuditEvent::UserUpdated(serde_json::to_value(&user)?), None)
         .await?;
 
     tx.commit().await?;
@@ -261,7 +261,7 @@ async fn user_delete(
 
     if deleted {
         audit_service
-            .log(&mut tx, &AuditEvent::UserDeleted(user.clone().into()), None)
+            .log(&mut tx, &AuditEvent::UserDeleted(serde_json::to_value(&user)?), None)
             .await?;
 
         tx.commit().await?;

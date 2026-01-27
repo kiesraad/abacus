@@ -185,7 +185,7 @@ pub async fn election_number_of_voters_change(
         audit_service
             .log(
                 &mut tx,
-                &AuditEvent::ElectionUpdated(election.clone().into()),
+                &AuditEvent::ElectionUpdated(serde_json::to_value(&election)?),
                 None,
             )
             .await?;
@@ -359,7 +359,7 @@ async fn create_election(
     audit_service
         .log(
             conn,
-            &AuditEvent::ElectionCreated(election.clone().into()),
+            &AuditEvent::ElectionCreated(serde_json::to_value(&election)?),
             Some(message),
         )
         .await?;

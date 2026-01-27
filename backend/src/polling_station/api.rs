@@ -3,6 +3,7 @@ use axum::{
     extract::{Path, State},
     http::StatusCode,
 };
+use serde_json::json;
 use sqlx::{Connection, SqliteConnection, SqlitePool};
 use utoipa_axum::{router::OpenApiRouter, routes};
 
@@ -15,7 +16,7 @@ use super::{
 };
 use crate::{
     APIError, AppState, ErrorResponse, SqlitePoolExt,
-    audit_log::{AuditEvent, AuditService, PollingStationImportDetails},
+    audit_log::{AuditEvent, AuditService},
     authentication::{AdminOrCoordinator, User, error::AuthenticationError},
     committee_session::{
         CommitteeSession,
@@ -126,7 +127,7 @@ async fn polling_station_create(
     audit_service
         .log(
             &mut tx,
-            &AuditEvent::PollingStationCreated(polling_station.clone().into()),
+            &AuditEvent::PollingStationCreated(serde_json::to_value(&polling_station)?),
             None,
         )
         .await?;
@@ -228,7 +229,7 @@ async fn polling_station_update(
     audit_service
         .log(
             &mut tx,
-            &AuditEvent::PollingStationUpdated(polling_station.clone().into()),
+            &AuditEvent::PollingStationUpdated(serde_json::to_value(&polling_station)?),
             None,
         )
         .await?;
@@ -303,7 +304,7 @@ async fn polling_station_delete(
     audit_service
         .log(
             &mut tx,
-            &AuditEvent::PollingStationDeleted(polling_station.clone().into()),
+            &AuditEvent::PollingStationDeleted(serde_json::to_value(&polling_station)?),
             None,
         )
         .await?;
@@ -373,12 +374,12 @@ pub async fn create_imported_polling_stations(
     audit_service
         .log(
             &mut tx,
-            &AuditEvent::PollingStationsImported(PollingStationImportDetails {
-                import_election_id: election_id,
-                import_file_name: polling_stations_request.file_name,
-                import_number_of_polling_stations: u64::try_from(polling_stations.len())
+            &AuditEvent::PollingStationsImported(json!({
+                "import_election_id": election_id,
+                "import_file_name": polling_stations_request.file_name,
+                "import_number_of_polling_stations": u64::try_from(polling_stations.len())
                     .map_err(|_| EMLImportError::NumberOfPollingStationsNotInRange)?,
-            }),
+            })),
             Some(format!(
                 "Polling stations file hash: {}",
                 file_hash.join(" ")

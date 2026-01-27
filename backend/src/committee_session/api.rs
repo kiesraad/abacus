@@ -73,7 +73,7 @@ pub async fn create_committee_session(
     audit_service
         .log(
             conn,
-            &AuditEvent::CommitteeSessionCreated(committee_session.clone().into()),
+            &AuditEvent::CommitteeSessionCreated(serde_json::to_value(&committee_session)?),
             None,
         )
         .await?;
@@ -169,7 +169,7 @@ pub async fn committee_session_delete(
         audit_service
             .log(
                 &mut tx,
-                &AuditEvent::CommitteeSessionDeleted(committee_session.clone().into()),
+                &AuditEvent::CommitteeSessionDeleted(serde_json::to_value(&committee_session)?),
                 None,
             )
             .await?;
@@ -243,7 +243,7 @@ pub async fn committee_session_update(
     audit_service
         .log(
             &mut tx,
-            &AuditEvent::CommitteeSessionUpdated(committee_session.clone().into()),
+            &AuditEvent::CommitteeSessionUpdated(serde_json::to_value(&committee_session)?),
             None,
         )
         .await?;

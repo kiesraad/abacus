@@ -1,7 +1,3 @@
-mod filter_input;
-pub mod models;
-mod votes_table;
-
 #[cfg(feature = "embed-typst")]
 mod embedded;
 
@@ -15,9 +11,6 @@ mod typst_tests;
 pub use embedded::{PdfGenError, generate_pdf, generate_pdfs};
 #[cfg(not(feature = "embed-typst"))]
 pub use external::{PdfGenError, generate_pdf, generate_pdfs};
-pub use votes_table::{
-    CandidatesTables, VotesTables, VotesTablesWithOnlyPreviousVotes, VotesTablesWithPreviousVotes,
-};
 
 pub struct PdfGenResult {
     pub buffer: Vec<u8>,
@@ -26,7 +19,6 @@ pub struct PdfGenResult {
 #[cfg(test)]
 pub(crate) mod tests {
     use chrono::Utc;
-    use models::ModelNa31_2Input;
     use test_log::test;
 
     use super::*;
@@ -38,9 +30,7 @@ pub(crate) mod tests {
                 ElectionCategory, ElectionId, ElectionWithPoliticalGroups, VoteCountingMethod,
                 tests::election_fixture,
             },
-        },
-        pdf_gen::{
-            models::{PdfFileModel, PdfModel, ToPdfFileModel},
+            models::{ModelNa31_2Input, PdfFileModel, PdfModel, ToPdfFileModel, filter_input},
             votes_table::VotesTables,
         },
         polling_station::{PollingStation, PollingStationId, PollingStationType},

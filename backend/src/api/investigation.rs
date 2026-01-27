@@ -20,15 +20,14 @@ use crate::{
             PollingStationInvestigationConcludeRequest, PollingStationInvestigationCreateRequest,
             PollingStationInvestigationUpdateRequest,
         },
+        models::{ModelNa14_2Bijlage1Input, ToPdfFileModel},
+        votes_table::VotesTablesWithOnlyPreviousVotes,
     },
     error::ErrorReference,
     infra::{
         audit_log::{AuditEvent, AuditService},
         authentication::Coordinator,
-    },
-    pdf_gen::{
-        VotesTablesWithOnlyPreviousVotes, generate_pdf,
-        models::{ModelNa14_2Bijlage1Input, ToPdfFileModel},
+        pdf_gen::generate_pdf,
     },
     polling_station::{self, PollingStation, PollingStationId},
     repository::{

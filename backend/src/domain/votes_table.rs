@@ -158,7 +158,7 @@ fn get_votes_for_candidate(
 }
 
 #[derive(Debug, Serialize, Deserialize)]
-pub(super) struct VotesTable {
+pub struct VotesTable {
     /// Political group number
     number: PGNumber,
     /// Political group name
@@ -285,7 +285,7 @@ impl VotesTable {
 }
 
 #[derive(Debug, Serialize, Deserialize)]
-pub(super) struct VotesTableColumn {
+pub struct VotesTableColumn {
     /// Sum of votes in this column
     column_total: Option<Count>,
     /// Sum of previous number of votes in this column
@@ -295,7 +295,7 @@ pub(super) struct VotesTableColumn {
 }
 
 #[derive(Debug, Serialize, Deserialize)]
-pub(super) struct CandidateVotes {
+pub struct CandidateVotes {
     /// Candidate information
     candidate: Candidate,
     /// Current number of votes for the candidate

@@ -1,3 +1,4 @@
+pub mod filter_input;
 mod model_n_10_2;
 mod model_na_14_2;
 mod model_na_31_2;
@@ -5,12 +6,11 @@ mod model_p_2a;
 
 use std::{error::Error, path::PathBuf};
 
+use filter_input::replace_unsupported_glyphs;
 pub use model_n_10_2::*;
 pub use model_na_14_2::*;
 pub use model_na_31_2::*;
 pub use model_p_2a::*;
-
-use super::filter_input::replace_unsupported_glyphs;
 
 pub trait ToPdfFileModel {
     fn to_pdf_file_model(self, file_name: String) -> PdfFileModel;

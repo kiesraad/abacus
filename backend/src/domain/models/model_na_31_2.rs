@@ -1,11 +1,11 @@
 use serde::{Deserialize, Serialize};
 
 use crate::{
-    domain::{committee_session::CommitteeSession, election::Election},
-    pdf_gen::{
-        CandidatesTables,
+    domain::{
+        committee_session::CommitteeSession,
+        election::Election,
         models::{PdfFileModel, PdfModel, ToPdfFileModel},
-        votes_table::VotesTables,
+        votes_table::{CandidatesTables, VotesTables},
     },
     polling_station::PollingStation,
     summary::ElectionSummaryWithoutVotes,

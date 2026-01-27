@@ -6,14 +6,13 @@ use std::{
 use abacus::{
     AppError, create_sqlite_pool,
     domain::{
-        committee_session::CommitteeSession, data_entry::PollingStationResults,
+        committee_session::CommitteeSession,
+        data_entry::PollingStationResults,
         election::ElectionWithPoliticalGroups,
+        models::{ModelNa31_2Input, ToPdfFileModel},
+        votes_table::VotesTables,
     },
     eml::{EML110, EML230, EMLDocument},
-    pdf_gen::{
-        VotesTables,
-        models::{ModelNa31_2Input, ToPdfFileModel},
-    },
     polling_station::PollingStation,
     report::DEFAULT_DATE_TIME_FORMAT,
     summary::ElectionSummary,

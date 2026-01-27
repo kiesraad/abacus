@@ -6,5 +6,7 @@ pub mod election;
 pub mod entry_number;
 pub mod file;
 pub mod investigation;
+pub mod models;
 pub mod status;
 pub mod validation;
+pub mod votes_table;

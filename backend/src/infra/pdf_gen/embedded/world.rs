@@ -138,14 +138,14 @@ impl World for PdfWorld {
 /// In a debug build, this is done at runtime, for a release build this is
 /// done at compile time.
 macro_rules! include_filedata {
-    ($path:expr) => {{ include_bytes!(concat!("../../../templates/", $path)) as &'static [u8] }};
+    ($path:expr) => {{ include_bytes!(concat!("../../../../templates/", $path)) as &'static [u8] }};
 }
 
 /// Macro that loads data as a string from a file
 /// In a debug build, this is done at runtime, for a release build this is
 /// done at compile time.
 macro_rules! include_strdata {
-    ($path:expr) => {{ include_str!(concat!("../../../templates/", $path)) as &'static str }};
+    ($path:expr) => {{ include_str!(concat!("../../../../templates/", $path)) as &'static str }};
 }
 
 /// Load all sources available from the `templates/` directory (i.e. all typst

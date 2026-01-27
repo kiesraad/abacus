@@ -20,14 +20,12 @@ use crate::{
         election::{ElectionId, ElectionWithPoliticalGroups},
         file::{File, create_file},
         investigation::PollingStationInvestigation,
+        models::{ModelNa14_2Input, ModelNa31_2Input, ModelP2aInput, PdfFileModel, ToPdfFileModel},
+        votes_table::{VotesTables, VotesTablesWithPreviousVotes},
     },
     eml::{EML510, EMLDocument, EmlHash},
     error::ErrorReference,
-    infra::{audit_log::AuditService, authentication::Coordinator},
-    pdf_gen::{
-        VotesTables, VotesTablesWithPreviousVotes, generate_pdf,
-        models::{ModelNa14_2Input, ModelNa31_2Input, ModelP2aInput, PdfFileModel, ToPdfFileModel},
-    },
+    infra::{audit_log::AuditService, authentication::Coordinator, pdf_gen::generate_pdf},
     polling_station::{self, PollingStation},
     repository::{
         committee_session_repo,

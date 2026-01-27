@@ -10,14 +10,17 @@ use utoipa_axum::{router::OpenApiRouter, routes};
 
 use crate::{
     APIError, AppState, ErrorResponse,
-    domain::election::ElectionId,
-    error::ErrorReference,
-    infra::authentication::AdminOrCoordinator,
-    pdf_gen::{
-        CandidatesTables, generate_pdf, generate_pdfs,
+    domain::{
+        election::ElectionId,
         models::{
             ModelN10_2Input, ModelNa31_2Bijlage1Input, ModelNa31_2InlegvelInput, ToPdfFileModel,
         },
+        votes_table::CandidatesTables,
+    },
+    error::ErrorReference,
+    infra::{
+        authentication::AdminOrCoordinator,
+        pdf_gen::{generate_pdf, generate_pdfs},
     },
     polling_station,
     repository::{committee_session_repo, election_repo},

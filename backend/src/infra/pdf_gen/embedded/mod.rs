@@ -6,11 +6,11 @@ use tracing::{debug, error, info, warn};
 use typst::{comemo, diag::SourceDiagnostic, ecow::EcoVec, foundations::Datetime};
 use typst_pdf::{PdfOptions, PdfStandard, PdfStandards, Timestamp};
 
-use super::{
-    PdfGenResult,
-    models::{PdfFileModel, PdfModel},
+use super::PdfGenResult;
+use crate::{
+    domain::models::{PdfFileModel, PdfModel},
+    zip::{ZipResponseError, ZipResponseWriter},
 };
-use crate::zip::{ZipResponseError, ZipResponseWriter};
 
 mod world;
 

@@ -1,8 +1,10 @@
 use serde::{Deserialize, Serialize};
 
 use crate::{
-    domain::election::ElectionWithPoliticalGroups,
-    pdf_gen::models::{PdfFileModel, PdfModel, ToPdfFileModel},
+    domain::{
+        election::ElectionWithPoliticalGroups,
+        models::{PdfFileModel, PdfModel, ToPdfFileModel},
+    },
     polling_station::PollingStation,
 };
 

@@ -6,7 +6,7 @@ use tracing::{error, info};
 
 use super::PdfGenResult;
 use crate::{
-    pdf_gen::models::PdfFileModel,
+    domain::models::PdfFileModel,
     zip::{ZipResponseError, ZipResponseWriter},
 };
 

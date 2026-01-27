@@ -2,10 +2,10 @@ use serde::{Deserialize, Serialize};
 
 use crate::{
     domain::{
-        committee_session::CommitteeSession, data_entry::CommonPollingStationResultsWithoutVotes,
-        election::Election, investigation::PollingStationInvestigation,
-    },
-    pdf_gen::{
+        committee_session::CommitteeSession,
+        data_entry::CommonPollingStationResultsWithoutVotes,
+        election::Election,
+        investigation::PollingStationInvestigation,
         models::{PdfFileModel, PdfModel, ToPdfFileModel},
         votes_table::{VotesTablesWithOnlyPreviousVotes, VotesTablesWithPreviousVotes},
     },

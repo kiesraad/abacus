@@ -24,9 +24,6 @@ use crate::{
         },
         file::FileId,
         investigation::PollingStationInvestigation,
-    },
-    pdf_gen::{
-        generate_pdf,
         models::{
             ModelN10_2Input, ModelNa14_2Bijlage1Input, ModelNa14_2Input, ModelNa31_2Bijlage1Input,
             ModelNa31_2Input, ModelP2aInput, PdfFileModel, PdfModel,
@@ -36,6 +33,7 @@ use crate::{
             VotesTablesWithPreviousVotes,
         },
     },
+    infra::pdf_gen::generate_pdf,
     polling_station::{PollingStation, PollingStationId, PollingStationType},
     report::DEFAULT_DATE_TIME_FORMAT,
     summary::{ElectionSummary, PollingStationInvestigations, SumCount, SummaryDifferencesCounts},

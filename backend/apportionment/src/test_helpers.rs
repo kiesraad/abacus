@@ -1,7 +1,6 @@
-use crate::{
-    ListNumber,
+use super::{
     fraction::Fraction,
-    structs::{CandidateNominationInput, ListVotes, SeatAssignmentInput},
+    structs::{CandidateNominationInput, ListNumber, ListVotes, SeatAssignmentInput},
 };
 
 pub fn candidate_nomination_fixture_with_given_number_of_seats(

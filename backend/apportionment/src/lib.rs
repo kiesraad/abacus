@@ -1,42 +1,31 @@
-use crate::{
-    candidate_nomination::candidate_nomination,
-    seat_assignment::seat_assignment,
-    structs::{CandidateNominationInput, SeatAssignmentInput},
-};
-
-// TODO: Temp
-pub type ListNumber = u32;
-
-// TODO: Fix positions of struct, fix visibilities
 mod candidate_nomination;
 mod fraction;
+mod id_macro;
 mod seat_assignment;
 mod structs;
-
 #[cfg(test)]
-pub(crate) mod test_helpers;
+mod test_helpers;
 
-pub use crate::{
+pub use self::{
     candidate_nomination::CandidateNominationResult,
     fraction::Fraction,
     seat_assignment::SeatAssignmentResult,
     structs::{ApportionmentError, ApportionmentInput, CandidateVotesTrait, ListVotesTrait},
 };
-
-// Place somewhere
-pub struct ApportionmentResponse {
-    pub seat_assignment: SeatAssignmentResult,
-    pub candidate_nomination: CandidateNominationResult,
-}
+use self::{
+    candidate_nomination::candidate_nomination,
+    seat_assignment::seat_assignment,
+    structs::{ApportionmentOutput, CandidateNominationInput, SeatAssignmentInput},
+};
 
 pub async fn process(
     input: impl ApportionmentInput,
-) -> Result<ApportionmentResponse, ApportionmentError> {
+) -> Result<ApportionmentOutput, ApportionmentError> {
     let seat_assignment = seat_assignment(SeatAssignmentInput::from(&input))?;
     let candidate_nomination =
         candidate_nomination(CandidateNominationInput::from((&input, &seat_assignment)))?;
 
-    Ok(ApportionmentResponse {
+    Ok(ApportionmentOutput {
         seat_assignment,
         candidate_nomination,
     })

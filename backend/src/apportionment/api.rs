@@ -1,5 +1,3 @@
-use std::ops::Deref;
-
 use apportionment::{
     ApportionmentError, ApportionmentInput, CandidateNominationResult, CandidateVotesTrait,
     ListVotesTrait, SeatAssignmentResult,
@@ -63,7 +61,7 @@ impl ListVotesTrait for PoliticalGroupCandidateVotes {
     type Cv = CandidateVotes;
 
     fn number(&self) -> u32 {
-        *self.number.deref()
+        *self.number
     }
 
     fn total(&self) -> u32 {
@@ -77,7 +75,7 @@ impl ListVotesTrait for PoliticalGroupCandidateVotes {
 
 impl CandidateVotesTrait for CandidateVotes {
     fn number(&self) -> u32 {
-        *self.number.deref()
+        *self.number
     }
 
     fn votes(&self) -> u32 {

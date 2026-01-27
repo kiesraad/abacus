@@ -1,9 +1,12 @@
-#[cfg(test)]
-use crate::ListNumber;
-use crate::{
+use super::{
+    candidate_nomination::CandidateNominationResult,
     fraction::Fraction,
+    id_macro::id,
     seat_assignment::{SeatAssignmentResult, get_total_seats_from_apportionment_result},
 };
+
+id!(CandidateNumber);
+id!(ListNumber);
 
 /// Errors that can occur during apportionment
 #[derive(Debug, PartialEq)]
@@ -20,6 +23,11 @@ pub trait ApportionmentInput {
     fn number_of_seats(&self) -> u32;
     fn total_votes(&self) -> u32;
     fn list_votes(&self) -> &[Self::List];
+}
+
+pub struct ApportionmentOutput {
+    pub seat_assignment: SeatAssignmentResult,
+    pub candidate_nomination: CandidateNominationResult,
 }
 
 pub trait ListVotesTrait {
@@ -57,7 +65,7 @@ where
 
 #[derive(Clone, Debug, PartialEq)]
 pub(crate) struct ListVotes {
-    pub number: u32,
+    pub number: ListNumber,
     pub list_votes: u32,
     pub candidate_votes: Vec<CandidateVotes>,
 }
@@ -74,7 +82,7 @@ impl ListVotes {
                 .iter()
                 .enumerate()
                 .map(|(i, votes)| CandidateVotes {
-                    number: u32::try_from(i + 1).unwrap(),
+                    number: CandidateNumber::try_from(i + 1).unwrap(),
                     votes: *votes,
                 })
                 .collect(),
@@ -84,7 +92,7 @@ impl ListVotes {
 
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct CandidateVotes {
-    pub number: u32,
+    pub number: CandidateNumber,
     pub votes: u32,
 }
 
@@ -130,13 +138,13 @@ fn list_votes_from_input<T: ApportionmentInput>(input: &T) -> Vec<ListVotes> {
         .list_votes()
         .iter()
         .map(|list| ListVotes {
-            number: list.number(),
+            number: ListNumber::from(list.number()),
             list_votes: list.total(),
             candidate_votes: list
                 .candidate_votes()
                 .iter()
                 .map(|cv| CandidateVotes {
-                    number: cv.number(),
+                    number: CandidateNumber::from(cv.number()),
                     votes: cv.votes(),
                 })
                 .collect(),

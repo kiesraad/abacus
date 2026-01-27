@@ -10,22 +10,26 @@ use tokio::{net::TcpListener, signal};
 use tracing::{info, trace, warn};
 
 pub mod airgap;
+pub mod api;
 pub mod app_error;
 pub mod audit_log;
 pub mod authentication;
 pub mod committee_session;
 pub mod data_entry;
 pub mod document;
+pub mod domain;
 pub mod election;
 pub mod eml;
 mod error;
 pub mod files;
 #[cfg(feature = "dev-database")]
 pub mod fixtures;
+pub mod infra;
 pub mod investigation;
 pub mod pdf_gen;
 pub mod polling_station;
 pub mod report;
+pub mod repository;
 pub mod router;
 pub mod summary;
 #[cfg(feature = "dev-database")]
@@ -225,9 +229,8 @@ mod test {
     use test_log::test;
     use tokio::net::TcpListener;
 
-    use crate::{AppError, create_sqlite_pool};
-
     use super::start_server;
+    use crate::{AppError, create_sqlite_pool};
 
     pub(crate) async fn run_server_test<F, Fut>(pool: SqlitePool, test_fn: F)
     where

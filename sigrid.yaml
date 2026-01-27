@@ -1,5 +1,17 @@
 components:
   # Backend modules
+  - name: "(Backend) Infrastructure"
+    include: [ ".*/backend/src/infra/.*" ]
+
+  - name: "(Backend) API"
+    include: [ ".*/backend/src/api/.*" ]
+
+  - name: "(Backend) Repository"
+    include: [ ".*/backend/src/repository/.*" ]
+
+  - name: "(Backend) Domain"
+    include: [ ".*/backend/src/domain/.*" ]
+
   - name: "(Backend) Airgap detection"
     include:
       - ".*/backend/src/airgap/.*"

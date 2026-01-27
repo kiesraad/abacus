@@ -16,7 +16,7 @@ use super::{
 };
 use crate::{
     APIError, AppState, ErrorResponse, SqlitePoolExt,
-    audit_log::{AuditEventType, AuditService},
+    audit_log::AuditService,
     authentication::Coordinator,
     election::ElectionId,
     error::ErrorReference,

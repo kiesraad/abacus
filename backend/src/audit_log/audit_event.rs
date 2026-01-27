@@ -13,26 +13,6 @@ use crate::{
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, Eq, ToSchema)]
 #[serde(deny_unknown_fields)]
-pub struct UserLoggedInDetails {
-    pub user_agent: String,
-    pub logged_in_users_count: u32,
-}
-
-#[derive(Serialize, Deserialize, Debug, PartialEq, Eq, ToSchema)]
-#[serde(deny_unknown_fields)]
-pub struct UserLoginFailedDetails {
-    pub username: String,
-    pub user_agent: String,
-}
-
-#[derive(Serialize, Deserialize, Debug, PartialEq, Eq, ToSchema)]
-#[serde(deny_unknown_fields)]
-pub struct UserLoggedOutDetails {
-    pub session_duration: u64,
-}
-
-#[derive(Serialize, Deserialize, Debug, PartialEq, Eq, ToSchema)]
-#[serde(deny_unknown_fields)]
 pub struct UserDetails {
     pub user_id: UserId,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -167,9 +147,9 @@ pub trait AsAuditEvent {
 #[serde(rename_all = "PascalCase", tag = "event_type")]
 pub enum AuditEventType {
     // authentication and account events
-    UserLoggedIn(UserLoggedInDetails),
-    UserLoginFailed(UserLoginFailedDetails),
-    UserLoggedOut(UserLoggedOutDetails),
+    UserLoggedIn,
+    UserLoginFailed,
+    UserLoggedOut,
     UserAccountUpdated(UserDetails),
     UserSessionExtended,
     // user management events
@@ -241,9 +221,9 @@ impl From<sqlx::types::Json<AuditEventType>> for AuditEventType {
 impl AuditEventType {
     pub fn level(&self) -> AuditEventLevel {
         match self {
-            AuditEventType::UserLoggedIn(_) => AuditEventLevel::Success,
-            AuditEventType::UserLoginFailed(_) => AuditEventLevel::Warning,
-            AuditEventType::UserLoggedOut(_) => AuditEventLevel::Success,
+            AuditEventType::UserLoggedIn => AuditEventLevel::Success,
+            AuditEventType::UserLoginFailed => AuditEventLevel::Warning,
+            AuditEventType::UserLoggedOut => AuditEventLevel::Success,
             AuditEventType::UserSessionExtended => AuditEventLevel::Info,
             AuditEventType::UserAccountUpdated(_) => AuditEventLevel::Success,
             AuditEventType::UserCreated(_) => AuditEventLevel::Success,

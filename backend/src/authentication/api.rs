@@ -21,8 +21,7 @@ use super::{
 use crate::{
     APIError, AppState, ErrorResponse, SqlitePoolExt,
     audit_log::{
-        AuditEventType, AuditService, UserDetails, UserLoggedInDetails, UserLoggedOutDetails,
-        UserLoginFailedDetails,
+        AsAuditEvent, AuditEvent, AuditEventType, AuditService, UserDetails
     },
     authentication::{CreateUserRequest, user::UserId},
     error::ErrorReference,
@@ -33,6 +32,46 @@ impl From<AuthenticationError> for APIError {
         APIError::Authentication(err)
     }
 }
+
+
+macro_rules! as_audit_event {
+    ($identifier:ident, $audit_event_type:path) => {
+        impl AsAuditEvent for $identifier {
+            fn as_audit_event(&self) -> crate::audit_log::AuditEvent {
+                AuditEvent {
+                    event_type: $audit_event_type,
+                    data: serde_json::to_value(self).expect("could not serialize to JSON"),
+                }
+            }
+        }
+    };
+}
+
+#[derive(Serialize, Deserialize, Debug, PartialEq, Eq, ToSchema)]
+#[serde(deny_unknown_fields)]
+pub struct UserLoggedInDetails {
+    pub user_agent: String,
+    pub logged_in_users_count: u32,
+}
+
+as_audit_event!(UserLoggedInDetails, AuditEventType::UserLoggedIn);
+
+#[derive(Serialize, Deserialize, Debug, PartialEq, Eq, ToSchema)]
+#[serde(deny_unknown_fields)]
+pub struct UserLoggedOutDetails {
+    pub session_duration: u64,
+}
+
+as_audit_event!(UserLoggedOutDetails, AuditEventType::UserLoggedOut);
+
+#[derive(Serialize, Deserialize, Debug, PartialEq, Eq, ToSchema)]
+#[serde(deny_unknown_fields)]
+pub struct UserLoginFailedDetails {
+    pub username: String,
+    pub user_agent: String,
+}
+
+as_audit_event!(UserLoginFailedDetails, AuditEventType::UserLoginFailed);
 
 pub fn router() -> OpenApiRouter<AppState> {
     OpenApiRouter::default()
@@ -126,10 +165,10 @@ async fn login(
             audit_service
                 .log(
                     &mut tx,
-                    &AuditEventType::UserLoginFailed(UserLoginFailedDetails {
+                    UserLoginFailedDetails {
                         username,
                         user_agent: user_agent.clone(),
-                    }),
+                    },
                     None,
                 )
                 .await?;
@@ -163,10 +202,10 @@ async fn login(
         .with_user(user.clone())
         .log(
             &mut tx,
-            &AuditEventType::UserLoggedIn(UserLoggedInDetails {
+            UserLoggedInDetails {
                 user_agent: user_agent.to_string(),
                 logged_in_users_count,
-            }),
+            },
             None,
         )
         .await?;

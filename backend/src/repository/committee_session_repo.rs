@@ -1,12 +1,15 @@
 use chrono::NaiveDateTime;
 use sqlx::{Connection, SqliteConnection, query, query_as};
 
-use super::{
-    CommitteeSession, CommitteeSessionCreateRequest, CommitteeSessionFilesUpdateRequest,
-    status::CommitteeSessionStatus,
-};
 use crate::{
-    committee_session::CommitteeSessionId, election::ElectionId,
+    domain::{
+        committee_session::{
+            CommitteeSession, CommitteeSessionCreateRequest, CommitteeSessionFilesUpdateRequest,
+            CommitteeSessionId,
+        },
+        committee_session_status::CommitteeSessionStatus,
+    },
+    election::ElectionId,
     polling_station::duplicate_for_committee_session,
 };
 

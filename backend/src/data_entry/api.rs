@@ -24,11 +24,12 @@ use super::{
 };
 use crate::{
     APIError, AppState, SqlitePoolExt,
-    committee_session::{
-        CommitteeSession, CommitteeSessionError,
-        status::{CommitteeSessionStatus, change_committee_session_status},
-    },
+    api::committee_session::CommitteeSessionError,
     data_entry::repository::get_result,
+    domain::{
+        committee_session::CommitteeSession,
+        committee_session_status::{CommitteeSessionStatus, change_committee_session_status},
+    },
     election::{ElectionId, ElectionWithPoliticalGroups, PoliticalGroup},
     error::{ErrorReference, ErrorResponse},
     infra::{
@@ -37,7 +38,7 @@ use crate::{
     },
     investigation::get_polling_station_investigation,
     polling_station::{self, PollingStation, PollingStationId},
-    repository::user_repo::UserId,
+    repository::{committee_session_repo, user_repo::UserId},
 };
 
 impl From<DataError> for APIError {
@@ -104,8 +105,7 @@ async fn validate_and_get_data(
 > {
     let polling_station = polling_station::get(conn, polling_station_id).await?;
     let committee_session =
-        crate::committee_session::repository::get(conn, polling_station.committee_session_id)
-            .await?;
+        committee_session_repo::get(conn, polling_station.committee_session_id).await?;
     let election = crate::election::repository::get(conn, committee_session.election_id).await?;
 
     let data_entry_status = crate::data_entry::repository::get_or_default(
@@ -646,8 +646,7 @@ async fn polling_station_data_entries_and_result_delete(
 
     let polling_station = polling_station::get(&mut tx, polling_station_id).await?;
     let committee_session =
-        crate::committee_session::repository::get(&mut tx, polling_station.committee_session_id)
-            .await?;
+        committee_session_repo::get(&mut tx, polling_station.committee_session_id).await?;
 
     let data_entry = get_data_entry(&mut tx, polling_station_id, committee_session.id).await?;
 
@@ -1019,11 +1018,7 @@ async fn election_status(
     let mut conn = pool.acquire().await?;
 
     let current_committee_session =
-        crate::committee_session::repository::get_election_committee_session(
-            &mut conn,
-            election_id,
-        )
-        .await?;
+        committee_session_repo::get_election_committee_session(&mut conn, election_id).await?;
 
     let statuses =
         crate::data_entry::repository::statuses(&mut conn, current_committee_session.id).await?;
@@ -1039,14 +1034,14 @@ mod tests {
 
     use super::*;
     use crate::{
-        committee_session::{
-            CommitteeSessionId, status::CommitteeSessionStatus,
-            tests::change_status_committee_session,
-        },
+        api::committee_session::tests::change_status_committee_session,
         data_entry::{
             ValidationResult, ValidationResultCode,
             repository::{data_entry_exists, result_exists},
             structs::tests::example_polling_station_results,
+        },
+        domain::{
+            committee_session::CommitteeSessionId, committee_session_status::CommitteeSessionStatus,
         },
         infra::authentication::Role,
         investigation::insert_test_investigation,
@@ -2211,10 +2206,9 @@ mod tests {
         assert!(!result_exists(&mut conn, polling_station_id).await.unwrap());
 
         // Check that the committee session status is changed to DataEntry
-        let committee_session =
-            crate::committee_session::repository::get(&mut conn, CommitteeSessionId::from(3))
-                .await
-                .unwrap();
+        let committee_session = committee_session_repo::get(&mut conn, CommitteeSessionId::from(3))
+            .await
+            .unwrap();
 
         assert_eq!(committee_session.status, CommitteeSessionStatus::DataEntry);
     }

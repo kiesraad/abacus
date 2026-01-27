@@ -296,7 +296,7 @@ mod tests {
 
     use super::*;
     use crate::{
-        committee_session::tests::committee_session_fixture,
+        api::committee_session::tests::committee_session_fixture,
         data_entry::{
             CSOFirstSessionResults, ExtraInvestigation, PoliticalGroupTotalVotes, YesNo,
             tests::ValidDefault,

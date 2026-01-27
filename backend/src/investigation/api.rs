@@ -18,14 +18,14 @@ use super::{
 };
 use crate::{
     APIError, AppState, ErrorResponse, SqlitePoolExt,
-    committee_session::{
-        CommitteeSession, CommitteeSessionError,
-        repository::get_election_committee_session,
-        status::{CommitteeSessionStatus, change_committee_session_status},
-    },
+    api::committee_session::CommitteeSessionError,
     data_entry::{
         PollingStationResults, delete_data_entry_and_result_for_polling_station,
         repository::{data_entry_exists, previous_results_for_polling_station, result_exists},
+    },
+    domain::{
+        committee_session::CommitteeSession,
+        committee_session_status::{CommitteeSessionStatus, change_committee_session_status},
     },
     election::ElectionWithPoliticalGroups,
     error::ErrorReference,
@@ -38,6 +38,7 @@ use crate::{
         models::{ModelNa14_2Bijlage1Input, ToPdfFileModel},
     },
     polling_station::{self, PollingStation, PollingStationId},
+    repository::committee_session_repo::get_election_committee_session,
 };
 
 pub fn router() -> OpenApiRouter<AppState> {

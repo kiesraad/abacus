@@ -7,9 +7,6 @@ use tracing::info;
 
 use crate::{
     SqlitePoolExt,
-    committee_session::{
-        self, CommitteeSession, CommitteeSessionCreateRequest, status::CommitteeSessionStatus,
-    },
     data_entry::{
         self, CSOFirstSessionResults, CandidateVotes, CountingDifferencesPollingStation,
         DifferenceCountsCompareVotesCastAdmittedVoters, DifferencesCounts, ExtraInvestigation,
@@ -18,12 +15,16 @@ use crate::{
         repository::list_results_for_committee_session,
         status::{DataEntryStatus, Definitive, FirstEntryFinalised},
     },
+    domain::{
+        committee_session::{CommitteeSession, CommitteeSessionCreateRequest},
+        committee_session_status::CommitteeSessionStatus,
+    },
     election::{
         self, CandidateGender, CandidateNumber, ElectionCategory, ElectionWithPoliticalGroups,
         NewElection, PGNumber, PoliticalGroup, VoteCountingMethod,
     },
     polling_station::{self, PollingStation, PollingStationRequest, PollingStationType},
-    repository::user_repo::UserId,
+    repository::{committee_session_repo, user_repo::UserId},
     test_data_gen::GenerateElectionArgs,
 };
 
@@ -44,7 +45,7 @@ async fn generate_data_entries(
     election: &ElectionWithPoliticalGroups,
     polling_stations: &[PollingStation],
 ) -> Result<bool, Box<dyn Error>> {
-    let committee_session = committee_session::repository::change_status(
+    let committee_session = committee_session_repo::change_status(
         conn,
         committee_session.id,
         CommitteeSessionStatus::DataEntry,
@@ -76,7 +77,7 @@ pub async fn create_test_election(
         election::repository::create(&mut tx, generate_election(&mut rng, &args)).await?;
 
     // generate the committee session for the election
-    let mut committee_session = committee_session::repository::create(
+    let mut committee_session = committee_session_repo::create(
         &mut tx,
         CommitteeSessionCreateRequest {
             number: 1,
@@ -94,7 +95,7 @@ pub async fn create_test_election(
     );
 
     if !polling_stations.is_empty() {
-        committee_session = committee_session::repository::change_status(
+        committee_session = committee_session_repo::change_status(
             &mut tx,
             committee_session.id,
             CommitteeSessionStatus::InPreparation,

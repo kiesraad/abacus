@@ -3,18 +3,18 @@ use sqlx::{Connection, SqliteConnection, Type};
 use strum::VariantNames;
 use utoipa::ToSchema;
 
-use super::{
-    CommitteeSession, CommitteeSessionError, CommitteeSessionFilesUpdateRequest,
-    repository::{change_files, change_status, get},
-};
 use crate::{
     APIError,
-    committee_session::CommitteeSessionId,
+    api::committee_session::CommitteeSessionError,
     data_entry::repository::are_results_complete_for_committee_session,
+    domain::committee_session::{
+        CommitteeSession, CommitteeSessionFilesUpdateRequest, CommitteeSessionId,
+    },
     files::{FileId, delete_file},
     infra::audit_log::{AuditEvent, AuditService},
     investigation::list_investigations_for_committee_session,
     polling_station,
+    repository::committee_session_repo::{change_files, change_status, get},
 };
 
 /// Committee session status
@@ -246,7 +246,6 @@ impl CommitteeSessionStatus {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::committee_session::repository::get;
 
     mod change_committee_session_status {
         use std::net::Ipv4Addr;
@@ -255,13 +254,9 @@ mod tests {
         use sqlx::{SqliteConnection, SqlitePool};
         use test_log::test;
 
-        use super::{
-            CommitteeSessionFilesUpdateRequest, CommitteeSessionStatus,
-            change_committee_session_status, change_files, get,
-        };
+        use super::*;
         use crate::{
             APIError,
-            committee_session::CommitteeSessionId,
             files::{self, FileId},
             infra::audit_log::{AuditService, list_event_names},
         };
@@ -369,9 +364,8 @@ mod tests {
         use sqlx::SqlitePool;
         use test_log::test;
 
-        use super::{CommitteeSessionError, CommitteeSessionStatus, get};
+        use super::*;
         use crate::{
-            committee_session::CommitteeSessionId,
             investigation::{
                 PollingStationInvestigationCreateRequest, create_polling_station_investigation,
             },
@@ -667,9 +661,8 @@ mod tests {
         use sqlx::SqlitePool;
         use test_log::test;
 
-        use super::{CommitteeSessionError, CommitteeSessionStatus, get};
+        use super::*;
         use crate::{
-            committee_session::CommitteeSessionId,
             investigation::{
                 PollingStationInvestigationCreateRequest, create_polling_station_investigation,
             },
@@ -903,9 +896,8 @@ mod tests {
         use sqlx::SqlitePool;
         use test_log::test;
 
-        use super::{CommitteeSessionError, CommitteeSessionStatus, get};
+        use super::*;
         use crate::{
-            committee_session::CommitteeSessionId,
             data_entry::{
                 PollingStationResults,
                 repository::{get_or_default, get_result, insert_test_result, make_definitive},

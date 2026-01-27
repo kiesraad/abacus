@@ -8,7 +8,7 @@ use sqlx::{FromRow, Type};
 use utoipa::ToSchema;
 
 use crate::{
-    APIError, committee_session::CommitteeSessionId, election::ElectionId,
+    APIError, domain::committee_session::CommitteeSessionId, election::ElectionId,
     infra::audit_log::PollingStationDetails, util::id,
 };
 
@@ -138,7 +138,7 @@ impl From<String> for PollingStationType {
 pub(crate) mod tests {
     use super::*;
     use crate::{
-        committee_session::tests::committee_session_fixture,
+        api::committee_session::tests::committee_session_fixture,
         election::structs::tests::election_fixture,
     };
 

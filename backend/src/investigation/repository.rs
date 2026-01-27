@@ -4,7 +4,7 @@ use super::structs::{
     PollingStationInvestigation, PollingStationInvestigationConcludeRequest,
     PollingStationInvestigationCreateRequest,
 };
-use crate::{committee_session::CommitteeSessionId, polling_station::PollingStationId};
+use crate::{domain::committee_session::CommitteeSessionId, polling_station::PollingStationId};
 
 pub async fn create_polling_station_investigation(
     conn: &mut SqliteConnection,

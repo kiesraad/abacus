@@ -1,21 +1,22 @@
-use chrono::{DateTime, Local, NaiveDate, NaiveDateTime, Utc};
-use rand::{Rng, seq::IndexedRandom};
-use test_log::test;
-
 /// Typst template smoke tests
 ///
 /// These tests generate PDFs using random data for all Typst templates as defined in `PdfModel`.
 /// The generated PDFs are checked to a minimum size to ensure that the generation was successful.
 /// The tests cover various edge cases by varying the number of parties, candidates,
 /// string lengths, and the presence of optional fields.
+use chrono::{DateTime, Local, NaiveDate, NaiveDateTime, Utc};
+use rand::{Rng, seq::IndexedRandom};
+use test_log::test;
+
 use crate::{
-    committee_session::{
-        CommitteeSessionId, status::CommitteeSessionStatus, structs::CommitteeSession,
-    },
     data_entry::structs::{
         CandidateVotes, CommonPollingStationResults,
         DifferenceCountsCompareVotesCastAdmittedVoters, DifferencesCounts,
         PoliticalGroupCandidateVotes, PoliticalGroupTotalVotes, VotersCounts, VotesCounts, YesNo,
+    },
+    domain::{
+        committee_session::{CommitteeSession, CommitteeSessionId},
+        committee_session_status::CommitteeSessionStatus,
     },
     election::{
         Candidate, CandidateGender, CandidateNumber, ElectionCategory, ElectionId,

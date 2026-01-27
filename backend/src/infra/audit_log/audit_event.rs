@@ -6,7 +6,7 @@ use utoipa::ToSchema;
 
 use super::AuditEventLevel;
 use crate::{
-    ErrorResponse, committee_session::CommitteeSessionId, election::ElectionId,
+    ErrorResponse, domain::committee_session::CommitteeSessionId, election::ElectionId,
     error::ErrorReference, files::FileId, investigation::PollingStationInvestigation,
     polling_station::PollingStationId, repository::user_repo::UserId,
 };

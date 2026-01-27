@@ -23,7 +23,9 @@ use utoipa_swagger_ui::SwaggerUi;
 #[cfg(feature = "dev-database")]
 use crate::test_data_gen;
 use crate::{
-    AppError, AppState, MAX_BODY_SIZE_MB, committee_session, data_entry, document, election, error,
+    AppError, AppState, MAX_BODY_SIZE_MB,
+    api::committee_session,
+    data_entry, document, election, error,
     infra::{airgap, airgap::AirgapDetection, audit_log, authentication},
     investigation, polling_station, report,
 };

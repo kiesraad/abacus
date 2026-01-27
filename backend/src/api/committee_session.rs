@@ -7,15 +7,16 @@ use chrono::NaiveDateTime;
 use sqlx::{SqliteConnection, SqlitePool};
 use utoipa_axum::{router::OpenApiRouter, routes};
 
-use super::{
-    CommitteeSession, CommitteeSessionCreateRequest, CommitteeSessionStatusChangeRequest,
-    CommitteeSessionUpdateRequest, InvestigationListResponse,
-    repository::{create, delete, get, get_election_committee_session, update},
-    status::{CommitteeSessionStatus, change_committee_session_status},
-};
 use crate::{
     APIError, AppState, ErrorResponse, SqlitePoolExt,
-    committee_session::CommitteeSessionId,
+    domain::{
+        committee_session::{
+            CommitteeSession, CommitteeSessionCreateRequest, CommitteeSessionId,
+            CommitteeSessionStatusChangeRequest, CommitteeSessionUpdateRequest,
+            InvestigationListResponse,
+        },
+        committee_session_status::{CommitteeSessionStatus, change_committee_session_status},
+    },
     election::ElectionId,
     error::ErrorReference,
     infra::{
@@ -23,6 +24,9 @@ use crate::{
         authentication::Coordinator,
     },
     investigation::list_investigations_for_committee_session,
+    repository::committee_session_repo::{
+        create, delete, get, get_election_committee_session, update,
+    },
 };
 
 #[derive(Debug, PartialEq, Eq)]
@@ -342,8 +346,8 @@ pub mod tests {
     use chrono::NaiveDate;
     use sqlx::SqlitePool;
 
-    use super::{CommitteeSession, CommitteeSessionId, CommitteeSessionStatus};
-    use crate::{committee_session::repository::change_status, election::ElectionId};
+    use super::*;
+    use crate::repository::committee_session_repo::change_status;
 
     pub async fn change_status_committee_session(
         pool: SqlitePool,

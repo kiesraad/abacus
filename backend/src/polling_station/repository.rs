@@ -2,7 +2,8 @@ use sqlx::{Connection, SqliteConnection, query, query_as};
 
 use super::structs::{PollingStation, PollingStationRequest};
 use crate::{
-    committee_session::CommitteeSessionId, election::ElectionId, polling_station::PollingStationId,
+    domain::committee_session::CommitteeSessionId, election::ElectionId,
+    polling_station::PollingStationId, repository::committee_session_repo,
 };
 
 /// List all polling stations from a committee session
@@ -76,7 +77,7 @@ pub async fn get_for_election(
     polling_station_id: PollingStationId,
 ) -> Result<PollingStation, sqlx::Error> {
     let committee_session_id =
-        crate::committee_session::repository::get_current_id_for_election(conn, election_id)
+        committee_session_repo::get_current_id_for_election(conn, election_id)
             .await?
             .ok_or(sqlx::Error::RowNotFound)?;
 
@@ -114,7 +115,7 @@ pub async fn create(
 ) -> Result<PollingStation, sqlx::Error> {
     let mut tx = conn.begin().await?;
     let committee_session_id =
-        crate::committee_session::repository::get_current_id_for_election(&mut tx, election_id)
+        committee_session_repo::get_current_id_for_election(&mut tx, election_id)
             .await?
             .ok_or(sqlx::Error::RowNotFound)?;
 
@@ -178,7 +179,7 @@ pub async fn create_many(
     let mut tx = conn.begin().await?;
 
     let committee_session_id =
-        crate::committee_session::repository::get_current_id_for_election(&mut tx, election_id)
+        committee_session_repo::get_current_id_for_election(&mut tx, election_id)
             .await?
             .ok_or(sqlx::Error::RowNotFound)?;
 
@@ -245,7 +246,7 @@ pub async fn update(
 ) -> Result<PollingStation, sqlx::Error> {
     let mut tx = conn.begin().await?;
     let committee_session_id =
-        crate::committee_session::repository::get_current_id_for_election(&mut tx, election_id)
+        committee_session_repo::get_current_id_for_election(&mut tx, election_id)
             .await?
             .ok_or(sqlx::Error::RowNotFound)?;
 
@@ -309,7 +310,7 @@ pub async fn delete(
 ) -> Result<bool, sqlx::Error> {
     let mut tx = conn.begin().await?;
     let committee_session_id =
-        crate::committee_session::repository::get_current_id_for_election(&mut tx, election_id)
+        committee_session_repo::get_current_id_for_election(&mut tx, election_id)
             .await?
             .ok_or(sqlx::Error::RowNotFound)?;
 

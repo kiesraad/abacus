@@ -15,9 +15,10 @@ use super::{
 };
 use crate::{
     APIError, AppState, ErrorResponse, SqlitePoolExt,
-    committee_session::{
-        CommitteeSession, CommitteeSessionCreateRequest, CommitteeSessionError,
-        create_committee_session, status::CommitteeSessionStatus,
+    api::committee_session::{CommitteeSessionError, create_committee_session},
+    domain::{
+        committee_session::{CommitteeSession, CommitteeSessionCreateRequest},
+        committee_session_status::CommitteeSessionStatus,
     },
     eml::{EML110, EML230, EMLDocument, EMLImportError, EmlHash, RedactedEmlHash},
     infra::{
@@ -30,6 +31,7 @@ use crate::{
         PollingStation, PollingStationRequest, PollingStationsRequest,
         create_imported_polling_stations,
     },
+    repository::committee_session_repo,
 };
 
 pub fn router() -> OpenApiRouter<AppState> {
@@ -83,8 +85,7 @@ pub async fn election_list(
     let mut conn = pool.acquire().await?;
     let elections = crate::election::repository::list(&mut conn).await?;
     let committee_sessions =
-        crate::committee_session::repository::get_committee_session_for_each_election(&mut conn)
-            .await?;
+        committee_session_repo::get_committee_session_for_each_election(&mut conn).await?;
     Ok(Json(ElectionListResponse {
         committee_sessions,
         elections,
@@ -115,11 +116,7 @@ pub async fn election_details(
     let mut conn = pool.acquire().await?;
     let election = crate::election::repository::get(&mut conn, election_id).await?;
     let committee_sessions =
-        crate::committee_session::repository::get_election_committee_session_list(
-            &mut conn,
-            election_id,
-        )
-        .await?;
+        committee_session_repo::get_election_committee_session_list(&mut conn, election_id).await?;
     let current_committee_session = committee_sessions
         .first()
         .expect("There is always one committee session")
@@ -169,8 +166,7 @@ pub async fn election_number_of_voters_change(
 
     crate::election::repository::get(&mut tx, election_id).await?;
     let current_committee_session =
-        crate::committee_session::repository::get_election_committee_session(&mut tx, election_id)
-            .await?;
+        committee_session_repo::get_election_committee_session(&mut tx, election_id).await?;
 
     // Only allow if this is a first and not yet started committee session
     if !current_committee_session.is_next_session()

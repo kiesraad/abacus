@@ -9,7 +9,7 @@ pub use yes_no::YesNo;
 use super::status::{DataEntryStatus, DataEntryStatusName};
 use crate::{
     APIError,
-    committee_session::CommitteeSessionId,
+    domain::committee_session::CommitteeSessionId,
     election::{CandidateNumber, PGNumber, PoliticalGroup},
     error::ErrorReference,
     infra::audit_log::{DataEntryDetails, ResultDetails},

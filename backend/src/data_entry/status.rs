@@ -712,12 +712,12 @@ impl Display for DataEntryTransitionError {
 mod tests {
     use super::*;
     use crate::{
-        committee_session::CommitteeSessionId,
         data_entry::{
             CSOFirstSessionResults, CandidateVotes, PoliticalGroupCandidateVotes,
             PoliticalGroupTotalVotes, VotersCounts, VotesCounts,
             structs::tests::{ValidDefault, example_polling_station_results},
         },
+        domain::committee_session::CommitteeSessionId,
         election::{
             Candidate, CandidateNumber, ElectionCategory, ElectionId, ElectionWithPoliticalGroups,
             PGNumber, PoliticalGroup, VoteCountingMethod,

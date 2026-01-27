@@ -13,7 +13,7 @@ use tracing::error;
 use utoipa::ToSchema;
 
 use crate::{
-    MAX_BODY_SIZE_MB, committee_session::CommitteeSessionError, data_entry::DataError,
+    MAX_BODY_SIZE_MB, api::committee_session::CommitteeSessionError, data_entry::DataError,
     eml::EMLImportError, infra::authentication::error::AuthenticationError, pdf_gen::PdfGenError,
     zip::ZipResponseError,
 };

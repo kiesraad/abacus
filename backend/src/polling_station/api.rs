@@ -15,12 +15,11 @@ use super::{
 };
 use crate::{
     APIError, AppState, ErrorResponse, SqlitePoolExt,
-    committee_session::{
-        CommitteeSession,
-        repository::get_election_committee_session,
-        status::{CommitteeSessionStatus, change_committee_session_status},
-    },
     data_entry::delete_data_entry_and_result_for_polling_station,
+    domain::{
+        committee_session::CommitteeSession,
+        committee_session_status::{CommitteeSessionStatus, change_committee_session_status},
+    },
     election::ElectionId,
     eml::{EML110, EMLDocument, EMLImportError, EmlHash},
     infra::{
@@ -28,6 +27,7 @@ use crate::{
         authentication::{AdminOrCoordinator, User, error::AuthenticationError},
     },
     investigation::delete_investigation_for_polling_station,
+    repository::committee_session_repo::get_election_committee_session,
 };
 
 pub fn router() -> OpenApiRouter<AppState> {

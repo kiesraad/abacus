@@ -9,8 +9,8 @@ use super::{
     },
 };
 use crate::{
-    committee_session::CommitteeSession,
     data_entry::{PoliticalGroupCandidateVotes, PollingStationResults},
+    domain::committee_session::CommitteeSession,
     polling_station::PollingStation,
     summary::ElectionSummary,
 };

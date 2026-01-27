@@ -20,6 +20,7 @@ use crate::{
         },
     },
     polling_station,
+    repository::committee_session_repo,
     zip::ZipResponse,
 };
 
@@ -61,11 +62,7 @@ async fn election_download_n_10_2(
     let mut conn = pool.acquire().await?;
     let election = crate::election::repository::get(&mut conn, election_id).await?;
     let current_committee_session =
-        crate::committee_session::repository::get_election_committee_session(
-            &mut conn,
-            election.id,
-        )
-        .await?;
+        committee_session_repo::get_election_committee_session(&mut conn, election.id).await?;
     let polling_stations = polling_station::list(&mut conn, current_committee_session.id).await?;
     drop(conn);
 
@@ -143,11 +140,7 @@ async fn election_download_na_31_2_bijlage1(
     let mut conn = pool.acquire().await?;
     let election = crate::election::repository::get(&mut conn, election_id).await?;
     let current_committee_session =
-        crate::committee_session::repository::get_election_committee_session(
-            &mut conn,
-            election.id,
-        )
-        .await?;
+        committee_session_repo::get_election_committee_session(&mut conn, election.id).await?;
     let polling_stations = polling_station::list(&mut conn, current_committee_session.id).await?;
     drop(conn);
 

@@ -7,8 +7,9 @@ use super::{
     PollingStationResults, status::DataEntryStatus,
 };
 use crate::{
-    committee_session::CommitteeSessionId,
+    domain::committee_session::CommitteeSessionId,
     polling_station::{self, PollingStation, PollingStationId},
+    repository::committee_session_repo,
 };
 
 /// Get the full polling station data entry row for a given polling station
@@ -382,13 +383,11 @@ pub async fn previous_results_for_polling_station(
         .id_prev_session
         .ok_or(sqlx::Error::RowNotFound)?;
 
-    let prev_session_id = crate::committee_session::repository::get_previous_session(
-        conn,
-        polling_station.committee_session_id,
-    )
-    .await?
-    .ok_or(sqlx::Error::RowNotFound)?
-    .id;
+    let prev_session_id =
+        committee_session_repo::get_previous_session(conn, polling_station.committee_session_id)
+            .await?
+            .ok_or(sqlx::Error::RowNotFound)?
+            .id;
 
     fetch_results_for_committee_session(conn, prev_session_id, Some(ps_id_prev_session))
         .await?
@@ -408,8 +407,7 @@ pub async fn are_results_complete_for_committee_session(
 ) -> Result<bool, sqlx::Error> {
     let mut tx = conn.begin().await?;
 
-    let committee_session =
-        crate::committee_session::repository::get(&mut tx, committee_session_id).await?;
+    let committee_session = committee_session_repo::get(&mut tx, committee_session_id).await?;
 
     let all_new_ps_have_data = query!(
         r#"

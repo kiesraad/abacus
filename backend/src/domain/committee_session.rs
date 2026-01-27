@@ -7,10 +7,9 @@ use serde::{Deserialize, Serialize};
 use sqlx::{FromRow, Type};
 use utoipa::ToSchema;
 
-use super::status::CommitteeSessionStatus;
 use crate::{
-    election::ElectionId, files::FileId, infra::audit_log,
-    investigation::PollingStationInvestigation, util::id,
+    domain::committee_session_status::CommitteeSessionStatus, election::ElectionId, files::FileId,
+    infra::audit_log, investigation::PollingStationInvestigation, util::id,
 };
 
 id!(CommitteeSessionId);

@@ -1,6 +1,8 @@
+import { Link } from "react-router";
 import { t } from "@/i18n/translate";
+import cls from "./Footer.module.css";
 
-export function Footer() {
+export function Footer({ showPrivacyStatementLink = true }: { showPrivacyStatementLink?: boolean }) {
   const gitBranch = __GIT_BRANCH__;
   let gitBranchShort = __GIT_BRANCH__;
   if (gitBranch && gitBranch.length > 32) {
@@ -11,23 +13,31 @@ export function Footer() {
 
   return (
     <footer>
-      <section>
-        Kiesraad - Abacus ({t("version")} {gitVersion})
+      <section className={cls.section}>
+        <span>
+          Kiesraad - Abacus ({t("version")} {gitVersion})
+        </span>
+        {showPrivacyStatementLink && (
+          <Link to={"/privacy-statement"} className="privacy_statement_link">
+            {t("privacy_statement.title").toLowerCase()}
+          </Link>
+        )}
       </section>
       {__SHOW_DEV_PAGE__ && (
-        <section>
-          <strong>{t("server")}</strong> {__API_MSW__ ? "Mock Service Worker" : "Live"}&nbsp;&nbsp;{" "}
+        <section className={cls.section}>
+          <span>
+            <strong>{t("server")}</strong> {__API_MSW__ ? "Mock Service Worker" : "Live"}
+          </span>
           {gitBranch && (
-            <>
+            <span>
               <strong>Branch</strong>{" "}
               <a href={`https://github.com/kiesraad/abacus/tree/${gitBranch}`} target="_blank">
                 {gitBranchShort}
               </a>
-              &nbsp;&nbsp;{" "}
-            </>
+            </span>
           )}
           {gitCommit && (
-            <>
+            <span>
               <strong>Commit</strong>{" "}
               {__GIT_DIRTY__ ? (
                 <>{gitCommit}-dirty</>
@@ -36,7 +46,7 @@ export function Footer() {
                   {gitCommit}
                 </a>
               )}
-            </>
+            </span>
           )}
         </section>
       )}

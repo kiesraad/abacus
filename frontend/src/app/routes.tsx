@@ -5,6 +5,7 @@ import { NotFoundPage } from "@/components/error/NotFoundPage";
 import { AdministratorLayout } from "@/components/layout/AdministratorLayout";
 import { ElectionLayout } from "@/components/layout/ElectionLayout";
 import { ElectionStatusLayout } from "@/components/layout/ElectionStatusLayout";
+import { PrivacyStatementPage } from "@/components/privacy_statement/PrivacyStatementPage";
 import { accountRoutes } from "@/features/account/routes";
 import { dataEntryRoutes } from "@/features/data_entry/routes";
 import { detailRoutes } from "@/features/data_entry_detail/routes";
@@ -20,7 +21,6 @@ import { logsRoutes } from "@/features/logs/routes";
 import { pollingStationsRoutes } from "@/features/polling_stations/routes";
 import { resolveDifferencesRoutes } from "@/features/resolve_differences/routes";
 import { usersRoutes } from "@/features/users/routes";
-
 import { RootLayout } from "./RootLayout";
 
 const showDevPage = __SHOW_DEV_PAGE__;
@@ -93,6 +93,11 @@ export const routes: RouteObject[] = [
         ],
       },
     ],
+  },
+  {
+    path: "privacy-statement",
+    element: <PrivacyStatementPage />,
+    handle: { public: true },
   },
   {
     path: "*",

@@ -95,7 +95,8 @@ export function NavBarLinks({ location }: NavBarLinksProps) {
     (location.pathname.match(/^\/elections(\/\d+)?$/) && (isAdministrator || isCoordinator)) ||
     location.pathname.startsWith("/elections/create") ||
     location.pathname.startsWith("/users") ||
-    location.pathname === "/logs"
+    location.pathname === "/logs" ||
+    (location.pathname === "/privacy-statement" && (isAdministrator || isCoordinator))
   ) {
     return <TopLevelManagementLinks />;
   }

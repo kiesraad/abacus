@@ -1,72 +1,35 @@
 components:
+  # Backend layers
+  - name: "(Backend) Infra layer"
+    include:
+      - ".*/backend/src/infra/.*"
+  - name: "(Backend) API layer"
+    include:
+      - ".*/backend/src/api/.*"
+  - name: "(Backend) Repository layer"
+    include:
+      - ".*/backend/src/repository/.*"
+  - name: "(Backend) Domain layer"
+    include:
+      - ".*/backend/src/domain/.*"
+
   # Backend modules
-  - name: "(Backend) Infrastructure"
-    include: [ ".*/backend/src/infra/.*" ]
-
-  - name: "(Backend) API"
-    include: [ ".*/backend/src/api/.*" ]
-
-  - name: "(Backend) Repository"
-    include: [ ".*/backend/src/repository/.*" ]
-
-  - name: "(Backend) Domain"
-    include: [ ".*/backend/src/domain/.*" ]
-
-  - name: "(Backend) Airgap detection"
-    include:
-      - ".*/backend/src/airgap/.*"
-  - name: "(Backend) Audit Log"
-    include:
-      - ".*/backend/src/audit_log/.*"
-  - name: "(Backend) Authentication"
-    include:
-      - ".*/backend/src/authentication/.*"
-  - name: "(Backend) Committee Session"
-    include:
-      - ".*/backend/src/committee_session/.*"
-  - name: "(Backend) Data entry"
-    include:
-      - ".*/backend/src/data_entry/.*"
-  - name: "(Backend) Document"
-    include:
-      - ".*/backend/src/document/.*"
-  - name: "(Backend) Election"
-    include:
-      - ".*/backend/src/election/.*"
   - name: "(Backend) EML"
     include:
       - ".*/backend/src/eml/.*"
-  - name: "(Backend) Files"
-    include:
-      - ".*/backend/src/files/.*"
-  - name: "(Backend) Investigation"
-    include:
-      - ".*/backend/src/investigation/.*"
-  - name: "(Backend) PDF generation"
-    include:
-      - ".*/backend/src/pdf_gen/.*"
-  - name: "(Backend) Polling station"
-    include:
-      - ".*/backend/src/polling_station/.*"
-  - name: "(Backend) Report"
-    include:
-      - ".*/backend/src/report/.*"
-  - name: "(Backend) Summary"
-    include:
-      - ".*/backend/src/summary/.*"
   - name: "(Backend) Test data generation"
     include:
       - ".*/backend/src/test_data_gen/.*"
-  - name: "(Backend) Zip"
-    include:
-      - ".*/backend/src/zip/.*"
   - name: "(Backend) bin/abacus"
     include:
       - ".*/backend/src/bin/abacus.rs"
   - name: "(Backend) bin/gen-openapi"
     include:
       - ".*/backend/src/bin/gen-openapi.rs"
-  - name: "(Backend) bin/gen-openapi"
+  - name: "(Backend) bin/gen-pdf"
+    include:
+      - ".*/backend/src/bin/gen-pdf.rs"
+  - name: "(Backend) bin/gen-test-election"
     include:
       - ".*/backend/src/bin/gen-test-election.rs"
   - name: "(Backend) App error"
@@ -75,15 +38,9 @@ components:
   - name: "(Backend) error"
     include:
       - ".*/backend/src/error.rs"
-  - name: "(Backend) fixtures"
-    include:
-      - ".*/backend/src/fixtures.rs"
   - name: "(Backend) lib"
     include:
       - ".*/backend/src/lib.rs"
-  - name: "(Backend) Router"
-    include:
-      - ".*/backend/src/router.rs"
   - name: "(Backend) Integration tests"
     include:
       - ".*/backend/tests/.*"

@@ -1,4 +1,3 @@
-use airgap::AirgapDetection;
 use axum::{
     Router, extract::DefaultBodyLimit, http::StatusCode, middleware, response::IntoResponse,
     routing::any,
@@ -24,8 +23,10 @@ use utoipa_swagger_ui::SwaggerUi;
 #[cfg(feature = "dev-database")]
 use crate::test_data_gen;
 use crate::{
-    AppError, AppState, MAX_BODY_SIZE_MB, airgap, audit_log, authentication, committee_session,
-    data_entry, document, election, error, investigation, polling_station, report,
+    AppError, AppState, MAX_BODY_SIZE_MB, audit_log, authentication, committee_session, data_entry,
+    document, election, error,
+    infra::{airgap, airgap::AirgapDetection},
+    investigation, polling_station, report,
 };
 
 pub fn get_scopes_from_operation(operation: &Operation) -> Option<Vec<String>> {

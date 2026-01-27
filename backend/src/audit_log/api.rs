@@ -151,12 +151,12 @@ mod tests {
 
     use crate::{
         AppState,
-        airgap::AirgapDetection,
         audit_log::{
             AuditEvent, AuditLogListResponse, AuditLogUser, AuditService, UserLoggedInDetails,
             api::{audit_log_list, audit_log_list_users},
         },
         authentication::{User, inject_user, user::UserId},
+        infra::airgap::AirgapDetection,
     };
 
     const TEST_USER_AGENT: &str = "TestAgent/1.0";

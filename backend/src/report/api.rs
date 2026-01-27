@@ -10,7 +10,6 @@ use utoipa_axum::{router::OpenApiRouter, routes};
 use super::DEFAULT_DATE_TIME_FORMAT;
 use crate::{
     APIError, AppState, ErrorResponse, SqlitePoolExt,
-    audit_log::AuditService,
     authentication::Coordinator,
     committee_session::{
         self, CommitteeSession, CommitteeSessionError, CommitteeSessionFilesUpdateRequest,
@@ -28,6 +27,7 @@ use crate::{
     eml::{EML510, EMLDocument, EmlHash},
     error::ErrorReference,
     files::{self, File, create_file},
+    infra::audit_log::AuditService,
     investigation::{PollingStationInvestigation, list_investigations_for_committee_session},
     pdf_gen::{
         VotesTables, VotesTablesWithPreviousVotes, generate_pdf,
@@ -579,7 +579,7 @@ mod tests {
     use test_log::test;
 
     use super::*;
-    use crate::{audit_log::list_event_names, files::FileId};
+    use crate::{files::FileId, infra::audit_log::list_event_names};
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_5_with_results"))))]
     async fn test_get_files_first_session(pool: SqlitePool) {

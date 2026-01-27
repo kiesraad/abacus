@@ -15,7 +15,6 @@ use super::{
 };
 use crate::{
     APIError, AppState, ErrorResponse, SqlitePoolExt,
-    audit_log::{AuditEvent, AuditService, PollingStationImportDetails},
     authentication::{AdminOrCoordinator, User, error::AuthenticationError},
     committee_session::{
         CommitteeSession,
@@ -25,6 +24,7 @@ use crate::{
     data_entry::delete_data_entry_and_result_for_polling_station,
     election::ElectionId,
     eml::{EML110, EMLDocument, EMLImportError, EmlHash},
+    infra::audit_log::{AuditEvent, AuditService, PollingStationImportDetails},
     investigation::delete_investigation_for_polling_station,
 };
 

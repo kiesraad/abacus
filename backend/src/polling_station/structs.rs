@@ -8,8 +8,8 @@ use sqlx::{FromRow, Type};
 use utoipa::ToSchema;
 
 use crate::{
-    APIError, audit_log::PollingStationDetails, committee_session::CommitteeSessionId,
-    election::ElectionId, util::id,
+    APIError, committee_session::CommitteeSessionId, election::ElectionId,
+    infra::audit_log::PollingStationDetails, util::id,
 };
 
 pub type PollingStationNumber = u32;

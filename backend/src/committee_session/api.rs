@@ -15,11 +15,11 @@ use super::{
 };
 use crate::{
     APIError, AppState, ErrorResponse, SqlitePoolExt,
-    audit_log::{AuditEvent, AuditService},
     authentication::Coordinator,
     committee_session::CommitteeSessionId,
     election::ElectionId,
     error::ErrorReference,
+    infra::audit_log::{AuditEvent, AuditService},
     investigation::list_investigations_for_committee_session,
 };
 

@@ -7,7 +7,7 @@ use utoipa::ToSchema;
 
 use crate::{
     APIError,
-    audit_log::{AuditEvent, AuditService, FileDetails},
+    infra::audit_log::{AuditEvent, AuditService, FileDetails},
     util::id,
 };
 

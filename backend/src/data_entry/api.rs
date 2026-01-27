@@ -24,7 +24,6 @@ use super::{
 };
 use crate::{
     APIError, AppState, SqlitePoolExt,
-    audit_log::{AuditEvent, AuditService},
     authentication::{Coordinator, Role, Typist, User, error::AuthenticationError, user::UserId},
     committee_session::{
         CommitteeSession, CommitteeSessionError,
@@ -33,6 +32,7 @@ use crate::{
     data_entry::repository::get_result,
     election::{ElectionId, ElectionWithPoliticalGroups, PoliticalGroup},
     error::{ErrorReference, ErrorResponse},
+    infra::audit_log::{AuditEvent, AuditService},
     investigation::get_polling_station_investigation,
     polling_station::{self, PollingStation, PollingStationId},
 };

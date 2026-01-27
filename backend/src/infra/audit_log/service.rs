@@ -74,11 +74,11 @@ mod test {
     use super::*;
     use crate::{
         SqlitePoolExt,
-        audit_log::{AuditEventLevel, UserLoggedInDetails},
         authentication::user::UserId,
+        infra::audit_log::{AuditEventLevel, UserLoggedInDetails},
     };
 
-    #[test(sqlx::test(fixtures("../../fixtures/users.sql")))]
+    #[test(sqlx::test(fixtures("../../../fixtures/users.sql")))]
     async fn test_log_event(pool: SqlitePool) {
         let mut tx = pool.begin_immediate().await.unwrap();
         let service = AuditService {

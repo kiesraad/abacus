@@ -9,10 +9,10 @@ use super::{
 };
 use crate::{
     APIError,
-    audit_log::{AuditEvent, AuditService},
     committee_session::CommitteeSessionId,
     data_entry::repository::are_results_complete_for_committee_session,
     files::{FileId, delete_file},
+    infra::audit_log::{AuditEvent, AuditService},
     investigation::list_investigations_for_committee_session,
     polling_station,
 };
@@ -261,9 +261,9 @@ mod tests {
         };
         use crate::{
             APIError,
-            audit_log::{AuditService, list_event_names},
             committee_session::CommitteeSessionId,
             files::{self, FileId},
+            infra::audit_log::{AuditService, list_event_names},
         };
 
         async fn generate_test_file(conn: &mut SqliteConnection) -> Result<FileId, APIError> {

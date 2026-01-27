@@ -12,7 +12,9 @@ use super::{
     password::{HashedPassword, ValidatedPassword, hash_password, verify_password},
     role::Role,
 };
-use crate::{APIError, audit_log::UserDetails, authentication::role::IncompleteUser, util::id};
+use crate::{
+    APIError, authentication::role::IncompleteUser, infra::audit_log::UserDetails, util::id,
+};
 
 const MIN_UPDATE_LAST_ACTIVITY_AT_SECS: i64 = 60; // 1 minute
 

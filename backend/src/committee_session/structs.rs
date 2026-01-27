@@ -9,8 +9,8 @@ use utoipa::ToSchema;
 
 use super::status::CommitteeSessionStatus;
 use crate::{
-    audit_log, election::ElectionId, files::FileId, investigation::PollingStationInvestigation,
-    util::id,
+    election::ElectionId, files::FileId, infra::audit_log,
+    investigation::PollingStationInvestigation, util::id,
 };
 
 id!(CommitteeSessionId);

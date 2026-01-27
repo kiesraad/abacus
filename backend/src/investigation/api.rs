@@ -18,7 +18,6 @@ use super::{
 };
 use crate::{
     APIError, AppState, ErrorResponse, SqlitePoolExt,
-    audit_log::{AuditEvent, AuditService},
     authentication::Coordinator,
     committee_session::{
         CommitteeSession, CommitteeSessionError,
@@ -31,6 +30,7 @@ use crate::{
     },
     election::ElectionWithPoliticalGroups,
     error::ErrorReference,
+    infra::audit_log::{AuditEvent, AuditService},
     pdf_gen::{
         VotesTablesWithOnlyPreviousVotes, generate_pdf,
         models::{ModelNa14_2Bijlage1Input, ToPdfFileModel},

@@ -11,7 +11,6 @@ use tracing::{info, trace, warn};
 
 pub mod api;
 pub mod app_error;
-pub mod audit_log;
 pub mod authentication;
 pub mod committee_session;
 pub mod data_entry;
@@ -38,6 +37,7 @@ pub mod zip;
 
 pub use app_error::AppError;
 pub use error::{APIError, ErrorResponse};
+use infra::audit_log;
 
 use crate::app_error::{DatabaseErrorWithPath, DatabaseMigrationErrorWithPath};
 

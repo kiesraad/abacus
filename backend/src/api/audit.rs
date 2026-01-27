@@ -5,10 +5,10 @@ use sqlx::SqlitePool;
 use utoipa::{IntoParams, ToSchema};
 use utoipa_axum::{router::OpenApiRouter, routes};
 
-use super::{AuditLogEvent, LogFilter};
 use crate::{
     APIError, AppState, ErrorResponse,
     authentication::{AdminOrCoordinator, Role},
+    infra::audit_log::{AuditLogEvent, LogFilter},
 };
 
 pub fn router() -> OpenApiRouter<AppState> {
@@ -151,12 +151,14 @@ mod tests {
 
     use crate::{
         AppState,
-        audit_log::{
-            AuditEvent, AuditLogListResponse, AuditLogUser, AuditService, UserLoggedInDetails,
-            api::{audit_log_list, audit_log_list_users},
-        },
+        api::audit::{audit_log_list, audit_log_list_users},
         authentication::{User, inject_user, user::UserId},
-        infra::airgap::AirgapDetection,
+        infra::{
+            airgap::AirgapDetection,
+            audit_log::{
+                AuditEvent, AuditLogListResponse, AuditLogUser, AuditService, UserLoggedInDetails,
+            },
+        },
     };
 
     const TEST_USER_AGENT: &str = "TestAgent/1.0";

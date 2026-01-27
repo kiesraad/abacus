@@ -8,7 +8,7 @@ use sqlx::SqlitePool;
 use tokio::{task::JoinSet, time::timeout};
 use tracing::{debug, error, info, trace, warn};
 
-use crate::audit_log::AuditEvent;
+use crate::infra::audit_log::AuditEvent;
 
 #[derive(Clone)]
 pub struct AirgapDetection {

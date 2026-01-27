@@ -7,7 +7,7 @@ use serde::{Deserialize, Serialize};
 use sqlx::{FromRow, Type};
 use utoipa::ToSchema;
 
-use crate::audit_log::ElectionDetails;
+use crate::infra::audit_log::ElectionDetails;
 
 crate::util::id!(ElectionId);
 

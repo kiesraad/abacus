@@ -8,11 +8,11 @@ use sqlx::{FromRow, Type};
 use utoipa::ToSchema;
 
 use crate::{
-    domain::{
-        committee_session_status::CommitteeSessionStatus, election::ElectionId, file::FileId,
-        id::id, investigation::PollingStationInvestigation,
-    },
-    infra::audit_log,
+    audit_log::{self, AsAuditEvent, AuditEvent},
+    election::ElectionId,
+    files::FileId,
+    investigation::PollingStationInvestigation,
+    util::id,
 };
 
 #[derive(Debug, PartialEq, Eq)]
@@ -79,18 +79,63 @@ impl CommitteeSession {
     }
 }
 
-impl From<CommitteeSession> for audit_log::CommitteeSessionDetails {
-    fn from(value: CommitteeSession) -> Self {
-        Self {
-            session_id: value.id,
-            session_number: value.number,
-            session_election_id: value.election_id,
-            session_location: value.location,
-            session_start_date_time: value.start_date_time,
-            session_status: value.status.to_string(),
-            session_results_eml: value.results_eml,
-            session_results_pdf: value.results_pdf,
-            session_overview_pdf: value.overview_pdf,
+pub struct CommitteeSessionCreated<'a>(pub &'a CommitteeSession);
+pub struct CommitteeSessionUpdated<'a>(pub &'a CommitteeSession);
+pub struct CommitteeSessionDeleted<'a>(pub &'a CommitteeSession);
+
+impl<'a> AsAuditEvent for CommitteeSessionCreated<'a> {
+    fn as_audit_event(&self) -> AuditEvent {
+        AuditEvent {
+            event_type: audit_log::AuditEventType::CommitteeSessionCreated,
+            data: serde_json::json!({
+                "session_id": self.0.id,
+                "session_number": self.0.number,
+                "session_election_id": self.0.election_id,
+                "session_location": self.0.location,
+                "session_start_date_time": self.0.start_date_time,
+                "session_status": self.0.status.to_string(),
+                "session_results_eml": self.0.results_eml,
+                "session_results_pdf": self.0.results_pdf,
+                "session_overview_pdf": self.0.overview_pdf,
+            }),
+        }
+    }
+}
+
+impl<'a> AsAuditEvent for CommitteeSessionUpdated<'a> {
+    fn as_audit_event(&self) -> AuditEvent {
+        AuditEvent {
+            event_type: audit_log::AuditEventType::CommitteeSessionUpdated,
+            data: serde_json::json!({
+                "session_id": self.0.id,
+                "session_number": self.0.number,
+                "session_election_id": self.0.election_id,
+                "session_location": self.0.location,
+                "session_start_date_time": self.0.start_date_time,
+                "session_status": self.0.status.to_string(),
+                "session_results_eml": self.0.results_eml,
+                "session_results_pdf": self.0.results_pdf,
+                "session_overview_pdf": self.0.overview_pdf,
+            }),
+        }
+    }
+}
+
+impl<'a> AsAuditEvent for CommitteeSessionDeleted<'a> {
+    fn as_audit_event(&self) -> AuditEvent {
+        AuditEvent {
+            event_type: audit_log::AuditEventType::CommitteeSessionDeleted,
+            data: serde_json::json!({
+                "session_id": self.0.id,
+                "session_number": self.0.number,
+                "session_election_id": self.0.election_id,
+                "session_location": self.0.location,
+                "session_start_date_time": self.0.start_date_time,
+                "session_status": self.0.status.to_string(),
+                "session_results_eml": self.0.results_eml,
+                "session_results_pdf": self.0.results_pdf,
+                "session_overview_pdf": self.0.overview_pdf,
+            }),
         }
     }
 }

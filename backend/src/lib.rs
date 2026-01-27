@@ -157,7 +157,7 @@ pub async fn shutdown_signal() {
 async fn log_app_started(conn: &mut SqliteConnection, db_path: &str) -> Result<(), AppError> {
     Ok(audit_log::create(
         conn,
-        &audit_log::AuditEvent::ApplicationStarted(audit_log::ApplicationStartedDetails {
+        &audit_log::AuditEventType::ApplicationStarted(audit_log::ApplicationStartedDetails {
             version: env!("ABACUS_GIT_VERSION").to_string(),
             commit: env!("ABACUS_GIT_REV").to_string(),
         }),

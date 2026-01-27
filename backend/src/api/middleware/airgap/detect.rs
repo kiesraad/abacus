@@ -8,7 +8,7 @@ use sqlx::SqlitePool;
 use tokio::{task::JoinSet, time::timeout};
 use tracing::{debug, error, info, trace, warn};
 
-use crate::infra::audit_log::AuditEvent;
+use crate::audit_log::AuditEventType;
 
 #[derive(Clone)]
 pub struct AirgapDetection {
@@ -77,9 +77,9 @@ impl AirgapDetection {
     #[allow(clippy::cognitive_complexity)]
     async fn log_status_change(&self) {
         let event = if self.violation_detected() {
-            AuditEvent::AirGapViolationDetected
+            AuditEventType::AirGapViolationDetected
         } else {
-            AuditEvent::AirGapViolationResolved
+            AuditEventType::AirGapViolationResolved
         };
 
         if let Some(pool) = &self.pool {
@@ -290,7 +290,7 @@ mod tests {
         }
 
         assert_eq!(events.len(), 1);
-        assert_eq!(events[0].event(), &AuditEvent::AirGapViolationDetected);
+        assert_eq!(events[0].event(), &AuditEventType::AirGapViolationDetected);
     }
 
     #[tokio::test]

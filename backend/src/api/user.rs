@@ -10,13 +10,8 @@ use utoipa_axum::{router::OpenApiRouter, routes};
 
 use crate::{
     APIError, AppState, ErrorResponse, SqlitePoolExt,
-    api::middleware::authentication::{AdminOrCoordinator, error::AuthenticationError},
-    domain::role::Role,
-    infra::audit_log::{AuditEvent, AuditService},
-    repository::{
-        session_repo,
-        user_repo::{self, User, UserId},
-    },
+    audit_log::{AuditEventType, AuditService},
+    authentication::{CreateUserRequest, Role, user::UserId},
 };
 
 pub fn user_router() -> OpenApiRouter<AppState> {
@@ -122,7 +117,11 @@ pub async fn user_create(
     )
     .await?;
     audit_service
-        .log(&mut tx, &AuditEvent::UserCreated(user.clone().into()), None)
+        .log(
+            &mut tx,
+            &AuditEventType::UserCreated(user.clone().into()),
+            None,
+        )
         .await?;
     tx.commit().await?;
 
@@ -218,7 +217,11 @@ pub async fn user_update(
         .ok_or(sqlx::Error::RowNotFound)?;
 
     audit_service
-        .log(&mut tx, &AuditEvent::UserUpdated(user.clone().into()), None)
+        .log(
+            &mut tx,
+            &AuditEventType::UserUpdated(user.clone().into()),
+            None,
+        )
         .await?;
 
     tx.commit().await?;
@@ -276,7 +279,11 @@ async fn user_delete(
 
     if deleted {
         audit_service
-            .log(&mut tx, &AuditEvent::UserDeleted(user.clone().into()), None)
+            .log(
+                &mut tx,
+                &AuditEventType::UserDeleted(user.clone().into()),
+                None,
+            )
             .await?;
 
         tx.commit().await?;

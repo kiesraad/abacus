@@ -5,7 +5,7 @@ use axum::{
 use sqlx::SqlitePool;
 use tracing::error;
 
-use super::{AuditEvent, AuditService, ErrorDetails};
+use super::{AuditEventType, AuditService, ErrorDetails};
 use crate::ErrorResponse;
 
 #[allow(clippy::cognitive_complexity)]
@@ -25,7 +25,7 @@ pub async fn log_error(
                 if let Err(e) = audit_service
                     .log(
                         &mut conn,
-                        &AuditEvent::Error(error_details),
+                        &AuditEventType::Error(error_details),
                         Some(error_response.error.clone()),
                     )
                     .await

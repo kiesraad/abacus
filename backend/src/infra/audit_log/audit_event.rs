@@ -1,5 +1,5 @@
 use axum::http::Uri;
-use chrono::{DateTime, NaiveDate, NaiveDateTime, Utc};
+use chrono::{DateTime, NaiveDate, Utc};
 use serde::{self, Deserialize, Serialize};
 use strum::VariantNames;
 use utoipa::ToSchema;
@@ -62,28 +62,6 @@ pub struct ElectionDetails {
     pub election_election_date: NaiveDate,
     #[schema(value_type = String, format = "date")]
     pub election_nomination_date: NaiveDate,
-}
-
-#[derive(Serialize, Deserialize, Debug, PartialEq, Eq, ToSchema)]
-#[serde(deny_unknown_fields)]
-pub struct CommitteeSessionDetails {
-    pub session_id: CommitteeSessionId,
-    pub session_number: u32,
-    pub session_election_id: ElectionId,
-    pub session_location: String,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[schema(value_type = String, format = "date-time", nullable = false)]
-    pub session_start_date_time: Option<NaiveDateTime>,
-    pub session_status: String,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[schema(nullable = false)]
-    pub session_results_eml: Option<FileId>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[schema(nullable = false)]
-    pub session_results_pdf: Option<FileId>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[schema(nullable = false)]
-    pub session_overview_pdf: Option<FileId>,
 }
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, Eq, ToSchema)]
@@ -179,11 +157,20 @@ impl ErrorDetails {
     }
 }
 
+pub struct AuditEvent {
+    pub event_type: AuditEventType,
+    pub data: serde_json::Value,
+}
+
+pub trait AsAuditEvent {
+    fn as_audit_event(&self) -> AuditEvent;
+}
+
 #[derive(
     Serialize, Deserialize, strum::Display, VariantNames, Debug, PartialEq, Eq, ToSchema, Default,
 )]
 #[serde(rename_all = "PascalCase", tag = "event_type")]
-pub enum AuditEvent {
+pub enum AuditEventType {
     // authentication and account events
     UserLoggedIn(UserLoggedInDetails),
     UserLoginFailed(UserLoginFailedDetails),
@@ -198,9 +185,9 @@ pub enum AuditEvent {
     ElectionCreated(ElectionDetails),
     ElectionUpdated(ElectionDetails),
     // committee session events
-    CommitteeSessionCreated(CommitteeSessionDetails),
-    CommitteeSessionDeleted(CommitteeSessionDetails),
-    CommitteeSessionUpdated(CommitteeSessionDetails),
+    CommitteeSessionCreated,
+    CommitteeSessionDeleted,
+    CommitteeSessionUpdated,
     // investigation events
     PollingStationInvestigationCreated(PollingStationInvestigation),
     PollingStationInvestigationConcluded(PollingStationInvestigation),
@@ -244,60 +231,60 @@ pub struct ApplicationStartedDetails {
     pub commit: String,
 }
 
-impl From<serde_json::Value> for AuditEvent {
+impl From<serde_json::Value> for AuditEventType {
     fn from(value: serde_json::Value) -> Self {
         serde_json::from_value(value).unwrap_or_default()
     }
 }
 
-impl From<sqlx::types::Json<AuditEvent>> for AuditEvent {
-    fn from(value: sqlx::types::Json<AuditEvent>) -> Self {
+impl From<sqlx::types::Json<AuditEventType>> for AuditEventType {
+    fn from(value: sqlx::types::Json<AuditEventType>) -> Self {
         value.0
     }
 }
 
-impl AuditEvent {
+impl AuditEventType {
     pub fn level(&self) -> AuditEventLevel {
         match self {
-            AuditEvent::UserLoggedIn(_) => AuditEventLevel::Success,
-            AuditEvent::UserLoginFailed(_) => AuditEventLevel::Warning,
-            AuditEvent::UserLoggedOut(_) => AuditEventLevel::Success,
-            AuditEvent::UserSessionExtended => AuditEventLevel::Info,
-            AuditEvent::UserAccountUpdated(_) => AuditEventLevel::Success,
-            AuditEvent::UserCreated(_) => AuditEventLevel::Success,
-            AuditEvent::UserUpdated(_) => AuditEventLevel::Success,
-            AuditEvent::UserDeleted(_) => AuditEventLevel::Info,
-            AuditEvent::ElectionCreated(_) => AuditEventLevel::Success,
-            AuditEvent::ElectionUpdated(_) => AuditEventLevel::Success,
-            AuditEvent::CommitteeSessionCreated(_) => AuditEventLevel::Success,
-            AuditEvent::CommitteeSessionDeleted(_) => AuditEventLevel::Info,
-            AuditEvent::CommitteeSessionUpdated(_) => AuditEventLevel::Success,
-            AuditEvent::FileCreated(_) => AuditEventLevel::Success,
-            AuditEvent::FileDeleted(_) => AuditEventLevel::Info,
-            AuditEvent::PollingStationCreated(_) => AuditEventLevel::Success,
-            AuditEvent::PollingStationUpdated(_) => AuditEventLevel::Success,
-            AuditEvent::PollingStationDeleted(_) => AuditEventLevel::Info,
-            AuditEvent::PollingStationsImported(_) => AuditEventLevel::Success,
-            AuditEvent::PollingStationInvestigationCreated(_) => AuditEventLevel::Success,
-            AuditEvent::PollingStationInvestigationConcluded(_) => AuditEventLevel::Success,
-            AuditEvent::PollingStationInvestigationUpdated(_) => AuditEventLevel::Success,
-            AuditEvent::PollingStationInvestigationDeleted(_) => AuditEventLevel::Info,
-            AuditEvent::DataEntryStarted(_) => AuditEventLevel::Success,
-            AuditEvent::DataEntrySaved(_) => AuditEventLevel::Success,
-            AuditEvent::DataEntryResumed(_) => AuditEventLevel::Success,
-            AuditEvent::DataEntryDeleted(_) => AuditEventLevel::Info,
-            AuditEvent::DataEntryFinalised(_) => AuditEventLevel::Success,
-            AuditEvent::ResultDeleted(_) => AuditEventLevel::Success,
-            AuditEvent::ApplicationStarted(_) => AuditEventLevel::Info,
-            AuditEvent::Error(ErrorDetails { level, .. }) => *level,
-            AuditEvent::UnknownEvent => AuditEventLevel::Warning,
-            AuditEvent::DataEntryDiscardedFirst(_) => AuditEventLevel::Info,
-            AuditEvent::DataEntryReturnedFirst(_) => AuditEventLevel::Info,
-            AuditEvent::DataEntryKeptFirst(_) => AuditEventLevel::Info,
-            AuditEvent::DataEntryKeptSecond(_) => AuditEventLevel::Info,
-            AuditEvent::DataEntryDiscardedBoth(_) => AuditEventLevel::Info,
-            AuditEvent::AirGapViolationDetected => AuditEventLevel::Error,
-            AuditEvent::AirGapViolationResolved => AuditEventLevel::Info,
+            AuditEventType::UserLoggedIn(_) => AuditEventLevel::Success,
+            AuditEventType::UserLoginFailed(_) => AuditEventLevel::Warning,
+            AuditEventType::UserLoggedOut(_) => AuditEventLevel::Success,
+            AuditEventType::UserSessionExtended => AuditEventLevel::Info,
+            AuditEventType::UserAccountUpdated(_) => AuditEventLevel::Success,
+            AuditEventType::UserCreated(_) => AuditEventLevel::Success,
+            AuditEventType::UserUpdated(_) => AuditEventLevel::Success,
+            AuditEventType::UserDeleted(_) => AuditEventLevel::Info,
+            AuditEventType::ElectionCreated(_) => AuditEventLevel::Success,
+            AuditEventType::ElectionUpdated(_) => AuditEventLevel::Success,
+            AuditEventType::CommitteeSessionCreated => AuditEventLevel::Success,
+            AuditEventType::CommitteeSessionDeleted => AuditEventLevel::Info,
+            AuditEventType::CommitteeSessionUpdated => AuditEventLevel::Success,
+            AuditEventType::FileCreated(_) => AuditEventLevel::Success,
+            AuditEventType::FileDeleted(_) => AuditEventLevel::Info,
+            AuditEventType::PollingStationCreated(_) => AuditEventLevel::Success,
+            AuditEventType::PollingStationUpdated(_) => AuditEventLevel::Success,
+            AuditEventType::PollingStationDeleted(_) => AuditEventLevel::Info,
+            AuditEventType::PollingStationsImported(_) => AuditEventLevel::Success,
+            AuditEventType::PollingStationInvestigationCreated(_) => AuditEventLevel::Success,
+            AuditEventType::PollingStationInvestigationConcluded(_) => AuditEventLevel::Success,
+            AuditEventType::PollingStationInvestigationUpdated(_) => AuditEventLevel::Success,
+            AuditEventType::PollingStationInvestigationDeleted(_) => AuditEventLevel::Info,
+            AuditEventType::DataEntryStarted(_) => AuditEventLevel::Success,
+            AuditEventType::DataEntrySaved(_) => AuditEventLevel::Success,
+            AuditEventType::DataEntryResumed(_) => AuditEventLevel::Success,
+            AuditEventType::DataEntryDeleted(_) => AuditEventLevel::Info,
+            AuditEventType::DataEntryFinalised(_) => AuditEventLevel::Success,
+            AuditEventType::ResultDeleted(_) => AuditEventLevel::Success,
+            AuditEventType::ApplicationStarted(_) => AuditEventLevel::Info,
+            AuditEventType::Error(ErrorDetails { level, .. }) => *level,
+            AuditEventType::UnknownEvent => AuditEventLevel::Warning,
+            AuditEventType::DataEntryDiscardedFirst(_) => AuditEventLevel::Info,
+            AuditEventType::DataEntryReturnedFirst(_) => AuditEventLevel::Info,
+            AuditEventType::DataEntryKeptFirst(_) => AuditEventLevel::Info,
+            AuditEventType::DataEntryKeptSecond(_) => AuditEventLevel::Info,
+            AuditEventType::DataEntryDiscardedBoth(_) => AuditEventLevel::Info,
+            AuditEventType::AirGapViolationDetected => AuditEventLevel::Error,
+            AuditEventType::AirGapViolationResolved => AuditEventLevel::Info,
         }
     }
 }

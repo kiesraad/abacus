@@ -8,20 +8,12 @@ use utoipa_axum::{router::OpenApiRouter, routes};
 
 use crate::{
     APIError, AppState, ErrorResponse, SqlitePoolExt,
-    api::{
-        data_entry::delete_data_entry_and_result_for_polling_station,
-        investigation::delete_investigation_for_polling_station,
-        middleware::authentication::{AdminOrCoordinator, error::AuthenticationError},
-    },
-    domain::{
-        committee_session::CommitteeSession,
-        committee_session_status::CommitteeSessionStatus,
-        election::ElectionId,
-        polling_station::{
-            PollingStation, PollingStationFileRequest, PollingStationId,
-            PollingStationListResponse, PollingStationRequest, PollingStationRequestListResponse,
-            PollingStationsRequest,
-        },
+    audit_log::{AuditEventType, AuditService, PollingStationImportDetails},
+    authentication::{AdminOrCoordinator, User, error::AuthenticationError},
+    committee_session::{
+        CommitteeSession,
+        repository::get_election_committee_session,
+        status::{CommitteeSessionStatus, change_committee_session_status},
     },
     eml::{EML110, EMLDocument, EMLImportError, EmlHash},
     infra::audit_log::{AuditEvent, AuditService, PollingStationImportDetails},
@@ -132,7 +124,7 @@ async fn polling_station_create(
     audit_service
         .log(
             &mut tx,
-            &AuditEvent::PollingStationCreated(polling_station.clone().into()),
+            &AuditEventType::PollingStationCreated(polling_station.clone().into()),
             None,
         )
         .await?;
@@ -234,7 +226,7 @@ async fn polling_station_update(
     audit_service
         .log(
             &mut tx,
-            &AuditEvent::PollingStationUpdated(polling_station.clone().into()),
+            &AuditEventType::PollingStationUpdated(polling_station.clone().into()),
             None,
         )
         .await?;
@@ -309,7 +301,7 @@ async fn polling_station_delete(
     audit_service
         .log(
             &mut tx,
-            &AuditEvent::PollingStationDeleted(polling_station.clone().into()),
+            &AuditEventType::PollingStationDeleted(polling_station.clone().into()),
             None,
         )
         .await?;
@@ -379,7 +371,7 @@ pub async fn create_imported_polling_stations(
     audit_service
         .log(
             &mut tx,
-            &AuditEvent::PollingStationsImported(PollingStationImportDetails {
+            &AuditEventType::PollingStationsImported(PollingStationImportDetails {
                 import_election_id: election_id,
                 import_file_name: polling_stations_request.file_name,
                 import_number_of_polling_stations: u64::try_from(polling_stations.len())

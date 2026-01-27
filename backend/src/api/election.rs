@@ -11,22 +11,11 @@ use utoipa_axum::{router::OpenApiRouter, routes};
 
 use crate::{
     APIError, AppState, ErrorResponse, SqlitePoolExt,
-    api::{
-        committee_session::create_committee_session,
-        middleware::authentication::{Admin, AdminOrCoordinator},
-        polling_station::create_imported_polling_stations,
-    },
-    domain::{
-        committee_session::{
-            CommitteeSession, CommitteeSessionCreateRequest, CommitteeSessionError,
-        },
-        committee_session_status::CommitteeSessionStatus,
-        election::{
-            Election, ElectionId, ElectionNumberOfVotersChangeRequest, ElectionWithPoliticalGroups,
-            NewElection, VoteCountingMethod,
-        },
-        investigation::PollingStationInvestigation,
-        polling_station::{PollingStation, PollingStationRequest, PollingStationsRequest},
+    audit_log::{AuditEventType, AuditService},
+    authentication::{Admin, AdminOrCoordinator, User},
+    committee_session::{
+        CommitteeSession, CommitteeSessionCreateRequest, CommitteeSessionError,
+        create_committee_session, status::CommitteeSessionStatus,
     },
     eml::{EML110, EML230, EMLDocument, EMLImportError, EmlHash, RedactedEmlHash},
     infra::audit_log::{AuditEvent, AuditService},
@@ -183,7 +172,7 @@ pub async fn election_number_of_voters_change(
         audit_service
             .log(
                 &mut tx,
-                &AuditEvent::ElectionUpdated(election.clone().into()),
+                &AuditEventType::ElectionUpdated(election.clone().into()),
                 None,
             )
             .await?;
@@ -359,7 +348,7 @@ async fn create_election(
     audit_service
         .log(
             conn,
-            &AuditEvent::ElectionCreated(election.clone().into()),
+            &AuditEventType::ElectionCreated(election.clone().into()),
             Some(message),
         )
         .await?;

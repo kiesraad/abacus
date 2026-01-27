@@ -12,14 +12,8 @@ use tracing::{debug, error, info};
 use super::{SESSION_LIFE_TIME, SESSION_MIN_LIFE_TIME, session::get_expires_at};
 use crate::{
     SqlitePoolExt,
-    api::authentication::set_default_cookie_properties,
-    infra::audit_log::{AuditEvent, AuditService},
-    repository::{
-        session_repo,
-        session_repo::{Session, SessionIdentifier},
-        user_repo,
-        user_repo::User,
-    },
+    audit_log::{AuditEventType, AuditService},
+    authentication::{User, request_data::RequestSessionData, set_default_cookie_properties},
 };
 
 /// Inject user and session
@@ -92,7 +86,7 @@ pub(crate) async fn extend_session(
                 Ok(session) => {
                     let _ = audit_service
                         .with_user(user.clone())
-                        .log(&mut tx, &AuditEvent::UserSessionExtended, None)
+                        .log(&mut tx, &AuditEventType::UserSessionExtended, None)
                         .await;
                     if let Err(err) = tx.commit().await {
                         error!("Failed to commit transaction: {:?}", err);

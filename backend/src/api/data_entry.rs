@@ -12,23 +12,11 @@ use utoipa_axum::{router::OpenApiRouter, routes};
 
 use crate::{
     APIError, AppState, SqlitePoolExt,
-    api::middleware::authentication::{Coordinator, Typist, error::AuthenticationError},
-    domain::{
-        committee_session::{CommitteeSession, CommitteeSessionError},
-        committee_session_status::CommitteeSessionStatus,
-        data_entry::{
-            CSONextSessionResults, CommonPollingStationResults, DataEntryStatusResponse,
-            PollingStationDataEntry, PollingStationResults,
-        },
-        election::{ElectionId, ElectionWithPoliticalGroups, PoliticalGroup},
-        entry_number::EntryNumber,
-        polling_station::{PollingStation, PollingStationId},
-        role::Role,
-        status::{
-            ClientState, CurrentDataEntry, DataEntryStatus, DataEntryStatusName,
-            DataEntryTransitionError, EntriesDifferent,
-        },
-        validation::{DataError, ValidateRoot, ValidationResults},
+    audit_log::{AuditEventType, AuditService},
+    authentication::{Coordinator, Role, Typist, User, error::AuthenticationError, user::UserId},
+    committee_session::{
+        CommitteeSession, CommitteeSessionError,
+        status::{CommitteeSessionStatus, change_committee_session_status},
     },
     error::{ErrorReference, ErrorResponse},
     infra::audit_log::{AuditEvent, AuditService},
@@ -166,12 +154,16 @@ pub async fn delete_data_entry_and_result_for_polling_station(
 ) -> Result<(), APIError> {
     if let Some(data_entry) = delete_data_entry(conn, polling_station_id).await? {
         audit_service
-            .log(conn, &AuditEvent::DataEntryDeleted(data_entry.into()), None)
+            .log(
+                conn,
+                &AuditEventType::DataEntryDeleted(data_entry.into()),
+                None,
+            )
             .await?;
     }
     if let Some(result) = delete_result(conn, polling_station_id).await? {
         audit_service
-            .log(conn, &AuditEvent::ResultDeleted(result.into()), None)
+            .log(conn, &AuditEventType::ResultDeleted(result.into()), None)
             .await?;
         if committee_session.status == CommitteeSessionStatus::Completed {
             change_committee_session_status(
@@ -231,16 +223,16 @@ pub enum ResolveDifferencesAction {
 }
 
 impl ResolveDifferencesAction {
-    pub fn audit_event(&self, data_entry: PollingStationDataEntry) -> AuditEvent {
+    pub fn audit_event(&self, data_entry: PollingStationDataEntry) -> AuditEventType {
         match self {
             ResolveDifferencesAction::KeepFirstEntry => {
-                AuditEvent::DataEntryKeptFirst(data_entry.into())
+                AuditEventType::DataEntryKeptFirst(data_entry.into())
             }
             ResolveDifferencesAction::KeepSecondEntry => {
-                AuditEvent::DataEntryKeptSecond(data_entry.into())
+                AuditEventType::DataEntryKeptSecond(data_entry.into())
             }
             ResolveDifferencesAction::DiscardBothEntries => {
-                AuditEvent::DataEntryDiscardedBoth(data_entry.into())
+                AuditEventType::DataEntryDiscardedBoth(data_entry.into())
             }
         }
     }
@@ -316,7 +308,7 @@ async fn polling_station_data_entry_claim(
             audit_service
                 .log(
                     &mut tx,
-                    &AuditEvent::DataEntryStarted(data_entry.into()),
+                    &AuditEventType::DataEntryStarted(data_entry.into()),
                     None,
                 )
                 .await?;
@@ -325,7 +317,7 @@ async fn polling_station_data_entry_claim(
             audit_service
                 .log(
                     &mut tx,
-                    &AuditEvent::DataEntryResumed(data_entry.into()),
+                    &AuditEventType::DataEntryResumed(data_entry.into()),
                     None,
                 )
                 .await?;
@@ -434,7 +426,7 @@ async fn polling_station_data_entry_save(
     audit_service
         .log(
             &mut tx,
-            &AuditEvent::DataEntrySaved(data_entry.into()),
+            &AuditEventType::DataEntrySaved(data_entry.into()),
             None,
         )
         .await?;
@@ -500,7 +492,7 @@ async fn polling_station_data_entry_delete(
     audit_service
         .log(
             &mut tx,
-            &AuditEvent::DataEntryDeleted(data_entry.into()),
+            &AuditEventType::DataEntryDeleted(data_entry.into()),
             None,
         )
         .await?;
@@ -589,7 +581,7 @@ async fn polling_station_data_entry_finalise(
     audit_service
         .log(
             &mut tx,
-            &AuditEvent::DataEntryFinalised(data_entry.clone().into()),
+            &AuditEventType::DataEntryFinalised(data_entry.clone().into()),
             None,
         )
         .await?;
@@ -608,13 +600,13 @@ pub enum ResolveErrorsAction {
 }
 
 impl ResolveErrorsAction {
-    pub fn audit_event(&self, data_entry: PollingStationDataEntry) -> AuditEvent {
+    pub fn audit_event(&self, data_entry: PollingStationDataEntry) -> AuditEventType {
         match self {
             ResolveErrorsAction::DiscardFirstEntry => {
-                AuditEvent::DataEntryDiscardedFirst(data_entry.into())
+                AuditEventType::DataEntryDiscardedFirst(data_entry.into())
             }
             ResolveErrorsAction::ResumeFirstEntry => {
-                AuditEvent::DataEntryReturnedFirst(data_entry.into())
+                AuditEventType::DataEntryReturnedFirst(data_entry.into())
             }
         }
     }

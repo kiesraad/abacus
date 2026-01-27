@@ -6,8 +6,7 @@ use axum::{
 };
 use sqlx::{SqliteConnection, SqlitePool};
 
-use super::AuditEvent;
-use crate::{APIError, repository::user_repo::User};
+use crate::{APIError, audit_log::AsAuditEvent, authentication::User};
 
 #[derive(Clone)]
 pub struct AuditService {
@@ -56,7 +55,7 @@ impl AuditService {
     pub async fn log(
         &self,
         conn: &mut SqliteConnection,
-        event: &AuditEvent,
+        event: impl AsAuditEvent,
         message: Option<String>,
     ) -> Result<(), APIError> {
         Ok(crate::audit_log::create(conn, event, self.user.as_ref(), message, self.ip).await?)
@@ -86,7 +85,7 @@ mod test {
             user: user_repo::get_by_username(&mut tx, "admin1").await.unwrap(),
         };
 
-        let audit_event = AuditEvent::UserLoggedIn(UserLoggedInDetails {
+        let audit_event = AuditEventType::UserLoggedIn(UserLoggedInDetails {
             user_agent: "Mozilla/5.0".to_string(),
             logged_in_users_count: 5,
         });
@@ -102,7 +101,7 @@ mod test {
 
         assert_eq!(
             event.event(),
-            &AuditEvent::UserLoggedIn(UserLoggedInDetails {
+            &AuditEventType::UserLoggedIn(UserLoggedInDetails {
                 user_agent: "Mozilla/5.0".to_string(),
                 logged_in_users_count: 5,
             })

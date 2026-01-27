@@ -152,17 +152,10 @@ mod tests {
 
     use crate::{
         AppState,
-        api::{
-            audit::{audit_log_list, audit_log_list_users},
-            middleware::{airgap::AirgapDetection, authentication::inject_user},
-        },
-        infra::audit_log::{
-            AuditEvent, AuditLogListResponse, AuditLogUser, AuditService, UserLoggedInDetails,
-        },
-        repository::{
-            session_repo,
-            session_repo::Session,
-            user_repo::{self, User, UserId},
+        airgap::AirgapDetection,
+        audit_log::{
+            AuditEventType, AuditLogListResponse, AuditLogUser, AuditService, UserLoggedInDetails,
+            api::{audit_log_list, audit_log_list_users},
         },
     };
 
@@ -180,7 +173,7 @@ mod tests {
             .unwrap()
             .unwrap();
         let service = new_test_audit_service(Some(user));
-        let audit_event = AuditEvent::UserLoggedIn(UserLoggedInDetails {
+        let audit_event = AuditEventType::UserLoggedIn(UserLoggedInDetails {
             user_agent: "Mozilla/5.0".to_string(),
             logged_in_users_count: 1,
         });

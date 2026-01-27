@@ -51,8 +51,15 @@ mod tests {
     use super::*;
     use crate::{
         AppState, ErrorResponse,
-        api::{authentication::*, middleware::airgap::AirgapDetection, user::*},
-        domain::role::Role,
+        airgap::AirgapDetection,
+        audit_log::{AuditEventType, LogFilter, UserLoginFailedDetails},
+        authentication::{
+            api::{AccountUpdateRequest, Credentials},
+            middleware::extend_session,
+            role::Role,
+            user::UserId,
+            *,
+        },
         error::ErrorReference,
         infra::audit_log::{AuditEvent, LogFilter, UserLoginFailedDetails},
         repository::{
@@ -181,7 +188,7 @@ mod tests {
         assert_eq!(events.len(), 1);
         assert_eq!(
             events[0].event(),
-            &AuditEvent::UserLoginFailed(UserLoginFailedDetails {
+            &AuditEventType::UserLoginFailed(UserLoginFailedDetails {
                 username: "admin".to_string(),
                 user_agent: TEST_USER_AGENT.to_string(),
             })

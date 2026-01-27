@@ -26,7 +26,12 @@ use crate::{
     },
     eml::{EML510, EMLDocument, EmlHash},
     error::ErrorReference,
-    infra::{audit_log::AuditService, authentication::Coordinator, pdf_gen::generate_pdf},
+    infra::{
+        audit_log::AuditService,
+        authentication::Coordinator,
+        pdf_gen::generate_pdf,
+        zip::{ZipResponse, ZipResponseError, slugify_filename, zip_single_file},
+    },
     repository::{
         committee_session_repo,
         committee_session_repo::{change_files, get_previous_session},
@@ -37,7 +42,6 @@ use crate::{
         investigation_repo::list_investigations_for_committee_session,
         polling_station_repo,
     },
-    zip::{ZipResponse, ZipResponseError, slugify_filename, zip_single_file},
 };
 
 /// Default date time format for reports

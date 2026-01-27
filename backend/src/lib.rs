@@ -21,7 +21,6 @@ pub mod repository;
 pub mod router;
 #[cfg(feature = "dev-database")]
 pub mod test_data_gen;
-pub mod zip;
 
 pub use app_error::AppError;
 pub use error::{APIError, ErrorResponse};

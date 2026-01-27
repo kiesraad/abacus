@@ -9,7 +9,7 @@ use typst_pdf::{PdfOptions, PdfStandard, PdfStandards, Timestamp};
 use super::PdfGenResult;
 use crate::{
     domain::models::{PdfFileModel, PdfModel},
-    zip::{ZipResponseError, ZipResponseWriter},
+    infra::zip::{ZipResponseError, ZipResponseWriter},
 };
 
 mod world;

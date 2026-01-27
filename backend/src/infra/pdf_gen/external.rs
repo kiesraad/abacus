@@ -7,7 +7,7 @@ use tracing::{error, info};
 use super::PdfGenResult;
 use crate::{
     domain::models::PdfFileModel,
-    zip::{ZipResponseError, ZipResponseWriter},
+    infra::zip::{ZipResponseError, ZipResponseWriter},
 };
 
 async fn generate_file(

@@ -21,9 +21,9 @@ use crate::{
     infra::{
         authentication::AdminOrCoordinator,
         pdf_gen::{generate_pdf, generate_pdfs},
+        zip::ZipResponse,
     },
     repository::{committee_session_repo, election_repo, polling_station_repo},
-    zip::ZipResponse,
 };
 
 pub fn router() -> OpenApiRouter<AppState> {

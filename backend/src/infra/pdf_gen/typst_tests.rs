@@ -30,13 +30,15 @@ use crate::{
             ModelNa31_2Input, ModelP2aInput, PdfFileModel, PdfModel,
         },
         polling_station::{PollingStation, PollingStationId, PollingStationType},
+        summary::{
+            ElectionSummary, PollingStationInvestigations, SumCount, SummaryDifferencesCounts,
+        },
         votes_table::{
             CandidatesTables, VotesTables, VotesTablesWithOnlyPreviousVotes,
             VotesTablesWithPreviousVotes,
         },
     },
     infra::pdf_gen::generate_pdf,
-    summary::{ElectionSummary, PollingStationInvestigations, SumCount, SummaryDifferencesCounts},
 };
 
 fn random_string(rng: &mut impl Rng, length: usize) -> String {

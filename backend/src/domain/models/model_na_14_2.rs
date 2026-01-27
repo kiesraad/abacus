@@ -1,16 +1,14 @@
 use serde::{Deserialize, Serialize};
 
-use crate::{
-    domain::{
-        committee_session::CommitteeSession,
-        data_entry::CommonPollingStationResultsWithoutVotes,
-        election::Election,
-        investigation::PollingStationInvestigation,
-        models::{PdfFileModel, PdfModel, ToPdfFileModel},
-        polling_station::PollingStation,
-        votes_table::{VotesTablesWithOnlyPreviousVotes, VotesTablesWithPreviousVotes},
-    },
+use crate::domain::{
+    committee_session::CommitteeSession,
+    data_entry::CommonPollingStationResultsWithoutVotes,
+    election::Election,
+    investigation::PollingStationInvestigation,
+    models::{PdfFileModel, PdfModel, ToPdfFileModel},
+    polling_station::PollingStation,
     summary::ElectionSummaryWithoutVotes,
+    votes_table::{VotesTablesWithOnlyPreviousVotes, VotesTablesWithPreviousVotes},
 };
 
 #[derive(Serialize, Deserialize)]

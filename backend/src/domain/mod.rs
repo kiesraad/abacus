@@ -9,5 +9,6 @@ pub mod investigation;
 pub mod models;
 pub mod polling_station;
 pub mod status;
+pub mod summary;
 pub mod validation;
 pub mod votes_table;

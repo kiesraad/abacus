@@ -21,6 +21,7 @@ use crate::{
         investigation::PollingStationInvestigation,
         models::{ModelNa14_2Input, ModelNa31_2Input, ModelP2aInput, PdfFileModel, ToPdfFileModel},
         polling_station::PollingStation,
+        summary::ElectionSummary,
         votes_table::{VotesTables, VotesTablesWithPreviousVotes},
     },
     eml::{EML510, EMLDocument, EmlHash},
@@ -36,7 +37,6 @@ use crate::{
         investigation_repo::list_investigations_for_committee_session,
         polling_station_repo,
     },
-    summary::ElectionSummary,
     zip::{ZipResponse, ZipResponseError, slugify_filename, zip_single_file},
 };
 

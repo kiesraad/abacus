@@ -9,8 +9,8 @@ use crate::{
         election::{
             Candidate, CandidateNumber, ElectionWithPoliticalGroups, PGNumber, PoliticalGroup,
         },
+        summary::ElectionSummary,
     },
-    summary::ElectionSummary,
 };
 
 const DEFAULT_CANDIDATES_PER_COLUMN: [usize; 4] = [25, 25, 15, 15];

@@ -8,13 +8,11 @@ use super::{
         ManagingAuthority,
     },
 };
-use crate::{
-    domain::{
-        committee_session::CommitteeSession,
-        data_entry::{PoliticalGroupCandidateVotes, PollingStationResults},
-        election,
-        polling_station::PollingStation,
-    },
+use crate::domain::{
+    committee_session::CommitteeSession,
+    data_entry::{PoliticalGroupCandidateVotes, PollingStationResults},
+    election,
+    polling_station::PollingStation,
     summary::ElectionSummary,
 };
 

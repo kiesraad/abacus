@@ -13,10 +13,10 @@ use abacus::{
         election::ElectionWithPoliticalGroups,
         models::{ModelNa31_2Input, ToPdfFileModel},
         polling_station::PollingStation,
+        summary::ElectionSummary,
         votes_table::VotesTables,
     },
     eml::{EML110, EML230, EMLDocument},
-    summary::ElectionSummary,
     test_data_gen::{GenerateElectionArgs, RandomRange, create_test_election, parse_range},
 };
 use clap::Parser;

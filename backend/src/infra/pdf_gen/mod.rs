@@ -32,9 +32,9 @@ pub(crate) mod tests {
             },
             models::{ModelNa31_2Input, PdfFileModel, PdfModel, ToPdfFileModel, filter_input},
             polling_station::{PollingStation, PollingStationId, PollingStationType},
+            summary::ElectionSummary,
             votes_table::VotesTables,
         },
-        summary::ElectionSummary,
     };
 
     pub fn polling_stations_fixture(

@@ -19,7 +19,6 @@ pub mod fixtures;
 pub mod infra;
 pub mod repository;
 pub mod router;
-pub mod summary;
 #[cfg(feature = "dev-database")]
 pub mod test_data_gen;
 pub mod util;

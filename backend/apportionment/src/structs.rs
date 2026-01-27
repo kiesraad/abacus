@@ -5,6 +5,8 @@ use super::{
     seat_assignment::{SeatAssignmentResult, get_total_seats_from_apportionment_result},
 };
 
+pub(crate) const LARGE_COUNCIL_THRESHOLD: u32 = 19;
+
 id!(CandidateNumber);
 id!(ListNumber);
 

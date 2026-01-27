@@ -1,10 +1,7 @@
-use std::cmp::Ordering;
-use tracing::{debug, info};
-
 use super::{
     super::{
         fraction::Fraction,
-        structs::{ListNumber, ListVotes},
+        structs::{LARGE_COUNCIL_THRESHOLD, ListNumber, ListVotes},
     },
     ApportionmentError, list_numbers,
     structs::{
@@ -12,6 +9,8 @@ use super::{
         SeatChangeStep,
     },
 };
+use std::cmp::Ordering;
+use tracing::{debug, info};
 
 /// This function assigns the residual seats that remain after full seat assignment is finished.  
 /// These residual seats are assigned through two different procedures,
@@ -36,7 +35,7 @@ pub fn assign_remainder(
                 list_numbers_without_empty_seats(current_standings.iter(), list_votes)
             });
 
-        let change = if seats >= 19 {
+        let change = if seats >= LARGE_COUNCIL_THRESHOLD {
             debug!("Assign residual seat using highest averages method");
             // [Artikel P 7 Kieswet](https://wetten.overheid.nl/BWBR0004627/2026-01-01/#AfdelingII_HoofdstukP_Paragraaf2_ArtikelP7)
             step_assign_remainder_using_highest_averages(

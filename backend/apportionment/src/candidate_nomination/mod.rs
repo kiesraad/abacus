@@ -8,7 +8,10 @@ pub use structs::CandidateNominationResult;
 use super::{
     ApportionmentError,
     fraction::Fraction,
-    structs::{CandidateNominationInput, CandidateNumber, CandidateVotes, ListVotes},
+    structs::{
+        CandidateNominationInput, CandidateNumber, CandidateVotes, LARGE_COUNCIL_THRESHOLD,
+        ListVotes,
+    },
 };
 
 /// Candidate nomination
@@ -19,7 +22,11 @@ pub fn candidate_nomination(
 
     // [Artikel P 15 Kieswet](https://wetten.overheid.nl/BWBR0004627/2026-01-01/#AfdelingII_HoofdstukP_Paragraaf3_ArtikelP15)
     // Calculate preference threshold as a proper fraction
-    let preference_threshold_percentage = if input.number_of_seats >= 19 { 25 } else { 50 };
+    let preference_threshold_percentage = if input.number_of_seats >= LARGE_COUNCIL_THRESHOLD {
+        25
+    } else {
+        50
+    };
     let preference_threshold = input.quota * Fraction::new(preference_threshold_percentage, 100);
     info!(
         "Preference threshold percentage: {}%",
@@ -54,7 +61,7 @@ pub fn candidate_nomination(
 }
 
 fn all_sorted_chosen_candidates(
-    list_votes: &Vec<ListVotes>,
+    list_votes: &[ListVotes],
     list_candidate_nomination: &[ListCandidateNomination],
 ) -> Vec<Candidate> {
     let mut chosen_candidates: Vec<Candidate> = vec![];
@@ -88,7 +95,7 @@ fn all_sorted_chosen_candidates(
 /// candidates are nominated.
 fn candidate_nomination_per_list(
     seats: u32,
-    list_votes: &Vec<ListVotes>,
+    list_votes: &[ListVotes],
     preference_threshold: Fraction,
     total_seats: &[u32],
 ) -> Result<Vec<ListCandidateNomination>, ApportionmentError> {
@@ -114,7 +121,7 @@ fn candidate_nomination_per_list(
         // [Artikel P 19 Kieswet](https://wetten.overheid.nl/BWBR0004627/2026-01-01/#AfdelingII_HoofdstukP_Paragraaf3_ArtikelP19)
         let updated_candidate_ranking: Vec<CandidateNumber> =
             if candidate_votes_meeting_preference_threshold.is_empty()
-                || (seats >= 19 && list_seats == 0)
+                || (seats >= LARGE_COUNCIL_THRESHOLD && list_seats == 0)
             {
                 vec![]
             } else {

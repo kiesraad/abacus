@@ -18,9 +18,7 @@ use self::{
     structs::{ApportionmentOutput, CandidateNominationInput, SeatAssignmentInput},
 };
 
-pub async fn process(
-    input: impl ApportionmentInput,
-) -> Result<ApportionmentOutput, ApportionmentError> {
+pub fn process(input: impl ApportionmentInput) -> Result<ApportionmentOutput, ApportionmentError> {
     let seat_assignment = seat_assignment(SeatAssignmentInput::from(&input))?;
     let candidate_nomination =
         candidate_nomination(CandidateNominationInput::from((&input, &seat_assignment)))?;

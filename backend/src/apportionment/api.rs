@@ -142,7 +142,7 @@ async fn election_apportionment(
             summary: ElectionSummary::from_results(&election, &results)?,
         };
 
-        let result = apportionment::process(input.clone()).await?;
+        let result = apportionment::process(input.clone())?;
 
         audit_service
             .log(

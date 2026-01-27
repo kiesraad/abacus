@@ -15,7 +15,7 @@ use super::{
 };
 use crate::{
     APIError, AppState, ErrorResponse, SqlitePoolExt,
-    audit_log::{AuditEvent, AuditService},
+    audit_log::{AuditEventType, AuditService},
     authentication::{Admin, AdminOrCoordinator, User},
     committee_session::{
         CommitteeSession, CommitteeSessionCreateRequest, CommitteeSessionError,
@@ -185,7 +185,7 @@ pub async fn election_number_of_voters_change(
         audit_service
             .log(
                 &mut tx,
-                &AuditEvent::ElectionUpdated(election.clone().into()),
+                &AuditEventType::ElectionUpdated(election.clone().into()),
                 None,
             )
             .await?;
@@ -359,7 +359,7 @@ async fn create_election(
     audit_service
         .log(
             conn,
-            &AuditEvent::ElectionCreated(election.clone().into()),
+            &AuditEventType::ElectionCreated(election.clone().into()),
             Some(message),
         )
         .await?;

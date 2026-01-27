@@ -18,7 +18,7 @@ use super::{
 };
 use crate::{
     APIError, AppState, ErrorResponse, SqlitePoolExt,
-    audit_log::{AuditEvent, AuditService},
+    audit_log::{AuditEventType, AuditService},
     authentication::Coordinator,
     committee_session::{
         CommitteeSession, CommitteeSessionError,
@@ -82,7 +82,7 @@ pub async fn delete_investigation_for_polling_station(
         audit_service
             .log(
                 conn,
-                &AuditEvent::PollingStationInvestigationDeleted(investigation),
+                &AuditEventType::PollingStationInvestigationDeleted(investigation),
                 None,
             )
             .await?;
@@ -139,7 +139,7 @@ async fn polling_station_investigation_create(
     audit_service
         .log(
             &mut tx,
-            &AuditEvent::PollingStationInvestigationCreated(investigation.clone()),
+            &AuditEventType::PollingStationInvestigationCreated(investigation.clone()),
             None,
         )
         .await?;
@@ -215,7 +215,7 @@ async fn polling_station_investigation_conclude(
     audit_service
         .log(
             &mut tx,
-            &AuditEvent::PollingStationInvestigationConcluded(investigation.clone()),
+            &AuditEventType::PollingStationInvestigationConcluded(investigation.clone()),
             None,
         )
         .await?;
@@ -254,7 +254,7 @@ async fn update_investigation(
     audit_service
         .log(
             conn,
-            &AuditEvent::PollingStationInvestigationUpdated(investigation.clone()),
+            &AuditEventType::PollingStationInvestigationUpdated(investigation.clone()),
             None,
         )
         .await?;

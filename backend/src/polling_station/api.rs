@@ -15,7 +15,7 @@ use super::{
 };
 use crate::{
     APIError, AppState, ErrorResponse, SqlitePoolExt,
-    audit_log::{AuditEvent, AuditService, PollingStationImportDetails},
+    audit_log::{AuditEventType, AuditService, PollingStationImportDetails},
     authentication::{AdminOrCoordinator, User, error::AuthenticationError},
     committee_session::{
         CommitteeSession,
@@ -126,7 +126,7 @@ async fn polling_station_create(
     audit_service
         .log(
             &mut tx,
-            &AuditEvent::PollingStationCreated(polling_station.clone().into()),
+            &AuditEventType::PollingStationCreated(polling_station.clone().into()),
             None,
         )
         .await?;
@@ -228,7 +228,7 @@ async fn polling_station_update(
     audit_service
         .log(
             &mut tx,
-            &AuditEvent::PollingStationUpdated(polling_station.clone().into()),
+            &AuditEventType::PollingStationUpdated(polling_station.clone().into()),
             None,
         )
         .await?;
@@ -303,7 +303,7 @@ async fn polling_station_delete(
     audit_service
         .log(
             &mut tx,
-            &AuditEvent::PollingStationDeleted(polling_station.clone().into()),
+            &AuditEventType::PollingStationDeleted(polling_station.clone().into()),
             None,
         )
         .await?;
@@ -373,7 +373,7 @@ pub async fn create_imported_polling_stations(
     audit_service
         .log(
             &mut tx,
-            &AuditEvent::PollingStationsImported(PollingStationImportDetails {
+            &AuditEventType::PollingStationsImported(PollingStationImportDetails {
                 import_election_id: election_id,
                 import_file_name: polling_stations_request.file_name,
                 import_number_of_polling_stations: u64::try_from(polling_stations.len())

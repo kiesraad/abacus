@@ -21,7 +21,7 @@ use super::{
 use crate::{
     APIError, AppState, ErrorResponse, SqlitePoolExt,
     audit_log::{
-        AuditEvent, AuditService, UserDetails, UserLoggedInDetails, UserLoggedOutDetails,
+        AuditEventType, AuditService, UserDetails, UserLoggedInDetails, UserLoggedOutDetails,
         UserLoginFailedDetails,
     },
     authentication::{CreateUserRequest, user::UserId},
@@ -126,7 +126,7 @@ async fn login(
             audit_service
                 .log(
                     &mut tx,
-                    &AuditEvent::UserLoginFailed(UserLoginFailedDetails {
+                    &AuditEventType::UserLoginFailed(UserLoginFailedDetails {
                         username,
                         user_agent: user_agent.clone(),
                     }),
@@ -163,7 +163,7 @@ async fn login(
         .with_user(user.clone())
         .log(
             &mut tx,
-            &AuditEvent::UserLoggedIn(UserLoggedInDetails {
+            &AuditEventType::UserLoggedIn(UserLoggedInDetails {
                 user_agent: user_agent.to_string(),
                 logged_in_users_count,
             }),
@@ -249,7 +249,7 @@ async fn account_update(
     audit_service
         .log(
             &mut tx,
-            &AuditEvent::UserAccountUpdated(response.clone().into()),
+            &AuditEventType::UserAccountUpdated(response.clone().into()),
             None,
         )
         .await?;
@@ -308,7 +308,7 @@ async fn create_first_admin(
             super::user::delete(&mut tx, user.id()).await?;
 
             audit_service
-                .log(&mut tx, &AuditEvent::UserDeleted(user.into()), None)
+                .log(&mut tx, &AuditEventType::UserDeleted(user.into()), None)
                 .await?;
         }
     }
@@ -325,7 +325,11 @@ async fn create_first_admin(
     .await?;
 
     audit_service
-        .log(&mut tx, &AuditEvent::UserCreated(user.clone().into()), None)
+        .log(
+            &mut tx,
+            &AuditEventType::UserCreated(user.clone().into()),
+            None,
+        )
         .await?;
 
     tx.commit().await?;
@@ -398,7 +402,7 @@ async fn logout(
         audit_service
             .log(
                 &mut tx,
-                &AuditEvent::UserLoggedOut(UserLoggedOutDetails {
+                &AuditEventType::UserLoggedOut(UserLoggedOutDetails {
                     session_duration: session.duration().as_secs(),
                 }),
                 None,

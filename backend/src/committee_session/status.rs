@@ -9,7 +9,7 @@ use super::{
 };
 use crate::{
     APIError,
-    audit_log::{AuditEvent, AuditService},
+    audit_log::{AuditEventType, AuditService},
     committee_session::CommitteeSessionId,
     data_entry::repository::are_results_complete_for_committee_session,
     files::{FileId, delete_file},
@@ -128,7 +128,7 @@ pub async fn change_committee_session_status(
     audit_service
         .log(
             &mut tx,
-            &AuditEvent::CommitteeSessionUpdated(committee_session.into()),
+            &AuditEventType::CommitteeSessionUpdated(committee_session.into()),
             None,
         )
         .await?;

@@ -8,16 +8,16 @@ use sqlx::{SqliteConnection, SqlitePool};
 use utoipa_axum::{router::OpenApiRouter, routes};
 
 use super::{
-    CommitteeSession, CommitteeSessionCreateRequest, CommitteeSessionStatusChangeRequest,
-    CommitteeSessionUpdateRequest, InvestigationListResponse,
+    CommitteeSession, CommitteeSessionCreateRequest, CommitteeSessionCreated,
+    CommitteeSessionDeleted, CommitteeSessionId, CommitteeSessionStatusChangeRequest,
+    CommitteeSessionUpdateRequest, CommitteeSessionUpdated, InvestigationListResponse,
     repository::{create, delete, get, get_election_committee_session, update},
     status::{CommitteeSessionStatus, change_committee_session_status},
 };
 use crate::{
     APIError, AppState, ErrorResponse, SqlitePoolExt,
-    audit_log::{AuditEvent, AuditService},
+    audit_log::{AuditEventType, AuditService},
     authentication::Coordinator,
-    committee_session::CommitteeSessionId,
     election::ElectionId,
     error::ErrorReference,
     investigation::list_investigations_for_committee_session,
@@ -71,11 +71,7 @@ pub async fn create_committee_session(
 ) -> Result<CommitteeSession, APIError> {
     let committee_session = create(conn, committee_session_create_request).await?;
     audit_service
-        .log(
-            conn,
-            &AuditEvent::CommitteeSessionCreated(committee_session.clone().into()),
-            None,
-        )
+        .log(conn, CommitteeSessionCreated(&committee_session), None)
         .await?;
     Ok(committee_session)
 }
@@ -167,11 +163,7 @@ pub async fn committee_session_delete(
         delete(&mut tx, committee_session_id).await?;
 
         audit_service
-            .log(
-                &mut tx,
-                &AuditEvent::CommitteeSessionDeleted(committee_session.clone().into()),
-                None,
-            )
+            .log(&mut tx, CommitteeSessionDeleted(&committee_session), None)
             .await?;
 
         tx.commit().await?;
@@ -241,11 +233,7 @@ pub async fn committee_session_update(
         update(&mut tx, committee_session_id, request.location, date_time).await?;
 
     audit_service
-        .log(
-            &mut tx,
-            &AuditEvent::CommitteeSessionUpdated(committee_session.clone().into()),
-            None,
-        )
+        .log(&mut tx, CommitteeSessionUpdated(&committee_session), None)
         .await?;
 
     tx.commit().await?;

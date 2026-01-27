@@ -72,7 +72,7 @@ mod tests {
     use crate::{
         AppState, ErrorResponse,
         airgap::AirgapDetection,
-        audit_log::{AuditEvent, LogFilter, UserLoginFailedDetails},
+        audit_log::{AuditEventType, LogFilter, UserLoginFailedDetails},
         authentication::{
             api::{AccountUpdateRequest, Credentials},
             middleware::extend_session,
@@ -203,7 +203,7 @@ mod tests {
         assert_eq!(events.len(), 1);
         assert_eq!(
             events[0].event(),
-            &AuditEvent::UserLoginFailed(UserLoginFailedDetails {
+            &AuditEventType::UserLoginFailed(UserLoginFailedDetails {
                 username: "admin".to_string(),
                 user_agent: TEST_USER_AGENT.to_string(),
             })

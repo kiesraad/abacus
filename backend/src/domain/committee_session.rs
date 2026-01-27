@@ -8,11 +8,11 @@ use sqlx::{FromRow, Type};
 use utoipa::ToSchema;
 
 use crate::{
-    audit_log::{self, AsAuditEvent, AuditEvent},
-    election::ElectionId,
-    files::FileId,
-    investigation::PollingStationInvestigation,
-    util::id,
+    domain::{
+        committee_session_status::CommitteeSessionStatus, election::ElectionId, file::FileId,
+        id::id, investigation::PollingStationInvestigation,
+    },
+    infra::audit_log::{AsAuditEvent, AuditEvent, AuditEventType, as_audit_event},
 };
 
 #[derive(Debug, PartialEq, Eq)]
@@ -79,66 +79,47 @@ impl CommitteeSession {
     }
 }
 
-pub struct CommitteeSessionCreated<'a>(pub &'a CommitteeSession);
-pub struct CommitteeSessionUpdated<'a>(pub &'a CommitteeSession);
-pub struct CommitteeSessionDeleted<'a>(pub &'a CommitteeSession);
-
-impl<'a> AsAuditEvent for CommitteeSessionCreated<'a> {
-    fn as_audit_event(&self) -> AuditEvent {
-        AuditEvent {
-            event_type: audit_log::AuditEventType::CommitteeSessionCreated,
-            data: serde_json::json!({
-                "session_id": self.0.id,
-                "session_number": self.0.number,
-                "session_election_id": self.0.election_id,
-                "session_location": self.0.location,
-                "session_start_date_time": self.0.start_date_time,
-                "session_status": self.0.status.to_string(),
-                "session_results_eml": self.0.results_eml,
-                "session_results_pdf": self.0.results_pdf,
-                "session_overview_pdf": self.0.overview_pdf,
-            }),
-        }
-    }
+#[derive(Serialize, Deserialize, Debug, PartialEq, Eq, ToSchema)]
+#[serde(deny_unknown_fields)]
+pub struct CommitteeSessionDetails {
+    pub session_id: CommitteeSessionId,
+    pub session_number: u32,
+    pub session_election_id: ElectionId,
+    pub session_location: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[schema(value_type = String, format = "date-time", nullable = false)]
+    pub session_start_date_time: Option<NaiveDateTime>,
+    pub session_status: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[schema(nullable = false)]
+    pub session_results_eml: Option<FileId>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[schema(nullable = false)]
+    pub session_results_pdf: Option<FileId>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[schema(nullable = false)]
+    pub session_overview_pdf: Option<FileId>,
 }
 
-impl<'a> AsAuditEvent for CommitteeSessionUpdated<'a> {
-    fn as_audit_event(&self) -> AuditEvent {
-        AuditEvent {
-            event_type: audit_log::AuditEventType::CommitteeSessionUpdated,
-            data: serde_json::json!({
-                "session_id": self.0.id,
-                "session_number": self.0.number,
-                "session_election_id": self.0.election_id,
-                "session_location": self.0.location,
-                "session_start_date_time": self.0.start_date_time,
-                "session_status": self.0.status.to_string(),
-                "session_results_eml": self.0.results_eml,
-                "session_results_pdf": self.0.results_pdf,
-                "session_overview_pdf": self.0.overview_pdf,
-            }),
-        }
-    }
-}
+#[derive(Serialize)]
+pub struct CommitteeSessionCreated(pub CommitteeSession);
+#[derive(Serialize)]
+pub struct CommitteeSessionUpdated(pub CommitteeSession);
+#[derive(Serialize)]
+pub struct CommitteeSessionDeleted(pub CommitteeSession);
 
-impl<'a> AsAuditEvent for CommitteeSessionDeleted<'a> {
-    fn as_audit_event(&self) -> AuditEvent {
-        AuditEvent {
-            event_type: audit_log::AuditEventType::CommitteeSessionDeleted,
-            data: serde_json::json!({
-                "session_id": self.0.id,
-                "session_number": self.0.number,
-                "session_election_id": self.0.election_id,
-                "session_location": self.0.location,
-                "session_start_date_time": self.0.start_date_time,
-                "session_status": self.0.status.to_string(),
-                "session_results_eml": self.0.results_eml,
-                "session_results_pdf": self.0.results_pdf,
-                "session_overview_pdf": self.0.overview_pdf,
-            }),
-        }
-    }
-}
+as_audit_event!(
+    CommitteeSessionCreated,
+    AuditEventType::CommitteeSessionCreated
+);
+as_audit_event!(
+    CommitteeSessionUpdated,
+    AuditEventType::CommitteeSessionUpdated
+);
+as_audit_event!(
+    CommitteeSessionDeleted,
+    AuditEventType::CommitteeSessionDeleted
+);
 
 impl IntoResponse for CommitteeSession {
     fn into_response(self) -> Response {

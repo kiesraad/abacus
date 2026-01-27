@@ -44,6 +44,7 @@ mod tests {
         Method,
         header::{CONTENT_TYPE, COOKIE, USER_AGENT},
     };
+    use serde_json::json;
     use sqlx::SqlitePool;
     use test_log::test;
     use tower::ServiceExt;
@@ -51,21 +52,11 @@ mod tests {
     use super::*;
     use crate::{
         AppState, ErrorResponse,
-        airgap::AirgapDetection,
-        audit_log::{AuditEventType, LogFilter, UserLoginFailedDetails},
-        authentication::{
-            api::{AccountUpdateRequest, Credentials},
-            middleware::extend_session,
-            role::Role,
-            user::UserId,
-            *,
-        },
+        api::{authentication::*, user::*},
+        domain::role::Role,
         error::ErrorReference,
-        infra::audit_log::{AuditEvent, LogFilter, UserLoginFailedDetails},
-        repository::{
-            session_repo::{self, Session},
-            user_repo::{self, User, UserId},
-        },
+        infra::{airgap::AirgapDetection, audit_log::LogFilter},
+        repository::user_repo::{self, User, UserId},
     };
 
     const TEST_USER_AGENT: &str = "TestAgent/1.0";
@@ -187,10 +178,10 @@ mod tests {
 
         assert_eq!(events.len(), 1);
         assert_eq!(
-            events[0].event(),
-            &AuditEventType::UserLoginFailed(UserLoginFailedDetails {
-                username: "admin".to_string(),
-                user_agent: TEST_USER_AGENT.to_string(),
+            *events[0].event(),
+            json!({
+                "username": "admin".to_string(),
+                "user_agent": TEST_USER_AGENT.to_string(),
             })
         );
     }

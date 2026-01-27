@@ -6,7 +6,7 @@ use axum::{
 };
 use sqlx::{SqliteConnection, SqlitePool};
 
-use crate::{APIError, audit_log::AsAuditEvent, authentication::User};
+use crate::{APIError, infra::audit_log::AsAuditEvent, repository::user_repo::User};
 
 #[derive(Clone)]
 pub struct AuditService {
@@ -55,7 +55,7 @@ impl AuditService {
     pub async fn log(
         &self,
         conn: &mut SqliteConnection,
-        event: impl AsAuditEvent,
+        event: &impl AsAuditEvent,
         message: Option<String>,
     ) -> Result<(), APIError> {
         Ok(crate::audit_log::create(conn, event, self.user.as_ref(), message, self.ip).await?)
@@ -67,13 +67,15 @@ impl AuditService {
 mod test {
     use std::net::Ipv4Addr;
 
+    use serde_json::json;
     use sqlx::SqlitePool;
     use test_log::test;
 
     use super::*;
     use crate::{
         SqlitePoolExt,
-        infra::audit_log::{AuditEventLevel, UserLoggedInDetails},
+        api::authentication::UserLoggedInDetails,
+        infra::audit_log::AuditEventLevel,
         repository::user_repo::{self, UserId},
     };
 
@@ -85,10 +87,10 @@ mod test {
             user: user_repo::get_by_username(&mut tx, "admin1").await.unwrap(),
         };
 
-        let audit_event = AuditEventType::UserLoggedIn(UserLoggedInDetails {
+        let audit_event = UserLoggedInDetails {
             user_agent: "Mozilla/5.0".to_string(),
             logged_in_users_count: 5,
-        });
+        };
         let message = Some("User logged in".to_string());
         service.log(&mut tx, &audit_event, message).await.unwrap();
         tx.commit().await.unwrap();
@@ -100,10 +102,10 @@ mod test {
         let event = logged_events.last().unwrap();
 
         assert_eq!(
-            event.event(),
-            &AuditEventType::UserLoggedIn(UserLoggedInDetails {
-                user_agent: "Mozilla/5.0".to_string(),
-                logged_in_users_count: 5,
+            *event.event(),
+            json!({
+                "user_agent": "Mozilla/5.0".to_string(),
+                "logged_in_users_count": 5,
             })
         );
 

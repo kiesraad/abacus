@@ -4,11 +4,12 @@ use std::{
     time::{Duration, Instant},
 };
 
+use serde::Serialize;
 use sqlx::SqlitePool;
 use tokio::{task::JoinSet, time::timeout};
 use tracing::{debug, error, info, trace, warn};
 
-use crate::audit_log::AuditEventType;
+use crate::infra::audit_log::{AsAuditEvent, AuditEvent, AuditEventType, as_audit_event};
 
 #[derive(Clone)]
 pub struct AirgapDetection {
@@ -39,6 +40,20 @@ const DOMAINS: [&str; 3] = [
 ];
 
 pub const AIRGAP_DETECTION_INTERVAL: u64 = 30; // interval in seconds
+
+#[derive(Serialize)]
+struct AirGapViolationDetected;
+#[derive(Serialize)]
+struct AirGapViolationResolved;
+
+as_audit_event!(
+    AirGapViolationDetected,
+    AuditEventType::AirGapViolationDetected
+);
+as_audit_event!(
+    AirGapViolationResolved,
+    AuditEventType::AirGapViolationResolved
+);
 
 impl AirgapDetection {
     /// Creates a new AirgapDetection instance that does not perform any detection.
@@ -77,9 +92,9 @@ impl AirgapDetection {
     #[allow(clippy::cognitive_complexity)]
     async fn log_status_change(&self) {
         let event = if self.violation_detected() {
-            AuditEventType::AirGapViolationDetected
+            AirGapViolationDetected.as_audit_event()
         } else {
-            AuditEventType::AirGapViolationResolved
+            AirGapViolationResolved.as_audit_event()
         };
 
         if let Some(pool) = &self.pool {
@@ -290,7 +305,7 @@ mod tests {
         }
 
         assert_eq!(events.len(), 1);
-        assert_eq!(events[0].event(), &AuditEventType::AirGapViolationDetected);
+        assert_eq!(events[0].message(), None);
     }
 
     #[tokio::test]

@@ -152,11 +152,16 @@ mod tests {
 
     use crate::{
         AppState,
-        airgap::AirgapDetection,
-        audit_log::{
-            AuditEventType, AuditLogListResponse, AuditLogUser, AuditService, UserLoggedInDetails,
-            api::{audit_log_list, audit_log_list_users},
+        api::{
+            audit::{audit_log_list, audit_log_list_users},
+            authentication::UserLoggedInDetails,
+            middleware::authentication::inject_user,
         },
+        infra::{
+            airgap::AirgapDetection,
+            audit_log::{AuditLogListResponse, AuditLogUser, AuditService},
+        },
+        repository::user_repo::{self, User, UserId},
     };
 
     const TEST_USER_AGENT: &str = "TestAgent/1.0";
@@ -173,10 +178,10 @@ mod tests {
             .unwrap()
             .unwrap();
         let service = new_test_audit_service(Some(user));
-        let audit_event = AuditEventType::UserLoggedIn(UserLoggedInDetails {
+        let audit_event = UserLoggedInDetails {
             user_agent: "Mozilla/5.0".to_string(),
             logged_in_users_count: 1,
-        });
+        };
         service.log(&mut conn, &audit_event, None).await.unwrap();
         service.log(&mut conn, &audit_event, None).await.unwrap();
         service.log(&mut conn, &audit_event, None).await.unwrap();

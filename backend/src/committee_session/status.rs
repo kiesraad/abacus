@@ -5,12 +5,12 @@ use utoipa::ToSchema;
 
 use super::{
     CommitteeSession, CommitteeSessionError, CommitteeSessionFilesUpdateRequest,
+    CommitteeSessionId, CommitteeSessionUpdated,
     repository::{change_files, change_status, get},
 };
 use crate::{
     APIError,
-    audit_log::{AuditEventType, AuditService},
-    committee_session::CommitteeSessionId,
+    audit_log::AuditService,
     data_entry::repository::are_results_complete_for_committee_session,
     files::{FileId, delete_file},
     investigation::list_investigations_for_committee_session,
@@ -128,7 +128,7 @@ pub async fn change_committee_session_status(
     audit_service
         .log(
             &mut tx,
-            &AuditEventType::CommitteeSessionUpdated(committee_session.into()),
+            CommitteeSessionUpdated(committee_session.into()),
             None,
         )
         .await?;

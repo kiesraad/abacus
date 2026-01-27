@@ -3,6 +3,7 @@ use axum::{
     extract::{Path, State},
     http::StatusCode,
 };
+use chrono::NaiveDate;
 use quick_xml::{DeError, SeError};
 use serde::{Deserialize, Serialize};
 use sqlx::{SqliteConnection, SqlitePool};
@@ -18,7 +19,7 @@ use crate::{
         create_committee_session, status::CommitteeSessionStatus,
     },
     eml::{EML110, EML230, EMLDocument, EMLImportError, EmlHash, RedactedEmlHash},
-    infra::audit_log::{AuditEvent, AuditService},
+    infra::audit_log::{AsAuditEvent, AuditEvent, AuditEventType, AuditService, as_audit_event},
     repository::{
         committee_session_repo, election_repo, investigation_repo, polling_station_repo,
         user_repo::User,
@@ -56,6 +57,32 @@ pub struct ElectionDetailsResponse {
     pub polling_stations: Vec<PollingStation>,
     pub investigations: Vec<PollingStationInvestigation>,
 }
+
+#[derive(Serialize, Deserialize, Debug, PartialEq, Eq, ToSchema)]
+#[serde(deny_unknown_fields)]
+pub struct ElectionDetails {
+    pub election_id: ElectionId,
+    pub election_name: String,
+    pub election_counting_method: String,
+    pub election_election_id: String,
+    pub election_location: String,
+    pub election_domain_id: String,
+    pub election_category: String,
+    pub election_number_of_seats: u32,
+    pub election_number_of_voters: u32,
+    #[schema(value_type = String, format = "date")]
+    pub election_election_date: NaiveDate,
+    #[schema(value_type = String, format = "date")]
+    pub election_nomination_date: NaiveDate,
+}
+
+#[derive(Serialize)]
+struct ElectionCreated(pub ElectionDetails);
+as_audit_event!(ElectionCreated, AuditEventType::ElectionCreated);
+
+#[derive(Serialize)]
+struct ElectionUpdated(pub ElectionDetails);
+as_audit_event!(ElectionUpdated, AuditEventType::ElectionUpdated);
 
 /// Get a list of all elections, without their candidate lists and
 /// a list of the current committee session for each election
@@ -170,11 +197,7 @@ pub async fn election_number_of_voters_change(
                 .await?;
 
         audit_service
-            .log(
-                &mut tx,
-                &AuditEventType::ElectionUpdated(election.clone().into()),
-                None,
-            )
+            .log(&mut tx, &ElectionUpdated(election.clone().into()), None)
             .await?;
 
         tx.commit().await?;
@@ -348,7 +371,7 @@ async fn create_election(
     audit_service
         .log(
             conn,
-            &AuditEventType::ElectionCreated(election.clone().into()),
+            &ElectionCreated(election.clone().into()),
             Some(message),
         )
         .await?;

@@ -6,15 +6,21 @@ use axum::{
     response::Response,
 };
 use chrono::Utc;
+use serde::Serialize;
 use sqlx::SqlitePool;
 use tracing::{debug, error, info};
 
 use super::{SESSION_LIFE_TIME, SESSION_MIN_LIFE_TIME, session::get_expires_at};
 use crate::{
     SqlitePoolExt,
-    audit_log::{AuditEventType, AuditService},
-    authentication::{User, request_data::RequestSessionData, set_default_cookie_properties},
+    api::authentication::set_default_cookie_properties,
+    infra::audit_log::{AsAuditEvent, AuditEvent, AuditEventType, AuditService, as_audit_event},
+    repository::user_repo::{self, User},
 };
+
+#[derive(Serialize)]
+struct UserSessionExtended;
+as_audit_event!(UserSessionExtended, AuditEventType::UserSessionExtended);
 
 /// Inject user and session
 pub(crate) async fn inject_user(
@@ -86,7 +92,7 @@ pub(crate) async fn extend_session(
                 Ok(session) => {
                     let _ = audit_service
                         .with_user(user.clone())
-                        .log(&mut tx, &AuditEventType::UserSessionExtended, None)
+                        .log(&mut tx, &UserSessionExtended, None)
                         .await;
                     if let Err(err) = tx.commit().await {
                         error!("Failed to commit transaction: {:?}", err);

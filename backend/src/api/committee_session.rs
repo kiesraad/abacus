@@ -16,11 +16,18 @@ use super::{
 };
 use crate::{
     APIError, AppState, ErrorResponse, SqlitePoolExt,
-    audit_log::{AuditEventType, AuditService},
-    authentication::Coordinator,
-    election::ElectionId,
+    api::middleware::authentication::Coordinator,
+    domain::{
+        committee_session::{
+            CommitteeSession, CommitteeSessionCreateRequest, CommitteeSessionCreated,
+            CommitteeSessionDeleted, CommitteeSessionId, CommitteeSessionStatusChangeRequest,
+            CommitteeSessionUpdateRequest, CommitteeSessionUpdated, InvestigationListResponse,
+        },
+        committee_session_status::{CommitteeSessionStatus, change_committee_session_status},
+        election::ElectionId,
+    },
     error::ErrorReference,
-    infra::audit_log::{AuditEvent, AuditService},
+    infra::audit_log::AuditService,
     repository::{
         committee_session_repo::{create, delete, get, get_election_committee_session, update},
         election_repo,
@@ -63,7 +70,11 @@ pub async fn create_committee_session(
 ) -> Result<CommitteeSession, APIError> {
     let committee_session = create(conn, committee_session_create_request).await?;
     audit_service
-        .log(conn, CommitteeSessionCreated(&committee_session), None)
+        .log(
+            conn,
+            &CommitteeSessionCreated(committee_session.clone()),
+            None,
+        )
         .await?;
     Ok(committee_session)
 }
@@ -155,7 +166,11 @@ pub async fn committee_session_delete(
         delete(&mut tx, committee_session_id).await?;
 
         audit_service
-            .log(&mut tx, CommitteeSessionDeleted(&committee_session), None)
+            .log(
+                &mut tx,
+                &CommitteeSessionDeleted(committee_session.clone()),
+                None,
+            )
             .await?;
 
         tx.commit().await?;
@@ -225,7 +240,11 @@ pub async fn committee_session_update(
         update(&mut tx, committee_session_id, request.location, date_time).await?;
 
     audit_service
-        .log(&mut tx, CommitteeSessionUpdated(&committee_session), None)
+        .log(
+            &mut tx,
+            &CommitteeSessionUpdated(committee_session.clone()),
+            None,
+        )
         .await?;
 
     tx.commit().await?;

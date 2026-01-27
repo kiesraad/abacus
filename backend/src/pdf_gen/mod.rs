@@ -32,10 +32,12 @@ pub(crate) mod tests {
     use super::*;
     use crate::{
         api::committee_session::tests::committee_session_fixture,
-        domain::committee_session::CommitteeSessionId,
-        election::{
-            ElectionCategory, ElectionId, ElectionWithPoliticalGroups, VoteCountingMethod,
-            structs::tests::election_fixture,
+        domain::{
+            committee_session::CommitteeSessionId,
+            election::{
+                ElectionCategory, ElectionId, ElectionWithPoliticalGroups, VoteCountingMethod,
+                tests::election_fixture,
+            },
         },
         pdf_gen::{
             models::{PdfFileModel, PdfModel, ToPdfFileModel},

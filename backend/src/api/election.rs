@@ -9,16 +9,16 @@ use sqlx::{SqliteConnection, SqlitePool};
 use utoipa::ToSchema;
 use utoipa_axum::{router::OpenApiRouter, routes};
 
-use super::{
-    ElectionId, ElectionNumberOfVotersChangeRequest, NewElection, VoteCountingMethod,
-    structs::{Election, ElectionWithPoliticalGroups},
-};
 use crate::{
     APIError, AppState, ErrorResponse, SqlitePoolExt,
     api::committee_session::{CommitteeSessionError, create_committee_session},
     domain::{
         committee_session::{CommitteeSession, CommitteeSessionCreateRequest},
         committee_session_status::CommitteeSessionStatus,
+        election::{
+            Election, ElectionId, ElectionNumberOfVotersChangeRequest, ElectionWithPoliticalGroups,
+            NewElection, VoteCountingMethod,
+        },
     },
     eml::{EML110, EML230, EMLDocument, EMLImportError, EmlHash, RedactedEmlHash},
     infra::{
@@ -31,7 +31,7 @@ use crate::{
         PollingStation, PollingStationRequest, PollingStationsRequest,
         create_imported_polling_stations,
     },
-    repository::committee_session_repo,
+    repository::{committee_session_repo, election_repo},
 };
 
 pub fn router() -> OpenApiRouter<AppState> {
@@ -83,7 +83,7 @@ pub async fn election_list(
     State(pool): State<SqlitePool>,
 ) -> Result<Json<ElectionListResponse>, APIError> {
     let mut conn = pool.acquire().await?;
-    let elections = crate::election::repository::list(&mut conn).await?;
+    let elections = election_repo::list(&mut conn).await?;
     let committee_sessions =
         committee_session_repo::get_committee_session_for_each_election(&mut conn).await?;
     Ok(Json(ElectionListResponse {
@@ -114,7 +114,7 @@ pub async fn election_details(
     Path(election_id): Path<ElectionId>,
 ) -> Result<Json<ElectionDetailsResponse>, APIError> {
     let mut conn = pool.acquire().await?;
-    let election = crate::election::repository::get(&mut conn, election_id).await?;
+    let election = election_repo::get(&mut conn, election_id).await?;
     let committee_sessions =
         committee_session_repo::get_election_committee_session_list(&mut conn, election_id).await?;
     let current_committee_session = committee_sessions
@@ -164,7 +164,7 @@ pub async fn election_number_of_voters_change(
 ) -> Result<StatusCode, APIError> {
     let mut tx = pool.begin_immediate().await?;
 
-    crate::election::repository::get(&mut tx, election_id).await?;
+    election_repo::get(&mut tx, election_id).await?;
     let current_committee_session =
         committee_session_repo::get_election_committee_session(&mut tx, election_id).await?;
 
@@ -173,12 +173,9 @@ pub async fn election_number_of_voters_change(
         && (current_committee_session.status == CommitteeSessionStatus::Created
             || current_committee_session.status == CommitteeSessionStatus::InPreparation)
     {
-        let election = crate::election::repository::change_number_of_voters(
-            &mut tx,
-            election_id,
-            request.number_of_voters,
-        )
-        .await?;
+        let election =
+            election_repo::change_number_of_voters(&mut tx, election_id, request.number_of_voters)
+                .await?;
 
         audit_service
             .log(
@@ -350,7 +347,7 @@ async fn create_election(
     election_data_hash: [String; 16],
     candidate_data_hash: [String; 16],
 ) -> Result<ElectionWithPoliticalGroups, APIError> {
-    let election = crate::election::repository::create(conn, new_election).await?;
+    let election = election_repo::create(conn, new_election).await?;
     let message = format!(
         "Election file hash: {}, candidates file hash: {}",
         election_data_hash.join(" "),

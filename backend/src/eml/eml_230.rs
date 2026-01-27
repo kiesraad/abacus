@@ -8,8 +8,8 @@ use super::{
         ElectionCategory, ElectionDomain, ElectionIdentifier, ManagingAuthority,
     },
 };
-use crate::election::{
-    CandidateNumber, ElectionWithPoliticalGroups, NewElection, PGNumber, PoliticalGroup,
+use crate::domain::election::{
+    self, CandidateNumber, ElectionWithPoliticalGroups, NewElection, PGNumber, PoliticalGroup,
 };
 
 /// Candidate list (230b)
@@ -120,32 +120,24 @@ impl EML230 {
                 let political_group = PoliticalGroup {
                     number: pg_number,
                     name: aff.affiliation_identifier.registered_name.clone(),
-                    candidates:
-                        aff.candidates
-                            .iter()
-                            .map(|can| {
-                                let candidate =
-                                    crate::election::structs::Candidate::try_from(
-                                        can.clone(),
-                                    )?;
+                    candidates: aff
+                        .candidates
+                        .iter()
+                        .map(|can| {
+                            let candidate = election::Candidate::try_from(can.clone())?;
 
-                                if candidate.number <= previous_can_number {
-                                    return Err(
-                                        EMLImportError::CandidateNumbersNotIncreasing {
-                                            political_group_number: pg_number,
-                                            expected_larger_than: previous_can_number,
-                                            found: candidate.number,
-                                        },
-                                    );
-                                }
+                            if candidate.number <= previous_can_number {
+                                return Err(EMLImportError::CandidateNumbersNotIncreasing {
+                                    political_group_number: pg_number,
+                                    expected_larger_than: previous_can_number,
+                                    found: candidate.number,
+                                });
+                            }
 
-                                previous_can_number = candidate.number;
-                                Ok(candidate)
-                            })
-                            .collect::<Result<
-                                Vec<crate::election::structs::Candidate>,
-                                EMLImportError,
-                            >>()?,
+                            previous_can_number = candidate.number;
+                            Ok(candidate)
+                        })
+                        .collect::<Result<Vec<election::Candidate>, EMLImportError>>()?,
                 };
 
                 previous_pg_number = pg_number;
@@ -281,10 +273,8 @@ pub struct ListData {
 mod tests {
     use quick_xml::DeError;
 
-    use crate::{
-        election::{CandidateNumber, PGNumber},
-        eml::{EML110, EML230, EMLDocument, EMLImportError},
-    };
+    use super::*;
+    use crate::eml::EML110;
 
     #[test]
     fn test_deserialize_eml230b() {

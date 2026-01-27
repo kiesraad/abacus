@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 
-use crate::election::{CandidateGender, CandidateNumber, PGNumber, structs};
+use crate::domain::election::{self, CandidateGender, CandidateNumber, PGNumber};
 
 /// Managing authority for the EML document
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -67,10 +67,10 @@ pub enum ElectionCategory {
     IR,
 }
 
-impl From<crate::election::ElectionCategory> for ElectionCategory {
-    fn from(value: crate::election::ElectionCategory) -> Self {
+impl From<election::ElectionCategory> for ElectionCategory {
+    fn from(value: election::ElectionCategory) -> Self {
         match value {
-            crate::election::ElectionCategory::Municipal => ElectionCategory::GR,
+            election::ElectionCategory::Municipal => ElectionCategory::GR,
         }
     }
 }
@@ -144,7 +144,7 @@ pub struct ElectionIdentifier {
 
 impl ElectionIdentifier {
     pub fn from_election(
-        election: &structs::ElectionWithPoliticalGroups,
+        election: &election::ElectionWithPoliticalGroups,
         include_nomination_date: bool,
     ) -> Self {
         let subcategory = if election.number_of_seats >= 19 {
@@ -255,8 +255,8 @@ pub struct Candidate {
     pub qualifying_address: Option<QualifyingAddress>,
 }
 
-impl From<structs::Candidate> for Candidate {
-    fn from(candidate: structs::Candidate) -> Self {
+impl From<election::Candidate> for Candidate {
+    fn from(candidate: election::Candidate) -> Self {
         Candidate {
             candidate_identifier: CandidateIdentifier {
                 id: candidate.number.to_string(),
@@ -299,11 +299,11 @@ impl From<structs::Candidate> for Candidate {
     }
 }
 
-impl TryFrom<Candidate> for structs::Candidate {
+impl TryFrom<Candidate> for election::Candidate {
     type Error = EMLImportError;
 
     fn try_from(parsed: Candidate) -> Result<Self, Self::Error> {
-        Ok(structs::Candidate {
+        Ok(election::Candidate {
             number: parsed
                 .candidate_identifier
                 .id

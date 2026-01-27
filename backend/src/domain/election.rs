@@ -222,7 +222,6 @@ pub(crate) mod tests {
     use chrono::NaiveDate;
 
     use super::*;
-    use crate::election::{Candidate, CandidateGender::X, ElectionCategory, PoliticalGroup};
 
     /// Create a test election with some political groups and a given number of seats.
     /// The number of political groups is the length of the `political_groups_candidates` slice.
@@ -246,7 +245,7 @@ pub(crate) mod tests {
                         last_name: format!("PG {}", i + 1),
                         locality: "Juinen".to_string(),
                         country_code: Some("NL".to_string()),
-                        gender: Some(X),
+                        gender: Some(CandidateGender::X),
                     })
                     .collect(),
             })

@@ -26,8 +26,8 @@ use crate::{
         committee_session::CommitteeSession,
         committee_session_status::{CommitteeSessionStatus, change_committee_session_status},
         data_entry::PollingStationResults,
+        election::ElectionWithPoliticalGroups,
     },
-    election::ElectionWithPoliticalGroups,
     error::ErrorReference,
     infra::{
         audit_log::{AuditEvent, AuditService},
@@ -41,6 +41,7 @@ use crate::{
     repository::{
         committee_session_repo::get_election_committee_session,
         data_entry_repo::{data_entry_exists, previous_results_for_polling_station, result_exists},
+        election_repo,
     },
 };
 
@@ -456,7 +457,7 @@ async fn polling_station_investigation_download_corrigendum_pdf(
     let polling_station: PollingStation =
         polling_station::get(&mut conn, polling_station_id).await?;
     let election: ElectionWithPoliticalGroups =
-        crate::election::repository::get(&mut conn, polling_station.election_id).await?;
+        election_repo::get(&mut conn, polling_station.election_id).await?;
 
     let previous_results = match polling_station.id_prev_session {
         Some(_) => {

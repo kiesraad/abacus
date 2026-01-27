@@ -18,10 +18,10 @@ use crate::{
             PoliticalGroupCandidateVotes, PoliticalGroupTotalVotes, VotersCounts, VotesCounts,
             YesNo,
         },
-    },
-    election::{
-        Candidate, CandidateGender, CandidateNumber, ElectionCategory, ElectionId,
-        ElectionWithPoliticalGroups, PGNumber, PoliticalGroup, VoteCountingMethod,
+        election::{
+            Candidate, CandidateGender, CandidateNumber, ElectionCategory, ElectionId,
+            ElectionWithPoliticalGroups, PGNumber, PoliticalGroup, VoteCountingMethod,
+        },
     },
     files::FileId,
     investigation::PollingStationInvestigation,

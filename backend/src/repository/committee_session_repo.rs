@@ -8,8 +8,8 @@ use crate::{
             CommitteeSessionId,
         },
         committee_session_status::CommitteeSessionStatus,
+        election::ElectionId,
     },
-    election::ElectionId,
     polling_station::duplicate_for_committee_session,
 };
 

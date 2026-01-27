@@ -20,6 +20,7 @@ use crate::{
             CSONextSessionResults, CommonPollingStationResults, DataEntryStatusResponse,
             PollingStationDataEntry, PollingStationResults,
         },
+        election::{ElectionId, ElectionWithPoliticalGroups, PoliticalGroup},
         entry_number::EntryNumber,
         status::{
             ClientState, CurrentDataEntry, DataEntryStatus, DataEntryStatusName,
@@ -27,7 +28,6 @@ use crate::{
         },
         validation::{DataError, ValidateRoot, ValidationResults},
     },
-    election::{ElectionId, ElectionWithPoliticalGroups, PoliticalGroup},
     error::{ErrorReference, ErrorResponse},
     infra::{
         audit_log::{AuditEvent, AuditService},
@@ -41,6 +41,7 @@ use crate::{
             delete_data_entry, delete_result, get_data_entry, get_result,
             previous_results_for_polling_station,
         },
+        election_repo,
         user_repo::UserId,
     },
 };
@@ -110,7 +111,7 @@ async fn validate_and_get_data(
     let polling_station = polling_station::get(conn, polling_station_id).await?;
     let committee_session =
         committee_session_repo::get(conn, polling_station.committee_session_id).await?;
-    let election = crate::election::repository::get(conn, committee_session.election_id).await?;
+    let election = election_repo::get(conn, committee_session.election_id).await?;
 
     let data_entry_status =
         data_entry_repo::get_or_default(conn, polling_station_id, committee_session.id).await?;

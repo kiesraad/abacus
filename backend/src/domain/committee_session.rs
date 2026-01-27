@@ -8,8 +8,11 @@ use sqlx::{FromRow, Type};
 use utoipa::ToSchema;
 
 use crate::{
-    domain::committee_session_status::CommitteeSessionStatus, election::ElectionId, files::FileId,
-    infra::audit_log, investigation::PollingStationInvestigation, util::id,
+    domain::{committee_session_status::CommitteeSessionStatus, election::ElectionId},
+    files::FileId,
+    infra::audit_log,
+    investigation::PollingStationInvestigation,
+    util::id,
 };
 
 id!(CommitteeSessionId);

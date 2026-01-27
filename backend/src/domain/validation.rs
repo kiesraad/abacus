@@ -11,9 +11,9 @@ use crate::{
             DifferencesCounts, ExtraInvestigation, PoliticalGroupCandidateVotes,
             PoliticalGroupTotalVotes, PollingStationResults, VotersCounts, VotesCounts,
         },
+        election::{CandidateNumber, ElectionWithPoliticalGroups, PGNumber},
         status::{DataEntryStatus, FirstEntryFinalised, FirstEntryHasErrors, FirstEntryInProgress},
     },
-    election::{CandidateNumber, ElectionWithPoliticalGroups, PGNumber},
     polling_station::PollingStation,
 };
 
@@ -1125,8 +1125,10 @@ mod tests {
 
     use super::*;
     use crate::{
-        domain::data_entry::{YesNo, tests::ValidDefault},
-        election::structs::tests::election_fixture,
+        domain::{
+            data_entry::{YesNo, tests::ValidDefault},
+            election::tests::election_fixture,
+        },
         polling_station::polling_station_fixture,
     };
 

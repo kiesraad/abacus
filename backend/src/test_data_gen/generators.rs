@@ -16,17 +16,17 @@ use crate::{
             PoliticalGroupCandidateVotes, PoliticalGroupTotalVotes, PollingStationResults,
             VotersCounts, VotesCounts, YesNo,
         },
+        election::{
+            self, CandidateGender, CandidateNumber, ElectionCategory, ElectionWithPoliticalGroups,
+            NewElection, PGNumber, PoliticalGroup, VoteCountingMethod,
+        },
         status::{DataEntryStatus, Definitive, FirstEntryFinalised},
         validation::{FieldPath, Validate, ValidationResults},
-    },
-    election::{
-        self, CandidateGender, CandidateNumber, ElectionCategory, ElectionWithPoliticalGroups,
-        NewElection, PGNumber, PoliticalGroup, VoteCountingMethod,
     },
     polling_station::{self, PollingStation, PollingStationRequest, PollingStationType},
     repository::{
         committee_session_repo, data_entry_repo,
-        data_entry_repo::list_results_for_committee_session, user_repo::UserId,
+        data_entry_repo::list_results_for_committee_session, election_repo, user_repo::UserId,
     },
     test_data_gen::GenerateElectionArgs,
 };
@@ -76,8 +76,7 @@ pub async fn create_test_election(
     let mut tx = pool.begin_immediate().await?;
 
     // generate and store the election
-    let election =
-        election::repository::create(&mut tx, generate_election(&mut rng, &args)).await?;
+    let election = election_repo::create(&mut tx, generate_election(&mut rng, &args)).await?;
 
     // generate the committee session for the election
     let mut committee_session = committee_session_repo::create(
@@ -593,7 +592,7 @@ fn distribute_power_law(
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::{election::repository as election_repo, test_data_gen::RandomRange};
+    use crate::{repository::election_repo, test_data_gen::RandomRange};
 
     #[sqlx::test]
     async fn test_create_test_election(pool: SqlitePool) {

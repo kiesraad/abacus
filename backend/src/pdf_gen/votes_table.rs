@@ -4,8 +4,12 @@ use serde::{Deserialize, Serialize};
 
 use crate::{
     APIError,
-    domain::data_entry::{CommonPollingStationResults, Count, PoliticalGroupCandidateVotes},
-    election::{Candidate, CandidateNumber, ElectionWithPoliticalGroups, PGNumber, PoliticalGroup},
+    domain::{
+        data_entry::{CommonPollingStationResults, Count, PoliticalGroupCandidateVotes},
+        election::{
+            Candidate, CandidateNumber, ElectionWithPoliticalGroups, PGNumber, PoliticalGroup,
+        },
+    },
     summary::ElectionSummary,
 };
 
@@ -306,9 +310,9 @@ mod tests {
     use test_log::test;
 
     use super::*;
-    use crate::{
-        domain::data_entry,
-        election::{ElectionCategory, ElectionId, ElectionWithPoliticalGroups, VoteCountingMethod},
+    use crate::domain::{
+        data_entry,
+        election::{ElectionCategory, ElectionId, VoteCountingMethod},
     };
 
     fn sample_candidate(number: CandidateNumber) -> Candidate {

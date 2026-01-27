@@ -10,9 +10,9 @@ use crate::{
     APIError,
     domain::{
         committee_session::CommitteeSessionId,
+        election::{CandidateNumber, PGNumber, PoliticalGroup},
         status::{DataEntryStatus, DataEntryStatusName},
     },
-    election::{CandidateNumber, PGNumber, PoliticalGroup},
     error::ErrorReference,
     infra::audit_log::{DataEntryDetails, ResultDetails},
     polling_station::PollingStationId,
@@ -900,7 +900,7 @@ pub mod tests {
         use test_log::test;
 
         use super::*;
-        use crate::{APIError, election::PGNumber, error::ErrorReference};
+        use crate::{APIError, error::ErrorReference};
 
         #[test]
         fn test_votes_addition() {

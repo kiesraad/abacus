@@ -5,8 +5,10 @@ use std::{
 
 use abacus::{
     AppError, create_sqlite_pool,
-    domain::{committee_session::CommitteeSession, data_entry::PollingStationResults},
-    election::ElectionWithPoliticalGroups,
+    domain::{
+        committee_session::CommitteeSession, data_entry::PollingStationResults,
+        election::ElectionWithPoliticalGroups,
+    },
     eml::{EML110, EML230, EMLDocument},
     pdf_gen::{
         VotesTables,

@@ -1,7 +1,6 @@
 use sqlx::{SqliteConnection, query_as, types::Json};
 
-use super::{Election, ElectionWithPoliticalGroups, NewElection};
-use crate::election::ElectionId;
+use crate::domain::election::{Election, ElectionId, ElectionWithPoliticalGroups, NewElection};
 
 pub async fn list(conn: &mut SqliteConnection) -> Result<Vec<Election>, sqlx::Error> {
     let elections: Vec<Election> = query_as(

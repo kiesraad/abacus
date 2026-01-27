@@ -8,9 +8,9 @@ use utoipa::ToSchema;
 use crate::{
     domain::{
         data_entry::PollingStationResults,
+        election::ElectionWithPoliticalGroups,
         validation::{DataError, ValidateRoot, ValidationResults},
     },
-    election::ElectionWithPoliticalGroups,
     polling_station::PollingStation,
     repository::user_repo::UserId,
 };
@@ -723,10 +723,10 @@ mod tests {
                 PoliticalGroupTotalVotes, VotersCounts, VotesCounts,
                 tests::{ValidDefault, example_polling_station_results},
             },
-        },
-        election::{
-            Candidate, CandidateNumber, ElectionCategory, ElectionId, ElectionWithPoliticalGroups,
-            PGNumber, PoliticalGroup, VoteCountingMethod,
+            election::{
+                Candidate, CandidateNumber, ElectionCategory, ElectionId, PGNumber, PoliticalGroup,
+                VoteCountingMethod,
+            },
         },
         polling_station::{PollingStation, PollingStationId, PollingStationType},
     };

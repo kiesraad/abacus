@@ -9,7 +9,7 @@ use super::{
     },
 };
 use crate::{
-    election::{PGNumber, PoliticalGroup, VoteCountingMethod},
+    domain::election::{self, PGNumber, PoliticalGroup, VoteCountingMethod},
     eml::common::{AuthorityAddress, AuthorityIdentifier},
     polling_station::PollingStationRequest,
 };
@@ -52,7 +52,7 @@ impl EML110 {
     }
 
     #[allow(clippy::too_many_lines)]
-    pub fn as_abacus_election(&self) -> Result<crate::election::NewElection, EMLImportError> {
+    pub fn as_abacus_election(&self) -> Result<election::NewElection, EMLImportError> {
         // we need to be importing from a 110a file
         if self.base.id != "110a" {
             return Err(EMLImportError::Needs110a);
@@ -152,13 +152,13 @@ impl EML110 {
             .collect::<Result<Vec<PoliticalGroup>, EMLImportError>>()?;
 
         // construct the election
-        let election = crate::election::NewElection {
+        let election = election::NewElection {
             name: self.election_identifier().election_name.clone(),
             counting_method: VoteCountingMethod::CSO,
             election_id: self.election_identifier().id.clone(),
             location: election_domain.name.clone(),
             domain_id: election_domain.id.clone(),
-            category: crate::election::ElectionCategory::Municipal,
+            category: election::ElectionCategory::Municipal,
             number_of_seats,
             number_of_voters: 0,
             election_date,
@@ -224,7 +224,7 @@ impl EML110 {
     ///
     pub fn polling_station_definition_matches_election(
         &self,
-        election: &crate::election::NewElection,
+        election: &election::NewElection,
     ) -> std::result::Result<bool, EMLImportError> {
         // we need to be importing from a 110b file
         if self.base.id != "110b" {
@@ -235,7 +235,7 @@ impl EML110 {
     }
 
     pub fn definition_from_abacus_election(
-        election: &crate::election::ElectionWithPoliticalGroups,
+        election: &election::ElectionWithPoliticalGroups,
         transaction_id: &str,
     ) -> Self {
         let now = chrono::Utc::now();
@@ -280,7 +280,7 @@ impl EML110 {
     }
 
     pub fn polling_stations_from_election(
-        election: &crate::election::ElectionWithPoliticalGroups,
+        election: &election::ElectionWithPoliticalGroups,
         polling_stations: &[crate::polling_station::PollingStation],
         transaction_id: &str,
     ) -> Self {

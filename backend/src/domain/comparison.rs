@@ -315,7 +315,7 @@ mod tests {
     use test_log::test;
 
     use super::*;
-    use crate::election::PGNumber;
+    use crate::domain::election::PGNumber;
 
     /// Tests that polling station results with equal data and no differences counts are correctly identified as equal.
     #[test]

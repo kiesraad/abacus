@@ -9,9 +9,9 @@ use crate::{
             PoliticalGroupCandidateVotes, PoliticalGroupTotalVotes, PollingStationResults,
             VotersCounts, VotesCounts,
         },
+        election::ElectionWithPoliticalGroups,
         validation::{Validate, ValidationResults},
     },
-    election::ElectionWithPoliticalGroups,
     error::ErrorReference,
     polling_station::{PollingStation, PollingStationNumber},
 };
@@ -300,8 +300,10 @@ mod tests {
     use super::*;
     use crate::{
         api::committee_session::tests::committee_session_fixture,
-        domain::data_entry::{ExtraInvestigation, YesNo, tests::ValidDefault},
-        election::{PGNumber, structs::tests::election_fixture},
+        domain::{
+            data_entry::{ExtraInvestigation, YesNo, tests::ValidDefault},
+            election::{PGNumber, tests::election_fixture},
+        },
         pdf_gen::tests::polling_stations_fixture,
     };
 

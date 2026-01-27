@@ -8,8 +8,10 @@ use sqlx::{FromRow, Type};
 use utoipa::ToSchema;
 
 use crate::{
-    APIError, domain::committee_session::CommitteeSessionId, election::ElectionId,
-    infra::audit_log::PollingStationDetails, util::id,
+    APIError,
+    domain::{committee_session::CommitteeSessionId, election::ElectionId},
+    infra::audit_log::PollingStationDetails,
+    util::id,
 };
 
 pub type PollingStationNumber = u32;
@@ -139,7 +141,7 @@ pub(crate) mod tests {
     use super::*;
     use crate::{
         api::committee_session::tests::committee_session_fixture,
-        election::structs::tests::election_fixture,
+        domain::election::tests::election_fixture,
     };
 
     /// Create a test polling station.

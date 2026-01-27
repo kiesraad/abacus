@@ -16,16 +16,17 @@ use crate::{
             InvestigationListResponse,
         },
         committee_session_status::{CommitteeSessionStatus, change_committee_session_status},
+        election::ElectionId,
     },
-    election::ElectionId,
     error::ErrorReference,
     infra::{
         audit_log::{AuditEvent, AuditService},
         authentication::Coordinator,
     },
     investigation::list_investigations_for_committee_session,
-    repository::committee_session_repo::{
-        create, delete, get, get_election_committee_session, update,
+    repository::{
+        committee_session_repo::{create, delete, get, get_election_committee_session, update},
+        election_repo,
     },
 };
 
@@ -331,7 +332,7 @@ pub async fn committee_session_investigations(
     let mut conn = pool.acquire().await?;
 
     // Check if the election exists, will respond with NOT_FOUND otherwise
-    crate::election::repository::get(&mut conn, election_id).await?;
+    election_repo::get(&mut conn, election_id).await?;
 
     let committee_session = get(&mut conn, committee_session_id).await?;
 

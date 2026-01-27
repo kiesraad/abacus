@@ -10,7 +10,7 @@ use utoipa_axum::{router::OpenApiRouter, routes};
 
 use crate::{
     APIError, AppState, ErrorResponse,
-    election::ElectionId,
+    domain::election::ElectionId,
     error::ErrorReference,
     infra::authentication::AdminOrCoordinator,
     pdf_gen::{
@@ -20,7 +20,7 @@ use crate::{
         },
     },
     polling_station,
-    repository::committee_session_repo,
+    repository::{committee_session_repo, election_repo},
     zip::ZipResponse,
 };
 
@@ -60,7 +60,7 @@ async fn election_download_n_10_2(
     Path(election_id): Path<ElectionId>,
 ) -> Result<impl IntoResponse, APIError> {
     let mut conn = pool.acquire().await?;
-    let election = crate::election::repository::get(&mut conn, election_id).await?;
+    let election = election_repo::get(&mut conn, election_id).await?;
     let current_committee_session =
         committee_session_repo::get_election_committee_session(&mut conn, election.id).await?;
     let polling_stations = polling_station::list(&mut conn, current_committee_session.id).await?;
@@ -138,7 +138,7 @@ async fn election_download_na_31_2_bijlage1(
     Path(election_id): Path<ElectionId>,
 ) -> Result<impl IntoResponse, APIError> {
     let mut conn = pool.acquire().await?;
-    let election = crate::election::repository::get(&mut conn, election_id).await?;
+    let election = election_repo::get(&mut conn, election_id).await?;
     let current_committee_session =
         committee_session_repo::get_election_committee_session(&mut conn, election.id).await?;
     let polling_stations = polling_station::list(&mut conn, current_committee_session.id).await?;
@@ -217,7 +217,7 @@ async fn election_download_na_31_2_inlegvel(
     Path(election_id): Path<ElectionId>,
 ) -> Result<impl IntoResponse, APIError> {
     let mut conn = pool.acquire().await?;
-    let election = crate::election::repository::get(&mut conn, election_id).await?;
+    let election = election_repo::get(&mut conn, election_id).await?;
     drop(conn);
 
     let name = "Model_Na_31_2_Inlegvel.pdf".to_string();

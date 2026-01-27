@@ -17,8 +17,8 @@ use crate::{
         },
         committee_session_status::CommitteeSessionStatus,
         data_entry::PollingStationResults,
+        election::{ElectionId, ElectionWithPoliticalGroups},
     },
-    election::{self, ElectionId, ElectionWithPoliticalGroups},
     eml::{EML510, EMLDocument, EmlHash},
     error::ErrorReference,
     files::{self, File, create_file},
@@ -35,6 +35,7 @@ use crate::{
         data_entry_repo::{
             are_results_complete_for_committee_session, list_results_for_committee_session,
         },
+        election_repo,
     },
     summary::ElectionSummary,
     zip::{ZipResponse, ZipResponseError, slugify_filename, zip_single_file},
@@ -69,7 +70,7 @@ impl ResultsInput {
         created_at: DateTime<Local>,
     ) -> Result<ResultsInput, APIError> {
         let committee_session = committee_session_repo::get(conn, committee_session_id).await?;
-        let election = election::repository::get(conn, committee_session.election_id).await?;
+        let election = election_repo::get(conn, committee_session.election_id).await?;
         let polling_stations = polling_station::list(conn, committee_session.id).await?;
         let results = list_results_for_committee_session(conn, committee_session.id).await?;
 
@@ -491,7 +492,7 @@ async fn election_download_zip_results(
     Path((election_id, committee_session_id)): Path<(ElectionId, CommitteeSessionId)>,
 ) -> Result<impl IntoResponse, APIError> {
     let mut conn = pool.acquire().await?;
-    let election = election::repository::get(&mut conn, election_id).await?;
+    let election = election_repo::get(&mut conn, election_id).await?;
     let committee_session = committee_session_repo::get(&mut conn, committee_session_id).await?;
     let (eml_file, pdf_file, overview_file, created_at) =
         get_files(&pool, audit_service, committee_session.id).await?;

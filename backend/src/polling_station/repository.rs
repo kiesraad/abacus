@@ -2,8 +2,9 @@ use sqlx::{Connection, SqliteConnection, query, query_as};
 
 use super::structs::{PollingStation, PollingStationRequest};
 use crate::{
-    domain::committee_session::CommitteeSessionId, election::ElectionId,
-    polling_station::PollingStationId, repository::committee_session_repo,
+    domain::{committee_session::CommitteeSessionId, election::ElectionId},
+    polling_station::PollingStationId,
+    repository::committee_session_repo,
 };
 
 /// List all polling stations from a committee session

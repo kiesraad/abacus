@@ -4,5 +4,6 @@ pub mod comparison;
 pub mod data_entry;
 pub mod election;
 pub mod entry_number;
+pub mod file;
 pub mod status;
 pub mod validation;

@@ -18,10 +18,10 @@ use crate::{
         committee_session_status::CommitteeSessionStatus,
         data_entry::PollingStationResults,
         election::{ElectionId, ElectionWithPoliticalGroups},
+        file::{File, create_file},
     },
     eml::{EML510, EMLDocument, EmlHash},
     error::ErrorReference,
-    files::{self, File, create_file},
     infra::{audit_log::AuditService, authentication::Coordinator},
     investigation::{PollingStationInvestigation, list_investigations_for_committee_session},
     pdf_gen::{
@@ -35,7 +35,7 @@ use crate::{
         data_entry_repo::{
             are_results_complete_for_committee_session, list_results_for_committee_session,
         },
-        election_repo,
+        election_repo, file_repo,
     },
     summary::ElectionSummary,
     zip::{ZipResponse, ZipResponseError, slugify_filename, zip_single_file},
@@ -380,17 +380,17 @@ async fn get_existing_files(
     let mut pdf_file: Option<File> = None;
     let mut overview_pdf_file: Option<File> = None;
     if let Some(eml_id) = committee_session.results_eml {
-        let file = files::repository::get(conn, eml_id).await?;
+        let file = file_repo::get(conn, eml_id).await?;
         created_at = file.created_at;
         eml_file = Some(file);
     }
     if let Some(pdf_id) = committee_session.results_pdf {
-        let file = files::repository::get(conn, pdf_id).await?;
+        let file = file_repo::get(conn, pdf_id).await?;
         created_at = file.created_at;
         pdf_file = Some(file);
     }
     if let Some(overview_pdf_id) = committee_session.overview_pdf {
-        let file = files::repository::get(conn, overview_pdf_id).await?;
+        let file = file_repo::get(conn, overview_pdf_id).await?;
         created_at = file.created_at;
         overview_pdf_file = Some(file);
     }
@@ -579,7 +579,7 @@ mod tests {
     use test_log::test;
 
     use super::*;
-    use crate::{files::FileId, infra::audit_log::list_event_names};
+    use crate::{domain::file::FileId, infra::audit_log::list_event_names};
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_5_with_results"))))]
     async fn test_get_files_first_session(pool: SqlitePool) {

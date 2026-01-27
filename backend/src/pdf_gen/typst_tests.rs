@@ -22,8 +22,8 @@ use crate::{
             Candidate, CandidateGender, CandidateNumber, ElectionCategory, ElectionId,
             ElectionWithPoliticalGroups, PGNumber, PoliticalGroup, VoteCountingMethod,
         },
+        file::FileId,
     },
-    files::FileId,
     investigation::PollingStationInvestigation,
     pdf_gen::{
         generate_pdf,

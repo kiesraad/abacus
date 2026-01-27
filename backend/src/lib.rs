@@ -14,7 +14,6 @@ pub mod app_error;
 pub mod domain;
 pub mod eml;
 mod error;
-pub mod files;
 #[cfg(feature = "dev-database")]
 pub mod fixtures;
 pub mod infra;

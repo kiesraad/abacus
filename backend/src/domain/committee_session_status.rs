@@ -6,10 +6,12 @@ use utoipa::ToSchema;
 use crate::{
     APIError,
     api::committee_session::CommitteeSessionError,
-    domain::committee_session::{
-        CommitteeSession, CommitteeSessionFilesUpdateRequest, CommitteeSessionId,
+    domain::{
+        committee_session::{
+            CommitteeSession, CommitteeSessionFilesUpdateRequest, CommitteeSessionId,
+        },
+        file::{FileId, delete_file},
     },
-    files::{FileId, delete_file},
     infra::audit_log::{AuditEvent, AuditService},
     investigation::list_investigations_for_committee_session,
     polling_station,
@@ -259,12 +261,13 @@ mod tests {
         use super::*;
         use crate::{
             APIError,
-            files::{self, FileId},
+            domain::file::FileId,
             infra::audit_log::{AuditService, list_event_names},
+            repository::file_repo,
         };
 
         async fn generate_test_file(conn: &mut SqliteConnection) -> Result<FileId, APIError> {
-            let file = files::repository::create(
+            let file = file_repo::create(
                 conn,
                 "filename.txt".into(),
                 &[97, 98, 97, 99, 117, 115, 0],

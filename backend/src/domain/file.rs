@@ -1,5 +1,3 @@
-pub mod repository;
-
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use sqlx::{FromRow, SqliteConnection, Type};
@@ -8,6 +6,7 @@ use utoipa::ToSchema;
 use crate::{
     APIError,
     infra::audit_log::{AuditEvent, AuditService, FileDetails},
+    repository::file_repo,
     util::id,
 };
 
@@ -45,7 +44,7 @@ pub async fn create_file(
     mime_type: String,
     created_at: DateTime<Utc>,
 ) -> Result<File, APIError> {
-    let file = repository::create(conn, filename, data, mime_type, created_at).await?;
+    let file = file_repo::create(conn, filename, data, mime_type, created_at).await?;
 
     audit_service
         .log(conn, &AuditEvent::FileCreated(file.clone().into()), None)
@@ -58,7 +57,7 @@ pub async fn delete_file(
     audit_service: &AuditService,
     id: FileId,
 ) -> Result<(), APIError> {
-    if let Some(file) = repository::delete(conn, id).await? {
+    if let Some(file) = file_repo::delete(conn, id).await? {
         audit_service
             .log(conn, &AuditEvent::FileDeleted(file.into()), None)
             .await?;

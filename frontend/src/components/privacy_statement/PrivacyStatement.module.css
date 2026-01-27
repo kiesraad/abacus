@@ -12,7 +12,7 @@
     margin-top: var(--space-xl);
   }
 
-  p {
+  p:not(:last-of-type) {
     margin-bottom: var(--space-md);
   }
 }

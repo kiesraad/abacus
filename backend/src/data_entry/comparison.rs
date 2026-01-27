@@ -311,9 +311,8 @@ impl Compare for CandidateVotes {
 mod tests {
     use test_log::test;
 
-    use crate::election::PGNumber;
-
     use super::*;
+    use crate::election::PGNumber;
 
     /// Tests that polling station results with equal data and no differences counts are correctly identified as equal.
     #[test]

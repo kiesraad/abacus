@@ -2617,8 +2617,9 @@ mod tests {
     }
 
     mod polling_station_data_entry_get {
-        use super::*;
         use test_log::test;
+
+        use super::*;
 
         async fn call_polling_station_data_entry_get(
             pool: SqlitePool,

@@ -1,4 +1,5 @@
 use std::sync::OnceLock;
+
 use ttf_parser::Face;
 
 const TOFU: char = '\u{fffd}';

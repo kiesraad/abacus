@@ -7,7 +7,6 @@ pub(crate) use self::{
     repository::{get_polling_station_investigation, list_investigations_for_committee_session},
     structs::PollingStationInvestigation,
 };
-
 #[cfg(test)]
 pub(crate) use self::{
     repository::{

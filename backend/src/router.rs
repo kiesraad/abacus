@@ -293,19 +293,19 @@ pub fn create_router_without_airgap_detection(pool: SqlitePool) -> Result<Router
 
 #[cfg(test)]
 mod tests {
+    use std::panic;
+
     use chrono::TimeDelta;
     use hyper::{Method, header::COOKIE};
     use sqlx::SqliteConnection;
-    use std::panic;
     use test_log::test;
 
+    use super::*;
     use crate::{
         SqlitePoolExt,
         authentication::{Role, session, user::UserId},
         test::run_server_test,
     };
-
-    use super::*;
 
     async fn get_user_cookie(conn: &mut SqliteConnection, user_id: UserId) -> String {
         session::create(conn, user_id, "", "127.0.0.1", TimeDelta::seconds(60 * 30))

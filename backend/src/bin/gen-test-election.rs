@@ -1,3 +1,8 @@
+use std::{
+    ops::Range,
+    path::{Path, PathBuf},
+};
+
 use abacus::{
     AppError,
     committee_session::CommitteeSession,
@@ -15,10 +20,6 @@ use abacus::{
     test_data_gen::{GenerateElectionArgs, RandomRange, create_test_election, parse_range},
 };
 use clap::Parser;
-use std::{
-    ops::Range,
-    path::{Path, PathBuf},
-};
 use tracing::{info, level_filters::LevelFilter};
 use tracing_subscriber::EnvFilter;
 

@@ -8,7 +8,6 @@ use super::{
         ElectionCategory, ElectionDomain, ElectionIdentifier, ManagingAuthority,
     },
 };
-
 use crate::election::{
     CandidateNumber, ElectionWithPoliticalGroups, NewElection, PGNumber, PoliticalGroup,
 };
@@ -280,11 +279,12 @@ pub struct ListData {
 
 #[cfg(test)]
 mod tests {
+    use quick_xml::DeError;
+
     use crate::{
         election::{CandidateNumber, PGNumber},
         eml::{EML110, EML230, EMLDocument, EMLImportError},
     };
-    use quick_xml::DeError;
 
     #[test]
     fn test_deserialize_eml230b() {

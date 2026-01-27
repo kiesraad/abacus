@@ -1,18 +1,17 @@
 use chrono::NaiveDate;
 use serde::{Deserialize, Deserializer, Serialize};
 
-use crate::{
-    election::{PGNumber, PoliticalGroup, VoteCountingMethod},
-    eml::common::{AuthorityAddress, AuthorityIdentifier},
-    polling_station::PollingStationRequest,
-};
-
 use super::{
     EMLBase,
     common::{
         ContestIdentifier, EMLImportError, ElectionCategory, ElectionDomain, ElectionIdentifier,
         ElectionSubcategory, ManagingAuthority,
     },
+};
+use crate::{
+    election::{PGNumber, PoliticalGroup, VoteCountingMethod},
+    eml::common::{AuthorityAddress, AuthorityIdentifier},
+    polling_station::PollingStationRequest,
 };
 
 /// Election definition (110a and 110b)

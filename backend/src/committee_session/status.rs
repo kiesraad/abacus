@@ -249,6 +249,10 @@ mod tests {
     use crate::committee_session::repository::get;
 
     mod change_committee_session_status {
+        use std::net::Ipv4Addr;
+
+        use chrono::Utc;
+        use sqlx::{SqliteConnection, SqlitePool};
         use test_log::test;
 
         use super::{
@@ -261,9 +265,6 @@ mod tests {
             committee_session::CommitteeSessionId,
             files::{self, FileId},
         };
-        use chrono::Utc;
-        use sqlx::{SqliteConnection, SqlitePool};
-        use std::net::Ipv4Addr;
 
         async fn generate_test_file(conn: &mut SqliteConnection) -> Result<FileId, APIError> {
             let file = files::repository::create(
@@ -365,6 +366,7 @@ mod tests {
     }
 
     mod prepare_data_entry {
+        use sqlx::SqlitePool;
         use test_log::test;
 
         use super::{CommitteeSessionError, CommitteeSessionStatus, get};
@@ -375,7 +377,6 @@ mod tests {
             },
             polling_station::PollingStationId,
         };
-        use sqlx::SqlitePool;
 
         /// Created --> Created
         #[test(sqlx::test(fixtures(
@@ -663,6 +664,7 @@ mod tests {
     }
 
     mod ready_for_data_entry {
+        use sqlx::SqlitePool;
         use test_log::test;
 
         use super::{CommitteeSessionError, CommitteeSessionStatus, get};
@@ -673,7 +675,6 @@ mod tests {
             },
             polling_station::PollingStationId,
         };
-        use sqlx::SqlitePool;
 
         /// Created --> InPreparation
         #[test(sqlx::test(fixtures(
@@ -898,6 +899,10 @@ mod tests {
     }
 
     mod finish_data_entry {
+        use chrono::Utc;
+        use sqlx::SqlitePool;
+        use test_log::test;
+
         use super::{CommitteeSessionError, CommitteeSessionStatus, get};
         use crate::{
             authentication::user::UserId,
@@ -914,9 +919,6 @@ mod tests {
             },
             polling_station::PollingStationId,
         };
-        use chrono::Utc;
-        use sqlx::SqlitePool;
-        use test_log::test;
 
         /// Created --> Completed
         #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]

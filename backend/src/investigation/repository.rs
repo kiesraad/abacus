@@ -1,10 +1,10 @@
-use crate::{committee_session::CommitteeSessionId, polling_station::PollingStationId};
+use sqlx::{SqliteConnection, query_as};
 
 use super::structs::{
     PollingStationInvestigation, PollingStationInvestigationConcludeRequest,
     PollingStationInvestigationCreateRequest,
 };
-use sqlx::{SqliteConnection, query_as};
+use crate::{committee_session::CommitteeSessionId, polling_station::PollingStationId};
 
 pub async fn create_polling_station_investigation(
     conn: &mut SqliteConnection,

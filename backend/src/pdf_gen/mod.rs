@@ -15,7 +15,6 @@ mod typst_tests;
 pub use embedded::{PdfGenError, generate_pdf, generate_pdfs};
 #[cfg(not(feature = "embed-typst"))]
 pub use external::{PdfGenError, generate_pdf, generate_pdfs};
-
 pub use votes_table::{
     CandidatesTables, VotesTables, VotesTablesWithOnlyPreviousVotes, VotesTablesWithPreviousVotes,
 };

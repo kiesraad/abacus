@@ -1,3 +1,7 @@
+use chrono::{DateTime, Local, NaiveDate, NaiveDateTime, Utc};
+use rand::{Rng, seq::IndexedRandom};
+use test_log::test;
+
 /// Typst template smoke tests
 ///
 /// These tests generate PDFs using random data for all Typst templates as defined in `PdfModel`.
@@ -34,10 +38,6 @@ use crate::{
     report::DEFAULT_DATE_TIME_FORMAT,
     summary::{ElectionSummary, PollingStationInvestigations, SumCount, SummaryDifferencesCounts},
 };
-
-use chrono::{DateTime, Local, NaiveDate, NaiveDateTime, Utc};
-use rand::{Rng, seq::IndexedRandom};
-use test_log::test;
 
 fn random_string(rng: &mut impl Rng, length: usize) -> String {
     rng.sample_iter(&rand::distr::Alphanumeric)

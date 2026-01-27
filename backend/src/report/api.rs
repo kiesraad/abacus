@@ -576,10 +576,10 @@ async fn election_download_pdf_results(
 
 #[cfg(test)]
 mod tests {
-    use super::*;
-
-    use crate::{audit_log::list_event_names, files::FileId};
     use test_log::test;
+
+    use super::*;
+    use crate::{audit_log::list_event_names, files::FileId};
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_5_with_results"))))]
     async fn test_get_files_first_session(pool: SqlitePool) {

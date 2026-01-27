@@ -4,6 +4,7 @@ use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use sqlx::{FromRow, types::Json};
 use utoipa::ToSchema;
+pub use yes_no::YesNo;
 
 use super::status::{DataEntryStatus, DataEntryStatusName};
 use crate::{
@@ -14,7 +15,6 @@ use crate::{
     error::ErrorReference,
     polling_station::PollingStationId,
 };
-pub use yes_no::YesNo;
 
 #[derive(Serialize, Deserialize, Clone, ToSchema, Debug, FromRow, Default)]
 #[serde(deny_unknown_fields)]

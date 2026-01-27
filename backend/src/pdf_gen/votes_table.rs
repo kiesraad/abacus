@@ -1,5 +1,6 @@
-use serde::{Deserialize, Serialize};
 use std::slice::Iter;
+
+use serde::{Deserialize, Serialize};
 
 use crate::{
     APIError,
@@ -301,9 +302,9 @@ pub(super) struct CandidateVotes {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
     use chrono::NaiveDate;
 
+    use super::*;
     use crate::{
         data_entry::CandidateVotes as DataEntryCandidateVotes,
         election::{ElectionCategory, ElectionId, ElectionWithPoliticalGroups, VoteCountingMethod},

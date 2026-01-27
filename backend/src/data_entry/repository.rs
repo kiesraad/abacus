@@ -472,13 +472,14 @@ pub async fn insert_test_result(
 
 #[cfg(test)]
 mod tests {
+    use sqlx::SqlitePool;
+    use test_log::test;
+
     use super::*;
     use crate::data_entry::{
         CSOFirstSessionResults, DifferencesCounts, PollingStationResults, VotersCounts,
         VotesCounts, structs::tests::ValidDefault,
     };
-    use sqlx::SqlitePool;
-    use test_log::test;
 
     fn create_test_results(proxy_certificate_count: u32) -> PollingStationResults {
         PollingStationResults::CSOFirstSession(CSOFirstSessionResults {
@@ -498,12 +499,13 @@ mod tests {
     }
 
     mod list_results_for_committee_session {
+        use sqlx::SqlitePool;
+        use test_log::test;
+
         use super::{super::*, create_test_results};
         use crate::{
             investigation::insert_test_investigation, polling_station::insert_test_polling_station,
         };
-        use sqlx::SqlitePool;
-        use test_log::test;
 
         /// Test with first session, 2 polling stations with results
         #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
@@ -838,6 +840,9 @@ mod tests {
     }
 
     mod are_results_complete_for_committee_session {
+        use sqlx::{SqliteConnection, SqlitePool};
+        use test_log::test;
+
         use super::{super::*, create_test_results};
         use crate::{
             data_entry::repository::insert_test_result,
@@ -848,8 +853,6 @@ mod tests {
             },
             polling_station::insert_test_polling_station,
         };
-        use sqlx::{SqliteConnection, SqlitePool};
-        use test_log::test;
 
         async fn create_test_investigation(
             conn: &mut SqliteConnection,

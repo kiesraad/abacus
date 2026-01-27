@@ -1,7 +1,8 @@
+use std::error::Error;
+
 use chrono::{Datelike, Days, NaiveDate, TimeDelta};
 use rand::{SeedableRng, rngs::StdRng, seq::IndexedRandom};
 use sqlx::{SqliteConnection, SqlitePool};
-use std::error::Error;
 use tracing::info;
 
 use crate::{

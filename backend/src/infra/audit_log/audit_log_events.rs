@@ -9,9 +9,9 @@ use utoipa::ToSchema;
 use super::{AuditEvent, AuditLogUser, LogFilterQuery};
 use crate::{
     APIError,
+    domain::id::id,
     infra::authentication::{Role, User},
     repository::user_repo::UserId,
-    util::id,
 };
 
 id!(AuditLogEventId);

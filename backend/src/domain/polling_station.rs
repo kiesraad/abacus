@@ -9,9 +9,8 @@ use utoipa::ToSchema;
 
 use crate::{
     APIError,
-    domain::{committee_session::CommitteeSessionId, election::ElectionId},
+    domain::{committee_session::CommitteeSessionId, election::ElectionId, id::id},
     infra::audit_log::PollingStationDetails,
-    util::id,
 };
 
 pub type PollingStationNumber = u32;

@@ -5,6 +5,7 @@ pub mod data_entry;
 pub mod election;
 pub mod entry_number;
 pub mod file;
+pub mod id;
 pub mod investigation;
 pub mod models;
 pub mod polling_station;

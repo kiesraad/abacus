@@ -5,9 +5,9 @@ use utoipa::ToSchema;
 
 use crate::{
     APIError,
+    domain::id::id,
     infra::audit_log::{AuditEvent, AuditService, FileDetails},
     repository::file_repo,
-    util::id,
 };
 
 id!(FileId);

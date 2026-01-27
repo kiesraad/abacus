@@ -7,9 +7,9 @@ use serde::{Deserialize, Serialize};
 use sqlx::{FromRow, Type};
 use utoipa::ToSchema;
 
-use crate::infra::audit_log::ElectionDetails;
+use crate::{domain::id::id, infra::audit_log::ElectionDetails};
 
-crate::util::id!(ElectionId);
+id!(ElectionId);
 
 /// Election without political groups
 #[derive(Serialize, Deserialize, ToSchema, Clone, Debug, PartialEq, Eq, Hash, FromRow)]
@@ -171,7 +171,7 @@ pub enum VoteCountingMethod {
     DSO,
 }
 
-crate::util::id!(PGNumber);
+id!(PGNumber);
 
 /// Political group with its candidates
 #[derive(Serialize, Deserialize, ToSchema, Clone, Debug, PartialEq, Eq, Hash)]
@@ -183,7 +183,7 @@ pub struct PoliticalGroup {
     pub candidates: Vec<Candidate>,
 }
 
-crate::util::id!(CandidateNumber);
+id!(CandidateNumber);
 
 /// Candidate
 #[derive(Serialize, Deserialize, ToSchema, Clone, Debug, PartialEq, Eq, Hash)]

@@ -10,10 +10,9 @@ use utoipa::ToSchema;
 use crate::{
     domain::{
         committee_session_status::CommitteeSessionStatus, election::ElectionId, file::FileId,
-        investigation::PollingStationInvestigation,
+        id::id, investigation::PollingStationInvestigation,
     },
     infra::audit_log,
-    util::id,
 };
 
 id!(CommitteeSessionId);

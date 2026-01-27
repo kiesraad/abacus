@@ -9,6 +9,7 @@ use utoipa::ToSchema;
 
 use crate::{
     APIError,
+    domain::id::id,
     infra::{
         audit_log::UserDetails,
         authentication::{
@@ -17,7 +18,6 @@ use crate::{
             password::{HashedPassword, ValidatedPassword, hash_password, verify_password},
         },
     },
-    util::id,
 };
 
 const MIN_UPDATE_LAST_ACTIVITY_AT_SECS: i64 = 60; // 1 minute

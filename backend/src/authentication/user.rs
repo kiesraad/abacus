@@ -25,7 +25,7 @@ pub struct User {
     id: UserId,
     username: String,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[schema(value_type = String, nullable = false)]
+    #[schema(nullable = false)]
     fullname: Option<String>,
     role: Role,
     #[serde(skip_deserializing)]
@@ -33,7 +33,7 @@ pub struct User {
     #[serde(skip)]
     password_hash: HashedPassword,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[schema(value_type = String, nullable = false)]
+    #[schema(value_type = String)]
     last_activity_at: Option<DateTime<Utc>>,
     #[schema(value_type = String)]
     updated_at: DateTime<Utc>,

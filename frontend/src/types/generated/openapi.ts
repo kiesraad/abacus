@@ -178,12 +178,12 @@ export type INITIALISED_REQUEST_PATH = `/api/initialised`;
 
 // /api/log
 export interface AUDIT_LOG_LIST_REQUEST_PARAMS {
-  page: number;
-  per_page: number;
-  level: string[];
-  event: string[];
-  user: number[];
-  since: number | null;
+  page?: number;
+  per_page?: number;
+  level?: string[];
+  event?: string[];
+  user?: number[];
+  since?: number;
 }
 export type AUDIT_LOG_LIST_REQUEST_PATH = `/api/log`;
 
@@ -508,7 +508,7 @@ export interface CommitteeSessionDetails {
   session_overview_pdf?: FileId;
   session_results_eml?: FileId;
   session_results_pdf?: FileId;
-  session_start_date_time?: string | null;
+  session_start_date_time?: string;
   session_status: string;
 }
 
@@ -594,7 +594,7 @@ export interface DataEntryDetails {
   committee_session_id: CommitteeSessionId;
   data_entry_progress: string;
   data_entry_status: string;
-  finished_at?: string | null;
+  finished_at?: string;
   first_entry_user_id?: UserId;
   polling_station_id: PollingStationId;
   second_entry_user_id?: UserId;
@@ -679,7 +679,7 @@ export interface Election {
 }
 
 export interface ElectionAndCandidateDefinitionValidateRequest {
-  candidate_data?: string | null;
+  candidate_data?: string;
   candidate_hash?: string[];
   counting_method?: VoteCountingMethod;
   election_data: string;

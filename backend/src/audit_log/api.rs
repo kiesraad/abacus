@@ -38,6 +38,7 @@ fn default_per_page() -> u32 {
 
 #[derive(Debug, Deserialize, ToSchema, IntoParams)]
 #[serde(deny_unknown_fields)]
+#[into_params(parameter_in = Query)]
 pub struct LogFilterQuery {
     /// Page number, default 1
     #[serde(default = "default_page")]

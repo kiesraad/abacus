@@ -2284,10 +2284,7 @@
             "description": "Only show events since the specified timestamp",
             "required": false,
             "schema": {
-              "type": [
-                "integer",
-                "null"
-              ],
+              "type": "integer",
               "format": "int64"
             }
           }
@@ -5367,10 +5364,7 @@
             "$ref": "#/components/schemas/FileId"
           },
           "session_start_date_time": {
-            "type": [
-              "string",
-              "null"
-            ],
+            "type": "string",
             "format": "date-time"
           },
           "session_status": {
@@ -5566,10 +5560,7 @@
             "type": "string"
           },
           "finished_at": {
-            "type": [
-              "string",
-              "null"
-            ]
+            "type": "string"
           },
           "first_entry_user_id": {
             "$ref": "#/components/schemas/UserId"
@@ -5777,10 +5768,7 @@
         ],
         "properties": {
           "candidate_data": {
-            "type": [
-              "string",
-              "null"
-            ]
+            "type": "string"
           },
           "candidate_hash": {
             "type": "array",

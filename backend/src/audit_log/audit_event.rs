@@ -67,7 +67,8 @@ pub struct CommitteeSessionDetails {
     pub session_number: u32,
     pub session_election_id: ElectionId,
     pub session_location: String,
-    #[schema(value_type = Option<String>, format = "date-time")]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[schema(value_type = String, format = "date-time", nullable = false)]
     pub session_start_date_time: Option<NaiveDateTime>,
     pub session_status: String,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -128,7 +129,8 @@ pub struct DataEntryDetails {
     pub committee_session_id: CommitteeSessionId,
     pub data_entry_status: String,
     pub data_entry_progress: String,
-    #[schema(value_type = Option<String>)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[schema(value_type = String)]
     pub finished_at: Option<DateTime<Utc>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     #[schema(nullable = false)]

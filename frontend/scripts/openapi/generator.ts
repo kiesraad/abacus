@@ -82,7 +82,8 @@ function addRequest(requestPath: string, request: OperationObject) {
       } else {
         const paramType = tsType(p.schema);
         requestPath = requestPath.replace(`{${p.name}}`, `\${${paramType}}`);
-        result.push(`${p.name}: ${paramType};`);
+        const optional = p.required ? "" : "?";
+        result.push(`${p.name}${optional}: ${paramType};`);
       }
     });
     result.push("}");

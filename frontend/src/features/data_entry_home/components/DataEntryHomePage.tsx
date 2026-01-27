@@ -9,6 +9,7 @@ import { PageTitle } from "@/components/page_title/PageTitle";
 import { Alert } from "@/components/ui/Alert/Alert";
 import { useElection } from "@/hooks/election/useElection";
 import { useElectionStatus } from "@/hooks/election/useElectionStatus";
+import { useLiveData } from "@/hooks/useLiveData";
 import { t } from "@/i18n/translate";
 
 import { ElectionProgress } from "./ElectionProgress";
@@ -20,17 +21,17 @@ export function DataEntryHomePage() {
   const { currentCommitteeSession, election, refetch: refetchElection } = useElection();
   const { statuses, refetch: refetchStatuses } = useElectionStatus();
 
-  // re-fetch statuses when component mounts
+  // live data polling for statuses (initial fetch + 30s interval + visibility change)
+  useLiveData(refetchStatuses, true);
+
+  // one-time fetch for election data on mount
   useEffect(() => {
     const abortController = new AbortController();
-
     void refetchElection(abortController);
-    void refetchStatuses(abortController);
-
     return () => {
       abortController.abort(DEFAULT_CANCEL_REASON);
     };
-  }, [refetchElection, refetchStatuses]);
+  }, [refetchElection]);
 
   const showFirstDataEntrySavedAlert = location.hash.startsWith("#data-entry-1-saved") ? location.hash : null;
   const showSecondDataEntrySavedAlert = location.hash.startsWith("#data-entry-2-saved") ? location.hash : null;

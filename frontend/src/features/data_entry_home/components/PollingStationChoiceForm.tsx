@@ -9,12 +9,12 @@ import { Icon } from "@/components/ui/Icon/Icon";
 import { KeyboardKeys } from "@/components/ui/KeyboardKeys/KeyboardKeys";
 import { useElection } from "@/hooks/election/useElection";
 import { useElectionStatus } from "@/hooks/election/useElectionStatus";
-import { useLiveData } from "@/hooks/useLiveData";
 import type { TranslationPath } from "@/i18n/i18n.types";
 import { t, tx } from "@/i18n/translate";
 import { KeyboardKey } from "@/types/ui";
 import { cn } from "@/utils/classnames";
 import { parseIntUserInput } from "@/utils/strings";
+
 import { useAvailablePollingStations } from "../hooks/useAvailablePollingStations";
 import { useDebouncedCallback } from "../hooks/useDebouncedCallback";
 import { getUrlForDataEntry, PollingStationUserStatus, type PollingStationWithStatus } from "../utils/util";
@@ -118,13 +118,11 @@ export interface PollingStationChoiceFormProps {
 export function PollingStationChoiceForm({ anotherEntry }: PollingStationChoiceFormProps) {
   const navigate = useNavigate();
   const { election, pollingStations } = useElection();
+  const { refetch: refetchStatuses } = useElectionStatus();
+  const { pollingStationsWithStatus, availableCurrentUser, inProgressCurrentUser } = useAvailablePollingStations();
   const [pollingStationNumber, setPollingStationNumber] = useState<string>("");
   const [alert, setAlert] = useState<string | undefined>(undefined);
   const [loading, setLoading] = useState<boolean>(false);
-  const { refetch: refetchStatuses } = useElectionStatus();
-  const { pollingStationsWithStatus, availableCurrentUser, inProgressCurrentUser } = useAvailablePollingStations();
-
-  useLiveData(refetchStatuses, true);
 
   const currentPollingStation = useMemo(() => {
     const parsedInt = parseIntUserInput(pollingStationNumber);

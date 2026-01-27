@@ -7,8 +7,6 @@ use serde::{Deserialize, Serialize};
 use sqlx::{FromRow, Type};
 use utoipa::ToSchema;
 
-use crate::audit_log::ElectionDetails;
-
 crate::util::id!(ElectionId);
 
 /// Election without political groups
@@ -65,42 +63,6 @@ impl From<ElectionWithPoliticalGroups> for Election {
             number_of_voters: value.number_of_voters,
             election_date: value.election_date,
             nomination_date: value.nomination_date,
-        }
-    }
-}
-
-impl From<Election> for ElectionDetails {
-    fn from(value: Election) -> Self {
-        Self {
-            election_id: value.id,
-            election_name: value.name,
-            election_counting_method: value.counting_method.to_string(),
-            election_election_id: value.election_id,
-            election_location: value.location,
-            election_domain_id: value.domain_id,
-            election_category: value.category.to_string(),
-            election_number_of_seats: value.number_of_seats,
-            election_number_of_voters: value.number_of_voters,
-            election_election_date: value.election_date,
-            election_nomination_date: value.nomination_date,
-        }
-    }
-}
-
-impl From<ElectionWithPoliticalGroups> for ElectionDetails {
-    fn from(value: ElectionWithPoliticalGroups) -> Self {
-        Self {
-            election_id: value.id,
-            election_name: value.name,
-            election_counting_method: value.counting_method.to_string(),
-            election_election_id: value.election_id,
-            election_location: value.location,
-            election_domain_id: value.domain_id,
-            election_category: value.category.to_string(),
-            election_number_of_seats: value.number_of_seats,
-            election_number_of_voters: value.number_of_voters,
-            election_election_date: value.election_date,
-            election_nomination_date: value.nomination_date,
         }
     }
 }

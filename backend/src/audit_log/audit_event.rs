@@ -1,5 +1,5 @@
 use axum::http::Uri;
-use chrono::{DateTime, NaiveDate, NaiveDateTime, Utc};
+use chrono::{DateTime, NaiveDateTime, Utc};
 use serde::{self, Deserialize, Serialize};
 use strum::VariantNames;
 use utoipa::ToSchema;
@@ -9,24 +9,6 @@ use crate::{
     ErrorResponse, authentication::user::UserId, committee_session::CommitteeSessionId,
     election::ElectionId, error::ErrorReference, files::FileId, polling_station::PollingStationId,
 };
-
-#[derive(Serialize, Deserialize, Debug, PartialEq, Eq, ToSchema)]
-#[serde(deny_unknown_fields)]
-pub struct ElectionDetails {
-    pub election_id: ElectionId,
-    pub election_name: String,
-    pub election_counting_method: String,
-    pub election_election_id: String,
-    pub election_location: String,
-    pub election_domain_id: String,
-    pub election_category: String,
-    pub election_number_of_seats: u32,
-    pub election_number_of_voters: u32,
-    #[schema(value_type = String, format = "date")]
-    pub election_election_date: NaiveDate,
-    #[schema(value_type = String, format = "date")]
-    pub election_nomination_date: NaiveDate,
-}
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, Eq, ToSchema)]
 #[serde(deny_unknown_fields)]

@@ -98,12 +98,11 @@ pub struct CandidateVotes {
 
 #[derive(Clone, Debug, PartialEq)]
 pub(crate) struct CandidateNominationInput {
-    // TODO: Rename to election_seats?
     pub number_of_seats: u32,
     pub list_votes: Vec<ListVotes>,
     pub quota: Fraction,
-    // TODO: Rename to political_group_seats? Should be mapped by ListNumber, not index
-    pub total_seats: Vec<u32>,
+    // TODO: #2785 Should be mapped by ListNumber, not index
+    pub total_seats_per_list: Vec<u32>,
 }
 
 impl<T> From<(&T, &SeatAssignmentResult)> for CandidateNominationInput
@@ -115,7 +114,7 @@ where
             number_of_seats: input.0.number_of_seats(),
             list_votes: list_votes_from_input(input.0),
             quota: input.1.quota,
-            total_seats: get_total_seats_from_apportionment_result(input.1),
+            total_seats_per_list: get_total_seats_from_apportionment_result(input.1),
         }
     }
 }

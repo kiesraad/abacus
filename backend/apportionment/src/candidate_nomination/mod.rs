@@ -31,7 +31,7 @@ pub fn candidate_nomination(
         input.number_of_seats,
         &input.list_votes,
         preference_threshold,
-        &input.total_seats,
+        &input.total_seats_per_list,
     )?;
     debug!(
         "List candidate nomination: {:#?}",
@@ -59,7 +59,7 @@ fn all_sorted_chosen_candidates(
 ) -> Vec<Candidate> {
     let mut chosen_candidates: Vec<Candidate> = vec![];
     for list in list_votes {
-        // TODO: don't use index
+        // TODO: #2785 Don't use index
         let list_candidate_nomination = &list_candidate_nomination[*list.number as usize - 1];
         chosen_candidates.extend(
             list.candidate_votes

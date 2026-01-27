@@ -7,7 +7,7 @@ pub fn candidate_nomination_fixture_with_given_number_of_seats(
     quota: Fraction,
     number_of_seats: u32,
     candidate_votes: Vec<Vec<u32>>,
-    total_seats: Vec<u32>,
+    total_seats_per_list: Vec<u32>,
 ) -> CandidateNominationInput {
     let seat_assignment_input =
         seat_assignment_fixture_with_given_candidate_votes(number_of_seats, candidate_votes);
@@ -16,7 +16,7 @@ pub fn candidate_nomination_fixture_with_given_number_of_seats(
         number_of_seats: seat_assignment_input.number_of_seats,
         list_votes: seat_assignment_input.list_votes,
         quota,
-        total_seats,
+        total_seats_per_list,
     }
 }
 

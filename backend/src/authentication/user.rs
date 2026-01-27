@@ -12,7 +12,7 @@ use super::{
     password::{HashedPassword, ValidatedPassword, hash_password, verify_password},
     role::Role,
 };
-use crate::{APIError, audit_log::UserDetails, authentication::role::IncompleteUser, util::id};
+use crate::{APIError, authentication::role::IncompleteUser, util::id};
 
 const MIN_UPDATE_LAST_ACTIVITY_AT_SECS: i64 = 60; // 1 minute
 
@@ -39,17 +39,6 @@ pub struct User {
     updated_at: DateTime<Utc>,
     #[schema(value_type = String)]
     created_at: DateTime<Utc>,
-}
-
-impl From<User> for UserDetails {
-    fn from(user: User) -> Self {
-        Self {
-            user_id: user.id,
-            fullname: user.fullname,
-            username: user.username,
-            role: user.role.to_string(),
-        }
-    }
 }
 
 impl User {

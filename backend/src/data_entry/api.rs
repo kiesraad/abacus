@@ -162,12 +162,20 @@ pub async fn delete_data_entry_and_result_for_polling_station(
 ) -> Result<(), APIError> {
     if let Some(data_entry) = delete_data_entry(conn, polling_station_id).await? {
         audit_service
-            .log(conn, &AuditEvent::DataEntryDeleted(data_entry.into()), None)
+            .log(
+                conn,
+                &AuditEvent::DataEntryDeleted(serde_json::to_value(&data_entry)?),
+                None,
+            )
             .await?;
     }
     if let Some(result) = delete_result(conn, polling_station_id).await? {
         audit_service
-            .log(conn, &AuditEvent::ResultDeleted(result.into()), None)
+            .log(
+                conn,
+                &AuditEvent::ResultDeleted(serde_json::to_value(&result)?),
+                None,
+            )
             .await?;
         if committee_session.status == CommitteeSessionStatus::Completed {
             change_committee_session_status(
@@ -229,15 +237,15 @@ pub enum ResolveDifferencesAction {
 impl ResolveDifferencesAction {
     pub fn audit_event(&self, data_entry: PollingStationDataEntry) -> AuditEvent {
         match self {
-            ResolveDifferencesAction::KeepFirstEntry => {
-                AuditEvent::DataEntryKeptFirst(data_entry.into())
-            }
-            ResolveDifferencesAction::KeepSecondEntry => {
-                AuditEvent::DataEntryKeptSecond(data_entry.into())
-            }
-            ResolveDifferencesAction::DiscardBothEntries => {
-                AuditEvent::DataEntryDiscardedBoth(data_entry.into())
-            }
+            ResolveDifferencesAction::KeepFirstEntry => AuditEvent::DataEntryKeptFirst(
+                serde_json::to_value(&data_entry).expect("could not serialize data_entry"),
+            ),
+            ResolveDifferencesAction::KeepSecondEntry => AuditEvent::DataEntryKeptSecond(
+                serde_json::to_value(&data_entry).expect("could not serialize data_entry"),
+            ),
+            ResolveDifferencesAction::DiscardBothEntries => AuditEvent::DataEntryDiscardedBoth(
+                serde_json::to_value(&data_entry).expect("could not serialize data_entry"),
+            ),
         }
     }
 }
@@ -312,7 +320,7 @@ async fn polling_station_data_entry_claim(
             audit_service
                 .log(
                     &mut tx,
-                    &AuditEvent::DataEntryStarted(data_entry.into()),
+                    &AuditEvent::DataEntryStarted(serde_json::to_value(&data_entry)?),
                     None,
                 )
                 .await?;
@@ -321,7 +329,7 @@ async fn polling_station_data_entry_claim(
             audit_service
                 .log(
                     &mut tx,
-                    &AuditEvent::DataEntryResumed(data_entry.into()),
+                    &AuditEvent::DataEntryResumed(serde_json::to_value(&data_entry)?),
                     None,
                 )
                 .await?;
@@ -430,7 +438,7 @@ async fn polling_station_data_entry_save(
     audit_service
         .log(
             &mut tx,
-            &AuditEvent::DataEntrySaved(data_entry.into()),
+            &AuditEvent::DataEntrySaved(serde_json::to_value(&data_entry)?),
             None,
         )
         .await?;
@@ -496,7 +504,7 @@ async fn polling_station_data_entry_delete(
     audit_service
         .log(
             &mut tx,
-            &AuditEvent::DataEntryDeleted(data_entry.into()),
+            &AuditEvent::DataEntryDeleted(serde_json::to_value(&data_entry)?),
             None,
         )
         .await?;
@@ -585,7 +593,7 @@ async fn polling_station_data_entry_finalise(
     audit_service
         .log(
             &mut tx,
-            &AuditEvent::DataEntryFinalised(data_entry.clone().into()),
+            &AuditEvent::DataEntryFinalised(serde_json::to_value(&data_entry)?),
             None,
         )
         .await?;
@@ -606,12 +614,12 @@ pub enum ResolveErrorsAction {
 impl ResolveErrorsAction {
     pub fn audit_event(&self, data_entry: PollingStationDataEntry) -> AuditEvent {
         match self {
-            ResolveErrorsAction::DiscardFirstEntry => {
-                AuditEvent::DataEntryDiscardedFirst(data_entry.into())
-            }
-            ResolveErrorsAction::ResumeFirstEntry => {
-                AuditEvent::DataEntryReturnedFirst(data_entry.into())
-            }
+            ResolveErrorsAction::DiscardFirstEntry => AuditEvent::DataEntryDiscardedFirst(
+                serde_json::to_value(&data_entry).expect("could not serialize data_entry"),
+            ),
+            ResolveErrorsAction::ResumeFirstEntry => AuditEvent::DataEntryReturnedFirst(
+                serde_json::to_value(&data_entry).expect("could not serialize data_entry"),
+            ),
         }
     }
 }
@@ -1724,6 +1732,7 @@ mod tests {
         assert_eq!(audit_log_row.event_name, "DataEntryFinalised");
 
         let event: serde_json::Value = serde_json::to_value(&audit_log_row.event).unwrap();
+        dbg!(&event);
         assert_eq!(event["data_entry_status"], "first_entry_has_errors");
     }
 

@@ -4197,106 +4197,63 @@
         },
         "additionalProperties": false
       },
-      "ApplicationStartedDetails": {
-        "type": "object",
-        "required": [
-          "version",
-          "commit"
-        ],
-        "properties": {
-          "commit": {
-            "type": "string"
-          },
-          "version": {
-            "type": "string"
-          }
-        }
-      },
       "AuditEvent": {
         "oneOf": [
           {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/UserLoggedInDetails"
-              },
-              {
-                "type": "object",
-                "required": [
-                  "event_type"
-                ],
-                "properties": {
-                  "event_type": {
-                    "type": "string",
-                    "enum": [
-                      "UserLoggedIn"
-                    ]
-                  }
-                }
+            "type": "object",
+            "required": [
+              "event_type"
+            ],
+            "properties": {
+              "event_type": {
+                "type": "string",
+                "enum": [
+                  "UserLoggedIn"
+                ]
               }
-            ]
+            }
           },
           {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/UserLoginFailedDetails"
-              },
-              {
-                "type": "object",
-                "required": [
-                  "event_type"
-                ],
-                "properties": {
-                  "event_type": {
-                    "type": "string",
-                    "enum": [
-                      "UserLoginFailed"
-                    ]
-                  }
-                }
+            "type": "object",
+            "required": [
+              "event_type"
+            ],
+            "properties": {
+              "event_type": {
+                "type": "string",
+                "enum": [
+                  "UserLoginFailed"
+                ]
               }
-            ]
+            }
           },
           {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/UserLoggedOutDetails"
-              },
-              {
-                "type": "object",
-                "required": [
-                  "event_type"
-                ],
-                "properties": {
-                  "event_type": {
-                    "type": "string",
-                    "enum": [
-                      "UserLoggedOut"
-                    ]
-                  }
-                }
+            "type": "object",
+            "required": [
+              "event_type"
+            ],
+            "properties": {
+              "event_type": {
+                "type": "string",
+                "enum": [
+                  "UserLoggedOut"
+                ]
               }
-            ]
+            }
           },
           {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/UserDetails"
-              },
-              {
-                "type": "object",
-                "required": [
-                  "event_type"
-                ],
-                "properties": {
-                  "event_type": {
-                    "type": "string",
-                    "enum": [
-                      "UserAccountUpdated"
-                    ]
-                  }
-                }
+            "type": "object",
+            "required": [
+              "event_type"
+            ],
+            "properties": {
+              "event_type": {
+                "type": "string",
+                "enum": [
+                  "UserAccountUpdated"
+                ]
               }
-            ]
+            }
           },
           {
             "type": "object",
@@ -4313,613 +4270,410 @@
             }
           },
           {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/UserDetails"
-              },
-              {
-                "type": "object",
-                "required": [
-                  "event_type"
-                ],
-                "properties": {
-                  "event_type": {
-                    "type": "string",
-                    "enum": [
-                      "UserCreated"
-                    ]
-                  }
-                }
+            "type": "object",
+            "required": [
+              "event_type"
+            ],
+            "properties": {
+              "event_type": {
+                "type": "string",
+                "enum": [
+                  "UserCreated"
+                ]
               }
-            ]
+            }
           },
           {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/UserDetails"
-              },
-              {
-                "type": "object",
-                "required": [
-                  "event_type"
-                ],
-                "properties": {
-                  "event_type": {
-                    "type": "string",
-                    "enum": [
-                      "UserUpdated"
-                    ]
-                  }
-                }
+            "type": "object",
+            "required": [
+              "event_type"
+            ],
+            "properties": {
+              "event_type": {
+                "type": "string",
+                "enum": [
+                  "UserUpdated"
+                ]
               }
-            ]
+            }
           },
           {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/UserDetails"
-              },
-              {
-                "type": "object",
-                "required": [
-                  "event_type"
-                ],
-                "properties": {
-                  "event_type": {
-                    "type": "string",
-                    "enum": [
-                      "UserDeleted"
-                    ]
-                  }
-                }
+            "type": "object",
+            "required": [
+              "event_type"
+            ],
+            "properties": {
+              "event_type": {
+                "type": "string",
+                "enum": [
+                  "UserDeleted"
+                ]
               }
-            ]
+            }
           },
           {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/ElectionDetails"
-              },
-              {
-                "type": "object",
-                "required": [
-                  "event_type"
-                ],
-                "properties": {
-                  "event_type": {
-                    "type": "string",
-                    "enum": [
-                      "ElectionCreated"
-                    ]
-                  }
-                }
+            "type": "object",
+            "required": [
+              "event_type"
+            ],
+            "properties": {
+              "event_type": {
+                "type": "string",
+                "enum": [
+                  "ElectionCreated"
+                ]
               }
-            ]
+            }
           },
           {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/ElectionDetails"
-              },
-              {
-                "type": "object",
-                "required": [
-                  "event_type"
-                ],
-                "properties": {
-                  "event_type": {
-                    "type": "string",
-                    "enum": [
-                      "ElectionUpdated"
-                    ]
-                  }
-                }
+            "type": "object",
+            "required": [
+              "event_type"
+            ],
+            "properties": {
+              "event_type": {
+                "type": "string",
+                "enum": [
+                  "ElectionUpdated"
+                ]
               }
-            ]
+            }
           },
           {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/CommitteeSessionDetails"
-              },
-              {
-                "type": "object",
-                "required": [
-                  "event_type"
-                ],
-                "properties": {
-                  "event_type": {
-                    "type": "string",
-                    "enum": [
-                      "CommitteeSessionCreated"
-                    ]
-                  }
-                }
+            "type": "object",
+            "required": [
+              "event_type"
+            ],
+            "properties": {
+              "event_type": {
+                "type": "string",
+                "enum": [
+                  "CommitteeSessionCreated"
+                ]
               }
-            ]
+            }
           },
           {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/CommitteeSessionDetails"
-              },
-              {
-                "type": "object",
-                "required": [
-                  "event_type"
-                ],
-                "properties": {
-                  "event_type": {
-                    "type": "string",
-                    "enum": [
-                      "CommitteeSessionDeleted"
-                    ]
-                  }
-                }
+            "type": "object",
+            "required": [
+              "event_type"
+            ],
+            "properties": {
+              "event_type": {
+                "type": "string",
+                "enum": [
+                  "CommitteeSessionDeleted"
+                ]
               }
-            ]
+            }
           },
           {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/CommitteeSessionDetails"
-              },
-              {
-                "type": "object",
-                "required": [
-                  "event_type"
-                ],
-                "properties": {
-                  "event_type": {
-                    "type": "string",
-                    "enum": [
-                      "CommitteeSessionUpdated"
-                    ]
-                  }
-                }
+            "type": "object",
+            "required": [
+              "event_type"
+            ],
+            "properties": {
+              "event_type": {
+                "type": "string",
+                "enum": [
+                  "CommitteeSessionUpdated"
+                ]
               }
-            ]
+            }
           },
           {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/PollingStationInvestigation"
-              },
-              {
-                "type": "object",
-                "required": [
-                  "event_type"
-                ],
-                "properties": {
-                  "event_type": {
-                    "type": "string",
-                    "enum": [
-                      "PollingStationInvestigationCreated"
-                    ]
-                  }
-                }
+            "type": "object",
+            "required": [
+              "event_type"
+            ],
+            "properties": {
+              "event_type": {
+                "type": "string",
+                "enum": [
+                  "PollingStationInvestigationCreated"
+                ]
               }
-            ]
+            }
           },
           {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/PollingStationInvestigation"
-              },
-              {
-                "type": "object",
-                "required": [
-                  "event_type"
-                ],
-                "properties": {
-                  "event_type": {
-                    "type": "string",
-                    "enum": [
-                      "PollingStationInvestigationConcluded"
-                    ]
-                  }
-                }
+            "type": "object",
+            "required": [
+              "event_type"
+            ],
+            "properties": {
+              "event_type": {
+                "type": "string",
+                "enum": [
+                  "PollingStationInvestigationConcluded"
+                ]
               }
-            ]
+            }
           },
           {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/PollingStationInvestigation"
-              },
-              {
-                "type": "object",
-                "required": [
-                  "event_type"
-                ],
-                "properties": {
-                  "event_type": {
-                    "type": "string",
-                    "enum": [
-                      "PollingStationInvestigationUpdated"
-                    ]
-                  }
-                }
+            "type": "object",
+            "required": [
+              "event_type"
+            ],
+            "properties": {
+              "event_type": {
+                "type": "string",
+                "enum": [
+                  "PollingStationInvestigationUpdated"
+                ]
               }
-            ]
+            }
           },
           {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/PollingStationInvestigation"
-              },
-              {
-                "type": "object",
-                "required": [
-                  "event_type"
-                ],
-                "properties": {
-                  "event_type": {
-                    "type": "string",
-                    "enum": [
-                      "PollingStationInvestigationDeleted"
-                    ]
-                  }
-                }
+            "type": "object",
+            "required": [
+              "event_type"
+            ],
+            "properties": {
+              "event_type": {
+                "type": "string",
+                "enum": [
+                  "PollingStationInvestigationDeleted"
+                ]
               }
-            ]
+            }
           },
           {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/FileDetails"
-              },
-              {
-                "type": "object",
-                "required": [
-                  "event_type"
-                ],
-                "properties": {
-                  "event_type": {
-                    "type": "string",
-                    "enum": [
-                      "FileCreated"
-                    ]
-                  }
-                }
+            "type": "object",
+            "required": [
+              "event_type"
+            ],
+            "properties": {
+              "event_type": {
+                "type": "string",
+                "enum": [
+                  "FileCreated"
+                ]
               }
-            ]
+            }
           },
           {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/FileDetails"
-              },
-              {
-                "type": "object",
-                "required": [
-                  "event_type"
-                ],
-                "properties": {
-                  "event_type": {
-                    "type": "string",
-                    "enum": [
-                      "FileDeleted"
-                    ]
-                  }
-                }
+            "type": "object",
+            "required": [
+              "event_type"
+            ],
+            "properties": {
+              "event_type": {
+                "type": "string",
+                "enum": [
+                  "FileDeleted"
+                ]
               }
-            ]
+            }
           },
           {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/PollingStationDetails"
-              },
-              {
-                "type": "object",
-                "required": [
-                  "event_type"
-                ],
-                "properties": {
-                  "event_type": {
-                    "type": "string",
-                    "enum": [
-                      "PollingStationCreated"
-                    ]
-                  }
-                }
+            "type": "object",
+            "required": [
+              "event_type"
+            ],
+            "properties": {
+              "event_type": {
+                "type": "string",
+                "enum": [
+                  "PollingStationCreated"
+                ]
               }
-            ]
+            }
           },
           {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/PollingStationDetails"
-              },
-              {
-                "type": "object",
-                "required": [
-                  "event_type"
-                ],
-                "properties": {
-                  "event_type": {
-                    "type": "string",
-                    "enum": [
-                      "PollingStationUpdated"
-                    ]
-                  }
-                }
+            "type": "object",
+            "required": [
+              "event_type"
+            ],
+            "properties": {
+              "event_type": {
+                "type": "string",
+                "enum": [
+                  "PollingStationUpdated"
+                ]
               }
-            ]
+            }
           },
           {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/PollingStationDetails"
-              },
-              {
-                "type": "object",
-                "required": [
-                  "event_type"
-                ],
-                "properties": {
-                  "event_type": {
-                    "type": "string",
-                    "enum": [
-                      "PollingStationDeleted"
-                    ]
-                  }
-                }
+            "type": "object",
+            "required": [
+              "event_type"
+            ],
+            "properties": {
+              "event_type": {
+                "type": "string",
+                "enum": [
+                  "PollingStationDeleted"
+                ]
               }
-            ]
+            }
           },
           {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/PollingStationImportDetails"
-              },
-              {
-                "type": "object",
-                "required": [
-                  "event_type"
-                ],
-                "properties": {
-                  "event_type": {
-                    "type": "string",
-                    "enum": [
-                      "PollingStationsImported"
-                    ]
-                  }
-                }
+            "type": "object",
+            "required": [
+              "event_type"
+            ],
+            "properties": {
+              "event_type": {
+                "type": "string",
+                "enum": [
+                  "PollingStationsImported"
+                ]
               }
-            ]
+            }
           },
           {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/DataEntryDetails"
-              },
-              {
-                "type": "object",
-                "required": [
-                  "event_type"
-                ],
-                "properties": {
-                  "event_type": {
-                    "type": "string",
-                    "enum": [
-                      "DataEntryStarted"
-                    ]
-                  }
-                }
+            "type": "object",
+            "required": [
+              "event_type"
+            ],
+            "properties": {
+              "event_type": {
+                "type": "string",
+                "enum": [
+                  "DataEntryStarted"
+                ]
               }
-            ]
+            }
           },
           {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/DataEntryDetails"
-              },
-              {
-                "type": "object",
-                "required": [
-                  "event_type"
-                ],
-                "properties": {
-                  "event_type": {
-                    "type": "string",
-                    "enum": [
-                      "DataEntrySaved"
-                    ]
-                  }
-                }
+            "type": "object",
+            "required": [
+              "event_type"
+            ],
+            "properties": {
+              "event_type": {
+                "type": "string",
+                "enum": [
+                  "DataEntrySaved"
+                ]
               }
-            ]
+            }
           },
           {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/DataEntryDetails"
-              },
-              {
-                "type": "object",
-                "required": [
-                  "event_type"
-                ],
-                "properties": {
-                  "event_type": {
-                    "type": "string",
-                    "enum": [
-                      "DataEntryResumed"
-                    ]
-                  }
-                }
+            "type": "object",
+            "required": [
+              "event_type"
+            ],
+            "properties": {
+              "event_type": {
+                "type": "string",
+                "enum": [
+                  "DataEntryResumed"
+                ]
               }
-            ]
+            }
           },
           {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/DataEntryDetails"
-              },
-              {
-                "type": "object",
-                "required": [
-                  "event_type"
-                ],
-                "properties": {
-                  "event_type": {
-                    "type": "string",
-                    "enum": [
-                      "DataEntryDeleted"
-                    ]
-                  }
-                }
+            "type": "object",
+            "required": [
+              "event_type"
+            ],
+            "properties": {
+              "event_type": {
+                "type": "string",
+                "enum": [
+                  "DataEntryDeleted"
+                ]
               }
-            ]
+            }
           },
           {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/DataEntryDetails"
-              },
-              {
-                "type": "object",
-                "required": [
-                  "event_type"
-                ],
-                "properties": {
-                  "event_type": {
-                    "type": "string",
-                    "enum": [
-                      "DataEntryFinalised"
-                    ]
-                  }
-                }
+            "type": "object",
+            "required": [
+              "event_type"
+            ],
+            "properties": {
+              "event_type": {
+                "type": "string",
+                "enum": [
+                  "DataEntryFinalised"
+                ]
               }
-            ]
+            }
           },
           {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/ResultDetails"
-              },
-              {
-                "type": "object",
-                "required": [
-                  "event_type"
-                ],
-                "properties": {
-                  "event_type": {
-                    "type": "string",
-                    "enum": [
-                      "ResultDeleted"
-                    ]
-                  }
-                }
+            "type": "object",
+            "required": [
+              "event_type"
+            ],
+            "properties": {
+              "event_type": {
+                "type": "string",
+                "enum": [
+                  "ResultDeleted"
+                ]
               }
-            ]
+            }
           },
           {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/DataEntryDetails"
-              },
-              {
-                "type": "object",
-                "required": [
-                  "event_type"
-                ],
-                "properties": {
-                  "event_type": {
-                    "type": "string",
-                    "enum": [
-                      "DataEntryDiscardedFirst"
-                    ]
-                  }
-                }
+            "type": "object",
+            "required": [
+              "event_type"
+            ],
+            "properties": {
+              "event_type": {
+                "type": "string",
+                "enum": [
+                  "DataEntryDiscardedFirst"
+                ]
               }
-            ]
+            }
           },
           {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/DataEntryDetails"
-              },
-              {
-                "type": "object",
-                "required": [
-                  "event_type"
-                ],
-                "properties": {
-                  "event_type": {
-                    "type": "string",
-                    "enum": [
-                      "DataEntryReturnedFirst"
-                    ]
-                  }
-                }
+            "type": "object",
+            "required": [
+              "event_type"
+            ],
+            "properties": {
+              "event_type": {
+                "type": "string",
+                "enum": [
+                  "DataEntryReturnedFirst"
+                ]
               }
-            ]
+            }
           },
           {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/DataEntryDetails"
-              },
-              {
-                "type": "object",
-                "required": [
-                  "event_type"
-                ],
-                "properties": {
-                  "event_type": {
-                    "type": "string",
-                    "enum": [
-                      "DataEntryKeptFirst"
-                    ]
-                  }
-                }
+            "type": "object",
+            "required": [
+              "event_type"
+            ],
+            "properties": {
+              "event_type": {
+                "type": "string",
+                "enum": [
+                  "DataEntryKeptFirst"
+                ]
               }
-            ]
+            }
           },
           {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/DataEntryDetails"
-              },
-              {
-                "type": "object",
-                "required": [
-                  "event_type"
-                ],
-                "properties": {
-                  "event_type": {
-                    "type": "string",
-                    "enum": [
-                      "DataEntryKeptSecond"
-                    ]
-                  }
-                }
+            "type": "object",
+            "required": [
+              "event_type"
+            ],
+            "properties": {
+              "event_type": {
+                "type": "string",
+                "enum": [
+                  "DataEntryKeptSecond"
+                ]
               }
-            ]
+            }
           },
           {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/DataEntryDetails"
-              },
-              {
-                "type": "object",
-                "required": [
-                  "event_type"
-                ],
-                "properties": {
-                  "event_type": {
-                    "type": "string",
-                    "enum": [
-                      "DataEntryDiscardedBoth"
-                    ]
-                  }
-                }
+            "type": "object",
+            "required": [
+              "event_type"
+            ],
+            "properties": {
+              "event_type": {
+                "type": "string",
+                "enum": [
+                  "DataEntryDiscardedBoth"
+                ]
               }
-            ]
+            }
           },
           {
             "type": "object",
@@ -4950,25 +4704,18 @@
             }
           },
           {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/ApplicationStartedDetails"
-              },
-              {
-                "type": "object",
-                "required": [
-                  "event_type"
-                ],
-                "properties": {
-                  "event_type": {
-                    "type": "string",
-                    "enum": [
-                      "ApplicationStarted"
-                    ]
-                  }
-                }
+            "type": "object",
+            "required": [
+              "event_type"
+            ],
+            "properties": {
+              "event_type": {
+                "type": "string",
+                "enum": [
+                  "ApplicationStarted"
+                ]
               }
-            ]
+            }
           },
           {
             "allOf": [
@@ -5333,52 +5080,6 @@
         },
         "additionalProperties": false
       },
-      "CommitteeSessionDetails": {
-        "type": "object",
-        "required": [
-          "session_id",
-          "session_number",
-          "session_election_id",
-          "session_location",
-          "session_status"
-        ],
-        "properties": {
-          "session_election_id": {
-            "$ref": "#/components/schemas/ElectionId"
-          },
-          "session_id": {
-            "$ref": "#/components/schemas/CommitteeSessionId"
-          },
-          "session_location": {
-            "type": "string"
-          },
-          "session_number": {
-            "type": "integer",
-            "format": "int32",
-            "minimum": 0
-          },
-          "session_overview_pdf": {
-            "$ref": "#/components/schemas/FileId"
-          },
-          "session_results_eml": {
-            "$ref": "#/components/schemas/FileId"
-          },
-          "session_results_pdf": {
-            "$ref": "#/components/schemas/FileId"
-          },
-          "session_start_date_time": {
-            "type": [
-              "string",
-              "null"
-            ],
-            "format": "date-time"
-          },
-          "session_status": {
-            "type": "string"
-          }
-        },
-        "additionalProperties": false
-      },
       "CommitteeSessionId": {
         "type": "integer",
         "format": "int32",
@@ -5543,42 +5244,6 @@
             "description": "Data entry progress between 0 and 100",
             "maximum": 100,
             "minimum": 0
-          }
-        },
-        "additionalProperties": false
-      },
-      "DataEntryDetails": {
-        "type": "object",
-        "required": [
-          "polling_station_id",
-          "committee_session_id",
-          "data_entry_status",
-          "data_entry_progress"
-        ],
-        "properties": {
-          "committee_session_id": {
-            "$ref": "#/components/schemas/CommitteeSessionId"
-          },
-          "data_entry_progress": {
-            "type": "string"
-          },
-          "data_entry_status": {
-            "type": "string"
-          },
-          "finished_at": {
-            "type": [
-              "string",
-              "null"
-            ]
-          },
-          "first_entry_user_id": {
-            "$ref": "#/components/schemas/UserId"
-          },
-          "polling_station_id": {
-            "$ref": "#/components/schemas/PollingStationId"
-          },
-          "second_entry_user_id": {
-            "$ref": "#/components/schemas/UserId"
           }
         },
         "additionalProperties": false
@@ -5894,64 +5559,6 @@
             "items": {
               "$ref": "#/components/schemas/PollingStationRequest"
             }
-          }
-        },
-        "additionalProperties": false
-      },
-      "ElectionDetails": {
-        "type": "object",
-        "required": [
-          "election_id",
-          "election_name",
-          "election_counting_method",
-          "election_election_id",
-          "election_location",
-          "election_domain_id",
-          "election_category",
-          "election_number_of_seats",
-          "election_number_of_voters",
-          "election_election_date",
-          "election_nomination_date"
-        ],
-        "properties": {
-          "election_category": {
-            "type": "string"
-          },
-          "election_counting_method": {
-            "type": "string"
-          },
-          "election_domain_id": {
-            "type": "string"
-          },
-          "election_election_date": {
-            "type": "string",
-            "format": "date"
-          },
-          "election_election_id": {
-            "type": "string"
-          },
-          "election_id": {
-            "$ref": "#/components/schemas/ElectionId"
-          },
-          "election_location": {
-            "type": "string"
-          },
-          "election_name": {
-            "type": "string"
-          },
-          "election_nomination_date": {
-            "type": "string",
-            "format": "date"
-          },
-          "election_number_of_seats": {
-            "type": "integer",
-            "format": "int32",
-            "minimum": 0
-          },
-          "election_number_of_voters": {
-            "type": "integer",
-            "format": "int32",
-            "minimum": 0
           }
         },
         "additionalProperties": false
@@ -6276,36 +5883,6 @@
         },
         "additionalProperties": false
       },
-      "FileDetails": {
-        "type": "object",
-        "required": [
-          "file_id",
-          "file_name",
-          "file_mime_type",
-          "file_size_bytes",
-          "file_created_at"
-        ],
-        "properties": {
-          "file_created_at": {
-            "type": "string"
-          },
-          "file_id": {
-            "$ref": "#/components/schemas/FileId"
-          },
-          "file_mime_type": {
-            "type": "string"
-          },
-          "file_name": {
-            "type": "string"
-          },
-          "file_size_bytes": {
-            "type": "integer",
-            "format": "int64",
-            "minimum": 0
-          }
-        },
-        "additionalProperties": false
-      },
       "FileId": {
         "type": "integer",
         "format": "int32",
@@ -6604,59 +6181,6 @@
         },
         "additionalProperties": false
       },
-      "PollingStationDetails": {
-        "type": "object",
-        "required": [
-          "polling_station_id",
-          "polling_station_election_id",
-          "polling_station_committee_session_id",
-          "polling_station_name",
-          "polling_station_number",
-          "polling_station_address",
-          "polling_station_postal_code",
-          "polling_station_locality"
-        ],
-        "properties": {
-          "polling_station_address": {
-            "type": "string"
-          },
-          "polling_station_committee_session_id": {
-            "$ref": "#/components/schemas/CommitteeSessionId"
-          },
-          "polling_station_election_id": {
-            "$ref": "#/components/schemas/ElectionId"
-          },
-          "polling_station_id": {
-            "$ref": "#/components/schemas/PollingStationId"
-          },
-          "polling_station_id_prev_session": {
-            "$ref": "#/components/schemas/PollingStationId"
-          },
-          "polling_station_locality": {
-            "type": "string"
-          },
-          "polling_station_name": {
-            "type": "string"
-          },
-          "polling_station_number": {
-            "type": "integer",
-            "format": "int32",
-            "minimum": 0
-          },
-          "polling_station_number_of_voters": {
-            "type": "integer",
-            "format": "int32",
-            "minimum": 0
-          },
-          "polling_station_postal_code": {
-            "type": "string"
-          },
-          "polling_station_type": {
-            "type": "string"
-          }
-        },
-        "additionalProperties": false
-      },
       "PollingStationFileRequest": {
         "type": "object",
         "required": [
@@ -6672,27 +6196,6 @@
         "type": "integer",
         "format": "int32",
         "minimum": 0
-      },
-      "PollingStationImportDetails": {
-        "type": "object",
-        "required": [
-          "import_election_id",
-          "import_file_name",
-          "import_number_of_polling_stations"
-        ],
-        "properties": {
-          "import_election_id": {
-            "$ref": "#/components/schemas/ElectionId"
-          },
-          "import_file_name": {
-            "type": "string"
-          },
-          "import_number_of_polling_stations": {
-            "type": "integer",
-            "format": "int64",
-            "minimum": 0
-          }
-        }
       },
       "PollingStationInvestigation": {
         "type": "object",
@@ -6950,26 +6453,6 @@
           "resume_first_entry"
         ]
       },
-      "ResultDetails": {
-        "type": "object",
-        "required": [
-          "polling_station_id",
-          "committee_session_id",
-          "created_at"
-        ],
-        "properties": {
-          "committee_session_id": {
-            "$ref": "#/components/schemas/CommitteeSessionId"
-          },
-          "created_at": {
-            "type": "string"
-          },
-          "polling_station_id": {
-            "$ref": "#/components/schemas/PollingStationId"
-          }
-        },
-        "additionalProperties": false
-      },
       "Role": {
         "type": "string",
         "enum": [
@@ -7037,29 +6520,6 @@
           }
         }
       },
-      "UserDetails": {
-        "type": "object",
-        "required": [
-          "user_id",
-          "username",
-          "role"
-        ],
-        "properties": {
-          "fullname": {
-            "type": "string"
-          },
-          "role": {
-            "type": "string"
-          },
-          "user_id": {
-            "$ref": "#/components/schemas/UserId"
-          },
-          "username": {
-            "type": "string"
-          }
-        },
-        "additionalProperties": false
-      },
       "UserId": {
         "type": "integer",
         "format": "int32",
@@ -7076,54 +6536,6 @@
             "items": {
               "$ref": "#/components/schemas/User"
             }
-          }
-        },
-        "additionalProperties": false
-      },
-      "UserLoggedInDetails": {
-        "type": "object",
-        "required": [
-          "user_agent",
-          "logged_in_users_count"
-        ],
-        "properties": {
-          "logged_in_users_count": {
-            "type": "integer",
-            "format": "int32",
-            "minimum": 0
-          },
-          "user_agent": {
-            "type": "string"
-          }
-        },
-        "additionalProperties": false
-      },
-      "UserLoggedOutDetails": {
-        "type": "object",
-        "required": [
-          "session_duration"
-        ],
-        "properties": {
-          "session_duration": {
-            "type": "integer",
-            "format": "int64",
-            "minimum": 0
-          }
-        },
-        "additionalProperties": false
-      },
-      "UserLoginFailedDetails": {
-        "type": "object",
-        "required": [
-          "username",
-          "user_agent"
-        ],
-        "properties": {
-          "user_agent": {
-            "type": "string"
-          },
-          "username": {
-            "type": "string"
           }
         },
         "additionalProperties": false

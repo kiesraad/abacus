@@ -128,7 +128,7 @@ pub async fn change_committee_session_status(
     audit_service
         .log(
             &mut tx,
-            &AuditEvent::CommitteeSessionUpdated(committee_session.into()),
+            &AuditEvent::CommitteeSessionUpdated(serde_json::to_value(&committee_session)?),
             None,
         )
         .await?;

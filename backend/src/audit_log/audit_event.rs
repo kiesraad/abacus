@@ -7,40 +7,8 @@ use utoipa::ToSchema;
 use super::AuditEventLevel;
 use crate::{
     ErrorResponse, authentication::user::UserId, committee_session::CommitteeSessionId,
-    election::ElectionId, error::ErrorReference, files::FileId,
-    investigation::PollingStationInvestigation, polling_station::PollingStationId,
+    election::ElectionId, error::ErrorReference, files::FileId, polling_station::PollingStationId,
 };
-
-#[derive(Serialize, Deserialize, Debug, PartialEq, Eq, ToSchema)]
-#[serde(deny_unknown_fields)]
-pub struct UserLoggedInDetails {
-    pub user_agent: String,
-    pub logged_in_users_count: u32,
-}
-
-#[derive(Serialize, Deserialize, Debug, PartialEq, Eq, ToSchema)]
-#[serde(deny_unknown_fields)]
-pub struct UserLoginFailedDetails {
-    pub username: String,
-    pub user_agent: String,
-}
-
-#[derive(Serialize, Deserialize, Debug, PartialEq, Eq, ToSchema)]
-#[serde(deny_unknown_fields)]
-pub struct UserLoggedOutDetails {
-    pub session_duration: u64,
-}
-
-#[derive(Serialize, Deserialize, Debug, PartialEq, Eq, ToSchema)]
-#[serde(deny_unknown_fields)]
-pub struct UserDetails {
-    pub user_id: UserId,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[schema(value_type = String, nullable = false)]
-    pub fullname: Option<String>,
-    pub username: String,
-    pub role: String,
-}
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, Eq, ToSchema)]
 #[serde(deny_unknown_fields)]
@@ -179,55 +147,56 @@ impl ErrorDetails {
 #[serde(rename_all = "PascalCase", tag = "event_type")]
 pub enum AuditEvent {
     // authentication and account events
-    UserLoggedIn(UserLoggedInDetails),
-    UserLoginFailed(UserLoginFailedDetails),
-    UserLoggedOut(UserLoggedOutDetails),
-    UserAccountUpdated(UserDetails),
+    UserLoggedIn(serde_json::Value),
+    UserLoginFailed(serde_json::Value),
+    UserLoggedOut(serde_json::Value),
+    UserAccountUpdated(serde_json::Value),
     UserSessionExtended,
     // user management events
-    UserCreated(UserDetails),
-    UserUpdated(UserDetails),
-    UserDeleted(UserDetails),
+    UserCreated(serde_json::Value),
+    UserUpdated(serde_json::Value),
+    UserDeleted(serde_json::Value),
     // election events
-    ElectionCreated(ElectionDetails),
-    ElectionUpdated(ElectionDetails),
+    ElectionCreated(serde_json::Value),
+    ElectionUpdated(serde_json::Value),
     // committee session events
-    CommitteeSessionCreated(CommitteeSessionDetails),
-    CommitteeSessionDeleted(CommitteeSessionDetails),
-    CommitteeSessionUpdated(CommitteeSessionDetails),
+    CommitteeSessionCreated(serde_json::Value),
+    CommitteeSessionDeleted(serde_json::Value),
+    CommitteeSessionUpdated(serde_json::Value),
     // investigation events
-    PollingStationInvestigationCreated(PollingStationInvestigation),
-    PollingStationInvestigationConcluded(PollingStationInvestigation),
-    PollingStationInvestigationUpdated(PollingStationInvestigation),
-    PollingStationInvestigationDeleted(PollingStationInvestigation),
+    PollingStationInvestigationCreated(serde_json::Value),
+    PollingStationInvestigationConcluded(serde_json::Value),
+    PollingStationInvestigationUpdated(serde_json::Value),
+    PollingStationInvestigationDeleted(serde_json::Value),
     // file events
-    FileCreated(FileDetails),
-    FileDeleted(FileDetails),
+    FileCreated(serde_json::Value),
+    FileDeleted(serde_json::Value),
     // polling station events
-    PollingStationCreated(PollingStationDetails),
-    PollingStationUpdated(PollingStationDetails),
-    PollingStationDeleted(PollingStationDetails),
-    PollingStationsImported(PollingStationImportDetails),
+    PollingStationCreated(serde_json::Value),
+    PollingStationUpdated(serde_json::Value),
+    PollingStationDeleted(serde_json::Value),
+    PollingStationsImported(serde_json::Value),
     // data entry events
-    DataEntryStarted(DataEntryDetails),
-    DataEntrySaved(DataEntryDetails),
-    DataEntryResumed(DataEntryDetails),
-    DataEntryDeleted(DataEntryDetails),
-    DataEntryFinalised(DataEntryDetails),
-    ResultDeleted(ResultDetails),
+    DataEntryStarted(serde_json::Value),
+    DataEntrySaved(serde_json::Value),
+    DataEntryResumed(serde_json::Value),
+    DataEntryDeleted(serde_json::Value),
+    DataEntryFinalised(serde_json::Value),
+    ResultDeleted(serde_json::Value),
     // data entry resolving events
-    DataEntryDiscardedFirst(DataEntryDetails),
-    DataEntryReturnedFirst(DataEntryDetails),
-    DataEntryKeptFirst(DataEntryDetails),
-    DataEntryKeptSecond(DataEntryDetails),
-    DataEntryDiscardedBoth(DataEntryDetails),
+    DataEntryDiscardedFirst(serde_json::Value),
+    DataEntryReturnedFirst(serde_json::Value),
+    DataEntryKeptFirst(serde_json::Value),
+    DataEntryKeptSecond(serde_json::Value),
+    DataEntryDiscardedBoth(serde_json::Value),
     // airgap detection events
     AirGapViolationDetected,
     AirGapViolationResolved,
     // system events
-    ApplicationStarted(ApplicationStartedDetails),
+    ApplicationStarted(serde_json::Value),
     // api errors
     Error(ErrorDetails),
+
     #[default]
     UnknownEvent,
 }

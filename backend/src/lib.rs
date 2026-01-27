@@ -2,6 +2,7 @@ use std::{future::Future, net::SocketAddr, str::FromStr};
 
 use airgap::AirgapDetection;
 use axum::{extract::FromRef, serve::ListenerExt};
+use serde_json::json;
 use sqlx::{
     Sqlite, SqliteConnection, SqlitePool,
     sqlite::{SqliteConnectOptions, SqliteJournalMode},
@@ -167,10 +168,10 @@ pub async fn shutdown_signal() {
 async fn log_app_started(conn: &mut SqliteConnection, db_path: &str) -> Result<(), AppError> {
     Ok(audit_log::create(
         conn,
-        &audit_log::AuditEvent::ApplicationStarted(audit_log::ApplicationStartedDetails {
-            version: env!("ABACUS_GIT_VERSION").to_string(),
-            commit: env!("ABACUS_GIT_REV").to_string(),
-        }),
+        &audit_log::AuditEvent::ApplicationStarted(json!({
+            "version": env!("ABACUS_GIT_VERSION").to_string(),
+            "commit": env!("ABACUS_GIT_REV").to_string(),
+        })),
         None,
         None,
         None,

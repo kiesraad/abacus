@@ -48,7 +48,11 @@ pub async fn create_file(
     let file = repository::create(conn, filename, data, mime_type, created_at).await?;
 
     audit_service
-        .log(conn, &AuditEvent::FileCreated(file.clone().into()), None)
+        .log(
+            conn,
+            &AuditEvent::FileCreated(serde_json::to_value(&file)?),
+            None,
+        )
         .await?;
     Ok(file)
 }
@@ -60,7 +64,11 @@ pub async fn delete_file(
 ) -> Result<(), APIError> {
     if let Some(file) = repository::delete(conn, id).await? {
         audit_service
-            .log(conn, &AuditEvent::FileDeleted(file.into()), None)
+            .log(
+                conn,
+                &AuditEvent::FileDeleted(serde_json::to_value(&file)?),
+                None,
+            )
             .await?;
     }
     Ok(())

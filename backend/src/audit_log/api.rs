@@ -144,6 +144,7 @@ mod tests {
     };
     use chrono::TimeDelta;
     use http_body_util::BodyExt;
+    use serde_json::json;
     use sqlx::SqlitePool;
     use test_log::test;
     use tower::ServiceExt;
@@ -152,7 +153,7 @@ mod tests {
         AppState,
         airgap::AirgapDetection,
         audit_log::{
-            AuditEvent, AuditLogListResponse, AuditLogUser, AuditService, UserLoggedInDetails,
+            AuditEvent, AuditLogListResponse, AuditLogUser, AuditService,
             api::{audit_log_list, audit_log_list_users},
         },
         authentication::{User, inject_user, user::UserId},
@@ -172,10 +173,10 @@ mod tests {
             .unwrap()
             .unwrap();
         let service = new_test_audit_service(Some(user));
-        let audit_event = AuditEvent::UserLoggedIn(UserLoggedInDetails {
-            user_agent: "Mozilla/5.0".to_string(),
-            logged_in_users_count: 1,
-        });
+        let audit_event = AuditEvent::UserLoggedIn(json!({
+            "user_agent": "Mozilla/5.0".to_string(),
+            "logged_in_users_count": 1,
+        }));
         service.log(&mut conn, &audit_event, None).await.unwrap();
         service.log(&mut conn, &audit_event, None).await.unwrap();
         service.log(&mut conn, &audit_event, None).await.unwrap();

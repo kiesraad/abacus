@@ -8,6 +8,7 @@ use axum_extra::{TypedHeader, extract::CookieJar, headers::UserAgent};
 use cookie::{Cookie, SameSite};
 use hyper::StatusCode;
 use serde::{Deserialize, Serialize};
+use serde_json::json;
 use sqlx::SqlitePool;
 use utoipa::ToSchema;
 use utoipa_axum::{router::OpenApiRouter, routes};
@@ -20,10 +21,7 @@ use super::{
 };
 use crate::{
     APIError, AppState, ErrorResponse, SqlitePoolExt,
-    audit_log::{
-        AuditEvent, AuditService, UserDetails, UserLoggedInDetails, UserLoggedOutDetails,
-        UserLoginFailedDetails,
-    },
+    audit_log::{AuditEvent, AuditService},
     authentication::{CreateUserRequest, user::UserId},
     error::ErrorReference,
 };
@@ -76,17 +74,6 @@ impl From<&User> for LoginResponse {
     }
 }
 
-impl From<LoginResponse> for UserDetails {
-    fn from(user: LoginResponse) -> Self {
-        Self {
-            user_id: user.user_id,
-            fullname: user.fullname,
-            username: user.username,
-            role: user.role.to_string(),
-        }
-    }
-}
-
 /// Set default session cookie properties
 pub(super) fn set_default_cookie_properties(cookie: &mut Cookie) {
     cookie.set_path("/");
@@ -126,10 +113,10 @@ async fn login(
             audit_service
                 .log(
                     &mut tx,
-                    &AuditEvent::UserLoginFailed(UserLoginFailedDetails {
-                        username,
-                        user_agent: user_agent.clone(),
-                    }),
+                    &AuditEvent::UserLoginFailed(json!({
+                        "username": username,
+                        "user_agent": user_agent.clone(),
+                    })),
                     None,
                 )
                 .await?;
@@ -163,10 +150,10 @@ async fn login(
         .with_user(user.clone())
         .log(
             &mut tx,
-            &AuditEvent::UserLoggedIn(UserLoggedInDetails {
-                user_agent: user_agent.to_string(),
-                logged_in_users_count,
-            }),
+            &AuditEvent::UserLoggedIn(json!({
+                "user_agent": user_agent,
+                "logged_in_users_count": logged_in_users_count,
+            })),
             None,
         )
         .await?;
@@ -249,7 +236,7 @@ async fn account_update(
     audit_service
         .log(
             &mut tx,
-            &AuditEvent::UserAccountUpdated(response.clone().into()),
+            &AuditEvent::UserAccountUpdated(serde_json::to_value(&response)?),
             None,
         )
         .await?;
@@ -308,7 +295,11 @@ async fn create_first_admin(
             super::user::delete(&mut tx, user.id()).await?;
 
             audit_service
-                .log(&mut tx, &AuditEvent::UserDeleted(user.into()), None)
+                .log(
+                    &mut tx,
+                    &AuditEvent::UserDeleted(serde_json::to_value(&user)?),
+                    None,
+                )
                 .await?;
         }
     }
@@ -325,7 +316,11 @@ async fn create_first_admin(
     .await?;
 
     audit_service
-        .log(&mut tx, &AuditEvent::UserCreated(user.clone().into()), None)
+        .log(
+            &mut tx,
+            &AuditEvent::UserCreated(serde_json::to_value(&user)?),
+            None,
+        )
         .await?;
 
     tx.commit().await?;
@@ -398,9 +393,9 @@ async fn logout(
         audit_service
             .log(
                 &mut tx,
-                &AuditEvent::UserLoggedOut(UserLoggedOutDetails {
-                    session_duration: session.duration().as_secs(),
-                }),
+                &AuditEvent::UserLoggedOut(json!({
+                    "session_duration": session.duration().as_secs(),
+                })),
                 None,
             )
             .await?;

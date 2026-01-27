@@ -68,15 +68,12 @@ impl AuditService {
 mod test {
     use std::net::Ipv4Addr;
 
+    use serde_json::json;
     use sqlx::SqlitePool;
     use test_log::test;
 
     use super::*;
-    use crate::{
-        SqlitePoolExt,
-        audit_log::{AuditEventLevel, UserLoggedInDetails},
-        authentication::user::UserId,
-    };
+    use crate::{SqlitePoolExt, audit_log::AuditEventLevel, authentication::user::UserId};
 
     #[test(sqlx::test(fixtures("../../fixtures/users.sql")))]
     async fn test_log_event(pool: SqlitePool) {
@@ -88,10 +85,10 @@ mod test {
                 .unwrap(),
         };
 
-        let audit_event = AuditEvent::UserLoggedIn(UserLoggedInDetails {
-            user_agent: "Mozilla/5.0".to_string(),
-            logged_in_users_count: 5,
-        });
+        let audit_event = AuditEvent::UserLoggedIn(json!({
+            "user_agent": "Mozilla/5.0".to_string(),
+            "logged_in_users_count": 5,
+        }));
         let message = Some("User logged in".to_string());
         service.log(&mut tx, &audit_event, message).await.unwrap();
         tx.commit().await.unwrap();
@@ -104,10 +101,10 @@ mod test {
 
         assert_eq!(
             event.event(),
-            &AuditEvent::UserLoggedIn(UserLoggedInDetails {
-                user_agent: "Mozilla/5.0".to_string(),
-                logged_in_users_count: 5,
-            })
+            &AuditEvent::UserLoggedIn(json!({
+                "user_agent": "Mozilla/5.0".to_string(),
+                "logged_in_users_count": 5,
+            }))
         );
 
         assert_eq!(event.event_level(), &AuditEventLevel::Success);

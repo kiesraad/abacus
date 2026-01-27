@@ -65,6 +65,7 @@ mod tests {
         Method,
         header::{CONTENT_TYPE, COOKIE, USER_AGENT},
     };
+    use serde_json::json;
     use sqlx::SqlitePool;
     use test_log::test;
     use tower::ServiceExt;
@@ -72,7 +73,7 @@ mod tests {
     use crate::{
         AppState, ErrorResponse,
         airgap::AirgapDetection,
-        audit_log::{AuditEvent, LogFilter, UserLoginFailedDetails},
+        audit_log::{AuditEvent, LogFilter},
         authentication::{
             api::{AccountUpdateRequest, Credentials},
             middleware::extend_session,
@@ -203,10 +204,10 @@ mod tests {
         assert_eq!(events.len(), 1);
         assert_eq!(
             events[0].event(),
-            &AuditEvent::UserLoginFailed(UserLoginFailedDetails {
-                username: "admin".to_string(),
-                user_agent: TEST_USER_AGENT.to_string(),
-            })
+            &AuditEvent::UserLoginFailed(json!({
+                "username": "admin".to_string(),
+                "user_agent": TEST_USER_AGENT.to_string(),
+            }))
         );
     }
 

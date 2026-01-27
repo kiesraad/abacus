@@ -2382,10 +2382,7 @@
             "description": "Only show events since the specified timestamp",
             "required": false,
             "schema": {
-              "type": [
-                "integer",
-                "null"
-              ],
+              "type": "integer",
               "format": "int64"
             }
           }
@@ -4044,9 +4041,7 @@
             "description": "User id",
             "required": true,
             "schema": {
-              "type": "integer",
-              "format": "int32",
-              "minimum": 0
+              "$ref": "#/components/schemas/UserId"
             }
           }
         ],
@@ -4118,11 +4113,10 @@
           {
             "name": "user_id",
             "in": "path",
+            "description": "User id",
             "required": true,
             "schema": {
-              "type": "integer",
-              "format": "int32",
-              "minimum": 0
+              "$ref": "#/components/schemas/UserId"
             }
           }
         ],
@@ -4214,11 +4208,10 @@
           {
             "name": "user_id",
             "in": "path",
+            "description": "User id",
             "required": true,
             "schema": {
-              "type": "integer",
-              "format": "int32",
-              "minimum": 0
+              "$ref": "#/components/schemas/UserId"
             }
           }
         ],
@@ -5171,9 +5164,7 @@
             "type": "string"
           },
           "user_id": {
-            "type": "integer",
-            "format": "int32",
-            "minimum": 0
+            "$ref": "#/components/schemas/UserId"
           },
           "user_role": {
             "$ref": "#/components/schemas/Role"
@@ -5250,7 +5241,7 @@
       },
       "CSOFirstSessionResults": {
         "type": "object",
-        "description": "CSOFirstSessionResults, following the fields in Model Na 31-2 Bijlage 2.\n\nSee \"Model Na 31-2. Proces-verbaal van een gemeentelijk stembureau/stembureau voor het openbaar\nlichaam in een gemeente/openbaar lichaam waar een centrale stemopneming wordt verricht,\nBijlage 2: uitkomsten per stembureau\" from the\n[Kiesregeling](https://wetten.overheid.nl/BWBR0034180/2024-04-01#Bijlage1_DivisieNa31.2) or\n[Verkiezingstoolbox](https://www.rijksoverheid.nl/onderwerpen/verkiezingen/verkiezingentoolkit/modellen).",
+        "description": "CSOFirstSessionResults, following the fields in Model Na 31-2 Bijlage 2.\n\nSee \"Model Na 31-2. Proces-verbaal van een gemeentelijk stembureau/stembureau voor het openbaar\nlichaam in een gemeente/openbaar lichaam waar een centrale stemopneming wordt verricht,\nBijlage 2: uitkomsten per stembureau\" from the\n[Kiesregeling](https://wetten.overheid.nl/BWBR0034180/2026-01-01#Bijlage1_DivisieNa31.2) or\n[Verkiezingstoolbox](https://www.rijksoverheid.nl/onderwerpen/verkiezingen/verkiezingentoolkit/modellen).",
         "required": [
           "extra_investigation",
           "counting_differences_polling_station",
@@ -5292,7 +5283,7 @@
       },
       "CSONextSessionResults": {
         "type": "object",
-        "description": "CSONextSessionResults, following the fields in Model Na 14-2 Bijlage 1.\n\nSee \"Model Na 14-2. Corrigendum bij het proces-verbaal van een gemeentelijk stembureau/\nstembureau voor het openbaar lichaam, Bijlage 1: uitkomsten per stembureau\" from the\n[Kiesregeling](https://wetten.overheid.nl/BWBR0034180/2024-04-01#Bijlage1_DivisieNa14.2) or\n[Verkiezingstoolbox](https://www.rijksoverheid.nl/onderwerpen/verkiezingen/verkiezingentoolkit/modellen).",
+        "description": "CSONextSessionResults, following the fields in Model Na 14-2 Bijlage 1.\n\nSee \"Model Na 14-2. Corrigendum bij het proces-verbaal van een gemeentelijk stembureau/\nstembureau voor het openbaar lichaam, Bijlage 1: uitkomsten per stembureau\" from the\n[Kiesregeling](https://wetten.overheid.nl/BWBR0034180/2026-01-01#Bijlage1_DivisieNa14.2) or\n[Verkiezingstoolbox](https://www.rijksoverheid.nl/onderwerpen/verkiezingen/verkiezingentoolkit/modellen).",
         "required": [
           "voters_counts",
           "votes_counts",
@@ -5492,10 +5483,7 @@
             "$ref": "#/components/schemas/FileId"
           },
           "session_start_date_time": {
-            "type": [
-              "string",
-              "null"
-            ],
+            "type": "string",
             "format": "date-time"
           },
           "session_status": {
@@ -5691,29 +5679,16 @@
             "type": "string"
           },
           "finished_at": {
-            "type": [
-              "string",
-              "null"
-            ]
+            "type": "string"
           },
           "first_entry_user_id": {
-            "type": [
-              "integer",
-              "null"
-            ],
-            "format": "int32",
-            "minimum": 0
+            "$ref": "#/components/schemas/UserId"
           },
           "polling_station_id": {
             "$ref": "#/components/schemas/PollingStationId"
           },
           "second_entry_user_id": {
-            "type": [
-              "integer",
-              "null"
-            ],
-            "format": "int32",
-            "minimum": 0
+            "$ref": "#/components/schemas/UserId"
           }
         },
         "additionalProperties": false
@@ -5731,17 +5706,13 @@
             "$ref": "#/components/schemas/PollingStationResults"
           },
           "first_entry_user_id": {
-            "type": "integer",
-            "format": "int32",
-            "minimum": 0
+            "$ref": "#/components/schemas/UserId"
           },
           "second_entry": {
             "$ref": "#/components/schemas/PollingStationResults"
           },
           "second_entry_user_id": {
-            "type": "integer",
-            "format": "int32",
-            "minimum": 0
+            "$ref": "#/components/schemas/UserId"
           }
         },
         "additionalProperties": false
@@ -5761,9 +5732,7 @@
             "$ref": "#/components/schemas/DataEntryStatusName"
           },
           "user_id": {
-            "type": "integer",
-            "format": "int32",
-            "minimum": 0
+            "$ref": "#/components/schemas/UserId"
           },
           "validation_results": {
             "$ref": "#/components/schemas/ValidationResults"
@@ -5918,10 +5887,7 @@
         ],
         "properties": {
           "candidate_data": {
-            "type": [
-              "string",
-              "null"
-            ]
+            "type": "string"
           },
           "candidate_hash": {
             "type": "array",
@@ -6600,9 +6566,7 @@
             "$ref": "#/components/schemas/Role"
           },
           "user_id": {
-            "type": "integer",
-            "format": "int32",
-            "minimum": 0
+            "$ref": "#/components/schemas/UserId"
           },
           "username": {
             "type": "string"
@@ -7296,9 +7260,7 @@
             "type": "string"
           },
           "id": {
-            "type": "integer",
-            "format": "int32",
-            "minimum": 0
+            "$ref": "#/components/schemas/UserId"
           },
           "last_activity_at": {
             "type": "string"
@@ -7329,15 +7291,18 @@
             "type": "string"
           },
           "user_id": {
-            "type": "integer",
-            "format": "int32",
-            "minimum": 0
+            "$ref": "#/components/schemas/UserId"
           },
           "username": {
             "type": "string"
           }
         },
         "additionalProperties": false
+      },
+      "UserId": {
+        "type": "integer",
+        "format": "int32",
+        "minimum": 0
       },
       "UserListResponse": {
         "type": "object",

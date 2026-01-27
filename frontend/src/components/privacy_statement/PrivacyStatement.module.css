@@ -1,0 +1,18 @@
+.privacy_statement {
+  max-width: 40rem;
+  color: var(--base-black);
+
+  h2,
+  h3,
+  p {
+    color: var(--base-black);
+  }
+
+  h2 {
+    margin-top: var(--space-xl);
+  }
+
+  p:not(:last-of-type) {
+    margin-bottom: var(--space-md);
+  }
+}

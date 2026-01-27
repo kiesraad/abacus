@@ -24,7 +24,7 @@ use crate::{
         AuditEvent, AuditService, UserDetails, UserLoggedInDetails, UserLoggedOutDetails,
         UserLoginFailedDetails,
     },
-    authentication::CreateUserRequest,
+    authentication::{CreateUserRequest, user::UserId},
     error::ErrorReference,
 };
 
@@ -55,9 +55,9 @@ pub struct Credentials {
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq, ToSchema)]
 #[serde(deny_unknown_fields)]
 pub struct LoginResponse {
-    pub user_id: u32,
+    pub user_id: UserId,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[schema(value_type = String, nullable = false)]
+    #[schema(nullable = false)]
     pub fullname: Option<String>,
     pub username: String,
     pub role: Role,
@@ -187,7 +187,7 @@ pub struct AccountUpdateRequest {
     pub username: String,
     pub password: String,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[schema(value_type = String, nullable = false)]
+    #[schema(nullable = false)]
     pub fullname: Option<String>,
 }
 

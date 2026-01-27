@@ -25,7 +25,7 @@ use super::{
 use crate::{
     APIError, AppState, SqlitePoolExt,
     audit_log::{AuditEvent, AuditService},
-    authentication::{Coordinator, Role, Typist, User, error::AuthenticationError},
+    authentication::{Coordinator, Role, Typist, User, error::AuthenticationError, user::UserId},
     committee_session::{
         CommitteeSession, CommitteeSessionError,
         status::{CommitteeSessionStatus, change_committee_session_status},
@@ -183,7 +183,7 @@ pub async fn delete_data_entry_and_result_for_polling_station(
 }
 
 fn initial_current_data_entry(
-    user_id: u32,
+    user_id: UserId,
     political_groups: &[PoliticalGroup],
     committee_session: &CommitteeSession,
     previous_results: Option<&PollingStationResults>,
@@ -678,7 +678,7 @@ async fn polling_station_data_entries_and_result_delete(
 pub struct DataEntryGetResponse {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[schema(nullable = false)]
-    pub user_id: Option<u32>,
+    pub user_id: Option<UserId>,
     pub data: PollingStationResults,
     pub status: DataEntryStatusName,
     pub validation_results: ValidationResults,
@@ -831,9 +831,9 @@ async fn polling_station_data_entry_resolve_errors(
 #[derive(Serialize, Deserialize, ToSchema, Debug)]
 #[serde(deny_unknown_fields)]
 pub struct DataEntryGetDifferencesResponse {
-    pub first_entry_user_id: u32,
+    pub first_entry_user_id: UserId,
     pub first_entry: PollingStationResults,
-    pub second_entry_user_id: u32,
+    pub second_entry_user_id: UserId,
     pub second_entry: PollingStationResults,
 }
 
@@ -970,11 +970,11 @@ pub struct ElectionStatusResponseEntry {
     /// First entry user id
     #[serde(skip_serializing_if = "Option::is_none")]
     #[schema(value_type = u8)]
-    pub first_entry_user_id: Option<u32>,
+    pub first_entry_user_id: Option<UserId>,
     /// Second entry user id
     #[serde(skip_serializing_if = "Option::is_none")]
     #[schema(value_type = u8)]
-    pub second_entry_user_id: Option<u32>,
+    pub second_entry_user_id: Option<UserId>,
     /// First entry progress as a percentage (0 to 100)
     #[serde(skip_serializing_if = "Option::is_none")]
     #[schema(value_type = u8)]
@@ -984,8 +984,8 @@ pub struct ElectionStatusResponseEntry {
     #[schema(value_type = u8)]
     pub second_entry_progress: Option<u8>,
     /// Time when the data entry was finalised
-    #[schema(value_type = String)]
     #[serde(skip_serializing_if = "Option::is_none")]
+    #[schema(value_type = String)]
     pub finished_at: Option<DateTime<Utc>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     #[schema(nullable = false)]
@@ -1083,8 +1083,8 @@ mod tests {
         entry_number: EntryNumber,
     ) -> Response {
         let user = match entry_number {
-            EntryNumber::FirstEntry => User::test_user(Role::Typist, 1),
-            EntryNumber::SecondEntry => User::test_user(Role::Typist, 2),
+            EntryNumber::FirstEntry => User::test_user(Role::Typist, UserId::from(1)),
+            EntryNumber::SecondEntry => User::test_user(Role::Typist, UserId::from(2)),
         };
         polling_station_data_entry_claim(
             Typist(user.clone()),
@@ -1103,8 +1103,8 @@ mod tests {
         entry_number: EntryNumber,
     ) -> Response {
         let user = match entry_number {
-            EntryNumber::FirstEntry => User::test_user(Role::Typist, 1),
-            EntryNumber::SecondEntry => User::test_user(Role::Typist, 2),
+            EntryNumber::FirstEntry => User::test_user(Role::Typist, UserId::from(1)),
+            EntryNumber::SecondEntry => User::test_user(Role::Typist, UserId::from(2)),
         };
         polling_station_data_entry_save(
             Typist(user.clone()),
@@ -1123,8 +1123,8 @@ mod tests {
         entry_number: EntryNumber,
     ) -> Response {
         let user = match entry_number {
-            EntryNumber::FirstEntry => User::test_user(Role::Typist, 1),
-            EntryNumber::SecondEntry => User::test_user(Role::Typist, 2),
+            EntryNumber::FirstEntry => User::test_user(Role::Typist, UserId::from(1)),
+            EntryNumber::SecondEntry => User::test_user(Role::Typist, UserId::from(2)),
         };
         polling_station_data_entry_delete(
             Typist(user.clone()),
@@ -1140,7 +1140,7 @@ mod tests {
         pool: SqlitePool,
         polling_station_id: PollingStationId,
     ) -> Response {
-        let user = User::test_user(Role::Coordinator, 1);
+        let user = User::test_user(Role::Coordinator, UserId::from(1));
         polling_station_data_entries_and_result_delete(
             Coordinator(user.clone()),
             State(pool.clone()),
@@ -1157,8 +1157,8 @@ mod tests {
         entry_number: EntryNumber,
     ) -> Response {
         let user = match entry_number {
-            EntryNumber::FirstEntry => User::test_user(Role::Typist, 1),
-            EntryNumber::SecondEntry => User::test_user(Role::Typist, 2),
+            EntryNumber::FirstEntry => User::test_user(Role::Typist, UserId::from(1)),
+            EntryNumber::SecondEntry => User::test_user(Role::Typist, UserId::from(2)),
         };
         polling_station_data_entry_finalise(
             Typist(user.clone()),
@@ -1175,7 +1175,7 @@ mod tests {
         polling_station_id: PollingStationId,
         action: ResolveDifferencesAction,
     ) -> Response {
-        let user = User::test_user(Role::Coordinator, 1);
+        let user = User::test_user(Role::Coordinator, UserId::from(1));
         polling_station_data_entry_resolve_differences(
             Coordinator(user.clone()),
             State(pool.clone()),
@@ -1192,7 +1192,7 @@ mod tests {
         polling_station_id: PollingStationId,
         action: ResolveErrorsAction,
     ) -> Response {
-        let user = User::test_user(Role::Coordinator, 1);
+        let user = User::test_user(Role::Coordinator, UserId::from(1));
         polling_station_data_entry_resolve_errors(
             Coordinator(user.clone()),
             State(pool.clone()),
@@ -1909,7 +1909,7 @@ mod tests {
         let response = finalise(pool.clone(), polling_station_id, EntryNumber::FirstEntry).await;
         assert_eq!(response.status(), StatusCode::OK);
 
-        let user = User::test_user(Role::Coordinator, 1);
+        let user = User::test_user(Role::Coordinator, UserId::from(1));
         let response = polling_station_data_entry_get(
             Coordinator(user),
             State(pool.clone()),
@@ -2058,10 +2058,10 @@ mod tests {
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
     async fn test_polling_station_data_entry_delete_nonexistent(pool: SqlitePool) {
-        let user = User::test_user(Role::Typist, 1);
+        let user = User::test_user(Role::Typist, UserId::from(1));
         // check that deleting a non-existing data entry returns 404
         let response = polling_station_data_entry_delete(
-            Typist(User::test_user(Role::Typist, 1)),
+            Typist(User::test_user(Role::Typist, UserId::from(1))),
             State(pool.clone()),
             Path((PollingStationId::from(1), EntryNumber::FirstEntry)),
             AuditService::new(Some(user), None),
@@ -2573,7 +2573,7 @@ mod tests {
     /// First committee session, should return all polling station statuses
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
     async fn test_statuses_first_session_all_polling_stations(pool: SqlitePool) {
-        let user = User::test_user(Role::Coordinator, 1);
+        let user = User::test_user(Role::Coordinator, UserId::from(1));
         let response =
             election_status(user.clone(), State(pool.clone()), Path(ElectionId::from(2)))
                 .await
@@ -2588,7 +2588,7 @@ mod tests {
     /// New committee session without investigations, should return no polling station statuses
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_7_four_sessions"))))]
     async fn test_statuses_second_session_no_polling_stations(pool: SqlitePool) {
-        let user = User::test_user(Role::Coordinator, 1);
+        let user = User::test_user(Role::Coordinator, UserId::from(1));
         let response =
             election_status(user.clone(), State(pool.clone()), Path(ElectionId::from(7)))
                 .await
@@ -2603,7 +2603,7 @@ mod tests {
     /// Second committee session with 1 investigation, should return 1 polling station status
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_5_with_results"))))]
     async fn test_statuses_second_session_with_investigation(pool: SqlitePool) {
-        let user = User::test_user(Role::Coordinator, 1);
+        let user = User::test_user(Role::Coordinator, UserId::from(1));
 
         let response =
             election_status(user.clone(), State(pool.clone()), Path(ElectionId::from(5)))
@@ -2624,7 +2624,7 @@ mod tests {
             pool: SqlitePool,
             polling_station_id: PollingStationId,
         ) -> Result<DataEntryGetResponse, ErrorResponse> {
-            let user = User::test_user(Role::Coordinator, 1);
+            let user = User::test_user(Role::Coordinator, UserId::from(1));
             let response = polling_station_data_entry_get(
                 Coordinator(user),
                 State(pool),
@@ -2669,7 +2669,7 @@ mod tests {
                     .unwrap();
 
             assert_eq!(result.status, DataEntryStatusName::FirstEntryInProgress);
-            assert_eq!(result.user_id, Some(1));
+            assert_eq!(result.user_id, Some(UserId::from(1)));
             assert_eq!(result.data.as_common().voters_counts.poll_card_count, 0);
             assert!(!result.validation_results.has_errors());
             assert!(!result.validation_results.has_warnings());
@@ -2697,7 +2697,7 @@ mod tests {
                 .unwrap();
 
             assert_eq!(result.status, DataEntryStatusName::FirstEntryHasErrors);
-            assert_eq!(result.user_id, Some(1));
+            assert_eq!(result.user_id, Some(UserId::from(1)));
             assert_eq!(result.data.as_common().voters_counts.poll_card_count, 1234);
             assert_eq!(
                 result.validation_results.errors,
@@ -2731,7 +2731,7 @@ mod tests {
                 .unwrap();
 
             assert_eq!(result.status, DataEntryStatusName::FirstEntryFinalised);
-            assert_eq!(result.user_id, Some(1));
+            assert_eq!(result.user_id, Some(UserId::from(1)));
             assert_eq!(result.data.as_common().voters_counts.poll_card_count, 199);
             assert!(!result.validation_results.has_errors());
             assert!(result.validation_results.has_warnings());
@@ -2761,7 +2761,7 @@ mod tests {
                 .unwrap();
 
             assert_eq!(result.status, DataEntryStatusName::SecondEntryInProgress);
-            assert_eq!(result.user_id, Some(2));
+            assert_eq!(result.user_id, Some(UserId::from(2)));
             assert_eq!(result.data.as_common().voters_counts.poll_card_count, 0);
             assert!(!result.validation_results.has_errors());
             assert!(!result.validation_results.has_warnings());

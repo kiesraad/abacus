@@ -70,7 +70,7 @@ impl From<PollingStation> for PollingStationDetails {
 pub struct PollingStationRequest {
     pub name: String,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[schema(nullable = false, value_type = u32)]
+    #[schema(value_type = u32, nullable = false)]
     pub number: Option<PollingStationNumber>,
     #[serde(skip_serializing_if = "Option::is_none")]
     #[schema(nullable = false)]

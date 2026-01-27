@@ -82,7 +82,8 @@ function addRequest(requestPath: string, request: OperationObject) {
       } else {
         const paramType = tsType(p.schema);
         requestPath = requestPath.replace(`{${p.name}}`, `\${${paramType}}`);
-        result.push(`${p.name}: ${paramType};`);
+        const optional = p.required ? "" : "?";
+        result.push(`${p.name}${optional}: ${paramType};`);
       }
     });
     result.push("}");
@@ -139,7 +140,6 @@ function addDefinition(name: string, v: ReferenceObject | SchemaObject) {
   return result.join("\n");
 }
 
-// biome-ignore lint/complexity/noExcessiveLinesPerFunction: TODO function should be refactored
 function tsType(s: ReferenceObject | SchemaObject | undefined): string {
   if (!s) return "unknown";
 

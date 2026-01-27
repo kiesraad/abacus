@@ -28,7 +28,6 @@ interface DataEntryErrors {
   validationError: string | undefined;
 }
 
-// biome-ignore lint/complexity/noExcessiveLinesPerFunction: TODO function should be refactored
 export function usePollingStationDataEntryErrors(pollingStationId: number): DataEntryErrors {
   const navigate = useNavigate();
   const client = useApiClient();

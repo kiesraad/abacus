@@ -25,7 +25,6 @@ export interface SessionState {
 // Keep track of the currently logged-in user
 // By initially fetching the user data from the server
 // and then updating it when the user logs in or out
-// biome-ignore lint/complexity/noExcessiveLinesPerFunction: TODO function should be refactored
 export default function useSessionState(client: ApiClient, fetchInitialUser: boolean = true): SessionState {
   const [user, setUser] = useState<LoginResponse | null>(null);
   const [expiration, setExpiration] = useState<Date | null>(null);

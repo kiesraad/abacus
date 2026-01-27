@@ -12,18 +12,20 @@ use super::{
     password::{HashedPassword, ValidatedPassword, hash_password, verify_password},
     role::Role,
 };
-use crate::{APIError, audit_log::UserDetails, authentication::role::IncompleteUser};
+use crate::{APIError, audit_log::UserDetails, authentication::role::IncompleteUser, util::id};
 
 const MIN_UPDATE_LAST_ACTIVITY_AT_SECS: i64 = 60; // 1 minute
+
+id!(UserId);
 
 /// User object, corresponds to a row in the users table
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Hash, FromRow, ToSchema)]
 // can't set `deny_unknown_fields` because this would break tests where `needs_password_change` is returned from API
 pub struct User {
-    id: u32,
+    id: UserId,
     username: String,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[schema(value_type = String, nullable = false)]
+    #[schema(nullable = false)]
     fullname: Option<String>,
     role: Role,
     #[serde(skip_deserializing)]
@@ -31,7 +33,7 @@ pub struct User {
     #[serde(skip)]
     password_hash: HashedPassword,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[schema(value_type = String, nullable = false)]
+    #[schema(value_type = String)]
     last_activity_at: Option<DateTime<Utc>>,
     #[schema(value_type = String)]
     updated_at: DateTime<Utc>,
@@ -51,7 +53,7 @@ impl From<User> for UserDetails {
 }
 
 impl User {
-    pub fn id(&self) -> u32 {
+    pub fn id(&self) -> UserId {
         self.id
     }
 
@@ -102,9 +104,9 @@ impl User {
     }
 
     #[cfg(test)]
-    pub fn test_user(role: Role, id: u32) -> Self {
+    pub fn test_user(role: Role, user_id: UserId) -> Self {
         Self {
-            id,
+            id: user_id,
             username: "test_user_1".to_string(),
             fullname: Some("Full Name".to_string()),
             role,
@@ -214,7 +216,7 @@ pub async fn create(
         r#"INSERT INTO users (username, fullname, password_hash, needs_password_change, role)
         VALUES (?, ?, ?, ?, ?)
         RETURNING
-            id as "id: u32",
+            id as "id: UserId",
             username,
             fullname,
             password_hash,
@@ -249,7 +251,7 @@ pub async fn create(
 /// Delete a user
 pub async fn delete(
     conn: &mut SqliteConnection,
-    user_id: u32,
+    user_id: UserId,
 ) -> Result<bool, AuthenticationError> {
     let rows_affected = sqlx::query_as!(User, r#" DELETE FROM users WHERE id = ?"#, user_id)
         .execute(conn)
@@ -262,7 +264,7 @@ pub async fn delete(
 /// Update a user's password
 pub async fn update_password(
     conn: &mut SqliteConnection,
-    user_id: u32,
+    user_id: UserId,
     username: &str,
     new_password: &str,
 ) -> Result<(), AuthenticationError> {
@@ -292,7 +294,7 @@ pub async fn update_password(
 /// Update a user's fullname
 pub async fn update_fullname(
     conn: &mut SqliteConnection,
-    user_id: u32,
+    user_id: UserId,
     fullname: &str,
 ) -> Result<(), AuthenticationError> {
     sqlx::query!(
@@ -309,7 +311,7 @@ pub async fn update_fullname(
 /// Set a temporary password for a user
 pub async fn set_temporary_password(
     conn: &mut SqliteConnection,
-    user_id: u32,
+    user_id: UserId,
     temp_password: &str,
 ) -> Result<(), AuthenticationError> {
     let username = username_by_id(conn, user_id).await?;
@@ -334,7 +336,7 @@ pub async fn get_by_username(
         User,
         r#"
         SELECT
-            id as "id: u32",
+            id as "id: UserId",
             username,
             fullname,
             role,
@@ -356,13 +358,13 @@ pub async fn get_by_username(
 /// Get a user by their id
 pub async fn get_by_id(
     conn: &mut SqliteConnection,
-    id: u32,
+    user_id: UserId,
 ) -> Result<Option<User>, AuthenticationError> {
     let user = sqlx::query_as!(
         User,
         r#"
         SELECT
-            id as "id: u32",
+            id as "id: UserId",
             username,
             fullname,
             role,
@@ -373,7 +375,7 @@ pub async fn get_by_id(
             created_at as "created_at: _"
         FROM users WHERE id = ?
         "#,
-        id
+        user_id
     )
     .fetch_optional(conn)
     .await?;
@@ -388,7 +390,7 @@ pub async fn list(
     let users = query_as!(
         User,
         r#"SELECT
-            id as "id: u32",
+            id as "id: UserId",
             username,
             fullname,
             password_hash,
@@ -431,7 +433,7 @@ pub async fn admin_exists(conn: &mut SqliteConnection) -> Result<bool, Authentic
 
 pub async fn username_by_id(
     conn: &mut SqliteConnection,
-    user_id: u32,
+    user_id: UserId,
 ) -> Result<String, sqlx::Error> {
     Ok(
         sqlx::query!("SELECT username FROM users WHERE id = ?", user_id)
@@ -443,7 +445,7 @@ pub async fn username_by_id(
 
 pub async fn update_last_activity_at(
     conn: &mut SqliteConnection,
-    user_id: u32,
+    user_id: UserId,
 ) -> Result<(), sqlx::Error> {
     query!(
         r#"UPDATE users SET last_activity_at = CURRENT_TIMESTAMP WHERE id = ?"#,
@@ -459,7 +461,12 @@ mod tests {
     use sqlx::SqlitePool;
     use test_log::test;
 
-    use crate::authentication::{error::AuthenticationError, password, role::Role, user::User};
+    use crate::authentication::{
+        error::AuthenticationError,
+        password,
+        role::Role,
+        user::{User, UserId},
+    };
 
     #[test(sqlx::test)]
     async fn test_create_user(pool: SqlitePool) {
@@ -678,7 +685,7 @@ mod tests {
     #[test]
     fn test_should_update_last_activity_at() {
         let mut user = User {
-            id: 2,
+            id: UserId::from(2),
             username: "user1".to_string(),
             fullname: Some("Full Name".to_string()),
             role: Role::Typist,

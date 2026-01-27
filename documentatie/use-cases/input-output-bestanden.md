@@ -166,7 +166,7 @@ EML_NL 510a (tellingsbestand stembureau) wordt niet gebruikt.
   - hertelling en wijziging in zetelverdeling: aangevuld met 2.3 t/m 2.10 o.b.v nieuwe telling
 - alleen relevant bij een hertelling n.a.v. bezwaar tijdens zitting CSB
   - dus niet bij terugverwijzing door CSB vóór invoer in Abacus
-  - dus niet bij hertelling op verzoek van gemeenteraad ([Artikel V 4a Kieswet](https://wetten.overheid.nl/jci1.3:c:BWBR0004627&afdeling=IV&hoofdstuk=V&paragraaf=1&artikel=V_4a&z=2025-02-12&g=2025-02-12))
+  - dus niet bij hertelling op verzoek van gemeenteraad ([Artikel V 4a Kieswet](https://wetten.overheid.nl/BWBR0004627/2026-01-01/#AfdelingIV_HoofdstukV_Paragraaf1_ArtikelV4a))
 
 ### Benoemingsbrieven en geloofsbrieven
 

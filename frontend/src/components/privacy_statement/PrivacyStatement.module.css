@@ -1,8 +1,5 @@
 .privacy_statement {
   max-width: 40rem;
-  display: flex;
-  flex-direction: column;
-  gap: 2.5rem;
   color: var(--base-black);
 
   h2,
@@ -11,11 +8,11 @@
     color: var(--base-black);
   }
 
-  p {
-    margin-bottom: 1rem;
+  h2 {
+    margin-top: var(--space-xl);
   }
 
-  ul {
-    margin-block-end: 0;
+  p {
+    margin-bottom: var(--space-md);
   }
 }

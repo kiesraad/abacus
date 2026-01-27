@@ -8,6 +8,7 @@ use utoipa::ToSchema;
 
 use crate::{
     APIError, ErrorResponse,
+    api::data_entry::util::validate_and_get_data,
     domain::{
         committee_session::CommitteeSession,
         data_entry_status::{CurrentDataEntry, DataEntryStatus},
@@ -25,7 +26,6 @@ use crate::{
         db::SqlitePoolExt,
     },
     repository::{data_entry_repo, polling_station_result_repo},
-    service::data_entry::validate_and_get_data,
 };
 
 /// Claim a data entry for a polling station, returning any existing progress

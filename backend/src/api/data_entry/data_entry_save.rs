@@ -9,6 +9,7 @@ use utoipa::ToSchema;
 
 use crate::{
     APIError, ErrorResponse,
+    api::data_entry::util::validate_and_get_data,
     domain::{
         data_entry_status::{ClientState, CurrentDataEntry},
         entry_number::EntryNumber,
@@ -21,7 +22,6 @@ use crate::{
         db::SqlitePoolExt,
     },
     repository::data_entry_repo,
-    service::data_entry::validate_and_get_data,
 };
 
 /// Save a data entry for a polling station

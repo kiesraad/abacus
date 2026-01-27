@@ -1,1 +1,2 @@
 pub mod change_committee_session_status;
+pub mod delete_data_entry_and_result;

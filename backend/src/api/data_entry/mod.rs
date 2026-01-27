@@ -7,6 +7,7 @@ mod data_entry_save;
 mod election_status;
 mod resolve_differences;
 mod resolve_errors;
+mod util;
 
 use utoipa_axum::{router::OpenApiRouter, routes};
 

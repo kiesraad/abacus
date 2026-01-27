@@ -35,9 +35,8 @@ use crate::{
     infra::{db::SqlitePoolExt, generate_test_data::GenerateElectionArgs},
     repository::{
         committee_session_repo, data_entry_repo, election_repo, polling_station_repo,
-        polling_station_result_repo,
+        polling_station_result_repo, polling_station_result_repo::make_definitive,
     },
-    service::data_entry::make_definitive,
 };
 
 pub struct CreateTestElectionResult {

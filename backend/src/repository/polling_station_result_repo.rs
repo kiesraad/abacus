@@ -4,7 +4,8 @@ use sqlx::{Connection, SqliteConnection, query, query_as, types::Json};
 
 use crate::{
     domain::{
-        polling_station::PollingStation, polling_station_result::PollingStationResult,
+        data_entry_status::DataEntryStatus, polling_station::PollingStation,
+        polling_station_result::PollingStationResult,
         polling_station_results::PollingStationResults,
     },
     repository::{committee_session_repo, polling_station_repo},
@@ -216,6 +217,47 @@ pub async fn all_investigations_finished(
     .fetch_one(conn)
     .await
     .map(|r| r.result)
+}
+
+pub async fn make_definitive(
+    conn: &mut SqliteConnection,
+    polling_station_id: u32,
+    committee_session_id: u32,
+    new_state: &DataEntryStatus,
+    definitive_entry: &PollingStationResults,
+) -> Result<(), sqlx::Error> {
+    let mut tx = conn.begin().await?;
+
+    let definitive_entry = Json(definitive_entry);
+    query!(
+        "INSERT INTO polling_station_results (polling_station_id, committee_session_id, data) VALUES ($1, $2, $3)",
+        polling_station_id,
+        committee_session_id,
+        definitive_entry,
+    )
+        .execute(&mut *tx)
+        .await?;
+
+    let new_state = Json(new_state);
+    query!(
+        r#"
+            INSERT INTO polling_station_data_entries (polling_station_id, committee_session_id, state)
+            VALUES (?, ?, ?)
+            ON CONFLICT(polling_station_id, committee_session_id) DO
+            UPDATE SET
+                state = excluded.state,
+                updated_at = CURRENT_TIMESTAMP
+        "#,
+        polling_station_id,
+        committee_session_id,
+        new_state
+    )
+        .execute(&mut *tx)
+        .await?;
+
+    tx.commit().await?;
+
+    Ok(())
 }
 
 #[cfg(test)]

@@ -8,6 +8,7 @@ use utoipa::ToSchema;
 
 use crate::{
     APIError, ErrorResponse,
+    api::data_entry::util::validate_and_get_data,
     domain::{
         data_entry_status::{DataEntryStatus, DataEntryStatusName},
         polling_station_results::PollingStationResults,
@@ -16,7 +17,6 @@ use crate::{
     error::ErrorReference,
     infra::authentication::Coordinator,
     repository::polling_station_result_repo,
-    service::data_entry::validate_and_get_data,
 };
 
 /// Get data entry with validation results

@@ -5,7 +5,10 @@ use crate::{
     APIError, ErrorResponse,
     api::{
         extractors::CurrentSessionPollingStationId,
-        util::change_committee_session_status::change_committee_session_status,
+        util::{
+            change_committee_session_status::change_committee_session_status,
+            delete_data_entry_and_result::delete_data_entry_and_result_for_polling_station,
+        },
     },
     domain::{
         committee_session::CommitteeSession,
@@ -33,7 +36,6 @@ use crate::{
         polling_station_repo,
         polling_station_result_repo::result_exists,
     },
-    service::data_entry::delete_data_entry_and_result_for_polling_station,
 };
 
 /// Validate that the committee session is in a state that allows mutations

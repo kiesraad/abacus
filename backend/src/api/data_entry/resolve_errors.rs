@@ -8,6 +8,10 @@ use utoipa::ToSchema;
 
 use crate::{
     APIError, ErrorResponse,
+    api::{
+        data_entry::util::validate_and_get_data,
+        util::delete_data_entry_and_result::delete_data_entry_and_result_for_polling_station,
+    },
     domain::{
         data_entry_status::DataEntryStatus, data_entry_status_response::DataEntryStatusResponse,
         polling_station_data_entry::PollingStationDataEntry,
@@ -18,9 +22,6 @@ use crate::{
         db::SqlitePoolExt,
     },
     repository::data_entry_repo,
-    service::data_entry::{
-        delete_data_entry_and_result_for_polling_station, validate_and_get_data,
-    },
 };
 
 /// Resolve accepted data entry errors by providing a `ResolveErrorsAction`

@@ -6,6 +6,7 @@ use sqlx::SqlitePool;
 
 use crate::{
     APIError, ErrorResponse,
+    api::data_entry::util::validate_and_get_data,
     domain::{
         data_entry_status::DataEntryStatus, data_entry_status_response::DataEntryStatusResponse,
         entry_number::EntryNumber,
@@ -15,8 +16,7 @@ use crate::{
         authentication::Typist,
         db::SqlitePoolExt,
     },
-    repository::data_entry_repo,
-    service::data_entry::{make_definitive, validate_and_get_data},
+    repository::{data_entry_repo, polling_station_result_repo::make_definitive},
 };
 
 /// Finalise the data entry for a polling station

@@ -7,7 +7,6 @@ mod error;
 pub mod fixtures;
 pub mod infra;
 pub mod repository;
-pub mod service;
 
 pub use app_error::AppError;
 pub use error::{APIError, ErrorResponse};

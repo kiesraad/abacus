@@ -9,7 +9,10 @@ use crate::{
     APIError,
     api::{
         election::investigation::delete_investigation_for_polling_station,
-        util::change_committee_session_status::change_committee_session_status,
+        util::{
+            change_committee_session_status::change_committee_session_status,
+            delete_data_entry_and_result::delete_data_entry_and_result_for_polling_station,
+        },
     },
     domain::{
         committee_session::CommitteeSession,
@@ -32,7 +35,6 @@ use crate::{
         election_repo, polling_station_repo,
         polling_station_repo::{create_many, delete, get_for_election, update},
     },
-    service::data_entry::delete_data_entry_and_result_for_polling_station,
 };
 
 /// Get a list of all [PollingStation]s for an election

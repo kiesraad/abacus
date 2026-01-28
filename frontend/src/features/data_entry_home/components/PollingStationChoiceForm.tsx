@@ -20,7 +20,7 @@ import { useDebouncedCallback } from "../hooks/useDebouncedCallback";
 import { getUrlForDataEntry, PollingStationUserStatus, type PollingStationWithStatus } from "../utils/util";
 import cls from "./PollingStationChoice.module.css";
 import { PollingStationLink } from "./PollingStationLink";
-import { PollingStationSelector } from "./PollingStationSelector";
+import { PollingStationNumberInput } from "./PollingStationNumberInput";
 import { PollingStationsList } from "./PollingStationsList";
 
 const USER_INPUT_DEBOUNCE: number = 500; // ms
@@ -172,7 +172,7 @@ export function PollingStationChoiceForm({ anotherEntry }: PollingStationChoiceF
             {anotherEntry ? t("polling_station_choice.insert_another") : t("polling_station_choice.insert_title")}
           </h2>
         </legend>
-        <PollingStationSelector
+        <PollingStationNumberInput
           pollingStationNumber={pollingStationNumber}
           updatePollingStationNumber={updatePollingStationNumber}
           loading={loading}

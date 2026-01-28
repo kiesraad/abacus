@@ -56,7 +56,7 @@ describe("Test PollingStationChoiceForm", () => {
 
       // Test if the feedback field shows an error
       await user.type(pollingStation, "abc");
-      const pollingStationFeedback = await screen.findByTestId("pollingStationSelectorFeedback");
+      const pollingStationFeedback = await screen.findByTestId("pollingStationNumberInputFeedback");
       expect(await within(pollingStationFeedback).findByText("Geen stembureau gevonden met nummer abc")).toBeVisible();
 
       await user.clear(pollingStation);
@@ -77,7 +77,7 @@ describe("Test PollingStationChoiceForm", () => {
 
       // Test if the polling station name is shown
       await user.type(pollingStation, "33");
-      const pollingStationFeedback = await screen.findByTestId("pollingStationSelectorFeedback");
+      const pollingStationFeedback = await screen.findByTestId("pollingStationNumberInputFeedback");
       expect(await within(pollingStationFeedback).findByText("Op Rolletjes")).toBeVisible();
     });
 
@@ -90,7 +90,7 @@ describe("Test PollingStationChoiceForm", () => {
 
       // Test if the polling station name is shown
       await user.type(pollingStation, "0034");
-      const pollingStationFeedback = await screen.findByTestId("pollingStationSelectorFeedback");
+      const pollingStationFeedback = await screen.findByTestId("pollingStationNumberInputFeedback");
       expect(await within(pollingStationFeedback).findByText(/Testplek/)).toBeVisible();
     });
 
@@ -157,7 +157,7 @@ describe("Test PollingStationChoiceForm", () => {
       const pollingStation = await screen.findByTestId("pollingStation");
       await user.type(pollingStation, pollingStationInput);
 
-      const pollingStationSelectFeedback = await screen.findByTestId("pollingStationSelectorFeedback");
+      const pollingStationSelectFeedback = await screen.findByTestId("pollingStationNumberInputFeedback");
       await waitFor(() => {
         expect(pollingStationSelectFeedback).toHaveTextContent(selectorFeedback);
       });
@@ -178,14 +178,14 @@ describe("Test PollingStationChoiceForm", () => {
 
       // Test if the error message is shown correctly without leading zeroes
       await user.type(pollingStation, "0099");
-      const pollingStationFeedback = await screen.findByTestId("pollingStationSelectorFeedback");
+      const pollingStationFeedback = await screen.findByTestId("pollingStationNumberInputFeedback");
       expect(await within(pollingStationFeedback).findByText("Geen stembureau gevonden met nummer 99")).toBeVisible();
 
       await user.clear(pollingStation);
 
       // Test if the error message is shown correctly when just entering number 0
       await user.type(pollingStation, "0");
-      const pollingStationFeedback2 = await screen.findByTestId("pollingStationSelectorFeedback");
+      const pollingStationFeedback2 = await screen.findByTestId("pollingStationNumberInputFeedback");
       expect(await within(pollingStationFeedback2).findByText("Geen stembureau gevonden met nummer 0")).toBeVisible();
     });
 
@@ -202,7 +202,7 @@ describe("Test PollingStationChoiceForm", () => {
 
       const pollingStation = await screen.findByTestId("pollingStation");
       await user.type(pollingStation, "33");
-      const pollingStationFeedback = await screen.findByTestId("pollingStationSelectorFeedback");
+      const pollingStationFeedback = await screen.findByTestId("pollingStationNumberInputFeedback");
       expect(
         await within(pollingStationFeedback).findByText("Stembureau 33 kan nu niet ingevoerd worden"),
       ).toBeVisible();
@@ -248,7 +248,7 @@ describe("Test PollingStationChoiceForm", () => {
       const pollingStation = await screen.findByTestId("pollingStation");
 
       await user.type(pollingStation, "33");
-      const pollingStationSearching = await screen.findByTestId("pollingStationSelectorFeedback");
+      const pollingStationSearching = await screen.findByTestId("pollingStationNumberInputFeedback");
       expect(within(pollingStationSearching).getByText("aan het zoeken …")).toBeVisible();
     });
 
@@ -496,7 +496,7 @@ describe("Test PollingStationChoiceForm", () => {
 
       await user.type(pollingStation, `${testPollingStation.number}`);
 
-      const pollingStationFeedback = await screen.findByTestId("pollingStationSelectorFeedback");
+      const pollingStationFeedback = await screen.findByTestId("pollingStationNumberInputFeedback");
       expect(
         await within(pollingStationFeedback).findByText(
           `Een andere invoerder is bezig met stembureau ${testPollingStation.number}`,
@@ -549,7 +549,7 @@ describe("Test PollingStationChoiceForm", () => {
 
       await user.type(pollingStation, `${testPollingStation.number}`);
 
-      const pollingStationFeedback = await screen.findByTestId("pollingStationSelectorFeedback");
+      const pollingStationFeedback = await screen.findByTestId("pollingStationNumberInputFeedback");
       expect(await within(pollingStationFeedback).findByText(testPollingStation.name)).toBeVisible();
 
       expect(within(pollingStationFeedback).getByRole("img", { hidden: true })).toHaveAttribute(
@@ -575,7 +575,7 @@ describe("Test PollingStationChoiceForm", () => {
         String(testPollingStation.number),
       );
 
-      const pollingStationFeedback = await screen.findByTestId("pollingStationSelectorFeedback");
+      const pollingStationFeedback = await screen.findByTestId("pollingStationNumberInputFeedback");
       await waitFor(() => {
         expect(pollingStationFeedback).toHaveTextContent("Stembureau 37 ligt ter beoordeling bij de coördinator");
       });
@@ -646,7 +646,7 @@ describe("Test PollingStationChoiceForm", () => {
     const pollingStation = await screen.findByTestId("pollingStation");
     await user.type(pollingStation, testPollingStation.number.toString());
 
-    const pollingStationFeedback = await screen.findByTestId("pollingStationSelectorFeedback");
+    const pollingStationFeedback = await screen.findByTestId("pollingStationNumberInputFeedback");
 
     expect(
       await within(pollingStationFeedback).findByText(

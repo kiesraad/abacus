@@ -20,7 +20,7 @@ interface FeedbackMessageProps {
 }
 
 const FeedbackMessage = ({ messageType, content, icon }: FeedbackMessageProps) => (
-  <div id="pollingStationSelectorFeedback" className={cn(cls.message, cls[messageType])}>
+  <div id="pollingStationNumberInputFeedback" className={cn(cls.message, cls[messageType])}>
     {icon && (
       <span className={cls.icon}>
         <Icon
@@ -33,7 +33,7 @@ const FeedbackMessage = ({ messageType, content, icon }: FeedbackMessageProps) =
   </div>
 );
 
-export interface PollingStationSelectorProps {
+export interface PollingStationNumberInputProps {
   pollingStationNumber: string;
   updatePollingStationNumber: (n: string) => void;
   loading: boolean;
@@ -45,7 +45,7 @@ export interface PollingStationSelectorProps {
 }
 
 // biome-ignore lint/complexity/noExcessiveLinesPerFunction: TODO function should be refactored
-export function PollingStationSelector({
+export function PollingStationNumberInput({
   pollingStationNumber,
   updatePollingStationNumber,
   loading,
@@ -53,7 +53,7 @@ export function PollingStationSelector({
   setAlert,
   handleSubmit,
   refetchStatuses,
-}: PollingStationSelectorProps) {
+}: PollingStationNumberInputProps) {
   const [refetch, reset] = useSingleCall(refetchStatuses);
   const user = useUser();
   if (!user) {

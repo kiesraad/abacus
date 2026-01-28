@@ -124,7 +124,7 @@ jobs:
           package-manager-cache: false
       - name: Install pnpm
         run: >
-          npm install --global corepack@latest &&
+          npm install --global --force corepack@latest &&
           corepack enable &&
           corepack prepare pnpm@latest-10 --activate
       - name: Install dependencies

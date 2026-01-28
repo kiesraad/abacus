@@ -94,12 +94,14 @@ jobs:
           path: ${{ matrix.target.binary }}
 
   playwright-e2e:
-    name: Playwright e2e tests (${{ matrix.os }}
+    name: Playwright e2e tests (${{ matrix.os }} ${{ matrix.shardIndex }}/${{ matrix.shardTotal }})
     needs:
       - build
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest]
+        shardIndex: [1, 2, 3]
+        shardTotal: [3]
     runs-on: ${{ matrix.os }}
     defaults:
       run:
@@ -125,12 +127,12 @@ jobs:
         run: chmod a+x ../builds/backend/abacus
         if: runner.os != 'Windows'
       - name: Run Playwright e2e tests
-        run: npm run test:e2e
+        run: npm run test:e2e -- --shard=${{ matrix.shardIndex }}/${{ matrix.shardTotal }}
       - name: Upload Playwright report
         uses: actions/upload-artifact@v5
         if: ${{ !cancelled() }}
         with:
-          name: playwright-report-release-${{ matrix.os }}
+          name: playwright-report-release-${{ matrix.os }}-${{ matrix.shardIndex }}
           path: frontend/playwright-report/
           retention-days: 30
 

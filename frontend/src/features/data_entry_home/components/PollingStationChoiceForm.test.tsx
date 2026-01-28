@@ -1,6 +1,7 @@
 import { userEvent } from "@testing-library/user-event";
 import { HttpResponse, http } from "msw";
 import { beforeEach, describe, expect, test, vi } from "vitest";
+
 import { ElectionProvider } from "@/hooks/election/ElectionProvider";
 import { ElectionStatusProvider } from "@/hooks/election/ElectionStatusProvider";
 import * as useUser from "@/hooks/user/useUser";
@@ -9,21 +10,22 @@ import { statusResponseMock } from "@/testing/api-mocks/ElectionStatusMockData";
 import { pollingStationMockData } from "@/testing/api-mocks/PollingStationMockData";
 import { ElectionRequestHandler, ElectionStatusRequestHandler } from "@/testing/api-mocks/RequestHandlers";
 import { overrideOnce, server } from "@/testing/server";
-import { render, renderReturningRouter, screen, waitFor, within } from "@/testing/test-utils";
+import { renderReturningRouter, screen, waitFor, within } from "@/testing/test-utils";
 import type { ElectionStatusResponse, LoginResponse } from "@/types/generated/openapi";
 
 import { PollingStationChoiceForm } from "./PollingStationChoiceForm";
 
-async function renderPollingStationChoiceForm() {
+async function renderPollingStationChoiceForm(anotherEntry?: boolean) {
   const router = renderReturningRouter(
     <ElectionProvider electionId={1}>
       <ElectionStatusProvider electionId={1}>
-        <PollingStationChoiceForm />
+        <PollingStationChoiceForm anotherEntry={anotherEntry} />
       </ElectionStatusProvider>
     </ElectionProvider>,
   );
 
-  expect(await screen.findByRole("group", { name: "Welk stembureau ga je invoeren?" })).toBeVisible();
+  const expectedLabel = anotherEntry ? "Verder met een volgend stembureau?" : "Welk stembureau ga je invoeren?";
+  expect(await screen.findByRole("group", { name: expectedLabel })).toBeVisible();
 
   return router;
 }
@@ -69,15 +71,8 @@ describe("Test PollingStationChoiceForm", () => {
     test("Selecting a valid polling station", async () => {
       overrideOnce("get", "/api/elections/1", 200, electionDetailsMockResponse);
       const user = userEvent.setup();
-      render(
-        <ElectionProvider electionId={1}>
-          <ElectionStatusProvider electionId={1}>
-            <PollingStationChoiceForm anotherEntry />
-          </ElectionStatusProvider>
-        </ElectionProvider>,
-      );
+      await renderPollingStationChoiceForm(true);
 
-      expect(await screen.findByRole("group", { name: "Verder met een volgend stembureau?" })).toBeVisible();
       const pollingStation = screen.getByTestId("pollingStation");
 
       // Test if the polling station name is shown

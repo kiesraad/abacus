@@ -1,5 +1,4 @@
 import { expect, test } from "@playwright/test";
-
 import { getTestPassword } from "e2e-tests/helpers-utils/e2e-test-api-helpers";
 import { CreateFirstAdminPgObj } from "e2e-tests/page-objects/authentication/CreateFirstAdminPgObj";
 import { FirstLoginPgObj } from "e2e-tests/page-objects/authentication/FirstLoginPgObj";
@@ -12,7 +11,7 @@ import { firstAdmin } from "e2e-tests/test-data/users";
 test.describe.configure({ mode: "serial" });
 
 test.describe("initialisation", () => {
-  test("initialise first account", async ({ page }) => {
+  test("initialise first account", async ({ page, browserName }) => {
     await page.goto("/account/initialise");
 
     const welcomePage = new InitialiseWelcomePgObj(page);
@@ -20,12 +19,13 @@ test.describe("initialisation", () => {
     await welcomePage.button.click();
 
     // add the first admin
+    const username = `${firstAdmin.username} - ${browserName}`;
     const password = getTestPassword(firstAdmin.username);
 
     const firstAdminPage = new CreateFirstAdminPgObj(page);
     await expect(firstAdminPage.header).toBeVisible();
     await firstAdminPage.fullname.fill(firstAdmin.fullname);
-    await firstAdminPage.username.fill(firstAdmin.username);
+    await firstAdminPage.username.fill(username);
     await firstAdminPage.password.fill(password);
     await firstAdminPage.confirmPassword.fill(password);
     await firstAdminPage.save.click();
@@ -33,7 +33,7 @@ test.describe("initialisation", () => {
     // login as first admin
     const firstLoginPage = new FirstLoginPgObj(page);
     await expect(firstLoginPage.header).toBeVisible();
-    await firstLoginPage.username.fill(firstAdmin.username);
+    await firstLoginPage.username.fill(username);
     await firstLoginPage.password.fill(password);
     await firstLoginPage.loginBtn.click();
 
@@ -48,19 +48,20 @@ test.describe("initialisation", () => {
     await expect(loginPage.loginBtn).toBeVisible();
   });
 
-  test("initialisation can only be done once", async ({ page }) => {
+  test("initialisation can only be done once", async ({ page, browserName }) => {
     await page.goto("/account/initialise");
 
     const welcomePage = new InitialiseWelcomePgObj(page);
     await expect(welcomePage.header).toBeVisible();
     await welcomePage.button.click();
 
+    const username = `${firstAdmin.username} - ${browserName}`;
     const password = getTestPassword(firstAdmin.username);
 
     const secondFirstAdminPage = new CreateFirstAdminPgObj(page);
     await expect(secondFirstAdminPage.header).toBeVisible();
     await secondFirstAdminPage.fullname.fill(firstAdmin.fullname);
-    await secondFirstAdminPage.username.fill(firstAdmin.username);
+    await secondFirstAdminPage.username.fill(username);
     await secondFirstAdminPage.password.fill(password);
     await secondFirstAdminPage.confirmPassword.fill(password);
     await secondFirstAdminPage.save.click();

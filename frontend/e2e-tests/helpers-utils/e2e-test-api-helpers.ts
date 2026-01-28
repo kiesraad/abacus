@@ -8,8 +8,13 @@ export function getTestPassword(username: string, prefix = ""): string {
   return `${prefix}${capitalizedUsername}Password01`;
 }
 
-export async function loginAs(request: APIRequestContext, username: string, passwordPrefix = "") {
-  const password = getTestPassword(username, passwordPrefix);
+export async function loginAs(
+  request: APIRequestContext,
+  username: string,
+  passwordPrefix = "",
+  usernameForPassword?: string,
+) {
+  const password = getTestPassword(usernameForPassword ? usernameForPassword : username, passwordPrefix);
   return await request.post("/api/login", {
     data: {
       username,

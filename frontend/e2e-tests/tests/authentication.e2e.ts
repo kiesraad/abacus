@@ -8,11 +8,12 @@ import { TypistNavBar } from "e2e-tests/page-objects/nav_bar/TypistNavBarPgObj";
 import { FIXTURE_TYPIST_TEMP_PASSWORD, test } from "../fixtures";
 
 test.describe("authentication", () => {
-  test("login happy path", async ({ page }) => {
+  test("login happy path", async ({ page, browserName }) => {
     await page.goto("/account/login");
 
+    const username = `admin2 - ${browserName}`;
     const loginPage = new LoginPgObj(page);
-    await loginPage.username.fill("admin2");
+    await loginPage.username.fill(username);
     await loginPage.password.fill(getTestPassword("admin2"));
     await loginPage.loginBtn.click();
 

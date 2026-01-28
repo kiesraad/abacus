@@ -3,10 +3,12 @@ import { getTestPassword, loginAs } from "e2e-tests/helpers-utils/e2e-test-api-h
 import { testUsers } from "e2e-tests/test-data/users";
 
 test.describe("setup test users", () => {
-  test("create test user accounts", async () => {
+  test("create test user accounts", async ({ browserName }) => {
     // create a new APIRequestContext
     const adminContext = await request.newContext();
-    const loginResponse = await loginAs(adminContext, "admin1");
+    const username = `admin1 - ${browserName}`;
+    const usernameForPassword = "admin1";
+    const loginResponse = await loginAs(adminContext, username, "", usernameForPassword);
     expect(loginResponse.status()).toBe(200);
 
     await adminContext.storageState({ path: "e2e-tests/state/admin1.json" });
@@ -15,6 +17,7 @@ test.describe("setup test users", () => {
       const response = await adminContext.post("/api/users", {
         data: {
           ...user,
+          username: `${user.username} - ${browserName}`,
           temp_password: getTestPassword(user.username, "Temp"),
         },
       });
@@ -23,12 +26,14 @@ test.describe("setup test users", () => {
 
     for (const user of testUsers) {
       const userContext = await request.newContext();
-      const loginResponse = await loginAs(userContext, user.username, "Temp");
+      const userUsername = `${user.username} - ${browserName}`;
+      const usernameForPassword = user.username;
+      const loginResponse = await loginAs(userContext, userUsername, "Temp", usernameForPassword);
       expect(loginResponse.status()).toBe(200);
 
       const response = await userContext.put("/api/account", {
         data: {
-          username: user.username,
+          username: userUsername,
           fullname: user.fullname,
           password: getTestPassword(user.username),
         },

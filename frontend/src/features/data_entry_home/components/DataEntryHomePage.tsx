@@ -1,7 +1,4 @@
-import { useEffect } from "react";
 import { useLocation, useNavigate } from "react-router";
-
-import { DEFAULT_CANCEL_REASON } from "@/api/ApiClient";
 import { CommitteeSessionPausedModal } from "@/components/data_entry/CommitteeSessionPausedModal";
 import { Footer } from "@/components/footer/Footer";
 import { Messages } from "@/components/messages/Messages";
@@ -21,17 +18,9 @@ export function DataEntryHomePage() {
   const { currentCommitteeSession, election, refetch: refetchElection } = useElection();
   const { statuses, refetch: refetchStatuses } = useElectionStatus();
 
-  // live data polling for statuses (initial fetch + 30s interval + visibility change)
+  // live data polling (initial fetch + 30s interval + visibility change)
   useLiveData(refetchStatuses, true);
-
-  // one-time fetch for election data on mount
-  useEffect(() => {
-    const abortController = new AbortController();
-    void refetchElection(abortController);
-    return () => {
-      abortController.abort(DEFAULT_CANCEL_REASON);
-    };
-  }, [refetchElection]);
+  useLiveData(refetchElection, true);
 
   const showFirstDataEntrySavedAlert = location.hash.startsWith("#data-entry-1-saved") ? location.hash : null;
   const showSecondDataEntrySavedAlert = location.hash.startsWith("#data-entry-2-saved") ? location.hash : null;

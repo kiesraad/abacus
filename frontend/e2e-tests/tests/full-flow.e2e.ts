@@ -1,5 +1,5 @@
 import { stat } from "node:fs/promises";
-import { expect } from "@playwright/test";
+import { expect, request } from "@playwright/test";
 import { test } from "e2e-tests/fixtures";
 import { getTestPassword } from "e2e-tests/helpers-utils/e2e-test-api-helpers";
 import {
@@ -63,12 +63,16 @@ const investigations = [
 
 const typistUsers = ["typist3", "typist4"];
 
+test.use({
+  storageState: "e2e-tests/state/admin2.json",
+});
+
 test.describe.configure({ mode: "serial" });
 
 test.describe("full flow", () => {
   let electionId: number | null = null;
 
-  test(`create typists for flow`, async ({ page }) => {
+  test(`create typists for flow`, async ({ page, browserName }) => {
     await page.goto("/account/login");
 
     const loginPage = new LoginPgObj(page);
@@ -90,21 +94,24 @@ test.describe("full flow", () => {
       const userCreateTypePgObj = new UserCreateTypePgObj(page);
       await userCreateTypePgObj.continue.click();
 
+      const usernameFull = `${username}-${browserName}`;
       const userCreateDetailsPgObj = new UserCreateDetailsPgObj(page);
-      await userCreateDetailsPgObj.username.fill(username);
-      await userCreateDetailsPgObj.fullname.fill(`Typist ${username}`);
-      await userCreateDetailsPgObj.password.fill(username.repeat(3));
+      await userCreateDetailsPgObj.username.fill(usernameFull);
+      await userCreateDetailsPgObj.fullname.fill(`Typist ${usernameFull}`);
+      await userCreateDetailsPgObj.password.fill(usernameFull.repeat(3));
       await userCreateDetailsPgObj.save.click();
 
-      await expect(userListPgObj.alert).toContainText(`${username} is toegevoegd met de rol Invoerder`);
+      await expect(userListPgObj.alert).toContainText(`${usernameFull} is toegevoegd met de rol Invoerder`);
     }
   });
 
   test("create election and a new polling station", async ({ page }) => {
+    const adminContext = await request.newContext();
     await page.goto("/account/login");
 
     const loginPage = new LoginPgObj(page);
     await loginPage.login("admin2", getTestPassword("admin2"));
+    await adminContext.storageState({ path: "e2e-tests/state/admin2.json" });
 
     const electionsOverviewPage = new ElectionsOverviewPgObj(page);
     await electionsOverviewPage.create.click();
@@ -158,7 +165,9 @@ test.describe("full flow", () => {
   });
 
   test("start data entry", async ({ page }) => {
+    const adminContext = await request.newContext();
     await page.goto("/account/login");
+    await adminContext.storageState({ path: "e2e-tests/state/coordinator2.json" });
 
     const loginPage = new LoginPgObj(page);
     await loginPage.login("coordinator2", getTestPassword("coordinator2"));
@@ -226,10 +235,11 @@ test.describe("full flow", () => {
   });
 
   for (const typist of typistUsers) {
-    test(`complete account for ${typist}`, async ({ page }) => {
+    test(`complete account for ${typist}`, async ({ page, browserName }) => {
       await page.goto("/account/login");
       const loginPage = new LoginPgObj(page);
-      await loginPage.login(typist, typist.repeat(3));
+      const username = `${typist}-${browserName}`;
+      await loginPage.login(username, username.repeat(3));
 
       const password = getTestPassword(typist);
       const accountSetupPage = new AccountSetupPgObj(page);
@@ -246,11 +256,12 @@ test.describe("full flow", () => {
     { number: "1", name: "Stadhuis" },
     { number: "2", name: "Basisschool de Regenboog" },
   ]) {
-    test(`first data entry ${station.name}`, async ({ page }) => {
+    test(`first data entry ${station.name}`, async ({ page, browserName }) => {
       await page.goto("/account/login");
 
+      const username = `typist3-${browserName}`;
       const loginPage = new LoginPgObj(page);
-      await loginPage.login("typist3", getTestPassword("typist3"));
+      await loginPage.login(username, getTestPassword("typist3"));
 
       const overviewPage = new ElectionsOverviewPgObj(page);
       await expect(overviewPage.header).toBeVisible();
@@ -265,11 +276,12 @@ test.describe("full flow", () => {
       await fillDataEntryPagesAndSave(page, noRecountNoDifferencesDataEntry);
     });
 
-    test(`second data entry ${station.name}`, async ({ page }) => {
+    test(`second data entry ${station.name}`, async ({ page, browserName }) => {
       await page.goto("/account/login");
 
+      const username = `typist4-${browserName}`;
       const loginPage = new LoginPgObj(page);
-      await loginPage.login("typist4", getTestPassword("typist4"));
+      await loginPage.login(username, getTestPassword("typist4"));
 
       const overviewPage = new ElectionsOverviewPgObj(page);
       await expect(overviewPage.header).toBeVisible();
@@ -453,11 +465,12 @@ test.describe("full flow", () => {
   }
 
   for (const typist of typistUsers) {
-    test(`corrected data entry with ${typist}`, async ({ page }) => {
+    test(`corrected data entry with ${typist}`, async ({ page, browserName }) => {
       await page.goto("/account/login");
 
+      const username = `${typist}-${browserName}`;
       const loginPage = new LoginPgObj(page);
-      await loginPage.login(typist, getTestPassword(typist));
+      await loginPage.login(username, getTestPassword(typist));
 
       const overviewPage = new ElectionsOverviewPgObj(page);
       await expect(overviewPage.header).toBeVisible();
@@ -499,11 +512,12 @@ test.describe("full flow", () => {
   }
 
   for (const typist of typistUsers) {
-    test(`data entry for new pollings station with ${typist}`, async ({ page }) => {
+    test(`data entry for new pollings station with ${typist}`, async ({ page, browserName }) => {
       await page.goto("/account/login");
 
+      const username = `${typist}-${browserName}`;
       const loginPage = new LoginPgObj(page);
-      await loginPage.login(typist, getTestPassword(typist));
+      await loginPage.login(username, getTestPassword(typist));
 
       const overviewPage = new ElectionsOverviewPgObj(page);
       await expect(overviewPage.header).toBeVisible();

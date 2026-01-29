@@ -105,8 +105,8 @@ exclude:
   - ".*/frontend/.*[.]d[.]ts"
   - ".*/frontend/.*[.]config[.]ts"
   - ".*/frontend/package.json"
-  - ".*/frontend/tsconfig[.]ts"
-  - "docker-compose.yml"
+  - ".*/frontend/tsconfig[.]json"
+  - "docker-compose[.]yml"
 
 dependencychecker:
   blocklist:

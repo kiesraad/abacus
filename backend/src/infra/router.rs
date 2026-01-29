@@ -23,11 +23,7 @@ use utoipa_swagger_ui::SwaggerUi;
 #[cfg(feature = "dev-database")]
 use crate::test_data_gen;
 use crate::{
-    AppError, AppState, MAX_BODY_SIZE_MB,
-    api::{
-        committee_session, data_entry, document, election, investigation, polling_station, report,
-    },
-    error,
+    AppError, AppState, MAX_BODY_SIZE_MB, api, error,
     infra::{airgap, airgap::AirgapDetection, audit_log, authentication},
 };
 
@@ -106,15 +102,15 @@ pub fn openapi_router() -> OpenApiRouter<AppState> {
 fn build_routes(doc: utoipa::openapi::OpenApi) -> OpenApiRouter<AppState> {
     let router = OpenApiRouter::with_openapi(doc)
         .merge(audit_log::router())
-        .merge(authentication::router())
-        .merge(authentication::user_router())
-        .merge(committee_session::router())
-        .merge(data_entry::router())
-        .merge(election::router())
-        .merge(polling_station::router())
-        .merge(report::router())
-        .merge(document::router())
-        .merge(investigation::router());
+        .merge(api::authentication::router())
+        .merge(api::user::user_router())
+        .merge(api::committee_session::router())
+        .merge(api::data_entry::router())
+        .merge(api::election::router())
+        .merge(api::polling_station::router())
+        .merge(api::report::router())
+        .merge(api::document::router())
+        .merge(api::investigation::router());
 
     #[cfg(feature = "dev-database")]
     let router = router.merge(test_data_gen::router());

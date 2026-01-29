@@ -25,12 +25,13 @@ use crate::{
     eml::{EML110, EMLDocument, EMLImportError, EmlHash},
     infra::{
         audit_log::{AuditEvent, AuditService, PollingStationImportDetails},
-        authentication::{AdminOrCoordinator, User, error::AuthenticationError},
+        authentication::{AdminOrCoordinator, error::AuthenticationError},
     },
     repository::{
         committee_session_repo::get_election_committee_session,
         election_repo,
         polling_station_repo::{create, create_many, delete, get_for_election, list, update},
+        user_repo::User,
     },
 };
 

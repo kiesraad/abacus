@@ -160,9 +160,9 @@ mod tests {
             audit_log::{
                 AuditEvent, AuditLogListResponse, AuditLogUser, AuditService, UserLoggedInDetails,
             },
-            authentication::{User, inject_user},
+            authentication::inject_user,
         },
-        repository::user_repo::{self, UserId},
+        repository::user_repo::{self, User, UserId},
     };
 
     const TEST_USER_AGENT: &str = "TestAgent/1.0";

@@ -10,8 +10,7 @@ use super::{AuditEvent, AuditLogUser, LogFilterQuery};
 use crate::{
     APIError,
     domain::{id::id, role::Role},
-    infra::authentication::User,
-    repository::user_repo::UserId,
+    repository::user_repo::{User, UserId},
 };
 
 id!(AuditLogEventId);

@@ -7,7 +7,7 @@ use axum::{
 use sqlx::{SqliteConnection, SqlitePool};
 
 use super::AuditEvent;
-use crate::{APIError, infra::authentication::User};
+use crate::{APIError, repository::user_repo::User};
 
 #[derive(Clone)]
 pub struct AuditService {

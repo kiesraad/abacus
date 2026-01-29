@@ -28,9 +28,12 @@ use crate::{
     eml::{EML110, EML230, EMLDocument, EMLImportError, EmlHash, RedactedEmlHash},
     infra::{
         audit_log::{AuditEvent, AuditService},
-        authentication::{Admin, AdminOrCoordinator, User},
+        authentication::{Admin, AdminOrCoordinator},
     },
-    repository::{committee_session_repo, election_repo, investigation_repo, polling_station_repo},
+    repository::{
+        committee_session_repo, election_repo, investigation_repo, polling_station_repo,
+        user_repo::User,
+    },
 };
 
 pub fn router() -> OpenApiRouter<AppState> {

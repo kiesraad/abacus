@@ -2,12 +2,6 @@ use chrono::TimeDelta;
 pub use middleware::*;
 pub use role::{Admin, AdminOrCoordinator, Coordinator, IncompleteUser, Typist};
 
-pub use crate::{
-    api::{authentication::*, user::*},
-    domain::role::Role,
-    repository::user_repo::{User, UserId},
-};
-
 pub mod error;
 mod middleware;
 pub mod password;
@@ -57,14 +51,15 @@ mod tests {
 
     use crate::{
         AppState, ErrorResponse,
-        api::authentication::{AccountUpdateRequest, Credentials},
+        api::{authentication::*, user::*},
+        domain::role::Role,
         error::ErrorReference,
         infra::{
             airgap::AirgapDetection,
             audit_log::{AuditEvent, LogFilter, UserLoginFailedDetails},
             authentication::{middleware::extend_session, *},
         },
-        repository::user_repo::{self, UserId},
+        repository::user_repo::{self, User, UserId},
     };
 
     const TEST_USER_AGENT: &str = "TestAgent/1.0";

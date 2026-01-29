@@ -33,7 +33,7 @@ use crate::{
     error::{ErrorReference, ErrorResponse},
     infra::{
         audit_log::{AuditEvent, AuditService},
-        authentication::{Coordinator, Typist, User, error::AuthenticationError},
+        authentication::{Coordinator, Typist, error::AuthenticationError},
     },
     repository::{
         committee_session_repo, data_entry_repo,
@@ -44,7 +44,7 @@ use crate::{
         election_repo,
         investigation_repo::get_polling_station_investigation,
         polling_station_repo,
-        user_repo::UserId,
+        user_repo::{User, UserId},
     },
 };
 

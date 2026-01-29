@@ -1,4 +1,19 @@
-import type { PollingStationResults } from "@/types/generated/openapi";
+import { electionMockData } from "@/testing/api-mocks/ElectionMockData";
+import type { Candidate, CandidateVotes, PollingStationResults } from "@/types/generated/openapi";
+
+/**
+ * Base candidate votes on given mock data to ensure there are the same number of candidates.
+ * @param candidates List of candidates
+ * @param votes Mapping of candidate number to votes
+ * @returns List of CandidateVotes
+ */
+const baseCandidateVotesOn = (candidates: Candidate[] | undefined, votes: Record<number, number>): CandidateVotes[] => {
+  // Get candidate numbers based on candidates or from the votes keys
+  const candidateNumbers = candidates?.map((c) => c.number) ?? Object.keys(votes).map((k) => parseInt(k, 10));
+  const expectedLength = Math.max(...candidateNumbers, 0);
+
+  return Array.from({ length: expectedLength }, (_, i) => ({ number: i + 1, votes: votes[i + 1] ?? 0 }));
+};
 
 /**
  * Return PollingStationResults data for testing the resolve differences feature.
@@ -44,30 +59,23 @@ export function pollingStationResultsMockData(first: boolean): PollingStationRes
       {
         number: 1,
         total: first ? 1512 : 1481,
-        candidate_votes: [
-          { number: 1, votes: first ? 1256 : 1258 },
-          { number: 2, votes: 128 },
-          { number: 3, votes: first ? 65 : 63 },
-          { number: 4, votes: first ? 26 : 28 },
-          { number: 3, votes: 10 },
-          { number: 4, votes: 8 },
-          { number: 5, votes: 4 },
-          { number: 6, votes: 4 },
-          { number: 7, votes: 3 },
-          { number: 8, votes: 2 },
-          { number: 9, votes: 0 },
-          { number: 10, votes: first ? 4 : 0 },
-          { number: 11, votes: first ? 2 : 4 },
-          { number: 12, votes: 0 },
-        ],
+        candidate_votes: baseCandidateVotesOn(electionMockData.political_groups[0]?.candidates, {
+          1: first ? 1256 : 1258,
+          2: 128,
+          3: first ? 65 : 63,
+          4: first ? 26 : 28,
+          5: 4,
+          6: 4,
+          7: 3,
+          8: 2,
+          10: first ? 4 : 0,
+          11: first ? 2 : 4,
+        }),
       },
       {
         number: 2,
         total: 2,
-        candidate_votes: [
-          { number: 1, votes: 2 },
-          { number: 2, votes: 0 },
-        ],
+        candidate_votes: baseCandidateVotesOn(electionMockData.political_groups[1]?.candidates, { 1: 2 }),
       },
     ],
   };

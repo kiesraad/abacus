@@ -78,6 +78,7 @@ export function mapResultsToSectionValues(section: DataEntrySection, results: Da
  * @param data The data object to retrieve the value from
  * @param path The dot-separated path string (e.g. "political_group_votes.0.total")
  * @returns The value at the specified path or undefined if not found/unexpected type
+ * @throws Error if the path does not exist in the data structure
  */
 export function getValueAtPath(data: DataEntryResults, path: string): PathValue {
   const segments = path.split(".");
@@ -92,8 +93,9 @@ export function getValueAtPath(data: DataEntryResults, path: string): PathValue 
  * @param path The dot-separated path string (e.g. "political_group_votes.0.total")
  * @param value The value to set
  * @param valueType The type of the value for processing
+ * @throws Error if the path does not exist in the data structure
  */
-function setValueAtPath(
+export function setValueAtPath(
   data: DataEntryResults,
   path: string,
   value: string,
@@ -101,10 +103,16 @@ function setValueAtPath(
 ): void {
   const segments = path.split(".");
   const lastProperty = segments.pop();
-  const refParent = traversePath(data, segments, true);
+  const refParent = traversePath(data, segments);
+  const processedValue = processValue(value, valueType);
 
-  if (isRecord(refParent) && lastProperty) {
-    refParent[lastProperty] = processValue(value, valueType);
+  if (lastProperty && isRecord(refParent)) {
+    refParent[lastProperty] = processedValue;
+  } else if (lastProperty && Array.isArray(refParent) && stringRepresentsInteger(lastProperty)) {
+    const arrayIndex = parseInt(lastProperty, 10);
+    refParent[arrayIndex] = processedValue;
+  } else {
+    throw new Error(`Cannot set value at path ${path}.`);
   }
 }
 
@@ -112,35 +120,23 @@ function setValueAtPath(
  * Traverses the data object based on the provided path segments
  * @param data The data object to traverse
  * @param segments The path segments to follow
- * @param createMissing Whether to create missing objects/arrays along the path
  * @return The value at the end of the path or undefined if not found
+ * @throws Error if a segment does not exist in the data structure
  */
-function traversePath(data: DataEntryResults, segments: string[], createMissing = false): unknown {
-  const handleMissingRecord = (obj: Record<string, unknown>, key: string, nextSegment: string | undefined) => {
-    if (nextSegment && obj[key] === undefined) {
-      obj[key] = stringContainsInteger(nextSegment) ? [] : {};
-    }
-  };
-
-  const ensureArrayLength = (arr: unknown[], index: number) => {
-    while (arr.length < index + 1) {
-      arr.push({});
-    }
-  };
-
-  return segments.reduce<unknown>((prev, curr, index, segments) => {
-    if (isRecord(prev)) {
-      if (createMissing) handleMissingRecord(prev, curr, segments[index + 1]);
+function traversePath(data: DataEntryResults, segments: string[]): unknown {
+  return segments.reduce<unknown>((prev, curr) => {
+    if (isRecord(prev) && curr in prev) {
       return prev[curr];
     }
 
-    if (Array.isArray(prev) && stringContainsInteger(curr)) {
+    if (Array.isArray(prev) && stringRepresentsInteger(curr)) {
       const arrayIndex = parseInt(curr, 10);
-      if (createMissing) ensureArrayLength(prev, arrayIndex);
-      return prev[arrayIndex];
+      if (arrayIndex < prev.length) {
+        return prev[arrayIndex];
+      }
     }
 
-    return undefined;
+    throw new Error(`Property ${curr} does not exist at path ${segments.join(".")}.`);
   }, data);
 }
 
@@ -163,11 +159,11 @@ function processValue(
 }
 
 /**
- * Checks if a string represents a valid integer
+ * Checks if a string represents a valid non-negative integer
  * @param str The string to check
- * @returns True if the string is an integer, false otherwise
+ * @returns boolean
  */
-function stringContainsInteger(str: string): boolean {
+export function stringRepresentsInteger(str: string): boolean {
   return /^\d+$/.test(str);
 }
 

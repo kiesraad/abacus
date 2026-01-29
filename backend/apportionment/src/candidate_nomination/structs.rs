@@ -3,8 +3,8 @@ use crate::{
     structs::{CandidateNumber, CandidateVotes, ListNumber},
 };
 
-/// Contains information about the chosen candidates and the candidate list ranking
-/// for a specific list.
+/// Contains information about the chosen candidates and
+/// the candidate list ranking for a specific list.
 #[derive(Debug, PartialEq)]
 pub struct ListCandidateNomination {
     /// List number for which this nomination applies
@@ -29,14 +29,14 @@ pub struct PreferenceThreshold {
 
 /// The result of the candidate nomination procedure.  
 /// This contains the preference threshold and percentage that was used.  
-/// It contains a list of all chosen candidates in alphabetical order.  
+/// It contains a list of all chosen candidates.
 /// It also contains the preferential nomination of candidates, the remaining
 /// nomination of candidates and the final ranking of candidates for each list.
 #[derive(Debug, PartialEq)]
 pub struct CandidateNominationResult {
     /// Preference threshold percentage and number of votes
     pub preference_threshold: PreferenceThreshold,
-    /// List of chosen candidates in alphabetical order
+    /// List of chosen candidates
     pub chosen_candidates: Vec<Candidate>,
     /// List of chosen candidates and candidate list ranking per list
     pub list_candidate_nomination: Vec<ListCandidateNomination>,

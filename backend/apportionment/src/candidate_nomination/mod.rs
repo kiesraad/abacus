@@ -46,8 +46,7 @@ pub fn candidate_nomination(
     );
 
     // Create chosen candidates list
-    let chosen_candidates =
-        all_sorted_chosen_candidates(&input.list_votes, &list_candidate_nomination);
+    let chosen_candidates = all_chosen_candidates(&input.list_votes, &list_candidate_nomination);
     debug!("Chosen candidates: {:#?}", chosen_candidates);
 
     Ok(CandidateNominationResult {
@@ -60,7 +59,9 @@ pub fn candidate_nomination(
     })
 }
 
-fn all_sorted_chosen_candidates(
+/// Collect all chosen candidates via nomination with preferential votes and
+/// the other nominated candidates into one list
+fn all_chosen_candidates(
     list_votes: &[ListVotes],
     list_candidate_nomination: &[ListCandidateNomination],
 ) -> Vec<Candidate> {
@@ -233,6 +234,8 @@ fn preferential_candidate_nomination(
     Ok(preferential_candidate_nomination)
 }
 
+/// Update the candidate list, moving the candidates meeting the preference threshold
+/// to the top of the list and keeping the ranking of the rest of candidates on the list the same
 fn update_candidate_ranking(
     preference_threshold: Fraction,
     candidate_votes_meeting_preference_threshold: &[CandidateVotes],

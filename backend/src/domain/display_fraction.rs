@@ -1,5 +1,14 @@
 use apportionment::Fraction;
 
+// TODO remote derive/newtype to make sure Fraction is serialized into DisplayFraction
+//  https://serde.rs/remote-derive.html
+//  #[derive(Serialize, Deserialize)]
+//  #[serde(
+//      deny_unknown_fields,
+//      into = "DisplayFraction",
+//      from = "DisplayFraction"
+//  )]
+
 /// Fraction with the integer part split out for display purposes
 #[derive(Clone, Copy, Debug)]
 pub struct DisplayFraction {

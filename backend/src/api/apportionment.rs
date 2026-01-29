@@ -155,14 +155,14 @@ async fn election_apportionment(
             )
             .await?;
 
-        // TODO: this data needs to be enriched
-        let mapped = ElectionApportionmentResponse {
+        // TODO: this data needs to be enriched, see below
+        let result = ElectionApportionmentResponse {
             seat_assignment: result.seat_assignment,
             candidate_nomination: result.candidate_nomination,
             summary: input.summary,
         };
 
-        Ok(Json(mapped))
+        Ok(Json(result))
     } else {
         Err(APIError::Apportionment(
             ApportionmentError::ApportionmentNotAvailableUntilDataEntryFinalised,
@@ -170,34 +170,38 @@ async fn election_apportionment(
     }
 }
 
-// After we need to enrich the data: result.candidate_nomination.chosen_candidates
-// pub fn sort_candidates_on_last_name_alphabetically(
-//     mut candidates: Vec<Candidate>,
-// ) -> Vec<Candidate> {
-//     candidates.sort_by(|a, b| a.last_name.cmp(&b.last_name));
-//     candidates
-// }
-
-// /// Test for function sort_candidates_on_last_name_alphabetically
-// #[test]
-// fn test_sort_candidates_on_last_name_alphabetically() {
-//     let names = ["Duin", "Korte", "Appel", "Zee", "Groen"];
-//     let candidates: Vec<Candidate> = (0..5)
-//         .map(|i| Candidate {
-//             number: i + 1,
-//             initials: "A.B.".to_string(),
-//             first_name: Some(format!("Candidate {}", i + 1)),
-//             last_name_prefix: if (i % 2) == 0 {
-//                 Some("van".to_string())
-//             } else {
-//                 None
-//             },
-//             last_name: names[i as usize].to_string(),
-//             locality: "Juinen".to_string(),
-//             country_code: Some("NL".to_string()),
-//             gender: Some(X),
-//         })
-//         .collect();
-//     let sorted_candidates = sort_candidates_on_last_name_alphabetically(candidates);
-//     assert_eq!(candidate_numbers(&sorted_candidates), vec![3, 1, 5, 2, 4]);
-// }
+// TODO: We need to enrich the data:
+//  - result.seat_assignment
+//  Add list name for each list
+//  - result.candidate_nomination.chosen_candidates
+//  Enrichment means mapping the candidate number per list to the original full candidate information
+//  Then the list of chosen candidates needs to be sorted alphabetically on last name
+//  pub fn sort_candidates_on_last_name_alphabetically(
+//      mut candidates: Vec<Candidate>,
+//  ) -> Vec<Candidate> {
+//      candidates.sort_by(|a, b| a.last_name.cmp(&b.last_name));
+//      candidates
+//  }
+//  /// Test for function sort_candidates_on_last_name_alphabetically
+//  #[test]
+//  fn test_sort_candidates_on_last_name_alphabetically() {
+//      let names = ["Duin", "Korte", "Appel", "Zee", "Groen"];
+//      let candidates: Vec<Candidate> = (0..5)
+//          .map(|i| Candidate {
+//              number: i + 1,
+//              initials: "A.B.".to_string(),
+//              first_name: Some(format!("Candidate {}", i + 1)),
+//              last_name_prefix: if (i % 2) == 0 {
+//                  Some("van".to_string())
+//              } else {
+//                  None
+//              },
+//              last_name: names[i as usize].to_string(),
+//              locality: "Juinen".to_string(),
+//              country_code: Some("NL".to_string()),
+//              gender: Some(X),
+//          })
+//          .collect();
+//      let sorted_candidates = sort_candidates_on_last_name_alphabetically(candidates);
+//      assert_eq!(candidate_numbers(&sorted_candidates), vec![3, 1, 5, 2, 4]);
+//  }

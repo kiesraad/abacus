@@ -28,7 +28,7 @@ describe("votersAndVotesSection", () => {
     expect(inputGrid.rows.some((row) => row.path === "votes_counts.total_votes_cast_count")).toBe(true);
     // Check that it has the correct amount of political group rows
     expect(
-      inputGrid.rows.filter((row) => row.path.startsWith("votes_counts.political_group_total_votes[")).length,
+      inputGrid.rows.filter((row) => row.path.startsWith("votes_counts.political_group_total_votes.")).length,
     ).toBe(2);
   });
 
@@ -120,12 +120,12 @@ describe("createPoliticalGroupSections", () => {
         const row =
           section.subsections[0]?.type === "inputGrid" ? section.subsections[0].rows[candidateIndex] : undefined;
         expect(row?.code).toBe(candidate.number.toString());
-        expect(row?.path).toBe(`political_group_votes[${groupIndex}].candidate_votes[${candidateIndex}].votes`);
+        expect(row?.path).toBe(`political_group_votes.${groupIndex}.candidate_votes.${candidateIndex}.votes`);
       });
 
       // Check total row
       const totalRow = inputGrid.rows[inputGrid.rows.length - 1]!;
-      expect(totalRow.path).toBe(`political_group_votes[${groupIndex}].total`);
+      expect(totalRow.path).toBe(`political_group_votes.${groupIndex}.total`);
       expect(totalRow.isListTotal).toBe(true);
     });
   });

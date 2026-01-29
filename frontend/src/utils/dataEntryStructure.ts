@@ -10,7 +10,7 @@ export const createVotersAndVotesSection = (
 ): DataEntrySection => {
   const rowsPerPoliticalGroup: InputGridSubsectionRow[] = election.political_groups.map((politicalGroup, index) => ({
     code: `E.${politicalGroup.number}`,
-    path: `votes_counts.political_group_total_votes[${index}].total`,
+    path: `votes_counts.political_group_total_votes.${index}.total`,
     title: `${t("total")} ${formatPoliticalGroupName(politicalGroup)}`,
     addSeparator: index === election.political_groups.length - 1,
   }));
@@ -270,7 +270,7 @@ export function createPoliticalGroupSections(election: ElectionWithPoliticalGrou
     politicalGroup.candidates.forEach((candidate, candidateIndex) => {
       rows.push({
         code: `${candidate.number}`,
-        path: `political_group_votes[${pgIndex}].candidate_votes[${candidateIndex}].votes`,
+        path: `political_group_votes.${pgIndex}.candidate_votes.${candidateIndex}.votes`,
         title: getCandidateFullName(candidate),
         autoFocusInput: candidateIndex === 0,
         addSeparator: (candidateIndex + 1) % 25 === 0 && candidateIndex + 1 !== politicalGroup.candidates.length,
@@ -278,7 +278,7 @@ export function createPoliticalGroupSections(election: ElectionWithPoliticalGrou
     });
 
     rows.push({
-      path: `political_group_votes[${pgIndex}].total`,
+      path: `political_group_votes.${pgIndex}.total`,
       title: t("totals_list", { group_number: politicalGroup.number }),
       isListTotal: true,
     });

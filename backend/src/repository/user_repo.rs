@@ -1,16 +1,10 @@
-use axum::{
-    extract::{FromRequestParts, OptionalFromRequestParts},
-    http::request::Parts,
-};
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use sqlx::{FromRow, SqliteConnection, SqlitePool, query, query_as};
 use utoipa::ToSchema;
 
 use crate::{
-    APIError,
     api::middleware::authentication::{
-        IncompleteUser,
         error::AuthenticationError,
         password::{HashedPassword, ValidatedPassword, hash_password, verify_password},
     },
@@ -123,62 +117,6 @@ impl User {
             updated_at: Utc::now(),
             created_at: Utc::now(),
         }
-    }
-}
-
-/// Implement the FromRequestParts trait for User, this allows us to extract a User from a request
-impl<S> FromRequestParts<S> for User
-where
-    S: Send + Sync,
-{
-    type Rejection = APIError;
-
-    async fn from_request_parts(parts: &mut Parts, _state: &S) -> Result<Self, Self::Rejection> {
-        let Some(user) = parts.extensions.get::<User>() else {
-            return Err(AuthenticationError::Unauthenticated.into());
-        };
-
-        if user.fullname.is_none() || user.needs_password_change() {
-            return Err(AuthenticationError::Unauthenticated.into());
-        }
-
-        Ok(user.clone())
-    }
-}
-
-/// Implement the FromRequestParts trait for IncompleteUser,
-/// for endpoints that are needed to fully set up the account
-impl<S> FromRequestParts<S> for IncompleteUser
-where
-    S: Send + Sync,
-{
-    type Rejection = APIError;
-
-    async fn from_request_parts(parts: &mut Parts, _state: &S) -> Result<Self, Self::Rejection> {
-        let Some(user) = parts.extensions.get::<User>() else {
-            return Err(AuthenticationError::Unauthenticated.into());
-        };
-
-        if user.fullname.is_some() && !user.needs_password_change() {
-            return Err(AuthenticationError::UserAlreadySetup.into());
-        }
-
-        Ok(IncompleteUser(user.clone()))
-    }
-}
-
-/// Implement the OptionalFromRequestParts trait for User, this allows us to extract an Option<User> from a request
-impl<S> OptionalFromRequestParts<S> for User
-where
-    S: Send + Sync,
-{
-    type Rejection = APIError;
-
-    async fn from_request_parts(
-        parts: &mut Parts,
-        _state: &S,
-    ) -> Result<Option<Self>, Self::Rejection> {
-        Ok(parts.extensions.get::<User>().cloned())
     }
 }
 

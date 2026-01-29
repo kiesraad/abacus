@@ -1,13 +1,19 @@
 #![no_main]
 
 use abacus::{
-    authentication::UserId,
-    committee_session::CommitteeSessionId,
-    data_entry::{status::*, *},
-    election::{ElectionCategory, ElectionId, ElectionWithPoliticalGroups, VoteCountingMethod},
-    polling_station::{PollingStationId, PollingStation, PollingStationType},
+    domain::{
+        committee_session::CommitteeSessionId,
+        data_entry::{
+            CSOFirstSessionResults, CountingDifferencesPollingStation,
+            DifferenceCountsCompareVotesCastAdmittedVoters, DifferencesCounts, ExtraInvestigation,
+            PollingStationResults, VotersCounts, VotesCounts, YesNo,
+        },
+        election::{ElectionCategory, ElectionId, ElectionWithPoliticalGroups, VoteCountingMethod},
+        polling_station::{PollingStation, PollingStationId, PollingStationType},
+        status::{CurrentDataEntry, DataEntryStatus, DataEntryTransitionError},
+    },
+    repository::user_repo::UserId,
 };
-
 use chrono::NaiveDate;
 use libfuzzer_sys::{
     arbitrary::{self, Arbitrary},
@@ -172,10 +178,7 @@ fn is_as_expected(
         // FinaliseFirstEntry
         (DataEntryStatus::FirstEntryInProgress(_), Transition::FinaliseFirstEntry(true)) => {
             if first_entry_correct {
-                matches!(
-                    resulting_state,
-                    Ok(DataEntryStatus::FirstEntryFinalised(_))
-                )
+                matches!(resulting_state, Ok(DataEntryStatus::FirstEntryFinalised(_)))
             } else {
                 matches!(resulting_state, Ok(DataEntryStatus::FirstEntryHasErrors(_)))
             }
@@ -214,10 +217,7 @@ fn is_as_expected(
         }
         // DeleteSecondEntry
         (DataEntryStatus::SecondEntryInProgress(_), Transition::DeleteSecondEntry(true)) => {
-            matches!(
-                resulting_state,
-                Ok(DataEntryStatus::FirstEntryFinalised(_))
-            )
+            matches!(resulting_state, Ok(DataEntryStatus::FirstEntryFinalised(_)))
         }
         // FinaliseSecondEntry
         (DataEntryStatus::SecondEntryInProgress(_), Transition::FinaliseSecondEntry(true)) => {
@@ -229,18 +229,12 @@ fn is_as_expected(
         }
         // KeepFirstEntry
         (DataEntryStatus::EntriesDifferent(_), Transition::KeepFirstEntry) => {
-            matches!(
-                resulting_state,
-                Ok(DataEntryStatus::FirstEntryFinalised(_))
-            )
+            matches!(resulting_state, Ok(DataEntryStatus::FirstEntryFinalised(_)))
         }
         // KeepSecondEntry
         (DataEntryStatus::EntriesDifferent(_), Transition::KeepSecondEntry) => {
             if second_entry_correct {
-                matches!(
-                    resulting_state,
-                    Ok(DataEntryStatus::FirstEntryFinalised(_))
-                )
+                matches!(resulting_state, Ok(DataEntryStatus::FirstEntryFinalised(_)))
             } else {
                 matches!(resulting_state, Ok(DataEntryStatus::FirstEntryHasErrors(_)))
             }

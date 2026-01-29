@@ -1,14 +1,51 @@
-# All subdirectories within those directories will be used as components
-# See: https://docs.sigrid-says.com/reference/analysis-scope-configuration.html
-component_base_dirs:
-  - "backend"
-  - "backend/src"
-  - "backend/src/api"
-  - "backend/src/bin"
-  - "backend/src/infra"
-  - "backend/src/repository"
-
 components:
+  # Backend infra layer
+  - { include: [ ".*/backend/src/infra/airgap/.*" ], name: "backend/src/infra/airgap" }
+  - { include: [ ".*/backend/src/infra/audit_log/.*" ], name: "backend/src/infra/audit_log" }
+  - { include: [ ".*/backend/src/infra/authentication/.*" ], name: "backend/src/infra/authentication" }
+  - { include: [ ".*/backend/src/infra/pdf_gen/.*" ], name: "backend/src/infra/pdf_gen" }
+  - { include: [ ".*/backend/src/infra/zip/.*" ], name: "backend/src/infra/zip" }
+  - { include: [ ".*/backend/src/infra/router.rs" ], name: "backend/src/infra/router" }
+  - { include: [ ".*/backend/src/infra/seed_data.rs" ], name: "backend/src/infra/seed_data" }
+
+  # Backend api layer
+  - { include: [ ".*/backend/src/api/audit.rs" ], name: "backend/src/api/audit" }
+  - { include: [ ".*/backend/src/api/authentication.rs" ], name: "backend/src/api/authentication" }
+  - { include: [ ".*/backend/src/api/committee_session.rs" ], name: "backend/src/api/committee_session" }
+  - { include: [ ".*/backend/src/api/data_entry.rs" ], name: "backend/src/api/data_entry" }
+  - { include: [ ".*/backend/src/api/document.rs" ], name: "backend/src/api/document" }
+  - { include: [ ".*/backend/src/api/election.rs" ], name: "backend/src/api/election" }
+  - { include: [ ".*/backend/src/api/investigation.rs" ], name: "backend/src/api/investigation" }
+  - { include: [ ".*/backend/src/api/polling_station.rs" ], name: "backend/src/api/polling_station" }
+  - { include: [ ".*/backend/src/api/report.rs" ], name: "backend/src/api/report" }
+  - { include: [ ".*/backend/src/api/user.rs" ], name: "backend/src/api/user" }
+
+  # Backend repository layer
+  - { include: [ ".*/backend/src/repository/committee_session_repo.rs" ], name: "backend/src/repository/committee_session_repo" }
+  - { include: [ ".*/backend/src/repository/data_entry_repo.rs" ], name: "backend/src/repository/data_entry_repo" }
+  - { include: [ ".*/backend/src/repository/election_repo.rs" ], name: "backend/src/repository/election_repo" }
+  - { include: [ ".*/backend/src/repository/file_repo.rs" ], name: "backend/src/repository/file_repo" }
+  - { include: [ ".*/backend/src/repository/investigation_repo.rs" ], name: "backend/src/repository/investigation_repo" }
+  - { include: [ ".*/backend/src/repository/polling_station_repo.rs" ], name: "backend/src/repository/polling_station_repo" }
+  - { include: [ ".*/backend/src/repository/user_repo.rs" ], name: "backend/src/repository/user_repo" }
+
+  # Backend domain layer
+  - { include: [ ".*/backend/src/domain/.*" ], name: "backend/src/domain" }
+
+  # Backend modules
+  - { include: [ ".*/backend/src/eml/.*" ], name: "(Backend) EML" }
+  - { include: [ ".*/backend/src/test_data_gen/.*" ], name: "(Backend) Test data generation" }
+  - { include: [ ".*/backend/src/bin/abacus.rs" ], name: "(Backend) bin/abacus" }
+  - { include: [ ".*/backend/src/bin/gen-openapi.rs" ], name: "(Backend) bin/gen-openapi" }
+  - { include: [ ".*/backend/src/bin/gen-pdf.rs" ], name: "(Backend) bin/gen-pdf" }
+  - { include: [ ".*/backend/src/bin/gen-test-election.rs" ], name: "(Backend) bin/gen-test-election" }
+  - { include: [ ".*/backend/src/app_error.rs" ], name: "(Backend) App error" }
+  - { include: [ ".*/backend/src/error.rs" ], name: "(Backend) error" }
+  - { include: [ ".*/backend/src/lib.rs" ], name: "(Backend) lib" }
+  - { include: [ ".*/backend/tests/.*" ], name: "(Backend) Integration tests" }
+  - { include: [ ".*/backend/migrations/.*" ], name: "(Backend) SQL Migrations" }
+  - { include: [ ".*/backend/templates/.*" ], name: "(Backend) Typst templates" }
+
   # Frontend src/components
   - { include: [ ".*/frontend/src/components/committee_session/.*" ], name: "(Frontend) Components/committee_session" }
   - { include: [ ".*/frontend/src/components/data_entry/.*" ], name: "(Frontend) Components/data_entry" }
@@ -106,7 +143,7 @@ exclude:
   - ".*/frontend/.*[.]config[.]ts"
   - ".*/frontend/package.json"
   - ".*/frontend/tsconfig[.]json"
-  - "docker-compose[.]yml"
+  - ".*/docker-compose[.]yml"
 
 dependencychecker:
   blocklist:

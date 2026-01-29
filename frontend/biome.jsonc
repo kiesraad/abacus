@@ -103,8 +103,8 @@
         "**/*.test.ts",
         "**/*.test.tsx",
         "**/*.stories.tsx",
-        "src/testing/**/*.ts",
-        "src/testing/**/*.tsx"
+        "src/**/testing/**/*.ts",
+        "src/**/testing/**/*.tsx"
       ],
       "linter": {
         "rules": {

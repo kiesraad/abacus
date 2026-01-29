@@ -103,7 +103,7 @@ export default defineConfig(
       "**/*.test.ts{,x}",
       ".storybook/**/*.ts{,x}",
       "e2e-tests/**/*",
-      "src/testing/**/*.ts{,x}",
+      "src/**/testing/**/*.ts{,x}",
     ],
     rules: {
       "@typescript-eslint/no-non-null-assertion": "off",

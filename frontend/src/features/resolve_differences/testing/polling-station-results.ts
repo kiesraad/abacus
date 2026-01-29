@@ -7,10 +7,12 @@ import type { Candidate, CandidateVotes, PollingStationResults } from "@/types/g
  * @param votes Mapping of candidate number to votes
  * @returns List of CandidateVotes
  */
-const baseCandidateVotesOn = (candidates: Candidate[] | undefined, votes: Record<number, number>): CandidateVotes[] => {
-  // Get candidate numbers based on candidates or from the votes keys
-  const candidateNumbers = candidates?.map((c) => c.number) ?? Object.keys(votes).map((k) => parseInt(k, 10));
-  const expectedLength = Math.max(...candidateNumbers, 0);
+const baseCandidateVotesOn = (candidates: Candidate[], votes: Record<number, number>): CandidateVotes[] => {
+  const expectedLength = Math.max(
+    ...candidates.map((c) => c.number),
+    ...Object.keys(votes).map((k) => parseInt(k, 10)),
+    0,
+  );
 
   return Array.from({ length: expectedLength }, (_, i) => ({ number: i + 1, votes: votes[i + 1] ?? 0 }));
 };
@@ -59,7 +61,7 @@ export function pollingStationResultsMockData(first: boolean): PollingStationRes
       {
         number: 1,
         total: first ? 1512 : 1481,
-        candidate_votes: baseCandidateVotesOn(electionMockData.political_groups[0]?.candidates, {
+        candidate_votes: baseCandidateVotesOn(electionMockData.political_groups[0]!.candidates, {
           1: first ? 1256 : 1258,
           2: 128,
           3: first ? 65 : 63,
@@ -75,7 +77,7 @@ export function pollingStationResultsMockData(first: boolean): PollingStationRes
       {
         number: 2,
         total: 2,
-        candidate_votes: baseCandidateVotesOn(electionMockData.political_groups[1]?.candidates, { 1: 2 }),
+        candidate_votes: baseCandidateVotesOn(electionMockData.political_groups[1]!.candidates, { 1: 2 }),
       },
     ],
   };

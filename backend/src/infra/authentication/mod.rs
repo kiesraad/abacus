@@ -1,9 +1,10 @@
 use chrono::TimeDelta;
 pub use middleware::*;
-pub use role::{Admin, AdminOrCoordinator, Coordinator, IncompleteUser, Role, Typist};
+pub use role::{Admin, AdminOrCoordinator, Coordinator, IncompleteUser, Typist};
 
 pub use crate::{
     api::{authentication::*, user::*},
+    domain::role::Role,
     repository::user_repo::{User, UserId},
 };
 
@@ -61,7 +62,7 @@ mod tests {
         infra::{
             airgap::AirgapDetection,
             audit_log::{AuditEvent, LogFilter, UserLoginFailedDetails},
-            authentication::{middleware::extend_session, role::Role, *},
+            authentication::{middleware::extend_session, *},
         },
         repository::user_repo::{self, UserId},
     };

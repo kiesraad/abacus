@@ -305,10 +305,8 @@ mod tests {
 
     use super::*;
     use crate::{
-        SqlitePoolExt,
-        infra::authentication::{Role, session},
-        repository::user_repo::UserId,
-        test::run_server_test,
+        SqlitePoolExt, domain::role::Role, infra::authentication::session,
+        repository::user_repo::UserId, test::run_server_test,
     };
 
     async fn get_user_cookie(conn: &mut SqliteConnection, user_id: UserId) -> String {

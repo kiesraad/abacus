@@ -142,10 +142,11 @@ mod test {
 
     use super::{extend_session, inject_user};
     use crate::{
+        domain::role::Role,
         infra::{
             audit_log::AuditService,
             authentication::{
-                DO_NOT_EXTEND_SESSION_HEADER, Role, SESSION_LIFE_TIME, SESSION_MIN_LIFE_TIME, User,
+                DO_NOT_EXTEND_SESSION_HEADER, SESSION_LIFE_TIME, SESSION_MIN_LIFE_TIME, User,
             },
         },
         repository::user_repo::{self, UserId},

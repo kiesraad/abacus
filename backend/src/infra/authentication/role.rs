@@ -2,35 +2,10 @@ use axum::{
     extract::{FromRef, FromRequestParts},
     http::request::Parts,
 };
-use serde::{Deserialize, Serialize};
-use sqlx::{SqlitePool, Type};
-use utoipa::ToSchema;
+use sqlx::SqlitePool;
 
 use super::error::AuthenticationError;
-use crate::{APIError, repository::user_repo::User};
-
-#[derive(
-    Serialize, Deserialize, strum::Display, Clone, Copy, Debug, PartialEq, Eq, Hash, ToSchema, Type,
-)]
-#[serde(rename_all = "lowercase")]
-#[strum(serialize_all = "lowercase")]
-#[sqlx(rename_all = "snake_case")]
-pub enum Role {
-    Administrator,
-    Typist,
-    Coordinator,
-}
-
-impl From<String> for Role {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "administrator" => Self::Administrator,
-            "typist" => Self::Typist,
-            "coordinator" => Self::Coordinator,
-            _ => unreachable!(),
-        }
-    }
-}
+use crate::{APIError, domain::role::Role, repository::user_repo::User};
 
 /// A user with the admin role
 #[allow(unused)]

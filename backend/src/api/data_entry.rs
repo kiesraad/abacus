@@ -23,6 +23,7 @@ use crate::{
         election::{ElectionId, ElectionWithPoliticalGroups, PoliticalGroup},
         entry_number::EntryNumber,
         polling_station::{PollingStation, PollingStationId},
+        role::Role,
         status::{
             ClientState, CurrentDataEntry, DataEntryStatus, DataEntryStatusName,
             DataEntryTransitionError, EntriesDifferent,
@@ -32,7 +33,7 @@ use crate::{
     error::{ErrorReference, ErrorResponse},
     infra::{
         audit_log::{AuditEvent, AuditService},
-        authentication::{Coordinator, Role, Typist, User, error::AuthenticationError},
+        authentication::{Coordinator, Typist, User, error::AuthenticationError},
     },
     repository::{
         committee_session_repo, data_entry_repo,
@@ -1042,7 +1043,6 @@ mod tests {
             data_entry::tests::example_polling_station_results,
             validation::{ValidationResult, ValidationResultCode},
         },
-        infra::authentication::Role,
         repository::{
             data_entry_repo::{data_entry_exists, result_exists},
             investigation_repo::insert_test_investigation,

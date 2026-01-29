@@ -7,9 +7,10 @@ use utoipa_axum::{router::OpenApiRouter, routes};
 
 use crate::{
     APIError, AppState, ErrorResponse,
+    domain::role::Role,
     infra::{
         audit_log::{AuditLogEvent, LogFilter},
-        authentication::{AdminOrCoordinator, Role},
+        authentication::AdminOrCoordinator,
     },
 };
 

@@ -14,6 +14,7 @@ use utoipa_axum::{router::OpenApiRouter, routes};
 
 use crate::{
     APIError, AppState, ErrorResponse, SqlitePoolExt,
+    domain::role::Role,
     error::ErrorReference,
     infra::{
         audit_log::{
@@ -21,7 +22,7 @@ use crate::{
             UserLoginFailedDetails,
         },
         authentication::{
-            IncompleteUser, Role, SECURE_COOKIES, SESSION_COOKIE_NAME, SESSION_LIFE_TIME,
+            IncompleteUser, SECURE_COOKIES, SESSION_COOKIE_NAME, SESSION_LIFE_TIME,
             error::AuthenticationError, session,
         },
     },

@@ -9,11 +9,11 @@ use utoipa::ToSchema;
 
 use crate::{
     APIError,
-    domain::id::id,
+    domain::{id::id, role::Role},
     infra::{
         audit_log::UserDetails,
         authentication::{
-            IncompleteUser, Role,
+            IncompleteUser,
             error::AuthenticationError,
             password::{HashedPassword, ValidatedPassword, hash_password, verify_password},
         },
@@ -468,7 +468,8 @@ mod tests {
     use test_log::test;
 
     use crate::{
-        infra::authentication::{Role, error::AuthenticationError, password},
+        domain::role::Role,
+        infra::authentication::{error::AuthenticationError, password},
         repository::user_repo::{User, UserId},
     };
 

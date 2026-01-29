@@ -1,8 +1,6 @@
 use chrono::TimeDelta;
 pub use middleware::*;
 pub use role::{Admin, AdminOrCoordinator, Coordinator, IncompleteUser, Role, Typist};
-use serde::{Deserialize, Serialize};
-use utoipa::ToSchema;
 
 pub use crate::{
     api::{authentication::*, user::*},
@@ -35,18 +33,6 @@ pub const SECURE_COOKIES: bool = false;
 
 /// Do not extend session header, only its existence is checked, not the value
 pub const DO_NOT_EXTEND_SESSION_HEADER: &str = "x-do-not-extend-session";
-
-/// Struct used to create a new user
-#[derive(Serialize, Deserialize, ToSchema)]
-#[serde(deny_unknown_fields)]
-pub struct CreateUserRequest {
-    pub username: String,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[schema(nullable = false)]
-    pub fullname: Option<String>,
-    pub temp_password: String,
-    pub role: Role,
-}
 
 #[cfg(test)]
 mod tests {

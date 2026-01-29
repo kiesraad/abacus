@@ -9,6 +9,7 @@ use crate::{
     api::{
         committee_session::CommitteeSessionError,
         data_entry::delete_data_entry_and_result_for_polling_station,
+        middleware::authentication::Coordinator,
     },
     domain::{
         committee_session::CommitteeSession,
@@ -27,7 +28,6 @@ use crate::{
     error::ErrorReference,
     infra::{
         audit_log::{AuditEvent, AuditService},
-        authentication::Coordinator,
         pdf_gen::generate_pdf,
     },
     repository::{

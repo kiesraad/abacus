@@ -10,11 +10,9 @@ use utoipa_axum::{router::OpenApiRouter, routes};
 
 use crate::{
     APIError, AppState, ErrorResponse, SqlitePoolExt,
+    api::middleware::authentication::{AdminOrCoordinator, error::AuthenticationError, session},
     domain::role::Role,
-    infra::{
-        audit_log::{AuditEvent, AuditService},
-        authentication::{AdminOrCoordinator, error::AuthenticationError, session},
-    },
+    infra::audit_log::{AuditEvent, AuditService},
     repository::user_repo::{self, User, UserId},
 };
 

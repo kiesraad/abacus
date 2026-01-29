@@ -9,15 +9,13 @@ use utoipa::ToSchema;
 
 use crate::{
     APIError,
-    domain::{id::id, role::Role},
-    infra::{
-        audit_log::UserDetails,
-        authentication::{
-            IncompleteUser,
-            error::AuthenticationError,
-            password::{HashedPassword, ValidatedPassword, hash_password, verify_password},
-        },
+    api::middleware::authentication::{
+        IncompleteUser,
+        error::AuthenticationError,
+        password::{HashedPassword, ValidatedPassword, hash_password, verify_password},
     },
+    domain::{id::id, role::Role},
+    infra::audit_log::UserDetails,
 };
 
 const MIN_UPDATE_LAST_ACTIVITY_AT_SECS: i64 = 60; // 1 minute
@@ -468,8 +466,8 @@ mod tests {
     use test_log::test;
 
     use crate::{
+        api::middleware::authentication::{error::AuthenticationError, password},
         domain::role::Role,
-        infra::authentication::{error::AuthenticationError, password},
         repository::user_repo::{User, UserId},
     };
 

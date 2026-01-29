@@ -14,17 +14,15 @@ use utoipa_axum::{router::OpenApiRouter, routes};
 
 use crate::{
     APIError, AppState, ErrorResponse, SqlitePoolExt,
+    api::middleware::authentication::{
+        IncompleteUser, SECURE_COOKIES, SESSION_COOKIE_NAME, SESSION_LIFE_TIME,
+        error::AuthenticationError, session,
+    },
     domain::role::Role,
     error::ErrorReference,
-    infra::{
-        audit_log::{
-            AuditEvent, AuditService, UserDetails, UserLoggedInDetails, UserLoggedOutDetails,
-            UserLoginFailedDetails,
-        },
-        authentication::{
-            IncompleteUser, SECURE_COOKIES, SESSION_COOKIE_NAME, SESSION_LIFE_TIME,
-            error::AuthenticationError, session,
-        },
+    infra::audit_log::{
+        AuditEvent, AuditService, UserDetails, UserLoggedInDetails, UserLoggedOutDetails,
+        UserLoginFailedDetails,
     },
     repository::user_repo::{self, User, UserId},
 };

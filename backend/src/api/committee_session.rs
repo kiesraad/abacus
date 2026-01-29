@@ -9,6 +9,7 @@ use utoipa_axum::{router::OpenApiRouter, routes};
 
 use crate::{
     APIError, AppState, ErrorResponse, SqlitePoolExt,
+    api::middleware::authentication::Coordinator,
     domain::{
         committee_session::{
             CommitteeSession, CommitteeSessionCreateRequest, CommitteeSessionId,
@@ -19,10 +20,7 @@ use crate::{
         election::ElectionId,
     },
     error::ErrorReference,
-    infra::{
-        audit_log::{AuditEvent, AuditService},
-        authentication::Coordinator,
-    },
+    infra::audit_log::{AuditEvent, AuditService},
     repository::{
         committee_session_repo::{create, delete, get, get_election_committee_session, update},
         election_repo,

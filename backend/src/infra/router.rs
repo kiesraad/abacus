@@ -23,8 +23,10 @@ use utoipa_swagger_ui::SwaggerUi;
 #[cfg(feature = "dev-database")]
 use crate::test_data_gen;
 use crate::{
-    AppError, AppState, MAX_BODY_SIZE_MB, api, error,
-    infra::{airgap, airgap::AirgapDetection, audit_log, authentication},
+    AppError, AppState, MAX_BODY_SIZE_MB, api,
+    api::middleware::authentication,
+    error,
+    infra::{airgap, airgap::AirgapDetection, audit_log},
 };
 
 pub fn get_scopes_from_operation(operation: &Operation) -> Option<Vec<String>> {
@@ -301,7 +303,7 @@ mod tests {
 
     use super::*;
     use crate::{
-        SqlitePoolExt, domain::role::Role, infra::authentication::session,
+        SqlitePoolExt, api::middleware::authentication::session, domain::role::Role,
         repository::user_repo::UserId, test::run_server_test,
     };
 

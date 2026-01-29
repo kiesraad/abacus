@@ -11,6 +11,7 @@ use crate::{
     api::{
         data_entry::delete_data_entry_and_result_for_polling_station,
         investigation::delete_investigation_for_polling_station,
+        middleware::authentication::{AdminOrCoordinator, error::AuthenticationError},
     },
     domain::{
         committee_session::CommitteeSession,
@@ -23,10 +24,7 @@ use crate::{
         },
     },
     eml::{EML110, EMLDocument, EMLImportError, EmlHash},
-    infra::{
-        audit_log::{AuditEvent, AuditService, PollingStationImportDetails},
-        authentication::{AdminOrCoordinator, error::AuthenticationError},
-    },
+    infra::audit_log::{AuditEvent, AuditService, PollingStationImportDetails},
     repository::{
         committee_session_repo::get_election_committee_session,
         election_repo,

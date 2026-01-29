@@ -85,7 +85,7 @@ async_zip = { version = "0.0.18", features = ["tokio", "deflate", "chrono"] }
 strum = { version = "0.27", features = ["derive"] }
 tokio-util = { version = "0.7.18", features = ["io"] }
 ttf-parser = "0.25.1"
-socket2 = "0.6.1"
+socket2 = "0.6.2"
 
 [dev-dependencies]
 test-log = "0.2.19"

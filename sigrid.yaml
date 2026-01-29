@@ -85,6 +85,9 @@ components:
   - name: "(Frontend) components/polling_station"
     include:
       - ".*/frontend/src/components/polling_station/.*"
+  - name: "(Frontend) components/privacy_statement"
+    include:
+      - ".*/frontend/src/components/privacy_statement/.*"
   - name: "(Frontend) Lib/UI"
     include:
       - ".*/frontend/src/components/ui/.*"
@@ -211,11 +214,15 @@ languages:
         - ".*/generated/.*[.]ts"
 
 exclude:
+  - ".*/backend/[.]env"
   - ".*/backend/[.]sqlx/.*"
   - ".*/documentatie/.*"
   - ".*/frontend/scripts/.*"
-  - ".*[.]d[.]ts"
-  - ".*[.]config[.]ts"
+  - ".*/frontend/.*[.]d[.]ts"
+  - ".*/frontend/.*[.]config[.]ts"
+  - ".*/frontend/package.json"
+  - ".*/frontend/tsconfig[.]ts"
+  - "docker-compose.yml"
 
 dependencychecker:
   blocklist:

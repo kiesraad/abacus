@@ -168,11 +168,11 @@ async fn test_polling_station_data_entry_validation(pool: SqlitePool) {
     let error_2_fields = errors[1]["fields"].as_array().unwrap();
     assert_eq!(
         error_2_fields[0],
-        "data.votes_counts.political_group_total_votes[0].total"
+        "data.votes_counts.political_group_total_votes.0.total"
     );
     assert_eq!(
         error_2_fields[1],
-        "data.votes_counts.political_group_total_votes[1].total"
+        "data.votes_counts.political_group_total_votes.1.total"
     );
     assert_eq!(
         error_2_fields[2],
@@ -195,13 +195,13 @@ async fn test_polling_station_data_entry_validation(pool: SqlitePool) {
     assert_eq!(errors[3]["code"], "F402");
     assert_eq!(
         errors[3]["fields"].as_array().unwrap()[0],
-        "data.political_group_votes[0]"
+        "data.political_group_votes.0"
     );
     // error 5
     assert_eq!(errors[4]["code"], "F402");
     assert_eq!(
         errors[4]["fields"].as_array().unwrap()[0],
-        "data.political_group_votes[1]"
+        "data.political_group_votes.1"
     );
 
     let warnings = body["validation_results"]["warnings"].as_array().unwrap();

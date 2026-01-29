@@ -682,7 +682,7 @@ mod tests {
         );
         assert_eq!(
             different_fields[3],
-            "polling_station_results.votes_counts.political_group_total_votes[0].total"
+            "polling_station_results.votes_counts.political_group_total_votes.0.total"
         );
         assert_eq!(
             different_fields[4],
@@ -760,23 +760,23 @@ mod tests {
         assert_eq!(different_fields.len(), 5);
         assert_eq!(
             different_fields[0],
-            "polling_station_results.political_group_votes[0].candidate_votes[0].votes"
+            "polling_station_results.political_group_votes.0.candidate_votes.0.votes"
         );
         assert_eq!(
             different_fields[1],
-            "polling_station_results.political_group_votes[0].candidate_votes[1].votes"
+            "polling_station_results.political_group_votes.0.candidate_votes.1.votes"
         );
         assert_eq!(
             different_fields[2],
-            "polling_station_results.political_group_votes[0].total"
+            "polling_station_results.political_group_votes.0.total"
         );
         assert_eq!(
             different_fields[3],
-            "polling_station_results.political_group_votes[1].candidate_votes[0].votes"
+            "polling_station_results.political_group_votes.1.candidate_votes.0.votes"
         );
         assert_eq!(
             different_fields[4],
-            "polling_station_results.political_group_votes[1].total"
+            "polling_station_results.political_group_votes.1.total"
         );
     }
 }

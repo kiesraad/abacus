@@ -62,8 +62,8 @@ const votersFieldIds = {
 };
 
 const votesFieldIds = {
-  politicalGroup1TotalVotes: "data.votes_counts.political_group_total_votes[0].total",
-  politicalGroup2TotalVotes: "data.votes_counts.political_group_total_votes[1].total",
+  politicalGroup1TotalVotes: "data.votes_counts.political_group_total_votes.0.total",
+  politicalGroup2TotalVotes: "data.votes_counts.political_group_total_votes.1.total",
   totalVotesCandidatesCount: "data.votes_counts.total_votes_candidates_count",
   blankVotesCount: "data.votes_counts.blank_votes_count",
   invalidVotesCount: "data.votes_counts.invalid_votes_count",

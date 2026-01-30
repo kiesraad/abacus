@@ -111,11 +111,13 @@ pub(crate) fn seat_assignment<T: ApportionmentInput>(
     })
 }
 
-pub fn get_total_seats_from_apportionment_result(result: &SeatAssignmentResult) -> Vec<u32> {
+pub fn get_total_seats_per_list_number_from_apportionment_result(
+    result: &SeatAssignmentResult,
+) -> Vec<(ListNumber, u32)> {
     result
         .final_standing
         .iter()
-        .map(|p| p.total_seats)
+        .map(|p| (p.list_number, p.total_seats))
         .collect::<Vec<_>>()
 }
 
@@ -279,6 +281,7 @@ fn reassign_residual_seats_for_exhausted_lists<T: ListVotesTrait>(
 #[cfg(test)]
 pub(crate) mod tests {
     use crate::{
+        SeatAssignmentResult,
         fraction::Fraction,
         seat_assignment::{ListStanding, SeatChange, list_numbers},
         structs::ListNumber,
@@ -290,6 +293,25 @@ pub(crate) mod tests {
         pub fn is_changed_by_list_exhaustion_removal(&self) -> bool {
             matches!(self, Self::ListExhaustionRemoval(_))
         }
+    }
+
+    fn check_total_seats_per_list(
+        result: &SeatAssignmentResult,
+        expected_total_seats: Vec<(u32, u32)>,
+    ) {
+        let total_seats_per_list_number = result
+            .final_standing
+            .iter()
+            .map(|p| (p.list_number, p.total_seats))
+            .collect::<Vec<_>>();
+        let expected_total_seats_per_list_number: Vec<(ListNumber, u32)> = expected_total_seats
+            .iter()
+            .map(|(number, seats)| (ListNumber::from(*number), *seats))
+            .collect();
+        assert_eq!(
+            expected_total_seats_per_list_number,
+            total_seats_per_list_number
+        );
     }
 
     #[test]
@@ -348,10 +370,9 @@ pub(crate) mod tests {
     mod lt_19_seats {
         use test_log::test;
 
+        use super::check_total_seats_per_list;
         use crate::{
-            ApportionmentError,
-            seat_assignment::{get_total_seats_from_apportionment_result, seat_assignment},
-            structs::ListNumber,
+            ApportionmentError, seat_assignment::seat_assignment, structs::ListNumber,
             test_helpers::seat_assignment_fixture_with_default_50_candidates,
         };
 
@@ -368,8 +389,10 @@ pub(crate) mod tests {
             assert_eq!(result.full_seats, 15);
             assert_eq!(result.residual_seats, 0);
             assert_eq!(result.steps.len(), 0);
-            let total_seats = get_total_seats_from_apportionment_result(&result);
-            assert_eq!(total_seats, vec![6, 2, 2, 2, 1, 1, 1]);
+            check_total_seats_per_list(
+                &result,
+                vec![(1, 6), (2, 2), (3, 2), (4, 2), (5, 1), (6, 1), (7, 1)],
+            );
         }
 
         /// Apportionment with residual seats assigned with largest remainders method
@@ -396,8 +419,19 @@ pub(crate) mod tests {
                 result.steps[1].change.list_number_assigned(),
                 ListNumber::from(7)
             );
-            let total_seats = get_total_seats_from_apportionment_result(&result);
-            assert_eq!(total_seats, vec![7, 2, 2, 1, 1, 1, 1, 0]);
+            check_total_seats_per_list(
+                &result,
+                vec![
+                    (1, 7),
+                    (2, 2),
+                    (3, 2),
+                    (4, 1),
+                    (5, 1),
+                    (6, 1),
+                    (7, 1),
+                    (8, 0),
+                ],
+            );
         }
 
         /// Apportionment with residual seats assigned with largest remainders and highest averages methods
@@ -440,8 +474,19 @@ pub(crate) mod tests {
                 result.steps[4].change.list_number_assigned(),
                 ListNumber::from(4)
             );
-            let total_seats = get_total_seats_from_apportionment_result(&result);
-            assert_eq!(total_seats, vec![12, 1, 1, 1, 0, 0, 0, 0]);
+            check_total_seats_per_list(
+                &result,
+                vec![
+                    (1, 12),
+                    (2, 1),
+                    (3, 1),
+                    (4, 1),
+                    (5, 0),
+                    (6, 0),
+                    (7, 0),
+                    (8, 0),
+                ],
+            );
         }
 
         /// Apportionment with residual seats assigned with largest remainders method
@@ -473,8 +518,19 @@ pub(crate) mod tests {
                 result.steps[2].change.list_number_assigned(),
                 ListNumber::from(3)
             );
-            let total_seats = get_total_seats_from_apportionment_result(&result);
-            assert_eq!(total_seats, vec![7, 4, 4, 0, 0, 0, 0, 0]);
+            check_total_seats_per_list(
+                &result,
+                vec![
+                    (1, 7),
+                    (2, 4),
+                    (3, 4),
+                    (4, 0),
+                    (5, 0),
+                    (6, 0),
+                    (7, 0),
+                    (8, 0),
+                ],
+            );
         }
 
         /// Apportionment with residual seats assigned with highest averages method
@@ -507,8 +563,21 @@ pub(crate) mod tests {
                 result.steps[2].change.list_number_assigned(),
                 ListNumber::from(3)
             );
-            let total_seats = get_total_seats_from_apportionment_result(&result);
-            assert_eq!(total_seats, vec![1, 1, 1, 0, 0, 0, 0, 0, 0, 0]);
+            check_total_seats_per_list(
+                &result,
+                vec![
+                    (1, 1),
+                    (2, 1),
+                    (3, 1),
+                    (4, 0),
+                    (5, 0),
+                    (6, 0),
+                    (7, 0),
+                    (8, 0),
+                    (9, 0),
+                    (10, 0),
+                ],
+            );
         }
 
         /// Apportionment with residual seats assigned with largest remainders and highest averages methods
@@ -539,8 +608,10 @@ pub(crate) mod tests {
                 result.steps[2].change.list_number_assigned(),
                 ListNumber::from(5)
             );
-            let total_seats = get_total_seats_from_apportionment_result(&result);
-            assert_eq!(total_seats, [0, 0, 0, 0, 1, 9]);
+            check_total_seats_per_list(
+                &result,
+                vec![(1, 0), (2, 0), (3, 0), (4, 0), (5, 1), (6, 9)],
+            );
         }
 
         /// Apportionment with 0 votes on candidates
@@ -597,8 +668,7 @@ pub(crate) mod tests {
                 result.steps[3].change.list_number_assigned(),
                 ListNumber::from(1)
             );
-            let total_seats = get_total_seats_from_apportionment_result(&result);
-            assert_eq!(total_seats, vec![8, 3, 2, 1, 1]);
+            check_total_seats_per_list(&result, vec![(1, 8), (2, 3), (3, 2), (4, 1), (5, 1)]);
         }
 
         mod drawing_of_lots {
@@ -663,14 +733,18 @@ pub(crate) mod tests {
         mod list_exhaustion {
             use test_log::test;
 
+            use crate::seat_assignment::tests::check_total_seats_per_list;
             use crate::{
                 ApportionmentError,
-                seat_assignment::{get_total_seats_from_apportionment_result, seat_assignment},
+                seat_assignment::seat_assignment,
                 structs::ListNumber,
-                test_helpers::seat_assignment_fixture_with_given_candidate_votes,
+                test_helpers::{
+                    seat_assignment_fixture_with_given_candidate_votes,
+                    seat_assignment_fixture_with_given_list_numbers_and_candidate_votes,
+                },
             };
 
-            /// Apportionment with no residual seats  
+            /// Apportionment with no residual seats
             /// This test triggers Kieswet Article P 10
             ///
             /// Full seats: [5, 4, 3, 2, 1] - Remainder seats: 0  
@@ -680,14 +754,14 @@ pub(crate) mod tests {
             /// 2 - largest remainder: seat assigned to list 5
             #[test]
             fn test_with_list_exhaustion_during_full_seats_assignment() {
-                let input = seat_assignment_fixture_with_given_candidate_votes(
+                let input = seat_assignment_fixture_with_given_list_numbers_and_candidate_votes(
                     15,
                     vec![
-                        vec![500, 500, 500, 500],
-                        vec![400, 400, 400, 400],
-                        vec![400, 400, 400],
-                        vec![400, 400],
-                        vec![200, 200],
+                        (1, vec![500, 500, 500, 500]),
+                        (2, vec![400, 400, 400, 400]),
+                        (4, vec![400, 400, 400]),
+                        (5, vec![400, 400]),
+                        (7, vec![200, 200]),
                     ],
                 );
                 let result = seat_assignment(&input).unwrap();
@@ -705,10 +779,9 @@ pub(crate) mod tests {
                 );
                 assert_eq!(
                     result.steps[1].change.list_number_assigned(),
-                    ListNumber::from(5)
+                    ListNumber::from(7)
                 );
-                let total_seats = get_total_seats_from_apportionment_result(&result);
-                assert_eq!(total_seats, vec![4, 4, 3, 2, 2]);
+                check_total_seats_per_list(&result, vec![(1, 4), (2, 4), (4, 3), (5, 2), (7, 2)]);
             }
 
             /// Apportionment with residual seats assigned with largest remainders method  
@@ -785,8 +858,22 @@ pub(crate) mod tests {
                     result.steps[7].change.list_number_assigned(),
                     ListNumber::from(6)
                 );
-                let total_seats = get_total_seats_from_apportionment_result(&result);
-                assert_eq!(total_seats, vec![3, 1, 2, 2, 1, 2, 1, 0, 3, 1, 1]);
+                check_total_seats_per_list(
+                    &result,
+                    vec![
+                        (1, 3),
+                        (2, 1),
+                        (3, 2),
+                        (4, 2),
+                        (5, 1),
+                        (6, 2),
+                        (7, 1),
+                        (8, 0),
+                        (9, 3),
+                        (10, 1),
+                        (11, 1),
+                    ],
+                );
             }
 
             /// Apportionment with residual seats assigned with largest remainders and highest averages methods
@@ -843,8 +930,10 @@ pub(crate) mod tests {
                     result.steps[4].change.list_number_assigned(),
                     ListNumber::from(4)
                 );
-                let total_seats = get_total_seats_from_apportionment_result(&result);
-                assert_eq!(total_seats, [0, 0, 0, 1, 1, 8]);
+                check_total_seats_per_list(
+                    &result,
+                    vec![(1, 0), (2, 0), (3, 0), (4, 1), (5, 1), (6, 8)],
+                );
             }
 
             /// Apportionment with residual seats assigned with largest remainders and highest averages methods
@@ -933,8 +1022,7 @@ pub(crate) mod tests {
                     result.steps[8].change.list_number_assigned(),
                     ListNumber::from(2)
                 );
-                let total_seats = get_total_seats_from_apportionment_result(&result);
-                assert_eq!(total_seats, [2, 2, 2]);
+                check_total_seats_per_list(&result, vec![(1, 2), (2, 2), (3, 2)]);
             }
 
             /// Apportionment with residual seats assigned with largest remainders and highest averages methods
@@ -1023,8 +1111,7 @@ pub(crate) mod tests {
                     result.steps[8].change.list_number_assigned(),
                     ListNumber::from(2)
                 );
-                let total_seats = get_total_seats_from_apportionment_result(&result);
-                assert_eq!(total_seats, [2, 2, 2]);
+                check_total_seats_per_list(&result, vec![(1, 2), (2, 2), (3, 2)]);
             }
 
             /// Apportionment with residual seats assigned with largest remainders method  
@@ -1093,8 +1180,7 @@ pub(crate) mod tests {
                     result.steps[5].change.list_number_assigned(),
                     ListNumber::from(4)
                 );
-                let total_seats = get_total_seats_from_apportionment_result(&result);
-                assert_eq!(total_seats, vec![7, 3, 2, 2, 1]);
+                check_total_seats_per_list(&result, vec![(1, 7), (2, 3), (3, 2), (4, 2), (5, 1)]);
             }
 
             /// Apportionment with residual seats assigned with largest remainders and highest averages methods  
@@ -1165,8 +1251,7 @@ pub(crate) mod tests {
                     result.steps[5].change.list_number_assigned(),
                     ListNumber::from(3)
                 );
-                let total_seats = get_total_seats_from_apportionment_result(&result);
-                assert_eq!(total_seats, [4, 3, 1]);
+                check_total_seats_per_list(&result, vec![(1, 4), (2, 3), (3, 1)]);
             }
 
             /// Apportionment with residual seats assigned with largest remainders and highest averages methods  
@@ -1253,8 +1338,7 @@ pub(crate) mod tests {
                     result.steps[7].change.list_number_assigned(),
                     ListNumber::from(2)
                 );
-                let total_seats = get_total_seats_from_apportionment_result(&result);
-                assert_eq!(total_seats, [2, 1, 5]);
+                check_total_seats_per_list(&result, vec![(1, 2), (2, 1), (3, 5)]);
             }
 
             /// Apportionment with no residual seats  
@@ -1314,10 +1398,9 @@ pub(crate) mod tests {
     mod gte_19_seats {
         use test_log::test;
 
+        use super::check_total_seats_per_list;
         use crate::{
-            ApportionmentError,
-            seat_assignment::{get_total_seats_from_apportionment_result, seat_assignment},
-            structs::ListNumber,
+            ApportionmentError, seat_assignment::seat_assignment, structs::ListNumber,
             test_helpers::seat_assignment_fixture_with_default_50_candidates,
         };
 
@@ -1334,8 +1417,10 @@ pub(crate) mod tests {
             assert_eq!(result.full_seats, 25);
             assert_eq!(result.residual_seats, 0);
             assert_eq!(result.steps.len(), 0);
-            let total_seats = get_total_seats_from_apportionment_result(&result);
-            assert_eq!(total_seats, vec![12, 6, 2, 2, 2, 1]);
+            check_total_seats_per_list(
+                &result,
+                vec![(1, 12), (2, 6), (3, 2), (4, 2), (5, 2), (6, 1)],
+            );
         }
 
         /// Apportionment with residual seats assigned with highest averages method
@@ -1369,8 +1454,7 @@ pub(crate) mod tests {
                 result.steps[3].change.list_number_assigned(),
                 ListNumber::from(4)
             );
-            let total_seats = get_total_seats_from_apportionment_result(&result);
-            assert_eq!(total_seats, vec![12, 6, 1, 2, 2]);
+            check_total_seats_per_list(&result, vec![(1, 12), (2, 6), (3, 1), (4, 2), (5, 2)]);
         }
 
         /// Apportionment with residual seats assigned with highest averages method
@@ -1421,8 +1505,20 @@ pub(crate) mod tests {
                 result.steps[6].change.list_number_assigned(),
                 ListNumber::from(1)
             );
-            let total_seats = get_total_seats_from_apportionment_result(&result);
-            assert_eq!(total_seats, vec![15, 1, 1, 1, 1, 0, 0, 0, 0]);
+            check_total_seats_per_list(
+                &result,
+                vec![
+                    (1, 15),
+                    (2, 1),
+                    (3, 1),
+                    (4, 1),
+                    (5, 1),
+                    (6, 0),
+                    (7, 0),
+                    (8, 0),
+                    (9, 0),
+                ],
+            );
         }
 
         /// Apportionment with 0 votes on candidates
@@ -1493,8 +1589,19 @@ pub(crate) mod tests {
                 result.steps[6].change.list_number_assigned(),
                 ListNumber::from(1)
             );
-            let total_seats = get_total_seats_from_apportionment_result(&result);
-            assert_eq!(total_seats, vec![13, 2, 2, 2, 2, 2, 1, 0]);
+            check_total_seats_per_list(
+                &result,
+                vec![
+                    (1, 13),
+                    (2, 2),
+                    (3, 2),
+                    (4, 2),
+                    (5, 2),
+                    (6, 2),
+                    (7, 1),
+                    (8, 0),
+                ],
+            );
         }
 
         mod drawing_of_lots {
@@ -1545,14 +1652,13 @@ pub(crate) mod tests {
         mod list_exhaustion {
             use test_log::test;
 
+            use crate::seat_assignment::tests::check_total_seats_per_list;
             use crate::{
-                ApportionmentError,
-                seat_assignment::{get_total_seats_from_apportionment_result, seat_assignment},
-                structs::ListNumber,
+                ApportionmentError, seat_assignment::seat_assignment, structs::ListNumber,
                 test_helpers::seat_assignment_fixture_with_given_candidate_votes,
             };
 
-            /// Apportionment with no residual seats  
+            /// Apportionment with no residual seats
             /// This test triggers Kieswet Article P 10
             ///
             /// Full seats: [5, 5, 4, 4, 2] - Remainder seats: 0  
@@ -1588,8 +1694,7 @@ pub(crate) mod tests {
                     result.steps[1].change.list_number_assigned(),
                     ListNumber::from(5)
                 );
-                let total_seats = get_total_seats_from_apportionment_result(&result);
-                assert_eq!(total_seats, vec![4, 5, 4, 4, 3]);
+                check_total_seats_per_list(&result, vec![(1, 4), (2, 5), (3, 4), (4, 4), (5, 3)]);
             }
 
             /// Apportionment with residual seats assigned with highest averages method  
@@ -1633,8 +1738,7 @@ pub(crate) mod tests {
                     result.steps[2].change.list_number_assigned(),
                     ListNumber::from(1)
                 );
-                let total_seats = get_total_seats_from_apportionment_result(&result);
-                assert_eq!(total_seats, vec![5, 4, 4, 4, 2]);
+                check_total_seats_per_list(&result, vec![(1, 5), (2, 4), (3, 4), (4, 4), (5, 2)]);
             }
 
             /// Apportionment with residual seats assigned with highest averages method  
@@ -1720,8 +1824,19 @@ pub(crate) mod tests {
                     result.steps[8].change.list_number_assigned(),
                     ListNumber::from(7)
                 );
-                let total_seats = get_total_seats_from_apportionment_result(&result);
-                assert_eq!(total_seats, vec![12, 2, 2, 2, 2, 2, 2, 0]);
+                check_total_seats_per_list(
+                    &result,
+                    vec![
+                        (1, 12),
+                        (2, 2),
+                        (3, 2),
+                        (4, 2),
+                        (5, 2),
+                        (6, 2),
+                        (7, 2),
+                        (8, 0),
+                    ],
+                );
             }
 
             /// Apportionment with no residual seats  

@@ -89,8 +89,8 @@ pub fn seat_assignment_fixture_with_given_list_numbers_and_candidate_votes(
     let mut list_votes: Vec<ListVotes> = vec![];
     for (list_number, list_candidate_votes) in list_candidate_votes.iter() {
         list_votes.push(ListVotes::from_test_data_auto(
-            ListNumber::try_from(*list_number).unwrap(),
-            &list_candidate_votes,
+            ListNumber::from(*list_number),
+            list_candidate_votes,
         ))
     }
 

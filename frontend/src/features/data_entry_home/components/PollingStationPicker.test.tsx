@@ -13,13 +13,13 @@ import { overrideOnce, server } from "@/testing/server";
 import { renderReturningRouter, screen, waitFor, within } from "@/testing/test-utils";
 import type { ElectionStatusResponse, LoginResponse } from "@/types/generated/openapi";
 
-import { PollingStationChoiceForm } from "./PollingStationChoiceForm";
+import { PollingStationPicker } from "./PollingStationPicker";
 
-async function renderPollingStationChoiceForm(anotherEntry?: boolean) {
+async function renderPollingStationPicker(anotherEntry?: boolean) {
   const router = renderReturningRouter(
     <ElectionProvider electionId={1}>
       <ElectionStatusProvider electionId={1}>
-        <PollingStationChoiceForm anotherEntry={anotherEntry} />
+        <PollingStationPicker anotherEntry={anotherEntry} />
       </ElectionStatusProvider>
     </ElectionProvider>,
   );
@@ -37,7 +37,7 @@ const testUser: LoginResponse = {
   needs_password_change: false,
 };
 
-describe("Test PollingStationChoiceForm", () => {
+describe("Test PollingStationPicker", () => {
   beforeEach(() => {
     // mock a current logged in user
     vi.spyOn(useUser, "useUser").mockReturnValue(testUser);
@@ -49,7 +49,7 @@ describe("Test PollingStationChoiceForm", () => {
       overrideOnce("get", "/api/elections/1", 200, electionDetailsMockResponse);
       const user = userEvent.setup();
 
-      await renderPollingStationChoiceForm();
+      await renderPollingStationPicker();
 
       expect(await screen.findByRole("group", { name: "Welk stembureau ga je invoeren?" })).toBeVisible();
       const pollingStation = screen.getByTestId("pollingStation");
@@ -71,7 +71,7 @@ describe("Test PollingStationChoiceForm", () => {
     test("Selecting a valid polling station", async () => {
       overrideOnce("get", "/api/elections/1", 200, electionDetailsMockResponse);
       const user = userEvent.setup();
-      await renderPollingStationChoiceForm(true);
+      await renderPollingStationPicker(true);
 
       const pollingStation = screen.getByTestId("pollingStation");
 
@@ -84,7 +84,7 @@ describe("Test PollingStationChoiceForm", () => {
     test("Selecting a valid polling station with leading zeros", async () => {
       overrideOnce("get", "/api/elections/1", 200, electionDetailsMockResponse);
       const user = userEvent.setup();
-      await renderPollingStationChoiceForm();
+      await renderPollingStationPicker();
 
       const pollingStation = await screen.findByTestId("pollingStation");
 
@@ -152,7 +152,7 @@ describe("Test PollingStationChoiceForm", () => {
       overrideOnce("get", "/api/elections/1/status", 200, statusResponseMock);
 
       const user = userEvent.setup();
-      await renderPollingStationChoiceForm();
+      await renderPollingStationPicker();
 
       const pollingStation = await screen.findByTestId("pollingStation");
       await user.type(pollingStation, pollingStationInput);
@@ -172,7 +172,7 @@ describe("Test PollingStationChoiceForm", () => {
     test("Selecting a non-existing polling station", async () => {
       overrideOnce("get", "/api/elections/1", 200, electionDetailsMockResponse);
       const user = userEvent.setup();
-      await renderPollingStationChoiceForm();
+      await renderPollingStationPicker();
 
       const pollingStation = await screen.findByTestId("pollingStation");
 
@@ -198,7 +198,7 @@ describe("Test PollingStationChoiceForm", () => {
       server.use(http.get("/api/elections/1/status", () => HttpResponse.json({ statuses: [] }, { status: 200 })));
 
       const user = userEvent.setup();
-      await renderPollingStationChoiceForm();
+      await renderPollingStationPicker();
 
       const pollingStation = await screen.findByTestId("pollingStation");
       await user.type(pollingStation, "33");
@@ -211,7 +211,7 @@ describe("Test PollingStationChoiceForm", () => {
     test("Submitting an empty or invalid polling station shows alert", async () => {
       overrideOnce("get", "/api/elections/1", 200, electionDetailsMockResponse);
       const user = userEvent.setup();
-      await renderPollingStationChoiceForm();
+      await renderPollingStationPicker();
 
       const pollingStation = await screen.findByTestId("pollingStation");
       const submitButton = screen.getByRole("button", { name: "Beginnen" });
@@ -243,7 +243,7 @@ describe("Test PollingStationChoiceForm", () => {
     test("Form displays message when searching", async () => {
       overrideOnce("get", "/api/elections/1", 200, electionDetailsMockResponse);
       const user = userEvent.setup();
-      await renderPollingStationChoiceForm();
+      await renderPollingStationPicker();
 
       const pollingStation = await screen.findByTestId("pollingStation");
 
@@ -275,7 +275,7 @@ describe("Test PollingStationChoiceForm", () => {
         ),
       );
 
-      const router = await renderPollingStationChoiceForm();
+      const router = await renderPollingStationPicker();
 
       const user = userEvent.setup();
       const pollingStation = await screen.findByTestId("pollingStation");
@@ -292,7 +292,7 @@ describe("Test PollingStationChoiceForm", () => {
       overrideOnce("get", "/api/elections/1/status", 200, statusResponseMock);
 
       const user = userEvent.setup();
-      await renderPollingStationChoiceForm();
+      await renderPollingStationPicker();
 
       expect(await screen.findByText("Kies het stembureau")).not.toBeVisible();
       const openPollingStationList = screen.getByTestId("openPollingStationList");
@@ -313,7 +313,7 @@ describe("Test PollingStationChoiceForm", () => {
     test("Empty polling station list shows message", async () => {
       overrideOnce("get", "/api/elections/1", 200, { ...electionDetailsMockResponse, polling_stations: [] });
       const user = userEvent.setup();
-      await renderPollingStationChoiceForm();
+      await renderPollingStationPicker();
 
       const openPollingStationList = await screen.findByTestId("openPollingStationList");
       await user.click(openPollingStationList);
@@ -337,7 +337,7 @@ describe("Test PollingStationChoiceForm", () => {
         ],
       } satisfies ElectionStatusResponse);
 
-      await renderPollingStationChoiceForm();
+      await renderPollingStationPicker();
 
       const pollingStationList = screen.queryByTestId("polling_station_list");
       expect(pollingStationList).not.toBeInTheDocument();
@@ -380,7 +380,7 @@ describe("Test PollingStationChoiceForm", () => {
       );
 
       const user = userEvent.setup();
-      await renderPollingStationChoiceForm();
+      await renderPollingStationPicker();
 
       const openPollingStationList = await screen.findByTestId("openPollingStationList");
       await user.click(openPollingStationList);
@@ -411,7 +411,7 @@ describe("Test PollingStationChoiceForm", () => {
           ),
         ),
       );
-      const router = await renderPollingStationChoiceForm();
+      const router = await renderPollingStationPicker();
 
       // Open the polling station list
       const user = userEvent.setup();
@@ -455,7 +455,7 @@ describe("Test PollingStationChoiceForm", () => {
         ),
       );
 
-      await renderPollingStationChoiceForm();
+      await renderPollingStationPicker();
 
       const alert = await screen.findByRole("alert");
       expect(within(alert).getByRole("strong")).toHaveTextContent("Je hebt nog een openstaande invoer");
@@ -488,7 +488,7 @@ describe("Test PollingStationChoiceForm", () => {
       );
 
       // Render the polling station choice page with the overridden server responses
-      await renderPollingStationChoiceForm();
+      await renderPollingStationPicker();
 
       // Search for polling station 2
       const user = userEvent.setup();
@@ -541,7 +541,7 @@ describe("Test PollingStationChoiceForm", () => {
       );
 
       // Render the polling station choice page with the overridden server responses
-      await renderPollingStationChoiceForm();
+      await renderPollingStationPicker();
 
       // Search for polling station 2
       const user = userEvent.setup();
@@ -568,7 +568,7 @@ describe("Test PollingStationChoiceForm", () => {
     });
 
     test("Show message when searching", async () => {
-      await renderPollingStationChoiceForm();
+      await renderPollingStationPicker();
       const user = userEvent.setup();
       await user.type(
         await screen.findByRole("textbox", { name: "Voer het nummer in:" }),
@@ -582,7 +582,7 @@ describe("Test PollingStationChoiceForm", () => {
     });
 
     test("Do not show in the list with available polling stations", async () => {
-      await renderPollingStationChoiceForm();
+      await renderPollingStationPicker();
 
       const pollingStationList = await screen.findByTestId("polling_station_list");
       expect(pollingStationList).not.toHaveTextContent(testPollingStation.name);
@@ -611,7 +611,7 @@ describe("Test PollingStationChoiceForm", () => {
       ),
     );
 
-    await renderPollingStationChoiceForm();
+    await renderPollingStationPicker();
 
     const list = await screen.findByTestId("unfinished-list");
     expect(list).toBeVisible();
@@ -640,7 +640,7 @@ describe("Test PollingStationChoiceForm", () => {
       ),
     );
 
-    await renderPollingStationChoiceForm();
+    await renderPollingStationPicker();
 
     const user = userEvent.setup();
     const pollingStation = await screen.findByTestId("pollingStation");

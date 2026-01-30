@@ -10,7 +10,7 @@ import { useLiveData } from "@/hooks/useLiveData";
 import { t } from "@/i18n/translate";
 
 import { ElectionProgress } from "./ElectionProgress";
-import { PollingStationChoiceForm } from "./PollingStationChoiceForm";
+import { PollingStationPicker } from "./PollingStationPicker";
 
 export function DataEntryHomePage() {
   const navigate = useNavigate();
@@ -88,7 +88,7 @@ export function DataEntryHomePage() {
       )}
       <main>
         <article id="polling-station-choice-form">
-          <PollingStationChoiceForm anotherEntry={!!dataEntryDone || !!dataEntryNotification} />
+          <PollingStationPicker anotherEntry={!!dataEntryDone || !!dataEntryNotification} />
         </article>
         <ElectionProgress />
       </main>

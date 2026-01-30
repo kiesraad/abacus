@@ -111,11 +111,11 @@ function PollingStationListDetails({
   );
 }
 
-export interface PollingStationChoiceFormProps {
+export interface PollingStationPickerProps {
   anotherEntry?: boolean;
 }
 
-export function PollingStationChoiceForm({ anotherEntry }: PollingStationChoiceFormProps) {
+export function PollingStationPicker({ anotherEntry }: PollingStationPickerProps) {
   const navigate = useNavigate();
   const { election, pollingStations } = useElection();
   const { refetch: refetchStatuses } = useElectionStatus();

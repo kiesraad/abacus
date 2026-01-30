@@ -2,7 +2,9 @@ use super::{
     candidate_nomination::CandidateNominationResult,
     fraction::Fraction,
     int_newtype_macro::int_newtype,
-    seat_assignment::{SeatAssignmentResult, get_total_seats_from_apportionment_result},
+    seat_assignment::{
+        SeatAssignmentResult, get_total_seats_per_list_number_from_apportionment_result,
+    },
 };
 
 pub(crate) const LARGE_COUNCIL_THRESHOLD: u32 = 19;
@@ -103,8 +105,7 @@ pub(crate) struct CandidateNominationInput {
     pub number_of_seats: u32,
     pub list_votes: Vec<ListVotes>,
     pub quota: Fraction,
-    // TODO: #2785 Should be mapped by ListNumber, not index
-    pub total_seats_per_list: Vec<u32>,
+    pub total_seats_per_list: Vec<(ListNumber, u32)>,
 }
 
 impl<T> From<(&T, &SeatAssignmentResult)> for CandidateNominationInput
@@ -116,7 +117,9 @@ where
             number_of_seats: input.0.number_of_seats(),
             list_votes: list_votes_from_input(input.0),
             quota: input.1.quota,
-            total_seats_per_list: get_total_seats_from_apportionment_result(input.1),
+            total_seats_per_list: get_total_seats_per_list_number_from_apportionment_result(
+                input.1,
+            ),
         }
     }
 }
@@ -127,9 +130,8 @@ where
 //         CandidateNominationInput {
 //             number_of_seats: input.number_of_seats(),
 //             list_votes: list_votes_from_input(&input),
-
 //             quota: seat_assignment.quota,
-//             total_seats: get_total_seats_from_apportionment_result(&seat_assignment),
+//             total_seats_per_list: get_total_seats_per_list_number_from_apportionment_result(&seat_assignment),
 //         }
 //     }
 // }

@@ -122,12 +122,12 @@ fn list_numbers_without_empty_seats<'a>(
     list_votes: &[ListVotes],
 ) -> Vec<ListNumber> {
     standings.fold(vec![], |mut list_numbers_without_empty_seats, s| {
-        let number_of_candidates = u32::try_from(
-            list_votes[*s.list_number as usize - 1]
-                .candidate_votes
-                .len(),
-        )
-        .expect("Number of candidates fits in u32");
+        let list_votes = list_votes
+            .iter()
+            .find(|list_votes| list_votes.number == s.list_number)
+            .expect("List votes exists");
+        let number_of_candidates = u32::try_from(list_votes.candidate_votes.len())
+            .expect("Number of candidates fits in u32");
 
         if number_of_candidates.cmp(&s.total_seats()) == Ordering::Equal {
             list_numbers_without_empty_seats.push(s.list_number)

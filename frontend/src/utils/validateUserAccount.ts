@@ -1,5 +1,5 @@
 import { t } from "@/i18n/translate";
-import type { AccountUpdateRequest, CreateUserRequest } from "@/types/generated/openapi";
+import type { AccountUpdateRequest, CreateFirstAdminRequest, CreateUserRequest } from "@/types/generated/openapi";
 
 export type UserValidationErrors = {
   fullname?: string;
@@ -30,7 +30,7 @@ export function validateUpdateUser(
 }
 
 export function validateCreateUser(
-  accountCreate: CreateUserRequest,
+  accountCreate: CreateUserRequest | CreateFirstAdminRequest,
   passwordRepeat: string | undefined,
 ): UserValidationErrors {
   const errors: UserValidationErrors = {};

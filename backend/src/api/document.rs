@@ -10,6 +10,7 @@ use utoipa_axum::{router::OpenApiRouter, routes};
 
 use crate::{
     APIError, AppState, ErrorResponse,
+    api::middleware::authentication::AdminOrCoordinator,
     domain::{
         election::ElectionId,
         models::{
@@ -19,7 +20,6 @@ use crate::{
     },
     error::ErrorReference,
     infra::{
-        authentication::AdminOrCoordinator,
         pdf_gen::{generate_pdf, generate_pdfs},
         zip::ZipResponse,
     },

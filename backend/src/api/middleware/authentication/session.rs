@@ -13,7 +13,7 @@ use super::{
     util::{create_new_session_key, get_expires_at},
 };
 use crate::{
-    APIError, infra::authentication::request_data::RequestSessionData,
+    APIError, api::middleware::authentication::request_data::RequestSessionData,
     repository::user_repo::UserId,
 };
 
@@ -293,7 +293,7 @@ mod test {
     const TEST_USER_AGENT: &str = "TestAgent/1.0";
     const TEST_IP_ADDRESS: &str = "0.0.0.0";
 
-    #[test(sqlx::test(fixtures("../../../fixtures/users.sql")))]
+    #[test(sqlx::test(fixtures("../../../../fixtures/users.sql")))]
     async fn test_create_and_get_session(pool: SqlitePool) {
         let mut conn = pool.acquire().await.unwrap();
         let session = super::create(
@@ -314,7 +314,7 @@ mod test {
         assert_eq!(session, session_from_db);
     }
 
-    #[test(sqlx::test(fixtures("../../../fixtures/users.sql")))]
+    #[test(sqlx::test(fixtures("../../../../fixtures/users.sql")))]
     async fn test_delete_session(pool: SqlitePool) {
         let mut conn = pool.acquire().await.unwrap();
         let session = super::create(
@@ -343,7 +343,7 @@ mod test {
         assert_eq!(None, session_from_db);
     }
 
-    #[test(sqlx::test(fixtures("../../../fixtures/users.sql")))]
+    #[test(sqlx::test(fixtures("../../../../fixtures/users.sql")))]
     async fn test_delete_old_sessions(pool: SqlitePool) {
         let mut conn = pool.acquire().await.unwrap();
         let session = super::create(
@@ -365,7 +365,7 @@ mod test {
         assert_eq!(None, session_from_db);
     }
 
-    #[test(sqlx::test(fixtures("../../../fixtures/users.sql")))]
+    #[test(sqlx::test(fixtures("../../../../fixtures/users.sql")))]
     async fn test_session_count(pool: SqlitePool) {
         let mut conn = pool.acquire().await.unwrap();
         let _active_session1 = super::create(

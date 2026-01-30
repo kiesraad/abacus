@@ -12,7 +12,10 @@ use utoipa_axum::{router::OpenApiRouter, routes};
 
 use crate::{
     APIError, AppState, SqlitePoolExt,
-    api::committee_session::CommitteeSessionError,
+    api::{
+        committee_session::CommitteeSessionError,
+        middleware::authentication::{Coordinator, Typist, error::AuthenticationError},
+    },
     domain::{
         committee_session::CommitteeSession,
         committee_session_status::{CommitteeSessionStatus, change_committee_session_status},
@@ -23,6 +26,7 @@ use crate::{
         election::{ElectionId, ElectionWithPoliticalGroups, PoliticalGroup},
         entry_number::EntryNumber,
         polling_station::{PollingStation, PollingStationId},
+        role::Role,
         status::{
             ClientState, CurrentDataEntry, DataEntryStatus, DataEntryStatusName,
             DataEntryTransitionError, EntriesDifferent,
@@ -30,10 +34,7 @@ use crate::{
         validation::{DataError, ValidateRoot, ValidationResults},
     },
     error::{ErrorReference, ErrorResponse},
-    infra::{
-        audit_log::{AuditEvent, AuditService},
-        authentication::{Coordinator, Role, Typist, User, error::AuthenticationError},
-    },
+    infra::audit_log::{AuditEvent, AuditService},
     repository::{
         committee_session_repo, data_entry_repo,
         data_entry_repo::{
@@ -43,7 +44,7 @@ use crate::{
         election_repo,
         investigation_repo::get_polling_station_investigation,
         polling_station_repo,
-        user_repo::UserId,
+        user_repo::{User, UserId},
     },
 };
 
@@ -1042,7 +1043,6 @@ mod tests {
             data_entry::tests::example_polling_station_results,
             validation::{ValidationResult, ValidationResultCode},
         },
-        infra::authentication::Role,
         repository::{
             data_entry_repo::{data_entry_exists, result_exists},
             investigation_repo::insert_test_investigation,

@@ -9,7 +9,7 @@ use utoipa_axum::{router::OpenApiRouter, routes};
 
 use crate::{
     APIError, AppState, ErrorResponse, SqlitePoolExt,
-    api::committee_session::CommitteeSessionError,
+    api::{committee_session::CommitteeSessionError, middleware::authentication::Coordinator},
     domain::{
         committee_session::{
             CommitteeSession, CommitteeSessionFilesUpdateRequest, CommitteeSessionId,
@@ -28,7 +28,6 @@ use crate::{
     error::ErrorReference,
     infra::{
         audit_log::AuditService,
-        authentication::Coordinator,
         pdf_gen::generate_pdf,
         zip::{ZipResponse, ZipResponseError, slugify_filename, zip_single_file},
     },

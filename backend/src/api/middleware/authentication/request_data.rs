@@ -7,10 +7,8 @@ use axum::{
 use axum_extra::{TypedHeader, extract::CookieJar, headers::UserAgent};
 use cookie::Cookie;
 
-use crate::{
-    APIError,
-    infra::authentication::{SESSION_COOKIE_NAME, error::AuthenticationError},
-};
+use super::{SESSION_COOKIE_NAME, error::AuthenticationError};
+use crate::APIError;
 
 #[derive(Debug)]
 pub struct RequestSessionData {

@@ -104,6 +104,7 @@ pub fn openapi_router() -> OpenApiRouter<AppState> {
 fn build_routes(doc: utoipa::openapi::OpenApi) -> OpenApiRouter<AppState> {
     let router = OpenApiRouter::with_openapi(doc)
         .merge(audit_log::router())
+        .merge(api::apportionment::router())
         .merge(api::authentication::router())
         .merge(api::user::user_router())
         .merge(api::committee_session::router())

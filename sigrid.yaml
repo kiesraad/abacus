@@ -1,4 +1,9 @@
 components:
+  # Backend crates
+  - name: "(Backend) Apportionment crate"
+    include:
+      - ".*/backend/apportionment/.*"
+
   # Backend infra layer
   - { include: [ ".*/backend/src/infra/airgap/.*" ], name: "backend/src/infra/airgap" }
   - { include: [ ".*/backend/src/infra/audit_log/.*" ], name: "backend/src/infra/audit_log" }

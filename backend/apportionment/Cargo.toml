@@ -7,3 +7,6 @@ rust-version.workspace = true
 
 [dependencies]
 tracing.workspace = true
+
+[dev-dependencies]
+test-log = "0.2.19"

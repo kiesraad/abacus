@@ -1,6 +1,6 @@
 mod candidate_nomination;
 mod fraction;
-mod id_macro;
+mod int_newtype_macro;
 mod seat_assignment;
 mod structs;
 #[cfg(test)]

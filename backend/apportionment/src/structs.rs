@@ -1,14 +1,14 @@
 use super::{
     candidate_nomination::CandidateNominationResult,
     fraction::Fraction,
-    id_macro::id,
+    int_newtype_macro::int_newtype,
     seat_assignment::{SeatAssignmentResult, get_total_seats_from_apportionment_result},
 };
 
 pub(crate) const LARGE_COUNCIL_THRESHOLD: u32 = 19;
 
-id!(CandidateNumber);
-id!(ListNumber);
+int_newtype!(CandidateNumber);
+int_newtype!(ListNumber);
 
 /// Errors that can occur during apportionment
 #[derive(Debug, PartialEq)]

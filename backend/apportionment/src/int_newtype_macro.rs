@@ -1,4 +1,4 @@
-macro_rules! id {
+macro_rules! int_newtype {
     ($identifier:ident) => {
         #[derive(Clone, Copy, Debug, PartialEq, Eq)]
         pub struct $identifier(u32);
@@ -33,4 +33,4 @@ macro_rules! id {
     };
 }
 
-pub(crate) use id;
+pub(crate) use int_newtype;

@@ -1,7 +1,6 @@
 import type { DataEntryResults, DataEntrySection, SectionValues } from "@/types/types";
 import { parseIntUserInput } from "@/utils/strings";
 
-type PathSegment = string | number;
 type PathValue = boolean | number | string | undefined;
 
 /**
@@ -33,23 +32,35 @@ export function extractFieldInfoFromSection(section: DataEntrySection): Map<stri
   return fieldInfoMap;
 }
 
+/**
+ * Maps form values to the results object based on the provided section structure
+ * @param currentResults The current results object to be updated
+ * @param formValues The form values to map into the results
+ * @param section The data entry section defining the structure
+ * @returns Results object with updated values
+ */
 export function mapSectionValues<T extends DataEntryResults>(
   currentResults: T,
   formValues: SectionValues,
   section: DataEntrySection,
 ): T {
   const newResults: T = structuredClone(currentResults);
-
   const fieldInfoMap = extractFieldInfoFromSection(section);
 
-  Object.entries(formValues).forEach(([path, value]) => {
+  for (const [path, value] of Object.entries(formValues)) {
     const valueType = fieldInfoMap.get(path);
     setValueAtPath(newResults, path, value, valueType);
-  });
+  }
 
   return newResults;
 }
 
+/**
+ * Maps results object to form values based on the provided section structure
+ * @param section The data entry section defining the structure
+ * @param results The data object to map from
+ * @returns Form values object with mapped values
+ */
 export function mapResultsToSectionValues(section: DataEntrySection, results: DataEntryResults): SectionValues {
   const formValues: SectionValues = {};
 
@@ -62,59 +73,71 @@ export function mapResultsToSectionValues(section: DataEntrySection, results: Da
   return formValues;
 }
 
-// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: TODO function should be refactored
-function setValueAtPath(
-  results: DataEntryResults,
+/**
+ * Retrieves the value at the specified path from the results object
+ * @param data The data object to retrieve the value from
+ * @param path The dot-separated path string (e.g. "political_group_votes.0.total")
+ * @returns The value at the specified path or undefined if not found/unexpected type
+ * @throws Error if the path does not exist in the data structure
+ */
+export function getValueAtPath(data: DataEntryResults, path: string): PathValue {
+  const segments = path.split(".");
+  const result = traversePath(data, segments);
+
+  return isPathValue(result) ? result : undefined;
+}
+
+/**
+ * Sets the value at the specified path in the results object
+ * @param data The data object to set the value in
+ * @param path The dot-separated path string (e.g. "political_group_votes.0.total")
+ * @param value The value to set
+ * @param valueType The type of the value for processing
+ * @throws Error if the path does not exist in the data structure
+ */
+export function setValueAtPath(
+  data: DataEntryResults,
   path: string,
   value: string,
   valueType: "boolean" | "number" | undefined,
 ): void {
-  const segments = parsePathSegments(path);
+  const segments = path.split(".");
+  const lastProperty = segments.pop();
+  const refParent = traversePath(data, segments);
   const processedValue = processValue(value, valueType);
 
-  let current: unknown = results;
-
-  for (let i = 0; i < segments.length - 1; i++) {
-    const segment = segments[i];
-    const nextSegment = segments[i + 1];
-
-    if (segment === undefined) continue;
-
-    if (typeof segment === "number") {
-      if (Array.isArray(current)) {
-        ensureArrayLength(current, segment + 1);
-        current = current[segment];
-      }
-    } else {
-      if (isRecord(current)) {
-        if (!(segment in current)) {
-          current[segment] = typeof nextSegment === "number" ? [] : {};
-        }
-        current = current[segment];
-      }
-    }
-  }
-
-  const finalSegment = segments[segments.length - 1];
-  if (finalSegment !== undefined && isRecord(current)) {
-    current[finalSegment] = processedValue;
+  if (lastProperty && isRecord(refParent)) {
+    refParent[lastProperty] = processedValue;
+  } else if (lastProperty && Array.isArray(refParent) && stringRepresentsInteger(lastProperty)) {
+    const arrayIndex = parseInt(lastProperty, 10);
+    refParent[arrayIndex] = processedValue;
+  } else {
+    throw new Error(`Cannot set value at path ${path}.`);
   }
 }
 
-export function getValueAtPath(results: DataEntryResults, path: string): PathValue {
-  const segments = parsePathSegments(path);
-
-  const result = segments.reduce<unknown>((current, segment) => {
-    if (current === undefined) return undefined;
-
-    if (typeof segment === "number") {
-      return Array.isArray(current) && segment < current.length ? current[segment] : undefined;
-    } else {
-      return isRecord(current) && segment in current ? current[segment] : undefined;
+/**
+ * Traverses the data object based on the provided path segments
+ * @param data The data object to traverse
+ * @param segments The path segments to follow
+ * @return The value at the end of the path or undefined if not found
+ * @throws Error if a segment does not exist in the data structure
+ */
+function traversePath(data: DataEntryResults, segments: string[]): unknown {
+  return segments.reduce<unknown>((prev, curr) => {
+    if (isRecord(prev) && curr in prev) {
+      return prev[curr];
     }
-  }, results);
 
-  return isPathValue(result) ? result : undefined;
+    if (Array.isArray(prev) && stringRepresentsInteger(curr)) {
+      const arrayIndex = parseInt(curr, 10);
+      if (arrayIndex < prev.length) {
+        return prev[arrayIndex];
+      }
+    }
+
+    throw new Error(`Property ${curr} does not exist at path ${segments.join(".")}.`);
+  }, data);
 }
 
 function processValue(
@@ -135,57 +158,20 @@ function processValue(
   return value;
 }
 
+/**
+ * Checks if a string represents a valid non-negative integer
+ * @param str The string to check
+ * @returns boolean
+ */
+export function stringRepresentsInteger(str: string): boolean {
+  return /^\d+$/.test(str);
+}
+
 function valueToString(value: PathValue): string {
   if (value === undefined || value === 0) {
     return "";
   }
   return String(value);
-}
-
-// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: TODO function should be refactored
-function parsePathSegments(path: string): PathSegment[] {
-  const segments: PathSegment[] = [];
-  let current = "";
-  let i = 0;
-
-  while (i < path.length) {
-    const char = path[i];
-    if (!char) break;
-
-    if (char === ".") {
-      if (current) {
-        segments.push(current);
-        current = "";
-      }
-    } else if (char === "[") {
-      if (current) {
-        segments.push(current);
-        current = "";
-      }
-      i++;
-      while (i < path.length && path[i] !== "]") {
-        const char = path[i];
-        if (char) {
-          current += char;
-        }
-        i++;
-      }
-      if (current && /^\d+$/.test(current)) {
-        segments.push(parseInt(current, 10));
-        current = "";
-      }
-    } else if (char !== "]") {
-      current += char;
-    }
-
-    i++;
-  }
-
-  if (current) {
-    segments.push(current);
-  }
-
-  return segments;
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -194,12 +180,6 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 
 function isPathValue(value: unknown): value is PathValue {
   return typeof value === "boolean" || typeof value === "number" || typeof value === "string" || value === undefined;
-}
-
-function ensureArrayLength(arr: unknown[], minLength: number): void {
-  while (arr.length < minLength) {
-    arr.push({});
-  }
 }
 
 /**

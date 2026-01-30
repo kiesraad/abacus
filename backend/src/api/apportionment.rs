@@ -13,6 +13,7 @@ use utoipa_axum::{router::OpenApiRouter, routes};
 
 use crate::{
     APIError, AppState, ErrorResponse,
+    api::middleware::authentication::Coordinator,
     audit_log::{AuditEvent, AuditService},
     domain::{
         data_entry::{CandidateVotes, PoliticalGroupCandidateVotes},
@@ -20,7 +21,6 @@ use crate::{
         status::DataEntryStatusName,
         summary::ElectionSummary,
     },
-    infra::authentication::Coordinator,
     repository::{
         committee_session_repo::get_election_committee_session,
         data_entry_repo::{list_results_for_committee_session, statuses},

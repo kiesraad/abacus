@@ -2230,7 +2230,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/CreateUserRequest"
+                "$ref": "#/components/schemas/CreateFirstAdminRequest"
               }
             }
           },
@@ -5593,9 +5593,28 @@
         },
         "additionalProperties": false
       },
+      "CreateFirstAdminRequest": {
+        "type": "object",
+        "required": [
+          "username",
+          "fullname",
+          "temp_password"
+        ],
+        "properties": {
+          "fullname": {
+            "type": "string"
+          },
+          "temp_password": {
+            "type": "string"
+          },
+          "username": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
       "CreateUserRequest": {
         "type": "object",
-        "description": "Struct used to create a new user",
         "required": [
           "username",
           "temp_password",

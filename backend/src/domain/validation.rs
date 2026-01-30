@@ -51,7 +51,7 @@ pub struct ValidationResult {
 #[serde(deny_unknown_fields)]
 pub struct ValidationResultContext {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[schema(value_type = u32, nullable = false)]
+    #[schema(nullable = false, value_type = u32)]
     pub political_group_number: Option<PGNumber>,
 }
 
@@ -158,7 +158,7 @@ impl FieldPath {
         path.components
             .last_mut()
             .expect("FieldPath constructed with no components")
-            .push_str(&format!("[{index}]"));
+            .push_str(&format!(".{index}"));
         path
     }
 
@@ -1501,9 +1501,9 @@ mod tests {
                 [ValidationResult {
                     code: ValidationResultCode::F202,
                     fields: vec![
-                        "votes_counts.political_group_total_votes[0].total".into(),
-                        "votes_counts.political_group_total_votes[1].total".into(),
-                        "votes_counts.political_group_total_votes[2].total".into(),
+                        "votes_counts.political_group_total_votes.0.total".into(),
+                        "votes_counts.political_group_total_votes.1.total".into(),
+                        "votes_counts.political_group_total_votes.2.total".into(),
                         "votes_counts.total_votes_candidates_count".into(),
                     ],
                     context: None,
@@ -1629,9 +1629,9 @@ mod tests {
                     ValidationResult {
                         code: ValidationResultCode::F202,
                         fields: vec![
-                            "votes_counts.political_group_total_votes[0].total".into(),
-                            "votes_counts.political_group_total_votes[1].total".into(),
-                            "votes_counts.political_group_total_votes[2].total".into(),
+                            "votes_counts.political_group_total_votes.0.total".into(),
+                            "votes_counts.political_group_total_votes.1.total".into(),
+                            "votes_counts.political_group_total_votes.2.total".into(),
                             "votes_counts.total_votes_candidates_count".into(),
                         ],
                         context: None,
@@ -3117,7 +3117,7 @@ mod tests {
                 validation_results.errors,
                 [ValidationResult {
                     code: ValidationResultCode::F401,
-                    fields: vec!["data.political_group_votes[1].total".into()],
+                    fields: vec!["data.political_group_votes.1.total".into()],
                     context: Some(ValidationResultContext {
                         political_group_number: Some(PGNumber::from(2)),
                     }),
@@ -3136,7 +3136,7 @@ mod tests {
                 validation_results.errors,
                 [ValidationResult {
                     code: ValidationResultCode::F401,
-                    fields: vec!["data.political_group_votes[1].total".into()],
+                    fields: vec!["data.political_group_votes.1.total".into()],
                     context: Some(ValidationResultContext {
                         political_group_number: Some(PGNumber::from(2)),
                     }),
@@ -3151,7 +3151,7 @@ mod tests {
                 validation_results.errors,
                 [ValidationResult {
                     code: ValidationResultCode::F401,
-                    fields: vec!["data.political_group_votes[1].total".into()],
+                    fields: vec!["data.political_group_votes.1.total".into()],
                     context: Some(ValidationResultContext {
                         political_group_number: Some(PGNumber::from(2)),
                     }),
@@ -3179,21 +3179,21 @@ mod tests {
                 [
                     ValidationResult {
                         code: ValidationResultCode::F402,
-                        fields: vec!["data.political_group_votes[0]".into()],
+                        fields: vec!["data.political_group_votes.0".into()],
                         context: Some(ValidationResultContext {
                             political_group_number: Some(PGNumber::from(1)),
                         }),
                     },
                     ValidationResult {
                         code: ValidationResultCode::F403,
-                        fields: vec!["data.political_group_votes[0].total".into()],
+                        fields: vec!["data.political_group_votes.0.total".into()],
                         context: Some(ValidationResultContext {
                             political_group_number: Some(PGNumber::from(1)),
                         }),
                     },
                     ValidationResult {
                         code: ValidationResultCode::F401,
-                        fields: vec!["data.political_group_votes[1].total".into()],
+                        fields: vec!["data.political_group_votes.1.total".into()],
                         context: Some(ValidationResultContext {
                             political_group_number: Some(PGNumber::from(2)),
                         }),
@@ -3217,14 +3217,14 @@ mod tests {
                 [
                     ValidationResult {
                         code: ValidationResultCode::F401,
-                        fields: vec!["data.political_group_votes[0].total".into()],
+                        fields: vec!["data.political_group_votes.0.total".into()],
                         context: Some(ValidationResultContext {
                             political_group_number: Some(PGNumber::from(1)),
                         }),
                     },
                     ValidationResult {
                         code: ValidationResultCode::F402,
-                        fields: vec!["data.political_group_votes[1]".into()],
+                        fields: vec!["data.political_group_votes.1".into()],
                         context: Some(ValidationResultContext {
                             political_group_number: Some(PGNumber::from(2)),
                         }),
@@ -3247,7 +3247,7 @@ mod tests {
                 validation_results.errors,
                 [ValidationResult {
                     code: ValidationResultCode::F401,
-                    fields: vec!["data.political_group_votes[1].total".into()],
+                    fields: vec!["data.political_group_votes.1.total".into()],
                     context: Some(ValidationResultContext {
                         political_group_number: Some(PGNumber::from(2)),
                     }),
@@ -3263,7 +3263,7 @@ mod tests {
                 validation_results.errors,
                 [ValidationResult {
                     code: ValidationResultCode::F402,
-                    fields: vec!["data.political_group_votes[1]".into()],
+                    fields: vec!["data.political_group_votes.1".into()],
                     context: Some(ValidationResultContext {
                         political_group_number: Some(PGNumber::from(2)),
                     }),
@@ -3284,7 +3284,7 @@ mod tests {
                 validation_results.errors,
                 [ValidationResult {
                     code: ValidationResultCode::F403,
-                    fields: vec!["data.political_group_votes[1].total".into()],
+                    fields: vec!["data.political_group_votes.1.total".into()],
                     context: Some(ValidationResultContext {
                         political_group_number: Some(PGNumber::from(2)),
                     }),
@@ -3300,14 +3300,14 @@ mod tests {
                 [
                     ValidationResult {
                         code: ValidationResultCode::F403,
-                        fields: vec!["data.political_group_votes[0].total".into()],
+                        fields: vec!["data.political_group_votes.0.total".into()],
                         context: Some(ValidationResultContext {
                             political_group_number: Some(PGNumber::from(1)),
                         }),
                     },
                     ValidationResult {
                         code: ValidationResultCode::F403,
-                        fields: vec!["data.political_group_votes[1].total".into()],
+                        fields: vec!["data.political_group_votes.1.total".into()],
                         context: Some(ValidationResultContext {
                             political_group_number: Some(PGNumber::from(2)),
                         }),
@@ -3323,14 +3323,14 @@ mod tests {
                 [
                     ValidationResult {
                         code: ValidationResultCode::F403,
-                        fields: vec!["data.political_group_votes[0].total".into()],
+                        fields: vec!["data.political_group_votes.0.total".into()],
                         context: Some(ValidationResultContext {
                             political_group_number: Some(PGNumber::from(1)),
                         }),
                     },
                     ValidationResult {
                         code: ValidationResultCode::F401,
-                        fields: vec!["data.political_group_votes[1].total".into()],
+                        fields: vec!["data.political_group_votes.1.total".into()],
                         context: Some(ValidationResultContext {
                             political_group_number: Some(PGNumber::from(2)),
                         }),

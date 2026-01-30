@@ -13,6 +13,7 @@ use crate::{
     APIError, AppState, ErrorResponse, SqlitePoolExt,
     api::{
         committee_session::{CommitteeSessionError, create_committee_session},
+        middleware::authentication::{Admin, AdminOrCoordinator},
         polling_station::create_imported_polling_stations,
     },
     domain::{
@@ -26,11 +27,11 @@ use crate::{
         polling_station::{PollingStation, PollingStationRequest, PollingStationsRequest},
     },
     eml::{EML110, EML230, EMLDocument, EMLImportError, EmlHash, RedactedEmlHash},
-    infra::{
-        audit_log::{AuditEvent, AuditService},
-        authentication::{Admin, AdminOrCoordinator, User},
+    infra::audit_log::{AuditEvent, AuditService},
+    repository::{
+        committee_session_repo, election_repo, investigation_repo, polling_station_repo,
+        user_repo::User,
     },
-    repository::{committee_session_repo, election_repo, investigation_repo, polling_station_repo},
 };
 
 pub fn router() -> OpenApiRouter<AppState> {

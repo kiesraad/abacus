@@ -55,9 +55,9 @@ function renderForm({ election, groupNumber }: { election?: ElectionWithPolitica
 }
 
 const candidatesFieldIds = {
-  candidate0: "data.political_group_votes[0].candidate_votes[0].votes",
-  candidate1: "data.political_group_votes[0].candidate_votes[1].votes",
-  total: "data.political_group_votes[0].total",
+  candidate0: "data.political_group_votes.0.candidate_votes.0.votes",
+  candidate1: "data.political_group_votes.0.candidate_votes.1.votes",
+  total: "data.political_group_votes.0.total",
 };
 
 describe("Test CandidatesVotesForm", () => {
@@ -137,7 +137,7 @@ describe("Test CandidatesVotesForm", () => {
 
       renderForm({ election });
 
-      const candidateRow = await screen.findByTestId("row-data.political_group_votes[0].candidate_votes[0].votes");
+      const candidateRow = await screen.findByTestId("row-data.political_group_votes.0.candidate_votes.0.votes");
       const candidateName = within(candidateRow).getAllByRole("cell")[2];
       expect(candidateName).toHaveTextContent(/^Zilverlicht, E\.$/);
     });

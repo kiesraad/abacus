@@ -6,6 +6,7 @@ pub mod data_entry;
 pub mod document;
 pub mod election;
 pub mod investigation;
+pub mod middleware;
 pub mod polling_station;
 pub mod report;
 pub mod user;

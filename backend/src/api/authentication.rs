@@ -14,16 +14,15 @@ use utoipa_axum::{router::OpenApiRouter, routes};
 
 use crate::{
     APIError, AppState, ErrorResponse, SqlitePoolExt,
+    api::middleware::authentication::{
+        IncompleteUser, SECURE_COOKIES, SESSION_COOKIE_NAME, SESSION_LIFE_TIME,
+        error::AuthenticationError, session,
+    },
+    domain::role::Role,
     error::ErrorReference,
-    infra::{
-        audit_log::{
-            AuditEvent, AuditService, UserDetails, UserLoggedInDetails, UserLoggedOutDetails,
-            UserLoginFailedDetails,
-        },
-        authentication::{
-            CreateUserRequest, IncompleteUser, Role, SECURE_COOKIES, SESSION_COOKIE_NAME,
-            SESSION_LIFE_TIME, error::AuthenticationError, session,
-        },
+    infra::audit_log::{
+        AuditEvent, AuditService, UserDetails, UserLoggedInDetails, UserLoggedOutDetails,
+        UserLoginFailedDetails,
     },
     repository::user_repo::{self, User, UserId},
 };
@@ -277,11 +276,19 @@ async fn initialised(State(pool): State<SqlitePool>) -> Result<impl IntoResponse
     }
 }
 
+#[derive(Serialize, Deserialize, ToSchema)]
+#[serde(deny_unknown_fields)]
+pub struct CreateFirstAdminRequest {
+    pub username: String,
+    pub fullname: String,
+    pub temp_password: String,
+}
+
 /// Create the first admin user, only allowed if no users exist yet
 #[utoipa::path(
     post,
     path = "/api/initialise/first-admin",
-    request_body = CreateUserRequest,
+    request_body = CreateFirstAdminRequest,
     responses(
         (status = 201, description = "First admin user created", body = User),
         (status = 403, description = "Forbidden, an active user already exists", body = ErrorResponse),
@@ -292,7 +299,7 @@ async fn initialised(State(pool): State<SqlitePool>) -> Result<impl IntoResponse
 async fn create_first_admin(
     State(pool): State<SqlitePool>,
     audit_service: AuditService,
-    Json(create_user_req): Json<CreateUserRequest>,
+    Json(admin_request): Json<CreateFirstAdminRequest>,
 ) -> Result<(StatusCode, Json<User>), APIError> {
     let mut tx = pool.begin_immediate().await?;
 
@@ -315,9 +322,9 @@ async fn create_first_admin(
     // Create the first admin user
     let user = user_repo::create(
         &mut tx,
-        &create_user_req.username,
-        create_user_req.fullname.as_deref(),
-        &create_user_req.temp_password,
+        &admin_request.username,
+        Some(&admin_request.fullname),
+        &admin_request.temp_password,
         false,
         Role::Administrator,
     )
@@ -424,20 +431,10 @@ async fn logout(
 
 #[cfg(test)]
 mod tests {
-    use axum::{extract::State, response::IntoResponse};
-    use cookie::{Cookie, SameSite};
-    use hyper::StatusCode;
-    use sqlx::SqlitePool;
     use test_log::test;
 
-    use crate::{
-        APIError,
-        api::authentication::set_default_cookie_properties,
-        infra::authentication::{
-            CreateUserRequest, Role, SECURE_COOKIES, error::AuthenticationError,
-        },
-        repository::{user_repo, user_repo::update_last_activity_at},
-    };
+    use super::*;
+    use crate::repository::user_repo::update_last_activity_at;
 
     #[test(tokio::test)]
     async fn test_set_default_cookie_properties() {
@@ -453,10 +450,10 @@ mod tests {
 
     #[test(sqlx::test)]
     async fn test_initialised(pool: SqlitePool) {
-        let initialised = super::initialised(State(pool.clone())).await;
+        let result = initialised(State(pool.clone())).await;
 
         assert!(matches!(
-            initialised,
+            result,
             Err(APIError::Authentication(
                 AuthenticationError::NotInitialised
             ))
@@ -477,26 +474,25 @@ mod tests {
 
         admin.update_last_activity_at(&mut conn).await.unwrap();
 
-        let initialised = super::initialised(State(pool)).await;
-        assert!(initialised.is_ok());
+        let result = initialised(State(pool)).await;
+        assert!(result.is_ok());
 
-        let response = initialised.unwrap().into_response();
+        let response = result.unwrap().into_response();
         assert_eq!(response.status(), StatusCode::NO_CONTENT);
     }
 
     #[test(sqlx::test)]
     async fn test_create_first_admin(pool: SqlitePool) {
-        let create_user_req = CreateUserRequest {
+        let admin_request = CreateFirstAdminRequest {
             username: "admin".to_string(),
-            fullname: Some("Admin User".to_string()),
+            fullname: "Admin User".to_string(),
             temp_password: "admin_password".to_string(),
-            role: Role::Administrator,
         };
 
-        let response = super::create_first_admin(
+        let response = create_first_admin(
             State(pool.clone()),
-            crate::audit_log::AuditService::new(None, None),
-            axum::Json(create_user_req),
+            AuditService::new(None, None),
+            Json(admin_request),
         )
         .await;
 
@@ -506,16 +502,15 @@ mod tests {
         assert_eq!(user.username(), "admin");
 
         // Create a new user again is allowed as long as the admin has not logged in yet
-        let create_user_req = CreateUserRequest {
+        let admin_request = CreateFirstAdminRequest {
             username: "admin2".to_string(),
-            fullname: Some("Admin User 2".to_string()),
+            fullname: "Admin User 2".to_string(),
             temp_password: "admin_password".to_string(),
-            role: Role::Administrator,
         };
-        let response = super::create_first_admin(
+        let response = create_first_admin(
             State(pool.clone()),
-            crate::audit_log::AuditService::new(None, None),
-            axum::Json(create_user_req),
+            AuditService::new(None, None),
+            Json(admin_request),
         )
         .await;
 
@@ -528,16 +523,15 @@ mod tests {
         let mut conn = pool.acquire().await.unwrap();
         update_last_activity_at(&mut conn, user.id()).await.unwrap();
 
-        let create_user_req = CreateUserRequest {
+        let admin_request = CreateFirstAdminRequest {
             username: "admin2".to_string(),
-            fullname: Some("Admin User 3".to_string()),
+            fullname: "Admin User 3".to_string(),
             temp_password: "admin_password".to_string(),
-            role: Role::Administrator,
         };
-        let response = super::create_first_admin(
+        let response = create_first_admin(
             State(pool.clone()),
-            crate::audit_log::AuditService::new(None, None),
-            axum::Json(create_user_req),
+            AuditService::new(None, None),
+            Json(admin_request),
         )
         .await;
 
@@ -547,21 +541,20 @@ mod tests {
     #[test(sqlx::test)]
     async fn test_admin_exists(pool: SqlitePool) {
         // No admin user exists yet
-        let response = super::admin_exists(State(pool.clone())).await;
+        let response = admin_exists(State(pool.clone())).await;
         assert!(response.is_err());
         assert!(matches!(response, Err(APIError::NotFound(_, _))));
 
         // Create an admin user
-        let create_user_req = CreateUserRequest {
+        let admin_request = CreateFirstAdminRequest {
             username: "admin".to_string(),
-            fullname: Some("Admin User".to_string()),
+            fullname: "Admin User".to_string(),
             temp_password: "admin_password".to_string(),
-            role: Role::Administrator,
         };
-        let response = super::create_first_admin(
+        let response = create_first_admin(
             State(pool.clone()),
-            crate::audit_log::AuditService::new(None, None),
-            axum::Json(create_user_req),
+            AuditService::new(None, None),
+            Json(admin_request),
         )
         .await;
 
@@ -569,7 +562,7 @@ mod tests {
         let (status, _user) = response.unwrap();
         assert_eq!(status, StatusCode::CREATED);
 
-        let response = super::admin_exists(State(pool.clone())).await;
+        let response = admin_exists(State(pool.clone())).await;
         assert_eq!(response.unwrap(), StatusCode::NO_CONTENT);
     }
 }

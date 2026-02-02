@@ -1,6 +1,5 @@
 components:
   # Backend infra layer
-  - { include: [ ".*/backend/src/infra/airgap/.*" ], name: "backend/src/infra/airgap" }
   - { include: [ ".*/backend/src/infra/audit_log/.*" ], name: "backend/src/infra/audit_log" }
   - { include: [ ".*/backend/src/infra/pdf_gen/.*" ], name: "backend/src/infra/pdf_gen" }
   - { include: [ ".*/backend/src/infra/zip/.*" ], name: "backend/src/infra/zip" }
@@ -9,6 +8,7 @@ components:
   - { include: [ ".*/backend/src/infra/seed_data.rs" ], name: "backend/src/infra/seed_data" }
 
   # Backend api layer
+  - { include: [ ".*/backend/src/api/middleware/airgap/.*" ], name: "backend/src/api/middleware/airgap" }
   - { include: [ ".*/backend/src/api/middleware/authentication/.*" ], name: "backend/src/api/middleware/authentication" }
   - { include: [ ".*/backend/src/api/middleware/mod.rs" ], name: "backend/src/api/middleware" }
   - { include: [ ".*/backend/src/api/mod.rs" ], name: "backend/src/api" }

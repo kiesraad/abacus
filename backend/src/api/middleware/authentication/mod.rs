@@ -52,13 +52,10 @@ mod tests {
     use super::*;
     use crate::{
         AppState, ErrorResponse,
-        api::{authentication::*, user::*},
+        api::{authentication::*, middleware::airgap::AirgapDetection, user::*},
         domain::role::Role,
         error::ErrorReference,
-        infra::{
-            airgap::AirgapDetection,
-            audit_log::{AuditEvent, LogFilter, UserLoginFailedDetails},
-        },
+        infra::audit_log::{AuditEvent, LogFilter, UserLoginFailedDetails},
         repository::user_repo::{self, User, UserId},
     };
 

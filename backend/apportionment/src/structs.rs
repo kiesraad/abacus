@@ -52,11 +52,8 @@ pub(crate) struct SeatAssignmentInput {
     pub list_votes: Vec<ListVotes>,
 }
 
-impl<T> From<&T> for SeatAssignmentInput
-where
-    T: ApportionmentInput,
-{
-    fn from(input: &T) -> Self {
+impl SeatAssignmentInput {
+    pub fn new(input: &impl ApportionmentInput) -> Self {
         SeatAssignmentInput {
             number_of_seats: input.number_of_seats(),
             total_votes: input.total_votes(),
@@ -108,10 +105,10 @@ pub(crate) struct CandidateNominationInput {
 }
 
 impl CandidateNominationInput {
-    pub fn new(input: impl ApportionmentInput, seat_assignment: &SeatAssignmentResult) -> Self {
+    pub fn new(input: &impl ApportionmentInput, seat_assignment: &SeatAssignmentResult) -> Self {
         CandidateNominationInput {
             number_of_seats: input.number_of_seats(),
-            list_votes: list_votes_from_input(&input),
+            list_votes: list_votes_from_input(input),
 
             quota: seat_assignment.quota,
             total_seats_per_list: get_total_seats_from_apportionment_result(seat_assignment),

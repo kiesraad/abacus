@@ -19,9 +19,9 @@ use self::{
 };
 
 pub fn process(input: impl ApportionmentInput) -> Result<ApportionmentOutput, ApportionmentError> {
-    let seat_assignment = seat_assignment(SeatAssignmentInput::from(&input))?;
+    let seat_assignment = seat_assignment(SeatAssignmentInput::new(&input))?;
     let candidate_nomination =
-        candidate_nomination(CandidateNominationInput::new(input, &seat_assignment))?;
+        candidate_nomination(CandidateNominationInput::new(&input, &seat_assignment))?;
 
     Ok(ApportionmentOutput {
         seat_assignment,

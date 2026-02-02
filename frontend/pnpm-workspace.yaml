@@ -16,7 +16,6 @@ packageManagerStrict: true
 packageManagerStrictVersion: true
 strictDepBuilds: true
 strictPeerDependencies: true
-sideEffectsCache: true
 overrides:
   # Storybook currently uses @vitest/expect 3.2.4 which doesn't work with our vitest.d.ts
   "@vitest/expect": "$@vitest/expect"

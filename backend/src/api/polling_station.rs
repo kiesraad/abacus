@@ -76,7 +76,7 @@ async fn polling_station_list(
     })
 }
 
-pub async fn validate_user_is_allowed_to_perform_action(
+pub fn validate_user_is_allowed_to_perform_action(
     user: AdminOrCoordinator,
     committee_session: &CommitteeSession,
 ) -> Result<(), APIError> {
@@ -124,7 +124,7 @@ async fn polling_station_create(
     election_repo::get(&mut tx, election_id).await?;
     let committee_session = get_election_committee_session(&mut tx, election_id).await?;
 
-    validate_user_is_allowed_to_perform_action(user, &committee_session).await?;
+    validate_user_is_allowed_to_perform_action(user, &committee_session)?;
 
     let polling_station = create(&mut tx, election_id, new_polling_station).await?;
 
@@ -220,7 +220,7 @@ async fn polling_station_update(
     election_repo::get(&mut tx, election_id).await?;
     let committee_session = get_election_committee_session(&mut tx, election_id).await?;
 
-    validate_user_is_allowed_to_perform_action(user, &committee_session).await?;
+    validate_user_is_allowed_to_perform_action(user, &committee_session)?;
 
     let polling_station = update(
         &mut tx,
@@ -283,7 +283,7 @@ async fn polling_station_delete(
     election_repo::get(&mut tx, election_id).await?;
     let committee_session = get_election_committee_session(&mut tx, election_id).await?;
 
-    validate_user_is_allowed_to_perform_action(user, &committee_session).await?;
+    validate_user_is_allowed_to_perform_action(user, &committee_session)?;
 
     let polling_station = get_for_election(&mut tx, election_id, polling_station_id).await?;
 

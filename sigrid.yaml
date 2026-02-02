@@ -2,13 +2,16 @@ components:
   # Backend infra layer
   - { include: [ ".*/backend/src/infra/airgap/.*" ], name: "backend/src/infra/airgap" }
   - { include: [ ".*/backend/src/infra/audit_log/.*" ], name: "backend/src/infra/audit_log" }
-  - { include: [ ".*/backend/src/infra/authentication/.*" ], name: "backend/src/infra/authentication" }
   - { include: [ ".*/backend/src/infra/pdf_gen/.*" ], name: "backend/src/infra/pdf_gen" }
   - { include: [ ".*/backend/src/infra/zip/.*" ], name: "backend/src/infra/zip" }
+  - { include: [ ".*/backend/src/infra/mod.rs" ], name: "backend/src/infra" }
   - { include: [ ".*/backend/src/infra/router.rs" ], name: "backend/src/infra/router" }
   - { include: [ ".*/backend/src/infra/seed_data.rs" ], name: "backend/src/infra/seed_data" }
 
   # Backend api layer
+  - { include: [ ".*/backend/src/api/middleware/authentication/.*" ], name: "backend/src/api/middleware/authentication" }
+  - { include: [ ".*/backend/src/api/middleware/mod.rs" ], name: "backend/src/api/middleware" }
+  - { include: [ ".*/backend/src/api/mod.rs" ], name: "backend/src/api" }
   - { include: [ ".*/backend/src/api/audit.rs" ], name: "backend/src/api/audit" }
   - { include: [ ".*/backend/src/api/authentication.rs" ], name: "backend/src/api/authentication" }
   - { include: [ ".*/backend/src/api/committee_session.rs" ], name: "backend/src/api/committee_session" }
@@ -21,6 +24,7 @@ components:
   - { include: [ ".*/backend/src/api/user.rs" ], name: "backend/src/api/user" }
 
   # Backend repository layer
+  - { include: [ ".*/backend/src/repository/mod.rs" ], name: "backend/src/repository" }
   - { include: [ ".*/backend/src/repository/committee_session_repo.rs" ], name: "backend/src/repository/committee_session_repo" }
   - { include: [ ".*/backend/src/repository/data_entry_repo.rs" ], name: "backend/src/repository/data_entry_repo" }
   - { include: [ ".*/backend/src/repository/election_repo.rs" ], name: "backend/src/repository/election_repo" }

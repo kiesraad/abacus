@@ -103,6 +103,7 @@ unexpected_cfgs = { level = "warn", check-cfg = ['cfg(fuzzing)'] }
 cast_possible_truncation = "deny"
 cognitive_complexity = "warn"
 too_many_lines = "warn"
+unused_async = "warn"
 unwrap_used = "warn"
 
 [profile.release]

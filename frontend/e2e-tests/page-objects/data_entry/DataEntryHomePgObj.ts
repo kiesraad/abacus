@@ -32,7 +32,7 @@ export class DataEntryHomePage {
     });
 
     this.pollingStationNumber = page.getByRole("textbox", { name: "Voer het nummer in: " });
-    this.pollingStationFeedback = page.getByTestId("pollingStationSelectorFeedback");
+    this.pollingStationFeedback = page.getByTestId("pollingStationNumberInputFeedback");
     this.pollingStationSubmitFeedback = page.getByTestId("pollingStationSubmitFeedback");
     this.start = page.getByRole("button", { name: "Beginnen" });
 

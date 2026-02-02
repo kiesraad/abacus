@@ -104,15 +104,16 @@ fn candidate_nomination_per_list<'a, T: ListVotesTrait>(
         let (list_number, list_seats) = total_seats
             .iter()
             .find(|(number, _)| *number == list.number())
-            .expect("Total seats exists");
-        let candidate_votes = list.candidate_votes();
+            .expect("Total seats exists")
+            .to_owned();
+        let candidate_votes = &list.candidate_votes();
         let candidate_votes_meeting_preference_threshold =
             candidate_votes_meeting_preference_threshold(preference_threshold, candidate_votes);
         let preferential_candidate_nomination = preferential_candidate_nomination::<T::Cv>(
             &candidate_votes_meeting_preference_threshold,
-            *list_seats,
+            list_seats,
         )?;
-        let non_assigned_seats = *list_seats as usize - preferential_candidate_nomination.len();
+        let non_assigned_seats = list_seats as usize - preferential_candidate_nomination.len();
 
         // [Artikel P 17 Kieswet](https://wetten.overheid.nl/BWBR0004627/2026-01-01/#AfdelingII_HoofdstukP_Paragraaf3_ArtikelP17)
         let other_candidate_nomination = other_candidate_nomination(
@@ -124,7 +125,7 @@ fn candidate_nomination_per_list<'a, T: ListVotesTrait>(
         // [Artikel P 19 Kieswet](https://wetten.overheid.nl/BWBR0004627/2026-01-01/#AfdelingII_HoofdstukP_Paragraaf3_ArtikelP19)
         let updated_candidate_ranking: Vec<CandidateNumber> =
             if candidate_votes_meeting_preference_threshold.is_empty()
-                || (seats >= LARGE_COUNCIL_THRESHOLD && *list_seats == 0)
+                || (seats >= LARGE_COUNCIL_THRESHOLD && list_seats == 0)
             {
                 vec![]
             } else {
@@ -146,8 +147,8 @@ fn candidate_nomination_per_list<'a, T: ListVotesTrait>(
             };
 
         list_candidate_nomination.push(ListCandidateNomination {
-            list_number: *list_number,
-            list_seats: *list_seats,
+            list_number,
+            list_seats,
             preferential_candidate_nomination,
             other_candidate_nomination,
             updated_candidate_ranking,

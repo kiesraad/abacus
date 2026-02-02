@@ -107,32 +107,17 @@ pub(crate) struct CandidateNominationInput {
     pub total_seats_per_list: Vec<u32>,
 }
 
-impl<T> From<(&T, &SeatAssignmentResult)> for CandidateNominationInput
-where
-    T: ApportionmentInput,
-{
-    fn from(input: (&T, &SeatAssignmentResult)) -> Self {
+impl CandidateNominationInput {
+    pub fn new(input: impl ApportionmentInput, seat_assignment: &SeatAssignmentResult) -> Self {
         CandidateNominationInput {
-            number_of_seats: input.0.number_of_seats(),
-            list_votes: list_votes_from_input(input.0),
-            quota: input.1.quota,
-            total_seats_per_list: get_total_seats_from_apportionment_result(input.1),
+            number_of_seats: input.number_of_seats(),
+            list_votes: list_votes_from_input(&input),
+
+            quota: seat_assignment.quota,
+            total_seats_per_list: get_total_seats_from_apportionment_result(seat_assignment),
         }
     }
 }
-
-// Could also be done this way, preferences?
-// impl CandidateNominationInput {
-//     pub fn new(input: impl ApportionmentInput, seat_assignment: &SeatAssignmentResult) -> Self {
-//         CandidateNominationInput {
-//             number_of_seats: input.number_of_seats(),
-//             list_votes: list_votes_from_input(&input),
-
-//             quota: seat_assignment.quota,
-//             total_seats: get_total_seats_from_apportionment_result(&seat_assignment),
-//         }
-//     }
-// }
 
 fn list_votes_from_input<T: ApportionmentInput>(input: &T) -> Vec<ListVotes> {
     input

@@ -8,6 +8,7 @@ pub use yes_no::YesNo;
 
 use crate::{
     APIError,
+    api::data_entry::{DataEntryDetails, ResultDetails},
     domain::{
         committee_session::CommitteeSessionId,
         election::{CandidateNumber, PGNumber, PoliticalGroup},
@@ -15,7 +16,6 @@ use crate::{
         status::{DataEntryStatus, DataEntryStatusName},
     },
     error::ErrorReference,
-    infra::audit_log::{DataEntryDetails, ResultDetails},
 };
 
 #[derive(Serialize, Deserialize, Clone, ToSchema, Debug, FromRow, Default)]

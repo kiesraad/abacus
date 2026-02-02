@@ -6,8 +6,7 @@ use axum::{
 };
 use sqlx::{SqliteConnection, SqlitePool};
 
-use super::AuditEvent;
-use crate::{APIError, repository::user_repo::User};
+use crate::{APIError, infra::audit_log::AsAuditEvent, repository::user_repo::User};
 
 #[derive(Clone)]
 pub struct AuditService {
@@ -59,7 +58,7 @@ impl AuditService {
         event: impl AsAuditEvent,
         message: Option<String>,
     ) -> Result<(), APIError> {
-        Ok(crate::audit_log::create(conn, event, self.user.as_ref(), message, self.ip).await?)
+        Ok(crate::audit_log::create(conn, &event, self.user.as_ref(), message, self.ip).await?)
     }
 }
 

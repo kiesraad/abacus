@@ -20,10 +20,7 @@ use crate::{
     },
     domain::role::Role,
     error::ErrorReference,
-    infra::audit_log::{
-        AuditEvent, AuditService, UserDetails, UserLoggedInDetails, UserLoggedOutDetails,
-        UserLoginFailedDetails,
-    },
+    infra::audit_log::{AsAuditEvent, AuditEvent, AuditEventType, AuditService, as_audit_event},
     repository::user_repo::{self, User, UserId},
 };
 
@@ -32,20 +29,6 @@ impl From<AuthenticationError> for APIError {
         APIError::Authentication(err)
     }
 }
-
-macro_rules! as_audit_event {
-    ($identifier:ident, $audit_event_type:path) => {
-        impl AsAuditEvent for $identifier {
-            fn as_audit_event(&self) -> crate::audit_log::AuditEvent {
-                AuditEvent {
-                    event_type: $audit_event_type,
-                    data: serde_json::to_value(self).expect("could not serialize to JSON"),
-                }
-            }
-        }
-    };
-}
-
 #[derive(Serialize, Deserialize, Debug, PartialEq, Eq, ToSchema)]
 #[serde(deny_unknown_fields)]
 pub struct UserLoggedInDetails {
@@ -71,6 +54,37 @@ pub struct UserLoginFailedDetails {
 }
 
 as_audit_event!(UserLoginFailedDetails, AuditEventType::UserLoginFailed);
+
+#[derive(Serialize, Deserialize, Debug, PartialEq, Eq, ToSchema)]
+#[serde(deny_unknown_fields)]
+pub struct UserDetails {
+    pub user_id: UserId,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[schema(value_type = String, nullable = false)]
+    pub fullname: Option<String>,
+    pub username: String,
+    pub role: String,
+}
+
+impl From<User> for UserDetails {
+    fn from(user: User) -> Self {
+        Self {
+            user_id: user.id(),
+            fullname: user.fullname(),
+            username: user.username(),
+            role: user.role(),
+        }
+    }
+}
+
+pub struct UserAccountUpdated(pub LoginResponse);
+as_audit_event!(UserAccountUpdated, AuditEventType::UserAccountUpdated);
+pub struct UserCreated(pub UserDetails);
+as_audit_event!(UserCreated, AuditEventType::UserCreated);
+pub struct UserUpdated(pub UserDetails);
+as_audit_event!(UserUpdated, AuditEventType::UserUpdated);
+pub struct UserDeleted(pub UserDetails);
+as_audit_event!(UserDeleted, AuditEventType::UserDeleted);
 
 pub fn router() -> OpenApiRouter<AppState> {
     OpenApiRouter::default()
@@ -113,7 +127,7 @@ impl From<&User> for LoginResponse {
         }
     }
 }
-
+/*
 impl From<LoginResponse> for UserDetails {
     fn from(user: LoginResponse) -> Self {
         Self {
@@ -124,7 +138,7 @@ impl From<LoginResponse> for UserDetails {
         }
     }
 }
-
+*/
 /// Set default session cookie properties
 pub(crate) fn set_default_cookie_properties(cookie: &mut Cookie) {
     cookie.set_path("/");
@@ -284,11 +298,7 @@ async fn account_update(
     let response = LoginResponse::from(&updated_user);
 
     audit_service
-        .log(
-            &mut tx,
-            &AuditEventType::UserAccountUpdated(response.clone().into()),
-            None,
-        )
+        .log(&mut tx, UserAccountUpdated(response.clone()), None)
         .await?;
 
     tx.commit().await?;
@@ -353,7 +363,7 @@ async fn create_first_admin(
             user_repo::delete(&mut tx, user.id()).await?;
 
             audit_service
-                .log(&mut tx, &AuditEventType::UserDeleted(user.into()), None)
+                .log(&mut tx, UserDeleted(user.clone().into()), None)
                 .await?;
         }
     }
@@ -370,11 +380,7 @@ async fn create_first_admin(
     .await?;
 
     audit_service
-        .log(
-            &mut tx,
-            &AuditEventType::UserCreated(user.clone().into()),
-            None,
-        )
+        .log(&mut tx, UserCreated(user.clone().into()), None)
         .await?;
 
     tx.commit().await?;
@@ -447,9 +453,9 @@ async fn logout(
         audit_service
             .log(
                 &mut tx,
-                &AuditEventType::UserLoggedOut(UserLoggedOutDetails {
+                UserLoggedOutDetails {
                     session_duration: session.duration().as_secs(),
-                }),
+                },
                 None,
             )
             .await?;

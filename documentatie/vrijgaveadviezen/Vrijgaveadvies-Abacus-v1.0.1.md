@@ -43,7 +43,7 @@ Elk van de 14 gemeenten heeft tijdens de GSB-zitting ter plaatse uitgebreide ond
 
 ### Relevante kwaliteitsattributen
 
-In het ["Testen en kwaliteit"](https://github.com/kiesraad/abacus/blob/main/documentatie/ontwikkelproces/testen-en-kwaliteit.md)-document staan de belangrijkste kwaliteitsattributen voor Abacus. Deze vallen uiteen in twee groepen: externe en interne kwaliteitsattributen. Externe kwaliteitsattributen zijn attributen waar gebruikers direct iets van merken. Interne kwaliteitsattributen zijn attributen die vooral impact hebben op het ontwikkelteam.
+In het ["Testen en kwaliteit"](https://github.com/kiesraad/abacus/blob/a1d4bf958a1038be5ea6e002f17fc800a67d45bb/documentatie/ontwikkelproces/testen-en-kwaliteit.md)-document staan de belangrijkste kwaliteitsattributen voor Abacus. Deze vallen uiteen in twee groepen: externe en interne kwaliteitsattributen. Externe kwaliteitsattributen zijn attributen waar gebruikers direct iets van merken. Interne kwaliteitsattributen zijn attributen die vooral impact hebben op het ontwikkelteam.
 
 Belangrijkste externe kwaliteitsattributen:
 - Betrouwbaarheid: kun je de software in de meeste situaties vertrouwen?
@@ -63,7 +63,7 @@ In de beschrijving hieronder van de uitgevoerde testwerkzaamheden wordt vooral a
 Ontwikkeling van Abacus is gestart in maart 2024. Tijdens de ontwikkeling werd er continu getest:
 
 - review met "approval" van minstens twee teamleden
-- [linting en geautomatiseerde tests op meerdere niveaus](https://github.com/kiesraad/abacus/blob/main/documentatie/ontwikkelproces/test-tooling.md) in onze ["Build, lint & test"-pipeline](https://github.com/kiesraad/abacus/actions/workflows/build-lint-test.yml)
+- [linting en geautomatiseerde tests op meerdere niveaus](https://github.com/kiesraad/abacus/blob/a1d4bf958a1038be5ea6e002f17fc800a67d45bb/documentatie/ontwikkelproces/test-tooling.md) in onze ["Build, lint & test"-pipeline](https://github.com/kiesraad/abacus/actions/workflows/build-lint-test.yml)
 - exploratief testen
 
 Om de ondersteuning van verschillende besturingssystemen te testen, draaide er tijdens de ontwikkeling een wekelijkse release-pipeline. Hierin werd de applicatie gedraaid op Windows, macOS en Linux en de end-to-end tests op Chrome, Firefox en Safari. Sinds de bouw van de v1.0.0-release draait deze pipeline alleen voor release candidates en wordt de applicatie niet meer op macOS gedraaid in de pipeline.  
@@ -77,13 +77,13 @@ Tot slot waren er een aantal toetsingsmomenten tijdens de ontwikkeling:
 
 In oktober 2024 hebben we het gebruik van Abacus zonder handleiding of uitleg vooraf getoetst. De resultaten waren positief. De test liet zien dat Abacus de gebruikers goed ondersteunt bij het invoeren van de tellingen. De deelnemers gaven ook goede feedback over mogelijke verbeteringen.
 
-Het [verslag van de gebruikerstest](https://github.com/kiesraad/abacus/tree/main/documentatie/usability-tests/20241025-bevindingen.md) staat op GitHub.
+Het [verslag van de gebruikerstest](https://github.com/kiesraad/abacus/tree/a1d4bf958a1038be5ea6e002f17fc800a67d45bb/documentatie/usability-tests/20241025-bevindingen.md) staat op GitHub.
 
 #### SIG code review
 
 In maart 2025 heeft de Software Improvement Group (SIG) een code review gedaan met focus op onderhoudbaarheid. Het rapport was positief en bevatte een aantal aanbevelingen die ondertussen opgevolgd zijn.
 
-Het [rapport en een overzicht van de aanbevelingen met opvolging](https://github.com/kiesraad/abacus/tree/main/documentatie/reviews/SIG2025) zijn op GitHub te vinden.
+Het [rapport en een overzicht van de aanbevelingen met opvolging](https://github.com/kiesraad/abacus/tree/a1d4bf958a1038be5ea6e002f17fc800a67d45bb/documentatie/reviews/SIG2025) zijn op GitHub te vinden.
 
 #### Performancetest parallelle invoer
 
@@ -95,7 +95,7 @@ Zowel de [gebruikte code](https://github.com/kiesraad/abacus-k6-poc) als de [res
 
 In juli 2025 heeft Bureau Veritas Cybersecurity een code review gedaan met focus op security. De belangrijkste conclusie is dat Abacus over het geheel genomen robuust is. Daarnaast bevat het rapport een aantal aandachtspunten, die ofwel opgevolgd zijn voor deze release, ofwel later opgevolgd zullen worden, ofwel zijn toegelicht in onze reactie.
 
-Het [rapport en onze reactie op de aandachtspunten](https://github.com/kiesraad/abacus/tree/main/documentatie/reviews/Veritas2025) zijn te vinden op GitHub.
+Het [rapport en onze reactie op de aandachtspunten](https://github.com/kiesraad/abacus/tree/a1d4bf958a1038be5ea6e002f17fc800a67d45bb/documentatie/reviews/Veritas2025) zijn te vinden op GitHub.
 
 
 ### Testwerkzaamheden specifiek voor de release
@@ -145,7 +145,7 @@ Het [rapport van de wettelijke toets](https://www.kiesraad.nl/adviezen-en-public
 
 ### Expliciet maken wanneer Abacus goed genoeg is
 
-Tijdens de ontwikkeling is er regelmatig en uitgebreid met stakeholders en binnen het team gesproken over wat "goed genoeg" betekent. De uitkomsten van die gesprekken zijn echter nooit duidelijk vastgelegd. Voor de volgende release gaan we van tevoren expliciet uitwerken aan welke kwaliteitseisen de release moet voldoen en welke testactiviteiten hiervoor nodig zijn. Hiermee geven we ook opvolging aan het [advies hierover van het Adviescollege ICT-toetsing (AcICT)](https://github.com/kiesraad/abacus/tree/main/documentatie/reviews/acict).
+Tijdens de ontwikkeling is er regelmatig en uitgebreid met stakeholders en binnen het team gesproken over wat "goed genoeg" betekent. De uitkomsten van die gesprekken zijn echter nooit duidelijk vastgelegd. Voor de volgende release gaan we van tevoren expliciet uitwerken aan welke kwaliteitseisen de release moet voldoen en welke testactiviteiten hiervoor nodig zijn. Hiermee geven we ook opvolging aan het [advies hierover van het Adviescollege ICT-toetsing (AcICT)](https://github.com/kiesraad/abacus/tree/a1d4bf958a1038be5ea6e002f17fc800a67d45bb/documentatie/reviews/acict).
 
 ### Regelmatiger exploratief testen tijdens ontwikkeling
 

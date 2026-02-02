@@ -1,6 +1,6 @@
-use abacus::pdf_gen::{
-    generate_pdf,
-    models::{PdfFileModel, PdfModel},
+use abacus::{
+    domain::models::{PdfFileModel, PdfModel},
+    infra::pdf_gen::generate_pdf,
 };
 use clap::Parser;
 use tokio::{fs, process::Command};
@@ -89,8 +89,9 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
     use std::{fs, path::PathBuf};
+
+    use super::*;
 
     fn inputs_dir() -> PathBuf {
         PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("templates/inputs")

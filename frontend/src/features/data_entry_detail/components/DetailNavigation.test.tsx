@@ -23,7 +23,7 @@ describe("DetailNavigation", () => {
   const mockValidationResultsWithErrors: ValidationResults = {
     errors: [
       validationResultMockData.F201, // voters_counts fields
-      validationResultMockData.F401, // political_group_votes[0]
+      validationResultMockData.F401, // political_group_votes.0
     ],
     warnings: [
       validationResultMockData.W201, // blank_votes_count field

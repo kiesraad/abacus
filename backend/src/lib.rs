@@ -1,7 +1,7 @@
 use std::{future::Future, net::SocketAddr, str::FromStr};
 
-use airgap::AirgapDetection;
 use axum::{extract::FromRef, serve::ListenerExt};
+use infra::airgap::AirgapDetection;
 use sqlx::{
     Sqlite, SqliteConnection, SqlitePool,
     sqlite::{SqliteConnectOptions, SqliteJournalMode},
@@ -9,32 +9,21 @@ use sqlx::{
 use tokio::{net::TcpListener, signal};
 use tracing::{info, trace, warn};
 
-pub mod airgap;
+pub mod api;
 pub mod app_error;
-pub mod audit_log;
-pub mod authentication;
-pub mod committee_session;
-pub mod data_entry;
-pub mod document;
-pub mod election;
+pub mod domain;
 pub mod eml;
 mod error;
-pub mod files;
-#[cfg(feature = "dev-database")]
-pub mod fixtures;
-pub mod investigation;
-pub mod pdf_gen;
-pub mod polling_station;
-pub mod report;
-pub mod router;
-pub mod summary;
+pub mod infra;
+pub mod repository;
 #[cfg(feature = "dev-database")]
 pub mod test_data_gen;
-pub mod util;
-pub mod zip;
 
 pub use app_error::AppError;
 pub use error::{APIError, ErrorResponse};
+#[cfg(feature = "dev-database")]
+use infra::seed_data;
+use infra::{audit_log, router};
 
 use crate::app_error::{DatabaseErrorWithPath, DatabaseMigrationErrorWithPath};
 
@@ -209,7 +198,7 @@ pub async fn create_sqlite_pool(
 
     #[cfg(feature = "dev-database")]
     if seed_data {
-        fixtures::seed_fixture_data(&pool).await?;
+        seed_data::seed_fixture_data(&pool).await?;
     }
 
     // log startup event and verify the database is writeable
@@ -225,9 +214,8 @@ mod test {
     use test_log::test;
     use tokio::net::TcpListener;
 
-    use crate::{AppError, create_sqlite_pool};
-
     use super::start_server;
+    use crate::{AppError, create_sqlite_pool};
 
     pub(crate) async fn run_server_test<F, Fut>(pool: SqlitePool, test_fn: F)
     where

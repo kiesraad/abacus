@@ -1,6 +1,7 @@
+use std::{error::Error, fmt, ops::Range, str::FromStr};
+
 use rand::distr::uniform::SampleRange;
 use serde::{Deserialize, Deserializer, de};
-use std::{error::Error, fmt, ops::Range, str::FromStr};
 use utoipa::{PartialSchema, ToSchema};
 
 mod api;

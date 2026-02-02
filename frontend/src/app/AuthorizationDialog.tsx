@@ -9,7 +9,6 @@ import { formatTimeToGo } from "@/utils/dateTime";
 
 import { EXPIRATION_DIALOG_SECONDS } from "./authorizationConstants";
 
-// biome-ignore lint/complexity/noExcessiveLinesPerFunction: TODO function should be refactored
 export function AuthorizationDialog() {
   const { user, loading, expiration, extendSession, setUser } = useApiState();
   const [sessionValidFor, setSessionValidFor] = useState<number | null>(

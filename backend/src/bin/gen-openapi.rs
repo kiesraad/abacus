@@ -1,6 +1,6 @@
 use std::fs;
 
-use abacus::router::openapi_router;
+use abacus::infra::router::openapi_router;
 
 /// Write OpenAPI JSON documentation to `openapi.json`.
 fn main() {
@@ -21,6 +21,15 @@ mod tests {
     use test_log::test;
 
     use super::*;
+
+    #[test]
+    fn check_openapi_json_for_null_type() {
+        let result = get_openapi_json();
+        assert!(
+            !result.contains("null"),
+            "Add #[serde(skip_serializing_if = \"Option::is_none\")] where Option is used."
+        );
+    }
 
     #[test]
     fn generated_openapi_json_is_up_to_date() {

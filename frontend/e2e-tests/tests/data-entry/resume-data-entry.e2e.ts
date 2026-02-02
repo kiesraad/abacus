@@ -275,7 +275,7 @@ test.describe("resume data entry flow", () => {
             },
             {
               code: "F401",
-              fields: ["data.political_group_votes[0].total"],
+              fields: ["data.political_group_votes.0.total"],
             },
           ],
           warnings: [

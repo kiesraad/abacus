@@ -49,7 +49,6 @@ export function onSubmitForm(
   dispatch: DataEntryDispatch,
   state: DataEntryState,
 ) {
-  // biome-ignore lint/complexity/noExcessiveLinesPerFunction: TODO function should be refactored
   return async (
     sectionId: FormSectionId,
     currentValues: SectionValues,

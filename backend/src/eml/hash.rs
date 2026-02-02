@@ -12,8 +12,9 @@ pub struct EmlHash {
 
 impl From<&[u8]> for EmlHash {
     fn from(input: &[u8]) -> Self {
-        use sha2::Digest;
         use std::fmt::Write;
+
+        use sha2::Digest;
         let digest = sha2::Sha256::digest(input);
 
         let mut chunks = [const { String::new() }; CHUNK_COUNT];

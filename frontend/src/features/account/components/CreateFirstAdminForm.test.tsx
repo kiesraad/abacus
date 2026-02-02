@@ -31,7 +31,6 @@ describe("CreateFirstAdminForm", () => {
       username: "firstlast",
       fullname: "First Last",
       temp_password: "password*password",
-      role: "administrator",
     });
     expect(next).toHaveBeenCalledOnce();
   });

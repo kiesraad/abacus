@@ -151,9 +151,11 @@ impl std::fmt::Display for AppError {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
-    use sqlx::error::ErrorKind;
     use std::{borrow::Cow, fmt};
+
+    use sqlx::error::ErrorKind;
+
+    use super::*;
 
     #[derive(Debug)]
     struct MockDatabaseError {

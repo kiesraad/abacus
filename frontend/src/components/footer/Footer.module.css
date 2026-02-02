@@ -1,0 +1,5 @@
+.section {
+  display: flex;
+  flex-direction: row;
+  gap: var(--space-sm);
+}

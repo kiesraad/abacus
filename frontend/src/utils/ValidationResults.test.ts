@@ -156,7 +156,7 @@ describe("getValidationResultSetForSection", () => {
     const politicalGroupSection = dataEntryStructure.find((s) => s.id === "political_group_votes_1")!;
 
     const validationResults = [
-      validationResultMockData.F401, // political_group_votes[0]
+      validationResultMockData.F401, // political_group_votes.0
       validationResultMockData.F301, // differences_counts
     ];
 

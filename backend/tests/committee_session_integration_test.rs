@@ -1,9 +1,10 @@
 #![cfg(test)]
 
+use std::net::SocketAddr;
+
 use axum::http::{HeaderValue, StatusCode};
 use reqwest::Response;
 use sqlx::SqlitePool;
-use std::net::SocketAddr;
 use test_log::test;
 
 use crate::{

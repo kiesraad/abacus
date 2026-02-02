@@ -1,28 +1,34 @@
+use std::error::Error;
+
 use chrono::{Datelike, Days, NaiveDate, TimeDelta};
 use rand::{SeedableRng, rngs::StdRng, seq::IndexedRandom};
 use sqlx::{SqliteConnection, SqlitePool};
-use std::error::Error;
 use tracing::info;
 
 use crate::{
     SqlitePoolExt,
-    authentication::user::UserId,
-    committee_session::{
-        self, CommitteeSession, CommitteeSessionCreateRequest, status::CommitteeSessionStatus,
-    },
-    data_entry::{
-        self, CSOFirstSessionResults, CandidateVotes, CountingDifferencesPollingStation,
-        DifferenceCountsCompareVotesCastAdmittedVoters, DifferencesCounts, ExtraInvestigation,
-        FieldPath, PoliticalGroupCandidateVotes, PoliticalGroupTotalVotes, PollingStationResults,
-        Validate, ValidationResults, VotersCounts, VotesCounts, YesNo,
-        repository::list_results_for_committee_session,
+    domain::{
+        committee_session::{CommitteeSession, CommitteeSessionCreateRequest},
+        committee_session_status::CommitteeSessionStatus,
+        data_entry::{
+            CSOFirstSessionResults, CandidateVotes, CountingDifferencesPollingStation,
+            DifferenceCountsCompareVotesCastAdmittedVoters, DifferencesCounts, ExtraInvestigation,
+            PoliticalGroupCandidateVotes, PoliticalGroupTotalVotes, PollingStationResults,
+            VotersCounts, VotesCounts, YesNo,
+        },
+        election::{
+            self, CandidateGender, CandidateNumber, ElectionCategory, ElectionWithPoliticalGroups,
+            NewElection, PGNumber, PoliticalGroup, VoteCountingMethod,
+        },
+        polling_station::{PollingStation, PollingStationRequest, PollingStationType},
         status::{DataEntryStatus, Definitive, FirstEntryFinalised},
+        validation::{FieldPath, Validate, ValidationResults},
     },
-    election::{
-        self, CandidateGender, CandidateNumber, ElectionCategory, ElectionWithPoliticalGroups,
-        NewElection, PGNumber, PoliticalGroup, VoteCountingMethod,
+    repository::{
+        committee_session_repo, data_entry_repo,
+        data_entry_repo::list_results_for_committee_session, election_repo, polling_station_repo,
+        user_repo::UserId,
     },
-    polling_station::{self, PollingStation, PollingStationRequest, PollingStationType},
     test_data_gen::GenerateElectionArgs,
 };
 
@@ -43,7 +49,7 @@ async fn generate_data_entries(
     election: &ElectionWithPoliticalGroups,
     polling_stations: &[PollingStation],
 ) -> Result<bool, Box<dyn Error>> {
-    let committee_session = committee_session::repository::change_status(
+    let committee_session = committee_session_repo::change_status(
         conn,
         committee_session.id,
         CommitteeSessionStatus::DataEntry,
@@ -71,11 +77,10 @@ pub async fn create_test_election(
     let mut tx = pool.begin_immediate().await?;
 
     // generate and store the election
-    let election =
-        election::repository::create(&mut tx, generate_election(&mut rng, &args)).await?;
+    let election = election_repo::create(&mut tx, generate_election(&mut rng, &args)).await?;
 
     // generate the committee session for the election
-    let mut committee_session = committee_session::repository::create(
+    let mut committee_session = committee_session_repo::create(
         &mut tx,
         CommitteeSessionCreateRequest {
             number: 1,
@@ -93,7 +98,7 @@ pub async fn create_test_election(
     );
 
     if !polling_stations.is_empty() {
-        committee_session = committee_session::repository::change_status(
+        committee_session = committee_session_repo::change_status(
             &mut tx,
             committee_session.id,
             CommitteeSessionStatus::InPreparation,
@@ -250,7 +255,7 @@ async fn generate_polling_stations(
         };
         remaining_voters -= ps_num_voters;
 
-        let ps = polling_station::create(
+        let ps = polling_station_repo::create(
             conn,
             election.id,
             PollingStationRequest {
@@ -349,7 +354,7 @@ async fn generate_data_entry(
                     finalised_with_warnings: validation_results.has_warnings(),
                 });
 
-                data_entry::repository::make_definitive(
+                data_entry_repo::make_definitive(
                     conn,
                     ps.id,
                     committee_session.id,
@@ -367,7 +372,7 @@ async fn generate_data_entry(
                     first_entry_finished_at: ts,
                     finalised_with_warnings: validation_results.has_warnings(),
                 });
-                data_entry::repository::upsert(conn, ps.id, committee_session.id, &state)
+                data_entry_repo::upsert(conn, ps.id, committee_session.id, &state)
                     .await
                     .expect("Could not create first data entry");
                 generated_first_entries += 1;
@@ -588,7 +593,7 @@ fn distribute_power_law(
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::{election::repository as election_repo, test_data_gen::RandomRange};
+    use crate::{repository::election_repo, test_data_gen::RandomRange};
 
     #[sqlx::test]
     async fn test_create_test_election(pool: SqlitePool) {

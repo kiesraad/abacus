@@ -170,7 +170,7 @@ export type ADMIN_EXISTS_REQUEST_PATH = `/api/initialise/admin-exists`;
 // /api/initialise/first-admin
 export type CREATE_FIRST_ADMIN_REQUEST_PARAMS = Record<string, never>;
 export type CREATE_FIRST_ADMIN_REQUEST_PATH = `/api/initialise/first-admin`;
-export type CREATE_FIRST_ADMIN_REQUEST_BODY = CreateUserRequest;
+export type CREATE_FIRST_ADMIN_REQUEST_BODY = CreateFirstAdminRequest;
 
 // /api/initialised
 export type INITIALISED_REQUEST_PARAMS = Record<string, never>;
@@ -178,12 +178,12 @@ export type INITIALISED_REQUEST_PATH = `/api/initialised`;
 
 // /api/log
 export interface AUDIT_LOG_LIST_REQUEST_PARAMS {
-  page: number;
-  per_page: number;
-  level: string[];
-  event: string[];
-  user: number[];
-  since: number | null;
+  page?: number;
+  per_page?: number;
+  level?: string[];
+  event?: string[];
+  user?: number[];
+  since?: number;
 }
 export type AUDIT_LOG_LIST_REQUEST_PATH = `/api/log`;
 
@@ -413,7 +413,7 @@ export interface AuditLogUser {
  * See "Model Na 31-2. Proces-verbaal van een gemeentelijk stembureau/stembureau voor het openbaar
  * lichaam in een gemeente/openbaar lichaam waar een centrale stemopneming wordt verricht,
  * Bijlage 2: uitkomsten per stembureau" from the
- * [Kiesregeling](https://wetten.overheid.nl/BWBR0034180/2024-04-01#Bijlage1_DivisieNa31.2) or
+ * [Kiesregeling](https://wetten.overheid.nl/BWBR0034180/2026-01-01#Bijlage1_DivisieNa31.2) or
  * [Verkiezingstoolbox](https://www.rijksoverheid.nl/onderwerpen/verkiezingen/verkiezingentoolkit/modellen).
  */
 export interface CSOFirstSessionResults {
@@ -436,7 +436,7 @@ export interface CSOFirstSessionResults {
  *
  * See "Model Na 14-2. Corrigendum bij het proces-verbaal van een gemeentelijk stembureau/
  * stembureau voor het openbaar lichaam, Bijlage 1: uitkomsten per stembureau" from the
- * [Kiesregeling](https://wetten.overheid.nl/BWBR0034180/2024-04-01#Bijlage1_DivisieNa14.2) or
+ * [Kiesregeling](https://wetten.overheid.nl/BWBR0034180/2026-01-01#Bijlage1_DivisieNa14.2) or
  * [Verkiezingstoolbox](https://www.rijksoverheid.nl/onderwerpen/verkiezingen/verkiezingentoolkit/modellen).
  */
 export interface CSONextSessionResults {
@@ -508,7 +508,7 @@ export interface CommitteeSessionDetails {
   session_overview_pdf?: FileId;
   session_results_eml?: FileId;
   session_results_pdf?: FileId;
-  session_start_date_time?: string | null;
+  session_start_date_time?: string;
   session_status: string;
 }
 
@@ -563,9 +563,12 @@ export interface CountingDifferencesPollingStation {
   unexplained_difference_ballots_voters: YesNo;
 }
 
-/**
- * Struct used to create a new user
- */
+export interface CreateFirstAdminRequest {
+  fullname: string;
+  temp_password: string;
+  username: string;
+}
+
 export interface CreateUserRequest {
   fullname?: string;
   role: Role;
@@ -594,7 +597,7 @@ export interface DataEntryDetails {
   committee_session_id: CommitteeSessionId;
   data_entry_progress: string;
   data_entry_status: string;
-  finished_at?: string | null;
+  finished_at?: string;
   first_entry_user_id?: UserId;
   polling_station_id: PollingStationId;
   second_entry_user_id?: UserId;
@@ -679,7 +682,7 @@ export interface Election {
 }
 
 export interface ElectionAndCandidateDefinitionValidateRequest {
-  candidate_data?: string | null;
+  candidate_data?: string;
   candidate_hash?: string[];
   counting_method?: VoteCountingMethod;
   election_data: string;

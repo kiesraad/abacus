@@ -58,7 +58,6 @@ export function InvestigationFindings({ pollingStationId }: InvestigationFinding
 
   const requiresCorrectedResults = !pollingStation.id_prev_session;
 
-  // biome-ignore lint/complexity/noExcessiveLinesPerFunction: TODO function should be refactored
   // biome-ignore lint/complexity/noExcessiveCognitiveComplexity: TODO function should be refactored
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();

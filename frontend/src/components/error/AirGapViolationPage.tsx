@@ -37,7 +37,7 @@ export function AirGapViolationPage() {
             </aside>
           </article>
         </main>
-        <Footer />
+        <Footer showPrivacyStatementLink={false} />
       </AppLayout>
     </AppFrame>
   );

@@ -98,6 +98,7 @@ async fn run() -> Result<(), AppError> {
     let socket = Socket::new(Domain::IPV6, Type::STREAM, Some(Protocol::TCP))?;
     socket.set_nonblocking(true)?;
     socket.set_only_v6(false)?;
+    socket.set_reuse_address(true)?;
 
     let address = SocketAddr::from((Ipv6Addr::UNSPECIFIED, args.port));
     socket.bind(&address.into()).map_err(|e| match e.kind() {

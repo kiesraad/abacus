@@ -77,5 +77,17 @@
         text-decoration: underline;
       }
     }
+    :global(.privacy_statement_link) {
+      color: var(--color-help-text);
+      text-decoration: underline;
+
+      &:hover {
+        color: var(--link-hover);
+      }
+
+      &:active {
+        color: var(--link-active);
+      }
+    }
   }
 }

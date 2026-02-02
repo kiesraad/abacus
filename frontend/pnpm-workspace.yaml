@@ -1,8 +1,8 @@
-onlyBuiltDependencies:
-  - '@swc/core'
-  - esbuild
-  - msw
-  - unrs-resolver
+allowBuilds:
+  "@swc/core": true
+  esbuild: true
+  msw: false
+  unrs-resolver: true
 blockExoticSubdeps: true
 minimumReleaseAge: 4320
 minimumReleaseAgeExclude:
@@ -12,7 +12,11 @@ trustPolicy: no-downgrade
 trustPolicyExclude:
   - semver@6.3.1
 engineStrict: true
-sideEffectsCache: false
+packageManagerStrict: true
+packageManagerStrictVersion: true
+strictDepBuilds: true
+strictPeerDependencies: true
+sideEffectsCache: true
 overrides:
   # Storybook currently uses @vitest/expect 3.2.4 which doesn't work with our vitest.d.ts
   "@vitest/expect": "$@vitest/expect"

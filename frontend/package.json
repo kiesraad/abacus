@@ -81,8 +81,5 @@
     "vitest": "4.0.16",
     "vitest-fail-on-console": "0.10.1",
     "xstate": "5.25.0"
-  },
-  "msw": {
-    "workerDirectory": [""]
   }
 }

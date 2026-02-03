@@ -218,7 +218,8 @@ mod tests {
 
     use super::*;
     use crate::{
-        infra::{airgap::block_request_on_airgap_violation, router, router::openapi_router},
+        api::middleware::airgap::block_request_on_airgap_violation,
+        infra::{router, router::openapi_router},
         shutdown_signal,
     };
 
@@ -385,7 +386,7 @@ mod tests {
         addr
     }
 
-    #[test(sqlx::test(fixtures(path = "../../../fixtures", scripts("election_2", "users"))))]
+    #[test(sqlx::test(fixtures(path = "../../../../fixtures", scripts("election_2", "users"))))]
     async fn test_airgap_detection(pool: SqlitePool) {
         let openapi = openapi_router().into_openapi();
         let addr = serve_api_with_airgap_detection(pool).await;

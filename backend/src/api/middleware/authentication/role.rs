@@ -1,6 +1,5 @@
-use axum::extract::OptionalFromRequestParts;
 use axum::{
-    extract::{FromRef, FromRequestParts},
+    extract::{FromRef, FromRequestParts, OptionalFromRequestParts},
     http::request::Parts,
 };
 use sqlx::SqlitePool;

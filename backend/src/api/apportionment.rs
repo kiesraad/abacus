@@ -64,10 +64,11 @@ impl ListVotesTrait for PoliticalGroupCandidateVotes {
     type Cv = CandidateVotes;
 
     fn number(&self) -> u32 {
+        // TODO: convert from PGNumber to listnumber of apportionment crate
         *self.number
     }
 
-    fn total(&self) -> u32 {
+    fn total_votes(&self) -> u32 {
         self.total
     }
 
@@ -78,6 +79,7 @@ impl ListVotesTrait for PoliticalGroupCandidateVotes {
 
 impl CandidateVotesTrait for CandidateVotes {
     fn number(&self) -> u32 {
+        // TODO: convert from CandidateNumber to candidatenumber of apportionment crate
         *self.number
     }
 
@@ -145,7 +147,7 @@ async fn election_apportionment(
             summary: ElectionSummary::from_results(&election, &results)?,
         };
 
-        let result = apportionment::process(input.clone())?;
+        let result = apportionment::process(&input)?;
 
         audit_service
             .log(

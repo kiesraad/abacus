@@ -1,20 +1,21 @@
 use crate::{
-    Fraction,
-    structs::{CandidateNumber, CandidateVotes, ListNumber},
+    CandidateVotesTrait, Fraction,
+    structs::{CandidateNumber, ListNumber},
 };
 
 /// Contains information about the chosen candidates and
 /// the candidate list ranking for a specific list.
 #[derive(Debug, PartialEq)]
-pub struct ListCandidateNomination {
+pub struct ListCandidateNomination<'a, T: CandidateVotesTrait> {
     /// List number for which this nomination applies
     pub list_number: ListNumber,
     /// The number of seats assigned to this group
     pub list_seats: u32,
     /// The list of chosen candidates via preferential votes, can be empty
-    pub preferential_candidate_nomination: Vec<CandidateVotes>,
+    // TODO: check lifetimes
+    pub preferential_candidate_nomination: Vec<&'a T>,
     /// The list of other chosen candidates, can be empty
-    pub other_candidate_nomination: Vec<CandidateVotes>,
+    pub other_candidate_nomination: Vec<&'a T>,
     /// The updated ranking of the whole candidate list, can be empty
     pub updated_candidate_ranking: Vec<CandidateNumber>,
 }
@@ -33,13 +34,13 @@ pub struct PreferenceThreshold {
 /// It also contains the preferential nomination of candidates, the remaining
 /// nomination of candidates and the final ranking of candidates for each list.
 #[derive(Debug, PartialEq)]
-pub struct CandidateNominationResult {
+pub struct CandidateNominationResult<'a, T: CandidateVotesTrait> {
     /// Preference threshold percentage and number of votes
     pub preference_threshold: PreferenceThreshold,
     /// List of chosen candidates
     pub chosen_candidates: Vec<Candidate>,
     /// List of chosen candidates and candidate list ranking per list
-    pub list_candidate_nomination: Vec<ListCandidateNomination>,
+    pub list_candidate_nomination: Vec<ListCandidateNomination<'a, T>>,
 }
 
 #[derive(Debug, PartialEq)]

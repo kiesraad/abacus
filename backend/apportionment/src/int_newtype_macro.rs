@@ -9,14 +9,6 @@ macro_rules! int_newtype {
             }
         }
 
-        impl std::ops::Deref for $identifier {
-            type Target = u32;
-
-            fn deref(&self) -> &Self::Target {
-                &self.0
-            }
-        }
-
         impl std::fmt::Display for $identifier {
             fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
                 write!(f, "{}", self.0)
@@ -28,6 +20,18 @@ macro_rules! int_newtype {
 
             fn try_from(value: usize) -> Result<Self, Self::Error> {
                 Ok(Self::from(u32::try_from(value)?))
+            }
+        }
+
+        impl PartialEq<u32> for $identifier {
+            fn eq(&self, other: &u32) -> bool {
+                self.0 == *other
+            }
+        }
+
+        impl PartialEq<$identifier> for u32 {
+            fn eq(&self, other: &$identifier) -> bool {
+                *self == other.0
             }
         }
     };

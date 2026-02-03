@@ -1,7 +1,7 @@
 use super::{
     super::{
         fraction::Fraction,
-        structs::{LARGE_COUNCIL_THRESHOLD, ListNumber, ListVotes},
+        structs::{LARGE_COUNCIL_THRESHOLD, ListNumber, ListVotesTrait},
     },
     ApportionmentError, list_numbers,
     structs::{
@@ -12,16 +12,16 @@ use super::{
 use std::cmp::Ordering;
 use tracing::{debug, info};
 
-/// This function assigns the residual seats that remain after full seat assignment is finished.  
+/// This function assigns the residual seats that remain after full seat assignment is finished.
 /// These residual seats are assigned through two different procedures,
 /// depending on how many total seats are available in the election.
-pub fn assign_remainder(
+pub fn assign_remainder<T: ListVotesTrait>(
     initial_standings: &[ListStanding],
     seats: u32,
     total_residual_seats: u32,
     current_residual_seat_number: u32,
     previous_steps: &[SeatChangeStep],
-    exclude_exhausted_lists: Option<&Vec<ListVotes>>,
+    exclude_exhausted_lists: Option<&[T]>,
 ) -> Result<(Vec<SeatChangeStep>, Vec<ListStanding>), ApportionmentError> {
     let mut steps: Vec<SeatChangeStep> = previous_steps.to_vec();
     let mut residual_seat_number = current_residual_seat_number;
@@ -117,17 +117,17 @@ fn list_largest_remainder_assigned_seats(
         .count()
 }
 
-fn list_numbers_without_empty_seats<'a>(
+fn list_numbers_without_empty_seats<'a, T: ListVotesTrait>(
     standings: impl Iterator<Item = &'a ListStanding>,
-    list_votes: &[ListVotes],
+    list_votes: &[T],
 ) -> Vec<ListNumber> {
     standings.fold(vec![], |mut list_numbers_without_empty_seats, s| {
-        let number_of_candidates = u32::try_from(
-            list_votes[*s.list_number as usize - 1]
-                .candidate_votes
-                .len(),
-        )
-        .expect("Number of candidates fits in u32");
+        let list_votes = list_votes
+            .iter()
+            .find(|list_votes| list_votes.number() == s.list_number)
+            .expect("List votes exists");
+        let number_of_candidates = u32::try_from(list_votes.candidate_votes().len())
+            .expect("Number of candidates fits in u32");
 
         if number_of_candidates.cmp(&s.total_seats()) == Ordering::Equal {
             list_numbers_without_empty_seats.push(s.list_number)

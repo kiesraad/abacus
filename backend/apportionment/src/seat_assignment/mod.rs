@@ -11,33 +11,33 @@ use self::{
         SeatChangeStep,
     },
 };
+use super::{
+    ApportionmentInput, ListVotesTrait,
+    fraction::Fraction,
+    structs::{ApportionmentError, ListNumber},
+};
 pub use structs::SeatAssignmentResult;
 
-use super::{
-    fraction::Fraction,
-    structs::{ApportionmentError, ListNumber, ListVotes, SeatAssignmentInput},
-};
-
 /// Seat assignment
-pub fn seat_assignment(
-    input: SeatAssignmentInput,
+pub(crate) fn seat_assignment<T: ApportionmentInput>(
+    input: &T,
 ) -> Result<SeatAssignmentResult, ApportionmentError> {
     info!("Seat assignment");
-    info!("Seats: {}", input.number_of_seats);
+    info!("Seats: {}", input.number_of_seats());
 
-    if input.total_votes == 0 {
+    if input.total_votes() == 0 {
         info!("No votes on candidates cast");
         return Err(ApportionmentError::ZeroVotesCast);
     }
 
     // [Artikel P 5 Kieswet](https://wetten.overheid.nl/BWBR0004627/2026-01-01/#AfdelingII_HoofdstukP_Paragraaf2_ArtikelP5)
     // Calculate electoral quota (kiesdeler) as a proper fraction
-    let quota = Fraction::from(input.total_votes) / Fraction::from(input.number_of_seats);
+    let quota = Fraction::from(input.total_votes()) / Fraction::from(input.number_of_seats());
     info!("Quota: {}", quota);
 
     // [Artikel P 6 Kieswet](https://wetten.overheid.nl/BWBR0004627/2026-01-01/#AfdelingII_HoofdstukP_Paragraaf2_ArtikelP6)
     let initial_standing: Vec<ListStanding> = input
-        .list_votes
+        .list_votes()
         .iter()
         .map(|list| ListStanding::new(list, quota))
         .collect();
@@ -46,12 +46,12 @@ pub fn seat_assignment(
         .iter()
         .map(|list| list.full_seats)
         .sum::<u32>();
-    let residual_seats = input.number_of_seats - full_seats;
+    let residual_seats = input.number_of_seats() - full_seats;
 
     let (mut steps, current_standings) = if residual_seats > 0 {
-        assign_remainder(
+        assign_remainder::<T::List>(
             &initial_standing,
-            input.number_of_seats,
+            input.number_of_seats(),
             residual_seats,
             0,
             &[],
@@ -65,9 +65,9 @@ pub fn seat_assignment(
     // [Artikel P 9 Kieswet](https://wetten.overheid.nl/BWBR0004627/2026-01-01/#AfdelingII_HoofdstukP_Paragraaf2_ArtikelP9)
     let (cumulative_standings, assigned_seat) = if let Some(last_step) = steps.last() {
         reassign_residual_seat_for_absolute_majority(
-            input.number_of_seats,
-            input.total_votes,
-            &input.list_votes,
+            input.number_of_seats(),
+            input.total_votes(),
+            input.list_votes(),
             &last_step.change.list_assigned(),
             current_standings,
         )?
@@ -89,8 +89,8 @@ pub fn seat_assignment(
     // [Artikel P 10 Kieswet](https://wetten.overheid.nl/BWBR0004627/2026-01-01/#AfdelingII_HoofdstukP_Paragraaf2_ArtikelP10)
     let (final_steps, final_standing) = reassign_residual_seats_for_exhausted_lists(
         cumulative_standings,
-        input.number_of_seats,
-        input.list_votes,
+        input.number_of_seats(),
+        input.list_votes(),
         residual_seats,
         steps,
     )?;
@@ -99,10 +99,10 @@ pub fn seat_assignment(
         .iter()
         .map(|list| list.full_seats)
         .sum::<u32>();
-    let final_residual_seats = input.number_of_seats - final_full_seats;
+    let final_residual_seats = input.number_of_seats() - final_full_seats;
 
     Ok(SeatAssignmentResult {
-        seats: input.number_of_seats,
+        seats: input.number_of_seats(),
         full_seats: final_full_seats,
         residual_seats: final_residual_seats,
         quota,
@@ -120,21 +120,21 @@ pub fn get_total_seats_from_apportionment_result(result: &SeatAssignmentResult) 
 }
 
 /// Create a vector containing just the list numbers from an iterator of the current standing
-fn list_numbers(standing: &[&ListStanding]) -> Vec<u32> {
-    standing.iter().map(|s| *s.list_number).collect()
+fn list_numbers(standing: &[&ListStanding]) -> Vec<ListNumber> {
+    standing.iter().map(|s| s.list_number).collect()
 }
 
-fn list_numbers_with_exhausted_seats<'a>(
+fn list_numbers_with_exhausted_seats<'a, T: ListVotesTrait>(
     standings: impl Iterator<Item = &'a ListStanding>,
-    list_votes: &[ListVotes],
+    list_votes: &[T],
 ) -> Vec<(ListNumber, u32)> {
     standings.fold(vec![], |mut exhausted_list_numbers_and_seats, s| {
-        let number_of_candidates = u32::try_from(
-            list_votes[*s.list_number as usize - 1]
-                .candidate_votes
-                .len(),
-        )
-        .expect("Number of candidates fits in u32");
+        let list_votes = list_votes
+            .iter()
+            .find(|list_votes| list_votes.number() == s.list_number)
+            .expect("List votes exists");
+        let number_of_candidates = u32::try_from(list_votes.candidate_votes().len())
+            .expect("Number of candidates fits in u32");
 
         if number_of_candidates.cmp(&s.total_seats()) == Ordering::Less {
             exhausted_list_numbers_and_seats.push((
@@ -149,10 +149,10 @@ fn list_numbers_with_exhausted_seats<'a>(
 /// If a list got the absolute majority of votes but not the absolute majority of seats,
 /// re-assign the last residual seat to the list with the absolute majority.  
 /// This re-assignment is done according to article P 9 of the Kieswet.
-fn reassign_residual_seat_for_absolute_majority(
+fn reassign_residual_seat_for_absolute_majority<T: ListVotesTrait>(
     seats: u32,
     total_votes: u32,
-    list_votes: &[ListVotes],
+    list_votes: &[T],
     lists_last_residual_seat: &[ListNumber],
     standings: Vec<ListStanding>,
 ) -> Result<(Vec<ListStanding>, Option<SeatChange>), ApportionmentError> {
@@ -161,7 +161,7 @@ fn reassign_residual_seat_for_absolute_majority(
     // Find list with an absolute majority of votes. Return early if we find none
     let Some(majority_list_votes) = list_votes
         .iter()
-        .find(|list| Fraction::from(list.list_votes) > half_of_votes_count)
+        .find(|list| Fraction::from(list.total_votes()) > half_of_votes_count)
     else {
         return Ok((standings, None));
     };
@@ -169,7 +169,7 @@ fn reassign_residual_seat_for_absolute_majority(
     let half_of_seats_count: Fraction = Fraction::from(seats) * Fraction::new(1, 2);
     let standing_of_list_with_majority_votes = standings
         .iter()
-        .find(|list_standing| list_standing.list_number == majority_list_votes.number)
+        .find(|list_standing| list_standing.list_number == majority_list_votes.number())
         .expect("Standing exists");
 
     let list_seats = Fraction::from(standing_of_list_with_majority_votes.total_seats());
@@ -185,19 +185,26 @@ fn reassign_residual_seat_for_absolute_majority(
 
         // Reassign the seat
         let mut standing = standings.clone();
-        standing[*lists_last_residual_seat[0] as usize - 1].residual_seats -= 1;
-        standing[*majority_list_votes.number as usize - 1].residual_seats += 1;
+        for list_standing in standing.iter_mut() {
+            if list_standing.list_number == lists_last_residual_seat[0] {
+                list_standing.residual_seats -= 1
+            }
+            if list_standing.list_number == majority_list_votes.number() {
+                list_standing.residual_seats += 1
+            }
+        }
 
         info!(
             "Seat first assigned to list {} has been reassigned to list {} in accordance with Article P 9 Kieswet",
-            lists_last_residual_seat[0], majority_list_votes.number
+            lists_last_residual_seat[0],
+            majority_list_votes.number()
         );
         Ok((
             standing,
             Some(SeatChange::AbsoluteMajorityReassignment(
                 AbsoluteMajorityReassignedSeat {
                     list_retracted_seat: lists_last_residual_seat[0],
-                    list_assigned_seat: majority_list_votes.number,
+                    list_assigned_seat: majority_list_votes.number(),
                 },
             )),
         ))
@@ -209,14 +216,14 @@ fn reassign_residual_seat_for_absolute_majority(
 /// If lists got more seats than candidates on their lists,
 /// re-assign those excess seats to other lists without exhausted lists.  
 /// This re-assignment is done according to article P 10 of the Kieswet.
-fn reassign_residual_seats_for_exhausted_lists(
+fn reassign_residual_seats_for_exhausted_lists<T: ListVotesTrait>(
     previous_standings: Vec<ListStanding>,
     seats: u32,
-    list_votes: Vec<ListVotes>,
+    list_votes: &[T],
     assigned_residual_seats: u32,
     previous_steps: Vec<SeatChangeStep>,
 ) -> Result<(Vec<SeatChangeStep>, Vec<ListStanding>), ApportionmentError> {
-    let exhausted_lists = list_numbers_with_exhausted_seats(previous_standings.iter(), &list_votes);
+    let exhausted_lists = list_numbers_with_exhausted_seats(previous_standings.iter(), list_votes);
     if !exhausted_lists.is_empty() {
         let mut current_standings = previous_standings.clone();
         let mut seats_to_reassign = 0;
@@ -227,11 +234,15 @@ fn reassign_residual_seats_for_exhausted_lists(
             seats_to_reassign += seats;
             let mut full_seat: bool = false;
             for _ in 1..=seats {
-                if current_standings[*list_number as usize - 1].residual_seats > 0 {
-                    current_standings[*list_number as usize - 1].residual_seats -= 1;
-                } else {
-                    current_standings[*list_number as usize - 1].full_seats -= 1;
-                    full_seat = true;
+                for list_standing in current_standings.iter_mut() {
+                    if list_standing.list_number == list_number {
+                        if list_standing.residual_seats > 0 {
+                            list_standing.residual_seats -= 1;
+                        } else {
+                            list_standing.full_seats -= 1;
+                            full_seat = true;
+                        }
+                    }
                 }
                 info!(
                     "Seat first assigned to list {} has been removed and will be assigned to another list in accordance with Article P 10 Kieswet",
@@ -257,7 +268,7 @@ fn reassign_residual_seats_for_exhausted_lists(
             assigned_residual_seats + seats_to_reassign,
             assigned_residual_seats,
             &current_steps,
-            Some(&list_votes),
+            Some(list_votes),
         )?;
         Ok((current_steps, current_standings))
     } else {
@@ -266,7 +277,7 @@ fn reassign_residual_seats_for_exhausted_lists(
 }
 
 #[cfg(test)]
-mod tests {
+pub(crate) mod tests {
     use crate::{
         fraction::Fraction,
         seat_assignment::{ListStanding, SeatChange, list_numbers},
@@ -353,7 +364,7 @@ mod tests {
                 15,
                 vec![480, 160, 160, 160, 80, 80, 80],
             );
-            let result = seat_assignment(input).unwrap();
+            let result = seat_assignment(&input).unwrap();
             assert_eq!(result.full_seats, 15);
             assert_eq!(result.residual_seats, 0);
             assert_eq!(result.steps.len(), 0);
@@ -373,7 +384,7 @@ mod tests {
                 15,
                 vec![540, 160, 160, 80, 80, 80, 60, 40],
             );
-            let result = seat_assignment(input).unwrap();
+            let result = seat_assignment(&input).unwrap();
             assert_eq!(result.full_seats, 13);
             assert_eq!(result.residual_seats, 2);
             assert_eq!(result.steps.len(), 2);
@@ -405,7 +416,7 @@ mod tests {
                 15,
                 vec![808, 59, 58, 57, 56, 55, 54, 53],
             );
-            let result = seat_assignment(input).unwrap();
+            let result = seat_assignment(&input).unwrap();
             assert_eq!(result.full_seats, 10);
             assert_eq!(result.residual_seats, 5);
             assert_eq!(result.steps.len(), 5);
@@ -446,7 +457,7 @@ mod tests {
                 15,
                 vec![480, 240, 240, 55, 50, 45, 45, 45],
             );
-            let result = seat_assignment(input).unwrap();
+            let result = seat_assignment(&input).unwrap();
             assert_eq!(result.full_seats, 12);
             assert_eq!(result.residual_seats, 3);
             assert_eq!(result.steps.len(), 3);
@@ -480,7 +491,7 @@ mod tests {
                 3,
                 vec![8, 7, 6, 5, 4, 3, 2, 1, 1, 1],
             );
-            let result = seat_assignment(input).unwrap();
+            let result = seat_assignment(&input).unwrap();
             assert_eq!(result.full_seats, 0);
             assert_eq!(result.residual_seats, 3);
             assert_eq!(result.steps.len(), 3);
@@ -512,7 +523,7 @@ mod tests {
         fn test_1st_round_unique_highest_averages_method_regression() {
             let input =
                 seat_assignment_fixture_with_default_50_candidates(10, vec![0, 3, 5, 6, 7, 79]);
-            let result = seat_assignment(input).unwrap();
+            let result = seat_assignment(&input).unwrap();
             assert_eq!(result.full_seats, 7);
             assert_eq!(result.residual_seats, 3);
             assert_eq!(result.steps.len(), 3);
@@ -538,7 +549,7 @@ mod tests {
         #[test]
         fn test_with_0_votes() {
             let input = seat_assignment_fixture_with_default_50_candidates(10, vec![0, 0, 0, 0, 0]);
-            let result = seat_assignment(input);
+            let result = seat_assignment(&input);
             assert_eq!(result, Err(ApportionmentError::ZeroVotesCast));
         }
 
@@ -557,7 +568,7 @@ mod tests {
                 15,
                 vec![2571, 977, 567, 536, 453],
             );
-            let result = seat_assignment(input).unwrap();
+            let result = seat_assignment(&input).unwrap();
             assert_eq!(result.full_seats, 12);
             assert_eq!(result.residual_seats, 3);
             assert_eq!(result.steps.len(), 4);
@@ -613,7 +624,7 @@ mod tests {
                     15,
                     vec![2552, 511, 511, 511, 509, 509],
                 );
-                let result = seat_assignment(input);
+                let result = seat_assignment(&input);
                 assert_eq!(result, Err(ApportionmentError::DrawingOfLotsNotImplemented));
             }
 
@@ -629,7 +640,7 @@ mod tests {
                     15,
                     vec![540, 160, 160, 80, 80, 80, 55, 45],
                 );
-                let result = seat_assignment(input);
+                let result = seat_assignment(&input);
                 assert_eq!(result, Err(ApportionmentError::DrawingOfLotsNotImplemented));
             }
 
@@ -644,7 +655,7 @@ mod tests {
                     15,
                     vec![500, 140, 140, 140, 140, 140],
                 );
-                let result = seat_assignment(input);
+                let result = seat_assignment(&input);
                 assert_eq!(result, Err(ApportionmentError::DrawingOfLotsNotImplemented));
             }
         }
@@ -679,7 +690,7 @@ mod tests {
                         vec![200, 200],
                     ],
                 );
-                let result = seat_assignment(input).unwrap();
+                let result = seat_assignment(&input).unwrap();
                 assert_eq!(result.full_seats, 14);
                 assert_eq!(result.residual_seats, 1);
                 assert_eq!(result.steps.len(), 2);
@@ -733,7 +744,7 @@ mod tests {
                         vec![221, 53, 15, 7, 27, 57],
                     ],
                 );
-                let result = seat_assignment(input).unwrap();
+                let result = seat_assignment(&input).unwrap();
                 assert_eq!(result.full_seats, 11);
                 assert_eq!(result.residual_seats, 6);
                 assert_eq!(result.steps.len(), 8);
@@ -803,7 +814,7 @@ mod tests {
                         vec![10, 10, 10, 10, 10, 10, 10, 9],
                     ],
                 );
-                let result = seat_assignment(input).unwrap();
+                let result = seat_assignment(&input).unwrap();
                 assert_eq!(result.full_seats, 7);
                 assert_eq!(result.residual_seats, 3);
                 assert_eq!(result.steps.len(), 5);
@@ -862,7 +873,7 @@ mod tests {
                     6,
                     vec![vec![3, 2], vec![3, 2], vec![25, 25]],
                 );
-                let result = seat_assignment(input).unwrap();
+                let result = seat_assignment(&input).unwrap();
                 assert_eq!(result.full_seats, 2);
                 assert_eq!(result.residual_seats, 4);
                 assert_eq!(result.steps.len(), 9);
@@ -952,7 +963,7 @@ mod tests {
                     6,
                     vec![vec![3, 3], vec![2, 2], vec![25, 25]],
                 );
-                let result = seat_assignment(input).unwrap();
+                let result = seat_assignment(&input).unwrap();
                 assert_eq!(result.full_seats, 2);
                 assert_eq!(result.residual_seats, 4);
                 assert_eq!(result.steps.len(), 9);
@@ -1040,7 +1051,7 @@ mod tests {
                         vec![453, 0],
                     ],
                 );
-                let result = seat_assignment(input).unwrap();
+                let result = seat_assignment(&input).unwrap();
                 assert_eq!(result.full_seats, 12);
                 assert_eq!(result.residual_seats, 3);
                 assert_eq!(result.steps.len(), 6);
@@ -1107,7 +1118,7 @@ mod tests {
                     8,
                     vec![vec![32, 0, 0, 0, 0], vec![41, 0, 0], vec![7]],
                 );
-                let result = seat_assignment(input).unwrap();
+                let result = seat_assignment(&input).unwrap();
                 assert_eq!(result.full_seats, 6);
                 assert_eq!(result.residual_seats, 2);
                 assert_eq!(result.steps.len(), 6);
@@ -1182,7 +1193,7 @@ mod tests {
                     8,
                     vec![vec![537, 0], vec![10], vec![426, 0, 0, 0, 0, 0]],
                 );
-                let result = seat_assignment(input).unwrap();
+                let result = seat_assignment(&input).unwrap();
                 assert_eq!(result.full_seats, 5);
                 assert_eq!(result.residual_seats, 3);
                 assert_eq!(result.steps.len(), 8);
@@ -1266,7 +1277,7 @@ mod tests {
                         vec![400],
                     ],
                 );
-                let result = seat_assignment(input);
+                let result = seat_assignment(&input);
                 assert_eq!(result, Err(ApportionmentError::AllListsExhausted));
             }
 
@@ -1293,7 +1304,7 @@ mod tests {
                         vec![400],
                     ],
                 );
-                let result = seat_assignment(input);
+                let result = seat_assignment(&input);
                 assert_eq!(result, Err(ApportionmentError::AllListsExhausted));
             }
         }
@@ -1319,7 +1330,7 @@ mod tests {
                 25,
                 vec![576, 288, 96, 96, 96, 48],
             );
-            let result = seat_assignment(input).unwrap();
+            let result = seat_assignment(&input).unwrap();
             assert_eq!(result.full_seats, 25);
             assert_eq!(result.residual_seats, 0);
             assert_eq!(result.steps.len(), 0);
@@ -1338,7 +1349,7 @@ mod tests {
         fn test_with_remainder_seats() {
             let input =
                 seat_assignment_fixture_with_default_50_candidates(23, vec![600, 302, 98, 99, 101]);
-            let result = seat_assignment(input).unwrap();
+            let result = seat_assignment(&input).unwrap();
             assert_eq!(result.full_seats, 19);
             assert_eq!(result.residual_seats, 4);
             assert_eq!(result.steps.len(), 4);
@@ -1378,7 +1389,7 @@ mod tests {
                 19,
                 vec![808, 57, 56, 55, 54, 53, 52, 51, 14],
             );
-            let result = seat_assignment(input).unwrap();
+            let result = seat_assignment(&input).unwrap();
             assert_eq!(result.full_seats, 12);
             assert_eq!(result.residual_seats, 7);
             assert_eq!(result.steps.len(), 7);
@@ -1420,7 +1431,7 @@ mod tests {
         #[test]
         fn test_with_0_votes() {
             let input = seat_assignment_fixture_with_default_50_candidates(19, vec![0]);
-            let result = seat_assignment(input);
+            let result = seat_assignment(&input);
             assert_eq!(result, Err(ApportionmentError::ZeroVotesCast));
         }
 
@@ -1441,7 +1452,7 @@ mod tests {
                 24,
                 vec![7501, 1249, 1249, 1249, 1249, 1249, 1248, 7],
             );
-            let result = seat_assignment(input).unwrap();
+            let result = seat_assignment(&input).unwrap();
             assert_eq!(result.full_seats, 18);
             assert_eq!(result.residual_seats, 6);
             assert_eq!(result.steps.len(), 7);
@@ -1511,7 +1522,7 @@ mod tests {
                     24,
                     vec![7501, 1249, 1249, 1249, 1249, 1248, 1248, 8],
                 );
-                let result = seat_assignment(input);
+                let result = seat_assignment(&input);
                 assert_eq!(result, Err(ApportionmentError::DrawingOfLotsNotImplemented));
             }
 
@@ -1526,7 +1537,7 @@ mod tests {
                     23,
                     vec![500, 140, 140, 140, 140, 140],
                 );
-                let result = seat_assignment(input);
+                let result = seat_assignment(&input);
                 assert_eq!(result, Err(ApportionmentError::DrawingOfLotsNotImplemented));
             }
         }
@@ -1560,7 +1571,7 @@ mod tests {
                         vec![400, 400, 0],
                     ],
                 );
-                let result = seat_assignment(input).unwrap();
+                let result = seat_assignment(&input).unwrap();
                 assert_eq!(result.full_seats, 19);
                 assert_eq!(result.residual_seats, 1);
                 assert_eq!(result.steps.len(), 2);
@@ -1601,7 +1612,7 @@ mod tests {
                         vec![502, 502],
                     ],
                 );
-                let result = seat_assignment(input).unwrap();
+                let result = seat_assignment(&input).unwrap();
                 assert_eq!(result.full_seats, 18);
                 assert_eq!(result.residual_seats, 1);
                 assert_eq!(result.steps.len(), 3);
@@ -1655,7 +1666,7 @@ mod tests {
                         vec![7],
                     ],
                 );
-                let result = seat_assignment(input).unwrap();
+                let result = seat_assignment(&input).unwrap();
                 assert_eq!(result.full_seats, 18);
                 assert_eq!(result.residual_seats, 6);
                 assert_eq!(result.steps.len(), 9);
@@ -1732,7 +1743,7 @@ mod tests {
                         vec![400, 400],
                     ],
                 );
-                let result = seat_assignment(input);
+                let result = seat_assignment(&input);
                 assert_eq!(result, Err(ApportionmentError::AllListsExhausted));
             }
 
@@ -1758,7 +1769,7 @@ mod tests {
                         vec![400, 400, 0],
                     ],
                 );
-                let result = seat_assignment(input);
+                let result = seat_assignment(&input);
                 assert_eq!(result, Err(ApportionmentError::AllListsExhausted));
             }
         }

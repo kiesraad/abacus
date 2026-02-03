@@ -6,18 +6,15 @@ use self::structs::{Candidate, ListCandidateNomination, PreferenceThreshold};
 pub use structs::CandidateNominationResult;
 
 use super::{
-    ApportionmentError,
+    ApportionmentError, ApportionmentInput, CandidateVotesTrait, ListVotesTrait,
     fraction::Fraction,
-    structs::{
-        CandidateNominationInput, CandidateNumber, CandidateVotes, LARGE_COUNCIL_THRESHOLD,
-        ListVotes,
-    },
+    structs::{CandidateNominationInputType, CandidateNumber, LARGE_COUNCIL_THRESHOLD},
 };
 
 /// Candidate nomination
-pub fn candidate_nomination(
-    input: CandidateNominationInput,
-) -> Result<CandidateNominationResult, ApportionmentError> {
+pub(crate) fn candidate_nomination<'a, T: ApportionmentInput>(
+    input: &CandidateNominationInputType<'a, T>,
+) -> Result<CandidateNominationResult<'a, <T::List as ListVotesTrait>::Cv>, ApportionmentError> {
     info!("Candidate nomination");
 
     // [Artikel P 15 Kieswet](https://wetten.overheid.nl/BWBR0004627/2026-01-01/#AfdelingII_HoofdstukP_Paragraaf3_ArtikelP15)
@@ -36,7 +33,7 @@ pub fn candidate_nomination(
 
     let list_candidate_nomination = candidate_nomination_per_list(
         input.number_of_seats,
-        &input.list_votes,
+        input.list_votes,
         preference_threshold,
         &input.total_seats_per_list,
     )?;
@@ -46,7 +43,7 @@ pub fn candidate_nomination(
     );
 
     // Create chosen candidates list
-    let chosen_candidates = all_chosen_candidates(&input.list_votes, &list_candidate_nomination);
+    let chosen_candidates = all_chosen_candidates(input.list_votes, &list_candidate_nomination);
     debug!("Chosen candidates: {:#?}", chosen_candidates);
 
     Ok(CandidateNominationResult {
@@ -61,30 +58,32 @@ pub fn candidate_nomination(
 
 /// Collect all chosen candidates via nomination with preferential votes and
 /// the other nominated candidates into one list
-fn all_chosen_candidates(
-    list_votes: &[ListVotes],
-    list_candidate_nomination: &[ListCandidateNomination],
+fn all_chosen_candidates<T: ListVotesTrait>(
+    list_votes: &[T],
+    list_candidate_nomination: &[ListCandidateNomination<T::Cv>],
 ) -> Vec<Candidate> {
     let mut chosen_candidates: Vec<Candidate> = vec![];
     for list in list_votes {
-        // TODO: #2785 Don't use index
-        let list_candidate_nomination = &list_candidate_nomination[*list.number as usize - 1];
+        let list_candidate_nomination = &list_candidate_nomination
+            .iter()
+            .find(|nomination| nomination.list_number == list.number())
+            .expect("List candidate nomination should exist");
         chosen_candidates.extend(
-            list.candidate_votes
+            list.candidate_votes()
                 .iter()
                 .filter(|candidate| {
                     list_candidate_nomination
                         .preferential_candidate_nomination
                         .iter()
-                        .any(|cv| cv.number == candidate.number)
+                        .any(|cv| candidate.number() == cv.number())
                         || list_candidate_nomination
                             .other_candidate_nomination
                             .iter()
-                            .any(|cv| cv.number == candidate.number)
+                            .any(|cv| candidate.number() == cv.number())
                 })
                 .map(|candidate| Candidate {
-                    list_number: list.number,
-                    candidate_number: candidate.number,
+                    list_number: list.number(),
+                    candidate_number: candidate.number(),
                 }),
         );
     }
@@ -94,29 +93,29 @@ fn all_chosen_candidates(
 /// This function nominates candidates for the seats each list has been assigned.  
 /// The candidate nomination is first done based on preferential votes and then the other
 /// candidates are nominated.
-fn candidate_nomination_per_list(
+fn candidate_nomination_per_list<'a, T: ListVotesTrait>(
     seats: u32,
-    list_votes: &[ListVotes],
+    list_votes: &'a [T],
     preference_threshold: Fraction,
     total_seats: &[u32],
-) -> Result<Vec<ListCandidateNomination>, ApportionmentError> {
-    let mut list_candidate_nomination: Vec<ListCandidateNomination> = vec![];
-    for list in list_votes {
-        let list_index = *list.number as usize - 1;
-        let list_seats = total_seats[list_index];
-        let candidate_votes = &list.candidate_votes;
+) -> Result<Vec<ListCandidateNomination<'a, T::Cv>>, ApportionmentError> {
+    let mut list_candidate_nomination: Vec<ListCandidateNomination<T::Cv>> = vec![];
+    for (index, list) in list_votes.iter().enumerate() {
+        let list_seats = total_seats[index];
+        let candidate_votes = list.candidate_votes();
         let candidate_votes_meeting_preference_threshold =
             candidate_votes_meeting_preference_threshold(preference_threshold, candidate_votes);
-        let preferential_candidate_nomination = preferential_candidate_nomination(
+        let preferential_candidate_nomination = preferential_candidate_nomination::<T::Cv>(
             &candidate_votes_meeting_preference_threshold,
             list_seats,
         )?;
+        let non_assigned_seats = list_seats as usize - preferential_candidate_nomination.len();
 
         // [Artikel P 17 Kieswet](https://wetten.overheid.nl/BWBR0004627/2026-01-01/#AfdelingII_HoofdstukP_Paragraaf3_ArtikelP17)
         let other_candidate_nomination = other_candidate_nomination(
             &preferential_candidate_nomination,
             candidate_votes,
-            list_seats as usize - preferential_candidate_nomination.len(),
+            non_assigned_seats,
         );
 
         // [Artikel P 19 Kieswet](https://wetten.overheid.nl/BWBR0004627/2026-01-01/#AfdelingII_HoofdstukP_Paragraaf3_ArtikelP19)
@@ -128,14 +127,14 @@ fn candidate_nomination_per_list(
             } else {
                 let updated_ranking = update_candidate_ranking(
                     preference_threshold,
-                    &candidate_votes_meeting_preference_threshold,
+                    candidate_votes_meeting_preference_threshold,
                     candidate_votes,
                 );
 
                 // If the updated candidate ranking is the same as the original candidate list,
                 // return an empty list, otherwise return the updated list
                 let original_ranking: Vec<CandidateNumber> =
-                    candidate_votes.iter().map(|cv| cv.number).collect();
+                    candidate_votes.iter().map(|cv| cv.number()).collect();
                 if updated_ranking == original_ranking {
                     vec![]
                 } else {
@@ -143,8 +142,8 @@ fn candidate_nomination_per_list(
                 }
             };
 
-        list_candidate_nomination.push(ListCandidateNomination {
-            list_number: list.number,
+        list_candidate_nomination.push(ListCandidateNomination::<T::Cv> {
+            list_number: list.number(),
             list_seats,
             preferential_candidate_nomination,
             other_candidate_nomination,
@@ -155,33 +154,34 @@ fn candidate_nomination_per_list(
 }
 
 /// List and sort the candidate votes whose votes meet the preference threshold
-fn candidate_votes_meeting_preference_threshold(
+fn candidate_votes_meeting_preference_threshold<T: CandidateVotesTrait>(
     preference_threshold: Fraction,
-    candidate_votes: &[CandidateVotes],
-) -> Vec<CandidateVotes> {
-    let mut candidates_meeting_preference_threshold: Vec<CandidateVotes> = candidate_votes
+    candidate_votes: &[T],
+) -> Vec<&T> {
+    let mut candidates_meeting_preference_threshold: Vec<&T> = candidate_votes
         .iter()
-        .filter(|candidate_votes| Fraction::from(candidate_votes.votes) >= preference_threshold)
-        .copied()
+        .filter(|candidate_votes| Fraction::from(candidate_votes.votes()) >= preference_threshold)
         .collect();
-    candidates_meeting_preference_threshold.sort_by(|a, b| b.votes.cmp(&a.votes));
+    candidates_meeting_preference_threshold.sort_by_key(|b| std::cmp::Reverse(b.votes()));
     candidates_meeting_preference_threshold
 }
 
 /// Create a vector containing just the candidate numbers from an iterator of candidate votes
-fn candidate_votes_numbers(candidate_votes: &[CandidateVotes]) -> Vec<u32> {
+fn candidate_votes_numbers<T: CandidateVotesTrait>(
+    candidate_votes: &Vec<&T>,
+) -> Vec<CandidateNumber> {
     candidate_votes
         .iter()
-        .map(|candidate| *candidate.number)
+        .map(|candidate| candidate.number())
         .collect()
 }
 
 /// List the other candidates nominated
-fn other_candidate_nomination(
-    preferential_candidate_nomination: &[CandidateVotes],
-    candidate_votes: &[CandidateVotes],
+fn other_candidate_nomination<'a, T: CandidateVotesTrait>(
+    preferential_candidate_nomination: &Vec<&T>,
+    candidate_votes: &'a [T],
     non_assigned_seats: usize,
-) -> Vec<CandidateVotes> {
+) -> Vec<&'a T> {
     if non_assigned_seats == 0 {
         return vec![];
     }
@@ -189,33 +189,31 @@ fn other_candidate_nomination(
     candidate_votes
         .iter()
         .filter(|candidate_votes| !preferential_candidate_nomination.contains(candidate_votes))
-        .copied()
         .take(non_assigned_seats)
         .collect()
 }
 
 /// List the candidates nominated with preferential votes
-fn preferential_candidate_nomination(
-    candidates_meeting_preference_threshold: &[CandidateVotes],
+fn preferential_candidate_nomination<'a, T: CandidateVotesTrait>(
+    candidates_meeting_preference_threshold: &Vec<&'a T>,
     list_seats: u32,
-) -> Result<Vec<CandidateVotes>, ApportionmentError> {
-    let mut preferential_candidate_nomination: Vec<CandidateVotes> = vec![];
+) -> Result<Vec<&'a T>, ApportionmentError> {
+    let mut preferential_candidate_nomination: Vec<&T> = vec![];
     if candidates_meeting_preference_threshold.len() <= list_seats as usize {
         preferential_candidate_nomination.extend(candidates_meeting_preference_threshold);
     } else {
         // Loop over non-assigned seats
         for (index, non_assigned_seats) in (1..=list_seats).rev().enumerate() {
             // List all candidates with the same number of votes that have not been nominated yet
-            let same_votes_candidates: Vec<CandidateVotes> =
-                candidates_meeting_preference_threshold
-                    .iter()
-                    .filter(|candidate_votes| {
-                        !preferential_candidate_nomination.contains(candidate_votes)
-                            && candidate_votes.votes
-                                == candidates_meeting_preference_threshold[index].votes
-                    })
-                    .copied()
-                    .collect();
+            let same_votes_candidates: Vec<&T> = candidates_meeting_preference_threshold
+                .iter()
+                .copied()
+                .filter(|candidate_votes| {
+                    !preferential_candidate_nomination.contains(candidate_votes)
+                        && candidate_votes.votes()
+                            == candidates_meeting_preference_threshold[index].votes()
+                })
+                .collect();
             // Check if we can actually nominate all these candidates, otherwise we would need to draw lots
             if same_votes_candidates.len() > non_assigned_seats as usize {
                 // TODO: #788 if multiple lists have the same largest remainder and not enough residual seats are available, use drawing of lots
@@ -236,23 +234,23 @@ fn preferential_candidate_nomination(
 
 /// Update the candidate list, moving the candidates meeting the preference threshold
 /// to the top of the list and keeping the ranking of the rest of candidates on the list the same
-fn update_candidate_ranking(
+fn update_candidate_ranking<T: CandidateVotesTrait>(
     preference_threshold: Fraction,
-    candidate_votes_meeting_preference_threshold: &[CandidateVotes],
-    candidate_votes: &[CandidateVotes],
+    candidate_votes_meeting_preference_threshold: Vec<&T>,
+    candidate_votes: &[T],
 ) -> Vec<CandidateNumber> {
     let mut updated_candidate_ranking: Vec<CandidateNumber> = vec![];
     // Add candidates meeting preference threshold to the top of the ranking
     for candidate_votes in candidate_votes_meeting_preference_threshold {
-        updated_candidate_ranking.push(candidate_votes.number);
+        updated_candidate_ranking.push(candidate_votes.number());
     }
 
     // Add the remaining candidates in the order of the original candidate list
     for candidate_votes in candidate_votes
         .iter()
-        .filter(|candidate_votes| Fraction::from(candidate_votes.votes) < preference_threshold)
+        .filter(|candidate_votes| Fraction::from(candidate_votes.votes()) < preference_threshold)
     {
-        updated_candidate_ranking.push(candidate_votes.number);
+        updated_candidate_ranking.push(candidate_votes.number());
     }
 
     updated_candidate_ranking
@@ -262,18 +260,22 @@ fn update_candidate_ranking(
 mod tests {
     use test_log::test;
 
+    use crate::test_helpers::seat_assignment_fixture_with_given_candidate_votes;
     use crate::{
-        ApportionmentError,
+        ApportionmentError, CandidateVotesTrait,
         candidate_nomination::{
             Candidate, ListCandidateNomination, candidate_nomination, candidate_votes_numbers,
         },
         fraction::Fraction,
-        structs::{CandidateVotes, ListNumber},
-        test_helpers::candidate_nomination_fixture_with_given_number_of_seats,
+        structs::ListNumber,
+        test_helpers::{
+            ApportionmentInputMock, CandidateVotesMock,
+            candidate_nomination_fixture_with_given_number_of_seats,
+        },
     };
 
-    fn check_list_candidate_nomination(
-        nomination: &ListCandidateNomination,
+    fn check_list_candidate_nomination<T: CandidateVotesTrait>(
+        nomination: &ListCandidateNomination<T>,
         expected_preferential_nomination: &[u32],
         expected_other_nomination: &[u32],
         expected_updated_ranking: &[u32],
@@ -288,25 +290,21 @@ mod tests {
         );
 
         assert_eq!(
-            nomination
-                .updated_candidate_ranking
-                .iter()
-                .map(|n| **n)
-                .collect::<Vec<u32>>(),
+            nomination.updated_candidate_ranking.to_vec(),
             expected_updated_ranking
         );
     }
 
-    fn check_chosen_candidates(
+    fn check_chosen_candidates<T: CandidateVotesTrait>(
         chosen_candidates: &[Candidate],
         list_number: &ListNumber,
-        expected_chosen_candidates: &[CandidateVotes],
-        expected_not_chosen_candidates: &[CandidateVotes],
+        expected_chosen_candidates: &[T],
+        expected_not_chosen_candidates: &[T],
     ) {
         assert!(expected_chosen_candidates.iter().all(|expected_candidate| {
             chosen_candidates.iter().any(|chosen_candidate| {
                 chosen_candidate.list_number == *list_number
-                    && chosen_candidate.candidate_number == expected_candidate.number
+                    && chosen_candidate.candidate_number == expected_candidate.number()
             })
         }));
         assert!(
@@ -315,31 +313,34 @@ mod tests {
                 .all(|expected_candidate| {
                     !chosen_candidates.iter().any(|chosen_candidate| {
                         chosen_candidate.list_number == *list_number
-                            && chosen_candidate.candidate_number == expected_candidate.number
+                            && chosen_candidate.candidate_number == expected_candidate.number()
                     })
                 })
         );
     }
 
-    fn get_chosen_and_not_chosen_candidates_for_a_list(
-        list_candidates: &[CandidateVotes],
+    fn get_chosen_and_not_chosen_candidates_for_a_list<T: CandidateVotesTrait + Clone>(
+        list_candidates: &[T],
         list_preferential_nominated_candidate_numbers: &[u32],
         list_other_nominated_candidate_numbers: &[u32],
-    ) -> (Vec<CandidateVotes>, Vec<CandidateVotes>) {
-        let list_0_chosen_candidates: Vec<CandidateVotes> = list_candidates
+    ) -> (Vec<T>, Vec<T>) {
+        let nominated_numbers: Vec<&u32> = list_preferential_nominated_candidate_numbers
             .iter()
-            .filter(|&c| {
-                list_preferential_nominated_candidate_numbers.contains(&c.number)
-                    || list_other_nominated_candidate_numbers.contains(&c.number)
-            })
+            .chain(list_other_nominated_candidate_numbers)
+            .collect();
+
+        // TODO: Using clones, but it is testcode. Could be improved.
+        let chosen_candidates: Vec<T> = list_candidates
+            .iter()
+            .filter(|c| nominated_numbers.iter().any(|&&n| c.number() == n))
             .cloned()
             .collect();
-        let list_0_not_chosen_candidates: Vec<CandidateVotes> = list_candidates
+        let not_chosen_candidates: Vec<T> = list_candidates
             .iter()
-            .filter(|&c| !list_0_chosen_candidates.contains(c))
+            .filter(|c| !nominated_numbers.iter().any(|&&n| c.number() == n))
             .cloned()
             .collect();
-        (list_0_chosen_candidates, list_0_not_chosen_candidates)
+        (chosen_candidates, not_chosen_candidates)
     }
 
     /// Candidate nomination with ranking change due to preferential candidate nomination
@@ -354,8 +355,7 @@ mod tests {
     #[test]
     fn test_with_lt_19_seats_and_preferential_candidate_nomination_and_updated_candidate_ranking() {
         let quota = Fraction::new(5104, 15);
-        let input = candidate_nomination_fixture_with_given_number_of_seats(
-            quota,
+        let seat_assignment_input = seat_assignment_fixture_with_given_candidate_votes(
             15,
             vec![
                 vec![1069, 303, 321, 210, 36, 101, 79, 121, 150, 149, 15, 17],
@@ -366,9 +366,13 @@ mod tests {
                 vec![347, 33, 14, 82, 30, 30],
                 vec![266, 36, 39, 36, 38, 38],
             ],
+        );
+        let input = candidate_nomination_fixture_with_given_number_of_seats(
+            quota,
+            &seat_assignment_input,
             vec![8, 3, 2, 1, 1],
         );
-        let result = candidate_nomination(input.clone()).unwrap();
+        let result = candidate_nomination::<ApportionmentInputMock>(&input).unwrap();
 
         assert_eq!(result.preference_threshold.percentage, 50);
         assert_eq!(
@@ -430,8 +434,7 @@ mod tests {
     #[test]
     fn test_with_lt_19_seats_and_no_preferential_candidate_nomination() {
         let quota = Fraction::new(105, 5);
-        let input = candidate_nomination_fixture_with_given_number_of_seats(
-            quota,
+        let seat_assignment_input = seat_assignment_fixture_with_given_candidate_votes(
             5,
             vec![
                 vec![5, 4, 4, 4, 4],
@@ -440,9 +443,13 @@ mod tests {
                 vec![4, 4, 4, 5, 4],
                 vec![4, 4, 4, 4, 5],
             ],
+        );
+        let input = candidate_nomination_fixture_with_given_number_of_seats(
+            quota,
+            &seat_assignment_input,
             vec![1, 1, 1, 1, 1],
         );
-        let result = candidate_nomination(input.clone()).unwrap();
+        let result = candidate_nomination::<ApportionmentInputMock>(&input).unwrap();
 
         assert_eq!(result.preference_threshold.percentage, 50);
         assert_eq!(
@@ -497,17 +504,20 @@ mod tests {
     #[test]
     fn test_with_lt_19_seats_and_candidate_votes_meeting_preference_threshold_but_no_seat() {
         let quota = Fraction::new(570, 18);
-        let input = candidate_nomination_fixture_with_given_number_of_seats(
-            quota,
+        let seat_assignment_input = seat_assignment_fixture_with_given_candidate_votes(
             18,
             vec![
                 vec![80, 70, 60, 50, 40, 30, 20, 0, 0, 0, 0, 0],
                 vec![80, 60, 40, 20, 4, 0, 0],
                 vec![0, 0, 0, 0, 16],
             ],
+        );
+        let input = candidate_nomination_fixture_with_given_number_of_seats(
+            quota,
+            &seat_assignment_input,
             vec![11, 7, 0],
         );
-        let result = candidate_nomination(input.clone()).unwrap();
+        let result = candidate_nomination::<ApportionmentInputMock>(&input).unwrap();
 
         assert_eq!(result.preference_threshold.percentage, 50);
         assert_eq!(
@@ -546,7 +556,12 @@ mod tests {
             &lists[1].candidate_votes[..7],
             &[],
         );
-        check_chosen_candidates(&result.chosen_candidates, &lists[2].number, &[], &[]);
+        check_chosen_candidates::<CandidateVotesMock>(
+            &result.chosen_candidates,
+            &lists[2].number,
+            &[],
+            &[],
+        );
     }
 
     /// Candidate nomination with candidate votes meeting preference threshold but no seat
@@ -560,8 +575,7 @@ mod tests {
     #[test]
     fn test_with_gte_19_seats_and_candidate_votes_meeting_preference_threshold_but_no_seat() {
         let quota = Fraction::new(960, 19);
-        let input = candidate_nomination_fixture_with_given_number_of_seats(
-            quota,
+        let seat_assignment_input = seat_assignment_fixture_with_given_candidate_votes(
             19,
             vec![
                 vec![80, 70, 60, 50, 40, 0],
@@ -570,9 +584,13 @@ mod tests {
                 vec![80, 40, 0, 0, 0],
                 vec![0, 0, 0, 0, 15],
             ],
+        );
+        let input = candidate_nomination_fixture_with_given_number_of_seats(
+            quota,
+            &seat_assignment_input,
             vec![6, 6, 5, 2, 0],
         );
-        let result = candidate_nomination(input.clone()).unwrap();
+        let result = candidate_nomination::<ApportionmentInputMock>(&input).unwrap();
 
         assert_eq!(result.preference_threshold.percentage, 25);
         assert_eq!(
@@ -648,8 +666,7 @@ mod tests {
     #[test]
     fn test_with_ge_19_seats_and_more_candidates_eligible_for_preferential_nomination_than_seats() {
         let quota = Fraction::new(9500, 19);
-        let input = candidate_nomination_fixture_with_given_number_of_seats(
-            quota,
+        let seat_assignment_input = seat_assignment_fixture_with_given_candidate_votes(
             19,
             vec![
                 vec![500, 0, 500, 500, 500, 500, 500],
@@ -658,9 +675,13 @@ mod tests {
                 vec![200, 200, 199, 198, 0, 197, 196],
                 vec![200, 200, 199, 198, 198, 0, 119],
             ],
+        );
+        let input = candidate_nomination_fixture_with_given_number_of_seats(
+            quota,
+            &seat_assignment_input,
             vec![6, 5, 4, 2, 2],
         );
-        let result = candidate_nomination(input.clone()).unwrap();
+        let result = candidate_nomination::<ApportionmentInputMock>(&input).unwrap();
 
         assert_eq!(result.preference_threshold.percentage, 25);
         assert_eq!(
@@ -722,8 +743,8 @@ mod tests {
         check_chosen_candidates(
             &result.chosen_candidates,
             &lists[0].number,
-            &list_0_chosen_candidates,
-            &list_0_not_chosen_candidates,
+            list_0_chosen_candidates.as_slice(),
+            list_0_not_chosen_candidates.as_slice(),
         );
 
         let (list_1_chosen_candidates, list_1_not_chosen_candidates) =
@@ -787,8 +808,7 @@ mod tests {
     #[test]
     fn test_with_drawing_of_lots_error() {
         let quota = Fraction::new(9600, 19);
-        let input = candidate_nomination_fixture_with_given_number_of_seats(
-            quota,
+        let seat_assignment_input = seat_assignment_fixture_with_given_candidate_votes(
             19,
             vec![
                 vec![500, 500, 500, 500, 500, 500],
@@ -797,9 +817,13 @@ mod tests {
                 vec![200, 200, 200, 200, 200, 200],
                 vec![200, 200, 200, 200, 200, 200],
             ],
+        );
+        let input = candidate_nomination_fixture_with_given_number_of_seats(
+            quota,
+            &seat_assignment_input,
             vec![6, 5, 4, 2, 2],
         );
-        let result = candidate_nomination(input.clone());
+        let result = candidate_nomination::<ApportionmentInputMock>(&input);
 
         assert_eq!(result, Err(ApportionmentError::DrawingOfLotsNotImplemented));
     }

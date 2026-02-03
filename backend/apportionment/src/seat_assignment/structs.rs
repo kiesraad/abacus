@@ -1,9 +1,6 @@
+use super::{super::structs::ListNumber, Fraction};
+use crate::ListVotesTrait;
 use tracing::{debug, info};
-
-use super::{
-    super::structs::{ListNumber, ListVotes},
-    Fraction,
-};
 
 /// The result of the seat assignment procedure. This contains the number of seats and the quota
 /// that was used. It then contains the initial standing after full seats were assigned,
@@ -75,8 +72,8 @@ pub struct ListStanding {
 impl ListStanding {
     /// Create a new instance computing the whole number of seats that
     /// were assigned to a list.
-    pub(crate) fn new(list: &ListVotes, quota: Fraction) -> Self {
-        let votes_cast = Fraction::from(list.list_votes);
+    pub(crate) fn new<T: ListVotesTrait>(list: &T, quota: Fraction) -> Self {
+        let votes_cast = Fraction::from(list.total_votes());
         let list_seats = if votes_cast > Fraction::ZERO {
             u32::try_from((votes_cast / quota).integer_part()).expect("list_seats fit in u32")
         } else {
@@ -87,11 +84,12 @@ impl ListStanding {
 
         debug!(
             "List {} has {list_seats} full seats with {} votes",
-            *list.number, list.list_votes
+            list.number(),
+            list.total_votes()
         );
         ListStanding {
-            list_number: list.number,
-            votes_cast: list.list_votes.into(),
+            list_number: list.number(),
+            votes_cast: list.total_votes().into(),
             remainder_votes,
             meets_remainder_threshold: votes_cast >= quota * Fraction::new(3, 4),
             next_votes_per_seat: votes_cast / Fraction::from(list_seats + 1),
@@ -102,7 +100,7 @@ impl ListStanding {
 
     /// Add a residual seat to the list and return the updated instance
     pub fn add_residual_seat(self) -> Self {
-        info!("Adding residual seat to list {}", *self.list_number);
+        info!("Adding residual seat to list {}", self.list_number);
         ListStanding {
             residual_seats: self.residual_seats + 1,
             next_votes_per_seat: Fraction::from(self.votes_cast)

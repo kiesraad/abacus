@@ -15,13 +15,15 @@ pub use self::{
 use self::{
     candidate_nomination::candidate_nomination,
     seat_assignment::seat_assignment,
-    structs::{ApportionmentOutput, CandidateNominationInput, SeatAssignmentInput},
+    structs::{ApportionmentOutput, as_candidate_nomination_input},
 };
 
-pub fn process(input: impl ApportionmentInput) -> Result<ApportionmentOutput, ApportionmentError> {
-    let seat_assignment = seat_assignment(SeatAssignmentInput::new(&input))?;
-    let candidate_nomination =
-        candidate_nomination(CandidateNominationInput::new(&input, &seat_assignment))?;
+pub fn process<T: ApportionmentInput>(
+    input: &T,
+) -> Result<ApportionmentOutput<'_, T::List>, ApportionmentError> {
+    let seat_assignment = seat_assignment(input)?;
+    let candidate_nomination_input = as_candidate_nomination_input(input, &seat_assignment);
+    let candidate_nomination = candidate_nomination::<T>(&candidate_nomination_input)?;
 
     Ok(ApportionmentOutput {
         seat_assignment,

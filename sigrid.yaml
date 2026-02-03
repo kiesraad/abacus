@@ -20,6 +20,7 @@ components:
   - { include: [ ".*/backend/src/api/election.rs" ], name: "backend/src/api/election" }
   - { include: [ ".*/backend/src/api/investigation.rs" ], name: "backend/src/api/investigation" }
   - { include: [ ".*/backend/src/api/polling_station.rs" ], name: "backend/src/api/polling_station" }
+  - { include: [ ".*/backend/src/api/providers.rs" ], name: "backend/src/api/providers" }
   - { include: [ ".*/backend/src/api/report.rs" ], name: "backend/src/api/report" }
   - { include: [ ".*/backend/src/api/user.rs" ], name: "backend/src/api/user" }
 

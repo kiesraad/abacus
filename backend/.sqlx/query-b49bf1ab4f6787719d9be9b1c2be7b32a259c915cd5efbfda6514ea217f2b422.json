@@ -1,0 +1,38 @@
+{
+  "db_name": "SQLite",
+  "query": "\n        SELECT\n            psi.polling_station_id as \"polling_station_id: PollingStationId\",\n            psi.reason,\n            psi.findings,\n            psi.corrected_results as \"corrected_results: bool\"\n        FROM polling_station_investigations psi\n        JOIN polling_stations ps ON ps.id = psi.polling_station_id\n        WHERE ps.committee_session_id = ?\n        ",
+  "describe": {
+    "columns": [
+      {
+        "name": "polling_station_id: PollingStationId",
+        "ordinal": 0,
+        "type_info": "Integer"
+      },
+      {
+        "name": "reason",
+        "ordinal": 1,
+        "type_info": "Text"
+      },
+      {
+        "name": "findings",
+        "ordinal": 2,
+        "type_info": "Text"
+      },
+      {
+        "name": "corrected_results: bool",
+        "ordinal": 3,
+        "type_info": "Integer"
+      }
+    ],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": [
+      false,
+      false,
+      true,
+      true
+    ]
+  },
+  "hash": "b49bf1ab4f6787719d9be9b1c2be7b32a259c915cd5efbfda6514ea217f2b422"
+}

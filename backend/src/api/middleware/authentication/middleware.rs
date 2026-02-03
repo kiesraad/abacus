@@ -6,6 +6,7 @@ use axum::{
     response::Response,
 };
 use chrono::Utc;
+use serde::Serialize;
 use sqlx::SqlitePool;
 use tracing::{debug, error, info};
 
@@ -17,6 +18,7 @@ use crate::{
     repository::user_repo::{self, User},
 };
 
+#[derive(Serialize)]
 struct UserSessionExtended;
 as_audit_event!(UserSessionExtended, AuditEventType::UserSessionExtended);
 
@@ -85,7 +87,7 @@ pub async fn extend_session(
                 Ok(session) => {
                     let _ = audit_service
                         .with_user(user.clone())
-                        .log(&mut tx, UserSessionExtended, None)
+                        .log(&mut tx, &UserSessionExtended, None)
                         .await;
                     if let Err(err) = tx.commit().await {
                         error!("Failed to commit transaction: {:?}", err);

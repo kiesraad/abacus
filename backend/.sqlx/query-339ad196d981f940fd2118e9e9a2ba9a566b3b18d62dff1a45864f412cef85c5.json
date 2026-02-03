@@ -1,0 +1,68 @@
+{
+  "db_name": "SQLite",
+  "query": "\n        SELECT\n            prev.id as \"id: CommitteeSessionId\",\n            prev.number as \"number: u32\",\n            prev.election_id as \"election_id: ElectionId\",\n            prev.status as \"status: _\",\n            prev.location,\n            prev.start_date_time as \"start_date_time: _\",\n            prev.results_eml as \"results_eml: _\",\n            prev.results_pdf as \"results_pdf: _\",\n            prev.overview_pdf as \"overview_pdf: _\"\n        FROM committee_sessions AS c\n        JOIN committee_sessions AS prev ON c.election_id = prev.election_id AND c.number = prev.number + 1\n        WHERE c.id = ?\n        ",
+  "describe": {
+    "columns": [
+      {
+        "name": "id: CommitteeSessionId",
+        "ordinal": 0,
+        "type_info": "Integer"
+      },
+      {
+        "name": "number: u32",
+        "ordinal": 1,
+        "type_info": "Integer"
+      },
+      {
+        "name": "election_id: ElectionId",
+        "ordinal": 2,
+        "type_info": "Integer"
+      },
+      {
+        "name": "status: _",
+        "ordinal": 3,
+        "type_info": "Text"
+      },
+      {
+        "name": "location",
+        "ordinal": 4,
+        "type_info": "Text"
+      },
+      {
+        "name": "start_date_time: _",
+        "ordinal": 5,
+        "type_info": "Text"
+      },
+      {
+        "name": "results_eml: _",
+        "ordinal": 6,
+        "type_info": "Integer"
+      },
+      {
+        "name": "results_pdf: _",
+        "ordinal": 7,
+        "type_info": "Integer"
+      },
+      {
+        "name": "overview_pdf: _",
+        "ordinal": 8,
+        "type_info": "Integer"
+      }
+    ],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      false,
+      true,
+      true,
+      true,
+      true
+    ]
+  },
+  "hash": "339ad196d981f940fd2118e9e9a2ba9a566b3b18d62dff1a45864f412cef85c5"
+}

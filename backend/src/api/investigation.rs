@@ -1,6 +1,7 @@
 use axum::{Json, extract::State, http::StatusCode};
 use axum_extra::response::Attachment;
 use chrono::Datelike;
+use serde::Serialize;
 use sqlx::{SqliteConnection, SqlitePool};
 use utoipa_axum::{router::OpenApiRouter, routes};
 
@@ -9,7 +10,7 @@ use crate::{
     api::{
         committee_session::CommitteeSessionError,
         data_entry::delete_data_entry_and_result_for_polling_station,
-        middleware::authentication::Coordinator, polling_station::PollingStationImportDetails,
+        middleware::authentication::Coordinator,
     },
     domain::{
         committee_session::CommitteeSession,
@@ -27,7 +28,7 @@ use crate::{
     },
     error::ErrorReference,
     infra::{
-        audit_log::{AsAuditEvent, AuditEvent, AuditService, as_audit_event},
+        audit_log::{AsAuditEvent, AuditEvent, AuditEventType, AuditService, as_audit_event},
         pdf_gen::generate_pdf,
     },
     repository::{
@@ -43,31 +44,30 @@ use crate::{
     },
 };
 
+#[derive(Serialize)]
 struct PollingStationInvestigationCreated(pub PollingStationInvestigation);
+#[derive(Serialize)]
 struct PollingStationInvestigationUpdated(pub PollingStationInvestigation);
+#[derive(Serialize)]
 struct PollingStationInvestigationDeleted(pub PollingStationInvestigation);
+#[derive(Serialize)]
 struct PollingStationInvestigationConcluded(pub PollingStationInvestigation);
-struct PollingStationInvestigationImported(pub PollingStationImportDetails);
 
 as_audit_event!(
     PollingStationInvestigationCreated,
-    AuditEvent::PollingStationInvestigationCreated
+    AuditEventType::PollingStationInvestigationCreated
 );
 as_audit_event!(
     PollingStationInvestigationUpdated,
-    AuditEvent::PollingStationInvestigationUpdated
+    AuditEventType::PollingStationInvestigationUpdated
 );
 as_audit_event!(
     PollingStationInvestigationDeleted,
-    AuditEvent::PollingStationInvestigationDeleted
-);
-as_audit_event!(
-    PollingStationInvestigationImported,
-    AuditEvent::PollingStationInvestigationImported
+    AuditEventType::PollingStationInvestigationDeleted
 );
 as_audit_event!(
     PollingStationInvestigationConcluded,
-    AuditEvent::PollingStationInvestigationConcluded
+    AuditEventType::PollingStationInvestigationConcluded
 );
 
 pub fn router() -> OpenApiRouter<AppState> {
@@ -114,7 +114,7 @@ pub async fn delete_investigation_for_polling_station(
         audit_service
             .log(
                 conn,
-                PollingStationInvestigationDeleted(investigation),
+                &PollingStationInvestigationDeleted(investigation),
                 None,
             )
             .await?;
@@ -171,7 +171,7 @@ async fn polling_station_investigation_create(
     audit_service
         .log(
             &mut tx,
-            PollingStationInvestigationCreated(investigation.clone()),
+            &PollingStationInvestigationCreated(investigation.clone()),
             None,
         )
         .await?;
@@ -247,7 +247,7 @@ async fn polling_station_investigation_conclude(
     audit_service
         .log(
             &mut tx,
-            PollingStationInvestigationConcluded(investigation.clone()),
+            &PollingStationInvestigationConcluded(investigation.clone()),
             None,
         )
         .await?;
@@ -286,7 +286,7 @@ async fn update_investigation(
     audit_service
         .log(
             conn,
-            PollingStationInvestigationUpdated(investigation.clone()),
+            &PollingStationInvestigationUpdated(investigation.clone()),
             None,
         )
         .await?;

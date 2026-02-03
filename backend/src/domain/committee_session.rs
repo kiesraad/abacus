@@ -69,8 +69,11 @@ pub struct CommitteeSessionDetails {
     pub session_overview_pdf: Option<FileId>,
 }
 
+#[derive(Serialize)]
 pub struct CommitteeSessionCreated(pub CommitteeSession);
+#[derive(Serialize)]
 pub struct CommitteeSessionUpdated(pub CommitteeSession);
+#[derive(Serialize)]
 pub struct CommitteeSessionDeleted(pub CommitteeSession);
 
 as_audit_event!(

@@ -78,7 +78,7 @@ pub async fn create_committee_session(
     audit_service
         .log(
             conn,
-            CommitteeSessionCreated(committee_session.clone()),
+            &CommitteeSessionCreated(committee_session.clone()),
             None,
         )
         .await?;
@@ -174,7 +174,7 @@ pub async fn committee_session_delete(
         audit_service
             .log(
                 &mut tx,
-                CommitteeSessionDeleted(committee_session.clone()),
+                &CommitteeSessionDeleted(committee_session.clone()),
                 None,
             )
             .await?;
@@ -248,7 +248,7 @@ pub async fn committee_session_update(
     audit_service
         .log(
             &mut tx,
-            CommitteeSessionUpdated(committee_session.clone()),
+            &CommitteeSessionUpdated(committee_session.clone()),
             None,
         )
         .await?;

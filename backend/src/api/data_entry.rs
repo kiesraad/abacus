@@ -97,32 +97,19 @@ pub struct ResultDetails {
     pub created_at: DateTime<Utc>,
 }
 
+#[derive(Serialize)]
 struct DataEntryStarted(pub DataEntryDetails);
+#[derive(Serialize)]
 struct DataEntrySaved(pub DataEntryDetails);
+#[derive(Serialize)]
 struct DataEntryResumed(pub DataEntryDetails);
+#[derive(Serialize)]
 struct DataEntryDeleted(pub DataEntryDetails);
+#[derive(Serialize)]
 struct DataEntryFinalised(pub DataEntryDetails);
+#[derive(Serialize)]
 struct ResultDeleted(pub ResultDetails);
-struct DataEntryDiscardedFirst(pub DataEntryDetails);
-struct DataEntryReturnedFirst(pub DataEntryDetails);
-struct DataEntryKeptFirst(pub DataEntryDetails);
-struct DataEntryKeptSecond(pub DataEntryDetails);
-struct DataEntryDiscardedBoth(pub DataEntryDetails);
 
-as_audit_event!(
-    DataEntryDiscardedFirst,
-    AuditEventType::DataEntryDiscardedFirst
-);
-as_audit_event!(
-    DataEntryReturnedFirst,
-    AuditEventType::DataEntryReturnedFirst
-);
-as_audit_event!(DataEntryKeptFirst, AuditEventType::DataEntryKeptFirst);
-as_audit_event!(DataEntryKeptSecond, AuditEventType::DataEntryKeptSecond);
-as_audit_event!(
-    DataEntryDiscardedBoth,
-    AuditEventType::DataEntryDiscardedBoth
-);
 as_audit_event!(DataEntryStarted, AuditEventType::DataEntryStarted);
 as_audit_event!(DataEntrySaved, AuditEventType::DataEntrySaved);
 as_audit_event!(DataEntryResumed, AuditEventType::DataEntryResumed);
@@ -228,12 +215,12 @@ pub async fn delete_data_entry_and_result_for_polling_station(
 ) -> Result<(), APIError> {
     if let Some(data_entry) = delete_data_entry(conn, polling_station_id).await? {
         audit_service
-            .log(conn, DataEntryDeleted(data_entry.into()), None)
+            .log(conn, &DataEntryDeleted(data_entry.into()), None)
             .await?;
     }
     if let Some(result) = delete_result(conn, polling_station_id).await? {
         audit_service
-            .log(conn, ResultDeleted(result.into()), None)
+            .log(conn, &ResultDeleted(result.into()), None)
             .await?;
         if committee_session.status == CommitteeSessionStatus::Completed {
             change_committee_session_status(
@@ -370,12 +357,12 @@ async fn polling_station_data_entry_claim(
     match state {
         DataEntryStatus::Empty | DataEntryStatus::FirstEntryFinalised(_) => {
             audit_service
-                .log(&mut tx, DataEntryStarted(data_entry.into()), None)
+                .log(&mut tx, &DataEntryStarted(data_entry.into()), None)
                 .await?;
         }
         _ => {
             audit_service
-                .log(&mut tx, DataEntryResumed(data_entry.into()), None)
+                .log(&mut tx, &DataEntryResumed(data_entry.into()), None)
                 .await?;
         }
     }
@@ -480,7 +467,7 @@ async fn polling_station_data_entry_save(
     let data_entry = get_data_entry(&mut tx, polling_station_id, committee_session.id).await?;
 
     audit_service
-        .log(&mut tx, DataEntrySaved(data_entry.into()), None)
+        .log(&mut tx, &DataEntrySaved(data_entry.into()), None)
         .await?;
 
     tx.commit().await?;
@@ -542,7 +529,7 @@ async fn polling_station_data_entry_delete(
     }
 
     audit_service
-        .log(&mut tx, DataEntryDeleted(data_entry.into()), None)
+        .log(&mut tx, &DataEntryDeleted(data_entry.into()), None)
         .await?;
 
     tx.commit().await?;
@@ -627,7 +614,11 @@ async fn polling_station_data_entry_finalise(
     let data_entry = get_data_entry(&mut tx, polling_station_id, committee_session.id).await?;
 
     audit_service
-        .log(&mut tx, DataEntryFinalised(data_entry.clone().into()), None)
+        .log(
+            &mut tx,
+            &DataEntryFinalised(data_entry.clone().into()),
+            None,
+        )
         .await?;
 
     tx.commit().await?;
@@ -858,7 +849,7 @@ async fn polling_station_data_entry_resolve_errors(
         let data = serde_json::to_value(DataEntryDetails::from(data_entry))?;
 
         audit_service
-            .log(&mut tx, AuditEvent { event_type, data }, None)
+            .log(&mut tx, &AuditEvent { event_type, data }, None)
             .await?;
     }
 
@@ -986,7 +977,7 @@ async fn polling_station_data_entry_resolve_differences(
         let data = serde_json::to_value(DataEntryDetails::from(data_entry.clone()))?;
 
         audit_service
-            .log(&mut tx, AuditEvent { event_type, data }, None)
+            .log(&mut tx, &AuditEvent { event_type, data }, None)
             .await?;
     }
 
@@ -1078,7 +1069,7 @@ mod tests {
         domain::{
             committee_session::CommitteeSessionId,
             committee_session_status::CommitteeSessionStatus,
-            data_entry::tests::example_polling_station_results,
+            data_entry::{PollingStationDataEntry, tests::example_polling_station_results},
             validation::{ValidationResult, ValidationResultCode},
         },
         repository::{

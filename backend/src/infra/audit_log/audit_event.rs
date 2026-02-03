@@ -1,11 +1,44 @@
 use axum::http::Uri;
 use serde::{self, Deserialize, Serialize};
+use serde_json::json;
 use strum::VariantNames;
 use utoipa::ToSchema;
 
 use super::AuditEventLevel;
 use crate::{ErrorResponse, error::ErrorReference};
 
+#[derive(Debug, Serialize, Clone)]
+pub struct AuditEvent {
+    pub event_type: AuditEventType,
+    pub data: serde_json::Value,
+}
+
+pub trait AsAuditEvent {
+    fn as_audit_event(&self) -> AuditEvent;
+}
+
+impl AsAuditEvent for AuditEvent {
+    fn as_audit_event(&self) -> AuditEvent {
+        self.clone()
+    }
+}
+
+macro_rules! as_audit_event {
+    ($identifier:ident, $audit_event_type:path) => {
+        impl AsAuditEvent for $identifier {
+            fn as_audit_event(&self) -> crate::audit_log::AuditEvent {
+                AuditEvent {
+                    event_type: $audit_event_type,
+                    data: serde_json::to_value(self).expect("could not serialize to JSON"),
+                }
+            }
+        }
+    };
+}
+
+pub(crate) use as_audit_event;
+
+/// Generic error type
 #[derive(Serialize, Deserialize, Debug, PartialEq, Eq, ToSchema)]
 #[serde(deny_unknown_fields)]
 pub struct ErrorDetails {
@@ -34,46 +67,34 @@ impl ErrorDetails {
 
 impl AsAuditEvent for ErrorDetails {
     fn as_audit_event(&self) -> AuditEvent {
+        let event_type = match self.level {
+            AuditEventLevel::Info => AuditEventType::Info,
+            AuditEventLevel::Success => AuditEventType::Success,
+            AuditEventLevel::Warning => AuditEventType::Warning,
+            AuditEventLevel::Error => AuditEventType::Error,
+        };
+
         AuditEvent {
-            event_type: AuditEventType::Error,
-            data: serde_json::to_value(self.0),
+            event_type,
+            data: json!({
+                "reference": self.reference,
+                "path": self.path,
+            }),
         }
     }
 }
-
-#[derive(Serialize)]
-pub struct AuditEvent {
-    pub event_type: AuditEventType,
-    pub data: serde_json::Value,
-}
-
-pub trait AsAuditEvent {
-    fn as_audit_event(&self) -> AuditEvent;
-}
-
-impl AsAuditEvent for AuditEvent {
-    fn as_audit_event(&self) -> AuditEvent {
-        *self
-    }
-}
-
-macro_rules! as_audit_event {
-    ($identifier:ident, $audit_event_type:path) => {
-        impl AsAuditEvent for $identifier {
-            fn as_audit_event(&self) -> crate::audit_log::AuditEvent {
-                AuditEvent {
-                    event_type: $audit_event_type,
-                    data: serde_json::to_value(self).expect("could not serialize to JSON"),
-                }
-            }
-        }
-    };
-}
-
-pub(crate) use as_audit_event;
 
 #[derive(
-    Serialize, Deserialize, strum::Display, VariantNames, Debug, PartialEq, Eq, ToSchema, Default,
+    Clone,
+    Serialize,
+    Deserialize,
+    strum::Display,
+    VariantNames,
+    Debug,
+    PartialEq,
+    Eq,
+    ToSchema,
+    Default,
 )]
 #[serde(rename_all = "PascalCase", tag = "event_type")]
 pub enum AuditEventType {
@@ -124,17 +145,15 @@ pub enum AuditEventType {
     AirGapViolationDetected,
     AirGapViolationResolved,
     // system events
-    ApplicationStarted(ApplicationStartedDetails),
-    // api errors
+    ApplicationStarted,
+    // generic errors (one for each severity level)
+    Success,
+    Info,
+    Warning,
     Error,
+
     #[default]
     UnknownEvent,
-}
-
-#[derive(Serialize, Deserialize, Debug, PartialEq, Eq, ToSchema)]
-pub struct ApplicationStartedDetails {
-    pub version: String,
-    pub commit: String,
 }
 
 impl From<serde_json::Value> for AuditEventType {
@@ -181,8 +200,7 @@ impl AuditEventType {
             AuditEventType::DataEntryDeleted => AuditEventLevel::Info,
             AuditEventType::DataEntryFinalised => AuditEventLevel::Success,
             AuditEventType::ResultDeleted => AuditEventLevel::Success,
-            AuditEventType::ApplicationStarted(_) => AuditEventLevel::Info,
-            AuditEventType::Error => todo!(),
+            AuditEventType::ApplicationStarted => AuditEventLevel::Info,
             AuditEventType::UnknownEvent => AuditEventLevel::Warning,
             AuditEventType::DataEntryDiscardedFirst => AuditEventLevel::Info,
             AuditEventType::DataEntryReturnedFirst => AuditEventLevel::Info,
@@ -191,6 +209,10 @@ impl AuditEventType {
             AuditEventType::DataEntryDiscardedBoth => AuditEventLevel::Info,
             AuditEventType::AirGapViolationDetected => AuditEventLevel::Error,
             AuditEventType::AirGapViolationResolved => AuditEventLevel::Info,
+            AuditEventType::Warning => AuditEventLevel::Warning,
+            AuditEventType::Error => AuditEventLevel::Error,
+            AuditEventType::Info => AuditEventLevel::Info,
+            AuditEventType::Success => AuditEventLevel::Success,
         }
     }
 }

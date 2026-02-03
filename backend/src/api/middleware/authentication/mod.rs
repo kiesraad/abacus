@@ -45,6 +45,7 @@ mod tests {
         Method,
         header::{CONTENT_TYPE, COOKIE, USER_AGENT},
     };
+    use serde_json::json;
     use sqlx::SqlitePool;
     use test_log::test;
     use tower::ServiceExt;
@@ -55,10 +56,7 @@ mod tests {
         api::{authentication::*, user::*},
         domain::role::Role,
         error::ErrorReference,
-        infra::{
-            airgap::AirgapDetection,
-            audit_log::{AuditEvent, LogFilter, UserLoginFailedDetails},
-        },
+        infra::{airgap::AirgapDetection, audit_log::LogFilter},
         repository::user_repo::{self, User, UserId},
     };
 
@@ -181,10 +179,10 @@ mod tests {
 
         assert_eq!(events.len(), 1);
         assert_eq!(
-            events[0].event(),
-            &AuditEventType::UserLoginFailed(UserLoginFailedDetails {
-                username: "admin".to_string(),
-                user_agent: TEST_USER_AGENT.to_string(),
+            *events[0].event(),
+            json!({
+                "username": "admin".to_string(),
+                "user_agent": TEST_USER_AGENT.to_string(),
             })
         );
     }

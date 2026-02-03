@@ -131,11 +131,7 @@ pub async fn change_committee_session_status(
     let committee_session = change_status(&mut tx, committee_session_id, new_status).await?;
 
     audit_service
-        .log(
-            &mut tx,
-            CommitteeSessionUpdated(committee_session.into()),
-            None,
-        )
+        .log(&mut tx, &CommitteeSessionUpdated(committee_session), None)
         .await?;
 
     tx.commit().await?;

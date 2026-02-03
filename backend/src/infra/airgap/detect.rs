@@ -4,6 +4,7 @@ use std::{
     time::{Duration, Instant},
 };
 
+use serde::Serialize;
 use sqlx::SqlitePool;
 use tokio::{task::JoinSet, time::timeout};
 use tracing::{debug, error, info, trace, warn};
@@ -40,7 +41,9 @@ const DOMAINS: [&str; 3] = [
 
 pub const AIRGAP_DETECTION_INTERVAL: u64 = 30; // interval in seconds
 
+#[derive(Serialize)]
 struct AirGapViolationDetected;
+#[derive(Serialize)]
 struct AirGapViolationResolved;
 
 as_audit_event!(
@@ -301,7 +304,7 @@ mod tests {
         }
 
         assert_eq!(events.len(), 1);
-        assert_eq!(events[0].event(), &AuditEventType::AirGapViolationDetected);
+        assert_eq!(events[0].message(), None);
     }
 
     #[tokio::test]

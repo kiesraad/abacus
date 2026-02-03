@@ -85,10 +85,12 @@ pub struct ElectionDetails {
     pub election_nomination_date: NaiveDate,
 }
 
+#[derive(Serialize)]
 struct ElectionCreated(pub ElectionDetails);
-struct ElectionUpdated(pub ElectionDetails);
-
 as_audit_event!(ElectionCreated, AuditEventType::ElectionCreated);
+
+#[derive(Serialize)]
+struct ElectionUpdated(pub ElectionDetails);
 as_audit_event!(ElectionUpdated, AuditEventType::ElectionUpdated);
 
 /// Get a list of all elections, without their candidate lists and
@@ -204,7 +206,7 @@ pub async fn election_number_of_voters_change(
                 .await?;
 
         audit_service
-            .log(&mut tx, ElectionUpdated(election.clone().into()), None)
+            .log(&mut tx, &ElectionUpdated(election.clone().into()), None)
             .await?;
 
         tx.commit().await?;
@@ -378,7 +380,7 @@ async fn create_election(
     audit_service
         .log(
             conn,
-            ElectionCreated(election.clone().into()),
+            &ElectionCreated(election.clone().into()),
             Some(message),
         )
         .await?;

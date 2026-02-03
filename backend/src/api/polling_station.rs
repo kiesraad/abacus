@@ -64,9 +64,13 @@ pub struct PollingStationImportDetails {
     pub import_number_of_polling_stations: u64,
 }
 
+#[derive(Serialize)]
 struct PollingStationCreated(pub PollingStationDetails);
+#[derive(Serialize)]
 struct PollingStationUpdated(pub PollingStationDetails);
+#[derive(Serialize)]
 struct PollingStationDeleted(pub PollingStationDetails);
+#[derive(Serialize)]
 struct PollingStationsImported(pub PollingStationImportDetails);
 
 as_audit_event!(PollingStationCreated, AuditEventType::PollingStationCreated);
@@ -175,7 +179,7 @@ async fn polling_station_create(
     audit_service
         .log(
             &mut tx,
-            PollingStationCreated(polling_station.clone().into()),
+            &PollingStationCreated(polling_station.clone().into()),
             None,
         )
         .await?;
@@ -277,7 +281,7 @@ async fn polling_station_update(
     audit_service
         .log(
             &mut tx,
-            PollingStationUpdated(polling_station.clone().into()),
+            &PollingStationUpdated(polling_station.clone().into()),
             None,
         )
         .await?;
@@ -352,7 +356,7 @@ async fn polling_station_delete(
     audit_service
         .log(
             &mut tx,
-            PollingStationDeleted(polling_station.clone().into()),
+            &PollingStationDeleted(polling_station.clone().into()),
             None,
         )
         .await?;
@@ -422,7 +426,7 @@ pub async fn create_imported_polling_stations(
     audit_service
         .log(
             &mut tx,
-            PollingStationsImported(PollingStationImportDetails {
+            &PollingStationsImported(PollingStationImportDetails {
                 import_election_id: election_id,
                 import_file_name: polling_stations_request.file_name,
                 import_number_of_polling_stations: u64::try_from(polling_stations.len())

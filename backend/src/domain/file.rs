@@ -23,7 +23,9 @@ pub struct FileDetails {
     pub file_created_at: DateTime<Utc>,
 }
 
+#[derive(Serialize)]
 struct FileCreated(pub FileDetails);
+#[derive(Serialize)]
 struct FileDeleted(pub FileDetails);
 as_audit_event!(FileCreated, AuditEventType::FileCreated);
 as_audit_event!(FileDeleted, AuditEventType::FileDeleted);
@@ -63,7 +65,7 @@ pub async fn create_file(
     let file = file_repo::create(conn, filename, data, mime_type, created_at).await?;
 
     audit_service
-        .log(conn, FileCreated(file.clone().into()), None)
+        .log(conn, &FileCreated(file.clone().into()), None)
         .await?;
     Ok(file)
 }
@@ -75,7 +77,7 @@ pub async fn delete_file(
 ) -> Result<(), APIError> {
     if let Some(file) = file_repo::delete(conn, id).await? {
         audit_service
-            .log(conn, FileDeleted(file.into()), None)
+            .log(conn, &FileDeleted(file.into()), None)
             .await?;
     }
     Ok(())

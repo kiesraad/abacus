@@ -341,37 +341,4 @@ pub async fn committee_session_investigations(
 }
 
 #[cfg(test)]
-pub mod tests {
-    use chrono::NaiveDate;
-    use sqlx::SqlitePool;
-
-    use super::*;
-    use crate::repository::committee_session_repo::change_status;
-
-    pub async fn change_status_committee_session(
-        pool: SqlitePool,
-        committee_session_id: CommitteeSessionId,
-        status: CommitteeSessionStatus,
-    ) -> CommitteeSession {
-        let mut conn = pool.acquire().await.unwrap();
-        change_status(&mut conn, committee_session_id, status)
-            .await
-            .unwrap()
-    }
-
-    /// Create a test committee session.
-    pub fn committee_session_fixture(election_id: ElectionId) -> CommitteeSession {
-        CommitteeSession {
-            id: CommitteeSessionId::from(1),
-            number: 1,
-            election_id,
-            location: "Test location".to_string(),
-            start_date_time: NaiveDate::from_ymd_opt(2025, 10, 22)
-                .and_then(|d| d.and_hms_opt(9, 15, 0)),
-            status: CommitteeSessionStatus::Completed,
-            results_eml: None,
-            results_pdf: None,
-            overview_pdf: None,
-        }
-    }
-}
+pub mod tests {}

@@ -114,3 +114,20 @@ impl IntoResponse for InvestigationListResponse {
         Json(self).into_response()
     }
 }
+
+/// Create a test committee session.
+#[cfg(test)]
+pub fn committee_session_fixture(election_id: ElectionId) -> CommitteeSession {
+    CommitteeSession {
+        id: CommitteeSessionId::from(1),
+        number: 1,
+        election_id,
+        location: "Test location".to_string(),
+        start_date_time: chrono::NaiveDate::from_ymd_opt(2025, 10, 22)
+            .and_then(|d| d.and_hms_opt(9, 15, 0)),
+        status: CommitteeSessionStatus::Completed,
+        results_eml: None,
+        results_pdf: None,
+        overview_pdf: None,
+    }
+}

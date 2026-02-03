@@ -53,7 +53,7 @@ impl AirgapDetection {
 
     /// Starts the airgap detection in a background task.
     /// It will periodically check for airgap violations by attempting to connect to a known server.
-    pub async fn start(pool: SqlitePool) -> AirgapDetection {
+    pub fn start(pool: SqlitePool) -> AirgapDetection {
         let airgap_detection = AirgapDetection {
             enabled: true,
             pool: Some(pool),
@@ -274,7 +274,7 @@ mod tests {
 
     #[test(sqlx::test)]
     async fn test_log_status_changes_to_audit_log(pool: SqlitePool) {
-        AirgapDetection::start(pool.clone()).await;
+        AirgapDetection::start(pool.clone());
 
         let mut events = Vec::new();
 
@@ -350,7 +350,7 @@ mod tests {
     }
 
     async fn serve_api_with_airgap_detection(pool: SqlitePool) -> SocketAddr {
-        let airgap_detection = AirgapDetection::start(pool.clone()).await;
+        let airgap_detection = AirgapDetection::start(pool.clone());
         let mut violation_detected = false;
 
         for i in 0..=200 {

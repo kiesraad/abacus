@@ -423,7 +423,7 @@ pub async fn are_results_complete_for_committee_session(
     .await?
     .result;
 
-    if !committee_session.is_next_session() {
+    if !all_new_ps_have_data || !committee_session.is_next_session() {
         tx.commit().await?;
         return Ok(all_new_ps_have_data);
     }

@@ -6,11 +6,27 @@ use utoipa::ToSchema;
 use crate::{
     APIError,
     domain::id::id,
-    infra::audit_log::{AuditEvent, AuditService, FileDetails},
+    infra::audit_log::{AsAuditEvent, AuditEvent, AuditEventType, AuditService, as_audit_event},
     repository::file_repo,
 };
 
 id!(FileId);
+
+#[derive(Serialize, Deserialize, Debug, PartialEq, Eq, ToSchema)]
+#[serde(deny_unknown_fields)]
+pub struct FileDetails {
+    pub file_id: FileId,
+    pub file_name: String,
+    pub file_mime_type: String,
+    pub file_size_bytes: u64,
+    #[schema(value_type = String)]
+    pub file_created_at: DateTime<Utc>,
+}
+
+struct FileCreated(pub FileDetails);
+struct FileDeleted(pub FileDetails);
+as_audit_event!(FileCreated, AuditEventType::FileCreated);
+as_audit_event!(FileDeleted, AuditEventType::FileDeleted);
 
 /// File
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq, ToSchema, Type, FromRow)]
@@ -47,7 +63,7 @@ pub async fn create_file(
     let file = file_repo::create(conn, filename, data, mime_type, created_at).await?;
 
     audit_service
-        .log(conn, &AuditEvent::FileCreated(file.clone().into()), None)
+        .log(conn, FileCreated(file.clone().into()), None)
         .await?;
     Ok(file)
 }
@@ -59,7 +75,7 @@ pub async fn delete_file(
 ) -> Result<(), APIError> {
     if let Some(file) = file_repo::delete(conn, id).await? {
         audit_service
-            .log(conn, &AuditEvent::FileDeleted(file.into()), None)
+            .log(conn, FileDeleted(file.into()), None)
             .await?;
     }
     Ok(())

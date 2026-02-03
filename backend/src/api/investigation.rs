@@ -9,7 +9,7 @@ use crate::{
     api::{
         committee_session::CommitteeSessionError,
         data_entry::delete_data_entry_and_result_for_polling_station,
-        middleware::authentication::Coordinator,
+        middleware::authentication::Coordinator, polling_station::PollingStationImportDetails,
     },
     domain::{
         committee_session::CommitteeSession,
@@ -27,7 +27,7 @@ use crate::{
     },
     error::ErrorReference,
     infra::{
-        audit_log::{AuditEvent, AuditService},
+        audit_log::{AsAuditEvent, AuditEvent, AuditService, as_audit_event},
         pdf_gen::generate_pdf,
     },
     repository::{
@@ -42,6 +42,33 @@ use crate::{
         polling_station_repo,
     },
 };
+
+struct PollingStationInvestigationCreated(pub PollingStationInvestigation);
+struct PollingStationInvestigationUpdated(pub PollingStationInvestigation);
+struct PollingStationInvestigationDeleted(pub PollingStationInvestigation);
+struct PollingStationInvestigationConcluded(pub PollingStationInvestigation);
+struct PollingStationInvestigationImported(pub PollingStationImportDetails);
+
+as_audit_event!(
+    PollingStationInvestigationCreated,
+    AuditEvent::PollingStationInvestigationCreated
+);
+as_audit_event!(
+    PollingStationInvestigationUpdated,
+    AuditEvent::PollingStationInvestigationUpdated
+);
+as_audit_event!(
+    PollingStationInvestigationDeleted,
+    AuditEvent::PollingStationInvestigationDeleted
+);
+as_audit_event!(
+    PollingStationInvestigationImported,
+    AuditEvent::PollingStationInvestigationImported
+);
+as_audit_event!(
+    PollingStationInvestigationConcluded,
+    AuditEvent::PollingStationInvestigationConcluded
+);
 
 pub fn router() -> OpenApiRouter<AppState> {
     OpenApiRouter::default()
@@ -87,7 +114,7 @@ pub async fn delete_investigation_for_polling_station(
         audit_service
             .log(
                 conn,
-                &AuditEvent::PollingStationInvestigationDeleted(investigation),
+                PollingStationInvestigationDeleted(investigation),
                 None,
             )
             .await?;
@@ -144,7 +171,7 @@ async fn polling_station_investigation_create(
     audit_service
         .log(
             &mut tx,
-            &AuditEvent::PollingStationInvestigationCreated(investigation.clone()),
+            PollingStationInvestigationCreated(investigation.clone()),
             None,
         )
         .await?;
@@ -220,7 +247,7 @@ async fn polling_station_investigation_conclude(
     audit_service
         .log(
             &mut tx,
-            &AuditEvent::PollingStationInvestigationConcluded(investigation.clone()),
+            PollingStationInvestigationConcluded(investigation.clone()),
             None,
         )
         .await?;
@@ -259,7 +286,7 @@ async fn update_investigation(
     audit_service
         .log(
             conn,
-            &AuditEvent::PollingStationInvestigationUpdated(investigation.clone()),
+            PollingStationInvestigationUpdated(investigation.clone()),
             None,
         )
         .await?;

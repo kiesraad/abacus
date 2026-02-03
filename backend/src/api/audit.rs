@@ -179,7 +179,7 @@ mod tests {
             .unwrap()
             .unwrap();
         let service = new_test_audit_service(Some(user));
-        let audit_event = AuditEvent::UserLoggedIn(UserLoggedInDetails {
+        let audit_event = AuditEventType::UserLoggedIn(UserLoggedInDetails {
             user_agent: "Mozilla/5.0".to_string(),
             logged_in_users_count: 1,
         });

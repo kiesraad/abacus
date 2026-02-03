@@ -182,7 +182,7 @@ mod tests {
         assert_eq!(events.len(), 1);
         assert_eq!(
             events[0].event(),
-            &AuditEvent::UserLoginFailed(UserLoginFailedDetails {
+            &AuditEventType::UserLoginFailed(UserLoginFailedDetails {
                 username: "admin".to_string(),
                 user_agent: TEST_USER_AGENT.to_string(),
             })

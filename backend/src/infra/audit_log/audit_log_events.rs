@@ -6,7 +6,7 @@ use sqlx::{SqliteConnection, Type, prelude::FromRow, types::Json};
 use strum::VariantNames;
 use utoipa::ToSchema;
 
-use super::{AuditEvent, AuditLogUser, LogFilterQuery};
+use super::{AsAuditEvent, AuditEventType, AuditLogUser, LogFilterQuery};
 use crate::{
     APIError,
     domain::{id::id, role::Role},
@@ -44,7 +44,7 @@ pub struct AuditLogEvent {
     id: AuditLogEventId,
     #[schema(value_type = String)]
     time: DateTime<Utc>,
-    event: AuditEvent,
+    event: AuditEventType,
     event_level: AuditEventLevel,
     #[serde(skip_serializing_if = "Option::is_none")]
     #[schema(nullable = false)]
@@ -67,7 +67,7 @@ pub struct AuditLogEvent {
 
 #[cfg(test)]
 impl AuditLogEvent {
-    pub fn event(&self) -> &AuditEvent {
+    pub fn event(&self) -> &AuditEventType {
         &self.event
     }
 
@@ -120,7 +120,7 @@ impl LogFilter {
             .event
             .clone()
             .into_iter()
-            .filter(|s| AuditEvent::VARIANTS.contains(&s.as_str()))
+            .filter(|s| AuditEventType::VARIANTS.contains(&s.as_str()))
             .collect();
 
         let since = query
@@ -163,13 +163,14 @@ impl LogFilter {
 
 pub async fn create(
     conn: &mut SqliteConnection,
-    event: &AuditEvent,
+    event: &impl AsAuditEvent,
     user: Option<&User>,
     message: Option<String>,
     ip: Option<IpAddr>,
 ) -> Result<(), sqlx::Error> {
-    let event_name = event.to_string();
-    let event_level = event.level();
+    let event = event.as_audit_event();
+    let event_name = event.event_type.to_string();
+    let event_level = event.event_type.level();
     let event = Json(event);
     let user_id = user.map(|u| u.id());
     let username = user.map(|u| u.username().to_string());
@@ -203,7 +204,7 @@ pub async fn list_all(conn: &mut SqliteConnection) -> Result<Vec<AuditLogEvent>,
         r#"SELECT
             audit_log.id as "id: AuditLogEventId",
             time as "time: _",
-            json(event) as "event!: Json<AuditEvent>",
+            json(event) as "event!: Json<AuditEventType>",
             event_level as "event_level: _",
             message,
             ip as "ip: String",
@@ -240,7 +241,7 @@ pub async fn list(
         r#"SELECT
             audit_log.id as "id: AuditLogEventId",
             time as "time: _",
-            json(event) as "event!: Json<AuditEvent>",
+            json(event) as "event!: Json<AuditEventType>",
             event_level as "event_level: _",
             message,
             ip as "ip: String",

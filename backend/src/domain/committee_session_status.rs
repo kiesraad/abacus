@@ -9,10 +9,11 @@ use crate::{
     domain::{
         committee_session::{
             CommitteeSession, CommitteeSessionFilesUpdateRequest, CommitteeSessionId,
+            CommitteeSessionUpdated,
         },
         file::{FileId, delete_file},
     },
-    infra::audit_log::{AuditEvent, AuditService},
+    infra::audit_log::AuditService,
     repository::{
         committee_session_repo::{change_files, change_status, get},
         data_entry_repo::are_results_complete_for_committee_session,
@@ -132,7 +133,7 @@ pub async fn change_committee_session_status(
     audit_service
         .log(
             &mut tx,
-            &AuditEvent::CommitteeSessionUpdated(committee_session.into()),
+            CommitteeSessionUpdated(committee_session.into()),
             None,
         )
         .await?;

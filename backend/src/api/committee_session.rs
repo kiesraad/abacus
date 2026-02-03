@@ -12,15 +12,15 @@ use crate::{
     api::middleware::authentication::Coordinator,
     domain::{
         committee_session::{
-            CommitteeSession, CommitteeSessionCreateRequest, CommitteeSessionId,
-            CommitteeSessionStatusChangeRequest, CommitteeSessionUpdateRequest,
-            InvestigationListResponse,
+            CommitteeSession, CommitteeSessionCreateRequest, CommitteeSessionCreated,
+            CommitteeSessionDeleted, CommitteeSessionId, CommitteeSessionStatusChangeRequest,
+            CommitteeSessionUpdateRequest, CommitteeSessionUpdated, InvestigationListResponse,
         },
         committee_session_status::{CommitteeSessionStatus, change_committee_session_status},
         election::ElectionId,
     },
     error::ErrorReference,
-    infra::audit_log::{AuditEvent, AuditService},
+    infra::audit_log::AuditService,
     repository::{
         committee_session_repo::{create, delete, get, get_election_committee_session, update},
         election_repo,
@@ -78,7 +78,7 @@ pub async fn create_committee_session(
     audit_service
         .log(
             conn,
-            &AuditEvent::CommitteeSessionCreated(committee_session.clone().into()),
+            CommitteeSessionCreated(committee_session.clone()),
             None,
         )
         .await?;
@@ -174,7 +174,7 @@ pub async fn committee_session_delete(
         audit_service
             .log(
                 &mut tx,
-                &AuditEvent::CommitteeSessionDeleted(committee_session.clone().into()),
+                CommitteeSessionDeleted(committee_session.clone()),
                 None,
             )
             .await?;
@@ -248,7 +248,7 @@ pub async fn committee_session_update(
     audit_service
         .log(
             &mut tx,
-            &AuditEvent::CommitteeSessionUpdated(committee_session.clone().into()),
+            CommitteeSessionUpdated(committee_session.clone()),
             None,
         )
         .await?;

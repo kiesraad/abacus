@@ -7,12 +7,11 @@ use utoipa_axum::{router::OpenApiRouter, routes};
 use crate::{
     APIError, AppState, ErrorResponse, SqlitePoolExt,
     api::{
-        committee_session::CommitteeSessionError,
         data_entry::delete_data_entry_and_result_for_polling_station,
         middleware::authentication::Coordinator,
     },
     domain::{
-        committee_session::CommitteeSession,
+        committee_session::{CommitteeSession, CommitteeSessionError},
         committee_session_status::CommitteeSessionStatus,
         data_entry::PollingStationResults,
         election::ElectionWithPoliticalGroups,

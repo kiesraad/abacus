@@ -15,6 +15,15 @@ use crate::{
     infra::audit_log,
 };
 
+#[derive(Debug, PartialEq, Eq)]
+pub enum CommitteeSessionError {
+    CommitteeSessionPaused,
+    InvalidCommitteeSessionStatus,
+    InvalidDetails,
+    InvalidStatusTransition,
+    ProviderError,
+}
+
 id!(CommitteeSessionId);
 
 /// Committee session

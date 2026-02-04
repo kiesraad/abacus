@@ -1,9 +1,8 @@
 use sqlx::SqliteConnection;
 
 use crate::{
-    api::committee_session::CommitteeSessionError,
     domain::{
-        committee_session::CommitteeSessionId,
+        committee_session::{CommitteeSessionError, CommitteeSessionId},
         committee_session_status::{
             CommitteeSessionHasInvestigationsProvider, CommitteeSessionHasPollingStationsProvider,
             DataEntryCompleteResultsProvider,
@@ -17,7 +16,9 @@ impl CommitteeSessionHasPollingStationsProvider for SqliteConnection {
         &mut self,
         committee_session_id: CommitteeSessionId,
     ) -> Result<bool, CommitteeSessionError> {
-        Ok(polling_station_repo::has_any(self, committee_session_id).await?)
+        polling_station_repo::has_any(self, committee_session_id)
+            .await
+            .map_err(|_| CommitteeSessionError::ProviderError)
     }
 }
 
@@ -26,13 +27,9 @@ impl CommitteeSessionHasInvestigationsProvider for SqliteConnection {
         &mut self,
         committee_session_id: CommitteeSessionId,
     ) -> Result<bool, CommitteeSessionError> {
-        Ok(
-            investigation_repo::has_investigations_for_committee_session(
-                self,
-                committee_session_id,
-            )
-            .await?,
-        )
+        investigation_repo::has_investigations_for_committee_session(self, committee_session_id)
+            .await
+            .map_err(|_| CommitteeSessionError::ProviderError)
     }
 }
 
@@ -41,9 +38,8 @@ impl DataEntryCompleteResultsProvider for SqliteConnection {
         &mut self,
         committee_session_id: CommitteeSessionId,
     ) -> Result<bool, CommitteeSessionError> {
-        Ok(
-            data_entry_repo::are_results_complete_for_committee_session(self, committee_session_id)
-                .await?,
-        )
+        data_entry_repo::are_results_complete_for_committee_session(self, committee_session_id)
+            .await
+            .map_err(|_| CommitteeSessionError::ProviderError)
     }
 }

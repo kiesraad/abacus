@@ -3,9 +3,8 @@ use sqlx::Type;
 use strum::VariantNames;
 use utoipa::ToSchema;
 
-use crate::{
-    api::committee_session::CommitteeSessionError,
-    domain::committee_session::{CommitteeSession, CommitteeSessionId},
+use crate::domain::committee_session::{
+    CommitteeSession, CommitteeSessionError, CommitteeSessionId,
 };
 
 /// Committee session status
@@ -34,12 +33,6 @@ pub enum CommitteeSessionStatus {
     DataEntry,
     Paused,
     Completed,
-}
-
-impl From<sqlx::Error> for CommitteeSessionError {
-    fn from(_: sqlx::Error) -> Self {
-        CommitteeSessionError::InvalidStatusTransition
-    }
 }
 
 pub trait CommitteeSessionHasPollingStationsProvider {

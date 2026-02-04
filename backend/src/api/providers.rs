@@ -17,8 +17,7 @@ impl CommitteeSessionHasPollingStationsProvider for SqliteConnection {
         &mut self,
         committee_session_id: CommitteeSessionId,
     ) -> Result<bool, CommitteeSessionError> {
-        let polling_stations = polling_station_repo::list(self, committee_session_id).await?;
-        Ok(!polling_stations.is_empty())
+        Ok(polling_station_repo::has_any(self, committee_session_id).await?)
     }
 }
 
@@ -27,12 +26,13 @@ impl CommitteeSessionHasInvestigationsProvider for SqliteConnection {
         &mut self,
         committee_session_id: CommitteeSessionId,
     ) -> Result<bool, CommitteeSessionError> {
-        let investigations = investigation_repo::list_investigations_for_committee_session(
-            self,
-            committee_session_id,
+        Ok(
+            investigation_repo::has_investigations_for_committee_session(
+                self,
+                committee_session_id,
+            )
+            .await?,
         )
-        .await?;
-        Ok(!investigations.is_empty())
     }
 }
 

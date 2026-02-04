@@ -9,6 +9,26 @@ use crate::{
     repository::committee_session_repo,
 };
 
+/// Returns if a committee session has polling stations
+pub async fn has_any(
+    conn: &mut SqliteConnection,
+    committee_session_id: CommitteeSessionId,
+) -> Result<bool, sqlx::Error> {
+    let result = query!(
+        r#"
+        SELECT EXISTS(
+            SELECT 1 FROM polling_stations AS p
+            JOIN committee_sessions AS c ON c.id = p.committee_session_id
+            WHERE c.id = $1
+        ) as `exists`"#,
+        committee_session_id
+    )
+    .fetch_one(conn)
+    .await?;
+
+    Ok(result.exists == 1)
+}
+
 /// List all polling stations from a committee session
 pub async fn list(
     conn: &mut SqliteConnection,

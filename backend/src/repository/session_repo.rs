@@ -1,18 +1,13 @@
 use std::time::Duration;
 
-use axum::{extract::OptionalFromRequestParts, http::request::Parts};
-use axum_extra::extract::cookie::Cookie;
 use chrono::{DateTime, TimeDelta, Utc};
-use cookie::CookieBuilder;
 use rand::{Rng, distr::Alphanumeric};
 use serde::{Deserialize, Serialize};
 use sqlx::{FromRow, SqliteConnection};
 
 use crate::{
-    APIError,
     api::middleware::authentication::{
-        SESSION_COOKIE_NAME, SESSION_LIFE_TIME, error::AuthenticationError,
-        request_data::RequestSessionData,
+        SESSION_LIFE_TIME, error::AuthenticationError, request_data::RequestSessionData,
     },
     repository::user_repo::UserId,
 };
@@ -27,20 +22,6 @@ pub struct Session {
     ip_address: String,
     expires_at: DateTime<Utc>,
     created_at: DateTime<Utc>,
-}
-
-impl<S> OptionalFromRequestParts<S> for Session
-where
-    S: Send + Sync,
-{
-    type Rejection = APIError;
-
-    async fn from_request_parts(
-        parts: &mut Parts,
-        _state: &S,
-    ) -> Result<Option<Self>, Self::Rejection> {
-        Ok(parts.extensions.get::<Session>().cloned())
-    }
 }
 
 impl Session {
@@ -86,15 +67,6 @@ impl Session {
             .signed_duration_since(self.created_at)
             .to_std()
             .unwrap_or_default()
-    }
-
-    /// Get a cookie containing this session key
-    pub(crate) fn get_cookie(&self) -> Cookie<'static> {
-        CookieBuilder::new(SESSION_COOKIE_NAME, self.session_key.clone())
-            .max_age(cookie::time::Duration::seconds(
-                SESSION_LIFE_TIME.num_seconds(),
-            ))
-            .build()
     }
 }
 

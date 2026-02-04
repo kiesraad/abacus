@@ -13,7 +13,7 @@ use crate::{
     },
     domain::{
         committee_session::CommitteeSession,
-        committee_session_status::{CommitteeSessionStatus, change_committee_session_status},
+        committee_session_status::CommitteeSessionStatus,
         data_entry::PollingStationResults,
         election::ElectionWithPoliticalGroups,
         investigation::{
@@ -41,6 +41,7 @@ use crate::{
         },
         polling_station_repo,
     },
+    service::change_committee_session_status::change_committee_session_status,
 };
 
 pub fn router() -> OpenApiRouter<AppState> {

@@ -17,9 +17,8 @@ pub async fn has_any(
     let result = query!(
         r#"
         SELECT EXISTS(
-            SELECT 1 FROM polling_stations AS p
-            JOIN committee_sessions AS c ON c.id = p.committee_session_id
-            WHERE c.id = $1
+            SELECT 1 FROM polling_stations
+            WHERE committee_session_id = $1
         ) as `exists`"#,
         committee_session_id
     )

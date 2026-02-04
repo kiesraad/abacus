@@ -437,6 +437,7 @@ mod tests {
                 (Created, First, false, false, Ok(Created)),
                 (Created, First, true, false, Ok(Created)),
                 (Created, Next, true, true, Ok(Created)),
+                (Created, Next, true, false, Ok(Created)),
                 // No polling stations
                 (InPreparation, First, false, false, Ok(Created)),
                 (DataEntry, First, false, false, Ok(Created)),
@@ -490,8 +491,11 @@ mod tests {
                 (InPreparation, Next, true, true, Ok(InPreparation)),
                 // DataEntry, Paused, Completed are not allowed
                 (DataEntry, First, true, false, err()),
+                (DataEntry, Next, true, true, err()),
                 (Paused, First, true, false, err()),
+                (Paused, Next, true, true, err()),
                 (Completed, First, true, false, err()),
+                (Completed, Next, true, true, err()),
             ] {
                 assert_eq!(
                     from.ready_for_data_entry(

@@ -1,5 +1,5 @@
 use serde::{Deserialize, Serialize};
-use sqlx::{SqliteConnection, Type};
+use sqlx::{Connection, SqliteConnection, Type};
 use strum::VariantNames;
 use utoipa::ToSchema;
 
@@ -105,23 +105,25 @@ async fn delete_committee_session_files(
 }
 
 pub async fn change_committee_session_status(
-    tx: &mut SqliteConnection,
+    conn: &mut SqliteConnection,
     committee_session_id: CommitteeSessionId,
     status: CommitteeSessionStatus,
     audit_service: AuditService,
 ) -> Result<(), APIError> {
-    let committee_session = get(tx, committee_session_id).await?;
+    let mut tx = conn.begin().await?;
+
+    let committee_session = get(&mut tx, committee_session_id).await?;
     let new_status = match status {
         CommitteeSessionStatus::Created => {
             committee_session
                 .status
-                .prepare_data_entry(&committee_session, tx)
+                .prepare_data_entry(&committee_session, &mut *tx)
                 .await?
         }
         CommitteeSessionStatus::InPreparation => {
             committee_session
                 .status
-                .ready_for_data_entry(&committee_session, tx)
+                .ready_for_data_entry(&committee_session, &mut *tx)
                 .await?
         }
         CommitteeSessionStatus::DataEntry => committee_session.status.start_data_entry()?,
@@ -129,7 +131,7 @@ pub async fn change_committee_session_status(
         CommitteeSessionStatus::Completed => {
             committee_session
                 .status
-                .finish_data_entry(&committee_session, tx)
+                .finish_data_entry(&committee_session, &mut *tx)
                 .await?
         }
     };
@@ -138,18 +140,20 @@ pub async fn change_committee_session_status(
     if committee_session.status == CommitteeSessionStatus::Completed
         && new_status == CommitteeSessionStatus::DataEntry
     {
-        delete_committee_session_files(tx, audit_service.clone(), committee_session).await?;
+        delete_committee_session_files(&mut tx, audit_service.clone(), committee_session).await?;
     }
 
-    let committee_session = change_status(tx, committee_session_id, new_status).await?;
+    let committee_session = change_status(&mut tx, committee_session_id, new_status).await?;
 
     audit_service
         .log(
-            tx,
+            &mut tx,
             &AuditEvent::CommitteeSessionUpdated(committee_session.into()),
             None,
         )
         .await?;
+
+    tx.commit().await?;
 
     Ok(())
 }

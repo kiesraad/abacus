@@ -7,10 +7,10 @@ use crate::{
             CommitteeSession, CommitteeSessionFilesUpdateRequest, CommitteeSessionId,
         },
         committee_session_status::CommitteeSessionStatus,
-        file::{FileId, delete_file},
+        file::FileId,
     },
     infra::audit_log::{AuditEvent, AuditService},
-    repository::committee_session_repo,
+    repository::{committee_session_repo, file_repo},
 };
 
 pub async fn change_committee_session_status(
@@ -95,7 +95,11 @@ async fn delete_committee_session_files(
         .await?;
 
         for id in file_ids {
-            delete_file(conn, &audit_service, id).await?;
+            if let Some(file) = file_repo::delete(conn, id).await? {
+                audit_service
+                    .log(conn, &AuditEvent::FileDeleted(file.into()), None)
+                    .await?;
+            }
         }
     }
     Ok(())

@@ -1,14 +1,9 @@
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
-use sqlx::{FromRow, SqliteConnection, Type};
+use sqlx::{FromRow, Type};
 use utoipa::ToSchema;
 
-use crate::{
-    APIError,
-    domain::id::id,
-    infra::audit_log::{AuditEvent, AuditService, FileDetails},
-    repository::file_repo,
-};
+use crate::{domain::id::id, infra::audit_log::FileDetails};
 
 id!(FileId);
 
@@ -34,33 +29,4 @@ impl From<File> for FileDetails {
             file_created_at: file.created_at,
         }
     }
-}
-
-pub async fn create_file(
-    conn: &mut SqliteConnection,
-    audit_service: &AuditService,
-    filename: String,
-    data: &[u8],
-    mime_type: String,
-    created_at: DateTime<Utc>,
-) -> Result<File, APIError> {
-    let file = file_repo::create(conn, filename, data, mime_type, created_at).await?;
-
-    audit_service
-        .log(conn, &AuditEvent::FileCreated(file.clone().into()), None)
-        .await?;
-    Ok(file)
-}
-
-pub async fn delete_file(
-    conn: &mut SqliteConnection,
-    audit_service: &AuditService,
-    id: FileId,
-) -> Result<(), APIError> {
-    if let Some(file) = file_repo::delete(conn, id).await? {
-        audit_service
-            .log(conn, &AuditEvent::FileDeleted(file.into()), None)
-            .await?;
-    }
-    Ok(())
 }

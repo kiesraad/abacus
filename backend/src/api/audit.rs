@@ -159,7 +159,10 @@ mod tests {
         infra::audit_log::{
             AuditEvent, AuditLogListResponse, AuditLogUser, AuditService, UserLoggedInDetails,
         },
-        repository::user_repo::{self, User, UserId},
+        repository::{
+            session_repo,
+            user_repo::{self, User, UserId},
+        },
     };
 
     const TEST_USER_AGENT: &str = "TestAgent/1.0";
@@ -193,7 +196,7 @@ mod tests {
         };
 
         let mut conn = pool.acquire().await.unwrap();
-        let session = crate::api::middleware::authentication::session::create(
+        let session = session_repo::create(
             &mut conn,
             UserId::from(1),
             TEST_USER_AGENT,
@@ -263,7 +266,7 @@ mod tests {
         };
 
         let mut conn = pool.acquire().await.unwrap();
-        let session = crate::api::middleware::authentication::session::create(
+        let session = session_repo::create(
             &mut conn,
             UserId::from(1),
             TEST_USER_AGENT,

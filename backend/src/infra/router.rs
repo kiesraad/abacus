@@ -303,12 +303,14 @@ mod tests {
 
     use super::*;
     use crate::{
-        SqlitePoolExt, api::middleware::authentication::session, domain::role::Role,
-        repository::user_repo::UserId, test::run_server_test,
+        SqlitePoolExt,
+        domain::role::Role,
+        repository::{session_repo, user_repo::UserId},
+        test::run_server_test,
     };
 
     async fn get_user_cookie(conn: &mut SqliteConnection, user_id: UserId) -> String {
-        session::create(conn, user_id, "", "127.0.0.1", TimeDelta::seconds(60 * 30))
+        session_repo::create(conn, user_id, "", "127.0.0.1", TimeDelta::seconds(60 * 30))
             .await
             .unwrap()
             .get_cookie()

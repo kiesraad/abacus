@@ -7,8 +7,6 @@ mod middleware;
 pub mod password;
 pub mod request_data;
 mod role;
-pub mod session;
-mod util;
 
 /// Session lifetime, for both cookie and database
 /// Also change the translation string "users.session_expired" in the frontend if this value is changed
@@ -56,7 +54,10 @@ mod tests {
         domain::role::Role,
         error::ErrorReference,
         infra::audit_log::{AuditEvent, LogFilter, UserLoginFailedDetails},
-        repository::user_repo::{self, User, UserId},
+        repository::{
+            session_repo::{self, Session},
+            user_repo::{self, User, UserId},
+        },
     };
 
     const TEST_USER_AGENT: &str = "TestAgent/1.0";
@@ -494,7 +495,7 @@ mod tests {
     async fn test_list(pool: SqlitePool) {
         let app = create_app(pool.clone());
         let mut conn = pool.acquire().await.unwrap();
-        let session = session::create(
+        let session = session_repo::create(
             &mut conn,
             UserId::from(1),
             TEST_USER_AGENT,
@@ -531,7 +532,7 @@ mod tests {
 
         // with a normal long-valid session the user should not get a new cookie
         let mut conn = pool.acquire().await.unwrap();
-        let session = session::create(
+        let session = session_repo::create(
             &mut conn,
             UserId::from(1),
             TEST_USER_AGENT,
@@ -561,7 +562,7 @@ mod tests {
         assert_eq!(response.headers().get("set-cookie"), None);
 
         // with a session that is about to expire the user should get a new cookie, and the session lifetime should be extended
-        let session: session::Session = session::create(
+        let session: Session = session_repo::create(
             &mut conn,
             UserId::from(1),
             TEST_USER_AGENT,
@@ -670,7 +671,7 @@ mod tests {
         let app = create_app(pool.clone());
         // user id 5 is a typist
         let mut conn = pool.acquire().await.unwrap();
-        let session = session::create(
+        let session = session_repo::create(
             &mut conn,
             UserId::from(5),
             TEST_USER_AGENT,

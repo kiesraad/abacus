@@ -16,7 +16,7 @@ use crate::{
     APIError, AppState, ErrorResponse, SqlitePoolExt,
     api::middleware::authentication::{
         IncompleteUser, SECURE_COOKIES, SESSION_COOKIE_NAME, SESSION_LIFE_TIME,
-        error::AuthenticationError, session,
+        error::AuthenticationError,
     },
     domain::role::Role,
     error::ErrorReference,
@@ -24,7 +24,10 @@ use crate::{
         AuditEvent, AuditService, UserDetails, UserLoggedInDetails, UserLoggedOutDetails,
         UserLoginFailedDetails,
     },
-    repository::user_repo::{self, User, UserId},
+    repository::{
+        session_repo,
+        user_repo::{self, User, UserId},
+    },
 };
 
 impl From<AuthenticationError> for APIError {
@@ -141,10 +144,10 @@ async fn login(
     let mut tx = pool.begin_immediate().await?;
 
     // Remove expired sessions, we do this after a login to prevent the necessity of periodical cleanup jobs
-    session::delete_expired_sessions(&mut tx).await?;
+    session_repo::delete_expired_sessions(&mut tx).await?;
 
     // Remove possible old session for this user
-    session::delete_user_session(&mut tx, user.id()).await?;
+    session_repo::delete_user_session(&mut tx, user.id()).await?;
 
     // Get the client IP address if available
     let ip = audit_service
@@ -153,10 +156,11 @@ async fn login(
         .to_string();
 
     // Create a new session and cookie
-    let session = session::create(&mut tx, user.id(), &user_agent, &ip, SESSION_LIFE_TIME).await?;
+    let session =
+        session_repo::create(&mut tx, user.id(), &user_agent, &ip, SESSION_LIFE_TIME).await?;
 
     // Log the login event
-    let logged_in_users_count = session::count(&mut tx).await?;
+    let logged_in_users_count = session_repo::count(&mut tx).await?;
     audit_service
         .with_user(user.clone())
         .log(
@@ -395,7 +399,7 @@ async fn logout(
     // Log audit event when a valid session exists
     let mut tx = pool.begin_immediate().await?;
 
-    if let Some(session) = session::get_by_key(&mut tx, session_key)
+    if let Some(session) = session_repo::get_by_key(&mut tx, session_key)
         .await
         .ok()
         .flatten()
@@ -413,7 +417,7 @@ async fn logout(
     }
 
     // Remove session from the database
-    session::delete(&mut tx, session_key).await?;
+    session_repo::delete(&mut tx, session_key).await?;
 
     // Commit the transaction
     tx.commit().await?;

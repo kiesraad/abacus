@@ -4,16 +4,16 @@ use axum::{extract::OptionalFromRequestParts, http::request::Parts};
 use axum_extra::extract::cookie::Cookie;
 use chrono::{DateTime, TimeDelta, Utc};
 use cookie::CookieBuilder;
+use rand::{Rng, distr::Alphanumeric};
 use serde::{Deserialize, Serialize};
 use sqlx::{FromRow, SqliteConnection};
 
-use super::{
-    SESSION_COOKIE_NAME, SESSION_LIFE_TIME,
-    error::AuthenticationError,
-    util::{create_new_session_key, get_expires_at},
-};
 use crate::{
-    APIError, api::middleware::authentication::request_data::RequestSessionData,
+    APIError,
+    api::middleware::authentication::{
+        SESSION_COOKIE_NAME, SESSION_LIFE_TIME, error::AuthenticationError,
+        request_data::RequestSessionData,
+    },
     repository::user_repo::UserId,
 };
 
@@ -282,9 +282,28 @@ pub(crate) async fn extend_session(
     Ok(session)
 }
 
+/// Create a new session key, a secure random alphanumeric string of 24 characters
+/// Which corresponds to ~142 bits of entropy
+fn create_new_session_key() -> String {
+    rand::rng()
+        .sample_iter(&Alphanumeric)
+        .take(24)
+        .map(char::from)
+        .collect()
+}
+
+/// Get the time when the session expires
+/// Note this will return the current time if adding the duration would be out of range,
+/// which will not happen in the next 260117 years, since the duration is only set using constants in out codebase
+fn get_expires_at(duration: TimeDelta) -> DateTime<Utc> {
+    Utc::now()
+        .checked_add_signed(duration)
+        .unwrap_or(Utc::now())
+}
+
 #[cfg(test)]
-mod test {
-    use chrono::TimeDelta;
+mod tests {
+    use chrono::{TimeDelta, Utc};
     use sqlx::SqlitePool;
     use test_log::test;
 
@@ -293,7 +312,7 @@ mod test {
     const TEST_USER_AGENT: &str = "TestAgent/1.0";
     const TEST_IP_ADDRESS: &str = "0.0.0.0";
 
-    #[test(sqlx::test(fixtures("../../../../fixtures/users.sql")))]
+    #[test(sqlx::test(fixtures("../../fixtures/users.sql")))]
     async fn test_create_and_get_session(pool: SqlitePool) {
         let mut conn = pool.acquire().await.unwrap();
         let session = super::create(
@@ -314,7 +333,7 @@ mod test {
         assert_eq!(session, session_from_db);
     }
 
-    #[test(sqlx::test(fixtures("../../../../fixtures/users.sql")))]
+    #[test(sqlx::test(fixtures("../../fixtures/users.sql")))]
     async fn test_delete_session(pool: SqlitePool) {
         let mut conn = pool.acquire().await.unwrap();
         let session = super::create(
@@ -343,7 +362,7 @@ mod test {
         assert_eq!(None, session_from_db);
     }
 
-    #[test(sqlx::test(fixtures("../../../../fixtures/users.sql")))]
+    #[test(sqlx::test(fixtures("../../fixtures/users.sql")))]
     async fn test_delete_old_sessions(pool: SqlitePool) {
         let mut conn = pool.acquire().await.unwrap();
         let session = super::create(
@@ -365,7 +384,7 @@ mod test {
         assert_eq!(None, session_from_db);
     }
 
-    #[test(sqlx::test(fixtures("../../../../fixtures/users.sql")))]
+    #[test(sqlx::test(fixtures("../../fixtures/users.sql")))]
     async fn test_session_count(pool: SqlitePool) {
         let mut conn = pool.acquire().await.unwrap();
         let _active_session1 = super::create(
@@ -397,5 +416,30 @@ mod test {
         .unwrap();
 
         assert_eq!(2, super::count(&mut conn).await.unwrap());
+    }
+
+    #[test]
+    fn test_create_new_session_key() {
+        let key = super::create_new_session_key();
+
+        assert_eq!(key.len(), 24);
+        assert!(key.chars().all(|c| c.is_ascii_alphanumeric()));
+    }
+
+    #[test]
+    fn test_get_current_time() {
+        let current_time = Utc::now();
+        let current_time2 = Utc::now();
+
+        assert!(current_time <= current_time2);
+    }
+
+    #[test]
+    fn test_get_expires_at() {
+        let current_time = Utc::now();
+        let expires_at = super::get_expires_at(TimeDelta::seconds(60));
+
+        assert!(expires_at > current_time);
+        assert_eq!((expires_at - current_time).num_seconds(), 60);
     }
 }

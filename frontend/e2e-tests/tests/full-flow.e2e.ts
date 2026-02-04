@@ -1,7 +1,7 @@
 import { stat } from "node:fs/promises";
 import { expect, request } from "@playwright/test";
 import { test } from "e2e-tests/fixtures";
-import { getTestPassword } from "e2e-tests/helpers-utils/e2e-test-api-helpers";
+import { getTestPassword, loginAs } from "e2e-tests/helpers-utils/e2e-test-api-helpers";
 import {
   createInvestigation,
   fillCandidatesListPages,
@@ -42,6 +42,7 @@ import { UserCreateTypePgObj } from "e2e-tests/page-objects/users/UserCreateType
 import { UserListPgObj } from "e2e-tests/page-objects/users/UserListPgObj";
 import { eml110b_single } from "e2e-tests/test-data/eml-files";
 import { noRecountNoDifferencesDataEntry } from "e2e-tests/test-data/request-response-templates";
+import { testUsers } from "../test-data/users.ts";
 
 const investigations = [
   { number: "1", name: "Stadhuis", reason: "Reden", findings: "Probleem", correctedResults: true },
@@ -61,27 +62,63 @@ const investigations = [
   },
 ];
 
-const typistUsers = ["typist3", "typist4"];
-
-test.use({
-  storageState: "e2e-tests/state/admin2.json",
-});
+const typistBaseNameUsers = ["typist3", "typist4"];
 
 test.describe.configure({ mode: "serial" });
 
 test.describe("full flow", () => {
   let electionId: number | null = null;
 
+  test("create test user accounts for browsers", async ({ browserName }) => {
+    // create a new APIRequestContext
+    const adminContext = await request.newContext();
+    const loginResponse = await loginAs(adminContext, "admin1");
+    expect(loginResponse.status()).toBe(200);
+
+    await adminContext.storageState({ path: "e2e-tests/state/admin1.json" });
+
+    for (const user of testUsers) {
+      const username = `${user.username}-${browserName}`;
+      const response = await adminContext.post("/api/users", {
+        data: {
+          ...user,
+          username: username,
+          temp_password: getTestPassword(username, "Temp"),
+        },
+      });
+      expect(response.status()).toBe(201);
+    }
+
+    for (const user of testUsers) {
+      const userContext = await request.newContext();
+      const username = `${user.username}-${browserName}`;
+      const loginResponse = await loginAs(userContext, username, "Temp");
+      expect(loginResponse.status()).toBe(200);
+
+      const response = await userContext.put("/api/account", {
+        data: {
+          username: username,
+          fullname: user.fullname,
+          password: getTestPassword(username),
+        },
+      });
+
+      expect(response.status()).toBe(200);
+      await userContext.storageState({ path: `e2e-tests/state/${user.username}.json` });
+    }
+  });
+
   test(`create typists for flow`, async ({ page, browserName }) => {
     await page.goto("/account/login");
 
+    const adminUsername = `admin2-${browserName}`;
     const loginPage = new LoginPgObj(page);
-    await loginPage.login("admin2", getTestPassword("admin2"));
+    await loginPage.login(adminUsername, getTestPassword(adminUsername));
 
     const navBar = new AdminNavBar(page);
     await expect(navBar.username).toHaveText(`Jef van Reybrouck`);
 
-    for (const username of typistUsers) {
+    for (const username of typistBaseNameUsers) {
       await page.goto(`/users`);
 
       const userListPgObj = new UserListPgObj(page);
@@ -105,13 +142,12 @@ test.describe("full flow", () => {
     }
   });
 
-  test("create election and a new polling station", async ({ page }) => {
-    const adminContext = await request.newContext();
+  test("create election and a new polling station", async ({ page, browserName }) => {
     await page.goto("/account/login");
 
+    const adminUsername = `admin2-${browserName}`;
     const loginPage = new LoginPgObj(page);
-    await loginPage.login("admin2", getTestPassword("admin2"));
-    await adminContext.storageState({ path: "e2e-tests/state/admin2.json" });
+    await loginPage.login(adminUsername, getTestPassword(adminUsername));
 
     const electionsOverviewPage = new ElectionsOverviewPgObj(page);
     await electionsOverviewPage.create.click();
@@ -164,13 +200,12 @@ test.describe("full flow", () => {
     );
   });
 
-  test("start data entry", async ({ page }) => {
-    const adminContext = await request.newContext();
+  test("start data entry", async ({ page, browserName }) => {
     await page.goto("/account/login");
-    await adminContext.storageState({ path: "e2e-tests/state/coordinator2.json" });
 
+    const username = `coordinator2-${browserName}`;
     const loginPage = new LoginPgObj(page);
-    await loginPage.login("coordinator2", getTestPassword("coordinator2"));
+    await loginPage.login(username, getTestPassword(username));
 
     const overviewPage = new ElectionsOverviewPgObj(page);
     await expect(overviewPage.header).toBeVisible();
@@ -234,7 +269,7 @@ test.describe("full flow", () => {
     expect((await stat(await download.path())).size).toBeGreaterThan(1024);
   });
 
-  for (const typist of typistUsers) {
+  for (const typist of typistBaseNameUsers) {
     test(`complete account for ${typist}`, async ({ page, browserName }) => {
       await page.goto("/account/login");
       const loginPage = new LoginPgObj(page);
@@ -464,7 +499,7 @@ test.describe("full flow", () => {
     });
   }
 
-  for (const typist of typistUsers) {
+  for (const typist of typistBaseNameUsers) {
     test(`corrected data entry with ${typist}`, async ({ page, browserName }) => {
       await page.goto("/account/login");
 
@@ -511,8 +546,8 @@ test.describe("full flow", () => {
     });
   }
 
-  for (const typist of typistUsers) {
-    test(`data entry for new pollings station with ${typist}`, async ({ page, browserName }) => {
+  for (const typist of typistBaseNameUsers) {
+    test(`data entry for new polling station with ${typist}`, async ({ page, browserName }) => {
       await page.goto("/account/login");
 
       const username = `${typist}-${browserName}`;

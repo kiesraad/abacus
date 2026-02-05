@@ -9,7 +9,10 @@ use chrono::Utc;
 use sqlx::SqlitePool;
 use tracing::{debug, error, info};
 
-use super::{SESSION_MIN_LIFE_TIME, request_data::RequestSessionData};
+use super::{
+    SESSION_LIFE_TIME, SESSION_MIN_LIFE_TIME, request_data::RequestSessionData,
+    session::get_expires_at,
+};
 use crate::{
     SqlitePoolExt,
     api::authentication::set_default_cookie_properties,
@@ -78,7 +81,13 @@ pub async fn extend_session(
     // extend lifetime of session and set new cookie if the session is still valid and will soon expire
     if (expires - now) < SESSION_MIN_LIFE_TIME && expires > now && !do_not_extend {
         match pool.begin_immediate().await {
-            Ok(mut tx) => match session_repo::extend_session(&mut tx, &session).await {
+            Ok(mut tx) => match session_repo::extend_session(
+                &mut tx,
+                &session,
+                get_expires_at(SESSION_LIFE_TIME),
+            )
+            .await
+            {
                 Ok(session) => {
                     let _ = audit_service
                         .with_user(user.clone())

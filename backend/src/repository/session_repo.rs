@@ -1,12 +1,11 @@
 use std::time::Duration;
 
-use chrono::{DateTime, TimeDelta, Utc};
-use rand::{Rng, distr::Alphanumeric};
+use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use sqlx::{FromRow, SqliteConnection};
 
 use crate::{
-    api::middleware::authentication::{SESSION_LIFE_TIME, request_data::RequestSessionData},
+    api::middleware::authentication::request_data::RequestSessionData,
     repository::user_repo::UserId,
 };
 
@@ -23,22 +22,19 @@ pub struct Session {
 }
 
 impl Session {
-    // Create a new session for a specific user
-    pub(crate) fn create(
+    pub fn new(
+        session_key: String,
         user_id: UserId,
-        user_agent: &str,
-        ip_address: &str,
-        life_time: TimeDelta,
+        user_agent: String,
+        ip_address: String,
+        expires_at: DateTime<Utc>,
+        created_at: DateTime<Utc>,
     ) -> Self {
-        let session_key = create_new_session_key();
-        let expires_at = get_expires_at(life_time);
-        let created_at = Utc::now();
-
         Self {
             session_key,
             user_id,
-            user_agent: user_agent.to_string(),
-            ip_address: ip_address.to_string(),
+            user_agent,
+            ip_address,
             expires_at,
             created_at,
         }
@@ -210,8 +206,8 @@ pub async fn count(conn: &mut SqliteConnection) -> Result<u32, sqlx::Error> {
 pub(crate) async fn extend_session(
     conn: &mut SqliteConnection,
     session: &Session,
+    expires_at: DateTime<Utc>,
 ) -> Result<Session, sqlx::Error> {
-    let new_expires_at = get_expires_at(SESSION_LIFE_TIME);
     let session_key = session.session_key();
 
     let session = sqlx::query_as!(
@@ -228,7 +224,7 @@ pub(crate) async fn extend_session(
             expires_at as "expires_at: _",
             created_at as "created_at: _"
         "#,
-        new_expires_at,
+        expires_at,
         session_key
     )
     .fetch_one(conn)
@@ -237,28 +233,9 @@ pub(crate) async fn extend_session(
     Ok(session)
 }
 
-/// Create a new session key, a secure random alphanumeric string of 24 characters
-/// Which corresponds to ~142 bits of entropy
-fn create_new_session_key() -> String {
-    rand::rng()
-        .sample_iter(&Alphanumeric)
-        .take(24)
-        .map(char::from)
-        .collect()
-}
-
-/// Get the time when the session expires
-/// Note this will return the current time if adding the duration would be out of range,
-/// which will not happen in the next 260117 years, since the duration is only set using constants in out codebase
-fn get_expires_at(duration: TimeDelta) -> DateTime<Utc> {
-    Utc::now()
-        .checked_add_signed(duration)
-        .unwrap_or(Utc::now())
-}
-
 #[cfg(test)]
 mod tests {
-    use chrono::{TimeDelta, Utc};
+    use chrono::TimeDelta;
     use sqlx::SqlitePool;
     use test_log::test;
 
@@ -362,30 +339,5 @@ mod tests {
         save(&mut conn, &expired_session).await.unwrap();
 
         assert_eq!(2, super::count(&mut conn).await.unwrap());
-    }
-
-    #[test]
-    fn test_create_new_session_key() {
-        let key = super::create_new_session_key();
-
-        assert_eq!(key.len(), 24);
-        assert!(key.chars().all(|c| c.is_ascii_alphanumeric()));
-    }
-
-    #[test]
-    fn test_get_current_time() {
-        let current_time = Utc::now();
-        let current_time2 = Utc::now();
-
-        assert!(current_time <= current_time2);
-    }
-
-    #[test]
-    fn test_get_expires_at() {
-        let current_time = Utc::now();
-        let expires_at = get_expires_at(TimeDelta::seconds(60));
-
-        assert!(expires_at > current_time);
-        assert_eq!((expires_at - current_time).num_seconds(), 60);
     }
 }

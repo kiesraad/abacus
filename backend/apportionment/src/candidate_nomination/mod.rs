@@ -262,11 +262,6 @@ fn update_candidate_ranking<T: CandidateVotesTrait>(
 mod tests {
     use test_log::test;
 
-    use crate::test_helpers::{
-        candidate_nomination_fixture_with_given_list_numbers_and_number_of_seats,
-        seat_assignment_fixture_with_given_candidate_votes,
-        seat_assignment_fixture_with_given_list_numbers_and_candidate_votes,
-    };
     use crate::{
         ApportionmentError, CandidateVotesTrait,
         candidate_nomination::{
@@ -276,8 +271,10 @@ mod tests {
         structs::ListNumber,
         test_helpers::{
             ApportionmentInputMock, CandidateVotesMock,
+            candidate_nomination_fixture_with_given_list_numbers_and_number_of_seats,
             candidate_nomination_fixture_with_given_number_of_seats,
             seat_assignment_fixture_with_given_candidate_votes,
+            seat_assignment_fixture_with_given_list_numbers_and_candidate_votes,
         },
     };
 

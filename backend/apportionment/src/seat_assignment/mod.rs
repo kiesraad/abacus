@@ -283,8 +283,12 @@ pub(crate) mod tests {
     use crate::{
         SeatAssignmentResult,
         fraction::Fraction,
-        seat_assignment::{ListStanding, SeatChange, list_numbers},
+        seat_assignment::{
+            ListStanding, SeatChange, get_total_seats_per_list_number_from_apportionment_result,
+            list_numbers,
+        },
         structs::ListNumber,
+        test_helpers::convert_total_seats_per_u32_list_number_to_total_seats_per_list_number,
     };
     use test_log::test;
 
@@ -297,17 +301,14 @@ pub(crate) mod tests {
 
     fn check_total_seats_per_list(
         result: &SeatAssignmentResult,
-        expected_total_seats: Vec<(u32, u32)>,
+        expected_total_seats_per_list: Vec<(u32, u32)>,
     ) {
-        let total_seats_per_list_number = result
-            .final_standing
-            .iter()
-            .map(|p| (p.list_number, p.total_seats))
-            .collect::<Vec<_>>();
-        let expected_total_seats_per_list_number: Vec<(ListNumber, u32)> = expected_total_seats
-            .iter()
-            .map(|(number, seats)| (ListNumber::from(*number), *seats))
-            .collect();
+        let total_seats_per_list_number =
+            get_total_seats_per_list_number_from_apportionment_result(result);
+        let expected_total_seats_per_list_number =
+            convert_total_seats_per_u32_list_number_to_total_seats_per_list_number(
+                expected_total_seats_per_list,
+            );
         assert_eq!(
             expected_total_seats_per_list_number,
             total_seats_per_list_number

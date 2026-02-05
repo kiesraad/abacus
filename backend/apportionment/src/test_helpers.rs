@@ -84,6 +84,16 @@ impl ListVotesMock {
     }
 }
 
+#[cfg(test)]
+pub fn convert_total_seats_per_u32_list_number_to_total_seats_per_list_number(
+    total_seats_per_list_number: Vec<(u32, u32)>,
+) -> Vec<(ListNumber, u32)> {
+    total_seats_per_list_number
+        .iter()
+        .map(|(number, total_seats)| (ListNumber::from(*number), *total_seats))
+        .collect()
+}
+
 /// Create a CandidateNominationInput with consecutive list numbers and
 /// given quota, number of seats, candidate votes and total seats per list.
 pub fn candidate_nomination_fixture_with_given_number_of_seats(
@@ -116,10 +126,10 @@ pub fn candidate_nomination_fixture_with_given_list_numbers_and_number_of_seats(
         number_of_seats: seat_assignment_input.number_of_seats,
         list_votes: &seat_assignment_input.list_votes,
         quota,
-        total_seats_per_list: total_seats_per_list_number
-            .iter()
-            .map(|(number, total_seats)| (ListNumber::from(*number), *total_seats))
-            .collect(),
+        total_seats_per_list:
+            convert_total_seats_per_u32_list_number_to_total_seats_per_list_number(
+                total_seats_per_list_number,
+            ),
     }
 }
 

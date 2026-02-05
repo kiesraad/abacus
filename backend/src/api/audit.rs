@@ -159,7 +159,11 @@ mod tests {
         infra::audit_log::{
             AuditEvent, AuditLogListResponse, AuditLogUser, AuditService, UserLoggedInDetails,
         },
-        repository::user_repo::{self, User, UserId},
+        repository::{
+            session_repo,
+            session_repo::Session,
+            user_repo::{self, User, UserId},
+        },
     };
 
     const TEST_USER_AGENT: &str = "TestAgent/1.0";
@@ -193,15 +197,13 @@ mod tests {
         };
 
         let mut conn = pool.acquire().await.unwrap();
-        let session = crate::api::middleware::authentication::session::create(
-            &mut conn,
+        let session = Session::create(
             UserId::from(1),
             TEST_USER_AGENT,
             TEST_IP_ADDRESS,
             TimeDelta::seconds(60 * 30),
-        )
-        .await
-        .unwrap();
+        );
+        session_repo::save(&mut conn, &session).await.unwrap();
 
         let app = Router::new()
             .route("/api/log", get(audit_log_list))
@@ -263,15 +265,13 @@ mod tests {
         };
 
         let mut conn = pool.acquire().await.unwrap();
-        let session = crate::api::middleware::authentication::session::create(
-            &mut conn,
+        let session = Session::create(
             UserId::from(1),
             TEST_USER_AGENT,
             TEST_IP_ADDRESS,
             TimeDelta::seconds(60 * 30),
-        )
-        .await
-        .unwrap();
+        );
+        session_repo::save(&mut conn, &session).await.unwrap();
 
         let app = Router::new()
             .route("/api/log-users", get(audit_log_list_users))

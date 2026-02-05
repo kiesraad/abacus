@@ -25,8 +25,13 @@ components:
   - { include: [ ".*/backend/src/api/election.rs" ], name: "backend/src/api/election" }
   - { include: [ ".*/backend/src/api/investigation.rs" ], name: "backend/src/api/investigation" }
   - { include: [ ".*/backend/src/api/polling_station.rs" ], name: "backend/src/api/polling_station" }
+  - { include: [ ".*/backend/src/api/providers.rs" ], name: "backend/src/api/providers" }
   - { include: [ ".*/backend/src/api/report.rs" ], name: "backend/src/api/report" }
   - { include: [ ".*/backend/src/api/user.rs" ], name: "backend/src/api/user" }
+
+  # Backend service layer
+  - { include: [ ".*/backend/src/service/mod.rs" ], name: "backend/src/service" }
+  - { include: [ ".*/backend/src/service/change_committee_session_status.rs" ], name: "backend/src/service/change_committee_session_status" }
 
   # Backend repository layer
   - { include: [ ".*/backend/src/repository/mod.rs" ], name: "backend/src/repository" }
@@ -36,6 +41,7 @@ components:
   - { include: [ ".*/backend/src/repository/file_repo.rs" ], name: "backend/src/repository/file_repo" }
   - { include: [ ".*/backend/src/repository/investigation_repo.rs" ], name: "backend/src/repository/investigation_repo" }
   - { include: [ ".*/backend/src/repository/polling_station_repo.rs" ], name: "backend/src/repository/polling_station_repo" }
+  - { include: [ ".*/backend/src/repository/session_repo.rs" ], name: "backend/src/repository/session_repo" }
   - { include: [ ".*/backend/src/repository/user_repo.rs" ], name: "backend/src/repository/user_repo" }
 
   # Backend domain layer

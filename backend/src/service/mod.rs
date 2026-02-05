@@ -1,0 +1,3 @@
+mod change_committee_session_status;
+
+pub use change_committee_session_status::change_committee_session_status;

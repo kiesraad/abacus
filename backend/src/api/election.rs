@@ -12,12 +12,14 @@ use utoipa_axum::{router::OpenApiRouter, routes};
 use crate::{
     APIError, AppState, ErrorResponse, SqlitePoolExt,
     api::{
-        committee_session::{CommitteeSessionError, create_committee_session},
+        committee_session::create_committee_session,
         middleware::authentication::{Admin, AdminOrCoordinator},
         polling_station::create_imported_polling_stations,
     },
     domain::{
-        committee_session::{CommitteeSession, CommitteeSessionCreateRequest},
+        committee_session::{
+            CommitteeSession, CommitteeSessionCreateRequest, CommitteeSessionError,
+        },
         committee_session_status::CommitteeSessionStatus,
         election::{
             Election, ElectionId, ElectionNumberOfVotersChangeRequest, ElectionWithPoliticalGroups,

@@ -15,7 +15,7 @@ use crate::{
     },
     domain::{
         committee_session::CommitteeSession,
-        committee_session_status::{CommitteeSessionStatus, change_committee_session_status},
+        committee_session_status::CommitteeSessionStatus,
         election::ElectionId,
         polling_station::{
             PollingStation, PollingStationFileRequest, PollingStationId,
@@ -31,6 +31,7 @@ use crate::{
         polling_station_repo::{create, create_many, delete, get_for_election, list, update},
         user_repo::User,
     },
+    service::change_committee_session_status,
 };
 
 pub fn router() -> OpenApiRouter<AppState> {

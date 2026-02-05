@@ -15,6 +15,15 @@ use crate::{
     infra::audit_log,
 };
 
+#[derive(Debug, PartialEq, Eq)]
+pub enum CommitteeSessionError {
+    CommitteeSessionPaused,
+    InvalidCommitteeSessionStatus,
+    InvalidDetails,
+    InvalidStatusTransition,
+    ProviderError,
+}
+
 id!(CommitteeSessionId);
 
 /// Committee session
@@ -44,6 +53,29 @@ impl CommitteeSession {
     /// Check if this session is the next session to be held
     pub fn is_next_session(&self) -> bool {
         self.number > 1
+    }
+
+    #[cfg(test)]
+    pub fn first_session() -> Self {
+        CommitteeSession {
+            number: 1,
+            id: CommitteeSessionId::from(0),
+            election_id: ElectionId::from(0),
+            location: "".to_string(),
+            start_date_time: None,
+            status: CommitteeSessionStatus::Created,
+            results_eml: None,
+            results_pdf: None,
+            overview_pdf: None,
+        }
+    }
+
+    #[cfg(test)]
+    pub fn next_session() -> Self {
+        CommitteeSession {
+            number: 2,
+            ..CommitteeSession::first_session()
+        }
     }
 }
 

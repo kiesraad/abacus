@@ -26,6 +26,7 @@ use crate::{
     },
     repository::{
         session_repo,
+        session_repo::Session,
         user_repo::{self, User, UserId},
     },
 };
@@ -156,8 +157,8 @@ async fn login(
         .to_string();
 
     // Create a new session and cookie
-    let session =
-        session_repo::create(&mut tx, user.id(), &user_agent, &ip, SESSION_LIFE_TIME).await?;
+    let session = Session::create(user.id(), &user_agent, &ip, SESSION_LIFE_TIME);
+    session_repo::save(&mut tx, &session).await?;
 
     // Log the login event
     let logged_in_users_count = session_repo::count(&mut tx).await?;

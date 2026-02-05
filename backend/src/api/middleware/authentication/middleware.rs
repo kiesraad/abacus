@@ -150,15 +150,13 @@ mod test {
 
         let user = User::test_user(Role::Administrator, UserId::from(1));
         let mut conn = pool.acquire().await.unwrap();
-        let session = session_repo::create(
-            &mut conn,
+        let session = Session::create(
             user.id(),
             TEST_USER_AGENT,
             TEST_IP_ADDRESS,
             SESSION_LIFE_TIME,
-        )
-        .await
-        .unwrap();
+        );
+        session_repo::save(&mut conn, &session).await.unwrap();
 
         let cookie = session.get_cookie();
 
@@ -214,15 +212,8 @@ mod test {
 
         let life_time = SESSION_MIN_LIFE_TIME + TimeDelta::seconds(30); // min life time + 30 seconds
         let mut conn = pool.acquire().await.unwrap();
-        let session = session_repo::create(
-            &mut conn,
-            user.id(),
-            TEST_USER_AGENT,
-            TEST_IP_ADDRESS,
-            life_time,
-        )
-        .await
-        .unwrap();
+        let session = Session::create(user.id(), TEST_USER_AGENT, TEST_IP_ADDRESS, life_time);
+        session_repo::save(&mut conn, &session).await.unwrap();
 
         let updated_response = extend_session(
             State(pool.clone()),
@@ -248,15 +239,8 @@ mod test {
         );
 
         let life_time = SESSION_MIN_LIFE_TIME - TimeDelta::seconds(30); // min life time - 30 seconds
-        let session = session_repo::create(
-            &mut conn,
-            user.id(),
-            TEST_USER_AGENT,
-            TEST_IP_ADDRESS,
-            life_time,
-        )
-        .await
-        .unwrap();
+        let session = Session::create(user.id(), TEST_USER_AGENT, TEST_IP_ADDRESS, life_time);
+        session_repo::save(&mut conn, &session).await.unwrap();
 
         let updated_response = extend_session(
             State(pool.clone()),
@@ -299,15 +283,8 @@ mod test {
 
         let life_time = SESSION_MIN_LIFE_TIME - TimeDelta::seconds(30); // min life time - 30 seconds
         let mut conn = pool.acquire().await.unwrap();
-        let session = session_repo::create(
-            &mut conn,
-            user.id(),
-            TEST_USER_AGENT,
-            TEST_IP_ADDRESS,
-            life_time,
-        )
-        .await
-        .unwrap();
+        let session = Session::create(user.id(), TEST_USER_AGENT, TEST_IP_ADDRESS, life_time);
+        session_repo::save(&mut conn, &session).await.unwrap();
 
         let mut headers = HeaderMap::new();
         headers.insert(

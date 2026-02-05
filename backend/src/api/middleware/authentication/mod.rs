@@ -496,15 +496,13 @@ mod tests {
     async fn test_list(pool: SqlitePool) {
         let app = create_app(pool.clone());
         let mut conn = pool.acquire().await.unwrap();
-        let session = session_repo::create(
-            &mut conn,
+        let session = Session::create(
             UserId::from(1),
             TEST_USER_AGENT,
             TEST_IP_ADDRESS,
             SESSION_LIFE_TIME,
-        )
-        .await
-        .unwrap();
+        );
+        session_repo::save(&mut conn, &session).await.unwrap();
         let mut cookie = session.get_cookie();
         set_default_cookie_properties(&mut cookie);
         let response = app
@@ -533,15 +531,13 @@ mod tests {
 
         // with a normal long-valid session the user should not get a new cookie
         let mut conn = pool.acquire().await.unwrap();
-        let session = session_repo::create(
-            &mut conn,
+        let session = Session::create(
             UserId::from(1),
             TEST_USER_AGENT,
             TEST_IP_ADDRESS,
             SESSION_LIFE_TIME,
-        )
-        .await
-        .unwrap();
+        );
+        session_repo::save(&mut conn, &session).await.unwrap();
         let mut cookie = session.get_cookie();
         set_default_cookie_properties(&mut cookie);
 
@@ -563,15 +559,13 @@ mod tests {
         assert_eq!(response.headers().get("set-cookie"), None);
 
         // with a session that is about to expire the user should get a new cookie, and the session lifetime should be extended
-        let session: Session = session_repo::create(
-            &mut conn,
+        let session = Session::create(
             UserId::from(1),
             TEST_USER_AGENT,
             TEST_IP_ADDRESS,
             SESSION_MIN_LIFE_TIME / 2,
-        )
-        .await
-        .unwrap();
+        );
+        session_repo::save(&mut conn, &session).await.unwrap();
         let mut cookie = session.get_cookie();
         set_default_cookie_properties(&mut cookie);
 
@@ -672,15 +666,13 @@ mod tests {
         let app = create_app(pool.clone());
         // user id 5 is a typist
         let mut conn = pool.acquire().await.unwrap();
-        let session = session_repo::create(
-            &mut conn,
+        let session = Session::create(
             UserId::from(5),
             TEST_USER_AGENT,
             TEST_IP_ADDRESS,
             SESSION_LIFE_TIME,
-        )
-        .await
-        .unwrap();
+        );
+        session_repo::save(&mut conn, &session).await.unwrap();
         let mut cookie = session.get_cookie();
         set_default_cookie_properties(&mut cookie);
         let response = app

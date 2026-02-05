@@ -53,7 +53,6 @@ impl Session {
                 SESSION_LIFE_TIME.num_seconds(),
             ))
             .build()
-            .clone()
     }
 }
 

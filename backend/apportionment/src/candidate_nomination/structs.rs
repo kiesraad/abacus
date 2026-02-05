@@ -12,7 +12,6 @@ pub struct ListCandidateNomination<'a, T: CandidateVotesTrait> {
     /// The number of seats assigned to this group
     pub list_seats: u32,
     /// The list of chosen candidates via preferential votes, can be empty
-    // TODO: check lifetimes
     pub preferential_candidate_nomination: Vec<&'a T>,
     /// The list of other chosen candidates, can be empty
     pub other_candidate_nomination: Vec<&'a T>,

@@ -5,9 +5,9 @@ pub use role::{Admin, AdminOrCoordinator, Coordinator, IncompleteUser, Typist};
 pub mod error;
 mod middleware;
 pub mod password;
-pub mod request_data;
 mod role;
 mod session;
+pub mod session_identifier;
 
 /// Session lifetime, for both cookie and database
 /// Also change the translation string "users.session_expired" in the frontend if this value is changed

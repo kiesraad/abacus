@@ -9,15 +9,17 @@ use chrono::Utc;
 use sqlx::SqlitePool;
 use tracing::{debug, error, info};
 
-use super::{
-    SESSION_LIFE_TIME, SESSION_MIN_LIFE_TIME, request_data::RequestSessionData,
-    session::get_expires_at,
-};
+use super::{SESSION_LIFE_TIME, SESSION_MIN_LIFE_TIME, session::get_expires_at};
 use crate::{
     SqlitePoolExt,
     api::authentication::set_default_cookie_properties,
     infra::audit_log::{AuditEvent, AuditService},
-    repository::{session_repo, session_repo::Session, user_repo, user_repo::User},
+    repository::{
+        session_repo,
+        session_repo::{Session, SessionIdentifier},
+        user_repo,
+        user_repo::User,
+    },
 };
 
 /// Inject user and session
@@ -25,7 +27,7 @@ pub async fn inject_user(
     State(pool): State<SqlitePool>,
     mut request: Request<Body>,
 ) -> Request<Body> {
-    let Some(request_data) = request.extract_parts::<RequestSessionData>().await.ok() else {
+    let Some(session_id) = request.extract_parts::<SessionIdentifier>().await.ok() else {
         return request;
     };
 
@@ -34,8 +36,7 @@ pub async fn inject_user(
         return request;
     };
 
-    let Ok(Some(session)) = session_repo::get_by_request_data(&mut conn, &request_data).await
-    else {
+    let Ok(Some(session)) = session_repo::get_by_identifier(&mut conn, &session_id).await else {
         return request;
     };
 

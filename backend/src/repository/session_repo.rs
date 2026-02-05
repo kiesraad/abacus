@@ -4,10 +4,7 @@ use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use sqlx::{FromRow, SqliteConnection};
 
-use crate::{
-    api::middleware::authentication::request_data::RequestSessionData,
-    repository::user_repo::UserId,
-};
+use crate::repository::user_repo::UserId;
 
 /// A session object, corresponds to a row in the sessions table
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Hash, FromRow)]
@@ -94,14 +91,19 @@ pub(crate) async fn save(
     Ok(saved_session)
 }
 
+#[derive(Debug)]
+pub struct SessionIdentifier {
+    pub session_key: String,
+    pub user_agent: String,
+    pub ip_address: String,
+}
+
 /// Get a session by its key and validate user agent and IP address
-pub(crate) async fn get_by_request_data(
+pub(crate) async fn get_by_identifier(
     conn: &mut SqliteConnection,
-    request_data: &RequestSessionData,
+    session: &SessionIdentifier,
 ) -> Result<Option<Session>, sqlx::Error> {
     let now = Utc::now();
-    let session_key = request_data.session_cookie.value();
-    let ip_address = request_data.ip_address.to_string();
 
     let session: Option<Session> = sqlx::query_as!(
         Session,
@@ -119,9 +121,9 @@ pub(crate) async fn get_by_request_data(
         AND ip_address = ?
         AND expires_at > ?
         "#,
-        session_key,
-        request_data.user_agent,
-        ip_address,
+        session.session_key,
+        session.user_agent,
+        session.ip_address,
         now
     )
     .fetch_optional(conn)

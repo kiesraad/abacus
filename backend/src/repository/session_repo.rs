@@ -6,9 +6,7 @@ use serde::{Deserialize, Serialize};
 use sqlx::{FromRow, SqliteConnection};
 
 use crate::{
-    api::middleware::authentication::{
-        SESSION_LIFE_TIME, error::AuthenticationError, request_data::RequestSessionData,
-    },
+    api::middleware::authentication::{SESSION_LIFE_TIME, request_data::RequestSessionData},
     repository::user_repo::UserId,
 };
 
@@ -31,19 +29,19 @@ impl Session {
         user_agent: String,
         ip_address: String,
         life_time: TimeDelta,
-    ) -> Result<Self, AuthenticationError> {
+    ) -> Self {
         let session_key = create_new_session_key();
         let expires_at = get_expires_at(life_time);
         let created_at = Utc::now();
 
-        Ok(Self {
+        Self {
             session_key,
             user_id,
             user_agent,
             ip_address,
             expires_at,
             created_at,
-        })
+        }
     }
 
     /// Get the session user id
@@ -70,21 +68,29 @@ impl Session {
     }
 }
 
-/// Create a new session, note this converts any i64 timestamps to i64
+/// Create and save a new session, note this converts any i64 timestamps to i64
 pub(crate) async fn create(
     conn: &mut SqliteConnection,
     user_id: UserId,
     user_agent: &str,
     ip_address: &str,
     life_time: TimeDelta,
-) -> Result<Session, AuthenticationError> {
+) -> Result<Session, sqlx::Error> {
     let session = Session::new(
         user_id,
         user_agent.to_string(),
         ip_address.to_string(),
         life_time,
-    )?;
+    );
 
+    save(conn, session).await
+}
+
+/// Save a session, note this converts any i64 timestamps to i64
+pub(crate) async fn save(
+    conn: &mut SqliteConnection,
+    session: Session,
+) -> Result<Session, sqlx::Error> {
     let saved_session = sqlx::query_as!(
         Session,
         r#"INSERT INTO sessions (session_key, user_id, user_agent, ip_address, expires_at, created_at)
@@ -104,8 +110,8 @@ pub(crate) async fn create(
         session.expires_at,
         session.created_at
     )
-    .fetch_one(conn)
-    .await?;
+        .fetch_one(conn)
+        .await?;
 
     Ok(saved_session)
 }
@@ -114,7 +120,7 @@ pub(crate) async fn create(
 pub(crate) async fn get_by_request_data(
     conn: &mut SqliteConnection,
     request_data: &RequestSessionData,
-) -> Result<Option<Session>, AuthenticationError> {
+) -> Result<Option<Session>, sqlx::Error> {
     let now = Utc::now();
     let session_key = request_data.session_cookie.value();
     let ip_address = request_data.ip_address.to_string();
@@ -150,7 +156,7 @@ pub(crate) async fn get_by_request_data(
 pub async fn get_by_key(
     conn: &mut SqliteConnection,
     session_key: &str,
-) -> Result<Option<Session>, AuthenticationError> {
+) -> Result<Option<Session>, sqlx::Error> {
     let now = Utc::now();
     let session: Option<Session> = sqlx::query_as!(
         Session,
@@ -176,10 +182,7 @@ pub async fn get_by_key(
 }
 
 /// Delete a session by its key
-pub async fn delete(
-    conn: &mut SqliteConnection,
-    session_key: &str,
-) -> Result<(), AuthenticationError> {
+pub async fn delete(conn: &mut SqliteConnection, session_key: &str) -> Result<(), sqlx::Error> {
     sqlx::query!("DELETE FROM sessions WHERE session_key = ?", session_key)
         .execute(conn)
         .await?;
@@ -191,7 +194,7 @@ pub async fn delete(
 pub async fn delete_user_session(
     conn: &mut SqliteConnection,
     user_id: UserId,
-) -> Result<(), AuthenticationError> {
+) -> Result<(), sqlx::Error> {
     sqlx::query!("DELETE FROM sessions WHERE user_id = ?", user_id)
         .execute(conn)
         .await?;
@@ -200,9 +203,7 @@ pub async fn delete_user_session(
 }
 
 /// Delete all sessions that have expired
-pub async fn delete_expired_sessions(
-    conn: &mut SqliteConnection,
-) -> Result<(), AuthenticationError> {
+pub async fn delete_expired_sessions(conn: &mut SqliteConnection) -> Result<(), sqlx::Error> {
     sqlx::query("DELETE FROM sessions WHERE expires_at <= ?")
         .bind(Utc::now())
         .execute(conn)
@@ -212,7 +213,7 @@ pub async fn delete_expired_sessions(
 }
 
 /// Count the number of active sessions
-pub async fn count(conn: &mut SqliteConnection) -> Result<u32, AuthenticationError> {
+pub async fn count(conn: &mut SqliteConnection) -> Result<u32, sqlx::Error> {
     let now = Utc::now();
     let count = sqlx::query_scalar!(
         r#"SELECT COUNT(*) AS "count: u32" FROM sessions WHERE expires_at > ?"#,
@@ -227,7 +228,7 @@ pub async fn count(conn: &mut SqliteConnection) -> Result<u32, AuthenticationErr
 pub(crate) async fn extend_session(
     conn: &mut SqliteConnection,
     session: &Session,
-) -> Result<Session, AuthenticationError> {
+) -> Result<Session, sqlx::Error> {
     let new_expires_at = get_expires_at(SESSION_LIFE_TIME);
     let session_key = session.session_key();
 

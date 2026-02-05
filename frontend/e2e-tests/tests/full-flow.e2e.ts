@@ -1,5 +1,5 @@
 import { stat } from "node:fs/promises";
-import { expect, request } from "@playwright/test";
+import { expect } from "@playwright/test";
 import { test } from "e2e-tests/fixtures";
 import { getTestPassword, loginAs } from "e2e-tests/helpers-utils/e2e-test-api-helpers";
 import {
@@ -69,17 +69,12 @@ test.describe.configure({ mode: "serial" });
 test.describe("full flow", () => {
   let electionId: number | null = null;
 
-  test("create test user accounts for browsers", async ({ browserName }) => {
-    // create a new APIRequestContext
-    const adminContext = await request.newContext();
-    const loginResponse = await loginAs(adminContext, "admin1");
-    expect(loginResponse.status()).toBe(200);
-
-    await adminContext.storageState({ path: "e2e-tests/state/admin1.json" });
+  test("create test user accounts for browsers", async ({ admin, browserName }) => {
+    const { request } = admin;
 
     for (const user of testUsers) {
       const username = `${user.username}-${browserName}`;
-      const response = await adminContext.post("/api/users", {
+      const response = await request.post("/api/users", {
         data: {
           ...user,
           username: username,
@@ -90,12 +85,11 @@ test.describe("full flow", () => {
     }
 
     for (const user of testUsers) {
-      const userContext = await request.newContext();
       const username = `${user.username}-${browserName}`;
-      const loginResponse = await loginAs(userContext, username, "Temp");
+      const loginResponse = await loginAs(request, username, "Temp");
       expect(loginResponse.status()).toBe(200);
 
-      const response = await userContext.put("/api/account", {
+      const response = await request.put("/api/account", {
         data: {
           username: username,
           fullname: user.fullname,
@@ -104,7 +98,6 @@ test.describe("full flow", () => {
       });
 
       expect(response.status()).toBe(200);
-      await userContext.storageState({ path: `e2e-tests/state/${user.username}.json` });
     }
   });
 

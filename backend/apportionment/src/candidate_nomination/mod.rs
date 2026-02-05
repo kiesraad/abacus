@@ -127,7 +127,7 @@ fn candidate_nomination_per_list<'a, T: ListVotesTrait>(
             } else {
                 let updated_ranking = update_candidate_ranking(
                     preference_threshold,
-                    candidate_votes_meeting_preference_threshold,
+                    &candidate_votes_meeting_preference_threshold,
                     candidate_votes,
                 );
 
@@ -193,7 +193,7 @@ fn other_candidate_nomination<'a, T: CandidateVotesTrait>(
 
 /// List the candidates nominated with preferential votes
 fn preferential_candidate_nomination<'a, T: CandidateVotesTrait>(
-    candidates_meeting_preference_threshold: &Vec<&'a T>,
+    candidates_meeting_preference_threshold: &[&'a T],
     list_seats: u32,
 ) -> Result<Vec<&'a T>, ApportionmentError> {
     let mut preferential_candidate_nomination: Vec<&T> = vec![];
@@ -234,7 +234,7 @@ fn preferential_candidate_nomination<'a, T: CandidateVotesTrait>(
 /// to the top of the list and keeping the ranking of the rest of candidates on the list the same
 fn update_candidate_ranking<T: CandidateVotesTrait>(
     preference_threshold: Fraction,
-    candidate_votes_meeting_preference_threshold: Vec<&T>,
+    candidate_votes_meeting_preference_threshold: &[&T],
     candidate_votes: &[T],
 ) -> Vec<CandidateNumber> {
     let mut updated_candidate_ranking: Vec<CandidateNumber> = vec![];

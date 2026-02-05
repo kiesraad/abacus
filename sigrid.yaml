@@ -24,6 +24,10 @@ components:
   - { include: [ ".*/backend/src/api/report.rs" ], name: "backend/src/api/report" }
   - { include: [ ".*/backend/src/api/user.rs" ], name: "backend/src/api/user" }
 
+  # Backend service layer
+  - { include: [ ".*/backend/src/service/mod.rs" ], name: "backend/src/service" }
+  - { include: [ ".*/backend/src/service/change_committee_session_status.rs" ], name: "backend/src/service/change_committee_session_status" }
+
   # Backend repository layer
   - { include: [ ".*/backend/src/repository/mod.rs" ], name: "backend/src/repository" }
   - { include: [ ".*/backend/src/repository/committee_session_repo.rs" ], name: "backend/src/repository/committee_session_repo" }

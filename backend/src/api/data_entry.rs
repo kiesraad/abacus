@@ -12,13 +12,10 @@ use utoipa_axum::{router::OpenApiRouter, routes};
 
 use crate::{
     APIError, AppState, SqlitePoolExt,
-    api::{
-        committee_session::CommitteeSessionError,
-        middleware::authentication::{Coordinator, Typist, error::AuthenticationError},
-    },
+    api::middleware::authentication::{Coordinator, Typist, error::AuthenticationError},
     domain::{
-        committee_session::CommitteeSession,
-        committee_session_status::{CommitteeSessionStatus, change_committee_session_status},
+        committee_session::{CommitteeSession, CommitteeSessionError},
+        committee_session_status::CommitteeSessionStatus,
         data_entry::{
             CSONextSessionResults, CommonPollingStationResults, DataEntryStatusResponse,
             PollingStationDataEntry, PollingStationResults,
@@ -46,6 +43,7 @@ use crate::{
         polling_station_repo,
         user_repo::{User, UserId},
     },
+    service::change_committee_session_status,
 };
 
 impl From<DataError> for APIError {

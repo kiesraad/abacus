@@ -12,11 +12,11 @@ use crate::{
     api::middleware::authentication::Coordinator,
     domain::{
         committee_session::{
-            CommitteeSession, CommitteeSessionCreateRequest, CommitteeSessionId,
-            CommitteeSessionStatusChangeRequest, CommitteeSessionUpdateRequest,
+            CommitteeSession, CommitteeSessionCreateRequest, CommitteeSessionError,
+            CommitteeSessionId, CommitteeSessionStatusChangeRequest, CommitteeSessionUpdateRequest,
             InvestigationListResponse,
         },
-        committee_session_status::{CommitteeSessionStatus, change_committee_session_status},
+        committee_session_status::CommitteeSessionStatus,
         election::ElectionId,
     },
     error::ErrorReference,
@@ -26,21 +26,8 @@ use crate::{
         election_repo,
         investigation_repo::list_investigations_for_committee_session,
     },
+    service::change_committee_session_status,
 };
-
-#[derive(Debug, PartialEq, Eq)]
-pub enum CommitteeSessionError {
-    CommitteeSessionPaused,
-    InvalidCommitteeSessionStatus,
-    InvalidDetails,
-    InvalidStatusTransition,
-}
-
-impl From<CommitteeSessionError> for APIError {
-    fn from(err: CommitteeSessionError) -> Self {
-        APIError::CommitteeSession(err)
-    }
-}
 
 pub fn router() -> OpenApiRouter<AppState> {
     OpenApiRouter::default()

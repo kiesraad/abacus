@@ -209,8 +209,6 @@ pub enum AuditEvent {
     // file events
     FileCreated(FileDetails),
     FileDeleted(FileDetails),
-    // apportionment
-    ApportionmentCreated(ElectionDetails),
     // polling station events
     PollingStationCreated(PollingStationDetails),
     PollingStationUpdated(PollingStationDetails),
@@ -276,7 +274,6 @@ impl AuditEvent {
             AuditEvent::CommitteeSessionUpdated(_) => AuditEventLevel::Success,
             AuditEvent::FileCreated(_) => AuditEventLevel::Success,
             AuditEvent::FileDeleted(_) => AuditEventLevel::Info,
-            AuditEvent::ApportionmentCreated(_) => AuditEventLevel::Success,
             AuditEvent::PollingStationCreated(_) => AuditEventLevel::Success,
             AuditEvent::PollingStationUpdated(_) => AuditEventLevel::Success,
             AuditEvent::PollingStationDeleted(_) => AuditEventLevel::Info,

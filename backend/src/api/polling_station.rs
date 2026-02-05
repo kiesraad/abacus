@@ -31,7 +31,7 @@ use crate::{
         polling_station_repo::{create, create_many, delete, get_for_election, list, update},
         user_repo::User,
     },
-    service::change_committee_session_status::change_committee_session_status,
+    service::change_committee_session_status,
 };
 
 pub fn router() -> OpenApiRouter<AppState> {

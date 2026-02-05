@@ -26,7 +26,7 @@ use crate::{
         election_repo,
         investigation_repo::list_investigations_for_committee_session,
     },
-    service::change_committee_session_status::change_committee_session_status,
+    service::change_committee_session_status,
 };
 
 pub fn router() -> OpenApiRouter<AppState> {

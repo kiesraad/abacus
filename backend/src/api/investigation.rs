@@ -40,7 +40,7 @@ use crate::{
         },
         polling_station_repo,
     },
-    service::change_committee_session_status::change_committee_session_status,
+    service::change_committee_session_status,
 };
 
 pub fn router() -> OpenApiRouter<AppState> {

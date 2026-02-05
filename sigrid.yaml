@@ -31,6 +31,7 @@ components:
   - { include: [ ".*/backend/src/repository/file_repo.rs" ], name: "backend/src/repository/file_repo" }
   - { include: [ ".*/backend/src/repository/investigation_repo.rs" ], name: "backend/src/repository/investigation_repo" }
   - { include: [ ".*/backend/src/repository/polling_station_repo.rs" ], name: "backend/src/repository/polling_station_repo" }
+  - { include: [ ".*/backend/src/repository/session_repo.rs" ], name: "backend/src/repository/session_repo" }
   - { include: [ ".*/backend/src/repository/user_repo.rs" ], name: "backend/src/repository/user_repo" }
 
   # Backend domain layer

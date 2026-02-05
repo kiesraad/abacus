@@ -733,10 +733,9 @@ pub(crate) mod tests {
         mod list_exhaustion {
             use test_log::test;
 
-            use crate::seat_assignment::tests::check_total_seats_per_list;
             use crate::{
                 ApportionmentError,
-                seat_assignment::seat_assignment,
+                seat_assignment::{seat_assignment, tests::check_total_seats_per_list},
                 structs::ListNumber,
                 test_helpers::{
                     seat_assignment_fixture_with_given_candidate_votes,
@@ -1652,9 +1651,10 @@ pub(crate) mod tests {
         mod list_exhaustion {
             use test_log::test;
 
-            use crate::seat_assignment::tests::check_total_seats_per_list;
             use crate::{
-                ApportionmentError, seat_assignment::seat_assignment, structs::ListNumber,
+                ApportionmentError,
+                seat_assignment::{seat_assignment, tests::check_total_seats_per_list},
+                structs::ListNumber,
                 test_helpers::seat_assignment_fixture_with_given_candidate_votes,
             };
 

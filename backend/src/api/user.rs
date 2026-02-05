@@ -10,10 +10,13 @@ use utoipa_axum::{router::OpenApiRouter, routes};
 
 use crate::{
     APIError, AppState, ErrorResponse, SqlitePoolExt,
-    api::middleware::authentication::{AdminOrCoordinator, error::AuthenticationError, session},
+    api::middleware::authentication::{AdminOrCoordinator, error::AuthenticationError},
     domain::role::Role,
     infra::audit_log::{AuditEvent, AuditService},
-    repository::user_repo::{self, User, UserId},
+    repository::{
+        session_repo,
+        user_repo::{self, User, UserId},
+    },
 };
 
 pub fn user_router() -> OpenApiRouter<AppState> {
@@ -207,7 +210,7 @@ pub async fn user_update(
     if let Some(temp_password) = update_user_req.temp_password {
         user_repo::set_temporary_password(&mut tx, user_id, &temp_password).await?;
 
-        session::delete_user_session(&mut tx, user_id).await?;
+        session_repo::delete_user_session(&mut tx, user_id).await?;
     };
 
     let user = user_repo::get_by_id(&mut tx, user_id)

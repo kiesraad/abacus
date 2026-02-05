@@ -5,19 +5,11 @@ use axum::{
     http::request::Parts,
 };
 use axum_extra::{TypedHeader, extract::CookieJar, headers::UserAgent};
-use cookie::Cookie;
 
 use super::{SESSION_COOKIE_NAME, error::AuthenticationError};
-use crate::APIError;
+use crate::{APIError, repository::session_repo::SessionIdentifier};
 
-#[derive(Debug)]
-pub struct RequestSessionData {
-    pub user_agent: String,
-    pub ip_address: IpAddr,
-    pub session_cookie: Cookie<'static>,
-}
-
-impl<S> FromRequestParts<S> for RequestSessionData
+impl<S> FromRequestParts<S> for SessionIdentifier
 where
     S: Send + Sync,
 {
@@ -42,10 +34,10 @@ where
             .map(|a| a.ip())
             .unwrap_or(IpAddr::V4(Ipv4Addr::UNSPECIFIED));
 
-        Ok(RequestSessionData {
+        Ok(SessionIdentifier {
+            session_key: session_cookie.value().to_string(),
             user_agent,
-            ip_address,
-            session_cookie: session_cookie.clone(),
+            ip_address: ip_address.to_string(),
         })
     }
 }

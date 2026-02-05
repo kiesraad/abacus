@@ -9,20 +9,25 @@ use chrono::Utc;
 use sqlx::SqlitePool;
 use tracing::{debug, error, info};
 
-use super::{SESSION_MIN_LIFE_TIME, request_data::RequestSessionData, session::Session};
+use super::{SESSION_LIFE_TIME, SESSION_MIN_LIFE_TIME, session::get_expires_at};
 use crate::{
     SqlitePoolExt,
     api::authentication::set_default_cookie_properties,
     infra::audit_log::{AuditEvent, AuditService},
-    repository::{user_repo, user_repo::User},
+    repository::{
+        session_repo,
+        session_repo::{Session, SessionIdentifier},
+        user_repo,
+        user_repo::User,
+    },
 };
 
 /// Inject user and session
-pub async fn inject_user(
+pub(crate) async fn inject_user(
     State(pool): State<SqlitePool>,
     mut request: Request<Body>,
 ) -> Request<Body> {
-    let Some(request_data) = request.extract_parts::<RequestSessionData>().await.ok() else {
+    let Some(session_id) = request.extract_parts::<SessionIdentifier>().await.ok() else {
         return request;
     };
 
@@ -31,8 +36,7 @@ pub async fn inject_user(
         return request;
     };
 
-    let Ok(Some(session)) = super::session::get_by_request_data(&mut conn, &request_data).await
-    else {
+    let Ok(Some(session)) = session_repo::get_by_identifier(&mut conn, &session_id).await else {
         return request;
     };
 
@@ -56,7 +60,7 @@ pub async fn inject_user(
 
 /// Middleware to extend the session lifetime
 #[allow(clippy::cognitive_complexity)]
-pub async fn extend_session(
+pub(crate) async fn extend_session(
     State(pool): State<SqlitePool>,
     headers: HeaderMap,
     audit_service: AuditService,
@@ -78,7 +82,13 @@ pub async fn extend_session(
     // extend lifetime of session and set new cookie if the session is still valid and will soon expire
     if (expires - now) < SESSION_MIN_LIFE_TIME && expires > now && !do_not_extend {
         match pool.begin_immediate().await {
-            Ok(mut tx) => match super::session::extend_session(&mut tx, &session).await {
+            Ok(mut tx) => match session_repo::extend_session(
+                &mut tx,
+                &session,
+                get_expires_at(SESSION_LIFE_TIME),
+            )
+            .await
+            {
                 Ok(session) => {
                     let _ = audit_service
                         .with_user(user.clone())
@@ -131,11 +141,9 @@ mod test {
 
     use super::*;
     use crate::{
-        api::middleware::authentication::{
-            DO_NOT_EXTEND_SESSION_HEADER, SESSION_LIFE_TIME, session,
-        },
+        api::middleware::authentication::{DO_NOT_EXTEND_SESSION_HEADER, SESSION_LIFE_TIME},
         domain::role::Role,
-        repository::user_repo::UserId,
+        repository::{session_repo, user_repo::UserId},
     };
 
     const TEST_USER_AGENT: &str = "TestAgent/1.0";
@@ -152,15 +160,13 @@ mod test {
 
         let user = User::test_user(Role::Administrator, UserId::from(1));
         let mut conn = pool.acquire().await.unwrap();
-        let session = session::create(
-            &mut conn,
+        let session = Session::create(
             user.id(),
             TEST_USER_AGENT,
             TEST_IP_ADDRESS,
             SESSION_LIFE_TIME,
-        )
-        .await
-        .unwrap();
+        );
+        session_repo::save(&mut conn, &session).await.unwrap();
 
         let cookie = session.get_cookie();
 
@@ -216,15 +222,8 @@ mod test {
 
         let life_time = SESSION_MIN_LIFE_TIME + TimeDelta::seconds(30); // min life time + 30 seconds
         let mut conn = pool.acquire().await.unwrap();
-        let session = session::create(
-            &mut conn,
-            user.id(),
-            TEST_USER_AGENT,
-            TEST_IP_ADDRESS,
-            life_time,
-        )
-        .await
-        .unwrap();
+        let session = Session::create(user.id(), TEST_USER_AGENT, TEST_IP_ADDRESS, life_time);
+        session_repo::save(&mut conn, &session).await.unwrap();
 
         let updated_response = extend_session(
             State(pool.clone()),
@@ -250,15 +249,8 @@ mod test {
         );
 
         let life_time = SESSION_MIN_LIFE_TIME - TimeDelta::seconds(30); // min life time - 30 seconds
-        let session = session::create(
-            &mut conn,
-            user.id(),
-            TEST_USER_AGENT,
-            TEST_IP_ADDRESS,
-            life_time,
-        )
-        .await
-        .unwrap();
+        let session = Session::create(user.id(), TEST_USER_AGENT, TEST_IP_ADDRESS, life_time);
+        session_repo::save(&mut conn, &session).await.unwrap();
 
         let updated_response = extend_session(
             State(pool.clone()),
@@ -273,7 +265,7 @@ mod test {
         let cookie = updated_response.headers().get(SET_COOKIE).unwrap();
         let cookie = Cookie::from_str(cookie.to_str().unwrap()).unwrap();
 
-        let new_session = session::get_by_key(&mut conn, cookie.value())
+        let new_session = session_repo::get_by_key(&mut conn, cookie.value())
             .await
             .unwrap()
             .unwrap();
@@ -301,15 +293,8 @@ mod test {
 
         let life_time = SESSION_MIN_LIFE_TIME - TimeDelta::seconds(30); // min life time - 30 seconds
         let mut conn = pool.acquire().await.unwrap();
-        let session = session::create(
-            &mut conn,
-            user.id(),
-            TEST_USER_AGENT,
-            TEST_IP_ADDRESS,
-            life_time,
-        )
-        .await
-        .unwrap();
+        let session = Session::create(user.id(), TEST_USER_AGENT, TEST_IP_ADDRESS, life_time);
+        session_repo::save(&mut conn, &session).await.unwrap();
 
         let mut headers = HeaderMap::new();
         headers.insert(

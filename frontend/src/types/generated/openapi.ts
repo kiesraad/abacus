@@ -29,6 +29,12 @@ export interface ELECTION_DETAILS_REQUEST_PARAMS {
 }
 export type ELECTION_DETAILS_REQUEST_PATH = `/api/elections/${ElectionId}`;
 
+// /api/elections/{election_id}/apportionment
+export interface ELECTION_APPORTIONMENT_REQUEST_PARAMS {
+  election_id: number;
+}
+export type ELECTION_APPORTIONMENT_REQUEST_PATH = `/api/elections/${number}/apportionment`;
+
 // /api/elections/{election_id}/committee_sessions
 export interface COMMITTEE_SESSION_CREATE_REQUEST_PARAMS {
   election_id: ElectionId;
@@ -354,6 +360,7 @@ export type AuditEvent =
   | (PollingStationInvestigation & { event_type: "PollingStationInvestigationDeleted" })
   | (FileDetails & { event_type: "FileCreated" })
   | (FileDetails & { event_type: "FileDeleted" })
+  | (ElectionDetails & { event_type: "ApportionmentCreated" })
   | (PollingStationDetails & { event_type: "PollingStationCreated" })
   | (PollingStationDetails & { event_type: "PollingStationUpdated" })
   | (PollingStationDetails & { event_type: "PollingStationDeleted" })
@@ -703,6 +710,10 @@ export interface ElectionAndCandidatesDefinitionImportRequest {
   polling_station_file_name?: string;
 }
 
+export interface ElectionApportionmentResponse {
+  summary: ElectionSummary;
+}
+
 /**
  * Election category (limited for now)
  */
@@ -793,6 +804,22 @@ export interface ElectionStatusResponseEntry {
 }
 
 /**
+ * Contains a summary of the election results, added up from the votes of all polling stations.
+ */
+export interface ElectionSummary {
+  /** The differences between voters and votes */
+  differences_counts: SummaryDifferencesCounts;
+  /** The summary votes for each political group (and each candidate within) */
+  political_group_votes: PoliticalGroupCandidateVotes[];
+  /** Polling stations where results were investigated by the GSB */
+  polling_station_investigations: PollingStationInvestigations;
+  /** The total number of voters */
+  voters_counts: VotersCounts;
+  /** The total number of votes */
+  votes_counts: VotesCounts;
+}
+
+/**
  * Election with political groups
  */
 export interface ElectionWithPoliticalGroups {
@@ -822,6 +849,10 @@ export interface ErrorDetails {
 export const errorReferenceValues = [
   "AirgapViolation",
   "AlreadyInitialised",
+  "ApportionmentAllListsExhausted",
+  "ApportionmentDrawingOfLotsRequired",
+  "ApportionmentNotAvailableUntilDataEntryFinalised",
+  "ApportionmentZeroVotesCast",
   "CommitteeSessionPaused",
   "DatabaseError",
   "DataEntryAlreadyClaimed",
@@ -1039,6 +1070,22 @@ export interface PollingStationInvestigationUpdateRequest {
 }
 
 /**
+ * Polling stations where results were investigated by the GSB,
+ * as vectors of polling station numbers
+ */
+export interface PollingStationInvestigations {
+  /** Admitted voters were recounted
+("Toegelaten kiezers opnieuw vastgesteld?") */
+  admitted_voters_recounted: number[];
+  /** Ballots were (partially) recounted
+("Stembiljetten (deels) herteld?") */
+  ballots_recounted: number[];
+  /** Investigated for other reasons than unexplained difference
+("Onderzocht vanwege andere reden dan onverklaard verschil?") */
+  investigated_other_reason: number[];
+}
+
+/**
  * Polling station list response
  */
 export interface PollingStationListResponse {
@@ -1117,6 +1164,23 @@ export type Role = (typeof roleValues)[number];
  */
 export interface SaveDataEntryResponse {
   validation_results: ValidationResults;
+}
+
+/**
+ * Contains a summary count, containing both the count and a list of polling
+ * stations that contributed to it.
+ */
+export interface SumCount {
+  count: number;
+  polling_stations: number[];
+}
+
+/**
+ * Contains a summary of the differences, containing which polling stations had differences.
+ */
+export interface SummaryDifferencesCounts {
+  fewer_ballots_count: SumCount;
+  more_ballots_count: SumCount;
 }
 
 export interface UpdateUserRequest {

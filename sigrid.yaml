@@ -119,6 +119,7 @@ languages:
         - ".*/api[.]rs"
     test:
       include:
+        - ".*/backend/apportionment/src/test_helpers.rs"
         - ".*/gen-test-election[.]rs"
         - ".*/test_data_gen/.*[.]rs"
         - ".*/typst_tests[.]rs"

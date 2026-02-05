@@ -1,7 +1,7 @@
 use std::{future::Future, net::SocketAddr, str::FromStr};
 
+use api::middleware::airgap::AirgapDetection;
 use axum::{extract::FromRef, serve::ListenerExt};
-use infra::airgap::AirgapDetection;
 use sqlx::{
     Sqlite, SqliteConnection, SqlitePool,
     sqlite::{SqliteConnectOptions, SqliteJournalMode},
@@ -63,7 +63,7 @@ pub async fn start_server(
     let airgap_detection = if enable_airgap_detection {
         info!("Airgap detection is enabled, starting airgap detection task...");
 
-        AirgapDetection::start(pool.clone()).await
+        AirgapDetection::start(pool.clone())
     } else {
         warn!("Airgap detection is disabled, this is not allowed in production.");
 

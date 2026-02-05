@@ -154,13 +154,10 @@ mod tests {
         AppState,
         api::{
             audit::{audit_log_list, audit_log_list_users},
-            middleware::authentication::inject_user,
+            middleware::{airgap::AirgapDetection, authentication::inject_user},
         },
-        infra::{
-            airgap::AirgapDetection,
-            audit_log::{
-                AuditEvent, AuditLogListResponse, AuditLogUser, AuditService, UserLoggedInDetails,
-            },
+        infra::audit_log::{
+            AuditEvent, AuditLogListResponse, AuditLogUser, AuditService, UserLoggedInDetails,
         },
         repository::user_repo::{self, User, UserId},
     };

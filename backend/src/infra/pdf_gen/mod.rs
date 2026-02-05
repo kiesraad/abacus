@@ -22,19 +22,16 @@ pub(crate) mod tests {
     use test_log::test;
 
     use super::*;
-    use crate::{
-        api::committee_session::tests::committee_session_fixture,
-        domain::{
-            committee_session::CommitteeSessionId,
-            election::{
-                ElectionCategory, ElectionId, ElectionWithPoliticalGroups, VoteCountingMethod,
-                tests::election_fixture,
-            },
-            models::{ModelNa31_2Input, PdfFileModel, PdfModel, ToPdfFileModel, filter_input},
-            polling_station::{PollingStation, PollingStationId, PollingStationType},
-            summary::ElectionSummary,
-            votes_table::VotesTables,
+    use crate::domain::{
+        committee_session::{CommitteeSessionId, committee_session_fixture},
+        election::{
+            ElectionCategory, ElectionId, ElectionWithPoliticalGroups, VoteCountingMethod,
+            tests::election_fixture,
         },
+        models::{ModelNa31_2Input, PdfFileModel, PdfModel, ToPdfFileModel, filter_input},
+        polling_station::{PollingStation, PollingStationId, PollingStationType},
+        summary::ElectionSummary,
+        votes_table::VotesTables,
     };
 
     pub fn polling_stations_fixture(

@@ -1036,14 +1036,13 @@ mod tests {
 
     use super::*;
     use crate::{
-        api::committee_session::tests::change_status_committee_session,
         domain::{
             committee_session::CommitteeSessionId,
-            committee_session_status::CommitteeSessionStatus,
             data_entry::tests::example_polling_station_results,
             validation::{ValidationResult, ValidationResultCode},
         },
         repository::{
+            committee_session_repo::change_status,
             data_entry_repo::{data_entry_exists, result_exists},
             investigation_repo::insert_test_investigation,
             polling_station_repo::insert_test_polling_station,
@@ -1284,6 +1283,17 @@ mod tests {
         let DataEntryStatusResponse { status } = serde_json::from_slice(&body).unwrap();
 
         assert_eq!(status, DataEntryStatusName::FirstEntryHasErrors);
+    }
+
+    pub async fn change_status_committee_session(
+        pool: SqlitePool,
+        committee_session_id: CommitteeSessionId,
+        status: CommitteeSessionStatus,
+    ) -> CommitteeSession {
+        let mut conn = pool.acquire().await.unwrap();
+        change_status(&mut conn, committee_session_id, status)
+            .await
+            .unwrap()
     }
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]

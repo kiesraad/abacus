@@ -47,7 +47,7 @@ die de zetelverdeling vaststelt en daarvoor een proces-verbaal genereert.
 | Proces-verbaal maken                             |           |        X        |                 |               |               |
 | **Zitting CSB**                                  |           |                 |                 |               |               |
 | EML_NL bestand zitting GSB importeren            |           |                 |        X        |               |               |
-| Resultaten GSB invoeren                          |           |                 |                 |       X       |               |
+| Resultaten GSB invoeren                          |           |                 |                 |               |       X       |
 | Conflicten en waarschuwingen oplossen            |           |                 |        X        |               |               |
 | Zetelverdeling vaststellen                       |           |                 |        X        |               |               |
 | Proces-verbaal maken                             |           |                 |        X        |               |               |

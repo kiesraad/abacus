@@ -1,7 +1,4 @@
-import { useEffect } from "react";
 import { useLocation, useNavigate } from "react-router";
-
-import { DEFAULT_CANCEL_REASON } from "@/api/ApiClient";
 import { CommitteeSessionPausedModal } from "@/components/data_entry/CommitteeSessionPausedModal";
 import { Footer } from "@/components/footer/Footer";
 import { Messages } from "@/components/messages/Messages";
@@ -9,10 +6,11 @@ import { PageTitle } from "@/components/page_title/PageTitle";
 import { Alert } from "@/components/ui/Alert/Alert";
 import { useElection } from "@/hooks/election/useElection";
 import { useElectionStatus } from "@/hooks/election/useElectionStatus";
+import { useLiveData } from "@/hooks/useLiveData";
 import { t } from "@/i18n/translate";
 
 import { ElectionProgress } from "./ElectionProgress";
-import { PollingStationChoiceForm } from "./PollingStationChoiceForm";
+import { PollingStationPicker } from "./PollingStationPicker";
 
 export function DataEntryHomePage() {
   const navigate = useNavigate();
@@ -20,17 +18,9 @@ export function DataEntryHomePage() {
   const { currentCommitteeSession, election, refetch: refetchElection } = useElection();
   const { statuses, refetch: refetchStatuses } = useElectionStatus();
 
-  // re-fetch statuses when component mounts
-  useEffect(() => {
-    const abortController = new AbortController();
-
-    void refetchElection(abortController);
-    void refetchStatuses(abortController);
-
-    return () => {
-      abortController.abort(DEFAULT_CANCEL_REASON);
-    };
-  }, [refetchElection, refetchStatuses]);
+  // live data polling (initial fetch + 30s interval + visibility change)
+  useLiveData(refetchStatuses, true);
+  useLiveData(refetchElection, true);
 
   const showFirstDataEntrySavedAlert = location.hash.startsWith("#data-entry-1-saved") ? location.hash : null;
   const showSecondDataEntrySavedAlert = location.hash.startsWith("#data-entry-2-saved") ? location.hash : null;
@@ -98,7 +88,7 @@ export function DataEntryHomePage() {
       )}
       <main>
         <article id="polling-station-choice-form">
-          <PollingStationChoiceForm anotherEntry={!!dataEntryDone || !!dataEntryNotification} />
+          <PollingStationPicker anotherEntry={!!dataEntryDone || !!dataEntryNotification} />
         </article>
         <ElectionProgress />
       </main>

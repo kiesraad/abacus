@@ -24,9 +24,9 @@ use utoipa_swagger_ui::SwaggerUi;
 use crate::test_data_gen;
 use crate::{
     AppError, AppState, MAX_BODY_SIZE_MB, api,
-    api::middleware::authentication,
+    api::middleware::{airgap, airgap::AirgapDetection, authentication},
     error,
-    infra::{airgap, airgap::AirgapDetection, audit_log},
+    infra::audit_log,
 };
 
 pub fn get_scopes_from_operation(operation: &Operation) -> Option<Vec<String>> {

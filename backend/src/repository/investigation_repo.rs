@@ -1,4 +1,4 @@
-use sqlx::{SqliteConnection, query_as};
+use sqlx::{SqliteConnection, query, query_as};
 
 use crate::domain::{
     committee_session::CommitteeSessionId,
@@ -121,6 +121,25 @@ pub async fn delete_polling_station_investigation(
     )
     .fetch_optional(conn)
     .await
+}
+
+pub async fn has_investigations_for_committee_session(
+    conn: &mut SqliteConnection,
+    committee_session_id: CommitteeSessionId,
+) -> Result<bool, sqlx::Error> {
+    let result = query!(
+        r#"
+        SELECT EXISTS(
+            SELECT 1 FROM polling_station_investigations psi
+            JOIN polling_stations ps ON ps.id = psi.polling_station_id
+            WHERE ps.committee_session_id = ?
+        ) as `exists`"#,
+        committee_session_id
+    )
+    .fetch_one(conn)
+    .await?;
+
+    Ok(result.exists == 1)
 }
 
 pub async fn list_investigations_for_committee_session(

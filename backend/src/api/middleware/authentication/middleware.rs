@@ -23,7 +23,7 @@ use crate::{
 };
 
 /// Inject user and session
-pub async fn inject_user(
+pub(crate) async fn inject_user(
     State(pool): State<SqlitePool>,
     mut request: Request<Body>,
 ) -> Request<Body> {
@@ -60,7 +60,7 @@ pub async fn inject_user(
 
 /// Middleware to extend the session lifetime
 #[allow(clippy::cognitive_complexity)]
-pub async fn extend_session(
+pub(crate) async fn extend_session(
     State(pool): State<SqlitePool>,
     headers: HeaderMap,
     audit_service: AuditService,

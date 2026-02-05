@@ -69,7 +69,7 @@ fn create_new_session_key() -> String {
 /// Get the time when the session expires
 /// Note this will return the current time if adding the duration would be out of range,
 /// which will not happen in the next 260117 years, since the duration is only set using constants in out codebase
-pub fn get_expires_at(duration: TimeDelta) -> DateTime<Utc> {
+pub(crate) fn get_expires_at(duration: TimeDelta) -> DateTime<Utc> {
     Utc::now()
         .checked_add_signed(duration)
         .unwrap_or(Utc::now())

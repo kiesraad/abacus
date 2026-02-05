@@ -9,7 +9,7 @@ use crate::repository::user_repo::UserId;
 /// A session object, corresponds to a row in the sessions table
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Hash, FromRow)]
 #[serde(deny_unknown_fields)]
-pub struct Session {
+pub(crate) struct Session {
     session_key: String,
     user_id: UserId,
     user_agent: String,
@@ -19,7 +19,7 @@ pub struct Session {
 }
 
 impl Session {
-    pub fn new(
+    pub(crate) fn new(
         session_key: String,
         user_id: UserId,
         user_agent: String,
@@ -53,7 +53,7 @@ impl Session {
     }
 
     /// Get the age of a session
-    pub fn duration(&self) -> Duration {
+    pub(crate) fn duration(&self) -> Duration {
         Utc::now()
             .signed_duration_since(self.created_at)
             .to_std()
@@ -92,7 +92,7 @@ pub(crate) async fn save(
 }
 
 #[derive(Debug)]
-pub struct SessionIdentifier {
+pub(crate) struct SessionIdentifier {
     pub session_key: String,
     pub user_agent: String,
     pub ip_address: String,
@@ -133,7 +133,7 @@ pub(crate) async fn get_by_identifier(
 }
 
 /// Get a session by its key
-pub async fn get_by_key(
+pub(crate) async fn get_by_key(
     conn: &mut SqliteConnection,
     session_key: &str,
 ) -> Result<Option<Session>, sqlx::Error> {
@@ -162,7 +162,10 @@ pub async fn get_by_key(
 }
 
 /// Delete a session by its key
-pub async fn delete(conn: &mut SqliteConnection, session_key: &str) -> Result<(), sqlx::Error> {
+pub(crate) async fn delete(
+    conn: &mut SqliteConnection,
+    session_key: &str,
+) -> Result<(), sqlx::Error> {
     sqlx::query!("DELETE FROM sessions WHERE session_key = ?", session_key)
         .execute(conn)
         .await?;
@@ -171,7 +174,7 @@ pub async fn delete(conn: &mut SqliteConnection, session_key: &str) -> Result<()
 }
 
 /// Delete a session for a certain user
-pub async fn delete_user_session(
+pub(crate) async fn delete_user_session(
     conn: &mut SqliteConnection,
     user_id: UserId,
 ) -> Result<(), sqlx::Error> {
@@ -183,7 +186,9 @@ pub async fn delete_user_session(
 }
 
 /// Delete all sessions that have expired
-pub async fn delete_expired_sessions(conn: &mut SqliteConnection) -> Result<(), sqlx::Error> {
+pub(crate) async fn delete_expired_sessions(
+    conn: &mut SqliteConnection,
+) -> Result<(), sqlx::Error> {
     sqlx::query("DELETE FROM sessions WHERE expires_at <= ?")
         .bind(Utc::now())
         .execute(conn)
@@ -193,7 +198,7 @@ pub async fn delete_expired_sessions(conn: &mut SqliteConnection) -> Result<(), 
 }
 
 /// Count the number of active sessions
-pub async fn count(conn: &mut SqliteConnection) -> Result<u32, sqlx::Error> {
+pub(crate) async fn count(conn: &mut SqliteConnection) -> Result<u32, sqlx::Error> {
     let now = Utc::now();
     let count = sqlx::query_scalar!(
         r#"SELECT COUNT(*) AS "count: u32" FROM sessions WHERE expires_at > ?"#,

@@ -13,14 +13,7 @@ use utoipa::ToSchema;
 use utoipa_axum::{router::OpenApiRouter, routes};
 
 use crate::{
-    APIError, AppState, ErrorResponse, SqlitePoolExt,
-    audit_log::{
-        AsAuditEvent, AuditEvent, AuditEventType, AuditService, UserDetails
-    },
-    domain::role::Role,
-    error::ErrorReference,
-    infra::audit_log::{AsAuditEvent, AuditEvent, AuditEventType, AuditService, as_audit_event},
-    repository::user_repo::{self, User, UserId},
+    APIError, AppState, ErrorResponse, SqlitePoolExt, api::middleware::authentication::{IncompleteUser, SECURE_COOKIES, SESSION_COOKIE_NAME, SESSION_LIFE_TIME, error::AuthenticationError}, domain::role::Role, error::ErrorReference, infra::audit_log::{AsAuditEvent, AuditEvent, AuditEventType, AuditService, as_audit_event}, repository::{session_repo::{self, Session}, user_repo::{self, User, UserId}}
 };
 
 impl From<AuthenticationError> for APIError {

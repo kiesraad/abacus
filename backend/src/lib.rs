@@ -2,7 +2,6 @@ use std::{future::Future, net::SocketAddr, str::FromStr};
 
 use api::middleware::airgap::AirgapDetection;
 use axum::{extract::FromRef, serve::ListenerExt};
-use infra::airgap::AirgapDetection;
 use serde::{Deserialize, Serialize};
 use sqlx::{
     Sqlite, SqliteConnection, SqlitePool,

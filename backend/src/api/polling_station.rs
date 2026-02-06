@@ -17,7 +17,7 @@ use crate::{
     },
     domain::{
         committee_session::{CommitteeSession, CommitteeSessionId},
-        committee_session_status::{CommitteeSessionStatus, change_committee_session_status},
+        committee_session_status::CommitteeSessionStatus,
         election::ElectionId,
         polling_station::{
             PollingStation, PollingStationFileRequest, PollingStationId,

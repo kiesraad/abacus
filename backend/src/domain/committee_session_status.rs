@@ -3,23 +3,8 @@ use sqlx::Type;
 use strum::VariantNames;
 use utoipa::ToSchema;
 
-use crate::{
-    APIError,
-    api::committee_session::CommitteeSessionError,
-    domain::{
-        committee_session::{
-            CommitteeSession, CommitteeSessionFilesUpdateRequest, CommitteeSessionId,
-            CommitteeSessionUpdated,
-        },
-        file::{FileId, delete_file},
-    },
-    infra::audit_log::AuditService,
-    repository::{
-        committee_session_repo::{change_files, change_status, get},
-        data_entry_repo::are_results_complete_for_committee_session,
-        investigation_repo::list_investigations_for_committee_session,
-        polling_station_repo,
-    },
+use crate::domain::committee_session::{
+    CommitteeSession, CommitteeSessionError, CommitteeSessionId,
 };
 
 /// Committee session status
@@ -64,54 +49,11 @@ pub trait CommitteeSessionHasInvestigationsProvider {
     ) -> impl Future<Output = Result<bool, CommitteeSessionError>>;
 }
 
-pub async fn change_committee_session_status(
-    conn: &mut SqliteConnection,
-    committee_session_id: CommitteeSessionId,
-    status: CommitteeSessionStatus,
-    audit_service: AuditService,
-) -> Result<(), APIError> {
-    let mut tx = conn.begin().await?;
-
-    let committee_session = get(&mut tx, committee_session_id).await?;
-    let new_status = match status {
-        CommitteeSessionStatus::Created => {
-            committee_session
-                .status
-                .prepare_data_entry(&mut tx, &committee_session)
-                .await?
-        }
-        CommitteeSessionStatus::InPreparation => {
-            committee_session
-                .status
-                .ready_for_data_entry(&mut tx, &committee_session)
-                .await?
-        }
-        CommitteeSessionStatus::DataEntry => committee_session.status.start_data_entry()?,
-        CommitteeSessionStatus::Paused => committee_session.status.pause_data_entry()?,
-        CommitteeSessionStatus::Completed => {
-            committee_session
-                .status
-                .finish_data_entry(&mut tx, &committee_session)
-                .await?
-        }
-    };
-
-    // If resuming committee session, delete all files from committee session and files tables
-    if committee_session.status == CommitteeSessionStatus::Completed
-        && new_status == CommitteeSessionStatus::DataEntry
-    {
-        delete_committee_session_files(&mut tx, audit_service.clone(), committee_session).await?;
-    }
-
-    let committee_session = change_status(&mut tx, committee_session_id, new_status).await?;
-
-    audit_service
-        .log(&mut tx, &CommitteeSessionUpdated(committee_session), None)
-        .await?;
-
-    tx.commit().await?;
-
-    Ok(())
+pub trait DataEntryCompleteResultsProvider {
+    fn has_complete_results(
+        &mut self,
+        committee_session_id: CommitteeSessionId,
+    ) -> impl Future<Output = Result<bool, CommitteeSessionError>>;
 }
 
 impl CommitteeSessionStatus {

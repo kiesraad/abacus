@@ -12,11 +12,11 @@ use crate::{
     APIError, AppState, ErrorResponse, SqlitePoolExt,
     api::{
         authentication::{UserCreated, UserDeleted, UserUpdated},
-        middleware::authentication::{AdminOrCoordinator, error::AuthenticationError, session},
+        middleware::authentication::{AdminOrCoordinator, error::AuthenticationError},
     },
     domain::role::Role,
     infra::audit_log::AuditService,
-    repository::user_repo::{self, User, UserId},
+    repository::{session_repo, user_repo::{self, User, UserId}},
 };
 
 pub fn user_router() -> OpenApiRouter<AppState> {

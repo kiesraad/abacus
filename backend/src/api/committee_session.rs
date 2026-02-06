@@ -7,23 +7,14 @@ use chrono::NaiveDateTime;
 use sqlx::{SqliteConnection, SqlitePool};
 use utoipa_axum::{router::OpenApiRouter, routes};
 
-use super::{
-    CommitteeSession, CommitteeSessionCreateRequest, CommitteeSessionCreated,
-    CommitteeSessionDeleted, CommitteeSessionId, CommitteeSessionStatusChangeRequest,
-    CommitteeSessionUpdateRequest, CommitteeSessionUpdated, InvestigationListResponse,
-    repository::{create, delete, get, get_election_committee_session, update},
-    status::{CommitteeSessionStatus, change_committee_session_status},
-};
 use crate::{
     APIError, AppState, ErrorResponse, SqlitePoolExt,
     api::middleware::authentication::Coordinator,
     domain::{
         committee_session::{
-            CommitteeSession, CommitteeSessionCreateRequest, CommitteeSessionCreated,
-            CommitteeSessionDeleted, CommitteeSessionId, CommitteeSessionStatusChangeRequest,
-            CommitteeSessionUpdateRequest, CommitteeSessionUpdated, InvestigationListResponse,
+            CommitteeSession, CommitteeSessionCreateRequest, CommitteeSessionCreated, CommitteeSessionDeleted, CommitteeSessionError, CommitteeSessionId, CommitteeSessionStatusChangeRequest, CommitteeSessionUpdateRequest, CommitteeSessionUpdated, InvestigationListResponse
         },
-        committee_session_status::{CommitteeSessionStatus, change_committee_session_status},
+        committee_session_status::CommitteeSessionStatus,
         election::ElectionId,
     },
     error::ErrorReference,

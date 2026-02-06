@@ -52,11 +52,11 @@ mod tests {
     use super::*;
     use crate::{
         AppState, ErrorResponse,
-        api::{authentication::*, user::*},
+        api::{authentication::*, middleware::airgap::AirgapDetection, user::*},
         domain::role::Role,
         error::ErrorReference,
-        infra::{airgap::AirgapDetection, audit_log::LogFilter},
-        repository::user_repo::{self, User, UserId},
+        infra::audit_log::LogFilter,
+        repository::{session_repo::{self, Session}, user_repo::{self, User, UserId}},
     };
 
     const TEST_USER_AGENT: &str = "TestAgent/1.0";

@@ -155,13 +155,10 @@ mod tests {
         api::{
             audit::{audit_log_list, audit_log_list_users},
             authentication::UserLoggedInDetails,
-            middleware::authentication::inject_user,
+            middleware::{airgap::AirgapDetection, authentication::inject_user},
         },
-        infra::{
-            airgap::AirgapDetection,
-            audit_log::{AuditLogListResponse, AuditLogUser, AuditService},
-        },
-        repository::user_repo::{self, User, UserId},
+        infra::audit_log::{AuditLogListResponse, AuditLogUser, AuditService},
+        repository::{session_repo::{self, Session}, user_repo::{self, User, UserId}},
     };
 
     const TEST_USER_AGENT: &str = "TestAgent/1.0";

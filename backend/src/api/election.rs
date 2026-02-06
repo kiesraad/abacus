@@ -12,11 +12,15 @@ use utoipa_axum::{router::OpenApiRouter, routes};
 
 use crate::{
     APIError, AppState, ErrorResponse, SqlitePoolExt,
-    audit_log::{AuditEventType, AuditService},
-    authentication::{Admin, AdminOrCoordinator, User},
-    committee_session::{
-        CommitteeSession, CommitteeSessionCreateRequest, CommitteeSessionError,
-        create_committee_session, status::CommitteeSessionStatus,
+    api::{committee_session::create_committee_session, middleware::authentication::{Admin, AdminOrCoordinator}, polling_station::create_imported_polling_stations},
+    domain::{
+        committee_session::{CommitteeSession, CommitteeSessionCreateRequest, CommitteeSessionError},
+        committee_session_status::CommitteeSessionStatus,
+        election::{
+            Election, ElectionId, ElectionNumberOfVotersChangeRequest, ElectionWithPoliticalGroups, NewElection, VoteCountingMethod
+        },
+        investigation::PollingStationInvestigation,
+        polling_station::{PollingStation, PollingStationRequest, PollingStationsRequest},
     },
     eml::{EML110, EML230, EMLDocument, EMLImportError, EmlHash, RedactedEmlHash},
     infra::audit_log::{AsAuditEvent, AuditEvent, AuditEventType, AuditService, as_audit_event},

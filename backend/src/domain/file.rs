@@ -1,6 +1,6 @@
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
-use sqlx::{FromRow, Type};
+use sqlx::{FromRow, SqliteConnection, Type};
 use utoipa::ToSchema;
 
 use crate::{
@@ -24,9 +24,9 @@ pub struct FileDetails {
 }
 
 #[derive(Serialize)]
-struct FileCreated(pub FileDetails);
+pub struct FileCreated(pub FileDetails);
 #[derive(Serialize)]
-struct FileDeleted(pub FileDetails);
+pub struct FileDeleted(pub FileDetails);
 as_audit_event!(FileCreated, AuditEventType::FileCreated);
 as_audit_event!(FileDeleted, AuditEventType::FileDeleted);
 

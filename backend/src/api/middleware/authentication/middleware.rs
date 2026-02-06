@@ -15,7 +15,7 @@ use crate::{
     SqlitePoolExt,
     api::authentication::set_default_cookie_properties,
     infra::audit_log::{AsAuditEvent, AuditEvent, AuditEventType, AuditService, as_audit_event},
-    repository::user_repo::{self, User},
+    repository::{session_repo::{self, Session, SessionIdentifier}, user_repo::{self, User}},
 };
 
 #[derive(Serialize)]

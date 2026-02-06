@@ -4,7 +4,7 @@
 
 ### Prerequisites
 
-- [Node](https://nodejs.org) v22
+- [Node](https://nodejs.org) 24
 - [pnpm](https://pnpm.io/) v10
 
 ### Building
@@ -103,7 +103,7 @@ Storybook runs on [http://localhost:6006](http://localhost:6006) and provides an
 
 Prerequisites:
 
-- [Node](https://nodejs.org) v22
+- [Node](https://nodejs.org) v24
 - [pnpm](https://pnpm.io/) v10
 
 Install npm dependencies, skipping development dependencies:

@@ -4,11 +4,11 @@
   "version": "1.1.0",
   "type": "module",
   "engines": {
-    "node": "^22",
+    "node": "^24",
     "pnpm": "^10",
     "npm": "please-use-pnpm"
   },
-  "packageManager": "pnpm@10.26.1",
+  "packageManager": "pnpm@10.28.2+sha512.41872f037ad22f7348e3b1debbaf7e867cfd448f2726d9cf74c08f19507c31d2c8e7a11525b983febc2df640b5438dee6023ebb1f84ed43cc2d654d2bc326264",
   "scripts": {
     "dev": "pnpm check-server && vite",
     "dev:msw": "cross-env API_MODE=mock vite",
@@ -54,7 +54,7 @@
     "@testing-library/jest-dom": "6.9.1",
     "@testing-library/react": "16.3.1",
     "@testing-library/user-event": "14.6.1",
-    "@types/node": "22.19.3",
+    "@types/node": "24.10.10",
     "@types/react": "19.2.7",
     "@types/react-dom": "19.2.3",
     "@typescript-eslint/eslint-plugin": "8.49.0",

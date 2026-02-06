@@ -1,4 +1,4 @@
-FROM node:22-slim AS frontend-builder
+FROM node:24-slim AS frontend-builder
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
 RUN corepack enable

@@ -744,7 +744,7 @@ pub(crate) mod tests {
                 },
             };
 
-            /// Apportionment with no residual seats
+            /// Apportionment with no residual seats  
             /// This test triggers Kieswet Article P 10
             ///
             /// Full seats: [5, 4, 3, 2, 1] - Remainder seats: 0  
@@ -1659,7 +1659,7 @@ pub(crate) mod tests {
                 test_helpers::seat_assignment_fixture_with_given_candidate_votes,
             };
 
-            /// Apportionment with no residual seats
+            /// Apportionment with no residual seats  
             /// This test triggers Kieswet Article P 10
             ///
             /// Full seats: [5, 5, 4, 4, 2] - Remainder seats: 0  

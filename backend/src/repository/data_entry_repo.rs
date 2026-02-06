@@ -271,6 +271,28 @@ pub async fn data_entry_exists(
     Ok(res.exists == 1)
 }
 
+#[cfg(test)]
+pub async fn get_polling_station_data_entries(
+    conn: &mut SqliteConnection,
+    polling_station_id: PollingStationId,
+) -> Result<Vec<PollingStationDataEntry>, sqlx::Error> {
+    query_as!(
+        PollingStationDataEntry,
+        r#"
+            SELECT
+                polling_station_id AS "polling_station_id: PollingStationId",
+                committee_session_id AS "committee_session_id: CommitteeSessionId",
+                state AS "state: _",
+                updated_at AS "updated_at: _"
+            FROM polling_station_data_entries
+            WHERE polling_station_id = ?
+            "#,
+        polling_station_id,
+    )
+    .fetch_all(conn)
+    .await
+}
+
 /// Check if a polling station has a result
 pub async fn result_exists(
     conn: &mut SqliteConnection,
@@ -423,7 +445,7 @@ pub async fn are_results_complete_for_committee_session(
     .await?
     .result;
 
-    if !committee_session.is_next_session() {
+    if !all_new_ps_have_data || !committee_session.is_next_session() {
         tx.commit().await?;
         return Ok(all_new_ps_have_data);
     }

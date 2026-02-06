@@ -1,14 +1,32 @@
-pub fn add(left: u64, right: u64) -> u64 {
-    left + right
-}
-
+mod candidate_nomination;
+mod fraction;
+mod int_newtype_macro;
+mod seat_assignment;
+mod structs;
 #[cfg(test)]
-mod tests {
-    use super::*;
+mod test_helpers;
 
-    #[test]
-    fn it_works() {
-        let result = add(2, 2);
-        assert_eq!(result, 4);
-    }
+pub use self::{
+    candidate_nomination::CandidateNominationResult,
+    fraction::Fraction,
+    seat_assignment::SeatAssignmentResult,
+    structs::{ApportionmentError, ApportionmentInput, CandidateVotesTrait, ListVotesTrait},
+};
+use self::{
+    candidate_nomination::candidate_nomination,
+    seat_assignment::seat_assignment,
+    structs::{ApportionmentOutput, as_candidate_nomination_input},
+};
+
+pub fn process<T: ApportionmentInput>(
+    input: &T,
+) -> Result<ApportionmentOutput<'_, T::List>, ApportionmentError> {
+    let seat_assignment = seat_assignment(input)?;
+    let candidate_nomination_input = as_candidate_nomination_input(input, &seat_assignment);
+    let candidate_nomination = candidate_nomination::<T>(&candidate_nomination_input)?;
+
+    Ok(ApportionmentOutput {
+        seat_assignment,
+        candidate_nomination,
+    })
 }

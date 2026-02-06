@@ -1,0 +1,20 @@
+{
+  "db_name": "SQLite",
+  "query": "\n        SELECT EXISTS(\n            SELECT 1 FROM polling_station_investigations psi\n            JOIN polling_stations ps ON ps.id = psi.polling_station_id\n            WHERE ps.committee_session_id = ?\n        ) as `exists`",
+  "describe": {
+    "columns": [
+      {
+        "name": "exists",
+        "ordinal": 0,
+        "type_info": "Integer"
+      }
+    ],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "3b49ad9988a84a1a738cfd9e3449ad873624f5e70f32f8379f475e43f6d41874"
+}

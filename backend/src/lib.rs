@@ -16,6 +16,7 @@ pub mod eml;
 mod error;
 pub mod infra;
 pub mod repository;
+pub mod service;
 #[cfg(feature = "dev-database")]
 pub mod test_data_gen;
 

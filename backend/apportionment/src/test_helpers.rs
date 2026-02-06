@@ -95,7 +95,7 @@ pub fn convert_total_seats_per_u32_list_number_to_total_seats_per_list_number(
 }
 
 /// Create a CandidateNominationInput with consecutive list numbers and
-/// given quota, number of seats, candidate votes and total seats per list.
+/// given quota, seat assignment input and total seats per list.
 pub fn candidate_nomination_fixture_with_given_number_of_seats(
     quota: Fraction,
     seat_assignment_input: &ApportionmentInputMock,
@@ -115,8 +115,8 @@ pub fn candidate_nomination_fixture_with_given_number_of_seats(
     }
 }
 
-/// Create a CandidateNominationInput with given quota, number of seats,
-/// candidate votes per list number and total seats per list number.
+/// Create a CandidateNominationInput with given quota, seat assignment input
+/// and total seats per list number.
 pub fn candidate_nomination_fixture_with_given_list_numbers_and_number_of_seats(
     quota: Fraction,
     seat_assignment_input: &ApportionmentInputMock,
@@ -133,7 +133,8 @@ pub fn candidate_nomination_fixture_with_given_list_numbers_and_number_of_seats(
     }
 }
 
-/// Create a ApportionmentInputMock with consecutive list numbers and given total votes and list votes.
+/// Create a ApportionmentInputMock with consecutive list numbers
+/// and given list votes and number of seats.
 pub fn seat_assignment_fixture_with_default_50_candidates(
     number_of_seats: u32,
     list_vote_counts: Vec<u32>,
@@ -159,7 +160,7 @@ pub fn seat_assignment_fixture_with_default_50_candidates(
     }
 }
 
-/// Create a ApportionmentInputMock with given total votes and list numbers and votes.
+/// Create a ApportionmentInputMock with given number of seats and list numbers and votes.
 pub fn seat_assignment_fixture_with_given_list_numbers_and_candidate_votes(
     number_of_seats: u32,
     list_candidate_votes: Vec<(u32, Vec<u32>)>,
@@ -184,9 +185,9 @@ pub fn seat_assignment_fixture_with_given_list_numbers_and_candidate_votes(
     }
 }
 
-/// Create a ApportionmentInputMock with consecutive list numbers and given votes per list.
-/// The number of lists is the length of the `list_votes` vector.  
-/// The number of candidates in each list is by default 50.
+/// Create a ApportionmentInputMock with consecutive list numbers
+/// and given candidate votes per list and number of seats.
+/// The number of lists is the length of the `candidate_votes` vector.
 pub fn seat_assignment_fixture_with_given_candidate_votes(
     number_of_seats: u32,
     candidate_votes: Vec<Vec<u32>>,
@@ -198,6 +199,41 @@ pub fn seat_assignment_fixture_with_given_candidate_votes(
             ListNumber::try_from(list_index + 1).unwrap(),
             list_candidate_votes,
         ))
+    }
+
+    ApportionmentInputMock {
+        number_of_seats,
+        total_votes,
+        list_votes,
+    }
+}
+
+/// Create a ApportionmentInputMock with consecutive list numbers and
+/// given candidate numbers and votes per list and number of seats.
+/// The number of lists is the length of the `candidate_votes` vector.
+pub fn seat_assignment_fixture_with_given_candidate_numbers_and_votes(
+    number_of_seats: u32,
+    candidate_votes: Vec<Vec<(u32, u32)>>,
+) -> ApportionmentInputMock {
+    let mut total_votes = 0;
+    let mut list_votes: Vec<ListVotesMock> = vec![];
+    for (list_index, list_candidate_votes) in candidate_votes.iter().enumerate() {
+        let list_total_votes = list_candidate_votes
+            .iter()
+            .map(|(_, candidate_votes)| candidate_votes)
+            .sum();
+        total_votes += list_total_votes;
+        list_votes.push(ListVotesMock {
+            number: ListNumber::try_from(list_index + 1).unwrap(),
+            total_votes: list_total_votes,
+            candidate_votes: list_candidate_votes
+                .iter()
+                .map(|(number, candidate_votes)| CandidateVotesMock {
+                    number: CandidateNumber::from(*number),
+                    votes: *candidate_votes,
+                })
+                .collect(),
+        })
     }
 
     ApportionmentInputMock {

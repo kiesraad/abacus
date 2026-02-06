@@ -273,6 +273,7 @@ mod tests {
             ApportionmentInputMock, CandidateVotesMock,
             candidate_nomination_fixture_with_given_list_numbers_and_number_of_seats,
             candidate_nomination_fixture_with_given_number_of_seats,
+            seat_assignment_fixture_with_given_candidate_numbers_and_votes,
             seat_assignment_fixture_with_given_candidate_votes,
             seat_assignment_fixture_with_given_list_numbers_and_candidate_votes,
         },
@@ -445,14 +446,14 @@ mod tests {
     #[test]
     fn test_with_lt_19_seats_and_no_preferential_candidate_nomination() {
         let quota = Fraction::new(105, 5);
-        let seat_assignment_input = seat_assignment_fixture_with_given_candidate_votes(
+        let seat_assignment_input = seat_assignment_fixture_with_given_candidate_numbers_and_votes(
             5,
             vec![
-                vec![5, 4, 4, 4, 4],
-                vec![4, 5, 4, 4, 4],
-                vec![4, 4, 5, 4, 4],
-                vec![4, 4, 4, 5, 4],
-                vec![4, 4, 4, 4, 5],
+                vec![(1, 5), (3, 4), (4, 4), (6, 4), (7, 4)],
+                vec![(2, 4), (3, 5), (5, 4), (6, 4), (8, 4)],
+                vec![(1, 4), (2, 4), (3, 5), (4, 4), (6, 4)],
+                vec![(2, 4), (3, 4), (4, 4), (5, 5), (7, 4)],
+                vec![(1, 4), (2, 4), (3, 4), (4, 4), (5, 5)],
             ],
         );
         let input = candidate_nomination_fixture_with_given_number_of_seats(
@@ -468,9 +469,9 @@ mod tests {
             quota * Fraction::new(result.preference_threshold.percentage, 100)
         );
         check_list_candidate_nomination(&result.list_candidate_nomination[0], &[], &[1], &[]);
-        check_list_candidate_nomination(&result.list_candidate_nomination[1], &[], &[1], &[]);
+        check_list_candidate_nomination(&result.list_candidate_nomination[1], &[], &[2], &[]);
         check_list_candidate_nomination(&result.list_candidate_nomination[2], &[], &[1], &[]);
-        check_list_candidate_nomination(&result.list_candidate_nomination[3], &[], &[1], &[]);
+        check_list_candidate_nomination(&result.list_candidate_nomination[3], &[], &[2], &[]);
         check_list_candidate_nomination(&result.list_candidate_nomination[4], &[], &[1], &[]);
 
         let lists = input.list_votes;

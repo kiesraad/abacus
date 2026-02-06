@@ -212,7 +212,7 @@ pub async fn list_all(conn: &mut SqliteConnection) -> Result<Vec<AuditLogEvent>,
             user_fullname,
             user_role as "user_role: Role"
         FROM audit_log
-        ORDER BY time DESC
+        ORDER BY time ASC
         "#,
     )
     .fetch_all(conn)

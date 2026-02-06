@@ -73,7 +73,7 @@ jobs:
       - name: Install Nextest
         run: cargo binstall cargo-nextest
       - name: Run tests with coverage
-        run: cargo llvm-cov nextest --workspace --branch --profile ci --features embed-typst,airgap-detection
+        run: cargo llvm-cov nextest --workspace --branch --profile ci --features embed-typst,airgap-detection --cobertura --output-path ./target/llvm-cov-target/codecov.json
       - name: Upload test results to Codecov
         if: ${{ !cancelled() }}
         uses: codecov/codecov-action@671740ac38dd9b0130fbe1cec585b89eea48d3de # v5
@@ -83,8 +83,6 @@ jobs:
           files: backend/target/nextest/ci/junit.xml
           disable_search: true
           fail_ci_if_error: true
-      - name: Create code coverage report
-        run: cargo llvm-cov report --cobertura --output-path ./target/llvm-cov-target/codecov.json
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@671740ac38dd9b0130fbe1cec585b89eea48d3de # v5
         with:

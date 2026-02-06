@@ -4,7 +4,7 @@
 
 ### Prerequisites
 
-- [Node](https://nodejs.org) 24
+- [Node](https://nodejs.org) v24
 - [pnpm](https://pnpm.io/) v10
 
 ### Building

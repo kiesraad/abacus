@@ -84,7 +84,6 @@ impl ListVotesMock {
     }
 }
 
-#[cfg(test)]
 pub fn convert_total_seats_per_u32_list_number_to_total_seats_per_list_number(
     total_seats_per_list_number: Vec<(u32, u32)>,
 ) -> Vec<(ListNumber, u32)> {

@@ -6,15 +6,6 @@ Het overzicht van alle input en output van Abacus (dus ook bijv. EML_NL) staat i
 
 ## Gemeentelijk stembureau
 
-TODO: wat heeft Abacus al ingevuld?
-TODO: ik snap mijn eigen document niet meer
-
-
-drie dingen:
-- invoer GSB
-- invoer CSB
-- wat zet Abacus in het PV? overlap met invoer GSB!
-
 ### Invoer in Abacus
 
 #### Eerste zitting
@@ -34,6 +25,8 @@ drie dingen:
 #### Latere zitting
 - Na 14-2
 - P 2a
+
+---
 
 ## Centraal stembureau
 

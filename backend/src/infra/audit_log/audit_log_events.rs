@@ -45,7 +45,7 @@ pub struct AuditLogEvent {
     #[schema(value_type = String)]
     time: DateTime<Utc>,
     event: serde_json::Value,
-    event_type: AuditEventType,
+    event_name: AuditEventType,
     event_level: AuditEventLevel,
     #[serde(skip_serializing_if = "Option::is_none")]
     #[schema(nullable = false)]
@@ -206,6 +206,7 @@ pub async fn list_all(conn: &mut SqliteConnection) -> Result<Vec<AuditLogEvent>,
             audit_log.id as "id: AuditLogEventId",
             time as "time: _",
             json(event) as "event!: serde_json::Value",
+            event_name as "event_name: AuditEventType",
             event_level as "event_level: _",
             message,
             ip as "ip: String",
@@ -243,6 +244,7 @@ pub async fn list(
             audit_log.id as "id: AuditLogEventId",
             time as "time: _",
             json(event) as "event!: serde_json::Value",
+            event_name as "event_name: AuditEventType",
             event_level as "event_level: _",
             message,
             ip as "ip: String",

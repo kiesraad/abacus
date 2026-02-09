@@ -4203,12 +4203,57 @@
           "error"
         ]
       },
+      "AuditEventType": {
+        "type": "string",
+        "enum": [
+          "UserLoggedIn",
+          "UserLoginFailed",
+          "UserLoggedOut",
+          "UserAccountUpdated",
+          "UserSessionExtended",
+          "UserCreated",
+          "UserUpdated",
+          "UserDeleted",
+          "ElectionCreated",
+          "ElectionUpdated",
+          "CommitteeSessionCreated",
+          "CommitteeSessionDeleted",
+          "CommitteeSessionUpdated",
+          "PollingStationInvestigationCreated",
+          "PollingStationInvestigationConcluded",
+          "PollingStationInvestigationUpdated",
+          "PollingStationInvestigationDeleted",
+          "FileCreated",
+          "FileDeleted",
+          "PollingStationCreated",
+          "PollingStationUpdated",
+          "PollingStationDeleted",
+          "PollingStationsImported",
+          "DataEntryStarted",
+          "DataEntrySaved",
+          "DataEntryResumed",
+          "DataEntryDeleted",
+          "DataEntryFinalised",
+          "ResultDeleted",
+          "DataEntryDiscardedFirst",
+          "DataEntryReturnedFirst",
+          "DataEntryKeptFirst",
+          "DataEntryKeptSecond",
+          "DataEntryDiscardedBoth",
+          "AirGapViolationDetected",
+          "AirGapViolationResolved",
+          "ApplicationStarted",
+          "Error",
+          "UnknownEvent"
+        ]
+      },
       "AuditLogEvent": {
         "type": "object",
         "required": [
           "id",
           "time",
           "event",
+          "event_name",
           "event_level",
           "ip"
         ],
@@ -4216,6 +4261,9 @@
           "event": {},
           "event_level": {
             "$ref": "#/components/schemas/AuditEventLevel"
+          },
+          "event_name": {
+            "$ref": "#/components/schemas/AuditEventType"
           },
           "id": {
             "$ref": "#/components/schemas/AuditLogEventId"

@@ -16,7 +16,10 @@ use crate::{
     },
     domain::role::Role,
     infra::audit_log::AuditService,
-    repository::{session_repo, user_repo::{self, User, UserId}},
+    repository::{
+        session_repo,
+        user_repo::{self, User, UserId},
+    },
 };
 
 pub fn user_router() -> OpenApiRouter<AppState> {

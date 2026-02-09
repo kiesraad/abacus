@@ -158,7 +158,10 @@ mod tests {
             middleware::{airgap::AirgapDetection, authentication::inject_user},
         },
         infra::audit_log::{AuditLogListResponse, AuditLogUser, AuditService},
-        repository::{session_repo::{self, Session}, user_repo::{self, User, UserId}},
+        repository::{
+            session_repo::{self, Session},
+            user_repo::{self, User, UserId},
+        },
     };
 
     const TEST_USER_AGENT: &str = "TestAgent/1.0";

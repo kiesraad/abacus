@@ -12,7 +12,10 @@ use crate::{
     api::middleware::authentication::Coordinator,
     domain::{
         committee_session::{
-            CommitteeSession, CommitteeSessionCreateRequest, CommitteeSessionCreated, CommitteeSessionDeleted, CommitteeSessionError, CommitteeSessionId, CommitteeSessionStatusChangeRequest, CommitteeSessionUpdateRequest, CommitteeSessionUpdated, InvestigationListResponse
+            CommitteeSession, CommitteeSessionCreateRequest, CommitteeSessionCreated,
+            CommitteeSessionDeleted, CommitteeSessionError, CommitteeSessionId,
+            CommitteeSessionStatusChangeRequest, CommitteeSessionUpdateRequest,
+            CommitteeSessionUpdated, InvestigationListResponse,
         },
         committee_session_status::CommitteeSessionStatus,
         election::ElectionId,

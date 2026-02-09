@@ -4,7 +4,8 @@ use crate::{
     APIError,
     domain::{
         committee_session::{
-            CommitteeSession, CommitteeSessionFilesUpdateRequest, CommitteeSessionId, CommitteeSessionUpdated,
+            CommitteeSession, CommitteeSessionFilesUpdateRequest, CommitteeSessionId,
+            CommitteeSessionUpdated,
         },
         committee_session_status::CommitteeSessionStatus,
         file::{FileDeleted, FileId},

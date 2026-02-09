@@ -12,11 +12,9 @@ use utoipa_axum::{router::OpenApiRouter, routes};
 
 use crate::{
     APIError, AppState, SqlitePoolExt,
-    api::{
-        middleware::authentication::{Coordinator, Typist, error::AuthenticationError},
-    },
+    api::middleware::authentication::{Coordinator, Typist, error::AuthenticationError},
     domain::{
-        committee_session::{CommitteeSession, CommitteeSessionId, CommitteeSessionError},
+        committee_session::{CommitteeSession, CommitteeSessionError, CommitteeSessionId},
         committee_session_status::CommitteeSessionStatus,
         data_entry::{
             CSONextSessionResults, CommonPollingStationResults, DataEntryStatusResponse,
@@ -1742,12 +1740,15 @@ mod tests {
         let mut conn = pool.acquire().await.unwrap();
         let audit_log = audit_log::list_all(&mut conn).await.unwrap();
         let last_event = audit_log.last().unwrap().event();
-
-        if let AuditEvent::DataEntryFinalised(details) = last_event {
-            assert_eq!(details.data_entry_status, "first_entry_has_errors");
-        } else {
-            panic!("Expected DataEntryFinalised event but got {:?}", last_event);
-        };
+        dbg!(last_event);
+        assert!(false);
+        /*
+                if let AuditEvent::DataEntryFinalised(details) = last_event {
+                    assert_eq!(details.data_entry_status, "first_entry_has_errors");
+                } else {
+                    panic!("Expected DataEntryFinalised event but got {:?}", last_event);
+                };
+        */
     }
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]

@@ -56,7 +56,10 @@ mod tests {
         domain::role::Role,
         error::ErrorReference,
         infra::audit_log::LogFilter,
-        repository::{session_repo::{self, Session}, user_repo::{self, User, UserId}},
+        repository::{
+            session_repo::{self, Session},
+            user_repo::{self, User, UserId},
+        },
     };
 
     const TEST_USER_AGENT: &str = "TestAgent/1.0";

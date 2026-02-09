@@ -67,18 +67,12 @@ impl ErrorDetails {
 
 impl AsAuditEvent for ErrorDetails {
     fn as_audit_event(&self) -> AuditEvent {
-        let event_type = match self.level {
-            AuditEventLevel::Info => AuditEventType::Info,
-            AuditEventLevel::Success => AuditEventType::Success,
-            AuditEventLevel::Warning => AuditEventType::Warning,
-            AuditEventLevel::Error => AuditEventType::Error,
-        };
-
         AuditEvent {
-            event_type,
+            event_type: AuditEventType::Error,
             data: json!({
                 "reference": self.reference,
                 "path": self.path,
+                "level": self.level,
             }),
         }
     }
@@ -89,6 +83,7 @@ impl AsAuditEvent for ErrorDetails {
     Serialize,
     Deserialize,
     strum::Display,
+    sqlx::Type,
     VariantNames,
     Debug,
     PartialEq,
@@ -96,7 +91,7 @@ impl AsAuditEvent for ErrorDetails {
     ToSchema,
     Default,
 )]
-#[serde(rename_all = "PascalCase", tag = "event_type")]
+#[serde(rename_all = "PascalCase")]
 pub enum AuditEventType {
     // authentication and account events
     UserLoggedIn,
@@ -147,9 +142,6 @@ pub enum AuditEventType {
     // system events
     ApplicationStarted,
     // generic errors (one for each severity level)
-    Success,
-    Info,
-    Warning,
     Error,
 
     #[default]
@@ -209,10 +201,7 @@ impl AuditEventType {
             AuditEventType::DataEntryDiscardedBoth => AuditEventLevel::Info,
             AuditEventType::AirGapViolationDetected => AuditEventLevel::Error,
             AuditEventType::AirGapViolationResolved => AuditEventLevel::Info,
-            AuditEventType::Warning => AuditEventLevel::Warning,
             AuditEventType::Error => AuditEventLevel::Error,
-            AuditEventType::Info => AuditEventLevel::Info,
-            AuditEventType::Success => AuditEventLevel::Success,
         }
     }
 }

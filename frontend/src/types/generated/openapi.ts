@@ -332,9 +332,53 @@ export interface AccountUpdateRequest {
 export const auditEventLevelValues = ["info", "success", "warning", "error"] as const;
 export type AuditEventLevel = (typeof auditEventLevelValues)[number];
 
+export const auditEventTypeValues = [
+  "UserLoggedIn",
+  "UserLoginFailed",
+  "UserLoggedOut",
+  "UserAccountUpdated",
+  "UserSessionExtended",
+  "UserCreated",
+  "UserUpdated",
+  "UserDeleted",
+  "ElectionCreated",
+  "ElectionUpdated",
+  "CommitteeSessionCreated",
+  "CommitteeSessionDeleted",
+  "CommitteeSessionUpdated",
+  "PollingStationInvestigationCreated",
+  "PollingStationInvestigationConcluded",
+  "PollingStationInvestigationUpdated",
+  "PollingStationInvestigationDeleted",
+  "FileCreated",
+  "FileDeleted",
+  "PollingStationCreated",
+  "PollingStationUpdated",
+  "PollingStationDeleted",
+  "PollingStationsImported",
+  "DataEntryStarted",
+  "DataEntrySaved",
+  "DataEntryResumed",
+  "DataEntryDeleted",
+  "DataEntryFinalised",
+  "ResultDeleted",
+  "DataEntryDiscardedFirst",
+  "DataEntryReturnedFirst",
+  "DataEntryKeptFirst",
+  "DataEntryKeptSecond",
+  "DataEntryDiscardedBoth",
+  "AirGapViolationDetected",
+  "AirGapViolationResolved",
+  "ApplicationStarted",
+  "Error",
+  "UnknownEvent",
+] as const;
+export type AuditEventType = (typeof auditEventTypeValues)[number];
+
 export interface AuditLogEvent {
   event: unknown;
   event_level: AuditEventLevel;
+  event_name: AuditEventType;
   id: AuditLogEventId;
   ip: string;
   message?: string;

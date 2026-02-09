@@ -39,7 +39,7 @@ EML_NL 210 (kandidatenlijst voor een politieke groepering) wordt niet gebruikt, 
 |-------------------|:---:|:---:|-------------------------------------|:--------------------------:|:-----------------:|:-----------------:|
 | N 10-1            |  X  |     | PV SB                               |             X              |         X         |                   |
 | Na 14-1 versie 1  |  X  |     | Corrigendum SB - eerste zitting     |             X              |         X         |                   |
-| N 10-2            |     |  X  | PV SB                               |             X              |         X         |                   |
+| N 10-2            |     |  X  | PV SB                               |             X              |                   |                   |
 | N 5               |  X  |  X  | Overdrachtsdocument GSB             |                            |                   |                   |
 | Na 31-2 Bijlage 1 |     |  X  | Telresultaten SB                    |             X              |         X         |                   |
 | Na 31-2 Bijlage 2 |     |  X  | Bezwaren SB's                       |                            |                   |                   |

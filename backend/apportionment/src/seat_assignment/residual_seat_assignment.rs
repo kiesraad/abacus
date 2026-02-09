@@ -119,10 +119,10 @@ fn list_largest_remainder_assigned_seats(
 
 fn list_numbers_without_empty_seats<'a, T: ListVotesTrait>(
     standings: impl Iterator<Item = &'a ListStanding>,
-    list_votes: &[T],
+    input_list_votes: &[T],
 ) -> Vec<ListNumber> {
     standings.fold(vec![], |mut list_numbers_without_empty_seats, s| {
-        let list_votes = list_votes
+        let list_votes = input_list_votes
             .iter()
             .find(|list_votes| list_votes.number() == s.list_number)
             .expect("List votes exists");
@@ -142,16 +142,28 @@ fn list_qualifies_for_extra_seat(
     previous_steps: &[SeatChangeStep],
     list_number: ListNumber,
 ) -> bool {
+    // A list qualifies for an extra seat if in a previous step, a seat has been removed
+    // due to absolute majority reassignment, and that that seat has then been removed due
+    // to list exhaustion. In that case, the seat can be returned to the original list.
     let has_retracted_seat: bool = previous_steps.iter().any(|prev| {
         prev.change.is_changed_by_absolute_majority_reassignment()
             && prev.change.list_number_retracted() == list_number
     });
+
+    // In case of largest remainder assignment
     if number_of_seats_unique_highest_averages_option.is_none() {
+        // If no largest remainder seat has been assigned to this list
+        // or the largest remainder assigned seat has been retracted
         number_of_seats_largest_remainders == 0
             || (has_retracted_seat && number_of_seats_largest_remainders == 1)
-    } else if let Some(number_of_seats_unique_highest_averages) =
+    }
+    // In case of unique highest average assignment
+    else if let Some(number_of_seats_unique_highest_averages) =
         number_of_seats_unique_highest_averages_option
     {
+        // If no unique highest average seat has been assigned to this list
+        // or (the unique highest average assigned seat has been retracted,
+        // and no largest remainder seat has been retracted and reassigned)
         number_of_seats_unique_highest_averages == 0
             || (has_retracted_seat
                 && number_of_seats_unique_highest_averages == 1
@@ -344,7 +356,7 @@ fn step_assign_remainder_using_highest_averages<'a>(
         let selected_lists =
             lists_with_highest_average(qualifying_for_highest_average, residual_seats)?;
         let selected_list = selected_lists[0];
-        let assigned_seat: HighestAverageAssignedSeat = HighestAverageAssignedSeat {
+        let assigned_seat = HighestAverageAssignedSeat {
             selected_list_number: selected_list.list_number,
             list_assigned: list_assigned_from_previous_step(
                 selected_list,

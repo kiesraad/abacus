@@ -1,128 +1,15 @@
-components:
-  # Backend crates
-  - name: "(Backend) Apportionment crate"
-    include:
-      - ".*/backend/apportionment/.*"
-
-  # Backend infra layer
-  - { include: [ ".*/backend/src/infra/audit_log/.*" ], name: "backend/src/infra/audit_log" }
-  - { include: [ ".*/backend/src/infra/pdf_gen/.*" ], name: "backend/src/infra/pdf_gen" }
-  - { include: [ ".*/backend/src/infra/zip/.*" ], name: "backend/src/infra/zip" }
-  - { include: [ ".*/backend/src/infra/mod.rs" ], name: "backend/src/infra" }
-  - { include: [ ".*/backend/src/infra/router.rs" ], name: "backend/src/infra/router" }
-  - { include: [ ".*/backend/src/infra/seed_data.rs" ], name: "backend/src/infra/seed_data" }
-
-  # Backend api layer
-  - { include: [ ".*/backend/src/api/middleware/airgap/.*" ], name: "backend/src/api/middleware/airgap" }
-  - { include: [ ".*/backend/src/api/middleware/authentication/.*" ], name: "backend/src/api/middleware/authentication" }
-  - { include: [ ".*/backend/src/api/middleware/mod.rs" ], name: "backend/src/api/middleware" }
-  - { include: [ ".*/backend/src/api/mod.rs" ], name: "backend/src/api" }
-  - { include: [ ".*/backend/src/api/audit.rs" ], name: "backend/src/api/audit" }
-  - { include: [ ".*/backend/src/api/authentication.rs" ], name: "backend/src/api/authentication" }
-  - { include: [ ".*/backend/src/api/committee_session.rs" ], name: "backend/src/api/committee_session" }
-  - { include: [ ".*/backend/src/api/data_entry.rs" ], name: "backend/src/api/data_entry" }
-  - { include: [ ".*/backend/src/api/document.rs" ], name: "backend/src/api/document" }
-  - { include: [ ".*/backend/src/api/election.rs" ], name: "backend/src/api/election" }
-  - { include: [ ".*/backend/src/api/investigation.rs" ], name: "backend/src/api/investigation" }
-  - { include: [ ".*/backend/src/api/polling_station.rs" ], name: "backend/src/api/polling_station" }
-  - { include: [ ".*/backend/src/api/providers.rs" ], name: "backend/src/api/providers" }
-  - { include: [ ".*/backend/src/api/report.rs" ], name: "backend/src/api/report" }
-  - { include: [ ".*/backend/src/api/user.rs" ], name: "backend/src/api/user" }
-
-  # Backend service layer
-  - { include: [ ".*/backend/src/service/mod.rs" ], name: "backend/src/service" }
-  - { include: [ ".*/backend/src/service/change_committee_session_status.rs" ], name: "backend/src/service/change_committee_session_status" }
-
-  # Backend repository layer
-  - { include: [ ".*/backend/src/repository/mod.rs" ], name: "backend/src/repository" }
-  - { include: [ ".*/backend/src/repository/committee_session_repo.rs" ], name: "backend/src/repository/committee_session_repo" }
-  - { include: [ ".*/backend/src/repository/data_entry_repo.rs" ], name: "backend/src/repository/data_entry_repo" }
-  - { include: [ ".*/backend/src/repository/election_repo.rs" ], name: "backend/src/repository/election_repo" }
-  - { include: [ ".*/backend/src/repository/file_repo.rs" ], name: "backend/src/repository/file_repo" }
-  - { include: [ ".*/backend/src/repository/investigation_repo.rs" ], name: "backend/src/repository/investigation_repo" }
-  - { include: [ ".*/backend/src/repository/polling_station_repo.rs" ], name: "backend/src/repository/polling_station_repo" }
-  - { include: [ ".*/backend/src/repository/session_repo.rs" ], name: "backend/src/repository/session_repo" }
-  - { include: [ ".*/backend/src/repository/user_repo.rs" ], name: "backend/src/repository/user_repo" }
-
-  # Backend domain layer
-  - { include: [ ".*/backend/src/domain/.*" ], name: "backend/src/domain" }
-
-  # Backend modules
-  - { include: [ ".*/backend/src/eml/.*" ], name: "(Backend) EML" }
-  - { include: [ ".*/backend/src/test_data_gen/.*" ], name: "(Backend) Test data generation" }
-  - { include: [ ".*/backend/src/bin/abacus.rs" ], name: "(Backend) bin/abacus" }
-  - { include: [ ".*/backend/src/bin/gen-openapi.rs" ], name: "(Backend) bin/gen-openapi" }
-  - { include: [ ".*/backend/src/bin/gen-pdf.rs" ], name: "(Backend) bin/gen-pdf" }
-  - { include: [ ".*/backend/src/bin/gen-test-election.rs" ], name: "(Backend) bin/gen-test-election" }
-  - { include: [ ".*/backend/src/app_error.rs" ], name: "(Backend) App error" }
-  - { include: [ ".*/backend/src/error.rs" ], name: "(Backend) error" }
-  - { include: [ ".*/backend/src/lib.rs" ], name: "(Backend) lib" }
-  - { include: [ ".*/backend/tests/.*" ], name: "(Backend) Integration tests" }
-  - { include: [ ".*/backend/migrations/.*" ], name: "(Backend) SQL Migrations" }
-  - { include: [ ".*/backend/templates/.*" ], name: "(Backend) Typst templates" }
-
-  # Frontend src/components
-  - { include: [ ".*/frontend/src/components/committee_session/.*" ], name: "(Frontend) Components/committee_session" }
-  - { include: [ ".*/frontend/src/components/data_entry/.*" ], name: "(Frontend) Components/data_entry" }
-  - { include: [ ".*/frontend/src/components/election/.*" ], name: "(Frontend) Components/election" }
-  - { include: [ ".*/frontend/src/components/error/.*" ], name: "(Frontend) Components/error" }
-  - { include: [ ".*/frontend/src/components/footer/.*" ], name: "(Frontend) Components/footer" }
-  - { include: [ ".*/frontend/src/components/generated/.*" ], name: "(Frontend) components/generated" }
-  - { include: [ ".*/frontend/src/components/layout/.*" ], name: "(Frontend) components/layout" }
-  - { include: [ ".*/frontend/src/components/messages/.*" ], name: "(Frontend) components/messages" }
-  - { include: [ ".*/frontend/src/components/navbar/.*" ], name: "(Frontend) Components/navbar" }
-  - { include: [ ".*/frontend/src/components/page_title/.*" ], name: "(Frontend) components/page_title" }
-  - { include: [ ".*/frontend/src/components/polling_station/.*" ], name: "(Frontend) components/polling_station" }
-  - { include: [ ".*/frontend/src/components/privacy_statement/.*" ], name: "(Frontend) components/privacy_statement" }
-  - { include: [ ".*/frontend/src/components/ui/.*" ], name: "(Frontend) Lib/UI" }
-
-  # Frontend src/features
-  - { include: [ ".*/frontend/src/features/account/.*" ], name: "(Frontend) Modules/account" }
-  - { include: [ ".*/frontend/src/features/data_entry/.*" ], name: "(Frontend) Modules/data_entry" }
-  - { include: [ ".*/frontend/src/features/data_entry_detail/.*" ], name: "(Frontend) features/data_entry_detail" }
-  - { include: [ ".*/frontend/src/features/data_entry_home/.*" ], name: "(Frontend) Modules/data_entry_home" }
-  - { include: [ ".*/frontend/src/features/dev/.*" ], name: "(Frontend) features/dev" }
-  - { include: [ ".*/frontend/src/features/election_create/.*" ], name: "(Frontend) Modules/election_create" }
-  - { include: [ ".*/frontend/src/features/election_management/.*" ], name: "(Frontend) Modules/election_management" }
-  - { include: [ ".*/frontend/src/features/election_overview/.*" ], name: "(Frontend) Modules/election_overview" }
-  - { include: [ ".*/frontend/src/features/election_status/.*" ], name: "(Frontend) Modules/election_status" }
-  - { include: [ ".*/frontend/src/features/investigations/.*" ], name: "(Frontend) features/investigations" }
-  - { include: [ ".*/frontend/src/features/logs/.*" ], name: "(Frontend) Modules/logs" }
-  - { include: [ ".*/frontend/src/features/polling_stations/.*" ], name: "(Frontend) Modules/polling_stations" }
-  - { include: [ ".*/frontend/src/features/resolve_differences/.*" ], name: "(Frontend) Modules/resolve_differences" }
-  - { include: [ ".*/frontend/src/features/resolve_errors/.*" ], name: "(Frontend) Modules/resolve_errors" }
-  - { include: [ ".*/frontend/src/features/users/.*" ], name: "(Frontend) Modules/users" }
-
-  # Frontend src level
-  - { include: [ ".*/frontend/src/api/.*" ], name: "(Frontend) Lib/API" }
-  - { include: [ ".*/frontend/src/app/.*" ], name: "(Frontend) App" }
-  - { include: [ ".*/frontend/src/hooks/.*" ], name: "(Frontend) Hooks" }
-  - { include: [ ".*/frontend/src/i18n/.*" ], name: "(Frontend) Lib/i18n" }
-  - { include: [ ".*/frontend/src/styles/.*" ], name: "(Frontend) src/styles" }
-  - { include: [ ".*/frontend/src/testing/.*" ], name: "(Frontend) src/testing" }
-  - { include: [ ".*/frontend/src/types/.*" ], name: "(Frontend) src/types" }
-  - { include: [ ".*/frontend/src/utils/.*" ], name: "(Frontend) Lib/Util" }
-
-  # Frontend root level
-  - { include: [ ".*/frontend/e2e-tests/.*" ], name: "(Frontend) e2e tests" }
-
 languages:
   - name: "css"
-  - name: "javascript"
   - name: "sqlite"
     production:
       include:
         - ".*/migrations/.*[.]sql"
-      exclude:
-        - ".*/fixtures/.*[.]sql"
     test:
-    generated:
+      include:
+        - ".*/fixtures/.*[.]sql"
 
   - name: "rust"
     production:
-      include:
-        - ".*/gen-openapi[.]rs"
-        - ".*/api[.]rs"
     test:
       include:
         - ".*/backend/apportionment/src/test_helpers.rs"
@@ -130,45 +17,40 @@ languages:
         - ".*/test_data_gen/.*[.]rs"
         - ".*/typst_tests[.]rs"
         - ".*/backend/fuzz/.*"
-    generated:
-      include:
-        - ".*/gen/.*[.]rs"
-        - ".*/.sqlx/.*[.]json"
 
   - name: "typescript"
     production:
     test:
       include:
-        - ".*/[.]storybook/.*"
-        - ".*[.]e2e[.]ts"
-        - ".*.stories[.]tsx"
-        - ".*/src/components/error/NotAvailableInMock[.]tsx"
-        - ".*/src/features/dev/.*"
-        - ".*/testing/.*"
-        - ".*/e2e-tests/.*"
+        - ".*/frontend/[.]storybook/.*"
+        - ".*/frontend/.*[.]e2e[.]ts"
+        - ".*/frontend/.*.stories[.]tsx"
+        - ".*/frontend/src/components/error/NotAvailableInMock[.]tsx"
+        - ".*/frontend/src/features/dev/.*"
+        - ".*/frontend/src/testing/.*"
+        - ".*/frontend/e2e-tests/.*"
     generated:
       include:
-        - ".*/generated/.*[.]ts"
+        - ".*/frontend/.*/generated/.*[.]ts"
 
 exclude:
   - ".*/backend/[.]env"
   - ".*/backend/[.]sqlx/.*"
+  - ".*/backend/src/bin/gen-.*[.]rs"
   - ".*/documentatie/.*"
   - ".*/frontend/scripts/.*"
-  - ".*/frontend/.*[.]d[.]ts"
-  - ".*/frontend/.*[.]config[.]ts"
-  - ".*/frontend/package.json"
-  - ".*/frontend/tsconfig[.]json"
   - ".*/docker-compose[.]yml"
+  - ".*/packaging/.*"
 
 dependencychecker:
   blocklist:
-    - "backend"
+    - "abacus"
+    - "abacus-fuzz"
+    - "apportionment"
   transitive: true
 
 architecture:
   enabled: true
-  custom_components: true
 
 thirdpartyfindings:
   enabled: true

@@ -1,20 +1,15 @@
 languages:
   - name: "css"
-  - name: "javascript"
   - name: "sqlite"
     production:
       include:
         - ".*/migrations/.*[.]sql"
-      exclude:
-        - ".*/fixtures/.*[.]sql"
     test:
-    generated:
+      include:
+        - ".*/fixtures/.*[.]sql"
 
   - name: "rust"
     production:
-      include:
-        - ".*/gen-openapi[.]rs"
-        - ".*/api[.]rs"
     test:
       include:
         - ".*/backend/apportionment/src/test_helpers.rs"
@@ -22,40 +17,36 @@ languages:
         - ".*/test_data_gen/.*[.]rs"
         - ".*/typst_tests[.]rs"
         - ".*/backend/fuzz/.*"
-    generated:
-      include:
-        - ".*/gen/.*[.]rs"
-        - ".*/.sqlx/.*[.]json"
 
   - name: "typescript"
     production:
     test:
       include:
-        - ".*/[.]storybook/.*"
-        - ".*[.]e2e[.]ts"
-        - ".*.stories[.]tsx"
-        - ".*/src/components/error/NotAvailableInMock[.]tsx"
-        - ".*/src/features/dev/.*"
-        - ".*/testing/.*"
-        - ".*/e2e-tests/.*"
+        - ".*/frontend/[.]storybook/.*"
+        - ".*/frontend/.*[.]e2e[.]ts"
+        - ".*/frontend/.*.stories[.]tsx"
+        - ".*/frontend/src/components/error/NotAvailableInMock[.]tsx"
+        - ".*/frontend/src/features/dev/.*"
+        - ".*/frontend/src/testing/.*"
+        - ".*/frontend/e2e-tests/.*"
     generated:
       include:
-        - ".*/generated/.*[.]ts"
+        - ".*/frontend/.*/generated/.*[.]ts"
 
 exclude:
   - ".*/backend/[.]env"
   - ".*/backend/[.]sqlx/.*"
+  - ".*/backend/src/bin/gen-.*[.]rs"
   - ".*/documentatie/.*"
   - ".*/frontend/scripts/.*"
-  - ".*/frontend/.*[.]d[.]ts"
-  - ".*/frontend/.*[.]config[.]ts"
-  - ".*/frontend/package.json"
-  - ".*/frontend/tsconfig[.]json"
   - ".*/docker-compose[.]yml"
+  - ".*/packaging/.*"
 
 dependencychecker:
   blocklist:
-    - "backend"
+    - "abacus"
+    - "abacus-fuzz"
+    - "apportionment"
   transitive: true
 
 architecture:

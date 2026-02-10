@@ -1069,7 +1069,7 @@ mod tests {
             data_entry::tests::example_polling_station_results,
             validation::{ValidationResult, ValidationResultCode},
         },
-        infra::audit_log,
+        infra::audit_log::{self, AuditEventLevel},
         repository::{
             committee_session_repo::change_status,
             data_entry_repo::{data_entry_exists, get_polling_station_data_entries, result_exists},
@@ -1739,16 +1739,16 @@ mod tests {
         // Check that it has been logged in the audit log
         let mut conn = pool.acquire().await.unwrap();
         let audit_log = audit_log::list_all(&mut conn).await.unwrap();
-        let last_event = audit_log.last().unwrap().event();
-        dbg!(last_event);
-        assert!(false);
-        /*
-                if let AuditEvent::DataEntryFinalised(details) = last_event {
-                    assert_eq!(details.data_entry_status, "first_entry_has_errors");
-                } else {
-                    panic!("Expected DataEntryFinalised event but got {:?}", last_event);
-                };
-        */
+        let last_event = audit_log.last().unwrap();
+
+        assert_eq!(*last_event.event_name(), AuditEventType::DataEntryFinalised);
+        assert_eq!(*last_event.event_level(), AuditEventLevel::Success);
+        assert_eq!(*last_event.event(), serde_json::json!({
+            "committee_session_id": 2,
+            "data_entry_progress": "100%",
+            "data_entry_status": "first_entry_has_errors",
+            "polling_station_id": 1,
+        }));
     }
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]

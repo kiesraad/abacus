@@ -72,6 +72,10 @@ impl AuditLogEvent {
         &self.event
     }
 
+    pub fn event_name(&self) -> &AuditEventType {
+        &self.event_name
+    }
+
     pub fn event_level(&self) -> &AuditEventLevel {
         &self.event_level
     }

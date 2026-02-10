@@ -6,9 +6,8 @@ use self::structs::{Candidate, ListCandidateNomination, PreferenceThreshold};
 use super::{
     ApportionmentError, ApportionmentInput, CandidateVotesTrait, ListVotesTrait,
     fraction::Fraction,
-    structs::{CandidateNominationInputType, CandidateNumber, LARGE_COUNCIL_THRESHOLD},
+    structs::{CandidateNominationInputType, CandidateNumber, LARGE_COUNCIL_THRESHOLD, ListNumber},
 };
-use crate::structs::ListNumber;
 pub use structs::CandidateNominationResult;
 
 /// Candidate nomination

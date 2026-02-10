@@ -126,18 +126,23 @@ fn list_numbers(standing: &[&ListStanding]) -> Vec<ListNumber> {
     standing.iter().map(|s| s.list_number).collect()
 }
 
+fn get_number_of_candidates<T: ListVotesTrait>(
+    input_list_votes: &[T],
+    list_number: ListNumber,
+) -> u32 {
+    let list_votes = input_list_votes
+        .iter()
+        .find(|list_votes| list_votes.number() == list_number)
+        .expect("List votes exists");
+    u32::try_from(list_votes.candidate_votes().len()).expect("Number of candidates fits in u32")
+}
+
 fn list_numbers_with_exhausted_seats<'a, T: ListVotesTrait>(
     standings: impl Iterator<Item = &'a ListStanding>,
-    list_votes: &[T],
+    input_list_votes: &[T],
 ) -> Vec<(ListNumber, u32)> {
     standings.fold(vec![], |mut exhausted_list_numbers_and_seats, s| {
-        let list_votes = list_votes
-            .iter()
-            .find(|list_votes| list_votes.number() == s.list_number)
-            .expect("List votes exists");
-        let number_of_candidates = u32::try_from(list_votes.candidate_votes().len())
-            .expect("Number of candidates fits in u32");
-
+        let number_of_candidates = get_number_of_candidates(input_list_votes, s.list_number);
         if number_of_candidates.cmp(&s.total_seats()) == Ordering::Less {
             exhausted_list_numbers_and_seats.push((
                 s.list_number,

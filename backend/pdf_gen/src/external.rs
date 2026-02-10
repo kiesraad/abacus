@@ -6,16 +6,14 @@ use tracing::{error, info};
 
 use super::PdfGenResult;
 use crate::{
-    domain::models::PdfFileModel,
-    infra::zip::{ZipResponseError, ZipResponseWriter},
+    PdfGenInput,
+    zip::{ZipResponseError, ZipResponseWriter},
 };
 
-async fn generate_file(
-    file_name: &String,
-    file_model: PdfFileModel,
-) -> Result<PdfGenResult, PdfGenError> {
+async fn generate_file(input: PdfGenInput) -> Result<PdfGenResult, PdfGenError> {
     let start = Instant::now();
-    let content = generate_pdf(file_model).await?;
+    let file_name = input.output_file_name.clone();
+    let content = generate_pdf(input).await?;
 
     info!(
         "Generated PDF {file_name} in {} ms",
@@ -26,12 +24,12 @@ async fn generate_file(
 
 /// Create a PDF file for each model in the provided vector and send them through the provided channel.
 pub async fn generate_pdfs(
-    models: Vec<PdfFileModel>,
+    inputs: Vec<PdfGenInput>,
     mut zip_writer: ZipResponseWriter,
 ) -> Result<(), PdfGenError> {
-    for file_model in models.into_iter() {
-        let file_name = file_model.file_name.clone();
-        let content = match generate_file(&file_name, file_model).await {
+    for input in inputs.into_iter() {
+        let file_name = input.output_file_name.clone();
+        let content = match generate_file(input).await {
             Ok(content) => content,
             Err(e) => {
                 error!("Failed to generate PDF {file_name}: {e:?}");
@@ -49,20 +47,11 @@ pub async fn generate_pdfs(
     Ok::<(), PdfGenError>(())
 }
 
-/// Uses environment variables `ABACUS_TYPST_BIN` (`typst` by default) and `ABACUS_TEMPLATES_DIR` (`./templates` by
-/// default) to generate a PDF using an external binary of typst.
-pub async fn generate_pdf(file_model: PdfFileModel) -> Result<PdfGenResult, PdfGenError> {
-    // create a temporary copy of the template files
-    let tmp_path = tokio::task::spawn_blocking(prep_tmp_templates_dir).await??;
-
-    // write JSON data to model input file
-    let json_path = {
-        let mut full_path = tmp_path.clone();
-        full_path.push(file_model.model.as_input_path());
-        full_path
-    };
-    let json_data = file_model.model.get_input()?;
-    tokio::fs::write(json_path, json_data).await?;
+/// Uses environment variable `ABACUS_TYPST_BIN` (`typst` by default) to generate a PDF using an
+/// external binary of typst. Sources, fonts and input data are provided via [`PdfGenInput`].
+pub async fn generate_pdf(input: PdfGenInput) -> Result<PdfGenResult, PdfGenError> {
+    // write sources, fonts and JSON input to a temporary directory
+    let tmp_path = prep_tmp_dir(&input).await?;
 
     // construct the typst command to run
     let typst_binary = std::env::var("ABACUS_TYPST_BIN").unwrap_or("typst".into());
@@ -75,11 +64,7 @@ pub async fn generate_pdf(file_model: PdfFileModel) -> Result<PdfGenResult, PdfG
             "--ignore-system-fonts",
             "--font-path",
             "fonts/",
-            file_model
-                .model
-                .as_template_path()
-                .to_str()
-                .expect("Model template path should always be UTF-8"),
+            input.main_template_path,
             "-",
         ])
         .current_dir(&tmp_path);
@@ -102,10 +87,8 @@ pub async fn generate_pdf(file_model: PdfFileModel) -> Result<PdfGenResult, PdfG
     Ok(PdfGenResult { buffer: res.stdout })
 }
 
-/// Creates a temporary copy of the templates directory
-fn prep_tmp_templates_dir() -> Result<PathBuf, std::io::Error> {
-    let from_dir =
-        PathBuf::from(&std::env::var("ABACUS_TEMPLATES_DIR").unwrap_or("./templates".into()));
+/// Creates a temporary directory and writes sources, fonts and JSON input into it.
+async fn prep_tmp_dir(input: &PdfGenInput) -> Result<PathBuf, std::io::Error> {
     let temp_dir = {
         let mut temp_dir = std::env::temp_dir();
         let mut tmp_dir_name = "abacus-".to_string();
@@ -119,36 +102,39 @@ fn prep_tmp_templates_dir() -> Result<PathBuf, std::io::Error> {
         temp_dir.push(tmp_dir_name);
         temp_dir
     };
-    copy_dir(&from_dir, &temp_dir)?;
+
+    // write source files
+    for source in &input.sources {
+        let full_path = temp_dir.join(source.path);
+        if let Some(parent) = full_path.parent() {
+            tokio::fs::create_dir_all(parent).await?;
+        }
+        tokio::fs::write(&full_path, source.content).await?;
+    }
+
+    // write font files
+    let fonts_dir = temp_dir.join("fonts");
+    tokio::fs::create_dir_all(&fonts_dir).await?;
+    for (i, font) in input.fonts.iter().enumerate() {
+        let font_path = fonts_dir.join(format!("font_{i}.ttf"));
+        tokio::fs::write(&font_path, font.0).await?;
+    }
+
+    // write JSON input file
+    let json_path = temp_dir.join(input.input_path);
+    if let Some(parent) = json_path.parent() {
+        tokio::fs::create_dir_all(parent).await?;
+    }
+    tokio::fs::write(&json_path, &input.input_json).await?;
 
     Ok(temp_dir)
-}
-
-/// Copy a directory recursively to another location
-fn copy_dir(
-    source: impl AsRef<std::path::Path>,
-    dest: impl AsRef<std::path::Path>,
-) -> Result<(), std::io::Error> {
-    std::fs::create_dir_all(&dest)?;
-    for entry in std::fs::read_dir(source)? {
-        let entry = entry?;
-        if entry.file_type()?.is_dir() {
-            copy_dir(entry.path(), dest.as_ref().join(entry.file_name()))?;
-        } else {
-            std::fs::copy(entry.path(), dest.as_ref().join(entry.file_name()))?;
-        }
-    }
-    Ok(())
 }
 
 #[derive(Debug, Display)]
 pub enum PdfGenError {
     Io(std::io::Error),
-    Join(tokio::task::JoinError),
-    Json(serde_json::Error),
     CompilationFailed(String),
     ZipError(ZipResponseError),
-    ChannelClosed,
 }
 
 impl std::error::Error for PdfGenError {}
@@ -156,18 +142,6 @@ impl std::error::Error for PdfGenError {}
 impl From<std::io::Error> for PdfGenError {
     fn from(err: std::io::Error) -> Self {
         PdfGenError::Io(err)
-    }
-}
-
-impl From<serde_json::Error> for PdfGenError {
-    fn from(err: serde_json::Error) -> Self {
-        PdfGenError::Json(err)
-    }
-}
-
-impl From<tokio::task::JoinError> for PdfGenError {
-    fn from(err: tokio::task::JoinError) -> Self {
-        PdfGenError::Join(err)
     }
 }
 

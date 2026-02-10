@@ -4,6 +4,7 @@ use axum::{
 };
 use axum_extra::response::Attachment;
 use chrono::{DateTime, Local, Utc};
+use pdf_gen::zip::{ZipResponse, ZipResponseError, slugify_filename, zip_single_file};
 use sqlx::{SqliteConnection, SqlitePool};
 use utoipa_axum::{router::OpenApiRouter, routes};
 
@@ -30,7 +31,6 @@ use crate::{
     infra::{
         audit_log::{AuditEvent, AuditService},
         pdf_gen::generate_pdf,
-        zip::{ZipResponse, ZipResponseError, slugify_filename, zip_single_file},
     },
     repository::{
         committee_session_repo,

@@ -298,13 +298,11 @@ mod tests {
     use test_log::test;
 
     use super::*;
-    use crate::{
-        domain::{
-            committee_session::committee_session_fixture,
-            data_entry::{ExtraInvestigation, YesNo, tests::ValidDefault},
-            election::{PGNumber, tests::election_fixture},
-        },
-        infra::pdf_gen::tests::polling_stations_fixture,
+    use crate::domain::{
+        committee_session::committee_session_fixture,
+        data_entry::{ExtraInvestigation, YesNo, tests::ValidDefault},
+        election::{PGNumber, tests::election_fixture},
+        polling_station::polling_stations_fixture,
     };
 
     fn polling_station_results_fixture_a() -> PollingStationResults {

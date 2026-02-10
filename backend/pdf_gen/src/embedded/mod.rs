@@ -1,4 +1,4 @@
-use std::{fmt::Debug, time::Instant};
+use std::time::Instant;
 
 use chrono::{Datelike, Timelike};
 use strum::Display;
@@ -8,16 +8,16 @@ use typst_pdf::{PdfOptions, PdfStandard, PdfStandards, Timestamp};
 
 use super::PdfGenResult;
 use crate::{
-    domain::models::{PdfFileModel, PdfModel},
-    infra::zip::{ZipResponseError, ZipResponseWriter},
+    PdfGenInput,
+    zip::{ZipResponseError, ZipResponseWriter},
 };
 
 mod world;
 
 /// Generates a PDF using the embedded typst library.
-pub async fn generate_pdf(file_model: PdfFileModel) -> Result<PdfGenResult, PdfGenError> {
+pub async fn generate_pdf(input: PdfGenInput) -> Result<PdfGenResult, PdfGenError> {
     tokio::task::spawn_blocking(move || {
-        let result = compile_pdf(&mut world::PdfWorld::new(), file_model.model);
+        let result = compile_pdf(input);
 
         // Evict the cache to free up memory + speed up next compile
         comemo::evict(0);
@@ -28,16 +28,16 @@ pub async fn generate_pdf(file_model: PdfFileModel) -> Result<PdfGenResult, PdfG
     .map_err(PdfGenError::from)?
 }
 
-/// Generates a ZIP file containing the PDFs for the provided models.
+/// Generates a ZIP file containing the PDFs for the provided inputs.
 /// Uses the embedded typst library to generate the PDFs.
 pub async fn generate_pdfs(
-    models: Vec<PdfFileModel>,
+    inputs: Vec<PdfGenInput>,
     mut zip_writer: ZipResponseWriter,
 ) -> Result<(), PdfGenError> {
-    for file_model in models.into_iter() {
-        let file_name = file_model.file_name.clone();
+    for input in inputs.into_iter() {
+        let file_name = input.output_file_name.clone();
 
-        let content = match generate_pdf(file_model).await {
+        let content = match generate_pdf(input).await {
             Ok(content) => content,
             Err(e) => {
                 error!("Failed to generate PDF {file_name}: {e:?}");
@@ -81,14 +81,17 @@ fn convert_datetime<Tz: chrono::TimeZone>(date_time: chrono::DateTime<Tz>) -> Op
 }
 
 #[allow(clippy::cognitive_complexity)]
-fn compile_pdf(world: &mut world::PdfWorld, model: PdfModel) -> Result<PdfGenResult, PdfGenError> {
-    debug!("Starting Typst compilation for {}", model.as_model_name());
+fn compile_pdf(input: PdfGenInput) -> Result<PdfGenResult, PdfGenError> {
+    debug!(
+        "Starting Typst compilation for {}",
+        input.main_template_path
+    );
 
-    world.set_input_model(model)?;
+    let world = world::PdfWorld::new(input)?;
 
     let compile_start = Instant::now();
 
-    let result = typst::compile(world);
+    let result = typst::compile(&world);
     info!(
         "Compile took {} ms, {} warnings",
         compile_start.elapsed().as_millis(),
@@ -121,7 +124,6 @@ fn compile_pdf(world: &mut world::PdfWorld, model: PdfModel) -> Result<PdfGenRes
 pub enum PdfGenError {
     Typst(String),
     Join(tokio::task::JoinError),
-    Json(serde_json::Error),
     TemplateNotFound(String),
     ZipError(ZipResponseError),
 }
@@ -152,12 +154,6 @@ impl PdfGenError {
 impl From<tokio::task::JoinError> for PdfGenError {
     fn from(err: tokio::task::JoinError) -> Self {
         PdfGenError::Join(err)
-    }
-}
-
-impl From<serde_json::Error> for PdfGenError {
-    fn from(err: serde_json::Error) -> Self {
-        PdfGenError::Json(err)
     }
 }
 

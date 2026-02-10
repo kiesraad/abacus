@@ -22,16 +22,17 @@ pub async fn log_error(
     {
         match pool.acquire().await {
             Ok(mut conn) => {
-                if let Err(e) = audit_service
-                    .log(
-                        &mut conn,
-                        &error_details.as_audit_event(),
-                        Some(error_response.error.clone()),
-                    )
-                    .await
-                {
-                    error!("Failed to log error: {e:?}");
-                }
+                match &error_details.as_audit_event() {
+                    Ok(event) => {
+                        if let Err(e) = audit_service
+                            .log(&mut conn, event, Some(error_response.error.clone()))
+                            .await
+                        {
+                            error!("Failed to log error: {e:?}");
+                        }
+                    }
+                    Err(e) => error!("Failed to serialize audit event into JSON: {e:?}"),
+                };
             }
             Err(e) => {
                 error!("Failed to acquire database connection: {e:?}");

@@ -38,7 +38,7 @@ export function LogsTable({ events, details, setDetails }: LogsTableProps) {
             <Table.Cell>{t(`log.level.${event.event_level}`)}</Table.Cell>
             <Table.Cell>
               {t(`log.event.${event.event_name}`)}
-              {event.event_type === "Error" && `: ${t(`error.api_error.${event.event.reference}`)}`}
+              {event.event_name === "Error" && `: ${t(`error.api_error.${event.event.reference}`)}`}
             </Table.Cell>
             <Table.Cell>
               {event.user_id &&

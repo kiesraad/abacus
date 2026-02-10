@@ -14,23 +14,23 @@ pub struct AuditEvent {
 }
 
 pub trait AsAuditEvent {
-    fn as_audit_event(&self) -> AuditEvent;
+    fn as_audit_event(&self) -> Result<AuditEvent, serde_json::Error>;
 }
 
 impl AsAuditEvent for AuditEvent {
-    fn as_audit_event(&self) -> AuditEvent {
-        self.clone()
+    fn as_audit_event(&self) -> Result<AuditEvent, serde_json::Error> {
+        Ok(self.clone())
     }
 }
 
 macro_rules! as_audit_event {
     ($identifier:ident, $audit_event_type:path) => {
         impl AsAuditEvent for $identifier {
-            fn as_audit_event(&self) -> crate::audit_log::AuditEvent {
-                AuditEvent {
+            fn as_audit_event(&self) -> Result<crate::audit_log::AuditEvent, serde_json::Error> {
+                Ok(AuditEvent {
                     event_type: $audit_event_type,
-                    data: serde_json::to_value(self).expect("could not serialize to JSON"),
-                }
+                    data: serde_json::to_value(self)?,
+                })
             }
         }
     };
@@ -66,15 +66,15 @@ impl ErrorDetails {
 }
 
 impl AsAuditEvent for ErrorDetails {
-    fn as_audit_event(&self) -> AuditEvent {
-        AuditEvent {
+    fn as_audit_event(&self) -> Result<AuditEvent, serde_json::Error> {
+        Ok(AuditEvent {
             event_type: AuditEventType::Error,
             data: json!({
                 "reference": self.reference,
                 "path": self.path,
                 "level": self.level,
             }),
-        }
+        })
     }
 }
 

@@ -3,7 +3,7 @@ import { Fragment } from "react";
 import { Modal } from "@/components/ui/Modal/Modal";
 import type { TranslationPath } from "@/i18n/i18n.types";
 import { t } from "@/i18n/translate";
-import type { AuditEventType, AuditLogEvent, auditEventTypeValues } from "@/types/generated/openapi";
+import type { AuditEventType, AuditLogEvent, ErrorReference } from "@/types/generated/openapi";
 import { formatDateTimeFull } from "@/utils/dateTime";
 
 import cls from "./LogsHomePage.module.css";
@@ -17,7 +17,7 @@ const SHOULD_TRANSLATE: Record<string, string> = {
 };
 
 // format an audit log event detail value
-function formatValue(key: AuditEventDetailKeys, value: AuditEventValues): string {
+function formatValue(key: string, value: AuditEventValues): string {
   if (value === true) {
     return t("yes");
   }
@@ -45,11 +45,10 @@ export function LogDetailsModal({ details, setDetails }: LogDetailsModalProps) {
   const event_type: AuditEventType = details.event_name;
   const event: object = details.event ? details.event : {};
 
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
   const filteredDetails: [string, TranslationPath, AuditEventValues][] = Object.entries(event).map(
-    ([key, value]: [string, AuditEventValues]) => {
-      const translatedKey: TranslationPath = `log.field.${key}`;
-      return [key, translatedKey, value];
+    ([key, value]: [string, unknown]) => {
+      const translatedKey: TranslationPath = `log.field.${key}` as TranslationPath;
+      return [key, translatedKey, value as AuditEventValues];
     },
   );
 

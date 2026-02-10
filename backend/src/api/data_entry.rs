@@ -1743,12 +1743,15 @@ mod tests {
 
         assert_eq!(*last_event.event_name(), AuditEventType::DataEntryFinalised);
         assert_eq!(*last_event.event_level(), AuditEventLevel::Success);
-        assert_eq!(*last_event.event(), serde_json::json!({
-            "committee_session_id": 2,
-            "data_entry_progress": "100%",
-            "data_entry_status": "first_entry_has_errors",
-            "polling_station_id": 1,
-        }));
+        assert_eq!(
+            *last_event.event(),
+            serde_json::json!({
+                "committee_session_id": 2,
+                "data_entry_progress": "100%",
+                "data_entry_status": "first_entry_has_errors",
+                "polling_station_id": 1,
+            })
+        );
     }
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]

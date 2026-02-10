@@ -6,10 +6,11 @@ use sqlx::{SqliteConnection, Type, prelude::FromRow, types::Json};
 use strum::VariantNames;
 use utoipa::ToSchema;
 
-use super::{AsAuditEvent, AuditEventType, AuditLogUser, LogFilterQuery};
+use super::{AuditEventType, AuditLogUser, LogFilterQuery};
 use crate::{
     APIError,
     domain::{id::id, role::Role},
+    infra::audit_log::AuditEvent,
     repository::user_repo::{User, UserId},
 };
 
@@ -168,15 +169,14 @@ impl LogFilter {
 
 pub async fn create(
     conn: &mut SqliteConnection,
-    event: &impl AsAuditEvent,
+    audit_event: AuditEvent,
     user: Option<&User>,
     message: Option<String>,
     ip: Option<IpAddr>,
 ) -> Result<(), sqlx::Error> {
-    let event = event.as_audit_event();
-    let event_name = event.event_type.to_string();
-    let event_level = event.event_type.level();
-    let event = dbg!(Json(event.data));
+    let event_name = audit_event.event_type.to_string();
+    let event_level = audit_event.event_type.level();
+    let event = Json(audit_event.data);
     let user_id = user.map(|u| u.id());
     let username = user.map(|u| u.username().to_string());
     let fullname = user.map(|u| u.fullname().unwrap_or_default().to_string());

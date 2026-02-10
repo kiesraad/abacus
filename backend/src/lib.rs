@@ -172,10 +172,11 @@ as_audit_event!(ApplicationStarted, AuditEventType::ApplicationStarted);
 async fn log_app_started(conn: &mut SqliteConnection, db_path: &str) -> Result<(), AppError> {
     Ok(audit_log::create(
         conn,
-        &ApplicationStarted(ApplicationStartedDetails {
+        ApplicationStarted(ApplicationStartedDetails {
             version: env!("ABACUS_GIT_VERSION").to_string(),
             commit: env!("ABACUS_GIT_REV").to_string(),
-        }),
+        })
+        .as_audit_event()?,
         None,
         None,
         None,

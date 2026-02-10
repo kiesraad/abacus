@@ -91,22 +91,32 @@ impl AirgapDetection {
 
     #[allow(clippy::cognitive_complexity)]
     async fn log_status_change(&self) {
-        let event = if self.violation_detected() {
+        let event_result = if self.violation_detected() {
             AirGapViolationDetected.as_audit_event()
         } else {
             AirGapViolationResolved.as_audit_event()
         };
 
-        if let Some(pool) = &self.pool {
-            if let Ok(mut conn) = pool.acquire().await {
-                if let Err(e) = crate::audit_log::create(&mut conn, &event, None, None, None).await
-                {
-                    error!("Failed to log air gap status change: {e:#?}");
-                }
-            } else {
-                error!("Failed to acquire database connection for air gap status logging");
-            }
-        }
+        // If we detect an airgap status change, but we're unable to create and save
+        // the audit event, we should at least log it to stdout
+        let Ok(event) = event_result else {
+            error!("Failed to serialize an air gap status change to JSON");
+            return;
+        };
+
+        let Some(pool) = &self.pool else {
+            error!("Failed to acquire database connection for air gap status logging");
+            return;
+        };
+
+        let Ok(mut conn) = pool.acquire().await else {
+            error!("Failed to acquire database connection for air gap status logging");
+            return;
+        };
+
+        if let Err(e) = crate::audit_log::create(&mut conn, event, None, None, None).await {
+            error!("Failed to log air gap status change: {e:#?}");
+        };
     }
 
     #[allow(clippy::cognitive_complexity)]

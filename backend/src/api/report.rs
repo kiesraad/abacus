@@ -18,7 +18,7 @@ use crate::{
         committee_session_status::CommitteeSessionStatus,
         data_entry::PollingStationResults,
         election::{ElectionId, ElectionWithPoliticalGroups},
-        file::File,
+        file::{File, FileCreated},
         investigation::PollingStationInvestigation,
         models::{ModelNa14_2Input, ModelNa31_2Input, ModelP2aInput, PdfFileModel, ToPdfFileModel},
         polling_station::PollingStation,
@@ -28,13 +28,12 @@ use crate::{
     eml::{EML510, EMLDocument, EmlHash},
     error::ErrorReference,
     infra::{
-        audit_log::{AuditEvent, AuditService},
+        audit_log::AuditService,
         pdf_gen::generate_pdf,
         zip::{ZipResponse, ZipResponseError, slugify_filename, zip_single_file},
     },
     repository::{
-        committee_session_repo,
-        committee_session_repo::{change_files, get_previous_session},
+        committee_session_repo::{self, change_files, get_previous_session},
         data_entry_repo::{
             are_results_complete_for_committee_session, list_results_for_committee_session,
         },
@@ -388,7 +387,7 @@ async fn create_file(
     let file = file_repo::create(conn, filename, data, mime_type, created_at).await?;
 
     audit_service
-        .log(conn, &AuditEvent::FileCreated(file.clone().into()), None)
+        .log(conn, &FileCreated(file.clone().into()), None)
         .await?;
     Ok(file)
 }

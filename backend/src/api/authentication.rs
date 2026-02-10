@@ -20,13 +20,9 @@ use crate::{
     },
     domain::role::Role,
     error::ErrorReference,
-    infra::audit_log::{
-        AuditEvent, AuditService, UserDetails, UserLoggedInDetails, UserLoggedOutDetails,
-        UserLoginFailedDetails,
-    },
+    infra::audit_log::{AsAuditEvent, AuditEvent, AuditEventType, AuditService, as_audit_event},
     repository::{
-        session_repo,
-        session_repo::Session,
+        session_repo::{self, Session},
         user_repo::{self, User, UserId},
     },
 };
@@ -36,6 +32,66 @@ impl From<AuthenticationError> for APIError {
         APIError::Authentication(err)
     }
 }
+#[derive(Serialize, Deserialize, Debug, PartialEq, Eq, ToSchema)]
+#[serde(deny_unknown_fields)]
+pub struct UserLoggedInDetails {
+    pub user_agent: String,
+    pub logged_in_users_count: u32,
+}
+
+as_audit_event!(UserLoggedInDetails, AuditEventType::UserLoggedIn);
+
+#[derive(Serialize, Deserialize, Debug, PartialEq, Eq, ToSchema)]
+#[serde(deny_unknown_fields)]
+pub struct UserLoggedOutDetails {
+    pub session_duration: u64,
+}
+
+as_audit_event!(UserLoggedOutDetails, AuditEventType::UserLoggedOut);
+
+#[derive(Serialize, Deserialize, Debug, PartialEq, Eq, ToSchema)]
+#[serde(deny_unknown_fields)]
+pub struct UserLoginFailedDetails {
+    pub username: String,
+    pub user_agent: String,
+}
+
+as_audit_event!(UserLoginFailedDetails, AuditEventType::UserLoginFailed);
+
+#[derive(Serialize, Deserialize, Debug, PartialEq, Eq, ToSchema)]
+#[serde(deny_unknown_fields)]
+pub struct UserDetails {
+    pub user_id: UserId,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[schema(value_type = String, nullable = false)]
+    pub fullname: Option<String>,
+    pub username: String,
+    pub role: String,
+}
+
+impl From<User> for UserDetails {
+    fn from(user: User) -> Self {
+        Self {
+            user_id: user.id(),
+            fullname: user.fullname().map(String::from),
+            username: user.username().to_string(),
+            role: user.role().to_string(),
+        }
+    }
+}
+
+#[derive(Serialize)]
+pub struct UserAccountUpdated(pub LoginResponse);
+as_audit_event!(UserAccountUpdated, AuditEventType::UserAccountUpdated);
+#[derive(Serialize)]
+pub struct UserCreated(pub UserDetails);
+as_audit_event!(UserCreated, AuditEventType::UserCreated);
+#[derive(Serialize)]
+pub struct UserUpdated(pub UserDetails);
+as_audit_event!(UserUpdated, AuditEventType::UserUpdated);
+#[derive(Serialize)]
+pub struct UserDeleted(pub UserDetails);
+as_audit_event!(UserDeleted, AuditEventType::UserDeleted);
 
 pub fn router() -> OpenApiRouter<AppState> {
     OpenApiRouter::default()
@@ -79,17 +135,6 @@ impl From<&User> for LoginResponse {
     }
 }
 
-impl From<LoginResponse> for UserDetails {
-    fn from(user: LoginResponse) -> Self {
-        Self {
-            user_id: user.user_id,
-            fullname: user.fullname,
-            username: user.username,
-            role: user.role.to_string(),
-        }
-    }
-}
-
 /// Set default session cookie properties
 pub(crate) fn set_default_cookie_properties(cookie: &mut Cookie) {
     cookie.set_path("/");
@@ -129,10 +174,10 @@ async fn login(
             audit_service
                 .log(
                     &mut tx,
-                    &AuditEvent::UserLoginFailed(UserLoginFailedDetails {
+                    &UserLoginFailedDetails {
                         username,
                         user_agent: user_agent.clone(),
-                    }),
+                    },
                     None,
                 )
                 .await?;
@@ -166,10 +211,10 @@ async fn login(
         .with_user(user.clone())
         .log(
             &mut tx,
-            &AuditEvent::UserLoggedIn(UserLoggedInDetails {
+            &UserLoggedInDetails {
                 user_agent: user_agent.to_string(),
                 logged_in_users_count,
-            }),
+            },
             None,
         )
         .await?;
@@ -250,11 +295,7 @@ async fn account_update(
     let response = LoginResponse::from(&updated_user);
 
     audit_service
-        .log(
-            &mut tx,
-            &AuditEvent::UserAccountUpdated(response.clone().into()),
-            None,
-        )
+        .log(&mut tx, &UserAccountUpdated(response.clone()), None)
         .await?;
 
     tx.commit().await?;
@@ -319,7 +360,7 @@ async fn create_first_admin(
             user_repo::delete(&mut tx, user.id()).await?;
 
             audit_service
-                .log(&mut tx, &AuditEvent::UserDeleted(user.into()), None)
+                .log(&mut tx, &UserDeleted(user.clone().into()), None)
                 .await?;
         }
     }
@@ -336,7 +377,7 @@ async fn create_first_admin(
     .await?;
 
     audit_service
-        .log(&mut tx, &AuditEvent::UserCreated(user.clone().into()), None)
+        .log(&mut tx, &UserCreated(user.clone().into()), None)
         .await?;
 
     tx.commit().await?;
@@ -409,9 +450,9 @@ async fn logout(
         audit_service
             .log(
                 &mut tx,
-                &AuditEvent::UserLoggedOut(UserLoggedOutDetails {
+                &UserLoggedOutDetails {
                     session_duration: session.duration().as_secs(),
-                }),
+                },
                 None,
             )
             .await?;

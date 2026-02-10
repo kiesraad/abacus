@@ -5,11 +5,12 @@ use crate::{
     domain::{
         committee_session::{
             CommitteeSession, CommitteeSessionFilesUpdateRequest, CommitteeSessionId,
+            CommitteeSessionUpdated,
         },
         committee_session_status::CommitteeSessionStatus,
-        file::FileId,
+        file::{FileDeleted, FileId},
     },
-    infra::audit_log::{AuditEvent, AuditService},
+    infra::audit_log::AuditService,
     repository::{committee_session_repo, file_repo},
 };
 
@@ -56,11 +57,7 @@ pub async fn change_committee_session_status(
         committee_session_repo::change_status(&mut tx, committee_session_id, new_status).await?;
 
     audit_service
-        .log(
-            &mut tx,
-            &AuditEvent::CommitteeSessionUpdated(committee_session.into()),
-            None,
-        )
+        .log(&mut tx, &CommitteeSessionUpdated(committee_session), None)
         .await?;
 
     tx.commit().await?;
@@ -97,7 +94,7 @@ async fn delete_committee_session_files(
         for id in file_ids {
             if let Some(file) = file_repo::delete(conn, id).await? {
                 audit_service
-                    .log(conn, &AuditEvent::FileDeleted(file.into()), None)
+                    .log(conn, &FileDeleted(file.into()), None)
                     .await?;
             }
         }

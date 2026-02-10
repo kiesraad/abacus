@@ -5,6 +5,7 @@ use axum::{
 };
 use axum_extra::response::Attachment;
 use chrono::Datelike;
+use serde::Serialize;
 use sqlx::{SqliteConnection, SqlitePool};
 use utoipa_axum::{router::OpenApiRouter, routes};
 
@@ -29,7 +30,7 @@ use crate::{
     },
     error::ErrorReference,
     infra::{
-        audit_log::{AuditEvent, AuditService},
+        audit_log::{AsAuditEvent, AuditEvent, AuditEventType, AuditService, as_audit_event},
         pdf_gen::generate_pdf,
     },
     repository::{
@@ -45,6 +46,32 @@ use crate::{
     },
     service::change_committee_session_status,
 };
+
+#[derive(Serialize)]
+struct PollingStationInvestigationCreated(pub PollingStationInvestigation);
+#[derive(Serialize)]
+struct PollingStationInvestigationUpdated(pub PollingStationInvestigation);
+#[derive(Serialize)]
+struct PollingStationInvestigationDeleted(pub PollingStationInvestigation);
+#[derive(Serialize)]
+struct PollingStationInvestigationConcluded(pub PollingStationInvestigation);
+
+as_audit_event!(
+    PollingStationInvestigationCreated,
+    AuditEventType::PollingStationInvestigationCreated
+);
+as_audit_event!(
+    PollingStationInvestigationUpdated,
+    AuditEventType::PollingStationInvestigationUpdated
+);
+as_audit_event!(
+    PollingStationInvestigationDeleted,
+    AuditEventType::PollingStationInvestigationDeleted
+);
+as_audit_event!(
+    PollingStationInvestigationConcluded,
+    AuditEventType::PollingStationInvestigationConcluded
+);
 
 pub fn router() -> OpenApiRouter<AppState> {
     OpenApiRouter::default()
@@ -90,7 +117,7 @@ pub async fn delete_investigation_for_polling_station(
         audit_service
             .log(
                 conn,
-                &AuditEvent::PollingStationInvestigationDeleted(investigation),
+                &PollingStationInvestigationDeleted(investigation),
                 None,
             )
             .await?;
@@ -174,7 +201,7 @@ async fn polling_station_investigation_create(
     audit_service
         .log(
             &mut tx,
-            &AuditEvent::PollingStationInvestigationCreated(investigation.clone()),
+            &PollingStationInvestigationCreated(investigation.clone()),
             None,
         )
         .await?;
@@ -250,7 +277,7 @@ async fn polling_station_investigation_conclude(
     audit_service
         .log(
             &mut tx,
-            &AuditEvent::PollingStationInvestigationConcluded(investigation.clone()),
+            &PollingStationInvestigationConcluded(investigation.clone()),
             None,
         )
         .await?;
@@ -289,7 +316,7 @@ async fn update_investigation(
     audit_service
         .log(
             conn,
-            &AuditEvent::PollingStationInvestigationUpdated(investigation.clone()),
+            &PollingStationInvestigationUpdated(investigation.clone()),
             None,
         )
         .await?;

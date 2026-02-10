@@ -3,7 +3,9 @@ use axum::{
     extract::{Path, State},
     http::StatusCode,
 };
+use serde::{Deserialize, Serialize};
 use sqlx::{Connection, SqliteConnection, SqlitePool};
+use utoipa::ToSchema;
 use utoipa_axum::{router::OpenApiRouter, routes};
 
 use crate::{
@@ -14,7 +16,7 @@ use crate::{
         middleware::authentication::{AdminOrCoordinator, error::AuthenticationError},
     },
     domain::{
-        committee_session::CommitteeSession,
+        committee_session::{CommitteeSession, CommitteeSessionId},
         committee_session_status::CommitteeSessionStatus,
         election::ElectionId,
         polling_station::{
@@ -24,7 +26,7 @@ use crate::{
         },
     },
     eml::{EML110, EMLDocument, EMLImportError, EmlHash},
-    infra::audit_log::{AuditEvent, AuditService, PollingStationImportDetails},
+    infra::audit_log::{AsAuditEvent, AuditEvent, AuditEventType, AuditService, as_audit_event},
     repository::{
         committee_session_repo::get_election_committee_session,
         election_repo,
@@ -33,6 +35,52 @@ use crate::{
     },
     service::change_committee_session_status,
 };
+
+#[derive(Serialize, Deserialize, Debug, PartialEq, Eq, ToSchema)]
+#[serde(deny_unknown_fields)]
+pub struct PollingStationDetails {
+    pub polling_station_id: PollingStationId,
+    pub polling_station_election_id: ElectionId,
+    pub polling_station_committee_session_id: CommitteeSessionId,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[schema(nullable = false)]
+    pub polling_station_id_prev_session: Option<PollingStationId>,
+    pub polling_station_name: String,
+    pub polling_station_number: u32,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[schema(nullable = false)]
+    pub polling_station_number_of_voters: Option<u32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[schema(nullable = false)]
+    pub polling_station_type: Option<String>,
+    pub polling_station_address: String,
+    pub polling_station_postal_code: String,
+    pub polling_station_locality: String,
+}
+
+#[derive(Serialize, Deserialize, Debug, PartialEq, Eq, ToSchema)]
+pub struct PollingStationImportDetails {
+    pub import_election_id: ElectionId,
+    pub import_file_name: String,
+    pub import_number_of_polling_stations: u64,
+}
+
+#[derive(Serialize)]
+struct PollingStationCreated(pub PollingStationDetails);
+#[derive(Serialize)]
+struct PollingStationUpdated(pub PollingStationDetails);
+#[derive(Serialize)]
+struct PollingStationDeleted(pub PollingStationDetails);
+#[derive(Serialize)]
+struct PollingStationsImported(pub PollingStationImportDetails);
+
+as_audit_event!(PollingStationCreated, AuditEventType::PollingStationCreated);
+as_audit_event!(PollingStationUpdated, AuditEventType::PollingStationUpdated);
+as_audit_event!(PollingStationDeleted, AuditEventType::PollingStationDeleted);
+as_audit_event!(
+    PollingStationsImported,
+    AuditEventType::PollingStationsImported
+);
 
 pub fn router() -> OpenApiRouter<AppState> {
     OpenApiRouter::default()
@@ -132,7 +180,7 @@ async fn polling_station_create(
     audit_service
         .log(
             &mut tx,
-            &AuditEvent::PollingStationCreated(polling_station.clone().into()),
+            &PollingStationCreated(polling_station.clone().into()),
             None,
         )
         .await?;
@@ -234,7 +282,7 @@ async fn polling_station_update(
     audit_service
         .log(
             &mut tx,
-            &AuditEvent::PollingStationUpdated(polling_station.clone().into()),
+            &PollingStationUpdated(polling_station.clone().into()),
             None,
         )
         .await?;
@@ -309,7 +357,7 @@ async fn polling_station_delete(
     audit_service
         .log(
             &mut tx,
-            &AuditEvent::PollingStationDeleted(polling_station.clone().into()),
+            &PollingStationDeleted(polling_station.clone().into()),
             None,
         )
         .await?;
@@ -379,7 +427,7 @@ pub async fn create_imported_polling_stations(
     audit_service
         .log(
             &mut tx,
-            &AuditEvent::PollingStationsImported(PollingStationImportDetails {
+            &PollingStationsImported(PollingStationImportDetails {
                 import_election_id: election_id,
                 import_file_name: polling_stations_request.file_name,
                 import_number_of_polling_stations: u64::try_from(polling_stations.len())

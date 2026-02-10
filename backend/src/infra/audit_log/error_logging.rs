@@ -5,7 +5,7 @@ use axum::{
 use sqlx::SqlitePool;
 use tracing::error;
 
-use super::{AuditEvent, AuditService, ErrorDetails};
+use super::{AsAuditEvent, AuditService, ErrorDetails};
 use crate::ErrorResponse;
 
 #[allow(clippy::cognitive_complexity)]
@@ -22,16 +22,17 @@ pub async fn log_error(
     {
         match pool.acquire().await {
             Ok(mut conn) => {
-                if let Err(e) = audit_service
-                    .log(
-                        &mut conn,
-                        &AuditEvent::Error(error_details),
-                        Some(error_response.error.clone()),
-                    )
-                    .await
-                {
-                    error!("Failed to log error: {e:?}");
-                }
+                match &error_details.as_audit_event() {
+                    Ok(event) => {
+                        if let Err(e) = audit_service
+                            .log(&mut conn, event, Some(error_response.error.clone()))
+                            .await
+                        {
+                            error!("Failed to log error: {e:?}");
+                        }
+                    }
+                    Err(e) => error!("Failed to serialize audit event into JSON: {e:?}"),
+                };
             }
             Err(e) => {
                 error!("Failed to acquire database connection: {e:?}");

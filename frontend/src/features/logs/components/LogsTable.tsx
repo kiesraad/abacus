@@ -37,8 +37,8 @@ export function LogsTable({ events, details, setDetails }: LogsTableProps) {
             <Table.Cell className="nowrap">{formatDateTime(new Date(event.time), false)}</Table.Cell>
             <Table.Cell>{t(`log.level.${event.event_level}`)}</Table.Cell>
             <Table.Cell>
-              {t(`log.event.${event.event.event_type}`)}
-              {event.event.event_type === "Error" && `: ${t(`error.api_error.${event.event.reference}`)}`}
+              {t(`log.event.${event.event_name}`)}
+              {event.event_name === "Error" && `: ${t(`error.api_error.${event.event.reference}`)}`}
             </Table.Cell>
             <Table.Cell>
               {event.user_id &&

@@ -158,8 +158,8 @@ mod tests {
         assert_eq!(fraction.to_string(), "10")
     }
 
-    #[should_panic]
     #[test]
+    #[should_panic(expected = "a Fraction denominator cannot be zero")]
     fn test_nan() {
         let _fraction = Fraction::new(1, 0);
     }
@@ -210,6 +210,13 @@ mod tests {
     }
 
     #[test]
+    #[should_panic(expected = "cannot divide a Fraction by zero")]
+    fn test_div_by_zero() {
+        let fraction = Fraction::new(1, 5);
+        let _divided = fraction / Fraction::new(0, 1);
+    }
+
+    #[test]
     fn test_eq() {
         assert_eq!(Fraction::new(1, 4), Fraction::new(2, 8));
     }
@@ -227,5 +234,11 @@ mod tests {
     #[test]
     fn test_smaller_than() {
         assert!(Fraction::new(1, 3) < Fraction::new(1, 2));
+    }
+
+    #[test]
+    fn test_debug_impl() {
+        let fraction = Fraction::new(1, 4);
+        assert_eq!(format!("{fraction:?}"), "1/4");
     }
 }

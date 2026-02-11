@@ -37,4 +37,4 @@ Het overzicht van alle input en output van Abacus (dus ook bijv. EML_NL) staat i
 - CSO/DSO: [Na 14-2](./Na14-2.md#welke-data-wordt-door-het-csb-in-abacus-ingevoerd)
 
 ### Output van Abacus
-- P 22-2
+- [P 22-2](./P22-2.md#welke-data-zet-abacus-in-dit-proces-verbaal-voor-het-csb)

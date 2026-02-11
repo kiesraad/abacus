@@ -146,7 +146,7 @@ async function inputElectionHash() {
 async function setPollingStationRole() {
   const user = userEvent.setup();
   expect(await screen.findByRole("heading", { level: 2, name: "Rol van het stembureau" })).toBeVisible();
-  expect(screen.getByRole("checkbox", { name: "Gemeentelijk stembureau (GSB)" })).toBeChecked();
+  expect(screen.getByRole("radio", { name: "Gemeentelijk stembureau (GSB)" })).toBeChecked();
   await user.click(screen.getByRole("button", { name: "Volgende" }));
 }
 

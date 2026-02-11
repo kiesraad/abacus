@@ -43,6 +43,10 @@ export type ElectionCreateAction =
       countingMethod: VoteCountingMethod;
     }
   | {
+      type: "SET_CATEGORY_TYPE";
+      electionCategory: string;
+    }
+  | {
       type: "SET_NUMBER_OF_VOTERS";
       numberOfVoters: number;
       isNumberOfVotersUserEdited: boolean;
@@ -64,6 +68,7 @@ export interface ElectionCreateState {
   pollingStationDefinitionMatchesElection?: boolean;
   countingMethod?: VoteCountingMethod;
   numberOfVoters?: number;
+  electionCategory?: string;
   isNumberOfVotersUserEdited?: boolean;
 }
 
@@ -123,6 +128,11 @@ function reducer(state: ElectionCreateState, action: ElectionCreateAction): Elec
       return {
         ...state,
         countingMethod: action.countingMethod,
+      };
+    case "SET_CATEGORY_TYPE":
+      return {
+        ...state,
+        electionCategory: action.electionCategory,
       };
     case "SET_NUMBER_OF_VOTERS":
       return {

@@ -6,16 +6,11 @@ import { ChoiceList } from "@/components/ui/CheckboxAndRadio/ChoiceList";
 import { Form } from "@/components/ui/Form/Form";
 import { FormLayout } from "@/components/ui/Form/FormLayout";
 import { t } from "@/i18n/translate";
-
+import { StringFormData } from "@/utils/stringFormData.ts";
 import { useElectionCreateContext } from "../hooks/useElectionCreateContext";
 
-/*
- * NOTES:
- * - This page is only implemented for municipal elections
- * - Also CSB is yet unsupported by Abacus, so it is disabled by default
- */
 export function PollingStationRole() {
-  const { state } = useElectionCreateContext();
+  const { state, dispatch } = useElectionCreateContext();
   const navigate = useNavigate();
 
   // if no election data was stored, navigate back to beginning
@@ -25,6 +20,12 @@ export function PollingStationRole() {
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    const formData = new StringFormData(event.currentTarget);
+    const category = formData.getString("category");
+    dispatch({
+      type: "SET_CATEGORY_TYPE",
+      electionCategory: category,
+    });
     await navigate("/elections/create/list-of-candidates");
   }
 
@@ -37,29 +38,20 @@ export function PollingStationRole() {
 
             <ChoiceList>
               <ChoiceList.Legend>{t("election.polling_station_type.choose")}</ChoiceList.Legend>
-
-              <ChoiceList.Checkbox
+              <ChoiceList.Radio
                 id="gsb"
+                name={"category"}
                 label={t("election.polling_station_type.gsb")}
-                checked={true}
-                onChange={() => {
-                  /*
-                  We need this to suppress an error because we explicitly set the `checked` property.
-                  We'll actually implement this handler once we support CSB
-                */
-                }}
-              ></ChoiceList.Checkbox>
-              <ChoiceList.Checkbox
-                id="csp"
-                label={
-                  <span>
-                    {t("election.polling_station_type.csb")} (
-                    <b>{t("election.polling_station_type.csb_not_supported")}</b>)
-                  </span>
-                }
-                checked={false}
-                disabled
-              ></ChoiceList.Checkbox>
+                defaultValue={"Municipal"}
+                defaultChecked={state.electionCategory === "Municipal"}
+              ></ChoiceList.Radio>
+              <ChoiceList.Radio
+                id="csb"
+                name={"category"}
+                label={t("election.polling_station_type.csb")}
+                defaultValue={"Central"}
+                defaultChecked={state.electionCategory === "Central"}
+              ></ChoiceList.Radio>
             </ChoiceList>
           </FormLayout.Section>
 

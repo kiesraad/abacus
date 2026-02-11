@@ -8,7 +8,7 @@ P 2a: Proces-verbaal van een gemeentelijk stembureau - Nieuwe zitting
 |-----------|----------------------------------------|
 | titelblad | ja (informatie gemeente en verkiezing) |
 | header    | ja (informatie gemeente)               |
-| footer    | ja (modelnaam, hash EML_NL 510b)       |
+| footer    | ja (modelnaam)                         |
 
 ### Deel 1 – Verslag van de zitting
 

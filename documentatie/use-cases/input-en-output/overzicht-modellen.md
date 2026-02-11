@@ -9,7 +9,7 @@ Het overzicht van alle input en output van Abacus (dus ook bijv. EML_NL) staat i
 ### Invoer in Abacus
 
 #### Eerste zitting
-- CSO: [Na 31-2 Bijlage 1](./Na31-1-en-Na31-2.md#welke-data-wordt-door-het-gsb-in-abacus-ingevoerd) (hertelling per stembureau)
+- CSO: [Na 31-2 Bijlage 1](./Na31-2.md#welke-data-wordt-door-het-gsb-in-abacus-ingevoerd) (hertelling per stembureau)
 - DSO: N 10-1 deel 2 (telling per stembureau), Na 14-1 versie 1 (hertelling per stembureau)
 
 #### Latere zitting
@@ -19,7 +19,7 @@ Het overzicht van alle input en output van Abacus (dus ook bijv. EML_NL) staat i
 ### Output van Abacus
 
 #### Eerste zitting
-- CSO: [Na 31-2](./Na31-1-en-Na31-2.md#welke-data-zet-abacus-in-dit-proces-verbaal-voor-het-gsb)
+- CSO: [Na 31-2](./Na31-2.md#welke-data-zet-abacus-in-dit-proces-verbaal-voor-het-gsb)
 - DSO: Na 31-1
 
 #### Latere zitting
@@ -32,7 +32,7 @@ Het overzicht van alle input en output van Abacus (dus ook bijv. EML_NL) staat i
 
 ### Invoer in Abacus
 
-- CSO: [Na 31-2](./Na31-1-en-Na31-2.md#welke-data-wordt-door-het-csb-in-abacus-ingevoerd)
+- CSO: [Na 31-2](./Na31-2.md#welke-data-wordt-door-het-csb-in-abacus-ingevoerd)
 - DSO: Na 31-1
 - CSO/DSO: [Na 14-2](./Na14-2.md#welke-data-wordt-door-het-csb-in-abacus-ingevoerd)
 

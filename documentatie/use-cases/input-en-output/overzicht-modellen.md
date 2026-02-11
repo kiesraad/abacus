@@ -24,14 +24,17 @@ Het overzicht van alle input en output van Abacus (dus ook bijv. EML_NL) staat i
 
 #### Latere zitting
 - [Na 14-2](./Na14-2.md#welke-data-zet-abacus-in-dit-proces-verbaal-voor-het-gsb)
-- P 2a
+- [P 2a](./P2a.md#welke-data-zet-abacus-in-dit-proces-verbaal-voor-het-gsb)
 
 ---
 
 ## Centraal stembureau
 
-#### Invoer in Abacus
+### Invoer in Abacus
 
 - CSO: [Na 31-2](./Na31-1-en-Na31-2.md#welke-data-wordt-door-het-csb-in-abacus-ingevoerd)
 - DSO: Na 31-1
 - CSO/DSO: [Na 14-2](./Na14-2.md#welke-data-wordt-door-het-csb-in-abacus-ingevoerd)
+
+### Output van Abacus
+- P 22-2

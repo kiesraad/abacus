@@ -204,17 +204,19 @@ __Niveau:__ gebruikersdoel, zee, 🌊
 __Hoofdscenario:__
 
 1. De beheerder maakt beheerders aan met een gebruikersnaam, volledige naam en tijdelijk wachtwoord.
-2. De beheerder maakt coördinatoren aan met een gebruikersnaam, volledige naam en tijdelijk wachtwoord.
-3. De beheerder maakt invoerders aan met een gebruikersnaam, volledige naam en tijdelijk wachtwoord.
-4. De beheerder controleert de lijst met gebruikers en stelt vast dat alle gebruikers goed zijn.
+2. De beheerder maakt coördinatoren voor het GSB aan met een gebruikersnaam, volledige naam en tijdelijk wachtwoord.
+3. De beheerder maakt coördinatoren voor het CSB aan met een gebruikersnaam, volledige naam en tijdelijk wachtwoord.
+4. De beheerder maakt invoerders voor het GSB aan met een gebruikersnaam, volledige naam en tijdelijk wachtwoord.
+5. De beheerder maakt invoerders voor het CSB aan met een gebruikersnaam, volledige naam en tijdelijk wachtwoord.
+6. De beheerder controleert de lijst met gebruikers en stelt vast dat alle gebruikers goed zijn.
 
 __Uitbreidingen:__
 
-3a. De beheerder heeft de volledige naam niet van de invoerder die nog toegevoegd moet worden:  
-&emsp; 3a1. De beheerder maakt een invoerder aan met een gebruikersnaam en tijdelijk wachtwoord, 
+4-5a. De beheerder heeft de volledige naam niet van de invoerder die nog toegevoegd moet worden:  
+&emsp; 4-5a1. De beheerder maakt een invoerder aan met een gebruikersnaam en tijdelijk wachtwoord, 
   maar zonder volledige naam.  
 
-4a. De lijst met gebruikers moet aangepast worden:  
-&emsp; 4a1. De beheerder past de volledige naam aan van een gebruiker.  
-&emsp; 4a2. De beheerder stelt een nieuw tijdelijk wachtwoord in voor een gebruiker.  
-&emsp; 4a3. De beheerder verwijdert een gebruiker.
+6a. De lijst met gebruikers moet aangepast worden:  
+&emsp; 6a1. De beheerder past de volledige naam aan van een gebruiker.  
+&emsp; 6a2. De beheerder stelt een nieuw tijdelijk wachtwoord in voor een gebruiker.  
+&emsp; 6a3. De beheerder verwijdert een gebruiker.

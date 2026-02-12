@@ -98,7 +98,7 @@
   },
   "polling_station_type": {
     "title": "Rol van het stembureau",
-    "description": "Voor welke rollen wil je deze Abacus installatie gebruiken?",
+    "description": "Voor welk stembureau wil je deze verkiezing nu klaarzetten? Ga je Abacus voor GSB én CSB gebruiken? Zet dan eerst het GSB klaar, en doe daarna hetzelfde voor het CSB.",
     "gsb": "Gemeentelijk stembureau (GSB)",
     "csb": "Centraal stembureau (CSB)",
     "choose": "Kies een rol"

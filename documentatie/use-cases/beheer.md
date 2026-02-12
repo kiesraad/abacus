@@ -9,8 +9,8 @@ __Niveau:__ hoog-over, wolk, ☁️
 1. [De beheerder installeert de applicatie.](#de-beheerder-installeert-de-applicatie-zee)
 2. De beheerder maakt voor zichzelf een eerste account en wachtwoord aan.
 3. [De beheerder zet het GSB voor de verkiezingen in de applicatie.](#de-beheerder-zet-het-gsb-voor-de-verkiezingen-in-de-applicatie-vis)
-3. [De beheerder zet het CSB voor de verkiezingen in de applicatie.](#de-beheerder-zet-het-csb-voor-de-verkiezingen-in-de-applicatie-vis)
-4. [De beheerder maakt de gebruikers aan.](#de-beheerder-maakt-de-gebruikers-aan-zee)
+4. [De beheerder zet het CSB voor de verkiezingen in de applicatie.](#de-beheerder-zet-het-csb-voor-de-verkiezingen-in-de-applicatie-vis)
+5. [De beheerder maakt de gebruikers aan.](#de-beheerder-maakt-de-gebruikers-aan-zee)
 
 
 ## De beheerder installeert de applicatie (zee)
@@ -50,26 +50,26 @@ __Hoofdscenario:__
 
 1. [De beheerder leest de verkiezingsdefinitie (EML 110a) in.](#de-beheerder-leest-de-verkiezingsdefinitie-eml-110a-in-vis)
 2. De beheerder selecteert "GSB" als rol van het stembureau.
-2. [De beheerder leest de kandidatenlijsten (EML 230b) in.](#de-beheerder-leest-de-kandidatenlijsten-eml-230b-in)
-3. [De beheerder leest het bestand met stembureaus en aantal kiesgerechtigden (EML 110b) in.](#de-beheerder-leest-het-bestand-met-stembureaus-en-aantal-kiesgerechtigden-eml-110b-in-vis)
-4. De beheerder selecteert het type stemopneming.
-5. De beheerder bevestigt het aantal kiesgerechtigden in de gemeente.
-6. De applicatie maakt het GSB voor de verkiezing aan.
+3. [De beheerder leest de kandidatenlijsten (EML 230b) in.](#de-beheerder-leest-de-kandidatenlijsten-eml-230b-in)
+4. [De beheerder leest het bestand met stembureaus en aantal kiesgerechtigden (EML 110b) in.](#de-beheerder-leest-het-bestand-met-stembureaus-en-aantal-kiesgerechtigden-eml-110b-in-vis)
+5. De beheerder selecteert het type stemopneming.
+6. De beheerder bevestigt het aantal kiesgerechtigden in de gemeente.
+7. De applicatie maakt het GSB voor de verkiezing aan.
 
 __Uitbreidingen:__
 
 2a. Er is al een GSB-stembureau voor deze verkiezing en dit gebied:  
 &emsp; 2a1. De applicatie staat niet toe de optie "GSB" te selecteren.
 
-3a. De beheerder slaat het invoeren van stembureaus over:  
-&emsp; 3a1. (tijdens stap 5) De beheerder voert het aantal kiesgerechtigden in de gemeente handmatig in.  
-&emsp; 3a2. (na inrichten applicatie) [De beheerder of coördinator zet de stembureaus in de applicatie.](#de-beheerder-of-coördinator-gsb-zet-de-stembureaus-in-de-applicatie-zee)
+4a. De beheerder slaat het invoeren van stembureaus over:  
+&emsp; 4a1. (tijdens stap 5) De beheerder voert het aantal kiesgerechtigden in de gemeente handmatig in.  
+&emsp; 4a2. (na inrichten applicatie) [De beheerder of coördinator zet de stembureaus in de applicatie.](#de-beheerder-of-coördinator-gsb-zet-de-stembureaus-in-de-applicatie-zee)
 
-5a. De beheerder stelt vast dat het aantal kiesgerechtigden uit het stembureaubestand (EML 110b) niet klopt:
-&emsp; 5a1. De beheerder corrigeert het aantal kiesgerechtigden in de applicatie.
+6a. De beheerder stelt vast dat het aantal kiesgerechtigden uit het stembureaubestand (EML 110b) niet klopt:
+&emsp; 6a1. De beheerder corrigeert het aantal kiesgerechtigden in de applicatie.
 
-5b. Het aantal kiesgerechtigden staat niet in het bestand met stembureaus (EML 110b):  
-&emsp; 5b1. De beheerder voert het aantal kiesgerechtigden handmatig in.
+6b. Het aantal kiesgerechtigden staat niet in het bestand met stembureaus (EML 110b):  
+&emsp; 6b1. De beheerder voert het aantal kiesgerechtigden handmatig in.
 
 
 ## De beheerder zet het CSB voor de verkiezingen in de applicatie (vis)

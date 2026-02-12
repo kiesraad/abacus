@@ -272,9 +272,8 @@ mod tests {
             ApportionmentInputMock, CandidateVotesMock,
             candidate_nomination_fixture_with_given_list_numbers_and_number_of_seats,
             candidate_nomination_fixture_with_given_number_of_seats,
-            seat_assignment_fixture_with_given_candidate_numbers_and_votes,
             seat_assignment_fixture_with_given_candidate_votes,
-            seat_assignment_fixture_with_given_list_numbers_and_candidate_votes,
+            seat_assignment_fixture_with_given_list_numbers_candidate_numbers_and_votes,
         },
     };
 
@@ -347,6 +346,124 @@ mod tests {
         (chosen_candidates, not_chosen_candidates)
     }
 
+    /// Candidate nomination with non-consecutive list and candidate numbers
+    ///
+    /// List seats: [(1, 8), (2, 3), (4, 2), (5, 1), (7, 1)]  
+    /// List 1: Preferential candidate nominations of candidates 1, 4, 3, 5 and 12 and other candidate nominations of candidates 7, 8 and 9  
+    /// List 2: Preferential candidate nomination of candidate 2 and 6 and other candidate nomination of candidates 3  
+    /// List 3: Preferential candidate nomination of candidate 1 and 4 and no other candidate nominations  
+    /// List 4: Preferential candidate nomination of candidate 1 and no other candidate nominations  
+    /// List 5: Preferential candidate nomination of candidate 3 and no other candidate nominations
+    #[test]
+    fn test_with_lt_19_seats_and_non_consecutive_list_and_candidate_numbers() {
+        let quota = Fraction::new(5104, 15);
+        let seat_assignment_input =
+            seat_assignment_fixture_with_given_list_numbers_candidate_numbers_and_votes(
+                15,
+                vec![
+                    (
+                        1,
+                        vec![
+                            (1, 1069),
+                            (3, 303),
+                            (4, 321),
+                            (5, 210),
+                            (7, 36),
+                            (8, 101),
+                            (9, 79),
+                            (10, 121),
+                            (11, 150),
+                            (12, 181),
+                        ],
+                    ),
+                    (2, vec![(2, 452), (3, 39), (4, 81), (6, 274), (7, 131)]),
+                    (4, vec![(1, 229), (2, 147), (4, 191)]),
+                    (5, vec![(1, 347), (3, 189)]),
+                    (7, vec![(3, 266), (2, 187)]),
+                ],
+            );
+        let input = candidate_nomination_fixture_with_given_list_numbers_and_number_of_seats(
+            quota,
+            &seat_assignment_input,
+            vec![(1, 8), (2, 3), (4, 2), (5, 1), (7, 1)],
+        );
+        let result = candidate_nomination::<ApportionmentInputMock>(&input).unwrap();
+
+        assert_eq!(result.preference_threshold.percentage, 50);
+        assert_eq!(
+            result.preference_threshold.number_of_votes,
+            quota * Fraction::new(result.preference_threshold.percentage, 100)
+        );
+        check_list_candidate_nomination(
+            &result.list_candidate_nomination[0],
+            &[1, 4, 3, 5, 12],
+            &[7, 8, 9],
+            &[1, 4, 3, 5, 12, 7, 8, 9, 10, 11],
+        );
+        check_list_candidate_nomination(
+            &result.list_candidate_nomination[1],
+            &[2, 6],
+            &[3],
+            &[2, 6, 3, 4, 7],
+        );
+        check_list_candidate_nomination(
+            &result.list_candidate_nomination[2],
+            &[1, 4],
+            &[],
+            &[1, 4, 2],
+        );
+        check_list_candidate_nomination(&result.list_candidate_nomination[3], &[1], &[], &[]);
+        check_list_candidate_nomination(&result.list_candidate_nomination[4], &[3], &[], &[]);
+
+        let lists = input.list_votes;
+        check_chosen_candidates(
+            &result.chosen_candidates,
+            &lists[0].number,
+            &[
+                &lists[0].candidate_votes[..7],
+                &lists[0].candidate_votes[10..],
+            ]
+            .concat(),
+            &lists[0].candidate_votes[8..9],
+        );
+        check_chosen_candidates(
+            &result.chosen_candidates,
+            &lists[1].number,
+            &[
+                &lists[1].candidate_votes[..2],
+                &lists[1].candidate_votes[3..4],
+            ]
+            .concat(),
+            &[
+                &lists[1].candidate_votes[2..3],
+                &lists[1].candidate_votes[4..],
+            ]
+            .concat(),
+        );
+        check_chosen_candidates(
+            &result.chosen_candidates,
+            &lists[2].number,
+            &[
+                &lists[2].candidate_votes[..1],
+                &lists[2].candidate_votes[2..],
+            ]
+            .concat(),
+            &lists[2].candidate_votes[1..2],
+        );
+        check_chosen_candidates(
+            &result.chosen_candidates,
+            &lists[3].number,
+            &lists[3].candidate_votes[..1],
+            &lists[3].candidate_votes[2..],
+        );
+        check_chosen_candidates(
+            &result.chosen_candidates,
+            &lists[4].number,
+            &lists[4].candidate_votes[..1],
+            &lists[4].candidate_votes[2..],
+        );
+    }
+
     /// Candidate nomination with ranking change due to preferential candidate nomination
     ///
     /// Actual case from GR2022  
@@ -359,29 +476,22 @@ mod tests {
     #[test]
     fn test_with_lt_19_seats_and_preferential_candidate_nomination_and_updated_candidate_ranking() {
         let quota = Fraction::new(5104, 15);
-        let seat_assignment_input =
-            seat_assignment_fixture_with_given_list_numbers_and_candidate_votes(
-                15,
+        let seat_assignment_input = seat_assignment_fixture_with_given_candidate_votes(
+            15,
+            vec![
+                vec![1069, 303, 321, 210, 36, 101, 79, 121, 150, 149, 15, 17],
                 vec![
-                    (
-                        1,
-                        vec![1069, 303, 321, 210, 36, 101, 79, 121, 150, 149, 15, 17],
-                    ),
-                    (
-                        2,
-                        vec![
-                            452, 39, 81, 76, 35, 109, 29, 25, 17, 6, 18, 9, 25, 30, 5, 18, 3,
-                        ],
-                    ),
-                    (4, vec![229, 63, 65, 9, 10, 58, 29, 50, 6, 11, 37]),
-                    (5, vec![347, 33, 14, 82, 30, 30]),
-                    (7, vec![266, 36, 39, 36, 38, 38]),
+                    452, 39, 81, 76, 35, 109, 29, 25, 17, 6, 18, 9, 25, 30, 5, 18, 3,
                 ],
-            );
-        let input = candidate_nomination_fixture_with_given_list_numbers_and_number_of_seats(
+                vec![229, 63, 65, 9, 10, 58, 29, 50, 6, 11, 37],
+                vec![347, 33, 14, 82, 30, 30],
+                vec![266, 36, 39, 36, 38, 38],
+            ],
+        );
+        let input = candidate_nomination_fixture_with_given_number_of_seats(
             quota,
             &seat_assignment_input,
-            vec![(1, 8), (2, 3), (4, 2), (5, 1), (7, 1)],
+            vec![8, 3, 2, 1, 1],
         );
         let result = candidate_nomination::<ApportionmentInputMock>(&input).unwrap();
 
@@ -445,14 +555,14 @@ mod tests {
     #[test]
     fn test_with_lt_19_seats_and_no_preferential_candidate_nomination() {
         let quota = Fraction::new(105, 5);
-        let seat_assignment_input = seat_assignment_fixture_with_given_candidate_numbers_and_votes(
+        let seat_assignment_input = seat_assignment_fixture_with_given_candidate_votes(
             5,
             vec![
-                vec![(1, 5), (3, 4), (4, 4), (6, 4), (7, 4)],
-                vec![(2, 4), (3, 5), (5, 4), (6, 4), (8, 4)],
-                vec![(1, 4), (2, 4), (3, 5), (4, 4), (6, 4)],
-                vec![(2, 4), (3, 4), (4, 4), (5, 5), (7, 4)],
-                vec![(1, 4), (2, 4), (3, 4), (4, 4), (5, 5)],
+                vec![5, 4, 4, 4, 4],
+                vec![4, 5, 4, 4, 4],
+                vec![4, 4, 5, 4, 4],
+                vec![4, 4, 4, 5, 4],
+                vec![4, 4, 4, 4, 5],
             ],
         );
         let input = candidate_nomination_fixture_with_given_number_of_seats(
@@ -468,9 +578,9 @@ mod tests {
             quota * Fraction::new(result.preference_threshold.percentage, 100)
         );
         check_list_candidate_nomination(&result.list_candidate_nomination[0], &[], &[1], &[]);
-        check_list_candidate_nomination(&result.list_candidate_nomination[1], &[], &[2], &[]);
+        check_list_candidate_nomination(&result.list_candidate_nomination[1], &[], &[1], &[]);
         check_list_candidate_nomination(&result.list_candidate_nomination[2], &[], &[1], &[]);
-        check_list_candidate_nomination(&result.list_candidate_nomination[3], &[], &[2], &[]);
+        check_list_candidate_nomination(&result.list_candidate_nomination[3], &[], &[1], &[]);
         check_list_candidate_nomination(&result.list_candidate_nomination[4], &[], &[1], &[]);
 
         let lists = input.list_votes;

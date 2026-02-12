@@ -16,8 +16,13 @@ export function CheckAndSave() {
   const createPath: ELECTION_IMPORT_REQUEST_PATH = `/api/elections/import`;
   const { create } = useCrud<ElectionWithPoliticalGroups>({ createPath, throwAllErrors: true });
 
-  // if no election, election data, candidate data or counting method is found in the state, go back to the beginning
-  if (!state.election || !state.electionDefinitionData || !state.candidateDefinitionData || !state.countingMethod) {
+  // if no election or candidate data is found in the state, go back to the beginning
+  if (!state.election || !state.electionDefinitionData || !state.candidateDefinitionData) {
+    return <Navigate to="/elections/create" />;
+  }
+
+  // GSB: if no counting method is found in the state, go back to the beginning
+  if (state.electionCategory === "Municipal" && !state.countingMethod) {
     return <Navigate to="/elections/create" />;
   }
 
@@ -35,7 +40,7 @@ export function CheckAndSave() {
       if (isSuccess(result)) {
         pushMessage({
           title: t("election.message.election_created", {
-            role: "GSB",
+            role: state.electionCategory ? t(state.electionCategory) : "GSB",
             name: result.data.name,
           }),
         });
@@ -52,6 +57,11 @@ export function CheckAndSave() {
         <li>
           <strong>{t("election.singular")}:</strong> {state.election.name}
         </li>
+        {state.electionCategory && (
+          <li>
+            <strong>{t("election.role")}:</strong> {t(state.electionCategory)}
+          </li>
+        )}
         <li>
           <strong>{t("area_designation")}:</strong> {state.election.location}
         </li>
@@ -63,10 +73,12 @@ export function CheckAndSave() {
             {t("election.polling_stations.added", { num: state.pollingStations.length })}
           </li>
         )}
-        <li id="counting-method">{t(state.countingMethod)}</li>
-        <li id="number-of-voters">
-          {formatNumber(state.numberOfVoters)} {t("voters")}
-        </li>
+        {state.countingMethod && <li id="counting-method">{t(state.countingMethod)}</li>}
+        {state.numberOfVoters && (
+          <li id="number-of-voters">
+            {formatNumber(state.numberOfVoters)} {t("voters")}
+          </li>
+        )}
       </ul>
       <div className="mt-xl">
         <Button

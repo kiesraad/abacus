@@ -6,6 +6,7 @@ import { ChoiceList } from "@/components/ui/CheckboxAndRadio/ChoiceList";
 import { Form } from "@/components/ui/Form/Form";
 import { FormLayout } from "@/components/ui/Form/FormLayout";
 import { t } from "@/i18n/translate";
+import type { ElectionCategory } from "@/types/generated/openapi.ts";
 import { StringFormData } from "@/utils/stringFormData.ts";
 import { useElectionCreateContext } from "../hooks/useElectionCreateContext";
 
@@ -21,7 +22,8 @@ export function PollingStationRole() {
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const formData = new StringFormData(event.currentTarget);
-    const category = formData.getString("category");
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+    const category = formData.get("category") as ElectionCategory;
     dispatch({
       type: "SET_CATEGORY_TYPE",
       electionCategory: category,
@@ -43,7 +45,7 @@ export function PollingStationRole() {
                 name={"category"}
                 label={t("election.polling_station_type.gsb")}
                 defaultValue={"Municipal"}
-                defaultChecked={state.electionCategory === "Municipal"}
+                defaultChecked={state.electionCategory === "Municipal" || !state.electionCategory}
               ></ChoiceList.Radio>
               <ChoiceList.Radio
                 id="csb"

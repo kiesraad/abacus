@@ -1,6 +1,7 @@
 import { type ReactNode, useReducer } from "react";
 
 import type {
+  ElectionCategory,
   ElectionDefinitionValidateResponse,
   NewElection,
   PollingStationRequest,
@@ -44,7 +45,7 @@ export type ElectionCreateAction =
     }
   | {
       type: "SET_CATEGORY_TYPE";
-      electionCategory: string;
+      electionCategory: ElectionCategory;
     }
   | {
       type: "SET_NUMBER_OF_VOTERS";
@@ -68,7 +69,7 @@ export interface ElectionCreateState {
   pollingStationDefinitionMatchesElection?: boolean;
   countingMethod?: VoteCountingMethod;
   numberOfVoters?: number;
-  electionCategory?: string;
+  electionCategory?: ElectionCategory;
   isNumberOfVotersUserEdited?: boolean;
 }
 

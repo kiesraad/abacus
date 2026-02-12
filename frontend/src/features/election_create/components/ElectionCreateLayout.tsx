@@ -1,39 +1,17 @@
-import { Link, Outlet, useLocation } from "react-router";
+import { Outlet } from "react-router";
 
 import { Footer } from "@/components/footer/Footer";
 import { NavBar } from "@/components/navbar/NavBar";
 import { PageTitle } from "@/components/page_title/PageTitle";
 import { StickyNav } from "@/components/ui/AppLayout/StickyNav";
-import { ProgressList } from "@/components/ui/ProgressList/ProgressList";
 import { t } from "@/i18n/translate";
-
 import { AbortModal } from "./AbortModal";
 import { ElectionCreateContextProvider } from "./ElectionCreateContextProvider";
 import cls from "./ElectionCreateLayout.module.css";
 import { ElectionHeader } from "./ElectionHeader";
-
-interface ElectionCreateFormSection {
-  key: string;
-  label: string;
-  path: string;
-}
-
-const formSections: ElectionCreateFormSection[] = [
-  { key: "election_definition", label: t("election_definition"), path: "create" },
-  { key: "polling_station_role", label: t("polling_station.role"), path: "create/polling-station-role" },
-  { key: "list_of_candidates", label: t("candidate.list.plural"), path: "create/list-of-candidates" },
-  { key: "polling_stations", label: t("polling_station.title.plural"), path: "create/polling-stations" },
-  { key: "counting_method_type", label: t("counting_method_type"), path: "create/counting-method-type" },
-  { key: "number_of_voters", label: t("number_of_voters"), path: "create/number-of-voters" },
-  { key: "check_and_save", label: t("election.check_and_save.title"), path: "create/check-and-save" },
-];
+import { ElectionNav } from "./ElectionNav";
 
 export function ElectionCreateLayout() {
-  const location = useLocation();
-
-  const currentFormSection = formSections.findIndex((formSection) => location.pathname.endsWith(formSection.path));
-  const fixedSections = formSections.slice(0, formSections.length - 1);
-
   return (
     <ElectionCreateContextProvider>
       <PageTitle title={`${t("election.create")} - Abacus`} />
@@ -42,37 +20,7 @@ export function ElectionCreateLayout() {
       <AbortModal />
       <main>
         <StickyNav>
-          <ProgressList>
-            <ProgressList.Fixed>
-              {fixedSections.map((formSection, index) => (
-                <ProgressList.Item
-                  key={formSection.key}
-                  status={index < currentFormSection ? "accept" : "idle"}
-                  active={index === currentFormSection}
-                  disabled={index > currentFormSection}
-                >
-                  {index >= currentFormSection ? (
-                    <span>{formSection.label}</span>
-                  ) : (
-                    <Link to={`/elections/${formSection.path}`}>
-                      <span>{formSection.label}</span>
-                    </Link>
-                  )}
-                </ProgressList.Item>
-              ))}
-            </ProgressList.Fixed>
-
-            <ProgressList.Fixed>
-              <ProgressList.Item
-                key="check_and_save"
-                status="idle"
-                disabled={currentFormSection !== formSections.length - 1}
-                active={currentFormSection === formSections.length - 1}
-              >
-                <span>{t("election.check_and_save.title")}</span>
-              </ProgressList.Item>
-            </ProgressList.Fixed>
-          </ProgressList>
+          <ElectionNav />
         </StickyNav>
         <article className={cls.container}>
           <Outlet />

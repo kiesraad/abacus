@@ -92,7 +92,11 @@ export function UploadCandidatesDefinition() {
           type: "SET_CANDIDATES_DEFINITION_HASH",
           candidateDefinitionHash: chunks,
         });
-        await navigate("/elections/create/polling-stations");
+        if (state.electionCategory === "Central") {
+          await navigate("/elections/create/check-and-save");
+        } else {
+          await navigate("/elections/create/polling-stations");
+        }
       } else if (isError(response) && response instanceof ApiError && response.reference === "InvalidHash") {
         setError(response.message);
       }

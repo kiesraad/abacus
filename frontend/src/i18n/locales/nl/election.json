@@ -73,6 +73,7 @@
     "show_all": "Toon alle {num} stembureaus",
     "skip_step": "Stap overslaan en stembureaus later toevoegen"
   },
+  "role": "rol",
   "singular": "verkiezing",
   "start_when_count_list_received": "Zodra je een proces-verbaal van een stembureau hebt gekregen kan je beginnen met invoeren.",
   "status": "Status",

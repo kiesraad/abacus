@@ -43,14 +43,14 @@ export function PollingStationRole() {
               <ChoiceList.Radio
                 id="gsb"
                 name={"category"}
-                label={t("election.polling_station_type.gsb")}
+                label={t("election.polling_station_types.Municipal.full")}
                 defaultValue={"Municipal"}
                 defaultChecked={state.electionCategory === "Municipal" || !state.electionCategory}
               ></ChoiceList.Radio>
               <ChoiceList.Radio
                 id="csb"
                 name={"category"}
-                label={t("election.polling_station_type.csb")}
+                label={t("election.polling_station_types.Central.full")}
                 defaultValue={"Central"}
                 defaultChecked={state.electionCategory === "Central"}
               ></ChoiceList.Radio>

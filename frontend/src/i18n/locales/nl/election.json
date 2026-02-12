@@ -99,9 +99,19 @@
   "polling_station_type": {
     "title": "Rol van het stembureau",
     "description": "Voor welk stembureau wil je deze verkiezing nu klaarzetten? Ga je Abacus voor GSB én CSB gebruiken? Zet dan eerst het GSB klaar, en doe daarna hetzelfde voor het CSB.",
-    "gsb": "Gemeentelijk stembureau (GSB)",
-    "csb": "Centraal stembureau (CSB)",
     "choose": "Kies een rol"
+  },
+  "polling_station_types": {
+    "Central": {
+      "abbreviation": "CSB",
+      "short": "Centraal Stembureau",
+      "full": "Centraal stembureau (CSB)"
+    },
+    "Municipal": {
+      "abbreviation": "GSB",
+      "short": "Gemeentelijk Stembureau",
+      "full": "Gemeentelijk stembureau (GSB)"
+    }
   },
   "you_cannot_start_data_entry_yet": "Je kan nog geen telresultaten invoeren."
 }

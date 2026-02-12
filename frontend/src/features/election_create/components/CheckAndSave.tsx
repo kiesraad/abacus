@@ -40,7 +40,9 @@ export function CheckAndSave() {
       if (isSuccess(result)) {
         pushMessage({
           title: t("election.message.election_created", {
-            role: state.electionCategory ? t(state.electionCategory) : "GSB",
+            role: state.electionCategory
+              ? t(`election.polling_station_types.${state.electionCategory}.abbreviation`)
+              : "GSB",
             name: result.data.name,
           }),
         });
@@ -59,7 +61,7 @@ export function CheckAndSave() {
         </li>
         {state.electionCategory && (
           <li>
-            <strong>{t("election.role")}:</strong> {t(state.electionCategory)}
+            <strong>{t("election.role")}:</strong> {t(`election.polling_station_types.${state.electionCategory}.short`)}
           </li>
         )}
         <li>

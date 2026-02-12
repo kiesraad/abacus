@@ -92,7 +92,7 @@ export function UploadCandidatesDefinition() {
           type: "SET_CANDIDATES_DEFINITION_HASH",
           candidateDefinitionHash: chunks,
         });
-        if (state.electionCategory === "Central") {
+        if (state.electionCategory && state.electionCategory === "Central") {
           await navigate("/elections/create/check-and-save");
         } else {
           await navigate("/elections/create/polling-stations");

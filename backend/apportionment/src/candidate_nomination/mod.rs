@@ -342,12 +342,12 @@ mod tests {
 
     /// Candidate nomination with ranking change due to preferential candidate nomination
     ///
-    /// Actual case from GR2022
-    /// List seats: [8, 3, 2, 1, 1]
-    /// List 1: Preferential candidate nominations of candidates 1, 3, 2 and 4 and other candidate nominations of candidates 5, 6, 7 and 8
-    /// List 2: Preferential candidate nomination of candidate 1 and other candidate nomination of candidates 2 and 3
-    /// List 3: Preferential candidate nomination of candidate 1 and other candidate nomination of candidate 2
-    /// List 4: Preferential candidate nomination of candidate 1 and no other candidate nominations
+    /// Actual case from GR2022  
+    /// List seats: [8, 3, 2, 1, 1]  
+    /// List 1: Preferential candidate nominations of candidates 1, 3, 2 and 4 and other candidate nominations of candidates 5, 6, 7 and 8  
+    /// List 2: Preferential candidate nomination of candidate 1 and other candidate nomination of candidates 2 and 3  
+    /// List 3: Preferential candidate nomination of candidate 1 and other candidate nomination of candidate 2  
+    /// List 4: Preferential candidate nomination of candidate 1 and no other candidate nominations  
     /// List 5: Preferential candidate nomination of candidate 1 and no other candidate nominations
     #[test]
     fn test_with_lt_19_seats_and_preferential_candidate_nomination_and_updated_candidate_ranking() {
@@ -422,11 +422,11 @@ mod tests {
 
     /// Candidate nomination with no preferential candidate nomination
     ///
-    /// List seats: [1, 1, 1, 1, 1]
-    /// List 1: No preferential candidate nominations and other candidate nomination of candidate 1
-    /// List 2: No preferential candidate nominations and other candidate nomination of candidate 1
-    /// List 3: No preferential candidate nominations and other candidate nomination of candidate 1
-    /// List 4: No preferential candidate nominations and other candidate nomination of candidate 1
+    /// List seats: [1, 1, 1, 1, 1]  
+    /// List 1: No preferential candidate nominations and other candidate nomination of candidate 1  
+    /// List 2: No preferential candidate nominations and other candidate nomination of candidate 1  
+    /// List 3: No preferential candidate nominations and other candidate nomination of candidate 1  
+    /// List 4: No preferential candidate nominations and other candidate nomination of candidate 1  
     /// List 5: No preferential candidate nominations and other candidate nomination of candidate 1
     #[test]
     fn test_with_lt_19_seats_and_no_preferential_candidate_nomination() {
@@ -494,9 +494,9 @@ mod tests {
 
     /// Candidate nomination with candidate votes meeting preference threshold but no seat
     ///
-    /// List seats: [11, 7, 0]
-    /// List 1: Preferential candidate nominations of candidates 1, 2, 3, 4, 5, 6 and 7 and other candidate nominations of candidates 8, 9, 10 and 11
-    /// List 2: Preferential candidate nominations of candidates 1, 2, 3 and 4 and other candidate nominations of candidates 5, 6 and 7
+    /// List seats: [11, 7, 0]  
+    /// List 1: Preferential candidate nominations of candidates 1, 2, 3, 4, 5, 6 and 7 and other candidate nominations of candidates 8, 9, 10 and 11  
+    /// List 2: Preferential candidate nominations of candidates 1, 2, 3 and 4 and other candidate nominations of candidates 5, 6 and 7  
     /// List 3: No preferential candidate nominations and no other candidate nomination
     #[test]
     fn test_with_lt_19_seats_and_candidate_votes_meeting_preference_threshold_but_no_seat() {
@@ -563,11 +563,11 @@ mod tests {
 
     /// Candidate nomination with candidate votes meeting preference threshold but no seat
     ///
-    /// List seats: [6, 6, 5, 2, 0]
-    /// List 1: Preferential candidate nominations of candidates 1, 2, 3, 4 and 5 and other candidate nominations of candidate 6
-    /// List 2: Preferential candidate nominations of candidates 1, 2, 3 and 4 and other candidate nominations of candidates 5 and 6
-    /// List 3: Preferential candidate nominations of candidates 1, 2, 3 and 4 and other candidate nominations of candidate 5
-    /// List 4: Preferential candidate nominations of candidates 1 and 2 and no other candidate nominations
+    /// List seats: [6, 6, 5, 2, 0]  
+    /// List 1: Preferential candidate nominations of candidates 1, 2, 3, 4 and 5 and other candidate nominations of candidate 6  
+    /// List 2: Preferential candidate nominations of candidates 1, 2, 3 and 4 and other candidate nominations of candidates 5 and 6  
+    /// List 3: Preferential candidate nominations of candidates 1, 2, 3 and 4 and other candidate nominations of candidate 5  
+    /// List 4: Preferential candidate nominations of candidates 1 and 2 and no other candidate nominations  
     /// List 5: No preferential candidate nominations and no other candidate nomination
     #[test]
     fn test_with_gte_19_seats_and_candidate_votes_meeting_preference_threshold_but_no_seat() {
@@ -650,15 +650,15 @@ mod tests {
 
     /// Candidate nomination with more candidates eligible for preferential nomination than seats
     ///
-    /// List seats: [6, 5, 4, 2, 2]
-    /// List 1: Preferential candidate nominations of candidates 1, 3, 4, 5, 6 and 7 no other candidate nominations
-    /// List 2: Preferential candidate nomination of candidates 1, 2, 4, 5 and 6 and no other candidate nominations
-    ///       Candidate 7 also meets the preferential threshold but does not get a seat
-    /// List 3: Preferential candidate nomination of candidate 1, 2, 3 and 5 and no other candidate nominations
-    ///       Candidates 6 and 7 also meet the preferential threshold but do not get seats
-    /// List 4: Preferential candidate nomination of candidate 1 and 2 and no other candidate nominations
-    ///       Candidates 3, 4, 6 and 7 also meet the preferential threshold but do not get seats
-    /// List 5: Preferential candidate nomination of candidate 1 and 2 and no other candidate nominations
+    /// List seats: [6, 5, 4, 2, 2]  
+    /// List 1: Preferential candidate nominations of candidates 1, 3, 4, 5, 6 and 7 no other candidate nominations  
+    /// List 2: Preferential candidate nomination of candidates 1, 2, 4, 5 and 6 and no other candidate nominations  
+    ///       Candidate 7 also meets the preferential threshold but does not get a seat  
+    /// List 3: Preferential candidate nomination of candidate 1, 2, 3 and 5 and no other candidate nominations  
+    ///       Candidates 6 and 7 also meet the preferential threshold but do not get seats  
+    /// List 4: Preferential candidate nomination of candidate 1 and 2 and no other candidate nominations  
+    ///       Candidates 3, 4, 6 and 7 also meet the preferential threshold but do not get seats  
+    /// List 5: Preferential candidate nomination of candidate 1 and 2 and no other candidate nominations  
     ///       Candidates 4, 5 and 7 also meet the preferential threshold but do not get seats
     #[test]
     fn test_with_ge_19_seats_and_more_candidates_eligible_for_preferential_nomination_than_seats() {
@@ -799,8 +799,8 @@ mod tests {
 
     /// Candidate nomination with more candidates eligible for preferential nomination than seats
     ///
-    /// List seats: [6, 5, 4, 2, 2]
-    /// List 1: Preferential candidate nominations of candidates 1, 2, 3, 4, 5 and 6 no other candidate nominations
+    /// List seats: [6, 5, 4, 2, 2]  
+    /// List 1: Preferential candidate nominations of candidates 1, 2, 3, 4, 5 and 6 no other candidate nominations  
     /// List 2: Drawing of lots is required for candidates: [1, 2, 3, 4, 5, 6], only 5 seats available
     #[test]
     fn test_with_drawing_of_lots_error() {

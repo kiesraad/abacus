@@ -46,14 +46,14 @@ mod tests {
 
     #[test]
     fn test_try_from_usize() {
-        let value = TestIntNewType::try_from(42 as usize).unwrap();
+        let value = TestIntNewType::try_from(42_usize).unwrap();
         assert_eq!(value, 42);
     }
 
     #[test]
     fn test_try_from_usize_overflow() {
         // Bitshifting << 42 overflows a u32, so this should return an error
-        let result = TestIntNewType::try_from((1 as usize) << 42);
+        let result = TestIntNewType::try_from((1_usize) << 42);
         assert!(result.is_err());
     }
 

@@ -10,7 +10,7 @@ updates:
       github-actions:
         patterns: ["*"]
   - package-ecosystem: "cargo"
-    directories: ["/backend", "backend/fuzz"]
+    directories: ["/backend", "backend/apportionment", "backend/fuzz", "backend/pdf_gen"]
     schedule:
       interval: "weekly"
     cooldown:

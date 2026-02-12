@@ -1,10 +1,6 @@
 use super::{
-    candidate_nomination::CandidateNominationResult,
-    fraction::Fraction,
-    int_newtype_macro::int_newtype,
-    seat_assignment::{
-        SeatAssignmentResult, get_total_seats_per_list_number_from_apportionment_result,
-    },
+    candidate_nomination::CandidateNominationResult, fraction::Fraction,
+    int_newtype_macro::int_newtype, seat_assignment::SeatAssignmentResult,
 };
 use std::fmt::Debug;
 
@@ -58,17 +54,3 @@ pub(crate) struct CandidateNominationInput<'a, L: ListVotesTrait> {
 
 pub(crate) type CandidateNominationInputType<'a, T> =
     CandidateNominationInput<'a, <T as ApportionmentInput>::List>;
-
-pub(crate) fn as_candidate_nomination_input<'a, T: ApportionmentInput>(
-    input: &'a T,
-    seat_assignment: &SeatAssignmentResult,
-) -> CandidateNominationInputType<'a, T> {
-    CandidateNominationInput {
-        number_of_seats: input.number_of_seats(),
-        list_votes: input.list_votes(),
-        quota: seat_assignment.quota,
-        total_seats_per_list: get_total_seats_per_list_number_from_apportionment_result(
-            seat_assignment,
-        ),
-    }
-}

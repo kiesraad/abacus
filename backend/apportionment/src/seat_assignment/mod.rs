@@ -14,7 +14,9 @@ use self::{
 use super::{
     ApportionmentInput, ListVotesTrait,
     fraction::Fraction,
-    structs::{ApportionmentError, ListNumber},
+    structs::{
+        ApportionmentError, CandidateNominationInput, CandidateNominationInputType, ListNumber,
+    },
 };
 pub use structs::SeatAssignmentResult;
 
@@ -119,6 +121,20 @@ pub fn get_total_seats_per_list_number_from_apportionment_result(
         .iter()
         .map(|p| (p.list_number, p.total_seats))
         .collect::<Vec<_>>()
+}
+
+pub fn as_candidate_nomination_input<'a, T: ApportionmentInput>(
+    input: &'a T,
+    seat_assignment: &SeatAssignmentResult,
+) -> CandidateNominationInputType<'a, T> {
+    CandidateNominationInput {
+        number_of_seats: input.number_of_seats(),
+        list_votes: input.list_votes(),
+        quota: seat_assignment.quota,
+        total_seats_per_list: get_total_seats_per_list_number_from_apportionment_result(
+            seat_assignment,
+        ),
+    }
 }
 
 /// Create a vector containing just the list numbers from an iterator of the current standing

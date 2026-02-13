@@ -308,31 +308,23 @@ pub async fn election_import_validate(
     }
 }
 
+/// Validate a GSB election
 fn validate_gsb_election(
     edu: GSBElectionCreationValidateRequest,
 ) -> Result<Json<ElectionDefinitionValidateResponse>, APIError> {
-    // parse and validate election
-    if let Some(user_hash) = edu.election_hash
-        && user_hash != EmlHash::from(edu.election_data.as_bytes()).chunks
-    {
-        return Err(APIError::InvalidHashError);
+    check_hash(edu.election_data.as_bytes(), edu.election_hash.as_ref())?;
+    if let Some(ref data) = edu.candidate_data {
+        check_hash(data.as_bytes(), edu.candidate_hash.as_ref())?;
     }
+
     let mut hash = RedactedEmlHash::from(edu.election_data.as_bytes());
-    let mut election = EML110::from_str(&edu.election_data)?.as_abacus_election()?;
+    let mut election =
+        parse_election_candidates_eml(&edu.election_data, edu.candidate_data.as_deref())?;
 
-    // parse and validate candidates, if available
-    if let Some(data) = edu.candidate_data.clone() {
-        if let Some(user_hash) = edu.candidate_hash
-            && user_hash != EmlHash::from(data.as_bytes()).chunks
-        {
-            return Err(APIError::InvalidHashError);
-        }
-
+    if let Some(ref data) = edu.candidate_data {
         hash = RedactedEmlHash::from(data.as_bytes());
-        election = EML230::from_str(&data)?.add_candidate_lists(election)?;
     }
 
-    // update counting method if available
     if let Some(cm) = edu.counting_method {
         election.counting_method = cm;
     }
@@ -342,7 +334,6 @@ fn validate_gsb_election(
     let mut polling_station_definition_matches_election = None;
     let mut number_of_voters = 0;
     if let Some(data) = edu.polling_station_data {
-        // If polling stations are submitted, file name must be also
         if edu.polling_station_file_name.is_none() {
             return Err(APIError::EmlImportError(EMLImportError::MissingFileName));
         }
@@ -356,7 +347,6 @@ fn validate_gsb_election(
         polling_stations = None;
     }
 
-    // override number of voters if provided
     if let Some(nov) = edu.number_of_voters {
         number_of_voters = nov;
     }
@@ -375,26 +365,18 @@ fn validate_gsb_election(
 fn validate_csb_election(
     edu: CSBElectionCreationValidateRequest,
 ) -> Result<Json<ElectionDefinitionValidateResponse>, APIError> {
-    // parse and validate election
-    if let Some(user_hash) = edu.election_hash
-        && user_hash != EmlHash::from(edu.election_data.as_bytes()).chunks
-    {
-        return Err(APIError::InvalidHashError);
+    check_hash(edu.election_data.as_bytes(), edu.election_hash.as_ref())?;
+    if let Some(ref data) = edu.candidate_data {
+        check_hash(data.as_bytes(), edu.candidate_hash.as_ref())?;
     }
+
     let mut hash = RedactedEmlHash::from(edu.election_data.as_bytes());
-    let mut election = EML110::from_str(&edu.election_data)?.as_abacus_election()?;
+    let mut election =
+        parse_election_candidates_eml(&edu.election_data, edu.candidate_data.as_deref())?;
     election.role = ElectionRole::CSB;
 
-    // parse and validate candidates, if available
-    if let Some(data) = edu.candidate_data.clone() {
-        if let Some(user_hash) = edu.candidate_hash
-            && user_hash != EmlHash::from(data.as_bytes()).chunks
-        {
-            return Err(APIError::InvalidHashError);
-        }
-
+    if let Some(ref data) = edu.candidate_data {
         hash = RedactedEmlHash::from(data.as_bytes());
-        election = EML230::from_str(&data)?.add_candidate_lists(election)?;
     }
 
     Ok(Json(ElectionDefinitionValidateResponse::CSB(
@@ -489,37 +471,25 @@ async fn import_gsb_election(
     pool: &SqlitePool,
     audit_service: &AuditService,
 ) -> Result<(StatusCode, Json<ElectionWithPoliticalGroups>), APIError> {
-    let election_data_hash = EmlHash::from(edu.election_data.as_bytes()).chunks;
-    if edu.election_hash != election_data_hash {
-        return Err(APIError::InvalidHashError);
-    }
-    let candidate_data_hash = EmlHash::from(edu.candidate_data.as_bytes()).chunks;
-    if edu.candidate_hash != candidate_data_hash {
-        return Err(APIError::InvalidHashError);
-    }
+    let election_data_hash = check_hash(edu.election_data.as_bytes(), Some(&edu.election_hash))?;
+    let candidate_data_hash = check_hash(edu.candidate_data.as_bytes(), Some(&edu.candidate_hash))?;
 
-    let mut new_election = EML110::from_str(&edu.election_data)?.as_abacus_election()?;
-    new_election = EML230::from_str(&edu.candidate_data)?.add_candidate_lists(new_election)?;
+    let mut new_election =
+        parse_election_candidates_eml(&edu.election_data, Some(&edu.candidate_data))?;
 
     // Validate polling stations
     if let Some(polling_station_data) = edu.polling_station_data.as_ref() {
-        // If polling stations are submitted, file name must be also
         if edu.polling_station_file_name.is_none() {
             return Err(APIError::EmlImportError(EMLImportError::MissingFileName));
         }
         EML110::from_str(polling_station_data)?.get_polling_stations()?;
     }
 
-    // Set counting method
-    // Note: not used yet in the frontend, only CSO is implemented for now
     new_election.counting_method = edu.counting_method;
-
-    // Set number of voters based on input
     new_election.number_of_voters = edu.number_of_voters;
 
-    // Create new election
     let mut tx = pool.begin_immediate().await?;
-    let election = create_election(
+    let election = create_election_with_committee_session(
         &mut tx,
         audit_service,
         new_election,
@@ -528,18 +498,6 @@ async fn import_gsb_election(
     )
     .await?;
 
-    // Create first committee session for the election
-    create_committee_session(
-        &mut tx,
-        audit_service,
-        CommitteeSessionCreateRequest {
-            number: 1,
-            election_id: election.id,
-        },
-    )
-    .await?;
-
-    // Create polling stations
     if let Some(polling_station_data) = edu.polling_station_data {
         let polling_stations_request = PollingStationsRequest {
             file_name: edu
@@ -566,22 +524,15 @@ async fn import_csb_election(
     pool: &SqlitePool,
     audit_service: &AuditService,
 ) -> Result<(StatusCode, Json<ElectionWithPoliticalGroups>), APIError> {
-    let election_data_hash = EmlHash::from(edu.election_data.as_bytes()).chunks;
-    if edu.election_hash != election_data_hash {
-        return Err(APIError::InvalidHashError);
-    }
-    let candidate_data_hash = EmlHash::from(edu.candidate_data.as_bytes()).chunks;
-    if edu.candidate_hash != candidate_data_hash {
-        return Err(APIError::InvalidHashError);
-    }
+    let election_data_hash = check_hash(edu.election_data.as_bytes(), Some(&edu.election_hash))?;
+    let candidate_data_hash = check_hash(edu.candidate_data.as_bytes(), Some(&edu.candidate_hash))?;
 
-    let mut new_election = EML110::from_str(&edu.election_data)?.as_abacus_election()?;
-    new_election = EML230::from_str(&edu.candidate_data)?.add_candidate_lists(new_election)?;
+    let mut new_election =
+        parse_election_candidates_eml(&edu.election_data, Some(&edu.candidate_data))?;
     new_election.role = ElectionRole::CSB;
 
-    // Create new election
     let mut tx = pool.begin_immediate().await?;
-    let election = create_election(
+    let election = create_election_with_committee_session(
         &mut tx,
         audit_service,
         new_election,
@@ -590,9 +541,55 @@ async fn import_csb_election(
     )
     .await?;
 
-    // Create first committee session for the election
+    tx.commit().await?;
+
+    Ok((StatusCode::CREATED, Json(election)))
+}
+
+/// Check if the user's entered hash matches the hash of given data
+fn check_hash(
+    data: &[u8],
+    user_hash: Option<&[String; crate::eml::hash::CHUNK_COUNT]>,
+) -> Result<[String; crate::eml::hash::CHUNK_COUNT], APIError> {
+    let computed = EmlHash::from(data).chunks;
+    if let Some(user_hash) = user_hash
+        && *user_hash != computed
+    {
+        return Err(APIError::InvalidHashError);
+    }
+    Ok(computed)
+}
+
+/// Parse EML_NL 110 election definition and EML_NL 230 candidate list into a [`NewElection`]
+fn parse_election_candidates_eml(
+    election_eml_data: &str,
+    candidate_eml_data: Option<&str>,
+) -> Result<NewElection, APIError> {
+    let mut election = EML110::from_str(election_eml_data)?.as_abacus_election()?;
+    if let Some(candidate_data) = candidate_eml_data {
+        election = EML230::from_str(candidate_data)?.add_candidate_lists(election)?;
+    }
+    Ok(election)
+}
+
+/// Create an election with a committee session
+async fn create_election_with_committee_session(
+    tx: &mut SqliteConnection,
+    audit_service: &AuditService,
+    new_election: NewElection,
+    election_data_hash: [String; 16],
+    candidate_data_hash: [String; 16],
+) -> Result<ElectionWithPoliticalGroups, APIError> {
+    let election = create_election(
+        tx,
+        audit_service,
+        new_election,
+        election_data_hash,
+        candidate_data_hash,
+    )
+    .await?;
     create_committee_session(
-        &mut tx,
+        tx,
         audit_service,
         CommitteeSessionCreateRequest {
             number: 1,
@@ -600,10 +597,7 @@ async fn import_csb_election(
         },
     )
     .await?;
-
-    tx.commit().await?;
-
-    Ok((StatusCode::CREATED, Json(election)))
+    Ok(election)
 }
 
 impl From<DeError> for APIError {

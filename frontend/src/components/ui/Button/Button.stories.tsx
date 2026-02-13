@@ -9,17 +9,9 @@ type Props = {
   text: string;
   onClick: () => void;
   size: Size;
-  disabled: boolean;
 };
 
-const buttonVariants: ButtonVariant[] = [
-  "primary",
-  "primary-destructive",
-  "secondary",
-  "tertiary",
-  "tertiary-destructive",
-  "underlined",
-];
+const buttonVariants: ButtonVariant[] = ["primary", "primary-destructive", "secondary", "tertiary", "underlined"];
 
 export const Buttons: StoryObj<Props> = {
   render: ({ text, onClick, size }) => (
@@ -34,14 +26,6 @@ export const Buttons: StoryObj<Props> = {
       ))}
     </>
   ),
-
-  args: {
-    disabled: false,
-  },
-
-  argTypes: {
-    disabled: { control: false },
-  },
 
   play: async ({ canvas, userEvent, args }) => {
     const buttons = canvas.getAllByRole("button", { name: args.text });
@@ -58,26 +42,18 @@ export const Buttons: StoryObj<Props> = {
 };
 
 export const ButtonsDisabled: StoryObj<Props> = {
-  render: ({ text, onClick, size, disabled }) => (
+  render: ({ text, onClick, size }) => (
     <>
       {buttonVariants.map((variant) => (
         <div key={variant} className="mb-lg">
           <h2>{variant}</h2>
-          <Button id={`button-variant-${variant}`} size={size} variant={variant} disabled={disabled} onClick={onClick}>
+          <Button id={`button-variant-${variant}`} size={size} variant={variant} disabled={true} onClick={onClick}>
             {text}
           </Button>
         </div>
       ))}
     </>
   ),
-
-  args: {
-    disabled: true,
-  },
-
-  argTypes: {
-    disabled: { control: false },
-  },
 
   play: async ({ canvas, args }) => {
     // Test disabled buttons
@@ -95,19 +71,12 @@ export const ButtonsDisabled: StoryObj<Props> = {
 };
 
 export const ButtonLinks: StoryObj<Props> = {
-  render: ({ text, onClick, size, disabled }) => (
+  render: ({ text, onClick, size }) => (
     <>
       {buttonVariants.map((variant) => (
         <div key={variant} className="mb-lg">
           <h2>{variant}</h2>
-          <Button.Link
-            id={`button-variant-${variant}`}
-            size={size}
-            variant={variant}
-            disabled={disabled}
-            to="#"
-            onClick={onClick}
-          >
+          <Button.Link id={`button-variant-${variant}`} size={size} variant={variant} to="#" onClick={onClick}>
             {text}
           </Button.Link>
         </div>
@@ -117,7 +86,7 @@ export const ButtonLinks: StoryObj<Props> = {
 };
 
 export const ButtonLabel: StoryObj<Props> = {
-  render: ({ text, onClick, size, disabled }) => (
+  render: ({ text, onClick, size }) => (
     <>
       {buttonVariants.map((variant) => (
         <div key={variant} className="mb-lg">
@@ -127,7 +96,6 @@ export const ButtonLabel: StoryObj<Props> = {
             htmlFor={`input-variant-${variant}`}
             size={size}
             variant={variant}
-            disabled={disabled}
             onClick={onClick}
           >
             {text}
@@ -141,16 +109,13 @@ export const ButtonLabel: StoryObj<Props> = {
 
 export default {
   args: {
-    text: "Invoer",
+    text: "Opslaan",
     onClick: fn(),
   },
   argTypes: {
     size: {
       options: ["xs", "sm", "md", "lg", "xl"],
       control: { type: "radio" },
-    },
-    disabled: {
-      control: { type: "boolean" },
     },
   },
 } satisfies Meta<Props>;

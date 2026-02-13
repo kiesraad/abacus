@@ -75,9 +75,9 @@
         &:focus-visible {
           outline: none;
           border-radius: var(--rounded-default);
-          border: 4px solid var(--shadow-color-focus);
           max-height: 2.75rem;
-          padding: calc(0.625rem - 4px) calc(0.75rem - 4px) calc(0.625rem - 4px) calc(2.5rem - 4px);
+          padding: calc(0.625rem - 2px) calc(0.75rem - 2px) calc(0.625rem - 2px) calc(2.5rem - 2px);
+          border: 2px solid var(--interactive-default);
         }
       }
       > span {

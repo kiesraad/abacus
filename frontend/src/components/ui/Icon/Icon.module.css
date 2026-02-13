@@ -70,13 +70,13 @@
 
   &.status-not-started {
     svg {
-      fill: var(--status-not-started);
+      fill: var(--purple-700);
     }
   }
 
   &.link-default {
     svg {
-      fill: var(--link-default);
+      fill: var(--interactive-default);
     }
   }
 

@@ -181,7 +181,7 @@ export function DataEntryNavigation({ onSubmit, currentValues = {} }: DataEntryN
         <Button
           leftIcon={<IconTrash />}
           size="lg"
-          variant="tertiary-destructive"
+          variant="tertiary"
           onClick={() => {
             void onAbortModalDelete();
           }}

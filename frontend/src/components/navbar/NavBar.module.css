@@ -1,7 +1,7 @@
 .navBar {
   flex: 0 0 2.75rem;
   padding: 0 5rem;
-  background-color: var(--base-brand-blue);
+  background-color: var(--base-blue);
   color: var(--base-white);
   min-height: 3rem;
   display: flex;
@@ -102,7 +102,7 @@
       background: var(--gray-50);
 
       > svg {
-        fill: var(--link-default);
+        fill: var(--interactive-default);
       }
     }
   }

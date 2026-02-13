@@ -6,8 +6,8 @@
   font-weight: 500;
   line-height: 2rem;
   padding: 0.5rem 1rem;
-  background: var(--badge-polling-station-bg);
-  color: var(--badge-polling-station);
+  background: var(--base-accent);
+  color: var(--base-white);
 }
 
 .sm {
@@ -33,7 +33,7 @@
   font-family: var(--font-text);
   font-size: var(--font-size-sm);
   font-style: normal;
-  font-weight: bold;
+  font-weight: 500;
   line-height: 1.25rem;
   padding: 0.25rem 0.75rem;
   border-radius: 1rem;
@@ -43,10 +43,14 @@
   min-width: fit-content;
   max-width: fit-content;
   align-items: center;
+  svg {
+    fill: var(--gray-800);
+  }
 }
 
 .correction {
   background: var(--badge-correction-bg);
+  border: 1px solid var(--badge-correction-border);
   color: var(--badge-correction);
 }
 
@@ -60,32 +64,32 @@
   color: var(--badge-difference);
 }
 
-.extra_entry {
-  background: var(--badge-extra-entry-bg);
-  color: var(--badge-extra-entry);
-}
-
 .empty,
 .first_entry_in_progress,
 .first_entry_has_errors,
 .first_entry_finalised {
-  background: var(--badge-first-entry-bg);
-  color: var(--badge-first-entry);
+  background: var(--badge-second-entry-bg);
+  border: 1px solid var(--badge-second-entry-border);
+  color: var(--badge-second-entry);
 }
 
 .objections {
   background: var(--badge-objections-bg);
+  border: 1px solid var(--badge-objections-border);
   color: var(--badge-objections);
 }
 
 .first_entry_finalised_for_typist,
 .second_entry_in_progress,
-.entries_different {
-  background: var(--badge-second-entry-bg);
-  color: var(--badge-second-entry);
+.entries_different,
+.extra_entry {
+  background: var(--badge-first-entry-bg);
+  border: 1px solid var(--badge-first-entry-border);
+  color: var(--badge-first-entry);
 }
 
 .typist_busy {
   background: var(--badge-typist-busy-bg);
+  border: 1px solid var(--badge-typist-busy-border);
   color: var(--badge-typist-busy);
 }

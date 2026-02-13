@@ -102,30 +102,30 @@ section.md {
 }
 
 a {
-  color: var(--link-default);
+  color: var(--interactive-default);
 
   &:visited {
-    color: var(--link-visited);
+    color: var(--interactive-visited);
   }
 
   &:hover {
-    color: var(--link-hover);
+    color: var(--interactive-hover);
   }
 
   &:active {
-    color: var(--link-active);
+    color: var(--interactive-active);
   }
 }
 
 .color-visited-link-default {
   &:visited {
-    color: var(--link-default);
+    color: var(--interactive-default);
   }
 }
 
 .underlined {
   text-decoration: underline;
-  color: var(--link-default);
+  color: var(--interactive-default);
 }
 
 /* Font weight */

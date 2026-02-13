@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { expect } from "storybook/test";
+import { expect, fireEvent, fn } from "storybook/test";
 
 import { IconCross } from "@/components/generated/icons";
 import type { ButtonVariant, Size } from "@/types/ui";
@@ -8,78 +8,97 @@ import { IconButton } from "./IconButton";
 
 type Props = {
   label: string;
+  onClick: () => void;
   variant: ButtonVariant;
   size: Size;
   isRound: boolean;
 };
 
+const buttonVariants: ButtonVariant[] = ["primary", "primary-destructive", "secondary", "tertiary", "underlined"];
+
 export const DefaultIconButton: StoryObj<Props> = {
-  render: ({ label, variant, size, isRound }) => (
-    <IconButton
-      role="button"
-      title="Icon Button"
-      icon={<IconCross />}
-      aria-label={label}
-      variant={variant}
-      size={size}
-      isRound={isRound}
-    />
+  render: ({ label, size, isRound, onClick }) => (
+    <>
+      {buttonVariants.map((variant) => (
+        <div key={variant} className="mb-lg">
+          <h2>{variant}</h2>
+          <IconButton
+            key={variant}
+            role="button"
+            title="Icon Button"
+            icon={<IconCross />}
+            aria-label={label}
+            variant={variant}
+            size={size}
+            isRound={isRound}
+            onClick={onClick}
+          />
+        </div>
+      ))}
+    </>
   ),
-  play: async ({ canvas }) => {
-    await expect(canvas.getByRole("button")).toBeEnabled();
+  play: async ({ canvas, userEvent, args }) => {
+    const buttons = canvas.getAllByRole("button", { name: args.label });
+
+    for (const button of buttons) {
+      await expect(button).toBeVisible();
+      await expect(button).toBeEnabled();
+
+      await userEvent.click(button);
+      // fireEvent.click(button);
+      await expect(args.onClick).toHaveBeenCalled();
+    }
   },
 };
 
 export const DisabledIconButton: StoryObj<Props> = {
-  render: ({ label, variant, size, isRound }) => (
-    <IconButton
-      role="button"
-      title="Icon Button"
-      icon={<IconCross />}
-      aria-label={label}
-      variant={variant}
-      size={size}
-      isRound={isRound}
-      isDisabled
-    />
+  render: ({ label, size, isRound, onClick }) => (
+    <>
+      {buttonVariants.map((variant) => (
+        <div key={variant} className="mb-lg">
+          <h2>{variant}</h2>
+          <IconButton
+            role="button"
+            title="Icon Button"
+            icon={<IconCross />}
+            aria-label={label}
+            variant={variant}
+            size={size}
+            isRound={isRound}
+            onClick={onClick}
+            isDisabled
+          />
+        </div>
+      ))}
+    </>
   ),
-  play: async ({ canvas }) => {
-    await expect(canvas.getByRole("button")).toBeDisabled();
-  },
-};
+  play: async ({ canvas, args }) => {
+    // Test disabled buttons
+    const buttons = canvas.getAllByRole("button", { name: args.label });
 
-export const IsLoadingIconButton: StoryObj<Props> = {
-  render: ({ label, variant, size, isRound }) => (
-    <IconButton
-      role="button"
-      title="Icon Button"
-      icon={<IconCross />}
-      aria-label={label}
-      variant={variant}
-      size={size}
-      isRound={isRound}
-      isLoading
-    />
-  ),
-  play: async ({ canvas }) => {
-    await expect(canvas.getByRole("button")).toBeDisabled();
+    for (const button of buttons) {
+      await expect(button).toBeVisible();
+      await expect(button).toBeDisabled();
+
+      // Force click on disabled button to test it does nothing
+      await fireEvent.click(button);
+      await expect(args.onClick).not.toHaveBeenCalled();
+    }
   },
 };
 
 export default {
   args: {
-    label: "Invoer",
+    label: "Close",
+    onClick: fn(),
   },
   argTypes: {
-    variant: {
-      options: ["primary", "primary-destructive", "secondary", "tertiary", "tertiary-destructive"],
-      control: { type: "radio" },
-    },
     size: {
       options: ["sm", "md", "lg"],
       control: { type: "radio" },
     },
     isRound: {
+      options: [true, false],
       control: { type: "boolean" },
     },
   },

@@ -1,7 +1,7 @@
 .DownloadButton {
   width: 100%;
   max-width: 32rem;
-  color: var(--link-default);
+  color: var(--interactive-default);
   border-color: var(--bg-gray-darkest);
   background: var(--button-color-secondary);
   border-radius: 0.5rem;
@@ -16,8 +16,8 @@
     width: 1.5rem;
     height: 1.5rem;
     stroke-width: 0;
-    stroke: var(--base-brand-blue);
-    fill: var(--base-brand-blue);
+    stroke: var(--base-blue);
+    fill: var(--base-blue);
   }
 
   & > span {
@@ -56,6 +56,6 @@
   }
 
   &:visited {
-    color: var(--link-default);
+    color: var(--interactive-default);
   }
 }

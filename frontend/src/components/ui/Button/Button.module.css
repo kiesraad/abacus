@@ -32,9 +32,9 @@ label.button {
   &:focus,
   &:focus-visible {
     outline: none;
-    border-color: var(--border-color-focus);
+    border-color: var(--button-color-focus-border);
     background-color: var(--button-color-primary-focus);
-    box-shadow: 0 0 0 4px var(--shadow-color-focus);
+    box-shadow: 0 0 0 4px var(--button-color-focus-shadow);
   }
 
   &:active {
@@ -54,8 +54,8 @@ label.button {
   }
 
   &.secondary {
-    color: var(--text-color-body);
-    border-color: var(--bg-gray-darkest);
+    color: var(--gray-700);
+    border-color: var(--button-color-secondary-border);
     background: var(--button-color-secondary);
 
     &:hover {
@@ -67,51 +67,26 @@ label.button {
       outline: none;
       --button-border-width: 2px;
       border-color: var(--border-color-focus);
-      background-color: var(--button-color-secondary-focus);
-      box-shadow: 0 0 0 4px var(--shadow-color-focus);
+      background-color: var(--button-color-focus);
+      box-shadow: 0 0 0 4px var(--button-color-focus-shadow);
     }
 
     &:active {
-      border-color: var(--border-color-default);
       background-color: var(--button-color-secondary-active);
     }
   }
 
   &.tertiary {
-    background: transparent;
-    border-color: transparent;
-    color: var(--button-color-primary);
+    background: var(--button-color-tertiary);
+    border-color: var(--button-color-tertiary);
+    color: var(--button-color-tertiary-text);
 
     &:hover {
-      background: rgba(16, 48, 81, 0.1);
-    }
-  }
-
-  &.tertiary-destructive {
-    --button-border-width: 0px;
-    border: none;
-    background: transparent;
-    color: var(--red-700);
-
-    &:not(:hover, :active) {
-      box-shadow: none;
-    }
-
-    &:hover {
-      background: var(--red-50);
-    }
-
-    &:focus,
-    &:focus-visible {
-      outline: none;
-      --button-border-width: 2px;
-      border: var(--button-border-width) solid var(--border-color-focus);
-      box-shadow: 0 0 0 4px var(--shadow-color-focus);
+      background: var(--button-color-tertiary-hover);
     }
 
     &:active {
-      border-color: var(--red-100);
-      background-color: var(--red-100);
+      background-color: var(--button-color-tertiary-active);
     }
   }
 

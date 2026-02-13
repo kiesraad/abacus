@@ -256,19 +256,31 @@ pub struct CSBElectionCreationValidateRequest {
 }
 
 #[derive(Debug, Deserialize, Serialize, Clone, ToSchema)]
+#[serde(tag = "role")]
+pub enum ElectionDefinitionValidateResponse {
+    GSB(GSBElectionDefinitionValidateResponse),
+    CSB(CSBElectionDefinitionValidateResponse),
+}
+
+#[derive(Debug, Deserialize, Serialize, Clone, ToSchema)]
 #[serde(deny_unknown_fields)]
-pub struct ElectionDefinitionValidateResponse {
+pub struct GSBElectionDefinitionValidateResponse {
     hash: RedactedEmlHash,
     election: NewElection,
     #[serde(skip_serializing_if = "Option::is_none")]
     #[schema(nullable = false)]
     polling_stations: Option<Vec<PollingStationRequest>>,
-
     #[serde(skip_serializing_if = "Option::is_none")]
     #[schema(nullable = false)]
     pub polling_station_definition_matches_election: Option<bool>,
-
     number_of_voters: u32,
+}
+
+#[derive(Debug, Deserialize, Serialize, Clone, ToSchema)]
+#[serde(deny_unknown_fields)]
+pub struct CSBElectionDefinitionValidateResponse {
+    hash: RedactedEmlHash,
+    election: NewElection,
 }
 
 /// Uploads election definition, validates it and returns the associated election data and
@@ -349,13 +361,15 @@ fn validate_gsb_election(
         number_of_voters = nov;
     }
 
-    Ok(Json(ElectionDefinitionValidateResponse {
-        hash,
-        election,
-        polling_stations,
-        number_of_voters,
-        polling_station_definition_matches_election,
-    }))
+    Ok(Json(ElectionDefinitionValidateResponse::GSB(
+        GSBElectionDefinitionValidateResponse {
+            hash,
+            election,
+            polling_stations,
+            number_of_voters,
+            polling_station_definition_matches_election,
+        },
+    )))
 }
 
 fn validate_csb_election(
@@ -383,13 +397,9 @@ fn validate_csb_election(
         election = EML230::from_str(&data)?.add_candidate_lists(election)?;
     }
 
-    Ok(Json(ElectionDefinitionValidateResponse {
-        hash,
-        election,
-        polling_stations: None,
-        number_of_voters: 0,
-        polling_station_definition_matches_election: None,
-    }))
+    Ok(Json(ElectionDefinitionValidateResponse::CSB(
+        CSBElectionDefinitionValidateResponse { hash, election },
+    )))
 }
 
 #[derive(Debug, Deserialize, Serialize, Clone, ToSchema)]

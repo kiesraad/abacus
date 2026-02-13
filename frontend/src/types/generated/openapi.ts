@@ -421,6 +421,11 @@ export interface CSBElectionCreationValidateRequest {
   election_hash?: string[];
 }
 
+export interface CSBElectionDefinitionValidateResponse {
+  election: NewElection;
+  hash: RedactedEmlHash;
+}
+
 /**
  * CSOFirstSessionResults, following the fields in Model Na 31-2 Bijlage 2.
  *
@@ -710,13 +715,9 @@ export type ElectionCreationValidateRequest =
   | (GSBElectionCreationValidateRequest & { role: "GSB" })
   | (CSBElectionCreationValidateRequest & { role: "CSB" });
 
-export interface ElectionDefinitionValidateResponse {
-  election: NewElection;
-  hash: RedactedEmlHash;
-  number_of_voters: number;
-  polling_station_definition_matches_election?: boolean;
-  polling_stations?: PollingStationRequest[];
-}
+export type ElectionDefinitionValidateResponse =
+  | (GSBElectionDefinitionValidateResponse & { role: "GSB" })
+  | (CSBElectionDefinitionValidateResponse & { role: "CSB" });
 
 export interface ElectionDetails {
   election_category: string;
@@ -923,6 +924,14 @@ export interface GSBElectionCreationValidateRequest {
   number_of_voters?: number;
   polling_station_data?: string;
   polling_station_file_name?: string;
+}
+
+export interface GSBElectionDefinitionValidateResponse {
+  election: NewElection;
+  hash: RedactedEmlHash;
+  number_of_voters: number;
+  polling_station_definition_matches_election?: boolean;
+  polling_stations?: PollingStationRequest[];
 }
 
 /**

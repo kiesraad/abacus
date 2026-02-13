@@ -31,6 +31,8 @@ async fn test_gsb_election_validate_valid(pool: SqlitePool) {
 
     // Ensure the response is what we expect
     assert_eq!(response.status(), StatusCode::OK);
+    let body: serde_json::Value = response.json().await.unwrap();
+    assert_eq!(body["role"], "GSB");
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("users"))))]
@@ -73,10 +75,15 @@ async fn test_csb_election_validate_valid(pool: SqlitePool) {
 
     assert_eq!(response.status(), StatusCode::OK);
     let body: serde_json::Value = response.json().await.unwrap();
+    assert_eq!(body["role"], "CSB");
     assert_eq!(body["election"]["role"], "CSB");
-    assert_eq!(body["number_of_voters"], 0);
-    assert!(body["polling_stations"].is_null());
-    assert!(body["polling_station_definition_matches_election"].is_null());
+    // CSB responses don't have these GSB-specific fields
+    assert!(body.get("number_of_voters").is_none());
+    assert!(body.get("polling_stations").is_none());
+    assert!(
+        body.get("polling_station_definition_matches_election")
+            .is_none()
+    );
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("users"))))]
@@ -105,8 +112,10 @@ async fn test_csb_election_validate_with_candidates(pool: SqlitePool) {
 
     assert_eq!(response.status(), StatusCode::OK);
     let body: serde_json::Value = response.json().await.unwrap();
+    assert_eq!(body["role"], "CSB");
     assert_eq!(body["election"]["role"], "CSB");
-    assert_eq!(body["number_of_voters"], 0);
+    // CSB responses don't have number_of_voters field
+    assert!(body.get("number_of_voters").is_none());
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("users"))))]

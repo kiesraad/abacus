@@ -361,6 +361,7 @@ export const electionImportMockResponse: ElectionWithPoliticalGroups = {
 };
 
 export const electionImportValidateMockResponse: ElectionDefinitionValidateResponse = {
+  role: "GSB",
   hash: {
     chunks: new Array<string>(16).fill("0000"),
     redacted_indexes: [3, 11],

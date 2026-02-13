@@ -20,7 +20,7 @@ pub struct SeatAssignmentResult {
 #[derive(Debug, PartialEq)]
 pub struct ListSeatAssignment {
     /// List number for which this assignment applies
-    list_number: ListNumber,
+    pub list_number: ListNumber,
     /// The number of votes cast for this group
     votes_cast: u64,
     /// The remainder votes that were not used to get full seats assigned to this list

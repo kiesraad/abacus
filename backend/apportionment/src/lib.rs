@@ -14,8 +14,8 @@ pub use self::{
 };
 use self::{
     candidate_nomination::candidate_nomination,
-    seat_assignment::seat_assignment,
-    structs::{ApportionmentOutput, as_candidate_nomination_input},
+    seat_assignment::{as_candidate_nomination_input, seat_assignment},
+    structs::ApportionmentOutput,
 };
 
 pub fn process<T: ApportionmentInput>(

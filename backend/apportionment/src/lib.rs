@@ -14,8 +14,8 @@ pub use self::{
 };
 use self::{
     candidate_nomination::candidate_nomination,
-    seat_assignment::seat_assignment,
-    structs::{ApportionmentOutput, as_candidate_nomination_input},
+    seat_assignment::{as_candidate_nomination_input, seat_assignment},
+    structs::ApportionmentOutput,
 };
 
 pub fn process<T: ApportionmentInput>(
@@ -35,8 +35,8 @@ pub fn process<T: ApportionmentInput>(
 mod tests {
     use super::process;
     use crate::{
-        Fraction, seat_assignment::get_total_seats_from_apportionment_result, structs::ListNumber,
-        test_helpers::seat_assignment_fixture_with_default_50_candidates,
+        Fraction, seat_assignment::tests::get_total_seats_from_apportionment_result,
+        structs::ListNumber, test_helpers::seat_assignment_fixture_with_default_50_candidates,
     };
 
     #[test]

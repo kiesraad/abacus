@@ -5120,6 +5120,63 @@
         },
         "additionalProperties": false
       },
+      "CSBElectionCreationRequest": {
+        "type": "object",
+        "required": [
+          "election_hash",
+          "election_data",
+          "candidate_hash",
+          "candidate_data"
+        ],
+        "properties": {
+          "candidate_data": {
+            "type": "string"
+          },
+          "candidate_hash": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "election_data": {
+            "type": "string"
+          },
+          "election_hash": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "CSBElectionCreationValidateRequest": {
+        "type": "object",
+        "required": [
+          "election_data"
+        ],
+        "properties": {
+          "candidate_data": {
+            "type": "string"
+          },
+          "candidate_hash": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "election_data": {
+            "type": "string"
+          },
+          "election_hash": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "additionalProperties": false
+      },
       "CSOFirstSessionResults": {
         "type": "object",
         "description": "CSOFirstSessionResults, following the fields in Model Na 31-2 Bijlage 2.\n\nSee \"Model Na 31-2. Proces-verbaal van een gemeentelijk stembureau/stembureau voor het openbaar\nlichaam in een gemeente/openbaar lichaam waar een centrale stemopneming wordt verricht,\nBijlage 2: uitkomsten per stembureau\" from the\n[Kiesregeling](https://wetten.overheid.nl/BWBR0034180/2026-01-01#Bijlage1_DivisieNa31.2) or\n[Verkiezingstoolbox](https://www.rijksoverheid.nl/onderwerpen/verkiezingen/verkiezingentoolkit/modellen).",
@@ -5813,6 +5870,27 @@
                 }
               }
             ]
+          },
+          {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/CSBElectionCreationRequest"
+              },
+              {
+                "type": "object",
+                "required": [
+                  "role"
+                ],
+                "properties": {
+                  "role": {
+                    "type": "string",
+                    "enum": [
+                      "CSB"
+                    ]
+                  }
+                }
+              }
+            ]
           }
         ]
       },
@@ -5833,6 +5911,27 @@
                     "type": "string",
                     "enum": [
                       "GSB"
+                    ]
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/CSBElectionCreationValidateRequest"
+              },
+              {
+                "type": "object",
+                "required": [
+                  "role"
+                ],
+                "properties": {
+                  "role": {
+                    "type": "string",
+                    "enum": [
+                      "CSB"
                     ]
                   }
                 }

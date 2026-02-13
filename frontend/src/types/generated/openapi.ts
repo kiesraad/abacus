@@ -407,6 +407,20 @@ export interface AuditLogUser {
   username: string;
 }
 
+export interface CSBElectionCreationRequest {
+  candidate_data: string;
+  candidate_hash: string[];
+  election_data: string;
+  election_hash: string[];
+}
+
+export interface CSBElectionCreationValidateRequest {
+  candidate_data?: string;
+  candidate_hash?: string[];
+  election_data: string;
+  election_hash?: string[];
+}
+
 /**
  * CSOFirstSessionResults, following the fields in Model Na 31-2 Bijlage 2.
  *
@@ -688,9 +702,13 @@ export interface Election {
 export const electionCategoryValues = ["Municipal"] as const;
 export type ElectionCategory = (typeof electionCategoryValues)[number];
 
-export type ElectionCreationRequest = GSBElectionCreationRequest & { role: "GSB" };
+export type ElectionCreationRequest =
+  | (GSBElectionCreationRequest & { role: "GSB" })
+  | (CSBElectionCreationRequest & { role: "CSB" });
 
-export type ElectionCreationValidateRequest = GSBElectionCreationValidateRequest & { role: "GSB" };
+export type ElectionCreationValidateRequest =
+  | (GSBElectionCreationValidateRequest & { role: "GSB" })
+  | (CSBElectionCreationValidateRequest & { role: "CSB" });
 
 export interface ElectionDefinitionValidateResponse {
   election: NewElection;

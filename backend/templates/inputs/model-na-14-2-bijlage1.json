@@ -2,6 +2,7 @@
   "election": {
     "id": 2,
     "name": "Gemeenteraad Test 2022",
+    "role": "GSB",
     "counting_method": "CSO",
     "election_id": "GR2022_Test",
     "location": "Test",

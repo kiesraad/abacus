@@ -69,6 +69,7 @@ function electionValidateResponse(
   number_of_voters: number = 0,
 ): ElectionDefinitionValidateResponse {
   return {
+    role: "GSB",
     hash: {
       // NOTE: In actual data, the redacted version of the hash
       // will have empty strings at the `redacted_indexes` positions.

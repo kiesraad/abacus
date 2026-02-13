@@ -5120,6 +5120,79 @@
         },
         "additionalProperties": false
       },
+      "CSBElectionCreationRequest": {
+        "type": "object",
+        "required": [
+          "election_hash",
+          "election_data",
+          "candidate_hash",
+          "candidate_data"
+        ],
+        "properties": {
+          "candidate_data": {
+            "type": "string"
+          },
+          "candidate_hash": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "election_data": {
+            "type": "string"
+          },
+          "election_hash": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "CSBElectionCreationValidateRequest": {
+        "type": "object",
+        "required": [
+          "election_data"
+        ],
+        "properties": {
+          "candidate_data": {
+            "type": "string"
+          },
+          "candidate_hash": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "election_data": {
+            "type": "string"
+          },
+          "election_hash": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "CSBElectionDefinitionValidateResponse": {
+        "type": "object",
+        "required": [
+          "hash",
+          "election"
+        ],
+        "properties": {
+          "election": {
+            "$ref": "#/components/schemas/NewElection"
+          },
+          "hash": {
+            "$ref": "#/components/schemas/RedactedEmlHash"
+          }
+        },
+        "additionalProperties": false
+      },
       "CSOFirstSessionResults": {
         "type": "object",
         "description": "CSOFirstSessionResults, following the fields in Model Na 31-2 Bijlage 2.\n\nSee \"Model Na 31-2. Proces-verbaal van een gemeentelijk stembureau/stembureau voor het openbaar\nlichaam in een gemeente/openbaar lichaam waar een centrale stemopneming wordt verricht,\nBijlage 2: uitkomsten per stembureau\" from the\n[Kiesregeling](https://wetten.overheid.nl/BWBR0034180/2026-01-01#Bijlage1_DivisieNa31.2) or\n[Verkiezingstoolbox](https://www.rijksoverheid.nl/onderwerpen/verkiezingen/verkiezingentoolkit/modellen).",
@@ -5727,6 +5800,7 @@
         "required": [
           "id",
           "name",
+          "role",
           "counting_method",
           "election_id",
           "location",
@@ -5776,6 +5850,9 @@
             "type": "integer",
             "format": "int32",
             "minimum": 0
+          },
+          "role": {
+            "$ref": "#/components/schemas/ElectionRole"
           }
         },
         "additionalProperties": false
@@ -5809,6 +5886,27 @@
                 }
               }
             ]
+          },
+          {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/CSBElectionCreationRequest"
+              },
+              {
+                "type": "object",
+                "required": [
+                  "role"
+                ],
+                "properties": {
+                  "role": {
+                    "type": "string",
+                    "enum": [
+                      "CSB"
+                    ]
+                  }
+                }
+              }
+            ]
           }
         ]
       },
@@ -5834,45 +5932,82 @@
                 }
               }
             ]
+          },
+          {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/CSBElectionCreationValidateRequest"
+              },
+              {
+                "type": "object",
+                "required": [
+                  "role"
+                ],
+                "properties": {
+                  "role": {
+                    "type": "string",
+                    "enum": [
+                      "CSB"
+                    ]
+                  }
+                }
+              }
+            ]
           }
         ]
       },
       "ElectionDefinitionValidateResponse": {
-        "type": "object",
-        "required": [
-          "hash",
-          "election",
-          "number_of_voters"
-        ],
-        "properties": {
-          "election": {
-            "$ref": "#/components/schemas/NewElection"
+        "oneOf": [
+          {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/GSBElectionDefinitionValidateResponse"
+              },
+              {
+                "type": "object",
+                "required": [
+                  "role"
+                ],
+                "properties": {
+                  "role": {
+                    "type": "string",
+                    "enum": [
+                      "GSB"
+                    ]
+                  }
+                }
+              }
+            ]
           },
-          "hash": {
-            "$ref": "#/components/schemas/RedactedEmlHash"
-          },
-          "number_of_voters": {
-            "type": "integer",
-            "format": "int32",
-            "minimum": 0
-          },
-          "polling_station_definition_matches_election": {
-            "type": "boolean"
-          },
-          "polling_stations": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/PollingStationRequest"
-            }
+          {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/CSBElectionDefinitionValidateResponse"
+              },
+              {
+                "type": "object",
+                "required": [
+                  "role"
+                ],
+                "properties": {
+                  "role": {
+                    "type": "string",
+                    "enum": [
+                      "CSB"
+                    ]
+                  }
+                }
+              }
+            ]
           }
-        },
-        "additionalProperties": false
+        ]
       },
       "ElectionDetails": {
         "type": "object",
         "required": [
           "election_id",
           "election_name",
+          "election_role",
           "election_counting_method",
           "election_election_id",
           "election_location",
@@ -5922,6 +6057,9 @@
             "type": "integer",
             "format": "int32",
             "minimum": 0
+          },
+          "election_role": {
+            "type": "string"
           }
         },
         "additionalProperties": false
@@ -6007,6 +6145,14 @@
         },
         "additionalProperties": false
       },
+      "ElectionRole": {
+        "type": "string",
+        "description": "Election role",
+        "enum": [
+          "GSB",
+          "CSB"
+        ]
+      },
       "ElectionStatusResponse": {
         "type": "object",
         "description": "Election polling stations data entry statuses response",
@@ -6080,6 +6226,7 @@
         "required": [
           "id",
           "name",
+          "role",
           "counting_method",
           "election_id",
           "location",
@@ -6136,6 +6283,9 @@
             "items": {
               "$ref": "#/components/schemas/PoliticalGroup"
             }
+          },
+          "role": {
+            "$ref": "#/components/schemas/ElectionRole"
           }
         },
         "additionalProperties": false
@@ -6368,6 +6518,37 @@
         },
         "additionalProperties": false
       },
+      "GSBElectionDefinitionValidateResponse": {
+        "type": "object",
+        "required": [
+          "hash",
+          "election",
+          "number_of_voters"
+        ],
+        "properties": {
+          "election": {
+            "$ref": "#/components/schemas/NewElection"
+          },
+          "hash": {
+            "$ref": "#/components/schemas/RedactedEmlHash"
+          },
+          "number_of_voters": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "polling_station_definition_matches_election": {
+            "type": "boolean"
+          },
+          "polling_stations": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PollingStationRequest"
+            }
+          }
+        },
+        "additionalProperties": false
+      },
       "GenerateElectionArgs": {
         "type": "object",
         "description": "Abacus API and asset server",
@@ -6477,6 +6658,7 @@
         "description": "Election request",
         "required": [
           "name",
+          "role",
           "counting_method",
           "election_id",
           "location",
@@ -6530,6 +6712,9 @@
             "items": {
               "$ref": "#/components/schemas/PoliticalGroup"
             }
+          },
+          "role": {
+            "$ref": "#/components/schemas/ElectionRole"
           }
         },
         "additionalProperties": false

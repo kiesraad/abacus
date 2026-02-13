@@ -57,7 +57,7 @@ export function UploadPollingStationDefinition() {
         polling_station_file_name: currentFile.name,
       });
 
-      if (isSuccess(response)) {
+      if (isSuccess(response) && response.data.role === "GSB") {
         dispatch({
           type: "SELECT_POLLING_STATION_DEFINITION",
           response: response.data,

@@ -2,6 +2,7 @@ CREATE TABLE elections
 (
     id               INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
     name             TEXT                              NOT NULL,
+    role             TEXT                              NOT NULL,
     counting_method  TEXT                              NOT NULL,
     election_id      TEXT                              NOT NULL,
     location         TEXT                              NOT NULL,

@@ -679,6 +679,7 @@ export interface Election {
   nomination_date: string;
   number_of_seats: number;
   number_of_voters: number;
+  role: ElectionRole;
 }
 
 /**
@@ -711,6 +712,7 @@ export interface ElectionDetails {
   election_nomination_date: string;
   election_number_of_seats: number;
   election_number_of_voters: number;
+  election_role: string;
 }
 
 /**
@@ -744,6 +746,12 @@ export interface ElectionListResponse {
 export interface ElectionNumberOfVotersChangeRequest {
   number_of_voters: number;
 }
+
+/**
+ * Election role
+ */
+export const electionRoleValues = ["GSB", "CSB"] as const;
+export type ElectionRole = (typeof electionRoleValues)[number];
 
 /**
  * Election polling stations data entry statuses response
@@ -790,6 +798,7 @@ export interface ElectionWithPoliticalGroups {
   number_of_seats: number;
   number_of_voters: number;
   political_groups: PoliticalGroup[];
+  role: ElectionRole;
 }
 
 export interface ErrorDetails {
@@ -954,6 +963,7 @@ export interface NewElection {
   number_of_seats: number;
   number_of_voters: number;
   political_groups: PoliticalGroup[];
+  role: ElectionRole;
 }
 
 /**

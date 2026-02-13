@@ -1,6 +1,6 @@
 {
   "db_name": "SQLite",
-  "query": "\n        UPDATE elections\n        SET number_of_voters = ?\n        WHERE id = ?\n        RETURNING\n            id as \"id: ElectionId\",\n            name,\n            counting_method as \"counting_method: _\", \n            election_id,\n            location,\n            domain_id,\n            category as \"category: _\",\n            number_of_seats as \"number_of_seats: u32\",\n            number_of_voters as \"number_of_voters: u32\",\n            election_date as \"election_date: _\",\n            nomination_date as \"nomination_date: _\"\n        ",
+  "query": "\n        UPDATE elections\n        SET number_of_voters = ?\n        WHERE id = ?\n        RETURNING\n            id as \"id: ElectionId\",\n            name,\n            role as \"role: _\",\n            counting_method as \"counting_method: _\", \n            election_id,\n            location,\n            domain_id,\n            category as \"category: _\",\n            number_of_seats as \"number_of_seats: u32\",\n            number_of_voters as \"number_of_voters: u32\",\n            election_date as \"election_date: _\",\n            nomination_date as \"nomination_date: _\"\n        ",
   "describe": {
     "columns": [
       {
@@ -14,48 +14,53 @@
         "type_info": "Text"
       },
       {
-        "name": "counting_method: _",
+        "name": "role: _",
         "ordinal": 2,
         "type_info": "Text"
       },
       {
-        "name": "election_id",
+        "name": "counting_method: _",
         "ordinal": 3,
         "type_info": "Text"
       },
       {
-        "name": "location",
+        "name": "election_id",
         "ordinal": 4,
         "type_info": "Text"
       },
       {
-        "name": "domain_id",
+        "name": "location",
         "ordinal": 5,
         "type_info": "Text"
       },
       {
-        "name": "category: _",
+        "name": "domain_id",
         "ordinal": 6,
         "type_info": "Text"
       },
       {
-        "name": "number_of_seats: u32",
+        "name": "category: _",
         "ordinal": 7,
-        "type_info": "Integer"
+        "type_info": "Text"
       },
       {
-        "name": "number_of_voters: u32",
+        "name": "number_of_seats: u32",
         "ordinal": 8,
         "type_info": "Integer"
       },
       {
-        "name": "election_date: _",
+        "name": "number_of_voters: u32",
         "ordinal": 9,
+        "type_info": "Integer"
+      },
+      {
+        "name": "election_date: _",
+        "ordinal": 10,
         "type_info": "Text"
       },
       {
         "name": "nomination_date: _",
-        "ordinal": 10,
+        "ordinal": 11,
         "type_info": "Text"
       }
     ],
@@ -73,8 +78,9 @@
       false,
       false,
       false,
+      false,
       false
     ]
   },
-  "hash": "6b5a01d63dc7838a9417a8895a490ad440995cc3685a3bf36ce72e1b0620f42d"
+  "hash": "d4f9eb3131a31338dd65166c6095f16a62b6c8690472662b375dc188f6b3f45f"
 }

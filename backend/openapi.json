@@ -5727,6 +5727,7 @@
         "required": [
           "id",
           "name",
+          "role",
           "counting_method",
           "election_id",
           "location",
@@ -5776,6 +5777,9 @@
             "type": "integer",
             "format": "int32",
             "minimum": 0
+          },
+          "role": {
+            "$ref": "#/components/schemas/ElectionRole"
           }
         },
         "additionalProperties": false
@@ -5873,6 +5877,7 @@
         "required": [
           "election_id",
           "election_name",
+          "election_role",
           "election_counting_method",
           "election_election_id",
           "election_location",
@@ -5922,6 +5927,9 @@
             "type": "integer",
             "format": "int32",
             "minimum": 0
+          },
+          "election_role": {
+            "type": "string"
           }
         },
         "additionalProperties": false
@@ -6007,6 +6015,14 @@
         },
         "additionalProperties": false
       },
+      "ElectionRole": {
+        "type": "string",
+        "description": "Election role",
+        "enum": [
+          "GSB",
+          "CSB"
+        ]
+      },
       "ElectionStatusResponse": {
         "type": "object",
         "description": "Election polling stations data entry statuses response",
@@ -6080,6 +6096,7 @@
         "required": [
           "id",
           "name",
+          "role",
           "counting_method",
           "election_id",
           "location",
@@ -6136,6 +6153,9 @@
             "items": {
               "$ref": "#/components/schemas/PoliticalGroup"
             }
+          },
+          "role": {
+            "$ref": "#/components/schemas/ElectionRole"
           }
         },
         "additionalProperties": false
@@ -6477,6 +6497,7 @@
         "description": "Election request",
         "required": [
           "name",
+          "role",
           "counting_method",
           "election_id",
           "location",
@@ -6530,6 +6551,9 @@
             "items": {
               "$ref": "#/components/schemas/PoliticalGroup"
             }
+          },
+          "role": {
+            "$ref": "#/components/schemas/ElectionRole"
           }
         },
         "additionalProperties": false

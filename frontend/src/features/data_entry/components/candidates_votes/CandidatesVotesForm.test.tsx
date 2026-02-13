@@ -311,6 +311,7 @@ describe("Test CandidatesVotesForm", () => {
       const electionMockData: ElectionWithPoliticalGroups = {
         id: 1,
         name: "Gemeenteraadsverkiezingen 2026",
+        role: "GSB",
         counting_method: "CSO",
         election_id: "Heemdamseburg_2024",
         location: "Heemdamseburg",

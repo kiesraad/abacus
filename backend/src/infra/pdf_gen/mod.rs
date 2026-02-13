@@ -25,8 +25,8 @@ pub(crate) mod tests {
     use crate::domain::{
         committee_session::{CommitteeSessionId, committee_session_fixture},
         election::{
-            ElectionCategory, ElectionId, ElectionWithPoliticalGroups, VoteCountingMethod,
-            tests::election_fixture,
+            ElectionCategory, ElectionId, ElectionRole, ElectionWithPoliticalGroups,
+            VoteCountingMethod, tests::election_fixture,
         },
         models::{ModelNa31_2Input, PdfFileModel, PdfModel, ToPdfFileModel, filter_input},
         polling_station::{PollingStation, PollingStationId, PollingStationType},
@@ -64,6 +64,7 @@ pub(crate) mod tests {
         let election = ElectionWithPoliticalGroups {
             id: ElectionId::from(1),
             name: "Municipal Election".to_string(),
+            role: ElectionRole::GSB,
             counting_method: VoteCountingMethod::CSO,
             election_id: "MunicipalElection_2025".to_string(),
             location: "Heemdamseburg".to_string(),

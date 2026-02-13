@@ -17,8 +17,9 @@ use crate::{
     api::middleware::authentication::error::AuthenticationError,
     domain::{committee_session::CommitteeSessionError, validation::DataError},
     eml::EMLImportError,
-    infra::{pdf_gen::PdfGenError, zip::ZipResponseError},
+    infra::pdf_gen::PdfGenError,
 };
+use pdf_gen::zip::ZipResponseError;
 
 /// Error reference used to show the corresponding error message to the end-user
 #[derive(Serialize, Deserialize, Clone, Copy, ToSchema, PartialEq, Eq, Debug)]

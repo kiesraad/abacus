@@ -8,6 +8,8 @@ use sqlx::SqlitePool;
 use tracing::error;
 use utoipa_axum::{router::OpenApiRouter, routes};
 
+use pdf_gen::zip::ZipResponse;
+
 use crate::{
     APIError, AppState, ErrorResponse,
     api::middleware::authentication::AdminOrCoordinator,
@@ -19,10 +21,7 @@ use crate::{
         votes_table::CandidatesTables,
     },
     error::ErrorReference,
-    infra::{
-        pdf_gen::{generate_pdf, generate_pdfs},
-        zip::ZipResponse,
-    },
+    infra::pdf_gen::{generate_pdf, generate_pdfs},
     repository::{committee_session_repo, election_repo, polling_station_repo},
 };
 

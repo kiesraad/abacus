@@ -136,10 +136,11 @@ impl From<String> for PollingStationType {
 }
 
 #[cfg(test)]
-pub(crate) mod tests {
+pub(crate) mod test_helpers {
     use super::*;
     use crate::domain::{
-        committee_session::committee_session_fixture, election::tests::election_fixture,
+        committee_session::committee_session_fixture,
+        election::{ElectionWithPoliticalGroups, tests::election_fixture},
     };
 
     /// Create a test polling station.
@@ -160,5 +161,32 @@ pub(crate) mod tests {
             postal_code: "1234 QY".to_string(),
             locality: "Testdorp".to_string(),
         }
+    }
+
+    /// Fixture for a vector of polling stations. The number of polling stations returned depends
+    /// on the length of the `polling_station_voter_count` slice parameter.
+    pub fn polling_stations_fixture(
+        election: &ElectionWithPoliticalGroups,
+        committee_session_id: CommitteeSessionId,
+        polling_station_voter_count: &[u32],
+    ) -> Vec<PollingStation> {
+        let mut polling_stations = Vec::new();
+        for (i, voter_count) in polling_station_voter_count.iter().enumerate() {
+            let idx = i + 1;
+            polling_stations.push(PollingStation {
+                id: PollingStationId::from(u32::try_from(idx).unwrap()),
+                election_id: election.id,
+                committee_session_id,
+                id_prev_session: None,
+                name: format!("Testplek {idx}"),
+                number: u32::try_from(idx).unwrap() + 30,
+                number_of_voters: Some(*voter_count),
+                polling_station_type: Some(PollingStationType::Special),
+                address: "Teststraat 2a".to_string(),
+                postal_code: "1234 QY".to_string(),
+                locality: "Testdorp".to_string(),
+            });
+        }
+        polling_stations
     }
 }

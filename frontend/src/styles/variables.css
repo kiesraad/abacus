@@ -106,7 +106,7 @@
   --red-100: #fbe9ed;
   --red-50: #fef9fa;
 
-  --purple-700: #b02d45;
+  --purple-700: #9f1ab1;
 
   --base-black: #000000;
   --base-blue: var(--blue-900);
@@ -223,6 +223,4 @@
   --progress-bar-definitive: var(--color-success);
   --progress-bar-not-started: var(--gray-300);
   --progress-bar-not-started-border: var(--gray-300);
-
-  --status-not-started: #9f1ab1;
 }

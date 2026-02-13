@@ -107,6 +107,7 @@ export const test = base.extend<Fixtures>({
     const candidate_data = await readFile(eml230b.path, "utf8");
     const electionResponse = await request.post(url, {
       data: {
+        role: "GSB",
         election_data,
         election_hash: eml110a.fullHash,
         candidate_data,

@@ -48,6 +48,7 @@ export function UploadPollingStationDefinition() {
       setFile(currentFile);
       const data = await currentFile.text();
       const response = await create({
+        role: "GSB",
         election_hash: state.electionDefinitionHash,
         election_data: state.electionDefinitionData,
         candidate_hash: state.candidateDefinitionHash,

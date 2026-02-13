@@ -201,8 +201,14 @@ pub async fn election_number_of_voters_change(
 }
 
 #[derive(Debug, Deserialize, Serialize, Clone, ToSchema)]
+#[serde(tag = "role")]
+pub enum ElectionCreationValidateRequest {
+    GSB(GSBElectionCreationValidateRequest),
+}
+
+#[derive(Debug, Deserialize, Serialize, Clone, ToSchema)]
 #[serde(deny_unknown_fields)]
-pub struct ElectionAndCandidateDefinitionValidateRequest {
+pub struct GSBElectionCreationValidateRequest {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[schema(value_type = Option<Vec<String>>, nullable = false)]
     election_hash: Option<[String; crate::eml::hash::CHUNK_COUNT]>,
@@ -253,7 +259,7 @@ pub struct ElectionDefinitionValidateResponse {
 #[utoipa::path(
     post,
     path = "/api/elections/import/validate",
-    request_body = ElectionAndCandidateDefinitionValidateRequest,
+    request_body = ElectionCreationValidateRequest,
     responses(
         (status = 200, description = "Election validated", body = ElectionDefinitionValidateResponse),
         (status = 400, description = "Bad request", body = ErrorResponse),
@@ -265,70 +271,82 @@ pub struct ElectionDefinitionValidateResponse {
 )]
 pub async fn election_import_validate(
     _user: Admin,
-    Json(edu): Json<ElectionAndCandidateDefinitionValidateRequest>,
+    Json(request): Json<ElectionCreationValidateRequest>,
 ) -> Result<Json<ElectionDefinitionValidateResponse>, APIError> {
-    // parse and validate election
-    if let Some(user_hash) = edu.election_hash
-        && user_hash != EmlHash::from(edu.election_data.as_bytes()).chunks
-    {
-        return Err(APIError::InvalidHashError);
-    }
-    let mut hash = RedactedEmlHash::from(edu.election_data.as_bytes());
-    let mut election = EML110::from_str(&edu.election_data)?.as_abacus_election()?;
+    match request {
+        ElectionCreationValidateRequest::GSB(edu) => {
+            // parse and validate election
+            if let Some(user_hash) = edu.election_hash
+                && user_hash != EmlHash::from(edu.election_data.as_bytes()).chunks
+            {
+                return Err(APIError::InvalidHashError);
+            }
+            let mut hash = RedactedEmlHash::from(edu.election_data.as_bytes());
+            let mut election = EML110::from_str(&edu.election_data)?.as_abacus_election()?;
 
-    // parse and validate candidates, if available
-    if let Some(data) = edu.candidate_data.clone() {
-        if let Some(user_hash) = edu.candidate_hash
-            && user_hash != EmlHash::from(data.as_bytes()).chunks
-        {
-            return Err(APIError::InvalidHashError);
+            // parse and validate candidates, if available
+            if let Some(data) = edu.candidate_data.clone() {
+                if let Some(user_hash) = edu.candidate_hash
+                    && user_hash != EmlHash::from(data.as_bytes()).chunks
+                {
+                    return Err(APIError::InvalidHashError);
+                }
+
+                hash = RedactedEmlHash::from(data.as_bytes());
+                election = EML230::from_str(&data)?.add_candidate_lists(election)?;
+            }
+
+            // update counting method if available
+            if let Some(cm) = edu.counting_method {
+                election.counting_method = cm;
+            }
+
+            // parse and validate polling stations, and update number of voters
+            let polling_stations;
+            let mut polling_station_definition_matches_election = None;
+            let mut number_of_voters = 0;
+            if let Some(data) = edu.polling_station_data {
+                // If polling stations are submitted, file name must be also
+                if edu.polling_station_file_name.is_none() {
+                    return Err(APIError::EmlImportError(EMLImportError::MissingFileName));
+                }
+
+                let eml110b = EML110::from_str(&data)?;
+                polling_stations = Some(eml110b.get_polling_stations()?);
+                number_of_voters = eml110b.get_number_of_voters().unwrap_or_default();
+                polling_station_definition_matches_election = Some(
+                    EML110::from_str(&data)?
+                        .polling_station_definition_matches_election(&election)?,
+                );
+            } else {
+                polling_stations = None;
+            }
+
+            // override number of voters if provided
+            if let Some(nov) = edu.number_of_voters {
+                number_of_voters = nov;
+            }
+
+            Ok(Json(ElectionDefinitionValidateResponse {
+                hash,
+                election,
+                polling_stations,
+                number_of_voters,
+                polling_station_definition_matches_election,
+            }))
         }
-
-        hash = RedactedEmlHash::from(data.as_bytes());
-        election = EML230::from_str(&data)?.add_candidate_lists(election)?;
     }
+}
 
-    // update counting method if available
-    if let Some(cm) = edu.counting_method {
-        election.counting_method = cm;
-    }
-
-    // parse and validate polling stations, and update number of voters
-    let polling_stations;
-    let mut polling_station_definition_matches_election = None;
-    let mut number_of_voters = 0;
-    if let Some(data) = edu.polling_station_data {
-        // If polling stations are submitted, file name must be also
-        if edu.polling_station_file_name.is_none() {
-            return Err(APIError::EmlImportError(EMLImportError::MissingFileName));
-        }
-
-        let eml110b = EML110::from_str(&data)?;
-        polling_stations = Some(eml110b.get_polling_stations()?);
-        number_of_voters = eml110b.get_number_of_voters().unwrap_or_default();
-        polling_station_definition_matches_election =
-            Some(EML110::from_str(&data)?.polling_station_definition_matches_election(&election)?);
-    } else {
-        polling_stations = None;
-    }
-
-    // override number of voters if provided
-    if let Some(nov) = edu.number_of_voters {
-        number_of_voters = nov;
-    }
-
-    Ok(Json(ElectionDefinitionValidateResponse {
-        hash,
-        election,
-        polling_stations,
-        number_of_voters,
-        polling_station_definition_matches_election,
-    }))
+#[derive(Debug, Deserialize, Serialize, Clone, ToSchema)]
+#[serde(tag = "role")]
+pub enum ElectionCreationRequest {
+    GSB(GSBElectionCreationRequest),
 }
 
 #[derive(Debug, Deserialize, Serialize, Clone, ToSchema)]
 #[serde(deny_unknown_fields)]
-pub struct ElectionAndCandidatesDefinitionImportRequest {
+pub struct GSBElectionCreationRequest {
     election_hash: [String; crate::eml::hash::CHUNK_COUNT],
     election_data: String,
     candidate_hash: [String; crate::eml::hash::CHUNK_COUNT],
@@ -370,7 +388,7 @@ async fn create_election(
 #[utoipa::path(
     post,
     path = "/api/elections/import",
-    request_body = ElectionAndCandidatesDefinitionImportRequest,
+    request_body = ElectionCreationRequest,
     responses(
         (status = 201, description = "Election imported", body = ElectionWithPoliticalGroups),
         (status = 400, description = "Bad request", body = ErrorResponse),
@@ -384,78 +402,83 @@ pub async fn election_import(
     _user: Admin,
     State(pool): State<SqlitePool>,
     audit_service: AuditService,
-    Json(edu): Json<ElectionAndCandidatesDefinitionImportRequest>,
+    Json(request): Json<ElectionCreationRequest>,
 ) -> Result<(StatusCode, Json<ElectionWithPoliticalGroups>), APIError> {
-    let election_data_hash = EmlHash::from(edu.election_data.as_bytes()).chunks;
-    if edu.election_hash != election_data_hash {
-        return Err(APIError::InvalidHashError);
-    }
-    let candidate_data_hash = EmlHash::from(edu.candidate_data.as_bytes()).chunks;
-    if edu.candidate_hash != candidate_data_hash {
-        return Err(APIError::InvalidHashError);
-    }
+    match request {
+        ElectionCreationRequest::GSB(edu) => {
+            let election_data_hash = EmlHash::from(edu.election_data.as_bytes()).chunks;
+            if edu.election_hash != election_data_hash {
+                return Err(APIError::InvalidHashError);
+            }
+            let candidate_data_hash = EmlHash::from(edu.candidate_data.as_bytes()).chunks;
+            if edu.candidate_hash != candidate_data_hash {
+                return Err(APIError::InvalidHashError);
+            }
 
-    let mut new_election = EML110::from_str(&edu.election_data)?.as_abacus_election()?;
-    new_election = EML230::from_str(&edu.candidate_data)?.add_candidate_lists(new_election)?;
+            let mut new_election = EML110::from_str(&edu.election_data)?.as_abacus_election()?;
+            new_election =
+                EML230::from_str(&edu.candidate_data)?.add_candidate_lists(new_election)?;
 
-    // Validate polling stations
-    if let Some(polling_station_data) = edu.polling_station_data.as_ref() {
-        // If polling stations are submitted, file name must be also
-        if edu.polling_station_file_name.is_none() {
-            return Err(APIError::EmlImportError(EMLImportError::MissingFileName));
+            // Validate polling stations
+            if let Some(polling_station_data) = edu.polling_station_data.as_ref() {
+                // If polling stations are submitted, file name must be also
+                if edu.polling_station_file_name.is_none() {
+                    return Err(APIError::EmlImportError(EMLImportError::MissingFileName));
+                }
+                EML110::from_str(polling_station_data)?.get_polling_stations()?;
+            }
+
+            // Set counting method
+            // Note: not used yet in the frontend, only CSO is implemented for now
+            new_election.counting_method = edu.counting_method;
+
+            // Set number of voters based on input
+            new_election.number_of_voters = edu.number_of_voters;
+
+            // Create new election
+            let mut tx = pool.begin_immediate().await?;
+            let election = create_election(
+                &mut tx,
+                &audit_service,
+                new_election,
+                election_data_hash,
+                candidate_data_hash,
+            )
+            .await?;
+
+            // Create first committee session for the election
+            create_committee_session(
+                &mut tx,
+                &audit_service,
+                CommitteeSessionCreateRequest {
+                    number: 1,
+                    election_id: election.id,
+                },
+            )
+            .await?;
+
+            // Create polling stations
+            if let Some(polling_station_data) = edu.polling_station_data {
+                let polling_stations_request = PollingStationsRequest {
+                    file_name: edu
+                        .polling_station_file_name
+                        .ok_or(EMLImportError::MissingFileName)?,
+                    polling_stations: polling_station_data,
+                };
+                create_imported_polling_stations(
+                    &mut tx,
+                    audit_service,
+                    election.id,
+                    polling_stations_request,
+                )
+                .await?;
+            }
+
+            tx.commit().await?;
+
+            Ok((StatusCode::CREATED, Json(election)))
         }
-        EML110::from_str(polling_station_data)?.get_polling_stations()?;
     }
-
-    // Set counting method
-    // Note: not used yet in the frontend, only CSO is implemented for now
-    new_election.counting_method = edu.counting_method;
-
-    // Set number of voters based on input
-    new_election.number_of_voters = edu.number_of_voters;
-
-    // Create new election
-    let mut tx = pool.begin_immediate().await?;
-    let election = create_election(
-        &mut tx,
-        &audit_service,
-        new_election,
-        election_data_hash,
-        candidate_data_hash,
-    )
-    .await?;
-
-    // Create first committee session for the election
-    create_committee_session(
-        &mut tx,
-        &audit_service,
-        CommitteeSessionCreateRequest {
-            number: 1,
-            election_id: election.id,
-        },
-    )
-    .await?;
-
-    // Create polling stations
-    if let Some(polling_station_data) = edu.polling_station_data {
-        let polling_stations_request = PollingStationsRequest {
-            file_name: edu
-                .polling_station_file_name
-                .ok_or(EMLImportError::MissingFileName)?,
-            polling_stations: polling_station_data,
-        };
-        create_imported_polling_stations(
-            &mut tx,
-            audit_service,
-            election.id,
-            polling_stations_request,
-        )
-        .await?;
-    }
-
-    tx.commit().await?;
-
-    Ok((StatusCode::CREATED, Json(election)))
 }
 
 impl From<DeError> for APIError {

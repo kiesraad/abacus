@@ -113,6 +113,8 @@
   --base-accent: #4a75ba;
   --base-white: #ffffff;
 
+  --accent-orange: #ef8050;
+
   --interactive-default: #155eef;
   --interactive-hover: #004eeb;
   --interactive-active: #0040c1;
@@ -185,8 +187,6 @@
   --bg-gray-darker: var(--gray-100);
   --bg-gray-darkest: var(--gray-300);
   --bg-highlight: #eff4ff;
-
-  --accent-orange: #ef8050;
 
   --menu-empty: var(--gray-500);
   --menu-unsaved: var(--color-notify);

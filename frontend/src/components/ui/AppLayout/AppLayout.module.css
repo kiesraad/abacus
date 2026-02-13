@@ -22,7 +22,7 @@
         line-height: 1.75rem;
         align-items: center;
         a:visited {
-          color: var(--link-default);
+          color: var(--interactive-default);
         }
       }
     }
@@ -82,11 +82,11 @@
       text-decoration: underline;
 
       &:hover {
-        color: var(--link-hover);
+        color: var(--interactive-hover);
       }
 
       &:active {
-        color: var(--link-active);
+        color: var(--interactive-active);
       }
     }
   }

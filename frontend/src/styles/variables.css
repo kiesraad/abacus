@@ -188,11 +188,6 @@
 
   --accent-orange: #ef8050;
 
-  --link-default: var(--interactive-default);
-  --link-hover: #004eeb;
-  --link-active: #0040c1;
-  --link-visited: #6927da;
-
   --menu-empty: var(--gray-500);
   --menu-unsaved: var(--color-notify);
   --menu-active: var(--text-color-header);
@@ -200,22 +195,23 @@
   --menu-warning: var(--color-warning);
   --menu-error: var(--color-error-darker);
 
-  --badge-polling-station: var(--base-white);
-  --badge-polling-station-bg: #4a75ba;
-  --badge-first-entry: #93370d;
-  --badge-first-entry-bg: #fef0c7;
-  --badge-second-entry: #095c37;
-  --badge-second-entry-bg: #d3f8df;
-  --badge-extra-entry: var(--badge-second-entry);
-  --badge-extra-entry-bg: var(--badge-second-entry-bg);
+  --badge-first-entry: var(--green-700);
+  --badge-first-entry-border: var(--green-200);
+  --badge-first-entry-bg: var(--green-100);
+  --badge-second-entry: var(--orange-700);
+  --badge-second-entry-border: var(--orange-200);
+  --badge-second-entry-bg: var(--orange-100);
   --badge-correction: #065986;
-  --badge-correction-bg: var(--color-notify-bg);
+  --badge-correction-border: #b9e6fe;
+  --badge-correction-bg: #e0fef2;
   --badge-objections: #4a1fb8;
+  --badge-objections-border: #d9d6fe;
   --badge-objections-bg: #ebe9fe;
   --badge-difference: var(--base-white);
   --badge-difference-bg: var(--red-600);
-  --badge-typist-busy: var(--link-active);
-  --badge-typist-busy-bg: var(--shadow-color-focus);
+  --badge-typist-busy: var(--blue-700);
+  --badge-typist-busy-border: var(--blue-200);
+  --badge-typist-busy-bg: var(--blue-100);
   --badge-definitive: var(--base-white);
   --badge-definitive-bg: var(--base-blue);
 

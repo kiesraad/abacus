@@ -76,7 +76,7 @@
 
   &.link-default {
     svg {
-      fill: var(--link-default);
+      fill: var(--interactive-default);
     }
   }
 

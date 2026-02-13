@@ -23,7 +23,7 @@
   }
 
   a {
-    color: var(--link-default);
+    color: var(--interactive-default);
     text-decoration: none;
 
     /* Align the icon in a link */

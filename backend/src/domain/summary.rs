@@ -302,7 +302,7 @@ mod tests {
         committee_session::committee_session_fixture,
         data_entry::{ExtraInvestigation, YesNo, tests::ValidDefault},
         election::{PGNumber, tests::election_fixture},
-        polling_station::polling_stations_fixture,
+        polling_station::test_helpers::polling_stations_fixture,
     };
 
     fn polling_station_results_fixture_a() -> PollingStationResults {

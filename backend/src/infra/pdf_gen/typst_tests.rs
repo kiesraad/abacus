@@ -9,7 +9,7 @@ use crate::domain::{
         tests::election_fixture,
     },
     models::{ModelNa31_2Input, PdfFileModel, PdfModel, ToPdfFileModel, filter_input},
-    polling_station::polling_stations_fixture,
+    polling_station::test_helpers::polling_stations_fixture,
     summary::ElectionSummary,
     votes_table::VotesTables,
 };

@@ -17,19 +17,13 @@
     box-shadow: 0 0 4px 4px rgba(66, 210, 243, 0.4);
   }
 
-  &:disabled {
-    background: var(--button-color-bg-disabled);
-    border: 1px solid var(--button-color-bg-disabled);
-    color: var(--button-color-disabled);
-  }
-
   &:global(.round) {
     border-radius: 50%;
   }
 
   svg {
     height: 1rem;
-    fill: var(--base-white);
+    fill: var(--base-black);
   }
 
   &.sm {
@@ -46,17 +40,15 @@
     }
   }
 
+  /* Only this variant is used */
   &.tertiary {
-    background: transparent;
+    background: var(--button-color-tertiary);
     border: none;
     box-shadow: none;
-    svg {
-      fill: var(--button-icon-tertiary-color-svg);
-    }
+
     &:focus,
     &:focus-visible {
-      border: 2px solid var(--button-icon-tertiary-color-border-focus);
-      background: var(--button-icon-tertiary-color-bg-focus);
+      border: 2px solid var(--button-color-focus-border);
       padding: calc(0.5rem - 2px);
     }
     &:hover {
@@ -73,23 +65,20 @@
   }
 
   &.secondary {
-    svg {
-      fill: black;
-    }
     border: 1px solid var(--bg-gray-darkest);
-    background: white;
-    /* Shadow/xs */
+    background: var(--button-color-secondary);
 
     &:focus,
     &:focus-visible {
       outline: none;
       box-shadow: 0 0 4px 4px rgba(66, 210, 243, 0.4);
     }
+  }
 
-    &:disabled {
-      background: var(--button-color-bg-disabled);
-      border: 1px solid var(--button-color-bg-disabled);
-      color: var(--button-color-disabled);
-    }
+  &:disabled,
+  &.disabled {
+    background: var(--button-color-bg-disabled);
+    border: 1px solid var(--button-color-bg-disabled);
+    color: var(--button-color-disabled);
   }
 }

@@ -39,7 +39,7 @@ export function InvestigationDelete({ pollingStation, onDeleted }: Investigation
 
   return (
     <div className="mt-md">
-      <Button variant="tertiary-destructive" leftIcon={<IconTrash />} onClick={toggleModal}>
+      <Button variant="tertiary" leftIcon={<IconTrash />} onClick={toggleModal}>
         {t("investigations.delete_investigation")}
       </Button>
 

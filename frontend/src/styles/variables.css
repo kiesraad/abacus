@@ -39,7 +39,19 @@
   --rounded-default: 0.5rem;
 
   /* COLORS */
-  --blue-900: #1b3764;
+  --gray-900: #101828;
+  --gray-800: #1d2939;
+  --gray-700: #344054;
+  --gray-600: #475467;
+  --gray-500: #667085;
+  --gray-400: #8792a6;
+  --gray-300: #d0d5dd;
+  --gray-200: #eaecf0;
+  --gray-100: #f2f4f7;
+  --gray-50: #f9fafb;
+  --gray-25: #fcfcfd;
+
+  --blue-900: #00305b;
   --blue-800: #254b89;
   --blue-700: #2e5eaa;
   --blue-600: #366fca;
@@ -48,7 +60,7 @@
   --blue-300: #a4bee8;
   --blue-200: #c5d6f1;
   --blue-100: #e7eef9;
-  --blue-50: #eff8ff;
+  --blue-50: #f8fafd;
 
   --green-900: #113b26;
   --green-800: #195738;
@@ -94,32 +106,41 @@
   --red-100: #fbe9ed;
   --red-50: #fef9fa;
 
-  --gray-900: #101828;
-  --gray-800: #1d2939;
-  --gray-700: #344054;
-  --gray-600: #475467;
-  --gray-500: #667085;
-  --gray-450: #8a95a8;
-  --gray-400: #98a2b3;
-  --gray-300: #d0d5dd;
-  --gray-200: #eaecf0;
-  --gray-100: #f2f4f7;
-  --gray-50: #f9fafb;
-  --gray-25: #fcfcfd;
+  --purple-700: #b02d45;
+
+  --base-black: #000000;
+  --base-blue: var(--blue-900);
+  --base-accent: #4a75ba;
+  --base-white: #ffffff;
+
+  --interactive-default: #155eef;
+  --interactive-hover: #004eeb;
+  --interactive-active: #0040c1;
+  --interactive-visited: #6927da;
 
   --text-color-header: var(--gray-900);
-  --text-color-body: var(--gray-700);
+  --text-color-body: var(--gray-600);
 
-  --button-color-primary: var(--base-dark-blue);
-  --button-color-primary-hover: #00447a;
-  --button-color-primary-focus: var(--base-dark-blue);
-  --button-color-primary-active: #00254e;
+  --button-color-primary: var(--blue-900);
+  --button-color-primary-hover: var(--blue-800);
+  --button-color-primary-focus: var(--blue-900);
+  --button-color-primary-active: var(--base-black);
+  --button-color-primary-active-border: #00254e;
   --button-color-secondary: var(--base-white);
-  --button-color-secondary-hover: var(--bg-gray);
-  --button-color-secondary-focus: var(--base-white);
-  --button-color-secondary-active: var(--color-hover);
+  --button-color-secondary-border: var(--gray-300);
+  --button-color-secondary-hover: var(--gray-50);
+  --button-color-secondary-active: var(--gray-200);
+  --button-color-tertiary: transparent;
+  --button-color-tertiary-text: var(--red-700);
+  --button-color-tertiary-hover: var(--red-50);
+  --button-color-tertiary-active: var(--red-100);
+  --button-color-focus: var(--base-white);
+  --button-color-focus-border: var(--interactive-default);
+  --button-color-focus-shadow: var(--blue-100);
   --button-color-disabled: #b3b3b3;
   --button-color-bg-disabled: #f2f2f2;
+
+  --button-icon-tertiary-color-bg-hover: var(--gray-100);
 
   --checkbox-radio-color-border: var(--gray-400);
   --checkbox-radio-color-bg-default: var(--base-white);
@@ -133,12 +154,6 @@
   --checkbox-radio-color-bg-disabled-checked: var(--checkbox-radio-color-border);
   --checkbox-radio-size: 1.25rem;
   --checkbox-radio-svg-size: 0.875rem;
-
-  --button-icon-modal-close-color-svg: var(--menu-empty);
-  --button-icon-tertiary-color-svg: var(--base-black);
-  --button-icon-tertiary-color-border-focus: var(--checkbox-radio-color-border);
-  --button-icon-tertiary-color-bg-focus: var(--bg-gray-darker);
-  --button-icon-tertiary-color-bg-hover: var(--bg-gray-darker);
 
   --shadow-color-focus: #d1e0ff;
   --border-color-default: var(--bg-gray-darkest);
@@ -171,14 +186,7 @@
   --bg-gray-darkest: var(--gray-300);
   --bg-highlight: #eff4ff;
 
-  --base-black: #000000;
-  --base-brand-blue: #113051;
-  --base-dark-blue: #00305b;
-  --base-white: #ffffff;
-
   --accent-orange: #ef8050;
-
-  --interactive-default: #155eef;
 
   --link-default: var(--interactive-default);
   --link-hover: #004eeb;
@@ -209,7 +217,7 @@
   --badge-typist-busy: var(--link-active);
   --badge-typist-busy-bg: var(--shadow-color-focus);
   --badge-definitive: var(--base-white);
-  --badge-definitive-bg: var(--base-dark-blue);
+  --badge-definitive-bg: var(--base-blue);
 
   --progress-bar-default: var(--blue-600);
   --progress-bar-errors-and-warnings: var(--color-error-darker);
@@ -217,8 +225,8 @@
   --progress-bar-in-progress: var(--yellow-300);
   --progress-bar-first-entry-finished: #66c61c;
   --progress-bar-definitive: var(--color-success);
-  --progress-bar-not-started: var(--gray-200);
-  --progress-bar-not-started-border: var(--gray-450);
+  --progress-bar-not-started: var(--gray-300);
+  --progress-bar-not-started-border: var(--gray-300);
 
   --status-not-started: #9f1ab1;
 }

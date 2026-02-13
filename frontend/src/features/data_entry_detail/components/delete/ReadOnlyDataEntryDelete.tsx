@@ -42,7 +42,7 @@ export function ReadOnlyDataEntryDelete({ pollingStation, status, onDeleted, onE
 
   return (
     <div>
-      <Button variant="tertiary-destructive" leftIcon={<IconTrash />} onClick={toggleModal}>
+      <Button variant="tertiary" leftIcon={<IconTrash />} onClick={toggleModal}>
         {t("data_entry_detail.delete")}
       </Button>
 

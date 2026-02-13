@@ -83,15 +83,14 @@ test.describe("full flow", () => {
     });
     expect(response.status()).toBe(201);
 
-    const username2 = `admin-${browserName}`;
-    const loginResponse = await loginAs(request, username2, "Temp");
+    const loginResponse = await loginAs(request, username, "Temp");
     expect(loginResponse.status()).toBe(200);
 
     const response2 = await request.put("/api/account", {
       data: {
-        username: username2,
+        username: username,
         fullname: "John Doe",
-        password: getTestPassword(username2),
+        password: getTestPassword(username),
       },
     });
 
@@ -117,14 +116,14 @@ test.describe("full flow", () => {
     await userCreateRolePgObj.coordinator.click();
     await userCreateRolePgObj.continue.click();
 
-    const usernameFull = `coordinator-${browserName}`;
+    const coordinatorUsername = `coordinator-${browserName}`;
     const userCreateDetailsPgObj = new UserCreateDetailsPgObj(page);
-    await userCreateDetailsPgObj.username.fill(usernameFull);
-    await userCreateDetailsPgObj.fullname.fill(`Coordinator ${usernameFull}`);
-    await userCreateDetailsPgObj.password.fill(getTestPassword(usernameFull, "Temp"));
+    await userCreateDetailsPgObj.username.fill(coordinatorUsername);
+    await userCreateDetailsPgObj.fullname.fill(`Coordinator ${coordinatorUsername}`);
+    await userCreateDetailsPgObj.password.fill(getTestPassword(coordinatorUsername, "Temp"));
     await userCreateDetailsPgObj.save.click();
 
-    await expect(userListPgObj.alert).toContainText(`${usernameFull} is toegevoegd met de rol Coördinator`);
+    await expect(userListPgObj.alert).toContainText(`${coordinatorUsername} is toegevoegd met de rol Coördinator`);
   });
 
   test(`complete account for coordinator`, async ({ page, browserName }) => {
@@ -167,14 +166,14 @@ test.describe("full flow", () => {
       const userCreateTypePgObj = new UserCreateTypePgObj(page);
       await userCreateTypePgObj.continue.click();
 
-      const usernameFull = `${username}-${browserName}`;
+      const typistUsername = `${username}-${browserName}`;
       const userCreateDetailsPgObj = new UserCreateDetailsPgObj(page);
-      await userCreateDetailsPgObj.username.fill(usernameFull);
-      await userCreateDetailsPgObj.fullname.fill(`Typist ${usernameFull}`);
-      await userCreateDetailsPgObj.password.fill(usernameFull.repeat(3));
+      await userCreateDetailsPgObj.username.fill(typistUsername);
+      await userCreateDetailsPgObj.fullname.fill(`Typist ${typistUsername}`);
+      await userCreateDetailsPgObj.password.fill(typistUsername.repeat(3));
       await userCreateDetailsPgObj.save.click();
 
-      await expect(userListPgObj.alert).toContainText(`${usernameFull} is toegevoegd met de rol Invoerder`);
+      await expect(userListPgObj.alert).toContainText(`${typistUsername} is toegevoegd met de rol Invoerder`);
     }
   });
 

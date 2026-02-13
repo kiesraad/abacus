@@ -7,10 +7,9 @@ use utoipa_axum::{router::OpenApiRouter, routes};
 
 use crate::{
     APIError, AppState, ErrorResponse,
-    infra::{
-        audit_log::{AuditLogEvent, LogFilter},
-        authentication::{AdminOrCoordinator, Role},
-    },
+    api::middleware::authentication::AdminOrCoordinator,
+    domain::role::Role,
+    infra::audit_log::{AuditLogEvent, LogFilter},
 };
 
 pub fn router() -> OpenApiRouter<AppState> {
@@ -153,15 +152,18 @@ mod tests {
 
     use crate::{
         AppState,
-        api::audit::{audit_log_list, audit_log_list_users},
-        infra::{
-            airgap::AirgapDetection,
-            audit_log::{
-                AuditEvent, AuditLogListResponse, AuditLogUser, AuditService, UserLoggedInDetails,
-            },
-            authentication::{User, inject_user},
+        api::{
+            audit::{audit_log_list, audit_log_list_users},
+            middleware::{airgap::AirgapDetection, authentication::inject_user},
         },
-        repository::user_repo::{self, UserId},
+        infra::audit_log::{
+            AuditEvent, AuditLogListResponse, AuditLogUser, AuditService, UserLoggedInDetails,
+        },
+        repository::{
+            session_repo,
+            session_repo::Session,
+            user_repo::{self, User, UserId},
+        },
     };
 
     const TEST_USER_AGENT: &str = "TestAgent/1.0";
@@ -195,15 +197,13 @@ mod tests {
         };
 
         let mut conn = pool.acquire().await.unwrap();
-        let session = crate::infra::authentication::session::create(
-            &mut conn,
+        let session = Session::create(
             UserId::from(1),
             TEST_USER_AGENT,
             TEST_IP_ADDRESS,
             TimeDelta::seconds(60 * 30),
-        )
-        .await
-        .unwrap();
+        );
+        session_repo::save(&mut conn, &session).await.unwrap();
 
         let app = Router::new()
             .route("/api/log", get(audit_log_list))
@@ -265,15 +265,13 @@ mod tests {
         };
 
         let mut conn = pool.acquire().await.unwrap();
-        let session = crate::infra::authentication::session::create(
-            &mut conn,
+        let session = Session::create(
             UserId::from(1),
             TEST_USER_AGENT,
             TEST_IP_ADDRESS,
             TimeDelta::seconds(60 * 30),
-        )
-        .await
-        .unwrap();
+        );
+        session_repo::save(&mut conn, &session).await.unwrap();
 
         let app = Router::new()
             .route("/api/log-users", get(audit_log_list_users))

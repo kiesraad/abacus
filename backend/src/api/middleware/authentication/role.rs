@@ -1,36 +1,11 @@
 use axum::{
-    extract::{FromRef, FromRequestParts},
+    extract::{FromRef, FromRequestParts, OptionalFromRequestParts},
     http::request::Parts,
 };
-use serde::{Deserialize, Serialize};
-use sqlx::{SqlitePool, Type};
-use utoipa::ToSchema;
+use sqlx::SqlitePool;
 
 use super::error::AuthenticationError;
-use crate::{APIError, repository::user_repo::User};
-
-#[derive(
-    Serialize, Deserialize, strum::Display, Clone, Copy, Debug, PartialEq, Eq, Hash, ToSchema, Type,
-)]
-#[serde(rename_all = "lowercase")]
-#[strum(serialize_all = "lowercase")]
-#[sqlx(rename_all = "snake_case")]
-pub enum Role {
-    Administrator,
-    Typist,
-    Coordinator,
-}
-
-impl From<String> for Role {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "administrator" => Self::Administrator,
-            "typist" => Self::Typist,
-            "coordinator" => Self::Coordinator,
-            _ => unreachable!(),
-        }
-    }
-}
+use crate::{APIError, domain::role::Role, repository::user_repo::User};
 
 /// A user with the admin role
 #[allow(unused)]
@@ -161,5 +136,61 @@ where
         let user = <User as FromRequestParts<S>>::from_request_parts(parts, state).await?;
 
         AdminOrCoordinator::try_from(user).map_err(|_| AuthenticationError::Forbidden.into())
+    }
+}
+
+/// Implement the FromRequestParts trait for IncompleteUser,
+/// for endpoints that are needed to fully set up the account
+impl<S> FromRequestParts<S> for IncompleteUser
+where
+    S: Send + Sync,
+{
+    type Rejection = APIError;
+
+    async fn from_request_parts(parts: &mut Parts, _state: &S) -> Result<Self, Self::Rejection> {
+        let Some(user) = parts.extensions.get::<User>() else {
+            return Err(AuthenticationError::Unauthenticated.into());
+        };
+
+        if user.fullname().is_some() && !user.needs_password_change() {
+            return Err(AuthenticationError::UserAlreadySetup.into());
+        }
+
+        Ok(IncompleteUser(user.clone()))
+    }
+}
+
+/// Implement the FromRequestParts trait for User, this allows us to extract a User from a request
+impl<S> FromRequestParts<S> for User
+where
+    S: Send + Sync,
+{
+    type Rejection = APIError;
+
+    async fn from_request_parts(parts: &mut Parts, _state: &S) -> Result<Self, Self::Rejection> {
+        let Some(user) = parts.extensions.get::<User>() else {
+            return Err(AuthenticationError::Unauthenticated.into());
+        };
+
+        if user.fullname().is_none() || user.needs_password_change() {
+            return Err(AuthenticationError::Unauthenticated.into());
+        }
+
+        Ok(user.clone())
+    }
+}
+
+/// Implement the OptionalFromRequestParts trait for User, this allows us to extract an Option<User> from a request
+impl<S> OptionalFromRequestParts<S> for User
+where
+    S: Send + Sync,
+{
+    type Rejection = APIError;
+
+    async fn from_request_parts(
+        parts: &mut Parts,
+        _state: &S,
+    ) -> Result<Option<Self>, Self::Rejection> {
+        Ok(parts.extensions.get::<User>().cloned())
     }
 }

@@ -9,40 +9,25 @@ use utoipa_axum::{router::OpenApiRouter, routes};
 
 use crate::{
     APIError, AppState, ErrorResponse, SqlitePoolExt,
+    api::middleware::authentication::Coordinator,
     domain::{
         committee_session::{
-            CommitteeSession, CommitteeSessionCreateRequest, CommitteeSessionId,
-            CommitteeSessionStatusChangeRequest, CommitteeSessionUpdateRequest,
+            CommitteeSession, CommitteeSessionCreateRequest, CommitteeSessionError,
+            CommitteeSessionId, CommitteeSessionStatusChangeRequest, CommitteeSessionUpdateRequest,
             InvestigationListResponse,
         },
-        committee_session_status::{CommitteeSessionStatus, change_committee_session_status},
+        committee_session_status::CommitteeSessionStatus,
         election::ElectionId,
     },
     error::ErrorReference,
-    infra::{
-        audit_log::{AuditEvent, AuditService},
-        authentication::Coordinator,
-    },
+    infra::audit_log::{AuditEvent, AuditService},
     repository::{
         committee_session_repo::{create, delete, get, get_election_committee_session, update},
         election_repo,
         investigation_repo::list_investigations_for_committee_session,
     },
+    service::change_committee_session_status,
 };
-
-#[derive(Debug, PartialEq, Eq)]
-pub enum CommitteeSessionError {
-    CommitteeSessionPaused,
-    InvalidCommitteeSessionStatus,
-    InvalidDetails,
-    InvalidStatusTransition,
-}
-
-impl From<CommitteeSessionError> for APIError {
-    fn from(err: CommitteeSessionError) -> Self {
-        APIError::CommitteeSession(err)
-    }
-}
 
 pub fn router() -> OpenApiRouter<AppState> {
     OpenApiRouter::default()
@@ -343,37 +328,4 @@ pub async fn committee_session_investigations(
 }
 
 #[cfg(test)]
-pub mod tests {
-    use chrono::NaiveDate;
-    use sqlx::SqlitePool;
-
-    use super::*;
-    use crate::repository::committee_session_repo::change_status;
-
-    pub async fn change_status_committee_session(
-        pool: SqlitePool,
-        committee_session_id: CommitteeSessionId,
-        status: CommitteeSessionStatus,
-    ) -> CommitteeSession {
-        let mut conn = pool.acquire().await.unwrap();
-        change_status(&mut conn, committee_session_id, status)
-            .await
-            .unwrap()
-    }
-
-    /// Create a test committee session.
-    pub fn committee_session_fixture(election_id: ElectionId) -> CommitteeSession {
-        CommitteeSession {
-            id: CommitteeSessionId::from(1),
-            number: 1,
-            election_id,
-            location: "Test location".to_string(),
-            start_date_time: NaiveDate::from_ymd_opt(2025, 10, 22)
-                .and_then(|d| d.and_hms_opt(9, 15, 0)),
-            status: CommitteeSessionStatus::Completed,
-            results_eml: None,
-            results_pdf: None,
-            overview_pdf: None,
-        }
-    }
-}
+pub mod tests {}

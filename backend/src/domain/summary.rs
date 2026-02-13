@@ -299,8 +299,8 @@ mod tests {
 
     use super::*;
     use crate::{
-        api::committee_session::tests::committee_session_fixture,
         domain::{
+            committee_session::committee_session_fixture,
             data_entry::{ExtraInvestigation, YesNo, tests::ValidDefault},
             election::{PGNumber, tests::election_fixture},
         },

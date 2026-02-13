@@ -10,13 +10,13 @@ use utoipa_axum::{router::OpenApiRouter, routes};
 
 use crate::{
     APIError, AppState, ErrorResponse, SqlitePoolExt,
-    infra::{
-        audit_log::{AuditEvent, AuditService},
-        authentication::{
-            AdminOrCoordinator, CreateUserRequest, Role, error::AuthenticationError, session,
-        },
+    api::middleware::authentication::{AdminOrCoordinator, error::AuthenticationError},
+    domain::role::Role,
+    infra::audit_log::{AuditEvent, AuditService},
+    repository::{
+        session_repo,
+        user_repo::{self, User, UserId},
     },
-    repository::user_repo::{self, User, UserId},
 };
 
 pub fn user_router() -> OpenApiRouter<AppState> {
@@ -61,6 +61,17 @@ async fn user_list(
     Ok(Json(UserListResponse {
         users: user_repo::list(&mut conn, only_allow_role).await?,
     }))
+}
+
+#[derive(Serialize, Deserialize, ToSchema)]
+#[serde(deny_unknown_fields)]
+pub struct CreateUserRequest {
+    pub username: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[schema(nullable = false)]
+    pub fullname: Option<String>,
+    pub temp_password: String,
+    pub role: Role,
 }
 
 #[derive(Serialize, Deserialize, ToSchema)]
@@ -199,7 +210,7 @@ pub async fn user_update(
     if let Some(temp_password) = update_user_req.temp_password {
         user_repo::set_temporary_password(&mut tx, user_id, &temp_password).await?;
 
-        session::delete_user_session(&mut tx, user_id).await?;
+        session_repo::delete_user_session(&mut tx, user_id).await?;
     };
 
     let user = user_repo::get_by_id(&mut tx, user_id)

@@ -53,7 +53,7 @@ impl AirgapDetection {
 
     /// Starts the airgap detection in a background task.
     /// It will periodically check for airgap violations by attempting to connect to a known server.
-    pub async fn start(pool: SqlitePool) -> AirgapDetection {
+    pub fn start(pool: SqlitePool) -> AirgapDetection {
         let airgap_detection = AirgapDetection {
             enabled: true,
             pool: Some(pool),
@@ -218,7 +218,8 @@ mod tests {
 
     use super::*;
     use crate::{
-        infra::{airgap::block_request_on_airgap_violation, router, router::openapi_router},
+        api::middleware::airgap::block_request_on_airgap_violation,
+        infra::{router, router::openapi_router},
         shutdown_signal,
     };
 
@@ -273,7 +274,7 @@ mod tests {
 
     #[test(sqlx::test)]
     async fn test_log_status_changes_to_audit_log(pool: SqlitePool) {
-        AirgapDetection::start(pool.clone()).await;
+        AirgapDetection::start(pool.clone());
 
         let mut events = Vec::new();
 
@@ -349,7 +350,7 @@ mod tests {
     }
 
     async fn serve_api_with_airgap_detection(pool: SqlitePool) -> SocketAddr {
-        let airgap_detection = AirgapDetection::start(pool.clone()).await;
+        let airgap_detection = AirgapDetection::start(pool.clone());
         let mut violation_detected = false;
 
         for i in 0..=200 {
@@ -385,7 +386,7 @@ mod tests {
         addr
     }
 
-    #[test(sqlx::test(fixtures(path = "../../../fixtures", scripts("election_2", "users"))))]
+    #[test(sqlx::test(fixtures(path = "../../../../fixtures", scripts("election_2", "users"))))]
     async fn test_airgap_detection(pool: SqlitePool) {
         let openapi = openapi_router().into_openapi();
         let addr = serve_api_with_airgap_detection(pool).await;

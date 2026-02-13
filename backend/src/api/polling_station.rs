@@ -11,10 +11,11 @@ use crate::{
     api::{
         data_entry::delete_data_entry_and_result_for_polling_station,
         investigation::delete_investigation_for_polling_station,
+        middleware::authentication::{AdminOrCoordinator, error::AuthenticationError},
     },
     domain::{
         committee_session::CommitteeSession,
-        committee_session_status::{CommitteeSessionStatus, change_committee_session_status},
+        committee_session_status::CommitteeSessionStatus,
         election::ElectionId,
         polling_station::{
             PollingStation, PollingStationFileRequest, PollingStationId,
@@ -23,15 +24,14 @@ use crate::{
         },
     },
     eml::{EML110, EMLDocument, EMLImportError, EmlHash},
-    infra::{
-        audit_log::{AuditEvent, AuditService, PollingStationImportDetails},
-        authentication::{AdminOrCoordinator, User, error::AuthenticationError},
-    },
+    infra::audit_log::{AuditEvent, AuditService, PollingStationImportDetails},
     repository::{
         committee_session_repo::get_election_committee_session,
         election_repo,
         polling_station_repo::{create, create_many, delete, get_for_election, list, update},
+        user_repo::User,
     },
+    service::change_committee_session_status,
 };
 
 pub fn router() -> OpenApiRouter<AppState> {
@@ -77,7 +77,7 @@ async fn polling_station_list(
     })
 }
 
-pub async fn validate_user_is_allowed_to_perform_action(
+pub fn validate_user_is_allowed_to_perform_action(
     user: AdminOrCoordinator,
     committee_session: &CommitteeSession,
 ) -> Result<(), APIError> {
@@ -125,7 +125,7 @@ async fn polling_station_create(
     election_repo::get(&mut tx, election_id).await?;
     let committee_session = get_election_committee_session(&mut tx, election_id).await?;
 
-    validate_user_is_allowed_to_perform_action(user, &committee_session).await?;
+    validate_user_is_allowed_to_perform_action(user, &committee_session)?;
 
     let polling_station = create(&mut tx, election_id, new_polling_station).await?;
 
@@ -221,7 +221,7 @@ async fn polling_station_update(
     election_repo::get(&mut tx, election_id).await?;
     let committee_session = get_election_committee_session(&mut tx, election_id).await?;
 
-    validate_user_is_allowed_to_perform_action(user, &committee_session).await?;
+    validate_user_is_allowed_to_perform_action(user, &committee_session)?;
 
     let polling_station = update(
         &mut tx,
@@ -284,7 +284,7 @@ async fn polling_station_delete(
     election_repo::get(&mut tx, election_id).await?;
     let committee_session = get_election_committee_session(&mut tx, election_id).await?;
 
-    validate_user_is_allowed_to_perform_action(user, &committee_session).await?;
+    validate_user_is_allowed_to_perform_action(user, &committee_session)?;
 
     let polling_station = get_for_election(&mut tx, election_id, polling_station_id).await?;
 

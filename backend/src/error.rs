@@ -14,12 +14,10 @@ use utoipa::ToSchema;
 
 use crate::{
     MAX_BODY_SIZE_MB,
-    api::committee_session::CommitteeSessionError,
-    domain::validation::DataError,
+    api::middleware::authentication::error::AuthenticationError,
+    domain::{committee_session::CommitteeSessionError, validation::DataError},
     eml::EMLImportError,
-    infra::{
-        authentication::error::AuthenticationError, pdf_gen::PdfGenError, zip::ZipResponseError,
-    },
+    infra::{pdf_gen::PdfGenError, zip::ZipResponseError},
 };
 
 /// Error reference used to show the corresponding error message to the end-user
@@ -403,6 +401,10 @@ impl IntoResponse for APIError {
                             true,
                         ),
                     ),
+                    CommitteeSessionError::ProviderError => (
+                        StatusCode::INTERNAL_SERVER_ERROR,
+                        to_error("Internal server error", ErrorReference::DatabaseError, true),
+                    ),
                 }
             }
             APIError::InvalidResultsType => (
@@ -479,6 +481,12 @@ impl From<InvalidHeaderValue> for APIError {
 impl From<Box<dyn Error>> for APIError {
     fn from(err: Box<dyn Error>) -> Self {
         APIError::StdError(err)
+    }
+}
+
+impl From<CommitteeSessionError> for APIError {
+    fn from(err: CommitteeSessionError) -> Self {
+        APIError::CommitteeSession(err)
     }
 }
 

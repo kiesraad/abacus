@@ -12,10 +12,10 @@ use utoipa_axum::{router::OpenApiRouter, routes};
 
 use crate::{
     APIError, AppState, SqlitePoolExt,
-    api::committee_session::CommitteeSessionError,
+    api::middleware::authentication::{Coordinator, Typist, error::AuthenticationError},
     domain::{
-        committee_session::CommitteeSession,
-        committee_session_status::{CommitteeSessionStatus, change_committee_session_status},
+        committee_session::{CommitteeSession, CommitteeSessionError},
+        committee_session_status::CommitteeSessionStatus,
         data_entry::{
             CSONextSessionResults, CommonPollingStationResults, DataEntryStatusResponse,
             PollingStationDataEntry, PollingStationResults,
@@ -23,6 +23,7 @@ use crate::{
         election::{ElectionId, ElectionWithPoliticalGroups, PoliticalGroup},
         entry_number::EntryNumber,
         polling_station::{PollingStation, PollingStationId},
+        role::Role,
         status::{
             ClientState, CurrentDataEntry, DataEntryStatus, DataEntryStatusName,
             DataEntryTransitionError, EntriesDifferent,
@@ -30,10 +31,7 @@ use crate::{
         validation::{DataError, ValidateRoot, ValidationResults},
     },
     error::{ErrorReference, ErrorResponse},
-    infra::{
-        audit_log::{AuditEvent, AuditService},
-        authentication::{Coordinator, Role, Typist, User, error::AuthenticationError},
-    },
+    infra::audit_log::{AuditEvent, AuditService},
     repository::{
         committee_session_repo, data_entry_repo,
         data_entry_repo::{
@@ -43,8 +41,9 @@ use crate::{
         election_repo,
         investigation_repo::get_polling_station_investigation,
         polling_station_repo,
-        user_repo::UserId,
+        user_repo::{User, UserId},
     },
+    service::change_committee_session_status,
 };
 
 impl From<DataError> for APIError {
@@ -1030,21 +1029,20 @@ async fn election_status(
 mod tests {
     use axum::http::StatusCode;
     use http_body_util::BodyExt;
-    use sqlx::{SqlitePool, query, query_as};
+    use sqlx::SqlitePool;
     use test_log::test;
 
     use super::*;
     use crate::{
-        api::committee_session::tests::change_status_committee_session,
         domain::{
             committee_session::CommitteeSessionId,
-            committee_session_status::CommitteeSessionStatus,
             data_entry::tests::example_polling_station_results,
             validation::{ValidationResult, ValidationResultCode},
         },
-        infra::authentication::Role,
+        infra::audit_log,
         repository::{
-            data_entry_repo::{data_entry_exists, result_exists},
+            committee_session_repo::change_status,
+            data_entry_repo::{data_entry_exists, get_polling_station_data_entries, result_exists},
             investigation_repo::insert_test_investigation,
             polling_station_repo::insert_test_polling_station,
         },
@@ -1284,6 +1282,17 @@ mod tests {
         let DataEntryStatusResponse { status } = serde_json::from_slice(&body).unwrap();
 
         assert_eq!(status, DataEntryStatusName::FirstEntryHasErrors);
+    }
+
+    pub async fn change_status_committee_session(
+        pool: SqlitePool,
+        committee_session_id: CommitteeSessionId,
+        status: CommitteeSessionStatus,
+    ) -> CommitteeSession {
+        let mut conn = pool.acquire().await.unwrap();
+        change_status(&mut conn, committee_session_id, status)
+            .await
+            .unwrap()
     }
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
@@ -1553,32 +1562,14 @@ mod tests {
         let response = claim(pool.clone(), polling_station_id, EntryNumber::FirstEntry).await;
         assert_eq!(response.status(), StatusCode::OK);
 
-        // Check that a new row was created
-        assert!(
-            data_entry_exists(&mut conn, polling_station_id)
-                .await
-                .unwrap()
-        );
+        // Check that one new row was created
+        let entries = get_polling_station_data_entries(&mut conn, polling_station_id)
+            .await
+            .unwrap();
+        assert_eq!(entries.len(), 1);
 
         // Check that the new data entry is linked to the new committee session
-        let data = query_as!(
-            PollingStationDataEntry,
-            r#"
-            SELECT
-                polling_station_id AS "polling_station_id: PollingStationId",
-                committee_session_id AS "committee_session_id: CommitteeSessionId",
-                state AS "state: _",
-                updated_at AS "updated_at: _"
-            FROM polling_station_data_entries
-            WHERE polling_station_id = ?
-            "#,
-            polling_station_id,
-        )
-        .fetch_all(&pool)
-        .await
-        .expect("No data found");
-        assert_eq!(data.len(), 1);
-        assert_eq!(data[0].committee_session_id, CommitteeSessionId::from(6));
+        assert_eq!(entries[0].committee_session_id, CommitteeSessionId::from(6));
     }
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
@@ -1716,15 +1707,15 @@ mod tests {
         finalise_with_errors(pool.clone()).await;
 
         // Check that it has been logged in the audit log
-        let audit_log_row =
-            query!(r#"SELECT event_name, json(event) as "event: serde_json::Value" FROM audit_log ORDER BY id DESC LIMIT 1"#)
-                .fetch_one(&pool)
-                .await
-                .expect("should have audit log row");
-        assert_eq!(audit_log_row.event_name, "DataEntryFinalised");
+        let mut conn = pool.acquire().await.unwrap();
+        let audit_log = audit_log::list_all(&mut conn).await.unwrap();
+        let last_event = audit_log.last().unwrap().event();
 
-        let event: serde_json::Value = serde_json::to_value(&audit_log_row.event).unwrap();
-        assert_eq!(event["data_entry_status"], "first_entry_has_errors");
+        if let AuditEvent::DataEntryFinalised(details) = last_event {
+            assert_eq!(details.data_entry_status, "first_entry_has_errors");
+        } else {
+            panic!("Expected DataEntryFinalised event but got {:?}", last_event);
+        };
     }
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]

@@ -56,8 +56,8 @@ describe("ResolveDifferencesTables", () => {
       ["3", "65", "63", "Fluisterwind, S. (Seraphina)"],
       ["4", "26", "28", "Nachtschaduw, V. (Vesper)"],
       [""],
-      ["12", "4", "—", "Groenhart, T. (Timo)"],
-      ["13", "2", "4", "Veldbloem, N. (Naima)"],
+      ["10", "4", "—", "Rotsbreker, H. (Helga)"],
+      ["11", "2", "4", "Zonnewende, L. (Luna)"],
       [""],
       ["", "1.512", "1.481", "Totaal lijst 1"],
     ]);

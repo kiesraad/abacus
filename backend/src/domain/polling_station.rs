@@ -138,9 +138,8 @@ impl From<String> for PollingStationType {
 #[cfg(test)]
 pub(crate) mod tests {
     use super::*;
-    use crate::{
-        api::committee_session::tests::committee_session_fixture,
-        domain::election::tests::election_fixture,
+    use crate::domain::{
+        committee_session::committee_session_fixture, election::tests::election_fixture,
     };
 
     /// Create a test polling station.

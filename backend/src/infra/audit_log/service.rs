@@ -7,7 +7,7 @@ use axum::{
 use sqlx::{SqliteConnection, SqlitePool};
 
 use super::AuditEvent;
-use crate::{APIError, infra::authentication::User};
+use crate::{APIError, repository::user_repo::User};
 
 #[derive(Clone)]
 pub struct AuditService {
@@ -98,7 +98,7 @@ mod test {
 
         // Verify the event was logged by checking the audit log
         let logged_events = crate::audit_log::list_all(&mut conn).await.unwrap();
-        let event = logged_events.first().unwrap();
+        let event = logged_events.last().unwrap();
 
         assert_eq!(
             event.event(),

@@ -1,4 +1,8 @@
-use axum::{Json, extract::State, http::StatusCode};
+use axum::{
+    Json,
+    extract::{FromRef, FromRequestParts, Path, State},
+    http::{StatusCode, request::Parts},
+};
 use axum_extra::response::Attachment;
 use chrono::Datelike;
 use sqlx::{SqliteConnection, SqlitePool};
@@ -7,18 +11,17 @@ use utoipa_axum::{router::OpenApiRouter, routes};
 use crate::{
     APIError, AppState, ErrorResponse, SqlitePoolExt,
     api::{
-        committee_session::CommitteeSessionError,
         data_entry::delete_data_entry_and_result_for_polling_station,
+        middleware::authentication::Coordinator,
     },
     domain::{
-        committee_session::CommitteeSession,
-        committee_session_status::{CommitteeSessionStatus, change_committee_session_status},
+        committee_session::{CommitteeSession, CommitteeSessionError},
+        committee_session_status::CommitteeSessionStatus,
         data_entry::PollingStationResults,
         election::ElectionWithPoliticalGroups,
         investigation::{
-            CurrentSessionPollingStationId, PollingStationInvestigation,
-            PollingStationInvestigationConcludeRequest, PollingStationInvestigationCreateRequest,
-            PollingStationInvestigationUpdateRequest,
+            PollingStationInvestigation, PollingStationInvestigationConcludeRequest,
+            PollingStationInvestigationCreateRequest, PollingStationInvestigationUpdateRequest,
         },
         models::{ModelNa14_2Bijlage1Input, ToPdfFileModel},
         polling_station::{PollingStation, PollingStationId},
@@ -27,7 +30,6 @@ use crate::{
     error::ErrorReference,
     infra::{
         audit_log::{AuditEvent, AuditService},
-        authentication::Coordinator,
         pdf_gen::generate_pdf,
     },
     repository::{
@@ -41,6 +43,7 @@ use crate::{
         },
         polling_station_repo,
     },
+    service::change_committee_session_status,
 };
 
 pub fn router() -> OpenApiRouter<AppState> {
@@ -103,6 +106,33 @@ pub async fn delete_investigation_for_polling_station(
         }
     }
     Ok(())
+}
+
+pub struct CurrentSessionPollingStationId(pub PollingStationId);
+
+impl<S> FromRequestParts<S> for CurrentSessionPollingStationId
+where
+    SqlitePool: FromRef<S>,
+    S: Send + Sync,
+{
+    type Rejection = APIError;
+
+    async fn from_request_parts(parts: &mut Parts, state: &S) -> Result<Self, Self::Rejection> {
+        let path_extractor = Path::<PollingStationId>::from_request_parts(parts, state).await;
+        let pool = SqlitePool::from_ref(state);
+        let mut conn = pool.acquire().await?;
+
+        if let Ok(Path(id)) = path_extractor
+            && polling_station_repo::get(&mut conn, id).await.is_ok()
+        {
+            return Ok(CurrentSessionPollingStationId(id));
+        }
+
+        Err(APIError::NotFound(
+            "Polling station not found for the current committee session".to_string(),
+            ErrorReference::EntryNotFound,
+        ))
+    }
 }
 
 /// Create an investigation for a polling station

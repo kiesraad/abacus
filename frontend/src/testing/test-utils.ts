@@ -85,7 +85,7 @@ export async function userTypeInputsArray<T extends Record<string, string | numb
   key: keyof T,
 ) {
   for (const [index, item] of inputArray.entries()) {
-    const input = await screen.findByTestId(`${fieldPath}[${index}].${key.toString()}`);
+    const input = await screen.findByTestId(`${fieldPath}.${index}.${key.toString()}`);
     await user.clear(input);
     await user.type(input, String(item[key]));
     expect(input).toHaveValue(String(item[key]));

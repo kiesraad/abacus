@@ -1,18 +1,23 @@
-onlyBuiltDependencies:
-  - '@swc/core'
-  - esbuild
-  - msw
-  - unrs-resolver
+allowBuilds:
+  "@swc/core": true
+  esbuild: true
+  msw: false
+  unrs-resolver: true
 blockExoticSubdeps: true
 minimumReleaseAge: 4320
 minimumReleaseAgeExclude:
-  # Fix GHSA-2w69-qvjg-hvjx / CVE-2026-22029
-  - react-router@7.12.0
+  # Fix GHSA-7h2j-956f-4vf2
+  - "@isaacs/brace-expansion@5.0.1"
 trustPolicy: no-downgrade
 trustPolicyExclude:
   - semver@6.3.1
+  - "@octokit/plugin-paginate-rest@9.2.2"
+  - "@octokit/endpoint@9.0.6"
 engineStrict: true
-sideEffectsCache: false
+packageManagerStrict: true
+packageManagerStrictVersion: true
+strictDepBuilds: true
+strictPeerDependencies: true
 overrides:
   # Storybook currently uses @vitest/expect 3.2.4 which doesn't work with our vitest.d.ts
   "@vitest/expect": "$@vitest/expect"
@@ -21,3 +26,5 @@ overrides:
   "vite": "$vite"
   # Fix GHSA-g9mf-h72j-4rw9 / CVE-2026-22036
   "undici@<6.23.0": ">=6.23.0"
+  # Fix GHSA-7h2j-956f-4vf2
+  "@isaacs/brace-expansion@<=5.0.0": ">=5.0.1"

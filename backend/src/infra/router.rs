@@ -23,12 +23,10 @@ use utoipa_swagger_ui::SwaggerUi;
 #[cfg(feature = "dev-database")]
 use crate::test_data_gen;
 use crate::{
-    AppError, AppState, MAX_BODY_SIZE_MB,
-    api::{
-        committee_session, data_entry, document, election, investigation, polling_station, report,
-    },
+    AppError, AppState, MAX_BODY_SIZE_MB, api,
+    api::middleware::{airgap, airgap::AirgapDetection, authentication},
     error,
-    infra::{airgap, airgap::AirgapDetection, audit_log, authentication},
+    infra::audit_log,
 };
 
 pub fn get_scopes_from_operation(operation: &Operation) -> Option<Vec<String>> {
@@ -106,15 +104,15 @@ pub fn openapi_router() -> OpenApiRouter<AppState> {
 fn build_routes(doc: utoipa::openapi::OpenApi) -> OpenApiRouter<AppState> {
     let router = OpenApiRouter::with_openapi(doc)
         .merge(audit_log::router())
-        .merge(authentication::router())
-        .merge(authentication::user_router())
-        .merge(committee_session::router())
-        .merge(data_entry::router())
-        .merge(election::router())
-        .merge(polling_station::router())
-        .merge(report::router())
-        .merge(document::router())
-        .merge(investigation::router());
+        .merge(api::authentication::router())
+        .merge(api::user::user_router())
+        .merge(api::committee_session::router())
+        .merge(api::data_entry::router())
+        .merge(api::election::router())
+        .merge(api::polling_station::router())
+        .merge(api::report::router())
+        .merge(api::document::router())
+        .merge(api::investigation::router());
 
     #[cfg(feature = "dev-database")]
     let router = router.merge(test_data_gen::router());
@@ -306,18 +304,15 @@ mod tests {
     use super::*;
     use crate::{
         SqlitePoolExt,
-        infra::authentication::{Role, session},
-        repository::user_repo::UserId,
+        domain::role::Role,
+        repository::{session_repo, session_repo::Session, user_repo::UserId},
         test::run_server_test,
     };
 
     async fn get_user_cookie(conn: &mut SqliteConnection, user_id: UserId) -> String {
-        session::create(conn, user_id, "", "127.0.0.1", TimeDelta::seconds(60 * 30))
-            .await
-            .unwrap()
-            .get_cookie()
-            .stripped()
-            .to_string()
+        let session = Session::create(user_id, "", "127.0.0.1", TimeDelta::seconds(60 * 30));
+        session_repo::save(conn, &session).await.unwrap();
+        session.get_cookie().stripped().to_string()
     }
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2", "users"))))]

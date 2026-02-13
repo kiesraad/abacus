@@ -9,15 +9,16 @@ use utoipa_axum::{router::OpenApiRouter, routes};
 
 use crate::{
     APIError, AppState, ErrorResponse, SqlitePoolExt,
-    api::committee_session::CommitteeSessionError,
+    api::middleware::authentication::Coordinator,
     domain::{
         committee_session::{
-            CommitteeSession, CommitteeSessionFilesUpdateRequest, CommitteeSessionId,
+            CommitteeSession, CommitteeSessionError, CommitteeSessionFilesUpdateRequest,
+            CommitteeSessionId,
         },
         committee_session_status::CommitteeSessionStatus,
         data_entry::PollingStationResults,
         election::{ElectionId, ElectionWithPoliticalGroups},
-        file::{File, create_file},
+        file::File,
         investigation::PollingStationInvestigation,
         models::{ModelNa14_2Input, ModelNa31_2Input, ModelP2aInput, PdfFileModel, ToPdfFileModel},
         polling_station::PollingStation,
@@ -27,8 +28,7 @@ use crate::{
     eml::{EML510, EMLDocument, EmlHash},
     error::ErrorReference,
     infra::{
-        audit_log::AuditService,
-        authentication::Coordinator,
+        audit_log::{AuditEvent, AuditService},
         pdf_gen::generate_pdf,
         zip::{ZipResponse, ZipResponseError, slugify_filename, zip_single_file},
     },
@@ -375,6 +375,22 @@ async fn generate_and_save_files(
     .await?;
 
     Ok((eml_file, pdf_file, overview_pdf_file))
+}
+
+async fn create_file(
+    conn: &mut SqliteConnection,
+    audit_service: &AuditService,
+    filename: String,
+    data: &[u8],
+    mime_type: String,
+    created_at: DateTime<Utc>,
+) -> Result<File, APIError> {
+    let file = file_repo::create(conn, filename, data, mime_type, created_at).await?;
+
+    audit_service
+        .log(conn, &AuditEvent::FileCreated(file.clone().into()), None)
+        .await?;
+    Ok(file)
 }
 
 async fn get_existing_files(

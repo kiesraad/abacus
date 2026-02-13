@@ -8,7 +8,11 @@ import { Form } from "@/components/ui/Form/Form";
 import { FormLayout } from "@/components/ui/Form/FormLayout";
 import { InputField } from "@/components/ui/InputField/InputField";
 import { t } from "@/i18n/translate";
-import type { CREATE_FIRST_ADMIN_REQUEST_PATH, CreateUserRequest, LoginResponse } from "@/types/generated/openapi";
+import type {
+  CREATE_FIRST_ADMIN_REQUEST_PATH,
+  CreateFirstAdminRequest,
+  LoginResponse,
+} from "@/types/generated/openapi";
 import { StringFormData } from "@/utils/stringFormData";
 
 import { type UserValidationErrors, validateCreateUser } from "@/utils/validateUserAccount";
@@ -29,11 +33,10 @@ export function CreateFirstAdminForm({ next }: CreateFirstAdminFormProps) {
 
     const formData = new StringFormData(event.currentTarget);
 
-    const account: Required<CreateUserRequest> = {
+    const account: CreateFirstAdminRequest = {
       username: formData.getString("username"),
       fullname: formData.getString("fullname"),
       temp_password: formData.getString("password"),
-      role: "administrator",
     };
 
     const passwordRepeat = formData.getString("password_repeat");

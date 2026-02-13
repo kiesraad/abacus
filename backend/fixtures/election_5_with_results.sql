@@ -1,5 +1,5 @@
-INSERT INTO elections (id, name, counting_method, election_id, location, domain_id, category, number_of_seats, number_of_voters, election_date, nomination_date, political_groups)
-VALUES (5, 'Corrigendum 2026', 'CSO', 'GroteStad_2026', 'Grote Stad', '0000', 'Municipal', 23, 15000, '2026-03-18', '2026-02-02',
+INSERT INTO elections (id, name, role, counting_method, election_id, location, domain_id, category, number_of_seats, number_of_voters, election_date, nomination_date, political_groups)
+VALUES (5, 'Corrigendum 2026', 'GSB', 'CSO', 'GroteStad_2026', 'Grote Stad', '0000', 'Municipal', 23, 15000, '2026-03-18', '2026-02-02',
         '[
           {
             "number": 1,

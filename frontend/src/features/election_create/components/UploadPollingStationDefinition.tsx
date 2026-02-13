@@ -48,16 +48,21 @@ export function UploadPollingStationDefinition() {
       setFile(currentFile);
       const data = await currentFile.text();
       const response = await create({
-        role: "GSB",
-        election_hash: state.electionDefinitionHash,
-        election_data: state.electionDefinitionData,
-        candidate_hash: state.candidateDefinitionHash,
-        candidate_data: state.candidateDefinitionData,
-        polling_station_data: data,
-        polling_station_file_name: currentFile.name,
+        GSB: {
+          election_and_candidates: {
+            election_data: state.electionDefinitionData,
+            election_hash: state.electionDefinitionHash,
+            candidate_data: state.candidateDefinitionData,
+            candidate_hash: state.candidateDefinitionHash,
+          },
+          gsb: {
+            polling_station_data: data,
+            polling_station_file_name: currentFile.name,
+          },
+        },
       });
 
-      if (isSuccess(response)) {
+      if (isSuccess(response) && response.data.role === "GSB") {
         dispatch({
           type: "SELECT_POLLING_STATION_DEFINITION",
           response: response.data,

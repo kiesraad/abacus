@@ -2,6 +2,7 @@
   "election": {
     "id": 2,
     "name": "Gemeenteraad Juinen 2035",
+    "role": "GSB",
     "counting_method": "CSO",
     "election_id": "Juinen_2035",
     "location": "Juinen",

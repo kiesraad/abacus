@@ -407,6 +407,18 @@ export interface AuditLogUser {
   username: string;
 }
 
+export interface CSBElectionCreationRequest {
+  candidate_data: string;
+  candidate_hash: string[];
+  election_data: string;
+  election_hash: string[];
+}
+
+export interface CSBElectionDefinitionValidateResponse {
+  election: NewElection;
+  hash: RedactedEmlHash;
+}
+
 /**
  * CSOFirstSessionResults, following the fields in Model Na 31-2 Bijlage 2.
  *
@@ -679,6 +691,14 @@ export interface Election {
   nomination_date: string;
   number_of_seats: number;
   number_of_voters: number;
+  role: ElectionRole;
+}
+
+export interface ElectionAndCandidateData {
+  candidate_data?: string;
+  candidate_hash?: string[];
+  election_data: string;
+  election_hash?: string[];
 }
 
 /**
@@ -687,17 +707,17 @@ export interface Election {
 export const electionCategoryValues = ["Municipal"] as const;
 export type ElectionCategory = (typeof electionCategoryValues)[number];
 
-export type ElectionCreationRequest = GSBElectionCreationRequest & { role: "GSB" };
+export type ElectionCreationRequest =
+  | (GSBElectionCreationRequest & { role: "GSB" })
+  | (CSBElectionCreationRequest & { role: "CSB" });
 
-export type ElectionCreationValidateRequest = GSBElectionCreationValidateRequest & { role: "GSB" };
+export type ElectionCreationValidateRequest =
+  | { GSB: { election_and_candidates: ElectionAndCandidateData; gsb: GSBElectionCreationValidateRequest } }
+  | { CSB: { election_and_candidates: ElectionAndCandidateData } };
 
-export interface ElectionDefinitionValidateResponse {
-  election: NewElection;
-  hash: RedactedEmlHash;
-  number_of_voters: number;
-  polling_station_definition_matches_election?: boolean;
-  polling_stations?: PollingStationRequest[];
-}
+export type ElectionDefinitionValidateResponse =
+  | (GSBElectionDefinitionValidateResponse & { role: "GSB" })
+  | (CSBElectionDefinitionValidateResponse & { role: "CSB" });
 
 export interface ElectionDetails {
   election_category: string;
@@ -711,6 +731,7 @@ export interface ElectionDetails {
   election_nomination_date: string;
   election_number_of_seats: number;
   election_number_of_voters: number;
+  election_role: string;
 }
 
 /**
@@ -744,6 +765,12 @@ export interface ElectionListResponse {
 export interface ElectionNumberOfVotersChangeRequest {
   number_of_voters: number;
 }
+
+/**
+ * Election role
+ */
+export const electionRoleValues = ["GSB", "CSB"] as const;
+export type ElectionRole = (typeof electionRoleValues)[number];
 
 /**
  * Election polling stations data entry statuses response
@@ -790,6 +817,7 @@ export interface ElectionWithPoliticalGroups {
   number_of_seats: number;
   number_of_voters: number;
   political_groups: PoliticalGroup[];
+  role: ElectionRole;
 }
 
 export interface ErrorDetails {
@@ -887,15 +915,22 @@ export interface GSBElectionCreationRequest {
   polling_station_file_name?: string;
 }
 
+/**
+ * GSB-specific election creation validation request fields
+ */
 export interface GSBElectionCreationValidateRequest {
-  candidate_data?: string;
-  candidate_hash?: string[];
   counting_method?: VoteCountingMethod;
-  election_data: string;
-  election_hash?: string[];
   number_of_voters?: number;
   polling_station_data?: string;
   polling_station_file_name?: string;
+}
+
+export interface GSBElectionDefinitionValidateResponse {
+  election: NewElection;
+  hash: RedactedEmlHash;
+  number_of_voters: number;
+  polling_station_definition_matches_election?: boolean;
+  polling_stations?: PollingStationRequest[];
 }
 
 /**
@@ -954,6 +989,7 @@ export interface NewElection {
   number_of_seats: number;
   number_of_voters: number;
   political_groups: PoliticalGroup[];
+  role: ElectionRole;
 }
 
 /**

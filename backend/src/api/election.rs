@@ -201,15 +201,20 @@ pub async fn election_number_of_voters_change(
 }
 
 #[derive(Debug, Deserialize, Serialize, Clone, ToSchema)]
-#[serde(tag = "role")]
+
 pub enum ElectionCreationValidateRequest {
-    GSB(GSBElectionCreationValidateRequest),
-    CSB(CSBElectionCreationValidateRequest),
+    GSB {
+        election_and_candidates: ElectionAndCandidateData,
+        gsb: GSBElectionCreationValidateRequest,
+    },
+    CSB {
+        election_and_candidates: ElectionAndCandidateData,
+    },
 }
 
 #[derive(Debug, Deserialize, Serialize, Clone, ToSchema)]
 #[serde(deny_unknown_fields)]
-pub struct GSBElectionCreationValidateRequest {
+pub struct ElectionAndCandidateData {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[schema(value_type = Option<Vec<String>>, nullable = false)]
     election_hash: Option<[String; crate::eml::hash::CHUNK_COUNT]>,
@@ -221,7 +226,12 @@ pub struct GSBElectionCreationValidateRequest {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[schema(nullable = false)]
     candidate_data: Option<String>,
+}
 
+#[derive(Debug, Deserialize, Serialize, Clone, ToSchema)]
+#[serde(deny_unknown_fields)]
+/// GSB-specific election creation validation request fields
+pub struct GSBElectionCreationValidateRequest {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[schema(nullable = false)]
     polling_station_data: Option<String>,
@@ -237,22 +247,6 @@ pub struct GSBElectionCreationValidateRequest {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[schema(nullable = false)]
     polling_station_file_name: Option<String>,
-}
-
-#[derive(Debug, Deserialize, Serialize, Clone, ToSchema)]
-#[serde(deny_unknown_fields)]
-pub struct CSBElectionCreationValidateRequest {
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[schema(value_type = Option<Vec<String>>, nullable = false)]
-    election_hash: Option<[String; crate::eml::hash::CHUNK_COUNT]>,
-    election_data: String,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[schema(value_type = Option<Vec<String>>, nullable = false)]
-    candidate_hash: Option<[String; crate::eml::hash::CHUNK_COUNT]>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[schema(nullable = false)]
-    candidate_data: Option<String>,
 }
 
 #[derive(Debug, Deserialize, Serialize, Clone, ToSchema)]
@@ -303,25 +297,31 @@ pub async fn election_import_validate(
     Json(request): Json<ElectionCreationValidateRequest>,
 ) -> Result<Json<ElectionDefinitionValidateResponse>, APIError> {
     match request {
-        ElectionCreationValidateRequest::GSB(edu) => validate_gsb_election(edu),
-        ElectionCreationValidateRequest::CSB(edu) => validate_csb_election(edu),
+        ElectionCreationValidateRequest::GSB {
+            election_and_candidates,
+            gsb,
+        } => validate_gsb_election(election_and_candidates, gsb),
+        ElectionCreationValidateRequest::CSB {
+            election_and_candidates,
+        } => validate_csb_election(election_and_candidates),
     }
 }
 
 /// Validate a GSB election
 fn validate_gsb_election(
+    ec: ElectionAndCandidateData,
     edu: GSBElectionCreationValidateRequest,
 ) -> Result<Json<ElectionDefinitionValidateResponse>, APIError> {
-    check_hash(edu.election_data.as_bytes(), edu.election_hash.as_ref())?;
-    if let Some(ref data) = edu.candidate_data {
-        check_hash(data.as_bytes(), edu.candidate_hash.as_ref())?;
+    check_hash(ec.election_data.as_bytes(), ec.election_hash.as_ref())?;
+    if let Some(ref data) = ec.candidate_data {
+        check_hash(data.as_bytes(), ec.candidate_hash.as_ref())?;
     }
 
-    let mut hash = RedactedEmlHash::from(edu.election_data.as_bytes());
+    let mut hash = RedactedEmlHash::from(ec.election_data.as_bytes());
     let mut election =
-        parse_election_candidates_eml(&edu.election_data, edu.candidate_data.as_deref())?;
+        parse_election_candidates_eml(&ec.election_data, ec.candidate_data.as_deref())?;
 
-    if let Some(ref data) = edu.candidate_data {
+    if let Some(ref data) = ec.candidate_data {
         hash = RedactedEmlHash::from(data.as_bytes());
     }
 
@@ -363,7 +363,7 @@ fn validate_gsb_election(
 }
 
 fn validate_csb_election(
-    edu: CSBElectionCreationValidateRequest,
+    edu: ElectionAndCandidateData,
 ) -> Result<Json<ElectionDefinitionValidateResponse>, APIError> {
     check_hash(edu.election_data.as_bytes(), edu.election_hash.as_ref())?;
     if let Some(ref data) = edu.candidate_data {

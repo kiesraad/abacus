@@ -37,7 +37,7 @@ export function UploadElectionDefinition() {
 
       setFile(currentFile);
       const data = await currentFile.text();
-      const response = await create({ role: "GSB", election_data: data });
+      const response = await create({ GSB: { election_and_candidates: { election_data: data }, gsb: {} } });
 
       if (isSuccess(response)) {
         dispatch({
@@ -73,9 +73,10 @@ export function UploadElectionDefinition() {
   ) {
     async function onSubmit(chunks: string[]) {
       const response = await create({
-        role: "GSB",
-        election_data: state.electionDefinitionData,
-        election_hash: chunks,
+        GSB: {
+          election_and_candidates: { election_data: state.electionDefinitionData, election_hash: chunks },
+          gsb: {},
+        },
       });
       if (isSuccess(response)) {
         dispatch({

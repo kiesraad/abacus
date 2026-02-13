@@ -5150,33 +5150,6 @@
         },
         "additionalProperties": false
       },
-      "CSBElectionCreationValidateRequest": {
-        "type": "object",
-        "required": [
-          "election_data"
-        ],
-        "properties": {
-          "candidate_data": {
-            "type": "string"
-          },
-          "candidate_hash": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          },
-          "election_data": {
-            "type": "string"
-          },
-          "election_hash": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          }
-        },
-        "additionalProperties": false
-      },
       "CSBElectionDefinitionValidateResponse": {
         "type": "object",
         "required": [
@@ -5857,6 +5830,33 @@
         },
         "additionalProperties": false
       },
+      "ElectionAndCandidateData": {
+        "type": "object",
+        "required": [
+          "election_data"
+        ],
+        "properties": {
+          "candidate_data": {
+            "type": "string"
+          },
+          "candidate_hash": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "election_data": {
+            "type": "string"
+          },
+          "election_hash": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "additionalProperties": false
+      },
       "ElectionCategory": {
         "type": "string",
         "description": "Election category (limited for now)",
@@ -5913,46 +5913,46 @@
       "ElectionCreationValidateRequest": {
         "oneOf": [
           {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/GSBElectionCreationValidateRequest"
-              },
-              {
+            "type": "object",
+            "required": [
+              "GSB"
+            ],
+            "properties": {
+              "GSB": {
                 "type": "object",
                 "required": [
-                  "role"
+                  "election_and_candidates",
+                  "gsb"
                 ],
                 "properties": {
-                  "role": {
-                    "type": "string",
-                    "enum": [
-                      "GSB"
-                    ]
+                  "election_and_candidates": {
+                    "$ref": "#/components/schemas/ElectionAndCandidateData"
+                  },
+                  "gsb": {
+                    "$ref": "#/components/schemas/GSBElectionCreationValidateRequest"
                   }
                 }
               }
-            ]
+            }
           },
           {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/CSBElectionCreationValidateRequest"
-              },
-              {
+            "type": "object",
+            "required": [
+              "CSB"
+            ],
+            "properties": {
+              "CSB": {
                 "type": "object",
                 "required": [
-                  "role"
+                  "election_and_candidates"
                 ],
                 "properties": {
-                  "role": {
-                    "type": "string",
-                    "enum": [
-                      "CSB"
-                    ]
+                  "election_and_candidates": {
+                    "$ref": "#/components/schemas/ElectionAndCandidateData"
                   }
                 }
               }
-            ]
+            }
           }
         ]
       },
@@ -6479,30 +6479,10 @@
       },
       "GSBElectionCreationValidateRequest": {
         "type": "object",
-        "required": [
-          "election_data"
-        ],
+        "description": "GSB-specific election creation validation request fields",
         "properties": {
-          "candidate_data": {
-            "type": "string"
-          },
-          "candidate_hash": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          },
           "counting_method": {
             "$ref": "#/components/schemas/VoteCountingMethod"
-          },
-          "election_data": {
-            "type": "string"
-          },
-          "election_hash": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
           },
           "number_of_voters": {
             "type": "integer",

@@ -414,13 +414,6 @@ export interface CSBElectionCreationRequest {
   election_hash: string[];
 }
 
-export interface CSBElectionCreationValidateRequest {
-  candidate_data?: string;
-  candidate_hash?: string[];
-  election_data: string;
-  election_hash?: string[];
-}
-
 export interface CSBElectionDefinitionValidateResponse {
   election: NewElection;
   hash: RedactedEmlHash;
@@ -701,6 +694,13 @@ export interface Election {
   role: ElectionRole;
 }
 
+export interface ElectionAndCandidateData {
+  candidate_data?: string;
+  candidate_hash?: string[];
+  election_data: string;
+  election_hash?: string[];
+}
+
 /**
  * Election category (limited for now)
  */
@@ -712,8 +712,8 @@ export type ElectionCreationRequest =
   | (CSBElectionCreationRequest & { role: "CSB" });
 
 export type ElectionCreationValidateRequest =
-  | (GSBElectionCreationValidateRequest & { role: "GSB" })
-  | (CSBElectionCreationValidateRequest & { role: "CSB" });
+  | { GSB: { election_and_candidates: ElectionAndCandidateData; gsb: GSBElectionCreationValidateRequest } }
+  | { CSB: { election_and_candidates: ElectionAndCandidateData } };
 
 export type ElectionDefinitionValidateResponse =
   | (GSBElectionDefinitionValidateResponse & { role: "GSB" })
@@ -915,12 +915,11 @@ export interface GSBElectionCreationRequest {
   polling_station_file_name?: string;
 }
 
+/**
+ * GSB-specific election creation validation request fields
+ */
 export interface GSBElectionCreationValidateRequest {
-  candidate_data?: string;
-  candidate_hash?: string[];
   counting_method?: VoteCountingMethod;
-  election_data: string;
-  election_hash?: string[];
   number_of_voters?: number;
   polling_station_data?: string;
   polling_station_file_name?: string;

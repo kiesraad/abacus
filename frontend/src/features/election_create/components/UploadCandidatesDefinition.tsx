@@ -43,10 +43,14 @@ export function UploadCandidatesDefinition() {
       setFile(currentFile);
       const data = await currentFile.text();
       const response = await create({
-        role: "GSB",
-        candidate_data: data,
-        election_hash: state.electionDefinitionHash,
-        election_data: state.electionDefinitionData,
+        GSB: {
+          election_and_candidates: {
+            election_data: state.electionDefinitionData,
+            election_hash: state.electionDefinitionHash,
+            candidate_data: data,
+          },
+          gsb: {},
+        },
       });
 
       if (isSuccess(response)) {
@@ -83,11 +87,15 @@ export function UploadCandidatesDefinition() {
   ) {
     async function onSubmit(chunks: string[]) {
       const response = await create({
-        role: "GSB",
-        candidate_data: state.candidateDefinitionData,
-        election_hash: state.electionDefinitionHash,
-        election_data: state.electionDefinitionData,
-        candidate_hash: chunks,
+        GSB: {
+          election_and_candidates: {
+            election_data: state.electionDefinitionData,
+            election_hash: state.electionDefinitionHash,
+            candidate_data: state.candidateDefinitionData,
+            candidate_hash: chunks,
+          },
+          gsb: {},
+        },
       });
       if (isSuccess(response)) {
         dispatch({

@@ -68,7 +68,7 @@
   }
 
   &.error {
-    border-color: var(--color-error-darker);
+    border-color: var(--color-error-darkest);
     background-color: var(--color-error-bg);
     > button:focus,
     > button:focus-visible {
@@ -79,7 +79,7 @@
       background: var(--color-error-hover);
     }
     aside > svg {
-      fill: var(--color-error-darker);
+      fill: var(--color-error-darkest);
     }
   }
   &.warning {

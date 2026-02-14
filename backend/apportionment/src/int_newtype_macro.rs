@@ -28,13 +28,46 @@ macro_rules! int_newtype {
                 self.0 == *other
             }
         }
-
-        impl PartialEq<$identifier> for u32 {
-            fn eq(&self, other: &$identifier) -> bool {
-                *self == other.0
-            }
-        }
     };
 }
 
 pub(crate) use int_newtype;
+
+#[cfg(test)]
+mod tests {
+    int_newtype!(TestIntNewType);
+
+    #[test]
+    fn test_int_newtype() {
+        let value = TestIntNewType::from(42);
+        assert_eq!(value, 42);
+        assert_eq!(value.0, 42);
+    }
+
+    #[test]
+    fn test_try_from_usize() {
+        let value = TestIntNewType::try_from(42_usize).unwrap();
+        assert_eq!(value, 42);
+    }
+
+    #[test]
+    fn test_try_from_usize_overflow() {
+        // Bitshifting << 42 overflows a u32, so this should return an error
+        let result = TestIntNewType::try_from((1_usize) << 42);
+        assert!(result.is_err());
+    }
+
+    #[test]
+    fn test_display() {
+        let value = TestIntNewType::from(42);
+        assert_eq!(value.to_string(), "42");
+    }
+
+    #[test]
+    fn test_partial_eq() {
+        let value = TestIntNewType::from(42);
+        assert!(value == 42);
+        assert!(value != 43);
+        assert!(value == TestIntNewType::from(42));
+    }
+}

@@ -179,7 +179,7 @@ fn reassign_residual_seat_for_absolute_majority<T: ListVotesTrait>(
     lists_last_residual_seat: &[ListNumber],
     standings: Vec<ListStanding>,
 ) -> Result<(Vec<ListStanding>, Option<SeatChange>), ApportionmentError> {
-    let half_of_votes_count: Fraction = Fraction::from(total_votes) * Fraction::new(1, 2);
+    let half_of_votes_count = Fraction::from(total_votes) * Fraction::new(1, 2);
 
     // Find list with an absolute majority of votes. Return early if we find none
     let Some(majority_list_votes) = list_votes
@@ -189,7 +189,7 @@ fn reassign_residual_seat_for_absolute_majority<T: ListVotesTrait>(
         return Ok((standings, None));
     };
 
-    let half_of_seats_count: Fraction = Fraction::from(seats) * Fraction::new(1, 2);
+    let half_of_seats_count = Fraction::from(seats) * Fraction::new(1, 2);
     let standing_of_list_with_majority_votes = standings
         .iter()
         .find(|list_standing| list_standing.list_number == majority_list_votes.number())
@@ -346,53 +346,18 @@ pub(crate) mod tests {
 
     #[test]
     fn test_list_numbers() {
-        let standing = [
-            &ListStanding {
-                list_number: ListNumber::from(2),
+        let standings: Vec<ListStanding> = (2..=6)
+            .map(|n| ListStanding {
+                list_number: ListNumber::from(n),
                 votes_cast: 1249,
                 remainder_votes: Fraction::new(14975, 24),
                 meets_remainder_threshold: true,
                 next_votes_per_seat: Fraction::new(1249, 2),
                 full_seats: 1,
                 residual_seats: 0,
-            },
-            &ListStanding {
-                list_number: ListNumber::from(3),
-                votes_cast: 1249,
-                remainder_votes: Fraction::new(14975, 24),
-                meets_remainder_threshold: true,
-                next_votes_per_seat: Fraction::new(1249, 2),
-                full_seats: 1,
-                residual_seats: 0,
-            },
-            &ListStanding {
-                list_number: ListNumber::from(4),
-                votes_cast: 1249,
-                remainder_votes: Fraction::new(14975, 24),
-                meets_remainder_threshold: true,
-                next_votes_per_seat: Fraction::new(1249, 2),
-                full_seats: 1,
-                residual_seats: 0,
-            },
-            &ListStanding {
-                list_number: ListNumber::from(5),
-                votes_cast: 1249,
-                remainder_votes: Fraction::new(14975, 24),
-                meets_remainder_threshold: true,
-                next_votes_per_seat: Fraction::new(1249, 2),
-                full_seats: 1,
-                residual_seats: 0,
-            },
-            &ListStanding {
-                list_number: ListNumber::from(6),
-                votes_cast: 1249,
-                remainder_votes: Fraction::new(14975, 24),
-                meets_remainder_threshold: true,
-                next_votes_per_seat: Fraction::new(1249, 2),
-                full_seats: 1,
-                residual_seats: 0,
-            },
-        ];
+            })
+            .collect();
+        let standing: Vec<&ListStanding> = standings.iter().collect();
         assert_eq!(list_numbers(&standing), vec![2, 3, 4, 5, 6]);
     }
 

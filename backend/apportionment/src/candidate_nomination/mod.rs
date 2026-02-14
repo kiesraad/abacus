@@ -61,32 +61,31 @@ fn all_chosen_candidates<T: ListVotesTrait>(
     list_votes: &[T],
     list_candidate_nomination: &[ListCandidateNomination<T::Cv>],
 ) -> Vec<Candidate> {
-    let mut chosen_candidates: Vec<Candidate> = vec![];
-    for list in list_votes {
-        let list_candidate_nomination = &list_candidate_nomination
-            .iter()
-            .find(|nomination| nomination.list_number == list.number())
-            .expect("List candidate nomination should exist");
-        chosen_candidates.extend(
+    list_votes
+        .iter()
+        .flat_map(|list| {
+            let nomination = &list_candidate_nomination
+                .iter()
+                .find(|nomination| nomination.list_number == list.number())
+                .expect("List candidate nomination should exist");
+
+            let is_nominated = |candidate: &&T::Cv| {
+                nomination
+                    .preferential_candidate_nomination
+                    .iter()
+                    .chain(&nomination.other_candidate_nomination)
+                    .any(|cv| cv.number() == candidate.number())
+            };
+
             list.candidate_votes()
                 .iter()
-                .filter(|candidate| {
-                    list_candidate_nomination
-                        .preferential_candidate_nomination
-                        .iter()
-                        .any(|cv| candidate.number() == cv.number())
-                        || list_candidate_nomination
-                            .other_candidate_nomination
-                            .iter()
-                            .any(|cv| candidate.number() == cv.number())
-                })
+                .filter(is_nominated)
                 .map(|candidate| Candidate {
                     list_number: list.number(),
                     candidate_number: candidate.number(),
-                }),
-        );
-    }
-    chosen_candidates
+                })
+        })
+        .collect()
 }
 
 /// This function nominates candidates for the seats each list has been assigned.  

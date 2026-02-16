@@ -33,9 +33,9 @@ export const FIXTURE_TYPIST_TEMP_PASSWORD: string = "temp_password_9876";
 // Regular fixtures need to be passed into the test's arguments.
 type Fixtures = {
   // page and request fixture for admin
-  admin: { page: Page; request: APIRequestContext };
+  adminOne: { page: Page; request: APIRequestContext };
   // page and request fixture for coordinator
-  coordinator: { page: Page; request: APIRequestContext };
+  coordinatorOne: { page: Page; request: APIRequestContext };
   // page and request fixture for typist one
   typistOne: { page: Page; request: APIRequestContext };
   // page and request fixture for typist two
@@ -68,13 +68,13 @@ type Fixtures = {
 };
 
 export const test = base.extend<Fixtures>({
-  admin: async ({ browser }, use) => {
+  adminOne: async ({ browser }, use) => {
     const context = await browser.newContext({ storageState: "e2e-tests/state/admin1.json" });
     const page = await context.newPage();
     await use({ page: page, request: context.request });
     await context.close();
   },
-  coordinator: async ({ browser }, use) => {
+  coordinatorOne: async ({ browser }, use) => {
     const context = await browser.newContext({ storageState: "e2e-tests/state/coordinator1.json" });
     const page = await context.newPage();
     await use({ page: page, request: context.request });
@@ -100,8 +100,8 @@ export const test = base.extend<Fixtures>({
     await use(pollingStation);
   },
   eml230b: [eml230b, { option: true }],
-  emptyElection: async ({ admin, eml230b }, use) => {
-    const { request } = admin;
+  emptyElection: async ({ adminOne, eml230b }, use) => {
+    const { request } = adminOne;
     const url: ELECTION_IMPORT_REQUEST_PATH = `/api/elections/import`;
     const election_data = await readFile(eml110a.path, "utf8");
     const candidate_data = await readFile(eml230b.path, "utf8");
@@ -121,24 +121,24 @@ export const test = base.extend<Fixtures>({
 
     await use(election);
   },
-  election: async ({ admin, coordinator, emptyElection }, use) => {
+  election: async ({ adminOne, coordinatorOne, emptyElection }, use) => {
     // create polling stations in the existing emptyElection
     const url: POLLING_STATION_CREATE_REQUEST_PATH = `/api/elections/${emptyElection.id}/polling_stations`;
     for (const pollingStationRequest of pollingStationRequests) {
-      const pollingStationResponse = await admin.request.post(url, { data: pollingStationRequest });
+      const pollingStationResponse = await adminOne.request.post(url, { data: pollingStationRequest });
       expect(pollingStationResponse.ok()).toBeTruthy();
     }
 
     // get election details
     const electionUrl: ELECTION_DETAILS_REQUEST_PATH = `/api/elections/${emptyElection.id}`;
-    const electionResponse = await admin.request.get(electionUrl);
+    const electionResponse = await adminOne.request.get(electionUrl);
     expect(electionResponse.ok()).toBeTruthy();
     const response = (await electionResponse.json()) as ElectionDetailsResponse;
 
     // Set committee session status to DataEntry
     const statusChangeUrl: COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_PATH = `/api/elections/${response.current_committee_session.election_id}/committee_sessions/${response.current_committee_session.id}/status`;
     const statusChangeData: COMMITTEE_SESSION_STATUS_CHANGE_REQUEST_BODY = { status: "data_entry" };
-    const statusChangeResponse = await coordinator.request.put(statusChangeUrl, { data: statusChangeData });
+    const statusChangeResponse = await coordinatorOne.request.put(statusChangeUrl, { data: statusChangeData });
     expect(statusChangeResponse.ok()).toBeTruthy();
 
     // Fill in committee session details
@@ -148,13 +148,13 @@ export const test = base.extend<Fixtures>({
       start_date: "2026-03-18",
       start_time: "21:45",
     };
-    const detailsUpdateResponse = await coordinator.request.put(detailsUpdateUrl, { data: detailsUpdateData });
+    const detailsUpdateResponse = await coordinatorOne.request.put(detailsUpdateUrl, { data: detailsUpdateData });
     expect(detailsUpdateResponse.ok()).toBeTruthy();
 
     await use(response);
   },
-  pollingStation: async ({ admin, election }, use) => {
-    const { request } = admin;
+  pollingStation: async ({ adminOne, election }, use) => {
+    const { request } = adminOne;
     // get the first polling station of the existing election
     const url: POLLING_STATION_GET_REQUEST_PATH = `/api/elections/${election.election.id}/polling_stations/${election.polling_stations[0]?.id ?? 0}`;
     const response = await request.get(url);
@@ -221,8 +221,8 @@ export const test = base.extend<Fixtures>({
   currentCommitteeSession: async ({ election }, use) => {
     await use(election.current_committee_session);
   },
-  newTypist: async ({ admin }, use) => {
-    const { request } = admin;
+  newTypist: async ({ adminOne }, use) => {
+    const { request } = adminOne;
     // create a new user
     const url: USER_CREATE_REQUEST_PATH = "/api/users";
     const data: USER_CREATE_REQUEST_BODY = {

@@ -564,7 +564,7 @@ test.describe("second data entry", () => {
 
   test("different second data entry after first data entry but correct warnings", async ({
     typistTwo,
-    coordinator,
+    coordinatorOne,
     pollingStationFirstEntryDone: pollingStation,
   }) => {
     const typistPage = typistTwo.page;
@@ -632,7 +632,7 @@ test.describe("second data entry", () => {
     );
 
     // check if data entries are marked as definitive on coordinator status page
-    const coordinatorPage = coordinator.page;
+    const coordinatorPage = coordinatorOne.page;
     await coordinatorPage.goto(`/elections/${pollingStation.election_id}/status`);
 
     const electionStatusPage = new ElectionStatus(coordinatorPage);
@@ -641,7 +641,7 @@ test.describe("second data entry", () => {
 
   test("different second data entry after first data entry", async ({
     typistTwo,
-    coordinator,
+    coordinatorOne,
     pollingStationFirstEntryDone: pollingStation,
   }) => {
     const typistPage = typistTwo.page;
@@ -714,7 +714,7 @@ test.describe("second data entry", () => {
     );
 
     // check if data entries are marked as different on coordinator status page
-    const coordinatorPage = coordinator.page;
+    const coordinatorPage = coordinatorOne.page;
     await coordinatorPage.goto(`/elections/${pollingStation.election_id}/status`);
 
     const electionStatusPage = new ElectionStatus(coordinatorPage);

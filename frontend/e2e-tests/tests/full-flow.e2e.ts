@@ -68,8 +68,8 @@ test.describe.configure({ mode: "serial" });
 test.describe("full flow", () => {
   let electionId: number | null = null;
 
-  test("create browser-specific admin user account", async ({ admin, browserName }) => {
-    const { request } = admin;
+  test("create browser-specific admin user account", async ({ adminOne, browserName }) => {
+    const { request } = adminOne;
 
     // Create admin user for each browser.
     const username = `admin-${browserName}`;

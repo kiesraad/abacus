@@ -45,7 +45,6 @@ export const DefaultIconButton: StoryObj<Props> = {
       await expect(button).toBeEnabled();
 
       await userEvent.click(button);
-      // fireEvent.click(button);
       await expect(args.onClick).toHaveBeenCalled();
     }
   },

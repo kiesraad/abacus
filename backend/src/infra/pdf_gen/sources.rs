@@ -16,7 +16,7 @@ macro_rules! include_strdata {
 
 /// Load all sources available from the `templates/` directory (i.e. all typst
 /// files).
-pub(super) fn load_sources() -> Vec<SourceFile> {
+pub(super) fn load_sources() -> &'static [SourceFile] {
     macro_rules! include_source {
         ($path:expr) => {
             SourceFile {
@@ -30,7 +30,7 @@ pub(super) fn load_sources() -> Vec<SourceFile> {
     // are available. We include these files into the binary in release mode, but
     // read them at runtime on initialization to allow more rapid development on the
     // typst files.
-    vec![
+    &[
         include_source!("common/scripts.typ"),
         include_source!("common/style.typ"),
         include_source!("model-n-10-2.typ"),
@@ -48,13 +48,10 @@ pub(super) fn load_sources() -> Vec<SourceFile> {
 }
 
 /// Load all fonts available from the `fonts/` directory
-pub(super) fn load_fonts() -> Vec<FontData> {
-    let mut fonts = vec![];
-
+pub(super) fn load_fonts() -> &'static [FontData] {
     macro_rules! include_font {
         ($path:literal) => {
-            let font = FontData(include_filedata!(concat!("fonts/", $path)));
-            fonts.push(font);
+            FontData(include_filedata!(concat!("fonts/", $path)))
         };
     }
 
@@ -62,13 +59,13 @@ pub(super) fn load_fonts() -> Vec<FontData> {
     // Note that these font files are only read at font index 0 (i.e. font files with multiple
     // fonts are not supported, split them up in separate files instead)
     // Typst also doesn't support variable fonts at this time, so we cannot use those either.
-    include_font!("DM_Sans/DMSans-Bold.ttf");
-    include_font!("DM_Sans/DMSans-BoldItalic.ttf");
-    include_font!("DM_Sans/DMSans-ExtraBold.ttf");
-    include_font!("DM_Sans/DMSans-ExtraBoldItalic.ttf");
-    include_font!("DM_Sans/DMSans-Italic.ttf");
-    include_font!("DM_Sans/DMSans-Regular.ttf");
-    include_font!("Geist_Mono/GeistMono-Regular.otf");
-
-    fonts
+    &[
+        include_font!("DM_Sans/DMSans-Bold.ttf"),
+        include_font!("DM_Sans/DMSans-BoldItalic.ttf"),
+        include_font!("DM_Sans/DMSans-ExtraBold.ttf"),
+        include_font!("DM_Sans/DMSans-ExtraBoldItalic.ttf"),
+        include_font!("DM_Sans/DMSans-Italic.ttf"),
+        include_font!("DM_Sans/DMSans-Regular.ttf"),
+        include_font!("Geist_Mono/GeistMono-Regular.otf"),
+    ]
 }

@@ -8,7 +8,7 @@ use sqlx::SqlitePool;
 use tracing::error;
 use utoipa_axum::{router::OpenApiRouter, routes};
 
-use pdf_gen::zip::ZipResponse;
+use pdf_gen::{generate_pdf, generate_pdfs, zip::ZipResponse};
 
 use crate::{
     APIError, AppState, ErrorResponse,
@@ -21,7 +21,6 @@ use crate::{
         votes_table::CandidatesTables,
     },
     error::ErrorReference,
-    infra::pdf_gen::{generate_pdf, generate_pdfs},
     repository::{committee_session_repo, election_repo, polling_station_repo},
 };
 
@@ -103,7 +102,7 @@ async fn election_download_n_10_2(
     let (zip_response, zip_writer) = ZipResponse::new(&zip_filename);
 
     tokio::spawn(async move {
-        if let Err(e) = generate_pdfs(models, zip_writer).await {
+        if let Err(e) = generate_pdfs(&models, zip_writer).await {
             error!("Failed to generate PDFs: {e:?}");
         }
     });
@@ -183,7 +182,7 @@ async fn election_download_na_31_2_bijlage1(
     let (zip_response, zip_writer) = ZipResponse::new(&zip_filename);
 
     tokio::spawn(async move {
-        if let Err(e) = generate_pdfs(models, zip_writer).await {
+        if let Err(e) = generate_pdfs(&models, zip_writer).await {
             error!("Failed to generate PDFs: {e:?}");
         }
     });
@@ -230,7 +229,7 @@ async fn election_download_na_31_2_inlegvel(
     }
     .to_pdf_file_model(name.clone());
 
-    let content = generate_pdf(input).await?;
+    let content = generate_pdf(&input).await?;
 
     Ok(Attachment::new(content.buffer)
         .filename(&name)

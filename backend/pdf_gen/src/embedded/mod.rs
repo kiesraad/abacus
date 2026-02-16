@@ -3,7 +3,7 @@ use std::time::Instant;
 use chrono::{Datelike, Timelike};
 use strum::Display;
 use tracing::{debug, error, info, warn};
-use typst::{comemo, diag::SourceDiagnostic, ecow::EcoVec, foundations::Datetime};
+use typst::{World, comemo, diag::SourceDiagnostic, ecow::EcoVec, foundations::Datetime};
 use typst_pdf::{PdfOptions, PdfStandard, PdfStandards, Timestamp};
 
 use super::PdfGenResult;
@@ -15,9 +15,10 @@ use crate::{
 mod world;
 
 /// Generates a PDF using the embedded typst library.
-pub async fn generate_pdf(input: PdfGenInput) -> Result<PdfGenResult, PdfGenError> {
+pub async fn generate_pdf(input: &impl PdfGenInput) -> Result<PdfGenResult, PdfGenError> {
+    let world = world::PdfWorld::new(input)?;
     tokio::task::spawn_blocking(move || {
-        let result = compile_pdf(input);
+        let result = compile_pdf(world);
 
         // Evict the cache to free up memory + speed up next compile
         comemo::evict(0);
@@ -30,12 +31,12 @@ pub async fn generate_pdf(input: PdfGenInput) -> Result<PdfGenResult, PdfGenErro
 
 /// Generates a ZIP file containing the PDFs for the provided inputs.
 /// Uses the embedded typst library to generate the PDFs.
-pub async fn generate_pdfs(
-    inputs: Vec<PdfGenInput>,
+pub async fn generate_pdfs<'a>(
+    inputs: impl IntoIterator<Item = &'a (impl PdfGenInput + 'a)>,
     mut zip_writer: ZipResponseWriter,
 ) -> Result<(), PdfGenError> {
-    for input in inputs.into_iter() {
-        let file_name = input.output_file_name.clone();
+    for input in inputs {
+        let file_name = input.output_file_name().to_string();
 
         let content = match generate_pdf(input).await {
             Ok(content) => content,
@@ -81,13 +82,11 @@ fn convert_datetime<Tz: chrono::TimeZone>(date_time: chrono::DateTime<Tz>) -> Op
 }
 
 #[allow(clippy::cognitive_complexity)]
-fn compile_pdf(input: PdfGenInput) -> Result<PdfGenResult, PdfGenError> {
+fn compile_pdf(world: world::PdfWorld) -> Result<PdfGenResult, PdfGenError> {
     debug!(
-        "Starting Typst compilation for {}",
-        input.main_template_path
+        "Starting Typst compilation for {:?}",
+        world.main().vpath().as_rootless_path()
     );
-
-    let world = world::PdfWorld::new(input)?;
 
     let compile_start = Instant::now();
 

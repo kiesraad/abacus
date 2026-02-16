@@ -5,6 +5,7 @@
 /// The tests cover various edge cases by varying the number of parties, candidates,
 /// string lengths, and the presence of optional fields.
 use chrono::{DateTime, Local, NaiveDate, NaiveDateTime, Utc};
+use pdf_gen::generate_pdf;
 use rand::{Rng, seq::IndexedRandom};
 use test_log::test;
 
@@ -38,7 +39,6 @@ use crate::{
             VotesTablesWithPreviousVotes,
         },
     },
-    infra::pdf_gen::generate_pdf,
 };
 
 fn random_string(rng: &mut impl Rng, length: usize) -> String {
@@ -386,7 +386,7 @@ const MIN_PDF_SIZE: usize = 20_000;
 
 async fn test_pdf(model: PdfModel) {
     let input = model.as_input_path_str();
-    let result = match generate_pdf(PdfFileModel::new("file.pdf".to_string(), model)).await {
+    let result = match generate_pdf(&PdfFileModel::new("file.pdf".to_string(), model)).await {
         Ok(r) => r,
         Err(e) => panic!("Error generating PDF for {input}: {e:?}"),
     };

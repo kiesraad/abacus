@@ -23,9 +23,9 @@ pub struct PdfWorld {
 
 impl PdfWorld {
     /// Create a new context for rendering PDFs from a [`PdfGenInput`].
-    pub fn new(input: PdfGenInput) -> Result<PdfWorld, PdfGenError> {
+    pub fn new(input: &impl PdfGenInput) -> Result<PdfWorld, PdfGenError> {
         let sources: Vec<Source> = input
-            .sources
+            .sources()
             .iter()
             .map(|s| {
                 Source::new(
@@ -37,21 +37,22 @@ impl PdfWorld {
 
         let mut fonts = vec![];
         let mut fontbook = FontBook::new();
-        for font_data in &input.fonts {
+        for font_data in input.fonts() {
             let font = Font::new(Bytes::new(font_data.0), 0).expect("Error reading font file");
             fontbook.push(font.info().clone());
             fonts.push(font);
         }
 
+        let main_template_path = input.main_template_path();
         let main_source = sources
             .iter()
-            .find(|s| s.id().vpath().as_rootless_path().to_str() == Some(input.main_template_path))
+            .find(|s| s.id().vpath().as_rootless_path().to_str() == Some(main_template_path))
             .cloned()
-            .ok_or_else(|| PdfGenError::TemplateNotFound(input.main_template_path.to_string()))?;
+            .ok_or_else(|| PdfGenError::TemplateNotFound(main_template_path.to_string()))?;
 
         let input_data = (
-            FileId::new(None, VirtualPath::new(input.input_path)),
-            Bytes::from_string(input.input_json),
+            FileId::new(None, VirtualPath::new(input.input_path())),
+            Bytes::from_string(input.input_json()),
         );
 
         Ok(PdfWorld {

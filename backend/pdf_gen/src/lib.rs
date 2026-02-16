@@ -21,19 +21,19 @@ pub struct SourceFile {
 pub struct FontData(pub &'static [u8]);
 
 /// Configuration for a single PDF generation
-pub struct PdfGenInput {
+pub trait PdfGenInput: Send + Sync {
     /// Typst source files (templates)
-    pub sources: Vec<SourceFile>,
+    fn sources(&self) -> &[SourceFile];
     /// Font data
-    pub fonts: Vec<FontData>,
+    fn fonts(&self) -> &[FontData];
     /// Which Typst source file is the entry point (e.g., "model-na-31-2.typ")
-    pub main_template_path: &'static str,
+    fn main_template_path(&self) -> &str;
     /// Virtual path for JSON input (e.g., "inputs/model-na-31-2.json")
-    pub input_path: &'static str,
+    fn input_path(&self) -> &str;
     /// The JSON input data
-    pub input_json: String,
+    fn input_json(&self) -> String;
     /// PDF output file name
-    pub output_file_name: String,
+    fn output_file_name(&self) -> &str;
 }
 
 pub struct PdfGenResult {

@@ -95,7 +95,7 @@ impl PdfModel {
     }
 
     /// Get the input, serialized as json
-    pub fn get_input(&self) -> serde_json::Result<String> {
+    pub fn get_input(&self) -> String {
         let data = match self {
             Self::ModelNa14_2(input) => serde_json::to_string(input),
             Self::ModelNa14_2Bijlage1(input) => serde_json::to_string(input),
@@ -113,9 +113,10 @@ impl PdfModel {
                 "../../../templates/inputs/test-unsupported-chars.json"
             )
             .to_string()),
-        }?;
+        }
+        .expect("JSON serialization succeeds because it is derived");
 
-        Ok(replace_unsupported_glyphs(data))
+        replace_unsupported_glyphs(data)
     }
 
     pub fn from_name_with_input(name: &str, input: &str) -> Result<PdfModel, Box<dyn Error>> {

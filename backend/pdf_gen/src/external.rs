@@ -10,9 +10,9 @@ use crate::{
     zip::{ZipResponseError, ZipResponseWriter},
 };
 
-async fn generate_file(input: PdfGenInput) -> Result<PdfGenResult, PdfGenError> {
+async fn generate_file(input: &impl PdfGenInput) -> Result<PdfGenResult, PdfGenError> {
     let start = Instant::now();
-    let file_name = input.output_file_name.clone();
+    let file_name = input.output_file_name().to_string();
     let content = generate_pdf(input).await?;
 
     info!(
@@ -23,12 +23,12 @@ async fn generate_file(input: PdfGenInput) -> Result<PdfGenResult, PdfGenError> 
 }
 
 /// Create a PDF file for each model in the provided vector and send them through the provided channel.
-pub async fn generate_pdfs(
-    inputs: Vec<PdfGenInput>,
+pub async fn generate_pdfs<'a>(
+    inputs: impl IntoIterator<Item = &'a (impl PdfGenInput + 'a)>,
     mut zip_writer: ZipResponseWriter,
 ) -> Result<(), PdfGenError> {
-    for input in inputs.into_iter() {
-        let file_name = input.output_file_name.clone();
+    for input in inputs {
+        let file_name = input.output_file_name().to_string();
         let content = match generate_file(input).await {
             Ok(content) => content,
             Err(e) => {
@@ -49,9 +49,9 @@ pub async fn generate_pdfs(
 
 /// Uses environment variable `ABACUS_TYPST_BIN` (`typst` by default) to generate a PDF using an
 /// external binary of typst. Sources, fonts and input data are provided via [`PdfGenInput`].
-pub async fn generate_pdf(input: PdfGenInput) -> Result<PdfGenResult, PdfGenError> {
+pub async fn generate_pdf(input: &impl PdfGenInput) -> Result<PdfGenResult, PdfGenError> {
     // write sources, fonts and JSON input to a temporary directory
-    let tmp_path = prep_tmp_dir(&input).await?;
+    let tmp_path = prep_tmp_dir(input).await?;
 
     // construct the typst command to run
     let typst_binary = std::env::var("ABACUS_TYPST_BIN").unwrap_or("typst".into());
@@ -64,7 +64,7 @@ pub async fn generate_pdf(input: PdfGenInput) -> Result<PdfGenResult, PdfGenErro
             "--ignore-system-fonts",
             "--font-path",
             "fonts/",
-            input.main_template_path,
+            input.main_template_path(),
             "-",
         ])
         .current_dir(&tmp_path);
@@ -88,7 +88,7 @@ pub async fn generate_pdf(input: PdfGenInput) -> Result<PdfGenResult, PdfGenErro
 }
 
 /// Creates a temporary directory and writes sources, fonts and JSON input into it.
-async fn prep_tmp_dir(input: &PdfGenInput) -> Result<PathBuf, std::io::Error> {
+async fn prep_tmp_dir(input: &impl PdfGenInput) -> Result<PathBuf, std::io::Error> {
     let temp_dir = {
         let mut temp_dir = std::env::temp_dir();
         let mut tmp_dir_name = "abacus-".to_string();
@@ -104,7 +104,7 @@ async fn prep_tmp_dir(input: &PdfGenInput) -> Result<PathBuf, std::io::Error> {
     };
 
     // write source files
-    for source in &input.sources {
+    for source in input.sources() {
         let full_path = temp_dir.join(source.path);
         if let Some(parent) = full_path.parent() {
             tokio::fs::create_dir_all(parent).await?;
@@ -115,17 +115,17 @@ async fn prep_tmp_dir(input: &PdfGenInput) -> Result<PathBuf, std::io::Error> {
     // write font files
     let fonts_dir = temp_dir.join("fonts");
     tokio::fs::create_dir_all(&fonts_dir).await?;
-    for (i, font) in input.fonts.iter().enumerate() {
+    for (i, font) in input.fonts().iter().enumerate() {
         let font_path = fonts_dir.join(format!("font_{i}.ttf"));
         tokio::fs::write(&font_path, font.0).await?;
     }
 
     // write JSON input file
-    let json_path = temp_dir.join(input.input_path);
+    let json_path = temp_dir.join(input.input_path());
     if let Some(parent) = json_path.parent() {
         tokio::fs::create_dir_all(parent).await?;
     }
-    tokio::fs::write(&json_path, &input.input_json).await?;
+    tokio::fs::write(&json_path, &input.input_json()).await?;
 
     Ok(temp_dir)
 }

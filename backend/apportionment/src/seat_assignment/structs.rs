@@ -36,6 +36,7 @@ pub struct ListSeatAssignment {
 }
 
 impl From<ListStanding> for ListSeatAssignment {
+    /// Converts a list standing into a list seat assignment.
     fn from(list: ListStanding) -> Self {
         ListSeatAssignment {
             list_number: list.list_number,

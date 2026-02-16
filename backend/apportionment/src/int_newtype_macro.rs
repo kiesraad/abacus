@@ -52,7 +52,7 @@ mod tests {
 
     #[test]
     fn test_try_from_usize_overflow() {
-        // Bitshifting << 42 overflows a u32, so this should return an error
+        // Bit shifting << 42 overflows an u32, so this should return an error
         let result = TestIntNewType::try_from((1_usize) << 42);
         assert!(result.is_err());
     }
@@ -66,8 +66,8 @@ mod tests {
     #[test]
     fn test_partial_eq() {
         let value = TestIntNewType::from(42);
-        assert!(value == 42);
-        assert!(value != 43);
-        assert!(value == TestIntNewType::from(42));
+        assert_eq!(value, 42);
+        assert_ne!(value, 43);
+        assert_eq!(value, TestIntNewType::from(42));
     }
 }

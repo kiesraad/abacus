@@ -104,6 +104,7 @@ fn list_assigned_from_previous_step(
     list_assigned
 }
 
+/// Returns the number of seats assigned with largest remainder method.
 fn list_largest_remainder_assigned_seats(
     previous_steps: &[SeatChangeStep],
     list_number: ListNumber,
@@ -117,6 +118,8 @@ fn list_largest_remainder_assigned_seats(
         .count()
 }
 
+/// Returns a vector with list numbers of which the same number of seats are assigned
+/// compared to the number of candidates.
 fn list_numbers_without_empty_seats<'a, T: ListVotesTrait>(
     standings: impl Iterator<Item = &'a ListStanding>,
     input_list_votes: &[T],
@@ -130,6 +133,7 @@ fn list_numbers_without_empty_seats<'a, T: ListVotesTrait>(
     })
 }
 
+/// Returns if a list qualifies for an extra seat.
 fn list_qualifies_for_extra_seat(
     number_of_seats_largest_remainders: usize,
     number_of_seats_unique_highest_averages_option: Option<usize>,
@@ -214,6 +218,7 @@ fn list_standings_qualifying_for_unique_highest_average<'a>(
     })
 }
 
+/// Returns the number of seats assigned with highest averages method.
 fn list_unique_highest_average_assigned_seats(
     previous_steps: &[SeatChangeStep],
     list_number: ListNumber,

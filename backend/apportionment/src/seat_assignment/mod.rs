@@ -86,7 +86,7 @@ pub(crate) fn seat_assignment<T: ApportionmentInput>(
     }
 
     // TODO: #797 [Artikel P 19a Kieswet](https://wetten.overheid.nl/BWBR0004627/2026-01-01/#AfdelingII_HoofdstukP_Paragraaf3_ArtikelP19a)
-    // mark deceased candidates
+    //  Mark deceased candidates
 
     // [Artikel P 10 Kieswet](https://wetten.overheid.nl/BWBR0004627/2026-01-01/#AfdelingII_HoofdstukP_Paragraaf2_ArtikelP10)
     let (final_steps, final_standing) = reassign_residual_seats_for_exhausted_lists(
@@ -113,6 +113,7 @@ pub(crate) fn seat_assignment<T: ApportionmentInput>(
     })
 }
 
+/// Returns the total number of seats each list number received in the apportionment result.
 pub fn get_total_seats_per_list_number_from_apportionment_result(
     result: &SeatAssignmentResult,
 ) -> Vec<(ListNumber, u32)> {
@@ -123,6 +124,8 @@ pub fn get_total_seats_per_list_number_from_apportionment_result(
         .collect::<Vec<_>>()
 }
 
+/// Returns candidate nomination input created from the initial apportionment input
+/// and the seat assignment result.
 pub fn as_candidate_nomination_input<'a, T: ApportionmentInput>(
     input: &'a T,
     seat_assignment: &SeatAssignmentResult,
@@ -137,11 +140,12 @@ pub fn as_candidate_nomination_input<'a, T: ApportionmentInput>(
     }
 }
 
-/// Create a vector containing just the list numbers from an iterator of the current standing
+/// Returns a vector containing just the list numbers from an iterator of the current standing
 fn list_numbers(standing: &[&ListStanding]) -> Vec<ListNumber> {
     standing.iter().map(|s| s.list_number).collect()
 }
 
+/// Returns the number of candidates of a list.
 fn get_number_of_candidates<T: ListVotesTrait>(
     input_list_votes: &[T],
     list_number: ListNumber,
@@ -153,6 +157,8 @@ fn get_number_of_candidates<T: ListVotesTrait>(
     u32::try_from(list_votes.candidate_votes().len()).expect("Number of candidates fits in u32")
 }
 
+/// Returns a vector with tuples of list numbers and how many more seats it was assigned
+/// compared to the number of candidates.
 fn list_numbers_with_exhausted_seats<'a, T: ListVotesTrait>(
     standings: impl Iterator<Item = &'a ListStanding>,
     input_list_votes: &[T],

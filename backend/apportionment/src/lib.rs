@@ -18,6 +18,7 @@ use self::{
     structs::ApportionmentOutput,
 };
 
+/// Perform seat assignment and candidate nomination on apportionment input.
 pub fn process<T: ApportionmentInput>(
     input: &T,
 ) -> Result<ApportionmentOutput<'_, T::List>, ApportionmentError> {

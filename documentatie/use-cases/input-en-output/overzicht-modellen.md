@@ -14,7 +14,7 @@ Het overzicht van alle input en output van Abacus (dus ook bijv. EML_NL) staat i
   - N 10-1 deel 2 (telling per stembureau)
   - Na 14-1 versie 1 (hertelling per stembureau)
 
-#### Latere zitting
+#### Volgende zitting
 - CSO: [Na 14-2 Bijlage 1 (hertelling per stembureau)](./Na14-2.md#welke-data-wordt-door-het-gsb-in-abacus-ingevoerd)
 - DSO: Na 14-1 versie 2 (hertelling per stembureau)
 
@@ -24,7 +24,7 @@ Het overzicht van alle input en output van Abacus (dus ook bijv. EML_NL) staat i
 - CSO: [Na 31-2](./Na31-2.md#welke-data-zet-abacus-in-dit-proces-verbaal-voor-het-gsb)
 - DSO: Na 31-1
 
-#### Latere zitting
+#### Volgende zitting
 - [Na 14-2](./Na14-2.md#welke-data-zet-abacus-in-dit-proces-verbaal-voor-het-gsb)
 - [P 2a](./P2a.md#welke-data-zet-abacus-in-dit-proces-verbaal-voor-het-gsb)
 

@@ -3,7 +3,7 @@ use super::{
         fraction::Fraction,
         structs::{LARGE_COUNCIL_THRESHOLD, ListNumber, ListVotesTrait},
     },
-    ApportionmentError, list_numbers,
+    ApportionmentError, get_number_of_candidates, list_numbers,
     structs::{
         HighestAverageAssignedSeat, LargestRemainderAssignedSeat, ListStanding, SeatChange,
         SeatChangeStep,
@@ -119,16 +119,10 @@ fn list_largest_remainder_assigned_seats(
 
 fn list_numbers_without_empty_seats<'a, T: ListVotesTrait>(
     standings: impl Iterator<Item = &'a ListStanding>,
-    list_votes: &[T],
+    input_list_votes: &[T],
 ) -> Vec<ListNumber> {
     standings.fold(vec![], |mut list_numbers_without_empty_seats, s| {
-        let list_votes = list_votes
-            .iter()
-            .find(|list_votes| list_votes.number() == s.list_number)
-            .expect("List votes exists");
-        let number_of_candidates = u32::try_from(list_votes.candidate_votes().len())
-            .expect("Number of candidates fits in u32");
-
+        let number_of_candidates = get_number_of_candidates(input_list_votes, s.list_number);
         if number_of_candidates.cmp(&s.total_seats()) == Ordering::Equal {
             list_numbers_without_empty_seats.push(s.list_number)
         }

@@ -167,7 +167,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/ElectionAndCandidatesDefinitionImportRequest"
+                "$ref": "#/components/schemas/ElectionCreationRequest"
               }
             }
           },
@@ -242,7 +242,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/ElectionAndCandidateDefinitionValidateRequest"
+                "$ref": "#/components/schemas/ElectionCreationValidateRequest"
               }
             }
           },
@@ -5899,109 +5899,61 @@
         },
         "additionalProperties": false
       },
-      "ElectionAndCandidateDefinitionValidateRequest": {
-        "type": "object",
-        "required": [
-          "election_data"
-        ],
-        "properties": {
-          "candidate_data": {
-            "type": "string"
-          },
-          "candidate_hash": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          },
-          "counting_method": {
-            "$ref": "#/components/schemas/VoteCountingMethod"
-          },
-          "election_data": {
-            "type": "string"
-          },
-          "election_hash": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          },
-          "number_of_voters": {
-            "type": "integer",
-            "format": "int32",
-            "minimum": 0
-          },
-          "polling_station_data": {
-            "type": "string"
-          },
-          "polling_station_file_name": {
-            "type": "string"
-          }
-        },
-        "additionalProperties": false
-      },
-      "ElectionAndCandidatesDefinitionImportRequest": {
-        "type": "object",
-        "required": [
-          "election_hash",
-          "election_data",
-          "candidate_hash",
-          "candidate_data",
-          "counting_method",
-          "number_of_voters"
-        ],
-        "properties": {
-          "candidate_data": {
-            "type": "string"
-          },
-          "candidate_hash": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          },
-          "counting_method": {
-            "$ref": "#/components/schemas/VoteCountingMethod"
-          },
-          "election_data": {
-            "type": "string"
-          },
-          "election_hash": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          },
-          "number_of_voters": {
-            "type": "integer",
-            "format": "int32",
-            "minimum": 0
-          },
-          "polling_station_data": {
-            "type": "string"
-          },
-          "polling_station_file_name": {
-            "type": "string"
-          }
-        },
-        "additionalProperties": false
-      },
-      "ElectionApportionmentResponse": {
-        "type": "object",
-        "required": [
-          "summary"
-        ],
-        "properties": {
-          "summary": {
-            "$ref": "#/components/schemas/ElectionSummary"
-          }
-        }
-      },
       "ElectionCategory": {
         "type": "string",
         "description": "Election category (limited for now)",
         "enum": [
           "Municipal"
+        ]
+      },
+      "ElectionCreationRequest": {
+        "oneOf": [
+          {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/GSBElectionCreationRequest"
+              },
+              {
+                "type": "object",
+                "required": [
+                  "role"
+                ],
+                "properties": {
+                  "role": {
+                    "type": "string",
+                    "enum": [
+                      "GSB"
+                    ]
+                  }
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "ElectionCreationValidateRequest": {
+        "oneOf": [
+          {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/GSBElectionCreationValidateRequest"
+              },
+              {
+                "type": "object",
+                "required": [
+                  "role"
+                ],
+                "properties": {
+                  "role": {
+                    "type": "string",
+                    "enum": [
+                      "GSB"
+                    ]
+                  }
+                }
+              }
+            ]
+          }
         ]
       },
       "ElectionDefinitionValidateResponse": {
@@ -6488,6 +6440,93 @@
         "type": "integer",
         "format": "int32",
         "minimum": 0
+      },
+      "GSBElectionCreationRequest": {
+        "type": "object",
+        "required": [
+          "election_hash",
+          "election_data",
+          "candidate_hash",
+          "candidate_data",
+          "counting_method",
+          "number_of_voters"
+        ],
+        "properties": {
+          "candidate_data": {
+            "type": "string"
+          },
+          "candidate_hash": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "counting_method": {
+            "$ref": "#/components/schemas/VoteCountingMethod"
+          },
+          "election_data": {
+            "type": "string"
+          },
+          "election_hash": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "number_of_voters": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "polling_station_data": {
+            "type": "string"
+          },
+          "polling_station_file_name": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "GSBElectionCreationValidateRequest": {
+        "type": "object",
+        "required": [
+          "election_data"
+        ],
+        "properties": {
+          "candidate_data": {
+            "type": "string"
+          },
+          "candidate_hash": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "counting_method": {
+            "$ref": "#/components/schemas/VoteCountingMethod"
+          },
+          "election_data": {
+            "type": "string"
+          },
+          "election_hash": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "number_of_voters": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "polling_station_data": {
+            "type": "string"
+          },
+          "polling_station_file_name": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
       },
       "GenerateElectionArgs": {
         "type": "object",

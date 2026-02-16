@@ -16,12 +16,12 @@ export type ELECTION_LIST_REQUEST_PATH = `/api/elections`;
 // /api/elections/import
 export type ELECTION_IMPORT_REQUEST_PARAMS = Record<string, never>;
 export type ELECTION_IMPORT_REQUEST_PATH = `/api/elections/import`;
-export type ELECTION_IMPORT_REQUEST_BODY = ElectionAndCandidatesDefinitionImportRequest;
+export type ELECTION_IMPORT_REQUEST_BODY = ElectionCreationRequest;
 
 // /api/elections/import/validate
 export type ELECTION_IMPORT_VALIDATE_REQUEST_PARAMS = Record<string, never>;
 export type ELECTION_IMPORT_VALIDATE_REQUEST_PATH = `/api/elections/import/validate`;
-export type ELECTION_IMPORT_VALIDATE_REQUEST_BODY = ElectionAndCandidateDefinitionValidateRequest;
+export type ELECTION_IMPORT_VALIDATE_REQUEST_BODY = ElectionCreationValidateRequest;
 
 // /api/elections/{election_id}
 export interface ELECTION_DETAILS_REQUEST_PARAMS {
@@ -688,37 +688,15 @@ export interface Election {
   number_of_voters: number;
 }
 
-export interface ElectionAndCandidateDefinitionValidateRequest {
-  candidate_data?: string;
-  candidate_hash?: string[];
-  counting_method?: VoteCountingMethod;
-  election_data: string;
-  election_hash?: string[];
-  number_of_voters?: number;
-  polling_station_data?: string;
-  polling_station_file_name?: string;
-}
-
-export interface ElectionAndCandidatesDefinitionImportRequest {
-  candidate_data: string;
-  candidate_hash: string[];
-  counting_method: VoteCountingMethod;
-  election_data: string;
-  election_hash: string[];
-  number_of_voters: number;
-  polling_station_data?: string;
-  polling_station_file_name?: string;
-}
-
-export interface ElectionApportionmentResponse {
-  summary: ElectionSummary;
-}
-
 /**
  * Election category (limited for now)
  */
 export const electionCategoryValues = ["Municipal"] as const;
 export type ElectionCategory = (typeof electionCategoryValues)[number];
+
+export type ElectionCreationRequest = GSBElectionCreationRequest & { role: "GSB" };
+
+export type ElectionCreationValidateRequest = GSBElectionCreationValidateRequest & { role: "GSB" };
 
 export interface ElectionDefinitionValidateResponse {
   election: NewElection;
@@ -924,6 +902,28 @@ export interface FileDetails {
 }
 
 export type FileId = number;
+
+export interface GSBElectionCreationRequest {
+  candidate_data: string;
+  candidate_hash: string[];
+  counting_method: VoteCountingMethod;
+  election_data: string;
+  election_hash: string[];
+  number_of_voters: number;
+  polling_station_data?: string;
+  polling_station_file_name?: string;
+}
+
+export interface GSBElectionCreationValidateRequest {
+  candidate_data?: string;
+  candidate_hash?: string[];
+  counting_method?: VoteCountingMethod;
+  election_data: string;
+  election_hash?: string[];
+  number_of_voters?: number;
+  polling_station_data?: string;
+  polling_station_file_name?: string;
+}
 
 /**
  * Abacus API and asset server

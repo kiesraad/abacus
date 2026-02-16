@@ -22,6 +22,7 @@ async fn test_election_validate_valid(pool: SqlitePool) {
         .post(&url)
         .header("cookie", admin_cookie)
         .json(&serde_json::json!({
+          "role": "GSB",
           "election_data": include_str!("../src/eml/tests/eml110a_test.eml.xml"),
         }))
         .send()
@@ -42,6 +43,7 @@ async fn test_election_validate_invalid_election_subcategory(pool: SqlitePool) {
         .post(&url)
         .header("cookie", admin_cookie)
         .json(&serde_json::json!({
+          "role": "GSB",
           "election_data": include_str!("../src/eml/tests/eml110a_invalid_election_subcategory.eml.xml"),
         }))
         .send()
@@ -62,6 +64,7 @@ async fn test_election_validate_invalid_election_number_of_seats(pool: SqlitePoo
         .post(&url)
         .header("cookie", admin_cookie)
         .json(&serde_json::json!({
+          "role": "GSB",
           "election_data": include_str!("../src/eml/tests/eml110a_invalid_election_number_of_seats.eml.xml"),
         }))
         .send()
@@ -82,6 +85,7 @@ async fn test_election_validate_invalid_xml(pool: SqlitePool) {
         .post(&url)
         .header("cookie", admin_cookie)
         .json(&serde_json::json!({
+          "role": "GSB",
           "election_data": include_str!("../src/eml/tests/eml110a_invalid_xml.eml.xml"),
         }))
         .send()
@@ -101,6 +105,7 @@ async fn test_election_candidates_validate_valid(pool: SqlitePool) {
         .post(&url)
         .header("cookie", admin_cookie)
         .json(&serde_json::json!({
+            "role": "GSB",
             "candidate_data": include_str!("../src/eml/tests/eml230b_test.eml.xml"),
             "election_hash": [
                 "4291", "a4e7", "c76e", "ed19",
@@ -128,6 +133,7 @@ async fn test_election_candidates_validate_wrong_file(pool: SqlitePool) {
         .post(&url)
         .header("cookie", admin_cookie)
         .json(&serde_json::json!({
+            "role": "GSB",
             "election_hash": [
                 "4291", "a4e7", "c76e", "ed19",
                 "476b", "ae90", "3882", "c2dc",
@@ -154,6 +160,7 @@ async fn test_election_candidates_validate_missing_authority(pool: SqlitePool) {
         .post(&url)
         .header("cookie", admin_cookie)
         .json(&serde_json::json!({
+            "role": "GSB",
             "election_hash": [
                 "4291", "a4e7", "c76e", "ed19",
                 "476b", "ae90", "3882", "c2dc",
@@ -180,6 +187,7 @@ async fn test_election_candidates_validate_wrong_election_type(pool: SqlitePool)
         .post(&url)
         .header("cookie", admin_cookie)
         .json(&serde_json::json!({
+            "role": "GSB",
             "election_hash": [
                 "4291", "a4e7", "c76e", "ed19",
                 "476b", "ae90", "3882", "c2dc",
@@ -206,6 +214,7 @@ async fn test_election_candidates_validate_wrong_election_id(pool: SqlitePool) {
         .post(&url)
         .header("cookie", admin_cookie)
         .json(&serde_json::json!({
+            "role": "GSB",
             "election_hash": [
                 "4291", "a4e7", "c76e", "ed19",
                 "476b", "ae90", "3882", "c2dc",
@@ -232,6 +241,7 @@ async fn test_election_candidates_validate_missing_election_domain(pool: SqliteP
         .post(&url)
         .header("cookie", admin_cookie)
         .json(&serde_json::json!({
+            "role": "GSB",
             "election_hash": [
                 "4291", "a4e7", "c76e", "ed19",
                 "476b", "ae90", "3882", "c2dc",
@@ -258,6 +268,7 @@ async fn test_election_candidates_validate_wrong_domain_id(pool: SqlitePool) {
         .post(&url)
         .header("cookie", admin_cookie)
         .json(&serde_json::json!({
+            "role": "GSB",
             "election_hash": [
                 "4291", "a4e7", "c76e", "ed19",
                 "476b", "ae90", "3882", "c2dc",
@@ -284,6 +295,7 @@ async fn test_election_candidates_validate_wrong_election_date(pool: SqlitePool)
         .post(&url)
         .header("cookie", admin_cookie)
         .json(&serde_json::json!({
+            "role": "GSB",
             "election_hash": [
                 "4291", "a4e7", "c76e", "ed19",
                 "476b", "ae90", "3882", "c2dc",
@@ -310,6 +322,7 @@ async fn test_election_candidates_validate_empty_affiliates(pool: SqlitePool) {
         .post(&url)
         .header("cookie", admin_cookie)
         .json(&serde_json::json!({
+            "role": "GSB",
             "election_hash": [
                 "4291", "a4e7", "c76e", "ed19",
                 "476b", "ae90", "3882", "c2dc",
@@ -336,6 +349,7 @@ async fn test_election_candidates_validate_empty_candidates(pool: SqlitePool) {
         .post(&url)
         .header("cookie", admin_cookie)
         .json(&serde_json::json!({
+            "role": "GSB",
             "election_hash": [
                 "4291", "a4e7", "c76e", "ed19",
                 "476b", "ae90", "3882", "c2dc",
@@ -364,6 +378,7 @@ async fn test_election_import_save_with_polling_stations(pool: SqlitePool) {
         .post(&url)
         .header("cookie", &admin_cookie)
         .json(&serde_json::json!({
+            "role": "GSB",
             "election_hash": [
                 "4291", "a4e7", "c76e", "ed19",
                 "476b", "ae90", "3882", "c2dc",
@@ -413,6 +428,7 @@ async fn test_election_import_save_without_polling_stations(pool: SqlitePool) {
         .post(&url)
         .header("cookie", &admin_cookie)
         .json(&serde_json::json!({
+            "role": "GSB",
             "election_hash": [
                 "4291", "a4e7", "c76e", "ed19",
                 "476b", "ae90", "3882", "c2dc",
@@ -460,6 +476,7 @@ async fn test_election_import_save_empty_stubs(pool: SqlitePool) {
         .post(&url)
         .header("cookie", admin_cookie)
         .json(&serde_json::json!({
+            "role": "GSB",
             "election_hash": [
                 "4291", "a4e7", "c76e", "ed19",
                 "", "ae90", "3882", "c2dc",
@@ -496,6 +513,7 @@ async fn test_election_import_save_empty_candidate_stubs(pool: SqlitePool) {
         .post(&url)
         .header("cookie", admin_cookie)
         .json(&serde_json::json!({
+            "role": "GSB",
             "election_hash": [
                 "4291", "a4e7", "c76e", "ed19",
                 "476b", "ae90", "3882", "c2dc",
@@ -532,6 +550,7 @@ async fn test_election_import_save_wrong_hash(pool: SqlitePool) {
         .post(&url)
         .header("cookie", admin_cookie)
         .json(&serde_json::json!({
+            "role": "GSB",
             "election_hash": [
                 "4291", "a4e7", "c76e", "ed19",
                 "1234", "ae90", "3882", "c2dc",
@@ -568,6 +587,7 @@ async fn test_election_import_missing_file_name(pool: SqlitePool) {
         .post(&url)
         .header("cookie", admin_cookie)
         .json(&serde_json::json!({
+            "role": "GSB",
             "election_hash": [
                 "84c9", "caba", "ff33", "6c42",
                 "9825", "b20c", "2ba9", "1ceb",
@@ -602,6 +622,7 @@ async fn test_election_polling_stations_not_matching_election(pool: SqlitePool) 
         .post(&url)
         .header("cookie", admin_cookie)
         .json(&serde_json::json!({
+          "role": "GSB",
           "election_hash": [
                 "4291", "a4e7", "c76e", "ed19",
                 "476b", "ae90", "3882", "c2dc",
@@ -640,6 +661,7 @@ async fn test_election_polling_stations_validate_valid(pool: SqlitePool) {
         .post(&url)
         .header("cookie", admin_cookie)
         .json(&serde_json::json!({
+          "role": "GSB",
           "election_hash": [
                 "4291", "a4e7", "c76e", "ed19",
                 "476b", "ae90", "3882", "c2dc",
@@ -678,6 +700,7 @@ async fn test_election_polling_stations_validate_missing_filename(pool: SqlitePo
         .post(&url)
         .header("cookie", admin_cookie)
         .json(&serde_json::json!({
+          "role": "GSB",
           "election_hash": [
               "84c9", "caba", "ff33", "6c42",
               "9825", "b20c", "2ba9", "1ceb",
@@ -711,6 +734,7 @@ async fn test_election_polling_stations_validate_invalid(pool: SqlitePool) {
         .post(&url)
         .header("cookie", admin_cookie)
         .json(&serde_json::json!({
+          "role": "GSB",
           "election_hash": [
                 "4291", "a4e7", "c76e", "ed19",
                 "476b", "ae90", "3882", "c2dc",

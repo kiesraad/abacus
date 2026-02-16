@@ -1,6 +1,6 @@
 use apportionment::{
     ApportionmentError, ApportionmentInput, CandidateNominationResult, CandidateVotesTrait,
-    ListVotesTrait, SeatAssignmentResult,
+    ListVotesTrait, SeatAssignmentResult, ListNumber, CandidateNumber
 };
 use axum::{
     Json,
@@ -63,9 +63,8 @@ impl ApportionmentInput for ElectionPoliticalGroupSummary {
 impl ListVotesTrait for PoliticalGroupCandidateVotes {
     type Cv = CandidateVotes;
 
-    fn number(&self) -> u32 {
-        // TODO: convert from PGNumber to listnumber of apportionment crate
-        *self.number
+    fn number(&self) -> ListNumber {
+        ListNumber::from(self.number)
     }
 
     fn total_votes(&self) -> u32 {
@@ -78,9 +77,8 @@ impl ListVotesTrait for PoliticalGroupCandidateVotes {
 }
 
 impl CandidateVotesTrait for CandidateVotes {
-    fn number(&self) -> u32 {
-        // TODO: convert from CandidateNumber to candidatenumber of apportionment crate
-        *self.number
+    fn number(&self) -> CandidateNumber {
+        CandidateNumber::from(self.number)
     }
 
     fn votes(&self) -> u32 {

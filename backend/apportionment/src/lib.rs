@@ -10,12 +10,12 @@ pub use self::{
     candidate_nomination::CandidateNominationResult,
     fraction::Fraction,
     seat_assignment::SeatAssignmentResult,
-    structs::{ApportionmentError, ApportionmentInput, CandidateVotesTrait, ListVotesTrait},
+    structs::{ApportionmentError, ApportionmentInput, CandidateVotesTrait, ListVotesTrait, ListNumber, CandidateNumber},
 };
 use self::{
     candidate_nomination::candidate_nomination,
-    seat_assignment::seat_assignment,
-    structs::{ApportionmentOutput, as_candidate_nomination_input},
+    seat_assignment::{as_candidate_nomination_input, seat_assignment},
+    structs::ApportionmentOutput,
 };
 
 pub fn process<T: ApportionmentInput>(

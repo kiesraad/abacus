@@ -48,19 +48,13 @@ __Uitbreidingen:__
 
 ### Niet in scope
 
-- Tellingsbestand in csv-formaat. Dit zal door het uitwisselplatform gedaan worden.
+- Tellingsbestand in csv-formaat.
 - Elektronische handtekening van documenten.
 - CSB besluit tijdens de zitting tot spontane hertelling. Resulteert in samenvoegen van oud en nieuw P22. Vereist wel aanmaken van nieuwe verkiezingen (GR GSB en GR CSB) in Abacus.
-
-### Open punten
-
-- We willen zoveel mogelijk van het PV in de applicatie invoeren. Dus idealiter worden alleen de handtekeningen van de CSB-leden met pen gezet. Dat is niet wat er op dit moment in de use cases staat.
-- In welke stap worden de volgende zaken in het PV opgenomen: locatie en datum, namen stembureauleden, opmerkelijkheden, ...?
-- Willen we de benoemingsbrieven en de kennisgevingen tot geloofsbrief door de applicatie laten genereren? Of doen we dat liever op een andere manier?
+- De benoemingsbrieven en de kennisgevingen tot geloofsbrief.
     - Hoe faciliteren we gemeentes in het bepalen van de layout (bijv. gebruik huisstijl gemeente).
     - Als de applicatie deze moet genereren, dan moeten we ook de totalenlijst i.p.v. de kandidatenlijsten importeren.
-- Overzicht bijlages toevoegen? Komen niet uit de software. (P 22-2)
-- Moet de applicatie Sectie 2.11 Hertelling van de P 22-2 genereren, inclusief extra secties 2.3 t/m 2.5 of 2.10 o.b.v. de hertelling? N.B. deze sectie is alleen relevant als het vertegenwoordigend orgaan vraagt om een hertelling (dus na zitting CSB).
+
 
 ## Het CSB stelt de zetelverdeling vast en wijst de gekozen kandidaten aan (vlieger)
 

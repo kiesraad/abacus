@@ -723,8 +723,8 @@ mod tests {
             tests::{ValidDefault, example_polling_station_results},
         },
         election::{
-            Candidate, CandidateNumber, ElectionCategory, ElectionId, PGNumber, PoliticalGroup,
-            VoteCountingMethod,
+            Candidate, CandidateNumber, ElectionCategory, ElectionId, ElectionRole, PGNumber,
+            PoliticalGroup, VoteCountingMethod,
         },
         polling_station::{PollingStation, PollingStationId, PollingStationType},
     };
@@ -796,6 +796,7 @@ mod tests {
         ElectionWithPoliticalGroups {
             id: ElectionId::from(1),
             name: "Test election".to_string(),
+            role: ElectionRole::GSB,
             counting_method: VoteCountingMethod::CSO,
             election_id: "Test_2025".to_string(),
             location: "Test location".to_string(),

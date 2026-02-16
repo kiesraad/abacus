@@ -1,16 +1,15 @@
 # Input- en output-bestanden Abacus
 
-Het doel is dat Abacus zoveel mogelijk in de documenten invult en er dus zo weinig mogelijk met pen op de processen-verbaal (PV's) moet worden geschreven.
+Dit document geeft een overzicht van alle input- en output-bestanden die relevant zijn voor Abacus. Voor een gedetailleerd overzicht van hoe de modellen gebruikt worden in combinatie met Abacus, zie ["Overzicht modellen en Abacus"](./overzicht-modellen.md). Dit overzicht linkt door naar de relevante details per model.
 
 ## Open punten
 
 - Hoe stellen we de adresgegevens van de (verkozen) kandidaten beschikbaar, makkelijker dan d.m.v. de totaallijst (EML_NL 230c)? Deze gegevens zijn nodig voor het opstellen van de benoemings- en geloofsbrieven.
-- Als er een hertelling gebeurt n.a.v. een verzoek van het CSB of op vraag van de Commissie voor het Onderzoek van de Geloofsbrieven, leidt dit dan op stembureau-niveau tot een corrigendum of tot een volledig nieuw tellings-PV?
-  - Wie vervult de rol van de Commissie voor het Onderzoek van de Geloofsbrieven (Tweede Kamerverkiezingen) bij gemeenteraadsverkiezingen?
-- Moet Abacus Sectie 2.11 Hertelling van de P 22-2 genereren, inclusief extra secties 2.3 t/m 2.5 of 2.10 o.b.v. de hertelling? Deze sectie wordt alleen gebruikt bij een hertelling n.a.v. een bezwaar tijdens de CSB-zitting.
+- Als er een hertelling gebeurt n.a.v. een verzoek van het CSB of van het vertegenwoordigend lichaam, leidt dit dan op stembureau-niveau tot een corrigendum of tot een volledig nieuw tellings-PV?
 
 ## Genereren van documenten door Abacus
 
+- Abacus vult de documenten zoveel mogelijk in, zodat er zo weinig mogelijk met pen op de processen-verbaal (PV's) moet worden geschreven.
 - Abacus moet alle documenten volgens de modellen kunnen genereren. Ofwel als 'leeg' document (in te vullen met de hand) of als ingevuld document (ingevuld door Abacus). In de tabellen hieronder zijn dit respectievelijk de kolommen *'leeg' document uit Abacus* en *output van Abacus*.
 - Alleen de documenten die overeenkomen met het ingestelde type stemopneming (DSO of CSO) kunnen gegenereerd worden voor een verkiezing.
 - Het is niet noodzakelijk om te beperken op welk moment bepaalde 'lege' documenten gegenereerd kunnen worden, zolang het onderscheid tussen de verschillende documenten duidelijk is voor gebruikers.
@@ -39,7 +38,7 @@ EML_NL 210 (kandidatenlijst voor een politieke groepering) wordt niet gebruikt, 
 |-------------------|:---:|:---:|-------------------------------------|:--------------------------:|:-----------------:|:-----------------:|
 | N 10-1            |  X  |     | PV SB                               |             X              |         X         |                   |
 | Na 14-1 versie 1  |  X  |     | Corrigendum SB - eerste zitting     |             X              |         X         |                   |
-| N 10-2            |     |  X  | PV SB                               |             X              |         X         |                   |
+| N 10-2            |     |  X  | PV SB                               |             X              |                   |                   |
 | N 5               |  X  |  X  | Overdrachtsdocument GSB             |                            |                   |                   |
 | Na 31-2 Bijlage 1 |     |  X  | Telresultaten SB                    |             X              |         X         |                   |
 | Na 31-2 Bijlage 2 |     |  X  | Bezwaren SB's                       |                            |                   |                   |

@@ -43,6 +43,7 @@ export function UploadCandidatesDefinition() {
       setFile(currentFile);
       const data = await currentFile.text();
       const response = await create({
+        role: "GSB",
         candidate_data: data,
         election_hash: state.electionDefinitionHash,
         election_data: state.electionDefinitionData,
@@ -82,6 +83,7 @@ export function UploadCandidatesDefinition() {
   ) {
     async function onSubmit(chunks: string[]) {
       const response = await create({
+        role: "GSB",
         candidate_data: state.candidateDefinitionData,
         election_hash: state.electionDefinitionHash,
         election_data: state.electionDefinitionData,

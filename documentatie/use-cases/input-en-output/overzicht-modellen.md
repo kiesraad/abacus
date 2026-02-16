@@ -9,8 +9,10 @@ Het overzicht van alle input en output van Abacus (dus ook bijv. EML_NL) staat i
 ### Invoer in Abacus
 
 #### Eerste zitting
-- CSO: [Na 31-2 Bijlage 1](./Na31-2.md#welke-data-wordt-door-het-gsb-in-abacus-ingevoerd) (hertelling per stembureau)
-- DSO: N 10-1 deel 2 (telling per stembureau), Na 14-1 versie 1 (hertelling per stembureau)
+- CSO: [Na 31-2 Bijlage 1](./Na31-2.md#welke-data-wordt-door-het-gsb-in-abacus-ingevoerd) (telling per stembureau)
+- DSO: 
+  - N 10-1 deel 2 (telling per stembureau)
+  - Na 14-1 versie 1 (hertelling per stembureau)
 
 #### Latere zitting
 - CSO: [Na 14-2 Bijlage 1 (hertelling per stembureau)](./Na14-2.md#welke-data-wordt-door-het-gsb-in-abacus-ingevoerd)

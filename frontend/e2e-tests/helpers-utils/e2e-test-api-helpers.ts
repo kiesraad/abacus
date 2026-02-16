@@ -1,5 +1,5 @@
-import type { APIRequestContext } from "@playwright/test";
-
+import { type APIRequestContext, expect } from "@playwright/test";
+import type { testUser } from "e2e-tests/test-data/users";
 import { dataEntryRequest } from "../test-data/request-response-templates";
 import { DataEntryApiClient } from "./api-clients";
 
@@ -34,4 +34,28 @@ export async function completePollingStationDataEntries(
   await secondDataEntry.claim();
   await secondDataEntry.save(secondRequest);
   await secondDataEntry.finalise();
+}
+
+export async function createUser(adminContext: APIRequestContext, user: testUser) {
+  const response = await adminContext.post("/api/users", {
+    data: {
+      ...user,
+      temp_password: getTestPassword(user.username, "Temp"),
+    },
+  });
+  expect(response.status()).toBe(201);
+}
+
+export async function firstLogin(userContext: APIRequestContext, user: testUser) {
+  const loginResponse = await loginAs(userContext, user.username, "Temp");
+  expect(loginResponse.status()).toBe(200);
+
+  const response = await userContext.put("/api/account", {
+    data: {
+      username: user.username,
+      fullname: user.fullname,
+      password: getTestPassword(user.username),
+    },
+  });
+  expect(response.status()).toBe(200);
 }

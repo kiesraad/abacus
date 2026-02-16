@@ -1,7 +1,7 @@
 import { stat } from "node:fs/promises";
-import { expect } from "@playwright/test";
+import { expect, request } from "@playwright/test";
 import { test } from "e2e-tests/fixtures";
-import { getTestPassword, loginAs } from "e2e-tests/helpers-utils/e2e-test-api-helpers";
+import { createUser, firstLogin, getTestPassword } from "e2e-tests/helpers-utils/e2e-test-api-helpers";
 import {
   createInvestigation,
   fillCandidatesListPages,
@@ -42,6 +42,7 @@ import { UserCreateTypePgObj } from "e2e-tests/page-objects/users/UserCreateType
 import { UserListPgObj } from "e2e-tests/page-objects/users/UserListPgObj";
 import { eml110b_single } from "e2e-tests/test-data/eml-files";
 import { noRecountNoDifferencesDataEntry } from "e2e-tests/test-data/request-response-templates";
+import type { testUser } from "e2e-tests/test-data/users";
 
 const investigations = [
   { number: "1", name: "Stadhuis", reason: "Reden", findings: "Probleem", correctedResults: true },
@@ -68,33 +69,20 @@ test.describe.configure({ mode: "serial" });
 test.describe("full flow", () => {
   let electionId: number | null = null;
 
+  // eslint-disable-next-line playwright/expect-expect
   test("create browser-specific admin user account", async ({ adminOne, browserName }) => {
-    const { request } = adminOne;
+    const { request: adminOneContext } = adminOne;
 
-    // Create admin user for each browser.
-    const username = `admin-${browserName}`;
-    const response = await request.post("/api/users", {
-      data: {
-        role: "administrator",
-        fullname: "John Doe",
-        username: username,
-        temp_password: getTestPassword(username, "Temp"),
-      },
-    });
-    expect(response.status()).toBe(201);
+    const user: testUser = {
+      role: "administrator",
+      fullname: "John Doe",
+      username: `admin-${browserName}`,
+    };
 
-    const loginResponse = await loginAs(request, username, "Temp");
-    expect(loginResponse.status()).toBe(200);
+    await createUser(adminOneContext, user);
 
-    const response2 = await request.put("/api/account", {
-      data: {
-        username: username,
-        fullname: "John Doe",
-        password: getTestPassword(username),
-      },
-    });
-
-    expect(response2.status()).toBe(200);
+    const newAdminContext = await request.newContext();
+    await firstLogin(newAdminContext, user);
   });
 
   test(`create browser-specific coordinator for flow`, async ({ page, browserName }) => {

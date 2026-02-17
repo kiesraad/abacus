@@ -1,8 +1,6 @@
-use abacus::{
-    domain::models::{PdfFileModel, PdfModel},
-    infra::pdf_gen::generate_pdf,
-};
+use abacus::domain::models::{PdfFileModel, PdfModel};
 use clap::Parser;
+use pdf_gen::generate_pdf;
 use tokio::{fs, process::Command};
 
 /// Generate PDFs for all available models using the input JSON files in
@@ -67,7 +65,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         let file_name = format!("{path}/{}.pdf", model.as_model_name());
         let file_model = PdfFileModel::new(file_name.clone(), model);
 
-        let pdf = match generate_pdf(file_model).await {
+        let pdf = match generate_pdf(&file_model).await {
             Ok(pdf) => pdf,
             Err(e) => {
                 eprintln!("Error generating PDF {file_name}: {e:?}");

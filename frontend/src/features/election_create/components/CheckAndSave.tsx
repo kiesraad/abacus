@@ -23,6 +23,7 @@ export function CheckAndSave() {
 
   function handleSubmit() {
     void create({
+      role: "GSB",
       election_data: state.electionDefinitionData,
       election_hash: state.electionDefinitionHash,
       candidate_data: state.candidateDefinitionData,

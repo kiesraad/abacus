@@ -1125,7 +1125,7 @@ mod tests {
     use crate::domain::{
         data_entry::{YesNo, tests::ValidDefault},
         election::tests::election_fixture,
-        polling_station::tests::polling_station_fixture,
+        polling_station::test_helpers::polling_station_fixture,
     };
 
     mod extra_investigation {

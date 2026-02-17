@@ -42,6 +42,7 @@ function electionValidateResponse(
   matching_election: boolean | undefined = undefined,
 ): ElectionDefinitionValidateResponse {
   return {
+    role: "GSB",
     hash: {
       chunks: [
         "asdf",

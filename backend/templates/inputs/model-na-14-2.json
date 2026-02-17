@@ -18,6 +18,7 @@
   "election": {
     "id": 4,
     "name": "Gemeenteraad Hovenerwoud 2022",
+    "role": "GSB",
     "counting_method": "CSO",
     "election_id": "Hovenerwoud_2022",
     "location": "Hovenerwoud",
@@ -61,41 +62,9 @@
       }
     },
     "polling_station_investigations": {
-      "admitted_voters_recounted": [
-        3,
-        7,
-        10,
-        16,
-        19,
-        20,
-        27,
-        28,
-        35,
-        41,
-        48,
-        49,
-        51,
-        52,
-        62,
-        64,
-        73,
-        82,
-        85,
-        89,
-        90
-      ],
-      "investigated_other_reason": [
-        13,
-        19,
-        35,
-        51,
-        55,
-        75,
-        85
-      ],
-      "ballots_recounted": [
-        13
-      ]
+      "admitted_voters_recounted": [3, 7, 10, 16, 19, 20, 27, 28, 35, 41, 48, 49, 51, 52, 62, 64, 73, 82, 85, 89, 90],
+      "investigated_other_reason": [13, 19, 35, 51, 55, 75, 85],
+      "ballots_recounted": [13]
     }
   },
   "summary": {
@@ -127,47 +96,13 @@
       },
       "fewer_ballots_count": {
         "count": 1,
-        "polling_stations": [
-          1
-        ]
+        "polling_stations": [1]
       }
     },
     "polling_station_investigations": {
-      "admitted_voters_recounted": [
-        3,
-        7,
-        10,
-        16,
-        19,
-        20,
-        27,
-        28,
-        35,
-        41,
-        48,
-        49,
-        51,
-        52,
-        62,
-        64,
-        73,
-        82,
-        85,
-        89,
-        90
-      ],
-      "investigated_other_reason": [
-        13,
-        19,
-        35,
-        51,
-        55,
-        75,
-        85
-      ],
-      "ballots_recounted": [
-        13
-      ]
+      "admitted_voters_recounted": [3, 7, 10, 16, 19, 20, 27, 28, 35, 41, 48, 49, 51, 52, 62, 64, 73, 82, 85, 89, 90],
+      "investigated_other_reason": [13, 19, 35, 51, 55, 75, 85],
+      "ballots_recounted": [13]
     }
   },
   "hash": "9a41 7d73 0dd2 b6d2 d0a6 ebdd 5360 d2ed de0c 3cc4 22e1 0c13 863e 3241 040d bd14",

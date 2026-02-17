@@ -81,6 +81,10 @@ label.button {
     border-color: var(--button-color-tertiary);
     color: var(--button-color-tertiary-text);
 
+    &:not(:hover, :active) {
+      box-shadow: none;
+    }
+
     &:hover {
       background: var(--button-color-tertiary-hover);
     }

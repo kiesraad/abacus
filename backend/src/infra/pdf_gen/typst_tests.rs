@@ -21,7 +21,8 @@ use crate::{
         },
         election::{
             Candidate, CandidateGender, CandidateNumber, ElectionCategory, ElectionId,
-            ElectionWithPoliticalGroups, PGNumber, PoliticalGroup, VoteCountingMethod,
+            ElectionRole, ElectionWithPoliticalGroups, PGNumber, PoliticalGroup,
+            VoteCountingMethod,
         },
         file::FileId,
         investigation::PollingStationInvestigation,
@@ -116,6 +117,7 @@ fn random_election(
     ElectionWithPoliticalGroups {
         id: ElectionId::from(rng.random_range(0..5)),
         name: random_string(rng, string_length),
+        role: ElectionRole::GSB,
         counting_method: random_value(rng, &[VoteCountingMethod::CSO, VoteCountingMethod::DSO]),
         election_id: random_string(rng, string_length),
         location: random_string(rng, string_length),

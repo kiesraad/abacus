@@ -1,7 +1,7 @@
 import { stat } from "node:fs/promises";
 import { expect } from "@playwright/test";
 import { test } from "e2e-tests/fixtures";
-import { getTestPassword } from "e2e-tests/helpers-utils/e2e-test-api-helpers";
+import { getTestPassword, loginAs } from "e2e-tests/helpers-utils/e2e-test-api-helpers";
 import {
   createInvestigation,
   fillCandidatesListPages,
@@ -61,23 +61,99 @@ const investigations = [
   },
 ];
 
-const typistUsers = ["typist3", "typist4"];
+const typistBaseNameUsers = ["typist3", "typist4"];
 
 test.describe.configure({ mode: "serial" });
 
 test.describe("full flow", () => {
   let electionId: number | null = null;
 
-  test(`create typists for flow`, async ({ page }) => {
+  test("create browser-specific admin user account", async ({ admin, browserName }) => {
+    const { request } = admin;
+
+    // Create admin user for each browser.
+    const username = `admin-${browserName}`;
+    const response = await request.post("/api/users", {
+      data: {
+        role: "administrator",
+        fullname: "John Doe",
+        username: username,
+        temp_password: getTestPassword(username, "Temp"),
+      },
+    });
+    expect(response.status()).toBe(201);
+
+    const loginResponse = await loginAs(request, username, "Temp");
+    expect(loginResponse.status()).toBe(200);
+
+    const response2 = await request.put("/api/account", {
+      data: {
+        username: username,
+        fullname: "John Doe",
+        password: getTestPassword(username),
+      },
+    });
+
+    expect(response2.status()).toBe(200);
+  });
+
+  test(`create browser-specific coordinator for flow`, async ({ page, browserName }) => {
     await page.goto("/account/login");
 
+    const adminUsername = `admin-${browserName}`;
     const loginPage = new LoginPgObj(page);
-    await loginPage.login("admin2", getTestPassword("admin2"));
+    await loginPage.login(adminUsername, getTestPassword(adminUsername));
 
     const navBar = new AdminNavBar(page);
-    await expect(navBar.username).toHaveText(`Jef van Reybrouck`);
+    await expect(navBar.username).toHaveText(`John Doe`);
 
-    for (const username of typistUsers) {
+    await page.goto(`/users`);
+
+    const userListPgObj = new UserListPgObj(page);
+    await userListPgObj.create.click();
+
+    const userCreateRolePgObj = new UserCreateRolePgObj(page);
+    await userCreateRolePgObj.coordinator.click();
+    await userCreateRolePgObj.continue.click();
+
+    const coordinatorUsername = `coordinator-${browserName}`;
+    const userCreateDetailsPgObj = new UserCreateDetailsPgObj(page);
+    await userCreateDetailsPgObj.username.fill(coordinatorUsername);
+    await userCreateDetailsPgObj.fullname.fill(`Coordinator ${coordinatorUsername}`);
+    await userCreateDetailsPgObj.password.fill(getTestPassword(coordinatorUsername, "Temp"));
+    await userCreateDetailsPgObj.save.click();
+
+    await expect(userListPgObj.alert).toContainText(`${coordinatorUsername} is toegevoegd met de rol Coördinator`);
+  });
+
+  test(`complete account for coordinator`, async ({ page, browserName }) => {
+    await page.goto("/account/login");
+    const loginPage = new LoginPgObj(page);
+    const username = `coordinator-${browserName}`;
+    await loginPage.login(username, getTestPassword(username, "Temp"));
+
+    const password = getTestPassword(username);
+    const accountSetupPage = new AccountSetupPgObj(page);
+    await accountSetupPage.password.fill(password);
+    await accountSetupPage.passwordRepeat.fill(password);
+    await accountSetupPage.saveBtn.click();
+
+    const overviewPage = new ElectionsOverviewPgObj(page);
+    await expect(overviewPage.alertAccountSetup).toBeVisible();
+  });
+
+  test(`create browser-specific typists for flow`, async ({ page, browserName }) => {
+    await page.goto("/account/login");
+
+    const adminUsername = `admin-${browserName}`;
+    const loginPage = new LoginPgObj(page);
+    await loginPage.login(adminUsername, getTestPassword(adminUsername));
+
+    const navBar = new AdminNavBar(page);
+    await expect(navBar.username).toHaveText(`John Doe`);
+
+    // Create browser-specific typists
+    for (const username of typistBaseNameUsers) {
       await page.goto(`/users`);
 
       const userListPgObj = new UserListPgObj(page);
@@ -90,21 +166,23 @@ test.describe("full flow", () => {
       const userCreateTypePgObj = new UserCreateTypePgObj(page);
       await userCreateTypePgObj.continue.click();
 
+      const typistUsername = `${username}-${browserName}`;
       const userCreateDetailsPgObj = new UserCreateDetailsPgObj(page);
-      await userCreateDetailsPgObj.username.fill(username);
-      await userCreateDetailsPgObj.fullname.fill(`Typist ${username}`);
-      await userCreateDetailsPgObj.password.fill(username.repeat(3));
+      await userCreateDetailsPgObj.username.fill(typistUsername);
+      await userCreateDetailsPgObj.fullname.fill(`Typist ${typistUsername}`);
+      await userCreateDetailsPgObj.password.fill(typistUsername.repeat(3));
       await userCreateDetailsPgObj.save.click();
 
-      await expect(userListPgObj.alert).toContainText(`${username} is toegevoegd met de rol Invoerder`);
+      await expect(userListPgObj.alert).toContainText(`${typistUsername} is toegevoegd met de rol Invoerder`);
     }
   });
 
-  test("create election and a new polling station", async ({ page }) => {
+  test("create election and a new polling station", async ({ page, browserName }) => {
     await page.goto("/account/login");
 
+    const adminUsername = `admin-${browserName}`;
     const loginPage = new LoginPgObj(page);
-    await loginPage.login("admin2", getTestPassword("admin2"));
+    await loginPage.login(adminUsername, getTestPassword(adminUsername));
 
     const electionsOverviewPage = new ElectionsOverviewPgObj(page);
     await electionsOverviewPage.create.click();
@@ -157,11 +235,12 @@ test.describe("full flow", () => {
     );
   });
 
-  test("start data entry", async ({ page }) => {
+  test("start data entry", async ({ page, browserName }) => {
     await page.goto("/account/login");
 
+    const username = `coordinator-${browserName}`;
     const loginPage = new LoginPgObj(page);
-    await loginPage.login("coordinator2", getTestPassword("coordinator2"));
+    await loginPage.login(username, getTestPassword(username));
 
     const overviewPage = new ElectionsOverviewPgObj(page);
     await expect(overviewPage.header).toBeVisible();
@@ -183,11 +262,12 @@ test.describe("full flow", () => {
     await expect(electionStatus.header).toContainText("Eerste zitting");
   });
 
-  test("download Na 31-2 documents", async ({ page }) => {
+  test("download Na 31-2 documents", async ({ page, browserName }) => {
     await page.goto("/account/login");
 
     const loginPage = new LoginPgObj(page);
-    await loginPage.login("coordinator2", getTestPassword("coordinator2"));
+    const username = `coordinator-${browserName}`;
+    await loginPage.login(username, getTestPassword(username));
 
     const overviewPage = new ElectionsOverviewPgObj(page);
     await expect(overviewPage.header).toBeVisible();
@@ -204,11 +284,12 @@ test.describe("full flow", () => {
     expect((await stat(await download.path())).size).toBeGreaterThan(1024);
   });
 
-  test("download N10-2 documents", async ({ page }) => {
+  test("download N10-2 documents", async ({ page, browserName }) => {
     await page.goto("/account/login");
 
     const loginPage = new LoginPgObj(page);
-    await loginPage.login("coordinator2", getTestPassword("coordinator2"));
+    const username = `coordinator-${browserName}`;
+    await loginPage.login(username, getTestPassword(username));
 
     const overviewPage = new ElectionsOverviewPgObj(page);
     await expect(overviewPage.header).toBeVisible();
@@ -225,11 +306,12 @@ test.describe("full flow", () => {
     expect((await stat(await download.path())).size).toBeGreaterThan(1024);
   });
 
-  for (const typist of typistUsers) {
-    test(`complete account for ${typist}`, async ({ page }) => {
+  for (const typist of typistBaseNameUsers) {
+    test(`complete account for ${typist}`, async ({ page, browserName }) => {
       await page.goto("/account/login");
       const loginPage = new LoginPgObj(page);
-      await loginPage.login(typist, typist.repeat(3));
+      const username = `${typist}-${browserName}`;
+      await loginPage.login(username, username.repeat(3));
 
       const password = getTestPassword(typist);
       const accountSetupPage = new AccountSetupPgObj(page);
@@ -246,11 +328,12 @@ test.describe("full flow", () => {
     { number: "1", name: "Stadhuis" },
     { number: "2", name: "Basisschool de Regenboog" },
   ]) {
-    test(`first data entry ${station.name}`, async ({ page }) => {
+    test(`first data entry ${station.name}`, async ({ page, browserName }) => {
       await page.goto("/account/login");
 
+      const username = `typist3-${browserName}`;
       const loginPage = new LoginPgObj(page);
-      await loginPage.login("typist3", getTestPassword("typist3"));
+      await loginPage.login(username, getTestPassword("typist3"));
 
       const overviewPage = new ElectionsOverviewPgObj(page);
       await expect(overviewPage.header).toBeVisible();
@@ -265,11 +348,12 @@ test.describe("full flow", () => {
       await fillDataEntryPagesAndSave(page, noRecountNoDifferencesDataEntry);
     });
 
-    test(`second data entry ${station.name}`, async ({ page }) => {
+    test(`second data entry ${station.name}`, async ({ page, browserName }) => {
       await page.goto("/account/login");
 
+      const username = `typist4-${browserName}`;
       const loginPage = new LoginPgObj(page);
-      await loginPage.login("typist4", getTestPassword("typist4"));
+      await loginPage.login(username, getTestPassword("typist4"));
 
       const overviewPage = new ElectionsOverviewPgObj(page);
       await expect(overviewPage.header).toBeVisible();
@@ -285,11 +369,12 @@ test.describe("full flow", () => {
     });
   }
 
-  test("finish data entry", async ({ page }) => {
+  test("finish data entry", async ({ page, browserName }) => {
     await page.goto("/account/login");
 
     const loginPage = new LoginPgObj(page);
-    await loginPage.login("coordinator2", getTestPassword("coordinator2"));
+    const username = `coordinator-${browserName}`;
+    await loginPage.login(username, getTestPassword(username));
 
     const overviewPage = new ElectionsOverviewPgObj(page);
     await expect(overviewPage.header).toBeVisible();
@@ -315,11 +400,12 @@ test.describe("full flow", () => {
     expect((await stat(await download.path())).size).toBeGreaterThan(1024);
   });
 
-  test("create new committee session", async ({ page }) => {
+  test("create new committee session", async ({ page, browserName }) => {
     await page.goto("/account/login");
 
     const loginPage = new LoginPgObj(page);
-    await loginPage.login("coordinator2", getTestPassword("coordinator2"));
+    const username = `coordinator-${browserName}`;
+    await loginPage.login(username, getTestPassword(username));
 
     const overviewPage = new ElectionsOverviewPgObj(page);
     await expect(overviewPage.header).toBeVisible();
@@ -332,11 +418,12 @@ test.describe("full flow", () => {
     await expect(electionDetailsPage.investigationsOverviewButton).toBeVisible();
   });
 
-  test("download Na 31-2 inlegvel", async ({ page }) => {
+  test("download Na 31-2 inlegvel", async ({ page, browserName }) => {
     await page.goto("/account/login");
 
     const loginPage = new LoginPgObj(page);
-    await loginPage.login("coordinator2", getTestPassword("coordinator2"));
+    const username = `coordinator-${browserName}`;
+    await loginPage.login(username, getTestPassword(username));
 
     const overviewPage = new ElectionsOverviewPgObj(page);
     await expect(overviewPage.header).toBeVisible();
@@ -353,11 +440,12 @@ test.describe("full flow", () => {
     expect((await stat(await download.path())).size).toBeGreaterThan(1024);
   });
 
-  test("add missing polling station", async ({ page }) => {
+  test("add missing polling station", async ({ page, browserName }) => {
     await page.goto("/account/login");
 
     const loginPage = new LoginPgObj(page);
-    await loginPage.login("coordinator2", getTestPassword("coordinator2"));
+    const username = `coordinator-${browserName}`;
+    await loginPage.login(username, getTestPassword(username));
 
     const overviewPage = new ElectionsOverviewPgObj(page);
     await expect(overviewPage.header).toBeVisible();
@@ -388,11 +476,12 @@ test.describe("full flow", () => {
   });
 
   for (const station of investigations) {
-    test(`create investigation for ${station.name}`, async ({ page }) => {
+    test(`create investigation for ${station.name}`, async ({ page, browserName }) => {
       await page.goto("/account/login");
 
       const loginPage = new LoginPgObj(page);
-      await loginPage.login("coordinator2", getTestPassword("coordinator2"));
+      const username = `coordinator-${browserName}`;
+      await loginPage.login(username, getTestPassword(username));
 
       const overviewPage = new ElectionsOverviewPgObj(page);
       await expect(overviewPage.header).toBeVisible();
@@ -402,11 +491,12 @@ test.describe("full flow", () => {
     });
   }
 
-  test("start data entry of corrected results", async ({ page }) => {
+  test("start data entry of corrected results", async ({ page, browserName }) => {
     await page.goto("/account/login");
 
     const loginPage = new LoginPgObj(page);
-    await loginPage.login("coordinator2", getTestPassword("coordinator2"));
+    const username = `coordinator-${browserName}`;
+    await loginPage.login(username, getTestPassword(username));
 
     const overviewPage = new ElectionsOverviewPgObj(page);
     await expect(overviewPage.header).toBeVisible();
@@ -420,11 +510,12 @@ test.describe("full flow", () => {
   });
 
   for (const station of investigations) {
-    test(`finish investigation for ${station.name}`, async ({ page }) => {
+    test(`finish investigation for ${station.name}`, async ({ page, browserName }) => {
       await page.goto("/account/login");
 
       const loginPage = new LoginPgObj(page);
-      await loginPage.login("coordinator2", getTestPassword("coordinator2"));
+      const username = `coordinator-${browserName}`;
+      await loginPage.login(username, getTestPassword(username));
 
       const overviewPage = new ElectionsOverviewPgObj(page);
       await expect(overviewPage.header).toBeVisible();
@@ -452,12 +543,13 @@ test.describe("full flow", () => {
     });
   }
 
-  for (const typist of typistUsers) {
-    test(`corrected data entry with ${typist}`, async ({ page }) => {
+  for (const typist of typistBaseNameUsers) {
+    test(`corrected data entry with ${typist}`, async ({ page, browserName }) => {
       await page.goto("/account/login");
 
+      const username = `${typist}-${browserName}`;
       const loginPage = new LoginPgObj(page);
-      await loginPage.login(typist, getTestPassword(typist));
+      await loginPage.login(username, getTestPassword(typist));
 
       const overviewPage = new ElectionsOverviewPgObj(page);
       await expect(overviewPage.header).toBeVisible();
@@ -498,12 +590,13 @@ test.describe("full flow", () => {
     });
   }
 
-  for (const typist of typistUsers) {
-    test(`data entry for new pollings station with ${typist}`, async ({ page }) => {
+  for (const typist of typistBaseNameUsers) {
+    test(`data entry for new polling station with ${typist}`, async ({ page, browserName }) => {
       await page.goto("/account/login");
 
+      const username = `${typist}-${browserName}`;
       const loginPage = new LoginPgObj(page);
-      await loginPage.login(typist, getTestPassword(typist));
+      await loginPage.login(username, getTestPassword(typist));
 
       const overviewPage = new ElectionsOverviewPgObj(page);
       await expect(overviewPage.header).toBeVisible();
@@ -535,11 +628,12 @@ test.describe("full flow", () => {
     });
   }
 
-  test("check progress", async ({ page }) => {
+  test("check progress", async ({ page, browserName }) => {
     await page.goto("/account/login");
 
     const loginPage = new LoginPgObj(page);
-    await loginPage.login("coordinator2", getTestPassword("coordinator2"));
+    const username = `coordinator-${browserName}`;
+    await loginPage.login(username, getTestPassword(username));
 
     const overviewPage = new ElectionsOverviewPgObj(page);
     await expect(overviewPage.header).toBeVisible();

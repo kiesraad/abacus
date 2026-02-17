@@ -331,14 +331,6 @@ pub(crate) mod tests {
         }
     }
 
-    pub fn get_total_seats_from_apportionment_result(result: &SeatAssignmentResult) -> Vec<u32> {
-        result
-            .final_standing
-            .iter()
-            .map(|p| p.total_seats)
-            .collect::<Vec<_>>()
-    }
-
     fn check_total_seats_per_list(
         result: &SeatAssignmentResult,
         expected_total_seats_per_list: Vec<(u32, u32)>,
@@ -376,10 +368,14 @@ pub(crate) mod tests {
     mod lt_19_seats {
         use test_log::test;
 
-        use super::get_total_seats_from_apportionment_result;
         use crate::{
-            ApportionmentError, seat_assignment::seat_assignment, structs::ListNumber,
-            test_helpers::seat_assignment_fixture_with_default_50_candidates,
+            ApportionmentError,
+            seat_assignment::seat_assignment,
+            structs::ListNumber,
+            test_helpers::{
+                get_total_seats_from_apportionment_result,
+                seat_assignment_fixture_with_default_50_candidates,
+            },
         };
 
         /// Apportionment without remainder seats
@@ -1340,12 +1336,13 @@ pub(crate) mod tests {
     mod gte_19_seats {
         use test_log::test;
 
-        use super::{check_total_seats_per_list, get_total_seats_from_apportionment_result};
+        use super::check_total_seats_per_list;
         use crate::{
             ApportionmentError,
             seat_assignment::seat_assignment,
             structs::ListNumber,
             test_helpers::{
+                get_total_seats_from_apportionment_result,
                 seat_assignment_fixture_with_default_50_candidates,
                 seat_assignment_fixture_with_given_list_numbers_and_candidate_votes,
             },

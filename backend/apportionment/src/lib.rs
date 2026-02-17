@@ -1,3 +1,7 @@
+//! Apportionment calculation with two parts, the seat assignment and the candidate nomination.
+//!
+//! Crate also contains a definition of a fraction, which is used in all calculations.
+
 mod candidate_nomination;
 mod fraction;
 mod int_newtype_macro;
@@ -35,9 +39,14 @@ pub fn process<T: ApportionmentInput>(
 #[cfg(test)]
 mod tests {
     use super::process;
+    use crate::test_helpers::{check_chosen_candidates, check_list_candidate_nomination};
     use crate::{
-        Fraction, seat_assignment::tests::get_total_seats_from_apportionment_result,
-        structs::ListNumber, test_helpers::seat_assignment_fixture_with_default_50_candidates,
+        Fraction,
+        structs::ListNumber,
+        test_helpers::{
+            get_total_seats_from_apportionment_result,
+            seat_assignment_fixture_with_default_50_candidates,
+        },
     };
 
     #[test]
@@ -75,9 +84,102 @@ mod tests {
                 .number_of_votes,
             Fraction::new(40, 1)
         );
-        // TODO: Do we want to check the full candidate nomination result?
-        //  In that case we need to move some test helper functions
-        //  out of candidate nomination tests to test_helpers.rs
-        //  and potentially move some structs as well
+        check_list_candidate_nomination(
+            &result.candidate_nomination.list_candidate_nomination[0],
+            &[1],
+            &[2, 3, 4, 5, 6, 7],
+            &[],
+        );
+        check_list_candidate_nomination(
+            &result.candidate_nomination.list_candidate_nomination[1],
+            &[1],
+            &[2],
+            &[],
+        );
+        check_list_candidate_nomination(
+            &result.candidate_nomination.list_candidate_nomination[2],
+            &[1],
+            &[2],
+            &[],
+        );
+        check_list_candidate_nomination(
+            &result.candidate_nomination.list_candidate_nomination[3],
+            &[1],
+            &[],
+            &[],
+        );
+        check_list_candidate_nomination(
+            &result.candidate_nomination.list_candidate_nomination[4],
+            &[1],
+            &[],
+            &[],
+        );
+        check_list_candidate_nomination(
+            &result.candidate_nomination.list_candidate_nomination[5],
+            &[1],
+            &[],
+            &[],
+        );
+        check_list_candidate_nomination(
+            &result.candidate_nomination.list_candidate_nomination[6],
+            &[1],
+            &[],
+            &[],
+        );
+        check_list_candidate_nomination(
+            &result.candidate_nomination.list_candidate_nomination[7],
+            &[],
+            &[],
+            &[],
+        );
+
+        check_chosen_candidates(
+            &result.candidate_nomination.chosen_candidates,
+            &input.list_votes[0].number,
+            &input.list_votes[0].candidate_votes[..7],
+            &input.list_votes[0].candidate_votes[8..],
+        );
+        check_chosen_candidates(
+            &result.candidate_nomination.chosen_candidates,
+            &input.list_votes[1].number,
+            &input.list_votes[1].candidate_votes[..2],
+            &input.list_votes[1].candidate_votes[2..],
+        );
+        check_chosen_candidates(
+            &result.candidate_nomination.chosen_candidates,
+            &input.list_votes[2].number,
+            &input.list_votes[2].candidate_votes[..2],
+            &input.list_votes[2].candidate_votes[2..],
+        );
+        check_chosen_candidates(
+            &result.candidate_nomination.chosen_candidates,
+            &input.list_votes[3].number,
+            &input.list_votes[3].candidate_votes[..1],
+            &input.list_votes[3].candidate_votes[1..],
+        );
+        check_chosen_candidates(
+            &result.candidate_nomination.chosen_candidates,
+            &input.list_votes[4].number,
+            &input.list_votes[4].candidate_votes[..1],
+            &input.list_votes[4].candidate_votes[1..],
+        );
+        check_chosen_candidates(
+            &result.candidate_nomination.chosen_candidates,
+            &input.list_votes[5].number,
+            &input.list_votes[5].candidate_votes[..1],
+            &input.list_votes[5].candidate_votes[1..],
+        );
+        check_chosen_candidates(
+            &result.candidate_nomination.chosen_candidates,
+            &input.list_votes[6].number,
+            &input.list_votes[6].candidate_votes[..1],
+            &input.list_votes[6].candidate_votes[2..],
+        );
+        check_chosen_candidates(
+            &result.candidate_nomination.chosen_candidates,
+            &input.list_votes[7].number,
+            &[],
+            &input.list_votes[7].candidate_votes[1..],
+        );
     }
 }

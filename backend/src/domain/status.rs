@@ -173,10 +173,12 @@ pub struct Definitive {
     pub first_entry_user_id: UserId,
     /// User who did the second data entry
     pub second_entry_user_id: UserId,
-    /// When both data entries were finalised
+    /// The definitive results data
+    pub results: PollingStationResults,
+    /// When the result was finalised
     #[schema(value_type = String)]
     pub finished_at: DateTime<Utc>,
-    /// Whether the second data entry was finalised with warnings
+    /// Whether the result has warnings
     pub finalised_with_warnings: bool,
 }
 
@@ -374,7 +376,7 @@ impl DataEntryStatus {
         polling_station: &PollingStation,
         election: &ElectionWithPoliticalGroups,
         user_id: UserId,
-    ) -> Result<(Self, Option<PollingStationResults>), DataEntryTransitionError> {
+    ) -> Result<Self, DataEntryTransitionError> {
         match &self {
             DataEntryStatus::SecondEntryInProgress(state) => {
                 if state.second_entry_user_id != user_id {
@@ -388,27 +390,22 @@ impl DataEntryStatus {
                         return Err(validation_results.into());
                     }
 
-                    Ok((
-                        Self::Definitive(Definitive {
-                            first_entry_user_id: state.first_entry_user_id,
-                            second_entry_user_id: state.second_entry_user_id,
-                            finished_at: Utc::now(),
-                            finalised_with_warnings: validation_results.has_warnings(),
-                        }),
-                        Some(state.second_entry.clone()),
-                    ))
+                    Ok(Self::Definitive(Definitive {
+                        first_entry_user_id: state.first_entry_user_id,
+                        second_entry_user_id: state.second_entry_user_id,
+                        finished_at: Utc::now(),
+                        finalised_with_warnings: validation_results.has_warnings(),
+                        results: state.second_entry.clone(),
+                    }))
                 } else {
-                    Ok((
-                        Self::EntriesDifferent(EntriesDifferent {
-                            first_entry_user_id: state.first_entry_user_id,
-                            second_entry_user_id: state.second_entry_user_id,
-                            first_entry: state.finalised_first_entry.clone(),
-                            second_entry: state.second_entry.clone(),
-                            first_entry_finished_at: state.first_entry_finished_at,
-                            second_entry_finished_at: Utc::now(),
-                        }),
-                        None,
-                    ))
+                    Ok(Self::EntriesDifferent(EntriesDifferent {
+                        first_entry_user_id: state.first_entry_user_id,
+                        second_entry_user_id: state.second_entry_user_id,
+                        first_entry: state.finalised_first_entry.clone(),
+                        second_entry: state.second_entry.clone(),
+                        first_entry_finished_at: state.first_entry_finished_at,
+                        second_entry_finished_at: Utc::now(),
+                    }))
                 }
             }
             DataEntryStatus::Definitive(_) => {
@@ -871,6 +868,7 @@ mod tests {
             second_entry_user_id: UserId::from(0),
             finished_at: Utc::now(),
             finalised_with_warnings: false,
+            results: example_polling_station_results(),
         })
     }
 
@@ -1199,8 +1197,7 @@ mod tests {
     fn second_entry_in_progress_finalise_equal() {
         let status = second_entry_in_progress()
             .finalise_second_entry(&polling_station(), &election(), UserId::from(0))
-            .unwrap()
-            .0;
+            .unwrap();
         assert_eq!(status.status_name(), DataEntryStatusName::Definitive);
     }
 
@@ -1231,7 +1228,7 @@ mod tests {
         let next = initial
             .finalise_second_entry(&polling_station(), &election(), UserId::from(0))
             .unwrap();
-        assert!(matches!(next.0, DataEntryStatus::EntriesDifferent(_)));
+        assert!(matches!(next, DataEntryStatus::EntriesDifferent(_)));
     }
 
     /// FirstEntryInProgress --> FirstEntryFinalised: error when finalising as a different user
@@ -1348,7 +1345,7 @@ mod tests {
                 UserId::from(0),
             )
             .unwrap();
-        assert!(matches!(next.0, DataEntryStatus::EntriesDifferent(_)));
+        assert!(matches!(next, DataEntryStatus::EntriesDifferent(_)));
     }
 
     /// SecondEntryInProgress --> FirstEntryFinalised: delete
@@ -1684,7 +1681,6 @@ mod tests {
                 second_entry_in_progress()
                     .finalise_second_entry(&polling_station(), &election(), UserId::from(0))
                     .unwrap()
-                    .0
                     .finalised_with_warnings(),
                 Some(&false)
             )
@@ -1700,7 +1696,6 @@ mod tests {
                 status
                     .finalise_second_entry(&polling_station(), &election(), UserId::from(0))
                     .unwrap()
-                    .0
                     .finalised_with_warnings(),
                 Some(&true)
             )

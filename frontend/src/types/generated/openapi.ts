@@ -363,7 +363,6 @@ export type AuditEvent =
   | (DataEntryDetails & { event_type: "DataEntryResumed" })
   | (DataEntryDetails & { event_type: "DataEntryDeleted" })
   | (DataEntryDetails & { event_type: "DataEntryFinalised" })
-  | (ResultDetails & { event_type: "ResultDeleted" })
   | (DataEntryDetails & { event_type: "DataEntryDiscardedFirst" })
   | (DataEntryDetails & { event_type: "DataEntryReturnedFirst" })
   | (DataEntryDetails & { event_type: "DataEntryKeptFirst" })
@@ -1143,12 +1142,6 @@ export type ResolveDifferencesAction = (typeof resolveDifferencesActionValues)[n
 
 export const resolveErrorsActionValues = ["discard_first_entry", "resume_first_entry"] as const;
 export type ResolveErrorsAction = (typeof resolveErrorsActionValues)[number];
-
-export interface ResultDetails {
-  committee_session_id: CommitteeSessionId;
-  created_at: string;
-  polling_station_id: PollingStationId;
-}
 
 export const roleValues = ["administrator", "typist", "coordinator"] as const;
 export type Role = (typeof roleValues)[number];

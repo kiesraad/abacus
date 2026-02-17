@@ -147,15 +147,6 @@ pub struct DataEntryDetails {
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, Eq, ToSchema)]
 #[serde(deny_unknown_fields)]
-pub struct ResultDetails {
-    pub polling_station_id: PollingStationId,
-    pub committee_session_id: CommitteeSessionId,
-    #[schema(value_type = String)]
-    pub created_at: DateTime<Utc>,
-}
-
-#[derive(Serialize, Deserialize, Debug, PartialEq, Eq, ToSchema)]
-#[serde(deny_unknown_fields)]
 pub struct ErrorDetails {
     pub reference: ErrorReference,
     pub path: String,
@@ -221,7 +212,6 @@ pub enum AuditEvent {
     DataEntryResumed(DataEntryDetails),
     DataEntryDeleted(DataEntryDetails),
     DataEntryFinalised(DataEntryDetails),
-    ResultDeleted(ResultDetails),
     // data entry resolving events
     DataEntryDiscardedFirst(DataEntryDetails),
     DataEntryReturnedFirst(DataEntryDetails),
@@ -288,7 +278,6 @@ impl AuditEvent {
             AuditEvent::DataEntryResumed(_) => AuditEventLevel::Success,
             AuditEvent::DataEntryDeleted(_) => AuditEventLevel::Info,
             AuditEvent::DataEntryFinalised(_) => AuditEventLevel::Success,
-            AuditEvent::ResultDeleted(_) => AuditEventLevel::Success,
             AuditEvent::ApplicationStarted(_) => AuditEventLevel::Info,
             AuditEvent::Error(ErrorDetails { level, .. }) => *level,
             AuditEvent::UnknownEvent => AuditEventLevel::Warning,

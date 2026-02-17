@@ -22,13 +22,13 @@ export function CheckAndSave() {
   }
 
   // GSB: if no counting method is found in the state, go back to the beginning
-  if (state.electionCategory === "Municipal" && !state.countingMethod) {
+  if (state.electionRole === "GSB" && !state.countingMethod) {
     return <Navigate to="/elections/create" />;
   }
 
   function handleSubmit() {
     void create({
-      role: "GSB",
+      role: state.electionRole,
       election_data: state.electionDefinitionData,
       election_hash: state.electionDefinitionHash,
       candidate_data: state.candidateDefinitionData,
@@ -41,9 +41,7 @@ export function CheckAndSave() {
       if (isSuccess(result)) {
         pushMessage({
           title: t("election.message.election_created", {
-            role: state.electionCategory
-              ? t(`election.polling_station_types.${state.electionCategory}.abbreviation`)
-              : "GSB",
+            role: state.electionRole ? t(`election.roles.${state.electionRole}.abbreviation`) : "GSB",
             name: result.data.name,
           }),
         });
@@ -60,9 +58,9 @@ export function CheckAndSave() {
         <li>
           <strong>{t("election.singular")}:</strong> {state.election.name}
         </li>
-        {state.electionCategory && (
+        {state.electionRole && (
           <li>
-            <strong>{t("election.role")}:</strong> {t(`election.polling_station_types.${state.electionCategory}.short`)}
+            <strong>{t("election.role")}:</strong> {t(`election.roles.${state.electionRole}.short`)}
           </li>
         )}
         <li>

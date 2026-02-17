@@ -8,16 +8,17 @@ interface ElectionCreateFormSection {
   key: string;
   label: string;
   path: string;
+  hidden: boolean;
 }
 
 const formSections: ElectionCreateFormSection[] = [
-  { key: "election_definition", label: t("election_definition"), path: "create" },
-  { key: "polling_station_role", label: t("polling_station.role"), path: "create/polling-station-role" },
-  { key: "list_of_candidates", label: t("candidate.list.plural"), path: "create/list-of-candidates" },
-  { key: "polling_stations", label: t("polling_station.title.plural"), path: "create/polling-stations" },
-  { key: "counting_method_type", label: t("counting_method_type"), path: "create/counting-method-type" },
-  { key: "number_of_voters", label: t("number_of_voters"), path: "create/number-of-voters" },
-  { key: "check_and_save", label: t("election.check_and_save.title"), path: "create/check-and-save" },
+  { key: "election_definition", label: t("election_definition"), path: "create", hidden: false },
+  { key: "polling_station_role", label: t("polling_station.role"), path: "create/polling-station-role", hidden: false },
+  { key: "list_of_candidates", label: t("candidate.list.plural"), path: "create/list-of-candidates", hidden: false },
+  { key: "polling_stations", label: t("polling_station.title.plural"), path: "create/polling-stations", hidden: false },
+  { key: "counting_method_type", label: t("counting_method_type"), path: "create/counting-method-type", hidden: false },
+  { key: "number_of_voters", label: t("number_of_voters"), path: "create/number-of-voters", hidden: false },
+  { key: "check_and_save", label: t("election.check_and_save.title"), path: "create/check-and-save", hidden: false },
 ];
 
 export function ElectionNav() {
@@ -25,8 +26,26 @@ export function ElectionNav() {
   const { state } = useElectionCreateContext();
 
   // Update menu for CSB
-  if (state.electionCategory === "Central") {
-    formSections.splice(4, 3);
+  if (state.electionRole === "CSB") {
+    // Hide items instead of deleting them, so that we can show them when role changes from CSB to GSB.
+    formSections.forEach((formSection) => {
+      if (
+        formSection.key === "polling_stations" ||
+        formSection.key === "counting_method_type" ||
+        formSection.key === "number_of_voters"
+      ) {
+        formSection.hidden = true;
+      }
+    });
+  }
+
+  // Show all menu items.
+  if (state.electionRole === "GSB") {
+    formSections.forEach((formSection) => {
+      if (formSection.hidden) {
+        formSection.hidden = false;
+      }
+    });
   }
 
   const currentFormSection = formSections.findIndex((formSection) => {
@@ -37,22 +56,24 @@ export function ElectionNav() {
   return (
     <ProgressList>
       <ProgressList.Fixed>
-        {fixedSections.map((formSection, index) => (
-          <ProgressList.Item
-            key={formSection.key}
-            status={index < currentFormSection || currentFormSection === -1 ? "accept" : "idle"}
-            active={index === currentFormSection}
-            disabled={index > currentFormSection && currentFormSection !== -1}
-          >
-            {index >= currentFormSection ? (
-              <span>{formSection.label}</span>
-            ) : (
-              <Link to={`/elections/${formSection.path}`}>
+        {fixedSections
+          .filter((formSection) => !formSection.hidden)
+          .map((formSection, index) => (
+            <ProgressList.Item
+              key={formSection.key}
+              status={index < currentFormSection || currentFormSection === -1 ? "accept" : "idle"}
+              active={index === currentFormSection}
+              disabled={index > currentFormSection && currentFormSection !== -1}
+            >
+              {index >= currentFormSection ? (
                 <span>{formSection.label}</span>
-              </Link>
-            )}
-          </ProgressList.Item>
-        ))}
+              ) : (
+                <Link to={`/elections/${formSection.path}`}>
+                  <span>{formSection.label}</span>
+                </Link>
+              )}
+            </ProgressList.Item>
+          ))}
       </ProgressList.Fixed>
 
       <ProgressList.Fixed>

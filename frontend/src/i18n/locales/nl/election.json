@@ -47,6 +47,7 @@
     "description": "Het bestand <file>filename</file> bevat geen geldige lijst met stembureaus. Kies een ander bestand.",
     "title": "Ongeldig stembureaubestand"
   },
+  "invalid_role": "Ongeldig rol van het stembureau",
   "message": {
     "election_created": "Verkiezing {role} {name} toegevoegd"
   },
@@ -101,15 +102,15 @@
     "description": "Voor welk stembureau wil je deze verkiezing nu klaarzetten? Ga je Abacus voor GSB én CSB gebruiken? Zet dan eerst het GSB klaar, en doe daarna hetzelfde voor het CSB.",
     "choose": "Kies een rol"
   },
-  "polling_station_types": {
-    "Central": {
+  "roles": {
+    "CSB": {
       "abbreviation": "CSB",
-      "short": "Centraal Stembureau",
+      "short": "Centraal stembureau",
       "full": "Centraal stembureau (CSB)"
     },
-    "Municipal": {
+    "GSB": {
       "abbreviation": "GSB",
-      "short": "Gemeentelijk Stembureau",
+      "short": "Gemeentelijk stembureau",
       "full": "Gemeentelijk stembureau (GSB)"
     }
   },

@@ -2,7 +2,7 @@ import { userEvent } from "@testing-library/user-event";
 import { describe, expect, test, vi } from "vitest";
 
 import { renderReturningRouter, screen } from "@/testing/test-utils";
-import type { ElectionCategory, NewElection } from "@/types/generated/openapi";
+import type { ElectionRole, NewElection } from "@/types/generated/openapi";
 
 import * as useElectionCreateContext from "../hooks/useElectionCreateContext";
 import { ElectionCreateContextProvider } from "./ElectionCreateContextProvider";
@@ -21,7 +21,7 @@ describe("PollingStationRole component", () => {
   });
 
   test("Navigates to candidate list upload page", async () => {
-    const state = { election, electionCategory: "Municipal" as ElectionCategory };
+    const state = { election, electionRole: "GSB" as ElectionRole };
     const dispatch = vi.fn();
     vi.spyOn(useElectionCreateContext, "useElectionCreateContext").mockReturnValue({ state, dispatch });
     const user = userEvent.setup();
@@ -38,15 +38,15 @@ describe("PollingStationRole component", () => {
     await user.click(screen.getByRole("button", { name: "Volgende" }));
 
     expect(dispatch).toHaveBeenCalledExactlyOnceWith({
-      type: "SET_CATEGORY_TYPE",
-      electionCategory: "Municipal",
+      type: "SET_ROLE_TYPE",
+      electionRole: "GSB",
     });
 
     expect(router.state.location.pathname).toEqual("/elections/create/list-of-candidates");
   });
 
   test("CSB checked: Navigates to candidate list upload page", async () => {
-    const state = { election, electionCategory: "Central" as ElectionCategory };
+    const state = { election, electionRole: "CSB" as ElectionRole };
     const dispatch = vi.fn();
     vi.spyOn(useElectionCreateContext, "useElectionCreateContext").mockReturnValue({ state, dispatch });
     const user = userEvent.setup();
@@ -63,8 +63,8 @@ describe("PollingStationRole component", () => {
     await user.click(screen.getByRole("button", { name: "Volgende" }));
 
     expect(dispatch).toHaveBeenCalledExactlyOnceWith({
-      type: "SET_CATEGORY_TYPE",
-      electionCategory: "Central",
+      type: "SET_ROLE_TYPE",
+      electionRole: "CSB",
     });
 
     expect(router.state.location.pathname).toEqual("/elections/create/list-of-candidates");

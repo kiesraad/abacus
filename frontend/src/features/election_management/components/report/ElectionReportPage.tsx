@@ -77,8 +77,7 @@ export function ElectionReportPage() {
       <header>
         <section>
           <h1>
-            {/* TODO (post 1.0): Change to conditional GSB/HSB/CSB when implemented */}
-            {sessionLabel} {t("GSB").replace(/(^\w|\s\w)/g, (m) => m.toUpperCase())}
+            {sessionLabel} {t(`election.roles.${election.role}.short`).replace(/(^\w|\s\w)/g, (m) => m.toUpperCase())}
           </h1>
         </section>
       </header>
@@ -90,8 +89,8 @@ export function ElectionReportPage() {
           <div>
             <h2 className="form_title">
               {t("election_report.counting_results")} {sessionLabel.toLowerCase()}{" "}
-              {/* TODO (post 1.0): Change to conditional GSB/HSB/CSB when implemented */}
-              {t("GSB").toLowerCase()} {t("municipality").toLowerCase()} {election.location}
+              {t(`election.roles.${election.role}.short`).toLowerCase()} {t("municipality").toLowerCase()}{" "}
+              {election.location}
             </h2>
             <div className={cls.reportInfoSection}>
               {t("election_report.committee_session_started", {

@@ -72,8 +72,11 @@ export function OverviewPage() {
       return (
         <>
           <Table.Cell>{election.name}</Table.Cell>
-          {/* TODO (post 1.0): Change to conditional GSB/HSB/CSB when implemented */}
-          <Table.Cell>{isTypist ? election.location : `GSB - ${election.location} (${election.domain_id})`}</Table.Cell>
+          <Table.Cell>
+            {isTypist
+              ? election.location
+              : `${t(`election.roles.${election.role}.abbreviation`)} - ${election.location} (${election.domain_id})`}
+          </Table.Cell>
           <Table.Cell>
             {isTypist ? (
               committeeSessionStatus

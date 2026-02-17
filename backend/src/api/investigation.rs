@@ -5,6 +5,7 @@ use axum::{
 };
 use axum_extra::response::Attachment;
 use chrono::Datelike;
+use pdf_gen::generate_pdf;
 use sqlx::{SqliteConnection, SqlitePool};
 use utoipa_axum::{router::OpenApiRouter, routes};
 
@@ -28,10 +29,7 @@ use crate::{
         votes_table::VotesTablesWithOnlyPreviousVotes,
     },
     error::ErrorReference,
-    infra::{
-        audit_log::{AuditEvent, AuditService},
-        pdf_gen::generate_pdf,
-    },
+    infra::audit_log::{AuditEvent, AuditService},
     repository::{
         committee_session_repo::get_election_committee_session,
         data_entry_repo::{data_entry_exists, previous_results_for_polling_station, result_exists},
@@ -521,7 +519,7 @@ async fn polling_station_investigation_download_corrigendum_pdf(
     }
     .to_pdf_file_model(name.clone());
 
-    let content = generate_pdf(input).await?;
+    let content = generate_pdf(&input).await?;
 
     Ok(Attachment::new(content.buffer)
         .filename(&name)

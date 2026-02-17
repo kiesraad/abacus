@@ -8,8 +8,9 @@ __Niveau:__ hoog-over, wolk, ☁️
 
 1. [De beheerder installeert de applicatie.](#de-beheerder-installeert-de-applicatie-zee)
 2. De beheerder maakt voor zichzelf een eerste account en wachtwoord aan.
-3. [De beheerder zet de verkiezingen in de applicatie.](#de-beheerder-zet-de-verkiezingen-in-de-applicatie-vis)
-4. [De beheerder maakt de gebruikers aan.](#de-beheerder-maakt-de-gebruikers-aan-zee)
+3. [De beheerder zet het GSB voor de verkiezingen in de applicatie.](#de-beheerder-zet-het-gsb-voor-de-verkiezingen-in-de-applicatie-vis)
+4. [De beheerder zet het CSB voor de verkiezingen in de applicatie.](#de-beheerder-zet-het-csb-voor-de-verkiezingen-in-de-applicatie-vis)
+5. [De beheerder maakt de gebruikers aan.](#de-beheerder-maakt-de-gebruikers-aan-zee)
 
 
 ## De beheerder installeert de applicatie (zee)
@@ -39,7 +40,7 @@ __Uitbreidingen:__
 &emsp;&emsp;&emsp; 4a1a1. De beheerder neemt contact op met de Kiesraad.
 
 
-## De beheerder zet de verkiezingen in de applicatie (vis)
+## De beheerder zet het GSB voor de verkiezingen in de applicatie (vis)
 
 __Niveau:__ subfunctie, vis, 🐟
 
@@ -48,33 +49,47 @@ __Niveau:__ subfunctie, vis, 🐟
 __Hoofdscenario:__
 
 1. [De beheerder leest de verkiezingsdefinitie (EML 110a) in.](#de-beheerder-leest-de-verkiezingsdefinitie-eml-110a-in-vis)
-2. De beheerder leest de kandidatenlijsten (EML 230b) in.
-3. [De beheerder leest het bestand met stembureaus en aantal kiesgerechtigden (EML 110b) in.](#de-beheerder-leest-het-bestand-met-stembureaus-en-aantal-kiesgerechtigden-eml-110b-in-vis)
-4. De beheerder selecteert het type stemopneming.
-5. De beheerder bevestigt het aantal kiesgerechtigden in de gemeente.
-6. De applicatie maakt de verkiezing GSB, de verkiezing CSB, en het GSB als stembureau voor het CSB aan.
+2. De beheerder selecteert "GSB" als rol van het stembureau.
+3. [De beheerder leest de kandidatenlijsten (EML 230b) in.](#de-beheerder-leest-de-kandidatenlijsten-eml-230b-in)
+4. [De beheerder leest het bestand met stembureaus en aantal kiesgerechtigden (EML 110b) in.](#de-beheerder-leest-het-bestand-met-stembureaus-en-aantal-kiesgerechtigden-eml-110b-in-vis)
+5. De beheerder selecteert het type stemopneming.
+6. De beheerder bevestigt het aantal kiesgerechtigden in de gemeente.
+7. De applicatie maakt het GSB voor de verkiezing aan.
 
 __Uitbreidingen:__
 
-2a. De applicatie geeft een foutmelding bij het inlezen van de kandidatenlijsten (EML 230b):  
-&emsp; 2a1. De beheerder stelt vast dat die het verkeerde bestand heeft ingelezen.  
-&emsp;&emsp; 2a1a. De beheerder stelt vast dat het bestand geen geldige kandidatenlijsten bevat:  
-&emsp;&emsp;&emsp; 2a1a1. De beheerder neemt contact op met het CSB.  
-&emsp; 2a2. De beheerder leest het correcte bestand in.
+2a. Er is al een GSB-stembureau voor deze verkiezing en dit gebied:  
+&emsp; 2a1. De applicatie staat niet toe de optie "GSB" te selecteren.
 
-3a. De beheerder slaat het invoeren van stembureaus over:  
-&emsp; 3a1. (tijdens stap 5) De beheerder voert het aantal kiesgerechtigden in de gemeente handmatig in.  
-&emsp; 3a2. (na inrichten applicatie) [De beheerder of coördinator zet de stembureaus in de applicatie.](#de-beheerder-of-coördinator-gsb-zet-de-stembureaus-in-de-applicatie-zee)
+4a. De beheerder slaat het invoeren van stembureaus over:  
+&emsp; 4a1. (tijdens stap 5) De beheerder voert het aantal kiesgerechtigden in de gemeente handmatig in.  
+&emsp; 4a2. (na inrichten applicatie) [De beheerder of coördinator zet de stembureaus in de applicatie.](#de-beheerder-of-coördinator-gsb-zet-de-stembureaus-in-de-applicatie-zee)
 
-5a. De beheerder stelt vast dat het aantal kiesgerechtigden uit het stembureaubestand (EML 110b) niet klopt:
-&emsp; 5a1. De beheerder corrigeert het aantal kiesgerechtigden in de applicatie.
+6a. De beheerder stelt vast dat het aantal kiesgerechtigden uit het stembureaubestand (EML 110b) niet klopt:
+&emsp; 6a1. De beheerder corrigeert het aantal kiesgerechtigden in de applicatie.
 
-5b. Het aantal kiesgerechtigden staat niet in het bestand met stembureaus (EML 110b):  
-&emsp; 5b1. De beheerder voert het aantal kiesgerechtigden handmatig in.
+6b. Het aantal kiesgerechtigden staat niet in het bestand met stembureaus (EML 110b):  
+&emsp; 6b1. De beheerder voert het aantal kiesgerechtigden handmatig in.
 
-### Niet in scope
 
-- Inlezen totalenlijst (kandidatenlijsten met adresgegevens). Deze gegevens zijn relevant voor de benoemingsbrieven en de kennisgevingen tot geloofsbrief.
+## De beheerder zet het CSB voor de verkiezingen in de applicatie (vis)
+
+__Niveau:__ subfunctie, vis, 🐟
+
+### Hoofdscenario en uitbreidingen
+
+__Hoofdscenario:__
+
+1. [De beheerder leest de verkiezingsdefinitie (EML 110a) in.](#de-beheerder-leest-de-verkiezingsdefinitie-eml-110a-in-vis)
+2. De beheerder selecteert "CSB" als rol van het stembureau.
+3. [De beheerder leest de kandidatenlijsten (EML 230b) in.](#de-beheerder-leest-de-kandidatenlijsten-eml-230b-in)
+4. De applicatie maakt het CSB voor de verkiezing en het GSB als stembureau voor het CSB aan.
+
+__Uitbreidingen:__
+
+2a. Er is al een CSB-stembureau voor deze verkiezing en dit gebied:  
+&emsp; 2a1. De applicatie staat niet toe de optie "CSB" te selecteren.
+
 
 ## De beheerder leest de verkiezingsdefinitie (EML 110a) in (vis)
 
@@ -99,6 +114,31 @@ __Uitbreidingen:__
 &emsp;&emsp;&emsp; 2a1a1. De beheerder neemt contact op met het CSB.  
 &emsp; 2a2. De beheerder corrigeert de ingevoerde hash.
 
+
+## De beheerder leest de kandidatenlijsten (EML 230b) in.
+
+__Niveau:__ subfunctie, vis, 🐟
+
+__Hoofdscenario:__
+
+1. De beheerder leest de kandidatenlijsten (EML 230b) in.
+2. De beheerder stelt vast dat de hash van de kandidatenlijsten klopt.
+
+__Uitbreidingen:__
+
+1a. De applicatie geeft een foutmelding bij het inlezen van de kandidantelijsten (EML 230b):  
+&emsp; 1a1. De beheerder stelt vast dat het verkeerde bestand is ingelezen.  
+&emsp;&emsp; 1a1a. De beheerder stelt vast dat het bestand geen geldige verkiezingsdefinitie bevat:  
+&emsp;&emsp;&emsp; 1a1a1. De beheerder neemt contact op met het CSB.  
+&emsp; 1a2. De beheerder leest het correcte bestand in.
+
+2a. De hash van de kandidantelijsten (EML 230b) klopt niet:  
+&emsp; 2a1. De beheerder stelt vast dat de hash niet correct is overgenomen.  
+&emsp;&emsp; 2a1a. De beheerder stelt vast dat de hash correct is overgenomen:  
+&emsp;&emsp;&emsp; 2a1a1. De beheerder neemt contact op met het CSB.  
+&emsp; 2a2. De beheerder corrigeert de ingevoerde hash.
+
+
 ## De beheerder leest het bestand met stembureaus en aantal kiesgerechtigden (EML 110b) in (vis)
 
 __Niveau:__ subfunctie, vis, 🐟
@@ -121,6 +161,7 @@ __Uitbreidingen:__
 
 3a. De stembureaus in de applicatie komen niet overeen met de vooraf gepubliceerde lijst:  
 &emsp; 3a1. De beheerder past de stembureaus aan.
+
 
 ## De beheerder of coördinator GSB zet de stembureaus in de applicatie (zee)
 
@@ -150,6 +191,7 @@ __Uitbreidingen:__
 4a. De stembureaus in de applicatie komen niet overeen met de vooraf gepubliceerde lijst:  
 &emsp; 4a1. De beheerder of coördinator past de stembureaus aan.
 
+
 ## De beheerder exporteert de stembureaus (zee)
 
 __Niveau:__ gebruikersdoel, zee, 🌊
@@ -170,17 +212,19 @@ __Niveau:__ gebruikersdoel, zee, 🌊
 __Hoofdscenario:__
 
 1. De beheerder maakt beheerders aan met een gebruikersnaam, volledige naam en tijdelijk wachtwoord.
-2. De beheerder maakt coördinatoren aan met een gebruikersnaam, volledige naam en tijdelijk wachtwoord.
-3. De beheerder maakt invoerders aan met een gebruikersnaam, volledige naam en tijdelijk wachtwoord.
-4. De beheerder controleert de lijst met gebruikers en stelt vast dat alle gebruikers goed zijn.
+2. De beheerder maakt coördinatoren voor het GSB aan met een gebruikersnaam, volledige naam en tijdelijk wachtwoord.
+3. De beheerder maakt coördinatoren voor het CSB aan met een gebruikersnaam, volledige naam en tijdelijk wachtwoord.
+4. De beheerder maakt invoerders voor het GSB aan met een gebruikersnaam, volledige naam en tijdelijk wachtwoord.
+5. De beheerder maakt invoerders voor het CSB aan met een gebruikersnaam, volledige naam en tijdelijk wachtwoord.
+6. De beheerder controleert de lijst met gebruikers en stelt vast dat alle gebruikers goed zijn.
 
 __Uitbreidingen:__
 
-3a. De beheerder heeft de volledige naam niet van de invoerder die nog toegevoegd moet worden:  
-&emsp; 3a1. De beheerder maakt een invoerder aan met een gebruikersnaam en tijdelijk wachtwoord, 
+4-5a. De beheerder heeft de volledige naam niet van de invoerder die nog toegevoegd moet worden:  
+&emsp; 4-5a1. De beheerder maakt een invoerder aan met een gebruikersnaam en tijdelijk wachtwoord, 
   maar zonder volledige naam.  
 
-4a. De lijst met gebruikers moet aangepast worden:  
-&emsp; 4a1. De beheerder past de volledige naam aan van een gebruiker.  
-&emsp; 4a2. De beheerder stelt een nieuw tijdelijk wachtwoord in voor een gebruiker.  
-&emsp; 4a3. De beheerder verwijdert een gebruiker.
+6a. De lijst met gebruikers moet aangepast worden:  
+&emsp; 6a1. De beheerder past de volledige naam aan van een gebruiker.  
+&emsp; 6a2. De beheerder stelt een nieuw tijdelijk wachtwoord in voor een gebruiker.  
+&emsp; 6a3. De beheerder verwijdert een gebruiker.

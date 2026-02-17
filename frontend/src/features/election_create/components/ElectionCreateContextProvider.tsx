@@ -110,15 +110,18 @@ function reducer(state: ElectionCreateState, action: ElectionCreateAction): Elec
         candidateDefinitionHash: action.candidateDefinitionHash,
       };
     case "SELECT_POLLING_STATION_DEFINITION":
-      return {
-        ...state,
-        pollingStations: action.response.polling_stations,
-        pollingStationDefinitionData: action.pollingStationDefinitionData,
-        pollingStationDefinitionFileName: action.pollingStationDefinitionFileName,
-        pollingStationDefinitionMatchesElection: action.pollingStationDefinitionMatchesElection,
-        numberOfVoters: action.response.number_of_voters,
-        isNumberOfVotersUserEdited: false,
-      };
+      if (action.response.role === "GSB") {
+        return {
+          ...state,
+          pollingStations: action.response.polling_stations,
+          pollingStationDefinitionData: action.pollingStationDefinitionData,
+          pollingStationDefinitionFileName: action.pollingStationDefinitionFileName,
+          pollingStationDefinitionMatchesElection: action.pollingStationDefinitionMatchesElection,
+          numberOfVoters: action.response.number_of_voters,
+          isNumberOfVotersUserEdited: false,
+        };
+      }
+      return state;
     case "SET_COUNTING_METHOD_TYPE":
       return {
         ...state,

@@ -254,6 +254,7 @@ export const electionListMockResponse: ElectionListResponse = {
     {
       id: 1,
       name: "Gemeenteraadsverkiezingen 2026",
+      role: "GSB",
       counting_method: "CSO",
       election_id: "Heemdamseburg_2024",
       location: "Heemdamseburg",
@@ -346,6 +347,7 @@ export const newElectionMockData = {
 export const electionImportMockResponse: ElectionWithPoliticalGroups = {
   id: 2,
   name: "Gemeenteraad Test 2022",
+  role: "GSB",
   counting_method: "CSO",
   election_id: "GR2022_Test",
   location: "Test",
@@ -359,6 +361,7 @@ export const electionImportMockResponse: ElectionWithPoliticalGroups = {
 };
 
 export const electionImportValidateMockResponse: ElectionDefinitionValidateResponse = {
+  role: "GSB",
   hash: {
     chunks: new Array<string>(16).fill("0000"),
     redacted_indexes: [3, 11],

@@ -4,6 +4,10 @@ use axum::{
 };
 use axum_extra::response::Attachment;
 use chrono::{DateTime, Local, Utc};
+use pdf_gen::{
+    generate_pdf,
+    zip::{ZipResponse, ZipResponseError, slugify_filename, zip_single_file},
+};
 use sqlx::{SqliteConnection, SqlitePool};
 use utoipa_axum::{router::OpenApiRouter, routes};
 
@@ -27,11 +31,7 @@ use crate::{
     },
     eml::{EML510, EMLDocument, EmlHash},
     error::ErrorReference,
-    infra::{
-        audit_log::{AuditEvent, AuditService},
-        pdf_gen::generate_pdf,
-        zip::{ZipResponse, ZipResponseError, slugify_filename, zip_single_file},
-    },
+    infra::audit_log::{AuditEvent, AuditService},
     repository::{
         committee_session_repo,
         committee_session_repo::{change_files, get_previous_session},
@@ -339,7 +339,7 @@ async fn generate_and_save_files(
             conn,
             audit_service,
             pdf_files.results.file_name.clone(),
-            &generate_pdf(pdf_files.results).await?.buffer,
+            &generate_pdf(&pdf_files.results).await?.buffer,
             PDF_MIME_TYPE.to_string(),
             created_at,
         )
@@ -355,7 +355,7 @@ async fn generate_and_save_files(
             conn,
             audit_service,
             overview_pdf.file_name.clone(),
-            &generate_pdf(overview_pdf).await?.buffer,
+            &generate_pdf(&overview_pdf).await?.buffer,
             PDF_MIME_TYPE.to_string(),
             created_at,
         )

@@ -32,8 +32,8 @@ import { FinishDataEntry } from "e2e-tests/page-objects/election/FinishDataEntry
 import { AddInvestigationPgObj } from "e2e-tests/page-objects/investigations/AddInvestigationPgObj";
 import { InvestigationFindingsPgObj } from "e2e-tests/page-objects/investigations/InvestigationFindingsPgObj";
 import { InvestigationOverviewPgObj } from "e2e-tests/page-objects/investigations/InvestigationOverviewPgObj";
-import { AdminNavBar } from "e2e-tests/page-objects/nav_bar/AdminNavBarPgObj";
 import { CoordinatorNavBarPgObj } from "e2e-tests/page-objects/nav_bar/CoordinatorNavBarPgObj";
+import { UserInfoTopBar } from "e2e-tests/page-objects/nav_bar/UserInfoTopBarPgObj";
 import { PollingStationFormPgObj } from "e2e-tests/page-objects/polling_station/PollingStationFormPgObj";
 import { PollingStationListPgObj } from "e2e-tests/page-objects/polling_station/PollingStationListPgObj";
 import { UserCreateDetailsPgObj } from "e2e-tests/page-objects/users/UserCreateDetailsPgObj";
@@ -92,8 +92,8 @@ test.describe("full flow", () => {
     const loginPage = new LoginPgObj(page);
     await loginPage.login(adminUsername, getTestPassword(adminUsername));
 
-    const navBar = new AdminNavBar(page);
-    await expect(navBar.username).toHaveText(`John Doe`);
+    const userInfoTopBar = new UserInfoTopBar(page);
+    await expect(userInfoTopBar.username).toHaveText(`John Doe`);
 
     await page.goto(`/users`);
 
@@ -137,8 +137,8 @@ test.describe("full flow", () => {
     const loginPage = new LoginPgObj(page);
     await loginPage.login(adminUsername, getTestPassword(adminUsername));
 
-    const navBar = new AdminNavBar(page);
-    await expect(navBar.username).toHaveText(`John Doe`);
+    const userInfoTopBar = new UserInfoTopBar(page);
+    await expect(userInfoTopBar.username).toHaveText(`John Doe`);
 
     // Create browser-specific typists
     for (const username of typistBaseNameUsers) {

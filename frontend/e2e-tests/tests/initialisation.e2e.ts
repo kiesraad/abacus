@@ -6,7 +6,7 @@ import { FirstLoginPgObj } from "e2e-tests/page-objects/authentication/FirstLogi
 import { InitialiseWelcomePgObj } from "e2e-tests/page-objects/authentication/InitialiseWelcomePgObj";
 import { LoginPgObj } from "e2e-tests/page-objects/authentication/LoginPgObj";
 import { ElectionsOverviewPgObj } from "e2e-tests/page-objects/election/ElectionsOverviewPgObj";
-import { AdminNavBar } from "e2e-tests/page-objects/nav_bar/AdminNavBarPgObj";
+import { UserInfoTopBar } from "e2e-tests/page-objects/nav_bar/UserInfoTopBarPgObj";
 import { firstAdmin } from "e2e-tests/test-data/users";
 
 test.describe.configure({ mode: "serial" });
@@ -41,8 +41,8 @@ test.describe("initialisation", () => {
     const electionsPage = new ElectionsOverviewPgObj(page);
     await expect(electionsPage.adminHeader).toBeVisible();
 
-    const navBar = new AdminNavBar(page);
-    await navBar.logout.click();
+    const userInfoTopBar = new UserInfoTopBar(page);
+    await userInfoTopBar.logout.click();
 
     const loginPage = new LoginPgObj(page);
     await expect(loginPage.loginBtn).toBeVisible();

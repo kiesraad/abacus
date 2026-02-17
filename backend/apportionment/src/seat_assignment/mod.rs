@@ -27,6 +27,8 @@ pub(crate) fn seat_assignment<T: ApportionmentInput>(
     info!("Seat assignment");
     info!("Seats: {}", input.number_of_seats());
 
+    // [Artikel P 5 Kieswet](https://wetten.overheid.nl/BWBR0004627/2026-01-01/#AfdelingII_HoofdstukP_Paragraaf2_ArtikelP5)
+    // Sum the votes cast on candidates for each list
     let total_votes_cast = input
         .list_votes()
         .iter()
@@ -37,7 +39,6 @@ pub(crate) fn seat_assignment<T: ApportionmentInput>(
         return Err(ApportionmentError::ZeroVotesCast);
     }
 
-    // [Artikel P 5 Kieswet](https://wetten.overheid.nl/BWBR0004627/2026-01-01/#AfdelingII_HoofdstukP_Paragraaf2_ArtikelP5)
     // Calculate electoral quota (kiesdeler) as a proper fraction
     let quota = Fraction::from(total_votes_cast) / Fraction::from(input.number_of_seats());
     info!("Quota: {}", quota);

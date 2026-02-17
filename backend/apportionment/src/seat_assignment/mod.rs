@@ -27,14 +27,19 @@ pub(crate) fn seat_assignment<T: ApportionmentInput>(
     info!("Seat assignment");
     info!("Seats: {}", input.number_of_seats());
 
-    if input.total_votes() == 0 {
+    let total_votes_cast = input
+        .list_votes()
+        .iter()
+        .map(|list_votes| list_votes.total_votes())
+        .sum();
+    if total_votes_cast == 0 {
         info!("No votes on candidates cast");
         return Err(ApportionmentError::ZeroVotesCast);
     }
 
     // [Artikel P 5 Kieswet](https://wetten.overheid.nl/BWBR0004627/2026-01-01/#AfdelingII_HoofdstukP_Paragraaf2_ArtikelP5)
     // Calculate electoral quota (kiesdeler) as a proper fraction
-    let quota = Fraction::from(input.total_votes()) / Fraction::from(input.number_of_seats());
+    let quota = Fraction::from(total_votes_cast) / Fraction::from(input.number_of_seats());
     info!("Quota: {}", quota);
 
     // [Artikel P 6 Kieswet](https://wetten.overheid.nl/BWBR0004627/2026-01-01/#AfdelingII_HoofdstukP_Paragraaf2_ArtikelP6)
@@ -68,7 +73,7 @@ pub(crate) fn seat_assignment<T: ApportionmentInput>(
     let (cumulative_standings, assigned_seat) = if let Some(last_step) = steps.last() {
         reassign_residual_seat_for_absolute_majority(
             input.number_of_seats(),
-            input.total_votes(),
+            total_votes_cast,
             input.list_votes(),
             &last_step.change.list_assigned(),
             current_standings,
@@ -180,12 +185,12 @@ fn list_numbers_with_exhausted_seats<'a, T: ListVotesTrait>(
 /// This re-assignment is done according to article P 9 of the Kieswet.
 fn reassign_residual_seat_for_absolute_majority<T: ListVotesTrait>(
     seats: u32,
-    total_votes: u32,
+    total_votes_cast: u32,
     list_votes: &[T],
     lists_last_residual_seat: &[ListNumber],
     standings: Vec<ListStanding>,
 ) -> Result<(Vec<ListStanding>, Option<SeatChange>), ApportionmentError> {
-    let half_of_votes_count = Fraction::from(total_votes) * Fraction::new(1, 2);
+    let half_of_votes_count = Fraction::from(total_votes_cast) * Fraction::new(1, 2);
 
     // Find list with an absolute majority of votes. Return early if we find none
     let Some(majority_list_votes) = list_votes

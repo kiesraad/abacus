@@ -8,7 +8,6 @@ use super::{
 
 pub struct ApportionmentInputMock {
     pub number_of_seats: u32,
-    pub total_votes: u32,
     pub list_votes: Vec<ListVotesMock>,
 }
 
@@ -19,10 +18,6 @@ impl ApportionmentInput for ApportionmentInputMock {
         self.number_of_seats
     }
 
-    fn total_votes(&self) -> u32 {
-        self.total_votes
-    }
-
     fn list_votes(&self) -> &[Self::List] {
         &self.list_votes
     }
@@ -31,7 +26,6 @@ impl ApportionmentInput for ApportionmentInputMock {
 #[derive(Debug, PartialEq)]
 pub struct ListVotesMock {
     pub number: ListNumber,
-    pub total_votes: u32,
     pub candidate_votes: Vec<CandidateVotesMock>,
 }
 
@@ -43,7 +37,10 @@ impl ListVotesTrait for ListVotesMock {
     }
 
     fn total_votes(&self) -> u32 {
-        self.total_votes
+        self.candidate_votes
+            .iter()
+            .map(|candidate_votes| candidate_votes.votes())
+            .sum()
     }
 
     fn candidate_votes(&self) -> &[Self::Cv] {
@@ -71,7 +68,6 @@ impl ListVotesMock {
     pub fn from_test_data_auto(number: ListNumber, candidate_votes: &[u32]) -> Self {
         ListVotesMock {
             number,
-            total_votes: candidate_votes.iter().sum(),
             candidate_votes: candidate_votes
                 .iter()
                 .enumerate()
@@ -138,8 +134,6 @@ pub fn seat_assignment_fixture_with_default_50_candidates(
     number_of_seats: u32,
     list_vote_counts: Vec<u32>,
 ) -> ApportionmentInputMock {
-    let total_votes = list_vote_counts.iter().sum();
-
     let mut list_votes: Vec<ListVotesMock> = vec![];
     for (index, votes) in list_vote_counts.iter().enumerate() {
         // Create list with 50 candidates with 0 votes
@@ -154,7 +148,6 @@ pub fn seat_assignment_fixture_with_default_50_candidates(
 
     ApportionmentInputMock {
         number_of_seats,
-        total_votes,
         list_votes,
     }
 }
@@ -164,11 +157,6 @@ pub fn seat_assignment_fixture_with_given_list_numbers_and_candidate_votes(
     number_of_seats: u32,
     list_candidate_votes: Vec<(u32, Vec<u32>)>,
 ) -> ApportionmentInputMock {
-    let total_votes = list_candidate_votes
-        .iter()
-        .map(|(_, candidate_votes)| candidate_votes.iter().sum::<u32>())
-        .sum();
-
     let mut list_votes: Vec<ListVotesMock> = vec![];
     for (list_number, list_candidate_votes) in list_candidate_votes.iter() {
         list_votes.push(ListVotesMock::from_test_data_auto(
@@ -179,7 +167,6 @@ pub fn seat_assignment_fixture_with_given_list_numbers_and_candidate_votes(
 
     ApportionmentInputMock {
         number_of_seats,
-        total_votes,
         list_votes,
     }
 }
@@ -191,7 +178,6 @@ pub fn seat_assignment_fixture_with_given_candidate_votes(
     number_of_seats: u32,
     candidate_votes: Vec<Vec<u32>>,
 ) -> ApportionmentInputMock {
-    let total_votes = candidate_votes.iter().flatten().sum();
     let mut list_votes: Vec<ListVotesMock> = vec![];
     for (list_index, list_candidate_votes) in candidate_votes.iter().enumerate() {
         list_votes.push(ListVotesMock::from_test_data_auto(
@@ -202,7 +188,6 @@ pub fn seat_assignment_fixture_with_given_candidate_votes(
 
     ApportionmentInputMock {
         number_of_seats,
-        total_votes,
         list_votes,
     }
 }
@@ -214,17 +199,10 @@ pub fn seat_assignment_fixture_with_given_list_numbers_candidate_numbers_and_vot
     number_of_seats: u32,
     list_number_candidate_votes: Vec<(u32, Vec<(u32, u32)>)>,
 ) -> ApportionmentInputMock {
-    let mut total_votes = 0;
     let mut list_votes: Vec<ListVotesMock> = vec![];
     for (list_number, list_candidate_votes) in list_number_candidate_votes.iter() {
-        let list_total_votes = list_candidate_votes
-            .iter()
-            .map(|(_, candidate_votes)| candidate_votes)
-            .sum();
-        total_votes += list_total_votes;
         list_votes.push(ListVotesMock {
             number: ListNumber::from(*list_number),
-            total_votes: list_total_votes,
             candidate_votes: list_candidate_votes
                 .iter()
                 .map(|(number, candidate_votes)| CandidateVotesMock {
@@ -237,7 +215,6 @@ pub fn seat_assignment_fixture_with_given_list_numbers_candidate_numbers_and_vot
 
     ApportionmentInputMock {
         number_of_seats,
-        total_votes,
         list_votes,
     }
 }

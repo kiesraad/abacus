@@ -16,7 +16,7 @@ use crate::{
 pub type PollingStationNumber = u32;
 id!(PollingStationId);
 
-/// Polling station of a certain [crate::election::Election]
+/// Polling station of a certain [crate::domain::election::Election]
 #[derive(Serialize, Deserialize, ToSchema, Debug, FromRow, Clone)]
 #[serde(deny_unknown_fields)]
 pub struct PollingStation {
@@ -64,7 +64,7 @@ impl From<PollingStation> for PollingStationDetails {
     }
 }
 
-/// Polling station of a certain [crate::election::Election]
+/// Polling station of a certain [crate::domain::election::Election]
 #[derive(Clone, Serialize, Deserialize, ToSchema, Debug, FromRequest)]
 #[from_request(via(axum::Json), rejection(APIError))]
 #[serde(deny_unknown_fields)]

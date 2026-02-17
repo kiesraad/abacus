@@ -1014,7 +1014,7 @@ export interface PoliticalGroupTotalVotes {
 }
 
 /**
- * Polling station of a certain [crate::election::Election]
+ * Polling station of a certain [crate::domain::election::Election]
  */
 export interface PollingStation {
   address: string;
@@ -1087,7 +1087,7 @@ export interface PollingStationListResponse {
 }
 
 /**
- * Polling station of a certain [crate::election::Election]
+ * Polling station of a certain [crate::domain::election::Election]
  */
 export interface PollingStationRequest {
   address: string;

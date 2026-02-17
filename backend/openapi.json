@@ -847,7 +847,7 @@
     },
     "/api/elections/{election_id}/committee_sessions/{committee_session_id}/investigations": {
       "get": {
-        "summary": "Get a list of all [Investigation]s for a committee session (coordinator)",
+        "summary": "Get a list of all [crate::domain::investigation::PollingStationInvestigation]s for a committee session (coordinator)",
         "operationId": "committee_session_investigations",
         "parameters": [
           {
@@ -6794,7 +6794,7 @@
       },
       "PollingStation": {
         "type": "object",
-        "description": "Polling station of a certain [crate::election::Election]",
+        "description": "Polling station of a certain [crate::domain::election::Election]",
         "required": [
           "id",
           "election_id",
@@ -7025,7 +7025,7 @@
       },
       "PollingStationRequest": {
         "type": "object",
-        "description": "Polling station of a certain [crate::election::Election]",
+        "description": "Polling station of a certain [crate::domain::election::Election]",
         "required": [
           "name",
           "address",

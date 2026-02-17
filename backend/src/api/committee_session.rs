@@ -292,7 +292,7 @@ pub async fn committee_session_status_change(
     Ok(StatusCode::NO_CONTENT)
 }
 
-/// Get a list of all [Investigation]s for a committee session
+/// Get a list of all [crate::domain::investigation::PollingStationInvestigation]s for a committee session
 #[utoipa::path(
     get,
     path = "/api/elections/{election_id}/committee_sessions/{committee_session_id}/investigations",

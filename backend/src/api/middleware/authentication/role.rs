@@ -180,7 +180,7 @@ where
     }
 }
 
-/// Implement the OptionalFromRequestParts trait for User, this allows us to extract an Option<User> from a request
+/// Implement the OptionalFromRequestParts trait for User, this allows us to extract an `Option<User>` from a request
 impl<S> OptionalFromRequestParts<S> for User
 where
     S: Send + Sync,

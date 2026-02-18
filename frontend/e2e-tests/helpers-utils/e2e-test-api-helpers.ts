@@ -8,7 +8,7 @@ export function getTestPassword(username: string, prefix = ""): string {
   return `${prefix}${capitalizedUsername}Password01`;
 }
 
-export async function loginAs(request: APIRequestContext, username: string, passwordPrefix = "") {
+export async function apiLoginAs(request: APIRequestContext, username: string, passwordPrefix = "") {
   const password = getTestPassword(username, passwordPrefix);
   return await request.post("/api/login", {
     data: {
@@ -16,6 +16,10 @@ export async function loginAs(request: APIRequestContext, username: string, pass
       password,
     },
   });
+}
+
+export async function apiLogout(request: APIRequestContext) {
+  return await request.post("/api/logout");
 }
 
 export async function completePollingStationDataEntries(
@@ -47,7 +51,7 @@ export async function createUser(adminContext: APIRequestContext, user: TestUser
 }
 
 export async function firstLogin(userContext: APIRequestContext, user: TestUser) {
-  const loginResponse = await loginAs(userContext, user.username, "Temp");
+  const loginResponse = await apiLoginAs(userContext, user.username, "Temp");
   expect(loginResponse.status()).toBe(200);
 
   const response = await userContext.put("/api/account", {

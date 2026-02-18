@@ -1,7 +1,7 @@
 import { stat } from "node:fs/promises";
 import { expect, request } from "@playwright/test";
 import { test } from "e2e-tests/fixtures";
-import { createUser, firstLogin, getTestPassword } from "e2e-tests/helpers-utils/e2e-test-api-helpers";
+import { apiLogout, createUser, firstLogin, getTestPassword } from "e2e-tests/helpers-utils/e2e-test-api-helpers";
 import {
   createInvestigation,
   fillCandidatesListPages,
@@ -70,7 +70,6 @@ test.describe.configure({ mode: "serial" });
 test.describe("full flow", () => {
   let electionId: number | null = null;
 
-  // eslint-disable-next-line playwright/expect-expect
   test("create browser-specific admin user account", async ({ adminOne, browserName }) => {
     const { request: adminOneContext } = adminOne;
 
@@ -84,6 +83,8 @@ test.describe("full flow", () => {
 
     const newAdminContext = await request.newContext();
     await firstLogin(newAdminContext, user);
+    const logoutResponse = await apiLogout(newAdminContext);
+    expect(logoutResponse.status()).toBe(204);
   });
 
   test(`create browser-specific coordinator for flow`, async ({ page, browserName }) => {

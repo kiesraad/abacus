@@ -1,36 +1,36 @@
 use super::{
     super::{
         fraction::Fraction,
-        structs::{LARGE_COUNCIL_THRESHOLD, ListNumber, ListVotesTrait},
+        structs::{LARGE_COUNCIL_THRESHOLD, ListVotesTrait},
     },
     ApportionmentError, get_number_of_candidates, list_numbers,
     structs::{
-        HighestAverageAssignedSeat, LargestRemainderAssignedSeat, ListStanding, SeatChange,
-        SeatChangeStep,
+        HighestAverageAssignedSeat, LargestRemainderAssignedSeat, ListStanding,
+        RemainderAssignmentResult, SeatChange, SeatChangeStep,
     },
 };
-use std::cmp::Ordering;
+use std::{cmp::Ordering, fmt::Debug};
 use tracing::{debug, info};
 
 /// This function assigns the residual seats that remain after full seat assignment is finished.
 /// These residual seats are assigned through two different procedures,
 /// depending on how many total seats are available in the election.
 pub fn assign_remainder<T: ListVotesTrait>(
-    initial_standings: &[ListStanding],
+    initial_standings: &[ListStanding<T::ListNumber>],
     seats: u32,
     total_residual_seats: u32,
     current_residual_seat_number: u32,
-    previous_steps: &[SeatChangeStep],
+    previous_steps: &[SeatChangeStep<T::ListNumber>],
     exclude_exhausted_lists: Option<&[T]>,
-) -> Result<(Vec<SeatChangeStep>, Vec<ListStanding>), ApportionmentError> {
-    let mut steps: Vec<SeatChangeStep> = previous_steps.to_vec();
+) -> RemainderAssignmentResult<T::ListNumber> {
+    let mut steps: Vec<SeatChangeStep<T::ListNumber>> = previous_steps.to_vec();
     let mut residual_seat_number = current_residual_seat_number;
     let mut current_standings = initial_standings.to_vec();
 
     while residual_seat_number != total_residual_seats {
         let residual_seats = total_residual_seats - residual_seat_number;
         residual_seat_number += 1;
-        let exhausted_list_numbers: Vec<ListNumber> = exclude_exhausted_lists
+        let exhausted_list_numbers: Vec<T::ListNumber> = exclude_exhausted_lists
             .map_or_else(Vec::new, |list_votes| {
                 list_numbers_without_empty_seats(current_standings.iter(), list_votes)
             });
@@ -85,11 +85,11 @@ pub fn assign_remainder<T: ListVotesTrait>(
 /// If the last residual seat was assigned to a list with the same
 /// remainder/votes per seat as lists assigned a seat in previous steps,
 /// return all list numbers that had the same remainder/votes per seat.
-fn list_assigned_from_previous_step(
-    selected_list: &ListStanding,
-    previous_steps: &[SeatChangeStep],
-    matcher: fn(&SeatChange) -> bool,
-) -> Vec<ListNumber> {
+fn list_assigned_from_previous_step<LN: Copy + Eq>(
+    selected_list: &ListStanding<LN>,
+    previous_steps: &[SeatChangeStep<LN>],
+    matcher: fn(&SeatChange<LN>) -> bool,
+) -> Vec<LN> {
     let mut list_assigned = Vec::new();
     if let Some(previous_step) = previous_steps.last()
         && matcher(&previous_step.change)
@@ -104,9 +104,9 @@ fn list_assigned_from_previous_step(
     list_assigned
 }
 
-fn list_largest_remainder_assigned_seats(
-    previous_steps: &[SeatChangeStep],
-    list_number: ListNumber,
+fn list_largest_remainder_assigned_seats<LN: Copy + Eq>(
+    previous_steps: &[SeatChangeStep<LN>],
+    list_number: LN,
 ) -> usize {
     previous_steps
         .iter()
@@ -118,9 +118,12 @@ fn list_largest_remainder_assigned_seats(
 }
 
 fn list_numbers_without_empty_seats<'a, T: ListVotesTrait>(
-    standings: impl Iterator<Item = &'a ListStanding>,
+    standings: impl Iterator<Item = &'a ListStanding<T::ListNumber>>,
     input_list_votes: &[T],
-) -> Vec<ListNumber> {
+) -> Vec<T::ListNumber>
+where
+    T::ListNumber: 'a,
+{
     standings.fold(vec![], |mut list_numbers_without_empty_seats, s| {
         let number_of_candidates = get_number_of_candidates(input_list_votes, s.list_number);
         if number_of_candidates.cmp(&s.total_seats()) == Ordering::Equal {
@@ -130,11 +133,11 @@ fn list_numbers_without_empty_seats<'a, T: ListVotesTrait>(
     })
 }
 
-fn list_qualifies_for_extra_seat(
+fn list_qualifies_for_extra_seat<LN: Copy + Eq>(
     number_of_seats_largest_remainders: usize,
     number_of_seats_unique_highest_averages_option: Option<usize>,
-    previous_steps: &[SeatChangeStep],
-    list_number: ListNumber,
+    previous_steps: &[SeatChangeStep<LN>],
+    list_number: LN,
 ) -> bool {
     let has_retracted_seat: bool = previous_steps.iter().any(|prev| {
         prev.change.is_changed_by_absolute_majority_reassignment()
@@ -162,11 +165,11 @@ fn list_qualifies_for_extra_seat(
 /// except when a seat was retracted.
 /// Additionally only lists that met the threshold are considered for this process.
 /// This also removes groups that do not have more candidates to be assigned seats.
-fn list_standings_qualifying_for_largest_remainder<'a>(
-    standings: &'a [ListStanding],
-    previous_steps: &'a [SeatChangeStep],
-    exhausted_list_numbers: &[ListNumber],
-) -> impl Iterator<Item = &'a ListStanding> {
+fn list_standings_qualifying_for_largest_remainder<'a, LN: Copy + Eq>(
+    standings: &'a [ListStanding<LN>],
+    previous_steps: &'a [SeatChangeStep<LN>],
+    exhausted_list_numbers: &[LN],
+) -> impl Iterator<Item = &'a ListStanding<LN>> {
     standings.iter().filter(|&s| {
         s.meets_remainder_threshold
             && !exhausted_list_numbers.contains(&s.list_number)
@@ -183,11 +186,11 @@ fn list_standings_qualifying_for_largest_remainder<'a>(
 /// This checks the previously assigned seats to make sure that every list that already
 /// got a residual seat through the highest average procedure does not qualify
 /// except when a seat was retracted.
-fn list_standings_qualifying_for_unique_highest_average<'a>(
-    standings: &'a [ListStanding],
-    previous_steps: &'a [SeatChangeStep],
-    exhausted_list_numbers: &[ListNumber],
-) -> impl Iterator<Item = &'a ListStanding> {
+fn list_standings_qualifying_for_unique_highest_average<'a, LN: Copy + Eq>(
+    standings: &'a [ListStanding<LN>],
+    previous_steps: &'a [SeatChangeStep<LN>],
+    exhausted_list_numbers: &[LN],
+) -> impl Iterator<Item = &'a ListStanding<LN>> {
     standings.iter().filter(|&s| {
         !exhausted_list_numbers.contains(&s.list_number)
             && list_qualifies_for_extra_seat(
@@ -202,9 +205,9 @@ fn list_standings_qualifying_for_unique_highest_average<'a>(
     })
 }
 
-fn list_unique_highest_average_assigned_seats(
-    previous_steps: &[SeatChangeStep],
-    list_number: ListNumber,
+fn list_unique_highest_average_assigned_seats<LN: Copy + Eq>(
+    previous_steps: &[SeatChangeStep<LN>],
+    list_number: LN,
 ) -> usize {
     previous_steps
         .iter()
@@ -225,10 +228,10 @@ fn list_unique_highest_average_assigned_seats(
 /// a drawing of lots is required.
 ///
 /// This function will always return at least one group.
-fn lists_with_highest_average<'a>(
-    standings: impl Iterator<Item = &'a ListStanding>,
+fn lists_with_highest_average<'a, LN: Copy + Debug>(
+    standings: impl Iterator<Item = &'a ListStanding<LN>>,
     residual_seats: u32,
-) -> Result<Vec<&'a ListStanding>, ApportionmentError> {
+) -> Result<Vec<&'a ListStanding<LN>>, ApportionmentError> {
     // We are now going to find the lists that have the highest average
     // votes per seat if we would were to add one additional seat to them
     let (max_average, lists) = standings.fold(
@@ -276,10 +279,10 @@ fn lists_with_highest_average<'a>(
 /// a drawing of lots is required.
 ///
 /// This function will always return at least one group.
-fn lists_with_largest_remainder<'a>(
-    standings: impl Iterator<Item = &'a ListStanding>,
+fn lists_with_largest_remainder<'a, LN: Copy + Debug>(
+    standings: impl Iterator<Item = &'a ListStanding<LN>>,
     residual_seats: u32,
-) -> Result<Vec<&'a ListStanding>, ApportionmentError> {
+) -> Result<Vec<&'a ListStanding<LN>>, ApportionmentError> {
     // We are now going to find the lists that have the largest remainder
     let (max_remainder, lists) = standings.fold(
         (Fraction::ZERO, vec![]),
@@ -321,13 +324,13 @@ fn lists_with_largest_remainder<'a>(
 
 /// Assign the next residual seat, and return which group that seat was assigned to.  
 /// This assignment is done according to the rules for elections with 19 seats or more.
-fn step_assign_remainder_using_highest_averages<'a>(
-    standings: impl Iterator<Item = &'a ListStanding>,
+fn step_assign_remainder_using_highest_averages<'a, LN: Copy + Debug + Eq + 'a>(
+    standings: impl Iterator<Item = &'a ListStanding<LN>>,
     residual_seats: u32,
-    previous_steps: &[SeatChangeStep],
-    exhausted_list_numbers: &[ListNumber],
+    previous_steps: &[SeatChangeStep<LN>],
+    exhausted_list_numbers: &[LN],
     unique: bool,
-) -> Result<SeatChange, ApportionmentError> {
+) -> Result<SeatChange<LN>, ApportionmentError> {
     // Get an iterator that lists all the list standings without exhausted lists.
     let mut qualifying_for_highest_average = standings
         .into_iter()
@@ -338,7 +341,7 @@ fn step_assign_remainder_using_highest_averages<'a>(
         let selected_lists =
             lists_with_highest_average(qualifying_for_highest_average, residual_seats)?;
         let selected_list = selected_lists[0];
-        let assigned_seat: HighestAverageAssignedSeat = HighestAverageAssignedSeat {
+        let assigned_seat: HighestAverageAssignedSeat<LN> = HighestAverageAssignedSeat {
             selected_list_number: selected_list.list_number,
             list_assigned: list_assigned_from_previous_step(
                 selected_list,
@@ -366,12 +369,12 @@ fn step_assign_remainder_using_highest_averages<'a>(
 
 /// Assign the next residual seat, and return which group that seat was assigned to.  
 /// This assignment is done according to the rules for elections with less than 19 seats.
-fn step_assign_remainder_using_largest_remainder(
-    standings: &[ListStanding],
+fn step_assign_remainder_using_largest_remainder<LN: Copy + Debug + Eq>(
+    standings: &[ListStanding<LN>],
     residual_seats: u32,
-    previous_steps: &[SeatChangeStep],
-    exhausted_list_numbers: &[ListNumber],
-) -> Result<SeatChange, ApportionmentError> {
+    previous_steps: &[SeatChangeStep<LN>],
+    exhausted_list_numbers: &[LN],
+) -> Result<SeatChange<LN>, ApportionmentError> {
     // first we check if there are any lists that still qualify for a largest remainder assigned seat
     let mut qualifying_for_remainder = list_standings_qualifying_for_largest_remainder(
         standings,

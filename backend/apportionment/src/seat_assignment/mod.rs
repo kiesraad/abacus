@@ -7,23 +7,21 @@ use tracing::info;
 use self::{
     residual_seat_assignment::assign_remainder,
     structs::{
-        AbsoluteMajorityReassignedSeat, ListExhaustionRemovedSeat, ListStanding, SeatChange,
-        SeatChangeStep,
+        AbsoluteMajorityReassignedSeat, AbsoluteMajorityResult, ListExhaustionRemovedSeat,
+        ListStanding, RemainderAssignmentResult, SeatChange, SeatChangeStep,
     },
 };
 use super::{
     ApportionmentInput, ListVotesTrait,
     fraction::Fraction,
-    structs::{
-        ApportionmentError, CandidateNominationInput, CandidateNominationInputType, ListNumber,
-    },
+    structs::{ApportionmentError, CandidateNominationInput, CandidateNominationInputType},
 };
 pub use structs::SeatAssignmentResult;
 
 /// Seat assignment
 pub(crate) fn seat_assignment<T: ApportionmentInput>(
     input: &T,
-) -> Result<SeatAssignmentResult, ApportionmentError> {
+) -> Result<SeatAssignmentResult<T::List>, ApportionmentError> {
     info!("Seat assignment");
     info!("Seats: {}", input.number_of_seats());
 
@@ -38,7 +36,7 @@ pub(crate) fn seat_assignment<T: ApportionmentInput>(
     info!("Quota: {}", quota);
 
     // [Artikel P 6 Kieswet](https://wetten.overheid.nl/BWBR0004627/2026-01-01/#AfdelingII_HoofdstukP_Paragraaf2_ArtikelP6)
-    let initial_standing: Vec<ListStanding> = input
+    let initial_standing: Vec<ListStanding<_>> = input
         .list_votes()
         .iter()
         .map(|list| ListStanding::new(list, quota))
@@ -113,9 +111,9 @@ pub(crate) fn seat_assignment<T: ApportionmentInput>(
     })
 }
 
-pub fn get_total_seats_per_list_number_from_apportionment_result(
-    result: &SeatAssignmentResult,
-) -> Vec<(ListNumber, u32)> {
+pub fn get_total_seats_per_list_number_from_apportionment_result<T: ListVotesTrait>(
+    result: &SeatAssignmentResult<T>,
+) -> Vec<(T::ListNumber, u32)> {
     result
         .final_standing
         .iter()
@@ -125,7 +123,7 @@ pub fn get_total_seats_per_list_number_from_apportionment_result(
 
 pub fn as_candidate_nomination_input<'a, T: ApportionmentInput>(
     input: &'a T,
-    seat_assignment: &SeatAssignmentResult,
+    seat_assignment: &SeatAssignmentResult<T::List>,
 ) -> CandidateNominationInputType<'a, T> {
     CandidateNominationInput {
         number_of_seats: input.number_of_seats(),
@@ -138,13 +136,13 @@ pub fn as_candidate_nomination_input<'a, T: ApportionmentInput>(
 }
 
 /// Create a vector containing just the list numbers from an iterator of the current standing
-fn list_numbers(standing: &[&ListStanding]) -> Vec<ListNumber> {
+fn list_numbers<LN: Copy>(standing: &[&ListStanding<LN>]) -> Vec<LN> {
     standing.iter().map(|s| s.list_number).collect()
 }
 
 fn get_number_of_candidates<T: ListVotesTrait>(
     input_list_votes: &[T],
-    list_number: ListNumber,
+    list_number: T::ListNumber,
 ) -> u32 {
     let list_votes = input_list_votes
         .iter()
@@ -153,20 +151,22 @@ fn get_number_of_candidates<T: ListVotesTrait>(
     u32::try_from(list_votes.candidate_votes().len()).expect("Number of candidates fits in u32")
 }
 
-fn list_numbers_with_exhausted_seats<'a, T: ListVotesTrait>(
-    standings: impl Iterator<Item = &'a ListStanding>,
+fn list_numbers_with_exhausted_seats<T: ListVotesTrait>(
+    standings: &[ListStanding<T::ListNumber>],
     input_list_votes: &[T],
-) -> Vec<(ListNumber, u32)> {
-    standings.fold(vec![], |mut exhausted_list_numbers_and_seats, s| {
-        let number_of_candidates = get_number_of_candidates(input_list_votes, s.list_number);
-        if number_of_candidates.cmp(&s.total_seats()) == Ordering::Less {
-            exhausted_list_numbers_and_seats.push((
-                s.list_number,
-                number_of_candidates.abs_diff(s.total_seats()),
-            ))
-        }
-        exhausted_list_numbers_and_seats
-    })
+) -> Vec<(T::ListNumber, u32)> {
+    standings
+        .iter()
+        .fold(vec![], |mut exhausted_list_numbers_and_seats, s| {
+            let number_of_candidates = get_number_of_candidates(input_list_votes, s.list_number);
+            if number_of_candidates.cmp(&s.total_seats()) == Ordering::Less {
+                exhausted_list_numbers_and_seats.push((
+                    s.list_number,
+                    number_of_candidates.abs_diff(s.total_seats()),
+                ))
+            }
+            exhausted_list_numbers_and_seats
+        })
 }
 
 /// If a list got the absolute majority of votes but not the absolute majority of seats,
@@ -176,9 +176,9 @@ fn reassign_residual_seat_for_absolute_majority<T: ListVotesTrait>(
     seats: u32,
     total_votes: u32,
     list_votes: &[T],
-    lists_last_residual_seat: &[ListNumber],
-    standings: Vec<ListStanding>,
-) -> Result<(Vec<ListStanding>, Option<SeatChange>), ApportionmentError> {
+    lists_last_residual_seat: &[T::ListNumber],
+    standings: Vec<ListStanding<T::ListNumber>>,
+) -> AbsoluteMajorityResult<T::ListNumber> {
     let half_of_votes_count: Fraction = Fraction::from(total_votes) * Fraction::new(1, 2);
 
     // Find list with an absolute majority of votes. Return early if we find none
@@ -218,7 +218,7 @@ fn reassign_residual_seat_for_absolute_majority<T: ListVotesTrait>(
         }
 
         info!(
-            "Seat first assigned to list {} has been reassigned to list {} in accordance with Article P 9 Kieswet",
+            "Seat first assigned to list {:?} has been reassigned to list {:?} in accordance with Article P 9 Kieswet",
             lists_last_residual_seat[0],
             majority_list_votes.number()
         );
@@ -240,17 +240,17 @@ fn reassign_residual_seat_for_absolute_majority<T: ListVotesTrait>(
 /// re-assign those excess seats to other lists without exhausted lists.  
 /// This re-assignment is done according to article P 10 of the Kieswet.
 fn reassign_residual_seats_for_exhausted_lists<T: ListVotesTrait>(
-    previous_standings: Vec<ListStanding>,
+    previous_standings: Vec<ListStanding<T::ListNumber>>,
     seats: u32,
     list_votes: &[T],
     assigned_residual_seats: u32,
-    previous_steps: Vec<SeatChangeStep>,
-) -> Result<(Vec<SeatChangeStep>, Vec<ListStanding>), ApportionmentError> {
-    let exhausted_lists = list_numbers_with_exhausted_seats(previous_standings.iter(), list_votes);
+    previous_steps: Vec<SeatChangeStep<T::ListNumber>>,
+) -> RemainderAssignmentResult<T::ListNumber> {
+    let exhausted_lists = list_numbers_with_exhausted_seats(&previous_standings, list_votes);
     if !exhausted_lists.is_empty() {
         let mut current_standings = previous_standings.clone();
         let mut seats_to_reassign = 0;
-        let mut list_exhaustion_steps: Vec<SeatChangeStep> = vec![];
+        let mut list_exhaustion_steps: Vec<SeatChangeStep<T::ListNumber>> = vec![];
 
         // Remove excess seats from exhausted lists
         for (list_number, seats) in exhausted_lists {
@@ -268,7 +268,7 @@ fn reassign_residual_seats_for_exhausted_lists<T: ListVotesTrait>(
                     }
                 }
                 info!(
-                    "Seat first assigned to list {} has been removed and will be assigned to another list in accordance with Article P 10 Kieswet",
+                    "Seat first assigned to list {:?} has been removed and will be assigned to another list in accordance with Article P 10 Kieswet",
                     list_number
                 );
                 list_exhaustion_steps.push(SeatChangeStep {
@@ -302,25 +302,25 @@ fn reassign_residual_seats_for_exhausted_lists<T: ListVotesTrait>(
 #[cfg(test)]
 pub(crate) mod tests {
     use crate::{
-        SeatAssignmentResult,
+        ListVotesTrait, SeatAssignmentResult,
         fraction::Fraction,
         seat_assignment::{
             ListStanding, SeatChange, get_total_seats_per_list_number_from_apportionment_result,
             list_numbers,
         },
-        structs::ListNumber,
-        test_helpers::convert_total_seats_per_u32_list_number_to_total_seats_per_list_number,
     };
     use test_log::test;
 
-    impl SeatChange {
+    impl SeatChange<u32> {
         /// Returns true if the seat was changed through the list exhaustion removal
         pub fn is_changed_by_list_exhaustion_removal(&self) -> bool {
             matches!(self, Self::ListExhaustionRemoval(_))
         }
     }
 
-    pub fn get_total_seats_from_apportionment_result(result: &SeatAssignmentResult) -> Vec<u32> {
+    pub fn get_total_seats_from_apportionment_result<T: ListVotesTrait>(
+        result: &SeatAssignmentResult<T>,
+    ) -> Vec<u32> {
         result
             .final_standing
             .iter()
@@ -328,27 +328,20 @@ pub(crate) mod tests {
             .collect::<Vec<_>>()
     }
 
-    fn check_total_seats_per_list(
-        result: &SeatAssignmentResult,
-        expected_total_seats_per_list: Vec<(u32, u32)>,
+    fn check_total_seats_per_list<T: ListVotesTrait>(
+        result: &SeatAssignmentResult<T>,
+        expected_total_seats_per_list: Vec<(T::ListNumber, u32)>,
     ) {
         let total_seats_per_list_number =
             get_total_seats_per_list_number_from_apportionment_result(result);
-        let expected_total_seats_per_list_number =
-            convert_total_seats_per_u32_list_number_to_total_seats_per_list_number(
-                expected_total_seats_per_list,
-            );
-        assert_eq!(
-            expected_total_seats_per_list_number,
-            total_seats_per_list_number
-        );
+        assert_eq!(expected_total_seats_per_list, total_seats_per_list_number);
     }
 
     #[test]
     fn test_list_numbers() {
         let standing = [
             &ListStanding {
-                list_number: ListNumber::from(2),
+                list_number: 2,
                 votes_cast: 1249,
                 remainder_votes: Fraction::new(14975, 24),
                 meets_remainder_threshold: true,
@@ -357,7 +350,7 @@ pub(crate) mod tests {
                 residual_seats: 0,
             },
             &ListStanding {
-                list_number: ListNumber::from(3),
+                list_number: 3,
                 votes_cast: 1249,
                 remainder_votes: Fraction::new(14975, 24),
                 meets_remainder_threshold: true,
@@ -366,7 +359,7 @@ pub(crate) mod tests {
                 residual_seats: 0,
             },
             &ListStanding {
-                list_number: ListNumber::from(4),
+                list_number: 4,
                 votes_cast: 1249,
                 remainder_votes: Fraction::new(14975, 24),
                 meets_remainder_threshold: true,
@@ -375,7 +368,7 @@ pub(crate) mod tests {
                 residual_seats: 0,
             },
             &ListStanding {
-                list_number: ListNumber::from(5),
+                list_number: 5,
                 votes_cast: 1249,
                 remainder_votes: Fraction::new(14975, 24),
                 meets_remainder_threshold: true,
@@ -384,7 +377,7 @@ pub(crate) mod tests {
                 residual_seats: 0,
             },
             &ListStanding {
-                list_number: ListNumber::from(6),
+                list_number: 6,
                 votes_cast: 1249,
                 remainder_votes: Fraction::new(14975, 24),
                 meets_remainder_threshold: true,
@@ -402,7 +395,7 @@ pub(crate) mod tests {
 
         use super::get_total_seats_from_apportionment_result;
         use crate::{
-            ApportionmentError, seat_assignment::seat_assignment, structs::ListNumber,
+            ApportionmentError, seat_assignment::seat_assignment,
             test_helpers::seat_assignment_fixture_with_default_50_candidates,
         };
 
@@ -439,14 +432,8 @@ pub(crate) mod tests {
             assert_eq!(result.full_seats, 13);
             assert_eq!(result.residual_seats, 2);
             assert_eq!(result.steps.len(), 2);
-            assert_eq!(
-                result.steps[0].change.list_number_assigned(),
-                ListNumber::from(1)
-            );
-            assert_eq!(
-                result.steps[1].change.list_number_assigned(),
-                ListNumber::from(7)
-            );
+            assert_eq!(result.steps[0].change.list_number_assigned(), 1);
+            assert_eq!(result.steps[1].change.list_number_assigned(), 7);
             let total_seats = get_total_seats_from_apportionment_result(&result);
             assert_eq!(total_seats, vec![7, 2, 2, 1, 1, 1, 1, 0]);
         }
@@ -471,26 +458,11 @@ pub(crate) mod tests {
             assert_eq!(result.full_seats, 10);
             assert_eq!(result.residual_seats, 5);
             assert_eq!(result.steps.len(), 5);
-            assert_eq!(
-                result.steps[0].change.list_number_assigned(),
-                ListNumber::from(1)
-            );
-            assert_eq!(
-                result.steps[1].change.list_number_assigned(),
-                ListNumber::from(1)
-            );
-            assert_eq!(
-                result.steps[2].change.list_number_assigned(),
-                ListNumber::from(2)
-            );
-            assert_eq!(
-                result.steps[3].change.list_number_assigned(),
-                ListNumber::from(3)
-            );
-            assert_eq!(
-                result.steps[4].change.list_number_assigned(),
-                ListNumber::from(4)
-            );
+            assert_eq!(result.steps[0].change.list_number_assigned(), 1);
+            assert_eq!(result.steps[1].change.list_number_assigned(), 1);
+            assert_eq!(result.steps[2].change.list_number_assigned(), 2);
+            assert_eq!(result.steps[3].change.list_number_assigned(), 3);
+            assert_eq!(result.steps[4].change.list_number_assigned(), 4);
             let total_seats = get_total_seats_from_apportionment_result(&result);
             assert_eq!(total_seats, vec![12, 1, 1, 1, 0, 0, 0, 0]);
         }
@@ -512,18 +484,9 @@ pub(crate) mod tests {
             assert_eq!(result.full_seats, 12);
             assert_eq!(result.residual_seats, 3);
             assert_eq!(result.steps.len(), 3);
-            assert_eq!(
-                result.steps[0].change.list_number_assigned(),
-                ListNumber::from(1)
-            );
-            assert_eq!(
-                result.steps[1].change.list_number_assigned(),
-                ListNumber::from(2)
-            );
-            assert_eq!(
-                result.steps[2].change.list_number_assigned(),
-                ListNumber::from(3)
-            );
+            assert_eq!(result.steps[0].change.list_number_assigned(), 1);
+            assert_eq!(result.steps[1].change.list_number_assigned(), 2);
+            assert_eq!(result.steps[2].change.list_number_assigned(), 3);
             let total_seats = get_total_seats_from_apportionment_result(&result);
             assert_eq!(total_seats, vec![7, 4, 4, 0, 0, 0, 0, 0]);
         }
@@ -546,18 +509,9 @@ pub(crate) mod tests {
             assert_eq!(result.full_seats, 0);
             assert_eq!(result.residual_seats, 3);
             assert_eq!(result.steps.len(), 3);
-            assert_eq!(
-                result.steps[0].change.list_number_assigned(),
-                ListNumber::from(1)
-            );
-            assert_eq!(
-                result.steps[1].change.list_number_assigned(),
-                ListNumber::from(2)
-            );
-            assert_eq!(
-                result.steps[2].change.list_number_assigned(),
-                ListNumber::from(3)
-            );
+            assert_eq!(result.steps[0].change.list_number_assigned(), 1);
+            assert_eq!(result.steps[1].change.list_number_assigned(), 2);
+            assert_eq!(result.steps[2].change.list_number_assigned(), 3);
             let total_seats = get_total_seats_from_apportionment_result(&result);
             assert_eq!(total_seats, vec![1, 1, 1, 0, 0, 0, 0, 0, 0, 0]);
         }
@@ -578,18 +532,9 @@ pub(crate) mod tests {
             assert_eq!(result.full_seats, 7);
             assert_eq!(result.residual_seats, 3);
             assert_eq!(result.steps.len(), 3);
-            assert_eq!(
-                result.steps[0].change.list_number_assigned(),
-                ListNumber::from(6)
-            );
-            assert_eq!(
-                result.steps[1].change.list_number_assigned(),
-                ListNumber::from(6)
-            );
-            assert_eq!(
-                result.steps[2].change.list_number_assigned(),
-                ListNumber::from(5)
-            );
+            assert_eq!(result.steps[0].change.list_number_assigned(), 6);
+            assert_eq!(result.steps[1].change.list_number_assigned(), 6);
+            assert_eq!(result.steps[2].change.list_number_assigned(), 5);
             let total_seats = get_total_seats_from_apportionment_result(&result);
             assert_eq!(total_seats, [0, 0, 0, 0, 1, 9]);
         }
@@ -623,31 +568,16 @@ pub(crate) mod tests {
             assert_eq!(result.full_seats, 12);
             assert_eq!(result.residual_seats, 3);
             assert_eq!(result.steps.len(), 4);
-            assert_eq!(
-                result.steps[0].change.list_number_assigned(),
-                ListNumber::from(2)
-            );
-            assert_eq!(
-                result.steps[1].change.list_number_assigned(),
-                ListNumber::from(3)
-            );
-            assert_eq!(
-                result.steps[2].change.list_number_assigned(),
-                ListNumber::from(4)
-            );
+            assert_eq!(result.steps[0].change.list_number_assigned(), 2);
+            assert_eq!(result.steps[1].change.list_number_assigned(), 3);
+            assert_eq!(result.steps[2].change.list_number_assigned(), 4);
             assert!(
                 result.steps[3]
                     .change
                     .is_changed_by_absolute_majority_reassignment()
             );
-            assert_eq!(
-                result.steps[3].change.list_number_retracted(),
-                ListNumber::from(4)
-            );
-            assert_eq!(
-                result.steps[3].change.list_number_assigned(),
-                ListNumber::from(1)
-            );
+            assert_eq!(result.steps[3].change.list_number_retracted(), 4);
+            assert_eq!(result.steps[3].change.list_number_assigned(), 1);
             let total_seats = get_total_seats_from_apportionment_result(&result);
             assert_eq!(total_seats, vec![8, 3, 2, 1, 1]);
         }
@@ -716,7 +646,7 @@ pub(crate) mod tests {
 
             use super::get_total_seats_from_apportionment_result;
             use crate::{
-                ApportionmentError, seat_assignment::seat_assignment, structs::ListNumber,
+                ApportionmentError, seat_assignment::seat_assignment,
                 test_helpers::seat_assignment_fixture_with_given_candidate_votes,
             };
 
@@ -749,14 +679,8 @@ pub(crate) mod tests {
                         .change
                         .is_changed_by_list_exhaustion_removal()
                 );
-                assert_eq!(
-                    result.steps[0].change.list_number_retracted(),
-                    ListNumber::from(1)
-                );
-                assert_eq!(
-                    result.steps[1].change.list_number_assigned(),
-                    ListNumber::from(5)
-                );
+                assert_eq!(result.steps[0].change.list_number_retracted(), 1);
+                assert_eq!(result.steps[1].change.list_number_assigned(), 5);
                 let total_seats = get_total_seats_from_apportionment_result(&result);
                 assert_eq!(total_seats, vec![4, 4, 3, 2, 2]);
             }
@@ -798,43 +722,19 @@ pub(crate) mod tests {
                 assert_eq!(result.full_seats, 11);
                 assert_eq!(result.residual_seats, 6);
                 assert_eq!(result.steps.len(), 8);
-                assert_eq!(
-                    result.steps[0].change.list_number_assigned(),
-                    ListNumber::from(3)
-                );
-                assert_eq!(
-                    result.steps[1].change.list_number_assigned(),
-                    ListNumber::from(11)
-                );
-                assert_eq!(
-                    result.steps[2].change.list_number_assigned(),
-                    ListNumber::from(9)
-                );
-                assert_eq!(
-                    result.steps[3].change.list_number_assigned(),
-                    ListNumber::from(10)
-                );
-                assert_eq!(
-                    result.steps[4].change.list_number_assigned(),
-                    ListNumber::from(1)
-                );
-                assert_eq!(
-                    result.steps[5].change.list_number_assigned(),
-                    ListNumber::from(4)
-                );
+                assert_eq!(result.steps[0].change.list_number_assigned(), 3);
+                assert_eq!(result.steps[1].change.list_number_assigned(), 11);
+                assert_eq!(result.steps[2].change.list_number_assigned(), 9);
+                assert_eq!(result.steps[3].change.list_number_assigned(), 10);
+                assert_eq!(result.steps[4].change.list_number_assigned(), 1);
+                assert_eq!(result.steps[5].change.list_number_assigned(), 4);
                 assert!(
                     result.steps[6]
                         .change
                         .is_changed_by_list_exhaustion_removal()
                 );
-                assert_eq!(
-                    result.steps[6].change.list_number_retracted(),
-                    ListNumber::from(10)
-                );
-                assert_eq!(
-                    result.steps[7].change.list_number_assigned(),
-                    ListNumber::from(6)
-                );
+                assert_eq!(result.steps[6].change.list_number_retracted(), 10);
+                assert_eq!(result.steps[7].change.list_number_assigned(), 6);
                 let total_seats = get_total_seats_from_apportionment_result(&result);
                 assert_eq!(total_seats, vec![3, 1, 2, 2, 1, 2, 1, 0, 3, 1, 1]);
             }
@@ -868,31 +768,16 @@ pub(crate) mod tests {
                 assert_eq!(result.full_seats, 7);
                 assert_eq!(result.residual_seats, 3);
                 assert_eq!(result.steps.len(), 5);
-                assert_eq!(
-                    result.steps[0].change.list_number_assigned(),
-                    ListNumber::from(6)
-                );
-                assert_eq!(
-                    result.steps[1].change.list_number_assigned(),
-                    ListNumber::from(6)
-                );
-                assert_eq!(
-                    result.steps[2].change.list_number_assigned(),
-                    ListNumber::from(5)
-                );
+                assert_eq!(result.steps[0].change.list_number_assigned(), 6);
+                assert_eq!(result.steps[1].change.list_number_assigned(), 6);
+                assert_eq!(result.steps[2].change.list_number_assigned(), 5);
                 assert!(
                     result.steps[3]
                         .change
                         .is_changed_by_list_exhaustion_removal()
                 );
-                assert_eq!(
-                    result.steps[3].change.list_number_retracted(),
-                    ListNumber::from(6)
-                );
-                assert_eq!(
-                    result.steps[4].change.list_number_assigned(),
-                    ListNumber::from(4)
-                );
+                assert_eq!(result.steps[3].change.list_number_retracted(), 6);
+                assert_eq!(result.steps[4].change.list_number_assigned(), 4);
                 let total_seats = get_total_seats_from_apportionment_result(&result);
                 assert_eq!(total_seats, [0, 0, 0, 1, 1, 8]);
             }
@@ -927,62 +812,35 @@ pub(crate) mod tests {
                 assert_eq!(result.full_seats, 2);
                 assert_eq!(result.residual_seats, 4);
                 assert_eq!(result.steps.len(), 9);
-                assert_eq!(
-                    result.steps[0].change.list_number_assigned(),
-                    ListNumber::from(3)
-                );
+                assert_eq!(result.steps[0].change.list_number_assigned(), 3);
                 assert!(
                     result.steps[1]
                         .change
                         .is_changed_by_list_exhaustion_removal()
                 );
-                assert_eq!(
-                    result.steps[1].change.list_number_retracted(),
-                    ListNumber::from(3)
-                );
+                assert_eq!(result.steps[1].change.list_number_retracted(), 3);
                 assert!(
                     result.steps[2]
                         .change
                         .is_changed_by_list_exhaustion_removal()
                 );
-                assert_eq!(
-                    result.steps[2].change.list_number_retracted(),
-                    ListNumber::from(3)
-                );
+                assert_eq!(result.steps[2].change.list_number_retracted(), 3);
                 assert!(
                     result.steps[3]
                         .change
                         .is_changed_by_list_exhaustion_removal()
                 );
-                assert_eq!(
-                    result.steps[3].change.list_number_retracted(),
-                    ListNumber::from(3)
-                );
+                assert_eq!(result.steps[3].change.list_number_retracted(), 3);
                 assert!(
                     result.steps[4]
                         .change
                         .is_changed_by_list_exhaustion_removal()
                 );
-                assert_eq!(
-                    result.steps[4].change.list_number_retracted(),
-                    ListNumber::from(3)
-                );
-                assert_eq!(
-                    result.steps[5].change.list_number_assigned(),
-                    ListNumber::from(1)
-                );
-                assert_eq!(
-                    result.steps[6].change.list_number_assigned(),
-                    ListNumber::from(2)
-                );
-                assert_eq!(
-                    result.steps[7].change.list_number_assigned(),
-                    ListNumber::from(1)
-                );
-                assert_eq!(
-                    result.steps[8].change.list_number_assigned(),
-                    ListNumber::from(2)
-                );
+                assert_eq!(result.steps[4].change.list_number_retracted(), 3);
+                assert_eq!(result.steps[5].change.list_number_assigned(), 1);
+                assert_eq!(result.steps[6].change.list_number_assigned(), 2);
+                assert_eq!(result.steps[7].change.list_number_assigned(), 1);
+                assert_eq!(result.steps[8].change.list_number_assigned(), 2);
                 let total_seats = get_total_seats_from_apportionment_result(&result);
                 assert_eq!(total_seats, [2, 2, 2]);
             }
@@ -1017,62 +875,35 @@ pub(crate) mod tests {
                 assert_eq!(result.full_seats, 2);
                 assert_eq!(result.residual_seats, 4);
                 assert_eq!(result.steps.len(), 9);
-                assert_eq!(
-                    result.steps[0].change.list_number_assigned(),
-                    ListNumber::from(3)
-                );
+                assert_eq!(result.steps[0].change.list_number_assigned(), 3);
                 assert!(
                     result.steps[1]
                         .change
                         .is_changed_by_list_exhaustion_removal()
                 );
-                assert_eq!(
-                    result.steps[1].change.list_number_retracted(),
-                    ListNumber::from(3)
-                );
+                assert_eq!(result.steps[1].change.list_number_retracted(), 3);
                 assert!(
                     result.steps[2]
                         .change
                         .is_changed_by_list_exhaustion_removal()
                 );
-                assert_eq!(
-                    result.steps[2].change.list_number_retracted(),
-                    ListNumber::from(3)
-                );
+                assert_eq!(result.steps[2].change.list_number_retracted(), 3);
                 assert!(
                     result.steps[3]
                         .change
                         .is_changed_by_list_exhaustion_removal()
                 );
-                assert_eq!(
-                    result.steps[3].change.list_number_retracted(),
-                    ListNumber::from(3)
-                );
+                assert_eq!(result.steps[3].change.list_number_retracted(), 3);
                 assert!(
                     result.steps[4]
                         .change
                         .is_changed_by_list_exhaustion_removal()
                 );
-                assert_eq!(
-                    result.steps[4].change.list_number_retracted(),
-                    ListNumber::from(3)
-                );
-                assert_eq!(
-                    result.steps[5].change.list_number_assigned(),
-                    ListNumber::from(1)
-                );
-                assert_eq!(
-                    result.steps[6].change.list_number_assigned(),
-                    ListNumber::from(2)
-                );
-                assert_eq!(
-                    result.steps[7].change.list_number_assigned(),
-                    ListNumber::from(1)
-                );
-                assert_eq!(
-                    result.steps[8].change.list_number_assigned(),
-                    ListNumber::from(2)
-                );
+                assert_eq!(result.steps[4].change.list_number_retracted(), 3);
+                assert_eq!(result.steps[5].change.list_number_assigned(), 1);
+                assert_eq!(result.steps[6].change.list_number_assigned(), 2);
+                assert_eq!(result.steps[7].change.list_number_assigned(), 1);
+                assert_eq!(result.steps[8].change.list_number_assigned(), 2);
                 let total_seats = get_total_seats_from_apportionment_result(&result);
                 assert_eq!(total_seats, [2, 2, 2]);
             }
@@ -1105,44 +936,23 @@ pub(crate) mod tests {
                 assert_eq!(result.full_seats, 12);
                 assert_eq!(result.residual_seats, 3);
                 assert_eq!(result.steps.len(), 6);
-                assert_eq!(
-                    result.steps[0].change.list_number_assigned(),
-                    ListNumber::from(2)
-                );
-                assert_eq!(
-                    result.steps[1].change.list_number_assigned(),
-                    ListNumber::from(3)
-                );
-                assert_eq!(
-                    result.steps[2].change.list_number_assigned(),
-                    ListNumber::from(4)
-                );
+                assert_eq!(result.steps[0].change.list_number_assigned(), 2);
+                assert_eq!(result.steps[1].change.list_number_assigned(), 3);
+                assert_eq!(result.steps[2].change.list_number_assigned(), 4);
                 assert!(
                     result.steps[3]
                         .change
                         .is_changed_by_absolute_majority_reassignment()
                 );
-                assert_eq!(
-                    result.steps[3].change.list_number_retracted(),
-                    ListNumber::from(4)
-                );
-                assert_eq!(
-                    result.steps[3].change.list_number_assigned(),
-                    ListNumber::from(1)
-                );
+                assert_eq!(result.steps[3].change.list_number_retracted(), 4);
+                assert_eq!(result.steps[3].change.list_number_assigned(), 1);
                 assert!(
                     result.steps[4]
                         .change
                         .is_changed_by_list_exhaustion_removal()
                 );
-                assert_eq!(
-                    result.steps[4].change.list_number_retracted(),
-                    ListNumber::from(1)
-                );
-                assert_eq!(
-                    result.steps[5].change.list_number_assigned(),
-                    ListNumber::from(4)
-                );
+                assert_eq!(result.steps[4].change.list_number_retracted(), 1);
+                assert_eq!(result.steps[5].change.list_number_assigned(), 4);
                 let total_seats = get_total_seats_from_apportionment_result(&result);
                 assert_eq!(total_seats, vec![7, 3, 2, 2, 1]);
             }
@@ -1172,49 +982,28 @@ pub(crate) mod tests {
                 assert_eq!(result.full_seats, 6);
                 assert_eq!(result.residual_seats, 2);
                 assert_eq!(result.steps.len(), 6);
-                assert_eq!(
-                    result.steps[0].change.list_number_assigned(),
-                    ListNumber::from(1)
-                );
+                assert_eq!(result.steps[0].change.list_number_assigned(), 1);
                 assert!(
                     result.steps[1]
                         .change
                         .is_changed_by_absolute_majority_reassignment()
                 );
-                assert_eq!(
-                    result.steps[1].change.list_number_retracted(),
-                    ListNumber::from(1)
-                );
-                assert_eq!(
-                    result.steps[1].change.list_number_assigned(),
-                    ListNumber::from(2)
-                );
+                assert_eq!(result.steps[1].change.list_number_retracted(), 1);
+                assert_eq!(result.steps[1].change.list_number_assigned(), 2);
                 assert!(
                     result.steps[2]
                         .change
                         .is_changed_by_list_exhaustion_removal()
                 );
-                assert_eq!(
-                    result.steps[2].change.list_number_retracted(),
-                    ListNumber::from(2)
-                );
+                assert_eq!(result.steps[2].change.list_number_retracted(), 2);
                 assert!(
                     result.steps[3]
                         .change
                         .is_changed_by_list_exhaustion_removal()
                 );
-                assert_eq!(
-                    result.steps[3].change.list_number_retracted(),
-                    ListNumber::from(2)
-                );
-                assert_eq!(
-                    result.steps[4].change.list_number_assigned(),
-                    ListNumber::from(1)
-                );
-                assert_eq!(
-                    result.steps[5].change.list_number_assigned(),
-                    ListNumber::from(3)
-                );
+                assert_eq!(result.steps[3].change.list_number_retracted(), 2);
+                assert_eq!(result.steps[4].change.list_number_assigned(), 1);
+                assert_eq!(result.steps[5].change.list_number_assigned(), 3);
                 let total_seats = get_total_seats_from_apportionment_result(&result);
                 assert_eq!(total_seats, [4, 3, 1]);
             }
@@ -1247,62 +1036,35 @@ pub(crate) mod tests {
                 assert_eq!(result.full_seats, 5);
                 assert_eq!(result.residual_seats, 3);
                 assert_eq!(result.steps.len(), 8);
-                assert_eq!(
-                    result.steps[0].change.list_number_assigned(),
-                    ListNumber::from(3)
-                );
+                assert_eq!(result.steps[0].change.list_number_assigned(), 3);
                 assert!(
                     result.steps[1]
                         .change
                         .is_changed_by_absolute_majority_reassignment()
                 );
-                assert_eq!(
-                    result.steps[1].change.list_number_retracted(),
-                    ListNumber::from(3)
-                );
-                assert_eq!(
-                    result.steps[1].change.list_number_assigned(),
-                    ListNumber::from(1)
-                );
+                assert_eq!(result.steps[1].change.list_number_retracted(), 3);
+                assert_eq!(result.steps[1].change.list_number_assigned(), 1);
                 assert!(
                     result.steps[2]
                         .change
                         .is_changed_by_list_exhaustion_removal()
                 );
-                assert_eq!(
-                    result.steps[2].change.list_number_retracted(),
-                    ListNumber::from(1)
-                );
+                assert_eq!(result.steps[2].change.list_number_retracted(), 1);
                 assert!(
                     result.steps[3]
                         .change
                         .is_changed_by_list_exhaustion_removal()
                 );
-                assert_eq!(
-                    result.steps[3].change.list_number_retracted(),
-                    ListNumber::from(1)
-                );
+                assert_eq!(result.steps[3].change.list_number_retracted(), 1);
                 assert!(
                     result.steps[4]
                         .change
                         .is_changed_by_list_exhaustion_removal()
                 );
-                assert_eq!(
-                    result.steps[4].change.list_number_retracted(),
-                    ListNumber::from(1)
-                );
-                assert_eq!(
-                    result.steps[5].change.list_number_assigned(),
-                    ListNumber::from(3)
-                );
-                assert_eq!(
-                    result.steps[6].change.list_number_assigned(),
-                    ListNumber::from(3)
-                );
-                assert_eq!(
-                    result.steps[7].change.list_number_assigned(),
-                    ListNumber::from(2)
-                );
+                assert_eq!(result.steps[4].change.list_number_retracted(), 1);
+                assert_eq!(result.steps[5].change.list_number_assigned(), 3);
+                assert_eq!(result.steps[6].change.list_number_assigned(), 3);
+                assert_eq!(result.steps[7].change.list_number_assigned(), 2);
                 let total_seats = get_total_seats_from_apportionment_result(&result);
                 assert_eq!(total_seats, [2, 1, 5]);
             }
@@ -1368,7 +1130,6 @@ pub(crate) mod tests {
         use crate::{
             ApportionmentError,
             seat_assignment::seat_assignment,
-            structs::ListNumber,
             test_helpers::{
                 seat_assignment_fixture_with_default_50_candidates,
                 seat_assignment_fixture_with_given_list_numbers_and_candidate_votes,
@@ -1415,22 +1176,10 @@ pub(crate) mod tests {
             assert_eq!(result.full_seats, 19);
             assert_eq!(result.residual_seats, 4);
             assert_eq!(result.steps.len(), 4);
-            assert_eq!(
-                result.steps[0].change.list_number_assigned(),
-                ListNumber::from(7)
-            );
-            assert_eq!(
-                result.steps[1].change.list_number_assigned(),
-                ListNumber::from(3)
-            );
-            assert_eq!(
-                result.steps[2].change.list_number_assigned(),
-                ListNumber::from(1)
-            );
-            assert_eq!(
-                result.steps[3].change.list_number_assigned(),
-                ListNumber::from(6)
-            );
+            assert_eq!(result.steps[0].change.list_number_assigned(), 7);
+            assert_eq!(result.steps[1].change.list_number_assigned(), 3);
+            assert_eq!(result.steps[2].change.list_number_assigned(), 1);
+            assert_eq!(result.steps[3].change.list_number_assigned(), 6);
             check_total_seats_per_list(&result, vec![(1, 12), (3, 6), (4, 1), (6, 2), (7, 2)]);
         }
 
@@ -1449,22 +1198,10 @@ pub(crate) mod tests {
             assert_eq!(result.full_seats, 19);
             assert_eq!(result.residual_seats, 4);
             assert_eq!(result.steps.len(), 4);
-            assert_eq!(
-                result.steps[0].change.list_number_assigned(),
-                ListNumber::from(5)
-            );
-            assert_eq!(
-                result.steps[1].change.list_number_assigned(),
-                ListNumber::from(2)
-            );
-            assert_eq!(
-                result.steps[2].change.list_number_assigned(),
-                ListNumber::from(1)
-            );
-            assert_eq!(
-                result.steps[3].change.list_number_assigned(),
-                ListNumber::from(4)
-            );
+            assert_eq!(result.steps[0].change.list_number_assigned(), 5);
+            assert_eq!(result.steps[1].change.list_number_assigned(), 2);
+            assert_eq!(result.steps[2].change.list_number_assigned(), 1);
+            assert_eq!(result.steps[3].change.list_number_assigned(), 4);
             let total_seats = get_total_seats_from_apportionment_result(&result);
             assert_eq!(total_seats, vec![12, 6, 1, 2, 2]);
         }
@@ -1489,34 +1226,13 @@ pub(crate) mod tests {
             assert_eq!(result.full_seats, 12);
             assert_eq!(result.residual_seats, 7);
             assert_eq!(result.steps.len(), 7);
-            assert_eq!(
-                result.steps[0].change.list_number_assigned(),
-                ListNumber::from(1)
-            );
-            assert_eq!(
-                result.steps[1].change.list_number_assigned(),
-                ListNumber::from(1)
-            );
-            assert_eq!(
-                result.steps[2].change.list_number_assigned(),
-                ListNumber::from(2)
-            );
-            assert_eq!(
-                result.steps[3].change.list_number_assigned(),
-                ListNumber::from(3)
-            );
-            assert_eq!(
-                result.steps[4].change.list_number_assigned(),
-                ListNumber::from(4)
-            );
-            assert_eq!(
-                result.steps[5].change.list_number_assigned(),
-                ListNumber::from(5)
-            );
-            assert_eq!(
-                result.steps[6].change.list_number_assigned(),
-                ListNumber::from(1)
-            );
+            assert_eq!(result.steps[0].change.list_number_assigned(), 1);
+            assert_eq!(result.steps[1].change.list_number_assigned(), 1);
+            assert_eq!(result.steps[2].change.list_number_assigned(), 2);
+            assert_eq!(result.steps[3].change.list_number_assigned(), 3);
+            assert_eq!(result.steps[4].change.list_number_assigned(), 4);
+            assert_eq!(result.steps[5].change.list_number_assigned(), 5);
+            assert_eq!(result.steps[6].change.list_number_assigned(), 1);
             let total_seats = get_total_seats_from_apportionment_result(&result);
             assert_eq!(total_seats, vec![15, 1, 1, 1, 1, 0, 0, 0, 0]);
         }
@@ -1552,43 +1268,19 @@ pub(crate) mod tests {
             assert_eq!(result.full_seats, 18);
             assert_eq!(result.residual_seats, 6);
             assert_eq!(result.steps.len(), 7);
-            assert_eq!(
-                result.steps[0].change.list_number_assigned(),
-                ListNumber::from(2)
-            );
-            assert_eq!(
-                result.steps[1].change.list_number_assigned(),
-                ListNumber::from(3)
-            );
-            assert_eq!(
-                result.steps[2].change.list_number_assigned(),
-                ListNumber::from(4)
-            );
-            assert_eq!(
-                result.steps[3].change.list_number_assigned(),
-                ListNumber::from(5)
-            );
-            assert_eq!(
-                result.steps[4].change.list_number_assigned(),
-                ListNumber::from(6)
-            );
-            assert_eq!(
-                result.steps[5].change.list_number_assigned(),
-                ListNumber::from(7)
-            );
+            assert_eq!(result.steps[0].change.list_number_assigned(), 2);
+            assert_eq!(result.steps[1].change.list_number_assigned(), 3);
+            assert_eq!(result.steps[2].change.list_number_assigned(), 4);
+            assert_eq!(result.steps[3].change.list_number_assigned(), 5);
+            assert_eq!(result.steps[4].change.list_number_assigned(), 6);
+            assert_eq!(result.steps[5].change.list_number_assigned(), 7);
             assert!(
                 result.steps[6]
                     .change
                     .is_changed_by_absolute_majority_reassignment()
             );
-            assert_eq!(
-                result.steps[6].change.list_number_retracted(),
-                ListNumber::from(7)
-            );
-            assert_eq!(
-                result.steps[6].change.list_number_assigned(),
-                ListNumber::from(1)
-            );
+            assert_eq!(result.steps[6].change.list_number_retracted(), 7);
+            assert_eq!(result.steps[6].change.list_number_assigned(), 1);
             let total_seats = get_total_seats_from_apportionment_result(&result);
             assert_eq!(total_seats, vec![13, 2, 2, 2, 2, 2, 1, 0]);
         }
@@ -1643,7 +1335,7 @@ pub(crate) mod tests {
 
             use super::get_total_seats_from_apportionment_result;
             use crate::{
-                ApportionmentError, seat_assignment::seat_assignment, structs::ListNumber,
+                ApportionmentError, seat_assignment::seat_assignment,
                 test_helpers::seat_assignment_fixture_with_given_candidate_votes,
             };
 
@@ -1675,14 +1367,8 @@ pub(crate) mod tests {
                         .change
                         .is_changed_by_list_exhaustion_removal()
                 );
-                assert_eq!(
-                    result.steps[0].change.list_number_retracted(),
-                    ListNumber::from(1)
-                );
-                assert_eq!(
-                    result.steps[1].change.list_number_assigned(),
-                    ListNumber::from(5)
-                );
+                assert_eq!(result.steps[0].change.list_number_retracted(), 1);
+                assert_eq!(result.steps[1].change.list_number_assigned(), 5);
                 let total_seats = get_total_seats_from_apportionment_result(&result);
                 assert_eq!(total_seats, vec![4, 5, 4, 4, 3]);
             }
@@ -1711,23 +1397,14 @@ pub(crate) mod tests {
                 assert_eq!(result.full_seats, 18);
                 assert_eq!(result.residual_seats, 1);
                 assert_eq!(result.steps.len(), 3);
-                assert_eq!(
-                    result.steps[0].change.list_number_assigned(),
-                    ListNumber::from(5)
-                );
+                assert_eq!(result.steps[0].change.list_number_assigned(), 5);
                 assert!(
                     result.steps[1]
                         .change
                         .is_changed_by_list_exhaustion_removal()
                 );
-                assert_eq!(
-                    result.steps[1].change.list_number_retracted(),
-                    ListNumber::from(5)
-                );
-                assert_eq!(
-                    result.steps[2].change.list_number_assigned(),
-                    ListNumber::from(1)
-                );
+                assert_eq!(result.steps[1].change.list_number_retracted(), 5);
+                assert_eq!(result.steps[2].change.list_number_assigned(), 1);
                 let total_seats = get_total_seats_from_apportionment_result(&result);
                 assert_eq!(total_seats, vec![5, 4, 4, 4, 2]);
             }
@@ -1765,56 +1442,26 @@ pub(crate) mod tests {
                 assert_eq!(result.full_seats, 18);
                 assert_eq!(result.residual_seats, 6);
                 assert_eq!(result.steps.len(), 9);
-                assert_eq!(
-                    result.steps[0].change.list_number_assigned(),
-                    ListNumber::from(2)
-                );
-                assert_eq!(
-                    result.steps[1].change.list_number_assigned(),
-                    ListNumber::from(3)
-                );
-                assert_eq!(
-                    result.steps[2].change.list_number_assigned(),
-                    ListNumber::from(4)
-                );
-                assert_eq!(
-                    result.steps[3].change.list_number_assigned(),
-                    ListNumber::from(5)
-                );
-                assert_eq!(
-                    result.steps[4].change.list_number_assigned(),
-                    ListNumber::from(6)
-                );
-                assert_eq!(
-                    result.steps[5].change.list_number_assigned(),
-                    ListNumber::from(7)
-                );
+                assert_eq!(result.steps[0].change.list_number_assigned(), 2);
+                assert_eq!(result.steps[1].change.list_number_assigned(), 3);
+                assert_eq!(result.steps[2].change.list_number_assigned(), 4);
+                assert_eq!(result.steps[3].change.list_number_assigned(), 5);
+                assert_eq!(result.steps[4].change.list_number_assigned(), 6);
+                assert_eq!(result.steps[5].change.list_number_assigned(), 7);
                 assert!(
                     result.steps[6]
                         .change
                         .is_changed_by_absolute_majority_reassignment()
                 );
-                assert_eq!(
-                    result.steps[6].change.list_number_retracted(),
-                    ListNumber::from(7)
-                );
-                assert_eq!(
-                    result.steps[6].change.list_number_assigned(),
-                    ListNumber::from(1)
-                );
+                assert_eq!(result.steps[6].change.list_number_retracted(), 7);
+                assert_eq!(result.steps[6].change.list_number_assigned(), 1);
                 assert!(
                     result.steps[7]
                         .change
                         .is_changed_by_list_exhaustion_removal()
                 );
-                assert_eq!(
-                    result.steps[7].change.list_number_retracted(),
-                    ListNumber::from(1)
-                );
-                assert_eq!(
-                    result.steps[8].change.list_number_assigned(),
-                    ListNumber::from(7)
-                );
+                assert_eq!(result.steps[7].change.list_number_retracted(), 1);
+                assert_eq!(result.steps[8].change.list_number_assigned(), 7);
                 let total_seats = get_total_seats_from_apportionment_result(&result);
                 assert_eq!(total_seats, vec![12, 2, 2, 2, 2, 2, 2, 0]);
             }

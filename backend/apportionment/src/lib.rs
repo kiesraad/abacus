@@ -1,6 +1,5 @@
 mod candidate_nomination;
 mod fraction;
-mod int_newtype_macro;
 mod seat_assignment;
 mod structs;
 #[cfg(test)]
@@ -10,7 +9,7 @@ pub use self::{
     candidate_nomination::CandidateNominationResult,
     fraction::Fraction,
     seat_assignment::SeatAssignmentResult,
-    structs::{ApportionmentError, ApportionmentInput, CandidateVotesTrait, ListVotesTrait, ListNumber, CandidateNumber},
+    structs::{ApportionmentError, ApportionmentInput, CandidateVotesTrait, ListVotesTrait},
 };
 use self::{
     candidate_nomination::candidate_nomination,
@@ -23,7 +22,7 @@ pub fn process<T: ApportionmentInput>(
 ) -> Result<ApportionmentOutput<'_, T::List>, ApportionmentError> {
     let seat_assignment = seat_assignment(input)?;
     let candidate_nomination_input = as_candidate_nomination_input(input, &seat_assignment);
-    let candidate_nomination = candidate_nomination::<T>(&candidate_nomination_input)?;
+    let candidate_nomination = candidate_nomination(&candidate_nomination_input)?;
 
     Ok(ApportionmentOutput {
         seat_assignment,

@@ -1,4 +1,6 @@
-use super::{super::structs::ListNumber, Fraction};
+use std::fmt::Debug;
+
+use super::{ApportionmentError, Fraction};
 use crate::ListVotesTrait;
 use tracing::{debug, info};
 
@@ -7,20 +9,20 @@ use tracing::{debug, info};
 /// and each of the changes and intermediate standings. The final standing contains the
 /// number of seats per list that was assigned after all seats were assigned.
 #[derive(Debug, PartialEq)]
-pub struct SeatAssignmentResult {
+pub struct SeatAssignmentResult<T: ListVotesTrait> {
     pub seats: u32,
     pub full_seats: u32,
     pub residual_seats: u32,
     pub quota: Fraction,
-    pub steps: Vec<SeatChangeStep>,
-    pub final_standing: Vec<ListSeatAssignment>,
+    pub steps: Vec<SeatChangeStep<T::ListNumber>>,
+    pub final_standing: Vec<ListSeatAssignment<T::ListNumber>>,
 }
 
 /// Contains information about the final assignment of seats for a specific list.
 #[derive(Debug, PartialEq)]
-pub struct ListSeatAssignment {
+pub struct ListSeatAssignment<LN> {
     /// List number for which this assignment applies
-    pub list_number: ListNumber,
+    pub list_number: LN,
     /// The number of votes cast for this group
     votes_cast: u64,
     /// The remainder votes that were not used to get full seats assigned to this list
@@ -35,8 +37,8 @@ pub struct ListSeatAssignment {
     pub total_seats: u32,
 }
 
-impl From<ListStanding> for ListSeatAssignment {
-    fn from(list: ListStanding) -> Self {
+impl<LN: Copy + Debug> From<ListStanding<LN>> for ListSeatAssignment<LN> {
+    fn from(list: ListStanding<LN>) -> Self {
         ListSeatAssignment {
             list_number: list.list_number,
             votes_cast: list.votes_cast,
@@ -52,9 +54,9 @@ impl From<ListStanding> for ListSeatAssignment {
 /// Contains the standing for a specific list. This is all the information
 /// that is needed to compute the apportionment for that specific list.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
-pub struct ListStanding {
+pub struct ListStanding<LN> {
     /// List number for which this standing applies
-    pub list_number: ListNumber,
+    pub list_number: LN,
     /// The number of votes cast for this group
     pub votes_cast: u64,
     /// The remainder of votes that was not used to get full seats (does not have to be a whole number of votes)
@@ -69,10 +71,10 @@ pub struct ListStanding {
     pub residual_seats: u32,
 }
 
-impl ListStanding {
+impl<LN: Debug> ListStanding<LN> {
     /// Create a new instance computing the whole number of seats that
     /// were assigned to a list.
-    pub(crate) fn new<T: ListVotesTrait>(list: &T, quota: Fraction) -> Self {
+    pub(crate) fn new<T: ListVotesTrait<ListNumber = LN>>(list: &T, quota: Fraction) -> Self {
         let votes_cast = Fraction::from(list.total_votes());
         let list_seats = if votes_cast > Fraction::ZERO {
             u32::try_from((votes_cast / quota).integer_part()).expect("list_seats fit in u32")
@@ -83,7 +85,7 @@ impl ListStanding {
         let remainder_votes = votes_cast - (Fraction::from(list_seats) * quota);
 
         debug!(
-            "List {} has {list_seats} full seats with {} votes",
+            "List {:?} has {list_seats} full seats with {:?} votes",
             list.number(),
             list.total_votes()
         );
@@ -100,7 +102,7 @@ impl ListStanding {
 
     /// Add a residual seat to the list and return the updated instance
     pub fn add_residual_seat(self) -> Self {
-        info!("Adding residual seat to list {}", self.list_number);
+        info!("Adding residual seat to list {:?}", self.list_number);
         ListStanding {
             residual_seats: self.residual_seats + 1,
             next_votes_per_seat: Fraction::from(self.votes_cast)
@@ -118,25 +120,25 @@ impl ListStanding {
 /// Records the change for a specific seat, and how the standing is once
 /// that seat was assigned or removed
 #[derive(Clone, Debug, PartialEq)]
-pub struct SeatChangeStep {
+pub struct SeatChangeStep<LN> {
     pub residual_seat_number: Option<u32>,
-    pub change: SeatChange,
-    pub standings: Vec<ListStanding>,
+    pub change: SeatChange<LN>,
+    pub standings: Vec<ListStanding<LN>>,
 }
 
 /// Records the list and specific change for a specific residual seat
 #[derive(Clone, Debug, PartialEq)]
-pub enum SeatChange {
-    HighestAverageAssignment(HighestAverageAssignedSeat),
-    UniqueHighestAverageAssignment(HighestAverageAssignedSeat),
-    LargestRemainderAssignment(LargestRemainderAssignedSeat),
-    AbsoluteMajorityReassignment(AbsoluteMajorityReassignedSeat),
-    ListExhaustionRemoval(ListExhaustionRemovedSeat),
+pub enum SeatChange<LN> {
+    HighestAverageAssignment(HighestAverageAssignedSeat<LN>),
+    UniqueHighestAverageAssignment(HighestAverageAssignedSeat<LN>),
+    LargestRemainderAssignment(LargestRemainderAssignedSeat<LN>),
+    AbsoluteMajorityReassignment(AbsoluteMajorityReassignedSeat<LN>),
+    ListExhaustionRemoval(ListExhaustionRemovedSeat<LN>),
 }
 
-impl SeatChange {
+impl<LN: Copy> SeatChange<LN> {
     /// Get the list number for the list this step has assigned a seat to
-    pub fn list_number_assigned(&self) -> ListNumber {
+    pub fn list_number_assigned(&self) -> LN {
         match self {
             Self::HighestAverageAssignment(highest_average_assigned_seat) => {
                 highest_average_assigned_seat.selected_list_number
@@ -155,7 +157,7 @@ impl SeatChange {
     }
 
     /// Get the list number for the list this step has retracted a seat from
-    pub fn list_number_retracted(&self) -> ListNumber {
+    pub fn list_number_retracted(&self) -> LN {
         match self {
             Self::HighestAverageAssignment(_) => unimplemented!(),
             Self::UniqueHighestAverageAssignment(_) => unimplemented!(),
@@ -170,7 +172,7 @@ impl SeatChange {
     }
 
     /// Get the list of lists with the same average, that have not been assigned a seat
-    pub fn list_options(&self) -> Vec<ListNumber> {
+    pub fn list_options(&self) -> Vec<LN> {
         match self {
             Self::HighestAverageAssignment(highest_average_assigned_seat) => {
                 highest_average_assigned_seat.list_options.clone()
@@ -187,7 +189,7 @@ impl SeatChange {
     }
 
     /// Get the list of lists with the same average, that have been assigned a seat
-    pub fn list_assigned(&self) -> Vec<ListNumber> {
+    pub fn list_assigned(&self) -> Vec<LN> {
         match self {
             Self::HighestAverageAssignment(highest_average_assigned_seat) => {
                 highest_average_assigned_seat.list_assigned.clone()
@@ -226,46 +228,54 @@ impl SeatChange {
 
 /// Contains the details for an assigned seat, assigned through the highest average method.
 #[derive(Clone, Debug, PartialEq)]
-pub struct HighestAverageAssignedSeat {
+pub struct HighestAverageAssignedSeat<LN> {
     /// The list that was selected for this seat has this list number
-    pub selected_list_number: ListNumber,
+    pub selected_list_number: LN,
     /// Collection of lists with the same average, that have not been assigned a seat
-    pub list_options: Vec<ListNumber>,
+    pub list_options: Vec<LN>,
     /// Collection of lists with the same average, that have been assigned a seat
-    pub list_assigned: Vec<ListNumber>,
+    pub list_assigned: Vec<LN>,
     /// Collection of lists that are exhausted, and will not be assigned a seat
-    pub list_exhausted: Vec<ListNumber>,
+    pub list_exhausted: Vec<LN>,
     /// This is the votes per seat achieved by the selected list
     pub votes_per_seat: Fraction,
 }
 
 /// Contains the details for an assigned seat, assigned through the largest remainder method.
 #[derive(Clone, Debug, PartialEq)]
-pub struct LargestRemainderAssignedSeat {
+pub struct LargestRemainderAssignedSeat<LN> {
     /// The list that was selected for this seat has this list number
-    pub selected_list_number: ListNumber,
+    pub selected_list_number: LN,
     /// Collection of lists with the same remainder, that have not been assigned a seat
-    pub list_options: Vec<ListNumber>,
+    pub list_options: Vec<LN>,
     /// Collection of lists with the same remainder, that have been assigned a seat
-    pub list_assigned: Vec<ListNumber>,
+    pub list_assigned: Vec<LN>,
     /// The number of remainder votes achieved by the selected list
     pub remainder_votes: Fraction,
 }
 
 /// Contains information about the enactment of article P 9 of the Kieswet.
 #[derive(Clone, Debug, PartialEq)]
-pub struct AbsoluteMajorityReassignedSeat {
+pub struct AbsoluteMajorityReassignedSeat<LN> {
     /// List number which the residual seat is retracted from
-    pub list_retracted_seat: ListNumber,
+    pub list_retracted_seat: LN,
     /// List number which the residual seat is assigned to
-    pub list_assigned_seat: ListNumber,
+    pub list_assigned_seat: LN,
 }
 
 /// Contains information about the enactment of article P 10 of the Kieswet.
 #[derive(Clone, Debug, PartialEq)]
-pub struct ListExhaustionRemovedSeat {
+pub struct ListExhaustionRemovedSeat<LN> {
     /// List number which the seat is retracted from
-    pub list_retracted_seat: ListNumber,
+    pub list_retracted_seat: LN,
     /// Whether the removed seat was a full seat
     pub full_seat: bool,
 }
+
+/// Result type for residual seat (re)assignment: steps taken and final standings.
+pub type RemainderAssignmentResult<LN> =
+    Result<(Vec<SeatChangeStep<LN>>, Vec<ListStanding<LN>>), ApportionmentError>;
+
+/// Result type for absolute majority reassignment: updated standings and optional seat change.
+pub type AbsoluteMajorityResult<LN> =
+    Result<(Vec<ListStanding<LN>>, Option<SeatChange<LN>>), ApportionmentError>;

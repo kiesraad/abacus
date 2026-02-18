@@ -1,13 +1,10 @@
 use super::{
     candidate_nomination::CandidateNominationResult, fraction::Fraction,
-    int_newtype_macro::int_newtype, seat_assignment::SeatAssignmentResult,
+    seat_assignment::SeatAssignmentResult,
 };
 use std::fmt::Debug;
 
 pub(crate) const LARGE_COUNCIL_THRESHOLD: u32 = 19;
-
-int_newtype!(CandidateNumber);
-int_newtype!(ListNumber);
 
 /// Errors that can occur during apportionment
 #[derive(Debug, PartialEq)]
@@ -27,20 +24,23 @@ pub trait ApportionmentInput {
 }
 
 pub struct ApportionmentOutput<'a, T: ListVotesTrait> {
-    pub seat_assignment: SeatAssignmentResult,
-    pub candidate_nomination: CandidateNominationResult<'a, T::Cv>,
+    pub seat_assignment: SeatAssignmentResult<T>,
+    pub candidate_nomination: CandidateNominationResult<'a, T>,
 }
 
 pub trait ListVotesTrait: PartialEq + Debug {
     type Cv: CandidateVotesTrait;
+    type ListNumber: Copy + Debug + Eq;
 
-    fn number(&self) -> ListNumber;
+    fn number(&self) -> Self::ListNumber;
     fn total_votes(&self) -> u32;
     fn candidate_votes(&self) -> &[Self::Cv];
 }
 
 pub trait CandidateVotesTrait: PartialEq + Debug {
-    fn number(&self) -> CandidateNumber;
+    type CandidateNumber: Copy + Debug + Eq;
+
+    fn number(&self) -> Self::CandidateNumber;
     fn votes(&self) -> u32;
 }
 
@@ -49,7 +49,7 @@ pub(crate) struct CandidateNominationInput<'a, L: ListVotesTrait> {
     pub number_of_seats: u32,
     pub list_votes: &'a [L],
     pub quota: Fraction,
-    pub total_seats_per_list: Vec<(ListNumber, u32)>,
+    pub total_seats_per_list: Vec<(L::ListNumber, u32)>,
 }
 
 pub(crate) type CandidateNominationInputType<'a, T> =

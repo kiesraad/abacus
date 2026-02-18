@@ -35,8 +35,7 @@ use crate::{
     repository::{
         committee_session_repo, data_entry_repo,
         data_entry_repo::{
-            delete_data_entry, delete_result, get_data_entry, get_result,
-            previous_results_for_polling_station,
+            delete_data_entry, get_data_entry, previous_results_for_polling_station,
         },
         election_repo,
         investigation_repo::get_polling_station_investigation,
@@ -158,22 +157,20 @@ async fn validate_and_get_data(
     ))
 }
 
-pub async fn delete_data_entry_and_result_for_polling_station(
+pub async fn delete_data_entry_for_polling_station(
     conn: &mut SqliteConnection,
     audit_service: &AuditService,
     committee_session: &CommitteeSession,
     polling_station_id: PollingStationId,
 ) -> Result<(), APIError> {
     if let Some(data_entry) = delete_data_entry(conn, polling_station_id).await? {
+        let was_definitive = matches!(data_entry.state.0, DataEntryStatus::Definitive(_));
+
         audit_service
             .log(conn, &AuditEvent::DataEntryDeleted(data_entry.into()), None)
             .await?;
-    }
-    if let Some(result) = delete_result(conn, polling_station_id).await? {
-        audit_service
-            .log(conn, &AuditEvent::ResultDeleted(result.into()), None)
-            .await?;
-        if committee_session.status == CommitteeSessionStatus::Completed {
+
+        if was_definitive && committee_session.status == CommitteeSessionStatus::Completed {
             change_committee_session_status(
                 conn,
                 committee_session.id,
@@ -553,34 +550,15 @@ async fn polling_station_data_entry_finalise(
             .await?;
         }
         EntryNumber::SecondEntry => {
-            let (new_state, data) =
-                state.finalise_second_entry(&polling_station, &election, user_id)?;
+            let new_state = state.finalise_second_entry(&polling_station, &election, user_id)?;
 
-            match (&new_state, data) {
-                (DataEntryStatus::Definitive(_), Some(data)) => {
-                    // Save the data to the database
-                    data_entry_repo::make_definitive(
-                        &mut tx,
-                        polling_station_id,
-                        committee_session.id,
-                        &new_state,
-                        &data,
-                    )
-                    .await?;
-                }
-                (DataEntryStatus::Definitive(_), None) => {
-                    unreachable!("Data entry is in definitive state but no data is present");
-                }
-                (new_state, _) => {
-                    data_entry_repo::upsert(
-                        &mut tx,
-                        polling_station_id,
-                        committee_session.id,
-                        new_state,
-                    )
-                    .await?;
-                }
-            }
+            data_entry_repo::upsert(
+                &mut tx,
+                polling_station_id,
+                committee_session.id,
+                &new_state,
+            )
+            .await?;
         }
     }
 
@@ -662,7 +640,7 @@ async fn polling_station_data_entries_and_result_delete(
         ))
     } else {
         // The database entries of the data entry (and optional result) are fully deleted
-        delete_data_entry_and_result_for_polling_station(
+        delete_data_entry_for_polling_station(
             &mut tx,
             &audit_service,
             &committee_session,
@@ -711,7 +689,7 @@ async fn polling_station_data_entry_get(
 ) -> Result<Json<DataEntryGetResponse>, APIError> {
     let mut conn = pool.acquire().await?;
 
-    let (polling_station, election, committee_session, state) =
+    let (polling_station, election, .., state) =
         validate_and_get_data(&mut conn, polling_station_id, &user.0).await?;
 
     match state.clone() {
@@ -747,15 +725,14 @@ async fn polling_station_data_entry_get(
                 validation_results: ValidationResults::default(),
             }))
         }
-        DataEntryStatus::Definitive(_) => {
-            let result = get_result(&mut conn, polling_station_id, committee_session.id).await?;
-            let data_entry = result.data.0;
-
-            let validation_results = data_entry.start_validate(&polling_station, &election)?;
+        DataEntryStatus::Definitive(definitive_state) => {
+            let validation_results = definitive_state
+                .results
+                .start_validate(&polling_station, &election)?;
 
             Ok(Json(DataEntryGetResponse {
                 user_id: None,
-                data: data_entry,
+                data: definitive_state.results,
                 status: state.status_name(),
                 validation_results,
             }))
@@ -805,7 +782,7 @@ async fn polling_station_data_entry_resolve_errors(
 
     if new_state == DataEntryStatus::Empty {
         // The database entry of the data entry is fully deleted when the first entry is discarded
-        delete_data_entry_and_result_for_polling_station(
+        delete_data_entry_for_polling_station(
             &mut tx,
             &audit_service,
             &committee_session,
@@ -929,7 +906,7 @@ async fn polling_station_data_entry_resolve_differences(
 
     if new_state == DataEntryStatus::Empty {
         // The database entry of the data entry is fully deleted when the entries are discarded
-        delete_data_entry_and_result_for_polling_station(
+        delete_data_entry_for_polling_station(
             &mut tx,
             &audit_service,
             &committee_session,
@@ -1042,7 +1019,7 @@ mod tests {
         infra::audit_log,
         repository::{
             committee_session_repo::change_status,
-            data_entry_repo::{data_entry_exists, get_polling_station_data_entries, result_exists},
+            data_entry_repo::{data_entry_exists, get_polling_station_data_entries},
             investigation_repo::insert_test_investigation,
             polling_station_repo::insert_test_polling_station,
         },
@@ -1756,9 +1733,6 @@ mod tests {
             .unwrap();
         let status: DataEntryStatus = data_entry.state.0;
         assert!(matches!(status, DataEntryStatus::SecondEntryInProgress(_)));
-
-        // Check that nothing is added to polling_station_results yet
-        assert!(!result_exists(&mut conn, polling_station_id).await.unwrap());
     }
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
@@ -1793,10 +1767,6 @@ mod tests {
         assert_eq!(response.status(), StatusCode::OK);
         let response = finalise(pool.clone(), polling_station_id, EntryNumber::SecondEntry).await;
         assert_eq!(response.status(), StatusCode::OK);
-
-        // Check that polling_station_results contains the finalised result and that the data entries are deleted
-        let mut conn = pool.acquire().await.unwrap();
-        assert!(result_exists(&mut conn, polling_station_id).await.unwrap());
 
         // Check that the status is 'Definitive'
         let status = get_data_entry_status(
@@ -1839,9 +1809,6 @@ mod tests {
             .unwrap();
         let status: DataEntryStatus = data_entry.state.0;
         assert!(matches!(status, DataEntryStatus::EntriesDifferent(_)));
-
-        // Check that no result has been created
-        assert!(!result_exists(&mut conn, polling_station_id).await.unwrap());
     }
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
@@ -2177,8 +2144,6 @@ mod tests {
                 .await
                 .unwrap()
         );
-        assert!(result_exists(&mut conn, polling_station_id).await.unwrap());
-
         change_status_committee_session(
             pool.clone(),
             CommitteeSessionId::from(3),
@@ -2190,13 +2155,12 @@ mod tests {
         let response = delete_data_entries_and_result(pool.clone(), polling_station_id).await;
         assert_eq!(response.status(), StatusCode::NO_CONTENT);
 
-        // Check that the data entry and result are deleted
+        // Check that the data entry is deleted
         assert!(
             !data_entry_exists(&mut conn, polling_station_id)
                 .await
                 .unwrap()
         );
-        assert!(!result_exists(&mut conn, polling_station_id).await.unwrap());
 
         // Check that the committee session status is changed to DataEntry
         let committee_session = committee_session_repo::get(&mut conn, CommitteeSessionId::from(3))

@@ -128,6 +128,16 @@ jobs:
         run: cargo --verbose --locked clippy --target=x86_64-unknown-linux-musl --workspace --all-targets --no-default-features -- -D warnings
       - name: Run tests
         run: cargo --verbose --locked test --target=x86_64-unknown-linux-musl --workspace --features embed-typst -- --nocapture
+      - name: Build documentation
+        run: cargo doc --workspace --no-deps --all-features
+        env:
+          RUSTDOCFLAGS: "-D warnings"
+      - name: Create documentation artifact
+        uses: actions/upload-artifact@v6
+        with:
+          name: rustdoc
+          path: backend/target/doc
+          retention-days: 30
 
   frontend:
     name: Frontend
@@ -273,3 +283,33 @@ jobs:
         run: cargo install cargo-fuzz
       - name: Run the fuzzer
         run: cargo fuzz run data_entry_status -- -max_total_time=60
+
+  rustdoc:
+    name: Deploy rustdoc to GitHub Pages
+    if: github.ref == 'refs/heads/main'
+    needs:
+      - backend
+    permissions:
+      pages: write
+      id-token: write
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Download rustdoc artifact
+        uses: actions/download-artifact@v7
+        with:
+          name: rustdoc
+          path: rustdoc
+      - name: Add redirect to main crate docs
+        run: echo '<meta http-equiv="refresh" content="0; url=abacus/index.html">' > rustdoc/index.html
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v5
+      - name: Upload to GitHub Pages
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: rustdoc
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

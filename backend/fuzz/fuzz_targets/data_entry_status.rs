@@ -411,9 +411,9 @@ fuzz_target!(|transitions: Vec<Transition>| {
                 &polling_station(),
                 &election(),
             ),
-            Transition::FinaliseSecondEntry(correct_user) => state
-                .finalise_second_entry(&polling_station(), &election(), users.second(correct_user))
-                .map(|r| r.0),
+            Transition::FinaliseSecondEntry(correct_user) => {
+                state.finalise_second_entry(&polling_station(), &election(), users.second(correct_user))
+            }
             Transition::ResumeFirstEntry => state.resume_first_entry(),
             Transition::DeleteBothEntries => state.delete_entries(),
             Transition::KeepFirstEntry => state.keep_first_entry(&polling_station(), &election()),

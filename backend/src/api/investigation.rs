@@ -5,14 +5,14 @@ use axum::{
 };
 use axum_extra::response::Attachment;
 use chrono::Datelike;
+use pdf_gen::generate_pdf;
 use sqlx::{SqliteConnection, SqlitePool};
 use utoipa_axum::{router::OpenApiRouter, routes};
 
 use crate::{
     APIError, AppState, ErrorResponse, SqlitePoolExt,
     api::{
-        data_entry::delete_data_entry_and_result_for_polling_station,
-        middleware::authentication::Coordinator,
+        data_entry::delete_data_entry_for_polling_station, middleware::authentication::Coordinator,
     },
     domain::{
         committee_session::{CommitteeSession, CommitteeSessionError},
@@ -28,13 +28,10 @@ use crate::{
         votes_table::VotesTablesWithOnlyPreviousVotes,
     },
     error::ErrorReference,
-    infra::{
-        audit_log::{AuditEvent, AuditService},
-        pdf_gen::generate_pdf,
-    },
+    infra::audit_log::{AuditEvent, AuditService},
     repository::{
         committee_session_repo::get_election_committee_session,
-        data_entry_repo::{data_entry_exists, previous_results_for_polling_station, result_exists},
+        data_entry_repo::{data_entry_exists, previous_results_for_polling_station},
         election_repo,
         investigation_repo::{
             conclude_polling_station_investigation, create_polling_station_investigation,
@@ -345,17 +342,16 @@ async fn polling_station_investigation_update(
         ));
     }
 
-    // If corrected_results is changed from yes to no, check if there are data entries or results.
+    // If corrected_results is changed from yes to no, check if there are data entries.
     // If deleting them is accepted, delete them. If not, return an error.
     if investigation_update_request.corrected_results == Some(false)
         && let Ok(current) = get_polling_station_investigation(&mut tx, polling_station_id).await
         && current.corrected_results == Some(true)
-        && (data_entry_exists(&mut tx, polling_station_id).await?
-            || result_exists(&mut tx, polling_station_id).await?)
+        && data_entry_exists(&mut tx, polling_station_id).await?
     {
         if investigation_update_request.accept_data_entry_deletion == Some(true) {
             let polling_station = polling_station_repo::get(&mut tx, polling_station_id).await?;
-            delete_data_entry_and_result_for_polling_station(
+            delete_data_entry_for_polling_station(
                 &mut tx,
                 &audit_service,
                 &committee_session,
@@ -423,7 +419,7 @@ async fn polling_station_investigation_delete(
     .await?;
 
     // Delete potential data entry and result linked to the polling station
-    delete_data_entry_and_result_for_polling_station(
+    delete_data_entry_for_polling_station(
         &mut tx,
         &audit_service,
         &committee_session,
@@ -521,7 +517,7 @@ async fn polling_station_investigation_download_corrigendum_pdf(
     }
     .to_pdf_file_model(name.clone());
 
-    let content = generate_pdf(input).await?;
+    let content = generate_pdf(&input).await?;
 
     Ok(Attachment::new(content.buffer)
         .filename(&name)

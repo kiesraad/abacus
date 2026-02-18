@@ -35,7 +35,7 @@ pub const MAX_BODY_SIZE_MB: usize = 12;
 pub trait SqlitePoolExt {
     /// Acquire a connection and start a transaction with "BEGIN IMMEDIATE",
     /// which is needed to prevent database is busy errors.
-    /// See https://sqlite.org/isolation.html for details.
+    /// See <https://sqlite.org/isolation.html> for details.
     fn begin_immediate(
         &self,
     ) -> impl Future<Output = Result<sqlx::Transaction<'_, Sqlite>, sqlx::Error>> + Send;

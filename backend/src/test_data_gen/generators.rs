@@ -17,8 +17,8 @@ use crate::{
             VotersCounts, VotesCounts, YesNo,
         },
         election::{
-            self, CandidateGender, CandidateNumber, ElectionCategory, ElectionWithPoliticalGroups,
-            NewElection, PGNumber, PoliticalGroup, VoteCountingMethod,
+            self, CandidateGender, CandidateNumber, ElectionCategory, ElectionRole,
+            ElectionWithPoliticalGroups, NewElection, PGNumber, PoliticalGroup, VoteCountingMethod,
         },
         polling_station::{PollingStation, PollingStationRequest, PollingStationType},
         status::{DataEntryStatus, Definitive, FirstEntryFinalised},
@@ -49,22 +49,15 @@ async fn generate_data_entries(
     election: &ElectionWithPoliticalGroups,
     polling_stations: &[PollingStation],
 ) -> Result<bool, Box<dyn Error>> {
-    let committee_session = committee_session_repo::change_status(
+    committee_session_repo::change_status(
         conn,
         committee_session.id,
         CommitteeSessionStatus::DataEntry,
     )
     .await?;
 
-    let (_, second_entries) = generate_data_entry(
-        &committee_session,
-        election,
-        polling_stations,
-        rng,
-        conn,
-        &args,
-    )
-    .await;
+    let (_, second_entries) =
+        generate_data_entry(election, polling_stations, rng, conn, &args).await;
     Ok(second_entries == polling_stations.len())
 }
 
@@ -171,6 +164,7 @@ fn generate_election(rng: &mut impl rand::Rng, args: &GenerateElectionArgs) -> N
     // and put it all in the struct (generating some additional fields where needed)
     NewElection {
         name,
+        role: ElectionRole::GSB,
         counting_method: VoteCountingMethod::CSO,
         domain_id: super::data::domain_id(rng),
         election_id,
@@ -279,7 +273,6 @@ async fn generate_polling_stations(
 /// Generate and store data entries for the given election based on arguments
 #[allow(clippy::too_many_lines)]
 async fn generate_data_entry(
-    committee_session: &CommitteeSession,
     election: &ElectionWithPoliticalGroups,
     polling_stations: &[PollingStation],
     rng: &mut impl rand::Rng,
@@ -352,17 +345,12 @@ async fn generate_data_entry(
                     second_entry_user_id: UserId::from(6), // second typist from users in fixtures
                     finished_at: ts,
                     finalised_with_warnings: validation_results.has_warnings(),
+                    results: results.clone(),
                 });
 
-                data_entry_repo::make_definitive(
-                    conn,
-                    ps.id,
-                    committee_session.id,
-                    &state,
-                    &results,
-                )
-                .await
-                .expect("Could not create definitive data entry");
+                data_entry_repo::upsert(conn, ps.id, &state)
+                    .await
+                    .expect("Could not create definitive data entry");
                 generated_second_entries += 1;
             } else {
                 // generate only a first data entry
@@ -372,7 +360,7 @@ async fn generate_data_entry(
                     first_entry_finished_at: ts,
                     finalised_with_warnings: validation_results.has_warnings(),
                 });
-                data_entry_repo::upsert(conn, ps.id, committee_session.id, &state)
+                data_entry_repo::upsert(conn, ps.id, &state)
                     .await
                     .expect("Could not create first data entry");
                 generated_first_entries += 1;

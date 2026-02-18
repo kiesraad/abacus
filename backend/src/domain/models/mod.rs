@@ -4,7 +4,7 @@ mod model_na_14_2;
 mod model_na_31_2;
 mod model_p_2a;
 
-use std::{error::Error, path::PathBuf};
+use std::error::Error;
 
 use filter_input::replace_unsupported_glyphs;
 pub use model_n_10_2::*;
@@ -60,24 +60,42 @@ impl PdfModel {
         }
     }
 
-    /// Get the path for the template of this model
-    pub fn as_template_path(&self) -> PathBuf {
-        let mut pb: PathBuf = [self.as_model_name()].iter().collect();
-        pb.set_extension("typ");
-
-        pb
+    /// Get the template path as a static string (e.g., "model-na-31-2.typ")
+    pub fn as_template_path_str(&self) -> &'static str {
+        match self {
+            Self::ModelNa14_2(_) => "model-na-14-2.typ",
+            Self::ModelNa14_2Bijlage1(_) => "model-na-14-2-bijlage1.typ",
+            Self::ModelNa31_2(_) => "model-na-31-2.typ",
+            Self::ModelNa31_2Bijlage1(_) => "model-na-31-2-bijlage1.typ",
+            Self::ModelNa31_2Inlegvel(_) => "model-na-31-2-inlegvel.typ",
+            Self::ModelN10_2(_) => "model-n-10-2.typ",
+            Self::ModelP2a(_) => "model-p-2a.typ",
+            #[cfg(test)]
+            Self::TestTeletexCharset() => "test-teletex-charset.typ",
+            #[cfg(test)]
+            Self::TestUnsupportedChars() => "test-unsupported-chars.typ",
+        }
     }
 
-    /// Get the path for the input of this model
-    pub fn as_input_path(&self) -> PathBuf {
-        let mut pb: PathBuf = ["inputs", self.as_model_name()].iter().collect();
-        pb.set_extension("json");
-
-        pb
+    /// Get the input path as a static string (e.g., "inputs/model-na-31-2.json")
+    pub fn as_input_path_str(&self) -> &'static str {
+        match self {
+            Self::ModelNa14_2(_) => "inputs/model-na-14-2.json",
+            Self::ModelNa14_2Bijlage1(_) => "inputs/model-na-14-2-bijlage1.json",
+            Self::ModelNa31_2(_) => "inputs/model-na-31-2.json",
+            Self::ModelNa31_2Bijlage1(_) => "inputs/model-na-31-2-bijlage1.json",
+            Self::ModelNa31_2Inlegvel(_) => "inputs/model-na-31-2-inlegvel.json",
+            Self::ModelN10_2(_) => "inputs/model-n-10-2.json",
+            Self::ModelP2a(_) => "inputs/model-p-2a.json",
+            #[cfg(test)]
+            Self::TestTeletexCharset() => "inputs/test-teletex-charset.json",
+            #[cfg(test)]
+            Self::TestUnsupportedChars() => "inputs/test-unsupported-chars.json",
+        }
     }
 
     /// Get the input, serialized as json
-    pub fn get_input(&self) -> serde_json::Result<String> {
+    pub fn get_input(&self) -> String {
         let data = match self {
             Self::ModelNa14_2(input) => serde_json::to_string(input),
             Self::ModelNa14_2Bijlage1(input) => serde_json::to_string(input),
@@ -95,9 +113,10 @@ impl PdfModel {
                 "../../../templates/inputs/test-unsupported-chars.json"
             )
             .to_string()),
-        }?;
+        }
+        .expect("JSON serialization succeeds because it is derived");
 
-        Ok(replace_unsupported_glyphs(data))
+        replace_unsupported_glyphs(data)
     }
 
     pub fn from_name_with_input(name: &str, input: &str) -> Result<PdfModel, Box<dyn Error>> {

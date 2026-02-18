@@ -8,8 +8,9 @@ use super::AuditEventLevel;
 use crate::{
     ErrorResponse,
     domain::{
-        committee_session::CommitteeSessionId, election::ElectionId, file::FileId,
-        investigation::PollingStationInvestigation, polling_station::PollingStationId,
+        committee_session::CommitteeSessionId, data_entry::DataEntryId, election::ElectionId,
+        file::FileId, investigation::PollingStationInvestigation,
+        polling_station::PollingStationId,
     },
     error::ErrorReference,
     repository::user_repo::UserId,
@@ -51,6 +52,7 @@ pub struct UserDetails {
 pub struct ElectionDetails {
     pub election_id: ElectionId,
     pub election_name: String,
+    pub election_role: String,
     pub election_counting_method: String,
     pub election_election_id: String,
     pub election_location: String,
@@ -129,8 +131,7 @@ pub struct PollingStationImportDetails {
 #[derive(Serialize, Deserialize, Debug, PartialEq, Eq, ToSchema)]
 #[serde(deny_unknown_fields)]
 pub struct DataEntryDetails {
-    pub polling_station_id: PollingStationId,
-    pub committee_session_id: CommitteeSessionId,
+    pub data_entry_id: DataEntryId,
     pub data_entry_status: String,
     pub data_entry_progress: String,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -142,15 +143,6 @@ pub struct DataEntryDetails {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[schema(nullable = false)]
     pub second_entry_user_id: Option<UserId>,
-}
-
-#[derive(Serialize, Deserialize, Debug, PartialEq, Eq, ToSchema)]
-#[serde(deny_unknown_fields)]
-pub struct ResultDetails {
-    pub polling_station_id: PollingStationId,
-    pub committee_session_id: CommitteeSessionId,
-    #[schema(value_type = String)]
-    pub created_at: DateTime<Utc>,
 }
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, Eq, ToSchema)]
@@ -222,7 +214,6 @@ pub enum AuditEvent {
     DataEntryResumed(DataEntryDetails),
     DataEntryDeleted(DataEntryDetails),
     DataEntryFinalised(DataEntryDetails),
-    ResultDeleted(ResultDetails),
     // data entry resolving events
     DataEntryDiscardedFirst(DataEntryDetails),
     DataEntryReturnedFirst(DataEntryDetails),
@@ -290,7 +281,6 @@ impl AuditEvent {
             AuditEvent::DataEntryResumed(_) => AuditEventLevel::Success,
             AuditEvent::DataEntryDeleted(_) => AuditEventLevel::Info,
             AuditEvent::DataEntryFinalised(_) => AuditEventLevel::Success,
-            AuditEvent::ResultDeleted(_) => AuditEventLevel::Success,
             AuditEvent::ApplicationStarted(_) => AuditEventLevel::Info,
             AuditEvent::Error(ErrorDetails { level, .. }) => *level,
             AuditEvent::UnknownEvent => AuditEventLevel::Warning,

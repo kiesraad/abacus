@@ -19,7 +19,6 @@ pub trait ApportionmentInput {
     type List: ListVotesTrait;
 
     fn number_of_seats(&self) -> u32;
-    fn total_votes(&self) -> u32;
     fn list_votes(&self) -> &[Self::List];
 }
 
@@ -33,7 +32,12 @@ pub trait ListVotesTrait: PartialEq + Debug {
     type ListNumber: Copy + Debug + Eq;
 
     fn number(&self) -> Self::ListNumber;
-    fn total_votes(&self) -> u32;
+    fn total_votes(&self) -> u32 {
+        self.candidate_votes()
+            .iter()
+            .map(|candidate_votes| candidate_votes.votes())
+            .sum()
+    }
     fn candidate_votes(&self) -> &[Self::Cv];
 }
 

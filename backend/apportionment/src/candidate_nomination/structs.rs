@@ -16,6 +16,7 @@ pub struct ListCandidateNomination<'a, T: ListVotesTrait> {
     pub updated_candidate_ranking: Vec<<T::Cv as CandidateVotesTrait>::CandidateNumber>,
 }
 
+/// Contains the preference threshold as a percentage and as a fraction of the number of votes.
 #[derive(Debug, PartialEq)]
 pub struct PreferenceThreshold {
     /// Preference threshold as a percentage (0 to 100)
@@ -39,6 +40,7 @@ pub struct CandidateNominationResult<'a, T: ListVotesTrait> {
     pub list_candidate_nomination: Vec<ListCandidateNomination<'a, T>>,
 }
 
+/// Contains the list number the candidate is listed on and the candidate number on that list.
 #[derive(Debug, PartialEq)]
 pub struct Candidate<T: ListVotesTrait> {
     pub list_number: T::ListNumber,

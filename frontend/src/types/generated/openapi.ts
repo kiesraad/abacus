@@ -370,7 +370,6 @@ export type AuditEvent =
   | (DataEntryDetails & { event_type: "DataEntryResumed" })
   | (DataEntryDetails & { event_type: "DataEntryDeleted" })
   | (DataEntryDetails & { event_type: "DataEntryFinalised" })
-  | (ResultDetails & { event_type: "ResultDeleted" })
   | (DataEntryDetails & { event_type: "DataEntryDiscardedFirst" })
   | (DataEntryDetails & { event_type: "DataEntryReturnedFirst" })
   | (DataEntryDetails & { event_type: "DataEntryKeptFirst" })
@@ -412,6 +411,25 @@ export interface AuditLogUser {
   id: number;
   role: Role;
   username: string;
+}
+
+export interface CSBElectionCreationRequest {
+  candidate_data: string;
+  candidate_hash: string[];
+  election_data: string;
+  election_hash: string[];
+}
+
+export interface CSBElectionCreationValidateRequest {
+  candidate_data?: string;
+  candidate_hash?: string[];
+  election_data: string;
+  election_hash?: string[];
+}
+
+export interface CSBElectionDefinitionValidateResponse {
+  election: NewElection;
+  hash: RedactedEmlHash;
 }
 
 /**
@@ -601,12 +619,11 @@ export interface DataEntry {
 }
 
 export interface DataEntryDetails {
-  committee_session_id: CommitteeSessionId;
+  data_entry_id: DataEntryId;
   data_entry_progress: string;
   data_entry_status: string;
   finished_at?: string;
   first_entry_user_id?: UserId;
-  polling_station_id: PollingStationId;
   second_entry_user_id?: UserId;
 }
 
@@ -623,6 +640,8 @@ export interface DataEntryGetResponse {
   user_id?: UserId;
   validation_results: ValidationResults;
 }
+
+export type DataEntryId = number;
 
 export const dataEntryStatusNameValues = [
   "empty",
@@ -686,6 +705,11 @@ export interface Election {
   nomination_date: string;
   number_of_seats: number;
   number_of_voters: number;
+  role: ElectionRole;
+}
+
+export interface ElectionApportionmentResponse {
+  summary: ElectionSummary;
 }
 
 /**
@@ -694,17 +718,17 @@ export interface Election {
 export const electionCategoryValues = ["Municipal"] as const;
 export type ElectionCategory = (typeof electionCategoryValues)[number];
 
-export type ElectionCreationRequest = GSBElectionCreationRequest & { role: "GSB" };
+export type ElectionCreationRequest =
+  | (GSBElectionCreationRequest & { role: "GSB" })
+  | (CSBElectionCreationRequest & { role: "CSB" });
 
-export type ElectionCreationValidateRequest = GSBElectionCreationValidateRequest & { role: "GSB" };
+export type ElectionCreationValidateRequest =
+  | (GSBElectionCreationValidateRequest & { role: "GSB" })
+  | (CSBElectionCreationValidateRequest & { role: "CSB" });
 
-export interface ElectionDefinitionValidateResponse {
-  election: NewElection;
-  hash: RedactedEmlHash;
-  number_of_voters: number;
-  polling_station_definition_matches_election?: boolean;
-  polling_stations?: PollingStationRequest[];
-}
+export type ElectionDefinitionValidateResponse =
+  | (GSBElectionDefinitionValidateResponse & { role: "GSB" })
+  | (CSBElectionDefinitionValidateResponse & { role: "CSB" });
 
 export interface ElectionDetails {
   election_category: string;
@@ -718,6 +742,7 @@ export interface ElectionDetails {
   election_nomination_date: string;
   election_number_of_seats: number;
   election_number_of_voters: number;
+  election_role: string;
 }
 
 /**
@@ -751,6 +776,12 @@ export interface ElectionListResponse {
 export interface ElectionNumberOfVotersChangeRequest {
   number_of_voters: number;
 }
+
+/**
+ * Election role
+ */
+export const electionRoleValues = ["GSB", "CSB"] as const;
+export type ElectionRole = (typeof electionRoleValues)[number];
 
 /**
  * Election polling stations data entry statuses response
@@ -813,6 +844,7 @@ export interface ElectionWithPoliticalGroups {
   number_of_seats: number;
   number_of_voters: number;
   political_groups: PoliticalGroup[];
+  role: ElectionRole;
 }
 
 export interface ErrorDetails {
@@ -925,6 +957,14 @@ export interface GSBElectionCreationValidateRequest {
   polling_station_file_name?: string;
 }
 
+export interface GSBElectionDefinitionValidateResponse {
+  election: NewElection;
+  hash: RedactedEmlHash;
+  number_of_voters: number;
+  polling_station_definition_matches_election?: boolean;
+  polling_stations?: PollingStationRequest[];
+}
+
 /**
  * Abacus API and asset server
  */
@@ -981,6 +1021,7 @@ export interface NewElection {
   number_of_seats: number;
   number_of_voters: number;
   political_groups: PoliticalGroup[];
+  role: ElectionRole;
 }
 
 /**
@@ -1004,11 +1045,12 @@ export interface PoliticalGroupTotalVotes {
 }
 
 /**
- * Polling station of a certain [crate::election::Election]
+ * Polling station of a certain [crate::domain::election::Election]
  */
 export interface PollingStation {
   address: string;
   committee_session_id: CommitteeSessionId;
+  data_entry_id?: DataEntryId;
   election_id: ElectionId;
   id: PollingStationId;
   id_prev_session?: PollingStationId;
@@ -1093,7 +1135,7 @@ export interface PollingStationListResponse {
 }
 
 /**
- * Polling station of a certain [crate::election::Election]
+ * Polling station of a certain [crate::domain::election::Election]
  */
 export interface PollingStationRequest {
   address: string;
@@ -1149,12 +1191,6 @@ export type ResolveDifferencesAction = (typeof resolveDifferencesActionValues)[n
 
 export const resolveErrorsActionValues = ["discard_first_entry", "resume_first_entry"] as const;
 export type ResolveErrorsAction = (typeof resolveErrorsActionValues)[number];
-
-export interface ResultDetails {
-  committee_session_id: CommitteeSessionId;
-  created_at: string;
-  polling_station_id: PollingStationId;
-}
 
 export const roleValues = ["administrator", "typist", "coordinator"] as const;
 export type Role = (typeof roleValues)[number];

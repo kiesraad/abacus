@@ -945,7 +945,7 @@
     },
     "/api/elections/{election_id}/committee_sessions/{committee_session_id}/investigations": {
       "get": {
-        "summary": "Get a list of all [Investigation]s for a committee session (coordinator)",
+        "summary": "Get a list of all [crate::domain::investigation::PollingStationInvestigation]s for a committee session (coordinator)",
         "operationId": "committee_session_investigations",
         "parameters": [
           {
@@ -4914,27 +4914,6 @@
           {
             "allOf": [
               {
-                "$ref": "#/components/schemas/ResultDetails"
-              },
-              {
-                "type": "object",
-                "required": [
-                  "event_type"
-                ],
-                "properties": {
-                  "event_type": {
-                    "type": "string",
-                    "enum": [
-                      "ResultDeleted"
-                    ]
-                  }
-                }
-              }
-            ]
-          },
-          {
-            "allOf": [
-              {
                 "$ref": "#/components/schemas/DataEntryDetails"
               },
               {
@@ -5235,6 +5214,79 @@
           },
           "username": {
             "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "CSBElectionCreationRequest": {
+        "type": "object",
+        "required": [
+          "election_hash",
+          "election_data",
+          "candidate_hash",
+          "candidate_data"
+        ],
+        "properties": {
+          "candidate_data": {
+            "type": "string"
+          },
+          "candidate_hash": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "election_data": {
+            "type": "string"
+          },
+          "election_hash": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "CSBElectionCreationValidateRequest": {
+        "type": "object",
+        "required": [
+          "election_data"
+        ],
+        "properties": {
+          "candidate_data": {
+            "type": "string"
+          },
+          "candidate_hash": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "election_data": {
+            "type": "string"
+          },
+          "election_hash": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "CSBElectionDefinitionValidateResponse": {
+        "type": "object",
+        "required": [
+          "hash",
+          "election"
+        ],
+        "properties": {
+          "election": {
+            "$ref": "#/components/schemas/NewElection"
+          },
+          "hash": {
+            "$ref": "#/components/schemas/RedactedEmlHash"
           }
         },
         "additionalProperties": false
@@ -5682,14 +5734,13 @@
       "DataEntryDetails": {
         "type": "object",
         "required": [
-          "polling_station_id",
-          "committee_session_id",
+          "data_entry_id",
           "data_entry_status",
           "data_entry_progress"
         ],
         "properties": {
-          "committee_session_id": {
-            "$ref": "#/components/schemas/CommitteeSessionId"
+          "data_entry_id": {
+            "$ref": "#/components/schemas/DataEntryId"
           },
           "data_entry_progress": {
             "type": "string"
@@ -5702,9 +5753,6 @@
           },
           "first_entry_user_id": {
             "$ref": "#/components/schemas/UserId"
-          },
-          "polling_station_id": {
-            "$ref": "#/components/schemas/PollingStationId"
           },
           "second_entry_user_id": {
             "$ref": "#/components/schemas/UserId"
@@ -5758,6 +5806,11 @@
           }
         },
         "additionalProperties": false
+      },
+      "DataEntryId": {
+        "type": "integer",
+        "format": "int32",
+        "minimum": 0
       },
       "DataEntryStatusName": {
         "type": "string",
@@ -5846,6 +5899,7 @@
         "required": [
           "id",
           "name",
+          "role",
           "counting_method",
           "election_id",
           "location",
@@ -5895,9 +5949,23 @@
             "type": "integer",
             "format": "int32",
             "minimum": 0
+          },
+          "role": {
+            "$ref": "#/components/schemas/ElectionRole"
           }
         },
         "additionalProperties": false
+      },
+      "ElectionApportionmentResponse": {
+        "type": "object",
+        "required": [
+          "summary"
+        ],
+        "properties": {
+          "summary": {
+            "$ref": "#/components/schemas/ElectionSummary"
+          }
+        }
       },
       "ElectionCategory": {
         "type": "string",
@@ -5928,6 +5996,27 @@
                 }
               }
             ]
+          },
+          {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/CSBElectionCreationRequest"
+              },
+              {
+                "type": "object",
+                "required": [
+                  "role"
+                ],
+                "properties": {
+                  "role": {
+                    "type": "string",
+                    "enum": [
+                      "CSB"
+                    ]
+                  }
+                }
+              }
+            ]
           }
         ]
       },
@@ -5953,45 +6042,82 @@
                 }
               }
             ]
+          },
+          {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/CSBElectionCreationValidateRequest"
+              },
+              {
+                "type": "object",
+                "required": [
+                  "role"
+                ],
+                "properties": {
+                  "role": {
+                    "type": "string",
+                    "enum": [
+                      "CSB"
+                    ]
+                  }
+                }
+              }
+            ]
           }
         ]
       },
       "ElectionDefinitionValidateResponse": {
-        "type": "object",
-        "required": [
-          "hash",
-          "election",
-          "number_of_voters"
-        ],
-        "properties": {
-          "election": {
-            "$ref": "#/components/schemas/NewElection"
+        "oneOf": [
+          {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/GSBElectionDefinitionValidateResponse"
+              },
+              {
+                "type": "object",
+                "required": [
+                  "role"
+                ],
+                "properties": {
+                  "role": {
+                    "type": "string",
+                    "enum": [
+                      "GSB"
+                    ]
+                  }
+                }
+              }
+            ]
           },
-          "hash": {
-            "$ref": "#/components/schemas/RedactedEmlHash"
-          },
-          "number_of_voters": {
-            "type": "integer",
-            "format": "int32",
-            "minimum": 0
-          },
-          "polling_station_definition_matches_election": {
-            "type": "boolean"
-          },
-          "polling_stations": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/PollingStationRequest"
-            }
+          {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/CSBElectionDefinitionValidateResponse"
+              },
+              {
+                "type": "object",
+                "required": [
+                  "role"
+                ],
+                "properties": {
+                  "role": {
+                    "type": "string",
+                    "enum": [
+                      "CSB"
+                    ]
+                  }
+                }
+              }
+            ]
           }
-        },
-        "additionalProperties": false
+        ]
       },
       "ElectionDetails": {
         "type": "object",
         "required": [
           "election_id",
           "election_name",
+          "election_role",
           "election_counting_method",
           "election_election_id",
           "election_location",
@@ -6041,6 +6167,9 @@
             "type": "integer",
             "format": "int32",
             "minimum": 0
+          },
+          "election_role": {
+            "type": "string"
           }
         },
         "additionalProperties": false
@@ -6125,6 +6254,14 @@
           }
         },
         "additionalProperties": false
+      },
+      "ElectionRole": {
+        "type": "string",
+        "description": "Election role",
+        "enum": [
+          "GSB",
+          "CSB"
+        ]
       },
       "ElectionStatusResponse": {
         "type": "object",
@@ -6236,6 +6373,7 @@
         "required": [
           "id",
           "name",
+          "role",
           "counting_method",
           "election_id",
           "location",
@@ -6292,6 +6430,9 @@
             "items": {
               "$ref": "#/components/schemas/PoliticalGroup"
             }
+          },
+          "role": {
+            "$ref": "#/components/schemas/ElectionRole"
           }
         },
         "additionalProperties": false
@@ -6528,6 +6669,37 @@
         },
         "additionalProperties": false
       },
+      "GSBElectionDefinitionValidateResponse": {
+        "type": "object",
+        "required": [
+          "hash",
+          "election",
+          "number_of_voters"
+        ],
+        "properties": {
+          "election": {
+            "$ref": "#/components/schemas/NewElection"
+          },
+          "hash": {
+            "$ref": "#/components/schemas/RedactedEmlHash"
+          },
+          "number_of_voters": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "polling_station_definition_matches_election": {
+            "type": "boolean"
+          },
+          "polling_stations": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PollingStationRequest"
+            }
+          }
+        },
+        "additionalProperties": false
+      },
       "GenerateElectionArgs": {
         "type": "object",
         "description": "Abacus API and asset server",
@@ -6637,6 +6809,7 @@
         "description": "Election request",
         "required": [
           "name",
+          "role",
           "counting_method",
           "election_id",
           "location",
@@ -6690,6 +6863,9 @@
             "items": {
               "$ref": "#/components/schemas/PoliticalGroup"
             }
+          },
+          "role": {
+            "$ref": "#/components/schemas/ElectionRole"
           }
         },
         "additionalProperties": false
@@ -6769,7 +6945,7 @@
       },
       "PollingStation": {
         "type": "object",
-        "description": "Polling station of a certain [crate::election::Election]",
+        "description": "Polling station of a certain [crate::domain::election::Election]",
         "required": [
           "id",
           "election_id",
@@ -6786,6 +6962,9 @@
           },
           "committee_session_id": {
             "$ref": "#/components/schemas/CommitteeSessionId"
+          },
+          "data_entry_id": {
+            "$ref": "#/components/schemas/DataEntryId"
           },
           "election_id": {
             "$ref": "#/components/schemas/ElectionId"
@@ -7039,7 +7218,7 @@
       },
       "PollingStationRequest": {
         "type": "object",
-        "description": "Polling station of a certain [crate::election::Election]",
+        "description": "Polling station of a certain [crate::domain::election::Election]",
         "required": [
           "name",
           "address",
@@ -7205,26 +7384,6 @@
           "discard_first_entry",
           "resume_first_entry"
         ]
-      },
-      "ResultDetails": {
-        "type": "object",
-        "required": [
-          "polling_station_id",
-          "committee_session_id",
-          "created_at"
-        ],
-        "properties": {
-          "committee_session_id": {
-            "$ref": "#/components/schemas/CommitteeSessionId"
-          },
-          "created_at": {
-            "type": "string"
-          },
-          "polling_station_id": {
-            "$ref": "#/components/schemas/PollingStationId"
-          }
-        },
-        "additionalProperties": false
       },
       "Role": {
         "type": "string",

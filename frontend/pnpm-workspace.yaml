@@ -5,9 +5,6 @@ allowBuilds:
   unrs-resolver: true
 blockExoticSubdeps: true
 minimumReleaseAge: 4320
-minimumReleaseAgeExclude:
-  # Fix GHSA-7h2j-956f-4vf2
-  - "@isaacs/brace-expansion@5.0.1"
 trustPolicy: no-downgrade
 trustPolicyExclude:
   - semver@6.3.1

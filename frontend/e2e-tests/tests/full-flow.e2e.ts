@@ -70,7 +70,7 @@ test.describe.configure({ mode: "serial" });
 test.describe("full flow", () => {
   let electionId: number | null = null;
 
-  test("create browser-specific admin user account", async ({ adminOne, browserName }) => {
+  test("create and complete admin user account", async ({ adminOne, browserName }) => {
     const { request: adminOneContext } = adminOne;
 
     const user: TestUser = {
@@ -148,7 +148,7 @@ test.describe("full flow", () => {
     await logout(page);
   });
 
-  test(`create browser-specific coordinator for flow`, async ({ page, browserName }) => {
+  test(`create coordinator user account`, async ({ page, browserName }) => {
     await page.goto("/account/login");
 
     const adminUsername = `admin-${browserName}`;
@@ -179,7 +179,7 @@ test.describe("full flow", () => {
     await logout(page);
   });
 
-  test(`complete account for coordinator`, async ({ page, browserName }) => {
+  test(`complete coordinator user account`, async ({ page, browserName }) => {
     await page.goto("/account/login");
     const loginPage = new LoginPgObj(page);
     const username = `coordinator-${browserName}`;
@@ -197,7 +197,7 @@ test.describe("full flow", () => {
     await logout(page);
   });
 
-  test(`create browser-specific typists for flow`, async ({ page, browserName }) => {
+  test(`create typist user accounts`, async ({ page, browserName }) => {
     await page.goto("/account/login");
 
     const adminUsername = `admin-${browserName}`;
@@ -312,7 +312,7 @@ test.describe("full flow", () => {
   });
 
   for (const typist of typistBaseNameUsers) {
-    test(`complete account for ${typist}`, async ({ page, browserName }) => {
+    test(`complete typist user account for ${typist}`, async ({ page, browserName }) => {
       await page.goto("/account/login");
       const loginPage = new LoginPgObj(page);
       const username = `${typist}-${browserName}`;

@@ -353,17 +353,12 @@ async fn generate_data_entry(
                     second_entry_user_id: UserId::from(6), // second typist from users in fixtures
                     finished_at: ts,
                     finalised_with_warnings: validation_results.has_warnings(),
+                    results: results.clone(),
                 });
 
-                data_entry_repo::make_definitive(
-                    conn,
-                    ps.id,
-                    committee_session.id,
-                    &state,
-                    &results,
-                )
-                .await
-                .expect("Could not create definitive data entry");
+                data_entry_repo::upsert(conn, ps.id, committee_session.id, &state)
+                    .await
+                    .expect("Could not create definitive data entry");
                 generated_second_entries += 1;
             } else {
                 // generate only a first data entry

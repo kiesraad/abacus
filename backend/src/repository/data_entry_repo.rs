@@ -6,7 +6,7 @@ use crate::{
     api::data_entry::ElectionStatusResponseEntry,
     domain::{
         committee_session::CommitteeSessionId,
-        data_entry::{PollingStationDataEntry, PollingStationResult, PollingStationResults},
+        data_entry::{PollingStationDataEntry, PollingStationResults},
         polling_station::{PollingStation, PollingStationId},
         status::DataEntryStatus,
     },
@@ -29,31 +29,6 @@ pub async fn get_data_entry(
                 state AS "state: _",
                 updated_at AS "updated_at: _"
             FROM polling_station_data_entries
-            WHERE polling_station_id = ? AND committee_session_id = ?
-        "#,
-        polling_station_id,
-        committee_session_id
-    )
-    .fetch_one(conn)
-    .await
-}
-
-/// Get the full polling station result row for a given polling station
-/// id, or return an error if there is no data
-pub async fn get_result(
-    conn: &mut SqliteConnection,
-    polling_station_id: PollingStationId,
-    committee_session_id: CommitteeSessionId,
-) -> Result<PollingStationResult, sqlx::Error> {
-    query_as!(
-        PollingStationResult,
-        r#"
-            SELECT
-                polling_station_id AS "polling_station_id: PollingStationId",
-                committee_session_id AS "committee_session_id: CommitteeSessionId",
-                data AS "data: _",
-                created_at AS "created_at: _"
-            FROM polling_station_results
             WHERE polling_station_id = ? AND committee_session_id = ?
         "#,
         polling_station_id,
@@ -154,27 +129,6 @@ pub async fn delete_data_entry(
     .await
 }
 
-pub async fn delete_result(
-    conn: &mut SqliteConnection,
-    polling_station_id: PollingStationId,
-) -> Result<Option<PollingStationResult>, sqlx::Error> {
-    query_as!(
-        PollingStationResult,
-        r#"
-            DELETE FROM polling_station_results
-            WHERE polling_station_id = ?
-            RETURNING
-                polling_station_id AS "polling_station_id: PollingStationId",
-                committee_session_id AS "committee_session_id: CommitteeSessionId",
-                data AS "data: _",
-                created_at AS "created_at: _"
-        "#,
-        polling_station_id,
-    )
-    .fetch_optional(conn)
-    .await
-}
-
 /// Get the status for each polling station data entry in a committee session
 pub async fn statuses(
     conn: &mut SqliteConnection,
@@ -210,47 +164,6 @@ pub async fn statuses(
     })
     .fetch_all(conn)
     .await
-}
-
-pub async fn make_definitive(
-    conn: &mut SqliteConnection,
-    polling_station_id: PollingStationId,
-    committee_session_id: CommitteeSessionId,
-    new_state: &DataEntryStatus,
-    definitive_entry: &PollingStationResults,
-) -> Result<(), sqlx::Error> {
-    let mut tx = conn.begin().await?;
-
-    let definitive_entry = Json(definitive_entry);
-    query!(
-        "INSERT INTO polling_station_results (polling_station_id, committee_session_id, data) VALUES ($1, $2, $3)",
-        polling_station_id,
-        committee_session_id,
-        definitive_entry,
-    )
-    .execute(&mut *tx)
-    .await?;
-
-    let new_state = Json(new_state);
-    query!(
-        r#"
-            INSERT INTO polling_station_data_entries (polling_station_id, committee_session_id, state)
-            VALUES (?, ?, ?)
-            ON CONFLICT(polling_station_id, committee_session_id) DO
-            UPDATE SET
-                state = excluded.state,
-                updated_at = CURRENT_TIMESTAMP
-        "#,
-        polling_station_id,
-        committee_session_id,
-        new_state
-    )
-    .execute(&mut *tx)
-    .await?;
-
-    tx.commit().await?;
-
-    Ok(())
 }
 
 /// Check if a polling station has a data entry
@@ -293,24 +206,6 @@ pub async fn get_polling_station_data_entries(
     .await
 }
 
-/// Check if a polling station has a result
-pub async fn result_exists(
-    conn: &mut SqliteConnection,
-    polling_station_id: PollingStationId,
-) -> Result<bool, sqlx::Error> {
-    let res = query!(
-        r#"
-        SELECT EXISTS(
-            SELECT 1 FROM polling_station_results
-            WHERE polling_station_id = ?)
-        AS `exists`"#,
-        polling_station_id
-    )
-    .fetch_one(conn)
-    .await?;
-    Ok(res.exists == 1)
-}
-
 async fn fetch_results_for_committee_session(
     conn: &mut SqliteConnection,
     committee_session_id: CommitteeSessionId,
@@ -336,27 +231,38 @@ async fn fetch_results_for_committee_session(
     // The initial query fetches the polling stations from the given committee session and any results
     // based on the same conditions as the recursive query.
     // The recursive query traverses previous committee sessions for each polling stations without results until:
-    // - Results are found
+    // - Results are found (data entry state is 'Definitive')
     // - Or results are expected due to an investigation requiring corrected results
     // Finally we select all the rows that have results, ensuring we get the most recent results
+    //
+    // Results are now embedded in the 'Definitive' state of polling_station_data_entries,
+    // extracted via json_extract(de.state, '$.state.results').
     //
     // This function returns the original polling station id and the found results. When no results are found,
     // an error is thrown.
     let results = query!(
         r#"
         WITH RECURSIVE polling_stations_chain(original_id, id, id_prev_session, data, investigation) AS (
-            SELECT ps.id AS original_id, ps.id, ps.id_prev_session, r.data, psi.polling_station_id
+            SELECT ps.id AS original_id, ps.id, ps.id_prev_session,
+                   CASE WHEN json_extract(de.state, '$.status') = 'Definitive'
+                        THEN json_extract(de.state, '$.state.results')
+                        ELSE NULL END AS data,
+                   psi.polling_station_id
             FROM polling_stations AS ps
-            LEFT JOIN polling_station_results AS r ON r.polling_station_id = ps.id
+            LEFT JOIN polling_station_data_entries AS de ON de.polling_station_id = ps.id
             LEFT JOIN polling_station_investigations AS psi ON psi.polling_station_id = ps.id AND psi.corrected_results = 1
             WHERE ps.committee_session_id = $1 AND ($2 IS NULL OR ps.id = $2)
 
             UNION ALL
 
-            SELECT sc.original_id, ps.id, ps.id_prev_session, r.data, psi.polling_station_id
+            SELECT sc.original_id, ps.id, ps.id_prev_session,
+                   CASE WHEN json_extract(de.state, '$.status') = 'Definitive'
+                        THEN json_extract(de.state, '$.state.results')
+                        ELSE NULL END AS data,
+                   psi.polling_station_id
             FROM polling_stations_chain AS sc
             JOIN polling_stations AS ps ON ps.id = sc.id_prev_session
-            LEFT JOIN polling_station_results AS r ON r.polling_station_id = ps.id
+            LEFT JOIN polling_station_data_entries AS de ON de.polling_station_id = ps.id
             LEFT JOIN polling_station_investigations AS psi ON psi.polling_station_id = ps.id AND psi.corrected_results = 1
             WHERE sc.data IS NULL AND sc.investigation IS NULL
         )
@@ -370,11 +276,12 @@ async fn fetch_results_for_committee_session(
         polling_station_id,
     )
     .try_map(|row| {
+        let data = row.data.ok_or(sqlx::Error::RowNotFound)?;
         polling_stations
             .get(&row.original_id)
             .cloned()
-            .map(|ps| (ps, row.data.0))
-            .ok_or_else(|| sqlx::Error::RowNotFound)
+            .map(|ps| (ps, data.0))
+            .ok_or(sqlx::Error::RowNotFound)
     })
     .fetch_all(&mut *tx)
     .await?;
@@ -432,12 +339,15 @@ pub async fn are_results_complete_for_committee_session(
 
     let committee_session = committee_session_repo::get(&mut tx, committee_session_id).await?;
 
+    // Check that all new polling stations have definitive results (embedded in data_entries state)
     let all_new_ps_have_data = query!(
         r#"
         SELECT COUNT(*) = 0 as "result: bool"
-        FROM polling_stations AS ps 
-        LEFT JOIN polling_station_results AS r ON r.polling_station_id = ps.id
-        WHERE ps.committee_session_id = ? AND ps.id_prev_session IS NULL AND r.data IS NULL
+        FROM polling_stations AS ps
+        LEFT JOIN polling_station_data_entries AS de ON de.polling_station_id = ps.id
+        WHERE ps.committee_session_id = ?
+          AND ps.id_prev_session IS NULL
+          AND (de.state IS NULL OR json_extract(de.state, '$.status') != 'Definitive')
         "#,
         committee_session_id
     )
@@ -450,16 +360,18 @@ pub async fn are_results_complete_for_committee_session(
         return Ok(all_new_ps_have_data);
     }
 
-    // Validate that all investigations are finished and have results
+    // Validate that all investigations are finished and have definitive results
     // if corrected_results is true
     let all_investigations_finished = query!(
         r#"
         SELECT COUNT(*) = 0 as "result: bool"
         FROM polling_station_investigations AS psi
         JOIN polling_stations AS ps ON ps.id = psi.polling_station_id
-        LEFT JOIN polling_station_results AS r ON psi.polling_station_id = r.polling_station_id
+        LEFT JOIN polling_station_data_entries AS de ON psi.polling_station_id = de.polling_station_id
         WHERE ps.committee_session_id = ?
-        AND (psi.corrected_results IS NULL OR (psi.corrected_results = 1 AND r.data IS NULL))
+        AND (psi.corrected_results IS NULL
+             OR (psi.corrected_results = 1
+                 AND (de.state IS NULL OR json_extract(de.state, '$.status') != 'Definitive')))
         "#,
         committee_session_id
     )
@@ -472,6 +384,7 @@ pub async fn are_results_complete_for_committee_session(
     Ok(all_new_ps_have_data && all_investigations_finished)
 }
 
+/// Insert a test result by creating a Definitive data entry state
 #[cfg(test)]
 pub async fn insert_test_result(
     conn: &mut SqliteConnection,
@@ -479,15 +392,17 @@ pub async fn insert_test_result(
     committee_session_id: CommitteeSessionId,
     results: &PollingStationResults,
 ) -> Result<(), sqlx::Error> {
-    let results = Json(results);
-    query!(
-        "INSERT INTO polling_station_results (polling_station_id, committee_session_id, data) VALUES (?, ?, ?)",
-        polling_station_id,
-        committee_session_id,
-        results,
-    )
-    .execute(conn)
-    .await?;
+    use crate::{domain::status::Definitive, repository::user_repo::UserId};
+
+    let state = DataEntryStatus::Definitive(Definitive {
+        first_entry_user_id: UserId::from(5),
+        second_entry_user_id: UserId::from(6),
+        finished_at: chrono::Utc::now(),
+        finalised_with_warnings: false,
+        results: results.clone(),
+    });
+
+    upsert(conn, polling_station_id, committee_session_id, &state).await?;
     Ok(())
 }
 

@@ -40,13 +40,6 @@ impl ListVotesTrait for ListVotesMock {
         self.number
     }
 
-    fn total_votes(&self) -> u32 {
-        self.candidate_votes
-            .iter()
-            .map(|candidate_votes| candidate_votes.votes())
-            .sum()
-    }
-
     fn candidate_votes(&self) -> &[Self::Cv] {
         &self.candidate_votes
     }

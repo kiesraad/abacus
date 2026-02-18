@@ -17,7 +17,7 @@ test.describe("initialisation", () => {
 
     const welcomePage = new InitialiseWelcomePgObj(page);
     await expect(welcomePage.header).toBeVisible();
-    await welcomePage.button.click();
+    await welcomePage.createAdminAccount.click();
 
     // add the first admin
     const password = getTestPassword(firstAdmin.username);
@@ -33,6 +33,7 @@ test.describe("initialisation", () => {
     // login as first admin
     const firstLoginPage = new FirstLoginPgObj(page);
     await expect(firstLoginPage.header).toBeVisible();
+    await expect(firstLoginPage.alert).toHaveText("Account van beheerder ingesteld");
     await firstLoginPage.username.fill(firstAdmin.username);
     await firstLoginPage.password.fill(password);
     await firstLoginPage.loginBtn.click();
@@ -53,7 +54,7 @@ test.describe("initialisation", () => {
 
     const welcomePage = new InitialiseWelcomePgObj(page);
     await expect(welcomePage.header).toBeVisible();
-    await welcomePage.button.click();
+    await welcomePage.createAdminAccount.click();
 
     const password = getTestPassword(firstAdmin.username);
 

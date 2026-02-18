@@ -20,14 +20,14 @@ use crate::{
             CSONextSessionResults, CommonPollingStationResults, DataEntryStatusResponse,
             PollingStationDataEntry, PollingStationResults,
         },
+        data_entry_status::{
+            ClientState, CurrentDataEntry, DataEntryStatus, DataEntryStatusName,
+            DataEntryTransitionError, EntriesDifferent,
+        },
         election::{ElectionId, ElectionWithPoliticalGroups, PoliticalGroup},
         entry_number::EntryNumber,
         polling_station::{PollingStation, PollingStationId},
         role::Role,
-        status::{
-            ClientState, CurrentDataEntry, DataEntryStatus, DataEntryStatusName,
-            DataEntryTransitionError, EntriesDifferent,
-        },
         validation::{DataError, ValidateRoot, ValidationResults},
     },
     error::{ErrorReference, ErrorResponse},

@@ -7,8 +7,8 @@ use crate::{
     domain::{
         committee_session::CommitteeSessionId,
         data_entry::{DataEntryId, PollingStationDataEntry, PollingStationResults},
+        data_entry_status::DataEntryStatus,
         polling_station::{PollingStation, PollingStationId},
-        status::DataEntryStatus,
     },
     repository::{committee_session_repo, polling_station_repo},
 };
@@ -447,7 +447,7 @@ pub async fn insert_test_result(
     polling_station_id: PollingStationId,
     results: &PollingStationResults,
 ) -> Result<(), sqlx::Error> {
-    use crate::{domain::status::Definitive, repository::user_repo::UserId};
+    use crate::{domain::data_entry_status::Definitive, repository::user_repo::UserId};
 
     let state = DataEntryStatus::Definitive(Definitive {
         first_entry_user_id: UserId::from(5),

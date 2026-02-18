@@ -13,7 +13,7 @@ use abacus::{
             VoteCountingMethod,
         },
         polling_station::{PollingStation, PollingStationId, PollingStationType},
-        status::{CurrentDataEntry, DataEntryStatus, DataEntryTransitionError},
+        data_entry_status::{CurrentDataEntry, DataEntryStatus, DataEntryTransitionError},
     },
     repository::user_repo::UserId,
 };

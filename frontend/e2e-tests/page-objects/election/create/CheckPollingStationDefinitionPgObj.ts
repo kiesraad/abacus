@@ -1,6 +1,7 @@
 import type { Locator, Page } from "@playwright/test";
 
 export class CheckPollingStationDefinitionPgObj {
+  readonly fieldset: Locator;
   readonly header: Locator;
   readonly showMore: Locator;
   readonly next: Locator;
@@ -8,6 +9,7 @@ export class CheckPollingStationDefinitionPgObj {
   readonly stations: Locator;
 
   constructor(protected readonly page: Page) {
+    this.fieldset = page.getByRole("group", { name: "Controleer stembureaus" });
     this.header = page.getByRole("heading", { level: 2, name: "Controleer stembureaus" });
     this.showMore = page.getByRole("button", { name: /Toon alle \d+ stembureaus/ });
     this.next = page.getByRole("button", { name: "Volgende" });

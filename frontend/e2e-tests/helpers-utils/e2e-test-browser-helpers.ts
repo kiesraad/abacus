@@ -106,10 +106,10 @@ export async function uploadPollingStations(page: Page, eml = eml110b) {
   const uploadElectionDefinitionPage = new UploadPollingStationDefinitionPgObj(page);
   await expect(uploadElectionDefinitionPage.header).toBeVisible();
   await uploadElectionDefinitionPage.uploadFile(eml.path);
-  await expect(uploadElectionDefinitionPage.main).toContainText(eml.filename);
 
   const checkDefinitionPage = new CheckPollingStationDefinitionPgObj(page);
   await expect(checkDefinitionPage.header).toBeVisible();
+  await expect(checkDefinitionPage.fieldset).toContainText(eml.filename);
   await checkDefinitionPage.next.click();
 }
 

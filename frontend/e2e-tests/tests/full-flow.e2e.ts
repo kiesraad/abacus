@@ -87,6 +87,67 @@ test.describe("full flow", () => {
     expect(logoutResponse.status()).toBe(204);
   });
 
+  test("create election and a new polling station", async ({ page, browserName }) => {
+    await page.goto("/account/login");
+
+    const adminUsername = `admin-${browserName}`;
+    const loginPage = new LoginPgObj(page);
+    await loginPage.login(adminUsername, getTestPassword(adminUsername));
+
+    const electionsOverviewPage = new ElectionsOverviewPgObj(page);
+    await electionsOverviewPage.create.click();
+
+    await uploadElectionAndInputHash(page);
+
+    const pollingStationRolePage = new PollingStationRolePgObj(page);
+    await expect(pollingStationRolePage.header).toBeVisible();
+    await expect(pollingStationRolePage.gsb).toBeChecked();
+    await pollingStationRolePage.next.click();
+
+    await uploadCandidatesAndInputHash(page);
+
+    await uploadPollingStations(page, eml110b_single);
+
+    const countingMethodPage = new CountingMethodTypePgObj(page);
+    await expect(countingMethodPage.header).toBeVisible();
+    await expect(countingMethodPage.cso).toBeChecked();
+    await countingMethodPage.next.click();
+
+    const numberOfVotersPage = new NumberOfVotersPgObj(page);
+    await expect(numberOfVotersPage.header).toBeVisible();
+    await expect(numberOfVotersPage.input).toHaveValue("612694"); // value comes from eml110b
+    await numberOfVotersPage.input.fill("61269");
+    await numberOfVotersPage.next.click();
+
+    const checkAndSavePage = new CheckAndSavePgObj(page);
+    await expect(checkAndSavePage.header).toBeVisible();
+    await expect(checkAndSavePage.numberOfVoters).toHaveText("61.269 kiesgerechtigden");
+    const election = await checkAndSavePage.saveElection();
+
+    electionId = election.id;
+
+    await expect(electionsOverviewPage.adminHeader).toBeVisible();
+    await expect(electionsOverviewPage.alertElectionCreated).toBeVisible();
+    await electionsOverviewPage.findElectionRowById(electionId).click();
+
+    const electionHomePage = new ElectionHome(page);
+    await expect(electionHomePage.header).toContainText("Gemeenteraad Test 2022");
+    const sessionCard = electionHomePage.getCommitteeSessionCard(1);
+    await expect(sessionCard).toContainText("Eerste zitting — Klaar voor invoer");
+
+    await electionHomePage.pollingStationsRow.click();
+    const pollingStationListPage = new PollingStationListPgObj(page);
+    await expect(pollingStationListPage.header).toBeVisible();
+    await pollingStationListPage.createPollingStation.click();
+
+    const form = new PollingStationFormPgObj(page);
+    await form.fillIn({ number: 2, name: "Basisschool de Regenboog" });
+    await form.create.click();
+    await expect(pollingStationListPage.alert).toHaveText("Stembureau 2 (Basisschool de Regenboog) toegevoegd");
+
+    await logout(page);
+  });
+
   test(`create browser-specific coordinator for flow`, async ({ page, browserName }) => {
     await page.goto("/account/login");
 
@@ -169,66 +230,6 @@ test.describe("full flow", () => {
 
       await expect(userListPgObj.alert).toContainText(`${typistUsername} is toegevoegd met de rol Invoerder`);
     }
-
-    await logout(page);
-  });
-
-  test("create election and a new polling station", async ({ page, browserName }) => {
-    await page.goto("/account/login");
-
-    const adminUsername = `admin-${browserName}`;
-    const loginPage = new LoginPgObj(page);
-    await loginPage.login(adminUsername, getTestPassword(adminUsername));
-
-    const electionsOverviewPage = new ElectionsOverviewPgObj(page);
-    await electionsOverviewPage.create.click();
-
-    await uploadElectionAndInputHash(page);
-
-    const pollingStationRolePage = new PollingStationRolePgObj(page);
-    await expect(pollingStationRolePage.header).toBeVisible();
-    await pollingStationRolePage.next.click();
-
-    await uploadCandidatesAndInputHash(page);
-    await uploadPollingStations(page, eml110b_single);
-
-    const countingMethodPage = new CountingMethodTypePgObj(page);
-    await expect(countingMethodPage.header).toBeVisible();
-    await countingMethodPage.next.click();
-
-    const numberOfVotersPage = new NumberOfVotersPgObj(page);
-    await expect(numberOfVotersPage.header).toBeVisible();
-    await expect(numberOfVotersPage.input).toHaveValue("612694"); // value comes from eml110b
-    await numberOfVotersPage.input.fill("61269");
-    await numberOfVotersPage.next.click();
-
-    const checkAndSavePage = new CheckAndSavePgObj(page);
-    await expect(checkAndSavePage.header).toBeVisible();
-    await expect(checkAndSavePage.numberOfVoters).toHaveText("61.269 kiesgerechtigden");
-    const election = await checkAndSavePage.saveElection();
-
-    electionId = election.id;
-
-    await expect(electionsOverviewPage.adminHeader).toBeVisible();
-    await electionsOverviewPage.findElectionRowById(electionId).click();
-
-    const electionHomePage = new ElectionHome(page);
-    await expect(electionHomePage.header).toContainText("Gemeenteraad Test 2022");
-    const sessionCard = electionHomePage.getCommitteeSessionCard(1);
-    await expect(sessionCard).toContainText("Eerste zitting — Klaar voor invoer");
-
-    await electionHomePage.pollingStationsRow.click();
-    const pollingStationListPage = new PollingStationListPgObj(page);
-    await expect(pollingStationListPage.header).toBeVisible();
-    await pollingStationListPage.createPollingStation.click();
-
-    const form = new PollingStationFormPgObj(page);
-
-    await form.fillIn({ number: 2, name: "Basisschool de Regenboog" });
-    await form.create.click();
-    expect(await pollingStationListPage.alert.textContent()).toContain(
-      "Stembureau 2 (Basisschool de Regenboog) toegevoegd",
-    );
 
     await logout(page);
   });

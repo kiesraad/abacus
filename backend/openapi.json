@@ -5615,14 +5615,13 @@
       "DataEntryDetails": {
         "type": "object",
         "required": [
-          "polling_station_id",
-          "committee_session_id",
+          "data_entry_id",
           "data_entry_status",
           "data_entry_progress"
         ],
         "properties": {
-          "committee_session_id": {
-            "$ref": "#/components/schemas/CommitteeSessionId"
+          "data_entry_id": {
+            "$ref": "#/components/schemas/DataEntryId"
           },
           "data_entry_progress": {
             "type": "string"
@@ -5635,9 +5634,6 @@
           },
           "first_entry_user_id": {
             "$ref": "#/components/schemas/UserId"
-          },
-          "polling_station_id": {
-            "$ref": "#/components/schemas/PollingStationId"
           },
           "second_entry_user_id": {
             "$ref": "#/components/schemas/UserId"
@@ -5691,6 +5687,11 @@
           }
         },
         "additionalProperties": false
+      },
+      "DataEntryId": {
+        "type": "integer",
+        "format": "int32",
+        "minimum": 0
       },
       "DataEntryStatusName": {
         "type": "string",
@@ -6790,6 +6791,9 @@
           },
           "committee_session_id": {
             "$ref": "#/components/schemas/CommitteeSessionId"
+          },
+          "data_entry_id": {
+            "$ref": "#/components/schemas/DataEntryId"
           },
           "election_id": {
             "$ref": "#/components/schemas/ElectionId"

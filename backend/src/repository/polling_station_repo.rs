@@ -3,6 +3,7 @@ use sqlx::{Connection, SqliteConnection, query, query_as};
 use crate::{
     domain::{
         committee_session::CommitteeSessionId,
+        data_entry::DataEntryId,
         election::ElectionId,
         polling_station::{PollingStation, PollingStationId, PollingStationRequest},
     },
@@ -41,6 +42,7 @@ pub async fn list(
             c.election_id AS "election_id: ElectionId",
             p.committee_session_id AS "committee_session_id: CommitteeSessionId",
             p.id_prev_session AS "id_prev_session: _",
+            p.data_entry_id AS "data_entry_id: DataEntryId",
             p.name,
             p.number AS "number: u32",
             p.number_of_voters AS "number_of_voters: _",
@@ -71,6 +73,7 @@ pub async fn get(
             c.election_id AS "election_id: ElectionId",
             p.committee_session_id AS "committee_session_id: CommitteeSessionId",
             p.id_prev_session AS "id_prev_session: _",
+            p.data_entry_id AS "data_entry_id: DataEntryId",
             p.name,
             p.number AS "number: u32",
             p.number_of_voters AS "number_of_voters: _",
@@ -111,6 +114,7 @@ pub async fn get_for_election(
             c.election_id AS "election_id: ElectionId",
             p.committee_session_id AS "committee_session_id: CommitteeSessionId",
             p.id_prev_session AS "id_prev_session: _",
+            p.data_entry_id AS "data_entry_id: DataEntryId",
             p.name,
             p.number AS "number: u32",
             p.number_of_voters AS "number_of_voters: _",
@@ -166,6 +170,7 @@ pub async fn create(
             ? AS "election_id!: ElectionId", -- Workaround to get election_id in the result without a temporary struct
             committee_session_id AS "committee_session_id: CommitteeSessionId",
             id_prev_session AS "id_prev_session: _",
+            data_entry_id AS "data_entry_id: DataEntryId",
             name,
             number AS "number: u32",
             number_of_voters AS "number_of_voters: _",
@@ -232,6 +237,7 @@ pub async fn create_many(
                 ? AS "election_id!: ElectionId", -- Workaround to get election_id in the result without a temporary struct
                 committee_session_id AS "committee_session_id: CommitteeSessionId",
                 id_prev_session AS "id_prev_session: _",
+                data_entry_id AS "data_entry_id: DataEntryId",
                 name,
                 number AS "number: u32",
                 number_of_voters AS "number_of_voters: _",
@@ -299,6 +305,7 @@ pub async fn update(
             ? AS "election_id!: ElectionId", -- Workaround to get election_id in the result without a temporary struct
             committee_session_id AS "committee_session_id: CommitteeSessionId",
             id_prev_session AS "id_prev_session: _",
+            data_entry_id AS "data_entry_id: DataEntryId",
             name,
             number AS "number: u32",
             number_of_voters AS "number_of_voters: _",

@@ -8,8 +8,9 @@ use super::AuditEventLevel;
 use crate::{
     ErrorResponse,
     domain::{
-        committee_session::CommitteeSessionId, election::ElectionId, file::FileId,
-        investigation::PollingStationInvestigation, polling_station::PollingStationId,
+        committee_session::CommitteeSessionId, data_entry::DataEntryId, election::ElectionId,
+        file::FileId, investigation::PollingStationInvestigation,
+        polling_station::PollingStationId,
     },
     error::ErrorReference,
     repository::user_repo::UserId,
@@ -130,8 +131,7 @@ pub struct PollingStationImportDetails {
 #[derive(Serialize, Deserialize, Debug, PartialEq, Eq, ToSchema)]
 #[serde(deny_unknown_fields)]
 pub struct DataEntryDetails {
-    pub polling_station_id: PollingStationId,
-    pub committee_session_id: CommitteeSessionId,
+    pub data_entry_id: DataEntryId,
     pub data_entry_status: String,
     pub data_entry_progress: String,
     #[serde(skip_serializing_if = "Option::is_none")]

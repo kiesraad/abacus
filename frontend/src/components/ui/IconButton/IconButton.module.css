@@ -46,6 +46,11 @@
     border: none;
     box-shadow: none;
 
+    &:active {
+      border: 2px solid var(--button-icon-tertiary-color-border-active);
+      background: var(--button-icon-tertiary-color-bg-active);
+    }
+
     &:focus,
     &:focus-visible {
       border: 2px solid var(--button-color-focus-border);

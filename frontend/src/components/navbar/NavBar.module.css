@@ -35,7 +35,7 @@
     }
 
     > :global(.active) {
-      border-bottom: 4px solid var(--accent-orange);
+      border-bottom: 4px solid var(--orange-500);
       padding-bottom: calc(0.5rem - 4px);
       font-weight: bold;
     }

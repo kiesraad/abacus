@@ -113,8 +113,6 @@
   --base-accent: #4a75ba;
   --base-white: #ffffff;
 
-  --accent-orange: #ef8050;
-
   --interactive-default: #155eef;
   --interactive-hover: #004eeb;
   --interactive-active: #0040c1;
@@ -142,6 +140,8 @@
   --button-color-disabled: #b3b3b3;
   --button-color-bg-disabled: #f2f2f2;
 
+  --button-icon-tertiary-color-bg-active: var(--gray-100);
+  --button-icon-tertiary-color-border-active: var(--gray-500);
   --button-icon-tertiary-color-bg-hover: var(--gray-100);
 
   --checkbox-radio-color-border: var(--gray-400);

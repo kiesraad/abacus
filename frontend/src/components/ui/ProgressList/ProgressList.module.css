@@ -26,11 +26,16 @@
     scroll-margin-top: 0.8rem;
     scroll-margin-bottom: 0.8rem;
 
+    &:has(div > a:focus),
+    &:has(div > a:focus-visible) {
+      background-color: var(--bg-gray);
+    }
+
     &.item:hover {
       background-color: var(--color-hover);
       &:has(div > a:focus),
       &:has(div > a:focus-visible) {
-        background-color: transparent;
+        background-color: var(--bg-gray);
       }
     }
 

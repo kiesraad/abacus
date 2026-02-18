@@ -1,20 +1,20 @@
 {
   "db_name": "SQLite",
-  "query": "\n        SELECT\n            p.id AS \"id: PollingStationId\",\n            c.election_id AS \"election_id: ElectionId\",\n            p.committee_session_id AS \"committee_session_id: CommitteeSessionId\",\n            p.id_prev_session AS \"id_prev_session: _\",\n            p.data_entry_id AS \"data_entry_id: DataEntryId\",\n            p.name,\n            p.number AS \"number: u32\",\n            p.number_of_voters AS \"number_of_voters: _\",\n            p.polling_station_type AS \"polling_station_type: _\",\n            p.address,\n            p.postal_code,\n            p.locality\n        FROM polling_stations AS p\n        JOIN committee_sessions AS c ON c.id = p.committee_session_id\n        WHERE c.id = $1\n        ",
+  "query": "\n        SELECT\n            p.id AS \"id: _\",\n            c.election_id AS \"election_id: _\",\n            p.committee_session_id AS \"committee_session_id: _\",\n            p.id_prev_session AS \"id_prev_session: _\",\n            p.data_entry_id AS \"data_entry_id: _\",\n            p.name,\n            p.number AS \"number: u32\",\n            p.number_of_voters AS \"number_of_voters: _\",\n            p.polling_station_type AS \"polling_station_type: _\",\n            p.address,\n            p.postal_code,\n            p.locality\n        FROM polling_stations AS p\n        JOIN committee_sessions AS c ON c.id = p.committee_session_id\n        WHERE c.id = $1\n        ",
   "describe": {
     "columns": [
       {
-        "name": "id: PollingStationId",
+        "name": "id: _",
         "ordinal": 0,
         "type_info": "Integer"
       },
       {
-        "name": "election_id: ElectionId",
+        "name": "election_id: _",
         "ordinal": 1,
         "type_info": "Integer"
       },
       {
-        "name": "committee_session_id: CommitteeSessionId",
+        "name": "committee_session_id: _",
         "ordinal": 2,
         "type_info": "Integer"
       },
@@ -24,7 +24,7 @@
         "type_info": "Integer"
       },
       {
-        "name": "data_entry_id: DataEntryId",
+        "name": "data_entry_id: _",
         "ordinal": 4,
         "type_info": "Integer"
       },
@@ -82,5 +82,5 @@
       false
     ]
   },
-  "hash": "b251fe5874231e1f80290aac8959290decce67c8ffbd3cd2e49c0e679ebd4078"
+  "hash": "e9eeaa980fc341bfcc94343a78656f5426ad1671d2d6ac406063f18262d73fda"
 }

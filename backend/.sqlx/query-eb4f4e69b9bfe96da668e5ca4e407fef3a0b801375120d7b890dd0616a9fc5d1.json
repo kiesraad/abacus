@@ -1,10 +1,10 @@
 {
   "db_name": "SQLite",
-  "query": "\n                INSERT INTO data_entries (state)\n                VALUES (?)\n                RETURNING\n                    id AS \"id: DataEntryId\",\n                    state AS \"state: _\",\n                    updated_at AS \"updated_at: _\"\n            ",
+  "query": "\n            SELECT\n                de.id AS \"id: _\",\n                de.state AS \"state: _\",\n                de.updated_at AS \"updated_at: _\"\n            FROM polling_stations AS p\n            JOIN data_entries AS de ON de.id = p.data_entry_id\n            WHERE p.id = ?\n            ",
   "describe": {
     "columns": [
       {
-        "name": "id: DataEntryId",
+        "name": "id: _",
         "ordinal": 0,
         "type_info": "Integer"
       },
@@ -28,5 +28,5 @@
       false
     ]
   },
-  "hash": "708d02a9de66f971cc89ddba8eba3ae62b18965183d79ee5ff726dd4d0bd5b21"
+  "hash": "eb4f4e69b9bfe96da668e5ca4e407fef3a0b801375120d7b890dd0616a9fc5d1"
 }

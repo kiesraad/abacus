@@ -6,7 +6,7 @@ use crate::{
     api::data_entry::ElectionStatusResponseEntry,
     domain::{
         committee_session::CommitteeSessionId,
-        data_entry::{DataEntryId, PollingStationDataEntry, PollingStationResults},
+        data_entry::{PollingStationDataEntry, PollingStationResults},
         data_entry_status::DataEntryStatus,
         polling_station::{PollingStation, PollingStationId},
     },
@@ -23,7 +23,7 @@ pub async fn get_data_entry(
         PollingStationDataEntry,
         r#"
             SELECT
-                de.id AS "id: DataEntryId",
+                de.id AS "id: _",
                 de.state AS "state: _",
                 de.updated_at AS "updated_at: _"
             FROM polling_stations AS p
@@ -57,7 +57,7 @@ pub async fn get_or_default(
         PollingStationDataEntry,
         r#"
             SELECT
-                de.id AS "id: DataEntryId",
+                de.id AS "id: _",
                 de.state AS "state: _",
                 de.updated_at AS "updated_at: _"
             FROM polling_stations AS p
@@ -83,7 +83,7 @@ pub async fn upsert(
 
     // Check if the polling station already has a data_entry_id
     let row = query!(
-        r#"SELECT data_entry_id AS "data_entry_id: DataEntryId" FROM polling_stations WHERE id = ?"#,
+        r#"SELECT data_entry_id FROM polling_stations WHERE id = ?"#,
         polling_station_id
     )
     .fetch_one(&mut *tx)
@@ -98,7 +98,7 @@ pub async fn upsert(
                 SET state = ?, updated_at = CURRENT_TIMESTAMP
                 WHERE id = ?
                 RETURNING
-                    id AS "id: DataEntryId",
+                    id AS "id: _",
                     state AS "state: _",
                     updated_at AS "updated_at: _"
             "#,
@@ -115,7 +115,7 @@ pub async fn upsert(
                 INSERT INTO data_entries (state)
                 VALUES (?)
                 RETURNING
-                    id AS "id: DataEntryId",
+                    id AS "id: _",
                     state AS "state: _",
                     updated_at AS "updated_at: _"
             "#,
@@ -147,7 +147,7 @@ pub async fn delete_data_entry(
 
     // Get data_entry_id from polling station
     let row = query!(
-        r#"SELECT data_entry_id AS "data_entry_id: DataEntryId" FROM polling_stations WHERE id = ?"#,
+        r#"SELECT data_entry_id FROM polling_stations WHERE id = ?"#,
         polling_station_id
     )
     .fetch_one(&mut *tx)
@@ -173,7 +173,7 @@ pub async fn delete_data_entry(
             DELETE FROM data_entries
             WHERE id = ?
             RETURNING
-                id AS "id: DataEntryId",
+                id AS "id: _",
                 state AS "state: _",
                 updated_at AS "updated_at: _"
         "#,
@@ -249,7 +249,7 @@ pub async fn get_data_entries(
         PollingStationDataEntry,
         r#"
             SELECT
-                de.id AS "id: DataEntryId",
+                de.id AS "id: _",
                 de.state AS "state: _",
                 de.updated_at AS "updated_at: _"
             FROM polling_stations AS p

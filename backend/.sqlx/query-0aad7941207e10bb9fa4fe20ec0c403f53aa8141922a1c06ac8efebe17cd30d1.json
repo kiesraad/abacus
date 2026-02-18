@@ -1,6 +1,6 @@
 {
   "db_name": "SQLite",
-  "query": "\n                UPDATE polling_station_data_entries\n                SET state = ?, updated_at = CURRENT_TIMESTAMP\n                WHERE id = ?\n                RETURNING\n                    id AS \"id: DataEntryId\",\n                    state AS \"state: _\",\n                    updated_at AS \"updated_at: _\"\n            ",
+  "query": "\n            SELECT\n                de.id AS \"id: DataEntryId\",\n                de.state AS \"state: _\",\n                de.updated_at AS \"updated_at: _\"\n            FROM polling_stations AS p\n            JOIN data_entries AS de ON de.id = p.data_entry_id\n            WHERE p.id = ?\n        ",
   "describe": {
     "columns": [
       {
@@ -20,7 +20,7 @@
       }
     ],
     "parameters": {
-      "Right": 2
+      "Right": 1
     },
     "nullable": [
       false,
@@ -28,5 +28,5 @@
       false
     ]
   },
-  "hash": "d8e663f23eae6139536e4249d6c9b5df8589046715583cbef561e8f737ff7a01"
+  "hash": "0aad7941207e10bb9fa4fe20ec0c403f53aa8141922a1c06ac8efebe17cd30d1"
 }

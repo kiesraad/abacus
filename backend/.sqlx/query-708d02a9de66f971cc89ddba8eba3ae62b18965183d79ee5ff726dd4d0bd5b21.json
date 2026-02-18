@@ -1,6 +1,6 @@
 {
   "db_name": "SQLite",
-  "query": "\n            SELECT\n                de.id AS \"id: DataEntryId\",\n                de.state AS \"state: _\",\n                de.updated_at AS \"updated_at: _\"\n            FROM polling_stations AS p\n            JOIN polling_station_data_entries AS de ON de.id = p.data_entry_id\n            WHERE p.id = ?\n            ",
+  "query": "\n                INSERT INTO data_entries (state)\n                VALUES (?)\n                RETURNING\n                    id AS \"id: DataEntryId\",\n                    state AS \"state: _\",\n                    updated_at AS \"updated_at: _\"\n            ",
   "describe": {
     "columns": [
       {
@@ -28,5 +28,5 @@
       false
     ]
   },
-  "hash": "429900fd357f05d4e290af7106749ffcaf9961d5dbbe52725715eb9501377f41"
+  "hash": "708d02a9de66f971cc89ddba8eba3ae62b18965183d79ee5ff726dd4d0bd5b21"
 }

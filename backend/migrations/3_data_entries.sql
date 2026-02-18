@@ -1,4 +1,4 @@
-CREATE TABLE polling_station_data_entries
+CREATE TABLE data_entries
 (
     id         INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
     state      TEXT                              NOT NULL,

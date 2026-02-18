@@ -1,6 +1,6 @@
 {
   "db_name": "SQLite",
-  "query": "\n            DELETE FROM polling_station_data_entries\n            WHERE id = ?\n            RETURNING\n                id AS \"id: DataEntryId\",\n                state AS \"state: _\",\n                updated_at AS \"updated_at: _\"\n        ",
+  "query": "\n            SELECT\n                de.id AS \"id: DataEntryId\",\n                de.state AS \"state: _\",\n                de.updated_at AS \"updated_at: _\"\n            FROM polling_stations AS p\n            JOIN data_entries AS de ON de.id = p.data_entry_id\n            WHERE p.id = ?\n            ",
   "describe": {
     "columns": [
       {
@@ -28,5 +28,5 @@
       false
     ]
   },
-  "hash": "7d6ab111eb121d7b25352d638bec6de51e80e39dacecbedde6f4ef458a3c9168"
+  "hash": "e30038caa00f7235a530852ecfd1a3c41b84a92ccf00efc19b9ccc25b3f438bc"
 }

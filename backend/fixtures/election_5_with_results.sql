@@ -468,7 +468,7 @@ VALUES
     (11, "reason", "findings", 1);
 
 INSERT INTO
-    polling_station_data_entries (id, state, updated_at)
+    data_entries (id, state, updated_at)
 VALUES
     (
         501,

@@ -779,6 +779,7 @@ mod tests {
             election_id: ElectionId::from(1),
             committee_session_id: CommitteeSessionId::from(1),
             id_prev_session: None,
+            data_entry_id: None,
             name: "Test polling station".to_string(),
             number: 1,
             number_of_voters: None,

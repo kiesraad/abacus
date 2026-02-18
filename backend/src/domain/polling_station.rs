@@ -9,7 +9,10 @@ use utoipa::ToSchema;
 
 use crate::{
     APIError,
-    domain::{committee_session::CommitteeSessionId, election::ElectionId, id::id},
+    domain::{
+        committee_session::CommitteeSessionId, data_entry::DataEntryId, election::ElectionId,
+        id::id,
+    },
     infra::audit_log::PollingStationDetails,
 };
 
@@ -26,6 +29,9 @@ pub struct PollingStation {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[schema(nullable = false)]
     pub id_prev_session: Option<PollingStationId>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[schema(nullable = false)]
+    pub data_entry_id: Option<DataEntryId>,
     pub name: String,
     #[schema(value_type = u32)]
     pub number: PollingStationNumber,
@@ -153,6 +159,7 @@ pub(crate) mod test_helpers {
             election_id: election.id,
             committee_session_id: committee_session.id,
             id_prev_session: None,
+            data_entry_id: None,
             name: "Testplek".to_string(),
             number: 34,
             number_of_voters,
@@ -178,6 +185,7 @@ pub(crate) mod test_helpers {
                 election_id: election.id,
                 committee_session_id,
                 id_prev_session: None,
+                data_entry_id: None,
                 name: format!("Testplek {idx}"),
                 number: u32::try_from(idx).unwrap() + 30,
                 number_of_voters: Some(*voter_count),

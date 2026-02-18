@@ -1,0 +1,32 @@
+{
+  "db_name": "SQLite",
+  "query": "\n                UPDATE polling_station_data_entries\n                SET state = ?, updated_at = CURRENT_TIMESTAMP\n                WHERE id = ?\n                RETURNING\n                    id AS \"id: DataEntryId\",\n                    state AS \"state: _\",\n                    updated_at AS \"updated_at: _\"\n            ",
+  "describe": {
+    "columns": [
+      {
+        "name": "id: DataEntryId",
+        "ordinal": 0,
+        "type_info": "Integer"
+      },
+      {
+        "name": "state: _",
+        "ordinal": 1,
+        "type_info": "Text"
+      },
+      {
+        "name": "updated_at: _",
+        "ordinal": 2,
+        "type_info": "Text"
+      }
+    ],
+    "parameters": {
+      "Right": 2
+    },
+    "nullable": [
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "d8e663f23eae6139536e4249d6c9b5df8589046715583cbef561e8f737ff7a01"
+}

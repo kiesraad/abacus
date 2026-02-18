@@ -1,6 +1,6 @@
 {
   "db_name": "SQLite",
-  "query": "\n        SELECT\n            p.id AS \"id: PollingStationId\",\n            c.election_id AS \"election_id: ElectionId\",\n            p.committee_session_id AS \"committee_session_id: CommitteeSessionId\",\n            p.id_prev_session AS \"id_prev_session: _\",\n            p.name,\n            p.number AS \"number: u32\",\n            p.number_of_voters AS \"number_of_voters: _\",\n            p.polling_station_type AS \"polling_station_type: _\",\n            p.address,\n            p.postal_code,\n            p.locality\n        FROM polling_stations AS p\n        JOIN committee_sessions AS c ON c.id = p.committee_session_id\n        WHERE p.id = $1 AND c.id = $2\n        ",
+  "query": "\n        SELECT\n            p.id AS \"id: PollingStationId\",\n            c.election_id AS \"election_id: ElectionId\",\n            p.committee_session_id AS \"committee_session_id: CommitteeSessionId\",\n            p.id_prev_session AS \"id_prev_session: _\",\n            p.data_entry_id AS \"data_entry_id: DataEntryId\",\n            p.name,\n            p.number AS \"number: u32\",\n            p.number_of_voters AS \"number_of_voters: _\",\n            p.polling_station_type AS \"polling_station_type: _\",\n            p.address,\n            p.postal_code,\n            p.locality\n        FROM polling_stations AS p\n        JOIN committee_sessions AS c ON c.id = p.committee_session_id\n        WHERE c.id = $1\n        ",
   "describe": {
     "columns": [
       {
@@ -24,48 +24,54 @@
         "type_info": "Integer"
       },
       {
-        "name": "name",
+        "name": "data_entry_id: DataEntryId",
         "ordinal": 4,
+        "type_info": "Integer"
+      },
+      {
+        "name": "name",
+        "ordinal": 5,
         "type_info": "Text"
       },
       {
         "name": "number: u32",
-        "ordinal": 5,
-        "type_info": "Integer"
-      },
-      {
-        "name": "number_of_voters: _",
         "ordinal": 6,
         "type_info": "Integer"
       },
       {
-        "name": "polling_station_type: _",
+        "name": "number_of_voters: _",
         "ordinal": 7,
-        "type_info": "Text"
+        "type_info": "Integer"
       },
       {
-        "name": "address",
+        "name": "polling_station_type: _",
         "ordinal": 8,
         "type_info": "Text"
       },
       {
-        "name": "postal_code",
+        "name": "address",
         "ordinal": 9,
         "type_info": "Text"
       },
       {
-        "name": "locality",
+        "name": "postal_code",
         "ordinal": 10,
+        "type_info": "Text"
+      },
+      {
+        "name": "locality",
+        "ordinal": 11,
         "type_info": "Text"
       }
     ],
     "parameters": {
-      "Right": 2
+      "Right": 1
     },
     "nullable": [
       false,
       false,
       false,
+      true,
       true,
       false,
       false,
@@ -76,5 +82,5 @@
       false
     ]
   },
-  "hash": "45e7e1dfcadff1796084b0ea8656cfffed7c80d82dbd0773958e5dc5ab49725e"
+  "hash": "b251fe5874231e1f80290aac8959290decce67c8ffbd3cd2e49c0e679ebd4078"
 }

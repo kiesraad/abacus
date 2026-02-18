@@ -12,4 +12,4 @@ We waarderen het als je (ernstige) beveiligingsproblemen op een verantwoorde man
 
 ## Meer informatie
 
-In ons [Test- en kwaliteitsbeleid](/documentatie/ontwikkelproces/testen-en-kwaliteit.md) lees je hoe we continu werken aan de beveiliging van Abacus.
+In ons [Test- en kwaliteitsbeleid](https://github.com/kiesraad/abacus-documentatie/blob/main/ontwikkelproces/testen-en-kwaliteit.md) lees je hoe we continu werken aan de beveiliging van Abacus.

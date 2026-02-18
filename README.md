@@ -9,7 +9,7 @@
 ### Documentatie
 
 - Voor informatie over het installeren, starten en gebruiken van Abacus ga je naar de website [Abacus Documentatie](https://kiesraad.github.io/abacus-documentatie/). Hier vind je niet alleen alle beschikbare gebruikersdocumentatie, maar bieden we ook uitleg over het verkiezingsproces.
-- Alle documentatie met betrekking tot de ontwikkeling van Abacus vind je op de [Hoofdpagina voor documentatie](/documentatie/README.md) in deze repository. Hier staat documentatie over de functionaliteit, de softwarearchitectuur, ons ontwikkelproces en specifieke facetten van het verkiezingsproces.
+- Alle documentatie met betrekking tot de ontwikkeling van Abacus vind je op de [Hoofdpagina voor documentatie](https://github.com/kiesraad/abacus-documentatie/blob/main/README.md) in deze repository. Hier staat documentatie over de functionaliteit, de softwarearchitectuur, ons ontwikkelproces en specifieke facetten van het verkiezingsproces.
 
 ### Versie 1.0 voor gemeenteraadsverkiezingen 2026 (GR26)
 
@@ -29,7 +29,7 @@ De Kiesraad ontwikkelt nieuwe software voor de berekening van de uitslag van de 
 
 Voor meer context over het gebruik van Abacus lees je [Het verkiezingsproces en Abacus](https://kiesraad.github.io/abacus-documentatie/verkiezingsproces/). Je kunt hiervoor ook kijken naar de presentatie [Abacus: Software for Secure and Transparent Voting Results](https://youtu.be/qhYd_LNS2nQ) die we in november 2024 hebben gegeven op WICCON (in het Engels).
 
-Abacus is werk in uitvoering! Dit betekent dat de functionaliteit stapsgewijs wordt gebouwd. Kijk bij [Functionaliteit van Abacus: eisen en wensen](/documentatie/functionaliteit/functionaliteit-eisen-en-wensen.md) om te zien welke mijlpalen we hebben gesteld. 
+Abacus is werk in uitvoering! Dit betekent dat de functionaliteit stapsgewijs wordt gebouwd. Kijk bij [Functionaliteit van Abacus: eisen en wensen](https://github.com/kiesraad/abacus-documentatie/blob/main/functionaliteit/functionaliteit-eisen-en-wensen.md) om te zien welke mijlpalen we hebben gesteld. 
 
 OSV2020 is de huidige software die bij verkiezingen wordt gebruikt. Het ontwikkelteam werkt nu aan een versie van Abacus die geschikt is voor toepassing bij de verkiezingen voor de Gemeenteraad. Abacus kan worden ingezet als het af is, aan alle eisen voldoet en de Kiesraad besloten heeft over de toepassing. 
 
@@ -37,7 +37,7 @@ OSV2020 is de huidige software die bij verkiezingen wordt gebruikt. Het ontwikke
 
 De eerste versie van Abacus wordt voor de gemeenteraadsverkiezingen gebouwd als een stand-alone binary, die net als OSV2020 in een lokaal netwerk met een webbrowser benaderbaar is. Dit is de basisversie die de Kiesraad in alle scenario's nodig heeft. De backend wordt geschreven in de programmeertaal Rust, de frontend in TypeScript/React.
 
-Een [overzicht van de architectuur](/documentatie/softwarearchitectuur/Overzicht.md) is te vinden in de documentatie, net als de afwegingen die gemaakt zijn bij [de keuzes voor Rust, TypeScript en React](</documentatie/softwarearchitectuur/overwegingen-talen-en-frameworks.md>).
+Een [overzicht van de architectuur](https://github.com/kiesraad/abacus-documentatie/blob/main/softwarearchitectuur/Overzicht.md) is te vinden in de documentatie, net als de afwegingen die gemaakt zijn bij [de keuzes voor Rust, TypeScript en React](https://github.com/kiesraad/abacus-documentatie/blob/main/softwarearchitectuur/overwegingen-talen-en-frameworks.md).
 
 ### Beveiligingsmaatregelen
 

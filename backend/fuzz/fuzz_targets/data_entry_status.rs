@@ -96,6 +96,7 @@ fn polling_station() -> PollingStation {
         election_id: ElectionId::from(1),
         committee_session_id: CommitteeSessionId::from(1),
         id_prev_session: None,
+        data_entry_id: None,
         name: "Test polling station".to_string(),
         number: 1,
         number_of_voters: None,
@@ -343,9 +344,7 @@ impl Users {
     }
 
     fn swap(&mut self) {
-        let temp = self.first;
-        self.first = self.second;
-        self.second = temp;
+        std::mem::swap(&mut self.first, &mut self.second);
     }
 }
 
@@ -439,7 +438,7 @@ fuzz_target!(|transitions: Vec<Transition>| {
                 "Prev: {:?}\n\nNext: {:?}\n\nInvalid transition: {} --{:?}--> {}\nfirst_entry_correct: {}\n",
                 &prev_state,
                 &next_state,
-                prev_state.status_name().to_string(),
+                prev_state.status_name(),
                 &transition,
                 next_state
                     .as_ref()

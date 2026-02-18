@@ -1,5 +1,5 @@
 import { type APIRequestContext, expect } from "@playwright/test";
-import type { testUser } from "e2e-tests/test-data/users";
+import type { TestUser } from "e2e-tests/test-data/users";
 import { dataEntryRequest } from "../test-data/request-response-templates";
 import { DataEntryApiClient } from "./api-clients";
 
@@ -36,7 +36,7 @@ export async function completePollingStationDataEntries(
   await secondDataEntry.finalise();
 }
 
-export async function createUser(adminContext: APIRequestContext, user: testUser) {
+export async function createUser(adminContext: APIRequestContext, user: TestUser) {
   const response = await adminContext.post("/api/users", {
     data: {
       ...user,
@@ -46,7 +46,7 @@ export async function createUser(adminContext: APIRequestContext, user: testUser
   expect(response.status()).toBe(201);
 }
 
-export async function firstLogin(userContext: APIRequestContext, user: testUser) {
+export async function firstLogin(userContext: APIRequestContext, user: TestUser) {
   const loginResponse = await loginAs(userContext, user.username, "Temp");
   expect(loginResponse.status()).toBe(200);
 

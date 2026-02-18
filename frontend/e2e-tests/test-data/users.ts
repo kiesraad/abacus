@@ -1,18 +1,18 @@
 import type { Role } from "@/types/generated/openapi";
 
-export type testUser = {
+export type TestUser = {
   username: string;
   fullname: string;
   role: Role;
 };
 
-export const firstAdmin: testUser = {
+export const firstAdmin: TestUser = {
   username: "admin1",
   fullname: "Sanne Molenaar",
   role: "administrator",
 };
 
-export const testUsers: testUser[] = [
+export const testUsers: TestUser[] = [
   {
     username: "admin2",
     fullname: "Jef van Reybrouck",

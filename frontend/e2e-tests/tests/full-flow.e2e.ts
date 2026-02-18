@@ -6,6 +6,7 @@ import {
   createInvestigation,
   fillCandidatesListPages,
   fillDataEntryPagesAndSave,
+  logout,
   uploadCandidatesAndInputHash,
   uploadElectionAndInputHash,
   uploadPollingStations,
@@ -42,7 +43,7 @@ import { UserCreateTypePgObj } from "e2e-tests/page-objects/users/UserCreateType
 import { UserListPgObj } from "e2e-tests/page-objects/users/UserListPgObj";
 import { eml110b_single } from "e2e-tests/test-data/eml-files";
 import { noRecountNoDifferencesDataEntry } from "e2e-tests/test-data/request-response-templates";
-import type { testUser } from "e2e-tests/test-data/users";
+import type { TestUser } from "e2e-tests/test-data/users";
 
 const investigations = [
   { number: "1", name: "Stadhuis", reason: "Reden", findings: "Probleem", correctedResults: true },
@@ -73,7 +74,7 @@ test.describe("full flow", () => {
   test("create browser-specific admin user account", async ({ adminOne, browserName }) => {
     const { request: adminOneContext } = adminOne;
 
-    const user: testUser = {
+    const user: TestUser = {
       role: "administrator",
       fullname: "John Doe",
       username: `admin-${browserName}`,
@@ -112,6 +113,8 @@ test.describe("full flow", () => {
     await userCreateDetailsPgObj.save.click();
 
     await expect(userListPgObj.alert).toContainText(`${coordinatorUsername} is toegevoegd met de rol Coördinator`);
+
+    await logout(page);
   });
 
   test(`complete account for coordinator`, async ({ page, browserName }) => {
@@ -128,6 +131,8 @@ test.describe("full flow", () => {
 
     const overviewPage = new ElectionsOverviewPgObj(page);
     await expect(overviewPage.alertAccountSetup).toBeVisible();
+
+    await logout(page);
   });
 
   test(`create browser-specific typists for flow`, async ({ page, browserName }) => {
@@ -163,6 +168,8 @@ test.describe("full flow", () => {
 
       await expect(userListPgObj.alert).toContainText(`${typistUsername} is toegevoegd met de rol Invoerder`);
     }
+
+    await logout(page);
   });
 
   test("create election and a new polling station", async ({ page, browserName }) => {
@@ -221,6 +228,8 @@ test.describe("full flow", () => {
     expect(await pollingStationListPage.alert.textContent()).toContain(
       "Stembureau 2 (Basisschool de Regenboog) toegevoegd",
     );
+
+    await logout(page);
   });
 
   test("start data entry", async ({ page, browserName }) => {
@@ -248,6 +257,8 @@ test.describe("full flow", () => {
 
     const electionStatus = new ElectionStatus(page);
     await expect(electionStatus.header).toContainText("Eerste zitting");
+
+    await logout(page);
   });
 
   test("download Na 31-2 documents", async ({ page, browserName }) => {
@@ -270,6 +281,8 @@ test.describe("full flow", () => {
 
     expect(download.suggestedFilename()).toBe("GR2022_Test_na_31_2_bijlage1.zip");
     expect((await stat(await download.path())).size).toBeGreaterThan(1024);
+
+    await logout(page);
   });
 
   test("download N10-2 documents", async ({ page, browserName }) => {
@@ -292,6 +305,8 @@ test.describe("full flow", () => {
 
     expect(download.suggestedFilename()).toBe("GR2022_Test_n_10_2.zip");
     expect((await stat(await download.path())).size).toBeGreaterThan(1024);
+
+    await logout(page);
   });
 
   for (const typist of typistBaseNameUsers) {
@@ -309,6 +324,8 @@ test.describe("full flow", () => {
 
       const overviewPage = new ElectionsOverviewPgObj(page);
       await expect(overviewPage.alertAccountSetup).toBeVisible();
+
+      await logout(page);
     });
   }
 
@@ -334,6 +351,8 @@ test.describe("full flow", () => {
       await dataEntryHomePage.clickStart();
 
       await fillDataEntryPagesAndSave(page, noRecountNoDifferencesDataEntry);
+
+      await logout(page);
     });
 
     test(`second data entry ${station.name}`, async ({ page, browserName }) => {
@@ -354,6 +373,8 @@ test.describe("full flow", () => {
       await dataEntryHomePage.clickStart();
 
       await fillDataEntryPagesAndSave(page, noRecountNoDifferencesDataEntry);
+
+      await logout(page);
     });
   }
 
@@ -386,6 +407,8 @@ test.describe("full flow", () => {
 
     expect(download.suggestedFilename()).toMatch(/definitieve-documenten_gr2022_test_gemeente_test-\d{8}-\d{6}.zip/);
     expect((await stat(await download.path())).size).toBeGreaterThan(1024);
+
+    await logout(page);
   });
 
   test("create new committee session", async ({ page, browserName }) => {
@@ -404,6 +427,8 @@ test.describe("full flow", () => {
     await electionDetailsPage.newSessionModalConfirmButton.click();
 
     await expect(electionDetailsPage.investigationsOverviewButton).toBeVisible();
+
+    await logout(page);
   });
 
   test("download Na 31-2 inlegvel", async ({ page, browserName }) => {
@@ -426,6 +451,8 @@ test.describe("full flow", () => {
 
     expect(download.suggestedFilename()).toBe("Model_Na_31_2_Inlegvel.pdf");
     expect((await stat(await download.path())).size).toBeGreaterThan(1024);
+
+    await logout(page);
   });
 
   test("add missing polling station", async ({ page, browserName }) => {
@@ -461,6 +488,8 @@ test.describe("full flow", () => {
 
     const pollingStationListPage = new PollingStationListPgObj(page);
     expect(await pollingStationListPage.alert.textContent()).toContain("Stembureau 5 (Sportfondsenbad) toegevoegd");
+
+    await logout(page);
   });
 
   for (const station of investigations) {
@@ -476,6 +505,8 @@ test.describe("full flow", () => {
       await overviewPage.findElectionRowById(electionId!).click();
 
       await createInvestigation(page, station.name, station.reason);
+
+      await logout(page);
     });
   }
 
@@ -495,6 +526,8 @@ test.describe("full flow", () => {
 
     const electionStatus = new ElectionStatus(page);
     await expect(electionStatus.header).toContainText("Tweede zitting");
+
+    await logout(page);
   });
 
   for (const station of investigations) {
@@ -528,6 +561,8 @@ test.describe("full flow", () => {
       await navBar.electionsButton.click();
 
       await expect(overviewPage.header).toBeVisible();
+
+      await logout(page);
     });
   }
 
@@ -575,6 +610,8 @@ test.describe("full flow", () => {
       await checkAndSavePage.save.click();
 
       await expect(dataEntryHomePage.dataEntrySaved).toBeVisible();
+
+      await logout(page);
     });
   }
 
@@ -613,6 +650,8 @@ test.describe("full flow", () => {
       await checkAndSavePage.save.click();
 
       await expect(dataEntryHomePage.dataEntrySaved).toBeVisible();
+
+      await logout(page);
     });
   }
 
@@ -656,5 +695,7 @@ test.describe("full flow", () => {
     const download = await downloadPromise;
     expect(download.suggestedFilename()).toMatch(/correctie_gr2022_test_gemeente_test-\d{8}-\d{6}.zip/);
     expect((await stat(await download.path())).size).toBeGreaterThan(1024);
+
+    await logout(page);
   });
 });

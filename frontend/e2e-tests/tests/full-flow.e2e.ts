@@ -33,6 +33,7 @@ import { FinishDataEntry } from "e2e-tests/page-objects/election/FinishDataEntry
 import { AddInvestigationPgObj } from "e2e-tests/page-objects/investigations/AddInvestigationPgObj";
 import { InvestigationFindingsPgObj } from "e2e-tests/page-objects/investigations/InvestigationFindingsPgObj";
 import { InvestigationOverviewPgObj } from "e2e-tests/page-objects/investigations/InvestigationOverviewPgObj";
+import { AdminNavBar } from "e2e-tests/page-objects/nav_bar/AdminNavBarPgObj";
 import { CoordinatorNavBarPgObj } from "e2e-tests/page-objects/nav_bar/CoordinatorNavBarPgObj";
 import { UserInfoTopBar } from "e2e-tests/page-objects/nav_bar/UserInfoTopBarPgObj";
 import { PollingStationFormPgObj } from "e2e-tests/page-objects/polling_station/PollingStationFormPgObj";
@@ -158,7 +159,8 @@ test.describe("full flow", () => {
     const userInfoTopBar = new UserInfoTopBar(page);
     await expect(userInfoTopBar.username).toHaveText(`John Doe`);
 
-    await page.goto(`/users`);
+    const adminNavBar = new AdminNavBar(page);
+    await adminNavBar.users.click();
 
     const userListPgObj = new UserListPgObj(page);
     await userListPgObj.create.click();
@@ -209,7 +211,8 @@ test.describe("full flow", () => {
 
     // Create browser-specific typists
     for (const username of typistBaseNameUsers) {
-      await page.goto(`/users`);
+      const adminNavBar = new AdminNavBar(page);
+      await adminNavBar.users.click();
 
       const userListPgObj = new UserListPgObj(page);
       await userListPgObj.create.click();

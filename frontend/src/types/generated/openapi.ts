@@ -612,12 +612,11 @@ export interface DataEntry {
 }
 
 export interface DataEntryDetails {
-  committee_session_id: CommitteeSessionId;
+  data_entry_id: DataEntryId;
   data_entry_progress: string;
   data_entry_status: string;
   finished_at?: string;
   first_entry_user_id?: UserId;
-  polling_station_id: PollingStationId;
   second_entry_user_id?: UserId;
 }
 
@@ -634,6 +633,8 @@ export interface DataEntryGetResponse {
   user_id?: UserId;
   validation_results: ValidationResults;
 }
+
+export type DataEntryId = number;
 
 export const dataEntryStatusNameValues = [
   "empty",
@@ -1018,6 +1019,7 @@ export interface PoliticalGroupTotalVotes {
 export interface PollingStation {
   address: string;
   committee_session_id: CommitteeSessionId;
+  data_entry_id?: DataEntryId;
   election_id: ElectionId;
   id: PollingStationId;
   id_prev_session?: PollingStationId;

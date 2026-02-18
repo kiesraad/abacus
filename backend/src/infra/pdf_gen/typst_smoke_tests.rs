@@ -193,6 +193,7 @@ fn random_polling_station(
         election_id: election.id,
         committee_session_id: CommitteeSessionId::from(rng.random_range(0..5)),
         id_prev_session: random_option(rng, id_prev_session, none_where_possible),
+        data_entry_id: None,
         name: random_string(rng, string_length),
         number: rng.random_range(0..5),
         number_of_voters: random_option(rng, number_of_voters, none_where_possible),

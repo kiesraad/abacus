@@ -1,6 +1,6 @@
 {
   "db_name": "SQLite",
-  "query": "\n        SELECT EXISTS(\n            SELECT 1 FROM polling_station_data_entries\n            WHERE polling_station_id = ?)\n        AS `exists`",
+  "query": "\n        SELECT data_entry_id IS NOT NULL AS `exists`\n        FROM polling_stations\n        WHERE id = ?",
   "describe": {
     "columns": [
       {
@@ -16,5 +16,5 @@
       false
     ]
   },
-  "hash": "2782dbc44b8b41178a719eaedc146c71684d84fddc179b1559ceeb0130717157"
+  "hash": "057219d4c7cf13fa0b4ef8c5d4211685961027325742e6167181c5505c43ec81"
 }

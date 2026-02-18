@@ -32,9 +32,10 @@ label.button {
   &:focus,
   &:focus-visible {
     outline: none;
+    --button-border-width: 2px;
+    box-shadow: 0 0 0 4px var(--button-color-focus-shadow);
     border-color: var(--button-color-focus-border);
     background-color: var(--button-color-primary-focus);
-    box-shadow: 0 0 0 4px var(--button-color-focus-shadow);
   }
 
   &:active {
@@ -48,9 +49,25 @@ label.button {
   }
 
   &.primary-destructive {
-    border-color: var(--red-600);
-    background: var(--red-600);
     color: var(--base-white);
+    border-color: var(--button-color-primary-destructive);
+    background: var(--button-color-primary-destructive);
+
+    &:hover {
+      background-color: var(--button-color-primary-destructive-hover);
+      border-color: var(--button-color-primary-destructive-hover);
+    }
+
+    &:focus,
+    &:focus-visible {
+      border-color: var(--button-color-focus-border);
+      background-color: var(--button-color-primary-destructive);
+    }
+
+    &:active {
+      background-color: var(--button-color-primary-destructive-active);
+      border-color: var(--button-color-primary-active-border);
+    }
   }
 
   &.secondary {
@@ -64,11 +81,8 @@ label.button {
 
     &:focus,
     &:focus-visible {
-      outline: none;
-      --button-border-width: 2px;
       border-color: var(--border-color-focus);
       background-color: var(--button-color-focus);
-      box-shadow: 0 0 0 4px var(--button-color-focus-shadow);
     }
 
     &:active {
@@ -87,6 +101,12 @@ label.button {
 
     &:hover {
       background: var(--button-color-tertiary-hover);
+    }
+
+    &:focus,
+    &:focus-visible {
+      border-color: var(--border-color-focus);
+      background-color: var(--button-color-focus);
     }
 
     &:active {

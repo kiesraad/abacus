@@ -126,6 +126,9 @@
   --button-color-primary-focus: var(--blue-900);
   --button-color-primary-active: var(--base-black);
   --button-color-primary-active-border: #00254e;
+  --button-color-primary-destructive: var(--red-600);
+  --button-color-primary-destructive-hover: var(--red-700);
+  --button-color-primary-destructive-active: var(--red-900);
   --button-color-secondary: var(--base-white);
   --button-color-secondary-border: var(--gray-300);
   --button-color-secondary-hover: var(--gray-50);

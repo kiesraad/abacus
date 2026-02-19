@@ -25,6 +25,10 @@ export class ElectionDetailsPgObj {
     this.startDataEntryButton = page.getByRole("button", { name: "Start invoer" });
   }
 
+  getCommitteeSessionCardById(id: number) {
+    return this.page.getByTestId(`session-${id}`);
+  }
+
   async fillForm(location: string, date: string, time: string) {
     await this.locationInput.fill(location);
     await this.dateInput.fill(date);

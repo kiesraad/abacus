@@ -358,6 +358,7 @@ test.describe("full flow", () => {
       await dataEntryHomePage.clickStart();
 
       await fillDataEntryPagesAndSave(page, noRecountNoDifferencesDataEntry);
+      await expect(dataEntryHomePage.dataEntrySaved).toBeVisible();
 
       await logout(page);
     });
@@ -380,6 +381,7 @@ test.describe("full flow", () => {
       await dataEntryHomePage.clickStart();
 
       await fillDataEntryPagesAndSave(page, noRecountNoDifferencesDataEntry);
+      await expect(dataEntryHomePage.dataEntrySaved).toBeVisible();
 
       await logout(page);
     });
@@ -433,7 +435,7 @@ test.describe("full flow", () => {
     await electionDetailsPage.newSessionButton.click();
     await electionDetailsPage.newSessionModalConfirmButton.click();
 
-    await expect(electionDetailsPage.investigationsOverviewButton).toBeVisible();
+    await expect(electionDetailsPage.getCommitteeSessionCardById(2)).toContainText("Tweede zitting");
 
     await logout(page);
   });
@@ -490,11 +492,10 @@ test.describe("full flow", () => {
       number: 5,
       name: "Sportfondsenbad",
     });
-
     await form.create.click();
 
     const pollingStationListPage = new PollingStationListPgObj(page);
-    expect(await pollingStationListPage.alert.textContent()).toContain("Stembureau 5 (Sportfondsenbad) toegevoegd");
+    await expect(pollingStationListPage.alert).toHaveText("Stembureau 5 (Sportfondsenbad) toegevoegd");
 
     await logout(page);
   });

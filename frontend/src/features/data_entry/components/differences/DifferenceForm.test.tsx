@@ -12,7 +12,7 @@ import {
 import { validationResultMockData } from "@/testing/api-mocks/ValidationResultMockData";
 import { overrideOnce, server } from "@/testing/server";
 import { getUrlMethodAndBody, render, screen, userTypeInputs } from "@/testing/test-utils";
-import type { LoginResponse, POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_BODY } from "@/types/generated/openapi";
+import type { DATA_ENTRY_SAVE_REQUEST_BODY, LoginResponse } from "@/types/generated/openapi";
 
 import { getDefaultDataEntryState, getEmptyDataEntryRequest } from "../../testing/mock-data";
 import {
@@ -202,7 +202,7 @@ describe("Test DifferencesForm", () => {
       const { url, method, body } = getUrlMethodAndBody(spy.mock.calls);
       expect(url).toEqual("/api/polling_stations/1/data_entries/1");
       expect(method).toEqual("POST");
-      const request_body = body as POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_BODY;
+      const request_body = body as DATA_ENTRY_SAVE_REQUEST_BODY;
       expect(request_body.data).toEqual(expectedRequest.data);
     });
   });

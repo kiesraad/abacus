@@ -2,11 +2,11 @@ import { useReducer } from "react";
 
 import { useApiClient } from "@/api/useApiClient";
 import type {
+  DATA_ENTRY_CLAIM_REQUEST_PATH,
+  DATA_ENTRY_DELETE_REQUEST_PATH,
+  DATA_ENTRY_FINALISE_REQUEST_PATH,
+  DATA_ENTRY_SAVE_REQUEST_PATH,
   ElectionWithPoliticalGroups,
-  POLLING_STATION_DATA_ENTRY_CLAIM_REQUEST_PATH,
-  POLLING_STATION_DATA_ENTRY_DELETE_REQUEST_PATH,
-  POLLING_STATION_DATA_ENTRY_FINALISE_REQUEST_PATH,
-  POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_PATH,
 } from "@/types/generated/openapi";
 import type { FormSectionId } from "@/types/types";
 
@@ -26,10 +26,10 @@ export default function useDataEntry(
   const [state, dispatch] = useReducer(dataEntryReducer, getInitialState(election, pollingStationId, entryNumber));
 
   // initial request to get the current data entry from the backend
-  const saveRequestPath: POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_PATH = `/api/polling_stations/${pollingStationId}/data_entries/${entryNumber}`;
-  const deleteRequestPath: POLLING_STATION_DATA_ENTRY_DELETE_REQUEST_PATH = `/api/polling_stations/${pollingStationId}/data_entries/${entryNumber}`;
-  const finaliseRequestPath: POLLING_STATION_DATA_ENTRY_FINALISE_REQUEST_PATH = `/api/polling_stations/${pollingStationId}/data_entries/${entryNumber}/finalise`;
-  const claimRequestPath: POLLING_STATION_DATA_ENTRY_CLAIM_REQUEST_PATH = `${saveRequestPath}/claim`;
+  const saveRequestPath: DATA_ENTRY_SAVE_REQUEST_PATH = `/api/polling_stations/${pollingStationId}/data_entries/${entryNumber}`;
+  const deleteRequestPath: DATA_ENTRY_DELETE_REQUEST_PATH = `/api/polling_stations/${pollingStationId}/data_entries/${entryNumber}`;
+  const finaliseRequestPath: DATA_ENTRY_FINALISE_REQUEST_PATH = `/api/polling_stations/${pollingStationId}/data_entries/${entryNumber}/finalise`;
+  const claimRequestPath: DATA_ENTRY_CLAIM_REQUEST_PATH = `${saveRequestPath}/claim`;
   useInitialDataEntryState(client, dispatch, claimRequestPath);
 
   // navigate to the correct section

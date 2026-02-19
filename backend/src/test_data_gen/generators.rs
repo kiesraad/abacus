@@ -16,12 +16,12 @@ use crate::{
             PoliticalGroupCandidateVotes, PoliticalGroupTotalVotes, PollingStationResults,
             VotersCounts, VotesCounts, YesNo,
         },
+        data_entry_status::{DataEntryStatus, Definitive, FirstEntryFinalised},
         election::{
             self, CandidateGender, CandidateNumber, ElectionCategory, ElectionRole,
             ElectionWithPoliticalGroups, NewElection, PGNumber, PoliticalGroup, VoteCountingMethod,
         },
         polling_station::{PollingStation, PollingStationRequest, PollingStationType},
-        status::{DataEntryStatus, Definitive, FirstEntryFinalised},
         validation::{FieldPath, Validate, ValidationResults},
     },
     repository::{

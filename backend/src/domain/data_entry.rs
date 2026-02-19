@@ -9,9 +9,9 @@ pub use yes_no::YesNo;
 use crate::{
     APIError,
     domain::{
+        data_entry_status::{DataEntryStatus, DataEntryStatusName},
         election::{CandidateNumber, PGNumber, PoliticalGroup},
         id::id,
-        status::{DataEntryStatus, DataEntryStatusName},
     },
     error::ErrorReference,
     infra::audit_log::DataEntryDetails,

@@ -205,6 +205,7 @@ async function setPollingStationRole(electionRole: ElectionRole = "GSB") {
     expect(screen.getByRole("radio", { name: "Gemeentelijk stembureau (GSB)" })).not.toBeChecked();
   } else {
     overrideOnce("post", "/api/elections/import/validate", 200, electionValidateResponse(newElectionMockData));
+    screen.getByRole("radio", { name: "Gemeentelijk stembureau (GSB)" }).click();
     expect(screen.getByRole("radio", { name: "Gemeentelijk stembureau (GSB)" })).toBeChecked();
     expect(screen.getByRole("radio", { name: "Centraal stembureau (CSB)" })).not.toBeChecked();
   }

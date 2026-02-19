@@ -171,10 +171,11 @@ test.describe("full flow", () => {
 
     const coordinatorUsername = `coordinator-${browserName}`;
     const userCreateDetailsPgObj = new UserCreateDetailsPgObj(page);
-    await userCreateDetailsPgObj.username.fill(coordinatorUsername);
-    await userCreateDetailsPgObj.fullname.fill(`Coordinator ${coordinatorUsername}`);
-    await userCreateDetailsPgObj.password.fill(getTestPassword(coordinatorUsername, "Temp"));
-    await userCreateDetailsPgObj.save.click();
+    await userCreateDetailsPgObj.createNamedUser(
+      coordinatorUsername,
+      `Coordinator ${coordinatorUsername}`,
+      getTestPassword(coordinatorUsername, "Temp"),
+    );
 
     await expect(userListPgObj.alert).toContainText(`${coordinatorUsername} is toegevoegd met de rol Coördinator`);
 
@@ -226,10 +227,11 @@ test.describe("full flow", () => {
 
       const typistUsername = `${username}-${browserName}`;
       const userCreateDetailsPgObj = new UserCreateDetailsPgObj(page);
-      await userCreateDetailsPgObj.username.fill(typistUsername);
-      await userCreateDetailsPgObj.fullname.fill(`Typist ${typistUsername}`);
-      await userCreateDetailsPgObj.password.fill(typistUsername.repeat(3));
-      await userCreateDetailsPgObj.save.click();
+      await userCreateDetailsPgObj.createNamedUser(
+        typistUsername,
+        `Typist ${typistUsername}`,
+        typistUsername.repeat(3),
+      );
 
       await expect(userListPgObj.alert).toContainText(`${typistUsername} is toegevoegd met de rol Invoerder`);
     }

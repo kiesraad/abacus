@@ -1,6 +1,6 @@
 use std::{path::PathBuf, time::Instant};
 
-use rand::{Rng, distr::Alphanumeric};
+use rand::{RngExt, distr::Alphanumeric};
 use strum::Display;
 use tracing::{error, info};
 

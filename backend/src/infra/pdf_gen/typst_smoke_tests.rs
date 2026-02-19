@@ -6,7 +6,7 @@
 /// string lengths, and the presence of optional fields.
 use chrono::{DateTime, Local, NaiveDate, NaiveDateTime, Utc};
 use pdf_gen::generate_pdf;
-use rand::{Rng, seq::IndexedRandom};
+use rand::{RngExt, seq::IndexedRandom};
 use test_log::test;
 
 use crate::{
@@ -42,18 +42,18 @@ use crate::{
     },
 };
 
-fn random_string(rng: &mut impl Rng, length: usize) -> String {
+fn random_string(rng: &mut impl RngExt, length: usize) -> String {
     rng.sample_iter(&rand::distr::Alphanumeric)
         .take(length)
         .map(char::from)
         .collect()
 }
 
-fn random_value<T: Copy>(rng: &mut impl Rng, variants: &[T]) -> T {
+fn random_value<T: Copy>(rng: &mut impl RngExt, variants: &[T]) -> T {
     *variants.choose(rng).unwrap()
 }
 
-fn random_date_time(rng: &mut impl Rng) -> DateTime<Local> {
+fn random_date_time(rng: &mut impl RngExt) -> DateTime<Local> {
     let now = Local::now().timestamp();
     let about_ten_years = 10 * 365 * 24 * 60 * 60;
     let date_range = now - about_ten_years..now + about_ten_years;
@@ -64,15 +64,15 @@ fn random_date_time(rng: &mut impl Rng) -> DateTime<Local> {
         .with_timezone(&Local)
 }
 
-fn random_date(rng: &mut impl Rng) -> NaiveDate {
+fn random_date(rng: &mut impl RngExt) -> NaiveDate {
     random_date_time(rng).date_naive()
 }
 
-fn random_naive_date_time(rng: &mut impl Rng) -> NaiveDateTime {
+fn random_naive_date_time(rng: &mut impl RngExt) -> NaiveDateTime {
     random_date_time(rng).naive_local()
 }
 
-fn random_option<T>(rng: &mut impl Rng, value: T, none_where_possible: bool) -> Option<T> {
+fn random_option<T>(rng: &mut impl RngExt, value: T, none_where_possible: bool) -> Option<T> {
     if none_where_possible {
         return None;
     }
@@ -85,7 +85,7 @@ fn random_option<T>(rng: &mut impl Rng, value: T, none_where_possible: bool) -> 
 }
 
 fn random_string_option(
-    rng: &mut impl Rng,
+    rng: &mut impl RngExt,
     string_length: usize,
     none_where_possible: bool,
 ) -> Option<String> {
@@ -98,7 +98,7 @@ fn random_string_option(
     random_option(rng, value, none_where_possible)
 }
 
-fn random_yes_no(rng: &mut impl Rng) -> YesNo {
+fn random_yes_no(rng: &mut impl RngExt) -> YesNo {
     match rng.random_range(0..4) {
         0 => YesNo::default(),
         1 => YesNo::both(),
@@ -108,7 +108,7 @@ fn random_yes_no(rng: &mut impl Rng) -> YesNo {
 }
 
 fn random_election(
-    rng: &mut impl Rng,
+    rng: &mut impl RngExt,
     parties: u32,
     candidates: u32,
     string_length: usize,
@@ -172,7 +172,7 @@ fn random_election(
 }
 
 fn random_polling_station(
-    rng: &mut impl Rng,
+    rng: &mut impl RngExt,
     election: &ElectionWithPoliticalGroups,
     string_length: usize,
     none_where_possible: bool,
@@ -205,7 +205,7 @@ fn random_polling_station(
 }
 
 fn random_polling_stations(
-    rng: &mut impl Rng,
+    rng: &mut impl RngExt,
     election: &ElectionWithPoliticalGroups,
     string_length: usize,
     none_where_possible: bool,
@@ -217,7 +217,7 @@ fn random_polling_stations(
 }
 
 fn random_committee_session(
-    rng: &mut impl Rng,
+    rng: &mut impl RngExt,
     election_id: ElectionId,
     string_length: usize,
     none_where_possible: bool,
@@ -249,7 +249,7 @@ fn random_committee_session(
 }
 
 fn random_polling_station_result(
-    rng: &mut impl Rng,
+    rng: &mut impl RngExt,
     election: &ElectionWithPoliticalGroups,
 ) -> CommonPollingStationResults {
     CommonPollingStationResults {
@@ -305,7 +305,7 @@ fn random_polling_station_result(
     }
 }
 
-fn random_station_subset(rng: &mut impl Rng, polling_stations: &[PollingStation]) -> Vec<u32> {
+fn random_station_subset(rng: &mut impl RngExt, polling_stations: &[PollingStation]) -> Vec<u32> {
     polling_stations
         .iter()
         .filter(|_| rng.random_bool(0.5))
@@ -313,7 +313,7 @@ fn random_station_subset(rng: &mut impl Rng, polling_stations: &[PollingStation]
         .collect()
 }
 
-fn random_sum_count(rng: &mut impl Rng, polling_stations: &[PollingStation]) -> SumCount {
+fn random_sum_count(rng: &mut impl RngExt, polling_stations: &[PollingStation]) -> SumCount {
     SumCount {
         count: rng.random_range(0..500),
         polling_stations: random_station_subset(rng, polling_stations),
@@ -321,7 +321,7 @@ fn random_sum_count(rng: &mut impl Rng, polling_stations: &[PollingStation]) -> 
 }
 
 fn random_election_summary(
-    rng: &mut impl Rng,
+    rng: &mut impl RngExt,
     election: &ElectionWithPoliticalGroups,
     polling_stations: &[PollingStation],
 ) -> ElectionSummary {
@@ -344,7 +344,7 @@ fn random_election_summary(
 }
 
 fn random_investigation(
-    rng: &mut impl Rng,
+    rng: &mut impl RngExt,
     polling_station: &PollingStation,
     string_length: usize,
     none_where_possible: bool,
@@ -360,7 +360,7 @@ fn random_investigation(
 }
 
 fn random_finished_investigation(
-    rng: &mut impl Rng,
+    rng: &mut impl RngExt,
     polling_station: &PollingStation,
     string_length: usize,
 ) -> PollingStationInvestigation {

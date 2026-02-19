@@ -70,7 +70,7 @@ impl From<&[u8]> for RedactedEmlHash {
 
 impl RedactedEmlHash {
     fn random_chunk_indexes(digest: [u8; 32]) -> [usize; 2] {
-        use rand::{Rng, SeedableRng};
+        use rand::{RngExt, SeedableRng};
 
         let mut rng = SmallRng::from_seed(digest);
         [

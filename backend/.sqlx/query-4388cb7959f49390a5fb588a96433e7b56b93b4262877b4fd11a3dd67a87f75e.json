@@ -1,0 +1,32 @@
+{
+  "db_name": "SQLite",
+  "query": "\n                INSERT INTO data_entries (state)\n                VALUES (?)\n                RETURNING\n                    id AS \"id: _\",\n                    state AS \"state: _\",\n                    updated_at AS \"updated_at: _\"\n            ",
+  "describe": {
+    "columns": [
+      {
+        "name": "id: _",
+        "ordinal": 0,
+        "type_info": "Integer"
+      },
+      {
+        "name": "state: _",
+        "ordinal": 1,
+        "type_info": "Text"
+      },
+      {
+        "name": "updated_at: _",
+        "ordinal": 2,
+        "type_info": "Text"
+      }
+    ],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": [
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "4388cb7959f49390a5fb588a96433e7b56b93b4262877b4fd11a3dd67a87f75e"
+}

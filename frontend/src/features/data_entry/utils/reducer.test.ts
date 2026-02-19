@@ -9,10 +9,7 @@ import {
 } from "@/testing/api-mocks/RequestHandlers";
 import { validationResultMockData } from "@/testing/api-mocks/ValidationResultMockData";
 import { overrideOnce, server } from "@/testing/server";
-import type {
-  POLLING_STATION_DATA_ENTRY_FINALISE_REQUEST_PATH,
-  PollingStationResults,
-} from "@/types/generated/openapi";
+import type { DATA_ENTRY_FINALISE_REQUEST_PATH, PollingStationResults } from "@/types/generated/openapi";
 import { ValidationResultSet } from "@/utils/ValidationResults";
 
 import { getDefaultDataEntryState, getInitialValues } from "../testing/mock-data";
@@ -361,8 +358,7 @@ describe("onFinaliseDataEntry", () => {
     const dispatch = vi.fn();
     const client = new ApiClient();
 
-    const finaliseUrl: POLLING_STATION_DATA_ENTRY_FINALISE_REQUEST_PATH =
-      "/api/polling_stations/1/data_entries/1/finalise";
+    const finaliseUrl: DATA_ENTRY_FINALISE_REQUEST_PATH = "/api/polling_stations/1/data_entries/1/finalise";
     const onFinalise = onFinaliseDataEntry(client, finaliseUrl, dispatch);
 
     const result = await onFinalise();

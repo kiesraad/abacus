@@ -1620,7 +1620,7 @@ mod tests {
         use crate::{
             domain::{
                 data_entry::PollingStationResults,
-                status::{
+                data_entry_status::{
                     DataEntryStatus,
                     tests::{
                         election, entries_different, example_polling_station_results,

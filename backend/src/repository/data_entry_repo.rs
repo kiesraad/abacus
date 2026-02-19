@@ -6,9 +6,9 @@ use crate::{
     api::data_entry::ElectionStatusResponseEntry,
     domain::{
         committee_session::CommitteeSessionId,
-        data_entry::{DataEntryId, PollingStationDataEntry, PollingStationResults},
+        data_entry::{PollingStationDataEntry, PollingStationResults},
+        data_entry_status::DataEntryStatus,
         polling_station::{PollingStation, PollingStationId},
-        status::DataEntryStatus,
     },
     repository::{committee_session_repo, polling_station_repo},
 };
@@ -23,11 +23,11 @@ pub async fn get_data_entry(
         PollingStationDataEntry,
         r#"
             SELECT
-                de.id AS "id: DataEntryId",
+                de.id AS "id: _",
                 de.state AS "state: _",
                 de.updated_at AS "updated_at: _"
             FROM polling_stations AS p
-            JOIN polling_station_data_entries AS de ON de.id = p.data_entry_id
+            JOIN data_entries AS de ON de.id = p.data_entry_id
             WHERE p.id = ?
         "#,
         polling_station_id,
@@ -57,11 +57,11 @@ pub async fn get_or_default(
         PollingStationDataEntry,
         r#"
             SELECT
-                de.id AS "id: DataEntryId",
+                de.id AS "id: _",
                 de.state AS "state: _",
                 de.updated_at AS "updated_at: _"
             FROM polling_stations AS p
-            JOIN polling_station_data_entries AS de ON de.id = p.data_entry_id
+            JOIN data_entries AS de ON de.id = p.data_entry_id
             WHERE p.id = ?
         "#,
         polling_station_id,
@@ -83,7 +83,7 @@ pub async fn upsert(
 
     // Check if the polling station already has a data_entry_id
     let row = query!(
-        r#"SELECT data_entry_id AS "data_entry_id: DataEntryId" FROM polling_stations WHERE id = ?"#,
+        r#"SELECT data_entry_id FROM polling_stations WHERE id = ?"#,
         polling_station_id
     )
     .fetch_one(&mut *tx)
@@ -94,11 +94,11 @@ pub async fn upsert(
         query_as!(
             PollingStationDataEntry,
             r#"
-                UPDATE polling_station_data_entries
+                UPDATE data_entries
                 SET state = ?, updated_at = CURRENT_TIMESTAMP
                 WHERE id = ?
                 RETURNING
-                    id AS "id: DataEntryId",
+                    id AS "id: _",
                     state AS "state: _",
                     updated_at AS "updated_at: _"
             "#,
@@ -112,10 +112,10 @@ pub async fn upsert(
         let data_entry = query_as!(
             PollingStationDataEntry,
             r#"
-                INSERT INTO polling_station_data_entries (state)
+                INSERT INTO data_entries (state)
                 VALUES (?)
                 RETURNING
-                    id AS "id: DataEntryId",
+                    id AS "id: _",
                     state AS "state: _",
                     updated_at AS "updated_at: _"
             "#,
@@ -147,7 +147,7 @@ pub async fn delete_data_entry(
 
     // Get data_entry_id from polling station
     let row = query!(
-        r#"SELECT data_entry_id AS "data_entry_id: DataEntryId" FROM polling_stations WHERE id = ?"#,
+        r#"SELECT data_entry_id FROM polling_stations WHERE id = ?"#,
         polling_station_id
     )
     .fetch_one(&mut *tx)
@@ -170,10 +170,10 @@ pub async fn delete_data_entry(
     let res = query_as!(
         PollingStationDataEntry,
         r#"
-            DELETE FROM polling_station_data_entries
+            DELETE FROM data_entries
             WHERE id = ?
             RETURNING
-                id AS "id: DataEntryId",
+                id AS "id: _",
                 state AS "state: _",
                 updated_at AS "updated_at: _"
         "#,
@@ -200,7 +200,7 @@ pub async fn statuses(
                 de.state AS "state: Json<DataEntryStatus>"
             FROM polling_stations AS p
             LEFT JOIN committee_sessions AS c ON c.id = p.committee_session_id
-            LEFT JOIN polling_station_data_entries AS de ON de.id = p.data_entry_id
+            LEFT JOIN data_entries AS de ON de.id = p.data_entry_id
             LEFT JOIN polling_station_investigations AS psi ON psi.polling_station_id = p.id
             WHERE c.id = $1 AND (c.number = 1 OR psi.corrected_results = 1)
         "#,
@@ -241,7 +241,7 @@ pub async fn data_entry_exists(
 }
 
 #[cfg(test)]
-pub async fn get_polling_station_data_entries(
+pub async fn get_data_entries(
     conn: &mut SqliteConnection,
     polling_station_id: PollingStationId,
 ) -> Result<Vec<PollingStationDataEntry>, sqlx::Error> {
@@ -249,11 +249,11 @@ pub async fn get_polling_station_data_entries(
         PollingStationDataEntry,
         r#"
             SELECT
-                de.id AS "id: DataEntryId",
+                de.id AS "id: _",
                 de.state AS "state: _",
                 de.updated_at AS "updated_at: _"
             FROM polling_stations AS p
-            JOIN polling_station_data_entries AS de ON de.id = p.data_entry_id
+            JOIN data_entries AS de ON de.id = p.data_entry_id
             WHERE p.id = ?
             "#,
         polling_station_id,
@@ -291,7 +291,7 @@ async fn fetch_results_for_committee_session(
     // - Or results are expected due to an investigation requiring corrected results
     // Finally we select all the rows that have results, ensuring we get the most recent results
     //
-    // Results are now embedded in the 'Definitive' state of polling_station_data_entries,
+    // Results are now embedded in the 'Definitive' state of data_entries,
     // extracted via json_extract(de.state, '$.state.results').
     //
     // This function returns the original polling station id and the found results. When no results are found,
@@ -305,7 +305,7 @@ async fn fetch_results_for_committee_session(
                         ELSE NULL END AS data,
                    psi.polling_station_id
             FROM polling_stations AS ps
-            LEFT JOIN polling_station_data_entries AS de ON de.id = ps.data_entry_id
+            LEFT JOIN data_entries AS de ON de.id = ps.data_entry_id
             LEFT JOIN polling_station_investigations AS psi ON psi.polling_station_id = ps.id AND psi.corrected_results = 1
             WHERE ps.committee_session_id = $1 AND ($2 IS NULL OR ps.id = $2)
 
@@ -318,7 +318,7 @@ async fn fetch_results_for_committee_session(
                    psi.polling_station_id
             FROM polling_stations_chain AS sc
             JOIN polling_stations AS ps ON ps.id = sc.id_prev_session
-            LEFT JOIN polling_station_data_entries AS de ON de.id = ps.data_entry_id
+            LEFT JOIN data_entries AS de ON de.id = ps.data_entry_id
             LEFT JOIN polling_station_investigations AS psi ON psi.polling_station_id = ps.id AND psi.corrected_results = 1
             WHERE sc.data IS NULL AND sc.investigation IS NULL
         )
@@ -400,7 +400,7 @@ pub async fn are_results_complete_for_committee_session(
         r#"
         SELECT COUNT(*) = 0 as "result: bool"
         FROM polling_stations AS ps
-        LEFT JOIN polling_station_data_entries AS de ON de.id = ps.data_entry_id
+        LEFT JOIN data_entries AS de ON de.id = ps.data_entry_id
         WHERE ps.committee_session_id = ?
           AND ps.id_prev_session IS NULL
           AND (de.state IS NULL OR json_extract(de.state, '$.status') != 'Definitive')
@@ -423,7 +423,7 @@ pub async fn are_results_complete_for_committee_session(
         SELECT COUNT(*) = 0 as "result: bool"
         FROM polling_station_investigations AS psi
         JOIN polling_stations AS ps ON ps.id = psi.polling_station_id
-        LEFT JOIN polling_station_data_entries AS de ON de.id = ps.data_entry_id
+        LEFT JOIN data_entries AS de ON de.id = ps.data_entry_id
         WHERE ps.committee_session_id = ?
         AND (psi.corrected_results IS NULL
              OR (psi.corrected_results = 1
@@ -447,7 +447,7 @@ pub async fn insert_test_result(
     polling_station_id: PollingStationId,
     results: &PollingStationResults,
 ) -> Result<(), sqlx::Error> {
-    use crate::{domain::status::Definitive, repository::user_repo::UserId};
+    use crate::{domain::data_entry_status::Definitive, repository::user_repo::UserId};
 
     let state = DataEntryStatus::Definitive(Definitive {
         first_entry_user_id: UserId::from(5),

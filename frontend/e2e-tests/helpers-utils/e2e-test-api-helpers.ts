@@ -47,12 +47,12 @@ export async function createUser(adminContext: APIRequestContext, user: TestUser
       temp_password: getTestPassword(user.username, "Temp"),
     },
   });
-  expect(response.status()).toBe(201);
+  expect(response.status(), `response status not 201: ${await response.json()}`).toBe(201);
 }
 
 export async function firstLogin(userContext: APIRequestContext, user: TestUser) {
   const loginResponse = await apiLoginAs(userContext, user.username, "Temp");
-  expect(loginResponse.status()).toBe(200);
+  expect(loginResponse.status(), `response status not 200: ${await loginResponse.json()}`).toBe(200);
 
   const response = await userContext.put("/api/account", {
     data: {
@@ -61,5 +61,5 @@ export async function firstLogin(userContext: APIRequestContext, user: TestUser)
       password: getTestPassword(user.username),
     },
   });
-  expect(response.status()).toBe(200);
+  expect(response.status(), `response status not 200: ${await response.json()}`).toBe(200);
 }

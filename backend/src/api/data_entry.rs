@@ -86,7 +86,7 @@ pub fn router() -> OpenApiRouter<AppState> {
         .routes(routes!(data_entry_save))
         .routes(routes!(data_entry_delete))
         .routes(routes!(data_entry_finalise))
-        .routes(routes!(data_entries_and_result_delete))
+        .routes(routes!(data_entry_reset))
         .routes(routes!(data_entry_get))
         .routes(routes!(data_entry_resolve_errors))
         .routes(routes!(data_entry_get_differences))
@@ -560,7 +560,7 @@ impl ResolveErrorsAction {
     }
 }
 
-/// Delete data entries and result for a polling station
+/// Reset the data entry for a polling station to empty
 #[utoipa::path(
     delete,
     path = "/api/polling_stations/{polling_station_id}/data_entries",
@@ -577,7 +577,7 @@ impl ResolveErrorsAction {
     ),
     security(("cookie_auth" = ["coordinator"])),
 )]
-async fn data_entries_and_result_delete(
+async fn data_entry_reset(
     _user: Coordinator,
     State(pool): State<SqlitePool>,
     Path(polling_station_id): Path<PollingStationId>,
@@ -1053,7 +1053,7 @@ mod tests {
         polling_station_id: PollingStationId,
     ) -> Response {
         let user = User::test_user(Role::Coordinator, UserId::from(1));
-        data_entries_and_result_delete(
+        data_entry_reset(
             Coordinator(user.clone()),
             State(pool.clone()),
             Path(polling_station_id),
@@ -1978,7 +1978,7 @@ mod tests {
     }
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
-    async fn test_data_entries_and_result_delete_first_entry_in_progress(pool: SqlitePool) {
+    async fn test_data_entry_reset_first_entry_in_progress(pool: SqlitePool) {
         // create data entry
         let polling_station_id = PollingStationId::from(1);
         let request_body = example_data_entry();
@@ -2010,7 +2010,7 @@ mod tests {
     }
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_3"))))]
-    async fn test_data_entries_and_result_delete_definitive(pool: SqlitePool) {
+    async fn test_data_entry_reset_definitive(pool: SqlitePool) {
         let polling_station_id = PollingStationId::from(3);
 
         // create data entry
@@ -2070,7 +2070,7 @@ mod tests {
     }
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
-    async fn test_data_entries_and_result_delete_fails_entries_different(pool: SqlitePool) {
+    async fn test_data_entry_reset_fails_entries_different(pool: SqlitePool) {
         let polling_station_id = PollingStationId::from(1);
         finalise_different_entries(pool.clone()).await;
 
@@ -2097,7 +2097,7 @@ mod tests {
     }
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
-    async fn test_data_entries_and_result_delete_fails_first_entry_has_errors(pool: SqlitePool) {
+    async fn test_data_entry_reset_fails_first_entry_has_errors(pool: SqlitePool) {
         let polling_station_id = PollingStationId::from(1);
         finalise_with_errors(pool.clone()).await;
 

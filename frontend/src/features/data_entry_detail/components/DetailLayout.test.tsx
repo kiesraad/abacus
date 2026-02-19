@@ -13,8 +13,8 @@ import {
   ElectionListRequestHandler,
   ElectionRequestHandler,
   ElectionStatusRequestHandler,
-  PollingStationDataEntriesAndResultDeleteHandler,
   PollingStationDataEntryGetHandler,
+  PollingStationDataEntryResetHandler,
 } from "@/testing/api-mocks/RequestHandlers";
 import { overrideOnce, server } from "@/testing/server";
 import { TestUserProvider } from "@/testing/TestUserProvider";
@@ -86,7 +86,7 @@ describe("DetailLayout", () => {
   });
 
   test("Delete data entry and return to status page with a message", async () => {
-    server.use(PollingStationDataEntriesAndResultDeleteHandler);
+    server.use(PollingStationDataEntryResetHandler);
     overrideOnce("get", "/api/polling_stations/5/data_entries/get", 200, dataEntryValidGetMockResponse);
     const user = userEvent.setup();
 
@@ -99,7 +99,7 @@ describe("DetailLayout", () => {
     expect(modal).toHaveTextContent(
       "Weet je zeker dat je de invoer voor stembureau 37 wilt verwijderen? Deze actie kan niet worden teruggedraaid.",
     );
-    const deleteDataEntries = spyOnHandler(PollingStationDataEntriesAndResultDeleteHandler);
+    const deleteDataEntries = spyOnHandler(PollingStationDataEntryResetHandler);
 
     const confirmButton = await within(modal).findByRole("button", { name: "Verwijder invoer" });
     await user.click(confirmButton);

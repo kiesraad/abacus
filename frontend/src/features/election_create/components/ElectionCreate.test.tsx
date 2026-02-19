@@ -200,12 +200,16 @@ async function setPollingStationRole(electionRole: ElectionRole = "GSB") {
     overrideOnce("post", "/api/elections/import/validate", 200, csbElectionValidateResponse(newElectionMockData));
 
     expect(await screen.findByRole("heading", { level: 2, name: "Rol van het stembureau" })).toBeInTheDocument();
-    screen.getByRole("radio", { name: "Centraal stembureau (CSB)" }).click();
+    await waitFor(() => {
+      screen.getByRole("radio", { name: "Centraal stembureau (CSB)" }).click();
+    });
     expect(screen.getByRole("radio", { name: "Centraal stembureau (CSB)" })).toBeChecked();
     expect(screen.getByRole("radio", { name: "Gemeentelijk stembureau (GSB)" })).not.toBeChecked();
   } else {
     overrideOnce("post", "/api/elections/import/validate", 200, electionValidateResponse(newElectionMockData));
-    screen.getByRole("radio", { name: "Gemeentelijk stembureau (GSB)" }).click();
+    await waitFor(() => {
+      screen.getByRole("radio", { name: "Gemeentelijk stembureau (GSB)" }).click();
+    });
     expect(screen.getByRole("radio", { name: "Gemeentelijk stembureau (GSB)" })).toBeChecked();
     expect(screen.getByRole("radio", { name: "Centraal stembureau (CSB)" })).not.toBeChecked();
   }

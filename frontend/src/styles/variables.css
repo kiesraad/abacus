@@ -119,7 +119,7 @@
   --interactive-visited: #6927da;
 
   --text-color-header: var(--gray-900);
-  --text-color-body: var(--gray-600);
+  --text-color-body: var(--gray-900);
 
   --button-color-primary: var(--blue-900);
   --button-color-primary-hover: var(--blue-800);

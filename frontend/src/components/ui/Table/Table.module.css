@@ -2,10 +2,10 @@
   width: 100%;
   line-height: 1.5rem;
   border-spacing: unset;
-  color: var(--color-help-text);
 
   thead {
     font-size: var(--font-size-xs);
+    color: var(--color-help-text);
   }
 
   th:not(:global(.bb-none)),

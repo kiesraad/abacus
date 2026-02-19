@@ -1018,13 +1018,13 @@ export interface PollingStation {
   data_entry_id?: DataEntryId;
   election_id: ElectionId;
   id: PollingStationId;
-  id_prev_session?: PollingStationId;
   locality: string;
   name: string;
   number: number;
   number_of_voters?: number;
   polling_station_type?: PollingStationType;
   postal_code: string;
+  prev_data_entry_id?: DataEntryId;
 }
 
 export interface PollingStationDetails {
@@ -1032,12 +1032,12 @@ export interface PollingStationDetails {
   polling_station_committee_session_id: CommitteeSessionId;
   polling_station_election_id: ElectionId;
   polling_station_id: PollingStationId;
-  polling_station_id_prev_session?: PollingStationId;
   polling_station_locality: string;
   polling_station_name: string;
   polling_station_number: number;
   polling_station_number_of_voters?: number;
   polling_station_postal_code: string;
+  polling_station_prev_data_entry_id?: DataEntryId;
   polling_station_type?: string;
 }
 

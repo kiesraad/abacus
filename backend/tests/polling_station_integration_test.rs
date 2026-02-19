@@ -134,9 +134,14 @@ async fn test_listing(pool: SqlitePool) {
     assert_eq!(polling_stations.len(), 2);
     let map = polling_stations
         .iter()
-        .map(|ps| (ps["id"].as_u64().unwrap(), ps["id_prev_session"].as_u64()))
+        .map(|ps| {
+            (
+                ps["id"].as_u64().unwrap(),
+                ps["prev_data_entry_id"].as_u64(),
+            )
+        })
         .collect::<Vec<(u64, Option<u64>)>>();
-    assert_eq!(map, vec![(741, Some(731)), (742, Some(732))]);
+    assert_eq!(map, vec![(741, Some(703)), (742, Some(704))]);
 }
 
 #[test(sqlx::test(fixtures(
@@ -272,7 +277,7 @@ async fn test_get(pool: SqlitePool) {
     let response = get_polling_station(&addr, &coordinator_cookie, 7, 742).await;
     let body: serde_json::Value = response.json().await.unwrap();
     assert_eq!(body["committee_session_id"], 704);
-    assert_eq!(body["id_prev_session"], 732);
+    assert_eq!(body["prev_data_entry_id"], 704);
     assert_eq!(body["name"], "TestB");
     assert_eq!(body["polling_station_type"], "FixedLocation");
 }

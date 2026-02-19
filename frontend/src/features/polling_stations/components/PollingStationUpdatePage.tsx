@@ -140,7 +140,7 @@ export function PollingStationUpdatePage() {
                 />
 
                 <div className="mt-md-lg">
-                  {requestState.data.id_prev_session !== undefined ? (
+                  {requestState.data.prev_data_entry_id !== undefined ? (
                     <section className="sm">
                       <strong>{t("polling_station.delete_not_possible.title")}</strong>
                       <p>{t("polling_station.delete_not_possible.pre_existing_polling_station")}</p>

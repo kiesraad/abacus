@@ -306,55 +306,36 @@ async fn fetch_results_for_committee_session(
             .map(|ps| (ps.id, ps))
             .collect();
 
-    // This is a recursive Common Table Expression (CTE)
-    // It traverses polling stations through previous committee sessions to find the most recent results
-    // while respecting investigations that require corrected results. It starts looking from the given
-    // committee session.
-    //
-    // A recursive CTE consists of two parts, the initial query and the recursive query.
-    // The initial query fetches the polling stations from the given committee session and any results
-    // based on the same conditions as the recursive query.
-    // The recursive query traverses previous committee sessions for each polling stations without results until:
-    // - Results are found (data entry state is 'Definitive')
-    // - Or results are expected due to an investigation requiring corrected results
-    // Finally we select all the rows that have results, ensuring we get the most recent results
-    //
-    // Results are now embedded in the 'Definitive' state of data_entries,
-    // extracted via json_extract(de.state, '$.state.results').
-    //
-    // This function returns the original polling station id and the found results. When no results are found,
-    // an error is thrown.
+    // Query to find the most recent results for each polling station.
+    // For each PS, it checks:
+    // 1. If the PS has its own Definitive data entry, use that
+    // 2. If there's no investigation requiring corrected results, use the previous data entry
+    //    (pointed to by prev_data_entry_id, which already skips intermediate sessions without results)
+    // 3. Otherwise, NULL (results are expected but not yet available)
     let results = query!(
         r#"
-        WITH RECURSIVE polling_stations_chain(original_id, id, id_prev_session, data, investigation) AS (
-            SELECT ps.id AS original_id, ps.id, ps.id_prev_session,
-                   CASE WHEN json_extract(de.state, '$.status') = 'Definitive'
-                        THEN json_extract(de.state, '$.state.results')
-                        ELSE NULL END AS data,
-                   psi.polling_station_id
+        WITH results AS (
+            SELECT ps.id AS original_id,
+                   CASE
+                       WHEN json_extract(de.state, '$.status') = 'Definitive'
+                           THEN json_extract(de.state, '$.state.results')
+                       WHEN psi.polling_station_id IS NULL
+                           AND json_extract(prev_de.state, '$.status') = 'Definitive'
+                           THEN json_extract(prev_de.state, '$.state.results')
+                       ELSE NULL
+                   END AS data
             FROM polling_stations AS ps
             LEFT JOIN data_entries AS de ON de.id = ps.data_entry_id
-            LEFT JOIN polling_station_investigations AS psi ON psi.polling_station_id = ps.id AND psi.corrected_results = 1
+            LEFT JOIN data_entries AS prev_de ON prev_de.id = ps.prev_data_entry_id
+            LEFT JOIN polling_station_investigations AS psi
+                ON psi.polling_station_id = ps.id AND psi.corrected_results = 1
             WHERE ps.committee_session_id = $1 AND ($2 IS NULL OR ps.id = $2)
-
-            UNION ALL
-
-            SELECT sc.original_id, ps.id, ps.id_prev_session,
-                   CASE WHEN json_extract(de.state, '$.status') = 'Definitive'
-                        THEN json_extract(de.state, '$.state.results')
-                        ELSE NULL END AS data,
-                   psi.polling_station_id
-            FROM polling_stations_chain AS sc
-            JOIN polling_stations AS ps ON ps.id = sc.id_prev_session
-            LEFT JOIN data_entries AS de ON de.id = ps.data_entry_id
-            LEFT JOIN polling_station_investigations AS psi ON psi.polling_station_id = ps.id AND psi.corrected_results = 1
-            WHERE sc.data IS NULL AND sc.investigation IS NULL
         )
         SELECT
-            sc.original_id AS "original_id!: PollingStationId",
-            sc.data AS "data: Json<PollingStationResults>"
-        FROM polling_stations_chain AS sc
-        WHERE sc.data IS NOT NULL
+            original_id AS "original_id!: PollingStationId",
+            data AS "data: Json<PollingStationResults>"
+        FROM results
+        WHERE data IS NOT NULL
         "#,
         committee_session_id,
         polling_station_id,
@@ -386,29 +367,29 @@ pub async fn list_results_for_committee_session(
     fetch_results_for_committee_session(conn, committee_session_id, None).await
 }
 
-/// Given a polling station id, find the previous results for that polling station
-/// Uses the CTE in fetch_results_for_committee_session to look back through previous committee sessions.
+/// Given a polling station id, find the previous results for that polling station.
+/// Directly queries the data entry pointed to by prev_data_entry_id.
 pub async fn previous_results_for_polling_station(
     conn: &mut SqliteConnection,
     polling_station_id: PollingStationId,
 ) -> Result<PollingStationResults, sqlx::Error> {
     let polling_station = polling_station_repo::get(conn, polling_station_id).await?;
-    let ps_id_prev_session = polling_station
-        .id_prev_session
+    let prev_data_entry_id = polling_station
+        .prev_data_entry_id
         .ok_or(sqlx::Error::RowNotFound)?;
 
-    let prev_session_id =
-        committee_session_repo::get_previous_session(conn, polling_station.committee_session_id)
-            .await?
-            .ok_or(sqlx::Error::RowNotFound)?
-            .id;
+    let row = query!(
+        r#"
+        SELECT json_extract(de.state, '$.state.results') AS "data: Json<PollingStationResults>"
+        FROM data_entries AS de
+        WHERE de.id = $1 AND json_extract(de.state, '$.status') = 'Definitive'
+        "#,
+        prev_data_entry_id,
+    )
+    .fetch_one(conn)
+    .await?;
 
-    fetch_results_for_committee_session(conn, prev_session_id, Some(ps_id_prev_session))
-        .await?
-        .into_iter()
-        .next()
-        .map(|(_, data)| data)
-        .ok_or(sqlx::Error::RowNotFound)
+    row.data.map(|d| d.0).ok_or(sqlx::Error::RowNotFound)
 }
 
 /// Checks if results are complete for a committee session by verifying that
@@ -430,7 +411,7 @@ pub async fn are_results_complete_for_committee_session(
         FROM polling_stations AS ps
         LEFT JOIN data_entries AS de ON de.id = ps.data_entry_id
         WHERE ps.committee_session_id = ?
-          AND ps.id_prev_session IS NULL
+          AND ps.prev_data_entry_id IS NULL
           AND (de.state IS NULL OR json_extract(de.state, '$.status') != 'Definitive')
         "#,
         committee_session_id
@@ -599,11 +580,11 @@ mod tests {
                 .unwrap();
             assert_eq!(results.len(), 2);
 
-            assert_eq!(results[0].0.id, PollingStationId::from(742));
-            assert_eq!(results[0].1.voters_counts().proxy_certificate_count, 4);
+            assert_eq!(results[0].0.id, PollingStationId::from(741));
+            assert_eq!(results[0].1.voters_counts().proxy_certificate_count, 3);
 
-            assert_eq!(results[1].0.id, PollingStationId::from(741));
-            assert_eq!(results[1].1.voters_counts().proxy_certificate_count, 3);
+            assert_eq!(results[1].0.id, PollingStationId::from(742));
+            assert_eq!(results[1].1.voters_counts().proxy_certificate_count, 4);
         }
 
         /// Test with 4th session, one polling station with investigation, corrected results=true and results exist
@@ -745,14 +726,14 @@ mod tests {
                 .unwrap();
             assert_eq!(results.len(), 3);
 
-            assert_eq!(results[0].0.id, PollingStationId::from(743));
-            assert_eq!(results[0].1.voters_counts().proxy_certificate_count, 10);
+            assert_eq!(results[0].0.id, PollingStationId::from(741));
+            assert_eq!(results[0].1.voters_counts().proxy_certificate_count, 3);
 
             assert_eq!(results[1].0.id, PollingStationId::from(742));
             assert_eq!(results[1].1.voters_counts().proxy_certificate_count, 4);
 
-            assert_eq!(results[2].0.id, PollingStationId::from(741));
-            assert_eq!(results[2].1.voters_counts().proxy_certificate_count, 3);
+            assert_eq!(results[2].0.id, PollingStationId::from(743));
+            assert_eq!(results[2].1.voters_counts().proxy_certificate_count, 10);
         }
 
         /// Test with 4th session, new polling station with investigation, corrected results=true and results don't exist (error)
@@ -820,12 +801,15 @@ mod tests {
             .await
             .unwrap();
 
-            // Add new polling station to fourth session, linked to the one in third session, but without investigation or results
+            // Add new polling station to fourth session, linked to the data entry from third session, but without investigation or results
+            let prev_data_entry = get_data_entry(&mut conn, PollingStationId::from(733))
+                .await
+                .unwrap();
             insert_test_polling_station(
                 &mut conn,
                 PollingStationId::from(743),
                 CommitteeSessionId::from(704),
-                Some(PollingStationId::from(733)),
+                Some(prev_data_entry.id),
                 123,
             )
             .await
@@ -836,14 +820,14 @@ mod tests {
                 .unwrap();
             assert_eq!(results.len(), 3);
 
-            assert_eq!(results[0].0.id, PollingStationId::from(742));
-            assert_eq!(results[0].1.voters_counts().proxy_certificate_count, 4);
+            assert_eq!(results[0].0.id, PollingStationId::from(741));
+            assert_eq!(results[0].1.voters_counts().proxy_certificate_count, 3);
 
-            assert_eq!(results[1].0.id, PollingStationId::from(743));
-            assert_eq!(results[1].1.voters_counts().proxy_certificate_count, 10);
+            assert_eq!(results[1].0.id, PollingStationId::from(742));
+            assert_eq!(results[1].1.voters_counts().proxy_certificate_count, 4);
 
-            assert_eq!(results[2].0.id, PollingStationId::from(741));
-            assert_eq!(results[2].1.voters_counts().proxy_certificate_count, 3);
+            assert_eq!(results[2].0.id, PollingStationId::from(743));
+            assert_eq!(results[2].1.voters_counts().proxy_certificate_count, 10);
         }
     }
 

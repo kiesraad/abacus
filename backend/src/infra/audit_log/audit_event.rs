@@ -107,7 +107,7 @@ pub struct PollingStationDetails {
     pub polling_station_committee_session_id: CommitteeSessionId,
     #[serde(skip_serializing_if = "Option::is_none")]
     #[schema(nullable = false)]
-    pub polling_station_id_prev_session: Option<PollingStationId>,
+    pub polling_station_prev_data_entry_id: Option<DataEntryId>,
     pub polling_station_name: String,
     pub polling_station_number: u32,
     #[serde(skip_serializing_if = "Option::is_none")]

@@ -271,7 +271,7 @@ async fn data_entry_claim(
     let (polling_station, election, committee_session, state) =
         validate_and_get_data(&mut tx, polling_station_id, &user.0).await?;
 
-    let previous_results = if polling_station.id_prev_session.is_some() {
+    let previous_results = if polling_station.prev_data_entry_id.is_some() {
         Some(previous_results_for_polling_station(&mut tx, polling_station_id).await?)
     } else {
         None

@@ -35,7 +35,7 @@ export function PollingStationForm({ electionId, pollingStation, onSaved, onCanc
   const [lastSubmit, setLastSubmit] = useState<PollingStationRequest>();
 
   const isUpdate = !!pollingStation;
-  const isPreExistingPollingStation = isUpdate && pollingStation.id_prev_session !== undefined;
+  const isPreExistingPollingStation = isUpdate && pollingStation.prev_data_entry_id !== undefined;
 
   const formFields: FormFields<PollingStationRequest> = {
     number: isPreExistingPollingStation

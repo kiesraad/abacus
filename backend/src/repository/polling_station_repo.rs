@@ -40,7 +40,7 @@ pub async fn list(
             p.id AS "id: _",
             c.election_id AS "election_id: _",
             p.committee_session_id AS "committee_session_id: _",
-            p.id_prev_session AS "id_prev_session: _",
+            p.prev_data_entry_id AS "prev_data_entry_id: _",
             p.data_entry_id AS "data_entry_id: _",
             p.name,
             p.number AS "number: u32",
@@ -71,7 +71,7 @@ pub async fn get(
             p.id AS "id: _",
             c.election_id AS "election_id: _",
             p.committee_session_id AS "committee_session_id: _",
-            p.id_prev_session AS "id_prev_session: _",
+            p.prev_data_entry_id AS "prev_data_entry_id: _",
             p.data_entry_id AS "data_entry_id: _",
             p.name,
             p.number AS "number: u32",
@@ -112,7 +112,7 @@ pub async fn get_for_election(
             p.id AS "id: _",
             c.election_id AS "election_id: _",
             p.committee_session_id AS "committee_session_id: _",
-            p.id_prev_session AS "id_prev_session: _",
+            p.prev_data_entry_id AS "prev_data_entry_id: _",
             p.data_entry_id AS "data_entry_id: _",
             p.name,
             p.number AS "number: u32",
@@ -155,7 +155,7 @@ pub async fn create(
         r#"
         INSERT INTO polling_stations (
             committee_session_id,
-            id_prev_session,
+            prev_data_entry_id,
             name,
             number,
             number_of_voters,
@@ -168,7 +168,7 @@ pub async fn create(
             id AS "id: _",
             ? AS "election_id!: _", -- Workaround to get election_id in the result without a temporary struct
             committee_session_id AS "committee_session_id: _",
-            id_prev_session AS "id_prev_session: _",
+            prev_data_entry_id AS "prev_data_entry_id: _",
             data_entry_id AS "data_entry_id: _",
             name,
             number AS "number: u32",
@@ -222,7 +222,7 @@ pub async fn create_many(
                 r#"
             INSERT INTO polling_stations (
                 committee_session_id,
-                id_prev_session,
+                prev_data_entry_id,
                 name,
                 number,
                 number_of_voters,
@@ -235,7 +235,7 @@ pub async fn create_many(
                 id AS "id: _",
                 ? AS "election_id!: ElectionId", -- Workaround to get election_id in the result without a temporary struct
                 committee_session_id AS "committee_session_id: _",
-                id_prev_session AS "id_prev_session: _",
+                prev_data_entry_id AS "prev_data_entry_id: _",
                 data_entry_id AS "data_entry_id: _",
                 name,
                 number AS "number: u32",
@@ -278,7 +278,7 @@ pub async fn update(
             .ok_or(sqlx::Error::RowNotFound)?;
 
     let polling_station = get(&mut tx, polling_station_id).await?;
-    if polling_station.id_prev_session.is_some() && polling_station_update.number.is_some() {
+    if polling_station.prev_data_entry_id.is_some() && polling_station_update.number.is_some() {
         return Err(sqlx::Error::InvalidArgument(
             "number cannot be updated for polling stations linked to a previous session"
                 .to_string(),
@@ -303,7 +303,7 @@ pub async fn update(
             id AS "id: _",
             ? AS "election_id!: _", -- Workaround to get election_id in the result without a temporary struct
             committee_session_id AS "committee_session_id: _",
-            id_prev_session AS "id_prev_session: _",
+            prev_data_entry_id AS "prev_data_entry_id: _",
             data_entry_id AS "data_entry_id: _",
             name,
             number AS "number: u32",
@@ -365,7 +365,7 @@ pub async fn duplicate_for_committee_session(
         r#"
         INSERT INTO polling_stations (
             committee_session_id,
-            id_prev_session,
+            prev_data_entry_id,
             name,
             number,
             number_of_voters,
@@ -376,7 +376,7 @@ pub async fn duplicate_for_committee_session(
         )
         SELECT
             ? AS committee_session_id,
-            id AS id_prev_session,
+            COALESCE(data_entry_id, prev_data_entry_id) AS prev_data_entry_id,
             name,
             number,
             number_of_voters,
@@ -400,14 +400,14 @@ pub async fn insert_test_polling_station(
     conn: &mut SqliteConnection,
     polling_station_id: PollingStationId,
     committee_session_id: CommitteeSessionId,
-    id_prev_session: Option<PollingStationId>,
+    prev_data_entry_id: Option<crate::domain::data_entry::DataEntryId>,
     number: u32,
 ) -> Result<(), sqlx::Error> {
     query!(
-        "INSERT INTO polling_stations (id, committee_session_id, id_prev_session, name, number, address, postal_code, locality) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+        "INSERT INTO polling_stations (id, committee_session_id, prev_data_entry_id, name, number, address, postal_code, locality) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
         polling_station_id,
         committee_session_id,
-        id_prev_session,
+        prev_data_entry_id,
         "Test name",
         number,
         "Test address",

@@ -815,7 +815,7 @@ VALUES (4, '{"status":"Empty"}', '2024-12-05 09:15:00'),
        (5, '{"status":"Empty"}', '2024-12-05 09:15:00'),
        (6, '{"status":"Empty"}', '2024-12-05 09:15:00');
 
-INSERT INTO polling_stations (id, committee_session_id, id_prev_session, data_entry_id, name, number, number_of_voters, polling_station_type, address,
+INSERT INTO polling_stations (id, committee_session_id, prev_data_entry_id, data_entry_id, name, number, number_of_voters, polling_station_type, address,
                               postal_code, locality)
 VALUES (4, 1, NULL, 4, 'Studio The Rules', 1, NULL, 'FixedLocation', 'Gerontoplein 1', '1337 YQ', 'Juinen'),
        (5, 1, NULL, 5, 'Buurtcentrum de Mattenklopper', 2, 1000, 'Special', 'Complexiteitslaan 2b', '1337 QY',

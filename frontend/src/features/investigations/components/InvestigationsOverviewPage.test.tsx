@@ -134,7 +134,7 @@ describe("InvestigationsOverviewPage", () => {
         ...pollingStationMockData.slice(0, 3),
         {
           ...pollingStationMockData[4]!,
-          id_prev_session: undefined,
+          prev_data_entry_id: undefined,
         },
       ] satisfies PollingStation[],
     });
@@ -155,7 +155,7 @@ describe("InvestigationsOverviewPage", () => {
         ...pollingStationMockData.slice(0, 3),
         {
           ...pollingStationMockData[4]!,
-          id_prev_session: undefined,
+          prev_data_entry_id: undefined,
         },
       ] satisfies PollingStation[],
     });
@@ -183,11 +183,11 @@ describe("InvestigationsOverviewPage", () => {
         ...pollingStationMockData.slice(0, 3),
         {
           ...pollingStationMockData[4]!,
-          id_prev_session: undefined,
+          prev_data_entry_id: undefined,
         },
         {
           ...pollingStationMockData[5]!,
-          id_prev_session: undefined,
+          prev_data_entry_id: undefined,
         },
       ] satisfies PollingStation[],
     });

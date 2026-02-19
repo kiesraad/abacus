@@ -114,7 +114,7 @@ describe("PollingStationUpdatePage", () => {
     test("Delete button should not be shown when polling station is linked to previous session", async () => {
       overrideOnce("get", "/api/elections/1/polling_stations/1", 200, {
         ...testPollingStation,
-        id_prev_session: 42,
+        prev_data_entry_id: 42,
       });
 
       renderPage("coordinator");

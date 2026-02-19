@@ -229,7 +229,8 @@ async fn polling_station_investigation_conclude(
     let committee_session = validate_and_get_committee_session(&mut tx, polling_station_id).await?;
 
     let polling_station = polling_station_repo::get(&mut tx, polling_station_id).await?;
-    if polling_station.id_prev_session.is_none() && !polling_station_investigation.corrected_results
+    if polling_station.prev_data_entry_id.is_none()
+        && !polling_station_investigation.corrected_results
     {
         return Err(APIError::Conflict(
             "Investigation requires corrected results, because the polling station is not part of a previous session".into(),
@@ -339,7 +340,7 @@ async fn polling_station_investigation_update(
     let committee_session = validate_and_get_committee_session(&mut tx, polling_station_id).await?;
 
     let polling_station = polling_station_repo::get(&mut tx, polling_station_id).await?;
-    if polling_station.id_prev_session.is_none()
+    if polling_station.prev_data_entry_id.is_none()
         && investigation_update_request.corrected_results != Some(true)
     {
         return Err(APIError::Conflict(
@@ -496,7 +497,7 @@ async fn polling_station_investigation_download_corrigendum_pdf(
     let election: ElectionWithPoliticalGroups =
         election_repo::get(&mut conn, polling_station.election_id).await?;
 
-    let previous_results = match polling_station.id_prev_session {
+    let previous_results = match polling_station.prev_data_entry_id {
         Some(_) => {
             match previous_results_for_polling_station(&mut conn, polling_station_id).await {
                 Ok(results) => results,

@@ -486,7 +486,7 @@ mod tests {
 
         // Insert two unique polling stations
         let _ = query!(r#"
-INSERT INTO polling_stations (id, committee_session_id, id_prev_session, name, number, number_of_voters, polling_station_type, address, postal_code, locality)
+INSERT INTO polling_stations (id, committee_session_id, prev_data_entry_id, name, number, number_of_voters, polling_station_type, address, postal_code, locality)
 VALUES
 (1, 2, NULL, 'Op Rolletjes', 33, NULL, 'mobiel', 'Rijksweg A12 1', '1234 YQ', 'Den Haag'),
 (2, 2, NULL, 'Testplek', 34, NULL, 'bijzonder', 'Teststraat 2b', '1234 QY', 'Testdorp')
@@ -497,7 +497,7 @@ VALUES
 
         // Add a polling station with the same number to a different election
         let _ = query!(r#"
-INSERT INTO polling_stations (id, committee_session_id, id_prev_session, name, number, number_of_voters, polling_station_type, address, postal_code, locality)
+INSERT INTO polling_stations (id, committee_session_id, prev_data_entry_id, name, number, number_of_voters, polling_station_type, address, postal_code, locality)
 VALUES
 (3, 3, NULL, 'Op Rolletjes', 33, NULL, 'mobiel', 'Rijksweg A12 1', '1234 YQ', 'Den Haag');
 "#)
@@ -507,7 +507,7 @@ VALUES
 
         // Add a polling station with a duplicate number and assert that it fails
         let result = query!(r#"
-INSERT INTO polling_stations (id, committee_session_id, id_prev_session, name, number, number_of_voters, polling_station_type, address, postal_code, locality)
+INSERT INTO polling_stations (id, committee_session_id, prev_data_entry_id, name, number, number_of_voters, polling_station_type, address, postal_code, locality)
 VALUES
 (4, 2, NULL, 'Op Rolletjes', 33, NULL, 'mobiel', 'Rijksweg A12 1', '1234 YQ', 'Den Haag');
 "#)
@@ -604,7 +604,7 @@ VALUES
         let election_id = ElectionId::from(7);
         let polling_station_id = PollingStationId::from(741);
 
-        // Update a polling station that has an id_prev_session reference
+        // Update a polling station that has a prev_data_entry_id reference
         // ... without number change
         let result = update(&mut conn, election_id, polling_station_id, data.clone()).await;
         assert!(result.is_ok());
@@ -617,7 +617,7 @@ VALUES
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_7_four_sessions"))))]
     async fn test_delete_restricted_when_prev_session(pool: SqlitePool) {
-        // Try to delete a polling station that has an id_prev_session reference
+        // Try to delete a polling station that has a prev_data_entry_id reference
         let result = query!("DELETE FROM polling_stations WHERE id = 721")
             .execute(&pool)
             .await;

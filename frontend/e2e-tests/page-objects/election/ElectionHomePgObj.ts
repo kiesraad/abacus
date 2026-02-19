@@ -8,7 +8,7 @@ export class ElectionHome {
   readonly startButton: Locator;
   readonly statusButton: Locator;
   readonly pollingStationsRow: Locator;
-  readonly downloadBijlage1: Locator;
+  readonly downloadNa31_2Bijlage1: Locator;
   readonly downloadN10_2: Locator;
   readonly downloadInlegvel: Locator;
 
@@ -20,7 +20,7 @@ export class ElectionHome {
     this.startButton = page.getByRole("button", { name: "Start invoer" });
     this.statusButton = page.getByRole("link", { name: "Bekijk voortgang" });
     this.pollingStationsRow = page.getByRole("rowheader", { name: "Stembureaus" });
-    this.downloadBijlage1 = page.getByRole("cell", { name: "Na 31-2 Bijlage 1" });
+    this.downloadNa31_2Bijlage1 = page.getByRole("cell", { name: "Na 31-2 Bijlage 1" });
     this.downloadN10_2 = page.getByRole("cell", { name: "N 10-2" });
     this.downloadInlegvel = page.getByRole("cell", { name: "Na 31-2 Inlegvel" });
   }

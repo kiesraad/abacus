@@ -283,7 +283,7 @@ test.describe("full flow", () => {
     await expect(electionHomePage.header).toContainText("Gemeenteraad Test 2022");
 
     const downloadPromise = page.waitForEvent("download");
-    await electionHomePage.downloadBijlage1.click();
+    await electionHomePage.downloadNa31_2Bijlage1.click();
     const download = await downloadPromise;
 
     expect(download.suggestedFilename()).toBe("GR2022_Test_na_31_2_bijlage1.zip");

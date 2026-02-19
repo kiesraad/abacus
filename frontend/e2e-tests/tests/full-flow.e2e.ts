@@ -64,19 +64,34 @@ const investigations = [
   },
 ];
 
+// Note: Do not use the randomSuffix in test titles. You cannot interpolate a non-static value.
+// Using the randomSuffix in test titles will result in those tests being executed last.
+const randomSuffix = Date.now();
+
 const adminUser: TestUser = {
-  username: `admin-${crypto.getRandomValues(new Uint32Array(1))}`,
+  username: `admin-${randomSuffix}`,
   fullname: `full flow admin`,
   role: "administrator",
 };
 
 const coordinatorUser: TestUser = {
-  username: `coordinator-${crypto.getRandomValues(new Uint32Array(1))}`,
+  username: `coordinator-${randomSuffix}`,
   fullname: `full flow coordinator`,
   role: "coordinator",
 };
 
-const typistBaseNameUsers = ["typist3", "typist4"];
+const typistUsers: TestUser[] = [
+  {
+    username: `typist3-${randomSuffix}`,
+    fullname: `full flow typist3`,
+    role: "typist",
+  },
+  {
+    username: `typist4-${randomSuffix}`,
+    fullname: `full flow typist4`,
+    role: "typist",
+  },
+];
 
 test.describe.configure({ mode: "serial" });
 
@@ -202,7 +217,7 @@ test.describe("full flow", () => {
     await logout(page);
   });
 
-  test(`create typist user accounts`, async ({ page, browserName }) => {
+  test(`create typist user accounts`, async ({ page }) => {
     await page.goto("/account/login");
 
     const loginPage = new LoginPgObj(page);
@@ -212,7 +227,7 @@ test.describe("full flow", () => {
     await expect(userInfoTopBar.username).toHaveText(adminUser.fullname);
 
     // Create browser-specific typists
-    for (const username of typistBaseNameUsers) {
+    for (const typist of typistUsers) {
       const adminNavBar = new AdminNavBar(page);
       await adminNavBar.users.click();
 
@@ -226,17 +241,10 @@ test.describe("full flow", () => {
       const userCreateTypePgObj = new UserCreateTypePgObj(page);
       await userCreateTypePgObj.continue.click();
 
-      const typistUsername = `${username}-${browserName}`;
       const userCreateDetailsPgObj = new UserCreateDetailsPgObj(page);
-      await userCreateDetailsPgObj.createNamedUser(
-        typistUsername,
-        `Typist ${typistUsername}`,
-        typistUsername.repeat(3),
-      );
-
-      await expect(userListPgObj.alert).toContainText(`${typistUsername} is toegevoegd met de rol Invoerder`);
+      await userCreateDetailsPgObj.createNamedUser(typist.username, typist.fullname, typist.username.repeat(3));
+      await expect(userListPgObj.alert).toContainText(`${typist.username} is toegevoegd met de rol Invoerder`);
     }
-
     await logout(page);
   });
 
@@ -314,14 +322,13 @@ test.describe("full flow", () => {
     await logout(page);
   });
 
-  for (const typist of typistBaseNameUsers) {
-    test(`complete typist user account for ${typist}`, async ({ page, browserName }) => {
+  for (const typist of typistUsers) {
+    test(`complete user account for ${typist.fullname}`, async ({ page }) => {
       await page.goto("/account/login");
       const loginPage = new LoginPgObj(page);
-      const username = `${typist}-${browserName}`;
-      await loginPage.login(username, username.repeat(3));
+      await loginPage.login(typist.username, typist.username.repeat(3));
 
-      const password = getTestPassword(typist);
+      const password = getTestPassword(typist.username);
       const accountSetupPage = new AccountSetupPgObj(page);
       await accountSetupPage.password.fill(password);
       await accountSetupPage.passwordRepeat.fill(password);
@@ -338,12 +345,13 @@ test.describe("full flow", () => {
     { number: "1", name: "Stadhuis" },
     { number: "2", name: "Basisschool de Regenboog" },
   ]) {
-    test(`first data entry ${station.name}`, async ({ page, browserName }) => {
+    test(`first data entry ${station.name}`, async ({ page }) => {
       await page.goto("/account/login");
 
-      const username = `typist3-${browserName}`;
+      const firstTypist = typistUsers[0]!;
       const loginPage = new LoginPgObj(page);
-      await loginPage.login(username, getTestPassword("typist3"));
+      const password = getTestPassword(firstTypist.username);
+      await loginPage.login(firstTypist.username, password);
 
       const overviewPage = new ElectionsOverviewPgObj(page);
       await expect(overviewPage.header).toBeVisible();
@@ -361,12 +369,12 @@ test.describe("full flow", () => {
       await logout(page);
     });
 
-    test(`second data entry ${station.name}`, async ({ page, browserName }) => {
+    test(`second data entry ${station.name}`, async ({ page }) => {
       await page.goto("/account/login");
 
-      const username = `typist4-${browserName}`;
+      const secondTypist = typistUsers.filter((typist) => typist.username.startsWith("typist4"))[0]!;
       const loginPage = new LoginPgObj(page);
-      await loginPage.login(username, getTestPassword("typist4"));
+      await loginPage.login(secondTypist.username, getTestPassword(secondTypist.username));
 
       const overviewPage = new ElectionsOverviewPgObj(page);
       await expect(overviewPage.header).toBeVisible();
@@ -565,13 +573,12 @@ test.describe("full flow", () => {
     });
   }
 
-  for (const typist of typistBaseNameUsers) {
-    test(`corrected data entry with ${typist}`, async ({ page, browserName }) => {
+  for (const user of typistUsers) {
+    test(`corrected data entry with ${user.fullname}`, async ({ page }) => {
       await page.goto("/account/login");
 
-      const username = `${typist}-${browserName}`;
       const loginPage = new LoginPgObj(page);
-      await loginPage.login(username, getTestPassword(typist));
+      await loginPage.login(user.username, getTestPassword(user.username));
 
       const overviewPage = new ElectionsOverviewPgObj(page);
       await expect(overviewPage.header).toBeVisible();
@@ -614,13 +621,12 @@ test.describe("full flow", () => {
     });
   }
 
-  for (const typist of typistBaseNameUsers) {
-    test(`data entry for new polling station with ${typist}`, async ({ page, browserName }) => {
+  for (const typist of typistUsers) {
+    test(`data entry for new polling station with ${typist.fullname}`, async ({ page }) => {
       await page.goto("/account/login");
 
-      const username = `${typist}-${browserName}`;
       const loginPage = new LoginPgObj(page);
-      await loginPage.login(username, getTestPassword(typist));
+      await loginPage.login(typist.username, getTestPassword(typist.username));
 
       const overviewPage = new ElectionsOverviewPgObj(page);
       await expect(overviewPage.header).toBeVisible();

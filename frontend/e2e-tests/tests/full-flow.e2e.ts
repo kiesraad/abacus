@@ -64,6 +64,12 @@ const investigations = [
   },
 ];
 
+const adminUser: TestUser = {
+  username: `admin-${crypto.getRandomValues(new Uint32Array(1))}`,
+  fullname: `full flow admin`,
+  role: "administrator",
+};
+
 const typistBaseNameUsers = ["typist3", "typist4"];
 
 test.describe.configure({ mode: "serial" });
@@ -71,29 +77,22 @@ test.describe.configure({ mode: "serial" });
 test.describe("full flow", () => {
   let electionId: number | null = null;
 
-  test("create and complete admin user account", async ({ adminOne, browserName }) => {
+  test("create and complete admin user account", async ({ adminOne }) => {
     const { request: adminOneContext } = adminOne;
 
-    const user: TestUser = {
-      role: "administrator",
-      fullname: "John Doe",
-      username: `admin-${browserName}`,
-    };
-
-    await createUser(adminOneContext, user);
+    await createUser(adminOneContext, adminUser);
 
     const newAdminContext = await request.newContext();
-    await firstLogin(newAdminContext, user);
+    await firstLogin(newAdminContext, adminUser);
     const logoutResponse = await apiLogout(newAdminContext);
     expect(logoutResponse.status()).toBe(204);
   });
 
-  test("create election and a new polling station", async ({ page, browserName }) => {
+  test("create election and a new polling station", async ({ page }) => {
     await page.goto("/account/login");
 
-    const adminUsername = `admin-${browserName}`;
     const loginPage = new LoginPgObj(page);
-    await loginPage.login(adminUsername, getTestPassword(adminUsername));
+    await loginPage.login(adminUser.username, getTestPassword(adminUser.username));
 
     const electionsOverviewPage = new ElectionsOverviewPgObj(page);
     await electionsOverviewPage.create.click();
@@ -152,12 +151,11 @@ test.describe("full flow", () => {
   test(`create coordinator user account`, async ({ page, browserName }) => {
     await page.goto("/account/login");
 
-    const adminUsername = `admin-${browserName}`;
     const loginPage = new LoginPgObj(page);
-    await loginPage.login(adminUsername, getTestPassword(adminUsername));
+    await loginPage.login(adminUser.username, getTestPassword(adminUser.username));
 
     const userInfoTopBar = new UserInfoTopBar(page);
-    await expect(userInfoTopBar.username).toHaveText(`John Doe`);
+    await expect(userInfoTopBar.username).toHaveText(adminUser.fullname);
 
     const adminNavBar = new AdminNavBar(page);
     await adminNavBar.users.click();
@@ -203,12 +201,11 @@ test.describe("full flow", () => {
   test(`create typist user accounts`, async ({ page, browserName }) => {
     await page.goto("/account/login");
 
-    const adminUsername = `admin-${browserName}`;
     const loginPage = new LoginPgObj(page);
-    await loginPage.login(adminUsername, getTestPassword(adminUsername));
+    await loginPage.login(adminUser.username, getTestPassword(adminUser.username));
 
     const userInfoTopBar = new UserInfoTopBar(page);
-    await expect(userInfoTopBar.username).toHaveText(`John Doe`);
+    await expect(userInfoTopBar.username).toHaveText(adminUser.fullname);
 
     // Create browser-specific typists
     for (const username of typistBaseNameUsers) {

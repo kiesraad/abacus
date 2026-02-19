@@ -132,6 +132,7 @@ import {
   saveDataEntryResponse,
 } from "./DataEntryMockData";
 import {
+  csbElectionImportMockResponse,
   electionDetailsMockResponse,
   electionImportMockResponse,
   electionImportValidateMockResponse,
@@ -316,6 +317,14 @@ export const ElectionImportRequestHandler = http.post<
   ElectionWithPoliticalGroups
 >("/api/elections/import" satisfies ELECTION_IMPORT_REQUEST_PATH, () =>
   HttpResponse.json(electionImportMockResponse, { status: 201 }),
+);
+
+export const CSBElectionImportRequestHandler = http.post<
+  ParamsToString<ELECTION_IMPORT_REQUEST_PARAMS>,
+  ELECTION_IMPORT_REQUEST_BODY,
+  ElectionWithPoliticalGroups
+>("/api/elections/import" satisfies ELECTION_IMPORT_REQUEST_PATH, () =>
+  HttpResponse.json(csbElectionImportMockResponse, { status: 201 }),
 );
 
 export const ElectionImportValidateRequestHandler = http.post<

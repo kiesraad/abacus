@@ -265,6 +265,20 @@ export const electionListMockResponse: ElectionListResponse = {
       election_date: "2024-11-30",
       nomination_date: "2024-11-01",
     },
+    {
+      id: 2,
+      name: "Gemeenteraadsverkiezingen 2026",
+      role: "CSB",
+      counting_method: "CSO",
+      election_id: "Heemdamseburg_2024",
+      location: "Heemdamseburg",
+      domain_id: "0035",
+      category: "Municipal",
+      number_of_seats: 0,
+      number_of_voters: 0,
+      election_date: "2024-11-30",
+      nomination_date: "2024-11-01",
+    },
   ],
 };
 
@@ -328,6 +342,29 @@ export const getElectionMockData = (
   };
 };
 
+export const getCSBElectionMockData = (
+  election: Partial<ElectionWithPoliticalGroups> = {},
+  committeeSession: Partial<CommitteeSession> = {},
+  investigations: PollingStationInvestigation[] = mockInvestigations,
+): Required<ElectionDetailsResponse> => {
+  const updatedCommitteeSession = getCommitteeSessionMockData(committeeSession);
+
+  updatedCommitteeSession.id = 2;
+  updatedCommitteeSession.election_id = 2;
+
+  return {
+    current_committee_session: updatedCommitteeSession,
+    committee_sessions: [updatedCommitteeSession],
+    election: {
+      ...electionListMockResponse.elections[1]!,
+      political_groups: [],
+      ...election,
+    },
+    polling_stations: [],
+    investigations: updatedCommitteeSession.number > 1 ? investigations : [],
+  };
+};
+
 export const getInvestigationMockData = (
   investigations: PollingStationInvestigation[] = mockInvestigations,
 ): InvestigationListResponse => {
@@ -338,10 +375,16 @@ export const getInvestigationMockData = (
 
 export const investigationListMockResponse: InvestigationListResponse = getInvestigationMockData();
 export const electionDetailsMockResponse: Required<ElectionDetailsResponse> = getElectionMockData();
+export const csbElectionDetailsMockResponse: Required<ElectionDetailsResponse> = getCSBElectionMockData();
 export const electionMockData = electionDetailsMockResponse.election;
 export const newElectionMockData = {
   ...electionDetailsMockResponse.election,
   polling_stations: pollingStationMockData,
+} as Required<NewElection>;
+
+export const newCSBElectionMockData = {
+  ...csbElectionDetailsMockResponse.election,
+  role: "CSB",
 } as Required<NewElection>;
 
 export const electionImportMockResponse: ElectionWithPoliticalGroups = {
@@ -358,6 +401,22 @@ export const electionImportMockResponse: ElectionWithPoliticalGroups = {
   election_date: "2022-03-16",
   nomination_date: "2022-01-31",
   political_groups: politicalGroupsMockData,
+};
+
+export const csbElectionImportMockResponse: ElectionWithPoliticalGroups = {
+  id: 2,
+  name: "Gemeenteraad Test 2022",
+  role: "CSB",
+  counting_method: "CSO",
+  election_id: "GR2022_Test",
+  location: "Test",
+  domain_id: "0000",
+  category: "Municipal",
+  number_of_seats: 0,
+  number_of_voters: 0,
+  election_date: "2022-03-16",
+  nomination_date: "2022-01-31",
+  political_groups: [],
 };
 
 export const electionImportValidateMockResponse: ElectionDefinitionValidateResponse = {

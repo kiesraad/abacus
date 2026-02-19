@@ -6,9 +6,10 @@ import { beforeEach, describe, expect, test, vi } from "vitest";
 import { ApiProvider } from "@/api/ApiProvider";
 import { MessagesProvider } from "@/hooks/messages/MessagesProvider";
 import * as useMessages from "@/hooks/messages/useMessages";
-import { newElectionMockData } from "@/testing/api-mocks/ElectionMockData";
+import { newCSBElectionMockData, newElectionMockData } from "@/testing/api-mocks/ElectionMockData";
 import { pollingStationMockData } from "@/testing/api-mocks/PollingStationMockData";
 import {
+  CSBElectionImportRequestHandler,
   ElectionImportRequestHandler,
   ElectionListRequestHandler,
   ElectionRequestHandler,
@@ -17,7 +18,12 @@ import { getRouter, type Router } from "@/testing/router";
 import { overrideOnce, server } from "@/testing/server";
 import { TestUserProvider } from "@/testing/TestUserProvider";
 import { screen, setupTestRouter, waitFor } from "@/testing/test-utils";
-import type { ElectionDefinitionValidateResponse, NewElection, PollingStationRequest } from "@/types/generated/openapi";
+import type {
+  ElectionDefinitionValidateResponse,
+  ElectionRole,
+  NewElection,
+  PollingStationRequest,
+} from "@/types/generated/openapi";
 import { electionCreateRoutes } from "../routes";
 
 const Providers = ({
@@ -101,13 +107,48 @@ function electionValidateResponse(
   };
 }
 
+function csbElectionValidateResponse(election: NewElection): ElectionDefinitionValidateResponse {
+  return {
+    role: "CSB",
+    hash: {
+      // NOTE: In actual data, the redacted version of the hash
+      // will have empty strings at the `redacted_indexes` positions.
+      // We leave them in here so we can test their absence
+      chunks: [
+        "asdf",
+        "qwer",
+        "zxcv",
+        "tyui",
+        "ghjk",
+        "bnml",
+        "1234",
+        "5678",
+        "8765",
+        "gfsd",
+        "a345",
+        "qwer",
+        "lgmg",
+        "thnr",
+        "nytf",
+        "sdfr",
+      ],
+      redacted_indexes: [2, 9],
+    },
+    election,
+  };
+}
+
 /**
  * Helper function; navigate to /elections/create
  * and upload an election definition.
  */
-async function uploadElectionDefinition(router: Router, file: File) {
+async function uploadElectionDefinition(router: Router, file: File, electionRole: ElectionRole = "GSB") {
   const user = userEvent.setup();
-  overrideOnce("post", "/api/elections/import/validate", 200, electionValidateResponse(newElectionMockData));
+  if (electionRole === "CSB") {
+    overrideOnce("post", "/api/elections/import/validate", 200, csbElectionValidateResponse(newElectionMockData));
+  } else {
+    overrideOnce("post", "/api/elections/import/validate", 200, electionValidateResponse(newElectionMockData));
+  }
   await router.navigate("/elections/create");
 
   // Wait for the page to be loaded
@@ -124,12 +165,20 @@ async function uploadElectionDefinition(router: Router, file: File) {
  * Helper function; assuming we are at the check election hash stage,
  * input the hash and continue.
  */
-async function inputElectionHash() {
+async function inputElectionHash(electionRole: ElectionRole = "GSB") {
   const user = userEvent.setup();
-  overrideOnce("post", "/api/elections/import/validate", 200, electionValidateResponse(newElectionMockData));
 
-  // Wait for the page to be loaded and expect the election name to be present
-  expect(await screen.findByText(newElectionMockData.name)).toBeInTheDocument();
+  if (electionRole === "CSB") {
+    overrideOnce("post", "/api/elections/import/validate", 200, csbElectionValidateResponse(newElectionMockData));
+
+    // Wait for the page to be loaded and expect the election name to be present
+    expect(await screen.findByText(newCSBElectionMockData.name)).toBeInTheDocument();
+  } else {
+    overrideOnce("post", "/api/elections/import/validate", 200, electionValidateResponse(newElectionMockData));
+
+    // Wait for the page to be loaded and expect the election name to be present
+    expect(await screen.findByText(newElectionMockData.name)).toBeInTheDocument();
+  }
 
   const inputPart1 = screen.getByRole("textbox", { name: "Controle deel 1" });
   await user.type(inputPart1, "zxcv");
@@ -144,10 +193,22 @@ async function inputElectionHash() {
  * Helper function: assuming we are on the polling station role page,
  * assert right checkbox is checked and continue.
  */
-async function setPollingStationRole() {
+async function setPollingStationRole(electionRole: ElectionRole = "GSB") {
   const user = userEvent.setup();
-  expect(await screen.findByRole("heading", { level: 2, name: "Rol van het stembureau" })).toBeVisible();
-  expect(screen.getByRole("radio", { name: "Gemeentelijk stembureau (GSB)" })).toBeChecked();
+
+  if (electionRole === "CSB") {
+    overrideOnce("post", "/api/elections/import/validate", 200, csbElectionValidateResponse(newElectionMockData));
+
+    expect(await screen.findByRole("heading", { level: 2, name: "Rol van het stembureau" })).toBeInTheDocument();
+    screen.getByRole("radio", { name: "Centraal stembureau (CSB)" }).click();
+    expect(screen.getByRole("radio", { name: "Centraal stembureau (CSB)" })).toBeChecked();
+    expect(screen.getByRole("radio", { name: "Gemeentelijk stembureau (GSB)" })).not.toBeChecked();
+  } else {
+    overrideOnce("post", "/api/elections/import/validate", 200, electionValidateResponse(newElectionMockData));
+    expect(screen.getByRole("radio", { name: "Gemeentelijk stembureau (GSB)" })).toBeChecked();
+    expect(screen.getByRole("radio", { name: "Centraal stembureau (CSB)" })).not.toBeChecked();
+  }
+
   await user.click(screen.getByRole("button", { name: "Volgende" }));
 }
 
@@ -155,9 +216,13 @@ async function setPollingStationRole() {
  * Helper function; assuming we are on the upload candidate page,
  * upload a valid candidate file.
  */
-async function uploadCandidateDefinition(file: File) {
+async function uploadCandidateDefinition(file: File, electionRole: ElectionRole = "GSB") {
   const user = userEvent.setup();
-  overrideOnce("post", "/api/elections/import/validate", 200, electionValidateResponse(newElectionMockData));
+  if (electionRole === "CSB") {
+    overrideOnce("post", "/api/elections/import/validate", 200, csbElectionValidateResponse(newElectionMockData));
+  } else {
+    overrideOnce("post", "/api/elections/import/validate", 200, electionValidateResponse(newElectionMockData));
+  }
 
   // Wait for the candidate page to be loaded
   expect(await screen.findByRole("heading", { level: 2, name: "Importeer kandidatenlijsten" })).toBeVisible();
@@ -174,9 +239,13 @@ async function uploadCandidateDefinition(file: File) {
  * Helper function; assuming we are at the check candidate hash stage,
  * input the hash and continue.
  */
-async function inputCandidateHash() {
+async function inputCandidateHash(electionRole: ElectionRole = "GSB") {
   const user = userEvent.setup();
-  overrideOnce("post", "/api/elections/import/validate", 200, electionValidateResponse(newElectionMockData));
+  if (electionRole === "CSB") {
+    overrideOnce("post", "/api/elections/import/validate", 200, csbElectionValidateResponse(newElectionMockData));
+  } else {
+    overrideOnce("post", "/api/elections/import/validate", 200, electionValidateResponse(newElectionMockData));
+  }
 
   const inputPart1 = screen.getByRole("textbox", { name: "Controle deel 1" });
   await user.type(inputPart1, "zxcv");
@@ -440,7 +509,7 @@ describe("Election create pages", () => {
     });
   });
 
-  describe("Full flow", () => {
+  describe("Full flow GSB", () => {
     const pushMessage = vi.fn();
 
     beforeEach(() => {
@@ -496,6 +565,47 @@ describe("Election create pages", () => {
 
       await waitFor(() => {
         expect(pushMessage).toHaveBeenCalledWith({ title: "Verkiezing GSB Gemeenteraad Test 2022 toegevoegd" });
+      });
+    });
+  });
+
+  describe("Full flow CSB", () => {
+    const pushMessage = vi.fn();
+
+    beforeEach(() => {
+      server.use(CSBElectionImportRequestHandler);
+      vi.spyOn(useMessages, "useMessages").mockReturnValue({
+        pushMessage,
+        popMessages: vi.fn(() => []),
+        hasMessages: vi.fn(() => false),
+      });
+    });
+
+    test("Adds new election when finishing election import", async () => {
+      vi.spyOn(console, "warn").mockImplementation(() => {});
+      const router = renderWithRouter();
+      const user = userEvent.setup();
+      const file = new File(["foo"], "foo.txt", { type: "text/plain" });
+
+      // election definition
+      await uploadElectionDefinition(router, file, "CSB");
+      await inputElectionHash("CSB");
+
+      // polling station role
+      await setPollingStationRole("CSB");
+
+      // candidates lists
+      await uploadCandidateDefinition(file, "CSB");
+      await inputCandidateHash("CSB");
+
+      // check and save
+      await waitFor(async () => {
+        expect(await screen.findByRole("heading", { name: "Controleren en opslaan" })).toBeVisible();
+      });
+      await user.click(screen.getByRole("button", { name: "Opslaan" }));
+
+      await waitFor(() => {
+        expect(pushMessage).toHaveBeenCalledWith({ title: "Verkiezing CSB Gemeenteraad Test 2022 toegevoegd" });
       });
     });
   });

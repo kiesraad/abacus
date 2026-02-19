@@ -42,6 +42,7 @@ describe("OverviewPage", () => {
     expect(table).toHaveTableContent([
       ["Verkiezing", "Gebied", "Status"],
       ["Gemeenteraadsverkiezingen 2026", "Heemdamseburg", "Je kan invoeren"],
+      ["Gemeenteraadsverkiezingen 2026", "Heemdamseburg", ""],
     ]);
 
     const tableRows = within(table).queryAllByRole("row");
@@ -65,6 +66,7 @@ describe("OverviewPage", () => {
     expect(table).toHaveTableContent([
       ["Verkiezing", "Niveau stembureau", "Status"],
       ["Gemeenteraadsverkiezingen 2026", "GSB - Heemdamseburg (0035)", "Invoer bezig — Eerste zitting"],
+      ["Gemeenteraadsverkiezingen 2026", "CSB - Heemdamseburg (0035)", ""],
     ]);
 
     const tableRows = within(table).queryAllByRole("row");
@@ -88,6 +90,7 @@ describe("OverviewPage", () => {
     expect(table).toHaveTableContent([
       ["Verkiezing", "Niveau stembureau", "Status"],
       ["Gemeenteraadsverkiezingen 2026", "GSB - Heemdamseburg (0035)", "Invoer bezig — Eerste zitting"],
+      ["Gemeenteraadsverkiezingen 2026", "CSB - Heemdamseburg (0035)", ""],
     ]);
 
     const tableRows = within(table).queryAllByRole("row");

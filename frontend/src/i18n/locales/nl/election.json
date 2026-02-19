@@ -47,7 +47,7 @@
     "description": "Het bestand <file>filename</file> bevat geen geldige lijst met stembureaus. Kies een ander bestand.",
     "title": "Ongeldig stembureaubestand"
   },
-  "invalid_role": "Ongeldig rol van het stembureau",
+  "invalid_role": "Ongeldige rol van het stembureau",
   "message": {
     "election_created": "Verkiezing {role} {name} toegevoegd"
   },

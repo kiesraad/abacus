@@ -513,6 +513,171 @@ async fn test_can_only_update_current_session(pool: SqlitePool) {
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_7_four_sessions", "users"))))]
+async fn test_conclude_creates_data_entry_when_corrected_results_true(pool: SqlitePool) {
+    let addr = serve_api(pool).await;
+    let election_id = 7;
+    let polling_station_id = 741;
+
+    // Create and conclude investigation with corrected_results: true
+    assert_eq!(
+        create_investigation(&addr, polling_station_id)
+            .await
+            .status(),
+        StatusCode::CREATED
+    );
+
+    assert_eq!(
+        conclude_investigation(
+            &addr,
+            polling_station_id,
+            Some(serde_json::json!({"findings": "Test findings", "corrected_results": true})),
+        )
+        .await
+        .status(),
+        StatusCode::OK
+    );
+
+    // Verify PS 741 is now in statuses with status "empty"
+    let statuses = get_statuses(&addr, &coordinator_login(&addr).await, election_id).await;
+    assert_eq!(statuses[&polling_station_id]["status"], "empty");
+}
+
+#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_7_four_sessions", "users"))))]
+async fn test_conclude_does_not_create_data_entry_when_corrected_results_false(pool: SqlitePool) {
+    let addr = serve_api(pool).await;
+    let election_id = 7;
+    let polling_station_id = 741;
+
+    // Create and conclude investigation with corrected_results: false
+    assert_eq!(
+        create_investigation(&addr, polling_station_id)
+            .await
+            .status(),
+        StatusCode::CREATED
+    );
+
+    assert_eq!(
+        conclude_investigation(
+            &addr,
+            polling_station_id,
+            Some(serde_json::json!({"findings": "Test findings", "corrected_results": false})),
+        )
+        .await
+        .status(),
+        StatusCode::OK
+    );
+
+    // Verify PS 741 is not in statuses (no data entry created)
+    let statuses = get_statuses(&addr, &coordinator_login(&addr).await, election_id).await;
+    assert!(!statuses.contains_key(&polling_station_id));
+}
+
+#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_7_four_sessions", "users"))))]
+async fn test_update_creates_data_entry_when_corrected_results_changed_to_true(pool: SqlitePool) {
+    let addr = serve_api(pool).await;
+    let election_id = 7;
+    let polling_station_id = 741;
+
+    // Create and conclude investigation with corrected_results: false
+    assert_eq!(
+        create_investigation(&addr, polling_station_id)
+            .await
+            .status(),
+        StatusCode::CREATED
+    );
+    assert_eq!(
+        conclude_investigation(
+            &addr,
+            polling_station_id,
+            Some(serde_json::json!({"findings": "Test findings", "corrected_results": false})),
+        )
+        .await
+        .status(),
+        StatusCode::OK
+    );
+
+    // Verify no data entry exists
+    let statuses = get_statuses(&addr, &coordinator_login(&addr).await, election_id).await;
+    assert!(!statuses.contains_key(&polling_station_id));
+
+    // Update corrected_results to true
+    assert_eq!(
+        update_investigation(
+            &addr,
+            polling_station_id,
+            Some(serde_json::json!({"reason": "Test reason", "corrected_results": true})),
+        )
+        .await
+        .status(),
+        StatusCode::OK
+    );
+
+    // Verify data entry was created
+    let statuses = get_statuses(&addr, &coordinator_login(&addr).await, election_id).await;
+    assert_eq!(statuses[&polling_station_id]["status"], "empty");
+}
+
+#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_7_four_sessions", "users"))))]
+async fn test_update_deletes_data_entry_when_corrected_results_changed_to_false(pool: SqlitePool) {
+    let addr = serve_api(pool).await;
+    let election_id = 7;
+    let polling_station_id = 741;
+
+    // Create and conclude investigation with corrected_results: true (creates data entry)
+    assert_eq!(
+        create_investigation(&addr, polling_station_id)
+            .await
+            .status(),
+        StatusCode::CREATED
+    );
+    assert_eq!(
+        conclude_investigation(
+            &addr,
+            polling_station_id,
+            Some(serde_json::json!({"findings": "Test findings", "corrected_results": true})),
+        )
+        .await
+        .status(),
+        StatusCode::OK
+    );
+
+    // Verify data entry exists
+    let statuses = get_statuses(&addr, &coordinator_login(&addr).await, election_id).await;
+    assert_eq!(statuses[&polling_station_id]["status"], "empty");
+
+    // Update corrected_results to false without accepting deletion — should fail
+    let response = update_investigation(
+        &addr,
+        polling_station_id,
+        Some(serde_json::json!({"reason": "Test reason", "corrected_results": false})),
+    )
+    .await;
+    assert_eq!(response.status(), StatusCode::CONFLICT);
+    let body: serde_json::Value = response.json().await.unwrap();
+    assert_eq!(body["reference"], "InvestigationHasDataEntryOrResult");
+
+    // Data entry still exists
+    let statuses = get_statuses(&addr, &coordinator_login(&addr).await, election_id).await;
+    assert_eq!(statuses[&polling_station_id]["status"], "empty");
+
+    // Update corrected_results to false with accepted deletion
+    assert_eq!(
+        update_investigation(
+            &addr,
+            polling_station_id,
+            Some(serde_json::json!({"reason": "Test reason", "corrected_results": false, "accept_data_entry_deletion": true})),
+        )
+        .await
+        .status(),
+        StatusCode::OK
+    );
+
+    // Verify data entry was deleted
+    let statuses = get_statuses(&addr, &coordinator_login(&addr).await, election_id).await;
+    assert!(!statuses.contains_key(&polling_station_id));
+}
+
+#[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_7_four_sessions", "users"))))]
 async fn test_can_conclude_update_new_polling_station_corrected_results_true(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let coordinator_cookie = coordinator_login(&addr).await;

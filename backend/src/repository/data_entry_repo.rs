@@ -14,11 +14,11 @@ use crate::{
 };
 
 /// Get the full polling station data entry row for a given polling station
-/// id, or return an error if there is no data
-pub async fn get_data_entry(
+/// id, or return None if there is no linked data entry
+async fn get_data_entry_optional(
     conn: &mut SqliteConnection,
     polling_station_id: PollingStationId,
-) -> Result<PollingStationDataEntry, sqlx::Error> {
+) -> Result<Option<PollingStationDataEntry>, sqlx::Error> {
     query_as!(
         PollingStationDataEntry,
         r#"
@@ -32,8 +32,19 @@ pub async fn get_data_entry(
         "#,
         polling_station_id,
     )
-    .fetch_one(conn)
+    .fetch_optional(conn)
     .await
+}
+
+/// Get the full polling station data entry row for a given polling station
+/// id, or return an error if there is no data
+pub async fn get_data_entry(
+    conn: &mut SqliteConnection,
+    polling_station_id: PollingStationId,
+) -> Result<PollingStationDataEntry, sqlx::Error> {
+    get_data_entry_optional(conn, polling_station_id)
+        .await?
+        .ok_or(sqlx::Error::RowNotFound)
 }
 
 /// Get a data entry or return an error if there is no data entry for the
@@ -72,8 +83,9 @@ pub async fn get_or_default(
     .unwrap_or(DataEntryStatus::Empty))
 }
 
-/// Saves the data entry or updates it if it already exists for a given polling station id
-pub async fn upsert(
+/// Updates an existing data entry for a given polling station id.
+/// Returns an error if no data entry exists for the polling station.
+pub async fn update(
     conn: &mut SqliteConnection,
     polling_station_id: PollingStationId,
     state: &DataEntryStatus,
@@ -81,7 +93,6 @@ pub async fn upsert(
     let mut tx = conn.begin().await?;
     let state = Json(state);
 
-    // Check if the polling station already has a data_entry_id
     let row = query!(
         r#"SELECT data_entry_id FROM polling_stations WHERE id = ?"#,
         polling_station_id
@@ -89,54 +100,71 @@ pub async fn upsert(
     .fetch_one(&mut *tx)
     .await?;
 
-    let res = if let Some(data_entry_id) = row.data_entry_id {
-        // Update existing data entry
-        query_as!(
-            PollingStationDataEntry,
-            r#"
-                UPDATE data_entries
-                SET state = ?, updated_at = CURRENT_TIMESTAMP
-                WHERE id = ?
-                RETURNING
-                    id AS "id: _",
-                    state AS "state: _",
-                    updated_at AS "updated_at: _"
-            "#,
-            state,
-            data_entry_id
-        )
-        .fetch_one(&mut *tx)
-        .await
-    } else {
-        // Insert new data entry and link it to the polling station
-        let data_entry = query_as!(
-            PollingStationDataEntry,
-            r#"
-                INSERT INTO data_entries (state)
-                VALUES (?)
-                RETURNING
-                    id AS "id: _",
-                    state AS "state: _",
-                    updated_at AS "updated_at: _"
-            "#,
-            state
-        )
-        .fetch_one(&mut *tx)
-        .await?;
+    let data_entry_id = row.data_entry_id.ok_or(sqlx::Error::RowNotFound)?;
 
-        query!(
-            "UPDATE polling_stations SET data_entry_id = ? WHERE id = ?",
-            data_entry.id,
-            polling_station_id
-        )
-        .execute(&mut *tx)
-        .await?;
-
-        Ok(data_entry)
-    };
+    let res = query_as!(
+        PollingStationDataEntry,
+        r#"
+            UPDATE data_entries
+            SET state = ?, updated_at = CURRENT_TIMESTAMP
+            WHERE id = ?
+            RETURNING
+                id AS "id: _",
+                state AS "state: _",
+                updated_at AS "updated_at: _"
+        "#,
+        state,
+        data_entry_id
+    )
+    .fetch_one(&mut *tx)
+    .await;
 
     tx.commit().await?;
     res
+}
+
+/// Create an empty data entry and link it to the given polling station.
+/// If the polling station already has a data entry, this is a no-op and
+/// returns the existing data entry.
+pub async fn create_empty(
+    conn: &mut SqliteConnection,
+    polling_station_id: PollingStationId,
+) -> Result<PollingStationDataEntry, sqlx::Error> {
+    let mut tx = conn.begin().await?;
+
+    // Guard against double creation: if a data entry already exists, return it
+    if let Some(existing) = get_data_entry_optional(&mut tx, polling_station_id).await? {
+        tx.commit().await?;
+        return Ok(existing);
+    }
+
+    let state = Json(DataEntryStatus::Empty);
+
+    let data_entry = query_as!(
+        PollingStationDataEntry,
+        r#"
+            INSERT INTO data_entries (state)
+            VALUES (?)
+            RETURNING
+                id AS "id: _",
+                state AS "state: _",
+                updated_at AS "updated_at: _"
+        "#,
+        state
+    )
+    .fetch_one(&mut *tx)
+    .await?;
+
+    query!(
+        "UPDATE polling_stations SET data_entry_id = ? WHERE id = ?",
+        data_entry.id,
+        polling_station_id
+    )
+    .execute(&mut *tx)
+    .await?;
+
+    tx.commit().await?;
+    Ok(data_entry)
 }
 
 pub async fn delete_data_entry(
@@ -457,7 +485,10 @@ pub async fn insert_test_result(
         results: results.clone(),
     });
 
-    upsert(conn, polling_station_id, &state).await?;
+    if !data_entry_exists(conn, polling_station_id).await? {
+        create_empty(conn, polling_station_id).await?;
+    }
+    update(conn, polling_station_id, &state).await?;
     Ok(())
 }
 

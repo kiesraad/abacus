@@ -297,7 +297,7 @@ async fn data_entry_claim(
     let validation_results = new_state.start_validate(&polling_station, &election)?;
 
     // Save the new data entry state
-    data_entry_repo::upsert(&mut tx, polling_station_id, &new_state).await?;
+    data_entry_repo::update(&mut tx, polling_station_id, &new_state).await?;
 
     let data_entry = get_data_entry(&mut tx, polling_station_id).await?;
 
@@ -411,7 +411,7 @@ async fn data_entry_save(
     let validation_results = new_state.start_validate(&polling_station, &election)?;
 
     // Save the new data entry state
-    data_entry_repo::upsert(&mut tx, polling_station_id, &new_state).await?;
+    data_entry_repo::update(&mut tx, polling_station_id, &new_state).await?;
 
     let data_entry = get_data_entry(&mut tx, polling_station_id).await?;
 
@@ -465,15 +465,9 @@ async fn data_entry_delete(
         }
     };
 
-    let mut data_entry = get_data_entry(&mut tx, polling_station_id).await?;
+    data_entry_repo::update(&mut tx, polling_station_id, &new_state).await?;
 
-    if new_state == DataEntryStatus::Empty {
-        // The database entry of the data entry is fully deleted when the first entry is deleted
-        delete_data_entry(&mut tx, polling_station_id).await?;
-    } else {
-        // The status of the data entry is updated when the second entry is deleted
-        data_entry = data_entry_repo::upsert(&mut tx, polling_station_id, &new_state).await?;
-    }
+    let data_entry = get_data_entry(&mut tx, polling_station_id).await?;
 
     audit_service
         .log(
@@ -522,11 +516,11 @@ async fn data_entry_finalise(
     match entry_number {
         EntryNumber::FirstEntry => {
             let new_state = state.finalise_first_entry(&polling_station, &election, user_id)?;
-            data_entry_repo::upsert(&mut tx, polling_station_id, &new_state).await?;
+            data_entry_repo::update(&mut tx, polling_station_id, &new_state).await?;
         }
         EntryNumber::SecondEntry => {
             let new_state = state.finalise_second_entry(&polling_station, &election, user_id)?;
-            data_entry_repo::upsert(&mut tx, polling_station_id, &new_state).await?;
+            data_entry_repo::update(&mut tx, polling_station_id, &new_state).await?;
         }
     }
 
@@ -607,14 +601,27 @@ async fn data_entries_and_result_delete(
             ErrorReference::DataEntryCannotBeDeleted,
         ))
     } else {
-        // The database entries of the data entry (and optional result) are fully deleted
-        delete_data_entry_for_polling_station(
-            &mut tx,
-            &audit_service,
-            &committee_session,
-            polling_station_id,
-        )
-        .await?;
+        let was_definitive = matches!(data_entry.state.0, DataEntryStatus::Definitive(_));
+
+        data_entry_repo::update(&mut tx, polling_station_id, &DataEntryStatus::Empty).await?;
+
+        audit_service
+            .log(
+                &mut tx,
+                &AuditEvent::DataEntryDeleted(data_entry.into()),
+                None,
+            )
+            .await?;
+
+        if was_definitive && committee_session.status == CommitteeSessionStatus::Completed {
+            change_committee_session_status(
+                &mut tx,
+                committee_session.id,
+                CommitteeSessionStatus::DataEntry,
+                audit_service,
+            )
+            .await?;
+        }
 
         tx.commit().await?;
 
@@ -740,30 +747,17 @@ async fn data_entry_resolve_errors(
 ) -> Result<Json<DataEntryStatusResponse>, APIError> {
     let mut tx = pool.begin_immediate().await?;
 
-    let (_, _, committee_session, state) =
-        validate_and_get_data(&mut tx, polling_station_id, &user.0).await?;
+    let (.., state) = validate_and_get_data(&mut tx, polling_station_id, &user.0).await?;
 
     let new_state = match action {
         ResolveErrorsAction::DiscardFirstEntry => state.discard_first_entry()?,
         ResolveErrorsAction::ResumeFirstEntry => state.resume_first_entry()?,
     };
 
-    if new_state == DataEntryStatus::Empty {
-        // The database entry of the data entry is fully deleted when the first entry is discarded
-        delete_data_entry_for_polling_station(
-            &mut tx,
-            &audit_service,
-            &committee_session,
-            polling_station_id,
-        )
+    let data_entry = data_entry_repo::update(&mut tx, polling_station_id, &new_state).await?;
+    audit_service
+        .log(&mut tx, &action.audit_event(data_entry.clone()), None)
         .await?;
-    } else {
-        // The status of the data entry is updated when the first entry is resumed
-        let data_entry = data_entry_repo::upsert(&mut tx, polling_station_id, &new_state).await?;
-        audit_service
-            .log(&mut tx, &action.audit_event(data_entry.clone()), None)
-            .await?;
-    }
 
     tx.commit().await?;
 
@@ -853,7 +847,7 @@ async fn data_entry_resolve_differences(
 ) -> Result<Json<DataEntryStatusResponse>, APIError> {
     let mut tx = pool.begin_immediate().await?;
 
-    let (polling_station, election, committee_session, state) =
+    let (polling_station, election, _, state) =
         validate_and_get_data(&mut tx, polling_station_id, &user.0).await?;
 
     let new_state = match action {
@@ -866,22 +860,10 @@ async fn data_entry_resolve_differences(
         ResolveDifferencesAction::DiscardBothEntries => state.delete_entries()?,
     };
 
-    if new_state == DataEntryStatus::Empty {
-        // The database entry of the data entry is fully deleted when the entries are discarded
-        delete_data_entry_for_polling_station(
-            &mut tx,
-            &audit_service,
-            &committee_session,
-            polling_station_id,
-        )
+    let data_entry = data_entry_repo::update(&mut tx, polling_station_id, &new_state).await?;
+    audit_service
+        .log(&mut tx, &action.audit_event(data_entry.clone()), None)
         .await?;
-    } else {
-        // The status of the data entry is updated when the first or second entry is kept
-        let data_entry = data_entry_repo::upsert(&mut tx, polling_station_id, &new_state).await?;
-        audit_service
-            .log(&mut tx, &action.audit_event(data_entry.clone()), None)
-            .await?;
-    }
 
     tx.commit().await?;
 
@@ -1258,13 +1240,10 @@ mod tests {
         let result: ErrorResponse = serde_json::from_slice(&body).unwrap();
         assert_eq!(result.reference, ErrorReference::CommitteeSessionPaused);
 
-        // Check that no row was created
+        // Check that the data entry is still Empty
         let mut conn = pool.acquire().await.unwrap();
-        assert!(
-            !data_entry_exists(&mut conn, polling_station_id)
-                .await
-                .unwrap()
-        );
+        let data_entry = get_data_entry(&mut conn, polling_station_id).await.unwrap();
+        assert_eq!(data_entry.state.0, DataEntryStatus::Empty);
     }
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
@@ -1288,13 +1267,10 @@ mod tests {
             ErrorReference::InvalidCommitteeSessionStatus
         );
 
-        // Check that no row was created
+        // Check that the data entry is still Empty
         let mut conn = pool.acquire().await.unwrap();
-        assert!(
-            !data_entry_exists(&mut conn, polling_station_id)
-                .await
-                .unwrap()
-        );
+        let data_entry = get_data_entry(&mut conn, polling_station_id).await.unwrap();
+        assert_eq!(data_entry.state.0, DataEntryStatus::Empty);
     }
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_7_four_sessions"))))]
@@ -1344,8 +1320,12 @@ mod tests {
     async fn test_claim_data_entry_next_session_ok(pool: SqlitePool) {
         let mut conn = pool.acquire().await.unwrap();
         let polling_station_id = PollingStationId::from(742);
-        // Insert investigation
+        // Insert investigation with corrected_results and create empty data entry
+        // (simulates what the investigation conclude flow does)
         insert_test_investigation(&mut conn, polling_station_id, Some(true))
+            .await
+            .unwrap();
+        data_entry_repo::create_empty(&mut conn, polling_station_id)
             .await
             .unwrap();
 
@@ -1359,7 +1339,7 @@ mod tests {
         let response = claim(pool.clone(), polling_station_id, EntryNumber::FirstEntry).await;
         assert_eq!(response.status(), StatusCode::OK);
 
-        // Check that row was created
+        // Check that row exists
         assert!(
             data_entry_exists(&mut conn, polling_station_id)
                 .await
@@ -1477,7 +1457,7 @@ mod tests {
 
         let polling_station_id = PollingStationId::from(9);
 
-        // Add investigation with corrected_results to be able to claim the polling station
+        // Add investigation with corrected_results and create empty data entry
         insert_test_investigation(
             &mut pool.acquire().await.unwrap(),
             polling_station_id,
@@ -1485,6 +1465,9 @@ mod tests {
         )
         .await
         .unwrap();
+        data_entry_repo::create_empty(&mut conn, polling_station_id)
+            .await
+            .unwrap();
 
         // Claim a polling station that had entries/a result in the previous committee session
         let response = claim(pool.clone(), polling_station_id, EntryNumber::FirstEntry).await;
@@ -1776,12 +1759,9 @@ mod tests {
         let response = delete(pool.clone(), polling_station_id, EntryNumber::FirstEntry).await;
         assert_eq!(response.status(), StatusCode::NO_CONTENT);
 
-        // Check that the data entry is deleted
-        assert!(
-            !data_entry_exists(&mut conn, polling_station_id)
-                .await
-                .unwrap()
-        );
+        // Check that the data entry is reset to Empty
+        let data_entry = get_data_entry(&mut conn, polling_station_id).await.unwrap();
+        assert_eq!(data_entry.state.0, DataEntryStatus::Empty);
     }
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
@@ -2024,12 +2004,9 @@ mod tests {
         let response = delete_data_entries_and_result(pool.clone(), polling_station_id).await;
         assert_eq!(response.status(), StatusCode::NO_CONTENT);
 
-        // Check that the data entry is deleted
-        assert!(
-            !data_entry_exists(&mut conn, polling_station_id)
-                .await
-                .unwrap()
-        );
+        // Check that the data entry is reset to Empty
+        let data_entry = get_data_entry(&mut conn, polling_station_id).await.unwrap();
+        assert_eq!(data_entry.state.0, DataEntryStatus::Empty);
     }
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_3"))))]
@@ -2080,12 +2057,9 @@ mod tests {
         let response = delete_data_entries_and_result(pool.clone(), polling_station_id).await;
         assert_eq!(response.status(), StatusCode::NO_CONTENT);
 
-        // Check that the data entry is deleted
-        assert!(
-            !data_entry_exists(&mut conn, polling_station_id)
-                .await
-                .unwrap()
-        );
+        // Check that the data entry is reset to Empty
+        let data_entry = get_data_entry(&mut conn, polling_station_id).await.unwrap();
+        assert_eq!(data_entry.state.0, DataEntryStatus::Empty);
 
         // Check that the committee session status is changed to DataEntry
         let committee_session = committee_session_repo::get(&mut conn, CommitteeSessionId::from(3))
@@ -2238,12 +2212,9 @@ mod tests {
         .await;
         assert_eq!(response.status(), StatusCode::OK);
 
-        // Check that the data entry is deleted
-        assert!(
-            !data_entry_exists(&mut conn, polling_station_id)
-                .await
-                .unwrap()
-        );
+        // Check that the data entry is reset to Empty
+        let data_entry = get_data_entry(&mut conn, polling_station_id).await.unwrap();
+        assert_eq!(data_entry.state.0, DataEntryStatus::Empty);
     }
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
@@ -2318,12 +2289,9 @@ mod tests {
         .await;
         assert_eq!(response.status(), StatusCode::OK);
 
-        // Check that the data entry is deleted
-        assert!(
-            !data_entry_exists(&mut conn, polling_station_id)
-                .await
-                .unwrap()
-        );
+        // Check that the data entry is reset to Empty
+        let data_entry = get_data_entry(&mut conn, polling_station_id).await.unwrap();
+        assert_eq!(data_entry.state.0, DataEntryStatus::Empty);
     }
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_2"))))]
@@ -2372,11 +2340,12 @@ mod tests {
     /// No previous results, should return none
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_7_four_sessions"))))]
     async fn test_previous_results_none(pool: SqlitePool) {
+        let mut conn = pool.acquire().await.unwrap();
         let committee_session_id = CommitteeSessionId::from(704);
         let polling_station_id = PollingStationId::from(743);
         // Add new polling station
         insert_test_polling_station(
-            &mut pool.acquire().await.unwrap(),
+            &mut conn,
             polling_station_id,
             committee_session_id,
             None,
@@ -2385,14 +2354,13 @@ mod tests {
         .await
         .unwrap();
 
-        // Add investigation with corrected_results to be able to claim the polling station
-        insert_test_investigation(
-            &mut pool.acquire().await.unwrap(),
-            polling_station_id,
-            Some(true),
-        )
-        .await
-        .unwrap();
+        // Add investigation with corrected_results and create empty data entry
+        insert_test_investigation(&mut conn, polling_station_id, Some(true))
+            .await
+            .unwrap();
+        data_entry_repo::create_empty(&mut conn, polling_station_id)
+            .await
+            .unwrap();
 
         change_status_committee_session(
             pool.clone(),
@@ -2411,15 +2379,15 @@ mod tests {
     /// Should get result from third session, even though there were also results in the first session
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_7_four_sessions"))))]
     async fn test_previous_results(pool: SqlitePool) {
+        let mut conn = pool.acquire().await.unwrap();
         let polling_station_id = PollingStationId::from(742);
-        // Add investigation with corrected_results to be able to claim the polling station
-        insert_test_investigation(
-            &mut pool.acquire().await.unwrap(),
-            polling_station_id,
-            Some(true),
-        )
-        .await
-        .unwrap();
+        // Add investigation with corrected_results and create empty data entry
+        insert_test_investigation(&mut conn, polling_station_id, Some(true))
+            .await
+            .unwrap();
+        data_entry_repo::create_empty(&mut conn, polling_station_id)
+            .await
+            .unwrap();
 
         change_status_committee_session(
             pool.clone(),

@@ -31,7 +31,7 @@ use crate::{
     infra::audit_log::{AuditEvent, AuditService},
     repository::{
         committee_session_repo::get_election_committee_session,
-        data_entry_repo::{data_entry_exists, previous_results_for_polling_station},
+        data_entry_repo::{self, data_entry_exists, previous_results_for_polling_station},
         election_repo,
         investigation_repo::{
             conclude_polling_station_investigation, create_polling_station_investigation,
@@ -237,12 +237,18 @@ async fn polling_station_investigation_conclude(
         ));
     }
 
+    let corrected_results = polling_station_investigation.corrected_results;
+
     let investigation = conclude_polling_station_investigation(
         &mut tx,
         polling_station_id,
         polling_station_investigation,
     )
     .await?;
+
+    if corrected_results {
+        data_entry_repo::create_empty(&mut tx, polling_station_id).await?;
+    }
 
     audit_service
         .log(
@@ -364,6 +370,13 @@ async fn polling_station_investigation_update(
                 ErrorReference::InvestigationHasDataEntryOrResult,
             ));
         }
+    }
+
+    // If corrected_results is changed to true and no data entry exists, create one
+    if investigation_update_request.corrected_results == Some(true)
+        && !data_entry_exists(&mut tx, polling_station_id).await?
+    {
+        data_entry_repo::create_empty(&mut tx, polling_station_id).await?;
     }
 
     let investigation = update_investigation(

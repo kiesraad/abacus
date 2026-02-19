@@ -248,9 +248,8 @@ describe("Test PollingStationPicker", () => {
       const pollingStation = await screen.findByTestId("pollingStation");
 
       await user.type(pollingStation, "33");
-
       const pollingStationSearching = await screen.findByTestId("pollingStationNumberInputFeedback");
-      expect(await within(pollingStationSearching).findByText(`aan het zoeken …`)).toBeVisible();
+      expect(within(pollingStationSearching).getByText("aan het zoeken…")).toBeVisible();
     });
 
     test("Selecting polling station with second data entry opens correct page", async () => {

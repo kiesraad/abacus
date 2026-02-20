@@ -1,6 +1,6 @@
 use super::{
     candidate_nomination::CandidateNominationResult, fraction::Fraction,
-    seat_assignment::SeatAssignmentResult,
+    optional_features::OptionalFeatures, seat_assignment::SeatAssignmentResult,
 };
 use std::fmt::Debug;
 
@@ -27,9 +27,9 @@ pub struct ApportionmentOutput<'a, T: ListVotesTrait> {
     pub candidate_nomination: CandidateNominationResult<'a, T>,
 }
 
-pub trait ListVotesTrait: PartialEq + Debug {
-    type Cv: CandidateVotesTrait;
-    type ListNumber: Copy + Debug + Eq;
+pub trait ListVotesTrait: PartialEq + Debug + OptionalFeatures {
+    type Cv: CandidateVotesTrait + OptionalFeatures;
+    type ListNumber: Copy + Debug + Eq + OptionalFeatures;
 
     fn number(&self) -> Self::ListNumber;
     fn total_votes(&self) -> u32 {
@@ -41,8 +41,8 @@ pub trait ListVotesTrait: PartialEq + Debug {
     fn candidate_votes(&self) -> &[Self::Cv];
 }
 
-pub trait CandidateVotesTrait: PartialEq + Debug {
-    type CandidateNumber: Copy + Debug + Eq;
+pub trait CandidateVotesTrait: PartialEq + Debug + OptionalFeatures {
+    type CandidateNumber: Copy + Debug + Eq + OptionalFeatures;
 
     fn number(&self) -> Self::CandidateNumber;
     fn votes(&self) -> u32;

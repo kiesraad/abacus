@@ -9,6 +9,8 @@ use tracing::{debug, info};
 /// and each of the changes and intermediate standings. The final standing contains the
 /// number of seats per list that was assigned after all seats were assigned.
 #[derive(Debug, PartialEq)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize))]
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 pub struct SeatAssignmentResult<T: ListVotesTrait> {
     pub seats: u32,
     pub full_seats: u32,
@@ -20,19 +22,21 @@ pub struct SeatAssignmentResult<T: ListVotesTrait> {
 
 /// Contains information about the final assignment of seats for a specific list.
 #[derive(Debug, PartialEq)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize))]
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 pub struct ListSeatAssignment<LN> {
     /// List number for which this assignment applies
     pub list_number: LN,
     /// The number of votes cast for this group
-    votes_cast: u64,
+    pub votes_cast: u64,
     /// The remainder votes that were not used to get full seats assigned to this list
-    remainder_votes: Fraction,
+    pub remainder_votes: Fraction,
     /// Whether this group met the threshold for largest remainder seat assignment
-    meets_remainder_threshold: bool,
+    pub meets_remainder_threshold: bool,
     /// The number of full seats assigned to this group
-    full_seats: u32,
+    pub full_seats: u32,
     /// The number of residual seats assigned to this group
-    residual_seats: u32,
+    pub residual_seats: u32,
     /// The total number of seats assigned to this group
     pub total_seats: u32,
 }
@@ -55,6 +59,8 @@ impl<LN: Copy + Debug> From<ListStanding<LN>> for ListSeatAssignment<LN> {
 /// Contains the standing for a specific list. This is all the information
 /// that is needed to compute the apportionment for that specific list.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize))]
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 pub struct ListStanding<LN> {
     /// List number for which this standing applies
     pub list_number: LN,
@@ -121,6 +127,8 @@ impl<LN: Debug> ListStanding<LN> {
 /// Records the change for a specific seat, and how the standing is once
 /// that seat was assigned or removed
 #[derive(Clone, Debug, PartialEq)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize))]
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 pub struct SeatChangeStep<LN> {
     pub residual_seat_number: Option<u32>,
     pub change: SeatChange<LN>,
@@ -129,6 +137,8 @@ pub struct SeatChangeStep<LN> {
 
 /// Records the list and specific change for a specific residual seat
 #[derive(Clone, Debug, PartialEq)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize))]
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 pub enum SeatChange<LN> {
     HighestAverageAssignment(HighestAverageAssignedSeat<LN>),
     UniqueHighestAverageAssignment(HighestAverageAssignedSeat<LN>),
@@ -229,6 +239,8 @@ impl<LN: Copy> SeatChange<LN> {
 
 /// Contains the details for an assigned seat, assigned through the highest average method.
 #[derive(Clone, Debug, PartialEq)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize))]
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 pub struct HighestAverageAssignedSeat<LN> {
     /// The list that was selected for this seat has this list number
     pub selected_list_number: LN,
@@ -244,6 +256,8 @@ pub struct HighestAverageAssignedSeat<LN> {
 
 /// Contains the details for an assigned seat, assigned through the largest remainder method.
 #[derive(Clone, Debug, PartialEq)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize))]
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 pub struct LargestRemainderAssignedSeat<LN> {
     /// The list that was selected for this seat has this list number
     pub selected_list_number: LN,
@@ -257,6 +271,8 @@ pub struct LargestRemainderAssignedSeat<LN> {
 
 /// Contains information about the enactment of article P 9 of the Kieswet.
 #[derive(Clone, Debug, PartialEq)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize))]
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 pub struct AbsoluteMajorityReassignedSeat<LN> {
     /// List number which the residual seat is retracted from
     pub list_retracted_seat: LN,
@@ -266,6 +282,8 @@ pub struct AbsoluteMajorityReassignedSeat<LN> {
 
 /// Contains information about the enactment of article P 10 of the Kieswet.
 #[derive(Clone, Debug, PartialEq)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize))]
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 pub struct ListExhaustionRemovedSeat<LN> {
     /// List number which the seat is retracted from
     pub list_retracted_seat: LN,

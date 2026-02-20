@@ -6,17 +6,17 @@ use tracing::info;
 
 use self::{
     residual_seat_assignment::assign_remainder,
-    structs::{
-        AbsoluteMajorityReassignedSeat, AbsoluteMajorityResult, ListExhaustionRemovedSeat,
-        ListStanding, RemainderAssignmentResult, SeatChange, SeatChangeStep,
-    },
+    structs::{AbsoluteMajorityResult, RemainderAssignmentResult},
 };
 use super::{
     ApportionmentInput, ListVotesTrait,
     fraction::Fraction,
     structs::{ApportionmentError, CandidateNominationInput, CandidateNominationInputType},
 };
-pub use structs::SeatAssignmentResult;
+pub use structs::{
+    AbsoluteMajorityReassignedSeat, ListExhaustionRemovedSeat, ListStanding, SeatAssignmentResult,
+    SeatChange, SeatChangeStep,
+};
 
 /// Seat assignment
 pub(crate) fn seat_assignment<T: ApportionmentInput>(

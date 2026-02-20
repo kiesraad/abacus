@@ -329,6 +329,14 @@ export type USER_DELETE_REQUEST_PATH = `/api/users/${UserId}`;
 
 /** TYPES **/
 
+/**
+ * Contains information about the enactment of article P 9 of the Kieswet.
+ */
+export interface AbsoluteMajorityReassignedSeat_PGNumber {
+  list_assigned_seat: number;
+  list_retracted_seat: number;
+}
+
 export interface AccountUpdateRequest {
   fullname?: string;
   password: string;
@@ -494,6 +502,12 @@ export interface Candidate {
  */
 export const candidateGenderValues = ["Male", "Female", "X"] as const;
 export type CandidateGender = (typeof candidateGenderValues)[number];
+
+export interface CandidateNominationResponse {
+  chosen_candidates: Candidate[];
+  list_candidate_nomination: ListCandidateNominationResponse[];
+  preference_threshold: PreferenceThreshold;
+}
 
 export interface CandidateVotes {
   number: number;
@@ -709,6 +723,8 @@ export interface Election {
 }
 
 export interface ElectionApportionmentResponse {
+  candidate_nomination: CandidateNominationResponse;
+  seat_assignment: SeatAssignmentResult_PoliticalGroupCandidateVotes;
   summary: ElectionSummary;
 }
 
@@ -935,6 +951,14 @@ export interface FileDetails {
 
 export type FileId = number;
 
+/**
+ * Implementation of a fraction with a numerator and a denominator.
+ */
+export interface Fraction {
+  denominator: number;
+  numerator: number;
+}
+
 export interface GSBElectionCreationRequest {
   candidate_data: string;
   candidate_hash: string[];
@@ -992,10 +1016,95 @@ export interface GenerateElectionArgs {
 }
 
 /**
+ * Contains the details for an assigned seat, assigned through the highest average method.
+ */
+export interface HighestAverageAssignedSeat_PGNumber {
+  /** Collection of lists with the same average, that have been assigned a seat */
+  list_assigned: number[];
+  /** Collection of lists that are exhausted, and will not be assigned a seat */
+  list_exhausted: number[];
+  /** Collection of lists with the same average, that have not been assigned a seat */
+  list_options: number[];
+  selected_list_number: number;
+  /** This is the votes per seat achieved by the selected list */
+  votes_per_seat: Fraction;
+}
+
+/**
  * Investigation list response
  */
 export interface InvestigationListResponse {
   investigations: PollingStationInvestigation[];
+}
+
+/**
+ * Contains the details for an assigned seat, assigned through the largest remainder method.
+ */
+export interface LargestRemainderAssignedSeat_PGNumber {
+  /** Collection of lists with the same remainder, that have been assigned a seat */
+  list_assigned: number[];
+  /** Collection of lists with the same remainder, that have not been assigned a seat */
+  list_options: number[];
+  /** The number of remainder votes achieved by the selected list */
+  remainder_votes: Fraction;
+  selected_list_number: number;
+}
+
+export interface ListCandidateNominationResponse {
+  list_name: string;
+  list_number: PGNumber;
+  list_seats: number;
+  other_candidate_nomination: CandidateVotes[];
+  preferential_candidate_nomination: CandidateVotes[];
+  updated_candidate_ranking: Candidate[];
+}
+
+/**
+ * Contains information about the enactment of article P 10 of the Kieswet.
+ */
+export interface ListExhaustionRemovedSeat_PGNumber {
+  /** Whether the removed seat was a full seat */
+  full_seat: boolean;
+  list_retracted_seat: number;
+}
+
+/**
+ * Contains information about the final assignment of seats for a specific list.
+ */
+export interface ListSeatAssignment_PGNumber {
+  /** The number of full seats assigned to this group */
+  full_seats: number;
+  list_number: number;
+  /** Whether this group met the threshold for largest remainder seat assignment */
+  meets_remainder_threshold: boolean;
+  /** The remainder votes that were not used to get full seats assigned to this list */
+  remainder_votes: Fraction;
+  /** The number of residual seats assigned to this group */
+  residual_seats: number;
+  /** The total number of seats assigned to this group */
+  total_seats: number;
+  /** The number of votes cast for this group */
+  votes_cast: number;
+}
+
+/**
+ * Contains the standing for a specific list. This is all the information
+ * that is needed to compute the apportionment for that specific list.
+ */
+export interface ListStanding_PGNumber {
+  /** The number of full seats this list got assigned */
+  full_seats: number;
+  list_number: number;
+  /** Whether the remainder votes meet the threshold to be applicable for largest remainder seat assignment */
+  meets_remainder_threshold: boolean;
+  /** The number of votes per seat if a new seat would be added to the current residual seats */
+  next_votes_per_seat: Fraction;
+  /** The remainder of votes that was not used to get full seats (does not have to be a whole number of votes) */
+  remainder_votes: Fraction;
+  /** The current number of residual seats this list got assigned */
+  residual_seats: number;
+  /** The number of votes cast for this group */
+  votes_cast: number;
 }
 
 export interface LoginResponse {
@@ -1023,6 +1132,8 @@ export interface NewElection {
   political_groups: PoliticalGroup[];
   role: ElectionRole;
 }
+
+export type PGNumber = number;
 
 /**
  * Political group with its candidates
@@ -1173,6 +1284,16 @@ export interface PollingStationsRequest {
   polling_stations: string;
 }
 
+/**
+ * Contains the preference threshold as a percentage and as a fraction of the number of votes.
+ */
+export interface PreferenceThreshold {
+  /** Preference threshold as a number of votes */
+  number_of_votes: Fraction;
+  /** Preference threshold as a percentage (0 to 100) */
+  percentage: number;
+}
+
 export type RandomRange = string;
 
 export interface RedactedEmlHash {
@@ -1201,6 +1322,41 @@ export type Role = (typeof roleValues)[number];
 export interface SaveDataEntryResponse {
   validation_results: ValidationResults;
 }
+
+/**
+ * The result of the seat assignment procedure. This contains the number of seats and the quota
+ * that was used. It then contains the initial standing after full seats were assigned,
+ * and each of the changes and intermediate standings. The final standing contains the
+ * number of seats per list that was assigned after all seats were assigned.
+ */
+export interface SeatAssignmentResult_PoliticalGroupCandidateVotes {
+  final_standing: ListSeatAssignment_PGNumber[];
+  full_seats: number;
+  quota: Fraction;
+  residual_seats: number;
+  seats: number;
+  steps: SeatChangeStep_PGNumber[];
+}
+
+/**
+ * Records the change for a specific seat, and how the standing is once
+ * that seat was assigned or removed
+ */
+export interface SeatChangeStep_PGNumber {
+  change: SeatChange_PGNumber;
+  residual_seat_number?: number | null;
+  standings: ListStanding_PGNumber[];
+}
+
+/**
+ * Records the list and specific change for a specific residual seat
+ */
+export type SeatChange_PGNumber =
+  | { HighestAverageAssignment: HighestAverageAssignedSeat_PGNumber }
+  | { UniqueHighestAverageAssignment: HighestAverageAssignedSeat_PGNumber }
+  | { LargestRemainderAssignment: LargestRemainderAssignedSeat_PGNumber }
+  | { AbsoluteMajorityReassignment: AbsoluteMajorityReassignedSeat_PGNumber }
+  | { ListExhaustionRemoval: ListExhaustionRemovedSeat_PGNumber };
 
 /**
  * Contains a summary count, containing both the count and a list of polling

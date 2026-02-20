@@ -57,7 +57,7 @@ required-features = ["embed-typst"]
 # Note: if you add a dependency here, please update the README.md for the backend as well.
 
 [dependencies]
-apportionment = { path = "./apportionment" }
+apportionment = { path = "./apportionment", features = ["serde", "utoipa"] }
 pdf_gen = { path = "./pdf_gen" }
 axum.workspace = true
 axum-extra.workspace = true

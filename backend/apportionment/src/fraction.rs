@@ -6,6 +6,8 @@ use std::{
 
 /// Implementation of a fraction with a numerator and a denominator.
 #[derive(Clone, Copy)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize))]
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 // type invariant: denominator has to be nonzero
 pub struct Fraction {
     pub numerator: u64,

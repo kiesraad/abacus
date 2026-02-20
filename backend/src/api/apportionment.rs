@@ -1,6 +1,8 @@
+use std::collections::HashMap;
+
 use apportionment::{
     ApportionmentError, ApportionmentInput, CandidateNominationResult, CandidateVotesTrait,
-    ListVotesTrait, SeatAssignmentResult, ListNumber, CandidateNumber
+    ListVotesTrait, PreferenceThreshold, SeatAssignmentResult,
 };
 use axum::{
     Json,
@@ -17,7 +19,7 @@ use crate::{
     audit_log::{AuditEvent, AuditService},
     domain::{
         data_entry::{CandidateVotes, PoliticalGroupCandidateVotes},
-        election::{ElectionId, ElectionWithPoliticalGroups},
+        election::{Candidate, CandidateNumber, ElectionId, PGNumber, PoliticalGroup},
         status::DataEntryStatusName,
         summary::ElectionSummary,
     },
@@ -39,36 +41,29 @@ pub fn router() -> OpenApiRouter<AppState> {
 }
 
 #[derive(Clone, Debug)]
-pub struct ElectionPoliticalGroupSummary {
-    pub election: ElectionWithPoliticalGroups,
-    pub summary: ElectionSummary,
+pub struct ApportionmentInputData {
+    pub number_of_seats: u32,
+    pub list_votes: Vec<PoliticalGroupCandidateVotes>,
 }
 
-impl ApportionmentInput for ElectionPoliticalGroupSummary {
+impl ApportionmentInput for ApportionmentInputData {
     type List = PoliticalGroupCandidateVotes;
 
     fn number_of_seats(&self) -> u32 {
-        self.election.number_of_seats
-    }
-
-    fn total_votes(&self) -> u32 {
-        self.summary.votes_counts.total_votes_candidates_count
+        self.number_of_seats
     }
 
     fn list_votes(&self) -> &[Self::List] {
-        &self.summary.political_group_votes
+        &self.list_votes
     }
 }
 
 impl ListVotesTrait for PoliticalGroupCandidateVotes {
     type Cv = CandidateVotes;
+    type ListNumber = PGNumber;
 
-    fn number(&self) -> ListNumber {
-        ListNumber::from(self.number)
-    }
-
-    fn total_votes(&self) -> u32 {
-        self.total
+    fn number(&self) -> Self::ListNumber {
+        self.number
     }
 
     fn candidate_votes(&self) -> &[Self::Cv] {
@@ -77,27 +72,15 @@ impl ListVotesTrait for PoliticalGroupCandidateVotes {
 }
 
 impl CandidateVotesTrait for CandidateVotes {
-    fn number(&self) -> CandidateNumber {
-        CandidateNumber::from(self.number)
+    type CandidateNumber = CandidateNumber;
+
+    fn number(&self) -> Self::CandidateNumber {
+        self.number
     }
 
     fn votes(&self) -> u32 {
         self.votes
     }
-}
-
-// TODO: fix dead code
-#[derive(Debug, Serialize, ToSchema)]
-#[allow(dead_code)]
-struct ElectionApportionmentResponse {
-    // TODO: newtype these fields
-    #[serde(skip)]
-    #[schema(value_type = Object)]
-    pub seat_assignment: SeatAssignmentResult,
-    #[serde(skip)]
-    #[schema(value_type = Object)]
-    pub candidate_nomination: CandidateNominationResult,
-    pub summary: ElectionSummary,
 }
 
 /// Get the apportionment for an election
@@ -140,11 +123,11 @@ async fn election_apportionment(
         let results =
             list_results_for_committee_session(&mut conn, current_committee_session.id).await?;
 
-        let input = ElectionPoliticalGroupSummary {
-            election: election.clone(),
-            summary: ElectionSummary::from_results(&election, &results)?,
+        let summary = ElectionSummary::from_results(&election, &results)?;
+        let input = ApportionmentInputData {
+            number_of_seats: election.number_of_seats,
+            list_votes: summary.political_group_votes.clone(),
         };
-
         let result = apportionment::process(&input)?;
 
         audit_service
@@ -155,12 +138,15 @@ async fn election_apportionment(
             )
             .await?;
 
-        // TODO: this data needs to be enriched, see below
         let result = ElectionApportionmentResponse {
             seat_assignment: result.seat_assignment,
-            candidate_nomination: result.candidate_nomination,
-            summary: input.summary,
+            candidate_nomination: map_candidate_nomination(
+                result.candidate_nomination,
+                election.political_groups,
+            ),
+            summary,
         };
+        tracing::debug!("Apportionment response: {:?}", result);
 
         Ok(Json(result))
     } else {
@@ -170,38 +156,87 @@ async fn election_apportionment(
     }
 }
 
-// TODO: We need to enrich the data:
-//  - result.seat_assignment
-//  Add list name for each list
-//  - result.candidate_nomination.chosen_candidates
-//  Enrichment means mapping the candidate number per list to the original full candidate information
-//  Then the list of chosen candidates needs to be sorted alphabetically on last name
-//  pub fn sort_candidates_on_last_name_alphabetically(
-//      mut candidates: Vec<Candidate>,
-//  ) -> Vec<Candidate> {
-//      candidates.sort_by(|a, b| a.last_name.cmp(&b.last_name));
-//      candidates
-//  }
-//  /// Test for function sort_candidates_on_last_name_alphabetically
-//  #[test]
-//  fn test_sort_candidates_on_last_name_alphabetically() {
-//      let names = ["Duin", "Korte", "Appel", "Zee", "Groen"];
-//      let candidates: Vec<Candidate> = (0..5)
-//          .map(|i| Candidate {
-//              number: i + 1,
-//              initials: "A.B.".to_string(),
-//              first_name: Some(format!("Candidate {}", i + 1)),
-//              last_name_prefix: if (i % 2) == 0 {
-//                  Some("van".to_string())
-//              } else {
-//                  None
-//              },
-//              last_name: names[i as usize].to_string(),
-//              locality: "Juinen".to_string(),
-//              country_code: Some("NL".to_string()),
-//              gender: Some(X),
-//          })
-//          .collect();
-//      let sorted_candidates = sort_candidates_on_last_name_alphabetically(candidates);
-//      assert_eq!(candidate_numbers(&sorted_candidates), vec![3, 1, 5, 2, 4]);
-//  }
+#[derive(Debug, Serialize, ToSchema)]
+struct ElectionApportionmentResponse {
+    pub seat_assignment: SeatAssignmentResult<PoliticalGroupCandidateVotes>,
+    pub candidate_nomination: CandidateNominationResponse,
+    pub summary: ElectionSummary,
+}
+
+#[derive(Debug, Serialize, ToSchema)]
+pub struct CandidateNominationResponse {
+    pub preference_threshold: PreferenceThreshold,
+    pub chosen_candidates: Vec<Candidate>,
+    pub list_candidate_nomination: Vec<ListCandidateNominationResponse>,
+}
+
+#[derive(Debug, Serialize, ToSchema)]
+pub struct ListCandidateNominationResponse {
+    pub list_number: PGNumber,
+    pub list_name: String,
+    pub list_seats: u32,
+    pub preferential_candidate_nomination: Vec<CandidateVotes>,
+    pub other_candidate_nomination: Vec<CandidateVotes>,
+    pub updated_candidate_ranking: Vec<Candidate>,
+}
+
+/// Maps the apportionment output with candidate and list information
+fn map_candidate_nomination(
+    nomination: CandidateNominationResult<'_, PoliticalGroupCandidateVotes>,
+    political_groups: Vec<PoliticalGroup>,
+) -> CandidateNominationResponse {
+    // Build lookups political_groups
+    let mut list_names: HashMap<PGNumber, String> = HashMap::new();
+    let mut candidate_map: HashMap<(PGNumber, CandidateNumber), Candidate> = HashMap::new();
+    for list in political_groups {
+        list_names.insert(list.number, list.name);
+
+        for candidate in list.candidates {
+            candidate_map.insert((list.number, candidate.number), candidate);
+        }
+    }
+
+    // Map chosen_candidates
+    let mut chosen_candidates: Vec<Candidate> = nomination
+        .chosen_candidates
+        .iter()
+        .map(|c| candidate_map[&(c.list_number, c.candidate_number)].clone())
+        .collect();
+
+    // Sort chosen_candidates on last_name
+    chosen_candidates.sort_by(|a, b| a.last_name.cmp(&b.last_name));
+
+    // Map list_names and candidates
+    let list_candidate_nomination: Vec<ListCandidateNominationResponse> = nomination
+        .list_candidate_nomination
+        .into_iter()
+        .map(|lcn| ListCandidateNominationResponse {
+            list_number: lcn.list_number,
+            list_name: list_names
+                .remove(&lcn.list_number)
+                .expect("list must exist in election data"),
+            list_seats: lcn.list_seats,
+            preferential_candidate_nomination: lcn
+                .preferential_candidate_nomination
+                .into_iter()
+                .copied()
+                .collect(),
+            other_candidate_nomination: lcn
+                .other_candidate_nomination
+                .into_iter()
+                .copied()
+                .collect(),
+            updated_candidate_ranking: lcn
+                .updated_candidate_ranking
+                .iter()
+                .map(|cn| candidate_map[&(lcn.list_number, *cn)].clone())
+                .collect(),
+        })
+        .collect();
+
+    CandidateNominationResponse {
+        preference_threshold: nomination.preference_threshold,
+        chosen_candidates,
+        list_candidate_nomination,
+    }
+}

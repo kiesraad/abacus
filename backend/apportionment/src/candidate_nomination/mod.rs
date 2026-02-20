@@ -2,13 +2,14 @@ mod structs;
 
 use tracing::{debug, info};
 
-use self::structs::PreferenceThreshold;
 use super::{
     ApportionmentError, CandidateVotesTrait, ListVotesTrait,
     fraction::Fraction,
     structs::{CandidateNominationInput, LARGE_COUNCIL_THRESHOLD},
 };
-pub use structs::{Candidate, CandidateNominationResult, ListCandidateNomination};
+pub use structs::{
+    Candidate, CandidateNominationResult, ListCandidateNomination, PreferenceThreshold,
+};
 
 /// Candidate nomination
 pub(crate) fn candidate_nomination<'a, L: ListVotesTrait>(

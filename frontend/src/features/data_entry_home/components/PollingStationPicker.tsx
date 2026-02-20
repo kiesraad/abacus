@@ -186,9 +186,7 @@ export function PollingStationPicker({ anotherEntry }: PollingStationPickerProps
         {alert && <AlertMessage message={alert} />}
         <BottomBar type="form">
           <BottomBar.Row>
-            <Button type="button" onClick={handleSubmit}>
-              {t("start")}
-            </Button>
+            <Button onClick={handleSubmit}>{t("start")}</Button>
             <KeyboardKeys keys={[KeyboardKey.Shift, KeyboardKey.Enter]} />
           </BottomBar.Row>
         </BottomBar>

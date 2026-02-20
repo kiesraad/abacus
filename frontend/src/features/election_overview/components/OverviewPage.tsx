@@ -32,7 +32,11 @@ function AddFirstElection() {
         <div>{tx("election.add_first_election")}</div>
       </FormLayout.Section>
       <FormLayout.Controls>
-        {isAdministrator && <Button.Link to={"./create"}>{t("election.create")}</Button.Link>}
+        {isAdministrator && (
+          <Button.Link type="submit" to={"./create"}>
+            {t("election.create")}
+          </Button.Link>
+        )}
       </FormLayout.Controls>
     </FormLayout>
   );

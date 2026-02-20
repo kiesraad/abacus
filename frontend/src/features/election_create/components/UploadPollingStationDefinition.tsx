@@ -114,7 +114,9 @@ export function UploadPollingStationDefinition() {
               <PollingStationsPreview pollingStations={state.pollingStations} />
             </FormLayout.Section>
             <FormLayout.Controls>
-              <Button onClick={() => void next()}>{t("next")}</Button>
+              <Button type="submit" onClick={() => void next()}>
+                {t("next")}
+              </Button>
             </FormLayout.Controls>
           </FormLayout>
         </Form>

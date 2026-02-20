@@ -71,6 +71,7 @@ export function CheckAndSave() {
       </ul>
       <div className="mt-xl">
         <Button
+          type="submit"
           onClick={() => {
             handleSubmit();
           }}

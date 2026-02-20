@@ -394,7 +394,6 @@ test.describe("full flow", () => {
     await expect(electionHome.header).toHaveText("Gemeenteraad Test 2022");
     await electionHome.newSessionButton.click();
     await electionHome.newSessionModalConfirmButton.click();
-
     await expect(electionHome.getCommitteeSessionCard(2)).toContainText("Tweede zitting");
 
     await logout(page);
@@ -438,6 +437,7 @@ test.describe("full flow", () => {
     await electionHome.investigationsOverviewButton.click();
 
     const investigationsOverviewPage = new InvestigationOverviewPgObj(page);
+    await expect(investigationsOverviewPage.header).toHaveText("Onderzoeken in tweede zitting");
     await investigationsOverviewPage.addInvestigationButton.click();
 
     const addInvestigationPage = new AddInvestigationPgObj(page);
@@ -445,7 +445,6 @@ test.describe("full flow", () => {
     await addInvestigationPage.addPollingStation.click();
 
     const form = new PollingStationFormPgObj(page);
-
     await form.fillIn({
       number: 5,
       name: "Sportfondsenbad",
@@ -469,7 +468,14 @@ test.describe("full flow", () => {
       await expect(overviewPage.header).toBeVisible();
       await overviewPage.findElectionRowById(electionId!).click();
 
+      const electionHome = new ElectionHome(page);
+      await electionHome.investigationsOverviewButton.click();
+
       await createInvestigation(page, station.name, station.reason);
+      const investigationsOverviewPage = new InvestigationOverviewPgObj(page);
+      await expect(investigationsOverviewPage.alert).toHaveText(
+        `Onderzoek voor stembureau ${station.number} (${station.name}) toegevoegd`,
+      );
 
       await logout(page);
     });
@@ -511,7 +517,7 @@ test.describe("full flow", () => {
       await electionHome.investigationsOverviewButton.click();
 
       const investigationsOverviewPage = new InvestigationOverviewPgObj(page);
-      await expect(investigationsOverviewPage.header).toContainText("Onderzoeken in tweede zitting");
+      await expect(investigationsOverviewPage.header).toHaveText("Onderzoeken in tweede zitting");
       await investigationsOverviewPage.findInvestigationEditButtonByPollingStation(station.number).click();
 
       const investigationsFindingsPage = new InvestigationFindingsPgObj(page);

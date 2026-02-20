@@ -14,7 +14,6 @@ import { CheckPollingStationDefinitionPgObj } from "e2e-tests/page-objects/elect
 import { UploadCandidateDefinitionPgObj } from "e2e-tests/page-objects/election/create/UploadCandidateDefinitionPgObj";
 import { UploadElectionDefinitionPgObj } from "e2e-tests/page-objects/election/create/UploadElectionDefinitionPgObj";
 import { UploadPollingStationDefinitionPgObj } from "e2e-tests/page-objects/election/create/UploadPollingStationDefinitionPgObj";
-import { ElectionHome } from "e2e-tests/page-objects/election/ElectionHomePgObj";
 import { AddInvestigationPgObj } from "e2e-tests/page-objects/investigations/AddInvestigationPgObj";
 import { InvestigationOverviewPgObj } from "e2e-tests/page-objects/investigations/InvestigationOverviewPgObj";
 import { InvestigationPrintCorrigendumPgObj } from "e2e-tests/page-objects/investigations/InvestigationPrintCorrigendumPgObj";
@@ -114,17 +113,18 @@ export async function uploadPollingStations(page: Page, eml = eml110b) {
 }
 
 export async function createInvestigation(page: Page, pollingStation: string, reason: string) {
-  const electionHome = new ElectionHome(page);
-  await electionHome.investigationsOverviewButton.click();
   const investigationsOverviewPage = new InvestigationOverviewPgObj(page);
   await investigationsOverviewPage.addInvestigationButton.click();
+
   const addInvestigationPage = new AddInvestigationPgObj(page);
   await expect(addInvestigationPage.header).toBeVisible();
   await addInvestigationPage.selectPollingStation(pollingStation);
+
   const investigationReasonPage = new InvestigationReasonPgObj(page);
   await expect(investigationReasonPage.header).toBeVisible();
   await investigationReasonPage.reasonField.fill(reason);
   await investigationReasonPage.nextButton.click();
+
   const investigationPrintCorrigendumPage = new InvestigationPrintCorrigendumPgObj(page);
   await expect(investigationPrintCorrigendumPage.header).toBeVisible();
   const downloadPromise = page.waitForEvent("download");
@@ -132,6 +132,8 @@ export async function createInvestigation(page: Page, pollingStation: string, re
   const download = await downloadPromise;
   expect(download.suggestedFilename()).toMatch(/Model_Na14-2_GR2022_Stembureau_\d+_Bijlage_1.pdf/);
   expect((await stat(await download.path())).size).toBeGreaterThan(1024);
+
+  await investigationPrintCorrigendumPage.backToInvestigationsButton.click();
 }
 
 export async function logout(page: Page) {

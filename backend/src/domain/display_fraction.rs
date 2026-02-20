@@ -1,16 +1,31 @@
 use apportionment::Fraction;
+use serde::{Deserialize, Serialize};
+use utoipa::openapi::{RefOr, Schema};
+use utoipa::{PartialSchema, ToSchema};
 
-// TODO remote derive/newtype to make sure Fraction is serialized into DisplayFraction
-//  https://serde.rs/remote-derive.html
-//  #[derive(Serialize, Deserialize)]
-//  #[serde(
-//      deny_unknown_fields,
-//      into = "DisplayFraction",
-//      from = "DisplayFraction"
-//  )]
+// TODO: The below does not work yet
+#[derive(Clone, Copy, Serialize, Deserialize)]
+#[serde(
+    deny_unknown_fields,
+    into = "DisplayFraction",
+    from = "DisplayFraction",
+    remote = "Fraction"
+)]
+pub struct FractionDef {
+    pub numerator: u64,
+    pub denominator: u64,
+}
+
+impl PartialSchema for FractionDef {
+    fn schema() -> RefOr<Schema> {
+        DisplayFraction::schema()
+    }
+}
+impl ToSchema for FractionDef {}
 
 /// Fraction with the integer part split out for display purposes
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy, Debug, Serialize, Deserialize, ToSchema)]
+#[schema(as = FractionDef)]
 pub struct DisplayFraction {
     integer: u64,
     numerator: u64,

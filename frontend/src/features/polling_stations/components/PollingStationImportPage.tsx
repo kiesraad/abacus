@@ -144,9 +144,7 @@ export function PollingStationImportPage() {
             <PollingStationsPreview pollingStations={pollingStations} />
           </FormLayout.Section>
           <FormLayout.Controls>
-            <Button type="submit" onClick={() => void importPollingStations(file)}>
-              {t("polling_station.import")}
-            </Button>
+            <Button onClick={() => void importPollingStations(file)}>{t("polling_station.import")}</Button>
           </FormLayout.Controls>
         </FormLayout>
       </Form>

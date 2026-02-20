@@ -75,7 +75,6 @@ export function AuthorizationDialog() {
           <Button
             variant="primary"
             size="xl"
-            type="submit"
             onClick={() => {
               void extendSession();
               setHideDialog(true);

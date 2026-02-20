@@ -20,7 +20,7 @@ pub struct SeatAssignmentResult {
 #[derive(Debug, PartialEq)]
 pub struct ListSeatAssignment {
     /// List number for which this assignment applies
-    list_number: ListNumber,
+    pub list_number: ListNumber,
     /// The number of votes cast for this group
     votes_cast: u64,
     /// The remainder votes that were not used to get full seats assigned to this list
@@ -36,6 +36,7 @@ pub struct ListSeatAssignment {
 }
 
 impl From<ListStanding> for ListSeatAssignment {
+    /// Converts a list standing into a list seat assignment.
     fn from(list: ListStanding) -> Self {
         ListSeatAssignment {
             list_number: list.list_number,
@@ -74,16 +75,16 @@ impl ListStanding {
     /// were assigned to a list.
     pub(crate) fn new<T: ListVotesTrait>(list: &T, quota: Fraction) -> Self {
         let votes_cast = Fraction::from(list.total_votes());
-        let list_seats = if votes_cast > Fraction::ZERO {
-            u32::try_from((votes_cast / quota).integer_part()).expect("list_seats fit in u32")
+        let full_seats = if votes_cast > Fraction::ZERO {
+            u32::try_from((votes_cast / quota).integer_part()).expect("full_seats fit in u32")
         } else {
             0
         };
 
-        let remainder_votes = votes_cast - (Fraction::from(list_seats) * quota);
+        let remainder_votes = votes_cast - (Fraction::from(full_seats) * quota);
 
         debug!(
-            "List {} has {list_seats} full seats with {} votes",
+            "List {} has {full_seats} full seats with {} votes",
             list.number(),
             list.total_votes()
         );
@@ -92,8 +93,8 @@ impl ListStanding {
             votes_cast: list.total_votes().into(),
             remainder_votes,
             meets_remainder_threshold: votes_cast >= quota * Fraction::new(3, 4),
-            next_votes_per_seat: votes_cast / Fraction::from(list_seats + 1),
-            full_seats: list_seats,
+            next_votes_per_seat: votes_cast / Fraction::from(full_seats + 1),
+            full_seats,
             residual_seats: 0,
         }
     }

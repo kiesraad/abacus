@@ -129,7 +129,6 @@ pub enum AuditEventType {
     DataEntryResumed,
     DataEntryDeleted,
     DataEntryFinalised,
-    ResultDeleted,
     // data entry resolving events
     DataEntryDiscardedFirst,
     DataEntryReturnedFirst,
@@ -191,7 +190,6 @@ impl AuditEventType {
             AuditEventType::DataEntryResumed => AuditEventLevel::Success,
             AuditEventType::DataEntryDeleted => AuditEventLevel::Info,
             AuditEventType::DataEntryFinalised => AuditEventLevel::Success,
-            AuditEventType::ResultDeleted => AuditEventLevel::Success,
             AuditEventType::ApplicationStarted => AuditEventLevel::Info,
             AuditEventType::UnknownEvent => AuditEventLevel::Warning,
             AuditEventType::DataEntryDiscardedFirst => AuditEventLevel::Info,

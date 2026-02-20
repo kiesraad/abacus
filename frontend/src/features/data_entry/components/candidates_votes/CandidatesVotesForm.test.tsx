@@ -13,9 +13,9 @@ import { validationResultMockData } from "@/testing/api-mocks/ValidationResultMo
 import { overrideOnce, server } from "@/testing/server";
 import { getUrlMethodAndBody, render, screen, waitFor, within } from "@/testing/test-utils";
 import type {
+  DATA_ENTRY_SAVE_REQUEST_BODY,
   ElectionWithPoliticalGroups,
   LoginResponse,
-  POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_BODY,
   PoliticalGroup,
 } from "@/types/generated/openapi";
 
@@ -311,6 +311,7 @@ describe("Test CandidatesVotesForm", () => {
       const electionMockData: ElectionWithPoliticalGroups = {
         id: 1,
         name: "Gemeenteraadsverkiezingen 2026",
+        role: "GSB",
         counting_method: "CSO",
         election_id: "Heemdamseburg_2024",
         location: "Heemdamseburg",
@@ -449,7 +450,7 @@ describe("Test CandidatesVotesForm", () => {
       const { url, method, body } = getUrlMethodAndBody(spy.mock.calls);
       expect(url).toEqual("/api/polling_stations/1/data_entries/1");
       expect(method).toEqual("POST");
-      const request_body = body as POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_BODY;
+      const request_body = body as DATA_ENTRY_SAVE_REQUEST_BODY;
       expect(request_body.data).toEqual(expectedRequest.data);
     });
   });

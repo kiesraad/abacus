@@ -14,7 +14,9 @@ use self::{
 use super::{
     ApportionmentInput, ListVotesTrait,
     fraction::Fraction,
-    structs::{ApportionmentError, ListNumber},
+    structs::{
+        ApportionmentError, CandidateNominationInput, CandidateNominationInputType, ListNumber,
+    },
 };
 pub use structs::SeatAssignmentResult;
 
@@ -25,14 +27,20 @@ pub(crate) fn seat_assignment<T: ApportionmentInput>(
     info!("Seat assignment");
     info!("Seats: {}", input.number_of_seats());
 
-    if input.total_votes() == 0 {
+    // [Artikel P 5 Kieswet](https://wetten.overheid.nl/BWBR0004627/2026-01-01/#AfdelingII_HoofdstukP_Paragraaf2_ArtikelP5)
+    // Sum the votes cast on candidates for each list
+    let total_votes_cast = input
+        .list_votes()
+        .iter()
+        .map(|list_votes| list_votes.total_votes())
+        .sum();
+    if total_votes_cast == 0 {
         info!("No votes on candidates cast");
         return Err(ApportionmentError::ZeroVotesCast);
     }
 
-    // [Artikel P 5 Kieswet](https://wetten.overheid.nl/BWBR0004627/2026-01-01/#AfdelingII_HoofdstukP_Paragraaf2_ArtikelP5)
     // Calculate electoral quota (kiesdeler) as a proper fraction
-    let quota = Fraction::from(input.total_votes()) / Fraction::from(input.number_of_seats());
+    let quota = Fraction::from(total_votes_cast) / Fraction::from(input.number_of_seats());
     info!("Quota: {}", quota);
 
     // [Artikel P 6 Kieswet](https://wetten.overheid.nl/BWBR0004627/2026-01-01/#AfdelingII_HoofdstukP_Paragraaf2_ArtikelP6)
@@ -66,7 +74,7 @@ pub(crate) fn seat_assignment<T: ApportionmentInput>(
     let (cumulative_standings, assigned_seat) = if let Some(last_step) = steps.last() {
         reassign_residual_seat_for_absolute_majority(
             input.number_of_seats(),
-            input.total_votes(),
+            total_votes_cast,
             input.list_votes(),
             &last_step.change.list_assigned(),
             current_standings,
@@ -84,7 +92,7 @@ pub(crate) fn seat_assignment<T: ApportionmentInput>(
     }
 
     // TODO: #797 [Artikel P 19a Kieswet](https://wetten.overheid.nl/BWBR0004627/2026-01-01/#AfdelingII_HoofdstukP_Paragraaf3_ArtikelP19a)
-    // mark deceased candidates
+    //  Mark deceased candidates
 
     // [Artikel P 10 Kieswet](https://wetten.overheid.nl/BWBR0004627/2026-01-01/#AfdelingII_HoofdstukP_Paragraaf2_ArtikelP10)
     let (final_steps, final_standing) = reassign_residual_seats_for_exhausted_lists(
@@ -111,31 +119,58 @@ pub(crate) fn seat_assignment<T: ApportionmentInput>(
     })
 }
 
-pub fn get_total_seats_from_apportionment_result(result: &SeatAssignmentResult) -> Vec<u32> {
+/// Returns the total number of seats each list number received in the apportionment result.
+pub fn get_total_seats_per_list_number_from_apportionment_result(
+    result: &SeatAssignmentResult,
+) -> Vec<(ListNumber, u32)> {
     result
         .final_standing
         .iter()
-        .map(|p| p.total_seats)
+        .map(|p| (p.list_number, p.total_seats))
         .collect::<Vec<_>>()
 }
 
-/// Create a vector containing just the list numbers from an iterator of the current standing
+/// Returns candidate nomination input created from the initial apportionment input
+/// and the seat assignment result.
+pub fn as_candidate_nomination_input<'a, T: ApportionmentInput>(
+    input: &'a T,
+    seat_assignment: &SeatAssignmentResult,
+) -> CandidateNominationInputType<'a, T> {
+    CandidateNominationInput {
+        number_of_seats: input.number_of_seats(),
+        list_votes: input.list_votes(),
+        quota: seat_assignment.quota,
+        total_seats_per_list: get_total_seats_per_list_number_from_apportionment_result(
+            seat_assignment,
+        ),
+    }
+}
+
+/// Returns a vector containing just the list numbers from an iterator of the current standing
 fn list_numbers(standing: &[&ListStanding]) -> Vec<ListNumber> {
     standing.iter().map(|s| s.list_number).collect()
 }
 
+/// Returns the number of candidates of a list.
+fn get_number_of_candidates<T: ListVotesTrait>(
+    input_list_votes: &[T],
+    list_number: ListNumber,
+) -> u32 {
+    let list_votes = input_list_votes
+        .iter()
+        .find(|list_votes| list_votes.number() == list_number)
+        .expect("List votes exists");
+    u32::try_from(list_votes.candidate_votes().len()).expect("Number of candidates fits in u32")
+}
+
+/// Returns a vector with tuples of list numbers and how many more seats it was assigned
+/// compared to the number of candidates.
 fn list_numbers_with_exhausted_seats<'a, T: ListVotesTrait>(
     standings: impl Iterator<Item = &'a ListStanding>,
-    list_votes: &[T],
+    input_list_votes: &[T],
 ) -> Vec<(ListNumber, u32)> {
     standings.fold(vec![], |mut exhausted_list_numbers_and_seats, s| {
-        let list_votes = list_votes
-            .iter()
-            .find(|list_votes| list_votes.number() == s.list_number)
-            .expect("List votes exists");
-        let number_of_candidates = u32::try_from(list_votes.candidate_votes().len())
-            .expect("Number of candidates fits in u32");
-
+        let number_of_candidates = get_number_of_candidates(input_list_votes, s.list_number);
         if number_of_candidates.cmp(&s.total_seats()) == Ordering::Less {
             exhausted_list_numbers_and_seats.push((
                 s.list_number,
@@ -151,12 +186,12 @@ fn list_numbers_with_exhausted_seats<'a, T: ListVotesTrait>(
 /// This re-assignment is done according to article P 9 of the Kieswet.
 fn reassign_residual_seat_for_absolute_majority<T: ListVotesTrait>(
     seats: u32,
-    total_votes: u32,
+    total_votes_cast: u32,
     list_votes: &[T],
     lists_last_residual_seat: &[ListNumber],
     standings: Vec<ListStanding>,
 ) -> Result<(Vec<ListStanding>, Option<SeatChange>), ApportionmentError> {
-    let half_of_votes_count: Fraction = Fraction::from(total_votes) * Fraction::new(1, 2);
+    let half_of_votes_count = Fraction::from(total_votes_cast) * Fraction::new(1, 2);
 
     // Find list with an absolute majority of votes. Return early if we find none
     let Some(majority_list_votes) = list_votes
@@ -166,7 +201,7 @@ fn reassign_residual_seat_for_absolute_majority<T: ListVotesTrait>(
         return Ok((standings, None));
     };
 
-    let half_of_seats_count: Fraction = Fraction::from(seats) * Fraction::new(1, 2);
+    let half_of_seats_count = Fraction::from(seats) * Fraction::new(1, 2);
     let standing_of_list_with_majority_votes = standings
         .iter()
         .find(|list_standing| list_standing.list_number == majority_list_votes.number())
@@ -279,9 +314,14 @@ fn reassign_residual_seats_for_exhausted_lists<T: ListVotesTrait>(
 #[cfg(test)]
 pub(crate) mod tests {
     use crate::{
+        SeatAssignmentResult,
         fraction::Fraction,
-        seat_assignment::{ListStanding, SeatChange, list_numbers},
+        seat_assignment::{
+            ListStanding, SeatChange, get_total_seats_per_list_number_from_apportionment_result,
+            list_numbers,
+        },
         structs::ListNumber,
+        test_helpers::convert_total_seats_per_u32_list_number_to_total_seats_per_list_number,
     };
     use test_log::test;
 
@@ -292,55 +332,36 @@ pub(crate) mod tests {
         }
     }
 
+    fn check_total_seats_per_list(
+        result: &SeatAssignmentResult,
+        expected_total_seats_per_list: Vec<(u32, u32)>,
+    ) {
+        let total_seats_per_list_number =
+            get_total_seats_per_list_number_from_apportionment_result(result);
+        let expected_total_seats_per_list_number =
+            convert_total_seats_per_u32_list_number_to_total_seats_per_list_number(
+                expected_total_seats_per_list,
+            );
+        assert_eq!(
+            expected_total_seats_per_list_number,
+            total_seats_per_list_number
+        );
+    }
+
     #[test]
     fn test_list_numbers() {
-        let standing = [
-            &ListStanding {
-                list_number: ListNumber::from(2),
+        let standings: Vec<ListStanding> = (2..=6)
+            .map(|n| ListStanding {
+                list_number: ListNumber::from(n),
                 votes_cast: 1249,
                 remainder_votes: Fraction::new(14975, 24),
                 meets_remainder_threshold: true,
                 next_votes_per_seat: Fraction::new(1249, 2),
                 full_seats: 1,
                 residual_seats: 0,
-            },
-            &ListStanding {
-                list_number: ListNumber::from(3),
-                votes_cast: 1249,
-                remainder_votes: Fraction::new(14975, 24),
-                meets_remainder_threshold: true,
-                next_votes_per_seat: Fraction::new(1249, 2),
-                full_seats: 1,
-                residual_seats: 0,
-            },
-            &ListStanding {
-                list_number: ListNumber::from(4),
-                votes_cast: 1249,
-                remainder_votes: Fraction::new(14975, 24),
-                meets_remainder_threshold: true,
-                next_votes_per_seat: Fraction::new(1249, 2),
-                full_seats: 1,
-                residual_seats: 0,
-            },
-            &ListStanding {
-                list_number: ListNumber::from(5),
-                votes_cast: 1249,
-                remainder_votes: Fraction::new(14975, 24),
-                meets_remainder_threshold: true,
-                next_votes_per_seat: Fraction::new(1249, 2),
-                full_seats: 1,
-                residual_seats: 0,
-            },
-            &ListStanding {
-                list_number: ListNumber::from(6),
-                votes_cast: 1249,
-                remainder_votes: Fraction::new(14975, 24),
-                meets_remainder_threshold: true,
-                next_votes_per_seat: Fraction::new(1249, 2),
-                full_seats: 1,
-                residual_seats: 0,
-            },
-        ];
+            })
+            .collect();
+        let standing: Vec<&ListStanding> = standings.iter().collect();
         assert_eq!(list_numbers(&standing), vec![2, 3, 4, 5, 6]);
     }
 
@@ -350,9 +371,12 @@ pub(crate) mod tests {
 
         use crate::{
             ApportionmentError,
-            seat_assignment::{get_total_seats_from_apportionment_result, seat_assignment},
+            seat_assignment::seat_assignment,
             structs::ListNumber,
-            test_helpers::seat_assignment_fixture_with_default_50_candidates,
+            test_helpers::{
+                get_total_seats_from_apportionment_result,
+                seat_assignment_fixture_with_default_50_candidates,
+            },
         };
 
         /// Apportionment without remainder seats
@@ -663,10 +687,9 @@ pub(crate) mod tests {
         mod list_exhaustion {
             use test_log::test;
 
+            use super::get_total_seats_from_apportionment_result;
             use crate::{
-                ApportionmentError,
-                seat_assignment::{get_total_seats_from_apportionment_result, seat_assignment},
-                structs::ListNumber,
+                ApportionmentError, seat_assignment::seat_assignment, structs::ListNumber,
                 test_helpers::seat_assignment_fixture_with_given_candidate_votes,
             };
 
@@ -1314,11 +1337,16 @@ pub(crate) mod tests {
     mod gte_19_seats {
         use test_log::test;
 
+        use super::check_total_seats_per_list;
         use crate::{
             ApportionmentError,
-            seat_assignment::{get_total_seats_from_apportionment_result, seat_assignment},
+            seat_assignment::seat_assignment,
             structs::ListNumber,
-            test_helpers::seat_assignment_fixture_with_default_50_candidates,
+            test_helpers::{
+                get_total_seats_from_apportionment_result,
+                seat_assignment_fixture_with_default_50_candidates,
+                seat_assignment_fixture_with_given_list_numbers_and_candidate_votes,
+            },
         };
 
         /// Apportionment without remainder seats
@@ -1336,6 +1364,48 @@ pub(crate) mod tests {
             assert_eq!(result.steps.len(), 0);
             let total_seats = get_total_seats_from_apportionment_result(&result);
             assert_eq!(total_seats, vec![12, 6, 2, 2, 2, 1]);
+        }
+
+        /// Apportionment with non-consecutive list numbers
+        ///
+        /// Full seats: [11, 5, 1, 1, 1] - Remainder seats: 4  
+        /// 1 - highest average: [50, 50 2/6, 49, 49 1/2, 50 1/2] seat assigned to list 7  
+        /// 2 - highest average: [50, 50 2/6, 49, 49 1/2, 33 2/3] seat assigned to list 3  
+        /// 3 - highest average: [50, 43 1/7, 49, 49 1/2, 33 2/3] seat assigned to list 1  
+        /// 4 - highest average: [46 2/13, 43 1/7, 49, 49 1/2, 33 2/3] seat assigned to list 6
+        #[test]
+        fn test_with_non_consecutive_list_numbers() {
+            let input = seat_assignment_fixture_with_given_list_numbers_and_candidate_votes(
+                23,
+                vec![
+                    (1, vec![50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50]),
+                    (3, vec![52, 50, 50, 50, 50, 50]),
+                    (4, vec![98]),
+                    (6, vec![50, 49]),
+                    (7, vec![51, 50]),
+                ],
+            );
+            let result = seat_assignment(&input).unwrap();
+            assert_eq!(result.full_seats, 19);
+            assert_eq!(result.residual_seats, 4);
+            assert_eq!(result.steps.len(), 4);
+            assert_eq!(
+                result.steps[0].change.list_number_assigned(),
+                ListNumber::from(7)
+            );
+            assert_eq!(
+                result.steps[1].change.list_number_assigned(),
+                ListNumber::from(3)
+            );
+            assert_eq!(
+                result.steps[2].change.list_number_assigned(),
+                ListNumber::from(1)
+            );
+            assert_eq!(
+                result.steps[3].change.list_number_assigned(),
+                ListNumber::from(6)
+            );
+            check_total_seats_per_list(&result, vec![(1, 12), (3, 6), (4, 1), (6, 2), (7, 2)]);
         }
 
         /// Apportionment with residual seats assigned with highest averages method
@@ -1545,10 +1615,9 @@ pub(crate) mod tests {
         mod list_exhaustion {
             use test_log::test;
 
+            use super::get_total_seats_from_apportionment_result;
             use crate::{
-                ApportionmentError,
-                seat_assignment::{get_total_seats_from_apportionment_result, seat_assignment},
-                structs::ListNumber,
+                ApportionmentError, seat_assignment::seat_assignment, structs::ListNumber,
                 test_helpers::seat_assignment_fixture_with_given_candidate_votes,
             };
 

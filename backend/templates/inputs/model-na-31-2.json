@@ -10,6 +10,7 @@
   "election": {
     "id": 2,
     "name": "Gemeenteraad Juinen 2035",
+    "role": "GSB",
     "counting_method": "CSO",
     "election_id": "Juinen_2035",
     "location": "Juinen",
@@ -77,24 +78,13 @@
       },
       "fewer_ballots_count": {
         "count": 2,
-        "polling_stations": [
-          1,
-          3,
-          5
-        ]
+        "polling_stations": [1, 3, 5]
       }
     },
     "polling_station_investigations": {
-      "admitted_voters_recounted": [
-        1,
-        5
-      ],
-      "investigated_other_reason": [
-        3
-      ],
-      "ballots_recounted": [
-        1
-      ]
+      "admitted_voters_recounted": [1, 5],
+      "investigated_other_reason": [3],
+      "ballots_recounted": [1]
     }
   },
   "polling_stations": [

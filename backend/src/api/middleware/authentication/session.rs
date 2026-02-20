@@ -2,7 +2,7 @@ use axum::{extract::OptionalFromRequestParts, http::request::Parts};
 use axum_extra::extract::cookie::Cookie;
 use chrono::{DateTime, TimeDelta, Utc};
 use cookie::CookieBuilder;
-use rand::{Rng, distr::Alphanumeric};
+use rand::{RngExt, distr::Alphanumeric};
 
 use crate::{
     APIError,

@@ -8,9 +8,12 @@ use abacus::{
             DifferenceCountsCompareVotesCastAdmittedVoters, DifferencesCounts, ExtraInvestigation,
             PollingStationResults, VotersCounts, VotesCounts, YesNo,
         },
-        election::{ElectionCategory, ElectionId, ElectionWithPoliticalGroups, VoteCountingMethod},
+        election::{
+            ElectionCategory, ElectionId, ElectionRole, ElectionWithPoliticalGroups,
+            VoteCountingMethod,
+        },
         polling_station::{PollingStation, PollingStationId, PollingStationType},
-        status::{CurrentDataEntry, DataEntryStatus, DataEntryTransitionError},
+        data_entry_status::{CurrentDataEntry, DataEntryStatus, DataEntryTransitionError},
     },
     repository::user_repo::UserId,
 };
@@ -93,6 +96,7 @@ fn polling_station() -> PollingStation {
         election_id: ElectionId::from(1),
         committee_session_id: CommitteeSessionId::from(1),
         id_prev_session: None,
+        data_entry_id: None,
         name: "Test polling station".to_string(),
         number: 1,
         number_of_voters: None,
@@ -107,6 +111,7 @@ fn election() -> ElectionWithPoliticalGroups {
     ElectionWithPoliticalGroups {
         id: ElectionId::from(1),
         name: "Test election".to_string(),
+        role: ElectionRole::GSB,
         counting_method: VoteCountingMethod::CSO,
         election_id: "Test_2025".to_string(),
         location: "Test locatie".to_string(),
@@ -339,9 +344,7 @@ impl Users {
     }
 
     fn swap(&mut self) {
-        let temp = self.first;
-        self.first = self.second;
-        self.second = temp;
+        std::mem::swap(&mut self.first, &mut self.second);
     }
 }
 
@@ -407,9 +410,9 @@ fuzz_target!(|transitions: Vec<Transition>| {
                 &polling_station(),
                 &election(),
             ),
-            Transition::FinaliseSecondEntry(correct_user) => state
-                .finalise_second_entry(&polling_station(), &election(), users.second(correct_user))
-                .map(|r| r.0),
+            Transition::FinaliseSecondEntry(correct_user) => {
+                state.finalise_second_entry(&polling_station(), &election(), users.second(correct_user))
+            }
             Transition::ResumeFirstEntry => state.resume_first_entry(),
             Transition::DeleteBothEntries => state.delete_entries(),
             Transition::KeepFirstEntry => state.keep_first_entry(&polling_station(), &election()),
@@ -435,7 +438,7 @@ fuzz_target!(|transitions: Vec<Transition>| {
                 "Prev: {:?}\n\nNext: {:?}\n\nInvalid transition: {} --{:?}--> {}\nfirst_entry_correct: {}\n",
                 &prev_state,
                 &next_state,
-                prev_state.status_name().to_string(),
+                prev_state.status_name(),
                 &transition,
                 next_state
                     .as_ref()

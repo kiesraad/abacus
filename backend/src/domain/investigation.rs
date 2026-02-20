@@ -1,17 +1,12 @@
 use axum::{
     Json,
-    extract::{FromRef, FromRequestParts, Path},
-    http::request::Parts,
     response::{IntoResponse, Response},
 };
 use serde::{Deserialize, Serialize};
-use sqlx::{FromRow, SqlitePool};
+use sqlx::FromRow;
 use utoipa::ToSchema;
 
-use crate::{
-    APIError, domain::polling_station::PollingStationId, error::ErrorReference,
-    repository::polling_station_repo,
-};
+use crate::domain::polling_station::PollingStationId;
 
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq, ToSchema, FromRow)]
 #[serde(deny_unknown_fields)]
@@ -58,31 +53,4 @@ pub struct PollingStationInvestigationUpdateRequest {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[schema(nullable = false)]
     pub accept_data_entry_deletion: Option<bool>,
-}
-
-pub struct CurrentSessionPollingStationId(pub PollingStationId);
-
-impl<S> FromRequestParts<S> for CurrentSessionPollingStationId
-where
-    SqlitePool: FromRef<S>,
-    S: Send + Sync,
-{
-    type Rejection = APIError;
-
-    async fn from_request_parts(parts: &mut Parts, state: &S) -> Result<Self, Self::Rejection> {
-        let path_extractor = Path::<PollingStationId>::from_request_parts(parts, state).await;
-        let pool = SqlitePool::from_ref(state);
-        let mut conn = pool.acquire().await?;
-
-        if let Ok(Path(id)) = path_extractor
-            && polling_station_repo::get(&mut conn, id).await.is_ok()
-        {
-            return Ok(CurrentSessionPollingStationId(id));
-        }
-
-        Err(APIError::NotFound(
-            "Polling station not found for the current committee session".to_string(),
-            ErrorReference::EntryNotFound,
-        ))
-    }
 }

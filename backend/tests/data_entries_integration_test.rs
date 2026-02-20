@@ -20,7 +20,7 @@ pub mod shared;
 pub mod utils;
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
-async fn test_polling_station_data_entry_valid(pool: SqlitePool) {
+async fn test_data_entry_valid(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let typist_cookie = typist_login(&addr).await;
 
@@ -47,7 +47,7 @@ async fn test_polling_station_data_entry_valid(pool: SqlitePool) {
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
-async fn test_polling_station_data_entry_validation(pool: SqlitePool) {
+async fn test_data_entry_validation(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let typist_cookie = typist_login(&addr).await;
 
@@ -232,7 +232,7 @@ async fn test_polling_station_data_entry_validation(pool: SqlitePool) {
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("users"))))]
-async fn test_polling_station_data_entry_invalid(pool: SqlitePool) {
+async fn test_data_entry_invalid(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let typist_cookie = typist_login(&addr).await;
     let url = format!("http://{addr}/api/polling_stations/1/data_entries/1");
@@ -256,7 +256,7 @@ async fn test_polling_station_data_entry_invalid(pool: SqlitePool) {
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
-async fn test_polling_station_data_entry_only_for_existing(pool: SqlitePool) {
+async fn test_data_entry_only_for_existing(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let typist_cookie = typist_login(&addr).await;
 
@@ -290,7 +290,7 @@ async fn test_polling_station_data_entry_only_for_existing(pool: SqlitePool) {
 
 /// test that we can get a data entry after saving it
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
-async fn test_polling_station_data_entry_claim(pool: SqlitePool) {
+async fn test_data_entry_claim(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let typist_cookie = typist_login(&addr).await;
 
@@ -338,7 +338,7 @@ async fn test_polling_station_data_entry_claim(pool: SqlitePool) {
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
-async fn test_polling_station_data_entry_claim_finalised(pool: SqlitePool) {
+async fn test_data_entry_claim_finalised(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let typist_cookie = typist_login(&addr).await;
     complete_data_entry(&addr, &typist_cookie, 1, 1, example_data_entry(None)).await;
@@ -355,7 +355,7 @@ async fn test_polling_station_data_entry_claim_finalised(pool: SqlitePool) {
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
-async fn test_polling_station_data_entry_deletion(pool: SqlitePool) {
+async fn test_data_entry_deletion(pool: SqlitePool) {
     let addr = serve_api(pool).await;
     let typist_cookie = typist_login(&addr).await;
     let request_body = example_data_entry(None);

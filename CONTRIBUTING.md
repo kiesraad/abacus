@@ -11,9 +11,9 @@ Voor de duidelijkheid: de Kiesraad heeft concrete plannen en doelstellingen met 
 
 Het team werkt met een planning en epics zoals opgenomen in het projectbord. Voor meer informatie over onze werkwijze ga je naar:
 
-- onze [werkwijze voor GitHub](/documentatie/ontwikkelproces/GitHub-werkwijze.md);
-- ons [proces voor ontwikkeling en releases](/documentatie/ontwikkelproces/proces-ontwikkeling-en-releases.md);
-- de [uitgangspunten voor testen en kwaliteit](/documentatie/ontwikkelproces/testen-en-kwaliteit.md).
+- onze [werkwijze voor GitHub](https://github.com/kiesraad/abacus-documentatie/blob/main/ontwikkelproces/GitHub-werkwijze.md);
+- ons [proces voor ontwikkeling en releases](https://github.com/kiesraad/abacus-documentatie/blob/main/ontwikkelproces/proces-ontwikkeling-en-releases.md);
+- de [uitgangspunten voor testen en kwaliteit](https://github.com/kiesraad/abacus-documentatie/blob/main/ontwikkelproces/testen-en-kwaliteit.md).
 
 ## Contributor Licence Agreement (CLA)
 

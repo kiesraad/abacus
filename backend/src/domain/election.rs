@@ -17,6 +17,7 @@ id!(ElectionId);
 pub struct Election {
     pub id: ElectionId,
     pub name: String,
+    pub role: ElectionRole,
     pub counting_method: VoteCountingMethod,
     pub election_id: String,
     pub location: String,
@@ -36,6 +37,7 @@ pub struct Election {
 pub struct ElectionWithPoliticalGroups {
     pub id: ElectionId,
     pub name: String,
+    pub role: ElectionRole,
     pub counting_method: VoteCountingMethod,
     pub election_id: String,
     pub location: String,
@@ -56,6 +58,7 @@ impl From<ElectionWithPoliticalGroups> for Election {
         Self {
             id: value.id,
             name: value.name,
+            role: value.role,
             counting_method: value.counting_method,
             election_id: value.election_id,
             location: value.location,
@@ -122,6 +125,7 @@ impl IntoResponse for ElectionWithPoliticalGroups {
 #[serde(deny_unknown_fields)]
 pub struct NewElection {
     pub name: String,
+    pub role: ElectionRole,
     pub counting_method: VoteCountingMethod,
     pub election_id: String,
     pub location: String,
@@ -158,6 +162,17 @@ impl ElectionCategory {
             ElectionCategory::Municipal => "GR",
         }
     }
+}
+
+/// Election role
+#[derive(
+    Serialize, Deserialize, strum::Display, ToSchema, Clone, Copy, Debug, PartialEq, Eq, Hash, Type,
+)]
+pub enum ElectionRole {
+    /// Gemeentelijk stembureau
+    GSB,
+    /// Centraal stembureau
+    CSB,
 }
 
 #[derive(
@@ -254,6 +269,7 @@ pub(crate) mod tests {
         ElectionWithPoliticalGroups {
             id: ElectionId::from(1),
             name: "Test".to_string(),
+            role: ElectionRole::GSB,
             counting_method: VoteCountingMethod::CSO,
             election_id: "Test_2023".to_string(),
             location: "Test".to_string(),

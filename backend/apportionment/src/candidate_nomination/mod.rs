@@ -2,14 +2,13 @@ mod structs;
 
 use tracing::{debug, info};
 
-use self::structs::{Candidate, ListCandidateNomination, PreferenceThreshold};
-pub use structs::CandidateNominationResult;
-
+use self::structs::PreferenceThreshold;
 use super::{
     ApportionmentError, ApportionmentInput, CandidateVotesTrait, ListVotesTrait,
     fraction::Fraction,
-    structs::{CandidateNominationInputType, CandidateNumber, LARGE_COUNCIL_THRESHOLD},
+    structs::{CandidateNominationInputType, CandidateNumber, LARGE_COUNCIL_THRESHOLD, ListNumber},
 };
+pub use structs::{Candidate, CandidateNominationResult, ListCandidateNomination};
 
 /// Candidate nomination
 pub(crate) fn candidate_nomination<'a, T: ApportionmentInput>(
@@ -62,32 +61,31 @@ fn all_chosen_candidates<T: ListVotesTrait>(
     list_votes: &[T],
     list_candidate_nomination: &[ListCandidateNomination<T::Cv>],
 ) -> Vec<Candidate> {
-    let mut chosen_candidates: Vec<Candidate> = vec![];
-    for list in list_votes {
-        let list_candidate_nomination = &list_candidate_nomination
-            .iter()
-            .find(|nomination| nomination.list_number == list.number())
-            .expect("List candidate nomination should exist");
-        chosen_candidates.extend(
+    list_votes
+        .iter()
+        .flat_map(|list| {
+            let nomination = &list_candidate_nomination
+                .iter()
+                .find(|nomination| nomination.list_number == list.number())
+                .expect("List candidate nomination should exist");
+
+            let is_nominated = |candidate: &&T::Cv| {
+                nomination
+                    .preferential_candidate_nomination
+                    .iter()
+                    .chain(&nomination.other_candidate_nomination)
+                    .any(|cv| cv.number() == candidate.number())
+            };
+
             list.candidate_votes()
                 .iter()
-                .filter(|candidate| {
-                    list_candidate_nomination
-                        .preferential_candidate_nomination
-                        .iter()
-                        .any(|cv| candidate.number() == cv.number())
-                        || list_candidate_nomination
-                            .other_candidate_nomination
-                            .iter()
-                            .any(|cv| candidate.number() == cv.number())
-                })
+                .filter(is_nominated)
                 .map(|candidate| Candidate {
                     list_number: list.number(),
                     candidate_number: candidate.number(),
-                }),
-        );
-    }
-    chosen_candidates
+                })
+        })
+        .collect()
 }
 
 /// This function nominates candidates for the seats each list has been assigned.  
@@ -97,12 +95,16 @@ fn candidate_nomination_per_list<'a, T: ListVotesTrait>(
     seats: u32,
     list_votes: &'a [T],
     preference_threshold: Fraction,
-    total_seats: &[u32],
+    total_seats: &[(ListNumber, u32)],
 ) -> Result<Vec<ListCandidateNomination<'a, T::Cv>>, ApportionmentError> {
     let mut list_candidate_nomination: Vec<ListCandidateNomination<T::Cv>> = vec![];
-    for (index, list) in list_votes.iter().enumerate() {
-        let list_seats = total_seats[index];
-        let candidate_votes = list.candidate_votes();
+    for list in list_votes {
+        let (list_number, list_seats) = total_seats
+            .iter()
+            .find(|(number, _)| *number == list.number())
+            .expect("Total seats exists")
+            .to_owned();
+        let candidate_votes = &list.candidate_votes();
         let candidate_votes_meeting_preference_threshold =
             candidate_votes_meeting_preference_threshold(preference_threshold, candidate_votes);
         let preferential_candidate_nomination = preferential_candidate_nomination::<T::Cv>(
@@ -142,8 +144,8 @@ fn candidate_nomination_per_list<'a, T: ListVotesTrait>(
                 }
             };
 
-        list_candidate_nomination.push(ListCandidateNomination::<T::Cv> {
-            list_number: list.number(),
+        list_candidate_nomination.push(ListCandidateNomination {
+            list_number,
             list_seats,
             preferential_candidate_nomination,
             other_candidate_nomination,
@@ -167,7 +169,9 @@ fn candidate_votes_meeting_preference_threshold<T: CandidateVotesTrait>(
 }
 
 /// Create a vector containing just the candidate numbers from an iterator of candidate votes
-fn candidate_votes_numbers<T: CandidateVotesTrait>(candidate_votes: &[&T]) -> Vec<CandidateNumber> {
+pub fn candidate_votes_numbers<T: CandidateVotesTrait>(
+    candidate_votes: &[&T],
+) -> Vec<CandidateNumber> {
     candidate_votes
         .iter()
         .map(|candidate| candidate.number())
@@ -259,86 +263,134 @@ mod tests {
     use test_log::test;
 
     use crate::{
-        ApportionmentError, CandidateVotesTrait,
-        candidate_nomination::{
-            Candidate, ListCandidateNomination, candidate_nomination, candidate_votes_numbers,
-        },
+        ApportionmentError,
+        candidate_nomination::candidate_nomination,
         fraction::Fraction,
-        structs::ListNumber,
         test_helpers::{
             ApportionmentInputMock, CandidateVotesMock,
-            candidate_nomination_fixture_with_given_number_of_seats,
+            candidate_nomination_fixture_with_given_list_numbers_and_number_of_seats,
+            candidate_nomination_fixture_with_given_number_of_seats, check_chosen_candidates,
+            check_list_candidate_nomination, get_chosen_and_not_chosen_candidates_for_a_list,
             seat_assignment_fixture_with_given_candidate_votes,
+            seat_assignment_fixture_with_given_list_numbers_candidate_numbers_and_votes,
         },
     };
 
-    fn check_list_candidate_nomination<T: CandidateVotesTrait>(
-        nomination: &ListCandidateNomination<T>,
-        expected_preferential_nomination: &[u32],
-        expected_other_nomination: &[u32],
-        expected_updated_ranking: &[u32],
-    ) {
+    /// Candidate nomination with non-consecutive list and candidate numbers
+    ///
+    /// List seats: [(1, 8), (2, 3), (4, 2), (5, 1), (7, 1)]  
+    /// List 1: Preferential candidate nominations of candidates 1, 4, 3, 5 and 12 and other candidate nominations of candidates 7, 8 and 9  
+    /// List 2: Preferential candidate nomination of candidate 2 and 6 and other candidate nomination of candidates 3  
+    /// List 3: Preferential candidate nomination of candidate 1 and 4 and no other candidate nominations  
+    /// List 4: Preferential candidate nomination of candidate 1 and no other candidate nominations  
+    /// List 5: Preferential candidate nomination of candidate 3 and no other candidate nominations
+    #[test]
+    fn test_with_lt_19_seats_and_non_consecutive_list_and_candidate_numbers() {
+        let quota = Fraction::new(5104, 15);
+        let seat_assignment_input =
+            seat_assignment_fixture_with_given_list_numbers_candidate_numbers_and_votes(
+                15,
+                vec![
+                    (
+                        1,
+                        vec![
+                            (1, 1069),
+                            (3, 303),
+                            (4, 321),
+                            (5, 210),
+                            (7, 36),
+                            (8, 101),
+                            (9, 79),
+                            (10, 121),
+                            (11, 150),
+                            (12, 181),
+                        ],
+                    ),
+                    (2, vec![(2, 452), (3, 39), (4, 81), (6, 274), (7, 131)]),
+                    (4, vec![(1, 229), (2, 147), (4, 191)]),
+                    (5, vec![(1, 347), (3, 189)]),
+                    (7, vec![(3, 266), (2, 187)]),
+                ],
+            );
+        let input = candidate_nomination_fixture_with_given_list_numbers_and_number_of_seats(
+            quota,
+            &seat_assignment_input,
+            vec![(1, 8), (2, 3), (4, 2), (5, 1), (7, 1)],
+        );
+        let result = candidate_nomination::<ApportionmentInputMock>(&input).unwrap();
+
+        assert_eq!(result.preference_threshold.percentage, 50);
         assert_eq!(
-            candidate_votes_numbers(&nomination.preferential_candidate_nomination),
-            expected_preferential_nomination
+            result.preference_threshold.number_of_votes,
+            quota * Fraction::new(result.preference_threshold.percentage, 100)
         );
-        assert_eq!(
-            candidate_votes_numbers(&nomination.other_candidate_nomination),
-            expected_other_nomination
+        check_list_candidate_nomination(
+            &result.list_candidate_nomination[0],
+            &[1, 4, 3, 5, 12],
+            &[7, 8, 9],
+            &[1, 4, 3, 5, 12, 7, 8, 9, 10, 11],
         );
-
-        assert_eq!(
-            nomination.updated_candidate_ranking.to_vec(),
-            expected_updated_ranking
+        check_list_candidate_nomination(
+            &result.list_candidate_nomination[1],
+            &[2, 6],
+            &[3],
+            &[2, 6, 3, 4, 7],
         );
-    }
-
-    fn check_chosen_candidates<T: CandidateVotesTrait>(
-        chosen_candidates: &[Candidate],
-        list_number: &ListNumber,
-        expected_chosen_candidates: &[T],
-        expected_not_chosen_candidates: &[T],
-    ) {
-        assert!(expected_chosen_candidates.iter().all(|expected_candidate| {
-            chosen_candidates.iter().any(|chosen_candidate| {
-                chosen_candidate.list_number == *list_number
-                    && chosen_candidate.candidate_number == expected_candidate.number()
-            })
-        }));
-        assert!(
-            expected_not_chosen_candidates
-                .iter()
-                .all(|expected_candidate| {
-                    !chosen_candidates.iter().any(|chosen_candidate| {
-                        chosen_candidate.list_number == *list_number
-                            && chosen_candidate.candidate_number == expected_candidate.number()
-                    })
-                })
+        check_list_candidate_nomination(
+            &result.list_candidate_nomination[2],
+            &[1, 4],
+            &[],
+            &[1, 4, 2],
         );
-    }
+        check_list_candidate_nomination(&result.list_candidate_nomination[3], &[1], &[], &[]);
+        check_list_candidate_nomination(&result.list_candidate_nomination[4], &[3], &[], &[]);
 
-    fn get_chosen_and_not_chosen_candidates_for_a_list<T: CandidateVotesTrait + Clone>(
-        list_candidates: &[T],
-        list_preferential_nominated_candidate_numbers: &[u32],
-        list_other_nominated_candidate_numbers: &[u32],
-    ) -> (Vec<T>, Vec<T>) {
-        let nominated_numbers: Vec<&u32> = list_preferential_nominated_candidate_numbers
-            .iter()
-            .chain(list_other_nominated_candidate_numbers)
-            .collect();
-
-        // TODO: Using clones, but it is testcode. Could be improved.
-        let chosen_candidates: Vec<T> = list_candidates
-            .iter()
-            .filter(|c| nominated_numbers.iter().any(|&&n| c.number() == n))
-            .cloned()
-            .collect();
-        let not_chosen_candidates: Vec<T> = list_candidates
-            .iter()
-            .filter(|c| !nominated_numbers.iter().any(|&&n| c.number() == n))
-            .cloned()
-            .collect();
-        (chosen_candidates, not_chosen_candidates)
+        check_chosen_candidates(
+            &result.chosen_candidates,
+            &input.list_votes[0].number,
+            &[
+                &input.list_votes[0].candidate_votes[..7],
+                &input.list_votes[0].candidate_votes[10..],
+            ]
+            .concat(),
+            &input.list_votes[0].candidate_votes[8..9],
+        );
+        check_chosen_candidates(
+            &result.chosen_candidates,
+            &input.list_votes[1].number,
+            &[
+                &input.list_votes[1].candidate_votes[..2],
+                &input.list_votes[1].candidate_votes[3..4],
+            ]
+            .concat(),
+            &[
+                &input.list_votes[1].candidate_votes[2..3],
+                &input.list_votes[1].candidate_votes[4..],
+            ]
+            .concat(),
+        );
+        check_chosen_candidates(
+            &result.chosen_candidates,
+            &input.list_votes[2].number,
+            &[
+                &input.list_votes[2].candidate_votes[..1],
+                &input.list_votes[2].candidate_votes[2..],
+            ]
+            .concat(),
+            &input.list_votes[2].candidate_votes[1..2],
+        );
+        check_chosen_candidates(
+            &result.chosen_candidates,
+            &input.list_votes[3].number,
+            &input.list_votes[3].candidate_votes[..1],
+            &input.list_votes[3].candidate_votes[2..],
+        );
+        check_chosen_candidates(
+            &result.chosen_candidates,
+            &input.list_votes[4].number,
+            &input.list_votes[4].candidate_votes[..1],
+            &input.list_votes[4].candidate_votes[2..],
+        );
     }
 
     /// Candidate nomination with ranking change due to preferential candidate nomination
@@ -388,36 +440,35 @@ mod tests {
         check_list_candidate_nomination(&result.list_candidate_nomination[3], &[1], &[], &[]);
         check_list_candidate_nomination(&result.list_candidate_nomination[4], &[1], &[], &[]);
 
-        let lists = input.list_votes;
         check_chosen_candidates(
             &result.chosen_candidates,
-            &lists[0].number,
-            &lists[0].candidate_votes[..8],
-            &lists[0].candidate_votes[9..],
+            &input.list_votes[0].number,
+            &input.list_votes[0].candidate_votes[..8],
+            &input.list_votes[0].candidate_votes[9..],
         );
         check_chosen_candidates(
             &result.chosen_candidates,
-            &lists[1].number,
-            &lists[1].candidate_votes[..3],
-            &lists[1].candidate_votes[4..],
+            &input.list_votes[1].number,
+            &input.list_votes[1].candidate_votes[..3],
+            &input.list_votes[1].candidate_votes[4..],
         );
         check_chosen_candidates(
             &result.chosen_candidates,
-            &lists[2].number,
-            &lists[2].candidate_votes[..2],
-            &lists[2].candidate_votes[3..],
+            &input.list_votes[2].number,
+            &input.list_votes[2].candidate_votes[..2],
+            &input.list_votes[2].candidate_votes[3..],
         );
         check_chosen_candidates(
             &result.chosen_candidates,
-            &lists[3].number,
-            &lists[3].candidate_votes[..1],
-            &lists[3].candidate_votes[2..],
+            &input.list_votes[3].number,
+            &input.list_votes[3].candidate_votes[..1],
+            &input.list_votes[3].candidate_votes[2..],
         );
         check_chosen_candidates(
             &result.chosen_candidates,
-            &lists[4].number,
-            &lists[4].candidate_votes[..1],
-            &lists[4].candidate_votes[2..],
+            &input.list_votes[4].number,
+            &input.list_votes[4].candidate_votes[..1],
+            &input.list_votes[4].candidate_votes[2..],
         );
     }
 
@@ -460,36 +511,35 @@ mod tests {
         check_list_candidate_nomination(&result.list_candidate_nomination[3], &[], &[1], &[]);
         check_list_candidate_nomination(&result.list_candidate_nomination[4], &[], &[1], &[]);
 
-        let lists = input.list_votes;
         check_chosen_candidates(
             &result.chosen_candidates,
-            &lists[0].number,
-            &lists[0].candidate_votes[..1],
-            &lists[0].candidate_votes[2..],
+            &input.list_votes[0].number,
+            &input.list_votes[0].candidate_votes[..1],
+            &input.list_votes[0].candidate_votes[2..],
         );
         check_chosen_candidates(
             &result.chosen_candidates,
-            &lists[1].number,
-            &lists[1].candidate_votes[..1],
-            &lists[1].candidate_votes[2..],
+            &input.list_votes[1].number,
+            &input.list_votes[1].candidate_votes[..1],
+            &input.list_votes[1].candidate_votes[2..],
         );
         check_chosen_candidates(
             &result.chosen_candidates,
-            &lists[2].number,
-            &lists[2].candidate_votes[..1],
-            &lists[2].candidate_votes[2..],
+            &input.list_votes[2].number,
+            &input.list_votes[2].candidate_votes[..1],
+            &input.list_votes[2].candidate_votes[2..],
         );
         check_chosen_candidates(
             &result.chosen_candidates,
-            &lists[3].number,
-            &lists[3].candidate_votes[..1],
-            &lists[3].candidate_votes[2..],
+            &input.list_votes[3].number,
+            &input.list_votes[3].candidate_votes[..1],
+            &input.list_votes[3].candidate_votes[2..],
         );
         check_chosen_candidates(
             &result.chosen_candidates,
-            &lists[4].number,
-            &lists[4].candidate_votes[..1],
-            &lists[4].candidate_votes[2..],
+            &input.list_votes[4].number,
+            &input.list_votes[4].candidate_votes[..1],
+            &input.list_votes[4].candidate_votes[2..],
         );
     }
 
@@ -541,22 +591,21 @@ mod tests {
             &[5, 1, 2, 3, 4],
         );
 
-        let lists = input.list_votes;
         check_chosen_candidates(
             &result.chosen_candidates,
-            &lists[0].number,
-            &lists[0].candidate_votes[..11],
-            &lists[0].candidate_votes[11..],
+            &input.list_votes[0].number,
+            &input.list_votes[0].candidate_votes[..11],
+            &input.list_votes[0].candidate_votes[11..],
         );
         check_chosen_candidates(
             &result.chosen_candidates,
-            &lists[1].number,
-            &lists[1].candidate_votes[..7],
+            &input.list_votes[1].number,
+            &input.list_votes[1].candidate_votes[..7],
             &[],
         );
         check_chosen_candidates::<CandidateVotesMock>(
             &result.chosen_candidates,
-            &lists[2].number,
+            &input.list_votes[2].number,
             &[],
             &[],
         );
@@ -616,36 +665,35 @@ mod tests {
         check_list_candidate_nomination(&result.list_candidate_nomination[3], &[1, 2], &[], &[]);
         check_list_candidate_nomination(&result.list_candidate_nomination[4], &[], &[], &[]);
 
-        let lists = input.list_votes;
         check_chosen_candidates(
             &result.chosen_candidates,
-            &lists[0].number,
-            &lists[0].candidate_votes,
+            &input.list_votes[0].number,
+            &input.list_votes[0].candidate_votes,
             &[],
         );
         check_chosen_candidates(
             &result.chosen_candidates,
-            &lists[1].number,
-            &lists[1].candidate_votes,
+            &input.list_votes[1].number,
+            &input.list_votes[1].candidate_votes,
             &[],
         );
         check_chosen_candidates(
             &result.chosen_candidates,
-            &lists[2].number,
-            &lists[2].candidate_votes[..5],
-            &lists[2].candidate_votes[5..],
+            &input.list_votes[2].number,
+            &input.list_votes[2].candidate_votes[..5],
+            &input.list_votes[2].candidate_votes[5..],
         );
         check_chosen_candidates(
             &result.chosen_candidates,
-            &lists[3].number,
-            &lists[3].candidate_votes[..2],
-            &lists[3].candidate_votes[2..],
+            &input.list_votes[3].number,
+            &input.list_votes[3].candidate_votes[..2],
+            &input.list_votes[3].candidate_votes[2..],
         );
         check_chosen_candidates(
             &result.chosen_candidates,
-            &lists[4].number,
+            &input.list_votes[4].number,
             &[],
-            &lists[4].candidate_votes,
+            &input.list_votes[4].candidate_votes,
         );
     }
 
@@ -731,68 +779,67 @@ mod tests {
             &[],
         );
 
-        let lists = input.list_votes;
         let (list_0_chosen_candidates, list_0_not_chosen_candidates) =
             get_chosen_and_not_chosen_candidates_for_a_list(
-                &lists[0].candidate_votes,
+                &input.list_votes[0].candidate_votes,
                 list_0_preferential_nominated_candidate_numbers,
                 list_0_other_nominated_candidate_numbers,
             );
         check_chosen_candidates(
             &result.chosen_candidates,
-            &lists[0].number,
+            &input.list_votes[0].number,
             &list_0_chosen_candidates,
             &list_0_not_chosen_candidates,
         );
 
         let (list_1_chosen_candidates, list_1_not_chosen_candidates) =
             get_chosen_and_not_chosen_candidates_for_a_list(
-                &lists[1].candidate_votes,
+                &input.list_votes[1].candidate_votes,
                 list_1_preferential_nominated_candidate_numbers,
                 list_1_other_nominated_candidate_numbers,
             );
         check_chosen_candidates(
             &result.chosen_candidates,
-            &lists[1].number,
+            &input.list_votes[1].number,
             &list_1_chosen_candidates,
             &list_1_not_chosen_candidates,
         );
 
         let (list_2_chosen_candidates, list_2_not_chosen_candidates) =
             get_chosen_and_not_chosen_candidates_for_a_list(
-                &lists[2].candidate_votes,
+                &input.list_votes[2].candidate_votes,
                 list_2_preferential_nominated_candidate_numbers,
                 list_2_other_nominated_candidate_numbers,
             );
         check_chosen_candidates(
             &result.chosen_candidates,
-            &lists[2].number,
+            &input.list_votes[2].number,
             &list_2_chosen_candidates,
             &list_2_not_chosen_candidates,
         );
 
         let (list_3_chosen_candidates, list_3_not_chosen_candidates) =
             get_chosen_and_not_chosen_candidates_for_a_list(
-                &lists[3].candidate_votes,
+                &input.list_votes[3].candidate_votes,
                 list_3_preferential_nominated_candidate_numbers,
                 list_3_other_nominated_candidate_numbers,
             );
         check_chosen_candidates(
             &result.chosen_candidates,
-            &lists[3].number,
+            &input.list_votes[3].number,
             &list_3_chosen_candidates,
             &list_3_not_chosen_candidates,
         );
 
         let (list_4_chosen_candidates, list_4_not_chosen_candidates) =
             get_chosen_and_not_chosen_candidates_for_a_list(
-                &lists[4].candidate_votes,
+                &input.list_votes[4].candidate_votes,
                 list_4_preferential_nominated_candidate_numbers,
                 list_4_other_nominated_candidate_numbers,
             );
         check_chosen_candidates(
             &result.chosen_candidates,
-            &lists[4].number,
+            &input.list_votes[4].number,
             &list_4_chosen_candidates,
             &list_4_not_chosen_candidates,
         );

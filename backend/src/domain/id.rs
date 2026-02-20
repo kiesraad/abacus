@@ -25,14 +25,6 @@ macro_rules! id {
             }
         }
 
-        impl std::ops::Deref for $identifier {
-            type Target = u32;
-
-            fn deref(&self) -> &Self::Target {
-                &self.0
-            }
-        }
-
         impl std::fmt::Display for $identifier {
             fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
                 write!(f, "{}", self.0)

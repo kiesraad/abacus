@@ -3,6 +3,7 @@ CREATE TABLE polling_stations
     id                    INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
     committee_session_id  INTEGER                           NOT NULL,
     id_prev_session       INTEGER,
+    data_entry_id         INTEGER,
     name                  TEXT                              NOT NULL,
     number                INTEGER                           NOT NULL,
     number_of_voters      INTEGER,
@@ -13,5 +14,6 @@ CREATE TABLE polling_stations
 
     FOREIGN KEY (committee_session_id) REFERENCES committee_sessions (id),
     FOREIGN KEY (id_prev_session) REFERENCES polling_stations (id),
+    FOREIGN KEY (data_entry_id) REFERENCES data_entries (id),
     CONSTRAINT number UNIQUE (committee_session_id, number)
 ) STRICT;

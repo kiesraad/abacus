@@ -111,7 +111,7 @@ async fn resolve_differences(
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
-async fn test_polling_station_data_entry_get_errors(pool: SqlitePool) {
+async fn test_data_entry_get_errors(pool: SqlitePool) {
     let addr = serve_api(pool.clone()).await;
 
     let typist_cookie = typist_login(&addr).await;
@@ -148,7 +148,7 @@ async fn test_polling_station_data_entry_get_errors(pool: SqlitePool) {
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
-async fn test_polling_station_data_entry_no_errors(pool: SqlitePool) {
+async fn test_data_entry_no_errors(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 
     let typist = typist_login(&addr).await;
@@ -171,7 +171,7 @@ async fn test_polling_station_data_entry_no_errors(pool: SqlitePool) {
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
-async fn test_polling_station_data_entry_resolve_errors_discard(pool: SqlitePool) {
+async fn test_data_entry_resolve_errors_discard(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 
     let typist = typist_login(&addr).await;
@@ -187,7 +187,7 @@ async fn test_polling_station_data_entry_resolve_errors_discard(pool: SqlitePool
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
-async fn test_polling_station_data_entry_resolve_errors_resume(pool: SqlitePool) {
+async fn test_data_entry_resolve_errors_resume(pool: SqlitePool) {
     let addr = serve_api(pool.clone()).await;
 
     let typist_cookie = typist_login(&addr).await;
@@ -206,7 +206,7 @@ async fn test_polling_station_data_entry_resolve_errors_resume(pool: SqlitePool)
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
-async fn test_polling_station_data_entry_resolve_errors_wrong_state(pool: SqlitePool) {
+async fn test_data_entry_resolve_errors_wrong_state(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 
     let typist = typist_login(&addr).await;
@@ -218,7 +218,7 @@ async fn test_polling_station_data_entry_resolve_errors_wrong_state(pool: Sqlite
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
-async fn test_polling_station_data_entry_resolve_errors_wrong_action(pool: SqlitePool) {
+async fn test_data_entry_resolve_errors_wrong_action(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 
     let typist = typist_login(&addr).await;
@@ -232,7 +232,7 @@ async fn test_polling_station_data_entry_resolve_errors_wrong_action(pool: Sqlit
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
-async fn test_polling_station_data_entry_get_differences(pool: SqlitePool) {
+async fn test_data_entry_get_differences(pool: SqlitePool) {
     let addr = serve_api(pool.clone()).await;
     let (first_entry, second_entry) = different_data_entries();
 
@@ -263,7 +263,7 @@ async fn test_polling_station_data_entry_get_differences(pool: SqlitePool) {
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
-async fn test_polling_station_data_entry_differences_not_found(pool: SqlitePool) {
+async fn test_data_entry_differences_not_found(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 
     let typist = typist_login(&addr).await;
@@ -278,7 +278,7 @@ async fn test_polling_station_data_entry_differences_not_found(pool: SqlitePool)
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
-async fn test_polling_station_data_entry_resolve_differences(pool: SqlitePool) {
+async fn test_data_entry_resolve_differences(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 
     let first_data_entry = example_data_entry(None);
@@ -314,7 +314,7 @@ async fn test_polling_station_data_entry_resolve_differences(pool: SqlitePool) {
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("election_2", "users"))))]
-async fn test_polling_station_data_entry_resolve_differences_then_resolve_errors(pool: SqlitePool) {
+async fn test_data_entry_resolve_differences_then_resolve_errors(pool: SqlitePool) {
     let addr = serve_api(pool).await;
 
     let first_data_entry = example_data_entry(None);

@@ -8,9 +8,13 @@ minimumReleaseAge: 4320
 minimumReleaseAgeExclude:
   # Fix GHSA-7h2j-956f-4vf2
   - "@isaacs/brace-expansion@5.0.1"
+  # Fix GHSA-3ppc-4f35-3m26 / CVE-2026-26996
+  - minimatch@10.2.1
 trustPolicy: no-downgrade
 trustPolicyExclude:
   - semver@6.3.1
+  - "@octokit/plugin-paginate-rest@9.2.2"
+  - "@octokit/endpoint@9.0.6"
 engineStrict: true
 packageManagerStrict: true
 packageManagerStrictVersion: true
@@ -26,3 +30,5 @@ overrides:
   "undici@<6.23.0": ">=6.23.0"
   # Fix GHSA-7h2j-956f-4vf2
   "@isaacs/brace-expansion@<=5.0.0": ">=5.0.1"
+  # Fix GHSA-3ppc-4f35-3m26 / CVE-2026-26996
+  minimatch@<10.2.1: '>=10.2.1'

@@ -167,7 +167,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/ElectionAndCandidatesDefinitionImportRequest"
+                "$ref": "#/components/schemas/ElectionCreationRequest"
               }
             }
           },
@@ -242,7 +242,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/ElectionAndCandidateDefinitionValidateRequest"
+                "$ref": "#/components/schemas/ElectionCreationValidateRequest"
               }
             }
           },
@@ -847,7 +847,7 @@
     },
     "/api/elections/{election_id}/committee_sessions/{committee_session_id}/investigations": {
       "get": {
-        "summary": "Get a list of all [Investigation]s for a committee session (coordinator)",
+        "summary": "Get a list of all [crate::domain::investigation::PollingStationInvestigation]s for a committee session (coordinator)",
         "operationId": "committee_session_investigations",
         "parameters": [
           {
@@ -2482,7 +2482,7 @@
     "/api/polling_stations/{polling_station_id}/data_entries": {
       "delete": {
         "summary": "Delete data entries and result for a polling station (coordinator)",
-        "operationId": "polling_station_data_entries_and_result_delete",
+        "operationId": "data_entries_and_result_delete",
         "parameters": [
           {
             "name": "polling_station_id",
@@ -2561,7 +2561,7 @@
     "/api/polling_stations/{polling_station_id}/data_entries/get": {
       "get": {
         "summary": "Get data entry with validation results (coordinator)",
-        "operationId": "polling_station_data_entry_get",
+        "operationId": "data_entry_get",
         "parameters": [
           {
             "name": "polling_station_id",
@@ -2647,7 +2647,7 @@
     "/api/polling_stations/{polling_station_id}/data_entries/resolve_differences": {
       "get": {
         "summary": "Get data entry differences to be resolved (coordinator)",
-        "operationId": "polling_station_data_entry_get_differences",
+        "operationId": "data_entry_get_differences",
         "parameters": [
           {
             "name": "polling_station_id",
@@ -2731,7 +2731,7 @@
       },
       "post": {
         "summary": "Resolve data entry differences by providing a `ResolveDifferencesAction` (coordinator)",
-        "operationId": "polling_station_data_entry_resolve_differences",
+        "operationId": "data_entry_resolve_differences",
         "parameters": [
           {
             "name": "polling_station_id",
@@ -2837,7 +2837,7 @@
     "/api/polling_stations/{polling_station_id}/data_entries/resolve_errors": {
       "post": {
         "summary": "Resolve accepted data entry errors by providing a `ResolveErrorsAction` (coordinator)",
-        "operationId": "polling_station_data_entry_resolve_errors",
+        "operationId": "data_entry_resolve_errors",
         "parameters": [
           {
             "name": "polling_station_id",
@@ -2943,7 +2943,7 @@
     "/api/polling_stations/{polling_station_id}/data_entries/{entry_number}": {
       "post": {
         "summary": "Save a data entry for a polling station (typist)",
-        "operationId": "polling_station_data_entry_save",
+        "operationId": "data_entry_save",
         "parameters": [
           {
             "name": "polling_station_id",
@@ -3058,7 +3058,7 @@
       },
       "delete": {
         "summary": "Delete an in-progress (not finalised) data entry for a polling station (typist)",
-        "operationId": "polling_station_data_entry_delete",
+        "operationId": "data_entry_delete",
         "parameters": [
           {
             "name": "polling_station_id",
@@ -3148,7 +3148,7 @@
     "/api/polling_stations/{polling_station_id}/data_entries/{entry_number}/claim": {
       "post": {
         "summary": "Claim a data entry for a polling station, returning any existing progress (typist)",
-        "operationId": "polling_station_data_entry_claim",
+        "operationId": "data_entry_claim",
         "parameters": [
           {
             "name": "polling_station_id",
@@ -3245,7 +3245,7 @@
     "/api/polling_stations/{polling_station_id}/data_entries/{entry_number}/finalise": {
       "post": {
         "summary": "Finalise the data entry for a polling station (typist)",
-        "operationId": "polling_station_data_entry_finalise",
+        "operationId": "data_entry_finalise",
         "parameters": [
           {
             "name": "polling_station_id",
@@ -4234,7 +4234,6 @@
           "DataEntryResumed",
           "DataEntryDeleted",
           "DataEntryFinalised",
-          "ResultDeleted",
           "DataEntryDiscardedFirst",
           "DataEntryReturnedFirst",
           "DataEntryKeptFirst",
@@ -4352,6 +4351,79 @@
           },
           "username": {
             "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "CSBElectionCreationRequest": {
+        "type": "object",
+        "required": [
+          "election_hash",
+          "election_data",
+          "candidate_hash",
+          "candidate_data"
+        ],
+        "properties": {
+          "candidate_data": {
+            "type": "string"
+          },
+          "candidate_hash": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "election_data": {
+            "type": "string"
+          },
+          "election_hash": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "CSBElectionCreationValidateRequest": {
+        "type": "object",
+        "required": [
+          "election_data"
+        ],
+        "properties": {
+          "candidate_data": {
+            "type": "string"
+          },
+          "candidate_hash": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "election_data": {
+            "type": "string"
+          },
+          "election_hash": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "CSBElectionDefinitionValidateResponse": {
+        "type": "object",
+        "required": [
+          "hash",
+          "election"
+        ],
+        "properties": {
+          "election": {
+            "$ref": "#/components/schemas/NewElection"
+          },
+          "hash": {
+            "$ref": "#/components/schemas/RedactedEmlHash"
           }
         },
         "additionalProperties": false
@@ -4800,6 +4872,11 @@
         },
         "additionalProperties": false
       },
+      "DataEntryId": {
+        "type": "integer",
+        "format": "int32",
+        "minimum": 0
+      },
       "DataEntryStatusName": {
         "type": "string",
         "enum": [
@@ -4887,6 +4964,7 @@
         "required": [
           "id",
           "name",
+          "role",
           "counting_method",
           "election_id",
           "location",
@@ -4936,93 +5014,9 @@
             "type": "integer",
             "format": "int32",
             "minimum": 0
-          }
-        },
-        "additionalProperties": false
-      },
-      "ElectionAndCandidateDefinitionValidateRequest": {
-        "type": "object",
-        "required": [
-          "election_data"
-        ],
-        "properties": {
-          "candidate_data": {
-            "type": "string"
           },
-          "candidate_hash": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          },
-          "counting_method": {
-            "$ref": "#/components/schemas/VoteCountingMethod"
-          },
-          "election_data": {
-            "type": "string"
-          },
-          "election_hash": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          },
-          "number_of_voters": {
-            "type": "integer",
-            "format": "int32",
-            "minimum": 0
-          },
-          "polling_station_data": {
-            "type": "string"
-          },
-          "polling_station_file_name": {
-            "type": "string"
-          }
-        },
-        "additionalProperties": false
-      },
-      "ElectionAndCandidatesDefinitionImportRequest": {
-        "type": "object",
-        "required": [
-          "election_hash",
-          "election_data",
-          "candidate_hash",
-          "candidate_data",
-          "counting_method",
-          "number_of_voters"
-        ],
-        "properties": {
-          "candidate_data": {
-            "type": "string"
-          },
-          "candidate_hash": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          },
-          "counting_method": {
-            "$ref": "#/components/schemas/VoteCountingMethod"
-          },
-          "election_data": {
-            "type": "string"
-          },
-          "election_hash": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          },
-          "number_of_voters": {
-            "type": "integer",
-            "format": "int32",
-            "minimum": 0
-          },
-          "polling_station_data": {
-            "type": "string"
-          },
-          "polling_station_file_name": {
-            "type": "string"
+          "role": {
+            "$ref": "#/components/schemas/ElectionRole"
           }
         },
         "additionalProperties": false
@@ -5034,36 +5028,143 @@
           "Municipal"
         ]
       },
-      "ElectionDefinitionValidateResponse": {
-        "type": "object",
-        "required": [
-          "hash",
-          "election",
-          "number_of_voters"
-        ],
-        "properties": {
-          "election": {
-            "$ref": "#/components/schemas/NewElection"
+      "ElectionCreationRequest": {
+        "oneOf": [
+          {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/GSBElectionCreationRequest"
+              },
+              {
+                "type": "object",
+                "required": [
+                  "role"
+                ],
+                "properties": {
+                  "role": {
+                    "type": "string",
+                    "enum": [
+                      "GSB"
+                    ]
+                  }
+                }
+              }
+            ]
           },
-          "hash": {
-            "$ref": "#/components/schemas/RedactedEmlHash"
-          },
-          "number_of_voters": {
-            "type": "integer",
-            "format": "int32",
-            "minimum": 0
-          },
-          "polling_station_definition_matches_election": {
-            "type": "boolean"
-          },
-          "polling_stations": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/PollingStationRequest"
-            }
+          {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/CSBElectionCreationRequest"
+              },
+              {
+                "type": "object",
+                "required": [
+                  "role"
+                ],
+                "properties": {
+                  "role": {
+                    "type": "string",
+                    "enum": [
+                      "CSB"
+                    ]
+                  }
+                }
+              }
+            ]
           }
-        },
-        "additionalProperties": false
+        ]
+      },
+      "ElectionCreationValidateRequest": {
+        "oneOf": [
+          {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/GSBElectionCreationValidateRequest"
+              },
+              {
+                "type": "object",
+                "required": [
+                  "role"
+                ],
+                "properties": {
+                  "role": {
+                    "type": "string",
+                    "enum": [
+                      "GSB"
+                    ]
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/CSBElectionCreationValidateRequest"
+              },
+              {
+                "type": "object",
+                "required": [
+                  "role"
+                ],
+                "properties": {
+                  "role": {
+                    "type": "string",
+                    "enum": [
+                      "CSB"
+                    ]
+                  }
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "ElectionDefinitionValidateResponse": {
+        "oneOf": [
+          {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/GSBElectionDefinitionValidateResponse"
+              },
+              {
+                "type": "object",
+                "required": [
+                  "role"
+                ],
+                "properties": {
+                  "role": {
+                    "type": "string",
+                    "enum": [
+                      "GSB"
+                    ]
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/CSBElectionDefinitionValidateResponse"
+              },
+              {
+                "type": "object",
+                "required": [
+                  "role"
+                ],
+                "properties": {
+                  "role": {
+                    "type": "string",
+                    "enum": [
+                      "CSB"
+                    ]
+                  }
+                }
+              }
+            ]
+          }
+        ]
       },
       "ElectionDetailsResponse": {
         "type": "object",
@@ -5146,6 +5247,14 @@
         },
         "additionalProperties": false
       },
+      "ElectionRole": {
+        "type": "string",
+        "description": "Election role",
+        "enum": [
+          "GSB",
+          "CSB"
+        ]
+      },
       "ElectionStatusResponse": {
         "type": "object",
         "description": "Election polling stations data entry statuses response",
@@ -5219,6 +5328,7 @@
         "required": [
           "id",
           "name",
+          "role",
           "counting_method",
           "election_id",
           "location",
@@ -5275,6 +5385,9 @@
             "items": {
               "$ref": "#/components/schemas/PoliticalGroup"
             }
+          },
+          "role": {
+            "$ref": "#/components/schemas/ElectionRole"
           }
         },
         "additionalProperties": false
@@ -5369,6 +5482,124 @@
         "type": "integer",
         "format": "int32",
         "minimum": 0
+      },
+      "GSBElectionCreationRequest": {
+        "type": "object",
+        "required": [
+          "election_hash",
+          "election_data",
+          "candidate_hash",
+          "candidate_data",
+          "counting_method",
+          "number_of_voters"
+        ],
+        "properties": {
+          "candidate_data": {
+            "type": "string"
+          },
+          "candidate_hash": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "counting_method": {
+            "$ref": "#/components/schemas/VoteCountingMethod"
+          },
+          "election_data": {
+            "type": "string"
+          },
+          "election_hash": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "number_of_voters": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "polling_station_data": {
+            "type": "string"
+          },
+          "polling_station_file_name": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "GSBElectionCreationValidateRequest": {
+        "type": "object",
+        "required": [
+          "election_data"
+        ],
+        "properties": {
+          "candidate_data": {
+            "type": "string"
+          },
+          "candidate_hash": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "counting_method": {
+            "$ref": "#/components/schemas/VoteCountingMethod"
+          },
+          "election_data": {
+            "type": "string"
+          },
+          "election_hash": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "number_of_voters": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "polling_station_data": {
+            "type": "string"
+          },
+          "polling_station_file_name": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "GSBElectionDefinitionValidateResponse": {
+        "type": "object",
+        "required": [
+          "hash",
+          "election",
+          "number_of_voters"
+        ],
+        "properties": {
+          "election": {
+            "$ref": "#/components/schemas/NewElection"
+          },
+          "hash": {
+            "$ref": "#/components/schemas/RedactedEmlHash"
+          },
+          "number_of_voters": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "polling_station_definition_matches_election": {
+            "type": "boolean"
+          },
+          "polling_stations": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PollingStationRequest"
+            }
+          }
+        },
+        "additionalProperties": false
       },
       "GenerateElectionArgs": {
         "type": "object",
@@ -5479,6 +5710,7 @@
         "description": "Election request",
         "required": [
           "name",
+          "role",
           "counting_method",
           "election_id",
           "location",
@@ -5532,6 +5764,9 @@
             "items": {
               "$ref": "#/components/schemas/PoliticalGroup"
             }
+          },
+          "role": {
+            "$ref": "#/components/schemas/ElectionRole"
           }
         },
         "additionalProperties": false
@@ -5611,7 +5846,7 @@
       },
       "PollingStation": {
         "type": "object",
-        "description": "Polling station of a certain [crate::election::Election]",
+        "description": "Polling station of a certain [crate::domain::election::Election]",
         "required": [
           "id",
           "election_id",
@@ -5628,6 +5863,9 @@
           },
           "committee_session_id": {
             "$ref": "#/components/schemas/CommitteeSessionId"
+          },
+          "data_entry_id": {
+            "$ref": "#/components/schemas/DataEntryId"
           },
           "election_id": {
             "$ref": "#/components/schemas/ElectionId"
@@ -5768,7 +6006,7 @@
       },
       "PollingStationRequest": {
         "type": "object",
-        "description": "Polling station of a certain [crate::election::Election]",
+        "description": "Polling station of a certain [crate::domain::election::Election]",
         "required": [
           "name",
           "address",

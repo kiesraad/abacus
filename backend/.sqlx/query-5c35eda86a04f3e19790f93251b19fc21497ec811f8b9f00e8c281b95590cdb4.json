@@ -1,0 +1,32 @@
+{
+  "db_name": "SQLite",
+  "query": "\n            DELETE FROM data_entries\n            WHERE id = ?\n            RETURNING\n                id AS \"id: _\",\n                state AS \"state: _\",\n                updated_at AS \"updated_at: _\"\n        ",
+  "describe": {
+    "columns": [
+      {
+        "name": "id: _",
+        "ordinal": 0,
+        "type_info": "Integer"
+      },
+      {
+        "name": "state: _",
+        "ordinal": 1,
+        "type_info": "Text"
+      },
+      {
+        "name": "updated_at: _",
+        "ordinal": 2,
+        "type_info": "Text"
+      }
+    ],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": [
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "5c35eda86a04f3e19790f93251b19fc21497ec811f8b9f00e8c281b95590cdb4"
+}

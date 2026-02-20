@@ -19,6 +19,7 @@ export default function useDataEntryNavigation(
 
   // navigate to the target form section
   const pathname = location.pathname;
+  // biome-ignore lint/correctness/useExhaustiveDependencies(pathname): pathname is used in the effect
   useEffect(() => {
     if (state.targetFormSectionId) {
       const url = getUrlForFormSectionID(election.id, pollingStationId, entryNumber, state.targetFormSectionId);

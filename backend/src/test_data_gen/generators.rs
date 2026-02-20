@@ -16,12 +16,12 @@ use crate::{
             PoliticalGroupCandidateVotes, PoliticalGroupTotalVotes, PollingStationResults,
             VotersCounts, VotesCounts, YesNo,
         },
+        data_entry_status::{DataEntryStatus, Definitive, FirstEntryFinalised},
         election::{
-            self, CandidateGender, CandidateNumber, ElectionCategory, ElectionWithPoliticalGroups,
-            NewElection, PGNumber, PoliticalGroup, VoteCountingMethod,
+            self, CandidateGender, CandidateNumber, ElectionCategory, ElectionRole,
+            ElectionWithPoliticalGroups, NewElection, PGNumber, PoliticalGroup, VoteCountingMethod,
         },
         polling_station::{PollingStation, PollingStationRequest, PollingStationType},
-        status::{DataEntryStatus, Definitive, FirstEntryFinalised},
         validation::{FieldPath, Validate, ValidationResults},
     },
     repository::{
@@ -49,22 +49,15 @@ async fn generate_data_entries(
     election: &ElectionWithPoliticalGroups,
     polling_stations: &[PollingStation],
 ) -> Result<bool, Box<dyn Error>> {
-    let committee_session = committee_session_repo::change_status(
+    committee_session_repo::change_status(
         conn,
         committee_session.id,
         CommitteeSessionStatus::DataEntry,
     )
     .await?;
 
-    let (_, second_entries) = generate_data_entry(
-        &committee_session,
-        election,
-        polling_stations,
-        rng,
-        conn,
-        &args,
-    )
-    .await;
+    let (_, second_entries) =
+        generate_data_entry(election, polling_stations, rng, conn, &args).await;
     Ok(second_entries == polling_stations.len())
 }
 
@@ -138,7 +131,7 @@ pub async fn create_test_election(
 }
 
 /// Generate a random election using the limits from args.
-fn generate_election(rng: &mut impl rand::Rng, args: &GenerateElectionArgs) -> NewElection {
+fn generate_election(rng: &mut impl rand::RngExt, args: &GenerateElectionArgs) -> NewElection {
     // start by generating the political groups
     let mut political_groups = vec![];
     let num_political_groups = rng.random_range(args.political_groups.clone());
@@ -171,6 +164,7 @@ fn generate_election(rng: &mut impl rand::Rng, args: &GenerateElectionArgs) -> N
     // and put it all in the struct (generating some additional fields where needed)
     NewElection {
         name,
+        role: ElectionRole::GSB,
         counting_method: VoteCountingMethod::CSO,
         domain_id: super::data::domain_id(rng),
         election_id,
@@ -186,7 +180,7 @@ fn generate_election(rng: &mut impl rand::Rng, args: &GenerateElectionArgs) -> N
 
 /// Generate a single political party using the limits from args
 fn generate_political_party(
-    rng: &mut impl rand::Rng,
+    rng: &mut impl rand::RngExt,
     pg_number: PGNumber,
     args: &GenerateElectionArgs,
 ) -> PoliticalGroup {
@@ -230,7 +224,7 @@ fn generate_political_party(
 
 /// Generate the polling stations for the given election using the limits from args
 async fn generate_polling_stations(
-    rng: &mut impl rand::Rng,
+    rng: &mut impl rand::RngExt,
     election: &ElectionWithPoliticalGroups,
     conn: &mut SqliteConnection,
     args: &GenerateElectionArgs,
@@ -279,10 +273,9 @@ async fn generate_polling_stations(
 /// Generate and store data entries for the given election based on arguments
 #[allow(clippy::too_many_lines)]
 async fn generate_data_entry(
-    committee_session: &CommitteeSession,
     election: &ElectionWithPoliticalGroups,
     polling_stations: &[PollingStation],
-    rng: &mut impl rand::Rng,
+    rng: &mut impl rand::RngExt,
     conn: &mut SqliteConnection,
     args: &GenerateElectionArgs,
 ) -> (usize, usize) {
@@ -352,17 +345,12 @@ async fn generate_data_entry(
                     second_entry_user_id: UserId::from(6), // second typist from users in fixtures
                     finished_at: ts,
                     finalised_with_warnings: validation_results.has_warnings(),
+                    results: results.clone(),
                 });
 
-                data_entry_repo::make_definitive(
-                    conn,
-                    ps.id,
-                    committee_session.id,
-                    &state,
-                    &results,
-                )
-                .await
-                .expect("Could not create definitive data entry");
+                data_entry_repo::upsert(conn, ps.id, &state)
+                    .await
+                    .expect("Could not create definitive data entry");
                 generated_second_entries += 1;
             } else {
                 // generate only a first data entry
@@ -372,7 +360,7 @@ async fn generate_data_entry(
                     first_entry_finished_at: ts,
                     finalised_with_warnings: validation_results.has_warnings(),
                 });
-                data_entry_repo::upsert(conn, ps.id, committee_session.id, &state)
+                data_entry_repo::upsert(conn, ps.id, &state)
                     .await
                     .expect("Could not create first data entry");
                 generated_first_entries += 1;
@@ -384,7 +372,7 @@ async fn generate_data_entry(
 
 #[allow(clippy::too_many_lines)]
 fn generate_cso_first_session_results(
-    rng: &mut impl rand::Rng,
+    rng: &mut impl rand::RngExt,
     political_groups: &[PoliticalGroup],
     number_of_votes: u32,
     group_weights: &[f64],
@@ -523,7 +511,11 @@ fn generate_cso_first_session_results(
 /// The slope determines the shape of the distribution, if the slope is zero,
 /// the distribution is uniform. Beyond a slope of 2.0-5.0, the distribution becomes
 /// heavily skewed towards a single target.
-fn distribute_power_law_weights(rng: &mut impl rand::Rng, targets: usize, slope: f64) -> Vec<f64> {
+fn distribute_power_law_weights(
+    rng: &mut impl rand::RngExt,
+    targets: usize,
+    slope: f64,
+) -> Vec<f64> {
     // Generate power-law weights: w_i = x_i^-s
     let mut weights: Vec<f64> = (0..targets)
         .map(|_| {
@@ -547,7 +539,7 @@ fn distribute_power_law_weights(rng: &mut impl rand::Rng, targets: usize, slope:
 /// Distribute a number of votes to a set of weighed targets. If the sorted flag is set,
 /// the targets are sorted from high to low weight.
 fn distribute_fill_weights(
-    rng: &mut impl rand::Rng,
+    rng: &mut impl rand::RngExt,
     weights: &[f64],
     votes: u32,
     sorted: bool,
@@ -580,7 +572,7 @@ fn distribute_fill_weights(
 /// the distribution is uniform. Beyond a slope of 2.0-5.0, the distribution becomes
 /// heavily skewed towards a single target.
 fn distribute_power_law(
-    rng: &mut impl rand::Rng,
+    rng: &mut impl rand::RngExt,
     votes: u32,
     targets: usize,
     slope: f64,

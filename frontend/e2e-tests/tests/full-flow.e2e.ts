@@ -318,7 +318,7 @@ test.describe("full flow", () => {
       await dataEntryHomePage.clickStart();
 
       await fillDataEntryPagesAndSave(page, noRecountNoDifferencesDataEntry);
-      await expect(dataEntryHomePage.dataEntrySaved).toBeVisible();
+      await expect(dataEntryHomePage.alertDataEntrySaved).toBeVisible();
 
       await logout(page);
     });
@@ -341,7 +341,7 @@ test.describe("full flow", () => {
       await dataEntryHomePage.clickStart();
 
       await fillDataEntryPagesAndSave(page, noRecountNoDifferencesDataEntry);
-      await expect(dataEntryHomePage.dataEntrySaved).toBeVisible();
+      await expect(dataEntryHomePage.alertDataEntrySaved).toBeVisible();
 
       await logout(page);
     });
@@ -575,7 +575,7 @@ test.describe("full flow", () => {
       const checkAndSavePage = new CheckAndSavePage(page);
       await checkAndSavePage.save.click();
 
-      await expect(dataEntryHomePage.dataEntrySaved).toBeVisible();
+      await expect(dataEntryHomePage.alertDataEntrySaved).toBeVisible();
 
       await logout(page);
     });
@@ -614,7 +614,7 @@ test.describe("full flow", () => {
       const checkAndSavePage = new CheckAndSavePage(page);
       await checkAndSavePage.save.click();
 
-      await expect(dataEntryHomePage.dataEntrySaved).toBeVisible();
+      await expect(dataEntryHomePage.alertDataEntrySaved).toBeVisible();
 
       await logout(page);
     });

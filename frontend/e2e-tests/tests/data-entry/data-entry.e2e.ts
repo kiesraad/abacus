@@ -123,7 +123,7 @@ test.describe("full data entry flow", () => {
     await checkAndSavePage.save.click();
 
     await expect(dataEntryHomePage.fieldsetNextPollingStation).toBeVisible();
-    await expect(dataEntryHomePage.dataEntrySaved).toBeVisible();
+    await expect(dataEntryHomePage.alertDataEntrySaved).toBeVisible();
 
     await expect(dataEntryHomePage.alertDataEntrySaved).toHaveText(
       [
@@ -194,7 +194,7 @@ test.describe("full data entry flow", () => {
 
     await checkAndSavePage.save.click();
 
-    await expect(dataEntryHomePage.dataEntrySaved).toBeVisible();
+    await expect(dataEntryHomePage.alertDataEntrySaved).toBeVisible();
   });
 
   test("difference of more ballots counted", async ({ page, pollingStation }) => {
@@ -270,7 +270,7 @@ test.describe("full data entry flow", () => {
 
     await checkAndSavePage.save.click();
 
-    await expect(dataEntryHomePage.dataEntrySaved).toBeVisible();
+    await expect(dataEntryHomePage.alertDataEntrySaved).toBeVisible();
   });
 
   test("difference of fewer ballots counted", async ({ page, pollingStation }) => {
@@ -346,7 +346,7 @@ test.describe("full data entry flow", () => {
     await expect(checkAndSavePage.fieldset).toBeVisible();
     await checkAndSavePage.save.click();
 
-    await expect(dataEntryHomePage.dataEntrySaved).toBeVisible();
+    await expect(dataEntryHomePage.alertDataEntrySaved).toBeVisible();
   });
 
   test("submit with accepted warning on voters and votes page", async ({ page, pollingStation }) => {
@@ -438,7 +438,7 @@ test.describe("full data entry flow", () => {
     await checkAndSavePage.save.click();
     const dataEntryHomePage = new DataEntryHomePage(page);
     await expect(dataEntryHomePage.fieldsetNextPollingStation).toBeVisible();
-    await expect(dataEntryHomePage.dataEntrySaved).toBeVisible();
+    await expect(dataEntryHomePage.alertDataEntrySaved).toBeVisible();
   });
 
   test("submit with accepted errors on voters and votes and candidate votes pages", async ({
@@ -522,7 +522,7 @@ test.describe("full data entry flow", () => {
 
     const dataEntryHomePage = new DataEntryHomePage(page);
     await expect(dataEntryHomePage.fieldsetNextPollingStation).toBeVisible();
-    await expect(dataEntryHomePage.dataEntryErrors).toBeVisible();
+    await expect(dataEntryHomePage.alertDataEntryErrors).toBeVisible();
   });
 });
 
@@ -546,7 +546,7 @@ test.describe("second data entry", () => {
 
     await fillDataEntryPagesAndSave(page, noRecountNoDifferencesDataEntry);
 
-    await expect(dataEntryHomePage.dataEntrySaved).toBeVisible();
+    await expect(dataEntryHomePage.alertDataEntrySaved).toBeVisible();
     await expect(dataEntryHomePage.alertDataEntrySaved).toHaveText(
       ["Je invoer is opgeslagen", "Geef het papieren proces-verbaal terug aan de coördinator."].join(""),
     );
@@ -626,7 +626,7 @@ test.describe("second data entry", () => {
     await expect(checkAndSavePage.fieldset).toBeVisible();
     await checkAndSavePage.save.click();
 
-    await expect(dataEntryHomePage.dataEntrySaved).toBeVisible();
+    await expect(dataEntryHomePage.alertDataEntrySaved).toBeVisible();
     await expect(dataEntryHomePage.alertDataEntrySaved).toHaveText(
       ["Je invoer is opgeslagen", "Geef het papieren proces-verbaal terug aan de coördinator."].join(""),
     );
@@ -703,7 +703,7 @@ test.describe("second data entry", () => {
     await expect(checkAndSavePage.fieldset).toBeVisible();
     await checkAndSavePage.save.click();
 
-    await expect(dataEntryHomePage.dataEntryDifferent).toBeVisible();
+    await expect(dataEntryHomePage.alertDataEntryDifferent).toBeVisible();
     await expect(dataEntryHomePage.alertDataEntryDifferent).toHaveText(
       [
         "Let op: verschil met eerste invoer",

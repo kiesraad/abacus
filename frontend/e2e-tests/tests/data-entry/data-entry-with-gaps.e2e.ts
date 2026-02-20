@@ -108,7 +108,7 @@ test.describe("full data entry flow with gaps in party/candidate numbers", () =>
     await checkAndSavePage.save.click();
 
     await expect(dataEntryHomePage.fieldsetNextPollingStation).toBeVisible();
-    await expect(dataEntryHomePage.dataEntrySaved).toBeVisible();
+    await expect(dataEntryHomePage.alertDataEntrySaved).toBeVisible();
 
     await expect(dataEntryHomePage.alertDataEntrySaved).toHaveText(
       [

@@ -14,7 +14,7 @@ import { CheckPollingStationDefinitionPgObj } from "e2e-tests/page-objects/elect
 import { UploadCandidateDefinitionPgObj } from "e2e-tests/page-objects/election/create/UploadCandidateDefinitionPgObj";
 import { UploadElectionDefinitionPgObj } from "e2e-tests/page-objects/election/create/UploadElectionDefinitionPgObj";
 import { UploadPollingStationDefinitionPgObj } from "e2e-tests/page-objects/election/create/UploadPollingStationDefinitionPgObj";
-import { ElectionDetailsPgObj } from "e2e-tests/page-objects/election/ElectionDetailsPgObj";
+import { ElectionHome } from "e2e-tests/page-objects/election/ElectionHomePgObj";
 import { AddInvestigationPgObj } from "e2e-tests/page-objects/investigations/AddInvestigationPgObj";
 import { InvestigationOverviewPgObj } from "e2e-tests/page-objects/investigations/InvestigationOverviewPgObj";
 import { InvestigationPrintCorrigendumPgObj } from "e2e-tests/page-objects/investigations/InvestigationPrintCorrigendumPgObj";
@@ -114,8 +114,8 @@ export async function uploadPollingStations(page: Page, eml = eml110b) {
 }
 
 export async function createInvestigation(page: Page, pollingStation: string, reason: string) {
-  const electionDetailsPage = new ElectionDetailsPgObj(page);
-  await electionDetailsPage.investigationsOverviewButton.click();
+  const electionHome = new ElectionHome(page);
+  await electionHome.investigationsOverviewButton.click();
   const investigationsOverviewPage = new InvestigationOverviewPgObj(page);
   await investigationsOverviewPage.addInvestigationButton.click();
   const addInvestigationPage = new AddInvestigationPgObj(page);

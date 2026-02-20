@@ -7,7 +7,7 @@ export class InvestigationOverviewPgObj {
   readonly fillInvestigationLink: Locator;
 
   constructor(protected readonly page: Page) {
-    this.header = page.getByRole("heading", { level: 1 }); // Onderzoeken in tweede/derde/... zitting
+    this.header = page.getByRole("heading", { level: 1, name: /Onderzoeken in \w+ zitting/ });
     this.alert = page.getByRole("alert");
     this.addInvestigationButton = page.getByRole("link", { name: "Onderzoek toevoegen" });
     this.fillInvestigationLink = page.getByRole("link", { name: "Nu invullen" });

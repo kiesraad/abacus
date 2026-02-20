@@ -34,7 +34,6 @@ import { AddInvestigationPgObj } from "e2e-tests/page-objects/investigations/Add
 import { InvestigationFindingsPgObj } from "e2e-tests/page-objects/investigations/InvestigationFindingsPgObj";
 import { InvestigationOverviewPgObj } from "e2e-tests/page-objects/investigations/InvestigationOverviewPgObj";
 import { AdminNavBar } from "e2e-tests/page-objects/nav_bar/AdminNavBarPgObj";
-import { CoordinatorNavBarPgObj } from "e2e-tests/page-objects/nav_bar/CoordinatorNavBarPgObj";
 import { UserInfoTopBar } from "e2e-tests/page-objects/nav_bar/UserInfoTopBarPgObj";
 import { PollingStationFormPgObj } from "e2e-tests/page-objects/polling_station/PollingStationFormPgObj";
 import { PollingStationListPgObj } from "e2e-tests/page-objects/polling_station/PollingStationListPgObj";
@@ -518,7 +517,7 @@ test.describe("full flow", () => {
 
       const investigationsOverviewPage = new InvestigationOverviewPgObj(page);
       await expect(investigationsOverviewPage.header).toHaveText("Onderzoeken in tweede zitting");
-      await investigationsOverviewPage.findInvestigationEditButtonByPollingStation(station.number).click();
+      await investigationsOverviewPage.getInvestigationEditButtonByPollingStationId(station.number).click();
 
       const investigationsFindingsPage = new InvestigationFindingsPgObj(page);
       await expect(investigationsFindingsPage.header).toBeVisible();
@@ -526,11 +525,9 @@ test.describe("full flow", () => {
       await investigationsFindingsPage.setCorrectedResults(station.correctedResults);
       await investigationsFindingsPage.save.click();
 
-      const navBar = new CoordinatorNavBarPgObj(page);
-      await navBar.menuButton.click();
-      await navBar.electionsButton.click();
-
-      await expect(overviewPage.header).toBeVisible();
+      await expect(investigationsOverviewPage.alert).toHaveText(
+        `Onderzoek voor stembureau ${station.number} (${station.name}) aangepast`,
+      );
 
       await logout(page);
     });
@@ -640,10 +637,7 @@ test.describe("full flow", () => {
 
     const statusPage = new ElectionStatus(page);
     await expect(statusPage.definitive).toBeVisible();
-
-    const finishButton = statusPage.finish;
-    await expect(finishButton).toBeVisible();
-    await finishButton.click();
+    await statusPage.finish.click();
 
     const finishDataEntryPage = new FinishDataEntry(page);
     await finishDataEntryPage.finishDataEntry.click();

@@ -13,7 +13,7 @@ export class InvestigationOverviewPgObj {
     this.fillInvestigationLink = page.getByRole("link", { name: "Nu invullen" });
   }
 
-  findInvestigationEditButtonByPollingStation(number: string) {
+  getInvestigationEditButtonByPollingStationId(number: string) {
     return this.page.getByTestId(`investigation-${number}`).getByRole("button", { name: /Bewerken|Nu invullen/ });
   }
 }

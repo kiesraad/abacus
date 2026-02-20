@@ -3,7 +3,6 @@ use sqlx::{Connection, SqliteConnection, query, query_as};
 use crate::{
     domain::{
         committee_session::CommitteeSessionId,
-        data_entry::DataEntryId,
         election::ElectionId,
         polling_station::{PollingStation, PollingStationId, PollingStationRequest},
     },
@@ -38,11 +37,11 @@ pub async fn list(
         PollingStation,
         r#"
         SELECT
-            p.id AS "id: PollingStationId",
-            c.election_id AS "election_id: ElectionId",
-            p.committee_session_id AS "committee_session_id: CommitteeSessionId",
+            p.id AS "id: _",
+            c.election_id AS "election_id: _",
+            p.committee_session_id AS "committee_session_id: _",
             p.id_prev_session AS "id_prev_session: _",
-            p.data_entry_id AS "data_entry_id: DataEntryId",
+            p.data_entry_id AS "data_entry_id: _",
             p.name,
             p.number AS "number: u32",
             p.number_of_voters AS "number_of_voters: _",
@@ -69,11 +68,11 @@ pub async fn get(
         PollingStation,
         r#"
         SELECT
-            p.id AS "id: PollingStationId",
-            c.election_id AS "election_id: ElectionId",
-            p.committee_session_id AS "committee_session_id: CommitteeSessionId",
+            p.id AS "id: _",
+            c.election_id AS "election_id: _",
+            p.committee_session_id AS "committee_session_id: _",
             p.id_prev_session AS "id_prev_session: _",
-            p.data_entry_id AS "data_entry_id: DataEntryId",
+            p.data_entry_id AS "data_entry_id: _",
             p.name,
             p.number AS "number: u32",
             p.number_of_voters AS "number_of_voters: _",
@@ -110,11 +109,11 @@ pub async fn get_for_election(
         PollingStation,
         r#"
         SELECT
-            p.id AS "id: PollingStationId",
-            c.election_id AS "election_id: ElectionId",
-            p.committee_session_id AS "committee_session_id: CommitteeSessionId",
+            p.id AS "id: _",
+            c.election_id AS "election_id: _",
+            p.committee_session_id AS "committee_session_id: _",
             p.id_prev_session AS "id_prev_session: _",
-            p.data_entry_id AS "data_entry_id: DataEntryId",
+            p.data_entry_id AS "data_entry_id: _",
             p.name,
             p.number AS "number: u32",
             p.number_of_voters AS "number_of_voters: _",
@@ -166,11 +165,11 @@ pub async fn create(
             locality
         ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
         RETURNING
-            id AS "id: PollingStationId",
-            ? AS "election_id!: ElectionId", -- Workaround to get election_id in the result without a temporary struct
-            committee_session_id AS "committee_session_id: CommitteeSessionId",
+            id AS "id: _",
+            ? AS "election_id!: _", -- Workaround to get election_id in the result without a temporary struct
+            committee_session_id AS "committee_session_id: _",
             id_prev_session AS "id_prev_session: _",
-            data_entry_id AS "data_entry_id: DataEntryId",
+            data_entry_id AS "data_entry_id: _",
             name,
             number AS "number: u32",
             number_of_voters AS "number_of_voters: _",
@@ -233,11 +232,11 @@ pub async fn create_many(
                 locality
             ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
             RETURNING
-                id AS "id: PollingStationId",
+                id AS "id: _",
                 ? AS "election_id!: ElectionId", -- Workaround to get election_id in the result without a temporary struct
-                committee_session_id AS "committee_session_id: CommitteeSessionId",
+                committee_session_id AS "committee_session_id: _",
                 id_prev_session AS "id_prev_session: _",
-                data_entry_id AS "data_entry_id: DataEntryId",
+                data_entry_id AS "data_entry_id: _",
                 name,
                 number AS "number: u32",
                 number_of_voters AS "number_of_voters: _",
@@ -301,11 +300,11 @@ pub async fn update(
         WHERE
             id = ? AND committee_session_id = ?
         RETURNING
-            id AS "id: PollingStationId",
-            ? AS "election_id!: ElectionId", -- Workaround to get election_id in the result without a temporary struct
-            committee_session_id AS "committee_session_id: CommitteeSessionId",
+            id AS "id: _",
+            ? AS "election_id!: _", -- Workaround to get election_id in the result without a temporary struct
+            committee_session_id AS "committee_session_id: _",
             id_prev_session AS "id_prev_session: _",
-            data_entry_id AS "data_entry_id: DataEntryId",
+            data_entry_id AS "data_entry_id: _",
             name,
             number AS "number: u32",
             number_of_voters AS "number_of_voters: _",

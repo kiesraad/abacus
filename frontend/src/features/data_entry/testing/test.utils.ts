@@ -5,7 +5,7 @@ import { screen, within } from "@/testing/test-utils";
 import type {
   ClaimDataEntryResponse,
   CSOFirstSessionResults,
-  POLLING_STATION_DATA_ENTRY_CLAIM_REQUEST_PATH,
+  DATA_ENTRY_CLAIM_REQUEST_PATH,
   PoliticalGroup,
 } from "@/types/generated/openapi";
 import { getCandidateFullName } from "@/utils/candidate";
@@ -29,20 +29,15 @@ export function overrideServerClaimDataEntryResponse({
   continueToNextSection = true,
   validationResults = { errors: [], warnings: [] },
 }: OverrideServerClaimDataEntryResponseProps) {
-  overrideOnce(
-    "post",
-    "/api/polling_stations/1/data_entries/1/claim" satisfies POLLING_STATION_DATA_ENTRY_CLAIM_REQUEST_PATH,
-    200,
-    {
-      client_state: getClientState(formState, formState.furthest, false, continueToNextSection),
-      data: {
-        model: "CSOFirstSession",
-        ...getInitialValues(),
-        ...pollingStationResults,
-      },
-      validation_results: validationResults,
-    } satisfies ClaimDataEntryResponse,
-  );
+  overrideOnce("post", "/api/polling_stations/1/data_entries/1/claim" satisfies DATA_ENTRY_CLAIM_REQUEST_PATH, 200, {
+    client_state: getClientState(formState, formState.furthest, false, continueToNextSection),
+    data: {
+      model: "CSOFirstSession",
+      ...getInitialValues(),
+      ...pollingStationResults,
+    },
+    validation_results: validationResults,
+  } satisfies ClaimDataEntryResponse);
 }
 
 export function expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage(fields: Array<string>, feedbackMessage: string) {

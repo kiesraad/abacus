@@ -2580,7 +2580,7 @@
     "/api/polling_stations/{polling_station_id}/data_entries": {
       "delete": {
         "summary": "Delete data entries and result for a polling station (coordinator)",
-        "operationId": "polling_station_data_entries_and_result_delete",
+        "operationId": "data_entries_and_result_delete",
         "parameters": [
           {
             "name": "polling_station_id",
@@ -2659,7 +2659,7 @@
     "/api/polling_stations/{polling_station_id}/data_entries/get": {
       "get": {
         "summary": "Get data entry with validation results (coordinator)",
-        "operationId": "polling_station_data_entry_get",
+        "operationId": "data_entry_get",
         "parameters": [
           {
             "name": "polling_station_id",
@@ -2745,7 +2745,7 @@
     "/api/polling_stations/{polling_station_id}/data_entries/resolve_differences": {
       "get": {
         "summary": "Get data entry differences to be resolved (coordinator)",
-        "operationId": "polling_station_data_entry_get_differences",
+        "operationId": "data_entry_get_differences",
         "parameters": [
           {
             "name": "polling_station_id",
@@ -2829,7 +2829,7 @@
       },
       "post": {
         "summary": "Resolve data entry differences by providing a `ResolveDifferencesAction` (coordinator)",
-        "operationId": "polling_station_data_entry_resolve_differences",
+        "operationId": "data_entry_resolve_differences",
         "parameters": [
           {
             "name": "polling_station_id",
@@ -2935,7 +2935,7 @@
     "/api/polling_stations/{polling_station_id}/data_entries/resolve_errors": {
       "post": {
         "summary": "Resolve accepted data entry errors by providing a `ResolveErrorsAction` (coordinator)",
-        "operationId": "polling_station_data_entry_resolve_errors",
+        "operationId": "data_entry_resolve_errors",
         "parameters": [
           {
             "name": "polling_station_id",
@@ -3041,7 +3041,7 @@
     "/api/polling_stations/{polling_station_id}/data_entries/{entry_number}": {
       "post": {
         "summary": "Save a data entry for a polling station (typist)",
-        "operationId": "polling_station_data_entry_save",
+        "operationId": "data_entry_save",
         "parameters": [
           {
             "name": "polling_station_id",
@@ -3156,7 +3156,7 @@
       },
       "delete": {
         "summary": "Delete an in-progress (not finalised) data entry for a polling station (typist)",
-        "operationId": "polling_station_data_entry_delete",
+        "operationId": "data_entry_delete",
         "parameters": [
           {
             "name": "polling_station_id",
@@ -3246,7 +3246,7 @@
     "/api/polling_stations/{polling_station_id}/data_entries/{entry_number}/claim": {
       "post": {
         "summary": "Claim a data entry for a polling station, returning any existing progress (typist)",
-        "operationId": "polling_station_data_entry_claim",
+        "operationId": "data_entry_claim",
         "parameters": [
           {
             "name": "polling_station_id",
@@ -3343,7 +3343,7 @@
     "/api/polling_stations/{polling_station_id}/data_entries/{entry_number}/finalise": {
       "post": {
         "summary": "Finalise the data entry for a polling station (typist)",
-        "operationId": "polling_station_data_entry_finalise",
+        "operationId": "data_entry_finalise",
         "parameters": [
           {
             "name": "polling_station_id",

@@ -10,9 +10,11 @@ use crate::domain::{
         DifferencesCounts, ExtraInvestigation, PoliticalGroupCandidateVotes,
         PoliticalGroupTotalVotes, PollingStationResults, VotersCounts, VotesCounts,
     },
+    data_entry_status::{
+        DataEntryStatus, FirstEntryFinalised, FirstEntryHasErrors, FirstEntryInProgress,
+    },
     election::{CandidateNumber, ElectionWithPoliticalGroups, PGNumber},
     polling_station::PollingStation,
-    status::{DataEntryStatus, FirstEntryFinalised, FirstEntryHasErrors, FirstEntryInProgress},
 };
 
 #[derive(Serialize, Deserialize, ToSchema, Debug, Default, PartialEq, Eq)]

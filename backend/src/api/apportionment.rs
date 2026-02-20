@@ -19,8 +19,8 @@ use crate::{
     audit_log::{AuditEvent, AuditService},
     domain::{
         data_entry::{CandidateVotes, PoliticalGroupCandidateVotes},
+        data_entry_status::DataEntryStatusName,
         election::{Candidate, CandidateNumber, ElectionId, PGNumber, PoliticalGroup},
-        status::DataEntryStatusName,
         summary::ElectionSummary,
     },
     repository::{

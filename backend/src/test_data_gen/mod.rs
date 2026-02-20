@@ -112,7 +112,7 @@ where
 }
 
 impl SampleRange<u32> for RandomRange {
-    fn sample_single<R: rand::RngCore + ?Sized>(
+    fn sample_single<R: rand::RngExt + ?Sized>(
         self,
         rng: &mut R,
     ) -> Result<u32, rand::distr::uniform::Error> {

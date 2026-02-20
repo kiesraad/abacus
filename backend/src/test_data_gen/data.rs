@@ -43,12 +43,12 @@ const FIRST_NAMES: &[&str] = &[
 ];
 
 /// Generate a first name using the random number generator given
-pub fn first_name(rng: &mut impl rand::Rng) -> &'static str {
+pub fn first_name(rng: &mut impl rand::RngExt) -> &'static str {
     FIRST_NAMES.choose(rng).expect("Missing test data")
 }
 
 /// Helper function that generates some additional initials
-fn gen_initials_helper(rng: &mut impl rand::Rng, mut offset: u32) -> String {
+fn gen_initials_helper(rng: &mut impl rand::RngExt, mut offset: u32) -> String {
     let mut initials = String::new();
 
     loop {
@@ -72,7 +72,7 @@ fn gen_initials_helper(rng: &mut impl rand::Rng, mut offset: u32) -> String {
 /// random number generator given. If the first name is provided most
 /// of the time the first letter of the first name will be used as the
 /// first initial.
-pub fn initials(rng: &mut impl rand::Rng, first_name: Option<&str>) -> String {
+pub fn initials(rng: &mut impl rand::RngExt, first_name: Option<&str>) -> String {
     if let Some(first_name) = first_name {
         if first_name.trim().is_empty() || rng.random_ratio(1, 8) {
             // either we have no name, or we want some random initials
@@ -124,7 +124,7 @@ const LAST_NAMES: &[(Option<&str>, &str)] = &[
 ];
 
 /// Generate a last name and an optional last name prefix using the random number generator given
-pub fn last_name(rng: &mut impl rand::Rng) -> (Option<&'static str>, &'static str) {
+pub fn last_name(rng: &mut impl rand::RngExt) -> (Option<&'static str>, &'static str) {
     let (prefix, last_name) = LAST_NAMES.choose(rng).expect("Missing test data");
     (*prefix, last_name)
 }
@@ -145,7 +145,7 @@ const LOCALITIES: &[&str] = &[
 ];
 
 /// Generate a random locality, using the random number generator given
-pub fn locality(rng: &mut impl rand::Rng) -> &'static str {
+pub fn locality(rng: &mut impl rand::RngExt) -> &'static str {
     LOCALITIES.choose(rng).expect("Missing test data")
 }
 
@@ -168,7 +168,7 @@ const STREETNAMES: &[&str] = &[
 ];
 
 /// Generate a random streetname and house number combination, using the random number generator given
-pub fn address(rng: &mut impl rand::Rng) -> String {
+pub fn address(rng: &mut impl rand::RngExt) -> String {
     let street = STREETNAMES.choose(rng).expect("Missing test data");
 
     let housenumber = rng.random_range(1..=120);
@@ -182,7 +182,7 @@ pub fn address(rng: &mut impl rand::Rng) -> String {
 }
 
 /// Generate a random postal code, using the random number generator given
-pub fn postal_code(rng: &mut impl rand::Rng) -> String {
+pub fn postal_code(rng: &mut impl rand::RngExt) -> String {
     let digits = rng.random_range(1000..10000).to_string();
     let letter1 = rng.random_range('A'..='Z');
     let letter2 = rng.random_range('A'..='Z');
@@ -247,7 +247,7 @@ static PG_OFFSET: AtomicU64 = AtomicU64::new(0);
 /// Generate a random political group name. This should not repeat political group names.
 /// This only uses the random number generator on the initial call to shuffle the list of
 /// political group names. If the list is exhausted, a simple "GROEP x" is returned.
-pub fn political_group_name(rng: &mut impl rand::Rng) -> String {
+pub fn political_group_name(rng: &mut impl rand::RngExt) -> String {
     static RAND_POLITICAL_GROUP_NAMES: OnceLock<Vec<&str>> = OnceLock::new();
 
     let offset = usize::try_from(PG_OFFSET.fetch_add(1, Ordering::Relaxed)).unwrap_or(usize::MAX);
@@ -312,7 +312,7 @@ const POLLING_STATION_SUFFIX: &[&str] = &[
 ];
 
 /// Generate a polling station name, using the random number generator given
-pub fn polling_station_name(rng: &mut impl rand::Rng) -> String {
+pub fn polling_station_name(rng: &mut impl rand::RngExt) -> String {
     let prefix = POLLING_STATION_PREFIX
         .choose(rng)
         .expect("Missing test data");
@@ -332,13 +332,13 @@ pub fn polling_station_name(rng: &mut impl rand::Rng) -> String {
 }
 
 /// Generate a random election domain id using the given random number generator
-pub fn domain_id(rng: &mut impl rand::Rng) -> String {
+pub fn domain_id(rng: &mut impl rand::RngExt) -> String {
     let num = rng.random_range(100..1000);
     format!("{num:04}")
 }
 
 /// Pick a date between the two given dates, using the given random number generator
-pub fn date_between(rng: &mut impl rand::Rng, start: NaiveDate, end: NaiveDate) -> NaiveDate {
+pub fn date_between(rng: &mut impl rand::RngExt, start: NaiveDate, end: NaiveDate) -> NaiveDate {
     assert!(end >= start, "Start date should be before end date");
     let delta = end - start;
     let days = delta.num_days();
@@ -352,7 +352,7 @@ pub fn date_between(rng: &mut impl rand::Rng, start: NaiveDate, end: NaiveDate) 
 /// Generate some datetime from some point in time and a duration from that point in time
 /// The duration may not exceed about 292 years.
 pub fn datetime_around(
-    rng: &mut impl rand::Rng,
+    rng: &mut impl rand::RngExt,
     point_in_time: DateTime<Utc>,
     duration: TimeDelta,
 ) -> DateTime<Utc> {

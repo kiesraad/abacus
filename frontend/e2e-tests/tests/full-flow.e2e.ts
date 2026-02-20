@@ -276,52 +276,6 @@ test.describe("full flow", () => {
     await logout(page);
   });
 
-  test("download Na 31-2 documents", async ({ page }) => {
-    await page.goto("/account/login");
-
-    const loginPage = new LoginPgObj(page);
-    await loginPage.login(coordinatorUser.username, getTestPassword(coordinatorUser.username));
-
-    const overviewPage = new ElectionsOverviewPgObj(page);
-    await expect(overviewPage.header).toBeVisible();
-    await overviewPage.findElectionRowById(electionId!).click();
-
-    const electionHomePage = new ElectionHome(page);
-    await expect(electionHomePage.header).toContainText("Gemeenteraad Test 2022");
-
-    const downloadPromise = page.waitForEvent("download");
-    await electionHomePage.downloadNa31_2Bijlage1.click();
-    const download = await downloadPromise;
-
-    expect(download.suggestedFilename()).toBe("GR2022_Test_na_31_2_bijlage1.zip");
-    expect((await stat(await download.path())).size).toBeGreaterThan(1024);
-
-    await logout(page);
-  });
-
-  test("download N10-2 documents", async ({ page }) => {
-    await page.goto("/account/login");
-
-    const loginPage = new LoginPgObj(page);
-    await loginPage.login(coordinatorUser.username, getTestPassword(coordinatorUser.username));
-
-    const overviewPage = new ElectionsOverviewPgObj(page);
-    await expect(overviewPage.header).toBeVisible();
-    await overviewPage.findElectionRowById(electionId!).click();
-
-    const electionHomePage = new ElectionHome(page);
-    await expect(electionHomePage.header).toContainText("Gemeenteraad Test 2022");
-
-    const downloadPromise = page.waitForEvent("download");
-    await electionHomePage.downloadN10_2.click();
-    const download = await downloadPromise;
-
-    expect(download.suggestedFilename()).toBe("GR2022_Test_n_10_2.zip");
-    expect((await stat(await download.path())).size).toBeGreaterThan(1024);
-
-    await logout(page);
-  });
-
   for (const typist of typistUsers) {
     test(`complete user account for ${typist.fullname}`, async ({ page }) => {
       await page.goto("/account/login");

@@ -10,9 +10,9 @@ import { newCSBElectionMockData, newElectionMockData } from "@/testing/api-mocks
 import { pollingStationMockData } from "@/testing/api-mocks/PollingStationMockData";
 import {
   CSBElectionImportRequestHandler,
-  ElectionImportRequestHandler,
   ElectionListRequestHandler,
   ElectionRequestHandler,
+  GSBElectionImportRequestHandler,
 } from "@/testing/api-mocks/RequestHandlers";
 import { getRouter, type Router } from "@/testing/router";
 import { overrideOnce, server } from "@/testing/server";
@@ -518,7 +518,7 @@ describe("Election create pages", () => {
     const pushMessage = vi.fn();
 
     beforeEach(() => {
-      server.use(ElectionImportRequestHandler);
+      server.use(GSBElectionImportRequestHandler);
       vi.spyOn(useMessages, "useMessages").mockReturnValue({
         pushMessage,
         popMessages: vi.fn(() => []),

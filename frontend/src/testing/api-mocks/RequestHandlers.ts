@@ -311,7 +311,7 @@ export const ElectionStatusRequestHandler = http.get<
   HttpResponse.json(statusResponseMock, { status: 200 }),
 );
 
-export const ElectionImportRequestHandler = http.post<
+export const GSBElectionImportRequestHandler = http.post<
   ParamsToString<ELECTION_IMPORT_REQUEST_PARAMS>,
   ELECTION_IMPORT_REQUEST_BODY,
   ElectionWithPoliticalGroups
@@ -522,11 +522,13 @@ export const handlers: HttpHandler[] = [
   InvestigationListRequestHandler,
   PollingStationInvestigationCreateHandler,
   PollingStationInvestigationConcludeHandler,
+  PollingStationInvestigationDeleteHandler,
   PollingStationInvestigationUpdateHandler,
   ElectionListRequestHandler,
   ElectionRequestHandler,
   ElectionStatusRequestHandler,
-  ElectionImportRequestHandler,
+  GSBElectionImportRequestHandler,
+  CSBElectionImportRequestHandler,
   ElectionImportValidateRequestHandler,
   ElectionChangeNumberOfVotersHandler,
   LoginHandler,

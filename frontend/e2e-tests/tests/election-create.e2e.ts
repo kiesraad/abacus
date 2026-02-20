@@ -144,6 +144,7 @@ test.describe("Election creation", () => {
     await electionRow.click();
 
     const electionHomePage = new ElectionHome(page);
+    await expect(electionHomePage.header).toHaveText("Gemeenteraad Test 2022");
     await electionHomePage.alertLinkToPollingStations.click();
 
     const pollingStationsPage = new PollingStationListEmptyPgObj(page);

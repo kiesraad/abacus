@@ -326,7 +326,7 @@ test.describe("full flow", () => {
     test(`second data entry ${station.name}`, async ({ page }) => {
       await page.goto("/account/login");
 
-      const secondTypist = typistUsers.filter((typist) => typist.username.startsWith("typist4"))[0]!;
+      const secondTypist = typistUsers[1]!;
       const loginPage = new LoginPgObj(page);
       await loginPage.login(secondTypist.username, getTestPassword(secondTypist.username));
 

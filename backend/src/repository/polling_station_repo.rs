@@ -1,5 +1,7 @@
 use sqlx::{Connection, SqliteConnection, query, query_as};
 
+#[cfg(test)]
+use crate::domain::data_entry::DataEntryId;
 use crate::{
     domain::{
         committee_session::CommitteeSessionId,
@@ -400,7 +402,7 @@ pub async fn insert_test_polling_station(
     conn: &mut SqliteConnection,
     polling_station_id: PollingStationId,
     committee_session_id: CommitteeSessionId,
-    prev_data_entry_id: Option<crate::domain::data_entry::DataEntryId>,
+    prev_data_entry_id: Option<DataEntryId>,
     number: u32,
 ) -> Result<(), sqlx::Error> {
     query!(

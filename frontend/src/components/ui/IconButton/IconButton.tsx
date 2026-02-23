@@ -11,6 +11,7 @@ export interface IconButtonProps extends ButtonHTMLAttributes<HTMLButtonElement>
   variant?: ButtonVariant;
   isRound?: boolean;
   size?: Size;
+  type?: "submit" | "reset" | "button";
 }
 
 export function IconButton({
@@ -21,6 +22,7 @@ export function IconButton({
   isRound = false,
   variant = "primary",
   size = "md",
+  type = "button",
   ...htmlButtonProps
 }: IconButtonProps) {
   return (
@@ -30,6 +32,7 @@ export function IconButton({
       })}
       title={title}
       disabled={isDisabled || isLoading}
+      type={type}
       {...htmlButtonProps}
     >
       {icon}

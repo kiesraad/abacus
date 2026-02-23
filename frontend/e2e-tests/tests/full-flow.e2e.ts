@@ -22,7 +22,6 @@ import { VotersAndVotesPage } from "e2e-tests/page-objects/data_entry/VotersAndV
 import { CheckAndSavePgObj } from "e2e-tests/page-objects/election/create/CheckAndSavePgObj";
 import { CountingMethodTypePgObj } from "e2e-tests/page-objects/election/create/CountingMethodTypePgObj";
 import { NumberOfVotersPgObj } from "e2e-tests/page-objects/election/create/NumberOfVotersPgObj";
-import { PollingStationRolePgObj } from "e2e-tests/page-objects/election/create/PollingStationRolePgObj";
 import { ElectionDetailsPgObj } from "e2e-tests/page-objects/election/ElectionDetailsPgObj";
 import { ElectionHome } from "e2e-tests/page-objects/election/ElectionHomePgObj";
 import { ElectionReport } from "e2e-tests/page-objects/election/ElectionReportPgObj";
@@ -42,6 +41,7 @@ import { UserCreateTypePgObj } from "e2e-tests/page-objects/users/UserCreateType
 import { UserListPgObj } from "e2e-tests/page-objects/users/UserListPgObj";
 import { eml110b_single } from "e2e-tests/test-data/eml-files";
 import { noRecountNoDifferencesDataEntry } from "e2e-tests/test-data/request-response-templates";
+import { ElectoralCommitteeRolePgObj } from "../page-objects/election/create/ElectoralCommitteeRolePgObj.ts";
 
 const investigations = [
   { number: "1", name: "Stadhuis", reason: "Reden", findings: "Probleem", correctedResults: true },
@@ -189,9 +189,9 @@ test.describe("full flow", () => {
 
     await uploadElectionAndInputHash(page);
 
-    const pollingStationRolePage = new PollingStationRolePgObj(page);
-    await expect(pollingStationRolePage.header).toBeVisible();
-    await pollingStationRolePage.next.click();
+    const electoralCommitteeRolePage = new ElectoralCommitteeRolePgObj(page);
+    await expect(electoralCommitteeRolePage.header).toBeVisible();
+    await electoralCommitteeRolePage.next.click();
 
     await uploadCandidatesAndInputHash(page);
     await uploadPollingStations(page, eml110b_single);

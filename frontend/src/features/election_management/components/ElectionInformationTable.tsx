@@ -71,7 +71,7 @@ export function ElectionInformationTable({
           <Table.HeaderCell scope="row" className="normal">
             {t("election_management.to_do_data_entry_for")}
           </Table.HeaderCell>
-          <Table.Cell>{t(`election.roles.${election.role}.short`)}</Table.Cell>
+          <Table.Cell>{t(`electoral_committee_role.roles.${election.role}.short`)}</Table.Cell>
         </Table.Row>
         <Table.Row key={election.id} to="polling-stations">
           <Table.HeaderCell scope="row" className="normal">

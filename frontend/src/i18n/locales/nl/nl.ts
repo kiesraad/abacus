@@ -11,6 +11,7 @@ import election from "./election.json";
 import election_management from "./election_management.json";
 import election_report from "./election_report.json";
 import election_status from "./election_status.json";
+import electoral_committee_role from "./electoral_committee_role.json";
 import error from "./error.json";
 import extra_investigation from "./extra_investigation.json";
 import feedback from "./feedback.json";
@@ -42,6 +43,7 @@ const nl = {
   differences_counts,
   election,
   election_management,
+  electoral_committee_role,
   extra_investigation,
   election_report,
   election_status,

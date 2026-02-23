@@ -419,13 +419,62 @@ export const csbElectionImportMockResponse: ElectionWithPoliticalGroups = {
   political_groups: [],
 };
 
-export const electionImportValidateMockResponse: ElectionDefinitionValidateResponse = {
-  role: "GSB",
+export const gsbElectionImportValidateMockResponse = (
+  matching_election: boolean = true,
+  number_of_voters: number = 0,
+): ElectionDefinitionValidateResponse => {
+  return {
+    role: "GSB",
+    hash: {
+      chunks: [
+        "asdf",
+        "qwer",
+        "zxcv",
+        "tyui",
+        "ghjk",
+        "bnml",
+        "1234",
+        "5678",
+        "8765",
+        "gfsd",
+        "a345",
+        "qwer",
+        "lgmg",
+        "thnr",
+        "nytf",
+        "sdfr",
+      ],
+      redacted_indexes: [2, 9],
+    },
+    election: newElectionMockData,
+    polling_stations: pollingStationMockData,
+    polling_station_definition_matches_election: matching_election,
+    number_of_voters: number_of_voters,
+  };
+};
+
+export const csbElectionImportValidateMockResponse: ElectionDefinitionValidateResponse = {
+  role: "CSB",
   hash: {
-    chunks: new Array<string>(16).fill("0000"),
-    redacted_indexes: [3, 11],
+    chunks: [
+      "asdf",
+      "qwer",
+      "zxcv",
+      "tyui",
+      "ghjk",
+      "bnml",
+      "1234",
+      "5678",
+      "8765",
+      "gfsd",
+      "a345",
+      "qwer",
+      "lgmg",
+      "thnr",
+      "nytf",
+      "sdfr",
+    ],
+    redacted_indexes: [2, 9],
   },
-  election: electionImportMockResponse,
-  polling_stations: pollingStationMockData,
-  number_of_voters: 612694,
+  election: newCSBElectionMockData,
 };

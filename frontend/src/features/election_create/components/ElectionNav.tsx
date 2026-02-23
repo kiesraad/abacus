@@ -11,9 +11,14 @@ interface ElectionCreateFormSection {
   hidden: boolean;
 }
 
-const formSections: ElectionCreateFormSection[] = [
+const sections: ElectionCreateFormSection[] = [
   { key: "election_definition", label: t("election_definition"), path: "create", hidden: false },
-  { key: "polling_station_role", label: t("polling_station.role"), path: "create/polling-station-role", hidden: false },
+  {
+    key: "electoral_committee_role",
+    label: t("electoral_committee_role.role"),
+    path: "create/polling-station-role",
+    hidden: false,
+  },
   { key: "list_of_candidates", label: t("candidate.list.plural"), path: "create/list-of-candidates", hidden: false },
   { key: "polling_stations", label: t("polling_station.title.plural"), path: "create/polling-stations", hidden: false },
   { key: "counting_method_type", label: t("counting_method_type"), path: "create/counting-method-type", hidden: false },
@@ -24,6 +29,11 @@ const formSections: ElectionCreateFormSection[] = [
 export function ElectionNav() {
   const location = useLocation();
   const { state } = useElectionCreateContext();
+  const formSections: ElectionCreateFormSection[] = [];
+
+  sections.forEach((formSection) => {
+    formSections.push(formSection);
+  });
 
   // Update menu for CSB
   if (state.electionRole === "CSB") {
@@ -80,8 +90,8 @@ export function ElectionNav() {
         <ProgressList.Item
           key="check_and_save"
           status="idle"
-          disabled={currentFormSection !== -1}
-          active={currentFormSection === -1}
+          disabled={currentFormSection !== formSections.length - 1}
+          active={currentFormSection === formSections.length - 1}
         >
           <span>{t("election.check_and_save.title")}</span>
         </ProgressList.Item>

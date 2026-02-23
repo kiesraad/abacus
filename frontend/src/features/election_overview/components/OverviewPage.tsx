@@ -75,7 +75,7 @@ export function OverviewPage() {
           <Table.Cell>
             {isTypist
               ? election.location
-              : `${t(`election.roles.${election.role}.abbreviation`)} - ${election.location} (${election.domain_id})`}
+              : `${t(`electoral_committee_role.roles.${election.role}.abbreviation`)} - ${election.location} (${election.domain_id})`}
           </Table.Cell>
           <Table.Cell>
             {isTypist ? (

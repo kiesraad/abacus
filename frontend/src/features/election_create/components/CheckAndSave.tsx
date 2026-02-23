@@ -16,8 +16,8 @@ export function CheckAndSave() {
   const createPath: ELECTION_IMPORT_REQUEST_PATH = `/api/elections/import`;
   const { create } = useCrud<ElectionWithPoliticalGroups>({ createPath, throwAllErrors: true });
 
-  // if no election or candidate data is found in the state, go back to the beginning
-  if (!state.election || !state.electionDefinitionData || !state.candidateDefinitionData) {
+  // if no election, election role or candidate data is found in the state, go back to the beginning
+  if (!state.election || !state.electionRole || !state.electionDefinitionData || !state.candidateDefinitionData) {
     return <Navigate to="/elections/create" />;
   }
 
@@ -27,7 +27,7 @@ export function CheckAndSave() {
   }
 
   function handleSubmit() {
-    void create({
+    let data = {
       role: state.electionRole,
       election_data: state.electionDefinitionData,
       election_hash: state.electionDefinitionHash,
@@ -37,11 +37,23 @@ export function CheckAndSave() {
       polling_station_file_name: state.pollingStationDefinitionFileName,
       counting_method: state.countingMethod,
       number_of_voters: state.numberOfVoters,
-    }).then((result) => {
+    };
+
+    if (state.electionRole === "CSB") {
+      data = {
+        ...data,
+        polling_station_data: undefined,
+        polling_station_file_name: undefined,
+        counting_method: undefined,
+        number_of_voters: undefined,
+      };
+    }
+
+    void create(data).then((result) => {
       if (isSuccess(result)) {
         pushMessage({
           title: t("election.message.election_created", {
-            role: state.electionRole ? t(`election.roles.${state.electionRole}.abbreviation`) : "GSB",
+            role: state.electionRole ? t(`electoral_committee_role.roles.${state.electionRole}.abbreviation`) : "GSB",
             name: result.data.name,
           }),
         });
@@ -58,11 +70,9 @@ export function CheckAndSave() {
         <li>
           <strong>{t("election.singular")}:</strong> {state.election.name}
         </li>
-        {state.electionRole && (
-          <li>
-            <strong>{t("election.role")}:</strong> {t(`election.roles.${state.electionRole}.short`)}
-          </li>
-        )}
+        <li>
+          <strong>{t("election.role")}:</strong> {t(`electoral_committee_role.roles.${state.electionRole}.short`)}
+        </li>
         <li>
           <strong>{t("area_designation")}:</strong> {state.election.location}
         </li>

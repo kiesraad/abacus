@@ -97,22 +97,10 @@
     "dso_not_supported": "Niet ondersteund in deze versie van Abacus",
     "title": "Type stemopneming in"
   },
-  "polling_station_type": {
+  "electoral_committee_role": {
     "title": "Rol van het stembureau",
     "description": "Voor welk stembureau wil je deze verkiezing nu klaarzetten? Ga je Abacus voor GSB én CSB gebruiken? Zet dan eerst het GSB klaar, en doe daarna hetzelfde voor het CSB.",
     "choose": "Kies een rol"
-  },
-  "roles": {
-    "CSB": {
-      "abbreviation": "CSB",
-      "short": "Centraal stembureau",
-      "full": "Centraal stembureau (CSB)"
-    },
-    "GSB": {
-      "abbreviation": "GSB",
-      "short": "Gemeentelijk stembureau",
-      "full": "Gemeentelijk stembureau (GSB)"
-    }
   },
   "you_cannot_start_data_entry_yet": "Je kan nog geen telresultaten invoeren."
 }

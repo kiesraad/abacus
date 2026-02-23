@@ -6,8 +6,12 @@ import { beforeEach, describe, expect, test, vi } from "vitest";
 import { ApiProvider } from "@/api/ApiProvider";
 import { MessagesProvider } from "@/hooks/messages/MessagesProvider";
 import * as useMessages from "@/hooks/messages/useMessages";
-import { newCSBElectionMockData, newElectionMockData } from "@/testing/api-mocks/ElectionMockData";
-import { pollingStationMockData } from "@/testing/api-mocks/PollingStationMockData";
+import {
+  csbElectionImportValidateMockResponse,
+  gsbElectionImportValidateMockResponse,
+  newCSBElectionMockData,
+  newElectionMockData,
+} from "@/testing/api-mocks/ElectionMockData";
 import {
   CSBElectionImportRequestHandler,
   ElectionListRequestHandler,
@@ -18,12 +22,7 @@ import { getRouter, type Router } from "@/testing/router";
 import { overrideOnce, server } from "@/testing/server";
 import { TestUserProvider } from "@/testing/TestUserProvider";
 import { screen, setupTestRouter, waitFor } from "@/testing/test-utils";
-import type {
-  ElectionDefinitionValidateResponse,
-  ElectionRole,
-  NewElection,
-  PollingStationRequest,
-} from "@/types/generated/openapi";
+import type { ElectionRole } from "@/types/generated/openapi";
 import { electionCreateRoutes } from "../routes";
 
 const Providers = ({
@@ -68,76 +67,6 @@ function renderWithRouter() {
   return router;
 }
 
-function electionValidateResponse(
-  election: NewElection,
-  polling_stations: PollingStationRequest[] | undefined = undefined,
-  matching_election: boolean | undefined = undefined,
-  number_of_voters: number = 0,
-): ElectionDefinitionValidateResponse {
-  return {
-    role: "GSB",
-    hash: {
-      // NOTE: In actual data, the redacted version of the hash
-      // will have empty strings at the `redacted_indexes` positions.
-      // We leave them in here so we can test their absence
-      chunks: [
-        "asdf",
-        "qwer",
-        "zxcv",
-        "tyui",
-        "ghjk",
-        "bnml",
-        "1234",
-        "5678",
-        "8765",
-        "gfsd",
-        "a345",
-        "qwer",
-        "lgmg",
-        "thnr",
-        "nytf",
-        "sdfr",
-      ],
-      redacted_indexes: [2, 9],
-    },
-    election,
-    polling_stations,
-    number_of_voters,
-    polling_station_definition_matches_election: matching_election,
-  };
-}
-
-function csbElectionValidateResponse(election: NewElection): ElectionDefinitionValidateResponse {
-  return {
-    role: "CSB",
-    hash: {
-      // NOTE: In actual data, the redacted version of the hash
-      // will have empty strings at the `redacted_indexes` positions.
-      // We leave them in here so we can test their absence
-      chunks: [
-        "asdf",
-        "qwer",
-        "zxcv",
-        "tyui",
-        "ghjk",
-        "bnml",
-        "1234",
-        "5678",
-        "8765",
-        "gfsd",
-        "a345",
-        "qwer",
-        "lgmg",
-        "thnr",
-        "nytf",
-        "sdfr",
-      ],
-      redacted_indexes: [2, 9],
-    },
-    election,
-  };
-}
-
 /**
  * Helper function; navigate to /elections/create
  * and upload an election definition.
@@ -145,9 +74,9 @@ function csbElectionValidateResponse(election: NewElection): ElectionDefinitionV
 async function uploadElectionDefinition(router: Router, file: File, electionRole: ElectionRole = "GSB") {
   const user = userEvent.setup();
   if (electionRole === "CSB") {
-    overrideOnce("post", "/api/elections/import/validate", 200, csbElectionValidateResponse(newElectionMockData));
+    overrideOnce("post", "/api/elections/import/validate", 200, csbElectionImportValidateMockResponse);
   } else {
-    overrideOnce("post", "/api/elections/import/validate", 200, electionValidateResponse(newElectionMockData));
+    overrideOnce("post", "/api/elections/import/validate", 200, gsbElectionImportValidateMockResponse(true, 2000));
   }
   await router.navigate("/elections/create");
 
@@ -169,12 +98,12 @@ async function inputElectionHash(electionRole: ElectionRole = "GSB") {
   const user = userEvent.setup();
 
   if (electionRole === "CSB") {
-    overrideOnce("post", "/api/elections/import/validate", 200, csbElectionValidateResponse(newElectionMockData));
+    overrideOnce("post", "/api/elections/import/validate", 200, csbElectionImportValidateMockResponse);
 
     // Wait for the page to be loaded and expect the election name to be present
     expect(await screen.findByText(newCSBElectionMockData.name)).toBeInTheDocument();
   } else {
-    overrideOnce("post", "/api/elections/import/validate", 200, electionValidateResponse(newElectionMockData));
+    overrideOnce("post", "/api/elections/import/validate", 200, gsbElectionImportValidateMockResponse(false, 2000));
 
     // Wait for the page to be loaded and expect the election name to be present
     expect(await screen.findByText(newElectionMockData.name)).toBeInTheDocument();
@@ -190,14 +119,14 @@ async function inputElectionHash(electionRole: ElectionRole = "GSB") {
 }
 
 /**
- * Helper function: assuming we are on the polling station role page,
+ * Helper function: assuming we are on the electoral committee role page,
  * assert right checkbox is checked and continue.
  */
-async function setPollingStationRole(electionRole: ElectionRole = "GSB") {
+async function setElectoralCommitteeRole(electionRole: ElectionRole = "GSB") {
   const user = userEvent.setup();
 
   if (electionRole === "CSB") {
-    overrideOnce("post", "/api/elections/import/validate", 200, csbElectionValidateResponse(newElectionMockData));
+    overrideOnce("post", "/api/elections/import/validate", 200, csbElectionImportValidateMockResponse);
 
     expect(await screen.findByRole("heading", { level: 2, name: "Rol van het stembureau" })).toBeInTheDocument();
     await waitFor(() => {
@@ -206,7 +135,7 @@ async function setPollingStationRole(electionRole: ElectionRole = "GSB") {
     expect(screen.getByRole("radio", { name: "Centraal stembureau (CSB)" })).toBeChecked();
     expect(screen.getByRole("radio", { name: "Gemeentelijk stembureau (GSB)" })).not.toBeChecked();
   } else {
-    overrideOnce("post", "/api/elections/import/validate", 200, electionValidateResponse(newElectionMockData));
+    overrideOnce("post", "/api/elections/import/validate", 200, gsbElectionImportValidateMockResponse(true, 2000));
     await waitFor(() => {
       screen.getByRole("radio", { name: "Gemeentelijk stembureau (GSB)" }).click();
     });
@@ -224,9 +153,9 @@ async function setPollingStationRole(electionRole: ElectionRole = "GSB") {
 async function uploadCandidateDefinition(file: File, electionRole: ElectionRole = "GSB") {
   const user = userEvent.setup();
   if (electionRole === "CSB") {
-    overrideOnce("post", "/api/elections/import/validate", 200, csbElectionValidateResponse(newElectionMockData));
+    overrideOnce("post", "/api/elections/import/validate", 200, csbElectionImportValidateMockResponse);
   } else {
-    overrideOnce("post", "/api/elections/import/validate", 200, electionValidateResponse(newElectionMockData));
+    overrideOnce("post", "/api/elections/import/validate", 200, gsbElectionImportValidateMockResponse(true, 2000));
   }
 
   // Wait for the candidate page to be loaded
@@ -247,9 +176,9 @@ async function uploadCandidateDefinition(file: File, electionRole: ElectionRole 
 async function inputCandidateHash(electionRole: ElectionRole = "GSB") {
   const user = userEvent.setup();
   if (electionRole === "CSB") {
-    overrideOnce("post", "/api/elections/import/validate", 200, csbElectionValidateResponse(newElectionMockData));
+    overrideOnce("post", "/api/elections/import/validate", 200, csbElectionImportValidateMockResponse);
   } else {
-    overrideOnce("post", "/api/elections/import/validate", 200, electionValidateResponse(newElectionMockData));
+    overrideOnce("post", "/api/elections/import/validate", 200, gsbElectionImportValidateMockResponse(true, 2000));
   }
 
   const inputPart1 = screen.getByRole("textbox", { name: "Controle deel 1" });
@@ -271,7 +200,7 @@ async function uploadPollingStationList(file: File, matching_election: boolean, 
     "post",
     "/api/elections/import/validate",
     200,
-    electionValidateResponse(newElectionMockData, pollingStationMockData, matching_election, number_of_voters),
+    gsbElectionImportValidateMockResponse(matching_election, number_of_voters),
   );
 
   // Wait for the polling station list page to be loaded
@@ -292,7 +221,7 @@ describe("Election create pages", () => {
 
   describe("Confirmation modal", () => {
     test("Shown when the abort button is clicked", async () => {
-      overrideOnce("post", "/api/elections/import/validate", 200, electionValidateResponse(newElectionMockData));
+      overrideOnce("post", "/api/elections/import/validate", 200, gsbElectionImportValidateMockResponse(false, 2000));
 
       const router = renderWithRouter();
       const user = userEvent.setup();
@@ -302,7 +231,7 @@ describe("Election create pages", () => {
       // update election and set hash, and continue
       await uploadElectionDefinition(router, file);
       await inputElectionHash();
-      await setPollingStationRole();
+      await setElectoralCommitteeRole();
 
       // upload candidate file
       await uploadCandidateDefinition(file);
@@ -315,7 +244,7 @@ describe("Election create pages", () => {
     });
 
     test("Shown when attempting to navigate away", async () => {
-      overrideOnce("post", "/api/elections/import/validate", 200, electionValidateResponse(newElectionMockData));
+      overrideOnce("post", "/api/elections/import/validate", 200, gsbElectionImportValidateMockResponse(true, 2000));
 
       const router = renderWithRouter();
       const user = userEvent.setup();
@@ -325,7 +254,7 @@ describe("Election create pages", () => {
       // update election and set hash, and continue
       await uploadElectionDefinition(router, file);
       await inputElectionHash();
-      await setPollingStationRole();
+      await setElectoralCommitteeRole();
 
       // upload candidate file
       await uploadCandidateDefinition(file);
@@ -341,7 +270,7 @@ describe("Election create pages", () => {
 
     test("Not shown when attempting to navigate away if nothing was done", async () => {
       vi.spyOn(console, "warn").mockImplementation(() => {});
-      overrideOnce("post", "/api/elections/import/validate", 200, electionValidateResponse(newElectionMockData));
+      overrideOnce("post", "/api/elections/import/validate", 200, gsbElectionImportValidateMockResponse(true, 2000));
 
       const router = renderWithRouter();
       const user = userEvent.setup();
@@ -360,7 +289,7 @@ describe("Election create pages", () => {
     });
 
     test("Cancel button closes the modal", async () => {
-      overrideOnce("post", "/api/elections/import/validate", 200, electionValidateResponse(newElectionMockData));
+      overrideOnce("post", "/api/elections/import/validate", 200, gsbElectionImportValidateMockResponse(true, 2000));
 
       const router = renderWithRouter();
       const user = userEvent.setup();
@@ -369,7 +298,7 @@ describe("Election create pages", () => {
       // update election and set hash, and continue
       await uploadElectionDefinition(router, file);
       await inputElectionHash();
-      await setPollingStationRole();
+      await setElectoralCommitteeRole();
 
       // upload candidate file
       await uploadCandidateDefinition(file);
@@ -390,7 +319,7 @@ describe("Election create pages", () => {
     });
 
     test("Delete button closes the modal", async () => {
-      overrideOnce("post", "/api/elections/import/validate", 200, electionValidateResponse(newElectionMockData));
+      overrideOnce("post", "/api/elections/import/validate", 200, gsbElectionImportValidateMockResponse(true, 2000));
 
       const router = renderWithRouter();
       const user = userEvent.setup();
@@ -399,7 +328,7 @@ describe("Election create pages", () => {
       // update election and set hash, and continue
       await uploadElectionDefinition(router, file);
       await inputElectionHash();
-      await setPollingStationRole();
+      await setElectoralCommitteeRole();
 
       // upload candidate file
       await uploadCandidateDefinition(file);
@@ -421,7 +350,7 @@ describe("Election create pages", () => {
     });
 
     test("Close button closes the modal", async () => {
-      overrideOnce("post", "/api/elections/import/validate", 200, electionValidateResponse(newElectionMockData));
+      overrideOnce("post", "/api/elections/import/validate", 200, gsbElectionImportValidateMockResponse(true, 2000));
 
       const router = renderWithRouter();
       const user = userEvent.setup();
@@ -430,7 +359,7 @@ describe("Election create pages", () => {
       // update election and set hash, and continue
       await uploadElectionDefinition(router, file);
       await inputElectionHash();
-      await setPollingStationRole();
+      await setElectoralCommitteeRole();
 
       // upload candidate file
       await uploadCandidateDefinition(file);
@@ -460,7 +389,7 @@ describe("Election create pages", () => {
       // upload election and set hash, and continue
       await uploadElectionDefinition(router, file);
       await inputElectionHash();
-      await setPollingStationRole();
+      await setElectoralCommitteeRole();
 
       // upload candidate file, set hash and continue
       await uploadCandidateDefinition(file);
@@ -485,7 +414,7 @@ describe("Election create pages", () => {
       // upload election and set hash, and continue
       await uploadElectionDefinition(router, file);
       await inputElectionHash();
-      await setPollingStationRole();
+      await setElectoralCommitteeRole();
 
       // upload candidate file, set hash and continue
       await uploadCandidateDefinition(file);
@@ -536,8 +465,8 @@ describe("Election create pages", () => {
       await uploadElectionDefinition(router, file);
       await inputElectionHash();
 
-      // polling station role
-      await setPollingStationRole();
+      // electoral committee role
+      await setElectoralCommitteeRole();
 
       // candidates lists
       await uploadCandidateDefinition(file);
@@ -596,8 +525,8 @@ describe("Election create pages", () => {
       await uploadElectionDefinition(router, file, "CSB");
       await inputElectionHash("CSB");
 
-      // polling station role
-      await setPollingStationRole("CSB");
+      // electoral committee role
+      await setElectoralCommitteeRole("CSB");
 
       // candidates lists
       await uploadCandidateDefinition(file, "CSB");

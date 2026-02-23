@@ -71,7 +71,7 @@ describe("PollingStationUpdatePage", () => {
   });
 
   test("Shows form", async () => {
-    renderPage("coordinator");
+    renderPage("coordinator_gsb");
 
     expect(await screen.findByTestId("polling-station-form")).toBeVisible();
     expect(screen.getByRole("textbox", { name: "Nummer" })).toHaveValue("33");
@@ -79,7 +79,7 @@ describe("PollingStationUpdatePage", () => {
   });
 
   test("Navigates back on save with a success message", async () => {
-    renderPage("coordinator");
+    renderPage("coordinator_gsb");
 
     expect(await screen.findByTestId("polling-station-form")).toBeVisible();
     const saveButton = await screen.findByRole("button", { name: "Wijzigingen opslaan" });
@@ -94,7 +94,7 @@ describe("PollingStationUpdatePage", () => {
   test("Navigates back on save with a warning message when data entry completed", async () => {
     overrideOnce("get", "/api/elections/1", 200, getElectionMockData({}, { status: "completed" }));
 
-    renderPage("coordinator");
+    renderPage("coordinator_gsb");
 
     expect(await screen.findByTestId("polling-station-form")).toBeVisible();
     const saveButton = await screen.findByRole("button", { name: "Wijzigingen opslaan" });
@@ -117,7 +117,7 @@ describe("PollingStationUpdatePage", () => {
         prev_data_entry_id: 42,
       });
 
-      renderPage("coordinator");
+      renderPage("coordinator_gsb");
 
       expect(await screen.findByTestId("polling-station-form")).toBeVisible();
       // Button should not be shown
@@ -135,7 +135,7 @@ describe("PollingStationUpdatePage", () => {
       server.use(PollingStationDeleteHandler);
       const user = userEvent.setup();
 
-      renderPage("coordinator");
+      renderPage("coordinator_gsb");
 
       expect(await screen.findByTestId("polling-station-form")).toBeVisible();
       const deleteButton = await screen.findByRole("button", { name: "Stembureau verwijderen" });
@@ -162,7 +162,7 @@ describe("PollingStationUpdatePage", () => {
 
       const user = userEvent.setup();
 
-      renderPage("coordinator");
+      renderPage("coordinator_gsb");
 
       expect(await screen.findByTestId("polling-station-form")).toBeVisible();
       const deleteButton = await screen.findByRole("button", { name: "Stembureau verwijderen" });
@@ -205,7 +205,7 @@ describe("PollingStationUpdatePage", () => {
       overrideOnce("get", "/api/elections/1/status", 200, getElectionStatusMockData({ status: status }));
       const user = userEvent.setup();
 
-      renderPage("coordinator");
+      renderPage("coordinator_gsb");
 
       expect(await screen.findByTestId("polling-station-form")).toBeVisible();
       const deleteButton = await screen.findByRole("button", { name: "Stembureau verwijderen" });
@@ -243,7 +243,7 @@ describe("PollingStationUpdatePage", () => {
       overrideOnce("get", "/api/elections/1/status", 200, getElectionStatusMockData({ status: status }));
       const user = userEvent.setup();
 
-      renderPage("coordinator");
+      renderPage("coordinator_gsb");
 
       expect(await screen.findByTestId("polling-station-form")).toBeVisible();
       const deleteButton = await screen.findByRole("button", { name: "Stembureau verwijderen" });

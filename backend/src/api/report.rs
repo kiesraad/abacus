@@ -13,7 +13,7 @@ use utoipa_axum::{router::OpenApiRouter, routes};
 
 use crate::{
     APIError, AppState, ErrorResponse, SqlitePoolExt,
-    api::middleware::authentication::Coordinator,
+    api::middleware::authentication::CoordinatorGSB,
     domain::{
         committee_session::{
             CommitteeSession, CommitteeSessionError, CommitteeSessionFilesUpdateRequest,
@@ -505,10 +505,10 @@ async fn get_files(
         ("election_id" = ElectionId, description = "Election database id"),
         ("committee_session_id" = CommitteeSessionId, description = "Committee session database id"),
     ),
-    security(("cookie_auth" = ["coordinator"])),
+    security(("cookie_auth" = ["coordinator_gsb"])),
 )]
 async fn election_download_zip_results(
-    _user: Coordinator,
+    _user: CoordinatorGSB,
     State(pool): State<SqlitePool>,
     audit_service: AuditService,
     Path((election_id, committee_session_id)): Path<(ElectionId, CommitteeSessionId)>,
@@ -576,10 +576,10 @@ async fn election_download_zip_results(
         ("election_id" = ElectionId, description = "Election database id"),
         ("committee_session_id" = CommitteeSessionId, description = "Committee session database id"),
     ),
-    security(("cookie_auth" = ["coordinator"])),
+    security(("cookie_auth" = ["coordinator_gsb"])),
 )]
 async fn election_download_pdf_results(
-    _user: Coordinator,
+    _user: CoordinatorGSB,
     State(pool): State<SqlitePool>,
     audit_service: AuditService,
     Path((_election_id, committee_session_id)): Path<(ElectionId, CommitteeSessionId)>,

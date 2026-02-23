@@ -25,12 +25,7 @@ import {
   spyOnHandler,
 } from "@/testing/test-utils";
 import { getAdminUser, getCoordinatorUser, getTypistUser } from "@/testing/user-mock-data";
-import type {
-  ElectionDetailsResponse,
-  ElectionStatusResponse,
-  ErrorResponse,
-  LoginResponse,
-} from "@/types/generated/openapi";
+import type { ElectionDetailsResponse, ElectionStatusResponse, ErrorResponse } from "@/types/generated/openapi";
 
 import { electionStatusRoutes } from "../routes";
 
@@ -71,11 +66,11 @@ describe("ElectionStatusPage", () => {
     vi.spyOn(ReactRouter, "useNavigate").mockImplementation(() => navigate);
   });
 
-  test.each<LoginResponse>([
+  test.each([
     getCoordinatorUser(),
     getAdminUser(),
-  ])("Page render when committee session status is created for user: %s", async (loginResponse) => {
-    vi.spyOn(useUser, "useUser").mockReturnValue(loginResponse);
+  ])("Page render when committee session status is created for user: %s", async (useUserReturn) => {
+    vi.spyOn(useUser, "useUser").mockReturnValue(useUserReturn);
     const user = userEvent.setup();
     server.use(
       http.get("/api/elections/1", () =>
@@ -354,11 +349,11 @@ describe("ElectionStatusPage", () => {
     expect(screen.queryByRole("button", { name: "Hervatten" })).not.toBeInTheDocument();
   });
 
-  test.each<LoginResponse>([
+  test.each([
     getCoordinatorUser(),
     getAdminUser(),
-  ])("Page render when committee session status is completed for role: %s", async (loginResponse) => {
-    vi.spyOn(useUser, "useUser").mockReturnValue(loginResponse);
+  ])("Page render when committee session status is completed for role: %s", async (useUserReturn) => {
+    vi.spyOn(useUser, "useUser").mockReturnValue(useUserReturn);
     server.use(
       http.get("/api/elections/1", () =>
         HttpResponse.json(getElectionMockData({}, { status: "completed" }) satisfies ElectionDetailsResponse, {

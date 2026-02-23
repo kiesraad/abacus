@@ -68,7 +68,7 @@ describe("ElectionInformationTable", () => {
 
   test("renders a table with the election information for first committee session status created for coordinator", async () => {
     // Number of voters can technically not be lower than 1
-    renderTable("coordinator", 0, 1, "created");
+    renderTable("coordinator_gsb", 0, 1, "created");
 
     const election_information_table = await screen.findByTestId("election-information-table");
     expect(election_information_table).toBeVisible();
@@ -91,7 +91,7 @@ describe("ElectionInformationTable", () => {
   });
 
   test("renders a table with the election information for first committee session status in_preparation for coordinator", async () => {
-    renderTable("coordinator", 1234, 1, "in_preparation");
+    renderTable("coordinator_gsb", 1234, 1, "in_preparation");
 
     const election_information_table = await screen.findByTestId("election-information-table");
     expect(election_information_table).toBeVisible();
@@ -114,7 +114,7 @@ describe("ElectionInformationTable", () => {
   });
 
   test("renders a table with the election information for first committee session status data_entry for coordinator", async () => {
-    renderTable("coordinator", 1234, 1, "data_entry");
+    renderTable("coordinator_gsb", 1234, 1, "data_entry");
 
     const election_information_table = await screen.findByTestId("election-information-table");
     expect(election_information_table).toBeVisible();
@@ -137,7 +137,7 @@ describe("ElectionInformationTable", () => {
   });
 
   test("renders a table with the election information for second committee session status created for coordinator", async () => {
-    renderTable("coordinator", 1234, 2, "created");
+    renderTable("coordinator_gsb", 1234, 2, "created");
 
     const election_information_table = await screen.findByTestId("election-information-table");
     expect(election_information_table).toBeVisible();

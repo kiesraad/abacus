@@ -75,7 +75,6 @@ export function Modal({ title, noFlex = false, autoWidth = false, onClose, child
             title={t("close_modal")}
             size="lg"
             variant="tertiary"
-            type="button"
           />
         )}
         <div className={cls.modalBody}>

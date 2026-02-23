@@ -11,33 +11,21 @@ use crate::{APIError, domain::role::Role, repository::user_repo::User};
 #[allow(unused)]
 pub struct Admin(pub User);
 
-/// A user with the coordinator role
+/// A user with the coordinator GSB role
 #[allow(unused)]
-pub struct Coordinator(pub User);
+pub struct CoordinatorGSB(pub User);
 
-/// A user with the typist role
+/// A user with the typist GSB role
 #[allow(unused)]
-pub struct Typist(pub User);
+pub struct TypistGSB(pub User);
 
-/// A user with the admin or coordinator role
+/// A user with the admin or coordinator GSB role
 #[allow(unused)]
-pub struct AdminOrCoordinator(pub User);
+pub struct AdminOrCoordinatorGSB(pub User);
 
 /// A user with potentially no fullname or needs_password_change=true
 #[allow(unused)]
 pub struct IncompleteUser(pub User);
-
-impl AdminOrCoordinator {
-    /// Returns true if the user is an administrator
-    pub fn is_administrator(&self) -> bool {
-        self.0.role() == Role::Administrator
-    }
-
-    /// Returns true if the user is a coordinator
-    pub fn is_coordinator(&self) -> bool {
-        self.0.role() == Role::Coordinator
-    }
-}
 
 impl TryFrom<User> for Admin {
     type Error = ();
@@ -50,34 +38,34 @@ impl TryFrom<User> for Admin {
     }
 }
 
-impl TryFrom<User> for Coordinator {
+impl TryFrom<User> for CoordinatorGSB {
     type Error = ();
 
     fn try_from(user: User) -> Result<Self, Self::Error> {
         match user.role() {
-            Role::Coordinator => Ok(Self(user)),
+            Role::CoordinatorGSB => Ok(Self(user)),
             _ => Err(()),
         }
     }
 }
 
-impl TryFrom<User> for Typist {
+impl TryFrom<User> for TypistGSB {
     type Error = ();
 
     fn try_from(user: User) -> Result<Self, Self::Error> {
         match user.role() {
-            Role::Typist => Ok(Self(user)),
+            Role::TypistGSB => Ok(Self(user)),
             _ => Err(()),
         }
     }
 }
 
-impl TryFrom<User> for AdminOrCoordinator {
+impl TryFrom<User> for AdminOrCoordinatorGSB {
     type Error = ();
 
     fn try_from(user: User) -> Result<Self, Self::Error> {
         match user.role() {
-            Role::Administrator | Role::Coordinator => Ok(Self(user)),
+            Role::Administrator | Role::CoordinatorGSB => Ok(Self(user)),
             _ => Err(()),
         }
     }
@@ -97,7 +85,7 @@ where
     }
 }
 
-impl<S> FromRequestParts<S> for Coordinator
+impl<S> FromRequestParts<S> for CoordinatorGSB
 where
     SqlitePool: FromRef<S>,
     S: Send + Sync,
@@ -107,11 +95,11 @@ where
     async fn from_request_parts(parts: &mut Parts, state: &S) -> Result<Self, Self::Rejection> {
         let user = <User as FromRequestParts<S>>::from_request_parts(parts, state).await?;
 
-        Coordinator::try_from(user).map_err(|_| AuthenticationError::Forbidden.into())
+        CoordinatorGSB::try_from(user).map_err(|_| AuthenticationError::Forbidden.into())
     }
 }
 
-impl<S> FromRequestParts<S> for Typist
+impl<S> FromRequestParts<S> for TypistGSB
 where
     SqlitePool: FromRef<S>,
     S: Send + Sync,
@@ -121,11 +109,11 @@ where
     async fn from_request_parts(parts: &mut Parts, state: &S) -> Result<Self, Self::Rejection> {
         let user = <User as FromRequestParts<S>>::from_request_parts(parts, state).await?;
 
-        Typist::try_from(user).map_err(|_| AuthenticationError::Forbidden.into())
+        TypistGSB::try_from(user).map_err(|_| AuthenticationError::Forbidden.into())
     }
 }
 
-impl<S> FromRequestParts<S> for AdminOrCoordinator
+impl<S> FromRequestParts<S> for AdminOrCoordinatorGSB
 where
     SqlitePool: FromRef<S>,
     S: Send + Sync,
@@ -135,7 +123,7 @@ where
     async fn from_request_parts(parts: &mut Parts, state: &S) -> Result<Self, Self::Rejection> {
         let user = <User as FromRequestParts<S>>::from_request_parts(parts, state).await?;
 
-        AdminOrCoordinator::try_from(user).map_err(|_| AuthenticationError::Forbidden.into())
+        AdminOrCoordinatorGSB::try_from(user).map_err(|_| AuthenticationError::Forbidden.into())
     }
 }
 

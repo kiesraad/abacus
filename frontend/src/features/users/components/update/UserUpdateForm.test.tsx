@@ -15,7 +15,7 @@ async function renderForm(user: Partial<User> = {}) {
 
   render(
     <UserUpdateForm
-      user={{ id: 1, role: "typist", username: "Gebruiker0123", ...user } as User}
+      user={{ id: 1, role: "typist_gsb", username: "Gebruiker0123", ...user } as User}
       onSaved={onSaved}
       onAbort={onAbort}
     ></UserUpdateForm>,

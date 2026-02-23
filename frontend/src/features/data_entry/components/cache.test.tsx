@@ -11,25 +11,17 @@ import {
 } from "@/testing/api-mocks/RequestHandlers";
 import { server } from "@/testing/server";
 import { render, screen } from "@/testing/test-utils";
-import type { LoginResponse } from "@/types/generated/openapi";
+import { getTypistUser } from "@/testing/user-mock-data";
 import type { SectionValues } from "@/types/types";
-
 import * as useDataEntryContext from "../hooks/useDataEntryContext";
 import { getDefaultDataEntryStateAndActionsLoaded } from "../testing/mock-data";
 import type { DataEntryStateAndActionsLoaded } from "../types/types";
 import { DataEntryProvider } from "./DataEntryProvider";
 import { DataEntrySection } from "./DataEntrySection";
 
-const testUser: LoginResponse = {
-  username: "test-user-1",
-  user_id: 1,
-  role: "typist",
-  needs_password_change: false,
-};
-
 describe("Data Entry cache behavior", () => {
   test("VotersAndVotesForm with cache", async () => {
-    vi.spyOn(useUser, "useUser").mockReturnValue(testUser);
+    vi.spyOn(useUser, "useUser").mockReturnValue(getTypistUser());
     server.use(PollingStationDataEntryClaimHandler, PollingStationDataEntrySaveHandler);
 
     const cacheData: SectionValues = {

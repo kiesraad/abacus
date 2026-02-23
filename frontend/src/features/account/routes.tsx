@@ -12,10 +12,14 @@ export const accountRoutes: RouteObject[] = [
   {
     Component: LoginLayout,
     children: [
-      { index: true, Component: UserHomePage, handle: { roles: ["administrator", "coordinator", "typist"] } },
+      { index: true, Component: UserHomePage, handle: { roles: ["administrator", "coordinator_gsb", "typist_gsb"] } },
       { path: "login", Component: LoginPage, handle: { public: true } },
-      { path: "logout", Component: Logout, handle: { roles: ["administrator", "coordinator", "typist"] } },
-      { path: "setup", Component: AccountSetupPage, handle: { roles: ["administrator", "coordinator", "typist"] } },
+      { path: "logout", Component: Logout, handle: { roles: ["administrator", "coordinator_gsb", "typist_gsb"] } },
+      {
+        path: "setup",
+        Component: AccountSetupPage,
+        handle: { roles: ["administrator", "coordinator_gsb", "typist_gsb"] },
+      },
     ],
   },
 ];

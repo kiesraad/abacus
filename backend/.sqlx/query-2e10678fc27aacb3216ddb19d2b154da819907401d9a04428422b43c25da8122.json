@@ -1,6 +1,6 @@
 {
   "db_name": "SQLite",
-  "query": "\n        SELECT\n            id as \"id: UserId\",\n            username,\n            fullname,\n            role,\n            password_hash,\n            needs_password_change as \"needs_password_change: bool\",\n            last_activity_at as \"last_activity_at: _\",\n            updated_at as \"updated_at: _\",\n            created_at as \"created_at: _\"\n        FROM users WHERE id = ?\n        ",
+  "query": "\n        SELECT\n            id as \"id: UserId\",\n            username,\n            fullname,\n            role as \"role: _\",\n            password_hash,\n            needs_password_change as \"needs_password_change: bool\",\n            last_activity_at as \"last_activity_at: _\",\n            updated_at as \"updated_at: _\",\n            created_at as \"created_at: _\"\n        FROM users WHERE username = ? COLLATE NOCASE\n        ",
   "describe": {
     "columns": [
       {
@@ -19,7 +19,7 @@
         "type_info": "Text"
       },
       {
-        "name": "role",
+        "name": "role: _",
         "ordinal": 3,
         "type_info": "Text"
       },
@@ -64,5 +64,5 @@
       false
     ]
   },
-  "hash": "6503f941086a79c1ad4e95533951e5dd16991451d7362a5a7c189a72238cf229"
+  "hash": "2e10678fc27aacb3216ddb19d2b154da819907401d9a04428422b43c25da8122"
 }

@@ -36,7 +36,7 @@ describe("Route authorisation is handled", () => {
     vi.spyOn(console, "error").mockImplementation(() => {});
 
     if (ownRole) {
-      let user: UseUserReturn | null = null;
+      let user: UseUserReturn;
       switch (ownRole) {
         case "administrator":
           user = userMockData.getAdminUser();

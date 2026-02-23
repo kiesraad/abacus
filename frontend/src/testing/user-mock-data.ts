@@ -1,6 +1,6 @@
 import type { UseUserReturn } from "@/hooks/user/useUser";
 
-export function getTypistUser(): UseUserReturn {
+export function getTypistUser(): NonNullable<UseUserReturn> {
   return {
     needs_password_change: false,
     role: "typist_gsb",
@@ -10,7 +10,7 @@ export function getTypistUser(): UseUserReturn {
   };
 }
 
-export function getCoordinatorUser(): UseUserReturn {
+export function getCoordinatorUser(): NonNullable<UseUserReturn> {
   return {
     needs_password_change: false,
     role: "coordinator_gsb",
@@ -20,7 +20,7 @@ export function getCoordinatorUser(): UseUserReturn {
   };
 }
 
-export function getAdminUser(): UseUserReturn {
+export function getAdminUser(): NonNullable<UseUserReturn> {
   return {
     needs_password_change: false,
     role: "administrator",

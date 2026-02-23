@@ -59,9 +59,7 @@ describe("ApportionmentResidualSeatsPage", () => {
 
     expect(screen.queryByTestId("largest-remainders-table")).not.toBeInTheDocument();
     expect(screen.queryByTestId("unique-highest-averages-table")).not.toBeInTheDocument();
-    expect(screen.queryByTestId("1-full-seat-list-exhaustion-information")).not.toBeInTheDocument();
-    expect(screen.queryByTestId("1-absolute-majority-change-information")).not.toBeInTheDocument();
-    expect(screen.queryByTestId("1-residual-seat-list-exhaustion-information")).not.toBeInTheDocument();
+    expect(screen.queryByTestId("footnotes-list")).not.toBeInTheDocument();
   });
 
   test("Residual seats assignment highest averages table with footnotes and absolute majority change information visible", async () => {
@@ -177,14 +175,12 @@ describe("ApportionmentResidualSeatsPage", () => {
       ["", "Restzetel toegekend aan lijst", "2", "3", "4", "5", "6", "7", ""],
     ]);
 
-    expect(await screen.findByTestId("1-absolute-majority-reassignment-information")).toHaveTextContent(
-      "1 Lijst 1 heeft meer dan de helft van alle uitgebrachte stemmen behaald, maar krijgt op basis van de standaard zetelverdeling niet de meerderheid van de zetels. Volgens de Kieswet (Artikel P 9 Toewijzing zetels bij volstrekte meerderheid) krijgt deze lijst één extra zetel. Deze zetel gaat ten koste van lijst 7 omdat die de laatste restzetel toegewezen heeft gekregen.",
+    expect(await screen.findByTestId("footnotes-list")).toHaveTextContent(
+      "Lijst 1 heeft meer dan de helft van alle uitgebrachte stemmen behaald, maar krijgt op basis van de standaard zetelverdeling niet de meerderheid van de zetels. Volgens de Kieswet (Artikel P 9 Toewijzing zetels bij volstrekte meerderheid) krijgt deze lijst één extra zetel. Deze zetel gaat ten koste van lijst 7 omdat die de laatste restzetel toegewezen heeft gekregen.",
     );
 
     expect(screen.queryByTestId("largest-remainders-table")).not.toBeInTheDocument();
     expect(screen.queryByTestId("unique-highest-averages-table")).not.toBeInTheDocument();
-    expect(screen.queryByTestId("2-full-seat-list-exhaustion-information")).not.toBeInTheDocument();
-    expect(screen.queryByTestId("2-residual-seat-list-exhaustion-information")).not.toBeInTheDocument();
   });
 
   test("Residual seats assignment largest remainders and unique highest averages tables visible", async () => {
@@ -229,9 +225,7 @@ describe("ApportionmentResidualSeatsPage", () => {
     ]);
 
     expect(screen.queryByTestId("highest-averages-table")).not.toBeInTheDocument();
-    expect(screen.queryByTestId("1-full-seat-list-exhaustion-information")).not.toBeInTheDocument();
-    expect(screen.queryByTestId("1-absolute-majority-change-information")).not.toBeInTheDocument();
-    expect(screen.queryByTestId("1-residual-seat-list-exhaustion-information")).not.toBeInTheDocument();
+    expect(screen.queryByTestId("footnotes-list")).not.toBeInTheDocument();
   });
 
   test("Residual seats assignment only largest remainders table visible", async () => {
@@ -265,9 +259,7 @@ describe("ApportionmentResidualSeatsPage", () => {
 
     expect(screen.queryByTestId("highest-averages-table")).not.toBeInTheDocument();
     expect(screen.queryByTestId("unique-highest-averages-table")).not.toBeInTheDocument();
-    expect(screen.queryByTestId("1-full-seat-list-exhaustion-information")).not.toBeInTheDocument();
-    expect(screen.queryByTestId("1-absolute-majority-change-information")).not.toBeInTheDocument();
-    expect(screen.queryByTestId("1-residual-seat-list-exhaustion-information")).not.toBeInTheDocument();
+    expect(screen.queryByTestId("footnotes-list")).not.toBeInTheDocument();
   });
 
   test("Residual seats assignment largest remainders table with footnotes and unique highest averages table and absolute majority change and list exhaustion information visible", async () => {
@@ -312,17 +304,10 @@ describe("ApportionmentResidualSeatsPage", () => {
       ["2", "Political Group B", "2", "244", "1/4", "1"],
     ]);
 
-    expect(await screen.findByTestId("1-full-seat-list-exhaustion-information")).toHaveTextContent(
-      "1 Het overschot is berekend op basis van de 7 volle zetels die de lijst heeft gehaald voordat lijstuitputting is meegenomen (Kieswet, artikel P 8).",
-    );
-    expect(await screen.findByTestId("2-absolute-majority-reassignment-information")).toHaveTextContent(
-      "2 Lijst 1 heeft meer dan de helft van alle uitgebrachte stemmen behaald, maar krijgt op basis van de standaard zetelverdeling niet de meerderheid van de zetels. Volgens de Kieswet (Artikel P 9 Toewijzing zetels bij volstrekte meerderheid) krijgt deze lijst één extra zetel. Deze zetel gaat ten koste van lijst 4 omdat die de laatste restzetel toegewezen heeft gekregen.",
-    );
-    expect(await screen.findByTestId("3-residual-seat-list-exhaustion-information")).toHaveTextContent(
-      "3 Omdat lijst 1 geen kandidaat heeft voor een zetel, is deze herverdeeld naar een andere lijst. (Kieswet, artikel P 10)",
+    expect(await screen.findByTestId("footnotes-list")).toHaveTextContent(
+      /^Het overschot is berekend op basis van de 7 volle zetels die de lijst heeft gehaald voordat lijstuitputting is meegenomen \(Kieswet, artikel P 8\).Lijst 1 heeft meer dan de helft van alle uitgebrachte stemmen behaald, maar krijgt op basis van de standaard zetelverdeling niet de meerderheid van de zetels. Volgens de Kieswet \(Artikel P 9 Toewijzing zetels bij volstrekte meerderheid\) krijgt deze lijst één extra zetel. Deze zetel gaat ten koste van lijst 4 omdat die de laatste restzetel toegewezen heeft gekregen.Omdat lijst 1 geen kandidaat heeft voor een zetel, is deze herverdeeld naar een andere lijst. \(Kieswet, artikel P 10\)$/,
     );
 
-    expect(screen.queryByTestId("4-residual-seat-list-exhaustion-information")).not.toBeInTheDocument();
     expect(screen.queryByTestId("highest-averages-table")).not.toBeInTheDocument();
   });
 
@@ -375,14 +360,9 @@ describe("ApportionmentResidualSeatsPage", () => {
       ["", "Restzetel toegekend aan lijst", "1", "2", ""],
     ]);
 
-    expect(await screen.findByTestId("1-full-seat-list-exhaustion-information")).toHaveTextContent(
-      "1 Het overschot is berekend op basis van de 5 volle zetels die de lijst heeft gehaald voordat lijstuitputting is meegenomen (Kieswet, artikel P 8).",
+    expect(await screen.findByTestId("footnotes-list")).toHaveTextContent(
+      /^Het overschot is berekend op basis van de 5 volle zetels die de lijst heeft gehaald voordat lijstuitputting is meegenomen \(Kieswet, artikel P 8\).Omdat lijst 3 geen kandidaat heeft voor een zetel, is deze herverdeeld naar een andere lijst. \(Kieswet, artikel P 10\)$/,
     );
-    expect(await screen.findByTestId("2-residual-seat-list-exhaustion-information")).toHaveTextContent(
-      "2 Omdat lijst 3 geen kandidaat heeft voor een zetel, is deze herverdeeld naar een andere lijst. (Kieswet, artikel P 10)",
-    );
-
-    expect(screen.queryByTestId("3-residual-seat-list-exhaustion-information")).not.toBeInTheDocument();
   });
 
   describe("Apportionment not yet available", () => {
@@ -407,9 +387,7 @@ describe("ApportionmentResidualSeatsPage", () => {
       expect(screen.queryByTestId("highest-averages-table")).not.toBeInTheDocument();
       expect(screen.queryByTestId("largest-remainders-table")).not.toBeInTheDocument();
       expect(screen.queryByTestId("unique-highest-averages-table")).not.toBeInTheDocument();
-      expect(screen.queryByTestId("1-full-seat-list-exhaustion-information")).not.toBeInTheDocument();
-      expect(screen.queryByTestId("1-absolute-majority-change-information")).not.toBeInTheDocument();
-      expect(screen.queryByTestId("1-residual-seat-list-exhaustion-information")).not.toBeInTheDocument();
+      expect(screen.queryByTestId("footnotes-list")).not.toBeInTheDocument();
     });
 
     test("Not possible because drawing of lots is not implemented yet", async () => {
@@ -433,9 +411,7 @@ describe("ApportionmentResidualSeatsPage", () => {
       expect(screen.queryByTestId("highest-averages-table")).not.toBeInTheDocument();
       expect(screen.queryByTestId("largest-remainders-table")).not.toBeInTheDocument();
       expect(screen.queryByTestId("unique-highest-averages-table")).not.toBeInTheDocument();
-      expect(screen.queryByTestId("1-full-seat-list-exhaustion-information")).not.toBeInTheDocument();
-      expect(screen.queryByTestId("1-absolute-majority-change-information")).not.toBeInTheDocument();
-      expect(screen.queryByTestId("1-residual-seat-list-exhaustion-information")).not.toBeInTheDocument();
+      expect(screen.queryByTestId("footnotes-list")).not.toBeInTheDocument();
     });
 
     test("Not possible because all lists are exhausted", async () => {
@@ -461,9 +437,7 @@ describe("ApportionmentResidualSeatsPage", () => {
       expect(screen.queryByTestId("highest-averages-table")).not.toBeInTheDocument();
       expect(screen.queryByTestId("largest-remainders-table")).not.toBeInTheDocument();
       expect(screen.queryByTestId("unique-highest-averages-table")).not.toBeInTheDocument();
-      expect(screen.queryByTestId("1-full-seat-list-exhaustion-information")).not.toBeInTheDocument();
-      expect(screen.queryByTestId("1-absolute-majority-change-information")).not.toBeInTheDocument();
-      expect(screen.queryByTestId("1-residual-seat-list-exhaustion-information")).not.toBeInTheDocument();
+      expect(screen.queryByTestId("footnotes-list")).not.toBeInTheDocument();
     });
 
     test("Not possible because no votes on candidates cast", async () => {
@@ -489,9 +463,7 @@ describe("ApportionmentResidualSeatsPage", () => {
       expect(screen.queryByTestId("highest-averages-table")).not.toBeInTheDocument();
       expect(screen.queryByTestId("largest-remainders-table")).not.toBeInTheDocument();
       expect(screen.queryByTestId("unique-highest-averages-table")).not.toBeInTheDocument();
-      expect(screen.queryByTestId("1-full-seat-list-exhaustion-information")).not.toBeInTheDocument();
-      expect(screen.queryByTestId("1-absolute-majority-change-information")).not.toBeInTheDocument();
-      expect(screen.queryByTestId("1-residual-seat-list-exhaustion-information")).not.toBeInTheDocument();
+      expect(screen.queryByTestId("footnotes-list")).not.toBeInTheDocument();
     });
 
     test("Internal Server Error renders error page", async () => {

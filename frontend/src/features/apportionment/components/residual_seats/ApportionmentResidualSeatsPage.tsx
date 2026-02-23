@@ -2,23 +2,21 @@ import { Link } from "react-router";
 
 import { useElection } from "@/hooks/election/useElection";
 import { t, tx } from "@/i18n/translate";
-import type { SeatAssignmentResult } from "@/types/generated/openapi";
 import { cn } from "@/utils/classnames";
 import { useApportionmentContext } from "../../hooks/useApportionmentContext";
 import {
-  type AbsoluteMajorityReassignmentStep,
   getResultChanges,
   isAbsoluteMajorityReassignmentStep,
   isHighestAverageAssignmentStep,
   isLargestRemainderAssignmentStep,
   isListExhaustionRemovalStep,
   isUniqueHighestAverageAssignmentStep,
-  type ListExhaustionRemovalStep,
   type resultChange,
 } from "../../utils/seat-change";
 import { render_title_and_header } from "../../utils/utils";
 import cls from "../Apportionment.module.css";
 import { ApportionmentError } from "../ApportionmentError";
+import { Footnotes } from "./Footnotes";
 import { HighestAveragesTable } from "./HighestAveragesTable";
 import { LargestRemaindersTable } from "./LargestRemaindersTable";
 import { UniqueHighestAveragesTable } from "./UniqueHighestAveragesTable";
@@ -37,68 +35,6 @@ function render_information(seats: number, residualSeats: number) {
       <br />
       {tx(`apportionment.information_${seats >= 19 ? "highest_averages" : "largest_remainders"}`)}
     </span>
-  );
-}
-
-// TODO: Refactor this to <ol><li><li><li></ol> with superscript styling
-function render_footnotes_list(
-  uniquePgNumbersWithFullSeatsRemoved: number[],
-  seatAssignment: SeatAssignmentResult | undefined,
-  absoluteMajorityReassignment: AbsoluteMajorityReassignmentStep | undefined,
-  residualSeatRemovalSteps: ListExhaustionRemovalStep[],
-) {
-  let footnoteNumber = 0;
-  return (
-    <div className={cls.footnoteDiv}>
-      {uniquePgNumbersWithFullSeatsRemoved.map((pgNumber) => {
-        footnoteNumber += 1;
-        return (
-          <div className="w-39" key={`step-${footnoteNumber}`}>
-            <span id={`${footnoteNumber}-full-seat-list-exhaustion-information`}>
-              <sup id={`footnote-${footnoteNumber}`} className={cls.footnoteNumber}>
-                {footnoteNumber}
-              </sup>{" "}
-              {t("apportionment.full_seat_removed_remainder_information", {
-                num_full_seats: seatAssignment?.steps[0]?.standings[pgNumber - 1]?.full_seats || "",
-              })}
-            </span>
-          </div>
-        );
-      })}
-      {absoluteMajorityReassignment &&
-        (() => {
-          footnoteNumber += 1;
-          return (
-            <div className="w-39">
-              <span id={`${footnoteNumber}-absolute-majority-reassignment-information`}>
-                <sup id="footnote-1" className={cls.footnoteNumber}>
-                  {footnoteNumber}
-                </sup>{" "}
-                {t("apportionment.absolute_majority_reassignment", {
-                  pg_assigned_seat: absoluteMajorityReassignment.change.pg_assigned_seat,
-                  pg_retracted_seat: absoluteMajorityReassignment.change.pg_retracted_seat,
-                })}
-              </span>
-            </div>
-          );
-        })()}
-      {residualSeatRemovalSteps.map((pgSeatRemoval, index) => {
-        footnoteNumber += 1;
-        return (
-          <div className="w-39" key={`step-${footnoteNumber}`}>
-            <span id={`${footnoteNumber}-residual-seat-list-exhaustion-information`}>
-              <sup id={`footnote-${footnoteNumber}`} className={cls.footnoteNumber}>
-                {footnoteNumber}
-              </sup>{" "}
-              {t("apportionment.list_exhaustion_residual_seat_removal", {
-                pg_retracted_seat: pgSeatRemoval.change.pg_retracted_seat,
-              })}
-              {index === 0 && ` ${t("apportionment.article_p10")}`}
-            </span>
-          </div>
-        );
-      })}
-    </div>
   );
 }
 
@@ -141,11 +77,13 @@ export function ApportionmentResidualSeatsPage() {
     );
 
     function render_footnotes() {
-      return render_footnotes_list(
-        uniquePgNumbersWithFullSeatsRemoved,
-        seatAssignment,
-        absoluteMajorityReassignment,
-        residualSeatRemovalSteps,
+      return (
+        <Footnotes
+          uniquePgNumbersWithFullSeatsRemoved={uniquePgNumbersWithFullSeatsRemoved}
+          seatAssignment={seatAssignment}
+          absoluteMajorityReassignment={absoluteMajorityReassignment}
+          residualSeatRemovalSteps={residualSeatRemovalSteps}
+        />
       );
     }
 

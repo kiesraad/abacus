@@ -21,10 +21,24 @@
   margin-bottom: 2rem;
 }
 
-.footnoteDiv {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
+.footnotesList {
+  counter-reset: li;
+  margin: 0;
+  padding: 0;
+
+  li {
+    margin-bottom: 1rem;
+    position: relative;
+    display: block;
+
+    &::before {
+      content: counter(li);
+      counter-increment: li;
+      vertical-align: super;
+      font-size: small;
+      padding-right: 0.5rem;
+    }
+  }
 }
 
 .footnoteNumber {

@@ -13,7 +13,7 @@ import { ElectoralCommitteeRole } from "./ElectoralCommitteeRole.tsx";
 
 const election = { name: "Naam", location: "Plek", role: "GSB" } as NewElection;
 
-describe("ElectoralCommittee component", () => {
+describe("ElectoralCommitteeRole component", () => {
   test("Navigates to election create page when no election", () => {
     const state = {};
     const dispatch = vi.fn();
@@ -23,7 +23,7 @@ describe("ElectoralCommittee component", () => {
     expect(router.state.location.pathname).toEqual("/elections/create");
   });
 
-  test("Navigates to candidate list upload page", async () => {
+  test("GSB: Navigates to candidate list upload page", async () => {
     const state = { election, electionRole: "GSB" as ElectionRole };
     const dispatch = vi.fn();
     vi.spyOn(useElectionCreateContext, "useElectionCreateContext").mockReturnValue({ state, dispatch });

@@ -1313,9 +1313,6 @@ mod tests {
         insert_test_investigation(&mut conn, polling_station_id, Some(true))
             .await
             .unwrap();
-        data_entry_repo::create_empty(&mut conn, polling_station_id)
-            .await
-            .unwrap();
 
         change_status_committee_session(
             pool.clone(),
@@ -1453,9 +1450,6 @@ mod tests {
         )
         .await
         .unwrap();
-        data_entry_repo::create_empty(&mut conn, polling_station_id)
-            .await
-            .unwrap();
 
         // Claim a polling station that had entries/a result in the previous committee session
         let response = claim(pool.clone(), polling_station_id, EntryNumber::FirstEntry).await;
@@ -2346,9 +2340,6 @@ mod tests {
         insert_test_investigation(&mut conn, polling_station_id, Some(true))
             .await
             .unwrap();
-        data_entry_repo::create_empty(&mut conn, polling_station_id)
-            .await
-            .unwrap();
 
         change_status_committee_session(
             pool.clone(),
@@ -2371,9 +2362,6 @@ mod tests {
         let polling_station_id = PollingStationId::from(742);
         // Add investigation with corrected_results and create empty data entry
         insert_test_investigation(&mut conn, polling_station_id, Some(true))
-            .await
-            .unwrap();
-        data_entry_repo::create_empty(&mut conn, polling_station_id)
             .await
             .unwrap();
 

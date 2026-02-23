@@ -1,5 +1,5 @@
 import { electionMockData } from "@/testing/api-mocks/ElectionMockData";
-import type { CSOFirstSessionResults, POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_BODY } from "@/types/generated/openapi";
+import type { CSOFirstSessionResults, DATA_ENTRY_SAVE_REQUEST_BODY } from "@/types/generated/openapi";
 import type { DataEntryModel, DataEntryStructure, FormSectionId } from "@/types/types";
 import { getDataEntryStructure } from "@/utils/dataEntryStructure";
 import { ValidationResultSet } from "@/utils/ValidationResults";
@@ -94,7 +94,7 @@ export function getDefaultDataEntryState(): DataEntryStateLoaded {
   };
 }
 
-export function getEmptyDataEntryRequest(): POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_BODY {
+export function getEmptyDataEntryRequest(): DATA_ENTRY_SAVE_REQUEST_BODY {
   return {
     progress: 0,
     data: {

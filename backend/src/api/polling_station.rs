@@ -9,7 +9,7 @@ use utoipa_axum::{router::OpenApiRouter, routes};
 use crate::{
     APIError, AppState, ErrorResponse, SqlitePoolExt,
     api::{
-        data_entry::delete_data_entry_and_result_for_polling_station,
+        data_entry::delete_data_entry_for_polling_station,
         investigation::delete_investigation_for_polling_station,
         middleware::authentication::{AdminOrCoordinator, error::AuthenticationError},
     },
@@ -288,7 +288,7 @@ async fn polling_station_delete(
 
     let polling_station = get_for_election(&mut tx, election_id, polling_station_id).await?;
 
-    delete_data_entry_and_result_for_polling_station(
+    delete_data_entry_for_polling_station(
         &mut tx,
         &audit_service,
         &committee_session,

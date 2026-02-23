@@ -5,14 +5,14 @@ export class UploadPollingStationDefinitionPgObj {
   readonly invalidFileAlert: Locator;
   readonly upload: Locator;
   readonly skipButton: Locator;
-  readonly main: Locator;
+  readonly fieldset: Locator;
 
   constructor(protected readonly page: Page) {
+    this.fieldset = page.getByRole("group", { name: "Importeer stembureaus" });
     this.header = page.getByRole("heading", { level: 2, name: "Importeer stembureaus" });
     this.invalidFileAlert = page.getByRole("alert").filter({ hasText: "Ongeldig stembureaubestand" });
     this.upload = page.getByRole("button", { name: "Bestand kiezen" });
     this.skipButton = page.getByRole("button", { name: "Stap overslaan en stembureaus later toevoegen" });
-    this.main = page.getByRole("main");
   }
 
   async uploadFile(path: string) {

@@ -201,68 +201,75 @@ export type LOGOUT_REQUEST_PARAMS = Record<string, never>;
 export type LOGOUT_REQUEST_PATH = `/api/logout`;
 
 // /api/polling_stations/{polling_station_id}/data_entries
-export interface POLLING_STATION_DATA_ENTRIES_AND_RESULT_DELETE_REQUEST_PARAMS {
+export interface DATA_ENTRIES_AND_RESULT_DELETE_REQUEST_PARAMS {
   polling_station_id: PollingStationId;
 }
-export type POLLING_STATION_DATA_ENTRIES_AND_RESULT_DELETE_REQUEST_PATH =
-  `/api/polling_stations/${PollingStationId}/data_entries`;
+
+export type DATA_ENTRIES_AND_RESULT_DELETE_REQUEST_PATH = `/api/polling_stations/${PollingStationId}/data_entries`;
 
 // /api/polling_stations/{polling_station_id}/data_entries/get
-export interface POLLING_STATION_DATA_ENTRY_GET_REQUEST_PARAMS {
+export interface DATA_ENTRY_GET_REQUEST_PARAMS {
   polling_station_id: PollingStationId;
 }
-export type POLLING_STATION_DATA_ENTRY_GET_REQUEST_PATH = `/api/polling_stations/${PollingStationId}/data_entries/get`;
+
+export type DATA_ENTRY_GET_REQUEST_PATH = `/api/polling_stations/${PollingStationId}/data_entries/get`;
 
 // /api/polling_stations/{polling_station_id}/data_entries/resolve_differences
-export interface POLLING_STATION_DATA_ENTRY_GET_DIFFERENCES_REQUEST_PARAMS {
+export interface DATA_ENTRY_GET_DIFFERENCES_REQUEST_PARAMS {
   polling_station_id: PollingStationId;
 }
-export type POLLING_STATION_DATA_ENTRY_GET_DIFFERENCES_REQUEST_PATH =
+
+export type DATA_ENTRY_GET_DIFFERENCES_REQUEST_PATH =
   `/api/polling_stations/${PollingStationId}/data_entries/resolve_differences`;
-export interface POLLING_STATION_DATA_ENTRY_RESOLVE_DIFFERENCES_REQUEST_PARAMS {
+
+export interface DATA_ENTRY_RESOLVE_DIFFERENCES_REQUEST_PARAMS {
   polling_station_id: PollingStationId;
 }
-export type POLLING_STATION_DATA_ENTRY_RESOLVE_DIFFERENCES_REQUEST_PATH =
+
+export type DATA_ENTRY_RESOLVE_DIFFERENCES_REQUEST_PATH =
   `/api/polling_stations/${PollingStationId}/data_entries/resolve_differences`;
-export type POLLING_STATION_DATA_ENTRY_RESOLVE_DIFFERENCES_REQUEST_BODY = ResolveDifferencesAction;
+export type DATA_ENTRY_RESOLVE_DIFFERENCES_REQUEST_BODY = ResolveDifferencesAction;
 
 // /api/polling_stations/{polling_station_id}/data_entries/resolve_errors
-export interface POLLING_STATION_DATA_ENTRY_RESOLVE_ERRORS_REQUEST_PARAMS {
+export interface DATA_ENTRY_RESOLVE_ERRORS_REQUEST_PARAMS {
   polling_station_id: PollingStationId;
 }
-export type POLLING_STATION_DATA_ENTRY_RESOLVE_ERRORS_REQUEST_PATH =
+
+export type DATA_ENTRY_RESOLVE_ERRORS_REQUEST_PATH =
   `/api/polling_stations/${PollingStationId}/data_entries/resolve_errors`;
-export type POLLING_STATION_DATA_ENTRY_RESOLVE_ERRORS_REQUEST_BODY = ResolveErrorsAction;
+export type DATA_ENTRY_RESOLVE_ERRORS_REQUEST_BODY = ResolveErrorsAction;
 
 // /api/polling_stations/{polling_station_id}/data_entries/{entry_number}
-export interface POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_PARAMS {
+export interface DATA_ENTRY_SAVE_REQUEST_PARAMS {
   polling_station_id: PollingStationId;
   entry_number: number;
 }
-export type POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_PATH =
-  `/api/polling_stations/${PollingStationId}/data_entries/${number}`;
-export type POLLING_STATION_DATA_ENTRY_SAVE_REQUEST_BODY = DataEntry;
-export interface POLLING_STATION_DATA_ENTRY_DELETE_REQUEST_PARAMS {
+
+export type DATA_ENTRY_SAVE_REQUEST_PATH = `/api/polling_stations/${PollingStationId}/data_entries/${number}`;
+export type DATA_ENTRY_SAVE_REQUEST_BODY = DataEntry;
+
+export interface DATA_ENTRY_DELETE_REQUEST_PARAMS {
   polling_station_id: PollingStationId;
   entry_number: number;
 }
-export type POLLING_STATION_DATA_ENTRY_DELETE_REQUEST_PATH =
-  `/api/polling_stations/${PollingStationId}/data_entries/${number}`;
+
+export type DATA_ENTRY_DELETE_REQUEST_PATH = `/api/polling_stations/${PollingStationId}/data_entries/${number}`;
 
 // /api/polling_stations/{polling_station_id}/data_entries/{entry_number}/claim
-export interface POLLING_STATION_DATA_ENTRY_CLAIM_REQUEST_PARAMS {
+export interface DATA_ENTRY_CLAIM_REQUEST_PARAMS {
   polling_station_id: PollingStationId;
   entry_number: number;
 }
-export type POLLING_STATION_DATA_ENTRY_CLAIM_REQUEST_PATH =
-  `/api/polling_stations/${PollingStationId}/data_entries/${number}/claim`;
+
+export type DATA_ENTRY_CLAIM_REQUEST_PATH = `/api/polling_stations/${PollingStationId}/data_entries/${number}/claim`;
 
 // /api/polling_stations/{polling_station_id}/data_entries/{entry_number}/finalise
-export interface POLLING_STATION_DATA_ENTRY_FINALISE_REQUEST_PARAMS {
+export interface DATA_ENTRY_FINALISE_REQUEST_PARAMS {
   polling_station_id: PollingStationId;
   entry_number: number;
 }
-export type POLLING_STATION_DATA_ENTRY_FINALISE_REQUEST_PATH =
+
+export type DATA_ENTRY_FINALISE_REQUEST_PATH =
   `/api/polling_stations/${PollingStationId}/data_entries/${number}/finalise`;
 
 // /api/polling_stations/{polling_station_id}/investigation
@@ -363,7 +370,6 @@ export type AuditEvent =
   | (DataEntryDetails & { event_type: "DataEntryResumed" })
   | (DataEntryDetails & { event_type: "DataEntryDeleted" })
   | (DataEntryDetails & { event_type: "DataEntryFinalised" })
-  | (ResultDetails & { event_type: "ResultDeleted" })
   | (DataEntryDetails & { event_type: "DataEntryDiscardedFirst" })
   | (DataEntryDetails & { event_type: "DataEntryReturnedFirst" })
   | (DataEntryDetails & { event_type: "DataEntryKeptFirst" })
@@ -613,12 +619,11 @@ export interface DataEntry {
 }
 
 export interface DataEntryDetails {
-  committee_session_id: CommitteeSessionId;
+  data_entry_id: DataEntryId;
   data_entry_progress: string;
   data_entry_status: string;
   finished_at?: string;
   first_entry_user_id?: UserId;
-  polling_station_id: PollingStationId;
   second_entry_user_id?: UserId;
 }
 
@@ -635,6 +640,8 @@ export interface DataEntryGetResponse {
   user_id?: UserId;
   validation_results: ValidationResults;
 }
+
+export type DataEntryId = number;
 
 export const dataEntryStatusNameValues = [
   "empty",
@@ -1014,11 +1021,12 @@ export interface PoliticalGroupTotalVotes {
 }
 
 /**
- * Polling station of a certain [crate::election::Election]
+ * Polling station of a certain [crate::domain::election::Election]
  */
 export interface PollingStation {
   address: string;
   committee_session_id: CommitteeSessionId;
+  data_entry_id?: DataEntryId;
   election_id: ElectionId;
   id: PollingStationId;
   id_prev_session?: PollingStationId;
@@ -1087,7 +1095,7 @@ export interface PollingStationListResponse {
 }
 
 /**
- * Polling station of a certain [crate::election::Election]
+ * Polling station of a certain [crate::domain::election::Election]
  */
 export interface PollingStationRequest {
   address: string;
@@ -1143,12 +1151,6 @@ export type ResolveDifferencesAction = (typeof resolveDifferencesActionValues)[n
 
 export const resolveErrorsActionValues = ["discard_first_entry", "resume_first_entry"] as const;
 export type ResolveErrorsAction = (typeof resolveErrorsActionValues)[number];
-
-export interface ResultDetails {
-  committee_session_id: CommitteeSessionId;
-  created_at: string;
-  polling_station_id: PollingStationId;
-}
 
 export const roleValues = ["administrator", "typist", "coordinator"] as const;
 export type Role = (typeof roleValues)[number];

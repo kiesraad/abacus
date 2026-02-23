@@ -5,10 +5,7 @@ import { pollingStationMockData } from "@/testing/api-mocks/PollingStationMockDa
 import { PollingStationDataEntriesAndResultDeleteHandler } from "@/testing/api-mocks/RequestHandlers";
 import { overrideOnce, server } from "@/testing/server";
 import { render, screen, spyOnHandler } from "@/testing/test-utils";
-import type {
-  DataEntryStatusName,
-  POLLING_STATION_DATA_ENTRIES_AND_RESULT_DELETE_REQUEST_PATH,
-} from "@/types/generated/openapi";
+import type {DATA_ENTRIES_AND_RESULT_DELETE_REQUEST_PATH, DataEntryStatusName} from "@/types/generated/openapi";
 
 import { ReadOnlyDataEntryDelete } from "./ReadOnlyDataEntryDelete";
 
@@ -87,7 +84,7 @@ describe("ReadOnlyDataEntryDelete", () => {
   test("on error", async () => {
     overrideOnce(
       "delete",
-      "/api/polling_stations/5/data_entries" satisfies POLLING_STATION_DATA_ENTRIES_AND_RESULT_DELETE_REQUEST_PATH,
+        "/api/polling_stations/5/data_entries" satisfies DATA_ENTRIES_AND_RESULT_DELETE_REQUEST_PATH,
       401,
       {
         error: "Invalid session",

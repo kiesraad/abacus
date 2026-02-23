@@ -229,7 +229,7 @@ async fn export_election(
                 .to_string(),
         }
         .to_pdf_file_model("file.pdf".to_string());
-        let input_json = input.model.get_input().expect("Failed to get model input");
+        let input_json = input.model.get_input();
         let results_filename = export_dir.join(format!(
             "input_{}_{}.json",
             election.election_id,

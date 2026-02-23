@@ -12,4 +12,11 @@ export class UserCreateDetailsPgObj {
     this.password = page.getByRole("textbox", { name: "Tijdelijk wachtwoord" });
     this.save = page.getByRole("button", { name: "Opslaan" });
   }
+
+    async createNamedUser(username: string, fullname: string, password: string) {
+        await this.username.fill(username);
+        await this.fullname.fill(fullname);
+        await this.password.fill(password);
+        await this.save.click();
+    }
 }

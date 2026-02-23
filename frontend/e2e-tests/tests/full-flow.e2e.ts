@@ -108,7 +108,7 @@ test.describe("full flow", () => {
     expect(logoutResponse.status()).toBe(204);
   });
 
-  test("create election and a new polling station", async ({ page }) => {
+  test("create GSB election and a new polling station", async ({ page }) => {
     await page.goto("/account/login");
 
     const loginPage = new LoginPgObj(page);
@@ -141,13 +141,14 @@ test.describe("full flow", () => {
 
     const checkAndSavePage = new CheckAndSavePgObj(page);
     await expect(checkAndSavePage.header).toBeVisible();
+    await expect(checkAndSavePage.electoralCommitteeRole).toHaveText("rol: Gemeentelijk stembureau");
     await expect(checkAndSavePage.numberOfVoters).toHaveText("61.269 kiesgerechtigden");
     const election = await checkAndSavePage.saveElection();
 
     electionId = election.id;
 
     await expect(electionsOverviewPage.adminHeader).toBeVisible();
-    await expect(electionsOverviewPage.alertElectionCreated).toBeVisible();
+    await expect(electionsOverviewPage.alertGSBElectionCreated).toBeVisible();
     await electionsOverviewPage.findElectionRowById(electionId).click();
 
     const electionHomePage = new ElectionHome(page);
@@ -164,6 +165,45 @@ test.describe("full flow", () => {
     await form.fillIn({ number: 2, name: "Basisschool de Regenboog" });
     await form.create.click();
     await expect(pollingStationListPage.alert).toHaveText("Stembureau 2 (Basisschool de Regenboog) toegevoegd");
+
+    await logout(page);
+  });
+
+  test("create CSB election", async ({ page }) => {
+    await page.goto("/account/login");
+
+    const loginPage = new LoginPgObj(page);
+    await loginPage.login(adminUser.username, getTestPassword(adminUser.username));
+
+    const electionsOverviewPage = new ElectionsOverviewPgObj(page);
+    await electionsOverviewPage.create.click();
+
+    await uploadElectionAndInputHash(page);
+
+    const electoralCommitteeRolePage = new ElectoralCommitteeRolePgObj(page);
+    await expect(electoralCommitteeRolePage.header).toBeVisible();
+    await expect(electoralCommitteeRolePage.csb).toBeChecked();
+    await electoralCommitteeRolePage.next.click();
+
+    await uploadCandidatesAndInputHash(page);
+
+    const checkAndSavePage = new CheckAndSavePgObj(page);
+    await expect(checkAndSavePage.header).toBeVisible();
+    await expect(checkAndSavePage.electoralCommitteeRole).toHaveText("rol: Centraal stembureau");
+    await expect(checkAndSavePage.numberOfVoters).toBeHidden();
+    await expect(checkAndSavePage.countingMethod).toBeHidden();
+    const election = await checkAndSavePage.saveElection();
+
+    electionId = election.id;
+
+    await expect(electionsOverviewPage.adminHeader).toBeVisible();
+    await expect(electionsOverviewPage.alertGSBElectionCreated).toBeVisible();
+    await electionsOverviewPage.findElectionRowById(electionId).click();
+
+    const electionHomePage = new ElectionHome(page);
+    await expect(electionHomePage.header).toHaveText("Gemeenteraad Test 2022");
+    const sessionCard = electionHomePage.getCommitteeSessionCard(1);
+    await expect(sessionCard).toContainText("Eerste zitting — Klaar voor invoer");
 
     await logout(page);
   });

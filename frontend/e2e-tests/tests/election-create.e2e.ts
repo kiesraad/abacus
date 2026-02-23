@@ -28,7 +28,7 @@ test.use({
 });
 
 test.describe("Election creation", () => {
-  test("it uploads an election file, candidate list and polling stations", async ({ page }) => {
+  test("GSB: it uploads an election file, candidate list and polling stations", async ({ page }) => {
     await page.goto("/elections");
     const overviewPage = new ElectionsOverviewPgObj(page);
     await overviewPage.create.click();
@@ -85,12 +85,50 @@ test.describe("Election creation", () => {
     // Back to the check and save page to test saving the election
     const election = await checkAndSavePage.saveElection();
     await expect(overviewPage.adminHeader).toBeVisible();
-    await expect(overviewPage.alertElectionCreated).toBeVisible();
+    await expect(overviewPage.alertGSBElectionCreated).toBeVisible();
 
     const electionRow = overviewPage.findElectionRowById(election.id);
     await expect(electionRow).toBeVisible();
     await expect(electionRow).toContainText("Gemeenteraad Test 2022");
+    await expect(electionRow).toContainText("GSB - Test (0000)");
     await expect(electionRow).toContainText("Klaar voor invoer");
+  });
+
+  test("CSB: it uploads an election file, candidate list and polling stations", async ({ page }) => {
+    await page.goto("/elections");
+    const overviewPage = new ElectionsOverviewPgObj(page);
+    await overviewPage.create.click();
+
+    // upload election and check hash
+    await uploadElectionAndInputHash(page);
+
+    // electoral committee role
+    const electoralCommitteeRolePage = new ElectoralCommitteeRolePgObj(page);
+    await expect(electoralCommitteeRolePage.header).toBeVisible();
+    await electoralCommitteeRolePage.csb.click();
+    await expect(electoralCommitteeRolePage.csb).toBeChecked();
+    await electoralCommitteeRolePage.next.click();
+
+    // upload candidates list and check
+    await uploadCandidatesAndInputHash(page);
+
+    // Now we should be at the check and save page
+    const checkAndSavePage = new CheckAndSavePgObj(page);
+    await expect(checkAndSavePage.header).toBeVisible();
+    await expect(checkAndSavePage.electoralCommitteeRole).toHaveText("rol: Centraal stembureau");
+    await expect(checkAndSavePage.countingMethod).toBeHidden();
+    await expect(checkAndSavePage.numberOfVoters).toBeHidden();
+
+    // Back to the check and save page to test saving the election
+    const election = await checkAndSavePage.saveElection();
+    await expect(overviewPage.adminHeader).toBeVisible();
+    await expect(overviewPage.alertCSBElectionCreated).toBeVisible();
+
+    const electionRow = overviewPage.findElectionRowById(election.id);
+    await expect(electionRow).toBeVisible();
+    await expect(electionRow).toContainText("Gemeenteraad Test 2022");
+    await expect(electionRow).toContainText("CSB - Test (0000)");
+    await expect(electionRow).toContainText("Zitting voorbereiden— Eerste zitting");
   });
 
   test("it uploads an election file, candidate list but adds polling stations afterwards", async ({ page }) => {

@@ -70,7 +70,7 @@ export function CheckAndSave() {
         <li>
           <strong>{t("election.singular")}:</strong> {state.election.name}
         </li>
-        <li>
+        <li id="electoral-committee-role">
           <strong>{t("role").toLowerCase()}:</strong> {t(`electoral_committee_role.roles.${state.electionRole}.short`)}
         </li>
         <li>

@@ -3,7 +3,7 @@ CREATE TABLE polling_stations
     id                    INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
     committee_session_id  INTEGER                           NOT NULL,
     id_prev_session       INTEGER,
-    data_entry_id INTEGER,
+    data_entry_id         INTEGER,
     name                  TEXT                              NOT NULL,
     number                INTEGER                           NOT NULL,
     number_of_voters      INTEGER,

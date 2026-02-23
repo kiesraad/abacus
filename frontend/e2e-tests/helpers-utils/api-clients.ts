@@ -1,15 +1,15 @@
 import { type APIRequestContext, expect } from "@playwright/test";
 
 import type {
-    DATA_ENTRY_CLAIM_REQUEST_PATH,
-    DATA_ENTRY_FINALISE_REQUEST_PATH,
-    DATA_ENTRY_SAVE_REQUEST_PATH,
+  DATA_ENTRY_CLAIM_REQUEST_PATH,
+  DATA_ENTRY_FINALISE_REQUEST_PATH,
+  DATA_ENTRY_SAVE_REQUEST_PATH,
   DataEntry,
 } from "@/types/generated/openapi";
 
 export class DataEntryApiClient {
   private session: APIRequestContext;
-    private readonly baseUrl: DATA_ENTRY_SAVE_REQUEST_PATH;
+  private readonly baseUrl: DATA_ENTRY_SAVE_REQUEST_PATH;
 
   public constructor(request: APIRequestContext, pollingStationId: number, entryNumber: number) {
     this.session = request;
@@ -17,7 +17,7 @@ export class DataEntryApiClient {
   }
 
   public async claim() {
-      const claimUrl: DATA_ENTRY_CLAIM_REQUEST_PATH = `${this.baseUrl}/claim`;
+    const claimUrl: DATA_ENTRY_CLAIM_REQUEST_PATH = `${this.baseUrl}/claim`;
     const claimResponse = await this.session.post(claimUrl);
     expect(claimResponse.ok()).toBeTruthy();
   }
@@ -28,7 +28,7 @@ export class DataEntryApiClient {
   }
 
   public async finalise() {
-      const finaliseUrl: DATA_ENTRY_FINALISE_REQUEST_PATH = `${this.baseUrl}/finalise`;
+    const finaliseUrl: DATA_ENTRY_FINALISE_REQUEST_PATH = `${this.baseUrl}/finalise`;
     const finaliseResponse = await this.session.post(finaliseUrl);
     expect(finaliseResponse.ok()).toBeTruthy();
   }

@@ -204,28 +204,23 @@ export type LOGOUT_REQUEST_PATH = `/api/logout`;
 export interface DATA_ENTRIES_AND_RESULT_DELETE_REQUEST_PARAMS {
   polling_station_id: PollingStationId;
 }
-
 export type DATA_ENTRIES_AND_RESULT_DELETE_REQUEST_PATH = `/api/polling_stations/${PollingStationId}/data_entries`;
 
 // /api/polling_stations/{polling_station_id}/data_entries/get
 export interface DATA_ENTRY_GET_REQUEST_PARAMS {
   polling_station_id: PollingStationId;
 }
-
 export type DATA_ENTRY_GET_REQUEST_PATH = `/api/polling_stations/${PollingStationId}/data_entries/get`;
 
 // /api/polling_stations/{polling_station_id}/data_entries/resolve_differences
 export interface DATA_ENTRY_GET_DIFFERENCES_REQUEST_PARAMS {
   polling_station_id: PollingStationId;
 }
-
 export type DATA_ENTRY_GET_DIFFERENCES_REQUEST_PATH =
   `/api/polling_stations/${PollingStationId}/data_entries/resolve_differences`;
-
 export interface DATA_ENTRY_RESOLVE_DIFFERENCES_REQUEST_PARAMS {
   polling_station_id: PollingStationId;
 }
-
 export type DATA_ENTRY_RESOLVE_DIFFERENCES_REQUEST_PATH =
   `/api/polling_stations/${PollingStationId}/data_entries/resolve_differences`;
 export type DATA_ENTRY_RESOLVE_DIFFERENCES_REQUEST_BODY = ResolveDifferencesAction;
@@ -234,7 +229,6 @@ export type DATA_ENTRY_RESOLVE_DIFFERENCES_REQUEST_BODY = ResolveDifferencesActi
 export interface DATA_ENTRY_RESOLVE_ERRORS_REQUEST_PARAMS {
   polling_station_id: PollingStationId;
 }
-
 export type DATA_ENTRY_RESOLVE_ERRORS_REQUEST_PATH =
   `/api/polling_stations/${PollingStationId}/data_entries/resolve_errors`;
 export type DATA_ENTRY_RESOLVE_ERRORS_REQUEST_BODY = ResolveErrorsAction;
@@ -244,15 +238,12 @@ export interface DATA_ENTRY_SAVE_REQUEST_PARAMS {
   polling_station_id: PollingStationId;
   entry_number: number;
 }
-
 export type DATA_ENTRY_SAVE_REQUEST_PATH = `/api/polling_stations/${PollingStationId}/data_entries/${number}`;
 export type DATA_ENTRY_SAVE_REQUEST_BODY = DataEntry;
-
 export interface DATA_ENTRY_DELETE_REQUEST_PARAMS {
   polling_station_id: PollingStationId;
   entry_number: number;
 }
-
 export type DATA_ENTRY_DELETE_REQUEST_PATH = `/api/polling_stations/${PollingStationId}/data_entries/${number}`;
 
 // /api/polling_stations/{polling_station_id}/data_entries/{entry_number}/claim
@@ -260,7 +251,6 @@ export interface DATA_ENTRY_CLAIM_REQUEST_PARAMS {
   polling_station_id: PollingStationId;
   entry_number: number;
 }
-
 export type DATA_ENTRY_CLAIM_REQUEST_PATH = `/api/polling_stations/${PollingStationId}/data_entries/${number}/claim`;
 
 // /api/polling_stations/{polling_station_id}/data_entries/{entry_number}/finalise
@@ -268,7 +258,6 @@ export interface DATA_ENTRY_FINALISE_REQUEST_PARAMS {
   polling_station_id: PollingStationId;
   entry_number: number;
 }
-
 export type DATA_ENTRY_FINALISE_REQUEST_PATH =
   `/api/polling_stations/${PollingStationId}/data_entries/${number}/finalise`;
 

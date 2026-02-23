@@ -7,9 +7,9 @@ export type TestUser = {
 };
 
 export const firstAdmin: TestUser = {
-    username: "admin1",
-    fullname: "Sanne Molenaar",
-    role: "administrator",
+  username: "admin1",
+  fullname: "Sanne Molenaar",
+  role: "administrator",
 };
 
 export const testUsers: TestUser[] = [

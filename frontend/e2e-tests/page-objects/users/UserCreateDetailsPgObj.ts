@@ -13,10 +13,10 @@ export class UserCreateDetailsPgObj {
     this.save = page.getByRole("button", { name: "Opslaan" });
   }
 
-    async createNamedUser(username: string, fullname: string, password: string) {
-        await this.username.fill(username);
-        await this.fullname.fill(fullname);
-        await this.password.fill(password);
-        await this.save.click();
-    }
+  async createNamedUser(username: string, fullname: string, password: string) {
+    await this.username.fill(username);
+    await this.fullname.fill(fullname);
+    await this.password.fill(password);
+    await this.save.click();
+  }
 }

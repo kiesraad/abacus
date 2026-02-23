@@ -7,9 +7,9 @@ import { ElectionStatusProviderContext } from "@/hooks/election/ElectionStatusPr
 import { useElection } from "@/hooks/election/useElection";
 import { t } from "@/i18n/translate";
 import type {
-    DATA_ENTRY_GET_DIFFERENCES_REQUEST_PATH,
-    DATA_ENTRY_RESOLVE_DIFFERENCES_REQUEST_BODY,
-    DATA_ENTRY_RESOLVE_DIFFERENCES_REQUEST_PATH,
+  DATA_ENTRY_GET_DIFFERENCES_REQUEST_PATH,
+  DATA_ENTRY_RESOLVE_DIFFERENCES_REQUEST_BODY,
+  DATA_ENTRY_RESOLVE_DIFFERENCES_REQUEST_PATH,
   DataEntryGetDifferencesResponse,
   DataEntryStatusName,
   DataEntryStatusResponse,
@@ -44,7 +44,7 @@ export function usePollingStationDataEntryDifferences(
   const [error, setError] = useState<AnyApiError | null>(null);
   const [validationError, setValidationError] = useState<string>();
 
-    const path: DATA_ENTRY_GET_DIFFERENCES_REQUEST_PATH = `/api/polling_stations/${pollingStationId}/data_entries/resolve_differences`;
+  const path: DATA_ENTRY_GET_DIFFERENCES_REQUEST_PATH = `/api/polling_stations/${pollingStationId}/data_entries/resolve_differences`;
   const { requestState } = useInitialApiGet<DataEntryGetDifferencesResponse>(path);
 
   // 404 error if polling station is not found
@@ -77,8 +77,8 @@ export function usePollingStationDataEntryDifferences(
       setValidationError(undefined);
     }
 
-      const path: DATA_ENTRY_RESOLVE_DIFFERENCES_REQUEST_PATH = `/api/polling_stations/${pollingStationId}/data_entries/resolve_differences`;
-      const body: DATA_ENTRY_RESOLVE_DIFFERENCES_REQUEST_BODY = action;
+    const path: DATA_ENTRY_RESOLVE_DIFFERENCES_REQUEST_PATH = `/api/polling_stations/${pollingStationId}/data_entries/resolve_differences`;
+    const body: DATA_ENTRY_RESOLVE_DIFFERENCES_REQUEST_BODY = action;
     const response = await client.postRequest<DataEntryStatusResponse>(path, body);
 
     if (isSuccess(response)) {

@@ -32,7 +32,7 @@ pub async fn generate_pdf(input: &impl PdfGenInput) -> Result<PdfGenResult, PdfG
 /// Generates a ZIP file containing the PDFs for the provided inputs.
 /// Uses the embedded typst library to generate the PDFs.
 pub async fn generate_pdfs<'a>(
-    inputs: impl IntoIterator<Item=&'a (impl PdfGenInput + 'a)>,
+    inputs: impl IntoIterator<Item = &'a (impl PdfGenInput + 'a)>,
     mut zip_writer: ZipResponseWriter,
 ) -> Result<(), PdfGenError> {
     for input in inputs {

@@ -86,8 +86,8 @@ pub async fn upsert(
         r#"SELECT data_entry_id FROM polling_stations WHERE id = ?"#,
         polling_station_id
     )
-        .fetch_one(&mut *tx)
-        .await?;
+    .fetch_one(&mut *tx)
+    .await?;
 
     let res = if let Some(data_entry_id) = row.data_entry_id {
         // Update existing data entry
@@ -105,8 +105,8 @@ pub async fn upsert(
             state,
             data_entry_id
         )
-            .fetch_one(&mut *tx)
-            .await
+        .fetch_one(&mut *tx)
+        .await
     } else {
         // Insert new data entry and link it to the polling station
         let data_entry = query_as!(
@@ -121,16 +121,16 @@ pub async fn upsert(
             "#,
             state
         )
-            .fetch_one(&mut *tx)
-            .await?;
+        .fetch_one(&mut *tx)
+        .await?;
 
         query!(
             "UPDATE polling_stations SET data_entry_id = ? WHERE id = ?",
             data_entry.id,
             polling_station_id
         )
-            .execute(&mut *tx)
-            .await?;
+        .execute(&mut *tx)
+        .await?;
 
         Ok(data_entry)
     };
@@ -150,8 +150,8 @@ pub async fn delete_data_entry(
         r#"SELECT data_entry_id FROM polling_stations WHERE id = ?"#,
         polling_station_id
     )
-        .fetch_one(&mut *tx)
-        .await?;
+    .fetch_one(&mut *tx)
+    .await?;
 
     let Some(data_entry_id) = row.data_entry_id else {
         tx.commit().await?;
@@ -163,8 +163,8 @@ pub async fn delete_data_entry(
         "UPDATE polling_stations SET data_entry_id = NULL WHERE id = ?",
         polling_station_id
     )
-        .execute(&mut *tx)
-        .await?;
+    .execute(&mut *tx)
+    .await?;
 
     // Delete the data entry
     let res = query_as!(
@@ -179,8 +179,8 @@ pub async fn delete_data_entry(
         "#,
         data_entry_id,
     )
-        .fetch_optional(&mut *tx)
-        .await?;
+    .fetch_optional(&mut *tx)
+    .await?;
 
     tx.commit().await?;
     Ok(res)

@@ -7,8 +7,8 @@ export class AdminNavBar {
 
   constructor(protected readonly page: Page) {
     this.navigation = page.getByRole("navigation", { name: "primary-navigation" });
-    this.electionOverviewButton = this.navigation.getByRole("link", {name: "Verkiezingen"});
-    this.users = this.navigation.getByRole("link", {name: "Gebruikers"});
+    this.electionOverviewButton = this.navigation.getByRole("link", { name: "Verkiezingen" });
+    this.users = this.navigation.getByRole("link", { name: "Gebruikers" });
   }
 
   getElectionBreadcrumb(electionName: string) {

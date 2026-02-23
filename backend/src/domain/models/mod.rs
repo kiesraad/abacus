@@ -114,7 +114,7 @@ impl PdfModel {
             )
             .to_string()),
         }
-            .expect("JSON serialization succeeds because it is derived");
+        .expect("JSON serialization succeeds because it is derived");
 
         replace_unsupported_glyphs(data)
     }

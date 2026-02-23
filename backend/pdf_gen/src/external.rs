@@ -24,7 +24,7 @@ async fn generate_file(input: &impl PdfGenInput) -> Result<PdfGenResult, PdfGenE
 
 /// Create a PDF file for each model in the provided vector and send them through the provided channel.
 pub async fn generate_pdfs<'a>(
-    inputs: impl IntoIterator<Item=&'a (impl PdfGenInput + 'a)>,
+    inputs: impl IntoIterator<Item = &'a (impl PdfGenInput + 'a)>,
     mut zip_writer: ZipResponseWriter,
 ) -> Result<(), PdfGenError> {
     for input in inputs {

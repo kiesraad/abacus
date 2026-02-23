@@ -19,7 +19,7 @@ import {
   userTypeInputsArray,
   waitFor,
 } from "@/testing/test-utils";
-import type {DATA_ENTRY_SAVE_REQUEST_BODY, LoginResponse, PollingStationResults} from "@/types/generated/openapi";
+import type { DATA_ENTRY_SAVE_REQUEST_BODY, LoginResponse, PollingStationResults } from "@/types/generated/openapi";
 
 import { getDefaultDataEntryState, getEmptyDataEntryRequest } from "../../testing/mock-data";
 import {
@@ -258,7 +258,7 @@ describe("Test VotersAndVotesForm", () => {
 
       expect(url).toEqual("/api/polling_stations/1/data_entries/1");
       expect(method).toEqual("POST");
-        const request_body = body as DATA_ENTRY_SAVE_REQUEST_BODY;
+      const request_body = body as DATA_ENTRY_SAVE_REQUEST_BODY;
       expect(request_body.data).toEqual(expectedRequest.data);
     });
   });

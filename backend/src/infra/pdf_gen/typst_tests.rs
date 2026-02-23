@@ -43,10 +43,10 @@ async fn it_generates_a_pdf() {
                 .to_string(),
             creation_date_time: "04-12-2024 12:08".to_string(),
         }
-            .to_pdf_file_model("file.pdf".into()),
+        .to_pdf_file_model("file.pdf".into()),
     )
-        .await
-        .unwrap();
+    .await
+    .unwrap();
 
     assert!(!content.buffer.is_empty());
 }
@@ -75,8 +75,8 @@ async fn it_generates_a_pdf_with_teletex_chars() {
         file_name: "file.pdf".into(),
         model: PdfModel::TestTeletexCharset(),
     })
-        .await
-        .unwrap();
+    .await
+    .unwrap();
 
     assert!(!content.buffer.is_empty());
 }
@@ -87,8 +87,8 @@ async fn it_generates_a_pdf_with_unsupported_chars() {
         file_name: "file.pdf".into(),
         model: PdfModel::TestUnsupportedChars(),
     })
-        .await
-        .unwrap();
+    .await
+    .unwrap();
 
     assert!(!content.buffer.is_empty());
 }
@@ -114,10 +114,10 @@ async fn it_generates_a_pdf_with_polling_stations() {
                 .to_string(),
             creation_date_time: "04-12-2024 12:08".to_string(),
         }
-            .to_pdf_file_model("file.pdf".into()),
+        .to_pdf_file_model("file.pdf".into()),
     )
-        .await
-        .unwrap();
+    .await
+    .unwrap();
 
     assert!(!content.buffer.is_empty());
 }

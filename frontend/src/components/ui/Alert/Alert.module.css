@@ -39,7 +39,7 @@
 .alert,
 .inlineAlert {
   a:not(:global(.button)):visited {
-    color: var(--link-default);
+    color: var(--interactive-default);
   }
 
   aside {

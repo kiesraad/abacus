@@ -21,7 +21,10 @@ export const Badges: StoryObj = {
     return (
       <>
         {badgeTypes.map((type) => (
-          <Badge id={type} key={type} type={type} userRole={"coordinator"} />
+          <div key={type} className="mb-lg">
+            <h2>{type}</h2>
+            <Badge id={type} type={type} showIcon userRole={"coordinator"} />
+          </div>
         ))}
       </>
     );
@@ -34,21 +37,7 @@ export const Badges: StoryObj = {
       await expect(within(badge).queryByRole("img")).toBeNull();
       await expect(badge.className, "there should be a css class defined for this type").toContain(badgeType);
     }
-  },
-};
 
-export const BadgesWithIcons: StoryObj = {
-  render: () => {
-    return (
-      <>
-        {badgeTypes.map((type) => (
-          <Badge id={type} key={type} type={type} showIcon userRole={"coordinator"} />
-        ))}
-      </>
-    );
-  },
-
-  play: async ({ canvas }) => {
     const badgesWithIcons = badgeTypes.filter((badgeType) => {
       const badge = canvas.getByTestId(badgeType);
       return within(badge).queryByRole("img", { hidden: true }) !== null;

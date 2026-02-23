@@ -17,11 +17,11 @@
 .loader::before {
   content: " ";
   position: fixed;
-  top: 0px;
-  left: 0px;
-  right: 0px;
+  top: 0;
+  left: 0;
+  right: 0;
   height: 2px;
   width: 100%;
-  background-color: var(--base-brand-blue);
+  background-color: var(--base-blue);
   animation: 10s cubic-bezier(0.05, 1.13, 0.25, 0.9) 0s 1 load;
 }

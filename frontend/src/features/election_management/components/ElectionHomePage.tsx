@@ -139,7 +139,7 @@ export function ElectionHomePage() {
           </nav>
         </Modal>
       )}
-      {pollingStations.length === 0 && (
+      {election.role === "GSB" && pollingStations.length === 0 && (
         <Alert type="warning">
           <strong className="heading-md" id="noPollingStationsWarningAlertTitle">
             {t("election_management.no_polling_stations")}

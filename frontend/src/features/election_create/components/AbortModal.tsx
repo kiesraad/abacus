@@ -66,7 +66,6 @@ export function AbortModal() {
           onClick={() => {
             onAbortModalDelete();
           }}
-          type="button"
         >
           {t("election.abort.discard_input")}
         </Button>
@@ -75,7 +74,6 @@ export function AbortModal() {
           onClick={() => {
             onAbortModalCancel();
           }}
-          type="button"
         >
           {t("election.abort.keep_input")}
         </Button>

@@ -17,7 +17,7 @@ env:
 
 jobs:
   backend:
-    name: Backend
+    name: Backend coverage
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -59,8 +59,8 @@ jobs:
       - name: Setup Rust Nightly
         shell: bash
         run: >
-          rustup update nightly &&
-          rustup default nightly
+          rustup update nightly-2026-02-21 &&
+          rustup default nightly-2026-02-21
       - name: Cargo cache
         uses: Swatinem/rust-cache@779680da715d629ac1d338a641029a2f4372abb5 # v2
         with:
@@ -95,7 +95,7 @@ jobs:
         run: df -h
 
   frontend:
-    name: Frontend
+    name: Frontend coverage
     runs-on: ubuntu-latest
     defaults:
       run:

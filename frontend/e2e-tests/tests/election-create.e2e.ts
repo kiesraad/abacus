@@ -144,6 +144,7 @@ test.describe("Election creation", () => {
     await electionRow.click();
 
     const electionHomePage = new ElectionHome(page);
+    await expect(electionHomePage.header).toHaveText("Gemeenteraad Test 2022");
     await electionHomePage.alertLinkToPollingStations.click();
 
     const pollingStationsPage = new PollingStationListEmptyPgObj(page);
@@ -444,7 +445,7 @@ test.describe("Election creation", () => {
       const uploadElectionDefinitionPage = new UploadPollingStationDefinitionPgObj(page);
       await expect(uploadElectionDefinitionPage.header).toBeVisible();
       await uploadElectionDefinitionPage.uploadFile(eml110a.path);
-      await expect(uploadElectionDefinitionPage.main).toContainText(eml110a.filename);
+      await expect(uploadElectionDefinitionPage.fieldset).toContainText(eml110a.filename);
       await expect(uploadElectionDefinitionPage.invalidFileAlert).toBeVisible();
       await expect(uploadElectionDefinitionPage.invalidFileAlert).toContainText(
         "Het bestand eml110a_test.eml.xml bevat geen geldige lijst met stembureaus. Kies een ander bestand.",

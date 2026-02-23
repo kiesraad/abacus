@@ -8,11 +8,7 @@ export class DataEntryHomePage {
   readonly pollingStationNumber: Locator;
   readonly pollingStationFeedback: Locator;
   readonly pollingStationSubmitFeedback: Locator;
-  readonly dataEntrySaved: Locator;
-  readonly dataEntryDifferent: Locator;
-  readonly dataEntryErrors: Locator;
-  readonly dataEntryWarning: Locator;
-  readonly resumeDataEntry: Locator;
+  readonly alert: Locator;
   readonly alertDataEntrySaved: Locator;
   readonly alertDataEntryDifferent: Locator;
   readonly alertDataEntryErrors: Locator;
@@ -36,22 +32,12 @@ export class DataEntryHomePage {
     this.pollingStationSubmitFeedback = page.getByTestId("pollingStationSubmitFeedback");
     this.start = page.getByRole("button", { name: "Beginnen" });
 
-    this.dataEntrySaved = page.getByRole("strong").filter({ hasText: "Je invoer is opgeslagen" });
-    this.dataEntryDifferent = page.getByRole("strong").filter({ hasText: "Let op: verschil met eerste invoer" });
-    this.dataEntryErrors = page.getByRole("strong").filter({ hasText: "Let op: fouten in het proces-verbaal" });
-    this.dataEntryWarning = page.getByRole("strong").filter({ hasText: /^Je kan stembureau \d+ niet invoeren$/ });
-    this.resumeDataEntry = page.getByRole("strong").filter({ hasText: "Je hebt nog een openstaande invoer" });
-
-    this.alertDataEntrySaved = page.getByRole("alert").filter({ has: this.dataEntrySaved });
-
-    this.alertDataEntryDifferent = page.getByRole("alert").filter({ has: this.dataEntryDifferent });
-
-    this.alertDataEntryErrors = page.getByRole("alert").filter({ has: this.dataEntryErrors });
-
-    this.alertDataEntryWarning = page.getByRole("alert").filter({ has: this.dataEntryWarning });
-
-    this.alertDataEntryInProgress = page.getByRole("alert").filter({ has: this.resumeDataEntry });
-
+    this.alert = page.getByRole("alert");
+    this.alertDataEntrySaved = this.alert.filter({ hasText: "Je invoer is opgeslagen" });
+    this.alertDataEntryDifferent = this.alert.filter({ hasText: "Let op: verschil met eerste invoer" });
+    this.alertDataEntryErrors = this.alert.filter({ hasText: "Let op: fouten in het proces-verbaal" });
+    this.alertDataEntryWarning = this.alert.filter({ hasText: /^Je kan stembureau \d+ niet invoeren/ });
+    this.alertDataEntryInProgress = this.alert.filter({ hasText: "Je hebt nog een openstaande invoer" });
     this.allDataEntriesInProgress = this.alertDataEntryInProgress.getByRole("link");
   }
 

@@ -156,7 +156,6 @@ function DevLinks() {
         )}
         <li>
           <Button
-            type="button"
             variant="underlined"
             size="md"
             onClick={() => {

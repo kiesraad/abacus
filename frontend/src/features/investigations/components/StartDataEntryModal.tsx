@@ -38,7 +38,6 @@ export function StartDataEntryModal({ onClose, to }: StartDataEntryModalProps) {
       <p>{t("investigations.start_data_entry_description")}</p>
       <nav>
         <Button
-          type="button"
           variant="primary"
           size="xl"
           disabled={isLoading}
@@ -48,7 +47,7 @@ export function StartDataEntryModal({ onClose, to }: StartDataEntryModalProps) {
         >
           {t("investigations.start_data_entry")}
         </Button>
-        <Button type="button" variant="secondary" size="xl" onClick={onClose}>
+        <Button variant="secondary" size="xl" onClick={onClose}>
           {t("cancel")}
         </Button>
       </nav>

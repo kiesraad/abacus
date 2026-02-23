@@ -15,7 +15,7 @@ describe("AuthorizationDialog", () => {
   test("Does not show dialog when session is still valid", () => {
     const togo = 1000 * 60 * EXPIRATION_DIALOG_SECONDS;
     render(
-      <TestUserProvider userRole="typist" overrideExpiration={new Date(Date.now() + togo + 1000)}>
+      <TestUserProvider userRole="typist_gsb" overrideExpiration={new Date(Date.now() + togo + 1000)}>
         <AuthorizationDialog />
       </TestUserProvider>,
     );
@@ -24,7 +24,7 @@ describe("AuthorizationDialog", () => {
 
   test("Show dialog on short session lifetime", () => {
     render(
-      <TestUserProvider userRole="typist" overrideExpiration={new Date(Date.now() + 1000)}>
+      <TestUserProvider userRole="typist_gsb" overrideExpiration={new Date(Date.now() + 1000)}>
         <AuthorizationDialog />
       </TestUserProvider>,
     );
@@ -44,7 +44,7 @@ describe("AuthorizationDialog", () => {
 
   test("Dialog can be closed", async () => {
     render(
-      <TestUserProvider userRole="typist" overrideExpiration={new Date(Date.now() + 1000)}>
+      <TestUserProvider userRole="typist_gsb" overrideExpiration={new Date(Date.now() + 1000)}>
         <AuthorizationDialog />
       </TestUserProvider>,
     );
@@ -58,7 +58,7 @@ describe("AuthorizationDialog", () => {
 
   test("Dialog can be dismissed", async () => {
     render(
-      <TestUserProvider userRole="typist" overrideExpiration={new Date(Date.now() + 1000)}>
+      <TestUserProvider userRole="typist_gsb" overrideExpiration={new Date(Date.now() + 1000)}>
         <AuthorizationDialog />
       </TestUserProvider>,
     );

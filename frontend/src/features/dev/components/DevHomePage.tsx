@@ -57,7 +57,7 @@ interface LinksProps {
 function TypistLinks({ electionList }: LinksProps) {
   return (
     <>
-      <strong>{t("typist")}</strong>
+      <strong>{t("typist_gsb")}</strong>
       <ul>
         <li>
           <Link to={"/elections"}>{t("election.title.plural")}</Link>
@@ -80,7 +80,7 @@ function AdministratorCoordinatorLinks({ electionList, committeeSessions }: Link
   return (
     <>
       <strong>
-        {t("administrator")} / {t("coordinator")}
+        {t("administrator")} / {t("coordinator_gsb")}
       </strong>
       <ul>
         <li>
@@ -198,7 +198,7 @@ function DevLinks() {
                   void login("coordinator1", "Coordinator1Password01").then(setResponse);
                 }}
               >
-                {t("coordinator")} 1
+                {t("coordinator_gsb")} 1
               </Link>
             </li>
             <li>
@@ -208,7 +208,7 @@ function DevLinks() {
                   void login("coordinator2", "Coordinator2Password01").then(setResponse);
                 }}
               >
-                {t("coordinator")} 2
+                {t("coordinator_gsb")} 2
               </Link>
             </li>
             <li>
@@ -218,7 +218,7 @@ function DevLinks() {
                   void login("typist1", "Typist1Password01").then(setResponse);
                 }}
               >
-                {t("typist")} 1
+                {t("typist_gsb")} 1
               </Link>
             </li>
             <li>
@@ -228,7 +228,7 @@ function DevLinks() {
                   void login("typist2", "Typist2Password01").then(setResponse);
                 }}
               >
-                {t("typist")} 2
+                {t("typist_gsb")} 2
               </Link>
             </li>
             {user && (

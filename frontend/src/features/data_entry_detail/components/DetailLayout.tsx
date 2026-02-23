@@ -69,7 +69,7 @@ export function DetailLayout() {
         <section className="smaller-gap">
           <PollingStationNumber>{pollingStation.number}</PollingStationNumber>
           <h1>{pollingStation.name}</h1>
-          <Badge type={dataEntry.status} userRole={user.role} />
+          <Badge type={dataEntry.status} userRole={user.roleWithoutElection} />
         </section>
         {dataEntry.status !== "first_entry_has_errors" && (
           <section>

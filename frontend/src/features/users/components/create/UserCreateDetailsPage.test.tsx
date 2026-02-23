@@ -38,7 +38,7 @@ describe("UserCreateDetailsPage", () => {
   });
 
   test("Render empty form", async () => {
-    renderPage({ role: "coordinator", type: "fullname" });
+    renderPage({ role: "coordinator_gsb", type: "fullname" });
 
     expect(await screen.findByRole("heading", { level: 1, name: "Coördinator toevoegen" })).toBeInTheDocument();
 
@@ -49,11 +49,11 @@ describe("UserCreateDetailsPage", () => {
 
   test("Navigate to user list after submitting", async () => {
     overrideOnce("post", "/api/users" satisfies USER_CREATE_REQUEST_PATH, 201, {
-      role: "coordinator",
+      role: "coordinator_gsb",
       username: "NieuweGebruiker",
     } satisfies Partial<User>);
 
-    renderPage({ role: "coordinator", type: "fullname" });
+    renderPage({ role: "coordinator_gsb", type: "fullname" });
 
     const user = userEvent.setup();
     await user.type(await screen.findByRole("textbox", { name: "Gebruikersnaam" }), "NieuweGebruiker");

@@ -1,27 +1,30 @@
-import type { LoginResponse } from "@/types/generated/openapi";
+import type { UseUserReturn } from "@/hooks/user/useUser";
 
-export function getTypistUser(): LoginResponse {
+export function getTypistUser(): UseUserReturn {
   return {
     needs_password_change: false,
-    role: "typist",
+    role: "typist_gsb",
+    roleWithoutElection: "typist",
     user_id: 1,
     username: "testuser",
   };
 }
 
-export function getCoordinatorUser(): LoginResponse {
+export function getCoordinatorUser(): UseUserReturn {
   return {
     needs_password_change: false,
-    role: "coordinator",
+    role: "coordinator_gsb",
+    roleWithoutElection: "coordinator",
     user_id: 2,
     username: "testcoordinator",
   };
 }
 
-export function getAdminUser(): LoginResponse {
+export function getAdminUser(): UseUserReturn {
   return {
     needs_password_change: false,
     role: "administrator",
+    roleWithoutElection: "administrator",
     user_id: 3,
     username: "testadministrator",
   };

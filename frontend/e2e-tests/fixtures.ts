@@ -226,7 +226,7 @@ export const test = base.extend<Fixtures>({
     // create a new user
     const url: USER_CREATE_REQUEST_PATH = "/api/users";
     const data: USER_CREATE_REQUEST_BODY = {
-      role: "typist",
+      role: "typist_gsb",
       username: createRandomUsername(),
       fullname: "Gebruiker met Achternaam",
       temp_password: FIXTURE_TYPIST_TEMP_PASSWORD,

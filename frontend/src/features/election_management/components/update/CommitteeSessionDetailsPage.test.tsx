@@ -32,7 +32,7 @@ const Providers = ({
 }) => {
   return (
     <ApiProvider fetchInitialUser={fetchInitialUser}>
-      <TestUserProvider userRole="coordinator">
+      <TestUserProvider userRole="coordinator_gsb">
         <ElectionProvider electionId={1}>
           <ReactRouter.RouterProvider router={router} />
         </ElectionProvider>

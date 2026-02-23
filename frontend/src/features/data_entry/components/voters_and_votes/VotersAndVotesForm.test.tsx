@@ -19,8 +19,8 @@ import {
   userTypeInputsArray,
   waitFor,
 } from "@/testing/test-utils";
-import type { DATA_ENTRY_SAVE_REQUEST_BODY, LoginResponse, PollingStationResults } from "@/types/generated/openapi";
-
+import { getTypistUser } from "@/testing/user-mock-data";
+import type { DATA_ENTRY_SAVE_REQUEST_BODY, PollingStationResults } from "@/types/generated/openapi";
 import { getDefaultDataEntryState, getEmptyDataEntryRequest } from "../../testing/mock-data";
 import {
   expectFieldsToBeInvalidAndToHaveAccessibleErrorMessage,
@@ -31,13 +31,6 @@ import {
 } from "../../testing/test.utils";
 import { DataEntryProvider } from "../DataEntryProvider";
 import { DataEntrySection } from "../DataEntrySection";
-
-const testUser: LoginResponse = {
-  username: "test-user-1",
-  user_id: 1,
-  role: "typist",
-  needs_password_change: false,
-};
 
 function renderForm() {
   vi.spyOn(ReactRouter, "useParams").mockReturnValue({ sectionId: "voters_votes_counts" });
@@ -68,7 +61,7 @@ const votesFieldIds = {
 
 describe("Test VotersAndVotesForm", () => {
   beforeEach(() => {
-    vi.spyOn(useUser, "useUser").mockReturnValue(testUser);
+    vi.spyOn(useUser, "useUser").mockReturnValue(getTypistUser());
     server.use(PollingStationDataEntryClaimHandler, PollingStationDataEntrySaveHandler);
   });
 

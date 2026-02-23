@@ -18,7 +18,7 @@ import { DetailSectionPage } from "./DetailSectionPage";
 
 const renderSectionPage = () => {
   return render(
-    <TestUserProvider userRole="coordinator">
+    <TestUserProvider userRole="coordinator_gsb">
       <ElectionProvider electionId={1}>
         <ElectionStatusProvider electionId={1}>
           <DetailSectionPage />

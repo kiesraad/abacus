@@ -46,7 +46,9 @@ export function DataEntryPage() {
         <section className="smaller-gap">
           <PollingStationNumber>{pollingStation.number}</PollingStationNumber>
           <h1>{pollingStation.name}</h1>
-          {pollingStationStatus.status && <Badge type={pollingStationStatus.status} userRole={user.role} />}
+          {pollingStationStatus.status && (
+            <Badge type={pollingStationStatus.status} userRole={user.roleWithoutElection} />
+          )}
         </section>
         <section>
           <AbortDataEntryControl />

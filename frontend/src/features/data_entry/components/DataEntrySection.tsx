@@ -89,14 +89,20 @@ export function DataEntrySection() {
         )}
         {error instanceof ApiError && <ErrorModal error={error} />}
         {formSection.isSaved && memoizedErrors.length > 0 && (
-          <Feedback id="feedback-error" type="error" data={memoizedErrors} userRole={user.role} shouldFocus={true} />
+          <Feedback
+            id="feedback-error"
+            type="error"
+            data={memoizedErrors}
+            userRole={user.roleWithoutElection}
+            shouldFocus={true}
+          />
         )}
         {formSection.isSaved && memoizedWarnings.length > 0 && (
           <Feedback
             id="feedback-warning"
             type="warning"
             data={memoizedWarnings}
-            userRole={user.role}
+            userRole={user.roleWithoutElection}
             shouldFocus={formSection.errors.isEmpty()}
           />
         )}

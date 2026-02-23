@@ -21,21 +21,21 @@ export const testUsers: TestUser[] = [
   {
     username: "coordinator1",
     fullname: "Mohammed van der Velden",
-    role: "coordinator",
+    role: "coordinator_gsb",
   },
   {
     username: "coordinator2",
     fullname: "Mei Chen",
-    role: "coordinator",
+    role: "coordinator_gsb",
   },
   {
     username: "typist1",
     fullname: "Sam Kuijpers",
-    role: "typist",
+    role: "typist_gsb",
   },
   {
     username: "typist2",
     fullname: "Aliyah van den Berg",
-    role: "typist",
+    role: "typist_gsb",
   },
 ];

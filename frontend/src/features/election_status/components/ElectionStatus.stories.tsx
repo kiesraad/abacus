@@ -26,7 +26,7 @@ export const ElectionStatusNoLinks: StoryObj<StoryProps> = {
   },
   render: ({ addLinks, buttonNavigate }) => {
     return (
-      <TestUserProvider userRole={"coordinator"}>
+      <TestUserProvider userRole={"coordinator_gsb"}>
         <ElectionStatus
           statuses={mockStatuses}
           committeeSession={committeeSessionMockData}
@@ -151,7 +151,7 @@ export const ElectionStatusWithLinks: StoryObj<StoryProps> = {
   },
   render: ({ addLinks, buttonNavigate }) => {
     return (
-      <TestUserProvider userRole={"coordinator"}>
+      <TestUserProvider userRole={"coordinator_gsb"}>
         <ElectionStatus
           statuses={mockStatuses}
           committeeSession={committeeSessionMockData}
@@ -230,7 +230,7 @@ export const ElectionStatusWithLinks: StoryObj<StoryProps> = {
 
 export const Empty: StoryObj<StoryProps> = {
   render: ({ addLinks, buttonNavigate }) => (
-    <TestUserProvider userRole={"coordinator"}>
+    <TestUserProvider userRole={"coordinator_gsb"}>
       <ElectionStatus
         statuses={[]}
         election={electionMockData}
@@ -266,7 +266,7 @@ export const NextSession: StoryObj<StoryProps> = {
     today.setHours(10, 20);
 
     return (
-      <TestUserProvider userRole={"coordinator"}>
+      <TestUserProvider userRole={"coordinator_gsb"}>
         <ElectionStatus
           statuses={mockStatuses}
           committeeSession={{ ...committeeSessionMockData, number: 2 }}
@@ -293,7 +293,7 @@ export const NextSession: StoryObj<StoryProps> = {
 
 export const NextSessionEmpty: StoryObj<StoryProps> = {
   render: ({ addLinks, buttonNavigate }) => (
-    <TestUserProvider userRole={"coordinator"}>
+    <TestUserProvider userRole={"coordinator_gsb"}>
       <ElectionStatus
         statuses={[]}
         election={electionMockData}

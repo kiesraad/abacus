@@ -15,7 +15,13 @@ describe("Role util", () => {
     expect(trueCount).toBe(1);
   });
 
-  test.each(roleValues)("Role without election should be the first part of role", (role: Role) => {
+  test.each([isAdministrator, isCoordinator, isTypist])("Invoking %o with undefined should return false", (fn: (
+    role?: Role,
+  ) => boolean) => {
+    expect(fn(undefined)).toBe(false);
+  });
+
+  test.each(roleValues)("Role %j without election should be the first part of role", (role: Role) => {
     const roleWithout = roleWithoutElection(role);
     expect(role.startsWith(roleWithout)).toBe(true);
   });

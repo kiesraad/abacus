@@ -71,7 +71,7 @@ export function CheckAndSave() {
           <strong>{t("election.singular")}:</strong> {state.election.name}
         </li>
         <li>
-          <strong>{t("election.role")}:</strong> {t(`electoral_committee_role.roles.${state.electionRole}.short`)}
+          <strong>{t("role").toLowerCase()}:</strong> {t(`electoral_committee_role.roles.${state.electionRole}.short`)}
         </li>
         <li>
           <strong>{t("area_designation")}:</strong> {state.election.location}

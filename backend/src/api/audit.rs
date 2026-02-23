@@ -7,7 +7,7 @@ use utoipa_axum::{router::OpenApiRouter, routes};
 
 use crate::{
     APIError, AppState, ErrorResponse,
-    api::middleware::authentication::AdminOrCoordinator,
+    api::middleware::authentication::AdminOrCoordinatorGSB,
     domain::role::Role,
     infra::audit_log::{AuditLogEvent, LogFilter},
 };
@@ -72,10 +72,10 @@ pub struct LogFilterQuery {
         (status = 403, description = "Forbidden", body = ErrorResponse),
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
-    security(("cookie_auth" = ["administrator", "coordinator"])),
+    security(("cookie_auth" = ["administrator", "coordinator_gsb"])),
 )]
 async fn audit_log_list(
-    _user: AdminOrCoordinator,
+    _user: AdminOrCoordinatorGSB,
     Query(filter_query): Query<LogFilterQuery>,
     State(pool): State<SqlitePool>,
 ) -> Result<Json<AuditLogListResponse>, APIError> {
@@ -118,10 +118,10 @@ pub struct AuditLogUser {
         (status = 403, description = "Forbidden", body = ErrorResponse),
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
-    security(("cookie_auth" = ["administrator", "coordinator"])),
+    security(("cookie_auth" = ["administrator", "coordinator_gsb"])),
 )]
 async fn audit_log_list_users(
-    _user: AdminOrCoordinator,
+    _user: AdminOrCoordinatorGSB,
     State(pool): State<SqlitePool>,
 ) -> Result<Json<Vec<AuditLogUser>>, APIError> {
     let mut conn = pool.acquire().await?;

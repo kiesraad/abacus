@@ -2,7 +2,8 @@ import type { ReactElement } from "react";
 
 import { IconEdit } from "@/components/generated/icons";
 import { t } from "@/i18n/translate";
-import type { DataEntryStatusName, Role } from "@/types/generated/openapi";
+import type { DataEntryStatusName } from "@/types/generated/openapi";
+import type { RoleWithoutElection } from "@/utils/role";
 
 import { Icon } from "../Icon/Icon";
 import cls from "./Badge.module.css";
@@ -14,7 +15,7 @@ export interface LabelProps {
   icon?: ReactElement;
 }
 
-function typeToLabel(userRole: Role, badgeType: BadgeType): LabelProps {
+function typeToLabel(userRole: RoleWithoutElection, badgeType: BadgeType): LabelProps {
   if (badgeType === "first_entry_finalised" && userRole === "typist") {
     badgeType = "first_entry_finalised_for_typist";
   }
@@ -42,7 +43,7 @@ function typeToLabel(userRole: Role, badgeType: BadgeType): LabelProps {
 export interface BadgeProps {
   id?: string;
   type: BadgeType;
-  userRole: Role;
+  userRole: RoleWithoutElection;
   showIcon?: boolean;
 }
 

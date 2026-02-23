@@ -8,8 +8,8 @@ import { Form } from "@/components/ui/Form/Form";
 import { FormLayout } from "@/components/ui/Form/FormLayout";
 import { useUser } from "@/hooks/user/useUser";
 import { t } from "@/i18n/translate";
+import { isCoordinator } from "@/utils/role";
 import { StringFormData } from "@/utils/stringFormData";
-
 import { useUserCreateContext } from "../../hooks/useUserCreateContext";
 
 export function UserCreateRolePage() {
@@ -18,10 +18,10 @@ export function UserCreateRolePage() {
   const { role, setRole, setType } = useUserCreateContext();
   const user = useUser();
 
-  // If the user is not an administrator, set the role to "typist" and navigate to the type page
+  // If the user is a coordinator, set the role to "typist" and navigate to the type page
   useEffect(() => {
-    if (user?.role === "coordinator") {
-      setRole("typist");
+    if (isCoordinator(user?.role)) {
+      setRole("typist_gsb");
       void navigate("/users/create/type");
     }
   }, [user, navigate, setRole]);
@@ -40,10 +40,10 @@ export function UserCreateRolePage() {
       return;
     }
 
-    if (roleValue === "typist") {
+    if (roleValue === "typist_gsb") {
       setRole(roleValue);
       void navigate("/users/create/type");
-    } else if (roleValue === "coordinator" || roleValue === "administrator") {
+    } else if (roleValue === "coordinator_gsb" || roleValue === "administrator") {
       setRole(roleValue);
       setType("fullname");
       void navigate("/users/create/details");
@@ -78,8 +78,8 @@ export function UserCreateRolePage() {
                 <ChoiceList.Radio
                   id={"role-coordinator"}
                   name={"role"}
-                  defaultValue={"coordinator"}
-                  defaultChecked={role === "coordinator"}
+                  defaultValue={"coordinator_gsb"}
+                  defaultChecked={role === "coordinator_gsb"}
                   label={t("coordinator")}
                 >
                   {t("users.role_coordinator_hint")}
@@ -87,8 +87,8 @@ export function UserCreateRolePage() {
                 <ChoiceList.Radio
                   id={"role-typist"}
                   name={"role"}
-                  defaultValue={"typist"}
-                  defaultChecked={role === "typist"}
+                  defaultValue={"typist_gsb"}
+                  defaultChecked={role === "typist_gsb"}
                   label={t("typist")}
                 >
                   {t("users.role_typist_hint")}

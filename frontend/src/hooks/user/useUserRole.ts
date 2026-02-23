@@ -1,3 +1,4 @@
+import { isAdministrator, isCoordinator, isTypist } from "@/utils/role";
 import { useUser } from "./useUser";
 
 export function useUserRole() {
@@ -5,8 +6,8 @@ export function useUserRole() {
 
   return {
     role: user?.role,
-    isTypist: user?.role === "typist",
-    isAdministrator: user?.role === "administrator",
-    isCoordinator: user?.role === "coordinator",
+    isAdministrator: isAdministrator(user?.role),
+    isCoordinator: isCoordinator(user?.role),
+    isTypist: isTypist(user?.role),
   };
 }

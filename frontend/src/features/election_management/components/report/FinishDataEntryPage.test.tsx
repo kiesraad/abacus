@@ -94,7 +94,7 @@ describe("FinishDataEntryPage", () => {
     }) => {
       return (
         <ApiProvider fetchInitialUser={fetchInitialUser}>
-          <TestUserProvider userRole="coordinator">
+          <TestUserProvider userRole="coordinator_gsb">
             <ElectionProvider electionId={1}>
               <ElectionStatusProvider electionId={1}>
                 <ReactRouter.RouterProvider router={router} />

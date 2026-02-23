@@ -3,5 +3,5 @@ import type { RouteObject } from "react-router";
 import { ElectionStatusPage } from "./components/ElectionStatusPage";
 
 export const electionStatusRoutes: RouteObject[] = [
-  { index: true, Component: ElectionStatusPage, handle: { roles: ["administrator", "coordinator"] } },
+  { index: true, Component: ElectionStatusPage, handle: { roles: ["administrator", "coordinator_gsb"] } },
 ];

@@ -71,7 +71,7 @@ describe("AccountSetupPage", () => {
     ]);
 
     vi.spyOn(useApiState, "useApiState").mockReturnValue({
-      user: { fullname: "Full Name", needs_password_change: false, role: "typist" } as Partial<LoginResponse>,
+      user: { fullname: "Full Name", needs_password_change: false, role: "typist_gsb" } as Partial<LoginResponse>,
       setUser,
     } as Partial<ApiState> as ApiState);
 

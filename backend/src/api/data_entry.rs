@@ -163,13 +163,11 @@ pub async fn delete_data_entry_for_polling_station(
     polling_station_id: PollingStationId,
 ) -> Result<(), APIError> {
     if let Some(data_entry) = delete_data_entry(conn, polling_station_id).await? {
-        let was_definitive = matches!(data_entry.state.0, DataEntryStatus::Definitive(_));
-
         audit_service
             .log(conn, &AuditEvent::DataEntryDeleted(data_entry.into()), None)
             .await?;
 
-        if was_definitive && committee_session.status == CommitteeSessionStatus::Completed {
+        if committee_session.status == CommitteeSessionStatus::Completed {
             change_committee_session_status(
                 conn,
                 committee_session.id,
@@ -601,8 +599,6 @@ async fn data_entry_reset(
             ErrorReference::DataEntryCannotBeDeleted,
         ))
     } else {
-        let was_definitive = matches!(data_entry.state.0, DataEntryStatus::Definitive(_));
-
         data_entry_repo::update(&mut tx, polling_station_id, &DataEntryStatus::Empty).await?;
 
         audit_service
@@ -613,7 +609,7 @@ async fn data_entry_reset(
             )
             .await?;
 
-        if was_definitive && committee_session.status == CommitteeSessionStatus::Completed {
+        if committee_session.status == CommitteeSessionStatus::Completed {
             change_committee_session_status(
                 &mut tx,
                 committee_session.id,

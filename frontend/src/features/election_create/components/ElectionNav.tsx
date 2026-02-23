@@ -16,7 +16,7 @@ const sections: ElectionCreateFormSection[] = [
   {
     key: "electoral_committee_role",
     label: t("electoral_committee_role.role"),
-    path: "create/polling-station-role",
+    path: "create/electoral-committee-role",
     hidden: false,
   },
   { key: "list_of_candidates", label: t("candidate.list.plural"), path: "create/list-of-candidates", hidden: false },

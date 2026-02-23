@@ -9,6 +9,7 @@ import { CheckAndSavePgObj } from "e2e-tests/page-objects/election/create/CheckA
 import { CheckCandidateDefinitionPgObj } from "e2e-tests/page-objects/election/create/CheckCandidateDefinitionPgObj";
 import { CheckElectionDefinitionPgObj } from "e2e-tests/page-objects/election/create/CheckElectionDefinitionPgObj";
 import { CountingMethodTypePgObj } from "e2e-tests/page-objects/election/create/CountingMethodTypePgObj";
+import { ElectoralCommitteeRolePgObj } from "e2e-tests/page-objects/election/create/ElectoralCommitteeRolePgObj.ts";
 import { NumberOfVotersPgObj } from "e2e-tests/page-objects/election/create/NumberOfVotersPgObj";
 import { UploadCandidateDefinitionPgObj } from "e2e-tests/page-objects/election/create/UploadCandidateDefinitionPgObj";
 import { UploadElectionDefinitionPgObj } from "e2e-tests/page-objects/election/create/UploadElectionDefinitionPgObj";
@@ -21,7 +22,6 @@ import { PollingStationListEmptyPgObj } from "e2e-tests/page-objects/polling_sta
 import { PollingStationListPgObj } from "e2e-tests/page-objects/polling_station/PollingStationListPgObj";
 import { eml110a, eml110b, eml230b } from "e2e-tests/test-data/eml-files";
 import { test } from "../fixtures";
-import { ElectoralCommitteeRolePgObj } from "../page-objects/election/create/ElectoralCommitteeRolePgObj.ts";
 
 test.use({
   storageState: "e2e-tests/state/admin1.json",

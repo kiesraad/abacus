@@ -14,7 +14,7 @@ export const electionCreateRoutes: RouteObject[] = [
     Component: ElectionCreateLayout,
     children: [
       { index: true, Component: UploadElectionDefinition, handle: { roles: ["administrator"] } },
-      { path: "polling-station-role", Component: ElectoralCommitteeRole, handle: { roles: ["administrator"] } },
+      { path: "electoral-committee-role", Component: ElectoralCommitteeRole, handle: { roles: ["administrator"] } },
       { path: "list-of-candidates", Component: UploadCandidatesDefinition, handle: { roles: ["administrator"] } },
       { path: "polling-stations", Component: UploadPollingStationDefinition, handle: { roles: ["administrator"] } },
       { path: "counting-method-type", Component: CountingMethodType, handle: { roles: ["administrator"] } },

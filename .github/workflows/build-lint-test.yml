@@ -227,6 +227,7 @@ jobs:
           token: ${{ secrets.CODECOV_TOKEN }}
           name: "Playwright e2e"
           files: frontend/playwright.e2e.junit.xml
+          report-type: test_results
           disable_search: true
           fail_ci_if_error: true
 

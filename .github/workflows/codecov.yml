@@ -81,6 +81,7 @@ jobs:
           token: ${{ secrets.CODECOV_TOKEN }}
           name: Backend Nextest Results
           files: backend/target/nextest/ci/junit.xml
+          report-type: test_results
           disable_search: true
           fail_ci_if_error: true
       - name: Upload coverage to Codecov
@@ -132,6 +133,7 @@ jobs:
           token: ${{ secrets.CODECOV_TOKEN }}
           name: Frontend Vitest Results
           files: frontend/test-report.junit.xml
+          report-type: test_results
           disable_search: true
           fail_ci_if_error: true
       - name: Upload coverage to Codecov

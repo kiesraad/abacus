@@ -295,9 +295,7 @@ async fn data_entry_claim(
     let validation_results = new_state.start_validate(&polling_station, &election)?;
 
     // Save the new data entry state
-    data_entry_repo::update(&mut tx, polling_station_id, &new_state).await?;
-
-    let data_entry = get_data_entry(&mut tx, polling_station_id).await?;
+    let data_entry = data_entry_repo::update(&mut tx, polling_station_id, &new_state).await?;
 
     match state {
         DataEntryStatus::Empty | DataEntryStatus::FirstEntryFinalised(_) => {
@@ -409,9 +407,7 @@ async fn data_entry_save(
     let validation_results = new_state.start_validate(&polling_station, &election)?;
 
     // Save the new data entry state
-    data_entry_repo::update(&mut tx, polling_station_id, &new_state).await?;
-
-    let data_entry = get_data_entry(&mut tx, polling_station_id).await?;
+    let data_entry = data_entry_repo::update(&mut tx, polling_station_id, &new_state).await?;
 
     audit_service
         .log(
@@ -463,9 +459,7 @@ async fn data_entry_delete(
         }
     };
 
-    data_entry_repo::update(&mut tx, polling_station_id, &new_state).await?;
-
-    let data_entry = get_data_entry(&mut tx, polling_station_id).await?;
+    let data_entry = data_entry_repo::update(&mut tx, polling_station_id, &new_state).await?;
 
     audit_service
         .log(
@@ -511,18 +505,16 @@ async fn data_entry_finalise(
         validate_and_get_data(&mut tx, polling_station_id, &user.0).await?;
 
     let user_id = user.0.id();
-    match entry_number {
+    let data_entry = match entry_number {
         EntryNumber::FirstEntry => {
             let new_state = state.finalise_first_entry(&polling_station, &election, user_id)?;
-            data_entry_repo::update(&mut tx, polling_station_id, &new_state).await?;
+            data_entry_repo::update(&mut tx, polling_station_id, &new_state).await?
         }
         EntryNumber::SecondEntry => {
             let new_state = state.finalise_second_entry(&polling_station, &election, user_id)?;
-            data_entry_repo::update(&mut tx, polling_station_id, &new_state).await?;
+            data_entry_repo::update(&mut tx, polling_station_id, &new_state).await?
         }
-    }
-
-    let data_entry = get_data_entry(&mut tx, polling_station_id).await?;
+    };
 
     audit_service
         .log(

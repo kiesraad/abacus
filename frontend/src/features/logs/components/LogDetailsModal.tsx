@@ -2,8 +2,8 @@ import { Fragment } from "react";
 
 import { Modal } from "@/components/ui/Modal/Modal";
 import type { TranslationPath } from "@/i18n/i18n.types";
-import { t } from "@/i18n/translate";
-import type { AuditEventType, AuditLogEvent, ErrorReference } from "@/types/generated/openapi";
+import { t, translateOrWarn } from "@/i18n/translate";
+import type { AuditEventType, AuditLogEvent } from "@/types/generated/openapi";
 import { formatDateTimeFull } from "@/utils/dateTime";
 
 import cls from "./LogsHomePage.module.css";
@@ -45,10 +45,10 @@ export function LogDetailsModal({ details, setDetails }: LogDetailsModalProps) {
   const event_type: AuditEventType = details.event_name;
   const event: object = details.event ? details.event : {};
 
-  const filteredDetails: [string, TranslationPath, AuditEventValues][] = Object.entries(event).map(
+  const filteredDetails: [string, string, AuditEventValues][] = Object.entries(event).map(
     ([key, value]: [string, unknown]) => {
-      const translatedKey: TranslationPath = `log.field.${key}` as TranslationPath;
-      return [key, translatedKey, value as AuditEventValues];
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+      return [key, translateOrWarn(key), value as AuditEventValues];
     },
   );
 
@@ -98,9 +98,9 @@ export function LogDetailsModal({ details, setDetails }: LogDetailsModalProps) {
           <>
             <h3>{t("log.header.details")}</h3>
             <dl id="log_details_description_list" className={cls.details}>
-              {filteredDetails.map(([key, translationKey, value]) => (
+              {filteredDetails.map(([key, translatedKey, value]) => (
                 <Fragment key={key}>
-                  <dt>{t(translationKey)}</dt>
+                  <dt>{translatedKey}</dt>
                   <dd>{formatValue(key, value)}</dd>
                 </Fragment>
               ))}

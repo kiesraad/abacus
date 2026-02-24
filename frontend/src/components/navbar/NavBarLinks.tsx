@@ -65,7 +65,9 @@ function ElectionManagementLinks({ location }: NavBarLinksProps) {
       {location.pathname.match(/^\/elections\/\d+\/status\/\d+\/(resolve-differences|detail(\/\w+)?)$/) && (
         <>
           <IconChevronRight />
-          <Link to={`/elections/${election.id}/status`}>{committeeSessionLabel(currentCommitteeSession.number)}</Link>
+          <Link to={`/elections/${election.id}/status`}>
+            {committeeSessionLabel(election.role, currentCommitteeSession.number)}
+          </Link>
         </>
       )}
       {location.pathname.match(/^\/elections\/\d+\/investigations\/add/) && (

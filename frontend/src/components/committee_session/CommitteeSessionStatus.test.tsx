@@ -1,7 +1,7 @@
 import { render, screen } from "@testing-library/react";
 import { describe, expect, test } from "vitest";
 
-import type { CommitteeSessionStatus } from "@/types/generated/openapi";
+import { type CommitteeSessionStatus, electionRoleValues } from "@/types/generated/openapi";
 
 import { CommitteeSessionStatusWithIcon, HeaderCommitteeSessionStatusWithIcon } from "./CommitteeSessionStatus";
 
@@ -22,19 +22,30 @@ const testScenarios: Scenario[] = [
 
 describe("CommitteeSessionStatusWithIcon", () => {
   test.each(testScenarios)("Status with icon for %s with role %s", (state, role, icon, label) => {
-    render(<CommitteeSessionStatusWithIcon status={state} userRole={role} />);
-    expect(screen.getByText(label)).toBeVisible();
-    expect(screen.getByRole("img", { hidden: true })).toHaveAttribute("data-icon", icon);
+    electionRoleValues.forEach((electionRole) => {
+      render(<CommitteeSessionStatusWithIcon status={state} userRole={role} electionRole={electionRole} />);
+      expect(screen.getByText(label)).toBeVisible();
+      expect(screen.getByRole("img", { hidden: true })).toHaveAttribute("data-icon", icon);
+    });
   });
 });
 
 describe("HeaderCommitteeSessionStatusWithIcon", () => {
   test.each(testScenarios)("Status with icon for %s with role %s", (state, role, icon, label) => {
-    render(<HeaderCommitteeSessionStatusWithIcon status={state} userRole={role} committeeSessionNumber={1} />);
-    expect(screen.getByText(label)).toBeVisible();
-    if (label === "Invoer afgerond") {
-      expect(screen.getByText("(eerste zitting)")).toBeVisible();
-    }
-    expect(screen.getByRole("img", { hidden: true })).toHaveAttribute("data-icon", icon);
+    electionRoleValues.forEach((electionRole) => {
+      render(
+        <HeaderCommitteeSessionStatusWithIcon
+          electionRole={electionRole}
+          status={state}
+          userRole={role}
+          committeeSessionNumber={1}
+        />,
+      );
+      expect(screen.getByText(label)).toBeVisible();
+      if (label === "Invoer afgerond") {
+        expect(screen.getByText("(eerste zitting)")).toBeVisible();
+      }
+      expect(screen.getByRole("img", { hidden: true })).toHaveAttribute("data-icon", icon);
+    });
   });
 });

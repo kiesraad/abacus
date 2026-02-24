@@ -101,7 +101,7 @@ export function ElectionHomePage() {
         <Modal title={`${t("election_management.delete_session")}?`} onClose={toggleDeleteCommitteeSessionModal}>
           <p>
             {t("election_management.delete_session_are_you_sure", {
-              sessionLabel: committeeSessionLabel(currentCommitteeSession.number, true).toLowerCase(),
+              sessionLabel: committeeSessionLabel(election.role, currentCommitteeSession.number, true).toLowerCase(),
             })}
           </p>
           <nav>
@@ -126,7 +126,7 @@ export function ElectionHomePage() {
         <Modal title={t("election_management.delete_investigations_first")} onClose={toggleDeleteCommitteeSessionModal}>
           <p>
             {t("election_management.delete_investigations_first_are_you_sure", {
-              sessionLabel: committeeSessionLabel(currentCommitteeSession.number, true).toLowerCase(),
+              sessionLabel: committeeSessionLabel(election.role, currentCommitteeSession.number, true).toLowerCase(),
             })}
           </p>
           <nav>
@@ -165,6 +165,7 @@ export function ElectionHomePage() {
                 <CommitteeSessionCard
                   key={committeeSession.id}
                   committeeSession={committeeSession}
+                  electionRole={election.role}
                   isCurrentSession={index === 0}
                 />
               ))}
@@ -184,42 +185,11 @@ export function ElectionHomePage() {
               numberOfPollingStations={pollingStations.length}
             />
           </div>
-          {currentCommitteeSession.number === 1 ? (
-            <div className={cn(cls.downloadModels, "mt-xl")}>
-              <h3 className={cls.tableTitle}>{t("election_management.empty_documents_title")}</h3>
-              <p>{t("election_management.empty_documents_description")}</p>
-              <Table className={cn(cls.electionInformationTable)} variant="information">
-                <Table.Header>
-                  <Table.HeaderCell scope="col">{t("election_management.document_model")}</Table.HeaderCell>
-                  <Table.HeaderCell scope="col">{t("election_management.document_purpose")}</Table.HeaderCell>
-                </Table.Header>
-                <Table.Body>
-                  <Table.ClickRow
-                    downloadIcon
-                    onClick={() => {
-                      directDownload(`/api/elections/${election.id}/download_na_31_2_bijlage1`);
-                    }}
-                  >
-                    <Table.Cell>Na 31-2 Bijlage 1</Table.Cell>
-                    <Table.Cell>{t("election_management.document_na_31_2_bijlage_1")}</Table.Cell>
-                  </Table.ClickRow>
-                  <Table.ClickRow
-                    downloadIcon
-                    onClick={() => {
-                      directDownload(`/api/elections/${election.id}/download_n_10_2`);
-                    }}
-                  >
-                    <Table.Cell>N 10-2</Table.Cell>
-                    <Table.Cell>{t("election_management.document_n_10_2")}</Table.Cell>
-                  </Table.ClickRow>
-                </Table.Body>
-              </Table>
-            </div>
-          ) : (
-            currentCommitteeSession.number === 2 && (
+          {election.role === "GSB" &&
+            (currentCommitteeSession.number === 1 ? (
               <div className={cn(cls.downloadModels, "mt-xl")}>
-                <h3 className={cls.tableTitle}>{t("election_management.empty_document_title")}</h3>
-                <p>{t("election_management.empty_document_description")}</p>
+                <h3 className={cls.tableTitle}>{t("election_management.empty_documents_title")}</h3>
+                <p>{t("election_management.empty_documents_description")}</p>
                 <Table className={cn(cls.electionInformationTable)} variant="information">
                   <Table.Header>
                     <Table.HeaderCell scope="col">{t("election_management.document_model")}</Table.HeaderCell>
@@ -229,17 +199,49 @@ export function ElectionHomePage() {
                     <Table.ClickRow
                       downloadIcon
                       onClick={() => {
-                        directDownload(`/api/elections/${election.id}/download_na_31_2_inlegvel`);
+                        directDownload(`/api/elections/${election.id}/download_na_31_2_bijlage1`);
                       }}
                     >
-                      <Table.Cell>Na 31-2 Inlegvel</Table.Cell>
-                      <Table.Cell>{t("election_management.document_na_31_2_inlegvel")}</Table.Cell>
+                      <Table.Cell>Na 31-2 Bijlage 1</Table.Cell>
+                      <Table.Cell>{t("election_management.document_na_31_2_bijlage_1")}</Table.Cell>
+                    </Table.ClickRow>
+                    <Table.ClickRow
+                      downloadIcon
+                      onClick={() => {
+                        directDownload(`/api/elections/${election.id}/download_n_10_2`);
+                      }}
+                    >
+                      <Table.Cell>N 10-2</Table.Cell>
+                      <Table.Cell>{t("election_management.document_n_10_2")}</Table.Cell>
                     </Table.ClickRow>
                   </Table.Body>
                 </Table>
               </div>
-            )
-          )}
+            ) : (
+              currentCommitteeSession.number === 2 && (
+                <div className={cn(cls.downloadModels, "mt-xl")}>
+                  <h3 className={cls.tableTitle}>{t("election_management.empty_document_title")}</h3>
+                  <p>{t("election_management.empty_document_description")}</p>
+                  <Table className={cn(cls.electionInformationTable)} variant="information">
+                    <Table.Header>
+                      <Table.HeaderCell scope="col">{t("election_management.document_model")}</Table.HeaderCell>
+                      <Table.HeaderCell scope="col">{t("election_management.document_purpose")}</Table.HeaderCell>
+                    </Table.Header>
+                    <Table.Body>
+                      <Table.ClickRow
+                        downloadIcon
+                        onClick={() => {
+                          directDownload(`/api/elections/${election.id}/download_na_31_2_inlegvel`);
+                        }}
+                      >
+                        <Table.Cell>Na 31-2 Inlegvel</Table.Cell>
+                        <Table.Cell>{t("election_management.document_na_31_2_inlegvel")}</Table.Cell>
+                      </Table.ClickRow>
+                    </Table.Body>
+                  </Table>
+                </div>
+              )
+            ))}
         </article>
       </main>
       <Footer />

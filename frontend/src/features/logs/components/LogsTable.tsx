@@ -26,8 +26,11 @@ export function LogsTable({ events, details, setDetails }: LogsTableProps) {
           </Table.Row>
         )}
         {events.map((event: AuditLogEvent) => {
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
-          const key = (event.event as Record<string, string>).reference;
+          let errorReference: string | undefined;
+          if (event.event_name === "Error" && event.event instanceof Object && "reference" in event.event) {
+            errorReference = String(event.event.reference);
+          }
+
           return (
             <Table.ClickRow
               key={event.id}
@@ -41,7 +44,7 @@ export function LogsTable({ events, details, setDetails }: LogsTableProps) {
               <Table.Cell>{t(`log.level.${event.event_level}`)}</Table.Cell>
               <Table.Cell>
                 {t(`log.event.${event.event_name}`)}
-                {event.event_name === "Error" && `: ${translateOrWarn(`error.api_error.${key}`)}`}
+                {errorReference && `: ${translateOrWarn(`error.api_error.${errorReference}`)}`}
               </Table.Cell>
               <Table.Cell>
                 {event.user_id &&

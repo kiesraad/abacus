@@ -17,7 +17,7 @@ const SHOULD_TRANSLATE: Record<string, string> = {
 };
 
 // format an audit log event detail value
-function formatValue(key: string, value: AuditEventValues): string {
+function formatValue(key: string, value: unknown): string {
   if (value === true) {
     return t("yes");
   }
@@ -31,7 +31,7 @@ function formatValue(key: string, value: AuditEventValues): string {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
-  return t(`${SHOULD_TRANSLATE[key]}${value}` as TranslationPath);
+  return t(`${SHOULD_TRANSLATE[key]}${String(value)}` as TranslationPath);
 }
 
 interface LogDetailsModalProps {
@@ -39,18 +39,13 @@ interface LogDetailsModalProps {
   setDetails: (details: AuditLogEvent | null) => void;
 }
 
-type AuditEventValues = string | number | boolean | null;
-
 export function LogDetailsModal({ details, setDetails }: LogDetailsModalProps) {
   const event_type: AuditEventType = details.event_name;
   const event: object = details.event ? details.event : {};
 
-  const filteredDetails: [string, string, AuditEventValues][] = Object.entries(event).map(
-    ([key, value]: [string, unknown]) => {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
-      return [key, translateOrWarn(`log.field.${key}`), value as AuditEventValues];
-    },
-  );
+  const filteredDetails: [string, string, unknown][] = Object.entries(event).map(([key, value]: [string, unknown]) => {
+    return [key, translateOrWarn(`log.field.${key}`), value];
+  });
 
   return (
     <Modal

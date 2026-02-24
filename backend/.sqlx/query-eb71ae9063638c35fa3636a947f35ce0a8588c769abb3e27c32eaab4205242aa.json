@@ -1,6 +1,6 @@
 {
   "db_name": "SQLite",
-  "query": "SELECT\n            audit_log.id as \"id: AuditLogEventId\",\n            time as \"time: _\",\n            json(event) as \"event!: Json<AuditEvent>\",\n            event_level as \"event_level: _\",\n            message,\n            ip as \"ip: String\",\n            user_id as \"user_id: UserId\",\n            username,\n            user_fullname,\n            user_role as \"user_role: Role\"\n        FROM audit_log\n        ORDER BY time ASC\n        ",
+  "query": "SELECT\n            audit_log.id as \"id: AuditLogEventId\",\n            time as \"time: _\",\n            json(event) as \"event!: serde_json::Value\",\n            event_name as \"event_name: AuditEventType\",\n            event_level as \"event_level: _\",\n            message,\n            ip as \"ip: String\",\n            user_id as \"user_id: UserId\",\n            username,\n            user_fullname,\n            user_role as \"user_role: Role\"\n        FROM audit_log\n        ORDER BY time ASC\n        ",
   "describe": {
     "columns": [
       {
@@ -14,43 +14,48 @@
         "type_info": "Text"
       },
       {
-        "name": "event!: Json<AuditEvent>",
+        "name": "event!: serde_json::Value",
         "ordinal": 2,
         "type_info": "Null"
       },
       {
-        "name": "event_level: _",
+        "name": "event_name: AuditEventType",
         "ordinal": 3,
         "type_info": "Text"
       },
       {
-        "name": "message",
+        "name": "event_level: _",
         "ordinal": 4,
         "type_info": "Text"
       },
       {
-        "name": "ip: String",
+        "name": "message",
         "ordinal": 5,
         "type_info": "Text"
       },
       {
-        "name": "user_id: UserId",
+        "name": "ip: String",
         "ordinal": 6,
+        "type_info": "Text"
+      },
+      {
+        "name": "user_id: UserId",
+        "ordinal": 7,
         "type_info": "Integer"
       },
       {
         "name": "username",
-        "ordinal": 7,
-        "type_info": "Text"
-      },
-      {
-        "name": "user_fullname",
         "ordinal": 8,
         "type_info": "Text"
       },
       {
-        "name": "user_role: Role",
+        "name": "user_fullname",
         "ordinal": 9,
+        "type_info": "Text"
+      },
+      {
+        "name": "user_role: Role",
+        "ordinal": 10,
         "type_info": "Text"
       }
     ],
@@ -62,6 +67,7 @@
       false,
       null,
       false,
+      false,
       true,
       true,
       true,
@@ -70,5 +76,5 @@
       true
     ]
   },
-  "hash": "46128291797a9a1c0b22765b000edfdb51a3c4e053d7ca9b27713415fb089a03"
+  "hash": "eb71ae9063638c35fa3636a947f35ce0a8588c769abb3e27c32eaab4205242aa"
 }

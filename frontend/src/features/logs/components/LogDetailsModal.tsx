@@ -2,8 +2,8 @@ import { Fragment } from "react";
 
 import { Modal } from "@/components/ui/Modal/Modal";
 import type { TranslationPath } from "@/i18n/i18n.types";
-import { t } from "@/i18n/translate";
-import type { AuditEvent, AuditLogEvent } from "@/types/generated/openapi";
+import { t, translateOrWarn } from "@/i18n/translate";
+import type { AuditEventType, AuditLogEvent } from "@/types/generated/openapi";
 import { formatDateTimeFull } from "@/utils/dateTime";
 
 import cls from "./LogsHomePage.module.css";
@@ -17,7 +17,7 @@ const SHOULD_TRANSLATE: Record<string, string> = {
 };
 
 // format an audit log event detail value
-function formatValue(key: AuditEventDetailKeys, value: AuditEventValues): string {
+function formatValue(key: string, value: unknown): string {
   if (value === true) {
     return t("yes");
   }
@@ -31,7 +31,7 @@ function formatValue(key: AuditEventDetailKeys, value: AuditEventValues): string
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
-  return t(`${SHOULD_TRANSLATE[key]}${value}` as TranslationPath);
+  return t(`${SHOULD_TRANSLATE[key]}${String(value)}` as TranslationPath);
 }
 
 interface LogDetailsModalProps {
@@ -39,30 +39,17 @@ interface LogDetailsModalProps {
   setDetails: (details: AuditLogEvent | null) => void;
 }
 
-type KeysOfUnion<T> = T extends T ? keyof T : never;
-type AuditEventDetailKeys = Exclude<KeysOfUnion<AuditEvent>, "event_type">;
-type AuditEventValues = string | number | boolean | null;
-type AuditEventDetails = {
-  [K in AuditEventDetailKeys]: [K, AuditEventValues];
-}[AuditEventDetailKeys][];
-
 export function LogDetailsModal({ details, setDetails }: LogDetailsModalProps) {
-  const event: AuditEvent = details.event;
+  const event_type: AuditEventType = details.event_name;
+  const event: object = details.event ? details.event : {};
 
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
-  const eventDetails = Object.entries(event).filter(([k]) => k !== "event_type") as AuditEventDetails;
-  const filteredDetails: [AuditEventDetailKeys, TranslationPath, AuditEventValues][] = eventDetails.map(
-    ([k, value]: [AuditEventDetailKeys, AuditEventValues]) => {
-      const key: AuditEventDetailKeys = k;
-      const translatedKey: TranslationPath = `log.field.${key}`;
-
-      return [key, translatedKey, value];
-    },
-  );
+  const filteredDetails: [string, string, unknown][] = Object.entries(event).map(([key, value]: [string, unknown]) => {
+    return [key, translateOrWarn(`log.field.${key}`), value];
+  });
 
   return (
     <Modal
-      title={t(`log.event.${details.event.event_type}`)}
+      title={t(`log.event.${event_type}`)}
       onClose={() => {
         setDetails(null);
       }}
@@ -106,9 +93,9 @@ export function LogDetailsModal({ details, setDetails }: LogDetailsModalProps) {
           <>
             <h3>{t("log.header.details")}</h3>
             <dl id="log_details_description_list" className={cls.details}>
-              {filteredDetails.map(([key, translationKey, value]) => (
+              {filteredDetails.map(([key, translatedKey, value]) => (
                 <Fragment key={key}>
-                  <dt>{t(translationKey)}</dt>
+                  <dt>{translatedKey}</dt>
                   <dd>{formatValue(key, value)}</dd>
                 </Fragment>
               ))}

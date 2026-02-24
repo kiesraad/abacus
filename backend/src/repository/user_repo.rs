@@ -9,7 +9,6 @@ use crate::{
         password::{HashedPassword, ValidatedPassword, hash_password, verify_password},
     },
     domain::{id::id, role::Role},
-    infra::audit_log::UserDetails,
 };
 
 const MIN_UPDATE_LAST_ACTIVITY_AT_SECS: i64 = 60; // 1 minute
@@ -37,17 +36,6 @@ pub struct User {
     updated_at: DateTime<Utc>,
     #[schema(value_type = String)]
     created_at: DateTime<Utc>,
-}
-
-impl From<User> for UserDetails {
-    fn from(user: User) -> Self {
-        Self {
-            user_id: user.id,
-            fullname: user.fullname,
-            username: user.username,
-            role: user.role.to_string(),
-        }
-    }
 }
 
 impl User {

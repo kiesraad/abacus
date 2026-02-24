@@ -74,6 +74,7 @@ pub struct ElectionDetailsResponse {
 pub struct ElectionDetails {
     pub election_id: ElectionId,
     pub election_name: String,
+    pub election_role: String,
     pub election_counting_method: String,
     pub election_election_id: String,
     pub election_location: String,

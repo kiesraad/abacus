@@ -1,6 +1,6 @@
 {
   "db_name": "SQLite",
-  "query": "\n        SELECT\n            p.id AS \"id: _\",\n            c.election_id AS \"election_id: _\",\n            p.committee_session_id AS \"committee_session_id: _\",\n            p.id_prev_session AS \"id_prev_session: _\",\n            p.data_entry_id AS \"data_entry_id: _\",\n            p.name,\n            p.number AS \"number: u32\",\n            p.number_of_voters AS \"number_of_voters: _\",\n            p.polling_station_type AS \"polling_station_type: _\",\n            p.address,\n            p.postal_code,\n            p.locality\n        FROM polling_stations AS p\n        JOIN committee_sessions AS c ON c.id = p.committee_session_id\n        WHERE c.id = $1\n        ",
+  "query": "\n            INSERT INTO polling_stations (\n                committee_session_id,\n                prev_data_entry_id,\n                name,\n                number,\n                number_of_voters,\n                polling_station_type,\n                address,\n                postal_code,\n                locality\n            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)\n            RETURNING\n                id AS \"id: _\",\n                ? AS \"election_id!: ElectionId\", -- Workaround to get election_id in the result without a temporary struct\n                committee_session_id AS \"committee_session_id: _\",\n                prev_data_entry_id AS \"prev_data_entry_id: _\",\n                data_entry_id AS \"data_entry_id: _\",\n                name,\n                number AS \"number: u32\",\n                number_of_voters AS \"number_of_voters: _\",\n                polling_station_type AS \"polling_station_type: _\",\n                address,\n                postal_code,\n                locality\n            ",
   "describe": {
     "columns": [
       {
@@ -9,9 +9,9 @@
         "type_info": "Integer"
       },
       {
-        "name": "election_id: _",
+        "name": "election_id!: ElectionId",
         "ordinal": 1,
-        "type_info": "Integer"
+        "type_info": "Null"
       },
       {
         "name": "committee_session_id: _",
@@ -19,7 +19,7 @@
         "type_info": "Integer"
       },
       {
-        "name": "id_prev_session: _",
+        "name": "prev_data_entry_id: _",
         "ordinal": 3,
         "type_info": "Integer"
       },
@@ -65,11 +65,11 @@
       }
     ],
     "parameters": {
-      "Right": 1
+      "Right": 10
     },
     "nullable": [
       false,
-      false,
+      null,
       false,
       true,
       true,
@@ -82,5 +82,5 @@
       false
     ]
   },
-  "hash": "e9eeaa980fc341bfcc94343a78656f5426ad1671d2d6ac406063f18262d73fda"
+  "hash": "61a2da06ffb20b19bf4daff430814a7232e71e8d6feb5423bb603aee6e8fcc1e"
 }

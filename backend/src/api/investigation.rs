@@ -33,7 +33,7 @@ use crate::{
     infra::audit_log::{AsAuditEvent, AuditEvent, AuditEventType, AuditService, as_audit_event},
     repository::{
         committee_session_repo::get_election_committee_session,
-        data_entry_repo::{data_entry_exists, previous_results_for_polling_station},
+        data_entry_repo::{self, data_entry_exists, previous_results_for_polling_station},
         election_repo,
         investigation_repo::{
             conclude_polling_station_investigation, create_polling_station_investigation,
@@ -257,7 +257,8 @@ async fn polling_station_investigation_conclude(
     let committee_session = validate_and_get_committee_session(&mut tx, polling_station_id).await?;
 
     let polling_station = polling_station_repo::get(&mut tx, polling_station_id).await?;
-    if polling_station.id_prev_session.is_none() && !polling_station_investigation.corrected_results
+    if polling_station.prev_data_entry_id.is_none()
+        && !polling_station_investigation.corrected_results
     {
         return Err(APIError::Conflict(
             "Investigation requires corrected results, because the polling station is not part of a previous session".into(),
@@ -265,12 +266,18 @@ async fn polling_station_investigation_conclude(
         ));
     }
 
+    let corrected_results = polling_station_investigation.corrected_results;
+
     let investigation = conclude_polling_station_investigation(
         &mut tx,
         polling_station_id,
         polling_station_investigation,
     )
     .await?;
+
+    if corrected_results {
+        data_entry_repo::create_empty(&mut tx, polling_station_id).await?;
+    }
 
     audit_service
         .log(
@@ -361,7 +368,7 @@ async fn polling_station_investigation_update(
     let committee_session = validate_and_get_committee_session(&mut tx, polling_station_id).await?;
 
     let polling_station = polling_station_repo::get(&mut tx, polling_station_id).await?;
-    if polling_station.id_prev_session.is_none()
+    if polling_station.prev_data_entry_id.is_none()
         && investigation_update_request.corrected_results != Some(true)
     {
         return Err(APIError::Conflict(
@@ -392,6 +399,13 @@ async fn polling_station_investigation_update(
                 ErrorReference::InvestigationHasDataEntryOrResult,
             ));
         }
+    }
+
+    // If corrected_results is changed to true and no data entry exists, create one
+    if investigation_update_request.corrected_results == Some(true)
+        && !data_entry_exists(&mut tx, polling_station_id).await?
+    {
+        data_entry_repo::create_empty(&mut tx, polling_station_id).await?;
     }
 
     let investigation = update_investigation(
@@ -511,7 +525,7 @@ async fn polling_station_investigation_download_corrigendum_pdf(
     let election: ElectionWithPoliticalGroups =
         election_repo::get(&mut conn, polling_station.election_id).await?;
 
-    let previous_results = match polling_station.id_prev_session {
+    let previous_results = match polling_station.prev_data_entry_id {
         Some(_) => {
             match previous_results_for_polling_station(&mut conn, polling_station_id).await {
                 Ok(results) => results,

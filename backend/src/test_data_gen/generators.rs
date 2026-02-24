@@ -249,7 +249,7 @@ async fn generate_polling_stations(
         };
         remaining_voters -= ps_num_voters;
 
-        let ps = polling_station_repo::create(
+        let mut ps = polling_station_repo::create(
             conn,
             election.id,
             PollingStationRequest {
@@ -264,6 +264,10 @@ async fn generate_polling_stations(
         )
         .await
         .expect("Failed to create polling station");
+        let data_entry = data_entry_repo::create_empty(conn, ps.id)
+            .await
+            .expect("Failed to create empty data entry");
+        ps.data_entry_id = Some(data_entry.id);
         polling_stations.push(ps);
     }
 
@@ -348,7 +352,7 @@ async fn generate_data_entry(
                     results: results.clone(),
                 });
 
-                data_entry_repo::upsert(conn, ps.id, &state)
+                data_entry_repo::update(conn, ps.id, &state)
                     .await
                     .expect("Could not create definitive data entry");
                 generated_second_entries += 1;
@@ -360,7 +364,7 @@ async fn generate_data_entry(
                     first_entry_finished_at: ts,
                     finalised_with_warnings: validation_results.has_warnings(),
                 });
-                data_entry_repo::upsert(conn, ps.id, &state)
+                data_entry_repo::update(conn, ps.id, &state)
                     .await
                     .expect("Could not create first data entry");
                 generated_first_entries += 1;

@@ -50,6 +50,9 @@ INSERT INTO committee_sessions (id, number, election_id, status, location, start
 VALUES (3, 1, 3, 'data_entry', '', NULL);
 
 
-INSERT INTO polling_stations (id, committee_session_id, id_prev_session, name, number, number_of_voters, polling_station_type, address,
+INSERT INTO data_entries (id, state, updated_at)
+VALUES (3, '{"status":"Empty"}', '2024-12-05 09:15:00');
+
+INSERT INTO polling_stations (id, committee_session_id, prev_data_entry_id, data_entry_id, name, number, number_of_voters, polling_station_type, address,
                               postal_code, locality)
-VALUES (3, 3, NULL, 'Testgebouw', 35, NULL, 'FixedLocation', 'Testweg 3', '1234 QA', 'Teststad');
+VALUES (3, 3, NULL, 3, 'Testgebouw', 35, NULL, 'FixedLocation', 'Testweg 3', '1234 QA', 'Teststad');

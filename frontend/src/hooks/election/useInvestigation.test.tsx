@@ -96,7 +96,7 @@ describe("useInvestigations", () => {
   });
 
   test("Categorizes missing investigations", async () => {
-    // Initialize with new polling station without id_prev_session and no investigation
+    // Initialize with new polling station without prev_data_entry_id and no investigation
     overrideOnce("get", "/api/elections/1", 200, {
       ...getElectionMockData({}, { number: 2 }),
       polling_stations: [
@@ -104,7 +104,7 @@ describe("useInvestigations", () => {
         {
           ...pollingStationMockData[4]!,
           id: 123,
-          id_prev_session: undefined,
+          prev_data_entry_id: undefined,
         },
       ],
     } satisfies ElectionDetailsResponse);

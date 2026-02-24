@@ -201,10 +201,10 @@ export type LOGOUT_REQUEST_PARAMS = Record<string, never>;
 export type LOGOUT_REQUEST_PATH = `/api/logout`;
 
 // /api/polling_stations/{polling_station_id}/data_entries
-export interface DATA_ENTRIES_AND_RESULT_DELETE_REQUEST_PARAMS {
+export interface DATA_ENTRY_RESET_REQUEST_PARAMS {
   polling_station_id: PollingStationId;
 }
-export type DATA_ENTRIES_AND_RESULT_DELETE_REQUEST_PATH = `/api/polling_stations/${PollingStationId}/data_entries`;
+export type DATA_ENTRY_RESET_REQUEST_PATH = `/api/polling_stations/${PollingStationId}/data_entries`;
 
 // /api/polling_stations/{polling_station_id}/data_entries/get
 export interface DATA_ENTRY_GET_REQUEST_PARAMS {
@@ -966,13 +966,13 @@ export interface PollingStation {
   data_entry_id?: DataEntryId;
   election_id: ElectionId;
   id: PollingStationId;
-  id_prev_session?: PollingStationId;
   locality: string;
   name: string;
   number: number;
   number_of_voters?: number;
   polling_station_type?: PollingStationType;
   postal_code: string;
+  prev_data_entry_id?: DataEntryId;
 }
 
 export interface PollingStationFileRequest {

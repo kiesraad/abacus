@@ -28,7 +28,7 @@ pub struct PollingStation {
     pub committee_session_id: CommitteeSessionId,
     #[serde(skip_serializing_if = "Option::is_none")]
     #[schema(nullable = false)]
-    pub id_prev_session: Option<PollingStationId>,
+    pub prev_data_entry_id: Option<DataEntryId>,
     #[serde(skip_serializing_if = "Option::is_none")]
     #[schema(nullable = false)]
     pub data_entry_id: Option<DataEntryId>,
@@ -58,7 +58,7 @@ impl From<PollingStation> for PollingStationDetails {
             polling_station_id: value.id,
             polling_station_election_id: value.election_id,
             polling_station_committee_session_id: value.committee_session_id,
-            polling_station_id_prev_session: value.id_prev_session,
+            polling_station_prev_data_entry_id: value.prev_data_entry_id,
             polling_station_name: value.name,
             polling_station_number: value.number,
             polling_station_number_of_voters: value.number_of_voters,
@@ -158,7 +158,7 @@ pub(crate) mod test_helpers {
             id: PollingStationId::from(1),
             election_id: election.id,
             committee_session_id: committee_session.id,
-            id_prev_session: None,
+            prev_data_entry_id: None,
             data_entry_id: None,
             name: "Testplek".to_string(),
             number: 34,
@@ -184,7 +184,7 @@ pub(crate) mod test_helpers {
                 id: PollingStationId::from(u32::try_from(idx).unwrap()),
                 election_id: election.id,
                 committee_session_id,
-                id_prev_session: None,
+                prev_data_entry_id: None,
                 data_entry_id: None,
                 name: format!("Testplek {idx}"),
                 number: u32::try_from(idx).unwrap() + 30,

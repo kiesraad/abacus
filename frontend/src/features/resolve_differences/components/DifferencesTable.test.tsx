@@ -8,7 +8,7 @@ import cls from "./ResolveDifferences.module.css";
 
 const tableHeaders = ["Code", "First", "Second", "Description"];
 
-function renderTable(rows: DifferencesRow[], action: ResolveDifferencesAction | undefined = undefined) {
+function renderTable(rows: DifferencesRow[], action?: ResolveDifferencesAction) {
   render(<DifferencesTable title={"Differences"} headers={tableHeaders} rows={rows} action={action} />);
 }
 

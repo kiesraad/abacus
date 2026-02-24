@@ -3,7 +3,8 @@ import { t } from "@/i18n/translate";
 import type { PoliticalGroup, PoliticalGroupSeatAssignment } from "@/types/generated/openapi";
 import { cn } from "@/utils/classnames";
 
-import { getFootnotes, type HighestAverageAssignmentStep, type resultChange } from "../../utils/seat-change";
+import { getFootnotes, type resultChange } from "../../utils/seat-change";
+import type { HighestAverageAssignmentStep } from "../../utils/steps";
 import cls from "../Apportionment.module.css";
 
 interface HighestAveragesTableProps {

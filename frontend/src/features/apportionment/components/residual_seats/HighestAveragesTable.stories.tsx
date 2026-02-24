@@ -1,7 +1,7 @@
 import type { StoryFn } from "@storybook/react-vite";
 
 import * as gte19Seats from "../../testing/gte-19-seats";
-import type { HighestAverageAssignmentStep } from "../../utils/seat-change";
+import type { HighestAverageAssignmentStep } from "../../utils/steps";
 import { HighestAveragesTable } from "./HighestAveragesTable";
 
 export const Default: StoryFn = () => (

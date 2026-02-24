@@ -4,15 +4,8 @@ import { useElection } from "@/hooks/election/useElection";
 import { t, tx } from "@/i18n/translate";
 import { cn } from "@/utils/classnames";
 import { useApportionmentContext } from "../../hooks/useApportionmentContext";
-import {
-  getResultChanges,
-  isAbsoluteMajorityReassignmentStep,
-  isHighestAverageAssignmentStep,
-  isLargestRemainderAssignmentStep,
-  isListExhaustionRemovalStep,
-  isUniqueHighestAverageAssignmentStep,
-  type resultChange,
-} from "../../utils/seat-change";
+import { getResultChanges, type resultChange } from "../../utils/seat-change";
+import { getAssignmentSteps, getRemovalSteps } from "../../utils/steps";
 import { render_title_and_header } from "../../utils/utils";
 import cls from "../Apportionment.module.css";
 import { ApportionmentError } from "../ApportionmentError";
@@ -57,19 +50,10 @@ export function ApportionmentResidualSeatsPage() {
     );
   }
   if (seatAssignment) {
-    const largestRemainderSteps = seatAssignment.steps.filter(isLargestRemainderAssignmentStep);
-    const uniqueHighestAverageSteps = seatAssignment.steps.filter(isUniqueHighestAverageAssignmentStep);
-    const highestAverageSteps = seatAssignment.steps.filter(isHighestAverageAssignmentStep);
-    const absoluteMajorityReassignment = seatAssignment.steps.find(isAbsoluteMajorityReassignmentStep);
-    const listExhaustionSteps = seatAssignment.steps.filter(isListExhaustionRemovalStep);
-    const fullSeatRemovalSteps = listExhaustionSteps.filter((step) => step.change.full_seat);
-    const residualSeatRemovalSteps = listExhaustionSteps.filter((step) => !step.change.full_seat);
-    const uniquePgNumbersWithFullSeatsRemoved: number[] = [];
-    fullSeatRemovalSteps.forEach((step) => {
-      if (!uniquePgNumbersWithFullSeatsRemoved.includes(step.change.pg_retracted_seat)) {
-        uniquePgNumbersWithFullSeatsRemoved.push(step.change.pg_retracted_seat);
-      }
-    });
+    const [largestRemainderSteps, uniqueHighestAverageSteps, highestAverageSteps, absoluteMajorityReassignment] =
+      getAssignmentSteps(seatAssignment);
+    const [, residualSeatRemovalSteps, uniquePgNumbersWithFullSeatsRemoved] = getRemovalSteps(seatAssignment);
+
     const resultChanges: resultChange[] = getResultChanges(
       absoluteMajorityReassignment,
       uniquePgNumbersWithFullSeatsRemoved,

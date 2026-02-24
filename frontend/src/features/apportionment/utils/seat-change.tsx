@@ -1,14 +1,7 @@
 import type { JSX } from "react/jsx-runtime";
 
-import type {
-  AbsoluteMajorityReassignedSeat,
-  HighestAverageAssignedSeat,
-  LargestRemainderAssignedSeat,
-  ListExhaustionRemovedSeat,
-  SeatChangeStep,
-} from "@/types/generated/openapi";
-
 import cls from "../components/Apportionment.module.css";
+import type { AbsoluteMajorityReassignmentStep, ListExhaustionRemovalStep } from "./steps";
 
 export interface resultChange {
   pgNumber: number;
@@ -21,7 +14,7 @@ export interface resultChange {
 export function getResultChanges(
   absoluteMajorityReassignment: AbsoluteMajorityReassignmentStep | undefined,
   uniquePgNumbersWithFullSeatsRemoved: number[],
-  residualSeatRemovalSteps: ListExhaustionRemovalStep[],
+  residualSeatRemovalSteps: ListExhaustionRemovalStep[] | undefined,
 ) {
   const resultChanges: resultChange[] = [];
   let footnoteNumber = 0;
@@ -52,7 +45,7 @@ export function getResultChanges(
       type: "residual_seat",
     });
   }
-  residualSeatRemovalSteps.forEach((step) => {
+  residualSeatRemovalSteps?.forEach((step) => {
     footnoteNumber += 1;
     resultChanges.push({
       pgNumber: step.change.pg_retracted_seat,
@@ -63,32 +56,6 @@ export function getResultChanges(
     });
   });
   return resultChanges;
-}
-
-export type HighestAverageAssignmentStep = SeatChangeStep & { change: HighestAverageAssignedSeat };
-export type UniqueHighestAverageAssignmentStep = SeatChangeStep & { change: HighestAverageAssignedSeat };
-export type LargestRemainderAssignmentStep = SeatChangeStep & { change: LargestRemainderAssignedSeat };
-export type AbsoluteMajorityReassignmentStep = SeatChangeStep & { change: AbsoluteMajorityReassignedSeat };
-export type ListExhaustionRemovalStep = SeatChangeStep & { change: ListExhaustionRemovedSeat };
-
-export function isHighestAverageAssignmentStep(step: SeatChangeStep): step is HighestAverageAssignmentStep {
-  return step.change.changed_by === "HighestAverageAssignment";
-}
-
-export function isUniqueHighestAverageAssignmentStep(step: SeatChangeStep): step is UniqueHighestAverageAssignmentStep {
-  return step.change.changed_by === "UniqueHighestAverageAssignment";
-}
-
-export function isLargestRemainderAssignmentStep(step: SeatChangeStep): step is LargestRemainderAssignmentStep {
-  return step.change.changed_by === "LargestRemainderAssignment";
-}
-
-export function isAbsoluteMajorityReassignmentStep(step: SeatChangeStep): step is AbsoluteMajorityReassignmentStep {
-  return step.change.changed_by === "AbsoluteMajorityReassignment";
-}
-
-export function isListExhaustionRemovalStep(step: SeatChangeStep): step is ListExhaustionRemovalStep {
-  return step.change.changed_by === "ListExhaustionRemoval";
 }
 
 export function getFootnotes(pgResultChanges: resultChange[]) {

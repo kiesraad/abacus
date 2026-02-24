@@ -10,7 +10,7 @@ import type {
   SeatChangeStep,
 } from "@/types/generated/openapi";
 
-import type { LargestRemainderAssignmentStep, UniqueHighestAverageAssignmentStep } from "../utils/seat-change";
+import type { LargestRemainderAssignmentStep, UniqueHighestAverageAssignmentStep } from "../utils/steps";
 
 export const largest_remainder_steps: LargestRemainderAssignmentStep[] = [
   {

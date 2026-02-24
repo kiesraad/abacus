@@ -1,7 +1,7 @@
 import { t } from "@/i18n/translate";
 import type { SeatAssignmentResult } from "@/types/generated/openapi";
 import { cn } from "@/utils/classnames";
-import type { AbsoluteMajorityReassignmentStep, ListExhaustionRemovalStep } from "../../utils/seat-change";
+import type { AbsoluteMajorityReassignmentStep, ListExhaustionRemovalStep } from "../../utils/steps";
 import cls from "../Apportionment.module.css";
 
 interface FootnotesProps {

@@ -5,7 +5,8 @@ import { t, tx } from "@/i18n/translate";
 import { cn } from "@/utils/classnames";
 
 import { useApportionmentContext } from "../../hooks/useApportionmentContext";
-import { isListExhaustionRemovalStep, type resultChange } from "../../utils/seat-change";
+import type { resultChange } from "../../utils/seat-change";
+import { getRemovalSteps } from "../../utils/steps";
 import { render_title_and_header } from "../../utils/utils";
 import cls from "../Apportionment.module.css";
 import { ApportionmentError } from "../ApportionmentError";
@@ -29,8 +30,7 @@ export function ApportionmentFullSeatsPage() {
     );
   }
   if (seatAssignment) {
-    const listExhaustionSteps = seatAssignment.steps.filter(isListExhaustionRemovalStep);
-    const fullSeatRemovalSteps = listExhaustionSteps.filter((step) => step.change.full_seat);
+    const [fullSeatRemovalSteps, ,] = getRemovalSteps(seatAssignment);
     const resultChanges: resultChange[] = [];
     fullSeatRemovalSteps.forEach((step, index) => {
       const footnoteNumber = index + 1;

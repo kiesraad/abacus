@@ -105,7 +105,7 @@ impl AirgapDetection {
         };
 
         let Some(pool) = &self.pool else {
-            error!("Failed to acquire database connection for air gap status logging");
+            error!("Cannot log airgap status, database pool not initialised yet");
             return;
         };
 

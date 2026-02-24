@@ -3,7 +3,7 @@ import { t } from "@/i18n/translate";
 import type { Fraction, PoliticalGroup, PoliticalGroupSeatAssignment } from "@/types/generated/openapi";
 import { cn } from "@/utils/classnames";
 
-import { getFootnotes, type resultChange } from "../../utils/seat-change";
+import { getFootnotesFromResultChanges, type resultChange } from "../../utils/seat-change";
 import cls from "../Apportionment.module.css";
 
 interface FullSeatsTableProps {
@@ -40,7 +40,7 @@ export function FullSeatsTable({ finalStanding, politicalGroups, quota, resultCh
               <Table.Cell>=</Table.Cell>
               <Table.NumberCell className="bold">
                 {pgResultChanges.length > 0 && <s>{standing.full_seats + pgResultChanges.length}</s>}{" "}
-                {getFootnotes(pgResultChanges)} {standing.full_seats}
+                {getFootnotesFromResultChanges(pgResultChanges)} {standing.full_seats}
               </Table.NumberCell>
             </Table.Row>
           );

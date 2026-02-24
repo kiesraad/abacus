@@ -12,9 +12,9 @@ export interface resultChange {
 }
 
 export function getResultChanges(
-  absoluteMajorityReassignment: AbsoluteMajorityReassignmentStep | undefined,
   uniquePgNumbersWithFullSeatsRemoved: number[],
-  residualSeatRemovalSteps: ListExhaustionRemovalStep[] | undefined,
+  absoluteMajorityReassignment?: AbsoluteMajorityReassignmentStep,
+  residualSeatRemovalSteps?: ListExhaustionRemovalStep[],
 ) {
   const resultChanges: resultChange[] = [];
   let footnoteNumber = 0;
@@ -58,7 +58,7 @@ export function getResultChanges(
   return resultChanges;
 }
 
-export function getFootnotes(pgResultChanges: resultChange[]) {
+export function getFootnotesFromResultChanges(pgResultChanges: resultChange[]) {
   const footnoteNumbers = pgResultChanges.map((pgResultChange) => pgResultChange.footnoteNumber);
   const footnoteLinks: JSX.Element[] = [];
   footnoteNumbers.forEach((footnoteNumber, index) => {
@@ -66,7 +66,7 @@ export function getFootnotes(pgResultChanges: resultChange[]) {
       footnoteLinks.push(<span key={`comma-${footnoteNumber}`}>,</span>);
     }
     footnoteLinks.push(
-      <a href={`#footnote-${footnoteNumber}`} key={`footnoteLink-${footnoteNumber}`}>
+      <a href={"#footnotes-list"} key={`footnoteLink-${footnoteNumber}`}>
         {footnoteNumber}
       </a>,
     );

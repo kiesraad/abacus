@@ -2,18 +2,135 @@ import { NotFoundError } from "@/api/ApiResult";
 import { useElection } from "@/hooks/election/useElection";
 import { useNumericParam } from "@/hooks/useNumericParam";
 import { t, tx } from "@/i18n/translate";
+import type { Candidate, CandidateVotes } from "@/types/generated/openapi";
 import { cn } from "@/utils/classnames";
 import { formatPoliticalGroupName } from "@/utils/politicalGroup";
-
 import { useApportionmentContext } from "../../hooks/useApportionmentContext";
 import { render_title_and_header } from "../../utils/utils";
 import cls from "../Apportionment.module.css";
-import { ApportionmentError } from "../ApportionmentError";
+import { ApportionmentErrorPage } from "../ApportionmentError";
 import { CandidatesRankingTable } from "./CandidatesRankingTable";
 import { CandidatesWithVotesTable } from "./CandidatesWithVotesTable";
 
-// biome-ignore lint/complexity/noExcessiveLinesPerFunction: TODO function should be refactored
-// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: TODO function should be refactored
+interface PreferentiallyChosenCandidatesSectionProps {
+  preferentialCandidateNomination: CandidateVotes[];
+  preferenceThresholdPercentage: number;
+  candidates: Candidate[];
+}
+
+function PreferentiallyChosenCandidatesSection({
+  preferentialCandidateNomination,
+  preferenceThresholdPercentage,
+  candidates,
+}: PreferentiallyChosenCandidatesSectionProps) {
+  return (
+    <div className={cn(cls.tableDiv, "mb-lg")}>
+      <div>
+        <h2 className={cls.tableTitle}>{t("apportionment.preferentially_chosen_candidates")}</h2>
+        {preferentialCandidateNomination.length > 0 ? (
+          <>
+            <span id="text-preferentially-chosen-candidates" className={cls.tableInformation}>
+              {t("apportionment.preferentially_chosen_candidates_info", {
+                percentage: preferenceThresholdPercentage,
+              })}
+            </span>
+            <CandidatesWithVotesTable
+              id="preferentially-chosen-candidates-table"
+              showNumber={false}
+              showLocality={true}
+              candidateList={candidates}
+              candidateVotesList={preferentialCandidateNomination}
+            />
+          </>
+        ) : (
+          <span id="text-preferentially-chosen-candidates">
+            {t("apportionment.preferentially_chosen_candidates_empty", {
+              percentage: preferenceThresholdPercentage,
+            })}
+          </span>
+        )}
+      </div>
+    </div>
+  );
+}
+
+interface OtherChosenCandidatesSectionProps {
+  otherCandidateNomination: CandidateVotes[];
+  candidates: Candidate[];
+}
+
+function OtherChosenCandidatesSection({ otherCandidateNomination, candidates }: OtherChosenCandidatesSectionProps) {
+  return (
+    <div className={cn(cls.tableDiv, "mb-lg")}>
+      <div>
+        <h2 className={cls.tableTitle}>{t("apportionment.other_chosen_candidates")}</h2>
+        {otherCandidateNomination.length > 0 ? (
+          <>
+            <span id="text-other-chosen-candidates" className={cls.tableInformation}>
+              {t("apportionment.other_chosen_candidates_info")}
+            </span>
+            <CandidatesWithVotesTable
+              id="other-chosen-candidates-table"
+              showNumber={false}
+              showLocality={true}
+              candidateList={candidates}
+              candidateVotesList={otherCandidateNomination}
+            />
+          </>
+        ) : (
+          <span id="text-other-chosen-candidates">{t("apportionment.other_chosen_candidates_empty")}</span>
+        )}
+      </div>
+    </div>
+  );
+}
+
+interface UpdatedCandidateRankingSectionProps {
+  updatedCandidateRanking: Candidate[];
+}
+
+function UpdatedCandidateRankingSection({ updatedCandidateRanking }: UpdatedCandidateRankingSectionProps) {
+  return (
+    <div className={cn(cls.tableDiv, "mb-lg")}>
+      <div>
+        <h2 className={cls.tableTitle}>{t("apportionment.ranking_candidates")}</h2>
+        {updatedCandidateRanking.length > 0 ? (
+          <>
+            <span id="text-ranking-candidates" className={cls.tableInformation}>
+              {t("apportionment.ranking_candidates_info")}
+            </span>
+            <CandidatesRankingTable candidateRanking={updatedCandidateRanking} />
+          </>
+        ) : (
+          <span id="text-ranking-candidates">{t("apportionment.ranking_candidates_empty")}</span>
+        )}
+      </div>
+    </div>
+  );
+}
+
+interface TotalVotesPerCandidateSectionProps {
+  candidateVotesList: CandidateVotes[];
+  candidates: Candidate[];
+}
+
+function TotalVotesPerCandidateSection({ candidateVotesList, candidates }: TotalVotesPerCandidateSectionProps) {
+  return (
+    <div className={cn(cls.tableDiv, "mb-lg")}>
+      <div>
+        <h2 className={cls.tableTitle}>{t("apportionment.total_number_votes_per_candidate")}</h2>
+        <CandidatesWithVotesTable
+          id="total-votes-per-candidate-table"
+          showNumber={true}
+          showLocality={false}
+          candidateList={candidates}
+          candidateVotesList={candidateVotesList}
+        />
+      </div>
+    </div>
+  );
+}
+
 export function ApportionmentListDetailsPage() {
   const { election } = useElection();
   const { seatAssignment, candidateNomination, electionSummary, error } = useApportionmentContext();
@@ -28,16 +145,7 @@ export function ApportionmentListDetailsPage() {
   const pgName = formatPoliticalGroupName(pg);
 
   if (error) {
-    return (
-      <>
-        {render_title_and_header(pgName)}
-        <main>
-          <article>
-            <ApportionmentError error={error} />
-          </article>
-        </main>
-      </>
-    );
+    return <ApportionmentErrorPage sectionTitle={pgName} error={error} />;
   }
   if (seatAssignment && candidateNomination && electionSummary) {
     const pgTotalSeats = seatAssignment.final_standing[pg.number - 1]?.total_seats;
@@ -45,10 +153,6 @@ export function ApportionmentListDetailsPage() {
     const pgCandidateNomination = candidateNomination.political_group_candidate_nomination[pg.number - 1];
 
     if (pgTotalSeats !== undefined && candidateVotesList && pgCandidateNomination) {
-      const updatedCandidateRanking = pgCandidateNomination.updated_candidate_ranking;
-      const preferentialCandidateNomination = pgCandidateNomination.preferential_candidate_nomination;
-      const otherCandidateNomination = pgCandidateNomination.other_candidate_nomination;
-
       return (
         <>
           {render_title_and_header(pgName)}
@@ -69,81 +173,19 @@ export function ApportionmentListDetailsPage() {
                   </span>
                 </div>
               </div>
-              <div className={cn(cls.tableDiv, "mb-lg")}>
-                <div>
-                  <h2 className={cls.tableTitle}>{t("apportionment.preferentially_chosen_candidates")}</h2>
-                  {preferentialCandidateNomination.length > 0 ? (
-                    <>
-                      <span id="text-preferentially-chosen-candidates" className={cls.tableInformation}>
-                        {t("apportionment.preferentially_chosen_candidates_info", {
-                          percentage: candidateNomination.preference_threshold.percentage,
-                        })}
-                      </span>
-                      <CandidatesWithVotesTable
-                        id="preferentially-chosen-candidates-table"
-                        showNumber={false}
-                        showLocality={true}
-                        candidateList={pg.candidates}
-                        candidateVotesList={preferentialCandidateNomination}
-                      />
-                    </>
-                  ) : (
-                    <span id="text-preferentially-chosen-candidates">
-                      {t("apportionment.preferentially_chosen_candidates_empty", {
-                        percentage: candidateNomination.preference_threshold.percentage,
-                      })}
-                    </span>
-                  )}
-                </div>
-              </div>
-              <div className={cn(cls.tableDiv, "mb-lg")}>
-                <div>
-                  <h2 className={cls.tableTitle}>{t("apportionment.other_chosen_candidates")}</h2>
-                  {otherCandidateNomination.length > 0 ? (
-                    <>
-                      <span id="text-other-chosen-candidates" className={cls.tableInformation}>
-                        {t("apportionment.other_chosen_candidates_info")}
-                      </span>
-                      <CandidatesWithVotesTable
-                        id="other-chosen-candidates-table"
-                        showNumber={false}
-                        showLocality={true}
-                        candidateList={pg.candidates}
-                        candidateVotesList={otherCandidateNomination}
-                      />
-                    </>
-                  ) : (
-                    <span id="text-other-chosen-candidates">{t("apportionment.other_chosen_candidates_empty")}</span>
-                  )}
-                </div>
-              </div>
-              <div className={cn(cls.tableDiv, "mb-lg")}>
-                <div>
-                  <h2 className={cls.tableTitle}>{t("apportionment.ranking_candidates")}</h2>
-                  {updatedCandidateRanking.length > 0 ? (
-                    <>
-                      <span id="text-ranking-candidates" className={cls.tableInformation}>
-                        {t("apportionment.ranking_candidates_info")}
-                      </span>
-                      <CandidatesRankingTable candidateRanking={updatedCandidateRanking} />
-                    </>
-                  ) : (
-                    <span id="text-ranking-candidates">{t("apportionment.ranking_candidates_empty")}</span>
-                  )}
-                </div>
-              </div>
-              <div className={cn(cls.tableDiv, "mb-lg")}>
-                <div>
-                  <h2 className={cls.tableTitle}>{t("apportionment.total_number_votes_per_candidate")}</h2>
-                  <CandidatesWithVotesTable
-                    id="total-votes-per-candidate-table"
-                    showNumber={true}
-                    showLocality={false}
-                    candidateList={pg.candidates}
-                    candidateVotesList={candidateVotesList}
-                  />
-                </div>
-              </div>
+              <PreferentiallyChosenCandidatesSection
+                preferentialCandidateNomination={pgCandidateNomination.preferential_candidate_nomination}
+                preferenceThresholdPercentage={candidateNomination.preference_threshold.percentage}
+                candidates={pg.candidates}
+              />
+              <OtherChosenCandidatesSection
+                otherCandidateNomination={pgCandidateNomination.other_candidate_nomination}
+                candidates={pg.candidates}
+              />
+              <UpdatedCandidateRankingSection
+                updatedCandidateRanking={pgCandidateNomination.updated_candidate_ranking}
+              />
+              <TotalVotesPerCandidateSection candidates={pg.candidates} candidateVotesList={candidateVotesList} />
             </article>
           </main>
         </>

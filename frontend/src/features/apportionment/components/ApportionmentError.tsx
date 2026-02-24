@@ -2,6 +2,7 @@ import type { ApiError } from "@/api/ApiResult";
 import { Alert } from "@/components/ui/Alert/Alert";
 import { FormLayout } from "@/components/ui/Form/FormLayout";
 import { t } from "@/i18n/translate";
+import { render_title_and_header } from "../utils/utils";
 
 interface ApportionmentErrorProps {
   error: ApiError;
@@ -18,5 +19,23 @@ export function ApportionmentError({ error }: ApportionmentErrorProps) {
         <p>{t(`error.api_error.${error.reference}`)}</p>
       </Alert>
     </FormLayout.Alert>
+  );
+}
+
+interface ApportionmentErrorPageProps {
+  sectionTitle: string;
+  error: ApiError;
+}
+
+export function ApportionmentErrorPage({ sectionTitle, error }: ApportionmentErrorPageProps) {
+  return (
+    <>
+      {render_title_and_header(sectionTitle)}
+      <main>
+        <article>
+          <ApportionmentError error={error} />
+        </article>
+      </main>
+    </>
   );
 }

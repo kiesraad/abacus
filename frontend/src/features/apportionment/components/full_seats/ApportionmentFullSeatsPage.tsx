@@ -9,7 +9,7 @@ import type { resultChange } from "../../utils/seat-change";
 import { getRemovalSteps } from "../../utils/steps";
 import { render_title_and_header } from "../../utils/utils";
 import cls from "../Apportionment.module.css";
-import { ApportionmentError } from "../ApportionmentError";
+import { ApportionmentErrorPage } from "../ApportionmentError";
 import { FullSeatsTable } from "./FullSeatsTable";
 import { ResidualSeatsCalculationTable } from "./ResidualSeatsCalculationTable";
 
@@ -18,16 +18,7 @@ export function ApportionmentFullSeatsPage() {
   const { seatAssignment, error } = useApportionmentContext();
 
   if (error) {
-    return (
-      <>
-        {render_title_and_header(t("apportionment.details_full_seats"))}
-        <main>
-          <article>
-            <ApportionmentError error={error} />
-          </article>
-        </main>
-      </>
-    );
+    return <ApportionmentErrorPage sectionTitle={t("apportionment.details_full_seats")} error={error} />;
   }
   if (seatAssignment) {
     const [fullSeatRemovalSteps, ,] = getRemovalSteps(seatAssignment);
@@ -59,24 +50,19 @@ export function ApportionmentFullSeatsPage() {
                 />
               </div>
               {fullSeatRemovalSteps.length > 0 && (
-                <div className={cls.footnoteDiv}>
+                <ol id="footnotes-list" className={cn(cls.footnotesList, "w-39")}>
                   {fullSeatRemovalSteps.map((pgSeatRemoval, index) => {
-                    const footnoteNumber = index + 1;
                     return (
-                      <div className="w-39" key={`step-${footnoteNumber}`}>
-                        <span id={`${footnoteNumber}-list-exhaustion-information`}>
-                          <sup id={`footnote-${footnoteNumber}`} className={cls.footnoteNumber}>
-                            {footnoteNumber}
-                          </sup>{" "}
-                          {t("apportionment.list_exhaustion_full_seat_removal", {
-                            pg_retracted_seat: pgSeatRemoval.change.pg_retracted_seat,
-                          })}
-                          {index === 0 && ` ${t("apportionment.article_p10")}`}
-                        </span>
-                      </div>
+                      // biome-ignore lint/suspicious/noArrayIndexKey: we can use the index as key since there is no unique id
+                      <li key={index} id={`step-${index + 1}-list-exhaustion-information`}>
+                        {t("apportionment.list_exhaustion_full_seat_removal", {
+                          pg_retracted_seat: pgSeatRemoval.change.pg_retracted_seat,
+                        })}
+                        {index === 0 && ` ${t("apportionment.article_p10")}`}
+                      </li>
                     );
                   })}
-                </div>
+                </ol>
               )}
             </div>
             <div className={cn(cls.tableDiv, "mb-lg")}>

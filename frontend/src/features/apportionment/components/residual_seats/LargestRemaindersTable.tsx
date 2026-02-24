@@ -3,7 +3,7 @@ import { t } from "@/i18n/translate";
 import type { PoliticalGroup, PoliticalGroupSeatAssignment } from "@/types/generated/openapi";
 import { cn } from "@/utils/classnames";
 
-import { getFootnotes, type resultChange } from "../../utils/seat-change";
+import { getFootnotesFromResultChanges, type resultChange } from "../../utils/seat-change";
 import type { LargestRemainderAssignmentStep } from "../../utils/steps";
 import cls from "../Apportionment.module.css";
 
@@ -55,11 +55,12 @@ export function LargestRemaindersTable({
               </Table.Cell>
               <Table.Cell>{politicalGroups[pgSeatAssignment.pg_number - 1]?.name || ""}</Table.Cell>
               <Table.NumberCell className="bold">
-                {pgFullSeatsNotes.length > 0 && getFootnotes(pgFullSeatsNotes)} {pgSeatAssignment.full_seats}
+                {pgFullSeatsNotes.length > 0 && getFootnotesFromResultChanges(pgFullSeatsNotes)}{" "}
+                {pgSeatAssignment.full_seats}
               </Table.NumberCell>
               <Table.DisplayFractionCells>{pgSeatAssignment.remainder_votes}</Table.DisplayFractionCells>
               <Table.NumberCell className="bold">
-                {getFootnotes(pgResultChanges)} {residualSeats}
+                {getFootnotesFromResultChanges(pgResultChanges)} {residualSeats}
               </Table.NumberCell>
             </Table.Row>
           );

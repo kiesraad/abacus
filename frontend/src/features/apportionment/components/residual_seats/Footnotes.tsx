@@ -1,3 +1,4 @@
+import type { ReactElement } from "react";
 import { t } from "@/i18n/translate";
 import type { SeatAssignmentResult } from "@/types/generated/openapi";
 import { cn } from "@/utils/classnames";
@@ -16,7 +17,7 @@ export function Footnotes({
   seatAssignment,
   absoluteMajorityReassignment,
   residualSeatRemovalSteps,
-}: FootnotesProps) {
+}: FootnotesProps): ReactElement {
   return (
     <ol id="footnotes-list" className={cn(cls.footnotesList, "w-39")}>
       {uniquePgNumbersWithFullSeatsRemoved.map((pgNumber) => {

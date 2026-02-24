@@ -1,9 +1,6 @@
 use std::collections::HashMap;
 
-use apportionment::{
-    ApportionmentError, ApportionmentInput, CandidateNominationResult, CandidateVotesTrait,
-    ListVotesTrait, PreferenceThreshold, SeatAssignmentResult,
-};
+use apportionment::{ApportionmentError, ApportionmentInput, CandidateVotesTrait, ListVotesTrait};
 use axum::{
     Json,
     extract::{Path, State},
@@ -20,6 +17,7 @@ use crate::{
     domain::{
         data_entry::{CandidateVotes, PoliticalGroupCandidateVotes},
         data_entry_status::DataEntryStatusName,
+        display_fraction::DisplayFraction,
         election::{Candidate, CandidateNumber, ElectionId, PGNumber, PoliticalGroup},
         summary::ElectionSummary,
     },
@@ -138,17 +136,14 @@ async fn election_apportionment(
             )
             .await?;
 
-        let result = ElectionApportionmentResponse {
-            seat_assignment: result.seat_assignment,
+        Ok(Json(ElectionApportionmentResponse {
+            seat_assignment: map_seat_assignment(result.seat_assignment),
             candidate_nomination: map_candidate_nomination(
                 result.candidate_nomination,
                 election.political_groups,
             ),
             summary,
-        };
-        tracing::debug!("Apportionment response: {:?}", result);
-
-        Ok(Json(result))
+        }))
     } else {
         Err(APIError::Apportionment(
             ApportionmentError::ApportionmentNotAvailableUntilDataEntryFinalised,
@@ -158,20 +153,104 @@ async fn election_apportionment(
 
 #[derive(Debug, Serialize, ToSchema)]
 struct ElectionApportionmentResponse {
-    pub seat_assignment: SeatAssignmentResult<PoliticalGroupCandidateVotes>,
-    pub candidate_nomination: CandidateNominationResponse,
+    pub seat_assignment: SeatAssignment,
+    pub candidate_nomination: CandidateNomination,
     pub summary: ElectionSummary,
 }
 
 #[derive(Debug, Serialize, ToSchema)]
-pub struct CandidateNominationResponse {
-    pub preference_threshold: PreferenceThreshold,
-    pub chosen_candidates: Vec<Candidate>,
-    pub list_candidate_nomination: Vec<ListCandidateNominationResponse>,
+struct SeatAssignment {
+    pub seats: u32,
+    pub full_seats: u32,
+    pub residual_seats: u32,
+    pub quota: DisplayFraction,
+    pub steps: Vec<SeatChangeStep>,
+    pub final_standing: Vec<ListSeatAssignment>,
 }
 
 #[derive(Debug, Serialize, ToSchema)]
-pub struct ListCandidateNominationResponse {
+pub struct SeatChangeStep {
+    pub residual_seat_number: Option<u32>,
+    pub change: SeatChange,
+    pub standings: Vec<ListStanding>,
+}
+
+#[derive(Debug, Serialize, ToSchema)]
+#[serde(deny_unknown_fields, tag = "changed_by")]
+pub enum SeatChange {
+    HighestAverageAssignment(HighestAverageAssignedSeat),
+    UniqueHighestAverageAssignment(HighestAverageAssignedSeat),
+    LargestRemainderAssignment(LargestRemainderAssignedSeat),
+    AbsoluteMajorityReassignment(AbsoluteMajorityReassignedSeat),
+    ListExhaustionRemoval(ListExhaustionRemovedSeat),
+}
+
+#[derive(Debug, Serialize, ToSchema)]
+pub struct HighestAverageAssignedSeat {
+    pub selected_list_number: PGNumber,
+    pub list_options: Vec<PGNumber>,
+    pub list_assigned: Vec<PGNumber>,
+    pub list_exhausted: Vec<PGNumber>,
+    pub votes_per_seat: DisplayFraction,
+}
+
+#[derive(Debug, Serialize, ToSchema)]
+pub struct LargestRemainderAssignedSeat {
+    pub selected_list_number: PGNumber,
+    pub list_options: Vec<PGNumber>,
+    pub list_assigned: Vec<PGNumber>,
+    pub remainder_votes: DisplayFraction,
+}
+
+#[derive(Debug, Serialize, ToSchema)]
+pub struct AbsoluteMajorityReassignedSeat {
+    pub list_retracted_seat: PGNumber,
+    pub list_assigned_seat: PGNumber,
+}
+
+#[derive(Debug, Serialize, ToSchema)]
+pub struct ListExhaustionRemovedSeat {
+    pub list_retracted_seat: PGNumber,
+    pub full_seat: bool,
+}
+
+#[derive(Debug, Serialize, ToSchema)]
+pub struct ListStanding {
+    pub list_number: PGNumber,
+    pub votes_cast: u64,
+    pub remainder_votes: DisplayFraction,
+    pub meets_remainder_threshold: bool,
+    pub next_votes_per_seat: DisplayFraction,
+    pub full_seats: u32,
+    pub residual_seats: u32,
+}
+
+#[derive(Debug, Serialize, ToSchema)]
+struct ListSeatAssignment {
+    pub list_number: PGNumber,
+    pub votes_cast: u64,
+    pub remainder_votes: DisplayFraction,
+    pub meets_remainder_threshold: bool,
+    pub full_seats: u32,
+    pub residual_seats: u32,
+    pub total_seats: u32,
+}
+
+#[derive(Debug, Serialize, ToSchema)]
+pub struct CandidateNomination {
+    pub preference_threshold: PreferenceThreshold,
+    pub chosen_candidates: Vec<Candidate>,
+    pub list_candidate_nomination: Vec<ListCandidateNomination>,
+}
+
+#[derive(Debug, Serialize, ToSchema)]
+pub struct PreferenceThreshold {
+    pub percentage: u64,
+    pub number_of_votes: DisplayFraction,
+}
+
+#[derive(Debug, Serialize, ToSchema)]
+pub struct ListCandidateNomination {
     pub list_number: PGNumber,
     pub list_name: String,
     pub list_seats: u32,
@@ -180,37 +259,119 @@ pub struct ListCandidateNominationResponse {
     pub updated_candidate_ranking: Vec<Candidate>,
 }
 
-/// Maps the apportionment output with candidate and list information
+impl From<apportionment::SeatChange<PGNumber>> for SeatChange {
+    fn from(change: apportionment::SeatChange<PGNumber>) -> Self {
+        use apportionment::SeatChange::*;
+
+        let as_highest_avg =
+            |c: apportionment::HighestAverageAssignedSeat<PGNumber>| HighestAverageAssignedSeat {
+                selected_list_number: c.selected_list_number,
+                list_options: c.list_options,
+                list_assigned: c.list_assigned,
+                list_exhausted: c.list_exhausted,
+                votes_per_seat: DisplayFraction::from(c.votes_per_seat),
+            };
+
+        match change {
+            HighestAverageAssignment(c) => SeatChange::HighestAverageAssignment(as_highest_avg(c)),
+            UniqueHighestAverageAssignment(c) => {
+                SeatChange::UniqueHighestAverageAssignment(as_highest_avg(c))
+            }
+            LargestRemainderAssignment(c) => {
+                SeatChange::LargestRemainderAssignment(LargestRemainderAssignedSeat {
+                    selected_list_number: c.selected_list_number,
+                    list_options: c.list_options,
+                    list_assigned: c.list_assigned,
+                    remainder_votes: DisplayFraction::from(c.remainder_votes),
+                })
+            }
+            AbsoluteMajorityReassignment(c) => {
+                SeatChange::AbsoluteMajorityReassignment(AbsoluteMajorityReassignedSeat {
+                    list_retracted_seat: c.list_retracted_seat,
+                    list_assigned_seat: c.list_assigned_seat,
+                })
+            }
+            ListExhaustionRemoval(c) => {
+                SeatChange::ListExhaustionRemoval(ListExhaustionRemovedSeat {
+                    list_retracted_seat: c.list_retracted_seat,
+                    full_seat: c.full_seat,
+                })
+            }
+        }
+    }
+}
+
+impl From<apportionment::SeatChangeStep<PGNumber>> for SeatChangeStep {
+    fn from(step: apportionment::SeatChangeStep<PGNumber>) -> Self {
+        SeatChangeStep {
+            residual_seat_number: step.residual_seat_number,
+            change: step.change.into(),
+            standings: step
+                .standings
+                .into_iter()
+                .map(|standing| ListStanding {
+                    list_number: standing.list_number,
+                    votes_cast: standing.votes_cast,
+                    remainder_votes: DisplayFraction::from(standing.remainder_votes),
+                    meets_remainder_threshold: standing.meets_remainder_threshold,
+                    next_votes_per_seat: DisplayFraction::from(standing.next_votes_per_seat),
+                    full_seats: standing.full_seats,
+                    residual_seats: standing.residual_seats,
+                })
+                .collect(),
+        }
+    }
+}
+
+fn map_seat_assignment(
+    sa: apportionment::SeatAssignmentResult<PoliticalGroupCandidateVotes>,
+) -> SeatAssignment {
+    SeatAssignment {
+        seats: sa.seats,
+        full_seats: sa.full_seats,
+        residual_seats: sa.residual_seats,
+        quota: DisplayFraction::from(sa.quota),
+        steps: sa.steps.into_iter().map(Into::into).collect(),
+        final_standing: sa
+            .final_standing
+            .into_iter()
+            .map(|standing| ListSeatAssignment {
+                list_number: standing.list_number,
+                votes_cast: standing.votes_cast,
+                remainder_votes: DisplayFraction::from(standing.remainder_votes),
+                meets_remainder_threshold: standing.meets_remainder_threshold,
+                full_seats: standing.full_seats,
+                residual_seats: standing.residual_seats,
+                total_seats: standing.total_seats,
+            })
+            .collect(),
+    }
+}
+
 fn map_candidate_nomination(
-    nomination: CandidateNominationResult<'_, PoliticalGroupCandidateVotes>,
+    cn: apportionment::CandidateNominationResult<'_, PoliticalGroupCandidateVotes>,
     political_groups: Vec<PoliticalGroup>,
-) -> CandidateNominationResponse {
-    // Build lookups political_groups
+) -> CandidateNomination {
     let mut list_names: HashMap<PGNumber, String> = HashMap::new();
     let mut candidate_map: HashMap<(PGNumber, CandidateNumber), Candidate> = HashMap::new();
     for list in political_groups {
-        list_names.insert(list.number, list.name);
-
-        for candidate in list.candidates {
-            candidate_map.insert((list.number, candidate.number), candidate);
+        for candidate in &list.candidates {
+            candidate_map.insert((list.number, candidate.number), candidate.clone());
         }
+        list_names.insert(list.number, list.name);
     }
 
-    // Map chosen_candidates
-    let mut chosen_candidates: Vec<Candidate> = nomination
+    let mut chosen_candidates: Vec<Candidate> = cn
         .chosen_candidates
         .iter()
         .map(|c| candidate_map[&(c.list_number, c.candidate_number)].clone())
         .collect();
-
-    // Sort chosen_candidates on last_name
     chosen_candidates.sort_by(|a, b| a.last_name.cmp(&b.last_name));
 
-    // Map list_names and candidates
-    let list_candidate_nomination: Vec<ListCandidateNominationResponse> = nomination
+    let list_candidate_nomination = cn
         .list_candidate_nomination
         .into_iter()
-        .map(|lcn| ListCandidateNominationResponse {
+        .map(|lcn| ListCandidateNomination {
             list_number: lcn.list_number,
             list_name: list_names
                 .remove(&lcn.list_number)
@@ -229,13 +390,17 @@ fn map_candidate_nomination(
             updated_candidate_ranking: lcn
                 .updated_candidate_ranking
                 .iter()
-                .map(|cn| candidate_map[&(lcn.list_number, *cn)].clone())
+                .map(|num| candidate_map[&(lcn.list_number, *num)].clone())
                 .collect(),
         })
         .collect();
 
-    CandidateNominationResponse {
-        preference_threshold: nomination.preference_threshold,
+    let threshold = cn.preference_threshold;
+    CandidateNomination {
+        preference_threshold: PreferenceThreshold {
+            percentage: threshold.percentage,
+            number_of_votes: DisplayFraction::from(threshold.number_of_votes),
+        },
         chosen_candidates,
         list_candidate_nomination,
     }

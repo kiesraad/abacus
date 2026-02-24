@@ -14,8 +14,8 @@ use super::{
     structs::{ApportionmentError, CandidateNominationInput, CandidateNominationInputType},
 };
 pub use structs::{
-    AbsoluteMajorityReassignedSeat, ListExhaustionRemovedSeat, ListStanding, SeatAssignmentResult,
-    SeatChange, SeatChangeStep,
+    AbsoluteMajorityReassignedSeat, HighestAverageAssignedSeat, ListExhaustionRemovedSeat,
+    ListStanding, SeatAssignmentResult, SeatChange, SeatChangeStep,
 };
 
 /// Seat assignment

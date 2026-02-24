@@ -4273,23 +4273,18 @@
   },
   "components": {
     "schemas": {
-      "AbsoluteMajorityReassignedSeat_PGNumber": {
+      "AbsoluteMajorityReassignedSeat": {
         "type": "object",
-        "description": "Contains information about the enactment of article P 9 of the Kieswet.",
         "required": [
           "list_retracted_seat",
           "list_assigned_seat"
         ],
         "properties": {
           "list_assigned_seat": {
-            "type": "integer",
-            "format": "int32",
-            "minimum": 0
+            "$ref": "#/components/schemas/PGNumber"
           },
           "list_retracted_seat": {
-            "type": "integer",
-            "format": "int32",
-            "minimum": 0
+            "$ref": "#/components/schemas/PGNumber"
           }
         }
       },
@@ -5433,7 +5428,7 @@
           "X"
         ]
       },
-      "CandidateNominationResponse": {
+      "CandidateNomination": {
         "type": "object",
         "required": [
           "preference_threshold",
@@ -5450,7 +5445,7 @@
           "list_candidate_nomination": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/ListCandidateNominationResponse"
+              "$ref": "#/components/schemas/ListCandidateNomination"
             }
           },
           "preference_threshold": {
@@ -5938,6 +5933,32 @@
         },
         "additionalProperties": false
       },
+      "DisplayFraction": {
+        "type": "object",
+        "description": "Fraction with the integer part split out for display purposes",
+        "required": [
+          "integer",
+          "numerator",
+          "denominator"
+        ],
+        "properties": {
+          "denominator": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 0
+          },
+          "integer": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 0
+          },
+          "numerator": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 0
+          }
+        }
+      },
       "Election": {
         "type": "object",
         "description": "Election without political groups",
@@ -6006,17 +6027,17 @@
         "required": [
           "seat_assignment",
           "candidate_nomination",
-          "summary"
+          "election_summary"
         ],
         "properties": {
           "candidate_nomination": {
-            "$ref": "#/components/schemas/CandidateNominationResponse"
+            "$ref": "#/components/schemas/CandidateNomination"
+          },
+          "election_summary": {
+            "$ref": "#/components/schemas/ElectionSummary"
           },
           "seat_assignment": {
-            "$ref": "#/components/schemas/SeatAssignmentResult_PoliticalGroupCandidateVotes"
-          },
-          "summary": {
-            "$ref": "#/components/schemas/ElectionSummary"
+            "$ref": "#/components/schemas/SeatAssignment"
           }
         }
       },
@@ -6635,26 +6656,6 @@
         "format": "int32",
         "minimum": 0
       },
-      "Fraction": {
-        "type": "object",
-        "description": "Implementation of a fraction with a numerator and a denominator.",
-        "required": [
-          "numerator",
-          "denominator"
-        ],
-        "properties": {
-          "denominator": {
-            "type": "integer",
-            "format": "int64",
-            "minimum": 0
-          },
-          "numerator": {
-            "type": "integer",
-            "format": "int64",
-            "minimum": 0
-          }
-        }
-      },
       "GSBElectionCreationRequest": {
         "type": "object",
         "required": [
@@ -6834,9 +6835,8 @@
           }
         }
       },
-      "HighestAverageAssignedSeat_PGNumber": {
+      "HighestAverageAssignedSeat": {
         "type": "object",
-        "description": "Contains the details for an assigned seat, assigned through the highest average method.",
         "required": [
           "selected_list_number",
           "list_options",
@@ -6848,38 +6848,26 @@
           "list_assigned": {
             "type": "array",
             "items": {
-              "type": "integer",
-              "format": "int32",
-              "minimum": 0
-            },
-            "description": "Collection of lists with the same average, that have been assigned a seat"
+              "$ref": "#/components/schemas/PGNumber"
+            }
           },
           "list_exhausted": {
             "type": "array",
             "items": {
-              "type": "integer",
-              "format": "int32",
-              "minimum": 0
-            },
-            "description": "Collection of lists that are exhausted, and will not be assigned a seat"
+              "$ref": "#/components/schemas/PGNumber"
+            }
           },
           "list_options": {
             "type": "array",
             "items": {
-              "type": "integer",
-              "format": "int32",
-              "minimum": 0
-            },
-            "description": "Collection of lists with the same average, that have not been assigned a seat"
+              "$ref": "#/components/schemas/PGNumber"
+            }
           },
           "selected_list_number": {
-            "type": "integer",
-            "format": "int32",
-            "minimum": 0
+            "$ref": "#/components/schemas/PGNumber"
           },
           "votes_per_seat": {
-            "$ref": "#/components/schemas/Fraction",
-            "description": "This is the votes per seat achieved by the selected list"
+            "$ref": "#/components/schemas/DisplayFraction"
           }
         }
       },
@@ -6899,9 +6887,8 @@
         },
         "additionalProperties": false
       },
-      "LargestRemainderAssignedSeat_PGNumber": {
+      "LargestRemainderAssignedSeat": {
         "type": "object",
-        "description": "Contains the details for an assigned seat, assigned through the largest remainder method.",
         "required": [
           "selected_list_number",
           "list_options",
@@ -6912,33 +6899,24 @@
           "list_assigned": {
             "type": "array",
             "items": {
-              "type": "integer",
-              "format": "int32",
-              "minimum": 0
-            },
-            "description": "Collection of lists with the same remainder, that have been assigned a seat"
+              "$ref": "#/components/schemas/PGNumber"
+            }
           },
           "list_options": {
             "type": "array",
             "items": {
-              "type": "integer",
-              "format": "int32",
-              "minimum": 0
-            },
-            "description": "Collection of lists with the same remainder, that have not been assigned a seat"
+              "$ref": "#/components/schemas/PGNumber"
+            }
           },
           "remainder_votes": {
-            "$ref": "#/components/schemas/Fraction",
-            "description": "The number of remainder votes achieved by the selected list"
+            "$ref": "#/components/schemas/DisplayFraction"
           },
           "selected_list_number": {
-            "type": "integer",
-            "format": "int32",
-            "minimum": 0
+            "$ref": "#/components/schemas/PGNumber"
           }
         }
       },
-      "ListCandidateNominationResponse": {
+      "ListCandidateNomination": {
         "type": "object",
         "required": [
           "list_number",
@@ -6980,28 +6958,23 @@
           }
         }
       },
-      "ListExhaustionRemovedSeat_PGNumber": {
+      "ListExhaustionRemovedSeat": {
         "type": "object",
-        "description": "Contains information about the enactment of article P 10 of the Kieswet.",
         "required": [
           "list_retracted_seat",
           "full_seat"
         ],
         "properties": {
           "full_seat": {
-            "type": "boolean",
-            "description": "Whether the removed seat was a full seat"
+            "type": "boolean"
           },
           "list_retracted_seat": {
-            "type": "integer",
-            "format": "int32",
-            "minimum": 0
+            "$ref": "#/components/schemas/PGNumber"
           }
         }
       },
-      "ListSeatAssignment_PGNumber": {
+      "ListSeatAssignment": {
         "type": "object",
-        "description": "Contains information about the final assignment of seats for a specific list.",
         "required": [
           "list_number",
           "votes_cast",
@@ -7015,45 +6988,36 @@
           "full_seats": {
             "type": "integer",
             "format": "int32",
-            "description": "The number of full seats assigned to this group",
             "minimum": 0
           },
           "list_number": {
-            "type": "integer",
-            "format": "int32",
-            "minimum": 0
+            "$ref": "#/components/schemas/PGNumber"
           },
           "meets_remainder_threshold": {
-            "type": "boolean",
-            "description": "Whether this group met the threshold for largest remainder seat assignment"
+            "type": "boolean"
           },
           "remainder_votes": {
-            "$ref": "#/components/schemas/Fraction",
-            "description": "The remainder votes that were not used to get full seats assigned to this list"
+            "$ref": "#/components/schemas/DisplayFraction"
           },
           "residual_seats": {
             "type": "integer",
             "format": "int32",
-            "description": "The number of residual seats assigned to this group",
             "minimum": 0
           },
           "total_seats": {
             "type": "integer",
             "format": "int32",
-            "description": "The total number of seats assigned to this group",
             "minimum": 0
           },
           "votes_cast": {
             "type": "integer",
             "format": "int64",
-            "description": "The number of votes cast for this group",
             "minimum": 0
           }
         }
       },
-      "ListStanding_PGNumber": {
+      "ListStanding": {
         "type": "object",
-        "description": "Contains the standing for a specific list. This is all the information\nthat is needed to compute the apportionment for that specific list.",
         "required": [
           "list_number",
           "votes_cast",
@@ -7067,36 +7031,28 @@
           "full_seats": {
             "type": "integer",
             "format": "int32",
-            "description": "The number of full seats this list got assigned",
             "minimum": 0
           },
           "list_number": {
-            "type": "integer",
-            "format": "int32",
-            "minimum": 0
+            "$ref": "#/components/schemas/PGNumber"
           },
           "meets_remainder_threshold": {
-            "type": "boolean",
-            "description": "Whether the remainder votes meet the threshold to be applicable for largest remainder seat assignment"
+            "type": "boolean"
           },
           "next_votes_per_seat": {
-            "$ref": "#/components/schemas/Fraction",
-            "description": "The number of votes per seat if a new seat would be added to the current residual seats"
+            "$ref": "#/components/schemas/DisplayFraction"
           },
           "remainder_votes": {
-            "$ref": "#/components/schemas/Fraction",
-            "description": "The remainder of votes that was not used to get full seats (does not have to be a whole number of votes)"
+            "$ref": "#/components/schemas/DisplayFraction"
           },
           "residual_seats": {
             "type": "integer",
             "format": "int32",
-            "description": "The current number of residual seats this list got assigned",
             "minimum": 0
           },
           "votes_cast": {
             "type": "integer",
             "format": "int64",
-            "description": "The number of votes cast for this group",
             "minimum": 0
           }
         }
@@ -7674,20 +7630,17 @@
       },
       "PreferenceThreshold": {
         "type": "object",
-        "description": "Contains the preference threshold as a percentage and as a fraction of the number of votes.",
         "required": [
           "percentage",
           "number_of_votes"
         ],
         "properties": {
           "number_of_votes": {
-            "$ref": "#/components/schemas/Fraction",
-            "description": "Preference threshold as a number of votes"
+            "$ref": "#/components/schemas/DisplayFraction"
           },
           "percentage": {
             "type": "integer",
             "format": "int64",
-            "description": "Preference threshold as a percentage (0 to 100)",
             "minimum": 0
           }
         }
@@ -7755,9 +7708,8 @@
         },
         "additionalProperties": false
       },
-      "SeatAssignmentResult_PoliticalGroupCandidateVotes": {
+      "SeatAssignment": {
         "type": "object",
-        "description": "The result of the seat assignment procedure. This contains the number of seats and the quota\nthat was used. It then contains the initial standing after full seats were assigned,\nand each of the changes and intermediate standings. The final standing contains the\nnumber of seats per list that was assigned after all seats were assigned.",
         "required": [
           "seats",
           "full_seats",
@@ -7770,7 +7722,7 @@
           "final_standing": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/ListSeatAssignment_PGNumber"
+              "$ref": "#/components/schemas/ListSeatAssignment"
             }
           },
           "full_seats": {
@@ -7779,7 +7731,7 @@
             "minimum": 0
           },
           "quota": {
-            "$ref": "#/components/schemas/Fraction"
+            "$ref": "#/components/schemas/DisplayFraction"
           },
           "residual_seats": {
             "type": "integer",
@@ -7794,21 +7746,129 @@
           "steps": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/SeatChangeStep_PGNumber"
+              "$ref": "#/components/schemas/SeatChangeStep"
             }
           }
         }
       },
-      "SeatChangeStep_PGNumber": {
+      "SeatChange": {
+        "oneOf": [
+          {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/HighestAverageAssignedSeat"
+              },
+              {
+                "type": "object",
+                "required": [
+                  "changed_by"
+                ],
+                "properties": {
+                  "changed_by": {
+                    "type": "string",
+                    "enum": [
+                      "HighestAverageAssignment"
+                    ]
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/HighestAverageAssignedSeat"
+              },
+              {
+                "type": "object",
+                "required": [
+                  "changed_by"
+                ],
+                "properties": {
+                  "changed_by": {
+                    "type": "string",
+                    "enum": [
+                      "UniqueHighestAverageAssignment"
+                    ]
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/LargestRemainderAssignedSeat"
+              },
+              {
+                "type": "object",
+                "required": [
+                  "changed_by"
+                ],
+                "properties": {
+                  "changed_by": {
+                    "type": "string",
+                    "enum": [
+                      "LargestRemainderAssignment"
+                    ]
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/AbsoluteMajorityReassignedSeat"
+              },
+              {
+                "type": "object",
+                "required": [
+                  "changed_by"
+                ],
+                "properties": {
+                  "changed_by": {
+                    "type": "string",
+                    "enum": [
+                      "AbsoluteMajorityReassignment"
+                    ]
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ListExhaustionRemovedSeat"
+              },
+              {
+                "type": "object",
+                "required": [
+                  "changed_by"
+                ],
+                "properties": {
+                  "changed_by": {
+                    "type": "string",
+                    "enum": [
+                      "ListExhaustionRemoval"
+                    ]
+                  }
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "SeatChangeStep": {
         "type": "object",
-        "description": "Records the change for a specific seat, and how the standing is once\nthat seat was assigned or removed",
         "required": [
           "change",
           "standings"
         ],
         "properties": {
           "change": {
-            "$ref": "#/components/schemas/SeatChange_PGNumber"
+            "$ref": "#/components/schemas/SeatChange"
           },
           "residual_seat_number": {
             "type": [
@@ -7821,70 +7881,10 @@
           "standings": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/ListStanding_PGNumber"
+              "$ref": "#/components/schemas/ListStanding"
             }
           }
         }
-      },
-      "SeatChange_PGNumber": {
-        "oneOf": [
-          {
-            "type": "object",
-            "required": [
-              "HighestAverageAssignment"
-            ],
-            "properties": {
-              "HighestAverageAssignment": {
-                "$ref": "#/components/schemas/HighestAverageAssignedSeat_PGNumber"
-              }
-            }
-          },
-          {
-            "type": "object",
-            "required": [
-              "UniqueHighestAverageAssignment"
-            ],
-            "properties": {
-              "UniqueHighestAverageAssignment": {
-                "$ref": "#/components/schemas/HighestAverageAssignedSeat_PGNumber"
-              }
-            }
-          },
-          {
-            "type": "object",
-            "required": [
-              "LargestRemainderAssignment"
-            ],
-            "properties": {
-              "LargestRemainderAssignment": {
-                "$ref": "#/components/schemas/LargestRemainderAssignedSeat_PGNumber"
-              }
-            }
-          },
-          {
-            "type": "object",
-            "required": [
-              "AbsoluteMajorityReassignment"
-            ],
-            "properties": {
-              "AbsoluteMajorityReassignment": {
-                "$ref": "#/components/schemas/AbsoluteMajorityReassignedSeat_PGNumber"
-              }
-            }
-          },
-          {
-            "type": "object",
-            "required": [
-              "ListExhaustionRemoval"
-            ],
-            "properties": {
-              "ListExhaustionRemoval": {
-                "$ref": "#/components/schemas/ListExhaustionRemovedSeat_PGNumber"
-              }
-            }
-          }
-        ],
-        "description": "Records the list and specific change for a specific residual seat"
       },
       "SumCount": {
         "type": "object",

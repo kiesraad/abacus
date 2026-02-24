@@ -4,7 +4,6 @@
 
 mod candidate_nomination;
 mod fraction;
-mod optional_features;
 mod seat_assignment;
 mod structs;
 #[cfg(test)]
@@ -13,13 +12,17 @@ mod test_helpers;
 use self::{
     candidate_nomination::candidate_nomination,
     seat_assignment::{as_candidate_nomination_input, seat_assignment},
-    structs::ApportionmentOutput,
 };
 pub use self::{
     candidate_nomination::{CandidateNominationResult, PreferenceThreshold},
     fraction::Fraction,
-    seat_assignment::SeatAssignmentResult,
-    structs::{ApportionmentError, ApportionmentInput, CandidateVotesTrait, ListVotesTrait},
+    seat_assignment::{
+        HighestAverageAssignedSeat, SeatAssignmentResult, SeatChange, SeatChangeStep,
+    },
+    structs::{
+        ApportionmentError, ApportionmentInput, ApportionmentOutput, CandidateVotesTrait,
+        ListVotesTrait,
+    },
 };
 
 /// Perform seat assignment and candidate nomination on apportionment input.

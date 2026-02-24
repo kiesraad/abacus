@@ -3,8 +3,6 @@ use crate::{CandidateVotesTrait, Fraction, ListVotesTrait};
 /// Contains information about the chosen candidates and
 /// the candidate list ranking for a specific list.
 #[derive(Debug, PartialEq)]
-#[cfg_attr(feature = "serde", derive(serde::Serialize))]
-// #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 pub struct ListCandidateNomination<'a, T: ListVotesTrait> {
     /// List number for which this nomination applies
     pub list_number: T::ListNumber,
@@ -20,8 +18,6 @@ pub struct ListCandidateNomination<'a, T: ListVotesTrait> {
 
 /// Contains the preference threshold as a percentage and as a fraction of the number of votes.
 #[derive(Debug, PartialEq)]
-#[cfg_attr(feature = "serde", derive(serde::Serialize))]
-#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 pub struct PreferenceThreshold {
     /// Preference threshold as a percentage (0 to 100)
     pub percentage: u64,
@@ -35,8 +31,6 @@ pub struct PreferenceThreshold {
 /// It also contains the preferential nomination of candidates, the remaining
 /// nomination of candidates and the final ranking of candidates for each list.
 #[derive(Debug, PartialEq)]
-#[cfg_attr(feature = "serde", derive(serde::Serialize))]
-// #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 pub struct CandidateNominationResult<'a, T: ListVotesTrait> {
     /// Preference threshold percentage and number of votes
     pub preference_threshold: PreferenceThreshold,
@@ -48,8 +42,6 @@ pub struct CandidateNominationResult<'a, T: ListVotesTrait> {
 
 /// Contains the list number the candidate is listed on and the candidate number on that list.
 #[derive(Debug, PartialEq)]
-#[cfg_attr(feature = "serde", derive(serde::Serialize))]
-// #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 pub struct Candidate<T: ListVotesTrait> {
     pub list_number: T::ListNumber,
     pub candidate_number: <T::Cv as CandidateVotesTrait>::CandidateNumber,

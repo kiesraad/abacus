@@ -1,31 +1,9 @@
 use apportionment::Fraction;
 use serde::{Deserialize, Serialize};
-use utoipa::openapi::{RefOr, Schema};
-use utoipa::{PartialSchema, ToSchema};
-
-// TODO: The below does not work yet
-#[derive(Clone, Copy, Serialize, Deserialize)]
-#[serde(
-    deny_unknown_fields,
-    into = "DisplayFraction",
-    from = "DisplayFraction",
-    remote = "Fraction"
-)]
-pub struct FractionDef {
-    pub numerator: u64,
-    pub denominator: u64,
-}
-
-impl PartialSchema for FractionDef {
-    fn schema() -> RefOr<Schema> {
-        DisplayFraction::schema()
-    }
-}
-impl ToSchema for FractionDef {}
+use utoipa::ToSchema;
 
 /// Fraction with the integer part split out for display purposes
 #[derive(Clone, Copy, Debug, Serialize, Deserialize, ToSchema)]
-#[schema(as = FractionDef)]
 pub struct DisplayFraction {
     integer: u64,
     numerator: u64,

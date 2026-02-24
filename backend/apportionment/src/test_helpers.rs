@@ -23,8 +23,6 @@ impl ApportionmentInput for ApportionmentInputMock {
 }
 
 #[derive(Debug, PartialEq)]
-#[cfg_attr(feature = "serde", derive(serde::Serialize))]
-#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 pub struct ListVotesMock {
     pub number: u32,
     pub candidate_votes: Vec<CandidateVotesMock>,
@@ -44,8 +42,6 @@ impl ListVotesTrait for ListVotesMock {
 }
 
 #[derive(Clone, Debug, PartialEq)]
-#[cfg_attr(feature = "serde", derive(serde::Serialize))]
-#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 pub struct CandidateVotesMock {
     pub number: u32,
     pub votes: u32,

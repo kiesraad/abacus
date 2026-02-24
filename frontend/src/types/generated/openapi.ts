@@ -1069,7 +1069,7 @@ export type ResolveDifferencesAction = (typeof resolveDifferencesActionValues)[n
 export const resolveErrorsActionValues = ["discard_first_entry", "resume_first_entry"] as const;
 export type ResolveErrorsAction = (typeof resolveErrorsActionValues)[number];
 
-export const roleValues = ["administrator", "typist", "coordinator"] as const;
+export const roleValues = ["administrator", "coordinator_gsb", "coordinator_csb", "typist_gsb", "typist_csb"] as const;
 export type Role = (typeof roleValues)[number];
 
 /**

@@ -1,7 +1,7 @@
 .navBar {
   flex: 0 0 2.75rem;
   padding: 0 5rem;
-  background-color: var(--base-brand-blue);
+  background-color: var(--base-blue);
   color: var(--base-white);
   min-height: 3rem;
   display: flex;
@@ -35,7 +35,7 @@
     }
 
     > :global(.active) {
-      border-bottom: 4px solid var(--accent-orange);
+      border-bottom: 4px solid var(--orange-500);
       padding-bottom: calc(0.5rem - 4px);
       font-weight: bold;
     }
@@ -102,7 +102,7 @@
       background: var(--gray-50);
 
       > svg {
-        fill: var(--link-default);
+        fill: var(--interactive-default);
       }
     }
   }

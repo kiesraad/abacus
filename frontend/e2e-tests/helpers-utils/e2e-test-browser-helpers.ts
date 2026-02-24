@@ -14,14 +14,12 @@ import { CheckPollingStationDefinitionPgObj } from "e2e-tests/page-objects/elect
 import { UploadCandidateDefinitionPgObj } from "e2e-tests/page-objects/election/create/UploadCandidateDefinitionPgObj";
 import { UploadElectionDefinitionPgObj } from "e2e-tests/page-objects/election/create/UploadElectionDefinitionPgObj";
 import { UploadPollingStationDefinitionPgObj } from "e2e-tests/page-objects/election/create/UploadPollingStationDefinitionPgObj";
-import { ElectionDetailsPgObj } from "e2e-tests/page-objects/election/ElectionDetailsPgObj";
 import { AddInvestigationPgObj } from "e2e-tests/page-objects/investigations/AddInvestigationPgObj";
 import { InvestigationOverviewPgObj } from "e2e-tests/page-objects/investigations/InvestigationOverviewPgObj";
 import { InvestigationPrintCorrigendumPgObj } from "e2e-tests/page-objects/investigations/InvestigationPrintCorrigendumPgObj";
 import { InvestigationReasonPgObj } from "e2e-tests/page-objects/investigations/InvestigationReasonPgObj";
-
+import { UserInfoTopBar } from "e2e-tests/page-objects/nav_bar/UserInfoTopBarPgObj";
 import type { PollingStationResults } from "@/types/generated/openapi";
-
 import { eml110a, eml110b, eml230b } from "../test-data/eml-files";
 
 export async function fillDataEntryPages(page: Page, results: PollingStationResults) {
@@ -75,7 +73,7 @@ export async function fillDataEntryPagesAndSave(page: Page, results: PollingStat
   await checkAndSavePage.save.click();
 
   const dataEntryHomePage = new DataEntryHomePage(page);
-  await expect(dataEntryHomePage.dataEntrySaved).toBeVisible();
+  await expect(dataEntryHomePage.alertDataEntrySaved).toBeVisible();
   return dataEntryHomePage;
 }
 
@@ -107,25 +105,26 @@ export async function uploadPollingStations(page: Page, eml = eml110b) {
   const uploadElectionDefinitionPage = new UploadPollingStationDefinitionPgObj(page);
   await expect(uploadElectionDefinitionPage.header).toBeVisible();
   await uploadElectionDefinitionPage.uploadFile(eml.path);
-  await expect(uploadElectionDefinitionPage.main).toContainText(eml.filename);
 
   const checkDefinitionPage = new CheckPollingStationDefinitionPgObj(page);
   await expect(checkDefinitionPage.header).toBeVisible();
+  await expect(checkDefinitionPage.fieldset).toContainText(eml.filename);
   await checkDefinitionPage.next.click();
 }
 
 export async function createInvestigation(page: Page, pollingStation: string, reason: string) {
-  const electionDetailsPage = new ElectionDetailsPgObj(page);
-  await electionDetailsPage.investigationsOverviewButton.click();
   const investigationsOverviewPage = new InvestigationOverviewPgObj(page);
   await investigationsOverviewPage.addInvestigationButton.click();
+
   const addInvestigationPage = new AddInvestigationPgObj(page);
   await expect(addInvestigationPage.header).toBeVisible();
   await addInvestigationPage.selectPollingStation(pollingStation);
+
   const investigationReasonPage = new InvestigationReasonPgObj(page);
   await expect(investigationReasonPage.header).toBeVisible();
   await investigationReasonPage.reasonField.fill(reason);
   await investigationReasonPage.nextButton.click();
+
   const investigationPrintCorrigendumPage = new InvestigationPrintCorrigendumPgObj(page);
   await expect(investigationPrintCorrigendumPage.header).toBeVisible();
   const downloadPromise = page.waitForEvent("download");
@@ -133,4 +132,12 @@ export async function createInvestigation(page: Page, pollingStation: string, re
   const download = await downloadPromise;
   expect(download.suggestedFilename()).toMatch(/Model_Na14-2_GR2022_Stembureau_\d+_Bijlage_1.pdf/);
   expect((await stat(await download.path())).size).toBeGreaterThan(1024);
+
+  await investigationPrintCorrigendumPage.backToInvestigationsButton.click();
+}
+
+export async function logout(page: Page) {
+  const userInfoTopBar = new UserInfoTopBar(page);
+  await userInfoTopBar.logout.click();
+  await expect(userInfoTopBar.login).toBeVisible();
 }

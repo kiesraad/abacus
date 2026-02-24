@@ -12,7 +12,7 @@ use crate::{
     APIError, AppState, ErrorResponse, SqlitePoolExt,
     api::{
         authentication::{UserCreated, UserDeleted, UserUpdated},
-        middleware::authentication::{AdminOrCoordinator, error::AuthenticationError},
+        middleware::authentication::{AdminOrCoordinatorGSB, error::AuthenticationError},
     },
     domain::role::Role,
     infra::audit_log::AuditService,
@@ -47,16 +47,16 @@ pub struct UserListResponse {
         (status = 403, description = "Forbidden", body = ErrorResponse),
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
-    security(("cookie_auth" = ["administrator", "coordinator"])),
+    security(("cookie_auth" = ["administrator", "coordinator_gsb"])),
 )]
 async fn user_list(
-    user: AdminOrCoordinator,
+    AdminOrCoordinatorGSB(user): AdminOrCoordinatorGSB,
     State(pool): State<SqlitePool>,
 ) -> Result<Json<UserListResponse>, APIError> {
     let mut conn = pool.acquire().await?;
 
-    let only_allow_role = if user.is_coordinator() {
-        Some(Role::Typist)
+    let only_allow_role = if user.role().is_coordinator() {
+        Some(Role::TypistGSB)
     } else {
         None
     };
@@ -101,16 +101,16 @@ pub struct UpdateUserRequest {
         (status = 409, description = "Conflict (username already exists)", body = ErrorResponse),
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
-    security(("cookie_auth" = ["administrator", "coordinator"])),
+    security(("cookie_auth" = ["administrator", "coordinator_gsb"])),
 )]
 pub async fn user_create(
-    user: AdminOrCoordinator,
+    AdminOrCoordinatorGSB(user): AdminOrCoordinatorGSB,
     State(pool): State<SqlitePool>,
     audit_service: AuditService,
     Json(create_user_req): Json<CreateUserRequest>,
 ) -> Result<(StatusCode, Json<User>), APIError> {
     // Coordinators can only create Typists
-    if user.is_coordinator() && create_user_req.role != Role::Typist {
+    if user.role().is_coordinator() && create_user_req.role != Role::TypistGSB {
         return Err(AuthenticationError::Forbidden.into());
     }
 
@@ -146,10 +146,10 @@ pub async fn user_create(
     params(
         ("user_id" = UserId, description = "User id"),
     ),
-    security(("cookie_auth" = ["administrator", "coordinator"])),
+    security(("cookie_auth" = ["administrator", "coordinator_gsb"])),
 )]
 async fn user_get(
-    logged_in_user: AdminOrCoordinator,
+    AdminOrCoordinatorGSB(logged_in_user): AdminOrCoordinatorGSB,
     State(pool): State<SqlitePool>,
     Path(user_id): Path<UserId>,
 ) -> Result<Json<User>, APIError> {
@@ -159,7 +159,7 @@ async fn user_get(
         .ok_or(sqlx::Error::RowNotFound)?;
 
     // Coordinators can only fetch Typists
-    if logged_in_user.is_coordinator() && user.role() != Role::Typist {
+    if logged_in_user.role().is_coordinator() && user.role() != Role::TypistGSB {
         return Err(AuthenticationError::Forbidden.into());
     }
 
@@ -182,24 +182,24 @@ async fn user_get(
     params(
         ("user_id" = UserId, description = "User id"),
     ),
-    security(("cookie_auth" = ["administrator", "coordinator"])),
+    security(("cookie_auth" = ["administrator", "coordinator_gsb"])),
 )]
 pub async fn user_update(
-    logged_in_user: AdminOrCoordinator,
+    AdminOrCoordinatorGSB(logged_in_user): AdminOrCoordinatorGSB,
     State(pool): State<SqlitePool>,
     audit_service: AuditService,
     Path(user_id): Path<UserId>,
     Json(update_user_req): Json<UpdateUserRequest>,
 ) -> Result<Json<User>, APIError> {
     // fetch the current user
-    if logged_in_user.is_coordinator() {
+    if logged_in_user.role().is_coordinator() {
         let mut conn = pool.acquire().await?;
         let target_user = user_repo::get_by_id(&mut conn, user_id)
             .await?
             .ok_or(sqlx::Error::RowNotFound)?;
 
         // Coordinators can only update Typists
-        if target_user.role() != Role::Typist {
+        if target_user.role() != Role::TypistGSB {
             return Err(AuthenticationError::Forbidden.into());
         }
     }
@@ -243,23 +243,23 @@ pub async fn user_update(
     params(
         ("user_id" = UserId, description = "User id"),
     ),
-    security(("cookie_auth" = ["administrator", "coordinator"])),
+    security(("cookie_auth" = ["administrator", "coordinator_gsb"])),
 )]
 async fn user_delete(
-    logged_in_user: AdminOrCoordinator,
+    AdminOrCoordinatorGSB(logged_in_user): AdminOrCoordinatorGSB,
     State(pool): State<SqlitePool>,
     audit_service: AuditService,
     Path(user_id): Path<UserId>,
 ) -> Result<StatusCode, APIError> {
     // fetch the current user
-    if logged_in_user.is_coordinator() {
+    if logged_in_user.role().is_coordinator() {
         let mut conn = pool.acquire().await?;
         let target_user = user_repo::get_by_id(&mut conn, user_id)
             .await?
             .ok_or(sqlx::Error::RowNotFound)?;
 
         // Coordinators can only delete Typists
-        if target_user.role() != Role::Typist {
+        if target_user.role() != Role::TypistGSB {
             return Err(AuthenticationError::Forbidden.into());
         }
     }
@@ -271,7 +271,7 @@ async fn user_delete(
         .ok_or(sqlx::Error::RowNotFound)?;
 
     // Prevent user from deleting their own account
-    if logged_in_user.0.id() == user_id {
+    if logged_in_user.id() == user_id {
         return Err(AuthenticationError::OwnAccountCannotBeDeleted.into());
     }
 

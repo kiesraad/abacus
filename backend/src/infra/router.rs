@@ -294,7 +294,7 @@ pub fn create_router_without_airgap_detection(pool: SqlitePool) -> Result<Router
 
 #[cfg(test)]
 mod tests {
-    use std::panic;
+    use std::str::FromStr;
 
     use chrono::TimeDelta;
     use hyper::{Method, header::COOKIE};
@@ -331,11 +331,11 @@ mod tests {
                 Some(get_user_cookie(&mut tx, UserId::from(1)).await),
             ),
             (
-                Some(Role::Coordinator),
+                Some(Role::CoordinatorGSB),
                 Some(get_user_cookie(&mut tx, UserId::from(3)).await),
             ),
             (
-                Some(Role::Typist),
+                Some(Role::TypistGSB),
                 Some(get_user_cookie(&mut tx, UserId::from(5)).await),
             ),
         ];
@@ -376,7 +376,7 @@ mod tests {
                     let scopes = get_scopes_from_operation(operation);
                     if let Some(scopes) = &scopes {
                         for scope in scopes {
-                            if panic::catch_unwind(|| Role::from(scope.clone())).is_err() {
+                            if Role::from_str(scope).is_err() {
                                 failures.push(format!(
                                     "- {method} {path} contains invalid scope '{scope}'"
                                 ));

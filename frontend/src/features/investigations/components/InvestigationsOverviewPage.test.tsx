@@ -85,7 +85,7 @@ describe("InvestigationsOverviewPage", () => {
   test("Renders the correct headings and button", async () => {
     overrideOnce("get", "/api/elections/1", 200, getElectionMockData({}, { number: 2, status: "created" }, []));
 
-    await renderPage("coordinator");
+    await renderPage("coordinator_gsb");
 
     expect(await screen.findByRole("heading", { level: 1, name: "Onderzoeken in tweede zitting" })).toBeVisible();
     expect(
@@ -98,7 +98,7 @@ describe("InvestigationsOverviewPage", () => {
   });
 
   test("Navigates to the polling station list when clicking the button", async () => {
-    const router = await renderPage("coordinator");
+    const router = await renderPage("coordinator_gsb");
 
     const link = await screen.findByRole("link", { name: "Onderzoek toevoegen" });
     link.click();
@@ -107,7 +107,7 @@ describe("InvestigationsOverviewPage", () => {
   });
 
   test("Renders and filters a list of investigations in two categories", async () => {
-    await renderPage("coordinator");
+    await renderPage("coordinator_gsb");
 
     // assert the investigations count + one "Afgehandelde onderzoeken" heading
     expect(await screen.findAllByRole("heading", { level: 3 })).toHaveLength(6);
@@ -139,7 +139,7 @@ describe("InvestigationsOverviewPage", () => {
       ] satisfies PollingStation[],
     });
 
-    await renderPage("coordinator");
+    await renderPage("coordinator_gsb");
 
     expect(screen.queryByRole("alert")).not.toBeInTheDocument();
   });
@@ -160,7 +160,7 @@ describe("InvestigationsOverviewPage", () => {
       ] satisfies PollingStation[],
     });
 
-    await renderPage("coordinator");
+    await renderPage("coordinator_gsb");
 
     const alert = await screen.findByRole("alert");
     expect(within(alert).getByRole("strong")).toHaveTextContent("Invoerfase kan niet worden afgerond");
@@ -192,7 +192,7 @@ describe("InvestigationsOverviewPage", () => {
       ] satisfies PollingStation[],
     });
 
-    await renderPage("coordinator");
+    await renderPage("coordinator_gsb");
 
     const alert = await screen.findByRole("alert");
     expect(within(alert).getByRole("strong")).toHaveTextContent("Invoerfase kan niet worden afgerond");
@@ -215,7 +215,7 @@ describe("InvestigationsOverviewPage", () => {
     ]);
     overrideOnce("get", "/api/elections/1", 200, electionData);
 
-    await renderPage("coordinator");
+    await renderPage("coordinator_gsb");
 
     const alert = await screen.findByRole("alert");
     expect(within(alert).getByRole("strong")).toHaveTextContent("Alle onderzoeken zijn afgehandeld");
@@ -237,7 +237,7 @@ describe("InvestigationsOverviewPage", () => {
     ]);
     overrideOnce("get", "/api/elections/1", 200, electionData);
 
-    await renderPage("coordinator");
+    await renderPage("coordinator_gsb");
     // Ensure rendering is complete
     await screen.findByRole("heading", { level: 1, name: "Onderzoeken in tweede zitting" });
 
@@ -258,7 +258,7 @@ describe("InvestigationsOverviewPage", () => {
     ]);
     overrideOnce("get", "/api/elections/1", 200, electionData);
 
-    await renderPage("coordinator");
+    await renderPage("coordinator_gsb");
 
     const finishButton = await screen.findByRole("button", { name: "Invoerfase afronden" });
     expect(finishButton).toBeVisible();
@@ -282,7 +282,7 @@ describe("InvestigationsOverviewPage", () => {
     ]);
     overrideOnce("get", "/api/elections/1", 200, electionData);
 
-    await renderPage("coordinator");
+    await renderPage("coordinator_gsb");
 
     const fillInLink = await screen.findByRole("button", { name: "Nu invullen" });
     expect(fillInLink).toBeInTheDocument();
@@ -305,7 +305,7 @@ describe("InvestigationsOverviewPage", () => {
   });
 
   test("Links to the correct pages when editing an investigation or printing the corrigendum", async () => {
-    await renderPage("coordinator");
+    await renderPage("coordinator_gsb");
 
     const printLink = await screen.findByRole("link", { name: "Corrigendum afdrukken" });
     expect(printLink).toHaveAttribute("href", "/elections/1/investigations/3/print-corrigendum");

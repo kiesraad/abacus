@@ -50,7 +50,7 @@ describe("NavBar", () => {
   });
 
   test("elections link and current election name for '/elections/1/data-entry'", async () => {
-    await renderNavBar({ pathname: "/elections/1/data-entry" }, "typist");
+    await renderNavBar({ pathname: "/elections/1/data-entry" }, "typist_gsb");
 
     expect(screen.queryByRole("link", { name: "Verkiezingen" })).toBeVisible();
     expect(
@@ -69,7 +69,7 @@ describe("NavBar", () => {
     { pathname: "/elections/1/data-entry/1/1/political_group_votes_2" },
     { pathname: "/elections/1/data-entry/1/1/save" },
   ])("elections link and current election link for $pathname", async (location) => {
-    await renderNavBar(location, "typist");
+    await renderNavBar(location, "typist_gsb");
 
     expect(screen.queryByRole("link", { name: "Verkiezingen" })).toBeVisible();
     expect(
@@ -104,7 +104,7 @@ describe("NavBar", () => {
     { pathname: "/logs" },
     { pathname: "/privacy-statement" },
   ])("top level management links for $pathname for coordinator", async (location) => {
-    await renderNavBar(location, "coordinator");
+    await renderNavBar(location, "coordinator_gsb");
 
     expect(screen.queryByRole("link", { name: "Verkiezingen" })).toBeVisible();
     expect(screen.queryByRole("link", { name: "Gebruikers" })).toBeVisible();
@@ -112,7 +112,7 @@ describe("NavBar", () => {
   });
 
   test("no elections link for '/privacy-statement' for typist", async () => {
-    await renderNavBar({ pathname: "/privacy-statement" }, "typist");
+    await renderNavBar({ pathname: "/privacy-statement" }, "typist_gsb");
 
     expect(screen.queryByRole("link", { name: "Verkiezingen" })).not.toBeInTheDocument();
   });
@@ -128,7 +128,7 @@ describe("NavBar", () => {
     { pathname: "/elections/1/status" },
     { pathname: "/elections/1/polling-stations" },
   ])("election management links for $pathname", async (location) => {
-    await renderNavBar(location, "coordinator");
+    await renderNavBar(location, "coordinator_gsb");
 
     expect(screen.queryByRole("link", { name: "Verkiezingen" })).not.toBeInTheDocument();
     expect(
@@ -141,7 +141,7 @@ describe("NavBar", () => {
     { pathname: "/elections/1/status/1/detail" },
     { pathname: "/elections/1/status/1/detail/extra_investigation" },
   ])("election status links for $pathname", async (location) => {
-    await renderNavBar(location, "coordinator");
+    await renderNavBar(location, "coordinator_gsb");
 
     expect(screen.queryByRole("link", { name: "Verkiezingen" })).not.toBeInTheDocument();
     expect(
@@ -154,7 +154,7 @@ describe("NavBar", () => {
     { pathname: "/elections/1/polling-stations/create" },
     { pathname: "/elections/1/polling-stations/1/update" },
   ])("polling station management links for $pathname", async (location) => {
-    await renderNavBar(location, "coordinator");
+    await renderNavBar(location, "coordinator_gsb");
 
     expect(screen.queryByRole("link", { name: "Verkiezingen" })).not.toBeInTheDocument();
     expect(

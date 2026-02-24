@@ -60,7 +60,7 @@ describe("ElectionHomePage", () => {
       ),
     );
 
-    await renderPage("coordinator");
+    await renderPage("coordinator_gsb");
 
     const committee_session_cards = await screen.findByTestId("committee-session-cards");
     expect(committee_session_cards).toBeVisible();
@@ -104,7 +104,7 @@ describe("ElectionHomePage", () => {
       ),
     );
 
-    await renderPage("coordinator");
+    await renderPage("coordinator_gsb");
 
     const committee_session_cards = await screen.findByTestId("committee-session-cards");
     expect(committee_session_cards).toBeVisible();
@@ -173,7 +173,7 @@ describe("ElectionHomePage", () => {
         ),
       );
 
-      await renderPage("coordinator");
+      await renderPage("coordinator_gsb");
 
       const deleteButton = screen.getByRole("button", { name: "Zitting verwijderen" });
       expect(deleteButton).toBeVisible();
@@ -202,7 +202,7 @@ describe("ElectionHomePage", () => {
         ),
       );
 
-      await renderPage("coordinator");
+      await renderPage("coordinator_gsb");
 
       const user = userEvent.setup();
       const deleteButton = screen.getByRole("button", { name: "Zitting verwijderen" });
@@ -229,7 +229,7 @@ describe("ElectionHomePage", () => {
         ),
       );
 
-      await renderPage("coordinator");
+      await renderPage("coordinator_gsb");
 
       const user = userEvent.setup();
       const deleteButton = screen.getByRole("button", { name: "Zitting verwijderen" });
@@ -261,7 +261,7 @@ describe("ElectionHomePage", () => {
     }) => {
       return (
         <ApiProvider fetchInitialUser={fetchInitialUser}>
-          <TestUserProvider userRole="coordinator">
+          <TestUserProvider userRole="coordinator_gsb">
             <ElectionProvider electionId={1}>
               <ElectionStatusProvider electionId={1}>
                 <RouterProvider router={router} />
@@ -330,7 +330,7 @@ describe("ElectionHomePage", () => {
       ),
     );
 
-    await renderPage("coordinator");
+    await renderPage("coordinator_gsb");
 
     const alert = await screen.findByRole("alert");
     expect(within(alert).getByRole("strong")).toHaveTextContent("Geen stembureaus");
@@ -360,7 +360,7 @@ describe("ElectionHomePage", () => {
   test("Shows empty documents section for first committee session", async () => {
     server.use(ElectionRequestHandler);
 
-    await renderPage("coordinator");
+    await renderPage("coordinator_gsb");
 
     expect(
       await screen.findByRole("heading", { level: 3, name: "Lege processen-verbaal voor deze verkiezing" }),
@@ -378,7 +378,7 @@ describe("ElectionHomePage", () => {
       ),
     );
 
-    await renderPage("coordinator");
+    await renderPage("coordinator_gsb");
 
     expect(await screen.findByRole("heading", { level: 3, name: "Leeg inlegvel voor deze verkiezing" })).toBeVisible();
     expect(screen.getByText("Na 31-2 Inlegvel")).toBeVisible();
@@ -399,7 +399,7 @@ describe("ElectionHomePage", () => {
       ),
     );
 
-    await renderPage("coordinator");
+    await renderPage("coordinator_gsb");
 
     expect(
       screen.queryByRole("heading", { level: 3, name: "Lege processen-verbaal voor deze verkiezing" }),

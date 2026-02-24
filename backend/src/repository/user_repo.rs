@@ -151,7 +151,7 @@ pub async fn create(
             fullname,
             password_hash,
             needs_password_change as "needs_password_change: bool",
-            role,
+            role as "role: _",
             last_activity_at as "last_activity_at: _",
             updated_at as "updated_at: _",
             created_at as "created_at: _"
@@ -269,7 +269,7 @@ pub async fn get_by_username(
             id as "id: UserId",
             username,
             fullname,
-            role,
+            role as "role: _",
             password_hash,
             needs_password_change as "needs_password_change: bool",
             last_activity_at as "last_activity_at: _",
@@ -297,7 +297,7 @@ pub async fn get_by_id(
             id as "id: UserId",
             username,
             fullname,
-            role,
+            role as "role: _",
             password_hash,
             needs_password_change as "needs_password_change: bool",
             last_activity_at as "last_activity_at: _",
@@ -325,7 +325,7 @@ pub async fn list(
             fullname,
             password_hash,
             needs_password_change as "needs_password_change: bool",
-            role,
+            role as "role: _",
             last_activity_at as "last_activity_at: _",
             updated_at as "updated_at: _",
             created_at as "created_at: _"
@@ -408,7 +408,7 @@ mod tests {
             None,
             "TotallyValidP4ssW0rd",
             true,
-            Role::Typist,
+            Role::TypistGSB,
         )
         .await
         .unwrap();
@@ -441,7 +441,7 @@ mod tests {
             None,
             "TotallyValidP4ssW0rd",
             true,
-            Role::Typist,
+            Role::TypistGSB,
         )
         .await
         .unwrap();
@@ -455,7 +455,7 @@ mod tests {
             None,
             "TotallyValidP4ssW0rd",
             true,
-            Role::Typist,
+            Role::TypistGSB,
         )
         .await;
 
@@ -474,7 +474,7 @@ mod tests {
             Some("Full Name"),
             "TotallyValidP4ssW0rd",
             true,
-            Role::Coordinator,
+            Role::CoordinatorGSB,
         )
         .await
         .unwrap();
@@ -617,7 +617,7 @@ mod tests {
             id: UserId::from(2),
             username: "user1".to_string(),
             fullname: Some("Full Name".to_string()),
-            role: Role::Typist,
+            role: Role::TypistGSB,
             needs_password_change: false,
             password_hash: password::hash_password(
                 password::ValidatedPassword::new("test_user_1", "TotallyValidP4ssW0rd", None)

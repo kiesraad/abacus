@@ -49,6 +49,6 @@ export default {
     },
   },
   parameters: {
-    userRole: "coordinator",
+    userRole: "coordinator_gsb",
   },
 } satisfies Meta;

@@ -27,7 +27,7 @@ export function NavBar({ location, empty }: NavBarProps) {
       <div className={cls.userInfo}>
         {user ? (
           <>
-            <strong id="navbar-username">{user.fullname || user.username}</strong>
+            <strong id="navbar-user-name">{user.fullname || user.username}</strong>
             <span className={cls.lower} id="navbar-role">
               ({t(user.role)})
             </span>

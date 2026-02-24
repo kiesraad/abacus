@@ -21,7 +21,7 @@ describe("UserCreateDetailsForm", () => {
   });
 
   test("Render empty form", async () => {
-    renderForm("coordinator", true);
+    renderForm("coordinator_gsb", true);
 
     expect(await screen.findByRole("textbox", { name: "Volledige naam" })).toHaveValue("");
     expect(await screen.findByRole("textbox", { name: "Gebruikersnaam" })).toHaveValue("");
@@ -29,7 +29,7 @@ describe("UserCreateDetailsForm", () => {
   });
 
   test("Call onSubmitted after submitting fullname fields", async () => {
-    const { onSubmitted } = renderForm("coordinator", true);
+    const { onSubmitted } = renderForm("coordinator_gsb", true);
     const createUser = spyOnHandler(UserCreateRequestHandler);
     const user = userEvent.setup();
 
@@ -39,7 +39,7 @@ describe("UserCreateDetailsForm", () => {
     await user.click(await screen.findByRole("button", { name: "Opslaan" }));
 
     expect(createUser).toHaveBeenCalledExactlyOnceWith({
-      role: "coordinator",
+      role: "coordinator_gsb",
       fullname: "Nieuwe Gebruiker",
       username: "NieuweGebruiker",
       temp_password: "Wachtwoord123",
@@ -48,7 +48,7 @@ describe("UserCreateDetailsForm", () => {
   });
 
   test("Call onSubmitted after submitting anonymous fields", async () => {
-    const { onSubmitted } = renderForm("typist", false);
+    const { onSubmitted } = renderForm("typist_gsb", false);
     const createUser = spyOnHandler(UserCreateRequestHandler);
     const user = userEvent.setup();
 
@@ -63,7 +63,7 @@ describe("UserCreateDetailsForm", () => {
     await user.click(submit);
 
     expect(createUser).toHaveBeenCalledExactlyOnceWith({
-      role: "typist",
+      role: "typist_gsb",
       username: "NieuweGebruiker",
       temp_password: "Wachtwoord123",
     });
@@ -72,7 +72,7 @@ describe("UserCreateDetailsForm", () => {
 
   describe("Validation", () => {
     test("Required fields", async () => {
-      const { onSubmitted } = renderForm("coordinator", true);
+      const { onSubmitted } = renderForm("coordinator_gsb", true);
       const createUser = spyOnHandler(UserCreateRequestHandler);
       const user = userEvent.setup();
 
@@ -98,7 +98,7 @@ describe("UserCreateDetailsForm", () => {
 
   describe("API error handling", () => {
     test("Show username must be unique error", async () => {
-      const { onSubmitted } = renderForm("typist", false);
+      const { onSubmitted } = renderForm("typist_gsb", false);
       const user = userEvent.setup();
       overrideOnce("post", "/api/users" satisfies USER_CREATE_REQUEST_PATH, 409, {
         error: "Username already exists",
@@ -151,7 +151,7 @@ describe("UserCreateDetailsForm", () => {
         expectedErrorMessage: "Het wachtwoord moet minimaal 13 karakters lang zijn.",
       },
     ])("shows expected error message for $error", async ({ error, expectedErrorMessage }) => {
-      const { onSubmitted } = renderForm("typist", false);
+      const { onSubmitted } = renderForm("typist_gsb", false);
       const user = userEvent.setup();
       overrideOnce("post", "/api/users" satisfies USER_CREATE_REQUEST_PATH, 400, {
         error: "Invalid password",

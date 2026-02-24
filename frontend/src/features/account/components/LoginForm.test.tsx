@@ -68,7 +68,7 @@ describe("LoginForm", () => {
     overrideOnce("post", loginUrl, 200, {
       user_id: 33,
       username: "Invoerder01",
-      role: "typist",
+      role: "typist_gsb",
       fullname: "Al Ingesteld",
       needs_password_change: true,
     } satisfies LoginResponse);
@@ -88,7 +88,7 @@ describe("LoginForm", () => {
     overrideOnce("post", loginUrl, 200, {
       user_id: 33,
       username: "Invoerder01",
-      role: "typist",
+      role: "typist_gsb",
       needs_password_change: false,
     } satisfies LoginResponse);
 
@@ -107,7 +107,7 @@ describe("LoginForm", () => {
     overrideOnce("post", loginUrl, 200, {
       user_id: 33,
       username: "Invoerder01",
-      role: "typist",
+      role: "typist_gsb",
       fullname: "Al Ingesteld",
       needs_password_change: false,
     } satisfies LoginResponse);

@@ -31,7 +31,7 @@
       > svg {
         height: 2rem;
         width: 2rem;
-        fill: var(--button-icon-modal-close-color-svg);
+        fill: var(--gray-500);
       }
     }
   }

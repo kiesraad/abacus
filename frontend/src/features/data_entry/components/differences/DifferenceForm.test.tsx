@@ -12,8 +12,8 @@ import {
 import { validationResultMockData } from "@/testing/api-mocks/ValidationResultMockData";
 import { overrideOnce, server } from "@/testing/server";
 import { getUrlMethodAndBody, render, screen, userTypeInputs } from "@/testing/test-utils";
-import type { DATA_ENTRY_SAVE_REQUEST_BODY, LoginResponse } from "@/types/generated/openapi";
-
+import { getTypistUser } from "@/testing/user-mock-data";
+import type { DATA_ENTRY_SAVE_REQUEST_BODY } from "@/types/generated/openapi";
 import { getDefaultDataEntryState, getEmptyDataEntryRequest } from "../../testing/mock-data";
 import {
   expectCheckboxListToBeInvalidAndToHaveTextContent,
@@ -25,13 +25,6 @@ import {
 } from "../../testing/test.utils";
 import { DataEntryProvider } from "../DataEntryProvider";
 import { DataEntrySection } from "../DataEntrySection";
-
-const testUser: LoginResponse = {
-  username: "test-user-1",
-  user_id: 1,
-  role: "typist",
-  needs_password_change: false,
-};
 
 function renderForm() {
   vi.spyOn(ReactRouter, "useParams").mockReturnValue({ sectionId: "differences_counts" });
@@ -61,7 +54,7 @@ const differencesFieldIds = {
 
 describe("Test DifferencesForm", () => {
   beforeEach(() => {
-    vi.spyOn(useUser, "useUser").mockReturnValue(testUser);
+    vi.spyOn(useUser, "useUser").mockReturnValue(getTypistUser());
     server.use(PollingStationDataEntryClaimHandler, PollingStationDataEntrySaveHandler);
   });
 

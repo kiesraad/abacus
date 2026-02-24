@@ -14,7 +14,7 @@ use crate::{
     APIError, AppState, ErrorResponse, SqlitePoolExt,
     api::{
         committee_session::create_committee_session,
-        middleware::authentication::{Admin, AdminOrCoordinator},
+        middleware::authentication::{Admin, AdminOrCoordinatorGSB},
         polling_station::create_imported_polling_stations,
     },
     domain::{
@@ -106,7 +106,7 @@ as_audit_event!(ElectionUpdated, AuditEventType::ElectionUpdated);
         (status = 401, description = "Unauthorized", body = ErrorResponse),
         (status = 500, description = "Internal server error", body = ErrorResponse),
     ),
-    security(("cookie_auth" = ["administrator", "coordinator", "typist"])),
+    security(("cookie_auth" = ["administrator", "coordinator_gsb", "typist_gsb"])),
 )]
 pub async fn election_list(
     _user: User,
@@ -136,7 +136,7 @@ pub async fn election_list(
     params(
         ("election_id" = ElectionId, description = "Election database id"),
     ),
-    security(("cookie_auth" = ["administrator", "coordinator", "typist"])),
+    security(("cookie_auth" = ["administrator", "coordinator_gsb", "typist_gsb"])),
 )]
 pub async fn election_details(
     _user: User,
@@ -184,10 +184,10 @@ pub async fn election_details(
     params(
         ("election_id" = ElectionId, description = "Election database id"),
     ),
-    security(("cookie_auth" = ["administrator", "coordinator"])),
+    security(("cookie_auth" = ["administrator", "coordinator_gsb"])),
 )]
 pub async fn election_number_of_voters_change(
-    _user: AdminOrCoordinator,
+    _user: AdminOrCoordinatorGSB,
     State(pool): State<SqlitePool>,
     audit_service: AuditService,
     Path(election_id): Path<ElectionId>,

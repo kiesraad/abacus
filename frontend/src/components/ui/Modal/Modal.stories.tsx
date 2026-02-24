@@ -31,7 +31,7 @@ export const DefaultModal: StoryObj = {
             <p>Twijfel je? Overleg dan met de coördinator.</p>
             <nav>
               <Button size="xl">Invoer bewaren</Button>
-              <Button size="lg" variant="tertiary-destructive">
+              <Button size="lg" variant="tertiary">
                 Verwijder invoer
               </Button>
             </nav>

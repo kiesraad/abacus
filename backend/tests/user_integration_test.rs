@@ -77,7 +77,7 @@ async fn test_user_last_activity_at_updating(pool: SqlitePool) {
         .as_array()
         .unwrap()
         .iter()
-        .find(|u| u["role"] == "typist")
+        .find(|u| u["role"] == "typist_gsb")
         .unwrap();
     assert!(typist_user["last_activity_at"].is_null());
 
@@ -221,7 +221,7 @@ async fn test_user_creation_anonymous(pool: SqlitePool) {
     let response = reqwest::Client::new()
         .post(&url)
         .json(&serde_json::json!({
-            "role": "typist",
+            "role": "typist_gsb",
             "username": "username",
             "temp_password": "MyLongPassword13"
         }))
@@ -235,7 +235,7 @@ async fn test_user_creation_anonymous(pool: SqlitePool) {
         "Unexpected response status"
     );
     let body: serde_json::Value = response.json().await.unwrap();
-    assert_eq!(body["role"], "typist");
+    assert_eq!(body["role"], "typist_gsb");
     assert_eq!(body["username"], "username");
     assert!(body.get("fullname").is_none());
     assert!(body.get("temp_password").is_none());
@@ -250,7 +250,7 @@ async fn test_user_creation_invalid_password(pool: SqlitePool) {
     let response = reqwest::Client::new()
         .post(&url)
         .json(&serde_json::json!({
-            "role": "typist",
+            "role": "typist_gsb",
             "username": "username",
             "temp_password": "too_short"
         }))
@@ -419,7 +419,7 @@ async fn test_coordinator_user_listing_only_typists(pool: SqlitePool) {
     let body: serde_json::Value = response.json().await.unwrap();
     let users = body["users"].as_array().unwrap();
     assert!(!users.is_empty());
-    assert!(users.iter().all(|user| user["role"] == "typist"));
+    assert!(users.iter().all(|user| user["role"] == "typist_gsb"));
 }
 
 #[test(sqlx::test(fixtures(path = "../fixtures", scripts("users"))))]
@@ -429,7 +429,7 @@ async fn test_coordinator_can_only_create_typists(pool: SqlitePool) {
 
     let url = format!("http://{addr}/api/users");
     let mut data = serde_json::json!({
-        "role": "typist",
+        "role": "typist_gsb",
         "username": "new_typist",
         "fullname": "New Typist",
         "temp_password": "MyLongPassword13"
@@ -443,7 +443,7 @@ async fn test_coordinator_can_only_create_typists(pool: SqlitePool) {
         .unwrap();
     assert_eq!(response.status(), StatusCode::CREATED);
     let body: serde_json::Value = response.json().await.unwrap();
-    assert_eq!(body["role"], "typist");
+    assert_eq!(body["role"], "typist_gsb");
     assert_eq!(body["username"], "new_typist");
 
     data["role"] = serde_json::json!("administrator");
@@ -456,7 +456,7 @@ async fn test_coordinator_can_only_create_typists(pool: SqlitePool) {
         .unwrap();
     assert_eq!(response.status(), StatusCode::FORBIDDEN);
 
-    data["role"] = serde_json::json!("coordinator");
+    data["role"] = serde_json::json!("coordinator_gsb");
     let response = reqwest::Client::new()
         .post(&url)
         .json(&data)
@@ -482,7 +482,7 @@ async fn test_coordinator_can_only_get_typists(pool: SqlitePool) {
     assert_eq!(response.status(), StatusCode::OK);
     let body: serde_json::Value = response.json().await.unwrap();
     assert_eq!(body["id"], 5);
-    assert_eq!(body["role"], "typist");
+    assert_eq!(body["role"], "typist_gsb");
 
     let admin_url = format!("http://{addr}/api/users/1");
     let response = reqwest::Client::new()

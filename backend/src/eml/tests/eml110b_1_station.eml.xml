@@ -10,7 +10,7 @@
   <ElectionEvent>
     <EventIdentifier/>
     <Election>
-      <ElectionIdentifier Id="GR2022">
+      <ElectionIdentifier Id="GR2022_Test">
         <ElectionName>Gemeenteraad Test 2022</ElectionName>
         <ElectionCategory>GR</ElectionCategory>
         <kr:ElectionSubcategory>GR1</kr:ElectionSubcategory>

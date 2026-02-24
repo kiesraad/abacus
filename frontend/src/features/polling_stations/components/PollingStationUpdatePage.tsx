@@ -147,7 +147,7 @@ export function PollingStationUpdatePage() {
                     </section>
                   ) : (
                     <>
-                      <Button variant="tertiary-destructive" leftIcon={<IconTrash />} onClick={toggleShowDeleteModal}>
+                      <Button variant="tertiary" leftIcon={<IconTrash />} onClick={toggleShowDeleteModal}>
                         {t("polling_station.delete")}
                       </Button>
                       {showDeleteModal && (

@@ -60,7 +60,7 @@ export const logMockResponse: AuditLogListResponse = {
       username: "typist",
       ip: "127.0.0.1",
       user_fullname: "Sam Kuijpers",
-      user_role: "typist",
+      user_role: "typist_gsb",
     },
     {
       id: 20,
@@ -76,7 +76,7 @@ export const logMockResponse: AuditLogListResponse = {
       username: "typist",
       ip: "127.0.0.1",
       user_fullname: "Sam Kuijpers",
-      user_role: "typist",
+      user_role: "typist_gsb",
     },
     {
       id: 19,
@@ -90,7 +90,7 @@ export const logMockResponse: AuditLogListResponse = {
       username: "coordinator",
       ip: "127.0.0.1",
       user_fullname: "Mohammed van der Velden",
-      user_role: "coordinator",
+      user_role: "coordinator_gsb",
     },
     {
       id: 18,
@@ -106,7 +106,7 @@ export const logMockResponse: AuditLogListResponse = {
       username: "coordinator",
       ip: "127.0.0.1",
       user_fullname: "Mohammed van der Velden",
-      user_role: "coordinator",
+      user_role: "coordinator_gsb",
     },
     {
       id: 17,
@@ -120,7 +120,7 @@ export const logMockResponse: AuditLogListResponse = {
       username: "coordinator",
       ip: "127.0.0.1",
       user_fullname: "Mohammed van der Velden",
-      user_role: "coordinator",
+      user_role: "coordinator_gsb",
     },
   ],
   page: 1,

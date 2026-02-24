@@ -86,7 +86,7 @@
     "polling_station_committee_session_id": "Zitting-ID",
     "polling_station_election_id": "Verkiezings-ID",
     "polling_station_id": "Stembureau-ID",
-    "polling_station_id_prev_session": "Zitting-ID vorige zitting",
+    "polling_station_prev_data_entry_id": "Invoer-ID vorige zitting",
     "polling_station_locality": "Stembureau plaats",
     "polling_station_name": "Stembureau naam",
     "polling_station_number": "Stembureau nummer",

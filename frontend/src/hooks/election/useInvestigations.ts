@@ -56,7 +56,7 @@ export default function useInvestigations(): InvestigationsOverview {
       (inv.findings && inv.corrected_results && inv.status === "definitive"),
   );
   const missingInvestigations = pollingStations.filter(
-    (ps) => !investigations.find((inv) => inv.polling_station_id === ps.id) && !ps.id_prev_session,
+    (ps) => !investigations.find((inv) => inv.polling_station_id === ps.id) && !ps.prev_data_entry_id,
   );
 
   return {

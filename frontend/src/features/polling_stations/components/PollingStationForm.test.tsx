@@ -186,10 +186,10 @@ describe("PollingStationForm", () => {
       number_of_voters: 1,
     };
 
-    test.each([undefined, 42])("Successful update", async (id_prev_session) => {
+    test.each([undefined, 42])("Successful update", async (prev_data_entry_id) => {
       const testObj: PollingStation = {
         ...testPollingStation,
-        id_prev_session,
+        prev_data_entry_id,
       };
 
       const onSaved = vi.fn();
@@ -211,11 +211,11 @@ describe("PollingStationForm", () => {
     test("Number should be disabled when polling station is linked to previous session", () => {
       const testObj: PollingStation = {
         ...testPollingStation,
-        id_prev_session: 42,
+        prev_data_entry_id: 42,
       };
       const onSaved = vi.fn();
 
-      // Disabled with id_prev_session defined
+      // Disabled with prev_data_entry_id defined
       render(<PollingStationForm electionId={1} onSaved={onSaved} pollingStation={testObj} />);
       expect(screen.queryByRole("textbox", { name: "Nummer" })).not.toBeInTheDocument();
       expect(screen.getByText("123")).toHaveClass("disabled_input");
@@ -224,11 +224,11 @@ describe("PollingStationForm", () => {
     test("Number should be enabled when polling station is not linked to previous session", () => {
       const testObj: PollingStation = {
         ...testPollingStation,
-        id_prev_session: undefined,
+        prev_data_entry_id: undefined,
       };
       const onSaved = vi.fn();
 
-      // Enabled with id_prev_session undefined
+      // Enabled with prev_data_entry_id undefined
       render(<PollingStationForm electionId={1} onSaved={onSaved} pollingStation={testObj} />);
       expect(screen.queryByRole("textbox", { name: "Nummer" })).toBeInTheDocument();
     });

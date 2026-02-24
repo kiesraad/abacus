@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/Button/Button";
 import { Modal } from "@/components/ui/Modal/Modal";
 import { t } from "@/i18n/translate";
 import type {
-  DATA_ENTRIES_AND_RESULT_DELETE_REQUEST_PATH,
+  DATA_ENTRY_RESET_REQUEST_PATH,
   DataEntryStatusName,
   PollingStation,
   PollingStationInvestigation,
@@ -22,7 +22,7 @@ interface ReadOnlyDataEntryDeleteProps {
 
 export function ReadOnlyDataEntryDelete({ pollingStation, status, onDeleted, onError }: ReadOnlyDataEntryDeleteProps) {
   const [showModal, setShowModal] = useState(false);
-  const removePath: DATA_ENTRIES_AND_RESULT_DELETE_REQUEST_PATH = `/api/polling_stations/${pollingStation.id}/data_entries`;
+  const removePath: DATA_ENTRY_RESET_REQUEST_PATH = `/api/polling_stations/${pollingStation.id}/data_entries`;
   const { remove, isLoading } = useCrud<PollingStationInvestigation>({ removePath });
 
   function toggleModal() {

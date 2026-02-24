@@ -56,7 +56,7 @@ export function InvestigationFindings({ pollingStationId }: InvestigationFinding
     throw error;
   }
 
-  const requiresCorrectedResults = !pollingStation.id_prev_session;
+  const requiresCorrectedResults = !pollingStation.prev_data_entry_id;
 
   // biome-ignore lint/complexity/noExcessiveCognitiveComplexity: TODO function should be refactored
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {

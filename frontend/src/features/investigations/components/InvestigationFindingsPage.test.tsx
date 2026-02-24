@@ -211,7 +211,7 @@ describe("InvestigationFindingsPage", () => {
       polling_stations: [
         {
           ...pollingStationMockData[2]!,
-          id_prev_session: undefined,
+          prev_data_entry_id: undefined,
         },
       ],
     });
@@ -257,7 +257,7 @@ describe("InvestigationFindingsPage", () => {
       polling_stations: [
         {
           ...pollingStationMockData[2]!,
-          id_prev_session: 1003,
+          prev_data_entry_id: 1003,
         },
       ],
     });

@@ -29,11 +29,7 @@ const sections: ElectionCreateFormSection[] = [
 export function ElectionNav() {
   const location = useLocation();
   const { state } = useElectionCreateContext();
-  const formSections: ElectionCreateFormSection[] = [];
-
-  sections.forEach((formSection) => {
-    formSections.push(formSection);
-  });
+  const formSections = sections.map((s) => ({ ...s }));
 
   // Update menu for CSB
   if (state.electionRole === "CSB") {

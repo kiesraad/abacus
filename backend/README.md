@@ -179,9 +179,9 @@ To update `openapi.json` in the repository, run the command `cargo run --bin gen
 
 ### Test data generation
 
-You can fill the database with test data and (optionally) export the election definition files with `gen-test-election.rs`.
+You can fill the database with test data and (optionally) export the election definition files with `gen-test-gsb-election.rs`.
 
-Run `cargo run --bin gen-test-election -- --help` to see all command-line options.
+Run `cargo run --bin gen-test-gsb-election -- --help` to see all command-line options.
 
 ### Binary usage
 

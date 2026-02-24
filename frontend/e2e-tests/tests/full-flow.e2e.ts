@@ -22,8 +22,8 @@ import { ProgressList } from "e2e-tests/page-objects/data_entry/ProgressListPgOb
 import { VotersAndVotesPage } from "e2e-tests/page-objects/data_entry/VotersAndVotesPgObj";
 import { CheckAndSavePgObj } from "e2e-tests/page-objects/election/create/CheckAndSavePgObj";
 import { CountingMethodTypePgObj } from "e2e-tests/page-objects/election/create/CountingMethodTypePgObj";
+import { ElectoralCommitteeRolePgObj } from "e2e-tests/page-objects/election/create/ElectoralCommitteeRolePgObj.ts";
 import { NumberOfVotersPgObj } from "e2e-tests/page-objects/election/create/NumberOfVotersPgObj";
-import { PollingStationRolePgObj } from "e2e-tests/page-objects/election/create/PollingStationRolePgObj";
 import { ElectionDetailsPgObj } from "e2e-tests/page-objects/election/ElectionDetailsPgObj";
 import { ElectionHome } from "e2e-tests/page-objects/election/ElectionHomePgObj";
 import { ElectionReport } from "e2e-tests/page-objects/election/ElectionReportPgObj";
@@ -119,10 +119,10 @@ test.describe("full flow", () => {
 
     await uploadElectionAndInputHash(page);
 
-    const pollingStationRolePage = new PollingStationRolePgObj(page);
-    await expect(pollingStationRolePage.header).toBeVisible();
-    await expect(pollingStationRolePage.gsb).toBeChecked();
-    await pollingStationRolePage.next.click();
+    const electoralCommitteeRolePage = new ElectoralCommitteeRolePgObj(page);
+    await expect(electoralCommitteeRolePage.header).toBeVisible();
+    await expect(electoralCommitteeRolePage.gsb).toBeChecked();
+    await electoralCommitteeRolePage.next.click();
 
     await uploadCandidatesAndInputHash(page);
 

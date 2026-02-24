@@ -155,8 +155,7 @@ export function ElectionHomePage() {
           <div className="mb-xl">
             <div>
               <h2>
-                {/* TODO (post 1.0): Change to conditional GSB/HSB/CSB when implemented */}
-                {t("GSB")} {election.location}
+                {t(`electoral_committee_role.roles.${election.role}.short`)} {election.location}
               </h2>
             </div>
           </div>

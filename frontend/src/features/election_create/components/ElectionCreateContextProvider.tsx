@@ -2,6 +2,7 @@ import { type ReactNode, useReducer } from "react";
 
 import type {
   ElectionDefinitionValidateResponse,
+  ElectionRole,
   NewElection,
   PollingStationRequest,
   RedactedEmlHash,
@@ -43,6 +44,10 @@ export type ElectionCreateAction =
       countingMethod: VoteCountingMethod;
     }
   | {
+      type: "SET_ROLE_TYPE";
+      electionRole: ElectionRole;
+    }
+  | {
       type: "SET_NUMBER_OF_VOTERS";
       numberOfVoters: number;
       isNumberOfVotersUserEdited: boolean;
@@ -64,6 +69,7 @@ export interface ElectionCreateState {
   pollingStationDefinitionMatchesElection?: boolean;
   countingMethod?: VoteCountingMethod;
   numberOfVoters?: number;
+  electionRole?: ElectionRole;
   isNumberOfVotersUserEdited?: boolean;
 }
 
@@ -126,6 +132,11 @@ function reducer(state: ElectionCreateState, action: ElectionCreateAction): Elec
       return {
         ...state,
         countingMethod: action.countingMethod,
+      };
+    case "SET_ROLE_TYPE":
+      return {
+        ...state,
+        electionRole: action.electionRole,
       };
     case "SET_NUMBER_OF_VOTERS":
       return {

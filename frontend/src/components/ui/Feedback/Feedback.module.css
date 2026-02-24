@@ -37,7 +37,7 @@
     div.content {
       max-width: 40rem;
       a:visited {
-        color: var(--link-default);
+        color: var(--interactive-default);
       }
     }
   }

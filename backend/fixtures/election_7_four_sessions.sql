@@ -49,23 +49,6 @@ VALUES (701, 1, 7, 'completed', 'Grote Stad', '2026-03-19 09:15:00'),
        (703, 3, 7, 'completed', 'Grote Stad', '2026-03-19 23:15:00'),
        (704, 4, 7, 'created', '', NULL);
 
-INSERT INTO polling_stations (id, committee_session_id, id_prev_session, name, number, number_of_voters, polling_station_type, address,
-                              postal_code, locality)
-VALUES (711, 701, NULL, 'TestA', 1, NULL, 'FixedLocation', 'Testweg 1a', '1234 AA', 'Grote Stad'),
-       (712, 701, NULL, 'TestB', 2, NULL, 'FixedLocation', 'Testweg 1b', '1234 BB', 'Grote Stad'),
-       (721, 702, 711,  'TestA', 1, NULL, 'FixedLocation', 'Testweg 1a', '1234 AA', 'Grote Stad'),
-       (722, 702, 712,  'TestB', 2, NULL, 'FixedLocation', 'Testweg 1b', '1234 BB', 'Grote Stad'),
-       (731, 703, 721,  'TestA', 1, NULL, 'FixedLocation', 'Testweg 1a', '1234 AA', 'Grote Stad'),
-       (732, 703, 722,  'TestB', 2, NULL, 'FixedLocation', 'Testweg 1b', '1234 BB', 'Grote Stad'),
-       (741, 704, 731,  'TestA', 1, NULL, 'FixedLocation', 'Testweg 1a', '1234 AA', 'Grote Stad'),
-       (742, 704, 732,  'TestB', 2, NULL, 'FixedLocation', 'Testweg 1b', '1234 BB', 'Grote Stad');
-
-INSERT INTO
-    polling_station_investigations
-VALUES
-    (721, "reason", "findings", 1),
-    (732, "reason", "findings", 1);
-
 -- Results differ by proxy_certificate_count
 INSERT INTO
     data_entries (id, state, updated_at)
@@ -82,7 +65,19 @@ VALUES (701,
         '{"status":"Definitive","state":{"first_entry_user_id":5,"second_entry_user_id":6,"finished_at":"2026-03-19T23:45:31.223365436Z","finalised_with_warnings":false,"results":{"model":"CSONextSession","voters_counts":{"poll_card_count":293,"proxy_certificate_count":4,"total_admitted_voters_count":297},"votes_counts":{"political_group_total_votes":[{"number":1,"total":200},{"number":2,"total":92}],"total_votes_candidates_count":292,"blank_votes_count":3,"invalid_votes_count":2,"total_votes_cast_count":297},"differences_counts":{"compare_votes_cast_admitted_voters":{"admitted_voters_equal_votes_cast":true,"votes_cast_greater_than_admitted_voters":false,"votes_cast_smaller_than_admitted_voters":false},"more_ballots_count":0,"fewer_ballots_count":0,"difference_completely_accounted_for":{"yes":false,"no":false}},"political_group_votes":[{"number":1,"total":200,"candidate_votes":[{"number":1,"votes":150},{"number":2,"votes":50}]},{"number":2,"total":92,"candidate_votes":[{"number":1,"votes":80},{"number":2,"votes":12}]}]}}}',
         '2026-03-19 23:45:31');
 
-UPDATE polling_stations SET data_entry_id = 701 WHERE id = 711;
-UPDATE polling_stations SET data_entry_id = 702 WHERE id = 712;
-UPDATE polling_stations SET data_entry_id = 703 WHERE id = 721;
-UPDATE polling_stations SET data_entry_id = 704 WHERE id = 732;
+INSERT INTO polling_stations (id, committee_session_id, prev_data_entry_id, data_entry_id, name, number, number_of_voters, polling_station_type,
+                              address, postal_code, locality)
+VALUES (711, 701, NULL, 701, 'TestA', 1, NULL, 'FixedLocation', 'Testweg 1a', '1234 AA', 'Grote Stad'),
+       (712, 701, NULL, 702, 'TestB', 2, NULL, 'FixedLocation', 'Testweg 1b', '1234 BB', 'Grote Stad'),
+       (721, 702, 701, 703, 'TestA', 1, NULL, 'FixedLocation', 'Testweg 1a', '1234 AA', 'Grote Stad'),
+       (722, 702, 702, NULL, 'TestB', 2, NULL, 'FixedLocation', 'Testweg 1b', '1234 BB', 'Grote Stad'),
+       (731, 703, 703, NULL, 'TestA', 1, NULL, 'FixedLocation', 'Testweg 1a', '1234 AA', 'Grote Stad'),
+       (732, 703, 702, 704, 'TestB', 2, NULL, 'FixedLocation', 'Testweg 1b', '1234 BB', 'Grote Stad'),
+       (741, 704, 703, NULL, 'TestA', 1, NULL, 'FixedLocation', 'Testweg 1a', '1234 AA', 'Grote Stad'),
+       (742, 704, 704, NULL, 'TestB', 2, NULL, 'FixedLocation', 'Testweg 1b', '1234 BB', 'Grote Stad');
+
+INSERT INTO
+    polling_station_investigations
+VALUES
+    (721, "reason", "findings", 1),
+    (732, "reason", "findings", 1);

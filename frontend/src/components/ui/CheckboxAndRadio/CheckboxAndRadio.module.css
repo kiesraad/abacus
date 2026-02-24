@@ -65,7 +65,7 @@
       &:focus-visible {
         background-color: var(--checkbox-radio-color-bg-focus-checked);
         &::before {
-          background-color: var(--base-dark-blue); /* change icon color as well */
+          background-color: var(--base-blue); /* change icon color as well */
         }
       }
     }

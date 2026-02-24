@@ -27,7 +27,7 @@ const navigate = vi.fn();
 
 const renderPage = async () => {
   render(
-    <TestUserProvider userRole="coordinator">
+    <TestUserProvider userRole="coordinator_gsb">
       <ElectionProvider electionId={1}>
         <ElectionStatusProvider electionId={1}>
           <UsersProvider>

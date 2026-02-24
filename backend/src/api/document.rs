@@ -4,15 +4,14 @@ use axum::{
 };
 use axum_extra::response::Attachment;
 use chrono::Datelike;
+use pdf_gen::{generate_pdf, generate_pdfs, zip::ZipResponse};
 use sqlx::SqlitePool;
 use tracing::error;
 use utoipa_axum::{router::OpenApiRouter, routes};
 
-use pdf_gen::{generate_pdf, generate_pdfs, zip::ZipResponse};
-
 use crate::{
     APIError, AppState, ErrorResponse,
-    api::middleware::authentication::AdminOrCoordinator,
+    api::middleware::authentication::AdminOrCoordinatorGSB,
     domain::{
         election::ElectionId,
         models::{
@@ -52,10 +51,10 @@ pub fn router() -> OpenApiRouter<AppState> {
     params(
         ("election_id" = ElectionId, description = "Election database id"),
     ),
-    security(("cookie_auth" = ["administrator", "coordinator"])),
+    security(("cookie_auth" = ["administrator", "coordinator_gsb"])),
 )]
 async fn election_download_n_10_2(
-    _user: AdminOrCoordinator,
+    _user: AdminOrCoordinatorGSB,
     State(pool): State<SqlitePool>,
     Path(election_id): Path<ElectionId>,
 ) -> Result<impl IntoResponse, APIError> {
@@ -131,10 +130,10 @@ async fn election_download_n_10_2(
     params(
         ("election_id" = ElectionId, description = "Election database id"),
     ),
-    security(("cookie_auth" = ["administrator", "coordinator"])),
+    security(("cookie_auth" = ["administrator", "coordinator_gsb"])),
 )]
 async fn election_download_na_31_2_bijlage1(
-    _user: AdminOrCoordinator,
+    _user: AdminOrCoordinatorGSB,
     State(pool): State<SqlitePool>,
     Path(election_id): Path<ElectionId>,
 ) -> Result<impl IntoResponse, APIError> {
@@ -211,10 +210,10 @@ async fn election_download_na_31_2_bijlage1(
     params(
         ("election_id" = ElectionId, description = "Election database id"),
     ),
-    security(("cookie_auth" = ["administrator", "coordinator"])),
+    security(("cookie_auth" = ["administrator", "coordinator_gsb"])),
 )]
 async fn election_download_na_31_2_inlegvel(
-    _user: AdminOrCoordinator,
+    _user: AdminOrCoordinatorGSB,
     State(pool): State<SqlitePool>,
     Path(election_id): Path<ElectionId>,
 ) -> Result<impl IntoResponse, APIError> {

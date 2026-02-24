@@ -11,8 +11,8 @@ import { pollingStationMockData } from "@/testing/api-mocks/PollingStationMockDa
 import { ElectionRequestHandler, ElectionStatusRequestHandler } from "@/testing/api-mocks/RequestHandlers";
 import { overrideOnce, server } from "@/testing/server";
 import { renderReturningRouter, screen, waitFor, within } from "@/testing/test-utils";
-import type { ElectionStatusResponse, LoginResponse } from "@/types/generated/openapi";
-
+import { getTypistUser } from "@/testing/user-mock-data";
+import type { ElectionStatusResponse } from "@/types/generated/openapi";
 import { PollingStationPicker } from "./PollingStationPicker";
 
 async function renderPollingStationPicker(anotherEntry?: boolean) {
@@ -30,12 +30,7 @@ async function renderPollingStationPicker(anotherEntry?: boolean) {
   return router;
 }
 
-const testUser: LoginResponse = {
-  username: "test-user-1",
-  user_id: 1,
-  role: "typist",
-  needs_password_change: false,
-};
+const testUser = getTypistUser();
 
 describe("Test PollingStationPicker", () => {
   beforeEach(() => {

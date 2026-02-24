@@ -38,8 +38,8 @@ const navigate = vi.fn();
 
 function electionValidateResponse(
   election: NewElection,
-  polling_stations: PollingStationRequest[] | undefined = undefined,
-  matching_election: boolean | undefined = undefined,
+  polling_stations?: PollingStationRequest[],
+  matching_election?: boolean,
 ): ElectionDefinitionValidateResponse {
   return {
     role: "GSB",

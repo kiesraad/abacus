@@ -14,7 +14,7 @@ describe("DevHomePage", () => {
 
   test("renders DevHomePage with election links", async () => {
     render(
-      <TestUserProvider userRole="typist">
+      <TestUserProvider userRole="typist_gsb">
         <DevHomePage />
       </TestUserProvider>,
     );

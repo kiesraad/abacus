@@ -76,19 +76,19 @@ const adminUser: TestUser = {
 const coordinatorUser: TestUser = {
   username: `coordinator-${randomSuffix}`,
   fullname: `full flow coordinator`,
-  role: "coordinator",
+  role: "coordinator_gsb",
 };
 
 const typistUsers: TestUser[] = [
   {
     username: `typist3-${randomSuffix}`,
     fullname: `full flow typist3`,
-    role: "typist",
+    role: "typist_gsb",
   },
   {
     username: `typist4-${randomSuffix}`,
     fullname: `full flow typist4`,
-    role: "typist",
+    role: "typist_gsb",
   },
 ];
 

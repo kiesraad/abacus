@@ -36,7 +36,7 @@ describe("UserCreateRolePage", () => {
   });
 
   test("Shows form previously selected", async () => {
-    renderPage({ role: "typist" });
+    renderPage({ role: "typist_gsb" });
 
     expect(await screen.findByRole("radio", { name: /Beheerder/ })).not.toBeChecked();
     expect(await screen.findByRole("radio", { name: /Coördinator/ })).not.toBeChecked();
@@ -82,7 +82,7 @@ describe("UserCreateRolePage", () => {
     await user.click(await screen.findByRole("radio", { name: /Coördinator/ }));
     await user.click(await screen.findByRole("button", { name: "Verder" }));
 
-    expect(setRole).toHaveBeenCalledExactlyOnceWith("coordinator");
+    expect(setRole).toHaveBeenCalledExactlyOnceWith("coordinator_gsb");
     expect(setType).toHaveBeenCalledExactlyOnceWith("fullname");
     expect(navigate).toHaveBeenCalledExactlyOnceWith("/users/create/details");
   });
@@ -96,7 +96,7 @@ describe("UserCreateRolePage", () => {
     await user.click(await screen.findByRole("radio", { name: /Invoerder/ }));
     await user.click(await screen.findByRole("button", { name: "Verder" }));
 
-    expect(setRole).toHaveBeenCalledExactlyOnceWith("typist");
+    expect(setRole).toHaveBeenCalledExactlyOnceWith("typist_gsb");
     expect(setType).not.toHaveBeenCalled();
     expect(navigate).toHaveBeenCalledExactlyOnceWith("/users/create/type");
   });
@@ -108,7 +108,7 @@ describe("UserCreateRolePage", () => {
     renderPage({ setRole });
 
     await waitFor(() => {
-      expect(setRole).toHaveBeenCalledExactlyOnceWith("typist");
+      expect(setRole).toHaveBeenCalledExactlyOnceWith("typist_gsb");
       expect(navigate).toHaveBeenCalledExactlyOnceWith("/users/create/type");
     });
   });

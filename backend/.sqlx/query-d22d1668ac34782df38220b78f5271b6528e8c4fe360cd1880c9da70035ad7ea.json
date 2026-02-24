@@ -1,6 +1,6 @@
 {
   "db_name": "SQLite",
-  "query": "\n        SELECT\n            id as \"id: UserId\",\n            username,\n            fullname,\n            role,\n            password_hash,\n            needs_password_change as \"needs_password_change: bool\",\n            last_activity_at as \"last_activity_at: _\",\n            updated_at as \"updated_at: _\",\n            created_at as \"created_at: _\"\n        FROM users WHERE username = ? COLLATE NOCASE\n        ",
+  "query": "SELECT\n            id as \"id: UserId\",\n            username,\n            fullname,\n            password_hash,\n            needs_password_change as \"needs_password_change: bool\",\n            role as \"role: _\",\n            last_activity_at as \"last_activity_at: _\",\n            updated_at as \"updated_at: _\",\n            created_at as \"created_at: _\"\n        FROM users\n        WHERE ($1 IS NULL OR role = $1)\n        ",
   "describe": {
     "columns": [
       {
@@ -19,19 +19,19 @@
         "type_info": "Text"
       },
       {
-        "name": "role",
+        "name": "password_hash",
         "ordinal": 3,
         "type_info": "Text"
       },
       {
-        "name": "password_hash",
+        "name": "needs_password_change: bool",
         "ordinal": 4,
-        "type_info": "Text"
+        "type_info": "Integer"
       },
       {
-        "name": "needs_password_change: bool",
+        "name": "role: _",
         "ordinal": 5,
-        "type_info": "Integer"
+        "type_info": "Text"
       },
       {
         "name": "last_activity_at: _",
@@ -64,5 +64,5 @@
       false
     ]
   },
-  "hash": "3643d295ce3fc3c77ab598ec222ff9a68214dce324486b1b0b4d845adf60f9c5"
+  "hash": "d22d1668ac34782df38220b78f5271b6528e8c4fe360cd1880c9da70035ad7ea"
 }

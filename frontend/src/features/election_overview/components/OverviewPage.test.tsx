@@ -31,7 +31,7 @@ describe("OverviewPage", () => {
 
   test("Renders elections for typist", async () => {
     const user = userEvent.setup();
-    renderOverviewPage("typist");
+    renderOverviewPage("typist_gsb");
 
     // Wait for the page to be loaded
     expect(await screen.findByRole("heading", { level: 1, name: "Verkiezingen" })).toBeVisible();
@@ -55,7 +55,7 @@ describe("OverviewPage", () => {
 
   test("Renders elections and does not show create election link for coordinator", async () => {
     const user = userEvent.setup();
-    renderOverviewPage("coordinator");
+    renderOverviewPage("coordinator_gsb");
 
     // Wait for the page to be loaded
     expect(await screen.findByRole("heading", { level: 1, name: "Verkiezingen" })).toBeVisible();
@@ -114,7 +114,7 @@ describe("OverviewPage", () => {
       ),
     );
 
-    renderOverviewPage("typist");
+    renderOverviewPage("typist_gsb");
 
     // Wait for the page to be loaded
     expect(await screen.findByRole("heading", { level: 1, name: "Verkiezingen" })).toBeVisible();
@@ -139,7 +139,7 @@ describe("OverviewPage", () => {
       ),
     );
 
-    renderOverviewPage("coordinator");
+    renderOverviewPage("coordinator_gsb");
 
     // Wait for the page to be loaded
     expect(await screen.findByRole("heading", { level: 1, name: "Verkiezingen" })).toBeVisible();
@@ -186,7 +186,7 @@ describe("OverviewPage", () => {
 
   test("Refetches data every 30 seconds", async () => {
     vi.useFakeTimers();
-    renderOverviewPage("typist");
+    renderOverviewPage("typist_gsb");
 
     // Wait for the page to be loaded
     await vi.waitFor(() => {
@@ -217,14 +217,14 @@ describe("OverviewPage", () => {
     }
 
     test("Typist is shown alert with instructions", async () => {
-      await render("typist");
+      await render("typist_gsb");
 
       const alert = await screen.findByRole("alert");
       expect(within(alert).getByRole("strong")).toHaveTextContent(alertHeader);
       expect(within(alert).getByRole("paragraph")).toHaveTextContent(alertBody);
     });
     test("Non-typist is shown plain alert", async () => {
-      await render("coordinator");
+      await render("coordinator_gsb");
 
       const alert = await screen.findByRole("alert");
       expect(within(alert).getByRole("strong")).toHaveTextContent(alertHeader);

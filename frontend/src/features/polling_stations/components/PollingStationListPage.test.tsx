@@ -38,7 +38,7 @@ describe("PollingStationListPage", () => {
 
   test("Shows polling stations", async () => {
     const user = userEvent.setup();
-    renderPage("coordinator");
+    renderPage("coordinator_gsb");
 
     expect(await screen.findByRole("heading", { level: 1, name: "Stembureaus beheren" })).toBeVisible();
     expect(await screen.findByRole("link", { name: "Stembureau toevoegen" })).toBeVisible();
@@ -70,7 +70,7 @@ describe("PollingStationListPage", () => {
       polling_stations: [],
     } satisfies PollingStationListResponse);
 
-    renderPage("coordinator");
+    renderPage("coordinator_gsb");
 
     expect(await screen.findByRole("heading", { level: 1, name: "Stembureaus beheren" })).toBeVisible();
     expect(await screen.findByText(/Er zijn nog geen stembureaus ingevoerd/)).toBeVisible();
@@ -82,7 +82,7 @@ describe("PollingStationListPage", () => {
       polling_stations: [],
     } satisfies PollingStationListResponse);
 
-    renderPage("coordinator");
+    renderPage("coordinator_gsb");
 
     expect(await screen.findByRole("heading", { level: 1, name: "Stembureaus beheren" })).toBeVisible();
     expect(screen.getByText("Handmatig invullen")).toBeVisible();

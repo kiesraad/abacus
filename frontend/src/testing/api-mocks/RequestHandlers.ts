@@ -30,8 +30,6 @@ import type {
   CREATE_FIRST_ADMIN_REQUEST_BODY,
   CREATE_FIRST_ADMIN_REQUEST_PARAMS,
   CREATE_FIRST_ADMIN_REQUEST_PATH,
-  DATA_ENTRIES_AND_RESULT_DELETE_REQUEST_PARAMS,
-  DATA_ENTRIES_AND_RESULT_DELETE_REQUEST_PATH,
   DATA_ENTRY_CLAIM_REQUEST_PARAMS,
   DATA_ENTRY_CLAIM_REQUEST_PATH,
   DATA_ENTRY_DELETE_REQUEST_PARAMS,
@@ -42,6 +40,8 @@ import type {
   DATA_ENTRY_GET_DIFFERENCES_REQUEST_PATH,
   DATA_ENTRY_GET_REQUEST_PARAMS,
   DATA_ENTRY_GET_REQUEST_PATH,
+  DATA_ENTRY_RESET_REQUEST_PARAMS,
+  DATA_ENTRY_RESET_REQUEST_PATH,
   DATA_ENTRY_RESOLVE_DIFFERENCES_REQUEST_BODY,
   DATA_ENTRY_RESOLVE_DIFFERENCES_REQUEST_PARAMS,
   DATA_ENTRY_RESOLVE_DIFFERENCES_REQUEST_PATH,
@@ -429,11 +429,9 @@ export const PollingStationDataEntryFinaliseHandler = http.post<
   HttpResponse.json({ status: "first_entry_finalised" }, { status: 200 }),
 );
 
-// delete data entries and result handler
-export const PollingStationDataEntriesAndResultDeleteHandler = http.delete<
-  ParamsToString<DATA_ENTRIES_AND_RESULT_DELETE_REQUEST_PARAMS>
->(
-  "/api/polling_stations/5/data_entries" satisfies DATA_ENTRIES_AND_RESULT_DELETE_REQUEST_PATH,
+// reset data entry handler
+export const PollingStationDataEntryResetHandler = http.delete<ParamsToString<DATA_ENTRY_RESET_REQUEST_PARAMS>>(
+  "/api/polling_stations/5/data_entries" satisfies DATA_ENTRY_RESET_REQUEST_PATH,
   () => new HttpResponse(null, { status: 204 }),
 );
 
@@ -538,7 +536,7 @@ export const handlers: HttpHandler[] = [
   PollingStationDataEntryClaimHandler,
   PollingStationDataEntryDeleteHandler,
   PollingStationDataEntryFinaliseHandler,
-  PollingStationDataEntriesAndResultDeleteHandler,
+  PollingStationDataEntryResetHandler,
   PollingStationCreateHandler,
   PollingStationDeleteHandler,
   PollingStationUpdateHandler,

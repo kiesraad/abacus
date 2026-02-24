@@ -320,12 +320,12 @@ export const getElectionMockData = (
 ): Required<ElectionDetailsResponse> => {
   const updatedCommitteeSession = getCommitteeSessionMockData(committeeSession);
 
-  // If committee session number > 1, add id_prev_session to polling stations
+  // If committee session number > 1, add prev_data_entry_id to polling stations
   const pollingStations =
     updatedCommitteeSession.number > 1
       ? pollingStationMockData.map((ps) => ({
           ...ps,
-          id_prev_session: 1000 + ps.id,
+          prev_data_entry_id: 1000 + ps.id,
         }))
       : pollingStationMockData;
 

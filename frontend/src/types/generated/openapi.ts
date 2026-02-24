@@ -201,10 +201,10 @@ export type LOGOUT_REQUEST_PARAMS = Record<string, never>;
 export type LOGOUT_REQUEST_PATH = `/api/logout`;
 
 // /api/polling_stations/{polling_station_id}/data_entries
-export interface DATA_ENTRIES_AND_RESULT_DELETE_REQUEST_PARAMS {
+export interface DATA_ENTRY_RESET_REQUEST_PARAMS {
   polling_station_id: PollingStationId;
 }
-export type DATA_ENTRIES_AND_RESULT_DELETE_REQUEST_PATH = `/api/polling_stations/${PollingStationId}/data_entries`;
+export type DATA_ENTRY_RESET_REQUEST_PATH = `/api/polling_stations/${PollingStationId}/data_entries`;
 
 // /api/polling_stations/{polling_station_id}/data_entries/get
 export interface DATA_ENTRY_GET_REQUEST_PARAMS {
@@ -1018,13 +1018,13 @@ export interface PollingStation {
   data_entry_id?: DataEntryId;
   election_id: ElectionId;
   id: PollingStationId;
-  id_prev_session?: PollingStationId;
   locality: string;
   name: string;
   number: number;
   number_of_voters?: number;
   polling_station_type?: PollingStationType;
   postal_code: string;
+  prev_data_entry_id?: DataEntryId;
 }
 
 export interface PollingStationDetails {
@@ -1032,12 +1032,12 @@ export interface PollingStationDetails {
   polling_station_committee_session_id: CommitteeSessionId;
   polling_station_election_id: ElectionId;
   polling_station_id: PollingStationId;
-  polling_station_id_prev_session?: PollingStationId;
   polling_station_locality: string;
   polling_station_name: string;
   polling_station_number: number;
   polling_station_number_of_voters?: number;
   polling_station_postal_code: string;
+  polling_station_prev_data_entry_id?: DataEntryId;
   polling_station_type?: string;
 }
 
@@ -1141,7 +1141,7 @@ export type ResolveDifferencesAction = (typeof resolveDifferencesActionValues)[n
 export const resolveErrorsActionValues = ["discard_first_entry", "resume_first_entry"] as const;
 export type ResolveErrorsAction = (typeof resolveErrorsActionValues)[number];
 
-export const roleValues = ["administrator", "typist", "coordinator"] as const;
+export const roleValues = ["administrator", "coordinator_gsb", "coordinator_csb", "typist_gsb", "typist_csb"] as const;
 export type Role = (typeof roleValues)[number];
 
 /**

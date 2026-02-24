@@ -3,5 +3,5 @@ import type { RouteObject } from "react-router";
 import { DataEntryHomePage } from "./components/DataEntryHomePage";
 
 export const dataEntryHomeRoutes: RouteObject[] = [
-  { index: true, Component: DataEntryHomePage, handle: { roles: ["typist"] } },
+  { index: true, Component: DataEntryHomePage, handle: { roles: ["typist_gsb"] } },
 ];

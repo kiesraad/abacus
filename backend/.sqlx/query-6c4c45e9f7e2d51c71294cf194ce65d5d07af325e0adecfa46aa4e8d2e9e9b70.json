@@ -1,6 +1,6 @@
 {
   "db_name": "SQLite",
-  "query": "INSERT INTO users (username, fullname, password_hash, needs_password_change, role)\n        VALUES (?, ?, ?, ?, ?)\n        RETURNING\n            id as \"id: UserId\",\n            username,\n            fullname,\n            password_hash,\n            needs_password_change as \"needs_password_change: bool\",\n            role,\n            last_activity_at as \"last_activity_at: _\",\n            updated_at as \"updated_at: _\",\n            created_at as \"created_at: _\"\n        ",
+  "query": "\n        SELECT\n            id as \"id: UserId\",\n            username,\n            fullname,\n            role as \"role: _\",\n            password_hash,\n            needs_password_change as \"needs_password_change: bool\",\n            last_activity_at as \"last_activity_at: _\",\n            updated_at as \"updated_at: _\",\n            created_at as \"created_at: _\"\n        FROM users WHERE id = ?\n        ",
   "describe": {
     "columns": [
       {
@@ -19,19 +19,19 @@
         "type_info": "Text"
       },
       {
-        "name": "password_hash",
+        "name": "role: _",
         "ordinal": 3,
         "type_info": "Text"
       },
       {
-        "name": "needs_password_change: bool",
+        "name": "password_hash",
         "ordinal": 4,
-        "type_info": "Integer"
+        "type_info": "Text"
       },
       {
-        "name": "role",
+        "name": "needs_password_change: bool",
         "ordinal": 5,
-        "type_info": "Text"
+        "type_info": "Integer"
       },
       {
         "name": "last_activity_at: _",
@@ -50,7 +50,7 @@
       }
     ],
     "parameters": {
-      "Right": 5
+      "Right": 1
     },
     "nullable": [
       false,
@@ -64,5 +64,5 @@
       false
     ]
   },
-  "hash": "d41b15734795ae1c9d45311d55effbccd8407295f52aaa08836089432f4bc551"
+  "hash": "6c4c45e9f7e2d51c71294cf194ce65d5d07af325e0adecfa46aa4e8d2e9e9b70"
 }

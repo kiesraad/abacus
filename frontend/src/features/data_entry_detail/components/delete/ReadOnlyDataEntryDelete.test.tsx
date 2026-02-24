@@ -2,10 +2,10 @@ import { userEvent } from "@testing-library/user-event";
 import { beforeEach, describe, expect, type Mock, test, vi } from "vitest";
 
 import { pollingStationMockData } from "@/testing/api-mocks/PollingStationMockData";
-import { PollingStationDataEntriesAndResultDeleteHandler } from "@/testing/api-mocks/RequestHandlers";
+import { PollingStationDataEntryResetHandler } from "@/testing/api-mocks/RequestHandlers";
 import { overrideOnce, server } from "@/testing/server";
 import { render, screen, spyOnHandler } from "@/testing/test-utils";
-import type { DATA_ENTRIES_AND_RESULT_DELETE_REQUEST_PATH, DataEntryStatusName } from "@/types/generated/openapi";
+import type { DATA_ENTRY_RESET_REQUEST_PATH, DataEntryStatusName } from "@/types/generated/openapi";
 
 import { ReadOnlyDataEntryDelete } from "./ReadOnlyDataEntryDelete";
 
@@ -27,8 +27,8 @@ describe("ReadOnlyDataEntryDelete", () => {
   let deleteDataEntry: Mock;
 
   beforeEach(() => {
-    server.use(PollingStationDataEntriesAndResultDeleteHandler);
-    deleteDataEntry = spyOnHandler(PollingStationDataEntriesAndResultDeleteHandler);
+    server.use(PollingStationDataEntryResetHandler);
+    deleteDataEntry = spyOnHandler(PollingStationDataEntryResetHandler);
   });
 
   test("delete after confirm", async () => {
@@ -82,16 +82,11 @@ describe("ReadOnlyDataEntryDelete", () => {
   });
 
   test("on error", async () => {
-    overrideOnce(
-      "delete",
-      "/api/polling_stations/5/data_entries" satisfies DATA_ENTRIES_AND_RESULT_DELETE_REQUEST_PATH,
-      401,
-      {
-        error: "Invalid session",
-        fatal: false,
-        reference: "InvalidSession",
-      },
-    );
+    overrideOnce("delete", "/api/polling_stations/5/data_entries" satisfies DATA_ENTRY_RESET_REQUEST_PATH, 401, {
+      error: "Invalid session",
+      fatal: false,
+      reference: "InvalidSession",
+    });
 
     const { onDeleted, onError } = renderComponent("first_entry_finalised");
 

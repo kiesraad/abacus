@@ -203,7 +203,7 @@ pub struct AccountUpdateRequest {
       (status = 401, description = "Invalid user session", body = ErrorResponse),
       (status = 500, description = "Internal server error", body = ErrorResponse),
   ),
-  security(("cookie_auth" = ["administrator", "coordinator", "typist"])),
+  security(("cookie_auth" = ["administrator", "coordinator_gsb", "typist_gsb"])),
 )]
 async fn account(user: Option<User>) -> Result<impl IntoResponse, APIError> {
     let user = user.ok_or(AuthenticationError::UserNotFound)?;
@@ -221,7 +221,7 @@ async fn account(user: Option<User>) -> Result<impl IntoResponse, APIError> {
       (status = 400, description = "Bad request", body = ErrorResponse),
       (status = 500, description = "Internal server error", body = ErrorResponse),
   ),
-  security(("cookie_auth" = ["administrator", "coordinator", "typist"])),
+  security(("cookie_auth" = ["administrator", "coordinator_gsb", "typist_gsb"])),
 )]
 async fn account_update(
     IncompleteUser(user): IncompleteUser,

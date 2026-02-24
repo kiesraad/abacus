@@ -414,6 +414,9 @@ VALUES (4, 'Test Election < 19 seats', 'GSB', 'CSO', 'TestLocation_2026', 'Test 
 INSERT INTO committee_sessions (id, number, election_id, status, location, start_date_time)
 VALUES (4, 1, 4, 'data_entry', '', NULL);
 
-INSERT INTO polling_stations (id, committee_session_id, id_prev_session, name, number, number_of_voters, polling_station_type, address,
+INSERT INTO data_entries (id, state, updated_at)
+VALUES (7, '{"status":"Empty"}', '2024-12-05 09:15:00');
+
+INSERT INTO polling_stations (id, committee_session_id, prev_data_entry_id, data_entry_id, name, number, number_of_voters, polling_station_type, address,
                               postal_code, locality)
-VALUES (7, 4, NULL, 'Testgebouw', 40, NULL, 'FixedLocation', 'Testweg 3', '1234 QA', 'Klein Dorp');
+VALUES (7, 4, NULL, 7, 'Testgebouw', 40, NULL, 'FixedLocation', 'Testweg 3', '1234 QA', 'Klein Dorp');

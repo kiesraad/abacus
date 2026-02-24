@@ -11,7 +11,7 @@ use crate::{
     api::{
         data_entry::delete_data_entry_for_polling_station,
         investigation::delete_investigation_for_polling_station,
-        middleware::authentication::{AdminOrCoordinator, error::AuthenticationError},
+        middleware::authentication::{AdminOrCoordinatorGSB, error::AuthenticationError},
     },
     domain::{
         committee_session::CommitteeSession,
@@ -27,7 +27,7 @@ use crate::{
     infra::audit_log::{AuditEvent, AuditService, PollingStationImportDetails},
     repository::{
         committee_session_repo::get_election_committee_session,
-        election_repo,
+        data_entry_repo, election_repo,
         polling_station_repo::{create, create_many, delete, get_for_election, list, update},
         user_repo::User,
     },
@@ -58,7 +58,7 @@ pub fn router() -> OpenApiRouter<AppState> {
     params(
         ("election_id" = ElectionId, description = "Election database id"),
     ),
-    security(("cookie_auth" = ["administrator", "coordinator", "typist"])),
+    security(("cookie_auth" = ["administrator", "coordinator_gsb", "typist_gsb"])),
 )]
 async fn polling_station_list(
     _user: User,
@@ -78,13 +78,13 @@ async fn polling_station_list(
 }
 
 pub fn validate_user_is_allowed_to_perform_action(
-    user: AdminOrCoordinator,
+    AdminOrCoordinatorGSB(user): AdminOrCoordinatorGSB,
     committee_session: &CommitteeSession,
 ) -> Result<(), APIError> {
     // Check if the user is allowed to perform the action in this committee session status,
     // respond with FORBIDDEN otherwise
-    if user.is_coordinator()
-        || (user.is_administrator()
+    if user.role().is_coordinator()
+        || (user.role().is_administrator()
             && (committee_session.status == CommitteeSessionStatus::Created
                 || committee_session.status == CommitteeSessionStatus::InPreparation))
     {
@@ -110,10 +110,10 @@ pub fn validate_user_is_allowed_to_perform_action(
     params(
         ("election_id" = ElectionId, description = "Election database id"),
     ),
-    security(("cookie_auth" = ["administrator", "coordinator"])),
+    security(("cookie_auth" = ["administrator", "coordinator_gsb"])),
 )]
 async fn polling_station_create(
-    user: AdminOrCoordinator,
+    user: AdminOrCoordinatorGSB,
     State(pool): State<SqlitePool>,
     Path(election_id): Path<ElectionId>,
     audit_service: AuditService,
@@ -127,7 +127,12 @@ async fn polling_station_create(
 
     validate_user_is_allowed_to_perform_action(user, &committee_session)?;
 
-    let polling_station = create(&mut tx, election_id, new_polling_station).await?;
+    let mut polling_station = create(&mut tx, election_id, new_polling_station).await?;
+
+    if !committee_session.is_next_session() {
+        let data_entry = data_entry_repo::create_empty(&mut tx, polling_station.id).await?;
+        polling_station.data_entry_id = Some(data_entry.id);
+    }
 
     audit_service
         .log(
@@ -176,7 +181,7 @@ async fn polling_station_create(
         ("election_id" = ElectionId, description = "Election database id"),
         ("polling_station_id" = PollingStationId, description = "Polling station database id"),
     ),
-    security(("cookie_auth" = ["administrator", "coordinator", "typist"])),
+    security(("cookie_auth" = ["administrator", "coordinator_gsb", "typist_gsb"])),
 )]
 async fn polling_station_get(
     _user: User,
@@ -206,10 +211,10 @@ async fn polling_station_get(
         ("election_id" = ElectionId, description = "Election database id"),
         ("polling_station_id" = PollingStationId, description = "Polling station database id"),
     ),
-    security(("cookie_auth" = ["administrator", "coordinator"])),
+    security(("cookie_auth" = ["administrator", "coordinator_gsb"])),
 )]
 async fn polling_station_update(
-    user: AdminOrCoordinator,
+    user: AdminOrCoordinatorGSB,
     State(pool): State<SqlitePool>,
     audit_service: AuditService,
     Path((election_id, polling_station_id)): Path<(ElectionId, PollingStationId)>,
@@ -270,10 +275,10 @@ async fn polling_station_update(
         ("election_id" = ElectionId, description = "Election database id"),
         ("polling_station_id" = PollingStationId, description = "Polling station database id"),
     ),
-    security(("cookie_auth" = ["administrator", "coordinator"])),
+    security(("cookie_auth" = ["administrator", "coordinator_gsb"])),
 )]
 async fn polling_station_delete(
-    user: AdminOrCoordinator,
+    user: AdminOrCoordinatorGSB,
     State(pool): State<SqlitePool>,
     audit_service: AuditService,
     Path((election_id, polling_station_id)): Path<(ElectionId, PollingStationId)>,
@@ -344,10 +349,10 @@ async fn polling_station_delete(
     params(
         ("election_id" = ElectionId, description = "Election database id"),
     ),
-    security(("cookie_auth" = ["administrator", "coordinator"])),
+    security(("cookie_auth" = ["administrator", "coordinator_gsb"])),
 )]
 async fn polling_station_validate_import(
-    _user: AdminOrCoordinator,
+    _user: AdminOrCoordinatorGSB,
     Json(polling_station_request): Json<PollingStationFileRequest>,
 ) -> Result<(StatusCode, Json<PollingStationRequestListResponse>), APIError> {
     Ok((
@@ -373,7 +378,14 @@ pub async fn create_imported_polling_stations(
     let file_hash = EmlHash::from(polling_stations_request.polling_stations.as_bytes()).chunks;
 
     // Create new polling stations
-    let polling_stations = create_many(&mut tx, election_id, polling_stations).await?;
+    let mut polling_stations = create_many(&mut tx, election_id, polling_stations).await?;
+
+    if !committee_session.is_next_session() {
+        for polling_station in &mut polling_stations {
+            let data_entry = data_entry_repo::create_empty(&mut tx, polling_station.id).await?;
+            polling_station.data_entry_id = Some(data_entry.id);
+        }
+    }
 
     // Create audit event
     audit_service
@@ -423,10 +435,10 @@ pub async fn create_imported_polling_stations(
     params(
         ("election_id" = ElectionId, description = "Election database id"),
     ),
-    security(("cookie_auth" = ["administrator", "coordinator"])),
+    security(("cookie_auth" = ["administrator", "coordinator_gsb"])),
 )]
 async fn polling_station_import(
-    _user: AdminOrCoordinator,
+    _user: AdminOrCoordinatorGSB,
     State(pool): State<SqlitePool>,
     Path(election_id): Path<ElectionId>,
     audit_service: AuditService,
@@ -474,7 +486,7 @@ mod tests {
 
         // Insert two unique polling stations
         let _ = query!(r#"
-INSERT INTO polling_stations (id, committee_session_id, id_prev_session, name, number, number_of_voters, polling_station_type, address, postal_code, locality)
+INSERT INTO polling_stations (id, committee_session_id, prev_data_entry_id, name, number, number_of_voters, polling_station_type, address, postal_code, locality)
 VALUES
 (1, 2, NULL, 'Op Rolletjes', 33, NULL, 'mobiel', 'Rijksweg A12 1', '1234 YQ', 'Den Haag'),
 (2, 2, NULL, 'Testplek', 34, NULL, 'bijzonder', 'Teststraat 2b', '1234 QY', 'Testdorp')
@@ -485,7 +497,7 @@ VALUES
 
         // Add a polling station with the same number to a different election
         let _ = query!(r#"
-INSERT INTO polling_stations (id, committee_session_id, id_prev_session, name, number, number_of_voters, polling_station_type, address, postal_code, locality)
+INSERT INTO polling_stations (id, committee_session_id, prev_data_entry_id, name, number, number_of_voters, polling_station_type, address, postal_code, locality)
 VALUES
 (3, 3, NULL, 'Op Rolletjes', 33, NULL, 'mobiel', 'Rijksweg A12 1', '1234 YQ', 'Den Haag');
 "#)
@@ -495,7 +507,7 @@ VALUES
 
         // Add a polling station with a duplicate number and assert that it fails
         let result = query!(r#"
-INSERT INTO polling_stations (id, committee_session_id, id_prev_session, name, number, number_of_voters, polling_station_type, address, postal_code, locality)
+INSERT INTO polling_stations (id, committee_session_id, prev_data_entry_id, name, number, number_of_voters, polling_station_type, address, postal_code, locality)
 VALUES
 (4, 2, NULL, 'Op Rolletjes', 33, NULL, 'mobiel', 'Rijksweg A12 1', '1234 YQ', 'Den Haag');
 "#)
@@ -592,7 +604,7 @@ VALUES
         let election_id = ElectionId::from(7);
         let polling_station_id = PollingStationId::from(741);
 
-        // Update a polling station that has an id_prev_session reference
+        // Update a polling station that has a prev_data_entry_id reference
         // ... without number change
         let result = update(&mut conn, election_id, polling_station_id, data.clone()).await;
         assert!(result.is_ok());
@@ -605,7 +617,7 @@ VALUES
 
     #[test(sqlx::test(fixtures(path = "../../fixtures", scripts("election_7_four_sessions"))))]
     async fn test_delete_restricted_when_prev_session(pool: SqlitePool) {
-        // Try to delete a polling station that has an id_prev_session reference
+        // Try to delete a polling station that has a prev_data_entry_id reference
         let result = query!("DELETE FROM polling_stations WHERE id = 721")
             .execute(&pool)
             .await;

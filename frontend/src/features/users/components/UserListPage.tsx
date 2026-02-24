@@ -28,7 +28,7 @@ export function UserListPage() {
 
   const users = requestState.data.users;
 
-  const sortedRoles: Role[] = ["administrator", "coordinator", "typist"];
+  const sortedRoles: Role[] = ["administrator", "coordinator_gsb", "typist_gsb"];
   users.sort((a, b) => {
     const roleCompare = sortedRoles.indexOf(a.role) - sortedRoles.indexOf(b.role);
     if (roleCompare !== 0) {

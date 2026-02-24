@@ -48,7 +48,7 @@ export function LogDetailsModal({ details, setDetails }: LogDetailsModalProps) {
   const filteredDetails: [string, string, AuditEventValues][] = Object.entries(event).map(
     ([key, value]: [string, unknown]) => {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
-      return [key, translateOrWarn(key), value as AuditEventValues];
+      return [key, translateOrWarn(`log.field.${key}`), value as AuditEventValues];
     },
   );
 

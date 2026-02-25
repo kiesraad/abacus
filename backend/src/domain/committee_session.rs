@@ -12,7 +12,7 @@ use crate::{
         committee_session_status::CommitteeSessionStatus, election::ElectionId, file::FileId,
         id::id, investigation::PollingStationInvestigation,
     },
-    infra::audit_log::{AsAuditEvent, AuditEvent, AuditEventType, as_audit_event},
+    infra::audit_log::{AsAuditEvent, AuditEventType, as_audit_event},
 };
 
 #[derive(Debug, PartialEq, Eq)]

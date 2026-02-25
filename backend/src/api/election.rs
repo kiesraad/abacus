@@ -30,7 +30,7 @@ use crate::{
         polling_station::{PollingStation, PollingStationRequest, PollingStationsRequest},
     },
     eml::{EML110, EML230, EMLDocument, EMLImportError, EmlHash, RedactedEmlHash},
-    infra::audit_log::{AsAuditEvent, AuditEvent, AuditEventType, AuditService, as_audit_event},
+    infra::audit_log::{AsAuditEvent, AuditEventType, AuditService, as_audit_event},
     repository::{
         committee_session_repo, election_repo, investigation_repo, polling_station_repo,
         user_repo::User,

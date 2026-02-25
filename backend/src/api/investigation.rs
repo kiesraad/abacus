@@ -30,7 +30,7 @@ use crate::{
         votes_table::VotesTablesWithOnlyPreviousVotes,
     },
     error::ErrorReference,
-    infra::audit_log::{AsAuditEvent, AuditEvent, AuditEventType, AuditService, as_audit_event},
+    infra::audit_log::{AsAuditEvent, AuditEventType, AuditService, as_audit_event},
     repository::{
         committee_session_repo::get_election_committee_session,
         data_entry_repo::{self, data_entry_exists, previous_results_for_polling_station},

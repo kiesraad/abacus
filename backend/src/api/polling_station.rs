@@ -27,7 +27,7 @@ use crate::{
         },
     },
     eml::{EML110, EMLDocument, EMLImportError, EmlHash},
-    infra::audit_log::{AsAuditEvent, AuditEvent, AuditEventType, AuditService, as_audit_event},
+    infra::audit_log::{AsAuditEvent, AuditEventType, AuditService, as_audit_event},
     repository::{
         committee_session_repo::get_election_committee_session,
         data_entry_repo, election_repo,

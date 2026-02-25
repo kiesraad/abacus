@@ -27,7 +27,7 @@ macro_rules! as_audit_event {
     ($identifier:ident, $audit_event_type:path) => {
         impl AsAuditEvent for $identifier {
             fn as_audit_event(&self) -> Result<crate::audit_log::AuditEvent, serde_json::Error> {
-                Ok(AuditEvent {
+                Ok(crate::audit_log::AuditEvent {
                     event_type: $audit_event_type,
                     data: serde_json::to_value(self)?,
                 })

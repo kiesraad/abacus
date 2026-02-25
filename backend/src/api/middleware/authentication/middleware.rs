@@ -14,7 +14,7 @@ use super::{SESSION_LIFE_TIME, SESSION_MIN_LIFE_TIME, session::get_expires_at};
 use crate::{
     SqlitePoolExt,
     api::authentication::set_default_cookie_properties,
-    infra::audit_log::{AsAuditEvent, AuditEvent, AuditEventType, AuditService, as_audit_event},
+    infra::audit_log::{AsAuditEvent, AuditEventType, AuditService, as_audit_event},
     repository::{
         session_repo::{self, Session, SessionIdentifier},
         user_repo::{self, User},

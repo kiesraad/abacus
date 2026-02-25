@@ -20,7 +20,7 @@ use crate::{
     },
     domain::role::Role,
     error::ErrorReference,
-    infra::audit_log::{AsAuditEvent, AuditEvent, AuditEventType, AuditService, as_audit_event},
+    infra::audit_log::{AsAuditEvent, AuditEventType, AuditService, as_audit_event},
     repository::{
         session_repo::{self, Session},
         user_repo::{self, User, UserId},

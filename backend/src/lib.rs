@@ -30,7 +30,7 @@ use utoipa::ToSchema;
 
 use crate::{
     app_error::{DatabaseErrorWithPath, DatabaseMigrationErrorWithPath},
-    infra::audit_log::{AsAuditEvent, AuditEvent, AuditEventType, as_audit_event},
+    infra::audit_log::{AsAuditEvent, AuditEventType, as_audit_event},
 };
 
 /// Maximum size of the request body in megabytes.

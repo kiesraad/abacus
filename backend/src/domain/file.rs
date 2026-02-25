@@ -5,7 +5,7 @@ use utoipa::ToSchema;
 
 use crate::{
     domain::id::id,
-    infra::audit_log::{AsAuditEvent, AuditEvent, AuditEventType, as_audit_event},
+    infra::audit_log::{AsAuditEvent, AuditEventType, as_audit_event},
 };
 
 id!(FileId);

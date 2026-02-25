@@ -170,8 +170,6 @@ pub async fn insert_test_investigation(
     polling_station_id: PollingStationId,
     corrected_results: Option<bool>,
 ) -> Result<(), sqlx::Error> {
-    use sqlx::query;
-
     query!(
         "INSERT INTO polling_station_investigations (polling_station_id, reason, findings, corrected_results) VALUES (?, ?, ?, ?)",
         polling_station_id,
@@ -181,10 +179,6 @@ pub async fn insert_test_investigation(
     )
     .execute(&mut *conn)
     .await?;
-
-    if corrected_results == Some(true) {
-        crate::repository::data_entry_repo::create_empty(conn, polling_station_id).await?;
-    }
 
     Ok(())
 }

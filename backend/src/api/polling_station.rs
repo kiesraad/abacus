@@ -30,11 +30,11 @@ use crate::{
     infra::audit_log::{AsAuditEvent, AuditEvent, AuditEventType, AuditService, as_audit_event},
     repository::{
         committee_session_repo::get_election_committee_session,
-        data_entry_repo, election_repo,
+        election_repo,
         polling_station_repo::{create, create_many, delete, get_for_election, list, update},
         user_repo::User,
     },
-    service::change_committee_session_status,
+    service::{change_committee_session_status, create_empty_data_entry},
 };
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, Eq, ToSchema)]
@@ -179,8 +179,7 @@ async fn polling_station_create(
     let mut polling_station = create(&mut tx, election_id, new_polling_station).await?;
 
     if !committee_session.is_next_session() {
-        let data_entry = data_entry_repo::create_empty(&mut tx, polling_station.id).await?;
-        polling_station.data_entry_id = Some(data_entry.id);
+        polling_station = create_empty_data_entry(&mut tx, polling_station.id).await?;
     }
 
     audit_service
@@ -431,8 +430,7 @@ pub async fn create_imported_polling_stations(
 
     if !committee_session.is_next_session() {
         for polling_station in &mut polling_stations {
-            let data_entry = data_entry_repo::create_empty(&mut tx, polling_station.id).await?;
-            polling_station.data_entry_id = Some(data_entry.id);
+            *polling_station = create_empty_data_entry(&mut tx, polling_station.id).await?;
         }
     }
 

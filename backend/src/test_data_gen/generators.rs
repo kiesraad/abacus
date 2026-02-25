@@ -29,6 +29,7 @@ use crate::{
         data_entry_repo::list_results_for_committee_session, election_repo, polling_station_repo,
         user_repo::UserId,
     },
+    service::create_empty_data_entry,
     test_data_gen::GenerateElectionArgs,
 };
 
@@ -264,10 +265,9 @@ async fn generate_polling_stations(
         )
         .await
         .expect("Failed to create polling station");
-        let data_entry = data_entry_repo::create_empty(conn, ps.id)
+        ps = create_empty_data_entry(conn, ps.id)
             .await
             .expect("Failed to create empty data entry");
-        ps.data_entry_id = Some(data_entry.id);
         polling_stations.push(ps);
     }
 

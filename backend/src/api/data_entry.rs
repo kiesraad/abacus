@@ -947,9 +947,9 @@ mod tests {
         repository::{
             committee_session_repo::change_status,
             data_entry_repo::{data_entry_exists, get_data_entries},
-            investigation_repo::insert_test_investigation,
             polling_station_repo::insert_test_polling_station,
         },
+        service::create_test_investigation,
     };
 
     fn example_data_entry() -> DataEntry {
@@ -1287,7 +1287,7 @@ mod tests {
         let mut conn = pool.acquire().await.unwrap();
         let polling_station_id = PollingStationId::from(742);
         // Insert investigation
-        insert_test_investigation(&mut conn, polling_station_id, Some(false))
+        create_test_investigation(&mut conn, polling_station_id, Some(false))
             .await
             .unwrap();
 
@@ -1311,7 +1311,7 @@ mod tests {
         let polling_station_id = PollingStationId::from(742);
         // Insert investigation with corrected_results and create empty data entry
         // (simulates what the investigation conclude flow does)
-        insert_test_investigation(&mut conn, polling_station_id, Some(true))
+        create_test_investigation(&mut conn, polling_station_id, Some(true))
             .await
             .unwrap();
 
@@ -1444,13 +1444,9 @@ mod tests {
         let polling_station_id = PollingStationId::from(9);
 
         // Add investigation with corrected_results and create empty data entry
-        insert_test_investigation(
-            &mut pool.acquire().await.unwrap(),
-            polling_station_id,
-            Some(true),
-        )
-        .await
-        .unwrap();
+        create_test_investigation(&mut conn, polling_station_id, Some(true))
+            .await
+            .unwrap();
 
         // Claim a polling station that had entries/a result in the previous committee session
         let response = claim(pool.clone(), polling_station_id, EntryNumber::FirstEntry).await;
@@ -2343,7 +2339,7 @@ mod tests {
         .unwrap();
 
         // Add investigation with corrected_results and create empty data entry
-        insert_test_investigation(&mut conn, polling_station_id, Some(true))
+        create_test_investigation(&mut conn, polling_station_id, Some(true))
             .await
             .unwrap();
 
@@ -2367,7 +2363,7 @@ mod tests {
         let mut conn = pool.acquire().await.unwrap();
         let polling_station_id = PollingStationId::from(742);
         // Add investigation with corrected_results and create empty data entry
-        insert_test_investigation(&mut conn, polling_station_id, Some(true))
+        create_test_investigation(&mut conn, polling_station_id, Some(true))
             .await
             .unwrap();
 

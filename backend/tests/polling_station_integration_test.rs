@@ -2,8 +2,7 @@
 
 use std::net::SocketAddr;
 
-use axum::http::StatusCode;
-use hyper::http::HeaderValue;
+use axum::http::{HeaderValue, StatusCode};
 use reqwest::Response;
 use sqlx::SqlitePool;
 use test_log::test;

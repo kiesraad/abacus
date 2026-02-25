@@ -42,9 +42,9 @@ pub(crate) use as_audit_event;
 #[derive(Serialize, Deserialize, Debug, PartialEq, Eq, ToSchema)]
 #[serde(deny_unknown_fields)]
 pub struct ErrorDetails {
-    pub reference: ErrorReference,
+    pub error_reference: ErrorReference,
     pub path: String,
-    pub level: AuditEventLevel,
+    pub fatal: bool,
 }
 
 impl ErrorDetails {
@@ -53,13 +53,9 @@ impl ErrorDetails {
             // ignore common user errors
             ErrorReference::InvalidSession | ErrorReference::UserNotFound => None,
             _ => Some(Self {
-                reference: error_response.reference,
+                error_reference: error_response.reference,
                 path: original_uri.path().to_string(),
-                level: if error_response.fatal {
-                    AuditEventLevel::Error
-                } else {
-                    AuditEventLevel::Warning
-                },
+                fatal: error_response.fatal,
             }),
         }
     }
@@ -68,11 +64,14 @@ impl ErrorDetails {
 impl AsAuditEvent for ErrorDetails {
     fn as_audit_event(&self) -> Result<AuditEvent, serde_json::Error> {
         Ok(AuditEvent {
-            event_type: AuditEventType::Error,
+            event_type: if self.fatal {
+                AuditEventType::ApiError
+            } else {
+                AuditEventType::ApiWarning
+            },
             data: json!({
-                "reference": self.reference,
+                "error_reference": self.error_reference,
                 "path": self.path,
-                "level": self.level,
             }),
         })
     }
@@ -140,8 +139,9 @@ pub enum AuditEventType {
     AirGapViolationResolved,
     // system events
     ApplicationStarted,
-    // generic errors (one for each severity level)
-    Error,
+    // API events (one for each severity level)
+    ApiError,
+    ApiWarning,
 
     #[default]
     UnknownEvent,
@@ -199,7 +199,8 @@ impl AuditEventType {
             AuditEventType::DataEntryDiscardedBoth => AuditEventLevel::Info,
             AuditEventType::AirGapViolationDetected => AuditEventLevel::Error,
             AuditEventType::AirGapViolationResolved => AuditEventLevel::Info,
-            AuditEventType::Error => AuditEventLevel::Error,
+            AuditEventType::ApiError => AuditEventLevel::Error,
+            AuditEventType::ApiWarning => AuditEventLevel::Warning,
         }
     }
 }

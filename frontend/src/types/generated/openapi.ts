@@ -365,7 +365,8 @@ export const auditEventTypeValues = [
   "AirGapViolationDetected",
   "AirGapViolationResolved",
   "ApplicationStarted",
-  "Error",
+  "ApiError",
+  "ApiWarning",
   "UnknownEvent",
 ] as const;
 export type AuditEventType = (typeof auditEventTypeValues)[number];

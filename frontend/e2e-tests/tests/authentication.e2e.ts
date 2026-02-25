@@ -19,7 +19,7 @@ test.describe("authentication", () => {
 
     const userInfoTopBar = new UserInfoTopBar(page);
     await expect(userInfoTopBar.username).toHaveText("Jef van Reybrouck");
-    await expect(userInfoTopBar.role).toHaveText("(Beheerder)");
+    await expect(userInfoTopBar.role).toHaveText("(beheerder)");
   });
 
   test("login unhappy path", async ({ page }) => {

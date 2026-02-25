@@ -66,20 +66,16 @@ impl From<DataEntryTransitionError> for APIError {
     }
 }
 
-#[derive(Serialize, Deserialize, Debug, PartialEq, Eq, ToSchema)]
-#[serde(deny_unknown_fields)]
+#[derive(Serialize)]
 pub struct DataEntryDetails {
     pub data_entry_id: DataEntryId,
     pub data_entry_status: String,
     pub data_entry_progress: String,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[schema(value_type = String)]
     pub finished_at: Option<DateTime<Utc>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[schema(nullable = false)]
     pub first_entry_user_id: Option<UserId>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[schema(nullable = false)]
     pub second_entry_user_id: Option<UserId>,
 }
 

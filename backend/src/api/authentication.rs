@@ -32,8 +32,7 @@ impl From<AuthenticationError> for APIError {
         APIError::Authentication(err)
     }
 }
-#[derive(Serialize, Deserialize, Debug, PartialEq, Eq, ToSchema)]
-#[serde(deny_unknown_fields)]
+#[derive(Serialize)]
 pub struct UserLoggedInDetails {
     pub user_agent: String,
     pub logged_in_users_count: u32,
@@ -41,16 +40,14 @@ pub struct UserLoggedInDetails {
 
 as_audit_event!(UserLoggedInDetails, AuditEventType::UserLoggedIn);
 
-#[derive(Serialize, Deserialize, Debug, PartialEq, Eq, ToSchema)]
-#[serde(deny_unknown_fields)]
+#[derive(Serialize)]
 pub struct UserLoggedOutDetails {
     pub session_duration: u64,
 }
 
 as_audit_event!(UserLoggedOutDetails, AuditEventType::UserLoggedOut);
 
-#[derive(Serialize, Deserialize, Debug, PartialEq, Eq, ToSchema)]
-#[serde(deny_unknown_fields)]
+#[derive(Serialize)]
 pub struct UserLoginFailedDetails {
     pub username: String,
     pub user_agent: String,
@@ -58,12 +55,10 @@ pub struct UserLoginFailedDetails {
 
 as_audit_event!(UserLoginFailedDetails, AuditEventType::UserLoginFailed);
 
-#[derive(Serialize, Deserialize, Debug, PartialEq, Eq, ToSchema)]
-#[serde(deny_unknown_fields)]
+#[derive(Serialize)]
 pub struct UserDetails {
     pub user_id: UserId,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[schema(value_type = String, nullable = false)]
     pub fullname: Option<String>,
     pub username: String,
     pub role: String,

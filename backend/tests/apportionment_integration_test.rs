@@ -372,3 +372,147 @@ async fn test_error_invalid_election(pool: SqlitePool) {
     let body: serde_json::Value = response.json().await.unwrap();
     assert_eq!(body["error"], "Item not found");
 }
+
+#[test(sqlx::test(fixtures(path = "../fixtures", scripts("users", "election_5_with_results"))))]
+async fn test_api_output(pool: SqlitePool) {
+    let addr = serve_api(pool).await;
+
+    let response = get_apportionment(&addr, 5).await;
+    assert_eq!(response.status(), StatusCode::OK);
+    let body: serde_json::Value = response.json().await.unwrap();
+    assert_eq!(body["seat_assignment"]["seats"], 23);
+    assert_eq!(body["seat_assignment"]["full_seats"], 19);
+    assert_eq!(body["seat_assignment"]["residual_seats"], 4);
+    assert_eq!(
+        body["seat_assignment"]["quota"],
+        json!({"integer": 104, "numerator": 8, "denominator": 23})
+    );
+
+    // 4 steps
+    assert_eq!(
+        body["seat_assignment"]["steps"].as_array().unwrap().len(),
+        4
+    );
+    let first_step = &body["seat_assignment"]["steps"][0];
+    assert_eq!(first_step["residual_seat_number"], 1);
+    assert_eq!(
+        first_step["change"],
+        json!({
+              "changed_by": "HighestAverageAssignment",
+              "selected_list_number": 5,
+              "list_options": [5],
+              "list_assigned": [5],
+              "list_exhausted": [],
+              "votes_per_seat": {
+                "integer": 101,
+                "numerator": 0,
+                "denominator": 2
+              }
+        })
+    );
+
+    assert_eq!(first_step["standings"].as_array().unwrap().len(), 5);
+    assert_eq!(
+        first_step["standings"][0],
+        json!({
+          "list_number": 1,
+          "votes_cast": 1200,
+          "remainder_votes": {
+            "integer": 52,
+            "numerator": 4,
+            "denominator": 23
+          },
+          "meets_remainder_threshold": true,
+          "next_votes_per_seat": {
+            "integer": 100,
+            "numerator": 0,
+            "denominator": 12
+          },
+          "full_seats": 11,
+          "residual_seats": 0
+        })
+    );
+
+    assert_eq!(
+        body["seat_assignment"]["final_standing"]
+            .as_array()
+            .unwrap()
+            .len(),
+        5
+    );
+    assert_eq!(
+        body["seat_assignment"]["final_standing"][0],
+        json!({
+            "list_number": 1,
+            "votes_cast": 1200,
+            "remainder_votes": {
+              "integer": 52,
+              "numerator": 4,
+              "denominator": 23
+            },
+            "meets_remainder_threshold": true,
+            "full_seats": 11,
+            "residual_seats": 1,
+            "total_seats": 12
+          }
+        )
+    );
+
+    let cn = &body["candidate_nomination"];
+    assert_eq!(
+        cn["preference_threshold"],
+        json!({
+          "percentage": 25,
+          "number_of_votes": {
+            "integer": 26,
+            "numerator": 200,
+            "denominator": 2300
+          }
+        })
+    );
+    assert_eq!(cn["chosen_candidates"].as_array().unwrap().len(), 23);
+    assert_eq!(
+        cn["chosen_candidates"][0],
+        json!({
+            "number": 8,
+            "initials": "S.",
+            "first_name": "Sophie",
+            "last_name": "Bakker",
+            "locality": "Juinen",
+            "gender": "Female"
+        })
+    );
+
+    assert_eq!(cn["list_candidate_nomination"].as_array().unwrap().len(), 5);
+    let second_list_nomination = &cn["list_candidate_nomination"][1];
+    assert_eq!(second_list_nomination["list_number"], 2);
+    assert_eq!(second_list_nomination["list_name"], "Political Group B");
+    assert_eq!(second_list_nomination["list_seats"], 6);
+    assert_eq!(
+        second_list_nomination["preferential_candidate_nomination"],
+        json!([
+          {"number": 1, "votes": 300},
+          {"number": 2, "votes": 100},
+          {"number": 6, "votes": 80},
+          {"number": 5, "votes": 60},
+          {"number": 3, "votes": 44}
+        ])
+    );
+    assert_eq!(
+        second_list_nomination["other_candidate_nomination"],
+        json!([
+          {"number": 4, "votes": 20},
+        ])
+    );
+    assert_eq!(
+        second_list_nomination["updated_candidate_ranking"],
+        json!([
+            { "number": 1, "initials": "T.", "first_name": "Tinus", "last_name": "Bakker", "locality": "Test Location", "gender": "Male" },
+            { "number": 2, "initials": "D.", "last_name": "Po", "locality": "Test Location", "gender": "X" },
+            { "number": 6, "initials": "H.", "first_name": "Henk", "last_name_prefix": "van den", "last_name": "Berg", "locality": "Test Location", "gender": "Male" },
+            { "number": 5, "initials": "L.", "first_name": "Liesbeth", "last_name": "Jansen", "locality": "Test Location", "gender": "Female" },
+            { "number": 3, "initials": "W.", "first_name": "Willem", "last_name_prefix": "de", "last_name": "Vries", "locality": "Test Location", "gender": "Male" },
+            { "number": 4, "initials": "K.", "first_name": "Klaas", "last_name": "Kloosterboer", "locality": "Test Location", "gender": "Male" }
+        ])
+    );
+}

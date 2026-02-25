@@ -182,6 +182,7 @@ test.describe("full flow", () => {
 
     const electoralCommitteeRolePage = new ElectoralCommitteeRolePgObj(page);
     await expect(electoralCommitteeRolePage.header).toBeVisible();
+    await electoralCommitteeRolePage.csb.check();
     await expect(electoralCommitteeRolePage.csb).toBeChecked();
     await electoralCommitteeRolePage.next.click();
 
@@ -194,16 +195,16 @@ test.describe("full flow", () => {
     await expect(checkAndSavePage.countingMethod).toBeHidden();
     const election = await checkAndSavePage.saveElection();
 
-    electionId = election.id;
+    const csbElectionId = election.id;
 
     await expect(electionsOverviewPage.adminHeader).toBeVisible();
-    await expect(electionsOverviewPage.alertGSBElectionCreated).toBeVisible();
-    await electionsOverviewPage.findElectionRowById(electionId).click();
+    await expect(electionsOverviewPage.alertCSBElectionCreated).toBeVisible();
+    await electionsOverviewPage.findElectionRowById(csbElectionId).click();
 
     const electionHomePage = new ElectionHome(page);
     await expect(electionHomePage.header).toHaveText("Gemeenteraad Test 2022");
     const sessionCard = electionHomePage.getCommitteeSessionCard(1);
-    await expect(sessionCard).toContainText("Eerste zitting — Klaar voor invoer");
+    await expect(sessionCard).toContainText("Eerste zitting — Zitting voorbereiden");
 
     await logout(page);
   });

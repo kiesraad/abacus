@@ -1,4 +1,4 @@
-# CSS
+# CSS guidelines
 Deze pagina beschrijft een aantal CSS guidelines waar we ons aan willen houden.
 
 We hebben op dit moment twee soorten CSS-bestanden: globale CSS-bestanden en CSS Module bestanden.
